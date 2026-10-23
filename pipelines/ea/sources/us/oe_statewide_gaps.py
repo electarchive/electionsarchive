@@ -14,8 +14,16 @@ from ea.store import DATA, connect
 SOURCE = "us.oe_statewide_gaps"
 VERSION = "1"
 PARSED = DATA / "parsed" / SOURCE
-DAYS = {"IA": date(2022, 11, 8), "KY": date(2019, 11, 5), "ND": date(2018, 11, 6)}
+DAYS = {"AR": date(2022, 11, 8), "IA": date(2022, 11, 8), "KY": date(2019, 11, 5), "ND": date(2018, 11, 6)}
 OFFICES = {
+    "AR": {
+        "Lieutenant Governor": "Lieutenant Governor",
+        "Attorney General": "Attorney General",
+        "Secretary of State": "Secretary of State",
+        "State Treasurer": "Treasurer",
+        "Auditor of State": "Auditor",
+        "Commissioner of State Lands": "Commissioner of State Lands",
+    },
     "IA": {
         "Auditor of State": "Auditor",
         "Treasurer of State": "Treasurer",
@@ -34,13 +42,27 @@ TYPOS = {
     "GREGORTY D. STUMBO": "GREGORY D. STUMBO",
     "SHERIE DONAHUE": "SHERI DONAHUE",
     "RYAN R. QUARLES": "RYAN F. QUARLES",
+    "LIEUTENANT GOVERNOR TIM GRIFFIN": "TIM GRIFFIN",
+    "TREASURER OF STATE DENNIS MILLIGAN": "DENNIS MILLIGAN",
+    "TOMMY LAND COMMISSIONER OF STATE LANDS": "TOMMY LAND",
+    "ATTORNEY GENERAL LESLIE RUTLEDGE": "LESLIE RUTLEDGE",
+    "SECRETARY OF STATE JOHN THURSTON": "JOHN THURSTON",
+    "STATE REPRESENTATIVE MARK LOWERY": "MARK LOWERY",
 }
-PARTIES = {"DEM": "DEMOCRATIC", "REP": "REPUBLICAN", "LIB": "LIBERTARIAN"}
-COUNTIES = {"IA": 99, "KY": 120, "ND": 53}
+PARTIES = {
+    "DEM": "DEMOCRATIC",
+    "D": "DEMOCRATIC",
+    "REP": "REPUBLICAN",
+    "R": "REPUBLICAN",
+    "LIB": "LIBERTARIAN",
+    "L": "LIBERTARIAN",
+    "LBT": "LIBERTARIAN",
+}
+COUNTIES = {"AR": 75, "IA": 99, "KY": 120, "ND": 53}
 METHOD = (
     "County totals are sums of OpenElections' transcriptions of the official precinct returns (Iowa and Kentucky, one "
     "file per county) or of the official county returns (North Dakota), at a pinned commit, with over- and under-votes "
-    "left out. Kentucky's sums run 0.03% to 0.1% below the State Board of Elections' certified statewide totals (for "
+    "left out. Arkansas's files have no rows for Phillips County. Kentucky's sums run 0.03% to 0.1% below the State Board of Elections' certified statewide totals (for "
     "attorney general, 822,834 and 601,938 against 823,346 and 602,272), so a precinct or two is missing from "
     "OpenElections' files. The winner shown is the candidate with the most votes in those totals."
 )
@@ -120,7 +142,9 @@ def parse() -> None:
         pl.col("county").filter(pl.col("votes") > 0).unique().sort().alias("present"),
         counties=pl.col("state").first().replace_strict(COUNTIES),
     )
-    short = races.filter(pl.col("present").list.len() != pl.col("counties"))
+    short = races.filter(
+        pl.col("present").list.len() != pl.col("counties") - pl.when(pl.col("state") == "AR").then(1).otherwise(0)
+    )
     if short.height:
         raise ValueError(f"not every county: {short}")
     PARSED.mkdir(parents=True, exist_ok=True)
@@ -159,7 +183,8 @@ def emit() -> Path:
         pipeline=SOURCE,
         version=VERSION,
         parsed=PARSED,
-        summary="Iowa's 2022 auditor, treasurer, and secretary of agriculture, Kentucky's 2019 secretary of state, "
+        summary="Arkansas's 2022 lieutenant governor, attorney general, secretary of state, treasurer, auditor, "
+        "and land commissioner, Iowa's 2022 auditor, treasurer, and secretary of agriculture, Kentucky's 2019 secretary of state, "
         "attorney general, auditor, treasurer, and agriculture commissioner, and North Dakota's 2018 tax commissioner "
         "by county from OpenElections' transcriptions of the official returns",
         cite=cite,
@@ -167,9 +192,23 @@ def emit() -> Path:
         close="The leading candidates were within half a percent in these totals, so no outcome is recorded from them.",
         absent="The source has no rows for {counties} in this race, so those votes are missing from these totals.",
         declared={
+            **{
+                f"2022-11-08:AR:{office}": (
+                    winner,
+                    f"{winner} led by far more than Phillips County's missing vote and was certified elected.",
+                )
+                for office, winner in [
+                    ("lieutenant-governor", "Leslie Rutledge"),
+                    ("attorney-general", "Tim Griffin"),
+                    ("secretary-of-state", "John Thurston"),
+                    ("treasurer", "Mark Lowery"),
+                    ("auditor", "Dennis Milligan"),
+                    ("commissioner-of-state-lands", "Tommy Land"),
+                ]
+            },
             "2022-11-08:IA:auditor": (
                 "Rob Sand",
                 "Rob Sand was certified elected by the State Canvassing Board, 600,719 votes to Todd Halbur's 597,826.",
-            )
+            ),
         },
     )
