@@ -17,8 +17,9 @@ VERSION = "1"
 PARSED = DATA / "parsed" / SOURCE
 TITLE = "Canvass Summary, Fall General Election 2004: State Senator and State Assembly"
 DAY = date(2004, 11, 2)
-DOCS = {1414: "assembly", 1438: "senate"}
-OFFICE = re.compile(r"\s*State (?:Assembly|Senate), District No\. (\d+)\s*")
+HOUSE_TITLE = "Canvass Summary, Fall General Election 2004: US Congress"
+DOCS = {1414: "assembly", 1438: "senate", 1423: "house"}
+OFFICE = re.compile(r"\s*(?:State Assembly|State Senate|US Congress), District No\. (\d+)\s*")
 ROW = re.compile(r"^\s*(\S.*?)\s*:?\s{2,}((?:[\d,]+\s+)*[\d,]+)\s*$")
 
 
@@ -38,6 +39,7 @@ def parse() -> None:
             ).fetchall()
         }
     rows = []
+    carried: dict[tuple[str, int], dict[str, list[int]]] = {}
     for doc, chamber in DOCS.items():
         text = subprocess.run(
             ["pdftotext", "-layout", str(raw.cached(SOURCE, URL.format(doc)).path), "-"],
@@ -79,12 +81,23 @@ def parse() -> None:
                     totals = cells
                 else:
                     parts[counties[re.sub(r"[^a-z]", "", row[1].lower().removesuffix("county"))]] = cells
+            if not totals:
+                carried[(chamber, district)] = parts
+                continue
+            parts = carried.pop((chamber, district), {}) | parts
             sums = [sum(values[k] for values in parts.values()) for k in range(len(ends))]
             if not all(names) or sums != totals or any(len(values) != len(ends) for values in parts.values()):
                 print(f"{chamber} {district}: {names} counties sum to {sums}, printed {totals}, skipped")
                 continue
             rows.extend(
-                (f"{chamber}:{district}:g", code, name.upper(), values[k + 1], name.upper().startswith("SCATTER"))
+                (
+                    chamber if chamber == "house" else f"{chamber}:{district}:g",
+                    district if chamber == "house" else None,
+                    code,
+                    name.upper(),
+                    values[k + 1],
+                    name.upper().startswith("SCATTER"),
+                )
                 for code, values in parts.items()
                 for k, name in enumerate(names)
             )
@@ -93,6 +106,7 @@ def parse() -> None:
         rows,
         schema={
             "chamber": pl.String,
+            "district": pl.Int16,
             "code": pl.String,
             "candidate": pl.String,
             "votes": pl.Int64,
@@ -101,13 +115,14 @@ def parse() -> None:
         orient="row",
     )
     print(
-        frame.group_by(pl.col("chamber").str.split(":").list.first().alias("office")).agg(pl.col("chamber").n_unique())
+        frame.group_by(pl.col("chamber").str.split(":").list.first().alias("office")).agg(
+            pl.concat_str("chamber", "district", ignore_nulls=True).n_unique()
+        )
     )
     frame.with_columns(
         candidate=pl.col("candidate").str.replace(r",?\s+(JR|SR|II|III|IV)\.?$", ""),
         year=pl.lit(DAY.year, pl.Int32),
         day=pl.lit(DAY),
-        district=pl.lit(None, pl.Int16),
         special=pl.lit(False),
         state=pl.lit("WI"),
         measure=pl.lit(1, pl.Int16),
@@ -122,21 +137,24 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Wisconsin's 2004 State Senate and State Assembly generals by county (State Elections Board canvass summaries, via the Wayback Machine)",
+            summary="Wisconsin's 2004 U.S. House, State Senate, and State Assembly generals by county (State Elections Board canvass summaries, via the Wayback Machine)",
             polity="US-WI",
         )
-        source = cs.source(PUBLISHER, TITLE)
-        if source in cs.minted:
-            cs.add(
-                "source",
-                id=source,
-                kind="official_body",
-                publisher=PUBLISHER,
-                title=TITLE,
-                url=LANDING,
-                license="Public record",
-            )
-        for doc in DOCS:
-            cs.artifact(raw.cached(SOURCE, URL.format(doc)), source)
-        medsl.attach(cs, conn, pl.read_parquet(PARSED / "counties.parquet"), {"WI": source}, strict=True)
+        frame = pl.read_parquet(PARSED / "counties.parquet")
+        for title, house in ((TITLE, False), (HOUSE_TITLE, True)):
+            source = cs.source(PUBLISHER, title)
+            if source in cs.minted:
+                cs.add(
+                    "source",
+                    id=source,
+                    kind="official_body",
+                    publisher=PUBLISHER,
+                    title=title,
+                    url=LANDING,
+                    license="Public record",
+                )
+            for doc, chamber in DOCS.items():
+                if (chamber == "house") == house:
+                    cs.artifact(raw.cached(SOURCE, URL.format(doc)), source)
+            medsl.attach(cs, conn, frame.filter((pl.col("chamber") == "house") == house), {"WI": source}, strict=True)
         return cs.write()
