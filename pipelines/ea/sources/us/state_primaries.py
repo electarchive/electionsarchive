@@ -942,6 +942,12 @@ WITHDREW = {
             "nomination without runoff,\" June 2010). Lexington County's runoff returns list no District 69 race."
         ),
     ),
+    "2000-09-05:FL:house:30:rp": (
+        {"Peter DiLavore"},
+        "Withdrew before the October 3 second primary, leaving Mike Haridopolos, who led with 47.8 percent, the "
+        "nominee; the Division of Elections' results extract for the October 3, 2000 second primary lists no House "
+        "District 30 race.",
+    ),
 }
 
 WITHHELD = (
