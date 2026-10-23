@@ -337,7 +337,7 @@ def emit() -> Path:
                     )
                 ]
                 if not hits and not pool:
-                    hits = [name for name, total in sums.items() if total == votes and name not in matched]
+                    hits = [name for name, total in sums.items() if votes in (total, 2 * total) and name not in matched]
                 if len(hits) != 1:
                     break
                 matched[hits[0]] = (str(option), votes)
