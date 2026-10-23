@@ -10,7 +10,7 @@ from ea.store import DATA, connect
 SOURCE = "us.leg_primary_counties"
 VERSION = "1"
 PARSED = DATA / "parsed" / SOURCE
-STATES = ["ID", "NY", "VT"]
+STATES = ["CT", "ID", "NY", "VT"]
 
 
 def fetch() -> None:
@@ -63,15 +63,15 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="State House, Senate, and Assembly primaries by county from the ElectionStats archives of Idaho, "
-            "New York, and Vermont, for contests held only as district totals",
+            summary="State House, Senate, and Assembly primaries by county from the ElectionStats archives of "
+            "Connecticut, Idaho, New York, and Vermont, for contests held only as district totals",
             polity="US",
         )
         totals = {
             value
             for (value,) in conn.execute(
                 """select x.value from external_id x
-                   where x.scheme = 'us.contest' and x.value ~ '^20[0-9-]{8}:(ID|NY|VT):(house|senate|assembly):'
+                   where x.scheme = 'us.contest' and x.value ~ '^20[0-9-]{8}:(CT|ID|NY|VT):(house|senate|assembly):'
                      and exists (select from result_set r where r.contest_id = x.entity_id and r.status <> 'withdrawn')
                      and not exists (select from result_set r join result_value v on v.result_set_k = r.k
                                      join reporting_unit u on u.k = v.unit_k
