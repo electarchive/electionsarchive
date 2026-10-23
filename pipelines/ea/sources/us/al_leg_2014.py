@@ -27,6 +27,10 @@ OFFICE = re.compile(
     re.IGNORECASE,
 )
 DROPPED = {"over votes", "under votes"}
+RELABELED = {
+    ("DeKalb", "State Rep. Dist 9"): "State Sen. Dist 9",
+    ("DeKalb", "State Rep. Dist 10"): "State Sen. Dist 10",
+}
 
 
 def fetch() -> None:
@@ -89,16 +93,30 @@ def parse() -> None:
             reported = next((row for row in cells if re.fullmatch(r"REPORTED( TOTALS)?", row[0], re.IGNORECASE)), None)
             precincts = [row for row in cells[2:] if row[0] and not totals.fullmatch(row[0])]
             for column, title in enumerate(titles):
-                found = OFFICE.fullmatch(title)
+                found = OFFICE.fullmatch(RELABELED.get((county, title), title))
                 if not found or column == 0 or not cells[1][column]:
                     continue
                 summed = sum(int(float(row[column])) for row in precincts if re.fullmatch(r"[\d.]+", row[column]))
                 votes = int(float(reported[column])) if reported and reported[column] else summed
                 if votes != summed:
                     print(f"{county} {title} {cells[1][column]}: precincts {summed}, reported {votes}")
-                candidate = re.sub(r"\s*\(\w+\s*\)\s*$", "", cells[1][column])
+                candidate = re.sub(r"\s*\([\w. ]+\)\s*$", "", cells[1][column])
                 chamber = "house" if found[3].lower() == "rep" else "senate"
                 rows.append((f"{chamber}:{int(found[4])}:g", code, candidate, candidate.lower() == "write-in", votes))
+    rows = [
+        (chamber, code, re.sub(r",?\s+(JR|SR|II|III|IV)\.?$", "", " ".join(candidate.upper().split())), writein, votes)
+        for chamber, code, candidate, writein, votes in rows
+    ]
+    full: dict[tuple[str, str], set[str]] = {}
+    for chamber, _, candidate, _, _ in rows:
+        if " " in candidate:
+            full.setdefault((chamber, candidate.split()[-1]), set()).add(candidate)
+    rows = [
+        (chamber, code, next(iter(names)), writein, votes)
+        if " " not in candidate and len(names := full.get((chamber, candidate), set())) == 1
+        else (chamber, code, candidate, writein, votes)
+        for chamber, code, candidate, writein, votes in rows
+    ]
     PARSED.mkdir(parents=True, exist_ok=True)
     (
         pl.DataFrame(
@@ -115,7 +133,6 @@ def parse() -> None:
         .group_by("chamber", "code", "candidate", "writein")
         .agg(pl.col("votes").sum())
         .with_columns(
-            candidate=pl.col("candidate").str.to_uppercase().str.replace(r",?\s+(JR|SR|II|III|IV)\.?$", ""),
             year=pl.lit(DAY.year, pl.Int32),
             day=pl.lit(DAY),
             district=pl.lit(None, pl.Int16),
