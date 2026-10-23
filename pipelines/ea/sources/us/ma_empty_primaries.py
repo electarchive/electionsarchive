@@ -11,7 +11,7 @@ from ea.sources.us import elstats, medsl, state_primaries
 from ea.store import DATA, connect
 
 SOURCE = "us.ma_empty_primaries"
-VERSION = "1"
+VERSION = "2"
 PARSED = DATA / "parsed" / SOURCE
 
 
