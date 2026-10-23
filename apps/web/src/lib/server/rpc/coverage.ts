@@ -4,7 +4,14 @@ import * as v from "valibot";
 import { os } from "#lib/server/cache.js";
 import { db } from "#lib/server/db/index.js";
 
-const GOALS = ["county", "history", "precinct", "local"] as const;
+const GOALS = [
+  "county",
+  "history",
+  "precinct",
+  "shapes",
+  "shapes_history",
+  "local",
+] as const;
 const counts = {
   total: v.number(),
   complete: v.number(),
@@ -16,6 +23,9 @@ const counts = {
   turnout: v.number(),
   precincts: v.number(),
   shaped: v.number(),
+  unshaped: v.number(),
+  units: v.number(),
+  undrawn: v.number(),
 };
 const SUMS = sql.raw(
   Object.keys(counts)

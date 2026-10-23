@@ -1,6 +1,13 @@
 import { m } from "#lib/paraglide/messages.js";
 
-export const GOALS = ["county", "history", "precinct", "local"] as const;
+export const GOALS = [
+  "county",
+  "history",
+  "precinct",
+  "shapes",
+  "shapes_history",
+  "local",
+] as const;
 export type Goal = (typeof GOALS)[number];
 export type Reason =
   | "complete"
@@ -8,7 +15,10 @@ export type Reason =
   | "partial"
   | "totals"
   | "bare"
-  | "absent";
+  | "absent"
+  | "units"
+  | "unshaped"
+  | "undrawn";
 export type Counts = Record<
   Reason | "total" | "turnout" | "precincts" | "shaped",
   number
@@ -18,6 +28,8 @@ export const REASONS: Record<Goal, Array<Reason>> = {
   county: ["complete", "partial", "totals", "bare", "absent"],
   history: ["complete", "partial", "totals", "bare", "absent"],
   precinct: ["complete", "coarse", "partial", "totals", "bare", "absent"],
+  shapes: ["complete", "units", "unshaped", "undrawn"],
+  shapes_history: ["complete", "units", "unshaped", "undrawn"],
   local: ["complete", "absent"],
 };
 
@@ -28,6 +40,9 @@ export const LABELS: Record<Reason, () => string> = {
   totals: m.coverage_reason_totals,
   bare: m.coverage_reason_bare,
   absent: m.coverage_reason_absent,
+  units: m.coverage_reason_units,
+  unshaped: m.coverage_reason_unshaped,
+  undrawn: m.coverage_reason_undrawn,
 };
 
 export const LEVELS: Record<string, () => string> = {

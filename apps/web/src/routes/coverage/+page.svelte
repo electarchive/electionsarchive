@@ -20,12 +20,16 @@
     county: m.coverage_goal_county,
     history: m.coverage_goal_history,
     precinct: m.coverage_goal_precinct,
+    shapes: m.coverage_goal_shapes,
+    shapes_history: m.coverage_goal_shapes_history,
     local: m.coverage_goal_local,
   };
   const TABS: Record<Goal, () => string> = {
     county: m.coverage_goal_tab_county,
     history: m.coverage_goal_tab_history,
     precinct: m.coverage_goal_tab_precinct,
+    shapes: m.coverage_goal_tab_shapes,
+    shapes_history: m.coverage_goal_tab_shapes_history,
     local: m.coverage_goal_tab_local,
   };
 
@@ -95,6 +99,8 @@
                 county: m.coverage_reason_complete_county_def,
                 history: m.coverage_reason_complete_history_def,
                 precinct: m.coverage_reason_complete_precinct_def,
+                shapes: m.coverage_reason_complete_shapes_def,
+                shapes_history: m.coverage_reason_complete_shapes_def,
                 local: m.coverage_reason_complete_local_def,
               }[row.goal]()
             : reason === "absent" && row.goal === "local"
@@ -105,6 +111,9 @@
                   totals: m.coverage_reason_totals_def,
                   bare: m.coverage_reason_bare_def,
                   absent: m.coverage_reason_absent_def,
+                  units: m.coverage_reason_units_def,
+                  unshaped: m.coverage_reason_unshaped_def,
+                  undrawn: m.coverage_reason_undrawn_def,
                 }[reason](),
         )}
         <li class="grid grid-cols-[0.75rem_minmax(0,1fr)] gap-x-2">
@@ -124,6 +133,10 @@
     {:else if row.goal === "local"}
       <p class="text-sm text-muted-foreground">
         {m.coverage_goal_local_note()}
+      </p>
+    {:else if row.goal === "shapes" || row.goal === "shapes_history"}
+      <p class="text-sm text-muted-foreground">
+        {m.coverage_goal_shapes_note()}
       </p>
     {/if}
     {#if row.goal === "county" && held > 0}

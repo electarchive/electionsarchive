@@ -29,11 +29,12 @@
 
 <header class="border-be">
   <div
-    class="mx-auto flex items-center justify-between gap-3 px-4 block-12 max-inline-7xl"
+    class="mx-auto flex items-center justify-between gap-3 px-4 block-12 max-inline-7xl max-sm:gap-2 max-sm:px-3"
   >
-    <a href={resolve("/")} class="flex items-center gap-2.5">
+    <a href={resolve("/")} class="flex items-center gap-2.5 max-[24rem]:gap-2">
       <Monogram size={26} />
-      <span class="text-lg font-[780] tracking-[-0.015em] whitespace-nowrap"
+      <span
+        class="text-lg font-[780] tracking-[-0.015em] whitespace-nowrap max-[24rem]:text-base"
         >{m.wordmark()}</span
       >
     </a>
@@ -99,7 +100,8 @@
           href="{resolve('/sign-in')}?next={encodeURIComponent(
             page.url.pathname,
           )}"
-          class={buttonVariants({ variant: "ghost" })}>{m.sign_in_submit()}</a
+          class={cn(buttonVariants({ variant: "ghost" }), "max-sm:px-2.5")}
+          >{m.sign_in_submit()}</a
         >
       {:else}
         <DropdownMenu.Root>
