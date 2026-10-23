@@ -1,27 +1,39 @@
 {
-  "kind": "statewide",
-  "year": 1990,
-  "day": "1990-11-06",
-  "polity": "US-ID",
-  "publisher": "Idaho Secretary of State",
-  "title": "Abstract of Votes Cast at the General Election November 6, 1990",
-  "license": "Public record",
-  "file": {
-    "url": "https://archive.org/download/micro_IA40706938_0391/micro_IA40706938_0391.pdf",
-    "item": "https://archive.org/details/micro_IA40706938_0391"
+ "kind": "statewide",
+ "year": 1990,
+ "day": "1990-11-06",
+ "polity": "US-ID",
+ "publisher": "Idaho Secretary of State",
+ "title": "Abstract of Votes Cast at the General Election November 6, 1990",
+ "license": "Public record",
+ "file": {
+  "url": "https://archive.org/download/micro_IA40706938_0391/micro_IA40706938_0391.pdf",
+  "item": "https://archive.org/details/micro_IA40706938_0391"
+ },
+ "raw_source": "us.scans",
+ "create": true,
+ "offices": {
+  "governor": "Governor",
+  "lieutenant-governor": "Lieutenant Governor",
+  "secretary-of-state": "Secretary of State",
+  "attorney-general": "Attorney General",
+  "auditor": "State Auditor",
+  "treasurer": "State Treasurer",
+  "superintendent-of-public-instruction": "Superintendent of Public Instruction"
+ },
+ "leaves": [
+  1
+ ],
+ "anchors": [
+  {
+   "contest": "1990-11-06:ID:governor",
+   "candidate": "Andrus",
+   "official": 218673
   },
-  "raw_source": "us.scans",
-  "create": true,
-  "offices": {
-    "governor": "Governor",
-    "lieutenant-governor": "Lieutenant Governor",
-    "secretary-of-state": "Secretary of State",
-    "attorney-general": "Attorney General",
-    "auditor": "State Auditor",
-    "treasurer": "State Treasurer",
-    "superintendent-of-public-instruction": "Superintendent of Public Instruction"
-  },
-  "leaves": [
-    1
-  ]
+  {
+   "contest": "1990-11-06:ID:governor",
+   "candidate": "Fairchild",
+   "official": 101937
+  }
+ ]
 }
