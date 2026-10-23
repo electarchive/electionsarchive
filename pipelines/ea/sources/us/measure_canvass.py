@@ -266,6 +266,10 @@ ILLINOIS_ADVISORY = {
     "assisted rep": "Illinois Assisted Reproductive Healthcare Advisory Question",
 }
 KENTUCKY = {
+    date(2012, 11, 6): (
+        "https://elect.ky.gov/SiteCollectionDocuments/Election%20Results/2010-2019/2012/2012genresults.pdf",
+        {"personal right to hunt": "Constitutional Amendment 1"},
+    ),
     date(2020, 11, 3): (
         "https://elect.ky.gov/results/2020-2029/Documents/2020%20General%20Election%20Results.pdf",
         {"crime victims": "Constitutional Amendment 1", "term of Commonwealth's Attorneys": "Constitutional Amendment 2"},
