@@ -8,22 +8,6 @@
   "url": "https://archive.org/download/officialvote1974illi/officialvote1974illi.pdf"
  },
  "contests": {
-  "state-house2": {
-   "year": 1974,
-   "chamber": "state-house",
-   "day": "1974-11-05",
-   "special": false,
-   "state": "IL",
-   "district": 2
-  },
-  "state-house3": {
-   "year": 1974,
-   "chamber": "state-house",
-   "day": "1974-11-05",
-   "special": false,
-   "state": "IL",
-   "district": 3
-  },
   "state-house5": {
    "year": 1974,
    "chamber": "state-house",
@@ -128,14 +112,6 @@
    "state": "IL",
    "district": 23
   },
-  "state-house24": {
-   "year": 1974,
-   "chamber": "state-house",
-   "day": "1974-11-05",
-   "special": false,
-   "state": "IL",
-   "district": 24
-  },
   "state-house26": {
    "year": 1974,
    "chamber": "state-house",
@@ -216,14 +192,6 @@
    "state": "IL",
    "district": 39
   },
-  "state-house42": {
-   "year": 1974,
-   "chamber": "state-house",
-   "day": "1974-11-05",
-   "special": false,
-   "state": "IL",
-   "district": 42
-  },
   "state-house41": {
    "year": 1974,
    "chamber": "state-house",
@@ -231,6 +199,14 @@
    "special": false,
    "state": "IL",
    "district": 41
+  },
+  "state-house42": {
+   "year": 1974,
+   "chamber": "state-house",
+   "day": "1974-11-05",
+   "special": false,
+   "state": "IL",
+   "district": 42
   },
   "state-house44": {
    "year": 1974,
@@ -263,22 +239,6 @@
    "special": false,
    "state": "IL",
    "district": 48
-  },
-  "state-house50": {
-   "year": 1974,
-   "chamber": "state-house",
-   "day": "1974-11-05",
-   "special": false,
-   "state": "IL",
-   "district": 50
-  },
-  "state-house51": {
-   "year": 1974,
-   "chamber": "state-house",
-   "day": "1974-11-05",
-   "special": false,
-   "state": "IL",
-   "district": 51
   },
   "state-house53": {
    "year": 1974,
@@ -323,81 +283,6 @@
  },
  "pages": [
   {
-   "page": 35,
-   "id": "35-1",
-   "columns": [
-    {
-     "label": "Democratic David E. Carey",
-     "contest": "state-house2",
-     "candidate": "David E. Carey"
-    },
-    {
-     "label": "Democratic Richard A. Mugalian",
-     "contest": "state-house2",
-     "candidate": "Richard A. Mugalian"
-    },
-    {
-     "label": "Republican John E. Friedland",
-     "contest": "state-house2",
-     "candidate": "John E. Friedland"
-    },
-    {
-     "label": "Republican Leo D. LaFleur",
-     "contest": "state-house2",
-     "candidate": "Leo D. Lafleur"
-    },
-    {
-     "label": "Independent Roger G. Kotecki",
-     "contest": "state-house2",
-     "candidate": "Roger G. Kotecki"
-    }
-   ],
-   "orientation": "counties_down",
-   "crop": [
-    0.037,
-    0.309,
-    0.936,
-    0.579
-   ],
-   "hint": "Read only the table headed '2nd District'; ignore any other table visible in the image. Cumulated vote cells may end in a small one-half fraction; transcribe halves as '\u00bd' directly after the digits, for example 68,317\u00bd (transcribe halves).",
-   "turn": -90
-  },
-  {
-   "page": 35,
-   "id": "35-2",
-   "columns": [
-    {
-     "label": "Democratic Eugenia S. Chapman",
-     "contest": "state-house3",
-     "candidate": "Eugenia S. Chapman"
-    },
-    {
-     "label": "Democratic Walter J. Sullivan",
-     "contest": "state-house3",
-     "candidate": "Walter J. Sullivan"
-    },
-    {
-     "label": "Republican Virginia B. Macdonald",
-     "contest": "state-house3",
-     "candidate": "Virginia B. Macdonald"
-    },
-    {
-     "label": "Republican Donald L. Totten",
-     "contest": "state-house3",
-     "candidate": "Donald L. Totten"
-    }
-   ],
-   "orientation": "counties_down",
-   "crop": [
-    0.037,
-    0.571,
-    0.936,
-    0.85
-   ],
-   "hint": "Read only the table headed '3rd District'; ignore any other table visible in the image. Cumulated vote cells may end in a small one-half fraction; transcribe halves as '\u00bd' directly after the digits, for example 68,317\u00bd (transcribe halves).",
-   "turn": -90
-  },
-  {
    "page": 36,
    "id": "36-1",
    "columns": [
@@ -424,17 +309,13 @@
    ],
    "orientation": "counties_down",
    "crop": [
-    0.322,
-    0.081,
-    0.498,
-    1.0
+    0.036,
+    0.295,
+    0.951,
+    0.504
    ],
-   "hint": "Read only the table headed '5th District'; ignore any other table visible in the image. Cumulated vote cells may end in a small one-half fraction; transcribe halves as '\u00bd' directly after the digits, for example 68,317\u00bd (transcribe halves).",
-   "bands": 3,
-   "header": [
-    0.0,
-    0.3689
-   ]
+   "hint": "Read only the table headed '5th District'; ignore any other table visible in the image. Cumulated vote cells may end in a small one-half fraction; transcribe halves as '½' directly after the digits, for example 68,317½ (transcribe halves).",
+   "turn": -90
   },
   {
    "page": 36,
@@ -463,17 +344,13 @@
    ],
    "orientation": "counties_down",
    "crop": [
-    0.522,
-    0.081,
-    0.708,
-    1.0
+    0.036,
+    0.496,
+    0.951,
+    0.707
    ],
-   "hint": "Read only the table headed '6th District'; ignore any other table visible in the image. Cumulated vote cells may end in a small one-half fraction; transcribe halves as '\u00bd' directly after the digits, for example 68,317\u00bd (transcribe halves).",
-   "bands": 3,
-   "header": [
-    0.0,
-    0.5919
-   ]
+   "hint": "Read only the table headed '6th District'; ignore any other table visible in the image. Cumulated vote cells may end in a small one-half fraction; transcribe halves as '½' directly after the digits, for example 68,317½ (transcribe halves).",
+   "turn": -90
   },
   {
    "page": 37,
@@ -502,12 +379,13 @@
    ],
    "orientation": "counties_down",
    "crop": [
-    0.217,
-    0.261,
-    0.964,
-    0.472
+    0.035,
+    0.184,
+    0.933,
+    0.335
    ],
-   "hint": "Read only the table headed '8th District'; ignore any other table visible in the image. Cumulated vote cells may end in a small one-half fraction; transcribe halves as '\u00bd' directly after the digits, for example 68,317\u00bd (transcribe halves)."
+   "hint": "Read only the table headed '8th District'; ignore any other table visible in the image. Cumulated vote cells may end in a small one-half fraction; transcribe halves as '½' directly after the digits, for example 68,317½ (transcribe halves).",
+   "turn": -90
   },
   {
    "page": 37,
@@ -536,12 +414,13 @@
    ],
    "orientation": "counties_down",
    "crop": [
-    0.417,
-    0.464,
-    0.964,
-    0.672
+    0.035,
+    0.327,
+    0.933,
+    0.615
    ],
-   "hint": "Read only the table headed '9th District'; ignore any other table visible in the image. Cumulated vote cells may end in a small one-half fraction; transcribe halves as '\u00bd' directly after the digits, for example 68,317\u00bd (transcribe halves)."
+   "hint": "Read only the table headed '9th District'; ignore any other table visible in the image. Cumulated vote cells may end in a small one-half fraction; transcribe halves as '½' directly after the digits, for example 68,317½ (transcribe halves).",
+   "turn": -90
   },
   {
    "page": 38,
@@ -570,17 +449,13 @@
    ],
    "orientation": "counties_down",
    "crop": [
-    0.135,
-    0.088,
-    0.295,
-    0.941
+    0.039,
+    0.132,
+    0.945,
+    0.378
    ],
-   "hint": "Read only the table headed '11th District'; ignore any other table visible in the image. Cumulated vote cells may end in a small one-half fraction; transcribe halves as '\u00bd' directly after the digits, for example 68,317\u00bd (transcribe halves).",
-   "bands": 2,
-   "header": [
-    0.0,
-    0.4455
-   ]
+   "hint": "Read only the table headed '11th District'; ignore any other table visible in the image. Cumulated vote cells may end in a small one-half fraction; transcribe halves as '½' directly after the digits, for example 68,317½ (transcribe halves).",
+   "turn": -90
   },
   {
    "page": 38,
@@ -597,107 +472,95 @@
      "candidate": "John Merlo"
     },
     {
-     "label": "Republican Arthur A. Telser",
+     "label": "Republican Arthur A. Telcser",
      "contest": "state-house12",
      "candidate": "Arthur A. Telcser"
     },
     {
-     "label": "Republican Paul M. Powers",
+     "label": "Republican Paul M Powers",
      "contest": "state-house12",
      "candidate": "Paul M. Powers"
     }
    ],
    "orientation": "counties_down",
    "crop": [
-    0.365,
-    0.088,
-    0.525,
-    0.941
+    0.039,
+    0.37,
+    0.945,
+    0.651
    ],
-   "hint": "Read only the table headed '12th District'; ignore any other table visible in the image. Cumulated vote cells may end in a small one-half fraction; transcribe halves as '\u00bd' directly after the digits, for example 68,317\u00bd (transcribe halves).",
-   "bands": 2,
-   "header": [
-    0.0,
-    0.4455
-   ]
+   "hint": "Read only the table headed '12th District'; ignore any other table visible in the image. Cumulated vote cells may end in a small one-half fraction; transcribe halves as '½' directly after the digits, for example 68,317½ (transcribe halves).",
+   "turn": -90
   },
   {
    "page": 39,
    "id": "39-0",
    "columns": [
     {
-     "label": "John B. Brandt Democratic",
+     "label": "Democratic John B. Brandt",
      "contest": "state-house14",
      "candidate": "John B. Brandt"
     },
     {
-     "label": "Bruce A. Farley Democratic",
+     "label": "Democratic Bruce A. Farley",
      "contest": "state-house14",
      "candidate": "Bruce A. Farley"
     },
     {
-     "label": "Charles J. Fleck, Jr. Republican",
+     "label": "Republican Charles J. Fleck, Jr.",
      "contest": "state-house14",
      "candidate": "Charles J. Fleck, Jr."
     },
     {
-     "label": "Thomas Matteini Republican",
+     "label": "Republican Thomas Matteini",
      "contest": "state-house14",
      "candidate": "Thomas Matteini"
     }
    ],
    "orientation": "counties_down",
    "crop": [
-    0.027,
-    0.086,
-    0.233,
-    0.814
+    0.057,
+    0.006,
+    1.0,
+    0.225
    ],
-   "hint": "Read only the table headed '14th District REPRESENTATIVE IN THE GENERAL ASSEMBLY'; ignore any other table visible in the image. Cumulated vote cells may end in a small one-half fraction; transcribe halves as '\u00bd' directly after the digits, for example 68,317\u00bd (transcribe halves).",
-   "bands": 2,
-   "header": [
-    0.0,
-    0.5137
-   ]
+   "hint": "Read only the table headed '14th District'; ignore any other table visible in the image. Cumulated vote cells may end in a small one-half fraction; transcribe halves as '½' directly after the digits, for example 68,317½ (transcribe halves).",
+   "turn": -90
   },
   {
    "page": 39,
    "id": "39-1",
    "columns": [
     {
-     "label": "William J. Laurino Democratic",
+     "label": "Democratic William J. Laurino",
      "contest": "state-house15",
      "candidate": "William J. Laurino"
     },
     {
-     "label": "Alan J. Greiman Democratic",
+     "label": "Democratic Alan J. Greiman",
      "contest": "state-house15",
      "candidate": "Alan J. Greiman"
     },
     {
-     "label": "Peter Piotrowicz Peters Republican",
+     "label": "Republican Peter Piotrowicz Peters",
      "contest": "state-house15",
      "candidate": "Peter Piotrowicz Peters"
     },
     {
-     "label": "Harold M. Milligan Republican",
+     "label": "Republican Harold M. Milligan",
      "contest": "state-house15",
      "candidate": "Harold M. Milligan"
     }
    ],
    "orientation": "counties_down",
    "crop": [
-    0.247,
-    0.314,
-    0.46,
-    0.814
+    0.054,
+    0.217,
+    1.0,
+    0.454
    ],
-   "hint": "Read only the table headed '15th District REPRESENTATIVE IN THE GENERAL ASSEMBLY'; ignore any other table visible in the image. Cumulated vote cells may end in a small one-half fraction; transcribe halves as '\u00bd' directly after the digits, for example 68,317\u00bd (transcribe halves).",
-   "bands": 2,
-   "header": [
-    0.0,
-    0.282
-   ]
+   "hint": "Read only the table headed '15th District'; ignore any other table visible in the image. Cumulated vote cells may end in a small one-half fraction; transcribe halves as '½' directly after the digits, for example 68,317½ (transcribe halves).",
+   "turn": -90
   },
   {
    "page": 40,
@@ -731,17 +594,13 @@
    ],
    "orientation": "counties_down",
    "crop": [
-    0.112,
-    0.061,
-    0.33,
-    1.0
+    0.057,
+    0.089,
+    0.952,
+    0.264
    ],
-   "hint": "Read only the table headed '17th District'; ignore any other table visible in the image. Cumulated vote cells may end in a small one-half fraction; transcribe halves as '\u00bd' directly after the digits, for example 68,317\u00bd (transcribe halves).",
-   "bands": 3,
-   "header": [
-    0.0,
-    0.2066
-   ]
+   "hint": "Read only the table headed '17th District'; ignore any other table visible in the image. Cumulated vote cells may end in a small one-half fraction; transcribe halves as '½' directly after the digits, for example 68,317½ (transcribe halves).",
+   "turn": -90
   },
   {
    "page": 40,
@@ -770,17 +629,13 @@
    ],
    "orientation": "counties_down",
    "crop": [
-    0.33,
-    0.061,
-    0.555,
-    1.0
+    0.057,
+    0.256,
+    0.957,
+    0.436
    ],
-   "hint": "Read only the table headed '18th District'; ignore any other table visible in the image. Cumulated vote cells may end in a small one-half fraction; transcribe halves as '\u00bd' directly after the digits, for example 68,317\u00bd (transcribe halves).",
-   "bands": 3,
-   "header": [
-    0.0,
-    0.4515
-   ]
+   "hint": "Read only the table headed '18th District'; ignore any other table visible in the image. Cumulated vote cells may end in a small one-half fraction; transcribe halves as '½' directly after the digits, for example 68,317½ (transcribe halves).",
+   "turn": -90
   },
   {
    "page": 41,
@@ -814,17 +669,13 @@
    ],
    "orientation": "counties_down",
    "crop": [
-    0.027,
-    0.086,
-    0.198,
-    0.774
+    0.052,
+    0.005,
+    0.956,
+    0.202
    ],
-   "hint": "Read only the table headed 'REPRESENTATIVE IN THE GENERAL ASSEMBLY 20th District'; ignore any other table visible in the image. Cumulated vote cells may end in a small one-half fraction; transcribe halves as '\u00bd' directly after the digits, for example 68,317\u00bd (transcribe halves).",
-   "bands": 2,
-   "header": [
-    0.0,
-    0.5363
-   ]
+   "hint": "Read only the table headed '20th District'; ignore any other table visible in the image. Cumulated vote cells may end in a small one-half fraction; transcribe halves as '½' directly after the digits, for example 68,317½ (transcribe halves).",
+   "turn": -90
   },
   {
    "page": 41,
@@ -853,16 +704,17 @@
    ],
    "orientation": "counties_down",
    "crop": [
-    0.224,
-    0.326,
-    0.396,
-    0.774
+    0.052,
+    0.194,
+    0.95,
+    0.4
    ],
-   "hint": "Read only the table headed 'REPRESENTATIVE IN THE GENERAL ASSEMBLY 21st District'; ignore any other table visible in the image. Cumulated vote cells may end in a small one-half fraction; transcribe halves as '\u00bd' directly after the digits, for example 68,317\u00bd (transcribe halves)."
+   "hint": "Read only the table headed '21st District'; ignore any other table visible in the image. Cumulated vote cells may end in a small one-half fraction; transcribe halves as '½' directly after the digits, for example 68,317½ (transcribe halves).",
+   "turn": -90
   },
   {
    "page": 41,
-   "id": "41-2",
+   "id": "41-3",
    "columns": [
     {
      "label": "Democratic Walter S. Kozubowski",
@@ -887,46 +739,12 @@
    ],
    "orientation": "counties_down",
    "crop": [
-    0.619,
-    0.326,
-    0.793,
-    0.774
+    0.052,
+    0.59,
+    0.95,
+    0.786
    ],
-   "hint": "Read only the table headed 'REPRESENTATIVE IN THE GENERAL ASSEMBLY 23rd District'; ignore any other table visible in the image. Cumulated vote cells may end in a small one-half fraction; transcribe halves as '\u00bd' directly after the digits, for example 68,317\u00bd (transcribe halves)."
-  },
-  {
-   "page": 42,
-   "id": "42-0",
-   "columns": [
-    {
-     "label": "Democratic Robert E. Mann",
-     "contest": "state-house24",
-     "candidate": "Robert E. Mann"
-    },
-    {
-     "label": "Democratic Lewis A. H. Caldwell",
-     "contest": "state-house24",
-     "candidate": "Lewis A. Caldwell"
-    },
-    {
-     "label": "Republican Bernard E. Epton",
-     "contest": "state-house24",
-     "candidate": "Bernard E. Epton"
-    },
-    {
-     "label": "Republican Henry G. Clark",
-     "contest": "state-house24",
-     "candidate": "Henry G. Clark"
-    }
-   ],
-   "orientation": "counties_down",
-   "crop": [
-    0.077,
-    0.086,
-    1.0,
-    0.281
-   ],
-   "hint": "Read only the table headed '24th District'; ignore any other table visible in the image. Cumulated vote cells may end in a small one-half fraction; transcribe halves as '\u00bd' directly after the digits, for example 68,317\u00bd (transcribe halves).",
+   "hint": "Read only the table headed '23rd District'; ignore any other table visible in the image. Cumulated vote cells may end in a small one-half fraction; transcribe halves as '½' directly after the digits, for example 68,317½ (transcribe halves).",
    "turn": -90
   },
   {
@@ -966,7 +784,7 @@
     1.0,
     0.67
    ],
-   "hint": "Read only the table headed '26th District'; ignore any other table visible in the image. Cumulated vote cells may end in a small one-half fraction; transcribe halves as '\u00bd' directly after the digits, for example 68,317\u00bd (transcribe halves).",
+   "hint": "Read only the table headed '26th District'; ignore any other table visible in the image. Cumulated vote cells may end in a small one-half fraction; transcribe halves as '½' directly after the digits, for example 68,317½ (transcribe halves).",
    "turn": -90
   },
   {
@@ -996,17 +814,13 @@
    ],
    "orientation": "counties_down",
    "crop": [
-    0.022,
-    0.081,
-    0.208,
-    0.934
+    0.042,
+    0.031,
+    0.935,
+    0.208
    ],
-   "hint": "Read only the table headed '27th District'; ignore any other table visible in the image. Cumulated vote cells may end in a small one-half fraction; transcribe halves as '\u00bd' directly after the digits, for example 68,317\u00bd (transcribe halves).",
-   "bands": 2,
-   "header": [
-    0.0,
-    0.0574
-   ]
+   "hint": "Read only the table headed '27th District'; ignore any other table visible in the image. Cumulated vote cells may end in a small one-half fraction; transcribe halves as '½' directly after the digits, for example 68,317½ (transcribe halves).",
+   "turn": -90
   },
   {
    "page": 43,
@@ -1035,17 +849,13 @@
    ],
    "orientation": "counties_down",
    "crop": [
-    0.412,
-    0.081,
-    0.603,
-    0.934
+    0.042,
+    0.476,
+    0.935,
+    0.718
    ],
-   "hint": "Read only the table headed '29th District'; ignore any other table visible in the image. Cumulated vote cells may end in a small one-half fraction; transcribe halves as '\u00bd' directly after the digits, for example 68,317\u00bd (transcribe halves).",
-   "bands": 2,
-   "header": [
-    0.0,
-    0.5264
-   ]
+   "hint": "Read only the table headed '29th District'; ignore any other table visible in the image. Cumulated vote cells may end in a small one-half fraction; transcribe halves as '½' directly after the digits, for example 68,317½ (transcribe halves).",
+   "turn": -90
   },
   {
    "page": 43,
@@ -1057,7 +867,7 @@
      "candidate": "Frank Giglio"
     },
     {
-     "label": "Democratic Samuel C. Marages",
+     "label": "Democratic Samuel C. Maragos",
      "contest": "state-house30",
      "candidate": "Samuel C. Maragos"
     },
@@ -1074,17 +884,13 @@
    ],
    "orientation": "counties_down",
    "crop": [
-    0.607,
-    0.081,
-    0.803,
-    0.934
+    0.042,
+    0.71,
+    0.935,
+    0.936
    ],
-   "hint": "Read only the table headed '30th District'; ignore any other table visible in the image. Cumulated vote cells may end in a small one-half fraction; transcribe halves as '\u00bd' directly after the digits, for example 68,317\u00bd (transcribe halves).",
-   "bands": 2,
-   "header": [
-    0.0,
-    0.7608
-   ]
+   "hint": "Read only the table headed '30th District'; ignore any other table visible in the image. Cumulated vote cells may end in a small one-half fraction; transcribe halves as '½' directly after the digits, for example 68,317½ (transcribe halves).",
+   "turn": -90
   },
   {
    "page": 44,
@@ -1118,7 +924,7 @@
     0.95,
     0.497
    ],
-   "hint": "Read only the table headed '32nd District'; ignore any other table visible in the image. Cumulated vote cells may end in a small one-half fraction; transcribe halves as '\u00bd' directly after the digits, for example 68,317\u00bd (transcribe halves).",
+   "hint": "Read only the table headed '32nd District'; ignore any other table visible in the image. Cumulated vote cells may end in a small one-half fraction; transcribe halves as '½' directly after the digits, for example 68,317½ (transcribe halves).",
    "turn": -90
   },
   {
@@ -1183,7 +989,7 @@
     0.95,
     0.741
    ],
-   "hint": "Read only the table headed '33rd District'; ignore any other table visible in the image. Cumulated vote cells may end in a small one-half fraction; transcribe halves as '\u00bd' directly after the digits, for example 68,317\u00bd (transcribe halves).",
+   "hint": "Read only the table headed '33rd District'; ignore any other table visible in the image. Cumulated vote cells may end in a small one-half fraction; transcribe halves as '½' directly after the digits, for example 68,317½ (transcribe halves).",
    "turn": -90
   },
   {
@@ -1223,7 +1029,7 @@
     1.0,
     0.473
    ],
-   "hint": "Read only the table headed '35th District'; ignore any other table visible in the image. Cumulated vote cells may end in a small one-half fraction; transcribe halves as '\u00bd' directly after the digits, for example 68,317\u00bd (transcribe halves).",
+   "hint": "Read only the table headed '35th District'; ignore any other table visible in the image. Cumulated vote cells may end in a small one-half fraction; transcribe halves as '½' directly after the digits, for example 68,317½ (transcribe halves).",
    "turn": -90
   },
   {
@@ -1258,7 +1064,7 @@
     1.0,
     0.688
    ],
-   "hint": "Read only the table headed '36th District'; ignore any other table visible in the image. Cumulated vote cells may end in a small one-half fraction; transcribe halves as '\u00bd' directly after the digits, for example 68,317\u00bd (transcribe halves).",
+   "hint": "Read only the table headed '36th District'; ignore any other table visible in the image. Cumulated vote cells may end in a small one-half fraction; transcribe halves as '½' directly after the digits, for example 68,317½ (transcribe halves).",
    "turn": -90
   },
   {
@@ -1298,7 +1104,7 @@
     0.965,
     0.602
    ],
-   "hint": "Read only the table headed '38th District'; ignore any other table visible in the image. Cumulated vote cells may end in a small one-half fraction; transcribe halves as '\u00bd' directly after the digits, for example 68,317\u00bd (transcribe halves).",
+   "hint": "Read only the table headed '38th District'; ignore any other table visible in the image. Cumulated vote cells may end in a small one-half fraction; transcribe halves as '½' directly after the digits, for example 68,317½ (transcribe halves).",
    "turn": -90
   },
   {
@@ -1333,46 +1139,12 @@
     0.965,
     0.83
    ],
-   "hint": "Read only the table headed '39th District'; ignore any other table visible in the image. Cumulated vote cells may end in a small one-half fraction; transcribe halves as '\u00bd' directly after the digits, for example 68,317\u00bd (transcribe halves).",
+   "hint": "Read only the table headed '39th District'; ignore any other table visible in the image. Cumulated vote cells may end in a small one-half fraction; transcribe halves as '½' directly after the digits, for example 68,317½ (transcribe halves).",
    "turn": -90
   },
   {
    "page": 47,
    "id": "47-1",
-   "columns": [
-    {
-     "label": "Democratic George E. Sangmeister",
-     "contest": "state-house42",
-     "candidate": "George E. Sangmeister"
-    },
-    {
-     "label": "Democratic LeRoy Van Duyne",
-     "contest": null,
-     "candidate": ""
-    },
-    {
-     "label": "Republican W. Robert Blair",
-     "contest": "state-house42",
-     "candidate": "W Robert Blair"
-    },
-    {
-     "label": "Republican Harry D. Leinenweber",
-     "contest": "state-house42",
-     "candidate": "Harry D. Leinenweber"
-    }
-   ],
-   "orientation": "counties_down",
-   "crop": [
-    0.433,
-    0.624,
-    0.598,
-    0.962
-   ],
-   "hint": "Read only the table headed '42nd District'; ignore any other table visible in the image. Cumulated vote cells may end in a small one-half fraction; transcribe halves as '\u00bd' directly after the digits, for example 68,317\u00bd (transcribe halves)."
-  },
-  {
-   "page": 47,
-   "id": "47-2",
    "columns": [
     {
      "label": "Democratic J. Glenn Schneider",
@@ -1397,12 +1169,48 @@
    ],
    "orientation": "counties_down",
    "crop": [
-    0.235,
-    0.628,
-    0.399,
-    0.962
+    0.06,
+    0.198,
+    0.966,
+    0.405
    ],
-   "hint": "Read only the table headed '41st District'; ignore any other table visible in the image. Cumulated vote cells may end in a small one-half fraction; transcribe halves as '\u00bd' directly after the digits, for example 68,317\u00bd (transcribe halves)."
+   "hint": "Read only the table headed '41st District'; ignore any other table visible in the image. Cumulated vote cells may end in a small one-half fraction; transcribe halves as '½' directly after the digits, for example 68,317½ (transcribe halves).",
+   "turn": -90
+  },
+  {
+   "page": 47,
+   "id": "47-2",
+   "columns": [
+    {
+     "label": "Democratic George E. Sangmeister",
+     "contest": "state-house42",
+     "candidate": "George E. Sangmeister"
+    },
+    {
+     "label": "Democratic LeRoy Van Duyne",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Republican W. Robert Blair",
+     "contest": "state-house42",
+     "candidate": "W Robert Blair"
+    },
+    {
+     "label": "Republican Harry D. Leinenweber",
+     "contest": "state-house42",
+     "candidate": "Harry D. Leinenweber"
+    }
+   ],
+   "orientation": "counties_down",
+   "crop": [
+    0.06,
+    0.397,
+    0.966,
+    0.591
+   ],
+   "hint": "Read only the table headed '42nd District'; ignore any other table visible in the image. Cumulated vote cells may end in a small one-half fraction; transcribe halves as '½' directly after the digits, for example 68,317½ (transcribe halves).",
+   "turn": -90
   },
   {
    "page": 48,
@@ -1446,7 +1254,7 @@
     0.958,
     0.461
    ],
-   "hint": "Read only the table headed '44th District'; ignore any other table visible in the image. Cumulated vote cells may end in a small one-half fraction; transcribe halves as '\u00bd' directly after the digits, for example 68,317\u00bd (transcribe halves).",
+   "hint": "Read only the table headed '44th District'; ignore any other table visible in the image. Cumulated vote cells may end in a small one-half fraction; transcribe halves as '½' directly after the digits, for example 68,317½ (transcribe halves).",
    "turn": -90
   },
   {
@@ -1481,7 +1289,7 @@
     0.956,
     0.264
    ],
-   "hint": "Read only the table headed '45th District'; ignore any other table visible in the image. Cumulated vote cells may end in a small one-half fraction; transcribe halves as '\u00bd' directly after the digits, for example 68,317\u00bd (transcribe halves).",
+   "hint": "Read only the table headed '45th District'; ignore any other table visible in the image. Cumulated vote cells may end in a small one-half fraction; transcribe halves as '½' directly after the digits, for example 68,317½ (transcribe halves).",
    "turn": -90
   },
   {
@@ -1516,7 +1324,7 @@
     0.956,
     0.822
    ],
-   "hint": "Read only the table headed '47th District'; ignore any other table visible in the image. Cumulated vote cells may end in a small one-half fraction; transcribe halves as '\u00bd' directly after the digits, for example 68,317\u00bd (transcribe halves).",
+   "hint": "Read only the table headed '47th District'; ignore any other table visible in the image. Cumulated vote cells may end in a small one-half fraction; transcribe halves as '½' directly after the digits, for example 68,317½ (transcribe halves).",
    "turn": -90
   },
   {
@@ -1551,92 +1359,7 @@
     0.963,
     0.365
    ],
-   "hint": "Read only the table headed '48th District'; ignore any other table visible in the image. Cumulated vote cells may end in a small one-half fraction; transcribe halves as '\u00bd' directly after the digits, for example 68,317\u00bd (transcribe halves).",
-   "turn": -90
-  },
-  {
-   "page": 51,
-   "id": "51-0",
-   "columns": [
-    {
-     "label": "Democratic James T. Londrigan",
-     "contest": "state-house50",
-     "candidate": "James T. Londrigan"
-    },
-    {
-     "label": "Democratic Douglas N. Kane",
-     "contest": "state-house50",
-     "candidate": "Douglas N. Kane"
-    },
-    {
-     "label": "Republican J. David Jones",
-     "contest": "state-house50",
-     "candidate": "J David Jones"
-    },
-    {
-     "label": "Republican Justin Taft",
-     "contest": "state-house50",
-     "candidate": "Justin Taft"
-    },
-    {
-     "label": "(Write-in) C. F. Marley",
-     "contest": "state-house50",
-     "candidate": "C F. Marley"
-    },
-    {
-     "label": "(Write-in) Jim Mece",
-     "contest": "state-house50",
-     "candidate": "Jim Mece"
-    }
-   ],
-   "orientation": "counties_down",
-   "crop": [
-    0.065,
-    0.013,
-    0.943,
-    0.31
-   ],
-   "hint": "Read only the table headed '50th District'; ignore any other table visible in the image. Cumulated vote cells may end in a small one-half fraction; transcribe halves as '\u00bd' directly after the digits, for example 68,317\u00bd (transcribe halves).",
-   "turn": -90
-  },
-  {
-   "page": 51,
-   "id": "51-1",
-   "columns": [
-    {
-     "label": "Democratic Rolland F. Tipsword",
-     "contest": "state-house51",
-     "candidate": "Rolland F. Tipsword"
-    },
-    {
-     "label": "Democratic John F. Dunn",
-     "contest": "state-house51",
-     "candidate": "John F. Dunn"
-    },
-    {
-     "label": "Republican Webber Borchers",
-     "contest": "state-house51",
-     "candidate": "Webber Borchers"
-    },
-    {
-     "label": "Republican Allen F. Bennett",
-     "contest": "state-house51",
-     "candidate": "Allen F. Bennett"
-    },
-    {
-     "label": "Independent Ruth A. Wilber",
-     "contest": "state-house51",
-     "candidate": "Ruth A. Wilber"
-    }
-   ],
-   "orientation": "counties_down",
-   "crop": [
-    0.065,
-    0.302,
-    0.943,
-    0.645
-   ],
-   "hint": "Read only the table headed '51st District'; ignore any other table visible in the image. Cumulated vote cells may end in a small one-half fraction; transcribe halves as '\u00bd' directly after the digits, for example 68,317\u00bd (transcribe halves).",
+   "hint": "Read only the table headed '48th District'; ignore any other table visible in the image. Cumulated vote cells may end in a small one-half fraction; transcribe halves as '½' directly after the digits, for example 68,317½ (transcribe halves).",
    "turn": -90
   },
   {
@@ -1671,7 +1394,7 @@
     0.965,
     0.314
    ],
-   "hint": "Read only the table headed '53rd District'; ignore any other table visible in the image. Cumulated vote cells may end in a small one-half fraction; transcribe halves as '\u00bd' directly after the digits, for example 68,317\u00bd (transcribe halves).",
+   "hint": "Read only the table headed '53rd District'; ignore any other table visible in the image. Cumulated vote cells may end in a small one-half fraction; transcribe halves as '½' directly after the digits, for example 68,317½ (transcribe halves).",
    "turn": -90
   },
   {
@@ -1711,7 +1434,7 @@
     0.965,
     0.752
    ],
-   "hint": "Read only the table headed '54th District'; ignore any other table visible in the image. Cumulated vote cells may end in a small one-half fraction; transcribe halves as '\u00bd' directly after the digits, for example 68,317\u00bd (transcribe halves).",
+   "hint": "Read only the table headed '54th District'; ignore any other table visible in the image. Cumulated vote cells may end in a small one-half fraction; transcribe halves as '½' directly after the digits, for example 68,317½ (transcribe halves).",
    "turn": -90
   },
   {
@@ -1746,7 +1469,7 @@
     1.0,
     0.573
    ],
-   "hint": "Read only the table headed '56th District'; ignore any other table visible in the image. Cumulated vote cells may end in a small one-half fraction; transcribe halves as '\u00bd' directly after the digits, for example 68,317\u00bd (transcribe halves).",
+   "hint": "Read only the table headed '56th District'; ignore any other table visible in the image. Cumulated vote cells may end in a small one-half fraction; transcribe halves as '½' directly after the digits, for example 68,317½ (transcribe halves).",
    "turn": -90
   },
   {
@@ -1781,7 +1504,7 @@
     1.0,
     0.792
    ],
-   "hint": "Read only the table headed '57th District'; ignore any other table visible in the image. Cumulated vote cells may end in a small one-half fraction; transcribe halves as '\u00bd' directly after the digits, for example 68,317\u00bd (transcribe halves).",
+   "hint": "Read only the table headed '57th District'; ignore any other table visible in the image. Cumulated vote cells may end in a small one-half fraction; transcribe halves as '½' directly after the digits, for example 68,317½ (transcribe halves).",
    "turn": -90
   },
   {
@@ -1816,7 +1539,7 @@
     1.0,
     0.75
    ],
-   "hint": "Read only the table headed '59th District'; ignore any other table visible in the image. Cumulated vote cells may end in a small one-half fraction; transcribe halves as '\u00bd' directly after the digits, for example 68,317\u00bd (transcribe halves).",
+   "hint": "Read only the table headed '59th District'; ignore any other table visible in the image. Cumulated vote cells may end in a small one-half fraction; transcribe halves as '½' directly after the digits, for example 68,317½ (transcribe halves).",
    "turn": -90
   }
  ],

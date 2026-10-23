@@ -69,6 +69,7 @@ class Volume(TypedDict):
     leaves: list[int]
     create: NotRequired[bool]
     autorotate: NotRequired[bool]
+    turn: NotRequired[int]
 
 
 def schema(offices: list[str]) -> dict[str, object]:
@@ -176,7 +177,7 @@ def requests(volume: Volume, reader: str, leaves: list[int]) -> dict[str, scans.
     text = instructions(volume)
     out: dict[str, scans.Read] = {}
     for leaf in leaves:
-        image = scans.render(manifest, {"page": leaf}, 200)
+        image = scans.render(manifest, {"page": leaf, **({"turn": volume["turn"]} if "turn" in volume else {})}, 200)
         media, data = scans.encode(image)
         digest = hashlib.sha256(data + text.encode()).hexdigest()
         blocks: list[ImageBlockParam | TextBlockParam] = [
@@ -276,7 +277,9 @@ def generate(name: str, volume: Volume, pages: dict[int, LayoutPage], folder: Pa
         ids = dict(conn.execute("select value, entity_id from external_id where scheme = 'us.contest'").fetchall())
         for leaf in volume["leaves"]:
             page = pages[leaf]
-            if volume.get("autorotate"):
+            if "turn" in volume:
+                turns[leaf] = volume["turn"]
+            elif volume.get("autorotate"):
                 turns[leaf] = scans.orientation(source, leaf, scans.render(source, {"page": leaf, "turn": 0}, 150))
             if page["notes"]:
                 notes.append(f"{leaf}: {page['notes']}")
