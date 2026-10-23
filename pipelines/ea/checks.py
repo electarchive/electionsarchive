@@ -16,7 +16,7 @@ KEYS = {
     "option_id": "contest_option",
     "from_option_id": "contest_option",
 }
-REPLACEABLE = ("area_geometry", "area_parent")
+REPLACEABLE = ("area_geometry", "area_parent", "tenure_affiliation")
 RULES = Draft7Validator(json.loads((ROOT / "packages" / "engine" / "rules.schema.json").read_text()))
 
 

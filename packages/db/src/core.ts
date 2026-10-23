@@ -41,7 +41,8 @@ export const stage = pgEnum("stage", ["live", "preliminary", "official", "certif
 export const resultSetStatus = pgEnum("result_set_status", ["active", "superseded", "annulled", "withdrawn"])
 export const outcomeKind = pgEnum("outcome_kind", ["elected", "won", "advanced", "eliminated", "lost", "tied", "withdrew", "disqualified"])
 export const acquiredVia = pgEnum("acquired_via", ["elected", "appointed", "trustee", "succession", "list_replacement", "co_opted", "acting"])
-export const endedVia = pgEnum("ended_via", ["term_end", "resigned", "died", "removed", "annulled", "dissolved", "expelled", "lost_seat", "disqualified"])
+export const endedVia = pgEnum("ended_via", ["term_end", "resigned", "died", "removed", "annulled", "dissolved", "expelled", "lost_seat", "disqualified", "withdrew"])
+export const representationGapReason = pgEnum("representation_gap_reason", ["secession"])
 export const tenureEventKind = pgEnum("tenure_event_kind", ["elected", "certified", "certificate_denied", "certificate_reversed", "sworn_in", "suspended", "removed", "trustee_appointed", "reinstated", "resigned", "died", "immunity_lifted", "arrested", "switched_party", "became_independent", "expelled", "term_ended"])
 export const tenureAffiliationKind = pgEnum("tenure_affiliation_kind", ["party", "parliamentary_group"])
 export const nameKind = pgEnum("name_kind", ["official", "native", "english", "historical", "transliteration", "abbreviation", "ballot", "short"])
@@ -204,6 +205,21 @@ export const bodyEvent = pgTable("body_event", {
 	changesetId: uuid("changeset_id").notNull().references(() => changeset.id),
 	recordedFrom: timestamp("recorded_from", { withTimezone: true }).default(sql`now()`).notNull(),
 });
+
+export const bodyApportionment = pgTable("body_apportionment", {
+	bodyId: uuid("body_id").notNull().references(() => body.id, { onDelete: "cascade" } ),
+	areaId: uuid("area_id").notNull().references(() => area.id),
+	seats: integer().notNull(),
+	validFrom: date("valid_from").notNull(),
+	validFromPrecision: datePrecision("valid_from_precision").default("day").notNull(),
+	validTo: date("valid_to"),
+	validToPrecision: datePrecision("valid_to_precision").default("day").notNull(),
+	valid: daterange().notNull().generatedAlwaysAs(sql`daterange(valid_from, valid_to, '[)'::text)`),
+	changesetId: uuid("changeset_id").notNull().references(() => changeset.id),
+	recordedFrom: timestamp("recorded_from", { withTimezone: true }).default(sql`now()`).notNull(),
+}, (table) => [
+	primaryKey({ columns: [table.bodyId, table.areaId, table.valid], name: "body_apportionment_pkey"}),
+]);
 
 export const bodySize = pgTable("body_size", {
 	bodyId: uuid("body_id").notNull().references(() => body.id, { onDelete: "cascade" } ),
@@ -961,6 +977,21 @@ export const reportingUnitArea = pgTable("reporting_unit_area", {
 	index("reporting_unit_area_area_idx").using("btree", table.areaId.asc().nullsLast()),
 ]);
 
+export const representationGap = pgTable("representation_gap", {
+	bodyId: uuid("body_id").notNull().references(() => body.id, { onDelete: "cascade" } ),
+	areaId: uuid("area_id").notNull().references(() => area.id),
+	reason: representationGapReason().notNull(),
+	validFrom: date("valid_from").notNull(),
+	validFromPrecision: datePrecision("valid_from_precision").default("day").notNull(),
+	validTo: date("valid_to"),
+	validToPrecision: datePrecision("valid_to_precision").default("day").notNull(),
+	valid: daterange().notNull().generatedAlwaysAs(sql`daterange(valid_from, valid_to, '[)'::text)`),
+	changesetId: uuid("changeset_id").notNull().references(() => changeset.id),
+	recordedFrom: timestamp("recorded_from", { withTimezone: true }).default(sql`now()`).notNull(),
+}, (table) => [
+	primaryKey({ columns: [table.bodyId, table.areaId, table.valid], name: "representation_gap_pkey"}),
+]);
+
 export const resultFlow = pgTable("result_flow", {
 	resultSetK: integer("result_set_k").notNull(),
 	unitK: integer("unit_k").notNull(),
@@ -1072,6 +1103,7 @@ export const seat = pgTable("seat", {
 	changesetId: uuid("changeset_id").notNull().references(() => changeset.id),
 	recordedFrom: timestamp("recorded_from", { withTimezone: true }).default(sql`now()`).notNull(),
 	voting: boolean().default(true).notNull(),
+	apportionedAreaId: uuid("apportioned_area_id").references(() => area.id),
 });
 
 export const slug = pgTable("slug", {

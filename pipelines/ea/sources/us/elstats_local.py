@@ -18,7 +18,7 @@ from ea.sources.us.alged import SOURCE as ALGED
 from ea.store import DATA, connect
 
 SOURCE = "us.elstats_local"
-VERSION = "6"
+VERSION = "7"
 PARSED = DATA / "parsed" / SOURCE
 TOWNS = "https://www2.census.gov/geo/tiger/GENZ2020/shp/cb_2020_09_cousub_500k.zip"
 COUNTY = ("board-of-commissioners", "Board of Commissioners", None)
@@ -880,6 +880,20 @@ def emit() -> Path:
                 supersedes_id=previous,
                 completeness=1,
             )
+            if counted is None and f"{contest_key}:precinct" in sets:
+                cs.add(
+                    "result_set",
+                    id=cs.key(f"{SOURCE}.result_set", f"{contest_key}:precinct"),
+                    election_id=election,
+                    contest_id=contest,
+                    stage="certified",
+                    kind="counted",
+                    status="withdrawn",
+                    source_id=sources[state],
+                    is_default=False,
+                    supersedes_id=None,
+                    completeness=1,
+                )
             flagged = state == "CT" and rows["winner"].any()
             cs.add(
                 "note",

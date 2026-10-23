@@ -6,6 +6,7 @@
   import ChevronRightIcon from "@lucide/svelte/icons/chevron-right";
   import { createQuery, keepPreviousData } from "@tanstack/svelte-query";
   import * as Select from "#lib/components/ui/select/index.js";
+  import { Slider } from "#lib/components/ui/slider/index.js";
   import { count, date } from "#lib/format.js";
   import { m } from "#lib/paraglide/messages.js";
   import { swatch } from "#lib/party.js";
@@ -63,16 +64,49 @@
   });
 
   const roll = $derived(members.data?.members ?? []);
-  const sitting = $derived(
-    members.data == null
-      ? []
-      : roll.filter(
-          (member) =>
-            member.isVoting &&
-            (!members.data.isSeated ||
-              ((member.from ?? "") <= (members.data.start ?? "") &&
-                (member.to == null || member.to > (members.data.start ?? "")))),
-        ),
+  let chosen = $state<{ term: string; day: string } | null>(null);
+  const first = $derived(members.data?.start ?? term?.start ?? "");
+  const on = $derived(
+    chosen != null && chosen.term === term?.start ? chosen.day : first,
+  );
+  const DAY = 864e5;
+  const range = $derived({
+    low: Date.parse(first) / DAY,
+    high:
+      Date.parse(members.data?.end ?? new Date().toISOString().slice(0, 10)) /
+        DAY -
+      1,
+  });
+  const sitting = $derived.by(() => {
+    if (members.data == null) {
+      return [];
+    }
+    const present = roll.filter(
+      (member) =>
+        member.isVoting &&
+        (!members.data.isSeated ||
+          ((member.from ?? "") <= on && (member.to == null || member.to > on))),
+    );
+    return members.data.seats.length === 0
+      ? present
+      : Map.groupBy(present, (member) => member.seat ?? member.person)
+          .values()
+          .map(
+            (group) =>
+              group.toSorted((a, b) =>
+                (b.from ?? "").localeCompare(a.from ?? ""),
+              )[0],
+          )
+          .filter((member) => member != null)
+          .toArray();
+  });
+  const open = $derived(
+    (members.data?.seats ?? []).filter(
+      (seat) => seat.from <= on && (seat.to == null || seat.to > on),
+    ),
+  );
+  const isCounted = $derived(
+    members.data?.isSeated === true && (open.length > 0 || on !== first),
   );
   const own = $derived(
     new Map((members.data?.parties ?? []).map((party) => [party.id, party])),
@@ -105,8 +139,17 @@
       ),
       (member) => home(member.party),
     );
-    return (term?.parties ?? []).map((entry) => {
-      const party = entry.party == null ? null : info.get(entry.party);
+    const rows = isCounted
+      ? seated
+          .entries()
+          .map(([party, list]) => ({ party, seats: list.length }))
+          .toArray()
+      : (term?.parties ?? []);
+    return rows.map((entry) => {
+      const party =
+        entry.party == null
+          ? null
+          : (info.get(entry.party) ?? own.get(entry.party));
       return {
         key: entry.party ?? "none",
         label: party?.label ?? m.record_none(),
@@ -128,6 +171,23 @@
         })),
       };
     });
+  });
+  const held = $derived.by(() => {
+    let total = 0;
+    for (const party of hemicycle) {
+      total += party.seats;
+    }
+    return total;
+  });
+  const seceded = $derived.by(() => {
+    const taken = new Set(sitting.map((member) => member.seat));
+    return open.filter(
+      (seat) =>
+        !taken.has(seat.label) &&
+        seat.gaps.some(
+          (gap) => gap.from <= on && (gap.to == null || gap.to > on),
+        ),
+    ).length;
   });
   const change = $derived.by(() => {
     if (previous == null) {
@@ -374,6 +434,38 @@
         </p>
       </div>
 
+      {#if members.data?.isSeated === true && range.high > range.low}
+        <div
+          class="col-span-12 flex flex-wrap items-center gap-x-4 gap-y-2 bg-card px-3.5 py-2.5"
+        >
+          <span
+            class="font-figures text-[0.8125rem] font-semibold tabular-nums min-inline-36"
+            >{m.chamber_on({ date: date(on) })}</span
+          >
+          <Slider
+            type="single"
+            class="flex-1 max-inline-120 min-inline-40"
+            aria-label={m.chamber_on_pick()}
+            min={range.low}
+            max={range.high}
+            step={1}
+            value={Date.parse(on) / DAY}
+            onValueChange={(value: number) => {
+              chosen = {
+                term: term.start,
+                day: new Date(value * DAY).toISOString().slice(0, 10),
+              };
+            }}
+          />
+          <button
+            type="button"
+            class="rounded-sm border border-input bg-card px-2.5 py-1 text-[0.8125rem] font-semibold keycap hover:bg-secondary disabled:opacity-40"
+            disabled={on === first}
+            onclick={() => (chosen = null)}>{m.chamber_on_first()}</button
+          >
+        </div>
+      {/if}
+
       {#key term.start}
         <Seats
           isLinked
@@ -382,10 +474,18 @@
           here={null}
           place={body.name}
           link={null}
-          size={term.size != null && term.total <= term.size ? term.size : null}
-          vacant={term.size == null || !term.isSeated
-            ? 0
-            : Math.max(0, term.size - term.total)}
+          size={open.length > 0
+            ? open.length
+            : term.size != null && held <= term.size
+              ? term.size
+              : null}
+          vacant={open.length > 0
+            ? Math.max(0, open.length - held - seceded)
+            : term.size == null || !term.isSeated
+              ? 0
+              : Math.max(0, term.size - held)}
+          {seceded}
+          official={seceded > 0 && term.size != null ? term.size : null}
           {change}
         />
       {/key}

@@ -30,6 +30,8 @@
     link,
     size,
     vacant = 0,
+    seceded = 0,
+    official = null,
     isComplete = true,
     change: moved = null,
     partners: pairs = [],
@@ -54,6 +56,8 @@
     link: { name: string; path: string | null } | null;
     size: number | null;
     vacant?: number;
+    seceded?: number;
+    official?: number | null;
     isComplete?: boolean;
     change?: Record<string, number> | null;
     partners?: Array<Array<string>>;
@@ -157,14 +161,14 @@
     ),
   );
   const totals = $derived.by(() => {
-    let [all, local] = [vacant, 0];
+    let [all, local] = [vacant + seceded, 0];
     for (const party of folded) {
       all += party.seats;
       local += party.here;
     }
     return { all, local };
   });
-  const majority = $derived(Math.floor(totals.all / 2) + 1);
+  const majority = $derived(Math.floor((official ?? totals.all) / 2) + 1);
 
   const layout = $derived.by(() => {
     const total = Math.max(1, totals.all);
@@ -268,6 +272,9 @@
         }
       }
     }
+    for (const seat of placed.slice(start, start + seceded)) {
+      seat.party = "~seceded";
+    }
     return placed;
   });
   const colors = $derived(
@@ -286,7 +293,10 @@
     ),
   );
   const labels = $derived(
-    new Map(folded.map((party) => [party.key, party.label])),
+    new Map([
+      ...folded.map((party) => [party.key, party.label] as const),
+      ["~seceded", m.seats_seceded()] as const,
+    ]),
   );
   const whole = $derived(
     isUp ||
@@ -335,6 +345,12 @@
         count: count(totals.local),
         total: count(totals.all),
         place,
+      });
+    }
+    if (official != null) {
+      return m.seats_official({
+        count: count(official),
+        majority: count(majority),
       });
     }
     if (whole) {
@@ -597,14 +613,21 @@
             ]
               .filter((part) => part != null)
               .join(", ")}
-            r={seat.party === "" ? dot - 0.3 * ring : dot}
-            stroke-width={seat.party === ""
+            r={seat.party === "" || seat.party === "~seceded"
+              ? dot - 0.3 * ring
+              : dot}
+            stroke-dasharray={seat.party === "~seceded"
+              ? `${0.9 * ring} ${0.7 * ring}`
+              : undefined}
+            stroke-width={seat.party === "" || seat.party === "~seceded"
               ? 0.6 * ring
               : link != null && seat.local
                 ? 0.45 * ring
                 : undefined}
-            style:stroke={seat.party === "" ? "var(--muted-foreground)" : null}
-            style:fill={seat.party === ""
+            style:stroke={seat.party === "" || seat.party === "~seceded"
+              ? "var(--muted-foreground)"
+              : null}
+            style:fill={seat.party === "" || seat.party === "~seceded"
               ? "var(--card)"
               : lit
                 ? colors.get(seat.party)
@@ -666,7 +689,7 @@
       {#if tip != null}
         <div
           class={cn(
-            "pointer-events-none absolute z-10 grid -translate-y-[calc(100%+0.5rem)] gap-0.5 rounded-sm bg-foreground px-2.5 py-2 text-[0.8125rem] leading-tight text-background shadow-sm inline-max max-inline-64",
+            "pointer-events-none absolute z-10 grid -translate-y-[calc(100%+0.5rem)] gap-0.5 rounded-sm bg-foreground px-2.5 py-2 text-[0.8125rem]/tight  text-background shadow-sm inline-max max-inline-64",
             {
               "-translate-x-1/2": tip.x >= 0.25 && tip.x <= 0.75,
               "-translate-x-3": tip.x < 0.25,
@@ -834,6 +857,28 @@
         {/if}
       </li>
     {/each}
+    {#if seceded > 0}
+      <li
+        class="flex items-center gap-2 rounded-xs px-1.5 py-1 text-muted-foreground"
+      >
+        <span
+          class="shrink-0 rounded-xs border border-dashed border-muted-foreground block-2.5 inline-2.5"
+        ></span>
+        <span class="flex-1 truncate font-semibold min-inline-0"
+          >{m.seats_seceded()}</span
+        >
+        {#if moved != null}
+          <span class="inline-10"></span>
+        {/if}
+        <span class="font-figures text-[0.8125rem] font-semibold tabular-nums"
+          >{count(seceded)}</span
+        >
+        <span
+          class="text-end font-figures text-[0.8125rem] tabular-nums inline-14"
+          >{percent(seceded / totals.all)}</span
+        >
+      </li>
+    {/if}
     {#if vacant > 0}
       <li
         class="flex items-center gap-2 rounded-xs px-1.5 py-1 text-muted-foreground"

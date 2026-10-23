@@ -5195,15 +5195,16 @@ def emit() -> Path:
         for state, numbers in sorted(owned.items()):
             for number in sorted(numbers):
                 senate_seats[(state, number)] = cs.key("us.seat", f"senate:{state}:{number}")
-                cs.add(
-                    "seat",
-                    id=senate_seats[(state, number)],
-                    body_id=bodies["senate"],
-                    district_area_id=states[state][1],
-                    label=f"{states[state][2]} Class {'I' * number}",
-                    voting=True,
-                    valid_from=None,
-                )
+                if senate_seats[(state, number)] in cs.minted:
+                    cs.add(
+                        "seat",
+                        id=senate_seats[(state, number)],
+                        body_id=bodies["senate"],
+                        district_area_id=states[state][1],
+                        label=f"{states[state][2]} Class {'I' * number}",
+                        voting=True,
+                        valid_from=None,
+                    )
         delegates: dict[str, UUID] = {}
         for state, label in DELEGATE_SEATS.items():
             delegates[state] = cs.key("us.seat", f"house:{state}")

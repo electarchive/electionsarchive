@@ -1,15 +1,49 @@
+import html
 import json
+import re
 from datetime import date, timedelta
 from pathlib import Path
-from uuid import UUID
+from urllib.parse import urlencode
+from uuid import UUID, uuid5
 
 from ea import raw
-from ea.changeset import Changeset, slug
+from ea.changeset import NAMESPACE, Changeset, slug
 from ea.sources.us.clerk import LEGISLATORS
 from ea.store import connect
 
 SOURCE = "us.legislators"
-VERSION = "1"
+VERSION = "2"
+SERVICE = "https://query.wikidata.org/sparql?" + urlencode(
+    {
+        "query": """SELECT ?bioguide ?start ?startPrecision ?end ?endPrecision ?cause WHERE {
+?person p:P39 ?held . ?held ps:P39 wd:Q4416090 . ?person wdt:P1157 ?bioguide .
+OPTIONAL { ?held pqv:P580 [ wikibase:timeValue ?start ; wikibase:timePrecision ?startPrecision ] }
+OPTIONAL { ?held pqv:P582 [ wikibase:timeValue ?end ; wikibase:timePrecision ?endPrecision ] }
+OPTIONAL { ?held pq:P1534 ?cause } }""",
+        "format": "json",
+    }
+)
+CAUSES = {"Q796919": "resigned", "Q5247364": "died", "Q4": "died"}
+MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+EXPULSIONS = "https://www.senate.gov/about/powers-procedures/expulsion/{page}_expulsion.htm"
+EXPELLED = {
+    "Blount": [("Blount", "TN")],
+    "036CivilWarCases1": [
+        ("Mason", "VA"),
+        ("Hunter", "VA"),
+        ("Clingman", "NC"),
+        ("Bragg", "NC"),
+        ("Chesnut", "SC"),
+        ("Nicholson", "TN"),
+        ("Sebastian", "AR"),
+        ("Mitchel", "AR"),
+        ("Hemphill", "TX"),
+        ("Wigfall", "TX"),
+    ],
+    "038Breckinridge": [("Breckinridge", "KY")],
+    "039CivilWarCases": [("Polk", "MO"), ("Johnson", "MO")],
+    "040JesseBright": [("Bright", "IN")],
+}
 PUBLISHER = "The @unitedstates project"
 TITLE = "congress-legislators: members of Congress, 1789 to the present"
 LANDING = "https://github.com/unitedstates/congress-legislators"
@@ -95,6 +129,7 @@ ADMITTED = {
     "OL": date(1812, 4, 30),
     "PI": date(1946, 7, 4),
 }
+RATIFIED = {"NC": date(1789, 11, 21), "RI": date(1790, 5, 29)}
 TERRITORIES = {
     "OH": "Delegate from the Northwest Territory",
     "TN": "Delegate from the Southwest Territory",
@@ -130,6 +165,12 @@ TERRITORIES = {
 }
 
 
+def fetch() -> None:
+    raw.fetch(SOURCE, SERVICE, suffix=".json")
+    for page in EXPELLED:
+        raw.fetch(SOURCE, EXPULSIONS.format(page=page), suffix=".html")
+
+
 def emit() -> Path:
     members = [
         person
@@ -163,6 +204,7 @@ def emit() -> Path:
             summary="House and Senate tenures, 1789 to the present, from congress-legislators",
             polity="US",
         )
+        cs.manifest["scope"] = {"polity": "US", "replaces": {"tenure_affiliation": ["us.lineage"]}}
         us = cs.polity("US")
         bodies = {kind: cs.key("us.body", kind) for kind in ("house", "senate")}
         if cs.minted:
@@ -180,6 +222,55 @@ def emit() -> Path:
         )
         for kind in ("historical", "current"):
             cs.artifact(raw.cached("us.clerk", LEGISLATORS.format(kind=kind)), source)
+        wikidata = cs.source("Wikidata", "Positions held in the United States Senate")
+        cs.add(
+            "source",
+            id=wikidata,
+            kind="wikidata",
+            publisher="Wikidata",
+            title="Positions held in the United States Senate",
+            url="https://www.wikidata.org/wiki/Q4416090",
+            license="CC0 1.0",
+            license_url="https://creativecommons.org/publicdomain/zero/1.0/",
+        )
+        cs.artifact(raw.cached(SOURCE, SERVICE), wikidata)
+        held: dict[str, list[dict[str, str]]] = {}
+        for binding in json.loads(raw.cached(SOURCE, SERVICE).path.read_text(encoding="utf-8"))["results"]["bindings"]:
+            held.setdefault(binding["bioguide"]["value"], []).append(
+                {key: value["value"].rsplit("/", 1)[-1] for key, value in binding.items()}
+            )
+        senate = cs.source("United States Senate", "Expulsion cases")
+        cs.add(
+            "source",
+            id=senate,
+            kind="official_body",
+            publisher="United States Senate",
+            title="Expulsion cases",
+            url="https://www.senate.gov/about/powers-procedures/expulsion.htm",
+        )
+        expelled: dict[tuple[str, str], date] = {}
+        for page, names in EXPELLED.items():
+            artifact = raw.cached(SOURCE, EXPULSIONS.format(page=page))
+            cs.artifact(artifact, senate)
+            text = re.sub(
+                r"\s+", " ", html.unescape(re.sub(r"<[^>]+>", " ", artifact.path.read_text(encoding="utf-8")))
+            )
+            month, day, year = re.findall(r"Senate vote ?: ?([A-Z][a-z]+)\.? (\d+), (\d{4})", text)[0]
+            for name in names:
+                expelled[name] = date(int(year), MONTHS.index(month[:3]) + 1, int(day))
+        withdrawn: dict[str, tuple[date, date | None]] = {
+            iso.removeprefix("US-"): (start, end)
+            for iso, start, end in conn.execute(
+                """select p.iso_code, g.valid_from, g.valid_to from representation_gap g
+                   join reporting_unit u on u.area_id = g.area_id and u.scheme_code = 'us.state'
+                   join polity p on p.id = u.polity_id
+                   join external_id b on b.entity_id = g.body_id and b.scheme = 'us.body' and b.value = 'senate'
+                   where g.reason = 'secession'"""
+            ).fetchall()
+        }
+        if not withdrawn:
+            raise ValueError("run us.secession first")
+        states: dict[UUID, str] = {}
 
         def named(entity: UUID, text: str) -> None:
             if entity in cs.minted:
@@ -245,9 +336,54 @@ def emit() -> Path:
             for term in member["terms"]:
                 chamber = "senate" if term["type"] == "sen" else "house"
                 start, end = date.fromisoformat(term["start"]), date.fromisoformat(term["end"])
+                scheduled = end.year % 2 == 1 and (end.month, end.day) in ((3, 3), (3, 4), (1, 3))
+                began = ended = "day"
+                cause = vote = None
                 seat = None
                 if chamber == "senate":
                     seat = cs.key("us.seat", f"senate:{term['state']}:{term['class']}")
+                    states[seat] = term["state"]
+                    statements = held.get(ids["bioguide"], [])
+                    if (start.month, start.day) == (1, 1):
+                        starts = [
+                            date.fromisoformat(entry["start"][:10])
+                            for entry in statements
+                            if entry.get("startPrecision") == "11" and entry["start"][:4] == term["start"][:4]
+                        ]
+                        start, began = (min(starts), "day") if starts else (start, "year")
+                    if (end.month, end.day) == (12, 31):
+                        ends = sorted(
+                            (date.fromisoformat(entry["end"][:10]), CAUSES.get(entry.get("cause", ""), ""))
+                            for entry in statements
+                            if entry.get("endPrecision") == "11"
+                            and entry["end"][:4] == term["end"][:4]
+                            and entry["end"][:10] > start.isoformat()
+                        )
+                        if ends:
+                            end, cause = ends[-1][0], ends[-1][1] or None
+                        else:
+                            ended = "year"
+                    due = date.fromisoformat(term["end"])
+                    gap = withdrawn.get(term["state"])
+                    if gap is not None and start < gap[0] and -60 <= (end - gap[0]).days <= 180:
+                        left = [
+                            date.fromisoformat(entry["end"][:10])
+                            for entry in statements
+                            if entry.get("endPrecision") == "11"
+                            and gap[0] - timedelta(days=60) <= date.fromisoformat(entry["end"][:10]) < end
+                        ]
+                        if left and cause is None:
+                            end = max(left)
+                    else:
+                        gap = None
+                    vote = expelled.get((member["name"]["last"], term["state"]))
+                    final = term is [other for other in member["terms"] if other["type"] == "sen"][-1]
+                    if vote is not None and not start <= vote <= due + timedelta(days=365 if final else 0):
+                        vote = None
+                    if vote is not None:
+                        end, cause = min(end, vote), "expelled"
+                    elif cause is None and gap is not None and (end < due or not scheduled):
+                        cause = "withdrew"
                 elif term["state"] in ("AS", "DC", "GU", "MP", "PR", "VI"):
                     seat = cs.key("us.seat", f"house:{term['state']}")
                 elif end <= ADMITTED.get(term["state"], date.min):
@@ -299,7 +435,6 @@ def emit() -> Path:
                             valid_to=None,
                             valid_to_precision="day",
                         )
-                scheduled = end.year % 2 == 1 and (end.month, end.day) in ((3, 3), (3, 4), (1, 3))
                 tenure = cs.key(f"{SOURCE}.tenure", f"{ids['bioguide']}:{chamber}:{term['start']}")
                 cs.add(
                     "tenure",
@@ -308,13 +443,23 @@ def emit() -> Path:
                     body_id=bodies[chamber],
                     seat_id=seat,
                     from_date=start,
-                    from_precision="day",
+                    from_precision=began,
                     to_date=None if end > today else end,
-                    to_precision="day",
+                    to_precision=ended,
                     acquired_via="appointed" if term.get("how") == "appointment" else "elected",
                     contest_id=contest,
-                    ended_via="term_end" if scheduled and end <= today else None,
+                    ended_via=cause or ("term_end" if scheduled and end <= today else None),
                 )
+                if vote is not None:
+                    cs.add(
+                        "tenure_event",
+                        id=uuid5(NAMESPACE, f"{SOURCE}.tenure_event\x1f{ids['bioguide']}:{term['start']}:expelled"),
+                        tenure_id=tenure,
+                        kind="expelled",
+                        date=vote,
+                        actor="United States Senate",
+                        source_id=senate,
+                    )
                 affiliations = term.get("party_affiliations") or [
                     {"start": term["start"], "end": term["end"], "party": term.get("party")}
                 ]
@@ -322,7 +467,7 @@ def emit() -> Path:
                     label = LABELS.get(affiliation["party"], affiliation["party"])
                     if label is None or label in UNAFFILIATED - {"Independent"}:
                         continue
-                    since = date.fromisoformat(affiliation["start"])
+                    since = max(start, date.fromisoformat(affiliation["start"]))
                     if label == "Republican":
                         key = "republican-party" if since.year >= 1854 else "democratic-republican-party"
                     elif label == "Progressive":
@@ -344,7 +489,7 @@ def emit() -> Path:
                     until = (
                         date.fromisoformat(affiliations[index + 1]["start"]) - timedelta(days=1)
                         if index + 1 < len(affiliations)
-                        else date.fromisoformat(affiliation["end"])
+                        else min(end, date.fromisoformat(affiliation["end"]))
                     )
                     cs.add(
                         "tenure_affiliation",
@@ -356,4 +501,18 @@ def emit() -> Path:
                         valid_to=None if until > today else until + timedelta(days=1),
                         valid_to_precision="day",
                     )
+        for seat, label, area in conn.execute(
+            "select id, label, district_area_id from seat where id = any(%s::uuid[])", [list(states)]
+        ).fetchall():
+            cs.add(
+                "seat",
+                id=seat,
+                body_id=bodies["senate"],
+                district_area_id=area,
+                label=label,
+                voting=True,
+                valid_from=ADMITTED.get(states[seat], RATIFIED.get(states[seat], date(1789, 3, 4))),
+                valid_to=None,
+                valid_to_precision="day",
+            )
         return cs.write()

@@ -128,6 +128,8 @@ export const relations = defineRelations(schema, (r) => ({
 		releases: r.many.release(),
 		reportingUnits: r.many.reportingUnit(),
 		reportingUnitAreas: r.many.reportingUnitArea(),
+		representationGaps: r.many.representationGap(),
+		bodyApportionments: r.many.bodyApportionment(),
 		resultSets: r.many.resultSet(),
 		politiesViaScheme: r.many.polity({
 			from: r.changeset.id.through(r.scheme.changesetId),
@@ -325,6 +327,8 @@ export const relations = defineRelations(schema, (r) => ({
 		polityTerritories: r.many.polityTerritory(),
 		reportingUnits: r.many.reportingUnit(),
 		reportingUnitAreas: r.many.reportingUnitArea(),
+		representationGaps: r.many.representationGap(),
+		bodyApportionments: r.many.bodyApportionment(),
 		seats: r.many.seat(),
 	},
 	scheme: {
@@ -512,6 +516,8 @@ export const relations = defineRelations(schema, (r) => ({
 		}),
 		contests: r.many.contest(),
 		offices: r.many.office(),
+		representationGaps: r.many.representationGap(),
+		bodyApportionments: r.many.bodyApportionment(),
 		seats: r.many.seat(),
 		tenures: r.many.tenure(),
 	},
@@ -1152,6 +1158,34 @@ export const relations = defineRelations(schema, (r) => ({
 		reportingUnit: r.one.reportingUnit({
 			from: r.reportingUnitArea.unitId,
 			to: r.reportingUnit.id
+		}),
+	},
+	bodyApportionment: {
+		area: r.one.area({
+			from: r.bodyApportionment.areaId,
+			to: r.area.id
+		}),
+		body: r.one.body({
+			from: r.bodyApportionment.bodyId,
+			to: r.body.id
+		}),
+		changeset: r.one.changeset({
+			from: r.bodyApportionment.changesetId,
+			to: r.changeset.id
+		}),
+	},
+	representationGap: {
+		area: r.one.area({
+			from: r.representationGap.areaId,
+			to: r.area.id
+		}),
+		body: r.one.body({
+			from: r.representationGap.bodyId,
+			to: r.body.id
+		}),
+		changeset: r.one.changeset({
+			from: r.representationGap.changesetId,
+			to: r.changeset.id
 		}),
 	},
 	sourceArtifact: {

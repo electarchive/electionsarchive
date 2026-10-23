@@ -10391,6 +10391,16 @@ export const bodies = {
             isVoting: v.boolean(),
           }),
         ),
+        seats: v.array(
+          v.object({
+            label: v.string(),
+            from: v.string(),
+            to: v.nullable(v.string()),
+            gaps: v.array(
+              v.object({ from: v.string(), to: v.nullable(v.string()) }),
+            ),
+          }),
+        ),
         parties: v.array(
           v.object({
             id: v.string(),
@@ -10518,28 +10528,46 @@ export const bodies = {
             .filter((id) => id != null),
         ),
       ];
-      const [labels, slugs, colors, positions, branches] = await Promise.all([
-        names([
-          ...new Set([
-            ...rows.map((row) => row.person),
-            ...rows.flatMap((row) => row.place ?? []),
+      const [labels, slugs, colors, positions, branches, seats] =
+        await Promise.all([
+          names([
+            ...new Set([
+              ...rows.map((row) => row.person),
+              ...rows.flatMap((row) => row.place ?? []),
+            ]),
           ]),
-        ]),
-        paths([...new Set(rows.flatMap((row) => row.contest ?? []))]),
-        refs(parties),
-        db.execute<{ party_id: string; lean: number }>(sql`
-          select distinct on (party_id) party_id, (low + high) * 100 + coalesce(rank, 99) as lean from party_position
-          where party_id = any(${sql.param(parties)}::uuid[])
-          order by party_id, valid_from desc nulls last
-        `),
-        db.execute<{ party: string; parent: string }>(sql`
-          select distinct on (a.party_id) a.party_id as party, coalesce(pm.into_id, a.parent_party_id) as parent
-          from party_affiliation a left join entity_merge pm on pm.entity_id = a.parent_party_id
-          where a.party_id = any(${sql.param(parties)}::uuid[]) and a.kind = 'regional_branch'
-            and (a.valid @> ${start ?? input.from}::date or upper(a.valid) is null)
-          order by a.party_id, lower(a.valid) desc nulls last
-        `),
-      ]);
+          paths([...new Set(rows.flatMap((row) => row.contest ?? []))]),
+          refs(parties),
+          db.execute<{ party_id: string; lean: number }>(sql`
+            select distinct on (party_id) party_id, (low + high) * 100 + coalesce(rank, 99) as lean from party_position
+            where party_id = any(${sql.param(parties)}::uuid[])
+            order by party_id, valid_from desc nulls last
+          `),
+          db.execute<{ party: string; parent: string }>(sql`
+            select distinct on (a.party_id) a.party_id as party, coalesce(pm.into_id, a.parent_party_id) as parent
+            from party_affiliation a left join entity_merge pm on pm.entity_id = a.parent_party_id
+            where a.party_id = any(${sql.param(parties)}::uuid[]) and a.kind = 'regional_branch'
+              and (a.valid @> ${start ?? input.from}::date or upper(a.valid) is null)
+            order by a.party_id, lower(a.valid) desc nulls last
+          `),
+          db.execute<{
+            label: string;
+            from: string;
+            to: string | null;
+            gaps: Array<{ from: string; to: string | null }>;
+          }>(sql`
+            select s.label, s.valid_from::text as from, s.valid_to::text as to,
+              coalesce(json_agg(json_build_object('from', g.valid_from::text, 'to', g.valid_to::text)
+                order by g.valid_from) filter (where g.valid_from is not null), '[]') as gaps
+            from seat s
+            left join representation_gap g on g.body_id = s.body_id and g.area_id = s.district_area_id
+              and g.valid && daterange(${start ?? input.from}::date, ${end}::date)
+            where s.body_id = ${input.id}::uuid and s.voting and s.label is not null
+              and s.valid && daterange(${start ?? input.from}::date, ${end}::date)
+              and not exists (select from seat x where x.body_id = s.body_id and x.voting and x.valid_from is null)
+            group by s.id
+          `),
+        ]);
       const lean = new Map(
         positions.rows.map((row) => [row.party_id, row.lean]),
       );
@@ -10565,6 +10593,7 @@ export const bodies = {
           ended: row.ended,
           isVoting: row.isVoting,
         })),
+        seats: seats.rows,
         parties: parties.map((id) => ({
           ...(colors.get(id) ?? { id, label: "", short: null, color: null }),
           lean: lean.get(id) ?? null,
