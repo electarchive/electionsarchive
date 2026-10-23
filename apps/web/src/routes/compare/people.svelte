@@ -22,7 +22,7 @@
     disqualified: m.outcome_disqualified,
   };
 
-  let width = $state(720);
+  let width = $state(0);
   let hovered = $state<string | null>(null);
 
   const sides = $derived(
@@ -260,100 +260,106 @@
         </span>
       {/if}
     </p>
-    <div bind:clientWidth={width} class="min-inline-0">
-      <svg
-        viewBox="0 0 {width} {height}"
-        class="block overflow-visible inline-full"
-        style:block-size="{height}px"
-        role="img"
-        aria-label={m.versus_shares_title()}
-        onpointerleave={() => (hovered = null)}
-        onpointermove={(event) => {
-          const box = event.currentTarget.getBoundingClientRect();
-          const [x, y] = [event.clientX - box.left, event.clientY - box.top];
-          let best = { id: null as string | null, distance: 24 };
-          for (const mark of marks) {
-            const distance = Math.hypot(
-              sx(mark.at) - x,
-              sy(mark.share ?? 0) - y,
-            );
-            if (distance < best.distance) {
-              best = { id: mark.id, distance };
+    <div
+      bind:clientWidth={width}
+      class="min-inline-0"
+      style:block-size={width === 0 ? "clamp(190px, 30vw, 280px)" : null}
+    >
+      {#if width > 0}
+        <svg
+          viewBox="0 0 {width} {height}"
+          class="block overflow-visible inline-full"
+          style:block-size="{height}px"
+          role="img"
+          aria-label={m.versus_shares_title()}
+          onpointerleave={() => (hovered = null)}
+          onpointermove={(event) => {
+            const box = event.currentTarget.getBoundingClientRect();
+            const [x, y] = [event.clientX - box.left, event.clientY - box.top];
+            let best = { id: null as string | null, distance: 24 };
+            for (const mark of marks) {
+              const distance = Math.hypot(
+                sx(mark.at) - x,
+                sy(mark.share ?? 0) - y,
+              );
+              if (distance < best.distance) {
+                best = { id: mark.id, distance };
+              }
             }
-          }
-          hovered = best.id;
-        }}
-      >
-        {#each [0, top / 2, top] as tick (tick)}
-          <line
-            x1={PAD.left}
-            x2={width - PAD.right}
-            y1={sy(tick)}
-            y2={sy(tick)}
-            class="stroke-border"
-          />
-          <text
-            x={PAD.left - 6}
-            y={sy(tick) + 3.5}
-            text-anchor="end"
-            class="fill-muted-foreground font-figures text-[0.625rem]"
-            >{Math.round(tick * 100)}</text
-          >
-        {/each}
-        {#if top >= 0.5}
-          <line
-            x1={PAD.left}
-            x2={width - PAD.right}
-            y1={sy(0.5)}
-            y2={sy(0.5)}
-            class="stroke-foreground/40"
-            stroke-dasharray="3 3"
-          />
-        {/if}
-        {#each decades as year (year)}
-          <text
-            x={sx(year)}
-            y={height - 6}
-            text-anchor="middle"
-            class="fill-muted-foreground font-figures text-[0.625rem]"
-            >{year}</text
-          >
-        {/each}
-        {#each sides as side, index (side.id)}
-          <polyline
-            points={side.marks
-              .filter(
-                (mark) =>
-                  mark.share != null &&
-                  mark.kind !== "primary" &&
-                  mark.kind !== "runoff",
-              )
-              .toSorted((a, b) => a.at - b.at)
-              .map((mark) => `${sx(mark.at)},${sy(mark.share ?? 0)}`)
-              .join(" ")}
-            fill="none"
-            class="stroke-foreground/25"
-            stroke-dasharray={index === 0 ? "" : "4 3"}
-          />
-        {/each}
-        {#each marks as mark (mark.id)}
-          <g
-            class={cn({
-              "opacity-45": mark.kind === "primary" && focus !== mark,
-            })}
-            transform="translate({sx(mark.at) - (focus === mark ? 7 : 5)} {sy(
-              mark.share ?? 0,
-            ) - (focus === mark ? 7 : 5)})"
-          >
-            {@render glyph(
-              mark.side,
-              mark.isWon,
-              mark.tint,
-              focus === mark ? 14 : 10,
-            )}
-          </g>
-        {/each}
-      </svg>
+            hovered = best.id;
+          }}
+        >
+          {#each [0, top / 2, top] as tick (tick)}
+            <line
+              x1={PAD.left}
+              x2={width - PAD.right}
+              y1={sy(tick)}
+              y2={sy(tick)}
+              class="stroke-border"
+            />
+            <text
+              x={PAD.left - 6}
+              y={sy(tick) + 3.5}
+              text-anchor="end"
+              class="fill-muted-foreground font-figures text-[0.625rem]"
+              >{Math.round(tick * 100)}</text
+            >
+          {/each}
+          {#if top >= 0.5}
+            <line
+              x1={PAD.left}
+              x2={width - PAD.right}
+              y1={sy(0.5)}
+              y2={sy(0.5)}
+              class="stroke-foreground/40"
+              stroke-dasharray="3 3"
+            />
+          {/if}
+          {#each decades as year (year)}
+            <text
+              x={sx(year)}
+              y={height - 6}
+              text-anchor="middle"
+              class="fill-muted-foreground font-figures text-[0.625rem]"
+              >{year}</text
+            >
+          {/each}
+          {#each sides as side, index (side.id)}
+            <polyline
+              points={side.marks
+                .filter(
+                  (mark) =>
+                    mark.share != null &&
+                    mark.kind !== "primary" &&
+                    mark.kind !== "runoff",
+                )
+                .toSorted((a, b) => a.at - b.at)
+                .map((mark) => `${sx(mark.at)},${sy(mark.share ?? 0)}`)
+                .join(" ")}
+              fill="none"
+              class="stroke-foreground/25"
+              stroke-dasharray={index === 0 ? "" : "4 3"}
+            />
+          {/each}
+          {#each marks as mark (mark.id)}
+            <g
+              class={cn({
+                "opacity-45": mark.kind === "primary" && focus !== mark,
+              })}
+              transform="translate({sx(mark.at) - (focus === mark ? 7 : 5)} {sy(
+                mark.share ?? 0,
+              ) - (focus === mark ? 7 : 5)})"
+            >
+              {@render glyph(
+                mark.side,
+                mark.isWon,
+                mark.tint,
+                focus === mark ? 14 : 10,
+              )}
+            </g>
+          {/each}
+        </svg>
+      {/if}
     </div>
   </section>
 {/if}

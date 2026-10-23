@@ -12,7 +12,7 @@
   const PAD = { top: 12, right: 12, bottom: 24, left: 40 };
   const YES = /^(?:yes|ja|oui|sì|si|evet)$/iu;
 
-  let width = $state(720);
+  let width = $state(0);
   let hovered = $state<{ series: number; point: number } | null>(null);
   let opened = $state<Array<string>>([]);
 
@@ -235,132 +235,141 @@
         >
       {/if}
     </div>
-    <div bind:clientWidth={width} class="min-inline-0">
-      <svg
-        viewBox="0 0 {width} {height}"
-        class="block overflow-visible inline-full"
-        style:block-size="{height}px"
-        role="img"
-        aria-label={race.name}
-        onpointerleave={() => (hovered = null)}
-        onpointermove={(event) => {
-          const box = event.currentTarget.getBoundingClientRect();
-          const x = event.clientX - box.left;
-          let best = { point: 0, distance: Infinity };
-          for (const [point, row] of race.rows.entries()) {
-            const distance = Math.abs(sx(race, row.year) - x);
-            if (distance < best.distance) {
-              best = { point, distance };
+    <div
+      bind:clientWidth={width}
+      class="min-inline-0"
+      style:block-size={width === 0 ? "clamp(200px, 34vw, 300px)" : null}
+    >
+      {#if width > 0}
+        <svg
+          viewBox="0 0 {width} {height}"
+          class="block overflow-visible inline-full"
+          style:block-size="{height}px"
+          role="img"
+          aria-label={race.name}
+          onpointerleave={() => (hovered = null)}
+          onpointermove={(event) => {
+            const box = event.currentTarget.getBoundingClientRect();
+            const x = event.clientX - box.left;
+            let best = { point: 0, distance: Infinity };
+            for (const [point, row] of race.rows.entries()) {
+              const distance = Math.abs(sx(race, row.year) - x);
+              if (distance < best.distance) {
+                best = { point, distance };
+              }
             }
-          }
-          hovered = { series: index, point: best.point };
-        }}
-      >
-        <rect
-          x={PAD.left}
-          y={PAD.top}
-          width={width - PAD.left - PAD.right}
-          height={sy(race, 0) - PAD.top}
-          fill={race.first?.color}
-          opacity="0.07"
-        />
-        <rect
-          x={PAD.left}
-          y={sy(race, 0)}
-          width={width - PAD.left - PAD.right}
-          height={height - PAD.bottom - sy(race, 0)}
-          fill={race.second?.color}
-          opacity="0.07"
-        />
-        {#each [race.top, race.top / 2, 0, -race.top / 2, -race.top] as tick (tick)}
-          <line
-            x1={PAD.left}
-            x2={width - PAD.right}
-            y1={sy(race, tick)}
-            y2={sy(race, tick)}
-            class={cn("stroke-border", { "stroke-foreground/40": tick === 0 })}
+            hovered = { series: index, point: best.point };
+          }}
+        >
+          <rect
+            x={PAD.left}
+            y={PAD.top}
+            width={width - PAD.left - PAD.right}
+            height={sy(race, 0) - PAD.top}
+            fill={race.first?.color}
+            opacity="0.07"
           />
-          <text
-            x={PAD.left - 6}
-            y={sy(race, tick) + 3.5}
-            text-anchor="end"
-            class="fill-muted-foreground font-figures text-[0.625rem]"
-            >{tick === 0 ? "0" : Math.round(Math.abs(tick) * 100)}</text
-          >
-        {/each}
-        {const labeled = $derived.by(() => {
-          const kept: Array<string> = [];
-          let last = Infinity;
-          for (const row of race.rows.toSorted((a, b) => b.year - a.year)) {
-            const x = sx(race, row.year);
-            if (last - x >= 34) {
-              kept.push(row.date);
-              last = x;
-            }
-          }
-          return kept;
-        })}
-        {#each race.rows as row (row.date)}
-          {#if labeled.includes(row.date) || focus === row}
+          <rect
+            x={PAD.left}
+            y={sy(race, 0)}
+            width={width - PAD.left - PAD.right}
+            height={height - PAD.bottom - sy(race, 0)}
+            fill={race.second?.color}
+            opacity="0.07"
+          />
+          {#each [race.top, race.top / 2, 0, -race.top / 2, -race.top] as tick (tick)}
+            <line
+              x1={PAD.left}
+              x2={width - PAD.right}
+              y1={sy(race, tick)}
+              y2={sy(race, tick)}
+              class={cn("stroke-border", {
+                "stroke-foreground/40": tick === 0,
+              })}
+            />
             <text
-              x={sx(race, row.year)}
-              y={height - 6}
-              text-anchor="middle"
-              class={cn("fill-muted-foreground font-figures text-[0.625rem]", {
-                "fill-foreground": focus === row,
-              })}>{row.year}</text
+              x={PAD.left - 6}
+              y={sy(race, tick) + 3.5}
+              text-anchor="end"
+              class="fill-muted-foreground font-figures text-[0.625rem]"
+              >{tick === 0 ? "0" : Math.round(Math.abs(tick) * 100)}</text
             >
-          {/if}
-        {/each}
-        {#if focus != null}
-          <line
-            x1={sx(race, focus.year)}
-            x2={sx(race, focus.year)}
-            y1={PAD.top}
-            y2={height - PAD.bottom}
-            class="stroke-foreground/30"
-          />
-        {/if}
-        {#each race.sides as side (side)}
-          <polyline
-            points={line(race, side)}
-            fill="none"
-            class={cn("stroke-foreground", {
-              "stroke-muted-foreground": side === 0,
-            })}
-            stroke-width={side === 0 ? 1.25 : 2}
-            stroke-dasharray={STROKES[side]}
-            stroke-linejoin="round"
-          />
-        {/each}
-        {#each race.rows as row (row.date)}
-          {#each [1, 2] as side (side)}
-            {const value = $derived(row.margins[side] ?? null)}
-            {#if value != null}
-              {const tint = $derived(
-                value >= 0 ? race.first?.color : race.second?.color,
-              )}
-              {const r = $derived(focus === row ? 5 : 3.5)}
-              {#if side === 1}
-                <circle
-                  cx={sx(race, row.year)}
-                  cy={sy(race, value)}
-                  {r}
-                  fill={tint}
-                />
-              {:else}
-                <rect
-                  x={sx(race, row.year) - r * 0.9}
-                  y={sy(race, value) - r * 0.9}
-                  width={r * 1.8}
-                  height={r * 1.8}
-                  fill={tint}
-                />
-              {/if}
+          {/each}
+          {const labeled = $derived.by(() => {
+            const kept: Array<string> = [];
+            let last = Infinity;
+            for (const row of race.rows.toSorted((a, b) => b.year - a.year)) {
+              const x = sx(race, row.year);
+              if (last - x >= 34) {
+                kept.push(row.date);
+                last = x;
+              }
+            }
+            return kept;
+          })}
+          {#each race.rows as row (row.date)}
+            {#if labeled.includes(row.date) || focus === row}
+              <text
+                x={sx(race, row.year)}
+                y={height - 6}
+                text-anchor="middle"
+                class={cn(
+                  "fill-muted-foreground font-figures text-[0.625rem]",
+                  { "fill-foreground": focus === row },
+                )}>{row.year}</text
+              >
             {/if}
           {/each}
-        {/each}
-      </svg>
+          {#if focus != null}
+            <line
+              x1={sx(race, focus.year)}
+              x2={sx(race, focus.year)}
+              y1={PAD.top}
+              y2={height - PAD.bottom}
+              class="stroke-foreground/30"
+            />
+          {/if}
+          {#each race.sides as side (side)}
+            <polyline
+              points={line(race, side)}
+              fill="none"
+              class={cn("stroke-foreground", {
+                "stroke-muted-foreground": side === 0,
+              })}
+              stroke-width={side === 0 ? 1.25 : 2}
+              stroke-dasharray={STROKES[side]}
+              stroke-linejoin="round"
+            />
+          {/each}
+          {#each race.rows as row (row.date)}
+            {#each [1, 2] as side (side)}
+              {const value = $derived(row.margins[side] ?? null)}
+              {#if value != null}
+                {const tint = $derived(
+                  value >= 0 ? race.first?.color : race.second?.color,
+                )}
+                {const r = $derived(focus === row ? 5 : 3.5)}
+                {#if side === 1}
+                  <circle
+                    cx={sx(race, row.year)}
+                    cy={sy(race, value)}
+                    {r}
+                    fill={tint}
+                  />
+                {:else}
+                  <rect
+                    x={sx(race, row.year) - r * 0.9}
+                    y={sy(race, value) - r * 0.9}
+                    width={r * 1.8}
+                    height={r * 1.8}
+                    fill={tint}
+                  />
+                {/if}
+              {/if}
+            {/each}
+          {/each}
+        </svg>
+      {/if}
     </div>
     <div class="overflow-x-auto">
       <table class="border-collapse text-sm tabular-nums inline-full">

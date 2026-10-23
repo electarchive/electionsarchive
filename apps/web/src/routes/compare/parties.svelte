@@ -18,7 +18,7 @@
 
   const PAD = { top: 12, right: 12, bottom: 24, left: 36 };
 
-  let width = $state(720);
+  let width = $state(0);
   let hovered = $state<{ series: number; point: number } | null>(null);
   let opened = $state<Array<string>>([]);
 
@@ -182,98 +182,106 @@
         >
       {/if}
     </div>
-    <div bind:clientWidth={width} class="min-inline-0">
-      <svg
-        viewBox="0 0 {width} {height}"
-        class="block overflow-visible inline-full"
-        style:block-size="{height}px"
-        role="img"
-        aria-label={chart.name}
-        onpointerleave={() => (hovered = null)}
-        onpointermove={(event) => {
-          const box = event.currentTarget.getBoundingClientRect();
-          const x = event.clientX - box.left;
-          let best = { point: 0, distance: Infinity };
-          for (const [point, row] of chart.points.entries()) {
-            const distance = Math.abs(sx(chart, row.at) - x);
-            if (distance < best.distance) {
-              best = { point, distance };
+    <div
+      bind:clientWidth={width}
+      class="min-inline-0"
+      style:block-size={width === 0 ? "clamp(200px, 34vw, 300px)" : null}
+    >
+      {#if width > 0}
+        <svg
+          viewBox="0 0 {width} {height}"
+          class="block overflow-visible inline-full"
+          style:block-size="{height}px"
+          role="img"
+          aria-label={chart.name}
+          onpointerleave={() => (hovered = null)}
+          onpointermove={(event) => {
+            const box = event.currentTarget.getBoundingClientRect();
+            const x = event.clientX - box.left;
+            let best = { point: 0, distance: Infinity };
+            for (const [point, row] of chart.points.entries()) {
+              const distance = Math.abs(sx(chart, row.at) - x);
+              if (distance < best.distance) {
+                best = { point, distance };
+              }
             }
-          }
-          hovered = { series: index, point: best.point };
-        }}
-      >
-        {#each [chart.top, chart.top / 2, 0] as tick (tick)}
-          <line
-            x1={PAD.left}
-            x2={width - PAD.right}
-            y1={sy(chart, tick)}
-            y2={sy(chart, tick)}
-            class={cn("stroke-border", { "stroke-foreground/40": tick === 0 })}
-          />
-          <text
-            x={PAD.left - 6}
-            y={sy(chart, tick) + 3.5}
-            text-anchor="end"
-            class="fill-muted-foreground font-figures text-[0.625rem]"
-            >{Math.round(tick * 100)}</text
-          >
-        {/each}
-        {#each chart.points as row, point (row.date)}
-          <text
-            x={sx(chart, row.at)}
-            y={height - 6}
-            text-anchor="middle"
-            class={cn("fill-muted-foreground font-figures text-[0.625rem]", {
-              hidden: !(ticks[index] ?? []).includes(point),
-              "fill-foreground": focus === row,
-            })}>{row.year}</text
-          >
-        {/each}
-        {#if focus != null}
-          <line
-            x1={sx(chart, focus.at)}
-            x2={sx(chart, focus.at)}
-            y1={PAD.top}
-            y2={height - PAD.bottom}
-            class="stroke-foreground/30"
-          />
-        {/if}
-        {#each sides as side, at (side.id)}
-          <g style:--party={side.tone}>
-            <path
-              d={line(chart, at)}
-              fill="none"
-              class="stroke-(--party)"
-              stroke-width="2"
-              stroke-dasharray={at === 0 ? "" : "5 3"}
-              stroke-linejoin="round"
+            hovered = { series: index, point: best.point };
+          }}
+        >
+          {#each [chart.top, chart.top / 2, 0] as tick (tick)}
+            <line
+              x1={PAD.left}
+              x2={width - PAD.right}
+              y1={sy(chart, tick)}
+              y2={sy(chart, tick)}
+              class={cn("stroke-border", {
+                "stroke-foreground/40": tick === 0,
+              })}
             />
-            {#each chart.points as row (row.date)}
-              {const value = $derived(row.sides[at]?.share ?? null)}
-              {const r = $derived(focus === row ? 5 : 3.5)}
-              {#if value != null}
-                {#if at === 0}
-                  <circle
-                    cx={sx(chart, row.at)}
-                    cy={sy(chart, value)}
-                    {r}
-                    class="fill-(--party)"
-                  />
-                {:else}
-                  <rect
-                    x={sx(chart, row.at) - r * 0.9}
-                    y={sy(chart, value) - r * 0.9}
-                    width={r * 1.8}
-                    height={r * 1.8}
-                    class="fill-(--party)"
-                  />
+            <text
+              x={PAD.left - 6}
+              y={sy(chart, tick) + 3.5}
+              text-anchor="end"
+              class="fill-muted-foreground font-figures text-[0.625rem]"
+              >{Math.round(tick * 100)}</text
+            >
+          {/each}
+          {#each chart.points as row, point (row.date)}
+            <text
+              x={sx(chart, row.at)}
+              y={height - 6}
+              text-anchor="middle"
+              class={cn("fill-muted-foreground font-figures text-[0.625rem]", {
+                hidden: !(ticks[index] ?? []).includes(point),
+                "fill-foreground": focus === row,
+              })}>{row.year}</text
+            >
+          {/each}
+          {#if focus != null}
+            <line
+              x1={sx(chart, focus.at)}
+              x2={sx(chart, focus.at)}
+              y1={PAD.top}
+              y2={height - PAD.bottom}
+              class="stroke-foreground/30"
+            />
+          {/if}
+          {#each sides as side, at (side.id)}
+            <g style:--party={side.tone}>
+              <path
+                d={line(chart, at)}
+                fill="none"
+                class="stroke-(--party)"
+                stroke-width="2"
+                stroke-dasharray={at === 0 ? "" : "5 3"}
+                stroke-linejoin="round"
+              />
+              {#each chart.points as row (row.date)}
+                {const value = $derived(row.sides[at]?.share ?? null)}
+                {const r = $derived(focus === row ? 5 : 3.5)}
+                {#if value != null}
+                  {#if at === 0}
+                    <circle
+                      cx={sx(chart, row.at)}
+                      cy={sy(chart, value)}
+                      {r}
+                      class="fill-(--party)"
+                    />
+                  {:else}
+                    <rect
+                      x={sx(chart, row.at) - r * 0.9}
+                      y={sy(chart, value) - r * 0.9}
+                      width={r * 1.8}
+                      height={r * 1.8}
+                      class="fill-(--party)"
+                    />
+                  {/if}
                 {/if}
-              {/if}
-            {/each}
-          </g>
-        {/each}
-      </svg>
+              {/each}
+            </g>
+          {/each}
+        </svg>
+      {/if}
     </div>
     <div class="overflow-x-auto">
       <table class="border-collapse text-sm tabular-nums inline-full">
