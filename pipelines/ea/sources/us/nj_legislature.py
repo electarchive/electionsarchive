@@ -12,7 +12,7 @@ from ea.sources.us.nj_federal import COUNTIES
 from ea.store import DATA, connect
 
 SOURCE = "us.nj_legislature"
-VERSION = "1"
+VERSION = "3"
 PARSED = DATA / "parsed" / SOURCE
 BASE = "https://www.nj.gov/state/elections/assets/pdf/election-results/"
 LANDING = "https://www.nj.gov/state/elections/election-information-results.shtml"
@@ -20,23 +20,37 @@ PUBLISHER = "New Jersey Division of Elections"
 TITLE = "Official list: candidate returns for State Senate and General Assembly"
 FILES = {
     (date(2001, 11, 6), "senate"): "2001/2001-general-elect-state-senate-tallies.pdf",
-    (date(2001, 11, 6), "house"): "2001/2001-general-elect-gen-assembly-tallies.pdf",
+    (date(2001, 11, 6), "general-assembly"): "2001/2001-general-elect-gen-assembly-tallies.pdf",
     (date(2003, 11, 4), "senate"): "2003/2003gen-elect-st_senate_candidate_tally.pdf",
-    (date(2003, 11, 4), "house"): "2003/2003gen-elect_assembly_candidate_tally.pdf",
+    (date(2003, 11, 4), "general-assembly"): "2003/2003gen-elect_assembly_candidate_tally.pdf",
+    (date(2005, 11, 8), "general-assembly"): "2005/2005_Official_General_Assembly_tallies.pdf",
     (date(2007, 11, 6), "senate"): "2007/2007-official-general-election-tallies(ss)-12.3.07.pdf",
-    (date(2007, 11, 6), "house"): "2007/2007-official-general-election-tallies(ga)-12.12.07.pdf",
+    (date(2007, 11, 6), "general-assembly"): "2007/2007-official-general-election-tallies(ga)-12.12.07.pdf",
+    (date(2009, 11, 3), "general-assembly"): "2009/2009-official-gen-elect-gen-assembly-tallies-120109.pdf",
     (date(2011, 11, 8), "senate"): "2011/2011-official-gen-elect-state-senate-results-050817.pdf",
-    (date(2011, 11, 8), "house"): "2011/2011-official-gen-elect-gen-assembly-results-050817.pdf",
+    (date(2011, 11, 8), "general-assembly"): "2011/2011-official-gen-elect-gen-assembly-results-050817.pdf",
     (date(2013, 11, 5), "senate"): "2013/2013-official-general-election-results-state-senate.pdf",
-    (date(2013, 11, 5), "house"): "2013/2013-official-general-election-results-general-assembly.pdf",
+    (date(2013, 11, 5), "general-assembly"): "2013/2013-official-general-election-results-general-assembly.pdf",
+    (date(2015, 11, 3), "general-assembly"): "2015/2015-official-ge-results-nj-general-assembly.pdf",
 }
-UNITS = "First Second Third Fourth Fifth Sixth Seventh Eighth Ninth".split()
+UNITS = ["First", "Second", "Third", "Fourth", "Fifth", "Sixth", "Seventh", "Eighth", "Ninth"]
 ORDINALS = {
     word.lower(): number
     for number, word in enumerate(
         [
             *UNITS,
-            *"Tenth Eleventh Twelfth Thirteenth Fourteenth Fifteenth Sixteenth Seventeenth Eighteenth Nineteenth".split(),
+            *[
+                "Tenth",
+                "Eleventh",
+                "Twelfth",
+                "Thirteenth",
+                "Fourteenth",
+                "Fifteenth",
+                "Sixteenth",
+                "Seventeenth",
+                "Eighteenth",
+                "Nineteenth",
+            ],
             "Twentieth",
             *(f"Twenty-{unit}" for unit in UNITS),
             "Thirtieth",
@@ -48,7 +62,9 @@ ORDINALS = {
 }
 DISTRICT = re.compile(r"^\s*([\w-]+) Legislative District", re.IGNORECASE)
 LINE = re.compile(r"(?:^|\s)(" + "|".join(COUNTIES) + r")(?:\s*\(part\))?\s.*?([\d,]+)\s*$", re.IGNORECASE)
-HEADING = re.compile(r"^(?:Name|Official|Candidate|For |Party|General Assembly|State Senate|\(bracketed|\d)", re.IGNORECASE)
+HEADING = re.compile(
+    r"^(?:Name|Official|Candidate|For |Party|General Assembly|State Senate|\(bracketed|\d)", re.IGNORECASE
+)
 
 
 def fetch() -> None:
@@ -60,7 +76,10 @@ def parse() -> None:
     rows = []
     for (day, chamber), path in FILES.items():
         text = subprocess.run(
-            ["pdftotext", "-layout", str(raw.cached(SOURCE, BASE + path).path), "-"], capture_output=True, check=True, text=True
+            ["pdftotext", "-layout", str(raw.cached(SOURCE, BASE + path).path), "-"],
+            capture_output=True,
+            check=True,
+            text=True,
         ).stdout
         district: int | None = None
         column = 0
@@ -77,13 +96,16 @@ def parse() -> None:
                 continue
             elif (found := re.search(r"\sTotal\s+([\d,]+)\s*$", line)) and (name is not None or lines):
                 if name is None or sum(votes for _, votes in lines) != int(found[1].replace(",", "")):
-                    print(f"{day} {chamber} {district}: {name} counties sum to {sum(v for _, v in lines)}, total {found[1]}")
+                    print(
+                        f"{day} {chamber} {district}: {name} counties sum to {sum(v for _, v in lines)}, total {found[1]}"
+                    )
                     broken.add(district)
                 else:
                     candidates.setdefault(district, []).extend((code, name, votes) for code, votes in lines)
                 name, lines = None, []
             else:
                 head = re.split(r"\s+\*|\s+\(w\)|\s{2,}", line.strip(), maxsplit=1)[0]
+                head = re.sub(r"\s+(?:\d+|P\.?\s?O\.?)\s.*$", "", re.sub(r"\s\([A-Z. ]+\)(?=\s)", "", head))
                 if (
                     not lines
                     and line[:1].isalpha()
@@ -97,7 +119,10 @@ def parse() -> None:
             if district in broken:
                 print(f"{day} {chamber} {district}: skipped")
                 continue
-            rows.extend((day, f"{chamber}:{district}:g", code, name.upper(), votes) for code, name, votes in entries)
+            rows.extend(
+                (day, f"{chamber}:{district}:g", code, name.upper().replace("DEL PILAR RIVAS", "DELPILARRIVAS"), votes)
+                for code, name, votes in entries
+            )
     PARSED.mkdir(parents=True, exist_ok=True)
     pl.DataFrame(
         rows,
@@ -121,7 +146,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="New Jersey's State Senate and General Assembly generals by county, 2001, 2003, 2007, 2011, and 2013 (Division of Elections official lists)",
+            summary="New Jersey's State Senate and General Assembly generals by county, 2001-2015 (Division of Elections official lists)",
             polity="US-NJ",
         )
         source = cs.source(PUBLISHER, TITLE)
