@@ -14,13 +14,27 @@ from ea.sources.us import elstats, medsl, openelections
 from ea.store import DATA, connect
 
 SOURCE = "us.elstats_leg_counties"
-VERSION = "2"
+VERSION = "3"
 PARSED = DATA / "parsed" / SOURCE
 YEARS = {"CT": range(1990, 2025, 2), "NY": range(1996, 2025, 2), "VA": range(1991, 2026, 2)}
 YEARS |= {"ID": range(2000, 2025, 2), "NM": range(2000, 2025, 2), "CO": range(2000, 2003, 2)}
 TERMS = ["State Senat", "State Representative", "Assembly", "Delegate"]
 CHAMBERS = {"NY": "assembly", "VA": "house-of-delegates"}
 OFFICE = r"(?i)^(state senat\w*|state representative( [ab])?|member of assembly|member,? house of delegates)$"
+LINES = {
+    "Democratic": "democratic-party",
+    "Republican": "republican-party",
+    "Conservative": "NY:conservative-party",
+    "Working Families": "NY:working-families-party",
+    "Independence": "NY:independence-party",
+    "Green": "green-party",
+    "Libertarian": "libertarian-party",
+    "Liberal": "NY:liberal",
+    "Right to Life": "NY:right-to-life",
+    "Reform": "NY:reform-party",
+    "Serve America Movement": "NY:serve-america-movement-party",
+    "Socialist Workers": "socialist-workers-party",
+}
 
 
 def search(state: str, year: int) -> str:
@@ -102,6 +116,7 @@ def parse() -> None:
                     .replace_strict(counties[state], default=None),
                     division=division,
                     candidate=pl.col("candidate_name").fill_null("").str.to_uppercase().str.strip_chars(),
+                    line=pl.col("candidate_party_name").str.strip_chars() if state == "NY" else pl.lit(None, pl.String),
                     votes=pl.col("votes").cast(pl.Float64, strict=False).cast(pl.Int64),
                 )
             )
@@ -120,7 +135,8 @@ def parse() -> None:
         )
         .with_columns(candidate=pl.when("writein").then(pl.lit("WRITE-INS")).otherwise("candidate"))
         .filter(pl.col("measure") > 0)
-        .group_by("year", "chamber", "day", "special", "state", "district", "code", "candidate", "measure")
+        .with_columns(line=pl.when("writein").then(None).otherwise("line"))
+        .group_by("year", "chamber", "day", "special", "state", "district", "code", "candidate", "line", "measure")
         .agg(pl.col("writein").any(), pl.col("votes").sum())
         .with_columns(kind=pl.lit("county"), source="state")
         .write_parquet(PARSED / "counties.parquet")
@@ -143,12 +159,27 @@ def emit() -> Path:
             for (key,) in conn.execute(
                 """select distinct x.value from result_set r
                    join external_id x on x.entity_id = r.contest_id and x.scheme = 'us.contest'
-                   where r.status = 'active'
+                   join changeset c on c.id = r.changeset_id
+                   where r.status = 'active' and not (c.pipeline = %s and x.value like '%%:NY:%%')
                      and exists (select from result_value v join reporting_unit u on u.k = v.unit_k
                                  where v.result_set_k = r.k
                                    and u.scheme_code in ('us.county', 'us.county_part', 'us.town', 'us.precinct'))""",
+                [SOURCE],
             ).fetchall()
         }
+        redone = frozenset(
+            value.removesuffix(":county")
+            for (value,) in conn.execute(
+                "select value from external_id where scheme = %s and value like '%%:NY:%%:county'",
+                [f"{SOURCE}.result_set"],
+            ).fetchall()
+        )
+        parties = dict(
+            conn.execute(
+                "select value, entity_id::text from external_id where scheme = 'us.party' and value = any(%s)",
+                [list(LINES.values())],
+            ).fetchall()
+        )
         frame = frame.filter(
             ~pl.concat_str(pl.col("day").cast(pl.String), "state", "chamber", separator=":").is_in(list(covered))
         )
@@ -167,5 +198,15 @@ def emit() -> Path:
                 )
             for year in YEARS[state]:
                 cs.artifact(raw.cached(SOURCE, search(state, year)), sources[state])
-        medsl.attach(cs, conn, frame, sources)
+        medsl.attach(
+            cs,
+            conn,
+            frame.with_columns(
+                line_party=pl.col("line").replace_strict(
+                    {line: parties.get(key) for line, key in LINES.items()}, default=None, return_dtype=pl.String
+                )
+            ),
+            sources,
+            redone=redone,
+        )
         return cs.write()

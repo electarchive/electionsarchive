@@ -739,7 +739,11 @@ def attach(
         )
         at_large = f"{day}:{state}:house:0{chamber.removeprefix('house')}"
         tried = [
-            *([f"{day}:{state}:house:{district}:special{chamber.removeprefix('house')}", f"{base}:special"] if special else []),
+            *(
+                [f"{day}:{state}:house:{district}:special{chamber.removeprefix('house')}", f"{base}:special"]
+                if special
+                else []
+            ),
             base,
         ]
         if chamber.startswith("house"):
@@ -883,9 +887,15 @@ def attach(
                 ),
             )
         )
-        if key not in declared and not emptied and (
-            max(known, key=lambda option: option[4] or 0)[0]
-            != max(known, key=lambda option: int(pooled.filter(pl.col("option") == str(option[0]))["votes"].sum()))[0]
+        if (
+            key not in declared
+            and not emptied
+            and (
+                max(known, key=lambda option: option[4] or 0)[0]
+                != max(known, key=lambda option: int(pooled.filter(pl.col("option") == str(option[0]))["votes"].sum()))[
+                    0
+                ]
+            )
         ):
             print(f"{key}: the county sum puts another option first, skipped")
             columns = ("id", "election_id", "contest_id", "stage", "kind", "source_id", "is_default", "completeness")
@@ -1047,13 +1057,59 @@ def attach(
                 members[code] = str(cs.unit("us.town", code))
             else:
                 members[code] = str(cs.unit("us.ak_house_district" if kind == "district" else "us.aggregate", code))
+        lined: dict[str, str] = {}
+        if "line" in congress.columns:
+            labels = {str(option): label for option, _, label, _, _ in known}
+            children: dict[str, list[tuple[str, str | None, str]]] = {}
+            for parent, option, party, label in conn.execute(
+                """select parent_option_id::text, id::text, party_id::text, ballot_label from contest_option
+                   where contest_id = %s and parent_option_id is not null""",
+                [contest],
+            ).fetchall():
+                children.setdefault(parent, []).append((option, party, label))
+            ballots = (
+                lines.filter(
+                    pl.col("measure") == 1, pl.col("line").is_not_null(), pl.col("candidate").is_in(list(picked))
+                )
+                .select("candidate", "line", "line_party")
+                .unique()
+            )
+            spread = dict(ballots.group_by("candidate").len().iter_rows())
+            for candidate, line, line_party in ballots.iter_rows():
+                root = picked[candidate]
+                if spread[candidate] < 2 and root not in children:
+                    continue
+                choices = children.get(root, [])
+                found = [option for option, party, _ in choices if line_party is not None and party == line_party] or [
+                    option for option, _, label in choices if slug(line)[:5] in slug(label.rsplit("(", 1)[-1])
+                ]
+                if len(found) == 1:
+                    lined[f"{candidate}\x1f{line}"] = found[0]
+                    continue
+                child = cs.key("us.option", f"{key}:{root}:{slug(line)}")
+                if child in cs.minted:
+                    cs.add(
+                        "contest_option",
+                        id=child,
+                        contest_id=contest,
+                        parent_option_id=UUID(root),
+                        kind="candidate",
+                        party_id=None if line_party is None else UUID(line_party),
+                        ballot_label=f"{labels.get(root, candidate)} ({line})",
+                    )
+                lined[f"{candidate}\x1f{line}"] = str(child)
         values.append(
             lines.filter((pl.col("measure") != 1) | pl.col("candidate").is_in(list(picked)))
             .select(
                 result_set_id=pl.lit(str(result_set)),
                 unit_id=pl.col("code").replace_strict(members),
                 option_id=pl.when(pl.col("measure") == 1).then(
-                    pl.col("candidate").replace_strict(picked, default=None)
+                    pl.coalesce(
+                        pl.concat_str("candidate", "line", separator="\x1f").replace_strict(lined, default=None),
+                        pl.col("candidate").replace_strict(picked, default=None),
+                    )
+                    if lined
+                    else pl.col("candidate").replace_strict(picked, default=None)
                 ),
                 channel=pl.col("channel") if "channel" in congress.columns else pl.lit(0, pl.Int16),
                 measure=pl.col("measure"),
