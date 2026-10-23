@@ -21,6 +21,7 @@ PUBLISHER = "Alabama Secretary of State"
 TITLE = "2014 general election: precinct-level results"
 LANDING = "https://www.sos.alabama.gov/alabama-votes/voter/election-data"
 URL = "https://www.sos.alabama.gov/sites/default/files/election-data/2017-06/2014General-precinctLevel.zip"
+CANVASS = "https://www.sos.alabama.gov/sites/default/files/voter-pdfs/2014/2014GeneralResults-WithoutWriteIn.pdf"
 DAY = date(2014, 11, 4)
 OFFICE = re.compile(
     r"STATE (REPRESENTATIVE|SENATOR),?\s+(?:D\d+\s+)?DISTRICT(?: NO\.)?\s*(\d+)|State (Rep|Sen)\.?\s*(?:Dist\.?)?\s*(\d+)",
@@ -31,10 +32,12 @@ RELABELED = {
     ("DeKalb", "State Rep. Dist 9"): "State Sen. Dist 9",
     ("DeKalb", "State Rep. Dist 10"): "State Sen. Dist 10",
 }
+CORRECTED = {("house:23:g", "01071", "JOHN ROBINSON"): 3392, ("house:37:g", "01017", "GUY KELLY"): 48}
 
 
 def fetch() -> None:
     raw.fetch(SOURCE, URL, suffix=".zip")
+    raw.fetch(SOURCE, CANVASS, suffix=".pdf")
 
 
 def parse() -> None:
@@ -117,6 +120,11 @@ def parse() -> None:
         else (chamber, code, candidate, writein, votes)
         for chamber, code, candidate, writein, votes in rows
     ]
+    if not set(CORRECTED) <= {row[:3] for row in rows}:
+        raise ValueError("a county corrected from the canvass is missing")
+    rows = [row for row in rows if row[:3] not in CORRECTED] + [
+        (*key, False, votes) for key, votes in CORRECTED.items()
+    ]
     PARSED.mkdir(parents=True, exist_ok=True)
     (
         pl.DataFrame(
@@ -167,5 +175,6 @@ def emit() -> Path:
                 license="Public record",
             )
         cs.artifact(raw.cached(SOURCE, URL), source)
+        cs.artifact(raw.cached(SOURCE, CANVASS), source)
         medsl.attach(cs, conn, pl.read_parquet(PARSED / "counties.parquet"), {"AL": source}, strict=True)
         return cs.write()
