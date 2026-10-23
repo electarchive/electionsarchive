@@ -1,4 +1,5 @@
 import html
+import io
 import json
 import re
 import subprocess
@@ -286,6 +287,12 @@ KENTUCKY = {
         {"Sections 145 and 155": "Constitutional Amendment 1", "To give parents choices": "Constitutional Amendment 2"},
     ),
 }
+NORTH_CAROLINA_RESULTS = "https://s3.amazonaws.com/dl.ncsbe.gov/ENRS/{}/results_pct_{}.zip"
+NORTH_CAROLINA_QUESTIONS = {
+    date(2012, 5, 8): "CONSTITUTIONAL AMENDMENT",
+    date(2014, 11, 4): "NC CONSTITUTIONAL AMENDMENT",
+    date(2016, 3, 15): "CONNECT NC PUBLIC IMPROVEMENT BOND",
+}
 NORTH_CAROLINA = {
     date(2018, 11, 6): (
         "2018-11-27/Canvass/Supplement_11_30_2018/State%20Composite%20Abstract%20Report%20-%20County.pdf",
@@ -297,6 +304,9 @@ NORTH_CAROLINA = {
     ),
 }
 NAMED_QUESTIONS = {
+    "CONSTITUTIONAL AMENDMENT": "North Carolina Amendment 1, Definition of Marriage and Prohibition of Civil Unions Amendment",
+    "NC CONSTITUTIONAL AMENDMENT": "North Carolina Criminal Defendant May Waive Jury Trial Amendment",
+    "CONNECT NC PUBLIC IMPROVEMENT BOND": "North Carolina Connect NC Public Improvement Bond",
     "Referendum Measure No. 4: Relating to University of North Dakota Athletic Nickname and Logo.": 'North Dakota University "Fighting Sioux" Referendum, Measure 4',
     "Elimination of Annual Poll Tax": "North Dakota Poll Tax Amendment, Measure 1",
     "Oaths of Office for Elected and Appointed Officials": "North Dakota Oaths of Office Amendment, Measure 2",
@@ -697,6 +707,8 @@ def link(state: str, day: date) -> tuple[str, str]:
         return SOURCE, "https://sos.wyo.gov/Elections/Docs/" + WYOMING[day] if day in WYOMING else ""
     if state == "LA":
         return SOURCE, la_sos.blob(day, "Votes_Multiparish.htm")
+    if state == "NC" and day in NORTH_CAROLINA_QUESTIONS:
+        return SOURCE, NORTH_CAROLINA_RESULTS.format(f"{day:%Y_%m_%d}", f"{day:%Y%m%d}")
     if state == "NC":
         return SOURCE, NCSBE + NORTH_CAROLINA[day][0] if day in NORTH_CAROLINA else ""
     if state == "AL":
@@ -834,7 +846,7 @@ def fetch() -> None:
         if source == SOURCE and url:
             for each in (
                 [url, NCSBE + NORTH_CAROLINA[day][1]]
-                if state == "NC"
+                if state == "NC" and day in NORTH_CAROLINA
                 else [url, *(HAWAII_REPORTS.format(day.year, county) for county in ("cch", "coh", "cok", "com"))]
                 if state == "HI"
                 else [url, WAYBACK.format(WV_JSON[day][2], CLARITY_JSON.format(WV_JSON[day][0], "sum"))]
@@ -854,7 +866,9 @@ def fetch() -> None:
                             "TN": ".xlsx",
                             "RI": ".xlsx",
                             "GA": ".zip",
-                        }.get(state, ".pdf"),
+                        }.get(state, ".pdf")
+                        if state != "NC" or day not in NORTH_CAROLINA_QUESTIONS
+                        else ".zip",
                     )
                 except httpx.HTTPStatusError as error:
                     print(f"{state} {day}: {error}")
@@ -1584,6 +1598,27 @@ def parse() -> None:
                     "url": pl.String,
                 },
                 orient="row",
+            )
+        elif state == "NC" and path.suffix == ".zip":
+            with zipfile.ZipFile(path) as archive:
+                text = archive.read(archive.namelist()[0]).decode("latin-1").replace("\0", "")
+            table = (
+                pl.read_csv(
+                    io.StringIO(text),
+                    separator="," if text.startswith('"') else "\t",
+                    infer_schema=False,
+                    truncate_ragged_lines=True,
+                )
+                .rename(lambda column: column.strip().lower().replace(" ", "_"))
+                .filter(pl.col("^contest(_name)?$") == NORTH_CAROLINA_QUESTIONS[day])
+                .group_by("county", "choice")
+                .agg(votes=pl.col("total_votes").cast(pl.Int64).sum().cast(pl.String))
+                .select(
+                    "county",
+                    office=pl.lit(NORTH_CAROLINA_QUESTIONS[day]),
+                    answer=pl.col("choice").str.to_uppercase(),
+                    votes="votes",
+                )
             )
         elif state == "NC":
             totals: dict[tuple[str, str], int] = {}
