@@ -188,8 +188,8 @@ def emit() -> Path:
                     """select distinct cy.person_id, n.text from candidacy cy
                        join contest_option o on o.id = cy.option_id and o.contest_id = %s
                        join name n on n.entity_id = cy.person_id and n.is_preferred
-                       where cy.role = 'head' and n.text ilike %s""",
-                    [previous, f"%{words[-1]}%"],
+                       where cy.role = 'head' and regexp_replace(lower(n.text), '[^a-z]', '', 'g') like %s""",
+                    [previous, f"%{re.sub(r'[^a-z]', '', words[-1].lower())}%"],
                 ).fetchall()
                 if len(found) != 1:
                     raise ValueError(f"{contest_key}: {candidate} is not one candidate of {first_key}")
