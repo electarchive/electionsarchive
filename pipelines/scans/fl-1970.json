@@ -1,0 +1,82 @@
+{
+ "polity": "US-FL",
+ "publisher": "Florida Department of State, Division of Elections",
+ "title": "Tabulation of Official Votes, Florida General Election 1970-11-03",
+ "license": "Public record",
+ "raw_source": "us.scans",
+ "file": {
+  "url": "http://edocs.dlis.state.fl.us/fldocs/dos/de/generalelectionvotes/generalelectionvotes_1970-1986/1970.pdf"
+ },
+ "contests": {
+  "attorney-general": {
+   "year": 1970,
+   "chamber": "attorney-general",
+   "day": "1970-11-03",
+   "special": false,
+   "state": "FL",
+   "district": null
+  },
+  "secretary-of-state": {
+   "year": 1970,
+   "chamber": "secretary-of-state",
+   "day": "1970-11-03",
+   "special": false,
+   "state": "FL",
+   "district": null
+  },
+  "comptroller": {
+   "year": 1970,
+   "chamber": "comptroller",
+   "day": "1970-11-03",
+   "special": false,
+   "state": "FL",
+   "district": null
+  }
+ },
+ "pages": [
+  {
+   "page": 4,
+   "id": "4-0",
+   "orientation": "counties_down",
+   "discover": [
+    "attorney-general",
+    "secretary-of-state",
+    "comptroller"
+   ],
+   "hint": "A table of Florida counties down the left with one or two candidate columns per office. Ignore the Grand Total row; the Total row is the printed total."
+  },
+  {
+   "page": 5,
+   "id": "5-0",
+   "orientation": "counties_down",
+   "discover": [
+    "attorney-general",
+    "secretary-of-state",
+    "comptroller"
+   ],
+   "hint": "A table of Florida counties down the left with one or two candidate columns per office. Ignore the Grand Total row; the Total row is the printed total."
+  },
+  {
+   "page": 6,
+   "id": "6-0",
+   "orientation": "counties_down",
+   "discover": [
+    "attorney-general",
+    "secretary-of-state",
+    "comptroller"
+   ],
+   "hint": "A table of Florida counties down the left with one or two candidate columns per office. Ignore the Grand Total row; the Total row is the printed total."
+  },
+  {
+   "page": 7,
+   "id": "7-0",
+   "orientation": "counties_down",
+   "discover": [
+    "attorney-general",
+    "secretary-of-state",
+    "comptroller"
+   ],
+   "hint": "A table of Florida counties down the left with one or two candidate columns per office. Ignore the Grand Total row; the Total row is the printed total."
+  }
+ ]
+}

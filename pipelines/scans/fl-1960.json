@@ -1,0 +1,93 @@
+{
+ "polity": "US-FL",
+ "publisher": "Florida Department of State, Division of Elections",
+ "title": "Tabulation of Official Votes, Florida General Election 1960-11-08",
+ "license": "Public record",
+ "raw_source": "us.scans",
+ "file": {
+  "url": "http://edocs.dlis.state.fl.us/fldocs/dos/de/generalelectionvotes/generalelectionvotes_1948-1968/1960.pdf"
+ },
+ "contests": {
+  "treasurer": {
+   "year": 1960,
+   "chamber": "treasurer",
+   "day": "1960-11-08",
+   "special": false,
+   "state": "FL",
+   "district": null
+  },
+  "secretary-of-state": {
+   "year": 1960,
+   "chamber": "secretary-of-state",
+   "day": "1960-11-08",
+   "special": false,
+   "state": "FL",
+   "district": null
+  },
+  "comptroller": {
+   "year": 1960,
+   "chamber": "comptroller",
+   "day": "1960-11-08",
+   "special": false,
+   "state": "FL",
+   "district": null
+  },
+  "commissioner-of-education": {
+   "year": 1960,
+   "chamber": "commissioner-of-education",
+   "day": "1960-11-08",
+   "special": false,
+   "state": "FL",
+   "district": null
+  },
+  "attorney-general": {
+   "year": 1960,
+   "chamber": "attorney-general",
+   "day": "1960-11-08",
+   "special": false,
+   "state": "FL",
+   "district": null
+  }
+ },
+ "pages": [
+  {
+   "page": 3,
+   "id": "3-0",
+   "orientation": "counties_down",
+   "discover": [
+    "treasurer",
+    "secretary-of-state",
+    "comptroller",
+    "commissioner-of-education",
+    "attorney-general"
+   ],
+   "hint": "A table of Florida counties down the left with one or two candidate columns per office. Ignore the Grand Total row; the Total row is the printed total."
+  },
+  {
+   "page": 4,
+   "id": "4-0",
+   "orientation": "counties_down",
+   "discover": [
+    "treasurer",
+    "secretary-of-state",
+    "comptroller",
+    "commissioner-of-education",
+    "attorney-general"
+   ],
+   "hint": "A table of Florida counties down the left with one or two candidate columns per office. Ignore the Grand Total row; the Total row is the printed total."
+  },
+  {
+   "page": 5,
+   "id": "5-0",
+   "orientation": "counties_down",
+   "discover": [
+    "treasurer",
+    "secretary-of-state",
+    "comptroller",
+    "commissioner-of-education",
+    "attorney-general"
+   ],
+   "hint": "A table of Florida counties down the left with one or two candidate columns per office. Ignore the Grand Total row; the Total row is the printed total."
+  }
+ ]
+}

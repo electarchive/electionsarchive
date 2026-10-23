@@ -1,0 +1,93 @@
+{
+ "polity": "US-FL",
+ "publisher": "Florida Department of State, Division of Elections",
+ "title": "Tabulation of Official Votes, Florida General Election 1974-11-05",
+ "license": "Public record",
+ "raw_source": "us.scans",
+ "file": {
+  "url": "http://edocs.dlis.state.fl.us/fldocs/dos/de/generalelectionvotes/generalelectionvotes_1970-1986/1974.pdf"
+ },
+ "contests": {
+  "comptroller": {
+   "year": 1974,
+   "chamber": "comptroller",
+   "day": "1974-11-05",
+   "special": false,
+   "state": "FL",
+   "district": null
+  },
+  "commissioner-of-education": {
+   "year": 1974,
+   "chamber": "commissioner-of-education",
+   "day": "1974-11-05",
+   "special": false,
+   "state": "FL",
+   "district": null
+  },
+  "treasurer": {
+   "year": 1974,
+   "chamber": "treasurer",
+   "day": "1974-11-05",
+   "special": false,
+   "state": "FL",
+   "district": null
+  },
+  "commissioner-of-agriculture": {
+   "year": 1974,
+   "chamber": "commissioner-of-agriculture",
+   "day": "1974-11-05",
+   "special": false,
+   "state": "FL",
+   "district": null
+  },
+  "secretary-of-state": {
+   "year": 1974,
+   "chamber": "secretary-of-state",
+   "day": "1974-11-05",
+   "special": false,
+   "state": "FL",
+   "district": null
+  }
+ },
+ "pages": [
+  {
+   "page": 5,
+   "id": "5-0",
+   "orientation": "counties_down",
+   "discover": [
+    "comptroller",
+    "commissioner-of-education",
+    "treasurer",
+    "commissioner-of-agriculture",
+    "secretary-of-state"
+   ],
+   "hint": "A table of Florida counties down the left with one or two candidate columns per office. Ignore the Grand Total row; the Total row is the printed total."
+  },
+  {
+   "page": 6,
+   "id": "6-0",
+   "orientation": "counties_down",
+   "discover": [
+    "comptroller",
+    "commissioner-of-education",
+    "treasurer",
+    "commissioner-of-agriculture",
+    "secretary-of-state"
+   ],
+   "hint": "A table of Florida counties down the left with one or two candidate columns per office. Ignore the Grand Total row; the Total row is the printed total."
+  },
+  {
+   "page": 7,
+   "id": "7-0",
+   "orientation": "counties_down",
+   "discover": [
+    "comptroller",
+    "commissioner-of-education",
+    "treasurer",
+    "commissioner-of-agriculture",
+    "secretary-of-state"
+   ],
+   "hint": "A table of Florida counties down the left with one or two candidate columns per office. Ignore the Grand Total row; the Total row is the printed total."
+  }
+ ]
+}

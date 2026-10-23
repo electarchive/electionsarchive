@@ -47,7 +47,7 @@ class Page(TypedDict):
     page: int
     id: NotRequired[str]
     columns: NotRequired[list[Column]]
-    discover: NotRequired[str]
+    discover: NotRequired[str | list[str]]
     hint: NotRequired[str]
     crop: NotRequired[list[float]]
     dpi: NotRequired[int]
@@ -979,9 +979,20 @@ def discover(manifest: Manifest, folder: Path) -> str:
                 if spec.get("orientation") == "counties_across"
                 else [entry["label"] for entry in table["header"]]
             )
-            columns, unmatched = match(
-                labels, options(conn, ids.get(key_of(manifest["contests"][spec["discover"]]))), spec["discover"]
-            )
+            wanted = [spec["discover"]] if isinstance(spec["discover"], str) else spec["discover"]
+            matched = [
+                match(labels, options(conn, ids.get(key_of(manifest["contests"][contest]))), contest)[0]
+                for contest in wanted
+            ]
+            columns = []
+            unmatched = []
+            for index, label in enumerate(labels):
+                hits = [one[index] for one in matched if one[index]["contest"] is not None]
+                if len(hits) == 1:
+                    columns.append(hits[0])
+                else:
+                    columns.append({"label": label, "contest": None, "candidate": ""})
+                    unmatched.append(label)
             state["columns"][number] = columns
             state["unmatched"][number] = unmatched
     found.write_text(json.dumps(state, indent=2))
