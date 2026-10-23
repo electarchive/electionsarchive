@@ -111,6 +111,11 @@ ARIZONA = {
     ),
     date(2020, 11, 3): ("20231207175657", "https://azsos.gov/sites/default/files/2020_General_State_Canvass.pdf"),
 }
+MINNESOTA = {
+    date(2012, 11, 6): "https://electionresults.sos.mn.gov/Results/MediaFile_Archive/Index?erselectionId=1&mediafileid=65",
+    date(2016, 11, 8): "https://electionresultsfiles.sos.mn.gov/20161108/ConstAmendCty.txt",
+    date(2024, 11, 5): "https://electionresultsfiles.sos.mn.gov/20241105/ConstAmendCty.txt",
+}
 ARIZONA_FILES = {
     date(2012, 11, 6): ("35978", "https://azmemory.azlibrary.gov/nodes/view/102715"),
     date(2016, 11, 8): ("35980", "https://azmemory.azlibrary.gov/nodes/view/102723"),
@@ -471,6 +476,12 @@ DOCUMENTS = {
         "https://elections.maryland.gov/elections/",
         "the Maryland State Board of Elections' official results for statewide questions",
     ),
+    "MN": (
+        "Minnesota Secretary of State",
+        "Constitutional amendment results by county",
+        "https://electionresults.sos.mn.gov/",
+        "the Minnesota Secretary of State's constitutional amendment results by county",
+    ),
     "TX": (
         "Texas Secretary of State",
         "Election history: constitutional amendment elections by county",
@@ -719,6 +730,8 @@ def link(state: str, day: date) -> tuple[str, str]:
         )
     if state == "ME" and day in MAINE:
         return SOURCE, MAINE[day]
+    if state == "MN" and day in MINNESOTA:
+        return SOURCE, MINNESOTA[day]
     if state == "AZ" and day in ARIZONA_FILES:
         return SOURCE, ARIZONA_FILES[day][1]
     if state == "AZ":
@@ -891,6 +904,20 @@ def fetch() -> None:
                     raw.fetch(SOURCE, NEW_JERSEY_SITE.format(name), suffix=".pdf")
                 except httpx.HTTPStatusError as error:
                     print(f"NJ {day}: {error}")
+            continue
+        if state == "MN" and day in MINNESOTA:
+            saved = DATA / "inbox" / "manual" / "MF-043" / f"{day:%Y%m%d}" / "ConstAmendCty.txt"
+            try:
+                raw.cached(SOURCE, url)
+            except LookupError:
+                raw.store(
+                    SOURCE,
+                    url,
+                    saved.read_bytes(),
+                    suffix=".txt",
+                    retrieved_at=datetime.fromtimestamp(saved.stat().st_mtime, UTC),
+                    media_type="text/plain",
+                )
             continue
         if state == "AZ" and day in ARIZONA_FILES:
             saved = DATA / "inbox" / "manual" / "MF-042" / f"{ARIZONA_FILES[day][0]}.pdf"
@@ -2174,6 +2201,20 @@ def parse() -> None:
                         continue
                     for county, votes in counties.items():
                         records.append((county, office, choice.get("text"), str(votes)))
+            table = pl.DataFrame(
+                records,
+                schema={"county": pl.String, "office": pl.String, "answer": pl.String, "votes": pl.String},
+                orient="row",
+            )
+        elif state == "MN" and day in MINNESOTA:
+            by_code = {code: plain for plain, code in names["MN"].items() if not plain.endswith("city")}
+            records = []
+            for line in path.read_text().splitlines():
+                fields = line.split(";")
+                if len(fields) < 15 or fields[7] not in {"YES", "NO"}:
+                    continue
+                fips = f"27{2 * int(fields[1]) - 1:03d}"
+                records.append((by_code[fips], fields[4].title(), fields[7], fields[13]))
             table = pl.DataFrame(
                 records,
                 schema={"county": pl.String, "office": pl.String, "answer": pl.String, "votes": pl.String},
