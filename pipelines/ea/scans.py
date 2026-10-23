@@ -517,7 +517,7 @@ def cells(
                     stem = slug(
                         ABBREVIATION.sub(lambda hit: f"{EXPANDED[hit[1].lower()]} ", WARD.sub("", label))
                         if towns
-                        else label
+                        else re.sub(r"\s+county$", "", label, flags=re.IGNORECASE)
                     ).replace(" ", "")
                     code = extra.get(stem) or names.get(stem)
                     if code is None:

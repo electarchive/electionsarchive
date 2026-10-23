@@ -1,0 +1,140 @@
+{
+ "polity": "US-UT",
+ "publisher": "Utah Lieutenant Governor's Office of Elections",
+ "title": "2022 regular primary election canvass",
+ "license": "Public record",
+ "file": {
+  "url": "https://vote.utah.gov/wp-content/uploads/2022/07/2022-Signed-Primary-Election-Statewide-Canvass.pdf"
+ },
+ "raw_source": "us.ut_canvass",
+ "contests": {
+  "s": {
+   "year": 2022,
+   "chamber": "senate:republican",
+   "day": "2022-06-28",
+   "special": false,
+   "state": "UT",
+   "district": null
+  },
+  "h1": {
+   "year": 2022,
+   "chamber": "house:republican",
+   "day": "2022-06-28",
+   "special": false,
+   "state": "UT",
+   "district": 1
+  },
+  "h2": {
+   "year": 2022,
+   "chamber": "house:republican",
+   "day": "2022-06-28",
+   "special": false,
+   "state": "UT",
+   "district": 2
+  },
+  "h3": {
+   "year": 2022,
+   "chamber": "house:republican",
+   "day": "2022-06-28",
+   "special": false,
+   "state": "UT",
+   "district": 3
+  },
+  "h4": {
+   "year": 2022,
+   "chamber": "house:republican",
+   "day": "2022-06-28",
+   "special": false,
+   "state": "UT",
+   "district": 4
+  }
+ },
+ "pages": [
+  {
+   "page": 2,
+   "turn": -90,
+   "orientation": "counties_down",
+   "columns": [
+    {
+     "label": "Ally Isom",
+     "contest": "s",
+     "candidate": "Ally Isom"
+    },
+    {
+     "label": "Becky Edwards",
+     "contest": "s",
+     "candidate": "Becky Edwards"
+    },
+    {
+     "label": "Mike Lee",
+     "contest": "s",
+     "candidate": "Mike Lee"
+    },
+    {
+     "label": "Andrew Badger",
+     "contest": "h1",
+     "candidate": "Andrew Badger"
+    },
+    {
+     "label": "Blake D. Moore",
+     "contest": "h1",
+     "candidate": "Blake D. Moore"
+    },
+    {
+     "label": "Tina Cannon",
+     "contest": "h1",
+     "candidate": "Tina Cannon"
+    },
+    {
+     "label": "Chris Stewart",
+     "contest": "h2",
+     "candidate": "Chris Stewart"
+    },
+    {
+     "label": "Erin Rider",
+     "contest": "h2",
+     "candidate": "Erin Rider"
+    }
+   ],
+   "crop": [
+    0.08,
+    0.1,
+    0.92,
+    0.7
+   ]
+  },
+  {
+   "page": 3,
+   "turn": -90,
+   "orientation": "counties_down",
+   "columns": [
+    {
+     "label": "Christopher Niles Herrod",
+     "contest": "h3",
+     "candidate": "Christopher Niles Herrod"
+    },
+    {
+     "label": "John Curtis",
+     "contest": "h3",
+     "candidate": "John Curtis"
+    },
+    {
+     "label": "Burgess Owens",
+     "contest": "h4",
+     "candidate": "Burgess Owens"
+    },
+    {
+     "label": "Jake Hunsaker",
+     "contest": "h4",
+     "candidate": "Jake Hunsaker"
+    }
+   ],
+   "crop": [
+    0.08,
+    0.1,
+    0.57,
+    0.7
+   ]
+  }
+ ]
+}

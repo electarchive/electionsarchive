@@ -1,0 +1,45 @@
+{
+ "polity": "US-UT",
+ "publisher": "Utah Lieutenant Governor's Office of Elections",
+ "title": "2006 primary official results, multi-county races",
+ "license": "Public record",
+ "file": {
+  "url": "https://vote.utah.gov/wp-content/uploads/2023/09/2006Pri.pdf"
+ },
+ "raw_source": "us.ut_canvass",
+ "contests": {
+  "h3": {
+   "year": 2006,
+   "chamber": "house:republican",
+   "day": "2006-06-27",
+   "special": false,
+   "state": "UT",
+   "district": 3
+  }
+ },
+ "pages": [
+  {
+   "page": 2,
+   "id": "h3",
+   "crop": [
+    0.05,
+    0.15,
+    0.28,
+    0.79
+   ],
+   "orientation": "counties_down",
+   "columns": [
+    {
+     "label": "Chris Cannon",
+     "contest": "h3",
+     "candidate": "Chris Cannon"
+    },
+    {
+     "label": "John D. Jacob",
+     "contest": "h3",
+     "candidate": "John D. Jacob"
+    }
+   ]
+  }
+ ]
+}
