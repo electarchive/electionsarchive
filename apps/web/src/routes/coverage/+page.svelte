@@ -30,6 +30,7 @@
   };
 
   let goal = $state<Goal>("county");
+  let order = $state<"gap" | "name">("gap");
   const lead = $derived(data.goals.find((row) => row.goal === "county"));
   const next = $derived(data.goals.filter((row) => row.goal !== "county"));
 
@@ -229,26 +230,52 @@
           {m.coverage_where()}
         </h2>
         <p class="text-sm text-muted-foreground">{m.coverage_where_hint()}</p>
-        <div
-          role="group"
-          aria-label={m.coverage_goal_tabs()}
-          class="flex flex-wrap rounded-sm border border-border p-0.5 text-sm inline-fit"
-        >
-          {#each GOALS as option (option)}
-            <button
-              type="button"
-              aria-pressed={goal === option}
-              class={cn(
-                "rounded-[3px] px-2 block-7 focus-visible:outline-2 focus-visible:outline-ring",
-                {
-                  "bg-foreground text-background": goal === option,
-                  "text-muted-foreground hover:text-foreground":
-                    goal !== option,
-                },
-              )}
-              onclick={() => (goal = option)}>{TABS[option]()}</button
-            >
-          {/each}
+        <div class="flex flex-wrap items-center gap-2">
+          <div
+            role="group"
+            aria-label={m.coverage_goal_tabs()}
+            class="flex flex-wrap rounded-sm border border-border p-0.5 text-sm inline-fit"
+          >
+            {#each GOALS as option (option)}
+              <button
+                type="button"
+                aria-pressed={goal === option}
+                class={cn(
+                  "rounded-[3px] px-2 block-7 focus-visible:outline-2 focus-visible:outline-ring",
+                  {
+                    "bg-foreground text-background": goal === option,
+                    "text-muted-foreground hover:text-foreground":
+                      goal !== option,
+                  },
+                )}
+                onclick={() => (goal = option)}>{TABS[option]()}</button
+              >
+            {/each}
+          </div>
+          <div
+            role="group"
+            aria-label={m.coverage_sort()}
+            class="flex rounded-sm border border-border p-0.5 text-sm inline-fit"
+          >
+            {#each ["gap", "name"] as const as option (option)}
+              <button
+                type="button"
+                aria-pressed={order === option}
+                class={cn(
+                  "rounded-[3px] px-2 block-7 focus-visible:outline-2 focus-visible:outline-ring",
+                  {
+                    "bg-foreground text-background": order === option,
+                    "text-muted-foreground hover:text-foreground":
+                      order !== option,
+                  },
+                )}
+                onclick={() => (order = option)}
+                >{option === "gap"
+                  ? m.coverage_sort_gap()
+                  : m.coverage_sort_name()}</button
+              >
+            {/each}
+          </div>
         </div>
         <p class="text-sm text-muted-foreground">{TITLES[goal]()}</p>
         <p class="text-xs text-muted-foreground">{m.coverage_column_note()}</p>
@@ -265,7 +292,7 @@
           <span role="columnheader">{m.coverage_column_done()}</span>
         </div>
         {#key goal}
-          <Gaps {goal} rows={goal === "county" ? data.gaps : null} />
+          <Gaps {goal} {order} rows={goal === "county" ? data.gaps : null} />
         {/key}
       </div>
     </section>

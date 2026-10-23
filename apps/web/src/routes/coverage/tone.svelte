@@ -21,6 +21,9 @@
       "bg-(--done-some)": reason === "totals",
       "bg-muted-foreground/45": reason === "bare",
     },
-    { "border border-muted-foreground/60 bg-muted": reason === "absent" },
+    {
+      "border border-muted-foreground/70 bg-muted bg-[repeating-linear-gradient(135deg,var(--muted-foreground)_0_1.5px,transparent_1.5px_5px)]":
+        reason === "absent",
+    },
   )}
 ></span>

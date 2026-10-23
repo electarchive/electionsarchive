@@ -546,7 +546,8 @@ def build() -> str:
         cell[9] += shaped
 
     with connect() as conn, conn.transaction():
-        conn.execute("truncate coverage_goal, coverage_government_year, coverage_government")
+        conn.execute("delete from coverage_goal")
+        conn.execute("truncate coverage_government_year, coverage_government")
         with conn.cursor().copy(
             "copy coverage_government (id, state, county, kind, name, function, population, active, polity_id, period,"
             " phase, month, basis) from stdin"

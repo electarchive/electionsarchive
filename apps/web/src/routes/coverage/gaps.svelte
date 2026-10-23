@@ -4,6 +4,7 @@
   import { SvelteSet } from "svelte/reactivity";
   import { count, percent } from "#lib/format.js";
   import { m } from "#lib/paraglide/messages.js";
+  import { getLocale } from "#lib/paraglide/runtime.js";
   import { orpc } from "#lib/rpc.js";
   import { cn } from "#lib/utils.js";
   import type { Counts, Goal } from "./reasons.js";
@@ -13,11 +14,13 @@
 
   const {
     goal,
+    order,
     rows = null,
     place = null,
     level = null,
   }: {
     goal: Goal;
+    order: "gap" | "name";
     rows?: Array<Counts & { key: string; label: string | null }> | null;
     place?: string | null;
     level?: string | null;
@@ -29,12 +32,27 @@
     }),
     enabled: rows == null,
   }));
-  const all = $derived(rows ?? fetched.data ?? []);
   const depth = $derived(place == null ? 0 : level == null ? 1 : 2);
+  const current = new Date().getFullYear();
+  const all = $derived.by(() => {
+    const named = (rows ?? fetched.data ?? []).map((row) => ({
+      row,
+      name:
+        depth === 0
+          ? (row.label ?? row.key)
+          : depth === 1
+            ? (LEVELS[row.key]?.() ?? row.key)
+            : Number(row.key) === current
+              ? m.coverage_in_progress({ year: row.key })
+              : row.key,
+    }));
+    return order === "name"
+      ? named.toSorted((a, b) => a.name.localeCompare(b.name, getLocale()))
+      : named;
+  });
   let isAll = $state(false);
   const list = $derived(isAll ? all : all.slice(0, 10));
   const opened = new SvelteSet<string>();
-  const current = new Date().getFullYear();
 </script>
 
 {#if rows == null && fetched.data == null}
@@ -46,16 +64,7 @@
     <span role="gridcell">{m.coverage_empty()}</span>
   </div>
 {/if}
-{#each list as row (row.key)}
-  {const name = $derived(
-    depth === 0
-      ? (row.label ?? row.key)
-      : depth === 1
-        ? (LEVELS[row.key]?.() ?? row.key)
-        : Number(row.key) === current
-          ? m.coverage_in_progress({ year: row.key })
-          : row.key,
-  )}
+{#each list as { row, name } (row.key)}
   {const isOpen = $derived(opened.has(row.key))}
   <div
     role="row"
@@ -110,6 +119,7 @@
   {#if isOpen}
     <Self
       {goal}
+      {order}
       place={depth === 0 ? row.key : place}
       level={depth === 1 ? row.key : null}
     />
