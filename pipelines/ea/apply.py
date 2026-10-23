@@ -692,7 +692,7 @@ def defaults(
                          exists (select from external_id x where x.scheme = 'ea.authoritative' and x.value = r.id::text)
                            as authoritative
                   from result_set d
-                  join source ds on ds.id = d.source_id and ds.kind <> 'official_body'
+                  join source ds on ds.id = d.source_id
                   join result_set r on r.election_id = d.election_id and r.contest_id = d.contest_id
                     and not r.is_default and r.status = 'active' and r.kind = 'counted'
                     and coalesce(r.completeness, 1) >= 0.98
@@ -701,6 +701,8 @@ def defaults(
                         and x.stage = r.stage and x.is_default)))
                   join source rs on rs.id = r.source_id and rs.kind = 'official_body'
                   where d.is_default and d.status = 'active' and d.kind = 'counted' and d.contest_id is not null
+                    and (ds.kind <> 'official_body' or exists (
+                      select from external_id x where x.scheme = 'ea.authoritative' and x.value = r.id::text))
                     and (%(contests)s::uuid[] is null or d.contest_id = any(%(contests)s::uuid[]))
                     and not exists (select from flag f where f.result_set_id = r.id and f.check_code = 'reconcile.official')
                   order by d.id, r.stage desc, r.completeness desc nulls last, r.k
@@ -717,11 +719,11 @@ def defaults(
     flipped: list[tuple[str, str, bool]] = []
     skipped: list[dict[str, object]] = []
     for old, new, same, contest, before, after, winners, authoritative in picks:
-        total, counted = sum(before.values()), sum(after.values())
+        total, counted = sum(before.values()), sum(after.get(option, 0) for option in before)
         losing = [votes for option, votes in after.items() if option not in winners]
         reason = (
             "no votes"
-            if not counted
+            if not sum(after.values())
             else f"counts {counted} against {total}"
             if total and not authoritative and not 0.98 <= counted / total <= 1.02
             else "winner differs"
