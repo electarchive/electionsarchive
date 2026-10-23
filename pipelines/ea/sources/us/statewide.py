@@ -16,6 +16,7 @@ import polars as pl
 
 from ea import names, raw
 from ea.changeset import Changeset, slug
+from ea.names import initials
 from ea.sources.us.county_changes import ct_regions
 from ea.sources.us.elstats import (
     FORMER,
@@ -495,7 +496,7 @@ def emit() -> Path:
         kept: dict[UUID, bool] = dict(
             conn.execute(
                 """select r.id, r.is_default from result_set r join changeset c on c.id = r.changeset_id
-                   join external_id e on e.entity_id = r.id and e.scheme = %s where c.pipeline <> %s""",
+                   join external_id e on e.entity_id = r.id and e.scheme = %s where c.pipeline <> %s or r.is_default""",
                 [f"{SOURCE}.result_set", SOURCE],
             ).fetchall()
         )
@@ -663,7 +664,7 @@ def emit() -> Path:
                 persons[person] = cs.key(f"{SOURCE}.person", person)
                 cs.add("person", id=persons[person])
                 if persons[person] in cs.minted:
-                    name(persons[person], candidate)
+                    name(persons[person], initials(candidate))
             named[(state, candidate)] = person
             surnames[(state, year, office, slug(candidate).split("-")[-1])] = person
 
@@ -835,7 +836,7 @@ def emit() -> Path:
                 )
                 resolved = [party(state, year, label) for label in lines_by_party["party"]]
                 write_in = person is None or all(label == "Write In" for label in lines_by_party["party"])
-                ballot = str(candidate)
+                ballot = initials(str(candidate))
                 option_key = f"{contest_key}:{person or 'write-ins'}"
                 matched = None
                 if reused:
@@ -878,7 +879,7 @@ def emit() -> Path:
                         else published.get(root, resolved[0][0] if len(resolved) == 1 else None),
                         ballot_label=ballot,
                     )
-                    members = re.split(TICKET, ballot, maxsplit=1) if person is not None else []
+                    members = re.split(TICKET, str(candidate), maxsplit=1) if person is not None else []
                     for member, role, held in zip(
                         members, ("head", "running_mate"), ("Governor", "Lieutenant Governor"), strict=False
                     ):
@@ -893,14 +894,14 @@ def emit() -> Path:
                             persons[who] = cs.key(f"{SOURCE}.person", who)
                             cs.add("person", id=persons[who])
                             if persons[who] in cs.minted:
-                                name(persons[who], member)
+                                name(persons[who], initials(member))
                         cs.add(
                             "candidacy",
                             id=cs.key("us.candidacy", f"{option_key}:{role}"),
                             person_id=persons[who],
                             option_id=root,
                             role=role,
-                            ballot_name=member,
+                            ballot_name=initials(member),
                             is_independent=all(independent for _, independent in resolved),
                         )
                 targets: list[UUID] = []
@@ -913,7 +914,7 @@ def emit() -> Path:
                     target = cs.key(
                         "us.option",
                         f"{option_key}:"
-                        + ("" if printed == ballot else f"{slug(printed)}:")
+                        + ("" if printed == str(candidate) else f"{slug(printed)}:")
                         + slug(label or "no-party"),
                     )
                     cs.add(
@@ -923,7 +924,7 @@ def emit() -> Path:
                         parent_option_id=root,
                         kind="write_in" if label == "Write In" else "candidate",
                         party_id=party_id if year < 1854 else published.get(target, party_id),
-                        ballot_label=f"{printed} ({label or 'no party'})",
+                        ballot_label=f"{initials(printed)} ({label or 'no party'})",
                     )
                     targets.append(target)
                 lines_keys = list(zip(lines_by_party["printed"], lines_by_party["party"], strict=True))
