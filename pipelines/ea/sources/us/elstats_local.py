@@ -18,7 +18,7 @@ from ea.sources.us.alged import SOURCE as ALGED
 from ea.store import DATA, connect
 
 SOURCE = "us.elstats_local"
-VERSION = "7"
+VERSION = "8"
 PARSED = DATA / "parsed" / SOURCE
 TOWNS = "https://www2.census.gov/geo/tiger/GENZ2020/shp/cb_2020_09_cousub_500k.zip"
 COUNTY = ("board-of-commissioners", "Board of Commissioners", None)
@@ -633,15 +633,25 @@ def emit() -> Path:
         parties = {label: cs.key("us.party", key) for label, key in PARTIES.items()}
         if cs.minted & {*systems.values(), *parties.values()}:
             raise ValueError("the systems and parties must already exist")
-        covered = {
-            (owner, day.year, None if precision == "year" else day.month)
-            for owner, day, precision in conn.execute(
-                """select coalesce(c.office_id, c.body_id), e.date_from, e.date_precision from contest c
-                   join election e on e.id = c.election_id join changeset x on x.id = c.changeset_id
-                   where x.pipeline = %s""",
-                [ALGED],
+        covered: set[tuple[UUID, int, int | None]] = set()
+        twins: dict[tuple[UUID, UUID, int, int | None], UUID] = {}
+        for contest, owner, area, pipeline, day, precision in conn.execute(
+            """select c.id, coalesce(c.office_id, c.body_id), c.district_area_id, h.pipeline, e.date_from, e.date_precision
+               from contest c join election e on e.id = c.election_id join changeset h on h.id = c.changeset_id
+               join external_id x on x.entity_id = c.id and x.scheme = 'us.contest' and x.value like 'alged:%%'"""
+        ).fetchall():
+            month = None if precision == "year" else day.month
+            if pipeline == ALGED:
+                covered.add((owner, day.year, month))
+            else:
+                twins[(owner, area, day.year, month)] = contest
+        ours: dict[str, UUID] = dict(
+            conn.execute(
+                """select x.value, c.id from contest c join changeset h on h.id = c.changeset_id
+                   join external_id x on x.entity_id = c.id and x.scheme = 'us.contest' where h.pipeline = %s""",
+                [SOURCE],
             ).fetchall()
-        }
+        )
         statewide = {
             value: (entity, last)
             for value, entity, last in conn.execute(
@@ -794,6 +804,13 @@ def emit() -> Path:
                     )
                 districts.add(district)
             contest_key = f"{state}:local:{contest_id}"
+            if (
+                twin := twins.get((owner, area, day.year, day.month)) or twins.get((owner, area, day.year, None))
+            ) is not None:
+                if (own := ours.get(contest_key)) is not None:
+                    cs.merge(own, twin)
+                skipped += 1
+                continue
             contest = cs.key("us.contest", contest_key)
             magnitude = first["magnitude"] or 1
             special = stage == "special"
