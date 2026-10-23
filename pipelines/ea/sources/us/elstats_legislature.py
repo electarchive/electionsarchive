@@ -17,7 +17,7 @@ from ea.store import DATA, connect
 SOURCE = "us.elstats_legislature"
 VERSION = "1"
 PARSED = DATA / "parsed" / SOURCE
-YEARS = {"NH": range(2000, 2017, 2), "VT": range(1990, 2017, 2)}
+YEARS = {"NH": range(2000, 2023, 2), "VT": range(1990, 2023, 2)}
 OFFICES = {8: "house", 9: "senate"}
 GRAPHQL = {
     "NH": "https://nh2.elstats3.civera.com/api/graphql_pr",
@@ -133,6 +133,7 @@ def parse() -> None:
         towns.setdefault((state, elstats.plain(name)), geoid[:5])
         towns.setdefault((state, elstats.plain(re.sub(elstats.SUFFIXES, "", name.lower()))), geoid[:5])
     towns.update(elstats.FORMER)
+    towns[("VT", elstats.plain("Essex Junction"))] = "50007"
     rows = []
     unknown: set[tuple[str, str]] = set()
     for state, contest, day, chamber, district in contests().iter_rows():
@@ -198,14 +199,14 @@ def emit() -> Path:
             pipeline=SOURCE,
             version=VERSION,
             summary="New Hampshire and Vermont House and Senate general elections by town, ward, and polling place "
-            "1990–2016, from the states' ElectionStats archives",
+            "1990–2022, from the states' ElectionStats archives",
             polity="US",
         )
         filled = {
             key
             for (key,) in conn.execute(
                 """select distinct cx.value from external_id cx join result_set rs on rs.contest_id = cx.entity_id
-                   where cx.scheme = 'us.contest' and cx.value ~ '^(199[0-9]|20(0[0-9]|1[0-6]))-1[01]-\\d\\d:(NH|VT):'
+                   where cx.scheme = 'us.contest' and cx.value ~ '^(199[0-9]|20([01][0-9]|2[0-2]))-1[01]-\\d\\d:(NH|VT):'
                      and rs.changeset_id not in (select id from changeset where pipeline = %s)
                      and exists (select 1 from result_value v join reporting_unit u on u.k = v.unit_k
                                  where v.result_set_k = rs.k and u.scheme_code = 'us.precinct')""",
@@ -273,10 +274,14 @@ def emit() -> Path:
                 """select c.id, c.election_id, c.district_area_id, rs.id, min(v.count_round),
                           sum(v.value) filter (where v.measure = 1)::bigint
                    from external_id x join contest c on c.id = x.entity_id
-                   join result_set rs on rs.contest_id = c.id and rs.is_default
+                   join lateral (select r.id, r.k from result_set r
+                                 where r.contest_id = c.id and r.status = 'active' and r.kind = 'counted'
+                                   and not exists (select from changeset z where z.id = r.changeset_id
+                                                   and z.pipeline = %s)
+                                 order by r.is_default desc, r.k limit 1) rs on true
                    join result_value v on v.result_set_k = rs.k and v.measure = 1
                    where x.scheme = 'us.contest' and x.value = %s group by 1, 2, 3, 4""",
-                [key],
+                [SOURCE, key],
             ).fetchone() or (None, None, None, None, None, None)
             if contest is None or not official or first not in (0, 1):
                 skipped.setdefault("no contest on file", []).append(key)
@@ -285,9 +290,9 @@ def emit() -> Path:
                 """select o.id, o.ballot_label,
                           coalesce((select sum(v.value) from result_value v
                                     where v.result_set_k = rs.k and v.option_k = o.k and v.measure = 1), 0)::bigint
-                   from contest_option o join result_set rs on rs.contest_id = o.contest_id and rs.is_default
+                   from contest_option o join result_set rs on rs.id = %s
                    where o.contest_id = %s and o.parent_option_id is null""",
-                [contest],
+                [default, contest],
             ).fetchall()
             sums = dict(rows.group_by("name").agg(pl.col("votes").sum()).iter_rows())
             matched: dict[str, tuple[str, int]] = {}
