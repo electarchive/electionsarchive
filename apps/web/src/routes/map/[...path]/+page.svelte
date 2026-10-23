@@ -2188,10 +2188,12 @@
         class="pointer-events-none absolute inset-e-14 inset-be-1 z-0 truncate text-[0.625rem] text-muted-foreground max-inline-[40%] max-sm:hidden"
       >
         {const vintage = $derived(
-          /\/(\d{4}-\d{2}-\d{2})$/u.exec(
-            sheet.levels.find((entry) => entry.code === sheet.level)?.tiles ??
-              "",
-          )?.[1],
+          !sheet.estimated
+            ? undefined
+            : /\/(\d{4}-\d{2}-\d{2})$/u.exec(
+                sheet.levels.find((entry) => entry.code === sheet.level)
+                  ?.tiles ?? "",
+              )?.[1],
         )}
         {vintage == null
           ? m.map_boundaries({ publishers: credits.join("; ") })

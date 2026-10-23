@@ -19,7 +19,7 @@
   import { fade, fly } from "svelte/transition";
   import Export from "#lib/components/export.svelte";
   import * as Select from "#lib/components/ui/select/index.js";
-  import { count, date, percent, points, precision } from "#lib/format.js";
+  import { count, percent, points, precision } from "#lib/format.js";
   import { keep } from "#lib/linked.js";
   import { m } from "#lib/paraglide/messages.js";
   import { getLocale } from "#lib/paraglide/runtime.js";
@@ -2216,15 +2216,7 @@
             publishers,
           ),
         )}
-        {const vintage = $derived(/\/(\d{4}-\d{2}-\d{2})$/u.exec(tiles)?.[1])}
-        <p>
-          {vintage == null
-            ? m.map_boundaries({ publishers: listed })
-            : m.map_boundaries_dated({
-                publishers: listed,
-                date: date(vintage),
-              })}
-        </p>
+        <p>{m.map_boundaries({ publishers: listed })}</p>
       {/if}
       {#each notices as notice (notice)}
         <p>{notice}</p>
