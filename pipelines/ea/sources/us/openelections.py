@@ -140,7 +140,7 @@ def picks() -> list[tuple[str, int, str]]:
                 continue
             year = int(found[1])
             level = LEVELS.get(found[2] or "", 4 if (found[2] or "").endswith("__precinct") else 5)
-            if 2000 <= year <= 2014 and year % 2 == 0:
+            if 2000 <= year <= 2019 and (year % 2 == 1 or year <= 2014):
                 if year not in best or level < best[year][0]:
                     best[year] = (level, [entry["path"]])
                 elif level == best[year][0] >= 4:
@@ -231,7 +231,7 @@ def parse() -> None:
                 year=pl.lit(year),
                 chamber="chamber",
                 day=pl.lit(date(year, 11, 2 + (-date(year, 11, 1).weekday()) % 7)),
-                special=office.str.contains("special|unexpired"),
+                special=office.str.contains("special|unexpired") | district.str.to_lowercase().str.contains("unexpired"),
                 state=pl.lit(state),
                 district=pl.when(pl.col("chamber") == "house").then(
                     pl.coalesce(district.str.extract(r"(\d+)"), office.str.extract(r"(\d+)")).cast(
@@ -249,7 +249,7 @@ def parse() -> None:
                 .str.replace_all(r"[^a-z]", "")
                 .replace_strict(fips.get(state, {}), default=None),
                 county="county",
-                candidate=pl.col("candidate").fill_null("").str.to_uppercase().str.strip_chars(),
+                candidate=pl.col("candidate").fill_null("").str.to_uppercase().str.strip_chars().replace({"TRENT LOFT": "TRENT LOTT"}),
                 votes=pl.col("votes").str.replace_all(r"[,\s]", "").cast(pl.Float64, strict=False).cast(pl.Int64),
             )
         )
