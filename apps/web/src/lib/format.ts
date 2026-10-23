@@ -74,3 +74,12 @@ export function credit(photo: {
         license: photo.license,
       });
 }
+
+export function definite(label: string, isStart = false) {
+  return !/^the /iu.test(label) &&
+    /\b(?:Party|Front|League|Alliance|Union|Coalition|Movement|Federation|Bloc|Congress|Rally)\b/u.test(
+      label,
+    )
+    ? `${isStart ? "The" : "the"} ${label}`
+    : label;
+}

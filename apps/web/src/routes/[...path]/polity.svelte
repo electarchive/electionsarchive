@@ -366,7 +366,13 @@
     {:else}
       <h2 class="text-[0.8125rem] font-bold">
         {m.polity_map_title({
-          race: loaded?.contest.name ?? headline?.name ?? "",
+          race:
+            loaded == null
+              ? (headline?.name ?? "")
+              : /\b\d{4}\b/u.test(loaded.contest.name) ||
+                  loaded.contest.election.date == null
+                ? loaded.contest.name
+                : `${loaded.contest.election.date.slice(0, 4)} ${loaded.contest.name}`,
           noun: drawn.noun,
         })}
       </h2>

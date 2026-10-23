@@ -4181,6 +4181,36 @@ export const contests = {
         input.group,
       );
     }),
+  adjacent: os
+    .meta(
+      openapi({
+        method: "GET",
+        path: "/contests/{id}/adjacent",
+        summary:
+          "List which of the given places border a place, with boundaries as of the contest's date",
+      }),
+    )
+    .input(
+      v.object({
+        id: v.pipe(v.string(), v.uuid()),
+        k: v.number(),
+        ks: v.array(v.number()),
+      }),
+    )
+    .output(v.array(v.number()))
+    .handler(async ({ input }) => {
+      const found = await db.execute<{ k: number }>(sql`
+        select distinct a.k
+        from contest c
+        join election e on e.id = c.election_id
+        join area o on o.k = ${input.k}
+        join area_geometry og on og.area_id = o.id and og.valid @> e.date_from
+        join area a on a.k = any(${sql.param(input.ks)}::int[]) and a.k <> o.k
+        join area_geometry g on g.area_id = a.id and g.valid @> e.date_from
+        where c.id = ${input.id}::uuid and st_dwithin(g.geom, og.geom, 0.002)
+      `);
+      return found.rows.map((row) => row.k);
+    }),
   boundaries: os
     .meta(
       openapi({
@@ -9156,7 +9186,7 @@ export const polities = {
           : await db.execute<{ id: string }>(sql`
             select c.id
             from election e
-            join contest c on c.election_id = e.id and c.allocation_parent_id is null and c.party_scope_id is null
+            join contest c on c.election_id = e.id and (c.allocation_parent_id is null or c.kind = 'elector_slate') and c.party_scope_id is null
             join polity_territory pt on pt.polity_id = e.polity_id and pt.valid @> e.date_from
             join area a on a.id = pt.area_id
             cross join lateral (
@@ -9168,7 +9198,7 @@ export const polities = {
             ) v
             where e.polity_id = ${input.id}::uuid and e.status = 'held' and e.date_from = ${newest}::date
               and (c.district_area_id is null or c.district_area_id = pt.area_id)
-            order by c.kind = 'ballot_question', c.term is not distinct from 'remainder', v.total desc nulls last
+            order by c.kind <> 'elector_slate', c.kind = 'ballot_question', c.term is not distinct from 'remainder', v.total desc nulls last
             limit 1
           `);
       const polity = found.rows[0];

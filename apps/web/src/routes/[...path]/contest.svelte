@@ -7,7 +7,14 @@
   import Term from "#lib/components/term.svelte";
   import { Combobox } from "#lib/components/ui/combobox/index.js";
   import * as Tooltip from "#lib/components/ui/tooltip/index.js";
-  import { count, date, percent, points, precision } from "#lib/format.js";
+  import {
+    count,
+    date,
+    definite,
+    percent,
+    points,
+    precision,
+  } from "#lib/format.js";
   import { MEASURES, OUTCOMES } from "#lib/outcomes.js";
   import { m } from "#lib/paraglide/messages.js";
   import { getLocale } from "#lib/paraglide/runtime.js";
@@ -191,24 +198,6 @@
   let focus = $state<number | null>(null);
 
   const here = $derived(page.url.pathname.slice(1));
-  const around = $derived.by(() => {
-    const siblings = contest.scope.trail.at(-1)?.siblings;
-    if (siblings == null) {
-      return null;
-    }
-    return async () => {
-      const found = await orpc.contests.places.call({
-        id: siblings.contest,
-        unit: siblings.unit ?? undefined,
-        by: siblings.level,
-      });
-      return (found?.rows ?? []).flatMap((row) =>
-        row.path == null
-          ? []
-          : [{ k: row.k, name: row.name, path: row.path, isAdjacent: false }],
-      );
-    };
-  });
   const upward = $derived.by(() => {
     const parent = contest.scope.trail.at(-2);
     return parent?.path == null
@@ -302,6 +291,33 @@
             ),
           ],
         };
+  });
+  const around = $derived.by(() => {
+    const siblings = contest.scope.trail.at(-1)?.siblings;
+    if (siblings == null) {
+      return null;
+    }
+    return async () => {
+      const found = await orpc.contests.places.call({
+        id: siblings.contest,
+        unit: siblings.unit ?? undefined,
+        by: siblings.level,
+      });
+      const rows = (found?.rows ?? []).flatMap((row) =>
+        row.path == null ? [] : [{ k: row.k, name: row.name, path: row.path }],
+      );
+      const own = drawn?.own?.k;
+      const adjacent = new Set(
+        own == null || rows.length === 0
+          ? []
+          : await orpc.contests.adjacent.call({
+              id: siblings.contest,
+              k: own,
+              ks: rows.map((row) => row.k),
+            }),
+      );
+      return rows.map((row) => ({ ...row, isAdjacent: adjacent.has(row.k) }));
+    };
   });
   const locating = $derived.by(() => {
     const own = boundaries.find(
@@ -443,8 +459,6 @@
     if (rows.length < 6) {
       return [];
     }
-    const margin = (row: (typeof rows)[number]) =>
-      points(row.margin ?? 0).replace("+", "");
     const median =
       rows.toSorted((a, b) => a.valid - b.valid)[Math.floor(rows.length / 2)]
         ?.valid ?? 0;
@@ -463,7 +477,7 @@
         rows: sizable
           .toSorted((a, b) => (a.margin ?? 0) - (b.margin ?? 0))
           .slice(0, 3),
-        value: margin,
+        value: (row: (typeof rows)[number]) => points(row.margin ?? 0),
       },
       largest,
       ...[0, 1]
@@ -624,19 +638,19 @@
       );
       return second?.votes === elector.votes
         ? m.race_lede_electors_tied({
-            party: elector.label,
-            runner: second.label,
+            party: definite(elector.label, true),
+            runner: definite(second.label),
             seats: count(elector.votes),
             total: count(total),
           })
         : popular?.current == null
           ? m.race_lede_electors_only({
-              party: elector.label,
+              party: definite(elector.label, true),
               seats: count(elector.votes),
               total: count(total),
             })
           : m.race_lede_electors({
-              party: elector.label,
+              party: definite(elector.label, true),
               seats: count(elector.votes),
               total: count(total),
               share: percent(
@@ -682,7 +696,7 @@
         : (contest.kind === "office" || contest.kind === "elector_slate"
             ? m.race_lede_electors
             : m.race_lede_seats)({
-            party: top.names.join("/"),
+            party: definite(top.names.join("/"), true),
             seats: count(top.seats),
             total: count(total),
             share: percent(top.share),
@@ -702,7 +716,7 @@
         : (["won", "elected"].includes(won?.outcome ?? "")
             ? m.race_lede_final
             : m.race_lede_final_led)({
-            party: named(first),
+            party: definite(named(first), true),
             share: percent((first.votes[last] ?? 0) / total),
             margin: count(
               Math.round(
@@ -711,7 +725,7 @@
                   1000,
               ) / 10,
             ),
-            runner: named(second),
+            runner: definite(named(second)),
           });
     }
     const [top, next] = contest.rows
@@ -722,14 +736,14 @@
         ["won", "elected"].includes(top.current.outcome ?? "")
           ? m.race_lede_unopposed
           : m.race_lede_unopposed_led
-      )({ party: named(top) });
+      )({ party: definite(named(top), true) });
     }
     if (top?.current == null || next?.current == null) {
       return null;
     }
     const isWon = ["won", "elected"].includes(top.current.outcome ?? "");
     return (isWon ? m.race_lede_won : m.race_lede_votes)({
-      party: named(top),
+      party: definite(named(top), true),
       share: percent(
         top.current.share,
         precision(top.current.share - next.current.share),

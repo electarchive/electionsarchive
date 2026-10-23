@@ -8,7 +8,7 @@
   } from "@tanstack/svelte-query";
   import { tick, untrack } from "svelte";
   import { MediaQuery } from "svelte/reactivity";
-  import { count, date, percent, points } from "#lib/format.js";
+  import { count, date, definite, percent, points } from "#lib/format.js";
   import { MEASURES } from "#lib/outcomes.js";
   import { m } from "#lib/paraglide/messages.js";
   import { getLocale } from "#lib/paraglide/runtime.js";
@@ -637,13 +637,13 @@
             ? null
             : top[1]?.value === top[0].value
               ? m.race_after_tied({
-                  party: top[0].name,
-                  runner: top[1].name,
+                  party: definite(top[0].name),
+                  runner: definite(top[1].name),
                   seats: count(top[0].value),
                   total: count(whole.total),
                 })
               : m.race_after({
-                  party: top[0].name,
+                  party: definite(top[0].name),
                   seats: count(top[0].value),
                   total: count(whole.total),
                 }),
@@ -816,7 +816,7 @@
               ? null
               : race.kind === "elector_slate" && seated.length > 0
                 ? m.race_lede_electors({
-                    party: named(leader),
+                    party: definite(named(leader), true),
                     seats: count(leader.seats ?? 0),
                     total: count(total),
                     share: percent(leader.share),
@@ -830,7 +830,7 @@
                     })
                   : seated.length > 0 && !race.isOffice && isSplit
                     ? m.race_lede_split({
-                        party: named(leader),
+                        party: definite(named(leader), true),
                         seats: count(isTallied ? wins : (leader.seats ?? 0)),
                         total: count(race.count),
                         noun,
@@ -838,7 +838,7 @@
                       })
                     : seated.length > 0 && race.isTotal && leader.share === 0
                       ? m.race_lede_seats_only({
-                          party: named(leader),
+                          party: definite(named(leader), true),
                           seats: count(leader.seats ?? 0),
                           total: count(
                             race.size != null && race.size <= total + 2
@@ -852,7 +852,7 @@
                             : isRound && race.round === 1
                               ? m.race_lede_seats_first
                               : m.race_lede_seats)({
-                            party: named(leader),
+                            party: definite(named(leader), true),
                             seats: count(leader.seats ?? 0),
                             total: count(
                               race.size != null && race.size <= total + 2
@@ -873,12 +873,12 @@
                                 race.results[0]?.isWon === true
                                 ? m.race_lede_won
                                 : m.race_lede_votes)({
-                                party: named(leader),
+                                party: definite(named(leader), true),
                                 share: percent(leader.share),
                                 margin: points(
                                   leader.share - runner.share,
                                 ).replace(/^\+/u, ""),
-                                runner: named(runner),
+                                runner: definite(named(runner)),
                               }),
         next:
           race.runoff?.runner == null

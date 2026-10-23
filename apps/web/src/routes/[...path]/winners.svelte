@@ -108,7 +108,7 @@
         </p>
       </div>
       <Input
-        class="ms-auto block-8 inline-56 max-sm:inline-full"
+        class="ms-auto block-8 inline-56 max-sm:basis-[calc(100%-3rem)]"
         type="search"
         placeholder={m.places_filter()}
         aria-label={m.places_filter()}
