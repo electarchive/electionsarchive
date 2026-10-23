@@ -14,7 +14,7 @@ from ea.sources.us.ne_primaries import COUNTIES
 from ea.store import DATA, connect
 
 SOURCE = "us.ne_pri_2008"
-VERSION = "1"
+VERSION = "2"
 PARSED = DATA / "parsed" / SOURCE
 BASE = "https://sos.nebraska.gov/sites/default/files/doc/"
 FILES = {
@@ -22,6 +22,7 @@ FILES = {
     date(2010, 5, 11): "elections/2010/Canvas%20PR10%20After%20Recount%20Final.pdf",
 }
 HOUSE_PAGES = (28, 31)
+STATEWIDE_PAGES = (9, 26)
 PUBLISHER = "Nebraska Secretary of State"
 TITLE = "Primary election canvass"
 DISTRICTS = {"One": 1, "Two": 2, "Three": 3}
@@ -120,6 +121,85 @@ def house_2008(pdf: Path) -> dict[tuple, dict[str, dict[str, int]]]:
     return tallies
 
 
+def statewide_2008(pdf: Path) -> tuple[dict[tuple, dict[str, dict[str, int]]], dict[tuple, dict[str, int]]]:
+    tallies: dict[tuple, dict[str, dict[str, int]]] = defaultdict(lambda: defaultdict(lambda: defaultdict(int)))
+    totals: dict[tuple, dict[str, int]] = defaultdict(lambda: defaultdict(int))
+    chamber, party, names = "", "", []
+    for page in range(STATEWIDE_PAGES[0], STATEWIDE_PAGES[1] + 1):
+        html = subprocess.run(
+            ["pdftotext", "-f", str(page), "-l", str(page), "-bbox", str(pdf), "-"], capture_output=True, text=True, check=True
+        ).stdout
+        words = [(float(a), float(b), float(c), float(d), t) for a, b, c, d, t in WORD.findall(html)]
+        words.sort(key=lambda w: (round((w[1] + w[3]) / 2 / 3), w[0]))
+        lines: list[list[tuple[float, float, float, float, str]]] = []
+        for word in words:
+            yc = (word[1] + word[3]) / 2
+            if lines and abs(yc - (lines[-1][0][1] + lines[-1][0][3]) / 2) < 3:
+                lines[-1].append(word)
+            else:
+                lines.append([word])
+        for line in lines:
+            line.sort()
+        split = 300 if any(w[0] >= 300 and (w[4].lower() in NAMES or w[4].lower() in PREFIXES) for w in words) else 10**6
+        heading = next((i for i, line in enumerate(lines) if any(w[4] == "County" and w[0] < split for w in line)), len(lines))
+        top = " ".join(w[4] for line in lines[:heading] for w in line)
+        if "President" in top:
+            chamber = "president"
+        elif "Senate" in top:
+            chamber = "senate"
+        if found := re.search(r"(Republican|Democratic|Nebraska|Green) Party Nomination", top):
+            party = found[1].lower()
+        elif found := re.search(r"Nonpartisan (Republican|Democratic|Nebraska|Green) Voters", top):
+            party = found[1].lower()
+        if heading < len(lines):
+            line = lines[heading]
+            left = [w for w in line if w[0] < split and w[4] != "County"]
+            total = next(entry for entry in lines[heading + 1 :] if any(w[4] == "TOTAL" for w in entry))
+            edges = [w[2] for w in total if w[0] < split and NUMBER.match(w[4])]
+            names = [""] * len(edges)
+            for w in left:
+                column = next(k for k, edge in enumerate(edges) if w[2] <= edge + 3)
+                names[column] = f"{names[column]} {w[4]}".strip()
+            lines[heading] = [w for w in line if w[0] >= split]
+        for line in lines[heading:] if heading < len(lines) else lines:
+            index = 0
+            label, row = None, []
+
+            def close() -> None:
+                if label is None:
+                    return
+                if len(row) != len(names):
+                    print(f"page {page} {label}: {len(row)} numbers for {names}")
+                    return
+                if label == "TOTAL":
+                    for name, n in zip(names, row, strict=True):
+                        totals[(chamber, party)][name] += n
+                else:
+                    for name, n in zip(names, row, strict=True):
+                        tallies[(chamber, party)][name][label] += n
+
+            while index < len(line):
+                text = line[index][4]
+                if NUMBER.match(text):
+                    row.append(number(text))
+                    index += 1
+                    continue
+                matched = None
+                for width in (3, 2, 1):
+                    joined = " ".join(w[4] for w in line[index : index + width]).lower()
+                    if len(line[index : index + width]) == width and (joined in NAMES or joined == "total"):
+                        matched = (joined, width)
+                        break
+                if matched is None:
+                    index += 1
+                    continue
+                close()
+                label, row = ("TOTAL" if matched[0] == "total" else NAMES[matched[0]]), []
+                index += matched[1]
+            close()
+    return tallies, totals
+
+
 def house_2010(pdf: Path) -> dict[tuple, dict[str, dict[str, int]]]:
     tallies: dict[tuple, dict[str, dict[str, int]]] = defaultdict(lambda: defaultdict(lambda: defaultdict(int)))
     lines = subprocess.run(["pdftotext", "-layout", str(pdf), "-"], capture_output=True, text=True, check=True).stdout.splitlines()
@@ -167,6 +247,9 @@ def parse() -> None:
     for day, path in FILES.items():
         pdf = raw.cached(SOURCE, BASE + path).path
         tallies = house_2008(pdf) if day.year == 2008 else house_2010(pdf)
+        if day.year == 2008:
+            for (chamber, party), by_name in statewide_2008(pdf)[0].items():
+                tallies[(chamber, None, party)] = by_name
         for (chamber, district, party), by_name in tallies.items():
             for name, by_county in by_name.items():
                 for county, votes in by_county.items():
@@ -203,7 +286,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Nebraska's 2008 and 2010 House primaries by county",
+            summary="Nebraska's 2008 Senate and presidential primaries by county",
             polity="US-NE",
         )
         source = cs.source(PUBLISHER, TITLE)
@@ -218,5 +301,11 @@ def emit() -> Path:
         )
         for path in FILES.values():
             cs.artifact(raw.cached(SOURCE, BASE + path), source)
-        medsl.attach(cs, conn, pl.read_parquet(PARSED / "counties.parquet"), {"NE": source}, strict=True)
+        medsl.attach(
+            cs,
+            conn,
+            pl.read_parquet(PARSED / "counties.parquet").filter(pl.col("chamber").str.starts_with("house").not_()),
+            {"NE": source},
+            strict=True,
+        )
         return cs.write()
