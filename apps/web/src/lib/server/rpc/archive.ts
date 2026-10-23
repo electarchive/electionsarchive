@@ -10083,10 +10083,25 @@ export const polities = {
             select p.parent_id from polity_parent p join upb on p.polity_id = upb.id
           ),
           place as (
-            select distinct on (t.polity_id) t.polity_id as polity, a.id as area, a.k
-            from polity_territory t join area a on a.id = t.area_id
-            where t.polity_id in (${input.a}::uuid, ${input.b}::uuid)
-            order by t.polity_id, upper(t.valid) desc nulls first
+            select o.polity, a.id as area, a.k, null::date as since,
+              case when r.id is not null then coalesce(r.date, '-infinity') end as until
+            from (
+              select distinct on (t.polity_id) t.polity_id as polity, t.area_id
+              from polity_territory t
+              where t.polity_id in (${input.a}::uuid, ${input.b}::uuid)
+              order by t.polity_id, upper(t.valid) desc nulls first
+            ) o
+            join area a on a.id = o.area_id
+            left join polity_relation r on r.from_polity_id = o.polity and r.kind = 'consolidated_with'
+            union all
+            select r.from_polity_id, a.id, a.k, coalesce(r.date, '-infinity'), null
+            from polity_relation r
+            cross join lateral (
+              select t.area_id from polity_territory t where t.polity_id = r.to_polity_id
+              order by upper(t.valid) desc nulls first limit 1
+            ) t
+            join area a on a.id = t.area_id
+            where r.kind = 'consolidated_with' and r.from_polity_id in (${input.a}::uuid, ${input.b}::uuid)
           ),
           ups(polity, area, depth) as (
             select polity, area, 0 from place
@@ -10113,12 +10128,15 @@ export const polities = {
           cand as materialized (
             select t.root, pl.polity, rs.k as set_k, pl.k as area_k
             from tree t
-            cross join lateral (select c.district_area_id from contest c where c.id = t.id offset 0) c
+            cross join lateral (
+              select c.district_area_id, e.date_from as day from contest c join election e on e.id = c.election_id
+              where c.id = t.id offset 0
+            ) c
             cross join lateral (
               select rs.k from result_set rs where rs.contest_id = t.id and rs.status = 'active' offset 0
             ) rs
-            join place pl on c.district_area_id is null
-              or c.district_area_id in (select u.area from ups u where u.polity = pl.polity)
+            join place pl on (pl.since is null or c.day >= pl.since) and (pl.until is null or c.day < pl.until)
+              and (c.district_area_id is null or c.district_area_id in (select u.area from ups u where u.polity = pl.polity))
           ),
           hits as (
             select cand.root from cand
@@ -10136,8 +10154,10 @@ export const polities = {
                 else concat_ws(':', coalesce(c.office_id, c.body_id), c.kind, c.round_number) end as series,
               coalesce(c.office_id, c.body_id) as owner, c.kind = 'ballot_question' as "isQuestion",
               e.date_from::text as date, ${CYCLE} as year, coalesce(own.k, home.k) as own,
-              (select k from place where polity = ${input.a}::uuid) as a,
-              (select k from place where polity = ${input.b}::uuid) as b
+              (select k from place where polity = ${input.a}::uuid
+                and (since is null or e.date_from >= since) and (until is null or e.date_from < until)) as a,
+              (select k from place where polity = ${input.b}::uuid
+                and (since is null or e.date_from >= since) and (until is null or e.date_from < until)) as b
             from hits h
             cross join lateral (select * from contest x where x.id = h.root offset 0) c
             join election e on e.id = c.election_id
@@ -10174,15 +10194,30 @@ export const polities = {
             select p.parent_id from polity_parent p join upb on p.polity_id = upb.id
           ),
           place as (
-            select distinct on (t.polity_id) t.polity_id as polity, a.id as area, a.k
-            from polity_territory t join area a on a.id = t.area_id
-            where t.polity_id in (${input.a}::uuid, ${input.b}::uuid)
-            order by t.polity_id, upper(t.valid) desc nulls first
+            select o.polity, a.id as area, a.k, null::date as since,
+              case when r.id is not null then coalesce(r.date, '-infinity') end as until
+            from (
+              select distinct on (t.polity_id) t.polity_id as polity, t.area_id
+              from polity_territory t
+              where t.polity_id in (${input.a}::uuid, ${input.b}::uuid)
+              order by t.polity_id, upper(t.valid) desc nulls first
+            ) o
+            join area a on a.id = o.area_id
+            left join polity_relation r on r.from_polity_id = o.polity and r.kind = 'consolidated_with'
+            union all
+            select r.from_polity_id, a.id, a.k, coalesce(r.date, '-infinity'), null
+            from polity_relation r
+            cross join lateral (
+              select t.area_id from polity_territory t where t.polity_id = r.to_polity_id
+              order by upper(t.valid) desc nulls first limit 1
+            ) t
+            join area a on a.id = t.area_id
+            where r.kind = 'consolidated_with' and r.from_polity_id in (${input.a}::uuid, ${input.b}::uuid)
           ),
           inside as (
-            select polity, area, k from place
+            select polity, area, k, since, until from place
             union
-            select pl.polity, ap.area_id, pl.k from place pl join area_parent ap on ap.parent_id = pl.area
+            select pl.polity, ap.area_id, pl.k, pl.since, pl.until from place pl join area_parent ap on ap.parent_id = pl.area
           ),
           picked as (
             select pl.polity, c.id, e.id as election, c.term, e.date_from, 'governor' as series, o.id as owner,
@@ -10194,6 +10229,7 @@ export const polities = {
             left join area own on own.id = c.district_area_id
             where c.allocation_parent_id is null and c.party_scope_id is null and c.round_number = 1
               and e.status = 'held' and e.kind = 'general' and e.date_from is not null
+              and (pl.since is null or e.date_from >= pl.since) and (pl.until is null or e.date_from < pl.until)
             union all
             select i.polity, c.id, e.id, c.term, e.date_from, c.body_id::text, c.body_id, own.k, i.k, ${CYCLE}
             from inside i
@@ -10204,6 +10240,7 @@ export const polities = {
             join area own on own.id = c.district_area_id
             where c.allocation_parent_id is null and c.party_scope_id is null and c.round_number = 1
               and c.kind = 'body_seats' and e.status = 'held' and e.kind = 'general' and e.date_from is not null
+              and (i.since is null or e.date_from >= i.since) and (i.until is null or e.date_from < i.until)
           ),
           kept as (
             select * from picked p
