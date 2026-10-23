@@ -8384,7 +8384,11 @@ export const elections = {
               name: v.string(),
               seats: v.number(),
               parties: v.array(
-                v.object({ party: v.nullable(v.string()), seats: v.number() }),
+                v.object({
+                  party: v.nullable(v.string()),
+                  isIndependent: v.boolean(),
+                  seats: v.number(),
+                }),
               ),
             }),
           ),
@@ -8409,6 +8413,7 @@ export const elections = {
         region: string;
         scheme: string;
         party: string | null;
+        isCandidate: boolean;
         seats: number;
       }>(sql`
         with recursive tree(id) as (
@@ -8440,12 +8445,12 @@ export const elections = {
           where not exists (select from contest k where k.allocation_parent_id = g.id)
         ),
         winners as materialized (
-          select l.id as leaf, l.root, o.id, o.party_id, o.alliance_id, max(coalesce(x.seats, 1))::int as seats
+          select l.id as leaf, l.root, o.id, o.party_id, o.alliance_id, o.kind = 'candidate' as candidate, max(coalesce(x.seats, 1))::int as seats
           from leaves l
           join result_set rs on rs.contest_id = l.id and rs.is_default
           join outcome x on x.result_set_id = rs.id and x.candidacy_id is null and x.kind in ('elected', 'won')
           join contest_option o on o.id = x.option_id
-          group by l.id, l.root, o.id, o.party_id, o.alliance_id
+          group by l.id, l.root, o.id, o.party_id, o.alliance_id, o.kind
         ),
         leads as (
           select distinct on (ch.parent_option_id) ch.parent_option_id as parent, ch.party_id
@@ -8475,7 +8480,8 @@ export const elections = {
             and (z.valid @> r.day or z.valid_from between r.day and r.day + 150)
             order by z.valid_from desc nulls last limit 1) as size,
           w.leaf, up.area as region, a.scheme_code as scheme,
-          coalesce(bm.into_id, br.parent_party_id, pm.into_id, w.party_id, ld.party_id, w.alliance_id) as party, w.seats
+          coalesce(bm.into_id, br.parent_party_id, pm.into_id, w.party_id, ld.party_id, w.alliance_id) as party,
+          w.candidate as "isCandidate", w.seats
         from winners w
         join roots r on r.id = w.root
         join up on up.leaf = w.leaf
@@ -8601,14 +8607,21 @@ export const elections = {
           regions: Map.groupBy(chamber.rows, (row) => row.region)
             .entries()
             .map(([region, rows]) => {
-              const tally = Map.groupBy(rows, (row) => row.party ?? "")
+              const tally = Map.groupBy(
+                rows,
+                (row) => row.party ?? (row.isCandidate ? "independent" : ""),
+              )
                 .entries()
                 .map(([party, group]) => {
                   let won = 0;
                   for (const row of group) {
                     won += row.seats;
                   }
-                  return { party: party === "" ? null : party, seats: won };
+                  return {
+                    party: group[0]?.party ?? null,
+                    isIndependent: party === "independent",
+                    seats: won,
+                  };
                 })
                 .toArray()
                 .toSorted((a, b) => b.seats - a.seats);

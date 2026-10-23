@@ -23,26 +23,32 @@
       const info = new Map(chamber.parties.map((party) => [party.id, party]));
       const totals = Map.groupBy(
         chamber.regions.flatMap((region) => region.parties),
-        (entry) => entry.party,
+        (entry) => entry.party ?? (entry.isIndependent ? "independent" : ""),
       )
         .entries()
-        .map(([party, entries]) => {
+        .map(([key, entries]) => {
           let seats = 0;
           for (const entry of entries) {
             seats += entry.seats;
           }
-          return { party, seats };
+          return {
+            key,
+            party: entries[0]?.party ?? null,
+            isIndependent: key === "independent",
+            seats,
+          };
         })
         .toArray()
         .toSorted((a, b) => b.seats - a.seats);
       const shown = totals.slice(0, totals.length > 9 ? 8 : 9);
       const columns = shown
         .map((entry) => ({
-          key: entry.party ?? "",
-          party: entry.party,
+          key: entry.key,
           label:
             entry.party == null
-              ? m.record_none()
+              ? entry.isIndependent
+                ? m.seats_independents()
+                : m.record_none()
               : (info.get(entry.party)?.short ??
                 info.get(entry.party)?.label ??
                 ""),
@@ -61,8 +67,7 @@
       const bySeats = columns
         .map((column, index) => ({
           index,
-          seats:
-            totals.find((entry) => entry.party === column.party)?.seats ?? 0,
+          seats: totals.find((entry) => entry.key === column.key)?.seats ?? 0,
         }))
         .toSorted((a, b) => b.seats - a.seats || a.index - b.index);
       const slots = bySeats.map((entry, index) =>
@@ -77,8 +82,11 @@
       const rows = chamber.regions.map((region) => {
         const cells = columns.map(
           (column) =>
-            region.parties.find((entry) => entry.party === column.party)
-              ?.seats ?? 0,
+            region.parties.find(
+              (entry) =>
+                (entry.party ?? (entry.isIndependent ? "independent" : "")) ===
+                column.key,
+            )?.seats ?? 0,
         );
         let listed = 0;
         for (const cell of cells) {
@@ -93,7 +101,7 @@
       });
       const total = columns.map(
         (column) =>
-          totals.find((entry) => entry.party === column.party)?.seats ?? 0,
+          totals.find((entry) => entry.key === column.key)?.seats ?? 0,
       );
       let all = 0;
       for (const entry of totals) {
@@ -142,17 +150,23 @@
     {#if raw != null}
       {const parties = $derived(
         [
-          ...new Set(
+          ...new Map(
             raw.regions.flatMap((region) =>
-              region.parties.map((entry) => entry.party),
+              region.parties.map((entry) => [
+                entry.party ?? (entry.isIndependent ? "independent" : ""),
+                entry,
+              ]),
             ),
-          ),
-        ].map((party) => ({
-          party,
+          ).entries(),
+        ].map(([key, entry]) => ({
+          key,
           label:
-            party == null
-              ? m.record_none()
-              : (raw.parties.find((entry) => entry.id === party)?.label ?? ""),
+            entry.party == null
+              ? entry.isIndependent
+                ? m.seats_independents()
+                : m.record_none()
+              : (raw.parties.find((party) => party.id === entry.party)?.label ??
+                ""),
         })),
       )}
       <Download
@@ -169,8 +183,11 @@
             region.seats,
             ...parties.map(
               (party) =>
-                region.parties.find((entry) => entry.party === party.party)
-                  ?.seats ?? 0,
+                region.parties.find(
+                  (entry) =>
+                    (entry.party ??
+                      (entry.isIndependent ? "independent" : "")) === party.key,
+                )?.seats ?? 0,
             ),
           ])}
       />
