@@ -155,7 +155,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="New Jersey's 2000–2008 and 2020–2022 House, Senate, and presidential primaries by county",
+            summary="New Jersey's 2000–2008 House, Senate, and presidential primaries by county",
             polity="US-NJ",
         )
         source = cs.source(PUBLISHER, TITLE)
@@ -170,5 +170,12 @@ def emit() -> Path:
         )
         for path in FILES.values():
             cs.artifact(raw.cached(SOURCE, BASE + path), source)
-        medsl.attach(cs, conn, pl.read_parquet(PARSED / "counties.parquet"), {"NJ": source}, strict=True)
+        medsl.attach(
+            cs,
+            conn,
+            pl.read_parquet(PARSED / "counties.parquet").filter(pl.col("year") < 2020),
+            {"NJ": source},
+            strict=True,
+            partial="the Division of Elections posted these county tallies before certification, and the certified totals are higher",
+        )
         return cs.write()
