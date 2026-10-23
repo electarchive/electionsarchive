@@ -6163,6 +6163,7 @@ async function races(
       series: string;
       owner: string | null;
       office: string | null;
+      elects: string | null;
       body: string | null;
       election: string;
       day: string | null;
@@ -6222,6 +6223,7 @@ async function races(
         case when c.kind = 'ballot_question' then c.id::text
           else concat_ws(':', c.office_id, c.body_id, c.kind, case when e.kind <> 'general' then e.date_from end, c.party_scope_id, k.stage) end as series,
         coalesce(c.body_id, c.office_id) as owner, c.office_id as office, c.election_id as election,
+        (select p.office_id from contest p where p.id = c.allocation_parent_id and c.kind = 'elector_slate') as elects,
         case when c.kind = 'office' then null else c.body_id end as body,
         e.date_from::text as day, c.round_number as round,
         c.kind = 'office' as "isOffice", k.stage as "isStage", z.seats as size,
@@ -6280,7 +6282,7 @@ async function races(
     names(
       owned.flatMap((row) => [
         row.id,
-        ...[row.owner, row.office, row.area, row.party].filter(
+        ...[row.owner, row.office, row.elects, row.area, row.party].filter(
           (id) => id != null,
         ),
       ]),
@@ -6643,6 +6645,8 @@ async function races(
                 return { key, seats };
               })
               .toArray();
+      const titled =
+        head?.isOffice === true ? head.office : (head?.elects ?? head?.owner);
       const named =
         (single == null ||
         (head?.isOffice === true &&
@@ -6657,7 +6661,7 @@ async function races(
             (other) =>
               other[0]?.owner === head.owner && other[0]?.party === head.party,
           ).length === 1)
-          ? head?.owner
+          ? titled
           : single.id) ??
         head?.id ??
         "";
@@ -6683,12 +6687,8 @@ async function races(
         election: head?.election ?? "",
         day: head?.day ?? null,
         chamber:
-          labels.short.get(
-            (head?.isOffice === true ? head.office : head?.owner) ?? "",
-          ) ??
-          labels.full.get(
-            (head?.isOffice === true ? head.office : head?.owner) ?? "",
-          ) ??
+          labels.short.get(titled ?? "") ??
+          labels.full.get(titled ?? "") ??
           null,
         isNational: head?.area == null || head.area === nation.id,
         rank:
