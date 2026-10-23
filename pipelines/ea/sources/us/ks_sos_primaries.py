@@ -17,6 +17,10 @@ PARSED = DATA / "parsed" / SOURCE
 BASE = "https://web.archive.org/web/{stamp}id_/http://www.kssos.org/elections/"
 LIVE = "https://sos.ks.gov/elections/"
 WYANDOTTE = {date(2018, 8, 7): "https://wycovoteskck.gov/2018-primary-election-results"}
+PAGES_2016 = {
+    "Sedgwick": "https://web.archive.org/web/20190824170813id_/https://www.sedgwickcounty.org/elections/election-results/2016-primary/",
+    "Wyandotte": "https://web.archive.org/web/20260305234012id_/https://wycovoteskck.gov/august-2-2016-statewide-primary-election",
+}
 FILES = {
     (date(2000, 8, 1), "house"): ("20140113113855", "00elec/2000_primary_uscongress_official_results.xls"),
     (date(2002, 8, 6), "house"): ("20041011130211", "02elec/ELUSHSE02P.xls"),
@@ -29,7 +33,15 @@ FILES = {
     (date(2010, 8, 3), "house"): ("20101202033458", "10elec/2010_primary_us_house_official_results.xls"),
     (date(2010, 8, 3), "senate"): ("20101011005454", "10elec/2010_primary_us_senate_official_results.xls"),
     (date(2014, 8, 5), "senate"): ("20141014113038", "14elec/2014_primary_us_senate_official_results.xls"),
-    (date(2018, 8, 7), "house"): (None, "18elec/2018_Primary_Election_US_House_of_Representatives_Precinct_Level_Results.xlsx"),
+    (date(2016, 8, 2), "house"): (
+        None,
+        "16elec/2016_Primary_Election_US_House_of_Representatives_Precinct_Level_Results.xlsx",
+    ),
+    (date(2016, 8, 2), "senate"): (None, "16elec/2016_Primary_Election_US_Senate_Precinct_Level_Results.xlsx"),
+    (date(2018, 8, 7), "house"): (
+        None,
+        "18elec/2018_Primary_Election_US_House_of_Representatives_Precinct_Level_Results.xlsx",
+    ),
 }
 PUBLISHER = "Kansas Secretary of State"
 TITLE = "Primary election official results by precinct"
@@ -44,7 +56,7 @@ def url(key: tuple[date, str]) -> str:
 def fetch() -> None:
     for key in FILES:
         raw.fetch(SOURCE, url(key), suffix=".xlsx" if url(key).endswith("x") else ".xls")
-    for page in WYANDOTTE.values():
+    for page in (*WYANDOTTE.values(), *PAGES_2016.values()):
         raw.fetch(SOURCE, page, suffix=".html")
 
 
@@ -76,7 +88,7 @@ def rows_2018(path: Path, day: date) -> pl.DataFrame:
             "County", "District", "Candidate", "Party", "Votes"
         ).rows()
     ]
-    cell = lambda text: (text or "").replace(" ", "").replace(",", "")  # noqa: E731
+    cell = lambda text: (text or "").replace(" ", "").replace(",", "")
     grid = pl.read_excel(path, sheet_name="JOHNSON", has_header=False, infer_schema_length=0).rows()
     total = next(row for row in grid if row[2] == "COUNTY TOTALS")
     for i in range(3, len(total)):
@@ -101,10 +113,47 @@ def rows_2018(path: Path, day: date) -> pl.DataFrame:
     page = raw.cached(SOURCE, WYANDOTTE[day]).path.read_text()
     text = html.unescape(re.sub(r"<[^>]+>", "\n", page))
     for party, block in re.findall(
-        r"\((Democratic|Republican) Party\) \*+\s*United States Representative3rd District\s*\(VOTE FOR\)\s*\d+\s*(.*?)\s*Governor", text, re.S
+        r"\((Democratic|Republican) Party\) \*+\s*United States Representative3rd District\s*\(VOTE FOR\)\s*\d+\s*(.*?)\s*Governor",
+        text,
+        re.DOTALL,
     ):
-        for name, votes in re.findall(r"^(.*?)\s*(?:\.\s*)+\s*([\d,]+)\s+[\d.]+\s*$", block, re.M):
+        for name, votes in re.findall(r"^(.*?)\s*(?:\.\s*)+\s*([\d,]+)\s+[\d.]+\s*$", block, re.MULTILINE):
             out.append(("Wyandotte", party, "3", name.strip(), cell(votes)))
+    return pl.DataFrame(out, schema=["county", "party", "district", "candidate", "votes"], orient="row")
+
+
+def rows_2016(path: Path, chamber: str) -> pl.DataFrame:
+    frame = pl.read_excel(path, infer_schema_length=0)
+    out = [
+        (county, party, re.search(r"\d+$", race)[0] if chamber == "house" else None, swapped(candidate), votes)
+        for county, race, candidate, party, votes in frame.select(
+            "County", "Race", "Candidate", "Party", "Votes"
+        ).rows()
+    ]
+    names = {candidate.split()[-1]: candidate for *_, candidate, _ in out}
+    for county, page in PAGES_2016.items():
+        text = re.sub(
+            r"<script.*?</script>|<style.*?</style>", "", raw.cached(SOURCE, page).path.read_text(), flags=re.DOTALL
+        )
+        lines = [line.strip() for line in html.unescape(re.sub(r"<[^>]+>", "\n", text)).splitlines() if line.strip()]
+        for k, line in enumerate(lines):
+            found = re.fullmatch(
+                r"(?:US Senator|U\. S\. Representative (\d)th District) \((Democratic|Republican) Primary\)", line
+            ) or re.fullmatch(r"(DEM|REP) US (?:Senate|Rep (\d)rd Dist)", line)
+            if found is None or (("Senat" in line) != (chamber == "senate")):
+                continue
+            if county == "Sedgwick":
+                district, party = found[1], found[2]
+                at = k + 4
+                stop = next(j for j in range(at, len(lines)) if "precincts reported" in lines[j])
+            else:
+                district, party = found[2], {"DEM": "Democratic", "REP": "Republican"}[found[1]]
+                at = next(j for j in range(k, len(lines)) if lines[j] == "Total Votes") + 2
+                stop = at + 3 * next(n for n in range(len(lines)) if not lines[at + 3 * n + 2].endswith("%"))
+            out.extend(
+                (county, party, district, names.get(lines[j].split()[-1], lines[j]), lines[j + 1].replace(",", ""))
+                for j in range(at, stop, 3)
+            )
     return pl.DataFrame(out, schema=["county", "party", "district", "candidate", "votes"], orient="row")
 
 
@@ -137,7 +186,15 @@ def parse() -> None:
     for key in FILES:
         day, chamber = key
         path = raw.cached(SOURCE, url(key)).path
-        rows = wide_rows(path) if day.year == 2000 else rows_2018(path, day) if day.year == 2018 else long_rows(path)
+        rows = (
+            wide_rows(path)
+            if day.year == 2000
+            else rows_2016(path, chamber)
+            if day.year == 2016
+            else rows_2018(path, day)
+            if day.year == 2018
+            else long_rows(path)
+        )
         frames.append(
             rows.select(
                 year=pl.lit(day.year, pl.Int32),
@@ -182,7 +239,8 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Kansas's House and Senate primaries by county, 2000-2014 (Secretary of State)",
+            summary="Kansas's U.S. House and Senate primaries by county, 2000-2018 (Secretary of State; Sedgwick and Wyandotte "
+            "county pages for 2016)",
             polity="US-KS",
         )
         source = cs.source(PUBLISHER, TITLE)
@@ -197,5 +255,7 @@ def emit() -> Path:
         )
         for key in FILES:
             cs.artifact(raw.cached(SOURCE, url(key)), source)
+        for page in PAGES_2016.values():
+            cs.artifact(raw.cached(SOURCE, page), source)
         medsl.attach(cs, conn, frame, {"KS": source}, strict=True)
         return cs.write()
