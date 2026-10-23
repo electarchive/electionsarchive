@@ -497,6 +497,7 @@ SPECIALS: dict[str, tuple[str, str, str | None]] = {
     "2025-01-07:VA:senate:32": ("elstats", VIRGINIA.format(161236), None),
     "2023-01-03:GA:house:7": ("enhanced", GEORGIA.format("2023JanHD7Spec"), "State House Dist 7"),
     "2023-01-31:GA:senate:11": ("enhanced", GEORGIA.format("2023JanSpec"), "State Senate 11 (Special)"),
+    "2023-01-31:GA:house:7:runoff": ("enhanced", GEORGIA.format("2023JanSpec"), "State House Dist 7"),
     "2023-01-31:GA:house:119": ("enhanced", GEORGIA.format("2023JanSpec"), "Representatives - District 119"),
     "2023-02-28:GA:house:119:runoff": ("enhanced", GEORGIA.format("2023FebHD119Run"), "Representatives - District 119"),
     "2023-03-21:GA:house:75": ("enhanced", GEORGIA.format("2023MarHD75Spec"), "State House District 75"),
