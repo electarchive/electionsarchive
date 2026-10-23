@@ -6,6 +6,10 @@ SUFFIXES = {"jr", "sr", "ii", "iii", "iv"}
 TITLES = {"judge", "gen", "col", "capt", "maj", "dr", "rev", "hon", "mr", "mrs", "gov", "senator"}
 
 
+def initials(text: str) -> str:
+    return re.sub(r"(?<![\w.'’-])([A-Z])(?=\s)", r"\1.", text)
+
+
 def tokens(text: str) -> tuple[list[str], frozenset[str]] | None:
     if re.search(r"\d", text):
         return None

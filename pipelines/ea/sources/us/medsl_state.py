@@ -10,6 +10,7 @@ import polars as pl
 
 from ea import raw
 from ea.changeset import Changeset, slug
+from ea.names import initials
 from ea.sources.us import elstats
 from ea.sources.us.ak_dor import CONTESTS as RANKED_ROUNDS
 from ea.sources.us.ak_dor import MEDSL
@@ -766,7 +767,7 @@ def emit() -> Path:
                 root = cs.key("us.option", option_key)
                 labels = rows["party_detailed"].to_list()
                 resolved = [party(state, label) for label in labels]
-                ballot = "Write-ins" if pooled else title(str(candidate))
+                ballot = "Write-ins" if pooled else initials(title(str(candidate)))
                 majors = {id for id, _ in resolved if id in principals}
                 named = [(votes or 0, id) for (id, _), votes in zip(resolved, rows["votes"], strict=True) if id]
                 principal = next(iter(majors)) if len(majors) == 1 else max(named)[1] if named else None
