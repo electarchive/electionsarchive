@@ -622,6 +622,7 @@
   "col_party": "Party",
   "party_record": "Contests",
   "party_record_more": "Showing the latest {shown} of {count}.",
+  "party_record_year_more": "Show all {count}",
   "party_relations": "Lineage and affiliations",
   "party_none": "No contests published for this party yet.",
   "party_won": "{count} won",

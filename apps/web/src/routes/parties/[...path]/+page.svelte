@@ -3,6 +3,7 @@
   import { page } from "$app/state";
   import ArrowLeftRightIcon from "@lucide/svelte/icons/arrow-left-right";
   import ArrowUpRightIcon from "@lucide/svelte/icons/arrow-up-right";
+  import { SvelteSet } from "svelte/reactivity";
   import { count, date } from "#lib/format.js";
   import { m } from "#lib/paraglide/messages.js";
   import { getLocale } from "#lib/paraglide/runtime.js";
@@ -39,8 +40,13 @@
   const years = $derived(
     Map.groupBy(data.record.elections, (election) => election.year)
       .entries()
+      .map(
+        ([year, entries]) =>
+          [year, entries.toSorted((a, b) => b.races - a.races)] as const,
+      )
       .toArray(),
   );
+  const opened = new SvelteSet<number | null>();
 </script>
 
 <svelte:head>
@@ -239,7 +245,7 @@
                 new RegExp(`^(?:\\p{L}+ (?:\\d{1,2}, )?)?${year} `, "u"),
               )}
               <ul class="grid gap-1 text-sm">
-                {#each entries as election, index (index)}
+                {#each opened.has(year) ? entries : entries.slice(0, 5) as election, index (index)}
                   {const name = $derived(election.name.replace(prefix, ""))}
                   {const day = $derived(
                     election.date != null &&
@@ -283,6 +289,18 @@
                     >
                   </li>
                 {/each}
+                {#if entries.length > 5 && !opened.has(year)}
+                  <li>
+                    <button
+                      type="button"
+                      class="text-[0.8125rem] font-semibold underline decoration-border underline-offset-4 hover:decoration-foreground"
+                      onclick={() => opened.add(year)}
+                      >{m.party_record_year_more({
+                        count: count(entries.length),
+                      })}</button
+                    >
+                  </li>
+                {/if}
               </ul>
             </li>
           {/each}
