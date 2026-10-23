@@ -451,5 +451,7 @@ def emit() -> Path:
                     raw.cached(SOURCE, REPOSITORY.format(state=state.lower(), commit=COMMITS[state], path=path)),
                     sources[state],
                 )
-        medsl.attach(cs, conn, counties_frame, sources, strict=True)
+        statewide = pl.col("chamber") != "house"
+        medsl.attach(cs, conn, counties_frame.filter(~statewide), sources, strict=True)
+        medsl.attach(cs, conn, counties_frame.filter(statewide), sources, strict=True, extend=True)
         return cs.write()
