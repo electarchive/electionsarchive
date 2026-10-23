@@ -10573,6 +10573,7 @@ export const bodies = {
             join candidacy cd on cd.option_id = o.id and cd.person_id = t.person_id
             left join contest_option po on po.id = o.parent_option_id
             left join entity_merge pm on pm.entity_id = coalesce(o.party_id, po.party_id)
+            where not exists (select from tenure_affiliation a where a.tenure_id = t.id and a.kind = 'party')
             order by t.id
           )
           select x.start::text as start, coalesce(bm.into_id, br.parent_party_id, x.party) as party,
