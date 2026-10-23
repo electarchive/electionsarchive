@@ -10742,6 +10742,15 @@ export const people = {
             to: v.nullable(v.string()),
           }),
         ),
+        elected: v.array(
+          v.object({
+            id: v.string(),
+            name: v.string(),
+            isBody: v.boolean(),
+            from: v.string(),
+            to: v.nullable(v.string()),
+          }),
+        ),
         record: v.array(
           v.object({
             name: v.string(),
@@ -10933,11 +10942,64 @@ export const people = {
           spells.push({ ...row });
         }
       }
+      const won = new Set(
+        rows.rows
+          .filter((row) => row.outcome === "elected" || row.outcome === "won")
+          .map((row) => row.root),
+      );
+      const seated = new Set(spells.map((spell) => spell.owner));
+      const wins = await db.execute<{
+        owner: string;
+        isBody: boolean;
+        from: string;
+        to: string | null;
+      }>(sql`
+        select coalesce(c.body_id, c.office_id) as owner, c.body_id is not null as "isBody", e.date_from::text as from,
+          coalesce(
+            (select min(e2.date_from) from contest c2 join election e2 on e2.id = c2.election_id
+              where c2.body_id is not distinct from c.body_id and c2.office_id is not distinct from c.office_id
+                and c2.district_area_id = c.district_area_id and c2.party_scope_id is null
+                and e2.kind in ('general', 'local') and e2.date_from > e.date_from + 60),
+            e.date_from + (e.date_from - (
+              select max(e2.date_from) from contest c2 join election e2 on e2.id = c2.election_id
+              where c2.body_id is not distinct from c.body_id and c2.office_id is not distinct from c.office_id
+                and c2.district_area_id = c.district_area_id and c2.party_scope_id is null
+                and e2.kind in ('general', 'local') and e2.date_from < e.date_from - 60
+                and e2.date_from > e.date_from - 3650
+            ))
+          )::text as to
+        from contest c join election e on e.id = c.election_id
+        where c.id = any(${sql.param([...won])}::uuid[]) and c.party_scope_id is null
+          and (c.body_id is not null or c.office_id is not null)
+          and e.kind in ('general', 'by_election', 'special', 'runoff', 'local')
+        order by 1, e.date_from
+      `);
+      const terms: Array<{
+        owner: string;
+        isBody: boolean;
+        from: string;
+        to: string | null;
+      }> = [];
+      for (const row of wins.rows) {
+        if (seated.has(row.owner)) {
+          continue;
+        }
+        const last = terms.at(-1);
+        if (
+          last?.owner === row.owner &&
+          last.to != null &&
+          Date.parse(row.from) - Date.parse(last.to) < 120 * 864e5
+        ) {
+          last.to = row.to;
+        } else {
+          terms.push({ ...row });
+        }
+      }
       const [labels, slugs] = await Promise.all([
         names([
           person.id,
           ...roots,
-          ...new Set(spells.map((spell) => spell.owner)),
+          ...new Set([...spells, ...terms].map((spell) => spell.owner)),
         ]),
         paths(roots),
       ]);
@@ -11051,6 +11113,15 @@ export const people = {
               (b.to ?? "").localeCompare(a.to ?? "") ||
               (b.from ?? "").localeCompare(a.from ?? ""),
           ),
+        elected: terms
+          .map((term) => ({
+            id: term.owner,
+            name: labels.full.get(term.owner) ?? "",
+            isBody: term.isBody,
+            from: term.from,
+            to: term.to,
+          }))
+          .toSorted((a, b) => b.from.localeCompare(a.from)),
         record,
       };
     }),

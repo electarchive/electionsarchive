@@ -63,14 +63,86 @@
       ...person.served.flatMap((spell) =>
         spell.from == null ? [] : [Date.parse(spell.from)],
       ),
+      ...person.elected.map((spell) => Date.parse(spell.from)),
       ...years.map((year) => Date.UTC(year, 0, 1)),
       Date.parse(today),
     ),
   );
+  const high = $derived(
+    Math.max(
+      Date.parse(today),
+      ...person.elected.flatMap((spell) =>
+        spell.to == null ? [] : [Date.parse(spell.to)],
+      ),
+    ),
+  );
   const at = (value: string | null) =>
     ((value == null ? Date.parse(today) : Date.parse(value)) - low) /
-    Math.max(Date.parse(today) - low, 1);
+    Math.max(high - low, 1);
 </script>
+
+{#snippet spells(
+  heading: string,
+  note: string | null,
+  list: Array<{
+    id: string;
+    name: string;
+    isBody: boolean;
+    from: string | null;
+    to: string | null;
+  }>,
+)}
+  <div class="grid gap-1.5">
+    <h2 class="text-[0.8125rem] font-bold">{heading}</h2>
+    {#if note != null}
+      <p class="text-xs text-muted-foreground max-inline-[60ch]">{note}</p>
+    {/if}
+    <ul class="grid text-sm">
+      {#each list as spell, index (index)}
+        {const x0 = $derived(at(spell.from))}
+        {const x1 = $derived(
+          note != null && spell.to == null ? x0 : at(spell.to),
+        )}
+        <li
+          class="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-4 gap-y-1 border-be border-border/60 py-1.5 last:border-be-0 sm:grid-cols-[minmax(0,18rem)_minmax(0,1fr)_auto]"
+        >
+          {#if spell.isBody}
+            <a
+              class="truncate font-semibold hover:highlighter"
+              href={resolve("/id/[id]", { id: spell.id })}>{spell.name}</a
+            >
+          {:else}
+            <span class="truncate font-semibold">{spell.name}</span>
+          {/if}
+          <span
+            class="relative block rounded-full bg-muted block-2 max-sm:col-span-2 max-sm:row-start-2"
+            aria-hidden="true"
+          >
+            <span
+              class={cn("absolute inset-y-0 rounded-full", {
+                "bg-(--party)": note == null,
+                "border border-(--party) bg-(--party)/35": note != null,
+              })}
+              style:inset-inline-start="{x0 * 100}%"
+              style:inline-size="{Math.max(x1 - x0, 0.01) * 100}%"
+            ></span>
+          </span>
+          <span
+            class="font-figures text-[0.8125rem] whitespace-nowrap text-muted-foreground tabular-nums"
+            >{spell.to == null
+              ? note == null
+                ? m.person_served_now({ from: spell.from?.slice(0, 4) ?? "" })
+                : spell.from?.slice(0, 4)
+              : m.person_served_span({
+                  from: spell.from?.slice(0, 4) ?? "",
+                  to: spell.to.slice(0, 4),
+                })}</span
+          >
+        </li>
+      {/each}
+    </ul>
+  </div>
+{/snippet}
 
 <svelte:head>
   <title>{person.name} | {m.wordmark()}</title>
@@ -163,7 +235,7 @@
       {/if}
     </header>
 
-    {#if entries.length > 0 || person.served.length > 0}
+    {#if entries.length > 0 || person.served.length > 0 || person.elected.length > 0}
       <section class="col-span-12 grid gap-3 bg-card px-3.5 pbs-3 pbe-3.5">
         {#if entries.length > 0}
           <p
@@ -192,49 +264,14 @@
           </p>
         {/if}
         {#if person.served.length > 0}
-          <div class="grid gap-1.5">
-            <h2 class="text-[0.8125rem] font-bold">{m.person_served()}</h2>
-            <ul class="grid text-sm">
-              {#each person.served as spell, index (index)}
-                {const x0 = $derived(at(spell.from))}
-                {const x1 = $derived(at(spell.to))}
-                <li
-                  class="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-4 gap-y-1 border-be border-border/60 py-1.5 last:border-be-0 sm:grid-cols-[minmax(0,18rem)_minmax(0,1fr)_auto]"
-                >
-                  {#if spell.isBody}
-                    <a
-                      class="truncate font-semibold hover:highlighter"
-                      href={resolve("/id/[id]", { id: spell.id })}
-                      >{spell.name}</a
-                    >
-                  {:else}
-                    <span class="truncate font-semibold">{spell.name}</span>
-                  {/if}
-                  <span
-                    class="relative block rounded-full bg-muted block-2 max-sm:col-span-2 max-sm:row-start-2"
-                    aria-hidden="true"
-                  >
-                    <span
-                      class="absolute inset-y-0 rounded-full bg-(--party)"
-                      style:inset-inline-start="{x0 * 100}%"
-                      style:inline-size="{Math.max(x1 - x0, 0.01) * 100}%"
-                    ></span>
-                  </span>
-                  <span
-                    class="font-figures text-[0.8125rem] whitespace-nowrap text-muted-foreground tabular-nums"
-                    >{spell.to == null
-                      ? m.person_served_now({
-                          from: spell.from?.slice(0, 4) ?? "",
-                        })
-                      : m.person_served_span({
-                          from: spell.from?.slice(0, 4) ?? "",
-                          to: spell.to.slice(0, 4),
-                        })}</span
-                  >
-                </li>
-              {/each}
-            </ul>
-          </div>
+          {@render spells(m.person_served(), null, person.served)}
+        {/if}
+        {#if person.elected.length > 0}
+          {@render spells(
+            m.person_elected(),
+            m.person_elected_note(),
+            person.elected,
+          )}
         {/if}
       </section>
     {/if}

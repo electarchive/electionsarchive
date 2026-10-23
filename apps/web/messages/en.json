@@ -939,6 +939,8 @@
   "person_served": "Served in",
   "person_served_span": "{from}–{to}",
   "person_served_now": "{from}–present",
+  "person_elected": "Elected to",
+  "person_elected_note": "Terms as elected, running to the seat's next scheduled election. The archive has no record of when they took office or left.",
   "person_parties": "Party history",
   "person_parties_lede": "Ran or served under {count} parties between {first} and {last}.",
   "person_parties_office": "Sat for the party",
