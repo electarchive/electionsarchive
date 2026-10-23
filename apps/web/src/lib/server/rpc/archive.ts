@@ -429,14 +429,21 @@ async function paths(ids: Array<string>) {
   return new Map(result.rows.map((row) => [row.entity_id, row.path]));
 }
 
-async function breadcrumbs(polity: string) {
+async function breadcrumbs(polity: string, keep: string | null = null) {
   const result = await db.execute<{ id: string }>(sql`
     with recursive chain(id, depth) as (
       select ${polity}::uuid, 0
       union all
       select p.parent_id, chain.depth + 1 from polity_parent p join chain on p.polity_id = chain.id where chain.depth < 8
     )
-    select id from chain group by id order by max(depth) desc
+    select chain.id from chain join polity y on y.id = chain.id
+    where chain.id = ${polity}::uuid or y.kind <> 'supranational'
+      or ${keep}::text = 'all'
+      or exists (
+        select from election e join election up on up.id = e.parent_id
+        where e.id::text = ${keep}::text and up.polity_id = chain.id
+      )
+    group by chain.id order by max(chain.depth) desc
   `);
   const ids = result.rows.map((row) => row.id);
   const [labels, slugs] = await Promise.all([names(ids), paths(ids)]);
@@ -2985,7 +2992,7 @@ export const contests = {
           contest.date,
         ),
         paths([contest.id, contest.election, ...childIds, ...ancestorIds]),
-        breadcrumbs(contest.polity),
+        breadcrumbs(contest.polity, contest.election),
         db.execute<{ kind: string; body: string }>(sql`
           select kind::text, body_md as body from note
           where entity_id in (
@@ -7154,7 +7161,7 @@ export const elections = {
         db.execute<{ kind: string; body: string }>(sql`
           select kind::text, body_md as body from note where entity_id = ${input.id}::uuid
         `),
-        breadcrumbs(election.polity),
+        breadcrumbs(election.polity, input.id),
         races(input.id, election.polity, election.date),
         db.execute<{
           k: number;
@@ -8977,7 +8984,7 @@ export const polities = {
               and not exists (select from election p where p.id = e.parent_id and p.polity_id = e.polity_id)
             order by e.date_from desc nulls last
           `),
-          breadcrumbs(input.id),
+          breadcrumbs(input.id, "all"),
           db.execute<{
             id: string;
             parent: string | null;
