@@ -18,6 +18,7 @@ PARSED = DATA / "parsed" / SOURCE
 BASE = "https://sos.nebraska.gov/sites/default/files/doc/elections/"
 FILES = {
     date(2016, 5, 10): "2016/Primary16CanvassBook.pdf",
+    date(2018, 5, 15): "2018/2018-canvass-book.pdf",
     date(2020, 5, 12): "2020/2020%20Primary%20Canvass%20Book.pdf",
     date(2022, 5, 10): "2022/2022%20Primary%20Canvass%20Book.pdf",
 }
@@ -233,7 +234,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Nebraska's 2016, 2020, and 2022 federal primaries by county",
+            summary="Nebraska's 2018 federal primaries by county",
             polity="US-NE",
         )
         source = cs.source(PUBLISHER, TITLE)
@@ -248,5 +249,11 @@ def emit() -> Path:
         )
         for path in FILES.values():
             cs.artifact(raw.cached(SOURCE, BASE + path), source)
-        medsl.attach(cs, conn, pl.read_parquet(PARSED / "counties.parquet"), {"NE": source}, strict=True)
+        medsl.attach(
+            cs,
+            conn,
+            pl.read_parquet(PARSED / "counties.parquet").filter(pl.col("day") == date(2018, 5, 15)),
+            {"NE": source},
+            strict=True,
+        )
         return cs.write()
