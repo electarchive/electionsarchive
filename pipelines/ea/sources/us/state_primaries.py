@@ -20,6 +20,7 @@ import polars as pl
 
 from ea import raw
 from ea.changeset import Changeset, slug
+from ea.names import initials
 from ea.sources.us import (
     elstats,
     fl_sos,
@@ -944,9 +945,11 @@ WITHDREW = {
     ),
     "2000-09-05:FL:house:30:rp": (
         {"Peter DiLavore"},
-        "Withdrew before the October 3 second primary, leaving Mike Haridopolos, who led with 47.8 percent, the "
-        "nominee; the Division of Elections' results extract for the October 3, 2000 second primary lists no House "
-        "District 30 race.",
+        (
+            "Withdrew before the October 3 second primary, leaving Mike Haridopolos, who led with 47.8 percent, the "
+            "nominee; the Division of Elections' results extract for the October 3, 2000 second primary lists no House "
+            "District 30 race."
+        ),
     ),
 }
 
@@ -3957,7 +3960,7 @@ def emit() -> Path:
                         person = persons.get(local) or cs.key(f"{SOURCE}.person", local)
                         if person in cs.minted and local not in persons:
                             cs.add("person", id=person)
-                            name(person, text)
+                            name(person, initials(text))
                     persons[local] = person
                     if role == "head":
                         nominated[choice] = len(found) == 1
@@ -3969,7 +3972,7 @@ def emit() -> Path:
                     contest_id=contest,
                     kind="ticket" if ticket else "candidate",
                     party_id=parties.get(preference),
-                    ballot_label=choice,
+                    ballot_label=initials(choice),
                 )
                 for role, text, person in people:
                     cs.add(
@@ -3978,7 +3981,7 @@ def emit() -> Path:
                         person_id=person,
                         option_id=option,
                         role=role,
-                        ballot_name=text,
+                        ballot_name=initials(text),
                         is_independent=False,
                     )
                 options[(state, day, office, code, party, choice)] = option
