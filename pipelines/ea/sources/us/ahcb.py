@@ -225,8 +225,10 @@ def emit() -> Path:
                    from area a join area_code c on c.area_id = a.id
                    join area_geometry g on g.area_id = a.id join changeset s on s.id = g.changeset_id
                    left join area_parent p on p.area_id = a.id and p.valid @> current_date
-                   where a.scheme_code = 'us.county' and s.pipeline = 'us.census'
-                     and lower_inf(g.valid) and upper_inf(g.valid)"""
+                   where a.scheme_code = 'us.county' and g.quality = 'official' and (
+                     s.pipeline = 'us.census' and lower_inf(g.valid) and upper_inf(g.valid)
+                     or s.pipeline = %s and (upper_inf(g.valid) or upper(g.valid) = %s and c.code like '090%%'))""",
+                [SOURCE, CT_REGIONS_FROM],
             ).fetchall()
         }
         census_by_code = {row[0]: area for area, row in census.items()}
