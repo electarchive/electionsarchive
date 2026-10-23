@@ -69,7 +69,10 @@
           ),
         );
         return {
-          name: series.name ?? "",
+          name:
+            series.name ??
+            (series.kind === "shared" ? "" : m.versus_governor()),
+          kind: series.kind,
           first,
           second,
           rows,
@@ -187,6 +190,9 @@
           first: race.first?.label ?? "",
           second: race.second?.label ?? "",
         })}
+        {#if race.kind === "combined"}
+          {m.versus_combined_key()}
+        {/if}
       </p>
     </div>
     <div class="flex flex-wrap gap-x-5 gap-y-1 text-[0.8125rem]">

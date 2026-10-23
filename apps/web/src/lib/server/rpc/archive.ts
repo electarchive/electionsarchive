@@ -26,6 +26,7 @@ const MEASURES = new Map([
   [11, "electoral_votes"],
   [12, "state_delegate_equivalents"],
 ]);
+const KINDS = ["shared", "each", "combined"] as const;
 const COUNTED = sql`${sql.param(MEASURES.keys().toArray())}::int2[]`;
 const FACTS = {
   area: (set: SQL, area: SQL) =>
@@ -9931,6 +9932,7 @@ export const polities = {
           v.object({
             name: v.nullable(v.string()),
             isQuestion: v.boolean(),
+            kind: v.picklist(KINDS),
             points: v.array(
               v.object({
                 name: v.string(),
@@ -9955,126 +9957,244 @@ export const polities = {
       }),
     )
     .handler(async ({ input }) => {
-      const found = await db.execute<{
-        id: string;
-        series: string;
-        owner: string | null;
-        isQuestion: boolean;
-        date: string;
-        year: number;
-        own: number | null;
-        a: number;
-        b: number;
-      }>(sql`
-        with recursive upa(id) as (
-          select ${input.a}::uuid
-          union
-          select p.parent_id from polity_parent p join upa on p.polity_id = upa.id
-        ),
-        upb(id) as (
-          select ${input.b}::uuid
-          union
-          select p.parent_id from polity_parent p join upb on p.polity_id = upb.id
-        ),
-        place as (
-          select distinct on (t.polity_id) t.polity_id as polity, a.id as area, a.k
-          from polity_territory t join area a on a.id = t.area_id
-          where t.polity_id in (${input.a}::uuid, ${input.b}::uuid)
-          order by t.polity_id, upper(t.valid) desc nulls first
-        ),
-        ups(polity, area, depth) as (
-          select polity, area, 0 from place
-          union
-          select ups.polity, ap.parent_id, ups.depth + 1
-          from ups join area_parent ap on ap.area_id = ups.area
-          where ups.depth < 8
-        ),
-        common as (
-          select area from ups group by area having count(distinct polity) = 2
-        ),
-        roots as materialized (
-          select c.id from election e join contest c on c.election_id = e.id
-          where e.polity_id in (select id from upa intersect select id from upb) and e.date_from is not null
-            and e.status = 'held' and e.kind not in ('runoff', 'indirect')
-            and c.allocation_parent_id is null and c.party_scope_id is null
-            and (c.district_area_id is null or c.district_area_id in (select area from common))
-        ),
-        tree(id, root) as (
-          select id, id from roots
-          union all
-          select c.id, tree.root from contest c join tree on c.allocation_parent_id = tree.id
-        ),
-        cand as materialized (
-          select t.root, pl.polity, rs.k as set_k, pl.k as area_k
-          from tree t
-          cross join lateral (select c.district_area_id from contest c where c.id = t.id offset 0) c
-          cross join lateral (
-            select rs.k from result_set rs where rs.contest_id = t.id and rs.status = 'active' offset 0
-          ) rs
-          join place pl on c.district_area_id is null
-            or c.district_area_id in (select u.area from ups u where u.polity = pl.polity)
-        ),
-        hits as (
-          select cand.root from cand
-          cross join lateral (
-            select from result_rollup r
-            where r.result_set_k = cand.set_k and r.area_k = cand.area_k and r.measure = any(${COUNTED})
-            limit 1
-          ) r
-          group by cand.root
-          having count(distinct cand.polity) = 2
-        )
-        select * from (
-          select distinct on (series, e.date_from, case when c.kind = 'ballot_question' then c.id end) c.id,
-            case when c.kind = 'ballot_question' then 'question'
-              else concat_ws(':', coalesce(c.office_id, c.body_id), c.kind, c.round_number) end as series,
-            coalesce(c.office_id, c.body_id) as owner, c.kind = 'ballot_question' as "isQuestion",
-            e.date_from::text as date, ${CYCLE} as year, coalesce(own.k, home.k) as own,
-            (select k from place where polity = ${input.a}::uuid) as a,
-            (select k from place where polity = ${input.b}::uuid) as b
-          from hits h
-          cross join lateral (select * from contest x where x.id = h.root offset 0) c
-          join election e on e.id = c.election_id
-          left join area own on own.id = c.district_area_id
-          left join lateral (
-            select a.k from polity_territory t join area a on a.id = t.area_id
-            where t.polity_id = e.polity_id
-            order by t.valid @> e.date_from desc, upper(t.valid) desc nulls first
-            limit 1
-          ) home on true
-          order by series, e.date_from, case when c.kind = 'ballot_question' then c.id end, c.term = 'remainder', c.id
-        ) s
-        order by date
-      `);
+      const [found, matched] = await Promise.all([
+        db.execute<{
+          id: string;
+          series: string;
+          owner: string | null;
+          isQuestion: boolean;
+          date: string;
+          year: number;
+          own: number | null;
+          a: number;
+          b: number;
+        }>(sql`
+          with recursive upa(id) as (
+            select ${input.a}::uuid
+            union
+            select p.parent_id from polity_parent p join upa on p.polity_id = upa.id
+          ),
+          upb(id) as (
+            select ${input.b}::uuid
+            union
+            select p.parent_id from polity_parent p join upb on p.polity_id = upb.id
+          ),
+          place as (
+            select distinct on (t.polity_id) t.polity_id as polity, a.id as area, a.k
+            from polity_territory t join area a on a.id = t.area_id
+            where t.polity_id in (${input.a}::uuid, ${input.b}::uuid)
+            order by t.polity_id, upper(t.valid) desc nulls first
+          ),
+          ups(polity, area, depth) as (
+            select polity, area, 0 from place
+            union
+            select ups.polity, ap.parent_id, ups.depth + 1
+            from ups join area_parent ap on ap.area_id = ups.area
+            where ups.depth < 8
+          ),
+          common as (
+            select area from ups group by area having count(distinct polity) = 2
+          ),
+          roots as materialized (
+            select c.id from election e join contest c on c.election_id = e.id
+            where e.polity_id in (select id from upa intersect select id from upb) and e.date_from is not null
+              and e.status = 'held' and e.kind not in ('runoff', 'indirect')
+              and c.allocation_parent_id is null and c.party_scope_id is null
+              and (c.district_area_id is null or c.district_area_id in (select area from common))
+          ),
+          tree(id, root) as (
+            select id, id from roots
+            union all
+            select c.id, tree.root from contest c join tree on c.allocation_parent_id = tree.id
+          ),
+          cand as materialized (
+            select t.root, pl.polity, rs.k as set_k, pl.k as area_k
+            from tree t
+            cross join lateral (select c.district_area_id from contest c where c.id = t.id offset 0) c
+            cross join lateral (
+              select rs.k from result_set rs where rs.contest_id = t.id and rs.status = 'active' offset 0
+            ) rs
+            join place pl on c.district_area_id is null
+              or c.district_area_id in (select u.area from ups u where u.polity = pl.polity)
+          ),
+          hits as (
+            select cand.root from cand
+            cross join lateral (
+              select from result_rollup r
+              where r.result_set_k = cand.set_k and r.area_k = cand.area_k and r.measure = any(${COUNTED})
+              limit 1
+            ) r
+            group by cand.root
+            having count(distinct cand.polity) = 2
+          )
+          select * from (
+            select distinct on (series, e.date_from, case when c.kind = 'ballot_question' then c.id end) c.id,
+              case when c.kind = 'ballot_question' then 'question'
+                else concat_ws(':', coalesce(c.office_id, c.body_id), c.kind, c.round_number) end as series,
+              coalesce(c.office_id, c.body_id) as owner, c.kind = 'ballot_question' as "isQuestion",
+              e.date_from::text as date, ${CYCLE} as year, coalesce(own.k, home.k) as own,
+              (select k from place where polity = ${input.a}::uuid) as a,
+              (select k from place where polity = ${input.b}::uuid) as b
+            from hits h
+            cross join lateral (select * from contest x where x.id = h.root offset 0) c
+            join election e on e.id = c.election_id
+            left join area own on own.id = c.district_area_id
+            left join lateral (
+              select a.k from polity_territory t join area a on a.id = t.area_id
+              where t.polity_id = e.polity_id
+              order by t.valid @> e.date_from desc, upper(t.valid) desc nulls first
+              limit 1
+            ) home on true
+            order by series, e.date_from, case when c.kind = 'ballot_question' then c.id end, c.term = 'remainder', c.id
+          ) s
+          order by date
+        `),
+        db.execute<{
+          polity: string;
+          id: string;
+          election: string;
+          series: string;
+          owner: string;
+          date: string;
+          year: number;
+          own: number;
+          side: number;
+        }>(sql`
+          with recursive upa(id) as (
+            select ${input.a}::uuid
+            union
+            select p.parent_id from polity_parent p join upa on p.polity_id = upa.id
+          ),
+          upb(id) as (
+            select ${input.b}::uuid
+            union
+            select p.parent_id from polity_parent p join upb on p.polity_id = upb.id
+          ),
+          place as (
+            select distinct on (t.polity_id) t.polity_id as polity, a.id as area, a.k
+            from polity_territory t join area a on a.id = t.area_id
+            where t.polity_id in (${input.a}::uuid, ${input.b}::uuid)
+            order by t.polity_id, upper(t.valid) desc nulls first
+          ),
+          inside as (
+            select polity, area, k from place
+            union
+            select pl.polity, ap.area_id, pl.k from place pl join area_parent ap on ap.parent_id = pl.area
+          ),
+          picked as (
+            select pl.polity, c.id, e.id as election, c.term, e.date_from, 'governor' as series, o.id as owner,
+              coalesce(own.k, pl.k) as own, pl.k as side, ${CYCLE} as year
+            from place pl
+            join office o on o.polity_id = pl.polity and o.kind = 'governor'
+            join contest c on c.office_id = o.id
+            join election e on e.id = c.election_id
+            left join area own on own.id = c.district_area_id
+            where c.allocation_parent_id is null and c.party_scope_id is null and c.round_number = 1
+              and e.status = 'held' and e.kind = 'general' and e.date_from is not null
+            union all
+            select i.polity, c.id, e.id, c.term, e.date_from, c.body_id::text, c.body_id, own.k, i.k, ${CYCLE}
+            from inside i
+            join contest c on c.district_area_id = i.area
+            join body b on b.id = c.body_id and b.kind in ('upper_house', 'lower_house')
+              and b.polity_id in (select id from upa intersect select id from upb)
+            join election e on e.id = c.election_id
+            join area own on own.id = c.district_area_id
+            where c.allocation_parent_id is null and c.party_scope_id is null and c.round_number = 1
+              and c.kind = 'body_seats' and e.status = 'held' and e.kind = 'general' and e.date_from is not null
+          ),
+          kept as (
+            select * from picked p
+            where p.term is distinct from 'remainder' or not exists (
+              select from picked q where q.polity = p.polity and q.series = p.series and q.date_from = p.date_from
+                and q.term is distinct from 'remainder'
+            )
+          )
+          select polity, id, election, series, owner, date_from::text as date, year, own, side
+          from kept k
+          where exists (
+            select from kept x where x.series = k.series and x.date_from = k.date_from and x.polity <> k.polity
+          )
+          order by date_from, polity = ${input.b}::uuid, own
+        `),
+      ]);
+      const taken = new Set(
+        found.rows.map((row) => `${row.owner ?? ""}:${row.date}`),
+      );
+      const pairs = Map.groupBy(
+        matched.rows.filter((row) => !taken.has(`${row.owner}:${row.date}`)),
+        (row) => `${row.series}:${row.date}`,
+      )
+        .values()
+        .map((rows) => {
+          const [first] = rows;
+          const sides = [input.a, input.b].map((polity) =>
+            rows.filter((row) => row.polity === polity),
+          );
+          const isCombined = sides.some(
+            (side) =>
+              side.length > 1 || side.some((row) => row.own !== row.side),
+          );
+          return {
+            id: isCombined ? (first?.election ?? "") : (first?.id ?? ""),
+            series: `each:${first?.series ?? ""}`,
+            owner: first?.series === "governor" ? null : (first?.owner ?? null),
+            isQuestion: false,
+            kind: isCombined ? ("combined" as const) : ("each" as const),
+            date: first?.date ?? "",
+            year: first?.year ?? 0,
+            ks: [null, ...sides.map((side) => side[0]?.side ?? null)],
+            rows,
+          };
+        })
+        .toArray();
+      const rows = [
+        ...found.rows.map((row) => ({
+          ...row,
+          kind: "shared" as const,
+          ks: [row.own, row.a, row.b],
+          rows: null,
+        })),
+        ...pairs,
+      ].toSorted((first, second) => first.date.localeCompare(second.date));
       const [labels, slugs, loaded] = await Promise.all([
         names(
           [
             input.a,
             input.b,
-            ...found.rows.flatMap((row) =>
+            ...rows.flatMap((row) =>
               row.owner == null ? [row.id] : [row.id, row.owner],
             ),
           ],
           null,
         ),
-        paths([input.a, input.b, ...found.rows.map((row) => row.id)]),
+        paths([input.a, input.b, ...rows.map((row) => row.id)]),
         Promise.all(
-          found.rows.map(async (row) =>
-            Promise.all([
-              load(
-                [row.id],
-                [row.own, row.a, row.b].filter((k) => k != null),
-                row.date,
-                [row.id],
-              ),
+          rows.map(async (row) => {
+            const ks = row.ks.filter((k) => k != null);
+            const ids = row.rows?.map((entry) => entry.id) ?? [];
+            return Promise.all([
+              row.rows == null
+                ? load([row.id], ks, row.date, [row.id])
+                : load(
+                    ids,
+                    row.rows.map((entry) => entry.own),
+                    row.date,
+                    ids,
+                    ids,
+                    null,
+                    "area",
+                    new Map<number, Array<[number, number]>>(
+                      row.rows.map((entry) => [entry.own, [[entry.side, 1]]]),
+                    ),
+                  ),
               branches(row.date),
-            ]),
-          ),
+            ]);
+          }),
         ),
       ]);
-      const points = found.rows.map((row, index) => ({
+      const points = rows.map((row, index) => ({
         ...row,
-        sides: [row.own, row.a, row.b].map((k) => {
+        sides: row.ks.map((k) => {
           const here = k == null ? null : loaded[index]?.[0].get(k);
           return here == null
             ? []
@@ -10119,6 +10239,7 @@ export const polities = {
                   labels.full.get(group[0].owner) ??
                   null),
             isQuestion: group[0]?.isQuestion ?? false,
+            kind: group[0]?.kind ?? "shared",
             points: group.map((point) => ({
               name: labels.full.get(point.id) ?? "",
               path: slugs.get(point.id) ?? null,
@@ -10129,7 +10250,9 @@ export const polities = {
           }))
           .toArray()
           .toSorted(
-            (first, second) => second.points.length - first.points.length,
+            (first, second) =>
+              KINDS.indexOf(first.kind) - KINDS.indexOf(second.kind) ||
+              second.points.length - first.points.length,
           ),
       };
     }),

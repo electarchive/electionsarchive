@@ -1050,7 +1050,8 @@ function comparisonMarkdown(
       ...(data.places.series.length === 0
         ? [m.versus_places_none()]
         : data.places.series.flatMap((series) => [
-            `## ${series.name ?? m.versus_overall()}`,
+            `## ${series.name ?? (series.kind === "shared" ? m.versus_overall() : m.versus_governor())}`,
+            ...(series.kind === "combined" ? [m.versus_combined_key()] : []),
             table(
               [
                 m.col_date(),

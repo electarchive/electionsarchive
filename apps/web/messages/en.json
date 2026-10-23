@@ -898,6 +898,8 @@
   "versus_shares_lede": "Includes every popular vote where either person received votes. Filled marks are wins, hollow marks are losses, and faded marks are primaries. Lines join the first rounds of general elections only.",
   "versus_action": "Compare",
   "versus_even": "Even",
+  "versus_governor": "Governor race",
+  "versus_combined_key": "Each place's figure adds up the votes in all of its districts.",
   "governments_title": "Governments",
   "governments_lede": "The government in office on election day and all governments formed before the next general election.",
   "governments_before": "In office on election day",
