@@ -7753,6 +7753,8 @@ export const elections = {
       v.nullable(
         v.object({
           name: v.string(),
+          question: v.nullable(v.string()),
+          quorum: v.nullable(v.number()),
           contested: v.number(),
           results: v.array(
             v.object({
@@ -7786,6 +7788,16 @@ export const elections = {
       if (race == null) {
         return null;
       }
+      const ruled = await db.execute<{
+        isQuestion: boolean;
+        quorum: number | null;
+      }>(sql`
+        select c.kind = 'ballot_question' as "isQuestion",
+          ((coalesce(es.rules, '{}') || coalesce(c.rules_override, '{}')) ->> 'quorum')::float8 as quorum
+        from contest c left join electoral_system es on es.id = c.electoral_system_id
+        where c.id = ${race.contest}::uuid
+      `);
+      const rules = ruled.rows[0];
       let contested = 0;
       for (const row of race.results) {
         contested += row.seats ?? 0;
@@ -7821,6 +7833,8 @@ export const elections = {
         .toArray();
       return {
         name: race.name,
+        question: rules?.isQuestion === true ? race.name : null,
+        quorum: rules?.quorum ?? null,
         contested,
         results: (contested > 1
           ? joined.toSorted((a, b) => (b.seats ?? 0) - (a.seats ?? 0))

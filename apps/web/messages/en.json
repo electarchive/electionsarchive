@@ -105,6 +105,7 @@
   "outcome_withdrew": "Withdrew",
   "outcome_disqualified": "Disqualified",
   "outcome_lost": "Not passed",
+  "outcome_quorum": "Turnout below quorum",
   "stat_valid": "Valid votes",
   "measure_list_votes": "Party votes",
   "measure_electoral_votes": "Electoral votes",

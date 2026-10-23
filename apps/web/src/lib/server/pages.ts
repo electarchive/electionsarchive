@@ -31,6 +31,7 @@ async function draw() {
         from polity_territory pt join polity y on y.id = pt.polity_id
         join area_geometry ag on ag.area_id = pt.area_id
         where y.kind = 'sovereign_state' and upper_inf(pt.valid)
+          and exists (select from election e where e.polity_id = y.id)
         order by pt.polity_id, upper(ag.valid) desc nulls first, lower(ag.valid) desc nulls last
       ),
       context as (
@@ -111,16 +112,34 @@ export async function home() {
           where e.parent_id is null and e.date_from > current_date
           order by e.date_from limit 4)
         union all
-        (select e.id, e.date_from, e.kind, e.polity_id, 'today'
-          from election e
-          where e.parent_id is null and e.date_from < current_date - 300
-            and abs(extract(doy from e.date_from) - extract(doy from current_date)) <= 3
-          order by (e.kind = 'general') desc, e.date_from desc limit 8)
+        (select t.id, t.date_from, t.kind, t.polity_id, 'today'
+          from (
+            select distinct on (case when y.kind in ('sovereign_state', 'supranational') then e.id else e.polity_id end)
+              e.id, e.date_from, e.kind, e.polity_id,
+              y.kind in ('sovereign_state', 'supranational') as is_national
+            from election e join polity y on y.id = e.polity_id
+            cross join lateral (
+              select abs(extract(doy from e.date_from) - extract(doy from current_date)) as gap
+            ) d
+            where e.parent_id is null and e.date_from < current_date - 300
+              and least(d.gap, 365 - d.gap) <= 3
+            order by case when y.kind in ('sovereign_state', 'supranational') then e.id else e.polity_id end,
+              (e.kind = 'general') desc, e.date_from desc
+          ) t
+          order by t.kind in ('general', 'referendum') desc, t.is_national desc, t.date_from desc limit 8)
       )
       select p.id, p.date_from::text as date, p.kind::text as kind, p.when, s.path,
         (select n.text from name n where n.entity_id = p.id and n.kind in ('official', 'english')
           order by n.is_preferred desc, (n.lang = 'en') desc, (n.kind = 'official') desc limit 1) as name,
-        (select n.text from name n where n.entity_id = p.polity_id and n.kind in ('official', 'english')
+        (select n.text from name n
+          where n.entity_id = coalesce((
+            with recursive up(id) as (
+              select p.polity_id
+              union
+              select pp.parent_id from polity_parent pp join up on pp.polity_id = up.id
+            )
+            select up.id from up join polity q on q.id = up.id where q.kind = 'sovereign_state' limit 1
+          ), p.polity_id) and n.kind in ('official', 'english')
           order by n.is_preferred desc, (n.lang = 'en') desc, (n.kind = 'official') desc limit 1) as polity
       from picked p join slug s on s.entity_id = p.id and s.is_current
     `),
@@ -149,11 +168,20 @@ export async function home() {
     polity: row.polity,
     when: row.when,
   }));
+  const recent = elections.filter((election) => election.when === "recent");
+  const leads = await Promise.all(
+    recent.map(async (election) =>
+      call(router.elections.lead, { id: election.id }),
+    ),
+  );
   return {
     kind: "home" as const,
     polities: covered,
     atlas: shapes,
-    recent: elections.filter((election) => election.when === "recent"),
+    recent: recent.map((election, at) => ({
+      ...election,
+      lead: leads[at] ?? null,
+    })),
     upcoming: elections
       .filter((election) => election.when === "upcoming")
       .toSorted((a, b) => a.date.localeCompare(b.date)),

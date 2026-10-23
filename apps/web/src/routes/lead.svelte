@@ -1,23 +1,22 @@
 <script lang="ts">
-  import { createQuery } from "@tanstack/svelte-query";
   import { count, percent } from "#lib/format.js";
   import { m } from "#lib/paraglide/messages.js";
   import { swatch } from "#lib/party.js";
-  import { orpc } from "#lib/rpc.js";
   import { cn } from "#lib/utils.js";
+  import type { PageData } from "./$types";
 
-  const { id }: { id: string } = $props();
+  const { race }: { race: PageData["recent"][number]["lead"] } = $props();
 
-  const lead = createQuery(() =>
-    orpc.elections.lead.queryOptions({ input: { id } }),
-  );
-
-  const race = $derived(lead.data ?? null);
   const isSeated = $derived(race != null && race.contested > 1);
 </script>
 
-<span class="grid gap-1.5 block-19">
+<span class="grid gap-1.5">
   {#if race != null}
+    {#if race.question != null}
+      <span class="line-clamp-2 text-[0.8125rem] text-muted-foreground"
+        >{race.question}</span
+      >
+    {/if}
     <span class="flex items-end justify-between gap-4">
       {#each race.results.slice(0, 2) as row, at (row.key)}
         <span
@@ -43,7 +42,9 @@
             >
             {#if row.isLost === true}
               <span class="shrink-0 text-xs text-muted-foreground"
-                >{m.outcome_lost()}</span
+                >{race.quorum != null && row.share > 0.5
+                  ? m.outcome_quorum()
+                  : m.outcome_lost()}</span
               >
             {/if}
           </span>
@@ -76,7 +77,5 @@
         })}</span
       >
     {/if}
-  {:else if lead.isPending}
-    <span class="animate-pulse bg-muted block-3"></span>
   {/if}
 </span>

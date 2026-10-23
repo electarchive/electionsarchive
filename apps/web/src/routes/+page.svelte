@@ -232,7 +232,7 @@
           {#each EXAMPLES as example (example)}
             <button
               type="button"
-              class="font-semibold underline decoration-border underline-offset-4 hover:decoration-foreground"
+              class="py-0.5 font-semibold underline decoration-border underline-offset-4 hover:decoration-foreground"
               onclick={() => seek(example)}>{example}</button
             >
           {/each}
@@ -269,7 +269,7 @@
                     datetime={election.date}>{date(election.date)}</time
                   >
                 </span>
-                <Lead id={election.id} />
+                <Lead race={election.lead} />
               </a>
             </li>
           {/each}
@@ -604,7 +604,10 @@
             {const name = $derived(
               election.name
                 .replace(/^\d{4} /, "")
-                .replace(/ \(\p{L}+ \d{1,2}\)$/u, ""),
+                .replace(
+                  /(?:, \p{L}+ \d{1,2}, \d{4}| \(\p{L}+ \d{1,2}\))$/u,
+                  "",
+                ),
             )}
             <li
               class="grid grid-cols-[4rem_minmax(0,1fr)] items-baseline gap-x-3 border-be border-border/60 py-2"
