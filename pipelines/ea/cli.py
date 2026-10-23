@@ -41,7 +41,7 @@ def main() -> None:
     )
     scanning.add_argument(
         "action",
-        choices=("prepare", "run", "status", "emit", "layout", "ledger", "statewide"),
+        choices=("prepare", "run", "status", "emit", "layout", "ledger", "reconcile", "statewide"),
         help="render crops and fill held totals, advance the Message Batches steps once, list manifests, "
         "or emit the tables that passed",
     )
@@ -74,6 +74,8 @@ def main() -> None:
                 if args.action == "status"
                 else scans.reconcile()
                 if args.action == "ledger"
+                else f"{scans.reconcile()}\n{scans.bill()}"
+                if args.action == "reconcile"
                 else layout.step(args.name, args.mode)
                 if args.action == "layout"
                 else statewide.step(args.name, args.mode)

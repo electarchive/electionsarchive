@@ -8,6 +8,7 @@ import os
 import re
 import subprocess
 import tempfile
+import time
 import zipfile
 from collections import Counter
 from concurrent.futures import ThreadPoolExecutor, as_completed
@@ -19,6 +20,7 @@ from typing import Literal, NamedTuple, NotRequired, TypedDict
 from uuid import UUID
 
 import anthropic
+import httpx
 import polars as pl
 from anthropic.types import ImageBlockParam, TextBlockParam
 from anthropic.types.message_create_params import MessageCreateParamsNonStreaming
@@ -151,7 +153,9 @@ DIRECT_FULL = 2.0
 DIRECT_THREADS = 8
 DIRECT_LIMIT = 200
 LEDGER = DATA / "scans-ledger.json"
-BUDGET = 190.0
+BUDGET = 150.0
+COST_REPORT = "https://api.anthropic.com/v1/organizations/cost_report"
+BILLED_FROM = "2026-10-22T00:00:00Z"
 IMAGE_LIMIT = 4_500_000
 BATCH_LIMIT = 200_000_000
 TOTAL = re.compile(r"^(state |grand |county )?totals?\b|^all counties$")
@@ -613,6 +617,16 @@ def ledger() -> dict[str, dict[str, float]]:
     return json.loads(LEDGER.read_text()) if LEDGER.exists() else {"spent": {}, "pending": {}}
 
 
+def committed(books: dict[str, dict[str, float]]) -> float:
+    entries = {**books["spent"], **books["pending"]}
+    billed = books.get("billed")
+    if billed is None:
+        return sum(entries.values())
+    since = billed["at"] - 3600
+    recent = sum(value for key, value in entries.items() if books.get("when", {}).get(key, 0) >= since)
+    return max(sum(entries.values()), billed["usd"] + recent)
+
+
 def submit(reader: str, wanted: dict[str, Read], state: dict[str, dict[str, list[Batch]]]) -> list[str]:
     api = client()
     groups: list[list[Read]] = [[]]
@@ -626,7 +640,7 @@ def submit(reader: str, wanted: dict[str, Read], state: dict[str, dict[str, list
         size += weight
     books = ledger()
     projected = sum(guess(reader, request) for request in wanted.values())
-    total = sum(books["spent"].values()) + sum(books["pending"].values())
+    total = committed(books)
     if total + projected > BUDGET:
         raise SystemExit(
             f"BLOCKED: budget; ${total:.2f} spent or pending plus ${projected:.2f} projected passes ${BUDGET}"
@@ -641,6 +655,7 @@ def submit(reader: str, wanted: dict[str, Read], state: dict[str, dict[str, list
             {"id": created.id, "keys": {request.custom: request.key for request in group}}
         )
         books["pending"][created.id] = sum(guess(reader, request) for request in group)
+        books.setdefault("when", {})[created.id] = time.time()
         ids.append(created.id)
     LEDGER.write_text(json.dumps(books, indent=2))
     return ids
@@ -659,7 +674,13 @@ def keep(key: str, message: anthropic.types.Message) -> None:
 
 def dollars(message: anthropic.types.Message, rate: float) -> float:
     price_in, price_out = PRICES[message.model]
-    return (message.usage.input_tokens * price_in + message.usage.output_tokens * price_out) * rate / 1e6
+    usage = message.usage
+    prompt = (
+        usage.input_tokens
+        + (usage.cache_creation_input_tokens or 0) * 1.25
+        + (usage.cache_read_input_tokens or 0) * 0.1
+    )
+    return (prompt * price_in + usage.output_tokens * price_out) * rate / 1e6
 
 
 def collect(reader: str, state: dict[str, dict[str, list[Batch]]]) -> str:
@@ -691,7 +712,7 @@ def read_direct(reader: str, wanted: dict[str, Read]) -> str:
     api = anthropic.Anthropic(max_retries=6, timeout=1200)
     books = ledger()
     projected = sum(guess(reader, request) for request in wanted.values()) * DIRECT_FULL
-    total = sum(books["spent"].values()) + sum(books["pending"].values())
+    total = committed(books)
     if total + projected > BUDGET:
         raise SystemExit(
             f"BLOCKED: budget; ${total:.2f} spent or pending plus ${projected:.2f} projected passes ${BUDGET}"
@@ -726,7 +747,9 @@ def read_direct(reader: str, wanted: dict[str, Read]) -> str:
                 done += 1
     finally:
         books = ledger()
-        books["spent"][f"direct-{datetime.now(UTC).isoformat(timespec='seconds')}-{reader}"] = spent
+        key = f"direct-{datetime.now(UTC).isoformat(timespec='seconds')}-{reader}"
+        books["spent"][key] = spent
+        books.setdefault("when", {})[key] = time.time()
         LEDGER.write_text(json.dumps(books, indent=2))
     return "; ".join([f"{reader}: read {done} of {len(wanted)} directly for ${spent:.3f}", *notes])
 
@@ -1102,7 +1125,57 @@ def status() -> str:
 
 
 def status_line(books: dict[str, dict[str, float]]) -> str:
-    return f"spent ${sum(books['spent'].values()):.2f}, pending ${sum(books['pending'].values()):.2f}, budget ${BUDGET}"
+    billed = books.get("billed")
+    return (
+        f"estimate ${sum(books['spent'].values()):.2f} spent, ${sum(books['pending'].values()):.2f} pending; "
+        + (
+            f"billed ${billed['usd']:.2f} at {datetime.fromtimestamp(billed['at'], UTC):%Y-%m-%d %H:%M}Z; "
+            if billed
+            else ""
+        )
+        + f"cap check ${committed(books):.2f} of ${BUDGET}"
+    )
+
+
+def bill() -> str:
+    admin = os.environ.get("ANTHROPIC_ADMIN_KEY")
+    if admin is None:
+        raise SystemExit("BLOCKED: ANTHROPIC_ADMIN_KEY is not set (. ~/.bashrc.d/anthropic)")
+    cents: dict[str, float] = {}
+    page: str | None = None
+    while True:
+        params = [("starting_at", BILLED_FROM), ("limit", "31"), ("group_by[]", "description")]
+        if page is not None:
+            params.append(("page", page))
+        response = httpx.get(
+            COST_REPORT,
+            params=params,
+            headers={"x-api-key": admin, "anthropic-version": "2023-06-01"},
+            timeout=60,
+        )
+        response.raise_for_status()
+        body = response.json()
+        for bucket in body["data"]:
+            for result in bucket["results"]:
+                label = result["description"] or "other"
+                cents[label] = cents.get(label, 0.0) + float(result["amount"])
+        if not body["has_more"]:
+            break
+        page = body["next_page"]
+    books = ledger()
+    books["billed"] = {"usd": sum(cents.values()) / 100, "at": time.time()}
+    LEDGER.write_text(json.dumps(books, indent=2))
+    lines = [
+        f"  {description}: ${amount / 100:.4f}"
+        for description, amount in sorted(cents.items(), key=lambda item: -item[1])
+    ]
+    return "\n".join(
+        [
+            f"billed ${books['billed']['usd']:.2f} for the whole organization since {BILLED_FROM[:10]} (daily buckets lag by some hours)",
+            f"estimate ${sum(books['spent'].values()) + sum(books['pending'].values()):.2f} (ledger, every direct and batch read this pipeline made)",
+            *lines,
+        ]
+    )
 
 
 def totals(manifest: Manifest, frame: pl.DataFrame) -> Path:
