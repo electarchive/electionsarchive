@@ -22,6 +22,12 @@ CA_OFFICES = {
 MD_DAY = date(2018, 11, 6)
 RI_PATH = "2018/20181106__ri__general__town.csv"
 WA_PATH = "2020/20201103__wa__general__county.csv"
+GA_PATHS = {
+    date(2002, 11, 5): "2002/20021105__ga__general.csv",
+    date(2006, 11, 7): "2006/20061107__ga__general.csv",
+    date(2014, 11, 4): "2014/20141104__ga__general__county-level.csv",
+}
+GA_VOTES = ["election_day_votes", "advanced_votes", "absentee_by_mail_votes", "provisional_votes"]
 OE_TITLE = "{state} precinct-level results"
 CITIES = {"Cranston": "44007", "Pawtucket": "44007", "Providence": "44007", "Warwick": "44003"}
 PARTIES = {
@@ -29,6 +35,8 @@ PARTIES = {
     "REP": "REPUBLICAN",
     "Democratic": "DEMOCRATIC",
     "Republican": "REPUBLICAN",
+    "Democrat": "DEMOCRATIC",
+    "Libertarian": "LIBERTARIAN",
     "Non-Partisan": "NONPARTISAN",
 }
 METHOD = (
@@ -36,7 +44,7 @@ METHOD = (
     "published or transcribed from the state's canvass. The winner shown is the candidate with the most votes in "
     "those totals."
 )
-COUNTIES = {"CA": 58, "MD": 24, "RI": 5, "WA": 39}
+COUNTIES = {"CA": 58, "GA": 159, "MD": 24, "RI": 5, "WA": 39}
 COLUMNS = ["year", "day", "state", "title", "county", "candidate", "party", "writein", "votes"]
 
 
@@ -57,6 +65,8 @@ def fetch() -> None:
         raw.fetch(SOURCE, url, suffix=".csv")
     raw.fetch(SOURCE, oe("RI", RI_PATH), suffix=".csv")
     raw.fetch(SOURCE, oe("WA", WA_PATH), suffix=".csv")
+    for path in GA_PATHS.values():
+        raw.fetch(SOURCE, oe("GA", path), suffix=".csv")
 
 
 def parse() -> None:
@@ -143,13 +153,34 @@ def parse() -> None:
             votes=pl.col("votes").str.replace_all(",", "").cast(pl.Int64),
         )
     )
+    for day, path in GA_PATHS.items():
+        ga = pl.read_csv(io.BytesIO(raw.cached(SOURCE, oe("GA", path)).path.read_bytes()), infer_schema_length=0)
+        frames.append(
+            ga.filter(pl.col("office") == "Public Service Commissioner").select(
+                year=pl.lit(day.year),
+                day=pl.lit(day),
+                state=pl.lit("GA"),
+                title=pl.lit("Public Service Commissioner"),
+                post="district",
+                county=pl.col("county").str.to_lowercase().str.replace_all(r"[^a-z]", "").replace_strict(fips["GA"]),
+                candidate="candidate",
+                party="party",
+                writein=pl.lit(False),
+                votes=pl.sum_horizontal(pl.col(GA_VOTES).cast(pl.Int64))
+                if "votes" not in ga.columns
+                else pl.col("votes").cast(pl.Int64),
+            )
+        )
     contest = ["year", "day", "state", "title", "post", "special"]
     returns = (
-        pl.concat([frame.select(COLUMNS).with_columns(pl.col("year").cast(pl.Int32)) for frame in frames])
+        pl.concat(
+            [frame.select(*COLUMNS, *(["post"] if "post" in frame.columns else [])) for frame in frames],
+            how="diagonal_relaxed",
+        )
         .with_columns(
+            pl.col("year").cast(pl.Int32),
             candidate=pl.col("candidate").str.strip_chars().str.replace_all(r"\s+", " ").str.to_uppercase(),
             party=pl.when(~pl.col("writein")).then(pl.col("party").replace(PARTIES)),
-            post=pl.lit(None, pl.String),
             special=pl.lit(False),
             magnitude=pl.lit(1, pl.Int16),
             kind=pl.lit("county"),
@@ -185,6 +216,7 @@ def parse() -> None:
 def emit() -> Path:
     def cite(cs: Changeset) -> dict[str, UUID]:
         found = {
+            "GA": ("OpenElections", "GA county-level results"),
             "CA": (ca_sen_2022.PUBLISHER, ca_sen_2022.TITLE),
             "MD": (md_sbe.PUBLISHER, md_sbe.TITLE),
             "RI": ("OpenElections", OE_TITLE.format(state="RI")),
@@ -199,6 +231,8 @@ def emit() -> Path:
             cs.artifact(raw.cached(SOURCE, url), sources["MD"])
         cs.artifact(raw.cached(SOURCE, oe("RI", RI_PATH)), sources["RI"])
         cs.artifact(raw.cached(SOURCE, oe("WA", WA_PATH)), sources["WA"])
+        for path in GA_PATHS.values():
+            cs.artifact(raw.cached(SOURCE, oe("GA", path)), sources["GA"])
         return sources
 
     return medsl_statewide.emit(
@@ -206,9 +240,10 @@ def emit() -> Path:
         version=VERSION,
         parsed=PARSED,
         summary="California's 2022 secretary of state, treasurer, and superintendent of public instruction, Maryland's "
-        "2018 attorney general, Rhode Island's 2018 secretary of state, and Washington's 2020 insurance commissioner "
-        "generals by county",
+        "2018 attorney general, Rhode Island's 2018 secretary of state, Washington's 2020 insurance commissioner, and "
+        "Georgia's 2002, 2006, and 2014 public service commissioner generals by county",
         cite=cite,
         method=METHOD,
+        close="The leading candidates were within half a percent in these totals, so no outcome is recorded from them.",
         absent="The source has no rows for {counties} in this race, so those votes are missing from these totals.",
     )
