@@ -1176,6 +1176,7 @@ def parse() -> None:
             io.BytesIO(archive.read(archive.namelist()[0])), separator="\t", infer_schema=False
         ).filter(pl.col("USPS").is_in(list(ELSTATS)))
     towns: dict[tuple[str, str], str] = {}
+    geoids: dict[str, str] = {}
     for state, geoid, name in (
         gazetteer.sort(pl.col("NAME").str.contains(r" (gore|grant|location|purchase|UT)$"))
         .select("USPS", "GEOID", "NAME")
@@ -1183,6 +1184,9 @@ def parse() -> None:
     ):
         towns.setdefault((state, elstats.plain(name)), geoid[:5])
         towns.setdefault((state, elstats.plain(re.sub(elstats.SUFFIXES, "", name.lower()))), geoid[:5])
+        if state == "MA":
+            geoids.setdefault(elstats.plain(name), geoid)
+            geoids.setdefault(elstats.plain(re.sub(elstats.SUFFIXES, "", name.lower())), geoid)
     regions = ct_regions()
     for (state, name), code in elstats.FORMER.items():
         towns.setdefault((state, name), code)
@@ -1404,8 +1408,17 @@ def parse() -> None:
                         party="party",
                         label="party",
                         fips="fips",
-                        scheme=pl.lit("us.county"),
-                        unit="fips",
+                        scheme=pl.lit("us.town" if state == "MA" else "us.county"),
+                        unit=pl.col("division_name").replace_strict(
+                            {
+                                name: geoids.get(elstats.plain(name))
+                                or geoids.get(elstats.plain(re.sub(elstats.SUFFIXES, "", name.lower())))
+                                for name in lines["division_name"].unique()
+                            },
+                            return_dtype=pl.String,
+                        )
+                        if state == "MA"
+                        else pl.col("fips"),
                         choice=pl.when(pooled)
                         .then(pl.lit("Write-ins"))
                         .otherwise(pl.col("candidate_name").str.strip_chars()),
@@ -3222,8 +3235,9 @@ def emit() -> Path:
             version=VERSION,
             summary="State legislative and statewide primaries and runoffs from state canvasses: "
             "North Carolina 2002–2022, Minnesota 2016–2022, Washington 2015–2022, and New York City 2014–2022 "
-            "by precinct, California 2002–2022 by county, Colorado, Connecticut, Idaho, Massachusetts, New Mexico, "
-            "New York, Vermont, and Virginia 2000–2022 by county from their ElectionStats archives, and Maine "
+            "by precinct, California 2002–2022 by county, Colorado, Connecticut, Idaho, New Mexico, "
+            "New York, Vermont, and Virginia 2000–2022 by county and Massachusetts 1994–2022 by town from their "
+            "ElectionStats archives, and Maine "
             "2000–2024 by county from the Secretary of State's tabulations, Illinois 2000–2022 by county from the "
             "State Board of Elections' vote totals, Texas 2000–2014 by county from the Secretary of State's "
             "election history, Florida 2000–2022 by county from the Division of Elections' results extracts, "
@@ -3405,6 +3419,14 @@ def emit() -> Path:
                 [f"{SOURCE}.result_set"],
             ).fetchall()
         )
+        yielded = {
+            result_set
+            for (result_set,) in conn.execute(
+                """select r.id from result_set r join changeset g on g.id = r.changeset_id
+                   where r.status = 'superseded' and g.pipeline <> %s""",
+                [SOURCE],
+            ).fetchall()
+        }
         keys = {
             value
             for (value,) in conn.execute(
@@ -3552,7 +3574,9 @@ def emit() -> Path:
         held = {key for key in contests if key[0] in rounds}
         parts = {
             tuple(row)
-            for row in lines.filter(pl.col("code").is_not_null(), pl.col("scheme").is_in(["us.county", "us.aggregate"]))
+            for row in lines.filter(
+                pl.col("code").is_not_null(), pl.col("scheme").is_in(["us.county", "us.aggregate", "us.town"])
+            )
             .select("state", "day", "office", "code", "party")
             .unique()
             .iter_rows()
@@ -3682,10 +3706,22 @@ def emit() -> Path:
                     + (f", Position {post}" if post else "")
                     + (" (unexpired term)" if remainder else ""),
                 )
+                seat = rows["seat"][0] or ""
                 path = (
-                    f"us/{state.lower()}/{day}-{kind}/{'state-' if office in ('house', 'senate') else ''}{office}-{district}"
+                    f"us/{state.lower()}/{day}-{kind}/{'state-' if office in ('house', 'senate') else ''}{office}-"
+                    + (
+                        re.sub(
+                            r"(?<=[a-z])(?=barnstable|berkshire|bristol|dukes|essex|franklin|hampden|hampshire|middlesex|nantucket|norfolk|plymouth|suffolk|worcester)",
+                            "-",
+                            district,
+                        )
+                        if state == "MA"
+                        else slug(seat)
+                        if re.sub(r"[^a-z0-9]", "", seat.lower()) == district.replace("-", "")
+                        else district
+                    )
                     + (f"-post-{post}" if post else "")
-                    + f"-{slug(stage)}"
+                    + (f"-{word}" if word else "")
                 )
             if slugs.setdefault(path, contest) != contest:
                 raise ValueError(f"slug {path} is taken")
@@ -3917,9 +3953,9 @@ def emit() -> Path:
                 contest_id=contest,
                 stage="certified",
                 kind="counted",
-                status="active",
+                status="superseded" if result_set in yielded else "active",
                 source_id=sources["NYC" if ed_level else state],
-                is_default=True,
+                is_default=result_set not in yielded,
                 completeness=1,
                 supersedes_id=supersedes,
             )
@@ -4010,6 +4046,18 @@ def emit() -> Path:
                     cs.add("outcome", result_set_id=row[0], option_id=option, kind=outcome, seats=seats, notes=notes)
                 cs.add("note", entity_id=row[0], kind="caveat", body_md=EMPTY)
         print(f"{len(made)} contests, {skipped} already held")
+        retowned = {
+            str(result_set)
+            for (result_set,) in conn.execute(
+                """select r.id from result_set r
+                   join external_id x on x.entity_id = r.contest_id and x.scheme = 'us.contest' and x.value like '%%:MA:%%'
+                   join changeset g on g.id = r.changeset_id and g.pipeline = %s
+                   where r.status = 'active' and exists (
+                     select from result_value v join reporting_unit u on u.k = v.unit_k
+                     where v.result_set_k = r.k and u.scheme_code <> 'us.town')""",
+                [SOURCE],
+            ).fetchall()
+        }
         frame = lines.join(
             pl.DataFrame(
                 [
@@ -4031,7 +4079,10 @@ def emit() -> Path:
             ),
             on=["state", "day", "office", "code", "party", "choice"],
             nulls_equal=True,
-        ).filter(pl.col("result_set_id").is_in([str(value) for value in sets.values() if value in cs.minted]))
+        ).filter(
+            pl.col("result_set_id").is_in([str(value) for value in sets.values() if value in cs.minted])
+            | pl.col("result_set_id").is_in(list(retowned))
+        )
         part = pl.col("code").is_not_null() & pl.col("scheme").is_in(["us.county", "us.aggregate"])
         frame = frame.with_columns(
             flags=pl.when(pl.col("scheme") == "us.aggregate").then(UNALLOCATED).otherwise(0).cast(pl.Int16),
@@ -4041,6 +4092,13 @@ def emit() -> Path:
             scheme=pl.when(part & (pl.col("scheme") == "us.county")).then(pl.lit("us.county_part")).otherwise("scheme"),
             part=part,
         )
+        with zipfile.ZipFile(raw.cached(elstats.SOURCE, elstats.GAZETTEER).path) as archive:
+            places = dict(
+                pl.read_csv(io.BytesIO(archive.read(archive.namelist()[0])), separator="\t", infer_schema=False)
+                .filter(pl.col("USPS") == "MA")
+                .select("GEOID", pl.col("NAME").str.replace(r" (city|town)$", ""))
+                .iter_rows()
+            )
         units: dict[str, UUID] = {}
         reused = 0
         for state, day, fips, scheme, unit, flags, office, code, parted in (
@@ -4075,9 +4133,11 @@ def emit() -> Path:
                 area_relation="within" if fips else "unlocated",
                 area_id=counties[fips][1] if fips else None,
                 kind="aggregate" if flags else "standard",
-                valid_from=None if flags and not parted else day,
-                valid_to=None if flags and not parted else day + timedelta(days=1),
+                valid_from=None if flags and not parted or scheme == "us.town" else day,
+                valid_to=None if flags and not parted or scheme == "us.town" else day + timedelta(days=1),
             )
+            if scheme == "us.town":
+                name(units[unit], places[unit])
         print(f"{len(units)} units, {reused} already held")
         precincts = (
             lines.filter(pl.col("scheme") == "us.precinct", pl.col("code").is_not_null())
