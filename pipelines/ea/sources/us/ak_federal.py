@@ -22,7 +22,19 @@ FILES = {
     date(2018, 8, 21): "18PRIM/data/resultsbyprecinct.txt",
     date(2020, 8, 18): "20PRIM/data/sovc/resultsbyprecinct20.txt",
 }
-SOVC = {date(2004, 8, 24): "04PRIM", date(2006, 8, 22): "06PRIM", date(2008, 8, 26): "08PRIM", date(2010, 8, 24): "10PRIM", date(2012, 8, 28): "12PRIM"}
+SOVC = {
+    date(2004, 8, 24): "04PRIM",
+    date(2006, 8, 22): "06PRIM",
+    date(2008, 8, 26): "08PRIM",
+    date(2010, 8, 24): "10PRIM",
+    date(2012, 8, 28): "12PRIM",
+    date(2004, 11, 2): "04GENR",
+    date(2006, 11, 7): "06GENR",
+    date(2008, 11, 4): "08GENR",
+    date(2010, 11, 2): "10GENR",
+    date(2012, 11, 6): "12GENR",
+}
+TITLES = {"US SENAT": "senate", "US REPRESENTATIVE": "house", "GOVERNOR": "governor", "US PRESIDENT": "president"}
 SOVC_URL = BASE + "{}/data/sovc/hd{}.pdf"
 PARTIES = {"DEM": "democratic", "REP": "republican", "LIB": "libertarian", "AD": "democratic"}
 STATS = {
@@ -149,7 +161,9 @@ def parse() -> None:
                     print(day, number, "columns", len(heads), "numbers", len(numbers))
                     continue
                 titles: list[list[float | str]] = []
-                for w in sorted((w for w in words if 80 < w[1] < 140 and w[0] > 100), key=lambda w: (round(w[1]), w[0])):
+                for w in sorted(
+                    (w for w in words if 80 < w[1] < 140 and w[0] > 100), key=lambda w: (round(w[1]), w[0])
+                ):
                     if titles and abs(w[1] - titles[-1][3]) < 2 and w[0] - titles[-1][1] < 6:
                         titles[-1][1] = w[2]
                         titles[-1][2] += f" {w[4]}"
@@ -163,12 +177,12 @@ def parse() -> None:
                     end = starts[k + 1] if k + 1 < len(starts) else len(heads)
                     left, right = heads[begin][0], heads[end - 1][0] + 10
                     best = max(
-                        (t for t in titles if not re.fullmatch(r"HOUSE DISTRICT \d+", str(t[2]))),
+                        (t for t in titles if day.month == 11 or not re.fullmatch(r"HOUSE DISTRICT \d+", str(t[2]))),
                         key=lambda t: min(right, t[1]) - max(left, t[0]),
                         default=None,
                     )
                     cut = next((i for i in range(begin, end) if heads[i][1].startswith("Total")), None)
-                    if cut is None or best is None or not str(best[2]).startswith(("US SENAT", "US REPRESENTATIVE")):
+                    if cut is None or best is None or not str(best[2]).startswith(tuple(TITLES)):
                         continue
                     blocks.append(
                         [
@@ -182,21 +196,21 @@ def parse() -> None:
                 if sum(cells) != printed:
                     print(day, number, title, "sum", sum(cells), "printed", printed)
                     continue
-                office = "senate" if title.startswith("US SENAT") else "house"
+                office = next(office for prefix, office in TITLES.items() if title.startswith(prefix))
                 for label, votes in zip(names, cells, strict=True):
                     found = re.fullmatch(r"(.*) \((\w+)\)", label)
-                    if found is None or found[2] not in PARTIES:
+                    if day.month < 11 and (found is None or found[2] not in PARTIES):
                         continue
                     rows.append(
                         (
                             day.year,
-                            f"{office}:{PARTIES[found[2]]}",
+                            office if day.month == 11 else f"{office}:{PARTIES[found[2]]}",
                             day,
                             False,
                             "AK",
                             0 if office == "house" else None,
                             f"{day.isoformat()}:{number:02}",
-                            found[1].strip().upper(),
+                            (found[1] if found else label).strip().upper(),
                             "district",
                             votes,
                         )
@@ -219,9 +233,9 @@ def parse() -> None:
         orient="row",
     ).group_by("year", "chamber", "day", "special", "state", "district", "code", "kind", "candidate").agg(
         pl.col("votes").sum()
-    ).with_columns(measure=pl.lit(1, pl.Int16), writein=pl.lit(False), source=pl.lit("AK")).write_parquet(
-        PARSED / "districts.parquet"
-    )
+    ).with_columns(
+        measure=pl.lit(1, pl.Int16), writein=pl.col("candidate").str.contains("WRITE"), source=pl.lit("AK")
+    ).write_parquet(PARSED / "districts.parquet")
 
 
 def emit() -> Path:
@@ -231,7 +245,8 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Alaska's 2004, 2006, 2008, 2010, 2012, 2014, 2016, 2018, and 2020 U.S. Senate and House primaries by House district",
+            summary="Alaska's 2004, 2006, 2008, 2010, 2012, 2014, 2016, 2018, and 2020 U.S. Senate and House primaries and "
+            "2004–2012 U.S. Senate, House, governor, and presidential generals by House district",
             polity="US-AK",
         )
         source = cs.source(PUBLISHER, TITLE)
