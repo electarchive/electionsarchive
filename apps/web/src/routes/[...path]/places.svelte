@@ -9,7 +9,7 @@
   import Name from "#lib/components/name.svelte";
   import { Input } from "#lib/components/ui/input/index.js";
   import * as Tooltip from "#lib/components/ui/tooltip/index.js";
-  import { count, percent, points } from "#lib/format.js";
+  import { count, percent, plural, points } from "#lib/format.js";
   import { m } from "#lib/paraglide/messages.js";
   import { swatch } from "#lib/party.js";
   import { provenance } from "#lib/provenance.svelte.js";
@@ -584,6 +584,11 @@
   {#if deeper != null}
     <p class="-mbs-1.5 text-[0.8125rem] text-muted-foreground">
       {m.places_deeper({ noun, finer: deeper })}
+    </p>
+  {/if}
+  {#if !all && !isSolo && picked == null && column === "valid" && query === "" && filtered.length > limit}
+    <p class="text-xs text-muted-foreground sm:hidden">
+      {m.places_top_votes({ count: count(limit), nouns: plural(noun) })}
     </p>
   {/if}
   <div class="-mx-2 overflow-x-auto">

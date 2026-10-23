@@ -524,8 +524,14 @@
         race.body == null || race.electors != null
           ? null
           : after.get(race.body);
+      const isTier =
+        !race.isTotal &&
+        ordered.some((other) => other.isTotal && other.body === race.body);
       const isPartial =
-        whole != null && race.count > 1 && whole.total > total * 1.25;
+        !isTier &&
+        whole != null &&
+        race.count > 1 &&
+        whole.total > total * 1.25;
       const top = whole?.parts.toSorted((a, b) => b.value - a.value) ?? [];
       const isRound =
         race.round != null &&
@@ -631,6 +637,7 @@
         ...race,
         decided,
         change,
+        isTier,
         whole: isPartial ? whole : null,
         sequel:
           !isPartial || top[0] == null || top[0].key === "none"
@@ -1231,7 +1238,7 @@
         parties={race.seated}
         places={race.holders}
         body={race.body}
-        size={race.size}
+        size={race.isTier ? null : race.size}
         date={election.date}
         place={race.name}
         region={election.parent == null
@@ -1240,7 +1247,7 @@
               .filter((crumb) => crumb.path !== election.parent?.path)
               .at(-1)?.name ?? null)}
         change={race.change}
-        isComplete={race.size != null || race.count === 1}
+        isComplete={!race.isTier && (race.size != null || race.count === 1)}
         partners={race.partners}
         governing={race.size === chamber?.size ? governing : []}
       />

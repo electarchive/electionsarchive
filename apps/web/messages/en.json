@@ -207,6 +207,7 @@
       }
     }
   ],
+  "places_top_votes": "Showing the {count} {nouns} with the most votes",
   "places_flipped": "Changed hands",
   "places_show_all": "Show all {count}",
   "places_sources": "These results come from {publisher}.",

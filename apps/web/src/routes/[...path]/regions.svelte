@@ -167,7 +167,7 @@
         {m.regions_lede({ noun: chamber.noun ?? "" })}
       </p>
     </div>
-    <div class="overflow-x-auto">
+    <div class="@container-[scroll-state] flex overflow-x-auto">
       <table class="border-collapse text-sm tabular-nums inline-full">
         <thead>
           <tr class="border-be">
@@ -287,6 +287,10 @@
           </tr>
         </tfoot>
       </table>
+      <span
+        class="pointer-events-none sticky inset-e-0 z-1 shrink-0 opacity-0 transition-opacity before:absolute before:inset-y-0 before:inset-e-0 before:bg-linear-to-l before:from-card before:to-transparent before:inline-10 motion-reduce:transition-none [@container_scroll-state(scrollable:right)]:opacity-100"
+        aria-hidden="true"
+      ></span>
     </div>
     {#if ordered.length > 16}
       <button

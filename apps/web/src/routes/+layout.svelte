@@ -164,7 +164,7 @@
       <div class="grid grid-rows-[auto_1fr] min-block-dvh">
         <a
           href="#content"
-          class="fixed inset-s-3 inset-bs-3 z-50 -translate-y-24 rounded-sm border border-foreground bg-card px-3 py-2 text-sm font-semibold focus-visible:translate-y-0"
+          class="fixed inset-s-3 inset-bs-3 z-50 -translate-y-24 rounded-sm border border-foreground bg-card px-3 py-2 text-sm font-semibold opacity-0 focus-visible:translate-y-0 focus-visible:opacity-100"
           >{m.skip_to_content()}</a
         >
         <Header />

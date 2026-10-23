@@ -162,6 +162,11 @@ function alliances(options: Array<Option>) {
     member.votes += option.votes;
     parties.set(option.party, member);
   }
+  for (const id of leads.keys()) {
+    if (!members.has(id)) {
+      members.set(id, new Map());
+    }
+  }
   return new Map(
     members.entries().map(([id, parties]) => {
       const ranked = parties
