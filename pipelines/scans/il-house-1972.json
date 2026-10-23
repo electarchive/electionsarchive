@@ -323,6 +323,84 @@
  },
  "pages": [
   {
+   "page": 70,
+   "id": "70-2",
+   "orientation": "counties_down",
+   "crop": [
+    0.04,
+    0.2,
+    0.99,
+    0.37
+   ],
+   "hint": "Read only the table headed '2nd District'; ignore any other table visible in the image. Cumulated vote cells may end in a small one-half fraction; transcribe halves as '\u00bd' directly after the digits, for example 68,317\u00bd (transcribe halves).",
+   "columns": [
+    {
+     "label": "John E. Friedland",
+     "contest": "state-house2",
+     "candidate": "John E. Friedland"
+    },
+    {
+     "label": "Leo D. LaFleur",
+     "contest": "state-house2",
+     "candidate": "Leo D. Lafleur"
+    },
+    {
+     "label": "Richard A. Mugalian",
+     "contest": "state-house2",
+     "candidate": "Richard A. Mugalian"
+    },
+    {
+     "label": "Neil C. Hebeisen",
+     "contest": "state-house2",
+     "candidate": "Neil C. Hebeisen"
+    },
+    {
+     "label": "Write-In",
+     "contest": null,
+     "candidate": ""
+    }
+   ]
+  },
+  {
+   "page": 70,
+   "id": "70-6",
+   "orientation": "counties_down",
+   "crop": [
+    0.04,
+    0.665,
+    0.99,
+    0.78
+   ],
+   "hint": "Read only the table headed '6th District'; ignore any other table visible in the image. Cumulated vote cells may end in a small one-half fraction; transcribe halves as '\u00bd' directly after the digits, for example 68,317\u00bd (transcribe halves).",
+   "columns": [
+    {
+     "label": "William D. Walsh",
+     "contest": "state-house6",
+     "candidate": "William D. Walsh"
+    },
+    {
+     "label": "Ronald K. Hoffman",
+     "contest": "state-house6",
+     "candidate": "Ronald K. Hoffman"
+    },
+    {
+     "label": "Joseph P. McGah",
+     "contest": "state-house6",
+     "candidate": "Joseph P. McGah"
+    },
+    {
+     "label": "John R. Hieber",
+     "contest": "state-house6",
+     "candidate": "John R. Hieber"
+    },
+    {
+     "label": "Write-In",
+     "contest": null,
+     "candidate": ""
+    }
+   ]
+  },
+  {
    "page": 72,
    "id": "72-1",
    "columns": [
