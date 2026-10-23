@@ -571,4 +571,66 @@ def emit() -> Path:
             for token in files:
                 cs.artifact(raw.cached(SOURCE, IL_DOWNLOAD.format(token)), sources["IL"])
         medsl.attach(cs, conn, frame, sources)
+        for result_set, option, candidacy, kind, seats, notes in conn.execute(
+            """select o.result_set_id, o.option_id, o.candidacy_id, o.kind, o.seats, o.notes
+               from outcome o join changeset c on c.id = o.changeset_id
+               where c.pipeline = %s and o.kind <> 'withdrew'""",
+            [SOURCE],
+        ).fetchall():
+            cs.add(
+                "outcome",
+                result_set_id=result_set,
+                option_id=option,
+                candidacy_id=candidacy,
+                kind=kind,
+                seats=seats,
+                notes=notes,
+            )
+        held = {
+            (day.year, re.sub(r":larunoff$", "", chamber))
+            for day, chamber in frame.filter(pl.col("state") == "LA", pl.col("day").dt.month() == 11)
+            .select("day", "chamber")
+            .unique()
+            .iter_rows()
+        }
+        runoffs = {day.year: day for day in LA_DAYS if day.month == 11}
+        tallies: dict[tuple[str, object], list[tuple[object, int, bool]]] = {}
+        for value, result_set, option, votes, elected in conn.execute(
+            """select x.value, r.id, op.id, sum(v.value)::bigint,
+                      exists (select from outcome e join result_set d on d.id = e.result_set_id and d.is_default
+                              where d.contest_id = r.contest_id and e.option_id = op.id and e.kind = 'elected')
+               from external_id x
+               join result_set r on r.contest_id = x.entity_id and r.status = 'active'
+               join changeset c on c.id = r.changeset_id and c.pipeline = %s
+               join result_value v on v.result_set_k = r.k
+               join contest_option op on op.k = v.option_k
+               where x.scheme = 'us.contest' and x.value ~ '^20..-10-..:LA:(house|senate):[0-9]+:laf(un)?settled$'
+               group by 1, 2, 3""",
+            [SOURCE],
+        ).fetchall():
+            tallies.setdefault((value, result_set), []).append((option, votes, elected))
+        for (value, result_set), tally in sorted(tallies.items()):
+            day, _, body, district, _ = value.split(":")
+            year = int(day[:4])
+            ranked = sorted(tally, key=lambda row: -row[1])
+            if (
+                len(ranked) < 2
+                or ranked[0][1] * 2 > sum(row[1] for row in ranked)
+                or (year, f"{body}:{district}") in held
+            ):
+                continue
+            top = ranked[:2]
+            winners = [row for row in top if row[2]]
+            if len(winners) != 1:
+                print(f"withdrew skipped, no single elected leader: {value}")
+                continue
+            runoff = runoffs[year]
+            cs.add(
+                "outcome",
+                result_set_id=result_set,
+                option_id=next(row[0] for row in top if not row[2]),
+                kind="withdrew",
+                notes=f"Withdrew from the {runoff:%B} {runoff.day}, {runoff.year} runoff, which was not held; "
+                "the Secretary of State's runoff results list no race for this district.",
+            )
         return cs.write()
