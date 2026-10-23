@@ -953,8 +953,33 @@ function comparisonMarkdown(
             ],
           ];
     });
+    const facts = [one, two].map((person) => {
+      const years = (person?.record ?? []).map((entry) => entry.year);
+      return {
+        party: person?.party?.label ?? null,
+        ran: count(person?.record.length ?? 0),
+        won: count(
+          (person?.record ?? []).filter((entry) =>
+            ["elected", "won", "advanced"].includes(entry.outcome ?? ""),
+          ).length,
+        ),
+        years:
+          years.length === 0
+            ? null
+            : span(Math.min(...years), Math.max(...years)),
+      };
+    });
     return [
       ...heading,
+      table(
+        ["", a.name, b.name],
+        [
+          [m.col_party(), facts[0]?.party ?? null, facts[1]?.party ?? null],
+          [m.person_ran(), facts[0]?.ran ?? null, facts[1]?.ran ?? null],
+          [m.person_won(), facts[0]?.won ?? null, facts[1]?.won ?? null],
+          [m.person_years(), facts[0]?.years ?? null, facts[1]?.years ?? null],
+        ],
+      ),
       `## ${m.versus_head_title()}`,
       shared.length === 0
         ? m.versus_head_none()
@@ -975,7 +1000,13 @@ function comparisonMarkdown(
         : data.places.series.flatMap((series) => [
             `## ${series.name ?? m.versus_overall()}`,
             table(
-              [m.col_date(), m.col_contest(), a.name, b.name],
+              [
+                m.col_date(),
+                m.col_contest(),
+                m.versus_overall(),
+                a.name,
+                b.name,
+              ],
               series.points
                 .toReversed()
                 .map((point) => [
@@ -983,6 +1014,7 @@ function comparisonMarkdown(
                   link(point.name, point.path),
                   top(point.sides[0]),
                   top(point.sides[1]),
+                  top(point.sides[2]),
                 ]),
             ),
           ])),
