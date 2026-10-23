@@ -599,7 +599,10 @@ WON_MAJORITY = "Derived: a majority of first choices in the certified contest to
 UT_FILES = {
     date(2000, 6, 27): ("2023/09/2000Pri.xls", ["2000 Primary Election"]),
     date(2010, 6, 22): ("2023/09/2010-Primary-Canvass-Reports.xls", ["Primary Multi County Races"]),
-    date(2012, 6, 26): ("2023/09/2012-Primary-Canvass-Reports-1.xlsx", ["Primary Multi County Races", "Utah Leg Single"]),
+    date(2012, 6, 26): (
+        "2023/09/2012-Primary-Canvass-Reports-1.xlsx",
+        ["Primary Multi County Races", "Utah Leg Single"],
+    ),
     date(2016, 6, 28): (
         "2023/09/2016-Primary-Election-State-Canvass-2-1.xlsx",
         ["Utah Leg. - Multi County", "Utah Leg. - Single County"],
@@ -930,6 +933,16 @@ WON_THRESHOLD = (
 )
 ADVANCED_TOP = "Derived: one of the top two of the certified contest totals."
 ADVANCED_RUNOFF = "Derived: one of the top two of the certified contest totals, and a second primary followed."
+WITHDREW = {
+    "2010-06-08:SC:house:69:rp": (
+        {"Danny Frazier", "Gary W Taylor", "Daniel E Ernie Peagler", "T R Parrish"},
+        (
+            "Withdrew before the June 22 second primary; the State Election Commission declared Rick Quinn the nominee on "
+            'receiving withdrawal letters from his four opponents (Associated Press, "Rick Quinn wins House Dist. 69 GOP '
+            "nomination without runoff,\" June 2010). Lexington County's runoff returns list no District 69 race."
+        ),
+    ),
+}
 
 WITHHELD = (
     'The archive withholds some of this primary\'s county counts by voting method for voter privacy, shown as "*", '
@@ -3265,7 +3278,7 @@ def parse() -> None:
                     for row in cells[first:last]
                     if row[column]
                 }
-                if (sum(counts.values()) != int(float(cells[last][column])) if cells[last][column] else len(counts) != 1):
+                if sum(counts.values()) != int(float(cells[last][column])) if cells[last][column] else len(counts) != 1:
                     raise ValueError(f"{day} {sheet} {candidate}: the counties do not add up to the total")
                 utah.extend(
                     (
@@ -3986,7 +3999,9 @@ def emit() -> Path:
                         wins = [(names[0], "won", WON_CONVENTION)]
                     elif tallies[0] > tallies[1] and nominated.get(names[0]):
                         wins = [(names[0], "won", WON_NOMINEE)]
-            elif state in ("MN", "CA", "ME", "IL", "KY", "PA", "IN", "UT", *ELSTATS) or (state == "FL" and day.year > 2000):
+            elif state in ("MN", "CA", "ME", "IL", "KY", "PA", "IN", "UT", *ELSTATS) or (
+                state == "FL" and day.year > 2000
+            ):
                 if len(tallies) <= magnitude:
                     wins = [(choice, "won", WON_ALONE) for choice in names]
                 elif (tallies[magnitude - 1] - tallies[magnitude]) * 100 > total and tallies[magnitude - 1] - tallies[
@@ -4026,6 +4041,8 @@ def emit() -> Path:
                     wins = [(names[0], "won", WON_THRESHOLD.format(threshold=threshold))]
                 elif tallies[0] > tallies[1] and nominated.get(names[0]):
                     wins = [(names[0], "won", WON_NOMINEE)]
+            if base in WITHDREW:
+                wins += [(choice, "withdrew", WITHDREW[base][1]) for choice in names if choice in WITHDREW[base][0]]
             wanted = {
                 (options[(state, day, office, code, party, choice)], kind, None, notes) for choice, kind, notes in wins
             }
