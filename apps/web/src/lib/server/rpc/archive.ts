@@ -1598,6 +1598,7 @@ async function chamber(
     roots: Array<string>;
     nation: number | null;
     area: string | null;
+    polity: string | null;
     path: string | null;
     base: string | null;
   }>(sql`
@@ -1612,7 +1613,7 @@ async function chamber(
             and s.party_scope_id is not distinct from c.party_scope_id and s.kind in ('body_seats', 'list_allocation')
         )
       end as roots,
-      a.k as nation, a.id as area,
+      a.k as nation, a.id as area, case when a.id = pt.area_id then e.polity_id end as polity,
       (select path from slug where entity_id = case when c.id = r.id then c.election_id else r.id end and is_current) as path,
       (select path from slug where entity_id = c.id and is_current) as base
     from contest c
@@ -1638,7 +1639,7 @@ async function chamber(
           shape.roots,
         ),
     names(
-      [shape?.area].filter((id) => id != null),
+      [shape?.area, shape?.polity].filter((id) => id != null),
       contest.date,
     ),
     now,
@@ -1692,7 +1693,10 @@ async function chamber(
   return {
     link: isFocus
       ? {
-          name: named.full.get(shape?.area ?? "") ?? "",
+          name:
+            named.full.get(shape?.polity ?? "") ??
+            named.full.get(shape?.area ?? "") ??
+            "",
           path: shape?.path ?? null,
         }
       : null,
