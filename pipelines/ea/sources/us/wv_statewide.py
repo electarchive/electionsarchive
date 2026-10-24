@@ -56,19 +56,30 @@ def parse() -> None:
         }
     rows = []
     for edition in range(1917, 2001, 2):
-        url = wv_bluebook.URL.format(edition)
-        cached = cache(url)
+        cached = cache(wv_bluebook.URL.format(edition))
         if cached is None:
             continue
-        pdf = cached.path
+        day = election_day(edition - 1)
+        with connect() as conn:
+            held = {
+                key.rsplit(":", 1)[-1]: [int(total) for (total,) in conn.execute(
+                    """select sum(v.value) from result_value v join result_set rs on rs.k = v.result_set_k and rs.is_default
+                       join contest_option o on o.k = v.option_k join contest c on c.id = o.contest_id
+                       where c.id = %s and v.measure = 1 and o.kind <> 'others' group by o.id""",
+                    [entity],
+                ).fetchall()]
+                for key, entity in conn.execute(
+                    "select value, entity_id from external_id where scheme = 'us.contest' and value ~ %s",
+                    [f"^{day}:WV:(president|governor|senate)$"],
+                ).fetchall()
+            }
         lines = subprocess.run(
-            ["pdftotext", "-layout", str(pdf), "-"], capture_output=True, text=True, check=True
+            ["pdftotext", "-layout", str(cached.path), "-"], capture_output=True, text=True, check=True
         ).stdout.splitlines()
         current: dict[str, list[int]] = {}
         last = -99
-        start = 0
         for index, line in enumerate(lines):
-            match = re.match(r"^\s*([A-Za-z][A-Za-z. ]{1,30}[A-Za-z])(\W.*)$", line)
+            match = re.match(r"^\W*([A-Za-z][A-Za-z. ]{1,30}[A-Za-z])(\W.*)$", line)
             if match and (not re.search(r"\d", match[2]) or re.search(r"[A-Za-z]{3}", match[2])):
                 match = None
             if match is None:
@@ -79,23 +90,28 @@ def parse() -> None:
             if close:
                 if index - last > 6 or close[0] in current:
                     current = {}
-                if not current:
-                    start = index
                 current[close[0]] = figures
                 last = index
             elif key.startswith("total") and current and index - last <= 3:
-                heading = " ".join(lines[max(0, start - 12) : start]).upper()
-                found = [(hit.start(), name) for pattern, name in OFFICES for hit in re.finditer(pattern, heading)]
-                office = max(found)[1] if found else None
                 sums = [sum(row[c] for row in current.values() if len(row) > c) for c in range(len(figures))]
-                if office and len(current) >= 50:
+                if len(current) >= 50:
                     ok = sums == figures and all(len(row) == len(figures) for row in current.values())
-                    print(edition, office, len(current), len(figures), "ok" if ok else f"sums {sums} printed {figures}")
+                    assigned = {}
+                    for column, total in enumerate(figures):
+                        near = [
+                            (abs(value - total), office)
+                            for office, values in held.items()
+                            for value in values
+                            if abs(value - total) * 300 <= total
+                        ]
+                        if len({office for _, office in near}) == 1:
+                            assigned[column] = near[0][1]
+                    if assigned:
+                        print(edition, len(current), len(figures), "ok" if ok else f"sums {sums} printed {figures}", assigned)
                     if ok:
-                        day = election_day(edition - 1)
                         for county, values in current.items():
-                            for column, votes in enumerate(values):
-                                rows.append((day, office, counties[county], str(column), votes))
+                            for column, office in assigned.items():
+                                rows.append((day, office, counties[county], f"{index}-{column}", values[column]))
                 current = {}
     PARSED.mkdir(parents=True, exist_ok=True)
     frame = pl.DataFrame(rows, schema=["day", "district", "county", "column", "votes"], orient="row")
