@@ -2,6 +2,7 @@ import html
 import re
 import subprocess
 from datetime import date, timedelta
+from uuid import uuid5
 from pathlib import Path
 
 import polars as pl
@@ -11,7 +12,7 @@ from ea.changeset import Changeset
 from ea.store import DATA, connect
 
 SOURCE = "us.nh_turnout"
-VERSION = "2"
+VERSION = "3"
 PARSED = DATA / "parsed" / SOURCE
 PUBLISHER = "New Hampshire Secretary of State"
 REGISTRATION = "https://web.archive.org/web/20260709183931if_/https://www.sos.nh.gov/party-registration-history-1970-2026"
@@ -99,7 +100,7 @@ def parse() -> None:
         day = first + timedelta(days=(7 - first.weekday()) % 7 + 1)
         near = [(abs((d - day).days), d) for d in snapshots if -3 <= (d - day).days <= 7]
         if near:
-            rows.append({"date": day, "kind": "general", "code": "33", "registered": snapshots[min(near)[1]], "voters": None})
+            rows.append({"date": day, "kind": "general", "code": "33", "registered": snapshots[min(near)[1]], "voters": None, "as_of": min(near)[1]})
     for year, url in BALLOTS.items():
         text = raw.cached(SOURCE, url).path.read_text(errors="ignore")
         totals = [c for c in cells(text) if c]
@@ -131,12 +132,12 @@ def parse() -> None:
             assert total == (printed[2] + printed[5] if measure == "ballots" else next(printed[i] for i in range(2, len(printed)) if sum(printed[:i]) == printed[i])), (name, total, printed)
         if files:
             for code, values in county.items():
-                rows.append({"date": day, "kind": "primary", "code": code, "registered": values.get("registered"), "voters": values.get("ballots")})
+                rows.append({"date": day, "kind": "primary", "code": code, "registered": values.get("registered"), "voters": values.get("ballots"), "as_of": None})
         if "registered" not in files:
             near = [(abs((d - day).days), d) for d in snapshots if -3 <= (d - day).days <= 7]
             if near:
-                rows.append({"date": day, "kind": "primary", "code": "33", "registered": snapshots[min(near)[1]], "voters": None})
-    frame = pl.DataFrame(rows, schema={"date": pl.Date, "kind": pl.String, "code": pl.String, "registered": pl.Int64, "voters": pl.Int64})
+                rows.append({"date": day, "kind": "primary", "code": "33", "registered": snapshots[min(near)[1]], "voters": None, "as_of": min(near)[1]})
+    frame = pl.DataFrame(rows, schema={"date": pl.Date, "kind": pl.String, "code": pl.String, "registered": pl.Int64, "voters": pl.Int64, "as_of": pl.Date})
     PARSED.mkdir(parents=True, exist_ok=True)
     frame.write_parquet(PARSED / "turnout.parquet")
     print(frame)
@@ -199,7 +200,18 @@ def emit() -> Path:
                 is_default=election_id not in held,
                 completeness=1,
             )
-            for code, registered, voters in rows.select("code", "registered", "voters").iter_rows():
+            for code, registered, voters, as_of in rows.select("code", "registered", "voters", "as_of").iter_rows():
+                if as_of is not None and as_of != day:
+                    offset = (as_of - day).days
+                    cs.add(
+                        "note",
+                        id=uuid5(result_set, "registered as of"),
+                        entity_id=result_set,
+                        kind="methodology",
+                        body_md=f"Registered voters is the checklist total as of {as_of.isoformat()}, {abs(offset)} day{'s' if abs(offset) != 1 else ''} "
+                        f"{'after' if offset > 0 else 'before'} the election, in the Secretary of State's party registration history; "
+                        "it has no figure dated election day. New Hampshire's checklists are not purged in the week after an election.",
+                    )
                 for measure, value in ((2, registered), (14 if kind == "general" else 3, voters)):
                     if value is None:
                         continue
@@ -211,7 +223,7 @@ def emit() -> Path:
                         channel=0,
                         measure=measure,
                         count_round=0,
-                        flags=0,
+                        flags=2 if measure == 2 and as_of is not None and as_of != day else 0,
                         value=value,
                     )
         return cs.write()

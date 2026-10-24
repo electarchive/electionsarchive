@@ -1,6 +1,7 @@
 import re
 from datetime import date
 from pathlib import Path
+from uuid import uuid5
 
 import polars as pl
 
@@ -10,7 +11,7 @@ from ea.sources.us import openelections
 from ea.store import DATA, connect
 
 SOURCE = "us.wi_turnout"
-VERSION = "1"
+VERSION = "2"
 PARSED = DATA / "parsed" / SOURCE
 PUBLISHER = "Wisconsin Elections Commission"
 TITLE = "Election Voting and Registration Statistics Report"
@@ -22,6 +23,7 @@ COLUMNS = {
     "edr": ("edrs", "electiondayregistrants"),
 }
 SITE = "https://elections.wi.gov/sites/"
+NOTE = "Registered voters is our sum of three columns of the same report: registrants (early registrants), late registrants, and election day registrants."
 FILES = {
     date(2008, 11, 4): "20230316065807 default/files/legacy/publication/65/2008nov_gab190_statistics_xls_13418.xls",
     date(2009, 4, 7): "20230316065744 default/files/legacy/publication/65/20090407_gab190_statistics_xlsx_93580.xlsx",
@@ -152,6 +154,7 @@ def emit() -> Path:
                     is_default=election_id not in held,
                     completeness=round(rows.height / 72, 4),
                 )
+                cs.add("note", id=uuid5(result_set, "registered"), entity_id=result_set, kind="methodology", body_md=NOTE)
                 for code, registered, ballots, voters in rows.select("code", "registered", "ballots", "voters").iter_rows():
                     for measure, value in ((2, registered), (3, ballots), (14, voters)):
                         cs.add(
@@ -162,7 +165,7 @@ def emit() -> Path:
                             channel=0,
                             measure=measure,
                             count_round=0,
-                            flags=0,
+                            flags=1 if measure == 2 else 0,
                             value=value,
                         )
         return cs.write()
