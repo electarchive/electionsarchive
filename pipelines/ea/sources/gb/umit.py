@@ -332,6 +332,13 @@ def emit() -> Path:
             polity="GB",
         )
         zeroed = cs.zeroed()
+        named: dict[UUID, list[tuple[UUID, str]]] = {}
+        for id, entity, text in conn.execute(
+            "select n.id, n.entity_id, n.text from name n join changeset c on c.id = n.changeset_id"
+            " where c.pipeline = %s",
+            [SOURCE],
+        ):
+            named.setdefault(entity, []).append((id, text))
 
         def name(entity: UUID, text: str, start: date | None = None) -> None:
             cs.add(
@@ -631,7 +638,15 @@ def emit() -> Path:
                                 value=value,
                             )
                 for line in lines.iter_rows(named=True):
-                    full = " ".join(part for part in (line["name"], line["surname"]) if part) or line["candidate"]
+                    option_key = f"{contest_key}:{slug(line['candidate'])}{line['suffix']}"
+                    option = cs.key("gb.option", option_key)
+                    given: list[str] = []
+                    for word in (line["name"] or "").split():
+                        if not given or given[-1] != word or not word[0].isupper():
+                            given.append(word)
+                    if line["surname"] and " ".join(given).lower() == line["surname"].lower():
+                        given = []
+                    full = " ".join([*given, line["surname"] or ""]).strip() or line["candidate"]
                     identity = line["member"] or f"{unit_code}:{slug(line['candidate'])}{line['suffix']}"
                     if identity not in persons:
                         persons[identity] = (
@@ -643,10 +658,21 @@ def emit() -> Path:
                                 id=persons[identity],
                                 gender=line["gender"].lower() if line["gender"] else None,
                             )
+                        if persons[identity] in cs.minted or persons[identity] in named:
                             name(persons[identity], full)
+                        for id, text in named.get(persons[identity], []):
+                            if text != full:
+                                cs.add(
+                                    "name",
+                                    id=id,
+                                    entity_id=persons[identity],
+                                    text=text,
+                                    lang="en",
+                                    kind="official",
+                                    is_preferred=False,
+                                    valid_from=None,
+                                )
                     party = party_of(line["party"], year, line["country"])
-                    option_key = f"{contest_key}:{slug(line['candidate'])}{line['suffix']}"
-                    option = cs.key("gb.option", option_key)
                     cs.add(
                         "contest_option",
                         id=option,

@@ -265,7 +265,7 @@ def _publish_table(conn: Connection, stage: Stage, table: str) -> None:
             )
         )
         if table == "name" and "is_preferred" in columns:
-            undated = sql.SQL(" and s.valid_from is null and s.valid_to is null" if "valid_from" in columns else "")
+            undated = sql.SQL("".join(f" and s.{column} is null" for column in ("valid_from", "valid_to") if column in columns))
             conn.execute(
                 sql.SQL(
                     """update public.name p set is_preferred = true from {} s
