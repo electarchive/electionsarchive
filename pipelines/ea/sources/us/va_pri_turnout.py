@@ -1,7 +1,9 @@
 import csv
 import re
-from datetime import UTC, datetime
+import subprocess
+from datetime import UTC, date, datetime
 from pathlib import Path
+from uuid import uuid5
 
 import httpx
 import polars as pl
@@ -11,7 +13,7 @@ from ea.changeset import Changeset
 from ea.store import DATA, connect
 
 SOURCE = "us.va_pri_turnout"
-VERSION = "1"
+VERSION = "2"
 PARSED = DATA / "parsed" / SOURCE
 PUBLISHER = "Virginia Department of Elections"
 BASE = "https://apps.elections.virginia.gov/SBE_CSV/ELECTIONS/ELECTIONTURNOUT/Turnout-"
@@ -55,6 +57,17 @@ FILES = [
     "2022%20June%20Democratic%20Primary",
     "2022%20June%20Republican%20Primary",
 ]
+STATISTICS = "https://www.elections.virginia.gov/media/registration-statistics/"
+SNAPSHOTS = {
+    "2007-06-12": "2007/05/Statewide_Statistics_by_Locality_05.pdf",
+    "2008-02-12": "2008/02/Statewide_Statistics_by_Locality.pdf",
+    "2008-06-10": "2008/06/Statewide_Statistics_by_Locality.pdf",
+    "2009-06-09": "2009/06/Statewide_Statistics_by_Locality.pdf",
+    "2010-06-08": "2010/05/Statewide_Statistics_by_Locality.pdf",
+    "2012-03-06": "2012/02/Registrant_Counts_By_Locality.pdf",
+    "2012-06-12": "2012/05/Registrant_Counts_By_Locality.pdf",
+    "2013-06-11": "2013/05/LocalityStatistics_2013_06_01_054452.pdf",
+}
 COUNTIES_SQL = """
 select u.code, n.text from reporting_unit u
 join name n on n.entity_id = u.area_id and n.kind = 'short'
@@ -79,7 +92,31 @@ def fetch() -> None:
             pass
         response = httpx.get(url(name), headers={"User-Agent": "Mozilla/5.0"}, follow_redirects=True, timeout=120)
         response.raise_for_status()
-        raw.store(SOURCE, url(name), response.content, suffix=".csv", retrieved_at=datetime.now(UTC), media_type="text/csv")
+        raw.store(
+            SOURCE, url(name), response.content, suffix=".csv", retrieved_at=datetime.now(UTC), media_type="text/csv"
+        )
+    for path in SNAPSHOTS.values():
+        raw.fetch(SOURCE, STATISTICS + path, suffix=".pdf")
+
+
+def snapshot(path: str) -> tuple[date, dict[str, int]]:
+    text = subprocess.run(
+        ["pdftotext", "-layout", str(raw.cached(SOURCE, STATISTICS + path).path), "-"],
+        capture_output=True,
+        text=True,
+        check=True,
+    ).stdout
+    month, day, year = re.search(r"as of (\d\d?)/(\d\d?)/(\d{4})", text).groups()
+    totals: dict[str, int] = {}
+    locality = None
+    for line in text.splitlines():
+        if found := re.search(r"Locality: (\d{3})\b", line):
+            locality = f"51{found[1]}"
+        elif locality is not None and ("Inactivate/Month" in line or "# of Voters:" in line and "Total #" not in line):
+            numbers = [int(value.replace(",", "")) for value in re.findall(r"\d[\d,]*", line.split("Voters:")[-1])]
+            totals[locality] = numbers[-1] if "Inactivate/Month" in line else numbers[2]
+            locality = None
+    return date(int(year), int(month), int(day)), totals
 
 
 def parse() -> None:
@@ -104,14 +141,31 @@ def parse() -> None:
             continue
         rows.append({"date": day, "code": code, "precinct": precinct, "voters": voters})
     frame = pl.DataFrame(rows).group_by("date", "code").agg(pl.col("voters").sum())
-    totals = pl.DataFrame(
-        [
-            {"date": day, "code": codes[key(re.sub(r" (city|county)$", "", locality), locality.endswith(" city"))], "registered": value}
-            for (day, locality, _), value in registered.items()
-            if key(re.sub(r" (city|county)$", "", locality), locality.endswith(" city")) in codes
-        ]
-    ).group_by("date", "code").agg(pl.col("registered").sum())
-    frame = frame.join(totals, on=["date", "code"], how="left")
+    totals = (
+        pl.DataFrame(
+            [
+                {
+                    "date": day,
+                    "code": codes[key(re.sub(r" (city|county)$", "", locality), locality.endswith(" city"))],
+                    "registered": value,
+                }
+                for (day, locality, _), value in registered.items()
+                if key(re.sub(r" (city|county)$", "", locality), locality.endswith(" city")) in codes
+            ]
+        )
+        .group_by("date", "code")
+        .agg(pl.col("registered").sum())
+    )
+    frame = frame.join(totals, on=["date", "code"], how="left").with_columns(as_of=pl.lit(None, pl.Date))
+    for day, path in SNAPSHOTS.items():
+        as_of, counts = snapshot(path)
+        print(f"{day}: {len(counts)} localities as of {as_of}, {sum(counts.values())} registered")
+        filled = (pl.col("date") == day) & pl.col("registered").is_null()
+        lookup = pl.col("code").replace_strict(counts, default=None, return_dtype=pl.Int64)
+        frame = frame.with_columns(
+            as_of=pl.when(filled & lookup.is_not_null()).then(pl.lit(as_of)).otherwise("as_of"),
+            registered=pl.when(filled).then(lookup).otherwise("registered"),
+        )
     PARSED.mkdir(parents=True, exist_ok=True)
     frame.write_parquet(PARSED / "counties.parquet")
     print(frame.group_by("date").agg(pl.len(), pl.col("registered").sum(), pl.col("voters").sum()).sort("date"))
@@ -125,7 +179,8 @@ def emit() -> Path:
             pipeline=SOURCE,
             version=VERSION,
             summary="Virginia's registered voters and ballots cast by locality for the primaries of 2007 to 2022, "
-            "from the Department of Elections' election turnout files",
+            "from the Department of Elections' election turnout files, with registered voters for the 2007-2013 primaries "
+            "from the nearest monthly registration statistics report",
             polity="US",
         )
         elections = {
@@ -138,7 +193,9 @@ def emit() -> Path:
         held = {
             election_id
             for (election_id,) in conn.execute(
-                "select election_id from result_set where contest_id is null and is_default and status <> 'withdrawn'"
+                """select r.election_id from result_set r join changeset c on c.id = r.changeset_id
+                   where r.contest_id is null and r.is_default and r.status <> 'withdrawn' and c.pipeline <> %s""",
+                [SOURCE],
             )
         }
         title = "Election Turnout"
@@ -155,6 +212,20 @@ def emit() -> Path:
             )
         for name in FILES:
             cs.artifact(raw.cached(SOURCE, url(name)), source)
+        title = "Voter Registration Statistics"
+        statistics = cs.source(PUBLISHER, title)
+        if statistics in cs.minted:
+            cs.add(
+                "source",
+                id=statistics,
+                kind="official_body",
+                publisher=PUBLISHER,
+                title=title,
+                url="https://www.elections.virginia.gov/resultsreports/registration-statistics/",
+                license="Public record",
+            )
+        for path in SNAPSHOTS.values():
+            cs.artifact(raw.cached(SOURCE, STATISTICS + path), statistics)
         for (day,), rows in frame.group_by("date", maintain_order=True):
             if day not in elections:
                 print(f"{day}: no election")
@@ -171,9 +242,21 @@ def emit() -> Path:
                 status="active",
                 source_id=source,
                 is_default=election_id not in held,
-                completeness=round(rows.height / 133, 4),
+                completeness=round(rows.height / (134 if day < "2013-07-01" else 133), 4),
             )
-            for code, registered, voters in rows.select("code", "registered", "voters").iter_rows():
+            as_of = rows["as_of"].drop_nulls().first()
+            if as_of is not None:
+                offset = (as_of - date.fromisoformat(day)).days
+                cs.add(
+                    "note",
+                    id=uuid5(result_set, "registered"),
+                    entity_id=result_set,
+                    kind="methodology",
+                    body_md=f"Registered voters is the Department of Elections' count of all registrants, active and inactive, as of "
+                    f"{as_of:%B} {as_of.day}, {as_of.year}, {abs(offset)} day{'s' if abs(offset) != 1 else ''} "
+                    f"{'after' if offset > 0 else 'before'} the primary, from its monthly registration statistics.",
+                )
+            for code, registered, voters, snapped in rows.select("code", "registered", "voters", "as_of").iter_rows():
                 for measure, value in ((2, registered), (3, voters)):
                     if value is None or (measure == 2 and value == 0):
                         continue
@@ -185,7 +268,7 @@ def emit() -> Path:
                         channel=0,
                         measure=measure,
                         count_round=0,
-                        flags=0,
+                        flags=2 if measure == 2 and snapped is not None else 0,
                         value=value,
                     )
         return cs.write()
