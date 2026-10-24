@@ -1066,10 +1066,18 @@
   const captions = $derived([
     ...new Set(
       contest.current?.sets.map((set) =>
-        m.sources_caption({
-          stage: STAGES[tier(set)]?.() ?? set.stage,
-          publisher: set.source.publisher,
-        }),
+        set.source.kind !== "official_body" &&
+        ["live", "preliminary", "official", "certified", "recount"].includes(
+          tier(set),
+        )
+          ? m.sources_caption_compiled({
+              stage: STAGES[tier(set)]?.() ?? set.stage,
+              publisher: set.source.publisher,
+            })
+          : m.sources_caption({
+              stage: STAGES[tier(set)]?.() ?? set.stage,
+              publisher: set.source.publisher,
+            }),
       ) ?? [],
     ),
   ]);

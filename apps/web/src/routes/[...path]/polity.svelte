@@ -232,10 +232,12 @@
           (entry) =>
             entry.scheme === contest.places?.level && entry.tiles != null,
         );
+        const steps = wanted.unit?.split("/") ?? [];
+        const up = steps.length > 1 ? steps.slice(0, -1).join("/") : undefined;
         const whole =
           isDrawn || wanted.unit == null
             ? null
-            : await orpc.contests.get.call({ id: wanted.id });
+            : await orpc.contests.get.call({ id: wanted.id, unit: up });
         const around =
           whole?.places == null
             ? null
@@ -243,6 +245,7 @@
                 contest: whole,
                 bounds: await orpc.contests.boundaries.call({
                   id: wanted.id,
+                  unit: up,
                   level: whole.places.level,
                 }),
               };

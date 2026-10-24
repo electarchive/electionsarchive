@@ -5133,7 +5133,7 @@ export const contests = {
       const chain = await descend(contest, input.unit);
       const area = chain.at(-1) ?? contest.place;
       const unit = chain.map((entry) => entry.segment).join("/");
-      return Promise.all(
+      const built = await Promise.all(
         found.rows.map(async (row) => {
           const [all, lineage] = await Promise.all([
             area == null
@@ -5182,6 +5182,24 @@ export const contests = {
           };
         }),
       );
+      const colors = new Map<string, string | null>();
+      const ordered = built.toSorted(
+        (a, b) => Number(b.isCurrent) - Number(a.isCurrent),
+      );
+      for (const round of ordered) {
+        for (const leader of round.leaders) {
+          if (!colors.has(leader.key)) {
+            colors.set(leader.key, leader.color);
+          }
+        }
+      }
+      return built.map((round) => ({
+        ...round,
+        leaders: round.leaders.map((leader) => ({
+          ...leader,
+          color: colors.get(leader.key) ?? leader.color,
+        })),
+      }));
     }),
   ballot: os
     .meta(

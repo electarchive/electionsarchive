@@ -278,6 +278,7 @@
   "siblings_loading": "Loading places…",
   "siblings_empty": "No place matches.",
   "sources_caption": "{stage}: {publisher}",
+  "sources_caption_compiled": "{stage} count, compiled by {publisher}",
   "citations_title": "Also cited",
   "checks_title": "Consistency checks",
   "check_turnout_unit": "{name}: {ballots} ballots cast, {registered} registered voters",
