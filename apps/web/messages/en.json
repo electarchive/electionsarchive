@@ -114,6 +114,8 @@
   "outcome_note": "{names}: {note}",
   "outcome_derived": "Outcome inferred from the certified totals: {rest}",
   "stat_valid": "Valid votes",
+  "regions_universities": "University seats",
+  "regions_unplaced": "Seats with no area",
   "stat_votes_cast": "Votes cast",
   "term_votes_cast": "Each voter could cast up to {count} votes here, so this counts votes, not voters.",
   "measure_list_votes": "Party votes",

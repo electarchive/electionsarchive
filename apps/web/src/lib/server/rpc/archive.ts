@@ -9,6 +9,7 @@ import path from "node:path";
 import * as v from "valibot";
 import { os } from "#lib/server/cache.js";
 import { db } from "#lib/server/db/index.js";
+import { m } from "#lib/paraglide/messages.js";
 
 const stored = (tiles: string | null | undefined) =>
   tiles != null &&
@@ -8910,8 +8911,8 @@ export const elections = {
         kind: string;
         size: number | null;
         leaf: string;
-        region: string;
-        scheme: string;
+        region: string | null;
+        scheme: string | null;
         party: string | null;
         isIndependent: boolean;
         seats: number;
@@ -8979,19 +8980,22 @@ export const elections = {
           (select z.seats from body_size z where z.body_id = r.body
             and (z.valid @> r.day or z.valid_from between r.day and r.day + 150)
             order by z.valid_from desc nulls last limit 1) as size,
-          w.leaf, up.area as region, a.scheme_code as scheme,
+          w.leaf, u.area as region, u.scheme as scheme,
           coalesce(bm.into_id, br.parent_party_id, pm.into_id, w.party_id, ld.party_id, w.alliance_id) as party,
           w.independent as "isIndependent", w.seats
         from winners w
         join roots r on r.id = w.root
-        join up on up.leaf = w.leaf
-        join area a on a.id = up.area
+        cross join lateral (
+          select up.area, a.scheme_code as scheme from up join area a on a.id = up.area
+          where up.leaf = w.leaf and up.depth > 0
+          union all
+          select null, null from leaves l where l.id = w.leaf and l.area is null
+        ) u
         left join leads ld on ld.parent = w.id
         left join entity_merge pm on pm.entity_id = coalesce(w.party_id, ld.party_id)
         left join party_affiliation br on br.party_id = coalesce(pm.into_id, w.party_id, ld.party_id)
           and br.kind = 'regional_branch' and br.valid @> r.day
         left join entity_merge bm on bm.entity_id = br.parent_party_id
-        where up.depth > 0
       `);
       const best = Map.groupBy(found.rows, (row) => row.body)
         .values()
@@ -8999,7 +9003,9 @@ export const elections = {
           const kinds = Map.groupBy(all, (row) => row.kind);
           const size = all[0]?.size ?? null;
           return [...kinds.values(), ...(kinds.size > 1 ? [all] : [])]
-            .flatMap((rows) => {
+            .flatMap((all) => {
+              const rows = all.filter((row) => row.region != null);
+              const unplaced = all.filter((row) => row.region == null);
               const leaves = new Set(rows.map((row) => row.leaf)).size;
               const chosen = Map.groupBy(rows, (row) => row.scheme)
                 .entries()
@@ -9014,7 +9020,7 @@ export const elections = {
                 )
                 .toArray()
                 .toSorted((a, b) => a.regions - b.regions)[0];
-              const counted = chosen?.rows ?? [];
+              const counted = [...(chosen?.rows ?? []), ...unplaced];
               let seats = 0;
               for (const row of counted) {
                 seats += row.seats;
@@ -9026,9 +9032,9 @@ export const elections = {
                 : [
                     {
                       body: rows[0]?.body ?? "",
-                      scheme: chosen.scheme,
+                      scheme: chosen.scheme ?? "",
                       seats,
-                      rows: chosen.rows,
+                      rows: counted,
                     },
                   ];
             })
@@ -9070,7 +9076,9 @@ export const elections = {
         names(
           [
             ...best.map((chamber) => chamber.body),
-            ...best.flatMap((chamber) => chamber.rows.map((row) => row.region)),
+            ...best.flatMap((chamber) =>
+              chamber.rows.map((row) => row.region ?? row.leaf),
+            ),
           ],
           null,
         ),
@@ -9089,8 +9097,13 @@ export const elections = {
       );
       const noun = new Map(nouns.rows.map((row) => [row.code, row.noun]));
       return best.map((chamber) => {
-        const titles = [...new Set(chamber.rows.map((row) => row.region))].map(
-          (region) => labels.full.get(region) ?? "",
+        const titles = [
+          ...new Set(chamber.rows.flatMap((row) => row.region ?? [])),
+        ].map((region) => labels.full.get(region) ?? "");
+        const isCollegiate = chamber.rows.every(
+          (row) =>
+            row.region != null ||
+            /universit/iu.test(labels.full.get(row.leaf) ?? ""),
         );
         const lead = titles[0]?.split(", ", 1)[0] ?? "";
         const shared =
@@ -9130,15 +9143,24 @@ export const elections = {
                 won += entry.seats;
               }
               return {
-                name: (labels.full.get(region) ?? "").slice(shared),
+                name:
+                  region == null
+                    ? isCollegiate
+                      ? m.regions_universities()
+                      : m.regions_unplaced()
+                    : (labels.full.get(region) ?? "").slice(shared),
+                isPlaced: region != null,
                 seats: won,
                 parties: tally,
               };
             })
             .toArray()
-            .toSorted((a, b) =>
-              a.name.localeCompare(b.name, undefined, { numeric: true }),
-            ),
+            .toSorted(
+              (a, b) =>
+                Number(b.isPlaced) - Number(a.isPlaced) ||
+                a.name.localeCompare(b.name, undefined, { numeric: true }),
+            )
+            .map(({ isPlaced: _, ...entry }) => entry),
           parties: [
             ...new Set(chamber.rows.flatMap((row) => row.party ?? [])),
           ].map((id) => ({
