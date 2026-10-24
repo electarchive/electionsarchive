@@ -5,6 +5,7 @@ import json
 import re
 import subprocess
 import unicodedata
+import zipfile
 from datetime import date
 from pathlib import Path
 from uuid import UUID
@@ -134,6 +135,22 @@ BUFFALO_NOTE = (
     "New York's fusion ballot prints them. Named write-in candidates are kept as candidates without a party; the "
     "workbooks' blank, void, and scattering column is left out."
 )
+MECKBOE = "https://web.archive.org/web/{}if_/http://meckboe.org/pages/Election/e_info/general{}/off1.html"
+NCSBE = "https://s3.amazonaws.com/dl.ncsbe.gov/ENRS/"
+CHARLOTTE = {
+    date(1999, 11, 2): MECKBOE.format(20101219103451, "99"),
+    date(2001, 11, 6): MECKBOE.format(20081204161819, "01"),
+    date(2003, 11, 4): MECKBOE.format(20101219114733, "03"),
+    date(2005, 11, 8): MECKBOE.format(20101125230849, "05"),
+    date(2011, 11, 8): NCSBE + "2011_11_08/results_pct_20111108.zip",
+    date(2013, 11, 5): NCSBE + "2013_11_05/results_sort_20131105.zip",
+}
+CHARLOTTE_NOTE = (
+    "Citywide totals from official results: the Mecklenburg County Board of Elections' official results pages for "
+    "1999 to 2005 (from the Internet Archive's copies of its old site), and the State Board of Elections' precinct "
+    "results files for 2011 and 2013, summed, with 2013's named write-ins counted in the write-ins line. Party labels "
+    "are as printed; the 1999 and 2001 pages print none."
+)
 SURNAMES = {"clarke": "clark"}
 PARTIES = {
     "D": ("democratic-party", "Democratic"),
@@ -199,6 +216,8 @@ def fetch() -> None:
         raw.fetch(SOURCE, link, suffix=Path(link).suffix if link.endswith((".pdf", ".json")) else ".html")
     for name, _ in BUFFALO.values():
         raw.fetch(SOURCE, ERIE + name, suffix=Path(name).suffix)
+    for link in CHARLOTTE.values():
+        raw.fetch(SOURCE, link, suffix=".zip" if link.endswith(".zip") else ".html")
 
 
 def parse() -> None:
@@ -478,7 +497,56 @@ def parse() -> None:
         ).with_columns(day=pl.lit(day), place=pl.lit("3611000"), county=pl.lit(None, pl.String))
         print(day, frame.select("candidate", "party", "votes").rows())
         rows.append(frame)
-    candidates = pl.concat(rows, how="diagonal").with_columns(write_in=pl.col("candidate") == "Write In")
+    for day, link in CHARLOTTE.items():
+        path = raw.cached(SOURCE, link).path
+        if link.endswith(".zip"):
+            with zipfile.ZipFile(path) as archive:
+                table = pl.read_csv(
+                    archive.read(next(name for name in archive.namelist() if name.endswith(".txt"))),
+                    infer_schema=False,
+                )
+            lines = (
+                table.filter(pl.col("contest") == "CITY OF CHARLOTTE MAYOR")
+                .group_by("choice", "party", maintain_order=True)
+                .agg(pl.col("total votes").cast(pl.Int64).sum())
+                .rows()
+            )
+        else:
+            text = [
+                line.strip()
+                for line in re.sub(r"<[^>]+>", "\n", html.unescape(path.read_text(errors="replace"))).splitlines()
+                if line.strip()
+            ]
+            start = next(i for i, line in enumerate(text) if line.startswith("Official Results as of"))
+            total = text.index("Total", start)
+            votes = []
+            for line in text[total + 1 :]:
+                if not line.isdigit():
+                    break
+                votes.append(int(line))
+            names = text[total - len(votes) : total]
+            parties = [line.upper() for line in text[start + 1 : total - len(votes)] if line.upper() in PARTIES]
+            lines = [(names[i], parties[i] if i < len(parties) else None, votes[i]) for i in range(len(votes))]
+        frame = pl.DataFrame(
+            [
+                (
+                    "Write In" if "WRITE" in candidate.upper() else candidate,
+                    party if party in PARTIES else None,
+                    votes,
+                )
+                for candidate, party, votes in lines
+            ],
+            schema={"candidate": pl.String, "party": pl.String, "votes": pl.Int64},
+            orient="row",
+        ).with_columns(day=pl.lit(day), place=pl.lit("3712000"), county=pl.lit(None, pl.String))
+        print(day, frame.select("candidate", "party", "votes").rows())
+        rows.append(frame)
+    candidates = (
+        pl.concat(rows, how="diagonal")
+        .group_by("day", "place", "county", "candidate", "party", maintain_order=True)
+        .agg(pl.col("votes").sum())
+        .with_columns(write_in=pl.col("candidate") == "Write In")
+    )
     for (day,), group in candidates.filter(pl.col("place") == "3651000").group_by("day"):
         print(
             day, group.group_by("candidate", "party").agg(pl.col("votes").sum()).sort("votes", descending=True).rows()
@@ -550,6 +618,20 @@ def emit() -> Path:
                 "https://elections.erie.gov/ElectionArch",
                 [ERIE + name for name, _ in BUFFALO.values()],
             ),
+            (
+                "3712000",
+                "Mecklenburg County Board of Elections",
+                "Official election results",
+                "https://vote.mecknc.gov/",
+                [link for link in CHARLOTTE.values() if not link.endswith(".zip")],
+            ),
+            (
+                "3712000:ncsbe",
+                "North Carolina State Board of Elections",
+                "Election results data",
+                "https://www.ncsbe.gov/results-data/election-results/historical-election-results-data",
+                [link for link in CHARLOTTE.values() if link.endswith(".zip")],
+            ),
         ):
             sources[place] = cs.source(publisher, title)
             cs.add(
@@ -580,6 +662,7 @@ def emit() -> Path:
                 "2404000": "baltimore_MD",
                 "4261000": "pittsburgh_PA",
                 "3611000": "buffalo_NY",
+                "3712000": "charlotte_NC",
             }[place]
             contest_key = f"alged:{place}_{day.year}_11_{city}_Mayor_mayor_1"
             contest = cs.key("us.contest", contest_key)
@@ -612,7 +695,7 @@ def emit() -> Path:
                 stage="certified",
                 kind="counted",
                 status="active",
-                source_id=sources[place],
+                source_id=sources.get(f"{place}:ncsbe" if day.year >= 2011 else place, sources[place]),
                 is_default=True,
                 completeness=1,
             )
@@ -626,6 +709,7 @@ def emit() -> Path:
                     "2404000": BALTIMORE_NOTE,
                     "4261000": PITTSBURGH_NOTE,
                     "3611000": BUFFALO_NOTE,
+                    "3712000": CHARLOTTE_NOTE,
                 }.get(place, DC_NOTE),
             )
             totals = (
