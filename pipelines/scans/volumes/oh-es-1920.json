@@ -1,0 +1,30 @@
+{
+  "year": 1920,
+  "day": "1920-11-02",
+  "polity": "US-OH",
+  "publisher": "Ohio Secretary of State",
+  "title": "Ohio Election Statistics, general election 1920-11-02, Representatives in Congress by county",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/ohioelectionsta02statgoog/page/n{page}_w2000.jpg",
+    "item": "https://archive.org/details/ohioelectionsta02statgoog"
+  },
+  "raw_source": "us.scans",
+  "offices": {
+    "house": "U.S. Representative in Congress, one table per district, counties down, columns by party"
+  },
+  "leaves": [
+    43,
+    44,
+    45,
+    46,
+    47,
+    48,
+    49,
+    50,
+    51,
+    52,
+    53,
+    54
+  ]
+}

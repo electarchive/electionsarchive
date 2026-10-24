@@ -1,0 +1,28 @@
+{
+  "year": 1898,
+  "day": "1898-11-08",
+  "polity": "US-OH",
+  "publisher": "Ohio Secretary of State",
+  "title": "Ohio Election Statistics, general election 1898-11-08, Representatives in Congress by county",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/ohioelectionsta01statgoog/page/n{page}_w2000.jpg",
+    "item": "https://archive.org/details/ohioelectionsta01statgoog"
+  },
+  "raw_source": "us.scans",
+  "offices": {
+    "house": "U.S. Representative in Congress, one table per district, counties down, columns by party"
+  },
+  "leaves": [
+    1270,
+    1271,
+    1272,
+    1273,
+    1274,
+    1275,
+    1276,
+    1277,
+    1278,
+    1279
+  ]
+}

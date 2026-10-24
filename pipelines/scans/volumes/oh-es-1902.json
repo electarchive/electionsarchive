@@ -1,0 +1,27 @@
+{
+  "year": 1902,
+  "day": "1902-11-04",
+  "polity": "US-OH",
+  "publisher": "Ohio Secretary of State",
+  "title": "Ohio Election Statistics, general election 1902-11-04, Representatives in Congress by county",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/ohioelectionsta04statgoog/page/n{page}_w2000.jpg",
+    "item": "https://archive.org/details/ohioelectionsta04statgoog"
+  },
+  "raw_source": "us.scans",
+  "offices": {
+    "house": "U.S. Representative in Congress, one table per district, counties down, columns by party"
+  },
+  "leaves": [
+    334,
+    335,
+    336,
+    337,
+    338,
+    339,
+    340,
+    341,
+    342
+  ]
+}
