@@ -8022,6 +8022,7 @@ export const elections = {
           to: v.nullable(v.string()),
           isCaretaker: v.boolean(),
           isBefore: v.boolean(),
+          size: v.nullable(v.number()),
           parties: v.array(
             v.object({
               ...PartyRef.entries,
@@ -8042,6 +8043,7 @@ export const elections = {
         to: string | null;
         isCaretaker: boolean;
         isBefore: boolean;
+        size: number | null;
       }>(sql`
         with here as (
           select e.id, e.polity_id, e.date_from,
@@ -8053,6 +8055,9 @@ export const elections = {
         select g.id, g.head_person_id as head, g.from_date::text as from, g.to_date::text as to,
           g.caretaker as "isCaretaker",
           g.from_date <= here.date_from and g.election_id is distinct from here.id as "isBefore",
+          (select bs.seats from body_size bs join body b on b.id = bs.body_id
+            where b.polity_id = g.polity_id and b.kind in ('lower_house', 'unicameral') and bs.valid @> g.from_date
+            order by b.kind limit 1) as size,
           (select n.text from name n where n.entity_id = g.id
             order by n.kind = 'short' desc, n.is_preferred desc limit 1) as name
         from here join government g on g.polity_id = here.polity_id
@@ -8098,6 +8103,7 @@ export const elections = {
         to: row.to,
         isCaretaker: row.isCaretaker,
         isBefore: row.isBefore,
+        size: row.size,
         parties: members.rows
           .filter((member) => member.government === row.id)
           .map((member) => ({

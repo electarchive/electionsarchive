@@ -37,7 +37,9 @@
       return {
         ...government,
         seats,
-        size: government.isBefore ? null : (chamber?.size ?? null),
+        size: government.isBefore
+          ? government.size
+          : (chamber?.size ?? government.size),
         parties,
         bar: parties
           .filter((party) => (party.seats ?? 0) > 0)
