@@ -187,6 +187,7 @@
         handover={data.handover}
         additional={data.additional}
         successors={data.successors}
+        statutes={data.statutes}
         boundaries={data.boundaries}
         surround={data.surround}
         match={data.match}

@@ -1175,4 +1175,105 @@ export const seats = {
         })),
       };
     }),
+  statutes: os
+    .meta(
+      openapi({
+        method: "GET",
+        path: "/contests/{id}/statutes",
+        summary:
+          "Seats a constituency lies within, or went into whole, at a boundary change, from links the redistribution Acts give in one direction only, on the first or last general election held under its boundaries",
+      }),
+    )
+    .input(v.object({ id: v.pipe(v.string(), v.uuid()) }))
+    .output(
+      v.array(
+        v.object({
+          isNext: v.boolean(),
+          year: v.string(),
+          name: v.string(),
+          path: v.nullable(v.string()),
+          from: v.nullable(v.string()),
+          to: v.nullable(v.string()),
+          basis: v.nullable(v.string()),
+          title: v.nullable(v.string()),
+          url: v.nullable(v.string()),
+        }),
+      ),
+    )
+    .handler(async ({ input }) => {
+      const found = await db.execute<{
+        isNext: boolean;
+        vintage: string;
+        area: string;
+        from: string | null;
+        to: string | null;
+        contest: string | null;
+        basis: string | null;
+        title: string | null;
+        url: string | null;
+      }>(sql`
+        with c as materialized (
+          select k.district_area_id as area, a.k, a.scheme_code, e.date_from as day
+          from contest k join election e on e.id = k.election_id join area a on a.id = k.district_area_id
+          where k.id = ${input.id}::uuid and k.kind = 'body_seats' and e.kind = 'general'
+        ),
+        s as materialized (
+          select bs.id, bs.valid, bs.vintage from boundary_set bs join c on bs.scheme_code = c.scheme_code and bs.valid @> c.day
+          order by bs.valid_from desc nulls last limit 1
+        )
+        select lower(t.valid) > lower(s.valid) as "isNext",
+          case when lower(t.valid) > lower(s.valid) then t.vintage else s.vintage end as vintage, ta.id::text as area,
+          extract(year from lower(t.valid))::text as from, extract(year from upper(t.valid))::text as to,
+          (select k.id::text from contest k join election e on e.id = k.election_id
+            where k.district_area_id = ta.id and k.kind = 'body_seats' and e.kind = 'general' and e.status = 'held'
+              and t.valid @> e.date_from
+            order by case when lower(t.valid) > lower(s.valid) then e.date_from end,
+              case when lower(t.valid) < lower(s.valid) then e.date_from end desc
+            limit 1) as contest,
+          ct.locator->>'basis' as basis, src.title, src.url
+        from s cross join c
+        join crosswalk x on x.from_boundary_set_id = s.id and x.method = 'exact'
+        join boundary_set t on t.id = x.to_boundary_set_id
+        join crosswalk y on y.from_boundary_set_id = x.to_boundary_set_id and y.to_boundary_set_id = x.from_boundary_set_id
+          and y.method = 'exact'
+        join crosswalk_weight w on w.crosswalk_id = x.id and w.from_k = c.k and w.exact
+        join area ta on ta.k = w.to_k
+        left join lateral (
+          select ci.locator, ci.source_id from citation ci
+          where ci.entity_id = c.area and ci.locator->>'crosswalk' = x.id::text
+            and (ci.locator->>'to' = w.to_k::text
+              or exists (select from area_code ac where ac.area_id = ta.id and ac.code = ci.locator->>'to'))
+          limit 1
+        ) ct on true
+        left join source src on src.id = ct.source_id
+        where not exists (
+            select from crosswalk_weight v where v.crosswalk_id = y.id and v.from_k = w.to_k and v.to_k = w.from_k
+          )
+          and not exists (
+            select from contest k join election e on e.id = k.election_id
+            where k.district_area_id = c.area and k.kind = 'body_seats' and e.kind = 'general' and e.status = 'held'
+              and s.valid @> e.date_from
+              and case when lower(t.valid) > lower(s.valid) then e.date_from > c.day else e.date_from < c.day end
+          )
+        order by 1, 2
+      `);
+      if (found.rows.length === 0) {
+        return [];
+      }
+      const [labels, slugs] = await Promise.all([
+        names(found.rows.map((row) => row.area)),
+        paths(found.rows.flatMap((row) => row.contest ?? [])),
+      ]);
+      return found.rows.map((row) => ({
+        isNext: row.isNext,
+        year: row.vintage,
+        name: labels.full.get(row.area) ?? "",
+        path: slugs.get(row.contest ?? "") ?? null,
+        from: row.from,
+        to: row.to,
+        basis: row.basis,
+        title: row.title,
+        url: row.url,
+      }));
+    }),
 };

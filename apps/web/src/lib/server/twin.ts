@@ -368,6 +368,7 @@ function markdown(data: Data, link: Link) {
         data.handover,
         data.additional,
         data.successors,
+        data.statutes,
         data.lists,
         link,
       );
@@ -1592,6 +1593,7 @@ function contestMarkdown(
   handover: Extract<Data, { kind: "contest" }>["handover"],
   additional: Extract<Data, { kind: "contest" }>["additional"],
   successors: Extract<Data, { kind: "contest" }>["successors"],
+  statutes: Extract<Data, { kind: "contest" }>["statutes"],
   lists: Extract<Data, { kind: "contest" }>["lists"],
   link: Link,
 ) {
@@ -1895,7 +1897,10 @@ function contestMarkdown(
         ]),
     ...(contest.origins == null ||
     contest.origins.length === 0 ||
-    contest.series.find((entry) => entry.current)?.year == null
+    contest.series.find((entry) => entry.current)?.year == null ||
+    contest.origins.every((origin) =>
+      statutes.some((entry) => !entry.isNext && entry.name === origin.name),
+    )
       ? []
       : [
           contest.origins.length === 1 &&
@@ -1927,7 +1932,10 @@ function contestMarkdown(
                 ),
               }),
         ]),
-    ...(successors == null
+    ...(successors == null ||
+    successors.places.every((place) =>
+      statutes.some((entry) => entry.isNext && entry.name === place.name),
+    )
       ? []
       : [
           successors.places.length === 1 &&
@@ -1957,6 +1965,31 @@ function contestMarkdown(
                 ),
               }),
         ]),
+    ...statutes.map((entry) =>
+      [
+        entry.isNext
+          ? m.statutes_into({
+              year: entry.year,
+              seat: link(entry.name, entry.path),
+            })
+          : m.statutes_within({
+              year: entry.year,
+              seat: link(entry.name, entry.path),
+              from: entry.from ?? "",
+              to: entry.to ?? "",
+            }),
+        ...(entry.basis == null
+          ? []
+          : [
+              m.statutes_basis({
+                basis:
+                  entry.url == null
+                    ? entry.basis
+                    : `[${entry.basis}](${entry.url})`,
+              }),
+            ]),
+      ].join(" "),
+    ),
     ...(contest.series.length < 2
       ? []
       : [

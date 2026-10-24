@@ -538,6 +538,7 @@ export async function archive(path: string, search: URLSearchParams) {
       handover,
       additional,
       successors,
+      statutes,
     ] = await found(
       Promise.all([
         call(router.contests.get, {
@@ -556,6 +557,7 @@ export async function archive(path: string, search: URLSearchParams) {
         call(router.seats.change, { id: slug.entity_id }),
         call(router.seats.additional, { id: slug.entity_id }),
         call(router.seats.successors, { id: slug.entity_id }),
+        call(router.seats.statutes, { id: slug.entity_id }),
       ]),
     );
     const boundaries = await call(router.contests.boundaries, {
@@ -606,6 +608,7 @@ export async function archive(path: string, search: URLSearchParams) {
       handover,
       additional,
       successors,
+      statutes,
       boundaries,
       surround,
       match,

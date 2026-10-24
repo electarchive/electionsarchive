@@ -59,6 +59,7 @@
     handover,
     additional,
     successors,
+    statutes,
     boundaries,
     surround,
     match,
@@ -71,6 +72,7 @@
     handover: Extract<PageData, { kind: "contest" }>["handover"];
     additional: Extract<PageData, { kind: "contest" }>["additional"];
     successors: Extract<PageData, { kind: "contest" }>["successors"];
+    statutes: Extract<PageData, { kind: "contest" }>["statutes"];
     boundaries: Extract<PageData, { kind: "contest" }>["boundaries"];
     surround: Extract<PageData, { kind: "contest" }>["surround"];
     match: string;
@@ -162,7 +164,13 @@
   const origins = $derived.by(() => {
     const list = contest.origins ?? [];
     const year = contest.series.find((entry) => entry.current)?.year;
-    if (list.length === 0 || year == null) {
+    if (
+      list.length === 0 ||
+      year == null ||
+      list.every((origin) =>
+        statutes.some((link) => !link.isNext && link.name === origin.name),
+      )
+    ) {
       return [];
     }
     const [only] = list;
@@ -211,7 +219,12 @@
   });
 
   const heirs = $derived.by(() => {
-    if (successors == null) {
+    if (
+      successors == null ||
+      successors.places.every((place) =>
+        statutes.some((link) => link.isNext && link.name === place.name),
+      )
+    ) {
       return [];
     }
     const [only] = successors.places;
@@ -1462,6 +1475,39 @@
           >{/if}{/each}
     </p>
   {/if}
+  {#each statutes as link, index (index)}
+    {const parts = $derived(
+      (link.isNext
+        ? m.statutes_into({ year: link.year, seat: "\u0001" })
+        : m.statutes_within({
+            year: link.year,
+            seat: "\u0001",
+            from: link.from ?? "",
+            to: link.to ?? "",
+          })
+      ).split("\u0001"),
+    )}
+    <p
+      class="text-[0.9375rem] text-pretty text-muted-foreground max-inline-[60ch] md:col-span-2"
+    >
+      {parts[0]}{#if link.path == null}{link.name}{:else}<Preview
+          class="text-foreground underline decoration-border underline-offset-4 hover:decoration-foreground"
+          path={link.path}>{link.name}</Preview
+        >{/if}{parts[1]}
+      {#if link.basis != null}
+        <span class="block text-[0.8125rem]"
+          >{#if link.url == null}{m.statutes_basis({
+              basis: link.basis,
+            })}{:else}<a
+              class="underline decoration-border underline-offset-4 hover:decoration-foreground"
+              href={link.url}
+              rel="external noreferrer"
+              >{m.statutes_basis({ basis: link.basis })}</a
+            >{/if}</span
+        >
+      {/if}
+    </p>
+  {/each}
   {#if contest.county != null}
     {const parts = $derived(
       m.contest_county({ county: "\u0001" }).split("\u0001"),
