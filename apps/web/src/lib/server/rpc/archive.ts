@@ -6260,6 +6260,10 @@ export const contests = {
                   path: slugs.get(election) ?? null,
                 },
           groups: groups
+            .filter(
+              (row) =>
+                row.kind !== "owner" || row.owner != null || row.count === 1,
+            )
             .toSorted(
               (a, b) =>
                 GROUPS.indexOf(
