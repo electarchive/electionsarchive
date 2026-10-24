@@ -3571,6 +3571,22 @@ export const contests = {
           union
           select p.parent_id from area_parent p join anc on p.area_id = anc.id
         ),
+        later(id) as (
+          select ${contest.place?.id ?? null}::uuid
+          union
+          select t.area_id from later
+          join area_event_member f on f.area_id = later.id and f.role = 'from'
+          join area_event e on e.id = f.event_id and e.kind = 'boundary_changed'
+          join area_event_member t on t.event_id = e.id and t.role = 'to'
+        ),
+        earlier(id) as (
+          select ${contest.place?.id ?? null}::uuid
+          union
+          select f.area_id from earlier
+          join area_event_member t on t.area_id = earlier.id and t.role = 'to'
+          join area_event e on e.id = t.event_id and e.kind = 'boundary_changed'
+          join area_event_member f on f.event_id = e.id and f.role = 'from'
+        ),
         roots as (
           select c.id, case when c.kind = 'ballot_question' then c.id::text
             else concat_ws(':', c.office_id, c.body_id, c.kind, c.round_number, c.party_scope_id) end as series,
@@ -3581,6 +3597,9 @@ export const contests = {
             select x.id from contest x where x.district_area_id in (select id from anc) and x.allocation_parent_id is null
             union
             select x.id from contest x where x.district_area_id = ${contest.place?.id ?? null}::uuid and x.allocation_parent_id is null
+            union
+            select x.id from contest x
+            where x.district_area_id in (select id from later union select id from earlier) and x.allocation_parent_id is null
             union
             select x.id from polity_territory pt
             join election y on y.polity_id = pt.polity_id and pt.valid @> y.date_from
