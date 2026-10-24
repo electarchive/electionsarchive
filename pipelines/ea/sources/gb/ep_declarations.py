@@ -17,7 +17,7 @@ from ea.changeset import Changeset, slug
 from ea.store import DATA, connect
 
 SOURCE = "gb.ep_declarations"
-VERSION = "2"
+VERSION = "3"
 PARSED = DATA / "parsed" / SOURCE
 LIBRARY = "House of Commons Library"
 PAPERS = {
@@ -48,6 +48,37 @@ LONDON = (
     "Regional Returning Officer, London Region",
     "Declaration of result, European Parliamentary Election, 23 May 2019, London Region",
 )
+DC = "https://candidates.democracyclub.org.uk"
+SOPN_DATES = {2014: "2014-05-22", 2019: "2019-05-23"}
+DC_PARTIES = {
+    "PP52": "conservative",
+    "PP53": "labour",
+    "PP90": "liberal-democrats",
+    "PP63": "green-party",
+    "PP130": "scottish-greens",
+    "PP85": "uk-independence-party",
+    "PP102": "scottish-national-party",
+    "PP77": "plaid-cymru",
+    "PP106": "british-national-party",
+    "PP7931": "reform-uk",
+    "PP9077": "the-independent-group-for-change",
+    "PP17": "english-democrats",
+    "PP616": "animal-welfare-party",
+    "PP9060": "uk-european-union-party",
+    "PP2755": "women-s-equality-party",
+    "PP79": "christian-peoples-alliance",
+    "PP73": "socialist-labour-party",
+    "PP2164": "no2eu",
+    "PP1918": "an-independence-from-europe",
+    "PP1931": "national-health-action-party",
+    "PP2214": "britain-first",
+    "PP2055": "the-yorkshire-party",
+    "PP2120": "yorkshire-first",
+    "PP32": "national-liberal-party-true-liberalism",
+    "PP133": "the-peace-party-non-violence-justice-environment",
+    "PP2342": "the-roman-party-ave",
+    "PP770": "pirate-party-uk",
+}
 API = "https://data.europarl.europa.eu/api/v2"
 FORMAT = "format=application%2Fld%2Bjson"
 TERMS = {1999: 5, 2004: 6, 2009: 7, 2014: 8, 2019: 9}
@@ -180,6 +211,11 @@ NATIONAL_PARTIES = {
     "SNP": "scottish-national-party",
     "UKIP": "uk-independence-party",
 }
+RENAMED = {(2019, "south-east", "Philips")}
+UNRANKED = (
+    "The source names only the members elected from each list, not the full ranked lists, so list ranks and the "
+    "members below each cut line are not recorded."
+)
 VOTES, REGISTERED, BALLOTS, VALID, INVALID = 1, 2, 3, 4, 5
 LINE = re.compile(r"^\s*(\S.*?\S)\s{3,}([\d,]+)\s*$")
 
@@ -209,9 +245,47 @@ def get(url: str, suffix: str = ".json") -> raw.Artifact:
             try:
                 return raw.fetch(SOURCE, url, suffix=suffix)
             except httpx.HTTPStatusError as error:
-                if error.response.status_code < 500 or attempt == 4:
+                if error.response.status_code not in (429,) and error.response.status_code < 500 or attempt == 4:
                     raise
         raise AssertionError
+
+
+def ballots_url(date: str) -> str:
+    return f"{DC}/api/next/ballots/?election_id=europarl.{date}&page_size=50"
+
+
+def export_url(date: str) -> str:
+    fields = "".join(f"&extra_fields={field}" for field in ("wikidata_id", "mnis_id", "party_list_position", "elected"))
+    return f"{DC}/data/export_csv/?election_id=europarl.{date}{fields}"
+
+
+def gb_ballots(date: str) -> list[dict]:
+    return [
+        ballot
+        for ballot in json.loads(raw.cached(SOURCE, ballots_url(date)).path.read_text())["results"]
+        if ballot["post"]["slug"] != "uk-northern-ireland"
+    ]
+
+
+def sopn(ballot: dict) -> str:
+    for url in (ballot["sopn"]["source_url"], ballot["sopn"]["uploaded_file"]):
+        try:
+            if raw.cached(SOURCE, url).path.read_bytes()[:4] == b"%PDF":
+                return url
+        except LookupError:
+            continue
+    raise LookupError(f"no SoPN for {ballot['ballot_paper_id']}")
+
+
+def party_key(label: str, region: str) -> str | None:
+    key = (
+        SNP_PC[region]
+        if label == "SNP/PC"
+        else NATIONAL_PARTIES.get(label[3:])
+        if label.startswith("EP:")
+        else PARTIES.get(label)
+    )
+    return "scottish-greens" if region == "scotland" and key == "green-party" else key
 
 
 def listing(term: int, offset: int) -> str:
@@ -252,6 +326,16 @@ def fetch() -> None:
                 if membership.get("membershipClassification") == NATIONAL:
                     get(f"{API}/corporate-bodies/{membership['organization'].split('/')[1]}?{FORMAT}")
     get(wikidata_query())
+    for date in SOPN_DATES.values():
+        get(ballots_url(date))
+        get(export_url(date), ".csv")
+        for ballot in gb_ballots(date):
+            for url in (ballot["sopn"]["source_url"], ballot["sopn"]["uploaded_file"]):
+                try:
+                    if get(url, ".pdf").path.read_bytes()[:4] == b"%PDF":
+                        break
+                except httpx.HTTPError:
+                    continue
 
 
 def region_of(label: str) -> str:
@@ -450,7 +534,78 @@ def parse() -> None:
             }
         )
     elected = pl.DataFrame(matched, infer_schema_length=None)
+
+    def same(row: dict[str, str], name: str) -> bool:
+        printed = folded(f"{row['forenames']} {row['surname']} {row['commonly_known_as']}").split()
+        held = folded(name).split()
+        return (
+            held[-1] in printed or (folded(row["surname"]) or printed[-1]).split()[-1] in held or held[0] == printed[0]
+        )
+
+    with open(Path(__file__).with_name("ep_sopn.tsv"), newline="") as handle:
+        printed = list(csv.DictReader(handle, delimiter="\t"))
+    lists = []
+    for year, date in SOPN_DATES.items():
+        export = list(csv.DictReader(raw.cached(SOURCE, export_url(date)).path.read_text().splitlines()))
+        for ballot in gb_ballots(date):
+            region = ballot["post"]["slug"].removeprefix("uk-")
+            known: dict[str, list[dict[str, str]]] = {}
+            for row in export:
+                if row["ballot_paper_id"] == ballot["ballot_paper_id"]:
+                    known.setdefault(row["party_id"], []).append(row)
+            groups: dict[str, list[dict[str, str]]] = {}
+            for row in printed:
+                if int(row["year"]) == year and row["region"] == region and not row["remark"]:
+                    groups.setdefault(row["party_printed"], []).append(row)
+            if sum(map(len, groups.values())) != sum(map(len, known.values())):
+                raise ValueError(
+                    f"{year} {region}: {sum(map(len, groups.values()))} printed, DC lists {sum(map(len, known.values()))}"
+                )
+            for party, rows in groups.items():
+                if party == "Independent":
+                    pairs = [
+                        (row, next(d for d in known["ynmp-party:2"] if same(row, d["person_name"]))) for row in rows
+                    ]
+                else:
+                    dc_party = max(
+                        (id for id in known if id != "ynmp-party:2"),
+                        key=lambda id: sum(
+                            any(
+                                folded(d["person_name"]).split()[-1]
+                                in folded(f"{row['surname']} {row['commonly_known_as']}").split()
+                                for d in known[id]
+                            )
+                            for row in rows
+                        ),
+                    )
+                    by_position = {int(d["party_list_position"] or 1): d for d in known[dc_party]}
+                    if len(by_position) != len(rows) or [int(row["position"]) for row in rows] != list(
+                        range(1, len(rows) + 1)
+                    ):
+                        raise ValueError(f"{year} {region} {party}: positions do not run 1 to {len(rows)}")
+                    pairs = [(row, by_position[int(row["position"])]) for row in rows]
+                for row, dc in pairs:
+                    if not same(row, dc["person_name"]) and (year, region, row["surname"]) not in RENAMED:
+                        raise ValueError(
+                            f"{year} {region} {party} {row['position']}: {row} against {dc['person_name']}"
+                        )
+                    lists.append(
+                        {
+                            "year": year,
+                            "region": region,
+                            "dc_party": dc["party_id"],
+                            "position": int(row["position"]) if row["position"] else None,
+                            "ballot_name": row["commonly_known_as"] or f"{row['forenames']} {row['surname']}",
+                            "dc_person": dc["person_id"],
+                            "dc_name": dc["person_name"],
+                            "qid": dc["wikidata_id"].strip('"') or None,
+                            "mnis": dc["mnis_id"] or None,
+                            "elected": dc["elected"] == "t",
+                            "sopn": sopn(ballot),
+                        }
+                    )
     PARSED.mkdir(parents=True, exist_ok=True)
+    pl.DataFrame(lists, infer_schema_length=None).write_parquet(PARSED / "lists.parquet")
     frame.write_parquet(PARSED / "results.parquet")
     elected.write_parquet(PARSED / "members.parquet")
     print(
@@ -519,7 +674,7 @@ def emit() -> Path:
             license="CC BY 4.0",
         )
         parties: dict[str, UUID] = {}
-        for key in {*PARTIES.values(), *NATIONAL_PARTIES.values()}:
+        for key in {*PARTIES.values(), *NATIONAL_PARTIES.values(), *DC_PARTIES.values()}:
             parties[key] = cs.key(*EXISTING[key]) if key in EXISTING else cs.key("gb.party", key)
             if parties[key] in cs.minted:
                 if key not in NEW_PARTIES:
@@ -532,7 +687,7 @@ def emit() -> Path:
             (scheme, value): entity
             for scheme, value, entity in conn.execute(
                 """select scheme, value, entity_id from external_id x
-                   where scheme in ('wikidata', 'mnis', 'ep.mep')
+                   where scheme in ('wikidata', 'mnis', 'ep.mep', 'democracyclub.person')
                      and not exists (select from entity_merge m where m.entity_id = x.entity_id)"""
             ).fetchall()
         }
@@ -557,6 +712,42 @@ def emit() -> Path:
         ).fetchall():
             owned.setdefault(person, []).append((id, text))
         rounds = elected.filter(pl.col("round").is_not_null()).height
+        lists = pl.read_parquet(PARSED / "lists.parquet")
+        ranked = 0
+        stale: dict[UUID, list[UUID]] = {}
+        for note, entity in conn.execute(
+            """select n.id, n.entity_id from note n join changeset c on c.id = n.changeset_id and c.pipeline = %s
+               where n.body_md = %s""",
+            [SOURCE, UNRANKED],
+        ).fetchall():
+            stale.setdefault(entity, []).append(note)
+        sopns: dict[str, UUID] = {}
+        for year, date in SOPN_DATES.items():
+            for ballot in gb_ballots(date):
+                url = sopn(ballot)
+                region = REGIONS[ballot["post"]["slug"].removeprefix("uk-")]
+                publisher = f"Regional Returning Officer, {region} Region"
+                title = f"Statement of Parties and Individual Candidates Nominated, European Parliamentary Election, {date}, {region}"
+                sopns[url] = cs.source(publisher, title)
+                cs.add(
+                    "source",
+                    id=sopns[url],
+                    kind="official_body",
+                    publisher=publisher,
+                    title=title,
+                    url=re.sub(r"^https://web\.archive\.org/web/\d+(?:id_)?/", "", ballot["sopn"]["source_url"]),
+                )
+                cs.artifact(raw.cached(SOURCE, url), sopns[url])
+        dc_source = cs.source("Democracy Club", "Candidates: European Parliament elections 2014 and 2019")
+        cs.add(
+            "source",
+            id=dc_source,
+            kind="community",
+            publisher="Democracy Club",
+            title="Candidates: European Parliament elections 2014 and 2019",
+            url=f"{DC}/elections/europarl.2019-05-23/",
+            license="CC BY 4.0",
+        )
         for (year, region), lines in frame.sort("year").group_by("year", "region", maintain_order=True):
             contest_key = f"GB:{year}:gb.ep_constituency:{region}"
             contest = cs.key("eu.contest", contest_key)
@@ -581,7 +772,7 @@ def emit() -> Path:
                 nonlocal position, others
                 if label in options:
                     return options[label]
-                key = SNP_PC[region] if label == "SNP/PC" else PARTIES.get(label)
+                key = party_key(label, region)
                 if label == "Others":
                     if others is None:
                         others = cs.key(f"{SOURCE}.option", f"{year}:{region}:others")
@@ -715,24 +906,37 @@ def emit() -> Path:
             for label, amount in votes:
                 value(result_set, unit, option_of(label), VOTES, amount)
             members = elected.filter((pl.col("year") == year) & (pl.col("region") == region))
+            listed = lists.filter((pl.col("year") == year) & (pl.col("region") == region)).to_dicts()
+            used: set[int] = set()
+            unlisted: set[str] = set()
             seats: dict[UUID, int] = {}
             for member in members.iter_rows(named=True):
-                label = member["party"].removeprefix("EP:")
-                key = (
-                    SNP_PC[region]
-                    if label == "SNP/PC"
-                    else NATIONAL_PARTIES.get(label)
-                    if member["party"].startswith("EP:")
-                    else PARTIES.get(label)
-                )
-                option = next(
-                    (options[l] for l in options if (SNP_PC[region] if l == "SNP/PC" else PARTIES.get(l)) == key), None
-                )
+                key = party_key(member["party"], region)
+                option = next((options[l] for l in options if party_key(l, region) == key), None)
                 if key is None or option is None:
                     raise ValueError(
                         f"{year} {region}: {member['name']} elected for {member['party']!r}, which has no line"
                     )
                 seats[option] = seats.get(option, 0) + 1
+                surname = folded(member["name"]).split()[-1]
+                match = next(
+                    (
+                        index
+                        for index, row in enumerate(listed)
+                        if index not in used
+                        and DC_PARTIES.get(row["dc_party"]) == key
+                        and (
+                            (member["qid"] is not None and row["qid"] == member["qid"])
+                            or surname in (folded(row["dc_name"]).split()[-1], folded(row["ballot_name"]).split()[-1])
+                        )
+                    ),
+                    None,
+                )
+                if listed and match is None:
+                    raise ValueError(f"{year} {region}: {member['name']} is on no list")
+                row = listed[match] if match is not None else None
+                if match is not None:
+                    used.add(match)
                 ident = member["qid"] or member["ep"] or f"{year}:{region}:{slug(member['name'])}"
                 if ident not in persons:
                     held = [
@@ -774,6 +978,11 @@ def emit() -> Path:
                             if id not in keyed:
                                 cs.add("external_id", entity_id=person, scheme=id[0], value=id[1])
                     persons[ident] = person
+                if row is not None and ("democracyclub.person", row["dc_person"]) not in known:
+                    known[("democracyclub.person", row["dc_person"])] = persons[ident]
+                    cs.add(
+                        "external_id", entity_id=persons[ident], scheme="democracyclub.person", value=row["dc_person"]
+                    )
                 candidacy = cs.key(f"{SOURCE}.candidacy", f"{year}:{region}:{member['ep'] or slug(member['name'])}")
                 cs.add(
                     "candidacy",
@@ -781,7 +990,8 @@ def emit() -> Path:
                     person_id=persons[ident],
                     option_id=option,
                     role="list_member",
-                    ballot_name=member["name"],
+                    list_position=row["position"] if row is not None else None,
+                    ballot_name=row["ballot_name"] if row is not None else member["name"],
                     member_of_party_id=parties[key],
                     is_independent=False,
                 )
@@ -801,13 +1011,74 @@ def emit() -> Path:
                     )
             for option, count in seats.items():
                 cs.add("outcome", result_set_id=result_set, option_id=option, kind="won", seats=count)
-            cs.add(
-                "note",
-                entity_id=result_set,
-                kind="caveat",
-                body_md="The source names only the members elected from each list, not the full ranked lists, so list "
-                "ranks and the members below each cut line are not recorded.",
-            )
+            for index, row in enumerate(listed):
+                if index in used or row["dc_party"] == "ynmp-party:2":
+                    continue
+                if row["elected"]:
+                    raise ValueError(f"{year} {region}: {row['ballot_name']} elected, but no member matched")
+                key = DC_PARTIES.get(row["dc_party"])
+                option = next((options[l] for l in options if key is not None and party_key(l, region) == key), None)
+                if option is None:
+                    unlisted.add(row["dc_party"])
+                    continue
+                ids = [
+                    (scheme, value)
+                    for scheme, value in (
+                        ("wikidata", row["qid"]),
+                        ("mnis", row["mnis"]),
+                        ("democracyclub.person", row["dc_person"]),
+                    )
+                    if value is not None
+                ]
+                person = next((known[id] for id in ids if id in known), None)
+                keyed = []
+                if person is None:
+                    keyed = ids[:1]
+                    person = cs.key(*ids[0])
+                    cs.add("person", id=person)
+                    if person in cs.minted:
+                        cs.add(
+                            "name", entity_id=person, text=row["dc_name"], lang="en", kind="official", is_preferred=True
+                        )
+                for id in ids:
+                    if id not in known:
+                        known[id] = person
+                        if id not in keyed:
+                            cs.add("external_id", entity_id=person, scheme=id[0], value=id[1])
+                cs.add(
+                    "candidacy",
+                    id=cs.key(f"{SOURCE}.candidacy", f"{year}:{region}:dc{row['dc_person']}"),
+                    person_id=person,
+                    option_id=option,
+                    role="list_member",
+                    list_position=row["position"],
+                    ballot_name=row["ballot_name"],
+                    member_of_party_id=parties[key],
+                    is_independent=False,
+                )
+                ranked += 1
+            if listed:
+                for note in stale.get(result_set, []):
+                    cs.add(
+                        "note_drop",
+                        note_id=note,
+                        entity_id=result_set,
+                        body_md=UNRANKED,
+                        reason="The full lists from the Statement of Persons Nominated are now loaded.",
+                    )
+                cs.add("citation", entity_id=result_set, source_id=sopns[listed[0]["sopn"]])
+                cs.add("citation", entity_id=result_set, source_id=dc_source)
+                if unlisted:
+                    cs.add(
+                        "note",
+                        entity_id=result_set,
+                        kind="caveat",
+                        body_md="List ranks are from the Regional Returning Officer's Statement of Parties and "
+                        "Individual Candidates Nominated. The lists of parties the source groups as Others are not "
+                        "recorded, because their votes are not given separately.",
+                    )
+            else:
+                cs.add("note", entity_id=result_set, kind="caveat", body_md=UNRANKED)
             if year in (2014, 2019) and region != "london":
                 cs.add(
                     "citation",
@@ -840,5 +1111,5 @@ def emit() -> Path:
                             )
                         else:
                             value(pcon_set, pcons[folded(name.replace("&", "and"))], None, VALID, row["value"])
-        print(f"{rounds} members with a round, {len(persons)} persons")
+        print(f"{rounds} members with a round, {len(persons)} persons, {ranked} unelected list members")
         return cs.write()
