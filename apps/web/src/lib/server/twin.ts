@@ -2348,7 +2348,11 @@ function resultsMarkdown(
   for (const row of contest.rows) {
     won += row.current?.seats ?? 0;
   }
-  const hasSeats = won > 1;
+  const hasSeats =
+    won > 1 &&
+    contest.rows.some(
+      (row) => (row.current?.seats ?? 0) > 0 && row.current?.person == null,
+    );
   const hasParty = contest.rows.some(
     (row) => row.current?.person != null && row.short != null,
   );

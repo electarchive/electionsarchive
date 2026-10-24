@@ -605,7 +605,12 @@
     for (const row of contest.rows) {
       total += row.current?.seats ?? 0;
     }
-    return total > 1;
+    return (
+      total > 1 &&
+      contest.rows.some(
+        (row) => (row.current?.seats ?? 0) > 0 && row.current?.person == null,
+      )
+    );
   });
   const phrases = $derived.by(() => {
     const mine = contest.name.replace(/^\d{4}\s+/u, "").split(" ");
