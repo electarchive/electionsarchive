@@ -69,6 +69,7 @@ FILES = {
         ],
     ),
 }
+RUNOFFS = {"GA": ("ga2", "2026-06-16", ["ballot-items"], "2026-05-19")}
 FIPS = {"TX": "48", "CA": "06", "MI": "26", "PA": "42", "WV": "54", "MS": "28", "SD": "46", "WY": "56", "OR": "41", "KY": "21", "CO": "08", "AZ": "04", "TN": "47", "NC": "37", "IL": "17", "NM": "35", "NY": "36", "VA": "51", "AL": "01", "ND": "38", "MD": "24", "MN": "27", "VT": "50", "KS": "20", "GA": "13", "WA": "53", "UT": "49", "IN": "18", "FL": "12", "ID": "16", "NJ": "34"}
 RUNOFF_SYSTEMS = {"GA": "two_round", "TX": "two_round", "MS": "two_round", "SD": "two_round_35", "NC": "two_round_30"}
 THRESHOLDS = {"GA": 50, "TX": 50, "MS": 50, "SD": 35, "NC": 30}
@@ -155,6 +156,10 @@ VT_CACHE: dict[str, str] = {}
 EV = {
     "ga": (
         "https://results.sos.ga.gov/results/public/api/elections/Georgia/GeneralPrimary51926/",
+        re.compile(r"(?:(?P<senate>US Senate)|(?P<governor>Governor)|US House of Representatives - District (?P<district>\d+)) - (?P<party>Rep|Dem)"),
+    ),
+    "ga2": (
+        "https://results.sos.ga.gov/results/public/api/elections/Georgia/06162026GeneralPrimaryRunoff/",
         re.compile(r"(?:(?P<senate>US Senate)|(?P<governor>Governor)|US House of Representatives - District (?P<district>\d+)) - (?P<party>Rep|Dem)"),
     ),
     "id": (
@@ -403,12 +408,12 @@ def title(text: str) -> str:
 
 
 def fetch() -> None:
-    for code, _, names in FILES.values():
+    for code, _, names, *_ in [*FILES.values(), *RUNOFFS.values()]:
         for name in names:
             if code == "fl":
                 raw.store(SOURCE, FL_URL, httpx.get(FL_URL, headers=BROWSER, follow_redirects=True, timeout=300).content, suffix=".txt", retrieved_at=datetime.now(UTC), media_type="text/tab-separated-values")
                 continue
-            raw.fetch(SOURCE, url(code, name), suffix={"nj": ".pdf", "ks": ".xlsx", "in": ".json", "ga": ".json", "wa": ".json", "ut": ".json", "id": ".json"}.get(code) or name[name.rindex(".") :])
+            raw.fetch(SOURCE, url(code, name), suffix={"nj": ".pdf", "ks": ".xlsx", "in": ".json", "ga": ".json", "ga2": ".json", "wa": ".json", "ut": ".json", "id": ".json"}.get(code) or name[name.rindex(".") :])
     fetch_ballot_items()
 
 
@@ -541,19 +546,24 @@ def emit() -> Path:
                     persons[(state, slug(text))] = id
             return persons[(state, slug(text))]
 
-        sources: dict[str, UUID] = {}
+        sources: dict[tuple[str, int], UUID] = {}
         retired_persons: set[UUID] = set()
-        elections: dict[str, UUID] = {}
-        totals: dict[str, int] = {}
-        for state, (code, day, files) in FILES.items():
+        elections: dict[tuple[str, int], UUID] = {}
+        totals: dict[tuple[str, int], int] = {}
+        for state, stage_no, (code, day, files, *first) in [
+            *((state, 1, entry) for state, entry in FILES.items()),
+            *((state, 2, entry) for state, entry in RUNOFFS.items()),
+        ]:
+            round_slot = (state, stage_no)
+            round_word = "primary runoff" if stage_no == 2 else "primary"
             state_name = state_names[state]
             publisher, address, how = OFFICIAL.get(state, ("OpenElections", f"https://github.com/openelections/openelections-data-{code}", ""))
-            source_title = f"{state_name} 2026 primary results by county"
-            sources[state] = cs.source(publisher, source_title)
-            if sources[state] in cs.minted:
+            source_title = f"{state_name} 2026 primary{' runoff' if stage_no == 2 else ''} results by county"
+            sources[round_slot] = cs.source(publisher, source_title)
+            if sources[round_slot] in cs.minted:
                 cs.add(
                     "source",
-                    id=sources[state],
+                    id=sources[round_slot],
                     kind="official_body" if state in OFFICIAL else "community",
                     publisher=publisher,
                     title=source_title,
@@ -561,22 +571,22 @@ def emit() -> Path:
                     license=None,
                 )
             for file in files:
-                cs.artifact(raw.cached(SOURCE, url(code, file)), sources[state])
-            election_key = f"{day}:{state}:primary"
-            elections[state] = cs.key("us.election", election_key)
-            if elections[state] in cs.minted:
+                cs.artifact(raw.cached(SOURCE, url(code, file)), sources[round_slot])
+            election_key = f"{day}:{state}:{'runoff' if stage_no == 2 else 'primary'}"
+            elections[round_slot] = cs.key("us.election", election_key)
+            if elections[round_slot] in cs.minted:
                 cs.add(
                     "election",
-                    id=elections[state],
+                    id=elections[round_slot],
                     polity_id=cs.polity(f"US-{state}"),
                     parent_id=None,
-                    kind="primary",
+                    kind="runoff" if stage_no == 2 else "primary",
                     date_from=day,
                     date_to=day,
                     status="held",
                 )
-                name(elections[state], f"2026 {state_name} primary election")
-                cs.add("slug", path=f"us/{state.lower()}/{day}-primary", entity_id=elections[state])
+                name(elections[round_slot], f"2026 {state_name} primary runoff election" if stage_no == 2 else f"2026 {state_name} primary election")
+                cs.add("slug", path=f"us/{state.lower()}/{day}-{round_word.replace(' ', '-')}", entity_id=elections[round_slot])
             grouped: dict[tuple[str, str, str], dict[tuple[str, str, str], dict[str, int]]] = defaultdict(
                 lambda: defaultdict(lambda: defaultdict(int))
             )
@@ -648,19 +658,19 @@ def emit() -> Path:
                     number = int(district)
                     suffix = "th" if 10 <= number % 100 <= 20 else ORDINALS.get(number % 10, "th")
                     at_large = number == 0
-                    title_text = f"2026 U.S. House {scope_label + ' ' if scope else ''}primary in {state_name}'s " + (
+                    title_text = f"2026 U.S. House {scope_label + ' ' if scope else ''}{round_word} in {state_name}'s " + (
                         "at-large congressional district" if at_large else f"{number}{suffix} congressional district"
                     )
                 elif chamber == "senate":
-                    title_text = f"2026 U.S. Senate {scope_label + ' ' if scope else ''}primary in {state_name}"
+                    title_text = f"2026 U.S. Senate {scope_label + ' ' if scope else ''}{round_word} in {state_name}"
                 else:
                     title_text = f"2026 {state_name} gubernatorial " + (
-                        f"{scope_label} primary" if scope else "top-two primary"
+                        f"{scope_label} {round_word}" if scope else "top-two primary"
                     )
                 cs.add(
                     "contest",
                     id=contest,
-                    election_id=elections[state],
+                    election_id=elections[round_slot],
                     kind=kind,
                     office_id=office,
                     body_id=body,
@@ -672,14 +682,15 @@ def emit() -> Path:
                     if scope
                     else None,
                     term=term,
-                    round_number=1,
+                    round_number=stage_no,
+                    previous_round_id=cs.key("us.contest", f"{first[0]}:{state}:{key_tail}") if stage_no == 2 else None,
                     electoral_system_id=systems["top_two"] if state in TOP_TWO else systems[RUNOFF_SYSTEMS.get(state, "fptp")],
                     default_result_kind=result_kind,
                 )
                 name(contest, title_text)
                 cs.add(
                     "slug",
-                    path=f"us/{state.lower()}/{day}-primary/{chamber}"
+                    path=f"us/{state.lower()}/{day}-{round_word.replace(' ', '-')}/{chamber}"
                     + (f"-{district}" if district else "")
                     + (f"-{scope}" if scope else ""),
                     entity_id=contest,
@@ -691,12 +702,12 @@ def emit() -> Path:
                 cs.add(
                     "result_set",
                     id=result_set,
-                    election_id=elections[state],
+                    election_id=elections[round_slot],
                     contest_id=contest,
                     stage="certified",
                     kind="counted",
                     status="active",
-                    source_id=sources[state],
+                    source_id=sources[round_slot],
                     is_default=True,
                     completeness=1,
                 )
@@ -738,7 +749,7 @@ def emit() -> Path:
                         named.append((sum(by_county.values()), option))
                 named.sort(key=lambda entry: -entry[0])
                 everyone = sum(votes for votes, _ in named)
-                if state in TOP_TWO or (len(named) > 1 and state in THRESHOLDS and named[0][0] * 100 <= THRESHOLDS[state] * everyone):
+                if state in TOP_TWO or (stage_no == 1 and len(named) > 1 and state in THRESHOLDS and named[0][0] * 100 <= THRESHOLDS[state] * everyone):
                     leaders = named[:2]
                     if len(named) > 2 and named[1][0] == named[2][0]:
                         cs.add("note", entity_id=result_set, kind="caveat", body_md="A tie for the last advancing place leaves the outcome unrecorded.")
@@ -749,6 +760,6 @@ def emit() -> Path:
                     if len(named) > 1 and named[0][0] == named[1][0]:
                         continue
                     cs.add("outcome", result_set_id=result_set, option_id=named[0][1], kind="won", seats=None)
-                totals[state] = totals.get(state, 0) + 1
+                totals[round_slot] = totals.get(round_slot, 0) + 1
         print(totals)
         return cs.write()
