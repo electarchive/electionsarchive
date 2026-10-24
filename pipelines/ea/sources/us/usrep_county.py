@@ -114,6 +114,10 @@ def emit(
                 if near and near[0][0] * 50 <= total:
                     targets[column] = near[0][1]
             missing = sorted(set(sums) - set(targets))
+            spare = [option for option in held if option not in targets.values()]
+            if len(missing) == 1 and len(spare) == 1 and sums[missing[0]] * 100 > sum(sums.values()):
+                targets[missing[0]] = spare[0]
+                missing = []
             if any(sums[column] * 100 > sum(sums.values()) for column in missing):
                 print(f"{key}: unmatched {[(c, sums[c]) for c in missing]}; held {held}")
                 continue

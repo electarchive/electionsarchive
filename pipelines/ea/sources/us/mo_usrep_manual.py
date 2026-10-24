@@ -24,7 +24,7 @@ PAGES = {
 }
 PRINTED = {1994: [530, 531, 532], 1998: [561, 562, 563]}
 DAYS = {1992: date(1992, 11, 3), 1994: date(1994, 11, 8), 1998: date(1998, 11, 3)}
-PRINTED_SUMS = {("1972-11-07", "3"): [124365, 53523, 465], ("1934-11-06", "3"): [61548, 39953, 91], ("1938-11-08", "2"): [51451, 37294, 49], ("1938-11-08", "6"): [52774, 52159, 12]}
+PRINTED_SUMS = {("1972-11-07", "3"): [124365, 53523, 465], ("1934-11-06", "3"): [61548, 39953, 91], ("1938-11-08", "2"): [51451, 37294, 49], ("1938-11-08", "6"): [52774, 52159, 12], ("1928-11-06", "8"): [26619, 32877]}
 PAGE_FIXES = {(62628, "868"): "888"}
 TOTALS = {(1998, 7): [43416, 129746, 5639]}
 EARLY = [
@@ -42,6 +42,7 @@ METHOD = (
     "reports apart, is added into Jackson County."
 )
 NOTES = {
+    "1928-11-06:MO:house:8": " The Manual prints 33,327 as the Democratic total, but its county rows (checked against the page image) sum to 32,877.",
     "1938-11-08:MO:house:2": " The Manual prints 48 as the Socialist total, but its county rows (checked against the page image) sum to 49.",
     "1938-11-08:MO:house:6": " The Manual prints 11 as the Socialist-Labor total, but its county rows (checked against the page image) sum to 12.",
     "1934-11-06:MO:house:3": " The Manual prints 84 as the Socialist total, but its county rows (checked against the page image) sum to 91.",
