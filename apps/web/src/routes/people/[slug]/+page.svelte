@@ -71,6 +71,18 @@
   const first = $derived(Math.min(...years));
   const last = $derived(Math.max(...years));
   const today = new Date().toISOString().slice(0, 10);
+  const endings: Record<string, () => string> = {
+    died: m.person_ended_died,
+    resigned: m.person_ended_resigned,
+    elevated: m.person_ended_elevated,
+    appointed: m.person_ended_appointed,
+    annulled: m.person_ended_annulled,
+    disqualified: m.person_ended_disqualified,
+    expelled: m.person_ended_expelled,
+    removed: m.person_ended_removed,
+    withdrew: m.person_ended_withdrew,
+    lost_seat: m.person_ended_lost_seat,
+  };
   const low = $derived(
     Math.min(
       ...person.served.flatMap((spell) =>
@@ -103,6 +115,12 @@
     isBody: boolean;
     from: string | null;
     to: string | null;
+    seats?: Array<{
+      name: string;
+      from: string | null;
+      to: string | null;
+      ended: string | null;
+    }>;
   }>,
 )}
   <div class="grid gap-1.5">
@@ -151,6 +169,32 @@
                   to: spell.to.slice(0, 4),
                 })}</span
           >
+          {#if spell.seats != null && spell.seats.length > 0}
+            <span
+              class="col-span-full text-xs text-pretty text-muted-foreground"
+              >{spell.seats
+                .map((seat) => {
+                  const span =
+                    seat.to == null
+                      ? m.person_served_now({
+                          from: seat.from?.slice(0, 4) ?? "",
+                        })
+                      : m.person_served_span({
+                          from: seat.from?.slice(0, 4) ?? "",
+                          to: seat.to.slice(0, 4),
+                        });
+                  const reason = endings[seat.ended ?? ""];
+                  return reason == null
+                    ? m.person_seat({ place: seat.name, span })
+                    : m.person_seat_ended({
+                        place: seat.name,
+                        span,
+                        reason: reason(),
+                      });
+                })
+                .join("; ")}</span
+            >
+          {/if}
         </li>
       {/each}
     </ul>

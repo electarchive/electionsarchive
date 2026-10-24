@@ -543,6 +543,18 @@ function personMarkdown(
     office: m.person_parties_office,
     group: m.person_parties_group,
   };
+  const endings: Record<string, (() => string) | undefined> = {
+    died: m.person_ended_died,
+    resigned: m.person_ended_resigned,
+    elevated: m.person_ended_elevated,
+    appointed: m.person_ended_appointed,
+    annulled: m.person_ended_annulled,
+    disqualified: m.person_ended_disqualified,
+    expelled: m.person_ended_expelled,
+    removed: m.person_ended_removed,
+    withdrew: m.person_ended_withdrew,
+    lost_seat: m.person_ended_lost_seat,
+  };
   const ways = {
     nominated: m.person_parties_nominated,
     line: m.person_parties_line,
@@ -575,7 +587,7 @@ function personMarkdown(
       wikidata,
     ]
       .filter((part) => part != null)
-      .join(", "),
+      .join(". "),
     ...[
       { title: m.person_served(), spells: person.served },
       { title: m.person_elected(), spells: person.elected },
@@ -587,7 +599,21 @@ function personMarkdown(
             table(
               [m.col_name(), m.person_years()],
               spells.map((spell) => [
-                spell.isBody ? link(spell.name, `id/${spell.id}`) : spell.name,
+                `${spell.isBody ? link(spell.name, `id/${spell.id}`) : spell.name}${
+                  "seats" in spell && spell.seats.length > 0
+                    ? ` (${spell.seats
+                        .map((seat) =>
+                          [
+                            seat.name,
+                            years(seat.from, seat.to),
+                            endings[seat.ended ?? ""]?.() ?? null,
+                          ]
+                            .filter((part) => part != null)
+                            .join(", "),
+                        )
+                        .join("; ")})`
+                    : ""
+                }`,
                 years(spell.from, spell.to),
               ]),
             ),

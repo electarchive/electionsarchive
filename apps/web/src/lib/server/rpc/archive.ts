@@ -12024,6 +12024,14 @@ export const people = {
             isBody: v.boolean(),
             from: v.nullable(v.string()),
             to: v.nullable(v.string()),
+            seats: v.array(
+              v.object({
+                name: v.string(),
+                from: v.nullable(v.string()),
+                to: v.nullable(v.string()),
+                ended: v.nullable(v.string()),
+              }),
+            ),
           }),
         ),
         elected: v.array(
@@ -12212,6 +12220,8 @@ export const people = {
         isBody: boolean;
         from: string | null;
         to: string | null;
+        place: string | null;
+        via: string | null;
       }>(sql`
         with recursive ids(id) as (
           select ${person.id}::uuid
@@ -12219,7 +12229,9 @@ export const people = {
           select em.entity_id from entity_merge em join ids on em.into_id = ids.id
         )
         select coalesce(t.body_id, t.office_id) as owner, t.body_id is not null as "isBody",
-          t.from_date::text as from, t.to_date::text as to
+          t.from_date::text as from, t.to_date::text as to,
+          case when t.ended_via not in ('term_end', 'dissolved') then t.ended_via::text end as via,
+          coalesce((select k.district_area_id from contest k where k.id = t.contest_id), t.contest_id) as place
         from tenure t where t.person_id in (select id from ids)
         order by coalesce(t.body_id, t.office_id), t.from_date nulls first
       `);
@@ -12316,6 +12328,9 @@ export const people = {
             person.id,
             ...roots,
             ...new Set([...spells, ...terms].map((spell) => spell.owner)),
+            ...tenures.rows.flatMap((row) =>
+              row.place == null ? [] : [row.place],
+            ),
             ...joins.rows.flatMap((row) =>
               row.place == null ? [] : [row.place],
             ),
@@ -12460,13 +12475,48 @@ export const people = {
         caucus: caucus == null ? null : (owned.get(caucus) ?? null),
         isIndependent,
         served: spells
-          .map((spell) => ({
-            id: spell.owner,
-            name: labels.full.get(spell.owner) ?? "",
-            isBody: spell.isBody,
-            from: spell.from,
-            to: spell.to,
-          }))
+          .map((spell) => {
+            const seats: Array<{
+              name: string;
+              from: string | null;
+              to: string | null;
+              ended: string | null;
+            }> = [];
+            for (const row of tenures.rows) {
+              if (
+                row.owner !== spell.owner ||
+                row.place == null ||
+                (spell.from != null && (row.from ?? "") < spell.from) ||
+                (spell.to != null && (row.to ?? spell.to) > spell.to)
+              ) {
+                continue;
+              }
+              const last = seats.at(-1);
+              const name = (labels.full.get(row.place) ?? "").replace(
+                /^.+? in /u,
+                "",
+              );
+              if (last?.name === name && last.ended == null) {
+                last.to = row.to;
+                last.ended = row.via;
+              } else {
+                seats.push({
+                  name,
+                  from: row.from,
+                  to: row.to,
+                  ended: row.via,
+                });
+              }
+            }
+            return {
+              id: spell.owner,
+              name: labels.full.get(spell.owner) ?? "",
+              isBody: spell.isBody,
+              from: spell.from,
+              to: spell.to,
+              seats,
+            };
+          })
           .toSorted(
             (a, b) =>
               Number(b.to == null) - Number(a.to == null) ||
