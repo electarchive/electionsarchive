@@ -2,6 +2,7 @@ person	bioguide	name	state	first	last	clause
 cd840d86-c1fe-5b50-99f3-d9cc2acee478	A000012	James Abercrombie	AL	1820	1820	member of the State house of representatives 1820-1822 and in 1824
 167ddceb-754d-5fa5-96f3-299f66a93e8a	A000373	Brad Ashford	NE	1986	2010	member of the Nebraska state legislature, 1987-1994
 cb0146c7-e570-5791-8c78-37a669fc22c8	A000377	Kelly Armstrong	ND	2012	2016	member of the North Dakota state senate, 2013-2018
+fe09dea6-1226-5bdd-a1f9-27ffbfaab0fd	B000056	Caleb Baker	NY	1807	1824	member of the State assembly in 1814, 1815, and again in 1829
 d8f6e80f-53d0-58c5-8374-86d5d00df0f4	B000081	John Baldacci	ME	1980	1992	member of the Maine state senate, 1982-1994
 2f71b51c-c6d5-5369-93a3-074d37421985	B000104	T. Cass Ballenger	NC	1974	1984	member of the North Carolina state house of representatives, 1974-1976
 d1adc5a6-a640-5930-adf1-f77c36957110	B000115	Linn Banks	VA	1821	1824	member of the Virginia house of delegates, 1812-1838, and served as speaker, 1817-1838
@@ -20,10 +21,12 @@ bf81d55d-b98a-5b25-a603-52990baa9a52	B000589	John A. Boehner	OH	1984	1988	member
 a73ecaa8-ea0e-59f0-8a6c-e55156a8a5cf	B000615	Bill Boner	TN	1970	1996	served in the Tennessee house of representatives, 1970-1972, 1974-1976
 8f04b03d-e49c-5de9-8d97-a8d4a0ab2046	B000660	Thomas Boude	PA	1796	1798	member of the State house of representatives 1794-1796
 231e2f4c-dbc7-5df7-b9a2-36880e2b405f	B000662	James Bouldin	VA	1824	1824	member of state house of delegates, 1825-1826
+46ad35e4-19f8-50e5-abd2-6978e5427210	B000731	Jonathan Brace	CT	1792	1823	member of the State senate in 1819 and 1820
 df1cefc8-2368-5029-9534-ec0bf2ac3df2	B000763	John Branch	NC	1811	1811	member, State senate 1811-1817, 1822, serving as speaker 1815-1817
 6d03387e-753e-563f-a56b-80215e9a2548	B000782	Daniel Breck	KY	1823	1824	member of the State house of representatives 1824-1827 and again in 1834
 64a02fd6-c19f-59ff-9c8a-60ae10dfb930	B000833	Elijah Brigham	MA	1793	1816	served in the State senate in 1796, 1798, 1801-1805, and 1807-1810
 2614d8eb-0ae8-53b7-a441-f3b131ea9b65	B000858	John Brodhead	NH	1817	1822	member of the State senate 1817-1827
+f3ad48f9-9341-5abe-9e8c-9fcd6f8a7cb2	B000926	John Brown	PA	1805	1809	member of the State house of representatives 1809-1813
 41f00c0a-dc90-51e9-b2fd-9203c0274162	B000944	Sherrod Brown	OH	1974	1980	member of the Ohio State house of representatives, 1975-1982
 d17d0e7c-defd-5d7f-ba95-32fd6ab8fba3	B000970	Phineas Bruce	MA	1791	1802	member of the Massachusetts house of representatives 1791-1798 and in 1800
 0ecbc6c8-bf32-57d6-9346-d9d7faedb926	B000988	John H. Bryan	NC	1823	1824	member of the State senate in 1823 and 1824
@@ -45,6 +48,7 @@ a33dbe30-90fc-596d-aea2-2f6fc0ed302c	C000791	Thomas Corwin	OH	1821	1822	member, 
 617317cd-a91a-52b6-b45b-ee130b7bcebe	C000843	William Jr. Coxe	NJ	1798	1809	served as a member of the State general assembly 1796-1804, 1806-1809, and again in 1816 and 1817
 63d1dbf4-4322-5732-879a-c6bae8730bd2	C000859	Robert Craig	VA	1817	1817	served in the State house of delegates in 1817, 1818, and again in 1825-1829
 f3caa1b3-93ca-5088-aafb-b119938140cb	C000872	Joseph H. Crane	OH	1808	1812	member of the State house of representatives in 1809
+6774eb35-1916-54b2-b324-f993ad4e506b	C000902	William Creighton	OH	1803	1813	member of the State house of representatives in 1810
 f825d269-915a-540a-ad2d-e509f527acd2	C000947	Jacob Crowninshield	MA	1799	1802	member of the State senate in 1801
 defaa8f1-183f-50f5-8c72-0bd7863efcda	C001034	Max Cleland	GA	1970	1972	member of the Georgia state senate 1971-1975
 56238554-62e7-5abe-8551-c2cd6373fd1b	C001053	Tom Cole	OK	1988	1988	member of the Oklahoma state senate, 1988-1991
@@ -59,6 +63,7 @@ a77a858c-9577-52bf-a838-b517eb72f975	C001080	Judy Chu	CA	2002	2004	member of the
 d24a32da-2d23-5406-824c-4b6c8eabc31a	D000490	William Drayton	SC	1808	1808	member of the State house of representatives 1806-1808
 ad1e3cd2-ee1c-5dca-9b84-153715ef4df4	D000543	Robert P. Dunlap	ME	1823	1824	served in the State senate 1824-1828 and 1831-1833
 d956874b-e52e-52a4-9a9b-09b55f09141f	D000563	Richard J. Durbin	IL	1976	1976	legal counsel, Illinois State senate judiciary committee 1972-1982
+9f62a7dc-aad3-5860-a2b3-e63a449a4a91	D000583	Thomas Dwight	MA	1789	1813	served in the State senate 1796-1803
 b0a03c1f-3097-5903-8656-65482f6861d4	D000609	Steve Driehaus	OH	2000	2006	member, Ohio state house of representatives, 2001-2008, minority whip, 2005-2007
 6c698505-c5a1-53f4-8ceb-be4008655aa3	E000011	Jonas Earll, Jr.	NY	1819	1822	member of the State assembly in 1820 and 1821
 e5e8e224-04b9-5a32-ae48-814d1522258f	E000031	Dennis E. Eckart	OH	1974	1978	served in the Ohio house of representatives, 1975-1980
@@ -70,6 +75,7 @@ f1954d03-a5f5-5c13-b801-65aa106f6983	F000332	Jon D. Fox	PA	1984	2004	member of t
 51565d4e-2f11-5f54-b38d-b62e81ade7be	F000463	Deb Fischer	NE	2004	2008	Nebraska Unicameral Legislature 2005-2012
 695ed61c-a5c6-55a9-a8b7-a6be62af15bb	F000464	John J. Faso	NY	1986	2000	member of the New York state assembly, 1986-2002
 67ec6e77-b4e9-5574-8b75-f24084c35ffa	G000083	Daniel Garrison	NJ	1805	1808	member of the State general assembly 1806-1808
+5c73843d-43ad-5cce-8043-6c388c535a9d	G000230	Thomas Glascock	GA	1812	1823	member of the State house of representatives 1821, 1823, 1831, 1834, 1839, serving as speaker in 1833 and 1834
 f45af754-542a-5fb0-bb6b-8a4d1d2461f1	G000241	John Gloninger	PA	1790	1790	resigned and served in the State senate from 1790 until 1792
 8b06cec0-9164-5be7-a839-b4098969056e	G000257	Thomas R. Gold	NY	1796	1818	member of the State senate 1796-1802
 372e57d7-d0fa-55f7-ae00-39b4115f478f	G000281	William O. Goode	VA	1824	1824	served in the State house of delegates in 1822 and 1824-1832
@@ -91,6 +97,7 @@ e7f8ed2f-abdd-573b-9ee4-9dc2ac1b7234	H000219	Alexander Harper	OH	1820	1820	membe
 051a84c7-93c3-5d96-9ef1-a73f742960ae	H000408	Wayne L. Hays	OH	1978	1980	member of the Ohio state house of representatives, 1978-1980
 91950552-af4d-5b9b-973f-204cef795a16	H000518	Thomas Henry	PA	1814	1814	elected a member of the State house of representatives in 1815
 2658b9e5-dadf-5039-b992-ea7b547730e4	H000594	John Hill	NC	1821	1823	member of the State house of commons 1819-1823
+7994e3fb-9369-5c30-af0b-581ae1878488	H000700	James L. Hogeboom	NY	1796	1819	member of the State assembly in 1804, 1805, and 1808
 347cc32c-b965-5b09-9e4f-61830151c6ad	H000715	Cornelius Holland	ME	1821	1824	served in the State senate in 1822, 1825, and 1826
 adfc605a-f7ba-52e0-9e17-0c6a734f04ef	H000737	Gabriel Holmes	NC	1813	1813	member of the State senate 1797-1802, 1812, and 1813
 d7fb743c-db2b-5483-aaa1-b86d9592d576	H001066	Steven Horsford	NV	2004	2008	member of the Nevada state senate, 2004-2012
@@ -102,6 +109,7 @@ d4944f38-497d-5ba5-8403-cbd6b0b75692	K000109	John P. Kennedy	MD	1820	1822	member
 f11a9791-7dcc-5fe5-8fd6-0acdb629c058	K000126	Moss Kent	NY	1796	1818	member of the State senate 1799-1803
 521c3b63-4073-5eb4-a058-f06e418e6f83	K000153	William M. Ketchum	CA	1968	1970	member, California assembly, 1967-1972
 b33f3b44-5932-5ce5-a5c8-3be8e74c19a9	K000190	Thomas N. Kindness	OH	1970	1972	member of the Ohio state house of representatives, 1971-1974
+68e53a59-a201-5398-8810-d6c5b2865b58	K000204	John King	NY	1804	1824	member of the State assembly in 1824
 3f48e1ba-791e-5ff0-b1e9-6f25161c33bd	K000285	Jonathan Knight	PA	1822	1824	member of the State house of representatives 1822-1828
 d1731621-8114-5c38-b4f3-0ce922339ecb	K000285	Jonathan T. Knight	PA	1824	1824	member of the State house of representatives 1822-1828
 dcf4f7a0-387d-520c-850e-fb6c758aa5ff	K000364	John R. Kuhl, Jr.	NY	1980	2002	member of the New York state assembly, 1981-1986
@@ -141,18 +149,22 @@ d6c90cf4-dde1-5fc4-b40c-24bd2c1367b9	N000032	Bill Nelson	FL	1972	1976	elected to
 16baf8eb-ce18-5be5-ad9e-8ce2d2ee0340	N000184	Kristi Noem	SD	2006	2008	member of the South Dakota state house of representatives, 2007-2010
 87642ca6-2682-5f65-a215-450c942a813b	N000190	Ralph W. Norman, Jr.	SC	2004	2016	member of the South Carolina state house of representatives, 2005-2006, 2009-2017
 a30971d0-6071-55dd-b44a-ab4ebfb1b814	O000001	Mary Rose Oakar	OH	2000	2000	member of the Ohio state house of representatives, 2000-2002. Bibliography ”Mary Rose Oakar” in Women in Congress, 1917-2006 . Prepared under the direction of the Committee on House Administration by the Office of History & Preservation, U. S. House of Representatives. Washington: Government Printin
+f9ba3a3b-0050-5c1b-b2c2-810347172258	O000003	Thomas J. Oakley	NY	1806	1823	member of the state assembly in 1816 and 1818-1820
 b11c08a2-fe00-51be-9811-47fab8f6e7dc	O000163	Michael G. Oxley	OH	1972	1980	member of the Ohio state house of representatives, 1972-1981
 0754c2c3-5ca1-51a7-b6d5-7921736d7dad	P000034	Frank Pallone, Jr.	NJ	1983	1987	member of the New Jersey state senate, 1983-1988
+12902921-08d6-53df-aa1f-ac4eea0f42cf	P000294	Elisha Phelps	CT	1815	1824	served in the state senate 1822-1824
 9df7b09c-1742-5a72-96de-387e5d43f056	P000330	Benjamin Pickman, Jr.	MA	1800	1824	member of the State house of representatives 1797-1802, 1812, and 1813
 7e7ad625-3621-55c9-94a0-906b9a8888d7	P000355	Henry Laurens Pinckney	SC	1816	1824	member of the State house of representatives 1816-1832
 043110f9-a534-5a78-bcc9-d62768f46da3	P000455	Jotham Post	NY	1793	1806	served in the State assembly 1795 and 1805-1808
 69605f24-068f-53d1-a88a-0476304ad313	P000586	Adam H. Putnam	FL	1996	1998	member of the Florida state house of representatives, 1996-2001
+65bdc2c8-bce1-593c-a98b-2fa8eb0664f9	Q000015	Josiah Quincy	MA	1799	1822	again served in the State senate 1813-1820
 c6f59009-6198-59dd-bc9f-49a1e4ebc23f	R000122	John F. Reed	RI	1984	1988	member, Rhode Island State senate 1985-1990
 703ef614-09c5-548e-92f0-d6a89259cf5e	R000226	Joseph Richardson	MA	1822	1824	served in the state senate in 1823, 1824, and 1826
 cdb89cc0-1858-51ba-bb4f-04f46a6c4d89	R000284	Francis E. Rives	VA	1824	1824	member of the State house of delegates 1821-1831
 372ef6eb-a8b7-5d4f-b959-3841f045a126	R000553	John Rutledge	SC	1790	1814	member of the State house of representatives 1788-1794 and in 1811
 f421408e-e499-5c84-9424-9a4cfe15f2c9	S000175	John Scott	PA	1819	1821	member of the State house of representatives in 1819 and 1820
 2e82641c-702d-5c1a-af74-ffb5eb3694d5	S000244	F. James Sensenbrenner	WI	1968	1976	member of the Wisconsin state assembly, 1969-1975
+ac33945d-f07d-5d7f-8d04-208116fba0ef	S000357	Samuel B. Sherwood	CT	1798	1824	served in the State senate in 1816
 80fda92a-54dd-5a00-8fd0-0f80a4e4958d	S000361	James Shields	OH	1806	1824	member of the State house of representatives 1806-1827
 1f9f5a99-c34f-5e0c-9319-9d74b32044df	S000412	Peter Silvester	NY	1796	1805	member of the state senate 1796-1800
 b3677ac6-218f-5598-95c3-9f3f608f22bb	S000751	Michael C. Sprigg	MD	1821	1823	member of the State house of delegates in 1821, 1823, 1837, 1840, and 1844
@@ -176,14 +188,16 @@ cc3e4029-4273-50a5-95ec-b1ef4b52cac0	T000262	George Tibbits	NY	1799	1819	member 
 4200d7e1-6535-5f47-b14e-a999ea8acc6e	T000478	Claudia Tenney	NY	2010	2010	member of the New York state assembly, 2011-2016
 57f3aeb6-24d4-5970-80ee-0b06610a2d3a	T000478	Claudia Tenney	NY	2012	2012	member of the New York state assembly, 2011-2016
 1e709d79-a097-5d8a-8506-be1bd289c01b	U000011	Joseph R. Underwood	KY	1818	1819	member, State house of representatives 1816-1819
+c2576685-7493-57ec-ac8d-82db2e0be68c	U000023	Jabez Upham	MA	1799	1807	member of the State house of representatives 1804-1806 and in 1811
 4add34f0-e69f-5ac8-ae12-2ab51a4621e5	V000074	Joseph B. Varnum	MA	1787	1821	member, State senate 1786-1795
 7cd45a79-920e-53b2-b698-8aeff64c06ab	W000217	Isaac Wayne	PA	1800	1810	member of the State house of representatives 1799-1801 and in 1806
 f97dcccd-135d-5947-bf01-c44357c93968	W000321	Reuben Whallon	NY	1808	1812	member of the State assembly in 1808, 1809, and 1811
 e82d8163-f0e5-50f2-8c73-47a393bc1ce1	W000376	Hugh L. White	TN	1817	1817	member, State senate 1817-1825
 ce9ddc86-473c-53a1-af47-a19dfcbb30c5	W000413	W. Edward Whitfield	KY	1973	1973	member of the Kentucky state house of representatives, 1973-1975
+0ead9d1e-471b-540d-a242-a0922662eed6	W000422	Lemuel Whitman	CT	1815	1824	member of the State senate in 1822
 0bffc7f1-bdbe-519a-9ae8-8c6c78a6add7	W000444	William Widgery	MA	1791	1806	member of the Massachusetts house of representatives 1787-1793 and 1795-1797
 061502c2-92d6-57ad-96e1-3d284973d695	W000473	Samuel J. Wilkin	NY	1823	1824	member of the State assembly in 1824 and 1825
-0f1006a6-4f64-56bf-a370-699e66ebca26	W000592	James J. Wilson	NJ	1809	1822	member of the State house of representatives 1803-1808 and 1812-1814
+0f1006a6-4f64-56bf-a370-699e66ebca26	W000595	James J. Wilson	NJ	1809	1822	member, State general assembly 1809-1811
 553779b9-7f03-5b1e-9cc0-11a720b3faa0	W000597	John Lyde Wilson	SC	1812	1822	member, State house of representatives, 1812-1817
 b1ce9475-7ead-59a0-9251-392f1c7107ce	W000687	Abiel Wood	MA	1807	1811	member of the Massachusetts house of representatives 1807-1811, and again in 1816
 871467a2-beca-5db9-99d4-82de897a2a86	W000725	John Woods	PA	1797	1797	member of the State senate in 1797

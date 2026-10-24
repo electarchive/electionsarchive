@@ -3580,11 +3580,18 @@ export const contests = {
             join election y on y.polity_id = pt.polity_id and pt.valid @> y.date_from
             join contest x on x.election_id = y.id
             where pt.area_id in (select id from anc) and x.district_area_id is null and x.allocation_parent_id is null
+              and y.kind <> 'by_election'
               and not exists (
                 select from contest z
                 where z.election_id = x.election_id and z.kind = x.kind and z.body_id = x.body_id
                   and z.district_area_id is not null and z.allocation_parent_id is null
               )
+            union
+            select x.id from contest r
+            join contest x on x.body_id = r.body_id and x.district_area_id is null and x.allocation_parent_id is null
+            join slug sx on sx.entity_id = x.id and sx.is_current
+            where r.id = ${contest.root}::uuid and r.district_area_id is null and r.body_id is not null
+              and substring(sx.path from '[^/]+$') = ${path?.split("/").at(-1) ?? ""}
           ) hit
           join contest c on c.id = hit.id
           join election e on e.id = c.election_id
