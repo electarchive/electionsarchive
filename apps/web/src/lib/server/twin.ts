@@ -1997,8 +1997,41 @@ function contestMarkdown(
           }),
         ]),
     resultsMarkdown(contest, then),
+    ...(lists == null || !lists.isOpen || additional != null
+      ? []
+      : [
+          `## ${m.lists_open_title()}`,
+          m.lists_open_summary({ seats: lists.seats }),
+          ...lists.lists.flatMap((list) => [
+            `### ${list.label}`,
+            [
+              list.votes == null
+                ? null
+                : m.lists_votes({ votes: count(list.votes) }),
+              m.lists_seats({ count: list.seats }),
+            ]
+              .filter((part) => part != null)
+              .join(", "),
+            table(
+              [m.col_candidate(), m.col_party(), m.col_votes(), m.col_result()],
+              list.members.map((member) => [
+                member.name,
+                member.short ?? list.short ?? "",
+                member.votes == null ? "" : count(member.votes),
+                member.fate === "elected"
+                  ? m.lists_elected()
+                  : member.fate === "withdrew"
+                    ? m.lists_withdrew()
+                    : member.fate === "disqualified"
+                      ? m.lists_disqualified()
+                      : "",
+              ]),
+            ),
+          ]),
+        ]),
     ...(lists == null ||
     lists.isRanked ||
+    lists.isOpen ||
     lists.seats === 0 ||
     additional != null
       ? []

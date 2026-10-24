@@ -6329,7 +6329,7 @@ export const contests = {
         method: "GET",
         path: "/contests/{id}/lists",
         summary:
-          "List a closed-list contest's ranked party lists, with each member's declared fate, the independents, and later list replacements",
+          "List a list contest's party lists, ranked for closed lists and by each candidate's votes for open lists, with each member's declared fate, the independents, and later list replacements",
       }),
     )
     .input(v.object({ id: v.pipe(v.string(), v.uuid()) }))
@@ -6338,6 +6338,7 @@ export const contests = {
         v.object({
           seats: v.number(),
           isRanked: v.boolean(),
+          isOpen: v.boolean(),
           lists: v.array(
             v.object({
               key: v.string(),
@@ -6352,6 +6353,8 @@ export const contests = {
                   position: v.nullable(v.number()),
                   person: v.string(),
                   name: v.string(),
+                  short: v.nullable(v.string()),
+                  votes: v.nullable(v.number()),
                   fate: v.nullable(
                     v.picklist(["elected", "withdrew", "disqualified"]),
                   ),
@@ -6387,21 +6390,23 @@ export const contests = {
     .handler(async ({ input }) => {
       const contest = await find(input.id);
       const day = contest.date ?? "infinity";
-      const found = await db.execute<{
-        k: number;
-        kind: string;
-        party: string | null;
-        label: string | null;
-        color: string | null;
-        seats: number | null;
-        candidacy: string;
-        person: string;
-        role: string;
-        position: number | null;
-        fate: "elected" | "withdrew" | "disqualified" | null;
-        note: string | null;
-      }>(sql`
-        select o.k, o.kind::text as kind, coalesce(pm.into_id, o.party_id) as party, o.ballot_label as label,
+      const [closed, open] = await Promise.all([
+        db.execute<{
+          k: number;
+          kind: string;
+          party: string | null;
+          alliance: string | null;
+          label: string | null;
+          color: string | null;
+          seats: number | null;
+          candidacy: string;
+          person: string;
+          role: string;
+          position: number | null;
+          fate: "elected" | "withdrew" | "disqualified" | null;
+          note: string | null;
+        }>(sql`
+        select o.k, o.kind::text as kind, coalesce(pm.into_id, o.party_id) as party, o.alliance_id as alliance, o.ballot_label as label,
           case when o.party_id is not null then
             ${paint(sql`coalesce(pm.into_id, o.party_id)`, sql`${contest.election}::uuid`, sql`${day}::date`)}
           end as color,
@@ -6428,10 +6433,69 @@ export const contests = {
           order by x.kind = 'elected' desc limit 1
         ) f on true
         where o.contest_id = ${contest.id}::uuid
-      `);
-      if (found.rows.every((row) => row.kind !== "list")) {
+      `),
+        db.execute<{
+          list: number;
+          party: string | null;
+          alliance: string | null;
+          label: string | null;
+          color: string | null;
+          seats: number | null;
+          k: number;
+          person: string | null;
+          own: string | null;
+          fate: "elected" | "withdrew" | "disqualified" | null;
+          note: string | null;
+        }>(sql`
+          select l.k as list, coalesce(lm.into_id, l.party_id) as party, l.alliance_id as alliance, l.ballot_label as label,
+            case when l.party_id is not null then
+              ${paint(sql`coalesce(lm.into_id, l.party_id)`, sql`${contest.election}::uuid`, sql`${day}::date`)}
+            end as color,
+            (select max(x.seats) from outcome x join result_set rs on rs.id = x.result_set_id and rs.is_default
+             where x.option_id = l.id and x.candidacy_id is null)::int as seats,
+            o.k, coalesce(m.into_id, cy.person_id) as person, coalesce(om.into_id, o.party_id) as own,
+            f.kind::text as fate, f.notes as note
+          from contest_option l
+          join contest_option o on o.parent_option_id = l.id
+          left join candidacy cy on cy.option_id = o.id and cy.role in ('head', 'list_member') and o.kind = 'candidate'
+          left join entity_merge lm on lm.entity_id = l.party_id
+          left join entity_merge om on om.entity_id = o.party_id
+          left join entity_merge m on m.entity_id = cy.person_id
+          left join lateral (
+            select x.kind, x.notes from outcome x join result_set rs on rs.id = x.result_set_id and rs.is_default
+            where x.option_id = o.id and x.kind in ('elected', 'withdrew', 'disqualified')
+            order by x.kind = 'elected' desc limit 1
+          ) f on cy.id is not null
+          where l.contest_id = ${contest.id}::uuid and l.kind = 'list'
+        `),
+      ]);
+      const isOpen =
+        closed.rows.every((row) => row.kind !== "list") &&
+        open.rows.some((row) => row.person != null);
+      if (closed.rows.every((row) => row.kind !== "list") && !isOpen) {
         return null;
       }
+      const found = {
+        rows: [
+          ...closed.rows.map((row) => ({ ...row, own: null, option: null })),
+          ...(isOpen ? open.rows : []).flatMap((row) =>
+            row.person == null
+              ? []
+              : [
+                  {
+                    ...row,
+                    k: row.list,
+                    kind: "list",
+                    person: row.person,
+                    candidacy: "",
+                    role: "head",
+                    position: null,
+                    option: row.k,
+                  },
+                ],
+          ),
+        ],
+      };
       const people = [...new Set(found.rows.map((row) => row.person))];
       const [votes, elsewhere, replaced] = await Promise.all([
         db.execute<{ k: number; votes: number }>(sql`
@@ -6497,7 +6561,7 @@ export const contests = {
             ...seated.values(),
             ...replaced.rows.map((row) => row.person),
             ...found.rows.flatMap((row) =>
-              row.party == null ? [] : [row.party],
+              [row.party, row.alliance, row.own].filter((id) => id != null),
             ),
           ],
           contest.date,
@@ -6505,6 +6569,13 @@ export const contests = {
         paths(seated.values().toArray()),
       ]);
       const tallies = new Map(votes.rows.map((row) => [row.k, row.votes]));
+      const sums = new Map<number, number>();
+      for (const row of open.rows) {
+        sums.set(
+          row.list,
+          (sums.get(row.list) ?? 0) + (tallies.get(row.k) ?? 0),
+        );
+      }
       const lists = Map.groupBy(
         found.rows.filter((row) => row.kind === "list"),
         (row) => row.k,
@@ -6513,17 +6584,18 @@ export const contests = {
         .map(([k, members]) => {
           const head = members[0];
           const party = head?.party ?? null;
+          const owner = party ?? head?.alliance ?? "";
           return {
             key: String(k),
             label:
-              labels.full.get(party ?? "") ??
-              head?.label ??
-              labels.short.get(party ?? "") ??
+              labels.full.get(owner) ??
+              (head?.label === "" ? null : head?.label) ??
+              labels.short.get(owner) ??
               "",
-            short: labels.short.get(party ?? "") ?? null,
+            short: labels.short.get(owner) ?? null,
             color: head?.color ?? null,
             party,
-            votes: tallies.get(k) ?? null,
+            votes: tallies.get(k) ?? sums.get(k) ?? null,
             seats:
               head?.seats ??
               members.filter((row) => row.fate === "elected").length,
@@ -6535,6 +6607,12 @@ export const contests = {
                   position: row.position,
                   person: row.person,
                   name: labels.full.get(row.person) ?? "",
+                  short:
+                    row.own == null || row.own === party
+                      ? null
+                      : (labels.short.get(row.own) ?? null),
+                  votes:
+                    row.option == null ? null : (tallies.get(row.option) ?? 0),
                   fate: row.fate,
                   note: row.note,
                   elsewhere:
@@ -6551,6 +6629,7 @@ export const contests = {
                   Number(/round (\d+)/u.exec(note ?? "")?.[1] ?? Infinity);
                 return (
                   (a.position ?? Infinity) - (b.position ?? Infinity) ||
+                  (b.votes ?? 0) - (a.votes ?? 0) ||
                   round(a.note) - round(b.note) ||
                   a.name.localeCompare(b.name)
                 );
@@ -6593,6 +6672,7 @@ export const contests = {
         isRanked: found.rows.every(
           (row) => row.kind !== "list" || row.position != null,
         ),
+        isOpen,
         lists,
         independents,
         replacements: replaced.rows.flatMap((row) => {

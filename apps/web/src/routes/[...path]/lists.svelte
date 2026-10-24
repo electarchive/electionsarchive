@@ -27,8 +27,9 @@
   let isFull = $state(false);
 
   const winners = $derived(lists.lists.filter((list) => list.seats > 0));
+  const isPickable = $derived(lists.isRanked || lists.isOpen);
   const shown = $derived(
-    (isAll && lists.isRanked) || winners.length === 0 ? lists.lists : winners,
+    (isAll && isPickable) || winners.length === 0 ? lists.lists : winners,
   );
   const ladders = $derived(
     shown.map((list) => {
@@ -71,16 +72,22 @@
   <header class="flex flex-wrap items-end justify-between gap-x-6 gap-y-2.5">
     <div class="grid gap-0.5">
       <h2 id="{uid}-title" class="heading">
-        {lists.isRanked ? m.lists_title() : m.lists_unranked_title()}
+        {lists.isOpen
+          ? m.lists_open_title()
+          : lists.isRanked
+            ? m.lists_title()
+            : m.lists_unranked_title()}
       </h2>
       <p class="text-sm text-muted-foreground">
-        {lists.isRanked
-          ? m.lists_summary({ seats: lists.seats })
-          : m.lists_unranked_summary({ seats: lists.seats })}
+        {lists.isOpen
+          ? m.lists_open_summary({ seats: lists.seats })
+          : lists.isRanked
+            ? m.lists_summary({ seats: lists.seats })
+            : m.lists_unranked_summary({ seats: lists.seats })}
       </p>
     </div>
     <div class="flex flex-wrap items-center gap-2">
-      {#if lists.isRanked && winners.length > 0 && winners.length < lists.lists.length}
+      {#if isPickable && winners.length > 0 && winners.length < lists.lists.length}
         <div class="flex" role="group" aria-label={m.lists_title()}>
           {#each [false, true] as value (value)}
             <button
@@ -113,7 +120,7 @@
     </div>
   </header>
 
-  {#if lists.isRanked}
+  {#if isPickable}
     <ul
       class="flex flex-wrap items-center gap-x-4 gap-y-1 text-[0.8125rem] text-muted-foreground"
     >
@@ -124,17 +131,19 @@
         ></span>
         {m.lists_elected()}
       </li>
-      <li class="flex items-center gap-1.5">
-        <span class="bg-foreground block-0.5 inline-5" aria-hidden="true"
-        ></span>
-        <Term label={m.lists_cut()} definition={m.term_cut()} />
-      </li>
-      <li class="flex items-center gap-1.5">
-        <span class="highlighter px-1 text-foreground" aria-hidden="true"
-          >Aa</span
-        >
-        <Term label={m.lists_next()} definition={m.term_next()} />
-      </li>
+      {#if lists.isRanked}
+        <li class="flex items-center gap-1.5">
+          <span class="bg-foreground block-0.5 inline-5" aria-hidden="true"
+          ></span>
+          <Term label={m.lists_cut()} definition={m.term_cut()} />
+        </li>
+        <li class="flex items-center gap-1.5">
+          <span class="highlighter px-1 text-foreground" aria-hidden="true"
+            >Aa</span
+          >
+          <Term label={m.lists_next()} definition={m.term_next()} />
+        </li>
+      {/if}
     </ul>
   {/if}
 
@@ -200,7 +209,10 @@
                 },
                 {
                   "border-bs-2 border-foreground":
-                    index === 0 && ladder.cut === 0 && ladder.seats === 0,
+                    !lists.isOpen &&
+                    index === 0 &&
+                    ladder.cut === 0 &&
+                    ladder.seats === 0,
                   "border-be-2 border-foreground":
                     lists.isRanked &&
                     ladder.cut > 0 &&
@@ -217,7 +229,7 @@
               {:else if lists.isRanked}
                 <span></span>
               {/if}
-              <span class="flex min-inline-0">
+              <span class="flex items-baseline gap-1.5 min-inline-0">
                 <Name
                   class={cn("truncate min-inline-0", {
                     "font-semibold": member.fate === "elected",
@@ -227,41 +239,55 @@
                   label={member.name}
                   person={member.person}
                 />
+                {#if member.short != null}
+                  <span class="shrink-0 text-xs text-muted-foreground"
+                    >{member.short}</span
+                  >
+                {/if}
                 {#if member.fate === "elected"}
                   <span class="sr-only">{m.lists_elected()}</span>
                 {:else if member.person === ladder.next}
                   <span class="sr-only">{m.lists_next()}</span>
                 {/if}
               </span>
-              {#if member.fate === "withdrew"}
-                <Term
-                  class="text-xs text-muted-foreground"
-                  label={m.lists_withdrew()}
-                  definition={member.note ?? m.term_withdrew_fallback()}
-                />
-              {:else if member.fate === "disqualified"}
-                <Term
-                  class="text-xs text-muted-foreground"
-                  label={m.lists_disqualified()}
-                  definition={member.note ?? m.lists_disqualified()}
-                />
-              {:else if member.elsewhere != null}
-                <Term
-                  class="text-xs text-muted-foreground"
-                  label={m.lists_elsewhere()}
-                  definition={m.lists_elsewhere_detail({
-                    contest: member.elsewhere.name,
-                  })}
-                />
-              {:else if ladder.left.has(member.person)}
-                <span class="text-xs text-muted-foreground"
-                  >{m.lists_replaced()}</span
-                >
-              {:else if ladder.joined.has(member.person)}
-                <span class="text-xs text-muted-foreground"
-                  >{m.lists_seated()}</span
-                >
-              {/if}
+              <span class="flex items-baseline gap-2">
+                {#if member.fate === "withdrew"}
+                  <Term
+                    class="text-xs text-muted-foreground"
+                    label={m.lists_withdrew()}
+                    definition={member.note ?? m.term_withdrew_fallback()}
+                  />
+                {:else if member.fate === "disqualified"}
+                  <Term
+                    class="text-xs text-muted-foreground"
+                    label={m.lists_disqualified()}
+                    definition={member.note ?? m.lists_disqualified()}
+                  />
+                {:else if member.elsewhere != null}
+                  <Term
+                    class="text-xs text-muted-foreground"
+                    label={m.lists_elsewhere()}
+                    definition={m.lists_elsewhere_detail({
+                      contest: member.elsewhere.name,
+                    })}
+                  />
+                {:else if ladder.left.has(member.person)}
+                  <span class="text-xs text-muted-foreground"
+                    >{m.lists_replaced()}</span
+                  >
+                {:else if ladder.joined.has(member.person)}
+                  <span class="text-xs text-muted-foreground"
+                    >{m.lists_seated()}</span
+                  >
+                {/if}
+                {#if member.votes != null}
+                  <span
+                    class="font-figures text-xs text-muted-foreground tabular-nums"
+                    aria-label={m.lists_votes({ votes: count(member.votes) })}
+                    >{count(member.votes)}</span
+                  >
+                {/if}
+              </span>
             </li>
           {/each}
           {#if rows.length < ladder.members.length}

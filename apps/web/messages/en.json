@@ -696,6 +696,17 @@
       }
     }
   ],
+  "lists_open_title": "Candidates by list",
+  "lists_open_summary": [
+    {
+      "declarations": ["input seats", "local seatsPlural = seats: plural"],
+      "selectors": ["seatsPlural"],
+      "match": {
+        "seatsPlural=one": "{seats} seat filled from open party lists, with each list's candidates ranked by personal votes",
+        "seatsPlural=*": "{seats} seats filled from open party lists, with each list's candidates ranked by personal votes"
+      }
+    }
+  ],
   "col_members": "Members elected",
   "lists_all": [
     {
