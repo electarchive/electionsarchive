@@ -997,6 +997,19 @@ function electionMarkdown(
             ),
           })}${election.turnout.basis === "rejected" ? ` ${m.turnout_basis_rejected()}` : election.turnout.basis === "valid" ? ` ${m.turnout_basis_valid()}` : ""}`,
         ]),
+    ...(election.control == null
+      ? []
+      : [
+          `${
+            election.control.label == null
+              ? m.control_none({ total: count(election.control.total) })
+              : m.control_party({
+                  party: election.control.label,
+                  seats: count(election.control.seats),
+                  total: count(election.control.total),
+                })
+          }. ${m.control_derived()}`,
+        ]),
     ...(tiered[0] == null
       ? []
       : [

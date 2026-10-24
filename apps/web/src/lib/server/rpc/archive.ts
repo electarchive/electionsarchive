@@ -7759,6 +7759,15 @@ export const elections = {
         breadcrumbs: v.array(Link),
         parent: v.nullable(Link),
         notes: v.array(v.object({ kind: v.string(), body: v.string() })),
+        control: v.nullable(
+          v.object({
+            key: v.nullable(v.string()),
+            label: v.nullable(v.string()),
+            color: v.nullable(v.string()),
+            seats: v.number(),
+            total: v.number(),
+          }),
+        ),
         races: v.array(
           v.object({
             name: v.string(),
@@ -8186,7 +8195,13 @@ export const elections = {
         ...(election.parent == null ? [] : [election.parent]),
         ...allied.rows.map((row) => row.id),
       ];
-      const [labels, slugs, faces] = await Promise.all([
+      const councils = raced.filter(
+        (race) =>
+          race.body != null &&
+          race.kind === "body_seats" &&
+          (race.round ?? 1) === 1,
+      );
+      const [labels, slugs, faces, whole] = await Promise.all([
         names(ids),
         paths(ids),
         portraits(
@@ -8194,7 +8209,37 @@ export const elections = {
             race.results.flatMap((row) => row.person ?? []),
           ),
         ),
+        db.execute<{ isWhole: boolean }>(sql`
+          select exists (
+            select from external_id where entity_id = ${input.id}::uuid and scheme = 'gb.leh.type'
+              and split_part(value, ':', 1) in ('SDA', 'UAA', 'LB', 'SC')
+          ) as "isWhole"
+        `),
       ]);
+      let control = null;
+      const council = councils[0];
+      if (
+        whole.rows[0]?.isWhole === true &&
+        councils.length === 1 &&
+        council != null &&
+        within == null
+      ) {
+        let total = 0;
+        for (const row of council.results) {
+          total += row.seats ?? 0;
+        }
+        const top = council.results.toSorted(
+          (a, b) => (b.seats ?? 0) - (a.seats ?? 0),
+        )[0];
+        const isMajority = top != null && (top.seats ?? 0) * 2 > total;
+        control = {
+          key: isMajority ? top.key : null,
+          label: isMajority ? top.label : null,
+          color: isMajority ? top.color : null,
+          seats: top?.seats ?? 0,
+          total,
+        };
+      }
       return {
         name:
           within == null
@@ -8219,6 +8264,7 @@ export const elections = {
                   path: slugs.get(election.parent) ?? null,
                 },
         notes: notes.rows,
+        control,
         turnout:
           pooledNow != null && pooledNow.reporting >= pooledNow.of * 0.9
             ? {

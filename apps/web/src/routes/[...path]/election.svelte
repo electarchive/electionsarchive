@@ -1050,6 +1050,33 @@
       {/if}
     </p>
   {/if}
+  {#if election.control != null}
+    <p
+      class="flex flex-wrap items-baseline gap-x-2.5 gap-y-0.5 text-[0.9375rem]"
+    >
+      <span class="inline-flex items-center gap-1.5 font-semibold">
+        {#if election.control.key != null}
+          <span
+            class="shrink-0 rounded-xs block-2.5 inline-2.5"
+            style:background={swatch(
+              election.control.color,
+              election.control.key,
+            )}
+          ></span>
+        {/if}
+        {election.control.label == null
+          ? m.control_none({ total: count(election.control.total) })
+          : m.control_party({
+              party: election.control.label,
+              seats: count(election.control.seats),
+              total: count(election.control.total),
+            })}
+      </span>
+      <span class="text-[0.8125rem] text-muted-foreground"
+        >{m.control_derived()}</span
+      >
+    </p>
+  {/if}
 </header>
 
 {#if races.length === 0 && election.contests.length > 0}
