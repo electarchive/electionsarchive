@@ -17,9 +17,15 @@ const stored = (tiles: string | null | undefined) =>
     ? tiles
     : null;
 
-const STAGES = sql.raw(
-  "array['court_revised','recount','certified','official','preliminary','live','alternative']::stage[]",
-);
+const ORDER =
+  "array['court_revised','recount','certified','official','preliminary','live','alternative']::stage[]";
+
+const STAGES = sql.raw(ORDER);
+
+export const latest = (set: string) =>
+  sql.raw(
+    `(${set}.is_default and not exists (select from result_set later where later.contest_id = ${set}.contest_id and later.is_default and array_position(${ORDER}, later.stage) < array_position(${ORDER}, ${set}.stage)))`,
+  );
 
 const MEASURES = new Map([
   [1, "votes"],
@@ -53,7 +59,7 @@ const CYCLE = sql`
 const fused = (option: SQL, contest: SQL) => sql`
   (
     select ch.party_id from contest_option ch
-    join result_set rs on rs.contest_id = ch.contest_id and rs.is_default
+    join result_set rs on rs.contest_id = ch.contest_id and ${latest("rs")}
     cross join lateral (select x.value from result_rollup x where x.result_set_k = rs.k and x.option_k = ch.k offset 0) x
     where ch.contest_id = ${contest} and ch.parent_option_id = ${option} and ch.party_id is not null
     group by ch.id, ch.party_id
@@ -70,7 +76,7 @@ const pooled = (list: SQL) => sql`
     join contest_option ch on ch.parent_option_id = pl.id and ch.party_id is not null
       and ch.party_id is distinct from pl.party_id
     join outcome y on y.option_id = ch.id and y.kind = 'elected' and y.candidacy_id is null
-    join result_set ry on ry.id = y.result_set_id and ry.is_default
+    join result_set ry on ry.id = y.result_set_id and ${latest("ry")}
     where pl.id = ${list} and pl.kind = 'list'
   )
 `;
@@ -91,7 +97,7 @@ const stray = (candidacy: SQL, option: SQL, contest: SQL) => sql`
           )
       ) then false
       when exists (
-        select from outcome x join result_set rs on rs.id = x.result_set_id and rs.is_default
+        select from outcome x join result_set rs on rs.id = x.result_set_id and ${latest("rs")}
         where x.option_id = ${option} and x.kind in ('elected', 'won', 'advanced', 'tied')
       ) then false
       else coalesce((
@@ -108,7 +114,7 @@ const stray = (candidacy: SQL, option: SQL, contest: SQL) => sql`
             )
           offset 0
         ) v
-        where rs.contest_id = k.id and rs.is_default
+        where rs.contest_id = k.id and ${latest("rs")}
         limit 1
       ), 0) < 0.05
     end
@@ -185,7 +191,7 @@ const sisters = (roots: Array<string>, day: string) => sql`
     where l.party in (
       select w.party from lines w
       cross join lateral (
-        select from outcome x join result_set rs on rs.id = x.result_set_id and rs.is_default
+        select from outcome x join result_set rs on rs.id = x.result_set_id and ${latest("rs")}
         where x.option_id = w.option and x.kind in ('elected', 'won')
         limit 1
       ) won
@@ -1051,7 +1057,7 @@ async function load(
           select n.party_id from candidacy_nomination n where n.candidacy_id = cy.id and n.kind = 'nominated'
           order by (
             select max(x.value) from contest_option ch
-            join result_set rs on rs.contest_id = ch.contest_id and rs.is_default
+            join result_set rs on rs.contest_id = ch.contest_id and ${latest("rs")}
             cross join lateral (select x.value from result_rollup x where x.result_set_k = rs.k and x.option_k = ch.k offset 0) x
             where ch.parent_option_id = o.id and ch.party_id = n.party_id
           ) desc nulls last, n.party_id
@@ -1092,7 +1098,7 @@ async function load(
       oc.kind::text as outcome, oc.note,
       case when o.kind = 'list' and ${pooled(sql`o.id`)} then null
         when o.parent_option_id is null or ${pooled(sql`o.parent_option_id`)} or not exists (
-          select from outcome y join result_set ry on ry.id = y.result_set_id and ry.is_default
+          select from outcome y join result_set ry on ry.id = y.result_set_id and ${latest("ry")}
           where y.option_id = o.parent_option_id and y.kind in ('elected', 'won') and y.candidacy_id is null
         ) then oc.seats end as seats
     from contest_option o
@@ -1102,7 +1108,7 @@ async function load(
         (array_agg(x.notes order by array_position(array['elected', 'advanced', 'won', 'tied', 'withdrew', 'disqualified']::outcome_kind[], x.kind)))[1] as note,
         coalesce(max(x.seats), nullif(count(*) filter (where x.kind = 'elected'), 0))::int as seats
       from outcome x join result_set rs on rs.id = x.result_set_id
-      where x.option_id = o.id and o.contest_id = any(${sql.param(outcomes)}::uuid[]) and rs.is_default
+      where x.option_id = o.id and o.contest_id = any(${sql.param(outcomes)}::uuid[]) and ${latest("rs")}
         and (x.kind in ('elected', 'won', 'advanced', 'tied', 'withdrew', 'disqualified') or x.kind = 'lost' and o.kind = 'answer') and x.candidacy_id is null
         and not (x.kind in ('withdrew', 'disqualified') and exists (
           select from contest_option lp where lp.id = o.parent_option_id and lp.kind = 'list'
@@ -1402,7 +1408,7 @@ async function units(
       where r.result_set_k = rs.k and r.measure = 16 and r.count_round = 0
         and r.area_k = any(${sql.param(kids.map((kid) => kid.k))}::int[]) offset 0
     ) r
-    where rs.contest_id = ${contest}::uuid and rs.is_default
+    where rs.contest_id = ${contest}::uuid and ${latest("rs")}
     group by r.area_k, r.option_k
     having sum(r.value) > 0
   `);
@@ -1598,7 +1604,7 @@ async function holders(
       coalesce(y.seated, false) as "isSeated", coalesce(y.elected, false) as "isElected"
     from contest c
     left join slug s on s.entity_id = c.id and s.is_current
-    join result_set rs on rs.contest_id = c.id and rs.is_default
+    join result_set rs on rs.contest_id = c.id and ${latest("rs")}
     join outcome x on x.result_set_id = rs.id and x.candidacy_id is null and (x.seats > 0 or (x.seats is null and x.kind in ('elected', 'won')))
     join contest_option o on o.id = x.option_id
     cross join lateral (select coalesce(o.party_id, ${fused(sql`o.id`, sql`o.contest_id`)}) as party) lp
@@ -1818,7 +1824,7 @@ async function tally(
         select x.measure, x.count_round, x.value from result_rollup x
         where x.result_set_k = rs.k and x.area_k = ${areaK} and x.option_k = 0 and x.measure in (21, 26) offset 0
       ) r
-      where rs.contest_id = ${contest.id}::uuid and rs.is_default
+      where rs.contest_id = ${contest.id}::uuid and ${latest("rs")}
       group by r.measure, r.count_round
       order by r.count_round
     `),
@@ -2118,7 +2124,7 @@ async function places(
       (
         select sum(x.seats)::int from contest_option o
         join outcome x on x.option_id = o.id and x.kind in ('elected', 'won')
-        join result_set rs on rs.id = x.result_set_id and rs.is_default
+        join result_set rs on rs.id = x.result_set_id and ${latest("rs")}
         where o.contest_id = c.id
       ) as seats
     from contest c
@@ -2405,7 +2411,7 @@ async function tabulate(
           coalesce(c.rules_override ->> 'formula', es.rules ->> 'formula', '') = 'stv' as "isStv"
         from contest c
         left join electoral_system es on es.id = c.electoral_system_id
-        join result_set rs on rs.contest_id = c.id and rs.is_default
+        join result_set rs on rs.contest_id = c.id and ${latest("rs")}
         join outcome x on x.result_set_id = rs.id and x.kind in ('elected', 'won') and x.candidacy_id is null
         join contest_option o on o.id = x.option_id
         join candidacy cy on cy.option_id = o.id and cy.role = 'head'
@@ -2576,7 +2582,7 @@ async function tabulate(
     join election e on e.id = c.election_id
     left join lateral (
       select rs.id, rs.kind::text as kind from result_set rs
-      where rs.contest_id = c.id and rs.is_default order by rs.stage desc limit 1
+      where rs.contest_id = c.id and ${latest("rs")} order by rs.stage desc limit 1
     ) rs on true
     left join lateral (
       select x.kind::text as kind, coalesce(pm.into_id, o.party_id) as party, coalesce(m.into_id, cy.person_id) as person
@@ -2905,7 +2911,7 @@ export const contests = {
           select a.k from head join contest c on c.id = head.id join area a on a.id = c.district_area_id
         ),
         sets as (
-          select rs.k, rs.source_id from tree cross join lateral (select * from result_set x where x.contest_id = tree.id offset 0) rs where rs.is_default
+          select rs.k, rs.source_id from tree cross join lateral (select * from result_set x where x.contest_id = tree.id offset 0) rs where ${latest("rs")}
         ),
         options as (
           select o.k from contest_option o join tree on tree.id = o.contest_id
@@ -3348,7 +3354,7 @@ export const contests = {
               )::int as held, count(*)::int as of
             from contest c
             join election e on e.id = c.election_id
-            join result_set rs on rs.contest_id = c.id and rs.is_default
+            join result_set rs on rs.contest_id = c.id and ${latest("rs")}
             left join boundary_set bs on bs.id = c.boundary_set_id
             join district_county dc on dc.district_area_id = c.district_area_id
               and dc.district_valid @> coalesce(bs.valid_from, e.date_from) and dc.county_valid @> e.date_from and dc.share >= 0.005
@@ -3374,7 +3380,7 @@ export const contests = {
                     select from result_rollup_unit u
                     where u.result_set_k = rs.k and not exists (
                       select from result_set d join result_rollup_unit w on w.result_set_k = d.k and w.area_k = u.area_k
-                      where d.contest_id = ${contest.id}::uuid and d.is_default
+                      where d.contest_id = ${contest.id}::uuid and ${latest("d")}
                     )
                   )
               ) as derived
@@ -3383,7 +3389,7 @@ export const contests = {
                 select x.count_round from result_rollup x
                 where x.result_set_k = rs.k and x.area_k = ${contest.place?.k ?? null}::int and x.measure = any(${COUNTED}) offset 0
               ) r
-              where rs.contest_id = ${contest.id}::uuid and rs.is_default
+              where rs.contest_id = ${contest.id}::uuid and ${latest("rs")}
             ) t
             left join lateral (
               select c.magnitude as seats from contest c
@@ -3434,11 +3440,11 @@ export const contests = {
               select ${contest.election}::uuid
               union all
               select rs.id from result_set rs
-                where rs.contest_id = ${contest.id}::uuid and (rs.is_default or exists (
+                where rs.contest_id = ${contest.id}::uuid and (${latest("rs")} or exists (
                   select from result_rollup r
                   where r.result_set_k = rs.k and r.measure = any(${COUNTED}) and not exists (
                     select from result_set d
-                    where d.contest_id = ${contest.id}::uuid and d.is_default and exists (
+                    where d.contest_id = ${contest.id}::uuid and ${latest("d")} and exists (
                       select from result_rollup q where q.result_set_k = d.k and q.area_k = r.area_k offset 0
                     )
                   )
@@ -3489,7 +3495,7 @@ export const contests = {
              join outcome x on x.result_set_id = rs.id and x.candidacy_id is null
              join contest_option o on o.id = x.option_id
              left join entity_merge pm on pm.entity_id = o.party_id
-             where ${isRoot}::boolean and rs.contest_id = ${contest.id}::uuid and rs.is_default
+             where ${isRoot}::boolean and rs.contest_id = ${contest.id}::uuid and ${latest("rs")}
                and (rs.kind <> 'counted' or not exists (select from result_rollup r where r.result_set_k = rs.k offset 0))
              order by o.k
           `),
@@ -3797,7 +3803,7 @@ export const contests = {
           cross join lateral (
             select from contest_option o
             join outcome x on x.option_id = o.id and x.kind in ('won', 'elected')
-            join result_set rs on rs.id = x.result_set_id and rs.is_default
+            join result_set rs on rs.id = x.result_set_id and ${latest("rs")}
             where o.contest_id = grp.id
             limit 1
           ) hit
@@ -4063,7 +4069,7 @@ export const contests = {
              cross join lateral (
                select from outcome x
                where x.option_id = o.id and x.kind in ('won', 'elected')
-                 and exists (select from result_set z where z.id = x.result_set_id and z.is_default)
+                 and exists (select from result_set z where z.id = x.result_set_id and ${latest("z")})
                limit 1
              ) won
              left join entity_merge pm on pm.entity_id = o.party_id
@@ -4115,7 +4121,7 @@ export const contests = {
           coalesce(o.ballot_label, o.kind::text) as label
         from contest c
         join election e on e.id = c.election_id
-        join result_set rs on rs.contest_id = c.id and rs.is_default
+        join result_set rs on rs.contest_id = c.id and ${latest("rs")}
         join outcome w on w.result_set_id = rs.id and w.kind in ('won', 'elected') and w.candidacy_id is null
         join contest_option o on o.id = w.option_id
         left join entity_merge pm on pm.entity_id = o.party_id
@@ -4439,7 +4445,7 @@ export const contests = {
               exists (select from candidacy cy where cy.option_id = o.id and cy.role = 'head' and cy.is_independent) as independent,
               t.first, t.second, t.valid
             from (
-              select rs.k, rs.id from result_set rs where rs.contest_id = p.id and rs.is_default limit 1
+              select rs.k, rs.id from result_set rs where rs.contest_id = p.id and ${latest("rs")} limit 1
             ) rs
             cross join lateral (
               select (array_agg(r.option_k order by r.seats desc, r.value desc))[1] as top,
@@ -4607,7 +4613,7 @@ export const contests = {
           select coalesce(pm.into_id, o.party_id) as party, sum(r.value)::int as seats
           from contest_option o
           left join entity_merge pm on pm.entity_id = o.party_id
-          join result_set rs on rs.contest_id = o.contest_id and rs.is_default
+          join result_set rs on rs.contest_id = o.contest_id and ${latest("rs")}
           cross join lateral (
             select r.value from result_rollup r
             where r.result_set_k = rs.k and r.option_k = o.k and r.area_k = ${area.k} and r.measure = 16 and r.count_round = 0 offset 0
@@ -6432,14 +6438,14 @@ export const contests = {
         from contest_option o
         join candidacy cy on cy.option_id = o.id
           and ((o.kind = 'list' and cy.role = 'list_member' and (cy.list_position is not null or exists (
-            select from outcome x join result_set r on r.id = x.result_set_id and r.is_default
+            select from outcome x join result_set r on r.id = x.result_set_id and ${latest("r")}
             where x.candidacy_id = cy.id and x.kind = 'elected'
           ))) or (o.kind = 'others' and cy.role = 'head'))
         left join entity_merge m on m.entity_id = cy.person_id
         left join entity_merge pm on pm.entity_id = o.party_id
         left join lateral (
           select rs.id from result_set rs
-          where rs.contest_id = o.contest_id and rs.is_default
+          where rs.contest_id = o.contest_id and ${latest("rs")}
           order by exists (select from outcome x where x.result_set_id = rs.id) desc, array_position(${STAGES}, rs.stage)
           limit 1
         ) rs on true
@@ -6467,7 +6473,7 @@ export const contests = {
             case when l.party_id is not null then
               ${paint(sql`coalesce(lm.into_id, l.party_id)`, sql`${contest.election}::uuid`, sql`${day}::date`)}
             end as color,
-            (select max(x.seats) from outcome x join result_set rs on rs.id = x.result_set_id and rs.is_default
+            (select max(x.seats) from outcome x join result_set rs on rs.id = x.result_set_id and ${latest("rs")}
              where x.option_id = l.id and x.candidacy_id is null)::int as seats,
             o.k, coalesce(m.into_id, cy.person_id) as person, coalesce(om.into_id, o.party_id) as own,
             f.kind::text as fate, f.notes as note
@@ -6478,7 +6484,7 @@ export const contests = {
           left join entity_merge om on om.entity_id = o.party_id
           left join entity_merge m on m.entity_id = cy.person_id
           left join lateral (
-            select x.kind, x.notes from outcome x join result_set rs on rs.id = x.result_set_id and rs.is_default
+            select x.kind, x.notes from outcome x join result_set rs on rs.id = x.result_set_id and ${latest("rs")}
             where x.option_id = o.id and x.kind in ('elected', 'withdrew', 'disqualified')
             order by x.kind = 'elected' desc limit 1
           ) f on cy.id is not null
@@ -6517,7 +6523,7 @@ export const contests = {
         db.execute<{ k: number; votes: number }>(sql`
           with chosen as (
             select rs.k from result_set rs
-            where rs.contest_id = ${contest.id}::uuid and rs.is_default and exists (
+            where rs.contest_id = ${contest.id}::uuid and ${latest("rs")} and exists (
               select from result_rollup r where r.result_set_k = rs.k and r.area_k = ${contest.place?.k ?? 0} and r.measure = any(${COUNTED}) offset 0
             )
             order by array_position(${STAGES}, rs.stage), rs.completeness desc nulls last
@@ -6544,7 +6550,7 @@ export const contests = {
           left join entity_merge m on m.entity_id = cy.person_id
           join contest_option o on o.id = cy.option_id
           join contest c on c.id = o.contest_id
-          join result_set rs on rs.contest_id = c.id and rs.is_default
+          join result_set rs on rs.contest_id = c.id and ${latest("rs")}
           join outcome x on x.result_set_id = rs.id and x.option_id = o.id and x.kind in ('elected', 'won')
             and (x.candidacy_id = cy.id or (x.candidacy_id is null and cy.role = 'head'))
           where c.election_id = ${contest.election}::uuid and c.id <> ${contest.id}::uuid
@@ -6734,7 +6740,7 @@ async function turnout(contest: string | null, ks: Array<number>) {
       select rs.k, rs.election_id from result_set rs
       join election e on e.id = rs.election_id
       cross join day d
-      where rs.contest_id is null and rs.is_default and e.date_from = d.date_from and e.kind = d.kind
+      where rs.contest_id is null and ${latest("rs")} and e.date_from = d.date_from and e.kind = d.kind
     ),
     facts as materialized (
       select s.k as set, s.election_id as election, ua.area_id as area, v.measure, sum(v.value)::float8 as value
@@ -6956,7 +6962,7 @@ async function poll(contest: string | null, k: number | null, isAsked = true) {
           where x.result_set_k = rs.k and x.area_k = ${k}::int and x.option_k = 0
             and x.measure in (2, 3, 4, 5, 14) and x.count_round = 0 offset 0
         ) r
-        where rs.contest_id = ${contest}::uuid and rs.is_default
+        where rs.contest_id = ${contest}::uuid and ${latest("rs")}
         group by r.channel
       ) c
     ) t
@@ -7710,7 +7716,7 @@ async function races(
                 select coalesce(bm.into_id, br.parent_party_id, pm.into_id, o.party_id) as party
                 from contest c
                 join election e on e.id = c.election_id
-                join result_set rs on rs.contest_id = c.id and rs.is_default and rs.kind = 'tacit'
+                join result_set rs on rs.contest_id = c.id and ${latest("rs")} and rs.kind = 'tacit'
                 join outcome x on x.result_set_id = rs.id and x.kind in ('elected', 'won') and x.candidacy_id is null
                 join contest_option o on o.id = x.option_id
                 left join entity_merge pm on pm.entity_id = o.party_id
@@ -7725,6 +7731,32 @@ async function races(
               union all
               select null, 0, (select count(*)::int from contest c left join electoral_system es on es.id = c.electoral_system_id where c.id = any(${sql.param(roots)}::uuid[]) and c.magnitude > 1 and c.kind <> 'list_allocation' and coalesce(c.rules_override ->> 'formula', es.rules ->> 'formula', '') not in ('dhondt', 'hare', 'sainte_lague_schepers', 'stv', 'imperiali_quota', 'hagenbach_bischoff', 'irv') and exists (select from contest_option co where co.contest_id = c.id and co.kind = 'candidate'))
               where not exists (select from tacit)
+            `);
+      const repeated =
+        single != null || head?.isOffice === true
+          ? null
+          : await db.execute<{
+              party: string | null;
+              name: string;
+              returns: number;
+            }>(sql`
+              select coalesce(bm.into_id, br.parent_party_id, pm.into_id, o.party_id) as party,
+                coalesce(min(n.text), '') as name, count(distinct c.id)::int as returns
+              from contest c
+              join election e on e.id = c.election_id
+              join result_set rs on rs.contest_id = c.id and ${latest("rs")}
+              join outcome x on x.result_set_id = rs.id and x.kind in ('elected', 'won') and x.candidacy_id is null
+              join contest_option o on o.id = x.option_id and o.kind = 'candidate'
+              join candidacy cy on cy.option_id = o.id
+              left join name n on n.entity_id = cy.person_id and n.is_preferred
+              left join entity_merge pm on pm.entity_id = o.party_id
+              left join party_affiliation br on br.party_id = coalesce(pm.into_id, o.party_id)
+                and br.kind = 'regional_branch' and br.valid @> e.date_from
+              left join entity_merge bm on bm.entity_id = br.parent_party_id
+              where c.id = any(${sql.param(roots)}::uuid[])
+              group by cy.person_id, 1
+              having count(distinct c.id) > 1
+              order by 2
             `);
       const unopposed = (returned?.rows ?? []).filter((row) => row.seats > 0);
       let tacit = 0;
@@ -7814,12 +7846,12 @@ async function races(
                 from tree t
                 join contest_option o on o.contest_id = t.id
                 join outcome x on x.option_id = o.id and x.kind in ('elected', 'won') and x.candidacy_id is null
-                join result_set rs on rs.id = x.result_set_id and rs.is_default
+                join result_set rs on rs.id = x.result_set_id and ${latest("rs")}
                 where not exists (select from contest k where k.allocation_parent_id = t.id)
                   and not (o.kind = 'candidate' and exists (
                     select from contest_option l
                     join outcome lx on lx.option_id = l.id and lx.kind in ('elected', 'won') and lx.candidacy_id is null
-                    join result_set lr on lr.id = lx.result_set_id and lr.is_default
+                    join result_set lr on lr.id = lx.result_set_id and ${latest("lr")}
                     where l.contest_id = o.contest_id and l.kind = 'list'
                   ))
                 group by o.id, o.contest_id, o.party_id
@@ -7832,7 +7864,7 @@ async function races(
                 join election le on le.id = lc.election_id
                 left join polity_territory lt on lt.polity_id = le.polity_id and lt.valid @> le.date_from
                 join area la on la.id = coalesce(lc.district_area_id, lt.area_id)
-                join result_set rs on rs.contest_id = ch.contest_id and rs.is_default
+                join result_set rs on rs.contest_id = ch.contest_id and ${latest("rs")}
                 cross join lateral (
                   select max(y.value) as value from result_rollup y
                   where y.result_set_k = rs.k and y.area_k = la.k and y.option_k = ch.k
@@ -7846,7 +7878,7 @@ async function races(
                 join contest_option o on o.contest_id = c.id and o.party_id is not null
                 left join entity_merge m on m.entity_id = o.party_id
                 join outcome x on x.option_id = o.id and x.kind in ('elected', 'won') and x.candidacy_id is null
-                join result_set rs on rs.id = x.result_set_id and rs.is_default
+                join result_set rs on rs.id = x.result_set_id and ${latest("rs")}
                 where c.election_id = ${head.election}::uuid and coalesce(c.body_id, c.office_id) = ${head.owner}::uuid
               )
               select coalesce(bm.into_id, br.parent_party_id, lin.party, pm.into_id, w.party_id, ld.party_id) as party,
@@ -7963,6 +7995,30 @@ async function races(
                   .toSorted((a, b) => b.seats - a.seats),
               },
         multiple: returned?.rows[0]?.multiple ?? 0,
+        repeats: Map.groupBy(repeated?.rows ?? [], (row) =>
+          row.party == null
+            ? "independent"
+            : `party:${parentOf.get(row.party) ?? row.party}`,
+        )
+          .entries()
+          .map(([key, rows]) => {
+            const shown = results.find((entry) => entry.key === key);
+            let extra = 0;
+            for (const row of rows) {
+              extra += row.returns - 1;
+            }
+            return {
+              label: shown?.label ?? "",
+              seats: shown?.seats ?? 0,
+              members: (shown?.seats ?? 0) - extra,
+              people: rows.map((row) => ({
+                name: row.name,
+                returns: row.returns,
+              })),
+            };
+          })
+          .filter((entry) => entry.label !== "" && entry.seats > 0)
+          .toArray(),
         spread: spread.rows,
         measure: here?.measure ?? "votes",
         valid: here?.side.valid ?? 0,
@@ -8045,7 +8101,7 @@ async function races(
         ) pc on true
         join contest_option o on o.contest_id = pc.id and o.party_id is not null
         join outcome x on x.option_id = o.id and x.kind in ('elected', 'won') and x.candidacy_id is null
-        join result_set rs on rs.id = x.result_set_id and rs.is_default
+        join result_set rs on rs.id = x.result_set_id and ${latest("rs")}
         left join entity_merge pm on pm.entity_id = o.party_id
         left join party_affiliation br on br.party_id = coalesce(pm.into_id, o.party_id)
           and br.kind = 'regional_branch' and br.valid @> e.date_from
@@ -8334,6 +8390,18 @@ export const elections = {
               ),
             ),
             multiple: v.optional(v.number()),
+            repeats: v.optional(
+              v.array(
+                v.object({
+                  label: v.string(),
+                  seats: v.number(),
+                  members: v.number(),
+                  people: v.array(
+                    v.object({ name: v.string(), returns: v.number() }),
+                  ),
+                }),
+              ),
+            ),
             partners: v.array(v.array(v.string())),
             holders: v.nullable(
               v.object({
@@ -8554,7 +8622,7 @@ export const elections = {
               )
               and exists (
                 select from result_set rs join election y on y.id = rs.election_id
-                where rs.contest_id is null and rs.is_default and y.date_from = x.date_from and y.kind = x.kind
+                where rs.contest_id is null and ${latest("rs")} and y.date_from = x.date_from and y.kind = x.kind
               )
             order by x.date_from desc limit 1
           ) prior on true
@@ -8664,7 +8732,7 @@ export const elections = {
                   select tree.root, rs.k, a.k as area, c.kind = 'body_seats' as "isSeat" from contest c
                   join tree on tree.id = c.election_id
                   join election e on e.id = c.election_id
-                  join result_set rs on rs.contest_id = c.id and rs.is_default
+                  join result_set rs on rs.contest_id = c.id and ${latest("rs")}
                   join area a on a.id = c.district_area_id
                   where c.body_id = ${chamber}::uuid and c.kind in ('body_seats', 'list_allocation') and c.allocation_parent_id is null
                     and c.previous_round_id is null
@@ -9467,7 +9535,7 @@ export const elections = {
              where cy.option_id = o.id and cy.role = 'head' order by cy.id limit 1) as person,
             ${paint(sql`coalesce(pm.into_id, o.party_id)`, sql`select ${input.id}::uuid`, sql`k.date_from`)} as color
           from contest c
-          join result_set rs on rs.contest_id = c.id and rs.is_default
+          join result_set rs on rs.contest_id = c.id and ${latest("rs")}
           join outcome x on x.result_set_id = rs.id and x.kind in ('elected', 'won') and x.candidacy_id is null
           join contest_option o on o.id = x.option_id
           left join entity_merge pm on pm.entity_id = o.party_id
@@ -9731,7 +9799,7 @@ export const elections = {
             cross join lateral (
               select distinct x.area_k from result_rollup x where x.result_set_k = rs.k
             ) r
-            where rs.contest_id = any(${sql.param(roots)}::uuid[]) and rs.is_default
+            where rs.contest_id = any(${sql.param(roots)}::uuid[]) and ${latest("rs")}
           )
           select a.scheme_code as scheme, sc.noun, array_agg(a.k order by a.k) as ks
           from hits h join area a on a.k = h.area_k join scheme sc on sc.code = a.scheme_code
@@ -9965,7 +10033,7 @@ export const elections = {
         winners as materialized (
           select l.id as leaf, l.root, o.id, o.party_id, o.alliance_id, o.kind = 'candidate' and exists (select from candidacy cd where cd.option_id = o.id and cd.is_independent) as independent, max(coalesce(x.seats, 1))::int as seats
           from leaves l
-          join result_set rs on rs.contest_id = l.id and rs.is_default
+          join result_set rs on rs.contest_id = l.id and ${latest("rs")}
           join outcome x on x.result_set_id = rs.id and x.candidacy_id is null and x.kind in ('elected', 'won')
           join contest_option o on o.id = x.option_id
           group by l.id, l.root, o.id, o.party_id, o.alliance_id, o.kind
@@ -9978,7 +10046,7 @@ export const elections = {
           join election le on le.id = lc.election_id
           left join polity_territory lt on lt.polity_id = le.polity_id and lt.valid @> le.date_from
           join area la on la.id = coalesce(lc.district_area_id, lt.area_id)
-          join result_set rs on rs.contest_id = ch.contest_id and rs.is_default
+          join result_set rs on rs.contest_id = ch.contest_id and ${latest("rs")}
           cross join lateral (
             select max(y.value) as value from result_rollup y
             where y.result_set_k = rs.k and y.area_k = la.k and y.option_k = ch.k
@@ -10289,7 +10357,7 @@ export const elections = {
         winners as materialized (
           select r.id as contest, r.part, r.tier, o.id, o.party_id, max(coalesce(x.seats, 1)) as seats
           from roots r
-          join result_set rs on rs.contest_id = r.id and rs.is_default
+          join result_set rs on rs.contest_id = r.id and ${latest("rs")}
           join outcome x on x.result_set_id = rs.id and x.candidacy_id is null and x.kind in ('elected', 'won')
           join contest_option o on o.id = x.option_id
           where r.tier <> 'measure'
@@ -10307,7 +10375,7 @@ export const elections = {
         leads as (
           select distinct on (l.parent) l.parent, l.party_id
           from lines l
-          join result_set rs on rs.contest_id = l.contest_id and rs.is_default
+          join result_set rs on rs.contest_id = l.contest_id and ${latest("rs")}
           cross join lateral (
             select max(y.value) as value from result_rollup y
             where y.result_set_k = rs.k and y.area_k = l.area and y.option_k = l.k
@@ -10321,7 +10389,7 @@ export const elections = {
               select from result_set rs
               join outcome x on x.result_set_id = rs.id and x.kind = 'won'
               join contest_option o on o.id = x.option_id
-              where rs.contest_id = r.id and rs.is_default and o.ballot_label ~* '^(yes|for|approve)'
+              where rs.contest_id = r.id and ${latest("rs")} and o.ballot_label ~* '^(yes|for|approve)'
             ))::int as passed
           from roots r where r.tier = 'measure'
           group by r.part
@@ -10767,7 +10835,7 @@ export const polities = {
               and (c.district_area_id is null or c.district_area_id = pt.area_id)
               and exists (
                 select from result_set rs
-                where rs.contest_id = c.id and rs.is_default and exists (
+                where rs.contest_id = c.id and ${latest("rs")} and exists (
                   select from (
                     select u.area_k from result_rollup_unit u where u.result_set_k = rs.k
                     union all
@@ -10796,7 +10864,7 @@ export const polities = {
                 select r.value from result_rollup r
                 where r.result_set_k = rs.k and r.area_k = a.k and r.measure = any(${COUNTED}) offset 0
               ) r
-              where rs.contest_id = c.id and rs.is_default
+              where rs.contest_id = c.id and ${latest("rs")}
             ) v
             where e.polity_id = ${input.id}::uuid and e.status = 'held' and e.date_from = ${newest}::date
               and (c.district_area_id is null or c.district_area_id = pt.area_id)
@@ -11436,7 +11504,7 @@ export const polities = {
             select o.id, o.party_id, o.kind, o.parent_option_id, x.seats
             from contest_option o
             join outcome x on x.option_id = o.id and x.kind in ('elected', 'won') and x.candidacy_id is null
-            join result_set rs on rs.id = x.result_set_id and rs.is_default
+            join result_set rs on rs.id = x.result_set_id and ${latest("rs")}
             where o.contest_id = t.id
             offset 0
           ) o
@@ -11446,7 +11514,7 @@ export const polities = {
             and not (o.kind = 'candidate' and not ${pooled(sql`o.parent_option_id`)} and exists (
               select from contest_option l
               join outcome lx on lx.option_id = l.id and lx.kind in ('elected', 'won') and lx.candidacy_id is null
-              join result_set lr on lr.id = lx.result_set_id and lr.is_default
+              join result_set lr on lr.id = lx.result_set_id and ${latest("lr")}
               where l.contest_id = t.id and l.kind = 'list'
             ))
           group by t.root, t.id, o.id, o.party_id
@@ -11463,7 +11531,7 @@ export const polities = {
         leads as (
           select distinct on (l.parent) l.parent, l.party_id
           from lines l
-          join result_set rs on rs.contest_id = l.contest_id and rs.is_default
+          join result_set rs on rs.contest_id = l.contest_id and ${latest("rs")}
           cross join lateral (
             select max(y.value) as value from result_rollup y
             where y.result_set_k = rs.k and y.area_k = l.area and y.option_k = l.k
@@ -11491,7 +11559,7 @@ export const polities = {
             x.count_round, max(x.count_round) over (partition by r.id, x.measure) as first
           from (select id, area from roots where "isOffice") r
           join (select distinct root, contest from won) w on w.root = r.id
-          join result_set rs on rs.contest_id = w.contest and rs.is_default
+          join result_set rs on rs.contest_id = w.contest and ${latest("rs")}
           cross join lateral (
             select x.option_k, x.measure, x.value, x.count_round from result_rollup x
             where x.result_set_k = rs.k and x.area_k = r.area and x.measure = any(${COUNTED}) and x.option_k <> 0
@@ -12793,7 +12861,7 @@ export const bodies = {
               join contest_option o on o.contest_id = c.id
               left join contest_option po on po.id = o.parent_option_id
               join outcome x on x.option_id = o.id and x.kind = 'elected'
-              join result_set rs on rs.id = x.result_set_id and rs.is_default
+              join result_set rs on rs.id = x.result_set_id and ${latest("rs")}
               join candidacy cd on cd.option_id = o.id
                 and (cd.id = x.candidacy_id or (x.candidacy_id is null and cd.role = 'head'))
               left join entity_merge pm on pm.entity_id = coalesce(o.party_id, po.party_id)
@@ -13228,7 +13296,7 @@ export const people = {
               then min(o.value) filter (where o.elected) - max(o.value) filter (where o.named and not o.elected) end as majority
           from (
             select f.root, f.option, sum(f.value) as value, co.kind in ('candidate', 'ticket') as named, exists (
-              select from outcome x join result_set rs on rs.id = x.result_set_id and rs.is_default
+              select from outcome x join result_set rs on rs.id = x.result_set_id and ${latest("rs")}
               where x.option_id = co.id and x.candidacy_id is null and x.kind in ('elected', 'won')
             ) as elected
             from fetched f join mains m on m.root = f.root and m.main = f.measure
@@ -13245,31 +13313,31 @@ export const people = {
         )
         select p.root, p.date::text as date, p.year, p.kind, p.election, t.main::int as measure, t.votes,
           g.majority, exists (
-            select from result_set rs where rs.contest_id = p.root and rs.is_default and rs.kind = 'tacit'
+            select from result_set rs where rs.contest_id = p.root and ${latest("rs")} and rs.kind = 'tacit'
           ) as unopposed,
           case when t.main = 11 then coalesce(t.appointed, t.total) else t.total end as total,
           coalesce(
             (select (array_agg(x.kind::text order by array_position(array['elected', 'advanced', 'won', 'tied']::outcome_kind[], x.kind)))[1]
               from mine m join outcome x on x.option_id = m.option
                 and (x.candidacy_id = m.candidacy or (x.candidacy_id is null and m.role = 'head'))
-              join result_set rs on rs.id = x.result_set_id and rs.is_default
+              join result_set rs on rs.id = x.result_set_id and ${latest("rs")}
               where m.contest_id = p.root),
             (select 'elsewhere' from mine m join contest c on c.id = m.contest_id join election e on e.id = c.election_id
               join outcome x on x.option_id = m.option and x.kind in ('elected', 'won')
                 and (x.candidacy_id = m.candidacy or (x.candidacy_id is null and m.role = 'head'))
-              join result_set rs on rs.id = x.result_set_id and rs.is_default
+              join result_set rs on rs.id = x.result_set_id and ${latest("rs")}
               where coalesce(e.parent_id, e.id) = (select coalesce(pe.parent_id, pe.id) from election pe where pe.id = p.election)
                 and m.contest_id not in (select g.id from grp g where g.root = p.root)
                 and exists (select from mine l join grp g on g.id = l.contest_id and g.root = p.root where l.role = 'list_member')
               limit 1),
             (select 'lost' from contest_option o join outcome x on x.option_id = o.id and x.kind in ('elected', 'won', 'advanced')
-              join result_set rs on rs.id = x.result_set_id and rs.is_default
+              join result_set rs on rs.id = x.result_set_id and ${latest("rs")}
               where o.contest_id = p.root limit 1)
           ) as outcome,
           (select (array_agg(x.notes order by array_position(array['elected', 'advanced', 'won', 'tied']::outcome_kind[], x.kind)))[1]
             from mine m join outcome x on x.option_id = m.option
               and (x.candidacy_id = m.candidacy or (x.candidacy_id is null and m.role = 'head'))
-            join result_set rs on rs.id = x.result_set_id and rs.is_default
+            join result_set rs on rs.id = x.result_set_id and ${latest("rs")}
             where m.contest_id = p.root) as note,
           lead.party, coalesce(lead.independent, false) as independent, coalesce(lead.scoped, false) as scoped,
           (select n.text from name n where n.entity_id = lead.party and n.kind in ('official', 'english')
@@ -14005,7 +14073,7 @@ export const parties = {
             select m.contest_id, m.option, case when c.party_scope_id is null then c.kind::text end as kind, max(coalesce(x.seats, 1)) as seats
             from mine m join contest c on c.id = m.contest_id
             join outcome x on x.option_id = m.option and x.candidacy_id is null and x.kind in ('elected', 'won')
-            join result_set rs on rs.id = x.result_set_id and rs.is_default
+            join result_set rs on rs.id = x.result_set_id and ${latest("rs")}
             group by m.contest_id, m.option, c.kind, c.party_scope_id
           ) w
           group by w.contest_id
@@ -14266,12 +14334,12 @@ export const parties = {
                 ) sub on true
                 join contest_option o on o.contest_id = sub.id
                 join outcome x on x.option_id = o.id and x.kind in ('elected', 'won')
-                join result_set rs on rs.id = x.result_set_id and rs.is_default
+                join result_set rs on rs.id = x.result_set_id and ${latest("rs")}
                 where (not exists (select from contest k where k.allocation_parent_id = sub.id)
                   or sub.id = r.id and not exists (select from contest k where k.allocation_parent_id = r.id))
                   and not (o.kind = 'list' and ${pooled(sql`o.id`)})
                   and not (o.parent_option_id is not null and not ${pooled(sql`o.parent_option_id`)} and exists (
-                    select from outcome y join result_set ry on ry.id = y.result_set_id and ry.is_default
+                    select from outcome y join result_set ry on ry.id = y.result_set_id and ${latest("ry")}
                     where y.option_id = o.parent_option_id and y.kind in ('elected', 'won') and y.candidacy_id is null
                   ))
                 group by r.id, o.id
@@ -14380,7 +14448,7 @@ export const parties = {
         counted as (
           select r.id, sum(x.value) filter (where o.party_id in (select id from ids))::float8 as votes,
             sum(x.value)::float8 as total
-          from roots r join result_set rs on rs.contest_id = r.id and rs.is_default
+          from roots r join result_set rs on rs.contest_id = r.id and ${latest("rs")}
           cross join lateral (
             select x.option_k, x.value from result_rollup x
             where x.result_set_k = rs.k and x.area_k = r.area and x.measure = 1 and x.option_k <> 0 offset 0
@@ -14393,7 +14461,7 @@ export const parties = {
             sum(x.seats)::int as filled
           from roots r join contest_option o on o.contest_id = r.id
           join outcome x on x.option_id = o.id and x.kind in ('elected', 'won')
-          join result_set rs on rs.id = x.result_set_id and rs.is_default
+          join result_set rs on rs.id = x.result_set_id and ${latest("rs")}
           group by o.contest_id
         )
         select r.id, r.election, r.path, r.tail, r.date_from::text as date, extract(year from r.date_from)::int as year,

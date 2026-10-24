@@ -3,6 +3,7 @@ import { error, redirect } from "@sveltejs/kit";
 import { sql } from "drizzle-orm";
 import { effective, stand } from "#lib/caucus.js";
 import { db } from "#lib/server/db/index.js";
+import { latest } from "#lib/server/rpc/archive.js";
 import { router } from "#lib/server/rpc/router.js";
 import land from "#lib/server/world.txt?raw";
 
@@ -834,7 +835,7 @@ export async function comparison(ids: Array<string>) {
           select o.party_id as id, sum(coalesce(x.seats, 1)) as rank, 0 as tie
           from contest_option o
           join outcome x on x.option_id = o.id and x.kind in ('elected', 'won')
-          join result_set rs on rs.id = x.result_set_id and rs.is_default
+          join result_set rs on rs.id = x.result_set_id and ${latest("rs")}
           where o.contest_id in (select contest_id from contest_option where party_id = ${first.id}::uuid)
             and o.party_id <> ${first.id}::uuid
           group by o.party_id
@@ -854,7 +855,7 @@ export async function comparison(ids: Array<string>) {
               from (select distinct contest_id from mine) x
               join contest c on c.id = x.contest_id
               join election e on e.id = c.election_id
-              join result_set rs on rs.contest_id = c.id and rs.is_default
+              join result_set rs on rs.contest_id = c.id and ${latest("rs")}
               join area a on a.id = coalesce(c.district_area_id, (
                 select t.area_id from polity_territory t where t.polity_id = e.polity_id and t.valid @> e.date_from
               ))

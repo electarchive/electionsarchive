@@ -1592,6 +1592,25 @@ function electionMarkdown(
       : [
           `## ${m.governments_title()}`,
           m.governments_lede(),
+        ...(race.repeats ?? []).map((repeat) =>
+          repeat.people.length === 1
+            ? m.race_repeat_one({
+                name: repeat.people[0]?.name ?? "",
+                count: count(repeat.people[0]?.returns ?? 0),
+                party: definite(repeat.label),
+                seats: count(repeat.seats),
+                members: count(repeat.members),
+              })
+            : m.race_repeat_many({
+                names: new Intl.ListFormat(getLocale(), {
+                  style: "long",
+                  type: "conjunction",
+                }).format(repeat.people.map((person) => person.name)),
+                party: definite(repeat.label),
+                seats: count(repeat.seats),
+                members: count(repeat.members),
+              }),
+        ),
           table(
             [
               m.col_name(),
@@ -2218,6 +2237,47 @@ function contestMarkdown(
       : [
           `## ${m.children_title()}`,
           contest.children
+    ...(lists == null || lists.replacements.length === 0
+      ? []
+      : [
+          `## ${m.lists_changes()}`,
+          lists.replacements
+            .map((change) => {
+              const reasons: Record<string, () => string> = {
+                resigned: m.lists_reason_resigned,
+                died: m.lists_reason_died,
+                removed: m.lists_reason_removed,
+                expelled: m.lists_reason_expelled,
+                disqualified: m.lists_reason_disqualified,
+                lost_seat: m.lists_reason_lost_seat,
+              };
+              const reason = reasons[change.replaced.via ?? ""]?.();
+              const label = lists.lists.find(
+                (list) => list.key === change.list,
+              )?.label;
+              const line =
+                reason == null
+                  ? m.lists_change({
+                      successor: link(change.name, `id/${change.person}`),
+                      predecessor: link(
+                        change.replaced.name,
+                        `id/${change.replaced.person}`,
+                      ),
+                      date: date(change.date),
+                    })
+                  : m.lists_change_reason({
+                      successor: link(change.name, `id/${change.person}`),
+                      predecessor: link(
+                        change.replaced.name,
+                        `id/${change.replaced.person}`,
+                      ),
+                      reason,
+                      date: date(change.date),
+                    });
+              return `- ${label == null ? "" : `${label}: `}${line}`;
+            })
+            .join("\n"),
+        ]),
             .map((child) => `- ${link(child.name, child.path)}`)
             .join("\n"),
         ]),

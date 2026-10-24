@@ -520,6 +520,8 @@
     }
   ],
   "race_unopposed_party": "{party} {seats}",
+  "race_repeat_one": "{name} was returned for {count} seats, so {party}'s {seats} seats belong to {members} members.",
+  "race_repeat_many": "{names} were each returned for more than one seat, so {party}'s {seats} seats belong to {members} members.",
   "race_lede_seats_first": "{party} won {seats} of the {total} seats, with {share} of the first-round vote.",
   "race_lede_tally": "{party} won {seats} of {total}, with {share} of the vote.",
   "race_lede_split": "{party} won {seats} of the {total} {noun} races with {share} of the vote.",

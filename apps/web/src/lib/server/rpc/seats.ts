@@ -5,7 +5,7 @@ import { os } from "#lib/server/cache.js";
 import { db } from "#lib/server/db/index.js";
 import layout2010 from "#lib/server/hex/gb-pcon-2010.json";
 import layout2024 from "#lib/server/hex/gb-pcon-2024.json";
-import { inside, names, paths, refs } from "#lib/server/rpc/archive.js";
+import { inside, latest, names, paths, refs } from "#lib/server/rpc/archive.js";
 
 const fold = (key: string) => (key.startsWith("person:") ? "independent" : key);
 
@@ -145,7 +145,7 @@ export const seats = {
           join outcome x on x.result_set_id = rs.id and x.kind in ('elected', 'won') and x.candidacy_id is null
           join contest_option o on o.id = x.option_id
           join election e on e.id = rs.election_id
-          where rs.is_default and rs.contest_id in (select id from paired union select prior from paired)
+          where ${latest("rs")} and rs.contest_id in (select id from paired union select prior from paired)
         ),
         won as (
           select distinct on (t.contest, t.k) t.contest, t.k,
@@ -436,7 +436,7 @@ export const seats = {
             ) y
             where kc.id = rs.contest_id
           ) v on true
-          where rs.is_default and rs.contest_id in (select id from paired union select prior from paired)
+          where ${latest("rs")} and rs.contest_id in (select id from paired union select prior from paired)
         ),
         won as (
           select distinct on (t.contest, t.k) t.contest, t.k, t.seats, t.votes,
@@ -749,7 +749,7 @@ export const seats = {
           left join party_affiliation br on br.party_id = coalesce(pm.into_id, o.party_id)
             and br.kind = 'regional_branch' and br.valid @> e.date_from
           left join entity_merge bm on bm.entity_id = br.parent_party_id
-          where rs.is_default and rs.contest_id in (select id from bys union select prior from prior)
+          where ${latest("rs")} and rs.contest_id in (select id from bys union select prior from prior)
         ),
         left_seat as (
           select b.id, t.person, t.via
@@ -764,7 +764,7 @@ export const seats = {
         ),
         votes as (
           select b.id, sum(x.value)::float8 as votes, row_number() over (partition by b.id order by sum(x.value) desc) as place
-          from bys b join result_set rs on rs.contest_id = b.id and rs.is_default
+          from bys b join result_set rs on rs.contest_id = b.id and ${latest("rs")}
           join area a on a.id = b.area
           cross join lateral (
             select x.option_k, x.value from result_rollup x
@@ -1019,19 +1019,19 @@ export const seats = {
             (select sum(coalesce(x.seats, 1))::int from outcome x
               where x.result_set_id = rs.id and x.option_id = o.id and x.candidacy_id is null and x.kind in ('won', 'elected')) as seats,
             null::uuid as person, null::text as ballot
-          from c join result_set rs on rs.contest_id = c.id and rs.is_default
+          from c join result_set rs on rs.contest_id = c.id and ${latest("rs")}
           join contest_option o on o.contest_id = c.id
           union all
           select 'list', o.id, o.party_id, o.kind::text, o.ballot_label, null, null, cy.person_id, cy.ballot_name
           from c join contest_option o on o.contest_id = c.id
           join candidacy cy on cy.option_id = o.id and cy.role in ('list_member', 'head')
-          join result_set rs on rs.contest_id = c.id and rs.is_default
+          join result_set rs on rs.contest_id = c.id and ${latest("rs")}
           where exists (select from outcome x where x.result_set_id = rs.id and x.option_id = o.id and x.kind in ('won', 'elected'))
           union all
           select 'seat', k.id, o.party_id, o.kind::text, o.ballot_label, null, 1, cy.person_id, cy.ballot_name
           from c join contest k on k.election_id = c.election_id and k.kind = 'body_seats' and k.allocation_parent_id is null
           join area_parent ap on ap.area_id = k.district_area_id and ap.parent_id = c.region and ap.valid @> c.day
-          join result_set rs on rs.contest_id = k.id and rs.is_default
+          join result_set rs on rs.contest_id = k.id and ${latest("rs")}
           join outcome x on x.result_set_id = rs.id and x.kind in ('elected', 'won') and x.candidacy_id is null
           join contest_option o on o.id = x.option_id
           left join candidacy cy on cy.option_id = o.id and cy.role = 'head'
