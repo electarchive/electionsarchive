@@ -47,7 +47,7 @@
         "br.uf"
       ],
       "fine": [
-        "br.municipio",
+        "br.municipality",
         "br.zona",
         "br.secao"
       ],
@@ -128,7 +128,7 @@
         "br.uf"
       ],
       "fine": [
-        "br.municipio",
+        "br.municipality",
         "br.zona",
         "br.secao"
       ],
@@ -224,7 +224,7 @@
         "br.uf"
       ],
       "fine": [
-        "br.municipio",
+        "br.municipality",
         "br.zona",
         "br.secao"
       ],

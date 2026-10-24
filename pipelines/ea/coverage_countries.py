@@ -359,7 +359,7 @@ def tally(cc: str, data: dict) -> tuple[dict, list[dict], list[dict]]:
                 else:
                     k = r[10] if unit == "polity" else cid
                     need = level.get("units") or 1
-                    ok = tacit or (at_grain >= 0.9 * need if grain else results)
+                    ok = tacit or (at_grain >= 0.9 * need or finer if grain else results)
                     current = "complete" if ok else "totals" if results else "bare"
                     rank = {"complete": 0, "totals": 1, "bare": 2}
                     if k not in status or rank[current] < rank[status[k]]:
