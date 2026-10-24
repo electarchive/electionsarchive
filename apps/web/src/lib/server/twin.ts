@@ -2133,10 +2133,19 @@ function sourcesMarkdown(
             ];
       return `- ${marks.length === 0 ? "" : `${marks.join(", ")}: `}${source.url == null ? source.title : `[${source.title}](${source.url})`}, ${source.publisher}${source.license == null ? "" : `. ${m.source_license({ license: source.license })}`}`;
     }),
-    ...contest.citations.map(
-      (citation) =>
-        `- ${citation.url == null ? citation.title : `[${citation.title}](${citation.url})`}, ${citation.publisher}`,
-    ),
+    ...contest.citations
+      .filter(
+        (citation) =>
+          !sets.some(
+            ({ source }) =>
+              source.title === citation.title &&
+              source.publisher === citation.publisher,
+          ),
+      )
+      .map(
+        (citation) =>
+          `- ${citation.url == null ? citation.title : `[${citation.title}](${citation.url})`}, ${citation.publisher}`,
+      ),
   ];
   return sources.length === 0
     ? []

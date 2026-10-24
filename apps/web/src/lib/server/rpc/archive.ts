@@ -3592,6 +3592,7 @@ export const contests = {
         isRemainder: boolean;
         counted: boolean;
         own: boolean;
+        lineage: boolean;
       }>(sql`
         with recursive anc(id) as (
           select ${area.id}::uuid
@@ -3601,43 +3602,71 @@ export const contests = {
         later(id) as (
           select ${contest.place?.id ?? null}::uuid
           union
-          select t.area_id from later
-          join area_event_member f on f.area_id = later.id and f.role = 'from'
-          join area_event e on e.id = f.event_id and e.kind = 'boundary_changed'
-          join area_event_member t on t.event_id = e.id and t.role = 'to'
-            and (
-              (select count(*) from area_event_member n where n.event_id = e.id and n.role = 'from') = 1
-              or (select count(*) from area_event_member n where n.event_id = e.id and n.role = 'to') = 1
-              or exists (
-                select from area_geometry gf join area_geometry gt on gf.geom && gt.geom
-                where gf.area_id = f.area_id and gt.area_id = t.area_id
-                  and ST_Area(ST_Intersection(gf.geom, gt.geom)) > 0.05 * least(ST_Area(gf.geom), ST_Area(gt.geom))
+          select x.id from later cross join lateral (
+            select t.area_id as id from area_event_member f
+            join area_event e on e.id = f.event_id and e.kind = 'boundary_changed'
+            join area_event_member t on t.event_id = e.id and t.role = 'to'
+              and (
+                (select count(*) from area_event_member n where n.event_id = e.id and n.role = 'from') = 1
+                or (select count(*) from area_event_member n where n.event_id = e.id and n.role = 'to') = 1
+                or exists (
+                  select from area_geometry gf join area_geometry gt on gf.geom && gt.geom
+                  where gf.area_id = f.area_id and gt.area_id = t.area_id
+                    and ST_Area(ST_Intersection(gf.geom, gt.geom)) > 0.05 * least(ST_Area(gf.geom), ST_Area(gt.geom))
+                )
               )
-            )
+            where f.area_id = later.id and f.role = 'from'
+            union
+            select b.id from area a
+            join crosswalk_weight f on f.from_k = a.k and f.weight >= 0.5
+            join crosswalk fc on fc.id = f.crosswalk_id and fc.method = 'area'
+            join boundary_set bf on bf.id = fc.from_boundary_set_id
+            join boundary_set bt on bt.id = fc.to_boundary_set_id and bt.valid_from > bf.valid_from
+            join crosswalk_weight r on r.from_k = f.to_k and r.to_k = a.k and r.weight >= 0.5
+            join crosswalk rc on rc.id = r.crosswalk_id and rc.method = 'area'
+              and rc.from_boundary_set_id = fc.to_boundary_set_id and rc.to_boundary_set_id = fc.from_boundary_set_id
+            join area b on b.k = f.to_k
+            where a.id = later.id
+          ) x
         ),
         earlier(id) as (
           select ${contest.place?.id ?? null}::uuid
           union
-          select f.area_id from earlier
-          join area_event_member t on t.area_id = earlier.id and t.role = 'to'
-          join area_event e on e.id = t.event_id and e.kind = 'boundary_changed'
-          join area_event_member f on f.event_id = e.id and f.role = 'from'
-            and (
-              (select count(*) from area_event_member n where n.event_id = e.id and n.role = 'from') = 1
-              or (select count(*) from area_event_member n where n.event_id = e.id and n.role = 'to') = 1
-              or exists (
-                select from area_geometry gf join area_geometry gt on gf.geom && gt.geom
-                where gf.area_id = f.area_id and gt.area_id = t.area_id
-                  and ST_Area(ST_Intersection(gf.geom, gt.geom)) > 0.05 * least(ST_Area(gf.geom), ST_Area(gt.geom))
+          select x.id from earlier cross join lateral (
+            select f.area_id as id from area_event_member t
+            join area_event e on e.id = t.event_id and e.kind = 'boundary_changed'
+            join area_event_member f on f.event_id = e.id and f.role = 'from'
+              and (
+                (select count(*) from area_event_member n where n.event_id = e.id and n.role = 'from') = 1
+                or (select count(*) from area_event_member n where n.event_id = e.id and n.role = 'to') = 1
+                or exists (
+                  select from area_geometry gf join area_geometry gt on gf.geom && gt.geom
+                  where gf.area_id = f.area_id and gt.area_id = t.area_id
+                    and ST_Area(ST_Intersection(gf.geom, gt.geom)) > 0.05 * least(ST_Area(gf.geom), ST_Area(gt.geom))
+                )
               )
-            )
+            where t.area_id = earlier.id and t.role = 'to'
+            union
+            select b.id from area a
+            join crosswalk_weight f on f.from_k = a.k and f.weight >= 0.5
+            join crosswalk fc on fc.id = f.crosswalk_id and fc.method = 'area'
+            join boundary_set bf on bf.id = fc.from_boundary_set_id
+            join boundary_set bt on bt.id = fc.to_boundary_set_id and bt.valid_from < bf.valid_from
+            join crosswalk_weight r on r.from_k = f.to_k and r.to_k = a.k and r.weight >= 0.5
+            join crosswalk rc on rc.id = r.crosswalk_id and rc.method = 'area'
+              and rc.from_boundary_set_id = fc.to_boundary_set_id and rc.to_boundary_set_id = fc.from_boundary_set_id
+            join area b on b.k = f.to_k
+            where a.id = earlier.id
+          ) x
         ),
         roots as (
           select c.id, case when c.kind = 'ballot_question' then c.id::text
             else concat_ws(':', c.office_id, c.body_id, c.kind, c.round_number, c.party_scope_id) end as series,
             e.id as election, e.kind = 'indirect' as indirect, e.date_from, ${CYCLE} as year, e.status,
             c.term is not distinct from 'remainder' as "isRemainder",
-            c.district_area_id is not distinct from ${contest.place?.id ?? null}::uuid as own
+            c.district_area_id is not distinct from ${contest.place?.id ?? null}::uuid as own,
+            c.district_area_id is distinct from ${contest.place?.id ?? null}::uuid
+              and c.district_area_id in (select id from later union select id from earlier) as lineage
           from (
             select x.id from contest x where x.district_area_id in (select id from anc) and x.allocation_parent_id is null
             union
@@ -3694,7 +3723,7 @@ export const contests = {
         )
         select * from (
           select r.id, r.series, r.election, r.indirect, r.date_from::text as date, r.year, r.status::text as status,
-            r."isRemainder", r.id in (select root from tallied) as counted, r.own, r.date_from
+            r."isRemainder", r.id in (select root from tallied) as counted, r.own, r.lineage, r.date_from
           from roots r
           where r.id <> ${contest.root}::uuid
         ) r
@@ -3889,10 +3918,19 @@ export const contests = {
              from grp cross join lateral (select * from result_set x where x.contest_id = grp.id offset 0) rs
            ),
            picked as (
-             select distinct on (rs.contest_id) rs.root, rs.k
+             select distinct on (rs.contest_id) rs.root, rs.k, hit.area
              from sets rs
              join lateral (
-               select 1 from result_rollup r where r.result_set_k = rs.k and r.area_k = ${area.k} and r.measure = any(${COUNTED}) limit 1
+               select x.area from (
+                 select ${area.k}::int as area, 0 as rank
+                 union all
+                 select a.k, 1 from contest c join area a on a.id = c.district_area_id
+                 where c.id = rs.root and c.id = any(${sql.param(sameRace.filter((row) => row.lineage).map((row) => row.id))}::uuid[])
+               ) x
+               where exists (
+                 select from result_rollup r where r.result_set_k = rs.k and r.area_k = x.area and r.measure = any(${COUNTED})
+               )
+               order by x.rank limit 1
              ) hit on true
              order by rs.contest_id, rs.is_default desc, array_position(${STAGES}, rs.stage), rs.completeness desc nulls last
            ),
@@ -3903,7 +3941,7 @@ export const contests = {
                  min(r.count_round) over (partition by r.measure) as first,
                  max(r.count_round) over (partition by r.measure) as last
                from result_rollup r
-               where r.result_set_k = p.k and r.area_k = ${area.k}
+               where r.result_set_k = p.k and r.area_k = p.area
                  and (r.measure = any(${COUNTED}) and r.option_k <> 0 or r.measure = 2 and r.option_k = 0)
              ) r
            ),
