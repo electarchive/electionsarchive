@@ -1,4 +1,5 @@
 import html
+import json
 import re
 import unicodedata
 import zipfile
@@ -339,6 +340,20 @@ NOTES = {
         "and by constituency."
     ),
 }
+WIKIDATA_TERMS = {1997: "Q3570394", 2002: "Q3570376"}
+WIKIDATA_QUERY = (
+    "https://query.wikidata.org/sparql?format=json&query="
+    "SELECT%20%3Fp%20%3FpLabel%20%3Fparty%20%3FpartyLabel%20WHERE%20%7B%20%3Fp%20p%3AP39%20%3Fs%20.%20"
+    "%3Fs%20ps%3AP39%20wd%3AQ3044918%20%3B%20pq%3AP2937%20wd%3A{term}%20.%20"
+    "OPTIONAL%7B%3Fp%20wdt%3AP102%20%3Fparty%7D%20"
+    "SERVICE%20wikibase%3Alabel%20%7B%20bd%3AserviceParam%20wikibase%3Alanguage%20%22fr%2Cen%22.%20%7D%20%7D"
+)
+WIKIDATA_TITLE = "Wikidata: deputies of the 11th and 12th legislatures and their parties"
+ASSOCIATION_CAVEAT = (
+    "Candidates who ran under the joint label of the Socialist Party and the Radical Party of the Left are coded as "
+    "Socialist, except winners whom Wikidata's records name as a member of the Radical Party of the Left alone; the "
+    "source does not separate the two parties for the label's losing candidates."
+)
 TENDENCY_CAVEAT = (
     "The source groups votes by political tendency and does not name the candidates. Where two candidates of one "
     "tendency stood in a constituency, their votes are combined, and the winner is the tendency with the most votes."
@@ -371,6 +386,8 @@ def fold(text: str) -> str:
 
 
 def fetch() -> None:
+    for term in WIKIDATA_TERMS.values():
+        raw.fetch(SOURCE, WIKIDATA_QUERY.format(term=term), suffix=".json")
     for url in FILES.values():
         raw.fetch(SOURCE, url, suffix=".zip")
     for url in AGGREGATED.values():
@@ -725,6 +742,31 @@ def emit() -> Path:
     options = pl.read_parquet(PARSED / "options.parquet")
     council = pl.read_parquet(PARSED / "council.parquet")
     unsettled = set(pl.read_parquet(PARSED / "unsettled.parquet").iter_rows())
+    prg_winners: set[tuple[int, str, str]] = set()
+    for year, term in WIKIDATA_TERMS.items():
+        members: dict[str, dict[str, set[str]]] = {}
+        for row in json.loads(raw.cached(SOURCE, WIKIDATA_QUERY.format(term=term)).path.read_text())["results"][
+            "bindings"
+        ]:
+            member = members.setdefault(row["p"]["value"], {"names": {fold(row["pLabel"]["value"])}, "parties": set()})
+            if "party" in row:
+                member["parties"].add(row["partyLabel"]["value"])
+        by_name: dict[str, list[str]] = {}
+        for item, member in members.items():
+            for name in member["names"]:
+                by_name.setdefault(name, []).append(item)
+        for row in options.filter(
+            (pl.col("kind") == "legi")
+            & (pl.col("year") == year)
+            & pl.col("elected")
+            & pl.col("etiquette").str.to_uppercase().str.contains("^(ASSOCIATION PARTI SOCIALISTE|ASSOCIATION PS )")
+        ).iter_rows(named=True):
+            hits = by_name.get(fold(f"{row['forename'] or ''} {row['surname']}"), [])
+            if len(hits) == 1:
+                parties = members[hits[0]]["parties"]
+                if "Parti radical de gauche" in parties and "Parti socialiste" not in parties:
+                    prg_winners.add((year, row["circ"], fold(row["surname"])))
+    caveated: set[UUID] = set()
     with connect() as conn:
         labels: dict[str, str] = dict(
             conn.execute(
@@ -806,6 +848,20 @@ def emit() -> Path:
         )
         for url in AGGREGATED.values():
             cs.artifact(raw.cached(SOURCE, url), sources["aggregated"])
+        sources["wikidata"] = cs.source("Wikidata", WIKIDATA_TITLE)
+        if sources["wikidata"] in cs.minted:
+            cs.add(
+                "source",
+                id=sources["wikidata"],
+                kind="wikidata",
+                publisher="Wikidata",
+                title=WIKIDATA_TITLE,
+                url="https://www.wikidata.org",
+                license="CC0 1.0",
+                license_url="https://creativecommons.org/publicdomain/zero/1.0/",
+            )
+        for term in WIKIDATA_TERMS.values():
+            cs.artifact(raw.cached(SOURCE, WIKIDATA_QUERY.format(term=term)), sources["wikidata"])
         sources["council"] = cs.source(COUNCIL_PUBLISHER, COUNCIL_TITLE)
         cs.add(
             "source",
@@ -1278,7 +1334,10 @@ def emit() -> Path:
                                 if nuance == "PRG" and (line["etiquette"] or "").startswith(
                                     ("ASSOCIATION PARTI SOCIALISTE", "ASSOCIATION PS ")
                                 ):
-                                    nuance = "SOC"
+                                    if fresh and result_set not in caveated:
+                                        caveated.add(result_set)
+                                        cs.add("note", entity_id=result_set, kind="caveat", body_md=ASSOCIATION_CAVEAT)
+                                    nuance = "PRG" if (year, circ, fold(line["surname"])) in prg_winners else "SOC"
                                 if nuance is not None and nuance not in nuances:
                                     raise ValueError(f"unknown nuance {nuance} in {year}")
                                 party = (
