@@ -91,13 +91,15 @@ def parse() -> None:
                     continue
                 for column in range(width):
                     piece = line[14 + 18 * column : 32 + 18 * column].strip()
-                    if piece and not (
-                        (indent - 14) % 18 == 2 and re.fullmatch(r"[A-Z]{2,4}", piece)
-                    ):
+                    if piece and not ((indent - 14) % 18 == 2 and re.fullmatch(r"[A-Z]{2,4}", piece)):
                         names[column].append(piece)
             sums = [0] * width
             for line in body:
-                code = counties[re.sub(r"[^a-z]", "", re.split(r"\t|\d", line)[0].lower()) if "\t" in line else re.sub(r"[^a-z]", "", line[:14].lower())]
+                code = counties[
+                    re.sub(r"[^a-z]", "", re.split(r"\t|\d", line)[0].lower())
+                    if "\t" in line
+                    else re.sub(r"[^a-z]", "", line[:14].lower())
+                ]
                 cells = [0] * width
                 if "\t" in line:
                     found = [int(value) for value in re.findall(r"\d+", line[7:])]
@@ -158,7 +160,9 @@ def emit() -> Path:
             if districts["district"].n_unique() > 1
         }
         contests = dict(
-            conn.execute("select value, entity_id from external_id where scheme = 'us.contest' and value ~ ':KY:house:'")
+            conn.execute(
+                "select value, entity_id from external_id where scheme = 'us.contest' and value ~ ':KY:house:'"
+            )
         )
         for (day, district), rows in frame.group_by("day", "district", maintain_order=True):
             key = f"{day}:KY:house:{district}"
@@ -191,7 +195,10 @@ def emit() -> Path:
             targets: dict[str, object] = {}
             for column, label in rows.select("column", "label").unique(maintain_order=True).iter_rows():
                 words = [re.sub(r"[^a-z]", "", word.lower()) for word in label.split()]
-                for attempt in ([[word] for word in words[-1:] if len(word) >= 3], [[word] for word in words if len(word) >= 3]):
+                for attempt in (
+                    [[word] for word in words[-1:] if len(word) >= 3],
+                    [[word] for word in words if len(word) >= 3],
+                ):
                     found = {
                         option
                         for guess in attempt
@@ -257,7 +264,9 @@ def emit() -> Path:
             ).fetchall():
                 cs.add("outcome", result_set_id=result_set, option_id=option, kind=kind, seats=seats)
             unit_ids = dict(units)
-            ((district_area,),) = conn.execute("select district_area_id from contest where id = %s", [contest]).fetchall()
+            ((district_area,),) = conn.execute(
+                "select district_area_id from contest where id = %s", [contest]
+            ).fetchall()
             for county in rows["county"].unique():
                 if (day, county) not in split:
                     continue
