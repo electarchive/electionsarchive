@@ -1,4 +1,5 @@
 import csv
+import gzip
 import html
 import json
 import re
@@ -77,6 +78,47 @@ DC_NOTE = (
     "certified summary report, and the 2010 certified citywide results. Party labels are as printed; independents "
     "carry none. Ballots cast are the reported total turnout, where given."
 )
+MARYLAND = "https://elections.maryland.gov/elections/archive/"
+BALTIMORE = {
+    date(1991, 11, 5): "baltimore/1991.html",
+    date(1995, 11, 7): "baltimore/1995.html",
+    date(1999, 11, 2): "baltimore/election_data/Baltimore_City_General_1999.csv",
+    date(2004, 11, 2): "baltimore/election_data/Baltimore_City_General_2003.csv",
+    date(2007, 11, 6): "baltimore/election_data/Baltimore_City_General_2007.csv",
+    date(2011, 11, 8): "baltimore/election_data/Baltimore_City_County_2011_General.csv",
+    date(2016, 11, 8): "2016/election_data/Baltimore_City_County_2016_General.csv",
+    date(2020, 11, 3): "2020/election_data/Baltimore_City_County_2020_General.csv",
+}
+BALTIMORE_PUBLISHER = "Maryland State Board of Elections"
+BALTIMORE_TITLE = "Baltimore City election results"
+BALTIMORE_NOTE = (
+    "Citywide totals from the State Board of Elections' Baltimore City results: its 1991 and 1995 results pages and "
+    "its county-level data files from 1999 on (the 2003 cycle's general was held on November 2, 2004). Party labels "
+    "are as printed; the 1991 and 1995 pages print none for the general, so the Democratic and Republican nominees' "
+    "parties come from the same page's primary winners. Unaffiliated candidates carry none, and named write-in "
+    "candidates are kept with the party the file prints."
+)
+ALLEGHENY = "https://www.alleghenycounty.us/files/assets/county/v/1/government/elections/documents/elections-archive/"
+CLARITY = "https://results.enr.clarityelections.com/PA/Allegheny/"
+OLD_SITE = "https://web.archive.org/web/{}if_/http://www.county.allegheny.pa.us:80/elect/{}11gen/muni188.asp"
+PITTSBURGH = {
+    date(2001, 11, 6): OLD_SITE.format(20021203230933, 2001),
+    date(2005, 11, 8): OLD_SITE.format(20061003035211, 2005).replace(":80", ""),
+    date(2007, 11, 6): ALLEGHENY + "2007-general-summary.pdf",
+    date(2009, 11, 3): ALLEGHENY + "2009-general-summary-reg-1-2-4-7.pdf",
+    date(2013, 11, 5): ALLEGHENY + "2013-general-summary.pdf",
+    date(2017, 11, 7): CLARITY + "71801/193474/json/en/summary.json",
+    date(2021, 11, 2): CLARITY + "111176/285575/json/en/summary.json",
+}
+PITTSBURGH_PUBLISHER = "Allegheny County Elections Division"
+PITTSBURGH_TITLE = "Official election results"
+PITTSBURGH_NOTE = (
+    "Citywide totals from the Allegheny County Elections Division's official results: its results pages for 2001 and "
+    "2005 (from the Internet Archive's copies of the county's old site), its official summary reports for 2007, 2009, "
+    "and 2013, and its county-certified results site for 2017 and 2021. Party labels are as printed; independents and "
+    "labels the county does not spell out carry none."
+)
+SURNAMES = {"clarke": "clark"}
 PARTIES = {
     "D": ("democratic-party", "Democratic"),
     "DEM": ("democratic-party", "Democratic"),
@@ -105,6 +147,11 @@ PARTIES = {
     "STG": ("DC:d-c-statehood-green-party", "D.C. Statehood Green"),
     "SG": ("DC:d-c-statehood-green-party", "D.C. Statehood Green"),
     "SOC": ("socialist-workers-party", "Socialist Workers"),
+    "GRN": ("green-party", "Green"),
+    "GRE": ("green-party", "Green"),
+    "LIB": ("libertarian-party", "Libertarian"),
+    "DEM/REP": ("democratic-party", "Democratic and Republican"),
+    "WCP": (None, "Working Class"),
     "REPUBLICAN\\LIBERAL": ("republican-party", "Republican and Liberal"),
     "INDEPENDENCE/JOBS & EDUCATION": ("NY:independence-party", "Independence and Jobs & Education"),
 }
@@ -126,6 +173,10 @@ def fetch() -> None:
         raw.fetch(SOURCE, NYC_FILES + name, suffix=Path(name).suffix)
     for day, link in DC.items():
         raw.fetch(SOURCE, link, suffix=".pdf" if link.endswith(".pdf") else ".json" if day.year == 2010 else ".html")
+    for name in BALTIMORE.values():
+        raw.fetch(SOURCE, MARYLAND + name, suffix=Path(name).suffix)
+    for link in PITTSBURGH.values():
+        raw.fetch(SOURCE, link, suffix=Path(link).suffix if link.endswith((".pdf", ".json")) else ".html")
 
 
 def parse() -> None:
@@ -298,6 +349,90 @@ def parse() -> None:
         )
         print(day, frame.select("candidate", "party", "votes").rows())
         rows.append(frame)
+    for day, name in BALTIMORE.items():
+        path = raw.cached(SOURCE, MARYLAND + name).path
+        if name.endswith(".html"):
+            text = [
+                line.strip()
+                for line in re.sub(r"<[^>]+>", "\n", html.unescape(path.read_text())).splitlines()
+                if line.strip()
+            ]
+            start = next(i for i, line in enumerate(text) if line.endswith("General Election"))
+            nominees = {
+                text[i - 1]: party
+                for heading, party in (("Democratic Candidates", "DEM"), ("Republican Candidates", "REP"))
+                for i in range(text.index(heading), start)
+                if text[i].endswith(" - winner")
+                and next(line for line in reversed(text[:i]) if line.endswith("Candidates")) == heading
+            }
+            end = text.index("Contact", start)
+            lines = [
+                (text[i], nominees.get(text[i]), text[i + 1].removesuffix(" - winner"))
+                for i in range(start + 3, end, 2)
+            ]
+        else:
+            lines = [
+                (row["Candidate Name"], row["Party"], row["Total Votes"])
+                for row in csv.DictReader(path.open(newline="", encoding="utf-8-sig"))
+                if row["Office Name"].strip() == "Mayor"
+            ]
+        frame = pl.DataFrame(
+            [(candidate.strip(), party, int(votes.replace(",", ""))) for candidate, party, votes in lines],
+            schema={"candidate": pl.String, "party": pl.String, "votes": pl.Int64},
+            orient="row",
+        ).with_columns(
+            candidate=pl.when(pl.col("party") == "BOT").then(pl.lit("Write In")).otherwise("candidate"),
+            party=pl.when(pl.col("party").is_in(["BOT", "UNF", "IND"])).then(None).otherwise("party"),
+            day=pl.lit(day),
+            place=pl.lit("2404000"),
+            county=pl.lit("24510"),
+        )
+        print(day, frame.select("candidate", "party", "votes").rows())
+        rows.append(frame)
+    for day, link in PITTSBURGH.items():
+        path = raw.cached(SOURCE, link).path
+        if link.endswith(".json"):
+            body = path.read_bytes()
+            contest = next(
+                contest
+                for contest in json.loads(gzip.decompress(body) if body[:2] == b"\x1f\x8b" else body)
+                if contest["C"] in ("Mayor CITYWIDE", "Mayor Pittsburgh")
+            )
+            lines = [
+                (re.sub(r"^[A-Z]{3} ", "", choice), party, votes)
+                for choice, party, votes in zip(contest["CH"], contest["P"], contest["V"], strict=True)
+            ]
+        elif link.endswith(".pdf"):
+            text = subprocess.run(
+                ["pdftotext", "-layout", str(path), "-"], check=True, capture_output=True, text=True
+            ).stdout.splitlines()
+            start = next(i for i, line in enumerate(text) if line.upper() == "MAYOR CITYWIDE")
+            lines = []
+            for line in text[start + 2 :]:
+                if (found := re.match(r"\s+(.+?) \(([\w/]+)\)[ .]+?([\d,]+)\s+[\d.]+$", line)) is not None:
+                    lines.append(found.groups())
+                elif (found := re.match(r"\s+WRITE-IN[ .]+?([\d,]+)\s+[\d.]+$", line)) is not None:
+                    lines.append(("Write In", None, found[1]))
+                else:
+                    break
+        else:
+            text = " ".join(re.sub(r"<[^>]+>", " ", html.unescape(path.read_text(errors="replace"))).split())
+            block = re.search(r" Mayor Mayor (.+?) Totals ", text)[1]
+            lines = re.findall(r"(\S.*?) \((\w+)\) ([\d,]+) [\d.]+%", block)
+        frame = pl.DataFrame(
+            [
+                (
+                    "Write In" if candidate.upper().startswith("WRITE") else candidate.strip(),
+                    None if party is None or party.upper() not in PARTIES else party.upper(),
+                    int(str(votes).replace(",", "")),
+                )
+                for candidate, party, votes in lines
+            ],
+            schema={"candidate": pl.String, "party": pl.String, "votes": pl.Int64},
+            orient="row",
+        ).with_columns(day=pl.lit(day), place=pl.lit("4261000"), county=pl.lit(None, pl.String))
+        print(day, frame.select("candidate", "party", "votes").rows())
+        rows.append(frame)
     candidates = pl.concat(rows, how="diagonal").with_columns(write_in=pl.col("candidate") == "Write In")
     for (day,), group in candidates.filter(pl.col("place") == "3651000").group_by("day"):
         print(
@@ -349,6 +484,20 @@ def emit() -> Path:
                 "https://www.dcboe.org/elections/election-results-archives",
                 list(DC.values()),
             ),
+            (
+                "2404000",
+                BALTIMORE_PUBLISHER,
+                BALTIMORE_TITLE,
+                MARYLAND + "index.html",
+                [MARYLAND + name for name in BALTIMORE.values()],
+            ),
+            (
+                "4261000",
+                PITTSBURGH_PUBLISHER,
+                PITTSBURGH_TITLE,
+                "https://www.alleghenycounty.us/Government/Elections/Election-Results",
+                list(PITTSBURGH.values()),
+            ),
         ):
             sources[place] = cs.source(publisher, title)
             cs.add(
@@ -366,12 +515,19 @@ def emit() -> Path:
         def surname(text: str) -> str:
             folded = unicodedata.normalize("NFKD", text).encode("ascii", "ignore").decode()
             folded = re.sub(r",?\s+(JR|SR|II|III)\.?$", "", folded.strip(), flags=re.IGNORECASE)
-            return re.sub(r"\W", "", folded.split()[-1]).lower()
+            name = re.sub(r"\W", "", folded.split()[-1]).lower()
+            return SURNAMES.get(name, name)
 
         values = []
         staged: set[UUID] = set()
         for (place, day), rows in candidates.group_by("place", "day", maintain_order=True):
-            city = {"4260000": "philadelphia_PA", "3651000": "new york_NY", "1150000": "washington_DC"}[place]
+            city = {
+                "4260000": "philadelphia_PA",
+                "3651000": "new york_NY",
+                "1150000": "washington_DC",
+                "2404000": "baltimore_MD",
+                "4261000": "pittsburgh_PA",
+            }[place]
             contest_key = f"alged:{place}_{day.year}_11_{city}_Mayor_mayor_1"
             contest = cs.key("us.contest", contest_key)
             if contest in cs.minted:
@@ -411,7 +567,12 @@ def emit() -> Path:
                 "note",
                 entity_id=result_set,
                 kind="methodology",
-                body_md={"4260000": NOTE, "3651000": NYC_NOTE}.get(place, DC_NOTE),
+                body_md={
+                    "4260000": NOTE,
+                    "3651000": NYC_NOTE,
+                    "2404000": BALTIMORE_NOTE,
+                    "4261000": PITTSBURGH_NOTE,
+                }.get(place, DC_NOTE),
             )
             totals = (
                 rows.filter(~pl.col("write_in"))
@@ -421,7 +582,22 @@ def emit() -> Path:
             )
             for name, _ in totals.iter_rows():
                 if name not in roots:
-                    raise ValueError(f"{contest_key}: no ALGED option for {name}")
+                    label = rows.filter(pl.col("candidate").map_elements(surname, pl.String) == name)["candidate"][0]
+                    option_key = f"{contest_key}:{slug(label)}"
+                    roots[name] = cs.key("us.option", option_key)
+                    person = cs.key(f"{SOURCE}.person", f"{place}:{slug(label)}")
+                    cs.add("contest_option", id=roots[name], contest_id=contest, kind="candidate", ballot_label=label)
+                    if person in cs.minted:
+                        cs.add("person", id=person)
+                        cs.add("name", entity_id=person, text=label, lang="en", kind="official", is_preferred=True)
+                    cs.add(
+                        "candidacy",
+                        id=cs.key("us.candidacy", f"{option_key}:head"),
+                        person_id=person,
+                        option_id=roots[name],
+                        role="head",
+                        ballot_name=label,
+                    )
                 cs.add(
                     "outcome",
                     result_set_id=result_set,
@@ -455,7 +631,7 @@ def emit() -> Path:
                         parent_option_id=roots[surname(candidate)],
                         kind="ticket",
                         party_id=None if key is None else cs.key("us.party", key),
-                        ballot_label=f"{candidate.title()} ({label})",
+                        ballot_label=f"{candidate.title() if candidate.isupper() else candidate} ({label})",
                     )
                 values.append((str(result_set), str(unit), str(option), 1, votes))
             for county, cast in (
