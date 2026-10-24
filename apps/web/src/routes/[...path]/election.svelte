@@ -189,6 +189,9 @@
       .filter((row) => row != null)
       .toArray()
       .toSorted((a, b) => (b.seats ?? 0) - (a.seats ?? 0) || b.votes - a.votes);
+    const lists = tiers.filter((race) => race.kind === "list_allocation");
+    const rest = sorted.filter((race) => !lists.includes(race));
+    const at = rest.findLastIndex((race) => tiers.includes(race)) + 1;
     return [
       {
         ...base,
@@ -205,7 +208,7 @@
         results: folded,
         isTotal: true,
       },
-      ...sorted.map((race) => ({
+      ...[...rest.slice(0, at), ...lists, ...rest.slice(at)].map((race) => ({
         ...race,
         ...(race === base ? { map: null } : {}),
         isTotal: false,
@@ -560,6 +563,7 @@
             other.round !== race.round,
         );
       const isSplit =
+        race.kind !== "list_allocation" &&
         race.count > 1 &&
         ordered.some(
           (other) =>

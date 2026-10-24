@@ -975,6 +975,9 @@ function electionMarkdown(
       tiers.set(row.key, entry);
     }
   }
+  const lists = tiered.filter((race) => race.kind === "list_allocation");
+  const rest = election.races.filter((race) => !lists.includes(race));
+  const at = rest.findLastIndex((race) => tiered.includes(race)) + 1;
   return [
     `# ${election.name}`,
     byline(election.breadcrumbs, link, election.date),
@@ -1017,7 +1020,7 @@ function electionMarkdown(
               ]),
           ),
         ]),
-    ...election.races.flatMap((entry) => {
+    ...[...rest.slice(0, at), ...lists, ...rest.slice(at)].flatMap((entry) => {
       const race =
         entry.round != null &&
         election.races.some(
@@ -1032,7 +1035,15 @@ function electionMarkdown(
             }
           : tiered.includes(entry) && entry.kind === "list_allocation"
             ? { ...entry, name: m.race_list({ name: entry.name }) }
-            : entry;
+            : tiered.includes(entry) && entry.places?.levels[0] != null
+              ? {
+                  ...entry,
+                  name: m.race_split({
+                    name: entry.name,
+                    noun: entry.places.levels[0].noun,
+                  }),
+                }
+              : entry;
       const hasSeats = race.results.some((row) => row.seats != null);
       const seats = race.electors == null ? m.col_seats() : m.col_electors();
       const districts = race.isPrimaries ? race.places : null;
