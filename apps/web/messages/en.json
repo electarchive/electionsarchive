@@ -446,6 +446,7 @@
   ],
   "election_stages": "Subsequent stages",
   "election_partial": "The archive has results for {held} of {of} {noun} areas so far.",
+  "locator_context": "Other seats show the results of the {date} general election.",
   "election_places": "Elections in each {noun}",
   "election_children": "Elections held within this one",
   "race_round": "{name} round {round}",

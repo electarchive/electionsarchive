@@ -69,7 +69,7 @@ export const seats = {
         with recursive tree(id) as (
           select e.id from election e
           join slug ps on ps.entity_id = e.polity_id and ps.is_current and (ps.path in ('gb', 'us') or ps.path like 'gb/%' or ps.path like 'us/%')
-          where e.id = ${input.id}::uuid
+          where e.id = ${input.id}::uuid and e.kind <> 'by_election'
           union all
           select e.id from election e join tree on e.parent_id = tree.id where e.kind not in ('runoff', 'indirect')
         ),

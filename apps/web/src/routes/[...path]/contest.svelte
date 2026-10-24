@@ -1727,6 +1727,20 @@
         span={null}
         isLinked
       />
+      {#if locating.places.context != null}
+        {const context = $derived(locating.places.context)}
+        <p class="pbs-2 text-xs text-muted-foreground">
+          {#if context.path == null}
+            {m.locator_context({ date: date(context.date) })}
+          {:else}
+            <a
+              href={resolve("/[...path]", { path: context.path })}
+              class="underline decoration-border underline-offset-4 hover:decoration-foreground"
+              >{m.locator_context({ date: date(context.date) })}</a
+            >
+          {/if}
+        </p>
+      {/if}
     </div>
     {#if chamber == null}
       <div

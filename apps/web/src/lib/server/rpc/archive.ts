@@ -357,6 +357,9 @@ const Places = v.nullable(
       v.array(v.object({ ...Unreconciled.entries, publisher: v.string() })),
     ),
     estimated: v.optional(v.boolean()),
+    context: v.optional(
+      v.object({ date: v.string(), path: v.nullable(v.string()) }),
+    ),
   }),
 );
 
@@ -4259,6 +4262,8 @@ export const contests = {
           area: string;
           k: number;
           scheme: string;
+          general: string | null;
+          since: string | null;
           noun: string;
           party: string | null;
           option: number | null;
@@ -4270,7 +4275,12 @@ export const contests = {
           independent: boolean;
         }>(sql`
           with me as (
-            select c.*, a.scheme_code as scheme, e.date_from as day
+            select c.*, a.scheme_code as scheme, e.date_from as day,
+              (
+                select g.id from election g
+                where e.kind = 'by_election' and g.polity_id = e.polity_id and g.kind = 'general' and g.date_from < e.date_from
+                order by g.date_from desc limit 1
+              ) as general
             from contest c join area a on a.id = c.district_area_id join election e on e.id = c.election_id
             where c.id = ${contest.root}::uuid
               and not exists (
@@ -4279,14 +4289,17 @@ export const contests = {
               )
           ),
           peers as (
-            select c.id, a.id as area, a.k, me.scheme, me.day
+            select c.id, a.id as area, a.k, me.scheme, me.day, me.general
             from me join contest c
-              on c.election_id = me.election_id and c.kind = me.kind and c.round_number = me.round_number
+              on (case when me.general is null then c.election_id = me.election_id
+                else c.id = me.id or (c.election_id = me.general and c.district_area_id <> me.district_area_id) end)
+              and c.kind = me.kind and c.round_number = me.round_number
               and c.body_id is not distinct from me.body_id and c.office_id is not distinct from me.office_id
               and c.party_scope_id is not distinct from me.party_scope_id and c.allocation_parent_id is null
             join area a on a.id = c.district_area_id and a.scheme_code = me.scheme
           )
-          select p.id, p.area, p.k, p.scheme, sc.noun, w.party, w.option, w.person, w.label,
+          select p.id, p.area, p.k, p.scheme, p.general,
+            (select g.date_from::text from election g where g.id = p.general) as since, sc.noun, w.party, w.option, w.person, w.label,
             ${paint(sql`w.party`, sql`${contest.election}::uuid`, sql`p.day`)} as color,
             coalesce(w.valid, 0)::float8 as valid,
             case when w.valid > 0 then ((w.first - w.second) / w.valid)::float8 end as margin,
@@ -4350,7 +4363,10 @@ export const contests = {
             ]),
             contest.date,
           ),
-          paths(found.rows.map((row) => row.id)),
+          paths([
+            ...found.rows.map((row) => row.id),
+            ...(first.general == null ? [] : [first.general]),
+          ]),
         ]);
         const isPersonal =
           new Set(found.rows.map((row) => row.party)).size <= 1 &&
@@ -4413,6 +4429,10 @@ export const contests = {
           ],
           level: first.scheme,
           legend,
+          context:
+            first.general == null || first.since == null
+              ? undefined
+              : { date: first.since, path: slugs.get(first.general) ?? null },
           rows: found.rows.map((row) => ({
             k: row.k,
             name: labels.full.get(row.area) ?? "",
@@ -8227,6 +8247,7 @@ export const elections = {
           from kids left join scheme s on s.code = kids.scheme_code
           where ${within}::uuid is null and exists (select from districts)
             and not exists (select from districts where area is null or area in (select area_id from home))
+            and not exists (select from election x where x.id = ${input.id}::uuid and x.kind = 'by_election')
         `),
       ]);
       const anchored = anchor.rows[0];

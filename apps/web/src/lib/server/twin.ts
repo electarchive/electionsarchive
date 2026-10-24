@@ -1139,12 +1139,19 @@ function electionMarkdown(
                   }),
                 }
               : entry;
-      const hasSeats = race.results.some((row) => row.seats != null);
       const seats = race.electors == null ? m.col_seats() : m.col_electors();
       let filled = 0;
       for (const row of race.results) {
         filled += row.seats ?? 0;
       }
+      const hasSeats = filled > 1;
+      const hasParty = race.results.some(
+        (row) =>
+          row.person != null &&
+          (row.short != null || row.isIndependent === true),
+      );
+      const hasResult =
+        !hasSeats && race.results.some((row) => row.isWon === true);
       const districts = race.isPrimaries ? race.places : null;
       if (districts != null) {
         return [
@@ -1167,16 +1174,31 @@ function electionMarkdown(
               table(
                 [
                   m.col_option(),
+                  ...(hasParty ? [m.col_party()] : []),
                   m.col_votes(),
                   m.col_share(),
                   ...(hasSeats ? [seats] : []),
+                  ...(hasResult ? [m.col_result()] : []),
                 ],
                 race.results.map((row) => [
                   row.label,
+                  ...(hasParty
+                    ? [
+                        row.person == null
+                          ? null
+                          : (row.short ??
+                            (row.isIndependent === true
+                              ? m.seats_independents()
+                              : null)),
+                      ]
+                    : []),
                   count(row.votes),
                   percent(row.share),
                   ...(hasSeats
                     ? [row.seats == null ? null : count(row.seats)]
+                    : []),
+                  ...(hasResult
+                    ? [row.isWon === true ? m.outcome_elected() : null]
                     : []),
                 ]),
               ),
@@ -1835,7 +1857,11 @@ function resultsMarkdown(
   contest: Extract<Data, { kind: "contest" }>["contest"],
   then: string | null,
 ) {
-  const hasSeats = contest.rows.some((row) => row.current?.seats != null);
+  let won = 0;
+  for (const row of contest.rows) {
+    won += row.current?.seats ?? 0;
+  }
+  const hasSeats = won > 1;
   const hasParty = contest.rows.some(
     (row) => row.current?.person != null && row.short != null,
   );
