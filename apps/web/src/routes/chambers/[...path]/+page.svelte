@@ -548,6 +548,7 @@
           {seceded}
           official={seceded > 0 && term.size != null ? term.size : null}
           {change}
+          partners={body.partners}
         />
       {/key}
 
