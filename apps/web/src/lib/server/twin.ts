@@ -1648,7 +1648,9 @@ function electionMarkdown(
       const isChanged =
         hasSeats &&
         race.before != null &&
-        race.results.every((row) => !row.key.startsWith("alliance:")) &&
+        race.results.every(
+          (row) => !row.key.startsWith("alliance:") || (row.seats ?? 0) === 0,
+        ) &&
         race.results.some((row) => (row.seats ?? 0) > 0 && before.has(row.key));
       const units = Map.groupBy(
         race.results.filter((row) => (row.seats ?? 0) > 0),

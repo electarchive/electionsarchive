@@ -1094,7 +1094,8 @@
     }${handover.basis === "same" ? "" : "*"}`;
   });
   const vacancy = $derived(
-    handover?.vacated == null
+    handover?.vacated == null ||
+      contest.notes.some((note) => note.body.startsWith("By-election held"))
       ? null
       : (VACANCIES[handover.vacated.via ?? ""] ?? m.byes_reason_none)({
           name: handover.vacated.name,

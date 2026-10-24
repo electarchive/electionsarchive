@@ -531,7 +531,9 @@
       );
       const change =
         race.before == null ||
-        seated.some((row) => row.key.startsWith("alliance:")) ||
+        seated.some(
+          (row) => row.key.startsWith("alliance:") && (row.seats ?? 0) > 0,
+        ) ||
         seated.every((row) => !before.has(row.key))
           ? null
           : Object.fromEntries(
