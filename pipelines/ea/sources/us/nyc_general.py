@@ -9,7 +9,7 @@ from ea.changeset import Changeset, slug
 from ea.store import DATA, connect
 
 SOURCE = "us.nyc_general"
-VERSION = "2"
+VERSION = "3"
 PARSED = DATA / "parsed" / SOURCE
 RESULTS = "https://www.vote.nyc/sites/default/files/pdf/election_results"
 GENERALS = {
@@ -232,7 +232,17 @@ def emit() -> Path:
                 if cs.minted & set(roots.values()):
                     raise ValueError(f"{contest_key}: ALGED's candidate options must already exist")
                 result_set = cs.key(f"{SOURCE}.result_set", contest_key)
-                default = False
+                default = True
+                columns = ("id", "election_id", "contest_id", "stage", "kind", "source_id", "completeness")
+                prior = conn.execute(
+                    f"""select {", ".join(f"r.{column}" for column in columns)} from result_set r
+                        join external_id x on x.entity_id = r.id and x.scheme = 'us.alged.result_set'
+                        where x.value = %s""",
+                    [contest_key],
+                ).fetchone()
+                if prior is None:
+                    raise ValueError(f"{contest_key}: no ALGED result set")
+                cs.add("result_set", **dict(zip(columns, prior, strict=True)), is_default=False, status="superseded")
             else:
                 contest_key = CONTEST_2025
                 election = cs.key("us.election", f"{day}:NY:3651000")
@@ -326,6 +336,20 @@ def emit() -> Path:
                 is_default=default,
                 completeness=1,
             )
+            if day.year == 2021:
+                totals = (
+                    rows.filter(pl.col("combined").is_null(), pl.col("unit").str.contains(r"\("))
+                    .group_by(pl.col("unit").str.extract(r"^(.+) \(").alias("candidate"))
+                    .agg(pl.col("votes").sum())
+                    .sort("votes", descending=True)
+                )
+                for candidate, _ in totals.iter_rows():
+                    cs.add(
+                        "outcome",
+                        result_set_id=result_set,
+                        option_id=roots[candidate],
+                        kind="won" if candidate == totals["candidate"][0] else "lost",
+                    )
             if result_set not in cs.minted:
                 continue
             cs.add("note", entity_id=result_set, kind="methodology", body_md=NOTE)
