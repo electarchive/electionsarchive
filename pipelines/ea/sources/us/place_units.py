@@ -25,7 +25,20 @@ INSIDE = 0.99
 FLOOR = 0.01
 TIGER_TITLE = "TIGER/Line Shapefiles: Places"
 TOWN_TITLE = "TIGER/Line Shapefiles: County Subdivisions"
-TOWN_STATES = {"26": "MI", "27": "MN", "34": "NJ", "36": "NY", "42": "PA", "55": "WI"}
+TOWN_STATES = {
+    "09": "CT",
+    "23": "ME",
+    "25": "MA",
+    "33": "NH",
+    "44": "RI",
+    "50": "VT",
+    "26": "MI",
+    "27": "MN",
+    "34": "NJ",
+    "36": "NY",
+    "42": "PA",
+    "55": "WI",
+}
 TOWNSHIP = {"township", "charter township"}
 KINDS = {
     "CITY": {"city"},
@@ -200,15 +213,19 @@ def emit() -> Path:
             index: dict[int, dict[tuple[str, str], list[tuple[str, str]]]] = {}
             labels: dict[str, str] = {}
             if towns:
+                connecticut = {code[5:]: code for code in areas if code.startswith("09")}
                 conn.execute("truncate city_shape")
                 for year in sorted(years[state]):
-                    rows = shapes(tiger(year, state, "cousub"))
+                    rows = [
+                        (connecticut.get(geoid[5:], geoid) if state == "09" else geoid, *rest)
+                        for geoid, *rest in shapes(tiger(year, state, "cousub"))
+                    ]
                     for geoid, name, legal, _ in rows:
                         if geoid in areas:
                             labels[geoid] = legal
-                            index.setdefault(year, {}).setdefault((geoid[:5], fold(name)), []).append(
-                                (geoid, legal[len(name) :].strip().lower())
-                            )
+                            index.setdefault(year, {}).setdefault(
+                                (geoid[:2] if state == "09" else geoid[:5], fold(name)), []
+                            ).append((geoid, legal[len(name) :].strip().lower()))
                     with conn.cursor() as cursor:
                         cursor.executemany(
                             """insert into city_shape values
@@ -301,7 +318,9 @@ def emit() -> Path:
                                 None,
                             )
                         )
-                        if county is None:
+                        if state == "09":
+                            county = state
+                        elif county is None:
                             continue
                         matched = set()
                         for text in (*parts[3:5], ", ".join(segments[:-1]) if len(segments) > 1 else segments[0]):
@@ -320,9 +339,11 @@ def emit() -> Path:
                                 follower = words[size] if size < len(words) else None
                                 if follower in KINDS:
                                     kinds = KINDS[follower] if kinds is None else kinds & KINDS[follower]
-                                elif (follower is None and kinds is None) or (
-                                    follower is not None and not (follower[0].isdigit() or follower in FOLLOWERS)
-                                ):
+                                elif (
+                                    follower is None
+                                    and kinds is None
+                                    and state not in ("09", "23", "25", "33", "44", "50")
+                                ) or (follower is not None and not (follower[0].isdigit() or follower in FOLLOWERS)):
                                     break
                                 if (
                                     follower is not None
@@ -390,11 +411,13 @@ def emit() -> Path:
                     }
                     candidates = []
                     for system in ("a", "u"):
+                        city_keys = {key for key in methods["city_universe"] if key[0] == system}
+                        if city_keys:
+                            candidates.append((len(city_keys), "city_universe", city_keys, f"{system} city"))
+                            continue
                         for pipeline, held in day_keys.items():
                             within = {
-                                "city_universe": {
-                                    key for key in methods["city_universe"] if key[0] == system and key in held
-                                },
+                                "city_universe": set(),
                                 "source_code": {key for key in found_named.get(pipeline, set()) if key[0] == system},
                                 "shape_contained": {key for key in inside if key[0] == system and key in held},
                             }
@@ -425,12 +448,18 @@ def emit() -> Path:
                             candidates.append((sizes[method], method, keys, f"{system} {pipeline}"))
                     if not candidates:
                         continue
-                    expected, method, keys, system = max(candidates, key=lambda candidate: candidate[0])
+                    expected, method, keys, system = max(
+                        candidates, key=lambda candidate: (len(candidate[2]), candidate[0])
+                    )
                     for other in candidates:
                         if other[3] != system:
                             log.write(
                                 f"{city}\t{day}\tskipped\t{other[3]}\t{other[1]} {other[0]} against {system} {method} {expected}\n"
                             )
+                    placed = {key: other[1] for other in candidates for key in other[2] if other[3][0] == system[0]}
+                    for unit, code, start, end, key, _, label, pipeline in rows:
+                        if key in placed and (unit, areas[geoid]) not in owned:
+                            memberships.append((unit, areas[geoid], start, end, placed[key]))
                     if expected == 0:
                         continue
                     chosen[method] += 1
@@ -449,9 +478,6 @@ def emit() -> Path:
                         else None,
                         result_set_id=own[0] if method == "city_universe" and own else None,
                     )
-                    for unit, code, start, end, key, _, label, pipeline in rows:
-                        if key in keys and (unit, areas[geoid]) not in owned:
-                            memberships.append((unit, areas[geoid], start, end, method))
         kept = {(unit, area) for unit, area, *_ in memberships}
         stale = [
             pair
