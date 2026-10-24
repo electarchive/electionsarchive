@@ -49,6 +49,23 @@ def fetch() -> None:
         raw.fetch(SOURCE, FILES.format(day=day), suffix=".zip")
 
 
+def read(day: date) -> pl.DataFrame:
+    with zipfile.ZipFile(raw.cached(SOURCE, FILES.format(day=day)).path) as archive:
+        text = archive.read(archive.namelist()[0])
+    first = text.split(b"\n", 1)[0]
+    headed = first.lower().startswith((b'"county"', b"county"))
+    frame = pl.read_csv(
+        io.BytesIO(text),
+        separator="\t" if b"\t" in first else ",",
+        has_header=headed,
+        new_columns=None if headed else HEADERLESS,
+        infer_schema=False,
+        quote_char='"',
+        truncate_ragged_lines=True,
+    )
+    return frame.rename({column: COLUMNS.get(column.strip().lower(), column.strip().lower()) for column in frame.columns})
+
+
 def parse() -> None:
     with connect() as conn:
         counties = {
@@ -61,22 +78,7 @@ def parse() -> None:
         }
     frames = []
     for day in DAYS:
-        with zipfile.ZipFile(raw.cached(SOURCE, FILES.format(day=day)).path) as archive:
-            text = archive.read(archive.namelist()[0])
-        first = text.split(b"\n", 1)[0]
-        headed = first.lower().startswith((b'"county"', b"county"))
-        frame = pl.read_csv(
-            io.BytesIO(text),
-            separator="\t" if b"\t" in first else ",",
-            has_header=headed,
-            new_columns=None if headed else HEADERLESS,
-            infer_schema=False,
-            quote_char='"',
-            truncate_ragged_lines=True,
-        )
-        frame = frame.rename(
-            {column: COLUMNS[column.strip().lower()] for column in frame.columns if column.strip().lower() in COLUMNS}
-        )
+        frame = read(day)
         name = pl.col("contest").str.strip_chars().str.replace_all(r"\s+", " ").str.to_uppercase()
         parts = name.str.extract_groups(CONTEST.pattern)
         seat = name.str.extract_groups(STATE)
