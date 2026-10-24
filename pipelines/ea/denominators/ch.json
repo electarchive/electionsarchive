@@ -1,0 +1,96 @@
+{
+  "polity": "CH",
+  "name": "Switzerland",
+  "sources": {},
+  "levels": [
+    {
+      "key": "national_council",
+      "goal": "national",
+      "label": "National Council elections",
+      "match": [
+        {
+          "kinds": [
+            "general"
+          ],
+          "bodies": [
+            "lower_house"
+          ],
+          "iso": "CH"
+        }
+      ],
+      "schemes": [
+        "ch.canton"
+      ],
+      "fine": [
+        "ch.commune"
+      ],
+      "gaps": [
+        {
+          "from": 1848,
+          "to": 2023,
+          "note": "No official count is compiled yet."
+        }
+      ],
+      "elections": []
+    },
+    {
+      "key": "council_of_states",
+      "goal": "national",
+      "label": "Council of States elections",
+      "match": [
+        {
+          "kinds": [
+            "general"
+          ],
+          "bodies": [
+            "upper_house"
+          ],
+          "iso": "CH"
+        }
+      ],
+      "schemes": [
+        "ch.canton"
+      ],
+      "gaps": [
+        {
+          "from": 1848,
+          "to": 2023,
+          "note": "Members of the Council of States are elected under each canton's own law, on dates the cantons set; no federal count is compiled yet."
+        }
+      ],
+      "elections": []
+    },
+    {
+      "key": "federal_votes",
+      "goal": "referendums",
+      "label": "Federal popular votes",
+      "unit": "contest",
+      "match": [
+        {
+          "kinds": [
+            "referendum"
+          ],
+          "bodies": [
+            "ballot_question"
+          ],
+          "iso": "CH"
+        }
+      ],
+      "grain": [
+        "ch.canton",
+        "ch.commune"
+      ],
+      "fine": [
+        "ch.commune"
+      ],
+      "gaps": [
+        {
+          "from": 1848,
+          "to": 2026,
+          "note": "No official count is compiled yet."
+        }
+      ],
+      "elections": []
+    }
+  ]
+}

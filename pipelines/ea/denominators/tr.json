@@ -1,0 +1,350 @@
+{
+  "polity": "TR",
+  "name": "Türkiye",
+  "region_schemes": [
+    "tr.il"
+  ],
+  "sources": {
+    "tuik": {
+      "title": "Milletvekili Genel Seçimleri, 1923-2011",
+      "publisher": "Türkiye İstatistik Kurumu (TÜİK)",
+      "url": "https://www.ysk.gov.tr/doc/dosyalar/1923-2011-MVSecimleri-Tuik.pdf",
+      "note": "TÜİK publication 3685, June 2012, hosted by YSK. The Dönem table gives polling days for the 9th to 24th terms. Table 3 gives total seats per election. Constituency counts are from the narrative (Açıklama section). The 1954 narrative says 542 seats, but Table 3 says 541; Table 3 is used. Province-level data for 1946 is not available per the text."
+    },
+    "ysk2023": {
+      "title": "14 Mayıs 2023 Cumhurbaşkanı ve 28. Dönem Milletvekili Genel Seçimleri İstatistikleri",
+      "publisher": "Yüksek Seçim Kurulu (YSK)",
+      "url": "https://www.ysk.gov.tr/doc/dosyalar/docs/14%20May%C4%B1s%202023%20Cumhurba%C5%9Fkan%C4%B1%20ve%2025.%20D%C3%B6nem%20MV%20Genel%20Se%C3%A7imleri%20%C4%B0statistikleri.pdf",
+      "note": "Section 2.6 gives seats per province for 2018 and 2023 (TOPLAM 600 in both). Section 4.3.3 is the constituency table for 2023: 87 rows, with 81 provinces and Ankara, Bursa, İstanbul, and İzmir split into 3, 2, 3, and 2 constituencies. The Kahramanmaraş row shows 5 in its İL TOPLAM cell, but its party cells and section 2.6 both give 8; 8 is used, and the column then sums to 600."
+    }
+  },
+  "levels": [
+    {
+      "key": "tbmm",
+      "goal": "national",
+      "label": "General elections",
+      "match": [
+        {
+          "kinds": [
+            "general"
+          ],
+          "bodies": [
+            "unicameral",
+            "lower_house"
+          ],
+          "iso": "TR"
+        }
+      ],
+      "schemes": [
+        "tr.il",
+        "tr.secim_cevresi"
+      ],
+      "fine": [
+        "tr.ilce",
+        "tr.belde",
+        "tr.mahalle",
+        "tr.okul",
+        "tr.sandik"
+      ],
+      "elections": [
+        {
+          "date": "1946-07-21",
+          "seats": 465,
+          "source": "tuik",
+          "quote": "Table 3, row 1946: Toplam milletvekili sayısı 465",
+          "note": "TÜİK says province-level results for 1946 are not available, so the number of constituencies (provinces) is not stated."
+        },
+        {
+          "date": "1950-05-14",
+          "seats": 487,
+          "source": "tuik",
+          "quote": "Table 3, row 1950: Toplam milletvekili sayısı 487; Dönem table: 9.Dönem 14 Mayıs 1950",
+          "note": "Before 1983 TÜİK says each province was one constituency, but the province count is not stated in the text, and the per-province tables did not reconcile with the published totals, so it is left null."
+        },
+        {
+          "date": "1954-05-02",
+          "seats": 541,
+          "source": "tuik",
+          "quote": "Table 3, row 1954: Toplam milletvekili sayısı 541; Dönem table: 10.Dönem 2 Mayıs 1954",
+          "note": "The narrative gives 542 seats; Table 3 gives 541. Pre-1983 constituency count left null (see 1950)."
+        },
+        {
+          "date": "1957-10-27",
+          "seats": 610,
+          "source": "tuik",
+          "quote": "Table 3, row 1957: Toplam milletvekili sayısı 610; Dönem table: 11.Dönem 27 Ekim 1957",
+          "note": "Pre-1983 constituency count left null (see 1950)."
+        },
+        {
+          "date": "1961-10-15",
+          "seats": 450,
+          "source": "tuik",
+          "quote": "Table 3, row 1961: Toplam milletvekili sayısı 450; Dönem table: 12.Dönem 15 Ekim 1961",
+          "note": "Pre-1983 constituency count left null (see 1950)."
+        },
+        {
+          "date": "1965-10-10",
+          "seats": 450,
+          "source": "tuik",
+          "quote": "Table 3, row 1965: Toplam milletvekili sayısı 450; Dönem table: 13.Dönem 10 Ekim 1965",
+          "note": "Pre-1983 constituency count left null (see 1950)."
+        },
+        {
+          "date": "1969-10-12",
+          "seats": 450,
+          "source": "tuik",
+          "quote": "Table 3, row 1969: Toplam milletvekili sayısı 450; Dönem table: 14.Dönem 12 Ekim 1969",
+          "note": "Pre-1983 constituency count left null (see 1950)."
+        },
+        {
+          "date": "1973-10-14",
+          "seats": 450,
+          "source": "tuik",
+          "quote": "Table 3, row 1973: Toplam milletvekili sayısı 450; Dönem table: 15.Dönem 14 Ekim 1973",
+          "note": "Pre-1983 constituency count left null (see 1950)."
+        },
+        {
+          "date": "1977-06-05",
+          "seats": 450,
+          "source": "tuik",
+          "quote": "Table 3, row 1977: Toplam milletvekili sayısı 450; Dönem table: 16.Dönem 5 Haziran 1977",
+          "note": "Pre-1983 constituency count left null (see 1950)."
+        },
+        {
+          "date": "1983-11-06",
+          "contests": 83,
+          "seats": 399,
+          "source": "tuik",
+          "quote": "Table 3, row 1983: Toplam milletvekili sayısı 399; narrative: 1983 seçiminde 83 seçim çevresi oluşturulmuştur"
+        },
+        {
+          "date": "1987-11-29",
+          "contests": 104,
+          "seats": 450,
+          "source": "tuik",
+          "quote": "Table 3, row 1987: Toplam milletvekili sayısı 450; narrative: Buna göre 1987 seçiminde, 104 seçim çevresi oluşturulmuştur"
+        },
+        {
+          "date": "1991-10-20",
+          "contests": 107,
+          "seats": 450,
+          "source": "tuik",
+          "quote": "Table 3, row 1991: Toplam milletvekili sayısı 450; narrative: Buna göre toplam 107 seçim çevresi oluşturulmuştur"
+        },
+        {
+          "date": "1995-12-24",
+          "contests": 83,
+          "seats": 550,
+          "source": "tuik",
+          "quote": "Table 3, row 1995: Toplam milletvekili sayısı 550; narrative: Buna göre 1995 seçiminde toplam 83 seçim çevresi oluşturulmuştur"
+        },
+        {
+          "date": "1999-04-18",
+          "seats": 550,
+          "source": "tuik",
+          "quote": "Table 3, row 1999: Toplam milletvekili sayısı 550; narrative: 1999, 2002, 2007 ve 2011 yıllarında ... 1995 yılı seçimindeki uygulamalar aynen devam etmiştir",
+          "note": "TÜİK says the 1995 rules continued but does not state the constituency count for this election."
+        },
+        {
+          "date": "2002-11-03",
+          "seats": 550,
+          "source": "tuik",
+          "quote": "Table 3, row 2002: Toplam milletvekili sayısı 550; Dönem table: 22.Dönem 3 Kasım 2002",
+          "note": "Constituency count not stated (see 1999)."
+        },
+        {
+          "date": "2007-07-22",
+          "seats": 550,
+          "source": "tuik",
+          "quote": "Table 3, row 2007: Toplam milletvekili sayısı 550; Dönem table: 23.Dönem 22 Temmuz 2007",
+          "note": "Constituency count not stated (see 1999)."
+        },
+        {
+          "date": "2011-06-12",
+          "seats": 550,
+          "source": "tuik",
+          "quote": "Table 3, row 2011: Toplam milletvekili sayısı 550; Dönem table: 24.Dönem 12 Haziran 2011",
+          "note": "Constituency count not stated (see 1999)."
+        },
+        {
+          "date": "2018-06-24",
+          "seats": 600,
+          "source": "ysk2023",
+          "quote": "Section 2.6, TOPLAM 600 in the 2018 column; date: (24 Haziran 2018)",
+          "note": "The YSK report gives 2018 seats per province but its constituency table covers 2023 only, so the 2018 constituency count is left null."
+        },
+        {
+          "date": "2023-05-14",
+          "contests": 87,
+          "seats": 600,
+          "source": "ysk2023",
+          "quote": "Section 4.3.3 (SEÇİM ÇEVRESİ table): 87 rows, 81 provinces with Ankara, Bursa, İstanbul, and İzmir split; TOPLAM 600",
+          "note": "Count of constituency rows in section 4.3.3 (Kahramanmaraş total corrected to 8, see source note)."
+        }
+      ],
+      "gaps": [
+        {
+          "from": 2015,
+          "to": 2015,
+          "note": "2015 (June and November) not researched. The TÜİK publication ends in 2011, and the YSK 2023 report does not cover 2015."
+        }
+      ]
+    },
+    {
+      "key": "president",
+      "goal": "national",
+      "label": "Presidential elections",
+      "unit": "contest",
+      "match": [
+        {
+          "kinds": [
+            "general",
+            "runoff"
+          ],
+          "bodies": [
+            "head_of_state"
+          ],
+          "iso": "TR"
+        }
+      ],
+      "grain": [
+        "tr.il"
+      ],
+      "gaps": [
+        {
+          "from": 2014,
+          "to": 2023,
+          "note": "Not researched yet."
+        },
+        {
+          "from": 2014,
+          "to": 2023,
+          "note": "No official count is compiled yet."
+        }
+      ],
+      "elections": []
+    },
+    {
+      "key": "senate",
+      "goal": "national",
+      "label": "Senate elections",
+      "match": [
+        {
+          "kinds": [
+            "general"
+          ],
+          "bodies": [
+            "upper_house"
+          ],
+          "iso": "TR"
+        }
+      ],
+      "schemes": [
+        "tr.il",
+        "tr.senato_cevresi"
+      ],
+      "gaps": [
+        {
+          "from": 1961,
+          "to": 1979,
+          "note": "Not researched yet."
+        },
+        {
+          "from": 1961,
+          "to": 1979,
+          "note": "No official count is compiled yet."
+        }
+      ],
+      "elections": []
+    },
+    {
+      "key": "tbmm_by",
+      "goal": "national",
+      "label": "By-elections",
+      "unit": "contest",
+      "match": [
+        {
+          "kinds": [
+            "by_election"
+          ],
+          "bodies": [
+            "unicameral",
+            "lower_house"
+          ],
+          "iso": "TR"
+        }
+      ],
+      "gaps": [
+        {
+          "from": 1950,
+          "to": 2026,
+          "note": "No official count is compiled yet."
+        }
+      ],
+      "elections": []
+    },
+    {
+      "key": "local",
+      "goal": "local",
+      "label": "Mayoral elections",
+      "unit": "polity",
+      "match": [
+        {
+          "kinds": [
+            "local"
+          ],
+          "bodies": [
+            "mayor"
+          ],
+          "iso": "*"
+        }
+      ],
+      "gaps": [
+        {
+          "from": 1963,
+          "to": 2024,
+          "note": "Not researched yet."
+        },
+        {
+          "from": 1963,
+          "to": 2024,
+          "note": "No official count is compiled yet."
+        }
+      ],
+      "elections": []
+    },
+    {
+      "key": "referendums",
+      "goal": "referendums",
+      "label": "Referendums",
+      "unit": "contest",
+      "match": [
+        {
+          "kinds": [
+            "referendum"
+          ],
+          "bodies": [
+            "ballot_question"
+          ],
+          "iso": "TR"
+        }
+      ],
+      "grain": [
+        "tr.il"
+      ],
+      "gaps": [
+        {
+          "from": 1961,
+          "to": 2017,
+          "note": "Not researched yet."
+        },
+        {
+          "from": 1961,
+          "to": 2017,
+          "note": "No official count is compiled yet."
+        }
+      ],
+      "elections": []
+    }
+  ]
+}

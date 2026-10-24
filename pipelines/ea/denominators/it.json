@@ -1,0 +1,156 @@
+{
+  "polity": "IT",
+  "name": "Italy",
+  "region_schemes": [
+    "it.regione"
+  ],
+  "sources": {},
+  "levels": [
+    {
+      "key": "camera",
+      "goal": "national",
+      "label": "Chamber of Deputies elections",
+      "match": [
+        {
+          "kinds": [
+            "general"
+          ],
+          "bodies": [
+            "lower_house"
+          ],
+          "iso": "IT"
+        }
+      ],
+      "schemes": [
+        "it.circoscrizione_camera",
+        "it.collegio_camera_1993",
+        "it.collegio_camera_2017",
+        "it.uninominale_camera",
+        "it.estero"
+      ],
+      "fine": [
+        "it.comune",
+        "it.comune_collegio",
+        "it.sezione"
+      ],
+      "gaps": [
+        {
+          "from": 1948,
+          "to": 2022,
+          "note": "No official count is compiled yet."
+        }
+      ],
+      "elections": []
+    },
+    {
+      "key": "senato",
+      "goal": "national",
+      "label": "Senate elections",
+      "match": [
+        {
+          "kinds": [
+            "general"
+          ],
+          "bodies": [
+            "upper_house"
+          ],
+          "iso": "IT"
+        }
+      ],
+      "schemes": [
+        "it.collegio_senato"
+      ],
+      "gaps": [
+        {
+          "from": 1948,
+          "to": 2022,
+          "note": "No official count is compiled yet."
+        }
+      ],
+      "elections": []
+    },
+    {
+      "key": "regionali",
+      "goal": "subnational",
+      "label": "Regional elections",
+      "match": [
+        {
+          "kinds": [
+            "general"
+          ],
+          "bodies": [
+            "unicameral"
+          ],
+          "iso": "IT-*"
+        }
+      ],
+      "schemes": [
+        "it.regione"
+      ],
+      "gaps": [
+        {
+          "from": 1970,
+          "to": 2025,
+          "note": "No official count is compiled yet."
+        }
+      ],
+      "elections": []
+    },
+    {
+      "key": "referendums",
+      "goal": "referendums",
+      "label": "Referendums",
+      "unit": "contest",
+      "match": [
+        {
+          "kinds": [
+            "referendum"
+          ],
+          "bodies": [
+            "ballot_question"
+          ],
+          "iso": "IT"
+        }
+      ],
+      "grain": [
+        "it.regione",
+        "it.comune"
+      ],
+      "gaps": [
+        {
+          "from": 1946,
+          "to": 2026,
+          "note": "No official count is compiled yet."
+        }
+      ],
+      "elections": []
+    },
+    {
+      "key": "ep",
+      "goal": "ep",
+      "label": "European Parliament elections",
+      "match": [
+        {
+          "kinds": [
+            "general"
+          ],
+          "bodies": [
+            "unicameral"
+          ],
+          "iso": "EU"
+        }
+      ],
+      "schemes": [
+        "it.ep_constituency"
+      ],
+      "gaps": [
+        {
+          "from": 1979,
+          "to": 2024,
+          "note": "No official count is compiled yet."
+        }
+      ],
+      "elections": []
+    }
+  ]
+}

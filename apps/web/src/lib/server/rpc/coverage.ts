@@ -79,7 +79,7 @@ export const coverage = {
         { goal: (typeof GOALS)[number] } & Record<keyof typeof counts, number>
       >(sql`
         select g.goal, ${SUMS} from coverage_goal g
-        where ${input.current} or g.year <> extract(year from current_date)
+        where g.polity = 'us' and (${input.current} or g.year <> extract(year from current_date))
         group by g.goal
       `);
       const parts = await db.execute<{
@@ -93,7 +93,7 @@ export const coverage = {
             when g.level in ('state_upper', 'state_lower') then 'legislature' else 'national' end as part,
           sum(g.total)::int as total, sum(g.complete)::int as complete
         from coverage_goal g
-        where g.goal in ('history', 'turnout')
+        where g.polity = 'us' and g.goal in ('history', 'turnout')
           and (${input.current} or g.year <> extract(year from current_date))
         group by 1, 2 order by 1, 2 desc
       `);
@@ -144,7 +144,7 @@ export const coverage = {
           (select n.text from name n where n.entity_id = p.id and n.is_preferred order by n.lang <> 'en', n.recorded_from desc, n.id limit 1) as label
         from (
           select ${key} as key, ${SUMS} from coverage_goal g
-          where g.goal = ${input.goal} and (${state}::text is null or g.state = ${state})
+          where g.polity = 'us' and g.goal = ${input.goal} and (${state}::text is null or g.state = ${state})
             and (${level}::text is null or g.level = ${level})
             and (${input.current} or g.year <> extract(year from current_date))
           group by 1

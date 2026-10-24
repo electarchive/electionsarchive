@@ -1,0 +1,1335 @@
+{
+  "polity": "GB",
+  "name": "United Kingdom",
+  "sources": {
+    "scotact1998-sch1": {
+      "title": "Scotland Act 1998, Schedule 1 (Scottish Parliament: constituencies and regional members)",
+      "publisher": "legislation.gov.uk (National Archives)",
+      "url": "https://www.legislation.gov.uk/ukpga/1998/46/schedule/1",
+      "note": "Current revised text. Quotes are from paragraphs 1(1), 2(1), and 2(3). Not checked paragraph by paragraph against each election's order."
+    },
+    "asc2024-s1": {
+      "title": "Senedd Cymru (Members and Elections) Act 2024, section 1",
+      "publisher": "legislation.gov.uk (National Archives)",
+      "url": "https://www.legislation.gov.uk/asc/2024/4/section/1"
+    },
+    "senedd-research-2021": {
+      "title": "Senedd Election 2021: Research Briefing",
+      "publisher": "Senedd Research (Senedd Cymru)",
+      "url": "https://senedd.wales/media/gp0hueyu/21-008-senedd-election-2021-web.pdf"
+    },
+    "hoc-cbp7529": {
+      "title": "UK Election Statistics: 1918-2023, A Long Century of Elections (CBP-7529, 9 August 2023)",
+      "publisher": "House of Commons Library",
+      "url": "https://commonslibrary.parliament.uk/research-briefings/cbp-7529/"
+    },
+    "uksi-2023-1230": {
+      "title": "The Parliamentary Constituencies Order 2023 (SI 2023/1230)",
+      "publisher": "legislation.gov.uk",
+      "url": "https://www.legislation.gov.uk/uksi/2023/1230/made"
+    }
+  },
+  "levels": [
+    {
+      "key": "commons",
+      "goal": "national",
+      "label": "House of Commons general elections",
+      "match": [
+        {
+          "kinds": [
+            "general"
+          ],
+          "bodies": [
+            "lower_house"
+          ],
+          "iso": "GB"
+        }
+      ],
+      "schemes": [
+        "gb.pcon"
+      ],
+      "fine_note": "Returning officers declare Westminster results by constituency only, so there is no finer official count to collect.",
+      "gaps": [
+        {
+          "from": 1832,
+          "to": 1910,
+          "note": "No authoritative count retrieved. No House of Commons Library or Parliament source for 1832-1910 contests was identified within the research budget. Statutes such as the Reform Act 1832 and the Redistribution of Seats Act 1885 set seat totals, not the number of contested constituencies (uncontested returns and two-member seats make these differ)."
+        },
+        {
+          "from": 1918,
+          "to": 2024,
+          "note": "No sourced count retrieved. The House of Commons Library briefing CBP-7529 (UK Election Statistics: 1918-2024) returns a Cloudflare challenge page (HTTP 403) to both curl and WebFetch, and parliament.uk is blocked for both tools, so it was not read. For 2024, the Parliamentary Constituencies Order 2023 (SI 2023/1230) sets the constituencies by nation, but its schedules were not read."
+        },
+        {
+          "from": 1832,
+          "to": 1917,
+          "note": "The House of Commons Library's statistics begin in 1918; no official count of constituencies at each general election from 1832 to 1910 is published online."
+        }
+      ],
+      "elections": [
+        {
+          "date": "1918-12-14",
+          "contests": null,
+          "seats": 707,
+          "source": "hoc-cbp7529",
+          "note": "Before 1950 some constituencies returned two or more members (two-member boroughs and university seats), so the seat count of the briefing is not a count of constituencies."
+        },
+        {
+          "date": "1922-11-15",
+          "contests": null,
+          "seats": 615,
+          "source": "hoc-cbp7529",
+          "note": "Before 1950 some constituencies returned two or more members (two-member boroughs and university seats), so the seat count of the briefing is not a count of constituencies."
+        },
+        {
+          "date": "1923-12-06",
+          "contests": null,
+          "seats": 615,
+          "source": "hoc-cbp7529",
+          "note": "Before 1950 some constituencies returned two or more members (two-member boroughs and university seats), so the seat count of the briefing is not a count of constituencies."
+        },
+        {
+          "date": "1924-10-29",
+          "contests": null,
+          "seats": 615,
+          "source": "hoc-cbp7529",
+          "note": "Before 1950 some constituencies returned two or more members (two-member boroughs and university seats), so the seat count of the briefing is not a count of constituencies."
+        },
+        {
+          "date": "1929-05-30",
+          "contests": null,
+          "seats": 615,
+          "source": "hoc-cbp7529",
+          "note": "Before 1950 some constituencies returned two or more members (two-member boroughs and university seats), so the seat count of the briefing is not a count of constituencies."
+        },
+        {
+          "date": "1931-10-27",
+          "contests": null,
+          "seats": 615,
+          "source": "hoc-cbp7529",
+          "note": "Before 1950 some constituencies returned two or more members (two-member boroughs and university seats), so the seat count of the briefing is not a count of constituencies."
+        },
+        {
+          "date": "1935-11-14",
+          "contests": null,
+          "seats": 615,
+          "source": "hoc-cbp7529",
+          "note": "Before 1950 some constituencies returned two or more members (two-member boroughs and university seats), so the seat count of the briefing is not a count of constituencies."
+        },
+        {
+          "date": "1945-07-05",
+          "contests": null,
+          "seats": 640,
+          "source": "hoc-cbp7529",
+          "note": "Before 1950 some constituencies returned two or more members (two-member boroughs and university seats), so the seat count of the briefing is not a count of constituencies."
+        },
+        {
+          "date": "1950-02-23",
+          "contests": 625,
+          "seats": 625,
+          "regions": {
+            "ENG": 506,
+            "WLS": 36,
+            "SCT": 71,
+            "NIR": 12
+          },
+          "source": "hoc-cbp7529",
+          "quote": "Tables 1a, 1c, 1e, 1g, and 1i, Total seats, 1950: UK 625, GB 613, England 506, Wales 36, Scotland 71; every constituency has returned one member since 1950, and Northern Ireland is the UK total less the GB total"
+        },
+        {
+          "date": "1951-10-25",
+          "contests": 625,
+          "seats": 625,
+          "regions": {
+            "ENG": 506,
+            "WLS": 36,
+            "SCT": 71,
+            "NIR": 12
+          },
+          "source": "hoc-cbp7529",
+          "quote": "Tables 1a, 1c, 1e, 1g, and 1i, Total seats, 1951: UK 625, GB 613, England 506, Wales 36, Scotland 71; every constituency has returned one member since 1950, and Northern Ireland is the UK total less the GB total"
+        },
+        {
+          "date": "1955-05-26",
+          "contests": 630,
+          "seats": 630,
+          "regions": {
+            "ENG": 511,
+            "WLS": 36,
+            "SCT": 71,
+            "NIR": 12
+          },
+          "source": "hoc-cbp7529",
+          "quote": "Tables 1a, 1c, 1e, 1g, and 1i, Total seats, 1955: UK 630, GB 618, England 511, Wales 36, Scotland 71; every constituency has returned one member since 1950, and Northern Ireland is the UK total less the GB total"
+        },
+        {
+          "date": "1959-10-08",
+          "contests": 630,
+          "seats": 630,
+          "regions": {
+            "ENG": 511,
+            "WLS": 36,
+            "SCT": 71,
+            "NIR": 12
+          },
+          "source": "hoc-cbp7529",
+          "quote": "Tables 1a, 1c, 1e, 1g, and 1i, Total seats, 1959: UK 630, GB 618, England 511, Wales 36, Scotland 71; every constituency has returned one member since 1950, and Northern Ireland is the UK total less the GB total"
+        },
+        {
+          "date": "1964-10-15",
+          "contests": 630,
+          "seats": 630,
+          "regions": {
+            "ENG": 511,
+            "WLS": 36,
+            "SCT": 71,
+            "NIR": 12
+          },
+          "source": "hoc-cbp7529",
+          "quote": "Tables 1a, 1c, 1e, 1g, and 1i, Total seats, 1964: UK 630, GB 618, England 511, Wales 36, Scotland 71; every constituency has returned one member since 1950, and Northern Ireland is the UK total less the GB total"
+        },
+        {
+          "date": "1966-03-31",
+          "contests": 630,
+          "seats": 630,
+          "regions": {
+            "ENG": 511,
+            "WLS": 36,
+            "SCT": 71,
+            "NIR": 12
+          },
+          "source": "hoc-cbp7529",
+          "quote": "Tables 1a, 1c, 1e, 1g, and 1i, Total seats, 1966: UK 630, GB 618, England 511, Wales 36, Scotland 71; every constituency has returned one member since 1950, and Northern Ireland is the UK total less the GB total"
+        },
+        {
+          "date": "1970-06-18",
+          "contests": 630,
+          "seats": 630,
+          "regions": {
+            "ENG": 511,
+            "WLS": 36,
+            "SCT": 71,
+            "NIR": 12
+          },
+          "source": "hoc-cbp7529",
+          "quote": "Tables 1a, 1c, 1e, 1g, and 1i, Total seats, 1970: UK 630, GB 618, England 511, Wales 36, Scotland 71; every constituency has returned one member since 1950, and Northern Ireland is the UK total less the GB total"
+        },
+        {
+          "date": "1974-02-28",
+          "contests": 635,
+          "seats": 635,
+          "regions": {
+            "ENG": 516,
+            "WLS": 36,
+            "SCT": 71,
+            "NIR": 12
+          },
+          "source": "hoc-cbp7529",
+          "quote": "Tables 1a, 1c, 1e, 1g, and 1i, Total seats, 1974 Feb: UK 635, GB 623, England 516, Wales 36, Scotland 71; every constituency has returned one member since 1950, and Northern Ireland is the UK total less the GB total"
+        },
+        {
+          "date": "1974-10-10",
+          "contests": 635,
+          "seats": 635,
+          "regions": {
+            "ENG": 516,
+            "WLS": 36,
+            "SCT": 71,
+            "NIR": 12
+          },
+          "source": "hoc-cbp7529",
+          "quote": "Tables 1a, 1c, 1e, 1g, and 1i, Total seats, 1974 Oct: UK 635, GB 623, England 516, Wales 36, Scotland 71; every constituency has returned one member since 1950, and Northern Ireland is the UK total less the GB total"
+        },
+        {
+          "date": "1979-05-03",
+          "contests": 635,
+          "seats": 635,
+          "regions": {
+            "ENG": 516,
+            "WLS": 36,
+            "SCT": 71,
+            "NIR": 12
+          },
+          "source": "hoc-cbp7529",
+          "quote": "Tables 1a, 1c, 1e, 1g, and 1i, Total seats, 1979: UK 635, GB 623, England 516, Wales 36, Scotland 71; every constituency has returned one member since 1950, and Northern Ireland is the UK total less the GB total"
+        },
+        {
+          "date": "1983-06-09",
+          "contests": 650,
+          "seats": 650,
+          "regions": {
+            "ENG": 523,
+            "WLS": 38,
+            "SCT": 72,
+            "NIR": 17
+          },
+          "source": "hoc-cbp7529",
+          "quote": "Tables 1a, 1c, 1e, 1g, and 1i, Total seats, 1983: UK 650, GB 633, England 523, Wales 38, Scotland 72; every constituency has returned one member since 1950, and Northern Ireland is the UK total less the GB total"
+        },
+        {
+          "date": "1987-06-11",
+          "contests": 650,
+          "seats": 650,
+          "regions": {
+            "ENG": 523,
+            "WLS": 38,
+            "SCT": 72,
+            "NIR": 17
+          },
+          "source": "hoc-cbp7529",
+          "quote": "Tables 1a, 1c, 1e, 1g, and 1i, Total seats, 1987: UK 650, GB 633, England 523, Wales 38, Scotland 72; every constituency has returned one member since 1950, and Northern Ireland is the UK total less the GB total"
+        },
+        {
+          "date": "1992-04-09",
+          "contests": 651,
+          "seats": 651,
+          "regions": {
+            "ENG": 524,
+            "WLS": 38,
+            "SCT": 72,
+            "NIR": 17
+          },
+          "source": "hoc-cbp7529",
+          "quote": "Tables 1a, 1c, 1e, 1g, and 1i, Total seats, 1992: UK 651, GB 634, England 524, Wales 38, Scotland 72; every constituency has returned one member since 1950, and Northern Ireland is the UK total less the GB total"
+        },
+        {
+          "date": "1997-05-01",
+          "contests": 659,
+          "seats": 659,
+          "regions": {
+            "ENG": 529,
+            "WLS": 40,
+            "SCT": 72,
+            "NIR": 18
+          },
+          "source": "hoc-cbp7529",
+          "quote": "Tables 1a, 1c, 1e, 1g, and 1i, Total seats, 1997: UK 659, GB 641, England 529, Wales 40, Scotland 72; every constituency has returned one member since 1950, and Northern Ireland is the UK total less the GB total"
+        },
+        {
+          "date": "2001-06-07",
+          "contests": 659,
+          "seats": 659,
+          "regions": {
+            "ENG": 529,
+            "WLS": 40,
+            "SCT": 72,
+            "NIR": 18
+          },
+          "source": "hoc-cbp7529",
+          "quote": "Tables 1a, 1c, 1e, 1g, and 1i, Total seats, 2001: UK 659, GB 641, England 529, Wales 40, Scotland 72; every constituency has returned one member since 1950, and Northern Ireland is the UK total less the GB total"
+        },
+        {
+          "date": "2005-05-05",
+          "contests": 646,
+          "seats": 646,
+          "regions": {
+            "ENG": 529,
+            "WLS": 40,
+            "SCT": 59,
+            "NIR": 18
+          },
+          "source": "hoc-cbp7529",
+          "quote": "Tables 1a, 1c, 1e, 1g, and 1i, Total seats, 2005: UK 646, GB 628, England 529, Wales 40, Scotland 59; every constituency has returned one member since 1950, and Northern Ireland is the UK total less the GB total"
+        },
+        {
+          "date": "2010-05-06",
+          "contests": 650,
+          "seats": 650,
+          "regions": {
+            "ENG": 533,
+            "WLS": 40,
+            "SCT": 59,
+            "NIR": 18
+          },
+          "source": "hoc-cbp7529",
+          "quote": "Tables 1a, 1c, 1e, 1g, and 1i, Total seats, 2010: UK 650, GB 632, England 533, Wales 40, Scotland 59; every constituency has returned one member since 1950, and Northern Ireland is the UK total less the GB total"
+        },
+        {
+          "date": "2015-05-07",
+          "contests": 650,
+          "seats": 650,
+          "regions": {
+            "ENG": 533,
+            "WLS": 40,
+            "SCT": 59,
+            "NIR": 18
+          },
+          "source": "hoc-cbp7529",
+          "quote": "Tables 1a, 1c, 1e, 1g, and 1i, Total seats, 2015: UK 650, GB 632, England 533, Wales 40, Scotland 59; every constituency has returned one member since 1950, and Northern Ireland is the UK total less the GB total"
+        },
+        {
+          "date": "2017-06-08",
+          "contests": 650,
+          "seats": 650,
+          "regions": {
+            "ENG": 533,
+            "WLS": 40,
+            "SCT": 59,
+            "NIR": 18
+          },
+          "source": "hoc-cbp7529",
+          "quote": "Tables 1a, 1c, 1e, 1g, and 1i, Total seats, 2017: UK 650, GB 632, England 533, Wales 40, Scotland 59; every constituency has returned one member since 1950, and Northern Ireland is the UK total less the GB total"
+        },
+        {
+          "date": "2019-12-12",
+          "contests": 650,
+          "seats": 650,
+          "regions": {
+            "ENG": 533,
+            "WLS": 40,
+            "SCT": 59,
+            "NIR": 18
+          },
+          "source": "hoc-cbp7529",
+          "quote": "Tables 1a, 1c, 1e, 1g, and 1i, Total seats, 2019: UK 650, GB 632, England 533, Wales 40, Scotland 59; every constituency has returned one member since 1950, and Northern Ireland is the UK total less the GB total"
+        },
+        {
+          "date": "2024-07-04",
+          "contests": 650,
+          "seats": 650,
+          "regions": {
+            "ENG": 543,
+            "WLS": 32,
+            "SCT": 57,
+            "NIR": 18
+          },
+          "source": "uksi-2023-1230",
+          "quote": "Schedules 1 to 4 name 543 constituencies in England, 18 in Northern Ireland, 57 in Scotland, and 32 in Wales"
+        }
+      ]
+    },
+    {
+      "key": "commons_by",
+      "goal": "national",
+      "label": "House of Commons by-elections",
+      "unit": "contest",
+      "match": [
+        {
+          "kinds": [
+            "by_election"
+          ],
+          "bodies": [
+            "lower_house"
+          ],
+          "iso": "GB"
+        }
+      ],
+      "gaps": [
+        {
+          "from": 1918,
+          "to": 2024,
+          "note": "No per-year count retrieved. The House of Commons Library by-election listing is on parliament.uk, which is blocked to both curl and WebFetch."
+        },
+        {
+          "from": 1832,
+          "to": 1945,
+          "note": "The House of Commons Library lists every by-election only from the 1945 general election on (and Northern Ireland's from 1922)."
+        },
+        {
+          "from": 2023,
+          "to": 2026,
+          "note": "Not yet counted from the Library's briefings after August 2023."
+        }
+      ],
+      "elections": [
+        {
+          "year": 1946,
+          "contests": 18,
+          "source": "hoc-cbp7529",
+          "quote": "Tables 13, 14a, and 14b list 18 by-elections dated 1946"
+        },
+        {
+          "year": 1947,
+          "contests": 8,
+          "source": "hoc-cbp7529",
+          "quote": "Tables 13, 14a, and 14b list 8 by-elections dated 1947"
+        },
+        {
+          "year": 1948,
+          "contests": 11,
+          "source": "hoc-cbp7529",
+          "quote": "Tables 13, 14a, and 14b list 11 by-elections dated 1948"
+        },
+        {
+          "year": 1949,
+          "contests": 6,
+          "source": "hoc-cbp7529",
+          "quote": "Tables 13, 14a, and 14b list 6 by-elections dated 1949"
+        },
+        {
+          "year": 1950,
+          "contests": 9,
+          "source": "hoc-cbp7529",
+          "quote": "Tables 13, 14a, and 14b list 9 by-elections dated 1950"
+        },
+        {
+          "year": 1951,
+          "contests": 6,
+          "source": "hoc-cbp7529",
+          "quote": "Tables 13, 14a, and 14b list 6 by-elections dated 1951"
+        },
+        {
+          "year": 1952,
+          "contests": 9,
+          "source": "hoc-cbp7529",
+          "quote": "Tables 13, 14a, and 14b list 9 by-elections dated 1952"
+        },
+        {
+          "year": 1953,
+          "contests": 14,
+          "source": "hoc-cbp7529",
+          "quote": "Tables 13, 14a, and 14b list 14 by-elections dated 1953"
+        },
+        {
+          "year": 1954,
+          "contests": 18,
+          "source": "hoc-cbp7529",
+          "quote": "Tables 13, 14a, and 14b list 18 by-elections dated 1954"
+        },
+        {
+          "year": 1955,
+          "contests": 10,
+          "source": "hoc-cbp7529",
+          "quote": "Tables 13, 14a, and 14b list 10 by-elections dated 1955"
+        },
+        {
+          "year": 1956,
+          "contests": 12,
+          "source": "hoc-cbp7529",
+          "quote": "Tables 13, 14a, and 14b list 12 by-elections dated 1956"
+        },
+        {
+          "year": 1957,
+          "contests": 15,
+          "source": "hoc-cbp7529",
+          "quote": "Tables 13, 14a, and 14b list 15 by-elections dated 1957"
+        },
+        {
+          "year": 1958,
+          "contests": 15,
+          "source": "hoc-cbp7529",
+          "quote": "Tables 13, 14a, and 14b list 15 by-elections dated 1958"
+        },
+        {
+          "year": 1959,
+          "contests": 5,
+          "source": "hoc-cbp7529",
+          "quote": "Tables 13, 14a, and 14b list 5 by-elections dated 1959"
+        },
+        {
+          "year": 1960,
+          "contests": 11,
+          "source": "hoc-cbp7529",
+          "quote": "Tables 13, 14a, and 14b list 11 by-elections dated 1960"
+        },
+        {
+          "year": 1961,
+          "contests": 12,
+          "source": "hoc-cbp7529",
+          "quote": "Tables 13, 14a, and 14b list 12 by-elections dated 1961"
+        },
+        {
+          "year": 1962,
+          "contests": 17,
+          "source": "hoc-cbp7529",
+          "quote": "Tables 13, 14a, and 14b list 17 by-elections dated 1962"
+        },
+        {
+          "year": 1963,
+          "contests": 15,
+          "source": "hoc-cbp7529",
+          "quote": "Tables 13, 14a, and 14b list 15 by-elections dated 1963"
+        },
+        {
+          "year": 1964,
+          "contests": 6,
+          "source": "hoc-cbp7529",
+          "quote": "Tables 13, 14a, and 14b list 6 by-elections dated 1964"
+        },
+        {
+          "year": 1965,
+          "contests": 12,
+          "source": "hoc-cbp7529",
+          "quote": "Tables 13, 14a, and 14b list 12 by-elections dated 1965"
+        },
+        {
+          "year": 1966,
+          "contests": 2,
+          "source": "hoc-cbp7529",
+          "quote": "Tables 13, 14a, and 14b list 2 by-elections dated 1966"
+        },
+        {
+          "year": 1967,
+          "contests": 11,
+          "source": "hoc-cbp7529",
+          "quote": "Tables 13, 14a, and 14b list 11 by-elections dated 1967"
+        },
+        {
+          "year": 1968,
+          "contests": 11,
+          "source": "hoc-cbp7529",
+          "quote": "Tables 13, 14a, and 14b list 11 by-elections dated 1968"
+        },
+        {
+          "year": 1969,
+          "contests": 13,
+          "source": "hoc-cbp7529",
+          "quote": "Tables 13, 14a, and 14b list 13 by-elections dated 1969"
+        },
+        {
+          "year": 1970,
+          "contests": 4,
+          "source": "hoc-cbp7529",
+          "quote": "Tables 13, 14a, and 14b list 4 by-elections dated 1970"
+        },
+        {
+          "year": 1971,
+          "contests": 10,
+          "source": "hoc-cbp7529",
+          "quote": "Tables 13, 14a, and 14b list 10 by-elections dated 1971"
+        },
+        {
+          "year": 1972,
+          "contests": 6,
+          "source": "hoc-cbp7529",
+          "quote": "Tables 13, 14a, and 14b list 6 by-elections dated 1972"
+        },
+        {
+          "year": 1973,
+          "contests": 12,
+          "source": "hoc-cbp7529",
+          "quote": "Tables 13, 14a, and 14b list 12 by-elections dated 1973"
+        },
+        {
+          "year": 1974,
+          "contests": 1,
+          "source": "hoc-cbp7529",
+          "quote": "Tables 13, 14a, and 14b list 1 by-elections dated 1974"
+        },
+        {
+          "year": 1975,
+          "contests": 1,
+          "source": "hoc-cbp7529",
+          "quote": "Tables 13, 14a, and 14b list 1 by-elections dated 1975"
+        },
+        {
+          "year": 1976,
+          "contests": 9,
+          "source": "hoc-cbp7529",
+          "quote": "Tables 13, 14a, and 14b list 9 by-elections dated 1976"
+        },
+        {
+          "year": 1977,
+          "contests": 7,
+          "source": "hoc-cbp7529",
+          "quote": "Tables 13, 14a, and 14b list 7 by-elections dated 1977"
+        },
+        {
+          "year": 1978,
+          "contests": 10,
+          "source": "hoc-cbp7529",
+          "quote": "Tables 13, 14a, and 14b list 10 by-elections dated 1978"
+        },
+        {
+          "year": 1979,
+          "contests": 5,
+          "source": "hoc-cbp7529",
+          "quote": "Tables 13, 14a, and 14b list 5 by-elections dated 1979"
+        },
+        {
+          "year": 1980,
+          "contests": 2,
+          "source": "hoc-cbp7529",
+          "quote": "Tables 13, 14a, and 14b list 2 by-elections dated 1980"
+        },
+        {
+          "year": 1981,
+          "contests": 5,
+          "source": "hoc-cbp7529",
+          "quote": "Tables 13, 14a, and 14b list 5 by-elections dated 1981"
+        },
+        {
+          "year": 1982,
+          "contests": 9,
+          "source": "hoc-cbp7529",
+          "quote": "Tables 13, 14a, and 14b list 9 by-elections dated 1982"
+        },
+        {
+          "year": 1983,
+          "contests": 3,
+          "source": "hoc-cbp7529",
+          "quote": "Tables 13, 14a, and 14b list 3 by-elections dated 1983"
+        },
+        {
+          "year": 1984,
+          "contests": 6,
+          "source": "hoc-cbp7529",
+          "quote": "Tables 13, 14a, and 14b list 6 by-elections dated 1984"
+        },
+        {
+          "year": 1985,
+          "contests": 2,
+          "source": "hoc-cbp7529",
+          "quote": "Tables 13, 14a, and 14b list 2 by-elections dated 1985"
+        },
+        {
+          "year": 1986,
+          "contests": 20,
+          "source": "hoc-cbp7529",
+          "quote": "Tables 13, 14a, and 14b list 20 by-elections dated 1986"
+        },
+        {
+          "year": 1987,
+          "contests": 2,
+          "source": "hoc-cbp7529",
+          "quote": "Tables 13, 14a, and 14b list 2 by-elections dated 1987"
+        },
+        {
+          "year": 1988,
+          "contests": 3,
+          "source": "hoc-cbp7529",
+          "quote": "Tables 13, 14a, and 14b list 3 by-elections dated 1988"
+        },
+        {
+          "year": 1989,
+          "contests": 5,
+          "source": "hoc-cbp7529",
+          "quote": "Tables 13, 14a, and 14b list 5 by-elections dated 1989"
+        },
+        {
+          "year": 1990,
+          "contests": 9,
+          "source": "hoc-cbp7529",
+          "quote": "Tables 13, 14a, and 14b list 9 by-elections dated 1990"
+        },
+        {
+          "year": 1991,
+          "contests": 7,
+          "source": "hoc-cbp7529",
+          "quote": "Tables 13, 14a, and 14b list 7 by-elections dated 1991"
+        },
+        {
+          "year": 1992,
+          "contests": 0,
+          "source": "hoc-cbp7529",
+          "quote": "Tables 13, 14a, and 14b list 0 by-elections dated 1992"
+        },
+        {
+          "year": 1993,
+          "contests": 2,
+          "source": "hoc-cbp7529",
+          "quote": "Tables 13, 14a, and 14b list 2 by-elections dated 1993"
+        },
+        {
+          "year": 1994,
+          "contests": 8,
+          "source": "hoc-cbp7529",
+          "quote": "Tables 13, 14a, and 14b list 8 by-elections dated 1994"
+        },
+        {
+          "year": 1995,
+          "contests": 4,
+          "source": "hoc-cbp7529",
+          "quote": "Tables 13, 14a, and 14b list 4 by-elections dated 1995"
+        },
+        {
+          "year": 1996,
+          "contests": 3,
+          "source": "hoc-cbp7529",
+          "quote": "Tables 13, 14a, and 14b list 3 by-elections dated 1996"
+        },
+        {
+          "year": 1997,
+          "contests": 5,
+          "source": "hoc-cbp7529",
+          "quote": "Tables 13, 14a, and 14b list 5 by-elections dated 1997"
+        },
+        {
+          "year": 1998,
+          "contests": 0,
+          "source": "hoc-cbp7529",
+          "quote": "Tables 13, 14a, and 14b list 0 by-elections dated 1998"
+        },
+        {
+          "year": 1999,
+          "contests": 5,
+          "source": "hoc-cbp7529",
+          "quote": "Tables 13, 14a, and 14b list 5 by-elections dated 1999"
+        },
+        {
+          "year": 2000,
+          "contests": 8,
+          "source": "hoc-cbp7529",
+          "quote": "Tables 13, 14a, and 14b list 8 by-elections dated 2000"
+        },
+        {
+          "year": 2001,
+          "contests": 1,
+          "source": "hoc-cbp7529",
+          "quote": "Tables 13, 14a, and 14b list 1 by-elections dated 2001"
+        },
+        {
+          "year": 2002,
+          "contests": 1,
+          "source": "hoc-cbp7529",
+          "quote": "Tables 13, 14a, and 14b list 1 by-elections dated 2002"
+        },
+        {
+          "year": 2003,
+          "contests": 1,
+          "source": "hoc-cbp7529",
+          "quote": "Tables 13, 14a, and 14b list 1 by-elections dated 2003"
+        },
+        {
+          "year": 2004,
+          "contests": 3,
+          "source": "hoc-cbp7529",
+          "quote": "Tables 13, 14a, and 14b list 3 by-elections dated 2004"
+        },
+        {
+          "year": 2005,
+          "contests": 2,
+          "source": "hoc-cbp7529",
+          "quote": "Tables 13, 14a, and 14b list 2 by-elections dated 2005"
+        },
+        {
+          "year": 2006,
+          "contests": 3,
+          "source": "hoc-cbp7529",
+          "quote": "Tables 13, 14a, and 14b list 3 by-elections dated 2006"
+        },
+        {
+          "year": 2007,
+          "contests": 2,
+          "source": "hoc-cbp7529",
+          "quote": "Tables 13, 14a, and 14b list 2 by-elections dated 2007"
+        },
+        {
+          "year": 2008,
+          "contests": 5,
+          "source": "hoc-cbp7529",
+          "quote": "Tables 13, 14a, and 14b list 5 by-elections dated 2008"
+        },
+        {
+          "year": 2009,
+          "contests": 2,
+          "source": "hoc-cbp7529",
+          "quote": "Tables 13, 14a, and 14b list 2 by-elections dated 2009"
+        },
+        {
+          "year": 2010,
+          "contests": 0,
+          "source": "hoc-cbp7529",
+          "quote": "Tables 13, 14a, and 14b list 0 by-elections dated 2010"
+        },
+        {
+          "year": 2011,
+          "contests": 6,
+          "source": "hoc-cbp7529",
+          "quote": "Tables 13, 14a, and 14b list 6 by-elections dated 2011"
+        },
+        {
+          "year": 2012,
+          "contests": 7,
+          "source": "hoc-cbp7529",
+          "quote": "Tables 13, 14a, and 14b list 7 by-elections dated 2012"
+        },
+        {
+          "year": 2013,
+          "contests": 3,
+          "source": "hoc-cbp7529",
+          "quote": "Tables 13, 14a, and 14b list 3 by-elections dated 2013"
+        },
+        {
+          "year": 2014,
+          "contests": 5,
+          "source": "hoc-cbp7529",
+          "quote": "Tables 13, 14a, and 14b list 5 by-elections dated 2014"
+        },
+        {
+          "year": 2015,
+          "contests": 1,
+          "source": "hoc-cbp7529",
+          "quote": "Tables 13, 14a, and 14b list 1 by-elections dated 2015"
+        },
+        {
+          "year": 2016,
+          "contests": 7,
+          "source": "hoc-cbp7529",
+          "quote": "Tables 13, 14a, and 14b list 7 by-elections dated 2016"
+        },
+        {
+          "year": 2017,
+          "contests": 2,
+          "source": "hoc-cbp7529",
+          "quote": "Tables 13, 14a, and 14b list 2 by-elections dated 2017"
+        },
+        {
+          "year": 2018,
+          "contests": 2,
+          "source": "hoc-cbp7529",
+          "quote": "Tables 13, 14a, and 14b list 2 by-elections dated 2018"
+        },
+        {
+          "year": 2019,
+          "contests": 3,
+          "source": "hoc-cbp7529",
+          "quote": "Tables 13, 14a, and 14b list 3 by-elections dated 2019"
+        },
+        {
+          "year": 2020,
+          "contests": 0,
+          "source": "hoc-cbp7529",
+          "quote": "Tables 13, 14a, and 14b list 0 by-elections dated 2020"
+        },
+        {
+          "year": 2021,
+          "contests": 6,
+          "source": "hoc-cbp7529",
+          "quote": "Tables 13, 14a, and 14b list 6 by-elections dated 2021"
+        },
+        {
+          "year": 2022,
+          "contests": 6,
+          "source": "hoc-cbp7529",
+          "quote": "Tables 13, 14a, and 14b list 6 by-elections dated 2022"
+        }
+      ]
+    },
+    {
+      "key": "holyrood",
+      "goal": "subnational",
+      "label": "Scottish Parliament elections",
+      "match": [
+        {
+          "kinds": [
+            "general"
+          ],
+          "bodies": [
+            "unicameral"
+          ],
+          "iso": "GB-SCT"
+        }
+      ],
+      "schemes": [
+        "gb.spc",
+        "gb.spr"
+      ],
+      "elections": [
+        {
+          "date": "1999-05-06",
+          "contests": 81,
+          "seats": 129,
+          "source": "scotact1998-sch1",
+          "quote": "There are to be 73 constituencies for the purposes of this Act. There are to be eight regions for the purposes of this Act. Seven regional members are to be returned for each region.",
+          "note": "Contests = 73 constituencies + 8 regions. Seats = 73 + (8 x 7), derived from the quoted provisions. The date is not quoted from a fetched source."
+        },
+        {
+          "date": "2003-05-01",
+          "contests": 81,
+          "seats": 129,
+          "source": "scotact1998-sch1",
+          "quote": "There are to be 73 constituencies for the purposes of this Act. There are to be eight regions for the purposes of this Act. Seven regional members are to be returned for each region.",
+          "note": "Same structure as the current revised text. Per-election check not made. The date is not quoted from a fetched source."
+        },
+        {
+          "date": "2007-05-03",
+          "contests": 81,
+          "seats": 129,
+          "source": "scotact1998-sch1",
+          "quote": "There are to be 73 constituencies for the purposes of this Act. There are to be eight regions for the purposes of this Act. Seven regional members are to be returned for each region.",
+          "note": "Same structure as the current revised text. Per-election check not made. The date is not quoted from a fetched source."
+        },
+        {
+          "date": "2011-05-05",
+          "contests": 81,
+          "seats": 129,
+          "source": "scotact1998-sch1",
+          "quote": "There are to be 73 constituencies for the purposes of this Act. There are to be eight regions for the purposes of this Act. Seven regional members are to be returned for each region.",
+          "note": "Same structure as the current revised text. Per-election check not made. The date is not quoted from a fetched source."
+        },
+        {
+          "date": "2016-05-05",
+          "contests": 81,
+          "seats": 129,
+          "source": "scotact1998-sch1",
+          "quote": "There are to be 73 constituencies for the purposes of this Act. There are to be eight regions for the purposes of this Act. Seven regional members are to be returned for each region.",
+          "note": "Same structure as the current revised text. Per-election check not made. The date is not quoted from a fetched source."
+        },
+        {
+          "date": "2021-05-06",
+          "contests": 81,
+          "seats": 129,
+          "source": "scotact1998-sch1",
+          "quote": "There are to be 73 constituencies for the purposes of this Act. There are to be eight regions for the purposes of this Act. Seven regional members are to be returned for each region.",
+          "note": "Same structure as the current revised text. Per-election check not made. The date is not quoted from a fetched source."
+        },
+        {
+          "date": "2026-05-07",
+          "contests": 81,
+          "seats": 129,
+          "source": "scotact1998-sch1",
+          "quote": "There are to be 73 constituencies for the purposes of this Act. There are to be eight regions for the purposes of this Act. Seven regional members are to be returned for each region.",
+          "note": "Seats corroborated by the six party totals on parl-scot-2026 (58, 17, 17, 15, 12, 10, summing to 129). The date is not quoted from a fetched source."
+        }
+      ],
+      "gaps": []
+    },
+    {
+      "key": "senedd",
+      "goal": "subnational",
+      "label": "Senedd elections",
+      "match": [
+        {
+          "kinds": [
+            "general"
+          ],
+          "bodies": [
+            "unicameral"
+          ],
+          "iso": "GB-WLS"
+        }
+      ],
+      "schemes": [
+        "gb.senc",
+        "gb.senr"
+      ],
+      "elections": [
+        {
+          "date": "2021-05-06",
+          "contests": 45,
+          "seats": 60,
+          "source": "senedd-research-2021",
+          "quote": "In 14 of the 40 constituencies, more than 50% of the electorate cast valid votes.",
+          "note": "Contests = 40 constituencies + 5 regions. Seats from the table row 'All Regions' with total 60 (second table on the Senedd Research PDF, line 1116). Quote for 'five regions' from the same PDF: 'Only one out of the five regions saw a decrease in turnout from the 2016 election.' The date is not quoted from a fetched source."
+        },
+        {
+          "date": "2026-05-07",
+          "contests": 16,
+          "seats": 96,
+          "source": "asc2024-s1",
+          "quote": "(a)16 Senedd constituencies, and (b)six seats for each constituency, and",
+          "note": "Seats 96 = 16 x 6 (derived from the quoted provisions). The 2026 date is not quoted from a fetched source. The Act's schedule applies to the first election after 6 April 2026."
+        },
+        {
+          "date": "1999-05-06",
+          "contests": 45,
+          "seats": 60,
+          "source": "hoc-cbp7529",
+          "quote": "Table 16, Constituency seats Total 40; section 9.4: 40 constituencies across five regions"
+        },
+        {
+          "date": "2003-05-01",
+          "contests": 45,
+          "seats": 60,
+          "source": "hoc-cbp7529",
+          "quote": "Table 16, Constituency seats Total 40; section 9.4: 40 constituencies across five regions"
+        },
+        {
+          "date": "2007-05-03",
+          "contests": 45,
+          "seats": 60,
+          "source": "hoc-cbp7529",
+          "quote": "Table 16, Constituency seats Total 40; section 9.4: 40 constituencies across five regions"
+        },
+        {
+          "date": "2011-05-05",
+          "contests": 45,
+          "seats": 60,
+          "source": "hoc-cbp7529",
+          "quote": "Table 16, Constituency seats Total 40; section 9.4: 40 constituencies across five regions"
+        },
+        {
+          "date": "2016-05-05",
+          "contests": 45,
+          "seats": 60,
+          "source": "hoc-cbp7529",
+          "quote": "Table 16, Constituency seats Total 40; section 9.4: 40 constituencies across five regions"
+        }
+      ],
+      "gaps": [
+        {
+          "from": 1999,
+          "to": 2016,
+          "note": "Contests would be 40 constituencies plus 5 regions if confirmed, but the Electoral Commission 2016 report and Senedd sources for 1999, 2003, 2007, 2011, and 2016 were not fetched. Government of Wales Act 2006 section 1 and section 2 do not state the counts (section 2 refers to regulations under section 49J)."
+        }
+      ]
+    },
+    {
+      "key": "ni_assembly",
+      "goal": "subnational",
+      "label": "Northern Ireland Assembly elections",
+      "match": [
+        {
+          "kinds": [
+            "general"
+          ],
+          "bodies": [
+            "unicameral"
+          ],
+          "iso": "GB-NIR"
+        }
+      ],
+      "schemes": [
+        "gb.pcon",
+        "gb.nia"
+      ],
+      "elections": [
+        {
+          "date": "1998-06-25",
+          "contests": 18,
+          "seats": 108,
+          "source": "hoc-cbp7529",
+          "quote": "Table 18, seats won total 108; section 9.4: eighteen constituencies"
+        },
+        {
+          "date": "2003-11-26",
+          "contests": 18,
+          "seats": 108,
+          "source": "hoc-cbp7529",
+          "quote": "Table 18, seats won total 108; section 9.4: eighteen constituencies"
+        },
+        {
+          "date": "2007-03-07",
+          "contests": 18,
+          "seats": 108,
+          "source": "hoc-cbp7529",
+          "quote": "Table 18, seats won total 108; section 9.4: eighteen constituencies"
+        },
+        {
+          "date": "2011-05-05",
+          "contests": 18,
+          "seats": 108,
+          "source": "hoc-cbp7529",
+          "quote": "Table 18, seats won total 108; section 9.4: eighteen constituencies"
+        },
+        {
+          "date": "2016-05-05",
+          "contests": 18,
+          "seats": 108,
+          "source": "hoc-cbp7529",
+          "quote": "Table 18, seats won total 108; section 9.4: eighteen constituencies"
+        },
+        {
+          "date": "2017-03-02",
+          "contests": 18,
+          "seats": 90,
+          "source": "hoc-cbp7529",
+          "quote": "Table 18, seats won total 90; section 9.4: eighteen constituencies"
+        },
+        {
+          "date": "2022-05-05",
+          "contests": 18,
+          "seats": 90,
+          "source": "hoc-cbp7529",
+          "quote": "Table 18, seats won total 90; section 9.4: eighteen constituencies"
+        }
+      ],
+      "gaps": [
+        {
+          "from": 1973,
+          "to": 2022,
+          "note": "No sourced count retrieved. The Electoral Office for Northern Ireland results pages were not fetched (no WebFetch or curl success). Search excerpts describe 18 constituencies of five MLAs for the current structure, but that text was not quoted from a fetched page. Assembly sizes for 1973, 1982, 1996, and earlier 1998-2011 elections were not confirmed."
+        }
+      ]
+    },
+    {
+      "key": "stormont",
+      "goal": "subnational",
+      "label": "Parliament of Northern Ireland elections",
+      "match": [
+        {
+          "kinds": [
+            "general"
+          ],
+          "bodies": [
+            "lower_house"
+          ],
+          "iso": "GB-NIR"
+        }
+      ],
+      "schemes": [
+        "gb.stormont"
+      ],
+      "gaps": [
+        {
+          "from": 1921,
+          "to": 1969,
+          "note": "No sourced count retrieved. The Parliament of Northern Ireland election data was not located in an official source within the budget. The Commons Library research papers that describe Stormont (for example CBP-8884) were not reachable via parliament.uk."
+        },
+        {
+          "from": 1921,
+          "to": 1969,
+          "note": "The House of Commons Library gives Stormont's 52 seats at each election but not its constituencies, several of which returned more than one member."
+        }
+      ],
+      "elections": []
+    },
+    {
+      "key": "councils",
+      "goal": "local",
+      "label": "Council elections",
+      "unit": "polity",
+      "match": [
+        {
+          "kinds": [
+            "local"
+          ],
+          "bodies": [
+            "council"
+          ],
+          "iso": "*"
+        }
+      ],
+      "gaps": [
+        {
+          "from": 1973,
+          "to": 2026,
+          "note": "No per-year count of councils holding elections retrieved. Electoral Commission reports and Commons Library local elections briefings were not reached within the budget."
+        },
+        {
+          "from": 1973,
+          "to": 2026,
+          "note": "No official count of the councils holding elections each year is compiled yet."
+        }
+      ],
+      "elections": []
+    },
+    {
+      "key": "referendums",
+      "goal": "referendums",
+      "label": "UK-wide referendums",
+      "unit": "contest",
+      "match": [
+        {
+          "kinds": [
+            "referendum"
+          ],
+          "bodies": [
+            "ballot_question"
+          ],
+          "iso": "GB"
+        }
+      ],
+      "grain": [
+        "gb.counting_area",
+        "gb.lad",
+        "gb.country",
+        "gb.ep_constituency"
+      ],
+      "elections": [
+        {
+          "year": 1975,
+          "contests": 1,
+          "source": "hoc-cbp7529",
+          "quote": "Table 31: Referendum on membership of the European Community"
+        },
+        {
+          "year": 2011,
+          "contests": 1,
+          "source": "hoc-cbp7529",
+          "quote": "Table 36: Results of the referendum on the Alternative Vote"
+        },
+        {
+          "year": 2016,
+          "contests": 1,
+          "source": "hoc-cbp7529",
+          "quote": "Table 30: EU referendum results by region"
+        }
+      ],
+      "gaps": []
+    },
+    {
+      "key": "ep",
+      "goal": "ep",
+      "label": "European Parliament elections in the UK",
+      "match": [
+        {
+          "kinds": [
+            "general"
+          ],
+          "bodies": [
+            "unicameral"
+          ],
+          "iso": "EU"
+        }
+      ],
+      "schemes": [
+        "gb.euc",
+        "gb.ep_constituency"
+      ],
+      "elections": [
+        {
+          "date": "1979-06-07",
+          "contests": 79,
+          "seats": 81,
+          "source": "hoc-cbp7529",
+          "quote": "Table 15a: Great Britain total 78, Northern Ireland total 3; section 9.3: before 1999 Great Britain elected by First Past the Post from constituencies, Northern Ireland by STV"
+        },
+        {
+          "date": "1984-06-14",
+          "contests": 79,
+          "seats": 81,
+          "source": "hoc-cbp7529",
+          "quote": "Table 15a: Great Britain total 78, Northern Ireland total 3; section 9.3"
+        },
+        {
+          "date": "1989-06-15",
+          "contests": 79,
+          "seats": 81,
+          "source": "hoc-cbp7529",
+          "quote": "Table 15a: Great Britain total 78, Northern Ireland total 3; section 9.3"
+        },
+        {
+          "date": "1994-06-09",
+          "contests": 85,
+          "seats": 87,
+          "source": "hoc-cbp7529",
+          "quote": "Table 15a: Great Britain total 84, Northern Ireland total 3; section 9.3"
+        },
+        {
+          "date": "1999-06-10",
+          "contests": 12,
+          "seats": 87,
+          "source": "hoc-cbp7529",
+          "quote": "Section 9.3: 12 regions, Scotland, Wales, Northern Ireland and the nine English regions"
+        },
+        {
+          "date": "2004-06-10",
+          "contests": 12,
+          "seats": 78,
+          "source": "hoc-cbp7529",
+          "quote": "Section 9.3: 12 regions"
+        },
+        {
+          "date": "2009-06-04",
+          "contests": 12,
+          "seats": 72,
+          "source": "hoc-cbp7529",
+          "quote": "Section 9.3: 12 regions"
+        },
+        {
+          "date": "2014-05-22",
+          "contests": 12,
+          "seats": 73,
+          "source": "hoc-cbp7529",
+          "quote": "Section 9.3: 12 regions"
+        },
+        {
+          "date": "2019-05-23",
+          "contests": 12,
+          "seats": 73,
+          "source": "hoc-cbp7529",
+          "quote": "Section 9.3: 12 regions"
+        }
+      ],
+      "gaps": [
+        {
+          "from": 1979,
+          "to": 2019,
+          "note": "No sourced count retrieved. The European Parliamentary Elections Act 1999 and 2002 and the Research Papers RP99-57 and RP02-78 were not reached (parliament.uk blocked). Legislation.gov.uk pages for these Acts were not fetched."
+        }
+      ]
+    }
+  ]
+}

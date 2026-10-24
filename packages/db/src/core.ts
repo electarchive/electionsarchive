@@ -441,6 +441,7 @@ export const coverageCacheUnitK = pgTable("coverage_cache_unit_k", {
 });
 
 export const coverageGoal = pgTable("coverage_goal", {
+	polity: text().default("us").notNull(),
 	goal: text().notNull(),
 	state: text().notNull(),
 	level: text().notNull(),
@@ -460,8 +461,22 @@ export const coverageGoal = pgTable("coverage_goal", {
 	undrawn: integer().default(0).notNull(),
 	icpsr: integer().default(0).notNull(),
 }, (table) => [
-	primaryKey({ columns: [table.goal, table.state, table.level, table.year], name: "coverage_goal_pkey"}),
+	primaryKey({ columns: [table.polity, table.goal, table.state, table.level, table.year], name: "coverage_goal_pkey"}),
 ]);
+
+export const coveragePolity = pgTable("coverage_polity", {
+	polity: text().primaryKey(),
+	first: integer(),
+	last: integer(),
+	elections: integer().notNull(),
+	contests: integer().notNull(),
+	finest: text(),
+	finestNoun: text("finest_noun"),
+	regions: jsonb().default({}).notNull(),
+	levels: jsonb().default([]).notNull(),
+	notes: jsonb().default([]).notNull(),
+	sources: jsonb().default({}).notNull(),
+});
 
 export const coverageGovernment = pgTable("coverage_government", {
 	id: text().primaryKey(),

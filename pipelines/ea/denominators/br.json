@@ -1,0 +1,186 @@
+{
+  "polity": "BR",
+  "name": "Brazil",
+  "sources": {},
+  "levels": [
+    {
+      "key": "president",
+      "goal": "national",
+      "label": "Presidential elections",
+      "unit": "contest",
+      "match": [
+        {
+          "kinds": [
+            "general",
+            "runoff"
+          ],
+          "bodies": [
+            "head_of_state"
+          ],
+          "iso": "BR"
+        }
+      ],
+      "grain": [
+        "br.uf"
+      ],
+      "fine": [
+        "br.municipio",
+        "br.zona",
+        "br.secao"
+      ],
+      "gaps": [
+        {
+          "from": 1945,
+          "to": 2022,
+          "note": "No official count is compiled yet."
+        }
+      ],
+      "elections": []
+    },
+    {
+      "key": "camara",
+      "goal": "national",
+      "label": "Chamber of Deputies elections",
+      "match": [
+        {
+          "kinds": [
+            "general"
+          ],
+          "bodies": [
+            "lower_house"
+          ],
+          "iso": "BR"
+        }
+      ],
+      "schemes": [
+        "br.uf"
+      ],
+      "fine": [
+        "br.municipio",
+        "br.zona",
+        "br.secao"
+      ],
+      "gaps": [
+        {
+          "from": 1945,
+          "to": 2022,
+          "note": "No official count is compiled yet."
+        }
+      ],
+      "elections": []
+    },
+    {
+      "key": "senado",
+      "goal": "national",
+      "label": "Senate elections",
+      "match": [
+        {
+          "kinds": [
+            "general"
+          ],
+          "bodies": [
+            "upper_house"
+          ],
+          "iso": "BR"
+        }
+      ],
+      "schemes": [
+        "br.uf"
+      ],
+      "fine": [
+        "br.municipio",
+        "br.zona",
+        "br.secao"
+      ],
+      "gaps": [
+        {
+          "from": 1945,
+          "to": 2022,
+          "note": "No official count is compiled yet."
+        }
+      ],
+      "elections": []
+    },
+    {
+      "key": "governor",
+      "goal": "subnational",
+      "label": "Gubernatorial elections",
+      "match": [
+        {
+          "kinds": [
+            "general",
+            "runoff"
+          ],
+          "bodies": [
+            "governor"
+          ],
+          "iso": "BR-*"
+        }
+      ],
+      "schemes": [
+        "br.uf"
+      ],
+      "gaps": [
+        {
+          "from": 1945,
+          "to": 2022,
+          "note": "No official count is compiled yet."
+        }
+      ],
+      "elections": []
+    },
+    {
+      "key": "assemblies",
+      "goal": "subnational",
+      "label": "State assembly elections",
+      "match": [
+        {
+          "kinds": [
+            "general"
+          ],
+          "bodies": [
+            "unicameral"
+          ],
+          "iso": "BR-*"
+        }
+      ],
+      "schemes": [
+        "br.uf"
+      ],
+      "gaps": [
+        {
+          "from": 1945,
+          "to": 2022,
+          "note": "No official count is compiled yet."
+        }
+      ],
+      "elections": []
+    },
+    {
+      "key": "municipal",
+      "goal": "local",
+      "label": "Municipal elections",
+      "unit": "polity",
+      "match": [
+        {
+          "kinds": [
+            "local"
+          ],
+          "bodies": [
+            "mayor",
+            "council"
+          ],
+          "iso": "*"
+        }
+      ],
+      "gaps": [
+        {
+          "from": 1996,
+          "to": 2024,
+          "note": "No official count is compiled yet."
+        }
+      ],
+      "elections": []
+    }
+  ]
+}

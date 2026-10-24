@@ -1,0 +1,212 @@
+{
+  "polity": "FR",
+  "name": "France",
+  "region_schemes": [
+    "fr.departement"
+  ],
+  "sources": {},
+  "levels": [
+    {
+      "key": "assemblee",
+      "goal": "national",
+      "label": "National Assembly elections",
+      "match": [
+        {
+          "kinds": [
+            "general",
+            "runoff"
+          ],
+          "bodies": [
+            "lower_house"
+          ],
+          "iso": "FR"
+        }
+      ],
+      "schemes": [
+        "fr.circonscription",
+        "fr.departement"
+      ],
+      "fine": [
+        "fr.commune",
+        "fr.bureau"
+      ],
+      "gaps": [
+        {
+          "from": 1958,
+          "to": 2024,
+          "note": "No official count is compiled yet."
+        }
+      ],
+      "elections": []
+    },
+    {
+      "key": "president",
+      "goal": "national",
+      "label": "Presidential elections",
+      "unit": "contest",
+      "match": [
+        {
+          "kinds": [
+            "general",
+            "runoff"
+          ],
+          "bodies": [
+            "head_of_state"
+          ],
+          "iso": "FR"
+        }
+      ],
+      "grain": [
+        "fr.departement"
+      ],
+      "fine": [
+        "fr.commune",
+        "fr.bureau"
+      ],
+      "gaps": [
+        {
+          "from": 1965,
+          "to": 2022,
+          "note": "No official count is compiled yet."
+        }
+      ],
+      "elections": []
+    },
+    {
+      "key": "regionales",
+      "goal": "subnational",
+      "label": "Regional elections",
+      "match": [
+        {
+          "kinds": [
+            "general"
+          ],
+          "bodies": [
+            "unicameral"
+          ],
+          "iso": "FR-*"
+        }
+      ],
+      "schemes": [
+        "fr.region"
+      ],
+      "gaps": [
+        {
+          "from": 1986,
+          "to": 2021,
+          "note": "No official count is compiled yet."
+        }
+      ],
+      "elections": []
+    },
+    {
+      "key": "departementales",
+      "goal": "subnational",
+      "label": "Departmental and cantonal elections",
+      "match": [
+        {
+          "kinds": [
+            "general"
+          ],
+          "bodies": [
+            "council"
+          ],
+          "iso": "*"
+        }
+      ],
+      "schemes": [
+        "fr.canton"
+      ],
+      "gaps": [
+        {
+          "from": 1958,
+          "to": 2021,
+          "note": "No official count is compiled yet."
+        }
+      ],
+      "elections": []
+    },
+    {
+      "key": "municipales",
+      "goal": "local",
+      "label": "Municipal elections",
+      "unit": "polity",
+      "match": [
+        {
+          "kinds": [
+            "local"
+          ],
+          "bodies": [
+            "council",
+            "mayor"
+          ],
+          "iso": "*"
+        }
+      ],
+      "gaps": [
+        {
+          "from": 1959,
+          "to": 2020,
+          "note": "No official count is compiled yet."
+        }
+      ],
+      "elections": []
+    },
+    {
+      "key": "referendums",
+      "goal": "referendums",
+      "label": "Referendums",
+      "unit": "contest",
+      "match": [
+        {
+          "kinds": [
+            "referendum"
+          ],
+          "bodies": [
+            "ballot_question"
+          ],
+          "iso": "FR"
+        }
+      ],
+      "grain": [
+        "fr.departement"
+      ],
+      "gaps": [
+        {
+          "from": 1958,
+          "to": 2005,
+          "note": "No official count is compiled yet."
+        }
+      ],
+      "elections": []
+    },
+    {
+      "key": "ep",
+      "goal": "ep",
+      "label": "European Parliament elections",
+      "match": [
+        {
+          "kinds": [
+            "general"
+          ],
+          "bodies": [
+            "unicameral"
+          ],
+          "iso": "EU"
+        }
+      ],
+      "schemes": [
+        "fr.ep_constituency",
+        "eu.member_state"
+      ],
+      "gaps": [
+        {
+          "from": 1979,
+          "to": 2024,
+          "note": "No official count is compiled yet."
+        }
+      ],
+      "elections": []
+    }
+  ]
+}

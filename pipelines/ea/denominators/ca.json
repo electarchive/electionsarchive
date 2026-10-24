@@ -1,0 +1,502 @@
+{
+  "polity": "CA",
+  "name": "Canada",
+  "sources": {
+    "heo": {
+      "title": "History of Election Outcomes (Parliaments table and Number of Provincial and Territorial Seats tables)",
+      "publisher": "Elections Canada",
+      "url": "https://www.elections.ca/content.aspx?section=vot&dir=bkg&document=heo&lang=e",
+      "note": "The Parliaments table runs from the 1st Parliament (1867) to the 41st (2011). Seats (won/total) gives the House total for each election. The Number of Provincial and Territorial Seats tables give the seats by province for the years listed; the 1882 row (211) differs from the 5th Parliament total (210) on the same page."
+    },
+    "cost-2015-2021": {
+      "title": "Cost of general elections, 42nd (2015) to 44th (2021)",
+      "publisher": "Elections Canada",
+      "url": "https://www.elections.ca/content.aspx?section=abo&dir=comp%2Fsep1724&document=p1&lang=e"
+    },
+    "ge45-report": {
+      "title": "45th General Election: 1. Preparing for the General Election (Electoral Districts)",
+      "publisher": "Elections Canada",
+      "url": "https://www.elections.ca/content.aspx?section=res&dir=rep%2Foff%2Fsta_ge45&document=p1&lang=e"
+    }
+  },
+  "levels": [
+    {
+      "key": "commons",
+      "goal": "national",
+      "label": "House of Commons general elections",
+      "match": [
+        {
+          "kinds": [
+            "general"
+          ],
+          "bodies": [
+            "lower_house"
+          ],
+          "iso": "CA"
+        }
+      ],
+      "schemes": [
+        "ca.fed"
+      ],
+      "fine": [
+        "ca.pd"
+      ],
+      "elections": [
+        {
+          "date": "1867-08-07",
+          "contests": null,
+          "seats": 181,
+          "regions": null,
+          "source": "heo",
+          "quote": "Parliaments table, 1st: 101/181; Number of Provincial and Territorial Seats, 1867: Can. 181, N.B. 15, N.S. 19, Ont. 82, Que. 65",
+          "note": "Elections Canada's table gives seats; some ridings returned two members until 1966, so seats are not a count of ridings."
+        },
+        {
+          "date": "1872-07-20",
+          "contests": null,
+          "seats": 200,
+          "regions": null,
+          "source": "heo",
+          "quote": "Parliaments table, 2nd: 103/200; Number of Provincial and Territorial Seats, 1872: Can. 200, N.B. 16, N.S. 21, Ont. 88, Que. 65, Man. 4, B.C. 6",
+          "note": "Elections Canada's table gives seats; some ridings returned two members until 1966, so seats are not a count of ridings."
+        },
+        {
+          "date": "1874-01-22",
+          "contests": null,
+          "seats": 206,
+          "source": "heo",
+          "quote": "Parliaments table, 3rd: 133/206",
+          "note": "Elections Canada's table gives seats; some ridings returned two members until 1966, so seats are not a count of ridings.",
+          "regions": null
+        },
+        {
+          "date": "1878-09-17",
+          "contests": null,
+          "seats": 206,
+          "source": "heo",
+          "quote": "Parliaments table, 4th: 137/206",
+          "note": "Elections Canada's table gives seats; some ridings returned two members until 1966, so seats are not a count of ridings.",
+          "regions": null
+        },
+        {
+          "date": "1882-06-20",
+          "contests": null,
+          "seats": 210,
+          "source": "heo",
+          "quote": "Parliaments table, 5th: 139/210",
+          "note": "Elections Canada's table gives seats; some ridings returned two members until 1966, so seats are not a count of ridings.",
+          "regions": null
+        },
+        {
+          "date": "1887-02-22",
+          "contests": null,
+          "seats": 215,
+          "regions": null,
+          "source": "heo",
+          "quote": "Parliaments table, 6th: 123/215; Number of Provincial and Territorial Seats, 1887: Can. 215, N.B. 16, N.S. 21, Ont. 92, Que. 65, Man. 5, B.C. 6, P.E.I. 6, N.W.T. 4",
+          "note": "Elections Canada's table gives seats; some ridings returned two members until 1966, so seats are not a count of ridings."
+        },
+        {
+          "date": "1891-03-05",
+          "contests": null,
+          "seats": 215,
+          "source": "heo",
+          "quote": "Parliaments table, 7th: 123/215",
+          "note": "Elections Canada's table gives seats; some ridings returned two members until 1966, so seats are not a count of ridings.",
+          "regions": null
+        },
+        {
+          "date": "1896-06-23",
+          "contests": null,
+          "seats": 213,
+          "source": "heo",
+          "quote": "Parliaments table, 8th: 118/213",
+          "note": "Elections Canada's table gives seats; some ridings returned two members until 1966, so seats are not a count of ridings.",
+          "regions": null
+        },
+        {
+          "date": "1900-11-07",
+          "contests": null,
+          "seats": 213,
+          "source": "heo",
+          "quote": "Parliaments table, 9th: 132/213",
+          "note": "Elections Canada's table gives seats; some ridings returned two members until 1966, so seats are not a count of ridings.",
+          "regions": null
+        },
+        {
+          "date": "1904-11-03",
+          "contests": null,
+          "seats": 214,
+          "source": "heo",
+          "quote": "Parliaments table, 10th: 139/214",
+          "note": "Elections Canada's table gives seats; some ridings returned two members until 1966, so seats are not a count of ridings.",
+          "regions": null
+        },
+        {
+          "date": "1908-10-26",
+          "contests": null,
+          "seats": 221,
+          "source": "heo",
+          "quote": "Parliaments table, 11th: 133/221",
+          "note": "Elections Canada's table gives seats; some ridings returned two members until 1966, so seats are not a count of ridings.",
+          "regions": null
+        },
+        {
+          "date": "1911-09-21",
+          "contests": null,
+          "seats": 221,
+          "source": "heo",
+          "quote": "Parliaments table, 12th: 133/221",
+          "note": "Elections Canada's table gives seats; some ridings returned two members until 1966, so seats are not a count of ridings.",
+          "regions": null
+        },
+        {
+          "date": "1917-12-17",
+          "contests": null,
+          "seats": 235,
+          "source": "heo",
+          "quote": "Parliaments table, 13th: 153/235",
+          "note": "Elections Canada's table gives seats; some ridings returned two members until 1966, so seats are not a count of ridings.",
+          "regions": null
+        },
+        {
+          "date": "1921-12-06",
+          "contests": null,
+          "seats": 235,
+          "source": "heo",
+          "quote": "Parliaments table, 14th: 118/235",
+          "note": "Elections Canada's table gives seats; some ridings returned two members until 1966, so seats are not a count of ridings.",
+          "regions": null
+        },
+        {
+          "date": "1925-10-29",
+          "contests": null,
+          "seats": 245,
+          "source": "heo",
+          "quote": "Parliaments table, 15th: 115/245",
+          "note": "Elections Canada's table gives seats; some ridings returned two members until 1966, so seats are not a count of ridings.",
+          "regions": null
+        },
+        {
+          "date": "1926-09-14",
+          "contests": null,
+          "seats": 245,
+          "source": "heo",
+          "quote": "Parliaments table, 16th: 125/245",
+          "note": "Elections Canada's table gives seats; some ridings returned two members until 1966, so seats are not a count of ridings.",
+          "regions": null
+        },
+        {
+          "date": "1930-07-28",
+          "contests": null,
+          "seats": 245,
+          "source": "heo",
+          "quote": "Parliaments table, 17th: 137/245",
+          "note": "Elections Canada's table gives seats; some ridings returned two members until 1966, so seats are not a count of ridings.",
+          "regions": null
+        },
+        {
+          "date": "1935-10-14",
+          "contests": null,
+          "seats": 245,
+          "source": "heo",
+          "quote": "Parliaments table, 18th: 173/245",
+          "note": "Elections Canada's table gives seats; some ridings returned two members until 1966, so seats are not a count of ridings.",
+          "regions": null
+        },
+        {
+          "date": "1940-03-26",
+          "contests": null,
+          "seats": 245,
+          "source": "heo",
+          "quote": "Parliaments table, 19th: 181/245",
+          "note": "Elections Canada's table gives seats; some ridings returned two members until 1966, so seats are not a count of ridings.",
+          "regions": null
+        },
+        {
+          "date": "1945-06-11",
+          "contests": null,
+          "seats": 245,
+          "source": "heo",
+          "quote": "Parliaments table, 20th: 125/245",
+          "note": "Elections Canada's table gives seats; some ridings returned two members until 1966, so seats are not a count of ridings.",
+          "regions": null
+        },
+        {
+          "date": "1949-06-27",
+          "contests": null,
+          "seats": 262,
+          "source": "heo",
+          "quote": "Parliaments table, 21st: 190/262",
+          "note": "Elections Canada's table gives seats; some ridings returned two members until 1966, so seats are not a count of ridings.",
+          "regions": null
+        },
+        {
+          "date": "1953-08-10",
+          "contests": null,
+          "seats": 265,
+          "source": "heo",
+          "quote": "Parliaments table, 22nd: 171/265",
+          "note": "Elections Canada's table gives seats; some ridings returned two members until 1966, so seats are not a count of ridings.",
+          "regions": null
+        },
+        {
+          "date": "1957-06-10",
+          "contests": null,
+          "seats": 265,
+          "source": "heo",
+          "quote": "Parliaments table, 23rd: 111/265",
+          "note": "Elections Canada's table gives seats; some ridings returned two members until 1966, so seats are not a count of ridings.",
+          "regions": null
+        },
+        {
+          "date": "1958-03-31",
+          "contests": null,
+          "seats": 265,
+          "source": "heo",
+          "quote": "Parliaments table, 24th: 208/265",
+          "note": "Elections Canada's table gives seats; some ridings returned two members until 1966, so seats are not a count of ridings.",
+          "regions": null
+        },
+        {
+          "date": "1962-06-18",
+          "contests": null,
+          "seats": 265,
+          "source": "heo",
+          "quote": "Parliaments table, 25th: 116/265",
+          "note": "Elections Canada's table gives seats; some ridings returned two members until 1966, so seats are not a count of ridings.",
+          "regions": null
+        },
+        {
+          "date": "1963-04-08",
+          "contests": null,
+          "seats": 265,
+          "source": "heo",
+          "quote": "Parliaments table, 26th: 128/265",
+          "note": "Elections Canada's table gives seats; some ridings returned two members until 1966, so seats are not a count of ridings.",
+          "regions": null
+        },
+        {
+          "date": "1965-11-08",
+          "contests": null,
+          "seats": 265,
+          "source": "heo",
+          "quote": "Parliaments table, 27th: 131/265",
+          "note": "Elections Canada's table gives seats; some ridings returned two members until 1966, so seats are not a count of ridings.",
+          "regions": null
+        },
+        {
+          "date": "1968-06-25",
+          "contests": 264,
+          "seats": 264,
+          "source": "heo",
+          "quote": "Parliaments table, 28th: 155/264"
+        },
+        {
+          "date": "1972-10-30",
+          "contests": null,
+          "seats": 265,
+          "source": "heo",
+          "quote": "Parliaments table, 29th: 109/265",
+          "note": "Elections Canada's Parliaments table gives 265 seats, which does not match the 264 ridings of the 1966 representation order; left uncounted until settled.",
+          "regions": null
+        },
+        {
+          "date": "1974-07-08",
+          "contests": 264,
+          "seats": 264,
+          "source": "heo",
+          "quote": "Parliaments table, 30th: 141/264"
+        },
+        {
+          "date": "1979-05-22",
+          "contests": 282,
+          "seats": 282,
+          "source": "heo",
+          "quote": "Parliaments table, 31st: 136/282"
+        },
+        {
+          "date": "1980-02-18",
+          "contests": 282,
+          "seats": 282,
+          "source": "heo",
+          "quote": "Parliaments table, 32nd: 147/282"
+        },
+        {
+          "date": "1984-09-04",
+          "contests": 282,
+          "seats": 282,
+          "source": "heo",
+          "quote": "Parliaments table, 33rd: 211/282"
+        },
+        {
+          "date": "1988-11-21",
+          "contests": 295,
+          "seats": 295,
+          "source": "heo",
+          "quote": "Parliaments table, 34th: 169/295"
+        },
+        {
+          "date": "1993-10-25",
+          "contests": 295,
+          "seats": 295,
+          "source": "heo",
+          "quote": "Parliaments table, 35th: 177/295"
+        },
+        {
+          "date": "1997-06-02",
+          "contests": 301,
+          "seats": 301,
+          "source": "heo",
+          "quote": "Parliaments table, 36th: 155/301"
+        },
+        {
+          "date": "2000-11-27",
+          "contests": 301,
+          "seats": 301,
+          "source": "heo",
+          "quote": "Parliaments table, 37th: 172/301"
+        },
+        {
+          "date": "2004-06-28",
+          "contests": 308,
+          "seats": 308,
+          "source": "heo",
+          "quote": "Parliaments table, 38th: 135/308"
+        },
+        {
+          "date": "2006-01-23",
+          "contests": 308,
+          "seats": 308,
+          "source": "heo",
+          "quote": "Parliaments table, 39th: 124/308"
+        },
+        {
+          "date": "2008-10-14",
+          "contests": 308,
+          "seats": 308,
+          "source": "heo",
+          "quote": "Parliaments table, 40th: 143/308"
+        },
+        {
+          "date": "2011-05-02",
+          "contests": 308,
+          "seats": 308,
+          "source": "heo",
+          "quote": "Parliaments table, 41st: 166/308"
+        },
+        {
+          "date": "2015-10-19",
+          "contests": 338,
+          "seats": 338,
+          "regions": {
+            "NB": 10,
+            "NS": 11,
+            "ON": 121,
+            "QC": 78,
+            "MB": 14,
+            "BC": 42,
+            "PE": 4,
+            "AB": 34,
+            "SK": 14,
+            "NT": 1,
+            "YT": 1,
+            "NL": 7,
+            "NU": 1
+          },
+          "source": "cost-2015-2021",
+          "quote": "Number of Electoral Districts 338 (2015, 2019, 2021 columns); Number of Provincial and Territorial Seats, 2013 row (Representation Order): Can. 338, N.B. 10, N.S. 11, Ont. 121, Que. 78, Man. 14, B.C. 42, P.E.I. 4, Alta. 34, Sask. 14, N.W.T. 1, Y.T. 1, N.L. 7, Num. 1; footnote: 'The 2013 Representation Order increased the number of seats in the House of Commons by 30, effective August 2015.'",
+          "note": "Regions come from the heo page's 2013 Representation Order row, which the footnote ties to the August 2015 election. Date from idx-42ge."
+        },
+        {
+          "date": "2019-10-21",
+          "contests": 338,
+          "seats": 338,
+          "source": "cost-2015-2021",
+          "quote": "Number of Electoral Districts 338 (2015, 2019, 2021 columns)",
+          "note": "Date from idx-43ge."
+        },
+        {
+          "date": "2021-09-20",
+          "contests": 338,
+          "seats": 338,
+          "source": "cost-2015-2021",
+          "quote": "Number of Electoral Districts 338 (2015, 2019, 2021 columns)",
+          "note": "Date from idx-44ge."
+        },
+        {
+          "date": "2025-04-28",
+          "contests": 343,
+          "seats": 343,
+          "source": "ge45-report",
+          "quote": "The new map of 343 electoral districts footnote 1 was set out in two representation orders, which were proclaimed on September 22, 2023, and came into effect upon the dissolution of Parliament, and when the writs for the 45th general election were issued on March 23, 2025.",
+          "note": "Date from idx-45ge. Provincial counts for the 2023 map are not on the fetched pages, so regions are null."
+        }
+      ],
+      "gaps": []
+    },
+    {
+      "key": "commons_by",
+      "goal": "national",
+      "label": "House of Commons by-elections",
+      "unit": "contest",
+      "match": [
+        {
+          "kinds": [
+            "by_election"
+          ],
+          "bodies": [
+            "lower_house"
+          ],
+          "iso": "CA"
+        }
+      ],
+      "gaps": [
+        {
+          "from": 1867,
+          "to": 2025,
+          "note": "Not researched yet."
+        },
+        {
+          "from": 1867,
+          "to": 2026,
+          "note": "No official count is compiled yet."
+        }
+      ],
+      "elections": []
+    },
+    {
+      "key": "provincial",
+      "goal": "subnational",
+      "label": "Provincial and territorial general elections",
+      "match": [
+        {
+          "kinds": [
+            "general"
+          ],
+          "bodies": [
+            "unicameral",
+            "lower_house"
+          ],
+          "iso": "CA-*"
+        }
+      ],
+      "schemes": [
+        "ca.provincial_district"
+      ],
+      "gaps": [
+        {
+          "from": 1867,
+          "to": 2025,
+          "note": "Not researched yet."
+        },
+        {
+          "from": 1867,
+          "to": 2026,
+          "note": "No official count is compiled yet."
+        }
+      ],
+      "elections": []
+    }
+  ]
+}

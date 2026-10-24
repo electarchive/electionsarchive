@@ -4,7 +4,21 @@ import subprocess
 import sys
 from pathlib import Path
 
-from ea import cache, checks, coverage, coverage_tables, fixtures, layout, portals, raw, scans, search, statewide, tiles
+from ea import (
+    cache,
+    checks,
+    coverage,
+    coverage_countries,
+    coverage_tables,
+    fixtures,
+    layout,
+    portals,
+    raw,
+    scans,
+    search,
+    statewide,
+    tiles,
+)
 from ea.apply import apply, publish, revert, rollup
 from ea.store import DATA, connect
 
@@ -33,9 +47,9 @@ def main() -> None:
     commands.add_parser("merged", help="list rows anywhere in the database that still reference a merged entity")
     commands.add_parser(
         "coverage",
-        help="measure a polity's coverage against its v1 goal and write .agents/spec/{polity}-coverage.md, "
-        "or refresh the coverage tables the app's coverage page reads",
-    ).add_argument("polity", choices=("us", "refresh"))
+        help="measure a country's coverage against its goals and write .agents/spec/us-coverage.md or "
+        ".agents/spec/coverage/{cc}-coverage.md, or refresh the coverage tables the app's coverage pages read",
+    ).add_argument("polity", choices=("us", "refresh", *coverage_countries.countries()))
     portal = commands.add_parser("portals", help="find county results portals and record them in us-portals.csv")
     portal.add_argument("action", choices=("census",))
     portal.add_argument("state", help="two-letter state code, such as TX")
@@ -101,8 +115,10 @@ def main() -> None:
             )
         case "coverage" if args.polity == "refresh":
             print(coverage_tables.refresh())
+        case "coverage" if args.polity == "us":
+            print(coverage.us())
         case "coverage":
-            print(getattr(coverage, args.polity)())
+            print(coverage_countries.report(args.polity))
         case "raw" if args.action in ("push", "pull"):
             print(getattr(raw, args.action)(args.source))
         case "raw":

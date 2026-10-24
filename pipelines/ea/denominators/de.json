@@ -1,0 +1,280 @@
+{
+  "polity": "DE",
+  "name": "Germany",
+  "sources": {
+    "bwl-ergebnisse": {
+      "title": "Ergebnisse früherer Bundestagswahlen (1949 bis 2025)",
+      "publisher": "Die Bundeswahlleiterin",
+      "url": "https://www.bundeswahlleiterin.de/dam/jcr/397735e3-0585-46f6-a0b5-2c60c5b83de6/btw_ab49_gesamt.pdf",
+      "note": "Edition published June 2025. Table 1 gives election dates. Table 12 gives, per election, Wkr. (footnote: Gewählte im Wahlkreis, direct winners) and Insg. (Gewählte insgesamt, seats). Figures for 1949 to 1989 cover the former federal territory without Berlin-West."
+    },
+    "bwl-wahlkreise-2025": {
+      "title": "Wahlkreise (Wahlkreiseinteilung für die Bundestagswahl 2025)",
+      "publisher": "Die Bundeswahlleiterin",
+      "url": "https://www.bundeswahlleiterin.de/bundestagswahlen/2025/wahlkreiseinteilung.html",
+      "note": "Fetched directly. Wahlkreiseinteilung per Land; the table's Anzahl Wahlkreise column sums to 299."
+    }
+  },
+  "levels": [
+    {
+      "key": "bundestag",
+      "goal": "national",
+      "label": "Bundestag elections",
+      "match": [
+        {
+          "kinds": [
+            "general"
+          ],
+          "bodies": [
+            "lower_house"
+          ],
+          "iso": "DE"
+        }
+      ],
+      "schemes": [
+        "de.wahlkreis"
+      ],
+      "fine": [
+        "de.gemeinde",
+        "de.wahlbezirk",
+        "de.bezirk"
+      ],
+      "elections": [
+        {
+          "date": "1949-08-14",
+          "contests": 242,
+          "seats": 410,
+          "source": "bwl-ergebnisse",
+          "quote": "Table 12, row 1949: Wkr. 242; Insg. 410",
+          "note": "Former federal territory without Berlin-West."
+        },
+        {
+          "date": "1953-09-06",
+          "contests": 242,
+          "seats": 509,
+          "source": "bwl-ergebnisse",
+          "quote": "Table 12, row 1953: Wkr. 242; Insg. 509"
+        },
+        {
+          "date": "1957-09-15",
+          "contests": 247,
+          "seats": 519,
+          "source": "bwl-ergebnisse",
+          "quote": "Table 12, row 1957: Wkr. 247; Insg. 519"
+        },
+        {
+          "date": "1961-09-17",
+          "contests": 247,
+          "seats": 521,
+          "source": "bwl-ergebnisse",
+          "quote": "Table 12, row 1961: Wkr. 247; Insg. 521"
+        },
+        {
+          "date": "1965-09-19",
+          "contests": 248,
+          "seats": 518,
+          "source": "bwl-ergebnisse",
+          "quote": "Table 12, row 1965: Wkr. 248; Insg. 518"
+        },
+        {
+          "date": "1969-09-28",
+          "contests": 248,
+          "seats": 518,
+          "source": "bwl-ergebnisse",
+          "quote": "Table 12, row 1969: Wkr. 248; Insg. 518"
+        },
+        {
+          "date": "1972-11-19",
+          "contests": 248,
+          "seats": 518,
+          "source": "bwl-ergebnisse",
+          "quote": "Table 12, row 1972: Wkr. 248; Insg. 518",
+          "note": "Early election (vorgezogene Bundestagswahl), per Table 1."
+        },
+        {
+          "date": "1976-10-03",
+          "contests": 248,
+          "seats": 518,
+          "source": "bwl-ergebnisse",
+          "quote": "Table 12, row 1976: Wkr. 248; Insg. 518"
+        },
+        {
+          "date": "1980-10-05",
+          "contests": 248,
+          "seats": 519,
+          "source": "bwl-ergebnisse",
+          "quote": "Table 12, row 1980: Wkr. 248; Insg. 519"
+        },
+        {
+          "date": "1983-03-06",
+          "contests": 248,
+          "seats": 520,
+          "source": "bwl-ergebnisse",
+          "quote": "Table 12, row 1983: Wkr. 248; Insg. 520",
+          "note": "Early election, per Table 1."
+        },
+        {
+          "date": "1987-01-25",
+          "contests": 248,
+          "seats": 519,
+          "source": "bwl-ergebnisse",
+          "quote": "Table 12, row 1987: Wkr. 248; Insg. 519",
+          "note": "Former federal territory without Berlin-West."
+        },
+        {
+          "date": "1990-12-02",
+          "contests": 328,
+          "seats": 662,
+          "source": "bwl-ergebnisse",
+          "quote": "Table 12, row 1990: Wkr. 328; Insg. 662",
+          "note": "First all-German election."
+        },
+        {
+          "date": "1994-10-16",
+          "contests": 328,
+          "seats": 672,
+          "source": "bwl-ergebnisse",
+          "quote": "Table 12, row 1994: Wkr. 328; Insg. 672"
+        },
+        {
+          "date": "1998-09-27",
+          "contests": 328,
+          "seats": 669,
+          "source": "bwl-ergebnisse",
+          "quote": "Table 12, row 1998: Wkr. 328; Insg. 669"
+        },
+        {
+          "date": "2002-09-22",
+          "contests": 299,
+          "seats": 603,
+          "source": "bwl-ergebnisse",
+          "quote": "Table 12, row 2002: Wkr. 299; Insg. 603"
+        },
+        {
+          "date": "2005-09-18",
+          "contests": 299,
+          "seats": 614,
+          "source": "bwl-ergebnisse",
+          "quote": "Table 12, row 2005: Wkr. 299; Insg. 614",
+          "note": "Early election, per Table 1."
+        },
+        {
+          "date": "2009-09-27",
+          "contests": 299,
+          "seats": 622,
+          "source": "bwl-ergebnisse",
+          "quote": "Table 12, row 2009: Wkr. 299; Insg. 622"
+        },
+        {
+          "date": "2013-09-22",
+          "contests": 299,
+          "seats": 631,
+          "source": "bwl-ergebnisse",
+          "quote": "Table 12, row 2013: Wkr. 299; Insg. 631"
+        },
+        {
+          "date": "2017-09-24",
+          "contests": 299,
+          "seats": 709,
+          "source": "bwl-ergebnisse",
+          "quote": "Table 12, row 2017: Wkr. 299; Insg. 709"
+        },
+        {
+          "date": "2021-09-26",
+          "contests": 299,
+          "seats": 735,
+          "source": "bwl-ergebnisse",
+          "quote": "Table 12, row 2021: Wkr. 299; Insg. 735"
+        },
+        {
+          "date": "2025-02-23",
+          "contests": 299,
+          "seats": 630,
+          "regions": {
+            "BW": 38,
+            "BY": 47,
+            "BE": 12,
+            "BB": 10,
+            "HB": 2,
+            "HH": 6,
+            "HE": 22,
+            "MV": 6,
+            "NI": 30,
+            "NW": 64,
+            "RP": 15,
+            "SL": 4,
+            "SN": 16,
+            "ST": 8,
+            "SH": 11,
+            "TH": 8
+          },
+          "source": "bwl-wahlkreise-2025",
+          "quote": "Das Bundesgebiet ist derzeit in 299 Wahlkreise eingeteilt. Table of Anzahl Wahlkreise per Land: Baden-Württemberg 38; Bayern 47; Berlin 12; Brandenburg 10; Bremen 2; Hamburg 6; Hessen 22; Mecklenburg-Vorpommern 6; Niedersachsen 30; Nordrhein-Westfalen 64; Rheinland-Pfalz 15; Saarland 4; Sachsen 16; Sachsen-Anhalt 8; Schleswig-Holstein 11; Thüringen 8",
+          "note": "Seats from bwl-ergebnisse Table 12, row 2025 Insg. 630. Wkr. 276 there is directly won seats, not constituencies. Early election, per Table 1."
+        }
+      ],
+      "gaps": []
+    },
+    {
+      "key": "landtage",
+      "goal": "subnational",
+      "label": "Landtag elections",
+      "match": [
+        {
+          "kinds": [
+            "general"
+          ],
+          "bodies": [
+            "unicameral",
+            "lower_house"
+          ],
+          "iso": "DE-*"
+        }
+      ],
+      "schemes": [
+        "de.landtag_wahlkreis"
+      ],
+      "gaps": [
+        {
+          "from": 1946,
+          "to": 2026,
+          "note": "Not researched. The first exa search returned HTTP 429 (rate limit), and the brief says to stop and write what was found. No Landeswahlleiter, statistical office, or Bundeswahlleiterin Landtag source was fetched, so no Land's election dates or Wahlkreis counts are recorded."
+        },
+        {
+          "from": 1946,
+          "to": 2026,
+          "note": "No official count of Landtag constituencies at each election is compiled yet."
+        }
+      ],
+      "elections": []
+    },
+    {
+      "key": "ep",
+      "goal": "ep",
+      "label": "European Parliament elections in Germany",
+      "match": [
+        {
+          "kinds": [
+            "general"
+          ],
+          "bodies": [
+            "unicameral"
+          ],
+          "iso": "EU"
+        }
+      ],
+      "schemes": [
+        "eu.member_state",
+        "de.nation"
+      ],
+      "gaps": [
+        {
+          "from": 1979,
+          "to": 2024,
+          "note": "No official count of German European Parliament constituencies is compiled yet."
+        }
+      ],
+      "elections": []
+    }
+  ]
+}

@@ -1,0 +1,40 @@
+{
+  "polity": "EU",
+  "name": "European Union",
+  "sources": {},
+  "levels": [
+    {
+      "key": "ep",
+      "goal": "national",
+      "label": "European Parliament elections",
+      "match": [
+        {
+          "kinds": [
+            "general"
+          ],
+          "bodies": [
+            "unicameral"
+          ],
+          "iso": "EU"
+        }
+      ],
+      "schemes": [
+        "eu.member_state",
+        "gb.euc",
+        "gb.ep_constituency",
+        "fr.ep_constituency",
+        "it.ep_constituency",
+        "ie.ep_constituency",
+        "pl.ep_constituency"
+      ],
+      "gaps": [
+        {
+          "from": 1979,
+          "to": 2024,
+          "note": "No official count of each member state's constituencies at each election is compiled yet."
+        }
+      ],
+      "elections": []
+    }
+  ]
+}

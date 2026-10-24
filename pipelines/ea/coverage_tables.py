@@ -9,7 +9,7 @@ from pathlib import Path
 
 import polars as pl
 
-from ea import coverage, raw, statewide_table
+from ea import coverage, coverage_countries, raw, statewide_table
 from ea.store import ROOT, connect
 
 LOCK = 7_302_019
@@ -840,7 +840,11 @@ from changeset
 
 def fingerprint(conn) -> str:
     row = conn.execute(FINGERPRINT_SQL).fetchone()
-    files = [Path(__file__).parent / name for name in ("coverage.py", "coverage_tables.py", "statewide_table.py")]
+    files = [
+        Path(__file__).parent / name
+        for name in ("coverage.py", "coverage_tables.py", "coverage_countries.py", "statewide_table.py")
+    ]
+    files += sorted(coverage_countries.DENOMINATORS.glob("*.json"))
     files += sorted(raw.parsed("us.cog").glob("*.parquet"))
     return ":".join([row[0] if row else "", *(f"{f.name}{f.stat().st_mtime_ns}" for f in files)])
 
@@ -1238,6 +1242,11 @@ def build() -> str:
         ) as copy:
             for key, values in goals.items():
                 copy.write_row([*key, *values])
+    with connect() as conn:
+        conn.execute(coverage.CACHE_SQL)
+        country_goals, country_polities = coverage_countries.build(conn)
+        with conn.transaction():
+            coverage_countries.write(conn, country_goals, country_polities)
     return (
         f"{len(governments):,} governments ({len(link):,} linked), {len(years_out):,} government years, "
         f"{len(goals):,} goal rows, {len(country_polities)} other countries with {len(country_goals):,} goal rows "

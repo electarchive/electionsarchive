@@ -282,6 +282,8 @@ left join cu on cu.contest_id = rs.contest_id
 group by rs.contest_id;
 """
 
+CACHE_SQL = CONTESTS_SQL[CONTESTS_SQL.index("create table if not exists coverage_cache_unit ") : CONTESTS_SQL.index("create temp view rsm")]
+
 COUNT_SQL = """
 with c as (
     select cc.*, cg.precinct, cg.county, cg.county_free, cg.any_county, exists (select from rs where rs.contest_id = cc.id) as results,
