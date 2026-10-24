@@ -1383,7 +1383,10 @@ function slots(
     .toSorted((a, b) => (a.position ?? Infinity) - (b.position ?? Infinity));
   const own = {
     id: option.contest,
-    name: labels.full.get(option.area ?? option.contest) ?? "",
+    name:
+      option.area == null
+        ? (labels.full.get(option.contest) ?? "").replace(/^.+? in /u, "")
+        : (labels.full.get(option.area) ?? ""),
     path: option.path,
   };
   const party = option.party;

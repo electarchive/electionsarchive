@@ -1515,7 +1515,7 @@
         parties={chamber.parties}
         places={chamber.places}
         here={chamber.here}
-        place={contest.scope.name}
+        place={chamber.places[chamber.here ?? -1]?.name ?? contest.scope.name}
         link={chamber.link}
         size={chamber.size}
         {change}
@@ -1869,7 +1869,7 @@
       parties={chamber.parties}
       places={chamber.places}
       here={chamber.here}
-      place={contest.scope.name}
+      place={chamber.places[chamber.here ?? -1]?.name ?? contest.scope.name}
       link={chamber.link}
       size={chamber.size}
       {change}
