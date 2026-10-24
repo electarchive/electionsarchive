@@ -13,7 +13,7 @@ from ea.sources.gb.umit import fold
 from ea.store import DATA, connect
 
 SOURCE = "gb.counting_areas"
-VERSION = "1"
+VERSION = "2"
 PARSED = DATA / "parsed" / SOURCE
 SERVICES = "https://services1.arcgis.com/ESMARspQHYMw9BZ9/arcgis/rest/services"
 LAD = f"{SERVICES}/Local_Authority_Districts_December_2016_GCB_in_the_UK_2022/FeatureServer"
@@ -25,6 +25,7 @@ LOOKUP = (
 COUNTRIES = gisco.DATASETS["countries"][0]
 ONS = "Office for National Statistics"
 TITLE = "Local Authority Districts (December 2016) Boundaries UK GCB"
+REGIONAL = [date(2011, 5, 5), date(2016, 6, 23)]
 COUNTIES_1974 = {
     "Avon": ("Bath and North East Somerset", "Bristol, City of", "North Somerset", "South Gloucestershire"),
     "Bedfordshire": ("Bedford", "Central Bedfordshire", "Luton"),
@@ -309,6 +310,22 @@ def emit() -> Path:
                     source_id=sources.get(source, source),
                 )
                 memberships.append((str(unit_ids[code]), str(area), day, day + timedelta(days=1)))
+        conn.execute("create temp table shape (code text, day date, geom text) on commit drop")
+        with conn.cursor() as cursor, cursor.copy("copy shape from stdin") as copy:
+            for code, day, geom in frame.filter(pl.col("day").is_in(REGIONAL)).select("code", "day", "geom").rows():
+                copy.write_row((code, day, geom))
+        regions = conn.execute(
+            """select distinct on (s.code, s.day) s.code, s.day, a.id,
+                      st_area(st_intersection(s.geom::geometry, g.geom)) / st_area(s.geom::geometry)
+               from shape s join area_geometry g on g.valid @> s.day and st_intersects(s.geom::geometry, g.geom)
+               join area a on a.id = g.area_id and a.scheme_code = 'gb.ep_constituency'
+               order by s.code, s.day, 4 desc"""
+        ).fetchall()
+        split = sorted(f"{code} {day} ({share:.3f})" for code, day, _, share in regions if share < 0.99)
+        print(f"{len(regions)} counting areas placed in a region; not wholly in one: {split}")
+        for code, day, region, share in regions:
+            if share >= 0.99:
+                memberships.append((str(unit_ids[code]), str(region), day, day + timedelta(days=1)))
         cs.frame(
             "reporting_unit_area",
             pl.DataFrame(
