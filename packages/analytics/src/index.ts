@@ -342,8 +342,8 @@ export function compare(
     if (party != null) {
       return `party:${party}`;
     }
-    return option.kind === "others"
-      ? `kind:others:${option.label.toLowerCase()}`
+    return option.kind === "others" || option.kind === "candidate"
+      ? `kind:${option.kind}:${option.label.toLowerCase()}`
       : `kind:${option.kind}`;
   };
   const both = new Set(
