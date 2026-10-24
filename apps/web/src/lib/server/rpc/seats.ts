@@ -382,7 +382,7 @@ export const seats = {
               (select election from last),
               (select coalesce(e.parent_id, e.id) from contest c join election e on e.id = c.election_id where c.id = p.id),
               (select coalesce(e.parent_id, e.id) from contest c join election e on e.id = c.election_id where c.id = p.prior)
-            ) limit 1) as alliance
+            ) order by n.recorded_from desc, n.id limit 1) as alliance
         from paired p
         left join lateral (select x.party from won x where x.contest = p.id order by x.k limit 1) w on true
         left join lateral (select x.party from won x where x.contest = p.prior order by x.k limit 1) b on true

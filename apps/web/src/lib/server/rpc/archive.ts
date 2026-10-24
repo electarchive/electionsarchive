@@ -129,7 +129,7 @@ const abbreviate = (party: SQL, date: SQL) => sql`
       select f.text from name f
       where f.entity_id = a.entity_id and f.kind in ('official', 'english')
       order by coalesce(f.valid @> coalesce(${date}, current_date), false) desc, f.is_preferred desc,
-        (f.lang = a.lang) desc, (f.kind = 'official') desc
+        (f.lang = a.lang) desc, (f.kind = 'official') desc, f.recorded_from desc, f.id
       limit 1
     ) f on true
     where a.entity_id = ${party} and a.kind in ('short', 'abbreviation')
@@ -141,7 +141,7 @@ const abbreviate = (party: SQL, date: SQL) => sql`
         ), ''))
         like array_to_string(regexp_split_to_array(regexp_replace(upper(a.text), '[^[:alnum:]]', '', 'g'), ''), '%') || '%',
         false) desc,
-      length(a.text), a.text
+      length(a.text), a.text, a.recorded_from desc, a.id
     limit 1)
 `;
 
@@ -433,7 +433,7 @@ export async function names(
     where entity_id = any(${sql.param(ids)}::uuid[]) and kind in ('official', 'english')
     order by entity_id, coalesce(valid @> ${on}::date, false) desc,
       coalesce(kind = 'english' and script = 'Latn' and entity_id = any(${sql.param(common)}::uuid[]), false) desc, is_preferred desc,
-      (lang = 'en') desc, (kind = 'official') desc)
+      (lang = 'en') desc, (kind = 'official') desc, recorded_from desc, id)
     union all
     select i.id, 'abbreviation', short.text
     from (select distinct unnest(${sql.param(ids)}::uuid[]) as id) i
@@ -3821,7 +3821,7 @@ export const contests = {
              ${paint(sql`x.party`, sql`e.id`, sql`e.date_from`)} as color,
              (select n.text from name n where n.entity_id = x.party and n.kind in ('official', 'english')
                order by coalesce(n.valid @> e.date_from, false) desc, n.is_preferred desc, (n.lang = 'en') desc,
-                 (n.kind = 'official') desc limit 1) as party_label,
+                 (n.kind = 'official') desc, n.recorded_from desc, n.id limit 1) as party_label,
              ${abbreviate(sql`x.party`, sql`e.date_from`)} as party_short
            from tops t
            join contest c on c.id = t.root
@@ -8556,7 +8556,7 @@ export const elections = {
             where b.polity_id = g.polity_id and b.kind in ('lower_house', 'unicameral') and bs.valid @> g.from_date
             order by b.kind limit 1) as size,
           (select n.text from name n where n.entity_id = g.id
-            order by n.kind = 'short' desc, n.is_preferred desc limit 1) as name
+            order by n.kind = 'short' desc, n.is_preferred desc, n.recorded_from desc, n.id limit 1) as name
         from here join government g on g.polity_id = here.polity_id
         where g.election_id = here.id
           or (g.from_date > here.date_from and g.from_date < coalesce(here.next, here.date_from + 2200))
@@ -10594,7 +10594,7 @@ export const polities = {
         select g.id, g.head_person_id as head, g.from_date::text as from, g.to_date::text as to,
           g.caretaker as "isCaretaker",
           (select n.text from name n where n.entity_id = g.id
-            order by n.kind = 'short' desc, n.is_preferred desc limit 1) as name,
+            order by n.kind = 'short' desc, n.is_preferred desc, n.recorded_from desc, n.id limit 1) as name,
           (select coalesce(pm.into_id, gp.party_id) from government_party gp
             left join entity_merge pm on pm.entity_id = gp.party_id
             where gp.government_id = g.id
@@ -12216,7 +12216,7 @@ export const people = {
           lead.party, coalesce(lead.independent, false) as independent, coalesce(lead.scoped, false) as scoped,
           (select n.text from name n where n.entity_id = lead.party and n.kind in ('official', 'english')
             order by coalesce(n.valid @> p.date, false) desc, n.is_preferred desc, (n.lang = 'en') desc,
-              (n.kind = 'official') desc limit 1) as party_label,
+              (n.kind = 'official') desc, n.recorded_from desc, n.id limit 1) as party_label,
           ${abbreviate(sql`lead.party`, sql`p.date`)} as party_short,
           coalesce(${paint(sql`lead.party`, sql`select election_id from contest where id = p.root`, sql`p.date`)},
             (select pc.color from party_color pc where pc.party_id = lead.party
@@ -13619,7 +13619,7 @@ export const search = {
           : await db.execute<{ name: string }>(sql`
             select n.text as name from polity p join name n on n.entity_id = p.id and n.kind = 'official'
             where p.iso_code = ${`US-${district[1]?.toUpperCase() ?? ""}`}
-            order by n.is_preferred desc limit 1
+            order by n.is_preferred desc, n.recorded_from desc, n.id limit 1
           `);
       const state = states?.rows[0]?.name;
       const seat = Number(district?.[2]);

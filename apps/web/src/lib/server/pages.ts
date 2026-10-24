@@ -130,7 +130,7 @@ export async function home() {
       )
       select p.id, p.date_from::text as date, p.kind::text as kind, p.when, s.path,
         (select n.text from name n where n.entity_id = p.id and n.kind in ('official', 'english')
-          order by n.is_preferred desc, (n.lang = 'en') desc, (n.kind = 'official') desc limit 1) as name,
+          order by n.is_preferred desc, (n.lang = 'en') desc, (n.kind = 'official') desc, n.recorded_from desc, n.id limit 1) as name,
         (select n.text from name n
           where n.entity_id = coalesce((
             with recursive up(id) as (
@@ -140,7 +140,7 @@ export async function home() {
             )
             select up.id from up join polity q on q.id = up.id where q.kind = 'sovereign_state' limit 1
           ), p.polity_id) and n.kind in ('official', 'english')
-          order by n.is_preferred desc, (n.lang = 'en') desc, (n.kind = 'official') desc limit 1) as polity
+          order by n.is_preferred desc, (n.lang = 'en') desc, (n.kind = 'official') desc, n.recorded_from desc, n.id limit 1) as polity
       from picked p join slug s on s.entity_id = p.id and s.is_current
     `),
     db.execute<{ id: string; years: Array<number> }>(sql`
@@ -273,7 +273,7 @@ export async function party(path: string, place: string | null = null) {
       left join entity_merge pm on pm.entity_id = m.person_id
       cross join lateral (
         select n.text from name n where n.entity_id = coalesce(pm.into_id, m.person_id)
-        order by n.is_preferred desc, (n.lang = 'en') desc, (n.kind = 'official') desc limit 1
+        order by n.is_preferred desc, (n.lang = 'en') desc, (n.kind = 'official') desc, n.recorded_from desc, n.id limit 1
       ) n
       where m.party_id = ${id}::uuid or m.party_id in (select entity_id from entity_merge where into_id = ${id}::uuid)
       order by m.valid_from nulls first, n.text
@@ -659,7 +659,7 @@ export async function comparison(ids: Array<string>) {
     sql`
       select e.id, e.type::text as type, coalesce((
         select n.text from name n where n.entity_id = e.id and n.kind in ('official', 'english')
-        order by n.is_preferred desc, (n.lang = 'en') desc, (n.kind = 'official') desc limit 1
+        order by n.is_preferred desc, (n.lang = 'en') desc, (n.kind = 'official') desc, n.recorded_from desc, n.id limit 1
       ), '') as name, (
         select n.text from name n
         where n.entity_id = case e.type
@@ -668,7 +668,7 @@ export async function comparison(ids: Array<string>) {
               where pp.polity_id = e.id order by y.kind = 'supranational' limit 1)
           end
           and n.kind in ('official', 'english')
-        order by n.is_preferred desc, (n.lang = 'en') desc, (n.kind = 'english') desc limit 1
+        order by n.is_preferred desc, (n.lang = 'en') desc, (n.kind = 'english') desc, n.recorded_from desc, n.id limit 1
       ) as context
       from unnest(${sql.param(ids.filter((id) => /^[0-9a-f-]{36}$/u.test(id)))}::uuid[]) with ordinality as x(asked, at)
       join entity e on e.id = coalesce((select into_id from entity_merge where entity_id = x.asked), x.asked)
@@ -713,7 +713,7 @@ export async function comparison(ids: Array<string>) {
           ),
           sided as (
             select k.at, k.side, k.id,
-              (select n.text from name n where n.entity_id = k.id order by n.is_preferred desc, (n.lang = 'en') desc limit 1) as name,
+              (select n.text from name n where n.entity_id = k.id order by n.is_preferred desc, (n.lang = 'en') desc, n.recorded_from desc, n.id limit 1) as name,
               (select '/' || i.path from person_image i where i.person_id = k.id order by i.recorded_from desc limit 1) as photo,
               case when k.kind = 'party' then k.id else (
                 select o.party_id from candidacy cy
@@ -862,7 +862,7 @@ export async function comparison(ids: Array<string>) {
       : await db.execute<{ id: string; name: string }>(sql`
         select r.id, (
           select n.text from name n where n.entity_id = r.id
-          order by n.is_preferred desc, (n.lang = 'en') desc limit 1
+          order by n.is_preferred desc, (n.lang = 'en') desc, n.recorded_from desc, n.id limit 1
         ) as name
         from (${suggested}) r
         order by r.rank desc, r.tie desc

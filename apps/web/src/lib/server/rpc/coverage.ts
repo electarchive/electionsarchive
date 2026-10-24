@@ -141,7 +141,7 @@ export const coverage = {
         >
       >(sql`
         select r.*,
-          (select n.text from name n where n.entity_id = p.id and n.is_preferred order by n.lang <> 'en' limit 1) as label
+          (select n.text from name n where n.entity_id = p.id and n.is_preferred order by n.lang <> 'en', n.recorded_from desc, n.id limit 1) as label
         from (
           select ${key} as key, ${SUMS} from coverage_goal g
           where g.goal = ${input.goal} and (${state}::text is null or g.state = ${state})
