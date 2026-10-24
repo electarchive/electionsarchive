@@ -538,25 +538,49 @@ async function children(
   if (ks.length === 0) {
     return [];
   }
+  const counted = sql`(
+    exists (
+      select from unnest(${sql.param(ks)}::int[]) as s(k)
+      join result_rollup_sum r on r.result_set_k = s.k and r.area_k = a.k and r.measure = any(${COUNTED})
+    )
+    or exists (
+      select from unnest(${sql.param(ks)}::int[]) as s(k)
+      join result_rollup_unit u on u.result_set_k = s.k and u.area_k = a.k
+      cross join lateral (
+        select from result_value v
+        where v.result_set_k = u.result_set_k and v.unit_k = u.unit_k and v.measure = any(${COUNTED})
+        limit 1
+      ) v
+    )
+  )`;
   let found = await db.execute<{ id: string; k: number; scheme: string }>(sql`
     select a.id, a.k, a.scheme_code as scheme
     from area_parent p join area a on a.id = p.area_id
-    where p.parent_id = ${area.id}::uuid and p.valid @> ${date}::date and (
-      exists (
-        select from unnest(${sql.param(ks)}::int[]) as s(k)
-        join result_rollup_sum r on r.result_set_k = s.k and r.area_k = a.k and r.measure = any(${COUNTED})
-      )
-      or exists (
-        select from unnest(${sql.param(ks)}::int[]) as s(k)
-        join result_rollup_unit u on u.result_set_k = s.k and u.area_k = a.k
-        cross join lateral (
-          select from result_value v
-          where v.result_set_k = u.result_set_k and v.unit_k = u.unit_k and v.measure = any(${COUNTED})
-          limit 1
-        ) v
-      )
-    )
+    where p.parent_id = ${area.id}::uuid and p.valid @> ${date}::date and ${counted}
   `);
+  const lone = Map.groupBy(found.rows, (row) => row.scheme)
+    .values()
+    .filter((group) => group.length === 1)
+    .flatMap((group) => group.map((row) => row.id))
+    .toArray();
+  const deeper = new Set<string>();
+  if (lone.length > 0) {
+    const through = await db.execute<{
+      id: string;
+      k: number;
+      scheme: string;
+    }>(sql`
+      select a.id, a.k, a.scheme_code as scheme
+      from area_parent p join area a on a.id = p.area_id
+      where p.parent_id = any(${sql.param(lone)}::uuid[]) and p.valid @> ${date}::date
+        and a.scheme_code <> all(${sql.param(found.rows.map((row) => row.scheme))}::text[])
+        and ${counted}
+    `);
+    for (const row of through.rows) {
+      deeper.add(row.id);
+      found.rows.push(row);
+    }
+  }
   if (isRoot && found.rows.length < 2) {
     found = await db.execute<{ id: string; k: number; scheme: string }>(sql`
       with recursive anc(id) as (
@@ -608,7 +632,10 @@ async function children(
   const scheme = new Map(schemes.rows.map((row) => [row.code, row]));
   const taken = new Map<string, number>();
   return found.rows
-    .toSorted((a, b) => a.k - b.k)
+    .toSorted(
+      (a, b) =>
+        Number(deeper.has(a.id)) - Number(deeper.has(b.id)) || a.k - b.k,
+    )
     .map((row) => {
       const name = labels.full.get(row.id) ?? "";
       const base = segment(name);
