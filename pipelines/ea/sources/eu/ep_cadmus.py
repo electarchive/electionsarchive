@@ -7,7 +7,8 @@ from uuid import UUID
 import polars as pl
 
 from ea import raw
-from ea.changeset import Changeset
+from ea.changeset import Changeset, slug
+from ea.sources.gb import umit
 from ea.store import DATA, connect
 
 SOURCE = "eu.ep_cadmus"
@@ -93,6 +94,35 @@ CONSTITUENCIES = {
 }
 OTHERS = {"others", "other"}
 MISSING = {".", ""}
+UK_PARTIES = {
+    "Conservative Party": "conservative",
+    "NI Conservatives": "conservative",
+    "Labour Party": "labour",
+    "Labour": "labour",
+    "Liberal Party": "liberal-party-1989",
+    "Brexit Party": "reform-uk",
+    "Green Party of England and Wales": "green-party",
+    "Alliance Party": "alliance-party-of-northern-ireland",
+    "CPA": "christian-peoples-alliance",
+    "BNP": "british-national-party",
+    "Ulster Popular Unionist Party": "ulster-popular-unionist",
+    "Conservatives": "conservative",
+    "Pirate": "pirate-party-uk",
+    "Change UK": "the-independent-group-for-change",
+    "Unionist Party": "unionist-party-ni",
+    "Pensiones": "pensioners-party",
+}
+UK_SYSTEMS = {
+    "ep-list": ("Regional closed lists, d'Hondt (European Parliament, Great Britain)", {"formula": "dhondt"}),
+    "ep-stv": (
+        "Single transferable vote (European Parliament, Northern Ireland)",
+        {"formula": "stv", "quota": "droop"},
+    ),
+}
+WINDOW_CAVEAT = (
+    "The source gives only the year of the election. The dates are the European Parliament's voting window for that "
+    "year, not the day this country voted."
+)
 
 
 def fold(text: str) -> str:
@@ -172,6 +202,61 @@ def emit() -> Path:
             cs.add("name", entity_id=entity, text=text, lang=lang, kind=kind, is_preferred=preferred)
 
         polities = {iso: cs.polity(iso) for iso in ISO.values()}
+        systems = {code: cs.key("gb.electoral_system", code) for code in UK_SYSTEMS}
+        for code, (label, rules) in UK_SYSTEMS.items():
+            if systems[code] in cs.minted:
+                cs.add("electoral_system", id=systems[code], polity_id=polities["GB"], rules=rules, rules_version=1)
+                name(systems[code], label)
+        kingdom = cs.area("gb.nation", "GBR")
+        if kingdom in cs.minted:
+            raise ValueError("the United Kingdom's area must already exist")
+        cs.add(
+            "area_parent",
+            area_id=cs.area("eu.member_state", "GB"),
+            parent_id=kingdom,
+            valid_from=date(1973, 1, 1),
+            valid_from_precision="day",
+            valid_to=date(2020, 1, 31),
+            valid_to_precision="day",
+        )
+        gb_parties = {
+            value for (value,) in conn.execute("select value from external_id where scheme = 'gb.party'").fetchall()
+        }
+        uk_parties = {
+            value: entity
+            for value, entity in conn.execute(
+                "select value, entity_id from external_id where scheme = 'eu.ep_cadmus.party' and value like 'GB:%%'"
+            ).fetchall()
+        }
+        stale = conn.execute(
+            """select n.id, n.entity_id from note n join changeset c on c.id = n.changeset_id
+               join external_id x on x.entity_id = n.entity_id and x.scheme = 'eu.election' and x.value like 'GB:%%'
+               where c.pipeline = %s and n.body_md = %s""",
+            [SOURCE, WINDOW_CAVEAT],
+        ).fetchall()
+        for id, entity in stale:
+            cs.add(
+                "note_drop",
+                note_id=id,
+                entity_id=entity,
+                body_md=WINDOW_CAVEAT,
+                reason="UK polls for the European Parliament were held on a single day, the Thursday of the window",
+            )
+        retired = {
+            value: entity
+            for value, entity in conn.execute(
+                """select x.value, x.entity_id from external_id x join entity e on e.id = x.entity_id
+                   where x.scheme = 'eu.contest' and x.value = any(%s) and e.retired_by is null""",
+                [["GB:1994:gb.ep_constituency:scotland", "GB:1994:gb.ep_constituency:wales"]],
+            ).fetchall()
+        }
+        for entity in retired.values():
+            cs.add(
+                "entity_retirement",
+                entity_id=entity,
+                reason="Scotland and Wales elected their members in single-member constituencies by first past the post "
+                "in 1994; the source's row is a national aggregate, not a contest",
+            )
         umbrellas: dict[int, UUID] = {}
         for year, (start, end) in WINDOWS.items():
             umbrella = cs.key("eu.election", f"{start}:european-parliament")
@@ -208,27 +293,30 @@ def emit() -> Path:
                 parent_id=umbrellas.get(year),
                 kind="general",
                 date_from=start,
-                date_to=window[1] if window else date(year, 12, 31),
+                date_to=start if iso == "GB" else window[1] if window else date(year, 12, 31),
                 date_precision="day" if window else "year",
                 original_text=str(year),
                 status="held",
             )
             name(election, f"{year} European Parliament election in {country}")
             cs.add("slug", path=path, entity_id=election)
-            cs.add(
-                "note",
-                entity_id=election,
-                kind="caveat",
-                body_md=(
-                    "The source gives only the year of the election. The dates are the European Parliament's voting "
-                    "window for that year, not the day this country voted."
-                    if window
-                    else "The source gives only the year of the election, which took place between general "
-                    "European Parliament elections following the country's accession."
-                ),
-            )
+            if iso != "GB":
+                cs.add(
+                    "note",
+                    entity_id=election,
+                    kind="caveat",
+                    body_md=(
+                        WINDOW_CAVEAT
+                        if window
+                        else "The source gives only the year of the election, which took place between general "
+                        "European Parliament elections following the country's accession."
+                    ),
+                )
             elections[(country, year)] = (election, path)
             for (constituency,), rows in by_election.group_by(["constituency"], maintain_order=True):
+                if iso == "GB" and year < 1999 and constituency != "Northern Ireland":
+                    skipped[f"{country} {constituency}"] = skipped.get(f"{country} {constituency}", 0) + 1
+                    continue
                 college = iso == "BE" or constituency == "Greenland"
                 if constituency == "National":
                     scheme, code, label = "eu.member_state", iso, country
@@ -273,6 +361,9 @@ def emit() -> Path:
                     body_id=parliament,
                     district_area_id=area,
                     magnitude=seats_total,
+                    electoral_system_id=(
+                        systems["ep-stv" if code == "northern-ireland" else "ep-list"] if iso == "GB" else None
+                    ),
                     default_result_kind="counted",
                 )
                 title = f"{year} European Parliament election in {country}" + (
@@ -309,9 +400,38 @@ def emit() -> Path:
                 values = []
                 for position, row in enumerate(rows.iter_rows(named=True), start=1):
                     label_text = row["party_original"] or row["party"]
+                    shown = row["party"] if iso == "GB" and row["party_original"] in MISSING else label_text
                     other = row["party"].lower() in OTHERS
                     party = None
-                    if not other:
+                    if iso == "GB" and not other and not label_text.startswith("Independent"):
+                        labels = (label_text, row["party"])
+                        umit_key = next(
+                            (
+                                key
+                                for key in (
+                                    *(UK_PARTIES.get(text) for text in labels),
+                                    "liberal" if label_text == "Liberal Democrats" and year < 1988 else None,
+                                    *(umit.ALIASES.get(text) for text in labels),
+                                    *(slug(text) + suffix for suffix in ("", "-party") for text in labels),
+                                )
+                                if key is not None and (key in umit.EXISTING or key in gb_parties or key == "liberal")
+                            ),
+                            slug(row["party"]),
+                        )
+                        party = parties.get((iso, umit_key))
+                        if party is None:
+                            party = parties[(iso, umit_key)] = (
+                                cs.key(*umit.EXISTING[umit_key])
+                                if umit_key in umit.EXISTING
+                                else cs.key("gb.party", umit_key)
+                            )
+                            if party in cs.minted:
+                                cs.add("party", id=party, kind="party", polity_id=polities[iso])
+                                name(party, umit.NAMES.get(umit_key, row["party"]))
+                        old = uk_parties.get(f"GB:{label_text}")
+                        if old is not None and old != party and old not in cs.survivors and umit_key != "liberal":
+                            cs.merge(old, party)
+                    elif not other and iso != "GB":
                         key = (iso, label_text)
                         party = parties.get(key)
                         if party is None:
@@ -329,7 +449,7 @@ def emit() -> Path:
                         kind="others" if other else "list",
                         party_id=party,
                         ballot_position=position,
-                        ballot_label=label_text,
+                        ballot_label=shown,
                     )
                     if row["seats"]:
                         cs.add("outcome", result_set_id=result_set, option_id=option, kind="won", seats=row["seats"])
