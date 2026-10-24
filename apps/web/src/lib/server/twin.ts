@@ -194,6 +194,12 @@ async function load(segments: Array<string>, search: URLSearchParams) {
     }
   }
   const found = await archive(segments.join("/"), search);
+  if (found.kind === "election") {
+    return {
+      ...found,
+      byes: await call(router.seats.byElections, { id: found.id }),
+    };
+  }
   return found.kind === "polity"
     ? { ...found, record: await call(router.polities.record, { id: found.id }) }
     : found;
@@ -338,7 +344,7 @@ function markdown(data: Data, link: Link) {
       return polityMarkdown(data.polity, data.record, link);
     }
     case "election": {
-      return electionMarkdown(data.election, link);
+      return electionMarkdown(data.election, data.byes, link);
     }
     default: {
       return contestMarkdown(data.contest, data.cycle, data.handover, link);
@@ -833,8 +839,31 @@ function polityMarkdown(
 
 function electionMarkdown(
   election: Extract<Data, { kind: "election" }>["election"],
+  byes: Extract<Data, { kind: "election" }>["byes"],
   link: Link,
 ) {
+  const parties = new Map(byes?.parties.map((party) => [party.key, party]));
+  const label = (key: string | null) =>
+    key == null || key.startsWith("person:")
+      ? m.seats_independents()
+      : (parties.get(key)?.short ?? parties.get(key)?.label ?? "");
+  const reasons: Record<string, (input: { name: string }) => string> = {
+    died: m.byes_reason_died,
+    resigned: m.byes_reason_resigned,
+    elevated: m.byes_reason_elevated,
+    appointed: m.byes_reason_appointed,
+    expelled: m.byes_reason_expelled,
+    disqualified: m.byes_reason_disqualified,
+    annulled: m.byes_reason_annulled,
+    removed: m.byes_reason_removed,
+    withdrew: m.byes_reason_withdrew,
+  };
+  const byeRows = (byes?.rows ?? []).map((row) => ({
+    ...row,
+    isGain:
+      row.to != null && row.from != null && label(row.to) !== label(row.from),
+  }));
+  const gained = byeRows.filter((row) => row.isGain).length;
   return [
     `# ${election.name}`,
     byline(election.breadcrumbs, link, election.date),
@@ -918,6 +947,40 @@ function electionMarkdown(
           : []),
       ];
     }),
+    ...(byeRows.length === 0
+      ? []
+      : [
+          `## ${m.byes_title()}`,
+          `${
+            byes?.until == null
+              ? m.byes_lede_open({ count: byeRows.length })
+              : m.byes_lede({ count: byeRows.length, year: String(byes.until) })
+          } ${gained === 0 ? m.byes_changed_none() : m.byes_changed({ count: gained })}`,
+          table(
+            [
+              m.col_date(),
+              m.col_seat(),
+              m.col_result(),
+              m.col_majority(),
+              m.col_previous_member(),
+            ],
+            byeRows.map((row) => [
+              date(row.date),
+              link(row.name, row.path),
+              row.to == null
+                ? null
+                : row.isGain
+                  ? m.gains_seat({ to: label(row.to), from: label(row.from) })
+                  : m.byes_hold({ party: label(row.to) }),
+              row.majority == null ? null : count(row.majority),
+              row.member == null
+                ? null
+                : (reasons[row.reason ?? ""] ?? m.byes_reason_none)({
+                    name: link(row.member.name, row.member.path),
+                  }),
+            ]),
+          ),
+        ]),
     ...(election.contests.length === 0
       ? []
       : [

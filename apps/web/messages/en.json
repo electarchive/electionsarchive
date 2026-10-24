@@ -132,6 +132,59 @@
   "change_gain_bare": "{party} gain from {from}.",
   "change_note_area": "Compared with the {year} result in the old seat that covered most of this seat's area:",
   "change_note_name": "Compared with the {year} result in the old seat of the same name:",
+  "byes_title": "By-elections in this parliament",
+  "byes_lede": [
+    {
+      "declarations": [
+        "input count",
+        "input year",
+        "local countPlural = count: plural"
+      ],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "1 by-election was held in this parliament, before the {year} general election.",
+        "countPlural=*": "{count} by-elections were held in this parliament, before the {year} general election."
+      }
+    }
+  ],
+  "byes_lede_open": [
+    {
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "1 by-election has been held in this parliament so far.",
+        "countPlural=*": "{count} by-elections have been held in this parliament so far."
+      }
+    }
+  ],
+  "byes_changed": [
+    {
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "1 seat changed hands.",
+        "countPlural=*": "{count} seats changed hands."
+      }
+    }
+  ],
+  "byes_changed_none": "No seat changed hands.",
+  "col_seat": "Seat",
+  "col_majority": "Majority (votes)",
+  "col_previous_member": "Previous member",
+  "byes_all": "Show all {count} by-elections",
+  "byes_net": "Net change",
+  "byes_hold": "{party} hold",
+  "byes_majority": "Majority {count}.",
+  "byes_reason_died": "{name} died.",
+  "byes_reason_resigned": "{name} resigned.",
+  "byes_reason_elevated": "{name} entered the House of Lords.",
+  "byes_reason_appointed": "{name} took an office that vacated the seat.",
+  "byes_reason_expelled": "{name} was expelled.",
+  "byes_reason_disqualified": "{name} was disqualified.",
+  "byes_reason_annulled": "{name}'s election was declared void.",
+  "byes_reason_removed": "{name} was removed.",
+  "byes_reason_withdrew": "{name} left the seat.",
+  "byes_reason_none": "Previous member: {name}.",
   "regions_universities": "University seats",
   "regions_unplaced": "Seats with no area",
   "stat_votes_cast": "Votes cast",
