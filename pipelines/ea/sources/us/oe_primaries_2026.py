@@ -50,8 +50,9 @@ PARTIES = {
     "No Party Preference": ("", "CA:no-party-preference"),
     "NOL": ("no-labels", "no-labels-party"),
 }
-ALIASES = {"jeffdavis": "jeffersondavis"}
-POOLED = {"write-in", "write-ins", "scattering"}
+ALIASES = {("MS", "jeffdavis"): "jeffersondavis"}
+POOLED = re.compile(r"write-?ins?\b|^scattering$", re.I)
+JUNK = re.compile(r"^(under|over) votes$|^\* withdrawn candidate$|^total|blank|registered voters", re.I)
 ORDINALS = {1: "st", 2: "nd", 3: "rd"}
 CAVEAT = "Held under the 2026 congressional map, which the archive has not yet loaded as a boundary set, so this contest is not yet tied to a district shape."
 METHOD = "Results by county from OpenElections' 2026 primary file for {state}, a community compilation of the state's county results. Candidates who received votes are listed; write-in votes are pooled."
@@ -161,6 +162,7 @@ def emit() -> Path:
             return persons[(state, slug(text))]
 
         sources: dict[str, UUID] = {}
+        retired_persons: set[UUID] = set()
         elections: dict[str, UUID] = {}
         totals: dict[str, int] = {}
         for state, (code, day, files) in FILES.items():
@@ -198,6 +200,7 @@ def emit() -> Path:
                 lambda: defaultdict(lambda: defaultdict(int))
             )
             scope_labels: dict[str, str] = {}
+            junk: dict[tuple[str, str, str], set[str]] = defaultdict(set)
             for file in files:
                 with raw.cached(SOURCE, BASE.format(code, file)).path.open(newline="") as file_handle:
                     for row in csv.DictReader(file_handle):
@@ -208,21 +211,38 @@ def emit() -> Path:
                         if scope == "" and state not in TOP_TWO:
                             continue
                         scope_labels.setdefault(scope, row["party"])
-                        pooled = row["candidate"].strip().lower() in POOLED or row.get("write_in") == "Y"
-                        label = row["party"] if not pooled else ""
                         district = ("0" if state in AT_LARGE else row["district"]) if chamber == "house" else ""
+                        if JUNK.search(row["candidate"].strip()):
+                            junk[(chamber, district, "" if state in TOP_TWO else scope)].add(title(row["candidate"].strip()))
+                            continue
+                        pooled = POOLED.search(row["candidate"]) is not None or row.get("write_in") == "Y"
+                        label = row["party"] if not pooled else ""
                         candidate = "Write-ins" if pooled else title(row["candidate"].strip())
-                        county = ALIASES.get(re.sub(r"[^a-z]", "", row["county"].lower()), re.sub(r"[^a-z]", "", row["county"].lower()))
+                        county = re.sub(r"[^a-z]", "", row["county"].lower())
+                        county = ALIASES.get((state, county), county)
                         grouped[(chamber, district, "" if state in TOP_TWO else scope)][
                             (candidate, label, "pooled" if pooled else "")
                         ][county] += int(row["votes"])
+            for (chamber, district, scope), labels in sorted(junk.items()):
+                key_tail = chamber + (f":{district}" if district else "") + (f":{scope}" if scope else "")
+                for label in sorted(labels):
+                    option = cs.key("us.option", f"{day}:{state}:{key_tail}:{slug(label)}")
+                    if option not in cs.minted:
+                        reason = f"{label} is a report line, not a candidate"
+                        cs.add(
+                            "entity_retirement",
+                            entity_id=cs.key("us.candidacy", f"{day}:{state}:{key_tail}:{slug(label)}"),
+                            reason=reason,
+                        )
+                        cs.add("entity_retirement", entity_id=option, reason=reason)
+                        gone = cs.key(f"{SOURCE}.person", f"{state}:{slug(label)}")
+                        if gone not in retired_persons and gone not in cs.minted:
+                            retired_persons.add(gone)
+                            cs.add("entity_retirement", entity_id=gone, reason=reason)
             for (chamber, district, scope), candidates in sorted(grouped.items()):
                 key_tail = chamber + (f":{district}" if district else "") + (f":{scope}" if scope else "")
                 contest_key = f"{day}:{state}:{key_tail}"
                 contest = cs.key("us.contest", contest_key)
-                if contest not in cs.minted:
-                    print(f"{contest_key} already held, skipped")
-                    continue
                 template_key = {
                     "house": f"2026-11-03:{state}:house:{district}",
                     "senate": f"2026-11-03:{state}:senate",
