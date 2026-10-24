@@ -12799,7 +12799,8 @@ export const people = {
         ),
         rounds as (
           select f.root, f.rk, f.measure,
-            case when bool_or(f.count_round = f.last and f.value > 0 and f.option in (select k from lines)) then max(f.last) else min(f.first) end as round
+            case when bool_or(f.count_round = f.last and f.value > 0 and f.option in (select k from lines))
+              and (select coalesce(c.magnitude, 1) <= 1 from contest c where c.id = f.root) then max(f.last) else min(f.first) end as round
           from fetched f group by f.root, f.rk, f.measure
         ),
         mains as (
