@@ -310,6 +310,7 @@ const PlaceRow = v.object({
   valid: v.number(),
   shares: v.array(FINE),
   leader: v.nullable(v.number()),
+  also: v.optional(v.nullable(v.number())),
   margin: v.nullable(FINE),
   earlier: v.nullable(v.array(FINE)),
   prior: v.nullable(v.number()),
@@ -2417,6 +2418,14 @@ async function tabulate(
     );
     const leader =
       lumped ?? ((running?.current?.votes ?? 0) > 0 ? (running ?? null) : null);
+    const seated = elects[index]?.held;
+    const also =
+      seated == null || leader == null || (seated.get(leader.key) ?? 0) === 0
+        ? null
+        : (result.find(
+            (entry) =>
+              entry.key !== leader.key && (seated.get(entry.key) ?? 0) > 0,
+          ) ?? null);
     let before: (typeof result)[number] | null = null;
     for (const entry of result) {
       if (
@@ -2448,6 +2457,7 @@ async function tabulate(
       item.votes += entry.current?.votes ?? 0;
       item.lead ||=
         entry.key === leader?.key ||
+        entry.key === also?.key ||
         (entry.key === before?.key && before.key !== leader?.key);
       legend.set(entry.key, item);
     }
@@ -2455,6 +2465,7 @@ async function tabulate(
       row,
       result,
       leader,
+      also,
       before,
       split: elects[index]?.split ?? null,
       valid: current?.side.valid ?? 0,
@@ -2573,46 +2584,50 @@ async function tabulate(
           : null,
       party: item.party,
     })),
-    rows: compared.map(({ row, result, leader, before, split, valid }) => {
-      const runner = result.find(
-        (entry) =>
-          entry.current != null &&
-          !entry.key.startsWith("kind:") &&
-          entry.key !== leader?.key,
-      );
-      return {
-        k: row.k,
-        name: row.name,
-        path: row.path,
-        contest: row.isContest,
-        isRemainder: row.isRemainder ?? false,
-        isCounted: row.isCounted,
-        valid,
-        shares: kept.map(
-          (item) =>
-            result.find((entry) => entry.key === item.key)?.current?.share ?? 0,
-        ),
-        leader:
-          position.get(
-            leader?.key ?? unopposed.get(row.owner ?? "")?.key ?? "",
-          ) ?? null,
-        declared: unopposed.get(row.owner ?? "")?.declared ?? null,
-        isRecorded: unopposed.get(row.owner ?? "")?.isRecorded ?? true,
-        margin:
-          leader?.current == null
-            ? null
-            : (split ?? leader.current.share - (runner?.current?.share ?? 0)),
-        earlier:
-          (then?.get(row.k)?.side.valid ?? 0) === 0
-            ? null
-            : kept.map(
-                (item) =>
-                  result.find((entry) => entry.key === item.key)?.earlier
-                    ?.share ?? 0,
-              ),
-        prior: before == null ? null : (position.get(before.key) ?? null),
-      };
-    }),
+    rows: compared.map(
+      ({ row, result, leader, also, before, split, valid }) => {
+        const runner = result.find(
+          (entry) =>
+            entry.current != null &&
+            !entry.key.startsWith("kind:") &&
+            entry.key !== leader?.key,
+        );
+        return {
+          k: row.k,
+          name: row.name,
+          path: row.path,
+          contest: row.isContest,
+          isRemainder: row.isRemainder ?? false,
+          isCounted: row.isCounted,
+          valid,
+          shares: kept.map(
+            (item) =>
+              result.find((entry) => entry.key === item.key)?.current?.share ??
+              0,
+          ),
+          leader:
+            position.get(
+              leader?.key ?? unopposed.get(row.owner ?? "")?.key ?? "",
+            ) ?? null,
+          also: also == null ? null : (position.get(also.key) ?? null),
+          declared: unopposed.get(row.owner ?? "")?.declared ?? null,
+          isRecorded: unopposed.get(row.owner ?? "")?.isRecorded ?? true,
+          margin:
+            leader?.current == null
+              ? null
+              : (split ?? leader.current.share - (runner?.current?.share ?? 0)),
+          earlier:
+            (then?.get(row.k)?.side.valid ?? 0) === 0
+              ? null
+              : kept.map(
+                  (item) =>
+                    result.find((entry) => entry.key === item.key)?.earlier
+                      ?.share ?? 0,
+                ),
+          prior: before == null ? null : (position.get(before.key) ?? null),
+        };
+      },
+    ),
     sources: [...sources],
     unreconciled: unreconciled.values().toArray(),
   };

@@ -1070,6 +1070,14 @@
                   ],
                 },
               },
+              {
+                id: "split",
+                type: "fill" as const,
+                source: "places",
+                "source-layer": "areas",
+                filter: ["in", ["id"], ["literal", []]],
+                paint: { "fill-pattern": "hatch" },
+              },
               ...(missing.length === 0
                 ? []
                 : [
@@ -1770,6 +1778,18 @@
     const tips = [0, 1].map((index) =>
       tones.read(colors[index] ?? "var(--muted-foreground)"),
     );
+    const splits =
+      view === "winner" && only == null
+        ? places.rows.flatMap((row) => {
+            if (row.also == null || row.leader == null || inner.has(row.k)) {
+              return [];
+            }
+            const color = tones.read(
+              colors[row.also] ?? "var(--muted-foreground)",
+            );
+            return [{ k: row.k, color, image: `split:${color}` }];
+          })
+        : [];
     const arrows = (scale: number) =>
       places.rows.flatMap((row) => {
         const change = changes.get(row.k)?.swing;
@@ -1800,6 +1820,54 @@
           }
         }
         map.setFilter("unmatched", ["in", ["id"], ["literal", hatched]]);
+        for (const { color, image } of splits) {
+          if (map.hasImage(image)) {
+            continue;
+          }
+          const tile = document.createElement("canvas");
+          tile.width = 8;
+          tile.height = 8;
+          const pen = tile.getContext("2d", { willReadFrequently: true });
+          if (pen == null) {
+            continue;
+          }
+          pen.strokeStyle = color;
+          pen.lineWidth = 2.5;
+          pen.beginPath();
+          for (const shift of [-8, 0, 8]) {
+            pen.moveTo(shift, 8);
+            pen.lineTo(shift + 8, 0);
+          }
+          pen.stroke();
+          map.addImage(image, {
+            width: 8,
+            height: 8,
+            data: new Uint8Array(pen.getImageData(0, 0, 8, 8).data.buffer),
+          });
+        }
+        const split: Maplibre.FilterSpecification = [
+          "in",
+          ["id"],
+          ["literal", splits.map((entry) => entry.k)],
+        ];
+        map.setFilter(
+          "split",
+          scopes[index] == null
+            ? split
+            : (["all", scopes[index], split] as Maplibre.FilterSpecification),
+        );
+        map.setPaintProperty(
+          "split",
+          "fill-pattern",
+          splits[0] == null
+            ? "hatch"
+            : ([
+                "match",
+                ["id"],
+                ...splits.flatMap((entry) => [entry.k, entry.image]),
+                splits[0].image,
+              ] as Maplibre.ExpressionSpecification),
+        );
         map.setPaintProperty("paper", "background-color", colorsNow.paper);
         map.setPaintProperty("fill", "fill-color", [
           "coalesce",
@@ -2633,6 +2701,24 @@
             <span class="font-figures text-xs tabular-nums"
               >{missing.length}</span
             >
+          </span>
+        {/if}
+        {const splits = $derived(
+          view === "winner" && only == null
+            ? places.rows.filter(
+                (row) => row.also != null && row.leader != null,
+              ).length
+            : 0,
+        )}
+        {#if splits > 0}
+          <span
+            class="flex items-center gap-1.5 px-1.5 text-[0.8125rem] text-muted-foreground block-7"
+          >
+            <span
+              class="rounded-xs bg-[repeating-linear-gradient(135deg,var(--muted-foreground)_0_1.5px,transparent_1.5px_3.5px)] ring-1 ring-border block-2.5 inline-2.5"
+            ></span>
+            <span>{m.map_split_key()}</span>
+            <span class="font-figures text-xs tabular-nums">{splits}</span>
           </span>
         {/if}
       </div>

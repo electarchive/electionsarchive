@@ -1450,6 +1450,7 @@
   "coverage_collapse": "Collapse {name}",
   "coverage_loading": "Loading",
   "map_no_results": "No results available for this contest",
+  "map_split_key": "Split between parties",
   "map_blank_key": "No results",
   "map_no_race": "No race in this election",
   "map_idle_key": "No race",
