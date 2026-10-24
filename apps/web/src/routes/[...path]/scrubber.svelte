@@ -53,19 +53,22 @@
   const lean = (party: string | null) =>
     (party == null ? null : parties.get(party)?.lean) ?? Infinity;
 
+  const own = $derived(
+    (record.data?.series ?? []).filter((series) => !series.isAbroad),
+  );
   const chamber = $derived(
-    (record.data?.series ?? [])
+    own
       .filter((series) => !series.isOffice)
       .toSorted((a, b) => b.points.length - a.points.length)[0] ?? null,
   );
   const office = $derived(
-    (record.data?.series ?? [])
+    own
       .filter((series) => series.isOffice)
       .toSorted((a, b) => b.points.length - a.points.length)[0] ?? null,
   );
   const steps = $derived(
     Map.groupBy(
-      (record.data?.series ?? []).flatMap((series) =>
+      own.flatMap((series) =>
         series.points.flatMap((point) =>
           point.path == null
             ? []

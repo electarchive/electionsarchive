@@ -10871,6 +10871,7 @@ export const polities = {
             id: v.string(),
             name: v.string(),
             isOffice: v.boolean(),
+            isAbroad: v.boolean(),
             points: v.array(
               v.object({
                 name: v.string(),
@@ -10916,6 +10917,7 @@ export const polities = {
       const found = await db.execute<{
         seat: string;
         isOffice: boolean;
+        isAbroad: boolean;
         bucket: string;
         link: string | null;
         date: string;
@@ -10945,6 +10947,7 @@ export const polities = {
         roots as materialized (
           select c.id, coalesce(c.office_id, c.body_id) as seat, c.office_id is not null as "isOffice",
             c.kind = 'list_allocation' as "isList",
+            coalesce((select bp.kind = 'supranational' from body b join polity bp on bp.id = b.polity_id where b.id = c.body_id), false) as "isAbroad",
             e.date_from as date, ${CYCLE} as year, a.k as area,
             case when g.polity_id = ${input.id}::uuid and g.id <> e.id and exists (
                 select from later l
@@ -10975,6 +10978,11 @@ export const polities = {
               (select polity_id from body where id = c.body_id),
               (select polity_id from office where id = c.office_id)
             ) = ${input.id}::uuid or (
+              e.polity_id = ${input.id}::uuid and exists (
+                select from body b join polity bp on bp.id = b.polity_id
+                where b.id = c.body_id and bp.kind = 'supranational'
+              )
+            ) or (
               (select yes from bare) and c.district_area_id is not null
               and (select polity_id from body where id = c.body_id) in (select id from anc)
               and exists (
@@ -11006,7 +11014,8 @@ export const polities = {
             where o.contest_id = t.id
             offset 0
           ) o
-          where not exists (select from contest k where k.allocation_parent_id = t.id)
+          where not exists (select from contest k where k.allocation_parent_id = t.id and k.party_scope_id is null)
+            and (t.id = t.root or not exists (select from contest sc where sc.id = t.id and sc.party_scope_id is not null))
             and not (o.kind = 'candidate' and exists (
               select from contest_option l
               join outcome lx on lx.option_id = l.id and lx.kind in ('elected', 'won') and lx.candidacy_id is null
@@ -11072,7 +11081,7 @@ export const polities = {
           group by f.root
         ),
         seated as (
-          select r.seat, bool_or(r."isOffice") as "isOffice", coalesce(r.link::text, r.year::text) as bucket,
+          select r.seat, bool_or(r."isOffice") as "isOffice", bool_or(r."isAbroad") as "isAbroad", coalesce(r.link::text, r.year::text) as bucket,
             (array_agg(r.link))[1] as link,
             min(r.date) as day, min(r.year) as year, count(distinct r.id)::int as races,
             w.party, bool_or(w.independent) as independent, sum(w.seats)::int as seats, avg(sh.share)::float8 as share,
@@ -11092,7 +11101,7 @@ export const polities = {
         flagged as (
           select s.*, coalesce(s.total > s.size * 1.02 and s.lists >= s.size * 0.9, false) as "isMixed" from sized s
         )
-        select seat, "isOffice", bucket, link, day::text as date, year, races, party, share,
+        select seat, "isOffice", "isAbroad", bucket, link, day::text as date, year, races, party, share,
           party is null and independent as "isIndependent",
           case when "isMixed" then listed else seats end as seats
         from flagged
@@ -11168,11 +11177,25 @@ export const polities = {
         positions.rows.map((row) => [row.party_id, row.lean]),
       );
       const region = new Map(homes.rows.map((row) => [row.id, row.region]));
-      const shown = new Map<string, number>();
-      for (const id of parties) {
-        const ref = colors.get(id);
-        const text = ref?.short ?? ref?.label ?? "";
-        shown.set(text, (shown.get(text) ?? 0) + 1);
+      const clashes = new Set<string>();
+      const bySeat = Map.groupBy(
+        found.rows.flatMap((row) =>
+          row.party == null ? [] : [{ seat: row.seat, party: row.party }],
+        ),
+        (row) => row.seat,
+      );
+      for (const group of bySeat.values()) {
+        const texts = Map.groupBy(
+          new Set(group.map((row) => row.party)),
+          (id) => colors.get(id)?.short ?? colors.get(id)?.label ?? "",
+        );
+        for (const ids of texts.values()) {
+          if (ids.length > 1) {
+            for (const id of ids) {
+              clashes.add(id);
+            }
+          }
+        }
       }
       return {
         scope: own.rows[0]?.path ?? null,
@@ -11183,6 +11206,7 @@ export const polities = {
               id: seat,
               name: labels.short.get(seat) ?? labels.full.get(seat) ?? "",
               isOffice: rows.some((row) => row.isOffice),
+              isAbroad: rows.some((row) => row.isAbroad),
               points: Map.groupBy(rows, (row) => row.bucket)
                 .values()
                 .map((group) => {
@@ -11215,7 +11239,11 @@ export const polities = {
                         seats: row.seats,
                         isIndependent: row.isIndependent,
                       }))
-                      .toSorted((a, b) => b.seats - a.seats),
+                      .toSorted(
+                        (a, b) =>
+                          b.seats - a.seats ||
+                          (a.party ?? "").localeCompare(b.party ?? ""),
+                      ),
                   };
                 })
                 .toArray()
@@ -11255,6 +11283,7 @@ export const polities = {
           .filter((entry) => entry.points.length > (input.body == null ? 1 : 0))
           .toSorted(
             (a, b) =>
+              Number(a.isAbroad) - Number(b.isAbroad) ||
               Number(b.isOffice) - Number(a.isOffice) ||
               Math.max(...b.points.map((point) => point.filled)) -
                 Math.max(...a.points.map((point) => point.filled)),
@@ -11283,14 +11312,13 @@ export const polities = {
           const last = Math.max(...years);
           return {
             ...ref,
-            short:
-              (shown.get(text) ?? 0) < 2
-                ? ref.short
-                : place != null && place !== ""
-                  ? `${text} (${place})`
-                  : years.length === 0
-                    ? ref.short
-                    : `${text} (${first === last ? first : `${first}–${last}`})`,
+            short: !clashes.has(id)
+              ? ref.short
+              : place != null && place !== ""
+                ? `${text} (${place})`
+                : years.length === 0
+                  ? ref.short
+                  : `${text} (${first === last ? first : `${first}–${last}`})`,
             lean: lean.get(id) ?? null,
           };
         }),
