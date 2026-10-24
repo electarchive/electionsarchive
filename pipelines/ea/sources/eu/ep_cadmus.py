@@ -453,6 +453,8 @@ def emit() -> Path:
                         old = uk_parties.get(f"GB:{label_text}")
                         if old is not None and old != party and old not in cs.survivors and umit_key != "liberal":
                             cs.merge(old, party)
+                        if code == "scotland" and year >= 1990 and umit_key == "green-party":
+                            party = cs.key("gb.party", "scottish-greens")
                     elif not other and iso != "GB":
                         key = (iso, label_text)
                         party = parties.get(key)
