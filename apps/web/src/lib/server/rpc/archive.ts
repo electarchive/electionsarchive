@@ -6663,6 +6663,7 @@ async function races(
   polity: string,
   date: string | null,
   isBrief = false,
+  isInside = false,
 ) {
   const day = date ?? "infinity";
   const [found, territory] = await Promise.all([
@@ -6715,9 +6716,14 @@ async function races(
         from contest c
         join election e on e.id = c.election_id
         join tree on tree.id = c.election_id
-        where c.allocation_parent_id is null or not exists (
+        where (c.allocation_parent_id is null or not exists (
           select from contest p join tree pt on pt.id = p.election_id where p.id = c.allocation_parent_id
-        )
+        )) and (not ${isInside} or c.district_area_id is null or exists (
+          select from polity_territory t
+          join area_parent ap on ap.area_id = c.district_area_id
+          left join area_parent up on up.area_id = ap.parent_id
+          where t.polity_id = ${polity}::uuid and t.valid @> e.date_from and t.area_id in (ap.parent_id, up.parent_id)
+        ))
       ),
       kept as materialized (
         select id, stage, own from base where own or not exists (select from base where own)
@@ -9689,7 +9695,11 @@ export const polities = {
             left join body b on b.id = c.body_id
             left join office o on o.id = c.office_id
             left join polity_territory pt on pt.polity_id = e.polity_id and pt.valid @> e.date_from
-            where e.polity_id in (select id from up) and e.date_from is not null and exists (
+            where e.polity_id in (select id from up) and e.date_from is not null and (
+              exists (select from election x where x.polity_id = ${input.id}::uuid)
+              or not exists (select from polity where id = ${input.id}::uuid and kind = 'region')
+              or exists (select from polity_territory t where t.polity_id = ${input.id}::uuid and t.valid @> e.date_from)
+            ) and exists (
               select 1 from result_set rs
               where rs.contest_id = c.id and rs.status = 'active' and exists (
                 select from result_rollup r where r.result_set_k = rs.k and r.area_k = place.k and r.measure = any(${COUNTED}) offset 0
@@ -9765,6 +9775,13 @@ export const polities = {
       const held = electionRows.rows.filter(
         (row) => row.date != null && row.date <= today && row.status === "held",
       );
+      const fallback = voted.find(
+        (row) =>
+          polity.kind === "region" &&
+          row.kind === "general" &&
+          row.status === "held" &&
+          row.date <= today,
+      );
       const recent =
         held.find(
           (row) =>
@@ -9772,7 +9789,9 @@ export const polities = {
             Date.parse(held[0]?.date ?? "") - Date.parse(row.date ?? "") < 9e10,
         ) ??
         held[0] ??
-        null;
+        (fallback == null
+          ? null
+          : { id: fallback.election, date: fallback.date });
       const parents = new Set(here.rows.map((row) => row.parent));
       const kept = here.rows.filter((row) => !parents.has(row.id));
       const sizes = Map.groupBy(kept, (row) => row.date)
@@ -9792,7 +9811,9 @@ export const polities = {
       const [labels, slugs, raced, built] = await Promise.all([
         names(ids),
         paths(ids),
-        recent == null ? [] : races(recent.id, input.id, recent.date, true),
+        recent == null
+          ? []
+          : races(recent.id, input.id, recent.date, true, held.length === 0),
         Promise.all(
           kept
             .filter((row) => shown.has(row.date))
@@ -10155,6 +10176,16 @@ export const polities = {
           from contest rc join election r on r.id = rc.election_id
           where rc.round_number > 1 and r.parent_id is not null
         ),
+        anc(id) as (
+          select parent_id from polity_parent where polity_id = ${input.id}::uuid
+          union
+          select p.parent_id from polity_parent p join anc on p.polity_id = anc.id
+        ),
+        bare as materialized (
+          select not exists (select from body where polity_id = ${input.id}::uuid)
+            and not exists (select from office where polity_id = ${input.id}::uuid)
+            and exists (select from polity where id = ${input.id}::uuid and kind = 'region') as yes
+        ),
         roots as materialized (
           select c.id, coalesce(c.office_id, c.body_id) as seat, c.office_id is not null as "isOffice",
             c.kind = 'list_allocation' as "isList",
@@ -10165,6 +10196,7 @@ export const polities = {
               ) then g.id
               when e.polity_id = ${input.id}::uuid then e.id
               when g.polity_id = ${input.id}::uuid then g.id
+              when (select yes from bare) then e.id
               else (
                 select n.id from election n
                 where n.polity_id = ${input.id}::uuid and n.kind = e.kind
@@ -10183,10 +10215,19 @@ export const polities = {
               select from contest pc join election pe on pe.id = pc.election_id
               where pc.id = c.previous_round_id and pe.kind in ('general', 'local')
             )
-            and coalesce(
+            and (coalesce(
               (select polity_id from body where id = c.body_id),
               (select polity_id from office where id = c.office_id)
-            ) = ${input.id}::uuid
+            ) = ${input.id}::uuid or (
+              (select yes from bare) and c.district_area_id is not null
+              and (select polity_id from body where id = c.body_id) in (select id from anc)
+              and exists (
+                select from polity_territory t
+                join area_parent ap on ap.area_id = c.district_area_id
+                left join area_parent up on up.area_id = ap.parent_id
+                where t.polity_id = ${input.id}::uuid and t.valid @> e.date_from and t.area_id in (ap.parent_id, up.parent_id)
+              )
+            ))
         ),
         rounds as (
           select r.id as root, r.id from roots r
@@ -10287,9 +10328,9 @@ export const polities = {
         ),
         sized as (
           select t.*, sum(t.seats) over b as total, sum(t.listed) over b as lists,
-            (select z.seats from body_size z
+            case when (select yes from bare) then sum(t.seats) over b else (select z.seats from body_size z
               where z.body_id = t.seat and (z.valid @> t.day or lower(z.valid) between t.day and t.day + 400)
-              order by lower(z.valid) desc limit 1) as size
+              order by lower(z.valid) desc limit 1) end as size
           from seated t window b as (partition by t.seat, t.bucket)
         ),
         flagged as (
