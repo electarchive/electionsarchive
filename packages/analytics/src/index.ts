@@ -225,24 +225,22 @@ function isPooledIndependent(
 }
 
 function independent(row: Row): Row {
-  if (row.key !== "independent") {
+  const label =
+    row.key === "independent"
+      ? "Independent"
+      : row.key === "unrecorded"
+        ? "No party recorded"
+        : null;
+  if (label == null) {
     return row;
   }
   return {
     ...row,
-    label: "Independent",
-    short: "Independent",
+    label,
+    short: label,
     color: null,
-    current: row.current && {
-      ...row.current,
-      label: "Independent",
-      person: null,
-    },
-    earlier: row.earlier && {
-      ...row.earlier,
-      label: "Independent",
-      person: null,
-    },
+    current: row.current && { ...row.current, label, person: null },
+    earlier: row.earlier && { ...row.earlier, label, person: null },
   };
 }
 
@@ -338,6 +336,11 @@ export function compare(
       current.options.filter(
         (option) => option.outcome === "elected" || option.outcome === "won",
       ).length > 1);
+  const isPartisan =
+    isShared &&
+    current.options.some(
+      (option) => option.kind === "candidate" && option.party != null,
+    );
   const base = (option: Option) => {
     if (grouping === "alliance" && option.alliance != null) {
       const anchor = anchors.get(option.alliance.id)?.party;
@@ -360,6 +363,15 @@ export function compare(
     }
     if (isPooledIndependent(option, party, match, isShared)) {
       return "independent";
+    }
+    if (
+      isPartisan &&
+      match !== "person" &&
+      party == null &&
+      option.kind === "candidate" &&
+      option.isIndependent !== true
+    ) {
+      return "unrecorded";
     }
     if (
       option.person != null &&
