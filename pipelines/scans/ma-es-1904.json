@@ -1,0 +1,792 @@
+{
+  "polity": "US-MA",
+  "publisher": "Massachusetts Secretary of the Commonwealth",
+  "title": "A Manual for the Use of the General Court, 1904 Representatives in Congress by town",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/amanualforusege01taylgoog/page/n{page}_w2000.jpg",
+    "item": "https://archive.org/details/amanualforusege01taylgoog"
+  },
+  "raw_source": "us.scans",
+  "unit_scheme": "town",
+  "unit_codes": {
+    "Gay Head": "25007"
+  },
+  "contests": {
+    "house1": {
+      "year": 1904,
+      "chamber": "house",
+      "day": "1904-11-08",
+      "special": false,
+      "state": "MA",
+      "district": 1
+    },
+    "house2": {
+      "year": 1904,
+      "chamber": "house",
+      "day": "1904-11-08",
+      "special": false,
+      "state": "MA",
+      "district": 2
+    },
+    "house3": {
+      "year": 1904,
+      "chamber": "house",
+      "day": "1904-11-08",
+      "special": false,
+      "state": "MA",
+      "district": 3
+    },
+    "house4": {
+      "year": 1904,
+      "chamber": "house",
+      "day": "1904-11-08",
+      "special": false,
+      "state": "MA",
+      "district": 4
+    },
+    "house5": {
+      "year": 1904,
+      "chamber": "house",
+      "day": "1904-11-08",
+      "special": false,
+      "state": "MA",
+      "district": 5
+    },
+    "house6": {
+      "year": 1904,
+      "chamber": "house",
+      "day": "1904-11-08",
+      "special": false,
+      "state": "MA",
+      "district": 6
+    },
+    "house7": {
+      "year": 1904,
+      "chamber": "house",
+      "day": "1904-11-08",
+      "special": false,
+      "state": "MA",
+      "district": 7
+    },
+    "house8": {
+      "year": 1904,
+      "chamber": "house",
+      "day": "1904-11-08",
+      "special": false,
+      "state": "MA",
+      "district": 8
+    },
+    "house9": {
+      "year": 1904,
+      "chamber": "house",
+      "day": "1904-11-08",
+      "special": false,
+      "state": "MA",
+      "district": 9
+    },
+    "house10": {
+      "year": 1904,
+      "chamber": "house",
+      "day": "1904-11-08",
+      "special": false,
+      "state": "MA",
+      "district": 10
+    },
+    "house11": {
+      "year": 1904,
+      "chamber": "house",
+      "day": "1904-11-08",
+      "special": false,
+      "state": "MA",
+      "district": 11
+    },
+    "house12": {
+      "year": 1904,
+      "chamber": "house",
+      "day": "1904-11-08",
+      "special": false,
+      "state": "MA",
+      "district": 12
+    }
+  },
+  "pages": [
+    {
+      "page": 368,
+      "id": "368-0",
+      "columns": [
+        {
+          "label": "Charles Giddings of Great Barrington, Democratic.",
+          "contest": "house1",
+          "candidate": "Charles Giddings"
+        },
+        {
+          "label": "John L. Kilbon of Lee, Prohibition.",
+          "contest": "house1",
+          "candidate": "John L Kilbon"
+        },
+        {
+          "label": "Theodore Koehler of Adams, Socialist.",
+          "contest": "house1",
+          "candidate": "Theodore Koehler"
+        },
+        {
+          "label": "George P. Lawrence of North Adams, Republican.",
+          "contest": "house1",
+          "candidate": "George Pelton Lawrence"
+        },
+        {
+          "label": "All others.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.179,
+        0.493,
+        0.885,
+        1.0
+      ],
+      "hint": "Read only the table headed 'CONGRESSIONAL DISTRICT No. 1.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.4477
+      ]
+    },
+    {
+      "page": 369,
+      "id": "369-0",
+      "columns": [
+        {
+          "label": "Charles Giddings of Great Barrington, Democratic.",
+          "contest": "house1",
+          "candidate": "Charles Giddings"
+        },
+        {
+          "label": "John L. Kilbon of Lee, Prohibition.",
+          "contest": "house1",
+          "candidate": "John L Kilbon"
+        },
+        {
+          "label": "Theodore Koehler of Adams, Socialist.",
+          "contest": "house1",
+          "candidate": "Theodore Koehler"
+        },
+        {
+          "label": "George P. Lawrence of North Adams, Republican.",
+          "contest": "house1",
+          "candidate": "George Pelton Lawrence"
+        },
+        {
+          "label": "All others.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.109,
+        0.148,
+        0.836,
+        0.839
+      ],
+      "hint": "Read only the table headed 'CONGRESSIONAL DISTRICT No. 1\u2014Concluded.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2084
+      ]
+    },
+    {
+      "page": 370,
+      "id": "370-0",
+      "columns": [
+        {
+          "label": "Frederick H. Gillett of Springfield, Republican.",
+          "contest": "house2",
+          "candidate": "Frederick Huntington Gillett"
+        },
+        {
+          "label": "Alfred E. Steele of Northampton, Prohibition.",
+          "contest": "house2",
+          "candidate": "Alfred E Steele"
+        },
+        {
+          "label": "George W. Wheelwright, Jr., of Hardwick, Democratic.",
+          "contest": "house2",
+          "candidate": "George W Wheelwright"
+        },
+        {
+          "label": "George H. Wrenn of Springfield, Socialist.",
+          "contest": "house2",
+          "candidate": "George H Wrenn"
+        },
+        {
+          "label": "All others.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.097,
+        0.136,
+        0.56,
+        1.0
+      ],
+      "hint": "Read only the table headed 'CONGRESSIONAL DISTRICT No. 2.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1759
+      ]
+    },
+    {
+      "page": 371,
+      "id": "371-0",
+      "columns": [
+        {
+          "label": "Frederick H. Gillett of Springfield, Republican.",
+          "contest": "house2",
+          "candidate": "Frederick Huntington Gillett"
+        },
+        {
+          "label": "Alfred E. Steele of Northampton, Prohibition.",
+          "contest": "house2",
+          "candidate": "Alfred E Steele"
+        },
+        {
+          "label": "George W. Wheelwright, Jr., of Hardwick, Democratic.",
+          "contest": "house2",
+          "candidate": "George W Wheelwright"
+        },
+        {
+          "label": "George H. Wrenn of Springfield, Socialist.",
+          "contest": "house2",
+          "candidate": "George H Wrenn"
+        },
+        {
+          "label": "All others.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.128,
+        0.147,
+        0.835,
+        0.435
+      ],
+      "hint": "Read only the table headed 'CONGRESSIONAL DISTRICT No. 2\u2014Concluded.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 371,
+      "id": "371-1",
+      "columns": [
+        {
+          "label": "John W. Brown of Worcester, Socialist.",
+          "contest": "house3",
+          "candidate": "John W Brown"
+        },
+        {
+          "label": "Rockwood Hoar of Worcester, Republican.",
+          "contest": "house3",
+          "candidate": "Rockwood Hoar"
+        },
+        {
+          "label": "John B. Ratigan of Worcester, Democratic.",
+          "contest": "house3",
+          "candidate": "John B Ratigan"
+        },
+        {
+          "label": "All others.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.127,
+        0.427,
+        0.835,
+        1.0
+      ],
+      "hint": "Read only the table headed 'CONGRESSIONAL DISTRICT No. 3.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.3019
+      ]
+    },
+    {
+      "page": 372,
+      "id": "372-0",
+      "columns": [
+        {
+          "label": "John W. Brown of Worcester, Socialist.",
+          "contest": "house3",
+          "candidate": "John W Brown"
+        },
+        {
+          "label": "Rockwood Hoar of Worcester, Republican.",
+          "contest": "house3",
+          "candidate": "Rockwood Hoar"
+        },
+        {
+          "label": "John R. Ratigan of Worcester, Democratic.",
+          "contest": "house3",
+          "candidate": "John B Ratigan"
+        },
+        {
+          "label": "All others.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.137,
+        0.14,
+        0.553,
+        0.379
+      ],
+      "hint": "Read only the table headed 'CONGRESSIONAL DISTRICT No. 3\u2014 Concluded.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 372,
+      "id": "372-1",
+      "columns": [
+        {
+          "label": "Marcus A. Coolidge of Fitchburg, Democratic.",
+          "contest": "house4",
+          "candidate": "Marcus A Coolidge"
+        },
+        {
+          "label": "John F. Mullen of Clinton, Socialist.",
+          "contest": "house4",
+          "candidate": "John F Mullen"
+        },
+        {
+          "label": "Charles Q. Tirrell of Natick, Republican.",
+          "contest": "house4",
+          "candidate": "Charles Quincy Tirrell"
+        },
+        {
+          "label": "All others.",
+          "contest": "house4",
+          "candidate": "Others"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.137,
+        0.371,
+        0.553,
+        1.0
+      ],
+      "hint": "Read only the table headed 'CONGRESSIONAL DISTRICT No. 4.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2576
+      ]
+    },
+    {
+      "page": 373,
+      "id": "373-0",
+      "columns": [
+        {
+          "label": "Marcus A. Coolidge of Fitchburg, Democratic.",
+          "contest": "house4",
+          "candidate": "Marcus A Coolidge"
+        },
+        {
+          "label": "John F. Mullen of Clinton, Socialist.",
+          "contest": "house4",
+          "candidate": "John F Mullen"
+        },
+        {
+          "label": "Charles Q. Tirrell of Natick, Republican.",
+          "contest": "house4",
+          "candidate": "Charles Quincy Tirrell"
+        },
+        {
+          "label": "All others.",
+          "contest": "house4",
+          "candidate": "Others"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.085,
+        0.141,
+        0.553,
+        0.616
+      ],
+      "hint": "Read only the table headed 'CONGRESSIONAL DISTRICT No. 4\u2014 Concluded.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.32
+      ]
+    },
+    {
+      "page": 373,
+      "id": "373-1",
+      "columns": [
+        {
+          "label": "Butler Ames of Lowell, Republican.",
+          "contest": "house5",
+          "candidate": "Butler Ames"
+        },
+        {
+          "label": "Alexander B. Bruce of Lawrence, Democratic.",
+          "contest": "house5",
+          "candidate": "Alexander B Bruce"
+        },
+        {
+          "label": "Winfield F. Parker of Lowell, Socialist.",
+          "contest": "house5",
+          "candidate": "Winfield F Parker"
+        },
+        {
+          "label": "All others.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.085,
+        0.608,
+        0.553,
+        1.0
+      ],
+      "hint": "Read only the table headed 'CONGRESSIONAL DISTRICT No. 5.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 374,
+      "id": "374-0",
+      "columns": [
+        {
+          "label": "Butler Ames of Lowell, Republican.",
+          "contest": "house5",
+          "candidate": "Butler Ames"
+        },
+        {
+          "label": "Alexander B. Bruce of Lawrence, Democratic.",
+          "contest": "house5",
+          "candidate": "Alexander B Bruce"
+        },
+        {
+          "label": "Winfield F. Parker of Lowell, Socialist.",
+          "contest": "house5",
+          "candidate": "Winfield F Parker"
+        },
+        {
+          "label": "All others.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.14,
+        0.155,
+        0.846,
+        0.54
+      ],
+      "hint": "Read only the table headed 'CONGRESSIONAL DISTRICT No. 5 \u2014 Concluded.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 374,
+      "id": "374-1",
+      "columns": [
+        {
+          "label": "James F. Carey of Haverhill, Socialist.",
+          "contest": "house6",
+          "candidate": "James F Carey"
+        },
+        {
+          "label": "Daniel N. Crowley of Danvers, Democratic.",
+          "contest": "house6",
+          "candidate": "Daniel N Crowley"
+        },
+        {
+          "label": "Augustus P. Gardner of Hamilton, Republican.",
+          "contest": "house6",
+          "candidate": "Augustus Peabody Gardner"
+        },
+        {
+          "label": "All others.",
+          "contest": "house6",
+          "candidate": "Others"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.14,
+        0.532,
+        0.846,
+        1.0
+      ],
+      "hint": "Read only the table headed 'CONGRESSIONAL DISTRICT No. 6.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.3846
+      ]
+    },
+    {
+      "page": 375,
+      "id": "375-0",
+      "columns": [
+        {
+          "label": "James F. Carey of Haverhill, Socialist.",
+          "contest": "house6",
+          "candidate": "James F Carey"
+        },
+        {
+          "label": "Daniel N. Crowley of Danvers, Democratic.",
+          "contest": "house6",
+          "candidate": "Daniel N Crowley"
+        },
+        {
+          "label": "Augustus P. Gardner of Hamilton, Republican.",
+          "contest": "house6",
+          "candidate": "Augustus Peabody Gardner"
+        },
+        {
+          "label": "All others.",
+          "contest": "house6",
+          "candidate": "Others"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.163,
+        0.15,
+        0.868,
+        0.559
+      ],
+      "hint": "Read only the table headed 'CONGRESSIONAL DISTRICT No. 6 \u2014 Concluded.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 375,
+      "id": "375-1",
+      "columns": [
+        {
+          "label": "James Goodwin of Lynn, Socialist Labor.",
+          "contest": "house7",
+          "candidate": "James Goodwin"
+        },
+        {
+          "label": "Fred P. Greenwood of Everett, Prohibition.",
+          "contest": "house7",
+          "candidate": "Fred P Greenwood"
+        },
+        {
+          "label": "Andrew A. Keene of Lynn, Socialist.",
+          "contest": "house7",
+          "candidate": "Andrew A Keene"
+        },
+        {
+          "label": "William A. Kelley of Lynn, Democratic.",
+          "contest": "house7",
+          "candidate": "William A Kelley"
+        },
+        {
+          "label": "Ernest W. Roberts of Chelsea, Republican.",
+          "contest": "house7",
+          "candidate": "Ernest William Roberts"
+        },
+        {
+          "label": "All others.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.161,
+        0.551,
+        0.868,
+        0.921
+      ],
+      "hint": "Read only the table headed 'CONGRESSIONAL DISTRICT No. 7.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 376,
+      "id": "376-0",
+      "columns": [
+        {
+          "label": "Samuel W. McCall of Winchester, Republican.",
+          "contest": "house8",
+          "candidate": "Samuel Walker McCall"
+        },
+        {
+          "label": "Thomas A. Scott of Cambridge, Socialist.",
+          "contest": "house8",
+          "candidate": "Thomas A Scott"
+        },
+        {
+          "label": "All others.",
+          "contest": "house8",
+          "candidate": "Others"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.13,
+        0.147,
+        0.834,
+        0.484
+      ],
+      "hint": "Read only the table headed 'CONGRESSIONAL DISTRICT No. 8.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 376,
+      "id": "376-1",
+      "columns": [
+        {
+          "label": "John A. Kelliher of Boston, Democratic.",
+          "contest": "house9",
+          "candidate": "John Austin Keliher"
+        },
+        {
+          "label": "James J. McVey of Boston, Socialist.",
+          "contest": "house9",
+          "candidate": "James J McVey"
+        },
+        {
+          "label": "Walter L. Sears of Boston, Republican.",
+          "contest": "house9",
+          "candidate": "Walter L Sears"
+        },
+        {
+          "label": "All others.",
+          "contest": "house9",
+          "candidate": "Others"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.135,
+        0.476,
+        0.841,
+        0.764
+      ],
+      "hint": "Read only the table headed 'CONGRESSIONAL DISTRICT No. 9.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 377,
+      "id": "377-0",
+      "columns": [
+        {
+          "label": "Jay B. Crawford of Boston, Republican.",
+          "contest": "house10",
+          "candidate": "Jay B Crawford"
+        },
+        {
+          "label": "William S. McNary of Boston, Democratic.",
+          "contest": "house10",
+          "candidate": "William Sarsfield McNary"
+        },
+        {
+          "label": "William T. Richards of Quincy, Socialist.",
+          "contest": "house10",
+          "candidate": "William T Richards"
+        },
+        {
+          "label": "All others.",
+          "contest": "house10",
+          "candidate": "Others"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.174,
+        0.154,
+        0.881,
+        0.434
+      ],
+      "hint": "Read only the table headed 'CONGRESSIONAL DISTRICT No. 10.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 377,
+      "id": "377-1",
+      "columns": [
+        {
+          "label": "Marion W. Addison of Boston, Democratic Independent Nom. Paper.",
+          "contest": "house11",
+          "candidate": "Marion W Addison"
+        },
+        {
+          "label": "George G. Cutting of Boston, Socialist.",
+          "contest": "house11",
+          "candidate": "George G Cutting"
+        },
+        {
+          "label": "Eugene N. Foss of Boston, Republican.",
+          "contest": "house11",
+          "candidate": "Eugene N Foss"
+        },
+        {
+          "label": "John A. Sullivan of Boston, Democratic.",
+          "contest": "house11",
+          "candidate": "John Andrew Sullivan"
+        },
+        {
+          "label": "All others.",
+          "contest": "house11",
+          "candidate": "Others"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.174,
+        0.426,
+        0.881,
+        0.69
+      ],
+      "hint": "Read only the table headed 'CONGRESSIONAL DISTRICT No. 11.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 377,
+      "id": "377-2",
+      "columns": [
+        {
+          "label": "Augustus Hemenway of Canton, Democratic.",
+          "contest": "house12",
+          "candidate": "Augustus Hemenway"
+        },
+        {
+          "label": "George Elmer Littlefield of Westwood, Socialist.",
+          "contest": "house12",
+          "candidate": "George Elmer Littlefield"
+        },
+        {
+          "label": "John W. Weeks of Newton, Republican.",
+          "contest": "house12",
+          "candidate": "John Wingate Weeks"
+        },
+        {
+          "label": "All others.",
+          "contest": "house12",
+          "candidate": "Others"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.174,
+        0.682,
+        0.881,
+        1.0
+      ],
+      "hint": "Read only the table headed 'CONGRESSIONAL DISTRICT No. 12.'; ignore any other table visible in the image."
+    }
+  ]
+}

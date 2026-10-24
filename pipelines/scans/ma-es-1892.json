@@ -1,0 +1,936 @@
+{
+  "polity": "US-MA",
+  "publisher": "Massachusetts Secretary of the Commonwealth",
+  "title": "A Manual for the Use of the General Court, 1892 Representatives in Congress by town",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/amanualforusege03taylgoog/page/n{page}_w2000.jpg",
+    "item": "https://archive.org/details/amanualforusege03taylgoog"
+  },
+  "raw_source": "us.scans",
+  "unit_scheme": "town",
+  "unit_codes": {
+    "Gay Head": "25007"
+  },
+  "contests": {
+    "house1": {
+      "year": 1892,
+      "chamber": "house",
+      "day": "1892-11-08",
+      "special": false,
+      "state": "MA",
+      "district": 1
+    },
+    "house2": {
+      "year": 1892,
+      "chamber": "house",
+      "day": "1892-11-08",
+      "special": false,
+      "state": "MA",
+      "district": 2
+    },
+    "house3": {
+      "year": 1892,
+      "chamber": "house",
+      "day": "1892-11-08",
+      "special": false,
+      "state": "MA",
+      "district": 3
+    },
+    "house4": {
+      "year": 1892,
+      "chamber": "house",
+      "day": "1892-11-08",
+      "special": false,
+      "state": "MA",
+      "district": 4
+    },
+    "house5": {
+      "year": 1892,
+      "chamber": "house",
+      "day": "1892-11-08",
+      "special": false,
+      "state": "MA",
+      "district": 5
+    },
+    "house6": {
+      "year": 1892,
+      "chamber": "house",
+      "day": "1892-11-08",
+      "special": false,
+      "state": "MA",
+      "district": 6
+    },
+    "house7": {
+      "year": 1892,
+      "chamber": "house",
+      "day": "1892-11-08",
+      "special": false,
+      "state": "MA",
+      "district": 7
+    },
+    "house8": {
+      "year": 1892,
+      "chamber": "house",
+      "day": "1892-11-08",
+      "special": false,
+      "state": "MA",
+      "district": 8
+    },
+    "house9": {
+      "year": 1892,
+      "chamber": "house",
+      "day": "1892-11-08",
+      "special": false,
+      "state": "MA",
+      "district": 9
+    },
+    "house10": {
+      "year": 1892,
+      "chamber": "house",
+      "day": "1892-11-08",
+      "special": false,
+      "state": "MA",
+      "district": 10
+    },
+    "house11": {
+      "year": 1892,
+      "chamber": "house",
+      "day": "1892-11-08",
+      "special": false,
+      "state": "MA",
+      "district": 11
+    },
+    "house12": {
+      "year": 1892,
+      "chamber": "house",
+      "day": "1892-11-08",
+      "special": false,
+      "state": "MA",
+      "district": 12
+    },
+    "house13": {
+      "year": 1892,
+      "chamber": "house",
+      "day": "1892-11-08",
+      "special": false,
+      "state": "MA",
+      "district": 13
+    }
+  },
+  "pages": [
+    {
+      "page": 360,
+      "id": "360-0",
+      "columns": [
+        {
+          "label": "John C. Crosby of Pittsfield, Democratic.",
+          "contest": "house1",
+          "candidate": "John C Crosby"
+        },
+        {
+          "label": "John L. Kilbon of Lee, Prohibition.",
+          "contest": "house1",
+          "candidate": "John L Kilbon"
+        },
+        {
+          "label": "Ashley B. Wright of North Adams, Republican.",
+          "contest": "house1",
+          "candidate": "Ashley Bascom Wright"
+        },
+        {
+          "label": "All others.",
+          "contest": "house1",
+          "candidate": "Others"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.127,
+        0.477,
+        0.833,
+        1.0
+      ],
+      "hint": "Read only the table headed 'CONGRESSIONAL DISTRICT No. 1.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0191
+      ]
+    },
+    {
+      "page": 361,
+      "id": "361-0",
+      "columns": [
+        {
+          "label": "John C. Crosby of Pittsfield, Democratic.",
+          "contest": "house1",
+          "candidate": "John C Crosby"
+        },
+        {
+          "label": "John L. Kilbon of Lee, Prohibition.",
+          "contest": "house1",
+          "candidate": "John L Kilbon"
+        },
+        {
+          "label": "Ashley B. Wright of North Adams, Republican.",
+          "contest": "house1",
+          "candidate": "Ashley Bascom Wright"
+        },
+        {
+          "label": "All others.",
+          "contest": "house1",
+          "candidate": "Others"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.175,
+        0.118,
+        0.881,
+        0.897
+      ],
+      "hint": "Read only the table headed 'CONGRESSIONAL DISTRICT No. 1\u2014Concluded.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1977
+      ]
+    },
+    {
+      "page": 362,
+      "id": "362-0",
+      "columns": [
+        {
+          "label": "Frederick H. Gillett of Springfield, Republican.",
+          "contest": "house2",
+          "candidate": "Frederick Huntington Gillett"
+        },
+        {
+          "label": "Edward Howard Lathrop of Springfield, Democratic.",
+          "contest": "house2",
+          "candidate": "Edward Howard"
+        },
+        {
+          "label": "Herbert M. Small of Templeton, Prohibition.",
+          "contest": "house2",
+          "candidate": "Herbert M Small"
+        },
+        {
+          "label": "All others.",
+          "contest": "house2",
+          "candidate": "Others"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.122,
+        0.112,
+        0.828,
+        1.0
+      ],
+      "hint": "Read only the table headed 'CONGRESSIONAL DISTRICT No. 2.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1644
+      ]
+    },
+    {
+      "page": 363,
+      "id": "363-0",
+      "columns": [
+        {
+          "label": "Frederick H. Gillett of Springfield, Republican.",
+          "contest": "house2",
+          "candidate": "Frederick Huntington Gillett"
+        },
+        {
+          "label": "Edward Howard Lathrop of Springfield, Democratic.",
+          "contest": "house2",
+          "candidate": "Edward Howard"
+        },
+        {
+          "label": "Herbert M. Small of Templeton, Prohibition.",
+          "contest": "house2",
+          "candidate": "Herbert M Small"
+        },
+        {
+          "label": "All others.",
+          "contest": "house2",
+          "candidate": "Others"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.157,
+        0.108,
+        0.863,
+        0.381
+      ],
+      "hint": "Read only the table headed 'CONGRESSIONAL DISTRICT No. 2 \u2014 Concluded.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 363,
+      "id": "363-1",
+      "columns": [
+        {
+          "label": "Erastus M. Eldridge of Worcester, People's Party.",
+          "contest": "house3",
+          "candidate": "Erastus M Eldridge"
+        },
+        {
+          "label": "John R. Thayer of Worcester, Democratic.",
+          "contest": "house3",
+          "candidate": "John R Thayer"
+        },
+        {
+          "label": "Joseph H. Walker of Worcester, Republican.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Melvin H. Walker of Westborough, Prohibition.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "All others.",
+          "contest": "house3",
+          "candidate": "Others"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.157,
+        0.373,
+        0.863,
+        1.0
+      ],
+      "hint": "Read only the table headed 'CONGRESSIONAL DISTRICT No. 3.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2791
+      ]
+    },
+    {
+      "page": 364,
+      "id": "364-0",
+      "columns": [
+        {
+          "label": "Erastus M. Eldridge of Worcester, People's Party.",
+          "contest": "house3",
+          "candidate": "Erastus M Eldridge"
+        },
+        {
+          "label": "John R. Thayer of Worcester, Democratic.",
+          "contest": "house3",
+          "candidate": "John R Thayer"
+        },
+        {
+          "label": "Joseph H. Walker of Worcester, Republican.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Melvin H. Walker of Westborough, Prohibition.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "All others.",
+          "contest": "house3",
+          "candidate": "Others"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.137,
+        0.1,
+        0.84,
+        0.374
+      ],
+      "hint": "Read only the table headed 'CONGRESSIONAL DISTRICT No. 3 \u2014 Concluded.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 364,
+      "id": "364-1",
+      "columns": [
+        {
+          "label": "Lewis Dewart Apsley of Hudson, Republican.",
+          "contest": "house4",
+          "candidate": "Lewis Dewart Apsley"
+        },
+        {
+          "label": "Frederic S. Coolidge of Ashburnham, Democratic.",
+          "contest": "house4",
+          "candidate": "Frederic S Coolidge"
+        },
+        {
+          "label": "Frank M. Forbush of Natick, Prohibition.",
+          "contest": "house4",
+          "candidate": "Frank M Forbush"
+        },
+        {
+          "label": "All others.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.137,
+        0.366,
+        0.84,
+        1.0
+      ],
+      "hint": "Read only the table headed 'CONGRESSIONAL DISTRICT No. 4.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2587
+      ]
+    },
+    {
+      "page": 365,
+      "id": "365-0",
+      "columns": [
+        {
+          "label": "Lewis Dewart Apsley of Hudson, Republican.",
+          "contest": "house4",
+          "candidate": "Lewis Dewart Apsley"
+        },
+        {
+          "label": "Frederic S. Coolidge of Ashburnham, Democratic.",
+          "contest": "house4",
+          "candidate": "Frederic S Coolidge"
+        },
+        {
+          "label": "Frank M. Forbush of Natick, Prohibition.",
+          "contest": "house4",
+          "candidate": "Frank M Forbush"
+        },
+        {
+          "label": "All others.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.152,
+        0.097,
+        0.856,
+        0.635
+      ],
+      "hint": "Read only the table headed 'CONGRESSIONAL DISTRICT No. 4\u2014Concluded.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2565
+      ]
+    },
+    {
+      "page": 365,
+      "id": "365-1",
+      "columns": [
+        {
+          "label": "Walter A. Dutton of Lowell, Prohibition.",
+          "contest": "house5",
+          "candidate": "Walter A Dutton"
+        },
+        {
+          "label": "William S. Knox of Lawrence, Republican.",
+          "contest": "house5",
+          "candidate": "William S Knox"
+        },
+        {
+          "label": "Moses T. Stevens of North Andover, Democratic.",
+          "contest": "house5",
+          "candidate": "Moses Tyler Stevens"
+        },
+        {
+          "label": "All others.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.152,
+        0.627,
+        0.856,
+        1.0
+      ],
+      "hint": "Read only the table headed 'CONGRESSIONAL DISTRICT No. 5.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 366,
+      "id": "366-0",
+      "columns": [
+        {
+          "label": "Walter A. Dutton of Lowell, Prohibition.",
+          "contest": "house5",
+          "candidate": "Walter A Dutton"
+        },
+        {
+          "label": "William S. Knox of Lawrence, Republican.",
+          "contest": "house5",
+          "candidate": "William S Knox"
+        },
+        {
+          "label": "Moses T. Stevens of North Andover, Democratic.",
+          "contest": "house5",
+          "candidate": "Moses Tyler Stevens"
+        },
+        {
+          "label": "All others.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.13,
+        0.16,
+        0.838,
+        0.55
+      ],
+      "hint": "Read only the table headed 'CONGRESSIONAL DISTRICT No. 5 \u2014 Concluded.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 366,
+      "id": "366-1",
+      "columns": [
+        {
+          "label": "Elbridge Gerry Brown of Boston, People's Party.",
+          "contest": "house6",
+          "candidate": "Elbridge Gerry Brown"
+        },
+        {
+          "label": "William Cogswell of Salem, Republican.",
+          "contest": "house6",
+          "candidate": "William Cogswell"
+        },
+        {
+          "label": "John H. Davis of Haverhill, Prohibition.",
+          "contest": "house6",
+          "candidate": "John H Davis"
+        },
+        {
+          "label": "Henry B. Little of Newburyport, Democratic.",
+          "contest": "house6",
+          "candidate": "Henry B Little"
+        },
+        {
+          "label": "All others.",
+          "contest": "house6",
+          "candidate": "Others"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.128,
+        0.542,
+        0.838,
+        1.0
+      ],
+      "hint": "Read only the table headed 'CONGRESSIONAL DISTRICT No. 6.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.4716
+      ]
+    },
+    {
+      "page": 367,
+      "id": "367-0",
+      "columns": [
+        {
+          "label": "William Everett of Quincy, Democratic.",
+          "contest": "house7",
+          "candidate": "William Everett"
+        },
+        {
+          "label": "Fred P Greenwood of Everett, Prohibition.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Henry Cabot Lodge of Nahant, Republican.",
+          "contest": "house7",
+          "candidate": "Henry Cabot Lodge"
+        },
+        {
+          "label": "All others.",
+          "contest": "house7",
+          "candidate": "Others"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.15,
+        0.108,
+        0.854,
+        0.493
+      ],
+      "hint": "Read only the table headed 'CONGRESSIONAL DISTRICT No. 7.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 367,
+      "id": "367-1",
+      "columns": [
+        {
+          "label": "John F. Andrew of Boston, Democratic.",
+          "contest": "house8",
+          "candidate": "John F Andrew"
+        },
+        {
+          "label": "Samuel W. McCall of Winchester, Republican.",
+          "contest": "house8",
+          "candidate": "Samuel Walker McCall"
+        },
+        {
+          "label": "All others.",
+          "contest": "house8",
+          "candidate": "Others"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.148,
+        0.485,
+        0.854,
+        0.833
+      ],
+      "hint": "Read only the table headed 'CONGRESSIONAL DISTRICT No. 8.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 368,
+      "id": "368-0",
+      "columns": [
+        {
+          "label": "Benjamin C. Lane of Boston, Republican.",
+          "contest": "house9",
+          "candidate": "Benjamin C Lane"
+        },
+        {
+          "label": "Alonzo A. Miner of Boston, Prohibition.",
+          "contest": "house9",
+          "candidate": "Alonzo A Miner"
+        },
+        {
+          "label": "Joseph H. O'Neil of Boston, Democratic.",
+          "contest": "house9",
+          "candidate": "Joseph Henry O\u2019Neil"
+        },
+        {
+          "label": "All others.",
+          "contest": "house9",
+          "candidate": "Others"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.13,
+        0.109,
+        0.838,
+        0.5
+      ],
+      "hint": "Read only the table headed 'CONGRESSIONAL DISTRICT No. 9.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 368,
+      "id": "368-1",
+      "columns": [
+        {
+          "label": "Harrison H. Atwood of Boston, Republican.",
+          "contest": "house10",
+          "candidate": "Harrison H Atwood"
+        },
+        {
+          "label": "Richard C. Humphreys of Boston, Independent.",
+          "contest": "house10",
+          "candidate": "Richard C Humphreys"
+        },
+        {
+          "label": "William W. Marple of Quincy, Prohibition.",
+          "contest": "house10",
+          "candidate": "William W Marple"
+        },
+        {
+          "label": "Michael J. McEttrick of Boston, Dem. Citizen.",
+          "contest": "house10",
+          "candidate": "Michael Joseph McEttrick"
+        },
+        {
+          "label": "William S. McNary of Boston, Democratic.",
+          "contest": "house10",
+          "candidate": "William S McNary"
+        },
+        {
+          "label": "All others.",
+          "contest": "house10",
+          "candidate": "Others"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.13,
+        0.492,
+        0.838,
+        0.882
+      ],
+      "hint": "Read only the table headed 'CONGRESSIONAL DISTRICT No. 10.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 369,
+      "id": "369-0",
+      "columns": [
+        {
+          "label": "William F. Draper of Hopedale, Republican.",
+          "contest": "house11",
+          "candidate": "William Franklin Draper"
+        },
+        {
+          "label": "Joseph D. Hunt of Milford, Prohibition.",
+          "contest": "house11",
+          "candidate": "Joseph D Hunt"
+        },
+        {
+          "label": "George Fred Williams of Dedham, Democratic.",
+          "contest": "house11",
+          "candidate": "George Fred Williams"
+        },
+        {
+          "label": "All others.",
+          "contest": "house11",
+          "candidate": "Others"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.15,
+        0.109,
+        0.854,
+        0.68
+      ],
+      "hint": "Read only the table headed 'CONGRESSIONAL DISTRICT No. 11.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2522
+      ]
+    },
+    {
+      "page": 370,
+      "id": "370-0",
+      "columns": [
+        {
+          "label": "Elbridge Cushman of Lakeville, Democratic.",
+          "contest": "house12",
+          "candidate": "Elbridge Cushman"
+        },
+        {
+          "label": "George W. Dyer of Weymouth, Prohibition.",
+          "contest": "house12",
+          "candidate": "George W Dyer"
+        },
+        {
+          "label": "Elijah A. Morse of Canton, Republican.",
+          "contest": "house12",
+          "candidate": "Elijah Adams Morse"
+        },
+        {
+          "label": "All others.",
+          "contest": "house12",
+          "candidate": "Others"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.14,
+        0.108,
+        0.844,
+        0.853
+      ],
+      "hint": "Read only the table headed 'CONGRESSIONAL DISTRICT No. 12.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1906
+      ]
+    },
+    {
+      "page": 371,
+      "id": "371-0",
+      "columns": [
+        {
+          "label": "Charles S. Randall of New Bedford, Republican.",
+          "contest": "house13",
+          "candidate": "Charles Sturtevant Randall"
+        },
+        {
+          "label": "Henry C. Thacher of Yarmouth, Democratic.",
+          "contest": "house13",
+          "candidate": "Henry C Thacher"
+        },
+        {
+          "label": "All others.",
+          "contest": "house13",
+          "candidate": "Others"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.157,
+        0.101,
+        0.869,
+        0.782
+      ],
+      "hint": "Read only the table headed 'CONGRESSIONAL DISTRICT No. 13.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2115
+      ]
+    },
+    {
+      "page": 372,
+      "id": "372-0",
+      "columns": [
+        {
+          "label": "Ashley B. Wright of North Adams (Republican)",
+          "contest": "house1",
+          "candidate": "Ashley Bascom Wright"
+        },
+        {
+          "label": "John C. Crosby of Pittsfield (Democratic)",
+          "contest": "house1",
+          "candidate": "John C Crosby"
+        },
+        {
+          "label": "John L. Kilbon of Lee (Prohibition)",
+          "contest": "house1",
+          "candidate": "John L Kilbon"
+        },
+        {
+          "label": "All others",
+          "contest": "house1",
+          "candidate": "Others"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.14,
+        0.22,
+        0.851,
+        0.371
+      ],
+      "hint": "Read only the table headed 'FIRST DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 372,
+      "id": "372-1",
+      "columns": [
+        {
+          "label": "Frederick H. Gillett of Springfield (Republican)",
+          "contest": "house2",
+          "candidate": "Frederick Huntington Gillett"
+        },
+        {
+          "label": "Edward Howard Lathrop of Springfield (Democratic)",
+          "contest": "house2",
+          "candidate": "Edward Howard"
+        },
+        {
+          "label": "Herbert M. Small of Templeton (Prohibition)",
+          "contest": "house2",
+          "candidate": "Herbert M Small"
+        },
+        {
+          "label": "All others",
+          "contest": "house2",
+          "candidate": "Others"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.14,
+        0.363,
+        0.851,
+        0.555
+      ],
+      "hint": "Read only the table headed 'SECOND DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 372,
+      "id": "372-2",
+      "columns": [
+        {
+          "label": "Joseph H. Walker of Worcester (Republican)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "John R. Thayer of Worcester (Democratic)",
+          "contest": "house3",
+          "candidate": "John R Thayer"
+        },
+        {
+          "label": "Melvin H. Walker of Westborough (Prohibition)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Erastus M. Eldridge of Worcester (People's Party)",
+          "contest": "house3",
+          "candidate": "Erastus M Eldridge"
+        },
+        {
+          "label": "All others",
+          "contest": "house3",
+          "candidate": "Others"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.14,
+        0.547,
+        0.851,
+        0.766
+      ],
+      "hint": "Read only the table headed 'THIRD DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 372,
+      "id": "372-3",
+      "columns": [
+        {
+          "label": "Lewis Dewart Apsley of Hudson (Republican)",
+          "contest": "house4",
+          "candidate": "Lewis Dewart Apsley"
+        },
+        {
+          "label": "Frederic S. Coolidge of Ashburnham (Democratic)",
+          "contest": "house4",
+          "candidate": "Frederic S Coolidge"
+        },
+        {
+          "label": "Frank M. Forbush of Natick (Prohibition)",
+          "contest": "house4",
+          "candidate": "Frank M Forbush"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.14,
+        0.758,
+        0.851,
+        1.0
+      ],
+      "hint": "Read only the table headed 'FOURTH DISTRICT.'; ignore any other table visible in the image."
+    }
+  ]
+}

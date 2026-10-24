@@ -1,0 +1,286 @@
+{
+  "polity": "US-CA",
+  "publisher": "California Secretary of State",
+  "title": "Statement of Vote, General Election November 5, 1996: United States Representative in Congress",
+  "license": "Public record",
+  "raw_source": "us.scans",
+  "file": {
+    "url": "https://elections.cdn.sos.ca.gov/sov/1996-general/us-representative.pdf"
+  },
+  "contests": {
+    "d1": {
+      "year": 1996,
+      "chamber": "house",
+      "day": "1996-11-05",
+      "special": false,
+      "state": "CA",
+      "district": 1
+    },
+    "d2": {
+      "year": 1996,
+      "chamber": "house",
+      "day": "1996-11-05",
+      "special": false,
+      "state": "CA",
+      "district": 2
+    },
+    "d3": {
+      "year": 1996,
+      "chamber": "house",
+      "day": "1996-11-05",
+      "special": false,
+      "state": "CA",
+      "district": 3
+    },
+    "d4": {
+      "year": 1996,
+      "chamber": "house",
+      "day": "1996-11-05",
+      "special": false,
+      "state": "CA",
+      "district": 4
+    },
+    "d6": {
+      "year": 1996,
+      "chamber": "house",
+      "day": "1996-11-05",
+      "special": false,
+      "state": "CA",
+      "district": 6
+    },
+    "d7": {
+      "year": 1996,
+      "chamber": "house",
+      "day": "1996-11-05",
+      "special": false,
+      "state": "CA",
+      "district": 7
+    },
+    "d10": {
+      "year": 1996,
+      "chamber": "house",
+      "day": "1996-11-05",
+      "special": false,
+      "state": "CA",
+      "district": 10
+    },
+    "d11": {
+      "year": 1996,
+      "chamber": "house",
+      "day": "1996-11-05",
+      "special": false,
+      "state": "CA",
+      "district": 11
+    },
+    "d12": {
+      "year": 1996,
+      "chamber": "house",
+      "day": "1996-11-05",
+      "special": false,
+      "state": "CA",
+      "district": 12
+    },
+    "d13": {
+      "year": 1996,
+      "chamber": "house",
+      "day": "1996-11-05",
+      "special": false,
+      "state": "CA",
+      "district": 13
+    },
+    "d14": {
+      "year": 1996,
+      "chamber": "house",
+      "day": "1996-11-05",
+      "special": false,
+      "state": "CA",
+      "district": 14
+    },
+    "d17": {
+      "year": 1996,
+      "chamber": "house",
+      "day": "1996-11-05",
+      "special": false,
+      "state": "CA",
+      "district": 17
+    },
+    "d18": {
+      "year": 1996,
+      "chamber": "house",
+      "day": "1996-11-05",
+      "special": false,
+      "state": "CA",
+      "district": 18
+    },
+    "d19": {
+      "year": 1996,
+      "chamber": "house",
+      "day": "1996-11-05",
+      "special": false,
+      "state": "CA",
+      "district": 19
+    },
+    "d20": {
+      "year": 1996,
+      "chamber": "house",
+      "day": "1996-11-05",
+      "special": false,
+      "state": "CA",
+      "district": 20
+    },
+    "d21": {
+      "year": 1996,
+      "chamber": "house",
+      "day": "1996-11-05",
+      "special": false,
+      "state": "CA",
+      "district": 21
+    },
+    "d22": {
+      "year": 1996,
+      "chamber": "house",
+      "day": "1996-11-05",
+      "special": false,
+      "state": "CA",
+      "district": 22
+    },
+    "d23": {
+      "year": 1996,
+      "chamber": "house",
+      "day": "1996-11-05",
+      "special": false,
+      "state": "CA",
+      "district": 23
+    },
+    "d24": {
+      "year": 1996,
+      "chamber": "house",
+      "day": "1996-11-05",
+      "special": false,
+      "state": "CA",
+      "district": 24
+    },
+    "d39": {
+      "year": 1996,
+      "chamber": "house",
+      "day": "1996-11-05",
+      "special": false,
+      "state": "CA",
+      "district": 39
+    },
+    "d40": {
+      "year": 1996,
+      "chamber": "house",
+      "day": "1996-11-05",
+      "special": false,
+      "state": "CA",
+      "district": 40
+    },
+    "d41": {
+      "year": 1996,
+      "chamber": "house",
+      "day": "1996-11-05",
+      "special": false,
+      "state": "CA",
+      "district": 41
+    },
+    "d48": {
+      "year": 1996,
+      "chamber": "house",
+      "day": "1996-11-05",
+      "special": false,
+      "state": "CA",
+      "district": 48
+    },
+    "d52": {
+      "year": 1996,
+      "chamber": "house",
+      "day": "1996-11-05",
+      "special": false,
+      "state": "CA",
+      "district": 52
+    }
+  },
+  "pages": [
+    {
+      "page": 1,
+      "id": "1-0",
+      "orientation": "counties_down",
+      "discover": [
+        "d1",
+        "d2",
+        "d3",
+        "d4"
+      ],
+      "hint": "A page of California U.S. Representative results, one table per congressional district, counties down the left, candidates across. Read only the tables for districts 1, 2, 3, 4 that have a District Totals row; ignore the Percent rows, the Votes not Cast in Race column, and every district table that has a single county row and no District Totals row. The District Totals row is the printed total."
+    },
+    {
+      "page": 2,
+      "id": "2-0",
+      "orientation": "counties_down",
+      "discover": [
+        "d6",
+        "d7",
+        "d10",
+        "d11"
+      ],
+      "hint": "A page of California U.S. Representative results, one table per congressional district, counties down the left, candidates across. Read only the tables for districts 6, 7, 10, 11 that have a District Totals row; ignore the Percent rows, the Votes not Cast in Race column, and every district table that has a single county row and no District Totals row. The District Totals row is the printed total."
+    },
+    {
+      "page": 3,
+      "id": "3-0",
+      "orientation": "counties_down",
+      "discover": [
+        "d12",
+        "d13",
+        "d14",
+        "d17",
+        "d18"
+      ],
+      "hint": "A page of California U.S. Representative results, one table per congressional district, counties down the left, candidates across. Read only the tables for districts 12, 13, 14, 17, 18 that have a District Totals row; ignore the Percent rows, the Votes not Cast in Race column, and every district table that has a single county row and no District Totals row. The District Totals row is the printed total."
+    },
+    {
+      "page": 4,
+      "id": "4-0",
+      "orientation": "counties_down",
+      "discover": [
+        "d19",
+        "d20",
+        "d21",
+        "d22",
+        "d23",
+        "d24"
+      ],
+      "hint": "A page of California U.S. Representative results, one table per congressional district, counties down the left, candidates across. Read only the tables for districts 19, 20, 21, 22, 23, 24 that have a District Totals row; ignore the Percent rows, the Votes not Cast in Race column, and every district table that has a single county row and no District Totals row. The District Totals row is the printed total."
+    },
+    {
+      "page": 6,
+      "id": "6-0",
+      "orientation": "counties_down",
+      "discover": [
+        "d39",
+        "d40",
+        "d41"
+      ],
+      "hint": "A page of California U.S. Representative results, one table per congressional district, counties down the left, candidates across. Read only the tables for districts 39, 40, 41 that have a District Totals row; ignore the Percent rows, the Votes not Cast in Race column, and every district table that has a single county row and no District Totals row. The District Totals row is the printed total."
+    },
+    {
+      "page": 7,
+      "id": "7-0",
+      "orientation": "counties_down",
+      "discover": [
+        "d48"
+      ],
+      "hint": "A page of California U.S. Representative results, one table per congressional district, counties down the left, candidates across. Read only the tables for districts 48 that have a District Totals row; ignore the Percent rows, the Votes not Cast in Race column, and every district table that has a single county row and no District Totals row. The District Totals row is the printed total."
+    },
+    {
+      "page": 8,
+      "id": "8-0",
+      "orientation": "counties_down",
+      "discover": [
+        "d52"
+      ],
+      "hint": "A page of California U.S. Representative results, one table per congressional district, counties down the left, candidates across. Read only the tables for districts 52 that have a District Totals row; ignore the Percent rows, the Votes not Cast in Race column, and every district table that has a single county row and no District Totals row. The District Totals row is the printed total."
+    }
+  ]
+}

@@ -1,0 +1,795 @@
+{
+  "polity": "US-MA",
+  "publisher": "Massachusetts Secretary of the Commonwealth",
+  "title": "A Manual for the Use of the General Court, 1890 Representatives in Congress by town",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/amanualforusege13taylgoog/page/n{page}_w2000.jpg",
+    "item": "https://archive.org/details/amanualforusege13taylgoog"
+  },
+  "raw_source": "us.scans",
+  "unit_scheme": "town",
+  "unit_codes": {
+    "Gay Head": "25007"
+  },
+  "contests": {
+    "house5": {
+      "year": 1890,
+      "chamber": "house",
+      "day": "1890-11-04",
+      "special": false,
+      "state": "MA",
+      "district": 5
+    },
+    "house6": {
+      "year": 1890,
+      "chamber": "house",
+      "day": "1890-11-04",
+      "special": false,
+      "state": "MA",
+      "district": 6
+    },
+    "house7": {
+      "year": 1890,
+      "chamber": "house",
+      "day": "1890-11-04",
+      "special": false,
+      "state": "MA",
+      "district": 7
+    },
+    "house8": {
+      "year": 1890,
+      "chamber": "house",
+      "day": "1890-11-04",
+      "special": false,
+      "state": "MA",
+      "district": 8
+    },
+    "house1": {
+      "year": 1890,
+      "chamber": "house",
+      "day": "1890-11-04",
+      "special": false,
+      "state": "MA",
+      "district": 1
+    },
+    "house2": {
+      "year": 1890,
+      "chamber": "house",
+      "day": "1890-11-04",
+      "special": false,
+      "state": "MA",
+      "district": 2
+    },
+    "house3": {
+      "year": 1890,
+      "chamber": "house",
+      "day": "1890-11-04",
+      "special": false,
+      "state": "MA",
+      "district": 3
+    },
+    "house4": {
+      "year": 1890,
+      "chamber": "house",
+      "day": "1890-11-04",
+      "special": false,
+      "state": "MA",
+      "district": 4
+    },
+    "house9": {
+      "year": 1890,
+      "chamber": "house",
+      "day": "1890-11-04",
+      "special": false,
+      "state": "MA",
+      "district": 9
+    },
+    "house10": {
+      "year": 1890,
+      "chamber": "house",
+      "day": "1890-11-04",
+      "special": false,
+      "state": "MA",
+      "district": 10
+    },
+    "house11": {
+      "year": 1890,
+      "chamber": "house",
+      "day": "1890-11-04",
+      "special": false,
+      "state": "MA",
+      "district": 11
+    },
+    "house12": {
+      "year": 1890,
+      "chamber": "house",
+      "day": "1890-11-04",
+      "special": false,
+      "state": "MA",
+      "district": 12
+    }
+  },
+  "pages": [
+    {
+      "page": 327,
+      "id": "327-0",
+      "columns": [
+        {
+          "label": "Votes",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.142,
+        0.163,
+        0.869,
+        0.359
+      ],
+      "hint": "Read only the table headed 'District No. 5.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 327,
+      "id": "327-1",
+      "columns": [
+        {
+          "label": "Votes",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.142,
+        0.351,
+        0.869,
+        0.539
+      ],
+      "hint": "Read only the table headed 'District No. 6.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 327,
+      "id": "327-2",
+      "columns": [
+        {
+          "label": "Votes",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.142,
+        0.531,
+        0.869,
+        0.714
+      ],
+      "hint": "Read only the table headed 'District No. 7.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 327,
+      "id": "327-3",
+      "columns": [
+        {
+          "label": "Votes",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.142,
+        0.706,
+        0.869,
+        1.0
+      ],
+      "hint": "Read only the table headed 'District No. 8.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 328,
+      "id": "328-0",
+      "columns": [
+        {
+          "label": "Charles S. Randall of New Bedford, Republican.",
+          "contest": "house1",
+          "candidate": "Charles Sturtevant Randall"
+        },
+        {
+          "label": "Charles R. Codman of Barnstable, Democratic.",
+          "contest": "house1",
+          "candidate": "Charles R Codman"
+        },
+        {
+          "label": "John D. Flint of Fall River, Prohibition.",
+          "contest": "house1",
+          "candidate": "John D Flint"
+        },
+        {
+          "label": "All others.",
+          "contest": "house1",
+          "candidate": "Others"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.15,
+        0.199,
+        0.874,
+        0.884
+      ],
+      "hint": "Read only the table headed 'Congressional District No. 1.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1562
+      ]
+    },
+    {
+      "page": 329,
+      "id": "329-0",
+      "columns": [
+        {
+          "label": "Elijah A. Morse of Canton, Republican.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Bushrod Morse of Sharon, Democratic.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Thomas J. Lothrop of Taunton, Prohibition.",
+          "contest": "house2",
+          "candidate": "Thomas J Lothrop"
+        },
+        {
+          "label": "All others.",
+          "contest": "house2",
+          "candidate": "Others"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.13,
+        0.096,
+        0.851,
+        0.794
+      ],
+      "hint": "Read only the table headed 'Congressional District No. 2.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1891
+      ]
+    },
+    {
+      "page": 330,
+      "id": "330-0",
+      "columns": [
+        {
+          "label": "John F. Andrew of Boston, Democratic.",
+          "contest": "house3",
+          "candidate": "John Forrester Andrew"
+        },
+        {
+          "label": "Edward L. Pierce of Milton, Republican.",
+          "contest": "house3",
+          "candidate": "Edward L Pierce"
+        },
+        {
+          "label": "John W. Field of Boston, Prohibition.",
+          "contest": "house3",
+          "candidate": "John W Field"
+        },
+        {
+          "label": "All others.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.147,
+        0.106,
+        0.873,
+        0.463
+      ],
+      "hint": "Read only the table headed 'Congressional District No. 3.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 330,
+      "id": "330-1",
+      "columns": [
+        {
+          "label": "Joseph H. O'Neil of Boston, Democratic.",
+          "contest": "house4",
+          "candidate": "Joseph Henry O\u2019Neil"
+        },
+        {
+          "label": "Thomas Copeland of Boston, Republican.",
+          "contest": "house4",
+          "candidate": "Thomas Copeland"
+        },
+        {
+          "label": "George L. Dacy of Boston, Prohibition.",
+          "contest": "house4",
+          "candidate": "George L Dacy"
+        },
+        {
+          "label": "All others.",
+          "contest": "house4",
+          "candidate": "Others"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.147,
+        0.455,
+        0.876,
+        0.804
+      ],
+      "hint": "Read only the table headed 'Congressional District No. 4.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 331,
+      "id": "331-0",
+      "columns": [
+        {
+          "label": "Sherman Hoar of Waltham, Democratic.",
+          "contest": "house5",
+          "candidate": "Sherman Hoar"
+        },
+        {
+          "label": "James A. Fox of Cambridge, Republican.",
+          "contest": "house5",
+          "candidate": "James A Fox"
+        },
+        {
+          "label": "James H. Roberts of Cambridge, Prohibition.",
+          "contest": "house5",
+          "candidate": "James H Roberts"
+        },
+        {
+          "label": "All others.",
+          "contest": "house5",
+          "candidate": "Others"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.126,
+        0.106,
+        0.845,
+        0.461
+      ],
+      "hint": "Read only the table headed 'Congressional District No. 5.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 331,
+      "id": "331-1",
+      "columns": [
+        {
+          "label": "Henry Cabot Lodge of Nahant, Republican.",
+          "contest": "house6",
+          "candidate": "Henry Cabot Lodge"
+        },
+        {
+          "label": "William Everett of Quincy, Democratic.",
+          "contest": "house6",
+          "candidate": "William Everett"
+        },
+        {
+          "label": "Charles E. Kimball of Lynn, Prohibition.",
+          "contest": "house6",
+          "candidate": "Charles E Kimball"
+        },
+        {
+          "label": "All others.",
+          "contest": "house6",
+          "candidate": "Others"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.128,
+        0.453,
+        0.848,
+        0.888
+      ],
+      "hint": "Read only the table headed 'Congressional District No. 6.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 332,
+      "id": "332-0",
+      "columns": [
+        {
+          "label": "William Cogswell of Salem, Republican.",
+          "contest": "house7",
+          "candidate": "William Cogswell"
+        },
+        {
+          "label": "Jonas H. French of Gloucester, Democratic.",
+          "contest": "house7",
+          "candidate": "Jonas H French"
+        },
+        {
+          "label": "Jacob F. Spalding of Salisbury, Prohibition.",
+          "contest": "house7",
+          "candidate": "Jacob F Spalding"
+        },
+        {
+          "label": "All others.",
+          "contest": "house7",
+          "candidate": "Others"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.152,
+        0.096,
+        0.873,
+        0.658
+      ],
+      "hint": "Read only the table headed 'Congressional District No. 7.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2384
+      ]
+    },
+    {
+      "page": 332,
+      "id": "332-1",
+      "columns": [
+        {
+          "label": "Moses T. Stevens of North Andover, Democratic.",
+          "contest": "house8",
+          "candidate": "Moses Tyler Stevens"
+        },
+        {
+          "label": "Frederic T. Greenhalge of Lowell, Republican.",
+          "contest": "house8",
+          "candidate": "Frederic T Greenhalge"
+        },
+        {
+          "label": "Nathaniel A. Glidden of Chelmsford, Prohibition.",
+          "contest": "house8",
+          "candidate": "Nathaniel A Glidden"
+        },
+        {
+          "label": "All others.",
+          "contest": "house8",
+          "candidate": "Others"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.152,
+        0.65,
+        0.873,
+        1.0
+      ],
+      "hint": "Read only the table headed 'Congressional District No. 8.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 333,
+      "id": "333-0",
+      "columns": [
+        {
+          "label": "Moses T. Stevens of North Andover, Democratic.",
+          "contest": "house8",
+          "candidate": "Moses Tyler Stevens"
+        },
+        {
+          "label": "Frederic T. Greenhalge of Lowell, Republican.",
+          "contest": "house8",
+          "candidate": "Frederic T Greenhalge"
+        },
+        {
+          "label": "Nathaniel A. Glidden of Chelmsford, Prohibition.",
+          "contest": "house8",
+          "candidate": "Nathaniel A Glidden"
+        },
+        {
+          "label": "All others.",
+          "contest": "house8",
+          "candidate": "Others"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.132,
+        0.095,
+        0.853,
+        0.648
+      ],
+      "hint": "Read only the table headed 'Congressional District No. 8\u2014Concluded.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2351
+      ]
+    },
+    {
+      "page": 333,
+      "id": "333-1",
+      "columns": [
+        {
+          "label": "George Fred Williams of Dedham, Democratic.",
+          "contest": "house9",
+          "candidate": "George Fred Williams"
+        },
+        {
+          "label": "John W. Candler of Brookline, Republican.",
+          "contest": "house9",
+          "candidate": "John W Candler"
+        },
+        {
+          "label": "Melvin H. Walker of Westborough, Prohibition.",
+          "contest": "house9",
+          "candidate": "Melvin H Walker"
+        },
+        {
+          "label": "All others.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.13,
+        0.64,
+        0.853,
+        1.0
+      ],
+      "hint": "Read only the table headed 'Congressional District No. 9.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 334,
+      "id": "334-0",
+      "columns": [
+        {
+          "label": "George Fred Williams of Dedham, Democratic.",
+          "contest": "house9",
+          "candidate": "George Fred Williams"
+        },
+        {
+          "label": "John W. Candler of Brookline, Republican.",
+          "contest": "house9",
+          "candidate": "John W Candler"
+        },
+        {
+          "label": "Melvin H. Walker of Westborough, Prohibition.",
+          "contest": "house9",
+          "candidate": "Melvin H Walker"
+        },
+        {
+          "label": "All others.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.141,
+        0.128,
+        0.86,
+        0.761
+      ],
+      "hint": "Read only the table headed 'Congressional District No. 9 \u2014 Concluded.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.158
+      ]
+    },
+    {
+      "page": 335,
+      "id": "335-0",
+      "columns": [
+        {
+          "label": "Joseph H. Walker of Worcester, Republican.",
+          "contest": "house10",
+          "candidate": "Joseph Henry Walker"
+        },
+        {
+          "label": "Charles B. Pratt of Worcester, Democratic.",
+          "contest": "house10",
+          "candidate": "Charles B Pratt"
+        },
+        {
+          "label": "Herbert M. Small of Templeton, Prohibition.",
+          "contest": "house10",
+          "candidate": "Herbert M Small"
+        },
+        {
+          "label": "All others.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.144,
+        0.106,
+        0.866,
+        0.909
+      ],
+      "hint": "Read only the table headed 'Congressional District No. 10.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1619
+      ]
+    },
+    {
+      "page": 336,
+      "id": "336-0",
+      "columns": [
+        {
+          "label": "Frederic S. Coolidge of Ashburnham, Democratic.",
+          "contest": "house11",
+          "candidate": "Frederick Spaulding Coolidge"
+        },
+        {
+          "label": "Timothy G. Spaulding of Northampton, Republican.",
+          "contest": "house11",
+          "candidate": "Timothy G Spaulding"
+        },
+        {
+          "label": "Myron P. Walker of Belchertown, Republican Independent N.P.",
+          "contest": "house11",
+          "candidate": "Myron P Walker"
+        },
+        {
+          "label": "Henry C. Smith of Williamsburg, Prohibition.",
+          "contest": "house11",
+          "candidate": "Henry C Smith"
+        },
+        {
+          "label": "All others.",
+          "contest": "house11",
+          "candidate": "Others"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.13,
+        0.201,
+        0.853,
+        1.0
+      ],
+      "hint": "Read only the table headed 'Congressional District No. 11.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0676
+      ]
+    },
+    {
+      "page": 337,
+      "id": "337-0",
+      "columns": [
+        {
+          "label": "Frederic S. Coolidge of Ashburnham, Democratic.",
+          "contest": "house11",
+          "candidate": "Frederick Spaulding Coolidge"
+        },
+        {
+          "label": "Timothy G. Spaulding of Northampton, Republican.",
+          "contest": "house11",
+          "candidate": "Timothy G Spaulding"
+        },
+        {
+          "label": "Myron P. Walker of Belchertown, Republican Independent N. P.",
+          "contest": "house11",
+          "candidate": "Myron P Walker"
+        },
+        {
+          "label": "Henry C. Smith of Williamsburg, Prohibition.",
+          "contest": "house11",
+          "candidate": "Henry C Smith"
+        },
+        {
+          "label": "All others.",
+          "contest": "house11",
+          "candidate": "Others"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.152,
+        0.1,
+        0.873,
+        0.55
+      ],
+      "hint": "Read only the table headed 'Congressional District No 11\u2014Concluded.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.3111
+      ]
+    },
+    {
+      "page": 337,
+      "id": "337-1",
+      "columns": [
+        {
+          "label": "John C. Crosby of Pittsfield, Democratic.",
+          "contest": "house12",
+          "candidate": "John Crawford Crosby"
+        },
+        {
+          "label": "Francis W. Rockwell of Pittsfield, Republican.",
+          "contest": "house12",
+          "candidate": "Francis W Rockwell"
+        },
+        {
+          "label": "John Bascom of Williamstown, Prohibition.",
+          "contest": "house12",
+          "candidate": "John Bascom"
+        },
+        {
+          "label": "All others.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.152,
+        0.542,
+        0.873,
+        1.0
+      ],
+      "hint": "Read only the table headed 'Congressional District No. 12.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.3515
+      ]
+    },
+    {
+      "page": 338,
+      "id": "338-0",
+      "columns": [
+        {
+          "label": "John C. Crosby of Pittsfield, Democratic.",
+          "contest": "house12",
+          "candidate": "John Crawford Crosby"
+        },
+        {
+          "label": "Francis W. Rockwell of Pittsfield, Republican.",
+          "contest": "house12",
+          "candidate": "Francis W Rockwell"
+        },
+        {
+          "label": "John Bascom of Williamstown, Prohibition.",
+          "contest": "house12",
+          "candidate": "John Bascom"
+        },
+        {
+          "label": "All others.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.131,
+        0.1,
+        0.85,
+        0.824
+      ],
+      "hint": "Read only the table headed 'Congressional District No. 12 \u2014 Concluded.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2003
+      ]
+    }
+  ]
+}

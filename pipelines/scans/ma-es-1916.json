@@ -1,0 +1,704 @@
+{
+  "polity": "US-MA",
+  "publisher": "Massachusetts Secretary of the Commonwealth",
+  "title": "A Manual for the Use of the General Court, 1916 Representatives in Congress by town",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/amanualforusege04taylgoog/page/n{page}_w2000.jpg",
+    "item": "https://archive.org/details/amanualforusege04taylgoog"
+  },
+  "raw_source": "us.scans",
+  "unit_scheme": "town",
+  "unit_codes": {
+    "Gay Head": "25007"
+  },
+  "contests": {
+    "house3": {
+      "year": 1916,
+      "chamber": "house",
+      "day": "1916-11-07",
+      "special": false,
+      "state": "MA",
+      "district": 3
+    },
+    "house4": {
+      "year": 1916,
+      "chamber": "house",
+      "day": "1916-11-07",
+      "special": false,
+      "state": "MA",
+      "district": 4
+    },
+    "house5": {
+      "year": 1916,
+      "chamber": "house",
+      "day": "1916-11-07",
+      "special": false,
+      "state": "MA",
+      "district": 5
+    },
+    "house6": {
+      "year": 1916,
+      "chamber": "house",
+      "day": "1916-11-07",
+      "special": false,
+      "state": "MA",
+      "district": 6
+    },
+    "house7": {
+      "year": 1916,
+      "chamber": "house",
+      "day": "1916-11-07",
+      "special": false,
+      "state": "MA",
+      "district": 7
+    },
+    "house8": {
+      "year": 1916,
+      "chamber": "house",
+      "day": "1916-11-07",
+      "special": false,
+      "state": "MA",
+      "district": 8
+    },
+    "house9": {
+      "year": 1916,
+      "chamber": "house",
+      "day": "1916-11-07",
+      "special": false,
+      "state": "MA",
+      "district": 9
+    },
+    "house10": {
+      "year": 1916,
+      "chamber": "house",
+      "day": "1916-11-07",
+      "special": false,
+      "state": "MA",
+      "district": 10
+    },
+    "house11": {
+      "year": 1916,
+      "chamber": "house",
+      "day": "1916-11-07",
+      "special": false,
+      "state": "MA",
+      "district": 11
+    },
+    "house12": {
+      "year": 1916,
+      "chamber": "house",
+      "day": "1916-11-07",
+      "special": false,
+      "state": "MA",
+      "district": 12
+    },
+    "house13": {
+      "year": 1916,
+      "chamber": "house",
+      "day": "1916-11-07",
+      "special": false,
+      "state": "MA",
+      "district": 13
+    },
+    "house14": {
+      "year": 1916,
+      "chamber": "house",
+      "day": "1916-11-07",
+      "special": false,
+      "state": "MA",
+      "district": 14
+    },
+    "house15": {
+      "year": 1916,
+      "chamber": "house",
+      "day": "1916-11-07",
+      "special": false,
+      "state": "MA",
+      "district": 15
+    },
+    "house16": {
+      "year": 1916,
+      "chamber": "house",
+      "day": "1916-11-07",
+      "special": false,
+      "state": "MA",
+      "district": 16
+    }
+  },
+  "pages": [
+    {
+      "page": 449,
+      "id": "449-0",
+      "columns": [
+        {
+          "label": "Calvin D. Paige of Southbridge, Republican.",
+          "contest": "house3",
+          "candidate": "Calvin DeWitt Paige"
+        },
+        {
+          "label": "Michael A. Scanlon of Clinton, Democratic.",
+          "contest": "house3",
+          "candidate": "Michael A Scanlon"
+        },
+        {
+          "label": "All Others.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.142,
+        0.111,
+        0.865,
+        1.0
+      ],
+      "hint": "Read only the table headed 'CONGRESSIONAL DISTRICT No. 3.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1924
+      ]
+    },
+    {
+      "page": 450,
+      "id": "450-0",
+      "columns": [
+        {
+          "label": "Calvin D. Paige of Southbridge, Republican.",
+          "contest": "house3",
+          "candidate": "Calvin DeWitt Paige"
+        },
+        {
+          "label": "Michael A. Scanlon of Clinton, Democratic.",
+          "contest": "house3",
+          "candidate": "Michael A Scanlon"
+        },
+        {
+          "label": "All Others.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.14,
+        0.135,
+        0.866,
+        0.541
+      ],
+      "hint": "Read only the table headed 'CONGRESSIONAL DISTRICT No. 3 \u2014 Concluded.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 451,
+      "id": "451-0",
+      "columns": [
+        {
+          "label": "John H. Hunt of Worcester, Democratic.",
+          "contest": "house4",
+          "candidate": "John H Hunt"
+        },
+        {
+          "label": "Richard D. Murphy of Worcester, Prohibition.",
+          "contest": "house4",
+          "candidate": "Richard D Murphy"
+        },
+        {
+          "label": "Samuel E. Winslow of Worcester, Republican.",
+          "contest": "house4",
+          "candidate": "Samuel Ellsworth Winslow"
+        },
+        {
+          "label": "All Others.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.142,
+        0.135,
+        0.865,
+        0.629
+      ],
+      "hint": "Read only the table headed 'CONGRESSIONAL DISTRICT No. 4.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.3441
+      ]
+    },
+    {
+      "page": 453,
+      "id": "453-0",
+      "columns": [
+        {
+          "label": "John H. Hunt of Worcester, Democratic.",
+          "contest": "house4",
+          "candidate": "John H Hunt"
+        },
+        {
+          "label": "Richard D. Murphy of Worcester, Prohibition.",
+          "contest": "house4",
+          "candidate": "Richard D Murphy"
+        },
+        {
+          "label": "Samuel E. Winslow of Worcester, Republican.",
+          "contest": "house4",
+          "candidate": "Samuel Ellsworth Winslow"
+        },
+        {
+          "label": "All Others.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.127,
+        0.146,
+        0.871,
+        0.63
+      ],
+      "hint": "Read only the table headed 'CONGRESSIONAL DISTRICT No. 4.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.3326
+      ]
+    },
+    {
+      "page": 454,
+      "id": "454-0",
+      "columns": [
+        {
+          "label": "Roger Sherman Hoar of Concord, Democratic.",
+          "contest": "house5",
+          "candidate": "Roger Sherman Hoar"
+        },
+        {
+          "label": "John Jacob Rogers of Lowell, Republican.",
+          "contest": "house5",
+          "candidate": "John Jacob Rogers"
+        },
+        {
+          "label": "All Others.",
+          "contest": "house5",
+          "candidate": "Others"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.145,
+        0.123,
+        0.87,
+        0.801
+      ],
+      "hint": "Read only the table headed 'CONGRESSIONAL DISTRICT No. 5.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.236
+      ]
+    },
+    {
+      "page": 455,
+      "id": "455-0",
+      "columns": [
+        {
+          "label": "Charles W. Fitzgerald of Beverly, Socialist.",
+          "contest": "house6",
+          "candidate": "Charles W Fitzgerald"
+        },
+        {
+          "label": "Augustus P. Gardner of Hamilton, Republican.",
+          "contest": "house6",
+          "candidate": "Augustus Peabody Gardner"
+        },
+        {
+          "label": "Arthur Howard of Salem, Democratic.",
+          "contest": "house6",
+          "candidate": "Arthur Howard"
+        },
+        {
+          "label": "All Others.",
+          "contest": "house6",
+          "candidate": "Others"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.121,
+        0.133,
+        0.844,
+        0.693
+      ],
+      "hint": "Read only the table headed 'CONGRESSIONAL DISTRICT No. 6.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2982
+      ]
+    },
+    {
+      "page": 456,
+      "id": "456-0",
+      "columns": [
+        {
+          "label": "Charles Neal Barney of Lynn, Republican.",
+          "contest": "house7",
+          "candidate": "Charles Neal Barney"
+        },
+        {
+          "label": "Samuel Bramhall of Lawrence, Socialist.",
+          "contest": "house7",
+          "candidate": "Samuel Bramhall"
+        },
+        {
+          "label": "Freeman H. Newhall of Lynn, Prohibition.",
+          "contest": "house7",
+          "candidate": "Freeman H Newhall"
+        },
+        {
+          "label": "Michael F. Phelan of Lynn, Democratic.",
+          "contest": "house7",
+          "candidate": "Michael Francis Phelan"
+        },
+        {
+          "label": "All Others.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.146,
+        0.218,
+        0.871,
+        0.807
+      ],
+      "hint": "Read only the table headed 'CONGRESSIONAL DISTRICT No. 7.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.4177
+      ]
+    },
+    {
+      "page": 457,
+      "id": "457-0",
+      "columns": [
+        {
+          "label": "Frederick W. Dallinger of Cambridge, Republican.",
+          "contest": "house8",
+          "candidate": "Frederick William Dallinger"
+        },
+        {
+          "label": "Frederick S. Deitrick of Cambridge, Democratic.",
+          "contest": "house8",
+          "candidate": "Frederick S Deitrick"
+        },
+        {
+          "label": "All Others.",
+          "contest": "house8",
+          "candidate": "Others"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.125,
+        0.147,
+        0.846,
+        0.543
+      ],
+      "hint": "Read only the table headed 'CONGRESSIONAL DISTRICT No. 8.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 457,
+      "id": "457-1",
+      "columns": [
+        {
+          "label": "Alvan T. Fuller of Malden, Independent.",
+          "contest": "house9",
+          "candidate": "Alvan Tufts Fuller"
+        },
+        {
+          "label": "Ernest W. Roberts of Chelsea, Republican.",
+          "contest": "house9",
+          "candidate": "Ernest W Roberts"
+        },
+        {
+          "label": "All Others.",
+          "contest": "house9",
+          "candidate": "Others"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.125,
+        0.535,
+        0.846,
+        0.897
+      ],
+      "hint": "Read only the table headed 'CONGRESSIONAL DISTRICT No. 9.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 458,
+      "id": "458-0",
+      "columns": [
+        {
+          "label": "James L. Hourihan of Boston, Republican.",
+          "contest": "house10",
+          "candidate": "James L Hourihan"
+        },
+        {
+          "label": "Peter F. Tague of Boston, Democratic.",
+          "contest": "house10",
+          "candidate": "Peter Francis Tague"
+        },
+        {
+          "label": "All Others.",
+          "contest": "house10",
+          "candidate": "Others"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.152,
+        0.136,
+        0.878,
+        0.38
+      ],
+      "hint": "Read only the table headed 'CONGRESSIONAL DISTRICT No. 10.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 458,
+      "id": "458-1",
+      "columns": [
+        {
+          "label": "Francis J. Hornan of Boston, Democratic.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "George Holden Tinkham of Boston, Republican.",
+          "contest": "house11",
+          "candidate": "George Holden Tinkham"
+        },
+        {
+          "label": "All Others.",
+          "contest": "house11",
+          "candidate": "Others"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.148,
+        0.372,
+        0.873,
+        0.631
+      ],
+      "hint": "Read only the table headed 'CONGRESSIONAL DISTRICT No. 11.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 458,
+      "id": "458-2",
+      "columns": [
+        {
+          "label": "James A. Gallivan of Boston, Democratic.",
+          "contest": "house12",
+          "candidate": "James Ambrose Gallivan"
+        },
+        {
+          "label": "Charles H. S. Robinson of Boston, Republican.",
+          "contest": "house12",
+          "candidate": "Charles H S Robinson"
+        },
+        {
+          "label": "All Others.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.144,
+        0.623,
+        0.873,
+        0.894
+      ],
+      "hint": "Read only the table headed 'CONGRESSIONAL DISTRICT No. 12.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 459,
+      "id": "459-0",
+      "columns": [
+        {
+          "label": "William H. Carter of Needham, Republican.",
+          "contest": "house13",
+          "candidate": "William Henry Carter"
+        },
+        {
+          "label": "William H. Murphy of Marlborough, Democratic.",
+          "contest": "house13",
+          "candidate": "William H Murphy"
+        },
+        {
+          "label": "All Others.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.123,
+        0.169,
+        0.846,
+        0.761
+      ],
+      "hint": "Read only the table headed 'CONGRESSIONAL DISTRICT No. 13.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2517
+      ]
+    },
+    {
+      "page": 460,
+      "id": "460-0",
+      "columns": [
+        {
+          "label": "Henry L. Kincaide of Quincy, Republican.",
+          "contest": "house14",
+          "candidate": "Henry L Kincaide"
+        },
+        {
+          "label": "John McCarty of Abington, Socialist.",
+          "contest": "house14",
+          "candidate": "John McCarty"
+        },
+        {
+          "label": "Richard Olney, 2nd of Dedham, Democratic.",
+          "contest": "house14",
+          "candidate": "Richard Olney"
+        },
+        {
+          "label": "All Others.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.154,
+        0.144,
+        0.88,
+        0.693
+      ],
+      "hint": "Read only the table headed 'CONGRESSIONAL DISTRICT No. 14.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2987
+      ]
+    },
+    {
+      "page": 461,
+      "id": "461-0",
+      "columns": [
+        {
+          "label": "Arthur J. B. Carter of Fall River, Democratic.",
+          "contest": "house15",
+          "candidate": "Arthur J B Cartier"
+        },
+        {
+          "label": "William S. Greene of Fall River, Republican.",
+          "contest": "house15",
+          "candidate": "William Stedman Greene"
+        },
+        {
+          "label": "All Others.",
+          "contest": "house15",
+          "candidate": "Others"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.167,
+        0.122,
+        0.89,
+        0.604
+      ],
+      "hint": "Read only the table headed 'CONGRESSIONAL DISTRICT No. 15.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.3548
+      ]
+    },
+    {
+      "page": 462,
+      "id": "462-0",
+      "columns": [
+        {
+          "label": "Ralph W. Crosby of Barnstable, Democratic.",
+          "contest": "house16",
+          "candidate": "Ralph W Crosby"
+        },
+        {
+          "label": "Joseph Walsh of New Bedford, Republican.",
+          "contest": "house16",
+          "candidate": "Joseph Walsh"
+        },
+        {
+          "label": "All Others.",
+          "contest": "house16",
+          "candidate": "Others"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.127,
+        0.111,
+        0.846,
+        1.0
+      ],
+      "hint": "Read only the table headed 'CONGRESSIONAL DISTRICT No. 16.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1935
+      ]
+    },
+    {
+      "page": 463,
+      "id": "463-0",
+      "columns": [
+        {
+          "label": "Ralph W. Crosby of Barnstable, Democratic.",
+          "contest": "house16",
+          "candidate": "Ralph W Crosby"
+        },
+        {
+          "label": "Joseph Walsh of New Bedford, Republican.",
+          "contest": "house16",
+          "candidate": "Joseph Walsh"
+        },
+        {
+          "label": "All Others.",
+          "contest": "house16",
+          "candidate": "Others"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.129,
+        0.148,
+        0.846,
+        0.487
+      ],
+      "hint": "Read only the table headed 'CONGRESSIONAL DISTRICT No. 16 \u2014 Concluded.'; ignore any other table visible in the image."
+    }
+  ]
+}
