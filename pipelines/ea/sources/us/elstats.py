@@ -212,13 +212,17 @@ def parse() -> None:
                 names[f"{plain(text)}city"] = code
             names.setdefault(plain(text), code)
         days: dict[tuple[str, str, int, int | None], list[date]] = {}
+        months: dict[tuple[str, str, int, int, int | None], date] = {}
         for (value,) in conn.execute(
-            "select value from external_id where scheme = 'us.contest' and value ~ '^\\d{4}-\\d\\d-\\d\\d:(CO|CT|VA|VT):'"
+            "select value from external_id where scheme = 'us.contest' and value ~ '^\\d{4}-\\d\\d(-\\d\\d)?:(CO|CT|VA|VT):'"
         ).fetchall():
             held, state, chamber, *rest = value.split(":")
             if chamber in ("house", "senate", "president") and (not rest or (len(rest) == 1 and rest[0].isdigit())):
-                day = date.fromisoformat(held)
-                days.setdefault((state, chamber, day.year, int(rest[0]) if rest else None), []).append(day)
+                day = date.fromisoformat(held if len(held) > 7 else f"{held}-01")
+                district = int(rest[0]) if rest else None
+                months.setdefault((state, chamber, day.year, day.month, district), day)
+                if len(held) > 7:
+                    days.setdefault((state, chamber, day.year, district), []).append(day)
     with zipfile.ZipFile(raw.cached(SOURCE, GAZETTEER).path) as archive:
         gazetteer = pl.read_csv(
             io.BytesIO(archive.read(archive.namelist()[0])), separator="\t", infer_schema=False
@@ -278,6 +282,7 @@ def parse() -> None:
                 )
                 .select(
                     year=pl.col("election_date").str.slice(0, 4).cast(pl.Int32),
+                    month=pl.col("election_date").str.slice(5, 2).cast(pl.Int8),
                     chamber="chamber",
                     day=pl.when(pl.col("election_date").str.slice(5, 2) == "11")
                     .then(
@@ -383,9 +388,15 @@ def parse() -> None:
     frame = frame.with_columns(
         day=pl.when((pl.col("year") < FIRST) & (pl.col("state") != "MA"))
         .then(
-            pl.struct("state", "chamber", "year", "district").map_elements(
+            pl.struct("state", "chamber", "year", "month", "district").map_elements(
                 lambda row: (
-                    snapped.get((row["state"], row["chamber"], row["year"], row["district"]))
+                    months.get((row["state"], row["chamber"], row["year"], row["month"], row["district"]))
+                    or (
+                        months.get((row["state"], row["chamber"], row["year"], row["month"], 0))
+                        if row["district"] is None
+                        else None
+                    )
+                    or snapped.get((row["state"], row["chamber"], row["year"], row["district"]))
                     or (
                         snapped.get((row["state"], row["chamber"], row["year"], 0)) if row["district"] is None else None
                     )
