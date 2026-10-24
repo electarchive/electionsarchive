@@ -974,7 +974,7 @@ def attach(
         if "pool" in picked.values():
             generic = [option for option, kind, label, _, _ in known if kind == "write_in" and label in GENERIC]
             pool = generic[0] if len(generic) == 1 else cs.key("us.option", f"{key}:write_in:{tag.removeprefix('us.')}")
-            if pool in cs.minted:
+            if pool in cs.minted and all(row["id"] != pool for row in cs.rows.get("contest_option", [])):
                 cs.add("contest_option", id=pool, contest_id=contest, kind="write_in", ballot_label="Write-ins")
             picked = {candidate: str(pool) if option == "pool" else option for candidate, option in picked.items()}
         inherited = False

@@ -18,7 +18,7 @@ from ea.sources.us.openelections import HOUSE, SENATE
 from ea.store import DATA, connect
 
 SOURCE = "us.elstats"
-VERSION = "7"
+VERSION = "8"
 PARSED = DATA / "parsed" / SOURCE
 FIRST, LAST = 1982, 2015
 PRIMARIES = 2022
@@ -41,7 +41,8 @@ HELD = {"NH": "No terms stated; held out of releases while NHPR's permission to 
 MA_PUBLISHER = "Massachusetts Secretary of the Commonwealth"
 TITLE = "Election statistics archive"
 MASSACHUSETTS = "https://electionstats.state.ma.us/elections/"
-MA_OFFICES = {5: "house", 6: "senate"}
+MA_OFFICES = {5: "house", 6: "senate", 1: "president"}
+MA_LAST = {1: 2024}
 MA_ROW = re.compile(
     r'id="election-id-(\d+)".*?<td[^>]*>(\d{4})</td>\s*<td[^>]*>[^<]*</td>\s*<td[^>]*>([^<]*)</td>\s*<td[^>]*>([^<]*)</td>',
     re.DOTALL,
@@ -165,7 +166,7 @@ def searched(tenant: str, address: str, source: str = SOURCE) -> pl.DataFrame:
 
 
 def ma_search(office: int) -> str:
-    return f"{MASSACHUSETTS}search/year_from:{MA_FIRST}/year_to:{LAST}/office_id:{office}/stage:General"
+    return f"{MASSACHUSETTS}search/year_from:{MA_FIRST}/year_to:{MA_LAST.get(office, LAST)}/office_id:{office}/stage:General"
 
 
 def ma_primary_search(office: int, year: int) -> str:
@@ -188,7 +189,7 @@ def fetch() -> None:
         listing = raw.fetch(SOURCE, ma_search(office), suffix=".html").path.read_text()
         for election, *_ in MA_ROW.findall(listing):
             raw.fetch(SOURCE, f"{MASSACHUSETTS}download/{election}/precincts_include:0/", suffix=".csv")
-        for year in MA_PRIMARIES:
+        for year in MA_PRIMARIES if office in (5, 6) else []:
             listing = raw.fetch(SOURCE, ma_primary_search(office, year), suffix=".html").path.read_text()
             for election, *_ in ma_primary_rows(listing):
                 raw.fetch(SOURCE, f"{MASSACHUSETTS}download/{election}/precincts_include:0/", suffix=".csv")
@@ -228,6 +229,7 @@ def parse() -> None:
             io.BytesIO(archive.read(archive.namelist()[0])), separator="\t", infer_schema=False
         ).filter(pl.col("USPS").is_in([*TENANTS, "MA"]))
     towns: dict[str, dict[str, str]] = {}
+    places: dict[str, str] = {}
     for state, geoid, name in (
         gazetteer.sort(pl.col("NAME").str.contains(r" (gore|grant|location|purchase|UT)$"))
         .select("USPS", "GEOID", "NAME")
@@ -236,6 +238,9 @@ def parse() -> None:
         names = towns.setdefault(state, {})
         names.setdefault(plain(name), geoid[:5])
         names.setdefault(plain(re.sub(SUFFIXES, "", name.lower())), geoid[:5])
+        if state == "MA":
+            places.setdefault(plain(name), geoid)
+            places.setdefault(plain(re.sub(SUFFIXES, "", name.lower())), geoid)
     for (state, name), code in FORMER.items():
         counties.setdefault(state, {})[name] = code
         towns.setdefault(state, {})[name] = code
@@ -340,7 +345,7 @@ def parse() -> None:
             )
     for office, chamber in MA_OFFICES.items():
         entries = MA_ROW.findall(raw.cached(SOURCE, ma_search(office)).path.read_text())
-        for primary_year in MA_PRIMARIES:
+        for primary_year in MA_PRIMARIES if office in (5, 6) else []:
             entries += ma_primary_rows(raw.cached(SOURCE, ma_primary_search(office, primary_year)).path.read_text())
         for election, year, district, stage in entries:
             if "Special" in stage:
@@ -375,7 +380,10 @@ def parse() -> None:
                     .map_elements(plain, return_dtype=pl.String)
                     .replace_strict(towns["MA"], default=None),
                     county=pl.concat_str(pl.lit("MA:"), "City/Town"),
-                    candidate=pl.col("name").str.to_uppercase().str.strip_chars(),
+                    town=pl.col("City/Town")
+                    .map_elements(plain, return_dtype=pl.String)
+                    .replace_strict(places, default=None),
+                    candidate=pl.col("name").str.to_uppercase().str.replace(r"/.*$", "").str.strip_chars(),
                     votes=pl.col("value").str.replace_all(",", "").cast(pl.Int64, strict=False),
                 )
             )
@@ -410,9 +418,8 @@ def parse() -> None:
     if lost.height:
         print(lost.group_by("county").agg(pl.col("votes").sum()).sort("votes", descending=True).head(40))
     PARSED.mkdir(parents=True, exist_ok=True)
-    (
-        frame.filter(pl.col("code").is_not_null())
-        .with_columns(
+    frame = (
+        frame.with_columns(
             measure=pl.col("candidate").replace_strict(
                 {**medsl.PSEUDO, "BLANK/VOID/SCATTERING": 0}, default=1, return_dtype=pl.Int16
             ),
@@ -420,10 +427,21 @@ def parse() -> None:
         )
         .with_columns(candidate=pl.when("writein").then(pl.lit("WRITE-INS")).otherwise("candidate"))
         .filter(pl.col("measure") > 0)
-        .group_by("year", "chamber", "day", "special", "state", "district", "code", "candidate", "measure")
+    )
+    grains = ("year", "chamber", "day", "special", "state", "district")
+    (
+        frame.filter(pl.col("code").is_not_null())
+        .group_by(*grains, "code", "candidate", "measure")
         .agg(pl.col("writein").any(), pl.col("votes").sum())
         .with_columns(kind=pl.lit("county"), source="state")
         .write_parquet(PARSED / "counties.parquet")
+    )
+    (
+        frame.filter((pl.col("chamber") == "president") & pl.col("town").is_not_null())
+        .group_by(*grains, pl.col("town").alias("code"), "candidate", "measure")
+        .agg(pl.col("writein").any(), pl.col("votes").sum())
+        .with_columns(kind=pl.lit("town"), source="state")
+        .write_parquet(PARSED / "towns.parquet")
     )
 
 
@@ -473,7 +491,7 @@ def emit() -> Path:
                 cs.artifact(
                     raw.cached(SOURCE, f"{MASSACHUSETTS}download/{election}/precincts_include:0/"), sources["MA"]
                 )
-            for year in MA_PRIMARIES:
+            for year in MA_PRIMARIES if office in (5, 6) else []:
                 listing = raw.cached(SOURCE, ma_primary_search(office, year))
                 cs.artifact(listing, sources["MA"])
                 for election, *_ in ma_primary_rows(listing.path.read_text()):
@@ -494,4 +512,5 @@ def emit() -> Path:
             )
         cs.artifact(raw.cached(SOURCE, GAZETTEER), gazetteer)
         medsl.attach(cs, conn, frame, sources)
+        medsl.attach(cs, conn, pl.read_parquet(PARSED / "towns.parquet"), sources, grain="town")
         return cs.write()
