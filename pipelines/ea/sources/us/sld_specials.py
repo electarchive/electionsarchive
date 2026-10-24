@@ -1653,14 +1653,18 @@ def emit() -> Path:
                 is_default=True,
                 completeness=1,
             )
-            total = int(group["votes"].sum())
+            remainder = group["candidate"].is_in(["Undervotes", "Overvotes"]).fill_null(False)
+            total = int(group.filter(~remainder)["votes"].sum())
             ranked: list[tuple[int, UUID]] = []
-            values: list[tuple[UUID, int]] = []
-            for (candidate,), rows in group.group_by("candidate", maintain_order=True):
+            values: list[tuple[UUID | None, int, int]] = [
+                (None, 6 if candidate == "Undervotes" else 5, int(votes))
+                for candidate, votes in group.filter(remainder).select("candidate", "votes").iter_rows()
+            ]
+            for (candidate,), rows in group.filter(~remainder).group_by("candidate", maintain_order=True):
                 if candidate is None:
                     option = cs.key("us.option", f"{contest_key}:write-ins")
                     cs.add("contest_option", id=option, contest_id=contest, kind="write_in", ballot_label="Write-ins")
-                    values.append((option, int(rows["votes"].sum())))
+                    values.append((option, 1, int(rows["votes"].sum())))
                     continue
                 assert isinstance(candidate, str)
                 lines_ = list(rows.select("party", "votes").iter_rows())
@@ -1713,9 +1717,9 @@ def emit() -> Path:
                             party_id=party,
                             ballot_label=f"{candidate} ({_title((party_key or 'no party').split(':')[-1].replace('-', ' '))})",
                         )
-                        values.append((line, votes))
+                        values.append((line, 1, votes))
                 else:
-                    values.append((option, lines_[0][1]))
+                    values.append((option, 1, lines_[0][1]))
                 ranked.append((int(rows["votes"].sum()), option))
             ranked.sort(key=lambda pair: -pair[0])
             if len(ranked) > seats and ranked[seats - 1][0] == ranked[seats][0]:
@@ -1726,14 +1730,14 @@ def emit() -> Path:
             else:
                 for _, option in ranked[:seats]:
                     cs.add("outcome", result_set_id=result_set, option_id=option, kind="elected", seats=1)
-            for option, votes in values:
+            for option, measure, votes in values:
                 cs.add(
                     "result_value",
                     result_set_id=result_set,
                     unit_id=unit,
                     option_id=option,
                     channel=0,
-                    measure=1,
+                    measure=measure,
                     count_round=0,
                     flags=0,
                     value=votes,
