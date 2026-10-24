@@ -966,6 +966,7 @@ def emit(source: ModuleType) -> Path:
             if not fresh and not ties:
                 continue
             if previous is not None and not conn.execute("select 1 from result_set where id = %s", [previous]).fetchone():
+                cs.rows["external_id"] = [row for row in cs.rows["external_id"] if row["entity_id"] != previous]
                 previous = None
             for id, status in ((previous, "superseded"), (result_set, "active")):
                 if id is not None and (fresh or id == result_set):
