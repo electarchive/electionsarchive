@@ -40,6 +40,30 @@ SELECT DISTINCT ?d ?cognome ?nome ?collegio ?inizio ?fine ?tipo ?nota ?lista WHE
 }
 """
 MANDATES = "https://dati.camera.it/sparql?" + urlencode({"query": QUERY, "format": "application/sparql-results+json"})
+GROUPS_QUERY = """
+PREFIX ocd: <http://dati.camera.it/ocd/>
+PREFIX dc: <http://purl.org/dc/elements/1.1/>
+SELECT DISTINCT ?d ?titolo ?inizio WHERE {
+  ?d a ocd:deputato ; ocd:rif_leg <http://dati.camera.it/ocd/legislatura.rdf/repubblica_19> ; ocd:aderisce ?a .
+  ?a ocd:rif_gruppoParlamentare ?g ; ocd:startDate ?inizio . ?g dc:title ?titolo
+}
+"""
+GROUPS = "https://dati.camera.it/sparql?" + urlencode({"query": GROUPS_QUERY, "format": "application/sparql-results+json"})
+GROUP_LISTS = {
+    "FRATELLI D'ITALIA": "FRATELLI D'ITALIA CON GIORGIA MELONI",
+    "PARTITO DEMOCRATICO": "PARTITO DEMOCRATICO - ITALIA DEMOCRATICA E PROGRESSISTA",
+    "LEGA - SALVINI PREMIER": "LEGA PER SALVINI PREMIER",
+    "MOVIMENTO 5 STELLE": "MOVIMENTO 5 STELLE",
+    "FORZA ITALIA": "FORZA ITALIA",
+    "AZIONE-": "AZIONE - ITALIA VIVA - CALENDA",
+    "ALLEANZA VERDI E SINISTRA": "ALLEANZA VERDI E SINISTRA",
+    "NOI MODERATI": "NOI MODERATI/LUPI - TOTI - BRUGNARO - UDC",
+}
+GROUPS_SETTLED = "20221130"
+MIXED_LISTS = {
+    "MAGI:RICCARDO:1976-08-07": "+EUROPA",
+    "DELLAVEDOVA:BENEDETTO:1962-04-03": "+EUROPA",
+}
 GENERAL = date(2022, 9, 25)
 VOTING = (date(2025, 6, 8), date(2025, 6, 9))
 FOUNDING_MEMBER = date(1958, 1, 1)
@@ -209,6 +233,7 @@ def fetch() -> None:
     raw.fetch(SOURCE, REFERENDUM, suffix=".zip")
     raw.fetch(SOURCE, ISTAT, suffix=".csv")
     raw.fetch(SOURCE, MANDATES, suffix=".json")
+    raw.fetch(SOURCE, GROUPS, suffix=".json")
     raw.fetch(SOURCE, TRASPARENZA, suffix=".json")
 
 
@@ -663,6 +688,22 @@ def parse() -> None:
     pl.DataFrame(aliases, schema=["alias", "person"], orient="row").write_parquet(PARSED / "aliases.parquet")
     pl.DataFrame(annulments).write_parquet(PARSED / "annulments.parquet")
     pl.DataFrame(tenures, infer_schema_length=None).write_parquet(PARSED / "tenures.parquet")
+    settled_group: dict[str, tuple[str, str]] = {}
+    for binding in json.loads(raw.cached(SOURCE, GROUPS).path.read_text())["results"]["bindings"]:
+        deputy = binding["d"]["value"].rsplit("/", 1)[1]
+        if binding["inizio"]["value"] <= GROUPS_SETTLED and (
+            deputy not in settled_group or binding["inizio"]["value"] > settled_group[deputy][0]
+        ):
+            settled_group[deputy] = (binding["inizio"]["value"], binding["titolo"]["value"])
+    pl.DataFrame(
+        [
+            (tenure["person"], settled_group[str(tenure["deputy"])][1])
+            for tenure in tenures
+            if not tenure["replacement"] and str(tenure["deputy"]) in settled_group
+        ],
+        schema=["person", "group"],
+        orient="row",
+    ).write_parquet(PARSED / "deputy_groups.parquet")
     pl.DataFrame(list(groups.items()), schema=["label", "group"], orient="row").write_parquet(PARSED / "lists.parquet")
 
     referendum = zipfile.ZipFile(raw.cached(SOURCE, REFERENDUM).path)
@@ -770,6 +811,7 @@ def emit() -> Path:
     members = pl.read_parquet(PARSED / "members.parquet")
     persons = pl.read_parquet(PARSED / "persons.parquet")
     tenures = pl.read_parquet(PARSED / "tenures.parquet")
+    deputy_groups = dict(pl.read_parquet(PARSED / "deputy_groups.parquet").iter_rows())
     lists = dict(pl.read_parquet(PARSED / "lists.parquet").iter_rows())
     referendum_units = pl.read_parquet(PARSED / "referendum_units.parquet")
     referendum_votes = pl.read_parquet(PARSED / "referendum_votes.parquet")
@@ -846,6 +888,7 @@ def emit() -> Path:
         cs.artifact(raw.cached(SOURCE, REFERENDUM), interno)
         cs.artifact(raw.cached(SOURCE, ISTAT), istat)
         cs.artifact(raw.cached(SOURCE, MANDATES), camera)
+        cs.artifact(raw.cached(SOURCE, GROUPS), camera)
         cs.artifact(raw.cached(SOURCE, TRASPARENZA), trasparenza)
 
         italy = cs.polity("IT")
@@ -1270,9 +1313,9 @@ def emit() -> Path:
                 if revision is None
                 else result_set(f"{contest_key}:revised", general, contests[code], "court_revised", camera, 0)
             )
-            for group, person, surname, forename, won in (
+            for group, person, surname, forename, won, linked in (
                 candidates.filter(pl.col("college") == code)
-                .select("group", "person", "surname", "forename", "won")
+                .select("group", "person", "surname", "forename", "won", "lists")
                 .sort("surname", "forename")
                 .iter_rows()
             ):
@@ -1287,14 +1330,24 @@ def emit() -> Path:
                     alliance_id=None if group is None else alliance_ids.get(group),
                     ballot_label=f"{surname} {forename}",
                 )
+                member = None
+                if won:
+                    title = deputy_groups.get(person, "")
+                    member = next((label for prefix, label in GROUP_LISTS.items() if title.startswith(prefix)), None)
+                    if member is None:
+                        member = MIXED_LISTS.get(person, linked[0] if len(linked) == 1 else None)
+                candidacy = cs.key("it.candidacy", f"{contest_key}:{person}")
                 cs.add(
                     "candidacy",
-                    id=cs.key("it.candidacy", f"{contest_key}:{person}"),
+                    id=candidacy,
                     person_id=person_ids[person],
                     option_id=id,
                     role="head",
+                    member_of_party_id=None if member is None else party_ids[member],
                     ballot_name=f"{surname} {forename}",
                 )
+                for label in linked:
+                    cs.add("candidacy_nomination", candidacy_id=candidacy, party_id=party_ids[label], kind="nominated")
                 if won:
                     cs.add("outcome", result_set_id=official, option_id=id, kind="elected")
                 if revised is not None and revision is not None and person == revision["replacement"]:

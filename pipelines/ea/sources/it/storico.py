@@ -1,9 +1,12 @@
 import io
 import itertools
+import json
 import re
+import unicodedata
 import zipfile
-from datetime import date
+from datetime import date, datetime
 from pathlib import Path
+from urllib.parse import urlencode
 from uuid import UUID
 
 import polars as pl
@@ -372,6 +375,70 @@ DERIVED_WINNERS = (
 )
 
 
+GROUPS_QUERY = """
+PREFIX ocd: <http://dati.camera.it/ocd/>
+PREFIX dc: <http://purl.org/dc/elements/1.1/>
+PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+PREFIX bio: <http://purl.org/vocab/bio/0.1/>
+SELECT DISTINCT ?d ?cognome ?nome ?nascita ?titolo ?inizio WHERE {{
+  ?d a ocd:deputato ; ocd:rif_leg <http://dati.camera.it/ocd/legislatura.rdf/repubblica_{legislature}> ;
+     foaf:surname ?cognome ; foaf:firstName ?nome ; ocd:rif_mandatoCamera ?m ; ocd:aderisce ?a .
+  ?m ocd:rif_leg <http://dati.camera.it/ocd/legislatura.rdf/repubblica_{legislature}> ; ocd:rif_elezione ?e .
+  ?e ocd:tipoElezione ?tipo . FILTER(STRSTARTS(?tipo, "maggioritario"))
+  ?a ocd:rif_gruppoParlamentare ?g ; ocd:startDate ?inizio . ?g dc:title ?titolo
+  BIND(IRI(CONCAT("http://dati.camera.it/ocd/persona.rdf/p", STRBEFORE(STRAFTER(STR(?d), "deputato.rdf/d"), "_"))) AS ?p)
+  OPTIONAL {{ ?p bio:Birth ?b . ?b bio:date ?nascita }}
+}}
+"""
+LEGISLATURES = {1994: 12, 1996: 13, 2001: 14, 2018: 18}
+GROUPS = {
+    year: "https://dati.camera.it/sparql?"
+    + urlencode({"query": GROUPS_QUERY.format(legislature=legislature), "format": "application/sparql-results+json"})
+    for year, legislature in LEGISLATURES.items()
+}
+GROUP_LABELS = {
+    1994: {
+        "LEGA NORD": "LEGA NORD",
+        "FORZA ITALIA": "FORZA ITALIA",
+        "ALLEANZA NAZIONALE": "ALLEANZA NAZIONALE",
+        "CENTRO CRISTIANO DEMOCRATICO": "CENTRO CRIST.DEM.",
+        "RIFONDAZIONE COMUNISTA": "RIFONDAZIONE COMUNISTA",
+        "PARTITO POPOLARE ITALIANO": "P.POPOLARE ITALIANO",
+    },
+    1996: {
+        "DEMOCRATICI DI SINISTRA": "PDS",
+        "POPOLARI DEMOCRATICI": "P.POPOLARE ITALIANO",
+        "FORZA ITALIA": "FORZA ITALIA",
+        "ALLEANZA NAZIONALE": "ALLEANZA NAZIONALE",
+        "LEGA NORD": "LEGA NORD",
+        "RINNOVAMENTO ITALIANO": "RINNOVAMENTO IT-DINI",
+        "CENTRO CRISTIANO DEMOCRATICO": "CCD-CDU",
+    },
+    2001: {
+        "FORZA ITALIA": "FORZA ITALIA",
+        "DEMOCRATICI DI SINISTRA": "DEMOCRATICI SINISTRA",
+        "ALLEANZA NAZIONALE": "ALLEANZA NAZIONALE",
+        "MARGHERITA": "LA MARGHERITA",
+        "UDC": "CCD-CDU",
+        "LEGA NORD": "LEGA NORD",
+        "RIFONDAZIONE COMUNISTA": "RIFONDAZIONE COMUNISTA",
+    },
+    2018: {
+        "MOVIMENTO 5 STELLE": "MOVIMENTO 5 STELLE",
+        "LEGA": "LEGA",
+        "FORZA ITALIA": "FORZA ITALIA",
+        "PARTITO DEMOCRATICO": "PARTITO DEMOCRATICO",
+        "FRATELLI D'ITALIA": "FRATELLI D'ITALIA CON GIORGIA MELONI",
+        "LIBERI E UGUALI": "LIBERI E UGUALI",
+    },
+}
+
+
+def fold(text: str) -> str:
+    folded = unicodedata.normalize("NFKD", text.replace("ß", "ss")).encode("ascii", "ignore").decode().upper()
+    return re.sub(r"[^A-Z0-9]", "", folded)
+
+
 def url(day: date) -> str:
     return f"{ARCHIVE}/camera-{day:%Y%m%d}.zip"
 
@@ -392,6 +459,8 @@ def fetch() -> None:
         if CALDEROLI <= day < ROSATO:
             for n in range(1, 5):
                 raw.fetch(SOURCE, RIPARTIZIONE.format(day=day, n=n), suffix=".html")
+    for groups_url in GROUPS.values():
+        raw.fetch(SOURCE, groups_url, suffix=".json")
 
 
 def parse() -> None:
@@ -730,6 +799,23 @@ def parse() -> None:
     pl.concat(abroad_accounting).write_parquet(PARSED / "abroad_accounting.parquet")
     pl.concat(abroad_seats).write_parquet(PARSED / "abroad_seats.parquet")
     pl.concat(singles, how="diagonal").write_parquet(PARSED / "singles.parquet")
+    pl.DataFrame(
+        [
+            (
+                year,
+                binding["d"]["value"].rsplit("/", 1)[1],
+                binding["cognome"]["value"],
+                binding["nome"]["value"],
+                datetime.strptime(binding["nascita"]["value"], "%Y%m%d").date() if "nascita" in binding else None,
+                binding["titolo"]["value"],
+                binding["inizio"]["value"],
+            )
+            for year, groups_url in GROUPS.items()
+            for binding in json.loads(raw.cached(SOURCE, groups_url).path.read_text())["results"]["bindings"]
+        ],
+        schema=["year", "deputy", "surname", "forename", "birth", "group", "start"],
+        orient="row",
+    ).write_parquet(PARSED / "deputy_groups.parquet")
     pl.concat(single_accounting, how="diagonal").write_parquet(PARSED / "single_accounting.parquet")
 
 
@@ -742,6 +828,13 @@ def emit() -> Path:
     abroad_seats = pl.read_parquet(PARSED / "abroad_seats.parquet")
     singles = pl.read_parquet(PARSED / "singles.parquet")
     single_accounting = pl.read_parquet(PARSED / "single_accounting.parquet")
+    deputy_spells: dict[int, dict[str, list[tuple[str, str]]]] = {}
+    surnames: dict[tuple[int, str], dict[str, tuple[str, date | None]]] = {}
+    for year, deputy, surname, forename, birth, group, start in (
+        pl.read_parquet(PARSED / "deputy_groups.parquet").sort("start").iter_rows()
+    ):
+        deputy_spells.setdefault(year, {}).setdefault(deputy, []).append((group, start))
+        surnames.setdefault((year, fold(surname)), {})[deputy] = (fold(forename), birth)
     with connect() as conn:
         cs = Changeset(
             conn,
@@ -1224,6 +1317,22 @@ def emit() -> Path:
                     ballot = f"{surname} {forename}"
                     option_key = f"{single_key}:{surname}:{forename}"
                     option = cs.key("it.option", option_key)
+                    member = None
+                    if elected and year in LEGISLATURES:
+                        found = surnames.get((year, fold(surname.split(" IN ")[0])), {})
+                        if len(found) > 1 and birth is not None:
+                            found = {d: v for d, v in found.items() if v[1] == birth} or found
+                        if len(found) > 1:
+                            found = {d: v for d, v in found.items() if v[0][:3] == fold(forename)[:3]} or found
+                        if len(found) == 1:
+                            for group, _ in deputy_spells[year][next(iter(found))]:
+                                label = next(
+                                    (label for prefix, label in GROUP_LABELS[year].items() if group.startswith(prefix)),
+                                    None,
+                                )
+                                if label is not None:
+                                    member = party_of(label, year)
+                                    break
                     cs.add(
                         "contest_option",
                         id=option,
@@ -1233,15 +1342,25 @@ def emit() -> Path:
                         alliance_id=alliance,
                         ballot_label=ballot,
                     )
+                    candidacy = cs.key("it.candidacy", option_key)
                     cs.add(
                         "candidacy",
-                        id=cs.key("it.candidacy", option_key),
+                        id=candidacy,
                         person_id=person,
                         option_id=option,
                         role="head",
+                        member_of_party_id=member,
                         ballot_name=ballot,
                         is_independent=False,
                     )
+                    for symbol in dict.fromkeys(symbols):
+                        if symbol not in SYMBOLS:
+                            cs.add(
+                                "candidacy_nomination",
+                                candidacy_id=candidacy,
+                                party_id=party_of(symbol, year),
+                                kind="nominated",
+                            )
                     if elected:
                         cs.add("outcome", result_set_id=declared, option_id=option, kind="elected")
                     if fresh:
