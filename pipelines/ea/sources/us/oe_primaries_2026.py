@@ -67,6 +67,7 @@ FILES = {
     "WA": ("wa", "2026-08-04", ["ballot-items"]),
     "UT": ("ut", "2026-06-23", ["ballot-items"]),
     "ME": ("me", "2026-06-09", list(ME_FILES)),
+    "NE": ("ne", "2026-05-12", ["2026_Primary_Canvass_Book.pdf"]),
     "LA": ("la", "2026-05-16", ["20260516/csv/ByParish_67538.csv", "20260516/csv/ByParish_67539.csv"]),
     "RI": ("ri", "2026-09-09", ["ballot-items"]),
     "CT": ("ct", "2026-08-11", ["111/27708/Lookupdata", "111/27708/townVotes_Electiondata", "112/28256/Lookupdata", "112/28256/townVotes_Electiondata"]),
@@ -96,7 +97,7 @@ RUNOFFS = {
     "LA": ("la", "2026-06-27", ["20260627/csv/ByParish_70156.csv", "20260627/csv/ByParish_70157.csv"], "2026-05-16"),
     "OK": ("ok", "2026-08-25", ["getelec/20260825", "20260825/12001", "20260825/13010"], "2026-06-16"),
 }
-FIPS = {"TX": "48", "CA": "06", "MI": "26", "PA": "42", "WV": "54", "MS": "28", "SD": "46", "WY": "56", "OR": "41", "KY": "21", "CO": "08", "AZ": "04", "TN": "47", "NC": "37", "IL": "17", "NM": "35", "NY": "36", "VA": "51", "AL": "01", "ND": "38", "MD": "24", "MN": "27", "VT": "50", "KS": "20", "GA": "13", "WA": "53", "UT": "49", "IN": "18", "FL": "12", "ID": "16", "NJ": "34", "MO": "29", "MA": "25", "DE": "10", "HI": "15", "ME": "23", "OK": "40", "AR": "05", "CT": "09", "RI": "44", "LA": "22"}
+FIPS = {"TX": "48", "CA": "06", "MI": "26", "PA": "42", "WV": "54", "MS": "28", "SD": "46", "WY": "56", "OR": "41", "KY": "21", "CO": "08", "AZ": "04", "TN": "47", "NC": "37", "IL": "17", "NM": "35", "NY": "36", "VA": "51", "AL": "01", "ND": "38", "MD": "24", "MN": "27", "VT": "50", "KS": "20", "GA": "13", "WA": "53", "UT": "49", "IN": "18", "FL": "12", "ID": "16", "NJ": "34", "MO": "29", "MA": "25", "DE": "10", "HI": "15", "ME": "23", "OK": "40", "AR": "05", "CT": "09", "RI": "44", "LA": "22", "NE": "31"}
 RUNOFF_SYSTEMS = {"GA": "two_round", "TX": "two_round", "MS": "two_round", "SD": "two_round_35", "NC": "two_round_30", "OK": "two_round", "AL": "two_round", "LA": "two_round"}
 THRESHOLDS = {"GA": 50, "TX": 50, "MS": 50, "SD": 35, "NC": 30, "OK": 50, "AL": 50, "LA": 50}
 ME_COUNTIES = {"AND": "23001", "ARO": "23003", "CUM": "23005", "FRA": "23007", "HAN": "23009", "KEN": "23011", "KNO": "23013", "LIN": "23015", "OXF": "23017", "PEN": "23019", "PIS": "23021", "SAG": "23023", "SOM": "23025", "WAL": "23027", "WAS": "23029", "YOR": "23031"}
@@ -154,6 +155,7 @@ OFFICIAL = {
     "CT": ("Connecticut Secretary of the State", "https://ctemspublic.pcctg.net/", "town results from the Election Center summed to counties"),
     "RI": ("Rhode Island Board of Elections", "https://elections.ri.gov/elections/previous-election-results", "town results summed to counties"),
     "LA": ("Louisiana Secretary of State", "https://voterportal.sos.la.gov/graphical", "parish files from the live election results site"),
+    "NE": ("Nebraska Secretary of State", "https://sos.nebraska.gov/elections", "county tables in the primary canvass book"),
     "KS": ("Kansas Secretary of State", "https://sos.ks.gov/elections/election-results.html", "precinct-level files summed to counties"),
 }
 METHOD = "Results by county from OpenElections' 2026 primary file for {state}, a community compilation of the state's county results. Candidates who received votes are listed; write-in votes are pooled."
@@ -252,6 +254,8 @@ def town_counties(state: str) -> dict[str, str]:
 
 
 def url(code: str, file: str) -> str:
+    if code == "ne":
+        return f"https://sos.nebraska.gov/sites/default/files/doc/elections/2026/{file}"
     if code == "la":
         return f"https://voterportal.sos.la.gov/ElectionResults/ElectionResults/Data?blob={file}"
     if code == "ct":
@@ -444,6 +448,40 @@ def rows(code: str, path: Path, file: str = ""):
                         "votes": str(candidate["TOTAL_VOTES"]),
                     }
         return
+    if code == "ne":
+        office = party = None
+        candidates: list[str] = []
+        previous = ""
+        for line in subprocess.run(["pdftotext", "-layout", str(path), "-"], capture_output=True, text=True, check=True).stdout.splitlines():
+            stripped = line.strip().replace("✓", "")
+            if stripped.startswith("Member of the United States Senate"):
+                office, party = "U.S. Senate", None
+            elif stripped == "Governor":
+                office, party = "Governor", None
+            elif re.match(r"(Member of the U\.S\. House|Secretary of State$|State Treasurer$|Attorney General$|Auditor of Public Accounts$|Public Service Commission|Member of Board|Member of the State Board|Member of the Legislature|Lieutenant)", stripped):
+                office, party = None, None
+            found = re.fullmatch(r"(Republican|Democratic|Libertarian|Legal Marijuana NOW) Party Nomination(?: \(.*\) — continued| \(.*\))?", stripped)
+            if found is not None:
+                party = {"Republican": "Republican", "Democratic": "Democratic"}.get(found[1])
+                candidates = []
+            elif re.match(r"(Libertarian|Legal Marijuana NOW|Democratic|Republican) Party (did not make|Nomination)", stripped):
+                party = None
+            elif office is not None and party is not None:
+                header = re.fullmatch(r"County\s{2,}(\S.*)", stripped)
+                if header is not None:
+                    last_names = re.split(r"\s{2,}", header[1].strip())
+                    last_names = last_names[: last_names.index("County")] if "County" in last_names else last_names
+                    first_names = re.split(r"\s{2,}", previous.strip().replace("✓", "")) if previous.strip() and not re.search(r"\d|Nomination|Page", previous) else []
+                    first_names = first_names[: len(last_names)]
+                    candidates = [f"{first} {last}".strip() for first, last in zip(first_names, last_names, strict=True)] if len(first_names) == len(last_names) else last_names
+                elif candidates:
+                    for row in re.finditer(r"([A-Za-z][A-Za-z .'-]*?)\s{2,}((?:\d[\d,]*\s+){%d}\d[\d,]*)" % (len(candidates) - 1), stripped):
+                        if row[1] != "Total":
+                            for candidate, votes in zip(candidates, row[2].split(), strict=True):
+                                yield {"county": row[1], "office": office, "district": "", "party": party, "candidate": candidate, "votes": votes.replace(",", "")}
+            if stripped:
+                previous = line
+        return
     if code == "la":
         with path.open(newline="") as handle:
             reader = csv.reader(handle)
@@ -631,7 +669,7 @@ def fetch() -> None:
             if code == "fl":
                 raw.store(SOURCE, FL_URL, httpx.get(FL_URL, headers=BROWSER, follow_redirects=True, timeout=300).content, suffix=".txt", retrieved_at=datetime.now(UTC), media_type="text/tab-separated-values")
                 continue
-            raw.fetch(SOURCE, url(code, name), suffix={"hi": ".pdf", "ri": ".json", "ct": ".json", "alx": ".zip", "de": ".html", "ma": ".html", "nj": ".pdf", "ks": ".xlsx", "in": ".json", "ga": ".json", "ga2": ".json", "wa": ".json", "ut": ".json", "id": ".json"}.get(code) or name[name.rindex(".") :])
+            raw.fetch(SOURCE, url(code, name), suffix={"hi": ".pdf", "ne": ".pdf", "ri": ".json", "ct": ".json", "alx": ".zip", "de": ".html", "ma": ".html", "nj": ".pdf", "ks": ".xlsx", "in": ".json", "ga": ".json", "ga2": ".json", "wa": ".json", "ut": ".json", "id": ".json"}.get(code) or name[name.rindex(".") :])
     fetch_ballot_items()
 
 
