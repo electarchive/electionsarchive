@@ -945,28 +945,32 @@ def emit() -> Path:
                 cs.merged.pop(str(person), None)
                 cs.merge(person, target)
         columns = ("id", "entity_id", "text", "lang", "script", "kind", "source_id")
-        for shared, qualified in conn.execute(
-            """with p as (
-                 select a.id, n.id as name, n.text, n.lang, split_part(n.text, ', ', 1) as base,
-                   split_part(n.text, ', ', 2) as state
-                 from area a join name n on n.entity_id = a.id and n.is_preferred
-                   and n.valid_from is null and n.valid_to is null
-                 where a.scheme_code = 'us.town' and not exists (select from entity_merge m where m.entity_id = a.id)
-               )
-               select p.name, (array_agg(x.id))[1] from p
-               join name x on x.entity_id = p.id and not x.is_preferred and x.lang = p.lang
-                 and x.valid_from is null and x.valid_to is null
-                 and x.text like p.base || ' %, ' || p.state and x.text not like p.base || ' % %, ' || p.state
-               where exists (select from p q where q.text = p.text and q.id <> p.id)
-                 and not exists (select from p q where q.text = x.text)
-               group by p.name having count(*) = 1"""
-        ).fetchall():
-            for id, preferred in ((shared, False), (qualified, True)):
-                row = conn.execute(
-                    "select id, entity_id, text, lang, script, kind, source_id from name where id = %s", [id]
-                ).fetchone()
-                if row is not None:
-                    cs.add("name", **dict(zip(columns, row, strict=True)), is_preferred=preferred)
+        with open(Path(__file__).with_name("identity_names.tsv"), newline="") as curated:
+            for entry in csv.DictReader(curated, delimiter="\t"):
+                stored = conn.execute(
+                    """select id, entity_id, text, lang, script, kind, source_id from name
+                       where entity_id = %s and lang = 'en' and valid_from is null and valid_to is null
+                       order by text = %s desc, is_preferred desc, id""",
+                    [entry["entity"], entry["text"]],
+                ).fetchall()
+                for index, row in enumerate(stored):
+                    cs.add(
+                        "name",
+                        **dict(zip(columns, row, strict=True)),
+                        is_preferred=index == 0 and row[2] == entry["text"],
+                    )
+                if not stored or stored[0][2] != entry["text"]:
+                    cs.add(
+                        "name",
+                        id=None,
+                        entity_id=UUID(entry["entity"]),
+                        text=entry["text"],
+                        lang="en",
+                        script=None,
+                        kind="official",
+                        source_id=None,
+                        is_preferred=True,
+                    )
         for row in conn.execute(
             """select n.id, n.entity_id, n.text, n.lang, n.script, n.kind, n.source_id from (
                  select n.*, row_number() over (
