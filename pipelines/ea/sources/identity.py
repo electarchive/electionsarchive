@@ -706,7 +706,21 @@ PEOPLE = {
         ("fr.legislatives_1986.person", "75:lionel-jospin"),
         ("fr.cdsp.person", "president:lionel-jospin"),
     ),
+    "Nicola Sturgeon, First Minister of Scotland, and her 1992 and 1997 Westminster candidacies": (
+        ("wikidata", "Q467112"),
+        ("gb.umit.person", "sct-glasgow-shettleston:sturgeon-nicola"),
+        ("gb.umit.person", "sct-glasgow-govan:sturgeon-nicola"),
+    ),
+    "Edwin Poots, MLA for Lagan Valley 1998-2022 and Belfast South from 2022": (
+        ("gb.umit.person", "nir-lagan-valley:poots-edwin"),
+        ("gb.ni_assembly.person", "2022-05-05:ni-assembly:belfast-south:12"),
+    ),
 }
+HONORIFICS = re.compile(
+    r"^(?:(?:the\s+)?(?:rt\.?\s+hon\.?|right\s+honou?rable|honou?rable|very\s+rev(?:erend|d)?\.?|rev(?:erend|d)?\.?)\s+"
+    r"|(?:mr|mrs|ms|miss|mx|dr|sir|dame|prof(?:essor)?)\.?\s+)+",
+    re.IGNORECASE,
+)
 PLACEHOLDERS = re.compile(
     r"\b(unknown|scatter\w*|write[- ]?ins?|all other|others?|blank|void|none of|uncommitted|vacan\w*|no candidate)\b"
 )
@@ -717,6 +731,7 @@ def words(text: str) -> tuple[str, frozenset[str]] | None:
         c for c in unicodedata.normalize("NFKD", text.lower().replace("ı", "i")) if not unicodedata.combining(c)
     )
     folded = re.sub(r"\([^)]*\)|\"[^\"]*\"|“[^”]*”", " ", folded)
+    folded = re.sub(r"(?<=[a-z])-(?=[a-z])", "", folded)
     if PLACEHOLDERS.search(folded):
         return None
     parts = [part for part in re.split(r"[^a-z]+", folded) if part]
@@ -1340,21 +1355,45 @@ def emit() -> Path:
             cs.add("name", **dict(zip(columns, row[:7], strict=True)), is_preferred=False)
             cs.add("name", **dict(zip(columns, row[7:], strict=True)), is_preferred=True)
             fuller.add(row[1])
-        for entity, text, lang, script, kind, source in conn.execute(
-            """select n.entity_id, n.text, n.lang, n.script, n.kind, n.source_id from name n
+        staged = {row["id"] for row in cs.rows.get("name", []) if row.get("id") is not None}
+        for name, entity, text, lang, script, kind, source, pipeline in conn.execute(
+            """select n.id, n.entity_id, n.text, n.lang, n.script, n.kind, n.source_id, c.pipeline from name n
                join entity e on e.id = n.entity_id and e.type = 'person'
+               join changeset c on c.id = n.changeset_id
                where n.is_preferred and n.valid_from is null and n.valid_to is null
-                 and n.text ~ '(^|[[:space:]])[A-Z][[:space:]]'"""
+                 and (n.text ~ '(^|[[:space:]])[A-Z][[:space:]]'
+                      or n.text ~* '^(the|rt|right|hon|honou?rable|rev|revd|reverend|very|mr|mrs|ms|miss|mx|dr|sir|dame|prof|professor)[.]?[[:space:]]')"""
         ).fetchall():
-            if entity not in fuller and (fixed := names.initials(text)) != text:
+            if entity in fuller or name in staged:
+                continue
+            bare = HONORIFICS.sub("", text)
+            if len(bare.split()) < 2 or (
+                re.match(r"(?i)(mrs|miss)\b", text) is not None
+                and (pipeline.startswith("us.") or pipeline == "identity")
+            ):
+                bare = text
+            if (fixed := names.initials(bare)) == text:
+                continue
+            if bare != text:
                 cs.add(
                     "name",
+                    id=name,
                     entity_id=entity,
-                    text=fixed,
+                    text=text,
                     lang=lang,
                     script=script,
                     kind=kind,
                     source_id=source,
-                    is_preferred=True,
+                    is_preferred=False,
                 )
+            cs.add(
+                "name",
+                entity_id=entity,
+                text=fixed,
+                lang=lang,
+                script=script,
+                kind=kind,
+                source_id=source,
+                is_preferred=True,
+            )
         return cs.write()
