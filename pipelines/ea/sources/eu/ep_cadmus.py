@@ -229,8 +229,11 @@ def emit() -> Path:
             )
             elections[(country, year)] = (election, path)
             for (constituency,), rows in by_election.group_by(["constituency"], maintain_order=True):
+                college = iso == "BE" or constituency == "Greenland"
                 if constituency == "National":
                     scheme, code, label = "eu.member_state", iso, country
+                elif college:
+                    scheme, code, label = "eu.member_state", iso, constituency
                 else:
                     code = CONSTITUENCIES.get((iso, constituency))
                     if code is None and iso == "PL":
@@ -260,7 +263,7 @@ def emit() -> Path:
                             valid_from=WINDOWS[1979][0],
                         )
                 seats_total = int(rows["seats_total"][0])
-                contest_key = f"{iso}:{year}:{scheme}:{code}"
+                contest_key = f"{iso}:{year}:{scheme}:{code}" + (f":{fold(constituency)}" if college else "")
                 contest = cs.key("eu.contest", contest_key)
                 cs.add(
                     "contest",
@@ -318,7 +321,7 @@ def emit() -> Path:
                                 name(party, row["party"])
                                 if row["party_original"] and row["party_original"] != row["party"]:
                                     name(party, row["party_original"], "und", "native", False)
-                    option = cs.key("eu.ep_cadmus.option", f"{contest_key}:{fold(label_text)}")
+                    option = cs.key("eu.ep_cadmus.option", f"{contest_key}:{fold(label_text) or label_text}:{position}")
                     cs.add(
                         "contest_option",
                         id=option,
