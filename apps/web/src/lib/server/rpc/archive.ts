@@ -8727,6 +8727,10 @@ export const elections = {
                     select p.id, p.date_from, false from election e
                     join election p on p.polity_id = e.polity_id and p.kind = e.kind and p.date_from < e.date_from
                       and p.status = 'held' and not exists (select from entity_merge m where m.entity_id = p.id)
+                      and exists (
+                        select from election pe join contest pc on pc.election_id = pe.id
+                        where (pe.id = p.id or pe.parent_id = p.id) and pc.body_id = ${chamber}::uuid
+                      )
                     where e.id = ${input.id}::uuid and e.kind <> 'by_election'
                     order by p.date_from desc limit 1
                   ) x
