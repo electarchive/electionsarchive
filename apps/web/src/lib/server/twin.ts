@@ -606,6 +606,41 @@ function personMarkdown(
     ]
       .filter((part) => part != null)
       .join(". "),
+    ...(() => {
+      if (person.record.length === 0) {
+        return [];
+      }
+      const won = person.record.filter(
+        (entry) => entry.outcome === "elected" || entry.outcome === "won",
+      ).length;
+      const advanced = person.record.filter(
+        (entry) => entry.outcome === "advanced",
+      ).length;
+      const first = Math.min(...person.record.map((entry) => entry.year));
+      const last = Math.max(...person.record.map((entry) => entry.year));
+      return [
+        person.record.length === 1
+          ? (won > 0 ? m.person_lede_single_won : m.person_lede_single)({
+              year: String(first),
+            })
+          : first === last
+            ? (advanced > 0 ? m.person_lede_advanced_year : m.person_lede_year)(
+                {
+                  won: count(won),
+                  advanced: count(advanced),
+                  count: count(person.record.length),
+                  year: String(first),
+                },
+              )
+            : (advanced > 0 ? m.person_lede_advanced : m.person_lede)({
+                won: count(won),
+                advanced: count(advanced),
+                count: count(person.record.length),
+                first: String(first),
+                last: String(last),
+              }),
+      ];
+    })(),
     ...[
       { title: m.person_served(), spells: person.served },
       { title: m.person_elected(), spells: person.elected },
@@ -624,7 +659,10 @@ function personMarkdown(
                           [
                             seat.name,
                             years(seat.from, seat.to),
-                            endings[seat.ended ?? ""]?.() ?? null,
+                            endings[seat.ended ?? ""]?.().replace(
+                              /^\p{Lu}/u,
+                              (letter) => letter.toLowerCase(),
+                            ) ?? null,
                           ]
                             .filter((part) => part != null)
                             .join(", "),
@@ -641,6 +679,40 @@ function personMarkdown(
       ? []
       : [
           `## ${m.person_parties()}`,
+          ...(() => {
+            const named = lanes.filter(
+              (lane) =>
+                lane.party != null &&
+                (lane.ballots.length > 0 ||
+                  lane.spans.some((spell) => spell.kind !== "group")),
+            ).length;
+            const open = person.isGone
+              ? person.died
+              : new Date().toISOString().slice(0, 10);
+            const dates = lanes
+              .flatMap((lane) => [
+                ...lane.spans.flatMap((spell) =>
+                  spell.from == null
+                    ? spell.to == null
+                      ? []
+                      : [spell.to]
+                    : [spell.from, spell.to ?? open].filter(
+                        (value) => value != null,
+                      ),
+                ),
+                ...lane.ballots.map((ballot) => ballot.date),
+              ])
+              .toSorted((a, b) => a.localeCompare(b));
+            return named > 1 && dates.length > 0
+              ? [
+                  m.person_parties_lede({
+                    count: String(named),
+                    first: dates[0]?.slice(0, 4) ?? "",
+                    last: dates.at(-1)?.slice(0, 4) ?? "",
+                  }),
+                ]
+              : [];
+          })(),
           table(
             [m.col_party(), m.col_role(), m.person_years()],
             lanes.flatMap((lane) => {
