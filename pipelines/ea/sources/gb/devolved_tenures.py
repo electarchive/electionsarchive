@@ -4,15 +4,15 @@ from collections import Counter, defaultdict
 from datetime import date, timedelta
 from pathlib import Path
 from urllib.parse import urlencode
-from uuid import UUID
+from uuid import UUID, uuid5
 
 from ea import raw
-from ea.changeset import Changeset
+from ea.changeset import NAMESPACE, Changeset
 from ea.sources.gb.msp_wikidata import fold, seat
 from ea.store import DATA, connect
 
 SOURCE = "gb.devolved_tenures"
-VERSION = "2"
+VERSION = "3"
 TITLE = "Members of the Scottish Parliament and the Senedd (P39) on Wikidata"
 BODIES = {
     "Scottish Parliament": ("Q1711695", r"the (\d\w\w) Scottish"),
@@ -120,6 +120,22 @@ WALES_CHANGES = (
     ("2026-01-20", "day", "James Evans", "Conservative", "Independent politician", "Expelled from the Conservatives."),
     ("2026-02-05", "day", "James Evans", "Independent politician", "Reform UK", "Joined Reform UK."),
 )
+PARLIAMENT = (
+    "https://www.parliament.scot/msps/current-and-previous-msps/anas-sarwar",
+    "https://www.parliament.scot/-/media/files/whats-on-bb/session-7-2026/2026/august/bb20260803.pdf",
+    "https://www.parliament.scot/msps/current-and-previous-msps/amanda-bland",
+    "https://www.parliament.scot/-/media/files/spice/factsheets/msps/cumulative-list-of-msps-by-party-session-7.pdf",
+)
+OFFICIAL = {
+    ("Anas Sarwar", date(2026, 7, 22)): (
+        date(2026, 7, 23),
+        "Anas Sarwar resigned his seat in the Scottish Parliament, and his membership ended on 23 July 2026, the day the returning officer notified the Presiding Officer of the vacancy; Monica Lennon filled it.",
+    ),
+    ("Amanda Bland", date(2026, 10, 19)): (
+        date(2026, 10, 19),
+        "Amanda Bland wrote to the Presiding Officer on 19 October 2026 to say she had resigned from Reform UK Scotland with immediate effect and would serve as an independent MSP. No reason was given.",
+    ),
+}
 UNMATCHED = DATA / "tmp" / "uk-dev" / "devolved_tenures_unmatched.tsv"
 
 
@@ -145,6 +161,8 @@ def fetch() -> None:
         raw.fetch(SOURCE, service(item), suffix=".json")
     for url in (*CHANGE_PAGES.values(), SENEDD_CHANGES):
         raw.fetch(SOURCE, url, suffix=".txt")
+    for url in PARLIAMENT:
+        raw.fetch(SOURCE, url, suffix=".pdf" if url.endswith(".pdf") else ".html")
 
 
 def ended(cause: str) -> str | None:
@@ -318,6 +336,19 @@ def emit() -> Path:
         )
         for url in (*CHANGE_PAGES.values(), SENEDD_CHANGES):
             cs.artifact(raw.cached(SOURCE, url), wikipedia)
+        parliament = cs.source("Scottish Parliament", "Members' pages, Business Bulletin, and the cumulative list of MSPs by party")
+        cs.add(
+            "source",
+            id=parliament,
+            kind="official_body",
+            publisher="Scottish Parliament",
+            title="Members' pages, Business Bulletin, and the cumulative list of MSPs by party",
+            url="https://www.parliament.scot/msps/current-and-previous-msps",
+            license="Open Parliament Licence v3.0",
+            license_url="https://www.parliament.uk/site-information/copyright-parliament/open-parliament-licence/",
+        )
+        for url in PARLIAMENT:
+            cs.artifact(raw.cached(SOURCE, url), parliament)
         for qid, label in MERGED.items():
             holders = held.get(qid, set())
             targets = {
@@ -331,6 +362,19 @@ def emit() -> Path:
                 cs.merge(next(iter(holders)), next(iter(targets)))
         unmatched: list[tuple[str, str]] = []
         totals = Counter()
+        held_events: dict[tuple[UUID, str], list[UUID]] = defaultdict(list)
+        dated_events: dict[tuple[UUID, str, date | None], UUID] = {}
+        for event_id_, event_tenure, event_kind, event_date in conn.execute(
+            "select id, tenure_id, kind::text, date from tenure_event"
+        ).fetchall():
+            held_events[(event_tenure, event_kind)].append(event_id_)
+            dated_events[(event_tenure, event_kind, event_date)] = event_id_
+
+        def event_id(tenure: UUID, kind: str, when: date) -> UUID:
+            held = held_events.get((tenure, kind), [])
+            if (tenure, kind, when) in dated_events:
+                return dated_events[(tenure, kind, when)]
+            return held[0] if len(held) == 1 else uuid5(NAMESPACE, f"{SOURCE}.event:{tenure}:{kind}:{when}")
         specs: list[dict[str, object]] = []
         for body_name, (item, pattern) in BODIES.items():
             body = conn.execute(
@@ -603,6 +647,10 @@ def emit() -> Path:
                 if any("presiding officer" in fold(str(value)) for value in event["new"]):
                     continue
                 when, note = event["date"], str(event["note"])
+                official = OFFICIAL.get((str(event["names"][0]), when))
+                if official is not None:
+                    when, note = official
+                origin = parliament if official is not None else wikipedia
                 old_known, old = party_of(str(event["old"][0]))
                 new_known, new = party_of(str(event["new"][0]))
                 person = next(
@@ -621,12 +669,13 @@ def emit() -> Path:
                     if reason in ("resigned", "died", "expelled"):
                         cs.add(
                             "tenure_event",
+                            id=event_id(cs.key(f"{SOURCE}.tenure", str(person["key"])), reason, when),
                             tenure_id=cs.key(f"{SOURCE}.tenure", str(person["key"])),
                             kind=reason,
                             date=when,
                             date_precision="day",
                             reason=note[:240],
-                            source_id=wikipedia,
+                            source_id=origin,
                         )
                     for name in event["names"]:
                         successor = arrives(body_name, name, when)
@@ -660,6 +709,7 @@ def emit() -> Path:
                         if new is None
                         else "switched_party",
                         "note": note,
+                        "source": origin,
                     }
                 )
                 totals["switches"] += 1
@@ -785,12 +835,13 @@ def emit() -> Path:
             for row in switches.get(id(spec), []):
                 cs.add(
                     "tenure_event",
+                    id=event_id(tenure, str(row["kind"]), row["date"]),
                     tenure_id=tenure,
                     kind=row["kind"],
                     date=row["date"],
                     date_precision=row["precision"],
                     reason=str(row["note"])[:240],
-                    source_id=wikipedia,
+                    source_id=row["source"],
                 )
         UNMATCHED.parent.mkdir(parents=True, exist_ok=True)
         UNMATCHED.write_text("\n".join(f"{name}\t{why}" for name, why in sorted(unmatched)) + "\n", encoding="utf-8")
