@@ -1333,7 +1333,7 @@ function electionMarkdown(
       const race = isRound
         ? {
             ...entry,
-            name: m.race_round({ name: entry.name, round: entry.round }),
+            name: m.race_round({ name: entry.name, round: entry.round ?? 1 }),
           }
         : tiered.includes(entry) && entry.kind === "list_allocation"
           ? { ...entry, name: m.race_list({ name: entry.name }) }
