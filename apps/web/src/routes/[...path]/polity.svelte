@@ -59,15 +59,25 @@
     if (data == null) {
       return null;
     }
+    const contested = (entry: (typeof data.series)[number]) =>
+      entry.points.filter(
+        (point) =>
+          point.sides.every((side) => (side[1]?.share ?? 0) >= 0.05) &&
+          point.sides[0]?.[0]?.party != null,
+      );
     const series = data.series
       .filter((entry) => !entry.isQuestion && entry.points.length > 1)
+      .map((entry) => ({ entry, points: contested(entry) }))
       .toSorted(
         (a, b) =>
+          Number(b.points.length > 1) - Number(a.points.length > 1) ||
           (b.points.at(-1)?.date ?? "").localeCompare(
             a.points.at(-1)?.date ?? "",
-          ) || b.points.length - a.points.length,
+          ) ||
+          b.points.length - a.points.length,
       )
-      .slice(0, 2);
+      .slice(0, 2)
+      .map(({ entry }) => entry);
     return series.length === 0 ? null : { ...data, series };
   });
 

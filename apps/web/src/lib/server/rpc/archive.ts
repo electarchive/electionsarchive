@@ -9344,6 +9344,9 @@ export const polities = {
             id: string;
             parent: string | null;
             host: string;
+            election: string;
+            kind: string;
+            status: string;
             path: string;
             date: string;
             year: number | null;
@@ -9364,7 +9367,8 @@ export const polities = {
               where t.polity_id = ${input.id}::uuid
               order by upper(t.valid) desc nulls first limit 1
             )
-            select c.id, c.allocation_parent_id as parent, e.polity_id as host, s.path, e.date_from::text as date, ${CYCLE} as year,
+            select c.id, c.allocation_parent_id as parent, e.polity_id as host, e.id as election, e.kind::text as kind,
+              e.status::text as status, s.path, e.date_from::text as date, ${CYCLE} as year,
               place.id as area, place.k,
               case
                 when c.kind = 'ballot_question' then 5
@@ -9439,12 +9443,21 @@ export const polities = {
       if (polity == null) {
         throw new ORPCError("NOT_FOUND");
       }
+      const voted =
+        electionRows.rows.length > 0
+          ? []
+          : Map.groupBy(here.rows, (row) => row.election)
+              .values()
+              .flatMap((rows) => rows.slice(0, 1))
+              .toArray()
+              .toSorted((a, b) => b.date.localeCompare(a.date));
       const ids = [
         input.id,
         ...subdivisions.rows.map((row) => row.id),
         ...electionRows.rows.flatMap((row) =>
           row.top == null ? [row.id] : [row.id, row.top],
         ),
+        ...voted.map((row) => row.election),
       ];
       const today = new Date().toISOString().slice(0, 10);
       const held = electionRows.rows.filter(
@@ -9519,7 +9532,10 @@ export const polities = {
                             : [
                                 {
                                   key: entry.key,
-                                  label: entry.label,
+                                  label:
+                                    entry.current.person == null
+                                      ? (entry.short ?? entry.label)
+                                      : entry.label,
                                   color: entry.color,
                                   person: entry.current.person,
                                   party: entry.current.party,
@@ -9596,21 +9612,32 @@ export const polities = {
             })),
           }))
           .toArray(),
-        elections: electionRows.rows.map((row) => ({
-          name: labels.full.get(row.id) ?? "",
-          path: slugs.get(row.id) ?? null,
-          date: row.date,
-          year: row.year,
-          kind: row.kind,
-          status: row.status,
-          lead:
-            row.top == null
-              ? null
-              : {
-                  place: labels.full.get(row.top) ?? "",
-                  more: (row.parts ?? 1) - 1,
-                },
-        })),
+        elections: [
+          ...electionRows.rows.map((row) => ({
+            name: labels.full.get(row.id) ?? "",
+            path: slugs.get(row.id) ?? null,
+            date: row.date,
+            year: row.year,
+            kind: row.kind,
+            status: row.status,
+            lead:
+              row.top == null
+                ? null
+                : {
+                    place: labels.full.get(row.top) ?? "",
+                    more: (row.parts ?? 1) - 1,
+                  },
+          })),
+          ...voted.map((row) => ({
+            name: labels.full.get(row.election) ?? "",
+            path: slugs.get(row.election) ?? null,
+            date: row.date,
+            year: row.year,
+            kind: row.kind,
+            status: row.status,
+            lead: null,
+          })),
+        ],
         mapped: ranked?.rows[0]?.id ?? null,
         local,
         latest:

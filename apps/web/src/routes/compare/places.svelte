@@ -53,14 +53,24 @@
             };
           });
         const [first, second] = tops;
-        const rows = series.points.map((point) => ({
-          ...point,
-          margins: point.sides.map((side) => {
-            const one = side.find((entry) => entry.key === first?.key);
-            const two = side.find((entry) => entry.key === second?.key);
-            return one == null || two == null ? null : one.share - two.share;
-          }),
-        }));
+        const rows = series.points.map((point) => {
+          const leaders = (point.sides.find((side) => side.length > 0) ?? [])
+            .slice(0, 2)
+            .map((entry) => entry.key);
+          const isPair =
+            leaders.includes(first?.key ?? "") &&
+            leaders.includes(second?.key ?? "");
+          return {
+            ...point,
+            margins: point.sides.map((side) => {
+              const one = side.find((entry) => entry.key === first?.key);
+              const two = side.find((entry) => entry.key === second?.key);
+              return !isPair || one == null || two == null
+                ? null
+                : one.share - two.share;
+            }),
+          };
+        });
         const reach = Math.max(
           0.1,
           ...rows.flatMap((row) =>

@@ -903,7 +903,7 @@
   "versus_parties_none": "These two parties never ran in the same kind of election in the archive.",
   "versus_parties_key": "Party vote share, with seats won where recorded.",
   "versus_overall": "Overall",
-  "versus_margin_key": "Above the line, {first} led; below it, {second} led.",
+  "versus_margin_key": "Above the line, {first} led. Below it, {second} led. A dash marks years when the two parties were not the top two.",
   "versus_gap": "Gap",
   "versus_year": "Year",
   "versus_questions": "Ballot questions",
