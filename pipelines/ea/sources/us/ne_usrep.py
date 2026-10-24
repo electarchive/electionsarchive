@@ -11,12 +11,19 @@ from ea.sources.us import usrep_county
 from ea.store import DATA, connect
 
 SOURCE = "us.ne_usrep"
-VERSION = "1"
+VERSION = "2"
 PARSED = DATA / "parsed" / SOURCE
 PUBLISHER = "Nebraska Secretary of State"
 TITLE = "Official Report of the Board of State Canvassers of the State of Nebraska"
 LANDING = "https://govdocs.nebraska.gov/epubs/S1200/S001.html"
 URL = "https://govdocs.nebraska.gov/epubs/S1200/S001-{}prim_gen.pdf"
+EARLY = [
+    (header.split(), block)
+    for header, *block in (
+        chunk.splitlines() for chunk in Path(__file__).with_name("ne_usrep_early.txt").read_text().split("@ ")[1:]
+    )
+]
+EARLY_DAYS = {1982: date(1982, 11, 2), 1984: date(1984, 11, 6), 1986: date(1986, 11, 4), 1988: date(1988, 11, 8), 1990: date(1990, 11, 6)}
 DAYS = {1992: date(1992, 11, 3), 1994: date(1994, 11, 8), 1996: date(1996, 11, 5), 1998: date(1998, 11, 3)}
 STARTS = {1992: 3361, 1994: 3194, 1996: 1859, 1998: 3033}
 METHOD = (
@@ -47,7 +54,7 @@ WRITEINS = {
 
 
 def fetch() -> None:
-    for year in DAYS:
+    for year in [*EARLY_DAYS, *DAYS]:
         raw.fetch(SOURCE, URL.format(year), suffix=".pdf")
 
 
@@ -135,6 +142,22 @@ def parse() -> None:
                 for column, value in enumerate(row):
                     if value is not None:
                         rows.append((str(day), district, codes[county], str(column), value))
+    for (day, district, _), block in EARLY:
+        table = {
+            re.sub(r"[^a-z]", "", name.lower()): cells
+            for name, cells in (
+                (" ".join(word for word in line.split() if not word.isdigit() and word != "-"), [None if word == "-" else int(word) for word in line.split() if word.isdigit() or word == "-"])
+                for line in block
+            )
+        }
+        total = table.pop("t")
+        for column, printed in enumerate(total):
+            if sum(row[column] or 0 for row in table.values() if len(row) > column) != printed:
+                raise ValueError(f"{day} district {district}: column {column} does not sum to {printed}")
+        for county, row in table.items():
+            for column, value in enumerate(row):
+                if value is not None:
+                    rows.append((day, int(district), codes[county], str(column), value))
     PARSED.mkdir(parents=True, exist_ok=True)
     frame = pl.DataFrame(rows, schema=["day", "district", "county", "column", "votes"], orient="row")
     frame.write_parquet(PARSED / "lines.parquet")
@@ -145,13 +168,13 @@ def emit() -> Path:
     return usrep_county.emit(
         SOURCE,
         VERSION,
-        "Nebraska's U.S. House general elections of 1992 through 1998 by county from the Board of State Canvassers' reports",
+        "Nebraska's U.S. House general elections of 1982 through 1998 by county from the Board of State Canvassers' reports",
         PUBLISHER,
         TITLE,
         LANDING,
         "NE",
         "31",
         pl.read_parquet(PARSED / "lines.parquet"),
-        [raw.cached(SOURCE, URL.format(year)) for year in DAYS],
+        [raw.cached(SOURCE, URL.format(year)) for year in [*EARLY_DAYS, *DAYS]],
         lambda key: METHOD,
     )
