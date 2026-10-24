@@ -3,7 +3,7 @@ import { call } from "@orpc/server";
 import { error, isHttpError, isRedirect, redirect } from "@sveltejs/kit";
 import { effective, stand } from "#lib/caucus.js";
 import { PARTS, label as reasonLabel, REASONS } from "#lib/coverage.js";
-import { count, date, percent, plural, points } from "#lib/format.js";
+import { count, date, definite, percent, plural, points } from "#lib/format.js";
 import { isDerived, VACANCIES } from "#lib/outcomes.js";
 import { m } from "#lib/paraglide/messages.js";
 import { getLocale } from "#lib/paraglide/runtime.js";
@@ -359,7 +359,7 @@ function markdown(data: Data, link: Link) {
       return polityMarkdown(data.polity, data.record, link);
     }
     case "election": {
-      return electionMarkdown(data.election, data.byes, link);
+      return electionMarkdown(data.election, data.sections, data.byes, link);
     }
     default: {
       return contestMarkdown(
@@ -996,9 +996,11 @@ function councilsMarkdown(
 
 function electionMarkdown(
   election: Extract<Data, { kind: "election" }>["election"],
+  { governments, regions }: Extract<Data, { kind: "election" }>["sections"],
   byes: Extract<Data, { kind: "election" }>["byes"],
   link: Link,
 ) {
+  const signed = new Intl.NumberFormat("en", { signDisplay: "exceptZero" });
   const parties = new Map(byes?.parties.map((party) => [party.key, party]));
   const label = (key: string | null) =>
     key == null || key.startsWith("person:")
@@ -1068,6 +1070,12 @@ function electionMarkdown(
     }
   }
   const lists = tiered.filter((race) => race.kind === "list_allocation");
+  const chamber = election.races.find(
+    (race) =>
+      race.kind === "body_seats" &&
+      (race.round ?? 1) === 1 &&
+      race.results.some((row) => (row.seats ?? 0) > 0),
+  );
   const rest = election.races.filter((race) => !lists.includes(race));
   const at = rest.findLastIndex((race) => tiered.includes(race)) + 1;
   return [
@@ -1083,7 +1091,18 @@ function electionMarkdown(
             share: percent(
               election.turnout.voters / election.turnout.registered,
             ),
-          })}${election.turnout.basis === "rejected" ? ` ${m.turnout_basis_rejected()}` : election.turnout.basis === "valid" ? ` ${m.turnout_basis_valid()}` : ""}`,
+          })}${
+            election.turnout.earlier == null
+              ? ""
+              : ` ${m.turnout_since({
+                  points: points(
+                    election.turnout.voters / election.turnout.registered -
+                      election.turnout.earlier.voters /
+                        election.turnout.earlier.registered,
+                  ),
+                  year: String(election.turnout.earlier.year),
+                })}.`
+          }${election.turnout.basis === "rejected" ? ` ${m.turnout_basis_rejected()}` : election.turnout.basis === "valid" ? ` ${m.turnout_basis_valid()}` : ""}`,
         ]),
     ...(election.control == null
       ? []
@@ -1164,6 +1183,61 @@ function electionMarkdown(
       const hasResult =
         !hasSeats &&
         race.results.some((row) => row.isWon === true && row.person != null);
+      const before = new Map(
+        (race.before ?? []).map((entry) => [entry.key, entry.seats]),
+      );
+      const isChanged =
+        hasSeats &&
+        race.before != null &&
+        race.results.every((row) => !row.key.startsWith("alliance:")) &&
+        race.results.some((row) => (row.seats ?? 0) > 0 && before.has(row.key));
+      const units = Map.groupBy(
+        race.results.filter((row) => (row.seats ?? 0) > 0),
+        (row) =>
+          race.partners.find((pair) => pair.includes(row.key))?.[0] ?? row.key,
+      )
+        .values()
+        .map((group) => {
+          let won = 0;
+          for (const row of group) {
+            won += row.seats ?? 0;
+          }
+          return { ...group[0], won };
+        })
+        .toArray()
+        .toSorted((a, b) => b.won - a.won);
+      const leader = units[0];
+      const lede =
+        !hasSeats ||
+        leader?.label == null ||
+        race.isOffice ||
+        race.isPrimaries ||
+        race.electors != null ||
+        race.kind !== "body_seats" ||
+        race.body == null ||
+        tiered.includes(entry) ||
+        leader.key?.startsWith("person:") === true
+          ? null
+          : ((race.unopposed?.seats ?? 0) * 10 >= filled ||
+              (race.multiple ?? 0) > 0
+              ? m.race_lede_seats_only
+              : race !== entry && race.round === 1
+                ? m.race_lede_seats_first
+                : m.race_lede_seats)({
+              party: definite(
+                leader.label.length > 28
+                  ? (leader.short ?? leader.label)
+                  : leader.label,
+                true,
+              ),
+              seats: count(leader.won),
+              total: count(
+                race.size != null && race.size <= filled + 2
+                  ? race.size
+                  : filled,
+              ),
+              share: percent(leader.share ?? 0),
+            });
       const districts = race.isPrimaries ? race.places : null;
       if (districts != null) {
         return [
@@ -1180,6 +1254,7 @@ function electionMarkdown(
       }
       return [
         `## ${link(race.name, race.path)}`,
+        ...(lede == null ? [] : [lede]),
         ...(race.results.length === 0
           ? []
           : [
@@ -1192,6 +1267,7 @@ function electionMarkdown(
                   m.col_votes(),
                   m.col_share(),
                   ...(hasSeats ? [seats] : []),
+                  ...(isChanged ? [m.col_change()] : []),
                   ...(hasResult ? [m.col_result()] : []),
                 ],
                 race.results.map((row) => [
@@ -1211,6 +1287,17 @@ function electionMarkdown(
                   ...(hasSeats
                     ? [row.seats == null ? null : count(row.seats)]
                     : []),
+                  ...(isChanged
+                    ? [
+                        before.has(row.key)
+                          ? signed
+                              .format(
+                                (row.seats ?? 0) - (before.get(row.key) ?? 0),
+                              )
+                              .replace("-", "−")
+                          : null,
+                      ]
+                    : []),
                   ...(hasResult
                     ? [
                         row.isWon === true && row.person != null
@@ -1220,6 +1307,13 @@ function electionMarkdown(
                     : []),
                 ]),
               ),
+            ]),
+        ...((race.places?.sources.length ?? 0) === 0
+          ? []
+          : [
+              m.places_sources({
+                publisher: race.places?.sources.join(", ") ?? "",
+              }),
             ]),
         ...(race.unopposed == null
           ? []
@@ -1255,6 +1349,166 @@ function electionMarkdown(
               }),
             ]
           : []),
+      ];
+    }),
+    ...(governments.every((government) => government.isBefore)
+      ? []
+      : [
+          `## ${m.governments_title()}`,
+          m.governments_lede(),
+          table(
+            [
+              m.col_name(),
+              m.col_status(),
+              m.col_led_by(),
+              m.col_from(),
+              m.col_to(),
+              m.col_parties(),
+            ],
+            governments.map((government) => {
+              const parties = government.parties.map((party) => ({
+                ...party,
+                seats:
+                  party.seats ??
+                  (government.isBefore
+                    ? null
+                    : (chamber?.results.find(
+                        (row) => row.key === `party:${party.id}`,
+                      )?.seats ?? null)),
+              }));
+              let held = 0;
+              for (const party of parties) {
+                held += party.seats ?? 0;
+              }
+              return [
+                government.name,
+                [
+                  government.isBefore
+                    ? m.governments_before()
+                    : m.governments_formed(),
+                  ...(government.isCaretaker
+                    ? [m.governments_caretaker()]
+                    : []),
+                ].join(", "),
+                government.head == null
+                  ? null
+                  : link(government.head.name, `id/${government.head.id}`),
+                date(government.from),
+                government.to == null
+                  ? m.governments_present()
+                  : date(government.to),
+                [
+                  parties
+                    .map((party) =>
+                      [
+                        party.short ?? party.label,
+                        party.role === "support"
+                          ? ` (${m.governments_support()})`
+                          : "",
+                        party.seats == null ? "" : ` ${count(party.seats)}`,
+                      ].join(""),
+                    )
+                    .join(", "),
+                  ...(held > 0 && government.size != null
+                    ? [
+                        `(${m.polity_seats({ seats: count(held), size: count(government.size) })})`,
+                      ]
+                    : []),
+                ].join(" "),
+              ];
+            }),
+          ),
+        ]),
+    ...regions.flatMap((chamber) => {
+      const info = new Map(chamber.parties.map((party) => [party.id, party]));
+      const totals = Map.groupBy(
+        chamber.regions.flatMap((region) => region.parties),
+        (entry) => entry.party ?? (entry.isIndependent ? "independent" : ""),
+      )
+        .entries()
+        .map(([key, entries]) => {
+          let seats = 0;
+          for (const entry of entries) {
+            seats += entry.seats;
+          }
+          const party = info.get(entries[0]?.party ?? "");
+          return {
+            key,
+            label:
+              party == null
+                ? key === "independent"
+                  ? m.seats_independents()
+                  : m.record_none()
+                : (party.short ?? party.label),
+            seats,
+          };
+        })
+        .toArray()
+        .toSorted((a, b) => b.seats - a.seats);
+      const shown = totals.slice(0, totals.length > 9 ? 8 : 9);
+      const hasOthers = totals.length > shown.length;
+      const cells = (
+        parties: Array<{
+          party: string | null;
+          isIndependent: boolean;
+          seats: number;
+        }>,
+        seats: number,
+      ) => {
+        const row = shown.map(
+          (column) =>
+            parties.find(
+              (entry) =>
+                (entry.party ?? (entry.isIndependent ? "independent" : "")) ===
+                column.key,
+            )?.seats ?? 0,
+        );
+        let listed = 0;
+        for (const cell of row) {
+          listed += cell;
+        }
+        return [
+          ...row.map((cell) => count(cell)),
+          ...(hasOthers ? [count(seats - listed)] : []),
+          count(seats),
+        ];
+      };
+      let all = 0;
+      for (const entry of totals) {
+        all += entry.seats;
+      }
+      return [
+        `## ${m.regions_title({ name: chamber.name, noun: chamber.noun ?? "" })}`,
+        table(
+          [
+            chamber.noun == null
+              ? m.regions_place()
+              : `${chamber.noun.charAt(0).toUpperCase()}${chamber.noun.slice(1)}`,
+            ...shown.map((column) => column.label),
+            ...(hasOthers ? [m.regions_others()] : []),
+            m.regions_total(),
+          ],
+          [
+            ...chamber.regions.map((region) => [
+              region.name,
+              ...cells(region.parties, region.seats),
+            ]),
+            [
+              m.regions_total(),
+              ...cells(
+                totals.map((entry) => ({
+                  party:
+                    entry.key === "independent" || entry.key === ""
+                      ? null
+                      : entry.key,
+                  isIndependent: entry.key === "independent",
+                  seats: entry.seats,
+                })),
+                all,
+              ),
+            ],
+          ],
+        ),
       ];
     }),
     ...(byeRows.length === 0
