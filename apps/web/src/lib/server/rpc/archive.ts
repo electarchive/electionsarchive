@@ -11624,7 +11624,7 @@ export const people = {
         from: string;
         to: string | null;
       }>(sql`
-        select o.owner, o.owner = c.body_id as "isBody", e.date_from::text as from,
+        select o.owner, o.owner is not distinct from c.body_id as "isBody", e.date_from::text as from,
           coalesce(
             (select min(e2.date_from) from contest c2 join election e2 on e2.id = c2.election_id
               where c2.body_id is not distinct from c.body_id and c2.office_id is not distinct from c.office_id

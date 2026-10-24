@@ -10,11 +10,17 @@ from ea.changeset import Changeset
 from ea.store import connect
 
 SOURCE = "us.wikidata_links"
-VERSION = "2"
+VERSION = "3"
 TITLE = "Positions held (P39) and candidacies in elections (P3602) of American politicians"
 CHUNK = 150
 SLACK = 1
 SUFFIXES = {"jr", "sr", "ii", "iii", "iv"}
+SAME = {
+    "Q607": (
+        UUID("59fa3c96-7551-57fc-b8dc-6dc4a5e79d6c"),
+        UUID("01a13afb-20b6-7142-811a-06c7aae3dfd7"),
+    ),
+}
 NICKNAMES = {
     "william": "bill billy will willie willy",
     "robert": "bob bobby rob robbie bert",
@@ -467,4 +473,16 @@ def emit() -> Path:
             f"{merged_in} joined to the record holding it, {unique} ambiguous left apart, "
             f"{len(found) - nominees - merged_in - unique} unmatched"
         )
+        gone = {
+            entity
+            for (entity,) in conn.execute(
+                "select entity_id from entity_merge where entity_id = any(%s)",
+                [[person for people in SAME.values() for person in people]],
+            ).fetchall()
+        }
+        for item, people in SAME.items():
+            owners = items[item]
+            for person in people:
+                if len(owners) == 1 and person not in gone and person not in cs.survivors:
+                    cs.merge(person, next(iter(owners)))
         return cs.write()
