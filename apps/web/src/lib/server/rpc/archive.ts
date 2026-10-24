@@ -64,6 +64,16 @@ const fused = (option: SQL, contest: SQL) => sql`
     limit 1
   )
 `;
+const pooled = (list: SQL) => sql`
+  exists (
+    select from contest_option pl
+    join contest_option ch on ch.parent_option_id = pl.id and ch.party_id is not null
+      and ch.party_id is distinct from pl.party_id
+    join outcome y on y.option_id = ch.id and y.kind = 'elected' and y.candidacy_id is null
+    join result_set ry on ry.id = y.result_set_id and ry.is_default
+    where pl.id = ${list} and pl.kind = 'list'
+  )
+`;
 const stray = (candidacy: SQL, option: SQL, contest: SQL) => sql`
   (
     select case
@@ -1080,10 +1090,11 @@ async function load(
          and not exists (select from candidacy cz where cz.option_id = cy.option_id and cz.role = 'head' and cz.id <> cy.id)
        order by cy.option_id = o.id desc, cy.id limit 1) as person,
       oc.kind::text as outcome, oc.note,
-      case when o.parent_option_id is null or not exists (
-        select from outcome y join result_set ry on ry.id = y.result_set_id and ry.is_default
-        where y.option_id = o.parent_option_id and y.kind in ('elected', 'won') and y.candidacy_id is null
-      ) then oc.seats end as seats
+      case when o.kind = 'list' and ${pooled(sql`o.id`)} then null
+        when o.parent_option_id is null or ${pooled(sql`o.parent_option_id`)} or not exists (
+          select from outcome y join result_set ry on ry.id = y.result_set_id and ry.is_default
+          where y.option_id = o.parent_option_id and y.kind in ('elected', 'won') and y.candidacy_id is null
+        ) then oc.seats end as seats
     from contest_option o
     left join entity_merge pm on pm.entity_id = o.party_id
     left join lateral (
@@ -1093,9 +1104,13 @@ async function load(
       from outcome x join result_set rs on rs.id = x.result_set_id
       where x.option_id = o.id and o.contest_id = any(${sql.param(outcomes)}::uuid[]) and rs.is_default
         and (x.kind in ('elected', 'won', 'advanced', 'tied', 'withdrew', 'disqualified') or x.kind = 'lost' and o.kind = 'answer') and x.candidacy_id is null
+        and not (x.kind in ('withdrew', 'disqualified') and exists (
+          select from contest_option lp where lp.id = o.parent_option_id and lp.kind = 'list'
+        ))
     ) oc on true
     where (o.k = any(${sql.param([...optionKs])}::int[]) or o.contest_id = any(${sql.param(outcomes)}::uuid[]))
       and (o.k = any(${sql.param([...optionKs])}::int[]) or oc.kind is not null)
+      and not (o.kind = 'list' and ${pooled(sql`o.id`)})
   `);
   const [backing, coalitions] = await Promise.all([
     db.execute<{ party: string; person: string }>(sql`
@@ -10984,45 +10999,48 @@ export const polities = {
                       },
                       ...raced.filter((race) => !tiers.includes(race)),
                     ]
-                ).map((race, _index, all) => {
-                  let contested = 0;
-                  for (const row of race.results) {
-                    contested += row.seats ?? 0;
-                  }
-                  const namesakes = all.filter(
-                    (other) => other !== race && other.name === race.name,
-                  );
-                  return {
-                    contest: race.contest,
-                    name:
-                      namesakes.length === 0
-                        ? race.name
-                        : namesakes.some(
-                              (other) =>
-                                (other.round ?? 1) !== (race.round ?? 1),
-                            )
-                          ? m.race_round({
-                              name: race.name,
-                              round: race.round ?? 1,
-                            })
-                          : race.kind === "list_allocation" || race.noun === ""
-                            ? race.name
-                            : m.race_split({
+                )
+                  .map((race, _index, all) => {
+                    let contested = 0;
+                    for (const row of race.results) {
+                      contested += row.seats ?? 0;
+                    }
+                    const namesakes = all.filter(
+                      (other) => other !== race && other.name === race.name,
+                    );
+                    return {
+                      contest: race.contest,
+                      name:
+                        namesakes.length === 0
+                          ? race.name
+                          : namesakes.some(
+                                (other) =>
+                                  (other.round ?? 1) !== (race.round ?? 1),
+                              )
+                            ? m.race_round({
                                 name: race.name,
-                                noun: race.noun,
-                              }),
-                    path: race.path,
-                    count: race.count,
-                    contested,
-                    measure: race.measure,
-                    results: (contested > 0
-                      ? race.results.toSorted(
-                          (a, b) => (b.seats ?? 0) - (a.seats ?? 0),
-                        )
-                      : race.results
-                    ).slice(0, 3),
-                  };
-                }),
+                                round: race.round ?? 1,
+                              })
+                            : race.kind === "list_allocation" ||
+                                race.noun === ""
+                              ? race.name
+                              : m.race_split({
+                                  name: race.name,
+                                  noun: race.noun,
+                                }),
+                      path: race.path,
+                      count: race.count,
+                      contested,
+                      measure: race.measure,
+                      results: (contested > 0
+                        ? race.results.toSorted(
+                            (a, b) => (b.seats ?? 0) - (a.seats ?? 0),
+                          )
+                        : race.results
+                      ).slice(0, 3),
+                    };
+                  })
+                  .filter((race) => race.results.length > 0),
               },
       };
     }),
@@ -11256,7 +11274,7 @@ export const polities = {
           select t.root, t.id as contest, o.id, o.party_id, max(coalesce(o.seats, 1)) as seats
           from tree t
           cross join lateral (
-            select o.id, o.party_id, o.kind, x.seats
+            select o.id, o.party_id, o.kind, o.parent_option_id, x.seats
             from contest_option o
             join outcome x on x.option_id = o.id and x.kind in ('elected', 'won') and x.candidacy_id is null
             join result_set rs on rs.id = x.result_set_id and rs.is_default
@@ -11265,7 +11283,8 @@ export const polities = {
           ) o
           where not exists (select from contest k where k.allocation_parent_id = t.id and k.party_scope_id is null)
             and (t.id = t.root or not exists (select from contest sc where sc.id = t.id and sc.party_scope_id is not null))
-            and not (o.kind = 'candidate' and exists (
+            and not (o.kind = 'list' and ${pooled(sql`o.id`)})
+            and not (o.kind = 'candidate' and not ${pooled(sql`o.parent_option_id`)} and exists (
               select from contest_option l
               join outcome lx on lx.option_id = l.id and lx.kind in ('elected', 'won') and lx.candidacy_id is null
               join result_set lr on lr.id = lx.result_set_id and lr.is_default
