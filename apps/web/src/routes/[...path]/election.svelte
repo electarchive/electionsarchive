@@ -202,7 +202,7 @@
         count: 1,
         sample: null,
         since: null,
-        before: null,
+        before: base.overall,
         holders: null,
         partners: [],
         runoff: null,

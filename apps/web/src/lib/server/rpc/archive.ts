@@ -7556,6 +7556,19 @@ async function races(
       const size = isInside
         ? group.filter((row) => row.isCounted).length
         : (head?.size ?? null);
+      const isTier =
+        head?.body != null &&
+        (head.round ?? 1) === 1 &&
+        (head.kind === "body_seats" || head.kind === "list_allocation") &&
+        groups.some(
+          (other) =>
+            other[0]?.body === head.body &&
+            other[0].election === head.election &&
+            (other[0].round ?? 1) === 1 &&
+            other[0].kind !== head.kind &&
+            (other[0].kind === "body_seats" ||
+              other[0].kind === "list_allocation"),
+        );
       const [map, previous, runoff, seated, asked] = await Promise.all([
         level == null || isBrief || isPrimaries
           ? null
@@ -7572,7 +7585,7 @@ async function races(
         size == null ||
         head?.owner == null ||
         head.isOffice ||
-        filled < size * 0.9
+        (!isTier && filled < size * 0.9)
           ? null
           : db.execute<{
               party: string | null;
@@ -7680,13 +7693,15 @@ async function races(
         ...(previous?.rows ?? []).map((row) => row.doubt),
       );
       const before =
-        straddled > 0
+        straddled > 0 || isTier
           ? null
           : carried(previous?.rows ?? null, filled, parentOf);
       const { titled, named } = naming(head, single, groups);
       return {
         map,
         before,
+        whole: isTier && straddled === 0 ? (previous?.rows ?? null) : null,
+        filled,
         runoff,
         turnout: asked.turnout,
         quorum: asked.quorum,
@@ -7894,8 +7909,20 @@ async function races(
         isNational,
         scope,
         rank: _rank,
+        whole,
+        filled: _filled,
         ...race
       }) => {
+        let seated = 0;
+        for (const other of built) {
+          if (
+            other.whole != null &&
+            other.body === race.body &&
+            other.election === election
+          ) {
+            seated += other.filled;
+          }
+        }
         const stage = stages.find((entry) => entry.office === office);
         const rows = (
           stage == null && race.measure === "electoral_votes" ? race : stage
@@ -7918,6 +7945,7 @@ async function races(
                 seats: row.seats,
               })) ??
             null,
+          overall: carried(whole, seated, parentOf),
           name:
             scope == null || name.includes(scope.split(" ", 1)[0] ?? "")
               ? name
@@ -8141,6 +8169,9 @@ export const elections = {
             ),
             places: Places,
             before: v.nullable(
+              v.array(v.object({ key: v.string(), seats: v.number() })),
+            ),
+            overall: v.nullable(
               v.array(v.object({ key: v.string(), seats: v.number() })),
             ),
             runoff: v.nullable(

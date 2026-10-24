@@ -1222,6 +1222,9 @@ function electionMarkdown(
       tiers.set(row.key, entry);
     }
   }
+  const overall = new Map(
+    (tiered[0]?.overall ?? []).map((entry) => [entry.key, entry.seats]),
+  );
   const lists = tiered.filter((race) => race.kind === "list_allocation");
   const chamber = election.races.find(
     (race) =>
@@ -1281,20 +1284,34 @@ function electionMarkdown(
               m.col_constituency_seats(),
               m.col_list_seats(),
               m.col_total_seats(),
+              ...(overall.size > 0 ? [m.col_change()] : []),
             ],
             tiers
-              .values()
-              .filter((entry) => entry.constituencies + entry.lists > 0)
+              .entries()
+              .filter(([, entry]) => entry.constituencies + entry.lists > 0)
               .toArray()
               .toSorted(
-                (a, b) =>
+                ([, a], [, b]) =>
                   b.constituencies + b.lists - (a.constituencies + a.lists),
               )
-              .map((entry) => [
+              .map(([key, entry]) => [
                 entry.label,
                 count(entry.constituencies),
                 count(entry.lists),
                 count(entry.constituencies + entry.lists),
+                ...(overall.size > 0
+                  ? [
+                      overall.has(key)
+                        ? signed
+                            .format(
+                              entry.constituencies +
+                                entry.lists -
+                                (overall.get(key) ?? 0),
+                            )
+                            .replace("-", "−")
+                        : null,
+                    ]
+                  : []),
               ]),
           ),
         ]),
