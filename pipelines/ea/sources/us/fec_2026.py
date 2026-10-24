@@ -78,9 +78,9 @@ def emit() -> Path:
                join contest_option op on op.id = o.option_id
                join candidacy cy on cy.option_id = op.id and cy.role = 'head'
                where x.scheme = 'us.contest'
-                 and (x.value ~ '^2026-[0-9-]+:[A-Z]{2}:(governor|senate|house:[0-9]+):(democratic|republican)$'
+                 and (x.value ~ '^2026-[0-9-]+:[A-Z]{2}:(governor|senate|house:[0-9]+):(democratic|republican|minnesota-democratic-farmer-labor)$'
                       and o.kind = 'won'
-                      or x.value ~ '^2026-[0-9-]+:CA:(governor|house:[0-9]+)$' and o.kind = 'advanced')"""
+                      or x.value ~ '^2026-[0-9-]+:(CA|WA):(governor|house:[0-9]+)$' and o.kind = 'advanced')"""
         ):
             _, state, chamber, *rest = value.split(":")
             general = f"{DAY}:{state}:{chamber}" + (f":{rest[0]}" if chamber == "house" else "")
@@ -184,7 +184,7 @@ def emit() -> Path:
                     "note",
                     entity_id=contest,
                     kind="methodology",
-                    body_md=f"Candidates are the {state_name} nominees recorded in the archive's own 2026 primary result sets ({'the two advancing candidates of the top-two primary' if state == 'CA' else 'the major-party primary winners'}). Where a party's primary was uncontested or has not been loaded, that party's nominee is not yet listed. No ballot list from the state has been confirmed, so third-party and independent candidates are not yet listed.",
+                    body_md=f"Candidates are the {state_name} nominees recorded in the archive's own 2026 primary result sets ({'the two advancing candidates of the top-two primary' if state in ('CA', 'WA') else 'the major-party primary winners'}). Where a party's primary was uncontested or has not been loaded, that party's nominee is not yet listed. No ballot list from the state has been confirmed, so third-party and independent candidates are not yet listed.",
                 )
         print(counts)
         return cs.write()
