@@ -16,7 +16,7 @@ from ea.sources.us.elstats import FORMER, GAZETTEER, HELD, SEARCH, SUFFIXES, TEN
 from ea.store import DATA, connect
 
 SOURCE = "us.elstats_gov"
-VERSION = "1"
+VERSION = "2"
 PARSED = DATA / "parsed" / SOURCE
 OFFICES = {"CO": 4, "CT": 4, "ID": 4, "NH": 3, "NM": 89, "VT": 3, "VA": 3}
 DIVISIONS = {"County": "county", "Locality": "county", "City/Town": "town"}
@@ -81,6 +81,22 @@ OVERCOUNTED = (
     "The state archive's candidate votes exceed its own total vote count by over 0.5%. "
     "These figures are shown exactly as provided by the archive."
 )
+CHOSEN = {
+    ("VT", date(1841, 9, 7)): "Charles Paine",
+    ("VT", date(1843, 9, 5)): "John Mattocks",
+    ("VT", date(1845, 9, 2)): "William Slade",
+    ("VT", date(1846, 9, 1)): "Horace Eaton",
+    ("VT", date(1847, 9, 7)): "Horace Eaton",
+    ("VT", date(1848, 9, 5)): "Carlos Coolidge",
+    ("VT", date(1849, 9, 4)): "Carlos Coolidge",
+    ("VT", date(1852, 9, 7)): "Erastus Fairbanks",
+    ("VT", date(1853, 9, 6)): "John S. Robinson",
+    ("VT", date(1986, 11, 4)): "Madeleine M. Kunin",
+    ("VT", date(2002, 11, 5)): "Jim Douglas",
+    ("VT", date(2010, 11, 2)): "Peter Shumlin",
+    ("VT", date(2014, 11, 4)): "Peter Shumlin",
+}
+ELECTED = "Elected by the legislature in joint assembly, since no candidate won a majority of the popular vote."
 LEGISLATURE = (
     "No candidate won a majority of the popular vote. Under {state}'s constitution at the time, the legislature chose "
     "the governor."
@@ -617,6 +633,25 @@ def emit() -> Path:
                 and totals[won[0]] * 2 <= sum(totals.values())
             ):
                 cs.add("note", entity_id=result_set, kind="caveat", body_md=LEGISLATURE.format(state=state_name))
+                chosen = CHOSEN.get((state, day))
+                if chosen is None:
+                    continue
+                if chosen not in totals:
+                    raise ValueError(f"{state} {day}: {chosen} is not a candidate")
+                pooled = set(lines.filter(pl.col("pooled"))["candidate"])
+                ranked: dict[UUID, str] = {}
+                for candidate in sorted(totals, key=lambda c: (c != chosen, -totals[c])):
+                    if candidate not in pooled:
+                        ranked.setdefault(options[candidate], candidate)
+                for option, candidate in ranked.items():
+                    cs.add(
+                        "outcome",
+                        result_set_id=result_set,
+                        option_id=option,
+                        kind="elected" if candidate == chosen else "lost",
+                        seats=None,
+                        notes=ELECTED if candidate == chosen else None,
+                    )
                 continue
             for candidate in won[:2] if advancing else won[:1]:
                 cs.add(
