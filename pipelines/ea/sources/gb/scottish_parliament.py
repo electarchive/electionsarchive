@@ -294,6 +294,12 @@ def parse_pages() -> tuple[pl.DataFrame, pl.DataFrame]:
                 rivals = [row["votes"] for row in candidates[first:] if row["votes"] is not None and not row["elected"]]
                 if rivals:
                     winner["votes"] = max(rivals) + majority
+            if year == 1999 and constituency == "Falkirk West":
+                for row in candidates[first:]:
+                    if row["candidate"] == "Ross Martin":
+                        row["votes"] = 6319
+                    if row["elected"]:
+                        row["votes"] = 18511
         region = None
         index = split + 2
         while index < len(lines) and not lines[index].startswith("Copyright"):
