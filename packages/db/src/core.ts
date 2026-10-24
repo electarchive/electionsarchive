@@ -49,7 +49,7 @@ export const resultKind = pgEnum("result_kind", ["counted", "tacit", "show_of_ha
 export const resultSetStatus = pgEnum("result_set_status", ["active", "superseded", "annulled", "withdrawn"])
 export const schemeKind = pgEnum("scheme_kind", ["administrative", "electoral_district", "precinct", "census", "synthetic"])
 export const sourceKind = pgEnum("source_kind", ["official_body", "aggregator", "compendium", "news_agency", "academic", "community", "wikidata"])
-export const stage = pgEnum("stage", ["live", "preliminary", "official", "certified", "court_revised", "recount", "alternative"])
+export const stage = pgEnum("stage", ["live", "preliminary", "official", "certified", "court_revised", "recount", "alternative", "notional"])
 export const tenureAffiliationKind = pgEnum("tenure_affiliation_kind", ["party", "parliamentary_group"])
 export const tenureEventKind = pgEnum("tenure_event_kind", ["elected", "certified", "certificate_denied", "certificate_reversed", "sworn_in", "suspended", "removed", "trustee_appointed", "reinstated", "resigned", "died", "immunity_lifted", "arrested", "switched_party", "became_independent", "expelled", "term_ended"])
 export const representationGapReason = pgEnum("representation_gap_reason", ["secession"])
@@ -357,6 +357,7 @@ export const contest = pgTable("contest", {
 	changesetId: uuid("changeset_id").notNull().references(() => changeset.id),
 	recordedFrom: timestamp("recorded_from", { withTimezone: true }).default(sql`now()`).notNull(),
 	term: contestTerm(),
+	notional: boolean().default(false).notNull(),
 }, (table) => [
 	foreignKey({
 		columns: [table.allocationParentId],
