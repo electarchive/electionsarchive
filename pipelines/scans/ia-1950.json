@@ -1,0 +1,206 @@
+{
+  "polity": "US-IA",
+  "publisher": "Iowa Legislative Services Agency (Iowa Official Register)",
+  "title": "Iowa Official Register 1951-1952 (Redbook), general election 1950-11-07, by counties",
+  "license": "Public record",
+  "raw_source": "us.scans",
+  "file": {
+    "url": "https://www.legis.iowa.gov/docs/shelves/redbooks/Redbook-1951-1952%20(54GA).pdf",
+    "item": "https://www.legis.iowa.gov/archives/register"
+  },
+  "contests": {
+    "governor": {
+      "year": 1950,
+      "chamber": "governor",
+      "day": "1950-11-07",
+      "special": false,
+      "state": "IA",
+      "district": null
+    },
+    "lieutenant-governor": {
+      "year": 1950,
+      "chamber": "lieutenant-governor",
+      "day": "1950-11-07",
+      "special": false,
+      "state": "IA",
+      "district": null
+    },
+    "secretary-of-state": {
+      "year": 1950,
+      "chamber": "secretary-of-state",
+      "day": "1950-11-07",
+      "special": false,
+      "state": "IA",
+      "district": null
+    },
+    "auditor": {
+      "year": 1950,
+      "chamber": "auditor",
+      "day": "1950-11-07",
+      "special": false,
+      "state": "IA",
+      "district": null
+    },
+    "treasurer": {
+      "year": 1950,
+      "chamber": "treasurer",
+      "day": "1950-11-07",
+      "special": false,
+      "state": "IA",
+      "district": null
+    },
+    "secretary-of-agriculture": {
+      "year": 1950,
+      "chamber": "secretary-of-agriculture",
+      "day": "1950-11-07",
+      "special": false,
+      "state": "IA",
+      "district": null
+    },
+    "attorney-general": {
+      "year": 1950,
+      "chamber": "attorney-general",
+      "day": "1950-11-07",
+      "special": false,
+      "state": "IA",
+      "district": null
+    },
+    "superintendent-of-public-instruction": {
+      "year": 1950,
+      "chamber": "superintendent-of-public-instruction",
+      "day": "1950-11-07",
+      "special": false,
+      "state": "IA",
+      "district": null
+    },
+    "commerce-commissioner": {
+      "year": 1950,
+      "chamber": "commerce-commissioner",
+      "day": "1950-11-07",
+      "special": false,
+      "state": "IA",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 317,
+      "id": "317-0",
+      "orientation": "counties_down",
+      "discover": [
+        "governor",
+        "lieutenant-governor",
+        "secretary-of-state",
+        "auditor",
+        "treasurer",
+        "secretary-of-agriculture",
+        "attorney-general",
+        "superintendent-of-public-instruction",
+        "commerce-commissioner"
+      ],
+      "hint": "A page of Iowa general election returns by counties, one table per office; each office's table runs over two pages (the first half of the counties, then the rest) and the printed Total row is on the second page only. Read only the office tables that appear on this page (governor, lieutenant governor, secretary of state, auditor, treasurer, secretary of agriculture, attorney general, superintendent of public instruction, commerce commissioner); skip the U.S. Senator table, any note, and the Convention question. Candidates print as surnames with the party under the name. Iowa has 99 counties."
+    },
+    {
+      "page": 318,
+      "id": "318-0",
+      "orientation": "counties_down",
+      "discover": [
+        "governor",
+        "lieutenant-governor",
+        "secretary-of-state",
+        "auditor",
+        "treasurer",
+        "secretary-of-agriculture",
+        "attorney-general",
+        "superintendent-of-public-instruction",
+        "commerce-commissioner"
+      ],
+      "hint": "A page of Iowa general election returns by counties, one table per office; each office's table runs over two pages (the first half of the counties, then the rest) and the printed Total row is on the second page only. Read only the office tables that appear on this page (governor, lieutenant governor, secretary of state, auditor, treasurer, secretary of agriculture, attorney general, superintendent of public instruction, commerce commissioner); skip the U.S. Senator table, any note, and the Convention question. Candidates print as surnames with the party under the name. Iowa has 99 counties."
+    },
+    {
+      "page": 319,
+      "id": "319-0",
+      "orientation": "counties_down",
+      "discover": [
+        "governor",
+        "lieutenant-governor",
+        "secretary-of-state",
+        "auditor",
+        "treasurer",
+        "secretary-of-agriculture",
+        "attorney-general",
+        "superintendent-of-public-instruction",
+        "commerce-commissioner"
+      ],
+      "hint": "A page of Iowa general election returns by counties, one table per office; each office's table runs over two pages (the first half of the counties, then the rest) and the printed Total row is on the second page only. Read only the office tables that appear on this page (governor, lieutenant governor, secretary of state, auditor, treasurer, secretary of agriculture, attorney general, superintendent of public instruction, commerce commissioner); skip the U.S. Senator table, any note, and the Convention question. Candidates print as surnames with the party under the name. Iowa has 99 counties."
+    },
+    {
+      "page": 320,
+      "id": "320-0",
+      "orientation": "counties_down",
+      "discover": [
+        "governor",
+        "lieutenant-governor",
+        "secretary-of-state",
+        "auditor",
+        "treasurer",
+        "secretary-of-agriculture",
+        "attorney-general",
+        "superintendent-of-public-instruction",
+        "commerce-commissioner"
+      ],
+      "hint": "A page of Iowa general election returns by counties, one table per office; each office's table runs over two pages (the first half of the counties, then the rest) and the printed Total row is on the second page only. Read only the office tables that appear on this page (governor, lieutenant governor, secretary of state, auditor, treasurer, secretary of agriculture, attorney general, superintendent of public instruction, commerce commissioner); skip the U.S. Senator table, any note, and the Convention question. Candidates print as surnames with the party under the name. Iowa has 99 counties."
+    },
+    {
+      "page": 321,
+      "id": "321-0",
+      "orientation": "counties_down",
+      "discover": [
+        "governor",
+        "lieutenant-governor",
+        "secretary-of-state",
+        "auditor",
+        "treasurer",
+        "secretary-of-agriculture",
+        "attorney-general",
+        "superintendent-of-public-instruction",
+        "commerce-commissioner"
+      ],
+      "hint": "A page of Iowa general election returns by counties, one table per office; each office's table runs over two pages (the first half of the counties, then the rest) and the printed Total row is on the second page only. Read only the office tables that appear on this page (governor, lieutenant governor, secretary of state, auditor, treasurer, secretary of agriculture, attorney general, superintendent of public instruction, commerce commissioner); skip the U.S. Senator table, any note, and the Convention question. Candidates print as surnames with the party under the name. Iowa has 99 counties."
+    },
+    {
+      "page": 322,
+      "id": "322-0",
+      "orientation": "counties_down",
+      "discover": [
+        "governor",
+        "lieutenant-governor",
+        "secretary-of-state",
+        "auditor",
+        "treasurer",
+        "secretary-of-agriculture",
+        "attorney-general",
+        "superintendent-of-public-instruction",
+        "commerce-commissioner"
+      ],
+      "hint": "A page of Iowa general election returns by counties, one table per office; each office's table runs over two pages (the first half of the counties, then the rest) and the printed Total row is on the second page only. Read only the office tables that appear on this page (governor, lieutenant governor, secretary of state, auditor, treasurer, secretary of agriculture, attorney general, superintendent of public instruction, commerce commissioner); skip the U.S. Senator table, any note, and the Convention question. Candidates print as surnames with the party under the name. Iowa has 99 counties."
+    },
+    {
+      "page": 323,
+      "id": "323-0",
+      "orientation": "counties_down",
+      "discover": [
+        "governor",
+        "lieutenant-governor",
+        "secretary-of-state",
+        "auditor",
+        "treasurer",
+        "secretary-of-agriculture",
+        "attorney-general",
+        "superintendent-of-public-instruction",
+        "commerce-commissioner"
+      ],
+      "hint": "A page of Iowa general election returns by counties, one table per office; each office's table runs over two pages (the first half of the counties, then the rest) and the printed Total row is on the second page only. Read only the office tables that appear on this page (governor, lieutenant governor, secretary of state, auditor, treasurer, secretary of agriculture, attorney general, superintendent of public instruction, commerce commissioner); skip the U.S. Senator table, any note, and the Convention question. Candidates print as surnames with the party under the name. Iowa has 99 counties."
+    }
+  ]
+}
