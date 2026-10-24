@@ -12,7 +12,7 @@ from ea.sources.us import oh_primaries
 from ea.store import DATA, connect
 
 SOURCE = "us.oh_pri_turnout"
-VERSION = "1"
+VERSION = "2"
 PARSED = DATA / "parsed" / SOURCE
 PUBLISHER = "Ohio Secretary of State"
 TITLE = "Primary election voter turnout by county"
@@ -26,6 +26,7 @@ FILES = {
     date(2008, 3, 4): WAYBACK.format(
         "20200807183317", "elections/election-results-and-data/2008-election-results/voter-turnout-march-4-2008/"
     ),
+    date(2006, 11, 7): WAYBACK.format("20190826023927", PAGES.format(2006, "voter-turnout-november-7-2006")),
     date(2010, 5, 4): WAYBACK.format("20191118035925", PAGES.format(2010, "voter-turnout-may-4-2010")),
     date(2012, 3, 6): WAYBACK.format("20191118133520", PAGES.format(2012, "voter-turnout-march-6-2012")),
     date(2014, 5, 6): WAYBACK.format("20200612164028", "globalassets/elections/2014/primary/turnout.xlsx"),
@@ -141,15 +142,16 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Ohio's registered voters and ballots cast by county for the primaries of 2000 to 2024, from the "
+            summary="Ohio's registered voters and ballots cast by county for the primaries of 2000 to 2024 and the 2006 general, from the "
             "Secretary of State's turnout pages and official canvass workbooks",
             polity="US",
         )
         elections = {
-            start: entity_id
-            for entity_id, start in conn.execute(
-                """select x.entity_id, e.date_from from external_id x join election e on e.id = x.entity_id
-                   where x.scheme = 'us.election' and x.value ~ '^\\d{4}-\\d\\d-\\d\\d:OH:primary$'"""
+            start: (entity_id, kind)
+            for entity_id, start, kind in conn.execute(
+                """select x.entity_id, e.date_from, e.kind from external_id x join election e on e.id = x.entity_id
+                   where x.scheme = 'us.election' and x.value ~ '^\\d{4}-\\d\\d-\\d\\d:OH(:primary|:special)?$'
+                   and e.kind in ('primary', 'general', 'special', 'referendum')"""
             )
         }
         held = {
@@ -179,8 +181,8 @@ def emit() -> Path:
             if day not in elections:
                 print(f"{day}: no election")
                 continue
-            election_id = elections[day]
-            result_set = cs.key(f"{SOURCE}.result_set", f"{day}:OH:primary:county")
+            election_id, kind = elections[day]
+            result_set = cs.key(f"{SOURCE}.result_set", f"{day}:OH:{kind}:county")
             note = rows["note"].drop_nulls().first()
             if note is not None:
                 cs.add("note", id=uuid5(result_set, "total"), entity_id=result_set, kind="caveat", body_md=note)
