@@ -1,4 +1,5 @@
 import csv
+import shutil
 import json
 import io
 import re
@@ -7,6 +8,7 @@ import time
 import unicodedata
 from datetime import date
 from uuid import UUID
+from PIL import Image
 from html import unescape
 from pathlib import Path
 
@@ -22,6 +24,7 @@ from ea.store import DATA, connect
 SOURCE = "gb.ni_council"
 VERSION = "1"
 PARSED = DATA / "parsed" / SOURCE
+SCAN_PAGES = DATA / "pages" / "gb.ni_scans"
 EONI = "https://www.eoni.org.uk"
 PAGE_2023 = f"{EONI}/results-data/local-council-elections-2023-results/"
 DEAS = f"{EONI}/media/aormmh5f/deas-by-district-website.xls"
@@ -736,6 +739,7 @@ COUNCILS = {
     "N09000011": "Ards and North Down Borough Council",
 }
 BODY_SIZES = {"N09000003": 60, "N09000002": 41, "N09000010": 41}
+SHORT_NAMES = ((r"green party", "Green"), (r"people before profit", "PBP"), (r"progressive unionist", "PUP"))
 EXTRA_PARTIES = (
     (r"democratic ulster unionist - d\.u\.p", "Democratic Unionist Party"),
     (r"^all$", "Alliance Party"),
@@ -744,6 +748,12 @@ EXTRA_PARTIES = (
     (r"^con$", "Conservative"),
     (r"^pbpa$", "People Before Profit Alliance"),
     (r"^ind$|indepdendent", None),
+    (r"^democratic union", "Democratic Unionist Party"),
+    (r"^social$", "Social Democratic and Labour Party"),
+    (r"^gre$", "Green Party Northern Ireland"),
+    (r"^cons\. ?& ?unionist", "Conservative"),
+    (r"^cross[- ]community la|^ccla$", "Cross-Community Labour Alignment"),
+    (r"^democrats (and|&) vetera", "Democrats and Veterans Party"),
     (r"^0$", None),
     (r"^ni2[12]$|northern ireland 21", "NI21"),
     (r"^-$|^valarie$|^upu$|^aa$|^up$|^0\s+0$|^official anti-trimble", None),
@@ -812,9 +822,17 @@ def parse() -> None:
     ark_units, ark_totals = parse_ark(2005)
     units += ark_units
     totals += ark_totals
-    pl.DataFrame(units, infer_schema_length=None).write_parquet(PARSED / "units.parquet")
-    pl.DataFrame(totals, infer_schema_length=None).write_parquet(PARSED / "totals.parquet")
-    print(pl.DataFrame(units, infer_schema_length=None).group_by("year").len().sort("year"))
+    scanned = DATA / "parsed" / "gb.ni_scans"
+    units = pl.DataFrame(units, infer_schema_length=None)
+    totals = pl.DataFrame(totals, infer_schema_length=None)
+    if (scanned / "units.parquet").exists():
+        read = pl.read_parquet(scanned / "units.parquet")
+        keys = read.select("year", "dea_code")
+        units = pl.concat([units.join(keys, on=["year", "dea_code"], how="anti"), read.drop("reader")], how="diagonal_relaxed")
+        totals = pl.concat([totals.join(keys, on=["year", "dea_code"], how="anti"), pl.read_parquet(scanned / "totals.parquet")], how="diagonal_relaxed")
+    units.write_parquet(PARSED / "units.parquet")
+    totals.write_parquet(PARSED / "totals.parquet")
+    print(units.group_by("year").len().sort("year"))
 
 
 VOTES, REGISTERED, BALLOTS, VALID, INVALID, EXHAUSTED, QUOTA = 1, 2, 3, 4, 5, 21, 26
@@ -869,6 +887,7 @@ def emit() -> Path:
         if found is not None:
             known[fold("Sinn Féin")] = found[0]
         parties: dict[str, UUID] = {}
+        shorted: set[str] = set()
 
         def party_id(canonical: str | None) -> UUID | None:
             if canonical is None:
@@ -881,6 +900,11 @@ def emit() -> Path:
                     if parties[canonical] in cs.minted:
                         cs.add("party", id=parties[canonical], kind="party", polity_id=gb)
                         name(parties[canonical], canonical)
+            for pattern, short in SHORT_NAMES:
+                if canonical not in shorted and re.search(pattern, fold(canonical)):
+                    shorted.add(canonical)
+                    if conn.execute("select 1 from name where entity_id = %s and kind = 'short'", (parties[canonical],)).fetchone() is None:
+                        name(parties[canonical], short, kind="short")
             return parties[canonical]
 
         council_areas: dict[str, UUID] = {}
@@ -928,6 +952,7 @@ def emit() -> Path:
         dea_units: dict[str, UUID] = {}
         council_elections: dict[tuple[int, str], UUID] = {}
         sources: dict[str, UUID] = {}
+        files: dict[object, object] = {}
         for year, day in DAYS.items():
             held = units.filter(pl.col("year") == year)
             if held.is_empty():
@@ -993,7 +1018,12 @@ def emit() -> Path:
                         license_url=OGL if year == 2014 else None,
                         attribution=publisher,
                     )
-                    cs.artifact(raw.cached(SOURCE, url), sources[url])
+                    try:
+                        stored = raw.cached(SOURCE, url)
+                    except LookupError:
+                        stored = raw.cached("gb.ni_scans", url)
+                    files[url] = cs.artifact(stored, sources[url])
+                    files[url, "sha"] = stored.sha256
                 seats = int(unit_row["seats"])
                 contest_key = f"{day}:local:{dea_code}"
                 contest = cs.key("gb.contest", contest_key)
@@ -1076,10 +1106,40 @@ def emit() -> Path:
                         is_independent=independent,
                     )
                     eliminated = False
+                    located = {
+                        row["stage"]: row
+                        for row in lines.filter((pl.col("number") == candidate["number"]) & pl.col("page").is_not_null()).iter_rows(named=True)
+                    } if "page" in lines.columns else {}
                     for stage in sorted(series):
                         if eliminated:
                             break
                         amount = series[stage]
+                        if stage in located:
+                            box = located[stage]
+                            number = int(box["page"])
+                            if (url, number) not in files:
+                                image = SCAN_PAGES / f"{files[url, 'sha']}-{number}.png"
+                                shutil.copy(sorted((SCAN_PAGES / re.sub(r"\W+", "-", url)[-80:]).glob("p-*.png"))[number - 1], image)
+                                width, height = Image.open(image).size
+                                files[url, number] = cs.page(files[url], number)
+                                cs.add("source_page", id=files[url, number], artifact_id=files[url], page_number=number, image_key=f"pages/gb.ni_scans/{image.name}", width=width, height=height)
+                                files[url, number, "size"] = (width, height)
+                            width, height = files[url, number, "size"]
+                            cs.add(
+                                "value_locator",
+                                result_set_id=result_set,
+                                unit_id=unit,
+                                option_id=option,
+                                channel=0,
+                                measure=VOTES,
+                                count_round=stage,
+                                page_id=files[url, number],
+                                source_id=None,
+                                x0=box["x0"] / width,
+                                y0=box["y0"] / height,
+                                x1=box["x1"] / width,
+                                y1=box["y1"] / height,
+                            )
                         cs.add(
                             "result_value",
                             result_set_id=result_set,
