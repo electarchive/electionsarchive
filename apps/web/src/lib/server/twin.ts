@@ -797,7 +797,9 @@ function polityMarkdown(
             polity.results.flatMap((group) =>
               group.races.map((race) => [
                 date(group.date),
-                link(race.name, race.path),
+                race.source == null
+                  ? link(race.name, race.path)
+                  : `${link(race.name, race.path)} (${m.polity_results_source({ publisher: race.source })})`,
                 race.leaders[0]?.label ?? null,
                 race.leaders[0] == null ? null : percent(race.leaders[0].share),
               ]),

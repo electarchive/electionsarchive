@@ -772,6 +772,9 @@
         </h2>
         <p class="text-[0.8125rem] text-muted-foreground">
           {m.polity_results_lede({ place: polity.name })}
+          {#if results.some( (group) => group.races.some((race) => race.source != null) )}
+            {m.polity_results_sourced({ place: polity.name })}
+          {/if}
         </p>
       </div>
       <ol class="grid">
@@ -790,14 +793,23 @@
                 <li
                   class="grid items-center gap-x-4 gap-y-1 text-sm sm:grid-cols-[minmax(0,1fr)_6rem_minmax(0,15rem)]"
                 >
-                  <Preview
-                    class="text-pretty first-letter:uppercase hover:highlighter"
-                    path={race.path}
-                    >{group.year != null &&
-                    race.name.startsWith(`${group.year} `)
-                      ? race.name.slice(String(group.year).length + 1)
-                      : race.name}</Preview
-                  >
+                  <div class="grid gap-0.5">
+                    <Preview
+                      class="text-pretty first-letter:uppercase hover:highlighter"
+                      path={race.path}
+                      >{group.year != null &&
+                      race.name.startsWith(`${group.year} `)
+                        ? race.name.slice(String(group.year).length + 1)
+                        : race.name}</Preview
+                    >
+                    {#if race.source != null}
+                      <span class="text-xs text-muted-foreground"
+                        >{m.polity_results_source({
+                          publisher: race.source,
+                        })}</span
+                      >
+                    {/if}
+                  </div>
                   <div
                     class="flex overflow-hidden rounded-xs bg-muted block-2 max-sm:hidden"
                     aria-hidden="true"

@@ -9289,6 +9289,7 @@ export const polities = {
                 name: v.string(),
                 path: v.string(),
                 unit: v.nullable(v.string()),
+                source: v.nullable(v.string()),
                 leaders: v.array(
                   v.object({
                     key: v.string(),
@@ -9571,13 +9572,39 @@ export const polities = {
                 other.place.k === row.k
                   ? []
                   : await children(row.id, other.place, true, row.date);
-              const unit =
-                other.place.k === row.k
-                  ? ""
-                  : kids.find((kid) => kid.k === row.k)?.segment;
-              if (unit == null) {
+              const direct = kids.find((kid) => kid.k === row.k);
+              const route =
+                direct != null || other.place.k === row.k
+                  ? null
+                  : await db.execute<{ path: Array<string> }>(sql`
+                    with recursive up(id, path) as (
+                      select ${row.area}::uuid, array[]::uuid[]
+                      union all
+                      select p.parent_id, p.area_id || up.path from up
+                      join area_parent p on p.area_id = up.id and p.valid @> ${row.date}::date
+                      where up.id <> ${other.place.id}::uuid and cardinality(up.path) < 4
+                    )
+                    select to_json(path) as path from up where id = ${other.place.id}::uuid limit 1
+                  `);
+              const steps = direct == null ? [] : [direct.segment];
+              const below = route?.rows[0]?.path ?? [];
+              let current = other.place;
+              for (const id of below) {
+                const step = (
+                  steps.length === 0
+                    ? kids
+                    : await children(row.id, current, false, row.date)
+                ).find((kid) => kid.id === id);
+                if (step == null) {
+                  return null;
+                }
+                steps.push(step.segment);
+                current = step;
+              }
+              if (other.place.k !== row.k && steps.length === 0) {
                 return null;
               }
+              const unit = steps.join("/");
               const [totals, label, lineage] = await Promise.all([
                 load([row.id], [row.k], row.date, [row.id]),
                 names([row.id], row.date),
@@ -9588,6 +9615,9 @@ export const polities = {
                 ...row,
                 unit,
                 valid: loaded?.side.valid ?? 0,
+                source: loaded?.sets.some((set) => set.isDefault)
+                  ? null
+                  : (loaded?.sets[0]?.source.publisher ?? null),
                 name: label.full.get(row.id) ?? "",
                 path: [row.path, unit].filter((part) => part !== "").join("/"),
                 leaders:
@@ -9676,6 +9706,7 @@ export const polities = {
               name: race.name,
               path: race.path,
               unit: race.unit === "" ? null : race.unit,
+              source: race.source,
               leaders: race.leaders,
             })),
           }))

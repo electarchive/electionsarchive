@@ -755,6 +755,8 @@
   "workbench_no_places": "This contest has no results below its own level.",
   "polity_results_title": "Results in {place}",
   "polity_results_lede": "State and national races in {place}. Each one opens at {place}.",
+  "polity_results_source": "Figures from {publisher}",
+  "polity_results_sourced": "Where official results stop above {place}, the figures come from another source, named under each race.",
   "polity_results_more": "Show all {count} years",
   "polity_results_fewer": "Show fewer years",
   "polity_kind_county": "Counties",
