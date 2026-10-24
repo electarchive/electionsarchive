@@ -13,7 +13,7 @@ from ea.sources.gb.umit import fold
 from ea.store import DATA, connect
 
 SOURCE = "gb.parlconst"
-VERSION = "1"
+VERSION = "2"
 PARSED = DATA / "parsed" / SOURCE
 UMAP = "https://umap.openstreetmap.fr/en"
 MAPS = {
@@ -158,7 +158,8 @@ REGIONAL = {
     ("south", "Wellington"): "Wellington (Somerset)",
 }
 ALIASES = {"1974:eng-richmond-upon-thames": "Richmond (Surrey)"}
-GAPS = {"1983:eng-north-east-milton-keynes", "1983:eng-south-west-milton-keynes"}
+GAPS = {"1983:eng-north-east-milton-keynes": "PCON01-315", "1983:eng-south-west-milton-keynes": "PCON01-292"}
+INTERIM = date(1992, 4, 9)
 SAME = {
     "1955:eng-woodford": "1955:eng-wanstead-and-woodford",
     "1955:eng-richmond-upon-thames": "1955:eng-richmond-surrey",
@@ -174,7 +175,10 @@ ATTRIBUTION = (
 NOTES = (
     "Constituency maps drawn by the author of parlconst.org backwards in time from Ordnance Survey's 2010 and 2024 "
     "boundaries and published as uMap layers on umap.openstreetmap.fr. Clipped here to the coastline of ONS's 2019 "
-    "generalized constituencies and simplified to 20 m."
+    "generalized constituencies and simplified to 20 m. Buckingham from 1992 to 1997 is ONS's 1997 Buckingham cut "
+    "to this 1983 Buckingham: the Parliamentary Constituencies (England) (Miscellaneous Changes) Order 1990 "
+    "(SI 1990/1307) moved its Milton Keynes wards to the two new Milton Keynes seats, and the Parliamentary "
+    "Constituencies (England) Order 1995 (SI 1995/1626) added Aston Clinton ward."
 )
 TOLERANCE = 20
 
@@ -318,16 +322,54 @@ def emit() -> Path:
         for url in json.loads((DATA / "raw" / SOURCE / "index.json").read_text()):
             cs.artifact(raw.cached(SOURCE, url), source)
         valid = {area: (start, end) for _, _, area, start, end in areas}
+        ids = {code: area for code, _, area, _, _ in areas}
         rows = frame.select("geom", "label_point").rows()
+        buckingham = ids["1983:eng-buckingham"]
         for area, i in sorted(matched.items(), key=lambda item: str(item[0])):
             cs.add(
                 "area_geometry",
                 area_id=area,
                 valid_from=valid[area][0],
-                valid_to=valid[area][1],
+                valid_to=INTERIM if area == buckingham else valid[area][1],
                 geom=rows[i][0],
                 label_point=rows[i][1],
                 quality="digitized",
                 source_id=source,
             )
+        ons = {
+            code: (geom, point, ons_source)
+            for code, geom, point, ons_source in conn.execute(
+                """select c.code, encode(st_asewkb(g.geom), 'hex'), encode(st_asewkb(g.label_point), 'hex'), g.source_id
+                   from area_code c join area_geometry g on g.area_id = c.area_id and g.valid @> date '1997-05-01'
+                   where c.code in ('PCON01-081', 'PCON01-292', 'PCON01-315')"""
+            ).fetchall()
+        }
+        for code, successor in GAPS.items():
+            geom, point, ons_source = ons[successor]
+            cs.add(
+                "area_geometry",
+                area_id=ids[code],
+                valid_from=INTERIM,
+                valid_to=valid[ids[code]][1],
+                geom=geom,
+                label_point=point,
+                quality="official",
+                source_id=ons_source,
+            )
+        geom, point = conn.execute(
+            """select encode(st_asewkb(shape), 'hex'), encode(st_asewkb(st_pointonsurface(shape)), 'hex')
+               from (select st_multi(st_collectionextract(st_makevalid(st_intersection(
+                       st_geomfromewkb(decode(%s, 'hex')), st_geomfromewkb(decode(%s, 'hex')))), 3)) as shape) cut""",
+            [ons["PCON01-081"][0], rows[matched[buckingham]][0]],
+        ).fetchone()
+        cs.add(
+            "area_geometry",
+            area_id=buckingham,
+            valid_from=INTERIM,
+            valid_to=valid[buckingham][1],
+            geom=geom,
+            label_point=point,
+            quality="digitized",
+            source_id=source,
+        )
         return cs.write()
