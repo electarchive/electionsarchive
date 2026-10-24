@@ -186,6 +186,7 @@
         cycle={data.cycle}
         handover={data.handover}
         additional={data.additional}
+        successors={data.successors}
         boundaries={data.boundaries}
         surround={data.surround}
         match={data.match}

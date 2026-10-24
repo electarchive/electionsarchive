@@ -52,6 +52,7 @@
     cycle,
     handover,
     additional,
+    successors,
     boundaries,
     surround,
     match,
@@ -63,6 +64,7 @@
     cycle: Extract<PageData, { kind: "contest" }>["cycle"];
     handover: Extract<PageData, { kind: "contest" }>["handover"];
     additional: Extract<PageData, { kind: "contest" }>["additional"];
+    successors: Extract<PageData, { kind: "contest" }>["successors"];
     boundaries: Extract<PageData, { kind: "contest" }>["boundaries"];
     surround: Extract<PageData, { kind: "contest" }>["surround"];
     match: string;
@@ -190,6 +192,50 @@
         return [
           { text: head, path: null },
           { text: origin.name, path: origin.path },
+          { text: tail, path: null },
+        ];
+      }),
+      { text: after, path: null },
+    ];
+  });
+
+  const heirs = $derived.by(() => {
+    if (successors == null) {
+      return [];
+    }
+    const [only] = successors.places;
+    if (successors.places.length === 1 && only != null && only.share >= 0.9) {
+      const [before = "", after = ""] = m
+        .successors_one({ year: successors.year, seat: "\u0001" })
+        .split("\u0001");
+      return [
+        { text: before, path: null },
+        { text: only.name, path: only.path },
+        { text: after, path: null },
+      ];
+    }
+    const [before = "", after = ""] = m
+      .successors_many({ year: successors.year, seats: "\u0001" })
+      .split("\u0001");
+    const parts = new Intl.ListFormat(getLocale(), {
+      type: "conjunction",
+    }).formatToParts(successors.places.map((_, index) => String(index)));
+    return [
+      { text: before, path: null },
+      ...parts.flatMap((part) => {
+        const place =
+          part.type === "element"
+            ? successors.places[Number(part.value)]
+            : undefined;
+        if (place == null) {
+          return [{ text: part.value, path: null }];
+        }
+        const [head = "", tail = ""] = m
+          .origins_item({ name: "\u0001", share: percent(place.share, 0) })
+          .split("\u0001");
+        return [
+          { text: head, path: null },
+          { text: place.name, path: place.path },
           { text: tail, path: null },
         ];
       }),
@@ -1349,6 +1395,16 @@
       class="text-[0.9375rem] text-pretty text-muted-foreground max-inline-[60ch] md:col-span-2"
     >
       {#each origins as part, index (index)}{#if part.path == null}{part.text}{:else}<Preview
+            class="text-foreground underline decoration-border underline-offset-4 hover:decoration-foreground"
+            path={part.path}>{part.text}</Preview
+          >{/if}{/each}
+    </p>
+  {/if}
+  {#if heirs.length > 0}
+    <p
+      class="text-[0.9375rem] text-pretty text-muted-foreground max-inline-[60ch] md:col-span-2"
+    >
+      {#each heirs as part, index (index)}{#if part.path == null}{part.text}{:else}<Preview
             class="text-foreground underline decoration-border underline-offset-4 hover:decoration-foreground"
             path={part.path}>{part.text}</Preview
           >{/if}{/each}

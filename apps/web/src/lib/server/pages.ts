@@ -529,26 +529,35 @@ export async function archive(path: string, search: URLSearchParams) {
   `);
   const within = region.rows[0]?.id ?? null;
   if (slug.type === "contest") {
-    const [contest, lists, rounds, ballot, cycle, handover, additional] =
-      await found(
-        Promise.all([
-          call(router.contests.get, {
-            id: slug.entity_id,
-            unit,
-            by: search.get("by") ?? undefined,
-            vs: search.get("vs") ?? undefined,
-            match,
-            round: Math.max(0, Math.trunc(Number(search.get("round"))) || 0),
-            group: search.get("group") ?? undefined,
-          }),
-          call(router.contests.lists, { id: slug.entity_id }),
-          call(router.contests.rounds, { id: slug.entity_id, unit }),
-          call(router.contests.ballot, { id: slug.entity_id, unit }),
-          call(router.contests.cycle, { id: slug.entity_id, unit }),
-          call(router.seats.change, { id: slug.entity_id }),
-          call(router.seats.additional, { id: slug.entity_id }),
-        ]),
-      );
+    const [
+      contest,
+      lists,
+      rounds,
+      ballot,
+      cycle,
+      handover,
+      additional,
+      successors,
+    ] = await found(
+      Promise.all([
+        call(router.contests.get, {
+          id: slug.entity_id,
+          unit,
+          by: search.get("by") ?? undefined,
+          vs: search.get("vs") ?? undefined,
+          match,
+          round: Math.max(0, Math.trunc(Number(search.get("round"))) || 0),
+          group: search.get("group") ?? undefined,
+        }),
+        call(router.contests.lists, { id: slug.entity_id }),
+        call(router.contests.rounds, { id: slug.entity_id, unit }),
+        call(router.contests.ballot, { id: slug.entity_id, unit }),
+        call(router.contests.cycle, { id: slug.entity_id, unit }),
+        call(router.seats.change, { id: slug.entity_id }),
+        call(router.seats.additional, { id: slug.entity_id }),
+        call(router.seats.successors, { id: slug.entity_id }),
+      ]),
+    );
     const boundaries = await call(router.contests.boundaries, {
       id: slug.entity_id,
       unit,
@@ -596,6 +605,7 @@ export async function archive(path: string, search: URLSearchParams) {
       cycle,
       handover,
       additional,
+      successors,
       boundaries,
       surround,
       match,

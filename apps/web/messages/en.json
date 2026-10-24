@@ -304,6 +304,8 @@
   "origins_one": "New boundaries for {year}, drawn almost entirely from {seat} as it stood from {from} to {to}.",
   "origins_many": "New boundaries for {year}. By area, this seat came from {seats}.",
   "origins_item": "{name} ({share})",
+  "successors_one": "Boundaries changed for {year}, and almost all of this seat's area went to {seat}.",
+  "successors_many": "Boundaries changed for {year}. By area, this seat went to {seats}.",
   "series_annulled": "{year} (annulled)",
   "places_shared": "Located in {place}",
   "places_deeper": "View {noun} results by {finer}",

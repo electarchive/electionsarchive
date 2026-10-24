@@ -367,6 +367,7 @@ function markdown(data: Data, link: Link) {
         data.cycle,
         data.handover,
         data.additional,
+        data.successors,
         link,
       );
     }
@@ -930,33 +931,34 @@ function electionMarkdown(
       row.to != null && row.from != null && label(row.to) !== label(row.from),
   }));
   const gained = byeRows.filter((row) => row.isGain).length;
-  const tiered = Map.groupBy(
-    election.races.filter(
-      (race) =>
-        race.body != null &&
-        (race.round ?? 1) === 1 &&
-        (race.kind === "body_seats" || race.kind === "list_allocation"),
-    ),
-    (race) => race.body,
-  )
-    .values()
-    .find((group) => {
-      let seats = 0;
-      for (const race of group) {
-        for (const row of race.results) {
-          seats += row.seats ?? 0;
+  const tiered =
+    Map.groupBy(
+      election.races.filter(
+        (race) =>
+          race.body != null &&
+          (race.round ?? 1) === 1 &&
+          (race.kind === "body_seats" || race.kind === "list_allocation"),
+      ),
+      (race) => race.body,
+    )
+      .values()
+      .find((group) => {
+        let seats = 0;
+        for (const race of group) {
+          for (const row of race.results) {
+            seats += row.seats ?? 0;
+          }
         }
-      }
-      return (
-        new Set(group.map((race) => race.kind)).size === 2 &&
-        (group[0]?.size == null || seats <= group[0].size * 1.02)
-      );
-    });
+        return (
+          new Set(group.map((race) => race.kind)).size === 2 &&
+          (group[0]?.size == null || seats <= group[0].size * 1.02)
+        );
+      }) ?? [];
   const tiers = new Map<
     string,
     { label: string; constituencies: number; lists: number }
   >();
-  for (const race of tiered ?? []) {
+  for (const race of tiered) {
     for (const row of race.results) {
       const entry = tiers.get(row.key) ?? {
         label: row.label,
@@ -986,7 +988,7 @@ function electionMarkdown(
             ),
           })}${election.turnout.basis === "rejected" ? ` ${m.turnout_basis_rejected()}` : election.turnout.basis === "valid" ? ` ${m.turnout_basis_valid()}` : ""}`,
         ]),
-    ...(tiered?.[0] == null
+    ...(tiered[0] == null
       ? []
       : [
           `## ${m.race_tiers_title({ name: tiered[0].name })}`,
@@ -1026,7 +1028,7 @@ function electionMarkdown(
               ...entry,
               name: m.race_round({ name: entry.name, round: entry.round }),
             }
-          : tiered?.includes(entry) && entry.kind === "list_allocation"
+          : tiered.includes(entry) && entry.kind === "list_allocation"
             ? { ...entry, name: m.race_list({ name: entry.name }) }
             : entry;
       const hasSeats = race.results.some((row) => row.seats != null);
@@ -1154,6 +1156,7 @@ function contestMarkdown(
   cycle: Extract<Data, { kind: "contest" }>["cycle"],
   handover: Extract<Data, { kind: "contest" }>["handover"],
   additional: Extract<Data, { kind: "contest" }>["additional"],
+  successors: Extract<Data, { kind: "contest" }>["successors"],
   link: Link,
 ) {
   const groups: Record<string, () => string> = {
@@ -1377,6 +1380,66 @@ function contestMarkdown(
           contest.children
             .map((child) => `- ${link(child.name, child.path)}`)
             .join("\n"),
+        ]),
+    ...(contest.origins == null ||
+    contest.origins.length === 0 ||
+    contest.series.find((entry) => entry.current)?.year == null
+      ? []
+      : [
+          contest.origins.length === 1 &&
+          (contest.origins[0]?.share ?? 0) >= 0.9 &&
+          contest.origins[0]?.first != null &&
+          contest.origins[0].year != null &&
+          contest.origins[0].first < contest.origins[0].year
+            ? m.origins_one({
+                year: String(
+                  contest.series.find((entry) => entry.current)?.year,
+                ),
+                seat: link(contest.origins[0].name, contest.origins[0].path),
+                from: String(contest.origins[0].first),
+                to: String(contest.origins[0].year),
+              })
+            : m.origins_many({
+                year: String(
+                  contest.series.find((entry) => entry.current)?.year,
+                ),
+                seats: new Intl.ListFormat(getLocale(), {
+                  type: "conjunction",
+                }).format(
+                  contest.origins.map((origin) =>
+                    m.origins_item({
+                      name: link(origin.name, origin.path),
+                      share: percent(origin.share, 0),
+                    }),
+                  ),
+                ),
+              }),
+        ]),
+    ...(successors == null
+      ? []
+      : [
+          successors.places.length === 1 &&
+          (successors.places[0]?.share ?? 0) >= 0.9
+            ? m.successors_one({
+                year: successors.year,
+                seat: link(
+                  successors.places[0]?.name ?? "",
+                  successors.places[0]?.path ?? null,
+                ),
+              })
+            : m.successors_many({
+                year: successors.year,
+                seats: new Intl.ListFormat(getLocale(), {
+                  type: "conjunction",
+                }).format(
+                  successors.places.map((place) =>
+                    m.origins_item({
+                      name: link(place.name, place.path),
+                      share: percent(place.share, 0),
+                    }),
+                  ),
+                ),
+              }),
         ]),
     ...(contest.series.length < 2
       ? []

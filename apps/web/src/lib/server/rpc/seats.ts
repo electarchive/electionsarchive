@@ -1019,4 +1019,82 @@ export const seats = {
           })),
       };
     }),
+  successors: os
+    .meta(
+      openapi({
+        method: "GET",
+        path: "/contests/{id}/successors",
+        summary:
+          "Where a constituency's land went at the next boundary change, as shares of its area estimated from boundary maps, on the last general election held under its boundaries",
+      }),
+    )
+    .input(v.object({ id: v.pipe(v.string(), v.uuid()) }))
+    .output(
+      v.nullable(
+        v.object({
+          year: v.string(),
+          places: v.array(
+            v.object({
+              name: v.string(),
+              path: v.nullable(v.string()),
+              share: v.number(),
+            }),
+          ),
+        }),
+      ),
+    )
+    .handler(async ({ input }) => {
+      const found = await db.execute<{
+        vintage: string;
+        area: string;
+        share: number;
+        contest: string | null;
+        day: string;
+      }>(sql`
+        with c as materialized (
+          select k.district_area_id as area, a.k, a.scheme_code, e.date_from as day
+          from contest k join election e on e.id = k.election_id join area a on a.id = k.district_area_id
+          where k.id = ${input.id}::uuid and k.kind = 'body_seats' and e.kind = 'general'
+        ),
+        s as materialized (
+          select bs.id, bs.valid from boundary_set bs join c on bs.scheme_code = c.scheme_code and bs.valid @> c.day
+          order by bs.valid_from desc nulls last limit 1
+        )
+        select t.vintage, ta.id::text as area, w.weight::float8 as share, c.day::text as day,
+          (select k.id::text from contest k join election e on e.id = k.election_id
+            where k.district_area_id = ta.id and k.kind = 'body_seats' and e.kind = 'general' and e.status = 'held'
+              and e.date_from >= lower(t.valid)
+            order by e.date_from limit 1) as contest
+        from s cross join c
+        join crosswalk x on x.from_boundary_set_id = s.id and x.method = 'area'
+        join boundary_set t on t.id = x.to_boundary_set_id and lower(t.valid) > lower(s.valid)
+        join crosswalk_weight w on w.crosswalk_id = x.id and w.from_k = c.k
+        join area ta on ta.k = w.to_k
+        where w.weight >= 0.01 and not exists (
+          select from contest k join election e on e.id = k.election_id
+          where k.district_area_id = c.area and k.kind = 'body_seats' and e.kind = 'general' and e.status = 'held'
+            and e.date_from > c.day and s.valid @> e.date_from
+        )
+        order by w.weight desc
+      `);
+      const first = found.rows[0];
+      if (first == null) {
+        return null;
+      }
+      const [labels, slugs] = await Promise.all([
+        names(
+          found.rows.map((row) => row.area),
+          first.day,
+        ),
+        paths(found.rows.flatMap((row) => row.contest ?? [])),
+      ]);
+      return {
+        year: first.vintage,
+        places: found.rows.map((row) => ({
+          name: labels.full.get(row.area) ?? "",
+          path: slugs.get(row.contest ?? "") ?? null,
+          share: Math.round(row.share * 100) / 100,
+        })),
+      };
+    }),
 };
