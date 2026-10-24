@@ -5,6 +5,7 @@ import subprocess
 import re
 import unicodedata
 import zipfile
+from xml.etree import ElementTree
 from collections import defaultdict
 from datetime import UTC, datetime
 from pathlib import Path
@@ -37,7 +38,7 @@ FILES = {
     "CA": ("ca", "2026-06-02", ["19-gov", "76-us-rep"]),
     "MI": ("mi", "2026-08-04", ["20260804__mi__primary__county.csv"]),
     "PA": ("pa", "2026-05-19", ["20260519__pa__primary__county.csv"]),
-    "WV": ("wv", "2026-05-13", ["20260513__wv__primary__county.csv"]),
+    "WV": ("wv", "2026-05-13", ["detailxml"]),
     "MS": ("ms", "2026-03-10", ["20260310__ms__democratic__primary__county.csv", "20260310__ms__republican__primary__county.csv"]),
     "SD": ("sd", "2026-06-02", ["20260602__sd__primary__county.csv"]),
     "WY": ("wy", "2026-08-18", ["20260818__wy__primary__county.csv"]),
@@ -168,6 +169,7 @@ OFFICIAL = {
     "IN": ("Indiana Secretary of State", "https://enr.indianavoters.in.gov", "county results from the state's election night reporting site"),
     "NJ": ("New Jersey Division of Elections", "https://www.nj.gov/state/elections/election-information-results.shtml", "county tables in the official primary results"),
     "CA": ("California Secretary of State", "https://www.sos.ca.gov/elections/prior-elections/statewide-election-results/primary-election-june-2-2026/statement-vote", "Statement of Vote spreadsheets"),
+    "WV": ("West Virginia Secretary of State", "https://sos.wv.gov/elections/election-data/historical-election-results-and-turnout", "county results from the state's election night reporting export, certified snapshot of June 15, 2026"),
     "KS": ("Kansas Secretary of State", "https://sos.ks.gov/elections/election-results.html", "precinct-level files summed to counties"),
 }
 METHOD = "Results by county from OpenElections' 2026 primary file for {state}, a community compilation of the state's county results. Candidates who received votes are listed; write-in votes are pooled."
@@ -281,6 +283,8 @@ def url(code: str, file: str) -> str:
         return f"{OK_BASE}enrapi/getelec/{second}/SW/xx" if first == "getelec" else f"{OK_BASE}enrapi/GetCntyResults/{first}/{second}"
     if code == "me":
         return f"https://www.maine.gov/sos/sites/maine.gov.sos/files/inline-files/{file}.xlsx"
+    if code == "wv":
+        return "https://results.enr.clarityelections.com/WV/126209/375698/reports/detailxml.zip"
     if code == "ca":
         return f"https://elections.cdn.sos.ca.gov/sov/2026-primary/sov/{file}.xlsx"
     if code == "hi":
@@ -305,6 +309,29 @@ def url(code: str, file: str) -> str:
 
 
 def rows(code: str, path: Path, file: str = ""):
+    if code == "wv":
+        with zipfile.ZipFile(path) as archive:
+            root = ElementTree.fromstring(archive.read("detail.xml"))
+        for contest in root.iter("Contest"):
+            found = re.fullmatch(r"U\.S\. (SENATOR|HOUSE OF REPRESENTATIVES, (\d+)\w\w Congressional District) - (REP|DEM)", contest.get("text"))
+            if found is None:
+                continue
+            for choice in contest.iter("Choice"):
+                totals: dict[str, int] = defaultdict(int)
+                for vote_type in choice.iter("VoteType"):
+                    for county in vote_type.iter("County"):
+                        totals[county.get("name")] += int(county.get("votes"))
+                for county, votes in totals.items():
+                    yield {
+                        "county": county,
+                        "office": "U.S. House" if found[2] else "U.S. Senate",
+                        "district": found[2] or "",
+                        "party": found[3],
+                        "candidate": choice.get("text"),
+                        "write_in": "Y" if choice.get("party") == "WI" else "",
+                        "votes": str(votes),
+                    }
+        return
     if code == "ca":
         sheet = pl.read_excel(path, sheet_id=1, engine="calamine", has_header=False, raise_if_empty=False).rows()
         district = ""
@@ -733,7 +760,7 @@ def fetch() -> None:
             if code == "fl":
                 raw.store(SOURCE, FL_URL, httpx.get(FL_URL, headers=BROWSER, follow_redirects=True, timeout=300).content, suffix=".txt", retrieved_at=datetime.now(UTC), media_type="text/tab-separated-values")
                 continue
-            raw.fetch(SOURCE, url(code, name), suffix={"hi": ".pdf", "ne": ".pdf", "ri": ".json", "ct": ".json", "alx": ".zip", "de": ".html", "ma": ".html", "nj": ".pdf", "ks": ".xlsx", "ca": ".xlsx", "in": ".json", "ga": ".json", "ga2": ".json", "wa": ".json", "ut": ".json", "id": ".json"}.get(code) or name[name.rindex(".") :])
+            raw.fetch(SOURCE, url(code, name), suffix={"hi": ".pdf", "ne": ".pdf", "ri": ".json", "ct": ".json", "alx": ".zip", "de": ".html", "ma": ".html", "nj": ".pdf", "ks": ".xlsx", "ca": ".xlsx", "wv": ".zip", "in": ".json", "ga": ".json", "ga2": ".json", "wa": ".json", "ut": ".json", "id": ".json"}.get(code) or name[name.rindex(".") :])
     fetch_ballot_items()
 
 
