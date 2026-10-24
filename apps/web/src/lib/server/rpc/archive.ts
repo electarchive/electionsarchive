@@ -12772,29 +12772,39 @@ export const entities = {
         return { path: null };
       }
       const labels = await names([entity.id]);
-      const common =
+      const known =
         entity.type === "person"
           ? await db.execute<{ text: string }>(sql`
-            select text from name where entity_id = ${entity.id}::uuid and kind = 'english' and lang = 'en' and script = 'Latn'
-            order by is_preferred desc, text limit 1
+            select text from name where entity_id = ${entity.id}::uuid and kind in ('official', 'english')
+            order by kind = 'english' and lang = 'en' and script = 'Latn' desc, is_preferred desc, text
           `)
           : null;
-      const base = segment(
-        common?.rows[0]?.text ?? labels.full.get(entity.id) ?? "",
-      );
       const owner =
         entity.type === "party"
           ? await db.execute<{ polity: string | null }>(sql`
             select polity_id as polity from party where id = ${entity.id}::uuid
           `)
           : null;
-      const peers = await namesakes(
-        entity.type,
-        base,
-        owner?.rows[0]?.polity ?? null,
-      );
-      const at = peers.indexOf(entity.id);
-      const slug = at > 0 ? `${base}-${at + 1}` : base;
+      const bases = new Set([
+        ...(known?.rows.map((row) => segment(row.text)) ?? []),
+        segment(labels.full.get(entity.id) ?? ""),
+      ]);
+      let slug: string | null = null;
+      for (const base of bases) {
+        const peers = await namesakes(
+          entity.type,
+          base,
+          owner?.rows[0]?.polity ?? null,
+        );
+        const at = peers.indexOf(entity.id);
+        if (at >= 0) {
+          slug = at > 0 ? `${base}-${at + 1}` : base;
+          break;
+        }
+      }
+      if (slug == null) {
+        return { path: null };
+      }
       return {
         path:
           entity.type === "person"
@@ -12854,6 +12864,12 @@ export const people = {
             path: v.nullable(v.string()),
             from: v.nullable(v.string()),
             to: v.nullable(v.string()),
+            spans: v.array(
+              v.object({
+                from: v.nullable(v.string()),
+                to: v.nullable(v.string()),
+              }),
+            ),
             seats: v.array(
               v.object({
                 name: v.string(),
@@ -13432,8 +13448,8 @@ export const people = {
         party: own == null ? null : (owned.get(own) ?? null),
         caucus: caucus == null ? null : (owned.get(caucus) ?? null),
         isIndependent,
-        served: spells
-          .map((spell) => {
+        served: [...Map.groupBy(spells, (spell) => spell.owner).entries()]
+          .map(([owner, group]) => {
             const seats: Array<{
               name: string;
               from: string | null;
@@ -13442,11 +13458,14 @@ export const people = {
             }> = [];
             for (const row of tenures.rows) {
               if (
-                !spell.isBody ||
-                row.owner !== spell.owner ||
                 row.place == null ||
-                (spell.from != null && (row.from ?? "") < spell.from) ||
-                (spell.to != null && (row.to ?? spell.to) > spell.to)
+                !group.some(
+                  (spell) =>
+                    spell.isBody &&
+                    row.owner === spell.owner &&
+                    (spell.from == null || (row.from ?? "") >= spell.from) &&
+                    (spell.to == null || (row.to ?? spell.to) <= spell.to),
+                )
               ) {
                 continue;
               }
@@ -13476,12 +13495,15 @@ export const people = {
               }
             }
             return {
-              id: spell.owner,
-              name: labels.full.get(spell.owner) ?? "",
-              isBody: spell.isBody,
-              path: chamberPath.get(spell.owner) ?? null,
-              from: spell.from,
-              to: spell.to,
+              id: owner,
+              name: labels.full.get(owner) ?? "",
+              isBody: group[0]?.isBody ?? false,
+              path: chamberPath.get(owner) ?? null,
+              from: group[0]?.from ?? null,
+              to: group.some((spell) => spell.to == null)
+                ? null
+                : (group.at(-1)?.to ?? null),
+              spans: group.map((spell) => ({ from: spell.from, to: spell.to })),
               seats,
             };
           })

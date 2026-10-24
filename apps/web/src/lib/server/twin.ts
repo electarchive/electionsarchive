@@ -670,7 +670,9 @@ function personMarkdown(
                         .join("; ")})`
                     : ""
                 }`,
-                years(spell.from, spell.to),
+                ("spans" in spell ? spell.spans : [spell])
+                  .map((part) => years(part.from, part.to))
+                  .join(", "),
               ]),
             ),
           ],
@@ -718,13 +720,23 @@ function personMarkdown(
             lanes.flatMap((lane) => {
               const party = lane.party?.label ?? m.person_parties_none();
               return [
-                ...lane.spans.map((spell) => [
-                  party,
-                  roles[spell.kind](),
-                  spell.from == null && spell.to == null
-                    ? null
-                    : years(spell.from, spell.to),
-                ]),
+                ...lane.spans
+                  .filter(
+                    (spell) =>
+                      spell.from != null ||
+                      spell.to != null ||
+                      (lane.ballots.length === 0 &&
+                        lane.spans.every(
+                          (peer) => peer.from == null && peer.to == null,
+                        )),
+                  )
+                  .map((spell) => [
+                    party,
+                    roles[spell.kind](),
+                    spell.from == null && spell.to == null
+                      ? null
+                      : years(spell.from, spell.to),
+                  ]),
                 ...Map.groupBy(lane.ballots, (ballot) => ballot.how)
                   .entries()
                   .map(([how, ballots]) => {

@@ -148,6 +148,7 @@
     path: string | null;
     from: string | null;
     to: string | null;
+    spans?: Array<{ from: string | null; to: string | null }>;
     seats?: Array<{
       name: string;
       from: string | null;
@@ -163,10 +164,7 @@
     {/if}
     <ul class="grid text-sm">
       {#each list as spell, index (index)}
-        {const x0 = $derived(at(spell.from))}
-        {const x1 = $derived(
-          note != null && spell.to == null ? x0 : at(spell.to),
-        )}
+        {const parts = $derived(spell.spans ?? [spell])}
         <li
           class="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-4 gap-y-1 border-be border-border/60 py-1.5 last:border-be-0 sm:grid-cols-[minmax(0,18rem)_minmax(0,1fr)_auto]"
         >
@@ -186,25 +184,35 @@
             class="relative block rounded-full bg-muted block-2 max-sm:col-span-2 max-sm:row-start-2"
             aria-hidden="true"
           >
-            <span
-              class={cn("absolute inset-y-0 rounded-full", {
-                "bg-(--party)": note == null,
-                "border border-(--party) bg-(--party)/35": note != null,
-              })}
-              style:inset-inline-start="{x0 * 100}%"
-              style:inline-size="{Math.max(x1 - x0, 0.01) * 100}%"
-            ></span>
+            {#each parts as part, slot (slot)}
+              {const x0 = $derived(at(part.from))}
+              {const x1 = $derived(
+                note != null && part.to == null ? x0 : at(part.to),
+              )}
+              <span
+                class={cn("absolute inset-y-0 rounded-full", {
+                  "bg-(--party)": note == null,
+                  "border border-(--party) bg-(--party)/35": note != null,
+                })}
+                style:inset-inline-start="{x0 * 100}%"
+                style:inline-size="{Math.max(x1 - x0, 0.01) * 100}%"
+              ></span>
+            {/each}
           </span>
           <span
             class="font-figures text-[0.8125rem] whitespace-nowrap text-muted-foreground tabular-nums"
-            >{spell.to == null
-              ? note == null
-                ? since({ from: spell.from?.slice(0, 4) ?? "" })
-                : spell.from?.slice(0, 4)
-              : m.person_served_span({
-                  from: spell.from?.slice(0, 4) ?? "",
-                  to: spell.to.slice(0, 4),
-                })}</span
+            >{parts
+              .map((part) =>
+                part.to == null
+                  ? note == null
+                    ? since({ from: part.from?.slice(0, 4) ?? "" })
+                    : part.from?.slice(0, 4)
+                  : m.person_served_span({
+                      from: part.from?.slice(0, 4) ?? "",
+                      to: part.to.slice(0, 4),
+                    }),
+              )
+              .join(", ")}</span
           >
           {#if spell.seats != null && spell.seats.length > 0}
             <span
@@ -224,7 +232,9 @@
                     : m.person_seat_ended({
                         place: seat.name,
                         span,
-                        reason: reason(),
+                        reason: reason().replace(/^\p{Lu}/u, (letter) =>
+                          letter.toLowerCase(),
+                        ),
                       });
                 })
                 .join("; ")}</span
