@@ -42,13 +42,23 @@ FILES = {
     "VA": ("va", "2026-08-04", ["va2.elstats"]),
     "NC": ("nc", "2026-03-03", ["results_pct_20260303.zip"]),
     "TN": ("tn", "2026-08-01", ["20260801__tn__primary__county.csv"]),
+    "AL": ("al", "2026-05-19", ["20260519__al__primary__county.csv"]),
+    "ND": ("nd", "2026-06-09", ["20260609__nd__primary__county.csv"]),
+    "MD": (
+        "md",
+        "2026-06-23",
+        [
+            *(f"gen_detail_results_2026_1_1_{party}.html" for party in ("Democratic", "Republican")),
+            *(f"gen_detail_results_2026_4_{number}_{party}_District%20{number}.html" for number in range(1, 9) for party in ("Democratic", "Republican")),
+        ],
+    ),
 }
-FIPS = {"TX": "48", "CA": "06", "MI": "26", "PA": "42", "WV": "54", "MS": "28", "SD": "46", "WY": "56", "OR": "41", "KY": "21", "CO": "08", "AZ": "04", "TN": "47", "NC": "37", "IL": "17", "NM": "35", "NY": "36", "VA": "51"}
+FIPS = {"TX": "48", "CA": "06", "MI": "26", "PA": "42", "WV": "54", "MS": "28", "SD": "46", "WY": "56", "OR": "41", "KY": "21", "CO": "08", "AZ": "04", "TN": "47", "NC": "37", "IL": "17", "NM": "35", "NY": "36", "VA": "51", "AL": "01", "ND": "38", "MD": "24"}
 RUNOFF_SYSTEMS = {"TX": "two_round", "MS": "two_round", "SD": "two_round_35", "NC": "two_round_30"}
 THRESHOLDS = {"TX": 50, "MS": 50, "SD": 35, "NC": 30}
 OFFICES = {"U.S. House": "house", "U.S. Senate": "senate", "Governor": "governor"}
 TOP_TWO = {"CA"}
-AT_LARGE = {"SD", "WY"}
+AT_LARGE = {"SD", "WY", "ND"}
 REDISTRICTED = {"TX", "CA", "NC"}
 PARTIES = {
     "REP": ("republican", "republican-party"),
@@ -67,7 +77,7 @@ PARTIES = {
     "No Party Preference": ("", "CA:no-party-preference"),
     "NOL": ("no-labels", "no-labels-party"),
 }
-ALIASES = {("MS", "jeffdavis"): "jeffersondavis"}
+ALIASES = {("MS", "jeffdavis"): "jeffersondavis", ("MD", "baltimorecounty"): "baltimore", ("MD", "saintmarys"): "stmarys"}
 POOLED = re.compile(r"write-?ins?\b|^scattering$", re.I)
 JUNK = re.compile(r"^void$|^(under|over) votes$|^\* withdrawn candidate$|^total|blank|registered voters", re.I)
 ORDINALS = {1: "st", 2: "nd", 3: "rd"}
@@ -105,10 +115,13 @@ def plain(text: str) -> str:
     return re.sub(r"[^a-z]", "", unicodedata.normalize("NFKD", text).lower())
 
 
+MD_URL = "https://elections.maryland.gov/elections/2026/primary_results/{}"
+
+
 def url(code: str, file: str) -> str:
     if code in ELSTATS:
         return elstats.url(file, 2026)
-    return {"nc": NC_URL, "il": IL_URL}.get(code, BASE.format(code, "{}")).format(file)
+    return {"nc": NC_URL, "il": IL_URL, "md": MD_URL}.get(code, BASE.format(code, "{}")).format(file)
 
 
 def rows(code: str, path: Path):
@@ -125,6 +138,27 @@ def rows(code: str, path: Path):
                             "candidate": row["candidate_name"].strip(),
                             "votes": row["votes"].replace(",", "").removesuffix(".0"),
                         }
+        return
+    if code == "md":
+        text = path.read_text(encoding="utf-8")
+        office = re.search(r"<h2>([^<]*)", text)[1].strip()
+        district = re.search(r"<h3>District (\d+)", text)
+        head, body = text.split("<tbody>", 1)
+        for county_row in re.findall(r"<tr>(.*?)</tr>", body, re.S):
+            cells = [re.sub(r"<[^>]*>", "", cell).strip() for cell in re.findall(r"<td[^>]*>(.*?)</td>", county_row, re.S)]
+            if not cells or not cells[0] or cells[0].startswith("Total"):
+                continue
+            for header, votes in zip(re.findall(r"<th scope=\"col\">(.*?)</th>", head, re.S), cells[1:]):
+                name, party = (re.sub(r"<img[^>]*>", "", part).strip() for part in re.split(r"<br\s*/?>", header)[:2])
+                name = name.split(" and ")[0]
+                yield {
+                    "county": cells[0],
+                    "office": "Governor" if office.startswith("Governor") else "U.S. House",
+                    "district": district[1] if district else "",
+                    "party": party,
+                    "candidate": name,
+                    "votes": votes.replace(",", ""),
+                }
         return
     if code == "il":
         totals: dict[tuple[str, str, str, str, str], int] = {}
@@ -354,6 +388,7 @@ def emit() -> Path:
                 lambda: defaultdict(lambda: defaultdict(int))
             )
             scope_labels: dict[str, str] = {}
+            spellings: dict[tuple[str, str, str, str], str] = {}
             junk: dict[tuple[str, str, str], set[str]] = defaultdict(set)
             for file in files:
                 for row in rows(code, raw.cached(SOURCE, url(code, file)).path):
@@ -371,6 +406,7 @@ def emit() -> Path:
                     pooled = POOLED.search(row["candidate"]) is not None or row.get("write_in") == "Y"
                     label = row["party"] if not pooled else ""
                     candidate = "Write-ins" if pooled else title(row["candidate"].strip())
+                    candidate = spellings.setdefault((chamber, district, scope, slug(candidate)), candidate)
                     county = plain(row["county"])
                     county = ALIASES.get((state, county), county)
                     grouped[(chamber, district, "" if state in TOP_TWO else scope)][
