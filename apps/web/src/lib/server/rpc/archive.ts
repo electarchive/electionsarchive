@@ -5677,7 +5677,8 @@ export const contests = {
                 when ykind in ('federal_unit', 'region') then 'regional_office'
                 else 'local' end as kind,
               case when kind <> 'ballot_question' and ykind in ('sovereign_state', 'supranational', 'historical_state')
-                then coalesce(office_id, body_id) end as owner
+                then coalesce(office_id, body_id)
+                when kind not in ('ballot_question', 'office') and ykind = 'region' then body_id end as owner
             from roots
           )
           select kind, owner, count(*)::int as count, min(id::text) as sample,
@@ -7191,10 +7192,10 @@ async function races(
                 where c.id = any(${sql.param(roots)}::uuid[])
               )
               select party, count(*)::int as seats,
-                (select count(*)::int from contest c where c.id = any(${sql.param(roots)}::uuid[]) and c.magnitude > 1) as multiple
+                (select count(*)::int from contest c where c.id = any(${sql.param(roots)}::uuid[]) and c.magnitude > 1 and c.kind <> 'list_allocation') as multiple
               from tacit group by party
               union all
-              select null, 0, (select count(*)::int from contest c where c.id = any(${sql.param(roots)}::uuid[]) and c.magnitude > 1)
+              select null, 0, (select count(*)::int from contest c where c.id = any(${sql.param(roots)}::uuid[]) and c.magnitude > 1 and c.kind <> 'list_allocation')
               where not exists (select from tacit)
             `);
       const unopposed = (returned?.rows ?? []).filter((row) => row.seats > 0);

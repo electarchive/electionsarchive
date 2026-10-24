@@ -22,6 +22,7 @@
   import { orpc } from "#lib/rpc.js";
   import { cn } from "#lib/utils.js";
   import type { PageData } from "./$types";
+  import Additional from "./additional.svelte";
   import Ballot from "./ballot.svelte";
   import Changes from "./changes.svelte";
   import Count from "./count.svelte";
@@ -50,6 +51,7 @@
     ballot,
     cycle,
     handover,
+    additional,
     boundaries,
     surround,
     match,
@@ -60,6 +62,7 @@
     ballot: Extract<PageData, { kind: "contest" }>["ballot"];
     cycle: Extract<PageData, { kind: "contest" }>["cycle"];
     handover: Extract<PageData, { kind: "contest" }>["handover"];
+    additional: Extract<PageData, { kind: "contest" }>["additional"];
     boundaries: Extract<PageData, { kind: "contest" }>["boundaries"];
     surround: Extract<PageData, { kind: "contest" }>["surround"];
     match: string;
@@ -1626,6 +1629,9 @@
     </div>
   {:else}
     {@render stats(false)}
+  {/if}
+  {#if additional != null}
+    <Additional {additional} />
   {/if}
   {#if contest.count?.stv != null}
     <Stv count={contest.count} stv={contest.count.stv} {here} />

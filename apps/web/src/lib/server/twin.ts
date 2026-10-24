@@ -362,7 +362,13 @@ function markdown(data: Data, link: Link) {
       return electionMarkdown(data.election, data.byes, link);
     }
     default: {
-      return contestMarkdown(data.contest, data.cycle, data.handover, link);
+      return contestMarkdown(
+        data.contest,
+        data.cycle,
+        data.handover,
+        data.additional,
+        link,
+      );
     }
   }
 }
@@ -924,6 +930,47 @@ function electionMarkdown(
       row.to != null && row.from != null && label(row.to) !== label(row.from),
   }));
   const gained = byeRows.filter((row) => row.isGain).length;
+  const tiered = Map.groupBy(
+    election.races.filter(
+      (race) =>
+        race.body != null &&
+        (race.round ?? 1) === 1 &&
+        (race.kind === "body_seats" || race.kind === "list_allocation"),
+    ),
+    (race) => race.body,
+  )
+    .values()
+    .find((group) => {
+      let seats = 0;
+      for (const race of group) {
+        for (const row of race.results) {
+          seats += row.seats ?? 0;
+        }
+      }
+      return (
+        new Set(group.map((race) => race.kind)).size === 2 &&
+        (group[0]?.size == null || seats <= group[0].size * 1.02)
+      );
+    });
+  const tiers = new Map<
+    string,
+    { label: string; constituencies: number; lists: number }
+  >();
+  for (const race of tiered ?? []) {
+    for (const row of race.results) {
+      const entry = tiers.get(row.key) ?? {
+        label: row.label,
+        constituencies: 0,
+        lists: 0,
+      };
+      if (race.kind === "list_allocation") {
+        entry.lists += row.seats ?? 0;
+      } else {
+        entry.constituencies += row.seats ?? 0;
+      }
+      tiers.set(row.key, entry);
+    }
+  }
   return [
     `# ${election.name}`,
     byline(election.breadcrumbs, link, election.date),
@@ -939,6 +986,33 @@ function electionMarkdown(
             ),
           })}${election.turnout.basis === "rejected" ? ` ${m.turnout_basis_rejected()}` : election.turnout.basis === "valid" ? ` ${m.turnout_basis_valid()}` : ""}`,
         ]),
+    ...(tiered?.[0] == null
+      ? []
+      : [
+          `## ${m.race_tiers_title({ name: tiered[0].name })}`,
+          table(
+            [
+              m.col_party(),
+              m.col_constituency_seats(),
+              m.col_list_seats(),
+              m.col_total_seats(),
+            ],
+            tiers
+              .values()
+              .filter((entry) => entry.constituencies + entry.lists > 0)
+              .toArray()
+              .toSorted(
+                (a, b) =>
+                  b.constituencies + b.lists - (a.constituencies + a.lists),
+              )
+              .map((entry) => [
+                entry.label,
+                count(entry.constituencies),
+                count(entry.lists),
+                count(entry.constituencies + entry.lists),
+              ]),
+          ),
+        ]),
     ...election.races.flatMap((entry) => {
       const race =
         entry.round != null &&
@@ -952,7 +1026,9 @@ function electionMarkdown(
               ...entry,
               name: m.race_round({ name: entry.name, round: entry.round }),
             }
-          : entry;
+          : tiered?.includes(entry) && entry.kind === "list_allocation"
+            ? { ...entry, name: m.race_list({ name: entry.name }) }
+            : entry;
       const hasSeats = race.results.some((row) => row.seats != null);
       const seats = race.electors == null ? m.col_seats() : m.col_electors();
       const districts = race.isPrimaries ? race.places : null;
@@ -1077,6 +1153,7 @@ function contestMarkdown(
   contest: Extract<Data, { kind: "contest" }>["contest"],
   cycle: Extract<Data, { kind: "contest" }>["cycle"],
   handover: Extract<Data, { kind: "contest" }>["handover"],
+  additional: Extract<Data, { kind: "contest" }>["additional"],
   link: Link,
 ) {
   const groups: Record<string, () => string> = {
@@ -1198,6 +1275,99 @@ function contestMarkdown(
     ...compared,
     ...held,
     resultsMarkdown(contest, then),
+    ...(additional == null
+      ? []
+      : [
+          `## ${m.ams_title()}`,
+          `${m.ams_lede({ seats: count(additional.seats) })} ${
+            additional.isCounted
+              ? additional.isReproduced
+                ? m.ams_reproduced()
+                : m.ams_differs({
+                    parties: new Intl.ListFormat(getLocale(), {
+                      style: "long",
+                      type: "conjunction",
+                    }).format(
+                      additional.parties
+                        .filter((party) => party.computed !== party.declared)
+                        .map((party) =>
+                          m.ams_differs_party({
+                            party: party.short ?? party.label,
+                            computed: count(party.computed ?? 0),
+                            declared: count(party.declared),
+                          }),
+                        ),
+                    ),
+                  })
+              : m.ams_uncounted()
+          }`,
+          table(
+            [
+              m.col_party(),
+              ...(additional.isCounted ? [m.col_list_votes()] : []),
+              m.col_constituency_seats(),
+              ...additional.picks.map((_, seat) =>
+                m.ams_seat({ count: seat + 1 }),
+              ),
+              m.col_list_seats(),
+              m.col_total_seats(),
+            ],
+            additional.parties
+              .filter(
+                (party) =>
+                  party.constituencies +
+                    party.declared +
+                    (party.computed ?? 0) >
+                    0 || party.key === additional.next?.key,
+              )
+              .map((party) => [
+                party.label,
+                ...(additional.isCounted
+                  ? [party.votes == null ? null : count(party.votes)]
+                  : []),
+                count(party.constituencies),
+                ...additional.picks.map((pick, seat) => {
+                  const quotient = party.quotients[seat];
+                  return quotient == null
+                    ? null
+                    : pick === party.key
+                      ? `**${count(Math.round(quotient))}**`
+                      : count(Math.round(quotient));
+                }),
+                count(party.declared),
+                count(party.constituencies + party.declared),
+              ]),
+          ),
+          additional.next == null
+            ? ""
+            : m.ams_next({
+                party:
+                  additional.parties.find(
+                    (party) => party.key === additional.next?.key,
+                  )?.label ?? "",
+                quotient: count(Math.round(additional.next.quotient)),
+              }),
+          `### ${m.ams_constituency_members()}`,
+          additional.constituencies
+            .map(
+              (seat) =>
+                `- ${link(seat.name, seat.path)}${seat.member == null ? "" : `: ${link(seat.member, seat.memberPath)}`}`,
+            )
+            .join("\n"),
+          ...(additional.members.length === 0
+            ? []
+            : [
+                `### ${m.ams_list_members()}`,
+                Map.groupBy(additional.members, (member) => member.key)
+                  .entries()
+                  .map(
+                    ([key, elected]) =>
+                      `- ${additional.parties.find((party) => party.key === key)?.label ?? ""}: ${elected.map((member) => link(member.name, member.path)).join(", ")}`,
+                  )
+                  .toArray()
+                  .join("\n"),
+              ]),
+        ]),
     ...countMarkdown(contest),
     ...placesMarkdown(contest.places, link, then),
     ...(contest.children.length === 0

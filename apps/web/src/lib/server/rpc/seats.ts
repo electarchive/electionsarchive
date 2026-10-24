@@ -771,4 +771,252 @@ export const seats = {
         }),
       };
     }),
+  additional: os
+    .meta(
+      openapi({
+        method: "GET",
+        path: "/contests/{id}/additional",
+        summary:
+          "Allocate a regional list's additional seats by D'Hondt against the constituency seats each party won in the region, seat by seat",
+      }),
+    )
+    .input(v.object({ id: v.pipe(v.string(), v.uuid()) }))
+    .output(
+      v.nullable(
+        v.object({
+          seats: v.number(),
+          isCounted: v.boolean(),
+          isReproduced: v.boolean(),
+          parties: v.array(
+            v.object({
+              key: v.string(),
+              label: v.string(),
+              short: v.nullable(v.string()),
+              color: v.nullable(v.string()),
+              isParty: v.boolean(),
+              votes: v.nullable(v.number()),
+              constituencies: v.number(),
+              declared: v.number(),
+              computed: v.nullable(v.number()),
+              quotients: v.array(v.nullable(v.number())),
+            }),
+          ),
+          picks: v.array(v.string()),
+          next: v.nullable(v.object({ key: v.string(), quotient: v.number() })),
+          constituencies: v.array(
+            v.object({
+              name: v.string(),
+              path: v.nullable(v.string()),
+              key: v.string(),
+              member: v.nullable(v.string()),
+              memberPath: v.nullable(v.string()),
+            }),
+          ),
+          members: v.array(
+            v.object({
+              name: v.string(),
+              path: v.nullable(v.string()),
+              key: v.string(),
+            }),
+          ),
+        }),
+      ),
+    )
+    .handler(async ({ input }) => {
+      const found = await db.execute<{
+        tier: "list" | "seat";
+        id: string;
+        key: string;
+        own: string | null;
+        label: string;
+        is_person: boolean;
+        is_pool: boolean;
+        votes: number | null;
+        seats: number | null;
+        person: string | null;
+        ballot: string | null;
+        magnitude: number;
+        day: string;
+      }>(sql`
+        with c as materialized (
+          select c.id, c.election_id, c.district_area_id as region, a.k as region_k, c.magnitude, e.date_from as day
+          from contest c join election e on e.id = c.election_id join area a on a.id = c.district_area_id
+          join electoral_system es on es.id = c.electoral_system_id
+          where c.id = ${input.id}::uuid and c.kind = 'list_allocation' and es.rules ->> 'formula' = 'dhondt'
+            and c.allocation_parent_id is null and c.magnitude is not null
+        ),
+        tiers as (
+          select 'list' as tier, o.id, o.party_id, o.kind::text as kind, o.ballot_label,
+            (select sum(y.value)::float8 from result_rollup y
+              where y.result_set_k = rs.k and y.area_k = c.region_k and y.option_k = o.k
+                and y.measure = 1 and y.channel = 0 and y.count_round = 0) as votes,
+            (select sum(coalesce(x.seats, 1))::int from outcome x
+              where x.result_set_id = rs.id and x.option_id = o.id and x.candidacy_id is null and x.kind in ('won', 'elected')) as seats,
+            null::uuid as person, null::text as ballot
+          from c join result_set rs on rs.contest_id = c.id and rs.is_default
+          join contest_option o on o.contest_id = c.id
+          union all
+          select 'list', o.id, o.party_id, o.kind::text, o.ballot_label, null, null, cy.person_id, cy.ballot_name
+          from c join contest_option o on o.contest_id = c.id
+          join candidacy cy on cy.option_id = o.id and cy.role in ('list_member', 'head')
+          join result_set rs on rs.contest_id = c.id and rs.is_default
+          where exists (select from outcome x where x.result_set_id = rs.id and x.option_id = o.id and x.kind in ('won', 'elected'))
+          union all
+          select 'seat', k.id, o.party_id, o.kind::text, o.ballot_label, null, 1, cy.person_id, cy.ballot_name
+          from c join contest k on k.election_id = c.election_id and k.kind = 'body_seats' and k.allocation_parent_id is null
+          join area_parent ap on ap.area_id = k.district_area_id and ap.parent_id = c.region and ap.valid @> c.day
+          join result_set rs on rs.contest_id = k.id and rs.is_default
+          join outcome x on x.result_set_id = rs.id and x.kind in ('elected', 'won') and x.candidacy_id is null
+          join contest_option o on o.id = x.option_id
+          left join candidacy cy on cy.option_id = o.id and cy.role = 'head'
+        )
+        select t.tier, t.id::text, coalesce(bm.into_id, br.parent_party_id, pm.into_id, t.party_id, t.id)::text as key,
+          coalesce(pm.into_id, t.party_id)::text as own, t.ballot_label as label,
+          t.party_id is null and t.kind <> 'list' as is_person, t.kind = 'others' as is_pool, t.votes, t.seats, t.person::text, t.ballot,
+          c.magnitude, c.day::text
+        from tiers t cross join c
+        left join entity_merge pm on pm.entity_id = t.party_id
+        left join party_affiliation br on br.party_id = coalesce(pm.into_id, t.party_id)
+          and br.kind = 'regional_branch' and br.valid @> c.day
+        left join entity_merge bm on bm.entity_id = br.parent_party_id
+      `);
+      const first = found.rows[0];
+      const seated = found.rows.filter((row) => row.tier === "seat");
+      if (first == null || seated.length === 0) {
+        return null;
+      }
+      const listed = found.rows.filter(
+        (row) => row.tier === "list" && row.person == null && !row.is_pool,
+      );
+      const won = Map.groupBy(seated, (row) => row.key);
+      const keys = [
+        ...new Set([...listed.map((row) => row.key), ...won.keys()]),
+      ];
+      const own = new Map<string, string>();
+      for (const row of [...seated, ...listed]) {
+        if (row.own != null && !own.has(row.key)) {
+          own.set(row.key, row.own);
+        }
+      }
+      const people = new Set(found.rows.flatMap((row) => row.person ?? []))
+        .values()
+        .toArray();
+      const [colored, labels, slugs] = await Promise.all([
+        refs(own.values().toArray(), first.day),
+        names([...people, ...seated.map((row) => row.id)], first.day),
+        paths([...people, ...seated.map((row) => row.id)]),
+      ]);
+      const votes = new Map<string, number>();
+      const declared = new Map<string, number>();
+      for (const row of listed) {
+        if (row.votes != null) {
+          votes.set(row.key, (votes.get(row.key) ?? 0) + row.votes);
+        }
+        declared.set(row.key, (declared.get(row.key) ?? 0) + (row.seats ?? 0));
+      }
+      const isCounted = votes.size > 0;
+      const solo = new Set(
+        listed.filter((row) => row.is_person).map((row) => row.key),
+      );
+      const taken = new Map<string, number>();
+      const quotients = new Map(
+        keys.map((key) => [key, [] as Array<number | null>]),
+      );
+      const picks: Array<string> = [];
+      let next: { key: string; quotient: number } | null = null;
+      const last = isCounted ? first.magnitude : -1;
+      for (let seat = 0; seat <= last; seat += 1) {
+        let best: string | null = null;
+        let top = 0;
+        for (const key of keys) {
+          const total = votes.get(key);
+          const isOut = solo.has(key) && (taken.get(key) ?? 0) > 0;
+          const quotient =
+            total == null || isOut
+              ? null
+              : total /
+                ((won.get(key)?.length ?? 0) + (taken.get(key) ?? 0) + 1);
+          quotients.get(key)?.push(quotient);
+          if (quotient != null && quotient > top) {
+            top = quotient;
+            best = key;
+          }
+        }
+        if (best == null) {
+          break;
+        }
+        if (seat === first.magnitude) {
+          next = { key: best, quotient: top };
+          for (const list of quotients.values()) {
+            list.pop();
+          }
+          break;
+        }
+        picks.push(best);
+        taken.set(best, (taken.get(best) ?? 0) + 1);
+      }
+      const label = (key: string) => {
+        const party = colored.get(own.get(key) ?? "");
+        const row =
+          listed.find((entry) => entry.key === key) ??
+          seated.find((entry) => entry.key === key);
+        const named = party?.label ?? "";
+        return {
+          label:
+            named === ""
+              ? ((row?.person == null
+                  ? row?.label
+                  : labels.full.get(row.person)) ?? "")
+              : named,
+          short: party?.short ?? null,
+          color: party?.color ?? null,
+        };
+      };
+      const parties = keys
+        .map((key) => ({
+          key,
+          ...label(key),
+          isParty: own.has(key),
+          votes: votes.get(key) ?? null,
+          constituencies: won.get(key)?.length ?? 0,
+          declared: declared.get(key) ?? 0,
+          computed: isCounted ? (taken.get(key) ?? 0) : null,
+          quotients: quotients.get(key) ?? [],
+        }))
+        .toSorted(
+          (a, b) =>
+            b.constituencies + b.declared - (a.constituencies + a.declared) ||
+            (b.votes ?? 0) - (a.votes ?? 0),
+        );
+      return {
+        seats: first.magnitude,
+        isCounted,
+        isReproduced:
+          isCounted &&
+          parties.every((party) => party.computed === party.declared),
+        parties,
+        picks,
+        next,
+        constituencies: seated
+          .map((row) => ({
+            name: (labels.full.get(row.id) ?? "").replace(/^.+? in /u, ""),
+            path: slugs.get(row.id) ?? null,
+            key: row.key,
+            member:
+              row.person == null
+                ? row.ballot
+                : (labels.full.get(row.person) ?? row.ballot),
+            memberPath:
+              row.person == null ? null : (slugs.get(row.person) ?? null),
+          }))
+          .toSorted((a, b) => a.name.localeCompare(b.name)),
+        members: found.rows
+          .filter((row) => row.tier === "list" && row.person != null)
+          .map((row) => ({
+            name: labels.full.get(row.person ?? "") ?? row.ballot ?? "",
+            path: slugs.get(row.person ?? "") ?? null,
+            key: row.key,
+          })),
+      };
+    }),
 };
