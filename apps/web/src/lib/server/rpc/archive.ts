@@ -7801,6 +7801,7 @@ async function races(
         isNational: head?.area == null || head.area === nation.id,
         rank: standing(head),
         count: group.length,
+        noun: first?.noun ?? "",
         nonvoting: group.filter((row) => !row.isVoting).length,
         sample: table?.sample ?? null,
         since: table?.since ?? null,
@@ -10983,14 +10984,33 @@ export const polities = {
                       },
                       ...raced.filter((race) => !tiers.includes(race)),
                     ]
-                ).map((race) => {
+                ).map((race, _index, all) => {
                   let contested = 0;
                   for (const row of race.results) {
                     contested += row.seats ?? 0;
                   }
+                  const namesakes = all.filter(
+                    (other) => other !== race && other.name === race.name,
+                  );
                   return {
                     contest: race.contest,
-                    name: race.name,
+                    name:
+                      namesakes.length === 0
+                        ? race.name
+                        : namesakes.some(
+                              (other) =>
+                                (other.round ?? 1) !== (race.round ?? 1),
+                            )
+                          ? m.race_round({
+                              name: race.name,
+                              round: race.round ?? 1,
+                            })
+                          : race.kind === "list_allocation" || race.noun === ""
+                            ? race.name
+                            : m.race_split({
+                                name: race.name,
+                                noun: race.noun,
+                              }),
                     path: race.path,
                     count: race.count,
                     contested,
