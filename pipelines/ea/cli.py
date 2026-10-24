@@ -5,7 +5,7 @@ import sys
 from pathlib import Path
 
 from ea import cache, checks, coverage, coverage_tables, fixtures, layout, portals, raw, scans, search, statewide, tiles
-from ea.apply import apply, publish, revert
+from ea.apply import apply, publish, revert, rollup
 from ea.store import DATA, connect
 
 
@@ -27,6 +27,9 @@ def main() -> None:
     )
     commands.add_parser("search", help="rebuild the search index from names and slugs")
     commands.add_parser("parties", help="rebuild the precomputed party pages the app serves")
+    rolling = commands.add_parser("rollup", help="recompute the area rollups of result sets")
+    rolling.add_argument("sets", nargs="*", type=int, help="result_set k values")
+    rolling.add_argument("--affected", action="store_true", help="add every set with no rollup at its district")
     commands.add_parser("merged", help="list rows anywhere in the database that still reference a merged entity")
     commands.add_parser(
         "coverage",
@@ -108,6 +111,9 @@ def main() -> None:
             with connect() as conn:
                 for relation, column, entity, into, merge, rows in checks.merged(conn):
                     print(f"{relation}.{column}: {rows} rows reference {entity}, merged into {into} by {merge}")
+        case "rollup":
+            with connect() as conn:
+                rollup(conn, args.sets, args.affected)
         case "publish":
             with connect() as conn:
                 publish(conn, args.changeset_id)

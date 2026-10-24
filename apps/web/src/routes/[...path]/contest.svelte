@@ -631,7 +631,12 @@
               note,
             }),
       )
-      .toArray(),
+      .toArray()
+      .concat(
+        contest.partial == null
+          ? []
+          : [m.race_partial_counties(contest.partial)],
+      ),
   );
   const verdict = $derived.by(() => {
     if (contest.current == null) {
@@ -673,35 +678,37 @@
             share: percent(top.current.share),
           })
         : top?.current?.outcome === "lost" && yes.test(top.label)
-        ? m.race_lede_measure_blocked({ share: percent(top.current.share) })
-        : top?.current?.outcome === "lost"
-          ? m.race_lede_lost({
-              answer: named(top),
-              share: percent(top.current.share),
-            })
-          : top?.current?.outcome === "won" &&
-              next?.current != null &&
-              yes.test(top.label)
-            ? m.race_lede_measure_passed({ share: percent(top.current.share) })
+          ? m.race_lede_measure_blocked({ share: percent(top.current.share) })
+          : top?.current?.outcome === "lost"
+            ? m.race_lede_lost({
+                answer: named(top),
+                share: percent(top.current.share),
+              })
             : top?.current?.outcome === "won" &&
                 next?.current != null &&
-                /^(?:no|against|reject|nein|hayır|não)/iu.test(top.label)
-              ? m.race_lede_measure_failed({
+                yes.test(top.label)
+              ? m.race_lede_measure_passed({
                   share: percent(top.current.share),
                 })
-              : top?.current?.outcome === "won" && next?.current != null
-                ? m.race_lede_won({
-                    party: named(top),
-                    share: percent(
-                      top.current.share,
-                      precision(top.current.share - next.current.share),
-                    ),
-                    margin: points(
-                      top.current.share - next.current.share,
-                    ).replace(/^\+/u, ""),
-                    runner: named(next),
+              : top?.current?.outcome === "won" &&
+                  next?.current != null &&
+                  /^(?:no|against|reject|nein|hayır|não)/iu.test(top.label)
+                ? m.race_lede_measure_failed({
+                    share: percent(top.current.share),
                   })
-                : null;
+                : top?.current?.outcome === "won" && next?.current != null
+                  ? m.race_lede_won({
+                      party: named(top),
+                      share: percent(
+                        top.current.share,
+                        precision(top.current.share - next.current.share),
+                      ),
+                      margin: points(
+                        top.current.share - next.current.share,
+                      ).replace(/^\+/u, ""),
+                      runner: named(next),
+                    })
+                  : null;
     }
     const [elector, second] = contest.electors?.rows ?? [];
     if (elector != null) {

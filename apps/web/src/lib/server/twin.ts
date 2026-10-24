@@ -1087,7 +1087,7 @@ function resultsMarkdown(
           m.col_result(),
         ],
         results,
-      )}\n\n${m.stat_valid()}: ${count(contest.current.valid)}${contest.rows
+      )}\n\n${m.stat_valid()}: ${count(contest.current.valid)}${contest.partial == null ? "" : `\n\n${m.race_partial_counties(contest.partial)}`}${contest.rows
         .flatMap((row) =>
           row.current?.outcome == null ||
           row.current.note == null ||

@@ -2848,6 +2848,7 @@ export const contests = {
           }),
         ),
         quorum: v.nullable(v.number()),
+        partial: v.nullable(v.object({ held: v.number(), of: v.number() })),
         turnout: v.nullable(
           v.object({
             registered: v.number(),
@@ -3024,76 +3025,92 @@ export const contests = {
       const isRoot = scoped == null;
       const area = scoped ?? contest.place;
       const unit = chain.map((entry) => entry.segment);
-      const [parts, ancestors, cited, home, roll, counted] = await Promise.all([
-        db.execute<{ id: string }>(sql`
-          select id from contest where allocation_parent_id = ${contest.id}::uuid
-        `),
-        db.execute<{
-          id: string;
-          area: string | null;
-          scheme: string | null;
-          noun: string | null;
-        }>(sql`
-          with recursive up(id, parent, depth) as (
-            select id, allocation_parent_id, 0 from contest where id = ${contest.id}::uuid
-            union all
-            select c.id, c.allocation_parent_id, up.depth + 1 from contest c join up on c.id = up.parent
-          )
-          select up.id, a.id as area, a.scheme_code as scheme, sc.noun
-          from up
-          join contest c on c.id = up.id
-          join election e on e.id = c.election_id
-          left join polity_territory pt on pt.polity_id = e.polity_id and pt.valid @> e.date_from
-          left join area a on a.id = coalesce(c.district_area_id, pt.area_id)
-          left join scheme sc on sc.code = a.scheme_code
-          order by up.depth desc
-        `),
-        db.execute<{
-          publisher: string;
-          title: string;
-          url: string | null;
-        }>(sql`
-          select distinct s.publisher, s.title, s.url
-          from citation ct join source s on s.id = ct.source_id
-          where ct.entity_id = ${contest.id}::uuid or ct.entity_id in (
-            select cy.id from candidacy cy join contest_option o on o.id = cy.option_id
-            where o.contest_id = ${contest.id}::uuid
-          )
-          order by s.publisher, s.title
-        `),
-        db.execute<{ path: string }>(sql`
-          select s.path from polity_territory t join slug s on s.entity_id = t.polity_id and s.is_current
-          where t.area_id = ${area?.id}::uuid and t.polity_id <> ${contest.polity}::uuid
-          order by upper(t.valid) desc nulls first limit 1
-        `),
-        poll(contest.id, area?.k ?? null),
-        db.execute<{
-          last: number;
-          round: number | null;
-          derived: boolean;
-        }>(sql`
-          select coalesce(t.last, 1) as last,
-            case when t.last > 1 then least(greatest(coalesce(nullif(${input.round}::int, 0), t.last), 1), t.last) end as round,
-            exists (
-              select from result_set rs join note n on n.entity_id = rs.id and n.kind = 'methodology'
-              where rs.contest_id = ${contest.id}::uuid and not rs.is_default
-                and exists (
-                  select from result_rollup_unit u
-                  where u.result_set_k = rs.k and not exists (
-                    select from result_set d join result_rollup_unit w on w.result_set_k = d.k and w.area_k = u.area_k
-                    where d.contest_id = ${contest.id}::uuid and d.is_default
+      const [parts, ancestors, cited, home, roll, reach, counted] =
+        await Promise.all([
+          db.execute<{ id: string }>(sql`
+            select id from contest where allocation_parent_id = ${contest.id}::uuid
+          `),
+          db.execute<{
+            id: string;
+            area: string | null;
+            scheme: string | null;
+            noun: string | null;
+          }>(sql`
+            with recursive up(id, parent, depth) as (
+              select id, allocation_parent_id, 0 from contest where id = ${contest.id}::uuid
+              union all
+              select c.id, c.allocation_parent_id, up.depth + 1 from contest c join up on c.id = up.parent
+            )
+            select up.id, a.id as area, a.scheme_code as scheme, sc.noun
+            from up
+            join contest c on c.id = up.id
+            join election e on e.id = c.election_id
+            left join polity_territory pt on pt.polity_id = e.polity_id and pt.valid @> e.date_from
+            left join area a on a.id = coalesce(c.district_area_id, pt.area_id)
+            left join scheme sc on sc.code = a.scheme_code
+            order by up.depth desc
+          `),
+          db.execute<{
+            publisher: string;
+            title: string;
+            url: string | null;
+          }>(sql`
+            select distinct s.publisher, s.title, s.url
+            from citation ct join source s on s.id = ct.source_id
+            where ct.entity_id = ${contest.id}::uuid or ct.entity_id in (
+              select cy.id from candidacy cy join contest_option o on o.id = cy.option_id
+              where o.contest_id = ${contest.id}::uuid
+            )
+            order by s.publisher, s.title
+          `),
+          db.execute<{ path: string }>(sql`
+            select s.path from polity_territory t join slug s on s.entity_id = t.polity_id and s.is_current
+            where t.area_id = ${area?.id}::uuid and t.polity_id <> ${contest.polity}::uuid
+            order by upper(t.valid) desc nulls first limit 1
+          `),
+          poll(contest.id, area?.k ?? null),
+          db.execute<{ held: number; of: number }>(sql`
+            select count(*) filter (
+                where exists (select from result_rollup x where x.result_set_k = rs.k and x.area_k = a.k)
+              )::int as held, count(*)::int as of
+            from contest c
+            join election e on e.id = c.election_id
+            join result_set rs on rs.contest_id = c.id and rs.is_default
+            join district_county dc on dc.district_area_id = c.district_area_id
+              and dc.district_valid @> e.date_from and dc.county_valid @> e.date_from and dc.share >= 0.005
+            join area a on a.id = dc.county_area_id
+            where c.id = ${contest.id}::uuid and c.district_area_id = ${area?.id ?? null}::uuid
+              and exists (
+                select from result_rollup_sum x where x.result_set_k = rs.k and x.area_k = ${area?.k ?? null}::int and not x.complete
+              )
+          `),
+          db.execute<{
+            last: number;
+            round: number | null;
+            derived: boolean;
+          }>(sql`
+            select coalesce(t.last, 1) as last,
+              case when t.last > 1 then least(greatest(coalesce(nullif(${input.round}::int, 0), t.last), 1), t.last) end as round,
+              exists (
+                select from result_set rs join note n on n.entity_id = rs.id and n.kind = 'methodology'
+                where rs.contest_id = ${contest.id}::uuid and not rs.is_default
+                  and exists (
+                    select from result_rollup_unit u
+                    where u.result_set_k = rs.k and not exists (
+                      select from result_set d join result_rollup_unit w on w.result_set_k = d.k and w.area_k = u.area_k
+                      where d.contest_id = ${contest.id}::uuid and d.is_default
+                    )
                   )
-                )
-            ) as derived
-          from (
-            select max(r.count_round)::int as last from result_set rs cross join lateral (
-              select x.count_round from result_rollup x
-              where x.result_set_k = rs.k and x.area_k = ${contest.place?.k ?? null}::int and x.measure = any(${COUNTED}) offset 0
-            ) r
-            where rs.contest_id = ${contest.id}::uuid and rs.is_default
-          ) t
-        `),
-      ]);
+              ) as derived
+            from (
+              select max(r.count_round)::int as last from result_set rs cross join lateral (
+                select x.count_round from result_rollup x
+                where x.result_set_k = rs.k and x.area_k = ${contest.place?.k ?? null}::int and x.measure = any(${COUNTED}) offset 0
+              ) r
+              where rs.contest_id = ${contest.id}::uuid and rs.is_default
+            ) t
+          `),
+        ]);
       const [
         { last, round, derived } = { last: 1, round: null, derived: false },
       ] = counted.rows;
@@ -3331,6 +3348,8 @@ export const contests = {
               },
         turnout: roll.turnout,
         quorum: roll.quorum,
+        partial:
+          reach.rows.find((row) => row.held > 0 && row.held < row.of) ?? null,
         count: null,
         isDerived: derived,
         current: null,

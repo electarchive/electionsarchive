@@ -339,6 +339,7 @@
   "race_lede_measure_failed": "Failed with {share} voting no.",
   "race_lede_measure_blocked": "Failed despite {share} voting yes.",
   "race_turnout": "Turnout for this question was {share}.",
+  "race_partial_counties": "Partial results: the archive has {held} of the {of} counties in this district.",
   "race_lede_quorum": "Quorum not reached: turnout was {turnout}, short of the {quorum} required, though {share} voted yes.",
   "race_lede_won_withdrew": "{party} won with {share} of the vote, {margin} points ahead of {runner}, who withdrew before the runoff.",
   "race_lede_votes": "{party} led with {share} of the vote, {margin} points ahead of {runner}.",
