@@ -53,7 +53,20 @@
       {m.count_table_note()}
     </p>
   </div>
-  <div class="overflow-x-auto">
+  <div
+    class="overflow-x-auto"
+    {@attach (node: HTMLElement) => {
+      const cell = node.querySelector<HTMLElement>(
+        `thead th:nth-child(${count.round + 1})`,
+      );
+      if (cell != null) {
+        node.scrollLeft = Math.max(
+          0,
+          cell.offsetLeft + cell.offsetWidth - node.clientWidth,
+        );
+      }
+    }}
+  >
     <table class="border-collapse text-sm inline-full">
       <thead>
         <tr class="border-be text-[0.8125rem] text-muted-foreground">
@@ -61,7 +74,7 @@
             class="sticky inset-s-0 z-10 bg-card pe-3 pbe-1.5 text-start font-normal"
             scope="col"
           >
-            {m.col_option()}
+            {m.col_candidate()}
           </th>
           {#each rounds as round (round)}
             <th
@@ -123,13 +136,18 @@
                 class={cn("px-2 py-1.5 align-top", {
                   "bg-secondary": round === count.round,
                 })}
-                title={votes == null ? undefined : figure(votes)}
               >
                 {#if share != null}
                   <span class="grid justify-items-end gap-1">
-                    <span class="font-figures tabular-nums"
-                      >{percent(share)}</span
-                    >
+                    <span class="grid justify-items-end">
+                      <span class="font-figures tabular-nums"
+                        >{percent(share)}</span
+                      >
+                      <span
+                        class="font-figures text-xs text-muted-foreground tabular-nums"
+                        >{figure(votes ?? 0)}</span
+                      >
+                    </span>
                     <span
                       class="bg-(--party) block-0.75"
                       style:inline-size="{share * 100}%"

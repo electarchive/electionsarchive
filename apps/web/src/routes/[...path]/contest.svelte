@@ -40,6 +40,7 @@
   import Series from "./series.svelte";
   import Shift from "./shift.svelte";
   import Tally from "./tally.svelte";
+  import Wording from "./wording.svelte";
 
   const {
     contest,
@@ -621,12 +622,14 @@
     )
       .entries()
       .map(([note, rows]) =>
-        m.outcome_note({
-          names: new Intl.ListFormat(getLocale(), {
-            type: "conjunction",
-          }).format(rows.map((row) => row.label)),
-          note,
-        }),
+        question
+          ? note
+          : m.outcome_note({
+              names: new Intl.ListFormat(getLocale(), {
+                type: "conjunction",
+              }).format(rows.map((row) => row.label)),
+              note,
+            }),
       )
       .toArray(),
   );
@@ -654,32 +657,37 @@
         .toSorted(
           (a, b) => (b.current?.share ?? 0) - (a.current?.share ?? 0),
         )[0];
-      return top?.current?.outcome === "lost"
-        ? m.race_lede_lost({
-            answer: named(top),
-            share: percent(top.current.share),
-          })
-        : top?.current?.outcome === "won" &&
-            next?.current != null &&
-            /^(?:yes|for|approve)/iu.test(top.label)
-          ? m.race_lede_measure_passed({ share: percent(top.current.share) })
+      const yes = /^(?:yes|for|approve|(?:sì|si|oui|ja|evet|sim)(?!\p{L}))/iu;
+      return top?.current?.outcome === "lost" && yes.test(top.label)
+        ? m.race_lede_measure_blocked({ share: percent(top.current.share) })
+        : top?.current?.outcome === "lost"
+          ? m.race_lede_lost({
+              answer: named(top),
+              share: percent(top.current.share),
+            })
           : top?.current?.outcome === "won" &&
               next?.current != null &&
-              /^(?:no|against|reject)/iu.test(top.label)
-            ? m.race_lede_measure_failed({ share: percent(top.current.share) })
-            : top?.current?.outcome === "won" && next?.current != null
-              ? m.race_lede_won({
-                  party: named(top),
-                  share: percent(
-                    top.current.share,
-                    precision(top.current.share - next.current.share),
-                  ),
-                  margin: points(
-                    top.current.share - next.current.share,
-                  ).replace(/^\+/u, ""),
-                  runner: named(next),
+              yes.test(top.label)
+            ? m.race_lede_measure_passed({ share: percent(top.current.share) })
+            : top?.current?.outcome === "won" &&
+                next?.current != null &&
+                /^(?:no|against|reject|nein|hayır|não)/iu.test(top.label)
+              ? m.race_lede_measure_failed({
+                  share: percent(top.current.share),
                 })
-              : null;
+              : top?.current?.outcome === "won" && next?.current != null
+                ? m.race_lede_won({
+                    party: named(top),
+                    share: percent(
+                      top.current.share,
+                      precision(top.current.share - next.current.share),
+                    ),
+                    margin: points(
+                      top.current.share - next.current.share,
+                    ).replace(/^\+/u, ""),
+                    runner: named(next),
+                  })
+                : null;
     }
     const [elector, second] = contest.electors?.rows ?? [];
     if (elector != null) {
@@ -823,6 +831,43 @@
     return isWon && withdrew != null && withdrew.key !== next.key
       ? `${lede} ${m.race_lede_withdrew({ name: named(withdrew) })}`
       : lede;
+  });
+  const comeback = $derived.by(() => {
+    if (question || contest.current == null) {
+      return null;
+    }
+    const winner = contest.rows.find((row) =>
+      ["won", "elected"].includes(row.current?.outcome ?? ""),
+    );
+    const same = (key: string, person: string | null) =>
+      winner != null &&
+      (winner.key === key ||
+        (person != null && winner.current?.person === person));
+    if (contest.count != null) {
+      let total = 0;
+      for (const row of contest.count.rows) {
+        total += row.votes[0] ?? 0;
+      }
+      const [leader] = contest.count.rows.toSorted(
+        (a, b) => (b.votes[0] ?? 0) - (a.votes[0] ?? 0),
+      );
+      return leader == null || total === 0 || same(leader.key, leader.person)
+        ? null
+        : m.race_lede_first_led({
+            name: leader.label,
+            share: percent((leader.votes[0] ?? 0) / total),
+          });
+    }
+    const index = rounds.findIndex((round) => round.isCurrent);
+    const leader = rounds[index - 1]?.leaders[0];
+    return rounds[index]?.kind !== "runoff" ||
+      leader == null ||
+      same(leader.key, leader.person)
+      ? null
+      : m.race_lede_first_led({
+          name: leader.label,
+          share: percent(leader.share),
+        });
   });
   const items = $derived.by(() => {
     const winners = new Map(
@@ -1117,7 +1162,7 @@
       <p
         class="mbs-1 font-serif text-[clamp(1.0625rem,1.5vw,1.25rem)]/snug text-pretty max-inline-[60ch]"
       >
-        {verdict}
+        {verdict}{#if comeback != null}{" "}{comeback}{/if}
       </p>
     {/if}
     {#each footnotes as line (line)}
@@ -1127,6 +1172,9 @@
         {line}
       </p>
     {/each}
+    {#if contest.wording.length > 0}
+      <Wording wording={contest.wording} />
+    {/if}
   </div>
   {#if contest.series.length > 1}
     <Series series={contest.series} />

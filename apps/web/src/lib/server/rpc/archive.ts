@@ -2796,6 +2796,14 @@ export const contests = {
           }),
         ),
         notes: v.array(v.object({ kind: v.string(), body: v.string() })),
+        wording: v.array(
+          v.object({
+            kind: v.picklist(["text", "summary", "link"]),
+            body: v.nullable(v.string()),
+            url: v.nullable(v.string()),
+            publisher: v.string(),
+          }),
+        ),
         children: v.array(Link),
         places: Places,
         sets: v.array(ResultSet),
@@ -3096,19 +3104,22 @@ export const contests = {
       ] = counted.rows;
       const childIds = parts.rows.map((row) => row.id);
       const ancestorIds = ancestors.rows.map((row) => row.id);
-      const [labels, slugs, crumbs, notes, sets, declared] = await Promise.all([
-        names(
-          [
-            contest.id,
-            contest.election,
-            ...childIds,
-            ...ancestors.rows.map((row) => row.area).filter((id) => id != null),
-          ],
-          contest.date,
-        ),
-        paths([contest.id, contest.election, ...childIds, ...ancestorIds]),
-        breadcrumbs(contest.polity, contest.election),
-        db.execute<{ kind: string; body: string }>(sql`
+      const [labels, slugs, crumbs, notes, sets, declared, wording] =
+        await Promise.all([
+          names(
+            [
+              contest.id,
+              contest.election,
+              ...childIds,
+              ...ancestors.rows
+                .map((row) => row.area)
+                .filter((id) => id != null),
+            ],
+            contest.date,
+          ),
+          paths([contest.id, contest.election, ...childIds, ...ancestorIds]),
+          breadcrumbs(contest.polity, contest.election),
+          db.execute<{ kind: string; body: string }>(sql`
           select kind::text, body_md as body from note
           where entity_id in (
             select ${contest.id}::uuid
@@ -3132,19 +3143,19 @@ export const contests = {
           )
           order by array_position(array['caveat','context','methodology','editorial']::note_kind[], kind)
         `),
-        db.execute<{
-          stage: string;
-          status: string;
-          completeness: number | null;
-          is_default: boolean;
-          kind: string;
-          publisher: string;
-          title: string;
-          url: string | null;
-          license: string | null;
-          attribution: string | null;
-          unreconciled: v.InferOutput<typeof Unreconciled> | null;
-        }>(sql`
+          db.execute<{
+            stage: string;
+            status: string;
+            completeness: number | null;
+            is_default: boolean;
+            kind: string;
+            publisher: string;
+            title: string;
+            url: string | null;
+            license: string | null;
+            attribution: string | null;
+            unreconciled: v.InferOutput<typeof Unreconciled> | null;
+          }>(sql`
           select rs.stage::text, rs.status::text, rs.completeness::float8 as completeness, rs.is_default,
             s.kind::text, s.publisher, s.title, s.url, s.license, s.attribution,
             (select f.details from flag f where f.result_set_id = rs.id and f.check_code = 'reconcile.official' limit 1) as unreconciled
@@ -3152,15 +3163,15 @@ export const contests = {
           where rs.contest_id = ${contest.id}::uuid
           order by rs.is_default desc, array_position(${STAGES}, rs.stage)
         `),
-        db.execute<{
-          key: string;
-          kind: string;
-          party: string | null;
-          person: string | null;
-          label: string | null;
-          outcome: string;
-          note: string | null;
-        }>(sql`
+          db.execute<{
+            key: string;
+            kind: string;
+            party: string | null;
+            person: string | null;
+            label: string | null;
+            outcome: string;
+            note: string | null;
+          }>(sql`
            select o.id as key, rs.kind::text, coalesce(pm.into_id, o.party_id) as party, o.ballot_label as label,
              (select coalesce(m.into_id, cy.person_id) from candidacy cy left join entity_merge m on m.entity_id = cy.person_id
               where cy.option_id in (o.id, o.parent_option_id) and cy.role = 'head'
@@ -3175,7 +3186,18 @@ export const contests = {
              and (rs.kind <> 'counted' or not exists (select from result_rollup r where r.result_set_k = rs.k offset 0))
            order by o.k
         `),
-      ]);
+          db.execute<{
+            kind: "text" | "summary" | "link";
+            body: string | null;
+            url: string | null;
+            publisher: string;
+          }>(sql`
+          select distinct on (t.kind) t.kind::text, t.body, coalesce(t.url, s.url) as url, s.publisher
+          from ballot_question_text t join source s on s.id = t.source_id
+          where ${isRoot}::boolean and t.contest_id = ${contest.id}::uuid
+          order by t.kind, t.lang = 'en' desc, s.kind = 'official_body' desc, s.kind = 'community', t.id
+        `),
+        ]);
       const declaredParties = [
         ...new Set(
           declared.rows.map((row) => row.party).filter((id) => id != null),
@@ -3256,6 +3278,13 @@ export const contests = {
         },
         series: [],
         notes: notes.rows,
+        wording: wording.rows.filter(
+          (row) =>
+            row.kind !== "link" ||
+            wording.rows.every(
+              (other) => other === row || other.url !== row.url,
+            ),
+        ),
         children: childIds
           .map((id) => ({
             name: labels.full.get(id) ?? "",
@@ -5110,7 +5139,7 @@ export const contests = {
                         ],
                   )
                   .toSorted((a, b) => b.votes - a.votes)
-                  .slice(0, 2);
+                  .slice(0, 3);
           return {
             id: row.id,
             path:

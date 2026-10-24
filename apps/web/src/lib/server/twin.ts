@@ -937,9 +937,16 @@ function contestMarkdown(
           .map((step) => link(step.name, step.path))
           .join(" / ")
       : "",
+    ...contest.wording.map((row) => {
+      const source = m.wording_source({ publisher: row.publisher });
+      return row.kind === "link"
+        ? `[${m.wording_link()}](${row.url ?? ""})`
+        : `${row.kind === "text" ? m.wording_text() : m.wording_summary()}: ${row.body ?? ""} (${row.url == null ? source : `[${source}](${row.url})`})`;
+    }),
     ...contest.notes.map((note) => `> ${note.body}`),
     ...compared,
     resultsMarkdown(contest, then),
+    ...countMarkdown(contest),
     ...placesMarkdown(contest.places, link, then),
     ...(contest.children.length === 0
       ? []
@@ -988,6 +995,51 @@ function contestMarkdown(
   ].filter((block) => block !== "");
 }
 
+function countMarkdown(contest: Extract<Data, { kind: "contest" }>["contest"]) {
+  const { count: tally } = contest;
+  if (tally == null || tally.last < 2) {
+    return [];
+  }
+  const rounds = Array.from({ length: tally.last }, (_, step) => step);
+  const totals = rounds.map((round) => {
+    let total = 0;
+    for (const row of tally.rows) {
+      total += row.votes[round] ?? 0;
+    }
+    return total;
+  });
+  return [
+    `## ${m.count_table()}`,
+    table(
+      [
+        m.col_candidate(),
+        ...rounds.map((round) =>
+          round === tally.last - 1
+            ? m.count_final()
+            : m.count_round({ round: round + 1 }),
+        ),
+      ],
+      [
+        ...tally.rows.map((row) => [
+          row.label,
+          ...rounds.map((round) => {
+            const votes = row.votes[round];
+            return votes == null || totals[round] === 0
+              ? null
+              : `${count(votes)} (${percent(votes / (totals[round] ?? 1))})`;
+          }),
+        ]),
+        [
+          m.count_exhausted(),
+          ...tally.exhausted.map((spent) =>
+            spent == null ? null : count(spent),
+          ),
+        ],
+      ],
+    ),
+  ];
+}
+
 function resultsMarkdown(
   contest: Extract<Data, { kind: "contest" }>["contest"],
   then: string | null,
@@ -1018,7 +1070,9 @@ function resultsMarkdown(
     ? m.no_results()
     : `${table(
         [
-          m.col_option(),
+          contest.rows.some((row) => row.key.startsWith("answer:"))
+            ? m.col_answer()
+            : m.col_option(),
           m.col_votes(),
           m.col_share(),
           ...(hasSeats ? [m.col_seats()] : []),
@@ -1035,7 +1089,7 @@ function resultsMarkdown(
           isDerived(row.current.note)
             ? []
             : [
-                `\n\n${m.outcome_note({ names: row.label, note: row.current.note })}`,
+                `\n\n${row.key.startsWith("answer:") ? row.current.note : m.outcome_note({ names: row.label, note: row.current.note })}`,
               ],
         )
         .join("")}`;
