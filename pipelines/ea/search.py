@@ -3,7 +3,36 @@ import time
 from ea.store import connect
 
 BUILD_SQL = """
-with docs as (
+with prom as (
+    select person_id, max(prominence) as prominence from (
+        select cy.person_id, case
+            when o.kind in ('head_of_state', 'head_of_government') and p.kind in ('sovereign_state', 'supranational')
+                and el.polity_id = o.polity_id then 3
+            when o.kind in ('head_of_state', 'head_of_government', 'governor') and p.kind in ('federal_unit', 'region')
+                and el.polity_id = o.polity_id then 1.5
+            when b.kind = 'upper_house' and bp.kind = 'sovereign_state' then 1
+            when b.kind in ('lower_house', 'unicameral') and bp.kind = 'sovereign_state' then 0.5
+            else 0 end as prominence
+        from candidacy cy
+        join outcome oc on oc.option_id = cy.option_id and oc.kind in ('elected', 'won')
+        join contest_option co on co.id = cy.option_id
+        join contest c on c.id = co.contest_id and c.party_scope_id is null
+        join election el on el.id = c.election_id and el.kind <> 'primary'
+        left join office o on o.id = c.office_id
+        left join polity p on p.id = o.polity_id
+        left join body b on b.id = c.body_id
+        left join polity bp on bp.id = b.polity_id
+        where cy.role = 'head'
+        union all
+        select t.person_id, case
+            when o.kind in ('head_of_state', 'head_of_government') and p.kind in ('sovereign_state', 'supranational') then 3
+            when o.kind in ('head_of_state', 'head_of_government', 'governor') then 1.5
+            else 0 end
+        from tenure t join office o on o.id = t.office_id join polity p on p.id = o.polity_id
+    ) x
+    group by person_id
+),
+docs as (
     select e.id as entity_id, e.type,
         case e.type
             when 'polity' then e.id
@@ -21,14 +50,16 @@ with docs as (
             when 'party' then 1 + ln(1 + (select count(*) from contest_option o where o.party_id = e.id)) / 3
             when 'person' then ln(1 + (select count(*) from candidacy cy where cy.person_id = e.id)) / 2
                 + (select count(*) from external_id x where x.entity_id = e.id and x.scheme = 'wikidata')
+                + coalesce(pr.prominence, 0)
         end as rank_boost
     from entity e
     join name n on n.entity_id = e.id
+    left join prom pr on pr.person_id = e.id
     where e.type in ('polity', 'election', 'contest', 'party', 'person')
         and not exists (select from entity_merge m where m.entity_id = e.id)
         and e.retired_by is null
         and (e.type in ('party', 'person') or exists (select from slug s where s.entity_id = e.id and s.is_current))
-    group by e.id, e.type
+    group by e.id, e.type, pr.prominence
 )
 insert into search_document (entity_id, type, polity_id, text, tsv, rank_boost)
 select entity_id, type, polity_id, text, to_tsvector('simple', text), rank_boost

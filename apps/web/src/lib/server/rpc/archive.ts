@@ -10804,7 +10804,7 @@ async function locate(
     return null;
   }
   const peers = await namesakes(type, suffix[1], polity);
-  return peers[Number(suffix[2]) - 1] ?? null;
+  return peers[Number(suffix[2]) - 1] ?? (peers.length === 1 ? peers[0] : null);
 }
 
 async function chambers(polity: string) {
@@ -13124,6 +13124,9 @@ export const search = {
               when h.type = 'election' then (el.kind = 'general' and q.t ~ '\\m\\d{4}\\M')::int
               when h.type = 'party' then coalesce((
                 select (0.75 * h.exact::int * least(1, greatest(0, d.rank_boost - 2) / 1.5) + 0.3 * greatest(0, d.rank_boost - 2))
+                from search_document d where d.entity_id = h.entity_id), 0)
+              when h.type = 'person' then coalesce((
+                select 0.75 * h.exact::int * least(1, greatest(0, d.rank_boost - 2) / 3)
                 from search_document d where d.entity_id = h.entity_id), 0)
               when h.type <> 'contest' or c.kind = 'ballot_question' or c.allocation_parent_id is not null then 0
               when f.whole then
