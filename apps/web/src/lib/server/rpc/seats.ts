@@ -1124,7 +1124,7 @@ export const seats = {
         day: string;
       }>(sql`
         with c as materialized (
-          select k.district_area_id as area, a.k, a.scheme_code, e.date_from as day
+          select k.district_area_id as area, k.body_id as body, a.k, a.scheme_code, e.date_from as day
           from contest k join election e on e.id = k.election_id join area a on a.id = k.district_area_id
           where k.id = ${input.id}::uuid and k.kind = 'body_seats' and e.kind = 'general'
         ),
@@ -1134,7 +1134,7 @@ export const seats = {
         )
         select t.vintage, x.method, ta.id::text as area, w.weight::float8 as share, c.day::text as day,
           (select k.id::text from contest k join election e on e.id = k.election_id
-            where k.district_area_id = ta.id and k.kind = 'body_seats' and e.kind = 'general' and e.status = 'held'
+            where k.district_area_id = ta.id and k.body_id is not distinct from c.body and k.kind = 'body_seats' and e.kind = 'general' and e.status = 'held'
               and e.date_from >= lower(t.valid)
             order by e.date_from limit 1) as contest
         from s cross join c
@@ -1149,7 +1149,7 @@ export const seats = {
         join area ta on ta.k = w.to_k
         where w.weight >= 0.01 and not exists (
           select from contest k join election e on e.id = k.election_id
-          where k.district_area_id = c.area and k.kind = 'body_seats' and e.kind = 'general' and e.status = 'held'
+          where k.district_area_id = c.area and k.body_id is not distinct from c.body and k.kind = 'body_seats' and e.kind = 'general' and e.status = 'held'
             and e.date_from > c.day and s.valid @> e.date_from
         )
         order by w.weight desc
@@ -1213,7 +1213,7 @@ export const seats = {
         url: string | null;
       }>(sql`
         with c as materialized (
-          select k.district_area_id as area, a.k, a.scheme_code, e.date_from as day
+          select k.district_area_id as area, k.body_id as body, a.k, a.scheme_code, e.date_from as day
           from contest k join election e on e.id = k.election_id join area a on a.id = k.district_area_id
           where k.id = ${input.id}::uuid and k.kind = 'body_seats' and e.kind = 'general'
         ),
@@ -1225,7 +1225,7 @@ export const seats = {
           case when lower(t.valid) > lower(s.valid) then t.vintage else s.vintage end as vintage, ta.id::text as area,
           extract(year from lower(t.valid))::text as from, extract(year from upper(t.valid))::text as to,
           (select k.id::text from contest k join election e on e.id = k.election_id
-            where k.district_area_id = ta.id and k.kind = 'body_seats' and e.kind = 'general' and e.status = 'held'
+            where k.district_area_id = ta.id and k.body_id is not distinct from c.body and k.kind = 'body_seats' and e.kind = 'general' and e.status = 'held'
               and t.valid @> e.date_from
             order by case when lower(t.valid) > lower(s.valid) then e.date_from end,
               case when lower(t.valid) < lower(s.valid) then e.date_from end desc
@@ -1251,7 +1251,7 @@ export const seats = {
           )
           and not exists (
             select from contest k join election e on e.id = k.election_id
-            where k.district_area_id = c.area and k.kind = 'body_seats' and e.kind = 'general' and e.status = 'held'
+            where k.district_area_id = c.area and k.body_id is not distinct from c.body and k.kind = 'body_seats' and e.kind = 'general' and e.status = 'held'
               and s.valid @> e.date_from
               and case when lower(t.valid) > lower(s.valid) then e.date_from > c.day else e.date_from < c.day end
           )
