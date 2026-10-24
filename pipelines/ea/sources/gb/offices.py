@@ -205,7 +205,7 @@ def emit() -> Path:
                 id=cs.key(f"{SOURCE}.tenure", f"speaker:{item}:{start}"),
                 person_id=person(item, label),
                 office_id=offices["speaker"],
-                body_id=commons,
+                body_id=None,
                 from_date=start,
                 from_precision="day",
                 to_date=stop,
