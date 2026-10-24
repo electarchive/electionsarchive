@@ -72,6 +72,7 @@ PARTIES = {
     "plaid cymru": "Plaid Cymru",
     "forward wales": "Forward Wales",
 }
+MERGED = {"Q14420732": "Rhun ap Iorwerth"}
 RENAMED = {"Ash Denham": "Ash Regan"}
 INDEPENDENT = {"independent", "independent politician", "independent (politician)"}
 WALES_CHANGES = (
@@ -317,6 +318,17 @@ def emit() -> Path:
         )
         for url in (*CHANGE_PAGES.values(), SENEDD_CHANGES):
             cs.artifact(raw.cached(SOURCE, url), wikipedia)
+        for qid, label in MERGED.items():
+            holders = held.get(qid, set())
+            targets = {
+                person
+                for (person,) in conn.execute(
+                    "select p.id from person p join name n on n.entity_id = p.id and n.is_preferred where n.text = %s and not exists (select from entity_merge m where m.entity_id = p.id)",
+                    [label],
+                ).fetchall()
+            } - holders
+            if len(holders) == 1 and len(targets) == 1:
+                cs.merge(next(iter(holders)), next(iter(targets)))
         unmatched: list[tuple[str, str]] = []
         totals = Counter()
         specs: list[dict[str, object]] = []
