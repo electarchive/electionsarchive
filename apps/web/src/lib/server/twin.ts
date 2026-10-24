@@ -533,7 +533,9 @@ function personMarkdown(
 ) {
   const years = (from: string | null, to: string | null) =>
     to == null
-      ? m.person_served_now({ from: from?.slice(0, 4) ?? "" })
+      ? (person.isGone ? m.person_served_from : m.person_served_now)({
+          from: from?.slice(0, 4) ?? "",
+        })
       : m.person_served_span({
           from: from?.slice(0, 4) ?? "",
           to: to.slice(0, 4),
@@ -569,6 +571,12 @@ function personMarkdown(
       : person.precision === "day"
         ? m.card_born_date({ date: date(person.born) })
         : m.card_born({ year: person.born.slice(0, 4) });
+  const died =
+    person.died == null
+      ? null
+      : person.diedPrecision === "day"
+        ? m.card_died_date({ date: date(person.died) })
+        : m.card_died({ year: person.died.slice(0, 4) });
   const wikidata =
     person.wikidata == null
       ? null
@@ -584,6 +592,7 @@ function personMarkdown(
             caucus: person.caucus.short ?? person.caucus.label,
           }),
       born,
+      died,
       wikidata,
     ]
       .filter((part) => part != null)

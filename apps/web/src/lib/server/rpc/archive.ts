@@ -12012,6 +12012,9 @@ export const people = {
         name: v.string(),
         born: v.nullable(v.string()),
         precision: v.nullable(v.string()),
+        died: v.nullable(v.string()),
+        diedPrecision: v.nullable(v.string()),
+        isGone: v.boolean(),
         wikidata: v.nullable(v.string()),
         photo: Photo,
         party: v.nullable(PartyRef),
@@ -12070,9 +12073,14 @@ export const people = {
         id: string;
         born: string | null;
         precision: string | null;
+        died: string | null;
+        diedPrecision: string | null;
+        isGone: boolean;
         wikidata: string | null;
       }>(sql`
         select p.id, p.birth_date::text as born, p.birth_precision::text as precision,
+          p.death_date::text as died, p.death_precision::text as "diedPrecision",
+          coalesce(p.death_date is not null or p.birth_date < current_date - interval '110 years', false) as "isGone",
           (select x.value from external_id x where x.entity_id = p.id and x.scheme = 'wikidata' limit 1) as wikidata
         from person p
         where p.id = coalesce((select into_id from entity_merge where entity_id = ${input.id}::uuid), ${input.id}::uuid)
@@ -12465,10 +12473,24 @@ export const people = {
         portraits([person.id]),
         refs([own, caucus].filter((id) => id != null)),
       ]);
+      const now = new Date();
+      const stamp = now.toISOString().slice(4, 10);
+      const earliest =
+        [
+          ...record.map((entry) => entry.date),
+          ...spells.flatMap((spell) =>
+            spell.from == null ? [] : [spell.from],
+          ),
+          ...terms.map((term) => term.from),
+        ].toSorted((a, b) => a.localeCompare(b))[0] ?? "9999";
       return {
         name: labels.full.get(person.id) ?? "",
         born: person.born,
         precision: person.precision,
+        died: person.died,
+        diedPrecision: person.diedPrecision,
+        isGone:
+          person.isGone || earliest < `${now.getUTCFullYear() - 92}${stamp}`,
         wikidata: person.wikidata,
         photo: faces.get(person.id) ?? null,
         party: own == null ? null : (owned.get(own) ?? null),

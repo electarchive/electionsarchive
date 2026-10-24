@@ -9,7 +9,12 @@
   import { cn } from "#lib/utils.js";
   import type { PageData } from "./$types";
 
-  const { lanes }: { lanes: PageData["parties"] } = $props();
+  const {
+    lanes,
+    isGone,
+    died,
+  }: { lanes: PageData["parties"]; isGone: boolean; died: string | null } =
+    $props();
 
   const HOW: Record<string, () => string> = {
     nominated: m.person_parties_nominated,
@@ -32,6 +37,7 @@
           ),
       ),
   );
+  const open = $derived(isGone ? died : today);
   const dates = $derived(
     lanes.flatMap((lane) => [
       ...lane.spans.flatMap((span) =>
@@ -39,10 +45,13 @@
           ? span.to == null
             ? []
             : [span.to]
-          : [span.from, span.to ?? today],
+          : [span.from, span.to ?? open].filter((value) => value != null),
       ),
       ...lane.ballots.map((ballot) => ballot.date),
     ]),
+  );
+  const end = $derived(
+    open ?? dates.toSorted((a, b) => a.localeCompare(b)).at(-1) ?? today,
   );
   const first = $derived(
     Number(
@@ -78,7 +87,7 @@
     ),
   );
   const at = (value: string | null) =>
-    (Date.parse(value ?? today) - low) / Math.max(high - low, 1);
+    (Date.parse(value ?? end) - low) / Math.max(high - low, 1);
   const ticks = $derived.by(() => {
     const first = new Date(low).getUTCFullYear();
     const last = new Date(high).getUTCFullYear();

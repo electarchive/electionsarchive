@@ -83,6 +83,22 @@
     withdrew: m.person_ended_withdrew,
     lost_seat: m.person_ended_lost_seat,
   };
+  const end = $derived(
+    person.isGone
+      ? (person.died ??
+          [
+            ...[...person.served, ...person.elected].flatMap((spell) => [
+              spell.from,
+              spell.to,
+            ]),
+            ...entries.map((entry) => entry.date),
+          ]
+            .filter((value) => value != null)
+            .toSorted((a, b) => a.localeCompare(b))
+            .at(-1) ??
+          today)
+      : today,
+  );
   const low = $derived(
     Math.min(
       ...person.served.flatMap((spell) =>
@@ -90,20 +106,22 @@
       ),
       ...person.elected.map((spell) => Date.parse(spell.from)),
       ...years.map((year) => Date.UTC(year, 0, 1)),
-      Date.parse(today),
+      Date.parse(end),
     ),
   );
   const high = $derived(
     Math.max(
-      Date.parse(today),
+      Date.parse(end),
       ...person.elected.flatMap((spell) =>
         spell.to == null ? [] : [Date.parse(spell.to)],
       ),
     ),
   );
   const at = (value: string | null) =>
-    ((value == null ? Date.parse(today) : Date.parse(value)) - low) /
-    Math.max(high - low, 1);
+    (Date.parse(value ?? end) - low) / Math.max(high - low, 1);
+  const since = $derived(
+    person.isGone ? m.person_served_from : m.person_served_now,
+  );
 </script>
 
 {#snippet spells(
@@ -162,7 +180,7 @@
             class="font-figures text-[0.8125rem] whitespace-nowrap text-muted-foreground tabular-nums"
             >{spell.to == null
               ? note == null
-                ? m.person_served_now({ from: spell.from?.slice(0, 4) ?? "" })
+                ? since({ from: spell.from?.slice(0, 4) ?? "" })
                 : spell.from?.slice(0, 4)
               : m.person_served_span({
                   from: spell.from?.slice(0, 4) ?? "",
@@ -176,9 +194,7 @@
                 .map((seat) => {
                   const span =
                     seat.to == null
-                      ? m.person_served_now({
-                          from: seat.from?.slice(0, 4) ?? "",
-                        })
+                      ? since({ from: seat.from?.slice(0, 4) ?? "" })
                       : m.person_served_span({
                           from: seat.from?.slice(0, 4) ?? "",
                           to: seat.to.slice(0, 4),
@@ -275,6 +291,13 @@
               : m.card_born({ year: person.born.slice(0, 4) })}</span
           >
         {/if}
+        {#if person.died != null}
+          <span
+            >{person.diedPrecision === "day"
+              ? m.card_died_date({ date: date(person.died) })
+              : m.card_died({ year: person.died.slice(0, 4) })}</span
+          >
+        {/if}
         {#if person.wikidata != null}
           <a
             class="inline-flex items-center gap-1 underline decoration-border underline-offset-4 hover:decoration-foreground"
@@ -334,7 +357,7 @@
       </section>
     {/if}
 
-    <Parties lanes={data.parties} />
+    <Parties lanes={data.parties} isGone={person.isGone} died={person.died} />
 
     <Career record={person.record} />
 
