@@ -5819,11 +5819,18 @@ def emit() -> Path:
                 previous = contest
                 if annulled:
                     continue
-                footnotes = {
-                    row["person"]: row["footnote"].lstrip("#").strip()
-                    for row in rows.iter_rows(named=True)
-                    if row["person"] is not None and row["footnote"] is not None
-                }
+                footnotes = {}
+                contest_notes = set()
+                for row in rows.iter_rows(named=True):
+                    if row["person"] is None or row["footnote"] is None:
+                        continue
+                    text = row["footnote"].lstrip("#").strip()
+                    if text.startswith(("*", "Top 2")):
+                        contest_notes.add(text.lstrip("*").strip())
+                    else:
+                        footnotes[row["person"]] = text
+                for text in sorted(contest_notes):
+                    cs.add("note", entity_id=result_set, kind="context", body_md=text)
                 withdrawn = {row["person"] for row in rows.iter_rows(named=True) if (year, row["fec_id"]) in WITHDREW}
                 for person in withdrawn:
                     cs.add("outcome", result_set_id=result_set, option_id=roots[person], kind="withdrew", notes=footnotes.get(person))
@@ -6424,11 +6431,18 @@ def emit() -> Path:
                                 y1=box[3],
                             )
 
-                footnotes = {
-                    row["person"]: row["footnote"].lstrip("#").strip()
-                    for row in rows.iter_rows(named=True)
-                    if row["person"] is not None and row["footnote"] is not None
-                }
+                footnotes = {}
+                contest_notes = set()
+                for row in rows.iter_rows(named=True):
+                    if row["person"] is None or row["footnote"] is None:
+                        continue
+                    text = row["footnote"].lstrip("#").strip()
+                    if text.startswith(("*", "Top 2")):
+                        contest_notes.add(text.lstrip("*").strip())
+                    else:
+                        footnotes[row["person"]] = text
+                for text in sorted(contest_notes):
+                    cs.add("note", entity_id=result_set, kind="context", body_md=text)
                 ranked = sorted(totals, key=totals.__getitem__, reverse=True)
                 share = totals[ranked[0]] / (rows["votes"].sum() or 1)
                 majority = 0.45 if system == "two_round_45" else 0.5
