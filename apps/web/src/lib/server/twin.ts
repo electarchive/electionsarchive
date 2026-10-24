@@ -677,6 +677,7 @@ function personMarkdown(
             m.col_contest(),
             m.col_party(),
             m.col_share(),
+            m.col_majority(),
             m.col_result(),
           ],
           person.record.map((entry) => [
@@ -694,9 +695,12 @@ function personMarkdown(
             entry.votes == null || entry.total == null || entry.total === 0
               ? null
               : percent(entry.votes / entry.total),
-            entry.note == null || isDerived(entry.note)
-              ? outcome(entry.outcome)
-              : `${outcome(entry.outcome)} (${entry.note})`,
+            entry.majority == null ? null : count(entry.majority),
+            entry.isUnopposed === true && entry.outcome === "elected"
+              ? m.person_elected_unopposed()
+              : entry.note == null || isDerived(entry.note)
+                ? outcome(entry.outcome)
+                : `${outcome(entry.outcome)} (${entry.note})`,
           ]),
         ),
   ].filter((block) => block !== "");

@@ -49,23 +49,13 @@
         (LOST.has(entry.outcome) || entry.outcome === "elsewhere"),
     })),
   );
-  const elections = $derived(
-    [...Map.groupBy(entries, (entry) => entry.election).values()].map((group) =>
-      group.map((entry) => entry.outcome),
-    ),
-  );
+  const races = $derived(entries.map((entry) => entry.outcome));
   const won = $derived(
-    elections.filter(
-      (outcomes) => outcomes.includes("elected") || outcomes.includes("won"),
-    ).length,
+    races.filter((outcome) => outcome === "elected" || outcome === "won")
+      .length,
   );
   const advanced = $derived(
-    elections.filter(
-      (outcomes) =>
-        outcomes.includes("advanced") &&
-        !outcomes.includes("elected") &&
-        !outcomes.includes("won"),
-    ).length,
+    races.filter((outcome) => outcome === "advanced").length,
   );
   const years = $derived(entries.map((entry) => entry.year));
   const first = $derived(Math.min(...years));
@@ -322,7 +312,7 @@
           <p
             class="font-serif text-[clamp(1.0625rem,1.6vw,1.25rem)]/snug text-pretty max-inline-[60ch]"
           >
-            {elections.length === 1
+            {races.length === 1
               ? (won > 0 ? m.person_lede_single_won : m.person_lede_single)({
                   year: String(first),
                 })
@@ -332,13 +322,13 @@
                     : m.person_lede_year)({
                     won: count(won),
                     advanced: count(advanced),
-                    count: count(elections.length),
+                    count: count(races.length),
                     year: String(first),
                   })
                 : (advanced > 0 ? m.person_lede_advanced : m.person_lede)({
                     won: count(won),
                     advanced: count(advanced),
-                    count: count(elections.length),
+                    count: count(races.length),
                     first: String(first),
                     last: String(last),
                   })}
@@ -430,7 +420,11 @@
               </span>
               <span class="grid justify-items-end gap-1">
                 <span class="font-figures text-[0.8125rem] tabular-nums"
-                  >{entry.share == null ? "–" : percent(entry.share)}</span
+                  >{entry.share == null
+                    ? entry.isUnopposed === true
+                      ? m.person_unopposed()
+                      : "–"
+                    : percent(entry.share)}</span
                 >
                 {#if entry.share != null}
                   <span
@@ -446,6 +440,12 @@
                       )}
                     ></span>
                   </span>
+                {/if}
+                {#if entry.majority != null}
+                  <span
+                    class="font-figures text-[0.6875rem] text-muted-foreground tabular-nums"
+                    >{m.person_majority({ count: count(entry.majority) })}</span
+                  >
                 {/if}
                 {#if entry.electoral != null}
                   <span

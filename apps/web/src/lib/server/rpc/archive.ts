@@ -12546,6 +12546,8 @@ export const people = {
             measure: v.string(),
             votes: v.nullable(v.number()),
             total: v.nullable(v.number()),
+            majority: v.optional(v.nullable(v.number())),
+            isUnopposed: v.optional(v.boolean()),
             outcome: v.nullable(v.string()),
             note: v.optional(v.nullable(v.string())),
             electoral: v.nullable(
@@ -12587,6 +12589,8 @@ export const people = {
         measure: number | null;
         votes: number | null;
         total: number | null;
+        majority: number | null;
+        unopposed: boolean;
         outcome: string | null;
         note: string | null;
         party: string | null;
@@ -12670,8 +12674,32 @@ export const people = {
             join rounds d on d.root = f.root and d.rk = f.rk and d.measure = f.measure
           where f.count_round = d.round and f.option <> 0
           group by f.root, m.main, m.appointed
+        ),
+        margins as (
+          select o.root,
+            case when bool_or(o.elected) and bool_or(o.named and not o.elected)
+              then min(o.value) filter (where o.elected) - max(o.value) filter (where o.named and not o.elected) end as majority
+          from (
+            select f.root, f.option, sum(f.value) as value, co.kind in ('candidate', 'ticket') as named, exists (
+              select from outcome x join result_set rs on rs.id = x.result_set_id and rs.is_default
+              where x.option_id = co.id and x.candidacy_id is null and x.kind in ('elected', 'won')
+            ) as elected
+            from fetched f join mains m on m.root = f.root and m.main = f.measure
+              join contest_option co on co.k = f.option
+            where f.first = f.last and f.option <> 0
+            group by f.root, f.option, co.id, co.kind
+          ) o
+          where not exists (select from contest c where c.allocation_parent_id = o.root)
+          group by o.root
+          having count(distinct o.option) = (select count(*) from contest_option co where co.contest_id = o.root)
+            and not exists (
+              select from contest_option co where co.contest_id = o.root and co.kind not in ('candidate', 'ticket', 'write_in', 'others')
+            )
         )
         select p.root, p.date::text as date, p.year, p.kind, p.election, t.main::int as measure, t.votes,
+          g.majority, exists (
+            select from result_set rs where rs.contest_id = p.root and rs.is_default and rs.kind = 'tacit'
+          ) as unopposed,
           case when t.main = 11 then coalesce(t.appointed, t.total) else t.total end as total,
           coalesce(
             (select (array_agg(x.kind::text order by array_position(array['elected', 'advanced', 'won', 'tied']::outcome_kind[], x.kind)))[1]
@@ -12705,6 +12733,7 @@ export const people = {
             (select pc.color from party_color pc where pc.party_id = lead.party
               order by upper(pc.valid) desc nulls first limit 1)) as party_color
         from placed p left join totals t on t.root = p.root
+        left join margins g on g.root = p.root
         left join lateral (
           select m.party, m.independent, m.scoped from mine m join grp g on g.id = m.contest_id and g.root = p.root
           order by m.party is null, m.independent limit 1
@@ -12870,6 +12899,11 @@ export const people = {
               measure: MEASURES.get(row.measure ?? 1) ?? "votes",
               votes: row.votes,
               total: row.total,
+              majority:
+                row.outcome === "elected" || row.outcome === "won"
+                  ? row.majority
+                  : null,
+              isUnopposed: row.unopposed,
               outcome: indirect == null ? row.outcome : indirect.outcome,
               note: indirect == null ? row.note : null,
               isIndependent: row.party == null && row.independent,
