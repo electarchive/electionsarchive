@@ -2,7 +2,7 @@ import csv
 import re
 import unicodedata
 from collections import defaultdict
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 from itertools import pairwise
 from pathlib import Path
 from uuid import UUID
@@ -859,6 +859,124 @@ def emit() -> Path:
                     cs.merge(person, survivor)
                     merged += 1
         print(f"{len(groups)} groups, {merged} merged, {skipped} skipped, deferred pipelines: {sorted(busy)}")
+
+        if "gb.byelections" not in busy:
+            lineage: dict[UUID, UUID] = {}
+
+            def party_root(node: UUID) -> UUID:
+                lineage.setdefault(node, node)
+                while lineage[node] != node:
+                    lineage[node] = lineage[lineage[node]]
+                    node = lineage[node]
+                return node
+
+            for left, right in conn.execute(
+                """select coalesce(a.into_id, r.from_party_id), coalesce(b.into_id, r.to_party_id) from party_relation r
+                   left join entity_merge a on a.entity_id = r.from_party_id
+                   left join entity_merge b on b.entity_id = r.to_party_id
+                   where r.kind in ('merged_into', 'successor_of', 'refounded_as', 'absorbed_by')"""
+            ).fetchall():
+                lineage[party_root(left)] = party_root(right)
+            linked: dict[UUID, set[UUID]] = defaultdict(set)
+            for left, right in conn.execute(
+                """select a.id, b.id from crosswalk c join boundary_set s on s.id = c.to_boundary_set_id
+                   join crosswalk_weight w on w.crosswalk_id = c.id
+                   join area a on a.k = w.from_k join area b on b.k = w.to_k
+                   where s.scheme_code = 'gb.pcon' and w.weight > 0"""
+            ).fetchall():
+                linked[left].add(right)
+                linked[right].add(left)
+            races: dict[UUID, set[tuple[UUID, date]]] = defaultdict(set)
+            seats: dict[UUID, list[tuple[date, UUID | None, UUID | None]]] = defaultdict(list)
+            for person, polity, day, area, party in conn.execute(
+                """select coalesce(m.into_id, cy.person_id), coalesce(u.polity_id, e.polity_id), e.date_from,
+                          k.district_area_id, coalesce(p.into_id, o.party_id)
+                   from candidacy cy
+                   left join entity_merge m on m.entity_id = cy.person_id
+                   join contest_option o on o.id = cy.option_id join contest k on k.id = o.contest_id
+                   join election e on e.id = k.election_id left join election u on u.id = e.parent_id
+                   left join entity_merge p on p.entity_id = o.party_id
+                   where e.date_from is not null and e.polity_id in (
+                     select distinct e.polity_id from election e join changeset c on c.id = e.changeset_id
+                     where c.pipeline = 'gb.byelections')"""
+            ).fetchall():
+                races[person].add((polity, day))
+                seats[person].append((day, area, None if party is None else party_root(party)))
+            titles = re.compile(r"^((sir|dr|rev|hon|lord|lady|dame|col|capt|maj|gen|mr|mrs|miss)\.? )+", re.IGNORECASE)
+            known: dict[tuple[str, frozenset[str]], set[UUID]] = defaultdict(set)
+            for person, text in conn.execute(
+                """with holder as (
+                     select distinct coalesce(m.into_id, x.entity_id) as person from external_id x
+                     left join entity_merge m on m.entity_id = x.entity_id
+                     where x.scheme in ('gb.umit.person', 'mnis', 'wikidata'))
+                   select h.person, n.text from holder h join name n on n.entity_id = h.person
+                   union all
+                   select h.person, n.text from holder h join entity_merge m on m.into_id = h.person
+                   join name n on n.entity_id = m.entity_id"""
+            ).fetchall():
+                if person in races and (named := words(titles.sub("", text))) is not None:
+                    known[named].add(person)
+            alone: dict[UUID, set[tuple[str, frozenset[str]]]] = defaultdict(set)
+            for person, text in conn.execute(
+                """select x.entity_id, n.text from external_id x join name n on n.entity_id = x.entity_id
+                   where x.scheme = 'gb.byelections.person'
+                     and not exists (select from entity_merge m where m.entity_id = x.entity_id)
+                     and not exists (select from external_id y where y.entity_id = x.entity_id and y.scheme <> x.scheme)"""
+            ).fetchall():
+                if (named := words(titles.sub("", text))) is not None:
+                    alone[person].add(named)
+            joined = doubtful = weak = 0
+            for person, keys in alone.items():
+                if person in cs.survivors:
+                    continue
+                mine = races[person]
+                found = {
+                    other
+                    for key in keys
+                    for other in known.get(key, ())
+                    if other != person
+                    and not mine & races[other]
+                    and any(
+                        polity == theirs and abs((day - when).days) <= NEAR
+                        for polity, day in mine
+                        for theirs, when in races[other]
+                    )
+                    and not (person in born and other in born and born[person] != born[other])
+                    and not (other in died and min(day for _, day in mine) > died[other] + timedelta(days=365))
+                }
+                if len(found) > 1:
+                    doubtful += 1
+                    continue
+                if not found:
+                    continue
+                other = found.pop()
+                theirs = seats[other]
+                if (
+                    any(len(key[0].split()) >= 3 for key in keys if other in known.get(key, ()))
+                    or any(
+                        area is not None and (area == seat or seat in linked[area])
+                        for _, area, _ in seats[person]
+                        for _, seat, _ in theirs
+                    )
+                    or any(
+                        party is not None
+                        and party
+                        in {
+                            near[2]
+                            for near in theirs
+                            if abs((near[0] - day).days) == min(abs((when - day).days) for when, _, _ in theirs)
+                        }
+                        for day, _, party in seats[person]
+                    )
+                ):
+                    cs.merge(person, cs.survivors.get(other, other))
+                    joined += 1
+                else:
+                    weak += 1
+            print(
+                f"{joined} by-election people joined to their other races, {weak} with too little evidence, "
+                f"{doubtful} with more than one match"
+            )
 
         parties: dict[UUID, tuple[str, int, bool, set[str]]] = {
             party: (polity, options, linked, set(writers))
