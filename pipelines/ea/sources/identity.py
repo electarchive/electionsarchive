@@ -1,3 +1,4 @@
+import csv
 import re
 import unicodedata
 from collections import defaultdict
@@ -917,6 +918,32 @@ def emit() -> Path:
             for person in dict.fromkeys(found[1:]):
                 if person != found[0] and person not in cs.survivors:
                     cs.merge(person, found[0])
+        with open(Path(__file__).with_name("identity_bioguide.tsv"), newline="") as twins:
+            for twin in csv.DictReader(twins, delimiter="\t"):
+                member = conn.execute(
+                    """select coalesce(m.into_id, x.entity_id) from external_id x
+                       left join entity_merge m on m.entity_id = x.entity_id
+                       where x.scheme = 'bioguide' and x.value = %s limit 1""",
+                    [twin["bioguide"]],
+                ).fetchone()
+                person = UUID(twin["person"])
+                target = None if member is None else cs.survivors.get(member[0], member[0])
+                if (
+                    target is None
+                    or target == person
+                    or person in cs.survivors
+                    or conn.execute("select from entity_merge where entity_id = %s", [person]).fetchone() is not None
+                ):
+                    print(f"{twin['name']} ({twin['bioguide']}): already merged or missing")
+                    continue
+                for row in cs.rows.get("entity_merge", []):
+                    absorbed = row["entity_id"]
+                    if row["into_id"] == person and isinstance(absorbed, UUID):
+                        row["into_id"] = target
+                        cs.survivors[absorbed] = target
+                        cs.merged.setdefault(str(target), []).append(str(absorbed))
+                cs.merged.pop(str(person), None)
+                cs.merge(person, target)
         for row in conn.execute(
             """select n.id, n.entity_id, n.text, n.lang, n.script, n.kind, n.source_id from (
                  select n.*, row_number() over (
