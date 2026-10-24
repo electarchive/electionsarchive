@@ -109,7 +109,7 @@ export async function home() {
         union all
         (select e.id, e.date_from, e.kind, e.polity_id, 'upcoming'
           from election e
-          where e.parent_id is null and e.date_from > current_date
+          where e.parent_id is null and e.date_from > current_date and not exists (select from entity_merge m where m.entity_id = e.id)
           order by e.date_from limit 4)
         union all
         (select t.id, t.date_from, t.kind, t.polity_id, 'today'
@@ -121,7 +121,7 @@ export async function home() {
             cross join lateral (
               select abs(extract(doy from e.date_from) - extract(doy from current_date)) as gap
             ) d
-            where e.parent_id is null and e.date_from < current_date - 300
+            where e.parent_id is null and e.date_from < current_date - 300 and not exists (select from entity_merge m where m.entity_id = e.id)
               and least(d.gap, 365 - d.gap) <= 3
             order by case when y.kind in ('sovereign_state', 'supranational') then e.id else e.polity_id end,
               (e.kind = 'general') desc, e.date_from desc
@@ -148,7 +148,7 @@ export async function home() {
         array_agg(distinct extract(year from e.date_from)::int) as years
       from election e join polity y on y.id = e.polity_id
       where e.parent_id is null and y.kind in ('sovereign_state', 'supranational')
-        and e.kind = 'general' and e.date_from <= current_date
+        and e.kind = 'general' and e.date_from <= current_date and not exists (select from entity_merge m where m.entity_id = e.id)
       group by e.polity_id
     `),
   ]);
