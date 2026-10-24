@@ -617,7 +617,8 @@ function personMarkdown(
                   : m.person_record_by_election({ place: entry.name }),
               entry.path,
             ),
-            entry.party?.label ?? null,
+            entry.party?.label ??
+              (entry.isIndependent === true ? m.person_parties_none() : null),
             entry.votes == null || entry.total == null || entry.total === 0
               ? null
               : percent(entry.votes / entry.total),

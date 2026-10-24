@@ -11369,6 +11369,7 @@ export const people = {
               v.object({ votes: v.number(), total: v.number() }),
             ),
             party: v.nullable(PartyRef),
+            isIndependent: v.optional(v.boolean()),
           }),
         ),
       }),
@@ -11559,7 +11560,17 @@ export const people = {
       const spells = merge(tenures.rows, 365);
       const won = new Set(
         rows.rows
-          .filter((row) => row.outcome === "elected" || row.outcome === "won")
+          .filter((row) => {
+            const indirect =
+              row.kind === "general"
+                ? rows.rows.find(
+                    (peer) =>
+                      peer.kind === "indirect" && peer.year === row.year,
+                  )
+                : undefined;
+            const outcome = indirect == null ? row.outcome : indirect.outcome;
+            return outcome === "elected" || outcome === "won";
+          })
           .map((row) => row.root),
       );
       const seated = new Set(spells.map((spell) => spell.owner));
@@ -11569,21 +11580,24 @@ export const people = {
         from: string;
         to: string | null;
       }>(sql`
-        select coalesce(c.body_id, c.office_id) as owner, c.body_id is not null as "isBody", e.date_from::text as from,
+        select o.owner, o.owner = c.body_id as "isBody", e.date_from::text as from,
           coalesce(
             (select min(e2.date_from) from contest c2 join election e2 on e2.id = c2.election_id
               where c2.body_id is not distinct from c.body_id and c2.office_id is not distinct from c.office_id
-                and c2.district_area_id = c.district_area_id and c2.party_scope_id is null
+                and c2.district_area_id is not distinct from c.district_area_id and c2.party_scope_id is null
                 and e2.kind in ('general', 'local') and e2.date_from > e.date_from + 60),
             e.date_from + (e.date_from - (
               select max(e2.date_from) from contest c2 join election e2 on e2.id = c2.election_id
               where c2.body_id is not distinct from c.body_id and c2.office_id is not distinct from c.office_id
-                and c2.district_area_id = c.district_area_id and c2.party_scope_id is null
+                and c2.district_area_id is not distinct from c.district_area_id and c2.party_scope_id is null
                 and e2.kind in ('general', 'local') and e2.date_from < e.date_from - 60
                 and e2.date_from > e.date_from - 3650
             ))
           )::text as to
         from contest c join election e on e.id = c.election_id
+        cross join lateral (
+          select case when c.kind = 'office' then coalesce(c.office_id, c.body_id) else coalesce(c.body_id, c.office_id) end as owner
+        ) o
         where c.id = any(${sql.param([...won])}::uuid[]) and c.party_scope_id is null
           and (c.body_id is not null or c.office_id is not null)
           and e.kind in ('general', 'by_election', 'special', 'runoff', 'local')
@@ -11645,6 +11659,7 @@ export const people = {
               total: row.total,
               outcome: indirect == null ? row.outcome : indirect.outcome,
               note: indirect == null ? row.note : null,
+              isIndependent: row.party == null && row.independent,
               electoral:
                 indirect?.votes == null || indirect.total == null
                   ? null

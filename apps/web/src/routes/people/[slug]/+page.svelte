@@ -350,6 +350,11 @@
                     color={swatch(entry.party.color, `party:${entry.party.id}`)}
                     party={entry.party.id}
                   />
+                {:else if entry.party == null && entry.isIndependent === true && !person.isIndependent}
+                  <span
+                    class="justify-self-start text-[0.8125rem] text-muted-foreground"
+                    >{m.person_parties_none()}</span
+                  >
                 {/if}
               </span>
               <span class="grid justify-items-end gap-1">
