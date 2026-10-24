@@ -67,7 +67,7 @@ def build(prefix: str | None) -> str:
                     *(
                         ["--no-feature-limit", "--no-tile-size-limit", "--no-tiny-polygon-reduction", "--drop-rate=1"]
                         if scheme_code in DENSE
-                        else ["--no-tiny-polygon-reduction-at-maximum-zoom", "--drop-smallest-as-needed"]
+                        else ["--no-tiny-polygon-reduction-at-maximum-zoom", "--coalesce-smallest-as-needed"]
                     ),
                     f"--named-layer=areas:{areas_path}",
                     f"--named-layer=labels:{labels_path}",
