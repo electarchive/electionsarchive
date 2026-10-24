@@ -14,7 +14,7 @@ from ea.changeset import Changeset
 from ea.store import connect
 
 SOURCE = "us.county_changes"
-VERSION = "1"
+VERSION = "2"
 REGIONS = "https://www2.census.gov/geo/tiger/GENZ2022/shp/cb_2022_us_county_500k.zip"
 NOTICE = "https://www2.census.gov/geo/pdfs/reference/ct_county_equiv_change.pdf"
 CROSSWALK = "https://www2.census.gov/geo/docs/reference/ct_change/ct_cou_to_cousub_crosswalk.txt"
@@ -40,6 +40,7 @@ FORMER = {
     "02270": ("Wade Hampton Census Area", date(2015, 7, 1)),
     "02261": ("Valdez-Cordova Census Area", date(2019, 1, 2)),
 }
+MERGED = {"46001": "Armstrong County", "46131": "Washabaugh County"}
 
 
 def ct_regions() -> dict[str, str]:
@@ -84,7 +85,8 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Dated county-equivalents: Connecticut's nine planning regions from 2022, and Alaska's census area and borough changes since 1990",
+            summary="Dated county-equivalents: Connecticut's nine planning regions from 2022, and Alaska's census area and borough changes since 1990, "
+            "and South Dakota's Armstrong (merged into Dewey) and Washabaugh (merged into Jackson) counties",
             polity="US",
         )
         census = cs.source("U.S. Census Bureau", "Changes to Counties and County Equivalent Entities")
@@ -208,6 +210,27 @@ def emit() -> Path:
                 valid_to=ended,
             )
             cs.add("name", entity_id=unit, text=label, lang="en", kind="official", is_preferred=True)
+
+        sd_state_unit = cs.unit("us.state", "46")
+        for code, valid_from, valid_to, area in conn.execute(
+            """select c.code, c.valid_from, c.valid_to, c.area_id from area_code c join area a on a.id = c.area_id
+               where a.scheme_code = 'us.county' and c.code = any(%s) and c.valid_to is not null""",
+            [list(MERGED)],
+        ).fetchall():
+            cs.add(
+                "reporting_unit",
+                id=cs.unit("us.county", code),
+                polity_id=cs.polity("US-SD"),
+                scheme_code="us.county",
+                code=code,
+                parent_id=sd_state_unit,
+                area_relation="equals",
+                area_id=area,
+                kind="standard",
+                valid_from=valid_from,
+                valid_to=valid_to,
+            )
+            print(f"{MERGED[code]}: {code} {valid_from} to {valid_to}")
 
         region_of = ct_regions()
         unmatched: list[str] = []
