@@ -11280,9 +11280,10 @@ export const polities = {
                         contested > 1 &&
                         race.results.every(
                           (row) =>
-                            row.party == null &&
-                            row.person != null &&
-                            !row.isIndependent,
+                            row.key.startsWith("kind:") ||
+                            (row.party == null &&
+                              row.person != null &&
+                              !row.isIndependent),
                         ),
                       measure: race.measure,
                       results: (contested > 0
