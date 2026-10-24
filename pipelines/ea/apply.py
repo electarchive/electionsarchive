@@ -248,7 +248,10 @@ def _publish_table(conn: Connection, stage: Stage, table: str) -> None:
                 """update public.name p set is_preferred = false from {} s, changeset c
                    where s.is_preferred and p.is_preferred and p.entity_id = s.entity_id and p.lang = s.lang
                      and p.text <> s.text and p.valid_from is null and p.valid_to is null{}{}
-                     and c.id = p.changeset_id and c.pipeline = %s"""
+                     and c.id = p.changeset_id
+                     and (c.pipeline = %s or (%s = 'identity'
+                          and regexp_replace(lower(unaccent(p.text)), '[^a-z0-9]', '', 'g')
+                            = regexp_replace(lower(unaccent(s.text)), '[^a-z0-9]', '', 'g')))"""
             ).format(
                 staged,
                 sql.SQL(
@@ -258,7 +261,7 @@ def _publish_table(conn: Connection, stage: Stage, table: str) -> None:
                     "".join(f" and s.{column} is null" for column in ("valid_from", "valid_to") if column in columns)
                 ),
             ),
-            [stage.pipeline],
+            [stage.pipeline, stage.pipeline],
         )
     if "id" in columns:
         compared = [column for column in columns if column != "id"]
@@ -1080,6 +1083,42 @@ def publish(conn: Connection, changeset_id: str) -> None:
             )
         for table in stage.tables:
             _publish_table(conn, stage, table)
+        if "name" in stage.tables:
+            conn.execute(
+                sql.SQL(
+                    """update public.name p set is_preferred = false from public.name q, changeset c, changeset o
+                       where %s <> 'identity' and p.is_preferred and p.valid_from is null and p.valid_to is null
+                         and o.id = p.changeset_id and o.pipeline = %s
+                         and exists (select from {} s where s.entity_id = p.entity_id and s.text = p.text
+                                     and s.lang = p.lang and s.is_preferred)
+                         and q.entity_id = p.entity_id and q.lang = p.lang and q.script is not distinct from p.script
+                         and q.is_preferred and q.text <> p.text and q.valid_from is null and q.valid_to is null
+                         and c.id = q.changeset_id and c.pipeline = 'identity'
+                         and regexp_replace(lower(unaccent(p.text)), '[^a-z0-9]', '', 'g')
+                           = regexp_replace(lower(unaccent(q.text)), '[^a-z0-9]', '', 'g')"""
+                ).format(stage.staged("name")),
+                [stage.pipeline, stage.pipeline],
+            )
+            conflicts = conn.execute(
+                sql.SQL(
+                    """select distinct p.entity_id::text, p.text, c.pipeline, q.text from public.name p
+                       join changeset c on c.id = p.changeset_id and c.pipeline <> 'identity'
+                       join public.name q on q.entity_id = p.entity_id and q.lang = p.lang
+                         and q.script is not distinct from p.script and q.is_preferred
+                         and q.valid_from is null and q.valid_to is null
+                       join changeset i on i.id = q.changeset_id and i.pipeline = 'identity'
+                       where p.is_preferred and p.valid_from is null and p.valid_to is null
+                         and p.entity_id in (select entity_id from {})
+                         and regexp_replace(lower(unaccent(p.text)), '[^a-z0-9]', '', 'g')
+                           <> regexp_replace(lower(unaccent(q.text)), '[^a-z0-9]', '', 'g')"""
+                ).format(stage.staged("name"))
+            ).fetchall()
+            if conflicts:
+                with (DATA / "logs" / "identity-name-conflicts.tsv").open("a", encoding="utf-8") as log:
+                    log.writelines(
+                        f"{changeset_id}\t{entity}\t{source}\t{text}\tidentity\t{curated}\n"
+                        for entity, text, source, curated in conflicts
+                    )
         stray = checks.merged(conn, changeset_id, set(stage.tables))
         if stray:
             raise ValueError(

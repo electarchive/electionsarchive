@@ -756,6 +756,9 @@ def emit() -> Path:
         born: dict[UUID, date] = dict(
             conn.execute("select id, birth_date from person where birth_date is not null").fetchall()
         )
+        died: dict[UUID, date] = dict(
+            conn.execute("select id, death_date from person where death_date is not null").fetchall()
+        )
         cs = Changeset(
             conn,
             pipeline=SOURCE,
@@ -815,7 +818,11 @@ def emit() -> Path:
                 for other in members[index + 1 :]:
                     signed = initials[line, person] | initials[line, other]
                     births = {born[one] for one in (person, other) if one in born}
-                    if set(dates[person]) & set(dates[other]) or len(signed) > 1 or len(births) > 1:
+                    posthumous = any(
+                        one in died and (max(dates[two], default=died[one]) - died[one]).days > 365
+                        for one, two in ((person, other), (other, person))
+                    )
+                    if set(dates[person]) & set(dates[other]) or len(signed) > 1 or len(births) > 1 or posthumous:
                         blocked.append((person, other))
                         continue
                     if min(abs((a - b).days) for a in people[person] for b in people[other]) <= NEAR:

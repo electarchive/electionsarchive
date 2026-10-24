@@ -183,6 +183,9 @@ def emit(
                 [list(ours)],
             )
         }
+        deaths: dict[UUID, date] = dict(
+            conn.execute("select id, death_date from person where death_date is not null").fetchall()
+        )
         offices_known = {value for (value,) in conn.execute("select value from external_id where scheme = 'us.office'")}
         parties_known = {value for (value,) in conn.execute("select value from external_id where scheme = 'us.party'")}
         slugs = {value for (value,) in conn.execute("select path from slug")}
@@ -358,8 +361,16 @@ def emit(
                 lines.sort("votes", descending=True).select("name", "party", "votes", "winner", "page").iter_rows()
             ):
                 probe = f"{plain(candidate.split()[0])}|{surname(candidate)}"
-                found = {person for person, seen in people[str(state)].get(probe, []) if abs(seen - year) <= 16}
+                found = {
+                    person
+                    for person, seen in people[str(state)].get(probe, [])
+                    if abs(seen - year) <= 16 and deaths.get(person, day) >= day
+                }
                 person = prior.get((key, candidate))
+                if person is not None and deaths.get(person, day) < day:
+                    split = cs.key(f"{pipeline}.person", f"{state}:{slug(candidate)}:{year}")
+                    cs.renamed[str(split)] = str(person)
+                    person = split
                 if person is None:
                     person = (
                         next(iter(found))
