@@ -114,6 +114,8 @@
   "outcome_note": "{names}: {note}",
   "outcome_derived": "Outcome inferred from the certified totals: {rest}",
   "stat_valid": "Valid votes",
+  "stat_votes_cast": "Votes cast",
+  "term_votes_cast": "Each voter could cast up to {count} votes here, so this counts votes, not voters.",
   "measure_list_votes": "Party votes",
   "measure_electoral_votes": "Electoral votes",
   "measure_state_delegate_equivalents": "State delegate equivalents",
@@ -328,6 +330,31 @@
   "race_special": "{name}, special election",
   "race_lede_seats": "{party} won {seats} of the {total} seats, with {share} of the vote.",
   "race_lede_seats_only": "{party} won {seats} of the {total} seats.",
+  "race_unopposed": [
+    {
+      "declarations": [
+        "input seats",
+        "input parties",
+        "local seatsPlural = seats: plural"
+      ],
+      "selectors": ["seatsPlural"],
+      "match": {
+        "seatsPlural=one": "1 seat was returned unopposed, so no votes were cast in it: {parties}.",
+        "seatsPlural=*": "{seats} seats were returned unopposed, so no votes were cast in them: {parties}."
+      }
+    }
+  ],
+  "race_multiple": [
+    {
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "1 constituency returned more than one member. Its voters could cast more than one vote, so the totals count votes, not voters.",
+        "countPlural=*": "{count} constituencies returned more than one member. Their voters could cast more than one vote, so the totals count votes, not voters."
+      }
+    }
+  ],
+  "race_unopposed_party": "{party} {seats}",
   "race_lede_seats_first": "{party} won {seats} of the {total} seats, with {share} of the first-round vote.",
   "race_lede_tally": "{party} won {seats} of {total}, with {share} of the vote.",
   "race_lede_split": "{party} won {seats} of the {total} {noun} races with {share} of the vote.",

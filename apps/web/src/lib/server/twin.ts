@@ -896,6 +896,26 @@ function electionMarkdown(
             ...(hasSeats ? [row.seats == null ? null : count(row.seats)] : []),
           ]),
         ),
+        ...(race.unopposed == null
+          ? []
+          : [
+              m.race_unopposed({
+                seats: race.unopposed.seats,
+                parties: new Intl.ListFormat("en", {
+                  type: "conjunction",
+                }).format(
+                  race.unopposed.parties.map((party) =>
+                    m.race_unopposed_party({
+                      party: party.label === "" ? m.record_none() : party.label,
+                      seats: count(party.seats),
+                    }),
+                  ),
+                ),
+              }),
+            ]),
+        ...((race.multiple ?? 0) > 0
+          ? [m.race_multiple({ count: race.multiple ?? 0 })]
+          : []),
       ];
     }),
     ...(election.contests.length === 0
@@ -1116,7 +1136,7 @@ function resultsMarkdown(
           m.col_result(),
         ],
         results,
-      )}\n\n${m.stat_valid()}: ${count(contest.current.valid)}${
+      )}\n\n${contest.ballot == null ? m.stat_valid() : m.stat_votes_cast()}: ${count(contest.current.valid)}${contest.ballot == null ? "" : ` ${m.term_votes_cast({ count: String(contest.ballot) })}`}${
         contest.turnout == null || contest.turnout.registered === 0
           ? ""
           : `\n\n${m.stat_turnout()}: ${percent(contest.turnout.voters / contest.turnout.registered)} (${m.stat_turnout_count({ voters: count(contest.turnout.voters), registered: count(contest.turnout.registered) })})${contest.turnout.basis === "rejected" ? ` ${m.turnout_basis_rejected()}` : contest.turnout.basis === "valid" ? ` ${m.turnout_basis_valid()}` : ""}`

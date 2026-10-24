@@ -2852,6 +2852,7 @@ export const contests = {
           }),
         ),
         quorum: v.nullable(v.number()),
+        ballot: v.optional(v.nullable(v.number())),
         partial: v.nullable(v.object({ held: v.number(), of: v.number() })),
         turnout: v.nullable(
           v.object({
@@ -3354,6 +3355,7 @@ export const contests = {
               },
         turnout: roll.turnout,
         quorum: roll.quorum,
+        ballot: roll.ballot,
         partial:
           reach.rows.find((row) => row.held > 0 && row.held < row.of) ?? null,
         count: null,
@@ -6254,15 +6256,18 @@ function merge<
 
 async function poll(contest: string | null, k: number | null, isAsked = true) {
   if (contest == null || !isAsked) {
-    return { turnout: null, quorum: null };
+    return { turnout: null, quorum: null, ballot: null };
   }
   const found = await db.execute<{
-    registered: number;
-    voters: number;
+    registered: number | null;
+    voters: number | null;
     basis: "valid" | "rejected" | null;
     quorum: number | null;
+    ballot: number | null;
   }>(sql`
-    select t.*, ((coalesce(es.rules, '{}') || coalesce(c.rules_override, '{}')) ->> 'quorum')::float8 as quorum
+    select t.*, ((coalesce(es.rules, '{}') || coalesce(c.rules_override, '{}')) ->> 'quorum')::float8 as quorum,
+      case (coalesce(es.rules, '{}') || coalesce(c.rules_override, '{}')) ->> 'formula'
+        when 'block' then c.magnitude when 'limited' then c.magnitude - 1 end as ballot
     from (
       select nullif(sum(registered), 0)::float8 as registered,
         sum(coalesce(voters, valid + coalesce(invalid, 0)))::float8 as voters,
@@ -6284,15 +6289,17 @@ async function poll(contest: string | null, k: number | null, isAsked = true) {
     ) t
     join contest c on c.id = ${contest}::uuid
     left join electoral_system es on es.id = c.electoral_system_id
-    where t.registered is not null and t.voters is not null and (t.basis is null or t.voters <= t.registered)
   `);
   const row = found.rows[0];
   return {
     turnout:
-      row == null
+      row?.registered == null ||
+      row.voters == null ||
+      (row.basis != null && row.voters > row.registered)
         ? null
         : { registered: row.registered, voters: row.voters, basis: row.basis },
     quorum: row?.quorum ?? null,
+    ballot: row?.ballot != null && row.ballot > 1 ? row.ballot : null,
   };
 }
 
@@ -7001,6 +7008,39 @@ async function races(
         .filter((row) => !row.key.startsWith("kind:") || row.votes > 0)
         .toArray()
         .toSorted((a, b) => b.votes - a.votes);
+      const returned =
+        single != null || head?.isOffice === true
+          ? null
+          : await db.execute<{
+              party: string | null;
+              seats: number;
+              multiple: number;
+            }>(sql`
+              with tacit as (
+                select coalesce(bm.into_id, br.parent_party_id, pm.into_id, o.party_id) as party
+                from contest c
+                join election e on e.id = c.election_id
+                join result_set rs on rs.contest_id = c.id and rs.is_default and rs.kind = 'tacit'
+                join outcome x on x.result_set_id = rs.id and x.kind in ('elected', 'won') and x.candidacy_id is null
+                join contest_option o on o.id = x.option_id
+                left join entity_merge pm on pm.entity_id = o.party_id
+                left join party_affiliation br on br.party_id = coalesce(pm.into_id, o.party_id)
+                  and br.kind = 'regional_branch' and br.valid @> e.date_from
+                left join entity_merge bm on bm.entity_id = br.parent_party_id
+                where c.id = any(${sql.param(roots)}::uuid[])
+              )
+              select party, count(*)::int as seats,
+                (select count(*)::int from contest c where c.id = any(${sql.param(roots)}::uuid[]) and c.magnitude > 1) as multiple
+              from tacit group by party
+              union all
+              select null, 0, (select count(*)::int from contest c where c.id = any(${sql.param(roots)}::uuid[]) and c.magnitude > 1)
+              where not exists (select from tacit)
+            `);
+      const unopposed = (returned?.rows ?? []).filter((row) => row.seats > 0);
+      let tacit = 0;
+      for (const row of unopposed) {
+        tacit += row.seats;
+      }
       const level = grid?.level ?? (table == null ? null : first?.scheme);
       let filled = 0;
       for (const row of results) {
@@ -7150,6 +7190,27 @@ async function races(
         sample: table?.sample ?? null,
         since: table?.since ?? null,
         size: head?.size ?? null,
+        unopposed:
+          tacit === 0
+            ? null
+            : {
+                seats: tacit,
+                parties: unopposed
+                  .map((row) => {
+                    const key =
+                      row.party == null
+                        ? "none"
+                        : `party:${parentOf.get(row.party) ?? row.party}`;
+                    const shown = results.find((entry) => entry.key === key);
+                    return {
+                      key,
+                      label: shown?.short ?? shown?.label ?? "",
+                      seats: row.seats,
+                    };
+                  })
+                  .toSorted((a, b) => b.seats - a.seats),
+              },
+        multiple: returned?.rows[0]?.multiple ?? 0,
         spread: spread.rows,
         measure: here?.measure ?? "votes",
         valid: here?.side.valid ?? 0,
@@ -7450,6 +7511,21 @@ export const elections = {
               }),
             ),
             size: v.nullable(v.number()),
+            unopposed: v.optional(
+              v.nullable(
+                v.object({
+                  seats: v.number(),
+                  parties: v.array(
+                    v.object({
+                      key: v.string(),
+                      label: v.string(),
+                      seats: v.number(),
+                    }),
+                  ),
+                }),
+              ),
+            ),
+            multiple: v.optional(v.number()),
             partners: v.array(v.array(v.string())),
             holders: v.nullable(
               v.object({

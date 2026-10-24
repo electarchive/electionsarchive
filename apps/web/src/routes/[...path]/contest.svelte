@@ -2122,9 +2122,12 @@
         <div class="flex items-baseline gap-2">
           <dt class="text-[0.8125rem] text-muted-foreground">
             <Term
-              label={counted ?? m.stat_valid()}
-              definition={DEFINITIONS[contest.current.measure]?.() ??
-                m.term_valid()}
+              label={contest.ballot == null
+                ? (counted ?? m.stat_valid())
+                : m.stat_votes_cast()}
+              definition={contest.ballot == null
+                ? (DEFINITIONS[contest.current.measure]?.() ?? m.term_valid())
+                : m.term_votes_cast({ count: String(contest.ballot) })}
             />
           </dt>
           <dd class="font-figures text-xl font-[760] tracking-[-0.015em]">

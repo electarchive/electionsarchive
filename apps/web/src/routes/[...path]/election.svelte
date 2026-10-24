@@ -856,7 +856,11 @@
                         noun,
                         share: percent(leader.share),
                       })
-                    : seated.length > 0 && race.isTotal && leader.share === 0
+                    : seated.length > 0 &&
+                        ((race.isTotal && leader.share === 0) ||
+                          (!race.isOffice &&
+                            ((race.unopposed?.seats ?? 0) * 10 >= total ||
+                              (race.multiple ?? 0) > 0)))
                       ? m.race_lede_seats_only({
                           party: definite(named(leader), true),
                           seats: count(leader.seats ?? 0),
@@ -1301,6 +1305,28 @@
               ? m.col_seats()
               : m.col_electors()}
         />
+        {#if race.unopposed != null}
+          <p class="px-1.5 pbs-1 text-[0.8125rem] text-muted-foreground">
+            {m.race_unopposed({
+              seats: race.unopposed.seats,
+              parties: new Intl.ListFormat(getLocale(), {
+                type: "conjunction",
+              }).format(
+                race.unopposed.parties.map((party) =>
+                  m.race_unopposed_party({
+                    party: party.label === "" ? m.record_none() : party.label,
+                    seats: count(party.seats),
+                  }),
+                ),
+              ),
+            })}
+          </p>
+        {/if}
+        {#if (race.multiple ?? 0) > 0}
+          <p class="px-1.5 text-[0.8125rem] text-muted-foreground">
+            {m.race_multiple({ count: race.multiple ?? 0 })}
+          </p>
+        {/if}
       </div>
     {/if}
     {#if race.places != null && !race.isTotal}
