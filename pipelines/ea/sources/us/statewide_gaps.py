@@ -2,7 +2,7 @@ import difflib
 import re
 import subprocess
 import zipfile
-from datetime import date
+from datetime import UTC, date, datetime
 from pathlib import Path
 from uuid import UUID
 from xml.etree import ElementTree
@@ -15,7 +15,7 @@ from ea.sources.us import medsl_statewide, openelections, sc_house_reports
 from ea.store import DATA, connect
 
 SOURCE = "us.statewide_gaps"
-VERSION = "1"
+VERSION = "2"
 PARSED = DATA / "parsed" / SOURCE
 KY_URL = "https://elect.ky.gov/SiteCollectionDocuments/Election%20Results/2010-2019/2015/2015%20General%20Election%20Results.pdf"
 WY_URL = "https://sos.wyo.gov/Elections/Docs/2006/06Results/06General/SW_Candidates_Summary.pdf"
@@ -37,6 +37,8 @@ KS_COUNTIES = {
 KS_TOTALS = "https://sos.ks.gov/elections/22elec/2022-General-Official-Vote-Totals.pdf"
 SC_URL = sc_house_reports.CLARITY[date(2010, 11, 2)]
 AL_URL = "https://www.sos.alabama.gov/sites/default/files/voter-pdfs/2014/2014GeneralResults-WithoutWriteIn.pdf"
+MT_URL = "https://sosmt.gov/docs/31/post-election/66775/2024-general-election-report-state-canvass"
+MT_DAY = date(2024, 11, 5)
 CITATIONS = {
     "AL": (
         "Alabama Secretary of State",
@@ -63,6 +65,7 @@ CITATIONS = {
         "2022 General Election results by precinct, with Johnson, Sedgwick, Shawnee, and Wyandotte counties' results",
         "https://sos.ks.gov/elections/election-results.html",
     ),
+    "MT": ("Montana Secretary of State", "2024 Statewide General Election Canvass", MT_URL),
     "SC": (
         sc_house_reports.PUBLISHER,
         sc_house_reports.CLARITY_TITLE.format(year=2010),
@@ -171,7 +174,7 @@ AL_GROUPS: dict[tuple[int, int], list[tuple[str, str | None, str, str | None] | 
 COLUMNS = ["year", "day", "state", "title", "special", "county", "candidate", "party", "writein", "votes"]
 METHOD = (
     "County totals are the state's official county returns as published by its election office: the canvass tables "
-    "for Alabama, Kentucky, Wyoming, and South Dakota, the sums of the Secretary of State's precinct returns for Kansas, with Johnson, Sedgwick, Shawnee, and Wyandotte counties, which those files omit, from the counties' own official results and write-ins left out, and the county detail of "
+    "for Alabama, Kentucky, Wyoming, South Dakota, and Montana, the sums of the Secretary of State's precinct returns for Kansas, with Johnson, Sedgwick, Shawnee, and Wyandotte counties, which those files omit, from the counties' own official results and write-ins left out, and the county detail of "
     "South Carolina's official results. The winner shown is the candidate with the most votes in those totals."
 )
 
@@ -186,6 +189,17 @@ def fetch() -> None:
     for url in KS_COUNTIES.values():
         raw.fetch(SOURCE, url, suffix=".pdf")
     raw.fetch(SOURCE, KS_TOTALS, suffix=".pdf")
+    try:
+        raw.cached(SOURCE, MT_URL)
+    except LookupError:
+        raw.store(
+            SOURCE,
+            MT_URL,
+            (DATA / "inbox" / "manual" / "MF-038" / "2024-General-Election-Report-State-Canvass.pdf").read_bytes(),
+            suffix=".pdf",
+            retrieved_at=datetime(2026, 10, 23, tzinfo=UTC),
+            media_type="application/pdf",
+        )
 
 
 def text(url: str) -> str:
@@ -404,6 +418,44 @@ def south_carolina(fips: dict[str, str]) -> list[tuple[object, ...]]:
     return rows
 
 
+def montana(fips: dict[str, str]) -> list[tuple[object, ...]]:
+    block = text(MT_URL).split("STATE SUPERINTENDENT OF", 1)[1].split("\nTotal", 1)
+    totals = [number(cell) for cell in block[1].split()[:2]]
+    names = {re.sub(r"[^a-z]", "", name): code for name, code in fips.items()}
+    counties: dict[str, tuple[int, int]] = {}
+    pending = None
+    for line in block[0].splitlines():
+        found = re.fullmatch(r"\s*([A-Z][A-Z .']*?)\s{2,}([\d,]+)\s+([\d,]+)\s*", line)
+        if found:
+            pending = (found[1], number(found[2]), number(found[3]))
+        elif pending is not None and line.strip():
+            pending = (f"{pending[0]} {line.strip()}", pending[1], pending[2])
+        else:
+            continue
+        key = re.sub(r"[^a-z]", "", pending[0].lower())
+        if key in names:
+            counties[names[key]] = pending[1:]
+            pending = None
+    if len(counties) != 56 or [sum(votes[index] for votes in counties.values()) for index in (0, 1)] != totals:
+        raise ValueError(f"MT superintendent: {len(counties)} counties do not add up to {totals}")
+    return [
+        (
+            MT_DAY.year,
+            MT_DAY,
+            "MT",
+            "Superintendent of Public Instruction",
+            False,
+            code,
+            candidate,
+            party,
+            False,
+            votes[index],
+        )
+        for code, votes in counties.items()
+        for index, (candidate, party) in enumerate((("Shannon O'Brien", "DEMOCRATIC"), ("Susie Hedalen", "REPUBLICAN")))
+    ]
+
+
 def alabama(fips: dict[str, str]) -> list[tuple[object, ...]]:
     pdf = str(raw.cached(SOURCE, AL_URL).path)
     names = {re.sub(r"[^a-z]", "", name): code for name, code in fips.items()}
@@ -496,6 +548,7 @@ def parse() -> None:
         + south_dakota(fips["SD"])
         + kansas(fips["KS"])
         + south_carolina(fips["SC"])
+        + montana(fips["MT"])
     )
     contest = ["year", "day", "state", "title", "post", "special"]
     returns = (
@@ -568,6 +621,7 @@ def emit() -> Path:
         for url in [*KS_URLS.values(), *KS_COUNTIES.values(), KS_TOTALS]:
             cs.artifact(raw.cached(SOURCE, url), sources["KS"])
         cs.artifact(raw.cached(sc_house_reports.SOURCE, SC_URL), sources["SC"])
+        cs.artifact(raw.cached(SOURCE, MT_URL), sources["MT"])
         return sources
 
     return medsl_statewide.emit(
@@ -577,8 +631,8 @@ def emit() -> Path:
         summary="Alabama's 2014 lieutenant governor, attorney general, secretary of state, auditor, agriculture "
         "commissioner, and both public service commission places, Kentucky's 2015 secretary of state, attorney general, auditor, treasurer, and agriculture "
         "commissioner, Wyoming's 2006 secretary of state, auditor, treasurer, and superintendent, South Dakota's two "
-        "2012 public utilities commissioner races, Kansas's 2022 treasurer and insurance commissioner, and South "
-        "Carolina's 2010 down-ballot statewide offices by county from each state's official returns",
+        "2012 public utilities commissioner races, Kansas's 2022 treasurer and insurance commissioner, South "
+        "Carolina's 2010 down-ballot statewide offices, and Montana's 2024 superintendent of public instruction by county from each state's official returns",
         cite=cite,
         method=METHOD,
         close="The leading candidates were within half a percent in these totals, so no outcome is recorded from them.",
