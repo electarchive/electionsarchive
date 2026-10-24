@@ -6280,7 +6280,7 @@ async function poll(contest: string | null, k: number | null, isAsked = true) {
     ) t
     join contest c on c.id = ${contest}::uuid
     left join electoral_system es on es.id = c.electoral_system_id
-    where t.registered is not null and t.voters is not null
+    where t.registered is not null and t.voters is not null and (t.basis is null or t.voters <= t.registered)
   `);
   const row = found.rows[0];
   return {
@@ -7505,6 +7505,7 @@ export const elections = {
             voters: v.number(),
             reporting: v.number(),
             of: v.number(),
+            basis: v.optional(v.nullable(v.picklist(["valid", "rejected"]))),
             earlier: v.nullable(
               v.object({
                 year: v.number(),
@@ -7697,6 +7698,76 @@ export const elections = {
       ) =>
         entry != null &&
         (entry.reporting === entry.of || entry.voters >= valid * 0.9);
+      const chamber = raced.find((race) => race.body != null)?.body ?? null;
+      const pooled =
+        isCovered(totaled) || chamber == null
+          ? []
+          : (
+              await db.execute<{
+                isNow: boolean;
+                year: number;
+                registered: number | null;
+                voters: number | null;
+                reporting: number;
+                of: number;
+                basis: "valid" | "rejected" | null;
+              }>(sql`
+                with recursive picked as (
+                  select e.id, e.date_from, true as "isNow" from election e where e.id = ${input.id}::uuid
+                  union all
+                  select * from (
+                    select p.id, p.date_from, false from election e
+                    join election p on p.polity_id = e.polity_id and p.kind = e.kind and p.date_from < e.date_from
+                      and p.status = 'held'
+                    where e.id = ${input.id}::uuid
+                    order by p.date_from desc limit 1
+                  ) x
+                ),
+                tree(id, root) as (
+                  select id, id from picked
+                  union all
+                  select e.id, tree.root from election e join tree on e.parent_id = tree.id
+                ),
+                seats as (
+                  select tree.root, rs.k, a.k as area from contest c
+                  join tree on tree.id = c.election_id
+                  join result_set rs on rs.contest_id = c.id and rs.is_default
+                  join area a on a.id = c.district_area_id
+                  where c.body_id = ${chamber}::uuid and c.kind = 'body_seats' and c.allocation_parent_id is null
+                ),
+                counted as (
+                  select s.root, nullif(max(x.value) filter (where x.measure = 2), 0) as registered,
+                    coalesce(max(x.value) filter (where x.measure = 14), max(x.value) filter (where x.measure = 3)) as voters,
+                    max(x.value) filter (where x.measure = 4) as valid,
+                    max(x.value) filter (where x.measure = 5) as invalid
+                  from seats s
+                  left join result_rollup x on x.result_set_k = s.k and x.area_k = s.area and x.option_k = 0
+                    and x.channel = 0 and x.count_round = 0 and x.measure in (2, 3, 4, 5, 14)
+                  group by s.root, s.k
+                ),
+                kept as (
+                  select *, coalesce(voters, valid + coalesce(invalid, 0)) as cast from counted
+                )
+                select p."isNow", extract(year from p.date_from)::int as year,
+                  sum(k.registered) filter (where k.cast <= k.registered)::float8 as registered,
+                  sum(k.cast) filter (where k.cast <= k.registered)::float8 as voters,
+                  count(*) filter (where k.cast <= k.registered)::int as reporting,
+                  count(*)::int as of,
+                  case when bool_and(k.voters is not null) filter (where k.cast <= k.registered) then null
+                    when bool_or(k.voters is null and k.invalid is not null) filter (where k.cast <= k.registered) then 'rejected'
+                    else 'valid' end as basis
+                from picked p join kept k on k.root = p.id
+                group by p."isNow", p.date_from
+              `)
+            ).rows.flatMap((row) =>
+              row.registered == null ||
+              row.voters == null ||
+              row.reporting === 0
+                ? []
+                : [{ ...row, registered: row.registered, voters: row.voters }],
+            );
+      const pooledNow = pooled.find((row) => row.isNow);
+      const pooledBefore = pooled.find((row) => !row.isNow);
       const ids = [
         input.id,
         ...contestRows.rows.map((row) => row.id),
@@ -7729,21 +7800,38 @@ export const elections = {
               },
         notes: notes.rows,
         turnout:
-          totaled == null || !isCovered(totaled)
-            ? null
-            : {
-                ...totaled,
+          pooledNow != null && pooledNow.reporting >= pooledNow.of * 0.9
+            ? {
+                registered: pooledNow.registered,
+                voters: pooledNow.voters,
+                reporting: pooledNow.reporting,
+                of: pooledNow.of,
+                basis: pooledNow.basis,
                 earlier:
-                  earlier == null ||
-                  anchored?.year == null ||
-                  !isCovered(earlier)
+                  pooledBefore == null ||
+                  pooledBefore.reporting < pooledBefore.of * 0.9
                     ? null
                     : {
-                        year: anchored.year,
-                        registered: earlier.registered,
-                        voters: earlier.voters,
+                        year: pooledBefore.year,
+                        registered: pooledBefore.registered,
+                        voters: pooledBefore.voters,
                       },
-              },
+              }
+            : totaled == null || !isCovered(totaled)
+              ? null
+              : {
+                  ...totaled,
+                  earlier:
+                    earlier == null ||
+                    anchored?.year == null ||
+                    !isCovered(earlier)
+                      ? null
+                      : {
+                          year: anchored.year,
+                          registered: earlier.registered,
+                          voters: earlier.voters,
+                        },
+                },
         races: raced.map((race, index) => ({
           ...race,
           anchor: raced

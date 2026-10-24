@@ -888,24 +888,24 @@
                               share: percent(leader.share),
                             })
                           : race.kind === "ballot_question" &&
-                            race.results[0]?.isLost === true
-                          ? m.race_lede_lost({
-                              answer: named(leader),
-                              share: percent(leader.share),
-                            })
-                          : runner == null
-                            ? null
-                            : (seated.length > 0 ||
-                                race.results[0]?.isWon === true
-                                ? m.race_lede_won
-                                : m.race_lede_votes)({
-                                party: definite(named(leader), true),
+                              race.results[0]?.isLost === true
+                            ? m.race_lede_lost({
+                                answer: named(leader),
                                 share: percent(leader.share),
-                                margin: points(
-                                  leader.share - runner.share,
-                                ).replace(/^\+/u, ""),
-                                runner: definite(named(runner)),
-                              }),
+                              })
+                            : runner == null
+                              ? null
+                              : (seated.length > 0 ||
+                                  race.results[0]?.isWon === true
+                                  ? m.race_lede_won
+                                  : m.race_lede_votes)({
+                                  party: definite(named(leader), true),
+                                  share: percent(leader.share),
+                                  margin: points(
+                                    leader.share - runner.share,
+                                  ).replace(/^\+/u, ""),
+                                  runner: definite(named(runner)),
+                                }),
         next:
           race.runoff?.runner == null
             ? turned == null || isShort
@@ -1014,6 +1014,13 @@
             reporting: String(turnout.reporting),
             of: String(turnout.of),
           })}</span
+        >
+      {/if}
+      {#if turnout.basis != null}
+        <span class="text-[0.8125rem] text-muted-foreground"
+          >{turnout.basis === "rejected"
+            ? m.turnout_basis_rejected()
+            : m.turnout_basis_valid()}</span
         >
       {/if}
     </p>

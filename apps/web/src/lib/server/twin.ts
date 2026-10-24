@@ -839,6 +839,17 @@ function electionMarkdown(
     `# ${election.name}`,
     byline(election.breadcrumbs, link, election.date),
     ...election.notes.map((note) => `> ${note.body}`),
+    ...(election.turnout == null
+      ? []
+      : [
+          `${m.election_turnout({
+            voters: count(election.turnout.voters),
+            registered: count(election.turnout.registered),
+            share: percent(
+              election.turnout.voters / election.turnout.registered,
+            ),
+          })}${election.turnout.basis === "rejected" ? ` ${m.turnout_basis_rejected()}` : election.turnout.basis === "valid" ? ` ${m.turnout_basis_valid()}` : ""}`,
+        ]),
     ...election.races.flatMap((entry) => {
       const race =
         entry.round != null &&
