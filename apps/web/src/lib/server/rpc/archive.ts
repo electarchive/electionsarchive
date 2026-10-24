@@ -7078,9 +7078,9 @@ function carried(
   if (earlier < filled * 0.9 || earlier > filled * 1.1) {
     return null;
   }
-  return Map.groupBy(rows, (row) =>
+  return Map.groupBy([...rows, { party: null, seats: 0 }], (row) =>
     row.party == null
-      ? "none"
+      ? "independent"
       : `party:${parentOf.get(row.party) ?? row.party}`,
   )
     .entries()
@@ -7722,7 +7722,7 @@ async function races(
                   .map((row) => {
                     const key =
                       row.party == null
-                        ? "none"
+                        ? "independent"
                         : `party:${parentOf.get(row.party) ?? row.party}`;
                     const shown = results.find((entry) => entry.key === key);
                     return {
