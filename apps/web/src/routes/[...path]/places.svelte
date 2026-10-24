@@ -364,7 +364,9 @@
           >{m.card_more({ count: count(ranked.length - 8) })}</span
         >
       {/if}
-      {#if row.margin != null}
+      {#if places.legend.length === 1}
+        <span class="text-xs opacity-80">{m.map_unopposed()}</span>
+      {:else if row.margin != null}
         <span class="text-xs opacity-80"
           >{m.col_margin()}
           <span class="font-figures tabular-nums">{points(row.margin)}</span
@@ -901,7 +903,11 @@
                   { "max-md:hidden": comparing },
                 )}
               >
-                {#if row.margin != null}
+                {#if row.margin != null && places.legend.length === 1}
+                  <span class="font-sans text-muted-foreground"
+                    >{m.map_unopposed()}</span
+                  >
+                {:else if row.margin != null}
                   {@render cite(
                     points(row.margin),
                     "margin",

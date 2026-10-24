@@ -1185,7 +1185,11 @@ function placesMarkdown(
         return [
           link(row.name, row.path),
           ...leading(row, places.legend),
-          row.margin == null ? null : points(row.margin),
+          row.margin == null
+            ? null
+            : places.legend.length === 1
+              ? m.map_unopposed()
+              : points(row.margin),
           ...(isCompared
             ? [
                 before == null ? null : percent(before),

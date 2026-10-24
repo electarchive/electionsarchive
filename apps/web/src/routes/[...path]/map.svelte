@@ -2607,6 +2607,10 @@
           ><span class="rounded-xs bg-(--party) chip block-2 inline-2"
           ></span>{m.map_flipped()}</span
         >
+      {:else if current.margin != null && places.legend.length === 1}
+        <span class="shrink-0 text-xs text-muted-foreground"
+          >{m.map_unopposed()}</span
+        >
       {:else if current.margin != null}
         <span
           class="shrink-0 font-figures text-xs text-muted-foreground tabular-nums"
