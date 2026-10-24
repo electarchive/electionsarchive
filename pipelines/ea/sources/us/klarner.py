@@ -287,8 +287,10 @@ def emit() -> Path | str:
         )
         zeroed = cs.zeroed()
 
+        staged_names: dict[UUID, str] = {}
+
         def name(entity: UUID, text: str) -> None:
-            cs.add("name", entity_id=entity, text=text, lang="en", kind="official", is_preferred=True)
+            staged_names[entity] = text
 
         source = cs.source(PUBLISHER, TITLE)
         cs.add(
@@ -482,6 +484,14 @@ def emit() -> Path | str:
             first, middle, last, suffix = (row[column] for column in ("first", "middle", "last", "suffix"))
             if not isinstance(last, str):
                 return initials(title(str(row["cand"])))
+            if (
+                isinstance(first, str)
+                and isinstance(middle, str)
+                and first.lower() == middle.lower()
+                and len(first) > 1
+            ):
+                given = re.sub(r"\(.*?\)|\d+", " ", str(row["cand"]).split(",")[1]).split()
+                first, middle = given[0], " ".join(given[1:]) or None
             parts = [
                 title(first) if isinstance(first, str) else None,
                 (title(middle) + ("." if len(middle) == 1 else "")) if isinstance(middle, str) else None,
@@ -907,4 +917,24 @@ def emit() -> Path | str:
                 ).fetchall()
             ):
                 cs.add("entity_retirement", entity_id=cs.key(scheme, value), reason=reason)
+        held: dict[UUID, list[tuple[UUID, str, str, bool]]] = {}
+        for id, entity, text, kind, ours in conn.execute(
+            """select n.id, n.entity_id, n.text, n.kind::text, c.pipeline is not distinct from %s
+               from name n left join changeset c on c.id = n.changeset_id
+               where n.entity_id = any(%s) and n.is_preferred and n.lang = 'en'
+                 and n.valid_from is null and n.valid_to is null""",
+            [SOURCE, [entity for entity in staged_names if entity not in cs.minted]],
+        ).fetchall():
+            held.setdefault(entity, []).append((id, text, kind, ours))
+        for entity, text in staged_names.items():
+            foreign = any(not ours for *_, ours in held.get(entity, []))
+            if not foreign or text not in {held_text for _, held_text, *_ in held[entity]}:
+                cs.add(
+                    "name", id=None, entity_id=entity, text=text, lang="en", kind="official", is_preferred=not foreign
+                )
+            kept = False
+            for id, old, kind, ours in held.get(entity, []):
+                if ours and (foreign or old != text or kept):
+                    cs.add("name", id=id, entity_id=entity, text=old, lang="en", kind=kind, is_preferred=False)
+                kept = kept or (ours and old == text)
         return cs.write()

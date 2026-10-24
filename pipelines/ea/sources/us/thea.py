@@ -94,6 +94,19 @@ def congress(day: date) -> int:
     return (day.year - 1789 - ((day.month, day.day) < (3, 4))) // 2 + 1
 
 
+TITLES = {
+    "dr": "Dr.",
+    "col": "Col.",
+    "gen": "Gen.",
+    "capt": "Capt.",
+    "maj": "Maj.",
+    "major": "Maj.",
+    "judge": "Judge",
+    "rev": "Rev.",
+    "hon": "Hon.",
+}
+
+
 def name(text: str) -> str:
     text = re.sub(r"\s+", " ", text.replace("(", " ").replace(")", " ")).strip(" ,")
     last, _, first = text.partition(",")
@@ -278,10 +291,14 @@ def parse() -> None:
             member = found.get(index) if index in winners else None
             party = None
             independent = False
+            printed, titled = line["can"], None
             if line["can"] in ("-990", "-992", ""):
                 kind = "others"
             else:
                 kind = "candidate"
+                if titled := re.search(rf"(?i)\(({'|'.join(TITLES)})\)|%({'|'.join(TITLES)})<", printed):
+                    surname, _, given = re.sub(titled.re, " ", printed).partition(",")
+                    printed = f"{surname}, {given.strip() or TITLES[(titled[1] or titled[2]).lower()]}"
                 code = line["pty"]
                 label = re.sub(r"\s*\(.*\)$", "", line["pty_n"] or "").strip()
                 if chamber == "senate":
@@ -316,7 +333,8 @@ def parse() -> None:
                     ),
                     "line": index,
                     "kind": kind,
-                    "name": name(line["can"]) if kind == "candidate" else None,
+                    "name": name(printed) if kind == "candidate" else None,
+                    "was": name(line["can"]) if titled else None,
                     "party": party,
                     "party_label": None
                     if party is None
@@ -508,7 +526,7 @@ def emit() -> Path:
         runs: dict[tuple[str, str], dict[int | None, list[date]]] = {}
         for state, text, district, day in (
             frame.filter(pl.col("member").is_null() & (pl.col("kind") == "candidate"))
-            .select("state", "name", "district", "day")
+            .select("state", pl.coalesce("was", "name"), "district", "day")
             .unique()
             .sort("day")
             .iter_rows()
@@ -538,6 +556,15 @@ def emit() -> Path:
         held: dict[str, UUID] = dict(
             conn.execute("select value, entity_id from external_id where scheme = %s", [f"{SOURCE}.person"]).fetchall()
         )
+        untitled: dict[UUID, list[tuple[UUID, str, str, bool, bool]]] = {}
+        for id, entity, text, kind, ours, titled in conn.execute(
+            """select n.id, n.entity_id, n.text, n.kind::text, c.pipeline is not distinct from %s, n.text ~ %s
+               from name n left join changeset c on c.id = n.changeset_id
+               where n.is_preferred and n.lang = 'en' and n.valid_from is null and n.valid_to is null
+                 and n.entity_id in (select entity_id from name where is_preferred and text ~ %s)""",
+            [SOURCE, *[r"%[a-z]+<|(^| )(Dr|Col|Gen|Capt|Maj|Major|Judge|Rev|Hon) [^ ]+$"] * 2],
+        ).fetchall():
+            untitled.setdefault(entity, []).append((id, text, kind, ours, titled))
         eras: dict[tuple[str, str, int | None, date], str] = {}
         for (state, handle), places in runs.items():
             segments: list[tuple[int | None, list[date]]] = []
@@ -560,7 +587,7 @@ def emit() -> Path:
         def person_of(row: dict) -> UUID:
             if row["member"] is not None:
                 return persons[row["member"]]
-            handle = slug(str(row["name"]))
+            handle = slug(str(row["was"] or row["name"]))
             key = eras[row["state"], handle, None if "-" in handle else row["district"], row["day"]]
             person = cs.key(f"{SOURCE}.person", key)
             if person in cs.minted and (old := held.get(f"{row['state']}:{handle}")) is not None:
@@ -569,6 +596,22 @@ def emit() -> Path:
                 created.add(person)
                 cs.add("person", id=person)
                 named(person, str(row["name"]))
+            if row["was"] is not None and (titles := untitled.pop(person, None)) is not None:
+                foreign = any(not ours and not titled for *_, ours, titled in titles)
+                clean = initials(str(row["name"]))
+                if clean not in {text for _, text, *_ in titles}:
+                    cs.add(
+                        "name",
+                        id=None,
+                        entity_id=person,
+                        text=clean,
+                        lang="en",
+                        kind="official",
+                        is_preferred=not foreign,
+                    )
+                for id, text, kind, ours, titled in titles:
+                    if ours and titled:
+                        cs.add("name", id=id, entity_id=person, text=text, lang="en", kind=kind, is_preferred=False)
             return person
 
         spans: dict[int, tuple[date, date]] = {}
@@ -693,9 +736,13 @@ def emit() -> Path:
                     people.setdefault(person_of(row), []).append(row)
             found = list(people)
             labels = {person: initials(lines[0]["member_name"] or lines[0]["name"]) for person, lines in people.items()}
+            keyed = {
+                person: initials(lines[0]["member_name"] or lines[0]["was"] or lines[0]["name"])
+                for person, lines in people.items()
+            }
             before = {person: list(lines) for person, lines in people.items()}
             folded = names.fold(
-                [people[person][0]["name"] for person in found],
+                [people[person][0]["was"] or people[person][0]["name"] for person in found],
                 [people[person][0]["member"] is not None for person in found],
             )
             duplicates: dict[UUID, UUID] = {}
@@ -775,7 +822,10 @@ def emit() -> Path:
                     option = root
                     if len(lines) > 1:
                         line_label = f"{label} ({row['party_label'] or 'no party'})"
-                        option = cs.key("us.option", f"{option_key}:{slug(line_label)}:{row['line']}")
+                        option = cs.key(
+                            "us.option",
+                            f"{option_key}:{slug(f'{keyed[person]} ({row["party_label"] or "no party"})')}:{row['line']}",
+                        )
                         cs.add(
                             "contest_option",
                             id=option,
@@ -811,12 +861,12 @@ def emit() -> Path:
                     continue
                 lines = before[duplicate]
                 for row in lines:
-                    line = f"{labels[person]} ({row['party_label'] or 'no party'})"
+                    line = f"{keyed[person]} ({row['party_label'] or 'no party'})"
                     into = cs.key("us.option", f"{kept}:{slug(line)}:{row['line']}")
                     if len(lines) == 1:
                         cs.merge(old, into)
                     else:
-                        line = f"{labels[duplicate]} ({row['party_label'] or 'no party'})"
+                        line = f"{keyed[duplicate]} ({row['party_label'] or 'no party'})"
                         cs.merge(cs.key("us.option", f"{gone}:{slug(line)}:{row['line']}"), into)
                 if len(lines) > 1:
                     cs.merge(old, cs.key("us.option", kept))

@@ -665,6 +665,14 @@ PEOPLE = {
         ("it.storico.person", "TOSCANA - Firenze 2:DINI:LAMBERTO"),
         ("wikidata", "Q208100"),
     ),
+    "Harold E. Sears, Sullivan County commissioner candidate 1976, printed Harold Harold E. Sears in the primary": (
+        ("us.elstats_local.person", "NH:43416"),
+        ("us.elstats_local.person", "NH:43398"),
+    ),
+    "Eleanor M. Quinn, Hillsborough County commissioner candidate 1974, printed Eleanor Eleanor M. M. Quinn in the Republican primary": (
+        ("us.elstats_local.person", "NH:43523"),
+        ("us.elstats_local.person", "NH:43482"),
+    ),
     "James Callaghan, Wikidata record and race records 1966-1983": (
         ("mnis", "3326"),
         ("wikidata", "Q9576"),

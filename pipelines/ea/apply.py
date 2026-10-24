@@ -242,6 +242,24 @@ def _publish_table(conn: Connection, stage: Stage, table: str) -> None:
         )
         return
     listed = sql.SQL(", ").join(map(sql.Identifier, columns))
+    if table == "name" and "is_preferred" in columns:
+        conn.execute(
+            sql.SQL(
+                """update public.name p set is_preferred = false from {} s, changeset c
+                   where s.is_preferred and p.is_preferred and p.entity_id = s.entity_id and p.lang = s.lang
+                     and p.text <> s.text and p.valid_from is null and p.valid_to is null{}{}
+                     and c.id = p.changeset_id and c.pipeline = %s"""
+            ).format(
+                staged,
+                sql.SQL(
+                    " and p.script is not distinct from s.script" if "script" in columns else " and p.script is null"
+                ),
+                sql.SQL(
+                    "".join(f" and s.{column} is null" for column in ("valid_from", "valid_to") if column in columns)
+                ),
+            ),
+            [stage.pipeline],
+        )
     if "id" in columns:
         compared = [column for column in columns if column != "id"]
         conflict = (
@@ -265,11 +283,13 @@ def _publish_table(conn: Connection, stage: Stage, table: str) -> None:
             )
         )
         if table == "name" and "is_preferred" in columns:
-            undated = sql.SQL("".join(f" and s.{column} is null" for column in ("valid_from", "valid_to") if column in columns))
             conn.execute(
                 sql.SQL(
-                    """update public.name p set is_preferred = true from {} s
-                       where s.id is null and s.is_preferred and not p.is_preferred and {}"""
+                    """update public.name p set is_preferred = true from {} s, changeset c
+                       where s.id is null and s.is_preferred and not p.is_preferred and {}
+                         and c.id = p.changeset_id and c.pipeline = %s
+                         and not exists (select from public.name q where q.entity_id = p.entity_id
+                                         and q.text = p.text and q.lang = p.lang and q.is_preferred)"""
                 ).format(
                     staged,
                     sql.SQL(" and ").join(
@@ -277,17 +297,8 @@ def _publish_table(conn: Connection, stage: Stage, table: str) -> None:
                         for column in compared
                         if column != "is_preferred"
                     ),
-                )
-            )
-            conn.execute(
-                sql.SQL(
-                    """update public.name p set is_preferred = false from {} s
-                       where s.is_preferred and p.is_preferred and p.entity_id = s.entity_id and p.lang = s.lang
-                         and p.text <> s.text and p.valid_from is null and p.valid_to is null{}"""
-                ).format(
-                    staged,
-                    sql.SQL(" and p.script is not distinct from s.script" if "script" in columns else "") + undated,
-                )
+                ),
+                [stage.pipeline],
             )
         if compared:
             others = sql.SQL(", ").join(map(sql.Identifier, compared))
