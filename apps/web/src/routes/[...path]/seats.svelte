@@ -818,7 +818,7 @@
       {const isMuted = $derived(link != null && party.here === 0)}
       <li
         class={cn(
-          "relative flex items-center gap-2 rounded-xs px-1.5 py-1",
+          "relative flex items-center gap-2 rounded-xs px-1.5 py-1 pointer-coarse:py-2",
           { "bg-secondary": lead === party.key },
           { "text-muted-foreground": isMuted },
           { "ring-1 ring-foreground ring-inset": picked.includes(party.key) },
