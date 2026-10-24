@@ -13,7 +13,7 @@ from ea.changeset import Changeset
 from ea.store import connect
 
 SOURCE = "wikidata"
-VERSION = "7"
+VERSION = "8"
 TITLE = "Political parties and their colors"
 POSITIONED = "Political positions of parties"
 COUNTRIES = {
@@ -125,6 +125,7 @@ INHERITED: dict[tuple[str, str], str] = {
 CHOSEN = {"Q47729": "EF1C27", "Q113168799": "56B45D"}
 PAINTED: dict[tuple[str, str, int | None], str] = {
     ("US", "American Independent Party", None): "800080",
+    ("US", "Anti-Administration", None): "5BA45B",
     ("US", "Anti-Jacksonian", None): "FFE6B0",
     ("US", "Constitutional Union Party", None): "F59100",
     ("US", "Democratic-Republican Party", None): "008000",
@@ -137,6 +138,7 @@ PAINTED: dict[tuple[str, str, int | None], str] = {
     ("US", "National Republican Party", None): "FFE6B0",
     ("US", "Progressive Party", 1912): "B63434",
     ("US", "Progressive Party", 1924): "5FD170",
+    ("US", "Pro-Administration", None): "F4B183",
     ("US", "Prohibition Party", None): "FF00FF",
     ("US", "Socialist Party USA", None): "CD3700",
     ("US", "Socialist Party of America", None): "CD3700",
@@ -169,6 +171,7 @@ PAINTED: dict[tuple[str, str, int | None], str] = {
     ("FR", "Socialist Party of France – Jean Jaurès Union", None): "E08A8A",
     ("FR", "The Greens", None): "3FA34D",
     ("GB", "Coalition Labour", None): "D97B7B",
+    ("GB", "Plaid Cymru", None): "A3B800",
     ("GB", "National Labour Organisation", None): "C27BA0",
     ("GB", "Radicals", None): "C2185B",
     ("GB", "All-for-Ireland", None): "8DB600",
@@ -765,16 +768,25 @@ def emit() -> Path:
             if party in painted:
                 report[scope, "painted"] += options
                 continue
-            hand = next(
-                (
-                    PAINTED[key]
-                    for name in full + short
-                    for key in ((iso, name, first), (iso, name, None))
-                    if key in PAINTED
-                ),
-                None,
+            hand, country = (
+                next(
+                    (
+                        PAINTED[key]
+                        for name in full + short
+                        for key in ((place, name, first), (place, name, None))
+                        if key in PAINTED
+                    ),
+                    None,
+                )
+                for place in (iso, iso.split("-")[0])
             )
-            ranges = [(hand, None, "day", None, "day")] if hand else colors(linked.get(party)) or colors(inherited)
+            ranges = (
+                [(hand, None, "day", None, "day")]
+                if hand
+                else colors(linked.get(party))
+                or colors(inherited)
+                or ([(country, None, "day", None, "day")] if country else [])
+            )
             for color, start, start_precision, end, end_precision in ranges:
                 cs.add(
                     "party_color",
