@@ -843,8 +843,10 @@ async function load(
         having count(*) > 0
       ) hit on true
       order by rs.contest_id, a.k,
-        exists (select from source s where s.id = rs.source_id and s.license ilike '%ICPSR%'), rs.is_default desc,
-        array_position(${STAGES}, rs.stage), hit.options desc, rs.completeness desc nulls last
+        exists (select from source s where s.id = rs.source_id and s.license ilike '%ICPSR%'),
+        (exists (select from source s where s.id = rs.source_id and s.kind = 'official_body')
+          and exists (select from result_rollup_unit u where u.result_set_k = rs.k and u.area_k = a.k)) desc,
+        rs.is_default desc, array_position(${STAGES}, rs.stage), hit.options desc, rs.completeness desc nulls last
     )
     select p.area, p.k, p.contest, p.root, p.stage::text, p.status::text, p.completeness::float8 as completeness, p.is_default,
       coalesce((select c.magnitude from contest c where c.id = p.contest), 1) <= 1 as single,
