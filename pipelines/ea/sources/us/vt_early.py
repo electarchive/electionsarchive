@@ -8,7 +8,7 @@ from ea.sources.us import elstats, medsl
 from ea.store import connect
 
 SOURCE = "us.vt_early"
-VERSION = "1"
+VERSION = "2"
 TENANT, PUBLISHER, SITE = elstats.TENANTS["VT"]
 
 
@@ -42,15 +42,17 @@ def emit() -> Path:
                 "select value from external_id where scheme = 'us.elstats.result_set' and value ~ ':VT:house:[0-9]+:county$'"
             ).fetchall()
         }
-        medsl.attach(
-            cs,
-            conn,
-            frame.filter(
-                ~pl.struct(pl.col("day").dt.strftime("%Y-%m").alias("m"), "district").map_elements(
-                    lambda row: (row["m"], row["district"]) in held, return_dtype=pl.Boolean
-                )
-            ),
-            sources,
-            authoritative="Vermont's Secretary of State publishes the town returns these sums come from.",
+        frame = frame.filter(
+            ~pl.struct(pl.col("day").dt.strftime("%Y-%m").alias("m"), "district").map_elements(
+                lambda row: (row["m"], row["district"]) in held, return_dtype=pl.Boolean
+            )
         )
+        named = pl.struct(pl.col("day").dt.strftime("%Y-%m").alias("m"), "district").map_elements(
+            lambda row: (row["m"], row["district"])
+            in {("1852-09", 3), ("1856-09", 1), ("1860-09", 2), ("1870-09", 1), ("1880-11", 3)},
+            return_dtype=pl.Boolean,
+        )
+        authoritative = "Vermont's Secretary of State publishes the town returns these sums come from."
+        medsl.attach(cs, conn, frame.filter(~named), sources, authoritative=authoritative)
+        medsl.attach(cs, conn, frame.filter(named), sources, authoritative=authoritative, extend=True)
         return cs.write()
