@@ -67,7 +67,7 @@ def _stage(conn: Connection, changeset_id: str) -> Stage:
         if table in tables
         and table not in temporal
         and table
-        not in (*FACTS, "external_id", "slug", "entity_merge", "entity_retirement", "entity_subtype_drop", "name_drop", "unit_area_drop")
+        not in (*FACTS, "external_id", "slug", "entity_merge", "entity_retirement", "entity_subtype_drop", "name_drop", "membership_drop", "unit_area_drop")
     }
     owners: dict[str, str] = {
         table: owner
@@ -650,6 +650,27 @@ def _publish_table(conn: Connection, stage: Stage, table: str) -> None:
             if held:
                 raise ValueError(f"dropping {subtype} row of {entity} still referenced: " + "; ".join(held))
             conn.execute(sql.SQL("delete from public.{} where id = %s").format(sql.Identifier(subtype)), [entity])
+    if table == "membership_drop":
+        for person, party, start, end, writer in conn.execute(
+            sql.SQL(
+                """select s.person_id::text, s.party_id::text, s.valid_from, s.valid_to, c.pipeline from {} s
+                   left join public.person_party_membership m on m.person_id = s.person_id and m.party_id = s.party_id
+                     and m.valid_from is not distinct from s.valid_from and m.valid_to is not distinct from s.valid_to
+                   left join changeset c on c.id = m.changeset_id"""
+            ).format(staged)
+        ).fetchall():
+            if writer != stage.pipeline:
+                raise ValueError(
+                    f"membership of {person} in {party} from {start} to {end} is "
+                    + ("missing" if writer is None else f"written by {writer}, not {stage.pipeline}")
+                )
+        conn.execute(
+            sql.SQL(
+                """delete from public.person_party_membership m using {} s
+                   where m.person_id = s.person_id and m.party_id = s.party_id
+                     and m.valid_from is not distinct from s.valid_from and m.valid_to is not distinct from s.valid_to"""
+            ).format(staged)
+        )
     if table == "name_drop":
         for name, entity, text, held, preferred in conn.execute(
             sql.SQL(

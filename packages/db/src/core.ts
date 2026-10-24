@@ -720,6 +720,17 @@ export const measure = pgTable("measure", {
 }, (table) => [
 	unique("measure_code_key").on(table.code),]);
 
+export const membershipDrop = pgTable("membership_drop", {
+	personId: uuid("person_id").notNull().references(() => person.id, { onDelete: "cascade" } ),
+	partyId: uuid("party_id").notNull().references(() => party.id),
+	validFrom: date("valid_from"),
+	validTo: date("valid_to"),
+	reason: text().notNull(),
+	changesetId: uuid("changeset_id").notNull().references(() => changeset.id),
+	recordedFrom: timestamp("recorded_from", { withTimezone: true }).default(sql`now()`).notNull(),
+}, (table) => [
+	unique("membership_drop_key").on(table.personId, table.partyId, table.validFrom, table.validTo).nullsNotDistinct(),check("membership_drop_reason_check", sql`(reason <> ''::text)`),]);
+
 export const name = pgTable("name", {
 	id: uuid().default(sql`uuidv7()`).primaryKey(),
 	entityId: uuid("entity_id").notNull().references(() => entity.id, { onDelete: "cascade" } ),

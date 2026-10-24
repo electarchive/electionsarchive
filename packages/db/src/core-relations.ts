@@ -98,6 +98,7 @@ export const relations = defineRelations(schema, (r) => ({
 			alias: "changeset_id_source_id_via_indicator"
 		}),
 		labels: r.many.label(),
+		membershipDrops: r.many.membershipDrop(),
 		names: r.many.name(),
 		entitiesViaNameDrop: r.many.entity({
 			from: r.changeset.id.through(r.nameDrop.changesetId),
@@ -283,6 +284,7 @@ export const relations = defineRelations(schema, (r) => ({
 		contests: r.many.contest(),
 		contestOptions: r.many.contestOption(),
 		governmentParties: r.many.governmentParty(),
+		membershipDrops: r.many.membershipDrop(),
 		changeset: r.one.changeset({
 			from: r.party.changesetId,
 			to: r.changeset.id
@@ -658,6 +660,7 @@ export const relations = defineRelations(schema, (r) => ({
 	person: {
 		candidacies: r.many.candidacy(),
 		governments: r.many.government(),
+		membershipDrops: r.many.membershipDrop(),
 		personImages: r.many.personImage(),
 		personPartyMemberships: r.many.personPartyMembership(),
 		tenures: r.many.tenure(),
@@ -958,6 +961,20 @@ export const relations = defineRelations(schema, (r) => ({
 		source: r.one.source({
 			from: r.label.sourceId,
 			to: r.source.id
+		}),
+	},
+	membershipDrop: {
+		changeset: r.one.changeset({
+			from: r.membershipDrop.changesetId,
+			to: r.changeset.id
+		}),
+		party: r.one.party({
+			from: r.membershipDrop.partyId,
+			to: r.party.id
+		}),
+		person: r.one.person({
+			from: r.membershipDrop.personId,
+			to: r.person.id
 		}),
 	},
 	name: {
