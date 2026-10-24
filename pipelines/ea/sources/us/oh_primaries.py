@@ -1,5 +1,5 @@
 import re
-from datetime import date
+from datetime import UTC, date, datetime
 from pathlib import Path
 
 import polars as pl
@@ -10,7 +10,7 @@ from ea.sources.us import medsl
 from ea.store import DATA, connect
 
 SOURCE = "us.oh_primaries"
-VERSION = "1"
+VERSION = "2"
 PARSED = DATA / "parsed" / SOURCE
 WAYBACK = "https://web.archive.org/web/{}id_/https://www.ohiosos.gov/globalassets/elections/{}"
 FILES = {
@@ -29,13 +29,43 @@ FILES = {
         "2022/pri/summarylevelofficialresults_2022-05-03_primaryelection_republican.xlsx",
     ),
 }
+INBOX = DATA / "inbox" / "manual" / "MF-044"
+PORTAL = "https://www.ohiosos.gov/globalassets/elections/{}"
+MANUAL = {
+    (date(2014, 5, 6), "democratic"): "2014/primary/democrat.xlsx",
+    (date(2014, 5, 6), "republican"): "2014/primary/republican.xlsx",
+    (date(2014, 5, 6), "green"): "2014/primary/green.xlsx",
+    (date(2014, 5, 6), "libertarian"): "2014/primary/libertarian.xlsx",
+    (date(2014, 5, 6), "constitution"): "2014/primary/constitution.xlsx",
+    (date(2016, 3, 15), "democratic"): "2016/primary/dem.xlsx",
+    (date(2016, 3, 15), "republican"): "2016/primary/republican.xlsx",
+    (date(2016, 3, 15), "green"): "2016/primary/green.xlsx",
+}
 PUBLISHER = "Ohio Secretary of State"
 TITLE = "Official primary election results by county"
+
+
+def urls() -> dict[tuple[date, str], str]:
+    return {key: WAYBACK.format(stamp, path) for key, (stamp, path) in FILES.items()} | {
+        key: PORTAL.format(path) for key, path in MANUAL.items()
+    }
 
 
 def fetch() -> None:
     for stamp, path in FILES.values():
         raw.fetch(SOURCE, WAYBACK.format(stamp, path), suffix=".xlsx")
+    for (day, _), path in MANUAL.items():
+        try:
+            raw.cached(SOURCE, PORTAL.format(path))
+        except LookupError:
+            raw.store(
+                SOURCE,
+                PORTAL.format(path),
+                (INBOX / day.isoformat() / path.rsplit("/", 1)[1]).read_bytes(),
+                suffix=".xlsx",
+                retrieved_at=datetime(2026, 10, 23, tzinfo=UTC),
+                media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            )
 
 
 def parse() -> None:
@@ -49,21 +79,30 @@ def parse() -> None:
             ).fetchall()
         }
     rows = []
-    for (day, party), (stamp, path) in FILES.items():
+    for (day, party), url in urls().items():
         sheet = pl.read_excel(
-            raw.cached(SOURCE, WAYBACK.format(stamp, path)).path,
-            sheet_name="Master",
+            raw.cached(SOURCE, url).path,
+            sheet_name="Master" if day.year > 2014 else None,
+            sheet_id=None if day.year > 2014 else 1,
             has_header=False,
             infer_schema_length=0,
         ).rows()
+        total = next((row for row in sheet if row[0] == "Total" and row[3] is not None), None)
         office = None
-        for column in range(6, len(sheet[0])):
+        start = (
+            sheet[1].index(
+                next(text for text in sheet[1] if text in ("Total Voters", "Total Votes Cast", "Ballots Counted"))
+            )
+            + 1
+        )
+        start += sheet[1][start] in ("Turnout Percentage", "Official Voter Turnout")
+        for column in range(start, len(sheet[0])):
             office = sheet[0][column] or office
             candidate = sheet[1][column]
             if office is None or candidate is None:
                 continue
             title = " ".join(office.split())
-            district = re.match(r"Representative to Congress\b\D*(\d+)", title)
+            district = re.match(r"(?:Representative to Congress|U\.S\. House of Representatives)\b\D*(\d+)", title)
             chamber = (
                 "house"
                 if district
@@ -77,10 +116,14 @@ def parse() -> None:
                 continue
             values = [
                 (row[0], int(float(row[column] or 0)))
-                for row in sheet[4:]
-                if row[0] is not None and row[0] not in ("Total", "Percentage")
+                for row in sheet[2:]
+                if re.sub(r"[^a-z]", "", (row[0] or "").lower()) in counties
             ]
-            if len(values) != 88 or sum(votes for _, votes in values) != int(float(sheet[2][column])):
+            if (
+                len(values) != 88
+                or total is not None
+                and sum(votes for _, votes in values) != int(float(total[column]))
+            ):
                 raise ValueError(f"{day} {party} {title} {candidate}: the counties do not add up to the total")
             rows.extend(
                 (
@@ -107,6 +150,8 @@ def parse() -> None:
             "votes": pl.Int64,
         },
         orient="row",
+    ).filter(
+        pl.col("district").is_null() | (pl.col("votes").sum().over("day", "chamber", "special", "district", "code") > 0)
     ).select(
         year=pl.col("day").dt.year(),
         chamber="chamber",
@@ -131,7 +176,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Ohio's House, Senate, and presidential primaries 2018–2022 by county",
+            summary="Ohio's House, Senate, and presidential primaries 2014–2022 by county",
             polity="US-OH",
         )
         source = cs.source(PUBLISHER, TITLE)
@@ -144,8 +189,8 @@ def emit() -> Path:
             url="https://www.ohiosos.gov/elections/election-results-and-data/",
             license="Public record",
         )
-        for stamp, path in FILES.values():
-            cs.artifact(raw.cached(SOURCE, WAYBACK.format(stamp, path)), source)
+        for url in urls().values():
+            cs.artifact(raw.cached(SOURCE, url), source)
         held = {
             value
             for (value,) in conn.execute(
@@ -173,6 +218,13 @@ def emit() -> Path:
                 ).is_in(held)
             ).sort("special", maintain_order=True),
             {"OH": source},
+            redone=frozenset(
+                value.removesuffix(":county")
+                for (value,) in conn.execute(
+                    "select value from external_id where scheme = %s and value ~ ':house:\\d+(:special)?:[a-z-]+:county$'",
+                    [f"{SOURCE}.result_set"],
+                ).fetchall()
+            ),
             strict=True,
         )
         return cs.write()
