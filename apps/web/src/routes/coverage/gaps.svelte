@@ -10,7 +10,7 @@
   import type { Counts, Goal } from "#lib/coverage.js";
   import Bar from "./bar.svelte";
   import Self from "./gaps.svelte";
-  import { LEVELS } from "#lib/coverage.js";
+  import { levelLabel } from "#lib/coverage.js";
 
   const {
     polity,
@@ -19,6 +19,7 @@
     rows = null,
     place = null,
     level = null,
+    start = 0,
     current,
   }: {
     polity: string;
@@ -28,6 +29,7 @@
     rows?: Array<Counts & { key: string; label: string | null }> | null;
     place?: string | null;
     level?: string | null;
+    start?: number;
   } = $props();
 
   const fetched = createQuery(() => ({
@@ -49,9 +51,9 @@
       row,
       name:
         depth === 0
-          ? (row.label ?? row.key)
+          ? (row.label ?? (row.key === "" ? m.coverage_region_none() : row.key))
           : depth === 1
-            ? (LEVELS[row.key]?.() ?? row.key)
+            ? levelLabel(polity, row.key)
             : Number(row.key) === year
               ? m.coverage_in_progress({ year: row.key })
               : row.key,
@@ -85,8 +87,8 @@
     <span
       role="gridcell"
       class={cn("flex items-center gap-1 min-inline-0", {
-        "ps-5": depth === 1,
-        "ps-10": depth === 2,
+        "ps-5": depth - start === 1,
+        "ps-10": depth - start === 2,
       })}
     >
       {#if depth < 2}
@@ -123,7 +125,7 @@
       <span class="text-xs text-muted-foreground">
         {percent(row.complete / Math.max(1, row.total), 1)}
       </span>
-      <Bar counts={row} {goal} class="block-2" />
+      <Bar counts={row} {goal} {polity} class="block-2" />
     </span>
   </div>
   {#if isOpen}
@@ -133,6 +135,7 @@
       {order}
       place={depth === 0 ? row.key : place}
       level={depth === 1 ? row.key : null}
+      {start}
       {current}
     />
   {/if}
@@ -141,7 +144,7 @@
   <div role="row" class="bg-card px-3.5 py-1.5 text-sm">
     <span
       role="gridcell"
-      class={cn({ "ps-5": depth === 1, "ps-10": depth === 2 })}
+      class={cn({ "ps-5": depth - start === 1, "ps-10": depth - start === 2 })}
     >
       <button
         type="button"

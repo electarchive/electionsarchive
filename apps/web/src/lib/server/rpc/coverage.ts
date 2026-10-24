@@ -71,6 +71,7 @@ const Summary = v.object({
   levels: v.array(
     v.object({
       key: v.string(),
+      label: v.optional(v.string()),
       goal: v.string(),
       fine: v.boolean(),
       unit: v.string(),
@@ -130,6 +131,12 @@ export const coverage = {
       v.object({
         builtAt: v.nullable(v.string()),
         building: v.boolean(),
+        totals: v.object({
+          elections: v.number(),
+          contests: v.number(),
+          first: v.nullable(v.number()),
+          last: v.nullable(v.number()),
+        }),
         polities: v.array(
           v.object({
             ...v.omit(Summary, ["regions", "levels", "notes", "sources"])
@@ -141,7 +148,21 @@ export const coverage = {
       }),
     )
     .handler(async ({ input }) => {
-      const [status, polities] = await Promise.all([build(), summaries(null)]);
+      const [status, polities, totals] = await Promise.all([
+        build(),
+        summaries(null),
+        db.execute<{
+          elections: number;
+          contests: number;
+          first: number | null;
+          last: number | null;
+        }>(sql`
+          select count(distinct e.id)::int as elections, count(c.id)::int as contests,
+            min(extract(year from e.date_from))::int as first, max(extract(year from e.date_from))::int as last
+          from election e join contest c on c.election_id = e.id
+          where e.date_from >= '1700-01-01' and e.date_from <= current_date and e.status <> 'scheduled'
+        `),
+      ]);
       const found = await db.execute<
         { polity: string; goal: (typeof GOALS)[number] } & Counts
       >(sql`
@@ -152,6 +173,12 @@ export const coverage = {
       `);
       return {
         ...status,
+        totals: totals.rows[0] ?? {
+          elections: 0,
+          contests: 0,
+          first: null,
+          last: null,
+        },
         polities: polities.map((polity) => ({
           polity: polity.polity,
           name: polity.name,
@@ -182,6 +209,9 @@ export const coverage = {
         building: v.boolean(),
         summary: Summary,
         goals: v.array(v.object({ goal: v.picklist(GOALS), ...counts })),
+        counted: v.array(
+          v.object({ level: v.string(), years: v.array(v.number()) }),
+        ),
         parts: v.array(
           v.object({
             goal: v.picklist(["history", "turnout"]),
@@ -222,9 +252,20 @@ export const coverage = {
           and (${input.current} or g.year <> extract(year from current_date))
         group by 1, 2 order by 1, 2 desc
       `);
+      const counted = await db.execute<{
+        level: string;
+        years: Array<number>;
+      }>(sql`
+        select g.level, array_agg(distinct g.year order by g.year) as years
+        from coverage_goal g
+        where g.polity = ${input.polity} and ${input.polity} <> 'us' and g.goal not in ('fine', 'shapes')
+          and (${input.current} or g.year <> extract(year from current_date))
+        group by g.level
+      `);
       return {
         ...status,
         summary,
+        counted: counted.rows,
         parts: parts.rows,
         goals: GOALS.flatMap((goal) =>
           found.rows.filter((row) => row.goal === goal),

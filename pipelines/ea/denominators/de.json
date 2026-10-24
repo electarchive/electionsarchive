@@ -238,12 +238,7 @@
         {
           "from": 1946,
           "to": 2026,
-          "note": "Not researched. The first exa search returned HTTP 429 (rate limit), and the brief says to stop and write what was found. No Landeswahlleiter, statistical office, or Bundeswahlleiterin Landtag source was fetched, so no Land's election dates or Wahlkreis counts are recorded."
-        },
-        {
-          "from": 1946,
-          "to": 2026,
-          "note": "No official count of Landtag constituencies at each election is compiled yet."
+          "note": "No official count of Landtag constituencies at each election has been compiled yet."
         }
       ],
       "elections": []

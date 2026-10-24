@@ -101,12 +101,7 @@
         {
           "from": 1922,
           "to": 2007,
-          "note": "No sourced constituency or seat count retrieved for these general elections. The Oireachtas Library history pages, the Electoral Acts, and Constituency Commission reports were not reached within the budget. The Electoral (Revision of Constituencies) Act, 1935 set 138 members by borough and county constituencies (not fetched; a search excerpt only)."
-        },
-        {
-          "from": 2011,
-          "to": 2011,
-          "note": "Seat count for 2011 not in the L&RS profile. The 166 seats is not sourced here."
+          "note": "No official count of constituencies at these elections has been compiled yet."
         }
       ]
     },
@@ -131,7 +126,7 @@
         {
           "from": 1923,
           "to": 2026,
-          "note": "No authoritative per-year count retrieved. The Oireachtas results page lists by-elections held 22 May 2026 (Galway West and Dublin Central) but does not give a complete per-year count, so no year is filled."
+          "note": "No official count of by-elections each year has been compiled yet."
         }
       ]
     },
@@ -199,7 +194,7 @@
         {
           "from": 1938,
           "to": 2018,
-          "note": "Only 1990, 1997, and 2011 are indicated as contested in open-data excerpts, and none was quoted from an official page. Presidential Elections Act 1937 governs the uncontested rule (no ballot where one candidate is nominated). The gov.ie results publication was blocked."
+          "note": "There is a poll only when more than one candidate is nominated, and the years that went to a poll haven't been confirmed from an official list yet."
         }
       ]
     },
@@ -452,7 +447,7 @@
         {
           "from": 1999,
           "to": 2014,
-          "note": "No authoritative count retrieved. The 1998 review report and the Department's results publications were not reached. The 2008 and 2013 Electoral Area Boundary Committee reports cover only a subset of authorities and are not totals, so they are not used."
+          "note": "No official count of local electoral areas at these elections has been compiled yet."
         }
       ]
     },
@@ -525,21 +520,24 @@
         },
         {
           "date": "2009-06-05",
-          "note": "Not verified. The number of constituencies and seats for 2009 was not found in an official source within the budget. The date is not quoted from a fetched source."
+          "note": "The number of constituencies in 2009 hasn't been confirmed from an official source yet.",
+          "research_note": "Not verified. The number of constituencies and seats for 2009 was not found in an official source within the budget. The date is not quoted from a fetched source."
         },
         {
           "date": "2014-05-23",
           "seats": 11,
           "source": "ep-results-2024",
           "quote": "Total Number of Seats 11 13 14",
-          "note": "Seats from the 2014, 2019, and 2024 columns of the 'Comparison 1979-2024' table. The constituency count for 2014 is not quoted here. The date is not quoted from a fetched source."
+          "note": "The number of constituencies in 2014 hasn't been confirmed from an official source yet.",
+          "research_note": "Seats from the 2014, 2019, and 2024 columns of the 'Comparison 1979-2024' table. The constituency count for 2014 is not quoted here. The date is not quoted from a fetched source."
         },
         {
           "date": "2019-05-24",
           "seats": 13,
           "source": "ep-results-2024",
           "quote": "Total Number of Seats 11 13 14",
-          "note": "Seats from the 2019 column of the same table. The constituency count for 2019 is not quoted here. The date is not quoted from a fetched source."
+          "note": "The number of constituencies in 2019 hasn't been confirmed from an official source yet.",
+          "research_note": "Seats from the 2019 column of the same table. The constituency count for 2019 is not quoted here. The date is not quoted from a fetched source."
         },
         {
           "date": "2024-06-07",

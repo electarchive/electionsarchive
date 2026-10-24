@@ -4,7 +4,103 @@
   "region_schemes": [
     "it.regione"
   ],
-  "sources": {},
+  "sources": {
+    "camera_conoscere_1948_1994": {
+      "title": "La Repubblica fino al 1994",
+      "publisher": "Camera dei deputati, Conoscere la Camera",
+      "url": "https://conoscere.camera.it/norme-essenziali/il-sistema-elettorale/precedente-legislazione-elettorale/la-repubblica-fino-al-1994"
+    },
+    "camera_storia_misto_1994_2005": {
+      "title": "Misto: maggioritario e proporzionale (1994-2005)",
+      "publisher": "Camera dei deputati, Portale storico",
+      "url": "https://storia.camera.it/legislature/sistema-misto-maggioritario-e-proporzionale-1994-2005"
+    },
+    "camera_storia_prop_2006_2016": {
+      "title": "Proporzionale con premio di maggioranza (2006-2016)",
+      "publisher": "Camera dei deputati, Portale storico",
+      "url": "https://storia.camera.it/legislature/sistema-proporzionale-premio-maggioranza-2006-2016"
+    },
+    "camera_dossier_ac0794a": {
+      "title": "Dossier AC0794A (sistema elettorale della Camera, XIV legislatura)",
+      "publisher": "Camera dei deputati, Servizio Studi",
+      "url": "https://documenti.camera.it/Leg14/dossier/Testi/ac0794a.htm"
+    },
+    "camera_dossier_ac0176": {
+      "title": "Dossier AC0176 (storia del sistema di elezione del Senato)",
+      "publisher": "Camera dei deputati, Servizio Studi",
+      "url": "https://documenti.camera.it/leg17/dossier/Testi/ac0176.htm"
+    },
+    "interno_vademecum_2013": {
+      "title": "Vademecum Elezioni Politiche 24-25 febbraio 2013",
+      "publisher": "Ministero dell'Interno, Dipartimento per gli affari interni e territoriali",
+      "url": "https://www1.interno.gov.it/mininterno/export/sites/default/it/assets/files/25/2013_02_24_Guida_alle_Politiche_Servizio_elettorale_corr.pdf"
+    },
+    "interno_dossier_2018": {
+      "title": "Elezioni politiche del 4 marzo 2018: il dossier",
+      "publisher": "Ministero dell'Interno, Direzione Centrale dei servizi elettorali",
+      "url": "https://dait.interno.gov.it/documenti/dcse_dossier_politiche_4_marzo_2018.pdf"
+    },
+    "interno_dossier_2022": {
+      "title": "Dossier Elezioni Politiche 25 settembre 2022",
+      "publisher": "Ministero dell'Interno, Dipartimento per gli affari interni e territoriali",
+      "url": "https://dait.interno.gov.it/documenti/dossier-elezioni-politiche-2022.pdf"
+    },
+    "interno_volume_senato_2001": {
+      "title": "Volume Elezione Senato della Repubblica (elezioni del 13 maggio 2001)",
+      "publisher": "Ministero dell'Interno, Ufficio Studi Elettorali",
+      "url": "https://www1.interno.gov.it/mininterno/export/sites/default/it/assets/files/3/20021030122655_10-113-232-34.pdf"
+    },
+    "interno_dossier_europee_2019": {
+      "title": "Elezioni dei membri del Parlamento europeo spettanti all'Italia: il dossier (26 maggio 2019)",
+      "publisher": "Ministero dell'Interno, Dipartimento per gli affari interni e territoriali",
+      "url": "https://www.interno.gov.it/sites/default/files/dossier_europee_2019_.pdf"
+    },
+    "gu_dpr_10_04_2024_ep": {
+      "title": "DPR 10 aprile 2024, Assegnazione del numero dei seggi alle circoscrizioni per l'elezione dei membri del Parlamento europeo spettanti all'Italia (GU n. 85, 11 aprile 2024)",
+      "publisher": "Gazzetta Ufficiale della Repubblica italiana (copia PDF ospitata da ASTRID)",
+      "url": "https://www.astrid-online.it/static/upload/dpr-/dpr-10-aprile-2024.pdf"
+    },
+    "parlamento_l18_1979": {
+      "title": "Legge 24 gennaio 1979, n. 18, Elezione dei membri del Parlamento europeo spettanti all'Italia",
+      "publisher": "Parlamento italiano",
+      "url": "https://www.parlamento.it/parlam/leggi/79018l.htm"
+    },
+    "piemonte_l18_1979_consolidata": {
+      "title": "L. 24 gennaio 1979, n. 18 (testo consolidato con le modifiche successive)",
+      "publisher": "Regione Piemonte, Osservatorio elezioni (copia PDF)",
+      "url": "https://www.cr.piemonte.it/dwd/web/media/files/L_%2024%20gennaio%201979,%20n_%2018.pdf"
+    },
+    "interno_referendum_risultati_1946_2016": {
+      "title": "Referendum popolari, risultati complessivi dal 1946 al 2016",
+      "publisher": "Ministero dell'Interno, Ufficio IV Servizi informatici elettorali",
+      "url": "https://dait.interno.gov.it/documenti/referendum_risultati_complessivi_1946_2016_0.pdf"
+    },
+    "gu_dpr_27_09_2016": {
+      "title": "DPR 27 settembre 2016, Indizione del referendum popolare confermativo (GU n. 227, 28 settembre 2016)",
+      "publisher": "Gazzetta Ufficiale della Repubblica italiana",
+      "url": "https://www.gazzettaufficiale.it/eli/gu/2016/09/28/227/sg/pdf"
+    },
+    "interno_dossier_referendum_2020": {
+      "title": "Dossier Referendum costituzionale 2020",
+      "publisher": "Ministero dell'Interno, Dipartimento per gli affari interni e territoriali",
+      "url": "https://dait.interno.gov.it/documenti/dossier_referendum_costituzionale_2020.pdf"
+    },
+    "interno_dossier_referendum_2022": {
+      "title": "Dossier Referendum 2022",
+      "publisher": "Ministero dell'Interno",
+      "url": "https://dait.interno.gov.it/documenti/dossier-referendum2022.pdf"
+    },
+    "interno_dossier_referendum_2025": {
+      "title": "Dossier Referendum 2025 (decreti di indizione dell'8 e 9 giugno 2025)",
+      "publisher": "Ministero dell'Interno",
+      "url": "https://dait.interno.gov.it/documenti/dossier-referendum2025.pdf"
+    },
+    "gu_dpr_13_01_2026": {
+      "title": "DPR 13 gennaio 2026, Indizione del referendum popolare confermativo (GU n. 10, 14 gennaio 2026)",
+      "publisher": "Gazzetta Ufficiale della Repubblica italiana",
+      "url": "https://www.gazzettaufficiale.it/eli/id/2026/01/14/26A00167/sg"
+    }
+  },
   "levels": [
     {
       "key": "camera",
@@ -26,21 +122,162 @@
         "it.collegio_camera_1993",
         "it.collegio_camera_2017",
         "it.uninominale_camera",
-        "it.estero"
+        "it.estero",
+        "it.plurinominale_camera"
       ],
       "fine": [
         "it.comune",
         "it.comune_collegio",
         "it.sezione"
       ],
-      "gaps": [
+      "elections": [
         {
-          "from": 1948,
-          "to": 2022,
-          "note": "No official count is compiled yet."
+          "date": "1948-04-18",
+          "contests": null,
+          "note": "The number of constituencies at this election has not yet been confirmed from an official source.",
+          "research_note": "Date verified. Circoscrizioni and seats left null: the Camera page (camera_conoscere_1948_1994) says 32 circoscrizioni for the postwar Chamber as a whole, but no year-specific quote for 1948 was captured. Wikipedia gives 31 for 1948 to 1958 (Trieste as XXXII from 1957 per its Trieste article), which conflicts and was not used. Seat count 574 is only in the Eligendo archive (elezionistorico.interno.gov.it), which is blocked here, so it is not cited."
+        },
+        {
+          "date": "1953-06-07",
+          "contests": null,
+          "note": "The number of constituencies at this election has not yet been confirmed from an official source.",
+          "research_note": "Date verified. Circoscrizioni and seats not quoted from an official source in this run (see 1948 note). Wikipedia gives 590 seats, not used."
+        },
+        {
+          "date": "1958-05-25",
+          "contests": null,
+          "note": "The number of constituencies at this election has not yet been confirmed from an official source.",
+          "research_note": "Date verified. Circoscrizioni and seats not quoted from an official source in this run. The Trieste circoscrizione (XXXII) question for 1958 is unresolved; Wikipedia gives 31 circoscrizioni for 1958, and the Tabella A text was not fetched. Wikipedia gives 596 seats, not used."
+        },
+        {
+          "date": "1963-04-28",
+          "contests": 32,
+          "seats": 630,
+          "source": "camera_conoscere_1948_1994",
+          "quote": "nelle 32 circoscrizioni in cui era, allora, suddiviso il territorio nazionale",
+          "note": "Counted as 32 circoscrizioni."
+        },
+        {
+          "date": "1968-05-19",
+          "contests": 32,
+          "seats": 630,
+          "source": "camera_conoscere_1948_1994",
+          "quote": "nelle 32 circoscrizioni in cui era, allora, suddiviso il territorio nazionale",
+          "note": "Counted as 32 circoscrizioni."
+        },
+        {
+          "date": "1972-05-07",
+          "contests": 32,
+          "seats": 630,
+          "source": "camera_conoscere_1948_1994",
+          "quote": "nelle 32 circoscrizioni in cui era, allora, suddiviso il territorio nazionale",
+          "note": "Counted as 32 circoscrizioni."
+        },
+        {
+          "date": "1976-06-20",
+          "contests": 32,
+          "seats": 630,
+          "source": "camera_conoscere_1948_1994",
+          "quote": "nelle 32 circoscrizioni in cui era, allora, suddiviso il territorio nazionale",
+          "note": "Counted as 32 circoscrizioni."
+        },
+        {
+          "date": "1979-06-03",
+          "contests": 32,
+          "seats": 630,
+          "source": "camera_conoscere_1948_1994",
+          "quote": "nelle 32 circoscrizioni in cui era, allora, suddiviso il territorio nazionale",
+          "note": "Counted as 32 circoscrizioni."
+        },
+        {
+          "date": "1983-06-26",
+          "contests": 32,
+          "seats": 630,
+          "source": "camera_conoscere_1948_1994",
+          "quote": "nelle 32 circoscrizioni in cui era, allora, suddiviso il territorio nazionale",
+          "note": "Counted as 32 circoscrizioni."
+        },
+        {
+          "date": "1987-06-14",
+          "contests": 32,
+          "seats": 630,
+          "source": "camera_conoscere_1948_1994",
+          "quote": "nelle 32 circoscrizioni in cui era, allora, suddiviso il territorio nazionale",
+          "note": "Counted as 32 circoscrizioni."
+        },
+        {
+          "date": "1992-04-05",
+          "contests": 32,
+          "seats": 630,
+          "source": "camera_conoscere_1948_1994",
+          "quote": "nelle 32 circoscrizioni in cui era, allora, suddiviso il territorio nazionale",
+          "note": "Counted as 32 circoscrizioni."
+        },
+        {
+          "date": "1994-03-27",
+          "contests": 475,
+          "seats": 630,
+          "source": "camera_storia_misto_1994_2005",
+          "quote": "La nuova disciplina portava ad eleggere 475 deputati con il sistema maggioritario in altrettanti collegi uninominali; 155 erano invece eletti con il sistema proporzionale, ripartendoli cioè in proporzione ai voti ottenuti dalle liste concorrenti presentate nelle 26 circoscrizioni.",
+          "note": "Counted as 475 collegi uninominali, 26 circoscrizioni proporzionale."
+        },
+        {
+          "date": "1996-04-21",
+          "contests": 475,
+          "seats": 630,
+          "source": "camera_storia_misto_1994_2005",
+          "quote": "La nuova disciplina portava ad eleggere 475 deputati con il sistema maggioritario in altrettanti collegi uninominali; 155 erano invece eletti con il sistema proporzionale, ripartendoli cioè in proporzione ai voti ottenuti dalle liste concorrenti presentate nelle 26 circoscrizioni.",
+          "note": "Counted as 475 collegi uninominali, 26 circoscrizioni proporzionale."
+        },
+        {
+          "date": "2001-05-13",
+          "contests": 475,
+          "seats": 630,
+          "source": "camera_storia_misto_1994_2005",
+          "quote": "La nuova disciplina portava ad eleggere 475 deputati con il sistema maggioritario in altrettanti collegi uninominali; 155 erano invece eletti con il sistema proporzionale, ripartendoli cioè in proporzione ai voti ottenuti dalle liste concorrenti presentate nelle 26 circoscrizioni.",
+          "note": "Counted as 475 collegi uninominali, 26 circoscrizioni proporzionale."
+        },
+        {
+          "date": "2006-04-09",
+          "contests": 31,
+          "seats": 630,
+          "source": "camera_storia_prop_2006_2016",
+          "quote": "617 deputati sono eletti nel territorio nazionale in proporzione ai voti ottenuti dalle liste concorrenti presentate nelle 26 circoscrizioni; un deputato viene eletto con metodo maggioritario nel collegio uninominale della Valle d'Aosta; i restanti 12 deputati sono eletti nella circoscrizione Estero",
+          "note": "Counted as 26 circoscrizioni, 1 valle daosta, 4 estero ripartizioni."
+        },
+        {
+          "date": "2008-04-13",
+          "contests": 31,
+          "seats": 630,
+          "source": "camera_dossier_ac0794a",
+          "quote": "Il territorio nazionale è suddiviso in 26 circoscrizioni (oltre alla Valle d’Aosta che, come detto, costituisce circoscrizione a sé)",
+          "note": "Counted as 26 circoscrizioni, 1 valle daosta, 4 estero ripartizioni."
+        },
+        {
+          "date": "2013-02-24",
+          "contests": 31,
+          "seats": 630,
+          "source": "interno_vademecum_2013",
+          "quote": "il territorio nazionale è suddiviso in 26 circoscrizioni, oltre alla Valle d’Aosta, che costituisce circoscrizione a sé ed elegge un solo deputato a maggioranza dei voti",
+          "note": "Counted as 26 circoscrizioni, 1 valle daosta, 4 estero ripartizioni."
+        },
+        {
+          "date": "2018-03-04",
+          "contests": 295,
+          "seats": 630,
+          "source": "interno_dossier_2018",
+          "quote": "Sono 232 i collegi uninominali del territorio nazionale, compreso il collegio della Valle d’Aosta, ai quali vengono assegnati i 232 seggi alla Camera. Sono 63 i collegi plurinominali nei quali vengono assegnati i restanti 386 seggi.",
+          "note": "Counted as 28 circoscrizioni, 232 collegi uninominali, 63 collegi plurinominali, 12 estero seats."
+        },
+        {
+          "date": "2022-09-25",
+          "contests": 196,
+          "seats": 400,
+          "source": "interno_dossier_2022",
+          "quote": "Sono 147 i collegi uninominali del territorio nazionale, compreso il collegio della Valle d’Aosta, ai quali vengono assegnati i 147 seggi maggioritari alla Camera. Sono 49 i collegi plurinominali nei quali vengono assegnati i restanti 245 seggi proporzionali.",
+          "note": "Counted as 28 circoscrizioni, 147 collegi uninominali, 49 collegi plurinominali, 8 estero seats."
         }
-      ],
-      "elections": []
+      ]
     },
     {
       "key": "senato",
@@ -60,14 +297,151 @@
       "schemes": [
         "it.collegio_senato"
       ],
-      "gaps": [
+      "elections": [
         {
-          "from": 1948,
-          "to": 2022,
-          "note": "No official count is compiled yet."
+          "date": "1948-04-18",
+          "contests": 238,
+          "source": "camera_dossier_ac0176",
+          "quote": "il numero dei collegi uninominali in cui risultavano divise le regioni è pertanto rimasto fermo alla cifra stabilita nel 1948 (238 collegi)",
+          "note": "Counted as 238 collegi uninominali."
+        },
+        {
+          "date": "1953-06-07",
+          "contests": 238,
+          "source": "camera_dossier_ac0176",
+          "quote": "il numero dei collegi uninominali in cui risultavano divise le regioni è pertanto rimasto fermo alla cifra stabilita nel 1948 (238 collegi)",
+          "note": "Counted as 238 collegi uninominali."
+        },
+        {
+          "date": "1958-05-25",
+          "contests": 238,
+          "source": "camera_dossier_ac0176",
+          "quote": "il numero dei collegi uninominali in cui risultavano divise le regioni è pertanto rimasto fermo alla cifra stabilita nel 1948 (238 collegi)",
+          "note": "Counted as 238 collegi uninominali."
+        },
+        {
+          "date": "1963-04-28",
+          "contests": 238,
+          "seats": 315,
+          "source": "camera_dossier_ac0176",
+          "quote": "a partire dal 1963, quando viene introdotto il numero fisso di 315",
+          "note": "Counted as 238 collegi uninominali."
+        },
+        {
+          "date": "1968-05-19",
+          "contests": 238,
+          "seats": 315,
+          "source": "camera_dossier_ac0176",
+          "quote": "a partire dal 1963, quando viene introdotto il numero fisso di 315",
+          "note": "Counted as 238 collegi uninominali."
+        },
+        {
+          "date": "1972-05-07",
+          "contests": 238,
+          "seats": 315,
+          "source": "camera_dossier_ac0176",
+          "quote": "a partire dal 1963, quando viene introdotto il numero fisso di 315",
+          "note": "Counted as 238 collegi uninominali."
+        },
+        {
+          "date": "1976-06-20",
+          "contests": 238,
+          "seats": 315,
+          "source": "camera_dossier_ac0176",
+          "quote": "a partire dal 1963, quando viene introdotto il numero fisso di 315",
+          "note": "Counted as 238 collegi uninominali."
+        },
+        {
+          "date": "1979-06-03",
+          "contests": 238,
+          "seats": 315,
+          "source": "camera_dossier_ac0176",
+          "quote": "a partire dal 1963, quando viene introdotto il numero fisso di 315",
+          "note": "Counted as 238 collegi uninominali."
+        },
+        {
+          "date": "1983-06-26",
+          "contests": 238,
+          "seats": 315,
+          "source": "camera_dossier_ac0176",
+          "quote": "a partire dal 1963, quando viene introdotto il numero fisso di 315",
+          "note": "Counted as 238 collegi uninominali."
+        },
+        {
+          "date": "1987-06-14",
+          "contests": 238,
+          "seats": 315,
+          "source": "camera_dossier_ac0176",
+          "quote": "a partire dal 1963, quando viene introdotto il numero fisso di 315",
+          "note": "Counted as 238 collegi uninominali."
+        },
+        {
+          "date": "1992-04-05",
+          "contests": 238,
+          "seats": 315,
+          "source": "camera_dossier_ac0176",
+          "quote": "a partire dal 1963, quando viene introdotto il numero fisso di 315",
+          "note": "Counted as 238 collegi uninominali."
+        },
+        {
+          "date": "1994-03-27",
+          "contests": 232,
+          "seats": 315,
+          "source": "interno_volume_senato_2001",
+          "quote": "I seggi spettanti a ciascuna regione sono assegnati per il 75% (pari a 232 seggi) con il sistema maggioritario in un unico turno di votazione in altrettanti collegi uninominali",
+          "note": "Counted as 232 collegi uninominali."
+        },
+        {
+          "date": "1996-04-21",
+          "contests": 232,
+          "seats": 315,
+          "source": "interno_volume_senato_2001",
+          "quote": "I seggi spettanti a ciascuna regione sono assegnati per il 75% (pari a 232 seggi) con il sistema maggioritario in un unico turno di votazione in altrettanti collegi uninominali",
+          "note": "Counted as 232 collegi uninominali."
+        },
+        {
+          "date": "2001-05-13",
+          "contests": 232,
+          "seats": 315,
+          "source": "interno_volume_senato_2001",
+          "quote": "I seggi spettanti a ciascuna regione sono assegnati per il 75% (pari a 232 seggi) con il sistema maggioritario in un unico turno di votazione in altrettanti collegi uninominali",
+          "note": "Counted as 232 collegi uninominali."
+        },
+        {
+          "date": "2006-04-09",
+          "contests": null,
+          "note": "The number of constituencies at this election has not yet been confirmed from an official source.",
+          "research_note": "Date verified. Senate is regional with no collegi uninominali under the 2005 law. Regional circoscrizioni and seats (315 under Art. 57, with 6 Estero) not quoted for 2006 in this run."
+        },
+        {
+          "date": "2008-04-13",
+          "contests": null,
+          "note": "The number of constituencies at this election has not yet been confirmed from an official source.",
+          "research_note": "Date verified. Same as 2006 (regional, no collegi uninominali). Not quoted in this run."
+        },
+        {
+          "date": "2013-02-24",
+          "contests": null,
+          "note": "The number of constituencies at this election has not yet been confirmed from an official source.",
+          "research_note": "Senate is regional with no collegi uninominali under the 2005 law. Regional circoscrizioni not quoted. Date from camera_ac0880_dates (24.2.2013)."
+        },
+        {
+          "date": "2018-03-04",
+          "contests": 149,
+          "seats": 315,
+          "source": "interno_dossier_2018",
+          "quote": "Sono 116 i collegi uninominali del territorio nazionale, compreso il collegio della Valle d’Aosta, ai quali vengono assegnati i 116 seggi al Senato. Sono 33 i collegi plurinominali nei quali vengono assegnati i restanti 193 seggi.",
+          "note": "Counted as 20 circoscrizioni, 116 collegi uninominali, 33 collegi plurinominali, 6 estero seats."
+        },
+        {
+          "date": "2022-09-25",
+          "contests": 100,
+          "seats": 200,
+          "source": "interno_dossier_2022",
+          "quote": "Sono 74 i collegi uninominali del territorio nazionale, compreso il collegio della Valle d’Aosta, ai quali vengono assegnati i 74 seggi maggioritari al Senato.",
+          "note": "Counted as 20 circoscrizioni, 74 collegi uninominali, 26 collegi plurinominali, 4 estero seats."
         }
-      ],
-      "elections": []
+      ]
     },
     {
       "key": "regionali",
@@ -116,14 +490,164 @@
         "it.regione",
         "it.comune"
       ],
-      "gaps": [
+      "elections": [
         {
-          "from": 1946,
-          "to": 2026,
-          "note": "No official count is compiled yet."
+          "contests": 1,
+          "source": "interno_referendum_risultati_1946_2016",
+          "quote": "1. Referendum sulla forma istituzionale dello Stato",
+          "year": 1946
+        },
+        {
+          "contests": 1,
+          "source": "interno_referendum_risultati_1946_2016",
+          "quote": "12 e 13 Maggio 1974 Elettori 37.646.322",
+          "year": 1974
+        },
+        {
+          "contests": 2,
+          "source": "interno_referendum_risultati_1946_2016",
+          "quote": "2. Finanziamento pubblico dei partiti",
+          "year": 1978
+        },
+        {
+          "contests": 5,
+          "source": "interno_referendum_risultati_1946_2016",
+          "quote": "17 e 18 Maggio 1981 43.154.682 Elettori",
+          "year": 1981
+        },
+        {
+          "contests": 1,
+          "source": "interno_referendum_risultati_1946_2016",
+          "quote": "9 e 10 Giugno 1985 Elettori 44.904.290",
+          "year": 1985
+        },
+        {
+          "contests": 5,
+          "source": "interno_referendum_risultati_1946_2016",
+          "quote": "5. Divieto partecipazione dell’ENEL a impianti nucleari all’estero",
+          "year": 1987
+        },
+        {
+          "contests": 1,
+          "source": "interno_referendum_risultati_1946_2016",
+          "quote": "REFERENDUM CONSULTIVO. Conferimento del mandato costituente al Parlamento Europeo",
+          "year": 1989
+        },
+        {
+          "contests": 3,
+          "source": "interno_referendum_risultati_1946_2016",
+          "quote": "3. Uso dei pesticidi",
+          "year": 1990
+        },
+        {
+          "contests": 1,
+          "source": "interno_referendum_risultati_1946_2016",
+          "quote": "9 e 10 Giugno 1991 47.377.843 Elettori",
+          "year": 1991
+        },
+        {
+          "contests": 8,
+          "source": "interno_referendum_risultati_1946_2016",
+          "quote": "8. Ministero Turismo e Spettacolo",
+          "year": 1993
+        },
+        {
+          "contests": 12,
+          "source": "interno_referendum_risultati_1946_2016",
+          "quote": "12. Raccolta pubblicità radiotelevisiva",
+          "year": 1995
+        },
+        {
+          "contests": 7,
+          "source": "interno_referendum_risultati_1946_2016",
+          "quote": "7. Ministero per le politiche agricole",
+          "year": 1997
+        },
+        {
+          "contests": 1,
+          "source": "interno_referendum_risultati_1946_2016",
+          "quote": "1. Elezione Camera dei Deputati (abolizione del voto di lista)",
+          "year": 1999
+        },
+        {
+          "contests": 7,
+          "source": "interno_referendum_risultati_1946_2016",
+          "quote": "7. Trattenute associative e sindacali tramite gli enti previdenziali",
+          "year": 2000
+        },
+        {
+          "contests": 1,
+          "source": "interno_referendum_risultati_1946_2016",
+          "quote": "1. REFERENDUM COSTITUZIONALE. Modifica al titolo V della parte seconda della Costituzione",
+          "year": 2001
+        },
+        {
+          "contests": 2,
+          "source": "interno_referendum_risultati_1946_2016",
+          "quote": "15 e 16 Giugno 2003 Elettori 49.474.940 IN COMPLESSO",
+          "year": 2003
+        },
+        {
+          "contests": 4,
+          "source": "interno_referendum_risultati_1946_2016",
+          "quote": "PROCREAZIONE MEDICALMENTE ASSISTITA. 1. Limite alla ricerca clinica e sperimentale sugli embrioni. Abrogazione parziale",
+          "year": 2005
+        },
+        {
+          "contests": 1,
+          "source": "interno_referendum_risultati_1946_2016",
+          "quote": "1. REFERENDUM COSTITUZIONALE. Approvazione legge di modifica alla parte seconda della Costituzione",
+          "year": 2006
+        },
+        {
+          "contests": 3,
+          "source": "interno_referendum_risultati_1946_2016",
+          "quote": "Elezione della Camera dei Deputati. Abrogazione della possibilità per uno stesso candidato di presentare la propria candidatura in",
+          "year": 2009
+        },
+        {
+          "contests": 4,
+          "source": "interno_referendum_risultati_1946_2016",
+          "quote": "4. Abrogazione di norme della legge 7 aprile 2010, n. 51, in materia di legittimo impedimento",
+          "year": 2011
+        },
+        {
+          "contests": 1,
+          "source": "interno_referendum_risultati_1946_2016",
+          "quote": "17 Aprile 2016 Elettori 46.730.317 IN COMPLESSO",
+          "year": 2016
+        },
+        {
+          "contests": 1,
+          "source": "gu_dpr_27_09_2016",
+          "quote": "È indetto il referendum popolare confermativo avente il seguente quesito",
+          "year": 2016
+        },
+        {
+          "contests": 1,
+          "source": "interno_dossier_referendum_2020",
+          "quote": "Il 20 e 21 settembre si terrà il referendum costituzionale confermativo sulla riduzione del numero dei parlamentari",
+          "year": 2020
+        },
+        {
+          "contests": 5,
+          "source": "interno_dossier_referendum_2022",
+          "quote": "Domenica 12 giugno 2022 si terranno i cinque referendum abrogativi",
+          "year": 2022
+        },
+        {
+          "contests": 5,
+          "source": "interno_dossier_referendum_2025",
+          "quote": "REFERENDUM numero 5",
+          "year": 2025
+        },
+        {
+          "contests": 1,
+          "source": "gu_dpr_13_01_2026",
+          "quote": "Indizione del referendum popolare confermativo della legge costituzionale recante: «Norme in materia di ordinamento giurisdizionale e di istituzione della Corte disciplinare»",
+          "year": 2026
         }
-      ],
-      "elections": []
+      ]
     },
     {
       "key": "ep",
@@ -143,14 +667,70 @@
       "schemes": [
         "it.ep_constituency"
       ],
-      "gaps": [
+      "elections": [
         {
-          "from": 1979,
-          "to": 2024,
-          "note": "No official count is compiled yet."
+          "date": "1979-06-10",
+          "contests": 5,
+          "source": "parlamento_l18_1979",
+          "quote": "I - Italia nord-occidentale (Piemonte - Valle d'Aosta - Liguria - Lombardia)"
+        },
+        {
+          "date": "1984-06-17",
+          "contests": 5,
+          "source": "piemonte_l18_1979_consolidata",
+          "quote": "I Italia nord-occidentale (Piemonte - Valle d'Aosta - Liguria - Lombardia) Milano"
+        },
+        {
+          "date": "1989-06-18",
+          "contests": 5,
+          "source": "piemonte_l18_1979_consolidata",
+          "quote": "V Italia insulare (Sicilia - Sardegna) Palermo"
+        },
+        {
+          "date": "1994-06-12",
+          "contests": 5,
+          "source": "piemonte_l18_1979_consolidata",
+          "quote": "V Italia insulare (Sicilia - Sardegna) Palermo"
+        },
+        {
+          "date": "1999-06-13",
+          "contests": 5,
+          "source": "piemonte_l18_1979_consolidata",
+          "quote": "V Italia insulare (Sicilia - Sardegna) Palermo"
+        },
+        {
+          "date": "2004-06-12",
+          "contests": 5,
+          "source": "piemonte_l18_1979_consolidata",
+          "quote": "V Italia insulare (Sicilia - Sardegna) Palermo"
+        },
+        {
+          "date": "2009-06-06",
+          "contests": 5,
+          "source": "piemonte_l18_1979_consolidata",
+          "quote": "V Italia insulare (Sicilia - Sardegna) Palermo"
+        },
+        {
+          "date": "2014-05-25",
+          "contests": 5,
+          "source": "piemonte_l18_1979_consolidata",
+          "quote": "V Italia insulare (Sicilia - Sardegna) Palermo"
+        },
+        {
+          "date": "2019-05-26",
+          "contests": 5,
+          "seats": 76,
+          "source": "interno_dossier_europee_2019",
+          "quote": "Le candidature (paragrafo 4.9. «Le candidature») si presentano nell'ambito di 5 circoscrizioni di dimensione sovra regionale"
+        },
+        {
+          "date": "2024-06-08",
+          "contests": 5,
+          "seats": 76,
+          "source": "gu_dpr_10_04_2024_ep",
+          "quote": "Totali 59.030.133 74 76"
         }
-      ],
-      "elections": []
+      ]
     }
   ]
 }

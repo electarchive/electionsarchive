@@ -52,18 +52,8 @@
       "gaps": [
         {
           "from": 1832,
-          "to": 1910,
-          "note": "No authoritative count retrieved. No House of Commons Library or Parliament source for 1832-1910 contests was identified within the research budget. Statutes such as the Reform Act 1832 and the Redistribution of Seats Act 1885 set seat totals, not the number of contested constituencies (uncontested returns and two-member seats make these differ)."
-        },
-        {
-          "from": 1918,
-          "to": 2024,
-          "note": "No sourced count retrieved. The House of Commons Library briefing CBP-7529 (UK Election Statistics: 1918-2024) returns a Cloudflare challenge page (HTTP 403) to both curl and WebFetch, and parliament.uk is blocked for both tools, so it was not read. For 2024, the Parliamentary Constituencies Order 2023 (SI 2023/1230) sets the constituencies by nation, but its schedules were not read."
-        },
-        {
-          "from": 1832,
-          "to": 1917,
-          "note": "The House of Commons Library's statistics begin in 1918; no official count of constituencies at each general election from 1832 to 1910 is published online."
+          "to": 1945,
+          "note": "Before 1950, some constituencies returned two or more members. The House of Commons Library's statistics, which start in 1918, give seats rather than constituencies. These elections aren't counted yet."
         }
       ],
       "elections": [
@@ -416,19 +406,14 @@
       ],
       "gaps": [
         {
-          "from": 1918,
-          "to": 2024,
-          "note": "No per-year count retrieved. The House of Commons Library by-election listing is on parliament.uk, which is blocked to both curl and WebFetch."
-        },
-        {
           "from": 1832,
           "to": 1945,
-          "note": "The House of Commons Library lists every by-election only from the 1945 general election on (and Northern Ireland's from 1922)."
+          "note": "The House of Commons Library lists every by-election only from 1945 on, and Northern Ireland's from 1922."
         },
         {
           "from": 2023,
           "to": 2026,
-          "note": "Not yet counted from the Library's briefings after August 2023."
+          "note": "By-elections since August 2023 aren't counted yet."
         }
       ],
       "elections": [
@@ -1046,13 +1031,6 @@
           "source": "hoc-cbp7529",
           "quote": "Table 16, Constituency seats Total 40; section 9.4: 40 constituencies across five regions"
         }
-      ],
-      "gaps": [
-        {
-          "from": 1999,
-          "to": 2016,
-          "note": "Contests would be 40 constituencies plus 5 regions if confirmed, but the Electoral Commission 2016 report and Senedd sources for 1999, 2003, 2007, 2011, and 2016 were not fetched. Government of Wales Act 2006 section 1 and section 2 do not state the counts (section 2 refers to regulations under section 49J)."
-        }
       ]
     },
     {
@@ -1128,8 +1106,8 @@
       "gaps": [
         {
           "from": 1973,
-          "to": 2022,
-          "note": "No sourced count retrieved. The Electoral Office for Northern Ireland results pages were not fetched (no WebFetch or curl success). Search excerpts describe 18 constituencies of five MLAs for the current structure, but that text was not quoted from a fetched page. Assembly sizes for 1973, 1982, 1996, and earlier 1998-2011 elections were not confirmed."
+          "to": 1997,
+          "note": "The assemblies of 1973 and 1982, the 1975 Constitutional Convention, and the 1996 Forum aren't counted yet."
         }
       ]
     },
@@ -1152,11 +1130,6 @@
         "gb.stormont"
       ],
       "gaps": [
-        {
-          "from": 1921,
-          "to": 1969,
-          "note": "No sourced count retrieved. The Parliament of Northern Ireland election data was not located in an official source within the budget. The Commons Library research papers that describe Stormont (for example CBP-8884) were not reachable via parliament.uk."
-        },
         {
           "from": 1921,
           "to": 1969,
@@ -1185,12 +1158,7 @@
         {
           "from": 1973,
           "to": 2026,
-          "note": "No per-year count of councils holding elections retrieved. Electoral Commission reports and Commons Library local elections briefings were not reached within the budget."
-        },
-        {
-          "from": 1973,
-          "to": 2026,
-          "note": "No official count of the councils holding elections each year is compiled yet."
+          "note": "No official count of the councils holding elections each year has been compiled yet."
         }
       ],
       "elections": []
@@ -1321,13 +1289,6 @@
           "seats": 73,
           "source": "hoc-cbp7529",
           "quote": "Section 9.3: 12 regions"
-        }
-      ],
-      "gaps": [
-        {
-          "from": 1979,
-          "to": 2019,
-          "note": "No sourced count retrieved. The European Parliamentary Elections Act 1999 and 2002 and the Research Papers RP99-57 and RP02-78 were not reached (parliament.uk blocked). Legislation.gov.uk pages for these Acts were not fetched."
         }
       ]
     }

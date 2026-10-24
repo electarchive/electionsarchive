@@ -298,8 +298,9 @@
           "seats": 265,
           "source": "heo",
           "quote": "Parliaments table, 29th: 109/265",
-          "note": "Elections Canada's Parliaments table gives 265 seats, which does not match the 264 ridings of the 1966 representation order; left uncounted until settled.",
-          "regions": null
+          "note": "Elections Canada gives 265 seats for 1972, which doesn't match the 264 ridings of the 1966 representation order, so 1972 stays uncounted until that is settled.",
+          "regions": null,
+          "research_note": "Elections Canada's Parliaments table gives 265 seats, which does not match the 264 ridings of the 1966 representation order; left uncounted until settled."
         },
         {
           "date": "1974-07-08",
@@ -433,7 +434,13 @@
           "note": "Date from idx-45ge. Provincial counts for the 2023 map are not on the fetched pages, so regions are null."
         }
       ],
-      "gaps": []
+      "gaps": [
+        {
+          "from": 1867,
+          "to": 1965,
+          "note": "Elections Canada gives seats for these elections, and some ridings returned two members until 1966, so seats aren't a count of ridings. These elections aren't counted yet."
+        }
+      ]
     },
     {
       "key": "commons_by",
@@ -454,13 +461,8 @@
       "gaps": [
         {
           "from": 1867,
-          "to": 2025,
-          "note": "Not researched yet."
-        },
-        {
-          "from": 1867,
           "to": 2026,
-          "note": "No official count is compiled yet."
+          "note": "No official count of by-elections has been compiled yet."
         }
       ],
       "elections": []
@@ -487,13 +489,8 @@
       "gaps": [
         {
           "from": 1867,
-          "to": 2025,
-          "note": "Not researched yet."
-        },
-        {
-          "from": 1867,
           "to": 2026,
-          "note": "No official count is compiled yet."
+          "note": "No official count of provincial and territorial constituencies at each election has been compiled yet."
         }
       ],
       "elections": []

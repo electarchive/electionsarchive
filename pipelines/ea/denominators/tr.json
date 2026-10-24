@@ -184,9 +184,14 @@
       ],
       "gaps": [
         {
-          "from": 2015,
-          "to": 2015,
-          "note": "2015 (June and November) not researched. The TÜİK publication ends in 2011, and the YSK 2023 report does not cover 2015."
+          "from": 1946,
+          "to": 1977,
+          "note": "Before 1983, each province was one constituency, but TÜİK doesn't state the count for each election, and its tables by province don't add up to its published totals. These elections aren't counted yet."
+        },
+        {
+          "from": 1999,
+          "to": 2018,
+          "note": "TÜİK and YSK give seats by province for these elections but not the number of constituencies, so they aren't counted yet."
         }
       ]
     },
@@ -214,12 +219,7 @@
         {
           "from": 2014,
           "to": 2023,
-          "note": "Not researched yet."
-        },
-        {
-          "from": 2014,
-          "to": 2023,
-          "note": "No official count is compiled yet."
+          "note": "No official count has been compiled yet."
         }
       ],
       "elections": []
@@ -247,12 +247,7 @@
         {
           "from": 1961,
           "to": 1979,
-          "note": "Not researched yet."
-        },
-        {
-          "from": 1961,
-          "to": 1979,
-          "note": "No official count is compiled yet."
+          "note": "No official count has been compiled yet."
         }
       ],
       "elections": []
@@ -303,12 +298,7 @@
         {
           "from": 1963,
           "to": 2024,
-          "note": "Not researched yet."
-        },
-        {
-          "from": 1963,
-          "to": 2024,
-          "note": "No official count is compiled yet."
+          "note": "No official count has been compiled yet."
         }
       ],
       "elections": []
@@ -336,12 +326,7 @@
         {
           "from": 1961,
           "to": 2017,
-          "note": "Not researched yet."
-        },
-        {
-          "from": 1961,
-          "to": 2017,
-          "note": "No official count is compiled yet."
+          "note": "No official count has been compiled yet."
         }
       ],
       "elections": []

@@ -1,7 +1,18 @@
 {
   "polity": "CH",
   "name": "Switzerland",
-  "sources": {},
+  "sources": {
+    "bfs-votes-xlsx": {
+      "title": "Eidgenössische Volksabstimmungen: detaillierte Ergebnisse - 1848-2026 (XLSX, provisional, last updated 01.10.2026; 9 sheets, one row per vote; GE rows are direct counter-proposals)",
+      "publisher": "Bundesamt für Statistik (BFS)",
+      "url": "https://www.bfs.admin.ch/asset/de/36842612"
+    },
+    "bfs-seats-xlsx": {
+      "title": "Verteilung der Nationalratssitze auf die Kantone - 1848-2023 (XLSX, last updated 01.09.2021)",
+      "publisher": "Bundesamt für Statistik (BFS)",
+      "url": "https://www.bfs.admin.ch/asset/de/18704909"
+    }
+  },
   "levels": [
     {
       "key": "national_council",
@@ -28,7 +39,7 @@
         {
           "from": 1848,
           "to": 2023,
-          "note": "No official count is compiled yet."
+          "note": "The Federal Statistical Office lists 25 constituencies from 1919 (one per canton and half-canton) and 26 from 1979, when Jura was added. The years of each election are not yet cited from an official list, and constituencies before 1919 are not yet counted."
         }
       ],
       "elections": []
@@ -83,14 +94,855 @@
       "fine": [
         "ch.commune"
       ],
-      "gaps": [
+      "elections": [
         {
-          "from": 1848,
-          "to": 2026,
-          "note": "No official count is compiled yet."
+          "year": 1848,
+          "contests": 1,
+          "source": "bfs-votes-xlsx",
+          "quote": "06.06.1848\t1\tTotalrevision vom 12. September 1848"
+        },
+        {
+          "year": 1866,
+          "contests": 9,
+          "source": "bfs-votes-xlsx",
+          "quote": "14.01.1866\t2\tFestsetzung von Mass und Gewicht"
+        },
+        {
+          "year": 1872,
+          "contests": 1,
+          "source": "bfs-votes-xlsx",
+          "quote": "12.05.1872\t11\tTotalrevision"
+        },
+        {
+          "year": 1874,
+          "contests": 1,
+          "source": "bfs-votes-xlsx",
+          "quote": "19.04.1874\t12\tTotalrevision"
+        },
+        {
+          "year": 1875,
+          "contests": 2,
+          "source": "bfs-votes-xlsx",
+          "quote": "23.05.1875\t13\tBundesgesez betreffend Feststellung und Beurkundung des Zivilstandes und die Ehe"
+        },
+        {
+          "year": 1876,
+          "contests": 2,
+          "source": "bfs-votes-xlsx",
+          "quote": "23.04.1876\t15\tBundesgesez über die Ausgabe und Einlösung von Banknoten"
+        },
+        {
+          "year": 1877,
+          "contests": 3,
+          "source": "bfs-votes-xlsx",
+          "quote": "21.10.1877\t17\tBundesgesez betreffend die Arbeit in den Fabriken"
+        },
+        {
+          "year": 1879,
+          "contests": 2,
+          "source": "bfs-votes-xlsx",
+          "quote": "19.01.1879\t20\tBundesgesez betreffend Gewährung von Subsidien für Alpenbahnen"
+        },
+        {
+          "year": 1880,
+          "contests": 1,
+          "source": "bfs-votes-xlsx",
+          "quote": "31.10.1880\t22\tBundesbeschluss betreffend den durch das Volksbegehren vom 3. August 1880 gestellten Antrag auf Revision der Bundesverfassung"
+        },
+        {
+          "year": 1882,
+          "contests": 3,
+          "source": "bfs-votes-xlsx",
+          "quote": "30.07.1882\t23\tBundesbeschluss betreffend den Erfindungsschutz"
+        },
+        {
+          "year": 1884,
+          "contests": 4,
+          "source": "bfs-votes-xlsx",
+          "quote": "11.05.1884\t26\tBundesgesetz betreffend die Organisation des eidgenössischen Justiz- und Polizeidepartements"
+        },
+        {
+          "year": 1885,
+          "contests": 1,
+          "source": "bfs-votes-xlsx",
+          "quote": "25.10.1885\t30\tBundesbeschluss betreffend theilweise Änderung der Bundesverfassung der schweizerischen Eidgenossenschaft"
+        },
+        {
+          "year": 1887,
+          "contests": 2,
+          "source": "bfs-votes-xlsx",
+          "quote": "15.05.1887\t31\tBundesgesetz betreffend gebrannte Wasser"
+        },
+        {
+          "year": 1889,
+          "contests": 1,
+          "source": "bfs-votes-xlsx",
+          "quote": "17.11.1889\t33\tBundesgesetz über Schuldbetreibung und Konkurs"
+        },
+        {
+          "year": 1890,
+          "contests": 1,
+          "source": "bfs-votes-xlsx",
+          "quote": "26.10.1890\t34\tBundesbeschluss betreffend Ergänzung der Bundesverfassung vom 29. Mai 1874 durch einen Zusatz bezüglich des Gesetzgebungsrechtes über Unfall- und Krankenversicherung"
+        },
+        {
+          "year": 1891,
+          "contests": 5,
+          "source": "bfs-votes-xlsx",
+          "quote": "15.03.1891\t35\tBundesgesetz betreffend die arbeitsunfähig gewordenen eidgenössischen Beamten und Angestellten"
+        },
+        {
+          "year": 1893,
+          "contests": 1,
+          "source": "bfs-votes-xlsx",
+          "quote": "20.08.1893\t40\tVolksinitiative «Verbot des Schlachtens ohne vorherige Betäubung»"
+        },
+        {
+          "year": 1894,
+          "contests": 3,
+          "source": "bfs-votes-xlsx",
+          "quote": "04.03.1894\t41\tBundesbeschluss vom 20. Dezember 1893 betreffend Ergänzung der Bundesverfassung durch einen Zusatz bezüglich des Rechts der Gesetzgebung über das Gewerbewesen"
+        },
+        {
+          "year": 1895,
+          "contests": 3,
+          "source": "bfs-votes-xlsx",
+          "quote": "03.02.1895\t44\tBundesgesetz betreffend die Vertretung der Schweiz im Auslande"
+        },
+        {
+          "year": 1896,
+          "contests": 3,
+          "source": "bfs-votes-xlsx",
+          "quote": "04.10.1896\t47\tBundesgesetz betreffend die Gewährleistung beim Viehhandel"
+        },
+        {
+          "year": 1897,
+          "contests": 3,
+          "source": "bfs-votes-xlsx",
+          "quote": "28.02.1897\t50\tBundesgesetz über die Errichtung der schweizerischen Bundesbank"
+        },
+        {
+          "year": 1898,
+          "contests": 3,
+          "source": "bfs-votes-xlsx",
+          "quote": "20.02.1898\t53\tBundesgesetz betreffend die Erwerbung und den Betrieb von Eisenbahnen für Rechnung des Bundes und die Organisation der Verwaltung der schweizerischen Bundesbahnen"
+        },
+        {
+          "year": 1900,
+          "contests": 3,
+          "source": "bfs-votes-xlsx",
+          "quote": "20.05.1900\t56\tBundesgesetz betreffend die Kranken- und Unfallversicherung mit Einschluss der Militärversicherung"
+        },
+        {
+          "year": 1902,
+          "contests": 1,
+          "source": "bfs-votes-xlsx",
+          "quote": "23.11.1902\t59\tBundesbeschluss betreffend die Unterstützung der öffentlichen Primarschule durch den Bund"
+        },
+        {
+          "year": 1903,
+          "contests": 4,
+          "source": "bfs-votes-xlsx",
+          "quote": "15.03.1903\t60\tBundesgesetz betreffend den schweizerischen Zolltarif"
+        },
+        {
+          "year": 1905,
+          "contests": 1,
+          "source": "bfs-votes-xlsx",
+          "quote": "19.03.1905\t64\tBundesbeschluss betreffend Revision des Art. 64 der Bundesverfassung (Ausdehnung des Erfinderschutzes)"
+        },
+        {
+          "year": 1906,
+          "contests": 1,
+          "source": "bfs-votes-xlsx",
+          "quote": "10.06.1906\t65\tBundesgesetz betreffend den Verkehr mit Lebensmitteln und Gebrauchsgegenständen"
+        },
+        {
+          "year": 1907,
+          "contests": 1,
+          "source": "bfs-votes-xlsx",
+          "quote": "03.11.1907\t66\tMilitärorganisation der schweizerischen Eidgenossenschaft"
+        },
+        {
+          "year": 1908,
+          "contests": 3,
+          "source": "bfs-votes-xlsx",
+          "quote": "05.07.1908\t67\tBundesbeschluss betreffend Ergänzung der Bundesverfassung bezüglich des Rechts der Gesetzgebung über das Gewerbewesen"
+        },
+        {
+          "year": 1910,
+          "contests": 1,
+          "source": "bfs-votes-xlsx",
+          "quote": "23.10.1910\t70\tVolksinitiative «für die Proporzwahl des Nationalrates»"
+        },
+        {
+          "year": 1912,
+          "contests": 1,
+          "source": "bfs-votes-xlsx",
+          "quote": "04.02.1912\t71\tBundesgesetz über die Kranken- und Unfallversicherung"
+        },
+        {
+          "year": 1913,
+          "contests": 1,
+          "source": "bfs-votes-xlsx",
+          "quote": "04.05.1913\t72\tBundesbeschluss betreffend Revision der Artikel 69 und 31, 2.Absatz, lit.d, der Bundesverfassung (Bekämpfung menschlicher und tierischer Krankheiten)"
+        },
+        {
+          "year": 1914,
+          "contests": 1,
+          "source": "bfs-votes-xlsx",
+          "quote": "25.10.1914\t73\tBundesbeschluss betreffend Revision von Art. 103 der Bundesverfassung und Aufnahme eines Artikels 114bis in die Bundesverfassung"
+        },
+        {
+          "year": 1915,
+          "contests": 1,
+          "source": "bfs-votes-xlsx",
+          "quote": "06.06.1915\t74\tBundesbeschluss betreffend Erlass eines Artikels der Bundesverfassung zur Erhebung einer einmaligen Kriegssteuer"
+        },
+        {
+          "year": 1917,
+          "contests": 1,
+          "source": "bfs-votes-xlsx",
+          "quote": "13.05.1917\t75\tBundesbeschluss betreffend die Einfügung eines Art. 41bis und eines Artikels 42, lit.g, in die Bundesverfasssung (Stempelabgaben)"
+        },
+        {
+          "year": 1918,
+          "contests": 2,
+          "source": "bfs-votes-xlsx",
+          "quote": "02.06.1918\t76\tVolksinitiative «für die Einführung der direkten Bundessteuer»"
+        },
+        {
+          "year": 1919,
+          "contests": 3,
+          "source": "bfs-votes-xlsx",
+          "quote": "04.05.1919\t78\tBundesbeschluss betreffend Aufnahme eines Art. 24ter in die Bundesverfassung (Schiffahrt)"
+        },
+        {
+          "year": 1920,
+          "contests": 5,
+          "source": "bfs-votes-xlsx",
+          "quote": "21.03.1920\t81\tBundesgesetz betreffend die Ordnung des Arbeitsverhältnisses"
+        },
+        {
+          "year": 1921,
+          "contests": 4,
+          "source": "bfs-votes-xlsx",
+          "quote": "30.01.1921\t85\tVolksinitiative «für die Unterstellung von unbefristeten oder für eine Dauer von mehr als 15 Jahren abgeschlossenen Staatsverträgen unter das Referendum (Staatsvertragsreferendum)»"
+        },
+        {
+          "year": 1922,
+          "contests": 5,
+          "source": "bfs-votes-xlsx",
+          "quote": "11.06.1922\t89\tVolksinitiative «betreffend die Erlangung des Schweizerbürgerrechts, Teil I»"
+        },
+        {
+          "year": 1923,
+          "contests": 4,
+          "source": "bfs-votes-xlsx",
+          "quote": "18.02.1923\t94\tVolksinitiative «Schutzhaft»"
+        },
+        {
+          "year": 1924,
+          "contests": 1,
+          "source": "bfs-votes-xlsx",
+          "quote": "17.02.1924\t98\tBundesgesetz betreffend Abänderung von Art. 41 des Fabrikgesetzes vom 18. Juni 1914 / 27. Juni 1919"
+        },
+        {
+          "year": 1925,
+          "contests": 3,
+          "source": "bfs-votes-xlsx",
+          "quote": "24.05.1925\t99\tVolksinitiative «für eine Invaliditäts-, Alters- und Hinterlassenenversicherung» (AHV)"
+        },
+        {
+          "year": 1926,
+          "contests": 1,
+          "source": "bfs-votes-xlsx",
+          "quote": "05.12.1926\t102\tBundesbeschluss über die Aufnahme eines neuen Artikels 23bis in die Bundesverfassung betreffend die Getreideversorgung des Landes"
+        },
+        {
+          "year": 1927,
+          "contests": 2,
+          "source": "bfs-votes-xlsx",
+          "quote": "15.05.1927\t103\tBundesbeschluss betreffend die Abänderung des Artikels 30 der Bundesverfassung"
+        },
+        {
+          "year": 1928,
+          "contests": 2,
+          "source": "bfs-votes-xlsx",
+          "quote": "20.05.1928\t105\tBundesbeschluss betreffend Revision des Art. 44 der Bundesverfassung (Massnahmen gegen die Ueberfremdung)"
+        },
+        {
+          "year": 1929,
+          "contests": 5,
+          "source": "bfs-votes-xlsx",
+          "quote": "03.03.1929\t107.10000000000001\tVolksinitiative «Getreideversorgung»"
+        },
+        {
+          "year": 1930,
+          "contests": 1,
+          "source": "bfs-votes-xlsx",
+          "quote": "06.04.1930\t111\tBundesbeschluss betreffend die Revision der Art. 31 und 32bis der Bundesverfassung und die Aufnahme eines neuen Art. 32quater (Alkoholwesen)"
+        },
+        {
+          "year": 1931,
+          "contests": 5,
+          "source": "bfs-votes-xlsx",
+          "quote": "08.02.1931\t112\tBundesbeschluss über das Volksbegehren um Revision des Artikels 12 der Bundesverfassung (Ordensverbot)"
+        },
+        {
+          "year": 1933,
+          "contests": 1,
+          "source": "bfs-votes-xlsx",
+          "quote": "28.05.1933\t117\tBundesgesetz über die vorübergehende Herabsetzung der Besoldungen, Gehälter und Löhne der im Dienste des Bundes stehenden Personen"
+        },
+        {
+          "year": 1934,
+          "contests": 1,
+          "source": "bfs-votes-xlsx",
+          "quote": "11.03.1934\t118\tBundesgesetz über den Schutz der öffentlichen Ordnung"
+        },
+        {
+          "year": 1935,
+          "contests": 4,
+          "source": "bfs-votes-xlsx",
+          "quote": "24.02.1935\t119\tBundesgesetz über die Abänderung des Bundesgesetzes vom 12. April 1907 betreffend die Militärorganisation (Neuordnung der Ausbildung)"
+        },
+        {
+          "year": 1937,
+          "contests": 1,
+          "source": "bfs-votes-xlsx",
+          "quote": "28.11.1937\t123\tVolksinitiative «für ein Verbot der Freimaurerei»"
+        },
+        {
+          "year": 1938,
+          "contests": 6,
+          "source": "bfs-votes-xlsx",
+          "quote": "20.02.1938\t124\tBundesbeschluss über die Revision der Art. 107 und 116 der Bundesverfassung (Anerkennung des Rätoromanischen als Nationalsprache)"
+        },
+        {
+          "year": 1939,
+          "contests": 4,
+          "source": "bfs-votes-xlsx",
+          "quote": "22.01.1939\t129\tVolksinitiative «zur Wahrung der verfassungsmässigen Rechte der Bürger» (Erweiterung der Verfassungsgerichtsbarkeit)"
+        },
+        {
+          "year": 1940,
+          "contests": 1,
+          "source": "bfs-votes-xlsx",
+          "quote": "01.12.1940\t133\tBundesgesetz über die Abänderung der Art. 103 und 104 des Bundesgesetzes vom 12. April 1907 betreffend die Militärorganisation (Einführung des obligatorischen militärischen Vorunterrichts)"
+        },
+        {
+          "year": 1941,
+          "contests": 1,
+          "source": "bfs-votes-xlsx",
+          "quote": "09.03.1941\t134\tVolksinitiative «zur Neuordnung des Alkoholwesens»"
+        },
+        {
+          "year": 1942,
+          "contests": 2,
+          "source": "bfs-votes-xlsx",
+          "quote": "25.01.1942\t135\tVolksinitiative «für die Wahl des Bundesrates durch das Volk und die Erhöhung der Mitgliederzahl»"
+        },
+        {
+          "year": 1944,
+          "contests": 1,
+          "source": "bfs-votes-xlsx",
+          "quote": "29.10.1944\t137\tBundesgesetz über den unlauteren Wettbewerb"
+        },
+        {
+          "year": 1945,
+          "contests": 2,
+          "source": "bfs-votes-xlsx",
+          "quote": "21.01.1945\t138\tBundesgesetz über die Schweizerischen Bundesbahnen"
+        },
+        {
+          "year": 1946,
+          "contests": 2,
+          "source": "bfs-votes-xlsx",
+          "quote": "10.02.1946\t140\tBundesbeschluss über das Volksbegehren betreffend eine Gütertransportordnung"
+        },
+        {
+          "year": 1947,
+          "contests": 3,
+          "source": "bfs-votes-xlsx",
+          "quote": "18.05.1947\t142\tVolksinitiative «Wirtschaftsreform und Rechte der Arbeit»"
+        },
+        {
+          "year": 1948,
+          "contests": 1,
+          "source": "bfs-votes-xlsx",
+          "quote": "14.03.1948\t145\tBundesbeschluss über die Ordnung der schweizerischen Zuckerwirtschaft"
+        },
+        {
+          "year": 1949,
+          "contests": 4,
+          "source": "bfs-votes-xlsx",
+          "quote": "22.05.1949\t146\tBundesbeschluss über die Revision von Artikel 39 der Bundesverfassung betreffend die Schweizerische Nationalbank"
+        },
+        {
+          "year": 1950,
+          "contests": 5,
+          "source": "bfs-votes-xlsx",
+          "quote": "29.01.1950\t150\tBundesbeschluss betreffend die Verlängerung der Geltungsdauer und die Abänderung des Bundesbeschlusses über Massnahmen zur Förderung der Wohnbautätigkeit"
+        },
+        {
+          "year": 1951,
+          "contests": 4,
+          "source": "bfs-votes-xlsx",
+          "quote": "25.02.1951\t155\tBundesbeschluss über den Transport von Personen und Sachen mit Motorfahrzeugen auf öffentlichen Strassen (Autotransportordnung)"
+        },
+        {
+          "year": 1952,
+          "contests": 9,
+          "source": "bfs-votes-xlsx",
+          "quote": "02.03.1952\t158\tBundesbeschluss betreffend Verlängerung der Geltungsdauer des Bundesbeschlusses über die Bewilligungspflicht für die Eröffnung und Erweiterung von Gasthöfen"
+        },
+        {
+          "year": 1953,
+          "contests": 3,
+          "source": "bfs-votes-xlsx",
+          "quote": "19.04.1953\t167\tBundesgesetz über die Revision des Bundesgesetzes betreffend den Postverkehr"
+        },
+        {
+          "year": 1954,
+          "contests": 4,
+          "source": "bfs-votes-xlsx",
+          "quote": "20.06.1954\t170\tBundesbeschluss über den Fähigkeitsausweis im Schuhmacher-, Coiffeur-, Sattler- und Wagnergewerbe"
+        },
+        {
+          "year": 1955,
+          "contests": 2,
+          "source": "bfs-votes-xlsx",
+          "quote": "13.03.1955\t174.1\tVolksinitiative «zum Schutz der Mieter und Konsumenten» (Weiterführung der Preiskontrolle)"
+        },
+        {
+          "year": 1956,
+          "contests": 5,
+          "source": "bfs-votes-xlsx",
+          "quote": "04.03.1956\t175\tBundesbeschluss über die befristete Weiterführung einer beschränkten Preiskontrolle (Verlängerung der Gültigkeitsdauer des Verfassungszusatzes vom 26. September 1952)"
+        },
+        {
+          "year": 1957,
+          "contests": 4,
+          "source": "bfs-votes-xlsx",
+          "quote": "03.03.1957\t180\tBundesbeschluss über die Ergänzung der Bundesverfassung durch einen Artikel 22bis über den Zivilschutz"
+        },
+        {
+          "year": 1958,
+          "contests": 7,
+          "source": "bfs-votes-xlsx",
+          "quote": "26.01.1958\t184\tVolksinitiative «gegen den Missbrauch wirtschaftlicher Macht»"
+        },
+        {
+          "year": 1959,
+          "contests": 2,
+          "source": "bfs-votes-xlsx",
+          "quote": "01.02.1959\t191\tBundesbeschluss über die Einführung des Frauenstimm- und -wahlrechts in eidgenössischen Angelegenheiten"
+        },
+        {
+          "year": 1960,
+          "contests": 2,
+          "source": "bfs-votes-xlsx",
+          "quote": "29.05.1960\t193\tBundesbeschluss über die Weiterführung befristeter Preiskontrollmassnahmen"
+        },
+        {
+          "year": 1961,
+          "contests": 4,
+          "source": "bfs-votes-xlsx",
+          "quote": "05.03.1961\t195\tBundesbeschluss über die Ergänzung der Bundesverfassung durch einen Artikel 26bis betreffend Rohrleitungsanlagen zur Beförderung flüssiger oder gasförmiger Brenn- oder Treibstoffe"
+        },
+        {
+          "year": 1962,
+          "contests": 4,
+          "source": "bfs-votes-xlsx",
+          "quote": "01.04.1962\t199\tVolksinitiative «für ein Verbot der Atomwaffen»"
+        },
+        {
+          "year": 1963,
+          "contests": 3,
+          "source": "bfs-votes-xlsx",
+          "quote": "26.05.1963\t203\tVolksinitiative «Entscheidungsrecht des Volkes über die Ausrüstung der schweizerischen Armee mit Atomwaffen»"
+        },
+        {
+          "year": 1964,
+          "contests": 3,
+          "source": "bfs-votes-xlsx",
+          "quote": "02.02.1964\t206\tBundesbeschluss über den Erlass einer allgemeinen Steueramnestie auf den 1. Januar 1965"
+        },
+        {
+          "year": 1965,
+          "contests": 3,
+          "source": "bfs-votes-xlsx",
+          "quote": "28.02.1965\t209\tBundesbeschluss über die Bekämpfung der Teuerung durch Massnahmen auf dem Gebiete des Geld- und Kapitalmarktes und des Kreditwesens"
+        },
+        {
+          "year": 1966,
+          "contests": 2,
+          "source": "bfs-votes-xlsx",
+          "quote": "16.10.1966\t212\tBundesbeschluss über die Ergänzung der Bundesverfasssung durch einen Artikel 45bis über die Auslandschweizer"
+        },
+        {
+          "year": 1967,
+          "contests": 1,
+          "source": "bfs-votes-xlsx",
+          "quote": "02.07.1967\t214\tVolksinitiative «gegen die Bodenspekulation»"
+        },
+        {
+          "year": 1968,
+          "contests": 2,
+          "source": "bfs-votes-xlsx",
+          "quote": "18.02.1968\t215\tBundesbeschluss über den Erlass einer allgemeinen Steueramnestie"
+        },
+        {
+          "year": 1969,
+          "contests": 2,
+          "source": "bfs-votes-xlsx",
+          "quote": "01.06.1969\t217\tBundesgesetz über die Eidgenössischen Technischen Hochschulen"
+        },
+        {
+          "year": 1970,
+          "contests": 5,
+          "source": "bfs-votes-xlsx",
+          "quote": "01.02.1970\t219\tBundesbeschluss über die inländische Zuckerwirtschaft"
+        },
+        {
+          "year": 1971,
+          "contests": 3,
+          "source": "bfs-votes-xlsx",
+          "quote": "07.02.1971\t224\tBundesbeschluss über die Einführung des Frauenstimm- und Wahlrechts in eidgenössischen Angelegenheiten"
+        },
+        {
+          "year": 1972,
+          "contests": 9,
+          "source": "bfs-votes-xlsx",
+          "quote": "05.03.1972\t227.1\tVolksinitiative «zur Förderung des Wohnungsbaues»"
+        },
+        {
+          "year": 1973,
+          "contests": 8,
+          "source": "bfs-votes-xlsx",
+          "quote": "04.03.1973\t234\tBundesbeschluss über die Änderung der Bundesverfassung betreffend das Bildungswesen"
+        },
+        {
+          "year": 1974,
+          "contests": 5,
+          "source": "bfs-votes-xlsx",
+          "quote": "20.10.1974\t242\tVolksinitiative «gegen die Ueberfremdung und Ueberbevölkerung der Schweiz»"
+        },
+        {
+          "year": 1975,
+          "contests": 9,
+          "source": "bfs-votes-xlsx",
+          "quote": "02.03.1975\t246\tBundesbeschluss über den Konjunkturartikel der Bundesverfassung"
+        },
+        {
+          "year": 1976,
+          "contests": 11,
+          "source": "bfs-votes-xlsx",
+          "quote": "21.03.1976\t255.1\tVolksinitiative «für die Mitbestimmung der Arbeitnehmer»"
+        },
+        {
+          "year": 1977,
+          "contests": 16,
+          "source": "bfs-votes-xlsx",
+          "quote": "13.03.1977\t265\tVolksinitiative «IV. Ueberfremdungsinitiative»"
+        },
+        {
+          "year": 1978,
+          "contests": 14,
+          "source": "bfs-votes-xlsx",
+          "quote": "26.02.1978\t279\tVolksinitiative «für die vermehrte Mitbestimmung der Bundesversammlung und des Schweizervolkes im Nationalstrassenbau»"
+        },
+        {
+          "year": 1979,
+          "contests": 6,
+          "source": "bfs-votes-xlsx",
+          "quote": "18.02.1979\t293\tBundesbeschluss über das Stimm- und Wahlrecht für 18jährige"
+        },
+        {
+          "year": 1980,
+          "contests": 6,
+          "source": "bfs-votes-xlsx",
+          "quote": "02.03.1980\t299\tVolksinitiative «betreffend die vollständige Trennung von Kirche und Staat»"
+        },
+        {
+          "year": 1981,
+          "contests": 4,
+          "source": "bfs-votes-xlsx",
+          "quote": "05.04.1981\t305\tVolksinitiative «Mitenand-Initiative für eine neue Ausländerpolitik»"
+        },
+        {
+          "year": 1982,
+          "contests": 4,
+          "source": "bfs-votes-xlsx",
+          "quote": "06.06.1982\t309\tSchweizerisches Strafgesetzbuch (Gewaltverbrechen)"
+        },
+        {
+          "year": 1983,
+          "contests": 4,
+          "source": "bfs-votes-xlsx",
+          "quote": "27.02.1983\t312\tBundesbeschluss über die Neuregelung bei den Treibstoffzöllen"
+        },
+        {
+          "year": 1984,
+          "contests": 10,
+          "source": "bfs-votes-xlsx",
+          "quote": "26.02.1984\t316\tBundesbeschluss über die Erhebung einer Schwerverkehrsabgabe"
+        },
+        {
+          "year": 1985,
+          "contests": 12,
+          "source": "bfs-votes-xlsx",
+          "quote": "10.03.1985\t326\tBundesbeschluss über die Aufhebung der Beiträge für den Primarschulunterricht"
+        },
+        {
+          "year": 1986,
+          "contests": 7,
+          "source": "bfs-votes-xlsx",
+          "quote": "16.03.1986\t338\tBundesbeschluss über den Beitritt der Schweiz zur Organisation der Vereinten Nationen"
+        },
+        {
+          "year": 1987,
+          "contests": 7,
+          "source": "bfs-votes-xlsx",
+          "quote": "05.04.1987\t344\tAsylgesetz"
+        },
+        {
+          "year": 1988,
+          "contests": 5,
+          "source": "bfs-votes-xlsx",
+          "quote": "12.06.1988\t351\tBundesbeschluss über die Verfassungsgrundlagen für eine koordinierte Verkehrspolitik"
+        },
+        {
+          "year": 1989,
+          "contests": 3,
+          "source": "bfs-votes-xlsx",
+          "quote": "04.06.1989\t356\tVolksinitiative «für ein naturnahes Bauern - gegen Tierfabriken (Kleinbauern-Initiative)»"
+        },
+        {
+          "year": 1990,
+          "contests": 10,
+          "source": "bfs-votes-xlsx",
+          "quote": "01.04.1990\t359\tVolksinitiative «Stopp dem Beton - für eine Begrenzung des Strassenbaus!»"
+        },
+        {
+          "year": 1991,
+          "contests": 4,
+          "source": "bfs-votes-xlsx",
+          "quote": "03.03.1991\t369\tBundesbeschluss über die Herabsetzung des Stimm- und Wahlrechtsalters auf 18 Jahre"
+        },
+        {
+          "year": 1992,
+          "contests": 16,
+          "source": "bfs-votes-xlsx",
+          "quote": "16.02.1992\t373\tVolksinitiative «für eine finanziell tragbare Krankenversicherung (Krankenkasseninitiative)»"
+        },
+        {
+          "year": 1993,
+          "contests": 16,
+          "source": "bfs-votes-xlsx",
+          "quote": "07.03.1993\t389\tBundesgesetz über die Erhöhung des Treibstoffzolles"
+        },
+        {
+          "year": 1994,
+          "contests": 13,
+          "source": "bfs-votes-xlsx",
+          "quote": "20.02.1994\t405\tBundesbeschluss über die Weiterführung der Nationalstrassenabgabe"
+        },
+        {
+          "year": 1995,
+          "contests": 7,
+          "source": "bfs-votes-xlsx",
+          "quote": "12.03.1995\t418\tGegenentwurf der Bundesversammlung zur Volksinitiative «für eine umweltgerechte und leistungsfähige bäuerliche Landwirtschaft»"
+        },
+        {
+          "year": 1996,
+          "contests": 9,
+          "source": "bfs-votes-xlsx",
+          "quote": "10.03.1996\t425\tBundesbeschluss über die Revision des Sprachenartikels in der Bundesverfassung (Art. 116 BV)"
+        },
+        {
+          "year": 1997,
+          "contests": 5,
+          "source": "bfs-votes-xlsx",
+          "quote": "08.06.1997\t434\tVolksinitiative «EU-Beitrittsverhandlungen vors Volk!»"
+        },
+        {
+          "year": 1998,
+          "contests": 10,
+          "source": "bfs-votes-xlsx",
+          "quote": "07.06.1998\t439\tBundesbeschluss über Massnahmen zum Haushaltausgleich"
+        },
+        {
+          "year": 1999,
+          "contests": 10,
+          "source": "bfs-votes-xlsx",
+          "quote": "07.02.1999\t449\tBundesbeschluss über die Änderung der Voraussetzung für die Wählbarkeit in den Bundesrat"
+        },
+        {
+          "year": 2000,
+          "contests": 16,
+          "source": "bfs-votes-xlsx",
+          "quote": "12.03.2000\t459\tBundesbeschluss über die Justizreform"
+        },
+        {
+          "year": 2001,
+          "contests": 11,
+          "source": "bfs-votes-xlsx",
+          "quote": "04.03.2001\t474\tVolksinitiative «Ja zu Europa!»"
+        },
+        {
+          "year": 2002,
+          "contests": 9,
+          "source": "bfs-votes-xlsx",
+          "quote": "03.03.2002\t485\tVolksinitiative «für den Beitritt der Schweiz zur Organisation der Vereinten Nationen (UNO)»"
+        },
+        {
+          "year": 2003,
+          "contests": 11,
+          "source": "bfs-votes-xlsx",
+          "quote": "09.02.2003\t493\tBundesbeschluss über die Änderung der Volksrechte"
+        },
+        {
+          "year": 2004,
+          "contests": 13,
+          "source": "bfs-votes-xlsx",
+          "quote": "08.02.2004\t504\tGegenentwurf zur Volksinitiative «Avanti – für sichere und leistungsfähige Autobahnen»"
+        },
+        {
+          "year": 2005,
+          "contests": 5,
+          "source": "bfs-votes-xlsx",
+          "quote": "05.06.2005\t517\tBundesbeschluss über die Genehmigung und die Umsetzung der bilateralen Abkommen zwischen der Schweiz und der EU über die Assoziierung an Schengen und Dublin"
+        },
+        {
+          "year": 2006,
+          "contests": 6,
+          "source": "bfs-votes-xlsx",
+          "quote": "21.05.2006\t522\tBundesbeschluss über die Neuordnung der Verfassungsbestimmungen zur Bildung"
+        },
+        {
+          "year": 2007,
+          "contests": 2,
+          "source": "bfs-votes-xlsx",
+          "quote": "11.03.2007\t528\tVolksinitiative «Für eine soziale Einheitskrankenkasse»"
+        },
+        {
+          "year": 2008,
+          "contests": 10,
+          "source": "bfs-votes-xlsx",
+          "quote": "24.02.2008\t530\tVolksinitiative «Gegen Kampfjetlärm in Tourismusgebieten»"
+        },
+        {
+          "year": 2009,
+          "contests": 8,
+          "source": "bfs-votes-xlsx",
+          "quote": "08.02.2009\t540\tBundesbeschluss über die Genehmigung der Weiterführung des Freizügigkeitsabkommens zwischen der Schweiz und der Europäischen Gemeinschaft sowie über die Genehmigung des Protokolls über die Ausdehnung des Abkommens auf Bulgarien und Rumänien"
+        },
+        {
+          "year": 2010,
+          "contests": 7,
+          "source": "bfs-votes-xlsx",
+          "quote": "07.03.2010\t548\tVerfassungsartikel über die Forschung am Menschen"
+        },
+        {
+          "year": 2011,
+          "contests": 1,
+          "source": "bfs-votes-xlsx",
+          "quote": "13.02.2011\t554\tVolksinitiative «Für den Schutz vor Waffengewalt»"
+        },
+        {
+          "year": 2012,
+          "contests": 12,
+          "source": "bfs-votes-xlsx",
+          "quote": "11.03.2012\t555\tVolksinitiative «Schluss mit uferlosem Bau von Zweitwohnungen!»"
+        },
+        {
+          "year": 2013,
+          "contests": 11,
+          "source": "bfs-votes-xlsx",
+          "quote": "03.03.2013\t567 5)\tBundesbeschluss über die Familienpolitik"
+        },
+        {
+          "year": 2014,
+          "contests": 12,
+          "source": "bfs-votes-xlsx",
+          "quote": "09.02.2014\t578\tBundesbeschluss über die Finanzierung und den Ausbau der Eisenbahninfrastruktur (direkter Gegenentwurf zur zurückgezogenen Volksinitiative «Für den öffentlichen Verkehr»)"
+        },
+        {
+          "year": 2015,
+          "contests": 6,
+          "source": "bfs-votes-xlsx",
+          "quote": "08.03.2015\t590\tVolksinitiative «Familien stärken! Steuerfreie Kinder- und Ausbildungszulagen»"
+        },
+        {
+          "year": 2016,
+          "contests": 13,
+          "source": "bfs-votes-xlsx",
+          "quote": "28.02.2016\t596 7)\tVolksinitiative «Für Ehe und Familie – gegen die Heiratsstrafe»"
+        },
+        {
+          "year": 2017,
+          "contests": 7,
+          "source": "bfs-votes-xlsx",
+          "quote": "12.02.2017\t609\tBundesbeschluss über die erleichterte Einbürgerung von Personen der dritten Ausländergeneration"
+        },
+        {
+          "year": 2018,
+          "contests": 10,
+          "source": "bfs-votes-xlsx",
+          "quote": "04.03.2018\t616\tBundesbeschluss über die neue Finanzordnung 2021"
+        },
+        {
+          "year": 2019,
+          "contests": 3,
+          "source": "bfs-votes-xlsx",
+          "quote": "10.02.2019\t626\tVolksinitiative «Zersiedelung stoppen – für eine nachhaltige Siedlungsentwicklung (Zersiedelungsinitiative)»"
+        },
+        {
+          "year": 2020,
+          "contests": 9,
+          "source": "bfs-votes-xlsx",
+          "quote": "09.02.2020\t629\tVolksinitiative «Mehr bezahlbare Wohnungen»"
+        },
+        {
+          "year": 2021,
+          "contests": 13,
+          "source": "bfs-votes-xlsx",
+          "quote": "07.03.2021\t638\tVolksinitiative «Ja zum Verhüllungsverbot»"
+        },
+        {
+          "year": 2022,
+          "contests": 11,
+          "source": "bfs-votes-xlsx",
+          "quote": "13.02.2022\t651\tVolksinitiative «Ja zum Tier- und Menschenversuchsverbot – Ja zu Forschungswegen mit Impulsen für Sicherheit und Fortschritt»"
+        },
+        {
+          "year": 2023,
+          "contests": 3,
+          "source": "bfs-votes-xlsx",
+          "quote": "18.06.2023\t662\tBundesbeschluss über eine besondere Besteuerung grosser Unternehmensgruppen (Umsetzung des OECD/G20-Projekts zur Besteuerung grosser Unternehmensgruppen)"
+        },
+        {
+          "year": 2024,
+          "contests": 12,
+          "source": "bfs-votes-xlsx",
+          "quote": "03.03.2024\t665\tVolksinitiative «Für ein besseres Leben im Alter (Initiative für eine 13. AHV-Rente)»"
+        },
+        {
+          "year": 2025,
+          "contests": 5,
+          "source": "bfs-votes-xlsx",
+          "quote": "09.02.2025\t677\tVolksinitiative «Für eine verantwortungsvolle Wirtschaft innerhalb der planetaren Grenzen (Umweltverantwortungsinitiative)»"
+        },
+        {
+          "year": 2026,
+          "contests": 9,
+          "source": "bfs-votes-xlsx",
+          "quote": "08.03.2026\t682.1\tVolksinitiative «Ja zu einer unabhängigen, freien Schweizer Währung mit Münzen oder Banknoten (Bargeld ist Freiheit)»"
         }
       ],
-      "elections": []
+      "note": "Counter-proposals count as their own votes, as in the Federal Statistical Office's table (706 rows to 2026)."
     }
   ]
 }

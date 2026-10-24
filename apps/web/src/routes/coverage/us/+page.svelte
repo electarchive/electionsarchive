@@ -10,7 +10,7 @@
   import { getLocale } from "#lib/paraglide/runtime.js";
   import { cn } from "#lib/utils.js";
   import type { PageData } from "./$types";
-  import type { Counts, Goal, Reason } from "#lib/coverage.js";
+  import type { Counts, Reason, UsGoal } from "#lib/coverage.js";
   import Bar from "#routes/coverage/bar.svelte";
   import Gaps from "#routes/coverage/gaps.svelte";
   import { GOALS, label, PARTS, REASONS } from "#lib/coverage.js";
@@ -18,7 +18,7 @@
 
   const { data }: { data: PageData } = $props();
 
-  const TITLES: Record<Goal, () => string> = {
+  const TITLES: Record<UsGoal, () => string> = {
     county: m.coverage_goal_county,
     history: m.coverage_goal_history,
     turnout: m.coverage_goal_turnout,
@@ -27,7 +27,7 @@
     shapes_history: m.coverage_goal_shapes_history,
     local: m.coverage_goal_local,
   };
-  const TABS: Record<Goal, () => string> = {
+  const TABS: Record<UsGoal, () => string> = {
     county: m.coverage_goal_tab_county,
     history: m.coverage_goal_tab_history,
     turnout: m.coverage_goal_tab_turnout,
@@ -45,7 +45,7 @@
 
   const year = String(new Date().getFullYear());
 
-  let goal = $state<Goal>("county");
+  let goal = $state<UsGoal>("county");
   let order = $state<"gap" | "name">("gap");
   const lead = $derived(data.goals.find((row) => row.goal === "county"));
   const next = $derived(data.goals.filter((row) => row.goal !== "county"));
@@ -76,7 +76,7 @@
   <meta name="robots" content="noindex" />
 </svelte:head>
 
-{#snippet progress(row: { goal: Goal } & Counts, isLead: boolean)}
+{#snippet progress(row: { goal: UsGoal } & Counts, isLead: boolean)}
   {const held = $derived(row.total - row.absent)}
   <div class="grid gap-3">
     <p class="flex flex-wrap items-baseline gap-x-3 gap-y-1 tabular-nums">

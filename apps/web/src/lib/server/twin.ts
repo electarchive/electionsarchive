@@ -2,7 +2,16 @@ import type { RequestEvent } from "@sveltejs/kit";
 import { call } from "@orpc/server";
 import { error, isHttpError, isRedirect, redirect } from "@sveltejs/kit";
 import { effective, stand } from "#lib/caucus.js";
-import { isGoal, PARTS, label as reasonLabel, REASONS } from "#lib/coverage.js";
+import {
+  COUNTRY_GOALS,
+  isCountryGoal,
+  isGoal,
+  levelLabel,
+  PARTS,
+  label as reasonLabel,
+  REASONS,
+  spans,
+} from "#lib/coverage.js";
 import { count, date, definite, percent, plural, points } from "#lib/format.js";
 import { isDerived, VACANCIES } from "#lib/outcomes.js";
 import { m } from "#lib/paraglide/messages.js";
@@ -13,6 +22,7 @@ import {
   chamber,
   comparison,
   coverage,
+  coverageOverview,
   home,
   party,
   person,
@@ -181,10 +191,13 @@ async function load(segments: Array<string>, search: URLSearchParams) {
   if (head === "chambers" && rest.length > 0) {
     return chamber(rest.join("/"));
   }
-  if (head === "coverage" && rest.length === 1 && rest[0] === "us") {
-    return coverage("us", search);
+  if (head === "coverage" && rest.length === 1) {
+    return coverage(rest[0] ?? "", search);
   }
   switch (rest.length === 0 ? head : "") {
+    case "coverage": {
+      return coverageOverview(search);
+    }
     case "compare": {
       return comparison(
         [search.get("a"), search.get("b")].filter((id) => id != null),
@@ -341,7 +354,12 @@ function markdown(data: Data, link: Link) {
       return homeMarkdown(data, link);
     }
     case "coverage": {
-      return coverageMarkdown(data, link);
+      return data.polity === "us"
+        ? coverageMarkdown(data, link)
+        : countryMarkdown(data, link);
+    }
+    case "coverage_overview": {
+      return overviewMarkdown(data, link);
     }
     case "person": {
       return personMarkdown(data.person, data.parties, link);
@@ -376,15 +394,16 @@ function markdown(data: Data, link: Link) {
   }
 }
 
+const share = (row: { complete: number; total: number }) =>
+  m.coverage_percent({
+    percent: percent(row.complete / Math.max(1, row.total), 1),
+  });
+
 function coverageMarkdown(
   data: Extract<Data, { kind: "coverage" }>,
   link: Link,
 ) {
   const year = String(new Date().getFullYear());
-  const share = (row: { complete: number; total: number }) =>
-    m.coverage_percent({
-      percent: percent(row.complete / Math.max(1, row.total), 1),
-    });
   return [
     `# ${m.coverage_title()}`,
     m.coverage_lede(),
@@ -440,6 +459,210 @@ function coverageMarkdown(
         share(row),
       ]),
     ),
+  ];
+}
+
+function countryMarkdown(
+  data: Extract<Data, { kind: "coverage" }>,
+  link: Link,
+) {
+  const year = String(new Date().getFullYear());
+  const { summary } = data;
+  const titles = {
+    national: m.coverage_country_goal_national,
+    fine: m.coverage_country_goal_fine,
+    shapes: m.coverage_country_goal_shapes,
+    subnational: m.coverage_country_goal_subnational,
+    local: m.coverage_country_goal_local,
+    referendums: m.coverage_country_goal_referendums,
+    ep: m.coverage_country_goal_ep,
+  };
+  const rows = data.goals.flatMap((row) =>
+    isCountryGoal(row.goal) ? [{ ...row, goal: row.goal }] : [],
+  );
+  return [
+    `# ${m.coverage_country_title({ name: summary.name })}`,
+    m.coverage_country_lede(),
+    ...(summary.first == null || summary.last == null
+      ? []
+      : [
+          [
+            m.coverage_country_facts({
+              elections: count(summary.elections),
+              contests: count(summary.contests),
+              first: String(summary.first),
+              last: String(summary.last),
+            }),
+            ...(summary.finestNoun == null
+              ? []
+              : [m.coverage_country_finest({ noun: summary.finestNoun })]),
+          ].join(" "),
+        ]),
+    (data.current ? m.twin_coverage_current_on : m.twin_coverage_current)({
+      year,
+    }),
+    ...COUNTRY_GOALS.flatMap((goal) => {
+      const row = rows.find((found) => found.goal === goal);
+      const levels = summary.levels.filter((level) =>
+        goal === "fine"
+          ? level.fine
+          : goal === "shapes"
+            ? level.goal === "national" && level.unit === "district"
+            : level.goal === goal,
+      );
+      if (row == null && levels.length === 0) {
+        return [];
+      }
+      return [
+        `## ${goal === "national" ? `${m.coverage_goal_now()}: ` : ""}${titles[goal]()}`,
+        row == null
+          ? m.coverage_country_none()
+          : [
+              `${m.coverage_progress({ complete: count(row.complete), total: count(row.total) })}, ${share(row)}`,
+              REASONS[goal]
+                .filter((reason) => reason === "complete" || row[reason] > 0)
+                .map(
+                  (reason) =>
+                    `- ${reasonLabel(goal, reason, data.polity)}: ${count(row[reason])}`,
+                )
+                .join("\n"),
+            ].join("\n\n"),
+        `### ${m.coverage_ledger()}`,
+        levels
+          .map((level) => {
+            const notes = summary.notes.filter(
+              (note) =>
+                note.level === level.key &&
+                (note.goal === level.goal || note.goal === goal),
+            );
+            const gaps = notes.filter(
+              (note) => note.from != null && note.listed !== false,
+            );
+            const counted = spans(
+              data.counted.find((found) => found.level === level.key)?.years ??
+                [],
+              gaps.flatMap((note) => (note.from == null ? [] : [note.from])),
+            );
+            const unlisted = notes.filter(
+              (note) => note.listed === false && note.from != null,
+            );
+            return [
+              `- ${levelLabel(data.polity, level.key)}: ${counted === "" ? m.coverage_ledger_nothing() : `${m.coverage_ledger_counted()} ${counted}`}`,
+              ...gaps.map(
+                (note) =>
+                  `  - ${m.coverage_ledger_uncounted()} ${note.from === note.to ? note.from : `${note.from}–${note.to}`}. ${note.note}${(note.held ?? 0) > 0 ? ` ${m.coverage_ledger_held({ count: count(note.held ?? 0) })}` : ""}`,
+              ),
+              ...notes
+                .filter((note) => note.from == null)
+                .map((note) => `  - ${note.note}`),
+              ...(unlisted.length === 0
+                ? []
+                : [
+                    `  - ${m.coverage_ledger_unlisted({ years: unlisted.map((note) => `${note.from} (${count(note.held ?? 0)})`).join(", ") })}`,
+                  ]),
+            ].join("\n");
+          })
+          .join("\n"),
+      ];
+    }),
+    ...(data.gaps.length === 0
+      ? []
+      : [
+          `## ${m.coverage_where()}`,
+          titles.national(),
+          table(
+            [
+              (data.isFlat
+                ? m.coverage_column_name_flat
+                : m.coverage_column_name_country)(),
+              m.coverage_column_short(),
+              m.coverage_column_done(),
+            ],
+            data.gaps.map((row) => [
+              data.isFlat
+                ? levelLabel(data.polity, row.key)
+                : (row.label ??
+                  (row.key === "" ? m.coverage_region_none() : row.key)),
+              count(row.total - row.complete),
+              share(row),
+            ]),
+          ),
+        ]),
+    ...(Object.keys(summary.sources).length === 0
+      ? []
+      : [
+          `## ${m.coverage_sources()}`,
+          Object.values(summary.sources)
+            .map(
+              (source) =>
+                `- [${source.title}](${source.url})${source.publisher == null ? "" : `, ${source.publisher}`}`,
+            )
+            .join("\n"),
+        ]),
+    link(m.coverage_country_back(), "coverage"),
+  ];
+}
+
+function overviewMarkdown(
+  data: Extract<Data, { kind: "coverage_overview" }>,
+  link: Link,
+) {
+  const year = String(new Date().getFullYear());
+  return [
+    `# ${m.coverage_overview_title()}`,
+    m.coverage_overview_lede(),
+    ...(data.totals.first == null || data.totals.last == null
+      ? []
+      : [
+          m.coverage_overview_totals({
+            elections: count(data.totals.elections),
+            contests: count(data.totals.contests),
+            first: String(data.totals.first),
+            last: String(data.totals.last),
+          }),
+        ]),
+    (data.current ? m.twin_coverage_current_on : m.twin_coverage_current)({
+      year,
+    }),
+    table(
+      [
+        m.coverage_overview_column_country(),
+        m.coverage_overview_column_goal(),
+        m.coverage_overview_column_span(),
+        m.coverage_overview_column_finest(),
+        m.coverage_overview_column_shapes(),
+      ],
+      data.polities.map((polity) => {
+        const lead = polity.goals.find(
+          (row) =>
+            row.goal === (polity.polity === "us" ? "county" : "national"),
+        );
+        const shapes = polity.goals.find((row) => row.goal === "shapes");
+        return [
+          link(polity.name, `coverage/${polity.polity}`),
+          lead == null
+            ? m.coverage_overview_none()
+            : `${(polity.polity === "us" ? m.coverage_overview_goal_us : m.coverage_overview_goal_national)()}: ${m.coverage_progress({ complete: count(lead.complete), total: count(lead.total) })}, ${percent(lead.complete / Math.max(1, lead.total), 1)}`,
+          polity.first == null || polity.last == null
+            ? ""
+            : `${polity.first}–${polity.last}`,
+          polity.finestNoun ?? "",
+          shapes == null
+            ? m.coverage_overview_shapes_none()
+            : m.coverage_overview_shapes({
+                percent: percent(
+                  shapes.complete / Math.max(1, shapes.total),
+                  1,
+                ),
+              }),
+        ];
+      }),
+    ),
+    `## ${m.coverage_overview_explain()}`,
+    m.coverage_overview_explain_count(),
+    m.coverage_overview_explain_goal(),
+    m.coverage_overview_explain_gaps(),
+    m.coverage_overview_explain_shapes(),
   ];
 }
 
@@ -2047,7 +2270,8 @@ function contestMarkdown(
     ...contest.notes.map((note) => `> ${note.body}`),
     ...compared,
     ...held,
-    ...(handover?.vacated == null
+    ...(handover?.vacated == null ||
+    contest.notes.some((note) => note.body.startsWith("By-election held"))
       ? []
       : [
           (VACANCIES[handover.vacated.via ?? ""] ?? m.byes_reason_none)({

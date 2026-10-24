@@ -195,20 +195,33 @@ export async function coverage(polity: string, search: URLSearchParams) {
   if (!/^[a-z]{2}$/.test(polity)) {
     error(404);
   }
-  const [goals, gaps] = await Promise.all([
-    found(call(router.coverage.goals, { polity, current: isCurrent })),
-    call(router.coverage.gaps, {
-      polity,
-      goal: polity === "us" ? "county" : "national",
-      current: isCurrent,
-    }),
-  ]);
+  const goals = await found(
+    call(router.coverage.goals, { polity, current: isCurrent }),
+  );
+  const isFlat =
+    polity !== "us" && Object.keys(goals.summary.regions).length === 0;
+  const gaps = await call(router.coverage.gaps, {
+    polity,
+    goal: polity === "us" ? "county" : "national",
+    state: isFlat ? "" : undefined,
+    current: isCurrent,
+  });
   return {
     kind: "coverage" as const,
     polity,
     current: isCurrent,
+    isFlat,
     ...goals,
     gaps,
+  };
+}
+
+export async function coverageOverview(search: URLSearchParams) {
+  const isCurrent = search.get("current") === "1";
+  return {
+    kind: "coverage_overview" as const,
+    current: isCurrent,
+    ...(await call(router.coverage.overview, { current: isCurrent })),
   };
 }
 

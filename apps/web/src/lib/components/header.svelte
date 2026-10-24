@@ -68,7 +68,7 @@
         <span class="max-sm:sr-only">{m.versus_action()}</span>
       </a>
       <a
-        href={resolve("/coverage/us")}
+        href={resolve("/coverage")}
         class={cn(buttonVariants({ variant: "ghost" }), "max-sm:px-2")}
         aria-current={page.url.pathname === "/coverage" ||
         page.url.pathname.startsWith("/coverage/")

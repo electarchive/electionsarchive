@@ -1,7 +1,30 @@
 {
   "polity": "BR",
   "name": "Brazil",
-  "sources": {},
+  "sources": {
+    "cf88": {
+      "title": "Constituição da República Federativa do Brasil de 1988",
+      "publisher": "Presidência da República (Planalto)",
+      "url": "https://www.planalto.gov.br/ccivil_03/constituicao/constituicao.htm"
+    },
+    "tse-vagas": {
+      "title": "Consulta vagas (seats by office and state for each election), 1994–2026",
+      "publisher": "Tribunal Superior Eleitoral, Portal de Dados Abertos",
+      "url": "https://dadosabertos.tse.jus.br/dataset/?q=vagas",
+      "note": "One file per election, https://cdn.tse.jus.br/estatistica/sead/odsele/consulta_vagas/consulta_vagas_{year}.zip; counted by distinct SG_UF per DS_CARGO, deduplicating the national file."
+    },
+    "tse-cand": {
+      "title": "Consulta candidatos (candidates and their result by round), 1994–2022",
+      "publisher": "Tribunal Superior Eleitoral, Portal de Dados Abertos",
+      "url": "https://dadosabertos.tse.jus.br/dataset/?q=candidatos",
+      "note": "consulta_cand_{year}.zip, BRASIL file, DS_CARGO Presidente: NR_TURNO and DS_SIT_TOT_TURNO."
+    },
+    "tse-detalhe-2006": {
+      "title": "Detalhe da apuração por município e zona, 2006",
+      "publisher": "Tribunal Superior Eleitoral, Portal de Dados Abertos",
+      "url": "https://cdn.tse.jus.br/estatistica/sead/odsele/detalhe_votacao_munzona/detalhe_votacao_munzona_2006.zip"
+    }
+  },
   "levels": [
     {
       "key": "president",
@@ -31,11 +54,60 @@
       "gaps": [
         {
           "from": 1945,
-          "to": 2022,
-          "note": "No official count is compiled yet."
+          "to": 1990,
+          "note": "Elections before 1994 aren't counted yet. Brazil had 27 voting units only from 1990 on, after Tocantins was created and Roraima and Amapá became states."
         }
       ],
-      "elections": []
+      "elections": [
+        {
+          "year": 1994,
+          "contests": 1,
+          "source": "tse-cand",
+          "quote": "consulta_cand_1994, DS_CARGO Presidente: only NR_TURNO 1, one candidate 'ELEITO'"
+        },
+        {
+          "year": 1998,
+          "contests": 1,
+          "source": "tse-cand",
+          "quote": "consulta_cand_1998, DS_CARGO Presidente: only NR_TURNO 1, one candidate 'ELEITO'"
+        },
+        {
+          "year": 2002,
+          "contests": 2,
+          "source": "tse-cand",
+          "quote": "consulta_cand_2002, DS_CARGO Presidente: two candidates '2º TURNO' in round 1, and NR_TURNO 2 rows with 'ELEITO' and 'NÃO ELEITO'"
+        },
+        {
+          "year": 2006,
+          "contests": 2,
+          "source": "tse-detalhe-2006",
+          "quote": "DS_CARGO Presidente, BRASIL file: NR_TURNO 1 on 01/10/2006 and NR_TURNO 2 on 29/10/2006"
+        },
+        {
+          "year": 2010,
+          "contests": 2,
+          "source": "tse-cand",
+          "quote": "consulta_cand_2010, DS_CARGO Presidente: two candidates '2º TURNO' in round 1, and NR_TURNO 2 rows with 'ELEITO' and 'NÃO ELEITO'"
+        },
+        {
+          "year": 2014,
+          "contests": 2,
+          "source": "tse-cand",
+          "quote": "consulta_cand_2014, DS_CARGO Presidente: two candidates '2º TURNO' in round 1, and NR_TURNO 2 rows with 'ELEITO' and 'NÃO ELEITO'"
+        },
+        {
+          "year": 2018,
+          "contests": 2,
+          "source": "tse-cand",
+          "quote": "consulta_cand_2018, DS_CARGO Presidente: two candidates '2º TURNO' in round 1, and NR_TURNO 2 rows with 'ELEITO' and 'NÃO ELEITO'"
+        },
+        {
+          "year": 2022,
+          "contests": 2,
+          "source": "tse-cand",
+          "quote": "consulta_cand_2022, DS_CARGO Presidente: two candidates '2º TURNO' in round 1, and NR_TURNO 2 rows with 'ELEITO' and 'NÃO ELEITO'"
+        }
+      ]
     },
     {
       "key": "camara",
@@ -63,11 +135,75 @@
       "gaps": [
         {
           "from": 1945,
-          "to": 2022,
-          "note": "No official count is compiled yet."
+          "to": 1990,
+          "note": "Elections before 1994 aren't counted yet. Brazil had 27 voting units only from 1990 on, after Tocantins was created and Roraima and Amapá became states."
         }
       ],
-      "elections": []
+      "elections": [
+        {
+          "date": "1994-10-03",
+          "contests": 27,
+          "source": "cf88",
+          "quote": "Art. 45. A Câmara dos Deputados compõe-se de representantes do povo, eleitos, pelo sistema proporcional, em cada Estado, em cada Território e no Distrito Federal.",
+          "note": "TSE's 1994 seat file has no Deputado Federal rows; its other offices list the same 27 units (26 states and the Distrito Federal)."
+        },
+        {
+          "date": "1998-10-04",
+          "contests": 27,
+          "source": "tse-vagas",
+          "seats": 513,
+          "quote": "consulta_vagas_1998: DS_CARGO Deputado Federal in 27 SG_UF, QT_VAGA summing to 513"
+        },
+        {
+          "date": "2002-10-06",
+          "contests": 27,
+          "source": "tse-vagas",
+          "seats": 513,
+          "quote": "consulta_vagas_2002: DS_CARGO Deputado Federal in 27 SG_UF, QT_VAGA summing to 513"
+        },
+        {
+          "date": "2006-10-01",
+          "contests": 27,
+          "source": "tse-vagas",
+          "seats": 513,
+          "quote": "consulta_vagas_2006: DS_CARGO Deputado Federal in 27 SG_UF, QT_VAGA summing to 513"
+        },
+        {
+          "date": "2010-10-03",
+          "contests": 27,
+          "source": "tse-vagas",
+          "seats": 513,
+          "quote": "consulta_vagas_2010: DS_CARGO Deputado Federal in 27 SG_UF, QT_VAGA summing to 513"
+        },
+        {
+          "date": "2014-10-05",
+          "contests": 27,
+          "source": "tse-vagas",
+          "seats": 513,
+          "quote": "consulta_vagas_2014: DS_CARGO Deputado Federal in 27 SG_UF, QT_VAGA summing to 513"
+        },
+        {
+          "date": "2018-10-07",
+          "contests": 27,
+          "source": "tse-vagas",
+          "seats": 513,
+          "quote": "consulta_vagas_2018: DS_CARGO Deputado Federal in 27 SG_UF, QT_VAGA summing to 513"
+        },
+        {
+          "date": "2022-10-02",
+          "contests": 27,
+          "source": "tse-vagas",
+          "seats": 513,
+          "quote": "consulta_vagas_2022: DS_CARGO Deputado Federal in 27 SG_UF, QT_VAGA summing to 513"
+        },
+        {
+          "date": "2026-10-04",
+          "contests": 27,
+          "source": "tse-vagas",
+          "seats": 513,
+          "quote": "consulta_vagas_2026: DS_CARGO Deputado Federal in 27 SG_UF, QT_VAGA summing to 513"
+        }
+      ]
     },
     {
       "key": "senado",
@@ -95,11 +231,75 @@
       "gaps": [
         {
           "from": 1945,
-          "to": 2022,
-          "note": "No official count is compiled yet."
+          "to": 1990,
+          "note": "Elections before 1994 aren't counted yet. Brazil had 27 voting units only from 1990 on, after Tocantins was created and Roraima and Amapá became states."
         }
       ],
-      "elections": []
+      "elections": [
+        {
+          "date": "1994-10-03",
+          "contests": 27,
+          "source": "tse-vagas",
+          "seats": 54,
+          "quote": "consulta_vagas_1994: DS_CARGO Senador in 27 SG_UF, QT_VAGA summing to 54"
+        },
+        {
+          "date": "1998-10-04",
+          "contests": 27,
+          "source": "tse-vagas",
+          "seats": 27,
+          "quote": "consulta_vagas_1998: DS_CARGO Senador in 27 SG_UF, QT_VAGA summing to 27"
+        },
+        {
+          "date": "2002-10-06",
+          "contests": 27,
+          "source": "tse-vagas",
+          "seats": 54,
+          "quote": "consulta_vagas_2002: DS_CARGO Senador in 27 SG_UF, QT_VAGA summing to 54"
+        },
+        {
+          "date": "2006-10-01",
+          "contests": 27,
+          "source": "tse-vagas",
+          "seats": 27,
+          "quote": "consulta_vagas_2006: DS_CARGO Senador in 27 SG_UF, QT_VAGA summing to 27"
+        },
+        {
+          "date": "2010-10-03",
+          "contests": 27,
+          "source": "tse-vagas",
+          "seats": 54,
+          "quote": "consulta_vagas_2010: DS_CARGO Senador in 27 SG_UF, QT_VAGA summing to 54"
+        },
+        {
+          "date": "2014-10-05",
+          "contests": 27,
+          "source": "tse-vagas",
+          "seats": 27,
+          "quote": "consulta_vagas_2014: DS_CARGO Senador in 27 SG_UF, QT_VAGA summing to 27"
+        },
+        {
+          "date": "2018-10-07",
+          "contests": 27,
+          "source": "tse-vagas",
+          "seats": 54,
+          "quote": "consulta_vagas_2018: DS_CARGO Senador in 27 SG_UF, QT_VAGA summing to 54"
+        },
+        {
+          "date": "2022-10-02",
+          "contests": 27,
+          "source": "tse-vagas",
+          "seats": 27,
+          "quote": "consulta_vagas_2022: DS_CARGO Senador in 27 SG_UF, QT_VAGA summing to 27"
+        },
+        {
+          "date": "2026-10-04",
+          "contests": 27,
+          "source": "tse-vagas",
+          "seats": 54,
+          "quote": "consulta_vagas_2026: DS_CARGO Senador in 27 SG_UF, QT_VAGA summing to 54"
+        }
+      ]
     },
     {
       "key": "governor",
@@ -123,11 +323,75 @@
       "gaps": [
         {
           "from": 1945,
-          "to": 2022,
-          "note": "No official count is compiled yet."
+          "to": 1990,
+          "note": "Elections before 1994 aren't counted yet. Brazil had 27 voting units only from 1990 on, after Tocantins was created and Roraima and Amapá became states."
         }
       ],
-      "elections": []
+      "elections": [
+        {
+          "date": "1994-10-03",
+          "contests": 27,
+          "source": "tse-vagas",
+          "seats": 27,
+          "quote": "consulta_vagas_1994: DS_CARGO Governador in 27 SG_UF, one seat each"
+        },
+        {
+          "date": "1998-10-04",
+          "contests": 27,
+          "source": "tse-vagas",
+          "seats": 27,
+          "quote": "consulta_vagas_1998: DS_CARGO Governador in 27 SG_UF, one seat each"
+        },
+        {
+          "date": "2002-10-06",
+          "contests": 27,
+          "source": "tse-vagas",
+          "seats": 27,
+          "quote": "consulta_vagas_2002: DS_CARGO Governador in 27 SG_UF, one seat each"
+        },
+        {
+          "date": "2006-10-01",
+          "contests": 27,
+          "source": "tse-vagas",
+          "seats": 27,
+          "quote": "consulta_vagas_2006: DS_CARGO Governador in 27 SG_UF, one seat each"
+        },
+        {
+          "date": "2010-10-03",
+          "contests": 27,
+          "source": "tse-vagas",
+          "seats": 27,
+          "quote": "consulta_vagas_2010: DS_CARGO Governador in 27 SG_UF, one seat each"
+        },
+        {
+          "date": "2014-10-05",
+          "contests": 27,
+          "source": "tse-vagas",
+          "seats": 27,
+          "quote": "consulta_vagas_2014: DS_CARGO Governador in 27 SG_UF, one seat each"
+        },
+        {
+          "date": "2018-10-07",
+          "contests": 27,
+          "source": "tse-vagas",
+          "seats": 27,
+          "quote": "consulta_vagas_2018: DS_CARGO Governador in 27 SG_UF, one seat each"
+        },
+        {
+          "date": "2022-10-02",
+          "contests": 27,
+          "source": "tse-vagas",
+          "seats": 27,
+          "quote": "consulta_vagas_2022: DS_CARGO Governador in 27 SG_UF, one seat each"
+        },
+        {
+          "date": "2026-10-04",
+          "contests": 27,
+          "source": "tse-vagas",
+          "seats": 27,
+          "quote": "consulta_vagas_2026: DS_CARGO Governador in 27 SG_UF, one seat each"
+        }
+      ]
     },
     {
       "key": "assemblies",
@@ -150,11 +414,75 @@
       "gaps": [
         {
           "from": 1945,
-          "to": 2022,
-          "note": "No official count is compiled yet."
+          "to": 1990,
+          "note": "Elections before 1994 aren't counted yet. Brazil had 27 voting units only from 1990 on, after Tocantins was created and Roraima and Amapá became states."
         }
       ],
-      "elections": []
+      "elections": [
+        {
+          "date": "1994-10-03",
+          "contests": 27,
+          "source": "tse-vagas",
+          "quote": "consulta_vagas_1994: DS_CARGO Deputado Estadual in 27 SG_UF, the Distrito Federal included",
+          "note": "The 1994 file's seat totals for Deputado Estadual match the Chamber's 513, so seats are left out."
+        },
+        {
+          "date": "1998-10-04",
+          "contests": 27,
+          "source": "tse-vagas",
+          "seats": 1059,
+          "quote": "consulta_vagas_1998: DS_CARGO Deputado Estadual in 26 SG_UF (1,035 seats) and Deputado Distrital in DF (24 seats)"
+        },
+        {
+          "date": "2002-10-06",
+          "contests": 27,
+          "source": "tse-vagas",
+          "seats": 1059,
+          "quote": "consulta_vagas_2002: DS_CARGO Deputado Estadual in 26 SG_UF (1,035 seats) and Deputado Distrital in DF (24 seats)"
+        },
+        {
+          "date": "2006-10-01",
+          "contests": 27,
+          "source": "tse-vagas",
+          "seats": 1059,
+          "quote": "consulta_vagas_2006: DS_CARGO Deputado Estadual in 26 SG_UF (1,035 seats) and Deputado Distrital in DF (24 seats)"
+        },
+        {
+          "date": "2010-10-03",
+          "contests": 27,
+          "source": "tse-vagas",
+          "seats": 1059,
+          "quote": "consulta_vagas_2010: DS_CARGO Deputado Estadual in 26 SG_UF (1,035 seats) and Deputado Distrital in DF (24 seats)"
+        },
+        {
+          "date": "2014-10-05",
+          "contests": 27,
+          "source": "tse-vagas",
+          "seats": 1059,
+          "quote": "consulta_vagas_2014: DS_CARGO Deputado Estadual in 26 SG_UF (1,035 seats) and Deputado Distrital in DF (24 seats)"
+        },
+        {
+          "date": "2018-10-07",
+          "contests": 27,
+          "source": "tse-vagas",
+          "seats": 1059,
+          "quote": "consulta_vagas_2018: DS_CARGO Deputado Estadual in 26 SG_UF (1,035 seats) and Deputado Distrital in DF (24 seats)"
+        },
+        {
+          "date": "2022-10-02",
+          "contests": 27,
+          "source": "tse-vagas",
+          "seats": 1059,
+          "quote": "consulta_vagas_2022: DS_CARGO Deputado Estadual in 26 SG_UF (1,035 seats) and Deputado Distrital in DF (24 seats)"
+        },
+        {
+          "date": "2026-10-04",
+          "contests": 27,
+          "source": "tse-vagas",
+          "seats": 1059,
+          "quote": "consulta_vagas_2026: DS_CARGO Deputado Estadual in 26 SG_UF (1,035 seats) and Deputado Distrital in DF (24 seats)"
+        }
+      ]
     },
     {
       "key": "municipal",

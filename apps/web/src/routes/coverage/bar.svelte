@@ -11,8 +11,9 @@
   const {
     counts,
     goal,
+    polity = "us",
     class: className,
-  }: { counts: Counts; goal: Goal; class?: string } = $props();
+  }: { counts: Counts; goal: Goal; polity?: string; class?: string } = $props();
 
   const tether = TooltipPrimitive.createTether<Reason | "icpsr">();
   const parts = $derived(
@@ -23,7 +24,7 @@
       .filter((part) => counts[part] > 0),
   );
   const label = (part: Reason | "icpsr") =>
-    part === "icpsr" ? m.coverage_icpsr() : reasonLabel(goal, part);
+    part === "icpsr" ? m.coverage_icpsr() : reasonLabel(goal, part, polity);
 </script>
 
 <span

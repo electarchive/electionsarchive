@@ -4,7 +4,93 @@
   "region_schemes": [
     "fr.departement"
   ],
-  "sources": {},
+  "sources": {
+    "an-stat-1967-1968": {
+      "title": "Statistiques 1967-1968 (IIIe and IVe législatures), Secrétariat général de l'Assemblée nationale",
+      "publisher": "Assemblée nationale",
+      "url": "https://www2.assemblee-nationale.fr/static/archives/BAN/Statistiques_1967-1968.pdf"
+    },
+    "an-stat-1973": {
+      "title": "Statistiques 1973, Secrétariat général de l'Assemblée nationale",
+      "publisher": "Assemblée nationale",
+      "url": "https://www2.assemblee-nationale.fr/static/archives/BAN/Statistiques_1973.pdf"
+    },
+    "an-stat-1978": {
+      "title": "Statistiques 1978, Secrétariat général de l'Assemblée nationale",
+      "publisher": "Assemblée nationale",
+      "url": "https://www2.assemblee-nationale.fr/static/archives/BAN/Statistiques_1978.pdf"
+    },
+    "an-stat-1981": {
+      "title": "Statistiques 1981, Secrétariat général de l'Assemblée nationale",
+      "publisher": "Assemblée nationale",
+      "url": "https://www2.assemblee-nationale.fr/static/archives/BAN/Statistiques_1981.pdf"
+    },
+    "an-stat-1988": {
+      "title": "Statistiques 1988, Secrétariat général de l'Assemblée nationale",
+      "publisher": "Assemblée nationale",
+      "url": "https://www2.assemblee-nationale.fr/static/archives/BAN/Statistiques_1988.pdf"
+    },
+    "an-stat-1993": {
+      "title": "Statistiques 1993, Secrétariat général de l'Assemblée nationale",
+      "publisher": "Assemblée nationale",
+      "url": "https://www2.assemblee-nationale.fr/static/archives/BAN/Statistiques_1993.pdf"
+    },
+    "an-stat-2007-2012": {
+      "title": "Statistiques 2007-2012, Secrétariat général de l'Assemblée nationale",
+      "publisher": "Assemblée nationale",
+      "url": "https://www2.assemblee-nationale.fr/static/archives/BAN/Statistiques_2007-2012.pdf"
+    },
+    "vp-results-2012": {
+      "title": "Résultats des élections législatives 2012",
+      "publisher": "La Documentation française / vie-publique.fr",
+      "url": "https://www.vie-publique.fr/eclairage/285715-resultats-des-elections-legislatives-2012"
+    },
+    "vp-ep-elus": {
+      "title": "Comment les députés européens sont-ils élus ?",
+      "publisher": "La Documentation française / vie-publique.fr",
+      "url": "https://www.vie-publique.fr/fiches/20338-comment-les-deputes-europeens-sont-ils-elus"
+    },
+    "cc-2003-468-dc": {
+      "title": "Décision n° 2003-468 DC du 3 avril 2003",
+      "publisher": "Conseil constitutionnel",
+      "url": "https://www.conseil-constitutionnel.fr/decision/2003/2003468DC.htm"
+    },
+    "cc-2019-811-commentaire": {
+      "title": "Commentaire de la décision n° 2019-811 QPC du 25 octobre 2019",
+      "publisher": "Conseil constitutionnel",
+      "url": "https://www.conseil-constitutionnel.fr/sites/default/files/as/root/bank_mm/decisions/2019811qpc/2019811qpc_ccc.pdf"
+    },
+    "elysee-presidentielles": {
+      "title": "Les résultats des élections présidentielles de la Vème République",
+      "publisher": "Présidence de la République",
+      "url": "https://www.presidence-de-la-republique.fr/hist/10/instit/electpr5.html"
+    },
+    "cc-2007-139-pdr": {
+      "title": "Déclaration du 25 avril 2007, résultats du premier tour de scrutin de l'élection du Président de la République",
+      "publisher": "Conseil constitutionnel",
+      "url": "https://www.conseil-constitutionnel.fr/sites/default/files/as/root/bank_mm/decisions/2007139pdr/2007139pdr.pdf"
+    },
+    "cc-2012-152-pdr": {
+      "title": "Décision n° 2012-152 PDR du 25 avril 2012",
+      "publisher": "Conseil constitutionnel",
+      "url": "https://www.conseil-constitutionnel.fr/decision/2012/2012152PDR.htm"
+    },
+    "cc-2017-169-pdr": {
+      "title": "Décision n° 2017-169 PDR du 26 avril 2017",
+      "publisher": "Conseil constitutionnel",
+      "url": "https://www.conseil-constitutionnel.fr/decision/2017/2017169PDR.htm"
+    },
+    "cc-2022-195-pdr": {
+      "title": "Décision n° 2022-195 PDR du 13 avril 2022 (déclaration relative aux résultats du premier tour)",
+      "publisher": "Conseil constitutionnel",
+      "url": "https://presidentielle2022.conseil-constitutionnel.fr/les-communiques/declaration-du-13-avril-2022-relative-aux-resultats-du-premier-tour-de-scrutin-de-l-election-du-president-de-la-republique.html"
+    },
+    "cc-referendums-tableau": {
+      "title": "Tableau récapitulatif des référendums de la Vème République",
+      "publisher": "Conseil constitutionnel",
+      "url": "https://www.conseil-constitutionnel.fr/referendum-sous-la-ve-republique/tableau-recapitulatif-des-referendums-de-la-veme-republique"
+    }
+  },
   "levels": [
     {
       "key": "assemblee",
@@ -30,14 +116,124 @@
         "fr.commune",
         "fr.bureau"
       ],
-      "gaps": [
+      "elections": [
         {
-          "from": 1958,
-          "to": 2024,
-          "note": "No official count is compiled yet."
+          "date": "1958-11-23",
+          "contests": null,
+          "note": "Algeria and the Sahara also elected deputies in 1958, by list, but the number of their constituencies has not yet been confirmed from an official source.",
+          "research_note": "contests 465 is metropolitan France only (matches the archive's count). Seats 546 from ord. 58-1065 art. 1 (source ord-58-1065): \"465 pour les départements de la France métropolitaine ; 67 pour les départements algériens ; 4 pour les départements des Oasis et de la Saoura ; 10 pour les départements de la Guadeloupe, de la Guyane, de la Martinique et de le Réunion.\" So the 465 excludes Algeria (67), the Sahara (4), and the 10 DOM. Overseas territories (TOM) are not in 546. A Wikipedia-derived figure of 579 seats in the Assemblée (including 33 TOM members kept in office) is unverified and not used. Overseas split: the 1958 ordonnance counts seats, not circonscriptions, for Algeria and the Sahara, so no circonscription count is given for them. The persee quote is a 1959 journal summary, not the ordonnance text itself."
+        },
+        {
+          "date": "1962-11-18",
+          "contests": null,
+          "note": "The number of constituencies at this election has not yet been confirmed from an official source.",
+          "research_note": "No official quote fetched. Assemblée statistics for 1962 are not at the URL tested (404). 482 appears in secondary sources only and is not used."
+        },
+        {
+          "date": "1967-03-05",
+          "contests": 487,
+          "seats": 487,
+          "source": "an-stat-1967-1968",
+          "quote": "Départements métropolitains ... 470 ... Départements d'outre-mer ... 10 ... Territoires d'outre-mer ... 7 ... Total ... 487",
+          "note": "One deputy per constituency, so constituencies equal the seats the Assemblée nationale lists."
+        },
+        {
+          "date": "1968-06-23",
+          "contests": 487,
+          "seats": 487,
+          "source": "an-stat-1967-1968",
+          "quote": "Premier tour (23 juin 1968) ... 166 ... Second tour (30 juin 1968) ... 319",
+          "note": "One deputy per constituency, so constituencies equal the seats the Assemblée nationale lists."
+        },
+        {
+          "date": "1973-03-04",
+          "contests": 490,
+          "seats": 490,
+          "source": "an-stat-1973",
+          "quote": "Nombre total de députés : Départements métropolitains ... 473 ... Départements d'outre-mer ... 10 ... Territoires d'outre-mer ... 7 ... T o t a l ... 490",
+          "note": "One deputy per constituency, so constituencies equal the seats the Assemblée nationale lists."
+        },
+        {
+          "date": "1978-03-12",
+          "contests": 491,
+          "seats": 491,
+          "source": "an-stat-1978",
+          "quote": "Nombre total de députés : Départements métropolitains ... 474; Départements d'outre-mer ... 11; Territoires d'outre-mer ... 5; Mayotte ... 1; Total ... 491",
+          "note": "One deputy per constituency, so constituencies equal the seats the Assemblée nationale lists."
+        },
+        {
+          "date": "1981-06-14",
+          "contests": 491,
+          "seats": 491,
+          "source": "an-stat-1981",
+          "quote": "Nombre total de députés : Départements métropolitains 474; Départements d'outre-mer 11; Territoires d'outre-mer 5; Mayotte 1; Total 491",
+          "note": "One deputy per constituency, so constituencies equal the seats the Assemblée nationale lists."
+        },
+        {
+          "date": "1986-03-16",
+          "contests": null,
+          "note": "In 1986, deputies were elected by list in each département, but the number of those constituencies has not yet been confirmed from an official source.",
+          "research_note": "Seats 577 from the official stats: 555 metropolitan, 15 DOM, 5 TOM, 1 Mayotte, 1 Saint-Pierre-et-Miquelon. The list-constituency count (départements plus overseas units) is not confirmed. Under the 1985 law the département forms the circonscription (Assemblée nationale proposition, l15b4013, quotes L. 123 of the 1985 version: \"Le département forme une circonscription.\"), but the number of départements and overseas units was not counted from an official text, so contests is null. Includes overseas units."
+        },
+        {
+          "date": "1988-06-05",
+          "contests": 577,
+          "seats": 577,
+          "source": "an-stat-1988",
+          "quote": "Elus au premier tour (5 juin 1988) ... 120 ... Elus au second tour (12 juin 1988) ... 457 (1) ... Total ... 577"
+        },
+        {
+          "date": "1993-03-21",
+          "contests": 577,
+          "seats": 577,
+          "source": "an-stat-1993",
+          "quote": "Total des sièges ... 577"
+        },
+        {
+          "date": "1997-05-25",
+          "contests": null,
+          "note": "The number of constituencies at this election has not yet been confirmed from an official source.",
+          "research_note": "No official quote fetched. The statistics PDF for 1997 is not at the URL tested (404). Date unverified."
+        },
+        {
+          "date": "2002-06-09",
+          "contests": null,
+          "note": "The number of constituencies at this election has not yet been confirmed from an official source.",
+          "research_note": "No official quote fetched. Date unverified."
+        },
+        {
+          "contests": 577,
+          "seats": 577,
+          "source": "an-stat-2007-2012",
+          "quote": "TOTAL 577",
+          "date": "2007-06-10"
+        },
+        {
+          "date": "2012-06-10",
+          "contests": 577,
+          "seats": 577,
+          "source": "vp-results-2012",
+          "quote": "Les élections législatives des 10 et 17 juin 2012 interviennent un mois après l'élection de François Hollande à la présidence de la République. ... Les 577 sièges de députés sont désormais répartis de la façon suivante : 558 pour les départements ; 8 pour la Nouvelle-Calédonie et les collectivités d'outre-mer ; 11 pour l'élection des députés par les Français de l'étranger."
+        },
+        {
+          "date": "2017-06-11",
+          "contests": null,
+          "note": "The number of constituencies at this election has not yet been confirmed from an official source.",
+          "research_note": "No official quote fetched; date not verified. Expected 577 with 11 SFE constituencies, not confirmed. Not entered."
+        },
+        {
+          "date": "2022-06-12",
+          "contests": null,
+          "note": "The number of constituencies at this election has not yet been confirmed from an official source.",
+          "research_note": "No official quote fetched; date not verified. Not entered."
+        },
+        {
+          "date": "2024-06-30",
+          "contests": null,
+          "note": "The number of constituencies at this election has not yet been confirmed from an official source.",
+          "research_note": "No official quote fetched; date not verified. Not entered."
         }
-      ],
-      "elections": []
+      ]
     },
     {
       "key": "president",
@@ -63,14 +259,74 @@
         "fr.commune",
         "fr.bureau"
       ],
-      "gaps": [
+      "elections": [
         {
-          "from": 1965,
-          "to": 2022,
-          "note": "No official count is compiled yet."
+          "date": "1965-12-05",
+          "contests": 2,
+          "source": "elysee-presidentielles",
+          "quote": "5 et 19 décembre 1965."
+        },
+        {
+          "date": "1969-06-01",
+          "contests": 2,
+          "source": "elysee-presidentielles",
+          "quote": "1er et 15 juin 1969."
+        },
+        {
+          "date": "1974-05-05",
+          "contests": 2,
+          "source": "elysee-presidentielles",
+          "quote": "5 et 19 mai 1974."
+        },
+        {
+          "date": "1981-04-26",
+          "contests": 2,
+          "source": "elysee-presidentielles",
+          "quote": "26 avril et 10 mai 1981."
+        },
+        {
+          "date": "1988-04-24",
+          "contests": 2,
+          "source": "elysee-presidentielles",
+          "quote": "24 avril et 8 mai 1988."
+        },
+        {
+          "date": "1995-04-23",
+          "contests": 2,
+          "source": "elysee-presidentielles",
+          "quote": "23 avril et 7 mai 1995."
+        },
+        {
+          "date": "2002-04-21",
+          "contests": 2,
+          "source": "elysee-presidentielles",
+          "quote": "21 avril et 5 mai 2002."
+        },
+        {
+          "date": "2007-04-21",
+          "contests": 2,
+          "source": "cc-2007-139-pdr",
+          "quote": "auquel il a été procédé les 21 et 22 avril 2007"
+        },
+        {
+          "date": "2012-04-21",
+          "contests": 2,
+          "source": "cc-2012-152-pdr",
+          "quote": "auquel il a été procédé les 21 et 22 avril 2012"
+        },
+        {
+          "date": "2017-04-22",
+          "contests": 2,
+          "source": "cc-2017-169-pdr",
+          "quote": "auquel il a été procédé les 22 et 23 avril 2017"
+        },
+        {
+          "date": "2022-04-09",
+          "contests": 2,
+          "source": "cc-2022-195-pdr",
+          "quote": "auquel il a été procédé les 9 et 10 avril 2022"
         }
-      ],
-      "elections": []
+      ]
     },
     {
       "key": "regionales",
@@ -171,14 +427,62 @@
       "grain": [
         "fr.departement"
       ],
-      "gaps": [
+      "elections": [
         {
-          "from": 1958,
-          "to": 2005,
-          "note": "No official count is compiled yet."
+          "year": 1958,
+          "contests": 1,
+          "source": "cc-referendums-tableau",
+          "quote": "28 septembre 1958 | Constitution de la Vème République"
+        },
+        {
+          "year": 1961,
+          "contests": 1,
+          "source": "cc-referendums-tableau",
+          "quote": "8 janvier 1961 | Autodétermination de l'Algérie"
+        },
+        {
+          "year": 1962,
+          "contests": 2,
+          "source": "cc-referendums-tableau",
+          "quote": "8 avril 1962 | Accords d'Evian sur l'indépendance de l'Algérie; 28 octobre 1962 | Election du président de la République au suffrage universel direct"
+        },
+        {
+          "year": 1969,
+          "contests": 1,
+          "source": "cc-referendums-tableau",
+          "quote": "27 avril 1969 | Réforme du Sénat et régionalisation"
+        },
+        {
+          "year": 1972,
+          "contests": 1,
+          "source": "cc-referendums-tableau",
+          "quote": "23 avril 1972 | Elargissement de la Communauté économique européenne"
+        },
+        {
+          "year": 1988,
+          "contests": 1,
+          "source": "cc-referendums-tableau",
+          "quote": "6 novembre 1988 | Statut de la Nouvelle Calédonie"
+        },
+        {
+          "year": 1992,
+          "contests": 1,
+          "source": "cc-referendums-tableau",
+          "quote": "20 septembre 1992 | Ratification du traité de Maastricht sur l'Union européenne"
+        },
+        {
+          "year": 2000,
+          "contests": 1,
+          "source": "cc-referendums-tableau",
+          "quote": "24 septembre 2000 | Quinquennat"
+        },
+        {
+          "year": 2005,
+          "contests": 1,
+          "source": "cc-referendums-tableau",
+          "quote": "29 mai 2005 | Ratification du traité établissant une Constitution pour l'Europe"
         }
-      ],
-      "elections": []
+      ]
     },
     {
       "key": "ep",
@@ -199,14 +503,68 @@
         "fr.ep_constituency",
         "eu.member_state"
       ],
-      "gaps": [
+      "elections": [
         {
-          "from": 1979,
-          "to": 2024,
-          "note": "No official count is compiled yet."
+          "year": 1979,
+          "contests": 1,
+          "source": "cc-2019-811-commentaire",
+          "quote": "le législateur a remplacé la circonscription nationale unique par huit circonscriptions interrégionales"
+        },
+        {
+          "year": 1984,
+          "contests": 1,
+          "source": "cc-2019-811-commentaire",
+          "quote": "le législateur a remplacé la circonscription nationale unique par huit circonscriptions interrégionales"
+        },
+        {
+          "year": 1989,
+          "contests": 1,
+          "source": "cc-2019-811-commentaire",
+          "quote": "le législateur a remplacé la circonscription nationale unique par huit circonscriptions interrégionales"
+        },
+        {
+          "year": 1994,
+          "contests": 1,
+          "source": "cc-2019-811-commentaire",
+          "quote": "le législateur a remplacé la circonscription nationale unique par huit circonscriptions interrégionales"
+        },
+        {
+          "year": 1999,
+          "contests": 1,
+          "source": "cc-2019-811-commentaire",
+          "quote": "le législateur a remplacé la circonscription nationale unique par huit circonscriptions interrégionales"
+        },
+        {
+          "year": 2004,
+          "contests": 8,
+          "source": "cc-2003-468-dc",
+          "quote": "la création, par les articles 14 et 15 de la loi déférée, de huit circonscriptions"
+        },
+        {
+          "year": 2009,
+          "contests": 8,
+          "source": "vp-ep-elus",
+          "quote": "En France, la loi du 25 juin 2018 rétablit une circonscription électorale unique en lieu et place du découpage en 8 circonscriptions régionales mis en place précédemment par une loi de 2003."
+        },
+        {
+          "year": 2014,
+          "contests": 8,
+          "source": "vp-ep-elus",
+          "quote": "la loi du 11 avril 2003 avait découpé la France en huit circonscriptions électorales pour les élections européennes"
+        },
+        {
+          "year": 2019,
+          "contests": 1,
+          "source": "vp-ep-elus",
+          "quote": "En France, la loi du 25 juin 2018 rétablit une circonscription électorale unique en lieu et place du découpage en 8 circonscriptions régionales mis en place précédemment par une loi de 2003."
+        },
+        {
+          "year": 2024,
+          "contests": 1,
+          "source": "vp-ep-elus",
+          "quote": "En France, la loi du 25 juin 2018 rétablit une circonscription électorale unique en lieu et place du découpage en 8 circonscriptions régionales mis en place précédemment par une loi de 2003."
         }
-      ],
-      "elections": []
+      ]
     }
   ]
 }

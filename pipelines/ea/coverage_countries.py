@@ -483,6 +483,7 @@ def build(conn) -> tuple[list[tuple], list[tuple]]:
                     [
                         {
                             "key": lv["key"],
+                            "label": lv["label"],
                             "goal": lv["goal"],
                             "fine": bool(lv.get("fine")),
                             "unit": lv.get("unit", "district"),
