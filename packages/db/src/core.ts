@@ -1,6 +1,6 @@
 import { daterange } from "./range.ts";
 import { users } from "./schema.ts";
-import { pgEnum, pgTable, uuid, smallint, text, integer, boolean, date, timestamp, jsonb, customType, bigint, numeric, real, char, geometry, index, uniqueIndex, foreignKey, primaryKey, unique, check, pgView } from "drizzle-orm/pg-core"
+import { pgEnum, pgTable, uuid, integer, smallint, text, boolean, customType, date, jsonb, timestamp, numeric, real, char, bigint, geometry, index, uniqueIndex, foreignKey, primaryKey, unique, check, pgView } from "drizzle-orm/pg-core"
 import { sql } from "drizzle-orm"
 
 export const acquiredVia = pgEnum("acquired_via", ["elected", "appointed", "trustee", "succession", "list_replacement", "co_opted", "acting"])
@@ -740,6 +740,16 @@ export const name = pgTable("name", {
 	index("name_entity_idx").using("btree", table.entityId.asc().nullsLast()),
 ]);
 
+export const nameDrop = pgTable("name_drop", {
+	nameId: uuid("name_id").primaryKey(),
+	entityId: uuid("entity_id").notNull().references(() => entity.id, { onDelete: "cascade" } ),
+	text: text().notNull(),
+	reason: text().notNull(),
+	changesetId: uuid("changeset_id").notNull().references(() => changeset.id),
+	recordedFrom: timestamp("recorded_from", { withTimezone: true }).default(sql`now()`).notNull(),
+}, (table) => [
+check("name_drop_reason_check", sql`(reason <> ''::text)`),]);
+
 export const note = pgTable("note", {
 	id: uuid().default(sql`uuidv7()`).primaryKey(),
 	entityId: uuid("entity_id").notNull().references(() => entity.id, { onDelete: "cascade" } ),
@@ -1293,14 +1303,6 @@ export const valueLocator = pgTable("value_locator", {
 }, (table) => [
 	primaryKey({ columns: [table.resultSetK, table.unitK, table.optionK, table.channel, table.measure, table.countRound], name: "value_locator_pkey"}),
 check("value_locator_check", sql`(num_nonnulls(page_id, source_id) >= 1)`),check("value_locator_check1", sql`((page_id IS NULL) = (x0 IS NULL))`),]);
-
-export const zzPpfSum = pgTable("zz_ppf_sum", {
-	resultSetK: integer("result_set_k"),
-	n: bigint({ mode: 'number' }),
-	v: numeric(),
-	c: bigint({ mode: 'number' }),
-	areas: bigint({ mode: 'number' }),
-});
 export const resultRollup = pgView("result_rollup", {	resultSetK: integer("result_set_k"),
 	areaK: integer("area_k"),
 	optionK: integer("option_k"),

@@ -66,7 +66,8 @@ def _stage(conn: Connection, changeset_id: str) -> Stage:
         ).fetchall()
         if table in tables
         and table not in temporal
-        and table not in (*FACTS, "external_id", "slug", "entity_merge", "entity_retirement", "entity_subtype_drop")
+        and table
+        not in (*FACTS, "external_id", "slug", "entity_merge", "entity_retirement", "entity_subtype_drop", "name_drop", "unit_area_drop")
     }
     owners: dict[str, str] = {
         table: owner
@@ -649,6 +650,25 @@ def _publish_table(conn: Connection, stage: Stage, table: str) -> None:
             if held:
                 raise ValueError(f"dropping {subtype} row of {entity} still referenced: " + "; ".join(held))
             conn.execute(sql.SQL("delete from public.{} where id = %s").format(sql.Identifier(subtype)), [entity])
+    if table == "name_drop":
+        for name, entity, text, held, preferred in conn.execute(
+            sql.SQL(
+                """select s.name_id::text, s.entity_id::text, s.text, n.entity_id::text, n.is_preferred
+                   from {} s left join public.name n on n.id = s.name_id and n.text = s.text"""
+            ).format(staged)
+        ).fetchall():
+            if held != entity:
+                raise ValueError(f"name {name} is not {text!r} on {entity}")
+            if preferred:
+                raise ValueError(f"name {name} ({text!r}) is the preferred name of {entity}")
+        conn.execute(sql.SQL("delete from public.name where id in (select name_id from {})").format(staged))
+    if table == "unit_area_drop":
+        conn.execute(
+            sql.SQL(
+                """delete from public.reporting_unit_area p using {} s
+                   where p.unit_id = s.unit_id and p.area_id = s.area_id"""
+            ).format(staged)
+        )
     if table == "slug":
         conn.execute(
             sql.SQL(

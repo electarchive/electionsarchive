@@ -99,6 +99,11 @@ export const relations = defineRelations(schema, (r) => ({
 		}),
 		labels: r.many.label(),
 		names: r.many.name(),
+		entitiesViaNameDrop: r.many.entity({
+			from: r.changeset.id.through(r.nameDrop.changesetId),
+			to: r.entity.id.through(r.nameDrop.entityId),
+			alias: "changeset_id_entity_id_via_nameDrop"
+		}),
 		entitiesViaNote: r.many.entity({
 			from: r.changeset.id.through(r.note.changesetId),
 			to: r.entity.id.through(r.note.entityId),
@@ -228,6 +233,9 @@ export const relations = defineRelations(schema, (r) => ({
 		governments: r.many.government(),
 		labels: r.many.label(),
 		names: r.many.name(),
+		changesetsViaNameDrop: r.many.changeset({
+			alias: "changeset_id_entity_id_via_nameDrop"
+		}),
 		changesetsViaNote: r.many.changeset({
 			alias: "changeset_id_entity_id_via_note"
 		}),
