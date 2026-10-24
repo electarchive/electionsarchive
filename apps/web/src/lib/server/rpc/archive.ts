@@ -8367,14 +8367,18 @@ export const elections = {
                   union all
                   select e.id, tree.root from election e join tree on e.parent_id = tree.id
                 ),
-                seats as (
-                  select tree.root, rs.k, a.k as area from contest c
+                candidates as (
+                  select tree.root, rs.k, a.k as area, c.kind = 'body_seats' as "isSeat" from contest c
                   join tree on tree.id = c.election_id
                   join election e on e.id = c.election_id
                   join result_set rs on rs.contest_id = c.id and rs.is_default
                   join area a on a.id = c.district_area_id
-                  where c.body_id = ${chamber}::uuid and c.kind = 'body_seats' and c.allocation_parent_id is null
+                  where c.body_id = ${chamber}::uuid and c.kind in ('body_seats', 'list_allocation') and c.allocation_parent_id is null
                     and ${within == null ? sql`true` : inside(within, sql`c.district_area_id`, sql`e.date_from`)}
+                ),
+                seats as (
+                  select root, k, area from candidates d
+                  where d."isSeat" or not exists (select from candidates x where x.root = d.root and x."isSeat")
                 ),
                 counted as (
                   select s.root, nullif(max(x.value) filter (where x.measure = 2), 0) as registered,
@@ -13122,6 +13126,7 @@ export const people = {
             }> = [];
             for (const row of tenures.rows) {
               if (
+                !spell.isBody ||
                 row.owner !== spell.owner ||
                 row.place == null ||
                 (spell.from != null && (row.from ?? "") < spell.from) ||

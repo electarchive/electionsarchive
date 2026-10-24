@@ -121,6 +121,7 @@
     id: string;
     name: string;
     isBody: boolean;
+    path: string | null;
     from: string | null;
     to: string | null;
     seats?: Array<{
@@ -148,7 +149,11 @@
           {#if spell.isBody}
             <a
               class="truncate font-semibold hover:highlighter"
-              href={resolve("/id/[id]", { id: spell.id })}>{spell.name}</a
+              href={spell.path == null
+                ? resolve("/id/[id]", { id: spell.id })
+                : resolve("/chambers/[...path]", {
+                    path: spell.path.replace(/^chambers\//u, ""),
+                  })}>{spell.name}</a
             >
           {:else}
             <span class="truncate font-semibold">{spell.name}</span>
