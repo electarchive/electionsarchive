@@ -22,10 +22,10 @@ PUBLISHER = "South Carolina State Election Commission"
 LANDING = "https://scvotes.gov/election-results/"
 URL = "https://scvotes.gov/wp-content/uploads/2022/08/Election_Report_{}.pdf"
 DPI = 200
-BOOKS = {1990: "1990-1991", 1992: "1992-1993", 1994: "1994-1995", 1996: "1995-1996", 1998: "1997-1998"}
-DAYS = {1990: date(1990, 11, 6), 1992: date(1992, 11, 3), 1994: date(1994, 11, 8), 1996: date(1996, 11, 5), 1998: date(1998, 11, 3)}
-PAGE_RANGES = {1990: (95, 95), 1992: (82, 84), 1994: (33, 34), 1996: (44, 45), 1998: (46, 47)}
-HALVES = {1990: 306.0}
+BOOKS = {1974: "1974-1975", 1990: "1990-1991", 1992: "1992-1993", 1994: "1994-1995", 1996: "1995-1996", 1998: "1997-1998"}
+DAYS = {1974: date(1974, 11, 5), 1990: date(1990, 11, 6), 1992: date(1992, 11, 3), 1994: date(1994, 11, 8), 1996: date(1996, 11, 5), 1998: date(1998, 11, 3)}
+PAGE_RANGES = {1974: (45, 47), 1990: (95, 95), 1992: (82, 84), 1994: (33, 34), 1996: (44, 45), 1998: (46, 47)}
+HALVES = {1974: 322.0, 1990: 306.0}
 FIXES = str.maketrans({"&": "6", "l": "1", "I": "1", "O": "0", "o": "0", "S": "5", "B": "8", "Z": "2", "|": "1"})
 COUNTIES = [
     "Abbeville", "Aiken", "Allendale", "Anderson", "Bamberg", "Barnwell", "Beaufort", "Berkeley", "Calhoun",
@@ -37,6 +37,105 @@ COUNTIES = [
 KEYS = {re.sub(r"[^a-z]", "", name.lower()): name for name in COUNTIES}
 ALIASES: dict[tuple[int, int, str], str] = {(1998, 6, "ester"): "Dorchester", (1998, 6, "nce"): "Florence", (1998, 6, "l"): "Lee"}
 OVERRIDES: dict[tuple[int, int, str, int], int] = {
+    (1974, 1, "Beaufort", 0): 5342,
+    (1974, 1, "Berkeley", 0): 8062,
+    (1974, 1, "Charleston", 0): 34188,
+    (1974, 1, "Colleton", 0): 4278,
+    (1974, 1, "Dorchester", 0): 6390,
+    (1974, 1, "Hampton", 0): 2969,
+    (1974, 1, "Jasper", 0): 1882,
+    (1974, 1, "Beaufort", 1): 1967,
+    (1974, 1, "Berkeley", 1): 2423,
+    (1974, 1, "Charleston", 1): 13821,
+    (1974, 1, "Colleton", 1): 1248,
+    (1974, 1, "Dorchester", 1): 2288,
+    (1974, 1, "Hampton", 1): 450,
+    (1974, 1, "Jasper", 1): 253,
+    (1974, 1, "Beaufort", 2): 82,
+    (1974, 1, "Berkeley", 2): 53,
+    (1974, 1, "Charleston", 2): 413,
+    (1974, 1, "Colleton", 2): 30,
+    (1974, 1, "Dorchester", 2): 74,
+    (1974, 1, "Hampton", 2): 14,
+    (1974, 1, "Jasper", 2): 21,
+    (1974, 1, "Beaufort", 3): 60,
+    (1974, 1, "Berkeley", 3): 20,
+    (1974, 1, "Charleston", 3): 309,
+    (1974, 1, "Colleton", 3): 76,
+    (1974, 1, "Dorchester", 3): 34,
+    (1974, 1, "Hampton", 3): 21,
+    (1974, 1, "Jasper", 3): 10,
+    (1974, 2, "Allendale", 0): 1667,
+    (1974, 2, "Bamberg", 0): 1848,
+    (1974, 2, "Barnwell", 0): 2206,
+    (1974, 2, "Calhoun", 0): 1204,
+    (1974, 2, "Lexington", 0): 6401,
+    (1974, 2, "Orangeburg", 0): 7939,
+    (1974, 2, "Richland", 0): 23940,
+    (1974, 2, "Allendale", 1): 1037,
+    (1974, 2, "Bamberg", 1): 1977,
+    (1974, 2, "Barnwell", 1): 2085,
+    (1974, 2, "Calhoun", 1): 1375,
+    (1974, 2, "Lexington", 1): 18582,
+    (1974, 2, "Orangeburg", 1): 7871,
+    (1974, 2, "Richland", 1): 26009,
+    (1974, 2, "Allendale", 2): 15,
+    (1974, 2, "Bamberg", 2): 51,
+    (1974, 2, "Barnwell", 2): 23,
+    (1974, 2, "Calhoun", 2): 11,
+    (1974, 2, "Lexington", 2): 337,
+    (1974, 2, "Orangeburg", 2): 52,
+    (1974, 2, "Richland", 2): 461,
+    (1974, 5, "Cherokee", 0): 4523,
+    (1974, 5, "Chester", 0): 3706,
+    (1974, 5, "Chesterfield", 0): 3834,
+    (1974, 5, "Fairfield", 0): 2811,
+    (1974, 5, "Kershaw", 0): 4811,
+    (1974, 5, "Lancaster", 0): 4886,
+    (1974, 5, "Laurens", 0): 4658,
+    (1974, 5, "Sumter", 0): 5825,
+    (1974, 5, "Union", 0): 4395,
+    (1974, 5, "York", 0): 8168,
+    (1974, 5, "Cherokee", 1): 1900,
+    (1974, 5, "Chester", 1): 1766,
+    (1974, 5, "Chesterfield", 1): 1397,
+    (1974, 5, "Fairfield", 1): 1126,
+    (1974, 5, "Kershaw", 1): 4079,
+    (1974, 5, "Lancaster", 1): 4338,
+    (1974, 5, "Laurens", 1): 2797,
+    (1974, 5, "Sumter", 1): 4740,
+    (1974, 5, "Union", 1): 2092,
+    (1974, 5, "York", 1): 5059,
+    (1974, 5, "Cherokee", 2): 41,
+    (1974, 5, "Chester", 2): 33,
+    (1974, 5, "Chesterfield", 2): 52,
+    (1974, 5, "Fairfield", 2): 18,
+    (1974, 5, "Kershaw", 2): 88,
+    (1974, 5, "Lancaster", 2): 57,
+    (1974, 5, "Laurens", 2): 87,
+    (1974, 5, "Sumter", 2): 64,
+    (1974, 5, "Union", 2): 69,
+    (1974, 5, "York", 2): 128,
+    (1974, 6, "Clarendon", 0): 3271,
+    (1974, 6, "Darlington", 0): 5408,
+    (1974, 6, "Dillon", 0): 2364,
+    (1974, 6, "Florence", 0): 7874,
+    (1974, 6, "Georgetown", 0): 4647,
+    (1974, 6, "Horry", 0): 8027,
+    (1974, 6, "Lee", 0): 2722,
+    (1974, 6, "Marion", 0): 2817,
+    (1974, 6, "Marlboro", 0): 2647,
+    (1974, 6, "Williamsburg", 0): 5619,
+    (1974, 6, "Clarendon", 1): 2170,
+    (1974, 6, "Darlington", 1): 5052,
+    (1974, 6, "Dillon", 1): 2266,
+    (1974, 6, "Florence", 1): 11605,
+    (1974, 6, "Georgetown", 1): 2679,
+    (1974, 6, "Horry", 1): 8009,
+    (1974, 6, "Lee", 1): 2175,
+    (1974, 6, "Marion", 1): 2499,
+    (1974, 6, "Marlboro", 1): 1823,
+    (1974, 6, "Williamsburg", 1): 3704,
     (1990, 2, "Calhoun", 0): 2162,
     (1990, 2, "Lexington", 0): 34572,
     (1990, 2, "Orangeburg", 0): 14337,
@@ -68,6 +167,13 @@ ROWNAMES: dict[tuple[int, int], list[str]] = {
     (1990, 2): ["Bamberg", "Calhoun", "Lexington", "Orangeburg", "Richland"],
     (1990, 4): ["Greenville", "Spartanburg", "Union"],
 }
+PRINTED: dict[tuple[int, int], list[int]] = {
+    (1974, 1): [60142, 22000, 673, 509],
+    (1974, 2): [45205, 58936, 950],
+    (1974, 5): [47617, 29294, 637],
+    (1974, 6): [45396, 41982],
+}
+OMITTED: dict[tuple[int, int], str] = {(1974, 1): "Hampton"}
 EXTRA: dict[tuple[int, int], dict[int, tuple[str, str]]] = {(1998, 4): {1: ("Peter J. Ashy (Patriot)", "PT"), 2: ("Peter J. Ashy (Reform)", "RF")}}
 SUMMARY = "South Carolina's U.S. House general elections of 1990 and 1992 through 1998 by county from the State Election Commission's election reports"
 METHOD = (
@@ -117,6 +223,7 @@ def parse() -> None:
     PARSED.mkdir(parents=True, exist_ok=True)
     rows: list[dict[str, object]] = []
     problems: list[str] = []
+    unresolved: set[tuple[int, int]] = set()
     for year, (first, last) in PAGE_RANGES.items():
         last_district = 0
         done = [0, 0]
@@ -127,7 +234,7 @@ def parse() -> None:
                 block = []
             for line in lines_of(year, page, half):
                 text = " ".join(w[4] for w in line)
-                is_total = re.match(r"^\W*(STATE\s+)?TOTALS?\b", text, re.IGNORECASE) is not None and re.search(r"\d", text) is not None
+                is_total = re.match(r"^\W*(\w+\s+)?TOTALS?\b", text, re.IGNORECASE) is not None and re.search(r"\d", text) is not None
                 if not is_total:
                     block.append((page, line))
                     continue
@@ -143,6 +250,7 @@ def parse() -> None:
                     district = 2 * done[half] + half + 1
                     done[half] += 1
                 last_district = district
+                printed = PRINTED.get((year, district), printed)
                 cells: list[tuple[str, list[int | None], list[list[float]]]] = []
                 scored: list[tuple[float, int, int, int, list[tuple[float, float, float, float, str]]]] = []
                 nameless = iter(ROWNAMES.get((year, district), []))
@@ -213,14 +321,17 @@ def parse() -> None:
                         item["votes"] = OVERRIDES[key]
                 for column in range(len(edges)):
                     mine = [r for r in rows if r["year"] == year and r["district"] == district and r["column"] == column]
-                    summed = sum(int(r["votes"]) for r in mine)
+                    summed = sum(int(r["votes"]) for r in mine if r["county"] != OMITTED.get((year, district)))
                     bad = [r["county"] for r in mine if int(r["votes"]) < 0]
                     if summed != printed[column] or bad:
+                        unresolved.add((year, district))
                         problems.append(
                             f"{year} d{district} col{column}: sum {summed} printed {printed[column]} (diff {printed[column] - summed}) unreadable {bad} counties {len(mine)}"
                         )
                 block = []
-    frame = pl.DataFrame(rows, schema_overrides={"box": pl.List(pl.Int64)})
+    frame = pl.DataFrame(
+        [row for row in rows if (row["year"], row["district"]) not in unresolved], schema_overrides={"box": pl.List(pl.Int64)}
+    )
     frame.write_parquet(PARSED / "lines.parquet")
     print("\n".join(problems))
     print(frame.group_by("year", "district").agg(pl.col("county").n_unique(), pl.col("column").n_unique()).sort("year", "district"))
@@ -297,8 +408,18 @@ def emit() -> Path:
             writein = [option for option, _, kind, _ in roots if kind == "write_in" and option not in targets.values()]
             extra = EXTRA.get((year, district), {})
             mismatch = False
+            inexact = False
             for column in leftover:
-                if column in extra:
+                near = sorted(
+                    (abs(int(value) - totals[column]), option)
+                    for option, _, kind, value in roots
+                    if option not in targets.values() and kind != "write_in"
+                )
+                if column not in extra and near and near[0][0] * 25 <= totals[column]:
+                    targets[column] = near[0][1]
+                    inexact = True
+                    print(f"{key}: column {column} {totals[column]} against FEC {near[0][0]} apart; non-default")
+                elif column in extra:
                     label, party = extra[column]
                     candidate = cs.key(f"{SOURCE}.person", f"SC:{re.sub(r'[^a-z]+', '-', label.lower())}")
                     if candidate in cs.minted and candidate not in made:
@@ -329,6 +450,7 @@ def emit() -> Path:
                 mismatch = merged != next(int(value) for option, _, _, value in roots if option in writein)
                 if mismatch:
                     print(f"{key}: write-ins {merged} against FEC; non-default")
+            mismatch = mismatch or inexact
             result_set = cs.key(f"{SOURCE}.result_set", key)
             cs.add(
                 "result_set",
