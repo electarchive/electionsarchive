@@ -67,6 +67,7 @@ FILES = {
     "WA": ("wa", "2026-08-04", ["ballot-items"]),
     "UT": ("ut", "2026-06-23", ["ballot-items"]),
     "ME": ("me", "2026-06-09", list(ME_FILES)),
+    "AR": ("ar", "2026-03-03", ["contests", "data"]),
     "OK": ("ok", "2026-06-16", ["getelec/20260616", *(f"20260616/{race}" for race in OK_RACES)]),
     "HI": ("hi", "2026-08-08", ["cch", "coh", "cok", "com"]),
     "DE": ("de", "2026-09-15", ["PR2026.html"]),
@@ -90,7 +91,7 @@ RUNOFFS = {
     "GA": ("ga2", "2026-06-16", ["ballot-items"], "2026-05-19"),
     "OK": ("ok", "2026-08-25", ["getelec/20260825", "20260825/12001", "20260825/13010"], "2026-06-16"),
 }
-FIPS = {"TX": "48", "CA": "06", "MI": "26", "PA": "42", "WV": "54", "MS": "28", "SD": "46", "WY": "56", "OR": "41", "KY": "21", "CO": "08", "AZ": "04", "TN": "47", "NC": "37", "IL": "17", "NM": "35", "NY": "36", "VA": "51", "AL": "01", "ND": "38", "MD": "24", "MN": "27", "VT": "50", "KS": "20", "GA": "13", "WA": "53", "UT": "49", "IN": "18", "FL": "12", "ID": "16", "NJ": "34", "MO": "29", "MA": "25", "DE": "10", "HI": "15", "ME": "23", "OK": "40"}
+FIPS = {"TX": "48", "CA": "06", "MI": "26", "PA": "42", "WV": "54", "MS": "28", "SD": "46", "WY": "56", "OR": "41", "KY": "21", "CO": "08", "AZ": "04", "TN": "47", "NC": "37", "IL": "17", "NM": "35", "NY": "36", "VA": "51", "AL": "01", "ND": "38", "MD": "24", "MN": "27", "VT": "50", "KS": "20", "GA": "13", "WA": "53", "UT": "49", "IN": "18", "FL": "12", "ID": "16", "NJ": "34", "MO": "29", "MA": "25", "DE": "10", "HI": "15", "ME": "23", "OK": "40", "AR": "05"}
 RUNOFF_SYSTEMS = {"GA": "two_round", "TX": "two_round", "MS": "two_round", "SD": "two_round_35", "NC": "two_round_30", "OK": "two_round"}
 THRESHOLDS = {"GA": 50, "TX": 50, "MS": 50, "SD": 35, "NC": 30, "OK": 50}
 ME_COUNTIES = {"AND": "23001", "ARO": "23003", "CUM": "23005", "FRA": "23007", "HAN": "23009", "KEN": "23011", "KNO": "23013", "LIN": "23015", "OXF": "23017", "PEN": "23019", "PIS": "23021", "SAG": "23023", "SOM": "23025", "WAL": "23027", "WAS": "23029", "YOR": "23031"}
@@ -143,6 +144,7 @@ OFFICIAL = {
     "MN": ("Minnesota Secretary of State", "https://electionresultsfiles.sos.mn.gov/20260811/", "county files and precinct file summed to counties"),
     "ME": ("Maine Secretary of State", "https://www.maine.gov/sos/cec/elec/results/index.html", "municipal and precinct files summed to counties; military and overseas ballots, reported only statewide, are not in the county figures"),
     "OK": ("Oklahoma State Election Board", "https://results.okelections.gov/OKER/", "county results from the board's results application"),
+    "AR": ("Arkansas Secretary of State", "https://arkansas.tally-enr.com/", "county results from the state's election night reporting site"),
     "KS": ("Kansas Secretary of State", "https://sos.ks.gov/elections/election-results.html", "precinct-level files summed to counties"),
 }
 METHOD = "Results by county from OpenElections' 2026 primary file for {state}, a community compilation of the state's county results. Candidates who received votes are listed; write-in votes are pooled."
@@ -204,6 +206,7 @@ EV = {
     ),
 }
 FL_URL = "https://results.elections.myflorida.com/ResultsExtract.Asp?ElectionDate=8/18/2026&OfficialResults=Y"
+AR_ELECTION = "7f77a178-af02-40ec-92db-c5cc50882c68"
 OK_BASE = "https://results.okelections.gov/OKERS/"
 BROWSER = {"User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36"}
 MA_BASE = elstats.MASSACHUSETTS
@@ -235,6 +238,8 @@ def town_counties(state: str) -> dict[str, str]:
 
 
 def url(code: str, file: str) -> str:
+    if code == "ar":
+        return f"https://enr-results-api.totalresults.com/Contest/GetContestSearchList?cid=arkansas&electionID={AR_ELECTION}" if file == "contests" else f"https://results.tally-enr.com/results/arkansas/{AR_ELECTION}/FullDataFile.json"
     if code == "ok":
         first, _, second = file.partition("/")
         return f"{OK_BASE}enrapi/getelec/{second}/SW/xx" if first == "getelec" else f"{OK_BASE}enrapi/GetCntyResults/{first}/{second}"
@@ -417,6 +422,18 @@ def rows(code: str, path: Path, file: str = ""):
                         "votes": str(candidate["TOTAL_VOTES"]),
                     }
         return
+    if code == "ar":
+        if file == "contests":
+            return
+        names = json.loads(raw.cached(SOURCE, url(code, "contests")).path.read_text())["response"]["contests"]
+        for contest in json.loads(path.read_text())["ContestData"]:
+            found = re.fullmatch(r"(REP|DEM) (Governor|U\.S\. Senate|U\.S\. Congress District (\d+))", names[contest["ContestID"]]["contestName"]) if contest["ContestID"] in names else None
+            if found is not None:
+                office = {"Governor": "Governor", "U.S. Senate": "U.S. Senate"}.get(found[2], "U.S. House")
+                for fips, location in contest["Locations"].items():
+                    for choice in location["Choices"]:
+                        yield {"county": fips, "office": office, "district": found[3] or "", "party": "Republican" if found[1] == "REP" else "Democratic", "candidate": names[contest["ContestID"]]["choices"][choice["ChoiceID"]]["name"], "votes": str(choice["TotalVotes"])}
+        return
     if code == "ok":
         if file.startswith("getelec"):
             return
@@ -540,6 +557,9 @@ def fetch() -> None:
             if code == "ma":
                 for election, *_ in elstats.ma_primary_rows(raw.fetch(SOURCE, url(code, name), suffix=".html").path.read_text()):
                     raw.fetch(SOURCE, f"{MA_BASE}download/{election}/precincts_include:0/", suffix=".csv")
+                continue
+            if code == "ar":
+                raw.store(SOURCE, url(code, name), httpx.get(url(code, name), headers={**BROWSER, "Origin": "https://arkansas.tally-enr.com"}, timeout=600).content, suffix=".json", retrieved_at=datetime.now(UTC), media_type="application/json")
                 continue
             if code == "ok":
                 token = httpx.put(OK_BASE + "enrapi/login/", json={"Username": "appuser", "Password": "X098de!22k098Mgfd"}, headers=BROWSER, timeout=60).json()[1:]
