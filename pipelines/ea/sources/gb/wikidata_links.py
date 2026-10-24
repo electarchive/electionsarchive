@@ -20,9 +20,19 @@ OPTIONAL { ?item rdfs:label ?label FILTER(lang(?label) = "en") } }""",
     }
 )
 
+CANDIDACIES = "https://query.wikidata.org/sparql?" + urlencode(
+    {
+        "query": """SELECT ?item ?day ?districtLabel WHERE { ?item p:P3602 ?held . ?held ps:P3602 ?election .
+?election wdt:P31/wdt:P279* wd:Q15283424 ; wdt:P585 ?day .
+OPTIONAL { ?held pq:P768 ?district . ?district rdfs:label ?districtLabel FILTER(lang(?districtLabel) = "en") } }""",
+        "format": "json",
+    }
+)
+
 
 def fetch() -> None:
     raw.fetch(SOURCE, SERVICE, suffix=".json")
+    raw.fetch(SOURCE, CANDIDACIES, suffix=".json")
 
 
 def emit() -> Path:
