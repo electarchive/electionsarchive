@@ -38,7 +38,7 @@ FILES = {
     "CA": ("ca", "2026-06-02", ["19-gov", "76-us-rep"]),
     "MI": ("mi", "2026-08-04", ["20260804__mi__primary__county.csv"]),
     "PA": ("pa", "2026-05-19", ["20260519__pa__primary__county.csv"]),
-    "WV": ("wv", "2026-05-13", ["detailxml"]),
+    "WV": ("wv", "2026-05-12", ["detailxml"]),
     "MS": ("ms", "2026-03-10", ["20260310__ms__democratic__primary__county.csv", "20260310__ms__republican__primary__county.csv"]),
     "SD": ("sd", "2026-06-02", ["20260602__sd__primary__county.csv"]),
     "WY": ("wy", "2026-08-18", ["20260818__wy__primary__county.csv"]),
@@ -820,6 +820,8 @@ def emit() -> Path:
             polity="US",
         )
 
+        cs.renamed["2026-05-12:WV"] = "2026-05-13:WV"
+
         def name(entity: UUID, text: str) -> None:
             if entity in cs.minted:
                 cs.add("name", entity_id=entity, text=text, lang="en", kind="official", is_preferred=True)
@@ -957,7 +959,7 @@ def emit() -> Path:
                 cs.artifact(raw.cached(SOURCE, url(code, file)), sources[round_slot])
             election_key = f"{day}:{state}:{'runoff' if stage_no == 2 else 'primary'}"
             elections[round_slot] = cs.key("us.election", election_key)
-            if elections[round_slot] in cs.minted:
+            if elections[round_slot] in cs.minted or (state, stage_no) == ("WV", 1):
                 cs.add(
                     "election",
                     id=elections[round_slot],
@@ -968,7 +970,8 @@ def emit() -> Path:
                     date_to=day,
                     status="held",
                 )
-                name(elections[round_slot], f"2026 {state_name} primary runoff election" if stage_no == 2 else f"2026 {state_name} primary election")
+                if elections[round_slot] in cs.minted:
+                    name(elections[round_slot], f"2026 {state_name} primary runoff election" if stage_no == 2 else f"2026 {state_name} primary election")
                 cs.add("slug", path=f"us/{state.lower()}/{day}-{round_word.replace(' ', '-')}", entity_id=elections[round_slot])
             grouped: dict[tuple[str, str, str], dict[tuple[str, str, str], dict[str, int]]] = defaultdict(
                 lambda: defaultdict(lambda: defaultdict(int))
