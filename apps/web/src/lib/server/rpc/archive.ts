@@ -7290,10 +7290,10 @@ async function races(
                 where c.id = any(${sql.param(roots)}::uuid[])
               )
               select party, count(*)::int as seats,
-                (select count(*)::int from contest c where c.id = any(${sql.param(roots)}::uuid[]) and c.magnitude > 1 and c.kind <> 'list_allocation') as multiple
+                (select count(*)::int from contest c where c.id = any(${sql.param(roots)}::uuid[]) and c.magnitude > 1 and c.kind <> 'list_allocation' and exists (select from contest_option co where co.contest_id = c.id and co.kind = 'candidate')) as multiple
               from tacit group by party
               union all
-              select null, 0, (select count(*)::int from contest c where c.id = any(${sql.param(roots)}::uuid[]) and c.magnitude > 1 and c.kind <> 'list_allocation')
+              select null, 0, (select count(*)::int from contest c where c.id = any(${sql.param(roots)}::uuid[]) and c.magnitude > 1 and c.kind <> 'list_allocation' and exists (select from contest_option co where co.contest_id = c.id and co.kind = 'candidate'))
               where not exists (select from tacit)
             `);
       const unopposed = (returned?.rows ?? []).filter((row) => row.seats > 0);

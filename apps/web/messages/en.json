@@ -134,6 +134,8 @@
   "change_allied_bare": "{party} hold (elected as {label}).",
   "change_allied_margin": "{party} hold (elected as {label}), with a margin of {majority} votes.",
   "change_seats": "{changes}.",
+  "change_seats_list": "Seats: {changes}.",
+  "change_seats_net": "{party} {count} ({change})",
   "change_seats_hold": "{party} hold {count} seats",
   "change_seats_gain": "{to} gain {count} seats from {from}",
   "change_hold_margin": "{party} hold, with a margin of {majority} votes.",

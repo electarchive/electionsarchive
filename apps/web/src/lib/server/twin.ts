@@ -1218,7 +1218,9 @@ function contestMarkdown(
       : [
           `${
             handover.seats != null
-              ? m.change_seats({
+              ? (handover.seats.some((seat) => seat.change != null)
+                  ? m.change_seats_list
+                  : m.change_seats)({
                   changes: new Intl.ListFormat(getLocale(), {
                     style: "long",
                     type: "conjunction",
@@ -1228,6 +1230,16 @@ function contestMarkdown(
                         seat.party?.short ??
                         seat.party?.label ??
                         m.seats_independents();
+                      if (seat.change != null) {
+                        return m.change_seats_net({
+                          party: to,
+                          count: count(seat.count),
+                          change:
+                            seat.change === 0
+                              ? "±0"
+                              : `${seat.change > 0 ? "+" : "−"}${count(Math.abs(seat.change))}`,
+                        });
+                      }
                       const before =
                         seat.from?.short ??
                         seat.from?.label ??

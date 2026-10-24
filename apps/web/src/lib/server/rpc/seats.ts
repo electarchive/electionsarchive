@@ -267,6 +267,7 @@ export const seats = {
               v.object({
                 isGain: v.boolean(),
                 count: v.number(),
+                change: v.optional(v.number()),
                 party: v.nullable(
                   v.object({
                     label: v.string(),
@@ -356,7 +357,7 @@ export const seats = {
           ) n on s.id is null and g.id is null
         ),
         top as materialized (
-          select rs.contest_id as contest, rs.k as set, e.date_from as day, o.id, o.k, o.party_id
+          select rs.contest_id as contest, rs.k as set, e.date_from as day, o.id, o.k, o.party_id, coalesce(x.seats, 1) as seats
           from result_set rs
           join outcome x on x.result_set_id = rs.id and x.kind in ('elected', 'won') and x.candidacy_id is null
           join contest_option o on o.id = x.option_id
@@ -364,7 +365,7 @@ export const seats = {
           where rs.is_default and rs.contest_id in (select id from paired union select prior from paired)
         ),
         won as (
-          select distinct on (t.contest, t.k) t.contest, t.k,
+          select distinct on (t.contest, t.k) t.contest, t.k, t.seats,
             coalesce(bm.into_id, br.parent_party_id, pm.into_id, lp.party)::text as party,
             cy.person_id::text as person
           from top t
@@ -385,8 +386,8 @@ export const seats = {
           order by t.contest, t.k
         )
         select p.basis, p.prior, p.area, p.day::text as since, (select "isUs" from this) as "isUs",
-          array(select coalesce(x.party, 'person:' || x.person) from won x where x.contest = p.id order by x.k) as now,
-          array(select coalesce(x.party, 'person:' || x.person) from won x where x.contest = p.prior order by x.k) as before,
+          array(select coalesce(x.party, 'person:' || x.person) from won x cross join generate_series(1, x.seats) where x.contest = p.id order by x.k) as now,
+          array(select coalesce(x.party, 'person:' || x.person) from won x cross join generate_series(1, x.seats) where x.contest = p.prior order by x.k) as before,
           (select n.text from alliance a
             join alliance_member x on x.alliance_id = a.id and x.party_id::text = w.party
             join alliance_member y on y.alliance_id = a.id and y.party_id::text = b.party
@@ -456,25 +457,49 @@ export const seats = {
         seats:
           row.now.length < 2
             ? undefined
-            : Map.groupBy(
-                [
-                  ...gained.map((key, index) => ({
-                    key,
-                    from: kept[index] ?? null,
-                  })),
-                  ...held.map((key) => ({ key, from: null })),
-                ],
-                (seat) =>
-                  `${fold(seat.key)}|${seat.from == null ? "" : fold(seat.from)}`,
-              )
-                .values()
-                .map((group) => ({
-                  isGain: group[0]?.from != null,
-                  count: group.length,
-                  party: party(group[0]?.key ?? ""),
-                  from: group[0]?.from == null ? null : party(group[0].from),
-                }))
-                .toArray(),
+            : [...row.now, ...row.before].every(
+                  (key) => !key.startsWith("person:"),
+                )
+              ? [...new Set([...row.now, ...row.before])]
+                  .map((key) => {
+                    const seats = row.now.filter(
+                      (entry) => entry === key,
+                    ).length;
+                    const change =
+                      seats -
+                      row.before.filter((entry) => entry === key).length;
+                    return {
+                      isGain: change > 0,
+                      count: seats,
+                      change,
+                      party: party(key),
+                      from: null,
+                    };
+                  })
+                  .toSorted(
+                    (a, b) =>
+                      b.count - a.count ||
+                      Math.abs(b.change) - Math.abs(a.change),
+                  )
+              : Map.groupBy(
+                  [
+                    ...gained.map((key, index) => ({
+                      key,
+                      from: kept[index] ?? null,
+                    })),
+                    ...held.map((key) => ({ key, from: null })),
+                  ],
+                  (seat) =>
+                    `${fold(seat.key)}|${seat.from == null ? "" : fold(seat.from)}`,
+                )
+                  .values()
+                  .map((group) => ({
+                    isGain: group[0]?.from != null,
+                    count: group.length,
+                    party: party(group[0]?.key ?? ""),
+                    from: group[0]?.from == null ? null : party(group[0].from),
+                  }))
+                  .toArray(),
       };
     }),
   byElections: os

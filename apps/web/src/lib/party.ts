@@ -5,12 +5,9 @@ const NEUTRALS = [78, 56, 36].map(
     `color-mix(in oklab, var(--muted-foreground) ${amount}%, var(--card))`,
 );
 
-const ANSWERS = new Map([
-  ["answer:yes", "var(--yes)"],
-  ["answer:sì", "var(--yes)"],
-  ["answer:evet", "var(--yes)"],
-  ["answer:no", "var(--no)"],
-  ["answer:hayır", "var(--no)"],
+const SIDES = new Map([
+  ["answer:leave the european union", "#005ea7"],
+  ["answer:remain a member of the european union", "#f7c600"],
 ]);
 
 function oklch(hex: string) {
@@ -50,7 +47,8 @@ export const WITHIN = Symbol("within");
 export function swatch(color: string | null | undefined, key: string) {
   const chosen =
     (key.startsWith("party:") ? palette.overrides[key.slice(6)] : undefined) ??
-    color;
+    color ??
+    SIDES.get(key);
   if (chosen != null) {
     let base = chosen;
     const shade =
@@ -69,9 +67,11 @@ export function swatch(color: string | null | undefined, key: string) {
     }
     return `light-dark(oklch(from ${base} min(l, 0.86) c h), oklch(from ${base} max(l, 0.52) c h))`;
   }
-  const answer = ANSWERS.get(key);
-  if (answer != null) {
-    return answer;
+  if (/^answer:(?:yes|sì|evet|for|approve|i agree)(?:$|\s)/u.test(key)) {
+    return "var(--yes)";
+  }
+  if (/^answer:(?:no|hayır|against|reject|i do not agree)(?:$|\s)/u.test(key)) {
+    return "var(--no)";
   }
   let hash = 0;
   for (const character of key) {

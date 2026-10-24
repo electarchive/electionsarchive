@@ -968,29 +968,40 @@
     if (handover.seats != null) {
       const label = (party: { label: string; short: string | null } | null) =>
         party?.short ?? party?.label ?? m.seats_independents();
-      return `${m.change_seats({
+      return `${(handover.seats.some((seat) => seat.change != null)
+        ? m.change_seats_list
+        : m.change_seats)({
         changes: new Intl.ListFormat(getLocale(), {
           style: "long",
           type: "conjunction",
         }).format(
           handover.seats.map((seat) =>
-            seat.isGain
-              ? seat.count > 1
-                ? m.change_seats_gain({
-                    to: label(seat.party),
-                    from: label(seat.from),
-                    count: count(seat.count),
-                  })
-                : m.gains_seat({
-                    to: label(seat.party),
-                    from: label(seat.from),
-                  })
-              : seat.count > 1
-                ? m.change_seats_hold({
-                    party: label(seat.party),
-                    count: count(seat.count),
-                  })
-                : m.byes_hold({ party: label(seat.party) }),
+            seat.change != null
+              ? m.change_seats_net({
+                  party: label(seat.party),
+                  count: count(seat.count),
+                  change:
+                    seat.change === 0
+                      ? "±0"
+                      : `${seat.change > 0 ? "+" : "−"}${count(Math.abs(seat.change))}`,
+                })
+              : seat.isGain
+                ? seat.count > 1
+                  ? m.change_seats_gain({
+                      to: label(seat.party),
+                      from: label(seat.from),
+                      count: count(seat.count),
+                    })
+                  : m.gains_seat({
+                      to: label(seat.party),
+                      from: label(seat.from),
+                    })
+                : seat.count > 1
+                  ? m.change_seats_hold({
+                      party: label(seat.party),
+                      count: count(seat.count),
+                    })
+                  : m.byes_hold({ party: label(seat.party) }),
           ),
         ),
       })}${handover.basis === "same" ? "" : "*"}`;
