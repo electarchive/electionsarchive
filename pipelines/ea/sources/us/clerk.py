@@ -26,7 +26,7 @@ from ea.sources.us.fec import INDEPENDENT, NATIONAL, OPEN_PRIMARY, PARTIES
 from ea.store import DATA, connect
 
 SOURCE = "us.clerk"
-VERSION = "1"
+VERSION = "2"
 PARSED = DATA / "parsed" / SOURCE
 PAGES = DATA / "pages" / SOURCE
 PUBLISHER = "Clerk of the House of Representatives"
@@ -48,6 +48,8 @@ STATES = {
 }  # fmt: skip
 SPECIAL = r"(?i)unexpired|vacanc|short term|to fill|balance of|term ending"
 BLANK = r"(?i)^(blanks?|void|blank,? (and )?void)$"
+UNNAMED = r"(?i)^(republican|democrat|democratic|socialist)( party)?$"
+AGGREGATE = r"(?i)^(write-?ins?|others?|all others|scattering|scattered|independent)$"
 DISTRICTS = {
     (1926, 4, 38): 5,
     (1930, 20, 40): 8,
@@ -859,10 +861,25 @@ def parse() -> None:
 
 
 def emit() -> Path:
-    frame = pl.read_parquet(PARSED / "contests.parquet").with_columns(
-        party=pl.when(pl.col("year").is_between(1936, 1940))
-        .then(pl.col("party").str.replace_all(r"(^|[,;/]\s*)Union(\s*(?:[,;/]|$))", "${1}Union Party of 1936${2}"))
-        .otherwise(pl.col("party"))
+    frame = (
+        pl.read_parquet(PARSED / "contests.parquet")
+        .with_columns(
+            party=pl.when(pl.col("year").is_between(1936, 1940))
+            .then(pl.col("party").str.replace_all(r"(^|[,;/]\s*)Union(\s*(?:[,;/]|$))", "${1}Union Party of 1936${2}"))
+            .otherwise(pl.col("party")),
+            relabeled=(pl.col("kind") == "candidate")
+            & (pl.col("name").str.contains(UNNAMED) | pl.col("name").str.contains(AGGREGATE)),
+        )
+        .with_columns(
+            party=pl.when(pl.col("relabeled") & pl.col("name").str.contains(UNNAMED))
+            .then(pl.col("party").fill_null(pl.col("name").str.replace(r"(?i) party$", "")))
+            .otherwise(pl.col("party")),
+            kind=pl.when(pl.col("relabeled") & pl.col("name").str.contains(UNNAMED))
+            .then(pl.lit("party"))
+            .when(pl.col("relabeled"))
+            .then(pl.lit("scattering"))
+            .otherwise(pl.col("kind")),
+        )
     )
     days = {year: date(year, 11, 2 + (-date(year, 11, 1).weekday()) % 7) for year in YEARS}
     with connect() as conn:
@@ -900,6 +917,14 @@ def emit() -> Path:
         ).fetchall():
             known.setdefault(scheme, {})[value] = entity
         identified = {(scheme, entity) for scheme, values in known.items() for entity in values.values()}
+        foreign: set[UUID] = {
+            entity
+            for (entity,) in conn.execute(
+                """select x.entity_id from external_id x join result_set r on r.id = x.entity_id
+                   join changeset c on c.id = r.changeset_id where x.scheme = %s and c.pipeline <> %s""",
+                [f"{SOURCE}.result_set", SOURCE],
+            ).fetchall()
+        }
         cs = Changeset(
             conn,
             pipeline=SOURCE,
@@ -1192,6 +1217,8 @@ def emit() -> Path:
                 entity_id=contest,
             )
             result_set = cs.key(f"{SOURCE}.result_set", contest_key)
+            if result_set in foreign:
+                rows = [{**row, "kind": "candidate", "relabeled": False} if row["relabeled"] else row for row in rows]
             cs.add(
                 "result_set",
                 id=result_set,
@@ -1299,21 +1326,35 @@ def emit() -> Path:
                         )
                     values.append((option, row["votes"], DIGITIZED, row))
             for row in rows:
-                if row["kind"] != "scattering":
+                if row["kind"] not in ("scattering", "party"):
                     continue
-                kind = "others" if re.search(r"(?i)blank|void", str(row["name"])) else "write_in"
+                kind = (
+                    "party"
+                    if row["kind"] == "party"
+                    else "others"
+                    if re.search(r"(?i)blank|void", str(row["name"]))
+                    or (row["relabeled"] and re.search(r"(?i)^(others?|independent)$", str(row["name"])))
+                    else "write_in"
+                )
                 option = cs.key("us.option", f"{contest_key}:{kind}:{slug(str(row['name']))}")
                 if option in seen:
                     option = cs.key(
                         "us.option", f"{contest_key}:{kind}:{slug(str(row['name']))}:{row['page']}:{row['line']}"
                     )
                 seen.add(option)
-                cs.add("contest_option", id=option, contest_id=contest, kind=kind, ballot_label=row["name"])
+                cs.add(
+                    "contest_option",
+                    id=option,
+                    contest_id=contest,
+                    kind="candidate" if kind == "party" else kind,
+                    party_id=parties[(state, labels(row["party"])[0][0])] if kind == "party" else None,
+                    ballot_label=row["name"],
+                )
                 values.append((option, row["votes"], DIGITIZED, row))
             counted = [votes for _, votes, _, _ in values if votes is not None]
             if counted:
                 values.append((None, sum(counted), DERIVED, None))
-            if result_set in cs.minted or contest_key in RESEATED.values():
+            if result_set in cs.minted or contest_key in RESEATED.values() or any(row["relabeled"] for row in rows):
                 for option, votes, flags, row in values:
                     if votes is None:
                         continue
@@ -1351,4 +1392,30 @@ def emit() -> Path:
                 raise ValueError(f"{contest_key}: {len(winners)} elected for {magnitude} seats")
             for person in winners:
                 cs.add("outcome", result_set_id=result_set, option_id=roots[person], kind="elected", seats=1)
+        reason = "A party label or write-in line in the Clerk's statistics read as a candidate's name"
+        junk = conn.execute(
+            """select c.id from candidacy c join changeset ch on ch.id = c.changeset_id
+               join name n on n.entity_id = c.person_id and n.is_preferred
+               join contest_option o on o.id = c.option_id
+               where ch.pipeline = %s and (n.text ~ %s or n.text ~ %s)
+                 and not exists (
+                   select 1 from result_set r join external_id x on x.entity_id = r.id and x.scheme = %s
+                   where r.contest_id = o.contest_id and r.id = any(%s::uuid[]))""",
+            [SOURCE, UNNAMED, AGGREGATE, f"{SOURCE}.result_set", list(foreign)],
+        ).fetchall()
+        if not junk:
+            junk = conn.execute(
+                """select x.entity_id from external_id x join contest_option o on o.id = x.entity_id
+                   where x.scheme = 'us.option' and x.value ~ ':[0-9a-f-]{36}$'
+                     and (o.ballot_label ~ %s or o.ballot_label ~ %s)
+                     and not exists (select 1 from candidacy c where c.option_id = o.id)
+                     and o.changeset_id in (select id from changeset where pipeline = %s)
+                   union
+                   select x.entity_id from external_id x join name n on n.entity_id = x.entity_id and n.is_preferred
+                   where x.scheme = %s and (n.text ~ %s or n.text ~ %s)
+                     and not exists (select 1 from candidacy c where c.person_id = x.entity_id)""",
+                [UNNAMED, AGGREGATE, SOURCE, f"{SOURCE}.person", UNNAMED, AGGREGATE],
+            ).fetchall()
+        for (entity,) in junk:
+            cs.add("entity_retirement", entity_id=entity, reason=reason)
         return cs.write()
