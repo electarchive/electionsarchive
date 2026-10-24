@@ -226,7 +226,8 @@ def wikidata_query() -> str:
     ids = sorted({mep["identifier"] for term in TERMS.values() for mep in meps(term)}, key=int)
     values = " ".join(f'"{id}"' for id in ids)
     return SPARQL + quote(
-        f"SELECT ?item ?ep ?mnis WHERE {{ VALUES ?ep {{ {values} }} ?item wdt:P1186 ?ep . OPTIONAL {{ ?item wdt:P10428 ?mnis }} }}"
+        f"SELECT ?item ?ep ?mnis ?label WHERE {{ VALUES ?ep {{ {values} }} ?item wdt:P1186 ?ep . "
+        f"OPTIONAL {{ ?item wdt:P10428 ?mnis }} OPTIONAL {{ ?item rdfs:label ?label FILTER(lang(?label) = 'en') }} }}"
     )
 
 
@@ -351,7 +352,11 @@ def parse() -> None:
     frame = pl.DataFrame(lines, infer_schema_length=None)
     elected = pl.DataFrame(members, infer_schema_length=None)
     wikidata = {
-        row["ep"]["value"]: (row["item"]["value"].rsplit("/", 1)[1], row.get("mnis", {}).get("value"))
+        row["ep"]["value"]: (
+            row["item"]["value"].rsplit("/", 1)[1],
+            row.get("mnis", {}).get("value"),
+            row.get("label", {}).get("value"),
+        )
         for row in json.loads(raw.cached(SOURCE, wikidata_query()).path.read_text())["results"]["bindings"]
     }
     matched = []
@@ -380,7 +385,7 @@ def parse() -> None:
                         raw.cached(SOURCE, f"{API}/corporate-bodies/{membership['organization'].split('/')[1]}?{FORMAT}").path.read_text()
                     )["data"][0]
                     party = f"EP:{body['label']}"
-        matched.append({**row, "party": party, "ep": ep, "ep_name": ep_name, "qid": wikidata[ep][0] if ep in wikidata else None, "mnis": wikidata[ep][1] if ep in wikidata else None})
+        matched.append({**row, "party": party, "ep": ep, "ep_name": ep_name, "qid": wikidata[ep][0] if ep in wikidata else None, "mnis": wikidata[ep][1] if ep in wikidata else None, "wd_name": wikidata[ep][2] if ep in wikidata else None})
     elected = pl.DataFrame(matched, infer_schema_length=None)
     PARSED.mkdir(parents=True, exist_ok=True)
     frame.write_parquet(PARSED / "results.parquet")
@@ -461,6 +466,13 @@ def emit() -> Path:
             ).fetchall()
         }
         persons: dict[str, UUID] = {}
+        owned: dict[UUID, list[tuple[UUID, str]]] = {}
+        for person, id, text in conn.execute(
+            """select p.id, n.id, n.text from person p join changeset c on c.id = p.changeset_id and c.pipeline = %s
+               join name n on n.entity_id = p.id and n.is_preferred and n.lang = 'en'""",
+            [SOURCE],
+        ).fetchall():
+            owned.setdefault(person, []).append((id, text))
         rounds = elected.filter(pl.col("round").is_not_null()).height
         for (year, region), lines in frame.sort("year").group_by("year", "region", maintain_order=True):
             contest_key = f"GB:{year}:gb.ep_constituency:{region}"
@@ -641,14 +653,16 @@ def emit() -> Path:
                         keyed = held[:1]
                         person = cs.key(*held[0]) if held else cs.key(f"{SOURCE}.person", ident)
                         cs.add("person", id=person)
-                        cs.add(
-                            "name",
-                            entity_id=person,
-                            text=member["ep_name"] or member["name"],
-                            lang="en",
-                            kind="official",
-                            is_preferred=True,
+                    if person in cs.minted or person in owned:
+                        text = next(
+                            text
+                            for text in (member["wd_name"], member["ep_name"], member["name"])
+                            if text is not None and not re.search(r",|\b[A-Z]{2,}\b|\bMc[a-z]", text)
                         )
+                        cs.add("name", entity_id=person, text=text, lang="en", kind="official", is_preferred=True)
+                        for id, old in owned.get(person, []):
+                            if old != text:
+                                cs.add("name", id=id, entity_id=person, text=old, lang="en", kind="official", is_preferred=False)
                     for id in held:
                         if id not in known:
                             known[id] = person
