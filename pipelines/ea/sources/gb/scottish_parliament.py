@@ -175,8 +175,16 @@ HISTORY_LISTS = (
     "over the region's constituencies; the workbook gives them by constituency. The same workbook prints "
     "the regional totals, which these sums reproduce. Independent candidates other than those named are pooled "
     "under Others, and the workbook does not name them. Electorates and rejected papers are the sums of "
-    "the constituencies' figures."
+    "the constituencies' figures. These figures replace the BBC News and Glasgow Digital Library (Aspect) "
+    "regional totals that this archive published earlier."
 )
+DROP_REASONS = {
+    1999: "replaced by the official Region Vote figures, which pool the independents the earlier list split",
+    2003: "replaced by the official Region Vote figures, which pool the independents the earlier list split",
+    2007: "replaced by the official Region Vote figures, which pool the independents the earlier list split",
+    2021: "a party that did not stand in this region, listed with no votes by the source",
+    2026: "a member elected from a party's list is not a separate ballot option",
+}
 NO_LIST_VOTES = (
     "The regional list votes by party for this election have not been loaded yet. The seats shown are the "
     "members the Scottish Parliament's results page declares elected from each region's lists."
@@ -1082,6 +1090,17 @@ def emit() -> Path:
                     cs.add("note", entity_id=result_set, kind="caveat", body_md=NO_LIST_VOTES)
                 if year in (1999, 2003, 2007):
                     cs.add("note", entity_id=result_set, kind="caveat", body_md=HISTORY_LISTS)
+                    for note, text in conn.execute(
+                        "select id, body_md from note where entity_id = %s and body_md like %s and body_md <> %s",
+                        [result_set, "The regional list votes are%", HISTORY_LISTS],
+                    ).fetchall():
+                        cs.add(
+                            "note_drop",
+                            note_id=note,
+                            entity_id=result_set,
+                            body_md=text,
+                            reason="replaced by the note on the official figures, which supersede the earlier lists",
+                        )
                 region_lists = year_lists.filter(pl.col("rkey") == rkey)
                 lothian_2011 = year == 2011 and rkey == "lothian"
                 options: dict[str, UUID] = {}
@@ -1200,6 +1219,17 @@ def emit() -> Path:
                                 candidacy_id=candidacy,
                                 kind="elected",
                             )
+                kept = {row["id"] for row in cs.rows["contest_option"] if row["contest_id"] == contest}
+                for (stale,) in conn.execute(
+                    "select id from contest_option where contest_id = %s", [contest]
+                ).fetchall():
+                    if stale not in kept:
+                        cs.add(
+                            "option_drop",
+                            option_id=stale,
+                            contest_id=contest,
+                            reason=DROP_REASONS.get(year, "no longer a ballot option of this contest in the emit"),
+                        )
                 if list_source is None:
                     continue
                 list_units = year_units.filter((pl.col("ballot") == "list") & (pl.col("rkey") == rkey))

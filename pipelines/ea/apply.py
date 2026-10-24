@@ -67,7 +67,7 @@ def _stage(conn: Connection, changeset_id: str) -> Stage:
         if table in tables
         and table not in temporal
         and table
-        not in (*FACTS, "external_id", "slug", "entity_merge", "entity_retirement", "entity_subtype_drop", "name_drop", "membership_drop", "unit_area_drop", "note_drop")
+        not in (*FACTS, "external_id", "slug", "entity_merge", "entity_retirement", "entity_subtype_drop", "name_drop", "membership_drop", "unit_area_drop", "note_drop", "option_drop")
     }
     owners: dict[str, str] = {
         table: owner
@@ -722,6 +722,57 @@ def _publish_table(conn: Connection, stage: Stage, table: str) -> None:
             if writer != stage.pipeline:
                 raise ValueError(f"note {note} was written by {writer}, not {stage.pipeline}")
         conn.execute(sql.SQL("delete from public.note where id in (select note_id from {})").format(staged))
+    if table == "option_drop":
+        for option, contest, k, held, writer in conn.execute(
+            sql.SQL(
+                """select s.option_id::text, s.contest_id::text, o.k, o.contest_id::text, c.pipeline from {} s
+                   left join public.contest_option o on o.id = s.option_id
+                   left join changeset c on c.id = o.changeset_id"""
+            ).format(staged)
+        ).fetchall():
+            if held != contest:
+                raise ValueError(f"option {option} is not in contest {contest}")
+            if writer != stage.pipeline:
+                raise ValueError(f"option {option} was written by {writer}, not {stage.pipeline}")
+            sets = [
+                row[0] for row in conn.execute("select k from public.result_set where contest_id = %s", [contest]).fetchall()
+            ]
+            used = [
+                f"{relation}.{column} ({rows} rows)"
+                for relation, column in (
+                    ("result_value", "option_k"),
+                    ("result_flow", "option_k"),
+                    ("result_flow", "from_option_k"),
+                    ("result_rollup", "option_k"),
+                    ("value_locator", "option_k"),
+                )
+                for (rows,) in conn.execute(
+                    sql.SQL("select count(*) from public.{} where result_set_k = any(%s) and {} = %s").format(
+                        sql.Identifier(relation), sql.Identifier(column)
+                    ),
+                    [sets, k],
+                ).fetchall()
+                if rows
+            ]
+            for relation, column in (("candidacy", "option_id"), ("outcome", "option_id"), ("contest_option", "parent_option_id")):
+                (rows,) = conn.execute(
+                    sql.SQL("select count(*) from public.{} where {} = %s").format(
+                        sql.Identifier(relation), sql.Identifier(column)
+                    ),
+                    [option],
+                ).fetchone()
+                if rows:
+                    used.append(f"{relation}.{column} ({rows} rows)")
+            if used:
+                raise ValueError(f"option {option} is still used: " + "; ".join(used))
+        for relation in ("name", "note", "slug", "external_id"):
+            conn.execute(
+                sql.SQL("delete from public.{} where entity_id in (select option_id from {})").format(
+                    sql.Identifier(relation), staged
+                )
+            )
+        conn.execute(sql.SQL("delete from public.contest_option where id in (select option_id from {})").format(staged))
+        conn.execute(sql.SQL("delete from public.entity where id in (select option_id from {})").format(staged))
     if table == "unit_area_drop":
         conn.execute(
             sql.SQL(

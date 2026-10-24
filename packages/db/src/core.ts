@@ -805,6 +805,15 @@ export const noteDrop = pgTable("note_drop", {
 }, (table) => [
 check("note_drop_reason_check", sql`(reason <> ''::text)`),]);
 
+export const optionDrop = pgTable("option_drop", {
+	optionId: uuid("option_id").primaryKey(),
+	contestId: uuid("contest_id").notNull().references(() => contest.id, { onDelete: "cascade" } ),
+	reason: text().notNull(),
+	changesetId: uuid("changeset_id").notNull().references(() => changeset.id),
+	recordedFrom: timestamp("recorded_from", { withTimezone: true }).default(sql`now()`).notNull(),
+}, (table) => [
+check("option_drop_reason_check", sql`(reason <> ''::text)`),]);
+
 export const office = pgTable("office", {
 	id: uuid().default(sql`uuidv7()`).primaryKey().references(() => entity.id, { onDelete: "cascade" } ),
 	polityId: uuid("polity_id").notNull().references(() => polity.id),
