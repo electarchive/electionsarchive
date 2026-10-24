@@ -1,7 +1,8 @@
 import html
 import re
+import subprocess
 import unicodedata
-from datetime import date
+from datetime import UTC, date, datetime
 from pathlib import Path
 
 import polars as pl
@@ -21,6 +22,24 @@ PAGES_2016 = {
     "Sedgwick": "https://web.archive.org/web/20190824170813id_/https://www.sedgwickcounty.org/elections/election-results/2016-primary/",
     "Wyandotte": "https://web.archive.org/web/20260305234012id_/https://wycovoteskck.gov/august-2-2016-statewide-primary-election",
 }
+SAVED_2016 = {
+    "Johnson": (
+        "https://www.jocoelection.org/events-elections/august-2-2016-primary-election",
+        DATA / "inbox" / "manual" / "MF-047" / "johnson" / "August 2016 Primary Election Results.pdf",
+    ),
+    "Shawnee": (
+        "https://www.snco.gov/election/results.php",
+        DATA / "inbox" / "manual" / "MF-047" / "shawnee" / "Nat_State_Offices.pdf",
+    ),
+}
+SHAWNEE_2016 = (
+    ("Democratic", None, "Patrick Wiesner", "6877"),
+    ("Democratic", None, "Monique Singh", "2649"),
+    ("Republican", None, "Jerry Moran", "14410"),
+    ("Republican", None, "DJ Smith", "4298"),
+    ("Democratic", "2", "Britani Potter", "8172"),
+    ("Republican", "2", "Lynn Jenkins", "16081"),
+)
 FILES = {
     (date(2000, 8, 1), "house"): ("20140113113855", "00elec/2000_primary_uscongress_official_results.xls"),
     (date(2002, 8, 6), "house"): ("20041011130211", "02elec/ELUSHSE02P.xls"),
@@ -154,6 +173,25 @@ def rows_2016(path: Path, chamber: str) -> pl.DataFrame:
                 (county, party, district, names.get(lines[j].split()[-1], lines[j]), lines[j + 1].replace(",", ""))
                 for j in range(at, stop, 3)
             )
+    page = subprocess.run(
+        ["pdftotext", "-layout", "-f", "1", "-l", "2", str(SAVED_2016["Johnson"][1]), "-"],
+        capture_output=True,
+        text=True,
+        check=True,
+    ).stdout
+    for race, block in re.findall(r"^\s*(US SENATOR [DR]|US REP 3 [DR])\s+[DR]\n(.*?)(?=^\s*(?:US |STATE ))", page, re.MULTILINE | re.DOTALL):
+        if ("SENATOR" in race) != (chamber == "senate"):
+            continue
+        party = {"D": "Democratic", "R": "Republican"}[race[-1]]
+        out.extend(
+            ("Johnson", party, None if chamber == "senate" else "3", names.get(name.split()[-1], name.title()), votes.replace(",", ""))
+            for name, votes in re.findall(r"^\s*([A-Z][A-Z .'-]+?)\s+[DR]\s+([\d,]+)\s+[\d.]+%", block, re.MULTILINE)
+        )
+    out.extend(
+        ("Shawnee", party, district, names.get(name.split()[-1], name), votes)
+        for party, district, name, votes in SHAWNEE_2016
+        if (district is None) == (chamber == "senate")
+    )
     return pl.DataFrame(out, schema=["county", "party", "district", "candidate", "votes"], orient="row")
 
 
@@ -239,8 +277,8 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Kansas's U.S. House and Senate primaries by county, 2000-2018 (Secretary of State; Sedgwick and Wyandotte "
-            "county pages for 2016)",
+            summary="Kansas's U.S. House and Senate primaries by county, 2000-2018 (Secretary of State; Sedgwick, Wyandotte, "
+            "Johnson, and Shawnee county canvasses for 2016)",
             polity="US-KS",
         )
         source = cs.source(PUBLISHER, TITLE)
@@ -257,5 +295,17 @@ def emit() -> Path:
             cs.artifact(raw.cached(SOURCE, url(key)), source)
         for page in PAGES_2016.values():
             cs.artifact(raw.cached(SOURCE, page), source)
+        for address, path in SAVED_2016.values():
+            cs.artifact(
+                raw.store(
+                    SOURCE,
+                    address,
+                    path.read_bytes(),
+                    suffix=".pdf",
+                    retrieved_at=datetime.fromtimestamp(path.stat().st_mtime, UTC),
+                    media_type="application/pdf",
+                ),
+                source,
+            )
         medsl.attach(cs, conn, frame, {"KS": source}, strict=True)
         return cs.write()
