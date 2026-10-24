@@ -16,7 +16,7 @@ from ea.changeset import Changeset
 from ea.store import DATA, connect
 
 SOURCE = "ie.returning_officer"
-VERSION = "1"
+VERSION = "2"
 PARSED = DATA / "parsed" / SOURCE
 PAGES = DATA / "pages" / SOURCE
 ELECTION = date(2024, 6, 7)
@@ -76,6 +76,7 @@ HEADER = {
     3: r"(?:votes cast\s+\([\d.]+%\)|total poll)\s+([\d,]+)",
     5: r"invalid ballot papers\s+([\d,]+)",
     4: r"valid poll\s+([\d,]+)",
+    26: r"quota\s+([\d,]+)",
 }
 EXHAUSTED = 21
 DERIVED = 1
@@ -232,7 +233,7 @@ def parse() -> None:
             )
 
         header: dict[int, tuple[int, int, Word]] = {}
-        magnitude = quota = 0
+        magnitude = 0
         for page_number, lines in enumerate(lines_of, 1):
             for _, ws in lines:
                 text = " ".join(w[4] for w in ws)
@@ -248,8 +249,7 @@ def parse() -> None:
                     match := re.search(r"(?:number of seats|no of positions:)\s+(\d+)", text, re.IGNORECASE)
                 ):
                     magnitude = int(match[1])
-                if not quota and (match := re.search(r"quota\s+([\d,]+)", text, re.IGNORECASE)):
-                    quota = int(match[1].replace(",", ""))
+        quota = header[26][0]
 
         labels: list[str] = []
         totals: dict[tuple[int, int], tuple[int | None, int, Word]] = {}

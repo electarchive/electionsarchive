@@ -26,6 +26,7 @@ HOST = "results.enr.clarityelections.com"
 CENSUS = "https://www2.census.gov/geo/tiger/GENZ2020/shp/cb_2020_{fips}_{layer}_500k.zip"
 LAYERS = ("place", "cousub", "unsd")
 TITLE = "Election night reporting results"
+DAY_FIXES = {("https://results.enr.clarityelections.com/IL/McHenry/", "109015"): date(2021, 4, 6)}
 STATE_NAMES = {"IL": "Illinois", "MI": "Michigan", "TX": "Texas", "PA": "Pennsylvania"}
 NUMBERS = {
     "ONE": "1",
@@ -470,6 +471,7 @@ def parse(
     skipped: Counter[str] = Counter()
     for record in read(registry):
         tenant, election, day = record["tenant"], record["election"], record["day"]
+        day = DAY_FIXES.get((tenant, election), day)
         row = registry[tenant]
         county, st = row["county_fips"], row["state"]
         county_name = _plain(row["county"])
@@ -1056,6 +1058,7 @@ def emit(
             summary="County, municipal, school, special district, and party offices and local questions from county election night reporting sites",
             polity="US",
         )
+        cs.renamed["2021-04-06:IL"] = "2021-03-29:IL"
 
         def name(entity: UUID, text: str) -> None:
             cs.add("name", id=None, entity_id=entity, text=text, lang="en", kind="official", is_preferred=True)

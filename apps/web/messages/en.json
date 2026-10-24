@@ -230,6 +230,8 @@
   "stv_title": "Count by count",
   "stv_lede": "{seats} seats. A candidate who reaches the quota of {quota} votes is elected. At each later count, the surplus of a winner, or the votes of the last-placed candidate, moves to the next preference on each ballot.",
   "stv_quota_derived": "The source doesn't print the quota, so we calculated it with the Droop formula: valid first preferences divided by seats plus one, rounded down, plus one.",
+  "stv_quota_declared": "Quota (declared): {quota}",
+  "stv_quota_computed": "Quota (computed, Droop): {quota}",
   "stv_count": "Count {count}",
   "stv_first": "First preferences",
   "stv_surplus": "Surplus of {names}",

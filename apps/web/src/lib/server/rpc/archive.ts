@@ -1747,14 +1747,15 @@ async function tally(
         ),
       ),
     ),
-    db.execute<{ round: number; value: number }>(sql`
-      select r.count_round as round, sum(r.value)::float8 as value
+    db.execute<{ measure: number; round: number; value: number }>(sql`
+      select r.measure, r.count_round as round, sum(r.value)::float8 as value
       from result_set rs cross join lateral (
-        select x.count_round, x.value from result_rollup x
-        where x.result_set_k = rs.k and x.area_k = ${areaK} and x.option_k = 0 and x.measure = 21 offset 0
+        select x.measure, x.count_round, x.value from result_rollup x
+        where x.result_set_k = rs.k and x.area_k = ${areaK} and x.option_k = 0 and x.measure in (21, 26) offset 0
       ) r
       where rs.contest_id = ${contest.id}::uuid and rs.is_default
-      group by r.count_round
+      group by r.measure, r.count_round
+      order by r.count_round
     `),
   ]);
   const lines = new Map<
@@ -1805,13 +1806,18 @@ async function tally(
   }
   const reach = (votes: Array<number | null>) =>
     votes.findLastIndex((value) => value != null);
-  const exhausted = new Map(spent.rows.map((row) => [row.round, row.value]));
+  const exhausted = new Map(
+    spent.rows
+      .filter((row) => row.measure === 21)
+      .map((row) => [row.round, row.value]),
+  );
+  const declared = spent.rows.find((row) => row.measure === 26)?.value;
   const listed = lines.values().toArray();
   let first = 0;
   for (const line of listed) {
     first += line.votes[0] ?? 0;
   }
-  const quota = Math.floor(first / ((seats ?? 0) + 1)) + 1;
+  const quota = declared ?? Math.floor(first / ((seats ?? 0) + 1)) + 1;
   return {
     round,
     last,
@@ -1828,7 +1834,7 @@ async function tally(
         : {
             seats,
             quota,
-            isDerived: true,
+            isDerived: declared == null,
             steps: rounds.map((step) => {
               const from =
                 step === 1

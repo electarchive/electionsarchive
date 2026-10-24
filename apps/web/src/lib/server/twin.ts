@@ -1271,7 +1271,10 @@ function countMarkdown(contest: Extract<Data, { kind: "contest" }>["contest"]) {
         : ` (${value > 0 ? "+" : "−"}${count(Math.abs(value))})`;
     return [
       `## ${m.stv_title()}`,
-      `${m.stv_lede({ seats: count(stv.seats), quota: count(stv.quota) })}${stv.isDerived ? ` ${m.stv_quota_derived()}` : ""}`,
+      m.stv_lede({ seats: count(stv.seats), quota: count(stv.quota) }),
+      (stv.isDerived ? m.stv_quota_computed : m.stv_quota_declared)({
+        quota: count(stv.quota),
+      }),
       table(
         [
           m.col_candidate(),
