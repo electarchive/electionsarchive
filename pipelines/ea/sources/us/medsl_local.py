@@ -241,8 +241,8 @@ EXCLUDED = re.compile(
     r"RECALL|PRESIDENT|CHAIR|VICE|JUDGE|CLERK|TREASURER|ATTORNEY|AUDITOR|BOARD|SCHOOL|QUESTION|PROPOSITION|AMENDMENT"
     r"|CHARTER|MEASURE|COUNTY|TOWNSHIP|ADVISORY|SHALL"
 )
-NONPARTISAN = {"NONPARTISAN", "NON-PARTISAN", "NP", "OTHER", '""'}
-UNAFFILIATED = {"NO", "INDEPENDENT-UNENROLLED", "NO PARTY PREFERENCE"}
+NONPARTISAN = {"NONPARTISAN", "NON-PARTISAN", "NON PARTISAN", "NON", "NONC", "NONS", "NP", "OTHER", '""'}
+UNAFFILIATED = {"NO", "INDEPENDENT-UNENROLLED", "NO PARTY PREFERENCE", "NO POLITICAL PARTY"}
 METHOD = (
     "Totals are the sums of the precinct rows in MEDSL's 2024 precinct file for the state. The file does not mark "
     "winners, so the winners shown are the candidates with the most votes, as many as the contest elects."
