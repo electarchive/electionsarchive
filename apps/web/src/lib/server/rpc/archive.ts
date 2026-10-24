@@ -1862,7 +1862,15 @@ async function tally(
       .map((row) => [row.round, row.value]),
   );
   const declared = spent.rows.find((row) => row.measure === 26)?.value;
-  const listed = lines.values().toArray();
+  const listed = lines
+    .values()
+    .toArray()
+    .map((line, _, all) =>
+      line.short != null &&
+      all.some((other) => other !== line && other.label === line.label)
+        ? { ...line, label: `${line.label} (${line.short})` }
+        : line,
+    );
   let first = 0;
   for (const line of listed) {
     first += line.votes[0] ?? 0;

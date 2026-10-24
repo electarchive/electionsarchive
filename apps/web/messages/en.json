@@ -265,6 +265,7 @@
   "stv_elected": "Elected at count {count}",
   "stv_elected_short": "Elected at the last count without reaching the quota",
   "stv_excluded": "Excluded at count {count}",
+  "stv_unelected": "Not elected; seats filled while still in the count",
   "stv_quota": "Quota",
   "stv_step": "Count {count} of {last}: {action}.",
   "stv_step_elected": "Elected at this count: {names}.",

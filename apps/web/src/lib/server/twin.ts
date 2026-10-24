@@ -2298,7 +2298,7 @@ function countMarkdown(contest: Extract<Data, { kind: "contest" }>["contest"]) {
                   ? m.stv_elected_short()
                   : m.stv_elected({ count: elected + 1 })
                 : out === -1
-                  ? null
+                  ? m.stv_unelected()
                   : m.stv_excluded({ count: out + 1 }),
               ...rounds.map((round) => {
                 const votes = row.votes[round];

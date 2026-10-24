@@ -169,6 +169,10 @@
                   <span class="ps-4 text-xs text-pretty text-muted-foreground"
                     >{m.stv_excluded({ count: row.out })}</span
                   >
+                {:else if count.last > 1}
+                  <span class="ps-4 text-xs text-pretty text-muted-foreground"
+                    >{m.stv_unelected()}</span
+                  >
                 {/if}
               </span>
             </th>
