@@ -4,14 +4,16 @@ import re
 import time
 from datetime import date
 from pathlib import Path
-from uuid import UUID
+from uuid import UUID, uuid5
 
 import fastexcel
 import polars as pl
 
 from ea import raw
-from ea.changeset import Changeset, slug
+from ea.changeset import NAMESPACE, Changeset, slug
 from ea.sources.gb import umit
+from ea.sources.gb.sp_boundaries import NAMES as BOUNDARY_NAMES
+from ea.sources.gb.sp_boundaries import regions_1999
 from ea.store import DATA, connect
 
 SOURCE = "gb.scottish_parliament"
@@ -30,11 +32,21 @@ ELECTIONS = {
 ERAS = {1999: 1999, 2003: 1999, 2007: 1999, 2011: 2011, 2016: 2011, 2021: 2011, 2026: 2026}
 OGL = "https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/"
 EC_ATTRIBUTION = "Contains information from the Electoral Commission licensed under the Open Government Licence v3.0."
+ANALYSIS_2011 = "https://archive2021.parliament.scot/Electionresults/2011_ElectionAnalysis.xls"
 SOURCES = (
     (
         "page",
         "The Scottish Parliament",
         "Scottish Parliament election results, 1999 to 2026",
+        "https://www.parliament.scot/msps/elections",
+        "Scottish Parliament Copyright Licence",
+        "https://www.parliament.scot/about/copyright",
+        "Contains information licensed under the Scottish Parliament Copyright Licence.",
+    ),
+    (
+        "analysis2011",
+        "The Scottish Parliament",
+        "Scottish Parliament election 2011: election analysis workbook",
         "https://www.parliament.scot/msps/elections",
         "Scottish Parliament Copyright Licence",
         "https://www.parliament.scot/about/copyright",
@@ -90,6 +102,15 @@ SOURCES = (
         "The Electoral Management Board for Scotland",
         "Scottish Parliamentary election 6 May 2021: full votes and seats by party and candidate",
         "https://www.emb.scot/",
+        "Public record",
+        None,
+        "The Electoral Management Board for Scotland.",
+    ),
+    (
+        "emb2026",
+        "The Electoral Management Board for Scotland",
+        "Scottish Parliament election 7 May 2026: regional votes in each constituency",
+        "https://www.emb.scot/downloads/download/176/scottish-parliament-election-2026-downloads",
         "Public record",
         None,
         "The Electoral Management Board for Scotland.",
@@ -262,18 +283,22 @@ BBC_PARTIES = {
     "FISH": "Fishing Party",
 }
 EMB_2021 = "https://www.emb.scot/downloads/file/815/spe21-full-votes-and-seats-by-party-candidate"
+EMB_2026 = "https://www.emb.scot/downloads/file/1212/regional-votes-by-constituency"
 
 
 def fetch() -> None:
     for year, url in PAGES.items():
         raw.fetch(SOURCE, url, suffix=".html")
         time.sleep(1)
+    raw.fetch(SOURCE, ANALYSIS_2011, suffix=".xls")
+    time.sleep(1)
     raw.fetch(SOURCE, EC_2011, suffix=".xlsx")
     time.sleep(1)
     raw.fetch(SOURCE, EC_2016, suffix=".xls")
     time.sleep(1)
     raw.fetch(SOURCE, EC_2007, suffix=".xls")
     raw.fetch(SOURCE, EMB_2021, suffix=".xlsx")
+    raw.fetch(SOURCE, EMB_2026, suffix=".xlsx")
     for code in ASPECT_1999.values():
         time.sleep(1)
         raw.fetch(SOURCE, f"http://gdl.cdlr.strath.ac.uk/aspect/aspect1999/regions/a99reg{code}.html", suffix=".html")
@@ -572,6 +597,52 @@ def parse_workbooks() -> tuple[list[dict[str, object]], list[dict[str, object]],
                 "valid": number(totals["Total"][index]) - number(totals["Rejected Papers"][index]),
             }
         )
+    book = fastexcel.read_excel(str(raw.cached(SOURCE, EMB_2026).path))
+    for name in book.sheet_names[1:]:
+        rows = [
+            [None if cell is None or str(cell).strip() == "" else str(cell).strip() for cell in row]
+            for row in book.load_sheet_by_name(name, header_row=None).to_polars().iter_rows()
+        ]
+        region = rows[2][1].removesuffix(" Region")
+        header = next(row for row in rows if row[0] is not None and row[0].startswith("Constituency"))
+        columns = {
+            index: label.removesuffix(" Constituency")
+            for index, label in enumerate(header)
+            if index > 0 and label is not None and label != "Total"
+        }
+        first = next(index for index, row in enumerate(rows) if row[0] is not None and row[0].startswith("Party/Ind"))
+        totals = {}
+        for row in rows[first + 1 :]:
+            if row[0] is None:
+                continue
+            if row[0] in ("Total Valid Votes", "Total Rejected Papers", "Electorate"):
+                totals[row[0]] = row
+            elif row[0].startswith("Turnout"):
+                break
+            elif "Total" not in row[0] and not row[0].startswith(("Analysis", "Lack", "Voting", "Writing", "Unmarked")):
+                for index, constituency in columns.items():
+                    lists.append(
+                        {
+                            "year": 2026,
+                            "region": region,
+                            "constituency": constituency,
+                            "party": row[0],
+                            "votes": number(row[index]),
+                        }
+                    )
+        for index, constituency in columns.items():
+            units.append(
+                {
+                    "year": 2026,
+                    "ballot": "list",
+                    "constituency": constituency,
+                    "region": region,
+                    "electorate": number(totals["Electorate"][index]),
+                    "cast": None,
+                    "rejected": number(totals["Total Rejected Papers"][index]),
+                    "valid": number(totals["Total Valid Votes"][index]),
+                }
+            )
     return units, lists, buckets
 
 
@@ -590,9 +661,9 @@ def parse_history_lists() -> list[dict[str, object]]:
         return rows
 
     for region, code in ASPECT_1999.items():
-        text = raw.cached(SOURCE, f"http://gdl.cdlr.strath.ac.uk/aspect/aspect1999/regions/a99reg{code}.html").path.read_text(
-            errors="ignore"
-        )
+        text = raw.cached(
+            SOURCE, f"http://gdl.cdlr.strath.ac.uk/aspect/aspect1999/regions/a99reg{code}.html"
+        ).path.read_text(errors="ignore")
         for label, votes in re.findall(
             r'<td>(?:<a [^>]*>)?([^<>]+?)(?:</a>)?</td>\s*<td>&nbsp;&nbsp;</td>\s*<td align="right">(\d+)</td>', text
         ):
@@ -739,6 +810,7 @@ def emit() -> Path:
         if body in cs.minted:
             cs.add("body", id=body, polity_id=scotland, kind="unicameral")
             name(body, "Scottish Parliament")
+        cs.add("body_size", body_id=body, seats=129, valid_from=ELECTIONS[1999])
 
         sources: dict[str, UUID] = {}
         for key, publisher, title, url, licence, licence_url, attribution in SOURCES:
@@ -757,9 +829,11 @@ def emit() -> Path:
         for url, key in (
             *((url, "page") for url in PAGES.values()),
             (EC_2007, "ec2007"),
+            (ANALYSIS_2011, "analysis2011"),
             (EC_2011, "ec2011"),
             (EC_2016, "ec2016"),
             (EMB_2021, "emb2021"),
+            (EMB_2026, "emb2026"),
             *(
                 (f"http://gdl.cdlr.strath.ac.uk/aspect/aspect1999/regions/a99reg{code}.html", "aspect1999")
                 for code in ASPECT_1999.values()
@@ -795,9 +869,24 @@ def emit() -> Path:
         constituency_units: dict[tuple[int, str], UUID] = {}
         region_labels: dict[tuple[int, str], str] = {}
         located = {
-            row["ckey"]: row["rkey"]
+            (2011, row["ckey"]): row["rkey"]
             for row in units.filter((pl.col("ballot") == "list") & (pl.col("year") == 2011)).iter_rows(named=True)
         }
+        for constituency, region in regions_1999().items():
+            for part in ("Orkney", "Shetland") if constituency == "Orkney and Shetland" else (constituency,):
+                located[(1999, fold(BOUNDARY_NAMES.get(part, part)))] = region_key(BOUNDARY_NAMES.get(region, region))
+        for constituency, region in conn.execute(
+            """select cn.text, rn.text from area c
+               join area_code cc on cc.area_id = c.id and cc.code like '2026:%'
+               join name cn on cn.entity_id = c.id and cn.is_preferred
+               join area_geometry cg on cg.area_id = c.id and cg.valid @> date '2026-05-07'
+               join area r on r.scheme_code = 'gb.spr'
+               join area_geometry rg on rg.area_id = r.id and rg.valid @> date '2026-05-07'
+                 and st_covers(rg.geom, st_pointonsurface(cg.geom))
+               join name rn on rn.entity_id = r.id and rn.is_preferred
+               where c.scheme_code = 'gb.spc'"""
+        ).fetchall():
+            located[(2026, fold(constituency))] = region_key(region)
         for era in starts:
             start = ELECTIONS[era]
             end = ELECTIONS[ends[era]] if era in ends else None
@@ -831,13 +920,13 @@ def emit() -> Path:
                     name(unit, label)
             for ckey, label in first.select("ckey", "constituency").unique().iter_rows():
                 code = f"{era}:{slug(label)}"
-                parent = region_areas[(era, located[ckey])] if era == 2011 else country
+                parent = region_areas[(era, located[(era, ckey)])]
                 area = constituency_areas[(era, ckey)] = cs.area("gb.spc", code, start)
                 unit = constituency_units[(era, ckey)] = cs.unit("gb.spc", code)
+                cs.add("area_parent", area_id=area, parent_id=parent, valid_from=start, valid_to=end)
                 if area in cs.minted:
                     cs.add("area", id=area, scheme_code="gb.spc")
                     cs.add("area_code", area_id=area, code=code, valid_from=start, valid_to=end)
-                    cs.add("area_parent", area_id=area, parent_id=parent, valid_from=start, valid_to=end)
                     name(area, label)
                 if unit in cs.minted:
                     cs.add(
@@ -1051,8 +1140,11 @@ def emit() -> Path:
                 2011: "ec2011",
                 2016: "ec2016",
                 2021: "emb2021",
+                2026: "emb2026",
             }.get(year)
-            year_lists = list_votes.filter(pl.col("year") == year)
+            year_lists = list_votes.filter(
+                (pl.col("year") == year) & ~((pl.col("year") == 2021) & (pl.col("votes") == 0))
+            )
             expansions = {2011: LISTS_2011, 2016: LISTS_2016}.get(year, {})
             for (rkey,), region_members in members.filter(pl.col("year") == year).group_by("rkey", maintain_order=True):
                 label = region_labels[(era, rkey)]
@@ -1095,17 +1187,28 @@ def emit() -> Path:
                         body_md=HISTORY_LISTS[year],
                     )
                 region_lists = year_lists.filter(pl.col("rkey") == rkey)
+                lothian_2011 = year == 2011 and rkey == "lothian"
                 options: dict[str, UUID] = {}
                 by_party: dict[UUID, UUID] = {}
                 for source_label in dict.fromkeys(region_lists["party"]):
-                    individual = re.fullmatch(r"[A-Z' -]+, .+", source_label) is not None
+                    individual = (
+                        re.fullmatch(r"[A-Z' -]+, .+", source_label) is not None
+                        and " - " not in source_label.split(",")[0]
+                    )
                     other = source_label in ("Others", "Ind", "IND")
                     independent = source_label.startswith(("Independent", "Margo"))
                     if individual:
                         surname, forename = source_label.split(", ", 1)
                         full = f"{forename} {surname.title()}"
-                    elif year == 2021:
-                        full = source_label.title().replace("(Snp)", "(SNP)").replace("(Ukip)", "(UKIP)")
+                    elif year in (2021, 2026):
+                        full = (
+                            source_label.title()
+                            .replace("(Snp)", "(SNP)")
+                            .replace("(Ukip)", "(UKIP)")
+                            .replace("Uk Independence", "UK Independence")
+                            .replace("Reform Uk", "Reform UK")
+                            .replace("Advance Uk", "Advance UK")
+                        )
                     else:
                         full = expansions.get(source_label, source_label)
                     option = options[source_label] = cs.key("gb.option", f"{contest_key}:{slug(source_label)}")
@@ -1118,7 +1221,23 @@ def emit() -> Path:
                         contest_id=contest,
                         kind="others" if other else "candidate" if individual or independent else "list",
                         party_id=party,
-                        ballot_label="Independent candidates" if source_label in ("Ind", "IND") else full,
+                        ballot_label=(
+                            "Other independent candidates"
+                            if lothian_2011 and source_label == "Ind"
+                            else "Independent candidates"
+                            if source_label in ("Ind", "IND")
+                            else full
+                        ),
+                    )
+                if lothian_2011:
+                    options["Margo MacDonald"] = cs.key("gb.option", f"{contest_key}:margo-macdonald")
+                    cs.add(
+                        "contest_option",
+                        id=options["Margo MacDonald"],
+                        contest_id=contest,
+                        kind="candidate",
+                        party_id=None,
+                        ballot_label="Margo MacDonald",
                     )
                 elected: dict[UUID, list[dict[str, object]]] = {}
                 for line in region_members.iter_rows(named=True):
@@ -1193,10 +1312,53 @@ def emit() -> Path:
                     ):
                         value(result_set, unit, None, measure, amount)
                 for row in region_lists.iter_rows(named=True):
+                    if lothian_2011 and row["party"] == "Ind":
+                        continue
                     unit = (
                         region_units[(era, rkey)]
                         if year in (1999, 2003, 2007, 2021)
                         else constituency_units[(era, row["ckey"])]
                     )
                     value(result_set, unit, options[row["party"]], VOTES, row["votes"])
+                if lothian_2011:
+                    pooled = region_lists.filter(pl.col("party") == "Ind")["votes"].sum()
+                    margo = next(
+                        int(row[3])
+                        for row in sheet(raw.cached(SOURCE, ANALYSIS_2011).path, "Table 3")
+                        if row[0] == "Margo MacDonald"
+                    )
+                    value(result_set, region_units[(era, rkey)], options["Margo MacDonald"], VOTES, margo)
+                    value(result_set, region_units[(era, rkey)], options["Ind"], VOTES, pooled - margo)
+                    cs.add(
+                        "note",
+                        entity_id=result_set,
+                        kind="caveat",
+                        body_md=f"The Electoral Commission's workbook pools every independent in Lothian into one column "
+                        f"by constituency ({pooled:,} votes). The Scottish Parliament's election analysis gives Margo "
+                        f"MacDonald {margo:,} regionally, so her votes and the other independents' ({pooled - margo:,}) "
+                        "are recorded once, at the region, and not by constituency.",
+                    )
+        renamed = {
+            region_key("Central Scotland and Lothians West"): region_key("Central Scotland"),
+            region_key("Edinburgh and Lothians East"): region_key("Lothian"),
+        }
+        for before, after in itertools.pairwise(starts):
+            for (era, rkey), area in region_areas.items():
+                if era != after:
+                    continue
+                event = uuid5(NAMESPACE, f"area_event\x1fgb.spr\x1f{after}\x1f{rkey}")
+                cs.add(
+                    "area_event",
+                    id=event,
+                    kind="boundary_changed",
+                    date=ELECTIONS[after],
+                    notes=f"The {region_labels[(after, rkey)]} region was redefined for the {after} election.",
+                )
+                cs.add(
+                    "area_event_member",
+                    event_id=event,
+                    area_id=region_areas[(before, renamed.get(rkey, rkey))],
+                    role="from",
+                )
+                cs.add("area_event_member", event_id=event, area_id=area, role="to")
         return cs.write()
