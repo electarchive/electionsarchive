@@ -1,0 +1,33 @@
+{
+ "kind": "statewide",
+ "year": 1970,
+ "day": "1970-11-03",
+ "polity": "US-IA",
+ "publisher": "Iowa Legislative Services Agency (Iowa Official Register)",
+ "title": "Iowa Official Register 1971-1972 (Redbook), general election 1970-11-03, by counties",
+ "license": "Public record",
+ "file": {
+  "url": "https://www.legis.iowa.gov/docs/shelves/redbooks/Redbook-1971-1972%20(64GA).pdf",
+  "item": "https://www.legis.iowa.gov/archives/register"
+ },
+ "raw_source": "us.scans",
+ "create": true,
+ "offices": {
+  "governor": "Governor",
+  "lieutenant-governor": "Lieutenant Governor",
+  "secretary-of-state": "Secretary of State",
+  "auditor": "Auditor of State",
+  "treasurer": "Treasurer of State",
+  "secretary-of-agriculture": "Secretary of Agriculture",
+  "attorney-general": "Attorney General"
+ },
+ "leaves": [
+  160,
+  161,
+  162,
+  163,
+  164,
+  165
+ ],
+ "note": "Printed pages 160 to 165, one pair of pages per table group (Governor and Lieutenant Governor 160 to 161; Secretary of State, Auditor, and Treasurer 162 to 163; Secretary of Agriculture, Attorney General, and Judge of the Supreme Court 164 to 165, skip the judge column). Each pair splits the 99 counties across two pages with the Total row last. The text layer is badly garbled (OCR slips in headings and digits), so vision with the printed Total as the check. The same book prints the primary by counties at PDF pages 148 to 152 and the general by precinct from page 176."
+}
