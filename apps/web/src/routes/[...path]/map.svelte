@@ -461,6 +461,7 @@
       Math.max(0.8, (wide / Math.max(tall, 0.0001)) * 1.04),
     );
   });
+  let isKeyed = $state(false);
   const leads = $derived(
     Map.groupBy(
       places.rows.filter((row) => row.leader != null),
@@ -2644,7 +2645,7 @@
       </div>
     {:else}
       <div class="flex flex-wrap gap-1.5">
-        {#each leads.slice(0, 6) as [index, won] (index)}
+        {#each isKeyed ? leads : leads.slice(0, 6) as [index, won] (index)}
           <button
             type="button"
             class={cn(
@@ -2677,6 +2678,17 @@
             {/if}
           </button>
         {/each}
+        {#if leads.length > 6}
+          <button
+            type="button"
+            class="rounded-xs px-1.5 text-[0.8125rem] font-semibold text-muted-foreground block-7 hover:bg-secondary hover:text-foreground"
+            aria-expanded={isKeyed}
+            onclick={() => (isKeyed = !isKeyed)}
+            >{isKeyed
+              ? m.map_key_fewer()
+              : m.map_key_more({ count: count(leads.length - 6) })}</button
+          >
+        {/if}
         {#if idle.length > 0}
           <span
             class="flex items-center gap-1.5 px-1.5 text-[0.8125rem] text-muted-foreground block-7"

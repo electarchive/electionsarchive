@@ -1498,6 +1498,8 @@
   "map_blank_key": "No results",
   "map_no_race": "No race in this election",
   "map_idle_key": "No race",
+  "map_key_more": "{count} more",
+  "map_key_fewer": "Fewer",
   "map_unmatched_key": "Not comparable",
   "map_unmatched_redrawn": "{count} redrawn since {year}",
   "map_unmatched_missing": "{count} with no {year} result",
