@@ -1,0 +1,27 @@
+{
+ "polity": "US-MI",
+ "publisher": "Michigan Secretary of State",
+ "license": "Public record",
+ "raw_source": "us.sri",
+ "year": 1988,
+ "day": "1988-11-08",
+ "title": "State of Michigan General Election, 1988: Official Canvass",
+ "file": {
+  "url": "https://archive.org/download/micro_IA40706932_0179/micro_IA40706932_0179.pdf",
+  "item": "https://archive.org/details/micro_IA40706932_0179"
+ },
+ "offices": {
+  "president": "presidential electors (President and Vice President)",
+  "senate": "U.S. Senator"
+ },
+ "leaves": [
+  1,
+  2,
+  3,
+  4,
+  5,
+  6,
+  7,
+  8
+ ]
+}

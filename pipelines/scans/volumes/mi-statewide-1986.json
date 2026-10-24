@@ -1,0 +1,28 @@
+{
+ "polity": "US-MI",
+ "publisher": "Michigan Secretary of State",
+ "license": "Public record",
+ "raw_source": "us.sri",
+ "year": 1986,
+ "day": "1986-11-04",
+ "title": "State of Michigan General Election, 1986: Official Canvass",
+ "file": {
+  "url": "https://archive.org/download/micro_IA40706925_0347/micro_IA40706925_0347.pdf",
+  "item": "https://archive.org/details/micro_IA40706925_0347"
+ },
+ "offices": {
+  "governor": "Governor"
+ },
+ "leaves": [
+  1,
+  2,
+  3,
+  4,
+  5,
+  6,
+  7,
+  8,
+  9,
+  10
+ ]
+}

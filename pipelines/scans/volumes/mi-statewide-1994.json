@@ -1,0 +1,31 @@
+{
+ "polity": "US-MI",
+ "publisher": "Michigan Secretary of State",
+ "license": "Public record",
+ "raw_source": "us.sri",
+ "year": 1994,
+ "day": "1994-11-08",
+ "title": "State of Michigan General Election, 1994: Official Canvass",
+ "file": {
+  "url": "https://archive.org/download/micro_IA40706952_0453/micro_IA40706952_0453.pdf",
+  "item": "https://archive.org/details/micro_IA40706952_0453"
+ },
+ "offices": {
+  "governor": "Governor",
+  "senate": "U.S. Senator"
+ },
+ "leaves": [
+  1,
+  2,
+  3,
+  4,
+  5,
+  6,
+  7,
+  8,
+  9,
+  10,
+  11,
+  12
+ ]
+}

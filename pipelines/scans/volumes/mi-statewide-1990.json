@@ -1,0 +1,30 @@
+{
+ "polity": "US-MI",
+ "publisher": "Michigan Secretary of State",
+ "license": "Public record",
+ "raw_source": "us.sri",
+ "year": 1990,
+ "day": "1990-11-06",
+ "title": "State of Michigan General Election, 1990: Official Canvass",
+ "file": {
+  "url": "https://archive.org/download/micro_IA40706939_0062/micro_IA40706939_0062.pdf",
+  "item": "https://archive.org/details/micro_IA40706939_0062"
+ },
+ "offices": {
+  "governor": "Governor",
+  "senate": "U.S. Senator"
+ },
+ "leaves": [
+  1,
+  2,
+  3,
+  4,
+  5,
+  35,
+  36,
+  37,
+  38,
+  39,
+  40
+ ]
+}

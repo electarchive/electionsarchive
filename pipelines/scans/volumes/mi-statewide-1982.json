@@ -1,0 +1,29 @@
+{
+ "polity": "US-MI",
+ "publisher": "Michigan Secretary of State",
+ "license": "Public record",
+ "raw_source": "us.sri",
+ "year": 1982,
+ "day": "1982-11-02",
+ "title": "State of Michigan General Election, 1982: Official Canvass",
+ "file": {
+  "url": "https://archive.org/download/micro_IA40706913_0052/micro_IA40706913_0052.pdf",
+  "item": "https://archive.org/details/micro_IA40706913_0052"
+ },
+ "offices": {
+  "governor": "Governor",
+  "senate": "U.S. Senator"
+ },
+ "leaves": [
+  1,
+  2,
+  3,
+  4,
+  5,
+  6,
+  7,
+  8,
+  9,
+  10
+ ]
+}

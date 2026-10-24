@@ -1,0 +1,22 @@
+{
+ "polity": "US-MI",
+ "publisher": "Michigan Secretary of State",
+ "license": "Public record",
+ "raw_source": "us.sri",
+ "year": 1992,
+ "day": "1992-11-03",
+ "title": "State of Michigan General Election, 1992: Official Canvass",
+ "file": {
+  "url": "https://archive.org/download/micro_IA40706945_0442/micro_IA40706945_0442.pdf",
+  "item": "https://archive.org/details/micro_IA40706945_0442"
+ },
+ "offices": {
+  "president": "presidential electors (President and Vice President)"
+ },
+ "leaves": [
+  1,
+  2,
+  3,
+  4
+ ]
+}
