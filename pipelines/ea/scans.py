@@ -1465,21 +1465,36 @@ def emit(name: str) -> Path:
         medsl.attach(
             cs, conn, frame, {f"SC{name}": source}, strict=not manifest.get("authoritative_loose"), authoritative=manifest.get("authoritative")
         )
-        for row in list(cs.rows.get("result_set", [])):
+        targets = {row["id"]: row["contest_id"] for row in cs.rows.get("result_set", [])}
+        for held, contest in conn.execute(
+            "select id, contest_id from result_set where source_id = %s and contest_id = any(%s)",
+            [source, [ids[key_of(contest)] for contest in contests.values() if key_of(contest) in ids]],
+        ).fetchall():
+            targets.setdefault(held, contest)
+        for held, contest in targets.items():
             found = conn.execute(
-                "select value from external_id where scheme = 'us.contest' and entity_id = %s", [row["contest_id"]]
+                "select value from external_id where scheme = 'us.contest' and entity_id = %s", [contest]
             ).fetchone()
-            cs.add(
-                "note",
-                entity_id=row["id"],
-                kind="caveat",
-                body_md=("Read from the scan's text layer, every column checked against the printed state total. Each cell's box is its column's band by its row's band, so it is approximate." if manifest.get("text_layer") else "Read from the scan by a vision model. Each cell's box is its column's band by its row's band as the model reported them, so it is approximate.")
+            text = (
+                ("Read from the scan's text layer, every column checked against the printed state total. Each cell's box is its column's band by its row's band, so it is approximate." if manifest.get("text_layer") else "Read from the scan by a vision model. Each cell's box is its column's band by its row's band as the model reported them, so it is approximate.")
                 + (
                     " Each county's votes are the sum of its towns' returns, towns placed in counties by the 2020 Census Gazetteer, and the box is the first town's."
                     if towns
                     else ""
                 )
                 + (f" {caveats[found[0]]}" if found is not None and found[0] in caveats else "")
-                + (f" {manifest['caveat']}" if manifest.get("caveat") else ""),
+                + (f" {manifest['caveat']}" if manifest.get("caveat") else "")
             )
+            current = False
+            for note, written in conn.execute(
+                """select n.id, n.body_md from note n join changeset c on c.id = n.changeset_id
+                   where n.entity_id = %s and n.kind = 'caveat' and c.pipeline = %s""",
+                [held, SOURCE],
+            ).fetchall():
+                if written == text:
+                    current = True
+                else:
+                    cs.add("note_drop", note_id=note, entity_id=held, body_md=written, reason="A later emit words the caveat anew.")
+            if not current:
+                cs.add("note", entity_id=held, kind="caveat", body_md=text)
         return cs.write()

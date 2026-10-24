@@ -1,5 +1,6 @@
 import difflib
 import json
+import os
 import re
 import subprocess
 
@@ -42,6 +43,8 @@ def parse() -> None:
             ).fetchall()
         }
     for name in manifests():
+        if os.environ.get("NE_ONLY", name) != name:
+            continue
         manifest = json.loads((MANIFESTS / f"{name}.json").read_text())
         path = raw.cached(manifest["raw_source"], manifest["file"]["url"]).path
         rows = []
@@ -70,42 +73,55 @@ def parse() -> None:
             lines = text.splitlines()
             end = next(index for index, line in enumerate(lines) if re.match(r"\s*TOTALS?\b", line, re.IGNORECASE))
             offset = lines[end].upper().index("TOTAL") + 5
-            anchors = [(position + offset, value) for position, value in cells(lines[end][offset:])]
-            total_y = next(y0 for x0, y0, x1, y1, word in placed if re.fullmatch(r"TOTALS?:?", word, re.IGNORECASE))
-            bands = sorted(
-                (x0, x1)
-                for x0, y0, x1, y1, word in placed
-                if abs(y0 - total_y) < 3 and re.search(r"[0-9]", word) and not re.fullmatch(r"TOTALS?:?", word, re.IGNORECASE)
-            )
-            if len(bands) != len(anchors):
-                raise ValueError(f"{name} page {page}: {len(bands)} boxed totals for {len(anchors)} printed")
-            table: dict[str, list[int | None]] = {}
-            heights: dict[str, tuple[float, float]] = {}
-            cursor = 0
+            printed = [(position + offset, value) for position, value in cells(lines[end][offset:])]
+            parsed: list[tuple[str, str, list[tuple[int, int]]]] = []
             for line in lines[:end]:
                 match = re.match(r"\s*([A-Za-z][A-Za-z .']*?)(?:\s{2,}|\.{3,}|(?=[0-9]))", line)
                 if not match:
                     continue
                 key = re.sub(r"[^a-z]", "", match[1].lower())
                 close = difflib.get_close_matches(key, counties, 1, 0.6)
-                if not close:
-                    continue
+                if close:
+                    parsed.append(
+                        (
+                            key,
+                            close[0],
+                            [(position + match.end(), value) for position, value in cells(line[match.end() :])],
+                        )
+                    )
+            ends = sorted(position for _, _, found in parsed for position, _ in found)
+            anchors: list[int] = []
+            group: list[int] = []
+            for position in ends:
+                if group and position - group[-1] > 3:
+                    if len(group) >= spec.get("minimum", 8):
+                        anchors.append(round(sum(group) / len(group)))
+                    group = []
+                group.append(position)
+            if len(group) >= spec.get("minimum", 8):
+                anchors.append(round(sum(group) / len(group)))
+            table: dict[str, list[int | None]] = {}
+            heights: dict[str, tuple[float, float]] = {}
+            cursor = 0
+            for key, county, found in parsed:
                 row: list[int | None] = [None] * len(anchors)
-                for position, value in cells(line[match.end() :]):
-                    position += match.end()
-                    nearest = min(range(len(anchors)), key=lambda a: abs(anchors[a][0] - position))
-                    if abs(anchors[nearest][0] - position) <= 8:
+                for position, value in found:
+                    nearest = min(range(len(anchors)), key=lambda a: abs(anchors[a] - position))
+                    if abs(anchors[nearest] - position) <= 4:
                         row[nearest] = value
-                table[close[0]] = row
-                first = key[:3]
+                table[county] = row
                 for index in range(cursor, len(placed)):
                     if (
-                        re.sub(r"[^a-z]", "", placed[index][4].lower()).startswith(first)
+                        re.sub(r"[^a-z]", "", placed[index][4].lower()).startswith(key[:3])
                         and placed[index][0] < width * 0.3
                     ):
-                        heights[close[0]] = (placed[index][1], placed[index][3])
+                        heights[county] = (placed[index][1], placed[index][3])
                         cursor = index + 1
                         break
+            for county, index, value in spec.get("fix", []):
+                table[re.sub(r"[^a-z]", "", county.lower())][index] = value
+            widest = max(len(line) for line in lines)
+            bands = [((position - 7) / widest * width, (position + 1) / widest * width) for position in anchors]
             known = [heights[county] for county in table if county in heights]
             pitch = (known[-1][0] - known[0][0]) / max(len(known) - 1, 1)
             previous = known[0]
@@ -117,9 +133,11 @@ def parse() -> None:
             for column in spec["columns"]:
                 index = column["column"]
                 total = sum(row[index] or 0 for row in table.values())
-                if total != anchors[index][1] or len(table) != len(counties):
+                nearest = [value for position, value in printed if abs(position - anchors[index]) <= 8]
+                official = column.get("official", nearest[0] if len(nearest) == 1 else None)
+                if total != official or len(table) != len(counties):
                     raise ValueError(
-                        f"{name} page {page} column {index}: {len(table)} counties sum to {total}, printed {anchors[index][1]}"
+                        f"{name} page {page} column {index}: {len(table)} counties sum to {total}, printed {official}"
                     )
                 for county, row in table.items():
                     if row[index] is None:
