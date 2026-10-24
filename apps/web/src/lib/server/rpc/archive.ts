@@ -4809,6 +4809,12 @@ export const contests = {
               current.ks.includes(row.set) ||
               grid?.sources.includes(row.publisher ?? "") === true,
           )
+          .filter(
+            (row) =>
+              !page.wording.some(
+                (entry) => entry.body?.trim() === row.body.trim(),
+              ),
+          )
           .map(({ kind, body }) => ({ kind, body })),
         turnout: attended,
         series,
