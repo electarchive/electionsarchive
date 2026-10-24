@@ -3391,6 +3391,8 @@ export const contests = {
           from (
             select x.id from contest x where x.district_area_id in (select id from anc) and x.allocation_parent_id is null
             union
+            select x.id from contest x where x.district_area_id = ${contest.place?.id ?? null}::uuid and x.allocation_parent_id is null
+            union
             select x.id from polity_territory pt
             join election y on y.polity_id = pt.polity_id and pt.valid @> y.date_from
             join contest x on x.election_id = y.id
@@ -3436,7 +3438,8 @@ export const contests = {
           from roots r
           where r.id <> ${contest.root}::uuid
         ) r
-        where r.counted or r.id in (select root from decided)
+        where r.counted or (r.id in (select root from decided)
+          and not (r.own and ${contest.place?.id ?? null}::uuid not in (select id from anc)))
         order by r.date_from desc nulls last, r.id
       `);
       const gaps = await db.execute<{ stop: string }>(sql`
@@ -3766,10 +3769,13 @@ export const contests = {
           const spot = row.counted
             ? located.rows.find((entry) => entry.root === row.id)
             : undefined;
+          const root = rootSlugs.get(row.id) ?? null;
+          const isDrilled = !isRoot && row.counted && row.own;
           const base =
-            spot == null
-              ? (rootSlugs.get(row.id) ?? null)
-              : (locatedSlugs.get(spot.contest) ?? null);
+            locatedSlugs.get(spot?.contest ?? "") ??
+            (root == null
+              ? null
+              : [root, ...unit.filter(() => isDrilled)].join("/"));
           const below = upper.rows
             .filter((entry) => spot != null && entry.depth < spot.depth)
             .toSorted((a, b) => b.depth - a.depth)
