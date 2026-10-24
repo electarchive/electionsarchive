@@ -128,6 +128,19 @@ NAMESAKES = {
         "JJ0319:johnston",
         "b27e8356-9860-5f1a-8123-b25090d68903",
     ),
+    **{
+        ("SS0313", record): ("us.nnv.person", "SS0313:ms", "15a158dd-0a6b-5a10-9cd3-19e2eccbbe1b")
+        for record in (
+            "ms.coroner.covington.1819",
+            "ms.coroner.covington.1821",
+            "ms.staterepresentative.covington.1822",
+        )
+    },
+    ("TI0046", "ma.senator.dukesnantucket.1794"): (
+        "us.nnv.person",
+        "TI0046:ma",
+        "f017171f-be38-54ba-921a-e98c1e9cce2b",
+    ),
 }
 SINGLE = {"the House", "the House, trials of THEA contests", "governor"}
 BLANK = re.compile(r"(?i)^blanks?\b")

@@ -80,6 +80,12 @@ ROSTER_NOTE = (
 )
 MONTH_NOTE = "THEA's archive only contains the month for this election; the date shown is the first of that month."
 YEAR_NOTE = "THEA's archive only contains the year for this election; the date shown is January 1 of that year."
+ERA_NOTES = {
+    "1864-11:NY:house:26": (
+        "This John Magee is listed separately from the John Magee who represented New York's 28th district from 1827 "
+        "to 1831, because more than 30 years separate their races. They may be the same man."
+    ),
+}
 REWORDED = {
     ROSTER_NOTE: (
         "THEA's archive marks no winner in this race. The winner shown is the member who took the seat, from the "
@@ -556,6 +562,15 @@ def emit() -> Path:
         held: dict[str, UUID] = dict(
             conn.execute("select value, entity_id from external_id where scheme = %s", [f"{SOURCE}.person"]).fetchall()
         )
+        bridges: dict[UUID, list[date]] = {}
+        for person, day in conn.execute(
+            """select cy.person_id, e.date_from from candidacy cy join contest_option o on o.id = cy.option_id
+               join contest k on k.id = o.contest_id join election e on e.id = k.election_id
+               join changeset c on c.id = cy.changeset_id
+               where c.pipeline <> %s and e.date_from is not null and cy.person_id = any(%s)""",
+            [SOURCE, [*held.values(), *(UUID(old) for id in held.values() for old in cs.merged.get(str(id), ()))]],
+        ).fetchall():
+            bridges.setdefault(cs.survivors.get(person, person), []).append(day)
         untitled: dict[UUID, list[tuple[UUID, str, str, bool, bool]]] = {}
         for id, entity, text, kind, ours, titled in conn.execute(
             """select n.id, n.entity_id, n.text, n.kind::text, c.pipeline is not distinct from %s, n.text ~ %s
@@ -574,11 +589,24 @@ def emit() -> Path:
                     if (later - earlier).days > APART:
                         segments.append((district, []))
                     segments[-1][1].append(later)
-            segments.sort(key=lambda segment: segment[1][0])
+            segments.sort(key=lambda segment: (segment[1][0], segment[0] is None, segment[0] or 0))
             original = f"{state}:{handle}"
             for index, (district, days) in enumerate(segments):
                 key = original
-                if index and str(held.get(original)) not in cs.merged:
+                latest = max(
+                    (
+                        day
+                        for day in [
+                            *(day for _, earlier in segments[:index] for day in earlier),
+                            *bridges.get(held.get(original), []),
+                        ]
+                        if day < days[0]
+                    ),
+                    default=None,
+                )
+                if index and (
+                    str(held.get(original)) not in cs.merged or latest is not None and (days[0] - latest).days > APART
+                ):
                     place = "" if district is None else f"{district}:"
                     key = f"{original}:{place}{days[0].year}"
                 for day in days:
@@ -786,9 +814,10 @@ def emit() -> Path:
                 (first["roster_winner"], "caveat", ROSTER_NOTE),
                 (precision == "month", "caveat", MONTH_NOTE),
                 (precision == "year", "caveat", YEAR_NOTE),
+                (contest_key in ERA_NOTES, "caveat", ERA_NOTES.get(contest_key, "")),
             ):
                 if applies:
-                    id = notes.get((result_set, body)) or notes.get((result_set, REWORDED[body]))
+                    id = notes.get((result_set, body)) or notes.get((result_set, REWORDED.get(body, "")))
                     cs.add("note", **({"id": id} if id else {}), entity_id=result_set, kind=kind, body_md=body)
             for person, lines in people.items():
                 option_key = f"{contest_key}:{person}"
