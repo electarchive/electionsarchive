@@ -2847,6 +2847,7 @@ export const contests = {
             ),
           }),
         ),
+        quorum: v.nullable(v.number()),
         turnout: v.nullable(
           v.object({
             registered: v.number(),
@@ -3065,18 +3066,7 @@ export const contests = {
           where t.area_id = ${area?.id}::uuid and t.polity_id <> ${contest.polity}::uuid
           order by upper(t.valid) desc nulls first limit 1
         `),
-        db.execute<{ registered: number; voters: number }>(sql`
-          select * from (
-            select nullif(max(r.value) filter (where r.measure = 2), 0)::float8 as registered,
-              coalesce(max(r.value) filter (where r.measure = 14), max(r.value) filter (where r.measure = 3))::float8 as voters
-            from result_set rs cross join lateral (
-              select x.measure, x.value from result_rollup x
-              where x.result_set_k = rs.k and x.area_k = ${area?.k ?? null}::int and x.option_k = 0
-                and x.measure in (2, 3, 14) and x.count_round = 0 offset 0
-            ) r
-            where rs.contest_id = ${contest.id}::uuid and rs.is_default
-          ) t where registered is not null and voters is not null
-        `),
+        poll(contest.id, area?.k ?? null),
         db.execute<{
           last: number;
           round: number | null;
@@ -3339,7 +3329,8 @@ export const contests = {
                   note: row.note,
                 })),
               },
-        turnout: roll.rows[0] ?? null,
+        turnout: roll.turnout,
+        quorum: roll.quorum,
         count: null,
         isDerived: derived,
         current: null,
@@ -6209,6 +6200,41 @@ function merge<
   return merged;
 }
 
+async function poll(contest: string | null, k: number | null, isAsked = true) {
+  if (contest == null || !isAsked) {
+    return { turnout: null, quorum: null };
+  }
+  const found = await db.execute<{
+    registered: number;
+    voters: number;
+    quorum: number | null;
+  }>(sql`
+    select t.*, ((coalesce(es.rules, '{}') || coalesce(c.rules_override, '{}')) ->> 'quorum')::float8 as quorum
+    from (
+      select nullif(sum(registered), 0)::float8 as registered, sum(voters)::float8 as voters from (
+        select nullif(max(r.value) filter (where r.measure = 2), 0) as registered,
+          coalesce(max(r.value) filter (where r.measure = 14), max(r.value) filter (where r.measure = 3)) as voters
+        from result_set rs cross join lateral (
+          select x.channel, x.measure, x.value from result_rollup x
+          where x.result_set_k = rs.k and x.area_k = ${k}::int and x.option_k = 0
+            and x.measure in (2, 3, 14) and x.count_round = 0 offset 0
+        ) r
+        where rs.contest_id = ${contest}::uuid and rs.is_default
+        group by r.channel
+      ) c
+    ) t
+    join contest c on c.id = ${contest}::uuid
+    left join electoral_system es on es.id = c.electoral_system_id
+    where t.registered is not null and t.voters is not null
+  `);
+  const row = found.rows[0];
+  return {
+    turnout:
+      row == null ? null : { registered: row.registered, voters: row.voters },
+    quorum: row?.quorum ?? null,
+  };
+}
+
 async function attendance(
   known: { registered: number; voters: number } | null,
   contest: string,
@@ -6912,7 +6938,7 @@ async function races(
       for (const row of results) {
         filled += row.seats ?? 0;
       }
-      const [map, previous, runoff, seated] = await Promise.all([
+      const [map, previous, runoff, seated, asked] = await Promise.all([
         level == null || isBrief || isPrimaries
           ? null
           : sketch(
@@ -7010,6 +7036,7 @@ async function races(
               new Set(results.map((row) => row.key)),
               null,
             ),
+        poll(single?.id ?? null, place.k, head?.kind === "ballot_question"),
       ]);
       const before = carried(previous?.rows ?? null, filled, parentOf);
       const { titled, named } = naming(head, single, groups);
@@ -7017,6 +7044,8 @@ async function races(
         map,
         before,
         runoff,
+        turnout: asked.turnout,
+        quorum: asked.quorum,
         contest: single?.id ?? null,
         anchor: segment(labels.full.get(head?.owner ?? head?.id ?? "") ?? ""),
         name: labels.short.get(named) ?? labels.full.get(named) ?? "",
@@ -7308,6 +7337,10 @@ export const elections = {
             anchor: v.string(),
             path: v.nullable(v.string()),
             kind: v.string(),
+            turnout: v.nullable(
+              v.object({ registered: v.number(), voters: v.number() }),
+            ),
+            quorum: v.nullable(v.number()),
             isOffice: v.boolean(),
             isRemainder: v.boolean(),
             isPrimaries: v.boolean(),

@@ -658,7 +658,21 @@
           (a, b) => (b.current?.share ?? 0) - (a.current?.share ?? 0),
         )[0];
       const yes = /^(?:yes|for|approve|(?:sì|si|oui|ja|evet|sim)(?!\p{L}))/iu;
-      return top?.current?.outcome === "lost" && yes.test(top.label)
+      const turned =
+        contest.turnout == null || contest.turnout.registered === 0
+          ? null
+          : contest.turnout.voters / contest.turnout.registered;
+      return top?.current?.outcome === "lost" &&
+        yes.test(top.label) &&
+        contest.quorum != null &&
+        turned != null &&
+        turned <= contest.quorum
+        ? m.race_lede_quorum({
+            turnout: percent(turned),
+            quorum: percent(contest.quorum),
+            share: percent(top.current.share),
+          })
+        : top?.current?.outcome === "lost" && yes.test(top.label)
         ? m.race_lede_measure_blocked({ share: percent(top.current.share) })
         : top?.current?.outcome === "lost"
           ? m.race_lede_lost({

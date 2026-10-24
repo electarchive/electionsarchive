@@ -636,6 +636,16 @@
           };
         }
       }
+      const turned =
+        race.turnout == null
+          ? null
+          : race.turnout.voters / race.turnout.registered;
+      const isShort =
+        race.kind === "ballot_question" &&
+        race.results[0]?.isLost === true &&
+        race.quorum != null &&
+        turned != null &&
+        turned <= race.quorum;
       return {
         ...race,
         decided,
@@ -871,7 +881,13 @@
                             ),
                             share: percent(leader.share),
                           })
-                        : race.kind === "ballot_question" &&
+                        : isShort
+                          ? m.race_lede_quorum({
+                              turnout: percent(turned),
+                              quorum: percent(race.quorum ?? 0),
+                              share: percent(leader.share),
+                            })
+                          : race.kind === "ballot_question" &&
                             race.results[0]?.isLost === true
                           ? m.race_lede_lost({
                               answer: named(leader),
@@ -892,7 +908,9 @@
                               }),
         next:
           race.runoff?.runner == null
-            ? null
+            ? turned == null || isShort
+              ? null
+              : m.race_turnout({ share: percent(turned) })
             : (race.runoff.isWon
                 ? m.race_lede_runoff_won
                 : m.race_lede_runoff_led)({
