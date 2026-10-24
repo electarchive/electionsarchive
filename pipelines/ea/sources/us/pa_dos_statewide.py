@@ -12,8 +12,8 @@ from ea.store import DATA
 SOURCE = "us.pa_dos_statewide"
 VERSION = "1"
 PARSED = DATA / "parsed" / SOURCE
-YEARS = [2000, 2004, 2008, 2012]
-OFFICES = {"AUD": ("auditor-general", "Auditor General"), "TRE": ("treasurer", "Treasurer")}
+YEARS = [1992, 2000, 2004, 2008, 2012]
+OFFICES = {"ATT": ("attorney-general", "Attorney General"), "AUD": ("auditor-general", "Auditor General"), "TRE": ("treasurer", "Treasurer")}
 PARTIES = {
     "DEM": "Democratic",
     "REP": "Republican",
@@ -48,7 +48,8 @@ def parse() -> None:
     for year in YEARS:
         frames.append(
             pl.read_parquet(raw.parsed("us.pa_dos_precincts") / f"{year}.parquet")
-            .filter(pl.col("office").is_in(list(OFFICES)), pl.col("last") != "WRITE-IN")
+            .filter(pl.col("office").is_in(list(OFFICES)), ~pl.col("last").is_in(["WRITE-IN", "OTHER"]))
+            .filter((pl.col("office") != "ATT") | (year == 1992))
             .group_by("office", "party", "first", "middle", "last", "suffix")
             .agg(pl.col("votes").sum())
             .with_columns(year=pl.lit(year))
@@ -95,7 +96,7 @@ def emit() -> Path:
     return statewide_totals.emit(
         SOURCE,
         VERSION,
-        "Pennsylvania's auditor general and treasurer generals of 2000, 2004, 2008, and 2012 by state total from the Department of State's precinct returns",
+        "Pennsylvania's attorney general, auditor general, and treasurer generals of 1992 and the auditor general and treasurer generals of 2000, 2004, 2008, and 2012 by state total from the Department of State's precinct returns",
         frame,
         book,
         NOTE,
