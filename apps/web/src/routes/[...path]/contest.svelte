@@ -147,6 +147,11 @@
     };
   });
   const chamber = $derived(single == null ? contest.chamber : null);
+  const seatsPlace = $derived(
+    contest.kind === "list_allocation"
+      ? contest.name.replace(/^.+?, /u, "")
+      : (chamber?.places[chamber.here ?? -1]?.name ?? contest.scope.name),
+  );
 
   const origins = $derived.by(() => {
     const list = contest.origins ?? [];
@@ -1619,7 +1624,7 @@
         parties={chamber.parties}
         places={chamber.places}
         here={chamber.here}
-        place={chamber.places[chamber.here ?? -1]?.name ?? contest.scope.name}
+        place={seatsPlace}
         link={chamber.link}
         size={chamber.size}
         {change}
@@ -1708,7 +1713,7 @@
         parties={chamber.parties}
         places={chamber.places}
         here={chamber.here}
-        place={chamber.places[chamber.here ?? -1]?.name ?? contest.scope.name}
+        place={seatsPlace}
         link={chamber.link}
         size={chamber.size}
         {change}
@@ -1998,7 +2003,7 @@
       parties={chamber.parties}
       places={chamber.places}
       here={chamber.here}
-      place={chamber.places[chamber.here ?? -1]?.name ?? contest.scope.name}
+      place={seatsPlace}
       link={chamber.link}
       size={chamber.size}
       {change}
