@@ -157,7 +157,7 @@ DIRECT_FULL = 2.0
 DIRECT_THREADS = 8
 DIRECT_LIMIT = 200
 LEDGER = DATA / "scans-ledger.json"
-BUDGET = 372.0
+BUDGET = 157.0
 BILLED_FROM = "2026-10-22T00:00:00Z"
 IMAGE_LIMIT = 4_500_000
 BATCH_LIMIT = 200_000_000
@@ -713,9 +713,11 @@ def committed(books: dict[str, dict[str, float]]) -> float:
     billed = books.get("billed")
     if billed is None:
         return sum(entries.values())
-    since = billed["at"] - 3600
+    if time.time() - billed["at"] > 6 * 3600:
+        raise SystemExit("BLOCKED: billing is over 6 hours old; run anthropic-batch uv run ea scans reconcile")
+    since = billed["at"] - 6 * 3600
     recent = sum(value for key, value in entries.items() if books.get("when", {}).get(key, 0) >= since)
-    return max(sum(entries.values()), billed["usd"] + recent)
+    return billed["usd"] + recent
 
 
 def submit(reader: str, wanted: dict[str, Read], state: dict[str, dict[str, list[Batch]]]) -> list[str]:
