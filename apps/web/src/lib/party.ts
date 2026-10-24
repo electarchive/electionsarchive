@@ -6,6 +6,8 @@ const NEUTRALS = [78, 56, 36].map(
 );
 
 const SIDES = new Map([
+  ["answer:leave", "#005ea7"],
+  ["answer:remain", "#f7c600"],
   ["answer:leave the european union", "#005ea7"],
   ["answer:remain a member of the european union", "#f7c600"],
 ]);
