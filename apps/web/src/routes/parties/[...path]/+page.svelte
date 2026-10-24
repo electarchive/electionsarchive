@@ -303,13 +303,17 @@
               )}
               <ul class="grid gap-1 text-sm">
                 {#each opened.has(year) ? entries : entries.slice(0, 5) as election, index (index)}
-                  {const name = $derived(election.name.replace(prefix, ""))}
+                  {const name = $derived.by(() => {
+                    const bare = election.name.replace(prefix, "");
+                    return bare.charAt(0).toUpperCase() + bare.slice(1);
+                  })}
                   {const day = $derived(
                     election.date != null &&
                       entries.some(
                         (other) =>
                           other !== election &&
-                          other.name.replace(prefix, "") === name,
+                          other.name.replace(prefix, "").toLowerCase() ===
+                            name.toLowerCase(),
                       )
                       ? new Intl.DateTimeFormat(getLocale(), {
                           month: "long",
@@ -339,9 +343,18 @@
                       class="text-xs whitespace-nowrap text-muted-foreground tabular-nums"
                       >{m.race_contests({
                         count: count(election.races),
-                      })}{#if election.won > 0}, <span
+                      })}{#if election.seats > 0 || election.won > 0}, <span
                           class="font-semibold text-foreground"
-                          >{m.party_won({ count: count(election.won) })}</span
+                          >{election.seats > 0 && election.won > 0
+                            ? m.party_seats_offices_won({
+                                seats: election.seats,
+                                offices: election.won,
+                              })
+                            : election.seats > 0
+                              ? m.party_seats_won({ count: election.seats })
+                              : m.party_won({
+                                  count: count(election.won),
+                                })}</span
                         >{/if}</span
                     >
                   </li>

@@ -13250,6 +13250,7 @@ export const parties = {
             year: v.nullable(v.number()),
             races: v.number(),
             won: v.number(),
+            seats: v.number(),
           }),
         ),
       }),
@@ -13261,6 +13262,7 @@ export const parties = {
         year: number | null;
         races: number;
         won: number;
+        seats: number;
         total: number;
       }>(sql`
         with recursive ids(id) as (
@@ -13298,9 +13300,15 @@ export const parties = {
           cross join lateral (select * from contest c where c.id = up.parent offset 0) c
         ),
         won as (
-          select distinct m.contest_id from mine m
-          join outcome x on x.option_id = m.option and x.candidacy_id is null and x.kind in ('elected', 'won')
-          join result_set rs on rs.id = x.result_set_id and rs.is_default
+          select w.contest_id, coalesce(bool_or(w.kind in ('body_seats', 'list_allocation')), false) as chamber, sum(w.seats)::int as seats
+          from (
+            select m.contest_id, m.option, case when c.party_scope_id is null then c.kind::text end as kind, max(coalesce(x.seats, 1)) as seats
+            from mine m join contest c on c.id = m.contest_id
+            join outcome x on x.option_id = m.option and x.candidacy_id is null and x.kind in ('elected', 'won')
+            join result_set rs on rs.id = x.result_set_id and rs.is_default
+            group by m.contest_id, m.option, c.kind, c.party_scope_id
+          ) w
+          group by w.contest_id
         ),
         tops as (
           select up.id, case when ${input.within ?? null}::uuid is null then coalesce(e.parent_id, e.id) else e.id end as election,
@@ -13314,7 +13322,8 @@ export const parties = {
         )
         select t.election, min(t.date_from)::text as date, min(t.year) as year,
           count(distinct t.id)::int as races,
-          count(distinct w.contest_id)::int as won,
+          count(distinct w.contest_id) filter (where not w.chamber)::int as won,
+          coalesce(sum(w.seats) filter (where w.chamber), 0)::int as seats,
           count(*) over ()::int as total
         from tops t
         left join won w on w.contest_id = t.id
@@ -13333,6 +13342,7 @@ export const parties = {
           year: row.year,
           races: row.races,
           won: row.won,
+          seats: row.seats,
         })),
       };
     }),

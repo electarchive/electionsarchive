@@ -841,6 +841,39 @@
   "party_relations": "Lineage and affiliations",
   "party_none": "No contests published for this party yet.",
   "party_won": "{count} won",
+  "party_seats_won": [
+    {
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural",
+        "local countText = count: number"
+      ],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "{countText} seat won",
+        "countPlural=*": "{countText} seats won"
+      }
+    }
+  ],
+  "party_seats_offices_won": [
+    {
+      "declarations": [
+        "input seats",
+        "input offices",
+        "local seatsPlural = seats: plural",
+        "local officesPlural = offices: plural",
+        "local seatsText = seats: number",
+        "local officesText = offices: number"
+      ],
+      "selectors": ["seatsPlural", "officesPlural"],
+      "match": {
+        "seatsPlural=one, officesPlural=one": "{seatsText} seat, {officesText} office won",
+        "seatsPlural=one, officesPlural=*": "{seatsText} seat, {officesText} offices won",
+        "seatsPlural=*, officesPlural=one": "{seatsText} seats, {officesText} office won",
+        "seatsPlural=*, officesPlural=*": "{seatsText} seats, {officesText} offices won"
+      }
+    }
+  ],
   "party_elections": "Elections",
   "twin_alternates": "Also available as HTML at {html} and JSON at {json}.",
   "col_date": "Date",

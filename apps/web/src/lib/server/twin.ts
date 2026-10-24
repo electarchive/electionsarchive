@@ -747,12 +747,19 @@ function partyMarkdown(
     record.elections.length === 0
       ? m.party_none()
       : table(
-          [m.col_year(), m.col_election(), m.party_contests(), m.person_won()],
+          [
+            m.col_year(),
+            m.col_election(),
+            m.party_contests(),
+            m.col_seats(),
+            m.person_won(),
+          ],
           record.elections.map((election) => [
             election.year,
             link(election.name, election.path),
             count(election.races),
-            count(election.won),
+            election.seats > 0 ? count(election.seats) : null,
+            election.won > 0 ? count(election.won) : null,
           ]),
         ),
     ...(record.count > record.elections.length
