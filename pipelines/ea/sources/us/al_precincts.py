@@ -23,13 +23,20 @@ PUBLISHER = "Alabama Secretary of State"
 TITLE = "Election Data Downloads: precinct-level general election results"
 LANDING = "https://www.sos.alabama.gov/alabama-votes/voter/election-data"
 BASE = "https://www.sos.alabama.gov/sites/default/files/election-data/2017-06/"
-FILES = {
-    date(2004, 11, 2): "https://www.sos.alabama.gov/sites/default/files/election-data/2023-06/2004-GeneralElection-PrecinctLevel.zip",
-    date(2002, 11, 5): BASE + "2002-GeneralElection-PrecinctLevel_0.xls",
-    date(2010, 11, 2): BASE + "2010-general-precinctLevel.zip",
-    date(2012, 11, 6): BASE + "2012General-PrecinctLevel.zip",
-    date(2014, 11, 4): BASE + "2014General-precinctLevel.zip",
-}
+FILES = [
+    *[
+        (date(2000, 11, 7), f"https://www.sos.alabama.gov/sites/default/files/election-data/2023-06/2000genp{pack}.zip")
+        for pack in (1, 2, 4, 5, 6, 7)
+    ],
+    (
+        date(2004, 11, 2),
+        "https://www.sos.alabama.gov/sites/default/files/election-data/2023-06/2004-GeneralElection-PrecinctLevel.zip",
+    ),
+    (date(2002, 11, 5), BASE + "2002-GeneralElection-PrecinctLevel_0.xls"),
+    (date(2010, 11, 2), BASE + "2010-general-precinctLevel.zip"),
+    (date(2012, 11, 6), BASE + "2012General-PrecinctLevel.zip"),
+    (date(2014, 11, 4), BASE + "2014General-precinctLevel.zip"),
+]
 SS = "{urn:schemas-microsoft-com:office:spreadsheet}"
 COUNTYWIDE = r"ABSENTEE|PROVISIONAL|MAIL|CURBSIDE"
 TOTALS = r"TOTAL|REGISTERED|BALLOTS CAST|CALCULATED|REPORTED"
@@ -45,7 +52,7 @@ STATEWIDE = {
 
 
 def fetch() -> None:
-    for url in FILES.values():
+    for _, url in FILES:
         raw.fetch(SOURCE, url, suffix=url[-4:])
 
 
@@ -69,10 +76,17 @@ def xml_sheets(content: bytes) -> list[list[list[str]]]:
 
 def contest(title: str) -> tuple[str, int | None] | None:
     name = re.sub(r"\s+", " ", re.sub(r"\(VOTE FOR \d+\)", "", re.sub(r"^FOR ", "", title.strip().upper()))).strip(" ,")
-    name = {"LT. GOVERNOR": "LIEUTENANT GOVERNOR", "ATTORNEY GEN.": "ATTORNEY GENERAL", "COMMISSIONER OF AG. & INDUSTRIES": "COMMISSIONER OF AGRICULTURE AND INDUSTRIES", "COMM OF AGRICULTURE AND INDUSTRIES": "COMMISSIONER OF AGRICULTURE AND INDUSTRIES", "AGRICULTURE COMM.": "COMMISSIONER OF AGRICULTURE AND INDUSTRIES", "US SENATOR": "UNITED STATES SENATOR"}.get(name, name)
+    name = {
+        "LT. GOVERNOR": "LIEUTENANT GOVERNOR",
+        "ATTORNEY GEN.": "ATTORNEY GENERAL",
+        "COMMISSIONER OF AG. & INDUSTRIES": "COMMISSIONER OF AGRICULTURE AND INDUSTRIES",
+        "COMM OF AGRICULTURE AND INDUSTRIES": "COMMISSIONER OF AGRICULTURE AND INDUSTRIES",
+        "AGRICULTURE COMM.": "COMMISSIONER OF AGRICULTURE AND INDUSTRIES",
+        "US SENATOR": "UNITED STATES SENATOR",
+    }.get(name, name)
     if name in STATEWIDE:
         return STATEWIDE[name], None
-    if name.startswith("PRESIDENT AND VICE"):
+    if name.startswith("PRESIDENT AND VICE") or name == "PRESIDENT":
         return "president", None
     if name == "UNITED STATES SENATOR":
         return "senate", None
@@ -94,6 +108,8 @@ def contest(title: str) -> tuple[str, int | None] | None:
         return f"senate:{int(matched[1])}:g", None
     if matched := re.match(r"STATE REPRESENTATIVE D\d+ DISTRICT (\d+)$", name):
         return f"house:{int(matched[1])}:g", None
+    if matched := re.match(r"U\.?S\.? HSE?\.?(?:OUSE)? (\d+)$", name):
+        return "house", int(matched[1])
     if matched := re.match(r"US REP[,.] DIST\.? ?(\d+)$", name):
         return "house", int(matched[1])
     if matched := re.match(r"STATE SEN\.? DIST\.? ?(\d+)$", name):
@@ -116,9 +132,11 @@ def parse() -> None:
             ).fetchall()
         }
     records: list[tuple[date, str, str, str, str, str, str]] = []
-    for day, url in FILES.items():
+    for day, url in FILES:
         if url.endswith(".xls"):
-            book = pl.read_excel(raw.cached(SOURCE, url).path, has_header=False, infer_schema_length=0, sheet_id=0, raise_if_empty=False)
+            book = pl.read_excel(
+                raw.cached(SOURCE, url).path, has_header=False, infer_schema_length=0, sheet_id=0, raise_if_empty=False
+            )
             for sheet, frame in book.items():
                 rows = [[cell or "" for cell in row] for row in frame.iter_rows()]
                 header = next((i for i, row in enumerate(rows) if row[0].strip() == "County Code"), None)
@@ -140,30 +158,65 @@ def parse() -> None:
                     table = pl.read_csv(archive.read(member), infer_schema=False, truncate_ragged_lines=True)
                     for row in table.iter_rows(named=True):
                         if row["Contest Title"] and contest(row["Contest Title"]) is not None:
-                            records.append((day, county, row["Contest Title"].strip(), row["Precinct Name"].strip(), row["Candidate Name"].strip(), row["Registered Voters"], row["Party Code"]))
+                            records.append(
+                                (
+                                    day,
+                                    county,
+                                    row["Contest Title"].strip(),
+                                    row["Precinct Name"].strip(),
+                                    row["Candidate Name"].strip(),
+                                    row["Registered Voters"],
+                                    row["Party Code"],
+                                )
+                            )
                     continue
                 if not member.lower().endswith((".xls", ".xlsx")) or member.startswith("__MACOSX"):
                     continue
-                county = re.sub(r"[^a-z]", "", re.sub(r"(?i)^2014-general-|[ _-]*2014 general precinct", "", Path(member).stem).lower()).removesuffix("xls").removesuffix("gen").replace("radolph", "randolph")
+                county = (
+                    re.sub(
+                        r"[^a-z]",
+                        "",
+                        re.sub(r"(?i)^2014-general-|[ _-]*2014 general precinct", "", Path(member).stem).lower(),
+                    )
+                    .removesuffix("xls")
+                    .removesuffix("gen")
+                    .replace("radolph", "randolph")
+                )
                 content = archive.read(member)
                 if content.lstrip(b"\xef\xbb\xbf").startswith(b"<?xml"):
                     sheets = xml_sheets(content)
                 else:
                     try:
                         book = pl.read_excel(
-                            io.BytesIO(content), has_header=False, infer_schema_length=0, sheet_id=0, raise_if_empty=False
+                            io.BytesIO(content),
+                            has_header=False,
+                            infer_schema_length=0,
+                            sheet_id=0,
+                            raise_if_empty=False,
                         )
                     except Exception:
                         with tempfile.TemporaryDirectory() as folder:
                             (Path(folder) / "in.xls").write_bytes(content)
                             subprocess.run(
-                                ["soffice", "--headless", "--convert-to", "xlsx", "--outdir", folder, str(Path(folder) / "in.xls")],
+                                [
+                                    "soffice",
+                                    "--headless",
+                                    "--convert-to",
+                                    "xlsx",
+                                    "--outdir",
+                                    folder,
+                                    str(Path(folder) / "in.xls"),
+                                ],
                                 check=True,
                                 capture_output=True,
                                 timeout=120,
                             )
                             book = pl.read_excel(
-                                Path(folder) / "in.xlsx", has_header=False, infer_schema_length=0, sheet_id=0, raise_if_empty=False
+                                Path(folder) / "in.xlsx",
+                                has_header=False,
+                                infer_schema_length=0,
+                                sheet_id=0,
+                                raise_if_empty=False,
                             )
                     sheets = [[[cell or "" for cell in row] for row in frame.iter_rows()] for frame in book.values()]
                 for rows in sheets:
@@ -178,6 +231,44 @@ def parse() -> None:
                                 if precinct and not re.search(TOTALS, precinct.upper()):
                                     records.append((day, county, row[0], precinct, row[2], value, row[1]))
                         continue
+                    if rows[0][:1] == ["County"] and "ContestTitle" in rows[0]:
+                        title, candidate, place, votes = (
+                            rows[0].index(label)
+                            for label in ("ContestTitle", "CandidateName", "PrecinctName", "NumberVotes")
+                        )
+                        for row in rows[1:]:
+                            if (
+                                len(row) > max(title, candidate, place, votes)
+                                and contest(row[title]) is not None
+                                and not re.search(TOTALS, row[place].upper())
+                            ):
+                                records.append((day, county, row[title], row[place], row[candidate], row[votes], ""))
+                        continue
+                    header = None if rows[0][0].startswith(("FOR ", "PROPOSED ")) else next((i for i, row in enumerate(rows[:6]) if i > 0 and row and row[0] == "Precinct"), None)
+                    if header is not None:
+                        owner = ""
+                        offices = []
+                        for label in rows[header - 1]:
+                            owner = label.strip() if label.strip() else owner
+                            offices.append(owner)
+                        for row in rows[header + 1 :]:
+                            if not row or not row[0].strip() or re.search(TOTALS, row[0].upper()):
+                                continue
+                            for position in range(1, min(len(row), len(rows[header]), len(offices))):
+                                if rows[header][position].strip() and contest(offices[position]) is not None:
+                                    name = re.sub(r"\s*\([A-Z ]*\)\s*$", "", rows[header][position]).strip()
+                                    records.append(
+                                        (
+                                            day,
+                                            county,
+                                            offices[position],
+                                            row[0],
+                                            "WRITE-INS" if name == "WI" else name,
+                                            row[position],
+                                            "",
+                                        )
+                                    )
+                        continue
                     if rows[0][0] == "ContestTitle":
                         for row in rows[1:]:
                             if len(row) < 4 or contest(row[0]) is None:
@@ -186,7 +277,13 @@ def parse() -> None:
                                 if precinct and not re.search(TOTALS, precinct.upper()):
                                     records.append((day, county, row[0], precinct, row[1], value, ""))
                         continue
-                    if rows[0][0].strip() == "" and len(rows) > 2 and rows[1] and rows[1][0] != "" and any(contest(label.strip()) for label in rows[0] if label.strip()):
+                    if (
+                        rows[0][0].strip() in ("", "Precinct")
+                        and len(rows) > 2
+                        and rows[1]
+                        and rows[1][0] != ""
+                        and any(contest(label.strip()) for label in rows[0] if label.strip())
+                    ):
                         offices = {}
                         owner = ""
                         for position, label in enumerate(rows[0]):
@@ -197,7 +294,17 @@ def parse() -> None:
                                 continue
                             for position in range(1, min(len(row), len(rows[1]))):
                                 if rows[1][position] and contest(offices[position]) is not None:
-                                    records.append((day, county, offices[position], row[0], re.sub(r"\s*\([A-Z ]+\)\s*$", "", rows[1][position]), row[position], ""))
+                                    records.append(
+                                        (
+                                            day,
+                                            county,
+                                            offices[position],
+                                            row[0],
+                                            re.sub(r"\s*\([A-Z ]*\)\s*$", "", rows[1][position]),
+                                            row[position],
+                                            "",
+                                        )
+                                    )
                         continue
                     if not rows[0][0].startswith(("FOR ", "PROPOSED ")) or contest(rows[0][0]) is None:
                         continue
@@ -216,11 +323,18 @@ def parse() -> None:
                         for position, label in enumerate(header):
                             if label == "Total Votes" and position < len(row):
                                 records.append((day, county, rows[0][0], row[0], owners[position], row[position], ""))
-    frame = pl.DataFrame(records, schema=["day", "county", "title", "place", "choice", "votes", "party"], orient="row", infer_schema_length=None)
+    frame = pl.DataFrame(
+        records,
+        schema=["day", "county", "title", "place", "choice", "votes", "party"],
+        orient="row",
+        infer_schema_length=None,
+    )
     titles = {title: contest(title) for title in frame["title"].unique().to_list()}
     frame = frame.with_columns(
         chamber=pl.col("title").replace_strict({t: c[0] for t, c in titles.items() if c}, default=None),
-        district=pl.col("title").replace_strict({t: c[1] for t, c in titles.items() if c}, default=None, return_dtype=pl.Int16),
+        district=pl.col("title").replace_strict(
+            {t: c[1] for t, c in titles.items() if c}, default=None, return_dtype=pl.Int16
+        ),
         county_code=pl.col("county").replace_strict(counties, default=None),
         votes=pl.col("votes").str.replace_all(",", "").cast(pl.Int64, strict=False),
     ).filter(pl.col("votes").is_not_null() & pl.col("chamber").is_not_null())
@@ -245,7 +359,12 @@ def parse() -> None:
             .then("county_code")
             .otherwise(
                 pl.concat_str(
-                    pl.col("day").cast(pl.String), pl.lit("AL"), "county_code", pl.col("county").str.to_uppercase(), "place", separator=":"
+                    pl.col("day").cast(pl.String),
+                    pl.lit("AL"),
+                    "county_code",
+                    pl.col("county").str.to_uppercase(),
+                    "place",
+                    separator=":",
                 )
             ),
         )
@@ -261,7 +380,9 @@ def parse() -> None:
     )
     PARSED.mkdir(parents=True, exist_ok=True)
     frame.write_parquet(PARSED / "precincts.parquet")
-    print(frame.filter(pl.col("kind") == "precinct").group_by("year").agg(pl.col("code").n_unique()).sort("year").rows())
+    print(
+        frame.filter(pl.col("kind") == "precinct").group_by("year").agg(pl.col("code").n_unique()).sort("year").rows()
+    )
 
 
 def emit() -> Path:
@@ -286,7 +407,7 @@ def emit() -> Path:
                 url=LANDING,
                 license="Public record",
             )
-        for day, url in FILES.items():
+        for day, url in FILES:
             if day.year == year:
                 cs.artifact(raw.cached(SOURCE, url), source)
         cs.scope_units("us.precinct", "____-__-__:AL:%")
@@ -334,7 +455,9 @@ def emit() -> Path:
                 ),
                 scheme_code=pl.lit("us.precinct"),
                 code="code",
-                parent_id=pl.col("county_code").replace_strict({code: str(unit) for code, (unit, _) in counties.items()}),
+                parent_id=pl.col("county_code").replace_strict(
+                    {code: str(unit) for code, (unit, _) in counties.items()}
+                ),
                 area_relation=pl.lit("within"),
                 area_id=pl.col("county_code").replace_strict({code: str(area) for code, (_, area) in counties.items()}),
                 kind=pl.lit("standard"),
