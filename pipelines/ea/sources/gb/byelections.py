@@ -11,7 +11,7 @@ from ea.sources.gb import umit
 from ea.store import DATA, connect
 
 SOURCE = "gb.byelections"
-VERSION = "2"
+VERSION = "3"
 PARSED = DATA / "parsed" / SOURCE
 BASE = "https://raw.githubusercontent.com/ukparliament/psephology/main/db/data/results-by-parliament/{}/by-elections/{}.csv"
 PARLIAMENTS = range(55, 60)
@@ -21,6 +21,9 @@ UMIT_README = f"{umit.DATAVERSE}/6811223"
 UMIT_TITLE = "By-elections to the UK House of Commons, version 3"
 UMIT_LANDING = "https://doi.org/10.7910/DVN/KN5Y7V"
 OFFICIAL_FROM = date(2010, 5, 6)
+NIR_FROM = date(1921, 6, 7)
+SIX_COUNTIES = "Antrim|Armagh|Belfast|Down|Fermanagh|Londonderry|Tyrone|Queen's University"
+NATIONS = {"ENG": "England", "SCT": "Scotland", "WLS": "Wales", "NIR": "Northern Ireland"}
 VOTES, REGISTERED, VALID, INVALID = 1, 2, 4, 5
 ALIASES = {
     "Social and Liberal Democrats": "liberal-democrats",
@@ -266,6 +269,11 @@ def parse() -> None:
 
 def emit() -> Path:
     frame = pl.read_parquet(PARSED / "results.parquet")
+    moved = (pl.col("country") == "IRL") & (pl.col("day") >= NIR_FROM)
+    stray = frame.filter(moved & ~pl.col("constituency").str.contains(SIX_COUNTIES))["constituency"].unique()
+    if stray.len():
+        raise ValueError(f"Irish seats after {NIR_FROM} outside Northern Ireland: {stray.to_list()}")
+    frame = frame.with_columns(country=pl.when(moved).then(pl.lit("NIR")).otherwise("country"))
     with connect() as conn:
         cs = Changeset(
             conn,
@@ -320,8 +328,19 @@ def emit() -> Path:
         parties: dict[str, UUID] = {}
         persons: dict[str, UUID] = {}
 
+        titles: dict[UUID, list[tuple[UUID, str]]] = {}
+        for id, entity, text in conn.execute(
+            """select n.id, n.entity_id, n.text from name n join changeset c on c.id = n.changeset_id and c.pipeline = %s
+               join election e on e.id = n.entity_id where n.is_preferred and n.lang = 'en'""",
+            [SOURCE],
+        ).fetchall():
+            titles.setdefault(entity, []).append((id, text))
+
         def name(entity: UUID, text: str) -> None:
             cs.add("name", entity_id=entity, text=text, lang="en", kind="official", is_preferred=True)
+            for id, old in titles.get(entity, []):
+                if old != text:
+                    cs.add("name", id=id, entity_id=entity, text=old, lang="en", kind="official", is_preferred=False)
 
         def party_of(label: str, year: int, country: str | None) -> UUID | None:
             if label in umit.NOT_PARTIES:
@@ -342,14 +361,18 @@ def emit() -> Path:
                 if parties[key] in cs.minted:
                     if key in umit.EXISTING:
                         raise ValueError(f"{key} is not in the database")
-                    cs.add("party", id=parties[key], kind="party", polity_id=gb)
+                    cs.add(
+                        "party",
+                        id=parties[key],
+                        kind="independent_group" if key == "speaker" else "party",
+                        polity_id=gb,
+                    )
                     name(parties[key], umit.NAMES.get(key, label))
             return parties[key]
 
         for (day,), on_day in frame.group_by("day", maintain_order=True):
             election = cs.key(f"{SOURCE}.election", str(day))
             spoken = f"{day.day} {day:%B %Y}"
-            places = on_day["constituency"].unique(maintain_order=True).to_list()
             cs.add(
                 "election",
                 id=election,
@@ -359,16 +382,35 @@ def emit() -> Path:
                 date_to=on_day["day_to"].max(),
                 status="held",
             )
-            name(
-                election,
-                f"{places[0]} by-election, {spoken}"
-                if len(places) == 1
-                else f"UK parliamentary by-elections, {spoken}",
-            )
+            name(election, f"By-elections, {spoken}")
             path = f"gb/{day}-by-election"
             cs.add("slug", path=path, entity_id=election)
+            children: dict[str, UUID] = {}
+            for (country,), in_nation in on_day.group_by("country", maintain_order=True):
+                if country not in NATIONS or (country == "NIR" and day < NIR_FROM):
+                    continue
+                child = children[country] = cs.key(f"{SOURCE}.election", f"{day}:{country}")
+                cs.add(
+                    "election",
+                    id=child,
+                    polity_id=cs.polity(f"GB-{country}"),
+                    parent_id=election,
+                    kind="by_election",
+                    date_from=day,
+                    date_to=in_nation["day_to"].max(),
+                    status="held",
+                )
+                seats = in_nation["constituency"].unique(maintain_order=True).to_list()
+                name(
+                    child,
+                    f"{seats[0]} by-election, {spoken}"
+                    if len(seats) == 1
+                    else f"By-elections in {NATIONS[country]}, {spoken}",
+                )
+                cs.add("slug", path=f"{path}/{slug(NATIONS[country])}", entity_id=child)
             for (unit_code,), lines in on_day.group_by("unit", maintain_order=True):
                 first = lines.row(0, named=True)
+                held = children.get(first["country"], election)
                 general = cs.key("gb.contest", first["general"])
                 if general in cs.minted:
                     raise ValueError(f"no general election contest {first['general']}")
@@ -379,7 +421,7 @@ def emit() -> Path:
                 cs.add(
                     "contest",
                     id=contest,
-                    election_id=election,
+                    election_id=held,
                     kind="body_seats",
                     body_id=commons,
                     district_area_id=district,
@@ -396,7 +438,7 @@ def emit() -> Path:
                 cs.add(
                     "result_set",
                     id=result_set,
-                    election_id=election,
+                    election_id=held,
                     contest_id=contest,
                     stage="official",
                     kind="tacit" if tacit else "counted",
@@ -473,4 +515,13 @@ def emit() -> Path:
                         )
                     if line["elected"]:
                         cs.add("outcome", result_set_id=result_set, option_id=option, kind="elected")
+        print(
+            f"{frame['day'].n_unique()} days; contests on the umbrella (Ireland before {NIR_FROM}):",
+            frame.filter(
+                ~pl.col("country").is_in(list(NATIONS)) | ((pl.col("country") == "NIR") & (pl.col("day") < NIR_FROM))
+            )
+            .select("day", "unit")
+            .unique()
+            .height,
+        )
         return cs.write()

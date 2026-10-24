@@ -13,7 +13,7 @@ from ea.changeset import Changeset, slug
 from ea.store import DATA, connect
 
 SOURCE = "gb.umit"
-VERSION = "1"
+VERSION = "2"
 PARSED = DATA / "parsed" / SOURCE
 DATAVERSE = "https://dataverse.harvard.edu/api/access/datafile"
 RESULTS = f"{DATAVERSE}/14037637?format=original"
@@ -25,6 +25,10 @@ LIBRARY = (
 LIBRARY_PAGE = "https://commonslibrary.parliament.uk/research-briefings/cbp-8647/"
 LIBRARY_TITLE = "General election results from 1918 to 2019 (CBP-8647)"
 LIBRARY_SHEETS = {"1974F": date(1974, 2, 28), "1974O": date(1974, 10, 10)}
+REGISTER = "https://search.electoralcommission.org.uk/api/pdf/Registrations/PP120"
+REFORM = "https://search.electoralcommission.org.uk/api/pdf/Registrations/PP7931"
+REFORM_PAGE = "https://search.electoralcommission.org.uk/English/Registrations/PP7931"
+REGISTER_PAGE = "https://search.electoralcommission.org.uk/English/Registrations/PP120"
 PUBLISHER = "Resul Umit, Durham University"
 TITLE = "UK House of Commons Election Results at Candidate Level, version 13 (2026-06-30)"
 LANDING = "https://doi.org/10.7910/DVN/S83HOA"
@@ -138,7 +142,7 @@ COUNTRIES = {
     "Ireland": "IRL",
     "Northern Ireland": "NIR",
 }
-NOT_PARTIES = ("Independent", "Speaker")
+NOT_PARTIES = ("Independent", "No label")
 SHAPED = date(2010, 5, 6)
 REDISTRIBUTIONS = (1832, 1868, 1885, 1918, 1950, 1955, 1974, 1983, 1997)
 MISSPELLED = {"RoxBoroughshire": "Roxburghshire", "East Suex": "East Sussex"}
@@ -176,6 +180,7 @@ ALIASES = {
     "Conservative": "conservative",
     "Tory": "conservative",
     "Unionist with Coalition Coupon": "conservative",
+    "Speaker with Coalition Coupon": "speaker",
     "Conservative and National Liberal": "conservative",
     "National Liberal and Conservative": "conservative",
     "NI Conservatives": "conservative",
@@ -242,6 +247,99 @@ ALIASES = {
     "Communist Party of Britain": "communist-party-of-britain",
     "Social Democratic Party": "social-democratic-party-1990",
 }
+UCUNF_DAY = date(2010, 5, 6)
+UCUNF = {
+    ("nir-belfast-east", "Ringland, Trevor"),
+    ("nir-belfast-north", "Cobain, Fred"),
+    ("nir-belfast-south", "Bradshaw, Paula"),
+    ("nir-belfast-west", "Manwaring, Bill"),
+    ("nir-east-antrim", "McCune, Rodney"),
+    ("nir-east-londonderry", "Macaulay, Lesley"),
+    ("nir-foyle", "Harding, David"),
+    ("nir-lagan-valley", "Trimble, Daphne"),
+    ("nir-mid-ulster", "Overend, Sandra"),
+    ("nir-newry-and-armagh", "Kennedy, Danny"),
+    ("nir-north-antrim", "Armstrong, Irwin"),
+    ("nir-north-down", "Parsley, Ian"),
+    ("nir-south-antrim", "Empey, Reg"),
+    ("nir-south-down", "McCallister, John"),
+    ("nir-strangford", "Nesbitt, Mike"),
+    ("nir-upper-bann", "Hamilton, Harry"),
+    ("nir-west-tyrone", "Hussey, Ross"),
+}
+UCUNF_NAME = "Ulster Conservatives and Unionists – New Force"
+UCUNF_NOTE = (
+    "Umit's dataset labels this candidate Independent; the candidate stood for Ulster Conservatives and Unionists – "
+    "New Force, the joint ticket of the Conservatives and the Ulster Unionists, which the Commons Library's "
+    "constituency results (CBP-8647) count with the Ulster Unionists."
+)
+RELABELED = {
+    (date(1950, 2, 23), "eng-widnes", "MacColl, James Eugene"): (
+        "Labour",
+        "Umit's dataset labels this candidate Conservative; the Commons Library's constituency results (CBP-8647) list him as Labour, the party he sat for.",
+        True,
+    ),
+    (date(1964, 10, 15), "eng-tavistock", "Elswood, John A"): (
+        "Labour",
+        "Umit's dataset labels this candidate Liberal; the Commons Library's constituency results (CBP-8647) list him as Labour.",
+        True,
+    ),
+    (date(1950, 2, 23), "eng-halifax", "Blackburn, RH"): (
+        None,
+        "Umit's dataset labels this candidate National Liberal and Conservative; the Commons Library's constituency results (CBP-8647) count him among other candidates, not with either party.",
+        True,
+    ),
+    (date(1979, 5, 3), "eng-blyth", "Nicholson, Emma"): (
+        "Conservative",
+        "Umit's dataset labels this candidate Communist; the Commons Library's constituency results (CBP-8647) list her as Conservative.",
+        True,
+    ),
+    (date(1923, 12, 6), "eng-salisbury", "Morrison, Hugh"): (
+        "Conservative",
+        "Umit's dataset labels this candidate Liberal; the Commons Library's constituency results (CBP-8647) list him as Conservative, the party he had sat for since 1918.",
+        True,
+    ),
+    (date(1922, 11, 15), "eng-central-newcastle-upon-tyne", "Dodd, John"): (
+        "Liberal",
+        "Umit's dataset prints this candidate's label as \"L+F24305iberal\", a spreadsheet slip; the Commons Library's constituency results (CBP-8647) list him as Liberal.",
+        True,
+    ),
+    (date(1950, 2, 23), "eng-hexham", "Brown, Douglas Clifton"): (
+        "Speaker",
+        "Umit's dataset labels this candidate Conservative; he was Speaker at the dissolution and stood for re-election as Speaker.",
+        False,
+    ),
+    (date(1955, 5, 26), "eng-cirencester-and-tewkesbury", "Morrison, William Shepherd"): (
+        "Speaker",
+        "Umit's dataset labels this candidate Conservative; he was Speaker at the dissolution and stood for re-election as Speaker, and the Commons Library's constituency results (CBP-8647) do not count him as a Conservative.",
+        True,
+    ),
+    (date(1964, 10, 15), "eng-cities-of-london-and-westminster", "Hylton-Foster, Harry Braustyn Hylton"): (
+        "Speaker",
+        "Umit's dataset labels this candidate Conservative; he was Speaker at the dissolution and stood for re-election as Speaker.",
+        False,
+    ),
+    (date(1966, 3, 31), "eng-southampton-itchen", "King, Horace Maybray"): (
+        "Speaker",
+        "Umit's dataset labels this candidate Labour; he was Speaker at the dissolution and stood for re-election as Speaker, and the Commons Library's constituency results (CBP-8647) do not count him as Labour.",
+        True,
+    ),
+    (date(1970, 6, 18), "eng-southampton-itchen", "King, Horace Maybray"): (
+        "Speaker",
+        "Umit's dataset labels this candidate Labour; he was Speaker at the dissolution and stood for re-election as Speaker.",
+        False,
+    ),
+    (date(1974, 2, 28), "eng-wirral", "Lloyd, John"): (
+        "Speaker",
+        "Umit's dataset labels this candidate Conservative; he was Speaker at the dissolution and stood for re-election as Speaker, and the Commons Library's constituency results (CBP-8647) do not count him as a Conservative.",
+        True,
+    ),
+    (date(1974, 10, 10), "eng-wirral", "Lloyd, John"): (
+        "Speaker",
+        "Umit's dataset labels this candidate Conservative; he was Speaker at the dissolution and stood for re-election as Speaker.",
+        False,
+    ),
+}
 ERAS = {
     ("Liberal", 1992): "liberal-party-1989",
     ("Social Democratic", 1983): "social-democratic-party-1981",
@@ -254,6 +352,7 @@ ERAS = {
     ("Socialist Labour", 1992): "socialist-labour-party",
     ("Reform UK", 1997): "reform-uk-2001",
     ("Reform UK", 2018): "reform-uk",
+    ("Scottish Unionist", 1986): "scottish-unionist-party",
 }
 NAMES = {
     "scottish-unionist": "Unionist Party (Scotland)",
@@ -325,6 +424,8 @@ def fetch() -> None:
     raw.fetch(SOURCE, RESULTS, suffix=".csv")
     raw.fetch(SOURCE, README, suffix=".pdf")
     raw.fetch(SOURCE, LIBRARY, suffix=".xlsx")
+    raw.fetch(SOURCE, REGISTER, suffix=".pdf")
+    raw.fetch(SOURCE, REFORM, suffix=".pdf")
 
 
 def library() -> pl.DataFrame:
@@ -696,9 +797,13 @@ def emit() -> Path:
         def party_of(label: str, year: int, country: str) -> UUID | None:
             if label in NOT_PARTIES:
                 return None
-            key = next(
-                (key for (era, since), key in sorted(ERAS.items(), reverse=True) if era == label and year >= since),
-                None,
+            key = (
+                "speaker"
+                if label == "Speaker"
+                else next(
+                    (key for (era, since), key in sorted(ERAS.items(), reverse=True) if era == label and year >= since),
+                    None,
+                )
             )
             if key is None and label == "Unionist":
                 key = "scottish-unionist" if country == "SCT" else "conservative"
@@ -711,7 +816,12 @@ def emit() -> Path:
                 else:
                     parties[key] = cs.key("gb.party", key)
                     if parties[key] in cs.minted:
-                        cs.add("party", id=parties[key], kind="party", polity_id=gb)
+                        cs.add(
+                            "party",
+                            id=parties[key],
+                            kind="independent_group" if key == "speaker" else "party",
+                            polity_id=gb,
+                        )
                         name(parties[key], NAMES.get(key, label))
                 if key == "liberal-national":
                     cs.add(
@@ -723,8 +833,27 @@ def emit() -> Path:
                         is_preferred=False,
                     )
                 if key == "reform-uk":
+                    registered = cs.source("Electoral Commission", "Register of political parties: Reform UK (PP7931)")
+                    cs.add(
+                        "source",
+                        id=registered,
+                        kind="official_body",
+                        publisher="Electoral Commission",
+                        title="Register of political parties: Reform UK (PP7931)",
+                        url=REFORM_PAGE,
+                        notes="Registered on 5 February 2019 as The Brexit Party; the change of name to Reform UK was "
+                        "authorized on 6 January 2021.",
+                    )
+                    cs.artifact(raw.cached(SOURCE, REFORM), registered)
+                    brexit = conn.execute(
+                        """select n.id from name n join changeset c on c.id = n.changeset_id and c.pipeline = %s
+                           where n.entity_id = %s and n.text = 'The Brexit Party'""",
+                        [SOURCE, parties[key]],
+                    ).fetchone()
                     cs.add(
                         "name",
+                        **({"id": brexit[0]} if brexit is not None else {}),
+                        source_id=registered,
                         entity_id=parties[key],
                         text="The Brexit Party",
                         lang="en",
@@ -827,6 +956,7 @@ def emit() -> Path:
         spans: dict[tuple[str, UUID], list[date]] = {}
         persons: dict[str, UUID] = {}
         restaged: set[UUID] = set()
+        relabeled: set[tuple[date, str, str]] = set()
         for (start, end, label, year), held in rows.group_by(
             "date_start", "date_end", "election", "year", maintain_order=True
         ):
@@ -843,6 +973,14 @@ def emit() -> Path:
             )
             name(election, title)
             path = f"gb/{start}-general"
+            ucunf = None
+            if start == UCUNF_DAY:
+                ucunf = cs.key(f"{SOURCE}.alliance", f"{start}:ucunf")
+                cs.add("alliance", id=ucunf, kind="electoral_alliance", election_id=election)
+                cs.add("name", entity_id=ucunf, text=UCUNF_NAME, lang="en", kind="official", is_preferred=True)
+                for member in ("Conservative", "Ulster Unionist Party"):
+                    cs.add("alliance_member", alliance_id=ucunf, party_id=party_of(member, year, "NIR"), role=None)
+                cs.add("citation", entity_id=ucunf, source_id=commons_library)
             cs.add("slug", path=path, entity_id=election)
             for (unit_code,), lines in held.group_by("unit", maintain_order=True):
                 first = lines.row(0, named=True)
@@ -1018,15 +1156,29 @@ def emit() -> Path:
                                     is_preferred=False,
                                     valid_from=None,
                                 )
-                    party = party_of(line["party"], year, line["country"])
+                    printed, relabel, cited = RELABELED.get(
+                        (start, unit_code, line["candidate"]), (line["party"], None, False)
+                    )
+                    if relabel is not None:
+                        relabeled.add((start, unit_code, line["candidate"]))
+                    joint = ucunf if ucunf is not None and (unit_code, line["candidate"]) in UCUNF else None
+                    if joint is not None:
+                        printed, relabel, cited = None, UCUNF_NOTE, True
+                        relabeled.add((start, unit_code, line["candidate"]))
+                    party = party_of(printed, year, line["country"]) if printed is not None else None
                     cs.add(
                         "contest_option",
                         id=option,
                         contest_id=contest,
                         kind="candidate",
                         party_id=party,
+                        alliance_id=joint,
                         ballot_label=full,
                     )
+                    if relabel is not None:
+                        cs.add("note", entity_id=option, kind="context", body_md=relabel)
+                        if cited:
+                            cs.add("citation", entity_id=option, source_id=commons_library)
                     cs.add(
                         "candidacy",
                         id=cs.key("gb.candidacy", option_key),
@@ -1035,7 +1187,7 @@ def emit() -> Path:
                         role="head",
                         ballot_name=line["candidate"],
                         member_of_party_id=party,
-                        is_independent=line["party"] == "Independent",
+                        is_independent=line["party"] == "Independent" and joint is None,
                     )
                     if (fresh or first["revised"]) and line["contested"]:
                         cs.add(
@@ -1051,6 +1203,9 @@ def emit() -> Path:
                         )
                     if line["elected"]:
                         cs.add("outcome", result_set_id=result_set, option_id=option, kind="elected")
+        expected = set(RELABELED) | {(UCUNF_DAY, unit, candidate) for unit, candidate in UCUNF}
+        if relabeled != expected:
+            raise ValueError(f"not in Umit's dataset: {expected - relabeled}")
         for (unit_code, district), held_on in spans.items():
             cs.add(
                 "reporting_unit_area",
@@ -1059,4 +1214,28 @@ def emit() -> Path:
                 valid_from=min(held_on),
                 valid_to=following.get(max(held_on)),
             )
+        for (placeholder,) in conn.execute(
+            "select entity_id from external_id where scheme = 'gb.party' and value = 'no-label'"
+        ).fetchall():
+            cs.add(
+                "entity_retirement",
+                entity_id=placeholder,
+                reason='"No label" is the source\'s mark for a candidate with no party label, not a party; the '
+                "candidate now carries no party.",
+            )
+        if "scottish-unionist-party" in parties:
+            register = cs.source(
+                "Electoral Commission", "Register of political parties: Scottish Unionist Party (PP120)"
+            )
+            cs.add(
+                "source",
+                id=register,
+                kind="official_body",
+                publisher="Electoral Commission",
+                title="Register of political parties: Scottish Unionist Party (PP120)",
+                url=REGISTER_PAGE,
+                notes="Registered on 28 June 2000 and deregistered on 6 November 2009; fielded candidates in Scotland.",
+            )
+            cs.artifact(raw.cached(SOURCE, REGISTER), register)
+            cs.add("citation", entity_id=parties["scottish-unionist-party"], source_id=register)
         return cs.write()
