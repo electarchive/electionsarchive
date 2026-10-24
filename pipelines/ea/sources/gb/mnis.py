@@ -63,7 +63,7 @@ def members() -> list[tuple[UUID, str]]:
     with connect() as conn:
         return conn.execute(
             """select x.entity_id, x.value from external_id x join person p on p.id = x.entity_id
-               where x.scheme = 'mnis' and not exists (select from entity_merge m where m.entity_id = x.entity_id)
+               where x.scheme = 'mnis' and x.value ~ '^[0-9]+$' and not exists (select from entity_merge m where m.entity_id = x.entity_id)
                order by x.value::int"""
         ).fetchall()
 

@@ -193,6 +193,20 @@ def emit() -> Path:
                 to_precision=precision,
                 acquired_via="appointed",
             )
+        sitting = [term for term in wikidata if term[3] is None and term[2].year >= max(last for *_, last in listed)]
+        if len(sitting) != 1:
+            raise ValueError(f"Wikidata gives {len(sitting)} sitting Prime Ministers")
+        item, label, start, _, _ = sitting[0]
+        cs.add(
+            "tenure",
+            id=cs.key(f"{SOURCE}.tenure", f"prime-minister:{item}:{start.year}"),
+            person_id=person(item, label),
+            office_id=offices["prime-minister"],
+            from_date=start,
+            from_precision="day",
+            to_precision="day",
+            acquired_via="appointed",
+        )
         speakers = 0
         seen: set[tuple[str, date]] = set()
         for item, label, start, stop, cause in terms(SPEAKERS):

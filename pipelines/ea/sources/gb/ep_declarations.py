@@ -689,7 +689,7 @@ def parse() -> None:
                             "dc_person": dc["person_id"],
                             "dc_name": dc["person_name"],
                             "qid": dc["wikidata_id"].strip('"') or None,
-                            "mnis": dc["mnis_id"] or None,
+                            "mnis": dc["mnis_id"].strip('"') or None,
                             "elected": dc["elected"] == "t",
                             "sopn": sopn(ballot),
                         }

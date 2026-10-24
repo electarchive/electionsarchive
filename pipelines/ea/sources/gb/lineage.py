@@ -19,6 +19,10 @@ RELATIONS = (
     ("Q1311653", "successor_of", "Q476840", date(1882, 1, 1), "year"),
 )
 URWIN = "Scottish Conservatism: A Party Organization in Transition"
+TWINS = (
+    ("yorkshire-party", "the-yorkshire-party"),
+    ("socialist-party-of-great-britain", "the-socialist-party-of-great-britain"),
+)
 VICTORIAN = (
     ("whig", "merged_into", "Q622441", date(1859, 6, 6), "day", "willis"),
     ("radicals", "merged_into", "Q622441", date(1859, 6, 6), "day", "willis"),
@@ -233,6 +237,23 @@ def emit() -> Path:
             valid_to_precision="year",
         )
         cs.add("citation", entity_id=irish, source_id=histories["ulster"])
+        for twin, survivor in TWINS:
+            party, into = cs.key("gb.party", twin), cs.key("gb.party", survivor)
+            if party in cs.minted or into in cs.minted:
+                raise ValueError(f"no gb.party {twin} or {survivor}")
+            if conn.execute("select from entity_merge where entity_id = %s", [party]).fetchone() is None:
+                cs.merge(party, into)
+            (text,) = conn.execute("select text from name where entity_id = %s and is_preferred", [party]).fetchone()
+            cs.add(
+                "name",
+                entity_id=into,
+                text=text,
+                lang="en",
+                kind="short",
+                is_preferred=False,
+                valid_from_precision="day",
+                valid_to_precision="day",
+            )
         print(
             f"{len(generals)} general elections with Ulster Unionist candidates to 1970:", [day for _, day in generals]
         )

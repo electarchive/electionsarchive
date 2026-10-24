@@ -287,7 +287,8 @@ def emit() -> Path:
         known: dict[str, UUID] = {}
         for text, id in conn.execute(
             "select n.text, p.id from party p join polity y on y.id = p.polity_id"
-            " join name n on n.entity_id = p.id where y.iso_code = 'GB' order by p.id desc"
+            " join name n on n.entity_id = p.id where y.iso_code = 'GB'"
+            " and not exists (select from entity_merge m where m.entity_id = p.id) order by p.id desc"
         ).fetchall():
             known[fold(text)] = id
         party_ids: dict[str, UUID | None] = {}
@@ -297,7 +298,7 @@ def emit() -> Path:
                 return None
             if abbreviation not in party_ids:
                 label = parties[abbreviation]
-                found = known.get(fold(label))
+                found = cs.key("gb.party", "reform-uk") if label == "Reform UK" else known.get(fold(label))
                 if found is None:
                     found = cs.key("gb.party", slug(label))
                     if found in cs.minted and found not in party_ids.values():
@@ -421,7 +422,12 @@ def emit() -> Path:
                     name(election, f"{year} {council_names[code]} election")
                     cs.add("slug", path=f"{path}/{day}-local", entity_id=election)
                     if ward_row and ward_row["type"] in CYCLES:
-                        cs.add("external_id", entity_id=election, scheme="gb.leh.type", value=f"{ward_row['type']}:{year}:{code}")
+                        cs.add(
+                            "external_id",
+                            entity_id=election,
+                            scheme="gb.leh.type",
+                            value=f"{ward_row['type']}:{year}:{code}",
+                        )
                         cs.add("note", entity_id=election, kind="context", body_md=CYCLES[ward_row["type"]])
                 ward_area = cs.area("gb.ward", ward_code)
                 display = names.get(ward_code)
