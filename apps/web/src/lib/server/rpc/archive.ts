@@ -3076,8 +3076,9 @@ export const contests = {
             from contest c
             join election e on e.id = c.election_id
             join result_set rs on rs.contest_id = c.id and rs.is_default
+            left join boundary_set bs on bs.id = c.boundary_set_id
             join district_county dc on dc.district_area_id = c.district_area_id
-              and dc.district_valid @> e.date_from and dc.county_valid @> e.date_from and dc.share >= 0.005
+              and dc.district_valid @> coalesce(bs.valid_from, e.date_from) and dc.county_valid @> e.date_from and dc.share >= 0.005
             join area a on a.id = dc.county_area_id
             where c.id = ${contest.id}::uuid and c.district_area_id = ${area?.id ?? null}::uuid
               and exists (
@@ -3478,8 +3479,9 @@ export const contests = {
         const found = await db.execute<{ polity: string }>(sql`
           select pt.polity_id as polity
           from contest c
+          left join boundary_set bs on bs.id = c.boundary_set_id
           join district_county d on d.district_area_id = c.district_area_id
-            and d.district_valid @> ${day}::date and d.county_valid @> ${day}::date
+            and d.district_valid @> coalesce(bs.valid_from, ${day}::date) and d.county_valid @> ${day}::date
             and (d.share >= 0.98 or d.rest <= 0.02)
           join polity_territory pt on pt.area_id = d.county_area_id and pt.valid @> ${day}::date
           where c.id = ${contest.root}::uuid and c.district_area_id = ${area.id}::uuid
