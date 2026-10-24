@@ -639,7 +639,7 @@ function personMarkdown(
 }
 
 function partyMarkdown(
-  { party, record, members }: Extract<Data, { kind: "party" }>,
+  { party, record, members, notes }: Extract<Data, { kind: "party" }>,
   link: Link,
 ) {
   const related = [
@@ -664,6 +664,7 @@ function partyMarkdown(
             polity: party.polity.name,
           }),
         ]),
+    ...notes.map((note) => `> ${note.body}`),
     ...(related.length === 0
       ? []
       : [`## ${m.party_relations()}`, related.join("\n")]),

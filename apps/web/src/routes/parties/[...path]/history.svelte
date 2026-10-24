@@ -18,6 +18,7 @@
     id,
     fallback,
     color,
+    notes,
   }: {
     history: PageData["history"];
     name: string;
@@ -25,6 +26,7 @@
     id: string;
     fallback: string | null;
     color: string;
+    notes: Array<{ body: string; from: string | null; to: string | null }>;
   } = $props();
 
   const PAD = { top: 16, right: 18, bottom: 26, left: 40 };
@@ -63,6 +65,16 @@
   );
   const active = $derived(
     series.find((entry) => entry.id === chosen) ?? series[0],
+  );
+  const caveats = $derived(
+    notes.filter(
+      (note) =>
+        active?.points.some(
+          (point) =>
+            (note.from == null || point.date >= note.from) &&
+            (note.to == null || point.date < note.to),
+        ) ?? false,
+    ),
   );
   const isDense = $derived(
     width > 0 &&
@@ -550,5 +562,10 @@
         </li>
       {/each}
     </ol>
+    {#each caveats as note (note.body)}
+      <p class="text-[0.8125rem] text-muted-foreground max-inline-[72ch]">
+        {note.body}
+      </p>
+    {/each}
   </section>
 {/if}

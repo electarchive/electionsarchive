@@ -228,7 +228,7 @@ export async function party(path: string, place: string | null = null) {
   if (scope != null && within == null) {
     error(404);
   }
-  const [page, generals, members] = await Promise.all([
+  const [page, generals, members, notes] = await Promise.all([
     (async () => {
       if (within == null) {
         const stored = await db.execute<{
@@ -278,6 +278,12 @@ export async function party(path: string, place: string | null = null) {
       where m.party_id = ${id}::uuid or m.party_id in (select entity_id from entity_merge where into_id = ${id}::uuid)
       order by m.valid_from nulls first, n.text
     `),
+    db.execute<{ body: string; from: string | null; to: string | null }>(sql`
+      select body_md as body, valid_from::text as from, valid_to::text as to from note
+      where kind = 'caveat'
+        and (entity_id = ${id}::uuid or entity_id in (select entity_id from entity_merge where into_id = ${id}::uuid))
+      order by valid_from nulls first
+    `),
   ]);
   return {
     kind: "party" as const,
@@ -285,6 +291,7 @@ export async function party(path: string, place: string | null = null) {
     ...page,
     elections: generals.rows,
     members: members.rows,
+    notes: notes.rows,
   };
 }
 

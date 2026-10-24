@@ -226,6 +226,7 @@
       id={data.id}
       fallback={party.color}
       {color}
+      notes={data.notes}
     />
 
     {#if data.elections.length > 0}
