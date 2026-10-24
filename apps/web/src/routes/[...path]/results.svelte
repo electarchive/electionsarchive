@@ -501,7 +501,7 @@
               { "max-sm:hidden": span != null },
             )}
           >
-            {#if page != null}
+            {#if page != null && !(page.votes === 0 && (page.seats ?? 0) > 0)}
               {@render cite(count(page.votes), "votes", row)}
             {/if}
           </td>
@@ -509,7 +509,7 @@
             <td
               class="px-2 py-1.5 text-end font-figures text-[0.8125rem] whitespace-nowrap tabular-nums"
             >
-              {#if page != null}
+              {#if page != null && !(page.votes === 0 && (page.seats ?? 0) > 0)}
                 <span class="relative inline-block min-inline-12">
                   {@render cite(percent(page.share, digits), "share", row)}
                   <span

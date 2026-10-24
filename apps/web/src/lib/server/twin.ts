@@ -1406,8 +1406,12 @@ function electionMarkdown(
                               : null)),
                       ]
                     : []),
-                  count(row.votes),
-                  percent(row.share),
+                  row.votes === 0 && (row.seats ?? 0) > 0
+                    ? null
+                    : count(row.votes),
+                  row.votes === 0 && (row.seats ?? 0) > 0
+                    ? null
+                    : percent(row.share),
                   ...(hasSeats
                     ? [row.seats == null ? null : count(row.seats)]
                     : []),
