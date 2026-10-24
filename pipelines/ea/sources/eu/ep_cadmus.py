@@ -123,6 +123,15 @@ WINDOW_CAVEAT = (
     "The source gives only the year of the election. The dates are the European Parliament's voting window for that "
     "year, not the day this country voted."
 )
+EUC_NAMES = {
+    (1979, "Cotswolds"): "The Cotswolds",
+    (1979, "Tyne South and Wear"): "South Tyne and Wear",
+    (1979, "South East Wales"): "South-East Wales",
+    (1984, "Cotswolds"): "The Cotswolds",
+    (1984, "Oxfordshire and Buckinghamshire"): "Oxford and Buckinghamshire",
+    (1984, "Sussex East"): "East Sussex",
+    (1984, "Sussex West"): "West Sussex",
+}
 
 
 def fold(text: str) -> str:
@@ -207,6 +216,9 @@ def emit() -> Path:
             if systems[code] in cs.minted:
                 cs.add("electoral_system", id=systems[code], polity_id=polities["GB"], rules=rules, rules_version=1)
                 name(systems[code], label)
+        fptp = cs.key("gb.electoral_system", "fptp")
+        if fptp in cs.minted:
+            raise ValueError("first past the post must exist")
         kingdom = cs.area("gb.nation", "GBR")
         if kingdom in cs.minted:
             raise ValueError("the United Kingdom's area must already exist")
@@ -314,11 +326,17 @@ def emit() -> Path:
                 )
             elections[(country, year)] = (election, path)
             for (constituency,), rows in by_election.group_by(["constituency"], maintain_order=True):
-                if iso == "GB" and year < 1999 and constituency != "Northern Ireland":
+                euc = iso == "GB" and year < 1999 and constituency != "Northern Ireland"
+                if euc and year not in (1979, 1984):
                     skipped[f"{country} {constituency}"] = skipped.get(f"{country} {constituency}", 0) + 1
                     continue
                 college = iso == "BE" or constituency == "Greenland"
-                if constituency == "National":
+                if euc:
+                    label = EUC_NAMES.get((year, constituency), constituency)
+                    scheme, code = "gb.euc", f"{year}:{slug(label)}"
+                    if int(rows["seats"].fill_null(0).sum()) != 1:
+                        raise ValueError(f"{year} {constituency}: {rows['seats'].sum()} seats declared, not 1")
+                elif constituency == "National":
                     scheme, code, label = "eu.member_state", iso, country
                 elif college:
                     scheme, code, label = "eu.member_state", iso, constituency
@@ -362,7 +380,11 @@ def emit() -> Path:
                     district_area_id=area,
                     magnitude=seats_total,
                     electoral_system_id=(
-                        systems["ep-stv" if code == "northern-ireland" else "ep-list"] if iso == "GB" else None
+                        fptp
+                        if euc
+                        else systems["ep-stv" if code == "northern-ireland" else "ep-list"]
+                        if iso == "GB"
+                        else None
                     ),
                     default_result_kind="counted",
                 )
@@ -446,13 +468,19 @@ def emit() -> Path:
                         "contest_option",
                         id=option,
                         contest_id=contest,
-                        kind="others" if other else "list",
+                        kind="others" if other else "candidate" if euc else "list",
                         party_id=party,
                         ballot_position=position,
                         ballot_label=shown,
                     )
                     if row["seats"]:
-                        cs.add("outcome", result_set_id=result_set, option_id=option, kind="won", seats=row["seats"])
+                        cs.add(
+                            "outcome",
+                            result_set_id=result_set,
+                            option_id=option,
+                            kind="elected" if euc else "won",
+                            seats=row["seats"],
+                        )
                     values.append((str(option), 1, row["votes"]))
                     if row["seats"] is not None:
                         values.append((str(option), 16, row["seats"]))

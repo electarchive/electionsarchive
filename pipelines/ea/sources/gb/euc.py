@@ -61,7 +61,14 @@ def emit() -> Path:
         )
         gb = cs.polity("GB")
         if conn.execute("select 1 from scheme where code = 'gb.euc'").fetchone() is None:
-            cs.add("scheme", code="gb.euc", polity_id=gb, kind="electoral_district", rank=1, noun="European Parliament constituency")
+            cs.add(
+                "scheme",
+                code="gb.euc",
+                polity_id=gb,
+                kind="electoral_district",
+                rank=1,
+                noun="European Parliament constituency",
+            )
         sources = {}
         for order, title in ORDERS.items():
             sources[order] = cs.source("UK Government", f"{title} (SI {order})")

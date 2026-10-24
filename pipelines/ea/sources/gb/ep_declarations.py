@@ -66,7 +66,11 @@ REGIONS = {
     "wales": "Wales",
     "scotland": "Scotland",
 }
-REGION_LABELS = {"east": "eastern", "yorkshire-the-humber": "yorkshire-and-the-humber", "yorkshire-and-humber": "yorkshire-and-the-humber"}
+REGION_LABELS = {
+    "east": "eastern",
+    "yorkshire-the-humber": "yorkshire-and-the-humber",
+    "yorkshire-and-humber": "yorkshire-and-the-humber",
+}
 PCON_NAMES = {
     "Regent's Park & Kensington North": "Regent's Park and North Kensington",
     "Durham, City of": "City of Durham",
@@ -185,7 +189,9 @@ def number(text: str) -> int:
 
 
 def folded(text: str) -> str:
-    return re.sub(r"[^a-z]+", " ", unicodedata.normalize("NFKD", text).encode("ascii", "ignore").decode().lower()).strip()
+    return re.sub(
+        r"[^a-z]+", " ", unicodedata.normalize("NFKD", text).encode("ascii", "ignore").decode().lower()
+    ).strip()
 
 
 def pdf(url: str) -> str:
@@ -257,14 +263,21 @@ def parse() -> None:
     lines: list[dict[str, object]] = []
     members: list[dict[str, object]] = []
 
-    def line(year: int, region: str, label: str, kind: str, value: int, unit: str | None = None, seats: int | None = None) -> None:
-        lines.append({"year": year, "region": region, "unit": unit, "label": label, "kind": kind, "value": value, "seats": seats})
+    def line(
+        year: int, region: str, label: str, kind: str, value: int, unit: str | None = None, seats: int | None = None
+    ) -> None:
+        lines.append(
+            {"year": year, "region": region, "unit": unit, "label": label, "kind": kind, "value": value, "seats": seats}
+        )
 
     text = pdf(PAPERS[1999][0])
     start = text.index("Votes cast by parliamentary constituency")
     table = text[start : text.index("Table 12", start)]
     region = None
-    columns = {7: ("Con", "Lab", "LDem", "Green", "UKIP", "Others"), 8: ("Con", "Lab", "LDem", "SNP/PC", "Green", "UKIP", "Others")}
+    columns = {
+        7: ("Con", "Lab", "LDem", "Green", "UKIP", "Others"),
+        8: ("Con", "Lab", "LDem", "SNP/PC", "Green", "UKIP", "Others"),
+    }
     for row in table.splitlines():
         found = re.match(r"^(.*?\S)\s{2,}([\d,\s]+)$", row)
         if found and re.search(r"\d", found[2]) and region is not None:
@@ -280,11 +293,27 @@ def parse() -> None:
             region = region_of(row.strip())
     with open(Path(__file__).with_name("ep_declarations_1999.tsv"), newline="") as handle:
         for row in csv.DictReader(handle, delimiter="\t"):
-            members.append({"year": 1999, "region": row["region"], "round": None, "name": row["name"], "party": row["party"]})
+            members.append(
+                {"year": 1999, "region": row["region"], "round": None, "name": row["name"], "party": row["party"]}
+            )
 
     page = raw.cached(SOURCE, EUROPARL[0]).path.read_text(encoding="latin-1")
-    order = iter(["eastern", "east-midlands", "london", "north-east", "north-west", "south-east", "south-west",
-                  "west-midlands", "yorkshire-and-the-humber", "scotland", "wales", None])
+    order = iter(
+        [
+            "eastern",
+            "east-midlands",
+            "london",
+            "north-east",
+            "north-west",
+            "south-east",
+            "south-west",
+            "west-midlands",
+            "yorkshire-and-the-humber",
+            "scotland",
+            "wales",
+            None,
+        ]
+    )
     region = None
     for row in re.findall(r"(?s)<tr[^>]*>(.*?)</tr>", page):
         cells = [
@@ -296,7 +325,9 @@ def parse() -> None:
         elif region is None:
             continue
         elif len(cells) == 3 and re.fullmatch(r"\d+\.", cells[0]):
-            members.append({"year": 2004, "region": region, "round": int(cells[0][:-1]), "name": cells[1], "party": cells[2]})
+            members.append(
+                {"year": 2004, "region": region, "round": int(cells[0][:-1]), "name": cells[1], "party": cells[2]}
+            )
         elif len(cells) == 8 and cells[0].startswith("Total valid votes"):
             line(2004, region, "valid", "valid", number(cells[1]))
         elif len(cells) == 8 and cells[0] == "Spoiled / rejected":
@@ -320,7 +351,13 @@ def parse() -> None:
                 for following in rows[at + 1 : at + 15]:
                     if elected := re.match(r"^\s*(\d+)\s{2,}(\S.*?)(?:\s{2,}(\S.*?))?\s*$", following):
                         members.append(
-                            {"year": year, "region": region, "round": int(elected[1]), "name": elected[2], "party": elected[3]}
+                            {
+                                "year": year,
+                                "region": region,
+                                "round": int(elected[1]),
+                                "name": elected[2],
+                                "party": elected[3],
+                            }
                         )
             elif found := re.match(r"\s+Summary: (.+)$", row):
                 region = region_of(found[1].strip())
@@ -330,7 +367,10 @@ def parse() -> None:
                     if total := re.match(r"^\s*Total\s+([\d,]+)", following):
                         line(year, region, "valid", "valid", number(total[1]))
                         break
-                    if party := re.match(r"^\s+(\S.*?\S)\s{2,}([\d,]{3,})\s+[\d.]+%(?:\s+[-+][\d.]+%)?\s+(\d+)(?:\s+(?:[-+]\d+|-))?\s*$", following):
+                    if party := re.match(
+                        r"^\s+(\S.*?\S)\s{2,}([\d,]{3,})\s+[\d.]+%(?:\s+[-+][\d.]+%)?\s+(\d+)(?:\s+(?:[-+]\d+|-))?\s*$",
+                        following,
+                    ):
                         line(year, region, party[1], "option", number(party[2]), seats=int(party[3]))
                 electorate = next(re.search(r"Electorate:\s+([\d,]+)", r) for r in rows[at:] if "Electorate:" in r)
                 line(year, region, "electorate", "electorate", number(electorate[1]))
@@ -364,12 +404,21 @@ def parse() -> None:
     for row in elected.iter_rows(named=True):
         candidates = meps(TERMS[row["year"]])
         name = folded(row["name"])
-        hits = [m for m in candidates if folded(f"{m.get('givenName', '')} {m.get('familyName', '')}") == name] or [
-            m for m in candidates if folded(m.get("familyName", "")) == name.split()[-1] and folded(m.get("givenName", ""))[:1] == name[:1]
-        ] or [m for m in candidates if folded(m.get("familyName", "")) == name.split()[-1]]
+        hits = (
+            [m for m in candidates if folded(f"{m.get('givenName', '')} {m.get('familyName', '')}") == name]
+            or [
+                m
+                for m in candidates
+                if folded(m.get("familyName", "")) == name.split()[-1]
+                and folded(m.get("givenName", ""))[:1] == name[:1]
+            ]
+            or [m for m in candidates if folded(m.get("familyName", "")) == name.split()[-1]]
+        )
         ep = hits[0]["identifier"] if len(hits) == 1 else None
         if (fixed := EP_IDS.get((row["year"], row["region"], row["name"]))) is not None:
-            at = taken[(row["year"], row["region"], row["name"])] = taken.get((row["year"], row["region"], row["name"]), -1) + 1
+            at = taken[(row["year"], row["region"], row["name"])] = (
+                taken.get((row["year"], row["region"], row["name"]), -1) + 1
+            )
             ep = fixed[at]
             if len(fixed) > 1:
                 row = {**row, "round": None}
@@ -380,21 +429,53 @@ def parse() -> None:
             detail = json.loads(raw.cached(SOURCE, f"{API}/meps/{ep}?{FORMAT}").path.read_text())["data"][0]
             start = f"{row['year']}-07"
             for membership in detail["hasMembership"]:
-                if membership.get("membershipClassification") == NATIONAL and membership["memberDuring"]["startDate"].startswith(start):
+                if membership.get("membershipClassification") == NATIONAL and membership["memberDuring"][
+                    "startDate"
+                ].startswith(start):
                     body = json.loads(
-                        raw.cached(SOURCE, f"{API}/corporate-bodies/{membership['organization'].split('/')[1]}?{FORMAT}").path.read_text()
+                        raw.cached(
+                            SOURCE, f"{API}/corporate-bodies/{membership['organization'].split('/')[1]}?{FORMAT}"
+                        ).path.read_text()
                     )["data"][0]
                     party = f"EP:{body['label']}"
-        matched.append({**row, "party": party, "ep": ep, "ep_name": ep_name, "qid": wikidata[ep][0] if ep in wikidata else None, "mnis": wikidata[ep][1] if ep in wikidata else None, "wd_name": wikidata[ep][2] if ep in wikidata else None})
+        matched.append(
+            {
+                **row,
+                "party": party,
+                "ep": ep,
+                "ep_name": ep_name,
+                "qid": wikidata[ep][0] if ep in wikidata else None,
+                "mnis": wikidata[ep][1] if ep in wikidata else None,
+                "wd_name": wikidata[ep][2] if ep in wikidata else None,
+            }
+        )
     elected = pl.DataFrame(matched, infer_schema_length=None)
     PARSED.mkdir(parents=True, exist_ok=True)
     frame.write_parquet(PARSED / "results.parquet")
     elected.write_parquet(PARSED / "members.parquet")
-    print(frame.filter(pl.col("unit").is_null()).group_by("year").agg(pl.col("region").n_unique(), pl.len()).sort("year"))
-    print(elected.group_by("year").agg(pl.len(), pl.col("ep").null_count().alias("no_ep"), pl.col("qid").null_count().alias("no_qid"), pl.col("party").null_count().alias("no_party")).sort("year"))
+    print(
+        frame.filter(pl.col("unit").is_null()).group_by("year").agg(pl.col("region").n_unique(), pl.len()).sort("year")
+    )
+    print(
+        elected.group_by("year")
+        .agg(
+            pl.len(),
+            pl.col("ep").null_count().alias("no_ep"),
+            pl.col("qid").null_count().alias("no_qid"),
+            pl.col("party").null_count().alias("no_party"),
+        )
+        .sort("year")
+    )
     print("unmatched:", elected.filter(pl.col("ep").is_null()).select("year", "region", "name").rows())
     labels = set(frame.filter(pl.col("kind") == "option")["label"]) | {p for p in elected["party"] if p}
-    print("unmapped labels:", sorted(l for l in labels if l not in PARTIES and l.removeprefix("EP:") not in NATIONAL_PARTIES and l not in ("Others", "SNP/PC")))
+    print(
+        "unmapped labels:",
+        sorted(
+            l
+            for l in labels
+            if l not in PARTIES and l.removeprefix("EP:") not in NATIONAL_PARTIES and l not in ("Others", "SNP/PC")
+        ),
+    )
 
 
 def emit() -> Path:
@@ -444,7 +525,9 @@ def emit() -> Path:
                 if key not in NEW_PARTIES:
                     raise ValueError(f"{key} is not in the database")
                 cs.add("party", id=parties[key], kind="party", polity_id=cs.polity("GB"))
-                cs.add("name", entity_id=parties[key], text=NEW_PARTIES[key], lang="en", kind="official", is_preferred=True)
+                cs.add(
+                    "name", entity_id=parties[key], text=NEW_PARTIES[key], lang="en", kind="official", is_preferred=True
+                )
         known = {
             (scheme, value): entity
             for scheme, value, entity in conn.execute(
@@ -567,7 +650,11 @@ def emit() -> Path:
             constituencies = lines.filter(pl.col("unit").is_not_null())
             totals = dict(regional.filter(pl.col("kind") != "option").select("kind", "value").iter_rows())
             if year == 1999:
-                summed = constituencies.filter(pl.col("kind") == "option").group_by("label", maintain_order=True).agg(pl.col("value").sum())
+                summed = (
+                    constituencies.filter(pl.col("kind") == "option")
+                    .group_by("label", maintain_order=True)
+                    .agg(pl.col("value").sum())
+                )
                 votes = list(summed.iter_rows())
                 valid = int(summed["value"].sum())
                 printed = totals["printed_valid"]
@@ -610,7 +697,11 @@ def emit() -> Path:
                     body_md=f"The source's party and candidate lines add to {lined:,}, not its printed total of "
                     f"{totals['valid']:,} valid votes. Both are stored as printed.",
                 )
-            if "rejected" in totals and "ballots" in totals and totals["valid"] + totals["rejected"] != totals["ballots"]:
+            if (
+                "rejected" in totals
+                and "ballots" in totals
+                and totals["valid"] + totals["rejected"] != totals["ballots"]
+            ):
                 cs.add(
                     "note",
                     entity_id=result_set,
@@ -638,13 +729,19 @@ def emit() -> Path:
                     (options[l] for l in options if (SNP_PC[region] if l == "SNP/PC" else PARTIES.get(l)) == key), None
                 )
                 if key is None or option is None:
-                    raise ValueError(f"{year} {region}: {member['name']} elected for {member['party']!r}, which has no line")
+                    raise ValueError(
+                        f"{year} {region}: {member['name']} elected for {member['party']!r}, which has no line"
+                    )
                 seats[option] = seats.get(option, 0) + 1
                 ident = member["qid"] or member["ep"] or f"{year}:{region}:{slug(member['name'])}"
                 if ident not in persons:
                     held = [
                         (scheme, value)
-                        for scheme, value in (("wikidata", member["qid"]), ("mnis", member["mnis"]), ("ep.mep", member["ep"]))
+                        for scheme, value in (
+                            ("wikidata", member["qid"]),
+                            ("mnis", member["mnis"]),
+                            ("ep.mep", member["ep"]),
+                        )
                         if value is not None
                     ]
                     person = next((known[id] for id in held if id in known), None)
@@ -662,7 +759,15 @@ def emit() -> Path:
                         cs.add("name", entity_id=person, text=text, lang="en", kind="official", is_preferred=True)
                         for id, old in owned.get(person, []):
                             if old != text:
-                                cs.add("name", id=id, entity_id=person, text=old, lang="en", kind="official", is_preferred=False)
+                                cs.add(
+                                    "name",
+                                    id=id,
+                                    entity_id=person,
+                                    text=old,
+                                    lang="en",
+                                    kind="official",
+                                    is_preferred=False,
+                                )
                     for id in held:
                         if id not in known:
                             known[id] = person
@@ -691,7 +796,9 @@ def emit() -> Path:
             printed = dict(regional.filter(pl.col("seats").is_not_null()).select("label", "seats").iter_rows())
             for label, count in printed.items():
                 if count != seats.get(options[label], 0):
-                    raise ValueError(f"{year} {region}: {label} won {count} seats, {seats.get(options[label], 0)} members named")
+                    raise ValueError(
+                        f"{year} {region}: {label} won {count} seats, {seats.get(options[label], 0)} members named"
+                    )
             for option, count in seats.items():
                 cs.add("outcome", result_set_id=result_set, option_id=option, kind="won", seats=count)
             cs.add(
@@ -724,7 +831,13 @@ def emit() -> Path:
                 for (name,), rows in constituencies.group_by("unit", maintain_order=True):
                     for row in rows.iter_rows(named=True):
                         if row["kind"] == "option":
-                            value(pcon_set, pcons[folded(name.replace("&", "and"))], option_of(row["label"]), VOTES, row["value"])
+                            value(
+                                pcon_set,
+                                pcons[folded(name.replace("&", "and"))],
+                                option_of(row["label"]),
+                                VOTES,
+                                row["value"],
+                            )
                         else:
                             value(pcon_set, pcons[folded(name.replace("&", "and"))], None, VALID, row["value"])
         print(f"{rounds} members with a round, {len(persons)} persons")
