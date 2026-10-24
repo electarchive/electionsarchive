@@ -53,6 +53,7 @@ export const stage = pgEnum("stage", ["live", "preliminary", "official", "certif
 export const tenureAffiliationKind = pgEnum("tenure_affiliation_kind", ["party", "parliamentary_group"])
 export const tenureEventKind = pgEnum("tenure_event_kind", ["elected", "certified", "certificate_denied", "certificate_reversed", "sworn_in", "suspended", "removed", "trustee_appointed", "reinstated", "resigned", "died", "immunity_lifted", "arrested", "switched_party", "became_independent", "expelled", "term_ended"])
 export const representationGapReason = pgEnum("representation_gap_reason", ["secession"])
+export const unitAreaMethod = pgEnum("unit_area_method", ["source_code", "city_universe", "shape_contained"])
 
 
 export const alliance = pgTable("alliance", {
@@ -163,6 +164,23 @@ export const areaParent = pgTable("area_parent", {
 	primaryKey({ columns: [table.areaId, table.valid], name: "area_parent_pkey"}),
 	index("area_parent_parent_idx").using("btree", table.parentId.asc().nullsLast()),
 ]);
+
+export const areaUniverse = pgTable("area_universe", {
+	areaId: uuid("area_id").notNull().references(() => area.id),
+	validFrom: date("valid_from"),
+	validFromPrecision: datePrecision("valid_from_precision").default("day").notNull(),
+	validTo: date("valid_to"),
+	validToPrecision: datePrecision("valid_to_precision").default("day").notNull(),
+	valid: daterange().notNull().generatedAlwaysAs(sql`daterange(valid_from, valid_to, '[)'::text)`),
+	expected: integer().notNull(),
+	method: unitAreaMethod().notNull(),
+	sourceId: uuid("source_id").references(() => source.id),
+	resultSetId: uuid("result_set_id").references(() => resultSet.id),
+	changesetId: uuid("changeset_id").notNull().references(() => changeset.id),
+	recordedFrom: timestamp("recorded_from", { withTimezone: true }).default(sql`now()`).notNull(),
+}, (table) => [
+	primaryKey({ columns: [table.areaId, table.valid], name: "area_universe_pkey"}),
+check("area_universe_check", sql`((method = 'city_universe'::unit_area_method) = (result_set_id IS NOT NULL))`),check("area_universe_expected_check", sql`(expected > 0)`),]);
 
 export const ballotQuestion = pgTable("ballot_question", {
 	contestId: uuid("contest_id").primaryKey().references(() => contest.id, { onDelete: "cascade" } ),
@@ -1052,6 +1070,7 @@ export const reportingUnitArea = pgTable("reporting_unit_area", {
 	recordedFrom: timestamp("recorded_from", { withTimezone: true }).default(sql`now()`).notNull(),
 	approximate: boolean().default(false).notNull(),
 	partial: boolean().default(false).notNull(),
+	method: unitAreaMethod(),
 }, (table) => [
 	primaryKey({ columns: [table.unitId, table.areaId, table.valid], name: "reporting_unit_area_pkey"}),
 	index("reporting_unit_area_area_idx").using("btree", table.areaId.asc().nullsLast()),
@@ -1144,6 +1163,15 @@ export const resultValue = pgTable("result_value", {
 	value: numeric().notNull(),
 }, (table) => [
 	primaryKey({ columns: [table.resultSetK, table.unitK, table.optionK, table.channel, table.measure, table.countRound], name: "result_value_pkey"}),
+]);
+
+export const rollupCoverage = pgTable("rollup_coverage", {
+	resultSetK: integer("result_set_k").notNull(),
+	areaK: integer("area_k").notNull(),
+	reporting: integer().notNull(),
+	expected: integer().notNull(),
+}, (table) => [
+	primaryKey({ columns: [table.resultSetK, table.areaK], name: "rollup_coverage_pkey"}),
 ]);
 
 export const scheme = pgTable("scheme", {

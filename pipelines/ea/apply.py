@@ -226,7 +226,7 @@ def _publish_table(conn: Connection, stage: Stage, table: str) -> None:
                 "update result_set set is_default = is_default where k = any(%s) and changeset_id <> ea_current_changeset()",
                 [replaced],
             )
-            for fact in (table, *(("result_rollup_sum", "result_rollup_unit") if table == "result_value" else ())):
+            for fact in (table, *(("result_rollup_sum", "result_rollup_unit", "rollup_coverage") if table == "result_value" else ())):
                 conn.execute(
                     sql.SQL("delete from public.{} where result_set_k = any(%s)").format(sql.Identifier(fact)),
                     [replaced],
@@ -749,7 +749,8 @@ def _publish_table(conn: Connection, stage: Stage, table: str) -> None:
 def _rollup(
     conn: Connection, stage: Stage | None, moved: list[str], repointed: list[str], sets: list[int] | None = None
 ) -> None:
-    if (stage is None or "result_value" not in stage.tables) and not moved and not repointed and not sets:
+    universe = stage is not None and "area_universe" in stage.tables
+    if (stage is None or "result_value" not in stage.tables) and not universe and not moved and not repointed and not sets:
         return
     stale = [
         *(sets or []),
@@ -764,9 +765,26 @@ def _rollup(
                 [moved, repointed],
             ).fetchall()
         ],
+        *(
+            [
+                key
+                for (key,) in conn.execute(
+                    sql.SQL(
+                        """select r.result_set_k from result_rollup_sum r join area a on a.k = r.area_k
+                           where a.id in (select area_id from {staged})
+                           union
+                           select r.result_set_k from result_rollup_unit r join area a on a.k = r.area_k
+                           where a.id in (select area_id from {staged})"""
+                    ).format(staged=stage.staged("area_universe"))
+                ).fetchall()
+            ]
+            if stage is not None and universe
+            else []
+        ),
     ]
     conn.execute("delete from result_rollup_sum where result_set_k = any(%s)", [stale])
     conn.execute("delete from result_rollup_unit where result_set_k = any(%s)", [stale])
+    conn.execute("delete from rollup_coverage where result_set_k = any(%s)", [stale])
     facts = (
         sql.SQL("select distinct result_set_id from {}").format(stage.staged("result_value"))
         if stage is not None and "result_value" in stage.tables
@@ -839,8 +857,24 @@ def _rollup(
               where rs.district_area_id is not null and rs.allocation_parent_id is null
                 and not exists (select from climbed r where r.result_set_k = rs.k and r.area_id = rs.district_area_id)
             ),
+            coverage as (
+              select r.result_set_k, r.area_id, au.expected,
+                     count(distinct case when own.scheme_code = ru.scheme_code then own.id::text else r.unit_k::text end)::int as reporting
+              from reached r join rs on rs.k = r.result_set_k
+              join area_universe au on au.area_id = r.area_id and au.valid @> rs.on_date
+              join reporting_unit ru on ru.k = r.unit_k
+              left join area own on own.id = ru.area_id
+              group by r.result_set_k, r.area_id, au.expected
+            ),
+            covered as (
+              insert into rollup_coverage (result_set_k, area_k, reporting, expected)
+              select c.result_set_k, area.k, c.reporting, c.expected from coverage c join area on area.id = c.area_id
+            ),
             counted as (
-              select r.result_set_k, r.area_id, min(r.unit_k) as unit_k, count(*) > 1 or not bool_and(r.complete) as summed
+              select r.result_set_k, r.area_id, min(r.unit_k) as unit_k,
+                     count(*) > 1 or not bool_and(r.complete) or exists (
+                       select from coverage c where c.result_set_k = r.result_set_k and c.area_id = r.area_id
+                         and c.reporting <> c.expected) as summed
               from reached r
               where not exists (select from ceiling x where x.result_set_k = r.result_set_k and x.area_id = r.area_id)
               group by r.result_set_k, r.area_id
@@ -850,13 +884,16 @@ def _rollup(
               select c.result_set_k, area.k, c.unit_k from counted c join area on area.id = c.area_id where not c.summed
             )
             insert into result_rollup_sum (result_set_k, area_k, option_k, channel, measure, count_round, complete, value)
-            select v.result_set_k, area.k, v.option_k, v.channel, v.measure, v.count_round, bool_and(a.complete), sum(v.value)
+            select v.result_set_k, area.k, v.option_k, v.channel, v.measure, v.count_round,
+                   bool_and(a.complete) and not exists (
+                     select from coverage s where s.result_set_k = v.result_set_k and s.area_id = area.id
+                       and s.reporting <> s.expected), sum(v.value)
             from result_value v
             join reached a on a.result_set_k = v.result_set_k and a.unit_k = v.unit_k
             join counted c on c.result_set_k = a.result_set_k and c.area_id = a.area_id and c.summed
             join area on area.id = a.area_id
             where v.result_set_k in (select k from rs)
-            group by v.result_set_k, area.k, v.option_k, v.channel, v.measure, v.count_round"""
+            group by v.result_set_k, area.k, area.id, v.option_k, v.channel, v.measure, v.count_round"""
         ).format(facts=facts, stale=sql.Literal(stale))
     )
 
@@ -1354,7 +1391,7 @@ def revert(conn: Connection, changeset_id: str, reason: str) -> None:
                or polity_id in (select id from polity where changeset_id = %(id)s)""",
             {"id": changeset_id},
         )
-        for table in (*FACTS, "result_rollup_sum", "result_rollup_unit"):
+        for table in (*FACTS, "result_rollup_sum", "result_rollup_unit", "rollup_coverage"):
             conn.execute(
                 sql.SQL(
                     "delete from {} where result_set_k in (select k from result_set rs where rs.changeset_id = %s"

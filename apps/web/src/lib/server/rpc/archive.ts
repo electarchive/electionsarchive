@@ -12365,6 +12365,12 @@ export const people = {
       }
       const [labels, slugs] = await Promise.all([
         names(
+          and not exists (
+            select from candidacy cy join contest_option o on o.id = cy.option_id
+            join contest c on c.id = o.contest_id join election e on e.id = c.election_id
+            where cy.person_id in (select id from ids) and c.office_id = t.office_id
+              and e.date_from between t.from_date - 400 and t.from_date
+          )
           [
             person.id,
             ...roots,

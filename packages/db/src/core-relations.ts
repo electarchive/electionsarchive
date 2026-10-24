@@ -43,6 +43,7 @@ export const relations = defineRelations(schema, (r) => ({
 		areaEventMembers: r.many.areaEventMember(),
 		areaGeometries: r.many.areaGeometry(),
 		areaParents: r.many.areaParent(),
+		areaUniverses: r.many.areaUniverse(),
 		contestsViaBallotQuestion: r.many.contest({
 			from: r.changeset.id.through(r.ballotQuestion.changesetId),
 			to: r.contest.id.through(r.ballotQuestion.contestId),
@@ -350,6 +351,7 @@ export const relations = defineRelations(schema, (r) => ({
 		areaParentsParentId: r.many.areaParent({
 			alias: "areaParent_parentId_area_id"
 		}),
+		areaUniverses: r.many.areaUniverse(),
 		bodyApportionments: r.many.bodyApportionment(),
 		contests: r.many.contest(),
 		polityTerritories: r.many.polityTerritory(),
@@ -375,6 +377,7 @@ export const relations = defineRelations(schema, (r) => ({
 			alias: "changeset_id_source_id_via_areaEvent"
 		}),
 		areaGeometries: r.many.areaGeometry(),
+		areaUniverses: r.many.areaUniverse(),
 		ballotQuestionTexts: r.many.ballotQuestionText(),
 		bodyEvents: r.many.bodyEvent(),
 		citations: r.many.citation(),
@@ -443,6 +446,57 @@ export const relations = defineRelations(schema, (r) => ({
 			from: r.areaParent.parentId,
 			to: r.area.id,
 			alias: "areaParent_parentId_area_id"
+		}),
+	},
+	areaUniverse: {
+		area: r.one.area({
+			from: r.areaUniverse.areaId,
+			to: r.area.id
+		}),
+		changeset: r.one.changeset({
+			from: r.areaUniverse.changesetId,
+			to: r.changeset.id
+		}),
+		resultSet: r.one.resultSet({
+			from: r.areaUniverse.resultSetId,
+			to: r.resultSet.id
+		}),
+		source: r.one.source({
+			from: r.areaUniverse.sourceId,
+			to: r.source.id
+		}),
+	},
+	resultSet: {
+		areaUniverses: r.many.areaUniverse(),
+		flags: r.many.flag(),
+		outcomes: r.many.outcome(),
+		changeset: r.one.changeset({
+			from: r.resultSet.changesetId,
+			to: r.changeset.id
+		}),
+		contest: r.one.contest({
+			from: r.resultSet.contestId,
+			to: r.contest.id
+		}),
+		election: r.one.election({
+			from: r.resultSet.electionId,
+			to: r.election.id
+		}),
+		entity: r.one.entity({
+			from: r.resultSet.id,
+			to: r.entity.id
+		}),
+		source: r.one.source({
+			from: r.resultSet.sourceId,
+			to: r.source.id
+		}),
+		resultSet: r.one.resultSet({
+			from: r.resultSet.supersedesId,
+			to: r.resultSet.id,
+			alias: "resultSet_supersedesId_resultSet_id"
+		}),
+		resultSets: r.many.resultSet({
+			alias: "resultSet_supersedesId_resultSet_id"
 		}),
 	},
 	contest: {
@@ -863,38 +917,6 @@ export const relations = defineRelations(schema, (r) => ({
 		resultSet: r.one.resultSet({
 			from: r.flag.resultSetId,
 			to: r.resultSet.id
-		}),
-	},
-	resultSet: {
-		flags: r.many.flag(),
-		outcomes: r.many.outcome(),
-		changeset: r.one.changeset({
-			from: r.resultSet.changesetId,
-			to: r.changeset.id
-		}),
-		contest: r.one.contest({
-			from: r.resultSet.contestId,
-			to: r.contest.id
-		}),
-		election: r.one.election({
-			from: r.resultSet.electionId,
-			to: r.election.id
-		}),
-		entity: r.one.entity({
-			from: r.resultSet.id,
-			to: r.entity.id
-		}),
-		source: r.one.source({
-			from: r.resultSet.sourceId,
-			to: r.source.id
-		}),
-		resultSet: r.one.resultSet({
-			from: r.resultSet.supersedesId,
-			to: r.resultSet.id,
-			alias: "resultSet_supersedesId_resultSet_id"
-		}),
-		resultSets: r.many.resultSet({
-			alias: "resultSet_supersedesId_resultSet_id"
 		}),
 	},
 	government: {
