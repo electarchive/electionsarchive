@@ -86,9 +86,15 @@ def parse() -> None:
     counties["cliftonforgecity"] = "51005"
     rows = []
     odd = []
+    tables: dict[tuple[str, str, str], tuple[int, list[list[str]]]] = {}
     for year in YEARS:
         for contest, (day, office, district) in contests(year).items():
             table = list(csv.reader(io.StringIO(raw.cached(SOURCE, TABLE.format(contest=contest)).path.read_text(encoding="utf-8-sig"))))
+            size = sum(int(value or 0) for row in table[2:3] for value in row[2:])
+            if (day, office, district) not in tables or size > tables[(day, office, district)][0]:
+                tables[(day, office, district)] = (size, table)
+    for (day, office, district), (_, table) in tables.items():
+        if True:
             names = table[0][2:]
             groups: list[tuple[list[str], list[list[str]]]] = []
             for row in table[2:]:
@@ -146,7 +152,7 @@ def emit() -> Path:
             chamber=pl.when(pl.col("office") == "state-senate")
             .then(pl.concat_str(pl.lit("senate:"), pl.col("district").cast(pl.String), pl.lit(":g")))
             .when(pl.col("office") == "state-house")
-            .then(pl.concat_str(pl.lit("house:"), pl.col("district").cast(pl.String), pl.lit(":g")))
+            .then(pl.concat_str(pl.lit("house-of-delegates:"), pl.col("district").cast(pl.String), pl.lit(":g")))
             .otherwise("office"),
             code=pl.when(pl.col("kind") == "precinct")
             .then(

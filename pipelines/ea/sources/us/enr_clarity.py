@@ -504,7 +504,7 @@ def parse(
             elif primary and (marker := re.search(r"\b(REPUBLICAN|DEMOCRATIC)\b", plain)):
                 party = PARTIES[marker[1]]
                 plain = re.sub(r"\s+", " ", plain[: marker.start()] + " " + plain[marker.end() :]).strip()
-            if SKIPPED.search(plain):
+            if SKIPPED.search(plain) or st == "IL" and re.fullmatch(r"(?:FOR )?TREASURER", plain):
                 skipped["state or federal"] += 1
                 continue
             labels = [choice["text"] for choice in choices if not WRITE_IN.match(choice["text"])]
