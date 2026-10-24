@@ -1,11 +1,13 @@
 import { openapi } from "@orpc/openapi";
 import { sql } from "drizzle-orm";
 import * as v from "valibot";
-import { names, paths, refs } from "#lib/server/rpc/archive.js";
 import { os } from "#lib/server/cache.js";
 import { db } from "#lib/server/db/index.js";
 import layout2010 from "#lib/server/hex/gb-pcon-2010.json";
 import layout2024 from "#lib/server/hex/gb-pcon-2024.json";
+import { inside, names, paths, refs } from "#lib/server/rpc/archive.js";
+
+const fold = (key: string) => (key.startsWith("person:") ? "independent" : key);
 
 export const seats = {
   gains: os
@@ -17,7 +19,12 @@ export const seats = {
           "Count the single-member seats each party gained from another since the chamber's previous general election",
       }),
     )
-    .input(v.object({ id: v.pipe(v.string(), v.uuid()) }))
+    .input(
+      v.object({
+        id: v.pipe(v.string(), v.uuid()),
+        within: v.optional(v.pipe(v.string(), v.uuid())),
+      }),
+    )
     .output(
       v.nullable(
         v.object({
@@ -71,6 +78,7 @@ export const seats = {
           from contest c join tree on tree.id = c.election_id join election e on e.id = c.election_id
           where c.kind = 'body_seats' and c.allocation_parent_id is null and c.party_scope_id is null
             and c.district_area_id is not null and coalesce(c.magnitude, 1) = 1 and c.body_id is not null
+            and ${input.within == null ? sql`true` : inside(input.within, sql`c.district_area_id`, sql`e.date_from`)}
         ),
         chamber as (
           select body from now group by body order by count(*) desc limit 1
@@ -155,7 +163,7 @@ export const seats = {
       const flows = Map.groupBy(compared, (row) => `${row.now}|${row.before}`)
         .entries()
         .map(([pair, rows]) => {
-          const [to = "", from = ""] = pair.split("|");
+          const [to = "", from = ""] = pair.split("|", 2);
           return { to, from, seats: rows.length };
         })
         .toArray()
@@ -291,8 +299,6 @@ export const seats = {
       if (row?.now == null || row.before == null) {
         return null;
       }
-      const fold = (key: string) =>
-        key.startsWith("person:") ? "independent" : key;
       const [colored, labels, slugs] = await Promise.all([
         refs(
           [row.now, row.before].filter((key) => !key.startsWith("person:")),
@@ -329,7 +335,12 @@ export const seats = {
           "List the by-elections held in the parliament a general election chose, with each seat's previous holder",
       }),
     )
-    .input(v.object({ id: v.pipe(v.string(), v.uuid()) }))
+    .input(
+      v.object({
+        id: v.pipe(v.string(), v.uuid()),
+        within: v.optional(v.pipe(v.string(), v.uuid())),
+      }),
+    )
     .output(
       v.nullable(
         v.object({
@@ -398,6 +409,7 @@ export const seats = {
           where e.kind = 'by_election' and e.date_from > h.day
             and e.date_from < coalesce((select day from next), 'infinity')
             and c.kind = 'body_seats' and c.allocation_parent_id is null and c.district_area_id is not null
+            and ${input.within == null ? sql`true` : inside(input.within, sql`c.district_area_id`, sql`e.date_from`)}
         ),
         prior as materialized (
           select b.id, p.id as prior, p.day as since
@@ -526,7 +538,12 @@ export const seats = {
           "Place each single-member seat of an election on an equal-area hex layout, where one exists",
       }),
     )
-    .input(v.object({ id: v.pipe(v.string(), v.uuid()) }))
+    .input(
+      v.object({
+        id: v.pipe(v.string(), v.uuid()),
+        within: v.optional(v.pipe(v.string(), v.uuid())),
+      }),
+    )
     .output(
       v.nullable(
         v.object({
@@ -557,11 +574,12 @@ export const seats = {
         join area_code ac on ac.area_id = a.id and (ac.valid @> e.date_from or ac.valid is null)
         where c.kind = 'body_seats' and c.allocation_parent_id is null and c.party_scope_id is null
           and coalesce(c.magnitude, 1) = 1
+          and ${input.within == null ? sql`true` : inside(input.within, sql`c.district_area_id`, sql`e.date_from`)}
       `);
       const layout = [layout2024, layout2010].find((entry) => {
         let matched = 0;
         for (const row of found.rows) {
-          if (row.code in entry.hexes) {
+          if (Object.hasOwn(entry.hexes, row.code)) {
             matched += 1;
           }
         }
@@ -571,16 +589,25 @@ export const seats = {
         return null;
       }
       const hexes: Record<string, Array<number>> = layout.hexes;
+      const cells = found.rows.flatMap((row) => {
+        const [q, r] = hexes[row.code] ?? [];
+        return q == null || r == null ? [] : [{ k: row.k, q, r }];
+      });
+      const kept = new Set(cells.map((cell) => `${cell.q},${cell.r}`));
       return {
         credit: "Open Innovations and contributors (MIT)",
-        cells: found.rows.flatMap((row) => {
-          const [q, r] = hexes[row.code] ?? [];
-          return q == null || r == null ? [] : [{ k: row.k, q, r }];
+        cells,
+        borders: Object.entries(layout.boundaries).flatMap(([name, edges]) => {
+          const isNation = ["sc-en", "wa-en"].includes(name);
+          return isNation && input.within != null
+            ? []
+            : [
+                {
+                  isNation,
+                  edges: edges.filter(([q, r]) => kept.has(`${q},${r}`)),
+                },
+              ];
         }),
-        borders: Object.entries(layout.boundaries).map(([name, edges]) => ({
-          isNation: ["sc-en", "wa-en"].includes(name),
-          edges,
-        })),
       };
     }),
 };

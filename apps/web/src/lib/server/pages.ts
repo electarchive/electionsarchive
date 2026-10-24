@@ -601,16 +601,28 @@ export async function archive(path: string, search: URLSearchParams) {
   }
   if (slug.type === "election") {
     const input = { id: slug.entity_id };
-    const [election, governments, regions, tiers, cycle] = await Promise.all([
-      call(router.elections.get, input),
-      call(router.elections.governments, input),
-      call(router.elections.regions, input),
-      call(router.elections.tiers, input),
-      call(router.elections.cycle, input),
-    ]);
+    const place = search.get("in");
+    const scoped = await db.execute<{ id: string; path: string }>(sql`
+      select s.entity_id as id, s.path from slug s join polity p on p.id = s.entity_id
+      where s.path = ${place} and s.is_current
+    `);
+    const scope = scoped.rows[0] ?? null;
+    if (place != null && scope == null) {
+      error(404);
+    }
+    const [election, governments, regions, tiers, cycle] = await found(
+      Promise.all([
+        call(router.elections.get, { ...input, within: scope?.id }),
+        call(router.elections.governments, input),
+        call(router.elections.regions, input),
+        call(router.elections.tiers, input),
+        call(router.elections.cycle, input),
+      ]),
+    );
     return {
       kind: "election" as const,
       id: slug.entity_id,
+      scope,
       election,
       cycle,
       sections: { governments, regions, tiers },

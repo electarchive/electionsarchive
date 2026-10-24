@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { resolve } from "$app/paths";
+  import { page } from "$app/state";
   import { createQuery } from "@tanstack/svelte-query";
   import Download from "#lib/components/download.svelte";
   import { count } from "#lib/format.js";
@@ -94,6 +96,7 @@
         }
         return {
           name: region.name,
+          scope: region.scope,
           seats: region.seats,
           cells,
           others: region.seats - listed,
@@ -259,7 +262,16 @@
                 scope="row"
                 class="sticky inset-s-0 bg-card py-1 pe-3 text-start font-normal whitespace-nowrap"
               >
-                {row.name}
+                {#if row.scope == null}
+                  {row.name}
+                {:else}
+                  <a
+                    class="underline decoration-border underline-offset-4 hover:decoration-foreground"
+                    href="{resolve('/[...path]', {
+                      path: page.params.path ?? '',
+                    })}?in={row.scope}">{row.name}</a
+                  >
+                {/if}
               </th>
               {#each chamber.slots.flat() as slot, position (position)}
                 {const cell = $derived(row.cells[slot.column] ?? 0)}

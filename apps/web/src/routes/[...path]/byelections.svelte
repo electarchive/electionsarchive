@@ -1,18 +1,19 @@
 <script lang="ts">
-  import { createQuery } from "@tanstack/svelte-query";
   import { resolve } from "$app/paths";
+  import { createQuery } from "@tanstack/svelte-query";
+  import { SvelteMap } from "svelte/reactivity";
   import { count, date } from "#lib/format.js";
   import { m } from "#lib/paraglide/messages.js";
   import { swatch } from "#lib/party.js";
   import { orpc } from "#lib/rpc.js";
   import { cn } from "#lib/utils.js";
 
-  const { id }: { id: string } = $props();
+  const { id, within }: { id: string; within?: string } = $props();
 
   const uid = $props.id();
 
   const byes = createQuery(() =>
-    orpc.seats.byElections.queryOptions({ input: { id } }),
+    orpc.seats.byElections.queryOptions({ input: { id, within } }),
   );
 
   let isAll = $state(false);
@@ -33,7 +34,7 @@
       key == null || key === "independent"
         ? swatch(null, "")
         : swatch(info.get(key)?.color ?? null, `party:${key}`);
-    const net = new Map<string, number>();
+    const net = new SvelteMap<string, number>();
     const reasons: Record<string, (input: { name: string }) => string> = {
       died: m.byes_reason_died,
       resigned: m.byes_reason_resigned,
@@ -62,7 +63,7 @@
           to == null
             ? null
             : isGain
-              ? m.gains_seat({ to: label(to), from: label(from ?? "") })
+              ? m.gains_seat({ to: label(to), from: label(from) })
               : m.byes_hold({ party: label(to) }),
         why:
           row.member == null

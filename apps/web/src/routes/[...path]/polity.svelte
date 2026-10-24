@@ -434,6 +434,12 @@
       </h2>
       {#if polity.latest.path == null}
         <span class="heading">{polity.latest.name}</span>
+      {:else if polity.latest.scope != null}
+        <a
+          class="heading underline decoration-border underline-offset-4 hover:decoration-foreground"
+          href="{resolve('/[...path]', { path: polity.latest.path })}?in={polity
+            .latest.scope}">{polity.latest.name}</a
+        >
       {:else}
         <Preview
           class="heading underline decoration-border underline-offset-4 hover:decoration-foreground"

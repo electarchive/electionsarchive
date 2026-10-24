@@ -43,7 +43,12 @@
       ? name
       : `${tail != null && name.endsWith(tail) ? name.slice(0, -tail.length) : name}, ${data.contest.election.name}`;
   });
-  const canonical = $derived(`${page.url.origin}${page.url.pathname}`);
+  const query = $derived(
+    data.kind === "election" && data.scope != null
+      ? `?in=${data.scope.path}`
+      : "",
+  );
+  const canonical = $derived(`${page.url.origin}${page.url.pathname}${query}`);
   const years = $derived(
     data.kind === "polity"
       ? [
@@ -109,7 +114,7 @@
     ].map(([type, suffix]) => ({
       "@type": "DataDownload",
       encodingFormat: type,
-      contentUrl: `${canonical}.${suffix}`,
+      contentUrl: `${page.url.origin}${page.url.pathname}.${suffix}${query}`,
     })),
   });
   const jsonld = $derived(
@@ -132,8 +137,16 @@
     content="{page.url.origin}/og{page.url.pathname}.png"
   />
   <meta name="twitter:card" content="summary_large_image" />
-  <link rel="alternate" type="application/json" href="{canonical}.json" />
-  <link rel="alternate" type="text/markdown" href="{canonical}.md" />
+  <link
+    rel="alternate"
+    type="application/json"
+    href="{page.url.origin}{page.url.pathname}.json{query}"
+  />
+  <link
+    rel="alternate"
+    type="text/markdown"
+    href="{page.url.origin}{page.url.pathname}.md{query}"
+  />
   {#if data.kind === "contest" && data.contest.scope.isFine}
     <meta name="robots" content="noindex" />
   {/if}
@@ -177,9 +190,10 @@
         match={data.match}
       />
     {:else if data.kind === "election"}
-      {#key data.id}
+      {#key `${data.id}${query}`}
         <Election
           id={data.id}
+          scope={data.scope}
           election={data.election}
           cycle={data.cycle}
           sections={data.sections}

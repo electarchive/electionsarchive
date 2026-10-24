@@ -1,18 +1,19 @@
 <script lang="ts">
-  import { createQuery } from "@tanstack/svelte-query";
   import { resolve } from "$app/paths";
+  import { createQuery } from "@tanstack/svelte-query";
+  import { SvelteMap } from "svelte/reactivity";
   import { count } from "#lib/format.js";
   import { m } from "#lib/paraglide/messages.js";
   import { swatch } from "#lib/party.js";
   import { orpc } from "#lib/rpc.js";
   import { cn } from "#lib/utils.js";
 
-  const { id }: { id: string } = $props();
+  const { id, within }: { id: string; within?: string } = $props();
 
   const uid = $props.id();
 
   const gains = createQuery(() =>
-    orpc.seats.gains.queryOptions({ input: { id } }),
+    orpc.seats.gains.queryOptions({ input: { id, within } }),
   );
 
   let picked = $state<{ to: string; from: string } | null>(null);
@@ -35,9 +36,9 @@
         ? swatch(null, "")
         : swatch(info.get(key)?.color ?? null, `party:${key}`);
     const moved = data.flows.filter((flow) => flow.to !== flow.from);
-    const cells = new Map<string, number>();
-    const gained = new Map<string, number>();
-    const lost = new Map<string, number>();
+    const cells = new SvelteMap<string, number>();
+    const gained = new SvelteMap<string, number>();
+    const lost = new SvelteMap<string, number>();
     for (const flow of moved) {
       const to = fold(flow.to);
       const from = fold(flow.from);

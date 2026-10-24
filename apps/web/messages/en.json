@@ -467,6 +467,8 @@
   "race_show": "Show results",
   "race_hide": "Hide results",
   "election_parent": "Part of {name}",
+  "election_within": "{name} in {place}",
+  "seats_change_straddled": "Change in seats isn't shown, because some seats at the previous election lay across this border.",
   "polity_subdivisions": "Subdivisions",
   "polity_local_one": "Local: {place}",
   "polity_local_more": "Local: {place} and {count} more",

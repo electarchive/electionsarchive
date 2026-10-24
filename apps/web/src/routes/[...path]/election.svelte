@@ -16,9 +16,9 @@
   import { orpc } from "#lib/rpc.js";
   import { cn } from "#lib/utils.js";
   import type { PageData } from "./$types";
+  import ByElections from "./byelections.svelte";
   import Cycle from "./cycle.svelte";
   import Electors from "./electors.svelte";
-  import ByElections from "./byelections.svelte";
   import Gains from "./gains.svelte";
   import Governments from "./governments.svelte";
   import PlaceMap from "./map.svelte";
@@ -32,11 +32,13 @@
 
   const {
     id,
+    scope,
     election,
     cycle,
     sections,
   }: {
     id: string;
+    scope: { id: string; path: string } | null;
     election: Extract<PageData, { kind: "election" }>["election"];
     cycle: Extract<PageData, { kind: "election" }>["cycle"];
     sections: Extract<PageData, { kind: "election" }>["sections"];
@@ -243,7 +245,7 @@
   });
 
   const hexes = createQuery(() =>
-    orpc.seats.hexes.queryOptions({ input: { id } }),
+    orpc.seats.hexes.queryOptions({ input: { id, within: scope?.id } }),
   );
   const governments = createQuery(() =>
     orpc.elections.governments.queryOptions({ input: { id } }),
@@ -311,6 +313,7 @@
         input: { id, contest: race.sample ?? race.anchor },
       }),
       enabled:
+        scope == null &&
         race.sample != null &&
         race.map != null &&
         race.places != null &&
@@ -1290,6 +1293,11 @@
         governing={race.size === chamber?.size ? governing : []}
       />
     {/if}
+    {#if (race.straddled ?? 0) > 0}
+      <p class="col-span-12 bg-card px-3.5 py-2 text-xs text-muted-foreground">
+        {m.seats_change_straddled()}
+      </p>
+    {/if}
     {#if !race.isPrimaries}
       <div
         class={cn(
@@ -1563,10 +1571,12 @@
   othersTitle={m.cycle_parts()}
 />
 
-<Governments {id} {chamber} />
-<Regions {id} />
-<Gains {id} />
-<ByElections {id} />
+{#if scope == null}
+  <Governments {id} {chamber} />
+  <Regions {id} />
+{/if}
+<Gains {id} within={scope?.id} />
+<ByElections {id} within={scope?.id} />
 
 {#if isTiled}
   <Tiers

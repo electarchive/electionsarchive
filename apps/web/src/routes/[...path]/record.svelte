@@ -370,7 +370,12 @@
             <a
               href={column.path == null
                 ? undefined
-                : resolve("/[...path]", { path: column.path })}
+                : resolve("/[...path]", {
+                    path:
+                      record.data?.scope == null
+                        ? column.path
+                        : `${column.path}?in=${record.data.scope}`,
+                  })}
               aria-label={column.name}
               onpointerenter={() => (hovered = column.index)}
               onpointerleave={() => (hovered = null)}

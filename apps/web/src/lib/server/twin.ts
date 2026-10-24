@@ -197,7 +197,10 @@ async function load(segments: Array<string>, search: URLSearchParams) {
   if (found.kind === "election") {
     return {
       ...found,
-      byes: await call(router.seats.byElections, { id: found.id }),
+      byes: await call(router.seats.byElections, {
+        id: found.id,
+        within: found.scope?.id,
+      }),
     };
   }
   return found.kind === "polity"
@@ -236,6 +239,9 @@ export async function twin({ request, url }: RequestEvent) {
       pathname.split("/").filter((segment) => segment !== ""),
       url.searchParams,
     );
+    if (data.kind === "election" && data.scope != null) {
+      headers.link = `<${url.origin}${pathname}?in=${data.scope.path}>; rel="canonical"`;
+    }
     if (format === "json") {
       return Response.json(
         data.kind === "home" ? { ...data, atlas: undefined } : data,
@@ -725,7 +731,12 @@ function polityMarkdown(
       : [
           `## ${latest.isLocal ? m.polity_latest_local() : m.polity_latest()}`,
           [
-            link(latest.name, latest.path),
+            link(
+              latest.name,
+              latest.path == null || latest.scope == null
+                ? latest.path
+                : `${latest.path}?in=${latest.scope}`,
+            ),
             latest.date == null ? null : date(latest.date),
           ]
             .filter((part) => part != null)
@@ -777,7 +788,12 @@ function polityMarkdown(
             }));
           return [
             point.year,
-            link(point.name, point.path),
+            link(
+              point.name,
+              point.path == null || record.scope == null
+                ? point.path
+                : `${point.path}?in=${record.scope}`,
+            ),
             series.isOffice
               ? [
                   parties[0]?.label,
@@ -1067,7 +1083,7 @@ function contestMarkdown(
           ...(handover.basis === "same"
             ? []
             : [
-                `\\* ${(handover.basis === "area" ? m.change_note_area : m.change_note_name)({ year: String(handover.since) })} ${link(handover.prior.name, handover.prior.path)}.`,
+                `${String.raw`\*`} ${(handover.basis === "area" ? m.change_note_area : m.change_note_name)({ year: String(handover.since) })} ${link(handover.prior.name, handover.prior.path)}.`,
               ]),
         ];
   return [
