@@ -2418,10 +2418,14 @@ async function tabulate(
         ).toSorted((a, b) => (held.get(b.key) ?? 0) - (held.get(a.key) ?? 0));
   });
   const personal = new Set(
-    results
-      .flat()
-      .filter((entry) => entry.key.startsWith("person:"))
-      .map((entry) => (entry.current ?? entry.earlier)?.party),
+    results.flatMap((entries, index) =>
+      entries
+        .filter((entry) => entry.key.startsWith("person:"))
+        .map(
+          (entry) =>
+            `${rows[index]?.owner ?? ""}:${(entry.current ?? entry.earlier)?.party}`,
+        ),
+    ),
   );
   const compared = rows.map((row, index) => {
     const current = now[tier[index] ?? 0]?.get(row.k);
@@ -2438,7 +2442,7 @@ async function tabulate(
     const result = (results[index] ?? []).map((entry) =>
       entry.key.startsWith("party:") &&
       entry.current?.person != null &&
-      personal.has(entry.current.party)
+      personal.has(`${row.owner ?? ""}:${entry.current.party}`)
         ? { ...entry, key: `person:${entry.current.person}` }
         : entry,
     );
