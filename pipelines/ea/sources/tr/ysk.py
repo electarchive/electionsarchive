@@ -1036,7 +1036,111 @@ CANDIDATES_2014 = [
     ("Selahattin Demirtaş", "Halkların Demokratik Partisi"),
     ("Ekmeleddin Mehmet İhsanoğlu", None),
 ]
-JOINT_2014 = ("Cumhuriyet Halk Partisi", "Milliyetçi Hareket Partisi")
+BACKING_SOURCES = {
+    "https://www.ysk.gov.tr/doc/dosyalar/docs/Kararlar/2014Pdf/2014-3137.pdf": (
+        "official_body",
+        "Yüksek Seçim Kurulu",
+        "Karar No: 2014/3137 (presidential nominations by members of parliament)",
+        ".pdf",
+    ),
+    "https://web.archive.org/web/2024if_/https://www.aa.com.tr/tr/politika/ihsanoglunu-destekleyen-partiler-secimi-degerlendirdi/131586": (
+        "news_agency",
+        "Anadolu Ajansı",
+        "İhsanoğlu'nu destekleyen partiler seçimi değerlendirdi",
+        ".htm",
+    ),
+    "https://web.archive.org/web/2024if_/https://www.aa.com.tr/tr/secim-2018/cumhurbaskani-secimi-gecici-aday-listesi-yayimlandi/1140752": (
+        "news_agency",
+        "Anadolu Ajansı",
+        "Cumhurbaşkanı seçimi geçici aday listesi yayımlandı (YSK decision of May 9, 2018)",
+        ".htm",
+    ),
+    "https://web.archive.org/web/2024if_/https://www.aa.com.tr/tr/gunun-basliklari/cumhur-ittifaki-protokolu-yskye-teslim-edildi/1135403": (
+        "news_agency",
+        "Anadolu Ajansı",
+        "'Cumhur İttifakı' protokolü YSK'ye teslim edildi",
+        ".htm",
+    ),
+    "https://www.ysk.gov.tr/doc/karar/dosya/82595/2023-254.pdf": (
+        "official_body",
+        "Yüksek Seçim Kurulu",
+        "Karar No: 2023/254 (presidential nominations by party groups)",
+        ".pdf",
+    ),
+    "https://www.ensondakika.com.tr/secmenler-tarafindan-aday-gosterilmek-isteyen-cumhurbaskani-adaylarina-iliskin-karar-resmi-gazete-de/111699/": (
+        "news_agency",
+        "Anadolu Ajansı",
+        "Seçmenler tarafından aday gösterilmek isteyen cumhurbaşkanı adaylarına ilişkin karar Resmi Gazete'de",
+        ".htm",
+    ),
+    "https://web.archive.org/web/2024if_/https://www.aa.com.tr/tr/gundem/secimde-13-siyasi-parti-tek-basina-digerleri-ittifak-catisinda-yarisacak/2868155": (
+        "news_agency",
+        "Anadolu Ajansı",
+        "Seçimde 13 siyasi parti tek başına, diğerleri ittifak çatısında yarışacak",
+        ".htm",
+    ),
+    "https://chp.org.tr/haberler/millet-ttifaki-ttifak-protokolunu-ysk-baskanligina-sunuldu": (
+        "official_body",
+        "Cumhuriyet Halk Partisi",
+        "Millet İttifakı, İttifak Protokolü'nü YSK Başkanlığı'na Sunuldu",
+        ".htm",
+    ),
+    "https://www.dw.com/tr/emek-ve-%C3%B6zg%C3%BCrl%C3%BCk-i%CC%87ttifak%C4%B1ndan-k%C4%B1l%C4%B1%C3%A7daro%C4%9Fluna-destek/a-65462288": (
+        "news_agency",
+        "Deutsche Welle",
+        "Emek ve Özgürlük İttifakı'ndan Kılıçdaroğlu'na destek",
+        ".htm",
+    ),
+}
+BACKING = {
+    ("2014", "Recep Tayyip Erdoğan"): {"Adalet ve Kalkınma Partisi": "nominated"},
+    ("2014", "Selahattin Demirtaş"): {"Halkların Demokratik Partisi": "nominated"},
+    ("2014", "Ekmeleddin Mehmet İhsanoğlu"): {
+        "Cumhuriyet Halk Partisi": "nominated",
+        "Milliyetçi Hareket Partisi": "nominated",
+        "Demokratik Sol Parti": "supported",
+        "Liberal Demokrat Parti": "supported",
+        "Demokrat Parti": "supported",
+        "Bağımsız Türkiye Partisi": "supported",
+        "Büyük Birlik Partisi": "supported",
+        "Türkiye Sosyalist İşçi Partisi": "supported",
+        "Doğru Yol Partisi": "supported",
+        "Hak ve Adalet Partisi": "supported",
+        "Toplumsal Uzlaşma Reform ve Kalkınma Partisi": "supported",
+    },
+    ("2018", "Recep Tayyip Erdoğan"): {
+        "Adalet ve Kalkınma Partisi": "nominated",
+        "Milliyetçi Hareket Partisi": "nominated",
+        "Büyük Birlik Partisi": "supported",
+    },
+    ("2018", "Muharrem İnce"): {"Cumhuriyet Halk Partisi": "nominated"},
+    ("2018", "Selahattin Demirtaş"): {"Halkların Demokratik Partisi": "nominated"},
+    ("2018", "Meral Akşener"): {"İYİ Parti": "endorsed"},
+    ("2018", "Temel Karamollaoğlu"): {"Saadet Partisi": "endorsed"},
+    ("2018", "Doğu Perinçek"): {"Vatan Partisi": "endorsed"},
+    ("2023", "Recep Tayyip Erdoğan"): {
+        "Adalet ve Kalkınma Partisi": "nominated",
+        "Milliyetçi Hareket Partisi": "nominated",
+        "Büyük Birlik Partisi": "supported",
+        "Yeniden Refah Partisi": "supported",
+        "Demokratik Sol Parti": "supported",
+        "Hür Dava Partisi": "supported",
+    },
+    ("2023", "Kemal Kılıçdaroğlu"): {
+        "Cumhuriyet Halk Partisi": "nominated",
+        "İYİ Parti": "nominated",
+        "Saadet Partisi": "supported",
+        "Gelecek Partisi": "supported",
+        "Demokrasi ve Atılım Partisi": "supported",
+        "Demokrat Parti": "supported",
+        "Halkların Demokratik Partisi": "supported",
+        "Yeşiller ve Sol Gelecek Partisi": "supported",
+        "Türkiye İşçi Partisi": "supported",
+        "Emek Partisi": "supported",
+    },
+    ("2023", "Muharrem İnce"): {"Memleket Partisi": "endorsed"},
+    ("2023", "Sinan Oğan"): {"Zafer Partisi": "supported", "Adalet Partisi": "supported"},
+}
 PRESIDENT_2014_CELLS = {
     "domestic": (
         3,
@@ -1901,6 +2005,8 @@ def fetch() -> None:
     raw.fetch(SOURCE, OZONDER_PRESS, suffix=".htm")
     for url in WITHDREW_SOURCES:
         raw.fetch(SOURCE, url, suffix=".htm")
+    for url, (*_, suffix) in BACKING_SOURCES.items():
+        raw.fetch(SOURCE, url, suffix=suffix)
     for url in (REFERENDUM_2007, REFERENDUM_2007_CUSTOMS, LISTS_2007):
         raw.fetch(SOURCE, url, suffix=".rtf")
     for url in (MAYORS, MPS_2018, MPS_2015, MPS_JUNE_2015, MPS_2011, OZONDER_ITEM):
@@ -6177,8 +6283,13 @@ def emit() -> Path:
                     member_of_party_id=None if party is None else parties[party],
                     is_independent=party is None,
                 )
-                if party is not None:
-                    cs.add("candidacy_nomination", candidacy_id=candidacy, party_id=parties[party], kind="nominated")
+                for backer, kind in BACKING["2023", label].items():
+                    cs.add(
+                        "candidacy_nomination",
+                        candidacy_id=candidacy,
+                        party_id=cs.key("tr.party", slug(backer)),
+                        kind=kind,
+                    )
                 outcome = {0: "advanced" if number == 1 else "elected", 1: "withdrew", 2: "advanced", 3: "eliminated"}
                 if number == 1 or index == 0:
                     cs.add(
@@ -6245,7 +6356,10 @@ def emit() -> Path:
                 member_of_party_id=parties[party],
                 is_independent=False,
             )
-            cs.add("candidacy_nomination", candidacy_id=candidacy, party_id=parties[party], kind="nominated")
+            for backer, kind in BACKING["2018", label].items():
+                cs.add(
+                    "candidacy_nomination", candidacy_id=candidacy, party_id=cs.key("tr.party", slug(backer)), kind=kind
+                )
             cs.add("outcome", result_set_id=declared, option_id=option, kind="elected" if index == 2 else "lost")
         collect(
             president.filter(pl.col("day") == str(DAY_2018)).rename({"candidate": "option"}),
@@ -6303,8 +6417,10 @@ def emit() -> Path:
                 member_of_party_id=None if party is None else parties[party],
                 is_independent=False,
             )
-            for nominator in JOINT_2014 if party is None else (party,):
-                cs.add("candidacy_nomination", candidacy_id=candidacy, party_id=parties[nominator], kind="nominated")
+            for backer, kind in BACKING["2014", label].items():
+                cs.add(
+                    "candidacy_nomination", candidacy_id=candidacy, party_id=cs.key("tr.party", slug(backer)), kind=kind
+                )
             cs.add("outcome", result_set_id=declared, option_id=option, kind="elected" if index == 0 else "lost")
         collect(
             president.filter(pl.col("day") == str(DAY_2014)).rename({"candidate": "option"}),
@@ -6452,6 +6568,18 @@ def emit() -> Path:
                 notes=note,
             )
             cs.artifact(raw.cached(SOURCE, url), withdrew_sources[url])
+        for url, (kind, publisher, heading, _) in BACKING_SOURCES.items():
+            backing_source = cs.source(publisher, heading)
+            cs.add(
+                "source",
+                id=backing_source,
+                kind=kind,
+                publisher=publisher,
+                title=heading,
+                url=url.removeprefix("https://web.archive.org/web/2024if_/"),
+                notes="Names the parties that nominated, endorsed, or supported a presidential candidate.",
+            )
+            cs.artifact(raw.cached(SOURCE, url), backing_source)
         members_2011 = cs.source("Wikidata", "Members of the 24th Grand National Assembly")
         cs.add(
             "source",

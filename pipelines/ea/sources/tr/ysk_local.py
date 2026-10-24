@@ -308,7 +308,43 @@ def number(text: str) -> int:
     return 0 if text == "-" else int(text.removesuffix(",0").replace(".", ""))
 
 
+WAYBACK = "https://web.archive.org/web/2024if_/"
+ALLIANCE_SOURCES = {
+    f"{WAYBACK}https://tr.euronews.com/2019/02/19/31-mart-yerel-secimleri-ittifak-partileri-toplam-51-ilde-isbirligi-yapti-aday-listeleri": (
+        "news_agency",
+        "Euronews",
+        "31 Mart yerel seçimleri: İttifak partileri toplam 51 ilde işbirliği yaptı (Anadolu Ajansı report)",
+    ),
+    "https://www.bbc.com/turkce/haberler-turkiye-47296568": (
+        "news_agency",
+        "BBC News Türkçe",
+        "Yerel seçim: Siyasi partilerin aday listeleri nasıl şekillendi?",
+    ),
+    "https://www.mhp.org.tr/htmldocs/mhp/5262/mhp/Milliyetci_Hareket_Partisi_Genel_Baskan_Yardimcisi___Ankara_Milletvekili_Sayin_Sadir_DURMAZ__in__31_Mart_2024_Mahalli_Idareler.html": (
+        "official_body",
+        "Milliyetçi Hareket Partisi",
+        "31 Mart 2024 Mahalli İdareler Seçimlerine Yönelik yazılı basın açıklaması, 10 Ocak 2024",
+    ),
+    "https://www.bbc.com/turkce/articles/cql1p1ndke0o": (
+        "news_agency",
+        "BBC News Türkçe",
+        "MHP, 55 belediye başkan adayını açıkladı",
+    ),
+}
+CUMHUR = {
+    "adalet-ve-kalkinma-partisi": "milliyetci-hareket-partisi",
+    "milliyetci-hareket-partisi": "adalet-ve-kalkinma-partisi",
+}
+MILLET = {
+    "cumhuriyet-halk-partisi": ("iyi-parti", {"01", "06", "07", "09", "16", "26", "31", "35", "44", "46", "48", "59"}),
+    "iyi-parti": ("cumhuriyet-halk-partisi", {"10", "20", "27", "38", "41", "42", "45", "54", "55", "61"}),
+}
+BALLOT_MHP = {2019: {"01", "33", "45"}, 2024: {"33", "45"}}
+
+
 def fetch() -> None:
+    for link in ALLIANCE_SOURCES:
+        raw.fetch(SOURCE, link, suffix=".htm")
     paths = {*OLD.values(), *NATIONAL.values(), *TABLES_2014.values(), CANDIDATES_2009, *CANDIDATES.values()}
     paths |= {path for path, _ in GRIDS.values()} | {path for path, _ in SEAT_GRIDS.values()}
     for path in sorted(paths):
@@ -1324,6 +1360,18 @@ def emit() -> Path:
                 url=PAGES_HTML[year],
                 license=LICENSE,
             )
+        for link, (kind, publisher, heading) in ALLIANCE_SOURCES.items():
+            alliance_source = cs.source(publisher, heading)
+            cs.add(
+                "source",
+                id=alliance_source,
+                kind=kind,
+                publisher=publisher,
+                title=heading,
+                url=link.removeprefix(WAYBACK),
+                notes="Names which party of an alliance fielded the metropolitan mayoral candidate and which backed it.",
+            )
+            cs.artifact(raw.cached(SOURCE, link), alliance_source)
         for link in sorted({*values["url"], *mayors["url"]}):
             year = next(year for year in DAYS if f"/{year}" in link)
             artifact = raw.cached(SOURCE, link)
@@ -1872,6 +1920,19 @@ def emit() -> Path:
                 )
                 if owner is not None:
                     cs.add("candidacy_nomination", candidacy_id=candidacy, party_id=parties[owner], kind="nominated")
+                if metro and year >= 2019 and owner is not None:
+                    supporters = []
+                    if owner in CUMHUR and (owner == "milliyetci-hareket-partisi") == (plate in BALLOT_MHP[year]):
+                        supporters = [CUMHUR[owner], *(["buyuk-birlik-partisi"] if year == 2019 else [])]
+                    elif year == 2019 and owner in MILLET and plate in MILLET[owner][1]:
+                        supporters = [MILLET[owner][0]]
+                    for supporter in supporters:
+                        cs.add(
+                            "candidacy_nomination",
+                            candidacy_id=candidacy,
+                            party_id=parties[supporter],
+                            kind="supported",
+                        )
             ranked = tallies[contest_key]
             for option_key, kind, _ in ranked:
                 if option_key in options:
