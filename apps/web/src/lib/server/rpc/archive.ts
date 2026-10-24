@@ -13105,6 +13105,9 @@ export const search = {
               when not h.matched then 0
               when h.type = 'polity' then 0.75 * h.exact::int
               when h.type = 'election' then (el.kind = 'general' and q.t ~ '\\m\\d{4}\\M')::int
+              when h.type = 'party' then coalesce((
+                select (0.75 * h.exact::int * least(1, greatest(0, d.rank_boost - 2) / 1.5) + 0.3 * greatest(0, d.rank_boost - 2))
+                from search_document d where d.entity_id = h.entity_id), 0)
               when h.type <> 'contest' or c.kind = 'ballot_question' or c.allocation_parent_id is not null then 0
               when f.whole then
                 (0.5 + 0.3 * (
@@ -13236,8 +13239,14 @@ export const search = {
         .filter((row) => row.path != null && row.name !== "")
         .toSorted(
           (a, b) =>
-            Number(b.type !== "person" && segment(b.name) === segment(q)) -
-            Number(a.type !== "person" && segment(a.name) === segment(q)),
+            Number(
+              !["person", "party"].includes(b.type) &&
+                segment(b.name) === segment(q),
+            ) -
+            Number(
+              !["person", "party"].includes(a.type) &&
+                segment(a.name) === segment(q),
+            ),
         )
         .slice(0, input.limit);
     }),
