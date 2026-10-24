@@ -17,6 +17,7 @@ RELATIONS = (
     ("Q1754707", "merged_into", "Q7886824", date(1912, 1, 1), "year"),
     ("Q1311653", "successor_of", "Q476840", date(1882, 1, 1), "year"),
 )
+URWIN = "Scottish Conservatism: A Party Organization in Transition"
 ITEMS = sorted({item for origin, _, target, _, _ in RELATIONS for item in (origin, target)} | {"Q9630", "Q21942488"})
 SERVICE = "https://query.wikidata.org/sparql?" + urlencode(
     {
@@ -83,5 +84,25 @@ def emit() -> Path:
             valid_to=date(1906, 2, 15),
             valid_to_precision="day",
             source_id=source,
+        )
+        urwin = cs.source("D. W. Urwin", URWIN)
+        cs.add(
+            "source",
+            id=urwin,
+            kind="academic",
+            publisher="D. W. Urwin, Political Studies",
+            title=URWIN,
+            url="https://vlex.co.uk/vid/scottish-conservatism-party-organization-874217393",
+            attribution="D. W. Urwin, Scottish Conservatism: A Party Organization in Transition, Political Studies.",
+            notes="Records that the Scottish Unionist Association's annual conference approved in April 1965 the change of the party's name to Conservative and its reform on the English model.",
+        )
+        cs.add(
+            "party_relation",
+            from_party_id=parties["Q7886824"],
+            to_party_id=parties["Q9626"],
+            kind="merged_into",
+            date=date(1965, 1, 1),
+            date_precision="year",
+            source_id=urwin,
         )
         return cs.write()

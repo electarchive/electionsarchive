@@ -49,7 +49,7 @@ SYSTEM = (
 CAVEAT = (
     "Votes, electorates, and rejected ballots are from the Senedd Research briefing on the 2026 election, compiled from "
     "the constituency returning officers' returns and the Electoral Management Board. Each constituency's party columns "
-    "were checked against its valid votes, and its seats against six. The elected members are not yet loaded."
+    "were checked against its valid votes, and its seats against six. The elected members are not yet loaded. Individual candidates carry an independent head candidacy."
 )
 
 
@@ -124,6 +124,26 @@ def emit() -> Path:
             cs.add("electoral_system", id=system, polity_id=wales, rules={"formula": "dhondt"}, rules_version=1)
             name(system, "Closed list proportional representation (Senedd Cymru)")
             cs.add("note", entity_id=system, kind="methodology", body_md=SYSTEM)
+        for seats, begin, end in ((60, date(1999, 5, 6), DAY), (96, DAY, None)):
+            cs.add(
+                "body_size",
+                body_id=body,
+                seats=seats,
+                valid_from=begin,
+                valid_from_precision="day",
+                valid_to=end,
+                valid_to_precision="day",
+            )
+        known: dict[str, list[UUID]] = {}
+        for person, text in conn.execute(
+            """select distinct cy.person_id, n.text from candidacy cy
+               join contest_option o on o.id = cy.option_id
+               join contest c on c.id = o.contest_id
+               join name n on n.entity_id = cy.person_id
+               where c.body_id = %s""",
+            [body],
+        ).fetchall():
+            known.setdefault(fold(text), []).append(person)
         source_id = cs.source("Senedd Research", "Senedd Election 2026: Research Briefing")
         cs.add(
             "source",
@@ -219,6 +239,21 @@ def emit() -> Path:
                     party_id=party,
                     ballot_label=row["name"],
                 )
+                if row["individual"]:
+                    found = known.get(fold(row["name"]), [])
+                    person = found[0] if len(found) == 1 else cs.key(f"{SOURCE}.person", f"{contest_key}:{slug(row['name'])}")
+                    if person in cs.minted:
+                        cs.add("person", id=person)
+                        name(person, row["name"])
+                    cs.add(
+                        "candidacy",
+                        id=cs.key("gb.candidacy", f"{contest_key}:{slug(row['name'])}"),
+                        person_id=person,
+                        option_id=option,
+                        role="head",
+                        ballot_name=row["name"],
+                        is_independent=True,
+                    )
                 cs.add(
                     "result_value",
                     result_set_id=result_set,
