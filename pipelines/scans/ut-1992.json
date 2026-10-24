@@ -1,0 +1,60 @@
+{
+  "polity": "US-UT",
+  "publisher": "Utah Lieutenant Governor's Office",
+  "title": "State of Utah general election 1992",
+  "license": "Public record",
+  "raw_source": "us.scans",
+  "file": {
+    "url": "https://vote.utah.gov/wp-content/uploads/2023/09/1992Gen.pdf"
+  },
+  "contests": {
+    "attorney-general": {
+      "year": 1992,
+      "chamber": "attorney-general",
+      "day": "1992-11-03",
+      "special": false,
+      "state": "UT",
+      "district": null
+    },
+    "auditor": {
+      "year": 1992,
+      "chamber": "auditor",
+      "day": "1992-11-03",
+      "special": false,
+      "state": "UT",
+      "district": null
+    },
+    "treasurer": {
+      "year": 1992,
+      "chamber": "treasurer",
+      "day": "1992-11-03",
+      "special": false,
+      "state": "UT",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 6,
+      "id": "6-0",
+      "orientation": "counties_down",
+      "discover": [
+        "attorney-general",
+        "auditor",
+        "treasurer"
+      ],
+      "hint": "A table of Utah counties down the left with registered voters and number voting columns, then candidate columns grouped under office headings (attorney general, state auditor, state treasurer; ignore governor, state senate, and any other office). The TOTAL row is the printed total; ignore the PERCENT row, registered voters, and number voting."
+    },
+    {
+      "page": 7,
+      "id": "7-0",
+      "orientation": "counties_down",
+      "discover": [
+        "attorney-general",
+        "auditor",
+        "treasurer"
+      ],
+      "hint": "A table of Utah counties down the left with registered voters and number voting columns, then candidate columns grouped under office headings (attorney general, state auditor, state treasurer; ignore governor, state senate, and any other office). The TOTAL row is the printed total; ignore the PERCENT row, registered voters, and number voting."
+    }
+  ]
+}
