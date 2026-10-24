@@ -2,7 +2,7 @@ import type { RequestEvent } from "@sveltejs/kit";
 import { call } from "@orpc/server";
 import { error, isHttpError, isRedirect, redirect } from "@sveltejs/kit";
 import { effective, stand } from "#lib/caucus.js";
-import { PARTS, label as reasonLabel, REASONS } from "#lib/coverage.js";
+import { isGoal, PARTS, label as reasonLabel, REASONS } from "#lib/coverage.js";
 import { count, date, definite, percent, plural, points } from "#lib/format.js";
 import { isDerived, VACANCIES } from "#lib/outcomes.js";
 import { m } from "#lib/paraglide/messages.js";
@@ -181,10 +181,10 @@ async function load(segments: Array<string>, search: URLSearchParams) {
   if (head === "chambers" && rest.length > 0) {
     return chamber(rest.join("/"));
   }
+  if (head === "coverage" && rest.length === 1 && rest[0] === "us") {
+    return coverage("us", search);
+  }
   switch (rest.length === 0 ? head : "") {
-    case "coverage": {
-      return coverage(search);
-    }
     case "compare": {
       return comparison(
         [search.get("a"), search.get("b")].filter((id) => id != null),
@@ -391,37 +391,41 @@ function coverageMarkdown(
     (data.current ? m.twin_coverage_current_on : m.twin_coverage_current)({
       year,
     }),
-    ...data.goals.flatMap((row) => [
-      `## ${TITLES[row.goal]()}`,
-      [
-        `${(row.goal === "local" ? m.coverage_progress_local : row.goal === "turnout" ? m.coverage_progress_turnout : m.coverage_progress)({ complete: count(row.complete), total: count(row.total) })}, ${share(row)}`,
-        ...(row.icpsr > 0
-          ? [m.coverage_icpsr_of({ count: count(row.icpsr) })]
-          : []),
-      ].join(", "),
-      ...(row.goal === "history" || row.goal === "turnout"
-        ? [
-            data.parts
-              .filter((part) => part.goal === row.goal)
-              .map(
-                (part) =>
-                  `- ${PARTS[part.part]({ complete: count(part.complete), total: count(part.total), percent: percent(part.complete / Math.max(1, part.total), 1) })}`,
-              )
-              .join("\n"),
-            (row.goal === "history"
-              ? m.coverage_goal_history_note
-              : m.coverage_goal_turnout_note)(),
-          ]
-        : []),
-      REASONS[row.goal]
-        .flatMap((reason) => [
-          `- ${reasonLabel(row.goal, reason)}: ${count(row[reason])}`,
-          ...(reason === "complete" && row.icpsr > 0
-            ? [`  - ${m.coverage_icpsr()}: ${count(row.icpsr)}`]
+    ...data.goals
+      .flatMap((goal) =>
+        isGoal(goal.goal) ? [{ ...goal, goal: goal.goal }] : [],
+      )
+      .flatMap((row) => [
+        `## ${TITLES[row.goal]()}`,
+        [
+          `${(row.goal === "local" ? m.coverage_progress_local : row.goal === "turnout" ? m.coverage_progress_turnout : m.coverage_progress)({ complete: count(row.complete), total: count(row.total) })}, ${share(row)}`,
+          ...(row.icpsr > 0
+            ? [m.coverage_icpsr_of({ count: count(row.icpsr) })]
             : []),
-        ])
-        .join("\n"),
-    ]),
+        ].join(", "),
+        ...(row.goal === "history" || row.goal === "turnout"
+          ? [
+              data.parts
+                .filter((part) => part.goal === row.goal)
+                .map(
+                  (part) =>
+                    `- ${PARTS[part.part]({ complete: count(part.complete), total: count(part.total), percent: percent(part.complete / Math.max(1, part.total), 1) })}`,
+                )
+                .join("\n"),
+              (row.goal === "history"
+                ? m.coverage_goal_history_note
+                : m.coverage_goal_turnout_note)(),
+            ]
+          : []),
+        REASONS[row.goal]
+          .flatMap((reason) => [
+            `- ${reasonLabel(row.goal, reason)}: ${count(row[reason])}`,
+            ...(reason === "complete" && row.icpsr > 0
+              ? [`  - ${m.coverage_icpsr()}: ${count(row.icpsr)}`]
+              : []),
+          ])
+          .join("\n"),
+      ]),
     `## ${m.coverage_where()}`,
     TITLES.county(),
     table(

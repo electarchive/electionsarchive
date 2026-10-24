@@ -68,9 +68,12 @@
         <span class="max-sm:sr-only">{m.versus_action()}</span>
       </a>
       <a
-        href={resolve("/coverage")}
+        href={resolve("/coverage/us")}
         class={cn(buttonVariants({ variant: "ghost" }), "max-sm:px-2")}
-        aria-current={page.url.pathname === "/coverage" ? "page" : undefined}
+        aria-current={page.url.pathname === "/coverage" ||
+        page.url.pathname.startsWith("/coverage/")
+          ? "page"
+          : undefined}
       >
         <GaugeIcon />
         <span class="max-sm:sr-only">{m.coverage_nav()}</span>

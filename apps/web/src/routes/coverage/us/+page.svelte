@@ -11,10 +11,10 @@
   import { cn } from "#lib/utils.js";
   import type { PageData } from "./$types";
   import type { Counts, Goal, Reason } from "#lib/coverage.js";
-  import Bar from "./bar.svelte";
-  import Gaps from "./gaps.svelte";
+  import Bar from "#routes/coverage/bar.svelte";
+  import Gaps from "#routes/coverage/gaps.svelte";
   import { GOALS, label, PARTS, REASONS } from "#lib/coverage.js";
-  import Tone from "./tone.svelte";
+  import Tone from "#routes/coverage/tone.svelte";
 
   const { data }: { data: PageData } = $props();
 
@@ -220,8 +220,8 @@
             onCheckedChange={(value: boolean) =>
               void goto(
                 value
-                  ? resolve("/coverage")
-                  : `${resolve("/coverage")}?current=1`,
+                  ? resolve("/coverage/us")
+                  : `${resolve("/coverage/us")}?current=1`,
                 { replace: true, reset: false },
               )}
           />
@@ -391,6 +391,7 @@
         </div>
         {#key `${goal}:${data.current}`}
           <Gaps
+            polity="us"
             {goal}
             {order}
             current={data.current}

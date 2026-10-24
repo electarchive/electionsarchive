@@ -2,6 +2,7 @@ import { call } from "@orpc/server";
 import { error } from "@sveltejs/kit";
 import { spawn } from "node:child_process";
 import { fileURLToPath } from "node:url";
+import { isGoal } from "#lib/coverage.js";
 import { router } from "#lib/server/rpc/router.js";
 import type { Actions, PageServerLoad } from "./$types";
 
@@ -10,10 +11,18 @@ const isDev = import.meta.env.DEV;
 export const load: PageServerLoad = async ({ url }) => {
   const current = url.searchParams.get("current") === "1";
   const [goals, gaps] = await Promise.all([
-    call(router.coverage.goals, { current }),
-    call(router.coverage.gaps, { goal: "county", current }),
+    call(router.coverage.goals, { polity: "us", current }),
+    call(router.coverage.gaps, { polity: "us", goal: "county", current }),
   ]);
-  return { ...goals, gaps, current, dev: isDev };
+  return {
+    ...goals,
+    goals: goals.goals.flatMap((row) =>
+      isGoal(row.goal) ? [{ ...row, goal: row.goal }] : [],
+    ),
+    gaps,
+    current,
+    dev: isDev,
+  };
 };
 
 export const actions: Actions = {
@@ -22,7 +31,7 @@ export const actions: Actions = {
       error(404);
     }
     const pipelines = fileURLToPath(
-      new URL("../../../../../pipelines", import.meta.url),
+      new URL("../../../../../../pipelines", import.meta.url),
     );
     spawn(
       `${pipelines}/.venv/bin/python`,

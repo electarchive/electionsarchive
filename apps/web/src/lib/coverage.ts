@@ -10,6 +10,10 @@ export const GOALS = [
   "local",
 ] as const;
 export type Goal = (typeof GOALS)[number];
+
+export function isGoal(goal: string): goal is Goal {
+  return (GOALS as ReadonlyArray<string>).includes(goal);
+}
 export type Reason =
   | "complete"
   | "coarse"

@@ -13,6 +13,7 @@
   import { LEVELS } from "#lib/coverage.js";
 
   const {
+    polity,
     goal,
     order,
     rows = null,
@@ -20,6 +21,7 @@
     level = null,
     current,
   }: {
+    polity: string;
     goal: Goal;
     order: "gap" | "name";
     current: boolean;
@@ -31,6 +33,7 @@
   const fetched = createQuery(() => ({
     ...orpc.coverage.gaps.queryOptions({
       input: {
+        polity,
         goal,
         state: place ?? undefined,
         level: level ?? undefined,
@@ -125,6 +128,7 @@
   </div>
   {#if isOpen}
     <Self
+      {polity}
       {goal}
       {order}
       place={depth === 0 ? row.key : place}

@@ -190,13 +190,26 @@ export async function home() {
   };
 }
 
-export async function coverage(search: URLSearchParams) {
+export async function coverage(polity: string, search: URLSearchParams) {
   const isCurrent = search.get("current") === "1";
+  if (!/^[a-z]{2}$/.test(polity)) {
+    error(404);
+  }
   const [goals, gaps] = await Promise.all([
-    call(router.coverage.goals, { current: isCurrent }),
-    call(router.coverage.gaps, { goal: "county", current: isCurrent }),
+    found(call(router.coverage.goals, { polity, current: isCurrent })),
+    call(router.coverage.gaps, {
+      polity,
+      goal: polity === "us" ? "county" : "national",
+      current: isCurrent,
+    }),
   ]);
-  return { kind: "coverage" as const, current: isCurrent, ...goals, gaps };
+  return {
+    kind: "coverage" as const,
+    polity,
+    current: isCurrent,
+    ...goals,
+    gaps,
+  };
 }
 
 export async function person(slug: string) {
