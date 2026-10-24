@@ -296,6 +296,11 @@
           >{m.gains_all({ count: count(listed.length) })}</button
         >
       {/if}
+      {#if sheet.isNotional === true}
+        <p class="text-xs text-muted-foreground max-inline-[72ch]">
+          {m.gains_notional({ year: String(sheet.since) })}
+        </p>
+      {/if}
       {#if sheet.estimated > 0}
         <p class="text-xs text-muted-foreground max-inline-[72ch]">
           * {m.gains_estimated({

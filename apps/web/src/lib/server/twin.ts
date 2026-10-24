@@ -1789,6 +1789,9 @@ function electionMarkdown(
                 ]),
               ),
             ]),
+        ...(isChanged && race.isNotional === true && race.since != null
+          ? [m.seats_change_notional({ year: race.since })]
+          : []),
         ...race.results.flatMap((row) =>
           row.supported.length === 0
             ? []
@@ -2235,7 +2238,9 @@ function contestMarkdown(
           ...(handover.basis === "same"
             ? []
             : [
-                `${String.raw`\*`} ${(handover.basis === "area" ? m.change_note_area : m.change_note_name)({ year: String(handover.since) })} ${link(handover.prior.name, handover.prior.path)}.`,
+                handover.basis === "notional"
+                  ? `${String.raw`\*`} ${m.change_note_notional({ year: String(handover.since) })}`
+                  : `${String.raw`\*`} ${(handover.basis === "area" ? m.change_note_area : m.change_note_name)({ year: String(handover.since) })} ${link(handover.prior.name, handover.prior.path)}.`,
               ]),
         ];
   return [

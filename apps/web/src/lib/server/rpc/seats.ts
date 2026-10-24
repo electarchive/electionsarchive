@@ -33,6 +33,7 @@ export const seats = {
           total: v.number(),
           compared: v.number(),
           estimated: v.number(),
+          isNotional: v.optional(v.boolean()),
           parties: v.array(
             v.object({
               key: v.string(),
@@ -66,6 +67,7 @@ export const seats = {
         since: string | null;
         day: string | null;
         election: string | null;
+        notional: boolean;
       }>(sql`
         with recursive tree(id) as (
           select e.id from election e
@@ -100,8 +102,14 @@ export const seats = {
             coalesce(c.magnitude, 1) as magnitude
           from contest c join election e on e.id = c.election_id
           left join boundary_set bs on bs.id = c.boundary_set_id
-          where c.body_id = (select body from chamber) and e.kind = 'general' and not c.notional
+          where c.body_id = (select body from chamber) and e.kind = 'general'
             and e.date_from between (select day from last) - 200 and (select day from last)
+            and c.notional = exists (
+              select from contest nc join election ne on ne.id = nc.election_id
+              where nc.notional and nc.body_id = (select body from chamber)
+                and ne.date_from between (select day from last) - 200 and (select day from last)
+                and nc.district_area_id in (select area from now)
+            )
             and c.kind = 'body_seats' and c.allocation_parent_id is null and c.party_scope_id is null
             and c.district_area_id is not null and (coalesce(c.magnitude, 1) = 1 or exists (select from now where magnitude > 1))
         ),
@@ -146,6 +154,20 @@ export const seats = {
           join contest_option o on o.id = x.option_id
           join election e on e.id = rs.election_id
           where ${latest("rs")} and rs.contest_id in (select id from paired union select prior from paired)
+          union all
+          select rs.contest_id, rs.k, e.date_from, o.id, o.k, o.party_id
+          from contest nc
+          join area na on na.id = nc.district_area_id
+          join election e on e.id = nc.election_id
+          join result_set rs on rs.contest_id = nc.id and rs.is_default and rs.stage = 'notional'
+          cross join lateral (
+            select o.id, o.k, o.party_id from contest_option o
+            join result_rollup y on y.result_set_k = rs.k and y.area_k = na.k and y.option_k = o.k
+              and y.measure = 1 and y.channel = 0 and y.count_round = 0
+            where o.contest_id = nc.id
+            order by y.value desc limit 1
+          ) o
+          where nc.notional and nc.id in (select prior from paired)
         ),
         won as (
           select distinct on (t.contest, t.k) t.contest, t.k,
@@ -208,7 +230,8 @@ export const seats = {
           array(select coalesce(b.party, 'person:' || b.person) from won b where b.contest = p.prior order by b.k) as before,
           (select day::text from last) as since,
           (select min(day)::text from now) as day,
-          (select election::text from last) as election
+          (select election::text from last) as election,
+          exists (select from paired x join contest c on c.id = x.prior where c.notional) as notional
         from paired p
         order by p.id
       `);
@@ -287,6 +310,7 @@ export const seats = {
         total: seated.length,
         compared: compared.length,
         estimated: compared.filter((row) => !row.same).length,
+        isNotional: found.rows[0]?.notional === true,
         parties: keys.map((key) => {
           const party = colored.get(key);
           return {
@@ -324,7 +348,7 @@ export const seats = {
           since: v.number(),
           isGain: v.boolean(),
           lead: v.picklist(["majority", "margin"]),
-          basis: v.picklist(["same", "area", "name"]),
+          basis: v.picklist(["notional", "same", "area", "name"]),
           party: v.nullable(
             v.object({ label: v.string(), short: v.nullable(v.string()) }),
           ),
@@ -364,7 +388,7 @@ export const seats = {
     )
     .handler(async ({ input }) => {
       const found = await db.execute<{
-        basis: "same" | "area" | "name";
+        basis: "notional" | "same" | "area" | "name";
         prior: string;
         area: string;
         since: string;
@@ -398,11 +422,11 @@ export const seats = {
           order by e.date_from desc limit 1
         ),
         prev as materialized (
-          select c.id, c.district_area_id as area, coalesce(bs.as_of, e.date_from) as drawn,
+          select c.id, c.district_area_id as area, coalesce(bs.as_of, e.date_from) as drawn, c.notional,
             case when e.kind = 'by_election' then e.date_from else (select day from last) end as day
           from contest c join election e on e.id = c.election_id
           left join boundary_set bs on bs.id = c.boundary_set_id
-          where c.body_id = (select body from this) and not c.notional
+          where c.body_id = (select body from this) and (not c.notional or c.district_area_id = (select area from this))
             and ((e.kind = case when (select kind from this) = 'local' then 'local' else 'general' end::election_kind
               and e.date_from between (select day from last) - 200 and (select day from last))
               or (e.kind = 'by_election' and (select kind from this) = 'by_election'
@@ -414,16 +438,16 @@ export const seats = {
         paired as (
           select t.id, coalesce(s.id, g.id, n.id) as prior, coalesce(s.area, g.area, n.area) as area,
             coalesce(s.day, g.day, n.day) as day,
-            case when s.same or g.same then 'same' when s.id is not null then 'name' when g.id is not null then 'area' else 'name' end as basis
+            case when s.notional then 'notional' when s.same or g.same then 'same' when s.id is not null then 'name' when g.id is not null then 'area' else 'name' end as basis
           from this t
           left join lateral (
-            select p.id, p.area, p.day, not exists (
+            select p.id, p.area, p.day, p.notional, not exists (
               select from area_geometry gp
               join area_geometry gn on gn.area_id = t.area and gn.valid @> t.drawn
               where gp.area_id = p.area and gp.valid @> p.drawn and gp.valid <> gn.valid
                 and ST_Area(ST_Intersection(gp.geom, gn.geom, 0.00001)) < 0.97 * greatest(ST_Area(gp.geom), ST_Area(gn.geom))
             ) as same
-            from prev p where p.area = t.area order by p.drawn desc, p.day desc limit 1
+            from prev p where p.area = t.area order by p.notional desc, p.drawn desc, p.day desc limit 1
           ) s on true
           left join lateral (
             select p.id, p.area, p.day, ST_Area(x.geom) >= 0.97 * greatest(ST_Area(gp.geom), ST_Area(gn.geom)) as same
@@ -458,6 +482,20 @@ export const seats = {
             where kc.id = rs.contest_id
           ) v on true
           where ${latest("rs")} and rs.contest_id in (select id from paired union select prior from paired)
+          union all
+          select rs.contest_id, rs.k, e.date_from, o.id, o.k, o.party_id, 1, o.votes
+          from contest nc
+          join area na on na.id = nc.district_area_id
+          join election e on e.id = nc.election_id
+          join result_set rs on rs.contest_id = nc.id and rs.is_default and rs.stage = 'notional'
+          cross join lateral (
+            select o.id, o.k, o.party_id, y.value as votes from contest_option o
+            join result_rollup y on y.result_set_k = rs.k and y.area_k = na.k and y.option_k = o.k
+              and y.measure = 1 and y.channel = 0 and y.count_round = 0
+            where o.contest_id = nc.id
+            order by y.value desc limit 1
+          ) o
+          where nc.notional and nc.id in (select prior from paired)
         ),
         won as (
           select distinct on (t.contest, t.k) t.contest, t.k, t.seats, t.votes,

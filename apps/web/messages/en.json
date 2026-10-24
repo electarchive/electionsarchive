@@ -141,6 +141,7 @@
   "gains_title": "Seats that changed hands",
   "gains_lede": "{changed} of {compared} seats changed hands since {year}. Each row is a party that gained seats; each column is the party it took them from.",
   "gains_estimated": "{count} seats were redrawn since {year}. For these, the previous winner is the winner of the old seat that covered most of the new seat's area, or of the old seat with the same name.",
+  "gains_notional": "Previous winners come from notional {year} results on the new boundaries, estimated by Rallings and Thrasher.",
   "gains_partial": "Only {compared} of {total} seats could be matched to a seat at the previous election.",
   "gains_corner": "Gained by",
   "gains_from": "From",
@@ -167,6 +168,7 @@
   "change_gain_margin": "{party} gain from {from}, with a margin of {majority} votes.",
   "change_note_area": "Compared with the {year} result in the old seat that covered most of this seat's area:",
   "change_note_name": "Compared with the {year} result in the old seat of the same name:",
+  "change_note_notional": "Compared with the notional {year} result on this seat's boundaries, estimated by Rallings and Thrasher.",
   "byes_title": "By-elections in this parliament",
   "byes_lede": [
     {
@@ -563,6 +565,7 @@
   "election_parent": "Part of {name}",
   "election_within": "{name} in {place}",
   "seats_change_straddled": "Change in seats isn't shown, because some seats at the previous election lay across this border.",
+  "seats_change_notional": "Changes are measured against notional {year} results on the new boundaries, estimated by Rallings and Thrasher.",
   "polity_subdivisions": "Subdivisions",
   "polity_local_one": "Local: {place}",
   "polity_local_more": "Local: {place} and {count} more",

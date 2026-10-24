@@ -7810,6 +7810,7 @@ async function races(
               party: string | null;
               seats: number;
               doubt: number;
+              notional: boolean;
             }>(sql`
               with recursive same as (
                 select case when x.kind = 'local' then 'local' else 'general' end::election_kind as kind
@@ -7829,7 +7830,12 @@ async function races(
                 left join seat st on st.id = c.seat_id
                 where coalesce(c.body_id, c.office_id) = ${head.owner}::uuid
                   and c.allocation_parent_id is null and c.party_scope_id is null and e.kind = (select kind from same)
-                  and not c.notional
+                  and c.notional = exists (
+                    select from contest nc join election ne on ne.id = nc.election_id
+                    where nc.notional and coalesce(nc.body_id, nc.office_id) = ${head.owner}::uuid
+                      and ne.date_from between (select day from last) - 200 and (select day from last)
+                      and nc.district_area_id in (select k.district_area_id from contest k where k.election_id = ${head.election}::uuid)
+                  )
                   and (c.term is distinct from 'remainder' or (c.seat_id is not null and not exists (
                     select from contest d where d.election_id = c.election_id and d.seat_id = c.seat_id and d.id <> c.id
                   ))) and coalesce(st.voting, true)
@@ -7860,6 +7866,19 @@ async function races(
                     where l.contest_id = o.contest_id and l.kind = 'list'
                   ))
                 group by o.id, o.contest_id, o.party_id
+                union all
+                select o.id, o.contest_id, o.party_id, 1
+                from tree t
+                join contest nc on nc.id = t.id and nc.notional
+                join area na on na.id = nc.district_area_id
+                cross join lateral (
+                  select o.id, o.contest_id, o.party_id from contest_option o
+                  join result_set rs on rs.contest_id = o.contest_id and rs.is_default and rs.stage = 'notional'
+                  join result_rollup y on y.result_set_k = rs.k and y.area_k = na.k and y.option_k = o.k
+                    and y.measure = 1 and y.channel = 0 and y.count_round = 0
+                  where o.contest_id = nc.id
+                  order by y.value desc limit 1
+                ) o
               ),
               leads as (
                 select distinct on (ch.parent_option_id) ch.parent_option_id as parent, ch.party_id
@@ -7888,7 +7907,8 @@ async function races(
               )
               select coalesce(bm.into_id, br.parent_party_id, lin.party, pm.into_id, w.party_id, ld.party_id) as party,
                 sum(w.seats)::int as seats,
-                (select count(*)::int from roots where ${isInside} and parents <> 1) as doubt
+                (select count(*)::int from roots where ${isInside} and parents <> 1) as doubt,
+                exists (select from roots r join contest n on n.id = r.id where n.notional) as notional
               from winners w
               left join leads ld on ld.parent = w.id
               left join entity_merge pm on pm.entity_id = coalesce(w.party_id, ld.party_id)
@@ -7912,7 +7932,7 @@ async function races(
               ) lin on true
               group by 1
               union all
-              select distinct coalesce(bm.into_id, br.parent_party_id, pm.into_id, o.party_id), 0, 0
+              select distinct coalesce(bm.into_id, br.parent_party_id, pm.into_id, o.party_id), 0, 0, false
               from tree t
               join contest_option o on o.contest_id = t.id and o.party_id is not null
               left join entity_merge pm on pm.entity_id = o.party_id
@@ -7944,6 +7964,8 @@ async function races(
       return {
         map,
         before,
+        isNotional:
+          before != null && (previous?.rows ?? []).some((row) => row.notional),
         whole: isTier && straddled === 0 ? (previous?.rows ?? null) : null,
         filled,
         runoff,
@@ -8462,6 +8484,7 @@ export const elections = {
             before: v.nullable(
               v.array(v.object({ key: v.string(), seats: v.number() })),
             ),
+            isNotional: v.optional(v.boolean()),
             overall: v.nullable(
               v.array(v.object({ key: v.string(), seats: v.number() })),
             ),

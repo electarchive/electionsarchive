@@ -1446,10 +1446,12 @@
       <p
         class="text-[0.9375rem] text-pretty text-muted-foreground max-inline-[60ch]"
       >
-        * {(handover.basis === "area"
-          ? m.change_note_area
-          : m.change_note_name)({ year: String(handover.since) })}
-        {#if handover.prior.path != null}
+        * {(handover.basis === "notional"
+          ? m.change_note_notional
+          : handover.basis === "area"
+            ? m.change_note_area
+            : m.change_note_name)({ year: String(handover.since) })}
+        {#if handover.basis === "notional"}{:else if handover.prior.path != null}
           <a
             class="underline decoration-border underline-offset-4 hover:decoration-foreground"
             href={resolve("/[...path]", { path: handover.prior.path })}
