@@ -5,8 +5,12 @@ from ea.changeset import Changeset
 from ea.store import connect
 
 SOURCE = "us.contest_merges"
-VERSION = "1"
-ELECTIONS = {"2016-11:ID:primary": "2016-05-17:ID:primary"}
+VERSION = "2"
+ELECTIONS = {
+    "2016-11:ID:primary": "2016-05-17:ID:primary",
+    "2005-11-08:CO": "2005-11-01:CO",
+    "2011-11-08:CO": "2011-11-01:CO",
+}
 OPTIONS = {"2016-11:ID:senate:5:rp:363818": "2016-05-17:ID:senate:5:rp:1984104a-862f-5ae9-bcfa-17f733bb61f6"}
 
 
@@ -16,7 +20,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Merge contests recorded twice under a misdated election into the contests of the real one: Klarner's November 2016 Idaho primary into the May 17 primary",
+            summary="Merge contests recorded twice under a misdated election into the contests of the real one: Klarner's November 2016 Idaho primary into the May 17 primary, and us.measures' Colorado 2005 and 2011 coordinated elections, dated November 8 instead of November 1",
             polity="US",
             kind="correction",
         )

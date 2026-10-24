@@ -364,7 +364,7 @@ def _publish_table(conn: Connection, stage: Stage, table: str) -> None:
         ).fetchall():
             moved = sql.Identifier(column)
             for key in keyed.get(referencing, []):
-                if column in key and len(key) > 1:
+                if column in key:
                     conn.execute(
                         sql.SQL(
                             """delete from public.{target} t using {staged} s where t.{moved} = s.entity_id
@@ -374,9 +374,14 @@ def _publish_table(conn: Connection, stage: Stage, table: str) -> None:
                             moved=moved,
                             staged=staged,
                             same=sql.SQL(" and ").join(
-                                sql.SQL("x.{0} is not distinct from t.{0}").format(sql.Identifier(other))
-                                for other in key
-                                if other != column
+                                [
+                                    sql.SQL("true"),
+                                    *(
+                                        sql.SQL("x.{0} is not distinct from t.{0}").format(sql.Identifier(other))
+                                        for other in key
+                                        if other != column
+                                    ),
+                                ]
                             ),
                         )
                     )

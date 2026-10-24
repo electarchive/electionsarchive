@@ -72,7 +72,12 @@ FORMER = {
     ("CT", "huntington"): "09001",
     ("CT", "southlyme"): "09011",
 }
-DATES = {("VA", date(1970, 7, 14)): date(1970, 11, 3)}
+DATES = {
+    ("VA", date(1970, 7, 14)): date(1970, 11, 3),
+    ("CO", date(2005, 11, 1)): date(2005, 11, 1),
+    ("CO", date(2011, 11, 1)): date(2011, 11, 1),
+}
+REDATED = {("CO", date(2005, 11, 1)): date(2005, 11, 8), ("CO", date(2011, 11, 1)): date(2011, 11, 8)}
 METHOD = (
     "County totals are the sums of the city, town, or county rows in the state's election statistics archive. "
     "The archive marks the leading answer in each county but not statewide, so the answer shown as winning is the one "
@@ -437,9 +442,18 @@ def emit() -> Path:
                     ballot_label=label,
                 )
             result_set = cs.key(f"{SOURCE}.result_set", contest_key)
-            if state == "CT" and day.year >= 2022 and result_set not in cs.minted:
-                previous = result_set
-                result_set = cs.key(f"{SOURCE}.result_set", f"{contest_key}:regions")
+            misdated = (
+                conn.execute(
+                    "select entity_id from external_id where scheme = %s and value = %s",
+                    [f"{SOURCE}.result_set", f"{REDATED[(state, day)]}:{state}:question:{question}"],
+                ).fetchone()
+                if (state, day) in REDATED
+                else None
+            )
+            if misdated is not None or state == "CT" and day.year >= 2022 and result_set not in cs.minted:
+                previous = result_set if misdated is None else misdated[0]
+                if misdated is None:
+                    result_set = cs.key(f"{SOURCE}.result_set", f"{contest_key}:regions")
                 (replaced,) = conn.execute(
                     "select election_id, contest_id, stage, kind, source_id, completeness, supersedes_id from result_set where id = %s",
                     [previous],
