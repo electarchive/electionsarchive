@@ -600,7 +600,33 @@
     });
     return moves.length === 0 ? null : Object.fromEntries(moves);
   });
+  const members = $derived.by(() => {
+    const won = contest.rows.filter((row) => (row.current?.seats ?? 0) > 0);
+    return won.length > 1 &&
+      won.every((row) => row.current?.person != null && row.current.seats === 1)
+      ? won
+      : null;
+  });
   const lead = $derived.by(() => {
+    if (members != null) {
+      const last = members
+        .map((row) => row.current?.share ?? 0)
+        .toSorted((a, b) => a - b)[0];
+      const loser = contest.rows
+        .filter(
+          (row) =>
+            row.current != null &&
+            !row.key.startsWith("kind:") &&
+            !members.includes(row),
+        )
+        .toSorted(
+          (a, b) => (b.current?.share ?? 0) - (a.current?.share ?? 0),
+        )[0];
+      const row = members.find((member) => member.current?.share === last);
+      return contest.isStv || row == null || loser?.current == null
+        ? null
+        : { row, margin: (last ?? 0) - loser.current.share };
+    }
     const [top, next] = contest.rows
       .filter((row) => row.current != null && !row.key.startsWith("kind:"))
       .toSorted((a, b) => (b.current?.share ?? 0) - (a.current?.share ?? 0));
@@ -766,6 +792,28 @@
       let total = 0;
       for (const row of contest.rows) {
         total += row.current?.seats ?? 0;
+      }
+      if (members != null && members.length <= 4) {
+        const names = new Intl.ListFormat(getLocale(), {
+          style: "long",
+          type: "conjunction",
+        }).format(
+          members.map((row) =>
+            row.short == null
+              ? row.label
+              : m.race_member({ name: row.label, party: row.short }),
+          ),
+        );
+        return contest.isStv && contest.count == null
+          ? m.race_lede_members_stv_first({
+              names,
+              total: count(total),
+              quota: count(Math.floor(contest.current.valid / (total + 1)) + 1),
+            })
+          : (contest.isStv ? m.race_lede_members_stv : m.race_lede_members)({
+              names,
+              total: count(total),
+            });
       }
       const blocs = Map.groupBy(
         contest.rows.filter((row) => row.current != null),
@@ -2159,7 +2207,12 @@
           style:--party={swatch(lead.row.color, lead.row.key)}
         >
           <dt class="text-[0.8125rem] text-muted-foreground">
-            <Term label={m.col_margin()} definition={m.term_margin()} />
+            <Term
+              label={m.col_margin()}
+              definition={members == null
+                ? m.term_margin()
+                : m.term_margin_last()}
+            />
           </dt>
           <dd class="flex items-baseline gap-2 min-inline-0">
             <span class="font-figures text-xl font-[760] tracking-[-0.015em]"

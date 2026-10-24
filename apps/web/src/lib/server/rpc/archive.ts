@@ -2911,6 +2911,7 @@ export const contests = {
         ),
         quorum: v.nullable(v.number()),
         ballot: v.optional(v.nullable(v.number())),
+        isStv: v.optional(v.boolean()),
         partial: v.nullable(v.object({ held: v.number(), of: v.number() })),
         turnout: v.nullable(
           v.object({
@@ -3443,6 +3444,7 @@ export const contests = {
         turnout: roll.turnout,
         quorum: roll.quorum,
         ballot: roll.ballot,
+        isStv: roll.isStv,
         partial:
           reach.rows.find((row) => row.held > 0 && row.held < row.of) ?? null,
         count: null,
@@ -6344,7 +6346,7 @@ function merge<
 
 async function poll(contest: string | null, k: number | null, isAsked = true) {
   if (contest == null || !isAsked) {
-    return { turnout: null, quorum: null, ballot: null };
+    return { turnout: null, quorum: null, ballot: null, isStv: false };
   }
   const found = await db.execute<{
     registered: number | null;
@@ -6352,8 +6354,10 @@ async function poll(contest: string | null, k: number | null, isAsked = true) {
     basis: "valid" | "rejected" | null;
     quorum: number | null;
     ballot: number | null;
+    isStv: boolean;
   }>(sql`
     select t.*, ((coalesce(es.rules, '{}') || coalesce(c.rules_override, '{}')) ->> 'quorum')::float8 as quorum,
+      (coalesce(es.rules, '{}') || coalesce(c.rules_override, '{}')) ->> 'formula' = 'stv' as "isStv",
       case (coalesce(es.rules, '{}') || coalesce(c.rules_override, '{}')) ->> 'formula'
         when 'block' then c.magnitude when 'limited' then c.magnitude - 1 end as ballot
     from (
@@ -6388,6 +6392,7 @@ async function poll(contest: string | null, k: number | null, isAsked = true) {
         : { registered: row.registered, voters: row.voters, basis: row.basis },
     quorum: row?.quorum ?? null,
     ballot: row?.ballot != null && row.ballot > 1 ? row.ballot : null,
+    isStv: row?.isStv ?? false,
   };
 }
 
