@@ -341,7 +341,7 @@ function markdown(data: Data, link: Link) {
       return electionMarkdown(data.election, link);
     }
     default: {
-      return contestMarkdown(data.contest, data.cycle, link);
+      return contestMarkdown(data.contest, data.cycle, data.handover, link);
     }
   }
 }
@@ -943,6 +943,7 @@ function electionMarkdown(
 function contestMarkdown(
   contest: Extract<Data, { kind: "contest" }>["contest"],
   cycle: Extract<Data, { kind: "contest" }>["cycle"],
+  handover: Extract<Data, { kind: "contest" }>["handover"],
   link: Link,
 ) {
   const groups: Record<string, () => string> = {
@@ -976,6 +977,36 @@ function contestMarkdown(
       ? null
       : String(target.year ?? target.date?.slice(0, 4) ?? target.name);
   const compared = comparedMarkdown(contest, link, then);
+  const [top, next] = contest.rows
+    .filter((row) => row.current != null && !row.key.startsWith("kind:"))
+    .toSorted((a, b) => (b.current?.votes ?? 0) - (a.current?.votes ?? 0));
+  const party =
+    handover?.party?.short ?? handover?.party?.label ?? m.seats_independents();
+  const from =
+    handover?.from?.short ?? handover?.from?.label ?? m.seats_independents();
+  const majority =
+    top?.current != null && next?.current != null && top.current.votes > 0
+      ? count(top.current.votes - next.current.votes)
+      : null;
+  const held =
+    handover == null || contest.current == null
+      ? []
+      : [
+          `${
+            majority == null
+              ? handover.isGain
+                ? m.change_gain_bare({ party, from })
+                : m.change_hold_bare({ party })
+              : handover.isGain
+                ? m.change_gain({ party, from, majority })
+                : m.change_hold({ party, majority })
+          }${handover.basis === "same" ? "" : "*"}`,
+          ...(handover.basis === "same"
+            ? []
+            : [
+                `\\* ${(handover.basis === "area" ? m.change_note_area : m.change_note_name)({ year: String(handover.since) })} ${link(handover.prior.name, handover.prior.path)}.`,
+              ]),
+        ];
   return [
     `# ${contest.name}`,
     byline(contest.breadcrumbs, link, contest.election.date),
@@ -992,6 +1023,7 @@ function contestMarkdown(
     }),
     ...contest.notes.map((note) => `> ${note.body}`),
     ...compared,
+    ...held,
     resultsMarkdown(contest, then),
     ...countMarkdown(contest),
     ...placesMarkdown(contest.places, link, then),

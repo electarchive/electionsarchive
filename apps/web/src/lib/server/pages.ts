@@ -529,7 +529,7 @@ export async function archive(path: string, search: URLSearchParams) {
   `);
   const within = region.rows[0]?.id ?? null;
   if (slug.type === "contest") {
-    const [contest, lists, rounds, ballot, cycle] = await found(
+    const [contest, lists, rounds, ballot, cycle, handover] = await found(
       Promise.all([
         call(router.contests.get, {
           id: slug.entity_id,
@@ -544,6 +544,7 @@ export async function archive(path: string, search: URLSearchParams) {
         call(router.contests.rounds, { id: slug.entity_id, unit }),
         call(router.contests.ballot, { id: slug.entity_id, unit }),
         call(router.contests.cycle, { id: slug.entity_id, unit }),
+        call(router.seats.change, { id: slug.entity_id }),
       ]),
     );
     const boundaries = await call(router.contests.boundaries, {
@@ -591,6 +592,7 @@ export async function archive(path: string, search: URLSearchParams) {
       rounds,
       ballot,
       cycle,
+      handover,
       boundaries,
       surround,
       match,

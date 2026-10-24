@@ -58,7 +58,9 @@ export const seats = {
         election: string | null;
       }>(sql`
         with recursive tree(id) as (
-          select ${input.id}::uuid
+          select e.id from election e
+          join slug ps on ps.entity_id = e.polity_id and ps.is_current and (ps.path = 'gb' or ps.path like 'gb/%')
+          where e.id = ${input.id}::uuid
           union all
           select e.id from election e join tree on e.parent_id = tree.id where e.kind not in ('runoff', 'indirect')
         ),
@@ -181,6 +183,139 @@ export const seats = {
             isEstimated: !row.same,
           }))
           .toSorted((a, b) => a.name.localeCompare(b.name)),
+      };
+    }),
+  change: os
+    .meta(
+      openapi({
+        method: "GET",
+        path: "/contests/{id}/change",
+        summary:
+          "Say whether a single-member seat's winning party held it or gained it since the chamber's previous general election",
+      }),
+    )
+    .input(v.object({ id: v.pipe(v.string(), v.uuid()) }))
+    .output(
+      v.nullable(
+        v.object({
+          since: v.number(),
+          isGain: v.boolean(),
+          basis: v.picklist(["same", "area", "name"]),
+          party: v.nullable(
+            v.object({ label: v.string(), short: v.nullable(v.string()) }),
+          ),
+          from: v.nullable(
+            v.object({ label: v.string(), short: v.nullable(v.string()) }),
+          ),
+          prior: v.object({ name: v.string(), path: v.nullable(v.string()) }),
+        }),
+      ),
+    )
+    .handler(async ({ input }) => {
+      const found = await db.execute<{
+        basis: "same" | "area" | "name";
+        prior: string;
+        area: string;
+        since: string;
+        now: string | null;
+        before: string | null;
+      }>(sql`
+        with this as materialized (
+          select c.id, c.body_id as body, c.district_area_id as area, e.date_from as day, e.kind
+          from contest c join election e on e.id = c.election_id
+          join slug ps on ps.entity_id = e.polity_id and ps.is_current and (ps.path = 'gb' or ps.path like 'gb/%')
+          where c.id = ${input.id}::uuid and c.kind = 'body_seats' and c.allocation_parent_id is null
+            and c.party_scope_id is null and c.district_area_id is not null
+            and coalesce(c.magnitude, 1) = 1 and c.body_id is not null
+        ),
+        last as (
+          select e.date_from as day
+          from this t join contest c on c.body_id = t.body join election e on e.id = c.election_id
+          where e.kind = 'general' and e.status = 'held'
+            and e.date_from < t.day - case when t.kind = 'general' then 120 else 0 end
+          order by e.date_from desc limit 1
+        ),
+        prev as materialized (
+          select c.id, c.district_area_id as area, e.date_from as day
+          from contest c join election e on e.id = c.election_id
+          where c.body_id = (select body from this) and e.kind = 'general'
+            and e.date_from between (select day from last) - 200 and (select day from last)
+            and c.kind = 'body_seats' and c.allocation_parent_id is null and c.party_scope_id is null
+            and c.district_area_id is not null and coalesce(c.magnitude, 1) = 1
+        ),
+        paired as (
+          select t.id, coalesce(s.id, g.id, n.id) as prior, coalesce(s.area, g.area, n.area) as area,
+            case when s.id is not null then 'same' when g.id is not null then 'area' else 'name' end as basis
+          from this t
+          left join lateral (select p.id, p.area from prev p where p.area = t.area limit 1) s on true
+          left join lateral (
+            select p.id, p.area from prev p
+            join area_geometry gp on gp.area_id = p.area and gp.valid @> p.day
+            join area_geometry gn on gn.area_id = t.area and gn.valid @> t.day
+            where gp.geom && gn.geom and ST_Intersects(gp.geom, gn.geom)
+            order by ST_Area(ST_Intersection(gp.geom, gn.geom, 0.00001)) desc limit 1
+          ) g on s.id is null
+          left join lateral (
+            select p.id, p.area from prev p
+            where exists (
+              select from name a join name b on lower(a.text) = lower(b.text)
+              where a.entity_id = t.area and b.entity_id = p.area
+            ) limit 1
+          ) n on s.id is null and g.id is null
+        ),
+        won as (
+          select distinct on (rs.contest_id) rs.contest_id as contest,
+            coalesce(bm.into_id, br.parent_party_id, pm.into_id, o.party_id)::text as party,
+            cy.person_id::text as person
+          from result_set rs
+          join outcome x on x.result_set_id = rs.id and x.kind in ('elected', 'won') and x.candidacy_id is null
+          join contest_option o on o.id = x.option_id
+          join election e on e.id = rs.election_id
+          left join candidacy cy on cy.option_id = o.id and cy.role = 'head'
+          left join entity_merge pm on pm.entity_id = o.party_id
+          left join party_affiliation br on br.party_id = coalesce(pm.into_id, o.party_id)
+            and br.kind = 'regional_branch' and br.valid @> e.date_from
+          left join entity_merge bm on bm.entity_id = br.parent_party_id
+          where rs.is_default and rs.contest_id in (select id from paired union select prior from paired)
+          order by rs.contest_id, o.k
+        )
+        select p.basis, p.prior, p.area, (select day::text from last) as since,
+          coalesce(w.party, 'person:' || w.person) as now,
+          coalesce(b.party, 'person:' || b.person) as before
+        from paired p left join won w on w.contest = p.id left join won b on b.contest = p.prior
+        where p.prior is not null
+      `);
+      const row = found.rows[0];
+      if (row?.now == null || row.before == null) {
+        return null;
+      }
+      const fold = (key: string) =>
+        key.startsWith("person:") ? "independent" : key;
+      const [colored, labels, slugs] = await Promise.all([
+        refs(
+          [row.now, row.before].filter((key) => !key.startsWith("person:")),
+          row.since,
+        ),
+        names([row.area], row.since),
+        paths([row.prior]),
+      ]);
+      const party = (key: string) =>
+        key.startsWith("person:")
+          ? null
+          : {
+              label: colored.get(key)?.label ?? "",
+              short: colored.get(key)?.short ?? null,
+            };
+      return {
+        since: Number(row.since.slice(0, 4)),
+        isGain: fold(row.now) !== fold(row.before),
+        basis: row.basis,
+        party: party(row.now),
+        from: party(row.before),
+        prior: {
+          name: labels.full.get(row.area) ?? "",
+          path: slugs.get(row.prior) ?? null,
+        },
       };
     }),
 };

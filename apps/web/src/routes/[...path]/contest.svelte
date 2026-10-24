@@ -48,6 +48,7 @@
     rounds,
     ballot,
     cycle,
+    handover,
     boundaries,
     surround,
     match,
@@ -57,6 +58,7 @@
     rounds: Extract<PageData, { kind: "contest" }>["rounds"];
     ballot: Extract<PageData, { kind: "contest" }>["ballot"];
     cycle: Extract<PageData, { kind: "contest" }>["cycle"];
+    handover: Extract<PageData, { kind: "contest" }>["handover"];
     boundaries: Extract<PageData, { kind: "contest" }>["boundaries"];
     surround: Extract<PageData, { kind: "contest" }>["surround"];
     match: string;
@@ -853,6 +855,31 @@
       ? `${lede} ${m.race_lede_withdrew({ name: named(withdrew) })}`
       : lede;
   });
+  const held = $derived.by(() => {
+    if (handover == null || contest.current == null) {
+      return null;
+    }
+    const [top, next] = contest.rows
+      .filter((row) => row.current != null && !row.key.startsWith("kind:"))
+      .toSorted((a, b) => (b.current?.votes ?? 0) - (a.current?.votes ?? 0));
+    const party =
+      handover.party?.short ?? handover.party?.label ?? m.seats_independents();
+    const from =
+      handover.from?.short ?? handover.from?.label ?? m.seats_independents();
+    const majority =
+      top?.current != null && next?.current != null && top.current.votes > 0
+        ? count(top.current.votes - next.current.votes)
+        : null;
+    return `${
+      majority == null
+        ? handover.isGain
+          ? m.change_gain_bare({ party, from })
+          : m.change_hold_bare({ party })
+        : handover.isGain
+          ? m.change_gain({ party, from, majority })
+          : m.change_hold({ party, majority })
+    }${handover.basis === "same" ? "" : "*"}`;
+  });
   const comeback = $derived.by(() => {
     if (question || contest.current == null) {
       return null;
@@ -1191,7 +1218,22 @@
       <p
         class="mbs-1 font-serif text-[clamp(1.0625rem,1.5vw,1.25rem)]/snug text-pretty max-inline-[60ch]"
       >
-        {verdict}{#if comeback != null}{" "}{comeback}{/if}
+        {#if held != null}{held}{" "}{/if}{verdict}{#if comeback != null}{" "}{comeback}{/if}
+      </p>
+    {/if}
+    {#if held != null && handover != null && handover.basis !== "same"}
+      <p
+        class="text-[0.9375rem] text-pretty text-muted-foreground max-inline-[60ch]"
+      >
+        * {(handover.basis === "area"
+          ? m.change_note_area
+          : m.change_note_name)({ year: String(handover.since) })}
+        {#if handover.prior.path != null}
+          <a
+            class="underline decoration-border underline-offset-4 hover:decoration-foreground"
+            href={resolve("/[...path]", { path: handover.prior.path })}
+            >{handover.prior.name}</a
+          >{:else}{handover.prior.name}{/if}.
       </p>
     {/if}
     {#each footnotes as line (line)}

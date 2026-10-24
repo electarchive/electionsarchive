@@ -171,6 +171,7 @@
         rounds={data.rounds}
         ballot={data.ballot}
         cycle={data.cycle}
+        handover={data.handover}
         boundaries={data.boundaries}
         surround={data.surround}
         match={data.match}
