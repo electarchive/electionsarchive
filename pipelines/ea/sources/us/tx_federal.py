@@ -11,19 +11,23 @@ from ea.sources.us import medsl
 from ea.store import DATA, connect
 
 SOURCE = "us.tx_federal"
-VERSION = "1"
+VERSION = "2"
 PARSED = DATA / "parsed" / SOURCE
 SITE = "https://results.texas-election.com/static/data/election/"
-DOWNLOADS = Path.home() / "Downloads"
+INBOX = DATA / "inbox" / "manual" / "MF-040"
 PUBLISHER = "Texas Secretary of State"
 TITLE = "Texas Election Results: official county results"
 ELECTIONS = {
-    47010: (date(2022, 3, 1), "republican"),
-    47011: (date(2022, 3, 1), "democratic"),
-    47292: (date(2022, 5, 24), "republican"),
-    47293: (date(2022, 5, 24), "democratic"),
-    44376: (date(2020, 7, 14), "republican"),
-    44387: (date(2020, 7, 14), "democratic"),
+    47010: (date(2022, 3, 1), ":republican", False, None),
+    47011: (date(2022, 3, 1), ":democratic", False, None),
+    47292: (date(2022, 5, 24), ":republican", False, None),
+    47293: (date(2022, 5, 24), ":democratic", False, None),
+    44376: (date(2020, 7, 14), ":republican", False, None),
+    44387: (date(2020, 7, 14), ":democratic", False, None),
+    47009: (date(2022, 11, 8), "", False, {14}),
+    45820: (date(2021, 5, 1), "", True, None),
+    46698: (date(2021, 7, 27), ":runoff", True, None),
+    47689: (date(2022, 6, 14), "", True, None),
 }
 
 
@@ -36,33 +40,35 @@ def fetch() -> None:
             raw.store(
                 SOURCE,
                 url,
-                (DOWNLOADS / f"tx_{election}_County.json").read_bytes(),
+                (INBOX / f"tx_{election}_County.json").read_bytes(),
                 suffix=".json",
-                retrieved_at=datetime.now(UTC),
+                retrieved_at=datetime(2026, 10, 23, tzinfo=UTC),
                 media_type="application/json",
             )
 
 
 def parse() -> None:
     rows = []
-    for election, (day, party) in ELECTIONS.items():
+    for election, (day, suffix, special, districts) in ELECTIONS.items():
         counties = json.loads(raw.cached(SOURCE, f"{SITE}{election}/County.json").path.read_bytes())
         for fips, county in counties.items():
             for race in county["Races"].values():
                 name = " ".join(race["ON"].split())
                 if name == "U. S. SENATOR":
                     chamber, district = "senate", None
-                elif match := re.fullmatch(r"U\. S\. REPRESENTATIVE DISTRICT (\d+)", name):
+                elif match := re.fullmatch(r"U\. S\. REPRESENTATIVE DISTRICT (\d+)(?: - UNEXPIRED TERM)?", name):
                     chamber, district = "house", int(match.group(1))
                 else:
+                    continue
+                if districts is not None and district not in districts:
                     continue
                 for candidate in race["C"].values():
                     rows.append(
                         {
                             "year": day.year,
-                            "chamber": f"{chamber}:{party}",
+                            "chamber": f"{chamber}{suffix}",
                             "day": day,
-                            "special": False,
+                            "special": special,
                             "state": "TX",
                             "district": district,
                             "code": fips,
@@ -93,7 +99,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Texas's 2020 and 2022 U.S. Senate and House primary runoffs and 2022 primaries by county",
+            summary="Texas's 2020 and 2022 U.S. Senate and House primary runoffs, 2022 primaries, the 2022 TX-14 general, and the 2021 TX-6 and 2022 TX-34 specials by county; the 2021 and 2022 files were saved from the results site by a person in a browser",
             polity="US-TX",
         )
         source = cs.source(PUBLISHER, TITLE)
