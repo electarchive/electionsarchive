@@ -176,11 +176,17 @@ const sisters = (roots: Array<string>, day: string) => sql`
       ) won
     )
     group by l.party
+  ),
+  pairs as (
+    select a.party as a, b.party as b
+    from reach a join reach b on a.party < b.party
+    where a.n + b.n = (select count(distinct contest) from lines)
+      and not a.contests && b.contests
   )
-  select 'party:' || a.party as from, 'party:' || b.party as to
-  from reach a join reach b on a.party < b.party
-  where a.n + b.n = (select count(distinct contest) from lines)
-    and not a.contests && b.contests
+  select 'party:' || p.a as from, 'party:' || p.b as to
+  from pairs p
+  where (select count(*) from pairs q where p.a in (q.a, q.b)) = 1
+    and (select count(*) from pairs q where p.b in (q.a, q.b)) = 1
 `;
 
 const Link = v.object({ name: v.string(), path: v.nullable(v.string()) });
@@ -7996,6 +8002,7 @@ export const elections = {
           left join area a on a.id = pt.area_id
           left join scheme sc on sc.code = a.scheme_code
           where e.parent_id = ${input.id}::uuid and ${within}::uuid is null
+            and not exists (select from entity_merge m where m.entity_id = e.id)
         `),
         db.execute<{ kind: string; body: string }>(sql`
           select kind::text, body_md as body from note where entity_id = ${input.id}::uuid
@@ -8025,6 +8032,7 @@ export const elections = {
               extract(year from x.date_from)::int as year
             from election x
             where x.polity_id = e.polity_id and x.kind = e.kind and x.date_from < e.date_from
+              and not exists (select from entity_merge m where m.entity_id = x.id)
               and exists (select from contest t where t.election_id = e.id and t.office_id is not null)
                 = exists (select from contest u where u.election_id = x.id and u.office_id is not null)
               and (
@@ -8060,7 +8068,6 @@ export const elections = {
           cross join lateral (values (m.party_id), (pm.into_id)) x(id)
           where x.id is not null
           group by a.alliance_id
-            and not exists (select from entity_merge m where m.entity_id = e.id)
         `),
         db.execute<{ held: number; of: number; noun: string | null }>(sql`
           with recursive tree(id) as (
@@ -8090,7 +8097,6 @@ export const elections = {
               where ap.area_id = up.area and ap.valid @> ${election.date}::date offset 0
             ) ap
             where up.depth < 6
-              and not exists (select from entity_merge m where m.entity_id = x.id)
           )
           select count(distinct kids.polity_id) filter (where kids.area_id in (select area from up))::int as held,
             count(distinct kids.polity_id)::int as of, min(s.noun) as noun
@@ -8409,6 +8415,7 @@ export const elections = {
           union all
           (select e.id, e.polity_id, e.date_from from x
             join election e on e.polity_id = x.polity_id and e.kind = 'general' and e.date_from between x.d and x.d + 400
+              and not exists (select from entity_merge m where m.entity_id = e.id)
             where x.kind in ('primary', 'caucus')
             order by e.date_from limit 1)
         ),
@@ -8473,7 +8480,6 @@ export const elections = {
           where c.option_id = o.id and c.role = 'head' order by c.id limit 1
         ) cy on true
         order by x.contest, o.ballot_position nulls last, o.k
-              and not exists (select from entity_merge m where m.entity_id = e.id)
       `);
       const [labels, slugs, colors] = await Promise.all([
         names(
@@ -9628,6 +9634,7 @@ export const elections = {
           select e.id, e.polity_id, e.date_from from election e
           where e.parent_id = ${input.id}::uuid and e.kind not in ('runoff', 'indirect')
             and e.polity_id <> (select polity_id from election where id = ${input.id}::uuid)
+            and not exists (select from entity_merge m where m.entity_id = e.id)
         ),
         roots as materialized (
           select c.id, p.id as part,
@@ -9692,7 +9699,6 @@ export const elections = {
         from winners w
         join parts p on p.id = w.part
         left join leads ld on ld.parent = w.id
-            and not exists (select from entity_merge m where m.entity_id = e.id)
         left join entity_merge pm on pm.entity_id = coalesce(w.party_id, ld.party_id)
         left join party_affiliation br on br.party_id = coalesce(pm.into_id, w.party_id, ld.party_id)
           and br.kind = 'regional_branch' and br.valid @> p.date_from
@@ -9830,6 +9836,7 @@ export const polities = {
           case when o.n is not null then (
             select e.id from election e where e.polity_id = p.id and e.status = 'held' and e.date_from <= current_date
               and not exists (select from election x where x.id = e.parent_id and x.polity_id = e.polity_id)
+              and not exists (select from entity_merge m where m.entity_id = e.id)
             order by e.kind = 'general' desc, e.date_from desc limit 1
           ) end as latest
         from polity p
@@ -9894,7 +9901,6 @@ export const polities = {
           v.object({
             name: v.string(),
             path: v.nullable(v.string()),
-              and not exists (select from entity_merge m where m.entity_id = e.id)
             kind: v.string(),
             elections: v.number(),
             first: v.nullable(v.number()),
@@ -10012,6 +10018,7 @@ export const polities = {
               sum(count(e.id)) over ()::int as within
             from below left join election e on e.polity_id = below.id
               and not exists (select from election p where p.id = e.parent_id and p.polity_id = e.polity_id)
+              and not exists (select from entity_merge m where m.entity_id = e.id)
             group by below.top
           `),
           db.execute<{
@@ -10038,6 +10045,7 @@ export const polities = {
             ) lead on e.kind = 'local'
             where e.polity_id = ${input.id}::uuid
               and not exists (select from election p where p.id = e.parent_id and p.polity_id = e.polity_id)
+              and not exists (select from entity_merge m where m.entity_id = e.id)
             order by e.date_from desc nulls last
           `),
           breadcrumbs(input.id, "all"),
@@ -10054,9 +10062,9 @@ export const polities = {
             area: string;
             k: number;
             tier: number;
+            scoped: boolean;
           }>(sql`
             with recursive up(id) as (
-            scoped: boolean;
               select parent_id from polity_parent where polity_id = ${input.id}::uuid
               union
               select p.parent_id from polity_parent p join up on p.polity_id = up.id
@@ -10072,13 +10080,12 @@ export const polities = {
             select c.id, c.allocation_parent_id as parent, e.polity_id as host, e.id as election, e.kind::text as kind,
               e.status::text as status, s.path, e.date_from::text as date, ${CYCLE} as year,
               place.id as area, place.k,
+              exists (select from polity_territory t where t.polity_id = ${input.id}::uuid and t.valid @> e.date_from) as scoped,
               case
                 when c.kind = 'ballot_question' then 5
-              exists (select from polity_territory t where t.polity_id = ${input.id}::uuid and t.valid @> e.date_from) as scoped,
                 when c.kind = 'elector_slate' or o.kind in ('head_of_state', 'head_of_government') then 0
                 when (c.district_area_id is null or c.district_area_id in (pt.area_id, place.id)) and (
                   o.kind = 'governor'
-              and not exists (select from entity_merge m where m.entity_id = e.id)
                   or b.polity_id in (select id from up) and (b.polity_id <> e.polity_id or c.district_area_id = place.id)
                 ) then 1
                 when b.polity_id in (select id from up) and b.polity_id <> e.polity_id then 2
@@ -10105,7 +10112,6 @@ export const polities = {
           db.execute<{ date: string }>(sql`
             select e.date_from::text as date
             from election e
-              and not exists (select from entity_merge m where m.entity_id = e.id)
             join contest c on c.election_id = e.id and (c.allocation_parent_id is null or c.kind = 'elector_slate') and c.party_scope_id is null
             join polity_territory pt on pt.polity_id = e.polity_id and pt.valid @> e.date_from
             where e.polity_id = ${input.id}::uuid and e.status = 'held' and e.date_from <= current_date
@@ -12517,6 +12523,12 @@ export const people = {
         ) inherited on true
         where t.person_id in (select id from ids) and t.acquired_via = 'elected' and t.contest_id is null
           and t.succeeds_tenure_id is not null and t.from_date is not null
+          and not exists (
+            select from candidacy cy join contest_option o on o.id = cy.option_id
+            join contest c on c.id = o.contest_id join election e on e.id = c.election_id
+            where cy.person_id in (select id from ids) and c.office_id = t.office_id
+              and e.date_from between t.from_date - 400 and t.from_date
+          )
       `);
       const spells = merge(tenures.rows, 365);
       const won = new Set(
@@ -12582,12 +12594,6 @@ export const people = {
       }
       const [labels, slugs] = await Promise.all([
         names(
-          and not exists (
-            select from candidacy cy join contest_option o on o.id = cy.option_id
-            join contest c on c.id = o.contest_id join election e on e.id = c.election_id
-            where cy.person_id in (select id from ids) and c.office_id = t.office_id
-              and e.date_from between t.from_date - 400 and t.from_date
-          )
           [
             person.id,
             ...roots,
