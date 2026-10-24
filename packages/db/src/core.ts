@@ -844,7 +844,7 @@ export const personImage = pgTable("person_image", {
 
 export const personPartyMembership = pgTable("person_party_membership", {
 	personId: uuid("person_id").notNull().references(() => person.id, { onDelete: "cascade" } ),
-	partyId: uuid("party_id").notNull().references(() => party.id),
+	partyId: uuid("party_id").references(() => party.id),
 	validFrom: date("valid_from"),
 	validFromPrecision: datePrecision("valid_from_precision").default("day").notNull(),
 	validTo: date("valid_to"),
@@ -855,7 +855,7 @@ export const personPartyMembership = pgTable("person_party_membership", {
 	recordedFrom: timestamp("recorded_from", { withTimezone: true }).default(sql`now()`).notNull(),
 }, (table) => [
 	index("person_party_membership_party_idx").using("btree", table.partyId.asc().nullsLast().op("uuid_ops")),
-	primaryKey({ columns: [table.personId, table.partyId, table.valid], name: "person_party_membership_pkey"}),
+	unique("person_party_membership_key").on(table.personId, table.partyId, table.valid).nullsNotDistinct(),
 ]);
 
 export const polity = pgTable("polity", {

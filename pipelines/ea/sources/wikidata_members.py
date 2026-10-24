@@ -10,7 +10,8 @@ from ea.changeset import Changeset
 from ea.store import connect
 
 SOURCE = "wikidata_members"
-VERSION = "1"
+VERSION = "2"
+INDEPENDENT = "Q327591"
 TITLE = "Party memberships (P102) of people"
 MEMBERSHIPS = """SELECT ?item ?party ?start ?sp ?end ?ep WHERE {{ VALUES ?item {{ {items} }}
 ?item p:P102 ?s . ?s ps:P102 ?party ; wikibase:rank ?rank . FILTER(?rank != wikibase:DeprecatedRank)
@@ -94,7 +95,7 @@ def emit() -> Path:
             version=VERSION,
             summary=(
                 "Party memberships from Wikidata for people with a Wikidata item, dated where Wikidata dates them, "
-                "and undated only where Wikidata names one party"
+                "and undated only where Wikidata names one party; dated spells as an independent politician carry no party"
             ),
             polity=None,
         )
@@ -116,8 +117,14 @@ def emit() -> Path:
             if len(people[item]) != 1:
                 continue
             named = {party for party, *_ in rows}
-            spans: dict[UUID, list[tuple[date | None, str, date | None, str]]] = defaultdict(list)
+            spans: dict[UUID | None, list[tuple[date | None, str, date | None, str]]] = defaultdict(list)
             for party, start, start_precision, end, end_precision in rows:
+                if party == INDEPENDENT:
+                    if start is None and end is None:
+                        undated += 1
+                    else:
+                        spans[None].append((start, start_precision, end, end_precision))
+                    continue
                 if len(parties[party]) != 1:
                     unmatched += 1
                     continue

@@ -78,7 +78,8 @@ def _stage(conn: Connection, changeset_id: str) -> Stage:
         ).fetchall()
         if table in parents
     }
-    return Stage(schema, tables, entities, pipeline, polity, temporal, parents, owners, replaces or {})
+    nullable = {table: set(keys) - _not_null(conn, table) for table, keys in temporal.items()}
+    return Stage(schema, tables, entities, pipeline, polity, temporal, parents, owners, replaces or {}, nullable)
 
 
 def _not_null(conn: Connection, table: str) -> set[str]:
@@ -337,7 +338,7 @@ def _publish_table(conn: Connection, stage: Stage, table: str) -> None:
                    from pg_constraint c
                    cross join lateral unnest(c.conkey) with ordinality k(attnum, ordinality)
                    join pg_attribute a on a.attrelid = c.conrelid and a.attnum = k.attnum
-                   where c.conperiod and c.contype = 'p' and c.connamespace = 'public'::regnamespace
+                   where c.conperiod and c.contype in ('p', 'u') and c.connamespace = 'public'::regnamespace
                      and a.attname <> 'valid'
                    group by c.conrelid"""
             ).fetchall()
@@ -399,7 +400,7 @@ def _publish_table(conn: Connection, stage: Stage, table: str) -> None:
                         sql.Identifier(referencing),
                         moved,
                         sql.SQL("").join(
-                            sql.SQL(" and x.{0} = t.{0}").format(sql.Identifier(key))
+                            sql.SQL(" and x.{0} is not distinct from t.{0}").format(sql.Identifier(key))
                             for key in periods[referencing]
                             if key != column
                         ),
@@ -812,7 +813,8 @@ def publish(conn: Connection, changeset_id: str) -> None:
                    where c.contype = 'f' and c.connamespace = 'public'::regnamespace
                      and c.confrelid::regclass::text = any(%s)
                      and not exists (
-                       select from pg_constraint k where k.conrelid = c.conrelid and k.contype = 'p'
+                       select from pg_constraint k where k.conrelid = c.conrelid
+                         and (k.contype = 'p' or k.conname = 'person_party_membership_key')
                          and a.attnum = any(k.conkey))""",
                 [["entity", *types]],
             ).fetchall()

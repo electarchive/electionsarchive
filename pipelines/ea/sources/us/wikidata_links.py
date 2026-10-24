@@ -10,7 +10,7 @@ from ea.changeset import Changeset
 from ea.store import connect
 
 SOURCE = "us.wikidata_links"
-VERSION = "1"
+VERSION = "2"
 TITLE = "Positions held (P39) and candidacies in elections (P3602) of American politicians"
 CHUNK = 150
 SLACK = 1
@@ -73,6 +73,21 @@ OPTIONAL { ?item rdfs:label ?label FILTER(lang(?label) = "en") } }""",
         "format": "json",
     }
 )
+SENATE = "https://query.wikidata.org/sparql?" + urlencode(
+    {
+        "query": """SELECT ?e ?eLabel ?date ?stateLabel ?c ?cLabel WHERE {
+?e wdt:P541 wd:Q4416090 ; wdt:P585 ?date . FILTER(YEAR(?date) >= 2000)
+OPTIONAL { ?e wdt:P1001 ?state } { ?e wdt:P726 ?c } UNION { ?c wdt:P3602 ?e }
+SERVICE wikibase:label { bd:serviceParam wikibase:language "en". } }""",
+        "format": "json",
+    }
+)
+NOMINEES = """select distinct pc.person_id, pc.st, pc.year,
+  (select n.text from name n where n.entity_id = pc.person_id order by n.is_preferred desc, length(n.text) limit 1)
+from pc join cc on cc.id = pc.contest_id
+where pc.level = 'us_senate' and pc.year >= 2000 and cc.stage <> 'primary'
+  and not exists (select from external_id x where x.entity_id = pc.person_id and x.scheme = 'wikidata')
+  and not exists (select from entity_merge m where m.entity_id = pc.person_id)"""
 STATES = {
     "AL": "Alabama",
     "AK": "Alaska",
@@ -269,6 +284,7 @@ def fetch() -> None:
         for url in _urls(_pairs(conn)):
             raw.fetch(SOURCE, url, suffix=".json")
     raw.fetch(SOURCE, FEC, suffix=".json")
+    raw.fetch(SOURCE, SENATE, suffix=".json")
 
 
 def emit() -> Path:
@@ -337,7 +353,7 @@ def emit() -> Path:
             license="CC0 1.0",
             license_url="https://creativecommons.org/publicdomain/zero/1.0/",
         )
-        for url in [*urls, FEC]:
+        for url in [*urls, FEC, SENATE]:
             cs.artifact(raw.cached(SOURCE, url), source)
         merged = ambiguous = 0
         for other, known in confirmed:
@@ -402,11 +418,53 @@ def emit() -> Path:
                 continue
             if not items[item]:
                 cs.add("external_id", entity_id=survivor, scheme="wikidata", value=item)
+                items[item].add(survivor)
                 linked += 1
             for person in people - {survivor}:
                 cs.merge(person, survivor)
                 joined += 1
         print(
             f"FEC IDs on Wikidata: {joined} people joined, {linked} given their Wikidata item, {conflicts} left apart"
+        )
+        canon = {nickname: name for name, nicknames in NICKNAMES.items() for nickname in (name, *nicknames.split())}
+        codes = {name: code for code, name in STATES.items()}
+
+        def key(text: str) -> tuple[str, str] | None:
+            words = [word for word in re.sub(r"[^a-z ]", "", text.lower()).split() if word not in SUFFIXES]
+            return (canon.get(words[0], words[0]), words[-1]) if len(words) > 1 else None
+
+        races: dict[tuple[str, int], dict[str, tuple[str, str] | None]] = defaultdict(dict)
+        for binding in json.loads(raw.cached(SOURCE, SENATE).path.read_text(encoding="utf-8"))["results"]["bindings"]:
+            place = binding.get("stateLabel", {}).get("value") or binding["eLabel"]["value"].rsplit(" in ", 1)[-1]
+            if place in codes:
+                item = binding["c"]["value"].rsplit("/", 1)[1]
+                races[(codes[place], int(binding["date"]["value"][:4]))][item] = key(binding["cLabel"]["value"])
+        found: dict[UUID, set[str]] = defaultdict(set)
+        for person, state, year, name in conn.execute(NOMINEES).fetchall():
+            wanted = key(name or "")
+            found[person] |= {
+                item for item, label in races.get((state, year), {}).items() if wanted is not None and label == wanted
+            }
+        nominees = merged_in = unique = 0
+        for person, matches in found.items():
+            if len(matches) != 1 or person in cs.survivors:
+                unique += len(matches) > 1
+                continue
+            item = next(iter(matches))
+            owners = items[item]
+            if len(owners) > 1 or any(owner in cs.survivors for owner in owners):
+                unique += 1
+                continue
+            if owners:
+                cs.merge(person, next(iter(owners)))
+                merged_in += 1
+            else:
+                cs.add("external_id", entity_id=person, scheme="wikidata", value=item)
+                items[item].add(person)
+                nominees += 1
+        print(
+            f"Senate nominees since 2000 without Wikidata: {nominees} given their item from Wikidata's candidacies, "
+            f"{merged_in} joined to the record holding it, {unique} ambiguous left apart, "
+            f"{len(found) - nominees - merged_in - unique} unmatched"
         )
         return cs.write()

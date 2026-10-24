@@ -3120,29 +3120,29 @@ export const contests = {
           paths([contest.id, contest.election, ...childIds, ...ancestorIds]),
           breadcrumbs(contest.polity, contest.election),
           db.execute<{ kind: string; body: string }>(sql`
-          select kind::text, body_md as body from note
-          where entity_id in (
-            select ${contest.id}::uuid
-            union all
-            select ${contest.election}::uuid
-            union all
-            select rs.id from result_set rs
-              where rs.contest_id = ${contest.id}::uuid and (rs.is_default or exists (
-                select from result_rollup r
-                where r.result_set_k = rs.k and r.measure = any(${COUNTED}) and not exists (
-                  select from result_set d
-                  where d.contest_id = ${contest.id}::uuid and d.is_default and exists (
-                    select from result_rollup q where q.result_set_k = d.k and q.area_k = r.area_k offset 0
+            select kind::text, body_md as body from note
+            where entity_id in (
+              select ${contest.id}::uuid
+              union all
+              select ${contest.election}::uuid
+              union all
+              select rs.id from result_set rs
+                where rs.contest_id = ${contest.id}::uuid and (rs.is_default or exists (
+                  select from result_rollup r
+                  where r.result_set_k = rs.k and r.measure = any(${COUNTED}) and not exists (
+                    select from result_set d
+                    where d.contest_id = ${contest.id}::uuid and d.is_default and exists (
+                      select from result_rollup q where q.result_set_k = d.k and q.area_k = r.area_k offset 0
+                    )
                   )
-                )
-                offset 0
-              ))
-            union all
-            select cy.id from candidacy cy join contest_option o on o.id = cy.option_id
-            where o.contest_id = ${contest.id}::uuid
-          )
-          order by array_position(array['caveat','context','methodology','editorial']::note_kind[], kind)
-        `),
+                  offset 0
+                ))
+              union all
+              select cy.id from candidacy cy join contest_option o on o.id = cy.option_id
+              where o.contest_id = ${contest.id}::uuid
+            )
+            order by array_position(array['caveat','context','methodology','editorial']::note_kind[], kind)
+          `),
           db.execute<{
             stage: string;
             status: string;
@@ -3156,13 +3156,13 @@ export const contests = {
             attribution: string | null;
             unreconciled: v.InferOutput<typeof Unreconciled> | null;
           }>(sql`
-          select rs.stage::text, rs.status::text, rs.completeness::float8 as completeness, rs.is_default,
-            s.kind::text, s.publisher, s.title, s.url, s.license, s.attribution,
-            (select f.details from flag f where f.result_set_id = rs.id and f.check_code = 'reconcile.official' limit 1) as unreconciled
-          from result_set rs join source s on s.id = rs.source_id
-          where rs.contest_id = ${contest.id}::uuid
-          order by rs.is_default desc, array_position(${STAGES}, rs.stage)
-        `),
+            select rs.stage::text, rs.status::text, rs.completeness::float8 as completeness, rs.is_default,
+              s.kind::text, s.publisher, s.title, s.url, s.license, s.attribution,
+              (select f.details from flag f where f.result_set_id = rs.id and f.check_code = 'reconcile.official' limit 1) as unreconciled
+            from result_set rs join source s on s.id = rs.source_id
+            where rs.contest_id = ${contest.id}::uuid
+            order by rs.is_default desc, array_position(${STAGES}, rs.stage)
+          `),
           db.execute<{
             key: string;
             kind: string;
@@ -3172,31 +3172,31 @@ export const contests = {
             outcome: string;
             note: string | null;
           }>(sql`
-           select o.id as key, rs.kind::text, coalesce(pm.into_id, o.party_id) as party, o.ballot_label as label,
-             (select coalesce(m.into_id, cy.person_id) from candidacy cy left join entity_merge m on m.entity_id = cy.person_id
-              where cy.option_id in (o.id, o.parent_option_id) and cy.role = 'head'
-          and not exists (select from candidacy cz where cz.option_id = cy.option_id and cz.role = 'head' and cz.id <> cy.id)
-              order by cy.option_id = o.id desc, cy.id limit 1) as person,
-             x.kind::text as outcome, x.notes as note
-           from result_set rs
-           join outcome x on x.result_set_id = rs.id and x.candidacy_id is null
-           join contest_option o on o.id = x.option_id
-           left join entity_merge pm on pm.entity_id = o.party_id
-           where ${isRoot}::boolean and rs.contest_id = ${contest.id}::uuid and rs.is_default
-             and (rs.kind <> 'counted' or not exists (select from result_rollup r where r.result_set_k = rs.k offset 0))
-           order by o.k
-        `),
+             select o.id as key, rs.kind::text, coalesce(pm.into_id, o.party_id) as party, o.ballot_label as label,
+               (select coalesce(m.into_id, cy.person_id) from candidacy cy left join entity_merge m on m.entity_id = cy.person_id
+                where cy.option_id in (o.id, o.parent_option_id) and cy.role = 'head'
+            and not exists (select from candidacy cz where cz.option_id = cy.option_id and cz.role = 'head' and cz.id <> cy.id)
+                order by cy.option_id = o.id desc, cy.id limit 1) as person,
+               x.kind::text as outcome, x.notes as note
+             from result_set rs
+             join outcome x on x.result_set_id = rs.id and x.candidacy_id is null
+             join contest_option o on o.id = x.option_id
+             left join entity_merge pm on pm.entity_id = o.party_id
+             where ${isRoot}::boolean and rs.contest_id = ${contest.id}::uuid and rs.is_default
+               and (rs.kind <> 'counted' or not exists (select from result_rollup r where r.result_set_k = rs.k offset 0))
+             order by o.k
+          `),
           db.execute<{
             kind: "text" | "summary" | "link";
             body: string | null;
             url: string | null;
             publisher: string;
           }>(sql`
-          select distinct on (t.kind) t.kind::text, t.body, coalesce(t.url, s.url) as url, s.publisher
-          from ballot_question_text t join source s on s.id = t.source_id
-          where ${isRoot}::boolean and t.contest_id = ${contest.id}::uuid
-          order by t.kind, t.lang = 'en' desc, s.kind = 'official_body' desc, s.kind = 'community', t.id
-        `),
+            select distinct on (t.kind) t.kind::text, t.body, coalesce(t.url, s.url) as url, s.publisher
+            from ballot_question_text t join source s on s.id = t.source_id
+            where ${isRoot}::boolean and t.contest_id = ${contest.id}::uuid
+            order by t.kind, t.lang = 'en' desc, s.kind = 'official_body' desc, s.kind = 'community', t.id
+          `),
         ]);
       const declaredParties = [
         ...new Set(
@@ -11687,8 +11687,8 @@ export const people = {
         )
         select coalesce(pm.into_id, x.party) as party, x.start::text as start, x.stop::text as stop from (
           select m.party_id as party, m.valid_from as start, m.valid_to as stop, 0 as rank
-          from person_party_membership m join party k on k.id = m.party_id and k.kind <> 'caucus'
-          where m.person_id in (select id from ids)
+          from person_party_membership m left join party k on k.id = m.party_id
+          where m.person_id in (select id from ids) and k.kind is distinct from 'caucus'
           union all
           select a.party_id, coalesce(lower(a.valid), t.from_date), coalesce(upper(a.valid), t.to_date), 1
           from tenure t join tenure_affiliation a on a.tenure_id = t.id and a.kind = 'party'
@@ -11830,7 +11830,7 @@ export const people = {
           select coalesce(bm.into_id, br.parent_party_id, pm.into_id, x.party) as party, x.kind, x.from, x.to from (
             select m.party_id as party, case when k.kind = 'caucus' then 'group' else 'member' end as kind,
               m.valid_from::text as from, m.valid_to::text as to
-            from person_party_membership m join party k on k.id = m.party_id
+            from person_party_membership m left join party k on k.id = m.party_id
             where m.person_id in (select id from ids)
             union all
             select a.party_id, case when a.kind = 'party' then 'office' else 'group' end,

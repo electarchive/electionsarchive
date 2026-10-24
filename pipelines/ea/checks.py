@@ -1,5 +1,5 @@
 import json
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import LiteralString
 from uuid import UUID
 
@@ -52,6 +52,7 @@ class Stage:
     parents: dict[str, str]
     owners: dict[str, str]
     replaces: dict[str, list[str]]
+    nullable: dict[str, set[str]] = field(default_factory=dict)
 
     def __post_init__(self) -> None:
         if unknown := sorted(set(self.replaces) - set(REPLACEABLE)):
@@ -70,14 +71,19 @@ class Stage:
                and not exists (select 1 from {staged} x where {same})"""
         ).format(
             keys=sql.SQL(" and ").join(
-                sql.SQL("p.{0} = s.{0}").format(sql.Identifier(key)) for key in self.temporal[table]
+                sql.SQL(
+                    "p.{0} is not distinct from s.{0}" if key in self.nullable.get(table, set()) else "p.{0} = s.{0}"
+                ).format(sql.Identifier(key))
+                for key in self.temporal[table]
             ),
             start=sql.SQL("s.valid_from" if "valid_from" in columns else "null::date"),
             to=sql.SQL("s.valid_to" if "valid_to" in columns else "null::date"),
             staged=self.staged(table),
             same=sql.SQL(" and ").join(
                 sql.SQL(
-                    "x.{0} = p.{0}" if column in self.temporal[table] else "x.{0} is not distinct from p.{0}"
+                    "x.{0} = p.{0}"
+                    if column in self.temporal[table] and column not in self.nullable.get(table, set())
+                    else "x.{0} is not distinct from p.{0}"
                 ).format(sql.Identifier(column))
                 for column in columns
             ),
