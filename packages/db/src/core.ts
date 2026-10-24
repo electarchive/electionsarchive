@@ -178,8 +178,9 @@ export const areaUniverse = pgTable("area_universe", {
 	resultSetId: uuid("result_set_id").references(() => resultSet.id),
 	changesetId: uuid("changeset_id").notNull().references(() => changeset.id),
 	recordedFrom: timestamp("recorded_from", { withTimezone: true }).default(sql`now()`).notNull(),
+	shaped: boolean().notNull(),
 }, (table) => [
-	primaryKey({ columns: [table.areaId, table.valid], name: "area_universe_pkey"}),
+	primaryKey({ columns: [table.areaId, table.shaped, table.valid], name: "area_universe_pkey"}),
 check("area_universe_check", sql`((method = 'city_universe'::unit_area_method) = (result_set_id IS NOT NULL))`),check("area_universe_expected_check", sql`(expected > 0)`),]);
 
 export const ballotQuestion = pgTable("ballot_question", {

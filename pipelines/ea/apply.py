@@ -932,13 +932,18 @@ def _rollup(
                 and not exists (select from climbed r where r.result_set_k = rs.k and r.area_id = rs.district_area_id)
             ),
             coverage as (
-              select r.result_set_k, r.area_id, au.expected,
-                     count(distinct case when own.scheme_code = ru.scheme_code then own.id::text else r.unit_k::text end)::int as reporting
-              from reached r join rs on rs.k = r.result_set_k
-              join area_universe au on au.area_id = r.area_id and au.valid @> rs.on_date
-              join reporting_unit ru on ru.k = r.unit_k and ru.scheme_code = 'us.precinct'
-              left join area own on own.id = ru.area_id
-              group by r.result_set_k, r.area_id, au.expected
+              select m.result_set_k, m.area_id, au.expected, greatest(m.shaped, m.shapeless) as reporting
+              from (
+                select r.result_set_k, r.area_id, rs.on_date,
+                       count(distinct own.id) filter (where own.scheme_code = ru.scheme_code)::int as shaped,
+                       count(distinct r.unit_k) filter (where own.scheme_code is distinct from ru.scheme_code)::int as shapeless
+                from reached r join rs on rs.k = r.result_set_k
+                join reporting_unit ru on ru.k = r.unit_k and ru.scheme_code = 'us.precinct'
+                left join area own on own.id = ru.area_id
+                where exists (select from area_universe u where u.area_id = r.area_id and u.valid @> rs.on_date)
+                group by r.result_set_k, r.area_id, rs.on_date
+              ) m
+              join area_universe au on au.area_id = m.area_id and au.valid @> m.on_date and au.shaped = (m.shaped >= m.shapeless)
             ),
             covered as (
               insert into rollup_coverage (result_set_k, area_k, reporting, expected)

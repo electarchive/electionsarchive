@@ -448,36 +448,47 @@ def emit() -> Path:
                             candidates.append((sizes[method], method, keys, f"{system} {pipeline}"))
                     if not candidates:
                         continue
-                    expected, method, keys, system = max(
-                        candidates, key=lambda candidate: (len(candidate[2]), candidate[0])
-                    )
-                    for other in candidates:
-                        if other[3] != system:
-                            log.write(
-                                f"{city}\t{day}\tskipped\t{other[3]}\t{other[1]} {other[0]} against {system} {method} {expected}\n"
-                            )
-                    placed = {key: other[1] for other in candidates for key in other[2] if other[3][0] == system[0]}
-                    for unit, code, start, end, key, _, label, pipeline in rows:
-                        if key in placed and (unit, areas[geoid]) not in owned:
-                            memberships.append((unit, areas[geoid], start, end, placed[key]))
-                    if expected == 0:
-                        continue
-                    chosen[method] += 1
-                    universes += 1
-                    cs.add(
-                        "area_universe",
-                        area_id=areas[geoid],
-                        valid_from=day,
-                        valid_to=day + timedelta(days=1),
-                        expected=expected,
-                        method=method,
-                        source_id=own[1]
-                        if method == "city_universe" and own
-                        else tiger_source
-                        if method == "shape_contained"
-                        else None,
-                        result_set_id=own[0] if method == "city_universe" and own else None,
-                    )
+                    for letter in ("a", "u"):
+                        mine = [candidate for candidate in candidates if candidate[3][0] == letter]
+                        if not mine:
+                            continue
+                        expected, method, keys, system = max(
+                            mine,
+                            key=lambda candidate: (
+                                len(candidate[2]),
+                                candidate[0],
+                                ("shape_contained", "source_code", "city_universe").index(candidate[1]),
+                                candidate[3],
+                            ),
+                        )
+                        for other in mine:
+                            if other[3] != system:
+                                log.write(
+                                    f"{city}\t{day}\tskipped\t{other[3]}\t{other[1]} {other[0]} against {system} {method} {expected}\n"
+                                )
+                        placed = {key: other[1] for other in mine for key in other[2]}
+                        for unit, code, start, end, key, _, label, pipeline in rows:
+                            if key in placed and (unit, areas[geoid]) not in owned:
+                                memberships.append((unit, areas[geoid], start, end, placed[key]))
+                        if expected == 0:
+                            continue
+                        chosen[method] += 1
+                        universes += 1
+                        cs.add(
+                            "area_universe",
+                            area_id=areas[geoid],
+                            valid_from=day,
+                            valid_to=day + timedelta(days=1),
+                            expected=expected,
+                            method=method,
+                            shaped=letter == "a",
+                            source_id=own[1]
+                            if method == "city_universe" and own
+                            else tiger_source
+                            if method == "shape_contained"
+                            else None,
+                            result_set_id=own[0] if method == "city_universe" and own else None,
+                        )
         kept = {(unit, area) for unit, area, *_ in memberships}
         stale = [
             pair
