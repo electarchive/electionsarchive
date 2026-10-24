@@ -20,13 +20,9 @@ DEMOTED = {
     (1920, "FL"),
     (1928, "ID"),
     (1940, "TX"),
-    (1956, "GA"),
-    (1960, "WY"),
-    (1964, "NH"),
-    (1968, "CA"),
-    (1972, "FL"),
-    (1976, "VT"),
 }
+TIED = {(1956, "GA"), (1960, "WY"), (1964, "NH"), (1968, "CA"), (1972, "FL"), (1976, "VT")}
+CORRECTED = {(1972, "FL", "Democratic"): 718117}
 ALIASES = {
     "democrat": "democratic",
     "prohibitionist": "prohibition",
@@ -130,6 +126,8 @@ def emit() -> Path:
                 continue
             rs, _, election, contest, stage, kind, source, completeness, _ = old[(year, state)]
             rows = group.sort("page", "line").to_dicts()
+            for row in rows:
+                row["votes"] = CORRECTED.get((year, state, row["label"]), row["votes"])
             tag = f"{year} {state}"
             if (year, state) in DEMOTED:
                 cs.add(
@@ -314,6 +312,22 @@ def emit() -> Path:
                 completeness=1,
             )
             cs.add("note", entity_id=result_set, kind="methodology", body_md=NOTE)
+            if (year, state) in TIED:
+                cs.add(
+                    "note",
+                    entity_id=result_set,
+                    kind="methodology",
+                    body_md=(
+                        "The book's own recapitulation table prints a state total that equals the sum of these lines, "
+                        "so the set is kept although a top candidate differs from Wikipedia's figure by more than 1%."
+                        + (
+                            " The headline line prints the Democratic vote as 2,718,117; the recapitulation prints "
+                            "718,117 and its total of 2,583,283 requires that figure, so 718,117 is stored."
+                            if (year, state) == (1972, "FL")
+                            else ""
+                        )
+                    ),
+                )
             cells: dict[UUID, int] = {ids[index]: row["votes"] for index, row in enumerate(taken)}
             if scatter:
                 cells[others] = scatter
