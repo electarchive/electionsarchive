@@ -1,0 +1,38 @@
+{
+ "kind": "statewide",
+ "year": 1998,
+ "day": "1998-11-03",
+ "polity": "US-IN",
+ "publisher": "Indiana Secretary of State",
+ "title": "Election report of Indiana 1998 (general election statistics), scanned by the Indiana State Library",
+ "license": "Public record",
+ "file": {
+  "url": "https://indianamemory.contentdm.oclc.org/iiif/2/p16066coll37:{page}/full/1500,/0/default.jpg",
+  "item": "https://indianamemory.contentdm.oclc.org/digital/collection/p16066coll37/id/3184"
+ },
+ "raw_source": "us.scans",
+ "create": true,
+ "offices": {
+  "secretary-of-state": "Secretary of State",
+  "auditor": "Auditor of State",
+  "treasurer": "Treasurer of State",
+  "clerk-of-the-supreme-court": "Clerk of the Supreme and Appellate Courts"
+ },
+ "office_status": {
+  "secretary-of-state": "exists",
+  "auditor": "exists",
+  "treasurer": "exists",
+  "clerk-of-the-supreme-court": "exists"
+ },
+ "leaves": [
+  3135,
+  3136,
+  3137,
+  3138,
+  3139,
+  3140,
+  3141,
+  3142
+ ],
+ "note": "Leaves are ContentDM item ids (report pages 42 to 49): Secretary of State 3135 to 3136, Auditor of State 3137 to 3138, Treasurer of State 3139 to 3140, Clerk of the Supreme Court 3141 to 3142 (each office is two pages with the TOTALS row on the second). Item 3184 is the 1998 compound report; per-page OCR is at /digital/api/collections/p16066coll37/items/{id}/false and its column blocks need vision with the printed TOTALS as the check. All four office slugs exist as `us.office` ids `{slug}:IN`."
+}
