@@ -40,6 +40,12 @@ PARTIES = {
 }
 INDEPENDENT = {"independent", "nonpartisan", "none", "no party", "scattering", "write-in", "write-ins"}
 
+SPLITS = {
+    ("1970-11-03:OH:secretary-of-state", "John F. Kennedy"): (
+        "Ohio's 1970 Democratic nominee for secretary of state, not the president, who died in 1963"
+    ),
+}
+
 
 def sources() -> pl.DataFrame:
     return pl.read_csv(FOLDER / "sources.tsv", separator="\t", schema_overrides={"page_offset": pl.Int64}).with_columns(
@@ -367,7 +373,7 @@ def emit(
                     if abs(seen - year) <= 16 and deaths.get(person, day) >= day
                 }
                 person = prior.get((key, candidate))
-                if person is not None and deaths.get(person, day) < day:
+                if person is not None and (deaths.get(person, day) < day or (key, candidate) in SPLITS):
                     split = cs.key(f"{pipeline}.person", f"{state}:{slug(candidate)}:{year}")
                     cs.renamed[str(split)] = str(person)
                     person = split
