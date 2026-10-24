@@ -339,6 +339,14 @@ PLANS: dict[str, list[tuple[int, int | None, str, str, str, str]]] = {
     ],
     "0644000": [
         (
+            2003,
+            2013,
+            "arcgis:https://maps.lacity.org/lahub/rest/services/Boundaries/MapServer/14",
+            "DISTRICT",
+            "la",
+            "Previous Council Districts (Adopted 2003)",
+        ),
+        (
             2013,
             2022,
             "arcgis:https://dpw.gis.lacounty.gov/dpw/rest/services/GIS_Web_Services/MapServer/84",
@@ -1694,12 +1702,12 @@ def emit() -> Path:
                  from contest ct join election e on e.id = ct.election_id
                  join entity n on n.id = ct.id join changeset s on s.id = n.changeset_id
                  where s.pipeline = 'us.alged' and not exists (select from entity_merge m where m.entity_id = ct.id)
-                   and ct.body_id in (select entity_id from name where text in (%(county)s, %(city)s)))
+                   and ct.body_id in (select entity_id from external_id where scheme = 'us.body' and value in (%(county)s, %(city)s)))
                select d.id, s.id, d.election_id, s.election_id from c d
                join c s on s.date_from = d.date_from and s.district_area_id = d.district_area_id and s.kind = d.kind
-               where d.body_id in (select entity_id from name where text = %(county)s)
-                 and s.body_id in (select entity_id from name where text = %(city)s)""",
-            {"county": "San Francisco County Board of Supervisors", "city": "San Francisco City Council"},
+               where d.body_id in (select entity_id from external_id where scheme = 'us.body' and value = %(county)s)
+                 and s.body_id in (select entity_id from external_id where scheme = 'us.body' and value = %(city)s)""",
+            {"county": "CA:06075:board-of-supervisors", "city": "CA:0667000:council"},
         ).fetchall()
         doubled = {id for row in pairs for id in row[:2]}
         if len(doubled) != 2 * len(pairs):
@@ -1896,6 +1904,52 @@ def emit() -> Path:
             if live is not None and live[0] is not None and set(live[0]) <= doubled:
                 cs.merge(election, into)
                 elections += 1
+        board = cs.key("us.body", "CA:0667000:council")
+        cs.merge(cs.key("us.body", "CA:06075:board-of-supervisors"), board)
+        found = conn.execute("select id, text from name where entity_id = %s and is_preferred", [board]).fetchone()
+        if found is not None and found[1] != "San Francisco Board of Supervisors":
+            cs.add(
+                "name_drop",
+                name_id=found[0],
+                entity_id=board,
+                text=found[1],
+                reason="ALGED's name for the board; San Francisco's legislature is the Board of Supervisors",
+            )
+        cs.add(
+            "name",
+            entity_id=board,
+            text="San Francisco Board of Supervisors",
+            lang="en",
+            kind="official",
+            is_preferred=True,
+        )
+        for entity, name_id, text in conn.execute(
+            """select n.entity_id, n.id, n.text from name n join contest c on c.id = n.entity_id
+               join external_id x on x.entity_id = c.body_id and x.scheme = 'us.body'
+               join changeset h on h.id = n.changeset_id and h.pipeline in ('us.alged', 'us.wards')
+               where n.is_preferred and x.value in ('CA:0667000:council', 'CA:06075:board-of-supervisors')
+                 and n.text ~ 'San Francisco (City Council|County Board of Supervisors|Board of Supervisors)'"""
+        ).fetchall():
+            if "Board of Supervisors" not in text or "County" in text:
+                cs.add(
+                    "name_drop",
+                    name_id=name_id,
+                    entity_id=entity,
+                    text=text,
+                    reason="ALGED's name for the board; San Francisco's legislature is the Board of Supervisors",
+                )
+            cs.add(
+                "name",
+                entity_id=entity,
+                text=re.sub(
+                    "San Francisco (City Council|County Board of Supervisors)",
+                    "San Francisco Board of Supervisors",
+                    text,
+                ),
+                lang="en",
+                kind="official",
+                is_preferred=True,
+            )
         print(
             f"{len(pairs)} San Francisco supervisor contests merged, {republished} county sets republished,"
             f" {people} people and {elections} elections merged"
