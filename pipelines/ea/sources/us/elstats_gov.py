@@ -112,9 +112,12 @@ LEGISLATURE = (
 )
 
 
-def url(state: str) -> str:
+WINDOWS = {"ID": [(1700, 1989), (1990, 1994), (1995, 1999), (2000, 2004), (2005, 2009), (2010, 2014), (2015, 2019), (2020, 2026)]}
+
+
+def url(state: str, years: tuple[int, int] = (1700, 2026)) -> str:
     search = {
-        "global": {"years": {"from": 1700, "to": 2026}},
+        "global": {"years": {"from": years[0], "to": years[1]}},
         "ballotQuestions": {"text": "", "types": [], "number": "", "divisions": []},
         "contests": {"candidates": [], "divisions": [], "offices": [{"id": OFFICES[state]}]},
         "specialElectionsOnly": False,
@@ -127,7 +130,8 @@ def url(state: str) -> str:
 def fetch() -> None:
     raw.fetch(SOURCE, GAZETTEER, suffix=".zip")
     for state in OFFICES:
-        raw.fetch(SOURCE, url(state), suffix=".csv")
+        for years in WINDOWS.get(state, [(1700, 2026)]):
+            raw.fetch(SOURCE, url(state, years), suffix=".csv")
     for _, _, link, _ in CITED.values():
         raw.fetch(SOURCE, link, suffix=".json")
 
@@ -171,7 +175,13 @@ def parse() -> None:
     for state, office in OFFICES.items():
         division = pl.col("division_name").fill_null("").str.replace(r"\s*\(.*\)$", "")
         frames.append(
-            pl.read_csv(raw.cached(SOURCE, url(state)).path, infer_schema=False)
+            pl.concat(
+                [
+                    pl.read_csv(raw.cached(SOURCE, url(state, years)).path, infer_schema=False)
+                    for years in WINDOWS.get(state, [(1700, 2026)])
+                ],
+                how="diagonal_relaxed",
+            )
             .filter(
                 (pl.col("office_name") == "Governor")
                 & (pl.col("office_id") == str(office))
@@ -344,7 +354,8 @@ def emit() -> Path:
                 url=site,
                 license=HELD.get(state, "Public record"),
             )
-            cs.artifact(raw.cached(SOURCE, url(state)), sources[state])
+            for years in WINDOWS.get(state, [(1700, 2026)]):
+                cs.artifact(raw.cached(SOURCE, url(state, years)), sources[state])
         cited: dict[tuple[str, date], UUID] = {}
         for place, (publisher, title, link, _) in CITED.items():
             cited[place] = cs.source(publisher, title)
