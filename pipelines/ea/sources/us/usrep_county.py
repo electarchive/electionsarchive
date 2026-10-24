@@ -21,6 +21,7 @@ def emit(
     frame: pl.DataFrame,
     artifacts: Iterable[Artifact],
     note_for: Callable[[str], str],
+    official: bool = False,
 ) -> Path:
     with connect() as conn:
         cs = Changeset(conn, pipeline=source_name, version=version, summary=summary, polity="US")
@@ -124,7 +125,8 @@ def emit(
             ]
             print(key, "ties" if ties else f"differs {differences}")
             result_set = cs.key(f"{source_name}.result_set", key)
-            if ties:
+            default = ties or official
+            if default:
                 cs.add(
                     "result_set",
                     **dict(
@@ -156,19 +158,19 @@ def emit(
                 kind="counted",
                 status="active",
                 source_id=source,
-                is_default=ties,
-                supersedes_id=row[0] if ties else None,
+                is_default=default,
+                supersedes_id=row[0] if default else None,
                 completeness=1,
             )
             note = note_for(key)
             if not ties:
                 note += (
-                    f" It differs from the default result set by {', '.join(differences)} votes."
+                    f" It differs from the Federal Election Commission's compilation by {', '.join(differences)} votes."
                     if differences
                     else " Every option printed here ties the default result set, which also holds an option this source does not print."
                 )
             cs.add("note", entity_id=result_set, kind="methodology", body_md=note)
-            if ties:
+            if default:
                 for option, kind, seats in conn.execute(
                     "select option_id, kind, seats from outcome where result_set_id = %s", [row[0]]
                 ).fetchall():

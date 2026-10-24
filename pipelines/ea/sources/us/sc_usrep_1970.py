@@ -15,13 +15,15 @@ BOOK_SOURCE = "us.sc_report"
 VERSION = "1"
 PARSED = DATA / "parsed" / SOURCE
 PUBLISHER = "South Carolina State Election Commission"
-TITLE = "1969-1973 Election Report"
+TITLE = "Election Report"
 LANDING = "https://scvotes.gov/election-results/"
-URL = "https://scvotes.gov/wp-content/uploads/2022/08/Election_Report_1969-1973.pdf"
-DAY = date(1970, 11, 3)
+URL = "https://scvotes.gov/wp-content/uploads/2022/08/Election_Report_{}.pdf"
+BOOKS = {1970: "1969-1973", 1978: "1978-1979"}
+DAYS = {1970: date(1970, 11, 3), 1978: date(1978, 11, 7)}
 METHOD = (
-    "County totals are keyed from page 306 (printed page 299) of the State Election Commission's 1969-1973 election "
-    "report, read from the page image. Each candidate's county sum equals the district total printed in the report."
+    "County totals are keyed from the district tables of the State Election Commission's election report (page 306 of "
+    "the 1969-1973 book; pages 59 to 61 of the 1978-1979 book), read from the page images. Each candidate's county sum "
+    "equals the district total printed in the report."
 )
 
 
@@ -36,29 +38,30 @@ def parse() -> None:
         }
     rows = []
     with (Path(__file__).parent / "sc_usrep_1970.tsv").open() as handle:
-        for _, district, candidate, cells in csv.reader(handle, delimiter="\t"):
+        for year, district, candidate, cells in csv.reader(handle, delimiter="\t"):
             for cell in cells.split(", "):
                 name, votes = cell.rsplit(" ", 1)
                 key = re.sub(r"[^a-z]", "", name.lower())
                 key = key if key in counties else difflib.get_close_matches(key, counties, 1, 0.7)[0]
-                rows.append((str(DAY), int(district), counties[key], candidate, int(votes)))
+                rows.append((str(DAYS[int(year)]), int(district), counties[key], candidate, int(votes)))
     PARSED.mkdir(parents=True, exist_ok=True)
     frame = pl.DataFrame(rows, schema=["day", "district", "county", "column", "votes"], orient="row")
     frame.write_parquet(PARSED / "lines.parquet")
-    print(frame.group_by("district").agg(pl.col("county").n_unique(), pl.col("votes").sum()).sort("district"))
+    print(frame.group_by("day", "district").agg(pl.col("county").n_unique(), pl.col("votes").sum()).sort("day", "district"))
 
 
 def emit() -> Path:
     return usrep_county.emit(
         SOURCE,
         VERSION,
-        "South Carolina's U.S. House general election of 1970 by county from the State Election Commission's report",
+        "South Carolina's U.S. House general elections of 1970 and 1978 by county from the State Election Commission's report",
         PUBLISHER,
         TITLE,
         LANDING,
         "SC",
         "45",
         pl.read_parquet(PARSED / "lines.parquet"),
-        [raw.cached(BOOK_SOURCE, URL)],
+        [raw.cached(BOOK_SOURCE, URL.format(book)) for book in BOOKS.values()],
         lambda key: METHOD,
+        official=True,
     )
