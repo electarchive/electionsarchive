@@ -1,8 +1,9 @@
+import os
 import re
 from collections import defaultdict
 from datetime import timedelta
 from pathlib import Path
-from uuid import UUID
+from uuid import UUID, uuid5
 
 import httpx
 import polars as pl
@@ -15,7 +16,7 @@ from ea.sources.us.medsl_precincts import METHOD
 from ea.store import DATA, connect
 
 SOURCE = "us.medsl_state_precincts"
-VERSION = "5"
+VERSION = "6"
 PARSED = DATA / "parsed" / SOURCE
 STATEWIDE = raw.parsed("us.medsl_statewide")
 STATES_2022 = {
@@ -169,6 +170,9 @@ POOLS = {"write-ins", "all-others", "scattering", "scatter", "others", "misc", "
 BODIES = r"(house|senate|assembly|house-of-delegates|general-assembly|legislature)"
 
 
+WITHDRAWN = "Withdrawn: these returns are for separate county offices that the source filed under one statewide title."
+
+
 def fetch() -> None:
     medsl_state.fetch()
     for year, (source, url) in ((year, file) for year, files in FILES.items() for file in files):
@@ -292,11 +296,18 @@ def parse() -> None:
 
 
 def emit() -> Path:
+    scope = os.environ.get("MEDSL_STATE")
+    wanted = pl.lit(True) if scope is None else pl.col("state") == scope
     mapped = pl.read_parquet(STATEWIDE / "contests.parquet")
     returns = pl.concat(
         [
-            pl.read_parquet(PARSED / "returns.parquet").with_columns(mapped=pl.lit(None, pl.String)),
-            pl.read_parquet(STATEWIDE / "returns.parquet")
+            pl.scan_parquet(PARSED / "returns.parquet")
+            .filter(wanted)
+            .collect()
+            .with_columns(mapped=pl.lit(None, pl.String)),
+            pl.scan_parquet(STATEWIDE / "returns.parquet")
+            .filter(wanted)
+            .collect()
             .join(mapped, on=["year", "state", "title", "post", "special"], nulls_equal=True)
             .select(
                 "year",
@@ -379,6 +390,8 @@ def emit() -> Path:
             "Science Lab",
             polity="US",
         )
+        if scope is not None:
+            cs.scope_units("us.precinct", f"____:{scope}:%")
         codes: dict[str, set[str]] = defaultdict(set)
         for scheme, code in conn.execute(
             "select a.scheme_code, c.code from area a join area_code c on c.area_id = a.id"
@@ -451,6 +464,7 @@ def emit() -> Path:
         values: list[pl.DataFrame] = []
         result_sets: list[UUID] = []
         taken: set[str] = set()
+        seen: set[str] = set()
         for (year, day, state, office, seat, special, statewide), lines in returns.group_by(
             "year", "day", "state", "office", "seat", "special", "mapped", maintain_order=True
         ):
@@ -501,6 +515,7 @@ def emit() -> Path:
                     ),
                     key,
                 )
+            seen.add(key)
             if key not in contests or key in taken:
                 print(f"{key}: no contest ({office} {seat}), {total} skipped")
                 continue
@@ -683,6 +698,7 @@ def emit() -> Path:
                 published[2] == counted
                 and ((year, state) not in MISFILED or published[6] == listed)
                 or (year, state) not in MISFILED
+                and (statewide is None or published[2] == counted)
                 and not {county for _, county in voted} - published[3]
                 and not published[4] - {code for code, _ in voted}
             ):
@@ -771,7 +787,17 @@ def emit() -> Path:
                 .group_by("result_set_id", "unit_id", "option_id", "channel", "measure", "count_round", "flags")
                 .agg(pl.col("value").sum())
             )
-        frame = pl.concat(values)
+        frame = (
+            pl.concat(values)
+            if values
+            else pl.DataFrame(
+                schema={
+                    **dict.fromkeys(("result_set_id", "unit_id", "option_id"), pl.String),
+                    **dict.fromkeys(("channel", "measure", "count_round", "flags"), pl.Int16),
+                    "value": pl.Int64,
+                }
+            )
+        )
         shaped: dict[str, str] = {
             code: str(area)
             for code, area in conn.execute(
@@ -788,7 +814,10 @@ def emit() -> Path:
         used = set(frame["unit_id"].unique())
         units = (
             pl.concat(
-                [pl.read_parquet(PARSED / "units.parquet"), pl.read_parquet(STATEWIDE / "units.parquet")],
+                [
+                    pl.scan_parquet(PARSED / "units.parquet").filter(wanted).collect(),
+                    pl.scan_parquet(STATEWIDE / "units.parquet").filter(wanted).collect(),
+                ],
                 how="vertical_relaxed",
             )
             .group_by("code")
@@ -822,6 +851,18 @@ def emit() -> Path:
             ),
         )
         cs.frame("result_value", frame)
+        columns = ("id", "election_id", "contest_id", "stage", "kind", "source_id", "supersedes_id", "completeness")
+        vanished = [
+            published[0]
+            for key, published in own.items()
+            if key not in seen and key[:10] in days and (scope is None or key.split(":")[1] == scope)
+        ]
+        print("withdrawn:", sorted(key for key in own if own[key][0] in vanished))
+        for row in conn.execute(
+            f"select {', '.join(columns)} from result_set where id = any(%s)", [vanished]
+        ).fetchall():
+            cs.add("result_set", **dict(zip(columns, row, strict=True)), status="withdrawn", is_default=False)
+            cs.add("note", id=uuid5(row[0], "withdrawn"), entity_id=row[0], kind="caveat", body_md=WITHDRAWN)
         for result_set in result_sets:
             cs.add(
                 "note",

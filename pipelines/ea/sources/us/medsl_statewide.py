@@ -1,3 +1,4 @@
+import os
 import re
 from collections import defaultdict
 from collections.abc import Callable
@@ -10,11 +11,11 @@ import polars as pl
 from ea import names, raw
 from ea.changeset import Changeset, slug
 from ea.sources.us import medsl, medsl_state
-from ea.sources.us.medsl_state_precincts import FILES, TITLES
+from ea.sources.us.medsl_state_precincts import FILES, STATES_2022, TITLES
 from ea.store import DATA, connect
 
 SOURCE = "us.medsl_statewide"
-VERSION = "1"
+VERSION = "2"
 PARSED = DATA / "parsed" / SOURCE
 TAIL = (
     r"(?:,? -? ?(?P<seat>(?:PLACE|POSITION|SEAT|DEPT\.|DEPARTMENT|COURT|- JUSTICE POSITION) (?:NO\. )?#?\w+|#\d+|\d+|\([A-Z]+\)"
@@ -161,13 +162,26 @@ CLOSE = (
 MISSING = "MEDSL's file has no rows for {counties} in this race, so those votes are missing from these totals."
 
 
+WITHDRAWN = "Withdrawn: these returns are for separate county offices that the source filed under one statewide title."
+RETIRED = "A county office filed under a statewide title in MEDSL's returns; the county races are held elsewhere."
+
+
 def parse() -> None:
+    scope = {
+        (int(year), state)
+        for year, state in (item.split(":") for item in os.environ.get("MEDSL_SCOPE", "").split(",") if item)
+    }
     frame = (
         pl.concat(
             [
                 medsl.precincts({("statewide", year): raw.cached(source, url).path})
                 for year, files in FILES.items()
                 for source, url in files
+                if not scope
+                or year != 2022
+                and any(year == chosen for chosen, _ in scope)
+                or year == 2022
+                and any(STATES_2022[state] in url for chosen, state in scope if chosen == 2022)
             ],
             how="diagonal_relaxed",
         )
@@ -191,6 +205,12 @@ def parse() -> None:
         .with_columns(party=pl.when(pl.col("party") != "").then("party"))
         .filter(~pl.col("candidate").str.contains(PSEUDO), ~pl.col("candidate").is_in(list(medsl_state.DROPPED)))
     )
+    if scope:
+        frame = frame.filter(
+            pl.struct("year", "state").map_elements(
+                lambda row: (row["year"], row["state"]) in scope, return_dtype=pl.Boolean
+            )
+        )
     race = ["year", "state", "office", "seat"]
     recounted = frame.filter(pl.col("stage") == "GEN RECOUNT").select(*race).unique()
     frame = pl.concat(
@@ -199,6 +219,17 @@ def parse() -> None:
             frame.filter(pl.col("stage") == "GEN RECOUNT"),
         ]
     )
+    spread = (
+        frame.select(*race, "candidate", "county", "writein", "votes")
+        .filter(pl.col("county").is_not_null(), ~pl.col("writein"), pl.col("votes").cast(pl.Int64, strict=False) > 0)
+        .group_by(*race, "candidate")
+        .agg(pl.col("county").n_unique().alias("spread"), pl.col("county").first())
+        .group_by(*race)
+        .agg(pl.col("spread").max(), pl.col("county").n_unique().alias("counties"))
+    )
+    local = spread.filter((pl.col("spread") == 1) & (pl.col("counties") > 1)).select(*race)
+    print("county races filed under a statewide office:", local.sort(race).rows())
+    frame = frame.join(local, on=race, how="anti", nulls_equal=True)
     counties = (
         frame.filter(pl.col("county").is_not_null())
         .group_by("year", "state")
@@ -225,7 +256,7 @@ def parse() -> None:
                 named.append((office, seat, title, post))
                 break
     frame = frame.join(
-        pl.DataFrame(named, schema=["office", "seat", "title", "post"], orient="row"),
+        pl.DataFrame(named, schema=dict.fromkeys(["office", "seat", "title", "post"], pl.String), orient="row"),
         on=["office", "seat"],
         nulls_equal=True,
     ).filter(~pl.col("post").fill_null("").str.starts_with("WARD"))
@@ -286,22 +317,38 @@ def parse() -> None:
         )
     )
     PARSED.mkdir(parents=True, exist_ok=True)
-    frame.filter(pl.col("kind") == "precinct").group_by("code").agg(
-        pl.col("state").first(), pl.col("fips").first().alias("county"), pl.col("day").min()
-    ).sort("code").write_parquet(PARSED / "units.parquet")
-    frame.group_by(
-        *contest,
-        "magnitude",
-        "kind",
-        "code",
-        "county",
-        "candidate",
-        "party",
-        "writein",
-        "measure",
-        maintain_order=True,
-    ).agg(pl.col("votes").sum()).write_parquet(PARSED / "returns.parquet")
-    races.select(*contest, "magnitude", "present", "counties").write_parquet(PARSED / "races.parquet")
+    outputs = {
+        "units": frame.filter(pl.col("kind") == "precinct")
+        .group_by("code")
+        .agg(pl.col("state").first(), pl.col("fips").first().alias("county"), pl.col("day").min()),
+        "returns": frame.group_by(
+            *contest,
+            "magnitude",
+            "kind",
+            "code",
+            "county",
+            "candidate",
+            "party",
+            "writein",
+            "measure",
+            maintain_order=True,
+        ).agg(pl.col("votes").sum()),
+        "races": races.select(*contest, "magnitude", "present", "counties"),
+    }
+    for name, output in outputs.items():
+        if scope:
+            kept = pl.read_parquet(PARSED / f"{name}.parquet")
+            output = pl.concat(
+                [
+                    kept.filter(
+                        pl.struct(
+                            pl.col("day").dt.year() if name == "units" else pl.col("year"), pl.col("state")
+                        ).map_elements(lambda row: tuple(row.values()) not in scope, return_dtype=pl.Boolean)
+                    ),
+                    output.select(kept.columns).cast(kept.schema),
+                ]
+            )
+        (output.sort("code") if name == "units" else output).write_parquet(PARSED / f"{name}.parquet")
     print(races.group_by("year").len().sort("year"))
 
 
@@ -376,7 +423,14 @@ def emit(
             ).fetchall()
         )
         own: dict[str, tuple[UUID, UUID, UUID, UUID, UUID | None, int]] = {
-            next((key.replace(old, new, 1) for new, old in renamed.items() if key.startswith(old)), key): (result_set, election, contest, source, supersedes, int(total))
+            next((key.replace(old, new, 1) for new, old in renamed.items() if key.startswith(old)), key): (
+                result_set,
+                election,
+                contest,
+                source,
+                supersedes,
+                int(total),
+            )
             for key, result_set, election, contest, source, supersedes, total in conn.execute(
                 """select regexp_replace(x.value, ':([0-9]+|folded)$', ''), r.id, r.election_id, r.contest_id, r.source_id,
                           r.supersedes_id,
@@ -486,6 +540,7 @@ def emit(
         outcomes: list[tuple[UUID, UUID, str, int | None]] = []
         mapping: list[tuple[int, str, str, str | None, bool, str]] = []
         made: set[UUID] = set()
+        seen: set[str] = set()
         contest_columns = ["year", "day", "state", "title", "post", "special"]
         starts: dict[tuple[object, ...], int] = {}
         for row in races.unique(contest_columns).iter_rows(named=True):
@@ -521,7 +576,11 @@ def emit(
             )
             first = row.get("first")
             term = re.fullmatch(TERM, post or "")
-            begins = None if term is None else f"{date(int(term[3]), int(term[1]), int(term[2])):%B} {int(term[2])}, {term[3]}"
+            begins = (
+                None
+                if term is None
+                else f"{date(int(term[3]), int(term[1]), int(term[2])):%B} {int(term[2])}, {term[3]}"
+            )
             display = (
                 f"{year} {states[state]} {office} {'special election' if special else 'primary election' if season and 'primary' in season else 'runoff' if first else 'election'}"
                 + (
@@ -578,6 +637,7 @@ def emit(
                 ).items()
             }
             revised = None
+            seen.update([contest_key, *matches[:1]])
             if matches:
                 mapping.append((year, state, office, post, special, matches[0]))
                 published = own.get(matches[0])
@@ -604,7 +664,13 @@ def emit(
                     if published is not None and begins is not None and matches[0] == contest_key:
                         retitle(published[2], display)
                         if starts[(day, state, office, special)] == 1:
-                            cs.add("note", id=uuid5(published[2], "term"), entity_id=published[2], kind="methodology", body_md=f"The term begins {begins}.")
+                            cs.add(
+                                "note",
+                                id=uuid5(published[2], "term"),
+                                entity_id=published[2],
+                                kind="methodology",
+                                body_md=f"The term begins {begins}.",
+                            )
                     continue
                 contest_key, revised = matches[0], published
                 print(
@@ -695,7 +761,13 @@ def emit(
             else:
                 retitle(contest, display)
             if begins is not None and starts[(day, state, office, special)] == 1:
-                cs.add("note", id=uuid5(contest, "term"), entity_id=contest, kind="methodology", body_md=f"The term begins {begins}.")
+                cs.add(
+                    "note",
+                    id=uuid5(contest, "term"),
+                    entity_id=contest,
+                    kind="methodology",
+                    body_md=f"The term begins {begins}.",
+                )
             path = (
                 f"{election_path or f'us/{state.lower()}/{day}-' + (slug(season) if season else 'general')}/{slug(office)}"
                 + (f"-{slug(shown)}" if shown else "")
@@ -981,4 +1053,42 @@ def emit(
             },
             orient="row",
         ).write_parquet(parsed / "contests.parquet")
+        columns = ("id", "election_id", "contest_id", "stage", "kind", "source_id", "supersedes_id", "completeness")
+        vanished = {key: own[key][0] for key in own if key not in seen and key[:10] in days}
+        print("withdrawn:", sorted(vanished))
+        for row in conn.execute(
+            f"select {', '.join(columns)} from result_set where id = any(%s) and status = 'active'",
+            [list(vanished.values())],
+        ).fetchall():
+            cs.add("result_set", **dict(zip(columns, row, strict=True)), status="withdrawn", is_default=False)
+            cs.add("note", id=uuid5(row[0], "withdrawn"), entity_id=row[0], kind="caveat", body_md=WITHDRAWN)
+        retired = conn.execute(
+            """select x.value, x.entity_id from external_id x join contest c on c.id = x.entity_id
+               join changeset g on g.id = c.changeset_id
+               where x.scheme = 'us.contest' and g.pipeline = %s and left(x.value, 10) = any(%s)
+                 and x.value <> all(%s) and c.id <> all(%s)
+                 and not exists (select from result_set r where r.contest_id = c.id and r.status <> 'withdrawn')""",
+            [
+                pipeline,
+                days,
+                list(seen),
+                [
+                    row[0]
+                    for row in conn.execute(
+                        "select contest_id from result_set where id = any(%s)", [list(vanished.values())]
+                    ).fetchall()
+                ],
+            ],
+        ).fetchall()
+        print("retired:", sorted(key for key, _ in retired))
+        for _, contest in retired:
+            cs.add("entity_retirement", entity_id=contest, reason=RETIRED)
+            for (person,) in conn.execute(
+                """select distinct cy.person_id from candidacy cy join contest_option o on o.id = cy.option_id
+                   where o.contest_id = %s and not exists (
+                     select from candidacy other join contest_option elsewhere on elsewhere.id = other.option_id
+                     where other.person_id = cy.person_id and elsewhere.contest_id <> %s)""",
+                [contest, contest],
+            ).fetchall():
+                cs.add("entity_retirement", entity_id=person, reason=RETIRED)
         return cs.write()

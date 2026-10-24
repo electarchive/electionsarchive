@@ -1536,7 +1536,7 @@ def emit() -> Path:
         }
         starts: dict[tuple[date, str, str], int] = {}
         for row in contests.iter_rows(named=True):
-            if re.fullmatch(TERM, row["seat"] or "", re.I):
+            if re.fullmatch(TERM, row["seat"] or "", re.IGNORECASE):
                 group = (row["day"], row["code"], row["key"])
                 starts[group] = starts.get(group, 0) + 1
         for row in contests.iter_rows(named=True):
@@ -1647,7 +1647,7 @@ def emit() -> Path:
                 default_result_kind="counted",
                 term="remainder" if row["remainder"] else "full",
             )
-            term = re.fullmatch(TERM, seat or "", re.I)
+            term = re.fullmatch(TERM, seat or "", re.IGNORECASE)
             start = None if term is None else date(int(term[3]), int(term[1]), int(term[2]))
             begins = None if start is None else f"{start:%B} {start.day}, {start.year}"
             (name if start is None else retitle)(
@@ -1663,7 +1663,13 @@ def emit() -> Path:
                 + (" (unexpired term)" if row["remainder"] else ""),
             )
             if start is not None and starts[(day, code, key)] == 1:
-                cs.add("note", id=uuid5(contest, "term"), entity_id=contest, kind="methodology", body_md=f"The term begins {begins}.")
+                cs.add(
+                    "note",
+                    id=uuid5(contest, "term"),
+                    entity_id=contest,
+                    kind="methodology",
+                    body_md=f"The term begins {begins}.",
+                )
             cs.add("slug", path=contest_path, entity_id=contest)
             if row["district"]:
                 cs.add("note", entity_id=contest, kind="caveat", body_md=DISTRICT)
