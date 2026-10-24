@@ -1,0 +1,27 @@
+{
+ "polity": "US-IL",
+ "publisher": "Illinois State Board of Elections",
+ "license": "Public record",
+ "raw_source": "us.scans",
+ "year": 1986,
+ "day": "1986-11-04",
+ "title": "State of Illinois official vote cast at the general election, 1986",
+ "file": {
+  "url": "https://archive.org/download/officialvote1986illi/officialvote1986illi.pdf"
+ },
+ "offices": {
+  "governor": "Governor",
+  "senate": "U.S. Senator"
+ },
+ "leaves": [
+  14,
+  15,
+  16,
+  17,
+  18,
+  19,
+  20,
+  21
+ ],
+ "autorotate": true
+}

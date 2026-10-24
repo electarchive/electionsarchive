@@ -1,0 +1,32 @@
+{
+ "polity": "US-IL",
+ "publisher": "Illinois State Board of Elections",
+ "license": "Public record",
+ "raw_source": "us.scans",
+ "year": 1976,
+ "day": "1976-11-02",
+ "title": "State of Illinois official vote cast at the general election, 1976",
+ "file": {
+  "url": "https://archive.org/download/officialvoteofst1976illi/officialvoteofst1976illi.pdf"
+ },
+ "offices": {
+  "president": "presidential electors (President and Vice President)",
+  "governor": "Governor"
+ },
+ "leaves": [
+  15,
+  16,
+  17,
+  18,
+  19,
+  20,
+  21,
+  22,
+  23,
+  24,
+  25,
+  26,
+  27
+ ],
+ "autorotate": true
+}

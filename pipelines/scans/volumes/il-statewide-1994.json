@@ -1,0 +1,26 @@
+{
+ "polity": "US-IL",
+ "publisher": "Illinois State Board of Elections",
+ "license": "Public record",
+ "raw_source": "us.scans",
+ "year": 1994,
+ "day": "1994-11-08",
+ "title": "State of Illinois official vote cast at the general election, 1994",
+ "file": {
+  "url": "https://archive.org/download/stateofillinoiso1994illi/stateofillinoiso1994illi.pdf"
+ },
+ "offices": {
+  "governor": "Governor"
+ },
+ "leaves": [
+  14,
+  15,
+  16,
+  17,
+  18,
+  19,
+  20,
+  21
+ ],
+ "autorotate": true
+}

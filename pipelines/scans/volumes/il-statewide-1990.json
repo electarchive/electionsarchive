@@ -1,0 +1,28 @@
+{
+ "polity": "US-IL",
+ "publisher": "Illinois State Board of Elections",
+ "license": "Public record",
+ "raw_source": "us.scans",
+ "year": 1990,
+ "day": "1990-11-06",
+ "title": "State of Illinois official vote cast at the general election, 1990",
+ "file": {
+  "url": "https://archive.org/download/officialvote90illi/officialvote90illi.pdf"
+ },
+ "offices": {
+  "governor": "Governor",
+  "senate": "U.S. Senator"
+ },
+ "leaves": [
+  11,
+  12,
+  13,
+  14,
+  15,
+  16,
+  17,
+  18,
+  19
+ ],
+ "autorotate": true
+}

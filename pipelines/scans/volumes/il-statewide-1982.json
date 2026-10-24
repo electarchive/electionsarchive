@@ -1,0 +1,25 @@
+{
+ "polity": "US-IL",
+ "publisher": "Illinois State Board of Elections",
+ "license": "Public record",
+ "raw_source": "us.scans",
+ "year": 1982,
+ "day": "1982-11-02",
+ "title": "State of Illinois official vote cast at the general election, 1982",
+ "file": {
+  "url": "https://archive.org/download/officialvoteofst1982illi/officialvoteofst1982illi.pdf"
+ },
+ "offices": {
+  "governor": "Governor"
+ },
+ "leaves": [
+  9,
+  10,
+  11,
+  12,
+  13,
+  14,
+  15
+ ],
+ "autorotate": true
+}

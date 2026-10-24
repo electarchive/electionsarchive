@@ -1,0 +1,36 @@
+{
+ "polity": "US-IL",
+ "publisher": "Illinois State Board of Elections",
+ "license": "Public record",
+ "raw_source": "us.scans",
+ "year": 1992,
+ "day": "1992-11-03",
+ "title": "State of Illinois official vote cast at the general election, 1992",
+ "file": {
+  "url": "https://archive.org/download/stateofillinois1992illi/stateofillinois1992illi.pdf"
+ },
+ "offices": {
+  "president": "presidential electors (President and Vice President)",
+  "senate": "U.S. Senator"
+ },
+ "leaves": [
+  29,
+  30,
+  31,
+  32,
+  33,
+  34,
+  35,
+  36,
+  37,
+  38,
+  39,
+  40,
+  41,
+  42,
+  43,
+  44,
+  45
+ ],
+ "autorotate": true
+}

@@ -1,0 +1,29 @@
+{
+ "polity": "US-IL",
+ "publisher": "Illinois State Board of Elections",
+ "license": "Public record",
+ "raw_source": "us.scans",
+ "year": 1974,
+ "day": "1974-11-05",
+ "title": "State of Illinois official vote cast at the general election, 1974",
+ "file": {
+  "url": "https://archive.org/download/officialvote1974illi/officialvote1974illi.pdf"
+ },
+ "offices": {
+  "senate": "U.S. Senator"
+ },
+ "leaves": [
+  10,
+  11,
+  12,
+  13,
+  14,
+  15,
+  16,
+  17,
+  18,
+  19,
+  20
+ ],
+ "autorotate": true
+}

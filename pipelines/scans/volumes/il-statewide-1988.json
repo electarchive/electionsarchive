@@ -1,0 +1,30 @@
+{
+ "polity": "US-IL",
+ "publisher": "Illinois State Board of Elections",
+ "license": "Public record",
+ "raw_source": "us.scans",
+ "year": 1988,
+ "day": "1988-11-08",
+ "title": "State of Illinois official vote cast at the general election, 1988",
+ "file": {
+  "url": "https://archive.org/download/officialvoteofst1988illi/officialvoteofst1988illi.pdf"
+ },
+ "offices": {
+  "president": "presidential electors (President and Vice President)"
+ },
+ "leaves": [
+  11,
+  12,
+  13,
+  14,
+  15,
+  16,
+  17,
+  18,
+  19,
+  20,
+  21,
+  22
+ ],
+ "autorotate": true
+}

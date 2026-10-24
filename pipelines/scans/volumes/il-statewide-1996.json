@@ -1,0 +1,36 @@
+{
+ "polity": "US-IL",
+ "publisher": "Illinois State Board of Elections",
+ "license": "Public record",
+ "raw_source": "us.scans",
+ "year": 1996,
+ "day": "1996-11-05",
+ "title": "State of Illinois official vote cast at the general election, 1996",
+ "file": {
+  "url": "https://archive.org/download/stateofillinois1996illi/stateofillinois1996illi.pdf"
+ },
+ "offices": {
+  "president": "presidential electors (President and Vice President)",
+  "senate": "U.S. Senator"
+ },
+ "leaves": [
+  14,
+  15,
+  16,
+  17,
+  18,
+  19,
+  20,
+  21,
+  22,
+  23,
+  24,
+  25,
+  26,
+  27,
+  28,
+  29,
+  30
+ ],
+ "autorotate": true
+}

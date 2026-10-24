@@ -1,0 +1,39 @@
+{
+ "polity": "US-IL",
+ "publisher": "Illinois State Board of Elections",
+ "license": "Public record",
+ "raw_source": "us.scans",
+ "year": 1972,
+ "day": "1972-11-07",
+ "title": "State of Illinois official vote cast at the general election, 1972",
+ "file": {
+  "url": "https://archive.org/download/officialvote72illi/officialvote72illi.pdf"
+ },
+ "offices": {
+  "president": "presidential electors (President and Vice President)",
+  "senate": "U.S. Senator",
+  "governor": "Governor"
+ },
+ "leaves": [
+  18,
+  19,
+  20,
+  21,
+  22,
+  23,
+  24,
+  25,
+  26,
+  27,
+  28,
+  29,
+  30,
+  31,
+  32,
+  33,
+  34,
+  35,
+  36
+ ],
+ "autorotate": true
+}

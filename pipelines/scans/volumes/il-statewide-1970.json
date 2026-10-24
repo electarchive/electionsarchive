@@ -1,0 +1,27 @@
+{
+ "polity": "US-IL",
+ "publisher": "Illinois State Board of Elections",
+ "license": "Public record",
+ "raw_source": "us.scans",
+ "year": 1970,
+ "day": "1970-11-03",
+ "title": "State of Illinois official vote cast at the general election, 1970",
+ "file": {
+  "url": "https://archive.org/download/officialvoteofst1970illi/officialvoteofst1970illi.pdf"
+ },
+ "offices": {
+  "senate": "U.S. Senator"
+ },
+ "leaves": [
+  8,
+  9,
+  10,
+  11,
+  12,
+  13,
+  14,
+  15,
+  16
+ ],
+ "autorotate": true
+}

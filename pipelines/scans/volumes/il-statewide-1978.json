@@ -1,0 +1,28 @@
+{
+ "polity": "US-IL",
+ "publisher": "Illinois State Board of Elections",
+ "license": "Public record",
+ "raw_source": "us.scans",
+ "year": 1978,
+ "day": "1978-11-07",
+ "title": "State of Illinois official vote cast at the general election, 1978",
+ "file": {
+  "url": "https://archive.org/download/officialvote78illi/officialvote78illi.pdf"
+ },
+ "offices": {
+  "governor": "Governor",
+  "senate": "U.S. Senator"
+ },
+ "leaves": [
+  20,
+  21,
+  22,
+  23,
+  24,
+  25,
+  26,
+  27,
+  28
+ ],
+ "autorotate": true
+}

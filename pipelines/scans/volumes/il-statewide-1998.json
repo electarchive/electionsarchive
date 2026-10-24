@@ -1,0 +1,31 @@
+{
+ "polity": "US-IL",
+ "publisher": "Illinois State Board of Elections",
+ "license": "Public record",
+ "raw_source": "us.scans",
+ "year": 1998,
+ "day": "1998-11-03",
+ "title": "State of Illinois official vote cast at the general election, 1998",
+ "file": {
+  "url": "https://archive.org/download/officialvoteof1998illi/officialvoteof1998illi.pdf"
+ },
+ "offices": {
+  "governor": "Governor"
+ },
+ "leaves": [
+  9,
+  10,
+  11,
+  12,
+  13,
+  14,
+  15,
+  16,
+  17,
+  18,
+  19,
+  20,
+  21
+ ],
+ "autorotate": true
+}
