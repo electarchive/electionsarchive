@@ -2364,6 +2364,7 @@ function resultsMarkdown(
           : null),
     ]),
   );
+  const hasOutcome = contest.rows.some((row) => row.current?.outcome != null);
   const results = contest.rows
     .filter(
       (row) => row.current != null || (then != null && row.earlier != null),
@@ -2390,9 +2391,13 @@ function resultsMarkdown(
             earlier && percent(earlier.share),
             delta == null ? null : points(delta),
           ]),
-      current?.outcome === "lost"
-        ? m.outcome_lost()
-        : outcome(current?.outcome ?? null),
+      ...(hasOutcome
+        ? [
+            current?.outcome === "lost"
+              ? m.outcome_lost()
+              : outcome(current?.outcome ?? null),
+          ]
+        : []),
     ]);
   if (contest.current == null && contest.declared != null) {
     const said = (
@@ -2427,7 +2432,7 @@ function resultsMarkdown(
           ...(then == null
             ? []
             : [m.col_share_in({ year: then }), m.col_change()]),
-          m.col_result(),
+          ...(hasOutcome ? [m.col_result()] : []),
         ],
         results,
       )}\n\n${contest.ballot == null ? m.stat_valid() : m.stat_votes_cast()}: ${count(contest.current.valid)}${contest.ballot == null ? "" : ` ${m.term_votes_cast({ count: String(contest.ballot) })}`}${

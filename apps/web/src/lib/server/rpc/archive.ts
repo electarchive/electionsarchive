@@ -4549,6 +4549,30 @@ export const contests = {
         return found.rows[0]?.noun ?? null;
       })();
       const current = now.get(area.k);
+      if (
+        current != null &&
+        current.side.options.every((option) => option.seats == null)
+      ) {
+        const declared = await db.execute<{ party: string; seats: number }>(sql`
+          select coalesce(pm.into_id, o.party_id) as party, sum(r.value)::int as seats
+          from contest_option o
+          left join entity_merge pm on pm.entity_id = o.party_id
+          join result_set rs on rs.contest_id = o.contest_id and rs.is_default
+          cross join lateral (
+            select r.value from result_rollup r
+            where r.result_set_k = rs.k and r.option_k = o.k and r.area_k = ${area.k} and r.measure = 16 and r.count_round = 0 offset 0
+          ) r
+          where o.contest_id = ${contest.id}::uuid and o.party_id is not null
+          group by 1
+          having sum(r.value) > 0
+        `);
+        const held = new Map(
+          declared.rows.map((row) => [row.party, row.seats]),
+        );
+        for (const option of current.side.options) {
+          option.seats = held.get(option.party ?? "") ?? null;
+        }
+      }
       if (current == null) {
         return {
           ...page,
