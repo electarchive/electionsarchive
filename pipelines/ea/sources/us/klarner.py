@@ -1,4 +1,7 @@
+import os
 import re
+import subprocess
+import sys
 from collections import Counter
 from datetime import date
 from pathlib import Path
@@ -244,8 +247,28 @@ def parse() -> None:
     lines.write_parquet(PARSED / "lines.parquet")
 
 
-def emit() -> Path:
+def emit() -> Path | str:
     lines = pl.read_parquet(PARSED / "lines.parquet").filter(~pl.col("caseid").is_in(VA_CLEANUP)).sort("caseid")
+    if (chunk := os.environ.get("KLARNER_STATES")) is None:
+        chunks: list[list[str]] = [[]]
+        size = 0
+        for sab, count in lines.group_by("sab").len().sort("sab").iter_rows():
+            if size + count > 60000 and chunks[-1]:
+                chunks.append([])
+                size = 0
+            chunks[-1].append(sab)
+            size += count
+        return "\n".join(
+            subprocess.run(
+                [sys.argv[0], "emit", SOURCE],
+                env=os.environ | {"KLARNER_STATES": ",".join(states)},
+                check=True,
+                stdout=subprocess.PIPE,
+                text=True,
+            ).stdout.strip()
+            for states in chunks
+        )
+    lines = lines.filter(pl.col("sab").is_in(chunk.split(",")))
     for (sab, year, month), (fixed, day) in UNDATED.items():
         undated = (
             (pl.col("sab") == sab) & (pl.col("year") == year) & (pl.col("month") == month) & pl.col("day").is_null()
@@ -258,7 +281,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="State legislative general, special, and primary elections 1967–2022 by district",
+            summary=f"State legislative general, special, and primary elections 1967–2022 by district ({chunk})",
             polity="US",
         )
         zeroed = cs.zeroed()
@@ -869,10 +892,14 @@ def emit() -> Path:
             ),
         )
         for (scheme, value), reason in RETIRED.items():
-            if (scheme, value) in conn.execute(
-                """select x.scheme, x.value from external_id x join entity e on e.id = x.entity_id
+            if (
+                value.split(":")[1] in chunk.split(",")
+                and (scheme, value)
+                in conn.execute(
+                    """select x.scheme, x.value from external_id x join entity e on e.id = x.entity_id
                    where x.scheme = %s and x.value = %s and e.retired_by is null""",
-                [scheme, value],
-            ).fetchall():
+                    [scheme, value],
+                ).fetchall()
+            ):
                 cs.add("entity_retirement", entity_id=cs.key(scheme, value), reason=reason)
         return cs.write()
