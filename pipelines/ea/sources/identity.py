@@ -1286,6 +1286,30 @@ def emit() -> Path:
                         source_id=None,
                         is_preferred=True,
                     )
+                if (county := re.fullmatch(r"(.+) \(([^)]+)\), [A-Z]{2}", entry["text"])) is None:
+                    continue
+                place = f"{county[1]} ({county[2]})"
+                for row in conn.execute(
+                    """select id, entity_id, text, lang, script, kind, source_id from name
+                       where is_preferred and lang = 'en' and valid_from is null and valid_to is null
+                         and strpos(text, %s) > 0 and strpos(text, %s) = 0
+                         and entity_id in (select id from contest where district_area_id = %s
+                                           union all select id from election where polity_id in (
+                                            select polity_id from polity_territory where area_id = %s))""",
+                    [county[1], place, entry["entity"], entry["entity"]],
+                ).fetchall():
+                    cs.add("name", **dict(zip(columns, row, strict=True)), is_preferred=False)
+                    cs.add(
+                        "name",
+                        id=None,
+                        entity_id=row[1],
+                        text=row[2].replace(county[1], place, 1),
+                        lang=row[3],
+                        script=row[4],
+                        kind=row[5],
+                        source_id=row[6],
+                        is_preferred=True,
+                    )
         for row in conn.execute(
             """select n.id, n.entity_id, n.text, n.lang, n.script, n.kind, n.source_id from (
                  select n.*, row_number() over (
