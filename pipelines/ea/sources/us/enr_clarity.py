@@ -26,7 +26,7 @@ HOST = "results.enr.clarityelections.com"
 CENSUS = "https://www2.census.gov/geo/tiger/GENZ2020/shp/cb_2020_{fips}_{layer}_500k.zip"
 LAYERS = ("place", "cousub", "unsd")
 TITLE = "Election night reporting results"
-STATE_NAMES = {"TX": "Texas", "PA": "Pennsylvania"}
+STATE_NAMES = {"MI": "Michigan", "TX": "Texas", "PA": "Pennsylvania"}
 NUMBERS = {
     "ONE": "1",
     "TWO": "2",
@@ -53,7 +53,7 @@ SKIPPED = re.compile(
     r"\bPRESIDENT\b(?! OF (?:THE )?(?:COUNCIL|BOARD))|UNITED STATES|\bU ?S\b|CONGRESS|GOVERNOR|ATTORNEY GENERAL|"
     r"COMPTROLLER OF|LAND OFFICE|GENERAL LAND|AGRICULTURE|RAILROAD|SUPREME|APPEALS?\b|\bAPP\b|\bCT OF\b|"
     r"SUPERIOR COURT|COMMONWEALTH COURT|SENATOR|STATE SENAT|REPRESENTATIVE|GENERAL ASSEMBLY|STATE BOARD|\bS?BOE\b|"
-    r"STATE PROP|STATE OF TEXAS|CONSTITUTIONAL|AMENDMENT|STRAIGHT|SECRETARY OF|AUDITOR GENERAL|STATE TREASURER|"
+    r"STATE PROP|STATE REP\b|STATE LEGISLATURE|\bCIRCUIT\b|JUDGE OF DISTRICT COURT|STATE OF TEXAS|CONSTITUTIONAL|AMENDMENT|STRAIGHT|SECRETARY OF|AUDITOR GENERAL|STATE TREASURER|"
     r"(?<!MAGISTERIAL )\bDIST(?:RICT)? (?:CT )?JUDGE|JUDIC(?:IAL)? DIST|RETENTION|RETAIN|DELEGATE|NATIONAL COMMITTEE|"
     r"STATE CONVENTION|REFERENDA|REFERENDUM ITEM|BALLOTS CAST|REGISTERED VOTERS|TURNOUT|STATEWIDE|\bTEST\b"
 )
@@ -84,6 +84,11 @@ OFFICERS = (
 )
 COUNTY_OFFICES = (
     (r"SHERIFF", "sheriff", "Sheriff", False),
+    (r"(?:COUNTY )?PROSECUTING ATTORNEY", "prosecuting-attorney", "Prosecuting Attorney", False),
+    (r"(?:COUNTY )?DRAIN COMMISSIONER", "drain-commissioner", "Drain Commissioner", False),
+    (r"(?:COUNTY )?ROAD COMMISSIONER", "road-commissioner", "Road Commissioner", False),
+    (r"(?:COUNTY )?REGISTER OF DEEDS", "register-of-deeds", "Register of Deeds", False),
+    (r"JUDGE OF PROBATE(?: COURT)?", "probate-court", "Judge, Probate Court", False),
     (r"COUNTY JUDGE", "county-judge", "County Judge", False),
     (r"COUNTY CRIMINAL (?:COURT|CT)(?:[ -]AT[ -]LAW)?", "county-criminal-court", "Judge, County Criminal Court", False),
     (r"(?:COUNTY )?(?:COURT|CT)\.?[ -]AT[ -]LAW", "county-court-at-law", "Judge, County Court at Law", False),
@@ -130,6 +135,11 @@ LOOSE = (
     (r"CONTROLLER", "controller", "Controller", False),
     (r"COMMISSIONERS?", "commissioners", "", True),
     (r"AUDITORS?", "auditors", "Auditors", True),
+)
+MI_MUNI_OFFICES = (
+    (r"SUPERVISOR", "supervisor", "Supervisor", False),
+    (r"CLERK", "clerk", "Clerk", False),
+    (r"(?<!COUNCIL )PRESIDENT", "president", "President", False),
 )
 MUNI_OFFICES = (
     (r"COUNCIL PRES\w*|PRESIDENT OF (?:THE )?COUNCIL", "council-president", "Council President", False),
@@ -387,7 +397,7 @@ def parse(
     for fips in states:
         for record, geom in _shapes(fips, "cousub", source):
             proper, whole = str(record["NAME"]), str(record["NAMELSAD"])
-            kind = whole[len(proper) :].strip().lower()
+            kind = whole[len(proper) :].strip().lower().replace("charter township", "township")
             if kind not in ("township", "borough", "town", "city"):
                 continue
             display = f"{proper} Township" if kind == "township" else proper
@@ -457,7 +467,7 @@ def parse(
         tenant, election, day = record["tenant"], record["election"], record["day"]
         row = registry[tenant]
         county, st = row["county_fips"], row["state"]
-        county_name = row["county"].upper()
+        county_name = _plain(row["county"])
         title = re.sub(r"\s+", " ", record["title"]).strip()
         heading = _plain(title)
         if re.search(r"\bTEST\b|MOCK|PRACTICE|SAMPLE", heading):
@@ -725,6 +735,9 @@ def _classify(
     listed: list[tuple[str, str, str, str]],
 ) -> dict[str, object] | None:
     plain = re.sub(r"\b(PRECINCT|PCT) (\d+) (CHAIR\w*)", r"\3 \1 \2", plain)
+    plain = re.sub(r"\bCHARTER (?=TOWNSHIP|TWP)", "", plain)
+    if st == "MI":
+        plain = re.sub(r"\b(\d+) (DISTRICT|DIST)\b", r"\2 \1", plain)
     for options, scope in ((PARTY_OFFICES, "party"), (OFFICERS, "officer")):
         for pattern, key, office in options:
             if found := re.search(rf"\b(?:{pattern})\b", plain):
@@ -752,7 +765,7 @@ def _classify(
                     "seat": seat,
                     "label": None,
                 }
-    plain = re.sub(rf"\b{re.escape(county_name)} COUNTY\b", "COUNTY", plain)
+    plain = re.sub(rf"\b{re.escape(county_name)} (?:COUNTY|CO)\b", "COUNTY", plain)
     label = re.sub(r"\s+", " ", plain).strip()
     if SCHOOL.search(plain) and school_names:
         bare = re.sub(r"\s+", " ", SCHOOL_WORDS.sub(" ", plain)).strip()
@@ -827,7 +840,7 @@ def _classify(
         if seat is None and (bare := re.search(r"\b(\d+)\b(?! ?(?:YR|YEAR))", rest)):
             noun = "Court" if "court" in key else "Precinct"
             seat, rest = f"{noun} {int(bare[1])}", re.sub(rf"\b{bare[1]}\b", " ", rest)
-        if _residue(rest, *(office[0] for office in held), r"JUDGE|COURT|CT|CRT|LAW|PCT|PRECINCT|COMM|CRIMINAL"):
+        if _residue(rest, *(office[0] for office in held), r"JUDGE|COURT|CT|CRT|LAW|PCT|PRECINCT|COMM|CRIMINAL", re.escape(county_name), r"TERM ENDING [0-9/]+"):
             return None
         if len(held) > 1 and not any(office[3] for office in held):
             key = "-and-".join(office[1] for office in held)
@@ -891,7 +904,7 @@ def _classify(
         found_seat = f"{'Ward' if st == 'PA' else 'Place'} {int(bare[1])}"
         rest = rest.replace(bare[0], " ", 1)
     seat = ", ".join(part for part in (seat, found_seat) if part) or None
-    for pattern, key, office, body in MUNI_OFFICES:
+    for pattern, key, office, body in (*MI_MUNI_OFFICES, *MUNI_OFFICES) if st == "MI" else MUNI_OFFICES:
         if re.search(rf"\b(?:{pattern})\b", rest):
             break
     else:
