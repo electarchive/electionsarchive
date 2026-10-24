@@ -1277,7 +1277,7 @@ def emit(
                 cs.add("slug", path=umbrella_path, entity_id=parent)
             kind = parents.get(parent_key, kind) if kind not in ("primary", "runoff") else kind
             election = cs.key("us.election", f"{day}:{st}:{code}{suffix}")
-            if election in cs.minted and election not in elections:
+            if (election in cs.minted or st == "IL" and day == date(2021, 4, 6)) and election not in elections:
                 elections.add(election)
                 cs.add(
                     "election",
