@@ -148,7 +148,7 @@
   });
   const chamber = $derived(single == null ? contest.chamber : null);
   const seatsPlace = $derived(
-    contest.kind === "list_allocation"
+    contest.kind === "list_allocation" && contest.name.includes(", ")
       ? contest.name.replace(/^.+?, /u, "")
       : (chamber?.places[chamber.here ?? -1]?.name ?? contest.scope.name),
   );

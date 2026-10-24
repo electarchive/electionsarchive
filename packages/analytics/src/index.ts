@@ -88,7 +88,11 @@ export function ancestry(relations: Array<Relation>, match: Match) {
     }
     const [from, to] = [root(relation.from), root(relation.to)];
     if (from !== to) {
-      parent.set(from, to);
+      if (from === relation.from) {
+        parent.set(from, to);
+      } else {
+        parent.set(to, from);
+      }
     }
   }
   return root;
@@ -434,7 +438,10 @@ export function compare(
             )?.toLabel ?? null),
     };
   });
-  const rank = (row: Row) => (row.key.startsWith("kind:") ? 1 : 0);
+  const rank = (row: Row) =>
+    row.key.startsWith("kind:") && !row.key.startsWith("kind:candidate:")
+      ? 1
+      : 0;
   return rows
     .map((row) => independent(row))
     .toSorted(

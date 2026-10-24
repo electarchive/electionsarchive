@@ -3583,6 +3583,15 @@ export const contests = {
           join area_event_member f on f.area_id = later.id and f.role = 'from'
           join area_event e on e.id = f.event_id and e.kind = 'boundary_changed'
           join area_event_member t on t.event_id = e.id and t.role = 'to'
+            and (
+              (select count(*) from area_event_member n where n.event_id = e.id and n.role = 'from') = 1
+              or (select count(*) from area_event_member n where n.event_id = e.id and n.role = 'to') = 1
+              or exists (
+                select from area_geometry gf join area_geometry gt on gf.geom && gt.geom
+                where gf.area_id = f.area_id and gt.area_id = t.area_id
+                  and ST_Area(ST_Intersection(gf.geom, gt.geom)) > 0.05 * least(ST_Area(gf.geom), ST_Area(gt.geom))
+              )
+            )
         ),
         earlier(id) as (
           select ${contest.place?.id ?? null}::uuid
@@ -3591,6 +3600,15 @@ export const contests = {
           join area_event_member t on t.area_id = earlier.id and t.role = 'to'
           join area_event e on e.id = t.event_id and e.kind = 'boundary_changed'
           join area_event_member f on f.event_id = e.id and f.role = 'from'
+            and (
+              (select count(*) from area_event_member n where n.event_id = e.id and n.role = 'from') = 1
+              or (select count(*) from area_event_member n where n.event_id = e.id and n.role = 'to') = 1
+              or exists (
+                select from area_geometry gf join area_geometry gt on gf.geom && gt.geom
+                where gf.area_id = f.area_id and gt.area_id = t.area_id
+                  and ST_Area(ST_Intersection(gf.geom, gt.geom)) > 0.05 * least(ST_Area(gf.geom), ST_Area(gt.geom))
+              )
+            )
         ),
         roots as (
           select c.id, case when c.kind = 'ballot_question' then c.id::text
