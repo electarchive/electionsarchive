@@ -30,7 +30,7 @@
       "day": "1984-11-06",
       "special": false,
       "state": "SD",
-      "district": null,
+      "district": 0,
       "create": true
     }
   },
@@ -40,22 +40,22 @@
       "id": "2-0",
       "columns": [
         {
-          "label": "Reagan/Bush\u2014R",
+          "label": "Reagan/Bush—R",
           "contest": "president",
           "candidate": "Ronald Reagan"
         },
         {
-          "label": "Mondale/Ferraro\u2014D",
+          "label": "Mondale/Ferraro—D",
           "contest": "president",
           "candidate": "Walter F. Mondale"
         },
         {
-          "label": "Serrette/Ross\u2014I",
+          "label": "Serrette/Ross—I",
           "contest": "president",
           "candidate": "Dennis L. Serrette"
         },
         {
-          "label": "Mason/Zimmermann\u2014I",
+          "label": "Mason/Zimmermann—I",
           "contest": "president",
           "candidate": "Mel Mason"
         }
@@ -79,12 +79,12 @@
       "id": "3-0",
       "columns": [
         {
-          "label": "Larry Pressler\u2014R",
+          "label": "Larry Pressler—R",
           "contest": "senate",
           "candidate": "Larry Pressler"
         },
         {
-          "label": "George V. Cunningham\u2014D",
+          "label": "George V. Cunningham—D",
           "contest": "senate",
           "candidate": "George V. Cunningham"
         }
@@ -108,13 +108,13 @@
       "id": "4-0",
       "columns": [
         {
-          "label": "Dale Bell\u2014R",
+          "label": "Dale Bell—R",
           "contest": "house",
           "candidate": "Dale Bell",
           "party": "R"
         },
         {
-          "label": "Tom Daschle\u2014D",
+          "label": "Tom Daschle—D",
           "contest": "house",
           "candidate": "Tom Daschle",
           "party": "D"

@@ -30,7 +30,7 @@
       "day": "1992-11-03",
       "special": false,
       "state": "SD",
-      "district": null,
+      "district": 0,
       "create": true
     }
   },
