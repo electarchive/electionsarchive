@@ -1,0 +1,56 @@
+{
+  "polity": "US-NE",
+  "text_layer": true,
+  "publisher": "Nebraska Secretary of State",
+  "license": "Public record",
+  "raw_source": "us.ne_statewide",
+  "title": "Official Report of the Board of State Canvassers of the State of Nebraska, general election November 6, 1990",
+  "file": {
+    "url": "https://govdocs.nebraska.gov/epubs/S1200/S001-1990prim_gen.pdf",
+    "item": "https://govdocs.nebraska.gov/epubs/S1200/S001.html"
+  },
+  "contests": {
+    "governor": {
+      "year": 1990,
+      "chamber": "governor",
+      "day": "1990-11-06",
+      "special": false,
+      "state": "NE",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 47,
+      "id": "47",
+      "columns": [
+        {
+          "label": "REPUBLICAN KAY A ORR",
+          "contest": "governor",
+          "candidate": "Kay A. Orr",
+          "column": 0
+        },
+        {
+          "label": "DEMOCRAT BEN NELSON",
+          "contest": "governor",
+          "candidate": "Ben Nelson",
+          "column": 1
+        },
+        {
+          "label": "WRITE IN MORT SULLIVAN",
+          "contest": "governor",
+          "candidate": "Mort Sullivan",
+          "writein": true,
+          "column": 2
+        },
+        {
+          "label": "WRITE IN",
+          "contest": "governor",
+          "candidate": "Write-ins",
+          "writein": true,
+          "column": 3
+        }
+      ]
+    }
+  ]
+}

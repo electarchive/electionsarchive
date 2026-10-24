@@ -1424,7 +1424,7 @@ def emit(name: str) -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary=f"{manifest['title']}: county tables read from the scan by a vision model and checked against the printed and held totals",
+            summary=f"{manifest['title']}: county tables read from the scan {'text layer' if manifest.get('text_layer') else 'by a vision model'} and checked against the printed and held totals",
             polity=manifest["polity"],
         )
         source = cs.source(manifest["publisher"], manifest["title"])
@@ -1473,7 +1473,7 @@ def emit(name: str) -> Path:
                 "note",
                 entity_id=row["id"],
                 kind="caveat",
-                body_md="Read from the scan by a vision model. Each cell's box is its column's band by its row's band as the model reported them, so it is approximate."
+                body_md=("Read from the scan's text layer, every column checked against the printed state total. Each cell's box is its column's band by its row's band, so it is approximate." if manifest.get("text_layer") else "Read from the scan by a vision model. Each cell's box is its column's band by its row's band as the model reported them, so it is approximate.")
                 + (
                     " Each county's votes are the sum of its towns' returns, towns placed in counties by the 2020 Census Gazetteer, and the box is the first town's."
                     if towns
