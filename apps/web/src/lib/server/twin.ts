@@ -652,7 +652,7 @@ function personMarkdown(
             table(
               [m.col_name(), m.person_years()],
               spells.map((spell) => [
-                `${spell.isBody ? link(spell.name, `id/${spell.id}`) : spell.name}${
+                `${spell.isBody ? link(spell.name, spell.path ?? `id/${spell.id}`) : spell.name}${
                   "seats" in spell && spell.seats.length > 0
                     ? ` (${spell.seats
                         .map((seat) =>
@@ -1962,14 +1962,12 @@ function contestMarkdown(
               ]
                 .filter((part) => part != null)
                 .join(", "),
-              ...(cut === 0
+              ...(cut === 0 || cut >= lines.length
                 ? [lines.join("\n")]
                 : [
                     lines.slice(0, cut).join("\n"),
                     m.lists_cut(),
-                    ...(cut < lines.length
-                      ? [lines.slice(cut).join("\n")]
-                      : []),
+                    lines.slice(cut).join("\n"),
                   ]),
             ];
           }),
