@@ -34,7 +34,7 @@ ME_FILES = {
 }
 FILES = {
     "TX": ("tx", "2026-03-03", ["20260303__tx__primary__county.csv"]),
-    "CA": ("ca", "2026-06-02", ["20260602__ca__primary__county.csv"]),
+    "CA": ("ca", "2026-06-02", ["19-gov", "76-us-rep"]),
     "MI": ("mi", "2026-08-04", ["20260804__mi__primary__county.csv"]),
     "PA": ("pa", "2026-05-19", ["20260519__pa__primary__county.csv"]),
     "WV": ("wv", "2026-05-13", ["20260513__wv__primary__county.csv"]),
@@ -135,6 +135,7 @@ PARTIES = {
     "DFL": ("minnesota-democratic-farmer-labor", "democratic-party"),
 }
 ALIASES = {("GA", "athensclarke"): "clarke", ("MS", "jeffdavis"): "jeffersondavis", ("MD", "baltimorecounty"): "baltimore", ("MD", "saintmarys"): "stmarys"}
+CA_PARTIES = {"NPP": "No Party Preference", "PF": "Peace and Freedom", "AIP": "American Independent", "AI": "American Independent"}
 POOLED = re.compile(r"write-?ins?\b|^scattering$", re.I)
 JUNK = re.compile(r"^void$|^(under|over) votes$|^\* withdrawn candidate$|^total|blank|registered voters", re.I)
 ORDINALS = {1: "st", 2: "nd", 3: "rd"}
@@ -166,6 +167,7 @@ OFFICIAL = {
     "FL": ("Florida Division of Elections", "https://results.elections.myflorida.com", "county results extract of official results"),
     "IN": ("Indiana Secretary of State", "https://enr.indianavoters.in.gov", "county results from the state's election night reporting site"),
     "NJ": ("New Jersey Division of Elections", "https://www.nj.gov/state/elections/election-information-results.shtml", "county tables in the official primary results"),
+    "CA": ("California Secretary of State", "https://www.sos.ca.gov/elections/prior-elections/statewide-election-results/primary-election-june-2-2026/statement-vote", "Statement of Vote spreadsheets"),
     "KS": ("Kansas Secretary of State", "https://sos.ks.gov/elections/election-results.html", "precinct-level files summed to counties"),
 }
 METHOD = "Results by county from OpenElections' 2026 primary file for {state}, a community compilation of the state's county results. Candidates who received votes are listed; write-in votes are pooled."
@@ -279,6 +281,8 @@ def url(code: str, file: str) -> str:
         return f"{OK_BASE}enrapi/getelec/{second}/SW/xx" if first == "getelec" else f"{OK_BASE}enrapi/GetCntyResults/{first}/{second}"
     if code == "me":
         return f"https://www.maine.gov/sos/sites/maine.gov.sos/files/inline-files/{file}.xlsx"
+    if code == "ca":
+        return f"https://elections.cdn.sos.ca.gov/sov/2026-primary/sov/{file}.xlsx"
     if code == "hi":
         return f"https://elections.hawaii.gov/wp-content/results/2026%20Primary/{file}.pdf"
     if code == "de":
@@ -301,6 +305,56 @@ def url(code: str, file: str) -> str:
 
 
 def rows(code: str, path: Path, file: str = ""):
+    if code == "ca":
+        sheet = pl.read_excel(path, sheet_id=1, engine="calamine", has_header=False, raise_if_empty=False).rows()
+        district = ""
+        names: tuple[str | None, ...] | None = None
+        header: list[tuple[int, str, str]] = []
+        shifted: list[tuple[str, tuple[str | None, ...]]] | None = None
+        for cells in sheet:
+            label = (cells[0] or "").strip()
+            found = re.fullmatch(r"(\d+)(?:st|nd|rd|th) Congressional District", label)
+            if found:
+                district, names, header = found[1], None, []
+            elif not label and str(cells[1]).isdigit():
+                continue
+            elif not label and names is None:
+                names = cells
+            elif not label:
+                header = [(index, " ".join(names[index].split()), party) for index, party in enumerate(cells) if index and party and names[index]]
+                names = None
+            elif names is not None or shifted is not None:
+                if shifted is None:
+                    header = [(index, " ".join(names[index].split()), party) for index, party in enumerate(cells) if index and party and names[index]]
+                    names, shifted = None, [(label, cells)]
+                elif label.startswith("Percent"):
+                    counties = [county for county, _ in shifted if not county.startswith("District Totals")]
+                    for county, (_, values) in zip(counties, shifted[1:], strict=True):
+                        for index, candidate, party in header:
+                            yield {
+                                "county": county,
+                                "office": "U.S. House",
+                                "district": district,
+                                "party": CA_PARTIES.get(party.removesuffix(" (W/I)"), party.removesuffix(" (W/I)")),
+                                "candidate": candidate,
+                                "write_in": "Y" if party.endswith("(W/I)") else "",
+                                "votes": values[index] or "",
+                            }
+                    shifted = None
+                else:
+                    shifted.append((label, cells))
+            elif not label.startswith(("District Totals", "State Totals", "Percent")):
+                for index, candidate, party in header:
+                    yield {
+                        "county": label,
+                        "office": "U.S. House" if district else "Governor",
+                        "district": district,
+                        "party": CA_PARTIES.get(party.removesuffix(" (W/I)"), party.removesuffix(" (W/I)")),
+                        "candidate": candidate,
+                        "write_in": "Y" if party.endswith("(W/I)") else "",
+                        "votes": cells[index] or "",
+                    }
+        return
     if code in ELSTATS:
         with path.open(newline="") as handle:
             for row in csv.DictReader(handle):
@@ -679,7 +733,7 @@ def fetch() -> None:
             if code == "fl":
                 raw.store(SOURCE, FL_URL, httpx.get(FL_URL, headers=BROWSER, follow_redirects=True, timeout=300).content, suffix=".txt", retrieved_at=datetime.now(UTC), media_type="text/tab-separated-values")
                 continue
-            raw.fetch(SOURCE, url(code, name), suffix={"hi": ".pdf", "ne": ".pdf", "ri": ".json", "ct": ".json", "alx": ".zip", "de": ".html", "ma": ".html", "nj": ".pdf", "ks": ".xlsx", "in": ".json", "ga": ".json", "ga2": ".json", "wa": ".json", "ut": ".json", "id": ".json"}.get(code) or name[name.rindex(".") :])
+            raw.fetch(SOURCE, url(code, name), suffix={"hi": ".pdf", "ne": ".pdf", "ri": ".json", "ct": ".json", "alx": ".zip", "de": ".html", "ma": ".html", "nj": ".pdf", "ks": ".xlsx", "ca": ".xlsx", "in": ".json", "ga": ".json", "ga2": ".json", "wa": ".json", "ut": ".json", "id": ".json"}.get(code) or name[name.rindex(".") :])
     fetch_ballot_items()
 
 
