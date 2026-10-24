@@ -183,6 +183,7 @@ def emit() -> Path:
                 kind="general",
                 date_from=start,
                 date_to=end,
+                date_precision="day",
                 status="held",
             )
             name(umbrella, f"{year} European Parliament election")

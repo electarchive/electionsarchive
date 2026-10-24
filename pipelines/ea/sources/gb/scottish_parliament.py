@@ -1,17 +1,156 @@
 import html
+import itertools
 import re
 import time
+from datetime import date
 from pathlib import Path
+from uuid import UUID
 
 import fastexcel
 import polars as pl
 
 from ea import raw
-from ea.store import DATA
+from ea.changeset import Changeset, slug
+from ea.sources.gb import umit
+from ea.store import DATA, connect
 
 SOURCE = "gb.scottish_parliament"
 VERSION = "1"
 PARSED = DATA / "parsed" / SOURCE
+VOTES, REGISTERED, BALLOTS, VALID, INVALID = 1, 2, 3, 4, 5
+ELECTIONS = {
+    1999: date(1999, 5, 6),
+    2003: date(2003, 5, 1),
+    2007: date(2007, 5, 3),
+    2011: date(2011, 5, 5),
+    2016: date(2016, 5, 5),
+    2021: date(2021, 5, 6),
+    2026: date(2026, 5, 7),
+}
+ERAS = {1999: 1999, 2003: 1999, 2007: 1999, 2011: 2011, 2016: 2011, 2021: 2011, 2026: 2026}
+OGL = "https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/"
+EC_ATTRIBUTION = "Contains information from the Electoral Commission licensed under the Open Government Licence v3.0."
+SOURCES = (
+    (
+        "page",
+        "The Scottish Parliament",
+        "Scottish Parliament election results, 1999 to 2026",
+        "https://www.parliament.scot/msps/elections",
+        "Scottish Parliament Copyright Licence",
+        "https://www.parliament.scot/about/copyright",
+        "Contains information licensed under the Scottish Parliament Copyright Licence.",
+    ),
+    (
+        "ec2007",
+        "The Electoral Commission",
+        "Scottish Parliament elections 2007: electorate and turnout by constituency",
+        "https://www.electoralcommission.org.uk/",
+        "Open Government Licence v3.0",
+        OGL,
+        EC_ATTRIBUTION,
+    ),
+    (
+        "ec2011",
+        "The Electoral Commission",
+        "Scottish Parliament election 2011: results flat file",
+        "https://www.electoralcommission.org.uk/",
+        "Open Government Licence v3.0",
+        OGL,
+        EC_ATTRIBUTION,
+    ),
+    (
+        "ec2016",
+        "The Electoral Commission",
+        "Scottish Parliament elections 2016: electoral data and results",
+        "https://www.electoralcommission.org.uk/",
+        "Open Government Licence v3.0",
+        OGL,
+        EC_ATTRIBUTION,
+    ),
+    (
+        "emb2021",
+        "The Electoral Management Board for Scotland",
+        "Scottish Parliamentary election 6 May 2021: full votes and seats by party and candidate",
+        "https://www.emb.scot/",
+        "Public record",
+        None,
+        "The Electoral Management Board for Scotland.",
+    ),
+)
+LISTS_2011 = {
+    "Con": "Scottish Conservative and Unionist Party",
+    "Lab": "Scottish Labour",
+    "LD": "Scottish Liberal Democrats",
+    "SNP": "Scottish National Party",
+    "Green": "Scottish Green Party",
+    "Pensioners": "All Scotland Pensioners Party",
+    "UKIP": "UK Independence Party",
+    "Socialist Labour": "Socialist Labour",
+    "Christian Party": "Scottish Christian Party",
+    "BNP": "British National Party",
+    "Scottish Socialist": "Scottish Socialist Party",
+    "Solidarity": "Solidarity",
+}
+LISTS_2016 = {
+    "CON": "Conservative and Unionist Party",
+    "LAB": "Labour Party",
+    "LIB": "Liberal Democrats",
+    "SNP": "Scottish National Party (SNP)",
+    "SGRN": "Scottish Green Party",
+    "UKIP": "UK Independence Party (UKIP)",
+    "SOL": "Solidarity - Scotland's Socialist Movement",
+    "RISE": "RISE - Respect, Independence, Socialism and Environmentalism",
+    "CHP": 'Christian Party "Proclaiming Christ\'s Lordship"',
+    "WEP": "Women's Equality Party",
+    "SLBR": "Scottish Libertarian Party",
+    "ABBUP": "A Better Britain - Unionist Party",
+    "COMP": "Communist Party of Britain",
+    "NF": "National Front",
+    "ANWP": "Animal Welfare Party",
+    "TUSC": "Trade Unionist and Socialist Coalition",
+}
+PARTY_KEYS = {
+    "conservative": "conservative",
+    "conservative and unionist party": "conservative",
+    "scottish conservative and unionist party": "conservative",
+    "scottish conservative & unionist party": "conservative",
+    "labour": "labour",
+    "labour party": "labour",
+    "scottish labour": "labour",
+    "scottish labour party": "labour",
+    "liberal democrat": "liberal-democrats",
+    "liberal democrats": "liberal-democrats",
+    "scottish liberal democrats": "liberal-democrats",
+    "snp": "scottish-national-party",
+    "scottish national party": "scottish-national-party",
+    "scottish national party (snp)": "scottish-national-party",
+    "green": "scottish-greens",
+    "scottish green party": "scottish-greens",
+    "ssp": "scottish-socialist-party",
+    "scottish socialist": "scottish-socialist-party",
+    "scottish socialists": "scottish-socialist-party",
+    "scottish socialist party": "scottish-socialist-party",
+    "sscu": "scottish-senior-citizens-unity-party",
+    "scottish senior citizens unity party": "scottish-senior-citizens-unity-party",
+    "uk independence party": "uk-independence-party",
+    "uk independence party (ukip)": "uk-independence-party",
+    "reform uk": "reform-uk",
+    "socialist labour": "socialist-labour-party",
+    "communist party of britain": "communist-party-of-britain",
+}
+AMS = (
+    "The additional member system elects 73 members from single-member constituencies by first past the post and "
+    "56 more from eight regional party lists, seven for each region, in a single Parliament of 129. Each voter has "
+    "two votes: one for a constituency candidate and one for a party list or an individual candidate in the "
+    "region. Each region's seven list seats go to parties by the D'Hondt method, dividing a party's regional list "
+    "votes by one more than the number of constituency seats it won in that region, so the list compensates for "
+    "disproportion in the constituency results. The rules schema cannot yet express that adjusted divisor, so the "
+    "declared seats are stored as published."
+)
+NO_LIST_VOTES = (
+    "The regional list votes by party for this election have not been loaded yet. The seats shown are the "
+    "members the Scottish Parliament's results page declares elected from each region's lists."
+)
 PAGES = {
     year: f"https://www.parliament.scot/msps/elections/{year}-election-results"
     for year in (1999, 2003, 2007, 2011, 2016, 2021, 2026)
@@ -36,7 +175,7 @@ def fetch() -> None:
 
 def page_lines(year: int) -> list[str]:
     text = raw.cached(SOURCE, PAGES[year]).path.read_text()
-    text = re.sub(r"<script.*?</script>|<style.*?</style>", "", text, flags=re.S)
+    text = re.sub(r"<script.*?</script>|<style.*?</style>", "", text, flags=re.DOTALL)
     text = html.unescape(re.sub(r"<[^>]+>", "\n", text))
     return [re.sub(r"\s+", " ", line).strip() for line in text.splitlines() if line.strip()]
 
@@ -119,11 +258,63 @@ def number(cell: str | None) -> int | None:
     return None if cell is None else int(round(float(cell)))
 
 
-def parse_workbooks() -> tuple[list[dict[str, object]], list[dict[str, object]]]:
+ALIASES = {
+    "fifecentral": "centralfife",
+    "fifenortheast": "northeastfife",
+    "renfrewshirewest": "westrenfrewshire",
+    "taysidenorth": "northtayside",
+    "aberdeenshirewestandkincardine": "westaberdeenshireandkincardine",
+    "nahheilanananiar": "naheileanananiar",
+    "orkneyislands": "orkney",
+    "shetlandislands": "shetland",
+    "glasgowballieston": "glasgowbaillieston",
+    "midscotandfife": "midscotlandandfife",
+    "southscotland": "southofscotland",
+    "southscotand": "southofscotland",
+    "westscotland": "westofscotland",
+}
+
+
+def fold(text: str) -> str:
+    key = _fold(text)
+    return ALIASES.get(key, key)
+
+
+def _fold(text: str) -> str:
+    text = text.lower().replace("&", "and").replace(" s. ", " south ").replace(" n. ", " north ")
+    return re.sub(r"[^a-z]+", "", re.sub(r"\bst\.?\b", "st", text))
+
+
+PARTY_LABELS = {
+    "con": "Scottish Conservative and Unionist Party",
+    "lab": "Scottish Labour Party",
+    "ld": "Scottish Liberal Democrats",
+    "snp": "Scottish National Party",
+    "grn": "Scottish Green Party",
+}
+BUCKETS = {
+    "conservative": "con",
+    "scottish conservative and unionist party": "con",
+    "scottish conservative & unionist party": "con",
+    "labour": "lab",
+    "scottish labour": "lab",
+    "scottish labour party": "lab",
+    "liberal democrat": "ld",
+    "scottish liberal democrats": "ld",
+    "snp": "snp",
+    "scottish national party": "snp",
+    "scottish green party": "grn",
+    "independent": "ind",
+}
+
+
+def parse_workbooks() -> tuple[list[dict[str, object]], list[dict[str, object]], list[dict[str, object]]]:
     units = []
     lists = []
+    buckets = []
     path = raw.cached(SOURCE, EC_2011).path
     rows = sheet(path, "Constituency results")
+    header = rows[0]
     for row in rows[1:]:
         if row[0] is None or row[0] == "Total":
             continue
@@ -134,10 +325,13 @@ def parse_workbooks() -> tuple[list[dict[str, object]], list[dict[str, object]]]
                 "constituency": row[0],
                 "region": None,
                 "electorate": number(row[1]),
+                "cast": None,
                 "rejected": number(row[2]),
                 "valid": number(row[3]),
             }
         )
+        for label, cell in zip(header[6:12], row[6:12], strict=True):
+            buckets.append({"year": 2011, "constituency": row[0], "bucket": label.lower(), "votes": number(cell)})
     rows = sheet(path, "List results")
     header = rows[0]
     for row in rows[1:]:
@@ -150,6 +344,7 @@ def parse_workbooks() -> tuple[list[dict[str, object]], list[dict[str, object]]]
                 "constituency": row[1],
                 "region": row[0],
                 "electorate": number(row[2]),
+                "cast": None,
                 "rejected": number(row[3]),
                 "valid": number(row[4]),
             }
@@ -159,10 +354,7 @@ def parse_workbooks() -> tuple[list[dict[str, object]], list[dict[str, object]]]
                 {"year": 2011, "region": row[0], "constituency": row[1], "party": label, "votes": number(cell)}
             )
     path = raw.cached(SOURCE, EC_2016).path
-    for ballot, name, width in (
-        ("constituency", "Constituencies - Results", 9),
-        ("list", "Regional List - Results", 9),
-    ):
+    for ballot, name in (("constituency", "Constituencies - Results"), ("list", "Regional List - Results")):
         rows = sheet(path, name)
         header = rows[1]
         parties = header[9 : header.index("Others", 9) + 1]
@@ -176,34 +368,639 @@ def parse_workbooks() -> tuple[list[dict[str, object]], list[dict[str, object]]]
                     "constituency": row[1],
                     "region": row[2],
                     "electorate": number(row[3]),
+                    "cast": number(row[4]),
                     "rejected": number(row[6]),
                     "valid": number(row[5]),
                 }
             )
-            if ballot == "list":
-                for label, cell in zip(parties, row[9 : 9 + len(parties)], strict=True):
+            for label, cell in zip(parties, row[9 : 9 + len(parties)], strict=True):
+                if ballot == "list":
                     lists.append(
                         {"year": 2016, "region": row[2], "constituency": row[1], "party": label, "votes": number(cell)}
                     )
-    return units, lists
+                else:
+                    buckets.append(
+                        {"year": 2016, "constituency": row[1], "bucket": label.lower(), "votes": number(cell)}
+                    )
+    path = raw.cached(SOURCE, EC_2007).path
+    for row in sheet(path, "Sheet1")[3:]:
+        if row[1] is None or row[1] == "Scotland" or row[2] in (None, "."):
+            continue
+        units.append(
+            {
+                "year": 2007,
+                "ballot": "constituency",
+                "constituency": row[1],
+                "region": None,
+                "electorate": number(row[2]),
+                "cast": number(row[3]),
+                "rejected": None,
+                "valid": number(row[4]),
+            }
+        )
+    path = raw.cached(SOURCE, EMB_2021).path
+    rows = sheet(path, "Constituency - Votes")
+    start = next(index for index, row in enumerate(rows) if row[0] == "Constituency")
+    header = rows[start]
+    columns = {label: index for index, label in enumerate(header) if label is not None}
+    party_columns = {
+        "con": "Scottish Conservative and Unionist Party",
+        "lab": "Scottish Labour Party",
+        "ld": "Scottish Liberal Democrats",
+        "snp": "Scottish National Party (SNP)",
+        "grn": "Scottish Green Party",
+        "ind": "Independent Candidates",
+    }
+    for row in rows[start + 1 :]:
+        if row[0] is None or row[0] == "Total":
+            break
+        rejected = number(row[22])
+        units.append(
+            {
+                "year": 2021,
+                "ballot": "constituency",
+                "constituency": row[0],
+                "region": None,
+                "electorate": number(row[columns["Electorate"]]),
+                "cast": number(row[columns["Total Votes"]]),
+                "rejected": rejected,
+                "valid": number(row[columns["Total Votes"]]) - rejected,
+            }
+        )
+        for bucket, label in party_columns.items():
+            votes = number(row[columns[label]]) or 0
+            if bucket == "ind":
+                votes += number(row[columns["Candidate - No description"]]) or 0
+            buckets.append({"year": 2021, "constituency": row[0], "bucket": bucket, "votes": votes})
+    rows = sheet(path, "Region - Votes")
+    start = next(index for index, row in enumerate(rows) if row[0] == "Region")
+    regions = rows[start][1:-2]
+    totals = {}
+    for row in rows[start + 1 :]:
+        if row[0] is None or row[0] in ("Registered Parties", "Individual Candidates"):
+            continue
+        if row[0] in ("Rejected Papers", "Total", "Electorate"):
+            totals.setdefault(row[0], row[1 : 1 + len(regions)])
+            continue
+        if row[0].startswith("Turnout"):
+            break
+        for region, cell in zip(regions, row[1 : 1 + len(regions)], strict=True):
+            lists.append({"year": 2021, "region": region, "constituency": None, "party": row[0], "votes": number(cell)})
+    for index, region in enumerate(regions):
+        units.append(
+            {
+                "year": 2021,
+                "ballot": "list",
+                "constituency": None,
+                "region": region,
+                "electorate": number(totals["Electorate"][index]),
+                "cast": number(totals["Total"][index]),
+                "rejected": number(totals["Rejected Papers"][index]),
+                "valid": number(totals["Total"][index]) - number(totals["Rejected Papers"][index]),
+            }
+        )
+    return units, lists, buckets
 
 
 def parse() -> None:
     PARSED.mkdir(parents=True, exist_ok=True)
     candidates, members = parse_pages()
+    units, lists, buckets = parse_workbooks()
+    units = pl.DataFrame(units, infer_schema_length=None)
+    official = {(row["year"], fold(row["constituency"]), row["bucket"]): row["votes"] for row in buckets}
+    names = {
+        (row["year"], fold(row["constituency"])): row["constituency"]
+        for row in units.filter(pl.col("ballot") == "constituency").iter_rows(named=True)
+    }
+    rows = []
+    for row in candidates.iter_rows(named=True):
+        key = (row["year"], fold(row["constituency"]))
+        bucket = BUCKETS.get((row["party"] or "").lower())
+        total = official.get((*key, bucket)) if bucket is not None and key in names else None
+        row["page_votes"] = row["votes"]
+        row["workbook_name"] = names.get(key)
+        row["checked"] = False
+        row["excluded"] = total == 0 and bucket == "ind" and (row["votes"] or 0) > 0
+        if total is not None and bucket != "ind":
+            rivals = [
+                other
+                for other in candidates.filter(
+                    (pl.col("year") == row["year"]) & (pl.col("constituency") == row["constituency"])
+                ).iter_rows(named=True)
+                if BUCKETS.get((other["party"] or "").lower()) == bucket
+            ]
+            if len(rivals) == 1:
+                row["checked"] = True
+                row["votes"] = total
+        row["party_from_workbook"] = None
+        if row["party"] is None and row["votes"] is not None and key in names:
+            matches = [
+                bucket for bucket in ("con", "lab", "ld", "snp", "grn") if official.get((*key, bucket)) == row["votes"]
+            ]
+            if len(matches) == 1:
+                row["party_from_workbook"] = PARTY_LABELS[matches[0]]
+                row["party"] = PARTY_LABELS[matches[0]]
+        rows.append(row)
+    candidates = pl.DataFrame(rows, infer_schema_length=None)
     candidates.write_parquet(PARSED / "candidates.parquet")
     members.write_parquet(PARSED / "members.parquet")
-    units, lists = parse_workbooks()
-    pl.DataFrame(units).write_parquet(PARSED / "units.parquet")
-    pl.DataFrame(lists).write_parquet(PARSED / "list_votes.parquet")
+    units.write_parquet(PARSED / "units.parquet")
+    pl.DataFrame(lists, infer_schema_length=None).write_parquet(PARSED / "list_votes.parquet")
     for year in sorted(set(candidates["year"])):
         winners = candidates.filter((pl.col("year") == year) & pl.col("elected"))
+        held = candidates.filter(pl.col("year") == year)
         print(
             year,
             "constituencies",
-            candidates.filter(pl.col("year") == year)["constituency"].n_unique(),
+            held["constituency"].n_unique(),
+            "matched",
+            held.filter(pl.col("workbook_name").is_not_null())["constituency"].n_unique(),
             "winners",
             len(winners),
             "list members",
             len(members.filter(pl.col("year") == year)),
+            "changed",
+            len(held.filter(pl.col("checked") & (pl.col("votes") != pl.col("page_votes")))),
         )
+
+
+def region_key(text: str) -> str:
+    key = fold(text)
+    return "lothian" if key == "lothians" else key
+
+
+def emit() -> Path:
+    candidates = pl.read_parquet(PARSED / "candidates.parquet").with_columns(
+        ckey=pl.col("constituency").map_elements(fold, return_dtype=pl.String)
+    )
+    members = pl.read_parquet(PARSED / "members.parquet").with_columns(
+        rkey=pl.col("region").map_elements(region_key, return_dtype=pl.String)
+    )
+    units = pl.read_parquet(PARSED / "units.parquet").with_columns(
+        ckey=pl.col("constituency").map_elements(fold, return_dtype=pl.String),
+        rkey=pl.col("region").map_elements(region_key, return_dtype=pl.String),
+    )
+    list_votes = pl.read_parquet(PARSED / "list_votes.parquet").with_columns(
+        ckey=pl.col("constituency").map_elements(fold, return_dtype=pl.String),
+        rkey=pl.col("region").map_elements(region_key, return_dtype=pl.String),
+    )
+    with connect() as conn:
+        cs = Changeset(
+            conn,
+            pipeline=SOURCE,
+            version=VERSION,
+            summary="Scottish Parliament elections 1999–2026 by constituency and region, from the Scottish Parliament, the Electoral Commission, and the Electoral Management Board",
+            polity="GB-SCT",
+        )
+
+        def name(entity: UUID, text: str) -> None:
+            cs.add("name", entity_id=entity, text=text, lang="en", kind="official", is_preferred=True)
+
+        scotland = cs.polity("GB-SCT")
+        gb = cs.polity("GB")
+        country = cs.area("gb.country", "SCT")
+        if country in cs.minted:
+            raise ValueError("publish gb.umit first: the countries must exist")
+        for code, rank, noun in (("gb.spr", 1, "electoral region"), ("gb.spc", 2, "constituency")):
+            if conn.execute("select 1 from scheme where code = %s", [code]).fetchone() is None:
+                cs.add("scheme", code=code, polity_id=scotland, kind="electoral_district", rank=rank, noun=noun)
+        fptp = cs.key("gb.electoral_system", "fptp")
+        if fptp in cs.minted:
+            raise ValueError("publish gb.parliament first: first past the post must exist")
+        ams = cs.key("gb.electoral_system", "scottish-ams-list")
+        if ams in cs.minted:
+            cs.add("electoral_system", id=ams, polity_id=scotland, rules={"formula": "dhondt"}, rules_version=1)
+            name(ams, "Additional member system, regional lists (Scottish Parliament)")
+            cs.add("note", entity_id=ams, kind="methodology", body_md=AMS)
+        body = cs.key("gb.body", "scottish-parliament")
+        if body in cs.minted:
+            cs.add("body", id=body, polity_id=scotland, kind="unicameral")
+            name(body, "Scottish Parliament")
+
+        sources: dict[str, UUID] = {}
+        for key, publisher, title, url, licence, licence_url, attribution in SOURCES:
+            sources[key] = cs.source(publisher, title)
+            cs.add(
+                "source",
+                id=sources[key],
+                kind="official_body",
+                publisher=publisher,
+                title=title,
+                url=url,
+                license=licence,
+                license_url=licence_url,
+                attribution=attribution,
+            )
+        for url, key in (
+            *((url, "page") for url in PAGES.values()),
+            (EC_2007, "ec2007"),
+            (EC_2011, "ec2011"),
+            (EC_2016, "ec2016"),
+            (EMB_2021, "emb2021"),
+        ):
+            cs.artifact(raw.cached(SOURCE, url), sources[key])
+
+        parties: dict[str, UUID] = {}
+
+        def party_of(label: str | None) -> UUID | None:
+            if label is None or label in umit.NOT_PARTIES or label == "Ind":
+                return None
+            key = PARTY_KEYS.get(label.lower()) or umit.ALIASES.get(label) or slug(label)
+            if key not in parties:
+                if key in umit.EXISTING:
+                    parties[key] = cs.key(*umit.EXISTING[key])
+                else:
+                    parties[key] = cs.key("gb.party", key)
+                    if parties[key] in cs.minted:
+                        cs.add("party", id=parties[key], kind="party", polity_id=gb)
+                        name(parties[key], umit.NAMES.get(key, label))
+            return parties[key]
+
+        starts = sorted(set(ERAS.values()))
+        ends = dict(itertools.pairwise(starts))
+        region_areas: dict[tuple[int, str], UUID] = {}
+        region_units: dict[tuple[int, str], UUID] = {}
+        constituency_areas: dict[tuple[int, str], UUID] = {}
+        constituency_units: dict[tuple[int, str], UUID] = {}
+        region_labels: dict[tuple[int, str], str] = {}
+        located = {
+            row["ckey"]: row["rkey"]
+            for row in units.filter((pl.col("ballot") == "list") & (pl.col("year") == 2011)).iter_rows(named=True)
+        }
+        for era in starts:
+            start = ELECTIONS[era]
+            end = ELECTIONS[ends[era]] if era in ends else None
+            first = candidates.filter(pl.col("year") == era)
+            for row in members.filter(pl.col("year") == era).iter_rows(named=True):
+                region_labels.setdefault(
+                    (era, row["rkey"]), "Lothian" if row["rkey"] == "lothian" and era == 2011 else row["region"]
+                )
+            for (rkey,), label in ((key[1:], label) for key, label in region_labels.items() if key[0] == era):
+                code = f"{era}:{slug(label)}"
+                area = region_areas[(era, rkey)] = cs.area("gb.spr", code, start)
+                unit = region_units[(era, rkey)] = cs.unit("gb.spr", code)
+                if area in cs.minted:
+                    cs.add("area", id=area, scheme_code="gb.spr")
+                    cs.add("area_code", area_id=area, code=code, valid_from=start, valid_to=end)
+                    cs.add("area_parent", area_id=area, parent_id=country, valid_from=start, valid_to=end)
+                    name(area, label)
+                if unit in cs.minted:
+                    cs.add(
+                        "reporting_unit",
+                        id=unit,
+                        polity_id=scotland,
+                        scheme_code="gb.spr",
+                        code=code,
+                        area_relation="equals",
+                        area_id=area,
+                        kind="standard",
+                        valid_from=start,
+                        valid_to=end,
+                    )
+                    name(unit, label)
+            for ckey, label in first.select("ckey", "constituency").unique().iter_rows():
+                code = f"{era}:{slug(label)}"
+                parent = region_areas[(era, located[ckey])] if era == 2011 else country
+                area = constituency_areas[(era, ckey)] = cs.area("gb.spc", code, start)
+                unit = constituency_units[(era, ckey)] = cs.unit("gb.spc", code)
+                if area in cs.minted:
+                    cs.add("area", id=area, scheme_code="gb.spc")
+                    cs.add("area_code", area_id=area, code=code, valid_from=start, valid_to=end)
+                    cs.add("area_parent", area_id=area, parent_id=parent, valid_from=start, valid_to=end)
+                    name(area, label)
+                if unit in cs.minted:
+                    cs.add(
+                        "reporting_unit",
+                        id=unit,
+                        polity_id=scotland,
+                        scheme_code="gb.spc",
+                        code=code,
+                        area_relation="equals",
+                        area_id=area,
+                        kind="standard",
+                        valid_from=start,
+                        valid_to=end,
+                    )
+                    name(unit, label)
+
+        elected_names = {
+            slug(text) for text in (*candidates.filter(pl.col("elected"))["candidate"], *members["member"])
+        }
+        persons: dict[str, UUID] = {}
+
+        def person_of(year: int, place: str, text: str) -> UUID:
+            identity = slug(text) if slug(text) in elected_names else f"{year}:{slug(place)}:{slug(text)}"
+            if identity not in persons:
+                persons[identity] = cs.key(f"{SOURCE}.person", identity)
+                if persons[identity] in cs.minted:
+                    cs.add("person", id=persons[identity])
+                    name(persons[identity], text)
+            return persons[identity]
+
+        def value(result_set: UUID, unit: UUID, option: UUID | None, measure: int, amount: int | None) -> None:
+            if amount is None:
+                return
+            cs.add(
+                "result_value",
+                result_set_id=result_set,
+                unit_id=unit,
+                option_id=option,
+                channel=0,
+                measure=measure,
+                count_round=0,
+                flags=0,
+                value=amount,
+            )
+
+        for year, day in ELECTIONS.items():
+            era = ERAS[year]
+            election = cs.key("gb.election", str(day))
+            cs.add(
+                "election",
+                id=election,
+                polity_id=scotland,
+                kind="general",
+                date_from=day,
+                date_to=day,
+                status="held",
+            )
+            name(election, f"{year} Scottish Parliament election")
+            path = f"gb/scotland/{day}-general"
+            cs.add("slug", path=path, entity_id=election)
+            workbook = {2007: "ec2007", 2011: "ec2011", 2016: "ec2016", 2021: "emb2021"}.get(year)
+            held = candidates.filter(pl.col("year") == year)
+            year_units = units.filter(pl.col("year") == year)
+            constituency_figures = {
+                row["ckey"]: row for row in year_units.filter(pl.col("ballot") == "constituency").iter_rows(named=True)
+            }
+            for (constituency,), lines in held.group_by("constituency", maintain_order=True):
+                ckey = fold(constituency)
+                unit = constituency_units[(era, ckey)]
+                contest_key = f"{day}:{slug(constituency)}"
+                contest = cs.key("gb.contest", contest_key)
+                cs.add(
+                    "contest",
+                    id=contest,
+                    election_id=election,
+                    kind="body_seats",
+                    body_id=body,
+                    district_area_id=constituency_areas[(era, ckey)],
+                    magnitude=1,
+                    round_number=1,
+                    electoral_system_id=fptp,
+                    default_result_kind="counted",
+                )
+                name(contest, f"{year} Scottish Parliament election in {constituency}")
+                cs.add("slug", path=f"{path}/{slug(constituency)}", entity_id=contest)
+                result_set = cs.key(f"{SOURCE}.result_set", contest_key)
+                figures = constituency_figures.get(ckey)
+                shown = lines.filter(~pl.col("excluded"))
+                missing = shown.filter(pl.col("votes").is_null())
+                cs.add(
+                    "result_set",
+                    id=result_set,
+                    election_id=election,
+                    contest_id=contest,
+                    stage="official",
+                    kind="counted",
+                    status="active",
+                    source_id=sources["page"],
+                    is_default=True,
+                    completeness=0.5 if len(missing) else 1,
+                )
+                if len(missing):
+                    cs.add(
+                        "note",
+                        entity_id=result_set,
+                        kind="caveat",
+                        body_md="The Scottish Parliament's page prints no vote count for "
+                        + " and ".join(missing["candidate"])
+                        + " in this contest. Their votes are left blank rather than inferred.",
+                    )
+                total = shown["votes"].drop_nulls().sum()
+                if figures is not None and not len(missing) and total != figures["valid"]:
+                    cs.add(
+                        "note",
+                        entity_id=result_set,
+                        kind="caveat",
+                        body_md=f"The candidates' votes on the Scottish Parliament's page sum to {total:,}, but the "
+                        f"{'Electoral Management Board' if year == 2021 else 'Electoral Commission'} reports "
+                        f"{figures['valid']:,} valid votes. The page's figures are kept for candidates the "
+                        "official workbook does not break out.",
+                    )
+                if figures is not None:
+                    for measure, amount in (
+                        (REGISTERED, figures["electorate"]),
+                        (BALLOTS, figures["cast"]),
+                        (VALID, figures["valid"]),
+                        (INVALID, figures["rejected"]),
+                    ):
+                        value(result_set, unit, None, measure, amount)
+                        if amount is not None:
+                            cs.add(
+                                "value_locator",
+                                result_set_id=result_set,
+                                unit_id=unit,
+                                option_id=None,
+                                channel=0,
+                                measure=measure,
+                                count_round=0,
+                                source_id=sources[workbook],
+                            )
+                for line in lines.iter_rows(named=True):
+                    if line["excluded"]:
+                        cs.add(
+                            "note",
+                            entity_id=contest,
+                            kind="context",
+                            body_md=f"The Scottish Parliament's page lists {line['candidate']} "
+                            f"({line['party'] or 'no party'}) with {line['page_votes']:,} votes. The Electoral "
+                            "Commission's workbook records no candidate in that column and a valid total that "
+                            "excludes them, so they are not shown.",
+                        )
+                        continue
+                    option_key = f"{contest_key}:{slug(line['candidate'])}"
+                    option = cs.key("gb.option", option_key)
+                    party = party_of(line["party"])
+                    cs.add(
+                        "contest_option",
+                        id=option,
+                        contest_id=contest,
+                        kind="candidate",
+                        party_id=party,
+                        ballot_label=line["candidate"],
+                    )
+                    cs.add(
+                        "candidacy",
+                        id=cs.key("gb.candidacy", option_key),
+                        person_id=person_of(year, constituency, line["candidate"]),
+                        option_id=option,
+                        role="head",
+                        ballot_name=line["candidate"],
+                        member_of_party_id=party,
+                        is_independent=line["party"] in umit.NOT_PARTIES,
+                    )
+                    if line["party_from_workbook"] is not None:
+                        cs.add(
+                            "note",
+                            entity_id=contest,
+                            kind="context",
+                            body_md=f"The Scottish Parliament's page prints no party for {line['candidate']}. The "
+                            f"workbook's {line['party_from_workbook']} total for this constituency equals their "
+                            f"{line['votes']:,} votes, so that party is shown.",
+                        )
+                    value(result_set, unit, option, VOTES, line["votes"])
+                    if line["checked"] and line["votes"] is not None:
+                        cs.add(
+                            "value_locator",
+                            result_set_id=result_set,
+                            unit_id=unit,
+                            option_id=option,
+                            channel=0,
+                            measure=VOTES,
+                            count_round=0,
+                            source_id=sources[workbook],
+                        )
+                        if line["votes"] != line["page_votes"]:
+                            cs.add(
+                                "note",
+                                entity_id=contest,
+                                kind="context",
+                                body_md=f"The Scottish Parliament's page prints {line['page_votes']:,} votes for "
+                                f"{line['candidate']}; the Electoral Commission's workbook gives {line['votes']:,} "
+                                "for their party, which is used here.",
+                            )
+                    if line["elected"]:
+                        cs.add("outcome", result_set_id=result_set, option_id=option, kind="elected")
+
+            list_source = {2011: "ec2011", 2016: "ec2016", 2021: "emb2021"}.get(year)
+            year_lists = list_votes.filter(pl.col("year") == year)
+            expansions = {2011: LISTS_2011, 2016: LISTS_2016}.get(year, {})
+            for (rkey,), region_members in members.filter(pl.col("year") == year).group_by("rkey", maintain_order=True):
+                label = region_labels[(era, rkey)]
+                contest_key = f"{day}:list:{slug(label)}"
+                contest = cs.key("gb.contest", contest_key)
+                cs.add(
+                    "contest",
+                    id=contest,
+                    election_id=election,
+                    kind="list_allocation",
+                    body_id=body,
+                    district_area_id=region_areas[(era, rkey)],
+                    magnitude=len(region_members),
+                    round_number=1,
+                    electoral_system_id=ams,
+                    default_result_kind="counted",
+                )
+                name(contest, f"{year} Scottish Parliament election, {label} regional list")
+                cs.add("slug", path=f"{path}/{slug(label)}-regional-list", entity_id=contest)
+                result_set = cs.key(f"{SOURCE}.result_set", contest_key)
+                cs.add(
+                    "result_set",
+                    id=result_set,
+                    election_id=election,
+                    contest_id=contest,
+                    stage="official",
+                    kind="counted",
+                    status="active",
+                    source_id=sources[list_source or "page"],
+                    is_default=True,
+                    completeness=1 if list_source is not None else 0,
+                )
+                if list_source is None:
+                    cs.add("note", entity_id=result_set, kind="caveat", body_md=NO_LIST_VOTES)
+                region_lists = year_lists.filter(pl.col("rkey") == rkey)
+                options: dict[str, UUID] = {}
+                by_party: dict[UUID, UUID] = {}
+                for source_label in dict.fromkeys(region_lists["party"]):
+                    individual = re.fullmatch(r"[A-Z' -]+, .+", source_label) is not None
+                    other = source_label in ("Others", "Ind", "IND")
+                    if individual:
+                        surname, forename = source_label.split(", ", 1)
+                        full = f"{forename} {surname.title()}"
+                    elif year == 2021:
+                        full = source_label.title().replace("(Snp)", "(SNP)").replace("(Ukip)", "(UKIP)")
+                    else:
+                        full = expansions.get(source_label, source_label)
+                    option = options[source_label] = cs.key("gb.option", f"{contest_key}:{slug(source_label)}")
+                    party = None if other or individual else party_of(full)
+                    if party is not None:
+                        by_party[party] = option
+                    cs.add(
+                        "contest_option",
+                        id=option,
+                        contest_id=contest,
+                        kind="others" if other else "candidate" if individual else "list",
+                        party_id=party,
+                        ballot_label="Independent candidates" if source_label in ("Ind", "IND") else full,
+                    )
+                elected: dict[UUID, list[dict[str, object]]] = {}
+                for line in region_members.iter_rows(named=True):
+                    party = party_of(line["party"])
+                    if party is None:
+                        option = cs.key("gb.option", f"{contest_key}:{slug(line['member'])}")
+                        cs.add(
+                            "contest_option",
+                            id=option,
+                            contest_id=contest,
+                            kind="candidate",
+                            party_id=None,
+                            ballot_label=line["member"],
+                        )
+                    elif party in by_party:
+                        option = by_party[party]
+                    elif list_source is None:
+                        option = by_party[party] = cs.key("gb.option", f"{contest_key}:{slug(line['party'])}")
+                        cs.add(
+                            "contest_option",
+                            id=option,
+                            contest_id=contest,
+                            kind="list",
+                            party_id=party,
+                            ballot_label=line["party"],
+                        )
+                    else:
+                        raise ValueError(f"{year} {label}: no list for {line['member']} ({line['party']})")
+                    elected.setdefault(option, []).append({**line, "party_id": party})
+                for option, winners in elected.items():
+                    listed = winners[0]["party_id"] is not None
+                    if listed:
+                        cs.add("outcome", result_set_id=result_set, option_id=option, kind="won", seats=len(winners))
+                    else:
+                        cs.add("outcome", result_set_id=result_set, option_id=option, kind="elected")
+                    for line in winners:
+                        candidacy = cs.key("gb.candidacy", f"{contest_key}:{slug(line['member'])}")
+                        cs.add(
+                            "candidacy",
+                            id=candidacy,
+                            person_id=person_of(year, label, line["member"]),
+                            option_id=option,
+                            role="list_member" if listed else "head",
+                            ballot_name=line["member"],
+                            member_of_party_id=line["party_id"],
+                            is_independent=not listed,
+                        )
+                        if listed:
+                            cs.add(
+                                "outcome",
+                                result_set_id=result_set,
+                                option_id=option,
+                                candidacy_id=candidacy,
+                                kind="elected",
+                            )
+                if list_source is None:
+                    continue
+                list_units = year_units.filter((pl.col("ballot") == "list") & (pl.col("rkey") == rkey))
+                for row in list_units.iter_rows(named=True):
+                    unit = region_units[(era, rkey)] if year == 2021 else constituency_units[(era, row["ckey"])]
+                    for measure, amount in (
+                        (REGISTERED, row["electorate"]),
+                        (BALLOTS, row["cast"]),
+                        (VALID, row["valid"]),
+                        (INVALID, row["rejected"]),
+                    ):
+                        value(result_set, unit, None, measure, amount)
+                for row in region_lists.iter_rows(named=True):
+                    unit = region_units[(era, rkey)] if year == 2021 else constituency_units[(era, row["ckey"])]
+                    value(result_set, unit, options[row["party"]], VOTES, row["votes"])
+        return cs.write()

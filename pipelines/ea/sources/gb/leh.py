@@ -288,7 +288,7 @@ def emit() -> Path:
                 found = known.get(fold(label))
                 if found is None:
                     found = cs.key("gb.party", slug(label))
-                    if found in cs.minted:
+                    if found in cs.minted and found not in party_ids.values():
                         cs.add("party", id=found, kind="party", polity_id=gb)
                         name(found, label)
                 party_ids[abbreviation] = found
@@ -342,7 +342,7 @@ def emit() -> Path:
             if polities[code] in cs.minted:
                 cs.add("polity", id=polities[code], kind="county" if is_county else "municipality", iso_code=None)
                 name(polities[code], f"{label} Council")
-                cs.add("polity_parent", polity_id=polities[code], parent_id=gb)
+                cs.add("polity_parent", polity_id=polities[code], parent_id=cs.polity("GB-WLS" if code.startswith("W") else "GB-ENG"))
                 cs.add("slug", path=path, entity_id=polities[code])
                 cs.add("polity_territory", polity_id=polities[code], area_id=areas[code])
             bodies[code] = cs.key("gb.body", code)
@@ -401,7 +401,7 @@ def emit() -> Path:
                         valid_from=None,
                     )
                     name(unit, display)
-                seats = ward_row["seats"] if ward_row else int(lines["elected"].sum())
+                seats = (ward_row["seats"] if ward_row else None) or int(lines["elected"].sum())
                 if int(lines["elected"].sum()) != seats:
                     raise ValueError(f"{year} {ward_code}: {lines['elected'].sum()} elected for {seats} seats")
                 tacit = ward_row is None or int(lines["votes"].sum()) == 0
