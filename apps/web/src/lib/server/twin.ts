@@ -708,7 +708,7 @@ function personMarkdown(
 }
 
 function partyMarkdown(
-  { party, record, members, notes }: Extract<Data, { kind: "party" }>,
+  { party, record, members, notes, history }: Extract<Data, { kind: "party" }>,
   link: Link,
 ) {
   const related = [
@@ -733,7 +733,57 @@ function partyMarkdown(
             polity: party.polity.name,
           }),
         ]),
+    ...(party.span == null && party.wikidata == null
+      ? []
+      : [
+          [
+            ...(party.span == null
+              ? []
+              : [
+                  `${m.party_ballot()}: ${
+                    party.span.from.slice(0, 4) === party.span.to.slice(0, 4)
+                      ? party.span.from.slice(0, 4)
+                      : m.polity_span({
+                          first: party.span.from.slice(0, 4),
+                          last: party.span.to.slice(0, 4),
+                        })
+                  }. ${m.party_elections()}: ${count(record.count)}. ${m.party_contests()}: ${count(party.span.contests)}.`,
+                ]),
+            ...(party.wikidata == null
+              ? []
+              : [
+                  `[${m.card_wikidata()}](https://www.wikidata.org/wiki/${party.wikidata})`,
+                ]),
+          ].join(" "),
+        ]),
     ...notes.map((note) => `> ${note.body}`),
+    ...history.flatMap((series) => [
+      `## ${history.length > 1 ? `${m.party_history_title()}, ${series.name}` : m.party_history_title()}`,
+      m.party_history_lede(),
+      table(
+        [
+          m.col_year(),
+          m.col_election(),
+          m.party_history_votes(),
+          m.party_history_seats(),
+        ],
+        series.points
+          .toReversed()
+          .map((point) => [
+            point.year,
+            `${link(point.name, point.path)}${point.predecessor == null ? "" : ` (${m.party_history_as({ name: point.predecessor })})`}`,
+            point.votes == null || point.votes === 0 || point.total == null
+              ? null
+              : percent(point.votes / point.total),
+            point.seats == null || point.filled == null
+              ? null
+              : m.party_history_seats_of({
+                  seats: count(point.seats),
+                  filled: count(point.filled),
+                }),
+          ]),
+      ),
+    ]),
     ...(related.length === 0
       ? []
       : [`## ${m.party_relations()}`, related.join("\n")]),

@@ -13733,7 +13733,11 @@ export const parties = {
               total: sum((row) => row.total, isMixed),
               seats: sum((row) => row.seats, isCovered),
               filled: sum((row) => row.filled, isCovered),
-              predecessor: vias[0] ?? null,
+              predecessor: group
+                .filter((row) => (byRoot.get(row.id)?.votes ?? 0) > 0)
+                .every((row) => byRoot.get(row.id)?.via != null)
+                ? (vias[0] ?? null)
+                : null,
             };
           })
           .toArray()
