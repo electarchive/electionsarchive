@@ -426,7 +426,8 @@ async function names(ids: Array<string>, on: string | null = null) {
     (select distinct on (entity_id) entity_id, kind::text, text
     from name
     where entity_id = any(${sql.param(ids)}::uuid[]) and kind in ('official', 'english')
-    order by entity_id, coalesce(valid @> ${on}::date, false) desc, is_preferred desc,
+    order by entity_id, coalesce(valid @> ${on}::date, false) desc,
+      (kind = 'english' and exists (select from person p where p.id = entity_id)) desc, is_preferred desc,
       (lang = 'en') desc, (kind = 'official') desc)
     union all
     select i.id, 'abbreviation', short.text
