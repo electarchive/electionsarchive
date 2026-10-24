@@ -2,6 +2,7 @@ import re
 import subprocess
 import unicodedata
 import zipfile
+import xml.etree.ElementTree as ET
 from datetime import date
 from pathlib import Path
 from uuid import UUID
@@ -25,12 +26,38 @@ DAYS = {
     2011: date(2011, 5, 5),
     2016: date(2016, 5, 5),
     2017: date(2017, 3, 2),
+    2022: date(2022, 5, 5),
 }
 ARK = {year: f"https://web.archive.org/web/2020if_/https://www.ark.ac.uk/elections/xls/asby/{year}.rar" for year in (1998, 2003, 2007)}
 NICVA = {
     year: f"https://raw.githubusercontent.com/NICVA/electionsni/master/{year}/{year}_archive_datapackage.zip"
     for year in (2011, 2016, 2017)
 }
+EONI_PAGE = "https://eoni.org.uk/results-data/ni-assembly-election-2022-results/"
+EONI = [
+    f"https://eoni.org.uk/media/{path}"
+    for path in (
+        "omtlpqow/ni-assembly-election-2022-result-sheet-belfast-east-xls.xlsx",
+        "bqrbtk4a/ni-assembly-election-2022-result-sheet-belfast-north-xls.xlsx",
+        "pkkjci4k/ni-assembly-election-2022-result-sheet-belfast-south-xls.xlsx",
+        "huglkl0f/ni-assembly-election-results-belfast-west.xlsx",
+        "qbyhzdfl/ni-assembly-election-2022-result-sheet-east-antrim.xlsx",
+        "doll4nhx/ni-assembly-election-2022-result-sheet-east-londonderry.xlsx",
+        "ohlpljon/ni-assembly-election-2022-result-sheet-fermanagh-south-tyrone-xls.xlsx",
+        "vzoenf3x/ni-assembly-election-2022-result-sheet-foyle-xls.xlsx",
+        "iv2fdbsu/ni-assembly-election-2022-result-sheet-lagan-valley-xls.xlsx",
+        "qqblt0jk/ni-assembly-election-results-mid-ulster.xlsx",
+        "g5fdrfyd/ni-assembly-election-2022-result-sheet-newry-and-armagh.xlsx",
+        "bsfixocn/ni-assembly-election-results-north-antrim.xlsx",
+        "vm5kqxjv/ni-assembly-election-results-north-down.xlsx",
+        "ye2os1yn/ni-assembly-election-2022-result-sheet-south-antrim-xls.xlsx",
+        "chabp3os/ni-assembly-election-results-south-down.xlsx",
+        "00jdc0l2/ni-assembly-election-2022-result-sheet-strangford-xls.xlsx",
+        "0trd4nsy/ni-assembly-election-results-upper-bann.xlsx",
+        "1q3b5g2u/ni-assembly-election-2022-result-sheet-west-tyrone-xls.xlsx",
+    )
+]
+SHEET = "{http://schemas.openxmlformats.org/spreadsheetml/2006/main}"
 FACTS = {
     "eligible electorate": "electorate",
     "votes polled": "polled",
@@ -45,9 +72,35 @@ def fold(text: str) -> str:
     return " ".join(re.findall(r"[a-z0-9]+", plain.replace("&", " and ")))
 
 
+INDEPENDENT_UNIONISTS_1998 = {
+    ("Belfast North", "Agnew"),
+    ("Upper Bann", "Watson"),
+    ("North Antrim", "Wright"),
+    ("Strangford", "Beattie"),
+}
+
+
 def fetch() -> None:
-    for url in (*ARK.values(), *NICVA.values()):
-        raw.fetch(SOURCE, url, suffix=".rar" if "ark.ac.uk" in url else ".zip")
+    for url in (*ARK.values(), *NICVA.values(), *EONI):
+        raw.fetch(SOURCE, url, suffix=".rar" if "ark.ac.uk" in url else ".xlsx" if url.endswith(".xlsx") else ".zip")
+
+
+def workbook(path: Path) -> dict[int, dict[str, str | float]]:
+    with zipfile.ZipFile(path) as z:
+        strings = [
+            "".join(t.text or "" for t in si.iter(f"{SHEET}t"))
+            for si in ET.fromstring(z.read("xl/sharedStrings.xml")).findall(f"{SHEET}si")
+        ]
+        rows: dict[int, dict[str, str | float]] = {}
+        for cell in ET.fromstring(z.read("xl/worksheets/sheet1.xml")).iter(f"{SHEET}c"):
+            value = cell.find(f"{SHEET}v")
+            if value is None or value.text is None or cell.get("t") == "e":
+                continue
+            column = re.match(r"[A-Z]+", cell.get("r")).group()
+            rows.setdefault(int(cell.get("r")[len(column) :]), {})[column] = (
+                strings[int(value.text)] if cell.get("t") == "s" else value.text if cell.get("t") in ("str", "b") else float(value.text)
+            )
+    return rows
 
 
 def number(cell: str | None) -> float:
@@ -69,7 +122,24 @@ def ark_sheet(year: int, path: Path) -> dict[str, object]:
     names = [(row[3] or "").strip().lower() for row in rows]
     non_transferable = next(index for index, name in enumerate(names) if name.startswith("non"))
     totals = next(index for index, name in enumerate(names) if name in ("total", "totals"))
-    stages = sorted(stage for stage, column in stage_cols.items() if rows[totals][column] not in (None, "", " "))
+    blank = (None, "", " ")
+
+    def cell(row: list[str | None], column: int) -> str | None:
+        return row[column] if column < len(row) else None
+
+    for stage, column in stage_cols.items():
+        if stage > 1 and (
+            (cell(rows[1], column) or "").strip().lower() == "recvd"
+            or (cell(rows[totals], column) in blank and cell(rows[totals], column + 1) not in blank)
+        ):
+            stage_cols[stage] = column + 1
+    body = rows[2:non_transferable]
+    stages = sorted(
+        stage
+        for stage, column in stage_cols.items()
+        if cell(rows[totals], column) not in blank
+        or any(cell(row, column) not in blank + ("-",) and (cell(row, 1) or "").strip().isdigit() for row in body)
+    )
     candidates = []
     for row in rows[2:non_transferable]:
         if row[2] is None or not (row[1] or "").strip().isdigit():
@@ -79,7 +149,7 @@ def ark_sheet(year: int, path: Path) -> dict[str, object]:
                 "name": row[2].strip(),
                 "party": re.sub(r"\s+", " ", (row[3] or "").strip()),
                 "elected": False,
-                "totals": {stage: number(row[stage_cols[stage]]) for stage in stages},
+                "totals": {stage: number(cell(row, stage_cols[stage])) for stage in stages},
             }
         )
     facts: dict[str, float] = {}
@@ -106,10 +176,23 @@ def ark_sheet(year: int, path: Path) -> dict[str, object]:
         elif "quota" in label:
             facts["quota"] = float(value)
     seats = int(facts["seats"])
-    ranked = sorted(candidates, key=lambda candidate: -candidate["totals"][stages[-1]])
+    valid = facts.get("valid") or sum(candidate["totals"][1] for candidate in candidates)
+    quota = (facts.get("quota") if facts.get("quota") and abs(facts["quota"] - (valid // (seats + 1) + 1)) < 1 else None) or valid // (seats + 1) + 1
     for candidate in candidates:
-        candidate["elected"] = candidate in ranked[:seats] and candidate["totals"][stages[-1]] > 0
-    exhausted = {stage: number(rows[non_transferable][stage_cols[stage]]) for stage in stages}
+        flag = cell(next(row for row in body if (cell(row, 2) or "").strip() == candidate["name"]), 0) or ""
+        candidate["flagged"] = flag.strip() not in ("", "Excluded")
+        candidate["elected"] = max(candidate["totals"].values()) >= quota - 0.01
+    standing = sorted(
+        (candidate for candidate in candidates if not candidate["elected"] and candidate["totals"][stages[-1]] > 0),
+        key=lambda candidate: -candidate["totals"][stages[-1]],
+    )
+    for candidate in standing[: max(seats - sum(candidate["elected"] for candidate in candidates), 0)]:
+        candidate["elected"] = True
+    chosen = {candidate["name"] for candidate in candidates if candidate["elected"]}
+    printed = {candidate["name"] for candidate in candidates if candidate["flagged"]}
+    if len(chosen) != seats or not printed <= chosen:
+        raise ValueError(f"{year} {path.stem}: derived {sorted(chosen)} against printed {sorted(printed)} for {seats} seats")
+    exhausted = {stage: number(cell(rows[non_transferable], stage_cols[stage])) for stage in stages}
     return {"facts": facts, "candidates": candidates, "exhausted": exhausted, "stages": stages}
 
 
@@ -136,6 +219,8 @@ def parse() -> None:
             facts = parsed["facts"]
             units.append({"year": year, "constituency": constituency, **facts})
             for position, candidate in enumerate(parsed["candidates"], start=1):
+                if (year, constituency, candidate["name"].split(",")[0].strip()) in {(1998, *key) for key in INDEPENDENT_UNIONISTS_1998}:
+                    candidate["party"] = "Independent Unionist"
                 for stage, value in candidate["totals"].items():
                     totals.append(
                         {
@@ -188,6 +273,66 @@ def parse() -> None:
                         "votes": float(line["Total_Votes"] or 0),
                     }
                 )
+    skipped = []
+    for url in EONI:
+        rows = workbook(raw.cached(SOURCE, url).path)
+        header = next(number for number, row in rows.items() if row.get("C") == "Candidate")
+        constituency = str(rows[2]["D"]).strip()
+        candidates = []
+        for number in range(header + 1, header + 40):
+            if not isinstance(rows.get(number, {}).get("C"), str) or not rows[number]["C"]:
+                break
+            candidates.append(rows[number])
+        tail = {}
+        for number in range(header + len(candidates) + 1, header + len(candidates) + 40):
+            if (row := rows.get(number, {})).get("D") in ("Non transferable", "Totals"):
+                tail.setdefault(row["D"], row)
+        columns = [column for column in ("E", "G", "I", "K", "M", "O", "Q", "S", "U", "W") if (tail["Totals"].get(column) or 0) > 0]
+        valid = rows[4]["G"]
+        ties = all(
+            abs(sum(row.get(column, 0) for row in candidates) + tail["Non transferable"].get(column, 0) - valid) <= 0.5
+            for column in columns
+        )
+        flagged = [row for row in candidates if row.get("A") == "Elected"]
+        seats = int(rows[3]["G"])
+        if not ties or len(flagged) not in (seats, seats - 1):
+            skipped.append(constituency)
+            continue
+        last_seat = None
+        if len(flagged) == seats - 1:
+            last_seat = max((row for row in candidates if row.get("A") != "Elected"), key=lambda row: row[columns[-1]])
+            last_seat["A"] = "Elected"
+            last_seat = last_seat["C"]
+        units.append(
+            {
+                "year": 2022,
+                "constituency": constituency,
+                "electorate": rows[3]["D"],
+                "polled": rows[4]["D"],
+                "invalid": rows[3]["J"],
+                "valid": valid,
+                "quota": rows[3]["M"],
+                "seats": seats,
+                "last_seat": last_seat,
+            }
+        )
+        for position, row in enumerate(candidates, start=1):
+            for stage, column in enumerate(columns, start=1):
+                totals.append(
+                    {
+                        "year": 2022,
+                        "constituency": constituency,
+                        "number": position,
+                        "name": row["C"],
+                        "party": row["D"],
+                        "elected": row.get("A") == "Elected",
+                        "incumbent": None,
+                        "gender": None,
+                        "stage": stage,
+                        "votes": float(row.get(column, 0)),
+                    }
+                )
+    print("not loaded, stages do not tie or elected not declared:", skipped)
     pl.DataFrame(units, infer_schema_length=None).write_parquet(PARSED / "units.parquet")
     pl.DataFrame(totals, infer_schema_length=None).with_columns(
         pl.col("elected").any().over("year", "constituency", "number")
@@ -197,8 +342,8 @@ def parse() -> None:
 
 PARTIES = (
     (r"women", "NI Women's Coalition"),
-    (r"united unionist|ulster unionist|^u\.?u\.?p\b|^uup$|ufster unionist|pariy", "Ulster Unionist Party"),
     (r"d\.?u\.?p|demo?cratic unionist|demoratic unionist", "Democratic Unionist Party"),
+    (r"united unionist|ulster unionist|^u\.?u\.?p\b|^uup$|ufster unionist|pariy", "Ulster Unionist Party"),
     (r"s\.?d\.?l\.?p|social democratic and labour", "Social Democratic and Labour Party"),
     (r"sinn f", "Sinn Féin"),
     (r"alliance party|^alliance", "Alliance Party"),
@@ -207,7 +352,10 @@ PARTIES = (
     (r"u\.?d\.?p\b|ulster democratic", "Ulster Democratic"),
     (r"uk unionist|u\.k\.? unionist|u\.?k\.?u\.?p|united kingdom unionist|untied kingdom", "UK Unionist Party"),
     (r"people before profit", "People Before Profit Alliance"),
-    (r"traditional unionist", "Traditional Unionist Voice"),
+    (r"traditional unionist|^tuv\b", "Traditional Unionist Voice"),
+    (r"aont", "Aontú"),
+    (r"^heritage party", "Heritage Party"),
+    (r"^irsp|irish republican socialist", "Irish Republican Socialist Party"),
     (r"uk independence", "UK Independence Party"),
     (r"conserv", "Conservative"),
     (r"^labour alternative|cross-community labour", "Cross-Community Labour Alternative"),
@@ -262,7 +410,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Northern Ireland Assembly elections 1998 to 2017 by constituency with every STV count, from ARK and Elections NI",
+            summary="Northern Ireland Assembly elections 1998 to 2022 by constituency with every STV count, from ARK, Elections NI, and the Electoral Office",
             polity="GB-NIR",
         )
 
@@ -319,24 +467,32 @@ def emit() -> Path:
 
         sources = {}
         for year in DAYS:
-            ark = year in ARK
-            sources[year] = cs.source("ARK" if ark else "Elections NI", f"Northern Ireland Assembly election {year}")
+            ark, official = year in ARK, year == 2022
+            publisher = "ARK Northern Ireland Elections" if ark else "Electoral Office for Northern Ireland" if official else "Elections NI (NICVA)"
+            sources[year] = cs.source(publisher, f"Northern Ireland Assembly election {year}")
             cs.add(
                 "source",
                 id=sources[year],
-                kind="academic" if ark else "compendium",
-                publisher="ARK Northern Ireland Elections" if ark else "Elections NI (NICVA)",
+                kind="academic" if ark else "official_body" if official else "compendium",
+                publisher=publisher,
                 title=f"Northern Ireland Assembly election {year}: count by count results",
-                url="https://www.ark.ac.uk/elections/gexcel.htm" if ark else "https://www.electionsni.org/data/",
-                license=None if ark else "CC BY-SA 4.0",
-                license_url=None if ark else "https://creativecommons.org/licenses/by-sa/4.0/",
+                url=EONI_PAGE if official else "https://www.ark.ac.uk/elections/gexcel.htm" if ark else "https://www.electionsni.org/data/",
+                license="Open Government Licence v3.0" if official else None if ark else "CC BY-SA 4.0",
+                license_url=(
+                    "https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/"
+                    if official
+                    else None if ark else "https://creativecommons.org/licenses/by-sa/4.0/"
+                ),
                 attribution=(
-                    "Count-by-count spreadsheets from ARK Northern Ireland Elections (ark.ac.uk/elections)."
+                    "Result sheets from the Electoral Office for Northern Ireland, under the Open Government Licence v3.0."
+                    if official
+                    else "Count-by-count spreadsheets from ARK Northern Ireland Elections (ark.ac.uk/elections)."
                     if ark
                     else "Contains data from the Electoral Office for Northern Ireland (OGL) and Democracy Club, via electionsni.org, CC BY-SA 4.0."
                 ),
             )
-            cs.artifact(raw.cached(SOURCE, (ARK if ark else NICVA)[year]), sources[year])
+            for url in EONI if official else [(ARK if ark else NICVA)[year]]:
+                cs.artifact(raw.cached(SOURCE, url), sources[year])
 
         areas = {
             (code, name_): (area, valid_from, valid_to)
@@ -434,6 +590,11 @@ def emit() -> Path:
                     quota = None
                 if any(after > before + 0.5 for before, after in zip(sums, sums[1:])):
                     caveats.append("The candidates' totals rise between two stages in the source; the stage totals are stored as published.")
+                if unit_row.get("last_seat"):
+                    caveats.append(
+                        f"The result sheet flags {seats - 1} candidates as elected; the last seat went to {display(unit_row['last_seat'])}, "
+                        "the highest remaining candidate at the final count, as the Electoral Office declared."
+                    )
                 for text in caveats:
                     cs.add("note", entity_id=result_set, kind="caveat", body_md=text)
                 for measure, amount in (
@@ -465,13 +626,15 @@ def emit() -> Path:
                     }
                     canonical = party_of(candidate["party"])
                     owner = party_id(canonical)
-                    independent = canonical is None and "independ" in candidate["party"].lower()
+                    independent = canonical is None and ("independ" in candidate["party"].lower() or candidate["party"].strip() in ("", "Unionist"))
                     full = display(candidate["name"]) if "," in candidate["name"] else candidate["name"]
                     option_key = f"{contest_key}:{candidate['number']}"
                     option = cs.key("gb.ni_assembly.option", option_key)
                     person = cs.key("gb.ni_assembly.person", option_key)
-                    cs.add("person", id=person, gender={"M": "male", "F": "female"}.get(candidate["gender"]))
-                    name(person, full)
+                    if person not in made:
+                        made.add(person)
+                        cs.add("person", id=person, gender={"M": "male", "F": "female"}.get(candidate["gender"]))
+                        name(person, full)
                     cs.add("contest_option", id=option, contest_id=contest, kind="candidate", party_id=owner, ballot_label=full)
                     cs.add(
                         "candidacy",
