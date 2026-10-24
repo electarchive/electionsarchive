@@ -383,7 +383,6 @@
     const places = contest.locator ?? surround?.places ?? null;
     if (
       drawn != null ||
-      chamber != null ||
       places == null ||
       own?.tiles == null ||
       own.k == null ||
@@ -847,11 +846,16 @@
           style: "long",
           type: "conjunction",
         }).format(
-          members.map((row) =>
-            row.short == null
+          members.map((row) => {
+            const party =
+              row.short ??
+              (row.current?.isIndependent === true
+                ? m.seats_independents()
+                : null);
+            return party == null
               ? row.label
-              : m.race_member({ name: row.label, party: row.short }),
-          ),
+              : m.race_member({ name: row.label, party });
+          }),
         );
         return contest.isStv && contest.count == null
           ? m.race_lede_members_stv_first({
@@ -1653,7 +1657,10 @@
     {/if}
   {:else if locating != null}
     <div
-      class="col-span-12 bg-card px-3.5 pbs-3 pbe-3.5 min-inline-0 lg:col-span-7 xl:col-span-8"
+      class={cn("col-span-12 bg-card px-3.5 pbs-3 pbe-3.5 min-inline-0", {
+        "lg:col-span-7 xl:col-span-8": chamber == null,
+        "lg:col-span-8": chamber != null,
+      })}
     >
       <PlaceMap
         places={locating.places}
@@ -1673,16 +1680,35 @@
         isLinked
       />
     </div>
-    <div
-      class="col-span-12 grid grid-rows-[auto_1fr] gap-px bg-border min-inline-0 lg:col-span-5 xl:col-span-4"
-    >
-      {@render stats(true)}
+    {#if chamber == null}
       <div
-        class="@container grid content-start gap-1 bg-card px-1.5 pbs-2 pbe-2.5"
+        class="col-span-12 grid grid-rows-[auto_1fr] gap-px bg-border min-inline-0 lg:col-span-5 xl:col-span-4"
+      >
+        {@render stats(true)}
+        <div
+          class="@container grid content-start gap-1 bg-card px-1.5 pbs-2 pbe-2.5"
+        >
+          {@render results()}
+        </div>
+      </div>
+    {:else}
+      <Seats
+        isLinked
+        parties={chamber.parties}
+        places={chamber.places}
+        here={chamber.here}
+        place={chamber.places[chamber.here ?? -1]?.name ?? contest.scope.name}
+        link={chamber.link}
+        size={chamber.size}
+        {change}
+      />
+      {@render stats(false)}
+      <div
+        class="@container col-span-12 grid content-start gap-1 bg-card px-1.5 pbs-2 pbe-2.5"
       >
         {@render results()}
       </div>
-    </div>
+    {/if}
   {:else}
     {@render stats(false)}
   {/if}
@@ -1955,7 +1981,7 @@
     </div>
   {/if}
 
-  {#if chamber != null && drawn == null}
+  {#if chamber != null && drawn == null && locating == null}
     <Seats
       isLinked
       parties={chamber.parties}

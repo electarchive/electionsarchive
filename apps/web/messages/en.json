@@ -466,11 +466,16 @@
   ],
   "race_multiple": [
     {
-      "declarations": ["input count", "local countPlural = count: plural"],
+      "declarations": [
+        "input count",
+        "input noun",
+        "input nouns",
+        "local countPlural = count: plural"
+      ],
       "selectors": ["countPlural"],
       "match": {
-        "countPlural=one": "1 constituency returned more than one member. Its voters could cast more than one vote, so the totals count votes, not voters.",
-        "countPlural=*": "{count} constituencies returned more than one member. Their voters could cast more than one vote, so the totals count votes, not voters."
+        "countPlural=one": "1 {noun} returned more than one member. Its voters could cast more than one vote, so the totals count votes, not voters.",
+        "countPlural=*": "{count} {nouns} returned more than one member. Their voters could cast more than one vote, so the totals count votes, not voters."
       }
     }
   ],

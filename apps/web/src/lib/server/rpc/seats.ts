@@ -419,7 +419,7 @@ export const seats = {
       const held: Array<string> = [];
       const gained: Array<string> = [];
       for (const key of row.now) {
-        const at = kept.findIndex((other) => fold(other) === fold(key));
+        const at = kept.indexOf(key);
         if (at === -1) {
           gained.push(key);
         } else {

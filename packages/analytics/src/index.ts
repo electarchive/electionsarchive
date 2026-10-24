@@ -201,6 +201,44 @@ function alliances(options: Array<Option>) {
   );
 }
 
+function isPooledIndependent(
+  option: Option,
+  party: string | null,
+  match: Match,
+  grouping: Grouping,
+  contests: number,
+) {
+  return (
+    match !== "person" &&
+    (grouping === "party" || contests > 1) &&
+    party == null &&
+    option.kind === "candidate" &&
+    option.isIndependent === true
+  );
+}
+
+function independent(row: Row): Row {
+  if (row.key !== "independent") {
+    return row;
+  }
+  return {
+    ...row,
+    label: "Independent",
+    short: "Independent",
+    color: null,
+    current: row.current && {
+      ...row.current,
+      label: "Independent",
+      person: null,
+    },
+    earlier: row.earlier && {
+      ...row.earlier,
+      label: "Independent",
+      person: null,
+    },
+  };
+}
+
 export function compare(
   current: Side,
   earlier: Side | null,
@@ -268,6 +306,8 @@ export function compare(
       )
       .map((line) => root(line.party ?? "")),
   );
+  const contests = new Set(current.options.map((option) => option.contest))
+    .size;
   const base = (option: Option) => {
     if (grouping === "alliance" && option.alliance != null) {
       const anchor = anchors.get(option.alliance.id)?.party;
@@ -282,6 +322,9 @@ export function compare(
       allied.has(option.contest)
     ) {
       return `alliance:${party}`;
+    }
+    if (isPooledIndependent(option, party, match, grouping, contests)) {
+      return "independent";
     }
     if (
       option.person != null &&
@@ -392,11 +435,13 @@ export function compare(
     };
   });
   const rank = (row: Row) => (row.key.startsWith("kind:") ? 1 : 0);
-  return rows.toSorted(
-    (a, b) =>
-      Number(a.current == null) - Number(b.current == null) ||
-      rank(a) - rank(b) ||
-      (b.current?.votes ?? 0) - (a.current?.votes ?? 0) ||
-      (b.earlier?.votes ?? 0) - (a.earlier?.votes ?? 0),
-  );
+  return rows
+    .map((row) => independent(row))
+    .toSorted(
+      (a, b) =>
+        Number(a.current == null) - Number(b.current == null) ||
+        rank(a) - rank(b) ||
+        (b.current?.votes ?? 0) - (a.current?.votes ?? 0) ||
+        (b.earlier?.votes ?? 0) - (a.earlier?.votes ?? 0),
+    );
 }

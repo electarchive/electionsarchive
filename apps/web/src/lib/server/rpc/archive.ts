@@ -281,6 +281,7 @@ const Cell = v.nullable(
     share: v.number(),
     outcome: v.nullable(v.string()),
     note: v.optional(v.nullable(v.string())),
+    isIndependent: v.optional(v.boolean()),
     seats: v.nullable(v.number()),
     lines: v.array(v.object({ label: v.string(), votes: v.number() })),
   }),
@@ -2308,8 +2309,58 @@ async function tabulate(
     string,
     v.InferOutput<typeof Unreconciled> & { publisher: string }
   >();
+  const owners = rows.flatMap((row) =>
+    row.isContest && row.owner != null ? [row.owner] : [],
+  );
+  const elected =
+    owners.length === 0
+      ? null
+      : await db.execute<{ seat: string }>(sql`
+        select o.contest_id || ':' || coalesce(m.into_id, cy.person_id) as seat
+        from contest c
+        join result_set rs on rs.contest_id = c.id and rs.is_default
+        join outcome x on x.result_set_id = rs.id and x.kind in ('elected', 'won') and x.candidacy_id is null
+        join contest_option o on o.id = x.option_id
+        join candidacy cy on cy.option_id = o.id and cy.role = 'head'
+        left join entity_merge m on m.entity_id = cy.person_id
+        where c.id = any(${sql.param(owners)}::uuid[]) and c.magnitude > 1
+      `);
+  const chosenOnes = new Set(elected?.rows.map((row) => row.seat));
+  const elects = rows.map((row, index) => {
+    const side = row.isContest
+      ? now[tier[index] ?? 0]?.get(row.k)?.side
+      : undefined;
+    const options = side?.options ?? [];
+    const won = options.filter((option) =>
+      chosenOnes.has(`${option.contest}:${option.person}`),
+    );
+    const held = new Map<string, number>();
+    for (const option of won) {
+      const key =
+        option.party != null
+          ? `party:${option.party}`
+          : option.isIndependent === true
+            ? "independent"
+            : `person:${option.person}`;
+      held.set(key, (held.get(key) ?? 0) + 1);
+    }
+    let split: number | null = null;
+    if (side != null && won.length > 1 && side.valid > 0) {
+      let [last, next] = [Infinity, 0];
+      for (const option of options) {
+        if (won.includes(option)) {
+          last = Math.min(last, option.votes);
+        } else if (option.kind === "candidate") {
+          next = Math.max(next, option.votes);
+        }
+      }
+      split = (last - next) / side.valid;
+    }
+    return { isMulti: won.length > 1, held, split };
+  });
   const results = rows.map((row, index) => {
     const current = now[tier[index] ?? 0]?.get(row.k);
+    const held = elects[index]?.held ?? new Map<string, number>();
     return current == null
       ? []
       : compare(
@@ -2317,8 +2368,8 @@ async function tabulate(
           then?.get(row.k)?.side ?? null,
           lineage,
           match,
-          grouping,
-        );
+          elects[index]?.isMulti === true ? "party" : grouping,
+        ).toSorted((a, b) => (held.get(b.key) ?? 0) - (held.get(a.key) ?? 0));
   });
   const personal = new Set(
     results
@@ -2389,7 +2440,14 @@ async function tabulate(
         (entry.key === before?.key && before.key !== leader?.key);
       legend.set(entry.key, item);
     }
-    return { row, result, leader, before, valid: current?.side.valid ?? 0 };
+    return {
+      row,
+      result,
+      leader,
+      before,
+      split: elects[index]?.split ?? null,
+      valid: current?.side.valid ?? 0,
+    };
   });
   const silent = rows.flatMap((row, index) =>
     row.owner == null || now[tier[index] ?? 0]?.has(row.k) === true
@@ -2504,7 +2562,7 @@ async function tabulate(
           : null,
       party: item.party,
     })),
-    rows: compared.map(({ row, result, leader, before, valid }) => {
+    rows: compared.map(({ row, result, leader, before, split, valid }) => {
       const runner = result.find(
         (entry) =>
           entry.current != null &&
@@ -2532,7 +2590,7 @@ async function tabulate(
         margin:
           leader?.current == null
             ? null
-            : leader.current.share - (runner?.current?.share ?? 0),
+            : (split ?? leader.current.share - (runner?.current?.share ?? 0)),
         earlier:
           (then?.get(row.k)?.side.valid ?? 0) === 0
             ? null
@@ -4135,6 +4193,7 @@ export const contests = {
           color: string | null;
           valid: number;
           margin: number | null;
+          independent: boolean;
         }>(sql`
           with me as (
             select c.*, a.scheme_code as scheme, e.date_from as day
@@ -4156,7 +4215,8 @@ export const contests = {
           select p.id, p.area, p.k, p.scheme, sc.noun, w.party, w.option, w.person, w.label,
             ${paint(sql`w.party`, sql`${contest.election}::uuid`, sql`p.day`)} as color,
             coalesce(w.valid, 0)::float8 as valid,
-            case when w.valid > 0 then ((w.first - w.second) / w.valid)::float8 end as margin
+            case when w.valid > 0 then ((w.first - w.second) / w.valid)::float8 end as margin,
+            coalesce(w.independent, false) as independent
           from peers p
           join scheme sc on sc.code = p.scheme
           left join lateral (
@@ -4164,25 +4224,40 @@ export const contests = {
               (select coalesce(m.into_id, ca.person_id) from candidacy ca
                 left join entity_merge m on m.entity_id = ca.person_id
                 where ca.option_id = o.id and ca.role = 'head' limit 1) as person,
+              exists (select from candidacy cy where cy.option_id = o.id and cy.role = 'head' and cy.is_independent) as independent,
               t.first, t.second, t.valid
             from (
-              select rs.k from result_set rs where rs.contest_id = p.id and rs.is_default limit 1
+              select rs.k, rs.id from result_set rs where rs.contest_id = p.id and rs.is_default limit 1
             ) rs
             cross join lateral (
-              select (array_agg(r.option_k order by r.value desc))[1] as top,
-                max(r.value) as first,
-                coalesce((array_agg(r.value order by r.value desc))[2], 0) as second,
+              select (array_agg(r.option_k order by r.seats desc, r.value desc))[1] as top,
+                case when count(*) filter (where r.elected) > 1 then min(r.value) filter (where r.elected) else max(r.value) end as first,
+                case when count(*) filter (where r.elected) > 1 then coalesce(max(r.value) filter (where not r.elected), 0)
+                  else coalesce((array_agg(r.value order by r.value desc))[2], 0) end as second,
                 sum(r.value) as valid
-              from result_rollup r
-              where r.result_set_k = rs.k and r.area_k = p.k and r.option_k <> 0
-                and r.measure = (
-                  select x.measure from result_rollup x
-                  where x.result_set_k = rs.k and x.area_k = p.k and x.measure = any(${COUNTED})
-                  order by array_position(${COUNTED}, x.measure) limit 1
-                )
-                and r.count_round = (
-                  select max(x.count_round) from result_rollup x where x.result_set_k = rs.k and x.area_k = p.k
-                )
+              from (
+                select r.option_k, r.value, r.elected, count(*) filter (where r.elected) over (partition by r.grp) as seats
+                from (
+                  select r.option_k, r.value,
+                    exists (
+                      select from outcome x where x.result_set_id = rs.id and x.option_id = ro.id
+                        and x.kind in ('elected', 'won') and x.candidacy_id is null
+                    ) as elected,
+                    coalesce(ro.party_id::text, case when exists (
+                      select from candidacy cy where cy.option_id = ro.id and cy.role = 'head' and cy.is_independent
+                    ) then 'independent' else ro.k::text end) as grp
+                  from result_rollup r join contest_option ro on ro.k = r.option_k
+                  where r.result_set_k = rs.k and r.area_k = p.k and r.option_k <> 0
+                    and r.measure = (
+                      select x.measure from result_rollup x
+                      where x.result_set_k = rs.k and x.area_k = p.k and x.measure = any(${COUNTED})
+                      order by array_position(${COUNTED}, x.measure) limit 1
+                    )
+                    and r.count_round = (
+                      select max(x.count_round) from result_rollup x where x.result_set_k = rs.k and x.area_k = p.k
+                    )
+                ) r
+              ) r
             ) t
             join contest_option o on o.k = t.top
             left join entity_merge pm on pm.entity_id = o.party_id
@@ -4207,11 +4282,13 @@ export const contests = {
           new Set(found.rows.map((row) => row.party)).size <= 1 &&
           found.rows.some((row) => row.person != null);
         const keyed = (row: (typeof found.rows)[number]) =>
-          (isPersonal || row.party == null) && row.person != null
-            ? `person:${row.person}`
-            : row.party == null
-              ? `option:${row.option ?? ""}`
-              : `party:${row.party}`;
+          !isPersonal && row.party == null && row.independent
+            ? "independent"
+            : (isPersonal || row.party == null) && row.person != null
+              ? `person:${row.person}`
+              : row.party == null
+                ? `option:${row.option ?? ""}`
+                : `party:${row.party}`;
         const own = found.rows.find((row) => row.id === contest.root);
         const legend = Map.groupBy(
           found.rows.filter((row) => row.option != null),
@@ -4233,6 +4310,7 @@ export const contests = {
             return {
               key,
               label:
+                (key === "independent" ? m.seats_independents() : null) ??
                 (person == null ? null : labels.full.get(person)) ??
                 labels.full.get(party ?? "") ??
                 rows[0]?.label ??
@@ -5676,7 +5754,8 @@ export const contests = {
             select k.id from election k join tree on k.parent_id = tree.id
           ),
           roots as materialized (
-            select c.id, c.kind, c.body_id, c.office_id, o.kind as okind, y.kind as ykind
+            select c.id, c.kind, c.body_id, c.office_id, o.kind as okind, y.kind as ykind,
+              y.id = (select t.polity_id from election t where t.id = (select id from up where parent is null)) as own
             from tree
             join election e on e.id = tree.id and e.date_from = ${contest.date ?? "infinity"}::date
             join contest c on c.election_id = e.id and c.allocation_parent_id is null
@@ -5690,12 +5769,12 @@ export const contests = {
                   when ykind in ('sovereign_state', 'supranational', 'historical_state') then 'national_measure'
                   when ykind in ('federal_unit', 'region') then 'regional_measure'
                   else 'local_measure' end
-                when ykind in ('sovereign_state', 'supranational', 'historical_state') then 'owner'
+                when ykind in ('sovereign_state', 'supranational', 'historical_state') or own then 'owner'
                 when okind = 'governor' then 'governor'
                 when ykind in ('federal_unit', 'region') and kind <> 'office' then 'legislature'
                 when ykind in ('federal_unit', 'region') then 'regional_office'
                 else 'local' end as kind,
-              case when kind <> 'ballot_question' and ykind in ('sovereign_state', 'supranational', 'historical_state')
+              case when kind <> 'ballot_question' and (ykind in ('sovereign_state', 'supranational', 'historical_state') or own)
                 then coalesce(office_id, body_id)
                 when kind not in ('ballot_question', 'office') and ykind = 'region' then body_id end as owner
             from roots

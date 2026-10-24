@@ -3,7 +3,7 @@ import { call } from "@orpc/server";
 import { error, isHttpError, isRedirect, redirect } from "@sveltejs/kit";
 import { effective, stand } from "#lib/caucus.js";
 import { PARTS, label as reasonLabel, REASONS } from "#lib/coverage.js";
-import { count, date, percent, points } from "#lib/format.js";
+import { count, date, percent, plural, points } from "#lib/format.js";
 import { isDerived } from "#lib/outcomes.js";
 import { m } from "#lib/paraglide/messages.js";
 import { getLocale } from "#lib/paraglide/runtime.js";
@@ -1081,7 +1081,13 @@ function electionMarkdown(
               }),
             ]),
         ...((race.multiple ?? 0) > 0
-          ? [m.race_multiple({ count: race.multiple ?? 0 })]
+          ? [
+              m.race_multiple({
+                count: race.multiple ?? 0,
+                noun: race.places?.levels[0]?.noun ?? "constituency",
+                nouns: plural(race.places?.levels[0]?.noun ?? "constituency"),
+              }),
+            ]
           : []),
       ];
     }),
@@ -1617,14 +1623,27 @@ function resultsMarkdown(
   const hasParty = contest.rows.some(
     (row) => row.current?.person != null && row.short != null,
   );
+  const parties = new Map(
+    contest.rows.map((row) => [
+      row.key,
+      row.short ??
+        ((row.current ?? row.earlier)?.isIndependent === true
+          ? m.seats_independents()
+          : null),
+    ]),
+  );
   const results = contest.rows
     .filter(
       (row) => row.current != null || (then != null && row.earlier != null),
     )
-    .map(({ label, short, current, earlier, delta }) => [
+    .map(({ key, label, current, earlier, delta }) => [
       label,
       ...(hasParty
-        ? [(current ?? earlier)?.person == null ? null : short]
+        ? [
+            (current ?? earlier)?.person == null
+              ? null
+              : (parties.get(key) ?? null),
+          ]
         : []),
       current && count(current.votes),
       current && percent(current.share),
@@ -1641,6 +1660,23 @@ function resultsMarkdown(
         ? m.outcome_lost()
         : outcome(current?.outcome ?? null),
     ]);
+  if (contest.current == null && contest.declared != null) {
+    const said = (
+      {
+        tacit: m.declared_tacit,
+        show_of_hands: m.declared_show_of_hands,
+        appointed: m.declared_appointed,
+        counted: m.declared_counted,
+      } as Record<string, () => string>
+    )[contest.declared.kind]?.();
+    return [
+      ...(said == null ? [] : [said, ""]),
+      ...contest.declared.rows.map(
+        (row) =>
+          `- ${row.label}${row.short == null || row.short === row.label ? "" : ` (${row.short})`}: ${outcome(row.outcome)}`,
+      ),
+    ].join("\n");
+  }
   return contest.current == null || results.length === 0
     ? m.no_results()
     : `${table(

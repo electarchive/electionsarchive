@@ -8,7 +8,14 @@
   } from "@tanstack/svelte-query";
   import { tick, untrack } from "svelte";
   import { MediaQuery } from "svelte/reactivity";
-  import { count, date, definite, percent, points } from "#lib/format.js";
+  import {
+    count,
+    date,
+    definite,
+    percent,
+    plural,
+    points,
+  } from "#lib/format.js";
   import { MEASURES } from "#lib/outcomes.js";
   import { m } from "#lib/paraglide/messages.js";
   import { getLocale } from "#lib/paraglide/runtime.js";
@@ -1338,7 +1345,11 @@
         {/if}
         {#if (race.multiple ?? 0) > 0}
           <p class="px-1.5 text-[0.8125rem] text-muted-foreground">
-            {m.race_multiple({ count: race.multiple ?? 0 })}
+            {m.race_multiple({
+              count: race.multiple ?? 0,
+              noun: race.places?.levels[0]?.noun ?? "constituency",
+              nouns: plural(race.places?.levels[0]?.noun ?? "constituency"),
+            })}
           </p>
         {/if}
       </div>

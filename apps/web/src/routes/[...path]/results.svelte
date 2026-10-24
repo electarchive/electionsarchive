@@ -447,6 +447,11 @@
                       party={(page ?? other)?.party}
                     />
                   </span>
+                {:else if row.short == null && page?.person != null && page.isIndependent === true && !isOneParty}
+                  <span
+                    class="block text-[0.8125rem] text-pretty text-muted-foreground"
+                    >{m.seats_independents()}</span
+                  >
                 {/if}
                 {#if span != null && there != null}
                   {#if page == null}
