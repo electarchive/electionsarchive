@@ -1,6 +1,6 @@
 import html
 import re
-from datetime import date
+from datetime import UTC, date, datetime
 from pathlib import Path
 from uuid import uuid5
 
@@ -12,7 +12,7 @@ from ea.sources.us import oh_primaries
 from ea.store import DATA, connect
 
 SOURCE = "us.oh_pri_turnout"
-VERSION = "2"
+VERSION = "3"
 PARSED = DATA / "parsed" / SOURCE
 PUBLISHER = "Ohio Secretary of State"
 TITLE = "Primary election voter turnout by county"
@@ -34,6 +34,12 @@ FILES = {
         "20240420171448", "globalassets/elections/2024/pri/official/turnoutbycountybyparty.xlsx"
     ),
 }
+PORTAL = "https://data.ohiosos.gov/portal/past-election-results#{}"
+MANUAL = {
+    date(2023, 8, 8): ("08-08-23_voterturnoutsummary.xlsx", "referendum"),
+    date(2023, 11, 7): ("11-07-23---voter-turnout-summary.xlsx", "general"),
+    date(2025, 5, 6): ("turnout-report-summary.xlsx", "referendum"),
+}
 MASTERS = {date(2016, 3, 15), date(2018, 5, 8), date(2020, 4, 28), date(2022, 5, 3)}
 BALLOTS = (
     "total votes cast",
@@ -48,6 +54,15 @@ BALLOTS = (
 def fetch() -> None:
     for url in FILES.values():
         raw.fetch(SOURCE, url, suffix=".xlsx" if url.endswith(".xlsx") else ".html")
+    for name, _ in MANUAL.values():
+        raw.store(
+            SOURCE,
+            PORTAL.format(name),
+            (DATA / "inbox" / "manual" / "MF-064" / name).read_bytes(),
+            suffix=".xlsx",
+            retrieved_at=datetime(2026, 10, 24, tzinfo=UTC),
+            media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        )
 
 
 def masters() -> dict[date, tuple[str, str]]:
@@ -69,9 +84,9 @@ def parse() -> None:
             ).fetchall()
         }
     tables: dict[date, list[list[str | None]]] = {}
-    for day, url in FILES.items():
+    for day, url in {**FILES, **{day: PORTAL.format(name) for day, (name, _) in MANUAL.items()}}.items():
         path = raw.cached(SOURCE, url).path
-        if url.endswith(".xlsx"):
+        if url.endswith(".xlsx") or day in MANUAL:
             tables[day] = [
                 list(row) for row in pl.read_excel(path, sheet_id=1, has_header=False, infer_schema_length=0).rows()
             ]
@@ -142,17 +157,19 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Ohio's registered voters and ballots cast by county for the primaries of 2000 to 2024 and the 2006 general, from the "
-            "Secretary of State's turnout pages and official canvass workbooks",
+            summary="Ohio's registered voters and ballots cast by county for the primaries of 2000 to 2024, the 2006 and 2023 "
+            "generals, and the 2023-08-08 and 2025-05-06 statewide issues, from the Secretary of State's turnout pages, official "
+            "canvass workbooks, and county turnout reports",
             polity="US",
         )
         elections = {
             start: (entity_id, kind)
             for entity_id, start, kind in conn.execute(
                 """select x.entity_id, e.date_from, e.kind from external_id x join election e on e.id = x.entity_id
-                   where x.scheme = 'us.election' and x.value ~ '^\\d{4}-\\d\\d-\\d\\d:OH(:primary|:special)?$'
+                   where x.scheme = 'us.election' and x.value ~ '^\\d{4}-\\d\\d-\\d\\d:OH(:primary|:special|:referendum)?$'
                    and e.kind in ('primary', 'general', 'special', 'referendum')"""
             )
+            if (e := MANUAL.get(start)) is None and kind != "referendum" or e is not None and e[1] == kind
         }
         held = {
             election_id
@@ -173,7 +190,7 @@ def emit() -> Path:
                 url="https://www.ohiosos.gov/elections/election-results-and-data/",
                 license="Public record",
             )
-        for url in FILES.values():
+        for url in (*FILES.values(), *(PORTAL.format(name) for name, _ in MANUAL.values())):
             cs.artifact(raw.cached(SOURCE, url), source)
         for cached, url in masters().values():
             cs.artifact(raw.cached(cached, url), source)
