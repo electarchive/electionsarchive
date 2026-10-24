@@ -593,7 +593,8 @@
   );
   const drilled = $derived(contest.scope.noun != null);
   const counted = $derived(
-    contest.count?.stv != null && contest.count.round === 1
+    (contest.count?.stv != null && contest.count.round === 1) ||
+      (contest.isStv && contest.count == null)
       ? m.stv_first()
       : MEASURES[contest.current?.measure ?? ""]?.(),
   );

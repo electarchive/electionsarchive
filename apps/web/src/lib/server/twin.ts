@@ -2575,7 +2575,8 @@ function resultsMarkdown(
             ? m.col_answer()
             : m.col_option(),
           ...(hasParty ? [m.col_party()] : []),
-          contest.count?.stv != null && contest.count.round === 1
+          (contest.count?.stv != null && contest.count.round === 1) ||
+          (contest.isStv && contest.count == null)
             ? m.stv_first()
             : m.col_votes(),
           m.col_share(),
