@@ -34,7 +34,7 @@ SHEETS = {
     "us house": "house",
     "statewide": "governor",
 }
-HOUSE_YEARS = {1988, 1990}
+HOUSE_YEARS = {1988, 1990, 1992, 1994, 1996, 1998}
 
 
 def url(year: int) -> str:
@@ -88,7 +88,7 @@ def parse() -> None:
                     if clean(grid[r][i])
                 ).strip()
                 district = re.search(r"District (\d+)", label)
-                columns.append((i, name, clean(grid[party][i]), int(district[1]) if district else None))
+                columns.append((i, name, clean(grid[party][i]), int(district[1]) if district else None, "unexpired" in label.lower()))
             rows = []
             totals: dict[object, list[int]] = {}
             for row in grid[party + 1 :]:
@@ -98,15 +98,15 @@ def parse() -> None:
                     fips = counties.get(key)
                     if fips is None:
                         raise ValueError(f"{year} {sheet}: no county {text}")
-                    for i, name, party, district in columns:
+                    for i, name, party, district, unexpired in columns:
                         value = clean(row[i]).replace(",", "")
                         if value:
-                            rows.append((year, chamber, day, district, fips, name, party, int(float(value))))
+                            rows.append((year, chamber, day, district, fips, name, party, int(float(value)), unexpired))
                 elif any(clean(c).lower().startswith(("district t", "totals")) for c in row[:4]):
-                    for i, name, party, district in columns:
+                    for i, name, party, district, unexpired in columns:
                         value = clean(row[i]).replace(",", "")
                         if value:
-                            totals[(district, name)] = int(float(value))
+                            totals[(district, name, unexpired)] = int(float(value))
             frame = pl.DataFrame(
                 rows,
                 schema={
@@ -118,12 +118,14 @@ def parse() -> None:
                     "candidate": pl.String,
                     "party": pl.String,
                     "votes": pl.Int64,
+                    "special": pl.Boolean,
                 },
                 orient="row",
             )
-            for (district, name), total in totals.items():
+            for (district, name, unexpired), total in totals.items():
                 summed = frame.filter(
                     (pl.col("candidate") == name)
+                    & (pl.col("special") == unexpired)
                     & (pl.col("district").is_null() if district is None else pl.col("district") == district)
                 )["votes"].sum()
                 if summed != total:
@@ -137,12 +139,11 @@ def parse() -> None:
             candidate=pl.col("candidate").str.to_uppercase(),
         )
         .with_columns(candidate=pl.when("writein").then(pl.lit("WRITE-INS")).otherwise("candidate"))
-        .group_by("year", "chamber", "day", "district", "code", "candidate")
+        .group_by("year", "chamber", "day", "district", "code", "candidate", "special")
         .agg(pl.col("writein").any(), pl.col("votes").sum())
         .with_columns(
             year=pl.col("year").cast(pl.Int32),
             district=pl.col("district").cast(pl.Int16),
-            special=pl.lit(False),
             state=pl.lit("KS"),
             measure=pl.lit(1, pl.Int16),
             kind=pl.lit("county"),
@@ -159,7 +160,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Kansas's president, Senate, governor, and 1988 and 1990 House general elections by county",
+            summary="Kansas's president, Senate, governor, and House general elections by county",
             polity="US-KS",
         )
         source = cs.source(PUBLISHER, TITLE)
@@ -180,5 +181,6 @@ def emit() -> Path:
             frame,
             {"KS": source},
             authoritative="The Secretary of State's county workbook for the general election.",
+            extend=True,
         )
         return cs.write()
