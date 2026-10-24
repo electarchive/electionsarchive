@@ -156,6 +156,16 @@ OFFICIAL = {
     "RI": ("Rhode Island Board of Elections", "https://elections.ri.gov/elections/previous-election-results", "town results summed to counties"),
     "LA": ("Louisiana Secretary of State", "https://voterportal.sos.la.gov/graphical", "parish files from the live election results site"),
     "NE": ("Nebraska Secretary of State", "https://sos.nebraska.gov/elections", "county tables in the primary canvass book"),
+    "GA": ("Georgia Secretary of State", "https://results.sos.ga.gov", "county results from the state's election results site"),
+    "ID": ("Idaho Secretary of State", "https://voteidaho.gov", "county results from the state's election results site"),
+    "UT": ("Utah Lieutenant Governor's Office", "https://electionresults.utah.gov", "county results from the state's election results site"),
+    "WA": ("Washington Secretary of State", "https://results.votewa.gov", "county results from the state's election results site"),
+    "HI": ("Hawaii Office of Elections", "https://elections.hawaii.gov", "county results from the office's primary election reports"),
+    "DE": ("Delaware Department of Elections", "https://elections.delaware.gov/results/", "county results from the department's election night reporting"),
+    "MA": ("Massachusetts Secretary of the Commonwealth", "https://electionstats.state.ma.us", "county results from the state's election statistics archive"),
+    "FL": ("Florida Division of Elections", "https://results.elections.myflorida.com", "county results extract of official results"),
+    "IN": ("Indiana Secretary of State", "https://enr.indianavoters.in.gov", "county results from the state's election night reporting site"),
+    "NJ": ("New Jersey Division of Elections", "https://www.nj.gov/state/elections/election-information-results.shtml", "county tables in the official primary results"),
     "KS": ("Kansas Secretary of State", "https://sos.ks.gov/elections/election-results.html", "precinct-level files summed to counties"),
 }
 METHOD = "Results by county from OpenElections' 2026 primary file for {state}, a community compilation of the state's county results. Candidates who received votes are listed; write-in votes are pooled."
