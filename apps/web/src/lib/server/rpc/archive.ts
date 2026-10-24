@@ -9740,6 +9740,7 @@ export const polities = {
                   v.object({
                     party: v.nullable(v.string()),
                     seats: v.number(),
+                    isIndependent: v.optional(v.boolean()),
                   }),
                 ),
               }),
@@ -9777,6 +9778,7 @@ export const polities = {
         year: number;
         races: number;
         party: string | null;
+        isIndependent: boolean;
         seats: number;
         share: number | null;
       }>(sql`
@@ -9870,7 +9872,8 @@ export const polities = {
         ),
         won as materialized (
           select w.root, w.contest, w.id, w.seats,
-            coalesce(bm.into_id, br.parent_party_id, pm.into_id, w.party_id, ld.party_id) as party
+            coalesce(bm.into_id, br.parent_party_id, pm.into_id, w.party_id, ld.party_id) as party,
+            exists (select from candidacy cy where cy.option_id = w.id and cy.is_independent) as independent
           from winners w
           join roots r on r.id = w.root
           left join leads ld on ld.parent = w.id
@@ -9907,7 +9910,7 @@ export const polities = {
           select r.seat, bool_or(r."isOffice") as "isOffice", coalesce(r.link::text, r.year::text) as bucket,
             (array_agg(r.link))[1] as link,
             min(r.date) as day, min(r.year) as year, count(distinct r.id)::int as races,
-            w.party, sum(w.seats)::int as seats, avg(sh.share)::float8 as share,
+            w.party, bool_or(w.independent) as independent, sum(w.seats)::int as seats, avg(sh.share)::float8 as share,
             coalesce(sum(w.seats) filter (where r."isList"), 0)::int as listed
           from roots r
           join won w on w.root = r.id
@@ -9925,6 +9928,7 @@ export const polities = {
           select s.*, coalesce(s.total > s.size * 1.02 and s.lists >= s.size * 0.9, false) as "isMixed" from sized s
         )
         select seat, "isOffice", bucket, link, day::text as date, year, races, party, share,
+          party is null and independent as "isIndependent",
           case when "isMixed" then listed else seats end as seats
         from flagged
         where not ("isMixed" and listed = 0)
@@ -10029,7 +10033,11 @@ export const polities = {
                         ? first.share
                         : null,
                     parties: group
-                      .map((row) => ({ party: row.party, seats: row.seats }))
+                      .map((row) => ({
+                        party: row.party,
+                        seats: row.seats,
+                        isIndependent: row.isIndependent,
+                      }))
                       .toSorted((a, b) => b.seats - a.seats),
                   };
                 })
@@ -10055,7 +10063,11 @@ export const polities = {
                       );
                     }
                     next.parties = [...merged]
-                      .map(([party, seats]) => ({ party, seats }))
+                      .map(([party, seats]) => ({
+                        party,
+                        seats,
+                        isIndependent: false,
+                      }))
                       .toSorted((x, y) => y.seats - x.seats);
                     return [];
                   }

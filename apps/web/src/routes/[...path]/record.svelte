@@ -457,7 +457,9 @@
                   class="rounded-xs block-2.5 inline-2.5"
                   style:background={tint(winner)}
                 ></span>
-                {label(winner)}
+                {winner == null && lit.parties[0]?.isIndependent === true
+                  ? m.person_parties_none()
+                  : label(winner)}
               </span>
               {#if lit.share != null}
                 <span class="font-figures tabular-nums"

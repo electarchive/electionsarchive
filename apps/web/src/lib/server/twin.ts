@@ -753,7 +753,11 @@ function polityMarkdown(
             .map((row) => ({
               label:
                 labels.get(row.party ?? "") ??
-                (series.isOffice ? null : m.record_none()),
+                (row.isIndependent === true
+                  ? m.person_parties_none()
+                  : series.isOffice
+                    ? null
+                    : m.record_none()),
               seats: row.seats,
             }));
           return [
