@@ -4097,6 +4097,9 @@ export const contests = {
         ...plural.rows.flatMap((row) =>
           row.person == null ? [] : [row.person],
         ),
+        ...plural.rows.flatMap((row) =>
+          row.person == null && row.party != null ? [row.party] : [],
+        ),
       ]);
       const seated = Map.groupBy(plural.rows, (row) => row.root);
       const winners = new Map(
@@ -4122,7 +4125,10 @@ export const contests = {
                   seat.party == null
                     ? `person:${seat.person ?? ""}`
                     : `party:${seat.party}`,
-                label: leaders.full.get(seat.person ?? "") ?? seat.label ?? "",
+                label:
+                  leaders.full.get(seat.person ?? seat.party ?? "") ??
+                  seat.label ??
+                  "",
                 color: seat.color,
               })),
           },
