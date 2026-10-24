@@ -6,7 +6,6 @@ from datetime import date
 from pathlib import Path
 from uuid import UUID, uuid5
 
-import httpx
 import polars as pl
 
 from ea import raw
@@ -73,6 +72,53 @@ ELECTIONS = {
     "2011-03-03": "2011 Welsh Assembly powers referendum",
     "1979-03-01": "1979 Scottish and Welsh devolution referendums",
     "1997-09-11": "1997 Scottish devolution referendum",
+}
+GIBRALTAR = (
+    "Gibraltar voted in the South West England region, which is how the Electoral Commission counted it. Its votes "
+    "therefore count toward England, not toward a nation of their own."
+)
+YEARBOOK_1980 = "https://www.scottishgovernmentyearbooks.ed.ac.uk/record/22819/1/1980_ref_3_referendumresults.pdf"
+NATIONAL = {
+    "1979-03-01:scotland": (
+        "SCT",
+        "Scotland, whole country",
+        3747112,
+        3133,
+        (
+            "The electorate is the register as adjusted by the Secretary of State for the 40 percent test (Scottish "
+            "Government Yearbook 1980, section 3, table 2); the unadjusted register is not printed in the sources "
+            "found. Spoilt ballots are from Research Paper 97/113, table 1."
+        ),
+    ),
+    "1979-03-01:wales": (
+        "WLS",
+        "Wales, whole country",
+        None,
+        3309,
+        "Spoilt ballots are from Research Paper 97/113, table 5.",
+    ),
+    "1997-09-11:parliament": (
+        "SCT",
+        "Scotland, whole country",
+        None,
+        11986,
+        "Spoilt ballots are from Research Paper 97/113, table 2.",
+    ),
+    "1997-09-11:tax": (
+        "SCT",
+        "Scotland, whole country",
+        None,
+        19013,
+        "Spoilt ballots are from Research Paper 97/113, table 2.",
+    ),
+    "1997-09-18": ("WLS", "Wales, whole country", None, 3999, "Spoilt ballots are from Research Paper 97/113."),
+    "2014-09-18": (
+        "SCT",
+        "Scotland, whole country",
+        4283938,
+        None,
+        "The electorate is printed for Scotland as a whole in the Electoral Commission's report.",
+    ),
 }
 RP97_NOTE = (
     "From House of Commons Library Research Paper 97/113 (Richard Dewdney, 10 November 1997). Its 1997 figures are "
@@ -237,7 +283,8 @@ REFERENDUMS = {
         "name": "2016 United Kingdom European Union membership referendum",
         "title": "European Union membership",
         "question": "Should the United Kingdom remain a member of the European Union or leave the European Union?",
-        "answers": ("Remain a member of the European Union", "Leave the European Union"),
+        "answers": ("Remain", "Leave"),
+        "ballot_answers": ("Remain a member of the European Union", "Leave the European Union"),
         "source": ("Results and turnout at the EU referendum", EU_2016),
         "page": (
             "https://www.electoralcommission.org.uk/research-reports-and-data/"
@@ -258,6 +305,7 @@ def fetch() -> None:
     raw.fetch(SOURCE, SENEDD, suffix=".pdf")
     raw.fetch(SOURCE, GLA98, suffix=".pdf")
     raw.fetch(SOURCE, RP1144, suffix=".pdf")
+    raw.fetch(SOURCE, YEARBOOK_1980, suffix=".pdf")
     for url in AV_LISTS:
         raw.fetch(SOURCE, url, suffix=".html")
         time.sleep(1)
@@ -482,7 +530,15 @@ def parse() -> None:
         raise ValueError(f"London 1998: {len(london)} areas, {sum(r['yes'] for r in london)} Yes")
     frames.append(pl.DataFrame(london, schema={**frames[0].schema, "country": pl.String}))
     rows = pl.concat(frames, how="diagonal").with_columns(
-        country=pl.coalesce(pl.col("country"), pl.col("code").str.slice(0, 1).replace_strict(COUNTRIES, default=None)),
+        country=pl.coalesce(
+            pl.col("country"),
+            pl.col("code").str.slice(0, 1).replace_strict(COUNTRIES, default=None),
+            pl.when(pl.col("region").is_not_null()).then(
+                pl.col("region").replace_strict(
+                    {"Scotland": "SCT", "Wales": "WLS", "Northern Ireland": "NIR"}, default="ENG"
+                )
+            ),
+        ),
     )
     bad = rows.filter(
         (pl.col("yes") + pl.col("no") != pl.col("valid"))
@@ -531,19 +587,21 @@ def emit() -> Path:
             .iter_rows()
         ):
             units[code] = cs.unit("gb.counting_area", code)
+            cs.add(
+                "reporting_unit",
+                id=units[code],
+                polity_id=gb,
+                scheme_code="gb.counting_area",
+                code=code,
+                area_relation="unlocated" if country is None else "within",
+                area_id=None if country is None else countries[country],
+                kind="standard",
+                valid_from=None,
+            )
             if units[code] in cs.minted:
-                cs.add(
-                    "reporting_unit",
-                    id=units[code],
-                    polity_id=gb,
-                    scheme_code="gb.counting_area",
-                    code=code,
-                    area_relation="unlocated" if country is None else "within",
-                    area_id=None if country is None else countries[country],
-                    kind="standard",
-                    valid_from=None,
-                )
                 name(units[code], label)
+            if code == "GI":
+                cs.add("note", entity_id=units[code], kind="context", body_md=GIBRALTAR)
 
         elections: dict[str, UUID] = {}
         written: set[UUID] = set()
@@ -572,7 +630,11 @@ def emit() -> Path:
                     ),
                     notes=meta["note"],
                 )
-            for artifact_url in (url, *meta.get("artifacts", ())):
+            for artifact_url in (
+                url,
+                *meta.get("artifacts", ()),
+                *([YEARBOOK_1980] if key == "1979-03-01:scotland" else []),
+            ):
                 cs.artifact(raw.cached(SOURCE, artifact_url), source)
             election = elections.get(day)
             path = f"gb/{day}-referendum"
@@ -626,6 +688,8 @@ def emit() -> Path:
                     ballot_position=position + 1,
                     ballot_label=label,
                 )
+                if "ballot_answers" in meta:
+                    name(option, meta["ballot_answers"][position], kind="ballot")
             result_set = cs.key(f"{SOURCE}.result_set", key)
             cs.add(
                 "result_set",
@@ -649,6 +713,36 @@ def emit() -> Path:
                     option_id=options[0 if totals[0] > totals[1] else 1],
                     kind="won",
                 )
+            if key in NATIONAL:
+                country, label, electorate, rejected, remark = NATIONAL[key]
+                unit = cs.unit("gb.counting_area", f"{key}:national")
+                cs.add(
+                    "reporting_unit",
+                    id=unit,
+                    polity_id=gb,
+                    scheme_code="gb.counting_area",
+                    code=f"{key}:national",
+                    area_relation="equals",
+                    area_id=countries[country],
+                    kind="aggregate",
+                    valid_from=None,
+                )
+                if unit in cs.minted:
+                    name(unit, label)
+                cs.add("note", entity_id=unit, kind="context", body_md=remark)
+                for measure, value in ((REGISTERED, electorate), (INVALID, rejected)):
+                    if value is not None:
+                        cs.add(
+                            "result_value",
+                            result_set_id=result_set,
+                            unit_id=unit,
+                            option_id=None,
+                            channel=0,
+                            measure=measure,
+                            count_round=0,
+                            flags=0,
+                            value=value,
+                        )
             for line in held.iter_rows(named=True):
                 for option, measure, value in (
                     (None, REGISTERED, line["electorate"]),
