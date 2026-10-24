@@ -1005,13 +1005,14 @@ def publish(conn: Connection, changeset_id: str) -> None:
             if "reporting_unit" in stage.tables and "area_id" in stage.tables["reporting_unit"]
             else []
         )
-        if "reporting_unit_area" in stage.tables:
-            repointed += [
-                str(unit)
-                for (unit,) in conn.execute(
-                    sql.SQL("select distinct unit_id from {}").format(stage.staged("reporting_unit_area"))
-                ).fetchall()
-            ]
+        for table in ("reporting_unit_area", "unit_area_drop"):
+            if table in stage.tables:
+                repointed += [
+                    str(unit)
+                    for (unit,) in conn.execute(
+                        sql.SQL("select distinct unit_id from {}").format(stage.staged(table))
+                    ).fetchall()
+                ]
         if "is_default" in stage.tables.get("result_set", []):
             group = "d.election_id = s.election_id and d.contest_id = s.contest_id and d.stage = s.stage"
             official = sql.SQL(
@@ -1029,7 +1030,18 @@ def publish(conn: Connection, changeset_id: str) -> None:
                 sql.SQL(
                     """update {staged} s set is_default = true
                        from public.result_set d
-                       where d.id = s.id and d.is_default and not s.is_default and {official}
+                       where d.id = s.id and d.is_default and not s.is_default and {official} and s.status = 'active'
+                         and not exists (select from {staged} x where x.is_default and x.election_id = s.election_id
+                                           and x.contest_id = s.contest_id and x.stage = s.stage)"""
+                ).format(staged=stage.staged("result_set"), official=official)
+            )
+            conn.execute(
+                sql.SQL(
+                    """update {staged} s set is_default = true
+                       where s.status = 'active' and not s.is_default and {official}
+                         and exists (select from {staged} w join public.result_set d on d.id = w.id and d.is_default
+                                     where w.status = 'withdrawn' and w.election_id = s.election_id
+                                       and w.contest_id = s.contest_id and w.stage = s.stage)
                          and not exists (select from {staged} x where x.is_default and x.election_id = s.election_id
                                            and x.contest_id = s.contest_id and x.stage = s.stage)"""
                 ).format(staged=stage.staged("result_set"), official=official)

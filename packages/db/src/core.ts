@@ -1298,6 +1298,16 @@ export const tenureEvent = pgTable("tenure_event", {
 	recordedFrom: timestamp("recorded_from", { withTimezone: true }).default(sql`now()`).notNull(),
 });
 
+export const unitAreaDrop = pgTable("unit_area_drop", {
+	unitId: uuid("unit_id").notNull().references(() => reportingUnit.id, { onDelete: "cascade" } ),
+	areaId: uuid("area_id").notNull().references(() => area.id),
+	reason: text().notNull(),
+	changesetId: uuid("changeset_id").notNull().references(() => changeset.id),
+	recordedFrom: timestamp("recorded_from", { withTimezone: true }).default(sql`now()`).notNull(),
+}, (table) => [
+	primaryKey({ columns: [table.unitId, table.areaId], name: "unit_area_drop_pkey"}),
+check("unit_area_drop_reason_check", sql`(reason <> ''::text)`),]);
+
 export const valueLocator = pgTable("value_locator", {
 	resultSetK: integer("result_set_k").notNull(),
 	unitK: integer("unit_k").notNull(),

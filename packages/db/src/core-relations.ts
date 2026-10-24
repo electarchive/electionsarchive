@@ -167,6 +167,7 @@ export const relations = defineRelations(schema, (r) => ({
 		tenures: r.many.tenure(),
 		tenureAffiliations: r.many.tenureAffiliation(),
 		tenureEvents: r.many.tenureEvent(),
+		unitAreaDrops: r.many.unitAreaDrop(),
 	},
 	election: {
 		alliances: r.many.alliance(),
@@ -353,6 +354,7 @@ export const relations = defineRelations(schema, (r) => ({
 		seatsDistrictAreaId: r.many.seat({
 			alias: "seat_districtAreaId_area_id"
 		}),
+		unitAreaDrops: r.many.unitAreaDrop(),
 	},
 	scheme: {
 		areas: r.many.area(),
@@ -1203,6 +1205,7 @@ export const relations = defineRelations(schema, (r) => ({
 			to: r.scheme.code
 		}),
 		reportingUnitAreas: r.many.reportingUnitArea(),
+		unitAreaDrops: r.many.unitAreaDrop(),
 	},
 	reportingUnitArea: {
 		area: r.one.area({
@@ -1318,6 +1321,20 @@ export const relations = defineRelations(schema, (r) => ({
 		tenure: r.one.tenure({
 			from: r.tenureEvent.tenureId,
 			to: r.tenure.id
+		}),
+	},
+	unitAreaDrop: {
+		area: r.one.area({
+			from: r.unitAreaDrop.areaId,
+			to: r.area.id
+		}),
+		changeset: r.one.changeset({
+			from: r.unitAreaDrop.changesetId,
+			to: r.changeset.id
+		}),
+		reportingUnit: r.one.reportingUnit({
+			from: r.unitAreaDrop.unitId,
+			to: r.reportingUnit.id
 		}),
 	},
 	sourcePage: {

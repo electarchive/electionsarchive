@@ -68,6 +68,15 @@
           entry.winner == null
             ? null
             : swatch(entry.winner.color, entry.winner.key),
+        paint:
+          entry.winner?.seats == null || entry.winner.seats.length < 2
+            ? null
+            : `linear-gradient(to right, ${entry.winner.seats
+                .map((seat, index, all) => {
+                  const color = swatch(seat.color, seat.key);
+                  return `${color} ${(index / all.length) * 100}% ${((index + 1) / all.length) * 100}%`;
+                })
+                .join(", ")})`,
         href:
           entry.path == null
             ? null
@@ -150,7 +159,17 @@
 />
 
 {#snippet winner(entry: (typeof years)[number])}
-  {#if entry.winner != null}
+  {#if entry.winner?.seats != null && entry.winner.seats.length > 1}
+    {#each entry.winner.seats as seat, index (index)}
+      <span class="flex items-baseline gap-1.5">
+        <span
+          class="shrink-0 self-center rounded-xs block-2 inline-2"
+          style:background-color={swatch(seat.color, seat.key)}
+        ></span>
+        <span class="flex-1">{seat.label}</span>
+      </span>
+    {/each}
+  {:else if entry.winner != null}
     <span class="flex items-baseline gap-1.5">
       <span
         class="shrink-0 self-center rounded-xs block-2 inline-2"
@@ -329,8 +348,8 @@
                       ? m.series_annulled({ year: entry.label })
                       : undefined}
                     >{entry.label}{#if entry.color != null}<span
-                        class="absolute inset-x-0 inset-be-0 bg-(--party) block-0.75"
-                        style:--party={entry.color}
+                        class="absolute inset-x-0 inset-be-0 block-0.75"
+                        style:background={entry.paint ?? entry.color}
                         aria-hidden="true"
                       ></span>{/if}</svelte:element
                   >

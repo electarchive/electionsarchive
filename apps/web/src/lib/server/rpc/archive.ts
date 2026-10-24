@@ -2861,6 +2861,15 @@ export const contests = {
                 share: v.number(),
                 total: v.number(),
                 measure: v.string(),
+                seats: v.optional(
+                  v.array(
+                    v.object({
+                      key: v.string(),
+                      label: v.string(),
+                      color: v.nullable(v.string()),
+                    }),
+                  ),
+                ),
               }),
             ),
           }),
@@ -3825,9 +3834,37 @@ export const contests = {
            ) x
         `),
       ]);
-      const leaders = await names(
-        tops.rows.flatMap((row) => (row.person == null ? [] : [row.person])),
-      );
+      const plural = await db.execute<{
+        root: string;
+        person: string | null;
+        party: string | null;
+        color: string | null;
+        label: string | null;
+      }>(sql`
+        select c.id as root, head.person, x.party, ${paint(sql`x.party`, sql`e.id`, sql`e.date_from`)} as color,
+          coalesce(o.ballot_label, o.kind::text) as label
+        from contest c
+        join election e on e.id = c.election_id
+        join result_set rs on rs.contest_id = c.id and rs.is_default
+        join outcome w on w.result_set_id = rs.id and w.kind in ('won', 'elected') and w.candidacy_id is null
+        join contest_option o on o.id = w.option_id
+        left join entity_merge pm on pm.entity_id = o.party_id
+        cross join lateral (select coalesce(pm.into_id, o.party_id) as party) x
+        left join lateral (
+          select coalesce(em.into_id, cy.person_id) as person
+          from candidacy cy left join entity_merge em on em.entity_id = cy.person_id
+          where cy.option_id = o.id and cy.role = 'head' order by cy.id limit 1
+        ) head on true
+        where c.id = any(${sql.param(tops.rows.map((row) => row.root))}::uuid[]) and c.magnitude > 1
+        order by c.id, o.k
+      `);
+      const leaders = await names([
+        ...tops.rows.flatMap((row) => (row.person == null ? [] : [row.person])),
+        ...plural.rows.flatMap((row) =>
+          row.person == null ? [] : [row.person],
+        ),
+      ]);
+      const seated = Map.groupBy(plural.rows, (row) => row.root);
       const winners = new Map(
         tops.rows.map((row) => [
           row.root,
@@ -3844,6 +3881,16 @@ export const contests = {
             share: row.total > 0 ? row.votes / row.total : 0,
             total: row.total,
             measure: MEASURES.get(row.measure) ?? "votes",
+            seats: seated
+              .get(row.root)
+              ?.map((seat) => ({
+                key:
+                  seat.party == null
+                    ? `person:${seat.person ?? ""}`
+                    : `party:${seat.party}`,
+                label: leaders.full.get(seat.person ?? "") ?? seat.label ?? "",
+                color: seat.color,
+              })),
           },
         ]),
       );
