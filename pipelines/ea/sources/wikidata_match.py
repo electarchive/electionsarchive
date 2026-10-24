@@ -8,12 +8,12 @@ from uuid import UUID
 
 import httpx
 
-from ea import raw
+from ea import names, raw
 from ea.changeset import Changeset
 from ea.store import connect
 
 SOURCE = "wikidata_match"
-VERSION = "1"
+VERSION = "2"
 TITLE = "Labels and positions held (P39) of people"
 BUCKETS = 300
 SLACK = 1
@@ -73,7 +73,8 @@ def _targets(conn) -> dict[UUID, dict]:
         "select entity_id, text, lang from name where entity_id = any(%s) and kind in ('official', 'english')",
         (list(targets),),
     ).fetchall():
-        targets[person]["names"] |= {(text, "en"), (text, lang)} if len(lang) == 2 else {(text, "en")}
+        for spelling in {text, names.PARTICLE.sub(lambda match: match[0][0].swapcase() + match[0][1:], text)}:
+            targets[person]["names"] |= {(spelling, "en"), (spelling, lang)} if len(lang) == 2 else {(spelling, "en")}
     return targets
 
 

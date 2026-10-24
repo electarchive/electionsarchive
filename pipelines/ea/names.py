@@ -4,6 +4,7 @@ from itertools import combinations
 
 SUFFIXES = {"jr", "sr", "ii", "iii", "iv"}
 TITLES = {"judge", "gen", "col", "capt", "maj", "dr", "rev", "hon", "mr", "mrs", "gov", "senator"}
+PARTICLE = re.compile(r"(?<=\S )(?:[Dd]e|[Vv]an|[Vv]on|[Ll]a)(?= \S)")
 
 
 def initials(text: str) -> str:
