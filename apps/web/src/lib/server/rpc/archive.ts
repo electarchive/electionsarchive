@@ -24,7 +24,7 @@ const STAGES = sql.raw(ORDER);
 
 export const latest = (set: string) =>
   sql.raw(
-    `(${set}.is_default and not exists (select from result_set later where later.contest_id = ${set}.contest_id and later.is_default and array_position(${ORDER}, later.stage) < array_position(${ORDER}, ${set}.stage)))`,
+    `(${set}.is_default and ${set}.stage <> 'notional' and not exists (select from result_set later where later.contest_id = ${set}.contest_id and later.is_default and array_position(${ORDER}, later.stage) < array_position(${ORDER}, ${set}.stage)))`,
   );
 
 const MEASURES = new Map([
@@ -1684,7 +1684,7 @@ async function chamber(
         when c.id <> r.id then array[r.id]
         else (
           select case when count(*) > 1 then array_agg(s.id) else '{}' end from contest s
-          where s.election_id = c.election_id and s.body_id = c.body_id and s.allocation_parent_id is null
+          where s.election_id = c.election_id and s.body_id = c.body_id and s.allocation_parent_id is null and not s.notional
             and s.party_scope_id is not distinct from c.party_scope_id and s.kind in ('body_seats', 'list_allocation')
         )
       end as roots,
@@ -3915,7 +3915,7 @@ export const contests = {
               on c.body_id is not distinct from me.body_id and c.office_id is not distinct from me.office_id
               and c.kind = me.kind and c.round_number = me.round_number
               and c.party_scope_id is not distinct from me.party_scope_id
-              and c.allocation_parent_id is null and c.district_area_id is not null
+              and c.allocation_parent_id is null and c.district_area_id is not null and not c.notional
           ),
           before as materialized (
             select max(e.date_from) as day from me, peers c
@@ -4430,7 +4430,7 @@ export const contests = {
                 else c.id = me.id or (c.election_id = me.general and c.district_area_id <> me.district_area_id) end)
               and c.kind = me.kind and c.round_number = me.round_number
               and c.body_id is not distinct from me.body_id and c.office_id is not distinct from me.office_id
-              and c.party_scope_id is not distinct from me.party_scope_id and c.allocation_parent_id is null
+              and c.party_scope_id is not distinct from me.party_scope_id and c.allocation_parent_id is null and not c.notional
             join area a on a.id = c.district_area_id and a.scheme_code = me.scheme
           )
           select p.id, p.area, p.k, p.scheme, p.general,
@@ -5839,7 +5839,7 @@ export const contests = {
           from contest c
           join tree on tree.id = c.election_id
           join election e on e.id = c.election_id and e.date_from = ${day}::date
-          where c.id not in (select id from own)
+          where c.id not in (select id from own) and not c.notional
         ),
         grp(id, top) as (
           select id, id from candidates
@@ -6083,7 +6083,7 @@ export const contests = {
               y.id is distinct from (select t.polity_id from election t where t.id = (select id from up where parent is null)) as part
             from tree
             join election e on e.id = tree.id and e.date_from = ${contest.date ?? "infinity"}::date
-            join contest c on c.election_id = e.id and c.allocation_parent_id is null
+            join contest c on c.election_id = e.id and c.allocation_parent_id is null and not c.notional
             left join office o on o.id = c.office_id
             left join body b on b.id = c.body_id
             join polity y on y.id = coalesce(b.polity_id, o.polity_id, e.polity_id)
@@ -7410,7 +7410,7 @@ async function races(
         from contest c
         join election e on e.id = c.election_id
         join tree on tree.id = c.election_id
-        where (c.allocation_parent_id is null or not exists (
+        where not c.notional and (c.allocation_parent_id is null or not exists (
           select from contest p join tree pt on pt.id = p.election_id where p.id = c.allocation_parent_id
         )) and (not ${isInside} or (c.district_area_id is null and c.kind <> 'body_seats') or ${inside(polity, sql`c.district_area_id`, sql`e.date_from`)})
       ),
@@ -7568,7 +7568,7 @@ async function races(
                     and c.round_number is not distinct from h.round_number
                     and c.party_scope_id is not distinct from h.party_scope_id
                     and e.date_from < ${day}::date and e.status::text <> 'annulled'
-                  order by h.id, e.date_from desc
+                  order by h.id, e.date_from desc, c.notional desc
                 `,
               );
               const years = Map.groupBy(prior.rows, (row) =>
@@ -7829,6 +7829,7 @@ async function races(
                 left join seat st on st.id = c.seat_id
                 where coalesce(c.body_id, c.office_id) = ${head.owner}::uuid
                   and c.allocation_parent_id is null and c.party_scope_id is null and e.kind = (select kind from same)
+                  and not c.notional
                   and (c.term is distinct from 'remainder' or (c.seat_id is not null and not exists (
                     select from contest d where d.election_id = c.election_id and d.seat_id = c.seat_id and d.id <> c.id
                   ))) and coalesce(st.voting, true)
@@ -8570,7 +8571,7 @@ export const elections = {
       ] = await Promise.all([
         db.execute<{ id: string; children: number }>(sql`
           select c.id, (select count(*)::int from contest x where x.allocation_parent_id = c.id) as children
-          from contest c where c.election_id = ${input.id}::uuid and c.allocation_parent_id is null
+          from contest c where c.election_id = ${input.id}::uuid and c.allocation_parent_id is null and not c.notional
             and ${within == null ? sql`true` : inside(within, sql`c.district_area_id`, sql`${election.date ?? "infinity"}::date`)}
         `),
         db.execute<{
@@ -8603,7 +8604,7 @@ export const elections = {
         }>(sql`
           select a.k,
             coalesce(
-              (select c.id from contest c where c.election_id = e.id limit 1),
+              (select c.id from contest c where c.election_id = e.id and not c.notional limit 1),
               (select c.id from election ch join contest c on c.election_id = ch.id where ch.parent_id = e.id and ch.kind = e.kind and ch.date_from = e.date_from limit 1)
             ) as now,
             prior.contest as before, prior.year
@@ -8612,7 +8613,7 @@ export const elections = {
           join area a on a.id = pt.area_id
           left join lateral (
             select coalesce(
-                (select c.id from contest c where c.election_id = x.id limit 1),
+                (select c.id from contest c where c.election_id = x.id and not c.notional limit 1),
                 (select c.id from election ch join contest c on c.election_id = ch.id where ch.parent_id = x.id and ch.kind = x.kind and ch.date_from = x.date_from limit 1)
               ) as contest,
               extract(year from x.date_from)::int as year
@@ -8673,7 +8674,7 @@ export const elections = {
           ),
           districts as (
             select distinct c.district_area_id as area from contest c
-            where c.election_id in (select id from tree) and c.allocation_parent_id is null
+            where c.election_id in (select id from tree) and c.allocation_parent_id is null and not c.notional
           ),
           up(area, depth) as (
             select area, 0 from districts where area is not null
@@ -8746,7 +8747,7 @@ export const elections = {
                   join election e on e.id = c.election_id
                   join result_set rs on rs.contest_id = c.id and ${latest("rs")}
                   join area a on a.id = c.district_area_id
-                  where c.body_id = ${chamber}::uuid and c.kind in ('body_seats', 'list_allocation') and c.allocation_parent_id is null
+                  where c.body_id = ${chamber}::uuid and c.kind in ('body_seats', 'list_allocation') and c.allocation_parent_id is null and not c.notional
                     and c.previous_round_id is null
                     and ${within == null ? sql`true` : inside(within, sql`c.district_area_id`, sql`e.date_from`)}
                 ),
@@ -9790,7 +9791,7 @@ export const elections = {
           and c.office_id is not distinct from s.office_id
           and c.party_scope_id is not distinct from s.party_scope_id
           and c.round_number is not distinct from s.round_number
-          and e.date_from = s.date_from and c.district_area_id is not null
+          and e.date_from = s.date_from and c.district_area_id is not null and not c.notional
           and (c.allocation_parent_id is null or not exists (
             select from contest p join tree pt on pt.id = p.election_id where p.id = c.allocation_parent_id
           ))
@@ -9847,7 +9848,7 @@ export const elections = {
               and c.office_id is not distinct from s.office_id
               and c.party_scope_id is not distinct from s.party_scope_id
               and c.round_number is not distinct from s.round_number
-              and e.kind = s.election_kind and c.district_area_id is not null
+              and e.kind = s.election_kind and c.district_area_id is not null and not c.notional
               and e.date_from < ${date}::date - 120 and e.status::text <> 'annulled'
               and (c.term is distinct from 'remainder' or (c.seat_id is not null and not exists (
                 select from contest d where d.election_id = c.election_id and d.seat_id = c.seat_id and d.id <> c.id
@@ -10026,7 +10027,7 @@ export const elections = {
           join election e on e.id = c.election_id
           join body b on b.id = c.body_id and b.polity_id = (select polity_id from election where id = ${input.id}::uuid)
           left join seat st on st.id = c.seat_id
-          where c.allocation_parent_id is null and c.party_scope_id is null
+          where c.allocation_parent_id is null and c.party_scope_id is null and not c.notional
             and c.kind in ('body_seats', 'list_allocation')
             and (c.term is distinct from 'remainder' or (c.seat_id is not null and not exists (
               select from contest d where d.election_id = c.election_id and d.seat_id = c.seat_id and d.id <> c.id
@@ -10356,7 +10357,7 @@ export const elections = {
               when b.kind = 'lower_house' then 'lower'
               else 'upper' end as tier
           from parts p
-          join contest c on c.election_id = p.id
+          join contest c on c.election_id = p.id and not c.notional
           left join office o on o.id = c.office_id
           left join body b on b.id = c.body_id
           where c.party_scope_id is null and (
@@ -10822,7 +10823,7 @@ export const polities = {
                 else 4
               end as tier
             from place, election e
-            join contest c on c.election_id = e.id
+            join contest c on c.election_id = e.id and not c.notional
             join slug s on s.entity_id = c.id and s.is_current
             left join body b on b.id = c.body_id
             left join office o on o.id = c.office_id
@@ -10841,7 +10842,7 @@ export const polities = {
           db.execute<{ date: string }>(sql`
             select e.date_from::text as date
             from election e
-            join contest c on c.election_id = e.id and (c.allocation_parent_id is null or c.kind = 'elector_slate') and c.party_scope_id is null
+            join contest c on c.election_id = e.id and (c.allocation_parent_id is null or c.kind = 'elector_slate') and c.party_scope_id is null and not c.notional
             join polity_territory pt on pt.polity_id = e.polity_id and pt.valid @> e.date_from
             where e.polity_id = ${input.id}::uuid and e.status = 'held' and e.date_from <= current_date
               and (c.district_area_id is null or c.district_area_id = pt.area_id)
@@ -10868,7 +10869,7 @@ export const polities = {
           : await db.execute<{ id: string }>(sql`
             select c.id
             from election e
-            join contest c on c.election_id = e.id and (c.allocation_parent_id is null or c.kind = 'elector_slate') and c.party_scope_id is null
+            join contest c on c.election_id = e.id and (c.allocation_parent_id is null or c.kind = 'elector_slate') and c.party_scope_id is null and not c.notional
             join polity_territory pt on pt.polity_id = e.polity_id and pt.valid @> e.date_from
             join area a on a.id = pt.area_id
             cross join lateral (
@@ -11473,7 +11474,7 @@ export const polities = {
           join election g on g.id = coalesce(e.parent_id, e.id)
           left join polity_territory pt on pt.polity_id = e.polity_id and pt.valid @> e.date_from
           left join area a on a.id = coalesce(c.district_area_id, pt.area_id)
-          where c.allocation_parent_id is null and c.party_scope_id is null
+          where c.allocation_parent_id is null and c.party_scope_id is null and not c.notional
             and e.kind in ('general', 'local') and c.kind in ('body_seats', 'list_allocation', 'office')
             and coalesce((select st.voting from seat st where st.id = c.seat_id), true)
             and not exists (
@@ -11968,7 +11969,7 @@ export const polities = {
             select area from ups group by area having count(distinct polity) = 2
           ),
           roots as materialized (
-            select c.id from election e join contest c on c.election_id = e.id
+            select c.id from election e join contest c on c.election_id = e.id and not c.notional
             where e.polity_id in (select id from upa intersect select id from upb) and e.date_from is not null
               and e.status = 'held' and e.kind not in ('runoff', 'indirect')
               and c.allocation_parent_id is null and c.party_scope_id is null
@@ -12633,7 +12634,7 @@ export const bodies = {
       const last = await db.execute<{ id: string; date: string }>(sql`
         select c.id, e.date_from::text as date from contest c join election e on e.id = c.election_id
         where c.body_id = ${input.id}::uuid and c.allocation_parent_id is null
-          and c.party_scope_id is null and e.kind = 'general'
+          and c.party_scope_id is null and e.kind = 'general' and not c.notional
           and e.date_from = (
             select max(e2.date_from) from contest c2 join election e2 on e2.id = c2.election_id
             where c2.body_id = ${input.id}::uuid and e2.kind = 'general'
@@ -14066,7 +14067,7 @@ export const parties = {
         mine as materialized (
           select o.id as option, o.contest_id, c.allocation_parent_id as parent, c.election_id
           from contest_option o join contest c on c.id = o.contest_id
-          where o.party_id in (select id from family) and (
+          where not c.notional and o.party_id in (select id from family) and (
             ${input.within ?? null}::uuid is null or exists (
               select from contest c join election e on e.id = c.election_id
               where c.id = o.contest_id and e.polity_id in (select id from below)
@@ -14211,7 +14212,7 @@ export const parties = {
           left join body b on b.id = c.body_id
           left join office f on f.id = c.office_id
           where c.allocation_parent_id is null and c.party_scope_id is null and e.kind in ('general', 'local')
-            and coalesce(c.body_id, c.office_id) is not null
+            and coalesce(c.body_id, c.office_id) is not null and not c.notional
             and ((select polity from home) is null or coalesce(b.polity_id, f.polity_id) = (select polity from home))
         ),
         entered as materialized (
@@ -14674,7 +14675,7 @@ export const parties = {
         from target t cross join lateral (
           select min(e.date_from)::text as from, max(e.date_from)::text as to, count(distinct o.contest_id)::int as contests
           from contest_option o join contest c on c.id = o.contest_id join election e on e.id = c.election_id
-          where o.party_id in (select id from ids)
+          where o.party_id in (select id from ids) and not c.notional
         ) s
       `);
       const party = found.rows[0];
@@ -14729,7 +14730,7 @@ export const parties = {
                 count(distinct o.contest_id)::int as contests,
                 array(select id::text from branches) as branches
               from contest_option o join contest c on c.id = o.contest_id join election e on e.id = c.election_id
-              where o.party_id in (select id from family) and e.polity_id in (select id from below)
+              where o.party_id in (select id from family) and e.polity_id in (select id from below) and not c.notional
             `);
       const branched = scoped?.rows[0]?.branches ?? [];
       const polity = [

@@ -100,7 +100,7 @@ export const seats = {
             coalesce(c.magnitude, 1) as magnitude
           from contest c join election e on e.id = c.election_id
           left join boundary_set bs on bs.id = c.boundary_set_id
-          where c.body_id = (select body from chamber) and e.kind = 'general'
+          where c.body_id = (select body from chamber) and e.kind = 'general' and not c.notional
             and e.date_from between (select day from last) - 200 and (select day from last)
             and c.kind = 'body_seats' and c.allocation_parent_id is null and c.party_scope_id is null
             and c.district_area_id is not null and (coalesce(c.magnitude, 1) = 1 or exists (select from now where magnitude > 1))
@@ -402,7 +402,7 @@ export const seats = {
             case when e.kind = 'by_election' then e.date_from else (select day from last) end as day
           from contest c join election e on e.id = c.election_id
           left join boundary_set bs on bs.id = c.boundary_set_id
-          where c.body_id = (select body from this)
+          where c.body_id = (select body from this) and not c.notional
             and ((e.kind = case when (select kind from this) = 'local' then 'local' else 'general' end::election_kind
               and e.date_from between (select day from last) - 200 and (select day from last))
               or (e.kind = 'by_election' and (select kind from this) = 'by_election'
@@ -746,7 +746,7 @@ export const seats = {
           select c.body_id as body, min(e.date_from) as day
           from contest c join tree on tree.id = c.election_id join election e on e.id = c.election_id
           where c.kind = 'body_seats' and c.allocation_parent_id is null and c.party_scope_id is null
-            and c.district_area_id is not null and c.body_id is not null
+            and c.district_area_id is not null and c.body_id is not null and not c.notional
           group by c.body_id order by count(*) desc limit 1
         ),
         general as (
@@ -773,7 +773,7 @@ export const seats = {
           from bys b cross join lateral (
             select c.id, e.date_from as day from contest c join election e on e.id = c.election_id
             where c.body_id = b.body and c.district_area_id = b.area and c.kind = 'body_seats'
-              and c.allocation_parent_id is null and e.kind in ('general', 'by_election') and e.date_from < b.day
+              and c.allocation_parent_id is null and e.kind in ('general', 'by_election') and e.date_from < b.day and not c.notional
             order by e.date_from desc limit 1
           ) p
         ),
@@ -968,7 +968,7 @@ export const seats = {
         join area a on a.id = c.district_area_id
         join area_code ac on ac.area_id = a.id and (ac.valid @> e.date_from or ac.valid is null)
         where c.kind = 'body_seats' and c.allocation_parent_id is null and c.party_scope_id is null
-          and coalesce(c.magnitude, 1) = 1
+          and coalesce(c.magnitude, 1) = 1 and not c.notional
           and ${input.within == null ? sql`true` : inside(input.within, sql`c.district_area_id`, sql`e.date_from`)}
       `);
       const layout = [layout2024, layout2010].find((entry) => {
