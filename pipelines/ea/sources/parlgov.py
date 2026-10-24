@@ -77,7 +77,7 @@ SPLITS: dict[int, list[tuple[str, date | None, date | None]]] = {
 }
 UNLINKED = {1094}
 SHARED = {1681: (1667, {1436, 596})}
-DECREE = "https://blog.landot-avocats.net/2025/09/08/financement-des-partis-et-groupements-politiques-voici-les-montants-2025-64-me-et-la-ventilation-correspondante/"
+DECREE = "https://echanges.dila.gouv.fr/OPENDATA/JORF/JORF_20250906-020743.tar.gz"
 DECREE_TITLE = "Décret n° 2025-893 du 4 septembre 2025, annexe II (rattachements de novembre 2024)"
 DECREE_SEATS = {"Q20012759": 47, "Q108846587": 34, "Q82892": 6}
 DECREE_NOTE = (
@@ -91,9 +91,9 @@ SHARED_NOTE = (
     "governo.it records one Draghi government from February 13, 2021 to October 22, 2022, with Giorgetti, Garavaglia, "
     "and Stefani for the Lega and Brunetta, Gelmini, and Carfagna for Forza Italia."
 )
-DECREE_MIRROR = (
-    "The decree is published in the Journal officiel and on Légifrance; this copy of its annex II was obtained "
-    "through a third-party reproduction, since Légifrance sits behind a bot check."
+DECREE_NOTE_SOURCE = (
+    "Text of the decree as published in the Journal officiel of September 6, 2025, read from the open-data archive "
+    "of the Direction de l'information légale et administrative (DILA)."
 )
 ENDS = {"Hitler": date(1945, 4, 30), "Petain": date(1940, 7, 11)}
 RECENT: list[tuple[str, str, date, date | None, str, list[str]]] = [
@@ -219,7 +219,7 @@ def _labels(db: sqlite3.Connection) -> list[str]:
 def fetch() -> None:
     raw.fetch(SOURCE, DATABASE, suffix=".db")
     raw.fetch(SOURCE, _holders_url(), suffix=".json")
-    raw.fetch(SOURCE, DECREE, suffix=".html")
+    raw.fetch(SOURCE, DECREE, suffix=".tar.gz")
     db = _database()
     for url, _ in _lookups(db):
         raw.fetch(SOURCE, url, suffix=".json")
@@ -354,7 +354,9 @@ def emit() -> Path:
             publisher="Journal officiel de la République française",
             title=DECREE_TITLE,
             url="https://www.legifrance.gouv.fr/jorf/id/JORFTEXT000052197358",
-            notes=DECREE_MIRROR,
+            license="Licence Ouverte 2.0",
+            license_url="https://www.etalab.gouv.fr/licence-ouverte-open-licence/",
+            notes=DECREE_NOTE_SOURCE,
         )
         cs.artifact(raw.cached(SOURCE, DECREE), decree)
         created: set[UUID] = set()
