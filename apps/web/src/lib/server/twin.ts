@@ -1247,7 +1247,7 @@ function electionMarkdown(
                   ),
                   year: String(election.turnout.earlier.year),
                 })}.`
-          }${election.turnout.basis === "rejected" ? ` ${m.turnout_basis_rejected()}` : election.turnout.basis === "valid" ? ` ${m.turnout_basis_valid()}` : ""}`,
+          }${election.turnout.reporting < election.turnout.of ? ` ${m.turnout_partial({ reporting: String(election.turnout.reporting), of: String(election.turnout.of) })}` : ""}${election.turnout.basis === "rejected" ? ` ${m.turnout_basis_rejected()}` : election.turnout.basis === "valid" ? ` ${m.turnout_basis_valid()}` : ""}`,
         ]),
     ...(election.control == null
       ? []
