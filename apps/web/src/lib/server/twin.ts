@@ -2648,7 +2648,13 @@ function chamberMarkdown(
   const last = terms.at(-1);
   const first = last?.start.slice(0, 4) ?? "";
   const final = last?.end?.slice(0, 4) ?? m.governments_present();
-  const sitting = (members?.members ?? []).filter((member) => member.isVoting);
+  const sitting = (members?.members ?? [])
+    .filter((member) => member.isVoting)
+    .toSorted(
+      (a, b) =>
+        (a.place ?? "").localeCompare(b.place ?? "") ||
+        (a.from ?? "").localeCompare(b.from ?? ""),
+    );
   return [
     `# ${body.name}`,
     byline(body.crumbs, link, null),
