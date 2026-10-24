@@ -294,14 +294,20 @@ def emit() -> Path:
         (district, upper(name)): id
         for id, district, name in pl.read_parquet(oveo.PARSED / "mahalle.parquet").iter_rows()
     }
-    local = pl.read_parquet(ysk_local.PARSED / "municipal.parquet")
+    local = pl.read_parquet(
+        ysk_local.PARSED / "municipal.parquet",
+        columns=["slug", "plate", "district", "neighborhood", "label", "votes", "contest", "option"],
+    ).with_columns(
+        pl.col("slug", "plate", "district", "neighborhood", "label", "contest", "option").cast(pl.Categorical)
+    )
     slugs: dict[tuple[str, str, str | None], set[str]] = {}
     for plate, district, neighborhood, slug in (
         pl.concat(
             [
                 frame.select("plate", "district", "neighborhood", "slug"),
-                local.select("plate", "district", "neighborhood", "slug"),
-            ]
+                local.select("plate", "district", "neighborhood", "slug").unique(),
+            ],
+            how="vertical_relaxed",
         )
         .unique()
         .iter_rows()
@@ -402,7 +408,11 @@ def emit() -> Path:
         rows: list[dict[str, object]] = []
         for plate, district, neighborhood in (
             pl.concat(
-                [frame.select("plate", "district", "neighborhood"), local.select("plate", "district", "neighborhood")]
+                [
+                    frame.select("plate", "district", "neighborhood"),
+                    local.select("plate", "district", "neighborhood").unique(),
+                ],
+                how="vertical_relaxed",
             )
             .unique()
             .sort("plate", "district", "neighborhood", nulls_last=False)
@@ -613,20 +623,27 @@ def emit() -> Path:
         local = local.with_columns(unit=place.replace_strict(units))
         for contest_key, option in local.select("contest", "option").unique().iter_rows():
             options[f"{contest_key}\x1f{option}"] = str(cs.key("tr.option", option))
-        votes = pl.concat([votes, local.group_by("contest", "unit", "option").agg(pl.col("votes").sum())])
+        votes = pl.concat(
+            [votes, local.group_by("contest", "unit", "option").agg(pl.col("votes").sum())], how="vertical_relaxed"
+        )
         unattributed = pl.read_parquet(PARSED / "unattributed.parquet").join(
             pl.concat(
                 [
                     frame.select("slug", "plate", "district", "neighborhood", "contest", "unit"),
-                    local.select("slug", "plate", "district", "neighborhood", "contest", "unit"),
-                ]
+                    local.select("slug", "plate", "district", "neighborhood", "contest", "unit").unique(),
+                ],
+                how="vertical_relaxed",
             ).unique(),
             on=["slug", "plate", "district", "neighborhood"],
         )
         valid = (
             pl.concat(
-                [frame, local.select(frame.columns), unattributed.select("contest", "unit", "votes")],
-                how="diagonal_relaxed",
+                [
+                    frame.group_by("contest", "unit").agg(pl.col("votes").sum()),
+                    local.group_by("contest", "unit").agg(pl.col("votes").sum()),
+                    unattributed.select("contest", "unit", "votes"),
+                ],
+                how="vertical_relaxed",
             )
             .group_by("contest", "unit")
             .agg(pl.col("votes").sum())
@@ -658,7 +675,13 @@ def emit() -> Path:
                 is_default=False,
                 completeness=None if denominator is None else round(counted / denominator, 4),
             )
-            if result_set in cs.minted:
+            if result_set in cs.minted or (
+                contest_key in unattributed["contest"]
+                and contest_key.startswith(str(DAY_2011))
+                and not conn.execute(
+                    "select from note where entity_id = %s and kind = 'caveat'", [result_set]
+                ).fetchone()
+            ):
                 result_sets[contest_key] = str(result_set)
                 if contest_key in unattributed["contest"]:
                     gap = unattributed.filter(pl.col("contest") == contest_key)["votes"].sum()

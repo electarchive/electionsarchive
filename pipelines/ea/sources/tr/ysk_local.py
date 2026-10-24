@@ -1121,15 +1121,16 @@ RESIDUAL_CAVEAT = {
     ),
     (2024, "belediye_baskani"): (
         "The mayors named in each municipality add up to these mayoralties by party except in 17 races: 16 where "
-        "YSK ballot-box data reports the leading candidate's votes together with other small parties' and independents', and a "
+        "the neighborhood results report the leading candidate's votes together with other small parties' and "
+        "independents', and a "
         "tie in Çıldır. Those races have no winner named, so the named mayors fall short of YSK's table by 3 AKP, "
         "6 BBP, and 8 independent mayoralties."
     ),
 }
 DERIVED_WINNER = (
     "YSK publishes the 2019 and 2024 mayoral winners only as mayoralties by party nationwide, not by municipality. "
-    "The winner named here is the candidate with the most votes in YSK's ballot-box results, which YSK ballot-box data "
-    "republishes by neighborhood; those votes are on the YSK ballot-box files' result set for this race."
+    "The winner named here is the candidate with the most votes in YSK's ballot-box results, which the "
+    "archive holds by neighborhood; those votes are on the neighborhood result set for this race."
 )
 ANNULLED_CAVEAT = {
     2019: "YSK annulled this race and held it again on June 2, 2019. The archive does not hold the rerun yet.",
@@ -1137,8 +1138,8 @@ ANNULLED_CAVEAT = {
 }
 TIED_CAVEAT = "The two leading candidates have the same number of votes in YSK's ballot-box results, so the archive does not name a winner."
 LUMPED_CAVEAT = (
-    "YSK ballot-box data reports several of this race's candidates as one total, and that total leads, so the archive cannot tell "
-    "which candidate won."
+    "The neighborhood results report several of this race's candidates as one total, and that total leads, so the "
+    "archive cannot tell which candidate won."
 )
 MANDATE_CAVEAT = (
     "In April 2019 YSK refused the mandate to the candidate with the most votes, who had been dismissed from public "
