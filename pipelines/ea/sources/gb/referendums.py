@@ -68,6 +68,9 @@ RP1144 = (
 )
 AV_REGIONS = r"East Midlands|Eastern|London|North East|North West|Northern Ireland|Scotland|South East|South West|Wales|West Midlands|Yorkshire and the Humber"
 ELECTIONS = {
+    "1973-03-08": "1973 Northern Ireland border poll",
+    "1975-06-05": "1975 United Kingdom European Communities membership referendum",
+    "1998-05-22": "1998 Northern Ireland Good Friday Agreement referendum",
     "1998-05-07": "1998 Greater London Authority referendum",
     "2011-03-03": "2011 Welsh Assembly powers referendum",
     "1979-03-01": "1979 Scottish and Welsh devolution referendums",
@@ -77,8 +80,32 @@ GIBRALTAR = (
     "Gibraltar voted in the South West England region, which is how the Electoral Commission counted it. Its votes "
     "therefore count toward England, not toward a nation of their own."
 )
+EP_1975 = "https://www.electionpolling.co.uk/results/1975ec"
+CBP7253 = (
+    "https://web.archive.org/web/2024if_/https://researchbriefings.files.parliament.uk/documents/CBP-7253/CBP-7253.pdf"
+)
+CBP7253_PAGE = "https://commonslibrary.parliament.uk/research-briefings/cbp-7253/"
+CAIN_1973 = "https://cain.ulster.ac.uk/issues/politics/election/ref1973.htm"
+CAIN_1998 = "https://cain.ulster.ac.uk/issues/politics/election/ref1998.htm"
+COUNTY_1975 = {
+    "Sussex East": "East Sussex",
+    "Sussex West": "West Sussex",
+    "Yorkshire North": "North Yorkshire",
+    "Yorkshire South": "South Yorkshire",
+    "Yorkshire West": "West Yorkshire",
+    "Glamorgan Mid": "Mid Glamorgan",
+    "Glamorgan South": "South Glamorgan",
+    "Glamorgan West": "West Glamorgan",
+}
 YEARBOOK_1980 = "https://www.scottishgovernmentyearbooks.ed.ac.uk/record/22819/1/1980_ref_3_referendumresults.pdf"
 NATIONAL = {
+    "1975-06-05": (
+        "GBR",
+        "United Kingdom, whole country",
+        40456877,
+        54540,
+        "The registered electorate and invalid votes are the declared national figures in House of Commons Library briefing CBP-7253.",
+    ),
     "1979-03-01:scotland": (
         "SCT",
         "Scotland, whole country",
@@ -126,6 +153,73 @@ RP97_NOTE = (
     "gives each area's votes counted for Yes and No, but electorates and spoilt ballots only for the whole country."
 )
 REFERENDUMS = {
+    "1975-06-05": {
+        "title": "Membership of the European Community",
+        "question": ("Do you think the United Kingdom should stay in the European Community (the Common Market)?"),
+        "answers": ("Yes", "No"),
+        "source": ("EC Referendum 1975 Results", EP_1975),
+        "publisher": "Election Polling",
+        "kind": "compendium",
+        "artifacts": (CBP7253,),
+        "page": EP_1975,
+        "license": "No licence stated",
+        "license_url": None,
+        "attribution": "Election Polling, EC Referendum 1975 Results, from the counting areas' declarations.",
+        "note": (
+            "Counted by 68 counting areas: the English counties and Greater London, the Scottish regions and island "
+            "areas, the Welsh counties, and Northern Ireland as one area. Yes and No votes by area are from Election "
+            "Polling's results table, a compilation. Its areas sum to 17,378,561 Yes and 8,468,038 No, which is 20 "
+            "Yes and 2,035 No below the declared national result (17,378,581 Yes and 8,470,073 No), so the national "
+            "result is stored as the sum of the areas and differs from the declared one by those amounts. The "
+            "registered electorate (40,456,877) and the invalid votes (54,540) are the declared national figures from "
+            "House of Commons Library briefing CBP-7253. The result was binding on no one but was a clear Yes."
+        ),
+    },
+    "1973-03-08": {
+        "title": "Northern Ireland constitutional position",
+        "question": "Do you want Northern Ireland to remain part of the United Kingdom?",
+        "answers": ("Remain in the United Kingdom", "Join the Republic of Ireland"),
+        "ballot_answers": (
+            "Do you want Northern Ireland to remain part of the United Kingdom?",
+            "Do you want Northern Ireland to be joined with the Republic of Ireland outside the United Kingdom?",
+        ),
+        "source": ("Referendum ('Border Poll') (NI) Thursday 8 March 1973", CAIN_1973),
+        "publisher": "CAIN Web Service, Ulster University",
+        "kind": "compendium",
+        "page": CAIN_1973,
+        "license": "CAIN material; reproduction with acknowledgment",
+        "license_url": None,
+        "attribution": "CAIN Web Service (Conflict Archive on the Internet), Ulster University; from the Irish Times, 1973.",
+        "note": (
+            "Counted centrally for Northern Ireland as a whole, so there are no results by area. Nationalist parties "
+            "boycotted the poll. CAIN labels these figures a draft and takes them from the Irish Times; the Northern "
+            "Ireland Election Archive by ARK prints the same counts."
+        ),
+    },
+    "1998-05-22": {
+        "title": "Belfast Agreement",
+        "question": (
+            "Do you support the agreement reached in the multi-party talks on Northern Ireland and set out in "
+            "Command Paper 3883?"
+        ),
+        "answers": ("Yes", "No"),
+        "source": (
+            "Results of the Referenda in Northern Ireland and Republic of Ireland, Friday 22 May 1998",
+            CAIN_1998,
+        ),
+        "publisher": "CAIN Web Service, Ulster University",
+        "kind": "compendium",
+        "page": CAIN_1998,
+        "license": "CAIN material; reproduction with acknowledgment",
+        "license_url": None,
+        "attribution": "CAIN Web Service (Conflict Archive on the Internet), Ulster University.",
+        "note": (
+            "Counted at a single central location for Northern Ireland as a whole, so there are no results by "
+            "constituency. CAIN labels these figures a first draft; the Northern Ireland Election Archive by ARK "
+            "prints the same Yes, No, and invalid counts. The parallel referendum in the Republic of Ireland on the "
+            "same day (Nineteenth Amendment) is held with the Irish elections, not here."
+        ),
+    },
     "1998-05-07": {
         "title": "Greater London Authority",
         "question": (
@@ -306,6 +400,10 @@ def fetch() -> None:
     raw.fetch(SOURCE, GLA98, suffix=".pdf")
     raw.fetch(SOURCE, RP1144, suffix=".pdf")
     raw.fetch(SOURCE, YEARBOOK_1980, suffix=".pdf")
+    raw.fetch(SOURCE, EP_1975, suffix=".html")
+    raw.fetch(SOURCE, CBP7253, suffix=".pdf")
+    raw.fetch(SOURCE, CAIN_1973, suffix=".htm")
+    raw.fetch(SOURCE, CAIN_1998, suffix=".htm")
     for url in AV_LISTS:
         raw.fetch(SOURCE, url, suffix=".html")
         time.sleep(1)
@@ -529,6 +627,59 @@ def parse() -> None:
     if len(london) != 33 or sum(r["yes"] for r in london) != 1230759 or sum(r["no"] for r in london) != 478413:
         raise ValueError(f"London 1998: {len(london)} areas, {sum(r['yes'] for r in london)} Yes")
     frames.append(pl.DataFrame(london, schema={**frames[0].schema, "country": pl.String}))
+    page = html.unescape(re.sub(r"<[^>]+>", " ", raw.cached(SOURCE, EP_1975).path.read_text(errors="ignore")))
+    page = re.sub(r"[ \t]+", " ", page)
+    nation = None
+    older = []
+    for line in page.splitlines():
+        line = line.strip()
+        header = re.match(r"^(England|Scotland|Wales|Northern Ireland) Yes No Yes \(%\)", line)
+        if header is not None:
+            nation = {"England": "ENG", "Scotland": "SCT", "Wales": "WLS", "Northern Ireland": "NIR"}[header[1]]
+            continue
+        match = re.match(r"^([A-Z][A-Za-z ,.'-]+?) ([\d,]{3,}) ([\d,]{3,}) [\d.]+% [\d.]+% N/A N/A$", line)
+        if match is None or nation is None:
+            continue
+        label = COUNTY_1975.get(match[1], match[1])
+        yes, no = int(match[2].replace(",", "")), int(match[3].replace(",", ""))
+        kind = {"ENG": "eng-county", "SCT": "sct-region", "WLS": "wls-county"}.get(nation)
+        older.append(
+            {
+                "referendum": "1975-06-05",
+                "code": f"{kind}-1974-{slug(label)}" if kind else "N92000002",
+                "name": label,
+                "region": None,
+                "electorate": None,
+                "cast": yes + no,
+                "valid": yes + no,
+                "rejected": None,
+                "yes": yes,
+                "no": no,
+                "country": nation,
+            }
+        )
+    if len(older) != 68 or sum(r["yes"] for r in older) != 17378561 or sum(r["no"] for r in older) != 8468038:
+        raise ValueError(f"1975: {len(older)} areas, {sum(r['yes'] for r in older)} Yes")
+    for key, electorate, cast, valid, rejected, yes, no in (
+        ("1973-03-08", 1030084, 604256, 598283, 5973, 591820, 6463),
+        ("1998-05-22", 1175403, 953583, 951845, 1738, 676966, 274879),
+    ):
+        older.append(
+            {
+                "referendum": key,
+                "code": "N92000002",
+                "name": "Northern Ireland",
+                "region": None,
+                "electorate": electorate,
+                "cast": cast,
+                "valid": valid,
+                "rejected": rejected,
+                "yes": yes,
+                "no": no,
+                "country": "NIR",
+            }
+        )
+    frames.append(pl.DataFrame(older, schema={**frames[0].schema, "country": pl.String}))
     rows = pl.concat(frames, how="diagonal").with_columns(
         country=pl.coalesce(
             pl.col("country"),
@@ -572,6 +723,7 @@ def emit() -> Path:
             cs.add("scheme", code="gb.counting_area", polity_id=gb, kind="administrative", rank=2, noun="counting area")
         countries = {code: cs.area("gb.country", code) for code in COUNTRIES.values()}
         nation = cs.area("gb.nation", "GBR")
+        countries["GBR"] = nation
         if cs.minted & {*countries.values(), nation}:
             raise ValueError("publish gb.umit first: the countries must exist")
         system = cs.key("gb.electoral_system", "referendum")
@@ -618,7 +770,7 @@ def emit() -> Path:
                 cs.add(
                     "source",
                     id=source,
-                    kind="official_body",
+                    kind=meta.get("kind", "official_body"),
                     publisher=owner,
                     title=publisher,
                     url=meta["page"],
