@@ -159,13 +159,18 @@ REGIONAL = {
 }
 ALIASES = {"1974:eng-richmond-upon-thames": "Richmond (Surrey)"}
 GAPS = {"1983:eng-north-east-milton-keynes", "1983:eng-south-west-milton-keynes"}
-SAME = {"1955:eng-woodford": "1955:eng-wanstead-and-woodford", "1955:eng-richmond-upon-thames": "1955:eng-richmond-surrey"}
+SAME = {
+    "1955:eng-woodford": "1955:eng-wanstead-and-woodford",
+    "1955:eng-richmond-upon-thames": "1955:eng-richmond-surrey",
+}
 PAGE = "https://www.parlconst.org/constituency-maps"
 PUBLISHER = "parlconst.org"
 TITLE = "UK Parliamentary Constituencies: constituency maps since 1885"
 LICENSE = "CC BY 4.0"
 LICENSE_URL = "https://creativecommons.org/licenses/by/4.0/"
-ATTRIBUTION = "Constituency boundaries © parlconst.org, CC BY 4.0. Contains OS data © Crown copyright and database right"
+ATTRIBUTION = (
+    "Constituency boundaries © parlconst.org, CC BY 4.0. Contains OS data © Crown copyright and database right"
+)
 NOTES = (
     "Constituency maps drawn by the author of parlconst.org backwards in time from Ordnance Survey's 2010 and 2024 "
     "boundaries and published as uMap layers on umap.openstreetmap.fr. Clipped here to the coastline of ONS's 2019 "
@@ -196,7 +201,9 @@ def parse() -> None:
                     for url in [url for url in index if url.startswith(f"{UMAP}/datalayer/{slug.rsplit('_', 1)[1]}/")]:
                         for feature in json.loads(raw.cached(SOURCE, url).path.read_text())["features"]:
                             label = str(feature["properties"].get("Name") or "").strip().replace("\u2019", "'")
-                            label = REGIONAL.get((next(r for r in ("south", "midlands", "north", "") if r in slug), label), label)
+                            label = REGIONAL.get(
+                                (next(r for r in ("south", "midlands", "north", "") if r in slug), label), label
+                            )
                             if label and feature.get("geometry") is not None:
                                 copy.write_row((vintage, country, slug, label, json.dumps(feature["geometry"])))
         rows = conn.execute(
@@ -218,7 +225,13 @@ def parse() -> None:
         ).fetchall()
     frame = pl.DataFrame(
         rows,
-        schema={"vintage": pl.String, "country": pl.String, "name": pl.String, "geom": pl.String, "label_point": pl.String},
+        schema={
+            "vintage": pl.String,
+            "country": pl.String,
+            "name": pl.String,
+            "geom": pl.String,
+            "label_point": pl.String,
+        },
         orient="row",
     )
     print(frame.group_by("vintage", "country").len().sort("vintage", "country").rows())
@@ -226,7 +239,9 @@ def parse() -> None:
     frame.write_parquet(PARSED / "areas.parquet")
 
 
-def match(frame: pl.DataFrame, areas: list[tuple[str, str, UUID, date, date | None]]) -> tuple[dict[UUID, int], list[str]]:
+def match(
+    frame: pl.DataFrame, areas: list[tuple[str, str, UUID, date, date | None]]
+) -> tuple[dict[UUID, int], list[str]]:
     matched: dict[UUID, int] = {}
     misses: list[str] = []
     expected: list[tuple[str, UUID, str]] = []
@@ -235,7 +250,10 @@ def match(frame: pl.DataFrame, areas: list[tuple[str, str, UUID, date, date | No
         group = [(i, label) for i, (v, c, label) in features if (v, c) == (vintage, country)]
         used: set[int] = set()
         for prefix in COUNTRIES[country]:
-            for archive in [ARCHIVE.get(vintage, vintage), *([EXTRA[(vintage, prefix)]] if (vintage, prefix) in EXTRA else [])]:
+            for archive in [
+                ARCHIVE.get(vintage, vintage),
+                *([EXTRA[(vintage, prefix)]] if (vintage, prefix) in EXTRA else []),
+            ]:
                 pool = [
                     (area, ALIASES.get(code, label))
                     for code, label, area, start, _ in areas
