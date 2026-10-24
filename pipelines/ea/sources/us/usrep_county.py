@@ -161,9 +161,12 @@ def emit(
                 completeness=1,
             )
             note = note_for(key)
-            note = (
-                note if ties else note + f" It differs from the default result set by {', '.join(differences)} votes."
-            )
+            if not ties:
+                note += (
+                    f" It differs from the default result set by {', '.join(differences)} votes."
+                    if differences
+                    else " Every option printed here ties the default result set, which also holds an option this source does not print."
+                )
             cs.add("note", entity_id=result_set, kind="methodology", body_md=note)
             if ties:
                 for option, kind, seats in conn.execute(
