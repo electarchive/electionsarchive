@@ -18,11 +18,11 @@ MERGE_LOCK = 1700949316
 
 def _stage(conn: Connection, changeset_id: str) -> Stage:
     row = conn.execute(
-        "select pipeline, scope ->> 'polity', artifact_keys, scope -> 'replaces' from changeset where id = %s",
+        "select pipeline, scope ->> 'polity', artifact_keys, scope -> 'replaces', scope -> 'clears' from changeset where id = %s",
         [changeset_id],
     ).fetchone()
     assert row is not None, changeset_id
-    pipeline, polity, keys, replaces = row
+    pipeline, polity, keys, replaces, clears = row
     schema = f"cs_{changeset_id.replace('-', '')}"
     tables: dict[str, list[str]] = {}
     for key in keys:
@@ -80,7 +80,7 @@ def _stage(conn: Connection, changeset_id: str) -> Stage:
         if table in parents
     }
     nullable = {table: set(keys) - _not_null(conn, table) for table, keys in temporal.items()}
-    return Stage(schema, tables, entities, pipeline, polity, temporal, parents, owners, replaces or {}, nullable)
+    return Stage(schema, tables, entities, pipeline, polity, temporal, parents, owners, replaces or {}, nullable, clears or [])
 
 
 def _not_null(conn: Connection, table: str) -> set[str]:

@@ -53,6 +53,7 @@ class Stage:
     owners: dict[str, str]
     replaces: dict[str, list[str]]
     nullable: dict[str, set[str]] = field(default_factory=dict)
+    clears: list[str] = field(default_factory=list)
 
     def __post_init__(self) -> None:
         if unknown := sorted(set(self.replaces) - set(REPLACEABLE)):
@@ -92,8 +93,8 @@ class Stage:
     def replaced(self, table: str) -> sql.Composed:
         return sql.SQL(
             """select r.k from public.result_set r join public.changeset c on c.id = r.changeset_id
-               where c.pipeline = {} and r.id in (select result_set_id from {})"""
-        ).format(sql.Literal(self.pipeline), self.staged(table))
+               where c.pipeline = {} and (r.id in (select result_set_id from {}) or r.id = any({}::uuid[]))"""
+        ).format(sql.Literal(self.pipeline), self.staged(table), sql.Literal(self.clears))
 
     def stale(self, table: str) -> sql.Composable:
         parent = sql.Identifier(self.parents[table])

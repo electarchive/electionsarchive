@@ -724,4 +724,52 @@ def emit() -> Path:
             .unique()
             .height,
         )
+        corrected = [cs.key(f"{SOURCE}.result_set", key) for key in CORRECTED]
+        cs.manifest["scope"] = {"polity": "GB", "clears": [str(id) for id in corrected]}
+        if any(row["result_set_id"] in corrected for row in cs.rows["result_value"]):
+            raise ValueError("a winners-only by-election set carries vote values")
+        kept = {row["id"] for row in cs.rows["contest_option"]}
+        noted = {(row["entity_id"], row["body_md"]) for row in cs.rows["note"]}
+        dropped = 0
+        for result_set, contest in conn.execute(
+            "select id, contest_id from result_set where id = any(%s)", [corrected]
+        ).fetchall():
+            for option, candidacies, outcomes in conn.execute(
+                """select o.id, array(select y.id from candidacy y where y.option_id = o.id),
+                          exists (select from outcome t where t.option_id = o.id)
+                   from contest_option o where o.contest_id = %s and not exists (
+                     select from result_value v join result_set r on r.k = v.result_set_k
+                     where r.contest_id = o.contest_id and v.option_k = o.k)""",
+                [contest],
+            ).fetchall():
+                if option in kept or outcomes:
+                    continue
+                dropped += 1
+                for candidacy in candidacies:
+                    cs.add(
+                        "entity_retirement",
+                        entity_id=candidacy,
+                        reason="Umit's rows for this by-election repeated the previous general election's candidates.",
+                    )
+                if not candidacies:
+                    cs.add(
+                        "option_drop",
+                        option_id=option,
+                        contest_id=contest,
+                        reason="Umit's rows for this by-election repeated the previous general election's candidates.",
+                    )
+            for note, text in conn.execute(
+                """select n.id, n.body_md from note n join changeset c on c.id = n.changeset_id
+                   where n.entity_id = %s and n.kind = 'caveat' and c.pipeline = %s""",
+                [result_set, SOURCE],
+            ).fetchall():
+                if (result_set, text) not in noted:
+                    cs.add(
+                        "note_drop",
+                        note_id=note,
+                        entity_id=result_set,
+                        body_md=text,
+                        reason="The caveat described Umit's rows, which the winners-only set replaces.",
+                    )
+        print(f"{len(corrected)} winners-only sets cleared of facts, {dropped} copied candidacies or options dropped")
         return cs.write()
