@@ -43,7 +43,16 @@ MISSING = {("2020/statewide_primary", town) for town in ("barrington", "warren",
 PARTIES = {"DEM": "democratic", "REP": "republican"}
 PUBLISHER = "Rhode Island Board of Elections"
 TITLE = "Election results by city and town"
-ARCHIVE = "https://web.archive.org/web/2009id_/http://www.elections.ri.gov/elections/results/2008/presidential_preference_primary/"
+ARCHIVES = {
+    "2008/presidential_preference_primary": (
+        "https://web.archive.org/web/2009id_/http://www.elections.ri.gov/elections/results/2008/presidential_preference_primary/",
+        date(2008, 3, 4),
+    ),
+    "2008/general_election": (
+        "https://web.archive.org/web/2012id_/http://www.elections.state.ri.us/elections/results/2008/general_election/",
+        date(2008, 11, 4),
+    ),
+}
 
 
 def fetch() -> None:
@@ -55,15 +64,18 @@ def fetch() -> None:
                 if error.response.status_code != 403:
                     raise
                 print("no file:", folder, town)
-    for town in [*TOWNS, "statewide"]:
-        raw.fetch(
-            SOURCE, ARCHIVE + ("statewidesummary.php" if town == "statewide" else f"{town}/index.php"), suffix=".html"
-        )
+    for archive, _ in ARCHIVES.values():
+        for town in [*TOWNS, "statewide"]:
+            raw.fetch(
+                SOURCE,
+                archive + ("statewidesummary.php" if town == "statewide" else f"{town}/index.php"),
+                suffix=".html",
+            )
 
 
 def parse() -> None:
     rows = []
-    for folder in [*FOLDERS, "2008/presidential_preference_primary"]:
+    for folder in [*FOLDERS, *ARCHIVES]:
         totals: dict[tuple[str, str, str], int] = {}
         statewide: dict[tuple[str, str, str], int] = {}
         for town in [*TOWNS, "statewide"]:
@@ -73,8 +85,9 @@ def parse() -> None:
                 data = json.loads(raw.cached(SOURCE, f"{BASE}{folder}/{town}.json").path.read_text())
                 day = datetime.strptime(data["election_date"], "%B %d, %Y").date()
             else:
+                archive, day = ARCHIVES[folder]
                 page = raw.cached(
-                    SOURCE, ARCHIVE + ("statewidesummary.php" if town == "statewide" else f"{town}/index.php")
+                    SOURCE, archive + ("statewidesummary.php" if town == "statewide" else f"{town}/index.php")
                 )
                 lines = [
                     line.strip()
@@ -83,20 +96,32 @@ def parse() -> None:
                     ).splitlines()
                     if line.strip()
                 ]
-                day, data, current = date(2008, 3, 4), {"contests": []}, None
+                data, current = {"contests": []}, None
                 for n, line in enumerate(lines):
-                    if line.endswith("PRESIDENTIAL CANDIDATE"):
+                    if line.endswith("PRESIDENTIAL CANDIDATE") or (
+                        folder.endswith("general_election") and n + 1 < len(lines) and lines[n + 1] == "Candidate"
+                    ):
                         current = {"name": line, "candidates": []}
                         data["contests"].append(current)
                     elif line.startswith("DELEGATES") or line == "Contact Us":
                         current = None
                     elif (
                         current is not None
-                        and line not in ("Candidate", "Total votes")
+                        and line not in ("Candidate", "Total votes", "Pct")
+                        and not re.fullmatch(r"\(\w+\)|[\d,.]+%?", line)
                         and n + 1 < len(lines)
                         and re.fullmatch(r"[\d,]+", lines[n + 1])
                     ):
                         current["candidates"].append({"name": line, "votes": lines[n + 1]})
+                    elif (
+                        current is not None
+                        and folder.endswith("general_election")
+                        and line not in ("Candidate", "Total votes", "Pct")
+                        and n + 2 < len(lines)
+                        and re.fullmatch(r"\(\w+\)", lines[n + 1])
+                        and re.fullmatch(r"[\d,]+", lines[n + 2])
+                    ):
+                        current["candidates"].append({"name": line, "votes": lines[n + 2]})
             for contest in data["contests"]:
                 name = contest["name"].upper()
                 if "GENERAL ASSEMBLY" in name or "DELEGATE" in name:
@@ -191,7 +216,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Rhode Island's 2008 to 2024 president, U.S. Senate, and House primaries and 2010 to 2014 U.S. Senate and House generals by county, with the presidential primaries' centrally counted mail ballots as a statewide row",
+            summary="Rhode Island's 2008 to 2024 president, U.S. Senate, and House primaries and 2008 to 2014 U.S. Senate and House generals by county, with the presidential primaries' centrally counted mail ballots as a statewide row",
             polity="US-RI",
         )
         source = cs.source(PUBLISHER, TITLE)
@@ -209,11 +234,14 @@ def emit() -> Path:
                 if (folder, town) in MISSING:
                     continue
                 cs.artifact(raw.cached(SOURCE, f"{BASE}{folder}/{town}.json"), source)
-        for town in [*TOWNS, "statewide"]:
-            cs.artifact(
-                raw.cached(SOURCE, ARCHIVE + ("statewidesummary.php" if town == "statewide" else f"{town}/index.php")),
-                source,
-            )
+        for archive, _ in ARCHIVES.values():
+            for town in [*TOWNS, "statewide"]:
+                cs.artifact(
+                    raw.cached(
+                        SOURCE, archive + ("statewidesummary.php" if town == "statewide" else f"{town}/index.php")
+                    ),
+                    source,
+                )
         frame = pl.read_parquet(PARSED / "counties.parquet")
         medsl.attach(cs, conn, frame, {"RI": source}, strict=True)
         staged = {str(row["id"]) for row in cs.rows.get("result_set", [])}
