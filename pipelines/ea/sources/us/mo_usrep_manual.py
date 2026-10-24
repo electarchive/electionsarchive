@@ -24,7 +24,7 @@ PAGES = {
 }
 PRINTED = {1994: [530, 531, 532], 1998: [561, 562, 563]}
 DAYS = {1992: date(1992, 11, 3), 1994: date(1994, 11, 8), 1998: date(1998, 11, 3)}
-PRINTED_SUMS = {("1972-11-07", "3"): [124365, 53523, 465], ("1934-11-06", "3"): [61548, 39953, 91], ("1938-11-08", "2"): [51451, 37294, 49], ("1938-11-08", "6"): [52774, 52159, 12], ("1928-11-06", "8"): [26619, 32877]}
+PRINTED_SUMS = {("1910-11-08", "7"): [22433, 21951, 382, 936], ("1918-11-05", "15"): [17826, 19133, 557], ("1918-11-05", "10"): [30080, 50400, 2981, 289], ("1918-11-05", "1"): [17184, 14255, 272, 1], ("1972-11-07", "3"): [124365, 53523, 465], ("1934-11-06", "3"): [61548, 39953, 91], ("1938-11-08", "2"): [51451, 37294, 49], ("1938-11-08", "6"): [52774, 52159, 12], ("1928-11-06", "8"): [26619, 32877]}
 PAGE_FIXES = {(62628, "868"): "888"}
 TOTALS = {(1998, 7): [43416, 129746, 5639]}
 EARLY = [
@@ -42,6 +42,12 @@ METHOD = (
     "reports apart, is added into Jackson County."
 )
 NOTES = {
+    "1910-11-08:MO:house:7": " The Manual prints 381 as the Prohibition total, but its county rows (checked against the page image) sum to 382.",
+    "1914-11-03:MO:house:2": " The Manual of 1917-1918 prints Livingston County's Democratic vote as 2,357, which does not tie the printed district total; the 1913-1914 Manual prints 2,537, which does, and is used here.",
+    "1918-11-05:MO:house:15": " The Manual prints 17,815 and 19,333 as the Democratic and Republican totals, but its county rows (checked against the page image) sum to 17,826 and 19,133.",
+    "1918-11-05:MO:house:10": " The Manual prints 50,390 as the Republican total for the regular term, but its county rows (checked against the page image) sum to 50,400. The Manual also prints a separate short-term vote for the unexpired term, which is not loaded.",
+    "1918-11-05:MO:house:1": " The Manual prints 17,384 as the Democratic total, but its county rows (checked against the page image) sum to 17,184.",
+    "1948-11-02:MO:house:3": " The Manual's county rows sum to its printed district total of 69,599; the Clerk's district total of 74,599 is 5,000 higher, so the Manual's rows are the default.",
     "1928-11-06:MO:house:8": " The Manual prints 33,327 as the Democratic total, but its county rows (checked against the page image) sum to 32,877.",
     "1938-11-08:MO:house:2": " The Manual prints 48 as the Socialist total, but its county rows (checked against the page image) sum to 49.",
     "1938-11-08:MO:house:6": " The Manual prints 11 as the Socialist-Labor total, but its county rows (checked against the page image) sum to 12.",
@@ -205,4 +211,5 @@ def emit() -> Path:
             for pointer in pointers
         ],
         lambda key: METHOD + NOTES.get(key, ""),
+        promote=frozenset({"1948-11-02:MO:house:3", *(f"1912-11-05:MO:house:{district}" for district in (1, 3, 4, 6, 7, 8, 9, 10, 13, 14, 15))}),
     )

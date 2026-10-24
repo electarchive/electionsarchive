@@ -23,6 +23,7 @@ def emit(
     note_for: Callable[[str], str],
     official: bool = False,
     hold: frozenset[str] = frozenset(),
+    promote: frozenset[str] = frozenset(),
     statewide: bool = False,
 ) -> Path:
     with connect() as conn:
@@ -138,7 +139,7 @@ def emit(
             ]
             print(key, "ties" if ties else f"differs {differences}")
             result_set = cs.key(f"{source_name}.result_set", key)
-            default = ties or (official and key not in hold)
+            default = ties or (official and key not in hold) or key in promote
             if default:
                 cs.add(
                     "result_set",
