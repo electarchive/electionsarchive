@@ -123,6 +123,13 @@ def _diff(conn: Connection, stage: Stage) -> dict[str, dict[str, int]]:
                           count(*) filter (where p.entity_id = s.entity_id)
                    from {} s left join public.external_id p using (scheme, value)"""
             ).format(staged)
+        elif table == "slug":
+            query = sql.SQL(
+                """select count(*) filter (where p.path is null),
+                          count(*) filter (where p.path is not null and not p.is_current),
+                          count(*) filter (where p.is_current)
+                   from {} s left join public.slug p on p.path = s.path and p.entity_id = s.entity_id"""
+            ).format(staged)
         else:
             query = sql.SQL(
                 "select count(*) filter (where not {present}), 0, count(*) filter (where {present}) from {staged} s"
@@ -655,25 +662,30 @@ def _publish_table(conn: Connection, stage: Stage, table: str) -> None:
     )
 
 
-def _rollup(conn: Connection, stage: Stage, moved: list[str], repointed: list[str]) -> None:
-    if "result_value" not in stage.tables and not moved and not repointed:
+def _rollup(
+    conn: Connection, stage: Stage | None, moved: list[str], repointed: list[str], sets: list[int] | None = None
+) -> None:
+    if (stage is None or "result_value" not in stage.tables) and not moved and not repointed and not sets:
         return
     stale = [
-        key
-        for (key,) in conn.execute(
-            """select result_set_k from result_rollup
+        *(sets or []),
+        *[
+            key
+            for (key,) in conn.execute(
+                """select result_set_k from result_rollup
                where area_k in (select k from area where id = any(%s::uuid[]))
                union
                select v.result_set_k from result_value v join reporting_unit u on u.k = v.unit_k
                where u.id = any(%s::uuid[])""",
-            [moved, repointed],
-        ).fetchall()
+                [moved, repointed],
+            ).fetchall()
+        ],
     ]
     conn.execute("delete from result_rollup_sum where result_set_k = any(%s)", [stale])
     conn.execute("delete from result_rollup_unit where result_set_k = any(%s)", [stale])
     facts = (
         sql.SQL("select distinct result_set_id from {}").format(stage.staged("result_value"))
-        if "result_value" in stage.tables
+        if stage is not None and "result_value" in stage.tables
         else sql.SQL("select null::uuid")
     )
     conn.execute(
@@ -723,8 +735,24 @@ def _rollup(conn: Connection, stage: Stage, moved: list[str], repointed: list[st
               select a.result_set_k, a.unit_k, p.parent_id, a.on_date, a.complete
               from ancestors a join area_parent p on p.area_id = a.area_id and p.valid @> a.on_date
             ),
-            reached as (
+            climbed as (
               select result_set_k, unit_k, area_id, bool_or(complete) as complete from ancestors group by result_set_k, unit_k, area_id
+            ),
+            spans as (
+              select rs.k as result_set_k, dc.county_area_id
+              from rs join district_county dc on dc.district_area_id = rs.district_area_id
+                and dc.district_valid @> rs.on_date and dc.county_valid @> rs.on_date and dc.share >= 0.005
+            ),
+            reached as (
+              select * from climbed
+              union all
+              select u.result_set_k, u.unit_k, rs.district_area_id,
+                     exists (select from spans s where s.result_set_k = rs.k) and not exists (
+                       select from spans s where s.result_set_k = rs.k and not exists (
+                         select from climbed r where r.result_set_k = s.result_set_k and r.area_id = s.county_area_id))
+              from units u join rs on rs.k = u.result_set_k
+              where rs.district_area_id is not null and rs.allocation_parent_id is null
+                and not exists (select from climbed r where r.result_set_k = rs.k and r.area_id = rs.district_area_id)
             ),
             counted as (
               select r.result_set_k, r.area_id, min(r.unit_k) as unit_k, count(*) > 1 or not bool_and(r.complete) as summed
@@ -746,6 +774,26 @@ def _rollup(conn: Connection, stage: Stage, moved: list[str], repointed: list[st
             group by v.result_set_k, area.k, v.option_k, v.channel, v.measure, v.count_round"""
         ).format(facts=facts, stale=sql.Literal(stale))
     )
+
+
+def rollup(conn: Connection, sets: list[int], affected: bool) -> int:
+    if affected:
+        sets += [
+            key
+            for (key,) in conn.execute(
+                """select r.k from result_set r join contest c on c.id = r.contest_id join area a on a.id = c.district_area_id
+                   where r.status = 'active' and c.allocation_parent_id is null
+                     and exists (select from result_rollup x where x.result_set_k = r.k)
+                     and not exists (select from result_rollup x where x.result_set_k = r.k and x.area_k = a.k)
+                   order by r.k"""
+            ).fetchall()
+        ]
+        conn.commit()
+    for start in range(0, len(sets), 500):
+        with conn.transaction():
+            _rollup(conn, None, [], [], sets[start : start + 500])
+        print(f"{min(start + 500, len(sets))} of {len(sets)} result sets rolled up", flush=True)
+    return len(sets)
 
 
 def defaults(

@@ -13,7 +13,7 @@ from ea.changeset import Changeset, slug
 from ea.store import DATA, connect
 
 SOURCE = "us.ne_towns"
-VERSION = "1"
+VERSION = "2"
 PARSED = DATA / "parsed" / SOURCE
 STATES = {"09": "CT", "23": "ME", "25": "MA", "33": "NH", "44": "RI", "50": "VT"}
 VINTAGES = {
@@ -45,7 +45,9 @@ def parse() -> None:
     for year, fips, url in urls():
         with zipfile.ZipFile(raw.cached(SOURCE, url).path) as archive:
             parts = {name.rsplit(".", 1)[1].lower(): archive.read(name) for name in archive.namelist()}
-        reader = shapefile.Reader(shp=io.BytesIO(parts["shp"]), shx=io.BytesIO(parts["shx"]), dbf=io.BytesIO(parts["dbf"]))
+        reader = shapefile.Reader(
+            shp=io.BytesIO(parts["shp"]), shx=io.BytesIO(parts["shx"]), dbf=io.BytesIO(parts["dbf"])
+        )
         for record, shape in zip(reader.iterRecords(), reader.iterShapes(), strict=True):
             row = record.as_dict()
             code = str(row.get("GEOID") or "")[-10:] or f"{row['STATE']}{row['COUNTY']}{row['COUSUB']}"
@@ -112,8 +114,9 @@ def emit() -> Path:
             code: str(area)
             for code, area in conn.execute(
                 """select c.code, c.area_id from area_code c join area a on a.id = c.area_id
-                   where a.scheme_code = 'us.town' and left(c.code, 2) = any(%s)""",
-                [list(STATES)],
+                   join changeset x on x.id = a.changeset_id
+                   where a.scheme_code = 'us.town' and left(c.code, 2) = any(%s) and x.pipeline <> %s""",
+                [list(STATES), SOURCE],
             ).fetchall()
         }
         places = {
@@ -127,13 +130,19 @@ def emit() -> Path:
                 [list(STATES)],
             ).fetchall()
         }
-        slugs = {path for (path,) in conn.execute("select path from slug").fetchall()}
+        slugs = {
+            path
+            for (path,) in conn.execute(
+                "select s.path from slug s join changeset c on c.id = s.changeset_id where c.pipeline <> %s", [SOURCE]
+            ).fetchall()
+        }
         census = cs.source("U.S. Census Bureau", "Cartographic Boundary Files, 1:500,000")
         if census in cs.minted:
             raise ValueError("the Census Bureau's cartographic boundary source must already exist")
         for _, _, url in urls():
             cs.artifact(raw.cached(SOURCE, url), census)
         dated = {town: rows for (town,), rows in codes.group_by("town")}
+        keys = set(towns["town"])
         created = reused = skipped = 0
         for row in towns.iter_rows(named=True):
             state, abbreviation = row["state"], STATES[row["state"]]
@@ -158,10 +167,19 @@ def emit() -> Path:
             created += 1
             proper, kind = row["name"], row["kind"]
             municipal = kind in MUNICIPAL
-            display = proper if kind in ("town", "city", "town city") else f"{proper} {kind.title() if municipal else kind}"
+            display = (
+                f"{proper} {kind.title()}"
+                if kind in ("town", "city")
+                and f"{row['town'].rsplit(':', 1)[0]}:{'city' if kind == 'town' else 'town'}" in keys
+                else proper
+                if kind in ("town", "city", "town city")
+                else f"{proper} {kind.title() if municipal else kind}"
+            )
             cs.add("area", id=area, scheme_code="us.town")
             cs.add("area_parent", area_id=area, parent_id=cs.area("us.county", row["code"][:5]))
-            cs.add("name", entity_id=area, text=f"{display}, {abbreviation}", lang="en", kind="official", is_preferred=True)
+            cs.add(
+                "name", entity_id=area, text=f"{display}, {abbreviation}", lang="en", kind="official", is_preferred=True
+            )
             cs.add(
                 "area_geometry",
                 area_id=area,
