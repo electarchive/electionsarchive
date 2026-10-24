@@ -67,6 +67,7 @@ FILES = {
     "WA": ("wa", "2026-08-04", ["ballot-items"]),
     "UT": ("ut", "2026-06-23", ["ballot-items"]),
     "ME": ("me", "2026-06-09", list(ME_FILES)),
+    "LA": ("la", "2026-05-16", ["20260516/csv/ByParish_67538.csv", "20260516/csv/ByParish_67539.csv"]),
     "RI": ("ri", "2026-09-09", ["ballot-items"]),
     "CT": ("ct", "2026-08-11", ["111/27708/Lookupdata", "111/27708/townVotes_Electiondata", "112/28256/Lookupdata", "112/28256/townVotes_Electiondata"]),
     "AR": ("ar", "2026-03-03", ["contests", "data"]),
@@ -92,11 +93,12 @@ FILES = {
 RUNOFFS = {
     "GA": ("ga2", "2026-06-16", ["ballot-items"], "2026-05-19"),
     "AL": ("alx", "2026-06-16", ["2026-07/2026_PRIMARY_RUNOFF_ELECTION.zip"], "2026-05-19"),
+    "LA": ("la", "2026-06-27", ["20260627/csv/ByParish_70156.csv", "20260627/csv/ByParish_70157.csv"], "2026-05-16"),
     "OK": ("ok", "2026-08-25", ["getelec/20260825", "20260825/12001", "20260825/13010"], "2026-06-16"),
 }
-FIPS = {"TX": "48", "CA": "06", "MI": "26", "PA": "42", "WV": "54", "MS": "28", "SD": "46", "WY": "56", "OR": "41", "KY": "21", "CO": "08", "AZ": "04", "TN": "47", "NC": "37", "IL": "17", "NM": "35", "NY": "36", "VA": "51", "AL": "01", "ND": "38", "MD": "24", "MN": "27", "VT": "50", "KS": "20", "GA": "13", "WA": "53", "UT": "49", "IN": "18", "FL": "12", "ID": "16", "NJ": "34", "MO": "29", "MA": "25", "DE": "10", "HI": "15", "ME": "23", "OK": "40", "AR": "05", "CT": "09", "RI": "44"}
-RUNOFF_SYSTEMS = {"GA": "two_round", "TX": "two_round", "MS": "two_round", "SD": "two_round_35", "NC": "two_round_30", "OK": "two_round", "AL": "two_round"}
-THRESHOLDS = {"GA": 50, "TX": 50, "MS": 50, "SD": 35, "NC": 30, "OK": 50, "AL": 50}
+FIPS = {"TX": "48", "CA": "06", "MI": "26", "PA": "42", "WV": "54", "MS": "28", "SD": "46", "WY": "56", "OR": "41", "KY": "21", "CO": "08", "AZ": "04", "TN": "47", "NC": "37", "IL": "17", "NM": "35", "NY": "36", "VA": "51", "AL": "01", "ND": "38", "MD": "24", "MN": "27", "VT": "50", "KS": "20", "GA": "13", "WA": "53", "UT": "49", "IN": "18", "FL": "12", "ID": "16", "NJ": "34", "MO": "29", "MA": "25", "DE": "10", "HI": "15", "ME": "23", "OK": "40", "AR": "05", "CT": "09", "RI": "44", "LA": "22"}
+RUNOFF_SYSTEMS = {"GA": "two_round", "TX": "two_round", "MS": "two_round", "SD": "two_round_35", "NC": "two_round_30", "OK": "two_round", "AL": "two_round", "LA": "two_round"}
+THRESHOLDS = {"GA": 50, "TX": 50, "MS": 50, "SD": 35, "NC": 30, "OK": 50, "AL": 50, "LA": 50}
 ME_COUNTIES = {"AND": "23001", "ARO": "23003", "CUM": "23005", "FRA": "23007", "HAN": "23009", "KEN": "23011", "KNO": "23013", "LIN": "23015", "OXF": "23017", "PEN": "23019", "PIS": "23021", "SAG": "23023", "SOM": "23025", "WAL": "23027", "WAS": "23029", "YOR": "23031"}
 RCV_WINNERS = {
     ("ME", "governor", "", "democratic"): ("hannah-m-pingree", "Hannah M. Pingree won the final round of the ranked-choice count, 111,750 votes to 86,950 for Nirav D. Shah, after three eliminations."),
@@ -151,6 +153,7 @@ OFFICIAL = {
     "AL": ("Alabama Secretary of State", "https://www.sos.alabama.gov/alabama-votes/voter/election-data", "county files of precinct results summed to counties"),
     "CT": ("Connecticut Secretary of the State", "https://ctemspublic.pcctg.net/", "town results from the Election Center summed to counties"),
     "RI": ("Rhode Island Board of Elections", "https://elections.ri.gov/elections/previous-election-results", "town results summed to counties"),
+    "LA": ("Louisiana Secretary of State", "https://voterportal.sos.la.gov/graphical", "parish files from the live election results site"),
     "KS": ("Kansas Secretary of State", "https://sos.ks.gov/elections/election-results.html", "precinct-level files summed to counties"),
 }
 METHOD = "Results by county from OpenElections' 2026 primary file for {state}, a community compilation of the state's county results. Candidates who received votes are listed; write-in votes are pooled."
@@ -249,6 +252,8 @@ def town_counties(state: str) -> dict[str, str]:
 
 
 def url(code: str, file: str) -> str:
+    if code == "la":
+        return f"https://voterportal.sos.la.gov/ElectionResults/ElectionResults/Data?blob={file}"
     if code == "ct":
         return f"https://ctemspublic.tgstg.net/ng-app/data/election/{file}.json"
     if code == "alx":
@@ -438,6 +443,15 @@ def rows(code: str, path: Path, file: str = ""):
                         "candidate": candidate["NAME_ON_BALLOT"],
                         "votes": str(candidate["TOTAL_VOTES"]),
                     }
+        return
+    if code == "la":
+        with path.open(newline="") as handle:
+            reader = csv.reader(handle)
+            header = next(reader)
+            for row in reader:
+                for column in range(2, len(header)):
+                    found = re.fullmatch(r"(.*) \((\w+)\)", header[column])
+                    yield {"county": row[1], "office": "U.S. Senate", "district": "", "party": "Democratic" if row[0].endswith("Democratic Party") else "Republican", "candidate": found[1] if found is not None else header[column], "votes": row[column]}
         return
     if code == "ct":
         if file.endswith("Lookupdata"):
