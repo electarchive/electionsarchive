@@ -35,5 +35,13 @@ export default defineConfig(({ command }) => {
           ],
         }),
     ],
+    optimizeDeps: {
+      include: [
+        "@lucide/svelte/icons/*",
+        "@better-auth/api-key/client",
+        "maplibre-gl",
+        "modern-screenshot",
+      ],
+    },
   };
 });
