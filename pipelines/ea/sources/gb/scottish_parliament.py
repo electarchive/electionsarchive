@@ -264,6 +264,7 @@ def parse_pages() -> tuple[pl.DataFrame, pl.DataFrame]:
             majority = int(re.sub(r"\D", "", lines[index + 2]))
             index += 3
             position = 0
+            first = len(candidates)
             while position < len(block):
                 name = block[position]
                 detail = (
@@ -288,6 +289,11 @@ def parse_pages() -> tuple[pl.DataFrame, pl.DataFrame]:
                         "majority": majority if name == member else None,
                     }
                 )
+            winner = next((row for row in candidates[first:] if row["elected"]), None)
+            if winner is not None and winner["votes"] is None:
+                rivals = [row["votes"] for row in candidates[first:] if row["votes"] is not None and not row["elected"]]
+                if rivals:
+                    winner["votes"] = max(rivals) + majority
         region = None
         index = split + 2
         while index < len(lines) and not lines[index].startswith("Copyright"):
@@ -1053,7 +1059,7 @@ def emit() -> Path:
                         role="head",
                         ballot_name=line["candidate"],
                         member_of_party_id=party,
-                        is_independent=line["party"] in umit.NOT_PARTIES,
+                        is_independent=line["party"] is None or line["party"] in umit.NOT_PARTIES,
                     )
                     if line["party_from_workbook"] is not None:
                         cs.add(
