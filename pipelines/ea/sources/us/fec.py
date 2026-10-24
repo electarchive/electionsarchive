@@ -5820,7 +5820,7 @@ def emit() -> Path:
                 if annulled:
                     continue
                 footnotes = {
-                    row["person"]: row["footnote"]
+                    row["person"]: row["footnote"].lstrip("#").strip()
                     for row in rows.iter_rows(named=True)
                     if row["person"] is not None and row["footnote"] is not None
                 }
@@ -6425,7 +6425,7 @@ def emit() -> Path:
                             )
 
                 footnotes = {
-                    row["person"]: row["footnote"]
+                    row["person"]: row["footnote"].lstrip("#").strip()
                     for row in rows.iter_rows(named=True)
                     if row["person"] is not None and row["footnote"] is not None
                 }
