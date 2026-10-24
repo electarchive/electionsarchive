@@ -7089,6 +7089,14 @@ async function races(
               and br.kind = 'regional_branch' and br.valid @> (select day from last)
             left join entity_merge bm on bm.entity_id = br.parent_party_id
             group by 1
+            union all
+            select distinct coalesce(bm.into_id, br.parent_party_id, pm.into_id, o.party_id), 0
+            from tree t
+            join contest_option o on o.contest_id = t.id and o.party_id is not null
+            left join entity_merge pm on pm.entity_id = o.party_id
+            left join party_affiliation br on br.party_id = coalesce(pm.into_id, o.party_id)
+              and br.kind = 'regional_branch' and br.valid @> (select day from last)
+            left join entity_merge bm on bm.entity_id = br.parent_party_id
           `),
         sequel(group, isBrief, place.k, lineage),
         isBrief || filled === 0 || group.length < 2
