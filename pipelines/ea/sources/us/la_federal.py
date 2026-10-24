@@ -16,6 +16,13 @@ SOURCE = "us.la_federal"
 VERSION = "1"
 PARSED = DATA / "parsed" / SOURCE
 DAYS = [
+    date(1992, 10, 3),
+    date(1992, 11, 3),
+    date(1994, 10, 1),
+    date(1996, 9, 21),
+    date(1996, 11, 5),
+    date(1996, 12, 7),
+    date(1998, 11, 3),
     date(2002, 11, 5),
     date(2002, 12, 7),
     date(2004, 11, 2),
@@ -139,7 +146,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Louisiana's 2002 to 2020 U.S. Senate, House, and presidential primary contests by parish from the Secretary of State's results",
+            summary="Louisiana's 1992 to 2020 U.S. Senate, House, and presidential primary contests by parish from the Secretary of State's results",
             polity="US-LA",
         )
         source = cs.source(la_sos.PUBLISHER, la_sos.TITLE)
