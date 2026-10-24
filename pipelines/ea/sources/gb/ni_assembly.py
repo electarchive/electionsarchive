@@ -1,3 +1,4 @@
+import difflib
 import re
 import subprocess
 import unicodedata
@@ -72,6 +73,27 @@ def fold(text: str) -> str:
     return " ".join(re.findall(r"[a-z0-9]+", plain.replace("&", " and ")))
 
 
+WIKIPEDIA = "https://en.wikipedia.org/w/index.php?title={}_(Assembly_constituency)&action=raw"
+CONSTITUENCIES = (
+    "Belfast East",
+    "Belfast North",
+    "Belfast South",
+    "Belfast West",
+    "East Antrim",
+    "East Londonderry",
+    "Fermanagh and South Tyrone",
+    "Foyle",
+    "Lagan Valley",
+    "Mid Ulster",
+    "Newry and Armagh",
+    "North Antrim",
+    "North Down",
+    "South Antrim",
+    "South Down",
+    "Strangford",
+    "Upper Bann",
+    "West Tyrone",
+)
 INDEPENDENT_UNIONISTS_1998 = {
     ("Belfast North", "Agnew"),
     ("Upper Bann", "Watson"),
@@ -83,6 +105,8 @@ INDEPENDENT_UNIONISTS_1998 = {
 def fetch() -> None:
     for url in (*ARK.values(), *NICVA.values(), *EONI):
         raw.fetch(SOURCE, url, suffix=".rar" if "ark.ac.uk" in url else ".xlsx" if url.endswith(".xlsx") else ".zip")
+    for constituency in CONSTITUENCIES:
+        raw.fetch(SOURCE, WIKIPEDIA.format(constituency.replace(" ", "_")), suffix=".txt")
 
 
 def workbook(path: Path) -> dict[int, dict[str, str | float]]:
@@ -218,7 +242,23 @@ def parse() -> None:
             parsed = ark_sheet(year, path)
             facts = parsed["facts"]
             units.append({"year": year, "constituency": constituency, **facts})
+            full_names: dict[int, str] = {}
+            if year == 2007:
+                section = raw.cached(SOURCE, WIKIPEDIA.format(constituency.replace(" ", "_"))).path.read_text(encoding="utf-8")
+                section = section.split("====2007====", 1)[1].split("\n====", 1)[0]
+                for block in section.split("STV Election box candidate2")[1:]:
+                    line = re.search(r"\|\s*candidate\s*=\s*([^\n]*)", block)
+                    link = None if line is None else re.sub(r"\[\[(?:[^\]|]*\|)?([^\]]*)\]\]", r"\1", line.group(1)).replace("\'", "").strip()
+                    first = re.search(r"count1\s*=\s*\'*([\d,]+)", block)
+                    if link and first is not None:
+                        full_names[int(first.group(1).replace(",", ""))] = link
             for position, candidate in enumerate(parsed["candidates"], start=1):
+                full = full_names.get(int(candidate["totals"][1]))
+                if full is not None and (
+                    fold(candidate["name"]) in fold(full)
+                    or difflib.SequenceMatcher(None, fold(candidate["name"]), fold(full.split()[-1])).ratio() >= 0.6
+                ):
+                    candidate["name"] = full
                 if (year, constituency, candidate["name"].split(",")[0].strip()) in {(1998, *key) for key in INDEPENDENT_UNIONISTS_1998}:
                     candidate["party"] = "Independent Unionist"
                 for stage, value in candidate["totals"].items():
@@ -393,10 +433,12 @@ def party_of(description: str) -> str | None:
 
 
 def display(name: str) -> str:
+    name = re.sub(r"\s+", " ", re.sub(r"##\s*unsure\s*(?:##)?|##", "", name, flags=re.IGNORECASE)).strip()
     surname, _, given = name.partition(",")
     words = []
-    for word in f"{given.strip()} {surname.strip()}".split():
-        if word.isupper() and len(word) > 1 and not re.fullmatch(r"(?:[A-Z]\.?)+", word):
+    for index, word in enumerate(f"{given.replace(',', ' ').strip()} {surname.strip()}".split()):
+        last = index == len(f"{given.replace(',', ' ').strip()} {surname.strip()}".split()) - 1
+        if word.isupper() and len(word) > (1 if last else 3):
             word = re.sub(r"\b(Mc|O')([a-z])", lambda found: found.group(1) + found.group(2).upper(), word.capitalize())
         words.append(word)
     return " ".join(words)
@@ -494,6 +536,21 @@ def emit() -> Path:
             for url in EONI if official else [(ARK if ark else NICVA)[year]]:
                 cs.artifact(raw.cached(SOURCE, url), sources[year])
 
+        names_source = cs.source("Wikipedia", "Northern Ireland Assembly constituencies")
+        cs.add(
+            "source",
+            id=names_source,
+            kind="community",
+            publisher="Wikipedia",
+            title="Northern Ireland Assembly constituency articles",
+            url="https://en.wikipedia.org/wiki/Category:Northern_Ireland_Assembly_constituencies",
+            license="CC BY-SA 4.0",
+            license_url="https://creativecommons.org/licenses/by-sa/4.0/",
+            attribution="Candidates' full names from Wikipedia's Northern Ireland Assembly constituency articles, CC BY-SA 4.0.",
+        )
+        for constituency in CONSTITUENCIES:
+            cs.artifact(raw.cached(SOURCE, WIKIPEDIA.format(constituency.replace(" ", "_"))), names_source)
+
         areas = {
             (code, name_): (area, valid_from, valid_to)
             for code, name_, area, valid_from, valid_to in conn.execute(
@@ -590,6 +647,11 @@ def emit() -> Path:
                     quota = None
                 if any(after > before + 0.5 for before, after in zip(sums, sums[1:])):
                     caveats.append("The candidates' totals rise between two stages in the source; the stage totals are stored as published.")
+                if year == 2007:
+                    caveats.append(
+                        "The source gives surnames only; the candidates' full names are from Wikipedia's constituency article, "
+                        "matched by surname and first-preference votes."
+                    )
                 if unit_row.get("last_seat"):
                     caveats.append(
                         f"The result sheet flags {seats - 1} candidates as elected; the last seat went to {display(unit_row['last_seat'])}, "
