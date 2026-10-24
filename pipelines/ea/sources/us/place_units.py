@@ -1,6 +1,7 @@
 import csv
 import io
 import json
+import os
 import re
 import zipfile
 from collections import Counter
@@ -15,7 +16,7 @@ from ea.changeset import Changeset
 from ea.store import DATA, connect
 
 SOURCE = "us.place_units"
-VERSION = "1"
+VERSION = "2"
 PARSED = DATA / "parsed" / SOURCE
 POPULATION = "https://www2.census.gov/programs-surveys/popest/datasets/2020-2024/cities/totals/sub-est2024.csv"
 CITIES = 100
@@ -23,11 +24,38 @@ VINTAGES = range(2011, 2026)
 INSIDE = 0.99
 FLOOR = 0.01
 TIGER_TITLE = "TIGER/Line Shapefiles: Places"
+TOWN_TITLE = "TIGER/Line Shapefiles: County Subdivisions"
+TOWN_STATES = {"26": "MI", "27": "MN", "34": "NJ", "36": "NY", "42": "PA", "55": "WI"}
+TOWNSHIP = {"township", "charter township"}
+KINDS = {
+    "CITY": {"city"},
+    "C": {"city"},
+    "CTY": {"city"},
+    "TOWNSHIP": TOWNSHIP,
+    "TWP": TOWNSHIP,
+    "TWSP": TOWNSHIP,
+    "TP": TOWNSHIP,
+    "CHARTER": {"charter township"},
+    "TOWN": {"town"},
+    "T": {"town"} | TOWNSHIP,
+    "VILLAGE": {"village"},
+    "VIL": {"village"},
+    "VLG": {"village"},
+    "V": {"village"},
+    "BOROUGH": {"borough"},
+    "BORO": {"borough"},
+    "BOR": {"borough"},
+    "B": {"borough"},
+}
+FOLLOWERS = {
+    *("W", "WD", "WARD", "WARDS", "P", "PCT", "PREC", "PRECINCT", "D", "DIST", "DISTRICT", "ED"),
+    *("N", "S", "E", "NE", "NW", "SE", "SW", "NORTH", "SOUTH", "EAST", "WEST", "UPPER", "LOWER", "MIDDLE", "CENTRAL"),
+}
 MARKER = re.compile(r"^(CITY OF )?(?P<name>.+?)( CITY| C| WD| WARD| W| PCT| PRECINCT| P| DIST| DISTRICT| \d)( |$)")
 
 
-def tiger(year: int, state: str) -> str:
-    return f"https://www2.census.gov/geo/tiger/TIGER{year}/PLACE/tl_{year}_{state}_place.zip"
+def tiger(year: int, state: str, layer: str = "place") -> str:
+    return f"https://www2.census.gov/geo/tiger/TIGER{year}/{layer.upper()}/tl_{year}_{state}_{layer}.zip"
 
 
 def fold(text: str) -> str:
@@ -60,6 +88,10 @@ def fetch() -> None:
     for state, years in sorted(vintages({geoid[:2] for geoid, _ in largest()}).items()):
         for year in sorted(years):
             raw.fetch(SOURCE, tiger(year, state), suffix=".zip")
+    found = vintages(set(TOWN_STATES))
+    for state in TOWN_STATES:
+        for year in sorted(found.get(state, set()) | {2020}):
+            raw.fetch(SOURCE, tiger(year, state, "cousub"), suffix=".zip")
 
 
 def parse() -> None:
@@ -68,86 +100,136 @@ def parse() -> None:
     rows = []
     for state, years in sorted(vintages({geoid[:2] for geoid in cities}).items()):
         for year in sorted(years):
-            with zipfile.ZipFile(raw.cached(SOURCE, tiger(year, state)).path) as z:
-                parts = {name.rsplit(".", 1)[1].lower(): z.read(name) for name in z.namelist()}
-            reader = shapefile.Reader(
-                shp=io.BytesIO(parts["shp"]),
-                shx=io.BytesIO(parts["shx"]),
-                dbf=io.BytesIO(parts["dbf"]),
-                encoding="latin-1",
-            )
-            for record, shape in zip(reader.records(), reader.shapes(), strict=True):
-                if record is None or shape is None:
-                    continue
-                fields = record.as_dict()
-                geoid = fields.get("GEOID") or fields.get(f"GEOID{str(year)[2:]}")
-                if geoid in cities:
-                    rows.append((geoid, year, json.dumps(shape.__geo_interface__)))
+            for geoid, _, _, geojson in shapes(tiger(year, state), cities):
+                rows.append((geoid, year, geojson))
     pl.DataFrame(rows, schema={"geoid": pl.String, "year": pl.Int32, "geojson": pl.String}, orient="row").write_parquet(
         PARSED / "cities.parquet"
     )
     print(f"{len(rows)} city shapes for {len(cities)} cities")
 
 
+def shapes(url: str, wanted: set[str] | dict[str, str] | None = None) -> list[tuple[str, str, str, str]]:
+    with zipfile.ZipFile(raw.cached(SOURCE, url).path) as z:
+        parts = {name.rsplit(".", 1)[1].lower(): z.read(name) for name in z.namelist()}
+    reader = shapefile.Reader(
+        shp=io.BytesIO(parts["shp"]), shx=io.BytesIO(parts["shx"]), dbf=io.BytesIO(parts["dbf"]), encoding="latin-1"
+    )
+    found = []
+    for record, shape in zip(reader.records(), reader.shapes(), strict=True):
+        if record is None or shape is None:
+            continue
+        fields = record.as_dict()
+        geoid = str(fields.get("GEOID") or next(value for key, value in fields.items() if key.startswith("GEOID")))
+        if wanted is None or geoid in wanted:
+            found.append((geoid, str(fields["NAME"]), str(fields["NAMELSAD"]), json.dumps(shape.__geo_interface__)))
+    return found
+
+
 def emit() -> Path:
-    cities = dict(largest())
-    shapes = pl.read_parquet(raw.parsed(SOURCE) / "cities.parquet")
-    with connect() as conn, open(DATA / "logs" / "place_units-disagreements.tsv", "w") as log:
-        log.write("city\tdate\tkind\tunit\tdetail\n")
+    scope = os.environ.get("TOWN_SCOPE")
+    towns = {STATE_FIPS[abbr]: abbr for abbr in scope.split(",")} if scope is not None else {}
+    cities = {} if towns else dict(largest())
+    title = TOWN_TITLE if towns else TIGER_TITLE
+    log_path = DATA / "logs" / (f"place_units-towns-{scope}.tsv" if towns else "place_units-disagreements.tsv")
+    with connect() as conn, open(log_path, "w") as log:
+        log.write("area\tdate\tkind\tunit\tdetail\n")
         cs = Changeset(
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary=f"Precincts placed in the {CITIES} largest cities by exact methods only: the city's own contest that day, "
-            "the source naming the city, or a precinct shape at least 99% inside the city's full-resolution TIGER/Line "
-            "boundary for the election year; each city's precinct universe on each election day is recorded",
+            summary=(
+                f"Precincts placed in the towns, townships, cities, villages, and boroughs of {', '.join(towns.values())}"
+                if towns
+                else f"Precincts placed in the {CITIES} largest cities"
+            )
+            + " by exact methods only: the government's own contest that day, the source naming it, or a precinct shape "
+            "at least 99% inside its full-resolution TIGER/Line boundary for the election year; each one's precinct "
+            "universe on each election day is recorded",
             polity="US",
         )
-        tiger_source = cs.source("U.S. Census Bureau", TIGER_TITLE)
+        tiger_source = cs.source("U.S. Census Bureau", title)
         cs.add(
             "source",
             id=tiger_source,
             kind="official_body",
             publisher="U.S. Census Bureau",
-            title=TIGER_TITLE,
+            title=title,
             url="https://www.census.gov/geographies/mapping-files/time-series/geo/tiger-line-file.html",
             license="Public domain",
         )
-        for state, years in vintages({geoid[:2] for geoid, _ in cities.items()}).items():
-            for year in years:
-                cs.artifact(raw.cached(SOURCE, tiger(year, state)), tiger_source)
-        places = dict(
+        found = vintages(set(towns) if towns else {geoid[:2] for geoid in cities})
+        years = {state: found.get(state, set()) | ({2020} if towns else set()) for state in towns or found}
+        for state, held in years.items():
+            for year in held:
+                cs.artifact(raw.cached(SOURCE, tiger(year, state, "cousub" if towns else "place")), tiger_source)
+        areas = dict(
             conn.execute(
                 """select c.code, a.id::text from area a join area_code c on c.area_id = a.id
-                   where a.scheme_code = 'us.place' and c.code = any(%s)""",
-                [list(cities)],
+                   where a.scheme_code = %s and (c.code = any(%s) or left(c.code, 2) = any(%s))""",
+                ["us.town" if towns else "us.place", list(cities), list(towns) if towns else []],
             ).fetchall()
         )
-        print(f"{len(places)} of {len(cities)} cities have a place area; missing: {sorted(set(cities) - set(places))}")
+        if not towns:
+            print(
+                f"{len(areas)} of {len(cities)} cities have a place area; missing: {sorted(set(cities) - set(areas))}"
+            )
         conn.execute("create temporary table city_shape (geoid text, year int, geom geometry(MultiPolygon, 4326))")
-        for geoid, year, geojson in shapes.iter_rows():
-            if geoid in places:
-                conn.execute(
-                    """insert into city_shape values
-                       (%s, %s, st_multi(st_collectionextract(st_makevalid(st_setsrid(st_geomfromgeojson(%s), 4326)), 3)))""",
-                    [geoid, year, geojson],
-                )
-        conn.execute("create index on city_shape using gist (geom)")
-        conn.execute("analyze city_shape")
+        if not towns:
+            for geoid, year, geojson in pl.read_parquet(raw.parsed(SOURCE) / "cities.parquet").iter_rows():
+                if geoid in areas:
+                    conn.execute(
+                        """insert into city_shape values
+                           (%s, %s, st_multi(st_collectionextract(st_makevalid(st_setsrid(st_geomfromgeojson(%s), 4326)), 3)))""",
+                        [geoid, year, geojson],
+                    )
+            conn.execute("create index on city_shape using gist (geom)")
+            conn.execute("analyze city_shape")
         owned = {
             (unit, area)
             for unit, area in conn.execute(
                 """select x.unit_id::text, x.area_id::text from reporting_unit_area x join changeset c on c.id = x.changeset_id
                    where x.area_id = any(%s::uuid[]) and c.pipeline <> %s""",
-                [list(places.values()), SOURCE],
+                [list(areas.values()), SOURCE],
             ).fetchall()
         }
         memberships: list[tuple[str, str, date, date, str]] = []
         universes = 0
         chosen: Counter[str] = Counter()
-        for state in sorted({geoid[:2] for geoid in places}):
+        for state in sorted(towns or {geoid[:2] for geoid in areas}):
             abbr = FIPS_STATE[state]
-            here = {geoid: name for geoid, name in cities.items() if geoid in places and geoid[:2] == state}
+            index: dict[int, dict[tuple[str, str], list[tuple[str, str]]]] = {}
+            labels: dict[str, str] = {}
+            if towns:
+                conn.execute("truncate city_shape")
+                for year in sorted(years[state]):
+                    rows = shapes(tiger(year, state, "cousub"))
+                    for geoid, name, legal, _ in rows:
+                        if geoid in areas:
+                            labels[geoid] = legal
+                            index.setdefault(year, {}).setdefault((geoid[:5], fold(name)), []).append(
+                                (geoid, legal[len(name) :].strip().lower())
+                            )
+                    with conn.cursor() as cursor:
+                        cursor.executemany(
+                            """insert into city_shape values
+                               (%s, %s, st_multi(st_collectionextract(st_makevalid(st_setsrid(st_geomfromgeojson(%s), 4326)), 3)))""",
+                            [(geoid, year, geojson) for geoid, _, _, geojson in rows if geoid in areas],
+                        )
+                conn.execute("create index if not exists city_shape_geom on city_shape using gist (geom)")
+                conn.execute("analyze city_shape")
+                here = dict(labels)
+                longest = max((len(name.split()) for names in index.values() for _, name in names), default=0)
+            else:
+                here = {geoid: name for geoid, name in cities.items() if geoid in areas and geoid[:2] == state}
+            counties = {
+                fold(re.sub(r"\s+(County|Parish)(, [A-Z]{2})?$", "", text)): code
+                for code, text in conn.execute(
+                    """select c.code, n.text from area a join area_code c on c.area_id = a.id
+                       join name n on n.entity_id = a.id and n.is_preferred
+                       where a.scheme_code = 'us.county' and left(c.code, 2) = %s""",
+                    [state],
+                ).fetchall()
+            }
             units = conn.execute(
                 """select u.id::text, u.code, lower(u.valid), upper(u.valid),
                           case when own.scheme_code = u.scheme_code then 'a' || own.id::text else 'u' || u.k::text end,
@@ -184,7 +266,8 @@ def emit() -> Path:
                 """select ac.code, e.date_from, r.id::text, r.source_id::text,
                           array_agg(distinct case when own.scheme_code = u.scheme_code then 'a' || own.id::text
                                                   else 'u' || u.k::text end)
-                   from area_code ac join contest c on c.district_area_id = ac.area_id
+                   from area_code ac join area d on d.id = ac.area_id and d.scheme_code = %s
+                   join contest c on c.district_area_id = ac.area_id
                    join result_set r on r.contest_id = c.id and r.status = 'active'
                    join election e on e.id = r.election_id
                    join lateral (select distinct unit_k from result_value v where v.result_set_k = r.k offset 0) v on true
@@ -192,45 +275,114 @@ def emit() -> Path:
                    left join area own on own.id = u.area_id
                    where ac.code = any(%s)
                    group by 1, 2, 3, 4""",
-                [list(here)],
+                ["us.town" if towns else "us.place", list(here)],
             ).fetchall():
                 if len(keys) > len(own_sets.get((geoid, day), ("", "", set()))[2]):
                     own_sets[(geoid, day)] = (set_id, source_id, set(keys))
             for day, rows in sorted(by_day.items()):
-                for geoid, city in here.items():
-                    name = fold(
-                        re.sub(
-                            r"\s+(city|town|village|municipality|metropolitan government|"
-                            r"urban county|consolidated government|unified government)\b.*$",
-                            "",
-                            re.sub(r"-[A-Za-z]+ (metropolitan|consolidated|unified).*$", "", city),
-                        )
-                    )
-                    named: dict[str, set[str]] = {}
+                named: dict[str, dict[str, set[str]]] = {}
+                day_keys: dict[str, set[str]] = {}
+                for row in rows:
+                    day_keys.setdefault(row[7], set()).add(row[4])
+                if towns:
+                    names = index[min(years[state], key=lambda year: (abs(year - day.year), -year))]
                     for unit, code, start, end, key, _, label, pipeline in rows:
-                        county = (
-                            fold(re.sub(r"\s+(County|Parish)$", "", label.rsplit(", ", 1)[1]))
-                            if label and ", " in label
-                            else ""
-                        )
                         parts = code.split(":")
-                        texts = [*parts[3:5], label.rsplit(", ", 1)[0] if label else ""]
-                        if any(
-                            (m := MARKER.match(fold(text) + " "))
-                            and m["name"] == name
-                            and not (county == name and m[3].strip().isdigit())
-                            for text in texts
-                            if text
-                        ):
-                            named.setdefault(pipeline, set()).add(key)
-                    source_keys = set().union(*named.values()) if named else set()
+                        segments = (label or "").split(", ")
+                        county = (
+                            parts[2]
+                            if len(parts) > 2 and len(parts[2]) == 5 and parts[2].startswith(state)
+                            else next(
+                                (
+                                    counties.get(fold(re.sub(r"\s+(County|Parish)$", "", segment)))
+                                    for segment in segments
+                                    if re.search(r"\s(County|Parish)$", segment)
+                                ),
+                                None,
+                            )
+                        )
+                        if county is None:
+                            continue
+                        matched = set()
+                        for text in (*parts[3:5], ", ".join(segments[:-1]) if len(segments) > 1 else segments[0]):
+                            words = fold(text).split()
+                            while words and words[0].isdigit():
+                                words.pop(0)
+                            kinds: set[str] | None = None
+                            for prefix in (["CHARTER", "TOWNSHIP", "OF"], [words[0] if words else "", "OF"]):
+                                if words[: len(prefix)] == prefix and prefix[0] in KINDS:
+                                    kinds, words = KINDS[prefix[0]], words[len(prefix) :]
+                                    break
+                            for size in range(min(longest, len(words)), 0, -1):
+                                found_towns = names.get((county, " ".join(words[:size])))
+                                if found_towns is None:
+                                    continue
+                                follower = words[size] if size < len(words) else None
+                                if follower in KINDS:
+                                    kinds = KINDS[follower] if kinds is None else kinds & KINDS[follower]
+                                elif (follower is None and kinds is None) or (
+                                    follower is not None and not (follower[0].isdigit() or follower in FOLLOWERS)
+                                ):
+                                    break
+                                if (
+                                    follower is not None
+                                    and follower[0].isdigit()
+                                    and counties.get(" ".join(words[:size])) == county
+                                ):
+                                    break
+                                picked = [geoid for geoid, kind in found_towns if kinds is None or kind in kinds]
+                                if len(picked) == 1:
+                                    matched.add(picked[0])
+                                break
+                        if len(matched) == 1:
+                            named.setdefault(matched.pop(), {}).setdefault(pipeline, set()).add(key)
+                else:
+                    for geoid, city in here.items():
+                        name = fold(
+                            re.sub(
+                                r"\s+(city|town|village|municipality|metropolitan government|"
+                                r"urban county|consolidated government|unified government)\b.*$",
+                                "",
+                                re.sub(r"-[A-Za-z]+ (metropolitan|consolidated|unified).*$", "", city),
+                            )
+                        )
+                        for unit, code, start, end, key, _, label, pipeline in rows:
+                            county = (
+                                fold(re.sub(r"\s+(County|Parish)$", "", label.rsplit(", ", 1)[1]))
+                                if label and ", " in label
+                                else ""
+                            )
+                            parts = code.split(":")
+                            texts = [*parts[3:5], label.rsplit(", ", 1)[0] if label else ""]
+                            if any(
+                                (m := MARKER.match(fold(text) + " "))
+                                and m["name"] == name
+                                and not (county == name and m[3].strip().isdigit())
+                                for text in texts
+                                if text
+                            ):
+                                named.setdefault(geoid, {}).setdefault(pipeline, set()).add(key)
+                claimed: dict[str, set[str]] = {}
+                for geoid, found in named.items():
+                    for keys in found.values():
+                        for key in keys:
+                            claimed.setdefault(key, set()).add(geoid)
+                for geoid, city in here.items():
+                    found_named = named.get(geoid, {})
+                    source_keys = set().union(*found_named.values()) if found_named else set()
                     share = shares.get((geoid, day), {})
-                    inside = {key for key, value in share.items() if value >= INSIDE}
-                    touched = {key for key, value in share.items() if value >= FLOOR}
+                    own = own_sets.get((geoid, day))
+                    if not source_keys and not share and own is None:
+                        continue
+                    inside = {
+                        key for key, value in share.items() if value >= INSIDE and claimed.get(key, {geoid}) >= {geoid}
+                    }
+                    touched = {
+                        key for key, value in share.items() if value >= FLOOR and claimed.get(key, {geoid}) >= {geoid}
+                    }
                     for key, value in share.items():
                         if 0.005 <= value <= 0.02:
                             log.write(f"{city}\t{day}\tfloor\t{key}\t{value:.4f}\n")
-                    own = own_sets.get((geoid, day))
                     methods = {
                         "city_universe": own[2] if own else set(),
                         "source_code": source_keys,
@@ -238,41 +390,46 @@ def emit() -> Path:
                     }
                     candidates = []
                     for system in ("a", "u"):
-                        within = {method: {key for key in keys if key[0] == system} for method, keys in methods.items()}
-                        present = [method for method, keys in within.items() if keys]
-                        if not present:
-                            continue
-                        sizes = {
-                            "city_universe": len(within["city_universe"]),
-                            "source_code": max(
-                                (len({key for key in found if key[0] == system}) for found in named.values()), default=0
-                            ),
-                            "shape_contained": len(touched),
-                        }
-                        method = (
-                            "city_universe"
-                            if within["city_universe"]
-                            else "source_code"
-                            if "source_code" in present and sizes["source_code"] >= len(within["shape_contained"])
-                            else "shape_contained"
-                        )
-                        keys = within[method]
-                        for other in present:
-                            if other == method:
+                        for pipeline, held in day_keys.items():
+                            within = {
+                                "city_universe": {
+                                    key for key in methods["city_universe"] if key[0] == system and key in held
+                                },
+                                "source_code": {key for key in found_named.get(pipeline, set()) if key[0] == system},
+                                "shape_contained": {key for key in inside if key[0] == system and key in held},
+                            }
+                            present = [method for method, keys in within.items() if keys]
+                            if not present:
                                 continue
-                            for key in sorted(keys ^ within[other]):
-                                log.write(
-                                    f"{city}\t{day}\t{method} vs {other}\t{key}\t"
-                                    f"only {method if key in keys else other}\n"
-                                )
-                        candidates.append((sizes[method], method, keys, system))
+                            sizes = {
+                                "city_universe": len(within["city_universe"]),
+                                "source_code": len(within["source_code"]),
+                                "shape_contained": len({key for key in touched if key[0] == system and key in held}),
+                            }
+                            method = (
+                                "city_universe"
+                                if within["city_universe"]
+                                else "source_code"
+                                if "source_code" in present and sizes["source_code"] >= len(within["shape_contained"])
+                                else "shape_contained"
+                            )
+                            keys = within[method]
+                            for other in present:
+                                if other == method:
+                                    continue
+                                for key in sorted(keys ^ within[other]):
+                                    log.write(
+                                        f"{city}\t{day}\t{method} vs {other}\t{key}\t"
+                                        f"only {method if key in keys else other}\n"
+                                    )
+                            candidates.append((sizes[method], method, keys, f"{system} {pipeline}"))
                     if not candidates:
                         continue
                     expected, method, keys, system = max(candidates, key=lambda candidate: candidate[0])
                     for other in candidates:
                         if other[3] != system:
                             log.write(
-                                f"{city}\t{day}\tsystem skipped\t{other[3]}\t{other[1]} {other[0]} against {method} {expected}\n"
+                                f"{city}\t{day}\tskipped\t{other[3]}\t{other[1]} {other[0]} against {system} {method} {expected}\n"
                             )
                     if expected == 0:
                         continue
@@ -280,7 +437,7 @@ def emit() -> Path:
                     universes += 1
                     cs.add(
                         "area_universe",
-                        area_id=places[geoid],
+                        area_id=areas[geoid],
                         valid_from=day,
                         valid_to=day + timedelta(days=1),
                         expected=expected,
@@ -293,9 +450,21 @@ def emit() -> Path:
                         result_set_id=own[0] if method == "city_universe" and own else None,
                     )
                     for unit, code, start, end, key, _, label, pipeline in rows:
-                        if key in keys and (unit, places[geoid]) not in owned:
-                            memberships.append((unit, places[geoid], start, end, method))
-        print(f"{universes} city universes by {dict(chosen)}; {len(memberships)} memberships")
+                        if key in keys and (unit, areas[geoid]) not in owned:
+                            memberships.append((unit, areas[geoid], start, end, method))
+        kept = {(unit, area) for unit, area, *_ in memberships}
+        stale = [
+            pair
+            for pair in conn.execute(
+                """select distinct x.unit_id::text, x.area_id::text from reporting_unit_area x
+                   join changeset c on c.id = x.changeset_id where c.pipeline = %s and x.area_id = any(%s::uuid[])""",
+                [SOURCE, list(areas.values())],
+            ).fetchall()
+            if pair not in kept
+        ]
+        for unit, area in stale:
+            cs.add("unit_area_drop", unit_id=unit, area_id=area, reason="no longer placed by an exact method")
+        print(f"{universes} universes by {dict(chosen)}; {len(memberships)} memberships; {len(stale)} dropped")
         cs.frame(
             "reporting_unit_area",
             pl.DataFrame(
