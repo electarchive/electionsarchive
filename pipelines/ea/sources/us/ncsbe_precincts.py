@@ -131,6 +131,7 @@ def emit() -> Path:
             raise ValueError("no North Carolina State Board of Elections source")
         for day in DAYS:
             cs.artifact(raw.cached(ncsbe.SOURCE, ncsbe.FILES.format(day=day)), source)
+        cs.scope_units("us.precinct", "____-__-__:NC:%")
         counties = {
             code: (unit, area)
             for code, unit, area in conn.execute(

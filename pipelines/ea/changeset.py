@@ -144,6 +144,14 @@ class Changeset:
             [scheme, on, on],
         )
 
+    def scope_units(self, scheme: str, like: str) -> None:
+        self._known[f"unit:{scheme}@None"] = {
+            str(code): id
+            for code, id in self.conn.execute(
+                "select code, id from reporting_unit where scheme_code = %s and code like %s", [scheme, like]
+            ).fetchall()
+        }
+
     def source(self, publisher: str, title: str) -> UUID:
         return self._resolve(
             "source", f"{publisher}\x1f{title}", "select publisher || chr(31) || title, id from source"
