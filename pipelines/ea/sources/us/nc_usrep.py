@@ -19,46 +19,58 @@ WORK = DATA / "work" / "nc_usrep"
 PUBLISHER = "North Carolina State Board of Elections"
 TITLE = "Abstract of votes cast in the general election"
 BUCKET = "https://s3.amazonaws.com/dl.ncsbe.gov/ENRS/{d}/results_by_contest_{c}.zip"
-DAYS = [date(1992, 11, 3), date(1996, 11, 5), date(1998, 11, 3)]
-RECORD = "https://digital.ncdcr.gov/Documents/Detail/4199407"
+DAYS = [date(1992, 11, 3), date(1994, 11, 8), date(1996, 11, 5), date(1998, 11, 3)]
+RECORDS = {
+    1992: "https://digital.ncdcr.gov/Documents/Detail/4199407",
+    1994: "https://digital.ncdcr.gov/Documents/Detail/4199426",
+}
+SCANNED = {1992: range(1, 7), 1994: (1, 3, 4, 5, 6, 7)}
 
-SUMMARY = "North Carolina's U.S. House general elections of 1996 and 1998 by county from the State Board of Elections"
+SUMMARY = "North Carolina's U.S. House general elections of 1992 through 1998 by county from the State Board of Elections"
 METHOD = (
     "County totals are from the State Board of Elections' abstracts of votes cast, one table per congressional "
     "district. Each candidate's county sum equals the district total printed in the abstract."
 )
 
-SCAN = " The 1992 abstract is a typed scan read by two OCR passes, with hand-read cells settled against the printed column totals."
+SCAN = " The abstract is a typed scan from the State Library read by OCR, with misread cells settled against the printed column totals."
 SCAN10 = " District 10's county rows fall short of its printed total by 34 Republican and 2 Libertarian votes."
 
 
 def address(day: date) -> str:
-    if day.year == 1992:
-        return RECORD
+    if day.year in RECORDS:
+        return RECORDS[day.year]
     return BUCKET.format(d=day.strftime("%Y_%m_%d"), c=day.strftime("%Y%m%d"))
 
 
 def fetch() -> None:
-    detail = subprocess.run(
-        ["curl", "-sL", "-m", "60", "-A", "Mozilla/5.0", RECORD], capture_output=True, text=True, check=True
-    ).stdout
-    for item in json.loads(re.search(r"var viewerItems = (\[.*?\]);\n", detail, re.DOTALL)[1]):
-        page = f"{RECORD}#page-{int(item['path'].rsplit('-', 1)[1]):02d}"
-        pdf = subprocess.run(
-            [
-                "curl",
-                "-sL",
-                "-m",
-                "120",
-                "-A",
-                "Mozilla/5.0",
-                item["pdfUrl"].replace("[IMAGETOKEN]", item["imageToken"]),
-            ],
-            capture_output=True,
-            check=True,
+    for record in RECORDS.values():
+        detail = subprocess.run(
+            ["curl", "-sL", "-m", "60", "-A", "Mozilla/5.0", record], capture_output=True, text=True, check=True
         ).stdout
-        raw.store(SOURCE, page, pdf, suffix=".pdf", retrieved_at=datetime.now(UTC), media_type="application/pdf")
-    for day in DAYS[1:]:
+        for item in json.loads(re.search(r"var viewerItems = (\[.*?\]);\n", detail, re.DOTALL)[1]):
+            page = f"{record}#page-{int(item['path'].rsplit('-', 1)[1]):02d}"
+            try:
+                raw.cached(SOURCE, page)
+                continue
+            except LookupError:
+                pass
+            pdf = subprocess.run(
+                [
+                    "curl",
+                    "-sL",
+                    "-m",
+                    "120",
+                    "-A",
+                    "Mozilla/5.0",
+                    item["pdfUrl"].replace("[IMAGETOKEN]", item["imageToken"]),
+                ],
+                capture_output=True,
+                check=True,
+            ).stdout
+            raw.store(SOURCE, page, pdf, suffix=".pdf", retrieved_at=datetime.now(UTC), media_type="application/pdf")
+    for day in DAYS:
+        if day.year in RECORDS:
+            continue
         try:
             raw.cached(SOURCE, address(day))
         except LookupError:
@@ -99,12 +111,17 @@ def parse() -> None:
             ).fetchall()
         }
     rows: list[tuple[str, int, str, str, int]] = []
-    for line in (Path(__file__).with_name("nc_usrep_1992.tsv")).read_text().splitlines():
-        district, name, column, votes = line.split("\t")
-        key = re.sub(r"[^a-z]", "", name.lower())
-        key = key if key in counties else difflib.get_close_matches(key, counties, 1, 0.8)[0]
-        rows.append(("1992-11-03", int(district), counties[key], column, int(votes)))
-    for day in DAYS[1:]:
+    for day in DAYS:
+        if day.year not in RECORDS:
+            continue
+        for line in Path(__file__).with_name(f"nc_usrep_{day.year}.tsv").read_text().splitlines():
+            district, name, column, votes = line.split("\t")
+            key = re.sub(r"[^a-z]", "", name.lower())
+            key = key if key in counties else difflib.get_close_matches(key, counties, 1, 0.8)[0]
+            rows.append((str(day), int(district), counties[key], column, int(votes)))
+    for day in DAYS:
+        if day.year in RECORDS:
+            continue
         found = pages(day)
         tables: list[tuple[int, list[tuple[str, list[tuple[int, int]]]], list[tuple[int, int]]]] = []
         if day.year == 1996:
@@ -187,11 +204,15 @@ def emit() -> Path:
         "NC",
         "37",
         pl.read_parquet(PARSED / "lines.parquet"),
-        [raw.cached(SOURCE, address(day)) for day in DAYS[1:]]
-        + [raw.cached(SOURCE, f"{RECORD}#page-{page:02d}") for page in range(1, 7)],
+        [raw.cached(SOURCE, address(day)) for day in DAYS if day.year not in RECORDS]
+        + [
+            raw.cached(SOURCE, f"{RECORDS[year]}#page-{page:02d}")
+            for year, pages_ in SCANNED.items()
+            for page in pages_
+        ],
         lambda key: (
             METHOD
-            + (SCAN if key.startswith("1992") else "")
+            + (SCAN if key[:4] in ("1992", "1994") else "")
             + (SCAN10 if key.endswith("1992-11-03:NC:house:10") else "")
         ),
     )
