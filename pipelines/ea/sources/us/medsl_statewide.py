@@ -3,7 +3,7 @@ from collections import defaultdict
 from collections.abc import Callable
 from datetime import date
 from pathlib import Path
-from uuid import UUID
+from uuid import UUID, uuid5
 
 import polars as pl
 
@@ -21,6 +21,7 @@ TAIL = (
     r"|:? ?TERM COMMENCING [\d/]+|UNEXPIRED [\w\- /,]+|INCUMBENT - PARTIAL TERM ENDING [\d/]+))?"
     r"(?: FULL TERM| 8 YEAR TERMS? \(\d\) POSITIONS?)?"
 )
+TERM = r":? ?TERM COMMENCING (\d\d?)/(\d\d?)/(\d{4})"
 OFFICES = [
     (r"(?:STATE )?GOVERNOR(?: AND (?:LIEUTENANT|LT\.) GOVERNOR|/LIEUTENANT GOVERNOR)?", "Governor"),
     (r"(?:LIEUTENANT|LT\.) GOVERNOR", "Lieutenant Governor"),
@@ -430,6 +431,17 @@ def emit(
         def name(entity: UUID, text: str) -> None:
             cs.add("name", entity_id=entity, text=text, lang="en", kind="official", is_preferred=True)
 
+        commencing: dict[UUID, list[tuple[UUID, str, str, str]]] = {}
+        for old, entity, text, lang, kind in conn.execute(
+            "select id, entity_id, text, lang, kind from name where is_preferred and text ~* 'term commencing \\d' "
+        ).fetchall():
+            commencing.setdefault(entity, []).append((old, text, lang, kind))
+
+        def retitle(entity: UUID, text: str) -> None:
+            cs.add("name", id=None, entity_id=entity, text=text, lang="en", kind="official", is_preferred=True)
+            for old, before, lang, kind in commencing.get(entity, []):
+                cs.add("name", id=old, entity_id=entity, text=before, lang=lang, kind=kind, is_preferred=False)
+
         def title(text: str) -> str:
             text = re.sub(r"\bMc([a-z])", lambda match: "Mc" + match[1].upper(), text.title())
             return re.sub(r"\b(Ii|Iii|Iv)\b", lambda match: match[0].upper(), text)
@@ -475,6 +487,11 @@ def emit(
         mapping: list[tuple[int, str, str, str | None, bool, str]] = []
         made: set[UUID] = set()
         contest_columns = ["year", "day", "state", "title", "post", "special"]
+        starts: dict[tuple[object, ...], int] = {}
+        for row in races.unique(contest_columns).iter_rows(named=True):
+            if re.fullmatch(TERM, row["post"] or ""):
+                group = (row["day"], row["state"], row["title"], row["special"])
+                starts[group] = starts.get(group, 0) + 1
         for row in races.sort("state", "year", "title", "post", nulls_last=True).iter_rows(named=True):
             year, day, state, office, post, special = (row[column] for column in contest_columns)
             magnitude = int(row["magnitude"] or 1)
@@ -503,6 +520,18 @@ def emit(
                 + (":runoff" if row.get("first") else "")
             )
             first = row.get("first")
+            term = re.fullmatch(TERM, post or "")
+            begins = None if term is None else f"{date(int(term[3]), int(term[1]), int(term[2])):%B} {int(term[2])}, {term[3]}"
+            display = (
+                f"{year} {states[state]} {office} {'special election' if special else 'primary election' if season and 'primary' in season else 'runoff' if first else 'election'}"
+                + (
+                    ""
+                    if not shown or begins is not None and starts[(day, state, office, special)] == 1
+                    else f" (term from {begins})"
+                    if begins is not None
+                    else f" ({shown})"
+                )
+            )
             previous = cs.key("us.contest", first) if first else None
             if previous is not None and previous in cs.minted:
                 raise ValueError(f"{contest_key}: no first round {first}")
@@ -572,6 +601,10 @@ def emit(
                             kind="caveat",
                             body_md=caveat,
                         )
+                    if published is not None and begins is not None and matches[0] == contest_key:
+                        retitle(published[2], display)
+                        if starts[(day, state, office, special)] == 1:
+                            cs.add("note", id=uuid5(published[2], "term"), entity_id=published[2], kind="methodology", body_md=f"The term begins {begins}.")
                     continue
                 contest_key, revised = matches[0], published
                 print(
@@ -657,11 +690,12 @@ def emit(
                 else systems["block"],
                 default_result_kind="counted",
             )
-            name(
-                contest,
-                f"{year} {states[state]} {office} {'special election' if special else 'primary election' if season and 'primary' in season else 'runoff' if first else 'election'}"
-                + (f" ({shown})" if shown else ""),
-            )
+            if begins is None:
+                name(contest, display)
+            else:
+                retitle(contest, display)
+            if begins is not None and starts[(day, state, office, special)] == 1:
+                cs.add("note", id=uuid5(contest, "term"), entity_id=contest, kind="methodology", body_md=f"The term begins {begins}.")
             path = (
                 f"{election_path or f'us/{state.lower()}/{day}-' + (slug(season) if season else 'general')}/{slug(office)}"
                 + (f"-{slug(shown)}" if shown else "")

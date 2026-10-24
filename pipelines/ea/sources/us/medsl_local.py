@@ -4,7 +4,7 @@ import re
 import zipfile
 from datetime import date, timedelta
 from pathlib import Path
-from uuid import UUID
+from uuid import UUID, uuid5
 
 import polars as pl
 import shapefile
@@ -224,6 +224,7 @@ COUNTYWIDE = {
     "soil-and-water",
     "county-and-district-clerk",
 }
+TERM = r"Term (?:Commencing|Beginning) (\d\d?)/(\d\d?)/(\d{4})"
 SCHOOLS = {"AL", "FL", "GA", "KY", "LA", "MD", "MS", "NV", "SC", "TN", "WV"}
 SEAT = re.compile(
     r"(?:(?:DIST(?:RICT)?|PRECINCT|PCT|PLACE|POST|POSITION|POS|SEAT|WARD|ZONE|DIVISION|BEAT|AREA|NO|NUMBER|#)\.? ?#? ?[A-Z]?\d+[A-Z]?"
@@ -1269,6 +1270,17 @@ def emit() -> Path:
         def name(entity: UUID, text: str) -> None:
             cs.add("name", entity_id=entity, text=text, lang="en", kind="official", is_preferred=True)
 
+        commencing: dict[UUID, list[tuple[UUID, str, str, str]]] = {}
+        for old, entity, text, lang, kind in conn.execute(
+            "select id, entity_id, text, lang, kind from name where is_preferred and text ~* 'term commencing \\d' "
+        ).fetchall():
+            commencing.setdefault(entity, []).append((old, text, lang, kind))
+
+        def retitle(entity: UUID, text: str) -> None:
+            cs.add("name", id=None, entity_id=entity, text=text, lang="en", kind="official", is_preferred=True)
+            for old, before, lang, kind in commencing.get(entity, []):
+                cs.add("name", id=old, entity_id=entity, text=before, lang=lang, kind=kind, is_preferred=False)
+
         def title(text: str) -> str:
             text = re.sub(r"\bMc([a-z])", lambda match: "Mc" + match[1].upper(), text.title())
             return re.sub(r"\b(Ii|Iii|Iv)\b", lambda match: match[0].upper(), text)
@@ -1522,6 +1534,11 @@ def emit() -> Path:
         grouped = {
             keys: rows for keys, rows in lines.group_by("day", "code", "key", "seat", "remainder", maintain_order=True)
         }
+        starts: dict[tuple[date, str, str], int] = {}
+        for row in contests.iter_rows(named=True):
+            if re.fullmatch(TERM, row["seat"] or "", re.I):
+                group = (row["day"], row["code"], row["key"])
+                starts[group] = starts.get(group, 0) + 1
         for row in contests.iter_rows(named=True):
             day, state, scheme, code, key, seat = (
                 row["day"],
@@ -1630,12 +1647,23 @@ def emit() -> Path:
                 default_result_kind="counted",
                 term="remainder" if row["remainder"] else "full",
             )
-            name(
+            term = re.fullmatch(TERM, seat or "", re.I)
+            start = None if term is None else date(int(term[3]), int(term[1]), int(term[2]))
+            begins = None if start is None else f"{start:%B} {start.day}, {start.year}"
+            (name if start is None else retitle)(
                 contest,
                 (f"{day.year} {city} mayoral election" if key == "mayor" else f"{day.year} {office_title} election")
-                + (f", {seat}" if seat else "")
+                + (
+                    ""
+                    if not seat or start is not None and starts[(day, code, key)] == 1
+                    else f" (term from {begins})"
+                    if start is not None
+                    else f", {seat}"
+                )
                 + (" (unexpired term)" if row["remainder"] else ""),
             )
+            if start is not None and starts[(day, code, key)] == 1:
+                cs.add("note", id=uuid5(contest, "term"), entity_id=contest, kind="methodology", body_md=f"The term begins {begins}.")
             cs.add("slug", path=contest_path, entity_id=contest)
             if row["district"]:
                 cs.add("note", entity_id=contest, kind="caveat", body_md=DISTRICT)
