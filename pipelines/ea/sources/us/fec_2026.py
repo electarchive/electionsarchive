@@ -69,7 +69,7 @@ def emit() -> Path:
             ).fetchall()
         )
 
-        nominees: dict[str, list[tuple[str, UUID, UUID]]] = {}
+        nominees: dict[str, dict[tuple[str, UUID], UUID | None]] = {}
         for value, ballot, person, party_id in conn.execute(
             """select x.value, op.ballot_label, cy.person_id, op.party_id
                from external_id x
@@ -84,7 +84,8 @@ def emit() -> Path:
         ):
             _, state, chamber, *rest = value.split(":")
             general = f"{DAY}:{state}:{chamber}" + (f":{rest[0]}" if chamber == "house" else "")
-            nominees.setdefault(general, []).append((ballot, person, party_id))
+            known = nominees.setdefault(general, {})
+            known[(ballot, person)] = known.get((ballot, person)) or party_id
 
         counts = {"house": 0, "senate": 0, "governor": 0, "candidates": 0}
         for (
@@ -160,7 +161,7 @@ def emit() -> Path:
                 path = f"us/{state.lower()}/{DAY}-general/governor"
             name(contest, title)
             cs.add("slug", path=path, entity_id=contest)
-            for ballot, person, party_id in sorted(nominees.get(key, [])):
+            for (ballot, person), party_id in sorted(nominees.get(key, {}).items(), key=lambda nominee: (nominee[0][0], str(nominee[0][1]))):
                 option = cs.key("us.option", f"{key}:{slug(ballot)}")
                 cs.add(
                     "contest_option",
