@@ -804,7 +804,7 @@ function partyMarkdown(
   return [
     party.scope == null
       ? `# ${party.name}${party.short != null && !party.name.includes(party.short) ? ` (${party.short})` : ""}`
-      : `# ${m.party_scope_title({ party: party.name, place: party.scope.polity.name })}`,
+      : `# ${(party.scope.polity.path != null && party.polity?.path != null && !party.scope.polity.path.startsWith(`${party.polity.path}/`) ? m.party_abroad_title : m.party_scope_title)({ party: party.name, place: party.scope.polity.name })}`,
     ...(party.polity == null
       ? []
       : [

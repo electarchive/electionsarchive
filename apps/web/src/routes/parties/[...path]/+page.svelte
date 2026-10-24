@@ -28,6 +28,11 @@
   };
 
   const party = $derived(data.party);
+  const isAbroad = $derived(
+    party.scope?.polity.path != null &&
+      party.polity?.path != null &&
+      !party.scope.polity.path.startsWith(`${party.polity.path}/`),
+  );
   const color = $derived(swatch(party.color, `party:${data.id}`));
   const links = $derived(
     party.parents.flatMap((parent) => {
@@ -71,7 +76,7 @@
   <title
     >{party.scope == null
       ? party.name
-      : m.party_scope_title({
+      : (isAbroad ? m.party_abroad_title : m.party_scope_title)({
           party: party.name,
           place: party.scope.polity.name,
         })} | {m.wordmark()}</title
@@ -101,7 +106,7 @@
         <h1 class="title">
           {party.scope == null
             ? party.name
-            : m.party_scope_title({
+            : (isAbroad ? m.party_abroad_title : m.party_scope_title)({
                 party: party.name,
                 place: party.scope.polity.name,
               })}
