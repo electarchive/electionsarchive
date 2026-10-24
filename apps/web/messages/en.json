@@ -194,6 +194,7 @@
   "places_deeper": "View {noun} results by {finer}",
   "places_title": "Results by {noun}",
   "places_unrecorded": "No results recorded",
+  "places_no_votes": "No votes reported",
   "places_no_earlier": "{year} has no results at this level; shifts cannot be shown.",
   "places_level": "Show results by",
   "places_filter": "Filter by name",

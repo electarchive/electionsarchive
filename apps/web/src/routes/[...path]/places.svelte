@@ -889,6 +889,10 @@
                   <span class="text-[0.8125rem] text-muted-foreground"
                     >{m.places_unrecorded()}</span
                   >
+                {:else if row.valid === 0}
+                  <span class="text-[0.8125rem] text-muted-foreground"
+                    >{m.places_no_votes()}</span
+                  >
                 {/if}
               </td>
               <td

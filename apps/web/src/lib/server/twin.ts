@@ -88,7 +88,14 @@ const leading = (
     ];
   }
   if (row.leader == null) {
-    return [row.isRecorded === false ? m.places_unrecorded() : null, null];
+    return [
+      row.isRecorded === false
+        ? m.places_unrecorded()
+        : row.valid === 0
+          ? m.places_no_votes()
+          : null,
+      null,
+    ];
   }
   return [
     legend[row.leader]?.label ?? null,
