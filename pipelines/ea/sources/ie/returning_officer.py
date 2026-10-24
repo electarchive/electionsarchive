@@ -744,8 +744,7 @@ def emit() -> Path:
                 is_default=True,
                 completeness=1,
             )
-            if result_set in cs.minted:
-                result_sets[code] = str(result_set)
+            result_sets[code] = str(result_set)
             if merged:
                 cs.add("note", entity_id=result_set, kind="caveat", body_md=MERGED)
             if relabeled:
