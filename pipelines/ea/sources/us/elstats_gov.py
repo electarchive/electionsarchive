@@ -575,6 +575,9 @@ def emit() -> Path:
                 for printed in [survivor, *(candidate for candidate, into in folded.items() if into == survivor)]:
                     party_id = party_of(state, day.year, lines.filter(pl.col("candidate") == printed)["party"][0])
                     targets[printed] = cs.key("us.option", f"{contest_key}:{kept}:{slug(printed)}")
+                    if targets[printed] == options[survivor]:
+                        options[printed] = options[survivor]
+                        continue
                     cs.add(
                         "contest_option",
                         id=targets[printed],
