@@ -61,27 +61,27 @@ export const seats = {
         id: string;
         area: string;
         same: boolean;
-        now: string | null;
-        before: string | null;
+        now: Array<string>;
+        before: Array<string>;
         since: string | null;
         day: string | null;
         election: string | null;
       }>(sql`
         with recursive tree(id) as (
           select e.id from election e
-          join slug ps on ps.entity_id = e.polity_id and ps.is_current and (ps.path in ('gb', 'us') or ps.path like 'gb/%' or ps.path like 'us/%')
+          join slug ps on ps.entity_id = e.polity_id and ps.is_current and (ps.path in ('gb', 'us', 'ie') or ps.path like 'gb/%' or ps.path like 'us/%')
           where e.id = ${input.id}::uuid and e.kind <> 'by_election'
           union all
           select e.id from election e join tree on e.parent_id = tree.id where e.kind not in ('runoff', 'indirect')
         ),
         now as materialized (
           select c.id, c.body_id as body, c.district_area_id as area, e.date_from as day,
-            coalesce(bs.as_of, e.date_from) as drawn
+            coalesce(bs.as_of, e.date_from) as drawn, coalesce(c.magnitude, 1) as magnitude
           from contest c join tree on tree.id = c.election_id join election e on e.id = c.election_id
           join body b on b.id = c.body_id join slug bp on bp.entity_id = b.polity_id and bp.is_current
           left join boundary_set bs on bs.id = c.boundary_set_id
           where c.kind = 'body_seats' and c.allocation_parent_id is null and c.party_scope_id is null
-            and c.district_area_id is not null and coalesce(c.magnitude, 1) = 1
+            and c.district_area_id is not null and (coalesce(c.magnitude, 1) = 1 or bp.path = 'ie')
             and ((bp.path = 'us' and b.kind = 'lower_house') or not (bp.path = 'us' or bp.path like 'us/%'))
             and ${input.within == null ? sql`true` : inside(input.within, sql`c.district_area_id`, sql`e.date_from`)}
         ),
@@ -96,13 +96,14 @@ export const seats = {
           order by e.date_from desc limit 1
         ),
         prev as materialized (
-          select c.id, c.district_area_id as area, e.date_from as day, coalesce(bs.as_of, e.date_from) as drawn
+          select c.id, c.district_area_id as area, e.date_from as day, coalesce(bs.as_of, e.date_from) as drawn,
+            coalesce(c.magnitude, 1) as magnitude
           from contest c join election e on e.id = c.election_id
           left join boundary_set bs on bs.id = c.boundary_set_id
           where c.body_id = (select body from chamber) and e.kind = 'general'
             and e.date_from between (select day from last) - 200 and (select day from last)
             and c.kind = 'body_seats' and c.allocation_parent_id is null and c.party_scope_id is null
-            and c.district_area_id is not null and coalesce(c.magnitude, 1) = 1
+            and c.district_area_id is not null and (coalesce(c.magnitude, 1) = 1 or exists (select from now where magnitude > 1))
         ),
         kept as materialized (
           select distinct on (n.id) n.id, p.id as prior, not exists (
@@ -111,25 +112,32 @@ export const seats = {
             where gp.area_id = p.area and gp.valid @> p.drawn and gp.valid <> gn.valid
               and ST_Area(ST_Intersection(gp.geom, gn.geom, 0.00001)) < 0.97 * greatest(ST_Area(gp.geom), ST_Area(gn.geom))
           ) as same
-          from now n join prev p on p.area = n.area
+          from now n join prev p on p.area = n.area and p.magnitude = n.magnitude
           where n.body = (select body from chamber)
           order by n.id, p.drawn desc
         ),
         paired as materialized (
-          select n.id, n.area, coalesce(k.same, false) as same, coalesce(
+          select n.id, n.area, coalesce(k.same, g.same, false) as same, coalesce(
             k.prior,
+            g.id,
             (select p.id from prev p
-              join area_geometry gp on gp.area_id = p.area and gp.valid @> p.drawn
-              join area_geometry gn on gn.area_id = n.area and gn.valid @> n.drawn
-              where gp.geom && gn.geom and ST_Intersects(gp.geom, gn.geom)
-              order by ST_Area(ST_Intersection(gp.geom, gn.geom, 0.00001)) desc limit 1),
-            (select p.id from prev p
-              where exists (
+              where p.magnitude = n.magnitude and exists (
                 select from name a join name b on lower(a.text) = lower(b.text)
                 where a.entity_id = n.area and b.entity_id = p.area
               ) limit 1)
           ) as prior
-          from now n left join kept k on k.id = n.id where n.body = (select body from chamber)
+          from now n left join kept k on k.id = n.id
+          left join lateral (
+            select p.id, ST_Area(x.geom) >= 0.97 * greatest(ST_Area(gp.geom), ST_Area(gn.geom)) as same
+            from prev p
+            join area_geometry gp on gp.area_id = p.area and gp.valid @> p.drawn
+            join area_geometry gn on gn.area_id = n.area and gn.valid @> n.drawn
+            cross join lateral (select ST_Intersection(gp.geom, gn.geom, 0.00001) as geom) x
+            where p.magnitude = n.magnitude and gp.geom && gn.geom and ST_Intersects(gp.geom, gn.geom)
+              and (n.magnitude = 1 or ST_Area(x.geom) > 0.5 * ST_Area(gn.geom))
+            order by ST_Area(x.geom) desc limit 1
+          ) g on k.prior is null
+          where n.body = (select body from chamber)
         ),
         top as materialized (
           select rs.contest_id as contest, rs.k as set, e.date_from as day, o.id, o.k, o.party_id
@@ -140,8 +148,8 @@ export const seats = {
           where rs.is_default and rs.contest_id in (select id from paired union select prior from paired)
         ),
         won as (
-          select distinct on (t.contest) t.contest,
-            coalesce(bm.into_id, br.parent_party_id, pm.into_id, lp.party)::text as party,
+          select distinct on (t.contest, t.k) t.contest, t.k,
+            coalesce(bm.into_id, br.parent_party_id, lin.party, pm.into_id, lp.party)::text as party,
             cy.person_id::text as person
           from top t
           cross join lateral (
@@ -158,19 +166,59 @@ export const seats = {
           left join party_affiliation br on br.party_id = coalesce(pm.into_id, lp.party)
             and br.kind = 'regional_branch' and br.valid @> t.day
           left join entity_merge bm on bm.entity_id = br.parent_party_id
+          left join lateral (
+            select coalesce(nm.into_id, d.new) as party from party_relation r
+            cross join lateral (
+              select case when r.kind = 'successor_of' then r.to_party_id else r.from_party_id end as old,
+                case when r.kind = 'successor_of' then r.from_party_id else r.to_party_id end as new
+            ) d
+            left join entity_merge nm on nm.entity_id = d.new
+            where t.contest in (select prior from paired)
+              and r.kind in ('merged_into', 'absorbed_by', 'successor_of')
+              and d.old = coalesce(pm.into_id, lp.party)
+              and r.date > t.day and r.date <= (select min(day) from now) + 365
+              and d.old not in (select x.party_id from top x where x.contest in (select id from paired) and x.party_id is not null)
+            limit 1
+          ) lin on true
           order by t.contest, t.k
         )
         select p.id, p.area, p.same,
-          coalesce(w.party, 'person:' || w.person) as now,
-          coalesce(b.party, 'person:' || b.person) as before,
+          array(select coalesce(w.party, 'person:' || w.person) from won w where w.contest = p.id order by w.k) as now,
+          array(select coalesce(b.party, 'person:' || b.person) from won b where b.contest = p.prior order by b.k) as before,
           (select day::text from last) as since,
           (select min(day)::text from now) as day,
           (select election::text from last) as election
-        from paired p left join won w on w.contest = p.id left join won b on b.contest = p.prior
+        from paired p
         order by p.id
       `);
       const since = found.rows[0]?.since;
-      const compared = found.rows.filter(
+      const seated: Array<{
+        id: string;
+        area: string;
+        same: boolean;
+        now: string | null;
+        before: string | null;
+      }> = [];
+      for (const row of found.rows) {
+        const kept = [...row.before];
+        const gained: Array<string> = [];
+        if (row.now.length === 0) {
+          seated.push({ ...row, now: null, before: row.before[0] ?? null });
+        }
+        for (const key of row.now) {
+          const at = kept.indexOf(key);
+          if (at === -1) {
+            gained.push(key);
+          } else {
+            seated.push({ ...row, now: key, before: key });
+            kept.splice(at, 1);
+          }
+        }
+        for (const [index, key] of gained.entries()) {
+          seated.push({ ...row, now: key, before: kept[index] ?? null });
+        }
+      }
+      const compared = seated.filter(
         (row) => row.now != null && row.before != null,
       );
       if (since == null || compared.length === 0) {
@@ -215,7 +263,7 @@ export const seats = {
       return {
         since: Number(since.slice(0, 4)),
         path: previous.get(found.rows[0]?.election ?? "") ?? null,
-        total: found.rows.length,
+        total: seated.length,
         compared: compared.length,
         estimated: compared.filter((row) => !row.same).length,
         parties: keys.map((key) => {
@@ -303,20 +351,22 @@ export const seats = {
         now: Array<string>;
         before: Array<string>;
         isUs: boolean;
+        isIe: boolean;
         alliance: string | null;
         member: string | null;
         via: string | null;
       }>(sql`
         with this as materialized (
           select c.id, c.body_id as body, c.district_area_id as area, e.date_from as day, e.kind, coalesce(c.magnitude, 1) as magnitude,
-            coalesce(bs.as_of, e.date_from) as drawn, bp.path = 'us' as "isUs"
+            coalesce(bs.as_of, e.date_from) as drawn, bp.path = 'us' as "isUs", bp.path = 'ie' as "isIe"
           from contest c join election e on e.id = c.election_id
-          join slug ps on ps.entity_id = e.polity_id and ps.is_current and (ps.path in ('gb', 'us', 'ca') or ps.path like 'gb/%' or ps.path like 'us/%')
+          join slug ps on ps.entity_id = e.polity_id and ps.is_current and (ps.path in ('gb', 'us', 'ca', 'ie') or ps.path like 'gb/%' or ps.path like 'us/%')
           join body b on b.id = c.body_id join slug bp on bp.entity_id = b.polity_id and bp.is_current
           left join boundary_set bs on bs.id = c.boundary_set_id
           where c.id = ${input.id}::uuid and c.kind = 'body_seats' and c.allocation_parent_id is null
             and c.party_scope_id is null and c.district_area_id is not null
             and ((bp.path = 'us' and b.kind = 'lower_house') or not (bp.path = 'us' or bp.path like 'us/%'))
+            and not (bp.path = 'ie' and e.kind = 'by_election')
         ),
         last as (
           select e.date_from as day, coalesce(e.parent_id, e.id) as election
@@ -343,7 +393,7 @@ export const seats = {
         paired as (
           select t.id, coalesce(s.id, g.id, n.id) as prior, coalesce(s.area, g.area, n.area) as area,
             coalesce(s.day, g.day, n.day) as day,
-            case when s.same then 'same' when s.id is not null then 'name' when g.id is not null then 'area' else 'name' end as basis
+            case when s.same or g.same then 'same' when s.id is not null then 'name' when g.id is not null then 'area' else 'name' end as basis
           from this t
           left join lateral (
             select p.id, p.area, p.day, not exists (
@@ -355,11 +405,14 @@ export const seats = {
             from prev p where p.area = t.area order by p.drawn desc, p.day desc limit 1
           ) s on true
           left join lateral (
-            select p.id, p.area, p.day from prev p
+            select p.id, p.area, p.day, ST_Area(x.geom) >= 0.97 * greatest(ST_Area(gp.geom), ST_Area(gn.geom)) as same
+            from prev p
             join area_geometry gp on gp.area_id = p.area and gp.valid @> p.drawn
             join area_geometry gn on gn.area_id = t.area and gn.valid @> t.drawn
+            cross join lateral (select ST_Intersection(gp.geom, gn.geom, 0.00001) as geom) x
             where gp.geom && gn.geom and ST_Intersects(gp.geom, gn.geom)
-            order by ST_Area(ST_Intersection(gp.geom, gn.geom, 0.00001)) desc, p.day desc limit 1
+              and (not t."isIe" or ST_Area(x.geom) > 0.5 * ST_Area(gn.geom))
+            order by ST_Area(x.geom) desc, p.day desc limit 1
           ) g on s.id is null
           left join lateral (
             select p.id, p.area, p.day from prev p
@@ -387,7 +440,7 @@ export const seats = {
         ),
         won as (
           select distinct on (t.contest, t.k) t.contest, t.k, t.seats, t.votes,
-            coalesce(bm.into_id, br.parent_party_id, pm.into_id, lp.party)::text as party,
+            coalesce(bm.into_id, br.parent_party_id, lin.party, pm.into_id, lp.party)::text as party,
             cy.person_id::text as person
           from top t
           cross join lateral (
@@ -404,9 +457,23 @@ export const seats = {
           left join party_affiliation br on br.party_id = coalesce(pm.into_id, lp.party)
             and br.kind = 'regional_branch' and br.valid @> t.day
           left join entity_merge bm on bm.entity_id = br.parent_party_id
+          left join lateral (
+            select coalesce(nm.into_id, d.new) as party from party_relation r
+            cross join lateral (
+              select case when r.kind = 'successor_of' then r.to_party_id else r.from_party_id end as old,
+                case when r.kind = 'successor_of' then r.from_party_id else r.to_party_id end as new
+            ) d
+            left join entity_merge nm on nm.entity_id = d.new
+            where t.contest in (select prior from paired)
+              and r.kind in ('merged_into', 'absorbed_by', 'successor_of')
+              and d.old = coalesce(pm.into_id, lp.party)
+              and r.date > t.day and r.date <= (select day from this) + 365
+              and d.old not in (select x.party_id from top x where x.contest in (select id from paired) and x.party_id is not null)
+            limit 1
+          ) lin on true
           order by t.contest, t.k
         )
-        select p.basis, p.prior, p.area, p.day::text as since, (select day::text from this) as day, (select "isUs" from this) as "isUs",
+        select p.basis, p.prior, p.area, p.day::text as since, (select day::text from this) as day, (select "isUs" from this) as "isUs", (select "isIe" from this) as "isIe",
           array(select coalesce(x.party, 'person:' || x.person) from won x cross join generate_series(1, x.seats) where x.contest = p.id order by x.k) as now,
           array(
             select coalesce(x.party, 'person:' || x.person) from won x cross join generate_series(1, x.seats) where x.contest = p.prior
@@ -472,7 +539,7 @@ export const seats = {
         const ref = isBefore
           ? (colored.get(key) ?? current.get(key))
           : (current.get(key) ?? colored.get(key));
-        return key.startsWith("person:")
+        return key === "independent" || key.startsWith("person:")
           ? null
           : { label: ref?.label ?? "", short: ref?.short ?? null };
       };
@@ -508,17 +575,22 @@ export const seats = {
         seats:
           row.now.length < 2
             ? undefined
-            : [...row.now, ...row.before].every(
+            : row.isIe ||
+                [...row.now, ...row.before].every(
                   (key) => !key.startsWith("person:"),
                 )
-              ? [...new Set([...row.now, ...row.before])]
+              ? [
+                  ...new Set(
+                    [...row.now, ...row.before].map((key) => fold(key)),
+                  ),
+                ]
                   .map((key) => {
                     const seats = row.now.filter(
-                      (entry) => entry === key,
+                      (entry) => fold(entry) === key,
                     ).length;
                     const change =
                       seats -
-                      row.before.filter((entry) => entry === key).length;
+                      row.before.filter((entry) => fold(entry) === key).length;
                     return {
                       isGain: change > 0,
                       count: seats,

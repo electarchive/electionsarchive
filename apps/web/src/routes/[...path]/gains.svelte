@@ -251,7 +251,7 @@
         >
       {/if}
       <ul class="grid gap-x-6 sm:grid-cols-2 xl:grid-cols-3">
-        {#each isAll || listed.length <= 24 ? listed : listed.slice(0, 18) as seat (seat.path ?? seat.name)}
+        {#each isAll || listed.length <= 24 ? listed : listed.slice(0, 18) as seat, index (`${seat.path ?? seat.name}|${index}`)}
           <li
             class="flex items-baseline gap-2 border-be border-border/60 py-1 text-[0.8125rem]"
           >
