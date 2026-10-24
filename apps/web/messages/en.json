@@ -1114,6 +1114,7 @@
   "chamber_makeup_mixed": "Seats each party held at the start of every term: from records of those who actually sat where available, and from election results otherwise. The dashed line marks a majority. Select a term to view details below.",
   "search_group_body": "Chambers",
   "board_after": "Chamber composition after election",
+  "board_after_whole": "{chamber} after the election, all {seats} seats",
   "board_won": "Seats won",
   "board_after_other": "Others",
   "race_after": "After the election, {party} held {seats} of the {total} seats.",

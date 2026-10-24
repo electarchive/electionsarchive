@@ -9879,6 +9879,7 @@ export const polities = {
         (fallback == null
           ? null
           : { id: fallback.election, date: fallback.date });
+      const isBorrowed = held.length === 0 && polity.isTerritorial;
       const parents = new Set(here.rows.map((row) => row.parent));
       const kept = here.rows.filter((row) => !parents.has(row.id));
       const sizes = Map.groupBy(kept, (row) => row.date)
@@ -10086,12 +10087,10 @@ export const polities = {
             : {
                 name: labels.full.get(recent.id) ?? "",
                 path: slugs.get(recent.id) ?? null,
-                scope:
-                  held.length === 0 && polity.isTerritorial
-                    ? (slugs.get(input.id) ?? null)
-                    : null,
+                scope: isBorrowed ? (slugs.get(input.id) ?? null) : null,
                 date: recent.date,
-                isLocal: (sizes[0]?.[0] ?? "") > (recent.date ?? ""),
+                isLocal:
+                  !isBorrowed && (sizes[0]?.[0] ?? "") > (recent.date ?? ""),
                 races: raced.map((race) => {
                   let contested = 0;
                   for (const row of race.results) {

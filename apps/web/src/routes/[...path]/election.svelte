@@ -334,7 +334,7 @@
         const held = Date.parse(election.date ?? "");
         const term = data?.makeup.find(
           (entry) =>
-            Date.parse(entry.start) > held &&
+            Date.parse(entry.start) >= held &&
             Date.parse(entry.start) - held < 1.2e10,
         );
         if (data == null || term == null) {
@@ -661,7 +661,7 @@
         isTier,
         whole: isPartial ? whole : null,
         sequel:
-          !isPartial || top[0] == null || top[0].key === "none"
+          !isPartial || scope != null || top[0] == null || top[0].key === "none"
             ? null
             : top[1]?.value === top[0].value
               ? m.race_after_tied({
@@ -1484,7 +1484,12 @@
       </div>
       <div class="grid gap-1">
         <p class="text-[0.8125rem] text-muted-foreground">
-          {m.board_after()}
+          {scope == null
+            ? m.board_after()
+            : m.board_after_whole({
+                chamber: race.name,
+                seats: count(race.whole.total),
+              })}
         </p>
         {@render balance({ ...race.whole, isCount: true }, false)}
       </div>
