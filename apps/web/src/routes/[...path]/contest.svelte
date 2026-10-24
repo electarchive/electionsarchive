@@ -2117,7 +2117,7 @@
                     definition={DEFINITIONS[tier(set)]?.() ?? ""}
                   />
                 {/if}
-                {#if set.isDefault}
+                {#if contest.current == null ? set.isDefault : contest.current.sets.some((other) => other.stage === set.stage && other.source.publisher === set.source.publisher && other.source.title === set.source.title)}
                   <Term
                     class="highlighter px-1 text-xs font-semibold"
                     label={m.source_shown()}

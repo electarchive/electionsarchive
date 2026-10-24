@@ -1818,12 +1818,23 @@ function sourcesMarkdown(
     withdrawn: m.status_withdrawn,
   };
   const sources = [
-    ...sets.map(({ source, isDefault, status }) => {
+    ...sets.map(({ source, isDefault, status, stage }) => {
       const marks =
         sets.length < 2
           ? []
           : [
-              ...(isDefault ? [m.source_shown()] : []),
+              ...((
+                contest.current == null
+                  ? isDefault
+                  : contest.current.sets.some(
+                      (other) =>
+                        other.stage === stage &&
+                        other.source.publisher === source.publisher &&
+                        other.source.title === source.title,
+                    )
+              )
+                ? [m.source_shown()]
+                : []),
               ...(status === "active" ? [] : [statuses[status]?.() ?? status]),
             ];
       return `- ${marks.length === 0 ? "" : `${marks.join(", ")}: `}${source.url == null ? source.title : `[${source.title}](${source.url})`}, ${source.publisher}${source.license == null ? "" : `. ${m.source_license({ license: source.license })}`}`;

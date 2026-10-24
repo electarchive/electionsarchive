@@ -3246,9 +3246,17 @@ export const contests = {
           ),
           paths([contest.id, contest.election, ...childIds, ...ancestorIds]),
           breadcrumbs(contest.polity, contest.election),
-          db.execute<{ kind: string; body: string }>(sql`
-            select kind::text, body_md as body from note
-            where entity_id in (
+          db.execute<{
+            kind: string;
+            body: string;
+            set: number | null;
+            publisher: string | null;
+          }>(sql`
+            select n.kind::text, n.body_md as body, rs.k as set, s.publisher
+            from note n
+            left join result_set rs on rs.id = n.entity_id
+            left join source s on s.id = rs.source_id
+            where n.entity_id in (
               select ${contest.id}::uuid
               union all
               select ${contest.election}::uuid
@@ -3268,7 +3276,7 @@ export const contests = {
               select cy.id from candidacy cy join contest_option o on o.id = cy.option_id
               where o.contest_id = ${contest.id}::uuid
             )
-            order by array_position(array['caveat','context','methodology','editorial']::note_kind[], kind)
+            order by array_position(array['caveat','context','methodology','editorial']::note_kind[], n.kind)
           `),
           db.execute<{
             stage: string;
@@ -3404,7 +3412,7 @@ export const contests = {
           trail,
         },
         series: [],
-        notes: notes.rows,
+        notes: notes.rows.map(({ kind, body }) => ({ kind, body })),
         wording: wording.rows.filter(
           (row) =>
             row.kind !== "link" ||
@@ -4453,6 +4461,15 @@ export const contests = {
       ]);
       return {
         ...page,
+        notes: notes.rows
+          .filter(
+            (row) =>
+              isRoot ||
+              row.set == null ||
+              current.ks.includes(row.set) ||
+              grid?.sources.includes(row.publisher ?? "") === true,
+          )
+          .map(({ kind, body }) => ({ kind, body })),
         turnout: attended,
         series,
         places: grid,
