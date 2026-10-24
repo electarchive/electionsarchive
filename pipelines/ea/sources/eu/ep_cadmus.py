@@ -218,29 +218,46 @@ def fold(text: str) -> str:
     return "-".join(re.findall(r"[a-z0-9]+", plain))
 
 
-def wikidata_items(fetching: bool) -> pl.DataFrame:
+def wikidata_items(fetching: bool) -> tuple[pl.DataFrame, pl.DataFrame]:
     database = sqlite3.connect(raw.cached(parlgov.SOURCE, parlgov.DATABASE).path)
+    results = pl.read_database(
+        """select cast(substr(e.date, 1, 4) as integer) year, k.name_short iso3, r.votes, r.party_id, r.alliance_id,
+                  p.wikipedia
+           from election e join country k on k.id = e.country_id
+           join election_result r on r.election_id = e.id join party p on p.id = r.party_id
+           where e.type_id = 1""",
+        database,
+    ).with_columns(iso=pl.col("iso3").replace_strict(PARLGOV_ISO, default=None))
     matched = (
         pl.read_parquet(PARSED / "results.parquet")
         .filter(pl.col("votes") > 0)
         .group_by("country", "year", "party", "party_original")
         .agg(pl.col("votes").sum())
-        .with_columns(iso=pl.col("country").replace_strict(ISO, default=None))
+        .with_columns(
+            iso=pl.col("country").replace_strict(ISO, default=None),
+            label=pl.when(pl.col("party_original").fill_null("") != "").then("party_original").otherwise("party"),
+        )
         .filter(pl.col("iso").is_not_null())
         .join(
-            pl.read_database(
-                """select cast(substr(e.date, 1, 4) as integer) year, k.name_short iso3, r.votes, r.party_id,
-                          p.wikipedia
-                   from election e join country k on k.id = e.country_id
-                   join election_result r on r.election_id = e.id join party p on p.id = r.party_id
-                   where e.type_id = 1 and r.votes is not null and p.wikipedia like 'http%'""",
-                database,
-            ).with_columns(iso=pl.col("iso3").replace_strict(PARLGOV_ISO, default=None)),
+            results.filter(pl.col("votes").is_not_null() & pl.col("wikipedia").fill_null("").str.starts_with("http")),
             on=["iso", "year", "votes"],
         )
     )
+    members = (
+        matched.select("iso", "year", "label", "alliance_id")
+        .drop_nulls("alliance_id")
+        .join(
+            results.select("alliance_id", member=pl.col("party_id"), member_wikipedia=pl.col("wikipedia")),
+            on="alliance_id",
+        )
+    )
     hosts: dict[str, dict[int, str]] = defaultdict(dict)
-    for party, article in matched.select("party_id", "wikipedia").unique().iter_rows():
+    for party, article in (
+        *matched.select("party_id", "wikipedia").unique().iter_rows(),
+        *members.select("member", "member_wikipedia").unique().iter_rows(),
+    ):
+        if article is None:
+            continue
         link = urlparse(article.strip())
         if not link.netloc.endswith(".wikipedia.org"):
             continue
@@ -273,11 +290,17 @@ def wikidata_items(fetching: bool) -> pl.DataFrame:
                     title = renamed[title]
                 if pages.get(title) is not None:
                     items[party] = pages[title]
-    return matched.select(
-        "iso",
-        label=pl.when(pl.col("party_original").fill_null("") != "").then("party_original").otherwise("party"),
-        item=pl.col("party_id").replace_strict(items, default=None),
-    ).drop_nulls("item")
+    return (
+        matched.select("iso", "label", item=pl.col("party_id").replace_strict(items, default=None)).drop_nulls("item"),
+        members.select(
+            "iso",
+            "year",
+            "label",
+            "alliance_id",
+            item=pl.col("member").replace_strict(items, default=None),
+            member=pl.col("member"),
+        ),
+    )
 
 
 def fetch() -> None:
@@ -402,7 +425,8 @@ def emit() -> Path:
         for entity, text in conn.execute("select entity_id, text from name").fetchall():
             party_names[entity].add(fold(text))
         labels: dict[str, set[str]] = defaultdict(set)
-        for iso, label, item in wikidata_items(False).iter_rows():
+        parlgov_items, parlgov_members = wikidata_items(False)
+        for iso, label, item in parlgov_items.iter_rows():
             labels[f"{iso}:{label}"].add(item)
         unambiguous = {
             label: next(iter(items)) for label, items in labels.items() if len(items) == 1 and label in cadmus_parties
@@ -427,6 +451,25 @@ def emit() -> Path:
                 else:
                     linked["coalitions left"] += 1
         print(linked)
+        attached_items = {item: {cadmus_parties[label]} for label, item in unambiguous.items() if not by_item[item]}
+        coalition_members: dict[tuple[str, int, str], set[UUID | None]] = defaultdict(set)
+        for iso, year, label, _, item, _ in parlgov_members.iter_rows():
+            key = f"{iso}:{label}"
+            if (
+                key not in cadmus_parties
+                or cadmus_parties[key] in cs.survivors
+                or str(cadmus_parties[key]) in cs.merged
+            ):
+                continue
+            holders = by_item.get(item, set()) or attached_items.get(item, set())
+            coalition_members[iso, year, label].add(
+                cs.survivors.get(next(iter(holders)), next(iter(holders))) if len(holders) == 1 else None
+            )
+        coalitions = {
+            key: members for key, members in coalition_members.items() if len(members) > 1 and None not in members
+        }
+        allied: set[UUID] = set()
+        print(f"{len(coalitions)} coalition lists with members named by ParlGov")
         stale = conn.execute(
             """select n.id, n.entity_id from note n join changeset c on c.id = n.changeset_id
                join external_id x on x.entity_id = n.entity_id and x.scheme = 'eu.election' and x.value like 'GB:%%'
@@ -662,6 +705,17 @@ def emit() -> Path:
                                 name(party, row["party"])
                                 if row["party_original"] and row["party_original"] != row["party"]:
                                     name(party, row["party_original"], "und", "native", False)
+                    members = coalitions.get((iso, year, label_text))
+                    alliance = None
+                    if members is not None:
+                        alliance = cs.key("eu.ep_cadmus.alliance", f"{iso}:{year}:{label_text}")
+                        if alliance not in allied:
+                            allied.add(alliance)
+                            cs.add("alliance", id=alliance, kind="electoral_alliance", election_id=election)
+                            name(alliance, label_text)
+                            for member in sorted(members, key=str):
+                                cs.add("alliance_member", alliance_id=alliance, party_id=member, role=None)
+                            cs.add("citation", entity_id=alliance, source_id=votes_source)
                     option = cs.key("eu.ep_cadmus.option", f"{contest_key}:{fold(label_text) or label_text}:{position}")
                     cs.add(
                         "contest_option",
@@ -669,6 +723,7 @@ def emit() -> Path:
                         contest_id=contest,
                         kind="others" if other else "candidate" if euc else "list",
                         party_id=party,
+                        alliance_id=alliance,
                         ballot_position=position,
                         ballot_label=shown,
                     )
