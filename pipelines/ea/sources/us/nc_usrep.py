@@ -1,7 +1,9 @@
+import difflib
+import json
 import re
 import subprocess
 import zipfile
-from datetime import date, timedelta
+from datetime import UTC, date, datetime, timedelta
 from pathlib import Path
 
 import polars as pl
@@ -17,20 +19,42 @@ WORK = DATA / "work" / "nc_usrep"
 PUBLISHER = "North Carolina State Board of Elections"
 TITLE = "Abstract of votes cast in the general election"
 BUCKET = "https://s3.amazonaws.com/dl.ncsbe.gov/ENRS/{d}/results_by_contest_{c}.zip"
-DAYS = [date(1996, 11, 5), date(1998, 11, 3)]
+DAYS = [date(1992, 11, 3), date(1996, 11, 5), date(1998, 11, 3)]
+RECORD = "https://digital.ncdcr.gov/Documents/Detail/4199407"
+
 SUMMARY = "North Carolina's U.S. House general elections of 1996 and 1998 by county from the State Board of Elections"
 METHOD = (
     "County totals are from the State Board of Elections' abstracts of votes cast, one table per congressional "
     "district. Each candidate's county sum equals the district total printed in the abstract."
 )
 
+SCAN = (
+    " The 1992 abstract is a typed scan read by two OCR passes, with hand-read cells settled against the printed column totals."
+)
+SCAN10 = (
+    " District 10's county rows fall short of its printed total by 34 Republican and 2 Libertarian votes."
+)
+
 
 def address(day: date) -> str:
+    if day.year == 1992:
+        return RECORD
     return BUCKET.format(d=day.strftime("%Y_%m_%d"), c=day.strftime("%Y%m%d"))
 
 
 def fetch() -> None:
-    for day in DAYS:
+    detail = subprocess.run(
+        ["curl", "-sL", "-m", "60", "-A", "Mozilla/5.0", RECORD], capture_output=True, text=True, check=True
+    ).stdout
+    for item in json.loads(re.search(r"var viewerItems = (\[.*?\]);\n", detail, re.S)[1]):
+        page = f"{RECORD}#page-{int(item['path'].rsplit('-', 1)[1]):02d}"
+        pdf = subprocess.run(
+            ["curl", "-sL", "-m", "120", "-A", "Mozilla/5.0", item["pdfUrl"].replace("[IMAGETOKEN]", item["imageToken"])],
+            capture_output=True,
+            check=True,
+        ).stdout
+        raw.store(SOURCE, page, pdf, suffix=".pdf", retrieved_at=datetime.now(UTC), media_type="application/pdf")
+    for day in DAYS[1:]:
         try:
             raw.cached(SOURCE, address(day))
         except LookupError:
@@ -69,7 +93,12 @@ def parse() -> None:
             ).fetchall()
         }
     rows: list[tuple[str, int, str, str, int]] = []
-    for day in DAYS:
+    for line in (Path(__file__).with_name("nc_usrep_1992.tsv")).read_text().splitlines():
+        district, name, column, votes = line.split("\t")
+        key = re.sub(r"[^a-z]", "", name.lower())
+        key = key if key in counties else difflib.get_close_matches(key, counties, 1, 0.8)[0]
+        rows.append(("1992-11-03", int(district), counties[key], column, int(votes)))
+    for day in DAYS[1:]:
         found = pages(day)
         tables: list[tuple[int, list[tuple[str, list[tuple[int, int]]]], list[tuple[int, int]]]] = []
         if day.year == 1996:
@@ -149,8 +178,10 @@ def emit() -> Path:
                 url="https://www.ncsbe.gov/results-data/election-results/historical-election-results-data",
                 license="Public record",
             )
-        for day in DAYS:
+        for day in DAYS[1:]:
             cs.artifact(raw.cached(SOURCE, address(day)), source)
+        for page in range(1, 7):
+            cs.artifact(raw.cached(SOURCE, f"{RECORD}#page-{page:02d}"), source)
         units = dict(
             conn.execute("select code, id from reporting_unit where scheme_code = 'us.county' and code like '37%%'").fetchall()
         )
@@ -225,7 +256,7 @@ def emit() -> Path:
                 totals[option] = totals.get(option, 0) + sums[column]
             ties = all(held.get(option) == value for option, value in totals.items()) and set(held) <= set(totals)
             differences = [
-                f"{value - held.get(option, 0):+d}" for option, value in totals.items() if held.get(option, 0) != value
+                f"{int(value - held.get(option, 0)):+d}" for option, value in totals.items() if held.get(option, 0) != value
             ]
             print(key, "ties" if ties else f"differs {differences}")
             result_set = cs.key(f"{SOURCE}.result_set", key)
@@ -265,7 +296,8 @@ def emit() -> Path:
                 supersedes_id=row[0] if ties else None,
                 completeness=1,
             )
-            note = METHOD if ties else METHOD + f" It differs from the default result set by {', '.join(differences)} votes."
+            note = METHOD + (SCAN if day.startswith("1992") else "") + (SCAN10 if key.endswith("1992-11-03:NC:house:10") else "")
+            note = note if ties else note + f" It differs from the default result set by {', '.join(differences)} votes."
             cs.add("note", entity_id=result_set, kind="methodology", body_md=note)
             if ties:
                 for option, kind, seats in conn.execute(
