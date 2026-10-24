@@ -12,7 +12,7 @@ from ea.changeset import Changeset
 from ea.store import connect
 
 SOURCE = "parlgov"
-VERSION = "1"
+VERSION = "2"
 DATABASE = "https://dataverse.harvard.edu/api/access/datafile/10437086"
 LANDING = "https://doi.org/10.7910/DVN/2VZ5ZC"
 PUBLISHER = "ParlGov (Döring, Huber, and Manow)"
@@ -76,6 +76,25 @@ SPLITS: dict[int, list[tuple[str, date | None, date | None]]] = {
     ],
 }
 UNLINKED = {1094}
+SHARED = {1681: (1667, {1436, 596})}
+DECREE = "https://blog.landot-avocats.net/2025/09/08/financement-des-partis-et-groupements-politiques-voici-les-montants-2025-64-me-et-la-ventilation-correspondante/"
+DECREE_TITLE = "Décret n° 2025-893 du 4 septembre 2025, annexe II (rattachements de novembre 2024)"
+DECREE_SEATS = {"Q20012759": 47, "Q108846587": 34, "Q82892": 6}
+DECREE_NOTE = (
+    "Seats are the deputies who declared their attachment to the party in November 2024, as listed in annex II of "
+    "décret n° 2025-893 of September 4, 2025. Renaissance and the Democratic Movement have no seat count: their "
+    "deputies declared together under Ensemble ! (127 deputies), which the decree does not split."
+)
+SHARED_NOTE = (
+    "ParlGov lists only the Five Star Movement, the Democratic Party, Italy Alive, and Left for this caretaker spell. "
+    "The Lega and Forza Italia ministers stayed in office, so both parties are added without seat counts: "
+    "governo.it records one Draghi government from February 13, 2021 to October 22, 2022, with Giorgetti, Garavaglia, "
+    "and Stefani for the Lega and Brunetta, Gelmini, and Carfagna for Forza Italia."
+)
+DECREE_MIRROR = (
+    "The decree is published in the Journal officiel and on Légifrance; this copy of its annex II was obtained "
+    "through a third-party reproduction, since Légifrance sits behind a bot check."
+)
 ENDS = {"Hitler": date(1945, 4, 30), "Petain": date(1940, 7, 11)}
 RECENT: list[tuple[str, str, date, date | None, str, list[str]]] = [
     ("FR", "Attal", date(2024, 1, 9), date(2022, 6, 19), "Q23731823", ["Q587370", "Q108846587"]),
@@ -108,6 +127,7 @@ RECENT: list[tuple[str, str, date, date | None, str, list[str]]] = [
     ("GB", "Burnham", date(2026, 7, 20), date(2024, 7, 4), "Q9630", []),
     ("CA", "Carney I", date(2025, 3, 14), date(2021, 9, 20), "Q138345", []),
     ("CA", "Carney II", date(2025, 4, 28), date(2025, 4, 28), "Q138345", []),
+    ("DE", "Scholz II", date(2024, 11, 7), date(2021, 9, 26), "Q49768", ["Q49766"]),
     ("DE", "Merz", date(2025, 5, 6), date(2025, 2, 23), "Q49762", ["Q49763", "Q49768"]),
 ]
 
@@ -199,6 +219,7 @@ def _labels(db: sqlite3.Connection) -> list[str]:
 def fetch() -> None:
     raw.fetch(SOURCE, DATABASE, suffix=".db")
     raw.fetch(SOURCE, _holders_url(), suffix=".json")
+    raw.fetch(SOURCE, DECREE, suffix=".html")
     db = _database()
     for url, _ in _lookups(db):
         raw.fetch(SOURCE, url, suffix=".json")
@@ -274,6 +295,8 @@ def emit() -> Path:
         )
     ):
         members[row["cabinet_id"]].append(row)
+    for cabinet, (donor, shared) in SHARED.items():
+        members[cabinet].extend({**row, "seats": None} for row in members[donor] if row["party_id"] in shared)
 
     with connect() as conn:
         parlgov = {
@@ -323,6 +346,17 @@ def emit() -> Path:
         cs.artifact(raw.cached(SOURCE, _holders_url()), wikidata)
         for url in [url for url, _ in _lookups(db)] + _labels(db):
             cs.artifact(raw.cached(SOURCE, url), wikidata)
+        decree = cs.source("Journal officiel de la République française", DECREE_TITLE)
+        cs.add(
+            "source",
+            id=decree,
+            kind="official_body",
+            publisher="Journal officiel de la République française",
+            title=DECREE_TITLE,
+            url="https://www.legifrance.gouv.fr/jorf/id/JORFTEXT000052197358",
+            notes=DECREE_MIRROR,
+        )
+        cs.artifact(raw.cached(SOURCE, DECREE), decree)
         created: set[UUID] = set()
 
         def entity(item: str, kind: str, iso: str, name: str) -> UUID:
@@ -416,8 +450,10 @@ def emit() -> Path:
             if head(iso, name, start) is None:
                 missing.append(f"{iso} {start} {name} (left out)")
                 continue
-            lineup = [(entity(leader, "party", iso, leader), "head", None)] + [
-                (entity(partner, "party", iso, partner), "member", None) for partner in partners
+            seated = iso == "FR" and followed == date(2024, 7, 7)
+            lineup = [(entity(leader, "party", iso, leader), "head", DECREE_SEATS.get(leader) if seated else None)] + [
+                (entity(partner, "party", iso, partner), "member", DECREE_SEATS.get(partner) if seated else None)
+                for partner in partners
             ]
             governments.append((iso, name, start, False, followed, lineup, ("ea.government", f"{iso}:{start}")))
         governments.sort(key=lambda government: (government[0], government[2]))
@@ -448,6 +484,10 @@ def emit() -> Path:
             cs.add("name", entity_id=government, text=name, lang="en", kind="short", is_preferred=True)
             for party, role, seats in lineup:
                 cs.add("government_party", government_id=government, party_id=party, role=role, seats=seats)
+            if key == ("parlgov.cabinet", "1681"):
+                cs.add("note", entity_id=government, kind="caveat", body_md=SHARED_NOTE)
+            if any(seats is not None for _, _, seats in lineup) and key[0] == "ea.government":
+                cs.add("note", entity_id=government, kind="caveat", body_md=DECREE_NOTE)
             previous[iso] = None if name in ENDS else government
         if missing:
             print("no head of government for", "; ".join(missing))

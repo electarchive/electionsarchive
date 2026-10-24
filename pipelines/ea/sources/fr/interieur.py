@@ -13,7 +13,7 @@ from ea.changeset import Changeset, slug
 from ea.store import DATA, connect
 
 SOURCE = "fr.interieur"
-VERSION = "1"
+VERSION = "2"
 PARSED = DATA / "parsed" / SOURCE
 DATASET = (
     "https://static.data.gouv.fr/resources/elections-legislatives-des-30-juin-et-7-juillet-2024-resultats-definitifs"
@@ -57,6 +57,19 @@ NUANCES = {
     "UXD": "Union de l'extrême droite",
     "EXD": "Extrême droite",
 }
+PARTIES = {
+    "COM": "Q192821",
+    "SOC": "Q170972",
+    "RDG": "Q427965",
+    "VEC": "Q613786",
+    "REN": "Q23731823",
+    "MDM": "Q587370",
+    "HOR": "Q108846587",
+    "UDI": "Q82892",
+    "LR": "Q20012759",
+    "RN": "Q205150",
+}
+ALLIANCES = {"UG": ("New Popular Front", "Nouveau Front populaire"), "ENS": ("Ensemble", "Ensemble")}
 SOURCE_NOTE = (
     "Candidates carry the Interior Ministry's political label (nuance), not their party. The polling-station files "
     "have no constituency column, so each station is placed in its constituency by matching its list of candidates."
@@ -415,7 +428,7 @@ def emit() -> Path:
                     quality="official",
                     source_id=etalab,
                 )
-            circ_units[circ] = cs.unit("fr.circonscription", circ)
+            circ_units[circ] = cs.unit("fr.circonscription", circ, REDISTRICTING)
             cs.add(
                 "reporting_unit",
                 id=circ_units[circ],
@@ -529,6 +542,11 @@ def emit() -> Path:
             date_to=ROUNDS[2],
             status="held",
         )
+        blocs = {code: cs.key("fr.alliance", f"{ROUNDS[1].year}:{code}") for code in ALLIANCES}
+        for code, (english, french) in ALLIANCES.items():
+            cs.add("alliance", id=blocs[code], kind="electoral_alliance", election_id=cycle)
+            name(blocs[code], english, "en")
+            name(blocs[code], french, "fr", "native")
         name(cycle, "2024 French legislative election", "en")
         name(cycle, "Élections législatives de 2024", "fr", "native")
         cs.add("slug", path=f"fr/{ROUNDS[1]}-legislative", entity_id=cycle)
@@ -622,6 +640,7 @@ def emit() -> Path:
                     contest_id=contests[(number, circ)],
                     kind="candidate",
                     party_id=nuances[nuance],
+                    alliance_id=blocs.get(nuance),
                     ballot_position=panel,
                     ballot_label=f"{surname} {forename}",
                 )
@@ -632,6 +651,7 @@ def emit() -> Path:
                     option_id=option,
                     role="head",
                     ballot_name=f"{surname} {forename}",
+                    member_of_party_id=cs.key("wikidata", PARTIES[nuance]) if nuance in PARTIES else None,
                 )
                 if outcome is not None:
                     cs.add(
