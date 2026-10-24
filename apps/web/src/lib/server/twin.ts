@@ -1454,12 +1454,26 @@ function comparisonMarkdown(
       const best = options?.toSorted((x, y) => y.share - x.share)[0];
       return best == null ? null : `${best.label}, ${percent(best.share)}`;
     };
+    const questions = data.places.series
+      .filter((series) => series.isQuestion)
+      .flatMap((series) => series.points)
+      .toSorted((x, y) => x.date.localeCompare(y.date));
     return [
       ...heading,
       ...(data.places.series.length === 0
         ? [m.versus_places_none()]
-        : data.places.series.flatMap((series) => [
-            `## ${series.name ?? (series.kind === "shared" ? m.versus_overall() : m.versus_governor())}`,
+        : [
+            ...data.places.series
+              .filter((series) => !series.isQuestion)
+              .map((series) => ({
+                ...series,
+                name: series.name ?? m.versus_governor(),
+              })),
+            ...[
+              { name: m.versus_questions(), kind: "shared", points: questions },
+            ].filter((series) => series.points.length > 0),
+          ].flatMap((series) => [
+            `## ${series.name}`,
             ...(series.kind === "combined" ? [m.versus_combined_key()] : []),
             table(
               [

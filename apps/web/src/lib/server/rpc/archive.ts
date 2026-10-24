@@ -10542,7 +10542,7 @@ export const polities = {
         })),
         ...pairs,
       ].toSorted((first, second) => first.date.localeCompare(second.date));
-      const [labels, slugs, loaded] = await Promise.all([
+      const [labels, slugs, loaded, offices] = await Promise.all([
         names(
           [
             input.a,
@@ -10577,7 +10577,12 @@ export const polities = {
             ]);
           }),
         ),
+        db.execute<{ id: string; rank: number }>(sql`
+          select id, array_position(array['head_of_state', 'head_of_government', 'governor', 'body', 'mayor', 'other'], kind::text) as rank
+          from office where id = any(${sql.param([...new Set(rows.flatMap((row) => row.owner ?? []))])}::uuid[])
+        `),
       ]);
+      const ranks = new Map(offices.rows.map((row) => [row.id, row.rank]));
       const points = rows.map((row, index) => ({
         ...row,
         sides: row.ks.map((k) => {
@@ -10625,6 +10630,8 @@ export const polities = {
                   labels.full.get(group[0].owner) ??
                   null),
             isQuestion: group[0]?.isQuestion ?? false,
+            rank:
+              group[0]?.owner == null ? 7 : (ranks.get(group[0].owner) ?? 4),
             kind: group[0]?.kind ?? "shared",
             points: group.map((point) => ({
               name: labels.full.get(point.id) ?? "",
@@ -10638,6 +10645,7 @@ export const polities = {
           .toSorted(
             (first, second) =>
               KINDS.indexOf(first.kind) - KINDS.indexOf(second.kind) ||
+              first.rank - second.rank ||
               second.points.length - first.points.length,
           ),
       };
