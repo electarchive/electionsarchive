@@ -64,6 +64,7 @@ export const seats = {
         now: string | null;
         before: string | null;
         since: string | null;
+        day: string | null;
         election: string | null;
       }>(sql`
         with recursive tree(id) as (
@@ -163,6 +164,7 @@ export const seats = {
           coalesce(w.party, 'person:' || w.person) as now,
           coalesce(b.party, 'person:' || b.person) as before,
           (select day::text from last) as since,
+          (select min(day)::text from now) as day,
           (select election::text from last) as election
         from paired p left join won w on w.contest = p.id left join won b on b.contest = p.prior
         order by p.id
@@ -192,7 +194,7 @@ export const seats = {
         key.startsWith("person:") ? [key.slice(7)] : [],
       );
       const [colored, labels, slugs, previous] = await Promise.all([
-        refs(parties, since),
+        refs(parties, found.rows[0]?.day ?? since),
         names([...people, ...changed.map((row) => row.area)], since),
         paths(changed.map((row) => row.id)),
         paths([found.rows[0]?.election ?? ""]),
