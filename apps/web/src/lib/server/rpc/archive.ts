@@ -2,7 +2,7 @@ import type { Grouping, Match, Option, Relation, Side } from "@ea/analytics";
 import type { SQL } from "drizzle-orm";
 import { ancestry, compare } from "@ea/analytics";
 import { openapi } from "@orpc/openapi";
-import { ORPCError } from "@orpc/server";
+import { call, ORPCError } from "@orpc/server";
 import { sql } from "drizzle-orm";
 import { existsSync } from "node:fs";
 import path from "node:path";
@@ -13371,6 +13371,8 @@ export const search = {
           context: v.nullable(v.string()),
           date: v.nullable(v.string()),
           photo: v.nullable(v.string()),
+          office: v.nullable(v.string()),
+          isBest: v.boolean(),
         }),
       ),
     )
@@ -13441,6 +13443,8 @@ export const search = {
         target: string | null;
         context: string | null;
         date: string | null;
+        boost: number | null;
+        office: string | null;
       }>(sql`
         with q as (select lower(unaccent(${q})) as t),
         terms as (
@@ -13538,7 +13542,22 @@ export const search = {
           order by score desc nulls last, t.date_from desc nulls last limit ${input.limit * 2}
         )
         select top.entity_id as id, top.type::text as type, x.target, x.context,
-          coalesce(x.date, (select e.date_from from contest c join election e on e.id = c.election_id where c.id = x.target and top.type = 'person'))::text as date
+          coalesce(x.date, (select e.date_from from contest c join election e on e.id = c.election_id where c.id = x.target and top.type = 'person'))::text as date,
+          case when top.type = 'person' then (select d.rank_boost from search_document d where d.entity_id = top.entity_id) end as boost,
+          case when top.type = 'person' then (
+            select coalesce(c.office_id, c.body_id) from candidacy cy
+            join outcome oc on oc.option_id = cy.option_id and oc.kind in ('elected', 'won')
+            join contest_option o on o.id = cy.option_id
+            join contest c on c.id = o.contest_id and c.party_scope_id is null
+            join election el on el.id = c.election_id and el.kind <> 'primary'
+            left join office f on f.id = c.office_id left join polity fp on fp.id = f.polity_id
+            left join body b on b.id = c.body_id left join polity bp on bp.id = b.polity_id
+            where cy.person_id = top.entity_id and cy.role = 'head' and (
+              f.kind in ('head_of_state', 'head_of_government', 'governor') and el.polity_id = f.polity_id
+              or f.id is null and b.kind in ('upper_house', 'lower_house', 'unicameral') and bp.kind = 'sovereign_state')
+            order by case when fp.kind in ('sovereign_state', 'supranational') then 3 when f.id is not null then 2
+              when b.kind = 'upper_house' then 1 else 0 end desc, el.date_from desc
+            limit 1) end as office
         from top
         cross join lateral (
           select
@@ -13576,6 +13595,8 @@ export const search = {
         target: row.id,
         context: row.polity,
         date: null,
+        boost: null,
+        office: null,
         isClose: row.isClose,
       }));
       const rows = [
@@ -13584,7 +13605,9 @@ export const search = {
         ...bodies.filter((row) => !row.isClose),
       ];
       const ids = rows.flatMap((row) =>
-        [row.id, row.target, row.context].filter((id) => id != null),
+        [row.id, row.target, row.context, row.office].filter(
+          (id) => id != null,
+        ),
       );
       const [labels, slugs, faces] = await Promise.all([
         names(
@@ -13597,7 +13620,7 @@ export const search = {
           rows.filter((row) => row.type === "person").map((row) => row.id),
         ),
       ]);
-      return rows
+      const ranked = rows
         .map((row) => ({
           id: row.id,
           type: row.type,
@@ -13611,6 +13634,8 @@ export const search = {
             ) ?? null,
           date: row.date,
           photo: faces.get(row.id)?.src ?? null,
+          office: labels.full.get(row.office ?? "") ?? null,
+          boost: row.boost,
         }))
         .filter((row) => row.path != null && row.name !== "")
         .toSorted(
@@ -13625,5 +13650,37 @@ export const search = {
             ),
         )
         .slice(0, input.limit);
+      const people = ranked.filter((row) => row.type === "person");
+      const [first, second] = people;
+      const words = segment(q).split("-");
+      const best =
+        first != null &&
+        (first.boost ?? 0) >= 4 &&
+        (second?.boost ?? 0) <= (first.boost ?? 0) - 1 &&
+        words.every((word) => segment(first.name).split("-").includes(word))
+          ? first
+          : null;
+      const located = new Map(
+        await Promise.all(
+          people.map(async (row) => {
+            const { path } = await call(entities.path, { id: row.id });
+            return [row.id, path] as const;
+          }),
+        ),
+      );
+      return [
+        ...(best == null ? [] : [best]),
+        ...ranked.filter((row) => row !== best),
+      ].map((row) => ({
+        id: row.id,
+        type: row.type,
+        name: row.name,
+        path: located.get(row.id) ?? row.path,
+        context: row.context,
+        date: row.date,
+        photo: row.photo,
+        office: row.office,
+        isBest: row === best,
+      }));
     }),
 };

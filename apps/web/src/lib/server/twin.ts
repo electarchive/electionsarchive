@@ -306,26 +306,34 @@ function markdown(data: Data, link: Link) {
         ["party", m.search_group_party()],
         ["person", m.search_group_person()],
       ] as const;
+      const line = (hit: (typeof data.hits)[number]) =>
+        `- ${(hit.office == null ? [link(hit.name, hit.path), hit.context, date(hit.date)] : [link(hit.name, hit.path), hit.office]).filter((part) => part != null && part !== "").join(", ")}`;
+      const best = data.hits.filter((hit) => hit.isBest);
       return [
         `# ${m.search_title()}`,
         ...(data.q === ""
           ? [m.search_hint()]
           : data.hits.length === 0
             ? [m.search_empty({ query: data.q })]
-            : groups.flatMap(([type, heading]) => {
-                const hits = data.hits.filter((hit) => hit.type === type);
-                return hits.length === 0
+            : [
+                ...(best.length === 0
                   ? []
                   : [
-                      `## ${heading}`,
-                      hits
-                        .map(
-                          (hit) =>
-                            `- ${[link(hit.name, hit.path), hit.context, date(hit.date)].filter((part) => part != null && part !== "").join(", ")}`,
-                        )
-                        .join("\n"),
-                    ];
-              })),
+                      `## ${m.search_best()}`,
+                      best.map((hit) => line(hit)).join("\n"),
+                    ]),
+                ...groups.flatMap(([type, heading]) => {
+                  const hits = data.hits.filter(
+                    (hit) => hit.type === type && !hit.isBest,
+                  );
+                  return hits.length === 0
+                    ? []
+                    : [
+                        `## ${heading}`,
+                        hits.map((hit) => line(hit)).join("\n"),
+                      ];
+                }),
+              ]),
       ];
     }
     case "home": {

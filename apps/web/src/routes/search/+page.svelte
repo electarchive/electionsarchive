@@ -23,12 +23,16 @@
     { type: "person", heading: m.search_group_person, icon: UserIcon },
   ];
 
+  const best = $derived(data.hits.find((hit) => hit.isBest) ?? null);
+
   const groups = $derived(
     GROUPS.map((group) => ({
       ...group,
-      first: data.hits.findIndex((hit) => hit.type === group.type),
+      first: data.hits.findIndex(
+        (hit) => hit.type === group.type && !hit.isBest,
+      ),
       hits: data.hits.filter(
-        (hit) => hit.type === group.type && hit.path != null,
+        (hit) => hit.type === group.type && hit.path != null && !hit.isBest,
       ),
     }))
       .filter((group) => group.hits.length > 0)
@@ -72,12 +76,52 @@
       </form>
       {#if data.q === ""}
         <p class="text-sm text-muted-foreground">{m.search_hint()}</p>
-      {:else if groups.length === 0}
+      {:else if groups.length === 0 && best == null}
         <p class="text-sm text-muted-foreground">
           {m.search_empty({ query: data.q })}
         </p>
       {/if}
     </header>
+
+    {#if best != null}
+      <section
+        class="col-span-12 grid gap-2 bg-card px-3.5 pbs-3 pbe-3.5"
+        aria-labelledby="search-best"
+      >
+        <h2 id="search-best" class="text-[0.8125rem] font-bold">
+          {m.search_best()}
+        </h2>
+        <a
+          class="grid grid-cols-[auto_minmax(0,1fr)] items-center gap-x-3.5 py-2 max-inline-2xl hover:bg-secondary"
+          href={resolve("/[...path]", { path: best.path ?? "" })}
+        >
+          {#if best.photo == null}
+            <span
+              class="row-span-2 grid place-items-center rounded-full bg-muted text-muted-foreground block-16 inline-16"
+              aria-hidden="true"
+            >
+              <UserIcon class="block-6 inline-6" />
+            </span>
+          {:else}
+            <img
+              class="row-span-2 rounded-full bg-muted object-cover object-top block-16 inline-16"
+              src={best.photo}
+              alt=""
+              width="64"
+              height="64"
+            />
+          {/if}
+          <span class="self-end text-xl font-bold text-pretty">{best.name}</span
+          >
+          <span class="self-start text-sm text-muted-foreground"
+            >{best.office ??
+              (best.context == null
+                ? ""
+                : m.search_person_latest({ contest: best.context }))}</span
+          >
+        </a>
+      </section>
+    {/if}
 
     {#each groups as group (group.type)}
       <section
@@ -119,7 +163,12 @@
                 <span class="line-clamp-2 font-semibold text-pretty"
                   >{hit.name}</span
                 >
-                {#if hit.context != null || hit.date != null}
+                {#if hit.office != null}
+                  <span
+                    class="col-start-2 truncate text-[0.8125rem] text-muted-foreground"
+                    >{hit.office}</span
+                  >
+                {:else if hit.context != null || hit.date != null}
                   <span
                     class="col-start-2 truncate text-[0.8125rem] text-muted-foreground"
                   >
