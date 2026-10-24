@@ -572,6 +572,41 @@ def rows(code: str, path: Path, file: str = ""):
                                 yield {"county": row[1], "office": office, "district": "", "party": party, "candidate": candidate, "votes": votes.replace(",", "")}
             if stripped:
                 previous = line
+        district = None
+        parties: list[tuple[int, str]] = []
+        starts: list[int] = []
+        columns: list[tuple[str, list[str]]] = []
+        previous = ""
+        for line in subprocess.run(["pdftotext", "-layout", str(path), "-"], capture_output=True, text=True, check=True).stdout.splitlines():
+            stripped = line.strip().replace("✓", "")
+            found = re.fullmatch(r"Congressional District (\d) – Two Year Term", stripped)
+            if found is not None:
+                district, parties, starts = found[1], [], []
+            elif district is not None and re.match(r"Governor$|Secretary of State$|State Treasurer$|Attorney General$|Auditor of Public Accounts$|Public Service Commission|Member of Board|Member of the (State Board|Nebraska)", stripped):
+                district = None
+            elif district is None or "did not make a nomination" in stripped:
+                continue
+            elif "Party Nomination" in line and "County" not in stripped:
+                parties = [(heading.start(), heading[1]) for heading in re.finditer(r"(Republican|Democratic|Libertarian|Legal Marijuana NOW) Party Nomination", line)]
+                starts = []
+            elif re.match(r"\s*County\s", line):
+                starts = [heading.start() for heading in re.finditer(r"County(?=\s)", line)] + [10**6]
+                columns = []
+                for index in range(len(starts) - 1):
+                    names = re.split(r"\s{2,}", line[starts[index] + 6 : starts[index + 1]].replace("✓", "").strip())
+                    first_names = re.split(r"\s{2,}", previous[max(starts[index] - 2, 0) : starts[index + 1]].replace("✓", "").strip())
+                    if len(first_names) == len(names) and not re.search(r"Nomination|Page|\d", previous):
+                        names = [f"{first} {last}" for first, last in zip(first_names, names, strict=True)]
+                    party = [name for start, name in parties if start <= starts[index] + 15]
+                    columns.append((party[-1] if party else parties[0][1], names))
+            elif starts and stripped:
+                for index, (party, names) in enumerate(columns):
+                    row = re.fullmatch(r"\s*([A-Za-z][A-Za-z .'-]*?)(?: \(\d+ precincts?\))?\s{2,}((?:\d[\d,]*\s*)+)\s*", line[starts[index] : starts[index + 1]])
+                    if row is not None and row[1] != "Total" and party in ("Republican", "Democratic"):
+                        for candidate, votes in zip(names, row[2].split(), strict=True):
+                            yield {"county": row[1], "office": "U.S. House", "district": district, "party": party, "candidate": candidate, "votes": votes.replace(",", "")}
+            if stripped:
+                previous = line
         return
     if code == "la":
         with path.open(newline="") as handle:
