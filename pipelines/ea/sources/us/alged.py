@@ -15,7 +15,7 @@ from ea.changeset import Changeset, slug
 from ea.store import DATA, connect
 
 SOURCE = "us.alged"
-VERSION = "1"
+VERSION = "2"
 PARSED = DATA / "parsed" / SOURCE
 URL = "https://osf.io/download/tbwzd/"
 PLACES = "https://www2.census.gov/geo/tiger/GENZ2020/shp/cb_2020_us_place_500k.zip"
@@ -520,20 +520,29 @@ def emit() -> Path:
                 ballot = re.sub(r"\b([a-z])", lambda found: found[1].upper(), full_name)
                 ballot = re.sub(r"\bMc([a-z])", lambda found: f"Mc{found[1].upper()}", ballot)
                 ballot = re.sub(r"\b(Ii|Iii|Iv)\b", lambda found: found[1].upper(), ballot)
-                if person in cs.minted and person not in persons:
-                    cs.add("person", id=person)
-                    name(person, ballot)
-                persons.add(person)
                 option = cs.key("us.option", f"{contest_key}:{candidate_id}")
-                cs.add("contest_option", id=option, contest_id=contest, kind="candidate", ballot_label=ballot)
-                cs.add(
-                    "candidacy",
-                    id=cs.key("us.candidacy", f"{contest_key}:{candidate_id}:head"),
-                    person_id=person,
-                    option_id=option,
-                    role="head",
-                    ballot_name=ballot,
-                )
+                if (pooled := re.fullmatch(r"(?i)(scattering)|write-?ins?", ballot)) is not None:
+                    cs.add(
+                        "contest_option",
+                        id=option,
+                        contest_id=contest,
+                        kind="others" if pooled[1] else "write_in",
+                        ballot_label="Others" if pooled[1] else "Write-ins",
+                    )
+                else:
+                    if person in cs.minted and person not in persons:
+                        cs.add("person", id=person)
+                        name(person, ballot)
+                    persons.add(person)
+                    cs.add("contest_option", id=option, contest_id=contest, kind="candidate", ballot_label=ballot)
+                    cs.add(
+                        "candidacy",
+                        id=cs.key("us.candidacy", f"{contest_key}:{candidate_id}:head"),
+                        person_id=person,
+                        option_id=option,
+                        role="head",
+                        ballot_name=ballot,
+                    )
                 if won:
                     cs.add("outcome", result_set_id=result_set, option_id=option, kind="elected", seats=None)
                 if not tacit and result_set in cs.minted:
@@ -548,4 +557,5 @@ def emit() -> Path:
                         flags=0,
                         value=votes,
                     )
+        cs.pool("A scattering or write-in line in ALGED read as a candidate")
         return cs.write()

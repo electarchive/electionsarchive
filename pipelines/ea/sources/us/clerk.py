@@ -72,6 +72,7 @@ DROPPED = {(1960, 47, "VA")}
 MEMBERS = {
     (1928, "KY", 3): "R000294",
     (1930, "MO", 7): "M000074",
+    (1954, "MI", 15): "D000354",
     (1974, "CA", 15): "S000454",
 }
 SWAPPED = {(1958, "OH", 23), (1970, "CA", 1), (1972, "OR", 4)}
@@ -530,7 +531,7 @@ def parse() -> None:
         special=pl.col("heading").fill_null("").str.contains(SPECIAL),
         kind=pl.when(pl.col("kind").is_in(["scattering", "write-in"]) & pl.col("name").str.contains(BLANK))
         .then(pl.lit("blank"))
-        .when(pl.col("kind") == "write-in")
+        .when((pl.col("kind") == "write-in") | pl.col("name").str.contains(r"(?i)^write-?ins?$"))
         .then(pl.lit("scattering"))
         .otherwise(pl.col("kind")),
     )
@@ -1392,6 +1393,22 @@ def emit() -> Path:
                 raise ValueError(f"{contest_key}: {len(winners)} elected for {magnitude} seats")
             for person in winners:
                 cs.add("outcome", result_set_id=result_set, option_id=roots[person], kind="elected", seats=1)
+        staged = {(str(row["contest_id"]), row["ballot_label"]): row["id"] for row in cs.rows.get("contest_option", [])}
+        ids = {str(row["id"]) for row in cs.rows.get("contest_option", [])}
+        for old, contest, label in conn.execute(
+            """select o.id, o.contest_id, o.ballot_label from contest_option o join changeset c on c.id = o.changeset_id
+               where c.pipeline = %s and o.kind = 'candidate' and o.parent_option_id is null
+                 and not exists (select from entity_merge m where m.entity_id = o.id)""",
+            [SOURCE],
+        ).fetchall():
+            if str(old) not in ids and (new := staged.get((str(contest), label))) is not None:
+                cs.add("entity_merge", entity_id=old, into_id=new)
+                for (candidacy,) in conn.execute("select id from candidacy where option_id = %s", [old]).fetchall():
+                    cs.add(
+                        "entity_retirement",
+                        entity_id=candidacy,
+                        reason="A candidacy on an option the Clerk's emit re-keyed",
+                    )
         reason = "A party label or write-in line in the Clerk's statistics read as a candidate's name"
         junk = conn.execute(
             """select c.id from candidacy c join changeset ch on ch.id = c.changeset_id

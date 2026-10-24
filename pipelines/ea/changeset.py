@@ -196,6 +196,81 @@ class Changeset:
             )
         }
 
+    def remainders(
+        self,
+        reason: str,
+        pattern: str = r"^(under ?votes?|over ?votes?|blank( votes| ballots)?|spoiled( votes| ballots)?)$",
+    ) -> set[UUID]:
+        options = self.conn.execute(
+            """select o.k, o.id, o.contest_id from contest_option o join changeset c on c.id = o.changeset_id
+               where c.pipeline = %s and o.kind = 'candidate' and o.ballot_label ~* %s""",
+            [self.manifest["pipeline"], pattern],
+        ).fetchall()
+        for (candidacy,) in self.conn.execute(
+            "select id from candidacy where option_id = any(%s::uuid[])", [[id for _, id, _ in options]]
+        ).fetchall():
+            self.add("entity_retirement", entity_id=candidacy, reason=reason)
+        for option, contest in self.conn.execute(
+            """select o.id, o.contest_id from contest_option o
+               where o.id = any(%s::uuid[])
+                 and not exists (select from candidacy where option_id = o.id)
+                 and not exists (select from outcome where option_id = o.id)
+                 and not exists (select from result_set r join result_value v on v.result_set_k = r.k
+                                 where r.contest_id = o.contest_id and v.option_k = o.k)""",
+            [[id for _, id, _ in options]],
+        ).fetchall():
+            self.add("option_drop", option_id=option, contest_id=contest, reason=reason)
+        for (person,) in self.conn.execute(
+            """select p.id from person p join changeset c on c.id = p.changeset_id
+               join name n on n.entity_id = p.id and n.is_preferred
+               where c.pipeline = %s and n.text ~* %s and not exists (select from candidacy where person_id = p.id)""",
+            [self.manifest["pipeline"], pattern],
+        ).fetchall():
+            self.add("entity_retirement", entity_id=person, reason=reason)
+        return {
+            id
+            for (id,) in self.conn.execute(
+                """select distinct r.id from result_set r join result_value v on v.result_set_k = r.k
+                   where r.status = 'active' and r.contest_id = any(%s::uuid[]) and v.option_k = any(%s)""",
+                [[contest for _, _, contest in options], [k for k, _, _ in options]],
+            ).fetchall()
+        }
+
+    def pool(self, reason: str) -> None:
+        pattern = r"^(write-?ins?|scattering|scattered)$"
+        staged = {str(row["id"]) for row in self.rows.get("contest_option", [])}
+        options = self.conn.execute(
+            """select o.id, o.contest_id, o.parent_option_id, o.party_id, o.alliance_id, o.ballot_position, o.ballot_label
+               from contest_option o join changeset c on c.id = o.changeset_id
+               where c.pipeline = %s and o.kind = 'candidate' and o.ballot_label ~* %s""",
+            [self.manifest["pipeline"], pattern],
+        ).fetchall()
+        for option, contest, parent, party, alliance, position, label in options:
+            if str(option) not in staged:
+                written = re.match(r"(?i)write", label) is not None
+                self.add(
+                    "contest_option",
+                    id=option,
+                    contest_id=contest,
+                    kind="write_in" if written else "others",
+                    parent_option_id=parent,
+                    party_id=party,
+                    alliance_id=alliance,
+                    ballot_position=position,
+                    ballot_label="Write-ins" if written else "Others",
+                )
+        for (candidacy,) in self.conn.execute(
+            "select id from candidacy where option_id = any(%s::uuid[])", [[row[0] for row in options]]
+        ).fetchall():
+            self.add("entity_retirement", entity_id=candidacy, reason=reason)
+        for (person,) in self.conn.execute(
+            """select p.id from person p join changeset c on c.id = p.changeset_id
+               join name n on n.entity_id = p.id and n.is_preferred
+               where c.pipeline = %s and n.text ~* %s and not exists (select from candidacy where person_id = p.id)""",
+            [self.manifest["pipeline"], pattern],
+        ).fetchall():
+            self.add("entity_retirement", entity_id=person, reason=reason)
+
     def write(self) -> Path:
         folder = DATA / "changesets" / str(self.id)
         folder.mkdir(parents=True)

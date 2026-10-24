@@ -19,7 +19,7 @@ from ea.sources.us.klarner import LOWER, UPPER
 from ea.store import DATA, connect
 
 SOURCE = "us.sld_specials"
-VERSION = "1"
+VERSION = "2"
 PARSED = DATA / "parsed" / SOURCE
 FLORIDA = "https://results.elections.myflorida.com/ResultsExtract.Asp?ElectionDate={0.month}/{0.day}/{0.year}&OfficialResults=Y"
 IOWA = "https://electionresults.iowa.gov/IA/{}/json/en/summary.json"
@@ -1417,7 +1417,7 @@ def parse() -> None:
                 row["election_date"].startswith(day)
                 and row["office_name"] in ("State Representative", "State Senate")
                 and row["division_type"] == "Locality"
-                and row["candidate_name"] not in ("Total Votes Cast", "Total Ballots Cast")
+                and row["candidate_name"] not in ("Total Votes Cast", "Total Ballots Cast", "Undervotes", "Overvotes")
             ):
                 chamber = "senate" if row["office_name"] == "State Senate" else "house"
                 label = None if WRITE_INS.match(row["candidate_name"]) else row["candidate_name"]
@@ -1472,6 +1472,16 @@ def emit() -> Path:
             summary="State legislative specials and odd-year generals from each state's official results",
             polity="US",
         )
+        published -= {
+            value
+            for (value,) in conn.execute(
+                "select value from external_id where scheme = %s and entity_id = any(%s::uuid[])",
+                [
+                    f"{SOURCE}.result_set",
+                    list(cs.remainders("An undervote line in Virginia's results read as a candidate")),
+                ],
+            )
+        }
 
         def name(entity: UUID, text: str) -> None:
             cs.add("name", entity_id=entity, text=text, lang="en", kind="official", is_preferred=True)

@@ -11,7 +11,7 @@ from ea.changeset import Changeset, slug
 from ea.store import DATA, connect
 
 SOURCE = "us.nyc_boe"
-VERSION = "2"
+VERSION = "3"
 PARSED = DATA / "parsed" / SOURCE
 PUBLISHER = "Board of Elections in the City of New York"
 RESULTS = "https://www.vote.nyc/sites/default/files/pdf/election_results"
@@ -147,6 +147,7 @@ BOROUGHS = {
     "Richmond": ("36085", "Staten Island"),
 }
 WRITE_INS = "Write-ins"
+WRITTEN = ("Write-ins", "WriteIn")
 INACTIVE = "Inactive ballots"
 PERSONS = {
     "Andrew Yang": ("fec.candidate", "P00006486"),
@@ -428,11 +429,11 @@ def emit() -> Path:
                         "contest_option",
                         id=options[label],
                         contest_id=contest,
-                        kind="write_in" if label == WRITE_INS else "candidate",
-                        party_id=None if label == WRITE_INS else party,
-                        ballot_label=label,
+                        kind="write_in" if label in WRITTEN else "candidate",
+                        party_id=None if label in WRITTEN else party,
+                        ballot_label=WRITE_INS if label in WRITTEN else label,
                     )
-                    if label == WRITE_INS:
+                    if label in WRITTEN:
                         continue
                     if label in persons:
                         person = persons[label]
@@ -454,7 +455,7 @@ def emit() -> Path:
                     "votes", descending=True
                 )["label"]
                 for label, option in options.items():
-                    if label != WRITE_INS:
+                    if label not in WRITTEN:
                         cs.add(
                             "outcome",
                             result_set_id=result_set,
@@ -486,4 +487,5 @@ def emit() -> Path:
                         flags=0,
                         value=rounds_frame.filter(pl.col("round") == 1)["votes"].sum(),
                     )
+        cs.pool("The Board of Elections' write-in line read as a candidate")
         return cs.write()

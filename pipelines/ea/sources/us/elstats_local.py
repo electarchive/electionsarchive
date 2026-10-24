@@ -18,7 +18,7 @@ from ea.sources.us.alged import SOURCE as ALGED
 from ea.store import DATA, connect
 
 SOURCE = "us.elstats_local"
-VERSION = "8"
+VERSION = "9"
 PARSED = DATA / "parsed" / SOURCE
 TOWNS = "https://www2.census.gov/geo/tiger/GENZ2020/shp/cb_2020_09_cousub_500k.zip"
 COUNTY = ("board-of-commissioners", "Board of Commissioners", None)
@@ -292,7 +292,11 @@ def parse() -> None:
                 )
             )
     frame = pl.concat(frames).with_columns(
-        candidate=pl.when(pl.col("name").str.contains(r"(?i)^write"))
+        candidate=pl.when(pl.col("name").str.contains(r"(?i)^(?:under ?votes?|blank(?: votes| ballots)?)$"))
+        .then(pl.lit("blank"))
+        .when(pl.col("name").str.contains(r"(?i)^(?:over ?votes?|spoiled(?: votes| ballots)?)$"))
+        .then(pl.lit("invalid"))
+        .when(pl.col("name").str.contains(r"(?i)^write"))
         .then(pl.lit("write-ins"))
         .when(pl.col("name").str.contains(r"(?i)^all other|^scatter"))
         .then(pl.lit("others"))
@@ -526,6 +530,7 @@ def emit() -> Path:
             polity="US",
         )
         zeroed = cs.zeroed()
+        zeroed |= cs.remainders("An undervote, overvote, blank, or spoiled line in ElectionStats read as a candidate")
 
         def name(entity: UUID, text: str) -> None:
             cs.add("name", entity_id=entity, text=text, lang="en", kind="official", is_preferred=True)
@@ -923,6 +928,30 @@ def emit() -> Path:
             for candidate_id, ballot, party, votes, winner in rows.select(
                 "candidate", "name", "party", "votes", "winner"
             ).iter_rows():
+                if candidate_id in ("blank", "invalid"):
+                    if result_set in cs.minted or result_set in zeroed:
+                        for target, value in (
+                            [(unit, votes)]
+                            if counted is None
+                            else [
+                                (precincts.get(place) or cs.unit("us.precinct", place), value)
+                                for place, value in counted.filter(pl.col("candidate") == candidate_id)
+                                .select("unit", "votes")
+                                .iter_rows()
+                            ]
+                        ):
+                            cs.add(
+                                "result_value",
+                                result_set_id=result_set,
+                                unit_id=target,
+                                option_id=None,
+                                channel=0,
+                                measure=6 if candidate_id == "blank" else 5,
+                                count_round=0,
+                                flags=0,
+                                value=value,
+                            )
+                    continue
                 if candidate_id in ("write-ins", "others"):
                     option = cs.key("us.option", f"{contest_key}:{candidate_id}")
                     cs.add(

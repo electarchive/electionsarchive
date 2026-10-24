@@ -17,7 +17,7 @@ from ea.sources.us.medsl_state import DROPPED, EXPANDED, INDEPENDENT, NATIONAL, 
 from ea.store import DATA, connect
 
 SOURCE = "us.medsl_local"
-VERSION = "5"
+VERSION = "6"
 PARSED = DATA / "parsed" / SOURCE
 LISTING = "https://dataverse.harvard.edu/api/datasets/:persistentId/?persistentId=doi:10.7910/DVN/NYTPDU"
 LISTING2022 = "https://dataverse.harvard.edu/api/datasets/:persistentId/?persistentId=doi:10.7910/DVN/UYQIEP"
@@ -956,7 +956,9 @@ def parse() -> None:
                 pl.col("candidate").is_not_null(),
                 pl.col("office").is_not_null(),
                 pl.col("county_fips").is_not_null(),
-                ~pl.col("candidate").str.to_uppercase().is_in([*DROPPED, *VACANT]),
+                ~pl.col("candidate")
+                .str.to_uppercase()
+                .is_in([*DROPPED, *VACANT, "OVER VOTES", "UNDER VOTES", "BLANK"]),
             )
             .collect()
         )
@@ -975,7 +977,10 @@ def parse() -> None:
         frame = (
             frame.with_columns(total=(pl.col("mode") == "TOTAL").any().over(*precinct, "candidate", "party_detailed"))
             .filter(pl.col("total") == (pl.col("mode") == "TOTAL"))
-            .with_columns(pooled=pl.col("candidate").is_in(list(POOLED)) | (pl.col("writein") == "TRUE"))
+            .with_columns(
+                pooled=pl.col("candidate").str.to_uppercase().is_in([*POOLED, "SCATTERING"])
+                | (pl.col("writein") == "TRUE")
+            )
         )
         labels = []
         towns = {}
@@ -1265,7 +1270,10 @@ def emit() -> Path:
             "precinct files",
             polity="US",
         )
-        zeroed = cs.zeroed()
+        zeroed = cs.zeroed() | cs.remainders(
+            "An over vote, under vote, blank, or scattering line in MEDSL's files read as a candidate",
+            r"^(over ?votes?|under ?votes?|blank|scattering)$",
+        )
 
         def name(entity: UUID, text: str) -> None:
             cs.add("name", entity_id=entity, text=text, lang="en", kind="official", is_preferred=True)

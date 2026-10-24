@@ -16,7 +16,7 @@ from ea.sources.us import openelections
 from ea.store import DATA, connect
 
 SOURCE = "us.canvass"
-VERSION = "2"
+VERSION = "3"
 PARSED = DATA / "parsed" / SOURCE
 PAGES = DATA / "pages" / SOURCE
 RHODE_ISLAND = "https://s3.amazonaws.com/rigov/election/results/{year}/general_election/{town}.json"
@@ -776,7 +776,11 @@ def emit() -> Path:
                 f"{day}:{state}:{OR_CHAMBERS[office_text]}:{district}:g"
                 if district is not None
                 else next(
-                    (key for key in existing if key.startswith(f"{day}:{state}:question:medsl:state-{slug(office_text)}-")),
+                    (
+                        key
+                        for key in existing
+                        if key.startswith(f"{day}:{state}:question:medsl:state-{slug(office_text)}-")
+                    ),
                     office_text,
                 )
                 if question
@@ -921,18 +925,19 @@ def emit() -> Path:
                 surname = [word for word in slug(ballot).split("-") if word not in ("jr", "sr", "ii", "iii")][-1]
                 option = next((option for option, words in options if surname in words), None)
                 if option is None:
+                    pooled = re.fullmatch(r"(?i)write-?ins?", ballot) is not None
                     head = person(state, ballot)
                     option = cs.key("us.option", f"{contest_key}:{head}")
                     cs.add(
                         "contest_option",
                         id=option,
                         contest_id=contest,
-                        kind="write_in" if write_in else "candidate",
+                        kind="write_in" if write_in or pooled else "candidate",
                         party_id=party_id,
-                        ballot_label=ballot,
+                        ballot_label="Write-ins" if pooled else ballot,
                     )
                     for role, text in (("head", ballot), ("running_mate", title(str(mate)) if mate else None)):
-                        if text:
+                        if text and not pooled:
                             cs.add(
                                 "candidacy",
                                 id=cs.key("us.candidacy", f"{contest_key}:{head}:{role}"),
@@ -995,4 +1000,5 @@ def emit() -> Path:
                     kind="won" if question else "elected",
                     seats=None if question else 1,
                 )
+        cs.pool("A write-in line in the state canvass read as a candidate")
         return cs.write()
