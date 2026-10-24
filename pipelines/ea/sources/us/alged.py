@@ -1,5 +1,6 @@
 import io
 import json
+import math
 import re
 import zipfile
 from datetime import date
@@ -93,6 +94,29 @@ def parse() -> None:
     ).with_columns(
         fips=pl.when(pl.col("office") == "School Board").then(pl.lit("sd") + pl.col("fips")).otherwise("fips")
     )
+    seats = ["Mayor", "Sheriff", "Prosecutor", "County Executive"]
+    contests = (
+        frame.filter(pl.col("office").is_in(seats))
+        .group_by("contest")
+        .agg(
+            pl.len().alias("rows"),
+            pl.col("votes").sum().alias("votes"),
+            pl.first("fips", "office", "year", "month"),
+        )
+    )
+    cycles = {
+        key: sorted(set(rows["year"])) for key, rows in contests.filter(pl.col("votes") > 5).group_by("fips", "office")
+    }
+    phantoms = []
+    for contest, rows, votes, fips, office, year, month in contests.select(
+        "contest", "rows", "votes", "fips", "office", "year", "month"
+    ).iter_rows():
+        years = cycles.get((fips, office), [])
+        if rows == 1 and (votes or 0) <= 1 and month is not None and len(years) >= 3:
+            step = math.gcd(*[other - years[0] for other in years[1:]])
+            if step >= 2 and (year - years[0]) % step:
+                phantoms.append(contest)
+    frame = frame.filter(~pl.col("contest").is_in(phantoms))
     wanted = set(frame.filter(pl.col("fips").str.len_chars() > 5)["fips"])
     records: list[tuple[dict[str, object], str]] = []
     for url in [PLACES, *SCHOOLS]:
