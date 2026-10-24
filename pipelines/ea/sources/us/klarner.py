@@ -159,6 +159,7 @@ CORRECTED = {
 }
 RELOCATED = {caseid: ("29", "2838", "harri anne") for caseid in (335434, 335435, 335436)}
 OUTCOMES = {335434: "w", 335435: "w", 335436: "w", 335475: "l", 335476: "l", 335477: "l"}
+RESTAGED = {"2014-11-04:AL:senate:24:g"}
 RETIRED = {
     (
         "us.option",
@@ -793,7 +794,7 @@ def emit() -> Path | str:
                 supersedes_id=None if result_set == first else first,
                 completeness=None if group["votes"].is_null().any() else 1,
             )
-            fresh = result_set in cs.minted or result_set in zeroed
+            fresh = result_set in cs.minted or result_set in zeroed or contest_key in RESTAGED
             nomination = "primary" in label
             for index, (candid, rows) in enumerate(group.group_by("candid", maintain_order=True)):
                 row = rows.row(0, named=True)
@@ -894,6 +895,10 @@ def emit() -> Path | str:
         for (scheme, value), reason in RETIRED.items():
             if (
                 value.split(":")[1] in chunk.split(",")
+                and not (
+                    scheme == "us.option"
+                    and conn.execute("select 1 from candidacy where option_id = %s", [cs.key(scheme, value)]).fetchone()
+                )
                 and (scheme, value)
                 in conn.execute(
                     """select x.scheme, x.value from external_id x join entity e on e.id = x.entity_id
