@@ -7188,7 +7188,7 @@ async function races(
       )
       select c.id, c.kind::text as kind, k.own as "isOwn",
         case when c.kind = 'ballot_question' then c.id::text
-          else concat_ws(':', c.office_id, c.body_id, c.kind, case when e.kind <> 'general' then e.date_from end, c.party_scope_id, k.stage) end as series,
+          else concat_ws(':', c.office_id, c.body_id, c.kind, case when e.kind <> 'general' then e.date_from end, case when e.kind = 'by_election' then c.id end, c.party_scope_id, k.stage) end as series,
         coalesce(c.body_id, c.office_id) as owner, c.office_id as office, c.election_id as election,
         (select p.office_id from contest p where p.id = c.allocation_parent_id and c.kind = 'elector_slate') as elects,
         case when c.kind = 'office' then null else c.body_id end as body,
