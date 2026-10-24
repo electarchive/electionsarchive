@@ -9894,7 +9894,12 @@ export const polities = {
                     count: race.count,
                     contested,
                     measure: race.measure,
-                    results: race.results.slice(0, 3),
+                    results: (contested > 0
+                      ? race.results.toSorted(
+                          (a, b) => (b.seats ?? 0) - (a.seats ?? 0),
+                        )
+                      : race.results
+                    ).slice(0, 3),
                   };
                 }),
               },
