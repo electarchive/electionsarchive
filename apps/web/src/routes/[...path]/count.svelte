@@ -104,7 +104,7 @@
   <div class="flex flex-wrap items-center justify-between gap-x-6 gap-y-2">
     <div class="grid gap-0.5">
       <h2 id="{uid}-title" class="text-sm font-semibold">
-        {m.count_title()}
+        {count.stv == null ? m.count_title() : m.count_title_stv()}
       </h2>
       <p class="text-[0.8125rem] text-muted-foreground">
         {#if action == null}

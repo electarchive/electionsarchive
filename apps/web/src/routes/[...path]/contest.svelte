@@ -682,9 +682,15 @@
     return moves.length === 0 ? null : Object.fromEntries(moves);
   });
   const members = $derived.by(() => {
-    const won = contest.rows.filter((row) => (row.current?.seats ?? 0) > 0);
+    const seated = contest.rows.filter((row) => (row.current?.seats ?? 0) > 0);
+    const won =
+      seated.length === 0 && contest.isStv
+        ? contest.rows.filter((row) => row.current?.outcome === "elected")
+        : seated;
     return won.length > 1 &&
-      won.every((row) => row.current?.person != null && row.current.seats === 1)
+      won.every(
+        (row) => row.current?.person != null && (row.current.seats ?? 1) === 1,
+      )
       ? won
       : null;
   });
@@ -869,10 +875,13 @@
               ),
             });
     }
-    if (seated) {
+    if (seated || (contest.isStv && members != null)) {
       let total = 0;
       for (const row of contest.rows) {
         total += row.current?.seats ?? 0;
+      }
+      if (total === 0) {
+        total = members?.length ?? 0;
       }
       if (members != null && (members.length <= 4 || contest.isStv)) {
         const names = new Intl.ListFormat(getLocale(), {

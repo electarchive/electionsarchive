@@ -217,6 +217,7 @@
   "no_results": "No results are published for this contest yet.",
   "no_counts": "Only turnout is recorded for this contest. No party or candidate votes are available.",
   "count_title": "Ranked-choice count",
+  "count_title_stv": "Single transferable vote count",
   "count_round": "Round {round}",
   "count_final": "Final round",
   "count_previous": "Previous round",
