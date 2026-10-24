@@ -151,6 +151,23 @@ CHARLOTTE_NOTE = (
     "results files for 2011 and 2013, summed, with 2013's named write-ins counted in the write-ins line. Party labels "
     "are as printed; the 1999 and 2001 pages print none."
 )
+RHODE_ISLAND = "https://rigov.s3.amazonaws.com/election/results/{}/general_election/providence.json"
+PROVIDENCE = {
+    date(2002, 11, 5): "https://web.archive.org/web/20090416063146id_/http://www.elections.ri.gov/downloads/LOCAL.zip",
+    date(2006, 11, 7): (
+        "https://web.archive.org/web/20090416062619id_/"
+        "http://www.elections.ri.gov/elections/results/2006/generalelection/sumprov.php"
+    ),
+    date(2010, 11, 2): RHODE_ISLAND.format(2010),
+    date(2014, 11, 4): RHODE_ISLAND.format(2014),
+    date(2018, 11, 6): RHODE_ISLAND.format(2018),
+}
+PROVIDENCE_NOTE = (
+    "Citywide totals from the Rhode Island Board of Elections' results for the city of Providence: its 2002 local "
+    "precinct workbook (summed) and 2006 Providence summary page, both from the Internet Archive's copies of its old "
+    "site, and its results files from 2010 on. Party labels are "
+    "as printed; independents carry none. The 2014 file reports 79 of 80 precincts."
+)
 SURNAMES = {"clarke": "clark"}
 PARTIES = {
     "D": ("democratic-party", "Democratic"),
@@ -218,6 +235,8 @@ def fetch() -> None:
         raw.fetch(SOURCE, ERIE + name, suffix=Path(name).suffix)
     for link in CHARLOTTE.values():
         raw.fetch(SOURCE, link, suffix=".zip" if link.endswith(".zip") else ".html")
+    for link in PROVIDENCE.values():
+        raw.fetch(SOURCE, link, suffix=Path(link).suffix if link.endswith((".zip", ".json")) else ".html")
 
 
 def parse() -> None:
@@ -541,6 +560,54 @@ def parse() -> None:
         ).with_columns(day=pl.lit(day), place=pl.lit("3712000"), county=pl.lit(None, pl.String))
         print(day, frame.select("candidate", "party", "votes").rows())
         rows.append(frame)
+    for day, link in PROVIDENCE.items():
+        path = raw.cached(SOURCE, link).path
+        if day.year == 2002:
+            with zipfile.ZipFile(path) as archive:
+                sheet = fastexcel.read_excel(archive.read("LOCAL.xls")).load_sheet("LOCAL CAND", header_row=4)
+            lines = (
+                sheet.to_polars()
+                .filter(pl.col("MUNICIPALITY") == "PROVIDENCE", pl.col("CONTEST").str.strip_chars() == "MAYOR")
+                .group_by("CANDIDATE", "PARTY", maintain_order=True)
+                .agg(pl.col("TOTAL").cast(pl.Float64).sum().cast(pl.Int64))
+                .rows()
+            )
+        elif day.year == 2006:
+            text = [
+                line.strip()
+                for line in re.sub(r"<[^>]+>", "\n", html.unescape(path.read_text(errors="replace"))).splitlines()
+                if line.strip()
+            ]
+            start = text.index("MAYOR CITY OF PROVIDENCE") + 6
+            lines = []
+            while not text[start].isupper():
+                lines.append((text[start], text[start + 1], text[start + 4].split(" - ")[0]))
+                start += 5
+        else:
+            lines = [
+                (row["name"], row["party_code"], row["votes"])
+                for row in next(
+                    contest
+                    for contest in json.loads(path.read_text())["contests"]
+                    if contest["name"].upper() == "MAYOR CITY OF PROVIDENCE"
+                )["candidates"]
+            ]
+        frame = pl.DataFrame(
+            [
+                (
+                    "Write In"
+                    if name.upper().startswith("WRITE")
+                    else " ".join(word.title() if word.isupper() else word for word in name.split()),
+                    party.upper() if party is not None and party.upper() in PARTIES else None,
+                    int(str(votes).replace(",", "")),
+                )
+                for name, party, votes in lines
+            ],
+            schema={"candidate": pl.String, "party": pl.String, "votes": pl.Int64},
+            orient="row",
+        ).with_columns(day=pl.lit(day), place=pl.lit("4459000"), county=pl.lit(None, pl.String))
+        print(day, frame.select("candidate", "party", "votes").rows())
+        rows.append(frame)
     candidates = (
         pl.concat(rows, how="diagonal")
         .group_by("day", "place", "county", "candidate", "party", maintain_order=True)
@@ -632,6 +699,13 @@ def emit() -> Path:
                 "https://www.ncsbe.gov/results-data/election-results/historical-election-results-data",
                 [link for link in CHARLOTTE.values() if link.endswith(".zip")],
             ),
+            (
+                "4459000",
+                "Rhode Island Board of Elections",
+                "Election results by city and town",
+                "https://www.ri.gov/election/results/",
+                list(PROVIDENCE.values()),
+            ),
         ):
             sources[place] = cs.source(publisher, title)
             cs.add(
@@ -663,6 +737,7 @@ def emit() -> Path:
                 "4261000": "pittsburgh_PA",
                 "3611000": "buffalo_NY",
                 "3712000": "charlotte_NC",
+                "4459000": "providence_RI",
             }[place]
             contest_key = f"alged:{place}_{day.year}_11_{city}_Mayor_mayor_1"
             contest = cs.key("us.contest", contest_key)
@@ -710,6 +785,7 @@ def emit() -> Path:
                     "4261000": PITTSBURGH_NOTE,
                     "3611000": BUFFALO_NOTE,
                     "3712000": CHARLOTTE_NOTE,
+                    "4459000": PROVIDENCE_NOTE,
                 }.get(place, DC_NOTE),
             )
             totals = (
