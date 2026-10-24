@@ -672,6 +672,18 @@
     }
   ],
   "lists_winners": "Lists that won seats",
+  "lists_unranked_title": "Members elected",
+  "lists_unranked_summary": [
+    {
+      "declarations": ["input seats", "local seatsPlural = seats: plural"],
+      "selectors": ["seatsPlural"],
+      "match": {
+        "seatsPlural=one": "{seats} seat filled from party lists. The source names only the elected members, not the full ranked lists.",
+        "seatsPlural=*": "{seats} seats filled from party lists. The source names only the elected members, not the full ranked lists."
+      }
+    }
+  ],
+  "col_members": "Members elected",
   "lists_all": [
     {
       "declarations": ["input count", "local countPlural = count: plural"],

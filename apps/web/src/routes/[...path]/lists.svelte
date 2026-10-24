@@ -27,7 +27,9 @@
   let isFull = $state(false);
 
   const winners = $derived(lists.lists.filter((list) => list.seats > 0));
-  const shown = $derived(isAll || winners.length === 0 ? lists.lists : winners);
+  const shown = $derived(
+    (isAll && lists.isRanked) || winners.length === 0 ? lists.lists : winners,
+  );
   const ladders = $derived(
     shown.map((list) => {
       let cut = 0;
@@ -37,7 +39,7 @@
         }
       }
       const next =
-        list.seats > 0
+        list.seats > 0 && lists.isRanked
           ? (list.members.find(
               (member, index) =>
                 index >= cut && member.fate == null && member.elsewhere == null,
@@ -69,14 +71,16 @@
   <header class="flex flex-wrap items-end justify-between gap-x-6 gap-y-2.5">
     <div class="grid gap-0.5">
       <h2 id="{uid}-title" class="heading">
-        {m.lists_title()}
+        {lists.isRanked ? m.lists_title() : m.lists_unranked_title()}
       </h2>
       <p class="text-sm text-muted-foreground">
-        {m.lists_summary({ seats: lists.seats })}
+        {lists.isRanked
+          ? m.lists_summary({ seats: lists.seats })
+          : m.lists_unranked_summary({ seats: lists.seats })}
       </p>
     </div>
     <div class="flex flex-wrap items-center gap-2">
-      {#if winners.length > 0 && winners.length < lists.lists.length}
+      {#if lists.isRanked && winners.length > 0 && winners.length < lists.lists.length}
         <div class="flex" role="group" aria-label={m.lists_title()}>
           {#each [false, true] as value (value)}
             <button
@@ -109,26 +113,30 @@
     </div>
   </header>
 
-  <ul
-    class="flex flex-wrap items-center gap-x-4 gap-y-1 text-[0.8125rem] text-muted-foreground"
-  >
-    <li class="flex items-center gap-1.5">
-      <span
-        class="rounded-xs bg-[color-mix(in_oklab,var(--foreground)_14%,var(--card))] shadow-[inset_3px_0_0_var(--foreground)] block-3 inline-5"
-        aria-hidden="true"
-      ></span>
-      {m.lists_elected()}
-    </li>
-    <li class="flex items-center gap-1.5">
-      <span class="bg-foreground block-0.5 inline-5" aria-hidden="true"></span>
-      <Term label={m.lists_cut()} definition={m.term_cut()} />
-    </li>
-    <li class="flex items-center gap-1.5">
-      <span class="highlighter px-1 text-foreground" aria-hidden="true">Aa</span
-      >
-      <Term label={m.lists_next()} definition={m.term_next()} />
-    </li>
-  </ul>
+  {#if lists.isRanked}
+    <ul
+      class="flex flex-wrap items-center gap-x-4 gap-y-1 text-[0.8125rem] text-muted-foreground"
+    >
+      <li class="flex items-center gap-1.5">
+        <span
+          class="rounded-xs bg-[color-mix(in_oklab,var(--foreground)_14%,var(--card))] shadow-[inset_3px_0_0_var(--foreground)] block-3 inline-5"
+          aria-hidden="true"
+        ></span>
+        {m.lists_elected()}
+      </li>
+      <li class="flex items-center gap-1.5">
+        <span class="bg-foreground block-0.5 inline-5" aria-hidden="true"
+        ></span>
+        <Term label={m.lists_cut()} definition={m.term_cut()} />
+      </li>
+      <li class="flex items-center gap-1.5">
+        <span class="highlighter px-1 text-foreground" aria-hidden="true"
+          >Aa</span
+        >
+        <Term label={m.lists_next()} definition={m.term_next()} />
+      </li>
+    </ul>
+  {/if}
 
   <div
     class="grid grid-cols-[repeat(auto-fill,minmax(min(100%,15rem),1fr))] gap-px overflow-hidden rounded-md border"
@@ -181,7 +189,11 @@
             )}
             <li
               class={cn(
-                "grid grid-cols-[2.25ch_minmax(0,1fr)_auto] items-center gap-x-2 px-2.5 block-7",
+                "grid items-center gap-x-2 px-2.5 block-7",
+                {
+                  "grid-cols-[2.25ch_minmax(0,1fr)_auto]": lists.isRanked,
+                  "grid-cols-[minmax(0,1fr)_auto]": !lists.isRanked,
+                },
                 {
                   "bg-[color-mix(in_oklab,var(--party)_16%,var(--card))] shadow-[inset_3px_0_0_var(--party)]":
                     member.fate === "elected",
@@ -190,15 +202,21 @@
                   "border-bs-2 border-foreground":
                     index === 0 && ladder.cut === 0 && ladder.seats === 0,
                   "border-be-2 border-foreground":
-                    ladder.cut > 0 && index === ladder.cut - 1,
+                    lists.isRanked &&
+                    ladder.cut > 0 &&
+                    index === ladder.cut - 1,
                 },
               )}
             >
-              <span
-                class="text-end font-figures text-xs text-muted-foreground tabular-nums"
-                aria-label={m.lists_rank({ position: member.position })}
-                >{member.position}</span
-              >
+              {#if member.position != null}
+                <span
+                  class="text-end font-figures text-xs text-muted-foreground tabular-nums"
+                  aria-label={m.lists_rank({ position: member.position })}
+                  >{member.position}</span
+                >
+              {:else if lists.isRanked}
+                <span></span>
+              {/if}
               <span class="flex min-inline-0">
                 <Name
                   class={cn("truncate min-inline-0", {

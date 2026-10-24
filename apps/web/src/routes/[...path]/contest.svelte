@@ -2015,7 +2015,7 @@
   {/if}
 {/if}
 
-{#if lists != null && !drilled}
+{#if lists != null && additional == null && !drilled}
   <Lists {lists} />
 {/if}
 

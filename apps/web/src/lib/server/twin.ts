@@ -368,6 +368,7 @@ function markdown(data: Data, link: Link) {
         data.handover,
         data.additional,
         data.successors,
+        data.lists,
         link,
       );
     }
@@ -1297,6 +1298,7 @@ function contestMarkdown(
   handover: Extract<Data, { kind: "contest" }>["handover"],
   additional: Extract<Data, { kind: "contest" }>["additional"],
   successors: Extract<Data, { kind: "contest" }>["successors"],
+  lists: Extract<Data, { kind: "contest" }>["lists"],
   link: Link,
 ) {
   const groups: Record<string, () => string> = {
@@ -1431,6 +1433,28 @@ function contestMarkdown(
     ...compared,
     ...held,
     resultsMarkdown(contest, then),
+    ...(lists == null ||
+    lists.isRanked ||
+    lists.seats === 0 ||
+    additional != null
+      ? []
+      : [
+          `## ${m.lists_unranked_title()}`,
+          m.lists_unranked_summary({ seats: lists.seats }),
+          table(
+            [m.col_party(), m.col_seats(), m.col_members()],
+            lists.lists
+              .filter((list) => list.seats > 0)
+              .map((list) => [
+                list.label,
+                count(list.seats),
+                list.members
+                  .filter((member) => member.fate === "elected")
+                  .map((member) => member.name)
+                  .join(", "),
+              ]),
+          ),
+        ]),
     ...(additional == null
       ? []
       : [

@@ -6082,6 +6082,7 @@ export const contests = {
       v.nullable(
         v.object({
           seats: v.number(),
+          isRanked: v.boolean(),
           lists: v.array(
             v.object({
               key: v.string(),
@@ -6093,7 +6094,7 @@ export const contests = {
               seats: v.number(),
               members: v.array(
                 v.object({
-                  position: v.number(),
+                  position: v.nullable(v.number()),
                   person: v.string(),
                   name: v.string(),
                   fate: v.nullable(
@@ -6154,7 +6155,10 @@ export const contests = {
           f.kind::text as fate, f.notes as note
         from contest_option o
         join candidacy cy on cy.option_id = o.id
-          and ((o.kind = 'list' and cy.role = 'list_member' and cy.list_position is not null) or (o.kind = 'others' and cy.role = 'head'))
+          and ((o.kind = 'list' and cy.role = 'list_member' and (cy.list_position is not null or exists (
+            select from outcome x join result_set r on r.id = x.result_set_id and r.is_default
+            where x.candidacy_id = cy.id and x.kind = 'elected'
+          ))) or (o.kind = 'others' and cy.role = 'head'))
         left join entity_merge m on m.entity_id = cy.person_id
         left join entity_merge pm on pm.entity_id = o.party_id
         left join lateral (
@@ -6269,12 +6273,11 @@ export const contests = {
               head?.seats ??
               members.filter((row) => row.fate === "elected").length,
             members: members
-              .toSorted((a, b) => (a.position ?? 0) - (b.position ?? 0))
               .map((row) => {
                 const other =
                   row.fate === "elected" ? null : seated.get(row.person);
                 return {
-                  position: row.position ?? 0,
+                  position: row.position,
                   person: row.person,
                   name: labels.full.get(row.person) ?? "",
                   fate: row.fate,
@@ -6287,6 +6290,15 @@ export const contests = {
                           path: slugs.get(other) ?? null,
                         },
                 };
+              })
+              .toSorted((a, b) => {
+                const round = (note: string | null) =>
+                  Number(/round (\d+)/u.exec(note ?? "")?.[1] ?? Infinity);
+                return (
+                  (a.position ?? Infinity) - (b.position ?? Infinity) ||
+                  round(a.note) - round(b.note) ||
+                  a.name.localeCompare(b.name)
+                );
               }),
           };
         })
@@ -6323,6 +6335,9 @@ export const contests = {
       }
       return {
         seats,
+        isRanked: found.rows.every(
+          (row) => row.kind !== "list" || row.position != null,
+        ),
         lists,
         independents,
         replacements: replaced.rows.flatMap((row) => {
