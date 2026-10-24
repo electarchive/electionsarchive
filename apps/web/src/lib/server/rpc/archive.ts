@@ -7823,8 +7823,17 @@ async function races(
                 ) y
                 where w.party_id is null and y.value is not null
                 order by ch.parent_option_id, y.value desc
+              ),
+              now as materialized (
+                select distinct coalesce(m.into_id, o.party_id) as party
+                from contest c
+                join contest_option o on o.contest_id = c.id and o.party_id is not null
+                left join entity_merge m on m.entity_id = o.party_id
+                join outcome x on x.option_id = o.id and x.kind in ('elected', 'won') and x.candidacy_id is null
+                join result_set rs on rs.id = x.result_set_id and rs.is_default
+                where c.election_id = ${head.election}::uuid and coalesce(c.body_id, c.office_id) = ${head.owner}::uuid
               )
-              select coalesce(bm.into_id, br.parent_party_id, pm.into_id, w.party_id, ld.party_id) as party,
+              select coalesce(bm.into_id, br.parent_party_id, lin.party, pm.into_id, w.party_id, ld.party_id) as party,
                 sum(w.seats)::int as seats,
                 (select count(*)::int from roots where ${isInside} and parents <> 1) as doubt
               from winners w
@@ -7833,6 +7842,21 @@ async function races(
               left join party_affiliation br on br.party_id = coalesce(pm.into_id, w.party_id, ld.party_id)
                 and br.kind = 'regional_branch' and br.valid @> (select day from last)
               left join entity_merge bm on bm.entity_id = br.parent_party_id
+              left join lateral (
+                select n.party from party_relation r
+                cross join lateral (
+                  select case when r.kind = 'successor_of' then r.to_party_id else r.from_party_id end as old,
+                    case when r.kind = 'successor_of' then r.from_party_id else r.to_party_id end as new
+                ) d
+                left join entity_merge nm on nm.entity_id = d.new
+                cross join lateral (select coalesce(nm.into_id, d.new) as party) n
+                where r.kind in ('merged_into', 'absorbed_by', 'successor_of')
+                  and d.old = coalesce(pm.into_id, w.party_id, ld.party_id)
+                  and r.date > (select day from last) and r.date <= ${date}::date + 365
+                  and n.party in (select party from now)
+                  and coalesce(pm.into_id, w.party_id, ld.party_id) not in (select party from now)
+                limit 1
+              ) lin on true
               group by 1
               union all
               select distinct coalesce(bm.into_id, br.parent_party_id, pm.into_id, o.party_id), 0, 0
