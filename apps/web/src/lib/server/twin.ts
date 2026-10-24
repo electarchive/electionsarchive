@@ -732,7 +732,9 @@ function personMarkdown(
                   )
                   .map((spell) => [
                     party,
-                    roles[spell.kind](),
+                    lane.party == null && spell.kind === "office"
+                      ? m.person_parties_office_independent()
+                      : roles[spell.kind](),
                     spell.from == null && spell.to == null
                       ? null
                       : years(spell.from, spell.to),
@@ -1585,13 +1587,6 @@ function electionMarkdown(
               }),
             ]
           : []),
-      ];
-    }),
-    ...(governments.every((government) => government.isBefore)
-      ? []
-      : [
-          `## ${m.governments_title()}`,
-          m.governments_lede(),
         ...(race.repeats ?? []).map((repeat) =>
           repeat.people.length === 1
             ? m.race_repeat_one({
@@ -1611,6 +1606,13 @@ function electionMarkdown(
                 members: count(repeat.members),
               }),
         ),
+      ];
+    }),
+    ...(governments.every((government) => government.isBefore)
+      ? []
+      : [
+          `## ${m.governments_title()}`,
+          m.governments_lede(),
           table(
             [
               m.col_name(),
@@ -2230,13 +2232,6 @@ function contestMarkdown(
                   .join("\n"),
               ]),
         ]),
-    ...countMarkdown(contest),
-    ...placesMarkdown(contest.places, link, then),
-    ...(contest.children.length === 0
-      ? []
-      : [
-          `## ${m.children_title()}`,
-          contest.children
     ...(lists == null || lists.replacements.length === 0
       ? []
       : [
@@ -2278,6 +2273,13 @@ function contestMarkdown(
             })
             .join("\n"),
         ]),
+    ...countMarkdown(contest),
+    ...placesMarkdown(contest.places, link, then),
+    ...(contest.children.length === 0
+      ? []
+      : [
+          `## ${m.children_title()}`,
+          contest.children
             .map((child) => `- ${link(child.name, child.path)}`)
             .join("\n"),
         ]),

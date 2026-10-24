@@ -13284,7 +13284,7 @@ export const people = {
         ),
         totals as (
           select f.root, m.main, m.appointed, sum(f.value) as total,
-            coalesce(sum(f.value) filter (where f.option in (select k from lines)), 0) as votes
+            sum(f.value) filter (where f.option in (select k from lines)) as votes
           from fetched f join mains m on m.root = f.root and m.main = f.measure
             join rounds d on d.root = f.root and d.rk = f.rk and d.measure = f.measure
           where f.count_round = d.round and f.option <> 0

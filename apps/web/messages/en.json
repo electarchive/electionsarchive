@@ -1322,6 +1322,7 @@
   "person_parties": "Party history",
   "person_parties_lede": "Ran or served under {count} parties between {first} and {last}.",
   "person_parties_office": "Sat for the party",
+  "person_parties_office_independent": "Sat as independent",
   "person_parties_member": "Party member",
   "person_parties_group": "Caucus or parliamentary group",
   "person_caucus": "{caucus} caucus",
