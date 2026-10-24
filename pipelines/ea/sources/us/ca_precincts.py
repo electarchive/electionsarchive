@@ -23,29 +23,30 @@ def emit(
     title: str,
     listing: str,
     method: str,
+    state_code: str = "CA",
 ) -> Path:
     days = sorted(set(rows["day"]))
     with connect() as conn:
-        cs = Changeset(conn, pipeline=pipeline, version=version, summary=summary, polity="US-CA")
-        cs.scope_units("us.precinct", f"%:CA:{fips}:%")
+        cs = Changeset(conn, pipeline=pipeline, version=version, summary=summary, polity=f"US-{state_code}")
+        cs.scope_units("us.precinct", f"%:{state_code}:{fips}:%")
         county = conn.execute(
             "select id, area_id from reporting_unit where scheme_code = 'us.county' and code = %s", [fips]
         ).fetchone()
         if county is None:
             raise ValueError(f"{place} has no unit")
-        state = cs.polity("US-CA")
+        state = cs.polity(f"US-{state_code}")
         contests = conn.execute(
             """select distinct on (k.id) k.id, k.election_id, e.date_from, rs.stage, rs.kind,
                       (select min(v.count_round) from result_value v where v.result_set_k = rs.k and v.measure = 1)
                from contest k join election e on e.id = k.election_id
                join result_set rs on rs.contest_id = k.id and rs.is_default
                where e.date_from = any(%s) and exists (
-                 select 1 from slug s where s.entity_id = e.polity_id and (s.path = 'us/ca' or s.path like 'us/ca/%%'))
+                 select 1 from slug s where s.entity_id = e.polity_id and (s.path = %s or s.path like %s))
                  and not exists (
                    select 1 from result_set r2 join result_value v on v.result_set_k = r2.k
                    join reporting_unit u on u.k = v.unit_k
                    where r2.contest_id = k.id and u.scheme_code = 'us.precinct')""",
-            [days],
+            [days, f"us/{state_code.lower()}", f"us/{state_code.lower()}/%%"],
         ).fetchall()
         ids = [contest for contest, *_ in contests]
         notes = dict(
@@ -159,7 +160,8 @@ def emit(
                 completeness=round(sum(votes for _, votes in picked.values()) / official, 4),
             )
             codes = {
-                precinct: f"{day}:CA:{fips}:{place}:{precinct}" for precinct in frame["precinct"].unique().to_list()
+                precinct: f"{day}:{state_code}:{fips}:{place}:{precinct}"
+                for precinct in frame["precinct"].unique().to_list()
             }
             unit_ids = {}
             for precinct, code in codes.items():
