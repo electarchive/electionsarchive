@@ -22,6 +22,7 @@ def emit(
     artifacts: Iterable[Artifact],
     note_for: Callable[[str], str],
     official: bool = False,
+    hold: frozenset[str] = frozenset(),
     statewide: bool = False,
 ) -> Path:
     with connect() as conn:
@@ -71,6 +72,13 @@ def emit(
                    from result_set where contest_id = %s and is_default""",
                 [contest],
             ).fetchall()
+            if len(old) == 2:
+                old = conn.execute(
+                    """select r.id, r.election_id, r.contest_id, r.stage, r.kind, r.status, r.source_id, r.as_of,
+                       r.completeness, r.supersedes_id from result_set r join changeset c on c.id = r.changeset_id
+                       where r.contest_id = %s and r.is_default and c.pipeline <> %s""",
+                    [contest, source_name],
+                ).fetchall()
             if len(old) != 1:
                 print(f"{key}: {len(old)} default result sets")
                 continue
@@ -126,7 +134,7 @@ def emit(
             ]
             print(key, "ties" if ties else f"differs {differences}")
             result_set = cs.key(f"{source_name}.result_set", key)
-            default = ties or official
+            default = ties or (official and key not in hold)
             if default:
                 cs.add(
                     "result_set",

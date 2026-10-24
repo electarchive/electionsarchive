@@ -177,4 +177,16 @@ def emit() -> Path:
         pl.read_parquet(PARSED / "lines.parquet"),
         [raw.cached(SOURCE, URL.format(year, "gen" if year < 1938 else "prim_gen")) for year in [*EARLY_DAYS, *DAYS]],
         lambda key: METHOD,
+        official=True,
+        hold=frozenset(
+            f"{day}:NE:house:{district}"
+            for day, district in [
+                ("1976-11-02", 3),
+                ("1944-11-07", 4),
+                ("1942-11-03", 1),
+                ("1942-11-03", 3),
+                ("1940-11-05", 4),
+                ("1922-11-07", 2),
+            ]
+        ),
     )

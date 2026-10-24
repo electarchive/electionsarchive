@@ -24,7 +24,7 @@ PAGES = {
 }
 PRINTED = {1994: [530, 531, 532], 1998: [561, 562, 563]}
 DAYS = {1992: date(1992, 11, 3), 1994: date(1994, 11, 8), 1998: date(1998, 11, 3)}
-PRINTED_SUMS = {("1972-11-07", "3"): [124365, 53523, 465]}
+PRINTED_SUMS = {("1972-11-07", "3"): [124365, 53523, 465], ("1934-11-06", "3"): [61548, 39953, 91], ("1938-11-08", "2"): [51451, 37294, 49], ("1938-11-08", "6"): [52774, 52159, 12]}
 PAGE_FIXES = {(62628, "868"): "888"}
 TOTALS = {(1998, 7): [43416, 129746, 5639]}
 EARLY = [
@@ -42,6 +42,9 @@ METHOD = (
     "reports apart, is added into Jackson County."
 )
 NOTES = {
+    "1938-11-08:MO:house:2": " The Manual prints 48 as the Socialist total, but its county rows (checked against the page image) sum to 49.",
+    "1938-11-08:MO:house:6": " The Manual prints 11 as the Socialist-Labor total, but its county rows (checked against the page image) sum to 12.",
+    "1934-11-06:MO:house:3": " The Manual prints 84 as the Socialist total, but its county rows (checked against the page image) sum to 91.",
     "1972-11-07:MO:house:3": " The Manual prints 54,523 as the Republican total, which the FEC also reports, but its two printed parts (30,034 in the city and 23,489 in the county) sum to 53,523.",
     "1992-11-03:MO:house:8": " The county rows fall short of the printed district total by 270 Republican votes; every cell was checked against the page image."
 }
@@ -162,14 +165,18 @@ def parse() -> None:
     for (day, district, _), block in EARLY:
         total = PRINTED_SUMS.get((day, district)) or [int(value) for value in block[-1].split()[1:]]
         table = [
-            (line.rsplit(" ", len(total))[0], [int(value) for value in line.rsplit(" ", len(total))[1:]])
+            (
+                line.rsplit(" ", len(total))[0],
+                [None if value == "-" else int(value) for value in line.rsplit(" ", len(total))[1:]],
+            )
             for line in block[:-1]
         ]
-        if [sum(values[column] for _, values in table) for column in range(len(total))] != total:
+        if [sum(values[column] or 0 for _, values in table) for column in range(len(total))] != total:
             raise ValueError(f"{day} district {district}: rows do not tie the printed totals {total}")
         for name, values in table:
             for column, votes in enumerate(values):
-                rows.append((day, int(district), keys[re.sub(r"[^a-z]", "", name.lower())], str(column), votes))
+                if votes is not None:
+                    rows.append((day, int(district), keys[re.sub(r"[^a-z]", "", name.lower())], str(column), votes))
     frame = (
         pl.DataFrame(rows, schema=["day", "district", "county", "column", "votes"], orient="row")
         .group_by("day", "district", "county", "column", maintain_order=True)
