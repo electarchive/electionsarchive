@@ -1036,7 +1036,7 @@ SWITCHES = {
     (2012, "S4VT00033"): "IND",
     (2020, "H0CT04211"): "IP",
 }
-SWAPPED = {(2006, "H8NY19058"): ("DEM", "WF"), (2008, "H8NY21203"): ("D", "WF")}
+SWAPPED = {(2006, "H8NY19058"): ("DEM", "WF"), (2006, "H4NY18075"): ("REP", "CRV"), (2008, "H8NY21203"): ("D", "WF")}
 SPECIALS = {(2002, "MO"), (2020, "AZ")}
 EXCLUDED = {(2010, "AK", "W (Challenged NOT Counted)")}
 STRAY = {(2004, "S4WA00474")}
@@ -5834,7 +5834,13 @@ def emit() -> Path:
                     cs.add("note", entity_id=result_set, kind="context", body_md=text)
                 withdrawn = {row["person"] for row in rows.iter_rows(named=True) if (year, row["fec_id"]) in WITHDREW}
                 for person in withdrawn:
-                    cs.add("outcome", result_set_id=result_set, option_id=roots[person], kind="withdrew", notes=footnotes.get(person))
+                    cs.add(
+                        "outcome",
+                        result_set_id=result_set,
+                        option_id=roots[person],
+                        kind="withdrew",
+                        notes=footnotes.get(person),
+                    )
                 ranked = [
                     person for person in sorted(totals, key=totals.__getitem__, reverse=True) if person not in withdrawn
                 ]
@@ -5845,7 +5851,13 @@ def emit() -> Path:
                 }
                 if number + 1 < len(stages):
                     for person in stages[number + 1][2]["person"].drop_nulls().unique():
-                        cs.add("outcome", result_set_id=result_set, option_id=roots[person], kind="advanced", notes=footnotes.get(person))
+                        cs.add(
+                            "outcome",
+                            result_set_id=result_set,
+                            option_id=roots[person],
+                            kind="advanced",
+                            notes=footnotes.get(person),
+                        )
                     continue
                 if blanket:
                     advancing = 4 if state == "AK" else 2
@@ -5858,7 +5870,13 @@ def emit() -> Path:
                         )
                     for person in ranked:
                         if person in chosen:
-                            cs.add("outcome", result_set_id=result_set, option_id=roots[person], kind="advanced", notes=footnotes.get(person))
+                            cs.add(
+                                "outcome",
+                                result_set_id=result_set,
+                                option_id=roots[person],
+                                kind="advanced",
+                                notes=footnotes.get(person),
+                            )
                     continue
                 if not ranked:
                     continue
@@ -5882,7 +5900,13 @@ def emit() -> Path:
                     continue
                 if tacit and len(ranked) != 1:
                     raise ValueError(f"{contest_key}: {len(ranked)} unopposed candidates")
-                cs.add("outcome", result_set_id=result_set, option_id=roots[winner], kind="won", notes=footnotes.get(winner))
+                cs.add(
+                    "outcome",
+                    result_set_id=result_set,
+                    option_id=roots[winner],
+                    kind="won",
+                    notes=footnotes.get(winner),
+                )
         if unmatched:
             raise ValueError(f"primary outcomes disagree with the FEC's flags or general lists: {unmatched}")
 
@@ -6392,7 +6416,9 @@ def emit() -> Path:
                         )
                         for count_round, column in counts
                     )
-                if result_set in cs.minted and not tacit:
+                if (
+                    result_set in cs.minted or any((year, fec_id) in SWAPPED for fec_id in lines["fec_id"])
+                ) and not tacit:
                     first = rows.row(0, named=True)
                     column = counts[0][1]
                     values.append(
@@ -6456,7 +6482,13 @@ def emit() -> Path:
                     if share >= majority:
                         raise ValueError(f"{contest_key}: a runoff after a {share:.1%} majority")
                     for person in runoff["person"].unique():
-                        cs.add("outcome", result_set_id=result_set, option_id=roots[person], kind="advanced", notes=footnotes.get(person))
+                        cs.add(
+                            "outcome",
+                            result_set_id=result_set,
+                            option_id=roots[person],
+                            kind="advanced",
+                            notes=footnotes.get(person),
+                        )
                     continue
                 flagged = {
                     row["person"]
@@ -6477,7 +6509,14 @@ def emit() -> Path:
                     )
                 ):
                     raise ValueError(f"{contest_key}: unclear winner {totals}, {flagged}")
-                cs.add("outcome", result_set_id=result_set, option_id=roots[winner], kind="elected", seats=1, notes=footnotes.get(winner))
+                cs.add(
+                    "outcome",
+                    result_set_id=result_set,
+                    option_id=roots[winner],
+                    kind="elected",
+                    seats=1,
+                    notes=footnotes.get(winner),
+                )
                 if contest_key in canvasses:
                     canvass, page, read = canvasses[contest_key]
                     corrected = cs.key(f"{SOURCE}.result_set", f"{contest_key}:canvass")
