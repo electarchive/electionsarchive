@@ -2203,47 +2203,6 @@ function contestMarkdown(
                   .join("\n"),
               ]),
         ]),
-    ...(lists == null || lists.replacements.length === 0
-      ? []
-      : [
-          `## ${m.lists_changes()}`,
-          lists.replacements
-            .map((change) => {
-              const reasons: Record<string, () => string> = {
-                resigned: m.lists_reason_resigned,
-                died: m.lists_reason_died,
-                removed: m.lists_reason_removed,
-                expelled: m.lists_reason_expelled,
-                disqualified: m.lists_reason_disqualified,
-                lost_seat: m.lists_reason_lost_seat,
-              };
-              const reason = reasons[change.replaced.via ?? ""]?.();
-              const label = lists.lists.find(
-                (list) => list.key === change.list,
-              )?.label;
-              const line =
-                reason == null
-                  ? m.lists_change({
-                      successor: link(change.name, `id/${change.person}`),
-                      predecessor: link(
-                        change.replaced.name,
-                        `id/${change.replaced.person}`,
-                      ),
-                      date: date(change.date),
-                    })
-                  : m.lists_change_reason({
-                      successor: link(change.name, `id/${change.person}`),
-                      predecessor: link(
-                        change.replaced.name,
-                        `id/${change.replaced.person}`,
-                      ),
-                      reason,
-                      date: date(change.date),
-                    });
-              return `- ${label == null ? "" : `${label}: `}${line}`;
-            })
-            .join("\n"),
-        ]),
     ...countMarkdown(contest),
     ...placesMarkdown(contest.places, link, then),
     ...(contest.children.length === 0
