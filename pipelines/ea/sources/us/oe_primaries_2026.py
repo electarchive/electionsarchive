@@ -21,6 +21,7 @@ from ea.store import connect
 SOURCE = "us.oe_primaries_2026"
 VERSION = "1"
 BASE = "https://raw.githubusercontent.com/openelections/openelections-data-{}/master/2026/{}"
+OK_RACES = ("12001", "12010", "12011", "12012", "12013", "12014", "13001", "13010", "13012", "13013", "13014", "13015")
 ME_FILES = {
     "US%20Senate%20DEM%20-%20FINAL": ("U.S. Senate", "", "Democratic"),
     "US%20Senate%20REP%20-%20FINAL": ("U.S. Senate", "", "Republican"),
@@ -66,6 +67,7 @@ FILES = {
     "WA": ("wa", "2026-08-04", ["ballot-items"]),
     "UT": ("ut", "2026-06-23", ["ballot-items"]),
     "ME": ("me", "2026-06-09", list(ME_FILES)),
+    "OK": ("ok", "2026-06-16", ["getelec/20260616", *(f"20260616/{race}" for race in OK_RACES)]),
     "HI": ("hi", "2026-08-08", ["cch", "coh", "cok", "com"]),
     "DE": ("de", "2026-09-15", ["PR2026.html"]),
     "MA": ("ma", "2026-09-01", ["3", "5", "6"]),
@@ -84,10 +86,13 @@ FILES = {
         ],
     ),
 }
-RUNOFFS = {"GA": ("ga2", "2026-06-16", ["ballot-items"], "2026-05-19")}
-FIPS = {"TX": "48", "CA": "06", "MI": "26", "PA": "42", "WV": "54", "MS": "28", "SD": "46", "WY": "56", "OR": "41", "KY": "21", "CO": "08", "AZ": "04", "TN": "47", "NC": "37", "IL": "17", "NM": "35", "NY": "36", "VA": "51", "AL": "01", "ND": "38", "MD": "24", "MN": "27", "VT": "50", "KS": "20", "GA": "13", "WA": "53", "UT": "49", "IN": "18", "FL": "12", "ID": "16", "NJ": "34", "MO": "29", "MA": "25", "DE": "10", "HI": "15", "ME": "23"}
-RUNOFF_SYSTEMS = {"GA": "two_round", "TX": "two_round", "MS": "two_round", "SD": "two_round_35", "NC": "two_round_30"}
-THRESHOLDS = {"GA": 50, "TX": 50, "MS": 50, "SD": 35, "NC": 30}
+RUNOFFS = {
+    "GA": ("ga2", "2026-06-16", ["ballot-items"], "2026-05-19"),
+    "OK": ("ok", "2026-08-25", ["getelec/20260825", "20260825/12001", "20260825/13010"], "2026-06-16"),
+}
+FIPS = {"TX": "48", "CA": "06", "MI": "26", "PA": "42", "WV": "54", "MS": "28", "SD": "46", "WY": "56", "OR": "41", "KY": "21", "CO": "08", "AZ": "04", "TN": "47", "NC": "37", "IL": "17", "NM": "35", "NY": "36", "VA": "51", "AL": "01", "ND": "38", "MD": "24", "MN": "27", "VT": "50", "KS": "20", "GA": "13", "WA": "53", "UT": "49", "IN": "18", "FL": "12", "ID": "16", "NJ": "34", "MO": "29", "MA": "25", "DE": "10", "HI": "15", "ME": "23", "OK": "40"}
+RUNOFF_SYSTEMS = {"GA": "two_round", "TX": "two_round", "MS": "two_round", "SD": "two_round_35", "NC": "two_round_30", "OK": "two_round"}
+THRESHOLDS = {"GA": 50, "TX": 50, "MS": 50, "SD": 35, "NC": 30, "OK": 50}
 ME_COUNTIES = {"AND": "23001", "ARO": "23003", "CUM": "23005", "FRA": "23007", "HAN": "23009", "KEN": "23011", "KNO": "23013", "LIN": "23015", "OXF": "23017", "PEN": "23019", "PIS": "23021", "SAG": "23023", "SOM": "23025", "WAL": "23027", "WAS": "23029", "YOR": "23031"}
 RCV_WINNERS = {
     ("ME", "governor", "", "democratic"): ("hannah-m-pingree", "Hannah M. Pingree won the final round of the ranked-choice count, 111,750 votes to 86,950 for Nirav D. Shah, after three eliminations."),
@@ -137,6 +142,7 @@ OFFICIAL = {
     "MD": ("Maryland State Board of Elections", "https://elections.maryland.gov/elections/2026/primary_results/", "official county breakdown pages"),
     "MN": ("Minnesota Secretary of State", "https://electionresultsfiles.sos.mn.gov/20260811/", "county files and precinct file summed to counties"),
     "ME": ("Maine Secretary of State", "https://www.maine.gov/sos/cec/elec/results/index.html", "municipal and precinct files summed to counties; military and overseas ballots, reported only statewide, are not in the county figures"),
+    "OK": ("Oklahoma State Election Board", "https://results.okelections.gov/OKER/", "county results from the board's results application"),
     "KS": ("Kansas Secretary of State", "https://sos.ks.gov/elections/election-results.html", "precinct-level files summed to counties"),
 }
 METHOD = "Results by county from OpenElections' 2026 primary file for {state}, a community compilation of the state's county results. Candidates who received votes are listed; write-in votes are pooled."
@@ -198,6 +204,7 @@ EV = {
     ),
 }
 FL_URL = "https://results.elections.myflorida.com/ResultsExtract.Asp?ElectionDate=8/18/2026&OfficialResults=Y"
+OK_BASE = "https://results.okelections.gov/OKERS/"
 BROWSER = {"User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36"}
 MA_BASE = elstats.MASSACHUSETTS
 MA_OFFICES = {"3": "Governor", "5": "U.S. House", "6": "U.S. Senate"}
@@ -228,6 +235,9 @@ def town_counties(state: str) -> dict[str, str]:
 
 
 def url(code: str, file: str) -> str:
+    if code == "ok":
+        first, _, second = file.partition("/")
+        return f"{OK_BASE}enrapi/getelec/{second}/SW/xx" if first == "getelec" else f"{OK_BASE}enrapi/GetCntyResults/{first}/{second}"
     if code == "me":
         return f"https://www.maine.gov/sos/sites/maine.gov.sos/files/inline-files/{file}.xlsx"
     if code == "hi":
@@ -407,6 +417,17 @@ def rows(code: str, path: Path, file: str = ""):
                         "votes": str(candidate["TOTAL_VOTES"]),
                     }
         return
+    if code == "ok":
+        if file.startswith("getelec"):
+            return
+        day, _, race = file.partition("/")
+        meta = next(entry for entry in json.loads(raw.cached(SOURCE, url(code, f"getelec/{day}")).path.read_text())["races"] if str(entry["raceID"]) == race)
+        found = re.fullmatch(r"FOR (GOVERNOR|UNITED STATES SENATOR|UNITED STATES REPRESENTATIVE DISTRICT (\d+))", meta["raceTitle"])
+        office = {"GOVERNOR": "Governor", "UNITED STATES SENATOR": "U.S. Senate"}.get(found[1], "U.S. House")
+        for county in json.loads(path.read_text())["summaryCandResults"]:
+            for candidate, result in zip(meta["raceCandidates"], county["candResults"], strict=True):
+                yield {"county": f"40{2 * int(county['countyID']) - 1:03}", "office": office, "district": found[2] or "", "party": "Democratic" if meta["raceTitle2"] == "Democrat" else meta["raceTitle2"], "candidate": candidate["candName"], "votes": str(result["totalVotes"])}
+        return
     if code == "me":
         office, district, party = ME_FILES[file]
         sheet = pl.read_excel(path, has_header=False, infer_schema_length=0).rows()
@@ -519,6 +540,10 @@ def fetch() -> None:
             if code == "ma":
                 for election, *_ in elstats.ma_primary_rows(raw.fetch(SOURCE, url(code, name), suffix=".html").path.read_text()):
                     raw.fetch(SOURCE, f"{MA_BASE}download/{election}/precincts_include:0/", suffix=".csv")
+                continue
+            if code == "ok":
+                token = httpx.put(OK_BASE + "enrapi/login/", json={"Username": "appuser", "Password": "X098de!22k098Mgfd"}, headers=BROWSER, timeout=60).json()[1:]
+                raw.store(SOURCE, url(code, name), httpx.get(url(code, name), headers={**BROWSER, "Authorization": f"Bearer {token}"}, timeout=300).content, suffix=".json", retrieved_at=datetime.now(UTC), media_type="application/json")
                 continue
             if code == "me":
                 raw.store(SOURCE, url(code, name), httpx.get(url(code, name), headers=BROWSER, follow_redirects=True, timeout=300).content, suffix=".xlsx", retrieved_at=datetime.now(UTC), media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
