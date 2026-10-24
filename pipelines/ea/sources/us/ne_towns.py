@@ -2,6 +2,8 @@ import io
 import json
 import re
 import zipfile
+from collections import Counter
+from collections.abc import Callable
 from datetime import date
 from pathlib import Path
 
@@ -14,7 +16,6 @@ from ea.store import DATA, connect
 
 SOURCE = "us.ne_towns"
 VERSION = "2"
-PARSED = DATA / "parsed" / SOURCE
 STATES = {"09": "CT", "23": "ME", "25": "MA", "33": "NH", "44": "RI", "50": "VT"}
 VINTAGES = {
     2010: "https://www2.census.gov/geo/tiger/GENZ2010/gz_2010_{}_060_00_500k.zip",
@@ -23,27 +24,37 @@ VINTAGES = {
 }
 SPELLED = {"enosburg": "enosburgh", "alburg": "alburgh"}
 MUNICIPAL = ("town", "city", "town city", "plantation", "reservation")
-KINDS = {"pltn": "plantation", "purch": "purchase", "resvn": "reservation", "twp": "township", "loc": "location"}
+KINDS = {
+    "pltn": "plantation",
+    "purch": "purchase",
+    "resvn": "reservation",
+    "twp": "township",
+    "loc": "location",
+    "boro": "borough",
+    "chartwp": "charter township",
+    "muny": "municipality",
+}
 
 
-def urls() -> list[tuple[int, str, str]]:
+def urls(states: dict[str, str] = STATES) -> list[tuple[int, str, str]]:
     return [
         (year, fips, url.format(fips))
-        for fips in STATES
+        for fips in states
         for year, url in VINTAGES.items()
         if not (fips == "09" and year == 2024)
     ]
 
 
-def fetch() -> None:
-    for _, _, url in urls():
-        raw.fetch(SOURCE, url, suffix=".zip")
+def fetch(source: str = SOURCE, states: dict[str, str] = STATES, extra: tuple[str, ...] = ()) -> None:
+    for url in (*(url for _, _, url in urls(states)), *extra):
+        raw.fetch(source, url, suffix=".zip")
 
 
-def parse() -> None:
+def parse(source: str = SOURCE, states: dict[str, str] = STATES, funcstat: dict[str, str] | None = None) -> None:
+    parsed = DATA / "parsed" / source
     records = []
-    for year, fips, url in urls():
-        with zipfile.ZipFile(raw.cached(SOURCE, url).path) as archive:
+    for year, fips, url in urls(states):
+        with zipfile.ZipFile(raw.cached(source, url).path) as archive:
             parts = {name.rsplit(".", 1)[1].lower(): archive.read(name) for name in archive.namelist()}
         reader = shapefile.Reader(
             shp=io.BytesIO(parts["shp"]), shx=io.BytesIO(parts["shx"]), dbf=io.BytesIO(parts["dbf"])
@@ -58,7 +69,7 @@ def parse() -> None:
             kind = KINDS.get(kind, kind)
             if kind == "city" and proper.endswith(" Town"):
                 proper, kind = proper.removesuffix(" Town"), "town city"
-            folded = re.sub(r"[^a-z]", "", proper.lower())
+            folded = re.sub(r"[^a-z0-9]", "", proper.lower())
             records.append(
                 {
                     "year": year,
@@ -68,6 +79,11 @@ def parse() -> None:
                     "name": proper,
                     "kind": kind,
                     "geojson": json.dumps(shape.__geo_interface__),
+                    **(
+                        {"legal": str(row.get("NAMELSAD") or ""), "funcstat": funcstat.get(code)}
+                        if funcstat is not None
+                        else {}
+                    ),
                 }
             )
     frame = pl.DataFrame(records)
@@ -75,6 +91,7 @@ def parse() -> None:
     frame = frame.with_columns(
         town=pl.when(pl.col("town").is_in(paired)).then(pl.col("town") + ":" + pl.col("kind")).otherwise("town")
     )
+    frame = frame.with_columns(town=pl.col("town").sort_by("year").last().over("code"))
     latest = frame.sort("year").group_by("town").last()
     codes = frame.group_by("town", "code").agg(first=pl.col("year").min(), last=pl.col("year").max())
     ends = frame.group_by("state").agg(pl.col("year").max().alias("final"))
@@ -91,32 +108,36 @@ def parse() -> None:
             schema=["town", "geom", "point"],
             orient="row",
         )
-    PARSED.mkdir(parents=True, exist_ok=True)
-    latest.drop("geojson").join(shapes, on="town").write_parquet(PARSED / "towns.parquet")
-    codes.write_parquet(PARSED / "codes.parquet")
+    parsed.mkdir(parents=True, exist_ok=True)
+    latest.drop("geojson").join(shapes, on="town").write_parquet(parsed / "towns.parquet")
+    codes.write_parquet(parsed / "codes.parquet")
     print(latest.group_by("state").len().sort("state"))
     print(codes.filter((pl.col("first") > 2010) | (pl.col("last") < pl.col("final"))).sort("town"))
 
 
-def emit() -> Path:
-    towns = pl.read_parquet(PARSED / "towns.parquet")
-    codes = pl.read_parquet(PARSED / "codes.parquet")
+def emit(
+    source: str = SOURCE,
+    version: str = VERSION,
+    states: dict[str, str] = STATES,
+    summary: str = "New England's towns, cities, plantations, and other county subdivisions from the Census Bureau's cartographic "
+    "boundary files (2010, 2020, and 2024 vintages), as us.town areas with municipal polities, each code dated by the vintages that carry it",
+    governed: Callable[[Changeset, set[str]], dict[str, str]] | None = None,
+) -> Path:
+    parsed = DATA / "parsed" / source
+    towns = pl.read_parquet(parsed / "towns.parquet").filter(pl.col("state").is_in(list(states)))
+    codes = pl.read_parquet(parsed / "codes.parquet").filter(pl.col("state").is_in(list(states)))
+    distinct = "funcstat" in towns.columns
     with connect() as conn:
-        cs = Changeset(
-            conn,
-            pipeline=SOURCE,
-            version=VERSION,
-            summary="New England's towns, cities, plantations, and other county subdivisions from the Census Bureau's cartographic "
-            "boundary files (2010, 2020, and 2024 vintages), as us.town areas with municipal polities, each code dated by the vintages that carry it",
-            polity="US",
-        )
+        cs = Changeset(conn, pipeline=source, version=version, summary=summary, polity="US")
+        for fips in states:
+            cs.scope_units("us.town", f"{fips}%")
         existing = {
             code: str(area)
             for code, area in conn.execute(
                 """select c.code, c.area_id from area_code c join area a on a.id = c.area_id
                    join changeset x on x.id = a.changeset_id
                    where a.scheme_code = 'us.town' and left(c.code, 2) = any(%s) and x.pipeline <> %s""",
-                [list(STATES), SOURCE],
+                [list(states), source],
             ).fetchall()
         }
         places = {
@@ -127,29 +148,64 @@ def emit() -> Path:
                    join polity_territory t on t.polity_id = p.id join area a on a.id = t.area_id
                    join area_code c on c.area_id = a.id
                    where p.kind = 'municipality' and a.scheme_code = 'us.place' and left(c.code, 2) = any(%s)""",
-                [list(STATES)],
+                [list(states)],
             ).fetchall()
         }
         slugs = {
             path
             for (path,) in conn.execute(
-                "select s.path from slug s join changeset c on c.id = s.changeset_id where c.pipeline <> %s", [SOURCE]
+                "select s.path from slug s join changeset c on c.id = s.changeset_id where c.pipeline <> %s", [source]
             ).fetchall()
         }
+        governments = governed(cs, slugs) if governed is not None else {}
         census = cs.source("U.S. Census Bureau", "Cartographic Boundary Files, 1:500,000")
         if census in cs.minted:
             raise ValueError("the Census Bureau's cartographic boundary source must already exist")
-        for _, _, url in urls():
-            cs.artifact(raw.cached(SOURCE, url), census)
+        for _, _, url in urls(states):
+            cs.artifact(raw.cached(source, url), census)
         dated = {town: rows for (town,), rows in codes.group_by("town")}
         keys = set(towns["town"])
-        created = reused = skipped = 0
+        counties = dict(
+            conn.execute(
+                """select c.code, regexp_replace(n.text, ',[^,]*$', '') from area a join area_code c on c.area_id = a.id
+                   join name n on n.entity_id = a.id and n.kind = 'official' and n.is_preferred
+                   where a.scheme_code = 'us.county' and left(c.code, 2) = any(%s)""",
+                [list(states)],
+            ).fetchall()
+        )
+        labels: dict[str, str] = {}
+        if distinct:
+            rows = list(towns.iter_rows(named=True))
+            legal = {
+                row["town"]: re.sub(r"\b([a-z])", lambda match: match[1].upper(), row["legal"] or row["name"])
+                for row in rows
+            }
+            names = Counter((row["state"], row["name"]) for row in rows if row["code"] not in existing)
+            legals = Counter((row["state"], legal[row["town"]]) for row in rows if row["code"] not in existing)
+            for state, text in conn.execute(
+                """select left(c.code, 2), regexp_replace(n.text, ',[^,]*$', '') from area a
+                   join area_code c on c.area_id = a.id join changeset x on x.id = a.changeset_id
+                   join name n on n.entity_id = a.id and n.kind = 'official' and n.is_preferred
+                   where a.scheme_code in ('us.town', 'us.place') and left(c.code, 2) = any(%s) and x.pipeline <> %s""",
+                [list(states), source],
+            ).fetchall():
+                names[(state, text)] += 1
+                legals[(state, text)] += 1
+            for row in rows:
+                labels[row["town"]] = (
+                    row["name"]
+                    if names[(row["state"], row["name"])] == 1 and row["code"] not in governments
+                    else legal[row["town"]]
+                    if legals[(row["state"], legal[row["town"]])] == 1 and row["code"] not in governments
+                    else f"{legal[row['town']]} ({counties.get(row['code'][:5], row['code'][:5])})"
+                )
+        created = reused = skipped = polities = 0
         for row in towns.iter_rows(named=True):
-            state, abbreviation = row["state"], STATES[row["state"]]
+            state, abbreviation = row["state"], states[row["state"]]
             rows = dated[row["town"]]
             known = [existing[code] for code in rows["code"] if code in existing]
             place = places.get((state, re.sub(r"[^a-z]", "", row["name"].lower())))
-            if not known and place is not None and row["kind"] in ("city", "town city"):
+            if not distinct and not known and place is not None and row["kind"] in ("city", "town city"):
                 skipped += 1
                 continue
             if known:
@@ -167,8 +223,12 @@ def emit() -> Path:
             created += 1
             proper, kind = row["name"], row["kind"]
             municipal = kind in MUNICIPAL
+            if distinct:
+                municipal = row["funcstat"] == "A"
             display = (
-                f"{proper} {kind.title()}"
+                labels[row["town"]]
+                if distinct
+                else f"{proper} {kind.title()}"
                 if kind in ("town", "city")
                 and f"{row['town'].rsplit(':', 1)[0]}:{'city' if kind == 'town' else 'town'}" in keys
                 else proper
@@ -191,6 +251,7 @@ def emit() -> Path:
             )
             polity = None
             if municipal:
+                polities += 1
                 polity = str(cs.key("us.polity", f"town:{row['code']}"))
                 path = f"us/{abbreviation.lower()}/{slug(display)}"
                 for fallback in (f"{path}-{kind.replace(' ', '-')}", f"{path}-{row['code']}"):
@@ -205,7 +266,7 @@ def emit() -> Path:
             cs.add(
                 "reporting_unit",
                 id=cs.unit("us.town", row["code"]),
-                polity_id=polity or str(cs.polity(f"US-{abbreviation}")),
+                polity_id=polity or governments.get(row["code"]) or str(cs.polity(f"US-{abbreviation}")),
                 scheme_code="us.town",
                 code=row["code"],
                 area_relation="equals",
@@ -213,5 +274,7 @@ def emit() -> Path:
                 kind="standard",
                 valid_from=None,
             )
-        print(f"{created} towns created, {reused} already held, {skipped} cities already held as places")
+        print(
+            f"{created} towns created, {polities} with polities, {reused} already held, {skipped} cities already held as places"
+        )
         return cs.write()
