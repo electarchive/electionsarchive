@@ -16,7 +16,7 @@ from ea.sources.us.elstats import FORMER, GAZETTEER, HELD, SEARCH, SUFFIXES, TEN
 from ea.store import DATA, connect
 
 SOURCE = "us.elstats_gov"
-VERSION = "2"
+VERSION = "3"
 PARSED = DATA / "parsed" / SOURCE
 OFFICES = {"CO": 4, "CT": 4, "ID": 4, "NH": 3, "NM": 89, "VT": 3, "VA": 3}
 DIVISIONS = {"County": "county", "Locality": "county", "City/Town": "town"}
@@ -95,6 +95,15 @@ CHOSEN = {
     ("VT", date(2002, 11, 5)): "Jim Douglas",
     ("VT", date(2010, 11, 2)): "Peter Shumlin",
     ("VT", date(2014, 11, 4)): "Peter Shumlin",
+    ("CT", date(1888, 11, 6)): "Morgan Bulkeley",
+}
+CITED = {
+    ("CT", date(1888, 11, 6)): (
+        "Supreme Court of Errors of Connecticut",
+        "State ex rel. Morris v. Bulkeley, 61 Conn. 287 (1892)",
+        "https://static.case.law/conn/61/cases/0287-01.json",
+        {"pages": [305, 358]},
+    ),
 }
 ELECTED = "Elected by the legislature in joint assembly, since no candidate won a majority of the popular vote."
 LEGISLATURE = (
@@ -119,6 +128,8 @@ def fetch() -> None:
     raw.fetch(SOURCE, GAZETTEER, suffix=".zip")
     for state in OFFICES:
         raw.fetch(SOURCE, url(state), suffix=".csv")
+    for _, _, link, _ in CITED.values():
+        raw.fetch(SOURCE, link, suffix=".json")
 
 
 def parse() -> None:
@@ -334,6 +345,19 @@ def emit() -> Path:
                 license=HELD.get(state, "Public record"),
             )
             cs.artifact(raw.cached(SOURCE, url(state)), sources[state])
+        cited: dict[tuple[str, date], UUID] = {}
+        for place, (publisher, title, link, _) in CITED.items():
+            cited[place] = cs.source(publisher, title)
+            cs.add(
+                "source",
+                id=cited[place],
+                kind="official_body",
+                publisher=publisher,
+                title=title,
+                url=link,
+                license="Public domain",
+            )
+            cs.artifact(raw.cached(SOURCE, link), cited[place])
 
         offices: dict[str, UUID] = {}
         elections: dict[str, UUID] = {}
@@ -641,6 +665,13 @@ def emit() -> Path:
                     continue
                 if chosen not in totals:
                     raise ValueError(f"{state} {day}: {chosen} is not a candidate")
+                if (state, day) in cited:
+                    cs.add(
+                        "citation",
+                        entity_id=result_set,
+                        source_id=cited[state, day],
+                        locator=CITED[state, day][3],
+                    )
                 pooled = set(lines.filter(pl.col("pooled"))["candidate"])
                 ranked: dict[UUID, str] = {}
                 for candidate in sorted(totals, key=lambda c: (c != chosen, -totals[c])):
