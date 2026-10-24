@@ -16,14 +16,14 @@ PARSED = DATA / "parsed" / SOURCE
 PUBLISHER = "Nebraska Secretary of State"
 TITLE = "Official Report of the Board of State Canvassers of the State of Nebraska"
 LANDING = "https://govdocs.nebraska.gov/epubs/S1200/S001.html"
-URL = "https://govdocs.nebraska.gov/epubs/S1200/S001-{}prim_gen.pdf"
+URL = "https://govdocs.nebraska.gov/epubs/S1200/S001-{}{}.pdf"
 EARLY = [
     (header.split(), block)
     for header, *block in (
         chunk.splitlines() for chunk in Path(__file__).with_name("ne_usrep_early.txt").read_text().split("@ ")[1:]
     )
 ]
-EARLY_DAYS = {1946: date(1946, 11, 5), 1948: date(1948, 11, 2), 1950: date(1950, 11, 7), 1952: date(1952, 11, 4), 1954: date(1954, 11, 2), 1956: date(1956, 11, 6), 1958: date(1958, 11, 4), 1960: date(1960, 11, 8), 1978: date(1978, 11, 7), 1962: date(1962, 11, 6), 1964: date(1964, 11, 3), 1966: date(1966, 11, 8), 1968: date(1968, 11, 5), 1970: date(1970, 11, 3), 1972: date(1972, 11, 7), 1974: date(1974, 11, 5), 1976: date(1976, 11, 2), 1982: date(1982, 11, 2), 1984: date(1984, 11, 6), 1986: date(1986, 11, 4), 1988: date(1988, 11, 8), 1990: date(1990, 11, 6)}
+EARLY_DAYS = {1944: date(1944, 11, 7), 1946: date(1946, 11, 5), 1948: date(1948, 11, 2), 1950: date(1950, 11, 7), 1952: date(1952, 11, 4), 1954: date(1954, 11, 2), 1956: date(1956, 11, 6), 1958: date(1958, 11, 4), 1960: date(1960, 11, 8), 1978: date(1978, 11, 7), 1962: date(1962, 11, 6), 1964: date(1964, 11, 3), 1966: date(1966, 11, 8), 1968: date(1968, 11, 5), 1970: date(1970, 11, 3), 1972: date(1972, 11, 7), 1974: date(1974, 11, 5), 1976: date(1976, 11, 2), 1982: date(1982, 11, 2), 1984: date(1984, 11, 6), 1986: date(1986, 11, 4), 1988: date(1988, 11, 8), 1990: date(1990, 11, 6)}
 DAYS = {1992: date(1992, 11, 3), 1994: date(1994, 11, 8), 1996: date(1996, 11, 5), 1998: date(1998, 11, 3)}
 STARTS = {1992: 3361, 1994: 3194, 1996: 1859, 1998: 3033}
 METHOD = (
@@ -55,7 +55,7 @@ WRITEINS = {
 
 def fetch() -> None:
     for year in [*EARLY_DAYS, *DAYS]:
-        raw.fetch(SOURCE, URL.format(year), suffix=".pdf")
+        raw.fetch(SOURCE, URL.format(year, "gen" if year < 1938 else "prim_gen"), suffix=".pdf")
 
 
 def number(text: str) -> int | None:
@@ -94,7 +94,7 @@ def parse() -> None:
     rows = []
     for year, day in DAYS.items():
         text = subprocess.run(
-            ["pdftotext", "-layout", str(raw.cached(SOURCE, URL.format(year)).path), "-"],
+            ["pdftotext", "-layout", str(raw.cached(SOURCE, URL.format(year, "gen" if year < 1938 else "prim_gen")).path), "-"],
             capture_output=True,
             text=True,
             check=True,
@@ -175,6 +175,6 @@ def emit() -> Path:
         "NE",
         "31",
         pl.read_parquet(PARSED / "lines.parquet"),
-        [raw.cached(SOURCE, URL.format(year)) for year in [*EARLY_DAYS, *DAYS]],
+        [raw.cached(SOURCE, URL.format(year, "gen" if year < 1938 else "prim_gen")) for year in [*EARLY_DAYS, *DAYS]],
         lambda key: METHOD,
     )
