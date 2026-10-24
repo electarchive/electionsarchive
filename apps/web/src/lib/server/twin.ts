@@ -976,6 +976,14 @@ function electionMarkdown(
       ? []
       : [
           `## ${m.byes_title()}`,
+          ...(byes?.general == null
+            ? []
+            : [
+                link(
+                  m.byes_parliament({ date: date(byes.general.date) }),
+                  byes.general.path,
+                ),
+              ]),
           `${
             byes?.until == null
               ? m.byes_lede_open({ count: byeRows.length })
@@ -991,7 +999,9 @@ function electionMarkdown(
             ],
             byeRows.map((row) => [
               date(row.date),
-              link(row.name, row.path),
+              row.isHere
+                ? `${link(row.name, row.path)} (${m.byes_here()})`
+                : link(row.name, row.path),
               row.to == null
                 ? null
                 : row.isGain

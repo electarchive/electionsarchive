@@ -75,6 +75,7 @@
     });
     return {
       until: data.until,
+      general: data.general,
       rows,
       changed: rows.filter((row) => row.isGain).length,
       net: [...net.entries()]
@@ -98,6 +99,17 @@
     <div class="grid gap-0.5">
       <h2 id="{uid}-title" class="heading">{m.byes_title()}</h2>
       <p class="text-[0.8125rem] text-muted-foreground max-inline-[64ch]">
+        {#if sheet.general != null}
+          {#if sheet.general.path == null}
+            {m.byes_parliament({ date: date(sheet.general.date) })}
+          {:else}
+            <a
+              class="text-foreground underline decoration-border underline-offset-4 hover:decoration-foreground"
+              href={resolve("/[...path]", { path: sheet.general.path })}
+              >{m.byes_parliament({ date: date(sheet.general.date) })}</a
+            >
+          {/if}
+        {/if}
         {sheet.until == null
           ? m.byes_lede_open({ count: sheet.rows.length })
           : m.byes_lede({
@@ -131,9 +143,13 @@
       </dl>
     {/if}
     <ol class="grid gap-x-6 md:grid-cols-2">
-      {#each isAll || sheet.rows.length <= 16 ? sheet.rows : sheet.rows.slice(0, 12) as row (row.path ?? `${row.date}${row.name}`)}
+      {#each isAll || sheet.rows.length <= 16 ? sheet.rows : sheet.rows.filter((row, index) => index < 12 || row.isHere) as row (row.path ?? `${row.date}${row.name}`)}
         <li
-          class="grid grid-cols-[auto_minmax(0,1fr)] items-baseline gap-x-2 border-be border-border/60 py-1.5 text-[0.8125rem]"
+          class={cn(
+            "grid grid-cols-[auto_minmax(0,1fr)] items-baseline gap-x-2 border-be border-border/60 py-1.5 text-[0.8125rem]",
+            { "-mx-1.5 bg-secondary px-1.5": row.isHere },
+          )}
+          aria-current={row.isHere ? "page" : undefined}
         >
           <span class="inline-flex translate-y-px gap-px">
             <span
@@ -146,6 +162,9 @@
             ></span>
           </span>
           <span>
+            {#if row.isHere}
+              <span class="text-xs font-semibold">{m.byes_here()}:</span>
+            {/if}
             {#if row.path != null}
               <a
                 class="font-semibold underline decoration-border underline-offset-4 hover:decoration-foreground"

@@ -265,7 +265,7 @@ export const seats = {
           select c.id, c.body_id as body, c.district_area_id as area, e.date_from as day, e.kind,
             coalesce(bs.as_of, e.date_from) as drawn, bp.path = 'us' as "isUs"
           from contest c join election e on e.id = c.election_id
-          join slug ps on ps.entity_id = e.polity_id and ps.is_current and (ps.path in ('gb', 'us') or ps.path like 'gb/%' or ps.path like 'us/%')
+          join slug ps on ps.entity_id = e.polity_id and ps.is_current and (ps.path in ('gb', 'us', 'ca') or ps.path like 'gb/%' or ps.path like 'us/%')
           join body b on b.id = c.body_id join slug bp on bp.entity_id = b.polity_id and bp.is_current
           left join boundary_set bs on bs.id = c.boundary_set_id
           where c.id = ${input.id}::uuid and c.kind = 'body_seats' and c.allocation_parent_id is null
@@ -406,6 +406,9 @@ export const seats = {
       v.nullable(
         v.object({
           until: v.nullable(v.number()),
+          general: v.nullable(
+            v.object({ date: v.string(), path: v.nullable(v.string()) }),
+          ),
           parties: v.array(
             v.object({
               key: v.string(),
@@ -429,6 +432,7 @@ export const seats = {
                 v.object({ name: v.string(), path: v.nullable(v.string()) }),
               ),
               reason: v.nullable(v.string()),
+              isHere: v.boolean(),
             }),
           ),
         }),
@@ -446,6 +450,9 @@ export const seats = {
         member: string | null;
         via: string | null;
         majority: number | null;
+        general: string;
+        since: string;
+        isHere: boolean;
       }>(sql`
         with recursive tree(id) as (
           select ${input.id}::uuid
@@ -459,15 +466,21 @@ export const seats = {
             and c.district_area_id is not null and c.body_id is not null
           group by c.body_id order by count(*) desc limit 1
         ),
+        general as (
+          select e.date_from as day, coalesce(e.parent_id, e.id) as id
+          from held h join contest c on c.body_id = h.body join election e on e.id = c.election_id
+          where e.kind = 'general' and e.status = 'held' and e.date_from <= h.day
+          order by e.date_from desc limit 1
+        ),
         next as (
           select min(e.date_from) as day
-          from contest c join election e on e.id = c.election_id, held h
-          where c.body_id = h.body and e.kind = 'general' and e.status = 'held' and e.date_from > h.day + 120
+          from contest c join election e on e.id = c.election_id, held h, general g
+          where c.body_id = h.body and e.kind = 'general' and e.status = 'held' and e.date_from > g.day + 120
         ),
         bys as materialized (
-          select c.id, c.district_area_id as area, e.date_from as day, h.body
+          select c.id, c.district_area_id as area, e.date_from as day, h.body, c.election_id in (select id from tree) as "isHere"
           from held h join contest c on c.body_id = h.body join election e on e.id = c.election_id
-          where e.kind = 'by_election' and e.date_from > h.day
+          where e.kind = 'by_election' and e.date_from > (select day from general)
             and e.date_from < coalesce((select day from next), 'infinity')
             and c.kind = 'body_seats' and c.allocation_parent_id is null and c.district_area_id is not null
             and ${input.within == null ? sql`true` : inside(input.within, sql`c.district_area_id`, sql`e.date_from`)}
@@ -519,6 +532,7 @@ export const seats = {
           group by b.id, x.option_k
         )
         select b.id, b.area, b.day::text as day, (select day::text from next) as until,
+          (select id::text from general) as general, (select day::text from general) as since, b."isHere",
           (select coalesce(party, 'person:' || person) from won w where w.contest = b.id order by w.k limit 1) as now,
           (select person from won w where w.contest = b.id order by w.k limit 1) as winner,
           coalesce(
@@ -555,15 +569,23 @@ export const seats = {
           day,
         ),
         names([...people, ...found.rows.map((row) => row.area)], day),
-        paths([...people, ...found.rows.map((row) => row.id)]),
+        paths([
+          ...people,
+          ...found.rows.map((row) => row.id),
+          found.rows[0]?.general ?? "",
+        ]),
       ]);
       const person = (id: string | null) =>
         id == null
           ? null
           : { name: labels.full.get(id) ?? "", path: slugs.get(id) ?? null };
-      const until = found.rows[0]?.until;
+      const first = found.rows[0];
       return {
-        until: until == null ? null : Number(until.slice(0, 4)),
+        until: first?.until == null ? null : Number(first.until.slice(0, 4)),
+        general:
+          first == null || found.rows.every((row) => !row.isHere)
+            ? null
+            : { date: first.since, path: slugs.get(first.general) ?? null },
         parties: keys.flatMap((key) => {
           const party = colored.get(key);
           return party == null
@@ -587,6 +609,7 @@ export const seats = {
           winner: person(row.winner),
           member: person(row.member),
           reason: row.via,
+          isHere: row.isHere,
         })),
       };
     }),

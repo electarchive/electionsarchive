@@ -170,6 +170,8 @@
     }
   ],
   "byes_changed_none": "No seat changed hands.",
+  "byes_parliament": "Elected at the {date} general election.",
+  "byes_here": "This by-election",
   "col_seat": "Seat",
   "col_majority": "Majority (votes)",
   "col_previous_member": "Previous member",
