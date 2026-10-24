@@ -130,6 +130,7 @@
   "change_gain": "{party} gain from {from}, with a majority of {majority} votes.",
   "change_hold_bare": "{party} hold.",
   "change_gain_bare": "{party} gain from {from}.",
+  "change_allied": "{alliance} (elected as {party})",
   "change_hold_margin": "{party} hold, with a margin of {majority} votes.",
   "change_gain_margin": "{party} gain from {from}, with a margin of {majority} votes.",
   "change_note_area": "Compared with the {year} result in the old seat that covered most of this seat's area:",

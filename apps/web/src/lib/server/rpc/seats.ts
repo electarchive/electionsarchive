@@ -248,6 +248,7 @@ export const seats = {
             v.object({ label: v.string(), short: v.nullable(v.string()) }),
           ),
           prior: v.object({ name: v.string(), path: v.nullable(v.string()) }),
+          alliance: v.nullable(v.string()),
         }),
       ),
     )
@@ -260,6 +261,7 @@ export const seats = {
         now: string | null;
         before: string | null;
         isUs: boolean;
+        alliance: string | null;
       }>(sql`
         with this as materialized (
           select c.id, c.body_id as body, c.district_area_id as area, e.date_from as day, e.kind,
@@ -273,7 +275,7 @@ export const seats = {
             and ((bp.path = 'us' and b.kind = 'lower_house') or not (bp.path = 'us' or bp.path like 'us/%'))
         ),
         last as (
-          select e.date_from as day
+          select e.date_from as day, coalesce(e.parent_id, e.id) as election
           from this t join contest c on c.body_id = t.body join election e on e.id = c.election_id
           where e.kind = 'general' and e.status = 'held'
             and e.date_from < t.day - case when t.kind = 'general' then 120 else 0 end
@@ -351,7 +353,16 @@ export const seats = {
         )
         select p.basis, p.prior, p.area, p.day::text as since, (select "isUs" from this) as "isUs",
           coalesce(w.party, 'person:' || w.person) as now,
-          coalesce(b.party, 'person:' || b.person) as before
+          coalesce(b.party, 'person:' || b.person) as before,
+          (select n.text from alliance a
+            join alliance_member x on x.alliance_id = a.id and x.party_id::text = w.party
+            join alliance_member y on y.alliance_id = a.id and y.party_id::text = b.party
+            join name n on n.entity_id = a.id and n.is_preferred
+            where w.party <> b.party and a.election_id in (
+              (select election from last),
+              (select coalesce(e.parent_id, e.id) from contest c join election e on e.id = c.election_id where c.id = p.id),
+              (select coalesce(e.parent_id, e.id) from contest c join election e on e.id = c.election_id where c.id = p.prior)
+            ) limit 1) as alliance
         from paired p left join won w on w.contest = p.id left join won b on b.contest = p.prior
         where p.prior is not null
       `);
@@ -376,7 +387,7 @@ export const seats = {
             };
       return {
         since: Number(row.since.slice(0, 4)),
-        isGain: fold(row.now) !== fold(row.before),
+        isGain: row.alliance == null && fold(row.now) !== fold(row.before),
         lead: row.isUs ? "margin" : "majority",
         basis: row.basis,
         party: party(row.now),
@@ -385,6 +396,8 @@ export const seats = {
           name: labels.full.get(row.area) ?? "",
           path: slugs.get(row.prior) ?? null,
         },
+        alliance:
+          row.alliance === colored.get(row.now)?.label ? null : row.alliance,
       };
     }),
   byElections: os

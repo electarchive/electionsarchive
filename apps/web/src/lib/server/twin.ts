@@ -1078,8 +1078,12 @@ function contestMarkdown(
   const [top, next] = contest.rows
     .filter((row) => row.current != null && !row.key.startsWith("kind:"))
     .toSorted((a, b) => (b.current?.votes ?? 0) - (a.current?.votes ?? 0));
-  const party =
+  const label =
     handover?.party?.short ?? handover?.party?.label ?? m.seats_independents();
+  const party =
+    handover?.alliance == null
+      ? label
+      : m.change_allied({ alliance: handover.alliance, party: label });
   const from =
     handover?.from?.short ?? handover?.from?.label ?? m.seats_independents();
   const majority =
