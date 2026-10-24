@@ -6,7 +6,7 @@ import subprocess
 import tempfile
 import zipfile
 from collections import defaultdict
-from datetime import date
+from datetime import UTC, date, datetime
 from pathlib import Path
 from urllib.parse import urlencode
 from uuid import UUID
@@ -96,9 +96,12 @@ MISSISSIPPI_QUALIFYING = (
 GEORGIA_QUALIFYING = (
     "https://web.archive.org/web/2025id_/https://sos.ga.gov/sites/default/files/2024-06/List_of_Candidates_v5.zip"
 )
+GEORGIA_SPECIAL_2026 = "https://mvp.sos.ga.gov/s/qualifying-candidate-information?election=2026-05-12-special"
 GEORGIA_QUALIFIED = {
-    "2024-04-09:GA:house:139": "State House Representative, District 139",
-    "2024-05-07:GA:house:139:runoff": "State House Representative, District 139",
+    "2024-04-09:GA:house:139": (GEORGIA_QUALIFYING, "State House Representative, District 139"),
+    "2024-05-07:GA:house:139:runoff": (GEORGIA_QUALIFYING, "State House Representative, District 139"),
+    "2026-05-12:GA:house:177": (GEORGIA_SPECIAL_2026, "State House, District 177"),
+    "2026-06-09:GA:house:177:runoff": (GEORGIA_SPECIAL_2026, "State House, District 177"),
 }
 MISSISSIPPI_READINGS = {
     "Dianne BD. Black": "Dianne D. Black",
@@ -1066,6 +1069,17 @@ def fetch() -> None:
             raw.fetch(SOURCE, url.replace("Votes_", "RacesCandidates_"), suffix=".json")
     raw.fetch(SOURCE, MISSISSIPPI_QUALIFYING, suffix=".pdf")
     raw.fetch(SOURCE, GEORGIA_QUALIFYING, suffix=".zip")
+    try:
+        raw.cached(SOURCE, GEORGIA_SPECIAL_2026)
+    except LookupError:
+        raw.store(
+            SOURCE,
+            GEORGIA_SPECIAL_2026,
+            (DATA / "inbox" / "manual" / "MF-046" / "2026-05-12_special" / "Qualified Candidates.csv").read_bytes(),
+            suffix=".csv",
+            retrieved_at=datetime(2026, 10, 23, tzinfo=UTC),
+            media_type="text/csv",
+        )
     for url in (url for sheets in COUNTY_SHEETS.values() for url in sheets):
         raw.fetch(SOURCE, url, suffix=".pdf")
     for election, url in GENERALS.items():
@@ -1097,12 +1111,33 @@ def parse() -> None:
     rows: list[dict[str, object]] = []
     with zipfile.ZipFile(raw.cached(SOURCE, GEORGIA_QUALIFYING).path) as archive:
         qualified = {
-            (re.sub(r" \(\w\)$", "", office), name.split()[-1]): party
+            (
+                GEORGIA_QUALIFYING,
+                re.sub(r" \(\w\)$", "", office),
+                [
+                    word
+                    for word in re.sub(r"[^A-Z ]", "", name.upper()).split()
+                    if word not in ("JR", "SR", "II", "III", "IV")
+                ][-1],
+            ): party
             for name, office, party in pl.read_excel(archive.read(archive.namelist()[0]), infer_schema_length=0)
             .select("Candidate Name", "Office Name", "Candidate Party")
             .iter_rows()
             if name and office
         }
+    with raw.cached(SOURCE, GEORGIA_SPECIAL_2026).path.open(encoding="utf-8-sig", newline="") as handle:
+        for row in csv.DictReader(handle):
+            qualified[
+                (
+                    GEORGIA_SPECIAL_2026,
+                    row["CONTEST NAME"],
+                    [
+                        word
+                        for word in re.sub(r"[^A-Z ]", "", row["CANDIDATE NAME"].upper()).split()
+                        if word not in ("JR", "SR", "II", "III", "IV")
+                    ][-1],
+                )
+            ] = row["POLITICAL PARTY"]
     for key, (system, url, select) in SPECIALS.items():
         state = key.split(":")[1]
         found: list[tuple[str | None, str | None, int]] = []
@@ -1211,7 +1246,16 @@ def parse() -> None:
             raise ValueError(f"{key}: no candidates")
         for label, party, votes in found:
             if key in GEORGIA_QUALIFIED and label is not None:
-                party = party or qualified.get((GEORGIA_QUALIFIED[key], label.upper().split()[-1]))
+                party = party or qualified.get(
+                    (
+                        *GEORGIA_QUALIFIED[key],
+                        [
+                            word
+                            for word in re.sub(r"[^A-Z ]", "", label.upper()).split()
+                            if word not in ("JR", "SR", "II", "III", "IV")
+                        ][-1],
+                    )
+                )
             rows.append({"key": key, "url": url, "candidate": label, "party": _party(state, party), "votes": votes})
     for election, url in GENERALS.items():
         day, state = election.split(":")[:2]
@@ -1471,7 +1515,7 @@ def emit() -> Path:
             for cite in (
                 (url, MISSISSIPPI_QUALIFYING)
                 if regular and state == "MS"
-                else (url, GEORGIA_QUALIFYING)
+                else (url, GEORGIA_QUALIFIED[key][0])
                 if key in GEORGIA_QUALIFIED
                 else (url, *COUNTY_SHEETS.get(key, ()))
             ):
