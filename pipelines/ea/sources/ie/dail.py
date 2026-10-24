@@ -10,6 +10,7 @@ import polars as pl
 
 from ea import raw
 from ea.changeset import Changeset, slug
+from ea.sources.ie import dail_pdf
 from ea.store import DATA, connect
 
 SOURCE = "ie.dail"
@@ -19,11 +20,13 @@ DERIVED = 1
 VOTES, REGISTERED, BALLOTS, VALID, INVALID, EXHAUSTED, QUOTA = 1, 2, 3, 4, 5, 21, 26
 DATASETS = "https://opendata.housing.gov.ie/dataset"
 ELECTIONS = {
+    2011: (date(2011, 2, 25), 2009, date(2009, 2, 24), 166),
     2016: (date(2016, 2, 26), 2013, date(2013, 3, 20), 158),
     2020: (date(2020, 2, 8), 2017, date(2017, 12, 23), 160),
     2024: (date(2024, 11, 29), 2023, date(2023, 12, 19), 174),
 }
 ACTS = {
+    2009: "Electoral (Amendment) Act 2009",
     2013: "Electoral (Amendment) (Dáil Constituencies) Act 2013",
     2017: "Electoral (Amendment) (Dáil Constituencies) Act 2017",
     2023: "Electoral (Amendment) Act 2023",
@@ -39,6 +42,9 @@ CSVS = {
         "units": f"{DATASETS}/1cb33a8b-6dd3-4948-a08d-22569abd3b72/resource/48704c3a-ecd8-49e9-9d3b-58b2fba6ae65/download/2020-05-27_general-election-2020-constituency-details-csv_en.csv",
         "people": f"{DATASETS}/9c55ef5e-5c2f-4f7e-9d26-2adc37dc3077/resource/927a8c56-f32e-4d62-9ac4-3f5c91bb0b4c/download/2020-05-27_general-election-2020-candidate_details-csv_en.csv",
     },
+}
+PDFS = {
+    2011: "https://data.oireachtas.ie/ie/oireachtas/electoralProcess/electionResults/dail/2011/2011-05-23_dail-general-election-2011-results_en.pdf",
 }
 XLSX_2024 = f"{DATASETS}/7ca52e7b-dd4d-4edd-b159-6ae111bbe538/resource/fb8a1f97-2683-4515-bac4-e2617222b20d/download/2024-dail-general-election-results.xlsx"
 PAGES = {
@@ -69,6 +75,7 @@ PARTY_CODES = {
 }
 NON_PARTY = "Non-Party"
 STATUTORY = {(2020, "Kildare South"): 4}
+CEANN_COMHAIRLE = {(2011, "Dún Laoghaire"): 4}
 HYPHENS = {
     "Laois Offaly": "Laois-Offaly",
     "Roscommon - Galway": "Roscommon-Galway",
@@ -147,6 +154,8 @@ def fetch() -> None:
         for url in urls.values():
             raw.fetch(SOURCE, url, suffix=".csv")
     raw.fetch(SOURCE, XLSX_2024, suffix=".xlsx")
+    for url in PDFS.values():
+        raw.fetch(SOURCE, url, suffix=".pdf")
 
 
 def number(cell: object) -> int:
@@ -297,6 +306,15 @@ def parse() -> None:
         if number(stat[3]) != valid + number(stat[5]) or quota != valid // (seats + 1) + 1:
             raise ValueError(f"2024 {label}: poll, valid, invalid, or quota do not tie")
 
+    for year, url in PDFS.items():
+        book = dail_pdf.rows(str(raw.cached(SOURCE, url).path), year)
+        for unit in book["units"]:
+            unit["total_seats"] = CEANN_COMHAIRLE.get((year, unit["constituency"]), unit["total_seats"])
+        units.extend(book["units"])
+        candidates.extend(book["candidates"])
+        counts.extend(book["counts"])
+        printed.extend(book["printed"])
+
     unit_frame = pl.DataFrame(units)
     count_frame = pl.DataFrame(counts)
     cand_frame = pl.DataFrame(candidates, schema_overrides={"candidate": pl.String})
@@ -340,7 +358,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Dáil Éireann general elections 2016, 2020, and 2024 by constituency, with every STV count, from the Department of Housing's open data",
+            summary="Dáil Éireann general elections 2011, 2016, 2020, and 2024 by constituency, with every STV count, from the Oireachtas results book and the Department of Housing's open data",
             polity="IE",
         )
 
@@ -412,23 +430,42 @@ def emit() -> Path:
         done_areas: set[UUID] = set()
         for year, (day, act, signed, _) in ELECTIONS.items():
             title = f"Dáil general election {year}: constituency results and transfers of votes"
-            source = cs.source("Department of Housing, Local Government and Heritage", title)
-            cs.add(
-                "source",
-                id=source,
-                kind="official_body",
-                publisher="Department of Housing, Local Government and Heritage",
-                title=title,
-                url=PAGES[year],
-                license="CC BY-SA 4.0",
-                license_url="https://creativecommons.org/licenses/by-sa/4.0/",
-                attribution=(
-                    "Election results and transfer of votes, compiled by the Department of Housing, Local Government "
-                    "and Heritage from returning officers' public notices (opendata.housing.gov.ie, CC BY-SA 4.0)."
-                ),
-            )
-            for url in [*CSVS[year].values()] if year in CSVS else [XLSX_2024]:
-                cs.artifact(raw.cached(SOURCE, url), source)
+            if year in PDFS:
+                publisher = "Houses of the Oireachtas"
+                source = cs.source(publisher, title)
+                cs.add(
+                    "source",
+                    id=source,
+                    kind="official_body",
+                    publisher=publisher,
+                    title=title,
+                    url=PDFS[year],
+                    license="Oireachtas (Open Data) PSI Licence, CC BY 4.0 terms",
+                    license_url="https://creativecommons.org/licenses/by/4.0/",
+                    attribution=(
+                        "Election results and transfer of votes, compiled from returning officers' public notices "
+                        "(data.oireachtas.ie, Oireachtas (Open Data) PSI Licence with CC BY 4.0 terms)."
+                    ),
+                )
+                cs.artifact(raw.cached(SOURCE, PDFS[year]), source)
+            else:
+                source = cs.source("Department of Housing, Local Government and Heritage", title)
+                cs.add(
+                    "source",
+                    id=source,
+                    kind="official_body",
+                    publisher="Department of Housing, Local Government and Heritage",
+                    title=title,
+                    url=PAGES[year],
+                    license="CC BY-SA 4.0",
+                    license_url="https://creativecommons.org/licenses/by-sa/4.0/",
+                    attribution=(
+                        "Election results and transfer of votes, compiled by the Department of Housing, Local Government "
+                        "and Heritage from returning officers' public notices (opendata.housing.gov.ie, CC BY-SA 4.0)."
+                    ),
+                )
+                for url in [*CSVS[year].values()] if year in CSVS else [XLSX_2024]:
+                    cs.artifact(raw.cached(SOURCE, url), source)
 
             election = cs.key("ie.election", f"{day}:dail-eireann")
             cs.add("election", id=election, polity_id=ireland, kind="general", date_from=day, date_to=day, status="held")
@@ -499,7 +536,7 @@ def emit() -> Path:
                     )
                 if (year, label) in STATUTORY:
                     cs.add("note", entity_id=result_set, kind="caveat", body_md=STATUTORY_NOTE)
-                if year != 2024:
+                if year in CSVS:
                     cs.add("note", entity_id=result_set, kind="caveat", body_md=EXHAUSTED_NOTE)
                 for measure, amount in (
                     (REGISTERED, unit_row["electorate"]),
