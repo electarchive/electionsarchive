@@ -464,8 +464,8 @@ export async function names(
     (select distinct on (entity_id) entity_id, kind::text, text
     from name
     where entity_id = any(${sql.param(ids)}::uuid[]) and kind in ('official', 'english')
-    order by entity_id, coalesce(valid @> ${on}::date, false) desc,
-      coalesce(valid @> ${on}::date and not (lower_inf(valid) and upper_inf(valid)), false) desc,
+    order by entity_id, coalesce(valid @> coalesce(${on}::date, current_date), false) desc,
+      coalesce(valid @> coalesce(${on}::date, current_date) and not (lower_inf(valid) and upper_inf(valid)), false) desc,
       coalesce(kind = 'english' and script = 'Latn' and entity_id = any(${sql.param(common)}::uuid[]), false) desc, is_preferred desc,
       (lang = 'en') desc, (kind = 'official') desc, recorded_from desc, id)
     union all
@@ -2123,8 +2123,12 @@ async function places(
     select c.district_area_id as area, a.k, p.parent_id as parent, s.path,
       (
         select sum(x.seats)::int from contest_option o
-        join outcome x on x.option_id = o.id and x.kind in ('elected', 'won')
-        join result_set rs on rs.id = x.result_set_id and ${latest("rs")}
+        cross join lateral (
+          select max(x.seats) as seats from outcome x
+          join result_set rs on rs.id = x.result_set_id and ${latest("rs")}
+          where x.option_id = o.id and x.kind in ('elected', 'won') and x.candidacy_id is null
+          having count(*) > 0
+        ) x
         where o.contest_id = c.id
       ) as seats
     from contest c
@@ -4117,7 +4121,7 @@ export const contests = {
         color: string | null;
         label: string | null;
       }>(sql`
-        select c.id as root, head.person, x.party, ${paint(sql`x.party`, sql`e.id`, sql`e.date_from`)} as color,
+        select distinct on (c.id, o.k) c.id as root, head.person, x.party, ${paint(sql`x.party`, sql`e.id`, sql`e.date_from`)} as color,
           coalesce(o.ballot_label, o.kind::text) as label
         from contest c
         join election e on e.id = c.election_id
@@ -7713,7 +7717,7 @@ async function races(
               multiple: number;
             }>(sql`
               with tacit as (
-                select coalesce(bm.into_id, br.parent_party_id, pm.into_id, o.party_id) as party
+                select distinct o.id, coalesce(bm.into_id, br.parent_party_id, pm.into_id, o.party_id) as party
                 from contest c
                 join election e on e.id = c.election_id
                 join result_set rs on rs.contest_id = c.id and ${latest("rs")} and rs.kind = 'tacit'
@@ -8100,8 +8104,12 @@ async function races(
           order by pe.date_from desc limit 1
         ) pc on true
         join contest_option o on o.contest_id = pc.id and o.party_id is not null
-        join outcome x on x.option_id = o.id and x.kind in ('elected', 'won') and x.candidacy_id is null
-        join result_set rs on rs.id = x.result_set_id and ${latest("rs")}
+        cross join lateral (
+          select max(x.seats) as seats from outcome x
+          join result_set rs on rs.id = x.result_set_id and ${latest("rs")}
+          where x.option_id = o.id and x.kind in ('elected', 'won') and x.candidacy_id is null
+          having count(*) > 0
+        ) x
         left join entity_merge pm on pm.entity_id = o.party_id
         left join party_affiliation br on br.party_id = coalesce(pm.into_id, o.party_id)
           and br.kind = 'regional_branch' and br.valid @> e.date_from
@@ -14460,8 +14468,12 @@ export const parties = {
           select o.contest_id as id, sum(x.seats) filter (where o.party_id in (select id from ids))::int as seats,
             sum(x.seats)::int as filled
           from roots r join contest_option o on o.contest_id = r.id
-          join outcome x on x.option_id = o.id and x.kind in ('elected', 'won')
-          join result_set rs on rs.id = x.result_set_id and ${latest("rs")}
+          cross join lateral (
+            select max(x.seats) as seats from outcome x
+            join result_set rs on rs.id = x.result_set_id and ${latest("rs")}
+            where x.option_id = o.id and x.kind in ('elected', 'won') and x.candidacy_id is null
+            having count(*) > 0
+          ) x
           group by o.contest_id
         )
         select r.id, r.election, r.path, r.tail, r.date_from::text as date, extract(year from r.date_from)::int as year,

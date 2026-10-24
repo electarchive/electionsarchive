@@ -845,10 +845,14 @@ export async function comparison(ids: Array<string>) {
       ? null
       : first.type === "party"
         ? sql`
-          select o.party_id as id, sum(coalesce(x.seats, 1)) as rank, 0 as tie
+          select o.party_id as id, sum(x.seats) as rank, 0 as tie
           from contest_option o
-          join outcome x on x.option_id = o.id and x.kind in ('elected', 'won')
-          join result_set rs on rs.id = x.result_set_id and ${latest("rs")}
+          cross join lateral (
+            select max(coalesce(x.seats, 1)) as seats from outcome x
+            join result_set rs on rs.id = x.result_set_id and ${latest("rs")}
+            where x.option_id = o.id and x.kind in ('elected', 'won') and x.candidacy_id is null
+            having count(*) > 0
+          ) x
           where o.contest_id in (select contest_id from contest_option where party_id = ${first.id}::uuid)
             and o.party_id <> ${first.id}::uuid
           group by o.party_id

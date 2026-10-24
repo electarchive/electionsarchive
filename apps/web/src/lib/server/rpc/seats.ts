@@ -740,8 +740,10 @@ export const seats = {
             coalesce(bm.into_id, br.parent_party_id, pm.into_id, o.party_id)::text as party,
             coalesce(mm.into_id, cy.person_id)::text as person
           from result_set rs
-          join outcome x on x.result_set_id = rs.id and x.kind in ('elected', 'won') and x.candidacy_id is null
-          join contest_option o on o.id = x.option_id
+          join contest_option o on o.contest_id = rs.contest_id and exists (
+            select from outcome x
+            where x.result_set_id = rs.id and x.option_id = o.id and x.kind in ('elected', 'won') and x.candidacy_id is null
+          )
           join election e on e.id = rs.election_id
           left join candidacy cy on cy.option_id = o.id and cy.role = 'head'
           left join entity_merge mm on mm.entity_id = cy.person_id
@@ -1016,7 +1018,7 @@ export const seats = {
             (select sum(y.value)::float8 from result_rollup y
               where y.result_set_k = rs.k and y.area_k = c.region_k and y.option_k = o.k
                 and y.measure = 1 and y.channel = 0 and y.count_round = 0) as votes,
-            (select sum(coalesce(x.seats, 1))::int from outcome x
+            (select max(coalesce(x.seats, 1))::int from outcome x
               where x.result_set_id = rs.id and x.option_id = o.id and x.candidacy_id is null and x.kind in ('won', 'elected')) as seats,
             null::uuid as person, null::text as ballot
           from c join result_set rs on rs.contest_id = c.id and ${latest("rs")}
@@ -1032,8 +1034,10 @@ export const seats = {
           from c join contest k on k.election_id = c.election_id and k.kind = 'body_seats' and k.allocation_parent_id is null
           join area_parent ap on ap.area_id = k.district_area_id and ap.parent_id = c.region and ap.valid @> c.day
           join result_set rs on rs.contest_id = k.id and ${latest("rs")}
-          join outcome x on x.result_set_id = rs.id and x.kind in ('elected', 'won') and x.candidacy_id is null
-          join contest_option o on o.id = x.option_id
+          join contest_option o on o.contest_id = k.id and exists (
+            select from outcome x
+            where x.result_set_id = rs.id and x.option_id = o.id and x.kind in ('elected', 'won') and x.candidacy_id is null
+          )
           left join candidacy cy on cy.option_id = o.id and cy.role = 'head'
         )
         select t.tier, t.id::text, coalesce(bm.into_id, br.parent_party_id, pm.into_id, t.party_id, t.id)::text as key,
