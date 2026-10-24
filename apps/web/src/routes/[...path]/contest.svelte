@@ -972,7 +972,22 @@
   });
   const held = $derived.by(() => {
     if (handover == null || contest.current == null) {
-      return null;
+      const won = contest.rows.filter((row) => (row.current?.seats ?? 0) > 0);
+      return contest.kind === "list_allocation" && won.length > 1
+        ? m.change_seats_list({
+            changes: new Intl.ListFormat(getLocale(), {
+              style: "long",
+              type: "conjunction",
+            }).format(
+              won.map((row) =>
+                m.change_seats_count({
+                  party: row.short ?? row.label,
+                  count: count(row.current?.seats ?? 0),
+                }),
+              ),
+            ),
+          })
+        : null;
     }
     if (handover.seats != null) {
       const label = (party: { label: string; short: string | null } | null) =>

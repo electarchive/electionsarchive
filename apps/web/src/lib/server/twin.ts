@@ -1348,9 +1348,26 @@ function contestMarkdown(
     handover?.lead === "margin"
       ? [m.change_gain_margin, m.change_hold_margin, m.change_allied_margin]
       : [m.change_gain, m.change_hold, m.change_allied];
+  const won = contest.rows.filter((row) => (row.current?.seats ?? 0) > 0);
   const held =
     handover == null || contest.current == null
-      ? []
+      ? contest.kind === "list_allocation" && won.length > 1
+        ? [
+            m.change_seats_list({
+              changes: new Intl.ListFormat(getLocale(), {
+                style: "long",
+                type: "conjunction",
+              }).format(
+                won.map((row) =>
+                  m.change_seats_count({
+                    party: row.short ?? row.label,
+                    count: count(row.current?.seats ?? 0),
+                  }),
+                ),
+              ),
+            }),
+          ]
+        : []
       : [
           `${
             handover.seats != null
