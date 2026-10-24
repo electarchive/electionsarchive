@@ -228,6 +228,16 @@ export async function party(path: string, place: string | null = null) {
   if (scope != null && within == null) {
     error(404);
   }
+  if (
+    within != null &&
+    (
+      await db.execute(
+        sql`select from party where id = ${id}::uuid and polity_id = ${within}::uuid`,
+      )
+    ).rows.length > 0
+  ) {
+    redirect(308, `/parties/${path}`);
+  }
   const [page, generals, members, notes] = await Promise.all([
     (async () => {
       if (within == null) {

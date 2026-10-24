@@ -899,15 +899,23 @@ function partyMarkdown(
             m.col_year(),
             m.col_election(),
             m.party_contests(),
-            m.col_seats(),
-            m.person_won(),
+            ...(record.elections.some((election) => election.seats > 0)
+              ? [m.col_seats()]
+              : []),
+            ...(record.elections.some((election) => election.won > 0)
+              ? [m.person_won()]
+              : []),
           ],
           record.elections.map((election) => [
             election.year,
             link(election.name, election.path),
             count(election.races),
-            election.seats > 0 ? count(election.seats) : null,
-            election.won > 0 ? count(election.won) : null,
+            ...(record.elections.some((other) => other.seats > 0)
+              ? [election.seats > 0 ? count(election.seats) : null]
+              : []),
+            ...(record.elections.some((other) => other.won > 0)
+              ? [election.won > 0 ? count(election.won) : null]
+              : []),
           ]),
         ),
     ...(record.count > record.elections.length
