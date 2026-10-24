@@ -434,3 +434,763 @@ Valley 1138 968
 Webster 908 1179
 Wheeler 230 205
 T 98607 94234 103
+@ 1976-11-02 1 31
+Butler 1174 2726
+Cedar 763 3910
+Colfax 1092 2999
+Cuming 837 3843
+Dakota 1662 3326
+Dixon 698 2625
+Dodge 3768 10440
+Fillmore 891 2778 1
+Gage 2625 7123
+Jefferson 1250 3567 1
+Johnson 698 1787
+Knox 1056 3577
+Lancaster 19884 46901
+Madison 2454 9017 3
+Nemaha 928 2610
+Otoe 1882 4407 1
+Pawnee 454 1411
+Pierce 504 2734
+Richardson 1700 3764 2
+Saline 1849 3705
+Saunders 2343 5085 2
+Seward 1496 4264
+Stanton 446 1835
+Thayer 746 2631
+Thurston 708 1629
+Wayne 715 2951
+York 1076 4913 1
+T 53699 146558 11
+@ 1976-11-02 2 31
+Burt 1415 2594 1
+Cass 3088 4041
+Douglas 89208 68503 114
+Sarpy 9908 9780 10
+Washington 2677 3434 2
+T 106296 88352 127
+@ 1976-11-02 3 31
+Adams 4117 8565 226 2
+Antelope 812 3040 75
+Arthur 38 227 5
+Banner 107 408 4
+Blaine 40 365 21
+Boone 859 2478 55
+Box Butte 1065 3436 76
+Boyd 443 1236 56
+Brown 310 1519 33
+Buffalo 3594 8740 323 3
+Chase 309 1603 26
+Cherry 528 2552 59
+Cheyenne 982 2903 74
+Clay 995 2591 88
+Custer 1022 4552 634
+Dawes 794 2945 126
+Dawson 1597 5964 146
+Deuel 170 1039 8
+Dundy 183 1014 18
+Franklin 507 1628 35
+Frontier 271 1367 24
+Furnas 641 2328 53
+Garden 270 1132 33
+Garfield 212 771 113
+Gosper 161 816 14
+Grant 44 389 7
+Greeley 603 1015 42
+Hall 4879 11451 404
+Hamilton 1058 3012 80
+Harlan 564 1620 42
+Hayes 82 599 11
+Hitchcock 317 1383 30
+Holt 1102 4055 159
+Hooker 52 365 9
+Howard 958 1718 78
+Kearney 869 2187 82
+Keith 756 2909 65
+Keya Paha 99 544 12
+Kimball 483 1509 27
+Lincoln 3403 9359 181
+Logan 58 428 8
+Loup 90 295 73
+McPherson 35 286 4
+Merrick 998 2580 84
+Morrill 594 1766 28
+Nance 646 1342 44
+Nuckolls 1051 2104 39
+Perkins 229 1412 19
+Phelps 934 3444 76 1
+Platte 2764 8060 218 2
+Polk 813 2146 48
+Red Willow 871 3798 76
+Rock 200 745 42
+Scotts Bluff 3736 8128 257
+Sheridan 433 2439 57
+Sherman 626 1339 85
+Sioux 173 711 13
+Thomas 51 424 14
+Valley 712 1823 235
+Webster 612 1796 30
+Wheeler 95 320 21
+T 51017 150720 5025 8
+@ 1974-11-05 1 40
+Butler 1980 1433
+Cedar 1146 2481
+Colfax 1732 1916
+Cuming 1407 2218
+Dakota 1934 1984
+Dixon 1159 1483
+Dodge 4917 5749
+Fillmore 1632 1647
+Gage 4095 3270
+Jefferson 2032 1992 1
+Johnson 1138 1198
+Knox 1392 2179
+Lancaster 23830 23782
+Madison 2792 5628
+Nemaha 1208 1522
+Otoe 2257 2750 1
+Pawnee 819 901
+Pierce 904 1972
+Richardson 2282 2564
+Saline 2545 1780
+Saunders 2854 2843
+Seward 2550 2499
+Stanton 713 1191
+Thayer 1246 1612
+Thurston 840 1048
+Wayne 1112 1732
+York 1583 2979
+T 72099 82353 2
+@ 1974-11-05 2 40
+Burt 974 2015
+Cass 1993 3135
+Douglas 48003 58775 41
+Sarpy 5471 6939 10
+Washington 2701 1867 1
+T 59142 72731 52
+@ 1974-11-05 3 40
+Adams 4827 4595 15
+Antelope 1431 1736
+Arthur 108 166
+Banner 196 293
+Blaine 215 234
+Boone 1550 1461
+Box Butte 1258 1782
+Boyd 612 785
+Brown 704 1049
+Buffalo 4967 4516 13
+Chase 897 897
+Cherry 935 1380
+Cheyenne 1385 1571
+Clay 1578 1424
+Custer 2417 2592
+Dawes 1104 1546
+Dawson 2740 2879
+Deuel 441 700
+Dundy 415 629
+Franklin 934 1011
+Frontier 660 723
+Furnas 1183 1336
+Garden 515 737
+Garfield 401 651
+Gosper 350 363
+Grant 122 216 2
+Greeley 901 610
+Hall 5801 5359
+Hamilton 1301 1571
+Harlan 955 995
+Hayes 262 323
+Hitchcock 634 742
+Holt 1776 2628
+Hooker 180 196
+Howard 1491 908
+Kearney 1416 1110
+Keith 1555 1595
+Keya Paha 248 382
+Kimball 727 939
+Lincoln 5994 3232
+Logan 258 173
+Loup 211 222
+McPherson 157 151 1
+Merrick 1358 1383
+Morrill 806 921 4
+Nance 957 738
+Nuckolls 1450 1333
+Perkins 699 707
+Phelps 1812 1649 11
+Platte 4504 3910
+Polk 1463 999 3
+Red Willow 1625 1902 16
+Rock 341 567
+Scotts Bluff 4230 4904
+Sheridan 814 1612
+Sherman 1285 708
+Sioux 306 397
+Thomas 246 252
+Valley 1188 1286
+Webster 1165 1092
+Wheeler 194 224
+T 80255 80992 65
+@ 1972-11-07 1 70
+Butler 1547 2423
+Cedar 1147 3584
+Colfax 1035 2770
+Cuming 1024 3638
+Dakota 1684 2903
+Dixon 939 2255
+Dodge 4587 8894
+Fillmore 1366 2402
+Gage 4029 5788
+Jefferson 1628 2864 1
+Johnson 1066 1468
+Knox 1242 3241
+Lancaster 28385 39751 76
+Madison 2603 8099
+Nemaha 1093 2374
+Otoe 1915 4514
+Pawnee 607 1233
+Pierce 657 2418
+Richardson 1635 3417
+Saline 2609 2791
+Saunders 2727 4065
+Seward 2241 3520
+Stanton 524 1602
+Thayer 1141 2110
+Thurston 880 1490
+Wayne 971 2561
+York 1288 4614
+T 70570 126789 77
+@ 1972-11-07 2 70
+Burt 910 2934
+Cass 1965 4311
+Douglas 55420 92898 20
+Sarpy 4938 10351
+Washington 1463 4175 2
+T 64696 114669 22
+@ 1972-11-07 3 70
+Adams 4209 7832 7
+Antelope 966 2912
+Arthur 40 234
+Banner 139 354
+Blaine 97 308
+Boone 847 2381
+Box Butte 1192 3192
+Boyd 465 1390
+Brown 435 1344
+Buffalo 4649 6859 19
+Chase 440 1169
+Cherry 573 2429
+Cheyenne 1194 2785
+Clay 1021 2300
+Custer 1516 4408
+Dawes 874 2695
+Dawson 2009 5639
+Deuel 321 902
+Dundy 252 945
+Franklin 676 1398
+Frontier 432 1178
+Furnas 762 2139
+Garden 264 1060
+Garfield 194 886
+Gosper 279 725
+Grant 66 377
+Greeley 726 981 1
+Hall 4978 9714
+Hamilton 1159 2652
+Harlan 645 1378
+Hayes 174 427
+Hitchcock 464 1203
+Holt 1257 3861
+Hooker 75 366
+Howard 931 1600
+Kearney 1028 1934
+Keith 919 2213
+Keya Paha 158 527
+Kimball 550 1524
+Lincoln 3754 6785
+Logan 100 289
+Loup 96 285
+McPherson 52 233
+Merrick 1092 2161 2
+Morrill 648 1617
+Nance 697 1288
+Nuckolls 1170 1899
+Perkins 456 1030
+Phelps 1032 2964 1
+Platte 3207 6972 1
+Polk 889 1907
+Red Willow 1223 3328 6
+Rock 230 824
+Scotts Bluff 3441 7715 1
+Sheridan 546 2299
+Sherman 812 1058
+Sioux 142 611
+Thomas 98 364
+Valley 811 1944
+Webster 820 1480
+Wheeler 86 333
+T 58378 133607 38
+@ 1970-11-03 1 20
+Butler 1599 1112 869
+Cedar 2051 1108 927
+Colfax 1720 719 692
+Cuming 2264 710 806
+Dakota 2048 989 851
+Dixon 1472 463 586
+Dodge 6186 3007 1871
+Fillmore 1690 683 1027
+Gage 2623 2580 2582
+Jefferson 1913 745 1646 1
+Johnson 771 1077 363
+Knox 2151 914 681
+Lancaster 22918 10515 14305 14
+Madison 5581 1189 1698
+Nemaha 1531 614 769
+Otoe 3009 1186 1046
+Pawnee 753 447 535
+Pierce 1913 540 593
+Richardson 2257 1194 933
+Saline 1551 1230 1743
+Saunders 2614 1833 1300
+Seward 2077 1044 1184
+Stanton 1154 344 330
+Thayer 1545 416 1108
+Thurston 954 352 621
+Wayne 1793 530 513
+York 2993 699 1340
+T 79131 36240 40919 15
+@ 1970-11-03 2 20
+Burt 1826 1227
+Cass 2342 2877
+Douglas 58115 52778 91
+Sarpy 5074 5619 5
+Washington 2314 2119
+T 69671 64620 96
+@ 1970-11-03 3 21
+Adams 4566 4629
+Antelope 2407 1124
+Arthur 224 72
+Banner 239 176
+Blaine 312 84
+Boone 1782 1009
+Box Butte 2190 1186
+Boyd 1205 428
+Brown 839 336
+Buffalo 4103 4629 1
+Chase 889 523
+Cherry 1749 552
+Cheyenne 1692 1186
+Clay 1585 1213
+Custer 3745 1686
+Dawes 2015 842
+Dawson 3439 2238
+Deuel 650 345
+Dundy 797 310
+Franklin 1030 879
+Frontier 958 484
+Furnas 1707 922
+Garden 959 341
+Garfield 773 215
+Gosper 452 344
+Grant 278 67
+Greeley 658 836
+Hall 6073 5683
+Hamilton 1760 1159
+Harlan 998 782
+Hayes 391 248
+Hitchcock 918 574
+Holt 3247 1343
+Hooker 272 82
+Howard 1095 1296
+Kearney 1247 1187
+Keith 1572 916
+Keya Paha 432 136
+Kimball 1076 665
+Lincoln 4569 4090
+Logan 224 129
+Loup 258 104
+McPherson 219 53
+Merrick 1402 1268 2
+Morrill 1295 739
+Nance 1046 847
+Nuckolls 1417 1358
+Perkins 925 491
+Phelps 2089 1321 1
+Platte 5273 3540
+Polk 1406 935
+Red Willow 2228 1404
+Rock 600 183
+Scotts Bluff 4604 2393
+Sheridan 1637 656
+Sherman 728 920
+Sioux 448 185
+Thomas 340 130
+Valley 1372 852
+Webster 1069 1189
+Wheeler 232 184
+T 93705 63698 4
+@ 1968-11-05 1 39
+Butler 1475 1854 53
+Cedar 2654 1810 48
+Colfax 2087 1256 54
+Cuming 3003 1316 42
+Dakota 2419 1627 65
+Dixon 1927 1140 24
+Dodge 7945 4107 204
+Fillmore 1925 1733 36
+Gage 3872 5612 221
+Jefferson 2363 2233 44
+Johnson 1331 1097 38
+Knox 2913 1557 58
+Lancaster 27184 28799 2611 17
+Madison 6778 3001 130
+Nemaha 2132 1343 86
+Otoe 3661 1903 101
+Pawnee 1019 932 39
+Pierce 2255 937 36
+Richardson 3023 2000 97
+Saline 1809 3294 93
+Saunders 3027 2641 123
+Seward 2467 2199 118
+Stanton 1351 580 23
+Thayer 2005 1506 29
+Thurston 1146 1106 22
+Wayne 2421 1058 40
+York 3505 1733 99
+T 97697 78374 4534 17
+@ 1968-11-05 2 39
+Burt 2185 1602
+Cass 3120 2275
+Douglas 73303 60461 40
+Sarpy 6327 4954
+Washington 2748 1962
+T 87683 71254 40
+@ 1968-11-05 3 39
+Adams 6972 4016 1
+Antelope 2971 927
+Arthur 227 43
+Banner 313 157
+Blaine 352 68
+Boone 2434 815
+Box Butte 2812 1151
+Boyd 1352 411
+Brown 1274 505
+Buffalo 6408 3661 4
+Chase 1219 435
+Cherry 2230 644
+Cheyenne 2728 1184
+Clay 2292 1012
+Custer 4269 1671
+Dawes 2568 931
+Dawson 4317 2788
+Deuel 999 285
+Dundy 1018 311
+Franklin 1420 604
+Frontier 1062 581
+Furnas 2173 770
+Garden 1101 265
+Garfield 819 172
+Gosper 613 322
+Grant 328 82
+Greeley 946 729
+Hall 8045 5287
+Hamilton 2518 1033
+Harlan 1404 671
+Hayes 451 226
+Hitchcock 1125 518
+Holt 3475 1362
+Hooker 343 38
+Howard 1231 956
+Kearney 1778 980
+Keith 2040 881
+Keya Paha 536 127
+Kimball 1487 540
+Lincoln 5925 4122
+Logan 361 153
+Loup 329 89
+McPherson 230 68
+Merrick 2051 943 1
+Morrill 1652 569
+Nance 1373 682
+Nuckolls 1905 1193
+Perkins 1059 529
+Phelps 2785 1052
+Platte 5818 2993
+Polk 1848 696
+Red Willow 3064 1365
+Rock 798 177
+Scotts Bluff 7054 3296
+Sheridan 2327 542
+Sherman 1071 866
+Sioux 594 190
+Thomas 341 97
+Valley 1811 829
+Webster 1427 995
+Wheeler 365 123
+T 123838 58728 6
+@ 1966-11-08 1 21
+Burt 1957 1330
+Butler 1561 2297
+Cedar 2078 2272
+Colfax 1879 1697
+Cuming 2380 1707
+Dakota 1964 1669
+Dixon 1602 1188
+Dodge 6324 4353
+Fillmore 1988 1724
+Gage 3476 4919
+Jefferson 2079 2584
+Johnson 1368 1407
+Knox 2677 1962
+Lancaster 24610 27799 6
+Madison 5173 3175
+Nemaha 2046 1366
+Otoe 3312 2138
+Pawnee 1043 1080
+Pierce 1845 1199
+Platte 4141 4071
+Polk 1571 1184
+Richardson 2550 2408
+Saline 1817 3392
+Saunders 2930 3201
+Seward 2270 2515
+Stanton 1133 758
+Thayer 2013 1872
+Thurston 855 1135
+Wayne 1960 1095
+York 3026 1876
+T 93628 89373 6
+@ 1966-11-08 2 21
+Cass 3586 1855
+Douglas 71492 40548 11
+Sarpy 5103 2768
+Washington 2901 1064
+T 83082 46235 11
+@ 1966-11-08 3 21
+Adams 6680 3144 4
+Antelope 2771 874
+Arthur 271 43
+Banner 362 93
+Blaine 397 75
+Boone 1884 963
+Box Butte 2398 867
+Boyd 1281 429
+Brown 1372 340
+Buffalo 5974 2586
+Chase 1235 426
+Cherry 2377 565
+Cheyenne 2918 1081
+Clay 2801 780
+Custer 4380 1401
+Dawes 2349 665
+Dawson 4686 1345 2
+Deuel 922 254
+Dundy 1052 265
+Franklin 1563 594
+Frontier 1174 315
+Furnas 2285 715
+Garden 1138 237
+Garfield 838 146
+Gosper 644 205
+Grant 379 76
+Greeley 863 742
+Hall 8350 3665
+Hamilton 2453 812
+Harlan 1133 667
+Hayes 537 180
+Hitchcock 1070 397
+Holt 3891 1170
+Hooker 337 53
+Howard 1363 820
+Kearney 1708 838
+Keith 2141 771
+Keya Paha 581 131
+Kimball 1545 494
+Lincoln 5427 2810
+Logan 307 71
+Loup 385 64
+McPherson 251 35
+Merrick 2045 729 1
+Morrill 1657 539
+Nance 1403 645
+Nuckolls 1930 1114
+Perkins 1259 400
+Phelps 2697 787
+Red Willow 2721 1053
+Rock 818 154
+Scotts Bluff 6789 3007
+Sheridan 2186 503
+Sherman 1116 690
+Sioux 634 128
+Thomas 354 74
+Valley 1816 701
+Webster 1617 685
+Wheeler 378 107
+T 115893 43520 7
+@ 1964-11-03 1 41
+Burt 1783 2449
+Butler 2590 1663
+Cedar 2527 2660
+Colfax 1704 2240
+Cuming 1807 3304
+Dakota 2291 2167
+Dixon 1757 1929
+Dodge 5580 7589
+Fillmore 2268 2038
+Gage 6800 3425
+Jefferson 2871 2086
+Johnson 1441 1321
+Knox 2081 3054
+Lancaster 33613 22952 8
+Madison 4003 6267
+Nemaha 1755 2038
+Otoe 2807 3611
+Pawnee 1082 1107
+Pierce 1351 2133
+Platte 4393 4934
+Polk 1541 1695
+Richardson 2700 2985
+Saline 3868 1807
+Saunders 3510 3607
+Seward 2932 2450
+Stanton 930 1314
+Thayer 2089 2181
+Thurston 1645 1114
+Wayne 1449 2454
+York 2515 3539
+T 107683 102113 8
+@ 1964-11-03 2 41
+Cass 3249 3460
+Douglas 61840 70228 4
+Sarpy 4760 5021
+Washington 2154 2951
+T 72003 81660 4
+@ 1964-11-03 3 41
+Adams 6112 5757
+Antelope 1674 2521
+Arthur 132 228
+Banner 202 318
+Blaine 153 345
+Boone 1720 1867
+Box Butte 2217 2367
+Boyd 816 1037
+Brown 607 1448
+Buffalo 5621 5142
+Chase 979 954
+Cherry 1228 2276
+Cheyenne 2666 2983
+Clay 1792 1945
+Custer 3061 4051
+Dawes 1827 2166
+Dawson 3393 4724
+Deuel 504 931
+Dundy 552 935
+Franklin 1251 1241
+Frontier 711 1130
+Furnas 1667 1859
+Garden 530 1065
+Garfield 389 784
+Gosper 511 495
+Grant 167 330
+Greeley 1224 746
+Hall 7501 7159
+Hamilton 1908 1980
+Harlan 1170 1192
+Hayes 389 453
+Hitchcock 884 1075
+Holt 2444 3148
+Hooker 111 352
+Howard 1852 1087
+Kearney 1803 1256
+Keith 1672 1932
+Keya Paha 244 529
+Kimball 1195 1445
+Lincoln 5556 5451
+Logan 232 301
+Loup 165 334
+McPherson 93 227
+Merrick 1634 1785
+Morrill 1266 1580
+Nance 1164 1132
+Nuckolls 1998 1613
+Perkins 785 985
+Phelps 2351 2145
+Red Willow 2395 2614
+Rock 293 819
+Scotts Bluff 5910 6989 1
+Sheridan 1407 2107
+Sherman 1391 858
+Sioux 349 681
+Thomas 174 333
+Valley 1405 1668
+Webster 1551 1199
+Wheeler 238 306
+T 93236 104380 1
+@ 1962-11-06 2 18
+Cass 2129 3636
+Douglas 31140 72161 11
+Sarpy 2182 4547
+Washington 1126 2795
+T 36577 83139 11
+@ 1962-11-06 3 18
+Adams 3452 5901 2
+Antelope 1572 1963
+Arthur 67 222
+Banner 140 294
+Blaine 116 336
+Boone 1246 1805
+Box Butte 1300 2442
+Boyd 562 990
+Brown 436 1424
+Buffalo 2590 5182 5
+Chase 542 1149
+Cherry 663 1773
+Cheyenne 1578 2891
+Clay 1015 1789
+Custer 1620 4015
+Dawes 922 2376
+Dawson 1439 3998
+Deuel 340 1123
+Dundy 362 888
+Franklin 717 1263
+Frontier 381 1018
+Furnas 766 1834
+Garden 339 1074
+Garfield 195 615
+Gosper 252 583
+Grant 148 381
+Greeley 714 753
+Hall 4096 6792
+Hamilton 926 2027
+Harlan 683 1203
+Hayes 228 549
+Hitchcock 511 1062
+Holt 1714 2985
+Hooker 51 330
+Howard 1028 1120
+Kearney 1006 1536
+Keith 1031 2142
+Keya Paha 151 499
+Kimball 604 1550
+Lincoln 3184 5237
+Logan 124 316
+Loup 133 367
+McPherson 48 192
+Merrick 1055 1770 2
+Morrill 740 1371
+Nance 698 1043
+Nuckolls 1205 1636
+Perkins 470 1076
+Phelps 1083 2570
+Red Willow 1249 2575
+Rock 218 839
+Scotts Bluff 4359 6411 2
+Sheridan 693 2387
+Sherman 979 1013
+Sioux 272 574
+Thomas 87 296
+Valley 857 1576
+Webster 922 1615
+Wheeler 179 338
+T 54058 103079 11

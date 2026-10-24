@@ -23,7 +23,7 @@ EARLY = [
         chunk.splitlines() for chunk in Path(__file__).with_name("ne_usrep_early.txt").read_text().split("@ ")[1:]
     )
 ]
-EARLY_DAYS = {1982: date(1982, 11, 2), 1984: date(1984, 11, 6), 1986: date(1986, 11, 4), 1988: date(1988, 11, 8), 1990: date(1990, 11, 6)}
+EARLY_DAYS = {1962: date(1962, 11, 6), 1964: date(1964, 11, 3), 1966: date(1966, 11, 8), 1968: date(1968, 11, 5), 1970: date(1970, 11, 3), 1972: date(1972, 11, 7), 1974: date(1974, 11, 5), 1976: date(1976, 11, 2), 1982: date(1982, 11, 2), 1984: date(1984, 11, 6), 1986: date(1986, 11, 4), 1988: date(1988, 11, 8), 1990: date(1990, 11, 6)}
 DAYS = {1992: date(1992, 11, 3), 1994: date(1994, 11, 8), 1996: date(1996, 11, 5), 1998: date(1998, 11, 3)}
 STARTS = {1992: 3361, 1994: 3194, 1996: 1859, 1998: 3033}
 METHOD = (
@@ -168,7 +168,7 @@ def emit() -> Path:
     return usrep_county.emit(
         SOURCE,
         VERSION,
-        "Nebraska's U.S. House general elections of 1982 through 1998 by county from the Board of State Canvassers' reports",
+        "Nebraska's U.S. House general elections of 1962 through 1998 by county from the Board of State Canvassers' reports",
         PUBLISHER,
         TITLE,
         LANDING,
