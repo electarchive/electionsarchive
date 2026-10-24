@@ -842,8 +842,8 @@ function polityMarkdown(
             link(
               point.name,
               point.path == null ||
-              record.scope == null ||
-              point.path.startsWith(`${record.scope}/`)
+                record.scope == null ||
+                point.path.startsWith(`${record.scope}/`)
                 ? point.path
                 : `${point.path}?in=${record.scope}`,
             ),
@@ -1051,20 +1051,26 @@ function electionMarkdown(
       }
       return [
         `## ${link(race.name, race.path)}`,
-        table(
-          [
-            m.col_option(),
-            m.col_votes(),
-            m.col_share(),
-            ...(hasSeats ? [seats] : []),
-          ],
-          race.results.map((row) => [
-            row.label,
-            count(row.votes),
-            percent(row.share),
-            ...(hasSeats ? [row.seats == null ? null : count(row.seats)] : []),
-          ]),
-        ),
+        ...(race.results.length === 0
+          ? []
+          : [
+              table(
+                [
+                  m.col_option(),
+                  m.col_votes(),
+                  m.col_share(),
+                  ...(hasSeats ? [seats] : []),
+                ],
+                race.results.map((row) => [
+                  row.label,
+                  count(row.votes),
+                  percent(row.share),
+                  ...(hasSeats
+                    ? [row.seats == null ? null : count(row.seats)]
+                    : []),
+                ]),
+              ),
+            ]),
         ...(race.unopposed == null
           ? []
           : [
