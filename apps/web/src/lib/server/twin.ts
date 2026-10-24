@@ -2730,15 +2730,28 @@ function chamberMarkdown(
       ? []
       : [
           `## ${(members?.isSeated === true ? m.chamber_members_title : m.chamber_members_returned)({ span: first === final ? first : m.polity_span({ first, last: final }) })}`,
-          table(
-            [m.col_name(), m.col_party(), m.chamber_joined(), m.chamber_left()],
-            sitting.map((member) => [
-              `${link(member.name, `id/${member.person}`)}${member.place == null ? "" : ` (${link(member.place, member.path)})`}`,
-              label(effective(member)),
-              date(member.from),
-              date(member.to),
-            ]),
-          ),
+          sitting.some((member) => member.from != null || member.to != null)
+            ? table(
+                [
+                  m.col_name(),
+                  m.col_party(),
+                  m.chamber_joined(),
+                  m.chamber_left(),
+                ],
+                sitting.map((member) => [
+                  `${link(member.name, `id/${member.person}`)}${member.place == null ? "" : ` (${link(member.place, member.path)})`}`,
+                  label(effective(member)),
+                  date(member.from),
+                  date(member.to),
+                ]),
+              )
+            : table(
+                [m.col_name(), m.col_party()],
+                sitting.map((member) => [
+                  `${link(member.name, `id/${member.person}`)}${member.place == null ? "" : ` (${link(member.place, member.path)})`}`,
+                  label(effective(member)),
+                ]),
+              ),
         ]),
   ].filter((block) => block !== "");
 }
