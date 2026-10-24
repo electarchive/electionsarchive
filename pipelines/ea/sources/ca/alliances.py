@@ -7,9 +7,9 @@ from ea.store import DATA, connect
 
 SOURCE = "ca.alliances"
 VERSION = "1"
-URL = "https://www.ourcommons.ca/procedure/procedure-and-practice-3/ch_16_5-e.html/app10-e.html"
+URL = "https://www.ourcommons.ca/procedure/procedure-and-practice-4/app12-e.html"
 PUBLISHER = "House of Commons of Canada"
-TITLE = "House of Commons Procedure and Practice, Third Edition, 2017: Appendix 10, General Election Results Since 1867"
+TITLE = "House of Commons Procedure and Practice, Fourth Edition, 2025: Appendix 12, General Election Results Since 1867"
 NOTES = (
     'Note 5 to the table: "Liberal-Conservative and Conservative Members always sat together in the House of Commons '
     'and, if applicable, in the same government." The table lists Liberal-Conservative Members in every Parliament '
@@ -19,7 +19,7 @@ CAUCUSES = [("Conservative", ["Conservative", "Liberal-Conservative"], 1867, 191
 
 
 def fetch() -> None:
-    saved = DATA / "inbox" / "manual" / "MF-067" / "app10-e.html"
+    saved = DATA / "inbox" / "manual" / "MF-067" / "app12-e.html"
     raw.store(
         SOURCE,
         URL,
