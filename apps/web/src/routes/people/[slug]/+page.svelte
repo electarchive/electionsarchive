@@ -8,6 +8,7 @@
   import { count, credit, date, percent } from "#lib/format.js";
   import { explain, LOST } from "#lib/outcomes.js";
   import { m } from "#lib/paraglide/messages.js";
+  import { getLocale } from "#lib/paraglide/runtime.js";
   import { swatch } from "#lib/party.js";
   import { cn } from "#lib/utils.js";
   import type { PageData } from "./$types";
@@ -30,24 +31,47 @@
   let isOpen = $state(false);
   const person = $derived(data.person);
   const entries = $derived(
-    person.record.map((entry) => ({
-      ...entry,
-      name:
-        entry.kind === "seated"
-          ? entry.name === ""
-            ? m.person_record_by_election_unplaced()
-            : m.person_record_by_election({ place: entry.name })
-          : entry.name.startsWith(`${entry.year} `)
-            ? `${entry.name.charAt(String(entry.year).length + 1).toLocaleUpperCase()}${entry.name.slice(String(entry.year).length + 2)}`
-            : entry.name,
-      share:
-        entry.votes == null || entry.total == null || entry.total === 0
-          ? null
-          : entry.votes / entry.total,
-      isMuted:
-        entry.outcome != null &&
-        (LOST.has(entry.outcome) || entry.outcome === "elsewhere"),
-    })),
+    person.record.map((entry) => {
+      const list = entry.nominated ?? [];
+      const [head = "", tail = ""] = m
+        .nominated_by({ parties: "\u0001" })
+        .split("\u0001");
+      let at = 0;
+      return {
+        ...entry,
+        name:
+          entry.kind === "seated"
+            ? entry.name === ""
+              ? m.person_record_by_election_unplaced()
+              : m.person_record_by_election({ place: entry.name })
+            : entry.name.startsWith(`${entry.year} `)
+              ? `${entry.name.charAt(String(entry.year).length + 1).toLocaleUpperCase()}${entry.name.slice(String(entry.year).length + 2)}`
+              : entry.name,
+        share:
+          entry.votes == null || entry.total == null || entry.total === 0
+            ? null
+            : entry.votes / entry.total,
+        isMuted:
+          entry.outcome != null &&
+          (LOST.has(entry.outcome) || entry.outcome === "elsewhere"),
+        nominees:
+          list.length === 0
+            ? null
+            : {
+                head,
+                tail,
+                parts: new Intl.ListFormat(getLocale(), { type: "conjunction" })
+                  .formatToParts(list.map((party) => party.label))
+                  .map((part) => ({
+                    text: part.value,
+                    party:
+                      part.type === "element"
+                        ? (list[at++]?.party ?? null)
+                        : null,
+                  })),
+              },
+      };
+    }),
   );
   const races = $derived(entries.map((entry) => entry.outcome));
   const won = $derived(
@@ -409,7 +433,16 @@
                     >
                   {/if}
                 </span>
-                {#if entry.party != null && entry.party.id !== person.party?.id}
+                {#if entry.nominees != null}
+                  <span
+                    class="justify-self-start text-[0.8125rem] text-muted-foreground"
+                    >{entry.nominees
+                      .head}{#each entry.nominees.parts as part, at (at)}{#if part.party == null}{part.text}{:else}<Name
+                          label={part.text}
+                          party={part.party}
+                        />{/if}{/each}{entry.nominees.tail}</span
+                  >
+                {:else if entry.party != null && entry.party.id !== person.party?.id}
                   <Name
                     class="justify-self-start text-[0.8125rem] text-muted-foreground"
                     label={entry.party.label}

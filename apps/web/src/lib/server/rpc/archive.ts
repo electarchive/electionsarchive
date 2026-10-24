@@ -3222,6 +3222,12 @@ export const contests = {
             backed: v.nullable(v.string()),
             origin: v.nullable(v.string()),
             photo: Photo,
+            nominated: v.array(
+              v.object({ party: v.string(), label: v.string() }),
+            ),
+            supported: v.array(
+              v.object({ party: v.string(), label: v.string() }),
+            ),
           }),
         ),
         targets: v.array(
@@ -4729,7 +4735,7 @@ export const contests = {
           votes: row.votes,
         }))
         .toSorted((a, b) => b.votes - a.votes);
-      const [faces, attended] = await Promise.all([
+      const [faces, attended, backers] = await Promise.all([
         portraits(
           rows.flatMap(
             (row) => row.current?.person ?? row.earlier?.person ?? [],
@@ -4743,7 +4749,26 @@ export const contests = {
           chosen?.id ?? null,
           earlier?.side.valid ?? null,
         ),
+        db.execute<{
+          person: string;
+          kind: string;
+          party: string;
+          isOwn: boolean;
+        }>(sql`
+          select distinct coalesce(m.into_id, cy.person_id) as person, n.kind::text as kind,
+            coalesce(pm.into_id, n.party_id) as party, n.party_id = o.party_id as "isOwn"
+          from candidacy_nomination n
+          join candidacy cy on cy.id = n.candidacy_id and cy.role = 'head'
+          join contest_option o on o.id = cy.option_id
+          left join entity_merge m on m.entity_id = cy.person_id
+          left join entity_merge pm on pm.entity_id = n.party_id
+          where o.contest_id = ${contest.id}::uuid
+        `),
       ]);
+      const backed = await names(
+        [...new Set(backers.rows.map((row) => row.party))],
+        contest.date,
+      );
       return {
         ...page,
         notes: notes.rows
@@ -4793,11 +4818,49 @@ export const contests = {
                 : "estimated",
           notes: notesOut,
         },
-        rows: rows.map((row) => ({
-          ...row,
-          photo:
-            faces.get(row.current?.person ?? row.earlier?.person ?? "") ?? null,
-        })),
+        rows: rows.map((row) => {
+          const own = backers.rows
+            .filter(
+              (entry) =>
+                row.current?.person != null &&
+                entry.person === row.current.person,
+            )
+            .map((entry) => ({
+              kind: entry.kind,
+              party: entry.party,
+              isOwn: entry.isOwn,
+              label:
+                backed.short.get(entry.party) ??
+                backed.full.get(entry.party) ??
+                "",
+            }))
+            .filter((entry) => entry.label !== "")
+            .toSorted(
+              (a, b) =>
+                Number(b.isOwn) - Number(a.isOwn) ||
+                a.label.localeCompare(b.label),
+            );
+          const nominated = own.filter((entry) => entry.kind === "nominated");
+          return {
+            ...row,
+            photo:
+              faces.get(row.current?.person ?? row.earlier?.person ?? "") ??
+              null,
+            nominated:
+              nominated.length > 1 || nominated[0]?.isOwn === false
+                ? nominated.map(({ party, label }) => ({ party, label }))
+                : [],
+            supported: own
+              .filter(
+                (entry) =>
+                  entry.kind === "supported" ||
+                  (entry.kind === "endorsed" &&
+                    !entry.isOwn &&
+                    nominated.every((other) => other.party !== entry.party)),
+              )
+              .map(({ party, label }) => ({ party, label })),
+          };
+        }),
         targets,
         origins: await origins,
         county: await county,
@@ -8165,6 +8228,12 @@ export const elections = {
                 isLost: v.optional(v.boolean()),
                 isIndependent: v.optional(v.boolean()),
                 photo: Photo,
+                nominated: v.array(
+                  v.object({ party: v.string(), label: v.string() }),
+                ),
+                supported: v.array(
+                  v.object({ party: v.string(), label: v.string() }),
+                ),
               }),
             ),
             places: Places,
@@ -8511,7 +8580,7 @@ export const elections = {
           race.kind === "body_seats" &&
           (race.round ?? 1) === 1,
       );
-      const [labels, slugs, faces, whole] = await Promise.all([
+      const [labels, slugs, faces, whole, nominations] = await Promise.all([
         names(ids),
         paths(ids),
         portraits(
@@ -8535,7 +8604,27 @@ export const elections = {
           from contest c
           where c.id = any(${sql.param(councils.flatMap((race) => race.sample ?? []))}::uuid[])
         `),
+        db.execute<{
+          contest: string;
+          person: string;
+          kind: string;
+          party: string;
+          isOwn: boolean;
+        }>(sql`
+          select distinct o.contest_id as contest, coalesce(m.into_id, cy.person_id) as person,
+            n.kind::text as kind, coalesce(pm.into_id, n.party_id) as party, n.party_id = o.party_id as "isOwn"
+          from candidacy_nomination n
+          join candidacy cy on cy.id = n.candidacy_id and cy.role = 'head'
+          join contest_option o on o.id = cy.option_id
+          left join entity_merge m on m.entity_id = cy.person_id
+          left join entity_merge pm on pm.entity_id = n.party_id
+          where o.contest_id = any(${sql.param(raced.flatMap((race) => race.contest ?? []))}::uuid[])
+        `),
       ]);
+      const nominators = await names(
+        [...new Set(nominations.rows.map((row) => row.party))],
+        election.date,
+      );
       const held = new Map(whole.rows.map((row) => [row.sample, row]));
       const standings = councils.map((race) => {
         const found = held.get(race.sample ?? "");
@@ -8656,10 +8745,48 @@ export const elections = {
             .some((other) => other.anchor === race.anchor)
             ? `${race.anchor}-${index + 1}`
             : race.anchor,
-          results: race.results.map((row) => ({
-            ...row,
-            photo: faces.get(row.person ?? "") ?? null,
-          })),
+          results: race.results.map((row) => {
+            const own = nominations.rows
+              .filter(
+                (entry) =>
+                  row.person != null &&
+                  entry.contest === race.contest &&
+                  entry.person === row.person,
+              )
+              .map((entry) => ({
+                kind: entry.kind,
+                party: entry.party,
+                isOwn: entry.isOwn,
+                label:
+                  nominators.short.get(entry.party) ??
+                  nominators.full.get(entry.party) ??
+                  "",
+              }))
+              .filter((entry) => entry.label !== "")
+              .toSorted(
+                (a, b) =>
+                  Number(b.isOwn) - Number(a.isOwn) ||
+                  a.label.localeCompare(b.label),
+              );
+            const nominated = own.filter((entry) => entry.kind === "nominated");
+            return {
+              ...row,
+              photo: faces.get(row.person ?? "") ?? null,
+              nominated:
+                nominated.length > 1 || nominated[0]?.isOwn === false
+                  ? nominated.map(({ party, label }) => ({ party, label }))
+                  : [],
+              supported: own
+                .filter(
+                  (entry) =>
+                    entry.kind === "supported" ||
+                    (entry.kind === "endorsed" &&
+                      !entry.isOwn &&
+                      nominated.every((other) => other.party !== entry.party)),
+                )
+                .map(({ party, label }) => ({ party, label })),
+            };
+          }),
         })),
         coverage:
           isUmbrella ||
@@ -12731,6 +12858,9 @@ export const people = {
               v.object({ votes: v.number(), total: v.number() }),
             ),
             party: v.nullable(PartyRef),
+            nominated: v.optional(
+              v.array(v.object({ party: v.string(), label: v.string() })),
+            ),
             isIndependent: v.optional(v.boolean()),
           }),
         ),
@@ -13035,10 +13165,32 @@ export const people = {
           }
         }
       }
+      const joint = await db.execute<{
+        root: string;
+        party: string;
+        isOwn: boolean;
+      }>(sql`
+        with recursive ids(id) as (
+          select ${person.id}::uuid
+          union
+          select em.entity_id from entity_merge em join ids on em.into_id = ids.id
+        )
+        select distinct coalesce(case when c.kind = 'list_allocation' then null else c.allocation_parent_id end, c.id) as root,
+          coalesce(pm.into_id, n.party_id) as party, n.party_id = o.party_id as "isOwn"
+        from candidacy cy
+        join candidacy_nomination n on n.candidacy_id = cy.id and n.kind = 'nominated'
+        join contest_option o on o.id = cy.option_id
+        join contest c on c.id = o.contest_id
+        left join entity_merge pm on pm.entity_id = n.party_id
+        where cy.person_id in (select id from ids) and cy.role = 'head'
+          and coalesce(case when c.kind = 'list_allocation' then null else c.allocation_parent_id end, c.id) = any(${sql.param(roots)}::uuid[])
+      `);
+      const nominations = Map.groupBy(joint.rows, (row) => row.root);
       const [labels, slugs] = await Promise.all([
         names(
           [
             person.id,
+            ...joint.rows.map((row) => row.party),
             ...roots,
             ...new Set([...spells, ...terms].map((spell) => spell.owner)),
             ...tenures.rows.flatMap((row) =>
@@ -13063,6 +13215,16 @@ export const people = {
               ),
           )
           .map((row) => {
+            const found = (nominations.get(row.root) ?? [])
+              .map((entry) => ({
+                party: entry.party,
+                isOwn: entry.isOwn,
+                label:
+                  labels.short.get(entry.party) ??
+                  labels.full.get(entry.party) ??
+                  "",
+              }))
+              .filter((entry) => entry.label !== "");
             const indirect =
               row.kind === "general"
                 ? rows.rows.find(
@@ -13101,6 +13263,16 @@ export const people = {
                       short: row.party_short,
                       color: row.party_color,
                     },
+              nominated:
+                found.length > 1 || found[0]?.isOwn === false
+                  ? found
+                      .toSorted(
+                        (a, b) =>
+                          Number(b.isOwn) - Number(a.isOwn) ||
+                          a.label.localeCompare(b.label),
+                      )
+                      .map(({ party, label }) => ({ party, label }))
+                  : [],
             };
           }),
         ...joins.rows.map((row) => ({

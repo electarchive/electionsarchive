@@ -106,6 +106,8 @@
   "col_delegates": "Delegates",
   "col_change": "Change",
   "backed": "Backed {name}",
+  "nominated_by": "Nominated by {parties}",
+  "supported_by": "Supported by {parties}",
   "split_from": "Split from {name}",
   "outcome_elected": "Elected",
   "outcome_won": "Won",

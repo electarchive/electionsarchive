@@ -831,6 +831,8 @@
           backed: null,
           origin: null,
           photo: row.photo,
+          nominated: row.nominated,
+          supported: row.supported,
         })),
         lede: race.isPrimaries
           ? m.race_lede_primaries({ count: count(race.count) })

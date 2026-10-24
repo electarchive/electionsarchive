@@ -763,8 +763,14 @@ function personMarkdown(
                   : m.person_record_by_election({ place: entry.name }),
               entry.path,
             ),
-            entry.party?.label ??
-              (entry.isIndependent === true ? m.person_parties_none() : null),
+            (entry.nominated?.length ?? 0) > 0
+              ? new Intl.ListFormat(getLocale(), {
+                  type: "conjunction",
+                }).format((entry.nominated ?? []).map((party) => party.label))
+              : (entry.party?.label ??
+                (entry.isIndependent === true
+                  ? m.person_parties_none()
+                  : null)),
             entry.votes == null || entry.total == null || entry.total === 0
               ? null
               : percent(entry.votes / entry.total),
@@ -1446,10 +1452,16 @@ function electionMarkdown(
                     ? [
                         row.person == null
                           ? null
-                          : (row.short ??
-                            (row.isIndependent === true
-                              ? m.seats_independents()
-                              : null)),
+                          : row.nominated.length > 0
+                            ? new Intl.ListFormat(getLocale(), {
+                                type: "conjunction",
+                              }).format(
+                                row.nominated.map((party) => party.label),
+                              )
+                            : (row.short ??
+                              (row.isIndependent === true
+                                ? m.seats_independents()
+                                : null)),
                       ]
                     : []),
                   row.votes === 0 && (row.seats ?? 0) > 0
@@ -1482,6 +1494,17 @@ function electionMarkdown(
                 ]),
               ),
             ]),
+        ...race.results.flatMap((row) =>
+          row.supported.length === 0
+            ? []
+            : [
+                `${row.label}: ${m.supported_by({
+                  parties: new Intl.ListFormat(getLocale(), {
+                    type: "conjunction",
+                  }).format(row.supported.map((party) => party.label)),
+                })}.`,
+              ],
+        ),
         ...((race.places?.sources.length ?? 0) === 0
           ? []
           : [
@@ -2405,13 +2428,16 @@ function resultsMarkdown(
   const hasParty = contest.rows.some(
     (row) => row.current?.person != null && row.short != null,
   );
+  const joined = new Intl.ListFormat(getLocale(), { type: "conjunction" });
   const parties = new Map(
     contest.rows.map((row) => [
       row.key,
-      row.short ??
-        ((row.current ?? row.earlier)?.isIndependent === true
-          ? m.seats_independents()
-          : null),
+      row.nominated.length > 0
+        ? joined.format(row.nominated.map((party) => party.label))
+        : (row.short ??
+          ((row.current ?? row.earlier)?.isIndependent === true
+            ? m.seats_independents()
+            : null)),
     ]),
   );
   const hasOutcome = contest.rows.some((row) => row.current?.outcome != null);
@@ -2490,6 +2516,14 @@ function resultsMarkdown(
           ? ""
           : `\n\n${m.stat_turnout()}: ${percent(contest.turnout.voters / contest.turnout.registered)} (${m.stat_turnout_count({ voters: count(contest.turnout.voters), registered: count(contest.turnout.registered) })})${contest.turnout.basis === "rejected" ? ` ${m.turnout_basis_rejected()}` : contest.turnout.basis === "valid" ? ` ${m.turnout_basis_valid()}` : ""}`
       }${contest.partial == null ? "" : `\n\n${m.race_partial_counties(contest.partial)}`}${contest.rows
+        .flatMap((row) =>
+          row.current == null || row.supported.length === 0
+            ? []
+            : [
+                `\n\n${row.label}: ${m.supported_by({ parties: joined.format(row.supported.map((party) => party.label)) })}.`,
+              ],
+        )
+        .join("")}${contest.rows
         .flatMap((row) =>
           row.current?.outcome == null ||
           row.current.note == null ||

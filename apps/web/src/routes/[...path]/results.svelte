@@ -43,10 +43,39 @@
     rows.map((row) => {
       const before = span?.forward === true ? row.current : row.earlier;
       const after = span?.forward === true ? row.earlier : row.current;
+      const nominated =
+        span == null && (row.current?.lines.length ?? 0) === 0
+          ? row.nominated
+          : [];
       return {
         row,
         before,
         after,
+        isNominated: nominated.length > 0,
+        backers: [
+          { say: m.nominated_by, list: nominated },
+          { say: m.supported_by, list: span == null ? row.supported : [] },
+        ]
+          .filter((entry) => entry.list.length > 0)
+          .map((entry) => {
+            const [head = "", tail = ""] = entry
+              .say({ parties: "\u0001" })
+              .split("\u0001");
+            let at = 0;
+            return {
+              head,
+              tail,
+              parts: new Intl.ListFormat(getLocale(), { type: "conjunction" })
+                .formatToParts(entry.list.map((party) => party.label))
+                .map((part) => ({
+                  text: part.value,
+                  party:
+                    part.type === "element"
+                      ? (entry.list[at++]?.party ?? null)
+                      : null,
+                })),
+            };
+          }),
         change:
           before == null || after == null ? null : after.share - before.share,
         gained:
@@ -442,7 +471,7 @@
                     />
                   {/if}
                 {/if}
-                {#if row.short != null && !row.label.includes(row.short) && !isOneParty && (span != null || (page?.lines.length ?? 0) === 0)}
+                {#if row.short != null && !row.label.includes(row.short) && !isOneParty && !line.isNominated && (span != null || (page?.lines.length ?? 0) === 0)}
                   <span class="block text-[0.8125rem] text-pretty">
                     <Name
                       class="text-muted-foreground"
@@ -482,6 +511,15 @@
                     >
                   {/if}
                 {/if}
+                {#each line.backers as backer, index (index)}
+                  <span
+                    class="block text-[0.8125rem] text-pretty text-muted-foreground"
+                    >{backer.head}{#each backer.parts as part, at (at)}{#if part.party == null}{part.text}{:else}<Name
+                          label={part.text}
+                          party={part.party}
+                        />{/if}{/each}{backer.tail}</span
+                  >
+                {/each}
                 {#if row.backed != null}
                   <span class="block text-[0.8125rem] text-muted-foreground"
                     >{m.backed({ name: row.backed })}</span

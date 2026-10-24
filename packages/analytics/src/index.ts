@@ -329,7 +329,11 @@ export function compare(
     }
   }
   const isShared =
-    new Set(current.options.map((option) => option.contest)).size > 1 ||
+    new Set(
+      current.options
+        .filter((option) => option.votes > 0)
+        .map((option) => option.contest),
+    ).size > 1 ||
     (grouping === "party" &&
       current.options.filter(
         (option) => option.outcome === "elected" || option.outcome === "won",
