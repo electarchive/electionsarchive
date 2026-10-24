@@ -864,7 +864,7 @@ def emit() -> Path:
         for year, day in ELECTIONS.items():
             era = ERAS[year]
             noun = "National Assembly for Wales" if year < 2021 else "Senedd"
-            election = cs.key("gb.election", str(day))
+            election = cs.key("gb.election", f"{day}:senedd")
             cs.add("election", id=election, polity_id=wales, kind="general", date_from=day, date_to=day, status="held")
             name(election, f"{year} {noun} election")
             path = f"gb/wales/{day}-general"

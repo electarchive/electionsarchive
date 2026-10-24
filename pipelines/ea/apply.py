@@ -694,9 +694,21 @@ def _publish_table(conn: Connection, stage: Stage, table: str) -> None:
         ).fetchall():
             if held != entity:
                 raise ValueError(f"name {name} is not {text!r} on {entity}")
-            if preferred:
-                raise ValueError(f"name {name} ({text!r}) is the preferred name of {entity}")
+            if preferred and not conn.execute(
+                "select 1 from public.name where entity_id = %s and id <> %s", [entity, name]
+            ).fetchone():
+                raise ValueError(f"name {name} ({text!r}) is the only name of {entity}")
         conn.execute(sql.SQL("delete from public.name where id in (select name_id from {})").format(staged))
+        conn.execute(
+            sql.SQL(
+                """update public.name n set is_preferred = true
+                   from (select distinct on (n.entity_id) n.id from public.name n
+                         where n.entity_id in (select entity_id from {}) and n.valid_from is null and n.valid_to is null
+                           and not exists (select from public.name o where o.entity_id = n.entity_id and o.is_preferred)
+                         order by n.entity_id, n.recorded_from desc) pick
+                   where n.id = pick.id"""
+            ).format(staged)
+        )
     if table == "note_drop":
         for note, entity, held, writer in conn.execute(
             sql.SQL(
@@ -718,6 +730,12 @@ def _publish_table(conn: Connection, stage: Stage, table: str) -> None:
             ).format(staged)
         )
     if table == "slug":
+        conn.execute(
+            sql.SQL(
+                """delete from public.slug p using {} s
+                   where p.path = s.path and p.entity_id <> s.entity_id and not p.is_current"""
+            ).format(staged)
+        )
         conn.execute(
             sql.SQL(
                 """update public.slug p set is_current = false from {} s

@@ -577,7 +577,7 @@ def emit() -> Path:
             election = elections.get(day)
             path = f"gb/{day}-referendum"
             if election is None:
-                election = elections[day] = cs.key("gb.election", day)
+                election = elections[day] = cs.key("gb.election", f"{day}:referendums" if day == "2011-05-05" else day)
                 cs.add(
                     "election",
                     id=election,
