@@ -21,7 +21,7 @@ VERSION = "1"
 ONLY = {state for state in os.environ.get("OE_STATES", "").upper().split(",") if state}
 PARSED = DATA / "parsed" / SOURCE / "_".join(sorted(ONLY)).lower()
 YEARS = range(2000, 2015)
-TOTALS = r"(?i)^\s*(county\s+|grand\s+|election\s+)?totals?:?\s*$"
+TOTALS = r"(?i)\btotals?\b|^\s*sub-?total|^erie county ny$"
 TALLIES = r"(?i)^(number of precincts|registered voters|times (blank|over|under) voted|total ?votes|under ?votes?|over ?votes?)\b"
 COLUMNS = {
     "vote": "votes",
@@ -513,7 +513,7 @@ def emit() -> Path:
 
         def head(row: dict[str, object]) -> str:
             candidate = str(row["candidate"])
-            halves = [half.strip() for half in candidate.split("&")]
+            halves = [half.strip() for half in candidate.split("&") if half.strip()]
             known = heads[(int(str(row["year"])), str(row["state"]))]
             named = [half for half in halves if re.sub(r"[^a-z]", "", half.split()[-1].lower()) in known]
             return named[0] if len(halves) == 2 and len(named) == 1 else candidate
