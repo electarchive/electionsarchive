@@ -210,9 +210,18 @@
   const sitting = $derived(
     cabinets.find((cabinet) => cabinet.from === seated) ?? null,
   );
+  const isFree = $derived(
+    current?.points.every((point) =>
+      point.parties.every(
+        (entry) => entry.party != null || entry.isIndependent,
+      ),
+    ) ?? false,
+  );
   const label = (party: string | null) =>
     party == null
-      ? m.record_none()
+      ? isFree
+        ? m.seats_independents()
+        : m.record_none()
       : (parties.get(party)?.short ?? parties.get(party)?.label ?? "");
 </script>
 

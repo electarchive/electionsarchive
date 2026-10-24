@@ -680,7 +680,7 @@
               aria-label={sitting.rows
                 .map(
                   (row) =>
-                    `${parties.get(row.party ?? "")?.short ?? parties.get(row.party ?? "")?.label ?? m.record_none()} ${row.seats}`,
+                    `${parties.get(row.party ?? "")?.short ?? parties.get(row.party ?? "")?.label ?? (row.isIndependent ? m.seats_independents() : m.record_none())} ${row.seats}`,
                 )
                 .join(", ")}
             >
@@ -713,7 +713,9 @@
                   <span class="font-semibold"
                     >{parties.get(row.party ?? "")?.short ??
                       parties.get(row.party ?? "")?.label ??
-                      m.record_none()}</span
+                      (row.isIndependent
+                        ? m.seats_independents()
+                        : m.record_none())}</span
                   >
                   <span class="font-figures text-xs tabular-nums"
                     >{row.seats}</span
