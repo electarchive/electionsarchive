@@ -1201,20 +1201,17 @@ function contestMarkdown(
     .toSorted((a, b) => (b.current?.votes ?? 0) - (a.current?.votes ?? 0));
   const label =
     handover?.party?.short ?? handover?.party?.label ?? m.seats_independents();
-  const party =
-    handover?.alliance == null
-      ? label
-      : m.change_allied({ alliance: handover.alliance, party: label });
+  const party = handover?.alliance ?? label;
   const from =
     handover?.from?.short ?? handover?.from?.label ?? m.seats_independents();
   const majority =
     top?.current != null && next?.current != null && top.current.votes > 0
       ? count(top.current.votes - next.current.votes)
       : null;
-  const [gain, hold] =
+  const [gain, hold, allied] =
     handover?.lead === "margin"
-      ? [m.change_gain_margin, m.change_hold_margin]
-      : [m.change_gain, m.change_hold];
+      ? [m.change_gain_margin, m.change_hold_margin, m.change_allied_margin]
+      : [m.change_gain, m.change_hold, m.change_allied];
   const held =
     handover == null || contest.current == null
       ? []
@@ -1252,13 +1249,17 @@ function contestMarkdown(
                     }),
                   ),
                 })
-              : majority == null
-                ? handover.isGain
-                  ? m.change_gain_bare({ party, from })
-                  : m.change_hold_bare({ party })
-                : handover.isGain
-                  ? gain({ party, from, majority })
-                  : hold({ party, majority })
+              : handover.alliance != null
+                ? majority == null
+                  ? m.change_allied_bare({ party, label })
+                  : allied({ party, label, majority })
+                : majority == null
+                  ? handover.isGain
+                    ? m.change_gain_bare({ party, from })
+                    : m.change_hold_bare({ party })
+                  : handover.isGain
+                    ? gain({ party, from, majority })
+                    : hold({ party, majority })
           }${handover.basis === "same" ? "" : "*"}`,
           ...(handover.basis === "same"
             ? []

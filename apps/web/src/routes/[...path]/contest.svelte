@@ -1000,20 +1000,20 @@
       .toSorted((a, b) => (b.current?.votes ?? 0) - (a.current?.votes ?? 0));
     const label =
       handover.party?.short ?? handover.party?.label ?? m.seats_independents();
-    const party =
-      handover.alliance == null
-        ? label
-        : m.change_allied({ alliance: handover.alliance, party: label });
     const from =
       handover.from?.short ?? handover.from?.label ?? m.seats_independents();
     const majority =
       top?.current != null && next?.current != null && top.current.votes > 0
         ? count(top.current.votes - next.current.votes)
         : null;
-    const [gain, hold] =
+    const [gain, hold, allied] =
       handover.lead === "margin"
-        ? [m.change_gain_margin, m.change_hold_margin]
-        : [m.change_gain, m.change_hold];
+        ? [m.change_gain_margin, m.change_hold_margin, m.change_allied_margin]
+        : [m.change_gain, m.change_hold, m.change_allied];
+    const party = handover.alliance ?? label;
+    if (handover.alliance != null) {
+      return `${majority == null ? m.change_allied_bare({ party, label }) : allied({ party, label, majority })}${handover.basis === "same" ? "" : "*"}`;
+    }
     return `${
       majority == null
         ? handover.isGain
