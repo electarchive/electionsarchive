@@ -9892,6 +9892,7 @@ export const polities = {
             year: v.nullable(v.number()),
             kind: v.string(),
             status: v.string(),
+            scope: v.nullable(v.string()),
             lead: v.nullable(v.object({ place: v.string(), more: v.number() })),
           }),
         ),
@@ -10009,6 +10010,7 @@ export const polities = {
             tier: number;
           }>(sql`
             with recursive up(id) as (
+            scoped: boolean;
               select parent_id from polity_parent where polity_id = ${input.id}::uuid
               union
               select p.parent_id from polity_parent p join up on p.polity_id = up.id
@@ -10016,7 +10018,7 @@ export const polities = {
             place as (
               select a.id, a.k from polity_territory t join area a on a.id = t.area_id
               join polity p on p.id = t.polity_id and (
-                p.kind in ('county', 'municipality') or not exists (select from election e where e.polity_id = p.id)
+                p.kind in ('county', 'municipality', 'region') or not exists (select from election e where e.polity_id = p.id)
               )
               where t.polity_id = ${input.id}::uuid
               order by upper(t.valid) desc nulls first limit 1
@@ -10026,6 +10028,7 @@ export const polities = {
               place.id as area, place.k,
               case
                 when c.kind = 'ballot_question' then 5
+              exists (select from polity_territory t where t.polity_id = ${input.id}::uuid and t.valid @> e.date_from) as scoped,
                 when c.kind = 'elector_slate' or o.kind in ('head_of_state', 'head_of_government') then 0
                 when (c.district_area_id is null or c.district_area_id in (pt.area_id, place.id)) and (
                   o.kind = 'governor'
@@ -10104,7 +10107,7 @@ export const polities = {
         throw new ORPCError("NOT_FOUND");
       }
       const voted =
-        electionRows.rows.length > 0
+        electionRows.rows.length > 0 && polity.kind !== "region"
           ? []
           : Map.groupBy(here.rows, (row) => row.election)
               .values()
@@ -10251,6 +10254,30 @@ export const polities = {
             }),
         ),
       ]);
+      const tiers =
+        Map.groupBy(
+          raced.filter(
+            (race) =>
+              race.body != null &&
+              (race.round ?? 1) === 1 &&
+              (race.kind === "body_seats" || race.kind === "list_allocation"),
+          ),
+          (race) => race.body,
+        )
+          .values()
+          .find((group) => {
+            let seats = 0;
+            for (const race of group) {
+              for (const row of race.results) {
+                seats += row.seats ?? 0;
+              }
+            }
+            return (
+              new Set(group.map((race) => race.kind)).size === 2 &&
+              (group[0]?.size == null || seats <= group[0].size * 1.02)
+            );
+          }) ?? [];
+      const seated = tiers.find((race) => race.kind === "body_seats");
       const local =
         built
           .filter((row) => row != null)
@@ -10322,6 +10349,8 @@ export const polities = {
             year: row.year,
             kind: row.kind,
             status: row.status,
+            scope: null,
+            rank: 0,
             lead:
               row.top == null
                 ? null
@@ -10330,16 +10359,37 @@ export const polities = {
                     more: (row.parts ?? 1) - 1,
                   },
           })),
-          ...voted.map((row) => ({
-            name: labels.full.get(row.election) ?? "",
-            path: slugs.get(row.election) ?? null,
-            date: row.date,
-            year: row.year,
-            kind: row.kind,
-            status: row.status,
-            lead: null,
-          })),
-        ],
+          ...voted.map((row) => {
+            const isScoped =
+              polity.isTerritorial &&
+              row.scoped &&
+              (row.kind === "general" || row.kind === "referendum");
+            return {
+              name: labels.full.get(row.election) ?? "",
+              path: slugs.get(row.election) ?? null,
+              date: row.date,
+              year: row.year,
+              kind: row.kind,
+              status: row.status,
+              scope: isScoped ? (slugs.get(input.id) ?? null) : null,
+              rank: isScoped
+                ? row.kind === "general"
+                  ? 1
+                  : 2
+                : row.kind === "by_election"
+                  ? 3
+                  : 4,
+              lead: null,
+            };
+          }),
+        ]
+          .toSorted(
+            (a, b) =>
+              (b.year ?? 0) - (a.year ?? 0) ||
+              a.rank - b.rank ||
+              (b.date ?? "").localeCompare(a.date ?? ""),
+          )
+          .map(({ rank: _rank, ...entry }) => entry),
         mapped: ranked?.rows[0]?.id ?? null,
         local,
         latest:
@@ -10351,8 +10401,41 @@ export const polities = {
                 scope: isBorrowed ? (slugs.get(input.id) ?? null) : null,
                 date: recent.date,
                 isLocal:
-                  !isBorrowed && (sizes[0]?.[0] ?? "") > (recent.date ?? ""),
-                races: raced.map((race) => {
+                  !isBorrowed &&
+                  polity.kind !== "region" &&
+                  (sizes[0]?.[0] ?? "") > (recent.date ?? ""),
+                races: (seated == null
+                  ? raced
+                  : [
+                      {
+                        ...seated,
+                        path: null,
+                        results: Map.groupBy(
+                          tiers
+                            .toSorted(
+                              (a, b) =>
+                                Number(b.kind === "list_allocation") -
+                                Number(a.kind === "list_allocation"),
+                            )
+                            .flatMap((race) => race.results),
+                          (row) => row.key,
+                        )
+                          .values()
+                          .flatMap(([head, ...rest]) => {
+                            if (head == null) {
+                              return [];
+                            }
+                            let seats = head.seats ?? 0;
+                            for (const row of rest) {
+                              seats += row.seats ?? 0;
+                            }
+                            return [{ ...head, seats }];
+                          })
+                          .toArray(),
+                      },
+                      ...raced.filter((race) => !tiers.includes(race)),
+                    ]
+                ).map((race) => {
                   let contested = 0;
                   for (const row of race.results) {
                     contested += row.seats ?? 0;

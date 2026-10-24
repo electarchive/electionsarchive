@@ -45,7 +45,12 @@
       (polity.elections.length === 0 ||
         !["sovereign_state", "supranational", "federal_unit"].includes(
           polity.kind,
-        )),
+        )) &&
+      !(
+        polity.kind === "region" &&
+        polity.latest != null &&
+        polity.latest.scope == null
+      ),
   );
   const above = $derived(polity.breadcrumbs.at(-1)?.name ?? "");
   const versus = createQuery(() => ({
@@ -643,6 +648,13 @@
                   <span class="flex flex-wrap items-baseline gap-x-2">
                     {#if election.path == null}
                       <span>{label}</span>
+                    {:else if election.scope != null}
+                      <a
+                        class="hover:highlighter"
+                        href="{resolve('/[...path]', {
+                          path: election.path,
+                        })}?in={election.scope}">{label}</a
+                      >
                     {:else}
                       <Preview class="hover:highlighter" path={election.path}
                         >{label}</Preview
