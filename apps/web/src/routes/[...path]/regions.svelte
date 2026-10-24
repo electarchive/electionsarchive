@@ -354,7 +354,7 @@
     {#if ordered.length > 16}
       <button
         type="button"
-        class="justify-self-start text-[0.8125rem] font-semibold underline decoration-border underline-offset-4 hover:decoration-foreground"
+        class="justify-self-start text-[0.8125rem] font-semibold underline decoration-border underline-offset-4 hover:decoration-foreground pointer-coarse:py-2"
         onclick={() => (isAll = !isAll)}
         >{isAll
           ? m.regions_fewer()

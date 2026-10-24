@@ -1021,7 +1021,7 @@
       {#if paths.length > 6}
         <button
           type="button"
-          class="justify-self-start text-[0.8125rem] font-semibold underline decoration-border underline-offset-4 hover:decoration-foreground"
+          class="justify-self-start text-[0.8125rem] font-semibold underline decoration-border underline-offset-4 hover:decoration-foreground pointer-coarse:py-2"
           onclick={() => (isAllPaths = !isAllPaths)}
           >{isAllPaths
             ? m.seats_paths_fewer()
@@ -1032,7 +1032,7 @@
   {/if}
   {#if chamber != null}
     <a
-      class="justify-self-start text-[0.8125rem] font-semibold underline decoration-border underline-offset-4 hover:decoration-foreground"
+      class="justify-self-start text-[0.8125rem] font-semibold underline decoration-border underline-offset-4 hover:decoration-foreground pointer-coarse:py-2"
       href={resolve("/id/[id]", { id: chamber })}>{m.chamber_open()}</a
     >
   {/if}

@@ -405,7 +405,7 @@
         {#if shown.length < years.length}
           <button
             type="button"
-            class="justify-self-start text-[0.8125rem] font-semibold underline decoration-border underline-offset-4 hover:decoration-foreground"
+            class="justify-self-start text-[0.8125rem] font-semibold underline decoration-border underline-offset-4 hover:decoration-foreground pointer-coarse:py-2"
             onclick={() => (isEvery = true)}
             >{m.party_record_years_more({
               count: count(years.length - shown.length),
