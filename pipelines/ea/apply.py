@@ -266,10 +266,15 @@ def _publish_table(conn: Connection, stage: Stage, table: str) -> None:
     if "id" in columns:
         compared = [column for column in columns if column != "id"]
         conflict = (
-            sql.SQL("do update set {} where ({}) is distinct from ({})").format(
+            sql.SQL("do update set {} where ({}) is distinct from ({}){}").format(
                 sql.SQL(", ").join(sql.SQL("{0} = excluded.{0}").format(sql.Identifier(c)) for c in compared),
                 sql.SQL(", ").join(sql.SQL("{}.{}").format(target, sql.Identifier(c)) for c in compared),
                 sql.SQL(", ").join(sql.SQL("excluded.{}").format(sql.Identifier(c)) for c in compared),
+                sql.SQL(
+                    " or (select o.pipeline from changeset o where o.id = name.changeset_id) <> 'identity'"
+                    if table == "name" and stage.pipeline == "identity"
+                    else ""
+                ),
             )
             if compared
             else sql.SQL("do nothing")
@@ -1024,16 +1029,18 @@ def defaults(
                        ({tally.format("new_k")}),
                        array(select o.k::text from outcome x join contest_option o on o.id = x.option_id
                              where x.result_set_id = p.old and x.candidacy_id is null and x.kind in ('elected', 'won')),
-                       p.authoritative
+                       p.authoritative,
+                       array(select o.k::text from contest_option o where o.contest_id = p.contest_id
+                             and o.kind in ('others', 'none_of_the_above', 'uncommitted'))
                 from picked p""",
         ),
         {"contests": contests},
     ).fetchall()
     flipped: list[tuple[str, str, bool]] = []
     skipped: list[dict[str, object]] = []
-    for old, new, same, contest, before, after, winners, authoritative in picks:
+    for old, new, same, contest, before, after, winners, authoritative, unranked in picks:
         total, counted = sum(before.values()), sum(after.get(option, 0) for option in before)
-        losing = [votes for option, votes in after.items() if option not in winners]
+        losing = [votes for option, votes in after.items() if option not in winners and option not in unranked]
         reason = (
             "no votes"
             if not sum(after.values())
@@ -1200,8 +1207,13 @@ def publish(conn: Connection, changeset_id: str) -> None:
                          and q.entity_id = p.entity_id and q.lang = p.lang and q.script is not distinct from p.script
                          and q.is_preferred and q.text <> p.text and q.valid_from is null and q.valid_to is null
                          and c.id = q.changeset_id and c.pipeline = 'identity'
-                         and regexp_replace(lower(unaccent(p.text)), '[^a-z0-9]', '', 'g')
-                           = regexp_replace(lower(unaccent(q.text)), '[^a-z0-9]', '', 'g')"""
+                         and (regexp_replace(lower(unaccent(p.text)), '[^a-z0-9]', '', 'g')
+                                = regexp_replace(lower(unaccent(q.text)), '[^a-z0-9]', '', 'g')
+                              or exists (select from public.name r join changeset i on i.id = r.changeset_id
+                                         where i.pipeline = 'identity' and r.entity_id = p.entity_id
+                                           and r.lang = p.lang and r.script is not distinct from p.script
+                                           and r.text = p.text and not r.is_preferred
+                                           and r.valid_from is null and r.valid_to is null))"""
                 ).format(stage.staged("name")),
                 [stage.pipeline, stage.pipeline],
             )
