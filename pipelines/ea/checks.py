@@ -100,9 +100,15 @@ class Stage:
         parent = sql.Identifier(self.parents[table])
         return sql.SQL(
             """c.id = {owner} and c.pipeline = {pipeline}
-               and p.{parent} in (select {parent} from {staged})
+               and (p.{parent} in (select {parent} from {staged}){cleared})
                and not exists (select from {staged} x where {same})"""
         ).format(
+            cleared=sql.SQL(
+                """ or p.{parent} in (select r.id from public.result_set r join public.changeset w on w.id = r.changeset_id
+                                      where w.pipeline = {pipeline} and r.id = any({clears}::uuid[]))"""
+            ).format(parent=parent, pipeline=sql.Literal(self.pipeline), clears=sql.Literal(self.clears))
+            if self.parents[table] == "result_set_id" and self.clears
+            else sql.SQL(""),
             owner=sql.SQL("(select r.changeset_id from public.{} r where r.id = p.{})").format(
                 sql.Identifier(self.owners[table]), parent
             )
@@ -369,6 +375,41 @@ def _seated(stage: Stage) -> list[tuple[str, sql.Composed]]:
     ]
 
 
+def _memberships(stage: Stage) -> list[tuple[str, sql.Composed]]:
+    if "person_party_membership" not in stage.tables:
+        return []
+    return [
+        (
+            "membership.overlap",
+            sql.SQL(
+                """with m as (
+                     select s.person_id, s.party_id, daterange(s.valid_from, s.valid_to) as valid
+                     from {staged} s
+                   ),
+                   o as (
+                     select a.person_id, a.party_id, a.valid,
+                            b.party_id as other, b.valid as other_valid, a.valid * b.valid as shared
+                     from m a join (select person_id, party_id, daterange(valid_from, valid_to) as valid
+                                    from {either}) b
+                       on b.person_id = a.person_id and b.party_id <> a.party_id and b.valid && a.valid
+                   )
+                   select o.person_id, null::uuid,
+                          jsonb_build_object('party', o.party_id, 'valid', o.valid::text, 'other', o.other,
+                                             'other_valid', o.other_valid::text)
+                   from o
+                   where (lower_inf(o.shared) or upper_inf(o.shared) or upper(o.shared) - lower(o.shared) > 366)
+                     and not exists (select from public.party_relation r
+                                     where (r.from_party_id, r.to_party_id) in ((o.party_id, o.other), (o.other, o.party_id)))
+                     and not exists (select from public.party_affiliation f
+                                     where (f.party_id, f.parent_party_id) in ((o.party_id, o.other), (o.other, o.party_id)))"""
+            ).format(
+                staged=stage.staged("person_party_membership"),
+                either=stage.either("person_party_membership", "person_id", "party_id", "valid_from", "valid_to"),
+            ),
+        )
+    ]
+
+
 def _scope(stage: Stage) -> list[tuple[str, sql.Composed]]:
     queries: list[tuple[str, sql.Composed]] = []
     for table, columns in stage.tables.items():
@@ -480,10 +521,11 @@ def run(conn: Connection, stage: Stage) -> list[Finding]:
         *_outcomes(stage),
         *_geometry(stage),
         *_seated(stage),
+        *_memberships(stage),
         *_scope(stage),
     ]:
         findings.extend(
-            Finding(code, "error", entity_id, result_set_id, details)
+            Finding(code, "warning" if code == "membership.overlap" else "error", entity_id, result_set_id, details)
             for entity_id, result_set_id, details in conn.execute(query).fetchall()
         )
     return findings
