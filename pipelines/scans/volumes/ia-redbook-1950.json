@@ -32,5 +32,16 @@
   322,
   323
  ],
- "note": "Each office table runs two pages (counties A to about K, then the rest) with the printed Total row on the second page only; page 317 starts with the end of the U.S. Senator table (skip) and carries the first page of Governor and Lieutenant Governor below it; page 319 opens with a note on Prohibition and State Right Democrat state totals (the printed totals for those lines are not by county), then the first Secretary of State, Auditor, and Treasurer page; page 322 ends with the first Commerce Commissioners page, which continues on 323 with the Convention question (skip). Clean typeset; the text layer drops rows and has digit slips, and tesseract does not tie to the printed Totals, so vision with the Total row as the check. Candidates print as surnames only; resolve full names from the candidate lists in the same book (page 7 to 8 of the election section) or leave surname-only. Iowa has 99 counties."
+ "note": "Each office table runs two pages (counties A to about K, then the rest) with the printed Total row on the second page only; page 317 starts with the end of the U.S. Senator table (skip) and carries the first page of Governor and Lieutenant Governor below it; page 319 opens with a note on Prohibition and State Right Democrat state totals (the printed totals for those lines are not by county), then the first Secretary of State, Auditor, and Treasurer page; page 322 ends with the first Commerce Commissioners page, which continues on 323 with the Convention question (skip). Clean typeset; the text layer drops rows and has digit slips, and tesseract does not tie to the printed Totals, so vision with the Total row as the check. Candidates print as surnames only; resolve full names from the candidate lists in the same book (page 7 to 8 of the election section) or leave surname-only. Iowa has 99 counties. Office slugs are `us.office` external ids `{slug}:IA`; the ones marked exists are in the database, and the Iowa emit creates the ones marked create (superintendent-of-public-instruction is the slug 15 other states use; commerce-commissioner is Iowa's Commerce Commission seat).",
+ "office_status": {
+  "governor": "exists",
+  "lieutenant-governor": "exists",
+  "secretary-of-state": "exists",
+  "auditor": "exists",
+  "treasurer": "exists",
+  "secretary-of-agriculture": "exists",
+  "attorney-general": "exists",
+  "superintendent-of-public-instruction": "create",
+  "commerce-commissioner": "create"
+ }
 }

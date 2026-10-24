@@ -29,5 +29,14 @@
   164,
   165
  ],
- "note": "Printed pages 160 to 165, one pair of pages per table group (Governor and Lieutenant Governor 160 to 161; Secretary of State, Auditor, and Treasurer 162 to 163; Secretary of Agriculture, Attorney General, and Judge of the Supreme Court 164 to 165, skip the judge column). Each pair splits the 99 counties across two pages with the Total row last. The text layer is badly garbled (OCR slips in headings and digits), so vision with the printed Total as the check. The same book prints the primary by counties at PDF pages 148 to 152 and the general by precinct from page 176."
+ "note": "Printed pages 160 to 165, one pair of pages per table group (Governor and Lieutenant Governor 160 to 161; Secretary of State, Auditor, and Treasurer 162 to 163; Secretary of Agriculture, Attorney General, and Judge of the Supreme Court 164 to 165, skip the judge column). Each pair splits the 99 counties across two pages with the Total row last. The text layer is badly garbled (OCR slips in headings and digits), so vision with the printed Total as the check. The same book prints the primary by counties at PDF pages 148 to 152 and the general by precinct from page 176. Office slugs are `us.office` external ids `{slug}:IA`; the ones marked exists are in the database, and the Iowa emit creates the ones marked create (superintendent-of-public-instruction is the slug 15 other states use; commerce-commissioner is Iowa's Commerce Commission seat).",
+ "office_status": {
+  "governor": "exists",
+  "lieutenant-governor": "exists",
+  "secretary-of-state": "exists",
+  "auditor": "exists",
+  "treasurer": "exists",
+  "secretary-of-agriculture": "exists",
+  "attorney-general": "exists"
+ }
 }
