@@ -2193,7 +2193,14 @@
         {/if}
         <div class="flex items-baseline gap-2">
           <dt class="text-[0.8125rem] text-muted-foreground">
-            <Term label={m.stat_turnout()} definition={m.term_turnout()} />
+            <Term
+              label={m.stat_turnout()}
+              definition={contest.turnout.basis === "rejected"
+                ? m.term_turnout_rejected()
+                : contest.turnout.basis === "valid"
+                  ? m.term_turnout_valid()
+                  : m.term_turnout()}
+            />
           </dt>
           <dd class="flex flex-wrap items-baseline gap-x-2">
             <span class="font-figures text-xl font-[760] tracking-[-0.015em]"

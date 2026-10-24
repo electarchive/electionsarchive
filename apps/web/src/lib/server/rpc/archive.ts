@@ -2855,6 +2855,7 @@ export const contests = {
             voters: v.number(),
             reporting: v.optional(v.number()),
             of: v.optional(v.number()),
+            basis: v.optional(v.nullable(v.picklist(["valid", "rejected"]))),
             earlier: v.optional(
               v.nullable(
                 v.object({ registered: v.number(), voters: v.number() }),
@@ -6254,17 +6255,24 @@ async function poll(contest: string | null, k: number | null, isAsked = true) {
   const found = await db.execute<{
     registered: number;
     voters: number;
+    basis: "valid" | "rejected" | null;
     quorum: number | null;
   }>(sql`
     select t.*, ((coalesce(es.rules, '{}') || coalesce(c.rules_override, '{}')) ->> 'quorum')::float8 as quorum
     from (
-      select nullif(sum(registered), 0)::float8 as registered, sum(voters)::float8 as voters from (
+      select nullif(sum(registered), 0)::float8 as registered,
+        sum(coalesce(voters, valid + coalesce(invalid, 0)))::float8 as voters,
+        case when bool_and(voters is not null) then null
+          when bool_or(voters is null and invalid is not null) then 'rejected' else 'valid' end as basis
+      from (
         select nullif(max(r.value) filter (where r.measure = 2), 0) as registered,
-          coalesce(max(r.value) filter (where r.measure = 14), max(r.value) filter (where r.measure = 3)) as voters
+          coalesce(max(r.value) filter (where r.measure = 14), max(r.value) filter (where r.measure = 3)) as voters,
+          max(r.value) filter (where r.measure = 4) as valid,
+          max(r.value) filter (where r.measure = 5) as invalid
         from result_set rs cross join lateral (
           select x.channel, x.measure, x.value from result_rollup x
           where x.result_set_k = rs.k and x.area_k = ${k}::int and x.option_k = 0
-            and x.measure in (2, 3, 14) and x.count_round = 0 offset 0
+            and x.measure in (2, 3, 4, 5, 14) and x.count_round = 0 offset 0
         ) r
         where rs.contest_id = ${contest}::uuid and rs.is_default
         group by r.channel
@@ -6277,22 +6285,29 @@ async function poll(contest: string | null, k: number | null, isAsked = true) {
   const row = found.rows[0];
   return {
     turnout:
-      row == null ? null : { registered: row.registered, voters: row.voters },
+      row == null
+        ? null
+        : { registered: row.registered, voters: row.voters, basis: row.basis },
     quorum: row?.quorum ?? null,
   };
 }
 
 async function attendance(
-  known: { registered: number; voters: number } | null,
+  known: {
+    registered: number;
+    voters: number;
+    basis: "valid" | "rejected" | null;
+  } | null,
   contest: string,
   k: number,
   valid: number,
   before: string | null,
   prior: number | null,
 ) {
-  const [pooled, earlier] = await Promise.all([
+  const [pooled, earlier, polled] = await Promise.all([
     known == null ? turnout(contest, [k]) : null,
     turnout(prior == null ? null : before, [k]),
+    prior == null ? null : poll(before, k),
   ]);
   const turned = sane(known ?? pooled?.get(k), valid);
   return turned == null
@@ -6302,7 +6317,9 @@ async function attendance(
         voters: turned.voters,
         reporting: turned.reporting,
         of: turned.of,
-        earlier: sane(earlier.get(k), prior ?? 0),
+        basis: known?.basis ?? null,
+        earlier:
+          sane(earlier.get(k), prior ?? 0) ?? sane(polled?.turnout, prior ?? 0),
       };
 }
 

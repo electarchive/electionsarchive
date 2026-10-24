@@ -1061,12 +1061,18 @@ function resultsMarkdown(
   then: string | null,
 ) {
   const hasSeats = contest.rows.some((row) => row.current?.seats != null);
+  const hasParty = contest.rows.some(
+    (row) => row.current?.person != null && row.short != null,
+  );
   const results = contest.rows
     .filter(
       (row) => row.current != null || (then != null && row.earlier != null),
     )
-    .map(({ label, current, earlier, delta }) => [
+    .map(({ label, short, current, earlier, delta }) => [
       label,
+      ...(hasParty
+        ? [(current ?? earlier)?.person == null ? null : short]
+        : []),
       current && count(current.votes),
       current && percent(current.share),
       ...(hasSeats
@@ -1089,6 +1095,7 @@ function resultsMarkdown(
           contest.rows.some((row) => row.key.startsWith("answer:"))
             ? m.col_answer()
             : m.col_option(),
+          ...(hasParty ? [m.col_party()] : []),
           m.col_votes(),
           m.col_share(),
           ...(hasSeats ? [m.col_seats()] : []),
@@ -1098,7 +1105,11 @@ function resultsMarkdown(
           m.col_result(),
         ],
         results,
-      )}\n\n${m.stat_valid()}: ${count(contest.current.valid)}${contest.partial == null ? "" : `\n\n${m.race_partial_counties(contest.partial)}`}${contest.rows
+      )}\n\n${m.stat_valid()}: ${count(contest.current.valid)}${
+        contest.turnout == null || contest.turnout.registered === 0
+          ? ""
+          : `\n\n${m.stat_turnout()}: ${percent(contest.turnout.voters / contest.turnout.registered)} (${m.stat_turnout_count({ voters: count(contest.turnout.voters), registered: count(contest.turnout.registered) })})${contest.turnout.basis === "rejected" ? ` ${m.turnout_basis_rejected()}` : contest.turnout.basis === "valid" ? ` ${m.turnout_basis_valid()}` : ""}`
+      }${contest.partial == null ? "" : `\n\n${m.race_partial_counties(contest.partial)}`}${contest.rows
         .flatMap((row) =>
           row.current?.outcome == null ||
           row.current.note == null ||
