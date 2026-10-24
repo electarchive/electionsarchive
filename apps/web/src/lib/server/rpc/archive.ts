@@ -12752,39 +12752,29 @@ export const entities = {
         return { path: null };
       }
       const labels = await names([entity.id]);
-      const known =
+      const common =
         entity.type === "person"
           ? await db.execute<{ text: string }>(sql`
-            select text from name where entity_id = ${entity.id}::uuid and kind in ('official', 'english')
-            order by kind = 'english' and lang = 'en' and script = 'Latn' desc, is_preferred desc, text
+            select text from name where entity_id = ${entity.id}::uuid and kind = 'english' and lang = 'en' and script = 'Latn'
+            order by is_preferred desc, text limit 1
           `)
           : null;
+      const base = segment(
+        common?.rows[0]?.text ?? labels.full.get(entity.id) ?? "",
+      );
       const owner =
         entity.type === "party"
           ? await db.execute<{ polity: string | null }>(sql`
             select polity_id as polity from party where id = ${entity.id}::uuid
           `)
           : null;
-      const bases = new Set([
-        ...(known?.rows.map((row) => segment(row.text)) ?? []),
-        segment(labels.full.get(entity.id) ?? ""),
-      ]);
-      let slug: string | null = null;
-      for (const base of bases) {
-        const peers = await namesakes(
-          entity.type,
-          base,
-          owner?.rows[0]?.polity ?? null,
-        );
-        const at = peers.indexOf(entity.id);
-        if (at >= 0) {
-          slug = at > 0 ? `${base}-${at + 1}` : base;
-          break;
-        }
-      }
-      if (slug == null) {
-        return { path: null };
-      }
+      const peers = await namesakes(
+        entity.type,
+        base,
+        owner?.rows[0]?.polity ?? null,
+      );
+      const at = peers.indexOf(entity.id);
+      const slug = at > 0 ? `${base}-${at + 1}` : base;
       return {
         path:
           entity.type === "person"
