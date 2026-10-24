@@ -210,18 +210,22 @@
     }
     const [only] = successors.places;
     if (successors.places.length === 1 && only != null && only.share >= 0.9) {
-      const [before = "", after = ""] = m
-        .successors_one({ year: successors.year, seat: "\u0001" })
-        .split("\u0001");
+      const [before = "", after = ""] = (
+        successors.method === "population"
+          ? m.successors_one_population
+          : m.successors_one
+      )({ year: successors.year, seat: "\u0001" }).split("\u0001");
       return [
         { text: before, path: null },
         { text: only.name, path: only.path },
         { text: after, path: null },
       ];
     }
-    const [before = "", after = ""] = m
-      .successors_many({ year: successors.year, seats: "\u0001" })
-      .split("\u0001");
+    const [before = "", after = ""] = (
+      successors.method === "population"
+        ? m.successors_many_population
+        : m.successors_many
+    )({ year: successors.year, seats: "\u0001" }).split("\u0001");
     const parts = new Intl.ListFormat(getLocale(), {
       type: "conjunction",
     }).formatToParts(successors.places.map((_, index) => String(index)));

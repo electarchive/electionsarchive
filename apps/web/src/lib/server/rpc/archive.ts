@@ -2133,6 +2133,11 @@ async function places(
             limit 1
           )
           and w.to_k = any(${sql.param(listed.map((row) => row.k))}::int[])
+          and not exists (
+            select from crosswalk y
+            where y.from_boundary_set_id = x.from_boundary_set_id and y.to_boundary_set_id = x.to_boundary_set_id
+              and y.method = 'population' and x.method <> 'population'
+          )
       `);
   const weights = crosswalk?.rows ?? [];
   const spread = new Map<number, Array<[number, number]>>();
@@ -5218,6 +5223,11 @@ export const contests = {
             limit 1
           )
           and w.to_k = any(${sql.param(shown.map((row) => row.k))}::int[])
+          and not exists (
+            select from crosswalk y
+            where y.from_boundary_set_id = x.from_boundary_set_id and y.to_boundary_set_id = x.to_boundary_set_id
+              and y.method = 'population' and x.method <> 'population'
+          )
       `);
       const spread = new Map<number, Array<[number, number]>>();
       for (const row of crosswalk.rows) {

@@ -1074,6 +1074,7 @@ export const seats = {
       v.nullable(
         v.object({
           year: v.string(),
+          method: v.string(),
           places: v.array(
             v.object({
               name: v.string(),
@@ -1087,6 +1088,7 @@ export const seats = {
     .handler(async ({ input }) => {
       const found = await db.execute<{
         vintage: string;
+        method: string;
         area: string;
         share: number;
         contest: string | null;
@@ -1101,14 +1103,19 @@ export const seats = {
           select bs.id, bs.valid from boundary_set bs join c on bs.scheme_code = c.scheme_code and bs.valid @> c.day
           order by bs.valid_from desc nulls last limit 1
         )
-        select t.vintage, ta.id::text as area, w.weight::float8 as share, c.day::text as day,
+        select t.vintage, x.method, ta.id::text as area, w.weight::float8 as share, c.day::text as day,
           (select k.id::text from contest k join election e on e.id = k.election_id
             where k.district_area_id = ta.id and k.kind = 'body_seats' and e.kind = 'general' and e.status = 'held'
               and e.date_from >= lower(t.valid)
             order by e.date_from limit 1) as contest
         from s cross join c
-        join crosswalk x on x.from_boundary_set_id = s.id and x.method = 'area'
+        join crosswalk x on x.from_boundary_set_id = s.id and x.method in ('population', 'area')
         join boundary_set t on t.id = x.to_boundary_set_id and lower(t.valid) > lower(s.valid)
+          and not exists (
+            select from crosswalk y
+            where y.from_boundary_set_id = x.from_boundary_set_id and y.to_boundary_set_id = x.to_boundary_set_id
+              and y.method = 'population' and x.method <> 'population'
+          )
         join crosswalk_weight w on w.crosswalk_id = x.id and w.from_k = c.k
         join area ta on ta.k = w.to_k
         where w.weight >= 0.01 and not exists (
@@ -1131,6 +1138,7 @@ export const seats = {
       ]);
       return {
         year: first.vintage,
+        method: first.method,
         places: found.rows.map((row) => ({
           name: labels.full.get(row.area) ?? "",
           path: slugs.get(row.contest ?? "") ?? null,

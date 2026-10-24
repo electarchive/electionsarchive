@@ -1484,14 +1484,18 @@ function contestMarkdown(
       : [
           successors.places.length === 1 &&
           (successors.places[0]?.share ?? 0) >= 0.9
-            ? m.successors_one({
+            ? (successors.method === "population"
+                ? m.successors_one_population
+                : m.successors_one)({
                 year: successors.year,
                 seat: link(
                   successors.places[0]?.name ?? "",
                   successors.places[0]?.path ?? null,
                 ),
               })
-            : m.successors_many({
+            : (successors.method === "population"
+                ? m.successors_many_population
+                : m.successors_many)({
                 year: successors.year,
                 seats: new Intl.ListFormat(getLocale(), {
                   type: "conjunction",
