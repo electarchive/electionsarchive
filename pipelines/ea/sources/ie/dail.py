@@ -411,10 +411,11 @@ def emit() -> Path:
     counts = pl.read_parquet(PARSED / "counts.parquet")
     printed = pl.read_parquet(PARSED / "printed.parquet")
     members = pl.read_parquet(PARSED / "members.parquet")
-    forms = {
-        (row["year"], row["constituency"], row["candidate"]): row["member_name"]
+    identity = {
+        (row["year"], row["constituency"], row["candidate"]): row
         for row in pl.read_parquet(PARSED / "identity.parquet").iter_rows(named=True)
     }
+    roster: list[dict[str, object]] = []
     with connect() as conn:
         cs = Changeset(
             conn,
@@ -660,7 +661,18 @@ def emit() -> Path:
                     option_key = f"{contest_key}:{fold(candidate['name'])}{suffix}"
                     option = cs.key("ie.option", option_key)
                     person = cs.key(f"{SOURCE}.person", f"{year}:{slug(label)}:{fold(candidate['name'])}{suffix}")
-                    shown_name = forms.get((year, label, candidate["candidate"]), candidate["name"])
+                    linked = identity.get((year, label, candidate["candidate"]))
+                    shown_name = linked["member_name"] if linked is not None else candidate["name"]
+                    roster.append(
+                        {
+                            "year": year,
+                            "constituency": label,
+                            "person": f"{year}:{slug(label)}:{fold(candidate['name'])}{suffix}",
+                            "name": fold(candidate["name"]),
+                            "party": candidate["party"],
+                            "code": linked["code"] if linked is not None else None,
+                        }
+                    )
                     cs.add("person", id=person, gender={"M": "male", "F": "female"}.get(str(candidate["gender"]).strip()[:1].upper()))
                     name(person, shown_name)
                     cs.add(
@@ -729,6 +741,16 @@ def emit() -> Path:
                     person = cs.key(f"{SOURCE}.person", f"{year}:{slug(label)}:{fold(speaker['name'])}")
                     cs.add("person", id=person)
                     name(person, speaker["name"])
+                    roster.append(
+                        {
+                            "year": year,
+                            "constituency": label,
+                            "person": f"{year}:{slug(label)}:{fold(speaker['name'])}",
+                            "name": fold(speaker["name"]),
+                            "party": speaker["party"],
+                            "code": speaker["code"],
+                        }
+                    )
                     cs.add(
                         "contest_option",
                         id=option,
@@ -761,6 +783,8 @@ def emit() -> Path:
                         flags=0 if len(shown) else DERIVED,
                         value=unit_row["valid"] - total,
                     )
+        PARSED.mkdir(parents=True, exist_ok=True)
+        pl.DataFrame(roster).write_parquet(PARSED / "roster.parquet")
         for year, (before, after) in SUCCESSIONS.items():
             successor, predecessor = party_id(after), party_id(before)
             if conn.execute(
