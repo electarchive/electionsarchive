@@ -8,7 +8,7 @@ from ea.sources.gb import offices
 from ea.store import connect
 
 SOURCE = "gb.lineage"
-VERSION = "2"
+VERSION = "3"
 TITLE = "UK party lineage: follows, followed by, inception, and dissolution (P155, P156, P571, P576)"
 RELATIONS = (
     ("Q622441", "merged_into", "Q9624", date(1988, 3, 3), "day"),
@@ -19,6 +19,44 @@ RELATIONS = (
     ("Q1311653", "successor_of", "Q476840", date(1882, 1, 1), "year"),
 )
 URWIN = "Scottish Conservatism: A Party Organization in Transition"
+VICTORIAN = (
+    ("whig", "merged_into", "Q622441", date(1859, 6, 6), "day", "willis"),
+    ("radicals", "merged_into", "Q622441", date(1859, 6, 6), "day", "willis"),
+    ("peelite", "merged_into", "Q622441", date(1859, 6, 6), "day", "willis"),
+    ("irish-national-federation", "split_from", "Q1311653", date(1891, 1, 1), "year", "redmond"),
+    ("irish-national-league", "split_from", "Q1311653", date(1891, 1, 1), "year", "redmond"),
+    ("irish-national-federation", "merged_into", "Q1311653", date(1900, 1, 1), "year", "redmond"),
+    ("irish-national-league", "merged_into", "Q1311653", date(1900, 1, 1), "year", "redmond"),
+)
+HISTORIES = {
+    "willis": (
+        "Liberal Democrat History Group",
+        "On this day, 6 June 1859: formation of the Liberal Party",
+        "https://liberalhistory.org.uk/timeline-event/on-this-day-6-6-1859/",
+        "academic",
+        (
+            "Whigs, Peelites, and Radicals met at Willis's Rooms on 6 June 1859, the date generally taken as the "
+            "formation of the Liberal Party."
+        ),
+    ),
+    "redmond": (
+        "National Library of Ireland",
+        "John Redmond and the Irish Parliamentary Party",
+        "https://www.nli.ie/1916/exhibition/en/content/stagesetters/homerule/johnredmond/",
+        "official_body",
+        (
+            "After the Irish Parliamentary Party split over Parnell's leadership, Redmond led the Parnellite wing from "
+            "1891 and became leader of the reunited party in 1900."
+        ),
+    ),
+    "ulster": (
+        "History Ireland",
+        "The 1885 and 1886 general elections in Ireland",
+        "https://historyireland.com/the-1885-and-1886-general-elections-in-ireland/",
+        "academic",
+        "Counts the sixteen Ulster seats won in 1885 by the Irish Conservatives as the Conservative Party's.",
+    ),
+}
 ITEMS = sorted({item for origin, _, target, _, _ in RELATIONS for item in (origin, target)} | {"Q9630", "Q21942488"})
 SERVICE = "https://query.wikidata.org/sparql?" + urlencode(
     {
@@ -32,6 +70,8 @@ SERVICE = "https://query.wikidata.org/sparql?" + urlencode(
 
 def fetch() -> None:
     raw.fetch(SOURCE, SERVICE, suffix=".json")
+    for *_, url, _, _ in HISTORIES.values():
+        raw.fetch(SOURCE, url, suffix=".html")
 
 
 def emit() -> Path:
@@ -161,6 +201,38 @@ def emit() -> Path:
             cs.add("alliance_member", alliance_id=alliance, party_id=parties["Q9626"], role=None)
             cs.add("alliance_member", alliance_id=alliance, party_id=ulster, role=None)
             cs.add("citation", entity_id=alliance, source_id=library)
+        histories = {}
+        for key, (publisher, title, url, kind, notes) in HISTORIES.items():
+            histories[key] = cs.source(publisher, title)
+            cs.add("source", id=histories[key], kind=kind, publisher=publisher, title=title, url=url, notes=notes)
+            cs.artifact(raw.cached(SOURCE, url), histories[key])
+        for origin, kind, target, day, precision, history in VICTORIAN:
+            party = cs.key("gb.party", origin)
+            if party in cs.minted:
+                raise ValueError(f"no gb.party {origin}")
+            cs.add(
+                "party_relation",
+                from_party_id=party,
+                to_party_id=parties[target],
+                kind=kind,
+                date=day,
+                date_precision=precision,
+                source_id=histories[history],
+            )
+        irish = cs.key("gb.party", "irish-conservative")
+        if irish in cs.minted:
+            raise ValueError("no gb.party irish-conservative")
+        cs.add(
+            "party_affiliation",
+            party_id=irish,
+            parent_party_id=parties["Q9626"],
+            kind="regional_branch",
+            valid_from=date(1885, 1, 1),
+            valid_from_precision="year",
+            valid_to=date(1886, 1, 1),
+            valid_to_precision="year",
+        )
+        cs.add("citation", entity_id=irish, source_id=histories["ulster"])
         print(
             f"{len(generals)} general elections with Ulster Unionist candidates to 1970:", [day for _, day in generals]
         )

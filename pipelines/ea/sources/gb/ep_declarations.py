@@ -17,7 +17,7 @@ from ea.changeset import Changeset, slug
 from ea.store import DATA, connect
 
 SOURCE = "gb.ep_declarations"
-VERSION = "3"
+VERSION = "4"
 PARSED = DATA / "parsed" / SOURCE
 LIBRARY = "House of Commons Library"
 PAPERS = {
@@ -47,6 +47,48 @@ LONDON = (
     "https://haringey.gov.uk/sites/default/files/2023-10/epe_2019_overall_london_votes.pdf",
     "Regional Returning Officer, London Region",
     "Declaration of result, European Parliamentary Election, 23 May 2019, London Region",
+)
+DECLARATIONS = {
+    "north-east": (
+        "https://www.middlesbrough.gov.uk/media/w4nodjdl/european-parliamentary-election-statement-of-result-north-east-may-2019.pdf",
+        ".pdf",
+    ),
+    "north-west": (
+        "https://www.ribblevalley.gov.uk/downloads/file/601/statement-of-the-result-for-the-north-west-electoral-region",
+        ".pdf",
+    ),
+    "yorkshire-and-the-humber": (
+        "https://datamillnorth.org/download/24lmx/dba6deb5-28b5-4b36-ad83-ada33db2a325/EPE%202019%20YH%20Totals%20by%20Authority.csv",
+        ".csv",
+    ),
+    "east-midlands": (
+        "https://www.mansfield.gov.uk/downloads/file/731/european-results-for-east-midlands-2019",
+        ".pdf",
+    ),
+    "west-midlands": (
+        "https://www.birmingham.gov.uk/info/50381/past_election_results/1946/european_parliamentary_election_results_may_2019",
+        ".html",
+    ),
+    "eastern": (
+        "https://www.maldon.gov.uk/download/downloads/id/17700/european_election_23_may_2019_-_east_of_england_-_statement_under_rule_61_1.pdf",
+        ".pdf",
+    ),
+    "south-east": ("https://www.eastleigh.gov.uk/media/5216/declaration-of-result-european-2019.pdf", ".pdf"),
+    "south-west": (
+        "https://www.bcpcouncil.gov.uk/news-hub/news-articles/european-election-results-for-the-south-west",
+        ".html",
+    ),
+    "wales": (
+        "https://www.rctcbc.gov.uk/EN/Council/Votingandelections/RelatedDocuments/DeclarationofResults/2019/DeclarationofresultElectoralRegionofWales.pdf",
+        ".pdf",
+    ),
+    "scotland": ("https://www.emb.scot/downloads/file/343/statement-of-results-for-scotland", ".pdf"),
+}
+SCANNED = {"north-west", "wales"}
+GROUPED = "The Commons Library groups smaller parties and independent candidates as Others."
+UNLISTED = (
+    "List ranks are from the Regional Returning Officer's Statement of Parties and Individual Candidates Nominated. "
+    "The lists of parties the source groups as Others are not recorded, because their votes are not given separately."
 )
 DC = "https://candidates.democracyclub.org.uk"
 SOPN_DATES = {2014: "2014-05-22", 2019: "2019-05-23"}
@@ -78,6 +120,8 @@ DC_PARTIES = {
     "PP133": "the-peace-party-non-violence-justice-environment",
     "PP2342": "the-roman-party-ave",
     "PP770": "pirate-party-uk",
+    "PP110": "the-socialist-party-of-great-britain",
+    "PP1951": "independent-network",
 }
 API = "https://data.europarl.europa.eu/api/v2"
 FORMAT = "format=application%2Fld%2Bjson"
@@ -150,6 +194,9 @@ PARTIES = {
     "Forward Wales": "forward-wales",
     "Animal Welfare Party": "animal-welfare-party",
     "UKEUP": "uk-european-union-party",
+    "The Yorkshire Party": "the-yorkshire-party",
+    "Independent Network": "independent-network",
+    "The Socialist Party of Great Britain": "the-socialist-party-of-great-britain",
     "Women's Equality Party": "women-s-equality-party",
     "Alliance for Green Socialism": "alliance-for-green-socialism",
     "Christian Democratic Party": "christian-democratic-party",
@@ -316,6 +363,8 @@ def fetch() -> None:
         get(url, ".pdf")
     get(EUROPARL[0], ".html")
     get(LONDON[0], ".pdf")
+    for url, suffix in DECLARATIONS.values():
+        get(url, suffix)
     for year, term in TERMS.items():
         listed = meps(term, fetching=True)
         if year < 2014:
@@ -472,6 +521,47 @@ def parse() -> None:
         raise ValueError("London 2019: no electorate and ballot paper totals")
     line(2019, "london", "electorate", "electorate", number(totals[1]))
     line(2019, "london", "ballots", "ballots", number(totals[2]))
+
+    seats = {
+        (entry["region"], party_key(str(entry["label"]), str(entry["region"]))): entry["seats"]
+        for entry in lines
+        if entry["year"] == 2019
+        and entry["region"] in DECLARATIONS
+        and entry["kind"] == "option"
+        and isinstance(entry["seats"], int)
+    }
+    lines = [
+        entry
+        for entry in lines
+        if not (entry["year"] == 2019 and entry["region"] in DECLARATIONS and entry["kind"] == "option")
+    ]
+    with open(Path(__file__).with_name("ep_declarations_2019.tsv"), newline="") as handle:
+        declared = list(csv.DictReader(handle, delimiter="\t"))
+    for region, (url, suffix) in DECLARATIONS.items():
+        rows = [row for row in declared if row["region"] == region]
+        if suffix == ".csv":
+            with open(raw.cached(SOURCE, url).path, newline="", encoding="utf-8-sig") as handle:
+                printed = {cell for entry in csv.reader(handle) for cell in entry}
+        elif suffix == ".pdf":
+            printed = set(re.findall(r"\d[\d,.]*\d", pdf(url)))
+        else:
+            printed = set(re.findall(r"\d[\d,.]*\d", raw.cached(SOURCE, url).path.read_text(errors="ignore")))
+        printed = {re.sub(r"[,.]", "", figure) for figure in printed}
+        missing = [row["label"] for row in rows if row["votes"] not in printed]
+        if missing and region not in SCANNED:
+            raise ValueError(f"2019 {region}: {missing} not in the declaration")
+        valid = next(
+            entry["value"]
+            for entry in lines
+            if (entry["year"], entry["region"], entry["kind"]) == (2019, region, "valid")
+        )
+        if (summed := sum(int(row["votes"]) for row in rows)) != valid:
+            raise ValueError(f"2019 {region}: declared lines sum to {summed:,}, the Library prints {valid:,}")
+        for row in rows:
+            key = party_key(row["label"], region)
+            line(
+                2019, region, row["label"], "option", int(row["votes"]), seats=seats.get((region, key), 0) if key else 0
+            )
 
     frame = pl.DataFrame(lines, infer_schema_length=None)
     elected = pl.DataFrame(members, infer_schema_length=None)
@@ -642,7 +732,7 @@ def emit() -> Path:
             pipeline=SOURCE,
             version=VERSION,
             summary="European Parliament results in Great Britain 1999–2019 by electoral region, from the Commons Library's "
-            "papers, the European Parliament's UK Office, and the London Regional Returning Officer's 2019 declaration, "
+            "papers, the European Parliament's UK Office, and the Regional Returning Officers' 2019 declarations, "
             "with the MEPs declared elected; the Women's Equality Party recorded twice is merged into one",
             polity="GB",
         )
@@ -652,6 +742,19 @@ def emit() -> Path:
             **{year: (url, LIBRARY, title) for year, (url, title) in PAPERS.items()},
             2004: EUROPARL,
             "london": LONDON,
+            **{
+                region: (
+                    url,
+                    f"Regional Returning Officer, {named}",
+                    f"Declaration of result, European Parliamentary Election, 23 May 2019, {named}",
+                )
+                for region, (url, _) in DECLARATIONS.items()
+                for named in [
+                    f"Electoral Region of {REGIONS[region]}"
+                    if region in ("wales", "scotland")
+                    else f"{REGIONS[region]} Region"
+                ]
+            },
         }.items():
             sources[key] = cs.source(publisher, title)
             cs.add(
@@ -721,6 +824,21 @@ def emit() -> Path:
             [SOURCE, UNRANKED],
         ).fetchall():
             stale.setdefault(entity, []).append(note)
+        grouped: dict[UUID, list[tuple[UUID, str]]] = {}
+        for note, entity, body in conn.execute(
+            """select n.id, n.entity_id, n.body_md from note n join changeset c on c.id = n.changeset_id
+               and c.pipeline = %s where n.body_md = any(%s)""",
+            [SOURCE, [GROUPED, UNLISTED]],
+        ).fetchall():
+            grouped.setdefault(entity, []).append((note, body))
+        own_others: dict[UUID, list[UUID]] = {}
+        for option, contest in conn.execute(
+            """select o.id, o.contest_id from contest_option o join changeset c on c.id = o.changeset_id
+               where c.pipeline = %s and o.kind = 'others'
+                 and not exists (select from result_value v where v.option_k = o.k)""",
+            [SOURCE],
+        ).fetchall():
+            own_others.setdefault(contest, []).append(option)
         sopns: dict[str, UUID] = {}
         for year, date in SOPN_DATES.items():
             for ballot in gb_ballots(date):
@@ -764,7 +882,8 @@ def emit() -> Path:
             ).fetchall()
             by_party = {party: id for id, kind, party in existing if party is not None and kind == "list"}
             others = next((id for id, kind, _ in existing if kind == "others"), None)
-            source = sources["london" if (year, region) == (2019, "london") else year]
+            declared = year == 2019 and (region == "london" or region in DECLARATIONS)
+            source = sources[region if declared else year]
             options: dict[str, UUID] = {}
             position = 0
 
@@ -870,12 +989,24 @@ def emit() -> Path:
                 )
             else:
                 votes = list(regional.filter(pl.col("kind") == "option").select("label", "value").iter_rows())
-                if year != 2004 and (year, region) != (2019, "london"):
+                if year != 2004 and not declared:
+                    cs.add("note", entity_id=result_set, kind="caveat", body_md=GROUPED)
+                for note, body in grouped.get(result_set, []) if declared else []:
+                    if body != GROUPED:
+                        continue
                     cs.add(
-                        "note",
+                        "note_drop",
+                        note_id=note,
                         entity_id=result_set,
-                        kind="caveat",
-                        body_md="The Commons Library groups smaller parties and independent candidates as Others.",
+                        body_md=body,
+                        reason="The Regional Returning Officer's declaration gives every party and candidate's votes.",
+                    )
+                for option in own_others.get(contest, []) if declared else []:
+                    cs.add(
+                        "option_drop",
+                        option_id=option,
+                        contest_id=contest,
+                        reason="The Regional Returning Officer's declaration gives every party and candidate's votes.",
                     )
             if "valid" not in totals:
                 totals["valid"] = sum(amount for _, amount in votes)
@@ -1069,14 +1200,16 @@ def emit() -> Path:
                 cs.add("citation", entity_id=result_set, source_id=sopns[listed[0]["sopn"]])
                 cs.add("citation", entity_id=result_set, source_id=dc_source)
                 if unlisted:
-                    cs.add(
-                        "note",
-                        entity_id=result_set,
-                        kind="caveat",
-                        body_md="List ranks are from the Regional Returning Officer's Statement of Parties and "
-                        "Individual Candidates Nominated. The lists of parties the source groups as Others are not "
-                        "recorded, because their votes are not given separately.",
-                    )
+                    cs.add("note", entity_id=result_set, kind="caveat", body_md=UNLISTED)
+                for note, body in grouped.get(result_set, []) if not unlisted else []:
+                    if body == UNLISTED:
+                        cs.add(
+                            "note_drop",
+                            note_id=note,
+                            entity_id=result_set,
+                            body_md=body,
+                            reason="Every party's list is now recorded.",
+                        )
             else:
                 cs.add("note", entity_id=result_set, kind="caveat", body_md=UNRANKED)
             if year in (2014, 2019) and region != "london":

@@ -2,14 +2,16 @@ import json
 import re
 import unicodedata
 from collections import Counter, defaultdict
-from datetime import date, timedelta
+from datetime import UTC, date, datetime, timedelta
 from pathlib import Path
 from urllib.parse import urlencode
 from uuid import UUID
 
+import polars as pl
+
 from ea import raw
 from ea.changeset import Changeset
-from ea.store import connect
+from ea.store import DATA, connect
 
 SOURCE = "gb.tenures"
 VERSION = "5"
@@ -51,7 +53,11 @@ CAUSES = (
     ("annulled", re.compile(r"void|petition|unseated")),
     ("expelled", re.compile(r"expel")),
     ("disqualified", re.compile(r"bankrupt|disqualif|lunacy|insan")),
+    ("removed", re.compile(r"recall")),
 )
+STEWARDS = "https://researchbriefings.files.parliament.uk/documents/SN04731/SN04731.xlsx"
+STEWARDS_TITLE = "Appointments to the Chiltern Hundreds and Manor of Northstead Stewardships since 1880 (SN04731)"
+DELIVERED = DATA / "inbox" / "manual" / "MF-071" / "SN04731.xlsx"
 TITLES = {"sir", "lord", "dr", "hon", "rev", "captain", "major", "colonel", "general", "admiral", "viscount", "earl"}
 
 
@@ -66,6 +72,34 @@ def vacated(cause: str) -> str | None:
     return next((kind for kind, pattern in CAUSES if pattern.search(cause.lower())), None)
 
 
+PREDECESSORS = {
+    "8fba0e65-95fa-5a23-98c9-ce4d27a7a3a3": "littleton",
+    "80a16c12-2c8f-56b2-83ac-df935bde0ddf": "hobhouse",
+    "49f7a127-489b-553c-b514-2b15beb7b5a3": "hobhouse",
+    "3288414d-cc61-5599-9807-b89dfdc4063c": "oconor",
+    "0ba00cd8-2b96-5405-b1aa-7f8208297477": "rothschild",
+    "699e929a-bc86-5e3c-bdbd-d68b2dc460dc": "busfeild",
+    "15f28d13-a211-5581-a805-a8bae5f4916d": "disraeli",
+    "24dfe67a-f588-5745-accc-fa48fbb23e0e": "hervey",
+    "f481b2c9-edb4-5159-9aac-0e3f14ff8246": "fortescue",
+    "f6c06bcd-a9ce-5948-84f2-b2ed77b8d476": "molesworth",
+    "455959ff-204f-524f-9950-9073cf49f84e": "rothschild",
+    "f28fd5a6-4964-5dd4-9c46-4b9eb74b4cd0": "cairns",
+    "8093770e-61c6-5b8e-8cbd-bc95af54e366": "bridgeman",
+    "ed8c2817-e8a0-5625-8488-124f48537088": "heathcote",
+    "f164e122-e965-5e50-b445-d9087783359c": "cecil",
+    "5e0ebb7e-287e-564d-a22a-43b4cb40b089": "manners",
+    "2d44f67e-f38a-51f5-8f3b-7e79984771d2": "thynne",
+    "515a0943-43f6-5441-ba56-3e29408f8e21": "disraeli",
+    "5e292f86-dbb4-578c-b62f-a59179f0afe5": "corbett",
+    "be858a6f-57cb-56e6-b48a-6b79edd1c961": "harcourt",
+    "02fe3b9b-700e-59c5-9f33-bf94bdda1bfa": "holmes",
+    "6c827f18-83ff-5aad-ae8c-eda25417325f": "madden",
+    "681b7ebb-8eb0-5a08-976a-1a3a7389fcbe": "morley",
+    "739e12aa-76d2-5255-b688-39b175f14719": "carson",
+}
+
+
 def cause_name(cause: str) -> list[str] | None:
     found = NAMED.search(cause)
     return fold(re.sub(r"['’]s?$", "", found.group(1)))[-1:] if found else None
@@ -73,6 +107,17 @@ def cause_name(cause: str) -> list[str] | None:
 
 def fetch() -> None:
     raw.fetch(SOURCE, SERVICE, suffix=".json")
+    try:
+        raw.cached(SOURCE, STEWARDS)
+    except LookupError:
+        raw.store(
+            SOURCE,
+            STEWARDS,
+            DELIVERED.read_bytes(),
+            suffix=".xlsx",
+            retrieved_at=datetime.fromtimestamp(DELIVERED.stat().st_mtime, UTC),
+            media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        )
 
 
 def emit() -> Path:
@@ -141,6 +186,34 @@ def emit() -> Path:
             license_url="https://creativecommons.org/publicdomain/zero/1.0/",
         )
         cs.artifact(artifact, wikidata)
+        library = cs.source("House of Commons Library", STEWARDS_TITLE)
+        cs.add(
+            "source",
+            id=library,
+            kind="official_body",
+            publisher="House of Commons Library",
+            title=STEWARDS_TITLE,
+            url="https://commonslibrary.parliament.uk/research-briefings/sn04731/",
+            license="Open Parliament Licence v3.0",
+            license_url="https://www.parliament.uk/site-information/copyright-parliament/open-parliament-licence/",
+            notes="The date each member who resigned was appointed to a stewardship, from the Treasury Register; it is "
+            "the day the seat fell vacant.",
+        )
+        cs.artifact(raw.cached(SOURCE, STEWARDS), library)
+        stewards: list[tuple[date, list[str], set[str]]] = []
+        for _, appointed, member, _, _, place, *_ in pl.read_excel(
+            raw.cached(SOURCE, STEWARDS).path, sheet_name="DATA", read_options={"header_row": 2}
+        ).iter_rows():
+            if member is None or appointed is None or place is None:
+                continue
+            text = appointed.removesuffix(" 00:00:00").strip()
+            day = (
+                date.fromisoformat(text)
+                if text[:4].isdigit()
+                else datetime.strptime(text, "%d %B %Y" if len(text.split()[1]) > 3 else "%d %b %Y").date()
+            )
+            stewards.append((day, fold(member), set(re.findall(r"[a-z]+", place.lower())) - {"and", "the", "of"}))
+        resigned = 0
         elections: list[tuple[UUID, date]] = conn.execute(
             """select distinct e.id, e.date_from from election e join contest c on c.election_id = e.id
                where c.body_id = %s and e.kind = 'general' order by e.date_from""",
@@ -188,6 +261,7 @@ def emit() -> Path:
         ).fetchall():
             winners[election].append((contest, person, fold(person_name or ""), contest_name or "", party, area))
         by_elections: list[tuple[date, UUID, UUID | str, str, list[tuple[UUID, list[str], UUID | None]]]] = []
+        places: dict[UUID, set[str]] = {}
         for day, contest, area, place, cause, people in conn.execute(
             """select e.date_from, c.id, c.district_area_id,
                       (select text from name where entity_id = c.id and is_preferred limit 1),
@@ -205,6 +279,11 @@ def emit() -> Path:
                group by 1, 2, 3, 4 order by 1, 2""",
             [commons],
         ).fetchall():
+            places[contest] = set(re.findall(r"[a-z]+", (place or "").partition(" in ")[2].lower())) - {
+                "and",
+                "the",
+                "of",
+            }
             by_elections.append(
                 (
                     day,
@@ -237,8 +316,7 @@ def emit() -> Path:
             if near:
                 assigned[dated[min(near, key=lambda day: abs((day - modal).days))]].append((modal, members))
         for election, start in elections:
-            if election in seated:
-                continue
+            own = election not in seated
             end = following.get(election)
             general = [
                 member
@@ -272,7 +350,7 @@ def emit() -> Path:
                     hits = [member for member in hits if fold(names[str(member["item"])])[:1] == words[:1]] or hits
                 return hits[0] if len(hits) == 1 else None
 
-            for contest, person, words, contest_name, party, area in winners[election]:
+            for contest, person, words, contest_name, party, area in winners[election] if own else []:
                 seat = area or contest_name.partition(" in ")[2]
                 if returned[person] > 1:
                     choice = next(
@@ -330,7 +408,7 @@ def emit() -> Path:
                     previous: list[dict[str, object]] = []
                 else:
                     pool = [record for record in open_seats[area] if record["from"] < day and "successor" not in record]
-                    named = cause_name(cause)
+                    named = [PREDECESSORS[str(contest)]] if str(contest) in PREDECESSORS else cause_name(cause)
                     if len(pool) > len(people) and named is not None:
                         pool = [record for record in pool if record["words"][-1:] == named] or pool
                     if len(pool) > len(people):
@@ -341,13 +419,30 @@ def emit() -> Path:
                         ]
                         pool = early if len(early) == len(people) else pool
                     previous = pool if len(pool) == len(people) else []
-                    if not previous:
+                    if not previous and own:
                         unresolved += 1
+                        print(
+                            f"UNRESOLVED {day} {contest} {named} {len(people)} of {len(pool)}: "
+                            f"{[record['words'] for record in pool]} | {cause}"
+                        )
                 for record in previous:
                     record["successor"] = True
                     if record["stop"] is None or record["stop"] > day or record["cause"] == "term_end":
                         record["stop"], record["cause"] = day, kind
                         ended += 1
+                    if kind == "resigned":
+                        appointed = [
+                            when
+                            for when, surname, seat in stewards
+                            if timedelta(0) <= day - when <= timedelta(days=400)
+                            and surname[-1:] == record["words"][-1:]
+                            and seat & places[contest]
+                            and (seat <= places[contest] or places[contest] <= seat)
+                        ]
+                        stop = record["stop"]
+                        if len(appointed) == 1 and isinstance(stop, date) and appointed[0] < stop:
+                            record["stop"], record["steward"] = appointed[0], True
+                            resigned += 1
                 for index, (person, words, party) in enumerate(people):
                     if kind == "died" and any(record["person"] == person for record in previous):
                         print(f"REVIEW {day} {contest}: the winner is the member whose death caused the by-election")
@@ -397,7 +492,7 @@ def emit() -> Path:
                     records.append(record)
                     open_seats[area].append(record)
                     joined += 1
-            for member in later:
+            for member in later if own else []:
                 if "tenure" in member or (end is not None and member["start"] >= end):
                     continue
                 item = str(member["item"])
@@ -459,6 +554,8 @@ def emit() -> Path:
                     ended_via=record["cause"],
                     succeeds_tenure_id=record["succeeds"],
                 )
+                if record.get("steward"):
+                    cs.add("citation", entity_id=tenure, source_id=library)
                 spans = record["spans"] or (
                     [(record["from"], stop, record["party"])] if record["party"] is not None else []
                 )
@@ -486,7 +583,7 @@ def emit() -> Path:
             )
         print(
             f"{matched} general winners matched, {joined} by-election winners, {left} left early per Wikidata, "
-            f"{ended} predecessors ended by a by-election, {unresolved} by-elections with no predecessor found, "
+            f"{ended} predecessors ended by a by-election, {resigned} on the day they took a stewardship, {unresolved} by-elections with no predecessor found, "
             f"{declined} declined seats, {len(stale)} tenures retired, {len(split)} by-election winners held apart "
             f"from their Wikidata person, {dead} by-election winners who caused the vacancy by dying, {unmatched} "
             "joiners with no by-election winner"

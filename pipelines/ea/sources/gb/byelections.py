@@ -1,5 +1,6 @@
+import json
 import re
-from datetime import date, datetime
+from datetime import UTC, date, datetime
 from pathlib import Path
 from uuid import UUID
 
@@ -7,7 +8,7 @@ import polars as pl
 
 from ea import raw
 from ea.changeset import Changeset, slug
-from ea.sources.gb import umit
+from ea.sources.gb import mnis, umit
 from ea.store import DATA, connect
 
 SOURCE = "gb.byelections"
@@ -39,7 +40,73 @@ NAMED_TWO = re.compile(
     r"\w(?:'s?|s'|') (?:death|resignation|appointment|elevation|succession)[^;]*? and [A-Z][\w-]+(?:'s?|s'|') "
 )
 WHOLE = re.compile(r"(?:the|general|previous|\d{4}) election (?:being|was) declared void")
+HANSARD = "https://api.parliament.uk/historic-hansard/constituencies/{}"
+HANSARD_TITLE = "Historic Hansard: constituencies"
+CORRECTED = {
+    "1901-03-01:eng-maidstone": ("Francis Henry Evans", "Evans, Francis Henry", "Liberal", None, "maidstone", False),
+    "1914-06-29:eng-brighton": (
+        "Charles Thomas-Stanford",
+        "Thomas-Stanford, Charles",
+        "Unionist",
+        None,
+        "brighton",
+        True,
+    ),
+    "1937-06-22:eng-hemel-hempstead": (
+        "Frances Davidson",
+        "Davidson, Frances",
+        "Conservative",
+        "2415",
+        "hemel-hempstead",
+        False,
+    ),
+    "1950-10-25:sct-glasgow-scotstoun": (
+        "James Riley Holt Hutchison",
+        "Hutchison, James Riley Holt",
+        "Scottish Unionist",
+        None,
+        "glasgow-scotstoun",
+        False,
+    ),
+    "1960-11-16:eng-ludlow": ("Jasper More", "More, Jasper", "Conservative", None, "ludlow", False),
+    "1960-11-16:eng-tiverton": (
+        "Robin John Maxwell-Hyslop",
+        "Maxwell-Hyslop, Robin John",
+        "Conservative",
+        "1296",
+        None,
+        False,
+    ),
+    "1961-03-16:eng-colchester": (
+        "Philip Antony Fyson Buck",
+        "Buck, Philip Antony Fyson",
+        "Conservative",
+        "1111",
+        None,
+        False,
+    ),
+    "1963-03-21:eng-colne-valley": (
+        "Albert Edward Patrick Duffy",
+        "Duffy, Albert Edward Patrick",
+        "Labour",
+        "806",
+        None,
+        False,
+    ),
+    "1969-03-27:eng-weston-super-mare": ("Jerry Wiggin", "Wiggin, Jerry", "Conservative", "1270", None, False),
+    "1978-04-13:sct-glasgow-garscadden": ("Donald Dewar", "Dewar, Donald", "Labour", "678", None, False),
+    "1982-12-02:sct-glasgow-queen-s-park": ("Helen McElhone", "McElhone, Helen", "Labour", "977", None, False),
+}
+CAUSES = {"1914-06-29:eng-brighton": "By-election held due to Gordon's resignation"}
+LIBRARY = "https://researchbriefings.files.parliament.uk/documents/SN02383/SN02383.xlsx"
+LIBRARY_TITLE = "UK parliamentary by-elections since 1945 (SN02383)"
+DELIVERED = DATA / "inbox" / "manual" / "MF-071" / "SN02383.xlsx"
 CAVEATS = {
+    "winners": "Umit's by-election dataset repeats the previous general election's result for this by-election, so it "
+    "is left out. Only the winner is shown, from Parliament's member records, and the other candidates and the votes "
+    "are not loaded.",
+    "tacit": "Umit's by-election dataset repeats the previous general election's result for this by-election, so it "
+    "is left out. The winner, returned unopposed, is from Parliament's member records.",
     "derived": "Umit's by-election dataset marks no winners. The candidates shown as elected are those with the most "
     "votes, one for each seat filled.",
     "tie": "Two or more candidates tie for the last seat in Umit's by-election dataset, so the tied candidates are not "
@@ -57,6 +124,20 @@ def fetch() -> None:
             raw.fetch(SOURCE, BASE.format(parliament, table), suffix=".csv")
     raw.fetch(SOURCE, UMIT, suffix=".csv")
     raw.fetch(SOURCE, UMIT_README, suffix=".txt")
+    for *_, page, _ in CORRECTED.values():
+        if page:
+            raw.fetch(SOURCE, HANSARD.format(page), suffix=".html")
+    try:
+        raw.cached(SOURCE, LIBRARY)
+    except LookupError:
+        raw.store(
+            SOURCE,
+            LIBRARY,
+            DELIVERED.read_bytes(),
+            suffix=".xlsx",
+            retrieved_at=datetime.fromtimestamp(DELIVERED.stat().st_mtime, UTC),
+            media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        )
 
 
 def read(table: str) -> pl.DataFrame:
@@ -139,6 +220,30 @@ def parse() -> None:
     )
     if official["unit"].is_null().any():
         raise ValueError("a candidacy has no by-election")
+    reasons: dict[date, list[tuple[set[str], str]]] = {}
+    for _, place, reason, day, *_ in (
+        pl.read_excel(
+            raw.cached(SOURCE, LIBRARY).path, sheet_name="By-elections since 2005", read_options={"header_row": 1}
+        )
+        .drop_nulls("Date of by-election")
+        .iter_rows()
+    ):
+        reason = re.sub(r"\s*\d*\s*$", "", reason.replace("\xa0", " ")).replace("  ", " ")
+        reasons.setdefault(day.date() if isinstance(day, datetime) else day, []).append(
+            (set(re.findall(r"[a-z]+", place.lower())), f"By-election held due to the {reason[0].lower()}{reason[1:]}")
+        )
+    causes = {}
+    for day, place in official.select("day", "constituency").unique().iter_rows():
+        words = set(re.findall(r"[a-z]+", place.lower()))
+        found = sorted(reasons.get(day, []), key=lambda row: -len(row[0] & words))
+        if not found or not found[0][0] & words:
+            raise ValueError(f"the Library lists no by-election in {place} on {day}")
+        causes[(day, place)] = found[0][1]
+    official = official.with_columns(
+        cause=pl.struct("day", "constituency").map_elements(
+            lambda row: causes[(row["day"], row["constituency"])], return_dtype=pl.String
+        )
+    )
     winners = official.group_by("day", "ons").agg(pl.col("elected").sum())
     if winners.filter(pl.col("elected") != 1).height:
         raise ValueError(f"no single declared member: {winners.filter(pl.col('elected') != 1).rows()}")
@@ -201,6 +306,7 @@ def parse() -> None:
                 "general": f"{day}:{unit_code}",
                 "magnitude": magnitude,
                 "candidate": f"{given} {surname}".strip(),
+                "surname": surname.lower(),
                 "identity": f"{person_unit}:{slug(line['candidate'])}{identity.removeprefix(line['candidate'])}",
                 "party": line["party"],
                 "votes": int(line["votes"]) if line["votes"] else None,
@@ -246,6 +352,62 @@ def parse() -> None:
         .otherwise(False),
         origin=pl.lit("umit"),
     )
+    previous = {
+        (f"{day}:{unit}", tuple(sorted(zip(rows["surname"].fill_null("").str.to_lowercase(), rows["votes"]))))
+        for (day, unit), rows in general.group_by("date_start", "unit")
+    }
+    copies = sorted(
+        f"{day}:{unit}"
+        for (day, unit), rows in frame.group_by("day", "unit")
+        if rows["votes"].is_not_null().any()
+        and (rows["general"][0], tuple(sorted(zip(rows["surname"], rows["votes"])))) in previous
+    )
+    if set(copies) - set(CORRECTED):
+        raise ValueError(
+            f"by-elections repeating the previous general election: {sorted(set(copies) - set(CORRECTED))}"
+        )
+    print(f"{len(copies)} by-elections repeating the previous general election, replaced by their winners")
+    key = pl.concat_str(pl.col("day").cast(pl.String), pl.lit(":"), "unit")
+    replaced = []
+    for contest, (candidate, listed, party, member, page, unopposed) in CORRECTED.items():
+        dropped = frame.filter(key == contest)
+        if dropped.height == 0:
+            raise ValueError(f"no Umit by-election {contest}")
+        first = dropped.row(0, named=True)
+        day = first["day"]
+        if page:
+            text = re.sub(
+                r"\s+", " ", re.sub(r"<[^>]+>", " ", raw.cached(SOURCE, HANSARD.format(page)).path.read_text())
+            )
+            if f"{day:%B} {day.day}, {day.year} -" not in text:
+                raise ValueError(f"Historic Hansard does not seat a member for {contest}")
+        elif not any(
+            seat["startDate"].startswith(str(day))
+            for seat in json.loads(raw.cached(mnis.SOURCE, mnis.BIOGRAPHY.format(member)).path.read_text())["value"][
+                "representations"
+            ]
+        ):
+            raise ValueError(f"MNIS does not seat member {member} from {contest}")
+        replaced.append(
+            first
+            | {
+                "candidate": candidate,
+                "surname": listed.split(", ")[0].lower(),
+                "identity": f"{first['identity'].split(':')[0]}:{slug(listed)}",
+                "party": party,
+                "votes": None,
+                "unopposed": unopposed,
+                "vacancies": 1,
+                "status": "tacit" if unopposed else "winners",
+                "elected": True,
+                "origin": "hansard" if page else "mnis",
+                "mnis": member,
+            }
+        )
+    frame = pl.concat(
+        [frame.filter(~key.is_in(list(CORRECTED))), pl.DataFrame(replaced, schema_overrides=frame.schema)],
+        how="diagonal_relaxed",
+    )
     if frame.filter(pl.len().over(*by, "identity") > 1).height:
         raise ValueError(f"a candidate stands twice: {frame.filter(pl.len().over(*by, 'identity') > 1).rows()[:3]}")
     print(
@@ -258,9 +420,13 @@ def parse() -> None:
         ),
     )
     PARSED.mkdir(parents=True, exist_ok=True)
-    pl.concat([frame, official], how="diagonal_relaxed").sort(
-        "day", "unit", pl.col("votes"), descending=[False, False, True], nulls_last=True
-    ).write_parquet(PARSED / "results.parquet")
+    pl.concat([frame, official], how="diagonal_relaxed").with_columns(
+        cause=pl.concat_str(pl.col("day").cast(pl.String), pl.lit(":"), "unit").replace_strict(
+            CAUSES, default=pl.col("cause")
+        )
+    ).sort("day", "unit", pl.col("votes"), descending=[False, False, True], nulls_last=True).write_parquet(
+        PARSED / "results.parquet"
+    )
     print(
         f"{frame.select(by).n_unique()} by-elections from Umit, {official.select('day', 'ons').n_unique()} official, "
         f"{frame.height + official.height} candidacies"
@@ -286,7 +452,41 @@ def emit() -> Path:
         sources = {
             "parliament": cs.source("UK Parliament", TITLE),
             "umit": cs.source(umit.PUBLISHER, UMIT_TITLE),
+            "mnis": cs.source("UK Parliament", mnis.TITLE),
+            "hansard": cs.source("UK Parliament", HANSARD_TITLE),
         }
+        if sources["mnis"] in cs.minted:
+            raise ValueError("gb.mnis must publish its source first")
+        cs.add(
+            "source",
+            id=sources["hansard"],
+            kind="official_body",
+            publisher="UK Parliament",
+            title=HANSARD_TITLE,
+            url="https://api.parliament.uk/historic-hansard/constituencies/",
+            license="Open Parliament Licence v3.0",
+            license_url="https://www.parliament.uk/site-information/copyright-parliament/open-parliament-licence/",
+            notes="Each constituency's members with the dates they sat, from Parliament's digitized Hansard 1803–2005.",
+        )
+        sources["library"] = cs.source("House of Commons Library", LIBRARY_TITLE)
+        cs.add(
+            "source",
+            id=sources["library"],
+            kind="official_body",
+            publisher="House of Commons Library",
+            title=LIBRARY_TITLE,
+            url="https://commonslibrary.parliament.uk/research-briefings/sn02383/",
+            license="Open Parliament Licence v3.0",
+            license_url="https://www.parliament.uk/site-information/copyright-parliament/open-parliament-licence/",
+            notes="The by-elections since 2005 table gives the reason for each by-election, which the cause notes "
+            "since 2010 quote.",
+        )
+        cs.artifact(raw.cached(SOURCE, LIBRARY), sources["library"])
+        for *_, member, page, _ in CORRECTED.values():
+            if page:
+                cs.artifact(raw.cached(SOURCE, HANSARD.format(page)), sources["hansard"])
+            else:
+                cs.artifact(raw.cached(mnis.SOURCE, mnis.BIOGRAPHY.format(member)), sources["mnis"])
         cs.add(
             "source",
             id=sources["parliament"],
@@ -445,9 +645,9 @@ def emit() -> Path:
                     status="active",
                     source_id=sources[first["origin"]],
                     is_default=True,
-                    completeness=1,
+                    completeness=0 if first["status"] == "winners" else 1,
                 )
-                if first["status"] in CAVEATS:
+                if first["status"] in CAVEATS and (first["status"] != "tacit" or contest_key in CORRECTED):
                     cs.add("note", entity_id=result_set, kind="caveat", body_md=CAVEATS[first["status"]])
                 unit = cs.unit("gb.pcon", unit_code)
                 for measure, value in (

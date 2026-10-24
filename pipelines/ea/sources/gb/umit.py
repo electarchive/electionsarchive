@@ -111,7 +111,16 @@ DECLARED = {
     ("1945-07-05", "eng-oxford-university"): ("Herbert, Alan Patrick", "Salter, James Arthur"),
     ("1945-07-05", "sct-combined-scottish-universities"): ("Anderson, John", "Kerr, John Graham", "Orr, John Boyd"),
 }
-NAMESAKES = (("eng-tamworth", "Peel, Robert", 1832, 1847, "@1788"),)
+NAMESAKES = (
+    ("eng-tamworth", "Peel, Robert", 1832, 1847, "@1788"),
+    ("sct-kirkcaldy-boroughs", "Ferguson, Robert", 1841, 1868, "@1802"),
+    ("wls-cardigan-boroughs", "Pryse, Pryse", 1849, 1855, "@1815"),
+    ("irl-kerry", "Herbert, Henry Arthur", 1866, 1880, "@1840"),
+    ("eng-richmond-yorks", "Dundas, John Charles", 1873, 1885, "@1845"),
+    ("eng-york", "Dundas, John Charles", 1886, 1886, "@1845"),
+)
+DUPLICATES = ((1955, "eng-finchley", "Sykes, A. M. P. H."),)
+WORKING_NOTE = re.compile(r"^\s*[\d,]+\s*$|\bnot in (?:the )?book\b|\bnot in (?:EH|FWSC)\b", re.IGNORECASE)
 ALLIANCE = (
     ("1983-06-09", "eng-truro", "Penhaligon, David", "Liberal"),
     ("1987-06-11", "eng-truro", "Taylor, Matthew", "Liberal"),
@@ -546,6 +555,11 @@ def parse() -> None:
         member=pl.when(pl.col("suffix") == 0).then("member"),
         suffix=pl.when(pl.col("suffix") > 0).then(pl.format("~{}", pl.col("suffix") + 1)).otherwise(pl.lit("")),
     )
+    for year, unit, candidate in DUPLICATES:
+        twice = (pl.col("year") == year) & (pl.col("unit") == unit) & (pl.col("candidate") == candidate)
+        if frame.filter(twice).height != 1:
+            raise ValueError(f"{candidate} does not stand in {unit} in {year}")
+        frame = frame.filter(~twice)
     for unit, candidate, first, last, mark in NAMESAKES:
         chosen = (pl.col("unit") == unit) & (pl.col("candidate") == candidate) & pl.col("year").is_between(first, last)
         if frame.filter(chosen).height == 0:
@@ -593,8 +607,8 @@ def parse() -> None:
             pl.when(pl.col("registered").is_not_null() & pl.col("electorate").is_not_null()).then(
                 pl.format(
                     "The electorate is the House of Commons Library's figure ({}); Umit's dataset gives {}.",
-                    "registered",
-                    "electorate",
+                    pl.col("registered").map_elements(lambda count: f"{count:,}", return_dtype=pl.String),
+                    pl.col("electorate").map_elements(lambda count: f"{count:,}", return_dtype=pl.String),
                 )
             ),
             separator=" ",
@@ -704,12 +718,13 @@ def emit() -> Path:
             [SOURCE],
         ):
             cautions.setdefault(entity, []).append((id, text))
+        contexts: dict[UUID, list[tuple[UUID, str]]] = {}
         for id, entity, text in conn.execute(
             "select n.id, n.entity_id, n.body_md from note n join changeset c on c.id = n.changeset_id"
-            " where c.pipeline = %s and n.kind = 'context' and btrim(n.body_md) = ''",
+            " join contest k on k.id = n.entity_id where c.pipeline = %s and n.kind = 'context'",
             [SOURCE],
         ):
-            cs.add("note_drop", note_id=id, entity_id=entity, body_md=text, reason="The note is empty.")
+            contexts.setdefault(entity, []).append((id, text))
 
         def name(entity: UUID, text: str, start: date | None = None) -> None:
             cs.add(
@@ -1036,10 +1051,22 @@ def emit() -> Path:
                 )
                 name(contest, f"{label.removesuffix(' General Election')} general election in {first['constituency']}")
                 cs.add("slug", path=f"{path}/{slug(first['constituency'])}", entity_id=contest)
-                for note in sorted(set(lines["notes"].drop_nulls()) | set(lines["correction"].drop_nulls())):
-                    if not note.strip():
-                        continue
+                notes = {
+                    note
+                    for note in set(lines["notes"].drop_nulls()) | set(lines["correction"].drop_nulls())
+                    if note.strip() and not WORKING_NOTE.search(note)
+                }
+                for note in sorted(notes):
                     cs.add("note", entity_id=contest, kind="context", body_md=note)
+                for id, text in contexts.get(contest, []):
+                    if text not in notes:
+                        cs.add(
+                            "note_drop",
+                            note_id=id,
+                            entity_id=contest,
+                            body_md=text,
+                            reason="The note is empty, a compiler's working note, or replaced by a corrected one.",
+                        )
                 result_set = cs.key(f"{SOURCE}.result_set", contest_key)
                 cs.add(
                     "result_set",
