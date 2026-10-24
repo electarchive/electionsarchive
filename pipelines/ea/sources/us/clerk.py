@@ -1404,17 +1404,24 @@ def emit() -> Path:
             [SOURCE, UNNAMED, AGGREGATE, f"{SOURCE}.result_set", list(foreign)],
         ).fetchall()
         if not junk:
-            junk = conn.execute(
-                """select x.entity_id from external_id x join contest_option o on o.id = x.entity_id
+            for old, new in conn.execute(
+                """select o.id, (array_agg(n.id))[1] from external_id x join contest_option o on o.id = x.entity_id
+                   join contest_option n on n.contest_id = o.contest_id and n.ballot_label = o.ballot_label
+                     and n.id <> o.id and n.parent_option_id is null
+                   join external_id y on y.entity_id = n.id and y.scheme = 'us.option' and y.value !~ ':[0-9a-f-]{36}$'
                    where x.scheme = 'us.option' and x.value ~ ':[0-9a-f-]{36}$'
                      and (o.ballot_label ~ %s or o.ballot_label ~ %s)
                      and not exists (select 1 from candidacy c where c.option_id = o.id)
                      and o.changeset_id in (select id from changeset where pipeline = %s)
-                   union
-                   select x.entity_id from external_id x join name n on n.entity_id = x.entity_id and n.is_preferred
+                   group by o.id having count(*) = 1""",
+                [UNNAMED, AGGREGATE, SOURCE],
+            ).fetchall():
+                cs.add("entity_merge", entity_id=old, into_id=new)
+            junk = conn.execute(
+                """select x.entity_id from external_id x join name n on n.entity_id = x.entity_id and n.is_preferred
                    where x.scheme = %s and (n.text ~ %s or n.text ~ %s)
                      and not exists (select 1 from candidacy c where c.person_id = x.entity_id)""",
-                [UNNAMED, AGGREGATE, SOURCE, f"{SOURCE}.person", UNNAMED, AGGREGATE],
+                [f"{SOURCE}.person", UNNAMED, AGGREGATE],
             ).fetchall()
         for (entity,) in junk:
             cs.add("entity_retirement", entity_id=entity, reason=reason)
