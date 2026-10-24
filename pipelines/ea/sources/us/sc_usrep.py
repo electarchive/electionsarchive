@@ -37,6 +37,19 @@ COUNTIES = [
 KEYS = {re.sub(r"[^a-z]", "", name.lower()): name for name in COUNTIES}
 ALIASES: dict[tuple[int, int, str], str] = {(1998, 6, "ester"): "Dorchester", (1998, 6, "nce"): "Florence", (1998, 6, "l"): "Lee"}
 OVERRIDES: dict[tuple[int, int, str, int], int] = {
+    (1990, 2, "Calhoun", 0): 2162,
+    (1990, 2, "Lexington", 0): 34572,
+    (1990, 2, "Orangeburg", 0): 14337,
+    (1990, 2, "Richland", 0): 36767,
+    (1990, 2, "Orangeburg", 1): 1333,
+    (1990, 2, "Lexington", 2): 62,
+    (1990, 2, "Richland", 2): 13,
+    (1990, 4, "Greenville", 0): 45406,
+    (1990, 4, "Spartanburg", 0): 30516,
+    (1990, 4, "Union", 0): 6005,
+    (1990, 4, "Greenville", 1): 35065,
+    (1990, 4, "Union", 1): 2103,
+    (1990, 4, "Greenville", 2): 253,
     (1992, 2, "Lexington", 0): 53541,
     (1992, 3, "Abbeville", 1): 5729,
     (1992, 4, "Greenville", 2): 46775,
@@ -56,7 +69,7 @@ ROWNAMES: dict[tuple[int, int], list[str]] = {
     (1990, 4): ["Greenville", "Spartanburg", "Union"],
 }
 EXTRA: dict[tuple[int, int], dict[int, tuple[str, str]]] = {(1998, 4): {1: ("Peter J. Ashy (Patriot)", "PT"), 2: ("Peter J. Ashy (Reform)", "RF")}}
-SUMMARY = "South Carolina's U.S. House general elections of 1992, 1994, 1996, and 1998 by county from the State Election Commission's election reports"
+SUMMARY = "South Carolina's U.S. House general elections of 1990 and 1992 through 1998 by county from the State Election Commission's election reports"
 METHOD = (
     "County totals are read from the State Election Commission's printed election reports (scans with an OCR text layer). "
     "Each candidate's county sum equals the state total printed under the table, and each cell carries its page and box."
