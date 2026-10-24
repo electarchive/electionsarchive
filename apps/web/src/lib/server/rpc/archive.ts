@@ -288,6 +288,7 @@ const Cell = v.nullable(
     outcome: v.nullable(v.string()),
     note: v.optional(v.nullable(v.string())),
     isIndependent: v.optional(v.boolean()),
+    isIncumbent: v.optional(v.boolean()),
     seats: v.nullable(v.number()),
     lines: v.array(v.object({ label: v.string(), votes: v.number() })),
   }),
@@ -995,6 +996,7 @@ async function load(
     alliance: string | null;
     is_line: boolean;
     independent: boolean;
+    incumbent: boolean;
   }>(sql`
     select o.k, o.contest_id as contest, o.kind::text, coalesce(pm.into_id, o.party_id, (
         select coalesce(mm.into_id, cy.member_of_party_id, ta.party_id, nm.party_id, nb.party)
@@ -1036,6 +1038,7 @@ async function load(
       )) as party, o.ballot_label as label,
       o.alliance_id as alliance, o.parent_option_id is not null as is_line,
       exists (select from candidacy cy where cy.option_id = o.id and cy.role = 'head' and cy.is_independent) as independent,
+      exists (select from candidacy cy where cy.option_id = o.id and cy.role = 'head' and cy.is_incumbent) as incumbent,
       (select coalesce(m.into_id, cy.person_id) from candidacy cy left join entity_merge m on m.entity_id = cy.person_id
        where cy.option_id in (o.id, o.parent_option_id) and cy.role = 'head'
          and not exists (select from candidacy cz where cz.option_id = cy.option_id and cz.role = 'head' and cz.id <> cy.id)
@@ -1267,6 +1270,7 @@ async function load(
             outcome: row.outcome,
             note: row.note,
             isIndependent: row.independent,
+            isIncumbent: row.incumbent,
             seats: row.seats,
             alliance:
               row.alliance == null

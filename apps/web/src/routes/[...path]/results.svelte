@@ -418,6 +418,11 @@
                   person={(page ?? other)?.person}
                   party={(page ?? other)?.party}
                 />
+                {#if page?.isIncumbent === true && page.person != null}
+                  <span class="ms-1 text-xs text-muted-foreground"
+                    >{m.results_incumbent()}</span
+                  >
+                {/if}
                 {#if page?.outcome != null && seats == null}
                   {#if page.note == null}
                     <span

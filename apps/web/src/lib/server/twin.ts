@@ -1812,7 +1812,9 @@ function resultsMarkdown(
       (row) => row.current != null || (then != null && row.earlier != null),
     )
     .map(({ key, label, current, earlier, delta }) => [
-      label,
+      current?.isIncumbent === true && current.person != null
+        ? m.results_incumbent_twin({ name: label })
+        : label,
       ...(hasParty
         ? [
             (current ?? earlier)?.person == null
