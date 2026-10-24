@@ -13,7 +13,7 @@ from ea.sources.gb.umit import fold
 from ea.store import DATA, connect
 
 SOURCE = "gb.bcs"
-VERSION = "1"
+VERSION = "2"
 PARSED = DATA / "parsed" / SOURCE
 UPLOADS = "https://www.bcomm-scotland.independent.gov.uk/wp-content/uploads/sites/2/2025/09"
 REVIEWS = {
@@ -44,7 +44,8 @@ ATTRIBUTION = (
 )
 NOTES = (
     "Superseded UK Parliament constituency boundaries in Scotland, released as Free to Use data under the One "
-    "Scotland Mapping Agreement. Simplified here to 50 m."
+    "Scotland Mapping Agreement. Clipped here to the coastline of ONS's 2019 generalized constituencies and simplified "
+    "to 50 m."
 )
 NAMES = {
     "Ayr District of Burghs": "Ayr Burghs",
@@ -97,9 +98,14 @@ def parse() -> None:
                       encode(st_asewkb(st_transform(st_pointonsurface(geom), 4326)), 'hex')
                from (select vintage, name, st_setsrid(st_coveragesimplify(geom, %s) over (partition by vintage), 27700)
                        as geom
-                     from (select vintage, name, st_multi(st_collectionextract(st_makevalid(st_union(
-                             st_makevalid(st_force2d(st_setsrid(st_geomfromgeojson(geojson), 27700))))), 3)) as geom
-                           from feature group by vintage, name) whole) simple""",
+                     from (select vintage, name, st_multi(st_collectionextract(st_intersection(st_makevalid(st_union(
+                             st_makevalid(st_force2d(st_setsrid(st_geomfromgeojson(geojson), 27700))))), coast.geom), 3))
+                             as geom
+                           from feature,
+                                (select st_makevalid(st_transform(st_union(g.geom), 27700)) as geom
+                                 from area a join area_geometry g on g.area_id = a.id
+                                 where a.scheme_code = 'gb.nation' and g.quality = 'official') coast
+                           group by vintage, name, coast.geom) whole) simple""",
             [TOLERANCE],
         ).fetchall()
     frame = pl.DataFrame(
