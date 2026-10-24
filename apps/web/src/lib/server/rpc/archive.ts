@@ -8382,8 +8382,11 @@ export const elections = {
                     max(x.value) filter (where x.measure = 4) as valid,
                     max(x.value) filter (where x.measure = 5) as invalid
                   from seats s
-                  left join result_rollup x on x.result_set_k = s.k and x.area_k = s.area and x.option_k = 0
-                    and x.channel = 0 and x.count_round = 0 and x.measure in (2, 3, 4, 5, 14)
+                  left join lateral (
+                    select x.measure, x.value from result_rollup x
+                    where x.result_set_k = s.k and x.area_k = s.area and x.option_k = 0
+                      and x.channel = 0 and x.count_round = 0 and x.measure in (2, 3, 4, 5, 14) offset 0
+                  ) x on true
                   group by s.root, s.k
                 ),
                 kept as (
@@ -12577,6 +12580,7 @@ export const people = {
             id: v.string(),
             name: v.string(),
             isBody: v.boolean(),
+            path: v.nullable(v.string()),
             from: v.nullable(v.string()),
             to: v.nullable(v.string()),
             seats: v.array(
@@ -12594,6 +12598,7 @@ export const people = {
             id: v.string(),
             name: v.string(),
             isBody: v.boolean(),
+            path: v.nullable(v.string()),
             from: v.string(),
             to: v.nullable(v.string()),
           }),
@@ -13061,10 +13066,29 @@ export const people = {
         sat != null && sat.stop === current?.stop && sat.party !== own
           ? sat.party
           : null;
-      const [faces, owned] = await Promise.all([
+      const housed = await db.execute<{ id: string; polity: string }>(sql`
+        select id, polity_id::text as polity from body
+        where id = any(${sql.param([...spells, ...terms].filter((spell) => spell.isBody).map((spell) => spell.owner))}::uuid[])
+      `);
+      const homes = [...new Set(housed.rows.map((row) => row.polity))];
+      const [faces, owned, peers, homeSlugs] = await Promise.all([
         portraits([person.id]),
         refs([own, caucus].filter((id) => id != null)),
+        Promise.all(homes.map((polity) => chambers(polity))).then(
+          (found) =>
+            new Map(found.flat().map((peer) => [peer.id, peer.slug] as const)),
+        ),
+        paths(homes),
       ]);
+      const chamberPath = new Map(
+        housed.rows.flatMap((row) => {
+          const home = homeSlugs.get(row.polity);
+          const slug = peers.get(row.id);
+          return home == null || slug == null
+            ? []
+            : [[row.id, `chambers/${home}/${slug}`] as const];
+        }),
+      );
       const now = new Date();
       const stamp = now.toISOString().slice(4, 10);
       const earliest =
@@ -13126,6 +13150,7 @@ export const people = {
               id: spell.owner,
               name: labels.full.get(spell.owner) ?? "",
               isBody: spell.isBody,
+              path: chamberPath.get(spell.owner) ?? null,
               from: spell.from,
               to: spell.to,
               seats,
@@ -13142,6 +13167,7 @@ export const people = {
             id: term.owner,
             name: labels.full.get(term.owner) ?? "",
             isBody: term.isBody,
+            path: chamberPath.get(term.owner) ?? null,
             from: term.from,
             to: term.to,
           }))
