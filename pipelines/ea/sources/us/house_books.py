@@ -965,6 +965,8 @@ def emit(source: ModuleType) -> Path:
                         cs.add("outcome", result_set_id=result_set, option_id=option, kind=outcome_kind, seats=seats)
             if not fresh and not ties:
                 continue
+            if previous is not None and not conn.execute("select 1 from result_set where id = %s", [previous]).fetchone():
+                previous = None
             for id, status in ((previous, "superseded"), (result_set, "active")):
                 if id is not None and (fresh or id == result_set):
                     cs.add(
@@ -980,6 +982,8 @@ def emit(source: ModuleType) -> Path:
                         supersedes_id=previous if id == result_set else None,
                         completeness=round(min(counted / official, 1), 4) if official else None,
                     )
+            for body in getattr(source, "NOTES", {}).get((int(year), int(district)), ()):
+                cs.add("note", entity_id=result_set, kind="caveat", body_md=body)
             if not fresh:
                 continue
             held = {
