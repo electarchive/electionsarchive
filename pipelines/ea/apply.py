@@ -880,7 +880,7 @@ def _rollup(
                      count(distinct case when own.scheme_code = ru.scheme_code then own.id::text else r.unit_k::text end)::int as reporting
               from reached r join rs on rs.k = r.result_set_k
               join area_universe au on au.area_id = r.area_id and au.valid @> rs.on_date
-              join reporting_unit ru on ru.k = r.unit_k
+              join reporting_unit ru on ru.k = r.unit_k and ru.scheme_code = 'us.precinct'
               left join area own on own.id = ru.area_id
               group by r.result_set_k, r.area_id, au.expected
             ),

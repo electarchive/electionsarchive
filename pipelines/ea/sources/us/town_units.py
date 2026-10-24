@@ -8,7 +8,7 @@ from ea.changeset import Changeset
 from ea.store import connect
 
 SOURCE = "us.town_units"
-VERSION = "4"
+VERSION = "5"
 STATES = {"MA": "25", "CT": "09", "RI": "44", "VT": "50", "NH": "33", "ME": "23"}
 DROPPED = "The precinct's code names its county, not its town; the town is read from the precinct's own name."
 
@@ -36,8 +36,8 @@ def emit() -> Path:
         )
         towns: dict[tuple[bool, str, str], set[str]] = {}
         for code, area, text in conn.execute(
-            """select c.code, a.id::text, n.text from area a join area_code c on c.area_id = a.id
-               join name n on n.entity_id = a.id and n.kind = 'official' and n.is_preferred
+            """select distinct c.code, a.id::text, n.text from area a join area_code c on c.area_id = a.id
+               join name n on n.entity_id = a.id and n.kind = 'official'
                where (a.scheme_code = 'us.town' or a.scheme_code = 'us.place') and left(c.code, 2) = any(%s)""",
             [list(STATES.values())],
         ).fetchall():
@@ -138,7 +138,36 @@ def emit() -> Path:
             rows.append((unit, next(iter(found)), start, end))
             if next(iter(found)) in coextensive:
                 rows.append((unit, coextensive[next(iter(found))], start, end))
-        placed = {(unit, area) for unit, area, _, _ in rows}
+        rows = [(*row, None) for row in rows]
+        areas = {
+            (scheme, code): (area, fold(re.sub(r",\s*[A-Z]{2}$", "", text), False))
+            for scheme, code, area, text in conn.execute(
+                """select a.scheme_code, c.code, a.id::text, n.text from area a join area_code c on c.area_id = a.id
+                   join name n on n.entity_id = a.id and n.kind = 'official' and n.is_preferred
+                   where a.scheme_code in ('us.town', 'us.place') and left(c.code, 2) = any(%s)""",
+                [list(STATES.values())],
+            ).fetchall()
+        }
+        whole = conn.execute(
+            """select u.id::text, u.code, lower(u.valid), upper(u.valid), n.text from reporting_unit u
+               join area a on a.id = u.area_id and a.scheme_code = 'us.county'
+               left join name n on n.entity_id = u.id and n.kind = 'official' and n.is_preferred
+               where u.scheme_code = 'us.town' and left(u.code, 2) = any(%s)""",
+            [list(STATES.values())],
+        ).fetchall()
+        for unit, code, start, end, label in whole:
+            town = areas.get(("us.town", code))
+            city = areas.get(("us.place", code[:2] + code[5:]))
+            matched = [
+                pair[0]
+                for pair in (town, city)
+                if pair is not None and label is not None and pair[1] == fold(label, False)
+            ]
+            if not matched:
+                missed[f"town unit {code} {label}"] += 1
+            rows.extend((unit, area, start, end, "source_code") for area in matched)
+        print(f"{sum(1 for row in rows if row[4])} memberships for {len(whole)} town units filed under their county")
+        placed = {(unit, area) for unit, area, _, _, _ in rows}
         stale = [
             (unit, area)
             for unit, area in conn.execute(
@@ -158,7 +187,13 @@ def emit() -> Path:
             "reporting_unit_area",
             pl.DataFrame(
                 rows,
-                schema={"unit_id": pl.String, "area_id": pl.String, "valid_from": pl.Date, "valid_to": pl.Date},
+                schema={
+                    "unit_id": pl.String,
+                    "area_id": pl.String,
+                    "valid_from": pl.Date,
+                    "valid_to": pl.Date,
+                    "method": pl.String,
+                },
                 orient="row",
             ),
         )
