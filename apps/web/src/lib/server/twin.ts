@@ -1914,6 +1914,66 @@ function contestMarkdown(
               ]),
           ),
         ]),
+    ...(lists == null || !lists.isRanked || lists.lists.length === 0
+      ? []
+      : [
+          `## ${m.lists_title()}`,
+          m.lists_summary({ seats: lists.seats }),
+          ...lists.lists.flatMap((list) => {
+            let cut = 0;
+            for (const [index, member] of list.members.entries()) {
+              if (member.fate === "elected") {
+                cut = index + 1;
+              }
+            }
+            const next =
+              list.seats > 0
+                ? list.members.findIndex(
+                    (member, index) =>
+                      index >= cut &&
+                      member.fate == null &&
+                      member.elsewhere == null,
+                  )
+                : -1;
+            const fates: Record<string, () => string> = {
+              elected: m.lists_elected,
+              withdrew: m.lists_withdrew,
+              disqualified: m.lists_disqualified,
+            };
+            const lines = list.members.map((member, index) => {
+              const status =
+                fates[member.fate ?? ""]?.() ??
+                (member.elsewhere == null
+                  ? index === next
+                    ? m.lists_next()
+                    : null
+                  : m.lists_elsewhere_detail({
+                      contest: member.elsewhere.name,
+                    }));
+              return `${member.position}. ${member.name}${status == null ? "" : ` (${status})`}`;
+            });
+            return [
+              `### ${list.label}`,
+              [
+                list.votes == null
+                  ? null
+                  : m.lists_votes({ votes: count(list.votes) }),
+                m.lists_seats({ count: list.seats }),
+              ]
+                .filter((part) => part != null)
+                .join(", "),
+              ...(cut === 0
+                ? [lines.join("\n")]
+                : [
+                    lines.slice(0, cut).join("\n"),
+                    m.lists_cut(),
+                    ...(cut < lines.length
+                      ? [lines.slice(cut).join("\n")]
+                      : []),
+                  ]),
+            ];
+          }),
+        ]),
     ...(additional == null
       ? []
       : [
