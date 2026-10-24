@@ -1,5 +1,7 @@
 import csv
+import io
 import re
+import zipfile
 from collections import defaultdict
 from pathlib import Path
 from uuid import UUID
@@ -24,15 +26,16 @@ FILES = {
     "KY": ("ky", "2026-05-19", ["20260519__ky__primary__county.csv"]),
     "CO": ("co", "2026-06-30", ["20260630__co__primary__county.csv"]),
     "AZ": ("az", "2026-07-21", ["20260721__az__primary__county.csv"]),
+    "NC": ("nc", "2026-03-03", ["results_pct_20260303.zip"]),
     "TN": ("tn", "2026-08-01", ["20260801__tn__primary__county.csv"]),
 }
-FIPS = {"TX": "48", "CA": "06", "MI": "26", "PA": "42", "WV": "54", "MS": "28", "SD": "46", "WY": "56", "OR": "41", "KY": "21", "CO": "08", "AZ": "04", "TN": "47"}
-RUNOFF_SYSTEMS = {"TX": "two_round", "MS": "two_round", "SD": "two_round_35"}
-THRESHOLDS = {"TX": 50, "MS": 50, "SD": 35}
+FIPS = {"TX": "48", "CA": "06", "MI": "26", "PA": "42", "WV": "54", "MS": "28", "SD": "46", "WY": "56", "OR": "41", "KY": "21", "CO": "08", "AZ": "04", "TN": "47", "NC": "37"}
+RUNOFF_SYSTEMS = {"TX": "two_round", "MS": "two_round", "SD": "two_round_35", "NC": "two_round_30"}
+THRESHOLDS = {"TX": 50, "MS": 50, "SD": 35, "NC": 30}
 OFFICES = {"U.S. House": "house", "U.S. Senate": "senate", "Governor": "governor"}
 TOP_TWO = {"CA"}
 AT_LARGE = {"SD", "WY"}
-REDISTRICTED = {"TX", "CA"}
+REDISTRICTED = {"TX", "CA", "NC"}
 PARTIES = {
     "REP": ("republican", "republican-party"),
     "R": ("republican", "republican-party"),
@@ -58,6 +61,45 @@ CAVEAT = "Held under the 2026 congressional map, which the archive has not yet l
 METHOD = "Results by county from OpenElections' 2026 primary file for {state}, a community compilation of the state's county results. Candidates who received votes are listed; write-in votes are pooled."
 
 
+NC_URL = "https://s3.amazonaws.com/dl.ncsbe.gov/ENRS/2026_03_03/{}"
+NC_CONTEST = re.compile(r"US (HOUSE OF REPRESENTATIVES DISTRICT (\d+)|SENATE) \((\w+)\)")
+
+
+def url(code: str, file: str) -> str:
+    return NC_URL.format(file) if code == "nc" else BASE.format(code, file)
+
+
+def rows(code: str, path: Path):
+    if code != "nc":
+        with path.open(newline="") as handle:
+            yield from csv.DictReader(handle)
+        return
+    with zipfile.ZipFile(path) as archive:
+        with archive.open("results_pct_20260303.txt") as handle:
+            totals: dict[tuple[str, str, str, str, str], int] = {}
+            for row in csv.DictReader(io.TextIOWrapper(handle, encoding="utf-8"), delimiter="\t"):
+                found = NC_CONTEST.fullmatch(row["Contest Name"].strip())
+                if found is None:
+                    continue
+                key = (
+                    row["County"].title(),
+                    "U.S. Senate" if found[2] is None else "U.S. House",
+                    found[2] or "",
+                    {"REP": "REP", "DEM": "DEM", "LIB": "LIB"}.get(found[3], found[3]),
+                    row["Choice"].strip(),
+                )
+                totals[key] = totals.get(key, 0) + int(row["Total Votes"])
+            for (county, office, district, party, candidate), votes in totals.items():
+                yield {
+                    "county": county,
+                    "office": office,
+                    "district": district,
+                    "party": party,
+                    "candidate": candidate,
+                    "votes": str(votes),
+                }
+
+
 def title(text: str) -> str:
     if text != text.upper():
         return text
@@ -75,7 +117,7 @@ def title(text: str) -> str:
 def fetch() -> None:
     for code, _, names in FILES.values():
         for name in names:
-            raw.fetch(SOURCE, BASE.format(code, name), suffix=".csv")
+            raw.fetch(SOURCE, url(code, name), suffix=name[name.rindex(".") :])
 
 
 def parse() -> None:
@@ -114,7 +156,7 @@ def emit() -> Path:
                       or x.value ~ '^(2026-11-03|2022-11-08):[A-Z]{2}:governor$'"""
             ).fetchall()
         }
-        systems = {key: cs.key("us.electoral_system", key) for key in ("fptp", "two_round", "two_round_35", "top_two")}
+        systems = {key: cs.key("us.electoral_system", key) for key in ("fptp", "two_round", "two_round_35", "two_round_30", "top_two")}
         counties = {
             (code[:2], re.sub(r"[^a-z]", "", text.lower())): id
             for code, text, id in conn.execute(
@@ -163,6 +205,37 @@ def emit() -> Path:
 
         sources: dict[str, UUID] = {}
         retired_persons: set[UUID] = set()
+        sources: dict[str, UUID] = {}
+        retired_persons: set[UUID] = set()
+        persons: dict[tuple[str, str], UUID] = {}
+        parties: dict[str, UUID] = {}
+
+        def party_of(label: str | None) -> UUID | None:
+            if label not in PARTIES:
+                return None
+            key = PARTIES[label][1]
+            if key not in parties:
+                parties[key] = cs.key("us.party", key)
+                if parties[key] in cs.minted:
+                    cs.add("party", id=parties[key], kind="party", polity_id=cs.polity("US"))
+                    name(parties[key], {"no-labels-party": "No Labels Party"}[key])
+            return parties[key]
+
+        def person_of(state: str, text: str) -> UUID:
+            if (state, slug(text)) not in persons:
+                found = pool.get((state, slug(text)), set())
+                if len(found) == 1:
+                    persons[(state, slug(text))] = next(iter(found))
+                else:
+                    id = cs.key(f"{SOURCE}.person", f"{state}:{slug(text)}")
+                    if id in cs.minted:
+                        cs.add("person", id=id)
+                        name(id, text)
+                    persons[(state, slug(text))] = id
+            return persons[(state, slug(text))]
+
+        sources: dict[str, UUID] = {}
+        retired_persons: set[UUID] = set()
         elections: dict[str, UUID] = {}
         totals: dict[str, int] = {}
         for state, (code, day, files) in FILES.items():
@@ -180,7 +253,7 @@ def emit() -> Path:
                     license=None,
                 )
             for file in files:
-                cs.artifact(raw.cached(SOURCE, BASE.format(code, file)), sources[state])
+                cs.artifact(raw.cached(SOURCE, url(code, file)), sources[state])
             election_key = f"{day}:{state}:primary"
             elections[state] = cs.key("us.election", election_key)
             if elections[state] in cs.minted:
@@ -202,31 +275,33 @@ def emit() -> Path:
             scope_labels: dict[str, str] = {}
             junk: dict[tuple[str, str, str], set[str]] = defaultdict(set)
             for file in files:
-                with raw.cached(SOURCE, BASE.format(code, file)).path.open(newline="") as file_handle:
-                    for row in csv.DictReader(file_handle):
-                        chamber = OFFICES.get(row["office"])
-                        if chamber is None or not row["votes"].isdigit() or row["party"] not in PARTIES:
-                            continue
-                        scope = PARTIES[row["party"]][0]
-                        if scope == "" and state not in TOP_TWO:
-                            continue
-                        scope_labels.setdefault(scope, row["party"])
-                        district = ("0" if state in AT_LARGE else row["district"]) if chamber == "house" else ""
-                        if JUNK.search(row["candidate"].strip()):
-                            junk[(chamber, district, "" if state in TOP_TWO else scope)].add(title(row["candidate"].strip()))
-                            continue
-                        pooled = POOLED.search(row["candidate"]) is not None or row.get("write_in") == "Y"
-                        label = row["party"] if not pooled else ""
-                        candidate = "Write-ins" if pooled else title(row["candidate"].strip())
-                        county = re.sub(r"[^a-z]", "", row["county"].lower())
-                        county = ALIASES.get((state, county), county)
-                        grouped[(chamber, district, "" if state in TOP_TWO else scope)][
-                            (candidate, label, "pooled" if pooled else "")
-                        ][county] += int(row["votes"])
+                for row in rows(code, raw.cached(SOURCE, url(code, file)).path):
+                    chamber = OFFICES.get(row["office"])
+                    if chamber is None or not row["votes"].isdigit() or row["party"] not in PARTIES:
+                        continue
+                    scope = PARTIES[row["party"]][0]
+                    if scope == "" and state not in TOP_TWO:
+                        continue
+                    scope_labels.setdefault(scope, row["party"])
+                    district = ("0" if state in AT_LARGE else str(int(row["district"]))) if chamber == "house" else ""
+                    if JUNK.search(row["candidate"].strip()):
+                        junk[(chamber, district, "" if state in TOP_TWO else scope)].add(title(row["candidate"].strip()))
+                        continue
+                    pooled = POOLED.search(row["candidate"]) is not None or row.get("write_in") == "Y"
+                    label = row["party"] if not pooled else ""
+                    candidate = "Write-ins" if pooled else title(row["candidate"].strip())
+                    county = re.sub(r"[^a-z]", "", row["county"].lower())
+                    county = ALIASES.get((state, county), county)
+                    grouped[(chamber, district, "" if state in TOP_TWO else scope)][
+                        (candidate, label, "pooled" if pooled else "")
+                    ][county] += int(row["votes"])
             for (chamber, district, scope), labels in sorted(junk.items()):
                 key_tail = chamber + (f":{district}" if district else "") + (f":{scope}" if scope else "")
                 for label in sorted(labels):
-                    option = cs.key("us.option", f"{day}:{state}:{key_tail}:{slug(label)}")
+                    try:
+                        option = cs.key("us.option", f"{day}:{state}:{key_tail}:{slug(label)}")
+                    except ValueError:
+                        continue
                     if option not in cs.minted:
                         reason = f"{label} is a report line, not a candidate"
                         cs.add(
