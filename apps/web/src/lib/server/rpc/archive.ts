@@ -10590,6 +10590,7 @@ export const polities = {
                 path: v.nullable(v.string()),
                 count: v.number(),
                 contested: v.number(),
+                isPartyless: v.boolean(),
                 measure: v.string(),
                 results: v.array(
                   v.object({
@@ -11165,13 +11166,28 @@ export const polities = {
                       path: race.path,
                       count: race.count,
                       contested,
+                      isPartyless:
+                        contested > 1 &&
+                        race.results.every(
+                          (row) =>
+                            row.party == null &&
+                            row.person != null &&
+                            !row.isIndependent,
+                        ),
                       measure: race.measure,
                       results: (contested > 0
                         ? race.results.toSorted(
                             (a, b) => (b.seats ?? 0) - (a.seats ?? 0),
                           )
                         : race.results
-                      ).slice(0, 3),
+                      )
+                        .filter(
+                          (row) =>
+                            row.votes > 0 ||
+                            (row.seats ?? 0) > 0 ||
+                            race.results.every((other) => other.votes === 0),
+                        )
+                        .slice(0, 3),
                     };
                   })
                   .filter((race) => race.results.length > 0),

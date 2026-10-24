@@ -494,7 +494,13 @@
               >
             {/if}
           </p>
-          {#if race.results.length > 1}
+          {#if race.isPartyless}
+            <p
+              class="font-figures text-[0.8125rem] text-muted-foreground tabular-nums"
+            >
+              {m.record_filled({ count: race.contested })}
+            </p>
+          {:else if race.results.length > 1}
             <div
               class="flex overflow-hidden rounded-xs bg-muted block-2"
               aria-hidden="true"
@@ -510,31 +516,33 @@
               {/each}
             </div>
           {/if}
-          <ul class="grid gap-0.5 text-sm">
-            {#each race.results.slice(0, 2) as row (row.key)}
-              <li
-                class="grid grid-cols-[minmax(0,1fr)_auto] items-baseline gap-x-3"
-              >
-                <Name
-                  class="truncate min-inline-0"
-                  label={row.label}
-                  color={swatch(row.color, row.key)}
-                  person={row.person}
-                  party={row.party}
-                />
-                <span class="font-figures text-[0.8125rem] tabular-nums"
-                  >{isSeated
-                    ? m.polity_seats({
-                        seats: count(row.seats ?? 0),
-                        size: count(race.contested),
-                      })
-                    : race.results.length === 1
-                      ? m.map_unopposed()
-                      : percent(row.share)}</span
+          {#if !race.isPartyless}
+            <ul class="grid gap-0.5 text-sm">
+              {#each race.results.slice(0, 2) as row (row.key)}
+                <li
+                  class="grid grid-cols-[minmax(0,1fr)_auto] items-baseline gap-x-3"
                 >
-              </li>
-            {/each}
-          </ul>
+                  <Name
+                    class="truncate min-inline-0"
+                    label={row.label}
+                    color={swatch(row.color, row.key)}
+                    person={row.person}
+                    party={row.party}
+                  />
+                  <span class="font-figures text-[0.8125rem] tabular-nums"
+                    >{isSeated
+                      ? m.polity_seats({
+                          seats: count(row.seats ?? 0),
+                          size: count(race.contested),
+                        })
+                      : race.results.length === 1
+                        ? m.map_unopposed()
+                        : percent(row.share)}</span
+                  >
+                </li>
+              {/each}
+            </ul>
+          {/if}
         </li>
       {/each}
     </ul>

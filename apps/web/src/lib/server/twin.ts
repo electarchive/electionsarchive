@@ -978,24 +978,26 @@ function polityMarkdown(
             const isSeated = race.results.some((row) => row.seats != null);
             return [
               `### ${link(race.name, race.path)}`,
-              table(
-                [
-                  m.col_option(),
-                  m.col_votes(),
-                  m.col_share(),
-                  ...(isSeated ? [m.col_seats()] : []),
-                ],
-                race.results
-                  .slice(0, 8)
-                  .map((row) => [
-                    row.label,
-                    count(row.votes),
-                    percent(row.share),
-                    ...(isSeated
-                      ? [row.seats == null ? null : count(row.seats)]
-                      : []),
-                  ]),
-              ),
+              race.isPartyless
+                ? m.record_filled({ count: race.contested })
+                : table(
+                    [
+                      m.col_option(),
+                      m.col_votes(),
+                      m.col_share(),
+                      ...(isSeated ? [m.col_seats()] : []),
+                    ],
+                    race.results
+                      .slice(0, 8)
+                      .map((row) => [
+                        row.label,
+                        count(row.votes),
+                        percent(row.share),
+                        ...(isSeated
+                          ? [row.seats == null ? null : count(row.seats)]
+                          : []),
+                      ]),
+                  ),
             ];
           }),
         ]),
