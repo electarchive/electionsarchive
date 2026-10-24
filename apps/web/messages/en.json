@@ -1437,7 +1437,7 @@
   "coverage_part_legislature": "State legislatures, by district total: {complete} of {total} ({percent})",
   "coverage_goal_precinct": "Every federal, statewide, and state legislative contest since 2000, primaries and runoffs included, with results by precinct",
   "coverage_goal_local": "Every local government election since 2000",
-  "coverage_goal_local_note": "Local governments come from the 2022 Census of Governments. Special districts are counted only if their boards are elected; districts with appointed boards, as the Census Bureau's Individual State Descriptions report them, are left out. A government is due to vote in the years its election history shows. If the archive has no election history for a government, the state's local election calendar for that type of government is used.",
+  "coverage_goal_local_note": "Local governments come from the 2022 Census of Governments. Special districts are counted only if their boards are elected. Districts with appointed boards, as the Census Bureau's Individual State Descriptions report them, are left out. A government is due to vote in the years its election history shows. If the archive has no election history for a government, we use the state's local election calendar for that type of government, as set by state election law. Where we could not confirm the law, the cycle is estimated.",
   "coverage_goal_shapes": "Every federal, statewide, and state legislative contest since 2000 with map shapes for its district and its counties",
   "coverage_goal_shapes_history": "Every federal, statewide, and state legislative contest before 2000 with map shapes for its district and its counties",
   "coverage_goal_shapes_note": "Precinct shapes are counted in the precinct goal, not here.",
