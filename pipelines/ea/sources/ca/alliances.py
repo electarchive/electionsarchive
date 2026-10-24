@@ -1,33 +1,28 @@
-from datetime import UTC, datetime
 from pathlib import Path
 
 from ea import raw
 from ea.changeset import Changeset
-from ea.store import DATA, connect
+from ea.store import connect
 
 SOURCE = "ca.alliances"
 VERSION = "1"
 URL = "https://www.ourcommons.ca/procedure/procedure-and-practice-4/app12-e.html"
+CAPTURE = f"https://web.archive.org/web/20251203032006if_/{URL}"
 PUBLISHER = "House of Commons of Canada"
-TITLE = "House of Commons Procedure and Practice, Fourth Edition, 2025: Appendix 12, General Election Results Since 1867"
+TITLE = (
+    "House of Commons Procedure and Practice, Fourth Edition, 2025: Appendix 12, General Election Results Since 1867"
+)
 NOTES = (
-    'Note 5 to the table: "Liberal-Conservative and Conservative Members always sat together in the House of Commons '
+    'Note 5 to the table: "Liberal-Conservative and Conservative members always sat together in the House of Commons '
     'and, if applicable, in the same government." The table lists Liberal-Conservative Members in every Parliament '
-    "from the 1st (1867) to the 12th (1911)."
+    "from the 1st (1867) to the 12th (1911). Retrieved from the Internet Archive's capture of December 3, 2025, "
+    "because ourcommons.ca refuses automated requests."
 )
 CAUCUSES = [("Conservative", ["Conservative", "Liberal-Conservative"], 1867, 1911)]
 
 
 def fetch() -> None:
-    saved = DATA / "inbox" / "manual" / "MF-067" / "app12-e.html"
-    raw.store(
-        SOURCE,
-        URL,
-        saved.read_bytes(),
-        suffix=".html",
-        retrieved_at=datetime.fromtimestamp(saved.stat().st_mtime, UTC),
-        media_type="text/html",
-    )
+    raw.fetch(SOURCE, CAPTURE, suffix=".html")
 
 
 def emit() -> Path:
@@ -55,7 +50,7 @@ def emit() -> Path:
             license_url="https://www.ourcommons.ca/en/important-notices",
             notes=NOTES,
         )
-        cs.artifact(raw.cached(SOURCE, URL), source)
+        cs.artifact(raw.cached(SOURCE, CAPTURE), source)
         generals = conn.execute(
             "select split_part(value, ':', 1)::date, entity_id from external_id"
             " where scheme = 'ca.lop.election' and value like '%:general' order by 1"
