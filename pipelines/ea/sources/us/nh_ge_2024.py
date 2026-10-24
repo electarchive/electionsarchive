@@ -134,9 +134,18 @@ def emit() -> Path:
         for row in conn.execute(
             f"""select {", ".join(f"r.{column}" for column in columns)} from result_set r
                 join external_id x on x.entity_id = r.id and x.scheme = %s
-                where x.value like '%%:county' and r.status = 'active'""",
+                where x.value like '%%:county' and (r.status = 'active' or r.is_default)""",
             [f"{SOURCE}.result_set"],
         ).fetchall():
             cs.add("result_set", **dict(zip(columns, row, strict=True)), status="withdrawn", is_default=False)
             cs.add("note", id=uuid5(row[0], "withdrawn"), entity_id=row[0], kind="caveat", body_md=WITHDRAWN)
+        for row in conn.execute(
+            f"""select {", ".join(f"r.{column}" for column in columns)} from result_set r
+                join external_id x on x.entity_id = r.id and x.scheme = %s
+                where x.value like '%%:town' and r.status = 'active' and not r.is_default and exists (
+                  select from result_set d where d.contest_id = r.contest_id and d.stage = r.stage
+                    and d.is_default and d.status = 'withdrawn')""",
+            [f"{SOURCE}.result_set"],
+        ).fetchall():
+            cs.add("result_set", **dict(zip(columns, row, strict=True)), status="active", is_default=True)
         return cs.write()
