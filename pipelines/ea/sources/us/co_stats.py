@@ -14,16 +14,22 @@ SOURCE = "us.co_stats"
 VERSION = "1"
 PARSED = DATA / "parsed" / SOURCE
 PUBLISHER = "Colorado Secretary of State"
-URL = "https://co.elstats.civera.com/api/download_contest/{}_table.csv?split_party=false"
+URL = "https://historicalelectiondata.coloradosos.gov/api/download_contest/{}_table.csv?split_party=false"
 STATS = {
     15045: (date(2005, 11, 1), None, "Total Ballots Cast"),
     15039: (date(2011, 11, 1), "Total Voters", None),
     15036: (date(2013, 11, 5), "Total Voters", "Total Ballots Cast"),
     15033: (date(2015, 11, 3), "Registered Voters", "Total Ballots Cast"),
-    15041: (date(2010, 8, 10), None, "Total Ballots Cast"),
+    15041: (date(2010, 8, 10), "Active Voters", "Total Ballots Cast"),
     15038: (date(2012, 6, 26), "Registered Voters", None),
     15035: (date(2014, 6, 24), "Total Voters", "Total Ballots Cast"),
     15031: (date(2016, 6, 28), "Total Voters", None),
+    24903: (date(2018, 6, 26), "Registered Voters", "Total Ballots Cast"),
+    25287: (date(2020, 3, 3), "Registered Voters", "Total Ballots Cast"),
+    25273: (date(2020, 6, 30), "Registered Voters", "Total Ballots Cast"),
+    25570: (date(2022, 6, 28), "Active Voters", "Total Ballots Cast"),
+    25995: (date(2024, 3, 5), "Active Voters", "Total Ballots Cast"),
+    25996: (date(2024, 6, 25), "Registered Voters", "Total Ballots Cast"),
 }
 COUNTIES_SQL = """
 select u.code, n.text from reporting_unit u
@@ -73,8 +79,8 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Colorado's registered voters and ballots cast by county for the odd-year coordinated elections of 2005, 2011, 2013, "
-            "and 2015 and the primaries of 2010, 2012, 2014 (with ballots), and 2016 (registered only), from the Secretary of State's voting statistics",
+            summary="Colorado's registered (or active) voters and ballots cast by county for the odd-year coordinated elections of 2005, 2011, 2013, "
+            "and 2015 and the primaries of 2010 to 2024 (2016 registered only), from the Secretary of State's voting statistics",
             polity="US",
         )
         elections = {
@@ -87,7 +93,9 @@ def emit() -> Path:
         held = {
             election_id
             for (election_id,) in conn.execute(
-                "select election_id from result_set where contest_id is null and is_default and status <> 'withdrawn'"
+                """select r.election_id from result_set r join changeset c on c.id = r.changeset_id
+                   where r.contest_id is null and r.is_default and r.status <> 'withdrawn' and c.pipeline <> %s""",
+                [SOURCE],
             )
         }
         title = "Voting Statistics"
