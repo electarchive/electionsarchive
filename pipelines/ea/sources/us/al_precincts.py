@@ -1,6 +1,8 @@
 import io
 import os
 import re
+import subprocess
+import tempfile
 import unicodedata
 import xml.etree.ElementTree as ET
 import zipfile
@@ -22,13 +24,14 @@ TITLE = "Election Data Downloads: precinct-level general election results"
 LANDING = "https://www.sos.alabama.gov/alabama-votes/voter/election-data"
 BASE = "https://www.sos.alabama.gov/sites/default/files/election-data/2017-06/"
 FILES = {
+    date(2002, 11, 5): BASE + "2002-GeneralElection-PrecinctLevel_0.xls",
     date(2010, 11, 2): BASE + "2010-general-precinctLevel.zip",
     date(2012, 11, 6): BASE + "2012General-PrecinctLevel.zip",
     date(2014, 11, 4): BASE + "2014General-precinctLevel.zip",
 }
 SS = "{urn:schemas-microsoft-com:office:spreadsheet}"
 COUNTYWIDE = r"ABSENTEE|PROVISIONAL|MAIL|CURBSIDE"
-TOTALS = r"TOTAL|REGISTERED|BALLOTS CAST"
+TOTALS = r"TOTAL|REGISTERED|BALLOTS CAST|CALCULATED|REPORTED"
 STATEWIDE = {
     "GOVERNOR": "governor",
     "LIEUTENANT GOVERNOR": "lieutenant-governor",
@@ -42,7 +45,7 @@ STATEWIDE = {
 
 def fetch() -> None:
     for url in FILES.values():
-        raw.fetch(SOURCE, url, suffix=".zip")
+        raw.fetch(SOURCE, url, suffix=url[-4:])
 
 
 def xml_sheets(content: bytes) -> list[list[list[str]]]:
@@ -65,6 +68,7 @@ def xml_sheets(content: bytes) -> list[list[list[str]]]:
 
 def contest(title: str) -> tuple[str, int | None] | None:
     name = re.sub(r"\s+", " ", re.sub(r"\(VOTE FOR \d+\)", "", re.sub(r"^FOR ", "", title.strip().upper()))).strip(" ,")
+    name = {"LT. GOVERNOR": "LIEUTENANT GOVERNOR", "ATTORNEY GEN.": "ATTORNEY GENERAL", "COMMISSIONER OF AG. & INDUSTRIES": "COMMISSIONER OF AGRICULTURE AND INDUSTRIES", "COMM OF AGRICULTURE AND INDUSTRIES": "COMMISSIONER OF AGRICULTURE AND INDUSTRIES", "AGRICULTURE COMM.": "COMMISSIONER OF AGRICULTURE AND INDUSTRIES", "US SENATOR": "UNITED STATES SENATOR"}.get(name, name)
     if name in STATEWIDE:
         return STATEWIDE[name], None
     if name.startswith("PRESIDENT AND VICE"):
@@ -77,7 +81,25 @@ def contest(title: str) -> tuple[str, int | None] | None:
         return f"senate:{int(matched[1])}:g", None
     if matched := re.match(r"STATE REPRESENTATIVE, DISTRICT NO\. (\d+)", name):
         return f"house:{int(matched[1])}:g", None
-    if matched := re.match(r"PUBLIC SERVICE COMMISSION, PLACE NO\. (\d+)", name):
+    if matched := re.match(r"STATE SENATE, DIST[IR]+CT 0*(\d+)$", name):
+        return f"senate:{int(matched[1])}:g", None
+    if matched := re.match(r"STATE HOUSE OF REPRESENTATIVES?, DISTRICT 0*(\d+)$", name):
+        return f"house:{int(matched[1])}:g", None
+    if matched := re.match(r"PUBLIC SERVICE COMMISSION, PLACE #(\d+)$", name):
+        return f"public-service-commissioner:place-{matched[1]}", None
+    if matched := re.match(r"UNITED STATES REPRESENTATIVE D(\d+)$", name):
+        return "house", int(matched[1])
+    if matched := re.match(r"STATE SENATOR D\d+ DISTRICT (\d+)$", name):
+        return f"senate:{int(matched[1])}:g", None
+    if matched := re.match(r"STATE REPRESENTATIVE D\d+ DISTRICT (\d+)$", name):
+        return f"house:{int(matched[1])}:g", None
+    if matched := re.match(r"US REP[,.] DIST\.? ?(\d+)$", name):
+        return "house", int(matched[1])
+    if matched := re.match(r"STATE SEN\.? DIST\.? ?(\d+)$", name):
+        return f"senate:{int(matched[1])}:g", None
+    if matched := re.match(r"STATE REP\.? (?:DIST ?)?(\d+)$", name):
+        return f"house:{int(matched[1])}:g", None
+    if matched := re.match(r"PUBLIC SERVICE (?:COMMISSION,? (?:PLACE|PL)\.? (?:NO\. )?|PL ?)(\d+)", name):
         return f"public-service-commissioner:place-{matched[1]}", None
     return None
 
@@ -94,8 +116,31 @@ def parse() -> None:
         }
     records: list[tuple[date, str, str, str, str, str, str]] = []
     for day, url in FILES.items():
+        if url.endswith(".xls"):
+            book = pl.read_excel(raw.cached(SOURCE, url).path, has_header=False, infer_schema_length=0, sheet_id=0, raise_if_empty=False)
+            for sheet, frame in book.items():
+                rows = [[cell or "" for cell in row] for row in frame.iter_rows()]
+                header = next((i for i, row in enumerate(rows) if row[0].strip() == "County Code"), None)
+                if header is None or header == 0:
+                    continue
+                county = re.sub(r"[^a-z]", "", sheet.lower())
+                names = rows[header - 1]
+                for row in rows[header + 1 :]:
+                    if len(row) < 7 or contest(row[2]) is None:
+                        continue
+                    for position in range(6, min(len(row), len(names))):
+                        if names[position].strip() and not re.search(TOTALS, names[position].upper()):
+                            records.append((day, county, row[2], names[position], row[4], row[position], row[3]))
+            continue
         with zipfile.ZipFile(raw.cached(SOURCE, url).path) as archive:
             for member in archive.namelist():
+                if member.lower().endswith(".csv"):
+                    county = re.sub(r"[^a-z]", "", Path(member).stem.lower())
+                    table = pl.read_csv(archive.read(member), infer_schema=False, truncate_ragged_lines=True)
+                    for row in table.iter_rows(named=True):
+                        if row["Contest Title"] and contest(row["Contest Title"]) is not None:
+                            records.append((day, county, row["Contest Title"].strip(), row["Precinct Name"].strip(), row["Candidate Name"].strip(), row["Registered Voters"], row["Party Code"]))
+                    continue
                 if not member.lower().endswith((".xls", ".xlsx")) or member.startswith("__MACOSX"):
                     continue
                 county = re.sub(r"[^a-z]", "", re.sub(r"(?i)^2014-general-|[ _-]*2014 general precinct", "", Path(member).stem).lower()).removesuffix("xls").replace("radolph", "randolph")
@@ -107,14 +152,23 @@ def parse() -> None:
                         book = pl.read_excel(
                             io.BytesIO(content), has_header=False, infer_schema_length=0, sheet_id=0, raise_if_empty=False
                         )
-                    except Exception as error:
-                        print(f"{day} {member}: unreadable ({str(error)[:60]})")
-                        continue
+                    except Exception:
+                        with tempfile.TemporaryDirectory() as folder:
+                            (Path(folder) / "in.xls").write_bytes(content)
+                            subprocess.run(
+                                ["soffice", "--headless", "--convert-to", "xlsx", "--outdir", folder, str(Path(folder) / "in.xls")],
+                                check=True,
+                                capture_output=True,
+                                timeout=120,
+                            )
+                            book = pl.read_excel(
+                                Path(folder) / "in.xlsx", has_header=False, infer_schema_length=0, sheet_id=0, raise_if_empty=False
+                            )
                     sheets = [[[cell or "" for cell in row] for row in frame.iter_rows()] for frame in book.values()]
                 for rows in sheets:
                     if not rows:
                         continue
-                    if rows[0][0] == "Contest Title":
+                    if rows[0][0] in ("Contest Title", "Contest Title "):
                         precincts = rows[0][3:]
                         for row in rows[1:]:
                             if len(row) < 4 or contest(row[0]) is None:
@@ -122,6 +176,19 @@ def parse() -> None:
                             for precinct, value in zip(precincts, row[3:], strict=False):
                                 if precinct and not re.search(TOTALS, precinct.upper()):
                                     records.append((day, county, row[0], precinct, row[2], value, row[1]))
+                        continue
+                    if rows[0][0].strip() == "" and len(rows) > 2 and rows[1] and rows[1][0] != "" and any(contest(label.strip()) for label in rows[0] if label.strip()):
+                        offices = {}
+                        owner = ""
+                        for position, label in enumerate(rows[0]):
+                            owner = label.strip() if label.strip() else owner
+                            offices[position] = owner
+                        for row in rows[2:]:
+                            if not row or not row[0] or re.search(TOTALS, row[0].upper()):
+                                continue
+                            for position in range(1, min(len(row), len(rows[1]))):
+                                if rows[1][position] and contest(offices[position]) is not None:
+                                    records.append((day, county, offices[position], row[0], re.sub(r"\s*\([A-Z ]+\)\s*$", "", rows[1][position]), row[position], ""))
                         continue
                     if not rows[0][0].startswith(("FOR ", "PROPOSED ")) or contest(rows[0][0]) is None:
                         continue
