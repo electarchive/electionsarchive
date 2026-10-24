@@ -61,7 +61,7 @@ FILES = {
     "NC": ("nc", "2026-03-03", ["results_pct_20260303.zip"]),
     "TN": ("tn", "2026-08-01", ["20260801__tn__primary__county.csv"]),
     "MO": ("mo", "2026-08-04", ["20260804__mo__primary__county.csv"]),
-    "AL": ("al", "2026-05-19", ["20260519__al__primary__county.csv"]),
+    "AL": ("alx", "2026-05-19", ["2026-07/2026_Primary_Election.zip"]),
     "ND": ("nd", "2026-06-09", ["20260609__nd__primary__county.csv"]),
     "GA": ("ga", "2026-05-19", ["ballot-items"]),
     "WA": ("wa", "2026-08-04", ["ballot-items"]),
@@ -89,11 +89,12 @@ FILES = {
 }
 RUNOFFS = {
     "GA": ("ga2", "2026-06-16", ["ballot-items"], "2026-05-19"),
+    "AL": ("alx", "2026-06-16", ["2026-07/2026_PRIMARY_RUNOFF_ELECTION.zip"], "2026-05-19"),
     "OK": ("ok", "2026-08-25", ["getelec/20260825", "20260825/12001", "20260825/13010"], "2026-06-16"),
 }
 FIPS = {"TX": "48", "CA": "06", "MI": "26", "PA": "42", "WV": "54", "MS": "28", "SD": "46", "WY": "56", "OR": "41", "KY": "21", "CO": "08", "AZ": "04", "TN": "47", "NC": "37", "IL": "17", "NM": "35", "NY": "36", "VA": "51", "AL": "01", "ND": "38", "MD": "24", "MN": "27", "VT": "50", "KS": "20", "GA": "13", "WA": "53", "UT": "49", "IN": "18", "FL": "12", "ID": "16", "NJ": "34", "MO": "29", "MA": "25", "DE": "10", "HI": "15", "ME": "23", "OK": "40", "AR": "05"}
-RUNOFF_SYSTEMS = {"GA": "two_round", "TX": "two_round", "MS": "two_round", "SD": "two_round_35", "NC": "two_round_30", "OK": "two_round"}
-THRESHOLDS = {"GA": 50, "TX": 50, "MS": 50, "SD": 35, "NC": 30, "OK": 50}
+RUNOFF_SYSTEMS = {"GA": "two_round", "TX": "two_round", "MS": "two_round", "SD": "two_round_35", "NC": "two_round_30", "OK": "two_round", "AL": "two_round"}
+THRESHOLDS = {"GA": 50, "TX": 50, "MS": 50, "SD": 35, "NC": 30, "OK": 50, "AL": 50}
 ME_COUNTIES = {"AND": "23001", "ARO": "23003", "CUM": "23005", "FRA": "23007", "HAN": "23009", "KEN": "23011", "KNO": "23013", "LIN": "23015", "OXF": "23017", "PEN": "23019", "PIS": "23021", "SAG": "23023", "SOM": "23025", "WAL": "23027", "WAS": "23029", "YOR": "23031"}
 RCV_WINNERS = {
     ("ME", "governor", "", "democratic"): ("hannah-m-pingree", "Hannah M. Pingree won the final round of the ranked-choice count, 111,750 votes to 86,950 for Nirav D. Shah, after three eliminations."),
@@ -145,6 +146,7 @@ OFFICIAL = {
     "ME": ("Maine Secretary of State", "https://www.maine.gov/sos/cec/elec/results/index.html", "municipal and precinct files summed to counties; military and overseas ballots, reported only statewide, are not in the county figures"),
     "OK": ("Oklahoma State Election Board", "https://results.okelections.gov/OKER/", "county results from the board's results application"),
     "AR": ("Arkansas Secretary of State", "https://arkansas.tally-enr.com/", "county results from the state's election night reporting site"),
+    "AL": ("Alabama Secretary of State", "https://www.sos.alabama.gov/alabama-votes/voter/election-data", "county files of precinct results summed to counties"),
     "KS": ("Kansas Secretary of State", "https://sos.ks.gov/elections/election-results.html", "precinct-level files summed to counties"),
 }
 METHOD = "Results by county from OpenElections' 2026 primary file for {state}, a community compilation of the state's county results. Candidates who received votes are listed; write-in votes are pooled."
@@ -238,6 +240,8 @@ def town_counties(state: str) -> dict[str, str]:
 
 
 def url(code: str, file: str) -> str:
+    if code == "alx":
+        return f"https://www.sos.alabama.gov/sites/default/files/election-data/{file}"
     if code == "ar":
         return f"https://enr-results-api.totalresults.com/Contest/GetContestSearchList?cid=arkansas&electionID={AR_ELECTION}" if file == "contests" else f"https://results.tally-enr.com/results/arkansas/{AR_ELECTION}/FullDataFile.json"
     if code == "ok":
@@ -421,6 +425,16 @@ def rows(code: str, path: Path, file: str = ""):
                         "candidate": candidate["NAME_ON_BALLOT"],
                         "votes": str(candidate["TOTAL_VOTES"]),
                     }
+        return
+    if code == "alx":
+        with zipfile.ZipFile(path) as archive:
+            for member in archive.namelist():
+                county = member.rpartition("-")[2].removesuffix(".xls").replace("_", " ")
+                for row in pl.read_excel(io.BytesIO(archive.read(member)), has_header=False, engine="calamine", infer_schema_length=0).rows()[1:]:
+                    found = re.fullmatch(r"(GOVERNOR|UNITED STATES SENATOR|UNITED STATES REPRESENTATIVE, (\d+)\w\w CONGRESSIONAL DISTRICT) \((DEM|REP)\)", row[0].strip())
+                    if found is not None and row[2].strip() not in ("Over Votes", "Under Votes"):
+                        office = {"GOVERNOR": "Governor", "UNITED STATES SENATOR": "U.S. Senate"}.get(found[1], "U.S. House")
+                        yield {"county": county, "office": office, "district": found[2] or "", "party": "Democratic" if found[3] == "DEM" else "Republican", "candidate": row[2].strip(), "votes": str(sum(int(cell) for cell in row[3:] if cell and cell.isdigit()))}
         return
     if code == "ar":
         if file == "contests":
