@@ -3744,7 +3744,9 @@ export const contests = {
       );
       const entries = [
         ...sameRace.map((row) => {
-          const spot = located.rows.find((entry) => entry.root === row.id);
+          const spot = row.counted
+            ? located.rows.find((entry) => entry.root === row.id)
+            : undefined;
           const base =
             spot == null
               ? (rootSlugs.get(row.id) ?? null)
