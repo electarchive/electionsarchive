@@ -417,7 +417,11 @@ function segment(text: string) {
   );
 }
 
-async function names(ids: Array<string>, on: string | null = null) {
+async function names(
+  ids: Array<string>,
+  on: string | null = null,
+  common: Array<string> = [],
+) {
   const result = await db.execute<{
     entity_id: string;
     kind: string;
@@ -427,7 +431,7 @@ async function names(ids: Array<string>, on: string | null = null) {
     from name
     where entity_id = any(${sql.param(ids)}::uuid[]) and kind in ('official', 'english')
     order by entity_id, coalesce(valid @> ${on}::date, false) desc,
-      (kind = 'english' and exists (select from person p where p.id = entity_id)) desc, is_preferred desc,
+      coalesce(kind = 'english' and script = 'Latn' and entity_id = any(${sql.param(common)}::uuid[]), false) desc, is_preferred desc,
       (lang = 'en') desc, (kind = 'official') desc)
     union all
     select i.id, 'abbreviation', short.text
@@ -11279,7 +11283,7 @@ export const entities = {
       const common =
         entity.type === "person"
           ? await db.execute<{ text: string }>(sql`
-            select text from name where entity_id = ${entity.id}::uuid and kind = 'english' and lang = 'en'
+            select text from name where entity_id = ${entity.id}::uuid and kind = 'english' and lang = 'en' and script = 'Latn'
             order by is_preferred desc, text limit 1
           `)
           : null;
@@ -11633,14 +11637,18 @@ export const people = {
         }
       }
       const [labels, slugs] = await Promise.all([
-        names([
-          person.id,
-          ...roots,
-          ...new Set([...spells, ...terms].map((spell) => spell.owner)),
-          ...joins.rows.flatMap((row) =>
-            row.place == null ? [] : [row.place],
-          ),
-        ]),
+        names(
+          [
+            person.id,
+            ...roots,
+            ...new Set([...spells, ...terms].map((spell) => spell.owner)),
+            ...joins.rows.flatMap((row) =>
+              row.place == null ? [] : [row.place],
+            ),
+          ],
+          null,
+          [person.id],
+        ),
         paths(roots),
       ]);
       const record = [
@@ -13024,7 +13032,11 @@ export const search = {
         [row.id, row.target, row.context].filter((id) => id != null),
       );
       const [labels, slugs, faces] = await Promise.all([
-        names(ids),
+        names(
+          ids,
+          null,
+          rows.filter((row) => row.type === "person").map((row) => row.id),
+        ),
         paths(ids),
         portraits(
           rows.filter((row) => row.type === "person").map((row) => row.id),

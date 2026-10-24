@@ -6,10 +6,10 @@ from urllib.parse import urlencode
 
 from ea import raw
 from ea.changeset import Changeset
-from ea.store import connect
+from ea.store import DATA, connect
 
 SOURCE = "wikidata_people"
-VERSION = "1"
+VERSION = "2"
 TITLE = "English labels of people"
 LABELS = """SELECT ?item ?label WHERE {{ VALUES ?item {{ {items} }} ?item rdfs:label ?label . FILTER(LANG(?label) = "en") }}"""
 CHUNK = 400
@@ -55,7 +55,7 @@ def emit() -> Path:
         for binding in json.loads(raw.cached(SOURCE, url).path.read_text(encoding="utf-8"))["results"]["bindings"]:
             labels[binding["item"]["value"].rsplit("/", 1)[1]] = binding["label"]["value"]
     with connect() as conn:
-        people: dict[str, list[tuple[str, set[str]]]] = {}
+        people: dict[str, list[tuple[str, list[str]]]] = {}
         for entity, item, texts in conn.execute(
             """
             select p.id, x.value, array_agg(n.text) filter (where s.title is distinct from %s)
@@ -68,7 +68,27 @@ def emit() -> Path:
             """,
             [TITLE],
         ).fetchall():
-            people.setdefault(item, []).append((str(entity), {_fold(text) for text in texts or []}))
+            people.setdefault(item, []).append((str(entity), texts or []))
+        countries: dict[str, set[str]] = {}
+        for entity, codes in conn.execute(
+            """
+            select cy.person_id, array_agg(distinct split_part(s.path, '/', 1))
+            from candidacy cy
+            join contest_option o on o.id = cy.option_id
+            join contest c on c.id = o.contest_id
+            join slug s on s.entity_id = c.election_id and s.is_current
+            where exists (select from external_id x where x.entity_id = cy.person_id and x.scheme = 'wikidata')
+            group by cy.person_id
+            """
+        ).fetchall():
+            countries[str(entity)] = set(codes)
+        stored = {
+            (str(entity), text): name
+            for name, entity, text in conn.execute(
+                "select n.id, n.entity_id, n.text from name n join source s on s.id = n.source_id where s.title = %s",
+                [TITLE],
+            ).fetchall()
+        }
         cs = Changeset(
             conn,
             pipeline=SOURCE,
@@ -93,18 +113,48 @@ def emit() -> Path:
         for url in urls:
             cs.artifact(raw.cached(SOURCE, url), source)
         added = 0
+        held: list[tuple[str, str, str, str]] = []
         for item, label in labels.items():
-            for entity, folded in people.get(item, []):
-                if _fold(label) and _fold(label) not in folded:
-                    cs.add(
-                        "name",
-                        entity_id=entity,
-                        text=label,
-                        lang="en",
-                        kind="english",
-                        is_preferred=False,
-                        source_id=source,
-                    )
-                    added += 1
-        print(f"{added} English names for {len(labels)} labeled items")
+            text = re.sub(
+                r"^Sir |\s*\(.*?\)\s*$|,.*\b(Baron|Baroness|Baronet|Viscount|Viscountess|Earl|Countess|Marquess|Duke|Lord|Lady)\b.*$",
+                "",
+                label,
+            ).strip()
+            words = [
+                word for word in re.findall(r"[^\s,.]+", text.lower()) if word not in {"jr", "sr", "ii", "iii", "iv"}
+            ]
+            if not words:
+                continue
+            for entity, texts in people.get(item, []):
+                if not texts or _fold(text) in {_fold(name) for name in texts}:
+                    continue
+                codes = countries.get(entity, set())
+                if "tr" in codes:
+                    continue
+                if not all("LATIN" in unicodedata.name(c, "") for c in text if c.isalpha()):
+                    continue
+                abroad = codes != {"us"}
+                surnames = (
+                    {word for name in texts for word in re.findall(r"[^\s,.]+", name.lower())}
+                    if abroad
+                    else {word for name in texts for word in _fold(name).split("-")}
+                )
+                if (words[-1] if abroad else _fold(words[-1])) not in surnames:
+                    held.append((entity, item, text, " | ".join(sorted(set(texts)))))
+                    continue
+                cs.add(
+                    "name",
+                    id=stored.get((entity, text)),
+                    entity_id=entity,
+                    text=text,
+                    lang="en",
+                    script="Latn",
+                    kind="english",
+                    is_preferred=False,
+                    source_id=source,
+                )
+                added += 1
+        log = DATA / "logs" / "wikidata_people_held.tsv"
+        log.write_text("".join("\t".join(row) + "\n" for row in sorted(held)), encoding="utf-8")
+        print(f"{added} English names for {len(labels)} labeled items, {len(held)} held for a surname check in {log}")
         return cs.write()
