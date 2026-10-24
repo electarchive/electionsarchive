@@ -66,7 +66,7 @@ def _stage(conn: Connection, changeset_id: str) -> Stage:
         ).fetchall()
         if table in tables
         and table not in temporal
-        and table not in (*FACTS, "external_id", "slug", "entity_merge", "entity_retirement")
+        and table not in (*FACTS, "external_id", "slug", "entity_merge", "entity_retirement", "entity_subtype_drop")
     }
     owners: dict[str, str] = {
         table: owner
@@ -597,6 +597,35 @@ def _publish_table(conn: Connection, stage: Stage, table: str) -> None:
                    where id = current_setting('ea.changeset_id')::uuid"""
             ).format(staged)
         )
+    if table == "entity_subtype_drop":
+        for entity, subtype, kind in conn.execute(
+            sql.SQL(
+                "select s.entity_id::text, s.subtype, e.type::text from {} s join entity e on e.id = s.entity_id"
+            ).format(staged)
+        ).fetchall():
+            if subtype == kind or subtype not in stage.entities:
+                raise ValueError(f"{entity} is a {kind}; {subtype} is not a stray subtype row to drop")
+            if subtype == "person":
+                conn.execute("delete from public.person_image where person_id = %s", [entity])
+            held = [
+                f"{relation}.{column} ({rows} rows)"
+                for relation, column in conn.execute(
+                    """select distinct c.conrelid::regclass::text, a.attname from pg_constraint c
+                       join pg_attribute a on a.attrelid = c.conrelid and a.attnum = c.conkey[1]
+                       where c.contype = 'f' and c.confrelid = %s::regclass""",
+                    [subtype],
+                ).fetchall()
+                for (rows,) in conn.execute(
+                    sql.SQL("select count(*) from public.{} where {} = %s").format(
+                        sql.Identifier(relation), sql.Identifier(column)
+                    ),
+                    [entity],
+                ).fetchall()
+                if rows
+            ]
+            if held:
+                raise ValueError(f"dropping {subtype} row of {entity} still referenced: " + "; ".join(held))
+            conn.execute(sql.SQL("delete from public.{} where id = %s").format(sql.Identifier(subtype)), [entity])
     if table == "slug":
         conn.execute(
             sql.SQL(

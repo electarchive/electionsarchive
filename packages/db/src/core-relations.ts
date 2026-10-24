@@ -52,6 +52,7 @@ export const relations = defineRelations(schema, (r) => ({
 		bodiesChangesetId: r.many.body({
 			alias: "body_changesetId_changeset_id"
 		}),
+		bodyApportionments: r.many.bodyApportionment(),
 		bodyEvents: r.many.bodyEvent(),
 		bodiesViaBodySize: r.many.body({
 			alias: "body_id_changeset_id_via_bodySize"
@@ -75,6 +76,11 @@ export const relations = defineRelations(schema, (r) => ({
 			from: r.changeset.id.through(r.entityRetirement.changesetId),
 			to: r.entity.id.through(r.entityRetirement.entityId),
 			alias: "changeset_id_entity_id_via_entityRetirement"
+		}),
+		entitiesViaEntitySubtypeDrop: r.many.entity({
+			from: r.changeset.id.through(r.entitySubtypeDrop.changesetId),
+			to: r.entity.id.through(r.entitySubtypeDrop.entityId),
+			alias: "changeset_id_entity_id_via_entitySubtypeDrop"
 		}),
 		entitiesViaExternalId: r.many.entity({
 			from: r.changeset.id.through(r.externalId.changesetId),
@@ -129,7 +135,6 @@ export const relations = defineRelations(schema, (r) => ({
 		reportingUnits: r.many.reportingUnit(),
 		reportingUnitAreas: r.many.reportingUnitArea(),
 		representationGaps: r.many.representationGap(),
-		bodyApportionments: r.many.bodyApportionment(),
 		resultSets: r.many.resultSet(),
 		politiesViaScheme: r.many.polity({
 			from: r.changeset.id.through(r.scheme.changesetId),
@@ -211,6 +216,9 @@ export const relations = defineRelations(schema, (r) => ({
 		}),
 		changesetsViaEntityRetirement: r.many.changeset({
 			alias: "changeset_id_entity_id_via_entityRetirement"
+		}),
+		changesetsViaEntitySubtypeDrop: r.many.changeset({
+			alias: "changeset_id_entity_id_via_entitySubtypeDrop"
 		}),
 		changesetsViaExternalId: r.many.changeset({
 			alias: "changeset_id_entity_id_via_externalId"
@@ -323,13 +331,18 @@ export const relations = defineRelations(schema, (r) => ({
 		areaParentsParentId: r.many.areaParent({
 			alias: "areaParent_parentId_area_id"
 		}),
+		bodyApportionments: r.many.bodyApportionment(),
 		contests: r.many.contest(),
 		polityTerritories: r.many.polityTerritory(),
 		reportingUnits: r.many.reportingUnit(),
 		reportingUnitAreas: r.many.reportingUnitArea(),
 		representationGaps: r.many.representationGap(),
-		bodyApportionments: r.many.bodyApportionment(),
-		seats: r.many.seat(),
+		seatsApportionedAreaId: r.many.seat({
+			alias: "seat_apportionedAreaId_area_id"
+		}),
+		seatsDistrictAreaId: r.many.seat({
+			alias: "seat_districtAreaId_area_id"
+		}),
 	},
 	scheme: {
 		areas: r.many.area(),
@@ -508,6 +521,7 @@ export const relations = defineRelations(schema, (r) => ({
 			from: r.body.polityId,
 			to: r.polity.id
 		}),
+		bodyApportionments: r.many.bodyApportionment(),
 		bodyEvents: r.many.bodyEvent(),
 		changesets: r.many.changeset({
 			from: r.body.id.through(r.bodySize.bodyId),
@@ -517,7 +531,6 @@ export const relations = defineRelations(schema, (r) => ({
 		contests: r.many.contest(),
 		offices: r.many.office(),
 		representationGaps: r.many.representationGap(),
-		bodyApportionments: r.many.bodyApportionment(),
 		seats: r.many.seat(),
 		tenures: r.many.tenure(),
 	},
@@ -549,6 +562,20 @@ export const relations = defineRelations(schema, (r) => ({
 			alias: "changeset_id_polity_id_via_scheme"
 		}),
 		entities: r.many.entity(),
+	},
+	bodyApportionment: {
+		area: r.one.area({
+			from: r.bodyApportionment.areaId,
+			to: r.area.id
+		}),
+		body: r.one.body({
+			from: r.bodyApportionment.bodyId,
+			to: r.body.id
+		}),
+		changeset: r.one.changeset({
+			from: r.bodyApportionment.changesetId,
+			to: r.changeset.id
+		}),
 	},
 	bodyEvent: {
 		body: r.one.body({
@@ -703,6 +730,11 @@ export const relations = defineRelations(schema, (r) => ({
 	},
 	seat: {
 		contests: r.many.contest(),
+		areaApportionedAreaId: r.one.area({
+			from: r.seat.apportionedAreaId,
+			to: r.area.id,
+			alias: "seat_apportionedAreaId_area_id"
+		}),
 		body: r.one.body({
 			from: r.seat.bodyId,
 			to: r.body.id
@@ -711,9 +743,10 @@ export const relations = defineRelations(schema, (r) => ({
 			from: r.seat.changesetId,
 			to: r.changeset.id
 		}),
-		area: r.one.area({
+		areaDistrictAreaId: r.one.area({
 			from: r.seat.districtAreaId,
-			to: r.area.id
+			to: r.area.id,
+			alias: "seat_districtAreaId_area_id"
 		}),
 		entity: r.one.entity({
 			from: r.seat.id,
@@ -1158,20 +1191,6 @@ export const relations = defineRelations(schema, (r) => ({
 		reportingUnit: r.one.reportingUnit({
 			from: r.reportingUnitArea.unitId,
 			to: r.reportingUnit.id
-		}),
-	},
-	bodyApportionment: {
-		area: r.one.area({
-			from: r.bodyApportionment.areaId,
-			to: r.area.id
-		}),
-		body: r.one.body({
-			from: r.bodyApportionment.bodyId,
-			to: r.body.id
-		}),
-		changeset: r.one.changeset({
-			from: r.bodyApportionment.changesetId,
-			to: r.changeset.id
 		}),
 	},
 	representationGap: {

@@ -1,58 +1,58 @@
 import { daterange } from "./range.ts";
 import { users } from "./schema.ts";
-import { pgEnum, pgTable, uuid, text, integer, smallint, boolean, date, timestamp, numeric, jsonb, customType, char, real, geometry, bigint, index, uniqueIndex, foreignKey, primaryKey, unique, check, pgView } from "drizzle-orm/pg-core"
+import { pgEnum, pgTable, uuid, smallint, text, integer, boolean, date, timestamp, jsonb, customType, bigint, numeric, real, char, geometry, index, uniqueIndex, foreignKey, primaryKey, unique, check, pgView } from "drizzle-orm/pg-core"
 import { sql } from "drizzle-orm"
 
-export const datePrecision = pgEnum("date_precision", ["day", "month", "year", "unknown"])
-export const calendar = pgEnum("calendar", ["gregorian", "julian", "rumi", "hijri", "french_republican"])
-export const entityType = pgEnum("entity_type", ["polity", "area", "reporting_unit", "election", "contest", "contest_option", "result_set", "electoral_system", "party", "alliance", "person", "candidacy", "body", "office", "seat", "tenure", "source", "saved_view", "government"])
-export const authorKind = pgEnum("author_kind", ["pipeline", "user", "agent", "system"])
-export const changesetKind = pgEnum("changeset_kind", ["import", "edit", "correction", "match", "digitization", "live"])
-export const changesetStatus = pgEnum("changeset_status", ["draft", "pending_review", "published", "rejected", "superseded"])
-export const payloadKind = pgEnum("payload_kind", ["ops", "artifacts"])
-export const sourceKind = pgEnum("source_kind", ["official_body", "aggregator", "compendium", "news_agency", "academic", "community", "wikidata"])
-export const polityKind = pgEnum("polity_kind", ["sovereign_state", "supranational", "federal_unit", "region", "county", "municipality", "submunicipal", "historical_state", "school_district", "judicial_district", "special_district"])
-export const polityRelationKind = pgEnum("polity_relation_kind", ["succeeded_by", "merged_into", "split_into", "annexed_by", "reunified_into", "seceded_from", "consolidated_with"])
-export const polityPeriodKind = pgEnum("polity_period_kind", ["constitutional_order", "military_rule", "occupation", "transitional"])
-export const schemeKind = pgEnum("scheme_kind", ["administrative", "electoral_district", "precinct", "census", "synthetic"])
-export const geometryQuality = pgEnum("geometry_quality", ["official", "osm", "academic", "digitized", "synthetic"])
+export const acquiredVia = pgEnum("acquired_via", ["elected", "appointed", "trustee", "succession", "list_replacement", "co_opted", "acting"])
+export const allianceKind = pgEnum("alliance_kind", ["electoral_alliance", "joint_list", "federation", "apparentement"])
 export const areaEventKind = pgEnum("area_event_kind", ["created", "dissolved", "renamed", "recoded", "split", "merged", "absorbed", "boundary_changed", "transferred"])
 export const areaEventRole = pgEnum("area_event_role", ["from", "to"])
 export const areaRelation = pgEnum("area_relation", ["equals", "within", "unlocated"])
-export const reportingUnitKind = pgEnum("reporting_unit_kind", ["standard", "abroad_mission", "customs_gate", "prison", "mobile", "postal_district", "aggregate"])
+export const authorKind = pgEnum("author_kind", ["pipeline", "user", "agent", "system"])
+export const ballotQuestionTextKind = pgEnum("ballot_question_text_kind", ["text", "summary", "link"])
+export const ballotQuestionType = pgEnum("ballot_question_type", ["initiative", "mandatory_referendum", "optional_referendum", "counter_proposal", "tie_break", "plebiscite", "recall_question"])
+export const bodyEventKind = pgEnum("body_event_kind", ["dissolved", "suspended", "reconstituted", "replaced_by_appointed"])
+export const bodyKind = pgEnum("body_kind", ["lower_house", "upper_house", "unicameral", "council", "electoral_college", "constituent_assembly", "appointed_assembly"])
+export const calendar = pgEnum("calendar", ["gregorian", "julian", "rumi", "hijri", "french_republican"])
+export const candidacyRole = pgEnum("candidacy_role", ["head", "running_mate", "list_member", "substitute"])
+export const changesetKind = pgEnum("changeset_kind", ["import", "edit", "correction", "match", "digitization", "live"])
+export const changesetStatus = pgEnum("changeset_status", ["draft", "pending_review", "published", "rejected", "superseded"])
+export const contestKind = pgEnum("contest_kind", ["office", "body_seats", "list_allocation", "ballot_question", "elector_slate", "delegate_allocation"])
+export const contestTerm = pgEnum("contest_term", ["full", "remainder"])
 export const crosswalkFromKind = pgEnum("crosswalk_from_kind", ["boundary_set", "reporting_scheme"])
 export const crosswalkMethod = pgEnum("crosswalk_method", ["exact", "registered_voters", "population", "area"])
-export const partyKind = pgEnum("party_kind", ["party", "independent_group", "list_vehicle", "federation", "bloc", "nuance", "parliamentary_group", "caucus"])
-export const partyRelationKind = pgEnum("party_relation_kind", ["merged_into", "split_from", "successor_of", "refounded_as", "absorbed_by", "closed_by_court", "list_vehicle_for"])
-export const partyAffiliationKind = pgEnum("party_affiliation_kind", ["ep_group", "federation", "international", "regional_branch", "coalition"])
-export const bodyKind = pgEnum("body_kind", ["lower_house", "upper_house", "unicameral", "council", "electoral_college", "constituent_assembly", "appointed_assembly"])
-export const bodyEventKind = pgEnum("body_event_kind", ["dissolved", "suspended", "reconstituted", "replaced_by_appointed"])
-export const officeKind = pgEnum("office_kind", ["head_of_state", "head_of_government", "governor", "mayor", "deputy_mayor", "muhtar", "speaker", "other"])
+export const datePrecision = pgEnum("date_precision", ["day", "month", "year", "unknown"])
 export const electionKind = pgEnum("election_kind", ["general", "by_election", "primary", "caucus", "runoff", "referendum", "recall", "indirect", "local", "special"])
 export const electionStatus = pgEnum("election_status", ["scheduled", "held", "postponed", "canceled", "annulled"])
-export const allianceKind = pgEnum("alliance_kind", ["electoral_alliance", "joint_list", "federation", "apparentement"])
-export const contestKind = pgEnum("contest_kind", ["office", "body_seats", "list_allocation", "ballot_question", "elector_slate", "delegate_allocation"])
-export const resultKind = pgEnum("result_kind", ["counted", "tacit", "show_of_hands", "appointed"])
-export const ballotQuestionType = pgEnum("ballot_question_type", ["initiative", "mandatory_referendum", "optional_referendum", "counter_proposal", "tie_break", "plebiscite", "recall_question"])
-export const optionKind = pgEnum("option_kind", ["candidate", "ticket", "list", "legend", "answer", "write_in", "others", "none_of_the_above", "uncommitted"])
-export const candidacyRole = pgEnum("candidacy_role", ["head", "running_mate", "list_member", "substitute"])
-export const nominationKind = pgEnum("nomination_kind", ["nominated", "endorsed", "supported"])
-export const stage = pgEnum("stage", ["live", "preliminary", "official", "certified", "court_revised", "recount", "alternative"])
-export const resultSetStatus = pgEnum("result_set_status", ["active", "superseded", "annulled", "withdrawn"])
-export const outcomeKind = pgEnum("outcome_kind", ["elected", "won", "advanced", "eliminated", "lost", "tied", "withdrew", "disqualified"])
-export const acquiredVia = pgEnum("acquired_via", ["elected", "appointed", "trustee", "succession", "list_replacement", "co_opted", "acting"])
 export const endedVia = pgEnum("ended_via", ["term_end", "resigned", "died", "removed", "annulled", "dissolved", "expelled", "lost_seat", "disqualified", "withdrew", "elevated", "appointed"])
-export const representationGapReason = pgEnum("representation_gap_reason", ["secession"])
-export const tenureEventKind = pgEnum("tenure_event_kind", ["elected", "certified", "certificate_denied", "certificate_reversed", "sworn_in", "suspended", "removed", "trustee_appointed", "reinstated", "resigned", "died", "immunity_lifted", "arrested", "switched_party", "became_independent", "expelled", "term_ended"])
-export const tenureAffiliationKind = pgEnum("tenure_affiliation_kind", ["party", "parliamentary_group"])
-export const nameKind = pgEnum("name_kind", ["official", "native", "english", "historical", "transliteration", "abbreviation", "ballot", "short"])
-export const noteKind = pgEnum("note_kind", ["context", "caveat", "methodology", "editorial", "retired"])
-export const labelKind = pgEnum("label_kind", ["recognition", "integrity", "data_quality"])
+export const entityType = pgEnum("entity_type", ["polity", "area", "reporting_unit", "election", "contest", "contest_option", "result_set", "electoral_system", "party", "alliance", "person", "candidacy", "body", "office", "seat", "tenure", "source", "saved_view", "government"])
 export const flagSeverity = pgEnum("flag_severity", ["info", "warning", "error"])
 export const flagStatus = pgEnum("flag_status", ["open", "accepted", "resolved"])
-export const contestTerm = pgEnum("contest_term", ["full", "remainder"])
+export const geometryQuality = pgEnum("geometry_quality", ["official", "osm", "academic", "digitized", "synthetic"])
 export const governmentPartyRole = pgEnum("government_party_role", ["head", "member", "support"])
-export const ballotQuestionTextKind = pgEnum("ballot_question_text_kind", ["text", "summary", "link"])
+export const labelKind = pgEnum("label_kind", ["recognition", "integrity", "data_quality"])
+export const nameKind = pgEnum("name_kind", ["official", "native", "english", "historical", "transliteration", "abbreviation", "ballot", "short"])
+export const nominationKind = pgEnum("nomination_kind", ["nominated", "endorsed", "supported"])
+export const noteKind = pgEnum("note_kind", ["context", "caveat", "methodology", "editorial", "retired"])
+export const officeKind = pgEnum("office_kind", ["head_of_state", "head_of_government", "governor", "mayor", "deputy_mayor", "muhtar", "speaker", "other"])
+export const optionKind = pgEnum("option_kind", ["candidate", "ticket", "list", "legend", "answer", "write_in", "others", "none_of_the_above", "uncommitted"])
+export const outcomeKind = pgEnum("outcome_kind", ["elected", "won", "advanced", "eliminated", "lost", "tied", "withdrew", "disqualified"])
+export const partyAffiliationKind = pgEnum("party_affiliation_kind", ["ep_group", "federation", "international", "regional_branch", "coalition"])
+export const partyKind = pgEnum("party_kind", ["party", "independent_group", "list_vehicle", "federation", "bloc", "nuance", "parliamentary_group", "caucus"])
+export const partyRelationKind = pgEnum("party_relation_kind", ["merged_into", "split_from", "successor_of", "refounded_as", "absorbed_by", "closed_by_court", "list_vehicle_for"])
+export const payloadKind = pgEnum("payload_kind", ["ops", "artifacts"])
+export const polityKind = pgEnum("polity_kind", ["sovereign_state", "supranational", "federal_unit", "region", "county", "municipality", "submunicipal", "historical_state", "school_district", "judicial_district", "special_district"])
+export const polityPeriodKind = pgEnum("polity_period_kind", ["constitutional_order", "military_rule", "occupation", "transitional"])
+export const polityRelationKind = pgEnum("polity_relation_kind", ["succeeded_by", "merged_into", "split_into", "annexed_by", "reunified_into", "seceded_from", "consolidated_with"])
+export const reportingUnitKind = pgEnum("reporting_unit_kind", ["standard", "abroad_mission", "customs_gate", "prison", "mobile", "postal_district", "aggregate"])
+export const resultKind = pgEnum("result_kind", ["counted", "tacit", "show_of_hands", "appointed"])
+export const resultSetStatus = pgEnum("result_set_status", ["active", "superseded", "annulled", "withdrawn"])
+export const schemeKind = pgEnum("scheme_kind", ["administrative", "electoral_district", "precinct", "census", "synthetic"])
+export const sourceKind = pgEnum("source_kind", ["official_body", "aggregator", "compendium", "news_agency", "academic", "community", "wikidata"])
+export const stage = pgEnum("stage", ["live", "preliminary", "official", "certified", "court_revised", "recount", "alternative"])
+export const tenureAffiliationKind = pgEnum("tenure_affiliation_kind", ["party", "parliamentary_group"])
+export const tenureEventKind = pgEnum("tenure_event_kind", ["elected", "certified", "certificate_denied", "certificate_reversed", "sworn_in", "suspended", "removed", "trustee_appointed", "reinstated", "resigned", "died", "immunity_lifted", "arrested", "switched_party", "became_independent", "expelled", "term_ended"])
+export const representationGapReason = pgEnum("representation_gap_reason", ["secession"])
 
 
 export const alliance = pgTable("alliance", {
@@ -195,17 +195,6 @@ export const body = pgTable("body", {
 	recordedFrom: timestamp("recorded_from", { withTimezone: true }).default(sql`now()`).notNull(),
 });
 
-export const bodyEvent = pgTable("body_event", {
-	id: uuid().default(sql`uuidv7()`).primaryKey(),
-	bodyId: uuid("body_id").notNull().references(() => body.id),
-	kind: bodyEventKind().notNull(),
-	date: date(),
-	datePrecision: datePrecision("date_precision").default("day").notNull(),
-	sourceId: uuid("source_id").references(() => source.id),
-	changesetId: uuid("changeset_id").notNull().references(() => changeset.id),
-	recordedFrom: timestamp("recorded_from", { withTimezone: true }).default(sql`now()`).notNull(),
-});
-
 export const bodyApportionment = pgTable("body_apportionment", {
 	bodyId: uuid("body_id").notNull().references(() => body.id, { onDelete: "cascade" } ),
 	areaId: uuid("area_id").notNull().references(() => area.id),
@@ -220,6 +209,17 @@ export const bodyApportionment = pgTable("body_apportionment", {
 }, (table) => [
 	primaryKey({ columns: [table.bodyId, table.areaId, table.valid], name: "body_apportionment_pkey"}),
 ]);
+
+export const bodyEvent = pgTable("body_event", {
+	id: uuid().default(sql`uuidv7()`).primaryKey(),
+	bodyId: uuid("body_id").notNull().references(() => body.id),
+	kind: bodyEventKind().notNull(),
+	date: date(),
+	datePrecision: datePrecision("date_precision").default("day").notNull(),
+	sourceId: uuid("source_id").references(() => source.id),
+	changesetId: uuid("changeset_id").notNull().references(() => changeset.id),
+	recordedFrom: timestamp("recorded_from", { withTimezone: true }).default(sql`now()`).notNull(),
+});
 
 export const bodySize = pgTable("body_size", {
 	bodyId: uuid("body_id").notNull().references(() => body.id, { onDelete: "cascade" } ),
@@ -389,6 +389,39 @@ export const coverageBuild = pgTable("coverage_build", {
 }, (table) => [
 check("coverage_build_id_check", sql`id`),]);
 
+export const coverageCacheDone = pgTable("coverage_cache_done", {
+	resultSetK: integer("result_set_k").primaryKey(),
+});
+
+export const coverageCacheMeasure = pgTable("coverage_cache_measure", {
+	resultSetK: integer("result_set_k").notNull(),
+	measure: smallint().notNull(),
+}, (table) => [
+	primaryKey({ columns: [table.resultSetK, table.measure], name: "coverage_cache_measure_pkey"}),
+]);
+
+export const coverageCacheShapes = pgTable("coverage_cache_shapes", {
+	key: text().primaryKey(),
+	signature: text().notNull(),
+	units: integer().notNull(),
+	shaped: integer().notNull(),
+});
+
+export const coverageCacheState = pgTable("coverage_cache_state", {
+	fingerprint: text().notNull(),
+});
+
+export const coverageCacheUnit = pgTable("coverage_cache_unit", {
+	resultSetK: integer("result_set_k").notNull(),
+	unitK: integer("unit_k").notNull(),
+}, (table) => [
+	primaryKey({ columns: [table.resultSetK, table.unitK], name: "coverage_cache_unit_pkey"}),
+]);
+
+export const coverageCacheUnitK = pgTable("coverage_cache_unit_k", {
+	unitK: integer("unit_k").primaryKey(),
+});
+
 export const coverageGoal = pgTable("coverage_goal", {
 	goal: text().notNull(),
 	state: text().notNull(),
@@ -468,9 +501,9 @@ export const crosswalkWeight = pgTable("crosswalk_weight", {
 
 export const districtCounty = pgTable("district_county", {
 	districtAreaId: uuid("district_area_id").notNull(),
-	districtValid: daterange("district_valid").notNull(),
+	districtValid: customType({ dataType: () => 'daterange' })("district_valid").notNull(),
 	countyAreaId: uuid("county_area_id").notNull(),
-	countyValid: daterange("county_valid").notNull(),
+	countyValid: customType({ dataType: () => 'daterange' })("county_valid").notNull(),
 	share: real().notNull(),
 	rest: real(),
 }, (table) => [
@@ -546,6 +579,16 @@ export const entityRetirement = pgTable("entity_retirement", {
 	recordedFrom: timestamp("recorded_from", { withTimezone: true }).default(sql`now()`).notNull(),
 }, (table) => [
 check("entity_retirement_reason_check", sql`(reason <> ''::text)`),]);
+
+export const entitySubtypeDrop = pgTable("entity_subtype_drop", {
+	entityId: uuid("entity_id").notNull().references(() => entity.id, { onDelete: "cascade" } ),
+	subtype: text().notNull(),
+	reason: text().notNull(),
+	changesetId: uuid("changeset_id").notNull().references(() => changeset.id),
+	recordedFrom: timestamp("recorded_from", { withTimezone: true }).default(sql`now()`).notNull(),
+}, (table) => [
+	primaryKey({ columns: [table.entityId, table.subtype], name: "entity_subtype_drop_pkey"}),
+check("entity_subtype_drop_reason_check", sql`(reason <> ''::text)`),]);
 
 export const externalId = pgTable("external_id", {
 	entityId: uuid("entity_id").notNull().references(() => entity.id, { onDelete: "cascade" } ),
@@ -854,9 +897,8 @@ export const personPartyMembership = pgTable("person_party_membership", {
 	changesetId: uuid("changeset_id").notNull().references(() => changeset.id),
 	recordedFrom: timestamp("recorded_from", { withTimezone: true }).default(sql`now()`).notNull(),
 }, (table) => [
-	index("person_party_membership_party_idx").using("btree", table.partyId.asc().nullsLast().op("uuid_ops")),
-	unique("person_party_membership_key").on(table.personId, table.partyId, table.valid).nullsNotDistinct(),
-]);
+	index("person_party_membership_party_idx").using("btree", table.partyId.asc().nullsLast()),
+	unique("person_party_membership_key").on(table.personId, table.partyId, table.valid).nullsNotDistinct(),]);
 
 export const polity = pgTable("polity", {
 	id: uuid().default(sql`uuidv7()`).primaryKey().references(() => entity.id, { onDelete: "cascade" } ),
@@ -1220,8 +1262,7 @@ export const tenureAffiliation = pgTable("tenure_affiliation", {
 	changesetId: uuid("changeset_id").notNull().references(() => changeset.id),
 	recordedFrom: timestamp("recorded_from", { withTimezone: true }).default(sql`now()`).notNull(),
 }, (table) => [
-	unique("tenure_affiliation_key").on(table.tenureId, table.kind, table.partyId, table.valid),
-]);
+	unique("tenure_affiliation_key").on(table.tenureId, table.kind, table.partyId, table.valid),]);
 
 export const tenureEvent = pgTable("tenure_event", {
 	id: uuid().default(sql`uuidv7()`).primaryKey(),
@@ -1252,6 +1293,14 @@ export const valueLocator = pgTable("value_locator", {
 }, (table) => [
 	primaryKey({ columns: [table.resultSetK, table.unitK, table.optionK, table.channel, table.measure, table.countRound], name: "value_locator_pkey"}),
 check("value_locator_check", sql`(num_nonnulls(page_id, source_id) >= 1)`),check("value_locator_check1", sql`((page_id IS NULL) = (x0 IS NULL))`),]);
+
+export const zzPpfSum = pgTable("zz_ppf_sum", {
+	resultSetK: integer("result_set_k"),
+	n: bigint({ mode: 'number' }),
+	v: numeric(),
+	c: bigint({ mode: 'number' }),
+	areas: bigint({ mode: 'number' }),
+});
 export const resultRollup = pgView("result_rollup", {	resultSetK: integer("result_set_k"),
 	areaK: integer("area_k"),
 	optionK: integer("option_k"),
