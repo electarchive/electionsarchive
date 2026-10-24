@@ -165,6 +165,7 @@ export const seats = {
           (select day::text from last) as since,
           (select election::text from last) as election
         from paired p left join won w on w.contest = p.id left join won b on b.contest = p.prior
+        order by p.id
       `);
       const since = found.rows[0]?.since;
       const compared = found.rows.filter(
@@ -173,11 +174,18 @@ export const seats = {
       if (since == null || compared.length === 0) {
         return null;
       }
+      const held = (side: "now" | "before", key: string) =>
+        compared.filter((row) => row[side] === key).length;
       const keys = [
         ...new Set(
           compared.flatMap((row) => [row.now ?? "", row.before ?? ""]),
         ),
-      ];
+      ].toSorted(
+        (a, b) =>
+          held("now", b) - held("now", a) ||
+          held("before", b) - held("before", a) ||
+          a.localeCompare(b),
+      );
       const changed = compared.filter((row) => row.now !== row.before);
       const parties = keys.filter((key) => !key.startsWith("person:"));
       const people = keys.flatMap((key) =>
@@ -196,7 +204,12 @@ export const seats = {
           return { to, from, seats: rows.length };
         })
         .toArray()
-        .toSorted((a, b) => b.seats - a.seats);
+        .toSorted(
+          (a, b) =>
+            b.seats - a.seats ||
+            a.to.localeCompare(b.to) ||
+            a.from.localeCompare(b.from),
+        );
       return {
         since: Number(since.slice(0, 4)),
         path: previous.get(found.rows[0]?.election ?? "") ?? null,
@@ -663,19 +676,21 @@ export const seats = {
           first == null || found.rows.every((row) => !row.isHere)
             ? null
             : { date: first.since, path: slugs.get(first.general) ?? null },
-        parties: keys.flatMap((key) => {
-          const party = colored.get(key);
-          return party == null
-            ? []
-            : [
-                {
-                  key,
-                  label: party.label,
-                  short: party.short ?? null,
-                  color: party.color ?? null,
-                },
-              ];
-        }),
+        parties: keys
+          .toSorted((a, b) => a.localeCompare(b))
+          .flatMap((key) => {
+            const party = colored.get(key);
+            return party == null
+              ? []
+              : [
+                  {
+                    key,
+                    label: party.label,
+                    short: party.short ?? null,
+                    color: party.color ?? null,
+                  },
+                ];
+          }),
         rows: found.rows.map((row) => ({
           date: row.day,
           name: labels.full.get(row.area) ?? "",
@@ -986,7 +1001,8 @@ export const seats = {
         .toSorted(
           (a, b) =>
             b.constituencies + b.declared - (a.constituencies + a.declared) ||
-            (b.votes ?? 0) - (a.votes ?? 0),
+            (b.votes ?? 0) - (a.votes ?? 0) ||
+            a.key.localeCompare(b.key),
         );
       return {
         seats: first.magnitude,
