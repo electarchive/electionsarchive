@@ -46,6 +46,10 @@
       )
       .toArray(),
   );
+  let isEvery = $state(false);
+  const shown = $derived(
+    isEvery || years.length <= 11 ? years : years.slice(0, 10),
+  );
   const opened = new SvelteSet<number | null>();
   const months = new Intl.DateTimeFormat(getLocale(), {
     month: "short",
@@ -285,7 +289,7 @@
         <p class="text-sm text-muted-foreground">{m.party_none()}</p>
       {:else}
         <ol class="grid">
-          {#each years as [year, entries] (year)}
+          {#each shown as [year, entries] (year)}
             <li
               class="grid grid-cols-[4.5rem_minmax(0,1fr)] items-baseline gap-x-3 border-be border-border/60 py-1.5 last:border-be-0"
             >
@@ -357,6 +361,16 @@
             </li>
           {/each}
         </ol>
+        {#if shown.length < years.length}
+          <button
+            type="button"
+            class="justify-self-start text-[0.8125rem] font-semibold underline decoration-border underline-offset-4 hover:decoration-foreground"
+            onclick={() => (isEvery = true)}
+            >{m.party_record_years_more({
+              count: count(years.length - shown.length),
+            })}</button
+          >
+        {/if}
         {#if data.record.count > data.record.elections.length}
           <p class="text-xs text-muted-foreground">
             {m.party_record_more({

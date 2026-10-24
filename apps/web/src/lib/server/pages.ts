@@ -255,8 +255,9 @@ export async function party(path: string, place: string | null = null) {
           then e.parent_id is null and e.polity_id = (select polity_id from party where id = ${id}::uuid)
           else e.polity_id = ${within ?? null}::uuid end
         and exists (
-          select from contest c join contest_option o on o.contest_id = c.id
-          where c.election_id = e.id and o.party_id in (select id from ids)
+          select from election x join contest c on c.election_id = x.id
+          join contest_option o on o.contest_id = c.id
+          where (x.id = e.id or x.parent_id = e.id) and o.party_id in (select id from ids)
         )
       order by e.date_from desc
     `),

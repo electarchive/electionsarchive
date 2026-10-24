@@ -12332,6 +12332,9 @@ export const parties = {
         round: number | null;
         area: number | null;
         bucket: string;
+        isList: boolean;
+        isSingle: boolean;
+        isCovering: boolean;
       }>(sql`
         with recursive ids(id) as (
           select coalesce((select into_id from entity_merge where entity_id = ${input.id}::uuid), ${input.id}::uuid)
@@ -12381,18 +12384,25 @@ export const parties = {
         ),
         roots as materialized (
           select c.id, n.grp, n.seat, e.date_from as date, ${CYCLE} as year, c.round_number as round, a.k as area,
-            case when g.polity_id = (select polity from home) then n.grp::text else (${CYCLE})::text end as bucket
+            case when g.polity_id = (select polity from home) then n.grp::text else (${CYCLE})::text end as bucket,
+            c.kind = 'list_allocation' as is_list,
+            coalesce(c.rules_override->>'formula', es.rules->>'formula') = 'fptp' as is_single,
+            coalesce(c.rules_override->'lists'->>'constituencies', es.rules->'lists'->>'constituencies') in ('all', 'covered') as is_covering
           from entered n join election g on g.id = n.grp join election e on coalesce(e.parent_id, e.id) = n.grp
           join contest c on c.election_id = e.id and coalesce(c.body_id, c.office_id) = n.seat
             and c.allocation_parent_id is null and c.party_scope_id is null and e.kind <> 'indirect'
+            and e.date_from <= current_date
             and coalesce((select st.voting from seat st where st.id = c.seat_id), true)
             and (c.term is distinct from 'remainder' or (c.seat_id is not null and not exists (
               select from contest d where d.election_id = c.election_id and d.seat_id = c.seat_id and d.id <> c.id
             )))
           left join polity_territory pt on pt.polity_id = e.polity_id and pt.valid @> e.date_from
           left join area a on a.id = coalesce(c.district_area_id, pt.area_id)
+          left join electoral_system es on es.id = c.electoral_system_id
         )
-        select id, grp, seat, date::text as date, year, round, area, bucket from roots
+        select id, grp, seat, date::text as date, year, round, area, bucket,
+          is_list as "isList", coalesce(is_single, false) as "isSingle", coalesce(is_covering, false) as "isCovering"
+        from roots
       `);
       const chunks = Map.groupBy(listed.rows, (_row, index) => index % 4)
         .values()
@@ -12517,13 +12527,19 @@ export const parties = {
         rows: Map.groupBy(listed.rows, (row) => `${row.bucket} ${row.seat}`)
           .values()
           .map((group) => {
+            const isMixed = group.some((row) => row.isList);
+            const isCovered = group.some((row) => row.isList && row.isCovering);
             const sum = (
               pick: (
                 row: (typeof counted)[number]["rows"][number],
               ) => number | null,
+              isSkipping: boolean,
             ) => {
               let total: number | null = null;
               for (const row of group) {
+                if (isSkipping && row.isSingle) {
+                  continue;
+                }
                 const tally = byRoot.get(row.id);
                 const value = tally == null ? null : pick(tally);
                 if (value != null) {
@@ -12549,10 +12565,10 @@ export const parties = {
                   .toSorted((a, b) => Number(a > b) - Number(a < b))[0] ?? "",
               year: Math.min(...group.map((row) => row.year)),
               races: new Set(group.map((row) => row.id)).size,
-              votes: sum((row) => row.votes),
-              total: sum((row) => row.total),
-              seats: sum((row) => row.seats),
-              filled: sum((row) => row.filled),
+              votes: sum((row) => row.votes, isMixed),
+              total: sum((row) => row.total, isMixed),
+              seats: sum((row) => row.seats, isCovered),
+              filled: sum((row) => row.filled, isCovered),
               predecessor: vias[0] ?? null,
             };
           })

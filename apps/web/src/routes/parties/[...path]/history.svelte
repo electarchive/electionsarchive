@@ -64,6 +64,11 @@
   const active = $derived(
     series.find((entry) => entry.id === chosen) ?? series[0],
   );
+  const isDense = $derived(
+    width > 0 &&
+      (width - PAD.left - PAD.right) / Math.max(1, active?.points.length ?? 1) <
+        8,
+  );
   const isOffice = $derived(
     active?.points.every((point) => (point.filled ?? 0) <= 1) ?? false,
   );
@@ -212,7 +217,7 @@
           {m.party_history_title()}
         </h2>
         <p class="text-[0.8125rem] text-muted-foreground max-inline-[64ch]">
-          {m.party_history_lede({ name })}
+          {m.party_history_lede()}
         </p>
       </div>
       <dl class="flex gap-6">
@@ -353,7 +358,7 @@
                 <circle
                   cx={sx(point.at)}
                   cy={sy(point.share)}
-                  r="2"
+                  r={isDense ? 1.25 : 2}
                   class="fill-muted-foreground/70"
                 />
               {/if}
@@ -372,12 +377,12 @@
             <circle
               cx={sx(point.at)}
               cy={sy(point.share)}
-              r={hovered === index ? 5 : 3.5}
+              r={hovered === index ? 5 : isDense ? 1.75 : 3.5}
               fill={isOffice && (point.seats ?? 0) === 0
                 ? "var(--card)"
                 : "var(--party)"}
               stroke={isOffice ? "var(--party)" : "var(--card)"}
-              stroke-width={isOffice ? 2 : 1.5}
+              stroke-width={isOffice ? 2 : isDense ? 0 : 1.5}
             />
           {/if}
         {/each}
