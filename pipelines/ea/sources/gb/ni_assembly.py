@@ -329,10 +329,14 @@ def parse() -> None:
                 tail.setdefault(row["D"], row)
         columns = [column for column in ("E", "G", "I", "K", "M", "O", "Q", "S", "U", "W") if (tail["Totals"].get(column) or 0) > 0]
         valid = rows[4]["G"]
-        ties = all(
-            abs(sum(row.get(column, 0) for row in candidates) + tail["Non transferable"].get(column, 0) - valid) <= 0.5
-            for column in columns
-        )
+        tying = []
+        for column in columns:
+            if abs(sum(row.get(column, 0) for row in candidates) + tail["Non transferable"].get(column, 0) - valid) > 0.5:
+                break
+            tying.append(column)
+        cut = None if len(tying) == len(columns) else len(tying) + 1
+        columns = tying
+        ties = len(columns) > 0
         flagged = [row for row in candidates if row.get("A") == "Elected"]
         seats = int(rows[3]["G"])
         if not ties or len(flagged) not in (seats, seats - 1):
@@ -354,6 +358,7 @@ def parse() -> None:
                 "quota": rows[3]["M"],
                 "seats": seats,
                 "last_seat": last_seat,
+                "cut_stage": cut,
             }
         )
         for position, row in enumerate(candidates, start=1):
@@ -395,6 +400,7 @@ PARTIES = (
     (r"traditional unionist|^tuv\b", "Traditional Unionist Voice"),
     (r"aont", "Aontú"),
     (r"^heritage party", "Heritage Party"),
+    (r"^resume", "Resume NI"),
     (r"^irsp|irish republican socialist", "Irish Republican Socialist Party"),
     (r"uk independence", "UK Independence Party"),
     (r"conserv", "Conservative"),
@@ -651,6 +657,12 @@ def emit() -> Path:
                     caveats.append(
                         "The source gives surnames only; the candidates' full names are from Wikipedia's constituency article, "
                         "matched by surname and first-preference votes."
+                    )
+                if unit_row.get("cut_stage"):
+                    caveats.append(
+                        f"The Electoral Office's result sheet does not distribute the votes of the candidate excluded at stage "
+                        f"{unit_row['cut_stage']}, so its counts end after stage {unit_row['cut_stage'] - 1}. The elected candidates are as "
+                        "declared; their final totals are not in the source."
                     )
                 if unit_row.get("last_seat"):
                     caveats.append(
