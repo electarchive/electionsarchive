@@ -692,7 +692,7 @@ def _rollup(
         sql.SQL(
             """with recursive
             rs as (
-              select r.k, e.date_from as on_date, c.id as contest_id, c.district_area_id, c.allocation_parent_id
+              select r.k, e.date_from as on_date, bs.valid_from as plan_from, c.id as contest_id, c.district_area_id, c.allocation_parent_id
               from result_set r join election e on e.id = r.election_id join contest c on c.id = r.contest_id
               where r.id in ({facts}) or r.k = any({stale})
             ),
@@ -710,6 +710,7 @@ def _rollup(
                 select from contest s join above t on t.result_set_k = b.result_set_k and t.area_id = s.district_area_id
                 where s.allocation_parent_id = rs.allocation_parent_id and s.id <> rs.contest_id
               )
+              left join boundary_set bs on bs.id = c.boundary_set_id
             ),
             units as (
               select rs.k as result_set_k, ru.k as unit_k, ru.id as unit_id,
@@ -741,7 +742,7 @@ def _rollup(
             spans as (
               select rs.k as result_set_k, dc.county_area_id
               from rs join district_county dc on dc.district_area_id = rs.district_area_id
-                and dc.district_valid @> rs.on_date and dc.county_valid @> rs.on_date and dc.share >= 0.005
+                and dc.district_valid @> coalesce(rs.plan_from, rs.on_date) and dc.county_valid @> rs.on_date and dc.share >= 0.005
             ),
             reached as (
               select * from climbed
