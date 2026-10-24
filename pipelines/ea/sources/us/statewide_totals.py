@@ -370,10 +370,10 @@ def emit(
                 found = {
                     person
                     for person, seen in people[str(state)].get(probe, [])
-                    if abs(seen - year) <= 16 and deaths.get(person, day) >= day
+                    if abs(seen - year) <= 16 and deaths.get(person, on) >= on
                 }
                 person = prior.get((key, candidate))
-                if person is not None and (deaths.get(person, day) < day or (key, candidate) in SPLITS):
+                if person is not None and (deaths.get(person, on) < on or (key, candidate) in SPLITS):
                     split = cs.key(f"{pipeline}.person", f"{state}:{slug(candidate)}:{year}")
                     cs.renamed[str(split)] = str(person)
                     person = split
