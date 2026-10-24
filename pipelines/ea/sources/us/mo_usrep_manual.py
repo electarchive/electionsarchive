@@ -26,6 +26,13 @@ PRINTED = {1994: [530, 531, 532], 1998: [561, 562, 563]}
 DAYS = {1992: date(1992, 11, 3), 1994: date(1994, 11, 8), 1998: date(1998, 11, 3)}
 PAGE_FIXES = {(62628, "868"): "888"}
 TOTALS = {(1998, 7): [43416, 129746, 5639]}
+EARLY = [
+    (header.split(), block)
+    for header, *block in (
+        chunk.splitlines()
+        for chunk in Path(__file__).with_name("mo_usrep_manual_early.txt").read_text().split("@ ")[1:]
+    )
+]
 FIXES = {"JL782": "1,782", "lackson": "Jackson", "RaHs": "Ralls", "lllyes": "Illyes"}
 METHOD = (
     "County totals are from the Missouri Official Manual's general election returns (volumes 1993-1994, 1995-1996, and "
@@ -39,7 +46,7 @@ NOTES = {
 
 
 def fetch() -> None:
-    for pointers in PAGES.values():
+    for pointers in [*PAGES.values(), sorted({int(header[2]) for header, _ in EARLY})]:
         for pointer in pointers:
             try:
                 raw.cached(SOURCE, API.format(pointer))
@@ -65,7 +72,13 @@ def read_page(year: int, pointer: int) -> list[str]:
     lines = []
     for index, line in enumerate(text.splitlines()):
         line = line.strip()
-        if not line or "MANUAL" in line or "GENERAL ELECTION" in line or line.startswith("U.S. Congress") or line.startswith("November"):
+        if (
+            not line
+            or "MANUAL" in line
+            or "GENERAL ELECTION" in line
+            or line.startswith("U.S. Congress")
+            or line.startswith("November")
+        ):
             continue
         if line.isdigit() and int(line) in PRINTED[year] and index < 4:
             continue
@@ -144,6 +157,17 @@ def parse() -> None:
             for name, values in table:
                 for column, votes in enumerate(values):
                     rows.append((str(DAYS[year]), district, keys[name], str(column), votes))
+    for (day, district, _), block in EARLY:
+        total = [int(value) for value in block[-1].split()[1:]]
+        table = [
+            (line.rsplit(" ", len(total))[0], [int(value) for value in line.rsplit(" ", len(total))[1:]])
+            for line in block[:-1]
+        ]
+        if [sum(values[column] for _, values in table) for column in range(len(total))] != total:
+            raise ValueError(f"{day} district {district}: rows do not tie the printed totals {total}")
+        for name, values in table:
+            for column, votes in enumerate(values):
+                rows.append((day, int(district), keys[re.sub(r"[^a-z]", "", name.lower())], str(column), votes))
     frame = (
         pl.DataFrame(rows, schema=["day", "district", "county", "column", "votes"], orient="row")
         .group_by("day", "district", "county", "column", maintain_order=True)
@@ -165,6 +189,10 @@ def emit() -> Path:
         "MO",
         "29",
         pl.read_parquet(PARSED / "lines.parquet"),
-        [raw.cached(SOURCE, API.format(pointer)) for pointers in PAGES.values() for pointer in pointers],
+        [
+            raw.cached(SOURCE, API.format(pointer))
+            for pointers in [*PAGES.values(), sorted({int(header[2]) for header, _ in EARLY})]
+            for pointer in pointers
+        ],
         lambda key: METHOD + NOTES.get(key, ""),
     )
