@@ -294,7 +294,7 @@ def emit() -> Path:
                             entity_id=contest,
                             kind="context",
                             body_md=f"Also returned for {' and '.join(others)}, where the member chose to sit; this seat "
-                            f"was filled at a by-election on {choice[0]:%-d %B %Y}.",
+                            f"was filled at a by-election on {choice[0]:%B %-d, %Y}.",
                         )
                         declined += 1
                         continue
