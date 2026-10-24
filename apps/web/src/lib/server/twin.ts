@@ -1076,6 +1076,10 @@ function contestMarkdown(
     top?.current != null && next?.current != null && top.current.votes > 0
       ? count(top.current.votes - next.current.votes)
       : null;
+  const [gain, hold] =
+    handover?.lead === "margin"
+      ? [m.change_gain_margin, m.change_hold_margin]
+      : [m.change_gain, m.change_hold];
   const held =
     handover == null || contest.current == null
       ? []
@@ -1086,8 +1090,8 @@ function contestMarkdown(
                 ? m.change_gain_bare({ party, from })
                 : m.change_hold_bare({ party })
               : handover.isGain
-                ? m.change_gain({ party, from, majority })
-                : m.change_hold({ party, majority })
+                ? gain({ party, from, majority })
+                : hold({ party, majority })
           }${handover.basis === "same" ? "" : "*"}`,
           ...(handover.basis === "same"
             ? []
