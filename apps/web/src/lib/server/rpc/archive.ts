@@ -11349,6 +11349,7 @@ export const polities = {
                 select from later l
                 where l.parent = g.id and l.election <> e.id and l.seat = coalesce(c.office_id, c.body_id)
               ) then g.id
+              when e.polity_id = ${input.id}::uuid and g.polity_id = e.polity_id and g.kind = e.kind then g.id
               when e.polity_id = ${input.id}::uuid then e.id
               when g.polity_id = ${input.id}::uuid then g.id
               when (select yes from bare) then e.id

@@ -1,11 +1,13 @@
 <script lang="ts">
   import { resolve } from "$app/paths";
   import { createQuery } from "@tanstack/svelte-query";
+  import { MediaQuery } from "svelte/reactivity";
   import Export from "#lib/components/export.svelte";
   import Measured from "#lib/components/measured.svelte";
   import * as Select from "#lib/components/ui/select/index.js";
   import { count, date, percent } from "#lib/format.js";
   import { m } from "#lib/paraglide/messages.js";
+  import { getLocale } from "#lib/paraglide/runtime.js";
   import { swatch } from "#lib/party.js";
   import { orpc } from "#lib/rpc.js";
   import { cn } from "#lib/utils.js";
@@ -15,6 +17,7 @@
 
   const uid = $props.id();
   const PAD = { top: 8, bottom: 22, side: 2 };
+  const coarse = new MediaQuery("pointer: coarse");
 
   const record = createQuery(() =>
     orpc.polities.record.queryOptions({ input: { id } }),
@@ -206,6 +209,26 @@
       ),
     };
   });
+  const decades = $derived.by(() => {
+    const month = new Intl.DateTimeFormat(getLocale(), {
+      month: "short",
+      timeZone: "UTC",
+    });
+    return Map.groupBy(columns, (column) => Math.floor(column.year / 10) * 10)
+      .entries()
+      .map(([decade, entries]) => ({
+        decade,
+        entries: entries.map((column) => ({
+          ...column,
+          top: column.parties.toSorted((a, b) => b.seats - a.seats)[0] ?? null,
+          month:
+            columns.filter((other) => other.year === column.year).length > 1
+              ? month.format(Date.parse(column.date))
+              : null,
+        })),
+      }))
+      .toArray();
+  });
   const lit = $derived(hovered == null ? null : (columns[hovered] ?? null));
   const sitting = $derived(
     cabinets.find((cabinet) => cabinet.from === seated) ?? null,
@@ -377,7 +400,7 @@
         >
           {#each columns as column (column.index)}
             <a
-              href={column.path == null
+              href={column.path == null || coarse.current
                 ? undefined
                 : resolve("/[...path]", {
                     path:
@@ -511,6 +534,58 @@
           </div>
         {/if}
       </Measured>
+      <ol
+        class="hidden gap-1.5 pointer-coarse:grid"
+        aria-label={m.record_list()}
+      >
+        {#each decades as row (row.decade)}
+          <li class="grid grid-cols-[3.25rem_minmax(0,1fr)] items-start gap-2">
+            <span
+              class="font-figures text-xs/11 text-muted-foreground tabular-nums"
+              >{m.record_decade({ decade: String(row.decade) })}</span
+            >
+            <ul class="flex flex-wrap gap-1.5">
+              {#each row.entries as entry (entry.index)}
+                {const party = $derived(
+                  entry.top == null
+                    ? ""
+                    : entry.top.party == null && entry.top.isIndependent
+                      ? m.person_parties_none()
+                      : (entry.top.label ?? label(entry.top.party)),
+                )}
+                <li>
+                  <a
+                    class="flex items-center gap-1.5 rounded-sm border px-2.5 font-figures text-sm tabular-nums min-block-11 min-inline-11 hover:bg-secondary"
+                    href={entry.path == null
+                      ? undefined
+                      : resolve("/[...path]", {
+                          path:
+                            record.data?.scope == null
+                              ? entry.path
+                              : `${entry.path}?in=${record.data.scope}`,
+                        })}
+                    aria-label={isSingle
+                      ? m.record_list_winner({ election: entry.name, party })
+                      : m.record_list_largest({ election: entry.name, party })}
+                  >
+                    <span
+                      class="shrink-0 rounded-xs block-2.5 inline-2.5"
+                      style:background={tint(entry.top?.party ?? null)}
+                      aria-hidden="true"
+                    ></span>
+                    {entry.year}
+                    {#if entry.month != null}
+                      <span class="text-xs text-muted-foreground"
+                        >{entry.month}</span
+                      >
+                    {/if}
+                  </a>
+                </li>
+              {/each}
+            </ul>
+          </li>
+        {/each}
+      </ol>
     {/if}
     {#if cabinets.length > 0}
       <p
