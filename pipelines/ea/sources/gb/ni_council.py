@@ -1,4 +1,5 @@
 import csv
+import json
 import io
 import re
 import subprocess
@@ -99,13 +100,13 @@ def tie(stage_totals: dict[int, float], valid: float, width: int = 12) -> list[i
     return tied
 
 
-def grid_sheet(grid: list[list[str | None]], dea: str) -> dict[str, object]:
-    grid = [row[:26] for row in grid]
+def grid_sheet(grid: list[list[str | None]], dea: str, scan: int = 14, width: int = 26) -> dict[str, object]:
+    grid = [row[:width] for row in grid]
     def find(label: str, row: list[str | None]) -> int | None:
         return next((index for index, cell in enumerate(row) if cell is not None and cell.strip().lower().startswith(label)), None)
 
     facts: dict[str, float] = {}
-    for row in grid[:14]:
+    for row in grid[:scan]:
         for index, cell in enumerate(row):
             if cell is None:
                 continue
@@ -118,7 +119,7 @@ def grid_sheet(grid: list[list[str | None]], dea: str) -> dict[str, object]:
                         ("polled", ("votes polled", "total votes polled")),
                         ("seats", ("number to be elected", "number of members to be elected")),
                         ("invalid", ("invalid votes",)),
-                        ("valid", ("total valid votes", "valid votes")),
+                        ("valid", ("total valid votes", "valid votes", "total vailid votes")),
                         ("quota", ("electoral quota",)),
                     )
                     if any(label.startswith(word) for word in words)
@@ -128,18 +129,22 @@ def grid_sheet(grid: list[list[str | None]], dea: str) -> dict[str, object]:
             if key is not None:
                 value = next((number(c) for c in row[index + 1 :] if number(c) is not None), None)
                 facts[key] = value
-    header = next(index for index, row in enumerate(grid) if any(c is not None and c.strip().lower().startswith(("1st pref", "first pref")) for c in row))
+    header = next(index for index, row in enumerate(grid) if any(c is not None and c.strip().lower().startswith(("1st pref", "first pref", "1st stage", "stage 1;")) for c in row))
     first = find("1st pref", grid[header])
     if first is None:
         first = find("first pref", grid[header])
+    if first is None:
+        first = find("1st stage", grid[header])
+    if first is None:
+        first = find("stage 1;", grid[header])
     name_col = next(
         index
         for row in (grid[header], grid[header - 1])
-        for index in [find("candidate", row) or find("names of candidate", row)]
+        for index in [find("candidate", row) or find("names of candidate", row) or find("name of candidate", row)]
         if index is not None
     )
     description_col = name_col + 1
-    totals_row = next(index for index in range(header + 1, len(grid)) if (grid[index][description_col] or "").strip().lower().startswith("totals"))
+    totals_row = next((index for index in range(header + 1, len(grid)) if (grid[index][description_col] or "").strip().lower().startswith("totals")), len(grid))
     nontransferable_row = next(
         index for index in range(header + 1, totals_row) if (grid[index][description_col] or "").strip().lower().startswith("non")
     )
@@ -148,11 +153,14 @@ def grid_sheet(grid: list[list[str | None]], dea: str) -> dict[str, object]:
         for row in grid[header + 1 : nontransferable_row]
         if (row[name_col] or "").strip() not in ("", "0") and number(row[name_col]) is None
     ]
+    marks = [name_col, *(index for index in range(name_col + 1, len(rows[0])) if rows[0][index] == rows[0][name_col])]
     total_cols = []
-    column = first
-    while column < len(grid[0]) and sum(number(row[column]) or 0.0 for row in rows) > 0:
-        total_cols.append(column)
-        column += 2
+    for block, mark in enumerate(marks):
+        column = first if block == 0 else mark + 3
+        bound = marks[block + 1] - 2 if block + 1 < len(marks) else len(grid[0])
+        while column < bound and sum(number(row[column]) or 0.0 for row in rows) > 0:
+            total_cols.append(column)
+            column += 2
     stage_totals = {
         stage: sum(number(row[col]) or 0.0 for row in rows) + (number(grid[nontransferable_row][col]) or 0.0)
         for stage, col in enumerate(total_cols, start=1)
@@ -295,6 +303,29 @@ def finish(year: int, dea: str, facts: dict[str, float], candidates: list[dict[s
     if key not in areas:
         raise ValueError(f"{year} {dea}: no DEA in the official list")
     dea_code, dea_name, council_code = areas[key]
+    completed = 0
+    for candidate in candidates:
+        candidate["name"] = re.sub(r"^[^A-Za-z]+", "", candidate["name"])
+        words = candidate["name"].split()
+        given = candidate["name"].partition(",")[2].strip()
+        if (not given and (len(words) == 1 or year == 2014)) or (given and len(given) <= 2):
+            keys = {squeeze(word) for word in re.split(r"[\s,]+", candidate["name"]) if word}
+            found = [
+                full
+                for full in FULL_NAMES.get(f"{year}|{round(candidate['totals'][0])}", [])
+                if squeeze(full.split()[-1]) in keys
+            ]
+            if len(found) == 1:
+                candidate["name"] = found[0]
+                completed += 1
+                words = []
+        if "," not in candidate["name"] and len(words) > 1:
+            lead = 0
+            while lead < len(words) - 1 and (words[lead].isupper() and len(words[lead]) > 1 or (lead == 0 and year == 2011 and not any(w.isupper() for w in words[1:]))):
+                lead += 1
+            if year == 2011 and lead == 1 and words[0].lower() in ("o", "ni", "mac", "de", "van", "nic", "mag", "ó") and len(words) > 2:
+                lead = 2
+            candidate["name"] = f"{' '.join(words[:lead])}, {' '.join(words[lead:])}"
     seats = int(facts["seats"])
     tied = len(candidates[0]["totals"])
     last = [float(candidate["totals"][-1]) for candidate in candidates]
@@ -316,6 +347,10 @@ def finish(year: int, dea: str, facts: dict[str, float], candidates: list[dict[s
         notes.append(
             "The published sheet stops before the last stage. The candidates continuing at its last tied stage are treated as "
             "elected when they equal the vacancies, after excluding the lowest where one too many continues."
+        )
+    if completed:
+        notes.append(
+            f"The result sheet prints surnames only for {completed} candidates; their given names come from Wikipedia's council election tables, matched on surname and first-preference votes."
         )
     if stages > tied:
         notes.append(f"The sheet has {stages} stages, but stage {tied + 1} does not add up to the valid votes, so only stages 1 to {tied} are stored.")
@@ -517,6 +552,169 @@ def parse_2014(areas: dict[str, tuple[str, str, str]]) -> tuple[list[dict[str, o
     return units, totals
 
 
+ARK = {2011: "lg11", 2005: "lg05"}
+FULL_NAMES: dict[str, list[str]] = json.loads((Path(__file__).parent / "ni_council_names.json").read_text())
+
+
+def parse_ark(year: int) -> tuple[list[dict[str, object]], list[dict[str, object]]]:
+    url = f"https://web.archive.org/web/2020if_/https://www.ark.ac.uk/elections/xls/lgov/{year}.rar"
+    folder = PARSED / f"ark-{year}"
+    if not folder.exists():
+        folder.mkdir(parents=True)
+        subprocess.run(["unar", "-q", "-o", str(folder), str(raw.cached(SOURCE, url).path)], check=True)
+    units: list[dict[str, object]] = []
+    totals: list[dict[str, object]] = []
+    failed: list[str] = []
+    for path in sorted(folder.rglob(f"{ARK[year]}-*.xls*")):
+        _, abbr, *rest = path.stem.split("-")
+        grid = [list(row) for row in pl.read_excel(path, has_header=False, infer_schema_length=0).iter_rows()]
+        dea = None
+        for row in grid:
+            for text in (cell for cell in row if isinstance(cell, str)):
+                if text.lower().startswith("district electo") and dea is None:
+                    dea = re.sub(r"^district electo\w* area\W*(?:of\s+|for\s+)?", "", text, flags=re.IGNORECASE).strip()
+        dea = dea or " ".join(rest)
+        try:
+            sheet = grid_sheet(grid, dea, 40, 80)
+            if sheet["tied"] < sheet["stages"]:
+                raise ValueError(f"tied through stage {sheet['tied']} of {sheet['stages']}")
+            candidates = [{**c, "elected": re.fullmatch(r"e|elected|e\d+", c["flag"]) is not None} for c in sheet["candidates"] if re.search("[A-Za-z]", c["name"])]
+            unit, rows = finish(year, dea, sheet["facts"], candidates, sheet["exhausted"], sheet["stages"], url, {squeeze(dea): (f"{abbr}/{slug('-'.join(rest))}", dea, abbr)})
+        except (ValueError, KeyError, StopIteration) as error:
+            print(f"FAILED {year} {path.name}: {error!r}")
+            failed.append(path.name)
+            continue
+        unit["note"] = " ".join(filter(None, [unit["note"], f"Workbook {path.name} in the ARK archive."]))
+        units.append(unit)
+        totals.extend(rows)
+    for unit in units:
+        unit["council_name"] = LEGACY_NAMES[unit["council_code"]]
+    (PARSED / f"ark-{year}-failed.json").write_text(json.dumps(failed))
+    return units, totals
+
+
+LEGACY = {
+    "antrim": "ANT", "ards": "ARD", "armagh": "ARM", "ballymena": "BMA", "ballymoney": "BMY", "banbridge": "BRG", "belfast": "BT",
+    "carrickfergus": "CAR", "castlereagh": "CAS", "coleraine": "COL", "cookstown": "COO", "craigavon": "CRA", "derry": "DE",
+    "down": "DOW", "dungannon": "DUN", "fermanagh": "FER", "larne": "LAR", "limavady": "LIM", "lisburn": "LIS",
+    "magherafelt": "MAG", "moyle": "MOY", "newry": "NaM", "newtownabbey": "NEW", "north": "NoD", "omagh": "OMA", "strabane": "STR",
+}
+
+
+LEGACY_NAMES = {
+    "ANT": "Antrim Borough Council", "ARD": "Ards Borough Council", "ARM": "Armagh City and District Council",
+    "BMA": "Ballymena Borough Council", "BMY": "Ballymoney Borough Council", "BRG": "Banbridge District Council",
+    "BT": "Belfast City Council", "CAR": "Carrickfergus Borough Council", "CAS": "Castlereagh Borough Council",
+    "COL": "Coleraine Borough Council", "COO": "Cookstown District Council", "CRA": "Craigavon Borough Council",
+    "DE": "Derry City Council", "DOW": "Down District Council", "DUN": "Dungannon and South Tyrone Borough Council",
+    "FER": "Fermanagh District Council", "LAR": "Larne Borough Council", "LIM": "Limavady Borough Council",
+    "LIS": "Lisburn City Council", "MAG": "Magherafelt District Council", "MOY": "Moyle District Council",
+    "NaM": "Newry and Mourne District Council", "NEW": "Newtownabbey Borough Council", "NoD": "North Down Borough Council",
+    "OMA": "Omagh District Council", "STR": "Strabane District Council",
+}
+
+
+def parse_2011_official() -> tuple[list[dict[str, object]], list[dict[str, object]]]:
+    sheets = json.loads((Path(__file__).parent / "ni_council_sheets.json").read_text())["2011"]
+    ark = {
+        (path.stem.split("-")[1], squeeze("".join(path.stem.split("-")[2:]))): "-".join(path.stem.split("-")[2:])
+        for path in (PARSED / "ark-2011").rglob("lg11-*.xls*")
+    }
+    units: list[dict[str, object]] = []
+    totals: list[dict[str, object]] = []
+    for sheet_url, page, label in sheets:
+        url = f"https://web.archive.org/web/2022if_/{sheet_url}"
+        try:
+            artifact = raw.cached(SOURCE, url)
+        except (KeyError, FileNotFoundError):
+            print(f"MISSING {label}")
+            continue
+        try:
+            abbr = LEGACY[page.split()[1].lower()]
+            lines = [line for line in subprocess.run(["pdftotext", "-layout", str(artifact.path), "-"], capture_output=True, text=True, check=True).stdout.splitlines() if line.strip()]
+            if not lines or not any(re.match(r"\s*Elected\s+No\s+Candidate", line) for line in lines):
+                print(f"SCAN {label} {artifact.path.name}")
+                continue
+            dea = re.sub(r"^(?:District Electo\w+ Area|Constituency)(?:\s+of)?\s+", "", lines[1].strip(), flags=re.IGNORECASE).title().replace("'S", "'s")
+            facts: dict[str, float] = {}
+            for line in lines[1:10]:
+                for key, pattern in (
+                    ("electorate", r"Eligible Electorate\s+(\d+)"),
+                    ("seats", r"Number to be Elected\s+(\d+)"),
+                    ("invalid", r"Invalid Votes\s+(\d+)"),
+                    ("quota", r"Electoral Quota of\s+(\d+)"),
+                    ("polled", r"Votes Polled\s+(\d+)"),
+                    ("valid", r"Total Valid Votes\s+(\d+)"),
+                ):
+                    found = re.search(pattern, line)
+                    if found:
+                        facts[key] = float(found.group(1))
+            header = next((line for line in lines if re.match(r"\s*Elected\s+No\s+Candidate", line)), None)
+            if header is None:
+                print(f"NOHEADER {label}: {len(lines)} lines {artifact.path.name}")
+                continue
+            left, right = header.index("Candidate"), header.index("Description")
+            ends = [m.end() for m in re.finditer(r"1st Preference|Total", header)]
+
+            def by_stage(line: str, start: int = 0) -> list[float]:
+                cells: list[float | None] = [None] * len(ends)
+                for m in re.finditer(r"(?<![\d.])-?\d+\.\d\d(?![\d.])", line[start:]):
+                    column = min(range(len(ends)), key=lambda k: abs(ends[k] - (start + m.end())))
+                    if abs(ends[column] - (start + m.end())) <= 6:
+                        cells[column] = float(m.group())
+                return [0.0 if cell is None or cell < 0 else cell for cell in cells]
+
+            candidates = []
+            exhausted: list[float] = []
+            for line in lines:
+                row = re.match(r"\s*(Elected|Excluded)?\s*(\d+)\s", line)
+                if line.lstrip().startswith("Non transferable"):
+                    exhausted = by_stage(line)
+                    exhausted[0] = 0.0
+                elif row and row.group(2) != "0" and re.search(r"[A-Za-z]{2}", line[row.end() : row.end() + 30]) and re.search(r"(?<![\d.])-?\d+\.\d\d(?![\d.])", line):
+                    body = line[row.end() :]
+                    name = re.split(r"\s{2,}", body.lstrip(), maxsplit=1)[0]
+                    first = re.search(r"(?<![\d.])-?\d+\.\d\d(?![\d.])", line[row.end() + len(body) - len(body.lstrip()) + len(name) :])
+                    candidates.append(
+                        {
+                            "name": name.strip(),
+                            "party": line[row.end() + len(body) - len(body.lstrip()) + len(name) :][: first.start() if first else 0].strip(),
+                            "elected": row.group(1) == "Elected",
+                            "totals": by_stage(line, right),
+                        }
+                    )
+            if not exhausted or not candidates:
+                print(f"UNREADABLE {label}")
+                continue
+            for candidate in candidates:
+                candidate["totals"] = (candidate["totals"] + [0.0] * len(exhausted))[: len(exhausted)]
+            stage_totals = {
+                stage: sum(c["totals"][stage - 1] for c in candidates) + exhausted[stage - 1] for stage in range(1, len(exhausted) + 1)
+            }
+            if "valid" not in facts or "seats" not in facts:
+                print(f"FACTS {label}: {facts}")
+                continue
+            tied = len(tie(stage_totals, facts["valid"], len(candidates)))
+            if tied < len(exhausted):
+                print(f"UNTIED OFFICIAL {label}: tied through stage {tied} of {len(exhausted)} cands {len(candidates)} sums {[round(v, 2) for v in stage_totals.values()][:4]} valid {facts['valid']}")
+                continue
+            wanted = squeeze(label.removesuffix(" Result Sheet"))
+            matches = sorted((key for (member, key) in ark if member == abbr and wanted.endswith(key)), key=len)
+            code = f"{abbr}/{slug(ark[(abbr, matches[-1])] if matches else dea)}"
+            try:
+                unit, rows = finish(2011, dea, facts, candidates, exhausted, len(exhausted), url, {squeeze(dea): (code, dea, abbr)})
+            except ValueError as error:
+                print(f"FAILED OFFICIAL {label}: {error}")
+                continue
+            unit["council_name"] = LEGACY_NAMES[abbr]
+            units.append(unit)
+            totals.extend(rows)
+        except (AttributeError, IndexError, KeyError, ValueError, StopIteration) as error:
+            print(f"UNREADABLE {label}: {error!r}")
+
+    return units, totals
+
+
 DAYS = {
     2023: date(2023, 5, 18),
     2019: date(2019, 5, 2),
@@ -537,6 +735,7 @@ COUNCILS = {
     "N09000010": "Newry, Mourne and Down District Council",
     "N09000011": "Ards and North Down Borough Council",
 }
+BODY_SIZES = {"N09000003": 60, "N09000002": 41, "N09000010": 41}
 EXTRA_PARTIES = (
     (r"democratic ulster unionist - d\.u\.p", "Democratic Unionist Party"),
     (r"^all$", "Alliance Party"),
@@ -547,7 +746,13 @@ EXTRA_PARTIES = (
     (r"^ind$|indepdendent", None),
     (r"^0$", None),
     (r"^ni2[12]$|northern ireland 21", "NI21"),
-    (r"^-$|^valarie$|^upu$", None),
+    (r"^-$|^valarie$|^upu$|^aa$|^up$|^0\s+0$|^official anti-trimble", None),
+    (r"^ap$", "Alliance Party"),
+    (r"^gp$", "Green Party Northern Ireland"),
+    (r"^spni$", "Socialist Party"),
+    (r"^i$|^ind\.$|^indepentent$", None),
+    (r"^newtownabbey ratepayers", "Newtownabbey Ratepayers Association"),
+    (r"^social democratic labour party$", "Social Democratic and Labour Party"),
     (r"aspire to better", "Aspire to Better"),
     (r"^british national party$", "British National Party"),
     (r"community partnership", "Community Partnership (Northern Ireland)"),
@@ -556,7 +761,7 @@ EXTRA_PARTIES = (
     (r"^gr+en party$", "Green Party Northern Ireland"),
     (r"^ni cons$", "Conservative"),
     (r"republican network for unity", "Republican Network for Unity"),
-    (r"^ukip$", "UK Independence Party"),
+    (r"^ukip|united king\w* independence", "UK Independence Party"),
     (r"^irsp|irish republican socialist", "Irish Republican Socialist Party"),
 )
 
@@ -599,6 +804,14 @@ def parse() -> None:
     more_units, more_totals = parse_2014(areas)
     units += more_units
     totals += more_totals
+    official_units, official_totals = parse_2011_official()
+    ark_units, ark_totals = parse_ark(2011)
+    covered = {unit["dea_code"] for unit in official_units}
+    units += official_units + [unit for unit in ark_units if unit["dea_code"] not in covered]
+    totals += official_totals + [row for row in ark_totals if row["dea_code"] not in covered]
+    ark_units, ark_totals = parse_ark(2005)
+    units += ark_units
+    totals += ark_totals
     pl.DataFrame(units, infer_schema_length=None).write_parquet(PARSED / "units.parquet")
     pl.DataFrame(totals, infer_schema_length=None).write_parquet(PARSED / "totals.parquet")
     print(pl.DataFrame(units, infer_schema_length=None).group_by("year").len().sort("year"))
@@ -628,6 +841,14 @@ def emit() -> Path:
         nir = cs.polity("GB-NIR")
         if conn.execute("select 1 from scheme where code = 'gb.dea'").fetchone() is None:
             cs.add("scheme", code="gb.dea", polity_id=gb, kind="electoral_district", rank=3, noun="district electoral area")
+        if conn.execute("select 1 from scheme where code = 'gb.ni_dea_1993'").fetchone() is None:
+            cs.add("scheme", code="gb.ni_dea_1993", polity_id=gb, kind="electoral_district", rank=3, noun="district electoral area (1993 to 2014)")
+        if conn.execute("select 1 from scheme where code = 'gb.ni_lgd_1973'").fetchone() is None:
+            cs.add("scheme", code="gb.ni_lgd_1973", polity_id=gb, kind="administrative", rank=2, noun="local government district (1973 to 2015)")
+        councils = dict(COUNCILS)
+        for legacy_code, legacy_name in units.filter(pl.col("council_name").is_not_null()).select("council_code", "council_name").unique().iter_rows():
+            councils[legacy_code] = legacy_name
+        lad_scheme = lambda code: "gb.lad" if code.startswith("N09") else "gb.ni_lgd_1973"
         country = cs.area("gb.country", "NIR")
         if country in cs.minted:
             raise ValueError("publish gb.umit first: the countries must exist")
@@ -666,16 +887,16 @@ def emit() -> Path:
         polities: dict[str, UUID] = {}
         bodies: dict[str, UUID] = {}
         paths: dict[str, str] = {}
-        for code, council_name in COUNCILS.items():
-            label = DISTRICTS[code]
-            council_areas[code] = cs.area("gb.lad", code)
+        for code, council_name in councils.items():
+            label = DISTRICTS.get(code) or re.sub(r" (?:Borough |District |City )?Council$", "", council_name)
+            council_areas[code] = cs.area(lad_scheme(code), code)
             if council_areas[code] in cs.minted:
-                cs.add("area", id=council_areas[code], scheme_code="gb.lad")
+                cs.add("area", id=council_areas[code], scheme_code=lad_scheme(code))
                 cs.add("area_code", area_id=council_areas[code], code=code, valid_from=None, valid_to=None)
                 cs.add("area_parent", area_id=council_areas[code], parent_id=country, valid_from=None, valid_to=None)
             name(council_areas[code], label)
             polities[code] = cs.key("gb.polity", code)
-            paths[code] = f"gb/{slug(label)}"
+            paths[code] = f"gb/{slug(label)}" if code.startswith("N09") else f"gb/{slug(council_name)}"
             if polities[code] in cs.minted:
                 cs.add("polity", id=polities[code], kind="municipality", iso_code=None)
                 cs.add("polity_parent", polity_id=polities[code], parent_id=nir)
@@ -686,6 +907,22 @@ def emit() -> Path:
             if bodies[code] in cs.minted:
                 cs.add("body", id=bodies[code], polity_id=polities[code], kind="council")
             name(bodies[code], council_name)
+            if code.startswith("N09"):
+                cs.add(
+                    "body_size",
+                    body_id=bodies[code],
+                    seats=BODY_SIZES.get(code, 40),
+                    valid_from=DAYS[2014],
+                    valid_from_precision="day",
+                    valid_to=None,
+                    valid_to_precision="day",
+                )
+                cs.add(
+                    "note",
+                    entity_id=bodies[code],
+                    kind="context",
+                    body_md="Council size from the 2014 elections, as set by the Local Government Act (Northern Ireland) 2014 and the Local Government Boundaries Commissioner's recommendations: Belfast 60, Armagh City, Banbridge and Craigavon 41, Newry, Mourne and Down 41, and 40 for the other eight councils.",
+                )
 
         dea_areas: dict[str, UUID] = {}
         dea_units: dict[str, UUID] = {}
@@ -715,23 +952,24 @@ def emit() -> Path:
                         date_to=day,
                         status="held",
                     )
-                    name(council_elections[(year, code)], f"{year} {COUNCILS[code]} election")
+                    name(council_elections[(year, code)], f"{year} {councils[code]} election")
                     cs.add("slug", path=f"{paths[code]}/{day}-local", entity_id=council_elections[(year, code)])
                 election = council_elections[(year, code)]
+                dea_scheme = "gb.dea" if dea_code.startswith("N10") else "gb.ni_dea_1993"
                 if dea_code not in dea_areas:
-                    dea_areas[dea_code] = cs.area("gb.dea", dea_code)
+                    dea_areas[dea_code] = cs.area(dea_scheme, dea_code)
                     if dea_areas[dea_code] in cs.minted:
-                        cs.add("area", id=dea_areas[dea_code], scheme_code="gb.dea")
+                        cs.add("area", id=dea_areas[dea_code], scheme_code=dea_scheme)
                         cs.add("area_code", area_id=dea_areas[dea_code], code=dea_code, valid_from=None, valid_to=None)
                         cs.add("area_parent", area_id=dea_areas[dea_code], parent_id=council_areas[code], valid_from=None, valid_to=None)
                     name(dea_areas[dea_code], label)
-                    dea_units[dea_code] = cs.unit("gb.dea", dea_code)
+                    dea_units[dea_code] = cs.unit(dea_scheme, dea_code)
                     if dea_units[dea_code] in cs.minted:
                         cs.add(
                             "reporting_unit",
                             id=dea_units[dea_code],
                             polity_id=polities[code],
-                            scheme_code="gb.dea",
+                            scheme_code=dea_scheme,
                             code=dea_code,
                             area_relation="equals",
                             area_id=dea_areas[dea_code],
@@ -741,18 +979,19 @@ def emit() -> Path:
                         name(dea_units[dea_code], label)
                 unit = dea_units[dea_code]
                 url = unit_row["source_url"]
+                publisher = "ARK Northern Ireland Elections" if year == 2005 or "ark.ac.uk" in url else "Electoral Office for Northern Ireland"
                 if url not in sources:
-                    sources[url] = cs.source("Electoral Office for Northern Ireland", f"Local council elections {year}: {url.rsplit('/', 1)[-1]}")
+                    sources[url] = cs.source(publisher, f"Local council elections {year}: {url.rsplit('/', 1)[-1]}")
                     cs.add(
                         "source",
                         id=sources[url],
-                        kind="official_body",
-                        publisher="Electoral Office for Northern Ireland",
-                        title=f"Local council elections {year}: result sheet {url.rsplit('/', 1)[-1]}",
+                        kind="academic" if publisher.startswith("ARK") else "official_body",
+                        publisher=publisher,
+                        title=f"Local council elections {year}: " + ("count spreadsheets" if publisher.startswith("ARK") else f"result sheet {url.rsplit('/', 1)[-1]}"),
                         url=url,
                         license="Open Government Licence v3.0" if year == 2014 else None,
                         license_url=OGL if year == 2014 else None,
-                        attribution="Electoral Office for Northern Ireland",
+                        attribution=publisher,
                     )
                     cs.artifact(raw.cached(SOURCE, url), sources[url])
                 seats = int(unit_row["seats"])
@@ -770,7 +1009,7 @@ def emit() -> Path:
                     electoral_system_id=system,
                     default_result_kind="counted",
                 )
-                name(contest, f"{label} district electoral area, {COUNCILS[code]}, {year}")
+                name(contest, f"{label} district electoral area, {councils[code]}, {year}")
                 cs.add("slug", path=f"{paths[code]}/{day}-local/{slug(label)}", entity_id=contest)
                 result_set = cs.key("gb.ni_council.result_set", contest_key)
                 cs.add(
@@ -816,7 +1055,9 @@ def emit() -> Path:
                     }
                     canonical = party_of(candidate["party"])
                     owner = party_id(canonical)
-                    independent = canonical is None and "independ" in candidate["party"].lower()
+                    independent = canonical is None and (
+                        re.sub(r"[\s0\-]+", "", candidate["party"]) == "" or re.match(r"ind|i$", candidate["party"].strip().lower()) is not None
+                    )
                     full = display(candidate["name"])
                     option_key = f"{contest_key}:{candidate['number']}"
                     option = cs.key("gb.ni_council.option", option_key)
