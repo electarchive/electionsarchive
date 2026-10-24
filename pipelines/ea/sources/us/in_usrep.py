@@ -75,7 +75,7 @@ def emit() -> Path:
     return usrep_county.emit(
         SOURCE,
         VERSION,
-        "Indiana's U.S. House general elections of 1966 to 1998 by county from the Secretary of State's election reports",
+        "Indiana's U.S. House general elections of 1950 to 1998 by county from the Secretary of State's election reports",
         PUBLISHER,
         TITLE,
         "https://indianamemory.contentdm.oclc.org/digital/collection/p16066coll37",
