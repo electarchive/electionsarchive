@@ -18,11 +18,11 @@ PUBLISHER = "South Carolina State Election Commission"
 TITLE = "Election Report"
 LANDING = "https://scvotes.gov/election-results/"
 URL = "https://scvotes.gov/wp-content/uploads/2022/08/Election_Report_{}.pdf"
-BOOKS = {1970: "1969-1973", 1978: "1978-1979"}
-DAYS = {1970: date(1970, 11, 3), 1978: date(1978, 11, 7)}
+BOOKS = {1970: "1969-1973", 1978: "1978-1979", 1988: "1988-1989"}
+DAYS = {1970: date(1970, 11, 3), 1978: date(1978, 11, 7), 1988: date(1988, 11, 8)}
 METHOD = (
     "County totals are keyed from the district tables of the State Election Commission's election report (page 306 of "
-    "the 1969-1973 book; pages 59 to 61 of the 1978-1979 book), read from the page images. Each candidate's county sum "
+    "the 1969-1973 book; pages 59 to 61 of the 1978-1979 book; page 87 of the 1988-1989 book), read from the page images. Each candidate's county sum "
     "equals the district total printed in the report."
 )
 
@@ -54,7 +54,7 @@ def emit() -> Path:
     return usrep_county.emit(
         SOURCE,
         VERSION,
-        "South Carolina's U.S. House general elections of 1970 and 1978 by county from the State Election Commission's report",
+        "South Carolina's U.S. House general elections of 1970, 1978, and 1988 by county from the State Election Commission's report",
         PUBLISHER,
         TITLE,
         LANDING,

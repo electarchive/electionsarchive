@@ -585,7 +585,8 @@ def emit() -> Path:
                 if mismatch:
                     print(f"{key}: write-ins {merged} against FEC; non-default")
             unprinted = sum(int(value) for option, _, kind, value in roots if kind == "write_in" and option not in covered)
-            own = all(int(g["votes"].sum()) == int(g["printed"][0]) for _, g in rows.group_by("column"))
+            omitted = OMITTED.get((year, district), "")
+            own = all(int(g.filter(pl.col("county") != omitted)["votes"].sum()) == int(g["printed"][0]) for _, g in rows.group_by("column"))
             mismatch = mismatch or (inexact and not own)
             result_set = cs.key(f"{SOURCE}.result_set", key)
             cs.add(
@@ -606,7 +607,7 @@ def emit() -> Path:
                 supersedes_id=row[0] if not mismatch else None,
                 completeness=1,
             )
-            cs.add("note", entity_id=result_set, kind="methodology", body_md=METHOD + (f" The Federal Election Commission's compilation differs by {', '.join(str(v) for v in apart)} votes in a candidate's total." if apart else "") + (f" The Federal Election Commission's compilation adds {unprinted} write-in votes that the book does not print." if unprinted else ""))
+            cs.add("note", entity_id=result_set, kind="methodology", body_md=METHOD + (f" The book's printed district total omits {omitted} County; the county rows match the Federal Election Commission's compilation within {max(apart, default=0)} votes." if omitted else "") + (f" The Federal Election Commission's compilation differs by {', '.join(str(v) for v in apart)} votes in a candidate's total." if apart else "") + (f" The Federal Election Commission's compilation adds {unprinted} write-in votes that the book does not print." if unprinted else ""))
             for option, kind, seats in conn.execute("select option_id, kind, seats from outcome where result_set_id = %s", [row[0]]).fetchall():
                 cs.add("outcome", result_set_id=result_set, option_id=option, kind=kind, seats=seats)
             unit_ids = dict(units)
