@@ -26,7 +26,7 @@ HOST = "results.enr.clarityelections.com"
 CENSUS = "https://www2.census.gov/geo/tiger/GENZ2020/shp/cb_2020_{fips}_{layer}_500k.zip"
 LAYERS = ("place", "cousub", "unsd")
 TITLE = "Election night reporting results"
-STATE_NAMES = {"MI": "Michigan", "TX": "Texas", "PA": "Pennsylvania"}
+STATE_NAMES = {"IL": "Illinois", "MI": "Michigan", "TX": "Texas", "PA": "Pennsylvania"}
 NUMBERS = {
     "ONE": "1",
     "TWO": "2",
@@ -84,6 +84,10 @@ OFFICERS = (
 )
 COUNTY_OFFICES = (
     (r"SHERIFF", "sheriff", "Sheriff", False),
+    (r"STATE ?S ATTORNEY", "state-s-attorney", "State's Attorney", False),
+    (r"CIRCUIT CLERK", "circuit-clerk", "Circuit Clerk", False),
+    (r"COUNTY BOARD(?: MEMBER)?", "board-of-commissioners", "Board of Commissioners", True),
+    (r"REGIONAL SUPERINTENDENT(?: OF SCHOOLS)?", "regional-superintendent", "Regional Superintendent of Schools", False),
     (r"(?:COUNTY )?PROSECUTING ATTORNEY", "prosecuting-attorney", "Prosecuting Attorney", False),
     (r"(?:COUNTY )?DRAIN COMMISSIONER", "drain-commissioner", "Drain Commissioner", False),
     (r"(?:COUNTY )?ROAD COMMISSIONER", "road-commissioner", "Road Commissioner", False),
@@ -137,6 +141,7 @@ LOOSE = (
     (r"AUDITORS?", "auditors", "Auditors", True),
 )
 MI_MUNI_OFFICES = (
+    (r"HIGHWAY COMMISSIONER", "highway-commissioner", "Highway Commissioner", False),
     (r"SUPERVISOR", "supervisor", "Supervisor", False),
     (r"CLERK", "clerk", "Clerk", False),
     (r"(?<!COUNCIL )PRESIDENT", "president", "President", False),
@@ -736,7 +741,7 @@ def _classify(
 ) -> dict[str, object] | None:
     plain = re.sub(r"\b(PRECINCT|PCT) (\d+) (CHAIR\w*)", r"\3 \1 \2", plain)
     plain = re.sub(r"\bCHARTER (?=TOWNSHIP|TWP)", "", plain)
-    if st == "MI":
+    if st in ("IL", "MI"):
         plain = re.sub(r"\b(\d+) (DISTRICT|DIST)\b", r"\2 \1", plain)
     for options, scope in ((PARTY_OFFICES, "party"), (OFFICERS, "officer")):
         for pattern, key, office in options:
@@ -840,7 +845,7 @@ def _classify(
         if seat is None and (bare := re.search(r"\b(\d+)\b(?! ?(?:YR|YEAR))", rest)):
             noun = "Court" if "court" in key else "Precinct"
             seat, rest = f"{noun} {int(bare[1])}", re.sub(rf"\b{bare[1]}\b", " ", rest)
-        if _residue(rest, *(office[0] for office in held), r"JUDGE|COURT|CT|CRT|LAW|PCT|PRECINCT|COMM|CRIMINAL", re.escape(county_name), r"TERM ENDING [0-9/]+"):
+        if _residue(rest, *(office[0] for office in held), r"JUDGE|COURT|CT|CRT|LAW|PCT|PRECINCT|COMM|CRIMINAL", re.escape(county_name), r"TERM ENDING [0-9/]+", r"FULL", r"UNEXPIRED", r"VOTE FOR \d+"):
             return None
         if len(held) > 1 and not any(office[3] for office in held):
             key = "-and-".join(office[1] for office in held)
@@ -904,7 +909,7 @@ def _classify(
         found_seat = f"{'Ward' if st == 'PA' else 'Place'} {int(bare[1])}"
         rest = rest.replace(bare[0], " ", 1)
     seat = ", ".join(part for part in (seat, found_seat) if part) or None
-    for pattern, key, office, body in (*MI_MUNI_OFFICES, *MUNI_OFFICES) if st == "MI" else MUNI_OFFICES:
+    for pattern, key, office, body in (*MI_MUNI_OFFICES, *MUNI_OFFICES) if st in ("IL", "MI") else MUNI_OFFICES:
         if re.search(rf"\b(?:{pattern})\b", rest):
             break
     else:
