@@ -22,10 +22,11 @@ PUBLISHER = "South Carolina State Election Commission"
 LANDING = "https://scvotes.gov/election-results/"
 URL = "https://scvotes.gov/wp-content/uploads/2022/08/Election_Report_{}.pdf"
 DPI = 200
-BOOKS = {1974: "1974-1975", 1990: "1990-1991", 1992: "1992-1993", 1994: "1994-1995", 1996: "1995-1996", 1998: "1997-1998"}
-DAYS = {1974: date(1974, 11, 5), 1990: date(1990, 11, 6), 1992: date(1992, 11, 3), 1994: date(1994, 11, 8), 1996: date(1996, 11, 5), 1998: date(1998, 11, 3)}
-PAGE_RANGES = {1974: (45, 47), 1990: (95, 95), 1992: (82, 84), 1994: (33, 34), 1996: (44, 45), 1998: (46, 47)}
-HALVES = {1974: 322.0, 1990: 306.0}
+BOOKS = {1974: "1974-1975", 1976: "1976-1977", 1990: "1990-1991", 1992: "1992-1993", 1994: "1994-1995", 1996: "1995-1996", 1998: "1997-1998"}
+DAYS = {1974: date(1974, 11, 5), 1976: date(1976, 11, 2), 1990: date(1990, 11, 6), 1992: date(1992, 11, 3), 1994: date(1994, 11, 8), 1996: date(1996, 11, 5), 1998: date(1998, 11, 3)}
+PAGE_RANGES = {1974: (45, 47), 1976: (33, 35), 1990: (95, 95), 1992: (82, 84), 1994: (33, 34), 1996: (44, 45), 1998: (46, 47)}
+PAGE_ORDER = {1976: (34, 33, 35)}
+HALVES = {1974: 322.0, 1976: 322.0, 1990: 306.0}
 FIXES = str.maketrans({"&": "6", "l": "1", "I": "1", "O": "0", "o": "0", "S": "5", "B": "8", "Z": "2", "|": "1"})
 COUNTIES = [
     "Abbeville", "Aiken", "Allendale", "Anderson", "Bamberg", "Barnwell", "Beaufort", "Berkeley", "Calhoun",
@@ -37,6 +38,115 @@ COUNTIES = [
 KEYS = {re.sub(r"[^a-z]", "", name.lower()): name for name in COUNTIES}
 ALIASES: dict[tuple[int, int, str], str] = {(1998, 6, "ester"): "Dorchester", (1998, 6, "nce"): "Florence", (1998, 6, "l"): "Lee"}
 OVERRIDES: dict[tuple[int, int, str, int], int] = {
+    (1976, 1, "Beaufort", 0): 8633,
+    (1976, 1, "Berkeley", 0): 13192,
+    (1976, 1, "Charleston", 0): 41695,
+    (1976, 1, "Colleton", 0): 6994,
+    (1976, 1, "Dorchester", 0): 10620,
+    (1976, 1, "Hampton", 0): 4992,
+    (1976, 1, "Jasper", 0): 3765,
+    (1976, 1, "Beaufort", 1): 3414,
+    (1976, 1, "Berkeley", 1): 3603,
+    (1976, 1, "Charleston", 1): 26741,
+    (1976, 1, "Colleton", 1): 1509,
+    (1976, 1, "Dorchester", 1): 4145,
+    (1976, 1, "Hampton", 1): 768,
+    (1976, 1, "Jasper", 1): 418,
+    (1976, 2, "Allendale", 0): 2072,
+    (1976, 2, "Bamberg", 0): 2538,
+    (1976, 2, "Barnwell", 0): 2980,
+    (1976, 2, "Calhoun", 0): 1764,
+    (1976, 2, "Lexington", 0): 9125,
+    (1976, 2, "Orangeburg", 0): 11590,
+    (1976, 2, "Richland", 0): 30533,
+    (1976, 2, "Allendale", 1): 1528,
+    (1976, 2, "Bamberg", 1): 2602,
+    (1976, 2, "Barnwell", 1): 3570,
+    (1976, 2, "Calhoun", 1): 1653,
+    (1976, 2, "Lexington", 1): 27509,
+    (1976, 2, "Orangeburg", 1): 10353,
+    (1976, 2, "Richland", 1): 36211,
+    (1976, 2, "Allendale", 2): 45,
+    (1976, 2, "Bamberg", 2): 51,
+    (1976, 2, "Barnwell", 2): 0,
+    (1976, 2, "Calhoun", 2): 25,
+    (1976, 2, "Lexington", 2): 479,
+    (1976, 2, "Orangeburg", 2): 97,
+    (1976, 2, "Richland", 2): 253,
+    (1976, 3, "Abbeville", 0): 6227,
+    (1976, 3, "Aiken", 0): 23384,
+    (1976, 3, "Anderson", 0): 25349,
+    (1976, 3, "Edgefield", 0): 4940,
+    (1976, 3, "Greenwood", 0): 15221,
+    (1976, 3, "McCormick", 0): 2395,
+    (1976, 3, "Newberry", 0): 9863,
+    (1976, 3, "Oconee", 0): 11714,
+    (1976, 3, "Pickens", 0): 13957,
+    (1976, 3, "Saluda", 0): 4690,
+    (1976, 4, "Greenville", 0): 56144,
+    (1976, 4, "Spartanburg", 0): 35567,
+    (1976, 4, "Greenville", 1): 20188,
+    (1976, 4, "Spartanburg", 1): 12961,
+    (1976, 5, "Cherokee", 0): 7194,
+    (1976, 5, "Chester", 0): 4222,
+    (1976, 5, "Chesterfield", 0): 6644,
+    (1976, 5, "Fairfield", 0): 4001,
+    (1976, 5, "Kershaw", 0): 5436,
+    (1976, 5, "Lancaster", 0): 6487,
+    (1976, 5, "Laurens", 0): 6453,
+    (1976, 5, "Sumter", 0): 8696,
+    (1976, 5, "Union", 0): 5323,
+    (1976, 5, "York", 0): 11617,
+    (1976, 5, "Cherokee", 1): 4509,
+    (1976, 5, "Chester", 1): 4022,
+    (1976, 5, "Chesterfield", 1): 3582,
+    (1976, 5, "Fairfield", 1): 2037,
+    (1976, 5, "Kershaw", 1): 6997,
+    (1976, 5, "Lancaster", 1): 6911,
+    (1976, 5, "Laurens", 1): 6348,
+    (1976, 5, "Sumter", 1): 10884,
+    (1976, 5, "Union", 1): 4528,
+    (1976, 5, "York", 1): 12248,
+    (1976, 5, "Cherokee", 2): 0,
+    (1976, 5, "Chester", 2): 18,
+    (1976, 5, "Chesterfield", 2): 15,
+    (1976, 5, "Fairfield", 2): 13,
+    (1976, 5, "Kershaw", 2): 42,
+    (1976, 5, "Lancaster", 2): 38,
+    (1976, 5, "Laurens", 2): 33,
+    (1976, 5, "Sumter", 2): 52,
+    (1976, 5, "Union", 2): 38,
+    (1976, 5, "York", 2): 49,
+    (1976, 6, "Clarendon", 0): 5001,
+    (1976, 6, "Darlington", 0): 10139,
+    (1976, 6, "Dillon", 0): 4584,
+    (1976, 6, "Florence", 0): 13442,
+    (1976, 6, "Georgetown", 0): 6909,
+    (1976, 6, "Horry", 0): 13888,
+    (1976, 6, "Lee", 0): 3658,
+    (1976, 6, "Marion", 0): 5708,
+    (1976, 6, "Marlboro", 0): 4951,
+    (1976, 6, "Williamsburg", 0): 7636,
+    (1976, 6, "Clarendon", 1): 3628,
+    (1976, 6, "Darlington", 1): 7562,
+    (1976, 6, "Dillon", 1): 3076,
+    (1976, 6, "Florence", 1): 15659,
+    (1976, 6, "Georgetown", 1): 4607,
+    (1976, 6, "Horry", 1): 10993,
+    (1976, 6, "Lee", 1): 2616,
+    (1976, 6, "Marion", 1): 3267,
+    (1976, 6, "Marlboro", 1): 2431,
+    (1976, 6, "Williamsburg", 1): 6449,
+    (1976, 6, "Clarendon", 2): 25,
+    (1976, 6, "Darlington", 2): 21,
+    (1976, 6, "Dillon", 2): 31,
+    (1976, 6, "Florence", 2): 216,
+    (1976, 6, "Georgetown", 2): 61,
+    (1976, 6, "Horry", 2): 238,
+    (1976, 6, "Lee", 2): 0,
+    (1976, 6, "Marion", 2): 35,
+    (1976, 6, "Marlboro", 2): 37,
+    (1976, 6, "Williamsburg", 2): 24,
     (1974, 1, "Beaufort", 0): 5342,
     (1974, 1, "Berkeley", 0): 8062,
     (1974, 1, "Charleston", 0): 34188,
@@ -160,8 +270,23 @@ OVERRIDES: dict[tuple[int, int, str, int], int] = {
     (1998, 6, "Williamsburg", 2): 2679,
 }
 LAYOUT: dict[tuple[int, int], tuple[list[float], list[int]]] = {
+    (1976, 1): ([175.0, 216.0], [89891, 40598]),
+    (1976, 2): ([499.0, 540.0, 580.0], [60602, 83426, 950]),
+    (1976, 3): ([216.0], [117740]),
+    (1976, 4): ([539.0, 579.0], [91711, 33149]),
+    (1976, 5): ([171.0, 212.0, 252.0], [66073, 62066, 298]),
+    (1976, 6): ([495.0, 535.0, 576.0], [75916, 60288, 688]),
     (1990, 2): ([396.0, 428.0, 456.0], [90054, 11101, 189]),
     (1990, 4): ([395.0, 425.0, 456.0], [81927, 51338, 270]),
+}
+ORDERED: dict[tuple[int, int], list[str]] = {
+    (1974, 6): ["Clarendon", "Darlington", "Dillon", "Florence", "Georgetown", "Horry", "Lee", "Marion", "Marlboro", "Williamsburg"],
+    (1976, 1): ['Beaufort', 'Berkeley', 'Charleston', 'Colleton', 'Dorchester', 'Hampton', 'Jasper'],
+    (1976, 2): ['Allendale', 'Bamberg', 'Barnwell', 'Calhoun', 'Lexington', 'Orangeburg', 'Richland'],
+    (1976, 3): ['Abbeville', 'Aiken', 'Anderson', 'Edgefield', 'Greenwood', 'McCormick', 'Newberry', 'Oconee', 'Pickens', 'Saluda'],
+    (1976, 4): ['Greenville', 'Spartanburg'],
+    (1976, 5): ['Cherokee', 'Chester', 'Chesterfield', 'Fairfield', 'Kershaw', 'Lancaster', 'Laurens', 'Sumter', 'Union', 'York'],
+    (1976, 6): ['Clarendon', 'Darlington', 'Dillon', 'Florence', 'Georgetown', 'Horry', 'Lee', 'Marion', 'Marlboro', 'Williamsburg'],
 }
 ROWNAMES: dict[tuple[int, int], list[str]] = {
     (1990, 2): ["Bamberg", "Calhoun", "Lexington", "Orangeburg", "Richland"],
@@ -228,13 +353,13 @@ def parse() -> None:
         last_district = 0
         done = [0, 0]
         block: list[tuple[int, list[tuple[float, float, float, float, str]]]] = []
-        for page, half in [(page, half) for page in range(first, last + 1) for half in ((0, 1) if year in HALVES else (None,))]:
+        for page, half in [(page, half) for page in PAGE_ORDER.get(year, range(first, last + 1)) for half in ((0, 1) if year in HALVES else (None,))]:
             render(year, page)
             if half is not None:
                 block = []
             for line in lines_of(year, page, half):
                 text = " ".join(w[4] for w in line)
-                is_total = re.match(r"^\W*(\w+\s+)?TOTALS?\b", text, re.IGNORECASE) is not None and re.search(r"\d", text) is not None
+                is_total = re.match(r"^\W*(?:[A-Za-z]+\s+){0,2}TOTALS?\b", text, re.IGNORECASE) is not None and re.search(r"\d", text) is not None
                 if not is_total:
                     block.append((page, line))
                     continue
@@ -254,6 +379,7 @@ def parse() -> None:
                 cells: list[tuple[str, list[int | None], list[list[float]]]] = []
                 scored: list[tuple[float, int, int, int, list[tuple[float, float, float, float, str]]]] = []
                 nameless = iter(ROWNAMES.get((year, district), []))
+                ordered = iter(ORDERED.get((year, district), []))
                 for index, (page_number, row) in enumerate(block):
                     county_words = []
                     for word in row:
@@ -264,6 +390,8 @@ def parse() -> None:
                     if not any(re.search(r"\d", w[4]) and w[0] > 90 for w in row) or re.search(r"DISTRICT|WRITE|WINNER", " ".join(w[4] for w in row), re.IGNORECASE):
                         continue
                     alias = ALIASES.get((year, district, key))
+                    if (year, district) in ORDERED:
+                        alias = next(ordered, None)
                     if not key and sum(1 for w in row if re.search(r"\d", w[4])) >= 2 and (year, district) in ROWNAMES:
                         alias = next(nameless, None)
                     best = COUNTIES.index(alias) if alias else max(range(len(COUNTIES)), key=lambda i: difflib.SequenceMatcher(None, key, COUNTIES[i].lower()).ratio())
@@ -300,6 +428,10 @@ def parse() -> None:
                         value: int | None = int(fixed.replace(",", "")) if re.fullmatch(r"\d[\d,]*", fixed) else None
                         values[column] = value if value is not None else -1
                         boxes[column] = [float(x0), float(y0), float(x1), float(y1)]
+                    for column in range(len(edges)):
+                        if values[column] is None and (year, district, KEYS[close[0]], column) in OVERRIDES:
+                            values[column] = OVERRIDES[(year, district, KEYS[close[0]], column)]
+                            boxes[column] = [edges[column] - 40, min(w[1] for w in row), edges[column], max(w[3] for w in row)]
                     cells.append((KEYS[close[0]], values, boxes))
                     rows.extend(
                         {
@@ -409,6 +541,7 @@ def emit() -> Path:
             extra = EXTRA.get((year, district), {})
             mismatch = False
             inexact = False
+            apart: list[int] = []
             for column in leftover:
                 near = sorted(
                     (abs(int(value) - totals[column]), option)
@@ -418,7 +551,8 @@ def emit() -> Path:
                 if column not in extra and near and near[0][0] * 25 <= totals[column]:
                     targets[column] = near[0][1]
                     inexact = True
-                    print(f"{key}: column {column} {totals[column]} against FEC {near[0][0]} apart; non-default")
+                    apart.append(near[0][0])
+                    print(f"{key}: column {column} {totals[column]} against FEC {near[0][0]} apart")
                 elif column in extra:
                     label, party = extra[column]
                     candidate = cs.key(f"{SOURCE}.person", f"SC:{re.sub(r'[^a-z]+', '-', label.lower())}")
@@ -442,7 +576,7 @@ def emit() -> Path:
                     targets[column] = writein[0]
                     mismatch = True
             covered = {option for option in targets.values()}
-            if len(targets) != len(totals) or any(option not in covered for option, _, _, _ in roots):
+            if len(targets) != len(totals) or any(option not in covered for option, _, kind, _ in roots if kind != "write_in"):
                 print(f"{key}: columns {totals} against FEC {[(label, kind, int(value)) for _, label, kind, value in roots]}")
                 continue
             if mismatch:
@@ -450,7 +584,9 @@ def emit() -> Path:
                 mismatch = merged != next(int(value) for option, _, _, value in roots if option in writein)
                 if mismatch:
                     print(f"{key}: write-ins {merged} against FEC; non-default")
-            mismatch = mismatch or inexact
+            unprinted = sum(int(value) for option, _, kind, value in roots if kind == "write_in" and option not in covered)
+            own = all(int(g["votes"].sum()) == int(g["printed"][0]) for _, g in rows.group_by("column"))
+            mismatch = mismatch or (inexact and not own)
             result_set = cs.key(f"{SOURCE}.result_set", key)
             cs.add(
                 "result_set",
@@ -470,7 +606,7 @@ def emit() -> Path:
                 supersedes_id=row[0] if not mismatch else None,
                 completeness=1,
             )
-            cs.add("note", entity_id=result_set, kind="methodology", body_md=METHOD)
+            cs.add("note", entity_id=result_set, kind="methodology", body_md=METHOD + (f" The Federal Election Commission's compilation differs by {', '.join(str(v) for v in apart)} votes in a candidate's total." if apart else "") + (f" The Federal Election Commission's compilation adds {unprinted} write-in votes that the book does not print." if unprinted else ""))
             for option, kind, seats in conn.execute("select option_id, kind, seats from outcome where result_set_id = %s", [row[0]]).fetchall():
                 cs.add("outcome", result_set_id=result_set, option_id=option, kind=kind, seats=seats)
             unit_ids = dict(units)
