@@ -24,6 +24,7 @@ PAGES = {
 }
 PRINTED = {1994: [530, 531, 532], 1998: [561, 562, 563]}
 DAYS = {1992: date(1992, 11, 3), 1994: date(1994, 11, 8), 1998: date(1998, 11, 3)}
+PRINTED_SUMS = {("1972-11-07", "3"): [124365, 53523, 465]}
 PAGE_FIXES = {(62628, "868"): "888"}
 TOTALS = {(1998, 7): [43416, 129746, 5639]}
 EARLY = [
@@ -41,6 +42,7 @@ METHOD = (
     "reports apart, is added into Jackson County."
 )
 NOTES = {
+    "1972-11-07:MO:house:3": " The Manual prints 54,523 as the Republican total, which the FEC also reports, but its two printed parts (30,034 in the city and 23,489 in the county) sum to 53,523.",
     "1992-11-03:MO:house:8": " The county rows fall short of the printed district total by 270 Republican votes; every cell was checked against the page image."
 }
 
@@ -158,7 +160,7 @@ def parse() -> None:
                 for column, votes in enumerate(values):
                     rows.append((str(DAYS[year]), district, keys[name], str(column), votes))
     for (day, district, _), block in EARLY:
-        total = [int(value) for value in block[-1].split()[1:]]
+        total = PRINTED_SUMS.get((day, district)) or [int(value) for value in block[-1].split()[1:]]
         table = [
             (line.rsplit(" ", len(total))[0], [int(value) for value in line.rsplit(" ", len(total))[1:]])
             for line in block[:-1]
