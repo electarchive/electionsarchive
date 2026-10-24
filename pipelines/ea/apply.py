@@ -528,7 +528,23 @@ def _publish_table(conn: Connection, stage: Stage, table: str) -> None:
                 raise ValueError(f"{entity} is already retired by {retired}")
             retiring.setdefault(kind, []).append(entity)
         held: list[str] = []
-        for kind, ids in retiring.items():
+        for kind, ids in sorted(retiring.items(), key=lambda item: item[0] != "contest"):
+            if kind == "contest":
+                for parent, query in (
+                    ("result_set", "select k from public.result_set where contest_id = any(%s::uuid[])"),
+                    ("contest_option", "select k from public.contest_option where contest_id = any(%s::uuid[])"),
+                ):
+                    for relation, column, owner in checks.references(conn):
+                        if owner == parent:
+                            conn.execute(
+                                sql.SQL("delete from public.{} where {} in ({})").format(
+                                    sql.Identifier(relation), sql.Identifier(column), sql.SQL(query)
+                                ),
+                                [ids],
+                            )
+                conn.execute("delete from public.result_set where contest_id = any(%s::uuid[])", [ids])
+                conn.execute("delete from public.candidacy where option_id in (select id from public.contest_option where contest_id = any(%s::uuid[]))", [ids])
+                conn.execute("delete from public.contest_option where contest_id = any(%s::uuid[])", [ids])
             if kind == "person":
                 conn.execute("delete from public.person_image where person_id = any(%s::uuid[])", [ids])
             if kind == "tenure":
@@ -694,6 +710,7 @@ def _rollup(
             rs as (
               select r.k, e.date_from as on_date, bs.valid_from as plan_from, c.id as contest_id, c.district_area_id, c.allocation_parent_id
               from result_set r join election e on e.id = r.election_id join contest c on c.id = r.contest_id
+              left join boundary_set bs on bs.id = c.boundary_set_id
               where r.id in ({facts}) or r.k = any({stale})
             ),
             above as (
@@ -710,7 +727,6 @@ def _rollup(
                 select from contest s join above t on t.result_set_k = b.result_set_k and t.area_id = s.district_area_id
                 where s.allocation_parent_id = rs.allocation_parent_id and s.id <> rs.contest_id
               )
-              left join boundary_set bs on bs.id = c.boundary_set_id
             ),
             units as (
               select rs.k as result_set_k, ru.k as unit_k, ru.id as unit_id,

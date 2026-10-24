@@ -161,6 +161,7 @@ def parse() -> None:
     print(f"dropped {missing['contest'].n_unique()} contests in {missing['fips'].n_unique()} places missing from 2020")
     frame = frame.filter((pl.col("fips").str.len_chars() == 5) | pl.col("fips").is_in(places["code"].implode()))
     PARSED.mkdir(parents=True, exist_ok=True)
+    pl.DataFrame({"contest": phantoms}, schema={"contest": pl.String}).write_parquet(PARSED / "phantoms.parquet")
     frame.write_parquet(PARSED / "candidates.parquet")
     places.write_parquet(PARSED / "places.parquet")
 
