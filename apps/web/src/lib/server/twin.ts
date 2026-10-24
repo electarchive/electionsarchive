@@ -1430,6 +1430,7 @@ function electionMarkdown(
         race.kind !== "body_seats" ||
         race.body == null ||
         tiered.includes(entry) ||
+        leader.key === "unrecorded" ||
         leader.key?.startsWith("person:") === true
           ? null
           : ((race.unopposed?.seats ?? 0) * 10 >= filled ||

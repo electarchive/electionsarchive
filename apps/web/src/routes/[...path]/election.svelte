@@ -856,7 +856,7 @@
                     total: count(appointed),
                     share: percent(popular.share),
                   })
-            : leader == null
+            : leader == null || leader.key === "unrecorded"
               ? null
               : race.kind === "elector_slate" && seated.length > 0
                 ? m.race_lede_electors({
@@ -1395,6 +1395,27 @@
             })}
           </p>
         {/if}
+        {#each race.repeats ?? [] as repeat (repeat.label)}
+          <p class="px-1.5 text-[0.8125rem] text-muted-foreground">
+            {repeat.people.length === 1
+              ? m.race_repeat_one({
+                  name: repeat.people[0]?.name ?? "",
+                  count: count(repeat.people[0]?.returns ?? 0),
+                  party: definite(repeat.label),
+                  seats: count(repeat.seats),
+                  members: count(repeat.members),
+                })
+              : m.race_repeat_many({
+                  names: new Intl.ListFormat(getLocale(), {
+                    style: "long",
+                    type: "conjunction",
+                  }).format(repeat.people.map((person) => person.name)),
+                  party: definite(repeat.label),
+                  seats: count(repeat.seats),
+                  members: count(repeat.members),
+                })}
+          </p>
+        {/each}
       </div>
     {/if}
     {#if race.places != null && !race.isTotal}
