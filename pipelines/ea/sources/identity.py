@@ -603,6 +603,97 @@ PEOPLE = {
         ("wikidata", "Q10853588"),
         ("us.alged.person", "61715"),
     ),
+    "Friedrich Merz, Wikidata record and race records 2025-2025": (
+        ("de.bundeswahlleiterin.person", "2025:Merz:Joachim-Friedrich Martin Josef:1955"),
+        ("wikidata", "Q566257"),
+    ),
+    "Massimo D'Alema, Wikidata record and race records 1994-2001": (
+        ("it.interno.person", "D'ALEMA:MASSIMO:1949-04-20"),
+        ("wikidata", "Q47602"),
+    ),
+    "Enrico Letta, Wikidata record and race records 1994-2022": (
+        ("it.camera.persona", "300127"),
+        ("wikidata", "Q674957"),
+    ),
+    "Édouard Philippe, Wikidata record and race records 2002-2012": (
+        ("fr.cdsp.person", "76:PHILIPPE:EDOUARD"),
+        ("wikidata", "Q3579995"),
+    ),
+    "Michel Rocard, Wikidata record and race records 1969-1993": (
+        ("fr.cdsp.person", "78:ROCARD:MICHEL"),
+        ("wikidata", "Q12946"),
+        ("fr.legislatives_1986.person", "78:michel-rocard"),
+        ("fr.cdsp.person", "president:michel-rocard"),
+    ),
+    "Gabriel Attal, Wikidata record and race records 2017-2024": (
+        ("fr.cdsp.person", "92:ATTAL:GABRIEL"),
+        ("wikidata", "Q30339350"),
+    ),
+    "Édouard Balladur, Wikidata record and race records 1988-2002": (
+        ("fr.cdsp.person", "75:BALLADUR:EDOUARD"),
+        ("wikidata", "Q12959"),
+        ("fr.cdsp.person", "president:edouard-balladur"),
+    ),
+    "Justin Trudeau, Wikidata record and race records 2008-2021": (
+        ("ca.elections.person", "2013:24055:justin trudeau"),
+        ("wikidata", "Q3099714"),
+    ),
+    "Mark Carney, Wikidata record and race records 2025-2025": (
+        ("ca.elections.person", "2023:35067:mark carney"),
+        ("wikidata", "Q192533"),
+    ),
+    "Élisabeth Borne, Wikidata record and race records 2022-2024": (
+        ("fr.cdsp.person", "14:BORNE:ELISABETH"),
+        ("wikidata", "Q20020731"),
+    ),
+    "Rishi Sunak, Wikidata record and race records 2015-2024": (
+        ("mnis", "4483"),
+        ("wikidata", "Q20055561"),
+    ),
+    "François Fillon, Wikidata record and race records 1986-2017": (
+        ("fr.cdsp.person", "72:FILLON:FRANCOIS"),
+        ("wikidata", "Q101410"),
+        ("fr.cdsp.person", "75:FILLON:FRANCOIS"),
+        ("fr.cdsp.person", "president:francois-fillon"),
+        ("fr.legislatives_1986.person", "72:francois-fillon"),
+    ),
+    "Olaf Scholz, Wikidata record and race records 2025-2025": (
+        ("de.bundeswahlleiterin.person", "2025:Scholz:Olaf:1958"),
+        ("wikidata", "Q61053"),
+    ),
+    "Lamberto Dini, Wikidata record and race records 1996-1996": (
+        ("it.storico.person", "TOSCANA - Firenze 2:DINI:LAMBERTO"),
+        ("wikidata", "Q208100"),
+    ),
+    "James Callaghan, Wikidata record and race records 1966-1983": (
+        ("mnis", "3326"),
+        ("wikidata", "Q9576"),
+    ),
+    "Raymond Barre, Wikidata record and race records 1986-1997": (
+        ("fr.cdsp.person", "69:BARRE:RAYMOND"),
+        ("wikidata", "Q12957"),
+        ("fr.legislatives_1986.person", "69:raymond-barre"),
+        ("fr.cdsp.person", "president:raymond-barre"),
+    ),
+    "Giuseppe Conte, Wikidata record and race records 2022-2022": (
+        ("it.camera.persona", "307926"),
+        ("wikidata", "Q53844829"),
+    ),
+    "Édith Cresson, Wikidata record and race records 1986-1988": (
+        ("fr.cdsp.person", "86:CRESSON:EDITH"),
+        ("wikidata", "Q230861"),
+        ("fr.legislatives_1986.person", "86:edith-cresson"),
+    ),
+    "Silvio Berlusconi, Wikidata record and race records 1994-2001": (
+        ("it.interno.person", "BERLUSCONI:SILVIO:1936-09-29"),
+        ("wikidata", "Q11860"),
+    ),
+    "Lionel Jospin, Wikidata record and race records 1986-2002": (
+        ("fr.cdsp.person", "31:JOSPIN:LIONEL"),
+        ("wikidata", "Q187099"),
+        ("fr.legislatives_1986.person", "75:lionel-jospin"),
+        ("fr.cdsp.person", "president:lionel-jospin"),
+    ),
 }
 PLACEHOLDERS = re.compile(
     r"\b(unknown|scatter\w*|write[- ]?ins?|all other|others?|blank|void|none of|uncommitted|vacan\w*|no candidate)\b"
