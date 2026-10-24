@@ -21,12 +21,14 @@ DERIVED = 1
 VOTES, REGISTERED, BALLOTS, VALID, INVALID, EXHAUSTED, QUOTA = 1, 2, 3, 4, 5, 21, 26
 DATASETS = "https://opendata.housing.gov.ie/dataset"
 ELECTIONS = {
+    2007: (date(2007, 5, 24), 2005, date(2005, 7, 9), 166),
     2011: (date(2011, 2, 25), 2009, date(2009, 2, 24), 166),
     2016: (date(2016, 2, 26), 2013, date(2013, 3, 20), 158),
     2020: (date(2020, 2, 8), 2017, date(2017, 12, 23), 160),
     2024: (date(2024, 11, 29), 2023, date(2023, 12, 19), 174),
 }
 ACTS = {
+    2005: "Electoral (Amendment) Act 2005",
     2009: "Electoral (Amendment) Act 2009",
     2013: "Electoral (Amendment) (Dáil Constituencies) Act 2013",
     2017: "Electoral (Amendment) (Dáil Constituencies) Act 2017",
@@ -45,18 +47,33 @@ CSVS = {
     },
 }
 MEMBERS = "https://api.oireachtas.ie/v1/members?chamber=dail&house_no={house}&limit=1000"
-HOUSES = {2011: 31, 2016: 32, 2020: 33, 2024: 34}
+HOUSES = {2007: 30, 2011: 31, 2016: 32, 2020: 33, 2024: 34}
 FIRST_HOUSE = 29
 REGISTERED_NAMES = {
     "Anti-Austerity Alliance - People Before Profit": "Anti-Austerity Alliance–People Before Profit",
     "Workers Party": "Workers' Party",
+    "Solidarity - People Before Profit": "Solidarity–People Before Profit",
 }
+SHORT_NAMES = {"Solidarity - People Before Profit": "Solidarity–PBP"}
 ALIASES = {"The Workers' Party": "Workers Party"}
 SUCCESSIONS = {
     2020: ("Anti-Austerity Alliance - People Before Profit", "Solidarity - People Before Profit"),
     2024: ("Solidarity - People Before Profit", "People Before Profit–Solidarity"),
 }
+ACT_NAMES = {
+    2007: (
+        "Carlow-Kilkenny", "Cavan-Monaghan", "Clare", "Cork East", "Cork North-Central", "Cork North-West",
+        "Cork South-Central", "Cork South-West", "Donegal North-East", "Donegal South-West", "Dublin Central",
+        "Dublin Mid-West", "Dublin North", "Dublin North-Central", "Dublin North-East", "Dublin North-West",
+        "Dublin South", "Dublin South-Central", "Dublin South-East", "Dublin South-West", "Dublin West",
+        "Dún Laoghaire", "Galway East", "Galway West", "Kerry North", "Kerry South", "Kildare North",
+        "Kildare South", "Laois-Offaly", "Limerick East", "Limerick West", "Longford-Westmeath", "Louth", "Mayo",
+        "Meath East", "Meath West", "Roscommon-South Leitrim", "Sligo-North Leitrim", "Tipperary North",
+        "Tipperary South", "Waterford", "Wexford", "Wicklow",
+    ),
+}
 PDFS = {
+    2007: "https://data.oireachtas.ie/ie/oireachtas/electoralProcess/electionResults/dail/2007/2007-10-23_dail-general-election-may-2007-results-and-transfer-of-votes_en.pdf",
     2011: "https://data.oireachtas.ie/ie/oireachtas/electoralProcess/electionResults/dail/2011/2011-05-23_dail-general-election-2011-results_en.pdf",
 }
 XLSX_2024 = f"{DATASETS}/7ca52e7b-dd4d-4edd-b159-6ae111bbe538/resource/fb8a1f97-2683-4515-bac4-e2617222b20d/download/2024-dail-general-election-results.xlsx"
@@ -70,6 +87,7 @@ PARTY_CODES = {
     "Fine Gael": "FG",
     "Sinn Féin": "SF",
     "The Labour Party": "LAB",
+    "Green Party": "GRN",
     "Green Party/ Comhaontas Glas": "GRN",
     "Green Party/An Comhaontas Glas": "GRN",
     "Green Party/ An Comhaontas Glas": "GRN",
@@ -87,9 +105,10 @@ PARTY_CODES = {
     "Independents 4 Change": "I4C",
 }
 NON_PARTY = "Non-Party"
+PARTY_OVERRIDES = {(2007, "Seamus Healy"): "Workers and Unemployed Action Group", (2011, "Seamus Healy"): "Workers and Unemployed Action Group"}
 STATUTORY = {(2020, "Kildare South"): 4}
-CEANN_COMHAIRLE = {(2011, "Louth"): 5}
-AUTOMATIC = {(2011, "Louth"): "Seamus Kirk"}
+CEANN_COMHAIRLE = {(2007, "Cavan-Monaghan"): 5, (2011, "Louth"): 5}
+AUTOMATIC = {(2007, "Cavan-Monaghan"): "Rory O'Hanlon", (2011, "Louth"): "Seamus Kirk"}
 HYPHENS = {
     "Laois Offaly": "Laois-Offaly",
     "Roscommon - Galway": "Roscommon-Galway",
@@ -145,12 +164,22 @@ def fold(text: str) -> str:
 def tidy(text: str) -> str:
     text = re.sub(r"\s+", " ", text.replace(",,", ",")).strip()
     if text != text.upper():
-        return text
+
+        def mixed(token: str) -> str:
+            if re.fullmatch(r"(Mc|Mac)[A-Z]{2,}", token):
+                return token[: token.index("c") + 1] + token[token.index("c") + 1 :].capitalize()
+            if re.fullmatch(r"[A-Z]{2,}[a-z]+|[A-Z][a-z]+[A-Z]", token):
+                return token.capitalize()
+            return token
+
+        return re.sub(r"O([’'])([a-z])", lambda m: "O" + m[1] + m[2].upper(), re.sub(r"[^\s'’\-]+", lambda m: mixed(m.group()), text))
 
     def word(token: str) -> str:
         token = token.capitalize()
         if re.match(r"^Mc[a-z]{2,}", token):
             token = "Mc" + token[2:].capitalize()
+        elif re.match(r"^Mac(?![kaeihou])[a-z]{3,}", token):
+            token = "Mac" + token[3:].capitalize()
         return token
 
     return re.sub(r"[^\s'’\-]+", lambda m: word(m.group()), text)
@@ -321,7 +350,7 @@ def parse() -> None:
             raise ValueError(f"2024 {label}: poll, valid, invalid, or quota do not tie")
 
     for year, url in PDFS.items():
-        book = dail_pdf.rows(str(raw.cached(SOURCE, url).path), year)
+        book = dail_pdf.rows(str(raw.cached(SOURCE, url).path), year, ACT_NAMES.get(year, ()))
         for unit in book["units"]:
             unit["total_seats"] = CEANN_COMHAIRLE.get((year, unit["constituency"]), unit["total_seats"])
         units.extend(book["units"])
@@ -333,6 +362,10 @@ def parse() -> None:
     count_frame = pl.DataFrame(counts)
     cand_frame = pl.DataFrame(candidates, schema_overrides={"candidate": pl.String})
     count_frame = count_frame.with_columns(pl.col("candidate").cast(pl.String))
+    for (year, name), party in PARTY_OVERRIDES.items():
+        cand_frame = cand_frame.with_columns(
+            party=pl.when((pl.col("year") == year) & (pl.col("name") == name)).then(pl.lit(party)).otherwise(pl.col("party"))
+        )
     for u in unit_frame.iter_rows(named=True):
         key = (pl.col("year") == u["year"]) & (pl.col("constituency") == u["constituency"])
         lines = count_frame.filter(key)
@@ -416,6 +449,7 @@ def emit() -> Path:
         for row in pl.read_parquet(PARSED / "identity.parquet").iter_rows(named=True)
     }
     roster: list[dict[str, object]] = []
+    added: set[UUID] = set()
     with connect() as conn:
         cs = Changeset(
             conn,
@@ -485,6 +519,8 @@ def emit() -> Path:
                 elif slug(canonical) in strays:
                     parties[label] = strays[slug(canonical)]
                     name(parties[label], REGISTERED_NAMES.get(canonical, canonical))
+                    if canonical in SHORT_NAMES:
+                        name(parties[label], SHORT_NAMES[canonical], kind="short")
                     if (earlier := strays.get(slug(label))) is not None and earlier != parties[label]:
                         cs.merge(earlier, parties[label])
                 elif len(known.get(fold(canonical), ())) == 1:
@@ -673,8 +709,10 @@ def emit() -> Path:
                             "code": linked["code"] if linked is not None else None,
                         }
                     )
-                    cs.add("person", id=person, gender={"M": "male", "F": "female"}.get(str(candidate["gender"]).strip()[:1].upper()))
-                    name(person, shown_name)
+                    if person not in added:
+                        added.add(person)
+                        cs.add("person", id=person, gender={"M": "male", "F": "female"}.get(str(candidate["gender"]).strip()[:1].upper()))
+                        name(person, shown_name)
                     cs.add(
                         "contest_option",
                         id=option,
@@ -739,8 +777,10 @@ def emit() -> Path:
                     option_key = f"{contest_key}:{fold(speaker['name'])}"
                     option = cs.key("ie.option", option_key)
                     person = cs.key(f"{SOURCE}.person", f"{year}:{slug(label)}:{fold(speaker['name'])}")
-                    cs.add("person", id=person)
-                    name(person, speaker["name"])
+                    if person not in added:
+                        added.add(person)
+                        cs.add("person", id=person)
+                        name(person, speaker["name"])
                     roster.append(
                         {
                             "year": year,
@@ -800,4 +840,10 @@ def emit() -> Path:
                     date_precision="day",
                     source_id=sources[year],
                 )
+        for note, entity, text in conn.execute(
+            """select n.id, n.entity_id, n.body_md from note n join changeset c on c.id = n.changeset_id
+               where n.entity_id = any(%s) and n.kind = 'caveat' and c.pipeline = %s""",
+            [[row["id"] for row in cs.rows["result_set"]], SOURCE],
+        ).fetchall():
+            cs.add("note_drop", note_id=note, entity_id=entity, body_md=text, reason="A re-emit writes the result set's caveats afresh.")
         return cs.write()

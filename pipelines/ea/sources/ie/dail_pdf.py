@@ -147,12 +147,14 @@ def read_book(pdf: str) -> list[dict[str, object]]:
             continue
         body: list[tuple[str, dict[int, int], bool]] = []
         for _, ws in lines[header + 1 :]:
-            label_words = [w for w in ws if w[2] < start - 4]
-            cell_words = [w for w in ws if w[2] >= start - 4]
+            label_words = [w for w in ws if w[2] < start - 4 or re.fullmatch(r"\([A-Za-z.\-]+\)", w[4])]
+            cell_words = [w for w in ws if w not in label_words]
             label = " ".join(w[4] for w in label_words if not NUMBER.match(w[4]) or len(label_words) > 1)
             label = re.sub(r"^\d+\s+", "", label).strip()
             cells: dict[int, int] = {}
             signed = False
+            total_row = label.upper().startswith("NON-TRANSFERABLE")
+            plus: dict[int, int] = {}
             for index, word in enumerate(cell_words):
                 if word[4] == "+":
                     signed = True
@@ -164,6 +166,11 @@ def read_book(pdf: str) -> list[dict[str, object]]:
                 if NUMBER.match(word[4]) or word[4] == "-":
                     previous = cell_words[index - 1] if index else None
                     if previous is not None and previous[4] in ("+", "-") and word[0] - previous[2] < 12:
+                        if total_row and previous[4] == "+":
+                            center = (word[0] + word[2]) / 2
+                            count = min(centers, key=lambda c: abs(c[0] - center))
+                            if abs(count[0] - center) <= pitch * 0.45:
+                                plus[count[1]] = number(word[4])
                         continue
                     center = (word[0] + word[2]) / 2
                     count = min(centers, key=lambda c: abs(c[0] - center))
@@ -172,6 +179,8 @@ def read_book(pdf: str) -> list[dict[str, object]]:
                     cells[count[1]] = 0 if word[4] == "-" else number(word[4])
             if label or cells:
                 body.append((label, cells, signed))
+            if plus:
+                body.append(("\0plus", plus, False))
         current.setdefault("pages", []).append(page_number)
         current.setdefault("body", []).append(body)
     return results
@@ -182,27 +191,32 @@ def assemble(book: dict[str, object]) -> dict[str, object]:
     series: list[dict[int, int]] = []
     nt: dict[int, int] = {}
     total: dict[int, int] = {}
+    plus: dict[int, int] = {}
     for index, body in enumerate(book["body"]):
         rows: list[dict[int, int]] = []
         started = index > 0
         finished = False
         awaiting = False
         for label, cells, signed in body:
+            if label == "\0plus":
+                plus.update(cells)
+                continue
             upper = label.upper()
             if upper.startswith("NON-TRANSFERABLE"):
+                nt.update(cells)
                 if cells and not signed:
-                    nt.update(cells)
                     finished = True
                 else:
                     awaiting = True
                 continue
-            if awaiting and not label and cells and not signed:
+            if awaiting and not label and len(cells) > 1 and not signed:
                 nt.update(cells)
                 awaiting = False
                 finished = True
                 continue
             if label == "TOTAL" or upper == "TOTAL":
                 total.update(cells)
+                finished = True
                 continue
             if label and not started and "," not in label:
                 continue
@@ -236,6 +250,9 @@ def assemble(book: dict[str, object]) -> dict[str, object]:
             for position, cells in enumerate(continuation):
                 first[position].update(cells)
         series = first
+    for count in set(total) - set(nt):
+        if count in plus:
+            nt[count] = plus[count]
     return {**book, "names": names, "series": series, "nt": nt, "total": total}
 
 
@@ -253,6 +270,7 @@ ABBREVIATIONS = {
     "SKIA": "South Kerry Independent Alliance",
     "SKI": "South Kerry Independent Alliance",
     "NONP": "Non-Party",
+    "PD": "Progressive Democrats",
 }
 
 
@@ -303,21 +321,23 @@ def finish(book: dict[str, object], year: int, abbreviations: dict[str, str]) ->
     for count in range(1, rounds + 1):
         if sum(c["series"][count] for c in candidates) + nt[count] != valid or total[count] != valid:
             raise ValueError(f"{label}: count {count} does not sum to the valid poll {valid}")
-    if nt[1] != 0 or any(b < a for a, b in zip(list(nt.values()), list(nt.values())[1:])):
+    if nt[1] != 0 or any(b < a for a, b in zip([nt[k] for k in sorted(nt)], [nt[k] for k in sorted(nt)][1:])):
         raise ValueError(f"{label}: non-transferable papers are not cumulative")
     reached = {c["candidate"] for c in candidates if max(c["series"].values()) >= quota}
     last = {c["candidate"]: c["series"][rounds] for c in candidates}
     continuing = sorted((k for k, v in last.items() if v > 0 and k not in reached), key=lambda k: -last[k])
     elected = reached | set(continuing[: seats - len(reached)])
+    declared = {fold(re.sub(r"\(.*?\)", "", text)) for text in book["elected"]}
+    named = {c["candidate"] for c in candidates if fold(c["name"]) in declared}
     capitals = {c["candidate"] for c in candidates if c["capitals"]}
-    if len(elected) != seats or (capitals and capitals != elected):
-        raise ValueError(f"{label}: elected {sorted(elected)} against {seats} seats and capitals {sorted(capitals)}")
+    if len(elected) != seats or (named or capitals) != elected:
+        raise ValueError(f"{label}: elected {sorted(elected)} against {seats} seats and the declared {sorted(named)}")
     return {**book, "candidates": candidates, "elected": elected, "rounds": rounds}
 
 
-def rows(pdf: str, year: int) -> dict[str, list[dict[str, object]]]:
-    statutory: dict[str, tuple[str, int]] = {}
-    for words in read_pages(pdf):
+def rows(pdf: str, year: int, names: tuple[str, ...] = ()) -> dict[str, list[dict[str, object]]]:
+    statutory: dict[str, tuple[str, int]] = {fold(n): (n, 0) for n in names}
+    for words in read_pages(pdf) if not names else ():
         for _, line in read_lines(words):
             name = " ".join(w[4] for w in line if not NUMBER.match(w[4]) and w[0] < min((x[0] for x in line if NUMBER.match(x[4])), default=0))
             figures = [w[4] for w in line if NUMBER.match(w[4])]
@@ -330,6 +350,7 @@ def rows(pdf: str, year: int) -> dict[str, list[dict[str, object]]]:
     for book in read_book(pdf):
         done = finish(assemble(book), year, ABBREVIATIONS)
         label, total_seats = statutory[fold(str(done["constituency"]))]
+        total_seats = int(done["seats"])
         valid, invalid = int(done["valid"]), int(done["invalid"])
         units.append(
             {
