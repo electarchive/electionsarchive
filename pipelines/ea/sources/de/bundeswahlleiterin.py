@@ -30,6 +30,12 @@ FILES = {
     "ep_elected": f"{EW24}/daten/gewaehlte_02.xml",
     "ep_parties": f"{BWL}/dam/jcr/2a99cb27-da04-4a51-977a-4ef408e3479f/ew24_parteien_utf8.csv",
 }
+CANDIDATES = "https://web.archive.org/web/20250320id_/https://www.bundeswahlleiterin.de/dam/jcr/d638438b-490d-4ad4-baac-45adac107efc/btw25_bewerb.zip"
+CANDIDATES_URL = "https://www.bundeswahlleiterin.de/dam/jcr/d638438b-490d-4ad4-baac-45adac107efc/btw25_bewerb.zip"
+CANDIDATES_NOTE = (
+    "The Bundeswahlleiterin withdrew this file on 15 September 2025 (§ 86 (3) BWO). The copy used here is the one the "
+    "Internet Archive saved on 20 March 2025, as published on 7 February 2025."
+)
 ELECTION = date(2025, 2, 23)
 CLOSED = date(2025, 2, 24)
 CONSTITUTED = date(2025, 3, 25)
@@ -83,9 +89,9 @@ BALLOTS = {"Erststimmen": 1, "Zweitstimmen": 2}
 ANNOTATION = re.compile(r"\s*\((Teil|Wkr\. [^)]*|in .+ enthalten|einschl\. .+)\)$")
 THRESHOLD = {"percent": 5, "level": "party", "scope": "national", "constituencies": 3}
 RESULTS_NOTE = (
-    "Unsuccessful candidates may have their personal data withdrawn after the election (§ 86 (3) BWO), so only the "
-    "630 elected members are named. Every other constituency candidate appears under their party or, for "
-    "independents, their surname."
+    "Constituency and list candidates are named from the Bundeswahlleiterin's list of applicants as admitted on "
+    "7 February 2025. The official site withdrew that file after the election (§ 86 (3) BWO), so a candidate who "
+    "lost may no longer appear there."
 )
 DISTRICTS_NOTE = (
     "A polling district with fewer than 30 voters hands its ballot box to another district in the same constituency, "
@@ -124,6 +130,7 @@ EUROPEAN_METHODOLOGY = (
 def fetch() -> None:
     for url in FILES.values():
         raw.fetch(SOURCE, url, suffix="." + url.rsplit(".", 1)[1])
+    raw.fetch(SOURCE, CANDIDATES, suffix=".zip")
 
 
 def parse() -> None:
@@ -583,6 +590,43 @@ def parse() -> None:
     if failures:
         raise ValueError("\n".join(failures))
 
+    with zipfile.ZipFile(raw.cached(SOURCE, CANDIDATES).path) as archive:
+        applicants = pl.read_csv(
+            archive.read("btw25_bewerb_utf8.csv"), separator=";", skip_rows=8, infer_schema=False
+        ).select(
+            key=pl.concat_str("Nachname", "Vornamen", "Geburtsjahr", separator=":"),
+            name=pl.concat_str("Rufname", "Namenszusatz", "Nachname", separator=" ", ignore_nulls=True),
+            ballot_name=pl.concat_str(
+                pl.concat_str("Titel", "Namenszusatz", "Nachname", separator=" ", ignore_nulls=True),
+                "Vornamen",
+                separator=", ",
+            ),
+            birth_year=pl.col("Geburtsjahr").cast(pl.Int16),
+            gender=pl.col("Geschlecht").replace_strict({"m": "male", "w": "female", "d": "diverse"}),
+            wk=pl.when(pl.col("Gebietsart") == "Wahlkreis").then(pl.col("Gebietsnummer").str.zfill(3)),
+            land=pl.when(pl.col("Gebietsart") == "Land").then(pl.col("Gebietsnummer").str.zfill(2)),
+            group=pl.when(pl.col("Kennzeichen") == "anderer Kreiswahlvorschlag")
+            .then(pl.lit("EB:") + pl.col("Nachname"))
+            .otherwise(pl.col("GruppennameKurz").fill_null("Team Todenhöfer").replace({"GRÜNE/B 90": "GRÜNE"})),
+            position=pl.col("Listenplatz").cast(pl.Int16),
+        )
+    problems = {
+        "constituency applicants without a candidate option": applicants.filter(pl.col("wk").is_not_null()).join(
+            candidates, left_on=["wk", "group"], right_on=["wk", "group"], how="anti"
+        ),
+        "list applicants without a list": applicants.filter(pl.col("land").is_not_null()).join(
+            lists, left_on=["land", "group"], right_on=["land", "group"], how="anti"
+        ),
+        "members missing from the applicants": elected.join(applicants, on="key", how="anti"),
+        "members named differently": elected.join(applicants.unique("key"), on="key").filter(
+            pl.col("name") != pl.col("name_right")
+        ),
+    }
+    failures = [f"{label}: {frame.head(3)}" for label, frame in problems.items() if frame.height]
+    if failures:
+        raise ValueError("\n".join(failures))
+    applicants.write_parquet(PARSED / "applicants.parquet")
+
     european = pl.read_csv(
         raw.cached(SOURCE, FILES["ep_results"]).path, separator=";", skip_rows=9, infer_schema=False
     ).filter(pl.col("Anzahl").is_not_null())
@@ -714,6 +758,7 @@ def emit() -> Path:
     lists = pl.read_parquet(PARSED / "lists.parquet")
     parties = pl.read_parquet(PARSED / "parties.parquet")
     members = pl.read_parquet(PARSED / "members.parquet")
+    applicants = pl.read_parquet(PARSED / "applicants.parquet")
     european_values = pl.read_parquet(PARSED / "ep_values.parquet")
     european_options = pl.read_parquet(PARSED / "ep_options.parquet")
     european_lists = pl.read_parquet(PARSED / "ep_lists.parquet")
@@ -751,6 +796,20 @@ def emit() -> Path:
                 attribution=f"© Die Bundeswahlleiterin, Wiesbaden {held.year}",
                 notes=notes,
             )
+        candidates_source = cs.source("Die Bundeswahlleiterin", "Bundestagswahl 2025: Wahlbewerberinnen und Wahlbewerber")
+        cs.add(
+            "source",
+            id=candidates_source,
+            kind="official_body",
+            publisher="Die Bundeswahlleiterin",
+            title="Bundestagswahl 2025: Wahlbewerberinnen und Wahlbewerber",
+            url=CANDIDATES_URL,
+            license="Datenlizenz Deutschland – Namensnennung – Version 2.0",
+            license_url="https://www.govdata.de/dl-de/by-2-0",
+            attribution="© Die Bundeswahlleiterin, Wiesbaden 2025",
+            notes=CANDIDATES_NOTE,
+        )
+        cs.artifact(raw.cached(SOURCE, CANDIDATES), candidates_source)
         for label, url in FILES.items():
             cs.artifact(
                 raw.cached(SOURCE, url),
@@ -1113,46 +1172,48 @@ def emit() -> Path:
                     )
 
         persons: dict[str, UUID] = {}
-        for row in members.iter_rows(named=True):
-            person = cs.key(f"{SOURCE}.person", f"{ELECTION.year}:{row['key']}")
-            persons[row["key"]] = person
-            cs.add(
-                "person",
-                id=person,
-                gender=row["gender"],
-                birth_date=date(row["birth_year"], 1, 1),
-                birth_precision="year",
-            )
-            name(person, row["name"])
+        list_seats = dict(members.filter(pl.col("seat") == "list").select("key", "seat").iter_rows())
+        for row in applicants.iter_rows(named=True):
+            if row["key"] not in persons:
+                persons[row["key"]] = cs.key(f"{SOURCE}.person", f"{ELECTION.year}:{row['key']}")
+                cs.add(
+                    "person",
+                    id=persons[row["key"]],
+                    gender=row["gender"],
+                    birth_date=date(row["birth_year"], 1, 1),
+                    birth_precision="year",
+                )
+                name(persons[row["key"]], row["name"])
+            person = persons[row["key"]]
             if row["wk"] is not None:
                 cs.add(
                     "candidacy",
-                    id=cs.key("de.candidacy", f"{ELECTION}:{row['wk']}:{row['wk_group']}"),
+                    id=cs.key("de.candidacy", f"{ELECTION}:{row['wk']}:{row['group']}"),
                     person_id=person,
-                    option_id=UUID(options[f"1:{row['wk']}:{row['wk_group']}"]),
+                    option_id=UUID(options[f"1:{row['wk']}:{row['group']}"]),
                     role="head",
                     ballot_name=row["ballot_name"],
-                    member_of_party_id=party_ids[row["wk_group"]],
+                    member_of_party_id=party_ids.get(row["group"]),
+                    is_independent=row["group"].startswith("EB:"),
                 )
             if row["land"] is not None:
-                candidacy = cs.key(
-                    "de.candidacy", f"{ELECTION}:list:{row['land']}:{row['list_group']}:{row['position']}"
-                )
+                candidacy = cs.key("de.candidacy", f"{ELECTION}:list:{row['land']}:{row['group']}:{row['position']}")
                 cs.add(
                     "candidacy",
                     id=candidacy,
                     person_id=person,
-                    option_id=UUID(options[f"2:{row['land']}:{row['list_group']}"]),
+                    option_id=UUID(options[f"2:{row['land']}:{row['group']}"]),
                     role="list_member",
                     list_position=row["position"],
                     ballot_name=row["ballot_name"],
-                    member_of_party_id=party_ids[row["list_group"]],
+                    member_of_party_id=party_ids[row["group"]],
+                    is_independent=False,
                 )
-                if row["seat"] == "list":
+                if row["key"] in list_seats:
                     cs.add(
                         "outcome",
                         result_set_id=default_sets[f"list:{row['land']}"],
-                        option_id=UUID(options[f"2:{row['land']}:{row['list_group']}"]),
+                        option_id=UUID(options[f"2:{row['land']}:{row['group']}"]),
                         candidacy_id=candidacy,
                         kind="elected",
                     )
@@ -1335,6 +1396,7 @@ def emit() -> Path:
                 list_position=row["position"],
                 ballot_name=row["ballot_name"],
                 member_of_party_id=european_party_ids[row["list_group"]],
+                is_independent=False,
             )
             cs.add(
                 "outcome",
