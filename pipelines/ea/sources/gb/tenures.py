@@ -12,7 +12,7 @@ from ea.changeset import Changeset
 from ea.store import connect
 
 SOURCE = "gb.tenures"
-VERSION = "4"
+VERSION = "5"
 SERVICE = "https://query.wikidata.org/sparql?" + urlencode(
     {
         "query": """SELECT ?item ?name ?pos ?start ?end ?cause ?district ?group ?mnis WHERE {
@@ -39,12 +39,36 @@ ENDED = {
     "Q51212178": "appointed",
 }
 VACATED = {*ENDED, "Q50393121"}
+DOUBLE = re.compile(
+    r"also (?:being )?(?:elected|returned)|deci(?:ding|sion) to sit|option to sit|opting to sit|opted to sit"
+)
+NAMED = re.compile(r"due to (?!the )([A-Z][\w'’-]*(?: [A-Z][\w'’-]*)*) ")
+CAUSES = (
+    ("died", re.compile(r"death|died")),
+    ("elevated", re.compile(r"elevat|peerage|succession to")),
+    ("resigned", re.compile(r"resign|chiltern|northstead")),
+    ("appointed", re.compile(r"appoint")),
+    ("annulled", re.compile(r"void|petition|unseated")),
+    ("expelled", re.compile(r"expel")),
+    ("disqualified", re.compile(r"bankrupt|disqualif|lunacy|insan")),
+)
 TITLES = {"sir", "lord", "dr", "hon", "rev", "captain", "major", "colonel", "general", "admiral", "viscount", "earl"}
 
 
 def fold(text: str) -> list[str]:
     plain = unicodedata.normalize("NFKD", text.split(",")[0]).encode("ascii", "ignore").decode().lower()
     return [word for word in re.findall(r"[a-z]+", plain.replace("'", "")) if word not in TITLES]
+
+
+def vacated(cause: str) -> str | None:
+    if DOUBLE.search(cause):
+        return "double"
+    return next((kind for kind, pattern in CAUSES if pattern.search(cause.lower())), None)
+
+
+def cause_name(cause: str) -> list[str] | None:
+    found = NAMED.search(cause)
+    return fold(re.sub(r"['’]s?$", "", found.group(1)))[-1:] if found else None
 
 
 def fetch() -> None:
@@ -101,6 +125,7 @@ def emit() -> Path:
             "members who joined between elections, and when and why each member left, from Wikidata",
             polity="GB",
         )
+        cs.manifest["scope"] = {"polity": "GB", "replaces": {"tenure_affiliation": ["gb.members", "identity"]}}
         commons = cs.key("gb.body", "house-of-commons")
         if commons in cs.minted:
             raise ValueError("the House of Commons must already exist")
@@ -123,14 +148,13 @@ def emit() -> Path:
         ).fetchall()
         following = {election: elections[index + 1][1] for index, (election, _) in enumerate(elections[:-1])}
         dated = {day: election for election, day in elections}
-        days = dict(elections)
         seated = {
             election
             for (election,) in conn.execute(
                 """select distinct c.election_id from tenure t join contest c on c.id = t.contest_id
-                   join changeset s on s.id = t.changeset_id
-                   where t.body_id = %s and s.pipeline not in (%s, 'identity')""",
-                [commons, SOURCE],
+                   where t.body_id = %s
+                     and not exists (select from external_id x where x.entity_id = t.id and x.scheme = %s)""",
+                [commons, f"{SOURCE}.tenure"],
             ).fetchall()
         }
         parties = dict(
@@ -138,196 +162,306 @@ def emit() -> Path:
                 "select e.value, e.entity_id from external_id e join party p on p.id = e.entity_id where e.scheme = 'wikidata'"
             ).fetchall()
         )
-        linked: dict[str, UUID] = {}
         items: dict[UUID, set[str]] = defaultdict(set)
+        linked: dict[str, UUID] = {}
         for scheme, value, person in conn.execute(
             """select e.scheme, e.value, e.entity_id from external_id e join person p on p.id = e.entity_id
-               where e.scheme in ('wikidata', 'mnis')"""
+               where e.scheme in ('wikidata', 'mnis')
+                 and not exists (select from entity_merge m where m.entity_id = e.entity_id)"""
         ).fetchall():
-            linked[f"{scheme}:{value}"] = person
             items[person].add(f"{scheme}:{value}")
-        winners: dict[UUID, list[tuple[UUID, UUID, list[str], str, UUID | None]]] = defaultdict(list)
-        for election, contest, person, party, person_name, contest_name in conn.execute(
+            linked[f"{scheme}:{value}"] = person
+        winners: dict[UUID, list[tuple[UUID, UUID, list[str], str, UUID | None, UUID | None]]] = defaultdict(list)
+        for election, contest, person, party, person_name, contest_name, area in conn.execute(
             """select e.id, c.id, cy.person_id, o.party_id,
                       (select text from name where entity_id = cy.person_id and is_preferred limit 1),
-                      (select text from name where entity_id = c.id and is_preferred limit 1)
+                      (select text from name where entity_id = c.id and is_preferred limit 1), c.district_area_id
                from contest c
                join election e on e.id = c.election_id
                join result_set rs on rs.contest_id = c.id and rs.is_default
                join outcome x on x.result_set_id = rs.id and x.kind = 'elected'
                join contest_option o on o.id = x.option_id
                join candidacy cy on cy.option_id = o.id and cy.role = 'head'
-               where c.body_id = %s and e.kind = 'general'""",
+               where c.body_id = %s and e.kind = 'general'
+               order by c.id, cy.person_id""",
             [commons],
         ).fetchall():
-            winners[election].append((contest, person, fold(person_name or ""), contest_name or "", party))
-        stood: dict[tuple[UUID, str], list[tuple[UUID, list[str], UUID | None]]] = defaultdict(list)
-        for election, contest_name, person, person_name, party in conn.execute(
-            """select e.id, (select text from name where entity_id = c.id and is_preferred limit 1), cy.person_id,
-                      (select text from name where entity_id = cy.person_id and is_preferred limit 1), o.party_id
-               from contest c join election e on e.id = c.election_id
-               join contest_option o on o.contest_id = c.id
+            winners[election].append((contest, person, fold(person_name or ""), contest_name or "", party, area))
+        by_elections: list[tuple[date, UUID, UUID | str, str, list[tuple[UUID, list[str], UUID | None]]]] = []
+        for day, contest, area, place, cause, people in conn.execute(
+            """select e.date_from, c.id, c.district_area_id,
+                      (select text from name where entity_id = c.id and is_preferred limit 1),
+                      (select body_md from note where entity_id = c.id and kind = 'context' limit 1),
+                      array_agg(array[cy.person_id::text, coalesce((select text from name
+                        where entity_id = cy.person_id and is_preferred limit 1), ''), o.party_id::text]
+                        order by cy.person_id)
+               from contest c
+               join election e on e.id = c.election_id
+               join result_set rs on rs.contest_id = c.id and rs.is_default
+               join outcome x on x.result_set_id = rs.id and x.kind = 'elected'
+               join contest_option o on o.id = x.option_id
                join candidacy cy on cy.option_id = o.id and cy.role = 'head'
-               where c.body_id = %s and e.kind = 'general'""",
+               where c.body_id = %s and e.kind = 'by_election'
+               group by 1, 2, 3, 4 order by 1, 2""",
             [commons],
         ).fetchall():
-            place = (contest_name or "").partition(" in ")[2]
-            stood[(election, place)].append((person, fold(person_name or ""), party))
-        found: dict[str, UUID] = {}
-        places: dict[tuple[str, str], str] = {}
-        tenures: dict[str, list[dict[str, object]]] = defaultdict(list)
-        matched = joined = left = created = orphaned = 0
-        for pos, members in chains.items():
+            by_elections.append(
+                (
+                    day,
+                    contest,
+                    area or (place or "").partition(" in ")[2],
+                    cause or "",
+                    [(UUID(person), fold(text), UUID(party) if party else None) for person, text, party in people],
+                )
+            )
+        held: dict[tuple[UUID, UUID], UUID] = {}
+        keyed: set[UUID] = set()
+        joiners: dict[str, UUID] = {}
+        for entity, contest, person, value in conn.execute(
+            """select t.id, t.contest_id, t.person_id, x.value from external_id x
+               join entity e on e.id = x.entity_id and e.retired_by is null
+               join tenure t on t.id = x.entity_id where x.scheme = %s""",
+            [f"{SOURCE}.tenure"],
+        ).fetchall():
+            keyed.add(entity)
+            joiners[value] = person
+            if contest is not None:
+                held[(contest, person)] = entity
+        emitted: set[UUID] = set()
+        split: list[tuple[date, UUID, UUID, UUID]] = []
+        matched = joined = left = ended = unresolved = declined = dead = unmatched = 0
+        assigned: dict[UUID, list[tuple[date, list[dict[str, object]]]]] = defaultdict(list)
+        for members in chains.values():
             modal = Counter(member["start"] for member in members).most_common(1)[0][0]
             near = [day for day in dated if abs((day - modal).days) <= 40]
-            if not near:
-                continue
-            election = dated[min(near, key=lambda day: abs((day - modal).days))]
+            if near:
+                assigned[dated[min(near, key=lambda day: abs((day - modal).days))]].append((modal, members))
+        for election, start in elections:
             if election in seated:
                 continue
             end = following.get(election)
-            general = [member for member in members if member["start"] <= modal + timedelta(days=45)]
-            taken: set[UUID] = set()
-            for contest, person, words, contest_name, party in winners[election]:
-                if not words:
-                    continue
-                pool = [
+            general = [
+                member
+                for modal, members in assigned[election]
+                for member in members
+                if member["start"] <= modal + timedelta(days=45)
+            ]
+            later = [
+                member
+                for modal, members in assigned[election]
+                for member in members
+                if member["start"] > modal + timedelta(days=7)
+            ]
+            sitting = [b for b in by_elections if b[0] > start and (end is None or b[0] < end)]
+            returned = Counter(person for _, person, _, _, _, _ in winners[election])
+            open_seats: dict[UUID | str, list[dict[str, object]]] = defaultdict(list)
+            records: list[dict[str, object]] = []
+
+            def pick(pool: list[dict[str, object]], person: UUID, words: list[str]) -> dict[str, object] | None:
+                hits = [
                     member
-                    for member in general
+                    for member in pool
                     if "tenure" not in member
-                    and {f"wikidata:{member['item']}", f"mnis:{numbers.get(member['item'])}"} & items[person]
+                    and {f"wikidata:{member['item']}", f"mnis:{numbers.get(str(member['item']))}"} & items[person]
                 ] or [
                     member
-                    for member in general
-                    if "tenure" not in member and fold(names[member["item"]])[-1:] == words[-1:]
+                    for member in pool
+                    if "tenure" not in member and words and fold(names[str(member["item"])])[-1:] == words[-1:]
                 ]
-                if len(pool) > 1:
-                    pool = [member for member in pool if fold(names[member["item"]])[:1] == words[:1]] or pool
-                if len(pool) != 1 or contest in taken:
-                    continue
-                member = pool[0]
-                taken.add(contest)
-                member["tenure"] = cs.key(f"{SOURCE}.tenure", f"{contest}:{person}")
-                member["person"], member["party"] = person, party
-                found.setdefault(member["item"], person)
-                places[(pos, str(member["district"]))] = contest_name.partition(" in ")[2]
-                matched += 1
-            for contest, person, _, _, party in winners[election]:
-                tenure = cs.key(f"{SOURCE}.tenure", f"{contest}:{person}")
-                member = next((member for member in general if member.get("tenure") == tenure), None)
-                stop, cause = end, None
-                if (
-                    member is not None
-                    and member["cause"] in VACATED
-                    and member["end"] is not None
-                    and (end is None or member["end"] < end - timedelta(days=1))
-                ):
-                    stop, cause = member["end"], ENDED.get(str(member["cause"]), None)
-                    left += 1
-                cs.add(
-                    "tenure",
-                    id=tenure,
-                    person_id=person,
-                    body_id=commons,
-                    from_date=days[election],
-                    from_precision="day",
-                    to_date=stop,
-                    to_precision="day",
-                    acquired_via="elected",
-                    contest_id=contest,
-                    ended_via=cause if stop != end else (None if end is None else "term_end"),
-                )
-                if party is not None:
-                    cs.add(
-                        "tenure_affiliation",
-                        tenure_id=tenure,
-                        kind="party",
-                        party_id=party,
-                        valid_from=days[election],
-                        valid_from_precision="day",
-                        valid_to=stop,
-                        valid_to_precision="day",
-                    )
-                if member is not None:
-                    tenures[(pos, str(member["district"]))].append({**member, "stop": stop})
-            for member in sorted(members, key=lambda member: member["start"]):
-                if "tenure" in member or member["start"] <= modal + timedelta(days=7):
-                    continue
-                if end is not None and member["start"] >= end:
-                    continue
-                before = [
-                    other
-                    for other in tenures[(pos, str(member["district"]))]
-                    if other["stop"] is not None and other["stop"] <= member["start"] and "successor" not in other
-                ]
-                predecessor = max(before, key=lambda other: other["stop"], default=None)
-                if predecessor is None:
-                    orphaned += 1
-                    continue
-                item = str(member["item"])
-                place = places.get((pos, str(member["district"])), "")
-                person = (
-                    next(
-                        (other["person"] for other in members if other["item"] == member["item"] and "person" in other),
+                if len(hits) > 1:
+                    hits = [member for member in hits if fold(names[str(member["item"])])[:1] == words[:1]] or hits
+                return hits[0] if len(hits) == 1 else None
+
+            for contest, person, words, contest_name, party, area in winners[election]:
+                seat = area or contest_name.partition(" in ")[2]
+                if returned[person] > 1:
+                    choice = next(
+                        (
+                            b
+                            for b in sitting
+                            if b[2] == seat and DOUBLE.search(b[3]) and (cause_name(b[3]) in (None, words[-1:]))
+                        ),
                         None,
                     )
-                    or found.get(item)
-                    or linked.get(f"wikidata:{item}")
-                    or linked.get(f"mnis:{numbers.get(item)}")
-                )
-                words = fold(names[item])
-                party = None
-                for neighbor in (election, next((e for e, d in elections if end is not None and d == end), None)):
-                    for candidate, candidate_words, candidate_party in stood.get((neighbor, place), []):
-                        if candidate_words[-1:] == words[-1:] and candidate_words[:1] == words[:1]:
-                            person = person or candidate
-                            party = party or candidate_party
-                if person is None:
-                    person = cs.key(f"{SOURCE}.person", item)
-                    if person in cs.minted:
-                        cs.add("person", id=person)
+                    if choice is not None:
+                        others = [
+                            name.partition(" in ")[2]
+                            for other, someone, _, name, _, _ in winners[election]
+                            if someone == person and other != contest
+                        ]
                         cs.add(
-                            "name",
-                            entity_id=person,
-                            text=names[item].split(",")[0],
-                            lang="en",
-                            kind="official",
-                            is_preferred=True,
+                            "note",
+                            entity_id=contest,
+                            kind="context",
+                            body_md=f"Also returned for {' and '.join(others)}, where the member chose to sit; this seat "
+                            f"was filled at a by-election on {choice[0]:%-d %B %Y}.",
                         )
-                        cs.add("external_id", entity_id=person, scheme="wikidata", value=item)
-                        if item in numbers:
-                            cs.add("external_id", entity_id=person, scheme="mnis", value=numbers[item])
-                        created += 1
-                found.setdefault(item, person)
-                tenure = cs.key(f"{SOURCE}.tenure", f"{item}:{member['start']}")
-                stop, cause = end, "term_end" if end is not None else None
+                        declined += 1
+                        continue
+                tenure = held.get((contest, person)) or cs.key(f"{SOURCE}.tenure", f"{contest}:{person}")
+                member = pick(general, person, words)
+                record: dict[str, object] = {
+                    "tenure": tenure,
+                    "person": person,
+                    "words": words,
+                    "from": start,
+                    "contest": contest,
+                    "party": party,
+                    "stop": end,
+                    "cause": None if end is None else "term_end",
+                    "spans": None,
+                    "succeeds": None,
+                }
+                if member is not None:
+                    member["tenure"] = tenure
+                    matched += 1
+                    if (
+                        member["cause"] in VACATED
+                        and member["end"] is not None
+                        and (end is None or member["end"] < end - timedelta(days=1))
+                    ):
+                        record["stop"], record["cause"] = member["end"], ENDED.get(str(member["cause"]))
+                        left += 1
+                records.append(record)
+                open_seats[seat].append(record)
+            for day, contest, area, cause, people in sitting:
+                kind = vacated(cause)
+                if kind == "double":
+                    previous: list[dict[str, object]] = []
+                else:
+                    pool = [record for record in open_seats[area] if record["from"] < day and "successor" not in record]
+                    named = cause_name(cause)
+                    if len(pool) > len(people) and named is not None:
+                        pool = [record for record in pool if record["words"][-1:] == named] or pool
+                    if len(pool) > len(people):
+                        early = [
+                            record
+                            for record in pool
+                            if record["stop"] is not None and record["stop"] <= day and record["cause"] != "term_end"
+                        ]
+                        pool = early if len(early) == len(people) else pool
+                    previous = pool if len(pool) == len(people) else []
+                    if not previous:
+                        unresolved += 1
+                for record in previous:
+                    record["successor"] = True
+                    if record["stop"] is None or record["stop"] > day or record["cause"] == "term_end":
+                        record["stop"], record["cause"] = day, kind
+                        ended += 1
+                for index, (person, words, party) in enumerate(people):
+                    if kind == "died" and any(record["person"] == person for record in previous):
+                        print(f"REVIEW {day} {contest}: the winner is the member whose death caused the by-election")
+                        dead += 1
+                        continue
+                    member = pick(
+                        [member for member in later if abs((member["start"] - day).days) <= 60], person, words
+                    )
+                    tenure = held.get((contest, person)) or cs.key(
+                        f"{SOURCE}.tenure",
+                        f"{member['item']}:{member['start']}" if member is not None else f"{contest}:{person}",
+                    )
+                    holder = person
+                    if member is not None:
+                        ids = {f"wikidata:{member['item']}", f"mnis:{numbers.get(str(member['item']))}"}
+                        known = next((linked[id] for id in sorted(ids) if id in linked), None)
+                        if not ids & items[person] and known is not None and known != person:
+                            holder = known
+                            split.append((day, contest, person, known))
+                    record = {
+                        "tenure": tenure,
+                        "person": holder,
+                        "words": words,
+                        "from": day,
+                        "contest": contest,
+                        "party": party,
+                        "stop": end,
+                        "cause": None if end is None else "term_end",
+                        "spans": None,
+                        "succeeds": previous[index]["tenure"] if len(previous) == len(people) else None,
+                    }
+                    if member is not None:
+                        member["tenure"] = tenure
+                        spans = [
+                            (since, until, parties.get(str(group)) if group is not None else None)
+                            for since, until, group in member["pieces"]
+                        ]
+                        if any(group is not None for _, _, group in spans):
+                            record["spans"] = spans
+                        if (
+                            member["cause"] in VACATED
+                            and member["end"] is not None
+                            and (end is None or member["end"] < end - timedelta(days=1))
+                        ):
+                            record["stop"], record["cause"] = member["end"], ENDED.get(str(member["cause"]))
+                            left += 1
+                    records.append(record)
+                    open_seats[area].append(record)
+                    joined += 1
+            for member in later:
+                if "tenure" in member or (end is not None and member["start"] >= end):
+                    continue
+                item = str(member["item"])
+                surname = fold(names[item])[-1:]
+                if any(
+                    record["contest"] is not None
+                    and record["from"] > start
+                    and abs((record["from"] - member["start"]).days) <= 90
+                    and record["words"][-1:] == surname
+                    for record in records
+                ):
+                    continue
+                holder = (
+                    linked.get(f"wikidata:{item}")
+                    or linked.get(f"mnis:{numbers.get(item)}")
+                    or joiners.get(f"{item}:{member['start']}")
+                )
+                if holder is None:
+                    continue
+                record = {
+                    "tenure": cs.key(f"{SOURCE}.tenure", f"{item}:{member['start']}"),
+                    "person": holder,
+                    "words": surname,
+                    "from": member["start"],
+                    "contest": None,
+                    "party": None,
+                    "stop": end,
+                    "cause": None if end is None else "term_end",
+                    "spans": [
+                        (since, until, parties.get(str(group)) if group is not None else None)
+                        for since, until, group in member["pieces"]
+                    ],
+                    "succeeds": None,
+                }
                 if (
                     member["cause"] in VACATED
                     and member["end"] is not None
                     and (end is None or member["end"] < end - timedelta(days=1))
                 ):
-                    stop, cause = member["end"], ENDED.get(str(member["cause"]))
-                    left += 1
-                predecessor["successor"] = tenure
+                    record["stop"], record["cause"] = member["end"], ENDED.get(str(member["cause"]))
+                member["tenure"] = record["tenure"]
+                print(f"REVIEW {member['start']} {names[item]} ({item}): joined with no by-election winner to match")
+                records.append(record)
+                unmatched += 1
+            for record in records:
+                tenure, stop = record["tenure"], record["stop"]
+                emitted.add(tenure)
                 cs.add(
                     "tenure",
                     id=tenure,
-                    person_id=person,
+                    person_id=record["person"],
                     body_id=commons,
-                    from_date=member["start"],
+                    from_date=record["from"],
                     from_precision="day",
                     to_date=stop,
                     to_precision="day",
                     acquired_via="elected",
-                    ended_via=cause,
-                    succeeds_tenure_id=predecessor["tenure"],
+                    contest_id=record["contest"],
+                    ended_via=record["cause"],
+                    succeeds_tenure_id=record["succeeds"],
                 )
-                spans = [
-                    (since, until, parties.get(str(group)) if group is not None else None)
-                    for since, until, group in member["pieces"]
-                ]
-                if all(group is None for _, _, group in spans) and party is not None:
-                    spans = [(member["start"], stop, party)]
+                spans = record["spans"] or (
+                    [(record["from"], stop, record["party"])] if record["party"] is not None else []
+                )
                 for index, (since, until, group) in enumerate(spans):
                     if group is None:
                         continue
@@ -337,15 +471,24 @@ def emit() -> Path:
                         tenure_id=tenure,
                         kind="party",
                         party_id=group,
-                        valid_from=since,
+                        valid_from=max(since, record["from"]),
                         valid_from_precision="day",
                         valid_to=upto if upto is None or stop is None else min(upto, stop),
                         valid_to_precision="day",
                     )
-                member["person"] = person
-                tenures[(pos, str(member["district"]))].append({**member, "tenure": tenure, "stop": stop})
-                joined += 1
+        stale = sorted(keyed - emitted, key=str)
+        for tenure in stale:
+            cs.add(
+                "entity_retirement",
+                entity_id=tenure,
+                reason="A Commons tenure this pipeline no longer emits: a seat the member declined after a double "
+                "return, or a member joining between elections now held on the by-election contest",
+            )
         print(
-            f"{matched} general winners matched, {joined} joined between elections, {left} left early, {created} new people, {orphaned} entrants with no departed predecessor left out"
+            f"{matched} general winners matched, {joined} by-election winners, {left} left early per Wikidata, "
+            f"{ended} predecessors ended by a by-election, {unresolved} by-elections with no predecessor found, "
+            f"{declined} declined seats, {len(stale)} tenures retired, {len(split)} by-election winners held apart "
+            f"from their Wikidata person, {dead} by-election winners who caused the vacancy by dying, {unmatched} "
+            "joiners with no by-election winner"
         )
         return cs.write()
