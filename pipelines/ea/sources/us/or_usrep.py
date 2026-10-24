@@ -19,6 +19,12 @@ FILES = {
     date(1992, 11, 3): "https://records.sos.state.or.us/ORSOSWebDrawer/Record/8411064/File/document",
     date(1994, 11, 8): "https://digitalcollections.library.oregon.gov/assets/downloadwiz/343327",
 }
+PAGE_1998 = "https://web.archive.org/web/20001018053233if_/http://www.sos.state.or.us/elections/nov398/other.info/usrep.htm"
+METHOD_1998 = (
+    "County totals are from the Secretary of State's official results page for the November 3, 1998 general "
+    "election (Wayback Machine capture of 2000-10-18). Each candidate's county sum equals the district total printed "
+    "on the page; the page's Misc. column is the write-in count."
+)
 METHOD = (
     "County totals are from the Secretary of State's official abstract of votes for the general election (a scan "
     "held by the Oregon State Library for 1994), read from the page images. Each candidate's county sum equals the "
@@ -27,6 +33,13 @@ METHOD = (
 
 
 def fetch() -> None:
+    try:
+        raw.cached(SOURCE, PAGE_1998)
+    except LookupError:
+        page = subprocess.run(["curl", "-sL", "-m", "120", PAGE_1998], capture_output=True, check=True).stdout
+        raw.store(
+            SOURCE, PAGE_1998, page, suffix=".htm", retrieved_at=datetime.now(UTC), media_type="text/html"
+        )
     for url in FILES.values():
         try:
             raw.cached(SOURCE, url)
@@ -76,13 +89,13 @@ def emit() -> Path:
     return usrep_county.emit(
         SOURCE,
         VERSION,
-        "Oregon's U.S. House general elections of 1992 and 1994 by county from the Secretary of State's abstracts",
+        "Oregon's U.S. House general elections of 1992, 1994, and 1998 by county from the Secretary of State's abstracts",
         PUBLISHER,
         TITLE,
         "https://sos.oregon.gov/elections/pages/historical-data.aspx",
         "OR",
         "41",
         pl.read_parquet(PARSED / "lines.parquet"),
-        [raw.cached(SOURCE, url) for url in FILES.values()],
-        lambda key: METHOD,
+        [raw.cached(SOURCE, url) for url in FILES.values()] + [raw.cached(SOURCE, PAGE_1998)],
+        lambda key: METHOD_1998 if key.startswith("1998") else METHOD,
     )
