@@ -68,11 +68,15 @@
   "home_polities": "Polities",
   "home_elections": [
     {
-      "declarations": ["input count", "local countPlural = count: plural"],
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural",
+        "local countText = count: number"
+      ],
       "selectors": ["countPlural"],
       "match": {
-        "countPlural=one": "{count} election",
-        "countPlural=*": "{count} elections"
+        "countPlural=one": "{countText} election",
+        "countPlural=*": "{countText} elections"
       }
     }
   ],

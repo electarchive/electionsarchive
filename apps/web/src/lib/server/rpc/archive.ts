@@ -10226,10 +10226,10 @@ export const polities = {
             parts: number | null;
           }>(sql`
             select e.id, e.date_from::text as date, ${CYCLE} as year, e.kind::text as kind, e.status::text as status,
-              lead.top, lead.parts
+              case when lead.population is not null then lead.top end as top, lead.parts
             from election e
             left join lateral (
-              select ch.polity_id as top, count(*) over ()::int as parts
+              select ch.polity_id as top, count(*) over ()::int as parts, g.population
               from election ch
               left join lateral (
                 select max(g.population) as population from coverage_government g where g.polity_id = ch.polity_id
