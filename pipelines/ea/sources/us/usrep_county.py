@@ -22,6 +22,7 @@ def emit(
     artifacts: Iterable[Artifact],
     note_for: Callable[[str], str],
     official: bool = False,
+    statewide: bool = False,
 ) -> Path:
     with connect() as conn:
         cs = Changeset(conn, pipeline=source_name, version=version, summary=summary, polity="US")
@@ -56,11 +57,11 @@ def emit(
         contests = dict(
             conn.execute(
                 "select value, entity_id from external_id where scheme = 'us.contest' and value ~ %s",
-                [f":{state}:house:"],
+                [f":{state}:" + ("(president|governor|senate)$" if statewide else "house:")],
             )
         )
         for (day, district), rows in frame.group_by("day", "district", maintain_order=True):
-            key = f"{day}:{state}:house:{district}"
+            key = f"{day}:{state}:{district}" if statewide else f"{day}:{state}:house:{district}"
             contest = contests.get(key)
             if contest is None:
                 print(f"{key}: no contest in the archive")
