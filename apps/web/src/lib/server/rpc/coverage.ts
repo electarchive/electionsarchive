@@ -160,7 +160,7 @@ export const coverage = {
           select count(distinct e.id)::int as elections, count(c.id)::int as contests,
             min(extract(year from e.date_from))::int as first, max(extract(year from e.date_from))::int as last
           from election e join contest c on c.election_id = e.id
-          where e.date_from >= '1700-01-01' and e.date_from <= current_date and e.status <> 'scheduled'
+          where e.date_from >= '1700-01-01' and e.date_from <= current_date and e.status <> 'scheduled' and not c.notional
         `),
       ]);
       const found = await db.execute<
