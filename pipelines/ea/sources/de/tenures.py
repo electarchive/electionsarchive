@@ -1,5 +1,6 @@
 import json
 import re
+import sys
 import unicodedata
 from collections import defaultdict
 from datetime import date
@@ -102,6 +103,17 @@ def emit() -> Path:
                    where e.scheme = 'wikidata' and not exists (select from entity_merge m where m.entity_id = p.id)"""
             ).fetchall()
         )
+        german: dict[tuple[str, str], list[UUID]] = defaultdict(list)
+        for person, text, born in conn.execute(
+            """select p.id, n.text, left(p.birth_date::text, 4) from person p
+               join name n on n.entity_id = p.id
+               where p.birth_date is not null
+               and not exists (select from entity_merge m where m.entity_id = p.id)
+               and not exists (select from external_id w where w.entity_id = p.id and w.scheme = 'wikidata')
+               and exists (select from external_id d where d.entity_id = p.id and d.scheme like 'de.%%')"""
+        ).fetchall():
+            german[(fold(text), born)].append(person)
+        review: list[str] = []
         districts: dict[str, list[tuple[UUID, UUID, UUID | None]]] = defaultdict(list)
         for contest, name, option, party in conn.execute(
             """select c.id, (select text from name where entity_id = c.id and is_preferred limit 1), o.id, o.party_id
@@ -114,13 +126,22 @@ def emit() -> Path:
         ).fetchall():
             if name is not None and name.startswith("Constituency "):
                 districts[fold(name.partition(", ")[2])].append((contest, option, party))
-        matched = skipped = created = tenures = 0
+        matched = skipped = created = tenures = resolved = 0
         reasons: dict[str, int] = defaultdict(int)
         for item, member in sorted(members.items()):
             spans = sorted(member["spans"].items())
             if not spans or "name" not in member:
                 continue
             person = linked.get(item)
+            if person is None and "birth" in member:
+                candidates = set(german.get((fold(member["name"]), member["birth"][:4]), []))
+                if len(candidates) > 1:
+                    review.append(f"{item} {member['name']} {member['birth'][:4]}: {len(candidates)} existing persons")
+                    continue
+                if candidates:
+                    person = candidates.pop()
+                    cs.add("external_id", entity_id=person, scheme="wikidata", value=item)
+                    resolved += 1
             if person is None:
                 person = cs.key(f"{SOURCE}.person", item)
                 cs.add(
@@ -185,7 +206,7 @@ def emit() -> Path:
                     ended_via=cause,
                 )
                 tenures += 1
-                for party in sorted(affiliation, key=str):
+                for party in sorted(affiliation, key=str) if until is None or until > begin else ():
                     cs.add(
                         "tenure_affiliation",
                         tenure_id=tenure,
@@ -196,7 +217,9 @@ def emit() -> Path:
                         valid_to=until,
                         valid_to_precision="day",
                     )
+        for line in review:
+            print(line, file=sys.stderr)
         print(
-            f"{tenures} tenures, {matched} constituency candidacies, {skipped} skipped {dict(reasons)}, {created} new people"
+            f"{tenures} tenures, {matched} constituency candidacies, {skipped} skipped {dict(reasons)}, {created} new people, {resolved} resolved to existing people, {len(review)} for review"
         )
         return cs.write()
