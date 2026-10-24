@@ -287,7 +287,17 @@ def emit() -> Path:
                 if row["seats"] > 0:
                     cs.add("outcome", result_set_id=result_set, option_id=option, kind="won", seats=row["seats"])
             ranks: dict[str, int] = {}
-            for member in sorted(block["members"], key=lambda member: member["position"]):
+            for number, member in enumerate(sorted(block["members"], key=lambda member: member["position"]), 1):
+                seat = cs.key(f"{SOURCE}.seat", f"{contest_key}:{number}")
+                cs.add(
+                    "seat",
+                    id=seat,
+                    body_id=body,
+                    district_area_id=area,
+                    label=f"{label} seat {number}",
+                    valid_from=DAY,
+                    valid_from_precision="day",
+                )
                 ranks[member["party"]] = ranks.get(member["party"], 0) + 1
                 option = cs.key("gb.option", f"{contest_key}:{slug(member['party'])}")
                 found = known.get(fold(member["name"]), [])
@@ -314,6 +324,7 @@ def emit() -> Path:
                     id=tenure,
                     person_id=person,
                     body_id=body,
+                    seat_id=seat,
                     from_date=DAY,
                     from_precision="day",
                     acquired_via="elected",
