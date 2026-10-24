@@ -168,6 +168,13 @@ PROVIDENCE_NOTE = (
     "site, and its results files from 2010 on. Party labels are "
     "as printed; independents carry none. The 2014 file reports 79 of 80 precincts."
 )
+LOUISIANA = "https://voterportal.sos.la.gov/ElectionResults/ElectionResults/Data?blob={:%Y%m%d}/{}"
+NEW_ORLEANS = [date(2017, 11, 18), date(2021, 11, 13)]
+NEW_ORLEANS_NOTE = (
+    "Citywide totals from the Louisiana Secretary of State's official results for Orleans Parish, with each "
+    "candidate's party as printed on the ballot; independents and candidates with no party carry none. Ballots cast "
+    "are the race's reported voters."
+)
 SURNAMES = {"clarke": "clark"}
 PARTIES = {
     "D": ("democratic-party", "Democratic"),
@@ -237,6 +244,9 @@ def fetch() -> None:
         raw.fetch(SOURCE, link, suffix=".zip" if link.endswith(".zip") else ".html")
     for link in PROVIDENCE.values():
         raw.fetch(SOURCE, link, suffix=Path(link).suffix if link.endswith((".zip", ".json")) else ".html")
+    for day in NEW_ORLEANS:
+        for name in ("RacesCandidates/ByParish_36.htm", "VotesParish/Votes_36.htm"):
+            raw.fetch(SOURCE, LOUISIANA.format(day, name), suffix=".json")
 
 
 def parse() -> None:
@@ -608,6 +618,31 @@ def parse() -> None:
         ).with_columns(day=pl.lit(day), place=pl.lit("4459000"), county=pl.lit(None, pl.String))
         print(day, frame.select("candidate", "party", "votes").rows())
         rows.append(frame)
+    for day in NEW_ORLEANS:
+        listed = json.loads(
+            raw.cached(SOURCE, LOUISIANA.format(day, "RacesCandidates/ByParish_36.htm")).path.read_text()
+        )
+        race = next(race for race in listed["Races"]["Race"] if race["SpecificTitle"] == "Mayor -- City of New Orleans")
+        names = {choice["ID"]: choice["Desc"] for choice in race["Choice"]}
+        counted = next(
+            item
+            for item in json.loads(
+                raw.cached(SOURCE, LOUISIANA.format(day, "VotesParish/Votes_36.htm")).path.read_text()
+            )["Races"]["Race"]
+            if item["ID"] == race["ID"]
+        )
+        ballots.append((day, "2255000", None, int(counted["VoterCountVoted"])))
+        lines = [
+            re.fullmatch(r"(.+) \((\w+)\)", names[choice["ID"]]).groups() + (int(choice["VoteTotal"]),)
+            for choice in counted["Choice"]
+        ]
+        frame = pl.DataFrame(
+            [(name, party if party in PARTIES else None, votes) for name, party, votes in lines],
+            schema={"candidate": pl.String, "party": pl.String, "votes": pl.Int64},
+            orient="row",
+        ).with_columns(day=pl.lit(day), place=pl.lit("2255000"), county=pl.lit(None, pl.String))
+        print(day, frame.select("candidate", "party", "votes").rows())
+        rows.append(frame)
     candidates = (
         pl.concat(rows, how="diagonal")
         .group_by("day", "place", "county", "candidate", "party", maintain_order=True)
@@ -706,6 +741,17 @@ def emit() -> Path:
                 "https://www.ri.gov/election/results/",
                 list(PROVIDENCE.values()),
             ),
+            (
+                "2255000",
+                "Louisiana Secretary of State",
+                "Official election results by parish",
+                "https://voterportal.sos.la.gov/graphical",
+                [
+                    LOUISIANA.format(day, name)
+                    for day in NEW_ORLEANS
+                    for name in ("RacesCandidates/ByParish_36.htm", "VotesParish/Votes_36.htm")
+                ],
+            ),
         ):
             sources[place] = cs.source(publisher, title)
             cs.add(
@@ -722,7 +768,7 @@ def emit() -> Path:
 
         def surname(text: str) -> str:
             folded = unicodedata.normalize("NFKD", text).encode("ascii", "ignore").decode()
-            folded = re.sub(r",?\s+(JR|SR|II|III)\.?$", "", folded.strip(), flags=re.IGNORECASE)
+            folded = re.sub(r",?\s+(JR|SR|I|II|III|IV)\.?$", "", folded.strip(), flags=re.IGNORECASE)
             name = re.sub(r"\W", "", folded.split()[-1]).lower()
             return SURNAMES.get(name, name)
 
@@ -738,6 +784,7 @@ def emit() -> Path:
                 "3611000": "buffalo_NY",
                 "3712000": "charlotte_NC",
                 "4459000": "providence_RI",
+                "2255000": "new orleans_LA",
             }[place]
             contest_key = f"alged:{place}_{day.year}_11_{city}_Mayor_mayor_1"
             contest = cs.key("us.contest", contest_key)
@@ -786,6 +833,7 @@ def emit() -> Path:
                     "3611000": BUFFALO_NOTE,
                     "3712000": CHARLOTTE_NOTE,
                     "4459000": PROVIDENCE_NOTE,
+                    "2255000": NEW_ORLEANS_NOTE,
                 }.get(place, DC_NOTE),
             )
             totals = (
