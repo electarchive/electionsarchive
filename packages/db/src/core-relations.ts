@@ -110,6 +110,11 @@ export const relations = defineRelations(schema, (r) => ({
 			to: r.entity.id.through(r.note.entityId),
 			alias: "changeset_id_entity_id_via_note"
 		}),
+		entitiesViaNoteDrop: r.many.entity({
+			from: r.changeset.id.through(r.noteDrop.changesetId),
+			to: r.entity.id.through(r.noteDrop.entityId),
+			alias: "changeset_id_entity_id_via_noteDrop"
+		}),
 		offices: r.many.office(),
 		outcomes: r.many.outcome(),
 		parties: r.many.party(),
@@ -240,6 +245,9 @@ export const relations = defineRelations(schema, (r) => ({
 		}),
 		changesetsViaNote: r.many.changeset({
 			alias: "changeset_id_entity_id_via_note"
+		}),
+		changesetsViaNoteDrop: r.many.changeset({
+			alias: "changeset_id_entity_id_via_noteDrop"
 		}),
 		offices: r.many.office(),
 		parties: r.many.party(),

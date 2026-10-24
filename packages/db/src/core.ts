@@ -777,6 +777,16 @@ export const note = pgTable("note", {
 	index("note_entity_idx").using("btree", table.entityId.asc().nullsLast()),
 ]);
 
+export const noteDrop = pgTable("note_drop", {
+	noteId: uuid("note_id").primaryKey(),
+	entityId: uuid("entity_id").notNull().references(() => entity.id, { onDelete: "cascade" } ),
+	bodyMd: text("body_md").notNull(),
+	reason: text().notNull(),
+	changesetId: uuid("changeset_id").notNull().references(() => changeset.id),
+	recordedFrom: timestamp("recorded_from", { withTimezone: true }).default(sql`now()`).notNull(),
+}, (table) => [
+check("note_drop_reason_check", sql`(reason <> ''::text)`),]);
+
 export const office = pgTable("office", {
 	id: uuid().default(sql`uuidv7()`).primaryKey().references(() => entity.id, { onDelete: "cascade" } ),
 	polityId: uuid("polity_id").notNull().references(() => polity.id),

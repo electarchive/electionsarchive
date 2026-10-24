@@ -67,7 +67,7 @@ def _stage(conn: Connection, changeset_id: str) -> Stage:
         if table in tables
         and table not in temporal
         and table
-        not in (*FACTS, "external_id", "slug", "entity_merge", "entity_retirement", "entity_subtype_drop", "name_drop", "membership_drop", "unit_area_drop")
+        not in (*FACTS, "external_id", "slug", "entity_merge", "entity_retirement", "entity_subtype_drop", "name_drop", "membership_drop", "unit_area_drop", "note_drop")
     }
     owners: dict[str, str] = {
         table: owner
@@ -683,6 +683,19 @@ def _publish_table(conn: Connection, stage: Stage, table: str) -> None:
             if preferred:
                 raise ValueError(f"name {name} ({text!r}) is the preferred name of {entity}")
         conn.execute(sql.SQL("delete from public.name where id in (select name_id from {})").format(staged))
+    if table == "note_drop":
+        for note, entity, held, writer in conn.execute(
+            sql.SQL(
+                """select s.note_id::text, s.entity_id::text, n.entity_id::text, c.pipeline from {} s
+                   left join public.note n on n.id = s.note_id and n.body_md = s.body_md
+                   left join changeset c on c.id = n.changeset_id"""
+            ).format(staged)
+        ).fetchall():
+            if held != entity:
+                raise ValueError(f"note {note} is not that text on {entity}")
+            if writer != stage.pipeline:
+                raise ValueError(f"note {note} was written by {writer}, not {stage.pipeline}")
+        conn.execute(sql.SQL("delete from public.note where id in (select note_id from {})").format(staged))
     if table == "unit_area_drop":
         conn.execute(
             sql.SQL(
