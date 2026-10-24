@@ -49,7 +49,7 @@ SYSTEM = (
 CAVEAT = (
     "Votes, electorates, and rejected ballots are from the Senedd Research briefing on the 2026 election, compiled from "
     "the constituency returning officers' returns and the Electoral Management Board. Each constituency's party columns "
-    "were checked against its valid votes, and its seats against six. The elected members are not yet loaded. Individual candidates carry an independent head candidacy."
+    "were checked against its valid votes, and its seats against six. The six members elected are from the briefing's list of elected members; candidates who were not elected are not loaded. Individual candidates carry an independent head candidacy."
 )
 
 
@@ -64,6 +64,7 @@ def parse() -> list[dict[str, object]]:
     by_name = {fold(label): label for label in SENC_2026}
     found: dict[str, dict[str, object]] = {}
     current: dict[str, object] | None = None
+    electing: dict[str, object] | None = None
     heading: str | None = None
     for line in lines:
         text = line.strip()
@@ -78,7 +79,20 @@ def parse() -> list[dict[str, object]]:
                 current[figure.group(1)] = int(figure.group(2).replace(",", ""))
             continue
         if text.startswith("Elected Members"):
+            if current is not None:
+                current["members"] = []
+                electing = current
             current = None
+            continue
+        seated = re.match(r"^([1-6])\s{2,}(.+?)\s{2,}(.+)$", text)
+        if seated is not None and electing is not None and len(electing["members"]) < 6:
+            electing["members"].append(
+                {
+                    "position": int(seated.group(1)),
+                    "name": seated.group(2).strip(),
+                    "party": WRAPPED.get(seated.group(3).strip(), seated.group(3).strip()),
+                }
+            )
             continue
         row = re.match(r"^(.+?)\s{2,}([\d,]+)\s+[\d.]+%\s+(\d+)\s+(\d+|Individual)$", text)
         if row is not None and current is not None:
@@ -272,4 +286,34 @@ def emit() -> Path:
                 )
                 if row["seats"] > 0:
                     cs.add("outcome", result_set_id=result_set, option_id=option, kind="won", seats=row["seats"])
+            for member in block["members"]:
+                option = cs.key("gb.option", f"{contest_key}:{slug(member['party'])}")
+                found = known.get(fold(member["name"]), [])
+                person = found[0] if len(found) == 1 else cs.key(f"{SOURCE}.person", f"{contest_key}:{slug(member['name'])}")
+                if person in cs.minted:
+                    cs.add("person", id=person)
+                    name(person, member["name"])
+                member_key = f"{contest_key}:{slug(member['name'])}"
+                cs.add(
+                    "candidacy",
+                    id=cs.key("gb.candidacy", member_key),
+                    person_id=person,
+                    option_id=option,
+                    role="list_member",
+                    ballot_name=member["name"],
+                    list_position=member["position"],
+                    is_independent=False,
+                )
+                tenure = cs.key(f"{SOURCE}.tenure", member_key)
+                cs.add(
+                    "tenure",
+                    id=tenure,
+                    person_id=person,
+                    body_id=body,
+                    from_date=DAY,
+                    from_precision="day",
+                    acquired_via="elected",
+                    contest_id=contest,
+                )
+                cs.add("tenure_affiliation", tenure_id=tenure, kind="party", party_id=parties[PARTIES[member["party"]][1]], valid_from=DAY)
         return cs.write()

@@ -131,7 +131,7 @@ def parse() -> None:
         for path in sorted(folder.rglob(f"as{str(year)[2:]}-*.xls*")):
             if "overall" in path.stem.lower():
                 continue
-            constituency = re.sub(r"[-_]+", " ", path.stem.split("-", 1)[1])
+            constituency = re.sub(r"[-_]+", " ", path.stem.split("-", 1)[1]).removesuffix(" corrected")
             parsed = ark_sheet(year, path)
             facts = parsed["facts"]
             units.append({"year": year, "constituency": constituency, **facts})
@@ -173,7 +173,7 @@ def parse() -> None:
             people = people.with_columns(
                 *(pl.lit(None).alias(column) for column in ("Outgoing_Member", "Gender") if column not in people.columns)
             ).select("Candidate_Id", "Outgoing_Member", "Gender")
-            for line in pl.read_csv(facts_path.with_name("Count.csv"), infer_schema_length=0, schema_overrides={"Candidate_Id": pl.Int64}).join(people, on="Candidate_Id").iter_rows(named=True):
+            for line in pl.read_csv(facts_path.with_name("Count.csv"), infer_schema_length=0, schema_overrides={"Candidate_Id": pl.Int64}).join(people, on="Candidate_Id", how="left").iter_rows(named=True):
                 totals.append(
                     {
                         "year": year,
@@ -182,14 +182,16 @@ def parse() -> None:
                         "name": f"{line['Surname']}, {line['Firstname']}",
                         "party": line["Party_Name"],
                         "elected": line["Status"] == "Elected",
-                        "incumbent": line["Outgoing_Member"] == 1,
+                        "incumbent": None if line["Outgoing_Member"] is None else line["Outgoing_Member"] == 1,
                         "gender": line["Gender"],
                         "stage": int(line["Count_Number"]),
                         "votes": float(line["Total_Votes"] or 0),
                     }
                 )
     pl.DataFrame(units, infer_schema_length=None).write_parquet(PARSED / "units.parquet")
-    pl.DataFrame(totals, infer_schema_length=None).write_parquet(PARSED / "totals.parquet")
+    pl.DataFrame(totals, infer_schema_length=None).with_columns(
+        pl.col("elected").any().over("year", "constituency", "number")
+    ).write_parquet(PARSED / "totals.parquet")
     print(pl.DataFrame(units, infer_schema_length=None).group_by("year").len().sort("year"))
 
 
@@ -347,6 +349,7 @@ def emit() -> Path:
                    where a.scheme_code = 'gb.pcon'"""
             ).fetchall()
         }
+        made: set[UUID] = set()
         for year, day in DAYS.items():
             election = cs.key("gb.election", f"{day}:ni-assembly")
             cs.add("election", id=election, polity_id=nir, kind="general", date_from=day, date_to=day, status="held")
@@ -364,7 +367,8 @@ def emit() -> Path:
                     raise ValueError(f"{year} {label}: {len(match)} Westminster areas")
                 code, area = match[0]
                 unit = cs.unit("gb.nia", code)
-                if unit in cs.minted:
+                if unit in cs.minted and unit not in made:
+                    made.add(unit)
                     cs.add(
                         "reporting_unit",
                         id=unit,
@@ -407,13 +411,37 @@ def emit() -> Path:
                     is_default=True,
                     completeness=1,
                 )
-                valid = unit_row["valid"] if unit_row["valid"] is not None else unit_row["polled"] - unit_row["invalid"]
+                lines = totals.filter((pl.col("year") == year) & (pl.col("constituency") == label))
+                stages = sorted(lines["stage"].unique().to_list())
+                sums = [lines.filter(pl.col("stage") == stage)["votes"].sum() for stage in stages]
+                valid = unit_row["valid"]
+                if valid is None and unit_row["polled"] is not None and unit_row["invalid"] is not None:
+                    valid = unit_row["polled"] - unit_row["invalid"]
+                polled = unit_row["polled"]
+                quota = unit_row["quota"]
+                caveats = []
+                if valid is not None and abs(sums[0] - valid) > 0.5:
+                    caveats.append(
+                        f"The source prints {valid:,.0f} valid votes, but the candidates' first preferences sum to "
+                        f"{sums[0]:,.0f}. The printed valid and total poll figures are left out because they contradict the count."
+                    )
+                    valid = polled = None
+                if quota is not None and quota != int(sums[0] // (seats + 1)) + 1:
+                    caveats.append(
+                        f"The source prints a quota of {quota:,.0f}, but the first preferences give "
+                        f"{int(sums[0] // (seats + 1)) + 1:,}. The printed quota is left out."
+                    )
+                    quota = None
+                if any(after > before + 0.5 for before, after in zip(sums, sums[1:])):
+                    caveats.append("The candidates' totals rise between two stages in the source; the stage totals are stored as published.")
+                for text in caveats:
+                    cs.add("note", entity_id=result_set, kind="caveat", body_md=text)
                 for measure, amount in (
                     (REGISTERED, unit_row["electorate"]),
-                    (BALLOTS, unit_row["polled"]),
+                    (BALLOTS, polled),
                     (VALID, valid),
                     (INVALID, unit_row["invalid"]),
-                    (QUOTA, unit_row["quota"]),
+                    (QUOTA, quota),
                 ):
                     if amount is not None:
                         cs.add(
@@ -427,8 +455,6 @@ def emit() -> Path:
                             flags=0,
                             value=amount,
                         )
-                lines = totals.filter((pl.col("year") == year) & (pl.col("constituency") == label))
-                stages = sorted(lines["stage"].unique().to_list())
                 running = dict.fromkeys(stages, 0.0)
                 for candidate in lines.select("number", "name", "party", "elected", "incumbent", "gender").unique(
                     maintain_order=True, subset=["number"]
@@ -483,7 +509,7 @@ def emit() -> Path:
                         option_id=option,
                         kind="elected" if candidate["elected"] else ("lost" if final > 0 else "eliminated"),
                     )
-                for stage in stages:
+                for stage in stages if valid is not None else ():
                     cs.add(
                         "result_value",
                         result_set_id=result_set,

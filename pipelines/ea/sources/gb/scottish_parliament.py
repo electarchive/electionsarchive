@@ -97,6 +97,15 @@ SOURCES = (
         None,
         "The Electoral Management Board for Scotland.",
     ),
+    (
+        "emb2026full",
+        "The Electoral Management Board for Scotland",
+        "Scottish Parliament election 7 May 2026: full analysis of the results (votes and seats)",
+        "https://www.emb.scot/downloads/download/176/scottish-parliament-election-2026-downloads",
+        "Public record",
+        None,
+        "The Electoral Management Board for Scotland.",
+    ),
 )
 LISTS_2011 = {
     "Con": "Scottish Conservative and Unionist Party",
@@ -160,6 +169,14 @@ PARTY_KEYS = {
     "reform uk": "reform-uk",
     "socialist labour": "socialist-labour-party",
     "communist party of britain": "communist-party-of-britain",
+    "alliance to liberate scotland and sovereignty": "alliance-to-liberate-scotland",
+    "alliance to liberate scotland for independence": "alliance-to-liberate-scotland",
+    "scottish alliance for democracy and freedom": "alliance-for-democracy-and-freedom",
+    "workers party of britian": "workers-party-of-britain",
+    "workers party - scotland": "workers-party-of-britain",
+    "ukip": "uk-independence-party",
+    "scottish workers party of britain": "workers-party-of-britain",
+    "british unionist party and abolish the scottish parliament party": "british-unionist-party",
 }
 AMS = (
     "The additional member system elects 73 members from single-member constituencies by first past the post and "
@@ -198,6 +215,7 @@ EC_2016 = "https://web.archive.org/web/20250912224401if_/https://www.electoralco
 EC_2007 = "https://web.archive.org/web/2015if_/http://www.electoralcommission.org.uk/__data/assets/excel_doc/0006/55590/Scotland-Parl-Elec-2007-Turnout-Electorate-Constituency.xls"
 EMB_2021 = "https://www.emb.scot/downloads/file/815/spe21-full-votes-and-seats-by-party-candidate"
 EMB_2026 = "https://www.emb.scot/downloads/file/1212/regional-votes-by-constituency"
+EMB_2026_FULL = "https://www.emb.scot/downloads/file/1201/full-analysis-of-2026-results"
 
 
 def fetch() -> None:
@@ -213,6 +231,7 @@ def fetch() -> None:
     raw.fetch(SOURCE, EC_2007, suffix=".xls")
     raw.fetch(SOURCE, EMB_2021, suffix=".xlsx")
     raw.fetch(SOURCE, EMB_2026, suffix=".xlsx")
+    raw.fetch(SOURCE, EMB_2026_FULL, suffix=".xlsx")
 
 
 def page_lines(year: int) -> list[str]:
@@ -559,6 +578,25 @@ def parse_workbooks() -> tuple[list[dict[str, object]], list[dict[str, object]],
                     "valid": figures["\0valid"],
                 }
             )
+    rows = sheet(raw.cached(SOURCE, EMB_2026_FULL).path, "Constituency - Votes")
+    start = next(index for index, row in enumerate(rows) if row[0] == "Constituency")
+    columns = {label.strip(): index for index, label in enumerate(rows[start]) if label is not None}
+    for row in rows[start + 1 :]:
+        if row[0] is None or row[0] == "Total":
+            break
+        rejected = number(row[columns["Rejected Ballot Papers"]])
+        units.append(
+            {
+                "year": 2026,
+                "ballot": "constituency",
+                "constituency": row[0],
+                "region": None,
+                "electorate": number(row[columns["Electorate"]]),
+                "cast": number(row[columns["Total Votes"]]),
+                "rejected": rejected,
+                "valid": number(row[columns["Total Votes"]]) - rejected,
+            }
+        )
     book = fastexcel.read_excel(str(raw.cached(SOURCE, EMB_2026).path))
     for name in book.sheet_names[1:]:
         rows = [
@@ -600,7 +638,7 @@ def parse_workbooks() -> tuple[list[dict[str, object]], list[dict[str, object]],
                     "constituency": constituency,
                     "region": region,
                     "electorate": number(totals["Electorate"][index]),
-                    "cast": None,
+                    "cast": number(totals["Total Valid Votes"][index]) + number(totals["Total Rejected Papers"][index]),
                     "rejected": number(totals["Total Rejected Papers"][index]),
                     "valid": number(totals["Total Valid Votes"][index]),
                 }
@@ -751,6 +789,7 @@ def emit() -> Path:
             (EC_2016, "ec2016"),
             (EMB_2021, "emb2021"),
             (EMB_2026, "emb2026"),
+            (EMB_2026_FULL, "emb2026full"),
         ):
             cs.artifact(raw.cached(SOURCE, url), sources[key])
 
@@ -896,7 +935,7 @@ def emit() -> Path:
             name(election, f"{year} Scottish Parliament election")
             path = f"gb/scotland/{day}-general"
             cs.add("slug", path=path, entity_id=election)
-            workbook = {2007: "ec2007", 2011: "ec2011", 2016: "ec2016", 2021: "emb2021"}.get(year)
+            workbook = {2007: "ec2007", 2011: "ec2011", 2016: "ec2016", 2021: "emb2021", 2026: "emb2026full"}.get(year)
             held = candidates.filter(pl.col("year") == year)
             year_units = units.filter(pl.col("year") == year)
             constituency_figures = {
