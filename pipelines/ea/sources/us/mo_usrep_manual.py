@@ -46,6 +46,7 @@ NOTES = {
     "1914-11-03:MO:house:2": " The Manual of 1917-1918 prints Livingston County's Democratic vote as 2,357, which does not tie the printed district total; the 1913-1914 Manual prints 2,537, which does, and is used here.",
     "1918-11-05:MO:house:15": " The Manual prints 17,815 and 19,333 as the Democratic and Republican totals, but its county rows (checked against the page image) sum to 17,826 and 19,133.",
     "1918-11-05:MO:house:10": " The Manual prints 50,390 as the Republican total for the regular term, but its county rows (checked against the page image) sum to 50,400. The Manual also prints a separate short-term vote for the unexpired term, which is not loaded.",
+    "1904-11-08:MO:house:10": " The Manual prints 2,792 as the Socialist total, but its county and ward rows (checked against the page image) sum to 2,802.",
     "1918-11-05:MO:house:1": " The Manual prints 17,384 as the Democratic total, but its county rows (checked against the page image) sum to 17,184.",
     "1948-11-02:MO:house:3": " The Manual's county rows sum to its printed district total of 69,599; the Clerk's district total of 74,599 is 5,000 higher, so the Manual's rows are the default.",
     "1928-11-06:MO:house:8": " The Manual prints 33,327 as the Democratic total, but its county rows (checked against the page image) sum to 32,877.",
