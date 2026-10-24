@@ -8707,8 +8707,16 @@ export const elections = {
           select e.id, e.polity_id, e.date_from,
             (select min(n.date_from) from election n
               where n.polity_id = e.polity_id and n.kind = 'general' and n.status = 'held'
-                and n.parent_id is null and n.date_from > e.date_from and not exists (select from entity_merge m where m.entity_id = n.id)) as next
+                and n.parent_id is null and n.date_from > e.date_from and not exists (select from entity_merge m where m.entity_id = n.id)
+                and exists (
+                  select from contest c join body b on b.id = c.body_id
+                  where c.election_id = n.id and b.polity_id = n.polity_id and b.kind in ('lower_house', 'unicameral')
+                )) as next
           from election e where e.id = ${input.id}::uuid and e.kind = 'general'
+            and exists (
+              select from contest c join body b on b.id = c.body_id
+              where c.election_id = e.id and b.polity_id = e.polity_id and b.kind in ('lower_house', 'unicameral')
+            )
         )
         select g.id, g.head_person_id as head, g.from_date::text as from, g.to_date::text as to,
           g.caretaker as "isCaretaker",
