@@ -912,6 +912,36 @@
     if (handover == null || contest.current == null) {
       return null;
     }
+    if (handover.seats != null) {
+      const label = (party: { label: string; short: string | null } | null) =>
+        party?.short ?? party?.label ?? m.seats_independents();
+      return `${m.change_seats({
+        changes: new Intl.ListFormat(getLocale(), {
+          style: "long",
+          type: "conjunction",
+        }).format(
+          handover.seats.map((seat) =>
+            seat.isGain
+              ? seat.count > 1
+                ? m.change_seats_gain({
+                    to: label(seat.party),
+                    from: label(seat.from),
+                    count: count(seat.count),
+                  })
+                : m.gains_seat({
+                    to: label(seat.party),
+                    from: label(seat.from),
+                  })
+              : seat.count > 1
+                ? m.change_seats_hold({
+                    party: label(seat.party),
+                    count: count(seat.count),
+                  })
+                : m.byes_hold({ party: label(seat.party) }),
+          ),
+        ),
+      })}${handover.basis === "same" ? "" : "*"}`;
+    }
     const [top, next] = contest.rows
       .filter((row) => row.current != null && !row.key.startsWith("kind:"))
       .toSorted((a, b) => (b.current?.votes ?? 0) - (a.current?.votes ?? 0));

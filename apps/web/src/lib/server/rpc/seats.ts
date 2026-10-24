@@ -249,6 +249,26 @@ export const seats = {
           ),
           prior: v.object({ name: v.string(), path: v.nullable(v.string()) }),
           alliance: v.nullable(v.string()),
+          seats: v.optional(
+            v.array(
+              v.object({
+                isGain: v.boolean(),
+                count: v.number(),
+                party: v.nullable(
+                  v.object({
+                    label: v.string(),
+                    short: v.nullable(v.string()),
+                  }),
+                ),
+                from: v.nullable(
+                  v.object({
+                    label: v.string(),
+                    short: v.nullable(v.string()),
+                  }),
+                ),
+              }),
+            ),
+          ),
         }),
       ),
     )
@@ -258,20 +278,20 @@ export const seats = {
         prior: string;
         area: string;
         since: string;
-        now: string | null;
-        before: string | null;
+        now: Array<string>;
+        before: Array<string>;
         isUs: boolean;
         alliance: string | null;
       }>(sql`
         with this as materialized (
-          select c.id, c.body_id as body, c.district_area_id as area, e.date_from as day, e.kind,
+          select c.id, c.body_id as body, c.district_area_id as area, e.date_from as day, e.kind, coalesce(c.magnitude, 1) as magnitude,
             coalesce(bs.as_of, e.date_from) as drawn, bp.path = 'us' as "isUs"
           from contest c join election e on e.id = c.election_id
           join slug ps on ps.entity_id = e.polity_id and ps.is_current and (ps.path in ('gb', 'us', 'ca') or ps.path like 'gb/%' or ps.path like 'us/%')
           join body b on b.id = c.body_id join slug bp on bp.entity_id = b.polity_id and bp.is_current
           left join boundary_set bs on bs.id = c.boundary_set_id
           where c.id = ${input.id}::uuid and c.kind = 'body_seats' and c.allocation_parent_id is null
-            and c.party_scope_id is null and c.district_area_id is not null and coalesce(c.magnitude, 1) = 1
+            and c.party_scope_id is null and c.district_area_id is not null
             and ((bp.path = 'us' and b.kind = 'lower_house') or not (bp.path = 'us' or bp.path like 'us/%'))
         ),
         last as (
@@ -291,7 +311,7 @@ export const seats = {
               or (e.kind = 'by_election' and (select kind from this) = 'by_election'
                 and e.date_from > (select day from last) and e.date_from < (select day from this)))
             and c.kind = 'body_seats' and c.allocation_parent_id is null and c.party_scope_id is null
-            and c.district_area_id is not null and coalesce(c.magnitude, 1) = 1
+            and c.district_area_id is not null and coalesce(c.magnitude, 1) = (select magnitude from this)
         ),
         paired as (
           select t.id, coalesce(s.id, g.id, n.id) as prior, coalesce(s.area, g.area, n.area) as area,
@@ -331,7 +351,7 @@ export const seats = {
           where rs.is_default and rs.contest_id in (select id from paired union select prior from paired)
         ),
         won as (
-          select distinct on (t.contest) t.contest,
+          select distinct on (t.contest, t.k) t.contest, t.k,
             coalesce(bm.into_id, br.parent_party_id, pm.into_id, lp.party)::text as party,
             cy.person_id::text as person
           from top t
@@ -352,8 +372,8 @@ export const seats = {
           order by t.contest, t.k
         )
         select p.basis, p.prior, p.area, p.day::text as since, (select "isUs" from this) as "isUs",
-          coalesce(w.party, 'person:' || w.person) as now,
-          coalesce(b.party, 'person:' || b.person) as before,
+          array(select coalesce(x.party, 'person:' || x.person) from won x where x.contest = p.id order by x.k) as now,
+          array(select coalesce(x.party, 'person:' || x.person) from won x where x.contest = p.prior order by x.k) as before,
           (select n.text from alliance a
             join alliance_member x on x.alliance_id = a.id and x.party_id::text = w.party
             join alliance_member y on y.alliance_id = a.id and y.party_id::text = b.party
@@ -363,16 +383,26 @@ export const seats = {
               (select coalesce(e.parent_id, e.id) from contest c join election e on e.id = c.election_id where c.id = p.id),
               (select coalesce(e.parent_id, e.id) from contest c join election e on e.id = c.election_id where c.id = p.prior)
             ) limit 1) as alliance
-        from paired p left join won w on w.contest = p.id left join won b on b.contest = p.prior
+        from paired p
+        left join lateral (select x.party from won x where x.contest = p.id order by x.k limit 1) w on true
+        left join lateral (select x.party from won x where x.contest = p.prior order by x.k limit 1) b on true
         where p.prior is not null
       `);
       const row = found.rows[0];
-      if (row?.now == null || row.before == null) {
+      const [now, before] = [row?.now[0], row?.before[0]];
+      if (
+        row == null ||
+        now == null ||
+        before == null ||
+        row.now.length !== row.before.length
+      ) {
         return null;
       }
       const [colored, labels, slugs] = await Promise.all([
         refs(
-          [row.now, row.before].filter((key) => !key.startsWith("person:")),
+          [...row.now, ...row.before].filter(
+            (key) => !key.startsWith("person:"),
+          ),
           row.since,
         ),
         names([row.area], row.since),
@@ -385,19 +415,53 @@ export const seats = {
               label: colored.get(key)?.label ?? "",
               short: colored.get(key)?.short ?? null,
             };
+      const kept = [...row.before];
+      const held: Array<string> = [];
+      const gained: Array<string> = [];
+      for (const key of row.now) {
+        const at = kept.findIndex((other) => fold(other) === fold(key));
+        if (at === -1) {
+          gained.push(key);
+        } else {
+          held.push(key);
+          kept.splice(at, 1);
+        }
+      }
       return {
         since: Number(row.since.slice(0, 4)),
-        isGain: row.alliance == null && fold(row.now) !== fold(row.before),
+        isGain: row.alliance == null && gained.length > 0,
         lead: row.isUs ? "margin" : "majority",
         basis: row.basis,
-        party: party(row.now),
-        from: party(row.before),
+        party: party(now),
+        from: party(before),
         prior: {
           name: labels.full.get(row.area) ?? "",
           path: slugs.get(row.prior) ?? null,
         },
         alliance:
-          row.alliance === colored.get(row.now)?.label ? null : row.alliance,
+          row.alliance === colored.get(now)?.label ? null : row.alliance,
+        seats:
+          row.now.length < 2
+            ? undefined
+            : Map.groupBy(
+                [
+                  ...gained.map((key, index) => ({
+                    key,
+                    from: kept[index] ?? null,
+                  })),
+                  ...held.map((key) => ({ key, from: null })),
+                ],
+                (seat) =>
+                  `${fold(seat.key)}|${seat.from == null ? "" : fold(seat.from)}`,
+              )
+                .values()
+                .map((group) => ({
+                  isGain: group[0]?.from != null,
+                  count: group.length,
+                  party: party(group[0]?.key ?? ""),
+                  from: group[0]?.from == null ? null : party(group[0].from),
+                }))
+                .toArray(),
       };
     }),
   byElections: os

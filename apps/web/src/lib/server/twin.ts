@@ -1099,13 +1099,45 @@ function contestMarkdown(
       ? []
       : [
           `${
-            majority == null
-              ? handover.isGain
-                ? m.change_gain_bare({ party, from })
-                : m.change_hold_bare({ party })
-              : handover.isGain
-                ? gain({ party, from, majority })
-                : hold({ party, majority })
+            handover.seats != null
+              ? m.change_seats({
+                  changes: new Intl.ListFormat(getLocale(), {
+                    style: "long",
+                    type: "conjunction",
+                  }).format(
+                    handover.seats.map((seat) => {
+                      const to =
+                        seat.party?.short ??
+                        seat.party?.label ??
+                        m.seats_independents();
+                      const before =
+                        seat.from?.short ??
+                        seat.from?.label ??
+                        m.seats_independents();
+                      return seat.isGain
+                        ? seat.count > 1
+                          ? m.change_seats_gain({
+                              to,
+                              from: before,
+                              count: count(seat.count),
+                            })
+                          : m.gains_seat({ to, from: before })
+                        : seat.count > 1
+                          ? m.change_seats_hold({
+                              party: to,
+                              count: count(seat.count),
+                            })
+                          : m.byes_hold({ party: to });
+                    }),
+                  ),
+                })
+              : majority == null
+                ? handover.isGain
+                  ? m.change_gain_bare({ party, from })
+                  : m.change_hold_bare({ party })
+                : handover.isGain
+                  ? gain({ party, from, majority })
+                  : hold({ party, majority })
           }${handover.basis === "same" ? "" : "*"}`,
           ...(handover.basis === "same"
             ? []
