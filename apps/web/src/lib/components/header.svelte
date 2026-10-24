@@ -45,7 +45,7 @@
       </a>
       <Tooltip.Root delayDuration={150}>
         <Tooltip.Trigger
-          class="absolute -inset-e-3 inset-bs-[calc(100%-0.375rem)] -rotate-3 cursor-help rounded-[2px] bg-marker px-1 text-[0.625rem]/[0.9rem] font-[780] tracking-[0.02em] text-[#15171a] transition-transform hover:rotate-0 focus-visible:outline-2 focus-visible:outline-ring motion-reduce:transition-none"
+          class="absolute -inset-e-3 inset-bs-[calc(100%-0.375rem)] -rotate-3 cursor-help rounded-[2px] bg-marker px-1 text-[0.625rem]/[0.9rem] font-[780] tracking-[0.02em] text-[#15171a] transition-transform hover:rotate-0 focus-visible:outline-2 focus-visible:outline-ring motion-reduce:transition-none max-sm:-inset-e-0.5"
           >{m.beta_label()}</Tooltip.Trigger
         >
         <Tooltip.Content
