@@ -1,0 +1,23 @@
+{
+  "kind": "statewide",
+  "year": 1992,
+  "day": "1992-11-03",
+  "polity": "US-UT",
+  "publisher": "Utah Lieutenant Governor's Office",
+  "title": "State of Utah general election 1992",
+  "license": "Public record",
+  "file": {
+    "url": "https://vote.utah.gov/wp-content/uploads/2023/09/1992Gen.pdf"
+  },
+  "raw_source": "us.scans",
+  "create": true,
+  "offices": {
+    "attorney-general": "Attorney General",
+    "auditor": "State Auditor",
+    "treasurer": "State Treasurer"
+  },
+  "leaves": [
+    6,
+    7
+  ]
+}
