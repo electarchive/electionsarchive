@@ -793,7 +793,7 @@
       for (const row of contest.rows) {
         total += row.current?.seats ?? 0;
       }
-      if (members != null && members.length <= 4) {
+      if (members != null && (members.length <= 4 || contest.isStv)) {
         const names = new Intl.ListFormat(getLocale(), {
           style: "long",
           type: "conjunction",
