@@ -14,16 +14,22 @@ SOURCE = "us.ky_usrep"
 VERSION = "1"
 PARSED = DATA / "parsed" / SOURCE
 WAYBACK = "https://web.archive.org/web/{}id_/{}"
-SITE = "https://elect.ky.gov/SiteCollectionDocuments/Election%20Results/1990-1999/"
+SITE = "https://elect.ky.gov/SiteCollectionDocuments/Election%20Results/"
 PUBLISHER = "Kentucky State Board of Elections"
 TITLE = "Election results by county"
 FILES = {
-    date(1992, 11, 3): ("20120927172040", "1992/92usrep.txt"),
-    date(1994, 11, 8): ("20120927231933", "1994/94gen_USRep.txt"),
-    date(1996, 11, 5): ("20120927165159", "1996/96Gen_usrep1.txt"),
-    date(1998, 11, 3): ("20120927170946", "1998/98Gen_usrep.txt"),
+    date(1980, 11, 4): ("20260509191325", "1980-1989/1980/80res_usrep1.txt"),
+    date(1982, 11, 2): ("20260608043720", "1980-1989/1982/82usrep9.txt"),
+    date(1984, 11, 6): ("20260608045034", "1980-1989/1984/84usrep7.txt"),
+    date(1986, 11, 4): ("20260814071617", "1980-1989/1986/86usrep5.txt"),
+    date(1988, 11, 8): ("20250627100717", "1980-1989/1988/88usrep2.txt"),
+    date(1990, 11, 6): ("20260131181953", "1990-1999/1990/90usrep.txt"),
+    date(1992, 11, 3): ("20120927172040", "1990-1999/1992/92usrep.txt"),
+    date(1994, 11, 8): ("20120927231933", "1990-1999/1994/94gen_USRep.txt"),
+    date(1996, 11, 5): ("20120927165159", "1990-1999/1996/96Gen_usrep1.txt"),
+    date(1998, 11, 3): ("20120927170946", "1990-1999/1998/98Gen_usrep.txt"),
 }
-SUMMARY = "Kentucky's U.S. House general elections of 1992, 1994, 1996, and 1998 by county from the State Board of Elections"
+SUMMARY = "Kentucky's U.S. House general elections of 1980 through 1998 by county from the State Board of Elections"
 METHOD = (
     "County totals are from the State Board of Elections' fixed-width result files, read from the Internet Archive's "
     "copies. Each candidate's county sum equals the district total printed under the table."
@@ -72,7 +78,7 @@ def parse() -> None:
             header = [line for line in lines[start:top] if line.strip()]
             body = [line for line in lines[top + 1 : bottom] if line.strip()]
             start = total_at + 1
-            district = int(re.search(r"(\d+)(?:ST|ND|RD|TH)\s+DISTRICT", "\n".join(header), re.IGNORECASE)[1])
+            district = int(re.search(r"(\d+)(?:ST|ND|RD|TH)\s+DIST", "\n".join(header), re.IGNORECASE)[1])
             if district in seen:
                 continue
             seen.add(district)
