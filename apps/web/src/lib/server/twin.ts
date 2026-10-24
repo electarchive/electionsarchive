@@ -933,6 +933,10 @@ function electionMarkdown(
       row.to != null && row.from != null && label(row.to) !== label(row.from),
   }));
   const gained = byeRows.filter((row) => row.isGain).length;
+  const listed =
+    byeRows.length > 20
+      ? byeRows.filter((row) => row.isGain || row.isHere || row.to == null)
+      : byeRows;
   const tiered =
     Map.groupBy(
       election.races.filter(
@@ -1135,7 +1139,7 @@ function electionMarkdown(
               m.col_majority(),
               m.col_previous_member(),
             ],
-            byeRows.map((row) => [
+            listed.map((row) => [
               date(row.date),
               row.isHere
                 ? `${link(row.name, row.path)} (${m.byes_here()})`
@@ -1148,11 +1152,20 @@ function electionMarkdown(
               row.majority == null ? null : count(row.majority),
               row.member == null
                 ? null
-                : (reasons[row.reason ?? ""] ?? m.byes_reason_none)({
+                : (reasons[row.reason ?? ""]?.({
                     name: link(row.member.name, row.member.path),
-                  }),
+                  }) ?? link(row.member.name, row.member.path)),
             ]),
           ),
+          ...(listed.length < byeRows.length
+            ? [
+                m.byes_holds_hidden({
+                  count: count(
+                    byeRows.filter((row) => !listed.includes(row)).length,
+                  ),
+                }),
+              ]
+            : []),
         ]),
     ...(election.contests.length === 0
       ? []

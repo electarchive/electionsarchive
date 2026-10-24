@@ -197,6 +197,7 @@
   "byes_reason_removed": "{name} was removed.",
   "byes_reason_withdrew": "{name} left the seat.",
   "byes_reason_none": "Previous member: {name}.",
+  "byes_holds_hidden": "The other {count} by-elections were holds and are not listed here. Each one has its own page.",
   "regions_universities": "University seats",
   "regions_unplaced": "Seats with no area",
   "stat_votes_cast": "Votes cast",
