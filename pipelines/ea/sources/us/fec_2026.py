@@ -11,7 +11,6 @@ DAY = date(2026, 11, 3)
 REDISTRICTED = {"TX", "CA", "MO", "NC", "OH", "UT"}
 CLASS_THREE_SPECIALS = ("OH", "FL")
 SYSTEM_OVERRIDES = {"AK": "top_four", "LA": "fptp"}
-NOMINEE_PRIMARIES = {"NM": "2026-06-02", "VT": "2026-08-11"}
 ORDINALS = {1: "st", 2: "nd", 3: "rd"}
 
 
@@ -70,18 +69,22 @@ def emit() -> Path:
             ).fetchall()
         )
 
-        nominees: dict[str, list[tuple[str, UUID, UUID, UUID, str]]] = {}
-        for value, party, ballot, person, party_id in conn.execute(
-            """select x.value, split_part(x.value, ':', 4), op.ballot_label, cy.person_id, op.party_id
+        nominees: dict[str, list[tuple[str, UUID, UUID]]] = {}
+        for value, ballot, person, party_id in conn.execute(
+            """select x.value, op.ballot_label, cy.person_id, op.party_id
                from external_id x
                join result_set rs on rs.contest_id = x.entity_id and rs.status = 'active'
-               join outcome o on o.result_set_id = rs.id and o.kind = 'won'
+               join outcome o on o.result_set_id = rs.id and o.kind in ('won', 'advanced')
                join contest_option op on op.id = o.option_id
                join candidacy cy on cy.option_id = op.id and cy.role = 'head'
-               where x.scheme = 'us.contest' and x.value ~ '^2026-[0-9-]+:(NM|VT):governor:[a-z]+$'"""
+               where x.scheme = 'us.contest'
+                 and (x.value ~ '^2026-[0-9-]+:[A-Z]{2}:(governor|senate|house:[0-9]+):(democratic|republican)$'
+                      and o.kind = 'won'
+                      or x.value ~ '^2026-[0-9-]+:CA:(governor|house:[0-9]+)$' and o.kind = 'advanced')"""
         ):
-            state = value.split(":")[1]
-            nominees.setdefault(state, []).append((value, ballot, person, party_id, party))
+            _, state, chamber, *rest = value.split(":")
+            general = f"{DAY}:{state}:{chamber}" + (f":{rest[0]}" if chamber == "house" else "")
+            nominees.setdefault(general, []).append((ballot, person, party_id))
 
         counts = {"house": 0, "senate": 0, "governor": 0, "candidates": 0}
         for (
@@ -157,32 +160,31 @@ def emit() -> Path:
                 path = f"us/{state.lower()}/{DAY}-general/governor"
             name(contest, title)
             cs.add("slug", path=path, entity_id=contest)
-            if chamber == "governor":
-                for _, ballot, person, party_id, party in sorted(nominees.get(state, [])):
-                    option = cs.key("us.option", f"{key}:{slug(ballot)}")
-                    cs.add(
-                        "contest_option",
-                        id=option,
-                        contest_id=contest,
-                        kind="candidate",
-                        party_id=party_id,
-                        ballot_label=ballot,
-                    )
-                    cs.add(
-                        "candidacy",
-                        id=cs.key("us.candidacy", f"{key}:{slug(ballot)}"),
-                        person_id=person,
-                        option_id=option,
-                        role="head",
-                        is_independent=False,
-                    )
-                    counts["candidates"] += 1
-                if state in nominees:
-                    cs.add(
-                        "note",
-                        entity_id=contest,
-                        kind="methodology",
-                        body_md=f"Candidates are the {state_name} major-party nominees recorded in the archive's own 2026 primary result sets. No ballot list from the state has been confirmed, so third-party and independent candidates are not yet listed.",
-                    )
+            for ballot, person, party_id in sorted(nominees.get(key, [])):
+                option = cs.key("us.option", f"{key}:{slug(ballot)}")
+                cs.add(
+                    "contest_option",
+                    id=option,
+                    contest_id=contest,
+                    kind="candidate",
+                    party_id=party_id,
+                    ballot_label=ballot,
+                )
+                cs.add(
+                    "candidacy",
+                    id=cs.key("us.candidacy", f"{key}:{slug(ballot)}"),
+                    person_id=person,
+                    option_id=option,
+                    role="head",
+                    is_independent=False,
+                )
+                counts["candidates"] += 1
+            if key in nominees:
+                cs.add(
+                    "note",
+                    entity_id=contest,
+                    kind="methodology",
+                    body_md=f"Candidates are the {state_name} nominees recorded in the archive's own 2026 primary result sets ({'the two advancing candidates of the top-two primary' if state == 'CA' else 'the major-party primary winners'}). Where a party's primary was uncontested or has not been loaded, that party's nominee is not yet listed. No ballot list from the state has been confirmed, so third-party and independent candidates are not yet listed.",
+                )
         print(counts)
         return cs.write()
