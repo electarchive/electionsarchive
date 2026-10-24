@@ -313,6 +313,21 @@ export function compare(
       )
       .map((line) => root(line.party ?? "")),
   );
+  const split = new Set<string>();
+  const listed = Map.groupBy(
+    current.options.filter(
+      (option) => option.person == null && option.party != null,
+    ),
+    (option) => `${option.contest}:${root(option.party ?? "")}`,
+  );
+  for (const group of listed.values()) {
+    const [head] = group.toSorted((a, b) => b.votes - a.votes);
+    for (const option of group) {
+      if (option.party != null && option.party !== head?.party) {
+        split.add(option.party);
+      }
+    }
+  }
   const isShared =
     new Set(current.options.map((option) => option.contest)).size > 1 ||
     (grouping === "party" &&
@@ -325,7 +340,12 @@ export function compare(
       return `alliance:${anchor == null ? option.alliance.id : root(anchor)}`;
     }
     const line = lines.get(`${option.contest}:${option.person}`) ?? option;
-    const party = line.party == null ? null : root(line.party);
+    const party =
+      line.party == null
+        ? null
+        : split.has(line.party)
+          ? line.party
+          : root(line.party);
     if (
       grouping === "alliance" &&
       party != null &&

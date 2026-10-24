@@ -7466,7 +7466,11 @@ async function races(
         })
         .filter((row) => !row.key.startsWith("kind:") || row.votes > 0)
         .toArray()
-        .toSorted((a, b) => b.votes - a.votes);
+        .toSorted(
+          (a, b) =>
+            Number(a.key.startsWith("kind:others")) -
+              Number(b.key.startsWith("kind:others")) || b.votes - a.votes,
+        );
       const returned =
         single != null || head?.isOffice === true
           ? null
@@ -7489,10 +7493,10 @@ async function races(
                 where c.id = any(${sql.param(roots)}::uuid[])
               )
               select party, count(*)::int as seats,
-                (select count(*)::int from contest c where c.id = any(${sql.param(roots)}::uuid[]) and c.magnitude > 1 and c.kind <> 'list_allocation' and exists (select from contest_option co where co.contest_id = c.id and co.kind = 'candidate')) as multiple
+                (select count(*)::int from contest c left join electoral_system es on es.id = c.electoral_system_id where c.id = any(${sql.param(roots)}::uuid[]) and c.magnitude > 1 and c.kind <> 'list_allocation' and coalesce(c.rules_override ->> 'formula', es.rules ->> 'formula', '') not in ('dhondt', 'hare', 'sainte_lague_schepers', 'stv', 'imperiali_quota', 'hagenbach_bischoff', 'irv') and exists (select from contest_option co where co.contest_id = c.id and co.kind = 'candidate')) as multiple
               from tacit group by party
               union all
-              select null, 0, (select count(*)::int from contest c where c.id = any(${sql.param(roots)}::uuid[]) and c.magnitude > 1 and c.kind <> 'list_allocation' and exists (select from contest_option co where co.contest_id = c.id and co.kind = 'candidate'))
+              select null, 0, (select count(*)::int from contest c left join electoral_system es on es.id = c.electoral_system_id where c.id = any(${sql.param(roots)}::uuid[]) and c.magnitude > 1 and c.kind <> 'list_allocation' and coalesce(c.rules_override ->> 'formula', es.rules ->> 'formula', '') not in ('dhondt', 'hare', 'sainte_lague_schepers', 'stv', 'imperiali_quota', 'hagenbach_bischoff', 'irv') and exists (select from contest_option co where co.contest_id = c.id and co.kind = 'candidate'))
               where not exists (select from tacit)
             `);
       const unopposed = (returned?.rows ?? []).filter((row) => row.seats > 0);
