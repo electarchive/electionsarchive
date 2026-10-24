@@ -748,7 +748,9 @@ def emit() -> Path:
         ).fetchall()
         held: dict[UUID, dict[str, set[str]]] = defaultdict(dict)
         for person, scheme, value in conn.execute(
-            "select entity_id, scheme, value from external_id where scheme = any(%s)", [list(IDENTITIES)]
+            """select entity_id, scheme, value from external_id
+               where scheme = any(%s) or scheme = 'us.nnv.person' and value ~ '^[A-Z]{2}[0-9]{4}' and value !~ '^AA0000'""",
+            [list(IDENTITIES)],
         ).fetchall():
             held[person].setdefault(scheme, set()).add(value)
         created: dict[UUID, datetime] = dict(

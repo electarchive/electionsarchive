@@ -92,6 +92,43 @@ ADMITTED = {
     "MO": 1821,
 }
 POOLED = {"scattering", "unknown", "scattering votes", "scatterings", "others", "all others"}
+PLACEHOLDER = ("AA0000", "b27e8356-9860-5f1a-8123-b25090d68903")
+NAMESAKES = {
+    ("CG0080", "ny.assembly.newyork.1799"): ("bioguide", "C000526", "cfef863d-98a0-5d53-b0d0-46c27b058d62"),
+    ("CG0080", "ny.assembly.newyork.1800"): ("bioguide", "C000526", "cfef863d-98a0-5d53-b0d0-46c27b058d62"),
+    ("FT0028", "ma.senator.worcester.1788"): ("us.nnv.person", "FT0028:1739", "cb6b1faa-fba1-5cef-acba-9211555854b6"),
+    ("FT0028", "ma.senator.worcester.1794"): ("us.nnv.person", "FT0028:1739", "cb6b1faa-fba1-5cef-acba-9211555854b6"),
+    ("FT0028", "ma.uscongress.western.4.1794"): (
+        "us.nnv.person",
+        "FT0028:1739",
+        "cb6b1faa-fba1-5cef-acba-9211555854b6",
+    ),
+    ("CJ1121", "va.houseofdelegates.lancaster.1824"): (
+        "us.nnv.person",
+        "CJ1121:1824",
+        "6141edf3-bc0f-5931-9925-2aabbf36ef3b",
+    ),
+    **{
+        ("WJ0328", f"nj.assemblyessex.{year}"): ("us.nnv.person", "WJ0328:nj", "37a9cee9-85c1-5c6c-a02e-012990afda9c")
+        for year in (1812, 1813, 1814)
+    },
+    **{
+        ("LH0069", record): ("us.nnv.person", "LH0069:columbia", "5effe77f-ea18-5d10-919e-8d6010831872")
+        for record in (
+            "ny.assembly.columbia.1791",
+            "ny.assembly.columbia.1814",
+            "ny.assembly.columbia.1815",
+            "ny.assembly.columbia.1818",
+            "ny.convention.columbia.1788",
+            "ny.convention.columbia.1801",
+        )
+    },
+    ("JJ0319", "ny.assembly.dutchess.1815"): (
+        "us.nnv.person",
+        "JJ0319:johnston",
+        "b27e8356-9860-5f1a-8123-b25090d68903",
+    ),
+}
 SINGLE = {"the House", "the House, trials of THEA contests", "governor"}
 BLANK = re.compile(r"(?i)^blanks?\b")
 DECLARED = re.compile(r"(?i)^((re-?)?elected\b|[^,.;]*\b(is|was) (re-?)?elected\b|[^,.;]* (re-?)?elected\.?$)")
@@ -704,7 +741,7 @@ def emit() -> Path:
                 if best is not None and _alike(words, best["words"]) and line["name"].lower() not in POOLED:
                     picked[line["candidate"]] = best["id"]
                     free.remove(best)
-                    if line["name_id"] and best["person"] is not None:
+                    if line["name_id"] and line["name_id"] != PLACEHOLDER[0] and best["person"] is not None:
                         persons.setdefault(line["name_id"], Counter())[best["person"]] += 1
             where = returns.get(record, {})
             local = {place: cell for place, cell in where.items() if place}
@@ -956,11 +993,17 @@ def emit() -> Path:
             return None
 
         def person_of(line: dict, postal: str, member: dict | None) -> UUID:
-            if member is not None and member["bioguide"] in bioguides:
+            split = NAMESAKES.get((line["name_id"], line["record"]))
+            if split is None and line["name_id"] == PLACEHOLDER[0]:
+                split = (f"{SOURCE}.person", f"{postal}:{slug(line['name'])}", PLACEHOLDER[1])
+            if split is not None:
+                person = cs.key(split[0], split[1])
+                cs.renamed[str(person)] = split[2]
+            elif member is not None and member["bioguide"] in bioguides:
                 return bioguides[member["bioguide"]]
-            if line["name_id"] in persons:
+            elif line["name_id"] in persons:
                 return persons[line["name_id"]].most_common(1)[0][0]
-            if member is not None:
+            elif member is not None:
                 person = cs.key("bioguide", member["bioguide"])
             else:
                 person = cs.key(f"{SOURCE}.person", line["name_id"] or f"{postal}:{slug(line['name'])}")
@@ -973,6 +1016,7 @@ def emit() -> Path:
         created: set[UUID] = set()
         listed: set[UUID] = set()
         used: set[str] = set()
+        keyed: dict[str, tuple[str, str]] = {}
         parties: dict[str, UUID] = {}
         stamps = {key for key in elections} | {
             f"{day_of(chain[0])[2]}:{info[chain[0]]['postal']}"
@@ -1188,6 +1232,7 @@ def emit() -> Path:
                     tally["NNV races duplicating another NNV race, not added"] += 1
                     break
                 used.add(key)
+                keyed[record] = (key, postal)
                 if round_number == 1 or f"{stamp}:{postal}" in stamps:
                     election_key, kind, part = f"{stamp}:{postal}", "general", "general"
                 else:
@@ -1505,6 +1550,50 @@ def emit() -> Path:
                 valid_from=day,
                 valid_to=day + timedelta(days=1),
             )
+        for record in ("ny.assembly.cayuga.1801", "ny.statesenatewestern.1801", "ny.statesenatewestern.1806"):
+            if record in keyed and keyed[record][0] in old_sets:
+                cs.add(
+                    "note",
+                    entity_id=old_sets[keyed[record][0]]["id"],
+                    kind="caveat",
+                    body_md="A New Nation Votes uses one name ID for both Governor George Clinton and his nephew "
+                    "George Clinton Jr. This candidate is linked to the governor's record, but he may be the younger man.",
+                )
+        rekeyed = [
+            (key, postal, line)
+            for record, (key, postal) in keyed.items()
+            for line in lines.get(record, [])
+            if (line["name_id"], record) in NAMESAKES or line["name_id"] == PLACEHOLDER[0]
+        ]
+        standing = {
+            (key, name, str(person)): rest
+            for key, name, person, *rest in conn.execute(
+                """select x.value, cy.ballot_name, cy.person_id, cy.id, cy.option_id, cy.role::text,
+                          cy.is_independent, cy.is_incumbent
+                   from external_id x join contest_option o on o.contest_id = x.entity_id
+                   join candidacy cy on cy.option_id = o.id
+                   where x.scheme = 'us.contest' and x.value = any(%s)""",
+                [list({key for key, _, _ in rekeyed})],
+            ).fetchall()
+        }
+        for key, postal, line in rekeyed:
+            person = person_of(line, postal, None)
+            found = standing.get((key, line["name"], cs.renamed[str(person)]))
+            if found is None:
+                tally["re-keyed NNV lines with no candidacy on the person they leave"] += 1
+                continue
+            candidacy, option, role, independent, incumbent = found
+            cs.add(
+                "candidacy",
+                id=candidacy,
+                person_id=person,
+                option_id=option,
+                role=role,
+                ballot_name=line["name"],
+                is_independent=independent,
+                is_incumbent=incumbent,
+            )
+            tally["candidacies moved off a namesake's person"] += 1
         for what, count in sorted(tally.items()):
             print(f"{what}: {count}")
         if values:
