@@ -12,25 +12,45 @@ SOURCE = "us.oe_primaries_2026"
 VERSION = "1"
 BASE = "https://raw.githubusercontent.com/openelections/openelections-data-{}/master/2026/{}"
 FILES = {
-    "TX": ("tx", "2026-03-03", "20260303__tx__primary__county.csv"),
-    "CA": ("ca", "2026-06-02", "20260602__ca__primary__county.csv"),
-    "MI": ("mi", "2026-08-04", "20260804__mi__primary__county.csv"),
+    "TX": ("tx", "2026-03-03", ["20260303__tx__primary__county.csv"]),
+    "CA": ("ca", "2026-06-02", ["20260602__ca__primary__county.csv"]),
+    "MI": ("mi", "2026-08-04", ["20260804__mi__primary__county.csv"]),
+    "PA": ("pa", "2026-05-19", ["20260519__pa__primary__county.csv"]),
+    "WV": ("wv", "2026-05-13", ["20260513__wv__primary__county.csv"]),
+    "MS": ("ms", "2026-03-10", ["20260310__ms__democratic__primary__county.csv", "20260310__ms__republican__primary__county.csv"]),
+    "SD": ("sd", "2026-06-02", ["20260602__sd__primary__county.csv"]),
+    "WY": ("wy", "2026-08-18", ["20260818__wy__primary__county.csv"]),
+    "OR": ("or", "2026-05-19", ["20260519__or__primary__county.csv"]),
+    "KY": ("ky", "2026-05-19", ["20260519__ky__primary__county.csv"]),
+    "CO": ("co", "2026-06-30", ["20260630__co__primary__county.csv"]),
+    "AZ": ("az", "2026-07-21", ["20260721__az__primary__county.csv"]),
+    "TN": ("tn", "2026-08-01", ["20260801__tn__primary__county.csv"]),
 }
+FIPS = {"TX": "48", "CA": "06", "MI": "26", "PA": "42", "WV": "54", "MS": "28", "SD": "46", "WY": "56", "OR": "41", "KY": "21", "CO": "08", "AZ": "04", "TN": "47"}
+RUNOFF_SYSTEMS = {"TX": "two_round", "MS": "two_round", "SD": "two_round_35"}
+THRESHOLDS = {"TX": 50, "MS": 50, "SD": 35}
 OFFICES = {"U.S. House": "house", "U.S. Senate": "senate", "Governor": "governor"}
 TOP_TWO = {"CA"}
+AT_LARGE = {"SD", "WY"}
 REDISTRICTED = {"TX", "CA"}
 PARTIES = {
-    "REP": "republican-party",
-    "Republican": "republican-party",
-    "DEM": "democratic-party",
-    "Democratic": "democratic-party",
-    "Libertarian": "libertarian-party",
-    "Green": "green-party",
-    "Peace and Freedom": "CA:peace-and-freedom-party",
-    "American Independent": "american-independent-party",
-    "No Party Preference": "CA:no-party-preference",
+    "REP": ("republican", "republican-party"),
+    "R": ("republican", "republican-party"),
+    "Republican": ("republican", "republican-party"),
+    "DEM": ("democratic", "democratic-party"),
+    "D": ("democratic", "democratic-party"),
+    "Democratic": ("democratic", "democratic-party"),
+    "LIB": ("libertarian", "libertarian-party"),
+    "LBT": ("libertarian", "libertarian-party"),
+    "Libertarian": ("libertarian", "libertarian-party"),
+    "GRN": ("green", "green-party"),
+    "Green": ("green", "green-party"),
+    "Peace and Freedom": ("peace-and-freedom", "CA:peace-and-freedom-party"),
+    "American Independent": ("american-independent", "american-independent-party"),
+    "No Party Preference": ("", "CA:no-party-preference"),
+    "NOL": ("no-labels", "no-labels-party"),
 }
-SCOPES = {"REP": "republican", "DEM": "democratic"}
+ALIASES = {"jeffdavis": "jeffersondavis"}
 POOLED = {"write-in", "write-ins", "scattering"}
 ORDINALS = {1: "st", 2: "nd", 3: "rd"}
 CAVEAT = "Held under the 2026 congressional map, which the archive has not yet loaded as a boundary set, so this contest is not yet tied to a district shape."
@@ -52,8 +72,9 @@ def title(text: str) -> str:
 
 
 def fetch() -> None:
-    for code, day, name in FILES.values():
-        raw.fetch(SOURCE, BASE.format(code, name), suffix=".csv")
+    for code, _, names in FILES.values():
+        for name in names:
+            raw.fetch(SOURCE, BASE.format(code, name), suffix=".csv")
 
 
 def parse() -> None:
@@ -92,36 +113,38 @@ def emit() -> Path:
                       or x.value ~ '^(2026-11-03|2022-11-08):[A-Z]{2}:governor$'"""
             ).fetchall()
         }
-        systems = {key: cs.key("us.electoral_system", key) for key in ("fptp", "two_round", "top_two")}
+        systems = {key: cs.key("us.electoral_system", key) for key in ("fptp", "two_round", "two_round_35", "top_two")}
         counties = {
             (code[:2], re.sub(r"[^a-z]", "", text.lower())): id
             for code, text, id in conn.execute(
                 """select u.code, n.text, u.id from reporting_unit u
                    join name n on n.entity_id = u.area_id and n.kind = 'short'
-                   where u.scheme_code = 'us.county' and u.code ~ '^(48|06|26)'"""
+                   where u.scheme_code = 'us.county' and u.code ~ %s""",
+                [f"^({'|'.join(FIPS.values())})"],
             ).fetchall()
         }
-        fips = {"TX": "48", "CA": "06", "MI": "26"}
         pool: dict[tuple[str, str], set[UUID]] = defaultdict(set)
         for state, person, text in conn.execute(
             """select split_part(x.value, ':', 2), cy.person_id, n.text
                from candidacy cy join contest_option o on o.id = cy.option_id
                join external_id x on x.entity_id = o.contest_id and x.scheme = 'us.contest'
                join name n on n.entity_id = cy.person_id and n.is_preferred
-               where x.value ~ '^20(1[4-9]|2[0-9])-[0-9-]+:(TX|CA|MI):(house|senate|governor)'"""
+               where x.value ~ ('^20(1[4-9]|2[0-9])-[0-9-]+:(' || %s || '):(house|senate|governor)')""",
+            ['|'.join(FILES)],
         ).fetchall():
             pool[(state, slug(text))].add(person)
         persons: dict[tuple[str, str], UUID] = {}
         parties: dict[str, UUID] = {}
 
         def party_of(label: str | None) -> UUID | None:
-            key = PARTIES.get(label or "")
-            if key is None:
+            if label not in PARTIES:
                 return None
+            key = PARTIES[label][1]
             if key not in parties:
                 parties[key] = cs.key("us.party", key)
                 if parties[key] in cs.minted:
-                    raise ValueError(f"no party {key}")
+                    cs.add("party", id=parties[key], kind="party", polity_id=cs.polity("US"))
+                    name(parties[key], {"no-labels-party": "No Labels Party"}[key])
             return parties[key]
 
         def person_of(state: str, text: str) -> UUID:
@@ -140,21 +163,22 @@ def emit() -> Path:
         sources: dict[str, UUID] = {}
         elections: dict[str, UUID] = {}
         totals: dict[str, int] = {}
-        for state, (code, day, file) in FILES.items():
+        for state, (code, day, files) in FILES.items():
             state_name = state_names[state]
-            url = BASE.format(code, file)
             publisher, source_title = "OpenElections", f"{state_name} 2026 primary results by county"
             sources[state] = cs.source(publisher, source_title)
-            cs.add(
-                "source",
-                id=sources[state],
-                kind="community",
-                publisher=publisher,
-                title=source_title,
-                url=f"https://github.com/openelections/openelections-data-{code}",
-                license=None,
-            )
-            cs.artifact(raw.cached(SOURCE, url), sources[state])
+            if sources[state] in cs.minted:
+                cs.add(
+                    "source",
+                    id=sources[state],
+                    kind="community",
+                    publisher=publisher,
+                    title=source_title,
+                    url=f"https://github.com/openelections/openelections-data-{code}",
+                    license=None,
+                )
+            for file in files:
+                cs.artifact(raw.cached(SOURCE, BASE.format(code, file)), sources[state])
             election_key = f"{day}:{state}:primary"
             elections[state] = cs.key("us.election", election_key)
             if elections[state] in cs.minted:
@@ -173,18 +197,25 @@ def emit() -> Path:
             grouped: dict[tuple[str, str, str], dict[tuple[str, str, str], dict[str, int]]] = defaultdict(
                 lambda: defaultdict(lambda: defaultdict(int))
             )
-            with raw.cached(SOURCE, url).path.open(newline="") as file_handle:
-                for row in csv.DictReader(file_handle):
-                    chamber = OFFICES.get(row["office"])
-                    if chamber is None or not row["votes"].isdigit():
-                        continue
-                    pooled = row["candidate"].strip().lower() in POOLED or row.get("write_in") == "Y"
-                    label = row["party"] if not pooled else ""
-                    scope = "" if state in TOP_TWO else SCOPES[row["party"]]
-                    district = row["district"] if chamber == "house" else ""
-                    candidate = "Write-ins" if pooled else title(row["candidate"].strip())
-                    county = re.sub(r"[^a-z]", "", row["county"].lower())
-                    grouped[(chamber, district, scope)][(candidate, label, "pooled" if pooled else "")][county] += int(row["votes"])
+            scope_labels: dict[str, str] = {}
+            for file in files:
+                with raw.cached(SOURCE, BASE.format(code, file)).path.open(newline="") as file_handle:
+                    for row in csv.DictReader(file_handle):
+                        chamber = OFFICES.get(row["office"])
+                        if chamber is None or not row["votes"].isdigit() or row["party"] not in PARTIES:
+                            continue
+                        scope = PARTIES[row["party"]][0]
+                        if scope == "" and state not in TOP_TWO:
+                            continue
+                        scope_labels.setdefault(scope, row["party"])
+                        pooled = row["candidate"].strip().lower() in POOLED or row.get("write_in") == "Y"
+                        label = row["party"] if not pooled else ""
+                        district = ("0" if state in AT_LARGE else row["district"]) if chamber == "house" else ""
+                        candidate = "Write-ins" if pooled else title(row["candidate"].strip())
+                        county = ALIASES.get(re.sub(r"[^a-z]", "", row["county"].lower()), re.sub(r"[^a-z]", "", row["county"].lower()))
+                        grouped[(chamber, district, "" if state in TOP_TWO else scope)][
+                            (candidate, label, "pooled" if pooled else "")
+                        ][county] += int(row["votes"])
             for (chamber, district, scope), candidates in sorted(grouped.items()):
                 key_tail = chamber + (f":{district}" if district else "") + (f":{scope}" if scope else "")
                 contest_key = f"{day}:{state}:{key_tail}"
@@ -208,12 +239,13 @@ def emit() -> Path:
                 ]
                 if shapeless and chamber == "house":
                     area, plan = None, None
-                scope_label = scope.title()
+                scope_label = scope.replace("-", " ").title()
                 if chamber == "house":
                     number = int(district)
                     suffix = "th" if 10 <= number % 100 <= 20 else ORDINALS.get(number % 10, "th")
-                    title_text = (
-                        f"2026 U.S. House {scope_label + ' ' if scope else ''}primary in {state_name}'s {number}{suffix} congressional district"
+                    at_large = number == 0
+                    title_text = f"2026 U.S. House {scope_label + ' ' if scope else ''}primary in {state_name}'s " + (
+                        "at-large congressional district" if at_large else f"{number}{suffix} congressional district"
                     )
                 elif chamber == "senate":
                     title_text = f"2026 U.S. Senate {scope_label + ' ' if scope else ''}primary in {state_name}"
@@ -232,12 +264,12 @@ def emit() -> Path:
                     seat_id=seat,
                     boundary_set_id=plan,
                     magnitude=magnitude,
-                    party_scope_id=party_of(next(label for label, value in SCOPES.items() if value == scope))
+                    party_scope_id=party_of(scope_labels[scope])
                     if scope
                     else None,
                     term=term,
                     round_number=1,
-                    electoral_system_id=systems["top_two"] if state in TOP_TWO else systems["two_round"] if state == "TX" else systems["fptp"],
+                    electoral_system_id=systems["top_two"] if state in TOP_TWO else systems[RUNOFF_SYSTEMS.get(state, "fptp")],
                     default_result_kind=result_kind,
                 )
                 name(contest, title_text)
@@ -290,7 +322,7 @@ def emit() -> Path:
                         cs.add(
                             "result_value",
                             result_set_id=result_set,
-                            unit_id=counties[(fips[state], county)],
+                            unit_id=counties[(FIPS[state], county)],
                             option_id=option,
                             channel=0,
                             measure=1,
@@ -302,7 +334,7 @@ def emit() -> Path:
                         named.append((sum(by_county.values()), option))
                 named.sort(key=lambda entry: -entry[0])
                 everyone = sum(votes for votes, _ in named)
-                if state in TOP_TWO or (len(named) > 1 and state == "TX" and named[0][0] * 2 <= everyone):
+                if state in TOP_TWO or (len(named) > 1 and state in THRESHOLDS and named[0][0] * 100 <= THRESHOLDS[state] * everyone):
                     leaders = named[:2]
                     if len(named) > 2 and named[1][0] == named[2][0]:
                         cs.add("note", entity_id=result_set, kind="caveat", body_md="A tie for the last advancing place leaves the outcome unrecorded.")
