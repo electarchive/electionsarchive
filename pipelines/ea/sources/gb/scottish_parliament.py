@@ -68,6 +68,24 @@ SOURCES = (
         EC_ATTRIBUTION,
     ),
     (
+        "aspect1999",
+        "Glasgow Digital Library",
+        "Aspect 1999: electoral region results and literature",
+        "http://gdl.cdlr.strath.ac.uk/aspect/aspect1999/",
+        "Public record",
+        None,
+        "Glasgow Digital Library, University of Strathclyde, reproducing the Scottish Parliament's declared results.",
+    ),
+    (
+        "bbc2007",
+        "BBC News",
+        "Election 2007: Scottish Parliament results by region, with the 2003 results for comparison",
+        "http://news.bbc.co.uk/2/shared/vote2007/scottish_parliment/html/region_99999.stm",
+        "Public record",
+        None,
+        "BBC News election 2007 results pages, reproducing the returning officers' declared regional votes.",
+    ),
+    (
         "emb2021",
         "The Electoral Management Board for Scotland",
         "Scottish Parliamentary election 6 May 2021: full votes and seats by party and candidate",
@@ -114,6 +132,8 @@ PARTY_KEYS = {
     "conservative and unionist party": "conservative",
     "scottish conservative and unionist party": "conservative",
     "scottish conservative & unionist party": "conservative",
+    "scottish liberal democrat party": "liberal-democrats",
+    "socialist labour party": "socialist-labour-party",
     "labour": "labour",
     "labour party": "labour",
     "scottish labour": "labour",
@@ -147,6 +167,29 @@ AMS = (
     "disproportion in the constituency results. The rules schema cannot yet express that adjusted divisor, so the "
     "declared seats are stored as published."
 )
+HISTORY_LISTS = {
+    1999: (
+        "The regional list votes are the totals by party and independent candidate for this region as "
+        "reproduced by the Glasgow Digital Library from the Scottish Parliament's declared results; they sum to "
+        "2,338,911 across the eight regions against the published 2,338,914. Registered electors and rejected "
+        "ballots by region are not loaded."
+    ),
+    2003: (
+        "The regional list votes are the totals by party for this region as reproduced by BBC News from the "
+        "declared results. Party totals across the eight regions agree with the Scottish Parliament's published "
+        "figures, and the independent candidates' total is 79 votes short of the published one. Independent candidates are not named in the source, except Margo MacDonald, who is identified "
+        "by being the elected independent. Registered electors and rejected ballots by region are not loaded."
+    ),
+    2007: (
+        "The regional list votes are the totals by party for this region as reproduced by BBC News from the "
+        "declared results. Across the eight regions Labour agrees exactly with the published total, and the "
+        "Scottish National Party, Conservative, Liberal Democrat, and Green totals differ from the published "
+        "ones by up to 210 votes, which the source does not explain. Scottish Voice includes the Scottish "
+        "Voice / NHS and NHS First lists. Independent candidates are not named in the source, except Margo "
+        "MacDonald, who is identified by being the elected independent. Registered electors and rejected "
+        "ballots by region are not loaded."
+    ),
+}
 NO_LIST_VOTES = (
     "The regional list votes by party for this election have not been loaded yet. The seats shown are the "
     "members the Scottish Parliament's results page declares elected from each region's lists."
@@ -158,6 +201,66 @@ PAGES = {
 EC_2011 = "https://web.archive.org/web/20251202132040if_/https://www.electoralcommission.org.uk/sites/default/files/excel_doc/SP-2011-results-flat-file-WEB.xlsx"
 EC_2016 = "https://web.archive.org/web/20250912224401if_/https://www.electoralcommission.org.uk/sites/default/files/2021-04/Electoral-Data-Results-May-2016-Scottish-Parliament-elections_2.xls"
 EC_2007 = "https://web.archive.org/web/2015if_/http://www.electoralcommission.org.uk/__data/assets/excel_doc/0006/55590/Scotland-Parl-Elec-2007-Turnout-Electorate-Constituency.xls"
+ASPECT_1999 = {
+    "Central Scotland": "cen",
+    "Glasgow": "gla",
+    "Highlands and Islands": "hig",
+    "Lothians": "lot",
+    "Mid Scotland and Fife": "mid",
+    "North East Scotland": "nor",
+    "South of Scotland": "sou",
+    "West of Scotland": "wes",
+}
+BBC_REGIONS = {
+    "Glasgow": 11,
+    "Highlands and Islands": 12,
+    "Lothians": 13,
+    "Mid Scotland and Fife": 14,
+    "North East Scotland": 15,
+    "South of Scotland": 16,
+    "Central Scotland": 17,
+    "West of Scotland": 18,
+}
+BBC_PARTIES = {
+    "SNP": "Scottish National Party",
+    "LD": "Scottish Liberal Democrats",
+    "CON": "Scottish Conservative and Unionist Party",
+    "GRN": "Scottish Green Party",
+    "LAB": "Scottish Labour Party",
+    "SOL": "Solidarity",
+    "BNP": "British National Party",
+    "SSCU": "Scottish Senior Citizens Unity Party",
+    "SCHP": "Scottish Christian Party",
+    "CPA": "Christian Peoples Alliance",
+    "SLP": "Socialist Labour Party",
+    "SSP": "Scottish Socialist Party",
+    "SUP": "Scottish Unionist Party",
+    "PUB": "Publican Party",
+    "IGV": "Independent Green Voice",
+    "SV": "Scottish Voice",
+    "UKIP": "UK Independence Party",
+    "CPB": "Communist Party of Britain",
+    "SACL": "Scotland Against Crooked Lawyers",
+    "NPG": "Nine Per Cent Growth Party",
+    "SENT": "Scottish Enterprise Party",
+    "WIT": "Adam Lyal's Witchery Tour Party",
+    "HEP": "Had Enough Party",
+    "FSP": "Free Scotland Party",
+    "SNHS": "Save Our NHS Group",
+    "SJP": "Scottish Jacobite Party",
+    "SEP": "Socialist Equality Party",
+    "PLP": "ProLife Alliance",
+    "SPA": "Scottish Peoples Alliance",
+    "TCP": "Countryside Party",
+    "PRS": "Protect Rural Scotland Party",
+    "RP": "Rural Party",
+    "PENP": "Pensioners Party",
+    "LPS": "Liberal Party",
+    "FSHC": "Fighting Hospital Closures and Downgrading",
+    "SLH": "Save Local Hospitals",
+    "CIA": "Christian Independent Alliance",
+    "FISH": "Fishing Party",
+}
 EMB_2021 = "https://www.emb.scot/downloads/file/815/spe21-full-votes-and-seats-by-party-candidate"
 
 
@@ -171,6 +274,16 @@ def fetch() -> None:
     time.sleep(1)
     raw.fetch(SOURCE, EC_2007, suffix=".xls")
     raw.fetch(SOURCE, EMB_2021, suffix=".xlsx")
+    for code in ASPECT_1999.values():
+        time.sleep(1)
+        raw.fetch(SOURCE, f"http://gdl.cdlr.strath.ac.uk/aspect/aspect1999/regions/a99reg{code}.html", suffix=".html")
+    for number in BBC_REGIONS.values():
+        time.sleep(1)
+        raw.fetch(
+            SOURCE,
+            f"http://news.bbc.co.uk/2/shared/vote2007/scottish_parliment/html/region_{number}.stm",
+            suffix=".html",
+        )
 
 
 def page_lines(year: int) -> list[str]:
@@ -462,10 +575,60 @@ def parse_workbooks() -> tuple[list[dict[str, object]], list[dict[str, object]],
     return units, lists, buckets
 
 
+def parse_history_lists() -> list[dict[str, object]]:
+    lists: list[dict[str, object]] = []
+
+    def table_rows(segment: str) -> list[list[str]]:
+        rows = []
+        for row in re.findall(r"<tr.*?(?=<tr|$)", segment, flags=re.S):
+            cells = [
+                html.unescape(re.sub(r"<[^>]+>", "", cell)).replace("\xa0", " ").strip()
+                for cell in re.findall(r"<td.*?(?=<td|$)", row, flags=re.S)
+            ]
+            if len(cells) >= 4 and re.fullmatch(r"[\d,]+", cells[2]):
+                rows.append(cells)
+        return rows
+
+    for region, code in ASPECT_1999.items():
+        text = raw.cached(SOURCE, f"http://gdl.cdlr.strath.ac.uk/aspect/aspect1999/regions/a99reg{code}.html").path.read_text(
+            errors="ignore"
+        )
+        for label, votes in re.findall(
+            r'<td>(?:<a [^>]*>)?([^<>]+?)(?:</a>)?</td>\s*<td>&nbsp;&nbsp;</td>\s*<td align="right">(\d+)</td>', text
+        ):
+            label = html.unescape(label)
+            if label == "Independent":
+                label = f"Independent candidate {sum(1 for row in lists if row['year'] == 1999 and row['region'] == region and str(row['party']).startswith('Independent candidate')) + 1}"
+            lists.append({"year": 1999, "region": region, "constituency": None, "party": label, "votes": int(votes)})
+    for region, number in BBC_REGIONS.items():
+        text = raw.cached(
+            SOURCE, f"http://news.bbc.co.uk/2/shared/vote2007/scottish_parliment/html/region_{number}.stm"
+        ).path.read_text(errors="ignore")
+        start, end = text.index("RESULTS IN DETAIL"), text.index("CONSTITUENCIES IN")
+        previous = text.index("2003 RESULTS FOR")
+        for year, segment in (
+            (2007, text[start:end]),
+            (2003, text[previous : text.index("SCOTTISH ELECTIONS 2007", previous)]),
+        ):
+            rows = table_rows(segment)
+            independents = [row for row in rows if row[0] == "IND"]
+            for row in rows:
+                votes = int(row[2].replace(",", ""))
+                if row[0] != "IND":
+                    label = BBC_PARTIES[row[0]]
+                elif region == "Lothians" and votes == max(int(other[2].replace(",", "")) for other in independents):
+                    label = "Margo MacDonald"
+                else:
+                    label = f"Independent candidate {independents.index(row) + 1}"
+                lists.append({"year": year, "region": region, "constituency": None, "party": label, "votes": votes})
+    return lists
+
+
 def parse() -> None:
     PARSED.mkdir(parents=True, exist_ok=True)
     candidates, members = parse_pages()
     units, lists, buckets = parse_workbooks()
+    lists.extend(parse_history_lists())
     units = pl.DataFrame(units, infer_schema_length=None)
     official = {(row["year"], fold(row["constituency"]), row["bucket"]): row["votes"] for row in buckets}
     names = {
@@ -597,6 +760,14 @@ def emit() -> Path:
             (EC_2011, "ec2011"),
             (EC_2016, "ec2016"),
             (EMB_2021, "emb2021"),
+            *(
+                (f"http://gdl.cdlr.strath.ac.uk/aspect/aspect1999/regions/a99reg{code}.html", "aspect1999")
+                for code in ASPECT_1999.values()
+            ),
+            *(
+                (f"http://news.bbc.co.uk/2/shared/vote2007/scottish_parliment/html/region_{number}.stm", "bbc2007")
+                for number in BBC_REGIONS.values()
+            ),
         ):
             cs.artifact(raw.cached(SOURCE, url), sources[key])
 
@@ -819,7 +990,7 @@ def emit() -> Path:
                             "excludes them, so they are not shown.",
                         )
                         continue
-                    option_key = f"{contest_key}:{slug(line['candidate'])}"
+                    option_key = f"{contest_key}:{slug(line['candidate'])}:{slug(line['party'] or 'none')}"
                     option = cs.key("gb.option", option_key)
                     party = party_of(line["party"])
                     cs.add(
@@ -833,7 +1004,7 @@ def emit() -> Path:
                     cs.add(
                         "candidacy",
                         id=cs.key("gb.candidacy", option_key),
-                        person_id=person_of(year, constituency, line["candidate"]),
+                        person_id=person_of(year, f"{constituency}:{line['party']}", line["candidate"]),
                         option_id=option,
                         role="head",
                         ballot_name=line["candidate"],
@@ -873,7 +1044,14 @@ def emit() -> Path:
                     if line["elected"]:
                         cs.add("outcome", result_set_id=result_set, option_id=option, kind="elected")
 
-            list_source = {2011: "ec2011", 2016: "ec2016", 2021: "emb2021"}.get(year)
+            list_source = {
+                1999: "aspect1999",
+                2003: "bbc2007",
+                2007: "bbc2007",
+                2011: "ec2011",
+                2016: "ec2016",
+                2021: "emb2021",
+            }.get(year)
             year_lists = list_votes.filter(pl.col("year") == year)
             expansions = {2011: LISTS_2011, 2016: LISTS_2016}.get(year, {})
             for (rkey,), region_members in members.filter(pl.col("year") == year).group_by("rkey", maintain_order=True):
@@ -909,12 +1087,20 @@ def emit() -> Path:
                 )
                 if list_source is None:
                     cs.add("note", entity_id=result_set, kind="caveat", body_md=NO_LIST_VOTES)
+                if year in (1999, 2003, 2007):
+                    cs.add(
+                        "note",
+                        entity_id=result_set,
+                        kind="caveat",
+                        body_md=HISTORY_LISTS[year],
+                    )
                 region_lists = year_lists.filter(pl.col("rkey") == rkey)
                 options: dict[str, UUID] = {}
                 by_party: dict[UUID, UUID] = {}
                 for source_label in dict.fromkeys(region_lists["party"]):
                     individual = re.fullmatch(r"[A-Z' -]+, .+", source_label) is not None
                     other = source_label in ("Others", "Ind", "IND")
+                    independent = source_label.startswith(("Independent", "Margo"))
                     if individual:
                         surname, forename = source_label.split(", ", 1)
                         full = f"{forename} {surname.title()}"
@@ -923,14 +1109,14 @@ def emit() -> Path:
                     else:
                         full = expansions.get(source_label, source_label)
                     option = options[source_label] = cs.key("gb.option", f"{contest_key}:{slug(source_label)}")
-                    party = None if other or individual else party_of(full)
+                    party = None if other or individual or independent else party_of(full)
                     if party is not None:
                         by_party[party] = option
                     cs.add(
                         "contest_option",
                         id=option,
                         contest_id=contest,
-                        kind="others" if other else "candidate" if individual else "list",
+                        kind="others" if other else "candidate" if individual or independent else "list",
                         party_id=party,
                         ballot_label="Independent candidates" if source_label in ("Ind", "IND") else full,
                     )
@@ -938,15 +1124,17 @@ def emit() -> Path:
                 for line in region_members.iter_rows(named=True):
                     party = party_of(line["party"])
                     if party is None:
-                        option = cs.key("gb.option", f"{contest_key}:{slug(line['member'])}")
-                        cs.add(
-                            "contest_option",
-                            id=option,
-                            contest_id=contest,
-                            kind="candidate",
-                            party_id=None,
-                            ballot_label=line["member"],
-                        )
+                        option = options.get(line["member"])
+                        if option is None:
+                            option = cs.key("gb.option", f"{contest_key}:{slug(line['member'])}")
+                            cs.add(
+                                "contest_option",
+                                id=option,
+                                contest_id=contest,
+                                kind="candidate",
+                                party_id=None,
+                                ballot_label=line["member"],
+                            )
                     elif party in by_party:
                         option = by_party[party]
                     elif list_source is None:
@@ -992,7 +1180,11 @@ def emit() -> Path:
                     continue
                 list_units = year_units.filter((pl.col("ballot") == "list") & (pl.col("rkey") == rkey))
                 for row in list_units.iter_rows(named=True):
-                    unit = region_units[(era, rkey)] if year == 2021 else constituency_units[(era, row["ckey"])]
+                    unit = (
+                        region_units[(era, rkey)]
+                        if year in (1999, 2003, 2007, 2021)
+                        else constituency_units[(era, row["ckey"])]
+                    )
                     for measure, amount in (
                         (REGISTERED, row["electorate"]),
                         (BALLOTS, row["cast"]),
@@ -1001,6 +1193,10 @@ def emit() -> Path:
                     ):
                         value(result_set, unit, None, measure, amount)
                 for row in region_lists.iter_rows(named=True):
-                    unit = region_units[(era, rkey)] if year == 2021 else constituency_units[(era, row["ckey"])]
+                    unit = (
+                        region_units[(era, rkey)]
+                        if year in (1999, 2003, 2007, 2021)
+                        else constituency_units[(era, row["ckey"])]
+                    )
                     value(result_set, unit, options[row["party"]], VOTES, row["votes"])
         return cs.write()
