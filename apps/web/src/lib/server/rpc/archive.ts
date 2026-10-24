@@ -10528,9 +10528,24 @@ export const polities = {
             select below.top as id, (select kind::text from polity where id = below.top) as kind, count(e.id)::int as elections,
               min(extract(year from e.date_from))::int as first, max(extract(year from e.date_from))::int as last,
               sum(count(e.id)) over ()::int as within
-            from below left join election e on e.polity_id = below.id
-              and not exists (select from election p where p.id = e.parent_id and p.polity_id = e.polity_id)
-              and not exists (select from entity_merge m where m.entity_id = e.id)
+            from below left join lateral (
+              select e.id, e.date_from from election e
+              where e.polity_id = below.id
+                and not exists (select from election p where p.id = e.parent_id and p.polity_id = e.polity_id)
+                and not exists (select from entity_merge m where m.entity_id = e.id)
+              union
+              select e.id, e.date_from
+              from (select where below.id = below.top and not exists (select from election x where x.polity_id = below.id)) g
+              cross join (select b.id from body b where b.polity_id = below.id) b
+              join contest c on c.body_id = b.id
+              join election e on e.id = c.election_id
+              union
+              select e.id, e.date_from
+              from (select where below.id = below.top and not exists (select from election x where x.polity_id = below.id)) g
+              cross join (select f.id from office f where f.polity_id = below.id) f
+              join contest c on c.office_id = f.id
+              join election e on e.id = c.election_id
+            ) e on true
             group by below.top
           `),
           db.execute<{
