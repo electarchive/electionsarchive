@@ -1,4 +1,5 @@
 import difflib
+import itertools
 import re
 import subprocess
 import unicodedata
@@ -94,6 +95,16 @@ CONSTITUENCIES = (
     "Upper Bann",
     "West Tyrone",
 )
+ARK_SOUTH_ANTRIM_2007 = "https://www.ark.ac.uk/elections/07sa.htm"
+SOUTH_ANTRIM_2007_COUNT_8 = {
+    "McLaughlin": 5454,
+    "McCrea": 5454,
+    "Ford": 5495.04,
+    "Burnside": 5454,
+    "Clarke": 5543.71,
+    "Burns": 5395.94,
+    "Lucas": 4228.79,
+}
 INDEPENDENT_UNIONISTS_1998 = {
     ("Belfast North", "Agnew"),
     ("Upper Bann", "Watson"),
@@ -105,6 +116,7 @@ INDEPENDENT_UNIONISTS_1998 = {
 def fetch() -> None:
     for url in (*ARK.values(), *NICVA.values(), *EONI):
         raw.fetch(SOURCE, url, suffix=".rar" if "ark.ac.uk" in url else ".xlsx" if url.endswith(".xlsx") else ".zip")
+    raw.fetch(SOURCE, ARK_SOUTH_ANTRIM_2007, suffix=".html")
     for constituency in CONSTITUENCIES:
         raw.fetch(SOURCE, WIKIPEDIA.format(constituency.replace(" ", "_")), suffix=".txt")
 
@@ -173,6 +185,7 @@ def ark_sheet(year: int, path: Path) -> dict[str, object]:
                 "name": row[2].strip(),
                 "party": re.sub(r"\s+", " ", (row[3] or "").strip()),
                 "elected": False,
+                "row": row,
                 "totals": {stage: number(cell(row, stage_cols[stage])) for stage in stages},
             }
         )
@@ -202,6 +215,32 @@ def ark_sheet(year: int, path: Path) -> dict[str, object]:
     seats = int(facts["seats"])
     valid = facts.get("valid") or sum(candidate["totals"][1] for candidate in candidates)
     quota = (facts.get("quota") if facts.get("quota") and abs(facts["quota"] - (valid // (seats + 1) + 1)) < 1 else None) or valid // (seats + 1) + 1
+    for candidate in candidates:
+        held = None
+        for stage in stages:
+            amount = candidate["totals"][stage]
+            if held is not None and amount < quota - 0.01:
+                candidate["totals"][stage] = held
+            elif held is None and amount >= quota - 0.01:
+                held = amount
+            elif held is not None:
+                held = amount
+    for before, stage in itertools.pairwise(stages):
+        column = stage_cols[stage]
+        gap = [
+            candidate
+            for candidate in candidates
+            if candidate["totals"][before] > 0
+            and cell(candidate["row"], column) in blank
+            and cell(candidate["row"], column - 1) not in blank + ("-",)
+        ]
+        previous = cell(rows[non_transferable], stage_cols[before])
+        spare = number(cell(rows[non_transferable], column)) if cell(rows[non_transferable], column) not in blank else None
+        if len(gap) == 1 and spare is None and previous not in blank:
+            spare = number(previous) + number(cell(rows[non_transferable], column - 1))
+        if len(gap) == 1 and spare is not None:
+            others = sum(candidate["totals"][stage] for candidate in candidates if candidate is not gap[0])
+            gap[0]["totals"][stage] = round(valid - others - spare, 2)
     for candidate in candidates:
         flag = cell(next(row for row in body if (cell(row, 2) or "").strip() == candidate["name"]), 0) or ""
         candidate["flagged"] = flag.strip() not in ("", "Excluded")
@@ -240,6 +279,9 @@ def parse() -> None:
                 continue
             constituency = re.sub(r"[-_]+", " ", path.stem.split("-", 1)[1]).removesuffix(" corrected")
             parsed = ark_sheet(year, path)
+            if (year, constituency) == (2007, "South Antrim"):
+                for candidate in parsed["candidates"]:
+                    candidate["totals"][8] = SOUTH_ANTRIM_2007_COUNT_8.get(candidate["name"], 0.0)
             facts = parsed["facts"]
             units.append({"year": year, "constituency": constituency, **facts})
             full_names: dict[int, str] = {}
@@ -248,7 +290,7 @@ def parse() -> None:
                 section = section.split("====2007====", 1)[1].split("\n====", 1)[0]
                 for block in section.split("STV Election box candidate2")[1:]:
                     line = re.search(r"\|\s*candidate\s*=\s*([^\n]*)", block)
-                    link = None if line is None else re.sub(r"\[\[(?:[^\]|]*\|)?([^\]]*)\]\]", r"\1", line.group(1)).replace("\'", "").strip()
+                    link = None if line is None else re.sub(r"\'{2,}", "", re.sub(r"\[\[(?:[^\]|]*\|)?([^\]]*)\]\]", r"\1", line.group(1))).strip()
                     first = re.search(r"count1\s*=\s*\'*([\d,]+)", block)
                     if link and first is not None:
                         full_names[int(first.group(1).replace(",", ""))] = link
@@ -313,6 +355,29 @@ def parse() -> None:
                         "votes": float(line["Total_Votes"] or 0),
                     }
                 )
+    first = {}
+    for line in totals:
+        if line["stage"] == 1:
+            first[(line["year"], line["constituency"])] = first.get((line["year"], line["constituency"]), 0.0) + line["votes"]
+    for unit in units:
+        if not 2003 <= unit["year"] <= 2017:
+            continue
+        page = raw.cached(SOURCE, WIKIPEDIA.format(unit["constituency"].replace(" ", "_"))).path.read_text(encoding="utf-8")
+        found = re.search(rf"====\s*{unit['year']}\s*====(.*?)STV Election box end2(.*?)\n\}}\}}", page, re.DOTALL)
+        box = {}
+        if found is not None:
+            for key, value in re.findall(r"\|\s*(electorate|valid|spoilt|turnout)\s*=\s*([\d,]+)", found.group(2)):
+                box[key] = float(value.replace(",", ""))
+        total = first[(unit["year"], unit["constituency"])]
+        printed = unit.get("valid")
+        confirmed = box.get("valid") is not None and abs(box["valid"] - total) <= 0.5
+        if confirmed and (printed is None or abs(printed - total) > 25):
+            unit["valid"], unit["polled"], unit["invalid"] = box["valid"], box.get("turnout"), box.get("spoilt")
+        for key, field in (("electorate", "electorate"), ("turnout", "polled"), ("spoilt", "invalid")):
+            if unit.get(field) is None and box.get(key) is not None:
+                unit[field] = box[key]
+        if unit.get("valid") is None and confirmed:
+            unit["valid"] = box["valid"]
     skipped = []
     for url in EONI:
         rows = workbook(raw.cached(SOURCE, url).path)
@@ -378,6 +443,18 @@ def parse() -> None:
                     }
                 )
     print("not loaded, stages do not tie or elected not declared:", skipped)
+    quotas = {
+        (unit["year"], unit["constituency"]): unit.get("quota") or unit["valid"] // (unit["seats"] + 1) + 1 for unit in units
+    }
+    reached: set[tuple[int, str, int]] = set()
+    for line in sorted(totals, key=lambda line: line["stage"]):
+        key = (line["year"], line["constituency"], line["number"])
+        if not line["elected"]:
+            continue
+        if line["votes"] >= quotas[key[:2]] - 0.5:
+            reached.add(key)
+        elif key in reached and line["votes"] > 0:
+            raise ValueError(f"{key[0]} {key[1]}: {line['name']} falls below the quota after reaching it")
     pl.DataFrame(units, infer_schema_length=None).write_parquet(PARSED / "units.parquet")
     pl.DataFrame(totals, infer_schema_length=None).with_columns(
         pl.col("elected").any().over("year", "constituency", "number")
@@ -442,12 +519,18 @@ def display(name: str) -> str:
     name = re.sub(r"\s+", " ", re.sub(r"##\s*unsure\s*(?:##)?|##", "", name, flags=re.IGNORECASE)).strip()
     surname, _, given = name.partition(",")
     words = []
-    for index, word in enumerate(f"{given.replace(',', ' ').strip()} {surname.strip()}".split()):
-        last = index == len(f"{given.replace(',', ' ').strip()} {surname.strip()}".split()) - 1
-        if word.isupper() and len(word) > (1 if last else 3):
+    for word in given.replace(",", " ").split():
+        words.append(word.capitalize() if word.isupper() and len(word) > 3 and "." not in word else word)
+    for word in surname.split():
+        if word.isupper() and len(word) > 1 and "." not in word:
             word = re.sub(r"\b(Mc|O')([a-z])", lambda found: found.group(1) + found.group(2).upper(), word.capitalize())
         words.append(word)
-    return " ".join(words)
+    return re.sub(
+        r"\bO(Dowd|Neill|Connor|Hara|Loan|Brien|Donnell|Rourke|Kane|Meara|Reilly|Rawe|Fachina|Callaghan|Driscoll|Hagan)\b",
+        lambda found: "O'" + found.group(1).capitalize(),
+        " ".join(words),
+        flags=re.IGNORECASE,
+    )
 
 
 def emit() -> Path:
@@ -476,16 +559,16 @@ def emit() -> Path:
         if body in cs.minted:
             cs.add("body", id=body, polity_id=nir, kind="unicameral")
             name(body, "Northern Ireland Assembly")
-            for seats, begin, end in ((108, DAYS[1998], date(2022, 5, 5)), (90, date(2022, 5, 5), None)):
-                cs.add(
-                    "body_size",
-                    body_id=body,
-                    seats=seats,
-                    valid_from=begin,
-                    valid_from_precision="day",
-                    valid_to=end,
-                    valid_to_precision="day",
-                )
+        for seats, begin, end in ((108, DAYS[1998], DAYS[2017]), (90, DAYS[2017], None)):
+            cs.add(
+                "body_size",
+                body_id=body,
+                seats=seats,
+                valid_from=begin,
+                valid_from_precision="day",
+                valid_to=end,
+                valid_to_precision="day",
+            )
         known: dict[str, UUID] = {}
         for text, party in conn.execute(
             "select n.text, p.id from party p join polity y on y.id = p.polity_id"
@@ -541,6 +624,8 @@ def emit() -> Path:
             )
             for url in EONI if official else [(ARK if ark else NICVA)[year]]:
                 cs.artifact(raw.cached(SOURCE, url), sources[year])
+            if year == 2007:
+                cs.artifact(raw.cached(SOURCE, ARK_SOUTH_ANTRIM_2007), sources[year])
 
         names_source = cs.source("Wikipedia", "Northern Ireland Assembly constituencies")
         cs.add(
@@ -640,11 +725,17 @@ def emit() -> Path:
                 quota = unit_row["quota"]
                 caveats = []
                 if valid is not None and abs(sums[0] - valid) > 0.5:
-                    caveats.append(
-                        f"The source prints {valid:,.0f} valid votes, but the candidates' first preferences sum to "
-                        f"{sums[0]:,.0f}. The printed valid and total poll figures are left out because they contradict the count."
-                    )
-                    valid = polled = None
+                    if abs(sums[0] - valid) <= 25:
+                        caveats.append(
+                            f"The declaration prints {valid:,.0f} valid votes, but the candidates' first preferences sum to "
+                            f"{sums[0]:,.0f}. Both are stored as published."
+                        )
+                    else:
+                        caveats.append(
+                            f"The source prints {valid:,.0f} valid votes, but the candidates' first preferences sum to "
+                            f"{sums[0]:,.0f}. The printed valid and total poll figures are left out because they contradict the count."
+                        )
+                        valid = polled = None
                 if quota is not None and quota != int(sums[0] // (seats + 1)) + 1:
                     caveats.append(
                         f"The source prints a quota of {quota:,.0f}, but the first preferences give "
@@ -653,6 +744,11 @@ def emit() -> Path:
                     quota = None
                 if any(after > before + 0.5 for before, after in zip(sums, sums[1:])):
                     caveats.append("The candidates' totals rise between two stages in the source; the stage totals are stored as published.")
+                if (year, label) == (2007, "South Antrim"):
+                    caveats.append(
+                        "The spreadsheet ends at count 7; count 8 (Burnside's surplus, which elected Clarke and Burns) is from ARK's "
+                        "web page for the constituency."
+                    )
                 if year == 2007:
                     caveats.append(
                         "The source gives surnames only; the candidates' full names are from Wikipedia's constituency article, "
