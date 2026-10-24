@@ -464,7 +464,7 @@
                 ></span>
                 {winner == null && lit.parties[0]?.isIndependent === true
                   ? m.person_parties_none()
-                  : label(winner)}
+                  : (lit.parties[0]?.label ?? label(winner))}
               </span>
               {#if lit.share != null}
                 <span class="font-figures tabular-nums"
@@ -480,7 +480,9 @@
                         class="shrink-0 rounded-xs block-2.5 inline-2.5"
                         style:background={tint(entry.party)}
                       ></span>
-                      <span class="truncate">{label(entry.party)}</span>
+                      <span class="truncate"
+                        >{entry.label ?? label(entry.party)}</span
+                      >
                     </span>
                     <span class="font-figures font-semibold tabular-nums"
                       >{count(entry.seats)}</span

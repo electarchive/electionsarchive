@@ -964,6 +964,7 @@ function polityMarkdown(
             .toSorted((a, b) => b.seats - a.seats)
             .map((row) => ({
               label:
+                row.label ??
                 labels.get(row.party ?? "") ??
                 (row.isIndependent === true
                   ? m.person_parties_none()

@@ -297,6 +297,7 @@ export const seats = {
         prior: string;
         area: string;
         since: string;
+        day: string;
         now: Array<string>;
         before: Array<string>;
         isUs: boolean;
@@ -392,7 +393,7 @@ export const seats = {
           left join entity_merge bm on bm.entity_id = br.parent_party_id
           order by t.contest, t.k
         )
-        select p.basis, p.prior, p.area, p.day::text as since, (select "isUs" from this) as "isUs",
+        select p.basis, p.prior, p.area, p.day::text as since, (select day::text from this) as day, (select "isUs" from this) as "isUs",
           array(select coalesce(x.party, 'person:' || x.person) from won x cross join generate_series(1, x.seats) where x.contest = p.id order by x.k) as now,
           array(select coalesce(x.party, 'person:' || x.person) from won x cross join generate_series(1, x.seats) where x.contest = p.prior order by x.k) as before,
           (select n.text from alliance a
@@ -434,11 +435,13 @@ export const seats = {
       ) {
         return null;
       }
-      const [colored, labels, slugs] = await Promise.all([
+      const [current, colored, labels, slugs] = await Promise.all([
         refs(
-          [...row.now, ...row.before].filter(
-            (key) => !key.startsWith("person:"),
-          ),
+          row.now.filter((key) => !key.startsWith("person:")),
+          row.day,
+        ),
+        refs(
+          row.before.filter((key) => !key.startsWith("person:")),
           row.since,
         ),
         names(
@@ -447,13 +450,14 @@ export const seats = {
         ),
         paths([row.prior]),
       ]);
-      const party = (key: string) =>
-        key.startsWith("person:")
+      const party = (key: string, isBefore = false) => {
+        const ref = isBefore
+          ? (colored.get(key) ?? current.get(key))
+          : (current.get(key) ?? colored.get(key));
+        return key.startsWith("person:")
           ? null
-          : {
-              label: colored.get(key)?.label ?? "",
-              short: colored.get(key)?.short ?? null,
-            };
+          : { label: ref?.label ?? "", short: ref?.short ?? null };
+      };
       const kept = [...row.before];
       const held: Array<string> = [];
       const gained: Array<string> = [];
@@ -472,13 +476,13 @@ export const seats = {
         lead: row.isUs ? "margin" : "majority",
         basis: row.basis,
         party: party(now),
-        from: party(before),
+        from: party(before, true),
         prior: {
           name: labels.full.get(row.area) ?? "",
           path: slugs.get(row.prior) ?? null,
         },
         alliance:
-          row.alliance === colored.get(now)?.label ? null : row.alliance,
+          row.alliance === current.get(now)?.label ? null : row.alliance,
         vacated:
           row.member == null
             ? null
@@ -526,7 +530,10 @@ export const seats = {
                     isGain: group[0]?.from != null,
                     count: group.length,
                     party: party(group[0]?.key ?? ""),
-                    from: group[0]?.from == null ? null : party(group[0].from),
+                    from:
+                      group[0]?.from == null
+                        ? null
+                        : party(group[0].from, true),
                   }))
                   .toArray(),
       };

@@ -126,13 +126,18 @@ const paint = (party: SQL, elections: SQL, date: SQL) => sql`
 const abbreviate = (party: SQL, date: SQL) => sql`
   (select a.text from name a
     left join lateral (
-      select f.text from name f
+      select f.text, f.is_preferred, f.valid from name f
       where f.entity_id = a.entity_id and f.kind in ('official', 'english')
-      order by coalesce(f.valid @> coalesce(${date}, current_date), false) desc, f.is_preferred desc,
+      order by coalesce(f.valid @> coalesce(${date}, current_date), false) desc,
+        coalesce(f.valid @> coalesce(${date}, current_date) and not (lower_inf(f.valid) and upper_inf(f.valid)), false) desc, f.is_preferred desc,
         (f.lang = a.lang) desc, (f.kind = 'official') desc, f.recorded_from desc, f.id
       limit 1
     ) f on true
     where a.entity_id = ${party} and a.kind in ('short', 'abbreviation')
+      and not (
+        f.is_preferred is false and not (lower_inf(f.valid) and upper_inf(f.valid)) and lower_inf(a.valid) and upper_inf(a.valid)
+        and exists (select from name p where p.entity_id = a.entity_id and p.kind in ('official', 'english') and p.is_preferred)
+      )
     order by (a.kind = 'short') desc, coalesce(a.valid @> coalesce(${date}, current_date), false) desc,
       (lower_inf(a.valid) and upper_inf(a.valid)), a.is_preferred desc, (a.lang = 'en') desc,
       coalesce(
@@ -444,6 +449,7 @@ export async function names(
     from name
     where entity_id = any(${sql.param(ids)}::uuid[]) and kind in ('official', 'english')
     order by entity_id, coalesce(valid @> ${on}::date, false) desc,
+      coalesce(valid @> ${on}::date and not (lower_inf(valid) and upper_inf(valid)), false) desc,
       coalesce(kind = 'english' and script = 'Latn' and entity_id = any(${sql.param(common)}::uuid[]), false) desc, is_preferred desc,
       (lang = 'en') desc, (kind = 'official') desc, recorded_from desc, id)
     union all
@@ -10893,6 +10899,7 @@ export const polities = {
                     party: v.nullable(v.string()),
                     seats: v.number(),
                     isIndependent: v.optional(v.boolean()),
+                    label: v.nullable(v.string()),
                   }),
                 ),
               }),
@@ -11149,26 +11156,27 @@ export const polities = {
         ]),
       ];
       const links = [...new Set(found.rows.flatMap((row) => row.link ?? []))];
-      const [labels, slugs, colors, positions, homes, own] = await Promise.all([
-        names([
-          ...seats,
-          ...links,
-          ...parties,
-          ...cabinets.rows.flatMap((row) => row.head ?? []),
-        ]),
-        paths(links),
-        refs(parties),
-        db.execute<{ party_id: string; lean: number }>(sql`
+      const [labels, slugs, colors, positions, homes, own, dated] =
+        await Promise.all([
+          names([
+            ...seats,
+            ...links,
+            ...parties,
+            ...cabinets.rows.flatMap((row) => row.head ?? []),
+          ]),
+          paths(links),
+          refs(parties),
+          db.execute<{ party_id: string; lean: number }>(sql`
           select distinct on (party_id) party_id, (low + high) * 100 + coalesce(rank, 99) as lean from party_position
           where party_id = any(${sql.param(parties)}::uuid[])
           order by party_id, valid_from desc nulls last
         `),
-        db.execute<{ id: string; region: string | null }>(sql`
+          db.execute<{ id: string; region: string | null }>(sql`
           select p.id, split_part(po.iso_code, '-', 2) as region from party p
           join polity po on po.id = p.polity_id
           where p.id = any(${sql.param(parties)}::uuid[]) and po.iso_code like '%-%'
         `),
-        db.execute<{ path: string }>(sql`
+          db.execute<{ path: string }>(sql`
           select s.path from slug s join polity p on p.id = s.entity_id
           where s.entity_id = ${input.id}::uuid and s.is_current
             and (p.kind = 'region' or (p.kind = 'federal_unit'
@@ -11179,7 +11187,19 @@ export const polities = {
                 where pp.polity_id = p.id
               )))
         `),
-      ]);
+          db.execute<{
+            party: string;
+            text: string;
+            from: string | null;
+            to: string | null;
+          }>(sql`
+          select n.entity_id::text as party, n.text, lower(n.valid)::text as from, upper(n.valid)::text as to from name n
+          where n.entity_id = any(${sql.param(parties)}::uuid[]) and n.kind in ('official', 'english') and not n.is_preferred
+            and not (lower_inf(n.valid) and upper_inf(n.valid))
+            and exists (select from name p where p.entity_id = n.entity_id and p.kind in ('official', 'english') and p.is_preferred)
+        `),
+        ]);
+      const renamed = Map.groupBy(dated.rows, (row) => row.party);
       const lean = new Map(
         positions.rows.map((row) => [row.party_id, row.lean]),
       );
@@ -11245,6 +11265,14 @@ export const polities = {
                         party: row.party,
                         seats: row.seats,
                         isIndependent: row.isIndependent,
+                        label:
+                          renamed
+                            .get(row.party ?? "")
+                            ?.find(
+                              (name) =>
+                                (name.from == null || name.from <= row.date) &&
+                                (name.to == null || row.date < name.to),
+                            )?.text ?? null,
                       }))
                       .toSorted(
                         (a, b) =>
@@ -11279,6 +11307,10 @@ export const polities = {
                         party,
                         seats,
                         isIndependent: false,
+                        label:
+                          [...next.parties, ...point.parties].find(
+                            (entry) => entry.party === party,
+                          )?.label ?? null,
                       }))
                       .toSorted((x, y) => y.seats - x.seats);
                     return [];
