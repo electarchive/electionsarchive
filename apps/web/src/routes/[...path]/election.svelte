@@ -18,6 +18,7 @@
   import type { PageData } from "./$types";
   import Cycle from "./cycle.svelte";
   import Electors from "./electors.svelte";
+  import Gains from "./gains.svelte";
   import Governments from "./governments.svelte";
   import PlaceMap from "./map.svelte";
   import Places from "./places.svelte";
@@ -1559,6 +1560,7 @@
 
 <Governments {id} {chamber} />
 <Regions {id} />
+<Gains {id} />
 
 {#if isTiled}
   <Tiers

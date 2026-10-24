@@ -9,6 +9,7 @@ import {
   search,
 } from "#lib/server/rpc/archive.js";
 import { coverage } from "#lib/server/rpc/coverage.js";
+import { seats } from "#lib/server/rpc/seats.js";
 
 export const router = {
   bodies,
@@ -20,6 +21,7 @@ export const router = {
   people,
   polities,
   search,
+  seats,
 };
 
 export type Router = typeof router;

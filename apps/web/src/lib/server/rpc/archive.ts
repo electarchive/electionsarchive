@@ -418,7 +418,7 @@ function segment(text: string) {
   );
 }
 
-async function names(
+export async function names(
   ids: Array<string>,
   on: string | null = null,
   common: Array<string> = [],
@@ -448,7 +448,7 @@ async function names(
   return { full, short };
 }
 
-async function paths(ids: Array<string>) {
+export async function paths(ids: Array<string>) {
   const result = await db.execute<{ entity_id: string; path: string }>(sql`
     select entity_id, path from slug where is_current and entity_id = any(${sql.param(ids)}::uuid[])
   `);
@@ -10920,7 +10920,7 @@ async function branches(day: string): Promise<Array<Relation>> {
   return found.rows.map((row) => ({ ...row, toLabel: "" }));
 }
 
-async function refs(ids: Array<string>, on: string | null = null) {
+export async function refs(ids: Array<string>, on: string | null = null) {
   const unique = [...new Set(ids)];
   const [labels, colors] = await Promise.all([
     names(unique, on),
