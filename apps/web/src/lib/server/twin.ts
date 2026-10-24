@@ -1322,29 +1322,39 @@ function electionMarkdown(
           ),
         ]),
     ...[...rest.slice(0, at), ...lists, ...rest.slice(at)].flatMap((entry) => {
-      const race =
+      const isRound =
         entry.round != null &&
         election.races.some(
           (other) =>
             other !== entry &&
             other.name === entry.name &&
             other.round !== entry.round,
-        )
-          ? {
-              ...entry,
-              name: m.race_round({ name: entry.name, round: entry.round }),
-            }
-          : tiered.includes(entry) && entry.kind === "list_allocation"
-            ? { ...entry, name: m.race_list({ name: entry.name }) }
-            : tiered.includes(entry) && entry.places?.levels[0] != null
-              ? {
-                  ...entry,
-                  name: m.race_split({
-                    name: entry.name,
-                    noun: entry.places.levels[0].noun,
-                  }),
-                }
-              : entry;
+        );
+      const race = isRound
+        ? {
+            ...entry,
+            name: m.race_round({ name: entry.name, round: entry.round }),
+          }
+        : tiered.includes(entry) && entry.kind === "list_allocation"
+          ? { ...entry, name: m.race_list({ name: entry.name }) }
+          : entry.places?.levels[0] != null &&
+              (tiered.includes(entry) ||
+                (entry.kind !== "list_allocation" &&
+                  entry.count > 1 &&
+                  election.races.some(
+                    (other) =>
+                      other !== entry &&
+                      other.name === entry.name &&
+                      other.count === 1,
+                  )))
+            ? {
+                ...entry,
+                name: m.race_split({
+                  name: entry.name,
+                  noun: entry.places.levels[0].noun,
+                }),
+              }
+            : entry;
       const seats = race.electors == null ? m.col_seats() : m.col_electors();
       let filled = 0;
       for (const row of race.results) {
@@ -1375,10 +1385,19 @@ function electionMarkdown(
         .values()
         .map((group) => {
           let won = 0;
+          let share = 0;
           for (const row of group) {
             won += row.seats ?? 0;
+            share += row.share;
           }
-          return { ...group[0], won };
+          return group.length === 1
+            ? { ...group[0], won }
+            : {
+                ...group[0],
+                won,
+                share,
+                label: group.map((row) => row.short ?? row.label).join("/"),
+              };
         })
         .toArray()
         .toSorted((a, b) => b.won - a.won);
@@ -1397,7 +1416,7 @@ function electionMarkdown(
           : ((race.unopposed?.seats ?? 0) * 10 >= filled ||
               (race.multiple ?? 0) > 0
               ? m.race_lede_seats_only
-              : race !== entry && race.round === 1
+              : isRound && race.round === 1
                 ? m.race_lede_seats_first
                 : m.race_lede_seats)({
               party: definite(

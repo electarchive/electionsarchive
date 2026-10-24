@@ -8531,6 +8531,7 @@ export const elections = {
                   join result_set rs on rs.contest_id = c.id and rs.is_default
                   join area a on a.id = c.district_area_id
                   where c.body_id = ${chamber}::uuid and c.kind in ('body_seats', 'list_allocation') and c.allocation_parent_id is null
+                    and c.previous_round_id is null
                     and ${within == null ? sql`true` : inside(within, sql`c.district_area_id`, sql`e.date_from`)}
                 ),
                 seats as (
@@ -8608,6 +8609,7 @@ export const elections = {
               and split_part(x.value, ':', 1) in ('SDA', 'UAA', 'LB', 'SC')
           ) or (
             not exists (select from external_id x where x.entity_id = c.election_id and x.scheme = 'gb.leh.type')
+            and (select e.kind = 'local' from election e where e.id = c.election_id)
             and (select sum(k.magnitude) from contest k where k.election_id = c.election_id and k.body_id = c.body_id and k.allocation_parent_id is null)
               = (select z.seats from body_size z join election e on e.id = c.election_id where z.body_id = c.body_id and z.valid @> e.date_from limit 1)
           ) as "isWhole", exists (
@@ -12750,29 +12752,39 @@ export const entities = {
         return { path: null };
       }
       const labels = await names([entity.id]);
-      const common =
+      const known =
         entity.type === "person"
           ? await db.execute<{ text: string }>(sql`
-            select text from name where entity_id = ${entity.id}::uuid and kind = 'english' and lang = 'en' and script = 'Latn'
-            order by is_preferred desc, text limit 1
+            select text from name where entity_id = ${entity.id}::uuid and kind in ('official', 'english')
+            order by kind = 'english' and lang = 'en' and script = 'Latn' desc, is_preferred desc, text
           `)
           : null;
-      const base = segment(
-        common?.rows[0]?.text ?? labels.full.get(entity.id) ?? "",
-      );
       const owner =
         entity.type === "party"
           ? await db.execute<{ polity: string | null }>(sql`
             select polity_id as polity from party where id = ${entity.id}::uuid
           `)
           : null;
-      const peers = await namesakes(
-        entity.type,
-        base,
-        owner?.rows[0]?.polity ?? null,
-      );
-      const at = peers.indexOf(entity.id);
-      const slug = at > 0 ? `${base}-${at + 1}` : base;
+      const bases = new Set([
+        ...(known?.rows.map((row) => segment(row.text)) ?? []),
+        segment(labels.full.get(entity.id) ?? ""),
+      ]);
+      let slug: string | null = null;
+      for (const base of bases) {
+        const peers = await namesakes(
+          entity.type,
+          base,
+          owner?.rows[0]?.polity ?? null,
+        );
+        const at = peers.indexOf(entity.id);
+        if (at >= 0) {
+          slug = at > 0 ? `${base}-${at + 1}` : base;
+          break;
+        }
+      }
+      if (slug == null) {
+        return { path: null };
+      }
       return {
         path:
           entity.type === "person"
