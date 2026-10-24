@@ -5819,6 +5819,7 @@ export const contests = {
           sample: string;
           isCurrent: boolean;
           isHead: boolean;
+          isPart: boolean;
           top: string;
           election: string;
         }>(sql`
@@ -5834,7 +5835,10 @@ export const contests = {
           ),
           roots as materialized (
             select c.id, c.kind, c.body_id, c.office_id, o.kind as okind, y.kind as ykind,
-              y.id = (select t.polity_id from election t where t.id = (select id from up where parent is null)) as own
+              y.id = (select t.polity_id from election t where t.id = (select id from up where parent is null))
+                or (y.id = (select x.polity_id from election x where x.id = (select election_id from contest where id = ${contest.id}::uuid))
+                  and y.kind not in ('sovereign_state', 'supranational', 'historical_state', 'federal_unit', 'region')) as own,
+              y.id is distinct from (select t.polity_id from election t where t.id = (select id from up where parent is null)) as part
             from tree
             join election e on e.id = tree.id and e.date_from = ${contest.date ?? "infinity"}::date
             join contest c on c.election_id = e.id and c.allocation_parent_id is null
@@ -5843,7 +5847,7 @@ export const contests = {
             join polity y on y.id = coalesce(b.polity_id, o.polity_id, e.polity_id)
           ),
           classed as (
-            select id, okind, case
+            select id, okind, part, case
                 when kind = 'ballot_question' then case
                   when ykind in ('sovereign_state', 'supranational', 'historical_state') then 'national_measure'
                   when ykind in ('federal_unit', 'region') then 'regional_measure'
@@ -5860,6 +5864,7 @@ export const contests = {
           )
           select kind, owner, count(*)::int as count, min(id::text) as sample,
             bool_or(id = ${contest.root}::uuid) as "isCurrent", bool_or(okind = 'head_of_state') as "isHead",
+            bool_and(part) as "isPart",
             (select id from up where parent is null) as top,
             (select election_id from contest where id = ${contest.id}::uuid) as election
           from classed group by kind, owner
@@ -6061,7 +6066,14 @@ export const contests = {
           groups: groups
             .toSorted(
               (a, b) =>
-                GROUPS.indexOf(a.kind) - GROUPS.indexOf(b.kind) ||
+                GROUPS.indexOf(
+                  a.kind === "owner" && a.isPart ? "local" : a.kind,
+                ) -
+                  GROUPS.indexOf(
+                    b.kind === "owner" && b.isPart ? "local" : b.kind,
+                  ) ||
+                Number(b.kind === "owner" && b.isPart) -
+                  Number(a.kind === "owner" && a.isPart) ||
                 Number(b.isHead) - Number(a.isHead) ||
                 b.count - a.count,
             )
@@ -6076,7 +6088,11 @@ export const contests = {
                   ? label
                   : (labels.short.get(row.owner ?? "") ?? label),
                 count: row.count,
-                path: isSingle ? (slugs.get(row.sample) ?? null) : hub,
+                path: isSingle
+                  ? (slugs.get(row.sample) ?? null)
+                  : row.kind === "owner" && row.isPart && election != null
+                    ? (slugs.get(election) ?? hub)
+                    : hub,
                 anchor: isSingle
                   ? null
                   : label != null && row.kind === "owner"
