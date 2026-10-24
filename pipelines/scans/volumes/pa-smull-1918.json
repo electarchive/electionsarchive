@@ -1,0 +1,32 @@
+{
+  "year": 1918,
+  "day": "1918-11-05",
+  "polity": "US-PA",
+  "publisher": "Pennsylvania Senate (Smull's Legislative Hand Book)",
+  "title": "Smull's Legislative Hand Book, 1919, general election 1918-11-05, Representatives in Congress by county and district",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/smullslegislativ1919unse/page/n{page}_w2000.jpg",
+    "item": "https://archive.org/details/smullslegislativ1919unse"
+  },
+  "raw_source": "us.scans",
+  "offices": {
+    "house": "Representative in Congress, one table per district, counties down (Philadelphia by ward), a column per candidate and party line; several party-line columns for one candidate are fused"
+  },
+  "leaves": [
+    940,
+    941,
+    942,
+    943,
+    944,
+    945,
+    946,
+    947,
+    948,
+    949,
+    950,
+    951,
+    952,
+    953
+  ]
+}

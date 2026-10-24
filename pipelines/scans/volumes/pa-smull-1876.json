@@ -1,0 +1,26 @@
+{
+  "year": 1876,
+  "day": "1876-11-07",
+  "polity": "US-PA",
+  "publisher": "Pennsylvania Senate (Smull's Legislative Hand Book)",
+  "title": "Smull's Legislative Hand Book, 1877, general election 1876-11-07, Representatives in Congress by county and district",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/smullslegislati00compgoog/page/n{page}_w2000.jpg",
+    "item": "https://archive.org/details/smullslegislati00compgoog"
+  },
+  "raw_source": "us.scans",
+  "offices": {
+    "house": "Representative in Congress, one table per district, counties down (Philadelphia by ward), a column per candidate and party line; several party-line columns for one candidate are fused"
+  },
+  "leaves": [
+    297,
+    298,
+    299,
+    300,
+    301,
+    302,
+    303,
+    304
+  ]
+}
