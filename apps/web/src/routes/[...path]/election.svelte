@@ -747,7 +747,9 @@
                     }),
                   isCount: true,
                   isWhole:
-                    isTallied || (race.size != null && race.size <= total + 2),
+                    scope == null &&
+                    (isTallied ||
+                      (race.size != null && race.size <= total + 2)),
                 }
               : {
                   total: 1,
@@ -1286,7 +1288,7 @@
         parties={race.seated}
         places={race.holders}
         body={race.body}
-        size={race.isTier ? null : race.size}
+        size={race.isTier || scope != null ? null : race.size}
         date={election.date}
         place={race.name}
         region={election.parent == null
@@ -1295,7 +1297,9 @@
               .filter((crumb) => crumb.path !== election.parent?.path)
               .at(-1)?.name ?? null)}
         change={race.change}
-        isComplete={!race.isTier && (race.size != null || race.count === 1)}
+        isComplete={scope == null &&
+          !race.isTier &&
+          (race.size != null || race.count === 1)}
         partners={race.partners}
         governing={race.size === chamber?.size ? governing : []}
       />
