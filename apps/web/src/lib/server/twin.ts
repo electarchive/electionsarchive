@@ -1446,6 +1446,23 @@ function contestMarkdown(
         ? `[${m.wording_link()}](${row.url ?? ""})`
         : `${row.kind === "text" ? m.wording_text() : m.wording_summary()}: ${row.body ?? ""} (${row.url == null ? source : `[${source}](${row.url})`})`;
     }),
+    ...(contest.kind === "ballot_question" &&
+    top?.current != null &&
+    next?.current != null
+      ? [
+          (["won", "elected"].includes(top.current.outcome ?? "")
+            ? m.race_lede_won
+            : m.race_lede_votes)({
+            party: top.label,
+            share: percent(top.current.share),
+            margin: points(top.current.share - next.current.share).replace(
+              /^\+/u,
+              "",
+            ),
+            runner: next.label,
+          }),
+        ]
+      : []),
     ...contest.notes.map((note) => `> ${note.body}`),
     ...compared,
     ...held,
