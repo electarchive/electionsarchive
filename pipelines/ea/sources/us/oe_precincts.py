@@ -1,5 +1,6 @@
 import io
 import json
+import os
 import re
 from collections import defaultdict
 from datetime import date, timedelta
@@ -17,7 +18,8 @@ from ea.store import DATA, connect
 
 SOURCE = "us.oe_precincts"
 VERSION = "1"
-PARSED = DATA / "parsed" / SOURCE
+ONLY = {state for state in os.environ.get("OE_STATES", "").upper().split(",") if state}
+PARSED = DATA / "parsed" / SOURCE / "_".join(sorted(ONLY)).lower()
 YEARS = range(2000, 2015)
 TOTALS = r"(?i)^\s*(county\s+|grand\s+|election\s+)?totals?:?\s*$"
 TALLIES = r"(?i)^(number of precincts|registered voters|times (blank|over|under) voted|total ?votes|under ?votes?|over ?votes?)\b"
@@ -115,6 +117,8 @@ VERMONT = {
 def picks() -> list[tuple[str, int, str]]:
     chosen: list[tuple[str, int, str]] = []
     for state, commit in openelections.COMMITS.items():
+        if ONLY and state not in ONLY:
+            continue
         tree = json.loads(
             raw.cached(
                 openelections.SOURCE, openelections.TREE.format(state=state.lower(), commit=commit)
@@ -123,14 +127,14 @@ def picks() -> list[tuple[str, int, str]]:
         found: dict[int, dict[bool, list[str]]] = defaultdict(lambda: defaultdict(list))
         for entry in tree["tree"]:
             matched = re.fullmatch(
-                rf"(\d{{4}})/(?:counties/)?(\d{{4}})11\d{{2}}__{state.lower()}__general(__[a-z_]+)?__precinct\.csv",
+                rf"(\d{{4}})/(?:counties/)?(\d{{4}})11\d{{2}}__{state.lower()}__general(__[a-z_]+)?__(?:precinct|ward)\.csv",
                 entry["path"],
             )
             if entry["type"] == "blob" and matched and int(matched[2]) in YEARS and matched[1] == matched[2]:
                 found[int(matched[2])][matched[3] is None].append(entry["path"])
         for year, files in sorted(found.items()):
             chosen.extend((state, year, path) for path in sorted(files[True] or files[False]))
-    return [*chosen, ("MI", 2022, MICHIGAN)]
+    return [*chosen, *([("MI", 2022, MICHIGAN)] if not ONLY or "MI" in ONLY else [])]
 
 
 def url(state: str, path: str) -> str:
@@ -181,6 +185,8 @@ def parse() -> None:
                 ),
                 votes="column_15",
             )
+        if "ward" in frame.columns and "precinct" not in frame.columns:
+            frame = frame.rename({"ward": "precinct"})
         renamed: dict[str, str] = {}
         for column in frame.columns:
             name = COLUMNS.get(column.strip().lower(), column.strip().lower())
