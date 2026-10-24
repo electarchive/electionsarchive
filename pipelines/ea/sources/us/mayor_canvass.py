@@ -1,4 +1,6 @@
 import csv
+import html
+import json
 import re
 import subprocess
 import unicodedata
@@ -14,7 +16,7 @@ from ea.changeset import Changeset, slug
 from ea.store import DATA, connect
 
 SOURCE = "us.mayor_canvass"
-VERSION = "2"
+VERSION = "3"
 PARSED = DATA / "parsed" / SOURCE
 PHILADELPHIA = "https://vote.phila.gov/files/"
 FILES = {
@@ -57,6 +59,24 @@ NYC_NOTE = (
     "Borough totals from the Board of Elections' certified Statement and Return report, one line per ballot line as "
     "New York's fusion ballot prints them, with write-ins as one line. Ballots cast are the report's total ballots."
 )
+DC = {
+    date(1994, 11, 8): "https://www.dcboe.org/elections/election-results-archives/november-8-general-election-1994",
+    date(1998, 11, 3): "https://web.archive.org/web/19990418030534if_/http://www.dcboee.org/htmldocs/113noche.htm",
+    date(2002, 11, 5): (
+        "https://www.dcboe.org/elections/election-results-archives/november-5-general-election/"
+        "certification-summary-candidate"
+    ),
+    date(2006, 11, 7): "https://www.dcboe.org/getmedia/77fd9c1b-bb65-473b-8c1c-4530af2e2f2f/Summary_General_2006.pdf",
+    date(2010, 11, 2): "https://electionresults.dcboe.org/cityWide/getCityWide/2010-General-Election",
+}
+DC_PUBLISHER = "District of Columbia Board of Elections"
+DC_TITLE = "Election results archive"
+DC_NOTE = (
+    "Citywide totals from the Board of Elections' final results: the 1994 and 1998 final and complete results pages "
+    "(1998 from the Internet Archive's copy of the Board's old site), the 2002 certification summary, the 2006 "
+    "certified summary report, and the 2010 certified citywide results. Party labels are as printed; independents "
+    "carry none. Ballots cast are the reported total turnout, where given."
+)
 PARTIES = {
     "D": ("democratic-party", "Democratic"),
     "DEM": ("democratic-party", "Democratic"),
@@ -80,6 +100,11 @@ PARTIES = {
     "RENT IS TOO DAMN HIGH": ("NY:rent-is-2-damn-high", "Rent Is Too Damn High"),
     "RENT IS 2 DAMN HIGH": ("NY:rent-is-2-damn-high", "Rent Is Too Damn High"),
     "SOCIALISM & LIB": ("party-for-socialism-and-liberation", "Socialism and Liberation"),
+    "DC STATEHOOD": ("DC:d-c-statehood", "D.C. Statehood"),
+    "D.C. STATEHOOD": ("DC:d-c-statehood", "D.C. Statehood"),
+    "STG": ("DC:d-c-statehood-green-party", "D.C. Statehood Green"),
+    "SG": ("DC:d-c-statehood-green-party", "D.C. Statehood Green"),
+    "SOC": ("socialist-workers-party", "Socialist Workers"),
     "REPUBLICAN\\LIBERAL": ("republican-party", "Republican and Liberal"),
     "INDEPENDENCE/JOBS & EDUCATION": ("NY:independence-party", "Independence and Jobs & Education"),
 }
@@ -99,6 +124,8 @@ def fetch() -> None:
                 raw.fetch(SOURCE, PHILADELPHIA + name, suffix=Path(name).suffix)
     for name in NYC.values():
         raw.fetch(SOURCE, NYC_FILES + name, suffix=Path(name).suffix)
+    for day, link in DC.items():
+        raw.fetch(SOURCE, link, suffix=".pdf" if link.endswith(".pdf") else ".json" if day.year == 2010 else ".html")
 
 
 def parse() -> None:
@@ -222,6 +249,55 @@ def parse() -> None:
             .agg(pl.col("votes").sum())
             .with_columns(day=pl.lit(day), place=pl.lit("3651000"))
         )
+    ballots = [(day, "3651000", county, cast) for day, county, cast in ballots]
+    for day, link in DC.items():
+        path = raw.cached(SOURCE, link).path
+        lines = []
+        if day.year == 2010:
+            for contest in json.loads(path.read_text()):
+                if contest["OfficeName"] == "MAYOR":
+                    lines += [(row["Contestant"], row["PartyCode"], row["Votes"]) for row in contest["ElectionData"]]
+        elif day.year in (1994, 1998):
+            text = " ".join(re.sub(r"<[^>]+>", " ", html.unescape(path.read_text(errors="replace"))).split())
+            block = re.search(r" MAYOR (.+?) CHAIRMAN OF THE COUNCIL", text)[1]
+            lines = re.findall(
+                r"(\S.*?) (?:(DEMOCRATIC|REPUBLICAN|D\.?C\.? STATEHOOD|SOCIALIST WORKERS|INDEPENDENT) )?([\d,]+) \d+(?= |$)",
+                block,
+            )
+            ballots.append((day, "1150000", None, int(re.search(r"TOTAL TURNOUT ([\d,]+)", text)[1].replace(",", ""))))
+        else:
+            if day.year == 2002:
+                text = re.sub(r"<[^>]+>", "", html.unescape(path.read_text()))
+                cast = re.search(r"BALLOTS CAST - TOTAL[ .]+([\d,]+)", text)[1]
+                pattern = r" (.+?)(?: \((\w+)\))?[ .]+?([\d,]+) +[\d.]+\b"
+            else:
+                text = subprocess.run(
+                    ["pdftotext", "-layout", str(path), "-"], check=True, capture_output=True, text=True
+                ).stdout
+                cast = re.search(r"Total \.\.\. +([\d,]+) +[\d.]+%", text)[1]
+                pattern = r"(?:(\w+) - )?(.+?) +([\d,]+) +[\d.]+%"
+            ballots.append((day, "1150000", None, int(cast.replace(",", ""))))
+            block = text.split("MAYOR OF THE DISTRICT OF COLUMBIA", 1)[1].splitlines()[1:]
+            for line in block:
+                if re.match(r"\s+Total \.", line):
+                    break
+                if (found := re.match(pattern, line[:66])) is not None and "Votes" not in line[:66]:
+                    lines.append(found.groups() if day.year == 2002 else (found[2], found[1], found[3]))
+        frame = pl.DataFrame(
+            [(name.strip(), party, int(str(votes).replace(",", ""))) for name, party, votes in lines],
+            schema={"candidate": pl.String, "party": pl.String, "votes": pl.Int64},
+            orient="row",
+        ).with_columns(
+            candidate=pl.when(pl.col("candidate").str.to_uppercase().str.contains(r"^WRITE[ -]?IN"))
+            .then(pl.lit("Write In"))
+            .otherwise("candidate"),
+            party=pl.when(pl.col("party").is_in(["IND", "INDEPENDENT", "NON", ""])).then(None).otherwise("party"),
+            day=pl.lit(day),
+            place=pl.lit("1150000"),
+            county=pl.lit(None, pl.String),
+        )
+        print(day, frame.select("candidate", "party", "votes").rows())
+        rows.append(frame)
     candidates = pl.concat(rows, how="diagonal").with_columns(write_in=pl.col("candidate") == "Write In")
     for (day,), group in candidates.filter(pl.col("place") == "3651000").group_by("day"):
         print(
@@ -230,7 +306,7 @@ def parse() -> None:
     PARSED.mkdir(parents=True, exist_ok=True)
     candidates.sort("day", "votes", descending=[False, True]).write_parquet(PARSED / "candidates.parquet")
     pl.DataFrame(
-        ballots, schema={"day": pl.Date, "county": pl.String, "ballots": pl.Int64}, orient="row"
+        ballots, schema={"day": pl.Date, "place": pl.String, "county": pl.String, "ballots": pl.Int64}, orient="row"
     ).write_parquet(PARSED / "ballots.parquet")
 
 
@@ -245,7 +321,8 @@ def emit() -> Path:
             summary=(
                 "Mayoral generals from official canvasses with each ballot line's party, superseding ALGED's partyless "
                 "sets: Philadelphia's 2007 to 2019 from the City Commissioners, and New York City's 2001 to 2017 by "
-                "borough from the Board of Elections' certified Statement and Return reports"
+                "borough from the Board of Elections' certified Statement and Return reports, and Washington's 1994 to 2010 from "
+                "the District of Columbia Board of Elections"
             ),
             polity="US",
         )
@@ -264,6 +341,13 @@ def emit() -> Path:
                 NYC_TITLE,
                 "https://www.vote.nyc/page/election-results-summary",
                 [NYC_FILES + name for name in NYC.values()],
+            ),
+            (
+                "1150000",
+                DC_PUBLISHER,
+                DC_TITLE,
+                "https://www.dcboe.org/elections/election-results-archives",
+                list(DC.values()),
             ),
         ):
             sources[place] = cs.source(publisher, title)
@@ -287,7 +371,7 @@ def emit() -> Path:
         values = []
         staged: set[UUID] = set()
         for (place, day), rows in candidates.group_by("place", "day", maintain_order=True):
-            city = "philadelphia_PA" if place == "4260000" else "new york_NY"
+            city = {"4260000": "philadelphia_PA", "3651000": "new york_NY", "1150000": "washington_DC"}[place]
             contest_key = f"alged:{place}_{day.year}_11_{city}_Mayor_mayor_1"
             contest = cs.key("us.contest", contest_key)
             if contest in cs.minted:
@@ -323,7 +407,12 @@ def emit() -> Path:
                 is_default=True,
                 completeness=1,
             )
-            cs.add("note", entity_id=result_set, kind="methodology", body_md=NOTE if place == "4260000" else NYC_NOTE)
+            cs.add(
+                "note",
+                entity_id=result_set,
+                kind="methodology",
+                body_md={"4260000": NOTE, "3651000": NYC_NOTE}.get(place, DC_NOTE),
+            )
             totals = (
                 rows.filter(~pl.col("write_in"))
                 .group_by(pl.col("candidate").map_elements(surname, pl.String).alias("surname"))
@@ -369,8 +458,11 @@ def emit() -> Path:
                         ballot_label=f"{candidate.title()} ({label})",
                     )
                 values.append((str(result_set), str(unit), str(option), 1, votes))
-            for county, cast in ballots.filter(pl.col("day") == day).select("county", "ballots").iter_rows():
-                values.append((str(result_set), str(cs.unit("us.county", county)), None, 3, cast))
+            for county, cast in (
+                ballots.filter(pl.col("day") == day, pl.col("place") == place).select("county", "ballots").iter_rows()
+            ):
+                unit = cs.unit("us.place", place) if county is None else cs.unit("us.county", county)
+                values.append((str(result_set), str(unit), None, 3, cast))
         cs.frame(
             "result_value",
             pl.DataFrame(
