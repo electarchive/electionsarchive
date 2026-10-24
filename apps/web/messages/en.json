@@ -393,6 +393,8 @@
   "seats_part": "Shows {count} of the {total} total seats.",
   "seats_vacant": "Vacant",
   "seats_seceded": "Seceded",
+  "seats_held": "Not up",
+  "race_staggered": "{count} of the council's {total} seats were up for election.",
   "seats_official": "Officially {count} seats, {majority} for a majority",
   "electors_title": "Electoral votes",
   "electors_majority": "{count} to win",

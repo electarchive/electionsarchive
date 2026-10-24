@@ -7872,6 +7872,7 @@ export const elections = {
               }),
             ),
             size: v.nullable(v.number()),
+            isStaggered: v.optional(v.boolean()),
             straddled: v.optional(v.number()),
             unopposed: v.optional(
               v.nullable(
@@ -8270,11 +8271,19 @@ export const elections = {
             race.results.flatMap((row) => row.person ?? []),
           ),
         ),
-        db.execute<{ sample: string; election: string; isWhole: boolean }>(sql`
+        db.execute<{
+          sample: string;
+          election: string;
+          isWhole: boolean;
+          isStaggered: boolean;
+        }>(sql`
           select c.id::text as sample, c.election_id::text as election, exists (
             select from external_id x where x.entity_id = c.election_id and x.scheme = 'gb.leh.type'
               and split_part(x.value, ':', 1) in ('SDA', 'UAA', 'LB', 'SC')
-          ) as "isWhole"
+          ) as "isWhole", exists (
+            select from external_id x where x.entity_id = c.election_id and x.scheme = 'gb.leh.type'
+              and split_part(x.value, ':', 1) in ('SDT', 'UAT', 'MB')
+          ) as "isStaggered"
           from contest c
           where c.id = any(${sql.param(councils.flatMap((race) => race.sample ?? []))}::uuid[])
         `),
@@ -8393,6 +8402,7 @@ export const elections = {
                 },
         races: (isUmbrella ? [] : raced).map((race, index) => ({
           ...race,
+          isStaggered: held.get(race.sample ?? "")?.isStaggered === true,
           anchor: raced
             .slice(0, index)
             .some((other) => other.anchor === race.anchor)

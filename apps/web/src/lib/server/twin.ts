@@ -1140,6 +1140,10 @@ function electionMarkdown(
               : entry;
       const hasSeats = race.results.some((row) => row.seats != null);
       const seats = race.electors == null ? m.col_seats() : m.col_electors();
+      let filled = 0;
+      for (const row of race.results) {
+        filled += row.seats ?? 0;
+      }
       const districts = race.isPrimaries ? race.places : null;
       if (districts != null) {
         return [
@@ -1193,6 +1197,14 @@ function electionMarkdown(
                 ),
               }),
             ]),
+        ...(race.isStaggered === true && race.size != null && filled < race.size
+          ? [
+              m.race_staggered({
+                count: count(filled),
+                total: count(race.size),
+              }),
+            ]
+          : []),
         ...((race.multiple ?? 0) > 0
           ? [
               m.race_multiple({

@@ -16,6 +16,7 @@
     isComplete,
     partners,
     governing,
+    isStaggered = false,
   }: {
     parties: Array<{
       key: string;
@@ -44,6 +45,7 @@
     isComplete: boolean;
     partners: Array<Array<string>>;
     governing: Array<string>;
+    isStaggered?: boolean;
   } = $props();
 
   const filled = $derived.by(() => {
@@ -132,6 +134,7 @@
     {place}
     link={null}
     {size}
+    held={isStaggered && isPart ? (size ?? 0) - filled : 0}
     {change}
     {isComplete}
     {partners}

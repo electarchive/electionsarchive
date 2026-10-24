@@ -31,6 +31,7 @@
     size,
     vacant = 0,
     seceded = 0,
+    held = 0,
     official = null,
     isComplete = true,
     change: moved = null,
@@ -57,6 +58,7 @@
     size: number | null;
     vacant?: number;
     seceded?: number;
+    held?: number;
     official?: number | null;
     isComplete?: boolean;
     change?: Record<string, number> | null;
@@ -161,7 +163,7 @@
     ),
   );
   const totals = $derived.by(() => {
-    let [all, local] = [vacant + seceded, 0];
+    let [all, local] = [vacant + seceded + held, 0];
     for (const party of folded) {
       all += party.seats;
       local += party.here;
@@ -275,6 +277,9 @@
     for (const seat of placed.slice(start, start + seceded)) {
       seat.party = "~seceded";
     }
+    for (const seat of placed.slice(start + seceded, start + seceded + held)) {
+      seat.party = "~held";
+    }
     return placed;
   });
   const colors = $derived(
@@ -296,11 +301,14 @@
     new Map([
       ...folded.map((party) => [party.key, party.label] as const),
       ["~seceded", m.seats_seceded()] as const,
+      ["~held", m.seats_held()] as const,
     ]),
   );
   const whole = $derived(
     isUp ||
-      (link == null && (size === totals.all || (size == null && isComplete))),
+      (link == null &&
+        held === 0 &&
+        (size === totals.all || (size == null && isComplete))),
   );
   const majorityAngle = $derived.by(() => {
     const before = seats[majority - 2];
@@ -318,7 +326,9 @@
   });
   const center = $derived(
     link == null
-      ? { value: totals.all, of: whole ? null : size }
+      ? held > 0
+        ? { value: totals.all - held, of: totals.all }
+        : { value: totals.all, of: whole ? null : size }
       : { value: totals.local, of: totals.all },
   );
   const font = $derived.by(() => {
@@ -334,6 +344,12 @@
     );
   });
   const caption = $derived.by(() => {
+    if (held > 0) {
+      return m.seats_up({
+        count: count(totals.all - held),
+        total: count(totals.all),
+      });
+    }
     if (isUp) {
       return m.seats_up({
         count: count(totals.local),
@@ -629,9 +645,11 @@
               : null}
             style:fill={seat.party === "" || seat.party === "~seceded"
               ? "var(--card)"
-              : lit
-                ? colors.get(seat.party)
-                : `color-mix(in oklab, ${colors.get(seat.party)} 28%, var(--card))`}
+              : seat.party === "~held"
+                ? "color-mix(in oklab, var(--muted-foreground) 22%, var(--card))"
+                : lit
+                  ? colors.get(seat.party)
+                  : `color-mix(in oklab, ${colors.get(seat.party)} 28%, var(--card))`}
           />
         {/each}
         {#if tip != null}
@@ -857,7 +875,7 @@
           >
           <span
             class="text-end font-figures text-[0.8125rem] text-muted-foreground tabular-nums inline-16"
-            >{percent(party.seats / totals.all)}</span
+            >{percent(party.seats / (totals.all - held))}</span
           >
         {:else}
           <span class="font-figures text-[0.8125rem] font-semibold tabular-nums"
@@ -891,6 +909,26 @@
           class="text-end font-figures text-[0.8125rem] tabular-nums inline-16"
           >{percent(seceded / totals.all)}</span
         >
+      </li>
+    {/if}
+    {#if held > 0}
+      <li
+        class="flex items-center gap-2 rounded-xs px-1.5 py-1 text-muted-foreground"
+      >
+        <span
+          class="shrink-0 rounded-xs bg-muted-foreground/22 block-2.5 inline-2.5"
+        ></span>
+        <span class="flex-1 truncate font-semibold min-inline-0"
+          >{m.seats_held()}</span
+        >
+        {#if moved != null}
+          <span class="inline-12"></span>
+        {/if}
+        <span
+          class="text-end font-figures text-[0.8125rem] font-semibold tabular-nums inline-10"
+          >{count(held)}</span
+        >
+        <span class="inline-16"></span>
       </li>
     {/if}
     {#if vacant > 0}

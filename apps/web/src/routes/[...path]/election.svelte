@@ -1338,6 +1338,7 @@
           (race.size != null || race.count === 1)}
         partners={race.partners}
         governing={race.size === chamber?.size ? governing : []}
+        isStaggered={race.isStaggered}
       />
     {/if}
     {#if (race.straddled ?? 0) > 0}
