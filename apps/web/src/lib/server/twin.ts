@@ -549,10 +549,12 @@ function personMarkdown(
       ? (person.isGone ? m.person_served_from : m.person_served_now)({
           from: from?.slice(0, 4) ?? "",
         })
-      : m.person_served_span({
-          from: from?.slice(0, 4) ?? "",
-          to: to.slice(0, 4),
-        });
+      : from?.slice(0, 4) === to.slice(0, 4)
+        ? to.slice(0, 4)
+        : m.person_served_span({
+            from: from?.slice(0, 4) ?? "",
+            to: to.slice(0, 4),
+          });
   const roles = {
     member: m.person_parties_member,
     office: m.person_parties_office,

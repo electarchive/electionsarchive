@@ -194,6 +194,10 @@ export const seats = {
                 where sx.kind = 'independent_group' and sx.id = coalesce(pm.into_id, lp.party)
               )
               and xc.person_id = cy.person_id and xe.date_from < t.day
+              and not exists (
+                select from top n join candidacy nc on nc.option_id = n.id and nc.role = 'head'
+                where n.contest in (select id from paired) and nc.person_id = cy.person_id
+              )
               and not (xp.kind = 'independent_group' and exists (select from name sn where sn.entity_id = xp.id and sn.text = 'Speaker'))
             order by xe.date_from desc limit 1
           ) sp on true
@@ -502,6 +506,10 @@ export const seats = {
                 where sx.kind = 'independent_group' and sx.id = coalesce(pm.into_id, lp.party)
               )
               and xc.person_id = cy.person_id and xe.date_from < t.day
+              and not exists (
+                select from top n join candidacy nc on nc.option_id = n.id and nc.role = 'head'
+                where n.contest in (select id from paired) and nc.person_id = cy.person_id
+              )
               and not (xp.kind = 'independent_group' and exists (select from name sn where sn.entity_id = xp.id and sn.text = 'Speaker'))
             order by xe.date_from desc limit 1
           ) sp on true
@@ -839,6 +847,7 @@ export const seats = {
               where sx.kind = 'independent_group' and sx.id::text = q.before
             )
             and coalesce(cm.into_id, cy.person_id)::text = q.member
+            and q.winner is distinct from q.member
             and e.date_from < q.day::date
             and not (pp.kind = 'independent_group' and exists (select from name sn where sn.entity_id = pp.id and sn.text = 'Speaker'))
           order by e.date_from desc limit 1

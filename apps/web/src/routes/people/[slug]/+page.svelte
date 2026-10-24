@@ -207,10 +207,12 @@
                   ? note == null
                     ? since({ from: part.from?.slice(0, 4) ?? "" })
                     : part.from?.slice(0, 4)
-                  : m.person_served_span({
-                      from: part.from?.slice(0, 4) ?? "",
-                      to: part.to.slice(0, 4),
-                    }),
+                  : part.from?.slice(0, 4) === part.to.slice(0, 4)
+                    ? part.to.slice(0, 4)
+                    : m.person_served_span({
+                        from: part.from?.slice(0, 4) ?? "",
+                        to: part.to.slice(0, 4),
+                      }),
               )
               .join(", ")}</span
           >
@@ -222,10 +224,12 @@
                   const span =
                     seat.to == null
                       ? since({ from: seat.from?.slice(0, 4) ?? "" })
-                      : m.person_served_span({
-                          from: seat.from?.slice(0, 4) ?? "",
-                          to: seat.to.slice(0, 4),
-                        });
+                      : seat.from?.slice(0, 4) === seat.to.slice(0, 4)
+                        ? seat.to.slice(0, 4)
+                        : m.person_served_span({
+                            from: seat.from?.slice(0, 4) ?? "",
+                            to: seat.to.slice(0, 4),
+                          });
                   const reason = endings[seat.ended ?? ""];
                   return reason == null
                     ? m.person_seat({ place: seat.name, span })
