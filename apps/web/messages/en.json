@@ -1340,6 +1340,8 @@
   "party_scope_title": "{place} {party}",
   "party_abroad_title": "{party} ({place})",
   "party_abroad": "Also contests elections in {places}",
+  "party_namesakes": "Not to be confused with {parties}.",
+  "party_namesake_years": "{name} ({years})",
   "party_scope_national": "National party",
   "party_scope_branch": "Operates in {place} as",
   "party_card_in": "{place}",

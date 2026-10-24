@@ -837,6 +837,29 @@ function partyMarkdown(
             polity: party.polity.name,
           }),
         ]),
+    ...((party.namesakes ?? []).length === 0
+      ? []
+      : [
+          m.party_namesakes({
+            parties: new Intl.ListFormat(getLocale(), {
+              type: "conjunction",
+            }).format(
+              (party.namesakes ?? []).map((namesake) => {
+                const from = namesake.span?.from.slice(0, 4);
+                const to = namesake.span?.to.slice(0, 4);
+                return link(
+                  from == null || to == null
+                    ? namesake.party.label
+                    : m.party_namesake_years({
+                        name: namesake.party.label,
+                        years: from === to ? from : `${from}–${to}`,
+                      }),
+                  `id/${namesake.party.id}`,
+                );
+              }),
+            ),
+          }),
+        ]),
     ...(abroad.length === 0
       ? []
       : [

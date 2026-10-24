@@ -60,6 +60,29 @@
           part.type === "element" ? data.abroad[Number(part.value)] : undefined,
       })),
   );
+  const peers = $derived(
+    new Intl.ListFormat(getLocale(), { type: "conjunction" })
+      .formatToParts((party.namesakes ?? []).map((_, index) => String(index)))
+      .map((part) => {
+        const namesake =
+          part.type === "element"
+            ? party.namesakes?.[Number(part.value)]
+            : undefined;
+        const from = namesake?.span?.from.slice(0, 4);
+        const to = namesake?.span?.to.slice(0, 4);
+        return {
+          text: part.value,
+          namesake,
+          label:
+            namesake == null || from == null || to == null
+              ? (namesake?.party.label ?? "")
+              : m.party_namesake_years({
+                  name: namesake.party.label,
+                  years: from === to ? from : `${from}–${to}`,
+                }),
+        };
+      }),
+  );
   let isEvery = $state(false);
   const shown = $derived(
     isEvery || years.length <= 11 ? years : years.slice(0, 10),
@@ -206,6 +229,18 @@
             >
           {/if}
         </p>
+        {#if (party.namesakes ?? []).length > 0}
+          {const frame = $derived(
+            m.party_namesakes({ parties: "\u0001" }).split("\u0001"),
+          )}
+          <p class="text-[0.9375rem] text-muted-foreground">
+            {frame[0]}{#each peers as part, index (index)}{#if part.namesake == null}{part.text}{:else}<a
+                  class="underline decoration-border underline-offset-4 hover:decoration-foreground"
+                  href={resolve("/id/[id]", { id: part.namesake.party.id })}
+                  >{part.label}</a
+                >{/if}{/each}{frame[1]}
+          </p>
+        {/if}
       {/if}
     </header>
 

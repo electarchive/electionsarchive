@@ -12358,7 +12358,7 @@ async function namesakes(
     where type = ${type}::entity_type
       and tsv @@ to_tsquery('simple', ${words.map((word) => `${word}:*`).join(" & ")})
       and (${polity}::uuid is null or polity_id = ${polity}::uuid)
-    order by case when type = 'person' then rank_boost end desc nulls last, entity_id
+    order by rank_boost desc, entity_id
   `);
   const ids = found.rows.map((row) => row.id);
   if (type === "party") {
@@ -14620,6 +14620,14 @@ export const parties = {
           }),
         ),
         parents: v.array(v.object({ kind: v.string(), party: PartyRef })),
+        namesakes: v.optional(
+          v.array(
+            v.object({
+              party: PartyRef,
+              span: v.nullable(v.object({ from: v.string(), to: v.string() })),
+            }),
+          ),
+        ),
         scope: v.nullable(
           v.object({
             polity: v.object({
@@ -14724,12 +14732,19 @@ export const parties = {
         ...(party.polity == null ? [] : [party.polity]),
         ...(input.within == null ? [] : [input.within]),
       ];
-      const others = relations.rows.map((row) => row.other);
+      const own = await names([party.id]);
+      const sakes = await namesakes(
+        "party",
+        segment(own.full.get(party.id) ?? ""),
+        party.polity,
+      );
+      const peers = sakes.filter((id) => id !== party.id);
+      const others = [...relations.rows.map((row) => row.other), ...peers];
       const [entities, slugs, spans] = await Promise.all([
         refs([
           party.id,
           ...polity,
-          ...relations.rows.map((row) => row.other),
+          ...others,
           ...parents.rows.map((row) => row.parent),
           ...branched,
         ]),
@@ -14781,6 +14796,19 @@ export const parties = {
         parents: parents.rows.flatMap((row) => {
           const other = entities.get(row.parent);
           return other == null ? [] : [{ kind: row.kind, party: other }];
+        }),
+        namesakes: peers.flatMap((id) => {
+          const other = entities.get(id);
+          const range = ranges.get(id);
+          return other == null
+            ? []
+            : [
+                {
+                  party: other,
+                  span:
+                    range == null ? null : { from: range.from, to: range.to },
+                },
+              ];
         }),
         scope:
           input.within == null
