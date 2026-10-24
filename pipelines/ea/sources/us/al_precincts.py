@@ -24,6 +24,7 @@ TITLE = "Election Data Downloads: precinct-level general election results"
 LANDING = "https://www.sos.alabama.gov/alabama-votes/voter/election-data"
 BASE = "https://www.sos.alabama.gov/sites/default/files/election-data/2017-06/"
 FILES = {
+    date(2004, 11, 2): "https://www.sos.alabama.gov/sites/default/files/election-data/2023-06/2004-GeneralElection-PrecinctLevel.zip",
     date(2002, 11, 5): BASE + "2002-GeneralElection-PrecinctLevel_0.xls",
     date(2010, 11, 2): BASE + "2010-general-precinctLevel.zip",
     date(2012, 11, 6): BASE + "2012General-PrecinctLevel.zip",
@@ -75,7 +76,7 @@ def contest(title: str) -> tuple[str, int | None] | None:
         return "president", None
     if name == "UNITED STATES SENATOR":
         return "senate", None
-    if matched := re.match(r"UNITED STATES REPRESENTATIVE, (\d+)\w* CONGRESSIONAL DISTRICT", name):
+    if matched := re.match(r"UNITED STATES REPRESENTATIVE, (\d+)\w* CONGRESSIONAL", name):
         return "house", int(matched[1])
     if matched := re.match(r"STATE SENATOR, DISTRICT NO\. (\d+)", name):
         return f"senate:{int(matched[1])}:g", None
@@ -143,7 +144,7 @@ def parse() -> None:
                     continue
                 if not member.lower().endswith((".xls", ".xlsx")) or member.startswith("__MACOSX"):
                     continue
-                county = re.sub(r"[^a-z]", "", re.sub(r"(?i)^2014-general-|[ _-]*2014 general precinct", "", Path(member).stem).lower()).removesuffix("xls").replace("radolph", "randolph")
+                county = re.sub(r"[^a-z]", "", re.sub(r"(?i)^2014-general-|[ _-]*2014 general precinct", "", Path(member).stem).lower()).removesuffix("xls").removesuffix("gen").replace("radolph", "randolph")
                 content = archive.read(member)
                 if content.lstrip(b"\xef\xbb\xbf").startswith(b"<?xml"):
                     sheets = xml_sheets(content)
@@ -176,6 +177,14 @@ def parse() -> None:
                             for precinct, value in zip(precincts, row[3:], strict=False):
                                 if precinct and not re.search(TOTALS, precinct.upper()):
                                     records.append((day, county, row[0], precinct, row[2], value, row[1]))
+                        continue
+                    if rows[0][0] == "ContestTitle":
+                        for row in rows[1:]:
+                            if len(row) < 4 or contest(row[0]) is None:
+                                continue
+                            for precinct, value in zip(rows[0][3:], row[3:], strict=False):
+                                if precinct and not re.search(TOTALS, precinct.upper()):
+                                    records.append((day, county, row[0], precinct, row[1], value, ""))
                         continue
                     if rows[0][0].strip() == "" and len(rows) > 2 and rows[1] and rows[1][0] != "" and any(contest(label.strip()) for label in rows[0] if label.strip()):
                         offices = {}
