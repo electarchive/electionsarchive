@@ -1,0 +1,27 @@
+{
+ "polity": "US-IA",
+ "publisher": "Iowa Secretary of State",
+ "license": "Public record",
+ "raw_source": "us.ia_sos",
+ "year": 1988,
+ "day": "1988-11-08",
+ "title": "Iowa official canvass summary, general election 1988",
+ "file": {
+  "url": "https://sos.iowa.gov/elections/pdf/results/80s/1988gencanv.pdf",
+  "item": "https://sos.iowa.gov/elections/results/"
+ },
+ "offices": {
+  "president": "presidential electors (President and Vice President)"
+ },
+ "leaves": [
+  1,
+  2,
+  3,
+  4,
+  5,
+  6,
+  7,
+  8
+ ],
+ "autorotate": true
+}

@@ -1,0 +1,32 @@
+{
+ "polity": "US-IA",
+ "publisher": "Iowa Secretary of State",
+ "license": "Public record",
+ "raw_source": "us.ia_sos",
+ "year": 1986,
+ "day": "1986-11-04",
+ "title": "Iowa official canvass summary, general election 1986",
+ "file": {
+  "url": "https://sos.iowa.gov/elections/pdf/results/80s/1986gencanv.pdf",
+  "item": "https://sos.iowa.gov/elections/results/"
+ },
+ "offices": {
+  "governor": "Governor",
+  "senate": "U.S. Senator"
+ },
+ "leaves": [
+  1,
+  2,
+  3,
+  4,
+  5,
+  6,
+  7,
+  8,
+  9,
+  10,
+  11,
+  12
+ ],
+ "autorotate": true
+}

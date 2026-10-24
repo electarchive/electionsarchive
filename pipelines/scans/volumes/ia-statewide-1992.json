@@ -1,0 +1,36 @@
+{
+ "polity": "US-IA",
+ "publisher": "Iowa Secretary of State",
+ "license": "Public record",
+ "raw_source": "us.ia_sos",
+ "year": 1992,
+ "day": "1992-11-03",
+ "title": "Iowa official canvass summary, general election 1992",
+ "file": {
+  "url": "https://sos.iowa.gov/elections/pdf/results/90s/1992gencanv.pdf",
+  "item": "https://sos.iowa.gov/elections/results/"
+ },
+ "offices": {
+  "president": "presidential electors (President and Vice President)",
+  "senate": "U.S. Senator"
+ },
+ "leaves": [
+  15,
+  16,
+  17,
+  18,
+  19,
+  20,
+  21,
+  22,
+  23,
+  24,
+  25,
+  26,
+  27,
+  28,
+  29,
+  30
+ ],
+ "autorotate": true
+}
