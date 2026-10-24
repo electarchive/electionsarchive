@@ -158,7 +158,6 @@ DIRECT_THREADS = 8
 DIRECT_LIMIT = 200
 LEDGER = DATA / "scans-ledger.json"
 BUDGET = 300.0
-COST_REPORT = "https://api.anthropic.com/v1/organizations/cost_report"
 BILLED_FROM = "2026-10-22T00:00:00Z"
 IMAGE_LIMIT = 4_500_000
 BATCH_LIMIT = 200_000_000
@@ -605,7 +604,12 @@ def cells(
                     stem = slug(
                         ABBREVIATION.sub(lambda hit: f"{EXPANDED[hit[1].lower()]} ", WARD.sub("", label))
                         if towns
-                        else re.sub(r"\s+county$", "", re.sub(r"\s*[(\[]+\s*part\s*[)\]]*$", "", label, flags=re.IGNORECASE), flags=re.IGNORECASE)
+                        else re.sub(
+                            r"\s+county$",
+                            "",
+                            re.sub(r"\s*[(\[]+\s*part\s*[)\]]*$", "", label, flags=re.IGNORECASE),
+                            flags=re.IGNORECASE,
+                        )
                     ).replace(" ", "")
                     code = extra.get(stem) or names.get(stem)
                     if code is None:
@@ -1257,9 +1261,9 @@ def status_line(books: dict[str, dict[str, float]]) -> str:
 
 
 def bill() -> str:
-    admin = os.environ.get("ANTHROPIC_ADMIN_KEY")
-    if admin is None:
-        raise SystemExit("BLOCKED: ANTHROPIC_ADMIN_KEY is not set (. ~/.bashrc.d/anthropic)")
+    base = os.environ.get("ANTHROPIC_BASE_URL")
+    if base is None:
+        raise SystemExit("BLOCKED: run through the proxy (anthropic-batch uv run ea scans billed)")
     cents: dict[str, float] = {}
     page: str | None = None
     while True:
@@ -1267,11 +1271,13 @@ def bill() -> str:
         if page is not None:
             params.append(("page", page))
         response = httpx.get(
-            COST_REPORT,
+            f"{base}/v1/organizations/cost_report",
             params=params,
-            headers={"x-api-key": admin, "anthropic-version": "2023-06-01"},
+            headers={"x-api-key": os.environ["ANTHROPIC_API_KEY"], "anthropic-version": "2023-06-01"},
             timeout=60,
         )
+        if response.status_code == 403:
+            raise SystemExit("BLOCKED: no admin key stored for anthropic-batch (~/.config/anthropic-batch/admin-key)")
         response.raise_for_status()
         body = response.json()
         for bucket in body["data"]:
@@ -1463,7 +1469,12 @@ def emit(name: str) -> Path:
             )
         frame = frame.with_columns(page_id=pl.col("page").replace_strict(pages, return_dtype=pl.String), page=pl.lit(1))
         medsl.attach(
-            cs, conn, frame, {f"SC{name}": source}, strict=not manifest.get("authoritative_loose"), authoritative=manifest.get("authoritative")
+            cs,
+            conn,
+            frame,
+            {f"SC{name}": source},
+            strict=not manifest.get("authoritative_loose"),
+            authoritative=manifest.get("authoritative"),
         )
         targets = {row["id"]: row["contest_id"] for row in cs.rows.get("result_set", [])}
         for held, contest in conn.execute(
@@ -1476,7 +1487,11 @@ def emit(name: str) -> Path:
                 "select value from external_id where scheme = 'us.contest' and entity_id = %s", [contest]
             ).fetchone()
             text = (
-                ("Read from the scan's text layer, every column checked against the printed state total. Each cell's box is its column's band by its row's band, so it is approximate." if manifest.get("text_layer") else "Read from the scan by a vision model. Each cell's box is its column's band by its row's band as the model reported them, so it is approximate.")
+                (
+                    "Read from the scan's text layer, every column checked against the printed state total. Each cell's box is its column's band by its row's band, so it is approximate."
+                    if manifest.get("text_layer")
+                    else "Read from the scan by a vision model. Each cell's box is its column's band by its row's band as the model reported them, so it is approximate."
+                )
                 + (
                     " Each county's votes are the sum of its towns' returns, towns placed in counties by the 2020 Census Gazetteer, and the box is the first town's."
                     if towns
@@ -1494,7 +1509,13 @@ def emit(name: str) -> Path:
                 if written == text:
                     current = True
                 else:
-                    cs.add("note_drop", note_id=note, entity_id=held, body_md=written, reason="A later emit words the caveat anew.")
+                    cs.add(
+                        "note_drop",
+                        note_id=note,
+                        entity_id=held,
+                        body_md=written,
+                        reason="A later emit words the caveat anew.",
+                    )
             if not current:
                 cs.add("note", entity_id=held, kind="caveat", body_md=text)
         return cs.write()
