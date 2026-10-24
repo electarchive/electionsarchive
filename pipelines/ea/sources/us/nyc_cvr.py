@@ -11,7 +11,7 @@ from ea.changeset import Changeset, slug
 from ea.store import DATA, connect
 
 SOURCE = "us.nyc_cvr"
-VERSION = "3"
+VERSION = "4"
 PARSED = DATA / "parsed" / SOURCE
 RESULTS = "https://www.vote.nyc/sites/default/files/pdf/election_results"
 CVRS = {
@@ -269,6 +269,26 @@ def emit() -> Path:
                 ),
             )
             councils = frame.filter(pl.col("office") == "council").select("ed", "district").unique().sort("ed")
+            unplaced = sorted(set(codes) - set(councils["ed"]))
+            councils = pl.concat(
+                [
+                    councils,
+                    pl.DataFrame(
+                        conn.execute(
+                            """select c.code, substring(d.code from 'district-([0-9]+)$') from area_code c
+                               join area a on a.id = c.area_id and a.scheme_code = 'us.nyc_ed'
+                               join area_geometry g on g.area_id = c.area_id and g.valid @> %s::date
+                               join area_code d on d.code like '36:3651000:council:district-%%'
+                               join area_geometry dg on dg.area_id = d.area_id and dg.valid @> %s::date
+                               where c.code = any(%s) and c.valid @> %s::date
+                                 and st_contains(dg.geom, st_pointonsurface(g.geom))""",
+                            [day, day, unplaced, day],
+                        ).fetchall(),
+                        schema={"ed": pl.String, "district": councils.schema["district"]},
+                        orient="row",
+                    ),
+                ]
+            ).sort("ed")
             if councils["ed"].is_duplicated().any():
                 raise ValueError(f"{day}: an election district votes in two council districts")
             cs.frame(
