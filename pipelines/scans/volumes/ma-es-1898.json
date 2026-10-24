@@ -1,0 +1,31 @@
+{
+  "year": 1898,
+  "day": "1898-11-08",
+  "polity": "US-MA",
+  "publisher": "Massachusetts Secretary of the Commonwealth",
+  "title": "A Manual for the Use of the General Court, 1898 Representatives in Congress by town",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/amanualforusege12taylgoog/page/n{page}_w2000.jpg",
+    "item": "https://archive.org/details/amanualforusege12taylgoog"
+  },
+  "raw_source": "us.scans",
+  "unit_scheme": "town",
+  "unit_codes": {
+    "Gay Head": "25007"
+  },
+  "offices": {
+    "house": "U.S. Representative in Congress, one table per district"
+  },
+  "leaves": [
+    346,
+    347,
+    348,
+    349,
+    350,
+    351,
+    352,
+    353,
+    354
+  ]
+}
