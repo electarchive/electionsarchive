@@ -36,7 +36,7 @@ left join body b on b.id = c.body_id
 left join office o on o.id = c.office_id
 left join polity op on op.id = coalesce(b.polity_id, o.polity_id, e.polity_id)
 left join area a on a.id = c.district_area_id
-where e.date_from is not null and e.date_from <= current_date and e.status <> 'scheduled'
+where e.date_from is not null and e.date_from <= current_date and e.status <> 'scheduled' and not c.notional
     and case when %(iso)s = 'EU' then op.iso_code = 'EU' else e.polity_id in (select id from t) end
 """
 
@@ -108,7 +108,7 @@ from election e join contest c on c.election_id = e.id
 left join body b on b.id = c.body_id
 left join office o on o.id = c.office_id
 left join polity op on op.id = coalesce(b.polity_id, o.polity_id, e.polity_id)
-where e.date_from >= '1700-01-01' and e.date_from <= current_date and e.status <> 'scheduled'
+where e.date_from >= '1700-01-01' and e.date_from <= current_date and e.status <> 'scheduled' and not c.notional
     and case when %(iso)s = 'EU' then op.iso_code = 'EU' else e.polity_id in (select id from t) end
 """
 

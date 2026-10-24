@@ -99,7 +99,7 @@ left join polity op on op.id = coalesce(o.polity_id, b.polity_id, e.polity_id)
 left join external_id oe on oe.entity_id = c.office_id and oe.scheme = 'us.office'
 left join external_id be on be.entity_id = c.body_id and be.scheme = 'us.body'
 join changeset cs on cs.id = c.changeset_id
-where e.date_from is not null;
+where e.date_from is not null and not c.notional;
 
 analyze cc;
 

@@ -792,7 +792,7 @@ with m as (
     where e.status <> 'scheduled' and e.date_from < current_date
         and e.kind in ('general', 'primary', 'runoff', 'referendum')
         and (extract(year from e.date_from) >= 2000 or e.kind = 'general' and extract(year from e.date_from) >= 1948)
-        and exists (select from contest c where c.election_id = e.id)
+        and exists (select from contest c where c.election_id = e.id and not c.notional)
     group by 1, 2, 3
 )
 select st, extract(year from date_from)::int, kind,
