@@ -1091,6 +1091,18 @@ BACKING_SOURCES = {
         "Emek ve Özgürlük İttifakı'ndan Kılıçdaroğlu'na destek",
         ".htm",
     ),
+    "https://www.bbc.com/turkce/articles/ck51ke8zk95o": (
+        "news_agency",
+        "BBC News Türkçe",
+        "HDP ve YSP, Kılıçdaroğlu'na desteği sürdürme kararı aldı (May 25, 2023)",
+        ".htm",
+    ),
+    "https://chp.org.tr/haberler/13-cumhurbaskani-adayi-kemal-kilicdaroglu-ve-adalet-partisi-genel-baskani-vecdet-ozun-ortak-basin-aciklamasi": (
+        "official_body",
+        "Cumhuriyet Halk Partisi",
+        "13. Cumhurbaşkanı Adayı Kemal Kılıçdaroğlu ve Adalet Partisi Genel Başkanı Vecdet Öz'ün Ortak Basın Açıklaması",
+        ".htm",
+    ),
 }
 BACKING = {
     ("2014", "Recep Tayyip Erdoğan"): {"Adalet ve Kalkınma Partisi": "nominated"},
@@ -1115,9 +1127,9 @@ BACKING = {
     },
     ("2018", "Muharrem İnce"): {"Cumhuriyet Halk Partisi": "nominated"},
     ("2018", "Selahattin Demirtaş"): {"Halkların Demokratik Partisi": "nominated"},
-    ("2018", "Meral Akşener"): {"İYİ Parti": "endorsed"},
-    ("2018", "Temel Karamollaoğlu"): {"Saadet Partisi": "endorsed"},
-    ("2018", "Doğu Perinçek"): {"Vatan Partisi": "endorsed"},
+    ("2018", "Meral Akşener"): {"İYİ Parti": "nominated"},
+    ("2018", "Temel Karamollaoğlu"): {"Saadet Partisi": "nominated"},
+    ("2018", "Doğu Perinçek"): {"Vatan Partisi": "nominated"},
     ("2023", "Recep Tayyip Erdoğan"): {
         "Adalet ve Kalkınma Partisi": "nominated",
         "Milliyetçi Hareket Partisi": "nominated",
@@ -1138,8 +1150,11 @@ BACKING = {
         "Türkiye İşçi Partisi": "supported",
         "Emek Partisi": "supported",
     },
-    ("2023", "Muharrem İnce"): {"Memleket Partisi": "endorsed"},
+    ("2023", "Muharrem İnce"): {"Memleket Partisi": "nominated"},
     ("2023", "Sinan Oğan"): {"Zafer Partisi": "supported", "Adalet Partisi": "supported"},
+}
+BACKING_RUNOFF_2023 = {
+    "Kemal Kılıçdaroğlu": {"Zafer Partisi": "supported", "Adalet Partisi": "supported"},
 }
 PRESIDENT_2014_CELLS = {
     "domestic": (
@@ -6283,7 +6298,10 @@ def emit() -> Path:
                     member_of_party_id=None if party is None else parties[party],
                     is_independent=party is None,
                 )
-                for backer, kind in BACKING["2023", label].items():
+                for backer, kind in {
+                    **BACKING["2023", label],
+                    **(BACKING_RUNOFF_2023.get(label, {}) if number == 2 else {}),
+                }.items():
                     cs.add(
                         "candidacy_nomination",
                         candidacy_id=candidacy,
