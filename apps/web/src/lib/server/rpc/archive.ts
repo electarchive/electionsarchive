@@ -11660,6 +11660,14 @@ export const people = {
                 and (x.candidacy_id = m.candidacy or (x.candidacy_id is null and m.role = 'head'))
               join result_set rs on rs.id = x.result_set_id and rs.is_default
               where m.contest_id = p.root),
+            (select 'elsewhere' from mine m join contest c on c.id = m.contest_id join election e on e.id = c.election_id
+              join outcome x on x.option_id = m.option and x.kind in ('elected', 'won')
+                and (x.candidacy_id = m.candidacy or (x.candidacy_id is null and m.role = 'head'))
+              join result_set rs on rs.id = x.result_set_id and rs.is_default
+              where coalesce(e.parent_id, e.id) = (select coalesce(pe.parent_id, pe.id) from election pe where pe.id = p.election)
+                and m.contest_id not in (select g.id from grp g where g.root = p.root)
+                and exists (select from mine l join grp g on g.id = l.contest_id and g.root = p.root where l.role = 'list_member')
+              limit 1),
             (select 'lost' from contest_option o join outcome x on x.option_id = o.id and x.kind in ('elected', 'won', 'advanced')
               join result_set rs on rs.id = x.result_set_id and rs.is_default
               where o.contest_id = p.root limit 1)

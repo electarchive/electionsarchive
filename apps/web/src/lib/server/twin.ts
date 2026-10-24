@@ -62,6 +62,7 @@ const OUTCOMES: Record<string, () => string> = {
   advanced: m.outcome_advanced,
   tied: m.outcome_tied,
   lost: m.person_lost_mark,
+  elsewhere: m.person_elected_elsewhere,
   withdrew: m.outcome_withdrew,
   disqualified: m.outcome_disqualified,
 };

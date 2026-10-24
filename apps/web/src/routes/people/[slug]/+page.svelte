@@ -22,6 +22,7 @@
     advanced: m.outcome_advanced,
     tied: m.outcome_tied,
     lost: m.person_lost_mark,
+    elsewhere: m.person_elected_elsewhere,
     withdrew: m.outcome_withdrew,
     disqualified: m.outcome_disqualified,
   };
@@ -43,6 +44,9 @@
         entry.votes == null || entry.total == null || entry.total === 0
           ? null
           : entry.votes / entry.total,
+      isMuted:
+        entry.outcome != null &&
+        (LOST.has(entry.outcome) || entry.outcome === "elsewhere"),
     })),
   );
   const elections = $derived(
@@ -322,9 +326,9 @@
                       class={cn(
                         "ms-1 px-1 text-xs font-semibold whitespace-nowrap",
                         {
-                          highlighter: !LOST.has(entry.outcome),
+                          highlighter: !entry.isMuted,
                           "rounded-xs bg-secondary text-muted-foreground":
-                            LOST.has(entry.outcome),
+                            entry.isMuted,
                         },
                       )}
                       label={OUTCOMES[entry.outcome]?.() ?? entry.outcome}
@@ -335,9 +339,9 @@
                       class={cn(
                         "ms-1 px-1 text-xs font-semibold whitespace-nowrap",
                         {
-                          highlighter: !LOST.has(entry.outcome),
+                          highlighter: !entry.isMuted,
                           "rounded-xs bg-secondary text-muted-foreground":
-                            LOST.has(entry.outcome),
+                            entry.isMuted,
                         },
                       )}>{OUTCOMES[entry.outcome]?.() ?? entry.outcome}</span
                     >

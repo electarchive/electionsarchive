@@ -17,6 +17,7 @@
     advanced: m.outcome_advanced,
     tied: m.outcome_tied,
     lost: m.person_lost_mark,
+    elsewhere: m.person_elected_elsewhere,
     withdrew: m.outcome_withdrew,
     disqualified: m.outcome_disqualified,
   };
@@ -26,6 +27,7 @@
 
   const marks = $derived(
     record
+      .filter((entry) => entry.outcome !== "elsewhere")
       .map((entry) => ({
         ...entry,
         at:
