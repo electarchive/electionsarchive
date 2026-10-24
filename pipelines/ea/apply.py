@@ -699,9 +699,19 @@ def _publish_table(conn: Connection, stage: Stage, table: str) -> None:
         ).fetchall():
             if held != entity:
                 raise ValueError(f"name {name} is not {text!r} on {entity}")
-            if preferred and not conn.execute(
-                "select 1 from public.name where entity_id = %s and id <> %s", [entity, name]
-            ).fetchone():
+            if (
+                preferred
+                and not conn.execute(
+                    "select 1 from public.name where entity_id = %s and id <> %s", [entity, name]
+                ).fetchone()
+                and not (
+                    "name" in stage.tables
+                    and conn.execute(
+                        sql.SQL("select 1 from {} where entity_id = %s and is_preferred").format(stage.staged("name")),
+                        [entity],
+                    ).fetchone()
+                )
+            ):
                 raise ValueError(f"name {name} ({text!r}) is the only name of {entity}")
         conn.execute(sql.SQL("delete from public.name where id in (select name_id from {})").format(staged))
         conn.execute(
