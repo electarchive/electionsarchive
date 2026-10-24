@@ -6,13 +6,13 @@ import time
 import unicodedata
 from datetime import date, datetime, timedelta
 from pathlib import Path
-from uuid import UUID
+from uuid import UUID, uuid5
 
 import httpx
 import polars as pl
 
 from ea import raw
-from ea.changeset import Changeset, slug
+from ea.changeset import NAMESPACE, Changeset, slug
 from ea.sources.gb.scottish_parliament import number, sheet
 from ea.sources.gb import umit
 from ea.store import DATA, connect
@@ -30,6 +30,25 @@ ELECTIONS = {
     2021: date(2021, 5, 6),
 }
 ERAS = {1999: 1999, 2003: 1999, 2007: 2007, 2011: 2007, 2016: 2007, 2021: 2007}
+ERA_STARTS = {1999: ELECTIONS[1999], 2007: ELECTIONS[2007], 2026: date(2026, 5, 7)}
+SENC_2026 = (
+    "Afan Ogwr Rhondda",
+    "Bangor Conwy Môn",
+    "Blaenau Gwent Caerffili Rhymni",
+    "Brycheiniog Tawe Nedd",
+    "Caerdydd Ffynnon Taf",
+    "Caerdydd Penarth",
+    "Casnewydd Islwyn",
+    "Ceredigion Penfro",
+    "Clwyd",
+    "Fflint Wrecsam",
+    "Gwynedd Maldwyn",
+    "Gŵyr Abertawe",
+    "Pen-y-bont Bro Morgannwg",
+    "Pontypridd Cynon Merthyr",
+    "Sir Fynwy Torfaen",
+    "Sir Gaerfyrddin",
+)
 TERMS = {
     "Q42310633": 1999,
     "Q42310642": 2003,
@@ -192,7 +211,7 @@ LABELS = {
     "workers": ("Workers Party of Britain", "workers-party-of-britain"),
     "nf": ("National Front", "national-front"),
     "people first": ("People First", "people-first"),
-    "womens equality party": ("Women's Equality Party", "womens-equality-party"),
+    "womens equality party": ("Women's Equality Party", "women-s-equality-party"),
     "assoc of welsh inds": ("Association of Welsh Local Independents", "association-of-welsh-local-independents"),
     "freedom to choose": ("Freedom to Choose", "freedom-to-choose"),
     "monmouth's future": ("Monmouth's Future", "monmouths-future"),
@@ -785,15 +804,15 @@ def emit() -> Path:
                         name(parties[key], umit.NAMES.get(key, label or key))
             return parties[key]
 
-        starts = sorted(set(ERAS.values()))
+        starts = sorted(ERA_STARTS)
         ends = dict(itertools.pairwise(starts))
         region_areas: dict[tuple[int, str], UUID] = {}
         region_units: dict[tuple[int, str], UUID] = {}
         constituency_areas: dict[tuple[int, str], UUID] = {}
         constituency_units: dict[tuple[int, str], UUID] = {}
         for era in starts:
-            start = ELECTIONS[era]
-            end = ELECTIONS[ends[era]] if era in ends else None
+            start = ERA_STARTS[era]
+            end = ERA_STARTS[ends[era]] if era in ends else None
             years = [year for year, value in ERAS.items() if value == era]
             located = {
                 row["constituency"]: row["region"]
@@ -804,9 +823,12 @@ def emit() -> Path:
             }
             if len(located) != votes.filter(pl.col("year").is_in(years) & (pl.col("ballot") == "constituency"))["constituency"].n_unique():
                 raise ValueError(f"{era}: a constituency changes region within one boundary era")
-            places = [("gb.senr", label, country, region_areas, region_units, label) for label in REGIONS] + [
-                ("gb.senc", label, None, constituency_areas, constituency_units, located[label]) for label in sorted(located)
-            ]
+            if era == 2026:
+                places = [("gb.senc", label, country, constituency_areas, constituency_units, None) for label in SENC_2026]
+            else:
+                places = [("gb.senr", label, country, region_areas, region_units, label) for label in REGIONS] + [
+                    ("gb.senc", label, None, constituency_areas, constituency_units, located[label]) for label in sorted(located)
+                ]
             for scheme, label, parent, areas, area_units, region in places:
                 code = f"{era}:{slug(label)}"
                 parent_id = parent if parent is not None else region_areas[(era, region)]
@@ -814,22 +836,22 @@ def emit() -> Path:
                 unit = area_units[(era, label)] = cs.unit(scheme, code)
                 if area in cs.minted:
                     cs.add("area", id=area, scheme_code=scheme)
-                    cs.add("area_code", area_id=area, code=code, valid_from=start, valid_to=end)
-                    cs.add("area_parent", area_id=area, parent_id=parent_id, valid_from=start, valid_to=end)
                     name(area, label)
+                cs.add("area_code", area_id=area, code=code, valid_from=start, valid_to=end)
+                cs.add("area_parent", area_id=area, parent_id=parent_id, valid_from=start, valid_to=end)
+                cs.add(
+                    "reporting_unit",
+                    id=unit,
+                    polity_id=wales,
+                    scheme_code=scheme,
+                    code=code,
+                    area_relation="equals",
+                    area_id=area,
+                    kind="standard",
+                    valid_from=start,
+                    valid_to=end,
+                )
                 if unit in cs.minted:
-                    cs.add(
-                        "reporting_unit",
-                        id=unit,
-                        polity_id=wales,
-                        scheme_code=scheme,
-                        code=code,
-                        area_relation="equals",
-                        area_id=area,
-                        kind="standard",
-                        valid_from=start,
-                        valid_to=end,
-                    )
                     name(unit, label)
 
         persons: dict[str, UUID] = {}
@@ -1015,4 +1037,35 @@ def emit() -> Path:
                     figures(result_set, unit, year_units.filter((pl.col("ballot") == "list") & (pl.col("region") == region)).row(0, named=True))
                     for line in region_votes.iter_rows(named=True):
                         value(result_set, unit, options[line["party"]], VOTES, line["votes"])
+        for before, after in itertools.pairwise(starts):
+            if after == 2026:
+                event = uuid5(NAMESPACE, f"area_event\x1fgb.senr\x1f{after}")
+                cs.add(
+                    "area_event",
+                    id=event,
+                    kind="boundary_changed",
+                    date=ERA_STARTS[after],
+                    notes="The five electoral regions were replaced by 16 constituencies as the areas that elect the "
+                    "Senedd's members, each choosing six from closed party lists, for the 2026 election.",
+                )
+                for (era, _), area in region_areas.items():
+                    if era == before:
+                        cs.add("area_event_member", event_id=event, area_id=area, role="from")
+                for (era, _), area in constituency_areas.items():
+                    if era == after:
+                        cs.add("area_event_member", event_id=event, area_id=area, role="to")
+                continue
+            for (era, label), area in region_areas.items():
+                if era != after:
+                    continue
+                event = uuid5(NAMESPACE, f"area_event\x1fgb.senr\x1f{after}\x1f{slug(label)}")
+                cs.add(
+                    "area_event",
+                    id=event,
+                    kind="boundary_changed",
+                    date=ERA_STARTS[after],
+                    notes=f"The {label} electoral region was redefined for the {after} election.",
+                )
+                cs.add("area_event_member", event_id=event, area_id=region_areas[(before, label)], role="from")
+                cs.add("area_event_member", event_id=event, area_id=area, role="to")
         return cs.write()
