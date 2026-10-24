@@ -4669,6 +4669,7 @@ def emit() -> Path:
             ),
             return_dtype=pl.List(pl.String),
         ),
+        printed=pl.col("parties").list.eval(pl.element().filter(pl.element().is_in(list(COMPOUND)))).list.first(),
         key=pl.when(pl.col("fec_id").is_not_null())
         .then(pl.col("fec_id"))
         .when(pl.col("parties").list.contains("Write-In") | pl.col("name").is_in([NOTA, VACANCY, "Scattered"]))
@@ -6290,7 +6291,9 @@ def emit() -> Path:
                     nominated = list(
                         dict.fromkeys(party for label in labels if (party := parties[(state, label)]) is not None)
                     )
-                    slogan = next((label for label in labels if (state, label) in slogans), None)
+                    slogan = next((label for label in labels if (state, label) in slogans), None) or next(
+                        (row["printed"] for row in lines_of if row["printed"] is not None), None
+                    )
                     ballot = lines_of[0]["name"]
                     cs.add(
                         "contest_option",
