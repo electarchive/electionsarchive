@@ -14234,7 +14234,7 @@ export const search = {
                 ? "at-large"
                 : `${seat}${{ one: "st", two: "nd", few: "rd", other: "th", zero: "th", many: "th" }[new Intl.PluralRules("en", { type: "ordinal" }).select(seat)]}`
             } congressional district`;
-      const chambers = db.execute<{
+      const bodyRows = db.execute<{
         id: string;
         polity: string;
         isClose: boolean;
@@ -14417,7 +14417,7 @@ export const search = {
         ) x
         order by top.score desc, x.date desc nulls last
       `);
-      const matched = await chambers;
+      const matched = await bodyRows;
       const bodies = matched.rows.map((row) => ({
         id: row.id,
         type: "body",
@@ -14439,7 +14439,7 @@ export const search = {
           (id) => id != null,
         ),
       );
-      const [labels, slugs, faces] = await Promise.all([
+      const [labels, slugs, faces, peers] = await Promise.all([
         names(
           ids,
           null,
@@ -14449,15 +14449,28 @@ export const search = {
         portraits(
           rows.filter((row) => row.type === "person").map((row) => row.id),
         ),
+        Promise.all(
+          [...new Set(matched.rows.map((row) => row.polity))].map((polity) =>
+            chambers(polity),
+          ),
+        ).then(
+          (found) =>
+            new Map(found.flat().map((peer) => [peer.id, peer.slug] as const)),
+        ),
       ]);
       const ranked = rows
         .map((row) => ({
           id: row.id,
           type: row.type,
           name: labels.full.get(row.id) ?? "",
-          path: ["person", "party", "body"].includes(row.type)
-            ? `id/${row.id}`
-            : (slugs.get(row.target ?? "") ?? null),
+          path:
+            row.type === "body" &&
+            slugs.get(row.context ?? "") != null &&
+            peers.get(row.id) != null
+              ? `chambers/${slugs.get(row.context ?? "")}/${peers.get(row.id)}`
+              : ["person", "party", "body"].includes(row.type)
+                ? `id/${row.id}`
+                : (slugs.get(row.target ?? "") ?? null),
           context:
             labels.full.get(
               (row.type === "person"
