@@ -170,7 +170,7 @@ async function load(segments: Array<string>, search: URLSearchParams) {
     if (path == null) {
       error(404);
     }
-    redirect(307, `/${path}`);
+    redirect(307, `/${path}${search.size > 0 ? `?${search}` : ""}`);
   }
   if (head === "people" && rest.length === 1) {
     return person(rest[0] ?? "");
@@ -780,7 +780,15 @@ function personMarkdown(
 }
 
 function partyMarkdown(
-  { party, record, members, notes, history }: Extract<Data, { kind: "party" }>,
+  {
+    id,
+    party,
+    record,
+    members,
+    notes,
+    history,
+    abroad,
+  }: Extract<Data, { kind: "party" }>,
   link: Link,
 ) {
   const related = [
@@ -803,6 +811,19 @@ function partyMarkdown(
           m.party_in({
             kind: KINDS[party.kind]?.() ?? party.kind,
             polity: party.polity.name,
+          }),
+        ]),
+    ...(abroad.length === 0
+      ? []
+      : [
+          m.party_abroad({
+            places: new Intl.ListFormat(getLocale(), {
+              type: "conjunction",
+            }).format(
+              abroad.map((place) =>
+                link(place.name, `id/${id}?in=${place.path}`),
+              ),
+            ),
           }),
         ]),
     ...(party.span == null && party.wikidata == null

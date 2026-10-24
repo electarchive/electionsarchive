@@ -46,6 +46,15 @@
       )
       .toArray(),
   );
+  const places = $derived(
+    new Intl.ListFormat(getLocale(), { type: "conjunction" })
+      .formatToParts(data.abroad.map((_, index) => String(index)))
+      .map((part) => ({
+        text: part.value,
+        place:
+          part.type === "element" ? data.abroad[Number(part.value)] : undefined,
+      })),
+  );
   let isEvery = $state(false);
   const shown = $derived(
     isEvery || years.length <= 11 ? years : years.slice(0, 10),
@@ -167,6 +176,19 @@
                 >
               {/if}
             </span>
+          {/if}
+          {#if data.abroad.length > 0}
+            {const frame = $derived(
+              m.party_abroad({ places: "\u0001" }).split("\u0001"),
+            )}
+            <span
+              >{frame[0]}{#each places as part, index (index)}{#if part.place == null}{part.text}{:else}<a
+                    class="underline decoration-border underline-offset-4 hover:decoration-foreground"
+                    href="{resolve('/parties/[...path]', {
+                      path: page.params.path ?? '',
+                    })}?in={part.place.path}">{part.place.name}</a
+                  >{/if}{/each}{frame[1]}</span
+            >
           {/if}
           {#if party.wikidata != null}
             <a

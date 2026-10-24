@@ -1302,6 +1302,7 @@
   "party_strength_missing": "No map of the party's vote available for this election.",
   "party_strength_open": "Open {year} results",
   "party_scope_title": "{place} {party}",
+  "party_abroad": "Also contests elections in {places}",
   "party_scope_national": "National party",
   "party_scope_branch": "Operates in {place} as",
   "party_card_in": "{place}",

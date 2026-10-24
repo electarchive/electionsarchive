@@ -285,6 +285,32 @@ export async function party(path: string, place: string | null = null) {
       order by valid_from nulls first
     `),
   ]);
+  const home = page.party.polity?.path ?? null;
+  const elsewhere = [
+    ...new Set(
+      page.record.elections.flatMap((election) => {
+        const found = /^([a-z]{2})\/\d{4}-\d{2}-\d{2}-general$/u.exec(
+          election.path ?? "",
+        )?.[1];
+        return within == null && found != null && found !== home ? [found] : [];
+      }),
+    ),
+  ];
+  const abroad =
+    elsewhere.length === 0
+      ? []
+      : (
+          await db.execute<{ name: string; path: string }>(sql`
+            select s.path, (
+              select n.text from name n where n.entity_id = s.entity_id
+              order by n.is_preferred desc, (n.lang = 'en') desc, n.recorded_from desc, n.id limit 1
+            ) as name
+            from slug s join polity p on p.id = s.entity_id and p.kind = 'sovereign_state'
+            where s.is_current and s.path = any(${sql.param(elsewhere)}::text[])
+          `)
+        ).rows.toSorted(
+          (a, b) => elsewhere.indexOf(a.path) - elsewhere.indexOf(b.path),
+        );
   return {
     kind: "party" as const,
     id,
@@ -292,6 +318,7 @@ export async function party(path: string, place: string | null = null) {
     elections: generals.rows,
     members: members.rows,
     notes: notes.rows,
+    abroad,
   };
 }
 
