@@ -118,6 +118,22 @@ PITTSBURGH_NOTE = (
     "and 2013, and its county-certified results site for 2017 and 2021. Party labels are as printed; independents and "
     "labels the county does not spell out carry none."
 )
+ERIE = "https://elections.erie.gov/Files/Election%20Results/"
+BUFFALO = {
+    date(2001, 11, 6): ("2001/2001%20GENERAL%20ELECTION%20results.xls", "Mayor"),
+    date(2005, 11, 8): ("2005/2005%20GENERAL%20ELECTION.xls", "BuffMayor"),
+    date(2009, 11, 3): ("2009/11032009/2009%20GENERAL%20ELECTION.xlsx", "BuffMayor"),
+    date(2013, 11, 5): ("2013/11052013/2013%20General%20Election%20Resultsnew.xlsx", "BuffMayor"),
+    date(2017, 11, 7): ("2017/2017-General-Election-Web.xlsx", "BuffMayor"),
+    date(2021, 11, 2): ("2021/2021%20General%20Canvass%20Bookup.xlsx", "Buffalo Mayor"),
+}
+BUFFALO_PUBLISHER = "Erie County Board of Elections"
+BUFFALO_TITLE = "Election results archive"
+BUFFALO_NOTE = (
+    "Citywide totals from the Erie County Board of Elections' official results workbooks, one line per ballot line as "
+    "New York's fusion ballot prints them. Named write-in candidates are kept as candidates without a party; the "
+    "workbooks' blank, void, and scattering column is left out."
+)
 SURNAMES = {"clarke": "clark"}
 PARTIES = {
     "D": ("democratic-party", "Democratic"),
@@ -149,6 +165,10 @@ PARTIES = {
     "SOC": ("socialist-workers-party", "Socialist Workers"),
     "GRN": ("green-party", "Green"),
     "GRE": ("green-party", "Green"),
+    "DEMOCRAT": ("democratic-party", "Democratic"),
+    "WOMEN'S EQUALITY": ("NY:women-s-equality-party", "Women's Equality"),
+    "REPUBLICAN/STRONG LEADERSHIP": ("republican-party", "Republican and Strong Leadership"),
+    "PROGRESSIVE": (None, "Progressive"),
     "LIB": ("libertarian-party", "Libertarian"),
     "DEM/REP": ("democratic-party", "Democratic and Republican"),
     "WCP": (None, "Working Class"),
@@ -177,6 +197,8 @@ def fetch() -> None:
         raw.fetch(SOURCE, MARYLAND + name, suffix=Path(name).suffix)
     for link in PITTSBURGH.values():
         raw.fetch(SOURCE, link, suffix=Path(link).suffix if link.endswith((".pdf", ".json")) else ".html")
+    for name, _ in BUFFALO.values():
+        raw.fetch(SOURCE, ERIE + name, suffix=Path(name).suffix)
 
 
 def parse() -> None:
@@ -433,6 +455,29 @@ def parse() -> None:
         ).with_columns(day=pl.lit(day), place=pl.lit("4261000"), county=pl.lit(None, pl.String))
         print(day, frame.select("candidate", "party", "votes").rows())
         rows.append(frame)
+    for day, (name, sheet) in BUFFALO.items():
+        table = (
+            fastexcel.read_excel(raw.cached(SOURCE, ERIE + name).path).load_sheet(sheet, header_row=None).to_polars()
+        )
+        total = [
+            row
+            for row in table.iter_rows()
+            if " ".join(str(row[0] or "").split()).upper() in ("TOTAL", "CITY OF BUFFALO TOTAL")
+        ][-1]
+        lines = []
+        for column in range(1, table.width):
+            parts = [part.strip() for part in re.split(r"\n|\s{2,}", str(table[0, column] or "")) if part.strip()]
+            if not parts or parts[0].upper() == "TOTAL" or parts[0].upper().startswith("BLANK"):
+                continue
+            party = parts[-1].upper() if len(parts) > 1 else None
+            lines.append((parts[0], None if party is None or party.startswith("WRITE") else party, total[column]))
+        frame = pl.DataFrame(
+            [(candidate, party, int(float(votes))) for candidate, party, votes in lines],
+            schema={"candidate": pl.String, "party": pl.String, "votes": pl.Int64},
+            orient="row",
+        ).with_columns(day=pl.lit(day), place=pl.lit("3611000"), county=pl.lit(None, pl.String))
+        print(day, frame.select("candidate", "party", "votes").rows())
+        rows.append(frame)
     candidates = pl.concat(rows, how="diagonal").with_columns(write_in=pl.col("candidate") == "Write In")
     for (day,), group in candidates.filter(pl.col("place") == "3651000").group_by("day"):
         print(
@@ -498,6 +543,13 @@ def emit() -> Path:
                 "https://www.alleghenycounty.us/Government/Elections/Election-Results",
                 list(PITTSBURGH.values()),
             ),
+            (
+                "3611000",
+                BUFFALO_PUBLISHER,
+                BUFFALO_TITLE,
+                "https://elections.erie.gov/ElectionArch",
+                [ERIE + name for name, _ in BUFFALO.values()],
+            ),
         ):
             sources[place] = cs.source(publisher, title)
             cs.add(
@@ -527,6 +579,7 @@ def emit() -> Path:
                 "1150000": "washington_DC",
                 "2404000": "baltimore_MD",
                 "4261000": "pittsburgh_PA",
+                "3611000": "buffalo_NY",
             }[place]
             contest_key = f"alged:{place}_{day.year}_11_{city}_Mayor_mayor_1"
             contest = cs.key("us.contest", contest_key)
@@ -572,6 +625,7 @@ def emit() -> Path:
                     "3651000": NYC_NOTE,
                     "2404000": BALTIMORE_NOTE,
                     "4261000": PITTSBURGH_NOTE,
+                    "3611000": BUFFALO_NOTE,
                 }.get(place, DC_NOTE),
             )
             totals = (
