@@ -1725,6 +1725,7 @@ async function tally(
   lineage: Array<Relation>,
   match: Match,
   grouping: Grouping,
+  seats: number | null,
 ) {
   if (round == null) {
     return null;
@@ -1733,7 +1734,14 @@ async function tally(
   const [sides, spent] = await Promise.all([
     Promise.all(
       rounds.map(async (step) =>
-        load([contest.root], [areaK], contest.date ?? "infinity", [], [], step),
+        load(
+          [contest.root],
+          [areaK],
+          contest.date ?? "infinity",
+          seats != null && step === last ? [contest.id] : [],
+          [],
+          step,
+        ),
       ),
     ),
     db.execute<{ round: number; value: number }>(sql`
@@ -1755,6 +1763,7 @@ async function tally(
       color: string | null;
       person: string | null;
       party: string | null;
+      outcome: string | null;
       votes: Array<number | null>;
     }
   >();
@@ -1783,27 +1792,75 @@ async function tally(
         color: row.color,
         person: row.current?.person ?? null,
         party: row.current?.party ?? null,
+        outcome: null,
         votes: rounds.map(() => null),
       };
       line.votes[index] = row.current?.votes ?? null;
+      line.outcome = row.current?.outcome ?? line.outcome;
       lines.set(row.key, line);
     }
   }
   const reach = (votes: Array<number | null>) =>
     votes.findLastIndex((value) => value != null);
   const exhausted = new Map(spent.rows.map((row) => [row.round, row.value]));
+  const listed = lines.values().toArray();
+  let first = 0;
+  for (const line of listed) {
+    first += line.votes[0] ?? 0;
+  }
+  const quota = Math.floor(first / ((seats ?? 0) + 1)) + 1;
   return {
     round,
     last,
-    rows: lines
-      .values()
-      .toArray()
-      .toSorted(
-        (a, b) =>
-          reach(b.votes) - reach(a.votes) ||
-          (b.votes[reach(b.votes)] ?? 0) - (a.votes[reach(a.votes)] ?? 0),
-      ),
+    initial: seats == null ? last : 1,
+    rows: listed.toSorted(
+      (a, b) =>
+        reach(b.votes) - reach(a.votes) ||
+        (b.votes[reach(b.votes)] ?? 0) - (a.votes[reach(a.votes)] ?? 0),
+    ),
     exhausted: rounds.map((step) => exhausted.get(step) ?? null),
+    stv:
+      seats == null
+        ? null
+        : {
+            seats,
+            quota,
+            isDerived: true,
+            steps: rounds.map((step) => {
+              const from =
+                step === 1
+                  ? []
+                  : listed.filter(
+                      (line) =>
+                        line.votes[step - 2] != null &&
+                        (line.votes[step - 1] ?? 0) <
+                          (line.votes[step - 2] ?? 0) - 0.5,
+                    );
+              return {
+                kind:
+                  step === 1
+                    ? ("first" as const)
+                    : from.length === 0
+                      ? ("none" as const)
+                      : from.every(
+                            (line) => (line.votes[step - 2] ?? 0) >= quota,
+                          )
+                        ? ("surplus" as const)
+                        : ("exclusion" as const),
+                from: from.map((line) => line.key),
+                elected: listed
+                  .filter(
+                    (line) =>
+                      ["elected", "won"].includes(line.outcome ?? "") &&
+                      ((line.votes[step - 1] ?? 0) >= quota
+                        ? step === 1 || (line.votes[step - 2] ?? 0) < quota
+                        : step === last &&
+                          line.votes.every((value) => (value ?? 0) < quota)),
+                  )
+                  .map((line) => line.key),
+              };
+            }),
+          },
   };
 }
 
@@ -2881,10 +2938,26 @@ export const contests = {
                 color: v.nullable(v.string()),
                 person: v.nullable(v.string()),
                 party: v.nullable(v.string()),
+                outcome: v.nullable(v.string()),
                 votes: v.array(v.nullable(v.number())),
               }),
             ),
             exhausted: v.array(v.nullable(v.number())),
+            initial: v.number(),
+            stv: v.nullable(
+              v.object({
+                seats: v.number(),
+                quota: v.number(),
+                isDerived: v.boolean(),
+                steps: v.array(
+                  v.object({
+                    kind: v.picklist(["first", "surplus", "exclusion", "none"]),
+                    from: v.array(v.string()),
+                    elected: v.array(v.string()),
+                  }),
+                ),
+              }),
+            ),
           }),
         ),
         isDerived: v.boolean(),
@@ -3096,9 +3169,11 @@ export const contests = {
             last: number;
             round: number | null;
             derived: boolean;
+            seats: number | null;
           }>(sql`
             select coalesce(t.last, 1) as last,
-              case when t.last > 1 then least(greatest(coalesce(nullif(${input.round}::int, 0), t.last), 1), t.last) end as round,
+              case when t.last > 1 then least(greatest(coalesce(nullif(${input.round}::int, 0), case when stv.seats is null then t.last else 1 end), 1), t.last) end as round,
+              stv.seats,
               exists (
                 select from result_set rs join note n on n.entity_id = rs.id and n.kind = 'methodology'
                 where rs.contest_id = ${contest.id}::uuid and not rs.is_default
@@ -3117,10 +3192,21 @@ export const contests = {
               ) r
               where rs.contest_id = ${contest.id}::uuid and rs.is_default
             ) t
+            left join lateral (
+              select c.magnitude as seats from contest c
+              left join electoral_system es on es.id = c.electoral_system_id
+              where c.id = ${contest.id}::uuid and c.magnitude > 1
+                and coalesce(c.rules_override ->> 'formula', es.rules ->> 'formula') = 'stv'
+            ) stv on true
           `),
         ]);
       const [
-        { last, round, derived } = { last: 1, round: null, derived: false },
+        { last, round, derived, seats: elects } = {
+          last: 1,
+          round: null,
+          derived: false,
+          seats: null,
+        },
       ] = counted.rows;
       const childIds = parts.rows.map((row) => row.id);
       const ancestorIds = ancestors.rows.map((row) => row.id);
@@ -3960,6 +4046,7 @@ export const contests = {
             lineage,
             input.match,
             input.group,
+            elects,
           ),
           redrawn([area.id], contest, chosen),
         ]);

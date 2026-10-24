@@ -39,6 +39,7 @@
   import Seats from "./seats.svelte";
   import Series from "./series.svelte";
   import Shift from "./shift.svelte";
+  import Stv from "./stv.svelte";
   import Tally from "./tally.svelte";
   import Wording from "./wording.svelte";
 
@@ -515,7 +516,11 @@
     ),
   );
   const drilled = $derived(contest.scope.noun != null);
-  const counted = $derived(MEASURES[contest.current?.measure ?? ""]?.());
+  const counted = $derived(
+    contest.count?.stv != null && contest.count.round === 1
+      ? m.stv_first()
+      : MEASURES[contest.current?.measure ?? ""]?.(),
+  );
   const question = $derived(
     contest.rows.some((row) => row.key.startsWith("answer:")),
   );
@@ -1536,7 +1541,9 @@
   {:else}
     {@render stats(false)}
   {/if}
-  {#if contest.count != null}
+  {#if contest.count?.stv != null}
+    <Stv count={contest.count} stv={contest.count.stv} {here} />
+  {:else if contest.count != null}
     <Tally count={contest.count} {here} />
   {/if}
 

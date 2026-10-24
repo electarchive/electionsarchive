@@ -6,6 +6,7 @@ import { PARTS, label as reasonLabel, REASONS } from "#lib/coverage.js";
 import { count, date, percent, points } from "#lib/format.js";
 import { isDerived } from "#lib/outcomes.js";
 import { m } from "#lib/paraglide/messages.js";
+import { getLocale } from "#lib/paraglide/runtime.js";
 import { AFFILIATIONS, RELATIONS } from "#lib/relations.js";
 import {
   archive,
@@ -1167,6 +1168,87 @@ function countMarkdown(contest: Extract<Data, { kind: "contest" }>["contest"]) {
     return [];
   }
   const rounds = Array.from({ length: tally.last }, (_, step) => step);
+  const { stv } = tally;
+  if (stv != null) {
+    const list = new Intl.ListFormat(getLocale(), {
+      style: "long",
+      type: "conjunction",
+    });
+    const names = (keys: Array<string>) =>
+      list.format(
+        keys.map(
+          (key) => tally.rows.find((row) => row.key === key)?.label ?? "",
+        ),
+      );
+    const signed = (value: number) =>
+      Math.abs(value) < 0.5
+        ? ""
+        : ` (${value > 0 ? "+" : "−"}${count(Math.abs(value))})`;
+    return [
+      `## ${m.stv_title()}`,
+      `${m.stv_lede({ seats: count(stv.seats), quota: count(stv.quota) })}${stv.isDerived ? ` ${m.stv_quota_derived()}` : ""}`,
+      table(
+        [
+          m.col_candidate(),
+          m.col_result(),
+          ...rounds.map((round) => m.stv_count({ count: round + 1 })),
+        ],
+        [
+          [
+            "",
+            "",
+            ...stv.steps.map((step) =>
+              step.kind === "first"
+                ? m.stv_first()
+                : step.kind === "surplus"
+                  ? m.stv_surplus({ names: names(step.from) })
+                  : step.kind === "exclusion"
+                    ? m.stv_exclusion({ names: names(step.from) })
+                    : m.stv_none(),
+            ),
+          ],
+          ...tally.rows.map((row) => {
+            const elected = stv.steps.findIndex((step) =>
+              step.elected.includes(row.key),
+            );
+            const out = stv.steps.findIndex(
+              (step) =>
+                step.kind === "exclusion" && step.from.includes(row.key),
+            );
+            return [
+              row.label,
+              elected !== -1
+                ? row.votes.every((value) => (value ?? 0) < stv.quota)
+                  ? m.stv_elected_short()
+                  : m.stv_elected({ count: elected + 1 })
+                : out === -1
+                  ? null
+                  : m.stv_excluded({ count: out + 1 }),
+              ...rounds.map((round) => {
+                const votes = row.votes[round];
+                const before = round === 0 ? null : row.votes[round - 1];
+                return votes == null
+                  ? before == null
+                    ? null
+                    : `−${count(before)}`
+                  : `${count(votes)}${before == null ? "" : signed(votes - before)}`;
+              }),
+            ];
+          }),
+          [
+            m.count_exhausted(),
+            "",
+            ...tally.exhausted.map((spent, index) => {
+              const prior = index === 0 ? null : tally.exhausted[index - 1];
+              return spent == null
+                ? null
+                : `${count(spent)}${prior == null ? "" : signed(spent - prior)}`;
+            }),
+          ],
+        ],
+      ),
+    ];
+  }
   const totals = rounds.map((round) => {
     let total = 0;
     for (const row of tally.rows) {
@@ -1246,7 +1328,9 @@ function resultsMarkdown(
             ? m.col_answer()
             : m.col_option(),
           ...(hasParty ? [m.col_party()] : []),
-          m.col_votes(),
+          contest.count?.stv != null && contest.count.round === 1
+            ? m.stv_first()
+            : m.col_votes(),
           m.col_share(),
           ...(hasSeats ? [m.col_seats()] : []),
           ...(then == null

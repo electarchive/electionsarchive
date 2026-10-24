@@ -35,7 +35,7 @@
   const href = (round: number) => {
     const kept = [...page.url.searchParams].filter(([key]) => key !== "round");
     const query = new URLSearchParams(
-      round === count.last ? kept : [...kept, ["round", String(round)]],
+      round === count.initial ? kept : [...kept, ["round", String(round)]],
     );
     const text = query.toString().replaceAll("%2F", "/");
     const suffix = text === "" ? ("" as const) : (`?${text}` as const);

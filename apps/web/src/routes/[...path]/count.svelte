@@ -43,7 +43,7 @@
   const href = (round: number) => {
     const kept = [...page.url.searchParams].filter(([key]) => key !== "round");
     const query = new URLSearchParams(
-      round === count.last ? kept : [...kept, ["round", String(round)]],
+      round === count.initial ? kept : [...kept, ["round", String(round)]],
     );
     const text = query.toString().replaceAll("%2F", "/");
     const suffix = text === "" ? ("" as const) : (`?${text}` as const);
@@ -52,6 +52,33 @@
   const rounds = $derived(
     Array.from({ length: count.last }, (_, step) => step + 1),
   );
+  const list = new Intl.ListFormat(getLocale(), {
+    style: "long",
+    type: "conjunction",
+  });
+  const action = $derived.by(() => {
+    const step = count.stv?.steps[index];
+    if (step == null) {
+      return null;
+    }
+    const label = (keys: Array<string>) =>
+      list.format(
+        keys.map(
+          (key) => count.rows.find((row) => row.key === key)?.label ?? "",
+        ),
+      );
+    return {
+      text:
+        step.kind === "first"
+          ? m.stv_first()
+          : step.kind === "surplus"
+            ? m.stv_surplus({ names: label(step.from) })
+            : step.kind === "exclusion"
+              ? m.stv_exclusion({ names: label(step.from) })
+              : m.stv_none(),
+      elected: step.elected.length === 0 ? null : label(step.elected),
+    };
+  });
 </script>
 
 {#snippet step(round: number, label: string, Icon: typeof ChevronLeftIcon)}
@@ -80,10 +107,21 @@
         {m.count_title()}
       </h2>
       <p class="text-[0.8125rem] text-muted-foreground">
-        {count.round === count.last
-          ? m.count_final()
-          : m.count_of({ round: count.round, last: count.last })}.
-        {m.count_continuing({ count: standing.length })}
+        {#if action == null}
+          {count.round === count.last
+            ? m.count_final()
+            : m.count_of({ round: count.round, last: count.last })}.
+          {m.count_continuing({ count: standing.length })}
+        {:else}
+          {m.stv_step({
+            count: count.round,
+            last: count.last,
+            action: action.text,
+          })}
+          {#if action.elected != null}
+            {m.stv_step_elected({ names: action.elected })}
+          {/if}
+        {/if}
       </p>
     </div>
     <div class="flex items-stretch gap-1.5">
@@ -103,9 +141,11 @@
               )}
               href={href(round)}
               aria-current={round === count.round ? "step" : undefined}
-              aria-label={round === count.last
-                ? m.count_final()
-                : m.count_round({ round })}
+              aria-label={count.stv != null
+                ? m.stv_count({ count: round })
+                : round === count.last
+                  ? m.count_final()
+                  : m.count_round({ round })}
               data-sveltekit-reset="false">{round}</a
             >
           </li>
@@ -126,7 +166,7 @@
       ></span>
     {/each}
   </div>
-  {#if leaving.length > 0}
+  {#if leaving.length > 0 && action == null}
     <p class="text-[0.8125rem]">
       {m.count_eliminated({
         names: new Intl.ListFormat(getLocale(), {
