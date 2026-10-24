@@ -1877,8 +1877,18 @@ async function tally(
       .map((row) => [row.round, row.value]),
   );
   const declared = spent.rows.find((row) => row.measure === 26)?.value;
+  const automatic = lines
+    .values()
+    .filter(
+      (line) =>
+        line.votes[0] == null &&
+        ["elected", "won"].includes(line.outcome ?? ""),
+    )
+    .toArray().length;
+  const filled = seats == null ? null : seats - automatic;
   const listed = lines
     .values()
+    .filter((line) => seats == null || line.votes[0] != null)
     .toArray()
     .map((line, _, all) =>
       line.short != null &&
@@ -1890,7 +1900,7 @@ async function tally(
   for (const line of listed) {
     first += line.votes[0] ?? 0;
   }
-  const quota = declared ?? Math.floor(first / ((seats ?? 0) + 1)) + 1;
+  const quota = declared ?? Math.floor(first / ((filled ?? 0) + 1)) + 1;
   return {
     round,
     last,
@@ -1902,10 +1912,10 @@ async function tally(
     ),
     exhausted: rounds.map((step) => exhausted.get(step) ?? null),
     stv:
-      seats == null
+      filled == null
         ? null
         : {
-            seats,
+            seats: filled,
             quota,
             isDerived: declared == null,
             steps: rounds.map((step) => {

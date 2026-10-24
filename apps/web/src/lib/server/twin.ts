@@ -2530,8 +2530,9 @@ function resultsMarkdown(
               : (parties.get(key) ?? null),
           ]
         : []),
-      current && count(current.votes),
-      current && percent(current.share),
+      ...(current == null || (current.votes === 0 && (current.seats ?? 0) > 0)
+        ? [null, null]
+        : [count(current.votes), percent(current.share)]),
       ...(hasSeats
         ? [current?.seats == null ? null : count(current.seats)]
         : []),
