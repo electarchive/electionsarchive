@@ -4,6 +4,8 @@ import * as v from "valibot";
 import { names, paths, refs } from "#lib/server/rpc/archive.js";
 import { os } from "#lib/server/cache.js";
 import { db } from "#lib/server/db/index.js";
+import layout2010 from "#lib/server/hex/gb-pcon-2010.json";
+import layout2024 from "#lib/server/hex/gb-pcon-2024.json";
 
 export const seats = {
   gains: os
@@ -512,6 +514,72 @@ export const seats = {
           winner: person(row.winner),
           member: person(row.member),
           reason: row.via,
+        })),
+      };
+    }),
+  hexes: os
+    .meta(
+      openapi({
+        method: "GET",
+        path: "/elections/{id}/hexes",
+        summary:
+          "Place each single-member seat of an election on an equal-area hex layout, where one exists",
+      }),
+    )
+    .input(v.object({ id: v.pipe(v.string(), v.uuid()) }))
+    .output(
+      v.nullable(
+        v.object({
+          credit: v.string(),
+          cells: v.array(
+            v.object({ k: v.number(), q: v.number(), r: v.number() }),
+          ),
+          borders: v.array(
+            v.object({
+              isNation: v.boolean(),
+              edges: v.array(v.array(v.number())),
+            }),
+          ),
+        }),
+      ),
+    )
+    .handler(async ({ input }) => {
+      const found = await db.execute<{ k: number; code: string }>(sql`
+        with recursive tree(id) as (
+          select e.id from election e join slug ps on ps.entity_id = e.polity_id and ps.is_current and (ps.path = 'gb' or ps.path like 'gb/%') where e.id = ${input.id}::uuid
+          union all
+          select e.id from election e join tree on e.parent_id = tree.id where e.kind not in ('runoff', 'indirect')
+        )
+        select distinct a.k, ac.code
+        from contest c join tree on tree.id = c.election_id
+        join election e on e.id = c.election_id
+        join area a on a.id = c.district_area_id
+        join area_code ac on ac.area_id = a.id and (ac.valid @> e.date_from or ac.valid is null)
+        where c.kind = 'body_seats' and c.allocation_parent_id is null and c.party_scope_id is null
+          and coalesce(c.magnitude, 1) = 1
+      `);
+      const layout = [layout2024, layout2010].find((entry) => {
+        let matched = 0;
+        for (const row of found.rows) {
+          if (row.code in entry.hexes) {
+            matched += 1;
+          }
+        }
+        return matched > 0 && matched >= found.rows.length * 0.95;
+      });
+      if (layout == null) {
+        return null;
+      }
+      const hexes: Record<string, Array<number>> = layout.hexes;
+      return {
+        credit: "Open Innovations and contributors (MIT)",
+        cells: found.rows.flatMap((row) => {
+          const [q, r] = hexes[row.code] ?? [];
+          return q == null || r == null ? [] : [{ k: row.k, q, r }];
+        }),
+        borders: Object.entries(layout.boundaries).map(([name, edges]) => ({
+          isNation: ["sc-en", "wa-en"].includes(name),
+          edges,
         })),
       };
     }),

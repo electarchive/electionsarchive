@@ -1,0 +1,1 @@
+Hex layouts for UK constituencies by Open Innovations and contributors (MIT, see LICENSE), from https://github.com/odileeds/hexmaps: `gb-pcon-2024.json` is `maps/uk-constituencies-2023.hexjson` v1.2 (commit 4d3152010cc5), and `gb-pcon-2010.json` is `maps/constituencies.hexjson` v1.3 (commit 4c15ff979e88), both trimmed to coordinates and borders.

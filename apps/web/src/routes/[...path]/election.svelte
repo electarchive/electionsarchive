@@ -242,6 +242,9 @@
     );
   });
 
+  const hexes = createQuery(() =>
+    orpc.seats.hexes.queryOptions({ input: { id } }),
+  );
   const governments = createQuery(() =>
     orpc.elections.governments.queryOptions({ input: { id } }),
   );
@@ -1197,6 +1200,7 @@
                 ? (final?.tones ?? race.tones)
                 : places.legend.map((item) => swatch(item.color, item.key))}
               tiles={shape.tiles}
+              hexes={hexes.data ?? null}
               own={shape.own}
               nested={shape.nested}
               frames={shape.frames}

@@ -55,6 +55,7 @@
     neighbors = null,
     up = null,
     tallies = null,
+    hexes = null,
   }: {
     places: Places;
     colors: Array<string>;
@@ -90,6 +91,11 @@
       | null;
     up?: { name: string; path: string } | null;
     tallies?: Array<number | null> | null;
+    hexes?: {
+      credit: string;
+      cells: Array<{ k: number; q: number; r: number }>;
+      borders: Array<{ isNation: boolean; edges: Array<Array<number>> }>;
+    } | null;
   } = $props();
 
   const BINS = [0.05, 0.1, 0.2];
@@ -123,7 +129,6 @@
   handoff = null;
   let dwell: ReturnType<typeof setTimeout> | undefined;
   let credits = $state<Array<string>>([]);
-  const credited = $derived(sources ?? credits);
   let pinned = $state<number | null>(null);
   let empty = $state<number | null>(null);
   let pointer = $state<{ x: number; y: number } | null>(null);
@@ -198,6 +203,103 @@
       [...places.rows, ...(places.districts ?? [])].map((row) => [row.k, row]),
     ),
   );
+  let isHex = $state(true);
+  let reader = $state<((css: string) => string) | null>(null);
+  const grid = $derived.by(() => {
+    if (hexes == null) {
+      return null;
+    }
+    let covered = 0;
+    for (const cell of hexes.cells) {
+      if (rows.has(cell.k)) {
+        covered += 1;
+      }
+    }
+    if (covered === 0 || covered < hexes.cells.length * 0.9) {
+      return null;
+    }
+    const center = (q: number, r: number) => ({
+      x: Math.sqrt(3) * (q + (r & 1) / 2),
+      y: -1.5 * r,
+    });
+    const cells = hexes.cells.map((cell) => ({
+      k: cell.k,
+      ...center(cell.q, cell.r),
+    }));
+    const corners = [
+      [0, -1],
+      [0.866, -0.5],
+      [0.866, 0.5],
+      [0, 1],
+      [-0.866, 0.5],
+      [-0.866, -0.5],
+    ];
+    const line = (edges: Array<Array<number>>) =>
+      edges
+        .map(([q = 0, r = 0, e = 1]) => {
+          const at = center(q, r);
+          const side = Math.abs(e) - 1;
+          const [ax = 0, ay = 0] = corners[side] ?? [];
+          const [bx = 0, by = 0] = corners[(side + 1) % 6] ?? [];
+          return `M${(at.x + ax).toFixed(3)} ${(at.y + ay).toFixed(3)}L${(at.x + bx).toFixed(3)} ${(at.y + by).toFixed(3)}`;
+        })
+        .join("");
+    let left = Infinity;
+    let right = -Infinity;
+    let top = Infinity;
+    let bottom = -Infinity;
+    for (const cell of cells) {
+      left = Math.min(left, cell.x);
+      right = Math.max(right, cell.x);
+      top = Math.min(top, cell.y);
+      bottom = Math.max(bottom, cell.y);
+    }
+    return {
+      cells,
+      at: new Map(cells.map((cell) => [cell.k, cell])),
+      x: left - 1.2,
+      y: top - 1.4,
+      width: right - left + 2.4,
+      height: bottom - top + 2.8,
+      nations: line(
+        hexes.borders.flatMap((border) =>
+          border.isNation ? border.edges : [],
+        ),
+      ),
+      regions: line(
+        hexes.borders.flatMap((border) =>
+          border.isNation ? [] : border.edges,
+        ),
+      ),
+    };
+  });
+  const isHexView = $derived(grid != null && isHex);
+  const tinted = $derived(
+    isHexView && reader != null
+      ? new Map(fills(reader))
+      : new Map<number, string>(),
+  );
+  const credited = $derived([
+    ...(sources ?? credits),
+    ...(isHexView && hexes != null
+      ? [m.map_hex_credit({ credit: hexes.credit })]
+      : []),
+  ]);
+  const stretch = $derived(
+    grid == null ? 1 : Math.min(boxWidth / grid.width, boxHeight / grid.height),
+  );
+  const place = (k: number) => {
+    const cell = grid?.at.get(k);
+    return grid == null || cell == null
+      ? null
+      : {
+          x:
+            (boxWidth - grid.width * stretch) / 2 + (cell.x - grid.x) * stretch,
+          y:
+            (boxHeight - grid.height * stretch) / 2 +
+            (cell.y - grid.y) * stretch,
+        };
+  };
   const inner = $derived(new Set(nested?.ks ?? []));
   const blanks = $derived(
     new Map((blank ?? []).map((entry) => [entry.k, entry])),
@@ -343,6 +445,9 @@
       .map((row) => row.k),
   );
   const ratio = $derived.by(() => {
+    if (isHexView && grid != null) {
+      return Math.min(2, Math.max(0.6, grid.width / grid.height));
+    }
     const frame = frames[0];
     if (frame == null) {
       return 4 / 3;
@@ -461,7 +566,15 @@
 
   const spot = $derived.by(() => {
     let anchor = pointer;
-    if (anchor == null && current?.at != null && maps[0] != null) {
+    if (anchor == null && isHexView && current != null) {
+      anchor = place(current.k);
+    }
+    if (
+      anchor == null &&
+      !isHexView &&
+      current?.at != null &&
+      maps[0] != null
+    ) {
       const projected = maps[0].project(current.at);
       anchor =
         projected.x >= 0 &&
@@ -1936,6 +2049,25 @@
         </div>
       </div>
     {/if}
+    {#if grid != null}
+      <div class="flex" role="group" aria-label={m.map_view()}>
+        {#each [true, false] as choice (choice)}
+          <button
+            type="button"
+            class={cn(
+              "-ms-px flex items-center border border-input bg-card px-2.5 text-[0.8125rem] font-semibold keycap block-7 first:ms-0 first:rounded-s-sm last:rounded-e-sm hover:bg-secondary pointer-coarse:block-10",
+              {
+                "relative z-10 bg-primary text-primary-foreground hover:bg-primary":
+                  isHex === choice,
+              },
+            )}
+            aria-pressed={isHex === choice}
+            onclick={() => (isHex = choice)}
+            >{choice ? m.map_view_hexes() : m.map_view_map()}</button
+          >
+        {/each}
+      </div>
+    {/if}
     {#if levels.length > 1}
       <div class="flex" role="group" aria-label={m.map_level()}>
         {#each levels as level (level.code)}
@@ -1989,10 +2121,149 @@
       class={cn(
         "transition-opacity duration-500 ease-out block-full inline-full motion-reduce:transition-none",
         { "opacity-0": !isLoaded },
+        { invisible: isHexView },
       )}
       data-map-surface
     ></div>
-    {#if still != null}
+    {#if isHexView && grid != null}
+      <svg
+        class="absolute inset-0 block-full inline-full"
+        viewBox="{grid.x} {grid.y} {grid.width} {grid.height}"
+        role="group"
+        aria-label={m.map_label({ noun })}
+        {@attach (node: SVGSVGElement) => {
+          const tones = paint(node.parentElement ?? document.body);
+          reader = tones.read;
+          return () => {
+            tones.done();
+            reader = null;
+          };
+        }}
+        onpointerleave={() => {
+          pointer = null;
+          if (pinned == null) {
+            focus = null;
+          }
+        }}
+      >
+        {#each grid.cells as cell (cell.k)}
+          {const row = $derived(rows.get(cell.k))}
+          <path
+            class="cursor-pointer outline-none"
+            d="M{cell.x.toFixed(3)} {(cell.y - 1).toFixed(
+              3,
+            )}l0.866 0.5v1l-0.866 0.5l-0.866 -0.5v-1z"
+            fill={tinted.get(cell.k) ??
+              "color-mix(in oklab, var(--muted-foreground) 14%, var(--card))"}
+            stroke="var(--card)"
+            stroke-width="0.12"
+            role="button"
+            tabindex={cell.k === (focus ?? grid.cells[0]?.k) ? 0 : -1}
+            aria-label={row == null
+              ? undefined
+              : row.leader == null
+                ? row.name
+                : m.map_hex_seat({
+                    name: row.name,
+                    winner: names[row.leader] ?? "",
+                  })}
+            data-k={cell.k}
+            onpointermove={(event) => {
+              if (event.pointerType !== "mouse") {
+                return;
+              }
+              const bounds =
+                event.currentTarget.ownerSVGElement?.parentElement?.getBoundingClientRect();
+              if (bounds != null) {
+                pointer = {
+                  x: event.clientX - bounds.left,
+                  y: event.clientY - bounds.top,
+                };
+              }
+              if (pinned == null) {
+                focus = cell.k;
+              }
+            }}
+            onfocus={() => {
+              pointer = null;
+              focus = cell.k;
+            }}
+            onblur={() => {
+              if (pinned == null) {
+                focus = null;
+              }
+            }}
+            onclick={(event) => {
+              if (
+                event instanceof PointerEvent &&
+                event.pointerType === "touch" &&
+                pinned !== cell.k
+              ) {
+                pinned = cell.k;
+                focus = cell.k;
+              } else {
+                open(cell.k);
+              }
+            }}
+            onkeydown={(event) => {
+              if (event.key === "Enter" || event.key === " ") {
+                event.preventDefault();
+                open(cell.k);
+                return;
+              }
+              const step =
+                event.key === "ArrowRight" || event.key === "ArrowDown"
+                  ? 1
+                  : event.key === "ArrowLeft" || event.key === "ArrowUp"
+                    ? -1
+                    : 0;
+              if (step === 0 || order.length === 0) {
+                return;
+              }
+              event.preventDefault();
+              const at = order.indexOf(cell.k);
+              const next =
+                order[(at + step + order.length) % order.length] ?? order[0];
+              event.currentTarget.ownerSVGElement
+                ?.querySelector<SVGPathElement>(`[data-k="${next}"]`)
+                ?.focus();
+            }}
+          />
+        {/each}
+        <path
+          d={grid.regions}
+          fill="none"
+          stroke="var(--foreground)"
+          stroke-opacity="0.45"
+          stroke-width="0.14"
+          stroke-linecap="round"
+          pointer-events="none"
+        />
+        <path
+          d={grid.nations}
+          fill="none"
+          stroke="var(--foreground)"
+          stroke-width="0.2"
+          stroke-linecap="round"
+          pointer-events="none"
+        />
+        {#if focus != null && grid.at.has(focus)}
+          {const cell = $derived(grid.at.get(focus))}
+          {#if cell != null}
+            <path
+              d="M{cell.x.toFixed(3)} {(cell.y - 1).toFixed(
+                3,
+              )}l0.866 0.5v1l-0.866 0.5l-0.866 -0.5v-1z"
+              fill="none"
+              stroke="var(--foreground)"
+              stroke-width="0.24"
+              pointer-events="none"
+            />
+          {/if}
+        {/if}
+      </svg>
+    {/if}
+    {#if isHexView}{:else if still != null}
       <img
         class="pointer-events-none absolute inset-0 object-cover block-full inline-full"
         src={still}
@@ -2031,7 +2302,10 @@
       </div>
     {/if}
     <div
-      class="absolute inset-e-2 inset-bs-2 flex flex-col overflow-hidden rounded-sm bg-card shadow-menu ring-1 ring-border max-sm:inset-bs-auto max-sm:inset-be-2"
+      class={cn(
+        "absolute inset-e-2 inset-bs-2 flex flex-col overflow-hidden rounded-sm bg-card shadow-menu ring-1 ring-border max-sm:inset-bs-auto max-sm:inset-be-2",
+        { hidden: isHexView },
+      )}
       data-export-skip
     >
       <button
