@@ -126,6 +126,39 @@ PARLGOV_ISO = {
     "ESP": "ES",
     "SWE": "SE",
 }
+ENTITY_URL = "https://www.wikidata.org/wiki/Special:EntityData/{}.json"
+NAMED_ITEMS = ["Q23731823", "Q205150", "Q541679", "Q1428001", "Q4732477"]
+SURVIVORS = {
+    "IT:Democratici di Sinistra": ("wikidata", "Q541679"),
+    "IT:Partito dei Comunisti Italiani": ("wikidata", "Q1428001"),
+    "IT:Lega": ("wikidata", "Q85776185"),
+    "FR:Parti Socialiste": ("wikidata", "Q170972"),
+    "FR:Parti socialiste": ("wikidata", "Q170972"),
+    "FR:Parti Communiste Français": ("wikidata", "Q192821"),
+    "FR:Parti communiste français": ("wikidata", "Q192821"),
+    "FR:Rassemblement pour la République": ("wikidata", "Q1052584"),
+    "FR:Alliance des Outre-mers": ("wikidata", "Q4732477"),
+    "IE:Sinn Féin": ("ie.party", "SF"),
+}
+WRONG_NAMES = {
+    "IT:Partito dei Comunisti Italiani": {"Italian Communist Party", "PCI"},
+    "IE:Sinn Féin": {"[We] Ourselves"},
+}
+NO_PARTY = {"IE:Independents"}
+DATED_NAMES = [
+    ("Q205150", "Front national", "fr", date(1972, 10, 5), date(2018, 6, 1)),
+    ("Q205150", "National Front", "en", date(1972, 10, 5), date(2018, 6, 1)),
+    ("Q205150", "Rassemblement national", "fr", date(2018, 6, 1), None),
+    ("Q205150", "National Rally", "en", date(2018, 6, 1), None),
+    ("Q23731823", "En marche !", "fr", date(2016, 4, 6), date(2017, 5, 8)),
+    ("Q23731823", "La République en marche !", "fr", date(2017, 5, 8), date(2022, 9, 22)),
+    ("Q23731823", "Renaissance", "fr", date(2022, 9, 22), None),
+    ("Q541679", "Partito Democratico della Sinistra", "it", None, date(1998, 2, 13)),
+    ("Q541679", "Democratic Party of the Left", "en", None, date(1998, 2, 13)),
+    ("Q541679", "Democratici di Sinistra", "it", date(1998, 2, 13), date(2007, 10, 14)),
+    ("Q541679", "Democrats of the Left", "en", date(1998, 2, 13), date(2007, 10, 14)),
+]
+WIKIDATA_TITLE = "Wikidata items for party names and dates"
 OTHERS = {"others", "other"}
 MISSING = {".", ""}
 UK_PARTIES = {
@@ -306,6 +339,11 @@ def wikidata_items(fetching: bool) -> tuple[pl.DataFrame, pl.DataFrame]:
 def fetch() -> None:
     raw.fetch(SOURCE, URL, suffix=".xlsx")
     wikidata_items(True)
+    for item in NAMED_ITEMS:
+        try:
+            raw.cached(SOURCE, ENTITY_URL.format(item))
+        except LookupError:
+            raw.fetch(SOURCE, ENTITY_URL.format(item), suffix=".json")
 
 
 def parse() -> None:
@@ -373,7 +411,19 @@ def emit() -> Path:
         cs.artifact(artifact, source)
 
         def name(entity: UUID, text: str, lang: str = "en", kind: str = "official", preferred: bool = True) -> None:
-            cs.add("name", entity_id=entity, text=text, lang=lang, kind=kind, is_preferred=preferred)
+            cs.add(
+                "name",
+                entity_id=entity,
+                text=text,
+                lang=lang,
+                kind=kind,
+                is_preferred=preferred,
+                valid_from=None,
+                valid_from_precision="day",
+                valid_to=None,
+                valid_to_precision="day",
+                source_id=None,
+            )
 
         polities = {iso: cs.polity(iso) for iso in ISO.values()}
         systems = {code: cs.key("gb.electoral_system", code) for code in UK_SYSTEMS}
@@ -468,6 +518,61 @@ def emit() -> Path:
         coalitions = {
             key: members for key, members in coalition_members.items() if len(members) > 1 and None not in members
         }
+
+        wikidata = cs.source("Wikidata", WIKIDATA_TITLE)
+        if wikidata in cs.minted:
+            cs.add(
+                "source",
+                id=wikidata,
+                kind="wikidata",
+                publisher="Wikidata",
+                title=WIKIDATA_TITLE,
+                url="https://www.wikidata.org",
+                license="CC0 1.0",
+                license_url="https://creativecommons.org/publicdomain/zero/1.0/",
+            )
+        for item in NAMED_ITEMS:
+            cs.artifact(raw.cached(SOURCE, ENTITY_URL.format(item)), wikidata)
+        for label, (scheme, value) in SURVIVORS.items():
+            entity = cadmus_parties[label]
+            survivor = cs.key(scheme, value)
+            if entity in cs.survivors or entity == survivor:
+                continue
+            for dropped in sorted(WRONG_NAMES.get(label, ())):
+                found = conn.execute(
+                    "select id from name where entity_id = %s and text = %s", [entity, dropped]
+                ).fetchone()
+                if found is not None:
+                    cs.add(
+                        "name_drop",
+                        name_id=found[0],
+                        entity_id=entity,
+                        text=dropped,
+                        reason="The source's English rendering of the party; the party's own name is already on the surviving entity",
+                    )
+            cs.merge(entity, survivor)
+        for entity in (cadmus_parties[label] for label in NO_PARTY):
+            if entity not in cs.retired:
+                cs.add(
+                    "entity_retirement",
+                    entity_id=entity,
+                    reason="The source's Independents line is a set of independent candidates, not a party; its options load with no party",
+                )
+        for item, text, lang, start, end in DATED_NAMES:
+            holder = cs.key("wikidata", item)
+            cs.add(
+                "name",
+                entity_id=holder,
+                text=text,
+                lang=lang,
+                kind="official",
+                is_preferred=True,
+                valid_from=start,
+                valid_from_precision="day",
+                valid_to=end,
+                valid_to_precision="day",
+                source_id=wikidata,
+            )
         allied: set[UUID] = set()
         print(f"{len(coalitions)} coalition lists with members named by ParlGov")
         stale = conn.execute(
@@ -695,7 +800,7 @@ def emit() -> Path:
                             cs.merge(old, party)
                         if code == "scotland" and year >= 1990 and umit_key == "green-party":
                             party = cs.key("gb.party", "scottish-greens")
-                    elif not other and iso != "GB":
+                    elif not other and iso != "GB" and f"{iso}:{label_text}" not in NO_PARTY:
                         key = (iso, label_text)
                         party = parties.get(key)
                         if party is None:
@@ -705,6 +810,8 @@ def emit() -> Path:
                                 name(party, row["party"])
                                 if row["party_original"] and row["party_original"] != row["party"]:
                                     name(party, row["party_original"], "und", "native", False)
+                    if iso == "IT" and year >= 2018 and label_text in ("Lega", "Lega Nord"):
+                        party = cs.key("wikidata", "Q85776185")
                     members = coalitions.get((iso, year, label_text))
                     alliance = None
                     if members is not None:

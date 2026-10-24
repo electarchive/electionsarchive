@@ -1274,16 +1274,21 @@ def emit() -> Path:
                                         if code in ("COM", "SOC", "DVD", "DVG", "EXG", "EXD", "ECO", "REG", "DIV")
                                     }
                                 )
-                                if line["nuance"] is not None and line["nuance"] not in nuances:
-                                    raise ValueError(f"unknown nuance {line['nuance']} in {year}")
+                                nuance = line["nuance"]
+                                if nuance == "PRG" and (line["etiquette"] or "").startswith(
+                                    ("ASSOCIATION PARTI SOCIALISTE", "ASSOCIATION PS ")
+                                ):
+                                    nuance = "SOC"
+                                if nuance is not None and nuance not in nuances:
+                                    raise ValueError(f"unknown nuance {nuance} in {year}")
                                 party = (
                                     None
-                                    if line["nuance"] is None
+                                    if nuance is None
                                     else party_of(
                                         "fr.interieur.nuance",
-                                        f"{year}:{line['nuance']}",
-                                        nuances[line["nuance"]],
-                                        line["nuance"],
+                                        f"{year}:{nuance}",
+                                        nuances[nuance],
+                                        nuance,
                                         "nuance",
                                     )
                                 )
