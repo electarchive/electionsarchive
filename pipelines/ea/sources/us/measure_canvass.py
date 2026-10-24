@@ -255,6 +255,8 @@ TENNESSEE = {
     date(2022, 11, 8): ("20240213031752", "20221108AllbyPrecinct.xlsx"),
 }
 OHIO = {
+    date(2017, 11, 7): ("20200216193822", "2017/gen/statewideresults-bycounty.xlsx"),
+    date(2018, 5, 8): ("20210510144703", "2018/pri/summaryissues.xlsx"),
     date(2015, 11, 3): ("20211009165730", "2015/general/officialsummary.xlsx"),
     date(2018, 11, 6): ("20250306204759", "2018/gen/2018-11-06_stateissuecounty.xlsx"),
     date(2022, 11, 8): ("20241007174602", "2022/gen/issues-summary.xlsx"),
