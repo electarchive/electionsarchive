@@ -10665,13 +10665,14 @@ export const polities = {
           db.execute<{
             id: string;
             date: string | null;
+            precision: string;
             year: number | null;
             kind: string;
             status: string;
             top: string | null;
             parts: number | null;
           }>(sql`
-            select e.id, e.date_from::text as date, ${CYCLE} as year, e.kind::text as kind, e.status::text as status,
+            select e.id, e.date_from::text as date, e.date_precision::text as precision, ${CYCLE} as year, e.kind::text as kind, e.status::text as status,
               case when lead.population is not null then lead.top end as top, lead.parts
             from election e
             left join lateral (
@@ -11038,7 +11039,11 @@ export const polities = {
           ...electionRows.rows.map((row) => ({
             name: labels.full.get(row.id) ?? "",
             path: slugs.get(row.id) ?? null,
-            date: row.date,
+            date:
+              row.precision === "day"
+                ? row.date
+                : (row.date?.slice(0, row.precision === "month" ? 7 : 4) ??
+                  null),
             year: row.year,
             kind: row.kind,
             status: row.status,
@@ -11276,6 +11281,7 @@ export const polities = {
                 races: v.number(),
                 filled: v.number(),
                 share: v.nullable(v.number()),
+                winner: v.nullable(v.string()),
                 parties: v.array(
                   v.object({
                     party: v.nullable(v.string()),
@@ -11323,6 +11329,7 @@ export const polities = {
         isIndependent: boolean;
         seats: number;
         share: number | null;
+        winner: string | null;
       }>(sql`
         with recursive later as materialized (
           select distinct r.parent_id as parent, r.id as election, coalesce(rc.office_id, rc.body_id) as seat
@@ -11445,7 +11452,10 @@ export const polities = {
         won as materialized (
           select w.root, w.contest, w.id, w.seats,
             coalesce(bm.into_id, br.parent_party_id, pm.into_id, w.party_id, ld.party_id) as party,
-            exists (select from candidacy cy where cy.option_id = w.id and cy.is_independent) as independent
+            exists (select from candidacy cy where cy.option_id = w.id and cy.is_independent) as independent,
+            case when r."isOffice" then (select coalesce(m.into_id, cy.person_id) from candidacy cy
+              left join entity_merge m on m.entity_id = cy.person_id
+              where cy.option_id = w.id and cy.person_id is not null order by cy.id limit 1) end as person
           from winners w
           join roots r on r.id = w.root
           left join leads ld on ld.parent = w.id
@@ -11483,6 +11493,7 @@ export const polities = {
             (array_agg(r.link))[1] as link,
             min(r.date) as day, min(r.year) as year, count(distinct r.id)::int as races,
             w.party, bool_or(w.independent) as independent, sum(w.seats)::int as seats, avg(sh.share)::float8 as share,
+            case when count(distinct r.id) = 1 then (array_agg(w.person))[1] end as winner,
             coalesce(sum(w.seats) filter (where r."isList"), 0)::int as listed
           from roots r
           join won w on w.root = r.id
@@ -11499,7 +11510,7 @@ export const polities = {
         flagged as (
           select s.*, coalesce(s.total > s.size * 1.02 and s.lists >= s.size * 0.9, false) as "isMixed" from sized s
         )
-        select seat, "isOffice", "isAbroad", bucket, link, day::text as date, year, races, party, share,
+        select seat, "isOffice", "isAbroad", bucket, link, day::text as date, year, races, party, share, winner,
           party is null and independent as "isIndependent",
           case when "isMixed" then listed else seats end as seats
         from flagged
@@ -11547,6 +11558,7 @@ export const polities = {
             ...links,
             ...parties,
             ...cabinets.rows.flatMap((row) => row.head ?? []),
+            ...found.rows.flatMap((row) => row.winner ?? []),
           ]),
           paths(links),
           refs(parties),
@@ -11644,6 +11656,10 @@ export const polities = {
                       group.length === 1 && first?.isOffice === true
                         ? first.share
                         : null,
+                    winner:
+                      group.length === 1 && first?.winner != null
+                        ? (labels.full.get(first.winner) ?? null)
+                        : null,
                     parties: group
                       .map((row) => ({
                         party: row.party,
@@ -11677,6 +11693,7 @@ export const polities = {
                     next.races += point.races;
                     next.filled += point.filled;
                     next.share = null;
+                    next.winner = null;
                     const merged = new Map(
                       next.parties.map((entry) => [entry.party, entry.seats]),
                     );

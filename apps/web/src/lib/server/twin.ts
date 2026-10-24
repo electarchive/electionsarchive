@@ -1032,15 +1032,20 @@ function polityMarkdown(
             ),
             series.isOffice
               ? [
+                  point.winner,
                   parties[0]?.label,
                   point.share == null ? null : percent(point.share),
                 ]
                   .filter((part) => part != null)
                   .join(", ")
-              : parties
-                  .slice(0, 4)
-                  .map((row) => `${row.label} ${count(row.seats)}`)
-                  .join(", "),
+              : point.parties.every(
+                    (row) => row.party == null && row.isIndependent !== true,
+                  )
+                ? m.record_filled({ count: point.filled })
+                : parties
+                    .slice(0, 4)
+                    .map((row) => `${row.label} ${count(row.seats)}`)
+                    .join(", "),
           ];
         }),
       ),

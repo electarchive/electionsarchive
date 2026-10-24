@@ -41,6 +41,20 @@
   "record_electors": "{count} electoral votes",
   "record_share": "{share} of the vote",
   "record_none": "No party recorded",
+  "record_filled": [
+    {
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural",
+        "local countText = count: number"
+      ],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "{countText} seat filled, no parties recorded",
+        "countPlural=*": "{countText} seats filled, no parties recorded"
+      }
+    }
+  ],
   "record_tabs": "Chamber or office",
   "record_governments": "Governments",
   "record_governments_key": "The strip shows which party governed between elections. Hover to see the cabinet.",

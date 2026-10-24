@@ -489,20 +489,29 @@
             <span class="text-[0.8125rem] font-semibold">{lit.name}</span>
             {#if isSingle}
               {const winner = $derived(lit.parties[0]?.party ?? null)}
-              <span class="flex items-center gap-1.5">
-                <span
-                  class="rounded-xs block-2.5 inline-2.5"
-                  style:background={tint(winner)}
-                ></span>
-                {winner == null && lit.parties[0]?.isIndependent === true
-                  ? m.person_parties_none()
-                  : (lit.parties[0]?.label ?? label(winner))}
-              </span>
+              {#if lit.winner != null}
+                <span>{lit.winner}</span>
+              {/if}
+              {#if lit.winner == null || winner != null || lit.parties[0]?.isIndependent === true}
+                <span class="flex items-center gap-1.5">
+                  <span
+                    class="rounded-xs block-2.5 inline-2.5"
+                    style:background={tint(winner)}
+                  ></span>
+                  {winner == null && lit.parties[0]?.isIndependent === true
+                    ? m.person_parties_none()
+                    : (lit.parties[0]?.label ?? label(winner))}
+                </span>
+              {/if}
               {#if lit.share != null}
                 <span class="font-figures tabular-nums"
                   >{m.record_share({ share: percent(lit.share) })}</span
                 >
               {/if}
+            {:else if !current.isOffice && lit.parties.every((entry) => entry.party == null && entry.isIndependent !== true)}
+              <span class="font-figures text-muted-foreground tabular-nums"
+                >{m.record_filled({ count: lit.filled })}</span
+              >
             {:else}
               <ul class="grid gap-0.5">
                 {#each lit.parties.slice(0, 5) as entry (entry.party)}
@@ -565,7 +574,13 @@
                               : `${entry.path}?in=${record.data.scope}`,
                         })}
                     aria-label={isSingle
-                      ? m.record_list_winner({ election: entry.name, party })
+                      ? m.record_list_winner({
+                          election: entry.name,
+                          party:
+                            entry.winner == null || party === ""
+                              ? (entry.winner ?? party)
+                              : `${entry.winner} (${party})`,
+                        })
                       : m.record_list_largest({ election: entry.name, party })}
                   >
                     <span

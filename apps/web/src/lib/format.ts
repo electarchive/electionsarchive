@@ -38,6 +38,16 @@ export function date(value: string | null) {
   if (value == null) {
     return "";
   }
+  if (/^\d{4}$/u.test(value)) {
+    return value;
+  }
+  if (/^\d{4}-\d{2}$/u.test(value)) {
+    return new Intl.DateTimeFormat(getLocale(), {
+      month: "long",
+      year: "numeric",
+      timeZone: "UTC",
+    }).format(new Date(`${value}-01T00:00:00Z`));
+  }
   return new Intl.DateTimeFormat(getLocale(), {
     dateStyle: "long",
     timeZone: "UTC",
