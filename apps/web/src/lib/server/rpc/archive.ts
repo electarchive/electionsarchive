@@ -14098,8 +14098,13 @@ export const parties = {
                 join contest_option o on o.contest_id = sub.id
                 join outcome x on x.option_id = o.id and x.kind in ('elected', 'won')
                 join result_set rs on rs.id = x.result_set_id and rs.is_default
-                where not exists (select from contest k where k.allocation_parent_id = sub.id)
-                  or sub.id = r.id and not exists (select from contest k where k.allocation_parent_id = r.id)
+                where (not exists (select from contest k where k.allocation_parent_id = sub.id)
+                  or sub.id = r.id and not exists (select from contest k where k.allocation_parent_id = r.id))
+                  and not (o.kind = 'list' and ${pooled(sql`o.id`)})
+                  and not (o.parent_option_id is not null and not ${pooled(sql`o.parent_option_id`)} and exists (
+                    select from outcome y join result_set ry on ry.id = y.result_set_id and ry.is_default
+                    where y.option_id = o.parent_option_id and y.kind in ('elected', 'won') and y.candidacy_id is null
+                  ))
                 group by r.id, o.id
               ) w
               group by w.root
