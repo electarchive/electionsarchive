@@ -12968,7 +12968,10 @@ export const people = {
                 and c2.district_area_id is not distinct from c.district_area_id and c2.party_scope_id is null
                 and e2.kind in ('general', 'local') and e2.date_from < e.date_from - 60
                 and e2.date_from > e.date_from - 3650
-            ))
+            )),
+            (select min(e2.date_from) from contest c2 join election e2 on e2.id = c2.election_id
+              where c.body_id is not null and c2.body_id = c.body_id and c2.office_id is not distinct from c.office_id
+                and c2.party_scope_id is null and e2.kind = 'general' and e2.date_from > e.date_from + 60)
           )::text as to
         from contest c join election e on e.id = c.election_id
         cross join lateral (
@@ -13208,7 +13211,15 @@ export const people = {
                 /^.+? in /u,
                 "",
               );
-              if (last?.name === name && last.ended == null) {
+              if (
+                last?.name === name &&
+                (last.ended == null ||
+                  (last.ended === "appointed" &&
+                    last.to != null &&
+                    row.from != null &&
+                    Date.parse(row.from) - Date.parse(last.to) <=
+                      120 * 86_400_000))
+              ) {
                 last.to = row.to;
                 last.ended = row.via;
               } else {
