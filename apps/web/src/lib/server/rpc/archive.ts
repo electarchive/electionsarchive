@@ -10527,9 +10527,10 @@ export const polities = {
           select p.parent_id from polity_parent p join anc on p.polity_id = anc.id
         ),
         bare as materialized (
-          select not exists (select from body where polity_id = ${input.id}::uuid)
+          select exists (select from polity p where p.id = ${input.id}::uuid and (p.kind = 'region' or (p.kind = 'federal_unit'
+            and not exists (select from body where polity_id = ${input.id}::uuid)
             and not exists (select from office where polity_id = ${input.id}::uuid)
-            and exists (select from polity p where p.id = ${input.id}::uuid and (p.kind = 'region' or (p.kind = 'federal_unit' and exists (select from polity_parent pp join slug ps on ps.entity_id = pp.parent_id and ps.is_current and ps.path = 'ca' where pp.polity_id = p.id)))) as yes
+            and exists (select from polity_parent pp join slug ps on ps.entity_id = pp.parent_id and ps.is_current and ps.path = 'ca' where pp.polity_id = p.id)))) as yes
         ),
         roots as materialized (
           select c.id, coalesce(c.office_id, c.body_id) as seat, c.office_id is not null as "isOffice",
@@ -10744,12 +10745,13 @@ export const polities = {
         db.execute<{ path: string }>(sql`
           select s.path from slug s join polity p on p.id = s.entity_id
           where s.entity_id = ${input.id}::uuid and s.is_current
-            and not exists (select from body where polity_id = p.id)
-            and not exists (select from office where polity_id = p.id)
-            and (p.kind = 'region' or (p.kind = 'federal_unit' and exists (
-              select from polity_parent pp join slug ps on ps.entity_id = pp.parent_id and ps.is_current and ps.path = 'ca'
-              where pp.polity_id = p.id
-            )))
+            and (p.kind = 'region' or (p.kind = 'federal_unit'
+              and not exists (select from body where polity_id = p.id)
+              and not exists (select from office where polity_id = p.id)
+              and exists (
+                select from polity_parent pp join slug ps on ps.entity_id = pp.parent_id and ps.is_current and ps.path = 'ca'
+                where pp.polity_id = p.id
+              )))
         `),
       ]);
       const lean = new Map(

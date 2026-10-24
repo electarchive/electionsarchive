@@ -841,7 +841,9 @@ function polityMarkdown(
             point.year,
             link(
               point.name,
-              point.path == null || record.scope == null
+              point.path == null ||
+              record.scope == null ||
+              point.path.startsWith(`${record.scope}/`)
                 ? point.path
                 : `${point.path}?in=${record.scope}`,
             ),
