@@ -1151,7 +1151,8 @@ function electionMarkdown(
           (row.short != null || row.isIndependent === true),
       );
       const hasResult =
-        !hasSeats && race.results.some((row) => row.isWon === true);
+        !hasSeats &&
+        race.results.some((row) => row.isWon === true && row.person != null);
       const districts = race.isPrimaries ? race.places : null;
       if (districts != null) {
         return [
@@ -1173,7 +1174,9 @@ function electionMarkdown(
           : [
               table(
                 [
-                  m.col_option(),
+                  race.results.some((row) => row.key.startsWith("answer:"))
+                    ? m.col_answer()
+                    : m.col_option(),
                   ...(hasParty ? [m.col_party()] : []),
                   m.col_votes(),
                   m.col_share(),
@@ -1198,7 +1201,11 @@ function electionMarkdown(
                     ? [row.seats == null ? null : count(row.seats)]
                     : []),
                   ...(hasResult
-                    ? [row.isWon === true ? m.outcome_elected() : null]
+                    ? [
+                        row.isWon === true && row.person != null
+                          ? m.outcome_elected()
+                          : null,
+                      ]
                     : []),
                 ]),
               ),
