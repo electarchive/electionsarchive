@@ -522,6 +522,8 @@ def _publish_table(conn: Connection, stage: Stage, table: str) -> None:
             retiring.setdefault(kind, []).append(entity)
         held: list[str] = []
         for kind, ids in retiring.items():
+            if kind == "person":
+                conn.execute("delete from public.person_image where person_id = any(%s::uuid[])", [ids])
             if kind == "tenure":
                 for owned, column in (
                     ("tenure_affiliation", "tenure_id"),

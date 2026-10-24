@@ -33,7 +33,7 @@ QUERY = """SELECT ?pos ?posLabel ?article ?statement ?person ?label ?start ?star
   ?state wdt:P300 "US-{state}" .
   ?pos wdt:P1001 ?state ; rdfs:label ?posLabel .
   FILTER(lang(?posLabel) = "en" && REGEX(?posLabel, "{include}") && !REGEX(?posLabel, "{exclude}"))
-  ?person p:P39 ?statement . ?statement ps:P39 ?pos .
+  ?person wdt:P31 wd:Q5 ; p:P39 ?statement . ?statement ps:P39 ?pos .
   FILTER NOT EXISTS {{ ?statement wikibase:rank wikibase:DeprecatedRank }}
   OPTIONAL {{ ?statement pqv:P580 [ wikibase:timeValue ?start ; wikibase:timePrecision ?startPrecision ] }}
   OPTIONAL {{ ?statement pqv:P582 [ wikibase:timeValue ?end ; wikibase:timePrecision ?endPrecision ] }}
@@ -74,6 +74,15 @@ def _query(state: str) -> str:
 
 def _article(title: str) -> str:
     return WIKIPEDIA + urlencode({"title": title, "action": "raw"})
+
+
+def _humans(qids: list[str]) -> str:
+    return "https://query.wikidata.org/sparql?" + urlencode(
+        {
+            "query": "SELECT ?p WHERE { VALUES ?p { " + " ".join(f"wd:{qid}" for qid in qids) + " } ?p wdt:P31 wd:Q5 }",
+            "format": "json",
+        }
+    )
 
 
 def _lookup(titles: list[str]) -> str:
@@ -191,6 +200,15 @@ def parse() -> None:
                             "year",
                         )
                     )
+    candidates = sorted({qid for _, _, qid in listed})
+    humans = {
+        binding["p"]["value"].rsplit("/", 1)[-1]
+        for index in range(0, len(candidates), 200)
+        for binding in json.loads(
+            raw.fetch(SOURCE, _humans(candidates[index : index + 200]), suffix=".json").path.read_text()
+        )["results"]["bindings"]
+    }
+    listed = defaultdict(list, {key: terms for key, terms in listed.items() if key[2] in humans})
     rows: list[dict[str, object]] = []
     people: dict[tuple[str, str], dict[str, object]] = {}
     for row in held.values():
@@ -442,4 +460,28 @@ def emit() -> Path:
                 locator={"statement": statement} if origin == "wikidata" else {"page": office_label},
             )
             previous[(state, position, "last")] = tenure
+        humans = {str(qid) for qid in frame["person"].unique()}
+        stale = [
+            (person, tenure)
+            for person, qid, tenure in conn.execute(
+                """select p.id, x.value, t.id from person p
+                   join external_id x on x.entity_id = p.id and x.scheme = 'wikidata'
+                   join entity en on en.id = p.id and en.type = 'person'
+                   join changeset c on c.id = p.changeset_id and c.pipeline = %s
+                   left join tenure t on t.person_id = p.id and t.changeset_id = p.changeset_id""",
+                [SOURCE],
+            ).fetchall()
+            if qid not in humans
+        ]
+        retired = [tenure for _, tenure in stale if tenure is not None] or sorted({person for person, _ in stale})
+        if stale and any(tenure is not None for _, tenure in stale):
+            cursor = conn.execute(
+                "select id, person_id, office_id, from_date, from_precision, to_date, to_precision, acquired_via,"
+                " contest_id, ended_via from tenure where id = any(%s)",
+                [retired],
+            )
+            for row in cursor.fetchall():
+                cs.add("tenure", **dict(zip([d.name for d in cursor.description], row, strict=True)), succeeds_tenure_id=None)
+        for entity in retired:
+            cs.add("entity_retirement", entity_id=entity, reason="Linked from an officeholder table but not a human in Wikidata")
         return cs.write()
