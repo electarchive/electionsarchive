@@ -9592,13 +9592,17 @@ export const polities = {
     .handler(async ({ input }) => {
       const [found, subdivisions, electionRows, crumbs, here, mapped] =
         await Promise.all([
-          db.execute<{ kind: string; parent: string | null }>(
+          db.execute<{
+            kind: string;
+            parent: string | null;
+            isTerritorial: boolean;
+          }>(
             sql`
-              select kind::text, (
-                select p.parent_id from polity_parent p where p.polity_id = polity.id
-                order by upper_inf(p.valid) desc, upper(p.valid) desc limit 1
-              ) as parent
-              from polity where id = ${input.id}::uuid
+              select p.kind::text, (
+                select pp.parent_id from polity_parent pp where pp.polity_id = p.id
+                order by upper_inf(pp.valid) desc, upper(pp.valid) desc limit 1
+              ) as parent, (p.kind = 'region' or (p.kind = 'federal_unit' and exists (select from polity_parent pp join slug ps on ps.entity_id = pp.parent_id and ps.is_current and ps.path = 'ca' where pp.polity_id = p.id))) as "isTerritorial"
+              from polity p where p.id = ${input.id}::uuid
             `,
           ),
           db.execute<{
@@ -9697,7 +9701,7 @@ export const polities = {
             left join polity_territory pt on pt.polity_id = e.polity_id and pt.valid @> e.date_from
             where e.polity_id in (select id from up) and e.date_from is not null and (
               exists (select from election x where x.polity_id = ${input.id}::uuid)
-              or not exists (select from polity where id = ${input.id}::uuid and kind = 'region')
+              or not exists (select from polity p where p.id = ${input.id}::uuid and (p.kind = 'region' or (p.kind = 'federal_unit' and exists (select from polity_parent pp join slug ps on ps.entity_id = pp.parent_id and ps.is_current and ps.path = 'ca' where pp.polity_id = p.id))))
               or exists (select from polity_territory t where t.polity_id = ${input.id}::uuid and t.valid @> e.date_from)
             ) and exists (
               select 1 from result_set rs
@@ -9777,7 +9781,7 @@ export const polities = {
       );
       const fallback = voted.find(
         (row) =>
-          polity.kind === "region" &&
+          polity.isTerritorial &&
           row.kind === "general" &&
           row.status === "held" &&
           row.date <= today,
@@ -10184,7 +10188,7 @@ export const polities = {
         bare as materialized (
           select not exists (select from body where polity_id = ${input.id}::uuid)
             and not exists (select from office where polity_id = ${input.id}::uuid)
-            and exists (select from polity where id = ${input.id}::uuid and kind = 'region') as yes
+            and exists (select from polity p where p.id = ${input.id}::uuid and (p.kind = 'region' or (p.kind = 'federal_unit' and exists (select from polity_parent pp join slug ps on ps.entity_id = pp.parent_id and ps.is_current and ps.path = 'ca' where pp.polity_id = p.id)))) as yes
         ),
         roots as materialized (
           select c.id, coalesce(c.office_id, c.body_id) as seat, c.office_id is not null as "isOffice",
@@ -10508,12 +10512,21 @@ export const polities = {
           };
           const text = ref.short ?? ref.label;
           const place = region.get(id);
+          const years = found.rows
+            .filter((row) => row.party === id)
+            .map((row) => row.year);
+          const first = Math.min(...years);
+          const last = Math.max(...years);
           return {
             ...ref,
             short:
-              place != null && place !== "" && (shown.get(text) ?? 0) > 1
-                ? `${text} (${place})`
-                : ref.short,
+              (shown.get(text) ?? 0) < 2
+                ? ref.short
+                : place != null && place !== ""
+                  ? `${text} (${place})`
+                  : years.length === 0
+                    ? ref.short
+                    : `${text} (${first === last ? first : `${first}–${last}`})`,
             lean: lean.get(id) ?? null,
           };
         }),
