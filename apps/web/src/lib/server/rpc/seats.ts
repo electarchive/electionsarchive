@@ -68,6 +68,7 @@ export const seats = {
         day: string | null;
         election: string | null;
         notional: boolean;
+        isChair: boolean;
       }>(sql`
         with recursive tree(id) as (
           select e.id from election e
@@ -231,7 +232,14 @@ export const seats = {
           (select day::text from last) as since,
           (select min(day)::text from now) as day,
           (select election::text from last) as election,
-          exists (select from paired x join contest c on c.id = x.prior where c.notional) as notional
+          exists (select from paired x join contest c on c.id = x.prior where c.notional) as notional,
+          exists (
+            select from won w
+            join won b on b.contest = p.prior and b.person = w.person
+            join party sx on sx.id::text = w.party and sx.kind = 'independent_group'
+            join name sn on sn.entity_id = sx.id and sn.text = 'Speaker'
+            where w.contest = p.id
+          ) as "isChair"
         from paired p
         order by p.id
       `);
@@ -246,10 +254,11 @@ export const seats = {
       for (const row of found.rows) {
         const kept = [...row.before];
         const gained: Array<string> = [];
-        if (row.now.length === 0) {
+        const now = row.isChair ? row.before : row.now;
+        if (now.length === 0) {
           seated.push({ ...row, now: null, before: row.before[0] ?? null });
         }
-        for (const key of row.now) {
+        for (const key of now) {
           const at = kept.indexOf(key);
           if (at === -1) {
             gained.push(key);
