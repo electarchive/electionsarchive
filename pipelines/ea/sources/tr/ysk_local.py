@@ -29,11 +29,40 @@ from ea.sources.tr.ysk import (
 from ea.store import DATA, connect
 
 SOURCE = "tr.ysk_local"
-VERSION = "2"
+VERSION = "3"
 PARSED = DATA / "parsed" / SOURCE
 PAGES = DATA / "pages" / SOURCE
 DOCS = "https://www.ysk.gov.tr/doc/dosyalar/docs/"
 SEATS = 16
+CREATED_2014 = {
+    "aydin/efeler",
+    "balikesir/karesi",
+    "balikesir/altieylul",
+    "denizli/merkezefendi",
+    "hatay/antakya",
+    "hatay/defne",
+    "hatay/arsuz",
+    "hatay/payas",
+    "manisa/sehzadeler",
+    "manisa/yunusemre",
+    "kahramanmaras/dulkadiroglu",
+    "kahramanmaras/onikisubat",
+    "mardin/artuklu",
+    "mugla/mentese",
+    "mugla/seydikemer",
+    "ordu/altinordu",
+    "tekirdag/suleymanpasa",
+    "tekirdag/kapakli",
+    "tekirdag/ergene",
+    "trabzon/ortahisar",
+    "sanliurfa/eyyubiye",
+    "sanliurfa/haliliye",
+    "sanliurfa/karakopru",
+    "van/tusba",
+    "van/ipekyolu",
+    "zonguldak/kilimli",
+    "zonguldak/kozlu",
+}
 DAYS = {
     1963: date(1963, 11, 17),
     1968: date(1968, 6, 2),
@@ -1768,6 +1797,17 @@ def emit() -> Path:
                     cs.add("office", id=office, polity_id=polity, kind="mayor")
                     name(office, f"Mayor of {label_text}", "en")
                     name(office, f"{label_text} Belediye Başkanı", kind="native")
+                    if town is None:
+                        created = path.split("/", 1)[1] in CREATED_2014
+                        cs.add(
+                            "polity_territory",
+                            polity_id=polity,
+                            area_id=area,
+                            valid_from=DAYS[2014] if created else None,
+                            valid_from_precision="day",
+                            valid_to=None,
+                            valid_to_precision="day",
+                        )
             election, contest, contest_key = mayor_contest(key, polity, office, path, english, native, day, area)
             declared = cs.key(f"{SOURCE}.result_set", contest_key)
             annulled = key in ANNULLED.get(year, set())
