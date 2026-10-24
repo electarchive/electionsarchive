@@ -502,8 +502,25 @@ def emit() -> Path:
                 ),
             ]
         )
+        heads: dict[tuple[int, str], set[str]] = defaultdict(set)
+        for text, key in conn.execute(
+            """select n.text, k.value from name n join candidacy cy on cy.person_id = n.entity_id and cy.role = 'head'
+               join contest_option o on o.id = cy.option_id
+               join external_id k on k.entity_id = o.contest_id and k.scheme = 'us.contest'
+               where n.is_preferred and k.value ~ '^20(0[0-9]|1[0-4])-11-[0-9]{2}:[A-Z]{2}:president$'"""
+        ).fetchall():
+            heads[(int(key[:4]), key[11:13])].update(re.sub(r"[^a-z]", "", word.lower()) for word in text.split())
+
+        def head(row: dict[str, object]) -> str:
+            candidate = str(row["candidate"])
+            halves = [half.strip() for half in candidate.split("&")]
+            known = heads[(int(str(row["year"])), str(row["state"]))]
+            named = [half for half in halves if re.sub(r"[^a-z]", "", half.split()[-1].lower()) in known]
+            return named[0] if len(halves) == 2 and len(named) == 1 else candidate
+
         returns = (
             lines.filter(pl.col("chamber").is_not_null())
+            .with_columns(candidate=pl.struct("candidate", "year", "state").map_elements(head, return_dtype=pl.String))
             .with_columns(candidate=pl.col("candidate").str.to_uppercase())
             .filter(~pl.col("candidate").str.contains(openelections.NOT_COUNTED), pl.col("candidate") != "")
             .with_columns(
