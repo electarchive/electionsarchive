@@ -71,6 +71,41 @@ JUDICIAL = {
     "WI": 1,
 }
 KNOWN = {("GA", 2025, "statewide_exec", "general"): 2}
+CALENDAR: dict[tuple[str, str], tuple[int, int | None]] = {
+    **{(st, "county"): (2, 0) for st in ("AL", "AZ", "AR", "CA", "CO", "FL", "GA", "ID", "IL", "IN", "IA", "KS")},
+    **{(st, "county"): (2, 0) for st in ("MN", "MO", "MT", "NE", "NV", "NM", "NC", "ND", "OH", "OK", "OR", "SC")},
+    **{(st, "county"): (2, 0) for st in ("SD", "TN", "TX", "UT", "WA", "WV", "WI", "WY", "MI", "MD", "AK", "HI")},
+    ("NJ", "county"): (1, 0),
+    ("PA", "county"): (2, 1),
+    ("VA", "county"): (4, 3),
+    ("LA", "county"): (4, 3),
+    ("MS", "county"): (4, 3),
+    ("KY", "county"): (4, 2),
+    **{(st, "township"): (1, 0) for st in ("NH", "VT", "ME", "MA", "NJ", "MN", "ND", "SD")},
+    **{(st, "township"): (2, 1) for st in ("NY", "PA", "WI", "OH", "KS", "CT")},
+    ("RI", "township"): (2, 0),
+    ("NE", "township"): (2, 0),
+    ("MI", "township"): (4, 0),
+    ("IL", "township"): (4, 1),
+    ("IN", "township"): (4, 2),
+    **{(st, "municipality"): (1, 0) for st in ("NY", "VT", "ME", "NJ", "DE", "WI", "MO", "TX", "SD", "AK")},
+    **{(st, "municipality"): (2, 1) for st in ("NH", "MA", "CT", "PA", "NC", "GA", "OH", "MI", "IL", "IA", "KS")},
+    **{(st, "municipality"): (2, 1) for st in ("MT", "NM", "UT", "ID", "WA")},
+    **{(st, "municipality"): (2, 0) for st in ("RI", "VA", "KY", "MN", "AR", "NE", "ND", "WY", "NV", "OR", "CA")},
+    ("AL", "municipality"): (4, 0),
+    ("MS", "municipality"): (4, 1),
+    ("IN", "municipality"): (4, 3),
+    ("LA", "municipality"): (4, None),
+    **{(st, "school"): (1, 0) for st in ("NY", "NH", "VT", "ME", "MA", "NJ", "WI", "MO", "SD", "AR", "DE", "MT")},
+    **{(st, "school"): (1, 0) for st in ("OK", "AK")},
+    **{(st, "school"): (2, 1) for st in ("IL", "PA", "OH", "IA", "KS", "WA", "OR", "CO", "ID", "NM", "VA", "CT")},
+    **{(st, "school"): (2, 0) for st in ("MN", "MI", "NE", "CA", "WY", "UT", "AZ", "NV", "ND", "KY", "GA", "AL")},
+    **{(st, "school"): (2, 0) for st in ("FL", "SC", "NC", "TN", "WV", "MD", "IN", "RI")},
+    ("LA", "school"): (4, 2),
+    **{(st, "special"): (1, 0) for st in ("NY", "NJ", "NH", "VT", "ME", "MA")},
+    **{(st, "special"): (2, 1) for st in ("IL", "CO", "WA", "OR")},
+    **{(st, "special"): (2, 0) for st in ("TX", "CA", "FL", "NE")},
+}
 ACRONYMS = {"MUD", "ISD", "CISD", "PUD", "USD", "CSD", "WCID", "GCD", "CDD", "SID", "MSD", "UD", "LID", "FWSD"}
 ABBREVIATIONS = {
     "SCH": "SCHOOL",
@@ -461,8 +496,8 @@ def build() -> str:
             taken.add(pid)
 
     governments: list[dict] = []
-    for gid, kind, name, st, county, function, population, active in cog.select(
-        "id", "kind", "name", "state_fips", "county_fips", "function", "population", "active"
+    for gid, kind, name, st, county, function, population, active, elected in cog.select(
+        "id", "kind", "name", "state_fips", "county_fips", "function", "population", "active", "elected"
     ).iter_rows():
         pid = link.get(gid)
         match = PREFIX.match(name)
@@ -496,6 +531,7 @@ def build() -> str:
             }
         )
     for pid, years in held.items():
+                "elected": elected,
         if pid in taken or pid not in polities:
             continue
         kind, code, name, st = polities[pid]
@@ -518,6 +554,7 @@ def build() -> str:
             }
         )
 
+                "elected": True,
     patterns: dict[tuple[str, str], Counter] = defaultdict(Counter)
     months: dict[tuple[str, str], Counter] = defaultdict(Counter)
     for g in governments:
@@ -545,15 +582,20 @@ def build() -> str:
     for g in governments:
         group = (g["state"], g["kind"])
         if g["period"] is None:
-            common = patterns[group].most_common(1)
+            period, phase = CALENDAR.get(group, (None, None))
+            common = [p for p, _ in patterns[group].most_common() if period is None or p[0] == period]
             if g["phase"] is not None:
-                period = Counter(p for p, _ in patterns[group].elements()).most_common(1)
-                g["period"] = period[0][0] if period else 2
-                g["phase"] = g["phase"] % g["period"]
+                if period is None:
+                    counted = Counter(p for p, _ in patterns[group].elements()).most_common(1)
+                    period = counted[0][0] if counted else 2
+                g["period"], g["phase"] = period, g["phase"] % period
+            elif period is not None:
+                g["period"], g["phase"] = period, phase if phase is not None else common[0][1] if common else 0
+                g["basis"] = "state calendar"
             elif common:
-                g["period"], g["phase"] = common[0][0]
+                g["period"], g["phase"] = common[0]
             else:
-                g["period"], g["phase"], g["basis"] = 1, 0, "unknown"
+                g["period"], g["phase"], g["basis"] = 2, 0, "unknown"
         if g["month"] is None and months[group]:
             g["month"] = months[group].most_common(1)[0][0]
         years = held.get(g["polity_id"] or "", {})
@@ -564,6 +606,7 @@ def build() -> str:
                 and (year - g["phase"]) % g["period"] == 0
                 and (year < today.year or (g["month"] is not None and g["month"] < today.month))
             )
+                and g["elected"]
             n, precinct, _, _, precincts, shaped, generals = years.get(year, [0, 0, 0, None, 0, 0, 0])
             earlier = years.get(year - 4, [0] * 7)[6] if year < today.year else 0
             if expected or n:
@@ -642,7 +685,7 @@ def build() -> str:
         cell[9] += shaped
 
     with connect() as conn, conn.transaction():
-        conn.execute("delete from coverage_goal")
+        conn.execute("delete from coverage_goal where polity = 'us'")
         conn.execute("truncate coverage_government_year, coverage_government")
         with conn.cursor().copy(
             "copy coverage_government (id, state, county, kind, name, function, population, active, polity_id, period,"
@@ -683,5 +726,6 @@ def build() -> str:
                 copy.write_row([*key, *values])
     return (
         f"{len(governments):,} governments ({len(link):,} linked), {len(years_out):,} government years, "
-        f"{len(goals):,} goal rows in {time.monotonic() - started:.0f}s"
+        f"{len(goals):,} goal rows, {len(country_polities)} other countries with {len(country_goals):,} goal rows "
+        f"in {time.monotonic() - started:.0f}s"
     )

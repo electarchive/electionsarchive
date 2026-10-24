@@ -1,5 +1,8 @@
 import io
+import re
+import subprocess
 import zipfile
+from xml.etree import ElementTree
 
 import fastexcel
 import polars as pl
@@ -16,11 +19,150 @@ SHEETS = {
     "DEP School Dist": "dependent_school",
 }
 TYPES = {"1 - COUNTY": "county", "2 - MUNICIPAL": "municipality", "3 - TOWNSHIP": "township"}
+ISD = "https://www.census.gov/content/dam/Census/library/publications/2024/econ/2022ISD.pdf"
+STATES = {
+    "Alabama": "01",
+    "Alaska": "02",
+    "Arizona": "04",
+    "Arkansas": "05",
+    "California": "06",
+    "Colorado": "08",
+    "Connecticut": "09",
+    "Delaware": "10",
+    "District of Columbia": "11",
+    "Florida": "12",
+    "Georgia": "13",
+    "Hawaii": "15",
+    "Idaho": "16",
+    "Illinois": "17",
+    "Indiana": "18",
+    "Iowa": "19",
+    "Kansas": "20",
+    "Kentucky": "21",
+    "Louisiana": "22",
+    "Maine": "23",
+    "Maryland": "24",
+    "Massachusetts": "25",
+    "Michigan": "26",
+    "Minnesota": "27",
+    "Mississippi": "28",
+    "Missouri": "29",
+    "Montana": "30",
+    "Nebraska": "31",
+    "Nevada": "32",
+    "New Hampshire": "33",
+    "New Jersey": "34",
+    "New Mexico": "35",
+    "New York": "36",
+    "North Carolina": "37",
+    "North Dakota": "38",
+    "Ohio": "39",
+    "Oklahoma": "40",
+    "Oregon": "41",
+    "Pennsylvania": "42",
+    "Rhode Island": "44",
+    "South Carolina": "45",
+    "South Dakota": "46",
+    "Tennessee": "47",
+    "Texas": "48",
+    "Utah": "49",
+    "Vermont": "50",
+    "Virginia": "51",
+    "Washington": "53",
+    "West Virginia": "54",
+    "Wisconsin": "55",
+    "Wyoming": "56",
+}
+FOOTER = re.compile(rf"^(?:({'|'.join(STATES)}) \d+|\d+ ({'|'.join(STATES)}))$")
+ELECTED = re.compile(
+    r"\b(popularly )?elected\b(?! (officials?|officers?|bod(y|ies)|county|city|town|state|governing|representatives?|"
+    r"heads?|members? of (the|a|each) (county|city|town|municipal|participating|member)))",
+    re.IGNORECASE,
+)
+STOP = {"DISTRICT", "OF", "AND", "THE", "FOR", "LAW", "ACT", "COUNTY", "IN", "A"}
+GENERIC = {
+    "AUTHORITY",
+    "COMMISSION",
+    "BOARD",
+    "AGENCY",
+    "CORPORATION",
+    "JOINT",
+    "SPECIAL",
+    "PUBLIC",
+    "OR",
+    "CITY",
+    "TOWN",
+    "TOWNSHIP",
+    "MUNICIPAL",
+    "REGIONAL",
+    "LOCAL",
+    "CREATED",
+    "UNDER",
+} | {word.upper() for state in STATES for word in state.split()}
 COUNTS = {"county": 3031, "municipality": 19491, "township": 16214, "special": 39555, "school": 12546}
 
 
 def fetch() -> None:
     raw.fetch(SOURCE, URL, suffix=".zip")
+    raw.fetch(SOURCE, ISD, suffix=".pdf")
+
+
+def words(text: str) -> frozenset[str]:
+    return frozenset(
+        w[:-3] + "Y" if w.endswith("IES") else w.rstrip("S")
+        for w in re.sub(r"\(.*?\)|—.*|[^A-Z ]", " ", text.upper()).split()
+    )
+
+
+def boards() -> dict[str, list[tuple[frozenset[str], str | None]]]:
+    root = ElementTree.fromstring(
+        subprocess.run(
+            ["pdftohtml", "-xml", "-i", "-q", "-stdout", str(raw.cached(SOURCE, ISD).path)],
+            capture_output=True,
+            check=True,
+        ).stdout
+    )
+    blocks: list[list] = []
+    inside = False
+    state = None
+    for page in root.iter("page"):
+        items = []
+        for text in page.iter("text"):
+            content = "".join(text.itertext()).strip()
+            if footer := FOOTER.match(re.sub(r"\s+", " ", content)):
+                state = STATES[footer[1] or footer[2]]
+            elif content and int(text.get("top")) <= 1110:
+                items.append((int(text.get("left")) >= 459, int(text.get("top")), text.find("b") is not None, content))
+        for _, _, bold, content in sorted(items):
+            if bold and re.fullmatch(r"SPECIAL DISTRICT GOVERNMENTS\d?", content):
+                inside = True
+            elif bold and content.isupper():
+                inside = False
+            elif (
+                inside
+                and bold
+                and blocks
+                and blocks[-1][0] == state
+                and (not blocks[-1][2] or blocks[-1][1].endswith("-"))
+            ):
+                blocks[-1][1] = blocks[-1][1].removesuffix("-") + ("" if blocks[-1][1].endswith("-") else " ") + content
+            elif inside and bold:
+                blocks.append([state, content, []])
+            elif inside and blocks:
+                blocks[-1][2].append(content)
+    classes = []
+    for state, heading, para in blocks:
+        para = re.sub(r"-\s", "", " ".join(para))
+        board = "elected" if ELECTED.search(para) else "appointed" if "appoint" in para.lower() else None
+        classes.append((state, words(heading) - STOP, board))
+    for i, (state, heading, board) in enumerate(classes):
+        children = [c[2] for c in classes[i + 1 : i + 8] if c[0] == state and c[2] is not None and heading < c[1]]
+        if board is None and children:
+            classes[i] = (state, heading, "elected" if "elected" in children else "appointed")
+    by_state: dict[str, list[tuple[frozenset[str], str | None]]] = {}
+    for state, heading, board in classes:
+        by_state.setdefault(state, []).append((heading, board))
+    return by_state
 
 
 def parse() -> None:
@@ -38,7 +180,9 @@ def parse() -> None:
                 pl.col("UNIT_NAME").str.strip_chars().alias("name"),
                 pl.col("FIPS_STATE").alias("state_fips"),
                 pl.col("FIPS_COUNTY").alias("county_fips"),
-                (pl.col("FIPS_PLACE") if "FIPS_PLACE" in frame.columns else pl.lit(None, pl.String)).alias("place_fips"),
+                (pl.col("FIPS_PLACE") if "FIPS_PLACE" in frame.columns else pl.lit(None, pl.String)).alias(
+                    "place_fips"
+                ),
                 (pl.col("FUNCTION_NAME") if "FUNCTION_NAME" in frame.columns else pl.lit(None, pl.String)).alias(
                     "function"
                 ),
@@ -51,6 +195,44 @@ def parse() -> None:
     governments = pl.concat(frames)
     if governments["id"].n_unique() != governments.height:
         raise ValueError("duplicate government IDs")
+    classes = boards()
+    matched = []
+    for gid, name, st in governments.filter(pl.col("kind") == "special").select("id", "name", "state_fips").iter_rows():
+        mine = words(name)
+        ranked = [
+            ((len(heading & mine) / len(heading), len(heading & mine), board is not None), board)
+            for heading, board in classes.get(st, [])
+            if heading and heading - GENERIC & mine and len(heading & mine) / len(heading) >= 0.5
+        ]
+        matched.append((gid, max(ranked, key=lambda r: r[0])[1] if ranked else None))
+    governments = governments.join(pl.DataFrame(matched, schema=["id", "board"], orient="row"), on="id", how="left")
+    for keys in (["state_fips", "function"], ["function"]):
+        share = (
+            governments.filter(pl.col("board").is_not_null())
+            .group_by(keys)
+            .agg((pl.col("board") == "elected").mean().alias("share"))
+        )
+        governments = (
+            governments.join(share, on=keys, how="left")
+            .with_columns(
+                pl.when(pl.col("kind") != "special")
+                .then(None)
+                .otherwise(
+                    pl.coalesce(
+                        "board",
+                        pl.when(pl.col("share") >= 0.5)
+                        .then(pl.lit("elected"))
+                        .when(pl.col("share").is_not_null())
+                        .then(pl.lit("appointed")),
+                    )
+                )
+                .alias("board")
+            )
+            .drop("share")
+        )
+    governments = governments.with_columns((pl.col("board") != "appointed").fill_null(True).alias("elected")).drop(
+        "board"
+    )
     held = dict(governments.group_by("kind").len().iter_rows())
     for kind, count in COUNTS.items():
         if held.get(kind) != count:
