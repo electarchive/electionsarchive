@@ -12,7 +12,7 @@ from ea.changeset import Changeset
 from ea.store import connect
 
 SOURCE = "gb.tenures"
-VERSION = "3"
+VERSION = "4"
 SERVICE = "https://query.wikidata.org/sparql?" + urlencode(
     {
         "query": """SELECT ?item ?name ?pos ?start ?end ?cause ?district ?group ?mnis WHERE {
@@ -139,11 +139,13 @@ def emit() -> Path:
             ).fetchall()
         )
         linked: dict[str, UUID] = {}
+        items: dict[UUID, set[str]] = defaultdict(set)
         for scheme, value, person in conn.execute(
             """select e.scheme, e.value, e.entity_id from external_id e join person p on p.id = e.entity_id
                where e.scheme in ('wikidata', 'mnis')"""
         ).fetchall():
             linked[f"{scheme}:{value}"] = person
+            items[person].add(f"{scheme}:{value}")
         winners: dict[UUID, list[tuple[UUID, UUID, list[str], str, UUID | None]]] = defaultdict(list)
         for election, contest, person, party, person_name, contest_name in conn.execute(
             """select e.id, c.id, cy.person_id, o.party_id,
@@ -190,6 +192,11 @@ def emit() -> Path:
                 if not words:
                     continue
                 pool = [
+                    member
+                    for member in general
+                    if "tenure" not in member
+                    and {f"wikidata:{member['item']}", f"mnis:{numbers.get(member['item'])}"} & items[person]
+                ] or [
                     member
                     for member in general
                     if "tenure" not in member and fold(names[member["item"]])[-1:] == words[-1:]
