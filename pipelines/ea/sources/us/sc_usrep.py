@@ -22,9 +22,10 @@ PUBLISHER = "South Carolina State Election Commission"
 LANDING = "https://scvotes.gov/election-results/"
 URL = "https://scvotes.gov/wp-content/uploads/2022/08/Election_Report_{}.pdf"
 DPI = 200
-BOOKS = {1992: "1992-1993", 1994: "1994-1995", 1996: "1995-1996", 1998: "1997-1998"}
-DAYS = {1992: date(1992, 11, 3), 1994: date(1994, 11, 8), 1996: date(1996, 11, 5), 1998: date(1998, 11, 3)}
-PAGE_RANGES = {1992: (82, 84), 1994: (33, 34), 1996: (44, 45), 1998: (46, 47)}
+BOOKS = {1990: "1990-1991", 1992: "1992-1993", 1994: "1994-1995", 1996: "1995-1996", 1998: "1997-1998"}
+DAYS = {1990: date(1990, 11, 6), 1992: date(1992, 11, 3), 1994: date(1994, 11, 8), 1996: date(1996, 11, 5), 1998: date(1998, 11, 3)}
+PAGE_RANGES = {1990: (95, 95), 1992: (82, 84), 1994: (33, 34), 1996: (44, 45), 1998: (46, 47)}
+HALVES = {1990: 306.0}
 FIXES = str.maketrans({"&": "6", "l": "1", "I": "1", "O": "0", "o": "0", "S": "5", "B": "8", "Z": "2", "|": "1"})
 COUNTIES = [
     "Abbeville", "Aiken", "Allendale", "Anderson", "Bamberg", "Barnwell", "Beaufort", "Berkeley", "Calhoun",
@@ -45,6 +46,14 @@ OVERRIDES: dict[tuple[int, int, str, int], int] = {
     (1996, 5, "Chesterfield", 2): 52,
     (1998, 6, "Bamberg", 2): 1029,
     (1998, 6, "Williamsburg", 2): 2679,
+}
+LAYOUT: dict[tuple[int, int], tuple[list[float], list[int]]] = {
+    (1990, 2): ([396.0, 428.0, 456.0], [90054, 11101, 189]),
+    (1990, 4): ([395.0, 425.0, 456.0], [81927, 51338, 270]),
+}
+ROWNAMES: dict[tuple[int, int], list[str]] = {
+    (1990, 2): ["Bamberg", "Calhoun", "Lexington", "Orangeburg", "Richland"],
+    (1990, 4): ["Greenville", "Spartanburg", "Union"],
 }
 EXTRA: dict[tuple[int, int], dict[int, tuple[str, str]]] = {(1998, 4): {1: ("Peter J. Ashy (Patriot)", "PT"), 2: ("Peter J. Ashy (Reform)", "RF")}}
 SUMMARY = "South Carolina's U.S. House general elections of 1992, 1994, 1996, and 1998 by county from the State Election Commission's election reports"
@@ -70,7 +79,7 @@ def render(year: int, page: int) -> Path:
     return image
 
 
-def lines_of(year: int, page: int) -> list[list[tuple[float, float, float, float, str]]]:
+def lines_of(year: int, page: int, half: int | None = None) -> list[list[tuple[float, float, float, float, str]]]:
     path, _ = book_path(year)
     xml = subprocess.run(["pdftotext", "-bbox", "-f", str(page), "-l", str(page), str(path), "-"], capture_output=True, text=True, check=True).stdout
     namespace = {"h": "http://www.w3.org/1999/xhtml"}
@@ -78,6 +87,8 @@ def lines_of(year: int, page: int) -> list[list[tuple[float, float, float, float
         (float(w.get("xMin")), float(w.get("yMin")), float(w.get("xMax")), float(w.get("yMax")), w.text or "")
         for w in ElementTree.fromstring(re.sub(r"<!DOCTYPE[^>]*>", "", xml)).findall(".//h:word", namespace)
     ]
+    if half is not None:
+        words = [w for w in words if (w[0] >= HALVES[year]) == (half == 1)]
     words.sort(key=lambda w: (w[1] + w[3]) / 2)
     lines: list[list[tuple[float, float, float, float, str]]] = []
     for word in words:
@@ -95,10 +106,13 @@ def parse() -> None:
     problems: list[str] = []
     for year, (first, last) in PAGE_RANGES.items():
         last_district = 0
+        done = [0, 0]
         block: list[tuple[int, list[tuple[float, float, float, float, str]]]] = []
-        for page in range(first, last + 1):
+        for page, half in [(page, half) for page in range(first, last + 1) for half in ((0, 1) if year in HALVES else (None,))]:
             render(year, page)
-            for line in lines_of(year, page):
+            if half is not None:
+                block = []
+            for line in lines_of(year, page, half):
                 text = " ".join(w[4] for w in line)
                 is_total = re.match(r"^\W*(STATE\s+)?TOTALS?\b", text, re.IGNORECASE) is not None and re.search(r"\d", text) is not None
                 if not is_total:
@@ -108,11 +122,17 @@ def parse() -> None:
                 edges = [w[2] for w in numbers]
                 printed = [int(re.sub(r"\D", "", w[4])) for w in numbers]
                 head = " ".join(" ".join(w[4] for w in item[1]) for item in block)
+                if half is not None and (year, 2 * done[half] + half + 1) in LAYOUT:
+                    edges, printed = LAYOUT[(year, 2 * done[half] + half + 1)]
                 match = re.search(r"DISTRICT\s*0*(\d)", head, re.IGNORECASE)
                 district = int(match[1]) if match is not None else last_district + 1
+                if half is not None:
+                    district = 2 * done[half] + half + 1
+                    done[half] += 1
                 last_district = district
                 cells: list[tuple[str, list[int | None], list[list[float]]]] = []
                 scored: list[tuple[float, int, int, int, list[tuple[float, float, float, float, str]]]] = []
+                nameless = iter(ROWNAMES.get((year, district), []))
                 for index, (page_number, row) in enumerate(block):
                     county_words = []
                     for word in row:
@@ -123,6 +143,8 @@ def parse() -> None:
                     if not any(re.search(r"\d", w[4]) and w[0] > 90 for w in row) or re.search(r"DISTRICT|WRITE|WINNER", " ".join(w[4] for w in row), re.IGNORECASE):
                         continue
                     alias = ALIASES.get((year, district, key))
+                    if not key and sum(1 for w in row if re.search(r"\d", w[4])) >= 2 and (year, district) in ROWNAMES:
+                        alias = next(nameless, None)
                     best = COUNTIES.index(alias) if alias else max(range(len(COUNTIES)), key=lambda i: difflib.SequenceMatcher(None, key, COUNTIES[i].lower()).ratio())
                     ratio = 1.0 if alias else difflib.SequenceMatcher(None, key, COUNTIES[best].lower()).ratio() if len(key) >= 3 else 0.0
                     if ratio < 0.5:
