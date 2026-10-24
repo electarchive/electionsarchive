@@ -5,7 +5,7 @@ from ea.changeset import Changeset
 from ea.store import connect
 
 SOURCE = "us.contest_merges"
-VERSION = "2"
+VERSION = "4"
 ELECTIONS = {
     "2016-11:ID:primary": "2016-05-17:ID:primary",
     "2005-11-08:CO": "2005-11-01:CO",
@@ -20,7 +20,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Merge contests recorded twice under a misdated election into the contests of the real one: Klarner's November 2016 Idaho primary into the May 17 primary, and us.measures' Colorado 2005 and 2011 coordinated elections, dated November 8 instead of November 1",
+            summary="Merge contests recorded twice under a misdated election into the contests of the real one: Klarner's November 2016 Idaho primary into the May 17 primary, and us.measures' Colorado 2005 and 2011 coordinated elections, dated November 8 instead of November 1, and the 2021-03-29 Illinois elections that us.enr_clarity first dated a week early, into the April 6 ones",
             polity="US",
             kind="correction",
         )
@@ -32,7 +32,15 @@ def emit() -> Path:
             assert row is not None, value
             return row[0]
 
-        for old, new in ELECTIONS.items():
+        illinois = {
+            value: value.replace("2021-03-29", "2021-04-06", 1)
+            for (value,) in conn.execute(
+                """select x.value from external_id x where x.scheme = 'us.election' and x.value like '2021-03-29:IL%'
+                   and exists (select 1 from external_id y where y.scheme = 'us.election'
+                               and y.value = replace(x.value, '2021-03-29', '2021-04-06'))"""
+            ).fetchall()
+        }
+        for old, new in {**ELECTIONS, **illinois}.items():
             duplicate, survivor = keyed("us.election", old), keyed("us.election", new)
             before, after = old.split(":")[0], new.split(":")[0]
             for contest, value in conn.execute(
