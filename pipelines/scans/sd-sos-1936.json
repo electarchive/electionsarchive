@@ -1,0 +1,209 @@
+{
+  "polity": "US-SD",
+  "publisher": "South Dakota Secretary of State",
+  "title": "Official election returns and registration figures for South Dakota, general election November 3, 1936",
+  "license": "Public record",
+  "file": {
+    "url": "https://sdsos.gov/elections-voting/assets/historicalelectiondata/1936G.pdf"
+  },
+  "raw_source": "us.scans",
+  "contests": {
+    "senate": {
+      "year": 1936,
+      "chamber": "senate",
+      "day": "1936-11-03",
+      "special": false,
+      "state": "SD",
+      "district": null
+    },
+    "house1": {
+      "year": 1936,
+      "chamber": "house",
+      "day": "1936-11-03",
+      "special": false,
+      "state": "SD",
+      "district": 1
+    },
+    "house2": {
+      "year": 1936,
+      "chamber": "house",
+      "day": "1936-11-03",
+      "special": false,
+      "state": "SD",
+      "district": 2
+    },
+    "president": {
+      "year": 1936,
+      "chamber": "president",
+      "day": "1936-11-03",
+      "special": false,
+      "state": "SD",
+      "district": null
+    },
+    "governor": {
+      "year": 1936,
+      "chamber": "governor",
+      "day": "1936-11-03",
+      "special": false,
+      "state": "SD",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 2,
+      "id": "2-0",
+      "columns": [
+        {
+          "label": "Bulow Dem.",
+          "contest": "senate",
+          "candidate": "W. J. Bulow"
+        },
+        {
+          "label": "Gurney Rep.",
+          "contest": "senate",
+          "candidate": "Chandler Gurney"
+        },
+        {
+          "label": "Bennett Ind.",
+          "contest": "senate",
+          "candidate": "Arthur Bennett"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.12,
+        0.076,
+        0.818,
+        0.916
+      ],
+      "hint": "Read only the table headed 'U. S. SENATOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.075
+      ]
+    },
+    {
+      "page": 3,
+      "id": "3-0",
+      "columns": [
+        {
+          "label": "Hildebrandt Dem.",
+          "contest": "house1",
+          "candidate": "Fred H. Hildebrandt"
+        },
+        {
+          "label": "Mundt Rep.",
+          "contest": "house1",
+          "candidate": "Karl E. Mundt"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.16,
+        0.11,
+        0.828,
+        0.907
+      ],
+      "hint": "Read only the table headed 'CONGRESSMAN\u2014FIRST DISTRICT'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0816
+      ]
+    },
+    {
+      "page": 4,
+      "id": "4-0",
+      "columns": [
+        {
+          "label": "Werner Dem.",
+          "contest": "house2",
+          "candidate": "Theodore B. Werner"
+        },
+        {
+          "label": "Case Rep.",
+          "contest": "house2",
+          "candidate": "Francis Case"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.138,
+        0.072,
+        0.842,
+        0.912
+      ],
+      "hint": "Read only the table headed 'CONGRESSMAN\u2014SECOND DISTRICT'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0774
+      ]
+    },
+    {
+      "page": 5,
+      "id": "5-0",
+      "columns": [
+        {
+          "label": "DEMOCRATIC Roosevelt & Garner",
+          "contest": "president",
+          "candidate": "Franklin D. Roosevelt (Democratic)"
+        },
+        {
+          "label": "REPUBLICAN Landon & Knox",
+          "contest": "president",
+          "candidate": "Alfred Landon (Republican)"
+        },
+        {
+          "label": "INDEPENDENT Lemke & O'Brien",
+          "contest": "president",
+          "candidate": "William Lemke (Union)"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.149,
+        0.094,
+        0.835,
+        0.929
+      ],
+      "hint": "Read only the table headed 'PRESIDENTIAL ELECTORS'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1174
+      ]
+    },
+    {
+      "page": 6,
+      "id": "6-0",
+      "columns": [
+        {
+          "label": "Berry Dem.",
+          "contest": "governor",
+          "candidate": "Tom Berry"
+        },
+        {
+          "label": "Jensen Rep.",
+          "contest": "governor",
+          "candidate": "Leslie Jensen"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.123,
+        0.078,
+        0.818,
+        0.907
+      ],
+      "hint": "Read only the table headed 'GOVERNOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0784
+      ]
+    }
+  ]
+}

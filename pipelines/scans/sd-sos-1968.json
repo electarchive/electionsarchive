@@ -1,0 +1,204 @@
+{
+  "polity": "US-SD",
+  "publisher": "South Dakota Secretary of State",
+  "title": "Official election returns and registration figures for South Dakota, general election November 5, 1968",
+  "license": "Public record",
+  "file": {
+    "url": "https://sdsos.gov/elections-voting/assets/historicalelectiondata/1968G.pdf"
+  },
+  "raw_source": "us.scans",
+  "contests": {
+    "president": {
+      "year": 1968,
+      "chamber": "president",
+      "day": "1968-11-05",
+      "special": false,
+      "state": "SD",
+      "district": null
+    },
+    "senate": {
+      "year": 1968,
+      "chamber": "senate",
+      "day": "1968-11-05",
+      "special": false,
+      "state": "SD",
+      "district": null
+    },
+    "house1": {
+      "year": 1968,
+      "chamber": "house",
+      "day": "1968-11-05",
+      "special": false,
+      "state": "SD",
+      "district": 1
+    },
+    "house2": {
+      "year": 1968,
+      "chamber": "house",
+      "day": "1968-11-05",
+      "special": false,
+      "state": "SD",
+      "district": 2
+    },
+    "governor": {
+      "year": 1968,
+      "chamber": "governor",
+      "day": "1968-11-05",
+      "special": false,
+      "state": "SD",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 2,
+      "id": "2-0",
+      "columns": [
+        {
+          "label": "Republican (Nixon and Agnew) C. C. Anderson Nora W. Hussey Maurice Matson V. G. Stoia",
+          "contest": "president",
+          "candidate": "Richard Nixon (Republican)"
+        },
+        {
+          "label": "Democratic (Humphrey & Muskie) John A. Engel J. M. Magness C. J. Grond Mrs. Homer Kandaras",
+          "contest": "president",
+          "candidate": "Hubert H. Humphrey (Democratic)"
+        },
+        {
+          "label": "Independent (Wallace & Griffin) Leslie T. Grozier Mrs. James Rybolt Joseph G. Trotter Mrs. Leona E. Lapka",
+          "contest": "president",
+          "candidate": "George Wallace (American Independent)"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.195,
+        0.124,
+        0.824,
+        0.885
+      ],
+      "hint": "Read only the table headed 'PRESIDENTIAL ELECTORS'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1209
+      ]
+    },
+    {
+      "page": 3,
+      "id": "3-0",
+      "columns": [
+        {
+          "label": "Republican Archie Gubbrud",
+          "contest": "senate",
+          "candidate": "Archie Gubbrud"
+        },
+        {
+          "label": "Democrat George McGovern",
+          "contest": "senate",
+          "candidate": "George McGovern"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.089,
+        0.08,
+        0.77,
+        0.842
+      ],
+      "hint": "Read only the table headed 'UNITED STATES SENATOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0617
+      ]
+    },
+    {
+      "page": 4,
+      "id": "4-0",
+      "columns": [
+        {
+          "label": "Republican Ben Reifel",
+          "contest": "house1",
+          "candidate": "Ben Reifel"
+        },
+        {
+          "label": "Democratic Frank Denholm",
+          "contest": "house1",
+          "candidate": "Frank Denholm"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.162,
+        0.11,
+        0.826,
+        0.846
+      ],
+      "hint": "Read only the table headed 'CONGRESSMAN\u2014FIRST DISTRICT'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0652
+      ]
+    },
+    {
+      "page": 5,
+      "id": "5-0",
+      "columns": [
+        {
+          "label": "Republican E. Y. Berry",
+          "contest": "house2",
+          "candidate": "E. Y. Berry"
+        },
+        {
+          "label": "Democratic David Garner",
+          "contest": "house2",
+          "candidate": "David Garner"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.107,
+        0.115,
+        0.763,
+        0.86
+      ],
+      "hint": "Read only the table headed 'CONGRESSMAN\u2014SECOND DISTRICT'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0671
+      ]
+    },
+    {
+      "page": 6,
+      "id": "6-0",
+      "columns": [
+        {
+          "label": "Republican Frank L. Farrar",
+          "contest": "governor",
+          "candidate": "Frank Farrar"
+        },
+        {
+          "label": "Democratic Robert Chamberlin",
+          "contest": "governor",
+          "candidate": "Robert Chamerlin"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.152,
+        0.156,
+        0.801,
+        0.834
+      ],
+      "hint": "Read only the table headed 'GOVERNOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0826
+      ]
+    }
+  ]
+}

@@ -1,0 +1,133 @@
+{
+  "polity": "US-SD",
+  "publisher": "South Dakota Secretary of State",
+  "title": "Official election returns and registration figures for South Dakota, general election November 6, 1990",
+  "license": "Public record",
+  "file": {
+    "url": "https://sdsos.gov/elections-voting/assets/historicalelectiondata/1990G.pdf"
+  },
+  "raw_source": "us.scans",
+  "contests": {
+    "senate": {
+      "year": 1990,
+      "chamber": "senate",
+      "day": "1990-11-06",
+      "special": false,
+      "state": "SD",
+      "district": null
+    },
+    "house": {
+      "year": 1990,
+      "chamber": "house",
+      "day": "1990-11-06",
+      "special": false,
+      "state": "SD",
+      "district": null,
+      "create": true
+    },
+    "governor": {
+      "year": 1990,
+      "chamber": "governor",
+      "day": "1990-11-06",
+      "special": false,
+      "state": "SD",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 3,
+      "id": "3-0",
+      "columns": [
+        {
+          "label": "Ted Muenster-D",
+          "contest": "senate",
+          "candidate": "Ted Muenster"
+        },
+        {
+          "label": "Larry Pressler-R",
+          "contest": "senate",
+          "candidate": "Larry Pressler"
+        },
+        {
+          "label": "Dean L. Sinclair-I",
+          "contest": "senate",
+          "candidate": "Dean L. Sinclair"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.197,
+        0.095,
+        0.788,
+        0.934
+      ],
+      "hint": "Read only the table headed 'UNITED STATES SENATE'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0453
+      ]
+    },
+    {
+      "page": 4,
+      "id": "4-0",
+      "columns": [
+        {
+          "label": "Tim Johnson-D",
+          "contest": "house",
+          "candidate": "Tim Johnson",
+          "party": "D"
+        },
+        {
+          "label": "Don Frankenfeld-R",
+          "contest": "house",
+          "candidate": "Don Frankenfeld",
+          "party": "R"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.212,
+        0.091,
+        0.788,
+        0.921
+      ],
+      "hint": "Read only the table headed 'UNITED STATES HOUSE OF REPRESENTATIVES'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.047
+      ]
+    },
+    {
+      "page": 5,
+      "id": "5-0",
+      "columns": [
+        {
+          "label": "Bob L. Samuelson/ Shirley Halleen-D",
+          "contest": "governor",
+          "candidate": "Bob L. Samuelson"
+        },
+        {
+          "label": "George S. Mickelson/ Walter Dale Miller-R",
+          "contest": "governor",
+          "candidate": "George S. Mickelson"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.229,
+        0.082,
+        0.793,
+        0.919
+      ],
+      "hint": "Read only the table headed 'GOVERNOR/LT. GOVERNOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0442
+      ]
+    }
+  ]
+}

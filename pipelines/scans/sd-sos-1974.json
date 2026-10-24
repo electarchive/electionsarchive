@@ -1,0 +1,162 @@
+{
+  "polity": "US-SD",
+  "publisher": "South Dakota Secretary of State",
+  "title": "Official election returns and registration figures for South Dakota, general election November 5, 1974",
+  "license": "Public record",
+  "file": {
+    "url": "https://sdsos.gov/elections-voting/assets/historicalelectiondata/1974G.pdf"
+  },
+  "raw_source": "us.scans",
+  "contests": {
+    "senate": {
+      "year": 1974,
+      "chamber": "senate",
+      "day": "1974-11-05",
+      "special": false,
+      "state": "SD",
+      "district": null
+    },
+    "house1": {
+      "year": 1974,
+      "chamber": "house",
+      "day": "1974-11-05",
+      "special": false,
+      "state": "SD",
+      "district": 1
+    },
+    "house2": {
+      "year": 1974,
+      "chamber": "house",
+      "day": "1974-11-05",
+      "special": false,
+      "state": "SD",
+      "district": 2
+    },
+    "governor": {
+      "year": 1974,
+      "chamber": "governor",
+      "day": "1974-11-05",
+      "special": false,
+      "state": "SD",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 2,
+      "id": "2-0",
+      "columns": [
+        {
+          "label": "Democrat George McGovern",
+          "contest": "senate",
+          "candidate": "George McGovern"
+        },
+        {
+          "label": "Republican Leo K. Thorsness",
+          "contest": "senate",
+          "candidate": "Leo K. Thorsness"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.129,
+        0.089,
+        0.823,
+        0.861
+      ],
+      "hint": "Read only the table headed 'UNITED STATES SENATOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0661
+      ]
+    },
+    {
+      "page": 3,
+      "id": "3-0",
+      "columns": [
+        {
+          "label": "Democrat Frank E. Denholm",
+          "contest": "house1",
+          "candidate": "Frank E. Denholm"
+        },
+        {
+          "label": "Republican Larry Pressler",
+          "contest": "house1",
+          "candidate": "Larry Pressler"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.158,
+        0.081,
+        0.827,
+        0.816
+      ],
+      "hint": "Read only the table headed 'CONGRESSMAN \u2014 FIRST DISTRICT'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0694
+      ]
+    },
+    {
+      "page": 4,
+      "id": "4-0",
+      "columns": [
+        {
+          "label": "Democrat Jack Weiland",
+          "contest": "house2",
+          "candidate": "Jack M. Weiland"
+        },
+        {
+          "label": "Republican James Abdnor",
+          "contest": "house2",
+          "candidate": "James Abdnor"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.149,
+        0.115,
+        0.821,
+        0.87
+      ],
+      "hint": "Read only the table headed 'CONGRESSMAN \u2014 SECOND DISTRICT'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0675
+      ]
+    },
+    {
+      "page": 5,
+      "id": "5-0",
+      "columns": [
+        {
+          "label": "Democrat Richard F. Kneip",
+          "contest": "governor",
+          "candidate": "Richard F. Kneip"
+        },
+        {
+          "label": "Republican John E. Olson",
+          "contest": "governor",
+          "candidate": "John E. Olson"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.145,
+        0.082,
+        0.82,
+        0.823
+      ],
+      "hint": "Read only the table headed 'GOVERNOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0661
+      ]
+    }
+  ]
+}

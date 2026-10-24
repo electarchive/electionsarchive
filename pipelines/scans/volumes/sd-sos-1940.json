@@ -1,0 +1,39 @@
+{
+  "year": 1940,
+  "day": "1940-11-05",
+  "polity": "US-SD",
+  "publisher": "South Dakota Secretary of State",
+  "title": "Official election returns and registration figures for South Dakota, general election November 5, 1940",
+  "license": "Public record",
+  "file": {
+    "url": "https://sdsos.gov/elections-voting/assets/historicalelectiondata/1940G.pdf"
+  },
+  "raw_source": "us.scans",
+  "create": true,
+  "offices": {
+    "president": "President (presidential electors)",
+    "governor": "Governor",
+    "senate": "U.S. Senator",
+    "house": "U.S. Representative (district 1 or 2; district 0 if at large)"
+  },
+  "leaves": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18
+  ]
+}

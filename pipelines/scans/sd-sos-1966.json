@@ -1,0 +1,167 @@
+{
+  "polity": "US-SD",
+  "publisher": "South Dakota Secretary of State",
+  "title": "Official election returns and registration figures for South Dakota, general election November 8, 1966",
+  "license": "Public record",
+  "file": {
+    "url": "https://sdsos.gov/elections-voting/assets/historicalelectiondata/1966G.pdf"
+  },
+  "raw_source": "us.scans",
+  "contests": {
+    "senate": {
+      "year": 1966,
+      "chamber": "senate",
+      "day": "1966-11-08",
+      "special": false,
+      "state": "SD",
+      "district": null
+    },
+    "house1": {
+      "year": 1966,
+      "chamber": "house",
+      "day": "1966-11-08",
+      "special": false,
+      "state": "SD",
+      "district": 1
+    },
+    "house2": {
+      "year": 1966,
+      "chamber": "house",
+      "day": "1966-11-08",
+      "special": false,
+      "state": "SD",
+      "district": 2
+    },
+    "governor": {
+      "year": 1966,
+      "chamber": "governor",
+      "day": "1966-11-08",
+      "special": false,
+      "state": "SD",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 2,
+      "id": "2-0",
+      "columns": [
+        {
+          "label": "Republican Karl E. Mundt",
+          "contest": "senate",
+          "candidate": "Karl E. Mundt"
+        },
+        {
+          "label": "Democrat Donn H. Wright",
+          "contest": "senate",
+          "candidate": "Donn H. Wright"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.124,
+        0.08,
+        0.835,
+        0.868
+      ],
+      "hint": "Read only the table headed 'U. S. SENATOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0761
+      ]
+    },
+    {
+      "page": 3,
+      "id": "3-0",
+      "columns": [
+        {
+          "label": "Republican Ben Reifel",
+          "contest": "house1",
+          "candidate": "Ben Reifel"
+        },
+        {
+          "label": "Democrat Dr. Francis C. Richter",
+          "contest": "house1",
+          "candidate": "Francis Richter"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.129,
+        0.066,
+        0.846,
+        0.87
+      ],
+      "hint": "Read only the table headed 'CONGRESSMEN\u2014FIRST DISTRICT'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0871
+      ]
+    },
+    {
+      "page": 4,
+      "id": "4-0",
+      "columns": [
+        {
+          "label": "COUNTY SEAT",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Republican E. Y. Berry",
+          "contest": "house2",
+          "candidate": "E. Y. Berry"
+        },
+        {
+          "label": "Democrat Jack Allmon",
+          "contest": "house2",
+          "candidate": "Jack P. Allmon"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.14,
+        0.085,
+        0.829,
+        0.847
+      ],
+      "hint": "Read only the table headed 'CONGRESSMEN\u2014SECOND DISTRICT'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0827
+      ]
+    },
+    {
+      "page": 5,
+      "id": "5-0",
+      "columns": [
+        {
+          "label": "Republican Nils A. Boe",
+          "contest": "governor",
+          "candidate": "Nils A. Boe"
+        },
+        {
+          "label": "Democrat Robert Chamberlin",
+          "contest": "governor",
+          "candidate": "Robert Chamerlin"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.149,
+        0.078,
+        0.848,
+        0.833
+      ],
+      "hint": "Read only the table headed 'GOVERNOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0808
+      ]
+    }
+  ]
+}

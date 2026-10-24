@@ -1,0 +1,283 @@
+{
+  "polity": "US-SD",
+  "publisher": "South Dakota Secretary of State",
+  "title": "Official election returns and registration figures for South Dakota, general election November 8, 1932",
+  "license": "Public record",
+  "file": {
+    "url": "https://sdsos.gov/elections-voting/assets/historicalelectiondata/1932G.pdf"
+  },
+  "raw_source": "us.scans",
+  "contests": {
+    "senate": {
+      "year": 1932,
+      "chamber": "senate",
+      "day": "1932-11-08",
+      "special": false,
+      "state": "SD",
+      "district": null
+    },
+    "house1": {
+      "year": 1932,
+      "chamber": "house",
+      "day": "1932-11-08",
+      "special": false,
+      "state": "SD",
+      "district": 1
+    },
+    "house2": {
+      "year": 1932,
+      "chamber": "house",
+      "day": "1932-11-08",
+      "special": false,
+      "state": "SD",
+      "district": 2
+    },
+    "president": {
+      "year": 1932,
+      "chamber": "president",
+      "day": "1932-11-08",
+      "special": false,
+      "state": "SD",
+      "district": null
+    },
+    "governor": {
+      "year": 1932,
+      "chamber": "governor",
+      "day": "1932-11-08",
+      "special": false,
+      "state": "SD",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 2,
+      "id": "2-0",
+      "columns": [
+        {
+          "label": "Norbeck, Rep.",
+          "contest": "senate",
+          "candidate": "Peter Norbeck"
+        },
+        {
+          "label": "Cherry, Dem.",
+          "contest": "senate",
+          "candidate": "U. S. G. Cherry"
+        },
+        {
+          "label": "Platt, Lib.",
+          "contest": "senate",
+          "candidate": "Howard Platt"
+        },
+        {
+          "label": "Luttio, Ind.",
+          "contest": "senate",
+          "candidate": "Oscar Luttio"
+        },
+        {
+          "label": "Manbeck, Ind.",
+          "contest": "senate",
+          "candidate": "L. J. Manbeck"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.114,
+        0.078,
+        0.823,
+        0.921
+      ],
+      "hint": "Read only the table headed 'U. S. SENATOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0724
+      ]
+    },
+    {
+      "page": 3,
+      "id": "3-0",
+      "columns": [
+        {
+          "label": "Christopherson, Rep.",
+          "contest": "house1",
+          "candidate": "C. A. Christopherson"
+        },
+        {
+          "label": "Hildebrandt, Dem.",
+          "contest": "house1",
+          "candidate": "Fred Hildebrant"
+        },
+        {
+          "label": "Werth, Lib.",
+          "contest": "house1",
+          "candidate": "Paul L. Werth"
+        },
+        {
+          "label": "Johnson, Ind.",
+          "contest": "house1",
+          "candidate": "Lydia B. Johnson"
+        },
+        {
+          "label": "Miller, Ind.",
+          "contest": "house1",
+          "candidate": "Roy Miller"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.11,
+        0.064,
+        0.838,
+        0.932
+      ],
+      "hint": "Read only the table headed 'CONGRESSMAN\u2014FIRST DISTRICT'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0864
+      ]
+    },
+    {
+      "page": 4,
+      "id": "4-0",
+      "columns": [
+        {
+          "label": "Williamson, Rep.",
+          "contest": "house2",
+          "candidate": "William Williamson"
+        },
+        {
+          "label": "Werner, Dem.",
+          "contest": "house2",
+          "candidate": "Theo. B. Werner"
+        },
+        {
+          "label": "Jaskela, Ind.",
+          "contest": "house2",
+          "candidate": "Arne Jaskela"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.1,
+        0.051,
+        0.841,
+        0.939
+      ],
+      "hint": "Read only the table headed 'CONGRESSMAN\u2014SECOND DISTRICT'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0721
+      ]
+    },
+    {
+      "page": 5,
+      "id": "5-0",
+      "columns": [
+        {
+          "label": "REPUBLICAN Hoover & Curtis",
+          "contest": "president",
+          "candidate": "Hoover (Republican)"
+        },
+        {
+          "label": "DEMOCRATIC Roosevelt & Garner",
+          "contest": "president",
+          "candidate": "Roosevelt (Democratic)"
+        },
+        {
+          "label": "LIBERTY Harvey (For President)",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.135,
+        0.089,
+        0.858,
+        0.964
+      ],
+      "hint": "Read only the table headed 'PRESIDENTIAL ELECTORS'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1669
+      ]
+    },
+    {
+      "page": 6,
+      "id": "6-0",
+      "columns": [
+        {
+          "label": "INDEPENDENT Upshaw & Regan",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "INDEPENDENT Foster & Ford",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "INDEPENDENT Thomas & Maurer",
+          "contest": "president",
+          "candidate": "Thomas (Socialist)"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.112,
+        0.06,
+        0.856,
+        0.966
+      ],
+      "hint": "Read only the table headed 'PRESIDENTIAL ELECTORS'; ignore any other table visible in the image.",
+      "bands": 3,
+      "header": [
+        0.0,
+        0.1214
+      ]
+    },
+    {
+      "page": 7,
+      "id": "7-0",
+      "columns": [
+        {
+          "label": "Green, Rep.",
+          "contest": "governor",
+          "candidate": "Warren E. Green"
+        },
+        {
+          "label": "Berry, Dem.",
+          "contest": "governor",
+          "candidate": "Tom Berry"
+        },
+        {
+          "label": "Stevens, Lib.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Tangen, Ind.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.119,
+        0.062,
+        0.854,
+        0.907
+      ],
+      "hint": "Read only the table headed 'GOVERNOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0746
+      ]
+    }
+  ]
+}

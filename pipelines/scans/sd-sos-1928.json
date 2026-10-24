@@ -1,0 +1,223 @@
+{
+  "polity": "US-SD",
+  "publisher": "South Dakota Secretary of State",
+  "title": "Official election returns and registration figures for South Dakota, general election November 6, 1928",
+  "license": "Public record",
+  "file": {
+    "url": "https://sdsos.gov/elections-voting/assets/historicalelectiondata/1928G.pdf"
+  },
+  "raw_source": "us.scans",
+  "contests": {
+    "house1": {
+      "year": 1928,
+      "chamber": "house",
+      "day": "1928-11-06",
+      "special": false,
+      "state": "SD",
+      "district": 1
+    },
+    "house": {
+      "year": 1928,
+      "chamber": "house",
+      "day": "1928-11-06",
+      "special": false,
+      "state": "SD",
+      "district": null,
+      "create": true
+    },
+    "president": {
+      "year": 1928,
+      "chamber": "president",
+      "day": "1928-11-06",
+      "special": false,
+      "state": "SD",
+      "district": null
+    },
+    "governor": {
+      "year": 1928,
+      "chamber": "governor",
+      "day": "1928-11-06",
+      "special": false,
+      "state": "SD",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 3,
+      "id": "3-0",
+      "columns": [
+        {
+          "label": "A. O. Steensland Dem.",
+          "contest": "house1",
+          "candidate": "A. O. Steensland"
+        },
+        {
+          "label": "C. A. Christopherson Rep.",
+          "contest": "house1",
+          "candidate": "Charles A. Christopherson"
+        },
+        {
+          "label": "Frank Hult F. L.",
+          "contest": "house1",
+          "candidate": "Frank Hult"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.112,
+        0.056,
+        0.846,
+        0.935
+      ],
+      "hint": "Read only the table headed 'REPRESENTATIVE IN CONGRESS\u2014FIRST DISTRICT'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1217
+      ]
+    },
+    {
+      "page": 5,
+      "id": "5-0",
+      "columns": [
+        {
+          "label": "Second District: Fred Hildebrandt Dem.",
+          "contest": "house",
+          "candidate": "Fred Hildebrandt",
+          "party": "Dem."
+        },
+        {
+          "label": "Second District: Royal C. Johnson Rep.",
+          "contest": "house",
+          "candidate": "Royal C. Johnson",
+          "party": "Rep."
+        },
+        {
+          "label": "Second District: Helge Tangen F. L.",
+          "contest": "house",
+          "candidate": "Helge Tangen",
+          "party": "F. L."
+        },
+        {
+          "label": "Third District: Arthur W. Wood Dem.",
+          "contest": "house",
+          "candidate": "Arthur W. Wood",
+          "party": "Dem."
+        },
+        {
+          "label": "Third District: William Williamson Rep.",
+          "contest": "house",
+          "candidate": "William Williamson",
+          "party": "Rep."
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.129,
+        0.08,
+        0.82,
+        0.93
+      ],
+      "hint": "Read only the table headed 'REPRESENTATIVES IN CONGRESS'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1318
+      ]
+    },
+    {
+      "page": 7,
+      "id": "7-0",
+      "columns": [
+        {
+          "label": "Smith & Robinson",
+          "contest": "president",
+          "candidate": "Al Smith (Democratic)"
+        },
+        {
+          "label": "Hoover & Curtis",
+          "contest": "president",
+          "candidate": "Herbert Hoover (Republican)"
+        },
+        {
+          "label": "Farm Labor",
+          "contest": "president",
+          "candidate": "Farm-Labor"
+        },
+        {
+          "label": "Thomas & Mauer",
+          "contest": "president",
+          "candidate": "Norman Thomas (Socialist)"
+        },
+        {
+          "label": "Foster & Gitlow",
+          "contest": "president",
+          "candidate": "William Foster (Communist)"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.172,
+        0.048,
+        0.841,
+        0.951
+      ],
+      "hint": "Read only the table headed 'PRESIDENTIAL ELECTORS'; ignore any other table visible in the image.",
+      "bands": 3,
+      "header": [
+        0.0,
+        0.196
+      ]
+    },
+    {
+      "page": 9,
+      "id": "9-0",
+      "columns": [
+        {
+          "label": "W. J. Bulow Dem.",
+          "contest": "governor",
+          "candidate": "William J. Bulow"
+        },
+        {
+          "label": "Buell F. Jones Rep.",
+          "contest": "governor",
+          "candidate": "Buell F. Jones"
+        },
+        {
+          "label": "John G. Sumption F. L.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "John T. Grigsby Dem.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "C. E. Coyne Rep.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Elza G. Anderson F. L.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.142,
+        0.064,
+        0.83,
+        0.934
+      ],
+      "hint": "Read only the table headed 'STATE OFFICERS'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1471
+      ]
+    }
+  ]
+}

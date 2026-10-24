@@ -1,0 +1,199 @@
+{
+  "polity": "US-SD",
+  "publisher": "South Dakota Secretary of State",
+  "title": "Official election returns and registration figures for South Dakota, general election November 6, 1956",
+  "license": "Public record",
+  "file": {
+    "url": "https://sdsos.gov/elections-voting/assets/historicalelectiondata/1956G.pdf"
+  },
+  "raw_source": "us.scans",
+  "contests": {
+    "president": {
+      "year": 1956,
+      "chamber": "president",
+      "day": "1956-11-06",
+      "special": false,
+      "state": "SD",
+      "district": null
+    },
+    "senate": {
+      "year": 1956,
+      "chamber": "senate",
+      "day": "1956-11-06",
+      "special": false,
+      "state": "SD",
+      "district": null
+    },
+    "house1": {
+      "year": 1956,
+      "chamber": "house",
+      "day": "1956-11-06",
+      "special": false,
+      "state": "SD",
+      "district": 1
+    },
+    "house2": {
+      "year": 1956,
+      "chamber": "house",
+      "day": "1956-11-06",
+      "special": false,
+      "state": "SD",
+      "district": 2
+    },
+    "governor": {
+      "year": 1956,
+      "chamber": "governor",
+      "day": "1956-11-06",
+      "special": false,
+      "state": "SD",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 2,
+      "id": "2-0",
+      "columns": [
+        {
+          "label": "Rep. (Eisenhower & Nixon)",
+          "contest": "president",
+          "candidate": "Dwight D. Eisenhower (Republican)"
+        },
+        {
+          "label": "Dem. (Stevenson & Kefauver)",
+          "contest": "president",
+          "candidate": "Adlai Stevenson (Democratic)"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.157,
+        0.065,
+        0.846,
+        0.897
+      ],
+      "hint": "Read only the table headed 'PRESIDENTIAL ELECTORS'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1635
+      ]
+    },
+    {
+      "page": 3,
+      "id": "3-0",
+      "columns": [
+        {
+          "label": "Rep. Francis Case",
+          "contest": "senate",
+          "candidate": "Francis Case"
+        },
+        {
+          "label": "Dem. Kenneth Holum",
+          "contest": "senate",
+          "candidate": "Kenneth Holum"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.144,
+        0.079,
+        0.836,
+        0.875
+      ],
+      "hint": "Read only the table headed 'UNITED STATES SENATOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0741
+      ]
+    },
+    {
+      "page": 4,
+      "id": "4-0",
+      "columns": [
+        {
+          "label": "Rep. Harold O. Lovre",
+          "contest": "house1",
+          "candidate": "Harold O. Lovre"
+        },
+        {
+          "label": "Dem. George S. McGovern",
+          "contest": "house1",
+          "candidate": "George S. McGovern"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.12,
+        0.087,
+        0.829,
+        0.899
+      ],
+      "hint": "Read only the table headed 'CONGRESSMEN\u2014FIRST DISTRICT'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0751
+      ]
+    },
+    {
+      "page": 5,
+      "id": "5-0",
+      "columns": [
+        {
+          "label": "E. Y. Berry Rep.",
+          "contest": "house2",
+          "candidate": "E. Y. Berry"
+        },
+        {
+          "label": "Tom Eastman, Jr. Dem.",
+          "contest": "house2",
+          "candidate": "Tom Eastman, Jr."
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.126,
+        0.079,
+        0.829,
+        0.883
+      ],
+      "hint": "Read only the table headed 'CONGRESSMEN\u2014SECOND DISTRICT'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0746
+      ]
+    },
+    {
+      "page": 6,
+      "id": "6-0",
+      "columns": [
+        {
+          "label": "Joe Foss Rep.",
+          "contest": "governor",
+          "candidate": "Joe Foss"
+        },
+        {
+          "label": "Ralph Herseth Dem.",
+          "contest": "governor",
+          "candidate": "Ralph Herseth"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.162,
+        0.109,
+        0.814,
+        0.861
+      ],
+      "hint": "Read only the table headed 'GOVERNOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0745
+      ]
+    }
+  ]
+}

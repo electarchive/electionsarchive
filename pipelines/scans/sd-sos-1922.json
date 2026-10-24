@@ -1,0 +1,138 @@
+{
+  "polity": "US-SD",
+  "publisher": "South Dakota Secretary of State",
+  "title": "Official election returns and registration figures for South Dakota, general election November 7, 1922",
+  "license": "Public record",
+  "file": {
+    "url": "https://sdsos.gov/elections-voting/assets/historicalelectiondata/1922G.pdf"
+  },
+  "raw_source": "us.scans",
+  "contests": {
+    "house": {
+      "year": 1922,
+      "chamber": "house",
+      "day": "1922-11-07",
+      "special": false,
+      "state": "SD",
+      "district": null,
+      "create": true
+    },
+    "governor": {
+      "year": 1922,
+      "chamber": "governor",
+      "day": "1922-11-07",
+      "special": false,
+      "state": "SD",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 1,
+      "id": "1-0",
+      "columns": [
+        {
+          "label": "C. A. Christopher Rep.",
+          "contest": "house",
+          "candidate": "C. A. Christopher",
+          "party": "Republican"
+        },
+        {
+          "label": "G. L. Hasvold N. P.",
+          "contest": "house",
+          "candidate": "G. L. Hasvold",
+          "party": "Nonpartisan"
+        },
+        {
+          "label": "John Stredronsky Dem.",
+          "contest": "house",
+          "candidate": "John Stredronsky",
+          "party": "Democratic"
+        },
+        {
+          "label": "Royal C. Johnson Rep.",
+          "contest": "house",
+          "candidate": "Royal C. Johnson",
+          "party": "Republican"
+        },
+        {
+          "label": "Andrew Francis Lockhart N. P.",
+          "contest": "house",
+          "candidate": "Andrew Francis Lockhart",
+          "party": "Nonpartisan"
+        },
+        {
+          "label": "Emmett C. Ryan Ind.",
+          "contest": "house",
+          "candidate": "Emmett C. Ryan",
+          "party": "Independent"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.116,
+        0.119,
+        0.844,
+        0.941
+      ],
+      "hint": "Read only the table headed 'OFFICIAL VOTE OF SOUTH DAKOTA BY COUNTIES November Election, 1922'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1472
+      ]
+    },
+    {
+      "page": 2,
+      "id": "2-0",
+      "columns": [
+        {
+          "label": "William Williamson Rep.",
+          "contest": "house",
+          "candidate": "William Williamson",
+          "party": "Republican"
+        },
+        {
+          "label": "Geo. H. Smith N. P.",
+          "contest": "house",
+          "candidate": "Geo. H. Smith",
+          "party": "Nonpartisan"
+        },
+        {
+          "label": "George Philip Dem.",
+          "contest": "house",
+          "candidate": "George Philip",
+          "party": "Democratic"
+        },
+        {
+          "label": "W. H. McMaster Rep.",
+          "contest": "governor",
+          "candidate": "William H. McMaster"
+        },
+        {
+          "label": "Lorraine Daly N. P.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Louis N. Crill Dem.",
+          "contest": "governor",
+          "candidate": "Louis N. Crill"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.115,
+        0.111,
+        0.823,
+        0.926
+      ],
+      "hint": "Read only the table headed 'OFFICIAL VOTE OF SOUTH DAKOTA BY COUNTIES November Election, 1922'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1669
+      ]
+    }
+  ]
+}

@@ -1,0 +1,182 @@
+{
+  "polity": "US-SD",
+  "publisher": "South Dakota Secretary of State",
+  "title": "Official election returns and registration figures for South Dakota, general election November 4, 1980",
+  "license": "Public record",
+  "file": {
+    "url": "https://sdsos.gov/elections-voting/assets/historicalelectiondata/1980G.pdf"
+  },
+  "raw_source": "us.scans",
+  "contests": {
+    "president": {
+      "year": 1980,
+      "chamber": "president",
+      "day": "1980-11-04",
+      "special": false,
+      "state": "SD",
+      "district": null
+    },
+    "senate": {
+      "year": 1980,
+      "chamber": "senate",
+      "day": "1980-11-04",
+      "special": false,
+      "state": "SD",
+      "district": null
+    },
+    "house1": {
+      "year": 1980,
+      "chamber": "house",
+      "day": "1980-11-04",
+      "special": false,
+      "state": "SD",
+      "district": 1
+    },
+    "house2": {
+      "year": 1980,
+      "chamber": "house",
+      "day": "1980-11-04",
+      "special": false,
+      "state": "SD",
+      "district": 2
+    }
+  },
+  "pages": [
+    {
+      "page": 2,
+      "id": "2-0",
+      "columns": [
+        {
+          "label": "Reagan/ Bush - R",
+          "contest": "president",
+          "candidate": "Ronald Reagan (Republican)"
+        },
+        {
+          "label": "Carter/ Mondale - D",
+          "contest": "president",
+          "candidate": "Jimmy Carter (Democratic)"
+        },
+        {
+          "label": "Clark/ Koch - I",
+          "contest": "president",
+          "candidate": "Ed Clark (Libertarian)"
+        },
+        {
+          "label": "Pulley/ Zimmermann - I",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Anderson/ Flint - I",
+          "contest": "president",
+          "candidate": "John Anderson (Independent)"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.154,
+        0.049,
+        0.818,
+        0.897
+      ],
+      "hint": "Read only the table headed 'PRESIDENTIAL ELECTORS'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.066
+      ]
+    },
+    {
+      "page": 3,
+      "id": "3-0",
+      "columns": [
+        {
+          "label": "James Abdnor - R",
+          "contest": "senate",
+          "candidate": "James Abdnor"
+        },
+        {
+          "label": "George McGovern - D",
+          "contest": "senate",
+          "candidate": "George McGovern"
+        },
+        {
+          "label": "Wayne Peterson - I",
+          "contest": "senate",
+          "candidate": "Wayne Peterson"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.128,
+        0.062,
+        0.78,
+        0.921
+      ],
+      "hint": "Read only the table headed 'UNITED STATES SENATE'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0698
+      ]
+    },
+    {
+      "page": 4,
+      "id": "4-0",
+      "columns": [
+        {
+          "label": "Bart Kull - R",
+          "contest": "house1",
+          "candidate": "Bart Kull"
+        },
+        {
+          "label": "Thomas A. Daschle - D",
+          "contest": "house1",
+          "candidate": "Thomas A. Daschle"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.188,
+        0.058,
+        0.834,
+        0.91
+      ],
+      "hint": "Read only the table headed 'UNITED STATES CONGRESS FIRST DISTRICT'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0599
+      ]
+    },
+    {
+      "page": 5,
+      "id": "5-0",
+      "columns": [
+        {
+          "label": "Clint Roberts - R",
+          "contest": "house2",
+          "candidate": "Clint Roberts"
+        },
+        {
+          "label": "Kenneth D. Stofferahn - D",
+          "contest": "house2",
+          "candidate": "Kenneth D. Stofferahn"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.12,
+        0.06,
+        0.768,
+        0.905
+      ],
+      "hint": "Read only the table headed 'UNITED STATES CONGRESS SECOND DISTRICT'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.058
+      ]
+    }
+  ]
+}

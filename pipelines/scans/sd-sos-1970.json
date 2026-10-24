@@ -1,0 +1,125 @@
+{
+  "polity": "US-SD",
+  "publisher": "South Dakota Secretary of State",
+  "title": "Official election returns and registration figures for South Dakota, general election November 3, 1970",
+  "license": "Public record",
+  "file": {
+    "url": "https://sdsos.gov/elections-voting/assets/historicalelectiondata/1970G.pdf"
+  },
+  "raw_source": "us.scans",
+  "contests": {
+    "house1": {
+      "year": 1970,
+      "chamber": "house",
+      "day": "1970-11-03",
+      "special": false,
+      "state": "SD",
+      "district": 1
+    },
+    "house2": {
+      "year": 1970,
+      "chamber": "house",
+      "day": "1970-11-03",
+      "special": false,
+      "state": "SD",
+      "district": 2
+    },
+    "governor": {
+      "year": 1970,
+      "chamber": "governor",
+      "day": "1970-11-03",
+      "special": false,
+      "state": "SD",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 2,
+      "id": "2-0",
+      "columns": [
+        {
+          "label": "Republican Dexter H. Gunderson",
+          "contest": "house1",
+          "candidate": "Dexter H. Gunderson"
+        },
+        {
+          "label": "Democrat Frank E. Denholm",
+          "contest": "house1",
+          "candidate": "Frank E. Denholm"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.038,
+        0.09,
+        0.457,
+        0.638
+      ],
+      "hint": "Read only the table headed 'CONGRESSMAN - FIRST DISTRICT'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0894
+      ]
+    },
+    {
+      "page": 3,
+      "id": "3-0",
+      "columns": [
+        {
+          "label": "Republican Fred D. Brady",
+          "contest": "house2",
+          "candidate": "Fred D. Brady"
+        },
+        {
+          "label": "Democrat James Abourezk",
+          "contest": "house2",
+          "candidate": "James Abourezk"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.533,
+        0.096,
+        0.956,
+        0.823
+      ],
+      "hint": "Read only the table headed 'CONGRESSMAN - SECOND DISTRICT'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0605
+      ]
+    },
+    {
+      "page": 4,
+      "id": "4-0",
+      "columns": [
+        {
+          "label": "Republican Frank L. Farrar",
+          "contest": "governor",
+          "candidate": "Frank Farrar"
+        },
+        {
+          "label": "Democrat Richard Francis Kneip",
+          "contest": "governor",
+          "candidate": "Richard F. Kneip"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.045,
+        0.089,
+        0.468,
+        0.638
+      ],
+      "hint": "Read only the table headed 'GOVERNOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0328
+      ]
+    }
+  ]
+}

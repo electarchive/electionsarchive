@@ -1,0 +1,162 @@
+{
+  "polity": "US-SD",
+  "publisher": "South Dakota Secretary of State",
+  "title": "Official election returns and registration figures for South Dakota, general election November 7, 1950",
+  "license": "Public record",
+  "file": {
+    "url": "https://sdsos.gov/elections-voting/assets/historicalelectiondata/1950G.pdf"
+  },
+  "raw_source": "us.scans",
+  "contests": {
+    "senate": {
+      "year": 1950,
+      "chamber": "senate",
+      "day": "1950-11-07",
+      "special": false,
+      "state": "SD",
+      "district": null
+    },
+    "house2": {
+      "year": 1950,
+      "chamber": "house",
+      "day": "1950-11-07",
+      "special": false,
+      "state": "SD",
+      "district": 2
+    },
+    "house1": {
+      "year": 1950,
+      "chamber": "house",
+      "day": "1950-11-07",
+      "special": false,
+      "state": "SD",
+      "district": 1
+    },
+    "governor": {
+      "year": 1950,
+      "chamber": "governor",
+      "day": "1950-11-07",
+      "special": false,
+      "state": "SD",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 2,
+      "id": "2-0",
+      "columns": [
+        {
+          "label": "Francis Case Rep.",
+          "contest": "senate",
+          "candidate": "Francis Case"
+        },
+        {
+          "label": "John A. Engel Dem.",
+          "contest": "senate",
+          "candidate": "John A. Engel"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.137,
+        0.056,
+        0.851,
+        0.917
+      ],
+      "hint": "Read only the table headed 'UNITED STATES SENATOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0848
+      ]
+    },
+    {
+      "page": 4,
+      "id": "4-0",
+      "columns": [
+        {
+          "label": "E. Y. Berry Rep.",
+          "contest": "house2",
+          "candidate": "E. Y. Berry"
+        },
+        {
+          "label": "Sam H. Bober Dem.",
+          "contest": "house2",
+          "candidate": "Sam H. Bober"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.137,
+        0.068,
+        0.84,
+        0.916
+      ],
+      "hint": "Read only the table headed 'CONGRESSMAN\u2014SECOND DISTRICT'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0884
+      ]
+    },
+    {
+      "page": 6,
+      "id": "6-0",
+      "columns": [
+        {
+          "label": "Harold O. Lovre Rep.",
+          "contest": "house1",
+          "candidate": "Harold O. Lovre"
+        },
+        {
+          "label": "Merton B. Tice Dem.",
+          "contest": "house1",
+          "candidate": "Merton B. Tice"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.116,
+        0.067,
+        0.814,
+        0.909
+      ],
+      "hint": "Read only the table headed 'CONGRESSMAN\u2014FIRST DISTRICT'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0843
+      ]
+    },
+    {
+      "page": 10,
+      "id": "10-0",
+      "columns": [
+        {
+          "label": "Sigurd Anderson Rep.",
+          "contest": "governor",
+          "candidate": "Sigurd Anderson"
+        },
+        {
+          "label": "Joe Robbie Dem.",
+          "contest": "governor",
+          "candidate": "Joe Robbie"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.135,
+        0.069,
+        0.834,
+        0.921
+      ],
+      "hint": "Read only the table headed 'GOVERNOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0798
+      ]
+    }
+  ]
+}

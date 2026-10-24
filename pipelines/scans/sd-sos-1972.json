@@ -1,0 +1,204 @@
+{
+  "polity": "US-SD",
+  "publisher": "South Dakota Secretary of State",
+  "title": "Official election returns and registration figures for South Dakota, general election November 7, 1972",
+  "license": "Public record",
+  "file": {
+    "url": "https://sdsos.gov/elections-voting/assets/historicalelectiondata/1972G.pdf"
+  },
+  "raw_source": "us.scans",
+  "contests": {
+    "president": {
+      "year": 1972,
+      "chamber": "president",
+      "day": "1972-11-07",
+      "special": false,
+      "state": "SD",
+      "district": null
+    },
+    "senate": {
+      "year": 1972,
+      "chamber": "senate",
+      "day": "1972-11-07",
+      "special": false,
+      "state": "SD",
+      "district": null
+    },
+    "house1": {
+      "year": 1972,
+      "chamber": "house",
+      "day": "1972-11-07",
+      "special": false,
+      "state": "SD",
+      "district": 1
+    },
+    "house2": {
+      "year": 1972,
+      "chamber": "house",
+      "day": "1972-11-07",
+      "special": false,
+      "state": "SD",
+      "district": 2
+    },
+    "governor": {
+      "year": 1972,
+      "chamber": "governor",
+      "day": "1972-11-07",
+      "special": false,
+      "state": "SD",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 2,
+      "id": "2-0",
+      "columns": [
+        {
+          "label": "Democrat (McGovern and Shriver)",
+          "contest": "president",
+          "candidate": "McGovern (Democratic)"
+        },
+        {
+          "label": "Republican (Nixon and Agnew)",
+          "contest": "president",
+          "candidate": "Nixon (Republican)"
+        },
+        {
+          "label": "Independent (Jenness and Pulley)",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.122,
+        0.08,
+        0.828,
+        0.916
+      ],
+      "hint": "Read only the table headed 'PRESIDENTIAL ELECTORS'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1136
+      ]
+    },
+    {
+      "page": 3,
+      "id": "3-0",
+      "columns": [
+        {
+          "label": "Democrat James Abourezk",
+          "contest": "senate",
+          "candidate": "James Abourezk"
+        },
+        {
+          "label": "Republican Robert W. Hirsch",
+          "contest": "senate",
+          "candidate": "Robert W. Hirsch"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.082,
+        0.083,
+        0.77,
+        0.842
+      ],
+      "hint": "Read only the table headed 'UNITED STATES SENATOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.054
+      ]
+    },
+    {
+      "page": 4,
+      "id": "4-0",
+      "columns": [
+        {
+          "label": "Democrat Frank E. Denholm",
+          "contest": "house1",
+          "candidate": "Frank E. Denholm"
+        },
+        {
+          "label": "Republican John Vickrman",
+          "contest": "house1",
+          "candidate": "John Vickerman"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.124,
+        0.072,
+        0.846,
+        0.877
+      ],
+      "hint": "Read only the table headed 'CONGRESSMAN \u2014 FIRST DISTRICT'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0497
+      ]
+    },
+    {
+      "page": 5,
+      "id": "5-0",
+      "columns": [
+        {
+          "label": "Democrat Pat McKeever",
+          "contest": "house2",
+          "candidate": "Pat McKeever"
+        },
+        {
+          "label": "Republican James Abdnor",
+          "contest": "house2",
+          "candidate": "James Abdnor"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.08,
+        0.089,
+        0.798,
+        0.847
+      ],
+      "hint": "Read only the table headed 'CONGRESSMAN \u2014 SECOND DISTRICT'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0264
+      ]
+    },
+    {
+      "page": 6,
+      "id": "6-0",
+      "columns": [
+        {
+          "label": "Democrat Richard F. Kneip",
+          "contest": "governor",
+          "candidate": "Richard F. Kneip"
+        },
+        {
+          "label": "Republican Carv Thompson",
+          "contest": "governor",
+          "candidate": "Carveth Thompson"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.078,
+        0.068,
+        0.835,
+        0.891
+      ],
+      "hint": "Read only the table headed 'GOVERNOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0535
+      ]
+    }
+  ]
+}

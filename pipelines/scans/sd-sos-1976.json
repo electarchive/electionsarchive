@@ -1,0 +1,145 @@
+{
+  "polity": "US-SD",
+  "publisher": "South Dakota Secretary of State",
+  "title": "Official election returns and registration figures for South Dakota, general election November 2, 1976",
+  "license": "Public record",
+  "file": {
+    "url": "https://sdsos.gov/elections-voting/assets/historicalelectiondata/1976G.pdf"
+  },
+  "raw_source": "us.scans",
+  "contests": {
+    "president": {
+      "year": 1976,
+      "chamber": "president",
+      "day": "1976-11-02",
+      "special": false,
+      "state": "SD",
+      "district": null
+    },
+    "house1": {
+      "year": 1976,
+      "chamber": "house",
+      "day": "1976-11-02",
+      "special": false,
+      "state": "SD",
+      "district": 1
+    },
+    "house2": {
+      "year": 1976,
+      "chamber": "house",
+      "day": "1976-11-02",
+      "special": false,
+      "state": "SD",
+      "district": 2
+    }
+  },
+  "pages": [
+    {
+      "page": 2,
+      "id": "2-0",
+      "columns": [
+        {
+          "label": "Democrat Carter/Mondale Gene Mahan Robert Burns Marilyn Teske Cheryl Enos",
+          "contest": "president",
+          "candidate": "Jimmy Carter (Democratic)"
+        },
+        {
+          "label": "Republican Ford/Dole W. H. Stake Dorothy Wood Susan Volk Ione Larson",
+          "contest": "president",
+          "candidate": "Gerald Ford (Republican)"
+        },
+        {
+          "label": "Independent MacBride/Bergland V. H. Hughes David B. Ellis Jeff Nelson Leslie D. Holst",
+          "contest": "president",
+          "candidate": "Roger MacBride (Libertarian)"
+        },
+        {
+          "label": "Independent Hall/Tyner John Stein, Jr. David S. Spellman Earl W. McGee James J. Ruzicka",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Independent Camejo/Reid Michael Estes Randy Lee Howey Bart P. Popowski Joseph P. Myers",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.18,
+        0.078,
+        0.856,
+        0.926
+      ],
+      "hint": "Read only the table headed 'OFFICIAL ELECTION RETURNS NOVEMBER 2, 1976 PRESIDENTIAL ELECTORS'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1733
+      ]
+    },
+    {
+      "page": 3,
+      "id": "3-0",
+      "columns": [
+        {
+          "label": "Democrat GUFFEY",
+          "contest": "house1",
+          "candidate": "James V. Guffey"
+        },
+        {
+          "label": "Republican PRESSLER",
+          "contest": "house1",
+          "candidate": "Larry Pressler"
+        },
+        {
+          "label": "Independent STEVENS",
+          "contest": "house1",
+          "candidate": "Donald Stevens"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.127,
+        0.08,
+        0.808,
+        0.825
+      ],
+      "hint": "Read only the table headed 'CONGRESSMAN \u2014 FIRST DISTRICT'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0644
+      ]
+    },
+    {
+      "page": 4,
+      "id": "4-0",
+      "columns": [
+        {
+          "label": "Democrat MICKELSON",
+          "contest": "house2",
+          "candidate": "Grace Mickelson"
+        },
+        {
+          "label": "Republican ABDNOR",
+          "contest": "house2",
+          "candidate": "James Abdnor"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.154,
+        0.08,
+        0.827,
+        0.811
+      ],
+      "hint": "Read only the table headed 'CONGRESSMAN \u2014 SECOND DISTRICT'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0643
+      ]
+    }
+  ]
+}

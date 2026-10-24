@@ -1,0 +1,433 @@
+{
+  "polity": "US-SD",
+  "publisher": "South Dakota Secretary of State",
+  "title": "Official election returns and registration figures for South Dakota, general election November 4, 1924",
+  "license": "Public record",
+  "file": {
+    "url": "https://sdsos.gov/elections-voting/assets/historicalelectiondata/1924G.pdf"
+  },
+  "raw_source": "us.scans",
+  "contests": {
+    "senate": {
+      "year": 1924,
+      "chamber": "senate",
+      "day": "1924-11-04",
+      "special": false,
+      "state": "SD",
+      "district": null
+    },
+    "house1": {
+      "year": 1924,
+      "chamber": "house",
+      "day": "1924-11-04",
+      "special": false,
+      "state": "SD",
+      "district": 1
+    },
+    "house2": {
+      "year": 1924,
+      "chamber": "house",
+      "day": "1924-11-04",
+      "special": false,
+      "state": "SD",
+      "district": 2
+    },
+    "house3": {
+      "year": 1924,
+      "chamber": "house",
+      "day": "1924-11-04",
+      "special": false,
+      "state": "SD",
+      "district": 3
+    },
+    "president": {
+      "year": 1924,
+      "chamber": "president",
+      "day": "1924-11-04",
+      "special": false,
+      "state": "SD",
+      "district": null
+    },
+    "governor": {
+      "year": 1924,
+      "chamber": "governor",
+      "day": "1924-11-04",
+      "special": false,
+      "state": "SD",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 2,
+      "id": "2-0",
+      "columns": [
+        {
+          "label": "W. H. McMaster Rep.",
+          "contest": "senate",
+          "candidate": "W. H. McMaster"
+        },
+        {
+          "label": "U. S. G. Cherry Dem.",
+          "contest": "senate",
+          "candidate": "U. S. G. Cherry"
+        },
+        {
+          "label": "Tom Ayres F. L.",
+          "contest": "senate",
+          "candidate": "Tom Ayres"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.142,
+        0.094,
+        0.858,
+        0.946
+      ],
+      "hint": "Read only the table headed 'UNITED STATES SENATOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1244
+      ]
+    },
+    {
+      "page": 3,
+      "id": "3-0",
+      "columns": [
+        {
+          "label": "Mark P. Bates Ind.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "C. H. Dillon Ind.",
+          "contest": "senate",
+          "candidate": "Dillon"
+        },
+        {
+          "label": "Geo. W. Egan Ind.",
+          "contest": "senate",
+          "candidate": "George Egan"
+        },
+        {
+          "label": "Don Livingston Ind.",
+          "contest": "senate",
+          "candidate": "Don Livingston"
+        },
+        {
+          "label": "H. L. Loucks Ind.",
+          "contest": "senate",
+          "candidate": "Loucks"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.119,
+        0.092,
+        0.844,
+        0.954
+      ],
+      "hint": "Read only the table headed 'UNITED STATES SENATOR\u2014Continued'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.123
+      ]
+    },
+    {
+      "page": 4,
+      "id": "4-0",
+      "columns": [
+        {
+          "label": "C. A. Christopherson Rep.",
+          "contest": "house1",
+          "candidate": "Charles A. Christopherson"
+        },
+        {
+          "label": "Warren E. Beck Dem.",
+          "contest": "house1",
+          "candidate": "Warren E. Beck"
+        },
+        {
+          "label": "Wm. T. Jones F. L.",
+          "contest": "house1",
+          "candidate": "William T. Jones"
+        },
+        {
+          "label": "William Bartling Ind.",
+          "contest": "house1",
+          "candidate": "William Bartling"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.131,
+        0.101,
+        0.869,
+        0.972
+      ],
+      "hint": "Read only the table headed 'CONGRESSMAN\u2014FIRST DISTRICT'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0999
+      ]
+    },
+    {
+      "page": 5,
+      "id": "5-0",
+      "columns": [
+        {
+          "label": "Royal C. Johnson Rep.",
+          "contest": "house2",
+          "candidate": "Royal C. Johnson"
+        },
+        {
+          "label": "Jack P. Reinhard Dem.",
+          "contest": "house2",
+          "candidate": "Jack P. Reinhord"
+        },
+        {
+          "label": "Walter P. Wohlheter F. L.",
+          "contest": "house2",
+          "candidate": "Walter P. Wohlheter"
+        },
+        {
+          "label": "Fred H. Hildebrandt Ind.",
+          "contest": "house2",
+          "candidate": "Fred H. Hildebrandt"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.142,
+        0.083,
+        0.865,
+        0.942
+      ],
+      "hint": "Read only the table headed 'CONGRESSMAN\u2014SECOND DISTRICT'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1246
+      ]
+    },
+    {
+      "page": 6,
+      "id": "6-0",
+      "columns": [
+        {
+          "label": "Wm. Williamson Rep.",
+          "contest": "house3",
+          "candidate": "William Williamson"
+        },
+        {
+          "label": "John R. Russell Dem.",
+          "contest": "house3",
+          "candidate": "John R. Russell"
+        },
+        {
+          "label": "Arthur W. Watwood F. L.",
+          "contest": "house3",
+          "candidate": "Arthur W. Atwood"
+        },
+        {
+          "label": "Charles Ash Bates Ind.",
+          "contest": "house3",
+          "candidate": "Charles Ash Bates"
+        },
+        {
+          "label": "George H. Randall Ind.",
+          "contest": "house3",
+          "candidate": "George H. Randall"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.135,
+        0.079,
+        0.859,
+        0.935
+      ],
+      "hint": "Read only the table headed 'CONGRESSMAN\u2014THIRD DISTRICT'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1297
+      ]
+    },
+    {
+      "page": 7,
+      "id": "7-0",
+      "columns": [
+        {
+          "label": "Helen H. Gamble",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Philo Hall",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Mrs. W. S. Hill",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "F. R. Smith",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Fred W. Wilson",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.132,
+        0.089,
+        0.856,
+        0.941
+      ],
+      "hint": "Read only the table headed 'PRESIDENTIAL ELECTORS\u2014REPUBLICAN'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1279
+      ]
+    },
+    {
+      "page": 8,
+      "id": "8-0",
+      "columns": [
+        {
+          "label": "William Galvin",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Mrs. R. H. Lewis",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "H. J. McMahon",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Mary Peabody",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. P. Stahl",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.138,
+        0.089,
+        0.861,
+        0.949
+      ],
+      "hint": "Read only the table headed 'PRESIDENTIAL ELECTORS\u2014DEMOCRATIC'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1302
+      ]
+    },
+    {
+      "page": 9,
+      "id": "9-0",
+      "columns": [
+        {
+          "label": "Alan Bogue",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Andrew E. Lee",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Edd McGrath",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Elinor Sabin",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "John Wise",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.114,
+        0.101,
+        0.846,
+        0.917
+      ],
+      "hint": "Read only the table headed 'PRESIDENTIAL ELECTORS\u2014INDEPENDENT'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1324
+      ]
+    },
+    {
+      "page": 10,
+      "id": "10-0",
+      "columns": [
+        {
+          "label": "Carl Gunderson Rep.",
+          "contest": "governor",
+          "candidate": "Carl Gunderson"
+        },
+        {
+          "label": "W. J. Bulow Dem.",
+          "contest": "governor",
+          "candidate": "William J. Bulow"
+        },
+        {
+          "label": "A. L. Putnam F. L.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "R. O. Richards Ind.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.129,
+        0.097,
+        0.846,
+        0.947
+      ],
+      "hint": "Read only the table headed 'GOVERNOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1247
+      ]
+    }
+  ]
+}

@@ -1,0 +1,125 @@
+{
+  "polity": "US-SD",
+  "publisher": "South Dakota Secretary of State",
+  "title": "Official election returns and registration figures for South Dakota, general election November 4, 1958",
+  "license": "Public record",
+  "file": {
+    "url": "https://sdsos.gov/elections-voting/assets/historicalelectiondata/1958G.pdf"
+  },
+  "raw_source": "us.scans",
+  "contests": {
+    "house1": {
+      "year": 1958,
+      "chamber": "house",
+      "day": "1958-11-04",
+      "special": false,
+      "state": "SD",
+      "district": 1
+    },
+    "house2": {
+      "year": 1958,
+      "chamber": "house",
+      "day": "1958-11-04",
+      "special": false,
+      "state": "SD",
+      "district": 2
+    },
+    "governor": {
+      "year": 1958,
+      "chamber": "governor",
+      "day": "1958-11-04",
+      "special": false,
+      "state": "SD",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 2,
+      "id": "2-0",
+      "columns": [
+        {
+          "label": "Joe Foss Rep.",
+          "contest": "house1",
+          "candidate": "Joe Foss"
+        },
+        {
+          "label": "George McGovern Dem.",
+          "contest": "house1",
+          "candidate": "George S. McGovern"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.108,
+        0.08,
+        0.816,
+        0.897
+      ],
+      "hint": "Read only the table headed 'REPRESENTATIVE IN CONGRESS\u2014 DISTRICT NO. 1'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1004
+      ]
+    },
+    {
+      "page": 3,
+      "id": "3-0",
+      "columns": [
+        {
+          "label": "E. Y. Berry, Rep.",
+          "contest": "house2",
+          "candidate": "E. Y. Berry"
+        },
+        {
+          "label": "J. T. McCullen Dem.",
+          "contest": "house2",
+          "candidate": "J. T. McCullen"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.123,
+        0.072,
+        0.846,
+        0.897
+      ],
+      "hint": "Read only the table headed 'REPRESENTATIVE IN CONGRESS\u2014DISTRICT NO. 2'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0921
+      ]
+    },
+    {
+      "page": 4,
+      "id": "4-0",
+      "columns": [
+        {
+          "label": "Phil Saunders Rep.",
+          "contest": "governor",
+          "candidate": "Phil Saunders"
+        },
+        {
+          "label": "Ralph Herseth Dem.",
+          "contest": "governor",
+          "candidate": "Ralph Herseth"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.138,
+        0.096,
+        0.863,
+        0.921
+      ],
+      "hint": "Read only the table headed 'GOVERNOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0836
+      ]
+    }
+  ]
+}

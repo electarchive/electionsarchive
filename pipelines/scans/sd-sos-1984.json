@@ -1,0 +1,138 @@
+{
+  "polity": "US-SD",
+  "publisher": "South Dakota Secretary of State",
+  "title": "Official election returns and registration figures for South Dakota, general election November 6, 1984",
+  "license": "Public record",
+  "file": {
+    "url": "https://sdsos.gov/elections-voting/assets/historicalelectiondata/1984G.pdf"
+  },
+  "raw_source": "us.scans",
+  "contests": {
+    "president": {
+      "year": 1984,
+      "chamber": "president",
+      "day": "1984-11-06",
+      "special": false,
+      "state": "SD",
+      "district": null
+    },
+    "senate": {
+      "year": 1984,
+      "chamber": "senate",
+      "day": "1984-11-06",
+      "special": false,
+      "state": "SD",
+      "district": null
+    },
+    "house": {
+      "year": 1984,
+      "chamber": "house",
+      "day": "1984-11-06",
+      "special": false,
+      "state": "SD",
+      "district": null,
+      "create": true
+    }
+  },
+  "pages": [
+    {
+      "page": 2,
+      "id": "2-0",
+      "columns": [
+        {
+          "label": "Reagan/Bush\u2014R",
+          "contest": "president",
+          "candidate": "Ronald Reagan"
+        },
+        {
+          "label": "Mondale/Ferraro\u2014D",
+          "contest": "president",
+          "candidate": "Walter F. Mondale"
+        },
+        {
+          "label": "Serrette/Ross\u2014I",
+          "contest": "president",
+          "candidate": "Dennis L. Serrette"
+        },
+        {
+          "label": "Mason/Zimmermann\u2014I",
+          "contest": "president",
+          "candidate": "Mel Mason"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.167,
+        0.071,
+        0.823,
+        0.925
+      ],
+      "hint": "Read only the table headed 'PRESIDENTIAL'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0375
+      ]
+    },
+    {
+      "page": 3,
+      "id": "3-0",
+      "columns": [
+        {
+          "label": "Larry Pressler\u2014R",
+          "contest": "senate",
+          "candidate": "Larry Pressler"
+        },
+        {
+          "label": "George V. Cunningham\u2014D",
+          "contest": "senate",
+          "candidate": "George V. Cunningham"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.12,
+        0.062,
+        0.785,
+        0.926
+      ],
+      "hint": "Read only the table headed 'U.S. SENATE'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0359
+      ]
+    },
+    {
+      "page": 4,
+      "id": "4-0",
+      "columns": [
+        {
+          "label": "Dale Bell\u2014R",
+          "contest": "house",
+          "candidate": "Dale Bell",
+          "party": "R"
+        },
+        {
+          "label": "Tom Daschle\u2014D",
+          "contest": "house",
+          "candidate": "Tom Daschle",
+          "party": "D"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.129,
+        0.065,
+        0.788,
+        0.921
+      ],
+      "hint": "Read only the table headed 'U.S. HOUSE'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0339
+      ]
+    }
+  ]
+}

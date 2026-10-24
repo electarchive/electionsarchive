@@ -1,0 +1,162 @@
+{
+  "polity": "US-SD",
+  "publisher": "South Dakota Secretary of State",
+  "title": "Official election returns and registration figures for South Dakota, general election November 2, 1954",
+  "license": "Public record",
+  "file": {
+    "url": "https://sdsos.gov/elections-voting/assets/historicalelectiondata/1954G.pdf"
+  },
+  "raw_source": "us.scans",
+  "contests": {
+    "senate": {
+      "year": 1954,
+      "chamber": "senate",
+      "day": "1954-11-02",
+      "special": false,
+      "state": "SD",
+      "district": null
+    },
+    "house1": {
+      "year": 1954,
+      "chamber": "house",
+      "day": "1954-11-02",
+      "special": false,
+      "state": "SD",
+      "district": 1
+    },
+    "house2": {
+      "year": 1954,
+      "chamber": "house",
+      "day": "1954-11-02",
+      "special": false,
+      "state": "SD",
+      "district": 2
+    },
+    "governor": {
+      "year": 1954,
+      "chamber": "governor",
+      "day": "1954-11-02",
+      "special": false,
+      "state": "SD",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 2,
+      "id": "2-0",
+      "columns": [
+        {
+          "label": "Karl E. Mundt Rep.",
+          "contest": "senate",
+          "candidate": "Karl E. Mundt"
+        },
+        {
+          "label": "Kenneth Holum Dem.",
+          "contest": "senate",
+          "candidate": "Kenneth Holum"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.172,
+        0.071,
+        0.868,
+        0.891
+      ],
+      "hint": "Read only the table headed 'UNITED STATES SENATOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.078
+      ]
+    },
+    {
+      "page": 3,
+      "id": "3-0",
+      "columns": [
+        {
+          "label": "Harold O. Lovre Rep.",
+          "contest": "house1",
+          "candidate": "Harold O. Lovre"
+        },
+        {
+          "label": "Francis G. Dunn Dem.",
+          "contest": "house1",
+          "candidate": "Francis G. Dunn"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.155,
+        0.071,
+        0.844,
+        0.887
+      ],
+      "hint": "Read only the table headed 'CONGRESSMAN\u2014FIRST DISTRICT'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0846
+      ]
+    },
+    {
+      "page": 4,
+      "id": "4-0",
+      "columns": [
+        {
+          "label": "E. Y. Berry Rep.",
+          "contest": "house2",
+          "candidate": "E. Y. Berry"
+        },
+        {
+          "label": "Ray Satterlee Dem.",
+          "contest": "house2",
+          "candidate": "Ray Satterlee"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.14,
+        0.084,
+        0.836,
+        0.905
+      ],
+      "hint": "Read only the table headed 'CONGRESSMAN\u2014SECOND DISTRICT'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.084
+      ]
+    },
+    {
+      "page": 5,
+      "id": "5-0",
+      "columns": [
+        {
+          "label": "Joe J. Foss Rep.",
+          "contest": "governor",
+          "candidate": "Joe Foss"
+        },
+        {
+          "label": "Ed C. Martin Dem.",
+          "contest": "governor",
+          "candidate": "Ed C. Martin"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.14,
+        0.062,
+        0.846,
+        0.887
+      ],
+      "hint": "Read only the table headed 'GOVERNOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0848
+      ]
+    }
+  ]
+}

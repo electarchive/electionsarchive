@@ -1,0 +1,162 @@
+{
+  "polity": "US-SD",
+  "publisher": "South Dakota Secretary of State",
+  "title": "Official election returns and registration figures for South Dakota, general election November 8, 1960",
+  "license": "Public record",
+  "file": {
+    "url": "https://sdsos.gov/elections-voting/assets/historicalelectiondata/1960G.pdf"
+  },
+  "raw_source": "us.scans",
+  "contests": {
+    "president": {
+      "year": 1960,
+      "chamber": "president",
+      "day": "1960-11-08",
+      "special": false,
+      "state": "SD",
+      "district": null
+    },
+    "house1": {
+      "year": 1960,
+      "chamber": "house",
+      "day": "1960-11-08",
+      "special": false,
+      "state": "SD",
+      "district": 1
+    },
+    "senate": {
+      "year": 1960,
+      "chamber": "senate",
+      "day": "1960-11-08",
+      "special": false,
+      "state": "SD",
+      "district": null
+    },
+    "governor": {
+      "year": 1960,
+      "chamber": "governor",
+      "day": "1960-11-08",
+      "special": false,
+      "state": "SD",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 2,
+      "id": "2-0",
+      "columns": [
+        {
+          "label": "Dem. (Kennedy & Johnson) Leo Heibel Arthur Nelson Opal Finn Jennie O'Hern",
+          "contest": "president",
+          "candidate": "John F. Kennedy (Democratic)"
+        },
+        {
+          "label": "Rep. (Nixon & Lodge) Arthur S. Mitchell Alex Olson Myrtle Watson Mrs. Dan Stuelpnagel",
+          "contest": "president",
+          "candidate": "Richard Nixon (Republican)"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.167,
+        0.058,
+        0.865,
+        0.929
+      ],
+      "hint": "Read only the table headed 'PRESIDENTIAL ELECTORS'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1596
+      ]
+    },
+    {
+      "page": 3,
+      "id": "3-0",
+      "columns": [
+        {
+          "label": "Dem. Ray Fitzgerald",
+          "contest": "house1",
+          "candidate": "Ray Fitzgerald"
+        },
+        {
+          "label": "Rep. Ben Reifel",
+          "contest": "house1",
+          "candidate": "Ben Reifel"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.107,
+        0.072,
+        0.833,
+        0.897
+      ],
+      "hint": "Read only the table headed 'CONGRESSMEN \u2014 FIRST DISTRICT'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0739
+      ]
+    },
+    {
+      "page": 5,
+      "id": "5-0",
+      "columns": [
+        {
+          "label": "Dem. George McGovern",
+          "contest": "senate",
+          "candidate": "George McGovern"
+        },
+        {
+          "label": "Rep. Karl E. Mundt",
+          "contest": "senate",
+          "candidate": "Karl E. Mundt"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.15,
+        0.08,
+        0.877,
+        0.904
+      ],
+      "hint": "Read only the table headed 'UNITED STATES SENATOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0704
+      ]
+    },
+    {
+      "page": 7,
+      "id": "7-0",
+      "columns": [
+        {
+          "label": "Dem. Ralph Herseth",
+          "contest": "governor",
+          "candidate": "Ralph Herseth"
+        },
+        {
+          "label": "Rep. Archie M. Gubbrud",
+          "contest": "governor",
+          "candidate": "Archie M. Gubbrud"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.131,
+        0.053,
+        0.863,
+        0.882
+      ],
+      "hint": "Read only the table headed 'GOVERNOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0688
+      ]
+    }
+  ]
+}

@@ -1,0 +1,191 @@
+{
+  "polity": "US-SD",
+  "publisher": "South Dakota Secretary of State",
+  "title": "Official election returns and registration figures for South Dakota, general election November 8, 1938",
+  "license": "Public record",
+  "file": {
+    "url": "https://sdsos.gov/elections-voting/assets/historicalelectiondata/1938G.pdf"
+  },
+  "raw_source": "us.scans",
+  "contests": {
+    "senate": {
+      "year": 1938,
+      "chamber": "senate",
+      "day": "1938-11-08",
+      "special": false,
+      "state": "SD",
+      "district": null
+    },
+    "house1": {
+      "year": 1938,
+      "chamber": "house",
+      "day": "1938-11-08",
+      "special": false,
+      "state": "SD",
+      "district": 1
+    },
+    "house2": {
+      "year": 1938,
+      "chamber": "house",
+      "day": "1938-11-08",
+      "special": false,
+      "state": "SD",
+      "district": 2
+    },
+    "governor": {
+      "year": 1938,
+      "chamber": "governor",
+      "day": "1938-11-08",
+      "special": false,
+      "state": "SD",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 2,
+      "id": "2-0",
+      "columns": [
+        {
+          "label": "Gurney Rep.",
+          "contest": "senate",
+          "candidate": "Chandler Gurney"
+        },
+        {
+          "label": "Berry Dem.",
+          "contest": "senate",
+          "candidate": "Tom Berry"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.17,
+        0.114,
+        0.861,
+        0.897
+      ],
+      "hint": "Read only the table headed 'U. S. SENATOR\u2014FULL 6-YEAR TERM'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0779
+      ]
+    },
+    {
+      "page": 3,
+      "id": "3-0",
+      "columns": [
+        {
+          "label": "Pyle Rep.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "McCullen Dem.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.147,
+        0.078,
+        0.855,
+        0.892
+      ],
+      "hint": "Read only the table headed 'U. S. SENATOR\u2014TERM EXPIRING JAN. 3, 1939'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0799
+      ]
+    },
+    {
+      "page": 4,
+      "id": "4-0",
+      "columns": [
+        {
+          "label": "Mundt Rep.",
+          "contest": "house1",
+          "candidate": "Karl Mundt"
+        },
+        {
+          "label": "Loriks Dem.",
+          "contest": "house1",
+          "candidate": "Emil Loriks"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.116,
+        0.084,
+        0.839,
+        0.904
+      ],
+      "hint": "Read only the table headed 'CONGRESSMAN\u2014FIRST DISTRICT'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0756
+      ]
+    },
+    {
+      "page": 5,
+      "id": "5-0",
+      "columns": [
+        {
+          "label": "Case Rep.",
+          "contest": "house2",
+          "candidate": "Francis Case"
+        },
+        {
+          "label": "Werner Dem.",
+          "contest": "house2",
+          "candidate": "Theodore B. Werner"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.144,
+        0.064,
+        0.867,
+        0.899
+      ],
+      "hint": "Read only the table headed 'CONGRESSMAN\u2014SECOND DISTRICT'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0754
+      ]
+    },
+    {
+      "page": 6,
+      "id": "6-0",
+      "columns": [
+        {
+          "label": "Bushfield Rep.",
+          "contest": "governor",
+          "candidate": "Harlan J. Bushfield"
+        },
+        {
+          "label": "Fosheim Dem.",
+          "contest": "governor",
+          "candidate": "Oscar Fosheim"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.128,
+        0.079,
+        0.846,
+        0.892
+      ],
+      "hint": "Read only the table headed 'GOVERNOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.075
+      ]
+    }
+  ]
+}

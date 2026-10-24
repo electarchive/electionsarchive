@@ -1,0 +1,176 @@
+{
+  "polity": "US-SD",
+  "publisher": "South Dakota Secretary of State",
+  "title": "Official election returns and registration figures for South Dakota, general election November 3, 1992",
+  "license": "Public record",
+  "file": {
+    "url": "https://sdsos.gov/elections-voting/assets/historicalelectiondata/1992G.pdf"
+  },
+  "raw_source": "us.scans",
+  "contests": {
+    "president": {
+      "year": 1992,
+      "chamber": "president",
+      "day": "1992-11-03",
+      "special": false,
+      "state": "SD",
+      "district": null
+    },
+    "senate": {
+      "year": 1992,
+      "chamber": "senate",
+      "day": "1992-11-03",
+      "special": false,
+      "state": "SD",
+      "district": null
+    },
+    "house": {
+      "year": 1992,
+      "chamber": "house",
+      "day": "1992-11-03",
+      "special": false,
+      "state": "SD",
+      "district": null,
+      "create": true
+    }
+  },
+  "pages": [
+    {
+      "page": 3,
+      "id": "3-0",
+      "columns": [
+        {
+          "label": "Clinton/ Gore-D",
+          "contest": "president",
+          "candidate": "Bill Clinton"
+        },
+        {
+          "label": "Bush/ Quayle-R",
+          "contest": "president",
+          "candidate": "George Bush"
+        },
+        {
+          "label": "Marrou/ Lord-L",
+          "contest": "president",
+          "candidate": "Andre Marrou"
+        },
+        {
+          "label": "Hagelin/ Tompkins-I",
+          "contest": "president",
+          "candidate": "John Hagelin"
+        },
+        {
+          "label": "Perot/ Stockdale-I",
+          "contest": "president",
+          "candidate": "Ross Perot"
+        },
+        {
+          "label": "Fulani/ Munoz-I",
+          "contest": "president",
+          "candidate": "Lenora Fulani"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.21,
+        0.086,
+        0.746,
+        0.921
+      ],
+      "hint": "Read only the table headed 'PRESIDENTIAL ELECTORS'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0491
+      ]
+    },
+    {
+      "page": 4,
+      "id": "4-0",
+      "columns": [
+        {
+          "label": "Tom Daschle-D",
+          "contest": "senate",
+          "candidate": "Tom Daschle"
+        },
+        {
+          "label": "Charlene Haar-R",
+          "contest": "senate",
+          "candidate": "Charlene Haar"
+        },
+        {
+          "label": "Gus Hercules-L",
+          "contest": "senate",
+          "candidate": "Gus Hercules"
+        },
+        {
+          "label": "Kent Hyde-I",
+          "contest": "senate",
+          "candidate": "Kent Hyde"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.237,
+        0.087,
+        0.74,
+        0.922
+      ],
+      "hint": "Read only the table headed 'UNITED STATES SENATI'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0455
+      ]
+    },
+    {
+      "page": 5,
+      "id": "5-0",
+      "columns": [
+        {
+          "label": "Tim Johnson-D",
+          "contest": "house",
+          "candidate": "Tim Johnson",
+          "party": "D"
+        },
+        {
+          "label": "John Timmer-R",
+          "contest": "house",
+          "candidate": "John Timmer",
+          "party": "R"
+        },
+        {
+          "label": "Robert J. Newland-L",
+          "contest": "house",
+          "candidate": "Robert J. Newland",
+          "party": "L"
+        },
+        {
+          "label": "Ronald Wieczorek-I",
+          "contest": "house",
+          "candidate": "Ronald Wieczorek",
+          "party": "I"
+        },
+        {
+          "label": "Ann Balakier-I",
+          "contest": "house",
+          "candidate": "Ann Balakier",
+          "party": "I"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.21,
+        0.088,
+        0.776,
+        0.916
+      ],
+      "hint": "Read only the table headed 'UNITED STATES HOUSE OF REPRESENTATIVES'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0471
+      ]
+    }
+  ]
+}

@@ -1,0 +1,199 @@
+{
+  "polity": "US-SD",
+  "publisher": "South Dakota Secretary of State",
+  "title": "Official election returns and registration figures for South Dakota, general election November 7, 1944",
+  "license": "Public record",
+  "file": {
+    "url": "https://sdsos.gov/elections-voting/assets/historicalelectiondata/1944G.pdf"
+  },
+  "raw_source": "us.scans",
+  "contests": {
+    "senate": {
+      "year": 1944,
+      "chamber": "senate",
+      "day": "1944-11-07",
+      "special": false,
+      "state": "SD",
+      "district": null
+    },
+    "house1": {
+      "year": 1944,
+      "chamber": "house",
+      "day": "1944-11-07",
+      "special": false,
+      "state": "SD",
+      "district": 1
+    },
+    "house2": {
+      "year": 1944,
+      "chamber": "house",
+      "day": "1944-11-07",
+      "special": false,
+      "state": "SD",
+      "district": 2
+    },
+    "president": {
+      "year": 1944,
+      "chamber": "president",
+      "day": "1944-11-07",
+      "special": false,
+      "state": "SD",
+      "district": null
+    },
+    "governor": {
+      "year": 1944,
+      "chamber": "governor",
+      "day": "1944-11-07",
+      "special": false,
+      "state": "SD",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 2,
+      "id": "2-0",
+      "columns": [
+        {
+          "label": "Chan Gurney Rep.",
+          "contest": "senate",
+          "candidate": "Chan Gurney"
+        },
+        {
+          "label": "George M. Bradshaw Dem.",
+          "contest": "senate",
+          "candidate": "George M. Bradshaw"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.165,
+        0.119,
+        0.839,
+        0.921
+      ],
+      "hint": "Read only the table headed 'UNITED STATES SENATOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0773
+      ]
+    },
+    {
+      "page": 3,
+      "id": "3-0",
+      "columns": [
+        {
+          "label": "Karl Mundt Rep.",
+          "contest": "house1",
+          "candidate": "Karl E. Mundt"
+        },
+        {
+          "label": "Grover Lothrop Dem.",
+          "contest": "house1",
+          "candidate": "Grover Lothrop"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.133,
+        0.101,
+        0.826,
+        0.931
+      ],
+      "hint": "Read only the table headed 'CONGRESSMAN\u2014First District'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0771
+      ]
+    },
+    {
+      "page": 4,
+      "id": "4-0",
+      "columns": [
+        {
+          "label": "Francis Case Rep.",
+          "contest": "house2",
+          "candidate": "Francis Case"
+        },
+        {
+          "label": "H. W. Clarkson Dem.",
+          "contest": "house2",
+          "candidate": "H. W. Clarkson"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.139,
+        0.076,
+        0.845,
+        0.916
+      ],
+      "hint": "Read only the table headed 'CONGRESSMAN\u2014Second District'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0762
+      ]
+    },
+    {
+      "page": 5,
+      "id": "5-0",
+      "columns": [
+        {
+          "label": "Republican (Dewey & Bricker) Mrs. Tyler Bane Berry Scott",
+          "contest": "president",
+          "candidate": "Thomas E. Dewey (Republican)"
+        },
+        {
+          "label": "Democratic (Roosevelt & Truman) Exon May Donley Mrs. Smith",
+          "contest": "president",
+          "candidate": "Franklin D. Roosevelt (Democratic)"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.126,
+        0.076,
+        0.818,
+        0.916
+      ],
+      "hint": "Read only the table headed 'PRESIDENTIAL ELECTORS'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1143
+      ]
+    },
+    {
+      "page": 6,
+      "id": "6-0",
+      "columns": [
+        {
+          "label": "M. Q. Sharpe Rep.",
+          "contest": "governor",
+          "candidate": "Merrell Q. Sharpe"
+        },
+        {
+          "label": "Lynn Fellows Dem.",
+          "contest": "governor",
+          "candidate": "Lynn Fellows"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.178,
+        0.084,
+        0.876,
+        0.916
+      ],
+      "hint": "Read only the table headed 'GOVERNOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0769
+      ]
+    }
+  ]
+}

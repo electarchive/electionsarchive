@@ -1,0 +1,101 @@
+{
+  "polity": "US-SD",
+  "publisher": "South Dakota Secretary of State",
+  "title": "Official election returns and registration figures for South Dakota, general election November 2, 1982",
+  "license": "Public record",
+  "file": {
+    "url": "https://sdsos.gov/elections-voting/assets/historicalelectiondata/1982G.pdf"
+  },
+  "raw_source": "us.scans",
+  "contests": {
+    "house": {
+      "year": 1982,
+      "chamber": "house",
+      "day": "1982-11-02",
+      "special": false,
+      "state": "SD",
+      "district": null,
+      "create": true
+    },
+    "governor": {
+      "year": 1982,
+      "chamber": "governor",
+      "day": "1982-11-02",
+      "special": false,
+      "state": "SD",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 2,
+      "id": "2-0",
+      "columns": [
+        {
+          "label": "Clint Roberts - R",
+          "contest": "house",
+          "candidate": "Clint Roberts",
+          "party": "R"
+        },
+        {
+          "label": "Tom Daschle - D",
+          "contest": "house",
+          "candidate": "Tom Daschle",
+          "party": "D"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.162,
+        0.058,
+        0.814,
+        0.889
+      ],
+      "hint": "Read only the table headed 'U.S. REPRESENTATIVE'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0505
+      ]
+    },
+    {
+      "page": 3,
+      "id": "3-0",
+      "columns": [
+        {
+          "label": "Bill Janklow & Lowell Hansen - R",
+          "contest": "governor",
+          "candidate": "William J. Janklow"
+        },
+        {
+          "label": "Mike O'Connor & Willis Danekas - D",
+          "contest": "governor",
+          "candidate": "Michael J. O'Connor"
+        },
+        {
+          "label": "Janklow & Hansen - R",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "O'Connor & Danekas - D",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.162,
+        0.058,
+        0.833,
+        0.906
+      ],
+      "hint": "Read only the table headed 'GOVERNOR AND LIEUTENANT GOVERNOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.092
+      ]
+    }
+  ]
+}

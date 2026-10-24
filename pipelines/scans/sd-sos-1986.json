@@ -1,0 +1,128 @@
+{
+  "polity": "US-SD",
+  "publisher": "South Dakota Secretary of State",
+  "title": "Official election returns and registration figures for South Dakota, general election November 4, 1986",
+  "license": "Public record",
+  "file": {
+    "url": "https://sdsos.gov/elections-voting/assets/historicalelectiondata/1986G.pdf"
+  },
+  "raw_source": "us.scans",
+  "contests": {
+    "senate": {
+      "year": 1986,
+      "chamber": "senate",
+      "day": "1986-11-04",
+      "special": false,
+      "state": "SD",
+      "district": null
+    },
+    "house": {
+      "year": 1986,
+      "chamber": "house",
+      "day": "1986-11-04",
+      "special": false,
+      "state": "SD",
+      "district": null,
+      "create": true
+    },
+    "governor": {
+      "year": 1986,
+      "chamber": "governor",
+      "day": "1986-11-04",
+      "special": false,
+      "state": "SD",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 2,
+      "id": "2-0",
+      "columns": [
+        {
+          "label": "Tom Daschle\u2014D",
+          "contest": "senate",
+          "candidate": "Thomas A. Daschle"
+        },
+        {
+          "label": "James Abdnor\u2014R",
+          "contest": "senate",
+          "candidate": "James Abdnor"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.204,
+        0.051,
+        0.705,
+        0.899
+      ],
+      "hint": "Read only the table headed 'SOUTH DAKOTA GENERAL ELECTION UNITED STATES SENATE'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0613
+      ]
+    },
+    {
+      "page": 3,
+      "id": "3-0",
+      "columns": [
+        {
+          "label": "Tim Johnson\u2014D",
+          "contest": "house",
+          "candidate": "Tim Johnson",
+          "party": "D"
+        },
+        {
+          "label": "Dale Bell\u2014R",
+          "contest": "house",
+          "candidate": "Dale Bell",
+          "party": "R"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.254,
+        0.049,
+        0.753,
+        0.898
+      ],
+      "hint": "Read only the table headed 'UNITED STATES HOUSE OF REPRESENTATIVES'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0601
+      ]
+    },
+    {
+      "page": 4,
+      "id": "4-0",
+      "columns": [
+        {
+          "label": "R. Lars Herseth/Ted Thoms\u2014D",
+          "contest": "governor",
+          "candidate": "R. Lars Herseth"
+        },
+        {
+          "label": "George S. Mickelson/Walter D. Miller\u2014R",
+          "contest": "governor",
+          "candidate": "George S. Mickelson"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.227,
+        0.053,
+        0.746,
+        0.925
+      ],
+      "hint": "Read only the table headed 'GOVERNOR AND LIEUTENANT GOVERNOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0722
+      ]
+    }
+  ]
+}

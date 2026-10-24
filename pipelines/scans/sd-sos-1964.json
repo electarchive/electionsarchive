@@ -1,0 +1,162 @@
+{
+  "polity": "US-SD",
+  "publisher": "South Dakota Secretary of State",
+  "title": "Official election returns and registration figures for South Dakota, general election November 3, 1964",
+  "license": "Public record",
+  "file": {
+    "url": "https://sdsos.gov/elections-voting/assets/historicalelectiondata/1964G.pdf"
+  },
+  "raw_source": "us.scans",
+  "contests": {
+    "president": {
+      "year": 1964,
+      "chamber": "president",
+      "day": "1964-11-03",
+      "special": false,
+      "state": "SD",
+      "district": null
+    },
+    "house1": {
+      "year": 1964,
+      "chamber": "house",
+      "day": "1964-11-03",
+      "special": false,
+      "state": "SD",
+      "district": 1
+    },
+    "house2": {
+      "year": 1964,
+      "chamber": "house",
+      "day": "1964-11-03",
+      "special": false,
+      "state": "SD",
+      "district": 2
+    },
+    "governor": {
+      "year": 1964,
+      "chamber": "governor",
+      "day": "1964-11-03",
+      "special": false,
+      "state": "SD",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 2,
+      "id": "2-0",
+      "columns": [
+        {
+          "label": "Rep. (Goldwater & Miller) Alice Kundert, Don Bierle, Gordon Gunderson, Charles Hight",
+          "contest": "president",
+          "candidate": "Barry Goldwater (Republican)"
+        },
+        {
+          "label": "Dem. (Johnson & Humphrey) Dean Sumner, James Magness, Ralph Herseth, John A. Engel",
+          "contest": "president",
+          "candidate": "Lyndon B. Johnson (Democratic)"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.18,
+        0.113,
+        0.846,
+        0.916
+      ],
+      "hint": "Read only the table headed 'ELECTION RETURNS NOVEMBER 3, 1964 PRESIDENTIAL ELECTORS'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1233
+      ]
+    },
+    {
+      "page": 3,
+      "id": "3-0",
+      "columns": [
+        {
+          "label": "Rep. Ben Reifel",
+          "contest": "house1",
+          "candidate": "Ben Reifel"
+        },
+        {
+          "label": "Dem. George May",
+          "contest": "house1",
+          "candidate": "George May"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.158,
+        0.078,
+        0.85,
+        0.873
+      ],
+      "hint": "Read only the table headed 'CONGRESSMEN\u2014FIRST DISTRICT'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0855
+      ]
+    },
+    {
+      "page": 4,
+      "id": "4-0",
+      "columns": [
+        {
+          "label": "Rep. E. Y. Berry",
+          "contest": "house2",
+          "candidate": "E. Y. Berry"
+        },
+        {
+          "label": "Dem. Byron T. Brown",
+          "contest": "house2",
+          "candidate": "Byron T. Brown"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.098,
+        0.092,
+        0.794,
+        0.881
+      ],
+      "hint": "Read only the table headed 'CONGRESSMEN\u2014SECOND DISTRICT'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0862
+      ]
+    },
+    {
+      "page": 5,
+      "id": "5-0",
+      "columns": [
+        {
+          "label": "Rep. Nils A. Boe",
+          "contest": "governor",
+          "candidate": "Nils A. Boe"
+        },
+        {
+          "label": "Dem. John F. Lindley",
+          "contest": "governor",
+          "candidate": "John F. Lindley"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.111,
+        0.046,
+        0.851,
+        0.873
+      ],
+      "hint": "Read only the table headed 'GOVERNOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0798
+      ]
+    }
+  ]
+}

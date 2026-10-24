@@ -1,0 +1,193 @@
+{
+  "polity": "US-SD",
+  "publisher": "South Dakota Secretary of State",
+  "title": "Official election returns and registration figures for South Dakota, general election November 4, 1930",
+  "license": "Public record",
+  "file": {
+    "url": "https://sdsos.gov/elections-voting/assets/historicalelectiondata/1930G.pdf"
+  },
+  "raw_source": "us.scans",
+  "contests": {
+    "senate": {
+      "year": 1930,
+      "chamber": "senate",
+      "day": "1930-11-04",
+      "special": false,
+      "state": "SD",
+      "district": null
+    },
+    "house": {
+      "year": 1930,
+      "chamber": "house",
+      "day": "1930-11-04",
+      "special": false,
+      "state": "SD",
+      "district": null,
+      "create": true
+    },
+    "house2": {
+      "year": 1930,
+      "chamber": "house",
+      "day": "1930-11-04",
+      "special": false,
+      "state": "SD",
+      "district": 2
+    },
+    "house3": {
+      "year": 1930,
+      "chamber": "house",
+      "day": "1930-11-04",
+      "special": false,
+      "state": "SD",
+      "district": 3
+    },
+    "governor": {
+      "year": 1930,
+      "chamber": "governor",
+      "day": "1930-11-04",
+      "special": false,
+      "state": "SD",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 1,
+      "id": "1-0",
+      "columns": [
+        {
+          "label": "W. J. Bulow, Dem.",
+          "contest": "senate",
+          "candidate": "W. J. Bulow"
+        },
+        {
+          "label": "Wm. H. McMaster, Rep.",
+          "contest": "senate",
+          "candidate": "William H. McMaster"
+        },
+        {
+          "label": "C. A. Christopherson, Rep.",
+          "contest": "house",
+          "candidate": "C. A. Christopherson",
+          "party": "Rep."
+        },
+        {
+          "label": "Henry Borman, Ind.",
+          "contest": "house",
+          "candidate": "Henry Borman",
+          "party": "Ind."
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.12,
+        0.079,
+        0.86,
+        0.954
+      ],
+      "hint": "Read only the table headed 'OFFICIAL VOTE OF SOUTH DAKOTA BY COUNTIES General Election, November 4, 1930'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1154
+      ]
+    },
+    {
+      "page": 2,
+      "id": "2-0",
+      "columns": [
+        {
+          "label": "Hildebrandt, Dem.",
+          "contest": "house2",
+          "candidate": "Fred H. Hildebrandt"
+        },
+        {
+          "label": "Royal C. Johnson, Rep.",
+          "contest": "house2",
+          "candidate": "Royal C. Johnson"
+        },
+        {
+          "label": "Eino Niva, Ind.",
+          "contest": "house2",
+          "candidate": "Einow Niva"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.133,
+        0.089,
+        0.853,
+        0.936
+      ],
+      "hint": "Read only the table headed 'Official Vote of South Dakota by Counties, General Election, November 4, 1930 \u2014 Congressman, Second District'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1015
+      ]
+    },
+    {
+      "page": 3,
+      "id": "3-0",
+      "columns": [
+        {
+          "label": "Theo. B. Werner, Dem.",
+          "contest": "house3",
+          "candidate": "Theo. B. Werner"
+        },
+        {
+          "label": "Wm. Williamson, Rep.",
+          "contest": "house3",
+          "candidate": "William Williamson"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.129,
+        0.118,
+        0.863,
+        0.954
+      ],
+      "hint": "Read only the table headed 'CONGRESSMAN Third District'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0801
+      ]
+    },
+    {
+      "page": 4,
+      "id": "4-0",
+      "columns": [
+        {
+          "label": "D. A. McCullough, Dem.",
+          "contest": "governor",
+          "candidate": "D. A. McCullough"
+        },
+        {
+          "label": "Warren E. Green, Rep.",
+          "contest": "governor",
+          "candidate": "Warren E. Green"
+        },
+        {
+          "label": "Helge Tangen, Ind.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.128,
+        0.092,
+        0.856,
+        0.921
+      ],
+      "hint": "Read only the table headed 'OFFICIAL VOTE OF SOUTH DAKOTA BY COUNTIES General Election, November 4, 1930 GOVERNOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1062
+      ]
+    }
+  ]
+}

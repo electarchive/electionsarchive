@@ -1,0 +1,204 @@
+{
+  "polity": "US-SD",
+  "publisher": "South Dakota Secretary of State",
+  "title": "Official election returns and registration figures for South Dakota, general election November 2, 1948",
+  "license": "Public record",
+  "file": {
+    "url": "https://sdsos.gov/elections-voting/assets/historicalelectiondata/1948G.pdf"
+  },
+  "raw_source": "us.scans",
+  "contests": {
+    "senate": {
+      "year": 1948,
+      "chamber": "senate",
+      "day": "1948-11-02",
+      "special": false,
+      "state": "SD",
+      "district": null
+    },
+    "house1": {
+      "year": 1948,
+      "chamber": "house",
+      "day": "1948-11-02",
+      "special": false,
+      "state": "SD",
+      "district": 1
+    },
+    "house2": {
+      "year": 1948,
+      "chamber": "house",
+      "day": "1948-11-02",
+      "special": false,
+      "state": "SD",
+      "district": 2
+    },
+    "president": {
+      "year": 1948,
+      "chamber": "president",
+      "day": "1948-11-02",
+      "special": false,
+      "state": "SD",
+      "district": null
+    },
+    "governor": {
+      "year": 1948,
+      "chamber": "governor",
+      "day": "1948-11-02",
+      "special": false,
+      "state": "SD",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 2,
+      "id": "2-0",
+      "columns": [
+        {
+          "label": "Karl E. Mundt Rep.",
+          "contest": "senate",
+          "candidate": "Karl E. Mundt"
+        },
+        {
+          "label": "John A. Engel Dem.",
+          "contest": "senate",
+          "candidate": "John A. Engel"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.148,
+        0.092,
+        0.858,
+        0.943
+      ],
+      "hint": "Read only the table headed 'UNITED STATES SENATOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0881
+      ]
+    },
+    {
+      "page": 3,
+      "id": "3-0",
+      "columns": [
+        {
+          "label": "Harold O. Lovre Rep.",
+          "contest": "house1",
+          "candidate": "Harold O. Lovre"
+        },
+        {
+          "label": "Merton B. Tice Dem.",
+          "contest": "house1",
+          "candidate": "Merton B. Tice"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.102,
+        0.088,
+        0.64,
+        0.929
+      ],
+      "hint": "Read only the table headed 'CONGRESSMEN First District'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0939
+      ]
+    },
+    {
+      "page": 3,
+      "id": "3-1",
+      "columns": [
+        {
+          "label": "Francis Case Rep.",
+          "contest": "house2",
+          "candidate": "Francis Case"
+        },
+        {
+          "label": "Jessie E. Sanders Dem.",
+          "contest": "house2",
+          "candidate": "Jessie E. Sanders"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.624,
+        0.088,
+        0.813,
+        0.929
+      ],
+      "hint": "Read only the table headed 'CONGRESSMEN Second District'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0939
+      ]
+    },
+    {
+      "page": 4,
+      "id": "4-0",
+      "columns": [
+        {
+          "label": "Republican (Dewey & Warren)",
+          "contest": "president",
+          "candidate": "Thomas E. Dewey (Republican)"
+        },
+        {
+          "label": "Democratic (Truman & Barkley)",
+          "contest": "president",
+          "candidate": "Harry S. Truman (Democratic)"
+        },
+        {
+          "label": "Independent (Wallace & Taylor)",
+          "contest": "president",
+          "candidate": "Henry Wallace (Progressive)"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.156,
+        0.088,
+        0.841,
+        0.92
+      ],
+      "hint": "Read only the table headed 'PRESIDENTIAL ELECTORS'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1226
+      ]
+    },
+    {
+      "page": 5,
+      "id": "5-0",
+      "columns": [
+        {
+          "label": "George T. Mickelson Rep.",
+          "contest": "governor",
+          "candidate": "George T. Mickelson"
+        },
+        {
+          "label": "Harold J. Volz Dem.",
+          "contest": "governor",
+          "candidate": "Harold J. Volz"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.125,
+        0.088,
+        0.814,
+        0.919
+      ],
+      "hint": "Read only the table headed 'GOVERNOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0866
+      ]
+    }
+  ]
+}

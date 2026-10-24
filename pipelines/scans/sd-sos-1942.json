@@ -1,0 +1,162 @@
+{
+  "polity": "US-SD",
+  "publisher": "South Dakota Secretary of State",
+  "title": "Official election returns and registration figures for South Dakota, general election November 3, 1942",
+  "license": "Public record",
+  "file": {
+    "url": "https://sdsos.gov/elections-voting/assets/historicalelectiondata/1942G.pdf"
+  },
+  "raw_source": "us.scans",
+  "contests": {
+    "senate": {
+      "year": 1942,
+      "chamber": "senate",
+      "day": "1942-11-03",
+      "special": false,
+      "state": "SD",
+      "district": null
+    },
+    "house1": {
+      "year": 1942,
+      "chamber": "house",
+      "day": "1942-11-03",
+      "special": false,
+      "state": "SD",
+      "district": 1
+    },
+    "house2": {
+      "year": 1942,
+      "chamber": "house",
+      "day": "1942-11-03",
+      "special": false,
+      "state": "SD",
+      "district": 2
+    },
+    "governor": {
+      "year": 1942,
+      "chamber": "governor",
+      "day": "1942-11-03",
+      "special": false,
+      "state": "SD",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 2,
+      "id": "2-0",
+      "columns": [
+        {
+          "label": "Bushfield Rep.",
+          "contest": "senate",
+          "candidate": "Harlan J. Bushfield"
+        },
+        {
+          "label": "Berry Dem.",
+          "contest": "senate",
+          "candidate": "Tom Berry"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.145,
+        0.075,
+        0.836,
+        0.907
+      ],
+      "hint": "Read only the table headed 'UNITED STATES SENATOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0697
+      ]
+    },
+    {
+      "page": 3,
+      "id": "3-0",
+      "columns": [
+        {
+          "label": "Mundt Rep.",
+          "contest": "house1",
+          "candidate": "Karl E. Mundt"
+        },
+        {
+          "label": "Hildebrandt Dem.",
+          "contest": "house1",
+          "candidate": "Fred H. Hildebrandt"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.135,
+        0.082,
+        0.828,
+        0.916
+      ],
+      "hint": "Read only the table headed 'CONGRESSMAN\u2014FIRST DISTRICT'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0731
+      ]
+    },
+    {
+      "page": 4,
+      "id": "4-0",
+      "columns": [
+        {
+          "label": "Case Rep.",
+          "contest": "house2",
+          "candidate": "Francis Case"
+        },
+        {
+          "label": "Bailey Dem.",
+          "contest": "house2",
+          "candidate": "George M. Bailey"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.132,
+        0.082,
+        0.828,
+        0.916
+      ],
+      "hint": "Read only the table headed 'CONGRESSMAN\u2014SECOND DISTRICT'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0767
+      ]
+    },
+    {
+      "page": 5,
+      "id": "5-0",
+      "columns": [
+        {
+          "label": "Sharpe Rep.",
+          "contest": "governor",
+          "candidate": "Merrell Q. Sharpe"
+        },
+        {
+          "label": "Bicknell Dem.",
+          "contest": "governor",
+          "candidate": "Lewis W. Bicknell"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.129,
+        0.076,
+        0.811,
+        0.892
+      ],
+      "hint": "Read only the table headed 'GOVERNOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0699
+      ]
+    }
+  ]
+}

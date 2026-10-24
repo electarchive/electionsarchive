@@ -1,0 +1,125 @@
+{
+  "polity": "US-SD",
+  "publisher": "South Dakota Secretary of State",
+  "title": "Official election returns and registration figures for South Dakota, general election November 5, 1946",
+  "license": "Public record",
+  "file": {
+    "url": "https://sdsos.gov/elections-voting/assets/historicalelectiondata/1946G.pdf"
+  },
+  "raw_source": "us.scans",
+  "contests": {
+    "house1": {
+      "year": 1946,
+      "chamber": "house",
+      "day": "1946-11-05",
+      "special": false,
+      "state": "SD",
+      "district": 1
+    },
+    "house2": {
+      "year": 1946,
+      "chamber": "house",
+      "day": "1946-11-05",
+      "special": false,
+      "state": "SD",
+      "district": 2
+    },
+    "governor": {
+      "year": 1946,
+      "chamber": "governor",
+      "day": "1946-11-05",
+      "special": false,
+      "state": "SD",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 2,
+      "id": "2-0",
+      "columns": [
+        {
+          "label": "Karl Mundt Rep.",
+          "contest": "house1",
+          "candidate": "Karl E. Mundt"
+        },
+        {
+          "label": "Merton B. Tice Dem.",
+          "contest": "house1",
+          "candidate": "Merton B. Tice"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.17,
+        0.082,
+        0.837,
+        0.893
+      ],
+      "hint": "Read only the table headed 'CONGRESSMAN\u2014FIRST DISTRICT'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0863
+      ]
+    },
+    {
+      "page": 3,
+      "id": "3-0",
+      "columns": [
+        {
+          "label": "Francis Case Rep.",
+          "contest": "house2",
+          "candidate": "Francis Case"
+        },
+        {
+          "label": "John P. Reinhard Dem.",
+          "contest": "house2",
+          "candidate": "John P. Reinhard"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.1,
+        0.072,
+        0.788,
+        0.912
+      ],
+      "hint": "Read only the table headed 'CONGRESSMAN\u2014SECOND DISTRICT'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0881
+      ]
+    },
+    {
+      "page": 4,
+      "id": "4-0",
+      "columns": [
+        {
+          "label": "George T. Mickelson Rep.",
+          "contest": "governor",
+          "candidate": "George T. Mickelson"
+        },
+        {
+          "label": "Richard Haeder Dem.",
+          "contest": "governor",
+          "candidate": "Richard Haeder"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.14,
+        0.089,
+        0.809,
+        0.911
+      ],
+      "hint": "Read only the table headed 'GOVERNOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0864
+      ]
+    }
+  ]
+}
