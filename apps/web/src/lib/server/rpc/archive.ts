@@ -7565,12 +7565,16 @@ async function races(
               seats: number;
               doubt: number;
             }>(sql`
-              with recursive last as (
+              with recursive same as (
+                select case when x.kind = 'local' then 'local' else 'general' end::election_kind as kind
+                from election x where x.id = ${head.election}::uuid
+              ),
+              last as (
                 select max(e.date_from) as day
                 from contest c join election e on e.id = c.election_id
                 where coalesce(c.body_id, c.office_id) = ${head.owner}::uuid
                   and c.allocation_parent_id is null and c.party_scope_id is null
-                  and e.kind = 'general' and e.date_from < ${date}::date - 120
+                  and e.kind = (select kind from same) and e.date_from < ${date}::date - 120
               ),
               roots as (
                 select c.id, not ${isInside} or ${inside(polity, sql`c.district_area_id`, sql`e.date_from`)} as inside,
@@ -7578,14 +7582,14 @@ async function races(
                 from contest c join election e on e.id = c.election_id
                 left join seat st on st.id = c.seat_id
                 where coalesce(c.body_id, c.office_id) = ${head.owner}::uuid
-                  and c.allocation_parent_id is null and c.party_scope_id is null and e.kind = 'general'
+                  and c.allocation_parent_id is null and c.party_scope_id is null and e.kind = (select kind from same)
                   and (c.term is distinct from 'remainder' or (c.seat_id is not null and not exists (
                     select from contest d where d.election_id = c.election_id and d.seat_id = c.seat_id and d.id <> c.id
                   ))) and coalesce(st.voting, true)
                   and e.date_from between (select day from last) - 200 and (select day from last)
                   and not exists (
                     select from contest pc join election pe on pe.id = pc.election_id
-                    where pc.id = c.previous_round_id and pe.kind = 'general'
+                    where pc.id = c.previous_round_id and pe.kind = (select kind from same)
                   )
               ),
               tree(id) as (

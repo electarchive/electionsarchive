@@ -319,8 +319,9 @@ export const seats = {
         last as (
           select e.date_from as day, coalesce(e.parent_id, e.id) as election
           from this t join contest c on c.body_id = t.body join election e on e.id = c.election_id
-          where e.kind = 'general' and e.status = 'held'
-            and e.date_from < t.day - case when t.kind = 'general' then 120 else 0 end
+          where e.status = 'held'
+            and ((t.kind <> 'local' and e.kind = 'general' and e.date_from < t.day - case when t.kind = 'general' then 120 else 0 end)
+              or (t.kind = 'local' and e.kind = 'local' and e.date_from <= t.day - interval '42 months'))
           order by e.date_from desc limit 1
         ),
         prev as materialized (
@@ -329,11 +330,13 @@ export const seats = {
           from contest c join election e on e.id = c.election_id
           left join boundary_set bs on bs.id = c.boundary_set_id
           where c.body_id = (select body from this)
-            and ((e.kind = 'general' and e.date_from between (select day from last) - 200 and (select day from last))
+            and ((e.kind = case when (select kind from this) = 'local' then 'local' else 'general' end::election_kind
+              and e.date_from between (select day from last) - 200 and (select day from last))
               or (e.kind = 'by_election' and (select kind from this) = 'by_election'
                 and e.date_from > (select day from last) and e.date_from < (select day from this)))
             and c.kind = 'body_seats' and c.allocation_parent_id is null and c.party_scope_id is null
-            and c.district_area_id is not null and coalesce(c.magnitude, 1) = (select magnitude from this)
+            and c.district_area_id is not null and (coalesce(c.magnitude, 1) = (select magnitude from this)
+              or ((select kind from this) = 'local' and (select magnitude from this) = 1 and c.magnitude > 1))
         ),
         paired as (
           select t.id, coalesce(s.id, g.id, n.id) as prior, coalesce(s.area, g.area, n.area) as area,
@@ -365,15 +368,23 @@ export const seats = {
           ) n on s.id is null and g.id is null
         ),
         top as materialized (
-          select rs.contest_id as contest, rs.k as set, e.date_from as day, o.id, o.k, o.party_id, coalesce(x.seats, 1) as seats
+          select rs.contest_id as contest, rs.k as set, e.date_from as day, o.id, o.k, o.party_id, coalesce(x.seats, 1) as seats, v.votes
           from result_set rs
           join outcome x on x.result_set_id = rs.id and x.kind in ('elected', 'won') and x.candidacy_id is null
           join contest_option o on o.id = x.option_id
           join election e on e.id = rs.election_id
+          left join lateral (
+            select max(y.value) as votes from contest kc join area ka on ka.id = kc.district_area_id
+            cross join lateral (
+              select y.value from result_rollup y
+              where y.result_set_k = rs.k and y.area_k = ka.k and y.option_k = o.k and y.measure = 1 and y.count_round = 0 offset 0
+            ) y
+            where kc.id = rs.contest_id
+          ) v on true
           where rs.is_default and rs.contest_id in (select id from paired union select prior from paired)
         ),
         won as (
-          select distinct on (t.contest, t.k) t.contest, t.k, t.seats,
+          select distinct on (t.contest, t.k) t.contest, t.k, t.seats, t.votes,
             coalesce(bm.into_id, br.parent_party_id, pm.into_id, lp.party)::text as party,
             cy.person_id::text as person
           from top t
@@ -395,7 +406,11 @@ export const seats = {
         )
         select p.basis, p.prior, p.area, p.day::text as since, (select day::text from this) as day, (select "isUs" from this) as "isUs",
           array(select coalesce(x.party, 'person:' || x.person) from won x cross join generate_series(1, x.seats) where x.contest = p.id order by x.k) as now,
-          array(select coalesce(x.party, 'person:' || x.person) from won x cross join generate_series(1, x.seats) where x.contest = p.prior order by x.k) as before,
+          array(
+            select coalesce(x.party, 'person:' || x.person) from won x cross join generate_series(1, x.seats) where x.contest = p.prior
+            order by case when pc.magnitude > (select magnitude from this) then x.votes end desc nulls last, x.k
+            limit case when pc.magnitude > (select magnitude from this) then (select magnitude from this) end
+          ) as before,
           (select n.text from alliance a
             join alliance_member x on x.alliance_id = a.id and x.party_id::text = w.party
             join alliance_member y on y.alliance_id = a.id and y.party_id::text = b.party
@@ -407,6 +422,7 @@ export const seats = {
             ) order by n.recorded_from desc, n.id limit 1) as alliance,
           v.person as member, v.via
         from paired p
+        join contest pc on pc.id = p.prior
         left join lateral (
           select coalesce(
             (select coalesce(m.into_id, t.person_id)::text from tenure t left join entity_merge m on m.entity_id = t.person_id
