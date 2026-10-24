@@ -1,7 +1,8 @@
 import json
 import re
+import subprocess
 from collections import Counter, defaultdict
-from datetime import date
+from datetime import UTC, date, datetime
 from pathlib import Path
 from urllib.parse import urlencode
 from uuid import UUID
@@ -52,6 +53,22 @@ RI_PARTIES = {"DEM": "DEMOCRAT", "REP": "REPUBLICAN", "Ind": "INDEPENDENT"}
 SUFFOLK = "https://apps2.suffolkcountyny.gov/boe/eleres/24ge/sd.htm"
 SUFFOLK_PUBLISHER = "Suffolk County Board of Elections"
 SUFFOLK_TITLE = "General election results, November 5, 2024: New York State Senate"
+PIMA = "https://apps.azsos.gov/election/2024/ge/canvass/202411GeneralElectionCanvass-Pima.pdf"
+AZ_CANVASS = "https://apps.azsos.gov/election/2024/ge/canvass/20241105_GeneralCanvass_Signed.pdf"
+PIMA_PUBLISHER = "Pima County Elections"
+PIMA_TITLE = "Official canvass, General Election, November 5, 2024"
+AZ_PARTIES = {
+    "NANCY GUTIERREZ": "DEMOCRAT",
+    "CHRIS MATHIS": "DEMOCRAT",
+    'LEONARD "LEN" ROSENBLUM': "REPUBLICAN",
+    "ALMA HERNANDEZ": "DEMOCRAT",
+    "BETTY VILLEGAS": "DEMOCRAT",
+}
+PIMA_NOTE = (
+    "Votes are from Pima County's official canvass and parties from the Secretary of State's signed statewide "
+    "canvass. The site answers scripts with a bot challenge, so a person saved both PDFs in a browser on "
+    "October 23, 2026."
+)
 NY_PUBLISHER = "New York State Board of Elections"
 NY_TITLE = "Election results, Member of Assembly, 2024"
 WA_PUBLISHER = "Washington Secretary of State"
@@ -120,6 +137,18 @@ def fetch() -> None:
     raw.fetch(SOURCE, NEW_YORK, suffix=".csv")
     raw.fetch(SOURCE, RHODE_ISLAND, suffix=".csv")
     raw.fetch(SOURCE, SUFFOLK, suffix=".htm")
+    for url in (PIMA, AZ_CANVASS):
+        try:
+            raw.cached(SOURCE, url)
+        except LookupError:
+            raw.store(
+                SOURCE,
+                url,
+                (DATA / "inbox" / "manual" / "MF-037" / url.rsplit("/", 1)[1]).read_bytes(),
+                suffix=".pdf",
+                retrieved_at=datetime(2026, 10, 23, tzinfo=UTC),
+                media_type="application/pdf",
+            )
 
 
 def _district(state: str, text: str) -> tuple[str, str | None]:
@@ -445,6 +474,45 @@ def parse() -> None:
     )
     if suffolk.select("code").n_unique() != 4:
         raise ValueError(f"Suffolk: {suffolk['code'].unique().to_list()} of State Senate districts 1-4")
+    text = subprocess.run(
+        ["pdftotext", "-layout", "-f", "154", "-l", "155", str(raw.cached(SOURCE, PIMA).path), "-"],
+        check=True,
+        capture_output=True,
+        text=True,
+    ).stdout
+    rows = []
+    for district, section in re.findall(
+        r"State Representative Dist\. (18|20)\nVote For 2\n(.*?)Total Votes Cast", text, re.DOTALL
+    ):
+        for name, votes in re.findall(r"^(\S.*?)\s{2,}([\d,]+)\s", section, re.MULTILINE):
+            pooled = name == "Write-In Totals"
+            surname, _, given = name.partition(", ")
+            rows.append((district, "WRITE-IN" if pooled else f"{given} {surname}", pooled, int(votes.replace(",", ""))))
+    pima = pl.DataFrame(
+        rows,
+        schema={"code": pl.String, "candidate": pl.String, "pooled": pl.Boolean, "votes": pl.Int64},
+        orient="row",
+    ).select(
+        state_po=pl.lit("AZ"),
+        office=pl.lit("STATE HOUSE"),
+        district=pl.col("code").str.zfill(3),
+        special=pl.lit("FALSE"),
+        candidate="candidate",
+        party_detailed=pl.col("candidate").replace_strict(AZ_PARTIES, default=None),
+        pooled="pooled",
+        votes="votes",
+        masked=pl.lit(False),
+        magnitude=pl.lit(2, pl.Int32),
+        state_fips=pl.lit("04"),
+        code="code",
+        post=pl.lit(None, pl.String),
+    )
+    if set(pima.filter(~pl.col("pooled"))["candidate"]) != set(AZ_PARTIES) or pima["pooled"].sum() != 2:
+        raise ValueError(f"Pima: {pima['candidate'].to_list()}")
+    if lines.filter(
+        pl.col("state_po") == "AZ", pl.col("office") == "STATE HOUSE", pl.col("code").is_in(["18", "20"])
+    ).height:
+        raise ValueError("MEDSL now holds AZ House 18 or 20")
     PARSED.mkdir(parents=True, exist_ok=True)
     pl.concat(
         [
@@ -454,6 +522,7 @@ def parse() -> None:
             new_york.with_columns(origin=pl.lit("ny")),
             rhode_island.with_columns(origin=pl.lit("ri")),
             suffolk.with_columns(origin=pl.lit("suffolk")),
+            pima.with_columns(origin=pl.lit("pima")),
         ]
     ).sort(
         "state_po",
@@ -604,6 +673,18 @@ def emit() -> Path:
             license="Public record",
         )
         cs.artifact(raw.cached(SOURCE, SUFFOLK), county)
+        pima = cs.source(PIMA_PUBLISHER, PIMA_TITLE)
+        cs.add(
+            "source",
+            id=pima,
+            kind="official_body",
+            publisher=PIMA_PUBLISHER,
+            title=PIMA_TITLE,
+            url="https://azsos.gov/elections/results-data",
+            license="Public record",
+        )
+        cs.artifact(raw.cached(SOURCE, PIMA), pima)
+        cs.artifact(raw.cached(SOURCE, AZ_CANVASS), pima)
         sources = {
             "medsl": source,
             "wa": secretary,
@@ -611,6 +692,7 @@ def emit() -> Path:
             "ny": board,
             "ri": rhode,
             "suffolk": county,
+            "pima": pima,
         }
         fptp, block = cs.key("us.electoral_system", "fptp"), cs.key("us.electoral_system", "block")
         irv = cs.key("us.electoral_system", "irv")
@@ -757,6 +839,8 @@ def emit() -> Path:
             )
             if group["masked"].any():
                 cs.add("note", entity_id=contest, kind="caveat", body_md=MASKED)
+            if group["origin"][0] == "pima":
+                cs.add("note", entity_id=contest, kind="methodology", body_md=PIMA_NOTE)
             if state == "AK":
                 cs.add(
                     "note", entity_id=contest, kind="caveat", body_md=MEDSL if contest_key in RANKED_ROUNDS else RANKED
