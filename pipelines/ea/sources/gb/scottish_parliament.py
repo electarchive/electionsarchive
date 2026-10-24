@@ -177,6 +177,7 @@ PARTY_KEYS = {
     "ukip": "uk-independence-party",
     "scottish workers party of britain": "workers-party-of-britain",
     "british unionist party and abolish the scottish parliament party": "british-unionist-party",
+    "edinburgh & east lothian people": "edinburgh-and-east-lothian-people",
 }
 AMS = (
     "The additional member system elects 73 members from single-member constituencies by first past the post and "
@@ -809,6 +810,12 @@ def emit() -> Path:
                         name(parties[key], umit.NAMES.get(key, label))
             return parties[key]
 
+        duplicate = conn.execute(
+            "select entity_id from external_id where scheme = 'gb.party' and value = 'edinburgh-east-lothian-people'"
+        ).fetchone()
+        if duplicate is not None:
+            cs.merge(duplicate[0], party_of("Edinburgh and East Lothian People"))
+
         starts = sorted(set(ERAS.values()))
         ends = dict(itertools.pairwise(starts))
         region_areas: dict[tuple[int, str], UUID] = {}
@@ -1127,6 +1134,17 @@ def emit() -> Path:
                 )
                 if list_source is None:
                     cs.add("note", entity_id=result_set, kind="caveat", body_md=NO_LIST_VOTES)
+                else:
+                    for note in conn.execute(
+                        "select id from note where entity_id = %s and body_md = %s", [result_set, NO_LIST_VOTES]
+                    ).fetchall():
+                        cs.add(
+                            "note_drop",
+                            note_id=note[0],
+                            entity_id=result_set,
+                            body_md=NO_LIST_VOTES,
+                            reason="the regional list votes by party are now loaded",
+                        )
                 if year in (1999, 2003, 2007):
                     cs.add("note", entity_id=result_set, kind="caveat", body_md=HISTORY_LISTS)
                     for note, text in conn.execute(
@@ -1150,7 +1168,9 @@ def emit() -> Path:
                         and " - " not in source_label.split(",")[0]
                     )
                     other = source_label in ("Others", "Ind", "IND")
-                    independent = source_label.startswith(("Independent", "Margo", "MP for", "MSP for"))
+                    independent = source_label.startswith(("Independent", "Margo", "MP for", "MSP for")) and not source_label.upper().startswith(
+                        "INDEPENDENT GREEN"
+                    )
                     if individual:
                         surname, forename = source_label.split(", ", 1)
                         full = f"{forename} {surname.title()}"
@@ -1162,6 +1182,7 @@ def emit() -> Path:
                             .replace("Uk Independence", "UK Independence")
                             .replace("Reform Uk", "Reform UK")
                             .replace("Advance Uk", "Advance UK")
+                            .replace("’S", "’s")
                         )
                     else:
                         full = expansions.get(source_label, source_label)

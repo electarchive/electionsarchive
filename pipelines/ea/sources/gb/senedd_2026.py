@@ -286,7 +286,9 @@ def emit() -> Path:
                 )
                 if row["seats"] > 0:
                     cs.add("outcome", result_set_id=result_set, option_id=option, kind="won", seats=row["seats"])
-            for member in block["members"]:
+            ranks: dict[str, int] = {}
+            for member in sorted(block["members"], key=lambda member: member["position"]):
+                ranks[member["party"]] = ranks.get(member["party"], 0) + 1
                 option = cs.key("gb.option", f"{contest_key}:{slug(member['party'])}")
                 found = known.get(fold(member["name"]), [])
                 person = found[0] if len(found) == 1 else cs.key(f"{SOURCE}.person", f"{contest_key}:{slug(member['name'])}")
@@ -294,16 +296,18 @@ def emit() -> Path:
                     cs.add("person", id=person)
                     name(person, member["name"])
                 member_key = f"{contest_key}:{slug(member['name'])}"
+                candidacy = cs.key("gb.candidacy", member_key)
                 cs.add(
                     "candidacy",
-                    id=cs.key("gb.candidacy", member_key),
+                    id=candidacy,
                     person_id=person,
                     option_id=option,
                     role="list_member",
                     ballot_name=member["name"],
-                    list_position=member["position"],
+                    list_position=ranks[member["party"]],
                     is_independent=False,
                 )
+                cs.add("outcome", result_set_id=result_set, option_id=option, candidacy_id=candidacy, kind="elected")
                 tenure = cs.key(f"{SOURCE}.tenure", member_key)
                 cs.add(
                     "tenure",
