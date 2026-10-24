@@ -85,7 +85,7 @@ def build(item: str, years: list[int], manual: bool = False) -> str:
                 clusters.append([leaf])
         biggest = max(clusters, key=lambda cluster: (len(cluster), cluster[0]))
         first, last = biggest[0], biggest[-1]
-        first = min(first, last - 7)
+        first = min(first, last - 7) - manual
         spec = {
             "year": year,
             "day": day_of(year),

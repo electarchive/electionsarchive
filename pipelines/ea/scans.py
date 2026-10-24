@@ -24,6 +24,7 @@ import httpx
 import polars as pl
 from anthropic.types import ImageBlockParam, TextBlockParam
 from anthropic.types.message_create_params import MessageCreateParamsNonStreaming
+from anthropic.types.messages import MessageBatchIndividualResponse
 from anthropic.types.messages.batch_create_params import Request
 from PIL import Image
 from psycopg import Connection
@@ -781,7 +782,12 @@ def collect(reader: str, state: dict[str, dict[str, list[Batch]]]) -> str:
             continue
         books = ledger()
         spent = 0.0
-        for result in api.messages.batches.results(batch["id"]):
+        for line in api.get(
+            f"/v1/messages/batches/{batch['id']}/results",
+            cast_to=str,
+            options={"headers": {"Accept": "application/binary"}},
+        ).splitlines():
+            result = MessageBatchIndividualResponse.model_validate_json(line)
             if result.result.type == "succeeded":
                 spent += dollars(result.result.message, 1.0)
                 keep(batch["keys"][result.custom_id], result.result.message)
@@ -876,7 +882,14 @@ def reconcile() -> str:
         books["pending"].pop(batch_id)
         spent = sum(
             dollars(result.result.message, 1.0)
-            for result in api.messages.batches.results(batch_id)
+            for result in (
+                MessageBatchIndividualResponse.model_validate_json(line)
+                for line in api.get(
+                    f"/v1/messages/batches/{batch_id}/results",
+                    cast_to=str,
+                    options={"headers": {"Accept": "application/binary"}},
+                ).splitlines()
+            )
             if result.result.type == "succeeded"
         )
         if spent:
