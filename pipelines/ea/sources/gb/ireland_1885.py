@@ -9,11 +9,12 @@ import polars as pl
 
 from ea import raw
 from ea.changeset import Changeset
+from ea.sources.gb import ireland_1918
 from ea.sources.gb.umit import fold
 from ea.store import DATA, connect
 
 SOURCE = "gb.ireland_1885"
-VERSION = "1"
+VERSION = "2"
 PARSED = DATA / "parsed" / SOURCE
 SERVICES = "https://services-eu1.arcgis.com/FH5XCsx8rYXqnjF5/arcgis/rest/services"
 LAYERS = {
@@ -27,12 +28,12 @@ STATUTE = "https://archive.org/details/india.history.resource.106075"
 ELECTION = date(1885, 11, 24)
 REDISTRIBUTION = date(1918, 12, 14)
 TOLERANCE = 50
-DUBLIN_CENTER = (-6.2592, 53.3472)
-DUBLIN = {
-    "NW": "dublin-college-green",
-    "NE": "dublin-harbour",
-    "SE": "dublin-st-stephen-s-green",
-    "SW": "dublin-st-patrick-s",
+WARDS = {
+    "dublin-college-green": ("ARRAN QUAY", "INNS QUAY", "NORTH CITY", "ROTUNDA B"),
+    "dublin-harbour": ("MOUNTJOY", "NORTH DOCK", "ROTUNDA A"),
+    "dublin-st-stephen-s-green": ("MANSION HOUSE", "ROYAL EXCHANGE", "SAINT KEVIN", "SOUTH DOCK"),
+    "dublin-st-patrick-s": ("MERCHANTS QUAY", "USHERS", "WOOD QUAY"),
+    "south-county-dublin": ("RATHMINES", "PEMBROKE", "TERENURE"),
 }
 CITIES = {
     "CORK": "cork-city",
@@ -685,8 +686,12 @@ NOTES = (
     "statutory baronies, civil parishes, and townlands as the Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23), "
     "Seventh Schedule, Part III, defines each division. The barony, parish, and townland lines are today's statutory "
     "ones. Each county's city seat (Cork, Galway, Kilkenny, Limerick, and Waterford, which also takes the barony of "
-    "Kilculliheen) is the rest of its county, and Dublin's four divisions, which the Act defines by municipal wards, "
-    "are the rest of County Dublin cut into quarters at the Liffey and Sackville Street."
+    "Kilculliheen) is the rest of its county. Dublin's four divisions, which the Act defines by municipal wards, are "
+    "built from Tailte Éireann's Dublin electoral divisions by the ward names they still carry (Arran Quay, Inns Quay, "
+    "Mansion House, Merchants' Quay, Mountjoy, North City, North Dock, Rotunda, Royal Exchange, South Dock, Usher's "
+    "Quay, and Wood Quay); the rest of today's city, which lay outside the 1885 borough, returns to South County Dublin "
+    "where it was the Rathmines and Pembroke townships and otherwise to North County Dublin, which held the rest of Uppercross. Fitzwilliam, South City, "
+    "and Trinity wards and the Ringsend and Beggar's Bush additions have no electoral division of their own."
 )
 
 
@@ -957,20 +962,29 @@ def parse() -> None:
             conn.execute(
                 "insert into division select %s, %s, geom from rest where county = %s", [division, county, county]
             )
+        conn.execute("create temp table ed (name text, division text, geojson text) on commit drop")
+        with conn.cursor() as cursor, cursor.copy("copy ed from stdin") as copy:
+            for feature in json.loads(raw.cached(ireland_1918.SOURCE, ireland_1918.DIVISIONS).path.read_text())[
+                "features"
+            ]:
+                name = feature["properties"]["ENGLISH"].upper()
+                ward = next((division for division, prefixes in WARDS.items() if name.startswith(prefixes)), None)
+                copy.write_row((name, ward, json.dumps(feature["geometry"])))
         conn.execute(
-            """insert into division
-               select %(quarters)s::jsonb ->> (case when st_y(st_pointonsurface(q.geom)) >= y then 'N' else 'S' end
-                                            || case when st_x(st_pointonsurface(q.geom)) >= x then 'E' else 'W' end),
-                      'DUBLIN', q.geom
-               from rest r,
-                    lateral (select st_x(c) as x, st_y(c) as y
-                             from st_transform(st_setsrid(st_point(%(lon)s, %(lat)s), 4326), 2157) c) center,
-                    lateral (select st_intersection(r.geom, st_makeenvelope(x0, y0, x0 + 40000, y0 + 40000, 2157)) as geom
-                             from (values (center.x - 40000, center.y - 40000), (center.x, center.y - 40000),
-                                          (center.x - 40000, center.y), (center.x, center.y)) corner(x0, y0)) q
-               where r.county = 'DUBLIN' and not st_isempty(q.geom)""",
-            {"quarters": json.dumps(DUBLIN), "lon": DUBLIN_CENTER[0], "lat": DUBLIN_CENTER[1]},
+            """create temp table ward on commit drop as
+               select coalesce(e.division, 'north-county-dublin') as division,
+                      st_multi(st_collectionextract(st_intersection(r.geom, g.geom), 3)) as geom
+               from rest r, ed e,
+                    lateral (select st_makevalid(st_setsrid(st_force2d(st_geomfromgeojson(e.geojson)), 2157)) as geom) g
+               where r.county = 'DUBLIN' and st_intersects(r.geom, g.geom)"""
         )
+        conn.execute(
+            """insert into ward
+               select (select w.division from ward w order by w.geom <-> part.geom limit 1), part.geom
+               from rest r, lateral st_dump(st_difference(r.geom, (select st_union(geom) from ward))) part
+               where r.county = 'DUBLIN' and st_area(part.geom) > 0"""
+        )
+        conn.execute("insert into division select division, 'DUBLIN', geom from ward where not st_isempty(geom)")
         conn.execute(
             """insert into division
                select (select d.division from division d where d.county ilike r.county
@@ -1039,6 +1053,7 @@ def emit() -> Path:
                 cs.artifact(raw.cached(SOURCE, url), source)
         for url in [*townland_pages(), *townland_geometry_urls()]:
             cs.artifact(raw.cached(SOURCE, url), source)
+        cs.artifact(raw.cached(ireland_1918.SOURCE, ireland_1918.DIVISIONS), source)
         for division, geom, point in frame.rows():
             area, start, end = areas[division]
             cs.add(
