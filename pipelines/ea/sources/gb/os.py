@@ -14,7 +14,7 @@ from ea.changeset import Changeset
 from ea.store import DATA, connect
 
 SOURCE = "gb.os"
-VERSION = "1"
+VERSION = "2"
 PARSED = DATA / "parsed" / SOURCE
 HISTORIC = (
     "https://1897589978-files.gitbook.io/~/files/v0/b/gitbook-x-prod.appspot.com/o/spaces%2FcNpJpLP8RROUaWVQo5ea"
@@ -28,6 +28,10 @@ ULSTER = (
     "?where=1%3D1&outFields=*&outSR=4326&f=geojson"
 )
 IRELAND = "https://data-osi.opendata.arcgis.com/api/download/v1/items/dc24df2a5ce84ee9a38d9afe8431ee9b/geojson?layers=1"
+RCAHMW = (
+    "https://datamap.gov.wales/geoserver/ows?service=WFS&version=2.0.0&request=GetFeature"
+    "&typeName=geonode:parliamentary_boundaries_bng_rcahmw_ply&outputFormat=application/json"
+)
 GEONAMES = tuple(f"https://download.geonames.org/export/dump/{country}.zip" for country in ("GB", "IE"))
 OGL = ("Open Government Licence v3.0", "https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/")
 CC_BY = ("CC BY 4.0", "https://creativecommons.org/licenses/by/4.0/")
@@ -56,6 +60,17 @@ SOURCES = {
         "© Tailte Éireann",
         "official_body",
     ),
+    RCAHMW: (
+        "Royal Commission on the Ancient and Historical Monuments of Wales",
+        "Historic Parliamentary Boundaries of Wales",
+        "https://datamap.gov.wales/layers/geonode:parliamentary_boundaries_bng_rcahmw_ply",
+        *OGL,
+        (
+            "© Royal Commission on the Ancient and Historical Monuments of Wales, licensed under the Open Government "
+            "Licence v3.0"
+        ),
+        "official_body",
+    ),
     GEONAMES[0]: (
         "GeoNames",
         "GeoNames gazetteer: GB and IE",
@@ -64,6 +79,18 @@ SOURCES = {
         "GeoNames",
         "aggregator",
     ),
+}
+CONTRIBUTORY = {
+    "Caernarvon Boroughs": ("Carnarvon", "Bangor", "Conway", "Criccieth", "Nevin", "Pwllheli"),
+    "Cardiff": ("Cardiff", "Cowbridge", "Llantrisant"),
+    "Carmarthen Boroughs": ("Carmarthen", "Llanelli"),
+    "Denbigh Boroughs": ("Denbigh", "Holt", "Ruthin", "Wrexham"),
+    "Flint Boroughs": ("Flint", "Caergwrle", "Caerwys", "Holywell", "Mold", "Overton", "Rhuddlan", "St Asaph"),
+    "Haverfordwest": ("Haverford West", "Fishguard", "Narberth"),
+    "Merthyr Tydfil": ("Merthyr Tydfil",),
+    "Monmouth Boroughs": ("Monmouth", "Newport", "Usk"),
+    "Pembroke Boroughs": ("Pembroke", "Tenby", "Milford", "Wiston"),
+    "Swansea District": ("Swansea", "Aberavan", "Kenfig", "Loughor", "Neath"),
 }
 IRISH = {
     "Antrim": "ANTRIM",
@@ -320,6 +347,7 @@ def fetch() -> None:
     raw.fetch(SOURCE, HISTORIC, suffix=".zip")
     raw.fetch(SOURCE, ULSTER, suffix=".geojson")
     raw.fetch(SOURCE, IRELAND, suffix=".geojson")
+    raw.fetch(SOURCE, RCAHMW, suffix=".geojson")
     for url in GEONAMES:
         raw.fetch(SOURCE, url, suffix=".zip")
 
@@ -354,7 +382,8 @@ def parse() -> None:
     with connect() as conn:
         seats = conn.execute(
             """select c.code, n.text from area a join area_code c on c.area_id = a.id
-               join name n on n.entity_id = a.id and n.is_preferred where a.scheme_code = 'gb.pcon'"""
+               join name n on n.entity_id = a.id and n.is_preferred
+               where a.scheme_code = 'gb.pcon' and c.code ~ '^[0-9]+$'"""
         ).fetchall()
         known = {part for part, *_ in parts} | {"Isle of Wight"}
         divisions = []
@@ -437,6 +466,22 @@ def parse() -> None:
                                  'SRID=3035;POLYGON EMPTY'::geometry)), 3))
                from located l join part c on c.part = l.part where l.city"""
         )
+        seat = {borough: name for name, boroughs in CONTRIBUTORY.items() for borough in boroughs}
+        features = json.loads(raw.cached(SOURCE, RCAHMW).path.read_bytes())["features"]
+        if missing := set(seat) - {feature["properties"]["Parliament"] for feature in features}:
+            raise ValueError(f"no RCAHMW borough for {sorted(missing)}")
+        conn.execute("create temp table contributory (code text, geojson text) on commit drop")
+        with conn.cursor() as cursor, cursor.copy("copy contributory from stdin") as copy:
+            for feature in features:
+                if (name := seat.get(feature["properties"]["Parliament"])) is not None:
+                    copy.write_row((codes[name], json.dumps(feature["geometry"])))
+        conn.execute(
+            """update town set geom = r.geom
+               from (select code, st_multi(st_collectionextract(st_makevalid(st_union(st_makevalid(st_transform(
+                       st_setsrid(st_force2d(st_geomfromgeojson(geojson)), 27700), 3035)))), 3)) as geom
+                     from contributory group by code) r
+               where town.code = r.code"""
+        )
         conn.execute("create temp table division (code text, county text, dx float, dy float) on commit drop")
         with conn.cursor() as cursor, cursor.copy("copy division from stdin") as copy:
             for row in divisions:
@@ -459,7 +504,9 @@ def parse() -> None:
         )
         rows = conn.execute(
             """with shapes as (
-                 select code, 'borough' as kind, geom from town
+                 select code, case when code in (select code from contributory) then 'rcahmw' else 'borough' end as kind,
+                        geom
+                 from town
                  union all
                  select s.code, 'division', case when (select count(*) from seed o where o.county = s.county) = 1
                    then c.geom
@@ -491,7 +538,9 @@ def parse() -> None:
         schema={"layer": pl.String, "code": pl.String, "kind": pl.String, "geom": pl.String, "label_point": pl.String},
         orient="row",
     ).with_columns(
-        pl.when(pl.col("kind") == "borough")
+        pl.when(pl.col("kind") == "rcahmw")
+        .then(pl.lit(RCAHMW))
+        .when(pl.col("kind") == "borough")
         .then(pl.lit(GEONAMES[0]))
         .when(pl.col("layer") == "nation")
         .then(pl.lit(HISTORIC))
@@ -514,8 +563,9 @@ def emit() -> Path:
             pipeline=SOURCE,
             version=VERSION,
             summary=(
-                "Synthetic shapes for the 1868 constituencies: county divisions split from Ordnance Survey's historic "
-                "counties and OSNI's and Tailte Éireann's Irish counties, and boroughs drawn around their GeoNames towns"
+                "Shapes for the 1868 constituencies: synthetic county divisions split from Ordnance Survey's historic "
+                "counties and OSNI's and Tailte Éireann's Irish counties, boroughs drawn around their GeoNames towns, "
+                "and ten Welsh districts of boroughs from RCAHMW's historic parliamentary boundaries"
             ),
             polity="GB",
         )
@@ -551,7 +601,7 @@ def emit() -> Path:
                 valid_to_precision="day",
                 geom=geom,
                 label_point=point,
-                quality="synthetic",
+                quality="digitized" if source == RCAHMW else "synthetic",
                 source_id=sources[source],
             )
         existing = conn.execute(
