@@ -5,6 +5,8 @@ from pathlib import Path
 from urllib.parse import urlencode
 from uuid import UUID
 
+import fastexcel
+
 from ea import raw
 from ea.changeset import Changeset
 from ea.sources.gb.tenures import ENDED
@@ -17,6 +19,11 @@ PAST = "https://www.gov.uk/government/history/past-prime-ministers"
 PAST_TITLE = "Past Prime Ministers"
 WIKIDATA_TITLE = "Prime Ministers (P39 Q14211) and Speakers of the House of Commons (P39 Q464103)"
 OGL = "https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/"
+LIBRARY = (
+    "https://web.archive.org/web/20230611142410if_/"
+    "https://researchbriefings.files.parliament.uk/documents/CBP-7529/general-elections-and-governments.xlsx"
+)
+LIBRARY_TITLE = "General elections and governments (CBP-7529)"
 
 
 def query(position: str) -> str:
@@ -62,6 +69,7 @@ def fetch() -> None:
     raw.fetch(SOURCE, PAST, suffix=".html")
     raw.fetch(SOURCE, SPEAKERS, suffix=".json")
     raw.fetch(SOURCE, PRIME_MINISTERS, suffix=".json")
+    raw.fetch(SOURCE, LIBRARY, suffix=".xlsx")
 
 
 def emit() -> Path:
@@ -73,6 +81,12 @@ def emit() -> Path:
         for first, last in re.findall(r"(\d{4}) to (\d{4})", rest.partition("</ul>")[0]):
             listed.append((who, int(first), int(last)))
     wikidata = terms(PRIME_MINISTERS)
+    library = raw.cached(SOURCE, LIBRARY)
+    served = [
+        (words(str(row[0])), int(float(row[1])))
+        for row in fastexcel.read_excel(library.path).load_sheet("2. PMs", header_row=1).to_polars().rows()
+        if row[0] is not None and row[1] is not None
+    ]
     with connect() as conn:
         cs = Changeset(
             conn,
@@ -106,6 +120,20 @@ def emit() -> Path:
             license="CC0 1.0",
             license_url="https://creativecommons.org/publicdomain/zero/1.0/",
         )
+        commons_library = cs.source("House of Commons Library", LIBRARY_TITLE)
+        cs.add(
+            "source",
+            id=commons_library,
+            kind="official_body",
+            publisher="House of Commons Library",
+            title=LIBRARY_TITLE,
+            url="https://commonslibrary.parliament.uk/research-briefings/cbp-7529/",
+            license="Open Parliament Licence v3.0",
+            license_url="https://www.parliament.uk/site-information/copyright-parliament/open-parliament-licence/",
+            notes="Its days in office settle a Prime Minister's term where Wikidata gives two end dates. Read through the "
+            "Internet Archive's copy of the workbook, since the Library's file host refuses scripts.",
+        )
+        cs.artifact(library, commons_library)
         cs.artifact(raw.cached(SOURCE, PRIME_MINISTERS), source)
         cs.artifact(raw.cached(SOURCE, SPEAKERS), source)
         commons = cs.key("gb.body", "house-of-commons")
@@ -142,6 +170,12 @@ def emit() -> Path:
                 raise ValueError(f"{who} {first}–{last}: Wikidata gives {sorted(items) or 'no one'}")
             item = items.pop()
             spans = {(term[2], term[3]) for term in found}
+            if len(spans) > 1:
+                spans = {
+                    (start, end)
+                    for start, end in spans
+                    if any(days == (end - start).days and name & words(who) for name, days in served)
+                }
             if len(spans) == 1:
                 (start, end), precision = spans.pop(), "day"
                 dated += 1

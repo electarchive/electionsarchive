@@ -107,6 +107,7 @@ DECLARED = {
     ("1945-07-05", "eng-oxford-university"): ("Herbert, Alan Patrick", "Salter, James Arthur"),
     ("1945-07-05", "sct-combined-scottish-universities"): ("Anderson, John", "Kerr, John Graham", "Orr, John Boyd"),
 }
+NAMESAKES = (("eng-tamworth", "Peel, Robert", 1832, 1847, "@1788"),)
 ALLIANCE = (
     ("1983-06-09", "eng-truro", "Penhaligon, David", "Liberal"),
     ("1987-06-11", "eng-truro", "Taylor, Matthew", "Liberal"),
@@ -444,6 +445,13 @@ def parse() -> None:
         member=pl.when(pl.col("suffix") == 0).then("member"),
         suffix=pl.when(pl.col("suffix") > 0).then(pl.format("~{}", pl.col("suffix") + 1)).otherwise(pl.lit("")),
     )
+    for unit, candidate, first, last, mark in NAMESAKES:
+        chosen = (pl.col("unit") == unit) & (pl.col("candidate") == candidate) & pl.col("year").is_between(first, last)
+        if frame.filter(chosen).height == 0:
+            raise ValueError(f"{candidate} does not stand in {unit} from {first} to {last}")
+        frame = frame.with_columns(
+            suffix=pl.when(chosen).then(pl.concat_str("suffix", pl.lit(mark))).otherwise("suffix")
+        )
     registers = library()
     found: dict[tuple[date, str], int] = {}
     contests = frame.group_by("date_start", "year", "unit").agg(pl.col("constituency").first())
@@ -811,6 +819,7 @@ def emit() -> Path:
 
         spans: dict[tuple[str, UUID], list[date]] = {}
         persons: dict[str, UUID] = {}
+        restaged: set[UUID] = set()
         for (start, end, label, year), held in rows.group_by(
             "date_start", "date_end", "election", "year", maintain_order=True
         ):
@@ -979,7 +988,12 @@ def emit() -> Path:
                             persons[identity] in named and persons[identity] not in survivors
                         ):
                             name(persons[identity], full)
-                        for id, text in named.get(persons[identity], []):
+                        if persons[identity] in restaged or persons[identity] in survivors:
+                            stale = []
+                        else:
+                            stale = named.get(persons[identity], [])
+                            restaged.add(persons[identity])
+                        for id, text in stale:
                             if text != full:
                                 cs.add(
                                     "name",

@@ -48,6 +48,8 @@ PEOPLE = {
             "sct-leith-burghs",
         )
     ),
+    "Q181875": ("eng-tamworth:peel-robert@1788",),
+    "Q193656": ("eng-south-hampshire:temple-henry-john", "eng-tiverton:temple-henry-john"),
     "Q82006": tuple(
         f"{unit}:disraeli-benjamin"
         for unit in ("eng-wycombe", "eng-maidstone", "eng-shrewsbury", "eng-buckinghamshire")
