@@ -149,7 +149,7 @@ export const seats = {
         ),
         won as (
           select distinct on (t.contest, t.k) t.contest, t.k,
-            coalesce(bm.into_id, br.parent_party_id, lin.party, pm.into_id, lp.party)::text as party,
+            coalesce(bm.into_id, br.parent_party_id, lin.party, sp.party, pm.into_id, lp.party)::text as party,
             cy.person_id::text as person
           from top t
           cross join lateral (
@@ -180,6 +180,23 @@ export const seats = {
               and d.old not in (select x.party_id from top x where x.contest in (select id from paired) and x.party_id is not null)
             limit 1
           ) lin on true
+          left join lateral (
+            select coalesce(xm.into_id, xo.party_id) as party
+            from candidacy xc
+            join contest_option xo on xo.id = xc.option_id
+            join contest xk on xk.id = xo.contest_id
+            join election xe on xe.id = xk.election_id
+            left join entity_merge xm on xm.entity_id = xo.party_id
+            join party xp on xp.id = coalesce(xm.into_id, xo.party_id)
+            where t.contest in (select prior from paired)
+              and exists (
+                select from party sx join name sn on sn.entity_id = sx.id and sn.text = 'Speaker'
+                where sx.kind = 'independent_group' and sx.id = coalesce(pm.into_id, lp.party)
+              )
+              and xc.person_id = cy.person_id and xe.date_from < t.day
+              and not (xp.kind = 'independent_group' and exists (select from name sn where sn.entity_id = xp.id and sn.text = 'Speaker'))
+            order by xe.date_from desc limit 1
+          ) sp on true
           order by t.contest, t.k
         )
         select p.id, p.area, p.same,
@@ -440,7 +457,7 @@ export const seats = {
         ),
         won as (
           select distinct on (t.contest, t.k) t.contest, t.k, t.seats, t.votes,
-            coalesce(bm.into_id, br.parent_party_id, lin.party, pm.into_id, lp.party)::text as party,
+            coalesce(bm.into_id, br.parent_party_id, lin.party, sp.party, pm.into_id, lp.party)::text as party,
             cy.person_id::text as person
           from top t
           cross join lateral (
@@ -471,6 +488,23 @@ export const seats = {
               and d.old not in (select x.party_id from top x where x.contest in (select id from paired) and x.party_id is not null)
             limit 1
           ) lin on true
+          left join lateral (
+            select coalesce(xm.into_id, xo.party_id) as party
+            from candidacy xc
+            join contest_option xo on xo.id = xc.option_id
+            join contest xk on xk.id = xo.contest_id
+            join election xe on xe.id = xk.election_id
+            left join entity_merge xm on xm.entity_id = xo.party_id
+            join party xp on xp.id = coalesce(xm.into_id, xo.party_id)
+            where t.contest in (select prior from paired)
+              and exists (
+                select from party sx join name sn on sn.entity_id = sx.id and sn.text = 'Speaker'
+                where sx.kind = 'independent_group' and sx.id = coalesce(pm.into_id, lp.party)
+              )
+              and xc.person_id = cy.person_id and xe.date_from < t.day
+              and not (xp.kind = 'independent_group' and exists (select from name sn where sn.entity_id = xp.id and sn.text = 'Speaker'))
+            order by xe.date_from desc limit 1
+          ) sp on true
           order by t.contest, t.k
         )
         select p.basis, p.prior, p.area, p.day::text as since, (select day::text from this) as day, (select "isUs" from this) as "isUs", (select "isIe" from this) as "isIe",
@@ -774,6 +808,7 @@ export const seats = {
           ) x
           group by b.id, x.option_k
         )
+        , listed as (
         select b.id, b.area, b.day::text as day, (select day::text from next) as until,
           (select id::text from general) as general, (select day::text from general) as since, b."isHere",
           (select coalesce(party, 'person:' || person) from won w where w.contest = b.id order by w.k limit 1) as now,
@@ -786,7 +821,29 @@ export const seats = {
           l.via,
           (select votes from votes v where v.id = b.id and v.place = 1) - (select votes from votes v where v.id = b.id and v.place = 2) as majority
         from bys b left join prior p on p.id = b.id left join left_seat l on l.id = b.id
-        order by b.day, b.id
+        )
+        select q.id, q.area, q.day, q.until, q.general, q.since, q."isHere", q.now, q.winner,
+          coalesce(sp.party, q.before) as before, q.member, q.via, q.majority
+        from listed q
+        left join lateral (
+          select coalesce(pm.into_id, co.party_id)::text as party
+          from candidacy cy
+          left join entity_merge cm on cm.entity_id = cy.person_id
+          join contest_option co on co.id = cy.option_id
+          join contest c on c.id = co.contest_id
+          join election e on e.id = c.election_id
+          left join entity_merge pm on pm.entity_id = co.party_id
+          join party pp on pp.id = coalesce(pm.into_id, co.party_id)
+          where exists (
+              select from party sx join name sn on sn.entity_id = sx.id and sn.text = 'Speaker'
+              where sx.kind = 'independent_group' and sx.id::text = q.before
+            )
+            and coalesce(cm.into_id, cy.person_id)::text = q.member
+            and e.date_from < q.day::date
+            and not (pp.kind = 'independent_group' and exists (select from name sn where sn.entity_id = pp.id and sn.text = 'Speaker'))
+          order by e.date_from desc limit 1
+        ) sp on true
+        order by q.day, q.id
       `);
       if (found.rows.length === 0) {
         return null;
