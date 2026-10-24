@@ -589,6 +589,13 @@ def emit() -> Path:
             [SOURCE],
         ):
             named.setdefault(entity, []).append((id, text))
+        sitting = {
+            entity
+            for (entity,) in conn.execute(
+                "select n.entity_id from name n join changeset c on c.id = n.changeset_id"
+                " where c.pipeline = 'gb.mnis' and n.is_preferred"
+            ).fetchall()
+        }
         cautions: dict[UUID, list[tuple[UUID, str]]] = {}
         for id, entity, text in conn.execute(
             "select n.id, n.entity_id, n.body_md from note n join changeset c on c.id = n.changeset_id"
@@ -985,10 +992,16 @@ def emit() -> Path:
                                 gender=line["gender"].lower() if line["gender"] else None,
                             )
                         if persons[identity] in cs.minted or (
-                            persons[identity] in named and persons[identity] not in survivors
+                            persons[identity] in named
+                            and persons[identity] not in survivors
+                            and persons[identity] not in sitting
                         ):
                             name(persons[identity], full)
-                        if persons[identity] in restaged or persons[identity] in survivors:
+                        if (
+                            persons[identity] in restaged
+                            or persons[identity] in survivors
+                            or persons[identity] in sitting
+                        ):
                             stale = []
                         else:
                             stale = named.get(persons[identity], [])
