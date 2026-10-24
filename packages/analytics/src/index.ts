@@ -213,12 +213,11 @@ function isPooledIndependent(
   option: Option,
   party: string | null,
   match: Match,
-  grouping: Grouping,
-  contests: number,
+  isShared: boolean,
 ) {
   return (
     match !== "person" &&
-    (grouping === "party" || contests > 1) &&
+    isShared &&
     party == null &&
     option.kind === "candidate" &&
     option.isIndependent === true
@@ -314,8 +313,12 @@ export function compare(
       )
       .map((line) => root(line.party ?? "")),
   );
-  const contests = new Set(current.options.map((option) => option.contest))
-    .size;
+  const isShared =
+    new Set(current.options.map((option) => option.contest)).size > 1 ||
+    (grouping === "party" &&
+      current.options.filter(
+        (option) => option.outcome === "elected" || option.outcome === "won",
+      ).length > 1);
   const base = (option: Option) => {
     if (grouping === "alliance" && option.alliance != null) {
       const anchor = anchors.get(option.alliance.id)?.party;
@@ -331,7 +334,7 @@ export function compare(
     ) {
       return `alliance:${party}`;
     }
-    if (isPooledIndependent(option, party, match, grouping, contests)) {
+    if (isPooledIndependent(option, party, match, isShared)) {
       return "independent";
     }
     if (
