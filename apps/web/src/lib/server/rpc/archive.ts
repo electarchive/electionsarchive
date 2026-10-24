@@ -14044,6 +14044,7 @@ export const search = {
         date: string | null;
         boost: number | null;
         office: string | null;
+        isExecutive: boolean | null;
       }>(sql`
         with q as (select lower(unaccent(${q})) as t),
         terms as (
@@ -14143,8 +14144,10 @@ export const search = {
         select top.entity_id as id, top.type::text as type, x.target, x.context,
           coalesce(x.date, (select e.date_from from contest c join election e on e.id = c.election_id where c.id = x.target and top.type = 'person'))::text as date,
           case when top.type = 'person' then (select d.rank_boost from search_document d where d.entity_id = top.entity_id) end as boost,
-          case when top.type = 'person' then (
-            select held.id from (
+          best.id as office, best.rank >= 2 as "isExecutive"
+        from top
+        left join lateral (
+            select held.id, held.rank from (
               select coalesce(c.office_id, c.body_id) as id, el.date_from as at,
                 case when fp.kind in ('sovereign_state', 'supranational') then 3 when f.id is not null then 2
                   when b.kind = 'upper_house' then 1 else 0 end as rank
@@ -14164,8 +14167,7 @@ export const search = {
               where t.person_id = top.entity_id and f.kind in ('head_of_state', 'head_of_government', 'governor')
             ) held
             order by held.rank desc, held.at desc nulls last
-            limit 1) end as office
-        from top
+            limit 1) best on top.type = 'person'
         cross join lateral (
           select
             case top.type
@@ -14204,6 +14206,7 @@ export const search = {
         date: null,
         boost: null,
         office: null,
+        isExecutive: null,
         isClose: row.isClose,
       }));
       const rows = [
@@ -14237,9 +14240,13 @@ export const search = {
             : (slugs.get(row.target ?? "") ?? null),
           context:
             labels.full.get(
-              (row.type === "person" ? row.target : row.context) ?? "",
+              (row.type === "person"
+                ? row.isExecutive === true
+                  ? row.office
+                  : row.target
+                : row.context) ?? "",
             ) ?? null,
-          date: row.date,
+          date: row.isExecutive === true ? null : row.date,
           photo: faces.get(row.id)?.src ?? null,
           office: labels.full.get(row.office ?? "") ?? null,
           boost: row.boost,

@@ -323,7 +323,9 @@
             {#if hit.context != null || hit.date != null}
               <span class="truncate text-xs text-muted-foreground">
                 {[
-                  hit.type === "person" && hit.context != null
+                  hit.type === "person" &&
+                  hit.context != null &&
+                  hit.context !== hit.office
                     ? m.search_person_latest({ contest: hit.context })
                     : hit.context,
                   hit.date == null ? null : date(hit.date),
