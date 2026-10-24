@@ -201,6 +201,11 @@ def emit() -> Path:
                 completeness=1,
             )
             cs.add("note", entity_id=result_set, kind="caveat", body_md=CAVEAT)
+            for note, text in conn.execute(
+                "select id, body_md from note where entity_id = %s and kind = 'caveat' and body_md <> %s",
+                [result_set, CAVEAT],
+            ).fetchall():
+                cs.add("note_drop", note_id=note, entity_id=result_set, body_md=text, reason="replaced by the current caveat")
             for measure, amount in (
                 (REGISTERED, block["Electorate"]),
                 (VALID, block["Valid votes cast"]),
