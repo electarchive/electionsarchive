@@ -67,6 +67,8 @@ FILES = {
     "WA": ("wa", "2026-08-04", ["ballot-items"]),
     "UT": ("ut", "2026-06-23", ["ballot-items"]),
     "ME": ("me", "2026-06-09", list(ME_FILES)),
+    "RI": ("ri", "2026-09-09", ["ballot-items"]),
+    "CT": ("ct", "2026-08-11", ["111/27708/Lookupdata", "111/27708/townVotes_Electiondata", "112/28256/Lookupdata", "112/28256/townVotes_Electiondata"]),
     "AR": ("ar", "2026-03-03", ["contests", "data"]),
     "OK": ("ok", "2026-06-16", ["getelec/20260616", *(f"20260616/{race}" for race in OK_RACES)]),
     "HI": ("hi", "2026-08-08", ["cch", "coh", "cok", "com"]),
@@ -92,7 +94,7 @@ RUNOFFS = {
     "AL": ("alx", "2026-06-16", ["2026-07/2026_PRIMARY_RUNOFF_ELECTION.zip"], "2026-05-19"),
     "OK": ("ok", "2026-08-25", ["getelec/20260825", "20260825/12001", "20260825/13010"], "2026-06-16"),
 }
-FIPS = {"TX": "48", "CA": "06", "MI": "26", "PA": "42", "WV": "54", "MS": "28", "SD": "46", "WY": "56", "OR": "41", "KY": "21", "CO": "08", "AZ": "04", "TN": "47", "NC": "37", "IL": "17", "NM": "35", "NY": "36", "VA": "51", "AL": "01", "ND": "38", "MD": "24", "MN": "27", "VT": "50", "KS": "20", "GA": "13", "WA": "53", "UT": "49", "IN": "18", "FL": "12", "ID": "16", "NJ": "34", "MO": "29", "MA": "25", "DE": "10", "HI": "15", "ME": "23", "OK": "40", "AR": "05"}
+FIPS = {"TX": "48", "CA": "06", "MI": "26", "PA": "42", "WV": "54", "MS": "28", "SD": "46", "WY": "56", "OR": "41", "KY": "21", "CO": "08", "AZ": "04", "TN": "47", "NC": "37", "IL": "17", "NM": "35", "NY": "36", "VA": "51", "AL": "01", "ND": "38", "MD": "24", "MN": "27", "VT": "50", "KS": "20", "GA": "13", "WA": "53", "UT": "49", "IN": "18", "FL": "12", "ID": "16", "NJ": "34", "MO": "29", "MA": "25", "DE": "10", "HI": "15", "ME": "23", "OK": "40", "AR": "05", "CT": "09", "RI": "44"}
 RUNOFF_SYSTEMS = {"GA": "two_round", "TX": "two_round", "MS": "two_round", "SD": "two_round_35", "NC": "two_round_30", "OK": "two_round", "AL": "two_round"}
 THRESHOLDS = {"GA": 50, "TX": 50, "MS": 50, "SD": 35, "NC": 30, "OK": 50, "AL": 50}
 ME_COUNTIES = {"AND": "23001", "ARO": "23003", "CUM": "23005", "FRA": "23007", "HAN": "23009", "KEN": "23011", "KNO": "23013", "LIN": "23015", "OXF": "23017", "PEN": "23019", "PIS": "23021", "SAG": "23023", "SOM": "23025", "WAL": "23027", "WAS": "23029", "YOR": "23031"}
@@ -147,6 +149,8 @@ OFFICIAL = {
     "OK": ("Oklahoma State Election Board", "https://results.okelections.gov/OKER/", "county results from the board's results application"),
     "AR": ("Arkansas Secretary of State", "https://arkansas.tally-enr.com/", "county results from the state's election night reporting site"),
     "AL": ("Alabama Secretary of State", "https://www.sos.alabama.gov/alabama-votes/voter/election-data", "county files of precinct results summed to counties"),
+    "CT": ("Connecticut Secretary of the State", "https://ctemspublic.pcctg.net/", "town results from the Election Center summed to counties"),
+    "RI": ("Rhode Island Board of Elections", "https://elections.ri.gov/elections/previous-election-results", "town results summed to counties"),
     "KS": ("Kansas Secretary of State", "https://sos.ks.gov/elections/election-results.html", "precinct-level files summed to counties"),
 }
 METHOD = "Results by county from OpenElections' 2026 primary file for {state}, a community compilation of the state's county results. Candidates who received votes are listed; write-in votes are pooled."
@@ -198,6 +202,10 @@ EV = {
         "https://results.voteidaho.gov/results/public/api/elections/id/may2026/",
         re.compile(r"(?:(?P<senate>United States Senator)|(?P<governor>Governor)|United States Representative District (?P<district>\d+)) - (?P<party>Democratic|Republican|Libertarian)"),
     ),
+    "ri": (
+        "https://electionresults.ri.gov/results/public/api/elections/RhodeIsland/RI2026StatewidePrimary/",
+        re.compile(r"(?P<party>REP|DEM) (?:(?P<senate>Senator in Congress)|(?P<governor>Governor)|Representative in Congress District (?P<district>\d+))"),
+    ),
     "ut": (
         "https://electionresults.utah.gov/results/public/api/elections/utah/Primary06232026/",
         re.compile(r"(?P<party>REP|DEM) U\.S\. House District (?P<district>\d+)"),
@@ -209,6 +217,7 @@ EV = {
 }
 FL_URL = "https://results.elections.myflorida.com/ResultsExtract.Asp?ElectionDate=8/18/2026&OfficialResults=Y"
 AR_ELECTION = "7f77a178-af02-40ec-92db-c5cc50882c68"
+CT_COUNTIES = {"Fairfield": "001", "Hartford": "003", "Litchfield": "005", "Middlesex": "007", "New Haven": "009", "New London": "011", "Tolland": "013", "Windham": "015"}
 OK_BASE = "https://results.okelections.gov/OKERS/"
 BROWSER = {"User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36"}
 MA_BASE = elstats.MASSACHUSETTS
@@ -240,6 +249,8 @@ def town_counties(state: str) -> dict[str, str]:
 
 
 def url(code: str, file: str) -> str:
+    if code == "ct":
+        return f"https://ctemspublic.tgstg.net/ng-app/data/election/{file}.json"
     if code == "alx":
         return f"https://www.sos.alabama.gov/sites/default/files/election-data/{file}"
     if code == "ar":
@@ -314,14 +325,16 @@ def rows(code: str, path: Path, file: str = ""):
             detail = json.loads(raw.cached(SOURCE, f"{EV[code][0]}ballot-items/{item['id']}").path.read_bytes())
             groups = found.groupdict()
             for county in detail["breakdownResults"]:
+                if code == "ri" and plain(re.sub(elstats.SUFFIXES, "", county["locality"]["name"][0]["text"].lower())) not in town_counties("RI"):
+                    continue
                 for option in county["ballotOptions"]:
                     label = (((option["party"] or {}).get("name") or [{}])[0].get("text") or "").strip("()") or "Prefers Democratic Party"
                     yield {
-                        "county": county["locality"]["name"][0]["text"].removesuffix(" County"),
+                        "county": town_counties("RI")[plain(re.sub(elstats.SUFFIXES, "", county["locality"]["name"][0]["text"].lower()))] if code == "ri" else county["locality"]["name"][0]["text"].removesuffix(" County"),
                         "office": "U.S. Senate" if groups.get("senate") else "Governor" if groups.get("governor") else "U.S. House",
                         "district": groups.get("district") or "",
                         "party": (groups["party"] if groups["party"] in PARTIES else groups["party"].upper()) if "party" in groups else label,
-                        "candidate": re.sub(r"\s*\(I\)$", "", option["name"][0]["text"]).strip(),
+                        "candidate": re.sub(r"\s*(\(I\)|\*)$", "", option["name"][0]["text"]).strip(),
                         "votes": str(option["voteCount"]),
                         "write_in": "Y" if option["isWriteIn"] else "",
                     }
@@ -425,6 +438,25 @@ def rows(code: str, path: Path, file: str = ""):
                         "candidate": candidate["NAME_ON_BALLOT"],
                         "votes": str(candidate["TOTAL_VOTES"]),
                     }
+        return
+    if code == "ct":
+        if file.endswith("Lookupdata"):
+            return
+        lookup = json.loads(raw.cached(SOURCE, url(code, file.replace("townVotes_Electiondata", "Lookupdata"))).path.read_text())
+        counties_of = {entry["TownID"]: "09" + CT_COUNTIES[lookup["counties"][entry["CountyID"]]] for entry in lookup["countyTowns"]}
+        offices = {key: value for entry in lookup["officeList"] for key, value in entry.items()}
+        totals = {}
+        for town, contests in json.loads(path.read_text()).items():
+            for office_id, results in contests.items():
+                found = re.fullmatch(r"Governor|Representative in Congress (\d+)", offices[office_id]["NM"])
+                if found is not None:
+                    for result in results:
+                        for candidate_id, tally in result.items():
+                            candidate = lookup["candidateIds"][candidate_id]
+                            key = (counties_of[town], "Governor" if found[1] is None else "U.S. House", found[1] or "", lookup["partyIds"][candidate["P"]]["NM"].removesuffix(" Party"), candidate["NM"])
+                            totals[key] = totals.get(key, 0) + int(tally["V"])
+        for (fips, office, district, party, candidate), votes in totals.items():
+            yield {"county": fips, "office": office, "district": district, "party": party, "candidate": candidate, "votes": str(votes)}
         return
     if code == "alx":
         with zipfile.ZipFile(path) as archive:
@@ -585,7 +617,7 @@ def fetch() -> None:
             if code == "fl":
                 raw.store(SOURCE, FL_URL, httpx.get(FL_URL, headers=BROWSER, follow_redirects=True, timeout=300).content, suffix=".txt", retrieved_at=datetime.now(UTC), media_type="text/tab-separated-values")
                 continue
-            raw.fetch(SOURCE, url(code, name), suffix={"hi": ".pdf", "de": ".html", "ma": ".html", "nj": ".pdf", "ks": ".xlsx", "in": ".json", "ga": ".json", "ga2": ".json", "wa": ".json", "ut": ".json", "id": ".json"}.get(code) or name[name.rindex(".") :])
+            raw.fetch(SOURCE, url(code, name), suffix={"hi": ".pdf", "ri": ".json", "ct": ".json", "alx": ".zip", "de": ".html", "ma": ".html", "nj": ".pdf", "ks": ".xlsx", "in": ".json", "ga": ".json", "ga2": ".json", "wa": ".json", "ut": ".json", "id": ".json"}.get(code) or name[name.rindex(".") :])
     fetch_ballot_items()
 
 
