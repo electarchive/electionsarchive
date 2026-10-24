@@ -2270,7 +2270,7 @@
               <button
                 type="button"
                 class={cn(
-                  "-ms-px flex items-center gap-1.5 border border-input bg-card px-2.5 text-[0.8125rem] font-semibold keycap block-7 first:ms-0 first:rounded-s-sm last:rounded-e-sm hover:bg-secondary",
+                  "min-is-0 -ms-px flex flex-1 flex-col items-center border border-input bg-card px-2 py-1 text-[0.8125rem] leading-tight font-semibold keycap first:ms-0 first:rounded-s-sm last:rounded-e-sm hover:bg-secondary",
                   {
                     "relative z-10 bg-primary text-primary-foreground hover:bg-primary":
                       level.code === sheet.level,
