@@ -206,7 +206,18 @@ def parse() -> None:
 
 OPL = "https://www.parliament.uk/site-information/copyright-parliament/open-parliament-licence/"
 DAYS = {2021: date(2021, 5, 6), 2022: date(2022, 5, 5)}
-VOTES, REGISTERED = 1, 2
+VOTES, REGISTERED, BALLOTS = 1, 2, 3
+SMALL_WORDS = {"And", "Of", "The", "Upon", "On", "In", "With", "By", "Cum", "Next", "At", "To", "Under"}
+COUNCIL_NAMES = {"E06000010": "Hull City Council"}
+CYCLES = {
+    "SDA": "Shire district: the whole council was up for election.",
+    "SDT": "Shire district: elected by thirds.",
+    "UAA": "Unitary authority: the whole council was up for election.",
+    "UAT": "Unitary authority: elected by thirds.",
+    "MB": "Metropolitan borough: normally elected by thirds.",
+    "LB": "London borough: the whole council was up for election.",
+    "SC": "Shire county: the whole council was up for election.",
+}
 GENDERS = {"M": "male", "F": "female"}
 NOT_PARTIES = {"IND", "ND"}
 ALIASES = {
@@ -217,7 +228,8 @@ METHODOLOGY = (
     "Compiled by the Elections Centre (Rallings, Thrasher, and Bunting) from council websites and correspondence with "
     "councils and released by the House of Commons Library. The workbook gives the year, not the poll day; the poll day "
     "is the one on which the year's local elections were held. Candidate names are printed as surname and initials. "
-    "Wards without a vote count were won without a poll."
+    "Wards without a vote count were won without a poll. The workbook prints turnout as a percentage to one decimal "
+    "place; ballots cast are that percentage of the electorate, rounded, and flagged as derived."
 )
 
 
@@ -313,10 +325,13 @@ def emit() -> Path:
 
         slugs: set[str] = set()
         council_paths: dict[str, str] = {}
+        council_names: dict[str, str] = {}
+        seen_elections: set[str] = set()
         areas: dict[str, UUID] = {}
         polities: dict[str, UUID] = {}
         bodies: dict[str, UUID] = {}
         seen_wards: set[str] = set()
+        named: set[str] = set()
 
         def council_of(la_code: str, ward_code: str, county: str) -> tuple[str, str, bool]:
             if ward_code.startswith("E58"):
@@ -327,28 +342,57 @@ def emit() -> Path:
         def council(code: str, label: str, is_county: bool) -> None:
             if code in polities:
                 return
+            place = label.removesuffix(", City of").removesuffix(", County of")
+            council_name = COUNCIL_NAMES.get(
+                code,
+                f"{label} County Council"
+                if is_county
+                else f"{place} City Council"
+                if label.endswith(", City of")
+                else f"{place} Council",
+            )
             areas[code] = cs.area("gb.lad", code)
             if areas[code] in cs.minted:
                 cs.add("area", id=areas[code], scheme_code="gb.lad")
                 cs.add("area_code", area_id=areas[code], code=code, valid_from=None, valid_to=None)
                 cs.add("area_parent", area_id=areas[code], parent_id=countries[code[0]], valid_from=None, valid_to=None)
-                name(areas[code], label)
+            name(areas[code], label)
             polities[code] = cs.key("gb.polity", code)
-            path = f"gb/{slug(label)}"
+            path = f"gb/{slug(place)}"
             if path in slugs:
                 path = f"{path}-{code.lower()}"
             slugs.add(path)
             council_paths[code] = path
+            council_names[code] = council_name
             if polities[code] in cs.minted:
                 cs.add("polity", id=polities[code], kind="county" if is_county else "municipality", iso_code=None)
-                name(polities[code], f"{label} Council")
-                cs.add("polity_parent", polity_id=polities[code], parent_id=cs.polity("GB-WLS" if code.startswith("W") else "GB-ENG"))
-                cs.add("slug", path=path, entity_id=polities[code])
+                cs.add(
+                    "polity_parent",
+                    polity_id=polities[code],
+                    parent_id=cs.polity("GB-WLS" if code.startswith("W") else "GB-ENG"),
+                )
                 cs.add("polity_territory", polity_id=polities[code], area_id=areas[code])
+            name(polities[code], council_name)
+            cs.add("slug", path=path, entity_id=polities[code])
             bodies[code] = cs.key("gb.body", code)
             if bodies[code] in cs.minted:
                 cs.add("body", id=bodies[code], polity_id=polities[code], kind="council")
-                name(bodies[code], f"{label} Council")
+            name(bodies[code], council_name)
+
+        national: dict[int, UUID] = {}
+        for year, day in DAYS.items():
+            national[year] = cs.key("gb.election", f"{day}:local:gb")
+            cs.add(
+                "election",
+                id=national[year],
+                polity_id=gb,
+                kind="local",
+                date_from=day,
+                date_to=day,
+                status="held",
+            )
+            name(national[year], f"{year} local elections in England and Wales")
+            cs.add("slug", path=f"gb/{day}-local", entity_id=national[year])
 
         for year, day in DAYS.items():
             held = wards.filter(pl.col("year") == year)
@@ -362,30 +406,38 @@ def emit() -> Path:
                 council(code, label, is_county)
                 path = council_paths[code]
                 election = cs.key("gb.election", f"{day}:local:{code}")
-                if election in cs.minted and election not in seen_wards:
-                    seen_wards.add(election)
+                if election not in seen_elections:
+                    seen_elections.add(election)
                     cs.add(
                         "election",
                         id=election,
                         polity_id=polities[code],
+                        parent_id=national[year],
                         kind="local",
                         date_from=day,
                         date_to=day,
                         status="held",
                     )
-                    name(election, f"{year} {label} Council election")
+                    name(election, f"{year} {council_names[code]} election")
                     cs.add("slug", path=f"{path}/{day}-local", entity_id=election)
+                    if ward_row and ward_row["type"] in CYCLES:
+                        cs.add("external_id", entity_id=election, scheme="gb.leh.type", value=f"{ward_row['type']}:{year}:{code}")
+                        cs.add("note", entity_id=election, kind="context", body_md=CYCLES[ward_row["type"]])
                 ward_area = cs.area("gb.ward", ward_code)
                 display = names.get(ward_code)
                 display = display if display and fold(display) == fold(ward_name) else ward_name
                 display = display.title() if display.isupper() else display
+                display = " ".join(
+                    word.lower() if index and word in SMALL_WORDS else word
+                    for index, word in enumerate(display.split())
+                )
                 if ward_code not in areas:
                     areas[ward_code] = ward_area
                     if ward_area in cs.minted:
                         cs.add("area", id=ward_area, scheme_code="gb.ward")
                         cs.add("area_code", area_id=ward_area, code=ward_code, valid_from=None, valid_to=None)
                         cs.add("area_parent", area_id=ward_area, parent_id=areas[code], valid_from=None, valid_to=None)
-                        name(ward_area, display)
+                    name(ward_area, display)
                 unit = cs.unit("gb.ward", ward_code)
                 if unit in cs.minted and ward_code not in seen_wards:
                     seen_wards.add(ward_code)
@@ -400,6 +452,8 @@ def emit() -> Path:
                         kind="standard",
                         valid_from=None,
                     )
+                if ward_code not in named:
+                    named.add(ward_code)
                     name(unit, display)
                 seats = (ward_row["seats"] if ward_row else None) or int(lines["elected"].sum())
                 if int(lines["elected"].sum()) != seats:
@@ -419,7 +473,7 @@ def emit() -> Path:
                     electoral_system_id=systems["fptp" if seats == 1 else "block"],
                     default_result_kind="tacit" if tacit else "counted",
                 )
-                name(contest, f"{display} ward, {label} Council, {year}")
+                name(contest, f"{display} {'division' if is_county else 'ward'}, {council_names[code]}, {year}")
                 ward_slug = slug(display)
                 cs.add("slug", path=f"{path}/{day}-local/{ward_slug}-{ward_code.lower()}", entity_id=contest)
                 result_set = cs.key("gb.leh.result_set", contest_key)
@@ -446,6 +500,18 @@ def emit() -> Path:
                         count_round=0,
                         flags=0,
                         value=ward_row["electorate"],
+                    )
+                if ward_row and ward_row["electorate"] and ward_row["turnout"] is not None:
+                    cs.add(
+                        "result_value",
+                        result_set_id=result_set,
+                        unit_id=unit,
+                        option_id=None,
+                        channel=0,
+                        measure=BALLOTS,
+                        count_round=0,
+                        flags=5,
+                        value=round(ward_row["electorate"] * ward_row["turnout"] / 100),
                     )
                 for line in lines.iter_rows(named=True):
                     option_key = f"{contest_key}:{line['number']}"
