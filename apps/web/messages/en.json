@@ -1008,6 +1008,7 @@
   "map_loading": "Loading map",
   "map_opening": "Loading {place}…",
   "atlas_page_title": "Map of {title}, {place}",
+  "atlas_page_title_plain": "Map of {title}",
   "atlas_trail": "Map area",
   "atlas_search": "Search places",
   "atlas_search_empty": "No loaded place matches that name",

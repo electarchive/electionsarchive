@@ -1693,10 +1693,12 @@
 
 <svelte:head>
   <title
-    >{m.atlas_page_title({
-      title: sheet.title,
-      place: sheet.scope.name,
-    })}</title
+    >{sheet.title.includes(sheet.scope.name)
+      ? m.atlas_page_title_plain({ title: sheet.title })
+      : m.atlas_page_title({
+          title: sheet.title,
+          place: sheet.scope.name,
+        })}</title
   >
 </svelte:head>
 
