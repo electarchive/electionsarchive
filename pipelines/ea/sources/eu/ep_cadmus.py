@@ -1,18 +1,23 @@
+import json
 import re
+import sqlite3
 import unicodedata
+from collections import defaultdict
 from datetime import date
 from pathlib import Path
+from urllib.parse import unquote, urlencode, urlparse
 from uuid import UUID
 
 import polars as pl
 
 from ea import raw
 from ea.changeset import Changeset, slug
+from ea.sources import parlgov
 from ea.sources.gb import umit
 from ea.store import DATA, connect
 
 SOURCE = "eu.ep_cadmus"
-VERSION = "1"
+VERSION = "2"
 PARSED = DATA / "parsed" / SOURCE
 URL = "https://cadmus.eui.eu/bitstreams/9a5261b3-8dea-5650-988a-fac4460a8f3c/download"
 WINDOWS = {
@@ -92,6 +97,35 @@ CONSTITUENCIES = {
     ("GB", "West Midlands Region"): "west-midlands",
     ("GB", "Yorkshire and the Humber"): "yorkshire-and-the-humber",
 }
+PARLGOV_ISO = {
+    "AUT": "AT",
+    "BEL": "BE",
+    "BGR": "BG",
+    "HRV": "HR",
+    "CYP": "CY",
+    "CZE": "CZ",
+    "DNK": "DK",
+    "EST": "EE",
+    "FIN": "FI",
+    "FRA": "FR",
+    "DEU": "DE",
+    "GRC": "GR",
+    "HUN": "HU",
+    "IRL": "IE",
+    "ITA": "IT",
+    "LVA": "LV",
+    "LTU": "LT",
+    "LUX": "LU",
+    "MLT": "MT",
+    "NLD": "NL",
+    "POL": "PL",
+    "PRT": "PT",
+    "ROU": "RO",
+    "SVK": "SK",
+    "SVN": "SI",
+    "ESP": "ES",
+    "SWE": "SE",
+}
 OTHERS = {"others", "other"}
 MISSING = {".", ""}
 UK_PARTIES = {
@@ -111,6 +145,51 @@ UK_PARTIES = {
     "Change UK": "the-independent-group-for-change",
     "Unionist Party": "unionist-party-ni",
     "Pensiones": "pensioners-party",
+}
+CORRECTED = {
+    (1984, False, "Alliance Party"): (
+        "sdp-liberal-alliance",
+        None,
+        (
+            'The source labels this candidate "Alliance Party"; in Great Britain that is the SDP–Liberal Alliance, not '
+            "the Alliance Party of Northern Ireland."
+        ),
+    ),
+    (1989, True, "Labour Party"): (
+        None,
+        None,
+        (
+            'The source labels this candidate "Labour Party"; the Labour Party did not contest elections in Northern '
+            "Ireland, so no party is linked."
+        ),
+    ),
+    (1989, True, "Green Party"): ("green-party-northern-ireland", None, None),
+    (2004, True, "Green Party"): ("green-party-northern-ireland", None, None),
+    (2014, True, "Green Party"): ("green-party-northern-ireland", None, None),
+    (2019, True, "Green Party of England and Wales"): (
+        "green-party-northern-ireland",
+        "Green Party Northern Ireland",
+        (
+            'The source labels this list "Green Party of England and Wales"; in Northern Ireland it was the Green Party '
+            "Northern Ireland."
+        ),
+    ),
+    (2019, True, "Conservative Party"): (
+        "traditional-unionist-voice",
+        "Traditional Unionist Voice",
+        (
+            'The source labels this list "Conservative Party"; its 62,683 votes are those of the Traditional Unionist '
+            "Voice (Jim Allister)."
+        ),
+    ),
+    (2019, True, "Social Democratic Party"): (
+        "social-democratic-and-labour-party",
+        "Social Democratic and Labour Party",
+        (
+            'The source labels this list "Social Democratic Party"; its 78,589 votes are those of the Social Democratic '
+            "and Labour Party."
+        ),
+    ),
 }
 UK_SYSTEMS = {
     "ep-list": ("Regional closed lists, d'Hondt (European Parliament, Great Britain)", {"formula": "dhondt"}),
@@ -139,8 +218,71 @@ def fold(text: str) -> str:
     return "-".join(re.findall(r"[a-z0-9]+", plain))
 
 
+def wikidata_items(fetching: bool) -> pl.DataFrame:
+    database = sqlite3.connect(raw.cached(parlgov.SOURCE, parlgov.DATABASE).path)
+    matched = (
+        pl.read_parquet(PARSED / "results.parquet")
+        .filter(pl.col("votes") > 0)
+        .group_by("country", "year", "party", "party_original")
+        .agg(pl.col("votes").sum())
+        .with_columns(iso=pl.col("country").replace_strict(ISO, default=None))
+        .filter(pl.col("iso").is_not_null())
+        .join(
+            pl.read_database(
+                """select cast(substr(e.date, 1, 4) as integer) year, k.name_short iso3, r.votes, r.party_id,
+                          p.wikipedia
+                   from election e join country k on k.id = e.country_id
+                   join election_result r on r.election_id = e.id join party p on p.id = r.party_id
+                   where e.type_id = 1 and r.votes is not null and p.wikipedia like 'http%'""",
+                database,
+            ).with_columns(iso=pl.col("iso3").replace_strict(PARLGOV_ISO, default=None)),
+            on=["iso", "year", "votes"],
+        )
+    )
+    hosts: dict[str, dict[int, str]] = defaultdict(dict)
+    for party, article in matched.select("party_id", "wikipedia").unique().iter_rows():
+        link = urlparse(article.strip())
+        if not link.netloc.endswith(".wikipedia.org"):
+            continue
+        hosts[link.netloc][party] = unquote(link.path.removeprefix("/wiki/")).replace("_", " ")
+    items: dict[int, str] = {}
+    for host, titles in sorted(hosts.items()):
+        pairs = sorted(titles.items())
+        for start in range(0, len(pairs), 50):
+            chunk = pairs[start : start + 50]
+            url = f"https://{host}/w/api.php?" + urlencode(
+                {
+                    "action": "query",
+                    "prop": "pageprops",
+                    "ppprop": "wikibase_item",
+                    "redirects": 1,
+                    "format": "json",
+                    "titles": "|".join(title for _, title in chunk),
+                }
+            )
+            if fetching:
+                try:
+                    raw.cached(SOURCE, url)
+                except LookupError:
+                    raw.fetch(SOURCE, url, suffix=".json")
+            query = json.loads(raw.cached(SOURCE, url).path.read_text())["query"]
+            renamed = {entry["from"]: entry["to"] for entry in query.get("normalized", []) + query.get("redirects", [])}
+            pages = {page["title"]: page.get("pageprops", {}).get("wikibase_item") for page in query["pages"].values()}
+            for party, title in chunk:
+                while title in renamed:
+                    title = renamed[title]
+                if pages.get(title) is not None:
+                    items[party] = pages[title]
+    return matched.select(
+        "iso",
+        label=pl.when(pl.col("party_original").fill_null("") != "").then("party_original").otherwise("party"),
+        item=pl.col("party_id").replace_strict(items, default=None),
+    ).drop_nulls("item")
+
+
 def fetch() -> None:
     raw.fetch(SOURCE, URL, suffix=".xlsx")
+    wikidata_items(True)
 
 
 def parse() -> None:
@@ -240,6 +382,51 @@ def emit() -> Path:
                 "select value, entity_id from external_id where scheme = 'eu.ep_cadmus.party' and value like 'GB:%%'"
             ).fetchall()
         }
+        votes_source = cs.source(parlgov.PUBLISHER, parlgov.TITLE)
+        if votes_source in cs.minted:
+            raise ValueError("publish parlgov before linking the European Parliament parties")
+        cs.artifact(raw.cached(parlgov.SOURCE, parlgov.DATABASE), votes_source)
+        cadmus_parties = {
+            value: entity
+            for value, entity in conn.execute(
+                "select value, entity_id from external_id where scheme = 'eu.ep_cadmus.party'"
+            ).fetchall()
+        }
+        by_item: dict[str, set[UUID]] = defaultdict(set)
+        for item, entity in conn.execute(
+            """select x.value, x.entity_id from external_id x join party p on p.id = x.entity_id
+               join entity e on e.id = x.entity_id where x.scheme = 'wikidata' and e.retired_by is null"""
+        ).fetchall():
+            by_item[item].add(entity)
+        party_names: dict[UUID, set[str]] = defaultdict(set)
+        for entity, text in conn.execute("select entity_id, text from name").fetchall():
+            party_names[entity].add(fold(text))
+        labels: dict[str, set[str]] = defaultdict(set)
+        for iso, label, item in wikidata_items(False).iter_rows():
+            labels[f"{iso}:{label}"].add(item)
+        unambiguous = {
+            label: next(iter(items)) for label, items in labels.items() if len(items) == 1 and label in cadmus_parties
+        }
+        sharing: dict[tuple[str, str], list[str]] = defaultdict(list)
+        for label, item in unambiguous.items():
+            sharing[label[:2], item].append(label)
+        linked = {"merged": 0, "attached": 0, "coalitions left": 0}
+        for (iso, item), group in sharing.items():
+            national = by_item[item] - set(cadmus_parties.values())
+            for label in group:
+                entity = cadmus_parties[label]
+                if entity in by_item[item] or entity in cs.survivors:
+                    continue
+                if not national:
+                    if len(group) == 1:
+                        cs.add("external_id", entity_id=entity, scheme="wikidata", value=item)
+                        linked["attached"] += 1
+                elif len(national) == 1 and (len(group) == 1 or fold(label[3:]) in party_names[next(iter(national))]):
+                    cs.merge(entity, next(iter(national)))
+                    linked["merged"] += 1
+                else:
+                    linked["coalitions left"] += 1
+        print(linked)
         stale = conn.execute(
             """select n.id, n.entity_id from note n join changeset c on c.id = n.changeset_id
                join external_id x on x.entity_id = n.entity_id and x.scheme = 'eu.election' and x.value like 'GB:%%'
@@ -425,7 +612,17 @@ def emit() -> Path:
                     shown = row["party"] if iso == "GB" and row["party_original"] in MISSING else label_text
                     other = row["party"].lower() in OTHERS
                     party = None
-                    if iso == "GB" and not other and not label_text.startswith("Independent"):
+                    fix = CORRECTED.get((year, constituency == "Northern Ireland", label_text)) if iso == "GB" else None
+                    if fix is not None:
+                        if fix[1] is not None:
+                            shown = fix[1]
+                        if fix[0] is not None:
+                            party = parties.get((iso, fix[0]))
+                            if party is None:
+                                party = parties[(iso, fix[0])] = cs.key("gb.party", fix[0])
+                                if party in cs.minted:
+                                    raise ValueError(f"no gb.party {fix[0]}")
+                    elif iso == "GB" and not other and not label_text.startswith("Independent"):
                         labels = (label_text, row["party"])
                         umit_key = next(
                             (
@@ -475,6 +672,8 @@ def emit() -> Path:
                         ballot_position=position,
                         ballot_label=shown,
                     )
+                    if fix is not None and fix[2] is not None:
+                        cs.add("note", entity_id=option, kind="context", body_md=fix[2])
                     if row["seats"]:
                         cs.add(
                             "outcome",

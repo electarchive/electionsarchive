@@ -1,4 +1,5 @@
 import html
+import os
 import re
 import subprocess
 from datetime import date
@@ -20,6 +21,8 @@ PUBLISHER = "Minnesota Legislative Reference Library"
 BASE = "https://www.lrl.mn.gov/archive/sessions/electionresults/"
 DAYS = [date(1956, 11, 6), date(1958, 11, 4), date(1960, 11, 8)]
 DPI = 150
+GAPS = {date(1920, 11, 2): 6.0, date(1936, 11, 3): 6.0, date(1940, 11, 5): 6.0}
+ONLY_PAGES = {date(1920, 11, 2): 174, date(1936, 11, 3): 189, date(1940, 11, 5): 186}
 FIXES: dict[tuple[date, int, int], dict[int, int]] = {}
 
 
@@ -28,14 +31,17 @@ def url(day: date) -> str:
 
 
 def fetch() -> None:
-    for day in DAYS:
+    for day in DAYS + list(GAPS):
         raw.fetch(SOURCE, url(day), suffix=".pdf")
 
 
 def parse() -> None:
     rows = []
+    parsed_days = (
+        [date.fromisoformat(value) for value in os.environ["MN_DAYS"].split(",")] if "MN_DAYS" in os.environ else DAYS
+    )
     with connect() as conn:
-        for day in DAYS:
+        for day in parsed_days:
             codes = [
                 code
                 for (code,) in conn.execute(
@@ -46,11 +52,27 @@ def parse() -> None:
                 ).fetchall()
             ]
             size = len(codes)
+            held = {
+                total
+                for (total,) in conn.execute(
+                    """select sum(v.value)::bigint
+                       from external_id x
+                       join contest c on c.id = x.entity_id
+                       join result_set rs on rs.contest_id = c.id and rs.is_default
+                       join contest_option o on o.contest_id = c.id and o.parent_option_id is null
+                       join result_value v on v.result_set_k = rs.k and v.option_k = o.k and v.measure = 1
+                       where x.scheme = 'us.contest' and x.value like %s and x.value not like %s
+                       group by o.id""",
+                    [f"{day}:MN:%", f"{day}:MN:%:%"],
+                ).fetchall()
+            }
             pdf = raw.cached(SOURCE, url(day)).path
             pages = subprocess.run(
                 ["pdftotext", "-bbox", str(pdf), "-"], capture_output=True, text=True, check=True
             ).stdout.split("<page ")[1:]
             for number, page in enumerate(pages, 1):
+                if day in ONLY_PAGES and number != ONLY_PAGES[day]:
+                    continue
                 width, height = (
                     float(value) for value in re.search(r'width="([\d.]+)" height="([\d.]+)"', page).groups()
                 )
@@ -61,6 +83,31 @@ def parse() -> None:
                         page,
                     )
                 ]
+                if day in GAPS:
+                    ends = [x1 for _, _, x1, _, text in words if re.fullmatch(r"\d{2,6}", text)]
+                    edges = sorted(
+                        {round(end, 0) for end in ends if sum(1 for other in ends if abs(other - end) < 1.5) >= 40}
+                    )
+                    split = []
+                    for x0, y0, x1, y1, text in words:
+                        if re.fullmatch(r"\d{8,12}", text):
+                            char = (x1 - x0) / len(text)
+                            cut = min(
+                                (
+                                    (abs(x0 + char * k - edge), k, edge)
+                                    for k in range(2, len(text) - 1)
+                                    for edge in edges
+                                    if abs(x0 + char * k - edge) < char * 0.6 and edge < x1 - char
+                                ),
+                                default=None,
+                            )
+                            if cut is not None:
+                                _, k, edge = cut
+                                split.append((x0, y0, edge, y1, text[:k]))
+                                split.append((edge + char * 0.2, y0, x1, y1, text[k:]))
+                                continue
+                        split.append((x0, y0, x1, y1, text))
+                    words = split
                 numbers = sorted(
                     (
                         word
@@ -71,7 +118,7 @@ def parse() -> None:
                 )
                 columns: list[list[tuple[float, float, float, float, str]]] = []
                 for word in numbers:
-                    if columns and word[2] - columns[-1][-1][2] < 12:
+                    if columns and word[2] - columns[-1][-1][2] < GAPS.get(day, 12):
                         columns[-1].append(word)
                     else:
                         columns.append([word])
@@ -82,9 +129,7 @@ def parse() -> None:
                 )
                 for index, column in enumerate(columns):
                     if template is not None and len(column) != size + 1:
-                        shifts = sorted(
-                            min((word[1] - ref[1] for ref in template), key=abs) for word in column
-                        )
+                        shifts = sorted(min((word[1] - ref[1] for ref in template), key=abs) for word in column)
                         shift = shifts[len(shifts) // 2]
                         slots: dict[int, list[tuple[float, float, float, float, str]]] = {}
                         for word in column:
@@ -106,6 +151,10 @@ def parse() -> None:
                         values[row] = value
                     if values[-1] < 10:
                         continue
+                    tied = sum(values[:-1]) == values[-1]
+                    if not tied and sum(values[:-1]) in held:
+                        values[-1] = sum(values[:-1])
+                        tied = True
                     rows.extend(
                         (
                             day,
@@ -115,7 +164,7 @@ def parse() -> None:
                             codes[row],
                             values[row],
                             values[-1],
-                            sum(values[:-1]) == values[-1],
+                            tied,
                             word[0] / width,
                             word[1] / height,
                             word[2] / width,
@@ -142,6 +191,10 @@ def parse() -> None:
         orient="row",
     )
     PARSED.mkdir(parents=True, exist_ok=True)
+    if (PARSED / "columns.parquet").exists():
+        frame = pl.concat(
+            [pl.read_parquet(PARSED / "columns.parquet").filter(~pl.col("day").is_in(parsed_days)), frame]
+        )
     frame.write_parquet(PARSED / "columns.parquet")
     print(
         frame.group_by("day", "page", "column", "total", "tied", maintain_order=True)
@@ -215,9 +268,7 @@ def emit() -> Path:
                 for label, (page, column) in matched.items():
                     pages.setdefault((day, page), "")
                     lines.append(
-                        frame.filter(
-                            pl.col("day") == day, pl.col("page") == page, pl.col("column") == column
-                        ).select(
+                        frame.filter(pl.col("day") == day, pl.col("page") == page, pl.col("column") == column).select(
                             year=pl.lit(day.year, pl.Int32),
                             chamber=pl.lit(office),
                             day=pl.col("day"),
