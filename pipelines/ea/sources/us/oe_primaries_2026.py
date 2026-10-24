@@ -1,6 +1,7 @@
 import csv
 import io
 import re
+import unicodedata
 import zipfile
 from collections import defaultdict
 from pathlib import Path
@@ -8,6 +9,7 @@ from uuid import UUID
 
 from ea import raw
 from ea.changeset import Changeset, slug
+from ea.sources.us import elstats
 from ea.store import connect
 
 SOURCE = "us.oe_primaries_2026"
@@ -26,10 +28,22 @@ FILES = {
     "KY": ("ky", "2026-05-19", ["20260519__ky__primary__county.csv"]),
     "CO": ("co", "2026-06-30", ["20260630__co__primary__county.csv"]),
     "AZ": ("az", "2026-07-21", ["20260721__az__primary__county.csv"]),
+    "IL": (
+        "il",
+        "2026-03-17",
+        [
+            "69-150-UNITED%20STATES%20SENATOR-2026GP.csv",
+            "69-180-GOVERNOR%20AND%20LIEUTENANT%20GOVERNOR-2026GP.csv",
+            *(f"69-{240 + 10 * number}-{number}{'TH' if 10 <= number % 100 <= 20 else {1: 'ST', 2: 'ND', 3: 'RD'}.get(number % 10, 'TH')}%20CONGRESS-2026GP.csv" for number in range(1, 18)),
+        ],
+    ),
+    "NM": ("nm", "2026-06-02", ["nm.elstats3"]),
+    "NY": ("ny", "2026-06-23", ["ny.elstats3"]),
+    "VA": ("va", "2026-08-04", ["va2.elstats"]),
     "NC": ("nc", "2026-03-03", ["results_pct_20260303.zip"]),
     "TN": ("tn", "2026-08-01", ["20260801__tn__primary__county.csv"]),
 }
-FIPS = {"TX": "48", "CA": "06", "MI": "26", "PA": "42", "WV": "54", "MS": "28", "SD": "46", "WY": "56", "OR": "41", "KY": "21", "CO": "08", "AZ": "04", "TN": "47", "NC": "37"}
+FIPS = {"TX": "48", "CA": "06", "MI": "26", "PA": "42", "WV": "54", "MS": "28", "SD": "46", "WY": "56", "OR": "41", "KY": "21", "CO": "08", "AZ": "04", "TN": "47", "NC": "37", "IL": "17", "NM": "35", "NY": "36", "VA": "51"}
 RUNOFF_SYSTEMS = {"TX": "two_round", "MS": "two_round", "SD": "two_round_35", "NC": "two_round_30"}
 THRESHOLDS = {"TX": 50, "MS": 50, "SD": 35, "NC": 30}
 OFFICES = {"U.S. House": "house", "U.S. Senate": "senate", "Governor": "governor"}
@@ -55,7 +69,7 @@ PARTIES = {
 }
 ALIASES = {("MS", "jeffdavis"): "jeffersondavis"}
 POOLED = re.compile(r"write-?ins?\b|^scattering$", re.I)
-JUNK = re.compile(r"^(under|over) votes$|^\* withdrawn candidate$|^total|blank|registered voters", re.I)
+JUNK = re.compile(r"^void$|^(under|over) votes$|^\* withdrawn candidate$|^total|blank|registered voters", re.I)
 ORDINALS = {1: "st", 2: "nd", 3: "rd"}
 CAVEAT = "Held under the 2026 congressional map, which the archive has not yet loaded as a boundary set, so this contest is not yet tied to a district shape."
 METHOD = "Results by county from OpenElections' 2026 primary file for {state}, a community compilation of the state's county results. Candidates who received votes are listed; write-in votes are pooled."
@@ -65,11 +79,71 @@ NC_URL = "https://s3.amazonaws.com/dl.ncsbe.gov/ENRS/2026_03_03/{}"
 NC_CONTEST = re.compile(r"US (HOUSE OF REPRESENTATIVES DISTRICT (\d+)|SENATE) \((\w+)\)")
 
 
+IL_URL = "https://elections.il.gov/Downloads/ElectionOperations/ElectionResults/ByOffice/69/{}"
+IL_CONTEST = re.compile(r"(?:(\d+)(?:ST|ND|RD|TH) CONGRESS|(UNITED STATES SENATOR)|(GOVERNOR AND LIEUTENANT GOVERNOR))")
+IL_CITIES = {
+    "CITY OF BLOOMINGTON": "McLean",
+    "CITY OF CHICAGO": "Cook",
+    "CITY OF DANVILLE": "Vermilion",
+    "CITY OF EAST ST. LOUIS": "St. Clair",
+    "CITY OF GALESBURG": "Knox",
+    "CITY OF ROCKFORD": "Winnebago",
+}
+
+
+ELSTATS = {"nm", "ny", "va"}
+ELSTATS_OFFICES = {
+    "United States Senator": "U.S. Senate",
+    "United States Representative": "U.S. House",
+    "Representative in Congress": "U.S. House",
+    "U.S. Senate": "U.S. Senate",
+    "U.S. House": "U.S. House",
+}
+
+
+def plain(text: str) -> str:
+    return re.sub(r"[^a-z]", "", unicodedata.normalize("NFKD", text).lower())
+
+
 def url(code: str, file: str) -> str:
-    return NC_URL.format(file) if code == "nc" else BASE.format(code, file)
+    if code in ELSTATS:
+        return elstats.url(file, 2026)
+    return {"nc": NC_URL, "il": IL_URL}.get(code, BASE.format(code, "{}")).format(file)
 
 
 def rows(code: str, path: Path):
+    if code in ELSTATS:
+        with path.open(newline="") as handle:
+            for row in csv.DictReader(handle):
+                if row["election_type"].startswith("Primary") and row["division_type"] in ("County", "Locality"):
+                    if row["office_name"] in ELSTATS_OFFICES:
+                        yield {
+                            "county": row["division_name"].removesuffix(" County"),
+                            "office": ELSTATS_OFFICES[row["office_name"]],
+                            "district": row["district_name"] if row["district_name"].isdigit() else "",
+                            "party": row["primary_party"],
+                            "candidate": row["candidate_name"].strip(),
+                            "votes": row["votes"].replace(",", "").removesuffix(".0"),
+                        }
+        return
+    if code == "il":
+        totals: dict[tuple[str, str, str, str, str], int] = {}
+        with path.open(newline="", encoding="utf-8-sig") as handle:
+            for row in csv.DictReader(handle):
+                found = IL_CONTEST.fullmatch(row["ContestName"].strip())
+                if found is None:
+                    continue
+                key = (
+                    IL_CITIES.get(row["JurisName"], row["JurisName"]),
+                    "U.S. House" if found[1] else "U.S. Senate" if found[2] else "Governor",
+                    found[1] or "",
+                    row["PartyName"].title(),
+                    row["CandidateName"].strip(),
+                )
+                totals[key] = totals.get(key, 0) + int(row["VoteCount"])
+        for (county, office, district, party, candidate), votes in totals.items():
+            yield {"county": county, "office": office, "district": district, "party": party, "candidate": candidate, "votes": str(votes)}
+        return
     if code != "nc":
         with path.open(newline="") as handle:
             yield from csv.DictReader(handle)
@@ -157,15 +231,16 @@ def emit() -> Path:
             ).fetchall()
         }
         systems = {key: cs.key("us.electoral_system", key) for key in ("fptp", "two_round", "two_round_35", "two_round_30", "top_two")}
-        counties = {
-            (code[:2], re.sub(r"[^a-z]", "", text.lower())): id
-            for code, text, id in conn.execute(
-                """select u.code, n.text, u.id from reporting_unit u
-                   join name n on n.entity_id = u.area_id and n.kind = 'short'
-                   where u.scheme_code = 'us.county' and u.code ~ %s""",
-                [f"^({'|'.join(FIPS.values())})"],
-            ).fetchall()
-        }
+        counties: dict[tuple[str, str], UUID] = {}
+        for code, text, id in conn.execute(
+            """select u.code, n.text, u.id from reporting_unit u
+               join name n on n.entity_id = u.area_id and n.kind = 'short'
+               where u.scheme_code = 'us.county' and u.code ~ %s order by u.code""",
+            [f"^({'|'.join(FIPS.values())})"],
+        ).fetchall():
+            counties.setdefault((code[:2], plain(text)), id)
+            if int(code[2:]) >= 500:
+                counties[(code[:2], plain(text) + "city")] = id
         pool: dict[tuple[str, str], set[UUID]] = defaultdict(set)
         for state, person, text in conn.execute(
             """select split_part(x.value, ':', 2), cy.person_id, n.text
@@ -205,6 +280,12 @@ def emit() -> Path:
 
         sources: dict[str, UUID] = {}
         retired_persons: set[UUID] = set()
+        held_options = {
+            value
+            for (value,) in conn.execute(
+                "select value from external_id where scheme = 'us.option' and value like '2026-%'"
+            ).fetchall()
+        }
         sources: dict[str, UUID] = {}
         retired_persons: set[UUID] = set()
         persons: dict[tuple[str, str], UUID] = {}
@@ -290,7 +371,7 @@ def emit() -> Path:
                     pooled = POOLED.search(row["candidate"]) is not None or row.get("write_in") == "Y"
                     label = row["party"] if not pooled else ""
                     candidate = "Write-ins" if pooled else title(row["candidate"].strip())
-                    county = re.sub(r"[^a-z]", "", row["county"].lower())
+                    county = plain(row["county"])
                     county = ALIASES.get((state, county), county)
                     grouped[(chamber, district, "" if state in TOP_TWO else scope)][
                         (candidate, label, "pooled" if pooled else "")
@@ -298,10 +379,9 @@ def emit() -> Path:
             for (chamber, district, scope), labels in sorted(junk.items()):
                 key_tail = chamber + (f":{district}" if district else "") + (f":{scope}" if scope else "")
                 for label in sorted(labels):
-                    try:
-                        option = cs.key("us.option", f"{day}:{state}:{key_tail}:{slug(label)}")
-                    except ValueError:
+                    if f"{day}:{state}:{key_tail}:{slug(label)}" not in held_options:
                         continue
+                    option = cs.key("us.option", f"{day}:{state}:{key_tail}:{slug(label)}")
                     if option not in cs.minted:
                         reason = f"{label} is a report line, not a candidate"
                         cs.add(
