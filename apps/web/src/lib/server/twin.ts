@@ -1997,7 +1997,7 @@ function contestMarkdown(
           }),
         ]),
     resultsMarkdown(contest, then),
-    ...(lists == null || !lists.isOpen || additional != null
+    ...(additional != null || !lists?.isOpen
       ? []
       : [
           `## ${m.lists_open_title()}`,
@@ -2029,11 +2029,11 @@ function contestMarkdown(
             ),
           ]),
         ]),
-    ...(lists == null ||
+    ...(additional != null ||
+    lists == null ||
     lists.isRanked ||
     lists.isOpen ||
-    lists.seats === 0 ||
-    additional != null
+    lists.seats === 0
       ? []
       : [
           `## ${m.lists_unranked_title()}`,
