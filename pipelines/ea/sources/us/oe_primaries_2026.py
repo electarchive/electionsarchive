@@ -1,13 +1,16 @@
 import csv
 import io
 import json
+import subprocess
 import re
 import unicodedata
 import zipfile
 from collections import defaultdict
+from datetime import UTC, datetime
 from pathlib import Path
 from uuid import UUID
 
+import httpx
 import polars as pl
 
 from ea import raw
@@ -51,6 +54,10 @@ FILES = {
     "GA": ("ga", "2026-05-19", ["ballot-items"]),
     "WA": ("wa", "2026-08-04", ["ballot-items"]),
     "UT": ("ut", "2026-06-23", ["ballot-items"]),
+    "NJ": ("nj", "2026-06-02", ["us-senate", "us-house"]),
+    "ID": ("id", "2026-05-19", ["ballot-items"]),
+    "FL": ("fl", "2026-08-18", ["extract"]),
+    "IN": ("in", "2026-05-05", ["OffCatC_1005_B.json"]),
     "KS": ("ks", "2026-08-04", ["United-States-Senate", "United-States-House-of-Representatives", "Governor"]),
     "MN": ("mn", "2026-08-11", ["USHouseCty.txt", "USSenateCty.txt", "GovernorPct.txt"]),
     "MD": (
@@ -62,7 +69,7 @@ FILES = {
         ],
     ),
 }
-FIPS = {"TX": "48", "CA": "06", "MI": "26", "PA": "42", "WV": "54", "MS": "28", "SD": "46", "WY": "56", "OR": "41", "KY": "21", "CO": "08", "AZ": "04", "TN": "47", "NC": "37", "IL": "17", "NM": "35", "NY": "36", "VA": "51", "AL": "01", "ND": "38", "MD": "24", "MN": "27", "VT": "50", "KS": "20", "GA": "13", "WA": "53", "UT": "49"}
+FIPS = {"TX": "48", "CA": "06", "MI": "26", "PA": "42", "WV": "54", "MS": "28", "SD": "46", "WY": "56", "OR": "41", "KY": "21", "CO": "08", "AZ": "04", "TN": "47", "NC": "37", "IL": "17", "NM": "35", "NY": "36", "VA": "51", "AL": "01", "ND": "38", "MD": "24", "MN": "27", "VT": "50", "KS": "20", "GA": "13", "WA": "53", "UT": "49", "IN": "18", "FL": "12", "ID": "16", "NJ": "34"}
 RUNOFF_SYSTEMS = {"GA": "two_round", "TX": "two_round", "MS": "two_round", "SD": "two_round_35", "NC": "two_round_30"}
 THRESHOLDS = {"GA": 50, "TX": 50, "MS": 50, "SD": 35, "NC": 30}
 OFFICES = {"U.S. House": "house", "U.S. Senate": "senate", "Governor": "governor"}
@@ -150,6 +157,10 @@ EV = {
         "https://results.sos.ga.gov/results/public/api/elections/Georgia/GeneralPrimary51926/",
         re.compile(r"(?:(?P<senate>US Senate)|(?P<governor>Governor)|US House of Representatives - District (?P<district>\d+)) - (?P<party>Rep|Dem)"),
     ),
+    "id": (
+        "https://results.voteidaho.gov/results/public/api/elections/id/may2026/",
+        re.compile(r"(?:(?P<senate>United States Senator)|(?P<governor>Governor)|United States Representative District (?P<district>\d+)) - (?P<party>Democratic|Republican|Libertarian)"),
+    ),
     "ut": (
         "https://electionresults.utah.gov/results/public/api/elections/utah/Primary06232026/",
         re.compile(r"(?P<party>REP|DEM) U\.S\. House District (?P<district>\d+)"),
@@ -159,6 +170,12 @@ EV = {
         re.compile(r"U\.S\. Representative - Congressional District (?P<district>\d+)"),
     ),
 }
+FL_URL = "https://results.elections.myflorida.com/ResultsExtract.Asp?ElectionDate=8/18/2026&OfficialResults=Y"
+BROWSER = {"User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36"}
+NJ_URL = "https://www.nj.gov/state/elections/assets/pdf/election-results/2026/2026-official-primary-results-{}.pdf"
+NJ_COUNTIES = ["ATLANTIC", "BERGEN", "BURLINGTON", "CAMDEN", "CAPE MAY", "CUMBERLAND", "ESSEX", "GLOUCESTER", "HUDSON", "HUNTERDON", "MERCER", "MIDDLESEX", "MONMOUTH", "MORRIS", "OCEAN", "PASSAIC", "SALEM", "SOMERSET", "SUSSEX", "UNION", "WARREN"]
+NJ_ORDINALS = {word: number for number, word in enumerate(["First", "Second", "Third", "Fourth", "Fifth", "Sixth", "Seventh", "Eighth", "Ninth", "Tenth", "Eleventh", "Twelfth"], 1)}
+IN_URL = "https://enr.indianavoters.in.gov/archive/2026Primary/data/{}"
 KS_URL = "https://sos.ks.gov/elections/26elec/2026-Primary-Election-{}-Precinct-Level-Results.xlsx"
 MN_URL = "https://electionresultsfiles.sos.mn.gov/20260811/{}"
 MN_OFFICES = {"U.S. Representative": "U.S. House", "U.S. Senator": "U.S. Senate", "Governor & Lt Governor": "Governor"}
@@ -180,6 +197,8 @@ def VT_TOWNS() -> dict[str, str]:
 
 
 def url(code: str, file: str) -> str:
+    if code == "fl":
+        return FL_URL
     if code in EV:
         return EV[code][0] + file
     if code in ELSTATS:
@@ -190,7 +209,7 @@ def url(code: str, file: str) -> str:
             finally:
                 elstats.OFFICES = offices
         return elstats.url(file, 2026)
-    return {"nc": NC_URL, "il": IL_URL, "md": MD_URL, "mn": MN_URL, "ks": KS_URL}.get(code, BASE.format(code, "{}")).format(file)
+    return {"nc": NC_URL, "il": IL_URL, "md": MD_URL, "mn": MN_URL, "ks": KS_URL, "in": IN_URL, "nj": NJ_URL}.get(code, BASE.format(code, "{}")).format(file)
 
 
 def rows(code: str, path: Path):
@@ -243,10 +262,60 @@ def rows(code: str, path: Path):
                         "county": county["locality"]["name"][0]["text"].removesuffix(" County"),
                         "office": "U.S. Senate" if groups.get("senate") else "Governor" if groups.get("governor") else "U.S. House",
                         "district": groups.get("district") or "",
-                        "party": groups["party"].upper() if "party" in groups else label,
+                        "party": (groups["party"] if groups["party"] in PARTIES else groups["party"].upper()) if "party" in groups else label,
                         "candidate": re.sub(r"\s*\(I\)$", "", option["name"][0]["text"]).strip(),
                         "votes": str(option["voteCount"]),
                         "write_in": "Y" if option["isWriteIn"] else "",
+                    }
+        return
+    if code == "nj":
+        text = subprocess.run(["pdftotext", "-layout", str(path), "-"], capture_output=True, text=True, check=True).stdout
+        office, district, candidate, party = "U.S. House" if "House of Representatives" in text else "U.S. Senate", "", None, None
+        for line in text.splitlines():
+            found = re.match(r"(\w+) Congressional District", line)
+            if found is not None:
+                district = str(NJ_ORDINALS[found[1]])
+                continue
+            found = re.match(r"([A-Z][A-Z .'\-,]+?)(?: \(w\))?(?: \*)?\s{2,}.*\s(Democratic|Republican|Libertarian|Green|Independent)\s*$", line)
+            if found is not None:
+                candidate, party = found[1].strip(), found[2]
+                continue
+            stripped = line.strip()
+            county = next((name for name in NJ_COUNTIES if stripped.startswith(name + " ")), None)
+            tally = re.search(r"\s([\d,]+)$", stripped)
+            if candidate is not None and county is not None and tally is not None:
+                yield {"county": county.title(), "office": office, "district": district, "party": party, "candidate": candidate, "votes": tally[1].replace(",", "")}
+        return
+    if code == "fl":
+        seen = set()
+        with path.open(newline="", encoding="utf-8-sig") as handle:
+            for row in csv.DictReader(handle, delimiter="\t"):
+                office = {"USS": "U.S. Senate", "USR": "U.S. House", "GOV": "Governor"}.get(row["RaceCode"])
+                key = (row["RaceCode"], row["PartyCode"], row["Juris1num"], row["CountyCode"], row["CanNameLast"], row["CanNameFirst"], row["CanNameMiddle"])
+                if office is None or key in seen or row["PartyCode"] not in ("REP", "DEM"):
+                    continue
+                seen.add(key)
+                yield {
+                    "county": row["CountyName"],
+                    "office": office,
+                    "district": row["Juris1num"].lstrip("0"),
+                    "party": row["PartyCode"],
+                    "candidate": " ".join(part for part in (row["CanNameFirst"], row["CanNameMiddle"], row["CanNameLast"]) if part),
+                    "votes": row["CanVotes"],
+                }
+        return
+    if code == "in":
+        for region in json.loads(path.read_bytes())["Root"]["OfficeCategory"]["Regions"]["Region"]:
+            races = region["Races"]["Race"]
+            for race in races if isinstance(races, list) else [races]:
+                for candidate in race["Candidates"]["Candidate"]:
+                    yield {
+                        "county": race["Jurisdiction"]["FIPS"],
+                        "office": "U.S. House",
+                        "district": region["MAP_JURISDICTION_NAME"],
+                        "party": candidate["PARTY_ABBREV"],
+                        "candidate": candidate["NAME_ON_BALLOT"],
+                        "votes": str(candidate["TOTAL_VOTES"]),
                     }
         return
     if code == "ks":
@@ -336,7 +405,10 @@ def title(text: str) -> str:
 def fetch() -> None:
     for code, _, names in FILES.values():
         for name in names:
-            raw.fetch(SOURCE, url(code, name), suffix={"ks": ".xlsx", "ga": ".json", "wa": ".json", "ut": ".json"}.get(code) or name[name.rindex(".") :])
+            if code == "fl":
+                raw.store(SOURCE, FL_URL, httpx.get(FL_URL, headers=BROWSER, follow_redirects=True, timeout=300).content, suffix=".txt", retrieved_at=datetime.now(UTC), media_type="text/tab-separated-values")
+                continue
+            raw.fetch(SOURCE, url(code, name), suffix={"nj": ".pdf", "ks": ".xlsx", "in": ".json", "ga": ".json", "wa": ".json", "ut": ".json", "id": ".json"}.get(code) or name[name.rindex(".") :])
     fetch_ballot_items()
 
 
