@@ -1,4 +1,5 @@
 import io
+import json
 import re
 import unicodedata
 from datetime import date
@@ -43,6 +44,18 @@ CSVS = {
         "people": f"{DATASETS}/9c55ef5e-5c2f-4f7e-9d26-2adc37dc3077/resource/927a8c56-f32e-4d62-9ac4-3f5c91bb0b4c/download/2020-05-27_general-election-2020-candidate_details-csv_en.csv",
     },
 }
+MEMBERS = "https://api.oireachtas.ie/v1/members?chamber=dail&house_no={house}&limit=1000"
+HOUSES = {2011: 31, 2016: 32, 2020: 33, 2024: 34}
+FIRST_HOUSE = 29
+REGISTERED_NAMES = {
+    "Anti-Austerity Alliance - People Before Profit": "Anti-Austerity Alliance–People Before Profit",
+    "Workers Party": "Workers' Party",
+}
+ALIASES = {"The Workers' Party": "Workers Party"}
+SUCCESSIONS = {
+    2020: ("Anti-Austerity Alliance - People Before Profit", "Solidarity - People Before Profit"),
+    2024: ("Solidarity - People Before Profit", "People Before Profit–Solidarity"),
+}
 PDFS = {
     2011: "https://data.oireachtas.ie/ie/oireachtas/electoralProcess/electionResults/dail/2011/2011-05-23_dail-general-election-2011-results_en.pdf",
 }
@@ -75,7 +88,8 @@ PARTY_CODES = {
 }
 NON_PARTY = "Non-Party"
 STATUTORY = {(2020, "Kildare South"): 4}
-CEANN_COMHAIRLE = {(2011, "Dún Laoghaire"): 4}
+CEANN_COMHAIRLE = {(2011, "Louth"): 5}
+AUTOMATIC = {(2011, "Louth"): "Seamus Kirk"}
 HYPHENS = {
     "Laois Offaly": "Laois-Offaly",
     "Roscommon - Galway": "Roscommon-Galway",
@@ -110,16 +124,14 @@ METHODOLOGY = (
 )
 CEANN = (
     "The outgoing Ceann Comhairle was deemed elected for this constituency without a contest. The count fills the "
-    "other {contested} of its {total} seats, and the quota is the Droop quota for {contested} seats."
+    "other {contested} of its {total} seats, and the quota is the Droop quota for {contested} seats. The Ceann "
+    "Comhairle is stored as elected and unopposed, with no votes."
 )
 STATUTORY_NOTE = (
     "The source's constituency details print 3 seats in Kildare South for 2020; the Electoral (Amendment) (Dáil "
     "Constituencies) Act 2017 (schedule) gives it 4, and one was filled without a contest, as the 3 seats in the count show."
 )
-REPEATED = (
-    "The results book prints the name {name} for two candidates in this constituency, one for each of two parties, "
-    "with their own counts. Both rows are stored as printed, as separate candidates; the archive has not changed either name."
-)
+REPEATED = "Two different candidates named {name} stood, one for {first} and one for {second}."
 EXHAUSTED_NOTE = (
     "The source's CSV files give each candidate's running total at every count but not the non-transferable papers. "
     "The archive stores them as the valid poll minus the candidates' running totals."
@@ -156,6 +168,8 @@ def fetch() -> None:
     raw.fetch(SOURCE, XLSX_2024, suffix=".xlsx")
     for url in PDFS.values():
         raw.fetch(SOURCE, url, suffix=".pdf")
+    for house in range(FIRST_HOUSE, max(HOUSES.values()) + 1):
+        raw.fetch(SOURCE, MEMBERS.format(house=house), suffix=".json")
 
 
 def number(cell: object) -> int:
@@ -339,7 +353,50 @@ def parse() -> None:
             series = lines.filter(pl.col("candidate") == winner["candidate"]).sort("count")["total"].to_list()
             if max(series) < u["quota"] and series[-1] == 0:
                 raise ValueError(f"{u['year']} {u['constituency']}: {winner['name']} elected below the quota and excluded")
+    seated: list[dict[str, object]] = []
+    for house in range(FIRST_HOUSE, max(HOUSES.values()) + 1):
+        for result in json.loads(raw.cached(SOURCE, MEMBERS.format(house=house)).path.read_bytes())["results"]:
+            member = result["member"]
+            for entry in member["memberships"]:
+                term = entry["membership"]
+                if term["house"]["houseNo"] != str(house):
+                    continue
+                seated.append(
+                    {
+                        "house": house,
+                        "code": member["memberCode"],
+                        "name": member["fullName"],
+                        "key": fold(member["fullName"]),
+                        "place": fold(term["represents"][0]["represent"]["showAs"]) if term["represents"] else "",
+                        "party": term["parties"][-1]["party"]["showAs"] if term["parties"] else None,
+                        "start": term["dateRange"]["start"],
+                    }
+                )
+    member_frame = pl.DataFrame(seated).with_columns(
+        original=pl.col("start") == pl.col("start").min().over("house")
+    )
+    links: list[dict[str, object]] = []
+    for year, house in HOUSES.items():
+        found: dict[tuple[str, str], list[dict[str, object]]] = {}
+        for person in cand_frame.filter(pl.col("year") == year).iter_rows(named=True):
+            key, place = fold(person["name"]), fold(person["constituency"])
+            own = member_frame.filter((pl.col("house") == house) & (pl.col("key") == key) & (pl.col("place") == place))
+            if own.height == 0:
+                other = member_frame.filter(pl.col("key") == key)
+                if other["code"].n_unique() == 1 and place in other["place"].to_list():
+                    own = other.head(1)
+            if own["code"].n_unique() == 1:
+                found.setdefault((person["constituency"], own["code"][0]), []).append(
+                    {"year": year, "constituency": person["constituency"], "candidate": person["candidate"], "code": own["code"][0], "member_name": own["name"][0], "member_party": own["party"][-1], "party": person["party"]}
+                )
+        for rows in found.values():
+            if len(rows) > 1:
+                rows = [r for r in rows if fold(r["party"]) == fold(str(r["member_party"]))]
+            if len(rows) == 1:
+                links.append(rows[0])
     PARSED.mkdir(parents=True, exist_ok=True)
+    member_frame.write_parquet(PARSED / "members.parquet")
+    pl.DataFrame(links).write_parquet(PARSED / "identity.parquet")
     unit_frame.write_parquet(PARSED / "units.parquet")
     cand_frame.write_parquet(PARSED / "candidates.parquet")
     count_frame.write_parquet(PARSED / "counts.parquet")
@@ -353,6 +410,11 @@ def emit() -> Path:
     candidates = pl.read_parquet(PARSED / "candidates.parquet")
     counts = pl.read_parquet(PARSED / "counts.parquet")
     printed = pl.read_parquet(PARSED / "printed.parquet")
+    members = pl.read_parquet(PARSED / "members.parquet")
+    forms = {
+        (row["year"], row["constituency"], row["candidate"]): row["member_name"]
+        for row in pl.read_parquet(PARSED / "identity.parquet").iter_rows(named=True)
+    }
     with connect() as conn:
         cs = Changeset(
             conn,
@@ -413,21 +475,27 @@ def emit() -> Path:
             if label == NON_PARTY or not label:
                 return None
             if label not in parties:
+                canonical = ALIASES.get(label, label)
                 code = PARTY_CODES.get(label)
                 if code is not None:
                     parties[label] = cs.key("ie.party", code)
                     if (earlier := strays.get(slug(label))) is not None and earlier != parties[label]:
                         cs.merge(earlier, parties[label])
-                elif len(known.get(fold(label), ())) == 1:
-                    parties[label] = known[fold(label)][0]
+                elif slug(canonical) in strays:
+                    parties[label] = strays[slug(canonical)]
+                    name(parties[label], REGISTERED_NAMES.get(canonical, canonical))
+                    if (earlier := strays.get(slug(label))) is not None and earlier != parties[label]:
+                        cs.merge(earlier, parties[label])
+                elif len(known.get(fold(canonical), ())) == 1:
+                    parties[label] = known[fold(canonical)][0]
                 else:
-                    parties[label] = cs.key("ie.dail.party", slug(label))
-                    if parties[label] in cs.minted:
-                        cs.add("party", id=parties[label], kind="party", polity_id=ireland)
-                        name(parties[label], label)
+                    parties[label] = cs.key("ie.dail.party", slug(canonical))
+                    cs.add("party", id=parties[label], kind="party", polity_id=ireland)
+                    name(parties[label], REGISTERED_NAMES.get(canonical, canonical))
             return parties[label]
 
         done_areas: set[UUID] = set()
+        sources: dict[int, UUID] = {}
         for year, (day, act, signed, _) in ELECTIONS.items():
             title = f"Dáil general election {year}: constituency results and transfers of votes"
             if year in PDFS:
@@ -466,6 +534,22 @@ def emit() -> Path:
                 )
                 for url in [*CSVS[year].values()] if year in CSVS else [XLSX_2024]:
                     cs.artifact(raw.cached(SOURCE, url), source)
+
+            sources[year] = source
+            if year in HOUSES:
+                api = cs.source("Houses of the Oireachtas", f"Members of the {HOUSES[year]}th Dáil")
+                cs.add(
+                    "source",
+                    id=api,
+                    kind="official_body",
+                    publisher="Houses of the Oireachtas",
+                    title=f"Members of the {HOUSES[year]}th Dáil",
+                    url=MEMBERS.format(house=HOUSES[year]),
+                    license="Oireachtas (Open Data) PSI Licence, CC BY 4.0 terms",
+                    license_url="https://creativecommons.org/licenses/by/4.0/",
+                    attribution="Member names, parties, and constituencies from api.oireachtas.ie (Oireachtas (Open Data) PSI Licence with CC BY 4.0 terms).",
+                )
+                cs.artifact(raw.cached(SOURCE, MEMBERS.format(house=HOUSES[year])), api)
 
             election = cs.key("ie.election", f"{day}:dail-eireann")
             cs.add("election", id=election, polity_id=ireland, kind="general", date_from=day, date_to=day, status="held")
@@ -507,7 +591,7 @@ def emit() -> Path:
                     kind="body_seats",
                     body_id=body,
                     district_area_id=area,
-                    magnitude=unit_row["seats"],
+                    magnitude=unit_row["total_seats"],
                     round_number=1,
                     electoral_system_id=system,
                     default_result_kind="counted",
@@ -562,7 +646,13 @@ def emit() -> Path:
                 field = candidates.filter(key)
                 repeated = set(field.filter(pl.col("name").is_duplicated())["name"])
                 for repeated_name in repeated:
-                    cs.add("note", entity_id=result_set, kind="caveat", body_md=REPEATED.format(name=repeated_name))
+                    first, second = field.filter(pl.col("name") == repeated_name)["party"].to_list()
+                    cs.add(
+                        "note",
+                        entity_id=result_set,
+                        kind="caveat",
+                        body_md=REPEATED.format(name=repeated_name, first=first, second=second),
+                    )
                 for candidate in field.iter_rows(named=True):
                     series = lines.filter(pl.col("candidate") == candidate["candidate"]).sort("count")
                     owner = party_id(candidate["party"])
@@ -570,15 +660,16 @@ def emit() -> Path:
                     option_key = f"{contest_key}:{fold(candidate['name'])}{suffix}"
                     option = cs.key("ie.option", option_key)
                     person = cs.key(f"{SOURCE}.person", f"{year}:{slug(label)}:{fold(candidate['name'])}{suffix}")
+                    shown_name = forms.get((year, label, candidate["candidate"]), candidate["name"])
                     cs.add("person", id=person, gender={"M": "male", "F": "female"}.get(str(candidate["gender"]).strip()[:1].upper()))
-                    name(person, candidate["name"])
+                    name(person, shown_name)
                     cs.add(
                         "contest_option",
                         id=option,
                         contest_id=contest,
                         kind="candidate",
                         party_id=owner,
-                        ballot_label=candidate["name"],
+                        ballot_label=shown_name,
                     )
                     cs.add(
                         "candidacy",
@@ -615,6 +706,48 @@ def emit() -> Path:
                         option_id=option,
                         kind="elected" if candidate["elected"] else ("lost" if final > 0 else "eliminated"),
                     )
+                if unit_row["total_seats"] != unit_row["seats"]:
+                    pending = members.filter(
+                        (pl.col("place") == fold(label))
+                        & (
+                            (pl.col("key") == fold(AUTOMATIC[year, label]))
+                            if (year, label) in AUTOMATIC
+                            else (
+                                (pl.col("house") == HOUSES[year])
+                                & pl.col("original")
+                                & ~pl.col("key").is_in([fold(n) for n in field["name"]])
+                            )
+                        )
+                    )
+                    pending = pending.sort("house").unique("code", keep="last")
+                    if pending.height != 1:
+                        raise ValueError(f"{year} {label}: {pending.height} members stand for the automatic return")
+                    speaker = pending.row(0, named=True)
+                    owner = party_id(speaker["party"])
+                    option_key = f"{contest_key}:{fold(speaker['name'])}"
+                    option = cs.key("ie.option", option_key)
+                    person = cs.key(f"{SOURCE}.person", f"{year}:{slug(label)}:{fold(speaker['name'])}")
+                    cs.add("person", id=person)
+                    name(person, speaker["name"])
+                    cs.add(
+                        "contest_option",
+                        id=option,
+                        contest_id=contest,
+                        kind="candidate",
+                        party_id=owner,
+                        ballot_label=speaker["name"],
+                    )
+                    cs.add(
+                        "candidacy",
+                        id=cs.key("ie.candidacy", option_key),
+                        person_id=person,
+                        option_id=option,
+                        role="head",
+                        ballot_name=speaker["name"],
+                        member_of_party_id=owner,
+                        is_independent=owner is None,
+                    )
+                    cs.add("outcome", result_set_id=result_set, option_id=option, kind="elected")
                 shown = printed.filter(key)
                 for count, total in running.items():
                     cs.add(
@@ -628,4 +761,19 @@ def emit() -> Path:
                         flags=0 if len(shown) else DERIVED,
                         value=unit_row["valid"] - total,
                     )
+        for year, (before, after) in SUCCESSIONS.items():
+            successor, predecessor = party_id(after), party_id(before)
+            if conn.execute(
+                "select 1 from party_relation where from_party_id = %s and to_party_id = %s and kind = 'successor_of'",
+                [successor, predecessor],
+            ).fetchone() is None:
+                cs.add(
+                    "party_relation",
+                    from_party_id=successor,
+                    to_party_id=predecessor,
+                    kind="successor_of",
+                    date=ELECTIONS[year][0],
+                    date_precision="day",
+                    source_id=sources[year],
+                )
         return cs.write()

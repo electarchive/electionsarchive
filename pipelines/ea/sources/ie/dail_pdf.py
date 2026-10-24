@@ -322,7 +322,7 @@ def rows(pdf: str, year: int) -> dict[str, list[dict[str, object]]]:
             name = " ".join(w[4] for w in line if not NUMBER.match(w[4]) and w[0] < min((x[0] for x in line if NUMBER.match(x[4])), default=0))
             figures = [w[4] for w in line if NUMBER.match(w[4])]
             if name and len(figures) >= 8 and len(figures[0]) == 1 and number(figures[1]) > 10000:
-                statutory[fold(name)] = (name, int(figures[0]))
+                statutory[fold(name)] = (name.rstrip("* "), int(figures[0]))
     units: list[dict[str, object]] = []
     candidates: list[dict[str, object]] = []
     counts: list[dict[str, object]] = []
