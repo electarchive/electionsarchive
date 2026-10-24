@@ -7803,6 +7803,32 @@ export const elections = {
             total: v.number(),
           }),
         ),
+        councils: v.array(
+          v.object({
+            name: v.string(),
+            path: v.nullable(v.string()),
+            up: v.number(),
+            size: v.nullable(v.number()),
+            parties: v.array(
+              v.object({
+                key: v.string(),
+                label: v.string(),
+                short: v.nullable(v.string()),
+                color: v.nullable(v.string()),
+                seats: v.number(),
+              }),
+            ),
+            control: v.nullable(
+              v.object({
+                key: v.nullable(v.string()),
+                label: v.nullable(v.string()),
+                color: v.nullable(v.string()),
+                seats: v.number(),
+                total: v.number(),
+              }),
+            ),
+          }),
+        ),
         races: v.array(
           v.object({
             name: v.string(),
@@ -8244,37 +8270,49 @@ export const elections = {
             race.results.flatMap((row) => row.person ?? []),
           ),
         ),
-        db.execute<{ isWhole: boolean }>(sql`
-          select exists (
-            select from external_id where entity_id = ${input.id}::uuid and scheme = 'gb.leh.type'
-              and split_part(value, ':', 1) in ('SDA', 'UAA', 'LB', 'SC')
+        db.execute<{ sample: string; election: string; isWhole: boolean }>(sql`
+          select c.id::text as sample, c.election_id::text as election, exists (
+            select from external_id x where x.entity_id = c.election_id and x.scheme = 'gb.leh.type'
+              and split_part(x.value, ':', 1) in ('SDA', 'UAA', 'LB', 'SC')
           ) as "isWhole"
+          from contest c
+          where c.id = any(${sql.param(councils.flatMap((race) => race.sample ?? []))}::uuid[])
         `),
       ]);
-      let control = null;
-      const council = councils[0];
-      if (
-        whole.rows[0]?.isWhole === true &&
-        councils.length === 1 &&
-        council != null &&
-        within == null
-      ) {
+      const held = new Map(whole.rows.map((row) => [row.sample, row]));
+      const standings = councils.map((race) => {
+        const found = held.get(race.sample ?? "");
         let total = 0;
-        for (const row of council.results) {
+        for (const row of race.results) {
           total += row.seats ?? 0;
         }
-        const top = council.results.toSorted(
+        const top = race.results.toSorted(
           (a, b) => (b.seats ?? 0) - (a.seats ?? 0),
         )[0];
         const isMajority = top != null && (top.seats ?? 0) * 2 > total;
-        control = {
-          key: isMajority ? top.key : null,
-          label: isMajority ? top.label : null,
-          color: isMajority ? top.color : null,
-          seats: top?.seats ?? 0,
+        return {
+          race,
+          path: slugs.get(found?.election ?? "") ?? null,
           total,
+          control:
+            found?.isWhole === true && within == null
+              ? {
+                  key: isMajority ? top.key : null,
+                  label: isMajority ? top.label : null,
+                  color: isMajority ? top.color : null,
+                  seats: top?.seats ?? 0,
+                  total,
+                }
+              : null,
         };
-      }
+      });
+      const isUmbrella =
+        within == null &&
+        raced.length >= 5 &&
+        standings.length === raced.length &&
+        new Set(raced.map((race) => race.body)).size === raced.length &&
+        new Set(whole.rows.map((row) => row.election)).size === raced.length &&
+        !whole.rows.some((row) => row.election === input.id);
       return {
         name:
           within == null
@@ -8299,9 +8337,29 @@ export const elections = {
                   path: slugs.get(election.parent) ?? null,
                 },
         notes: notes.rows,
-        control,
-        turnout:
-          pooledNow != null && pooledNow.reporting >= pooledNow.of * 0.9
+        control: councils.length === 1 ? (standings[0]?.control ?? null) : null,
+        councils: isUmbrella
+          ? standings.map(({ race, path, total, control }) => ({
+              name: race.name,
+              path,
+              up: total,
+              size: race.size,
+              parties: race.results
+                .filter((row) => (row.seats ?? 0) > 0)
+                .toSorted((a, b) => (b.seats ?? 0) - (a.seats ?? 0))
+                .map((row) => ({
+                  key: row.key,
+                  label: row.label,
+                  short: row.short,
+                  color: row.color,
+                  seats: row.seats ?? 0,
+                })),
+              control,
+            }))
+          : [],
+        turnout: isUmbrella
+          ? null
+          : pooledNow != null && pooledNow.reporting >= pooledNow.of * 0.9
             ? {
                 registered: pooledNow.registered,
                 voters: pooledNow.voters,
@@ -8333,7 +8391,7 @@ export const elections = {
                           voters: earlier.voters,
                         },
                 },
-        races: raced.map((race, index) => ({
+        races: (isUmbrella ? [] : raced).map((race, index) => ({
           ...race,
           anchor: raced
             .slice(0, index)
@@ -8346,6 +8404,7 @@ export const elections = {
           })),
         })),
         coverage:
+          isUmbrella ||
           partial?.noun == null ||
           partial.held === 0 ||
           partial.held > partial.of * 0.75

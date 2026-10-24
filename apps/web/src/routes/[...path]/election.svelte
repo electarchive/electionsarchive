@@ -27,6 +27,7 @@
   import Cycle from "./cycle.svelte";
   import Electors from "./electors.svelte";
   import Gains from "./gains.svelte";
+  import Councils from "./councils.svelte";
   import Governments from "./governments.svelte";
   import PlaceMap from "./map.svelte";
   import Places from "./places.svelte";
@@ -1078,6 +1079,10 @@
     </p>
   {/if}
 </header>
+
+{#if election.councils.length > 0}
+  <Councils councils={election.councils} />
+{/if}
 
 {#if races.length === 0 && election.contests.length > 0}
   <section class="col-span-12 bg-card px-3.5 py-3">

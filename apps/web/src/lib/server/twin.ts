@@ -906,6 +906,82 @@ function polityMarkdown(
   ].filter((block) => block !== "");
 }
 
+function councilsMarkdown(
+  councils: Extract<Data, { kind: "election" }>["election"]["councils"],
+  link: Link,
+) {
+  if (councils.length === 0) {
+    return [];
+  }
+  const none = councils.filter(
+    (council) => council.control != null && council.control.key == null,
+  ).length;
+  return [
+    `## ${m.councils_title()}`,
+    m.councils_lede({ count: count(councils.length) }),
+    `### ${m.councils_tally()}`,
+    table(
+      [m.col_party(), m.col_councillors(), m.col_councils_controlled()],
+      [
+        ...Map.groupBy(
+          councils.flatMap((council) =>
+            council.parties.map((party) => ({
+              party,
+              isControl: council.control?.key === party.key,
+            })),
+          ),
+          (entry) => entry.party.key,
+        )
+          .values()
+          .map((entries) => {
+            let seats = 0;
+            let controlled = 0;
+            for (const entry of entries) {
+              seats += entry.party.seats;
+              controlled += Number(entry.isControl);
+            }
+            return { label: entries[0]?.party.label ?? "", seats, controlled };
+          })
+          .toArray()
+          .toSorted((a, b) => b.seats - a.seats)
+          .map((entry) => [
+            entry.label,
+            count(entry.seats),
+            entry.controlled === 0 ? null : count(entry.controlled),
+          ]),
+        ...(none > 0 ? [[m.control_none_short(), null, count(none)]] : []),
+      ],
+    ),
+    table(
+      [
+        m.col_council(),
+        m.col_seats_up(),
+        m.col_seats_by_party(),
+        m.col_control(),
+      ],
+      councils.map((council) => [
+        link(council.name, council.path),
+        council.size != null && council.size > council.up
+          ? m.polity_seats({
+              seats: count(council.up),
+              size: count(council.size),
+            })
+          : count(council.up),
+        council.parties
+          .map((party) => `${party.short ?? party.label} ${count(party.seats)}`)
+          .join(", "),
+        council.control == null
+          ? null
+          : council.control.label == null
+            ? m.control_none_short()
+            : (council.parties.find(
+                (party) => party.key === council.control?.key,
+              )?.short ?? council.control.label),
+      ]),
+    ),
+  ];
+}
+
 function electionMarkdown(
   election: Extract<Data, { kind: "election" }>["election"],
   byes: Extract<Data, { kind: "election" }>["byes"],
@@ -1010,6 +1086,7 @@ function electionMarkdown(
                 })
           }. ${m.control_derived()}`,
         ]),
+    ...councilsMarkdown(election.councils, link),
     ...(tiered[0] == null
       ? []
       : [
