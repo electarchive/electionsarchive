@@ -2738,7 +2738,7 @@
         <span class="text-muted-foreground"
           >{m.map_bubbles_key({ votes: votes.toLowerCase() })}</span
         >
-      {:else}
+      {:else if places.rows.some((row) => row.margin != null)}
         <div class="flex items-center gap-2.5">
           <span
             class={cn(

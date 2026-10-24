@@ -255,12 +255,16 @@
       ? []
       : [
           { key: "leader" as const, label: m.col_leader(), numeric: false },
-          {
-            key: "margin" as const,
-            label: m.col_margin(),
-            numeric: true,
-            definition: m.term_margin(),
-          },
+          ...(listed.every((row) => row.margin == null)
+            ? []
+            : [
+                {
+                  key: "margin" as const,
+                  label: m.col_margin(),
+                  numeric: true,
+                  definition: m.term_margin(),
+                },
+              ]),
         ]),
     { key: "valid" as const, label: votes, numeric: true },
     ...(comparing && span != null

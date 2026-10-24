@@ -2331,15 +2331,26 @@ function countMarkdown(contest: Extract<Data, { kind: "contest" }>["contest"]) {
                     : m.stv_none(),
             ),
           ],
-          ...tally.rows.map((row) => {
-            const elected = stv.steps.findIndex((step) =>
-              step.elected.includes(row.key),
-            );
-            const out = stv.steps.findIndex(
-              (step) =>
-                step.kind === "exclusion" && step.from.includes(row.key),
-            );
-            return [
+          ...tally.rows
+            .map((row) => ({
+              row,
+              elected: stv.steps.findIndex((step) =>
+                step.elected.includes(row.key),
+              ),
+              out: stv.steps.findIndex(
+                (step) =>
+                  step.kind === "exclusion" && step.from.includes(row.key),
+              ),
+            }))
+            .toSorted(
+              (a, b) =>
+                (a.elected === -1 ? Infinity : a.elected) -
+                  (b.elected === -1 ? Infinity : b.elected) ||
+                (b.out === -1 ? Infinity : b.out) -
+                  (a.out === -1 ? Infinity : a.out) ||
+                (b.row.votes.at(-1) ?? 0) - (a.row.votes.at(-1) ?? 0),
+            )
+            .map(({ row, elected, out }) => [
               row.label,
               elected !== -1
                 ? row.votes.every((value) => (value ?? 0) < stv.quota)
@@ -2357,8 +2368,7 @@ function countMarkdown(contest: Extract<Data, { kind: "contest" }>["contest"]) {
                     : `−${count(before)}`
                   : `${count(votes)}${before == null ? "" : signed(votes - before)}`;
               }),
-            ];
-          }),
+            ]),
           [
             m.count_exhausted(),
             "",
@@ -2595,6 +2605,7 @@ function placesMarkdown(
   const noun =
     places.levels.find((level) => level.code === places.level)?.noun ??
     places.level;
+  const hasMargin = places.rows.some((row) => row.margin != null);
   return [
     `## ${m.places_title({ noun })}`,
     table(
@@ -2602,7 +2613,7 @@ function placesMarkdown(
         m.col_name(),
         m.col_leader(),
         m.col_share(),
-        m.col_margin(),
+        ...(hasMargin ? [m.col_margin()] : []),
         ...(isCompared ? [m.col_share_in({ year: then }), m.col_change()] : []),
         m.stat_valid(),
       ],
@@ -2612,11 +2623,15 @@ function placesMarkdown(
         return [
           link(row.name, row.path),
           ...leading(row, places.legend),
-          row.margin == null
-            ? null
-            : places.legend.length === 1
-              ? m.map_unopposed()
-              : points(row.margin),
+          ...(hasMargin
+            ? [
+                row.margin == null
+                  ? null
+                  : places.legend.length === 1
+                    ? m.map_unopposed()
+                    : points(row.margin),
+              ]
+            : []),
           ...(isCompared
             ? [
                 before == null ? null : percent(before),

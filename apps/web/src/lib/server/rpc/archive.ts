@@ -2375,9 +2375,11 @@ async function tabulate(
   const elected =
     owners.length === 0
       ? null
-      : await db.execute<{ seat: string }>(sql`
-        select o.contest_id || ':' || coalesce(m.into_id, cy.person_id) as seat
+      : await db.execute<{ seat: string; contest: string; isStv: boolean }>(sql`
+        select o.contest_id || ':' || coalesce(m.into_id, cy.person_id) as seat, c.id as contest,
+          coalesce(c.rules_override ->> 'formula', es.rules ->> 'formula', '') = 'stv' as "isStv"
         from contest c
+        left join electoral_system es on es.id = c.electoral_system_id
         join result_set rs on rs.contest_id = c.id and rs.is_default
         join outcome x on x.result_set_id = rs.id and x.kind in ('elected', 'won') and x.candidacy_id is null
         join contest_option o on o.id = x.option_id
@@ -2386,6 +2388,9 @@ async function tabulate(
         where c.id = any(${sql.param(owners)}::uuid[]) and c.magnitude > 1
       `);
   const chosenOnes = new Set(elected?.rows.map((row) => row.seat));
+  const transferred = new Set(
+    elected?.rows.flatMap((row) => (row.isStv ? [row.contest] : [])),
+  );
   const elects = rows.map((row, index) => {
     const side = row.isContest
       ? now[tier[index] ?? 0]?.get(row.k)?.side
@@ -2665,7 +2670,7 @@ async function tabulate(
           declared: unopposed.get(row.owner ?? "")?.declared ?? null,
           isRecorded: unopposed.get(row.owner ?? "")?.isRecorded ?? true,
           margin:
-            leader?.current == null
+            leader?.current == null || transferred.has(row.owner ?? "")
               ? null
               : (split ?? leader.current.share - (runner?.current?.share ?? 0)),
           earlier:
@@ -8601,6 +8606,10 @@ export const elections = {
           select c.id::text as sample, c.election_id::text as election, exists (
             select from external_id x where x.entity_id = c.election_id and x.scheme = 'gb.leh.type'
               and split_part(x.value, ':', 1) in ('SDA', 'UAA', 'LB', 'SC')
+          ) or (
+            not exists (select from external_id x where x.entity_id = c.election_id and x.scheme = 'gb.leh.type')
+            and (select sum(k.magnitude) from contest k where k.election_id = c.election_id and k.body_id = c.body_id and k.allocation_parent_id is null)
+              = (select z.seats from body_size z join election e on e.id = c.election_id where z.body_id = c.body_id and z.valid @> e.date_from limit 1)
           ) as "isWhole", exists (
             select from external_id x where x.entity_id = c.election_id and x.scheme = 'gb.leh.type'
               and split_part(x.value, ':', 1) in ('SDT', 'UAT', 'MB')
