@@ -1,0 +1,878 @@
+from	from_code	to	to_code	basis
+1832	1832:sct-aberdeen	1868	1	Representation of the People (Scotland) Act 1868 (31 & 32 Vict. c. 48): the burgh is not altered
+1868	1	1832	1832:sct-aberdeen	Representation of the People (Scotland) Act 1868 (31 & 32 Vict. c. 48): the burgh is not altered
+1868	410	1832	1832:sct-aberdeenshire	Representation of the People (Scotland) Act 1868 (31 & 32 Vict. c. 48) s. 9 and Schedule (B): the county is divided into two divisions
+1868	442	1832	1832:sct-aberdeenshire	Representation of the People (Scotland) Act 1868 (31 & 32 Vict. c. 48) s. 9 and Schedule (B): the county is divided into two divisions
+1832	1832:eng-abingdon	1868	3	Boundary Act 1868 (31 & 32 Vict. c. 46), First Schedule: the borough is the present borough with land added
+1832	1832:eng-andover	1868	4	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1868	4	1832	1832:eng-andover	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1868	5	1832	1832:wls-anglesey	Boundary Act 1868 (31 & 32 Vict. c. 46): the division lost land only to new or extended boroughs
+1868	6	1832	1832:irl-antrim	Representation of the People (Ireland) Act 1868 (31 & 32 Vict. c. 49) s. 9 only adds municipal land to boroughs, so each county lost land and gained none
+1832	1832:sct-argyllshire	1868	7	Representation of the People (Scotland) Act 1868 (31 & 32 Vict. c. 48): the county is not altered
+1868	7	1832	1832:sct-argyllshire	Representation of the People (Scotland) Act 1868 (31 & 32 Vict. c. 48): the county is not altered
+1868	8	1832	1832:irl-armagh	Representation of the People (Ireland) Act 1868 (31 & 32 Vict. c. 49) s. 9 only adds municipal land to boroughs, so each county lost land and gained none
+1832	1832:eng-ashton-under-lyne	1868	12	Boundary Act 1868 (31 & 32 Vict. c. 46), First Schedule: the borough is the present borough with land added
+1832	1832:sct-ayr-boroughs	1868	15	Representation of the People (Scotland) Act 1868 (31 & 32 Vict. c. 48): the burgh is not altered
+1868	15	1832	1832:sct-ayr-boroughs	Representation of the People (Scotland) Act 1868 (31 & 32 Vict. c. 48): the burgh is not altered
+1868	428	1832	1832:sct-ayrshire	Representation of the People (Scotland) Act 1868 (31 & 32 Vict. c. 48) s. 9 and Schedule (B): the county is divided into two divisions
+1868	433	1832	1832:sct-ayrshire	Representation of the People (Scotland) Act 1868 (31 & 32 Vict. c. 48) s. 9 and Schedule (B): the county is divided into two divisions
+1832	1832:eng-banbury	1868	17	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1868	17	1832	1832:eng-banbury	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1832	1832:sct-banffshire	1868	19	Representation of the People (Scotland) Act 1868 (31 & 32 Vict. c. 48): the county is not altered
+1868	19	1832	1832:sct-banffshire	Representation of the People (Scotland) Act 1868 (31 & 32 Vict. c. 48): the county is not altered
+1832	1832:eng-barnstaple	1868	20	Boundary Act 1868 (31 & 32 Vict. c. 46), First Schedule: the borough is the present borough with land added
+1832	1832:eng-bath	1868	21	Boundary Act 1868 (31 & 32 Vict. c. 46), First Schedule: the borough is the present borough with land added
+1832	1832:wls-beaumaris	1868	22	Boundary Act 1868 (31 & 32 Vict. c. 46), First Schedule: the borough is the present borough with land added
+1832	1832:eng-bedford	1868	23	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1868	23	1832	1832:eng-bedford	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1832	1832:eng-bedfordshire	1868	24	Boundary Act 1868 (31 & 32 Vict. c. 46): no borough in the county is new, altered, or disfranchised
+1868	24	1832	1832:eng-bedfordshire	Boundary Act 1868 (31 & 32 Vict. c. 46): no borough in the county is new, altered, or disfranchised
+1868	26	1832	1832:eng-berkshire	Boundary Act 1868 (31 & 32 Vict. c. 46): the division lost land only to new or extended boroughs
+1832	1832:eng-berwick-upon-tweed	1868	27	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1868	27	1832	1832:eng-berwick-upon-tweed	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1832	1832:sct-berwickshire	1868	28	Representation of the People (Scotland) Act 1868 (31 & 32 Vict. c. 48): the county is not altered
+1868	28	1832	1832:sct-berwickshire	Representation of the People (Scotland) Act 1868 (31 & 32 Vict. c. 48): the county is not altered
+1832	1832:eng-beverley	1868	29	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1868	29	1832	1832:eng-beverley	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1832	1832:eng-bewdley	1868	30	Boundary Act 1868 (31 & 32 Vict. c. 46), First Schedule: the borough is the present borough with land added
+1832	1832:eng-birkenhead	1868	402	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1868	402	1832	1832:eng-birkenhead	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1832	1832:eng-birmingham	1868	31	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1868	31	1832	1832:eng-birmingham	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1832	1832:eng-blackburn	1868	32	Boundary Act 1868 (31 & 32 Vict. c. 46), First Schedule: the borough is the present borough with land added
+1832	1832:eng-bodmin	1868	33	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1868	33	1832	1832:eng-bodmin	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1832	1832:eng-bolton	1868	34	Boundary Act 1868 (31 & 32 Vict. c. 46), First Schedule: the borough is the present borough with land added
+1832	1832:eng-boston	1868	35	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1868	35	1832	1832:eng-boston	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1832	1832:eng-bradford	1868	36	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1868	36	1832	1832:eng-bradford	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1832	1832:wls-brecon	1868	37	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1868	37	1832	1832:wls-brecon	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1832	1832:wls-breconshire	1868	38	Boundary Act 1868 (31 & 32 Vict. c. 46): no borough in the county is new, altered, or disfranchised
+1868	38	1832	1832:wls-breconshire	Boundary Act 1868 (31 & 32 Vict. c. 46): no borough in the county is new, altered, or disfranchised
+1832	1832:eng-bridgnorth	1868	39	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1868	39	1832	1832:eng-bridgnorth	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1832	1832:eng-bridgwater	1868	40	Boundary Act 1868 (31 & 32 Vict. c. 46), First Schedule: the borough is the present borough with land added
+1832	1832:eng-bridport	1868	41	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1868	41	1832	1832:eng-bridport	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1832	1832:eng-brighton	1868	42	Boundary Act 1868 (31 & 32 Vict. c. 46), First Schedule: the borough is the present borough with land added
+1832	1832:eng-bristol	1868	43	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1868	43	1832	1832:eng-bristol	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1832	1832:eng-buckingham	1868	44	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1868	44	1832	1832:eng-buckingham	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1832	1832:eng-bury	1868	46	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1868	46	1832	1832:eng-bury	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1832	1832:eng-bury-st-edmunds	1868	47	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1868	47	1832	1832:eng-bury-st-edmunds	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1832	1832:sct-buteshire	1868	48	Representation of the People (Scotland) Act 1868 (31 & 32 Vict. c. 48): the county is not altered
+1868	48	1832	1832:sct-buteshire	Representation of the People (Scotland) Act 1868 (31 & 32 Vict. c. 48): the county is not altered
+1832	1832:wls-caernarvon-boroughs	1868	49	Boundary Act 1868 (31 & 32 Vict. c. 46), First Schedule: the borough is the present borough with land added
+1868	50	1832	1832:wls-caernarvonshire	Boundary Act 1868 (31 & 32 Vict. c. 46): the division lost land only to new or extended boroughs
+1832	1832:sct-caithness	1868	51	Representation of the People (Scotland) Act 1868 (31 & 32 Vict. c. 48): the county is not altered
+1868	51	1832	1832:sct-caithness	Representation of the People (Scotland) Act 1868 (31 & 32 Vict. c. 48): the county is not altered
+1832	1832:eng-calne	1868	52	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1868	52	1832	1832:eng-calne	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1832	1832:eng-cambridge	1868	53	Boundary Act 1868 (31 & 32 Vict. c. 46), First Schedule: the borough is the present borough with land added
+1868	55	1832	1832:eng-cambridgeshire	Boundary Act 1868 (31 & 32 Vict. c. 46): the division lost land only to new or extended boroughs
+1832	1832:eng-canterbury	1868	56	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1868	56	1832	1832:eng-canterbury	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1832	1832:wls-cardiff	1868	57	Boundary Act 1868 (31 & 32 Vict. c. 46), First Schedule: the borough is the present borough with land added
+1832	1832:wls-cardigan-boroughs	1868	58	Boundary Act 1868 (31 & 32 Vict. c. 46), First Schedule: the borough is the present borough with land added
+1868	59	1832	1832:wls-cardiganshire	Boundary Act 1868 (31 & 32 Vict. c. 46): the division lost land only to new or extended boroughs
+1832	1832:eng-carlisle	1868	60	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1868	60	1832	1832:eng-carlisle	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1868	61	1832	1832:irl-carlow	Representation of the People (Ireland) Act 1868 (31 & 32 Vict. c. 49) s. 9 only adds municipal land to boroughs, so each county lost land and gained none
+1832	1832:wls-carmarthen-boroughs	1868	63	Boundary Act 1868 (31 & 32 Vict. c. 46), First Schedule: the borough is the present borough with land added
+1868	64	1832	1832:wls-carmarthenshire	Boundary Act 1868 (31 & 32 Vict. c. 46): the division lost land only to new or extended boroughs
+1868	67	1832	1832:irl-cavan	Representation of the People (Ireland) Act 1868 (31 & 32 Vict. c. 49) s. 9 only adds municipal land to boroughs, so each county lost land and gained none
+1832	1832:eng-chatham	1868	68	Boundary Act 1868 (31 & 32 Vict. c. 46), First Schedule: the borough is the present borough with land added
+1832	1832:eng-cheltenham	1868	69	Boundary Act 1868 (31 & 32 Vict. c. 46), First Schedule: the borough is the present borough with land added
+1832	1832:eng-chichester	1868	70	Boundary Act 1868 (31 & 32 Vict. c. 46), First Schedule: the borough is the present borough with land added
+1832	1832:eng-chippenham	1868	71	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1868	71	1832	1832:eng-chippenham	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1832	1832:eng-christchurch	1868	72	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1868	72	1832	1832:eng-christchurch	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1832	1832:eng-cirencester	1868	73	Boundary Act 1868 (31 & 32 Vict. c. 46), First Schedule: the borough is the present borough with land added
+1832	1832:eng-city-of-chester	1868	74	Boundary Act 1868 (31 & 32 Vict. c. 46), First Schedule: the borough is the present borough with land added
+1832	1832:eng-city-of-london	1868	75	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1868	75	1832	1832:eng-city-of-london	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1832	1832:sct-clackmannanshire-and-kinross-shire	1868	76	Representation of the People (Scotland) Act 1868 (31 & 32 Vict. c. 48): the county is not altered
+1868	76	1832	1832:sct-clackmannanshire-and-kinross-shire	Representation of the People (Scotland) Act 1868 (31 & 32 Vict. c. 48): the county is not altered
+1868	77	1832	1832:irl-clare	Representation of the People (Ireland) Act 1868 (31 & 32 Vict. c. 49) s. 9 only adds municipal land to boroughs, so each county lost land and gained none
+1832	1832:eng-clitheroe	1868	78	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1868	78	1832	1832:eng-clitheroe	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1832	1832:eng-cockermouth	1868	80	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1868	80	1832	1832:eng-cockermouth	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1832	1832:eng-colchester	1868	81	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1868	81	1832	1832:eng-colchester	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1868	83	1832	1832:irl-cork	Representation of the People (Ireland) Act 1868 (31 & 32 Vict. c. 49) s. 9 only adds municipal land to boroughs, so each county lost land and gained none
+1868	85	1832	1832:irl-county-dublin	Representation of the People (Ireland) Act 1868 (31 & 32 Vict. c. 49) s. 9 only adds municipal land to boroughs, so each county lost land and gained none
+1868	86	1832	1832:irl-county-galway	Representation of the People (Ireland) Act 1868 (31 & 32 Vict. c. 49) s. 9 only adds municipal land to boroughs, so each county lost land and gained none
+1868	87	1832	1832:irl-county-louth	Representation of the People (Ireland) Act 1868 (31 & 32 Vict. c. 49) s. 9 only adds municipal land to boroughs, so each county lost land and gained none
+1832	1832:eng-coventry	1868	88	Boundary Act 1868 (31 & 32 Vict. c. 46), First Schedule: the borough is the present borough with land added
+1832	1832:eng-cricklade	1868	89	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1868	89	1832	1832:eng-cricklade	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1832	1832:eng-derby	1868	93	Boundary Act 1868 (31 & 32 Vict. c. 46), First Schedule: the borough is the present borough with land added
+1832	1832:eng-devizes	1868	94	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1868	94	1832	1832:eng-devizes	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1832	1832:eng-devonport	1868	95	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1868	95	1832	1832:eng-devonport	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1868	96	1832	1832:irl-donegal	Representation of the People (Ireland) Act 1868 (31 & 32 Vict. c. 49) s. 9 only adds municipal land to boroughs, so each county lost land and gained none
+1832	1832:eng-dorchester	1868	97	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1868	97	1832	1832:eng-dorchester	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1832	1832:eng-dorset	1868	98	Representation of the People Act 1867 (30 & 31 Vict. c. 102) s. 18: Lyme Regis merges into the county, which loses nothing
+1832	1832:eng-dover	1868	99	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1868	99	1832	1832:eng-dover	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1868	100	1832	1832:irl-down	Representation of the People (Ireland) Act 1868 (31 & 32 Vict. c. 49) s. 9 only adds municipal land to boroughs, so each county lost land and gained none
+1832	1832:eng-droitwich	1868	103	Boundary Act 1868 (31 & 32 Vict. c. 46), First Schedule: the borough is the present borough with land added
+1832	1832:eng-dudley	1868	106	Boundary Act 1868 (31 & 32 Vict. c. 46), First Schedule: the borough is the present borough with land added
+1832	1832:sct-dumfries-boroughs	1868	107	Representation of the People (Scotland) Act 1868 (31 & 32 Vict. c. 48): the burgh is not altered
+1868	107	1832	1832:sct-dumfries-boroughs	Representation of the People (Scotland) Act 1868 (31 & 32 Vict. c. 48): the burgh is not altered
+1832	1832:sct-dumfriesshire	1868	108	Representation of the People (Scotland) Act 1868 (31 & 32 Vict. c. 48): the county is not altered
+1868	108	1832	1832:sct-dumfriesshire	Representation of the People (Scotland) Act 1868 (31 & 32 Vict. c. 48): the county is not altered
+1832	1832:sct-dunbartonshire	1868	109	Representation of the People (Scotland) Act 1868 (31 & 32 Vict. c. 48): the county is not altered
+1868	109	1832	1832:sct-dunbartonshire	Representation of the People (Scotland) Act 1868 (31 & 32 Vict. c. 48): the county is not altered
+1832	1832:sct-dundee	1868	111	Representation of the People (Scotland) Act 1868 (31 & 32 Vict. c. 48): the burgh is not altered
+1868	111	1832	1832:sct-dundee	Representation of the People (Scotland) Act 1868 (31 & 32 Vict. c. 48): the burgh is not altered
+1868	114	1832	1832:eng-durham	Boundary Act 1868 (31 & 32 Vict. c. 46): the division lost land only to new or extended boroughs
+1868	115	1832	1832:eng-east-cornwall	Boundary Act 1868 (31 & 32 Vict. c. 46): the division lost land only to new or extended boroughs
+1832	1832:eng-east-cumberland	1868	116	Boundary Act 1868 (31 & 32 Vict. c. 46): no borough in the county is new, altered, or disfranchised
+1868	116	1832	1832:eng-east-cumberland	Boundary Act 1868 (31 & 32 Vict. c. 46): no borough in the county is new, altered, or disfranchised
+1868	117	1832	1832:eng-east-gloucestershire	Boundary Act 1868 (31 & 32 Vict. c. 46): the division lost land only to new or extended boroughs
+1832	1832:eng-east-retford	1868	120	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1868	120	1832	1832:eng-east-retford	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1868	121	1832	1832:eng-east-riding-of-yorkshire	Boundary Act 1868 (31 & 32 Vict. c. 46): the division lost land only to new or extended boroughs
+1832	1832:eng-east-suffolk	1868	123	Boundary Act 1868 (31 & 32 Vict. c. 46): no borough in the county is new, altered, or disfranchised
+1868	123	1832	1832:eng-east-suffolk	Boundary Act 1868 (31 & 32 Vict. c. 46): no borough in the county is new, altered, or disfranchised
+1868	126	1832	1832:eng-east-worcestershire	Boundary Act 1868 (31 & 32 Vict. c. 46): the division lost land only to new or extended boroughs
+1832	1832:sct-edinburgh	1868	127	Representation of the People (Scotland) Act 1868 (31 & 32 Vict. c. 48): the burgh is not altered
+1868	127	1832	1832:sct-edinburgh	Representation of the People (Scotland) Act 1868 (31 & 32 Vict. c. 48): the burgh is not altered
+1832	1832:sct-elgin-boroughs	1868	128	Representation of the People (Scotland) Act 1868 (31 & 32 Vict. c. 48): the burgh is not altered
+1868	128	1832	1832:sct-elgin-boroughs	Representation of the People (Scotland) Act 1868 (31 & 32 Vict. c. 48): the burgh is not altered
+1832	1832:sct-elginshire-and-nairnshire	1868	129	Representation of the People (Scotland) Act 1868 (31 & 32 Vict. c. 48): the county is not altered
+1868	129	1832	1832:sct-elginshire-and-nairnshire	Representation of the People (Scotland) Act 1868 (31 & 32 Vict. c. 48): the county is not altered
+1832	1832:eng-evesham	1868	132	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1868	132	1832	1832:eng-evesham	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1832	1832:eng-eye	1868	134	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1868	134	1832	1832:eng-eye	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1832	1832:sct-falkirk	1868	135	Representation of the People (Scotland) Act 1868 (31 & 32 Vict. c. 48): the burgh is not altered
+1868	135	1832	1832:sct-falkirk	Representation of the People (Scotland) Act 1868 (31 & 32 Vict. c. 48): the burgh is not altered
+1868	136	1832	1832:irl-fermanagh	Representation of the People (Ireland) Act 1868 (31 & 32 Vict. c. 49) s. 9 only adds municipal land to boroughs, so each county lost land and gained none
+1832	1832:sct-fife	1868	137	Representation of the People (Scotland) Act 1868 (31 & 32 Vict. c. 48): the county is not altered
+1868	137	1832	1832:sct-fife	Representation of the People (Scotland) Act 1868 (31 & 32 Vict. c. 48): the county is not altered
+1832	1832:eng-finsbury	1868	138	Boundary Act 1868 (31 & 32 Vict. c. 46), First Schedule: the borough is the present borough with land added
+1832	1832:sct-forfarshire	1868	141	Representation of the People (Scotland) Act 1868 (31 & 32 Vict. c. 48): the county is not altered
+1868	141	1832	1832:sct-forfarshire	Representation of the People (Scotland) Act 1868 (31 & 32 Vict. c. 48): the county is not altered
+1832	1832:eng-frome	1868	142	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1868	142	1832	1832:eng-frome	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1832	1832:eng-gateshead	1868	144	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1868	144	1832	1832:eng-gateshead	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1868	145	1832	1832:wls-glamorganshire	Boundary Act 1868 (31 & 32 Vict. c. 46): the division lost land only to new or extended boroughs
+1832	1832:sct-glasgow	1868	146	Representation of the People (Scotland) Act 1868 (31 & 32 Vict. c. 48): the burgh is not altered
+1868	146	1832	1832:sct-glasgow	Representation of the People (Scotland) Act 1868 (31 & 32 Vict. c. 48): the burgh is not altered
+1832	1832:eng-gloucester	1868	147	Boundary Act 1868 (31 & 32 Vict. c. 46), First Schedule: the borough is the present borough with land added
+1832	1832:eng-grantham	1868	148	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1868	148	1832	1832:eng-grantham	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1832	1832:eng-great-grimsby	1868	149	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1868	149	1832	1832:eng-great-grimsby	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1832	1832:eng-great-marlow	1868	150	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1868	150	1832	1832:eng-great-marlow	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1832	1832:sct-greenock	1868	152	Representation of the People (Scotland) Act 1868 (31 & 32 Vict. c. 48): the burgh is not altered
+1868	152	1832	1832:sct-greenock	Representation of the People (Scotland) Act 1868 (31 & 32 Vict. c. 48): the burgh is not altered
+1832	1832:eng-greenwich	1868	153	Boundary Act 1868 (31 & 32 Vict. c. 46), First Schedule: the borough is the present borough with land added
+1832	1832:eng-guildford	1868	154	Boundary Act 1868 (31 & 32 Vict. c. 46), First Schedule: the borough is the present borough with land added
+1832	1832:sct-haddington-boroughs	1868	155	Representation of the People (Scotland) Act 1868 (31 & 32 Vict. c. 48): the burgh is not altered
+1868	155	1832	1832:sct-haddington-boroughs	Representation of the People (Scotland) Act 1868 (31 & 32 Vict. c. 48): the burgh is not altered
+1832	1832:sct-haddingtonshire	1868	156	Representation of the People (Scotland) Act 1868 (31 & 32 Vict. c. 48): the county is not altered
+1868	156	1832	1832:sct-haddingtonshire	Representation of the People (Scotland) Act 1868 (31 & 32 Vict. c. 48): the county is not altered
+1832	1832:eng-harwich	1868	158	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1868	158	1832	1832:eng-harwich	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1832	1832:eng-hastings	1868	159	Boundary Act 1868 (31 & 32 Vict. c. 46), First Schedule: the borough is the present borough with land added
+1832	1832:wls-haverfordwest	1868	160	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1868	160	1832	1832:wls-haverfordwest	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1832	1832:eng-helston	1868	161	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1868	161	1832	1832:eng-helston	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1832	1832:eng-hereford	1868	162	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1868	162	1832	1832:eng-hereford	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1832	1832:eng-herefordshire	1868	163	Boundary Act 1868 (31 & 32 Vict. c. 46): no borough in the county is new, altered, or disfranchised
+1868	163	1832	1832:eng-herefordshire	Boundary Act 1868 (31 & 32 Vict. c. 46): no borough in the county is new, altered, or disfranchised
+1832	1832:eng-hertford	1868	164	Boundary Act 1868 (31 & 32 Vict. c. 46), First Schedule: the borough is the present borough with land added
+1868	165	1832	1832:eng-hertfordshire	Boundary Act 1868 (31 & 32 Vict. c. 46): the division lost land only to new or extended boroughs
+1832	1832:eng-horsham	1868	167	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1868	167	1832	1832:eng-horsham	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1832	1832:eng-huddersfield	1868	168	Boundary Act 1868 (31 & 32 Vict. c. 46), First Schedule: the borough is the present borough with land added
+1832	1832:eng-huntingdon	1868	169	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1868	169	1832	1832:eng-huntingdon	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1832	1832:eng-huntingdonshire	1868	170	Boundary Act 1868 (31 & 32 Vict. c. 46): no borough in the county is new, altered, or disfranchised
+1868	170	1832	1832:eng-huntingdonshire	Boundary Act 1868 (31 & 32 Vict. c. 46): no borough in the county is new, altered, or disfranchised
+1832	1832:eng-hythe	1868	171	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1868	171	1832	1832:eng-hythe	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1832	1832:sct-inverness-boroughs	1868	172	Representation of the People (Scotland) Act 1868 (31 & 32 Vict. c. 48): the burgh is not altered
+1868	172	1832	1832:sct-inverness-boroughs	Representation of the People (Scotland) Act 1868 (31 & 32 Vict. c. 48): the burgh is not altered
+1832	1832:sct-inverness-shire	1868	173	Representation of the People (Scotland) Act 1868 (31 & 32 Vict. c. 48): the county is not altered
+1868	173	1832	1832:sct-inverness-shire	Representation of the People (Scotland) Act 1868 (31 & 32 Vict. c. 48): the county is not altered
+1832	1832:eng-ipswich	1868	174	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1868	174	1832	1832:eng-ipswich	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1868	175	1832	1832:eng-isle-of-wight	Boundary Act 1868 (31 & 32 Vict. c. 46): the division lost land only to new or extended boroughs
+1832	1832:eng-kendal	1868	176	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1868	176	1832	1832:eng-kendal	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1868	177	1832	1832:irl-kerry	Representation of the People (Ireland) Act 1868 (31 & 32 Vict. c. 49) s. 9 only adds municipal land to boroughs, so each county lost land and gained none
+1832	1832:eng-kidderminster	1868	178	Boundary Act 1868 (31 & 32 Vict. c. 46), First Schedule: the borough is the present borough with land added
+1868	179	1832	1832:irl-kildare	Representation of the People (Ireland) Act 1868 (31 & 32 Vict. c. 49) s. 9 only adds municipal land to boroughs, so each county lost land and gained none
+1868	180	1832	1832:irl-kilkenny	Representation of the People (Ireland) Act 1868 (31 & 32 Vict. c. 49) s. 9 only adds municipal land to boroughs, so each county lost land and gained none
+1832	1832:sct-kilmarnock-boroughs	1868	182	Representation of the People (Scotland) Act 1868 (31 & 32 Vict. c. 48): the burgh is not altered
+1868	182	1832	1832:sct-kilmarnock-boroughs	Representation of the People (Scotland) Act 1868 (31 & 32 Vict. c. 48): the burgh is not altered
+1832	1832:sct-kincardineshire	1868	183	Representation of the People (Scotland) Act 1868 (31 & 32 Vict. c. 48): the county is not altered
+1868	183	1832	1832:sct-kincardineshire	Representation of the People (Scotland) Act 1868 (31 & 32 Vict. c. 48): the county is not altered
+1868	184	1832	1832:irl-king-s-county	Representation of the People (Ireland) Act 1868 (31 & 32 Vict. c. 49) s. 9 only adds municipal land to boroughs, so each county lost land and gained none
+1832	1832:eng-king-s-lynn	1868	185	Boundary Act 1868 (31 & 32 Vict. c. 46), First Schedule: the borough is the present borough with land added
+1832	1832:eng-kingston-upon-hull	1868	186	Boundary Act 1868 (31 & 32 Vict. c. 46), First Schedule: the borough is the present borough with land added
+1832	1832:sct-kirkcaldy-boroughs	1868	188	Representation of the People (Scotland) Act 1868 (31 & 32 Vict. c. 48): the burgh is not altered
+1868	188	1832	1832:sct-kirkcaldy-boroughs	Representation of the People (Scotland) Act 1868 (31 & 32 Vict. c. 48): the burgh is not altered
+1832	1832:sct-kirkcudbrightshire	1868	189	Representation of the People (Scotland) Act 1868 (31 & 32 Vict. c. 48): the county is not altered
+1868	189	1832	1832:sct-kirkcudbrightshire	Representation of the People (Scotland) Act 1868 (31 & 32 Vict. c. 48): the county is not altered
+1832	1832:eng-knaresborough	1868	190	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1868	190	1832	1832:eng-knaresborough	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1832	1832:eng-lambeth	1868	191	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1868	191	1832	1832:eng-lambeth	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1868	430	1832	1832:sct-lanarkshire	Representation of the People (Scotland) Act 1868 (31 & 32 Vict. c. 48) s. 9 and Schedule (B): the county is divided into two divisions
+1868	435	1832	1832:sct-lanarkshire	Representation of the People (Scotland) Act 1868 (31 & 32 Vict. c. 48) s. 9 and Schedule (B): the county is divided into two divisions
+1832	1832:eng-launceston	1868	194	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1868	194	1832	1832:eng-launceston	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1832	1832:eng-leeds	1868	195	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1868	195	1832	1832:eng-leeds	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1832	1832:eng-leicester	1868	196	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1868	196	1832	1832:eng-leicester	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1832	1832:sct-leith-boroughs	1868	197	Representation of the People (Scotland) Act 1868 (31 & 32 Vict. c. 48): the burgh is not altered
+1868	197	1832	1832:sct-leith-boroughs	Representation of the People (Scotland) Act 1868 (31 & 32 Vict. c. 48): the burgh is not altered
+1868	198	1832	1832:irl-leitrim	Representation of the People (Ireland) Act 1868 (31 & 32 Vict. c. 49) s. 9 only adds municipal land to boroughs, so each county lost land and gained none
+1832	1832:eng-leominster	1868	199	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1868	199	1832	1832:eng-leominster	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1832	1832:eng-lewes	1868	200	Boundary Act 1868 (31 & 32 Vict. c. 46), First Schedule: the borough is the present borough with land added
+1832	1832:eng-lichfield	1868	201	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1868	201	1832	1832:eng-lichfield	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1868	202	1832	1832:irl-limerick	Representation of the People (Ireland) Act 1868 (31 & 32 Vict. c. 49) s. 9 only adds municipal land to boroughs, so each county lost land and gained none
+1832	1832:eng-lincoln	1868	204	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1868	204	1832	1832:eng-lincoln	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1832	1832:sct-linlithgowshire	1868	205	Representation of the People (Scotland) Act 1868 (31 & 32 Vict. c. 48): the county is not altered
+1868	205	1832	1832:sct-linlithgowshire	Representation of the People (Scotland) Act 1868 (31 & 32 Vict. c. 48): the county is not altered
+1832	1832:eng-liskeard	1868	207	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1868	207	1832	1832:eng-liskeard	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1832	1832:eng-liverpool	1868	208	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1868	208	1832	1832:eng-liverpool	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1868	209	1832	1832:irl-londonderry	Representation of the People (Ireland) Act 1868 (31 & 32 Vict. c. 49) s. 9 only adds municipal land to boroughs, so each county lost land and gained none
+1868	211	1832	1832:irl-longford	Representation of the People (Ireland) Act 1868 (31 & 32 Vict. c. 49) s. 9 only adds municipal land to boroughs, so each county lost land and gained none
+1832	1832:eng-ludlow	1868	212	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1868	212	1832	1832:eng-ludlow	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1832	1832:eng-lyme-regis	1868	98	Representation of the People Act 1867 (30 & 31 Vict. c. 102) s. 18: the borough ceases to return a member and merges into the undivided county
+1832	1832:eng-lymington	1868	214	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1868	214	1832	1832:eng-lymington	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1832	1832:eng-macclesfield	1868	215	Boundary Act 1868 (31 & 32 Vict. c. 46), First Schedule: the borough is the present borough with land added
+1832	1832:eng-maidstone	1868	216	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1868	216	1832	1832:eng-maidstone	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1832	1832:eng-maldon	1868	217	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1868	217	1832	1832:eng-maldon	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1832	1832:eng-malmesbury	1868	219	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1868	219	1832	1832:eng-malmesbury	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1832	1832:eng-malton	1868	220	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1868	220	1832	1832:eng-malton	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1832	1832:eng-manchester	1868	221	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1868	221	1832	1832:eng-manchester	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1832	1832:eng-marlborough	1868	222	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1868	222	1832	1832:eng-marlborough	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1832	1832:eng-marylebone	1868	223	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1868	223	1832	1832:eng-marylebone	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1868	224	1832	1832:irl-mayo	Representation of the People (Ireland) Act 1868 (31 & 32 Vict. c. 49) s. 9 only adds municipal land to boroughs, so each county lost land and gained none
+1868	225	1832	1832:irl-meath	Representation of the People (Ireland) Act 1868 (31 & 32 Vict. c. 49) s. 9 only adds municipal land to boroughs, so each county lost land and gained none
+1832	1832:wls-merioneth	1868	226	Boundary Act 1868 (31 & 32 Vict. c. 46): no borough in the county is new, altered, or disfranchised
+1868	226	1832	1832:wls-merioneth	Boundary Act 1868 (31 & 32 Vict. c. 46): no borough in the county is new, altered, or disfranchised
+1832	1832:wls-merthyr-tydfil	1868	227	Boundary Act 1868 (31 & 32 Vict. c. 46), First Schedule: the borough is the present borough with land added
+1868	228	1832	1832:eng-middlesex	Boundary Act 1868 (31 & 32 Vict. c. 46): the division lost land only to new or extended boroughs
+1832	1832:eng-midhurst	1868	229	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1868	229	1832	1832:eng-midhurst	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1832	1832:sct-midlothian	1868	230	Representation of the People (Scotland) Act 1868 (31 & 32 Vict. c. 48): the county is not altered
+1868	230	1832	1832:sct-midlothian	Representation of the People (Scotland) Act 1868 (31 & 32 Vict. c. 48): the county is not altered
+1868	231	1832	1832:irl-monaghan	Representation of the People (Ireland) Act 1868 (31 & 32 Vict. c. 49) s. 9 only adds municipal land to boroughs, so each county lost land and gained none
+1832	1832:wls-monmouth-boroughs	1868	232	Boundary Act 1868 (31 & 32 Vict. c. 46), First Schedule: the borough is the present borough with land added
+1868	233	1832	1832:wls-monmouthshire	Boundary Act 1868 (31 & 32 Vict. c. 46): the division lost land only to new or extended boroughs
+1832	1832:wls-montgomery	1868	234	Boundary Act 1868 (31 & 32 Vict. c. 46): no borough in the county is new, altered, or disfranchised
+1868	234	1832	1832:wls-montgomery	Boundary Act 1868 (31 & 32 Vict. c. 46): no borough in the county is new, altered, or disfranchised
+1832	1832:wls-montgomery-boroughs	1868	235	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1868	235	1832	1832:wls-montgomery-boroughs	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1832	1832:sct-montrose-boroughs	1868	236	Representation of the People (Scotland) Act 1868 (31 & 32 Vict. c. 48): the burgh is not altered
+1868	236	1832	1832:sct-montrose-boroughs	Representation of the People (Scotland) Act 1868 (31 & 32 Vict. c. 48): the burgh is not altered
+1832	1832:eng-morpeth	1868	237	Boundary Act 1868 (31 & 32 Vict. c. 46), First Schedule: the borough is the present borough with land added
+1832	1832:eng-new-shoreham	1868	239	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1868	239	1832	1832:eng-new-shoreham	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1832	1832:eng-newark	1868	240	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1868	240	1832	1832:eng-newark	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1832	1832:eng-newcastle-upon-tyne	1868	241	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1868	241	1832	1832:eng-newcastle-upon-tyne	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1832	1832:eng-newcastle-under-lyme	1868	242	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1868	242	1832	1832:eng-newcastle-under-lyme	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1832	1832:eng-newport-isle-of-wight	1868	243	Boundary Act 1868 (31 & 32 Vict. c. 46), First Schedule: the borough is the present borough with land added
+1868	248	1832	1832:eng-north-durham	Boundary Act 1868 (31 & 32 Vict. c. 46): the division lost land only to new or extended boroughs
+1832	1832:eng-north-hampshire	1868	250	Boundary Act 1868 (31 & 32 Vict. c. 46): no borough in the county is new, altered, or disfranchised
+1868	250	1832	1832:eng-north-hampshire	Boundary Act 1868 (31 & 32 Vict. c. 46): no borough in the county is new, altered, or disfranchised
+1832	1832:eng-north-leicestershire	1868	252	Boundary Act 1868 (31 & 32 Vict. c. 46): no borough in the county is new, altered, or disfranchised
+1868	252	1832	1832:eng-north-leicestershire	Boundary Act 1868 (31 & 32 Vict. c. 46): no borough in the county is new, altered, or disfranchised
+1868	254	1832	1832:eng-north-northamptonshire	Boundary Act 1868 (31 & 32 Vict. c. 46): the division lost land only to new or extended boroughs
+1868	255	1832	1832:eng-north-northumberland	Boundary Act 1868 (31 & 32 Vict. c. 46): the division lost land only to new or extended boroughs
+1832	1832:eng-north-nottinghamshire	1868	256	Boundary Act 1868 (31 & 32 Vict. c. 46): no borough in the county is new, altered, or disfranchised
+1868	256	1832	1832:eng-north-nottinghamshire	Boundary Act 1868 (31 & 32 Vict. c. 46): no borough in the county is new, altered, or disfranchised
+1868	257	1832	1832:eng-north-riding-of-yorkshire	Boundary Act 1868 (31 & 32 Vict. c. 46): the division lost land only to new or extended boroughs
+1832	1832:eng-north-shropshire	1868	258	Boundary Act 1868 (31 & 32 Vict. c. 46): no borough in the county is new, altered, or disfranchised
+1868	258	1832	1832:eng-north-shropshire	Boundary Act 1868 (31 & 32 Vict. c. 46): no borough in the county is new, altered, or disfranchised
+1868	260	1832	1832:eng-north-warwickshire	Boundary Act 1868 (31 & 32 Vict. c. 46): the division lost land only to new or extended boroughs
+1832	1832:eng-northallerton	1868	262	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1868	262	1832	1832:eng-northallerton	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1832	1832:eng-northampton	1868	263	Boundary Act 1868 (31 & 32 Vict. c. 46), First Schedule: the borough is the present borough with land added
+1832	1832:eng-norwich	1868	264	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1868	264	1832	1832:eng-norwich	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1832	1832:eng-nottingham	1868	265	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1868	265	1832	1832:eng-nottingham	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1832	1832:eng-oldham	1868	266	Boundary Act 1868 (31 & 32 Vict. c. 46), First Schedule: the borough is the present borough with land added
+1832	1832:sct-orkney-and-shetland	1868	267	Representation of the People (Scotland) Act 1868 (31 & 32 Vict. c. 48): the county is not altered
+1868	267	1832	1832:sct-orkney-and-shetland	Representation of the People (Scotland) Act 1868 (31 & 32 Vict. c. 48): the county is not altered
+1832	1832:eng-oxford	1868	268	Boundary Act 1868 (31 & 32 Vict. c. 46), First Schedule: the borough is the present borough with land added
+1868	270	1832	1832:eng-oxfordshire	Boundary Act 1868 (31 & 32 Vict. c. 46): the division lost land only to new or extended boroughs
+1832	1832:sct-paisley	1868	271	Representation of the People (Scotland) Act 1868 (31 & 32 Vict. c. 48): the burgh is not altered
+1868	271	1832	1832:sct-paisley	Representation of the People (Scotland) Act 1868 (31 & 32 Vict. c. 48): the burgh is not altered
+1832	1832:sct-peeblesshire	1868	432	Representation of the People (Scotland) Act 1868 (31 & 32 Vict. c. 48) s. 10: Peebles and Selkirk are united, less the burghs of the new Hawick district, which lie in Roxburgh and Selkirk
+1832	1832:wls-pembroke-boroughs	1868	273	Boundary Act 1868 (31 & 32 Vict. c. 46), First Schedule: the borough is the present borough with land added
+1868	274	1832	1832:wls-pembrokeshire	Boundary Act 1868 (31 & 32 Vict. c. 46): the division lost land only to new or extended boroughs
+1832	1832:eng-penryn-and-falmouth	1868	275	Boundary Act 1868 (31 & 32 Vict. c. 46), First Schedule: the borough is the present borough with land added
+1832	1832:sct-perth	1868	276	Representation of the People (Scotland) Act 1868 (31 & 32 Vict. c. 48): the burgh is not altered
+1868	276	1832	1832:sct-perth	Representation of the People (Scotland) Act 1868 (31 & 32 Vict. c. 48): the burgh is not altered
+1832	1832:sct-perthshire	1868	277	Representation of the People (Scotland) Act 1868 (31 & 32 Vict. c. 48): the county is not altered
+1868	277	1832	1832:sct-perthshire	Representation of the People (Scotland) Act 1868 (31 & 32 Vict. c. 48): the county is not altered
+1832	1832:eng-peterborough	1868	278	Boundary Act 1868 (31 & 32 Vict. c. 46), First Schedule: the borough is the present borough with land added
+1832	1832:eng-petersfield	1868	279	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1868	279	1832	1832:eng-petersfield	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1832	1832:eng-plymouth	1868	280	Boundary Act 1868 (31 & 32 Vict. c. 46), First Schedule: the borough is the present borough with land added
+1832	1832:eng-pontefract	1868	281	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1868	281	1832	1832:eng-pontefract	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1832	1832:eng-poole	1868	282	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1868	282	1832	1832:eng-poole	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1832	1832:eng-portsmouth	1868	284	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1868	284	1832	1832:eng-portsmouth	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1832	1832:eng-preston	1868	285	Boundary Act 1868 (31 & 32 Vict. c. 46), First Schedule: the borough is the present borough with land added
+1868	286	1832	1832:irl-queen-s-county	Representation of the People (Ireland) Act 1868 (31 & 32 Vict. c. 49) s. 9 only adds municipal land to boroughs, so each county lost land and gained none
+1832	1832:wls-radnor	1868	287	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1868	287	1832	1832:wls-radnor	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1832	1832:wls-radnorshire	1868	288	Boundary Act 1868 (31 & 32 Vict. c. 46): no borough in the county is new, altered, or disfranchised
+1868	288	1832	1832:wls-radnorshire	Boundary Act 1868 (31 & 32 Vict. c. 46): no borough in the county is new, altered, or disfranchised
+1832	1832:eng-reading	1868	289	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1868	289	1832	1832:eng-reading	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1832	1832:sct-renfrewshire	1868	291	Representation of the People (Scotland) Act 1868 (31 & 32 Vict. c. 48): the county is not altered
+1868	291	1832	1832:sct-renfrewshire	Representation of the People (Scotland) Act 1868 (31 & 32 Vict. c. 48): the county is not altered
+1832	1832:eng-richmond-yorks	1868	292	Boundary Act 1868 (31 & 32 Vict. c. 46), First Schedule: the borough is the present borough with land added
+1832	1832:eng-ripon	1868	293	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1868	293	1832	1832:eng-ripon	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1832	1832:eng-rochester	1868	295	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1868	295	1832	1832:eng-rochester	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1868	296	1832	1832:irl-roscommon	Representation of the People (Ireland) Act 1868 (31 & 32 Vict. c. 49) s. 9 only adds municipal land to boroughs, so each county lost land and gained none
+1832	1832:sct-ross-and-cromarty	1868	297	Representation of the People (Scotland) Act 1868 (31 & 32 Vict. c. 48): the county is not altered
+1868	297	1832	1832:sct-ross-and-cromarty	Representation of the People (Scotland) Act 1868 (31 & 32 Vict. c. 48): the county is not altered
+1868	298	1832	1832:sct-roxboroughshire	Representation of the People (Scotland) Act 1868 (31 & 32 Vict. c. 48) s. 10: Hawick joins a new district of burghs, and the county gains nothing
+1832	1832:eng-rutland	1868	299	Boundary Act 1868 (31 & 32 Vict. c. 46): no borough in the county is new, altered, or disfranchised
+1868	299	1832	1832:eng-rutland	Boundary Act 1868 (31 & 32 Vict. c. 46): no borough in the county is new, altered, or disfranchised
+1832	1832:eng-rye	1868	300	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1868	300	1832	1832:eng-rye	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1832	1832:eng-salford	1868	301	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1868	301	1832	1832:eng-salford	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1832	1832:eng-salisbury	1868	302	Boundary Act 1868 (31 & 32 Vict. c. 46), First Schedule: the borough is the present borough with land added
+1832	1832:eng-sandwich	1868	303	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1868	303	1832	1832:eng-sandwich	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1832	1832:eng-scarborough	1868	304	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1868	304	1832	1832:eng-scarborough	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1832	1832:eng-shaftesbury	1868	306	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1868	306	1832	1832:eng-shaftesbury	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1832	1832:eng-sheffield	1868	307	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1868	307	1832	1832:eng-sheffield	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1832	1832:eng-shrewsbury	1868	308	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1868	308	1832	1832:eng-shrewsbury	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1868	309	1832	1832:irl-sligo	Representation of the People (Ireland) Act 1868 (31 & 32 Vict. c. 49) s. 9 only adds municipal land to boroughs, so each county lost land and gained none
+1868	314	1832	1832:eng-south-durham	Boundary Act 1868 (31 & 32 Vict. c. 46): the division lost land only to new or extended boroughs
+1832	1832:eng-south-hampshire	1868	316	Boundary Act 1868 (31 & 32 Vict. c. 46): no borough in the county is new, altered, or disfranchised
+1868	316	1832	1832:eng-south-hampshire	Boundary Act 1868 (31 & 32 Vict. c. 46): no borough in the county is new, altered, or disfranchised
+1832	1832:eng-south-leicestershire	1868	318	Boundary Act 1868 (31 & 32 Vict. c. 46): no borough in the county is new, altered, or disfranchised
+1868	318	1832	1832:eng-south-leicestershire	Boundary Act 1868 (31 & 32 Vict. c. 46): no borough in the county is new, altered, or disfranchised
+1868	320	1832	1832:eng-south-northamptonshire	Boundary Act 1868 (31 & 32 Vict. c. 46): the division lost land only to new or extended boroughs
+1868	321	1832	1832:eng-south-northumberland	Boundary Act 1868 (31 & 32 Vict. c. 46): the division lost land only to new or extended boroughs
+1832	1832:eng-south-nottinghamshire	1868	322	Boundary Act 1868 (31 & 32 Vict. c. 46): no borough in the county is new, altered, or disfranchised
+1868	322	1832	1832:eng-south-nottinghamshire	Boundary Act 1868 (31 & 32 Vict. c. 46): no borough in the county is new, altered, or disfranchised
+1832	1832:eng-south-shields	1868	323	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1868	323	1832	1832:eng-south-shields	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1832	1832:eng-south-shropshire	1868	324	Boundary Act 1868 (31 & 32 Vict. c. 46): no borough in the county is new, altered, or disfranchised
+1868	324	1832	1832:eng-south-shropshire	Boundary Act 1868 (31 & 32 Vict. c. 46): no borough in the county is new, altered, or disfranchised
+1868	326	1832	1832:eng-south-warwickshire	Boundary Act 1868 (31 & 32 Vict. c. 46): the division lost land only to new or extended boroughs
+1832	1832:eng-southampton	1868	328	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1868	328	1832	1832:eng-southampton	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1832	1832:eng-southwark	1868	329	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1868	329	1832	1832:eng-southwark	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1832	1832:sct-st-andrews-boroughs	1868	331	Representation of the People (Scotland) Act 1868 (31 & 32 Vict. c. 48): the burgh is not altered
+1868	331	1832	1832:sct-st-andrews-boroughs	Representation of the People (Scotland) Act 1868 (31 & 32 Vict. c. 48): the burgh is not altered
+1832	1832:eng-st-ives	1868	332	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1868	332	1832	1832:eng-st-ives	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1832	1832:eng-stafford	1868	333	Boundary Act 1868 (31 & 32 Vict. c. 46), First Schedule: the borough is the present borough with land added
+1832	1832:eng-stamford	1868	334	Boundary Act 1868 (31 & 32 Vict. c. 46), First Schedule: the borough is the present borough with land added
+1832	1832:sct-stirling-boroughs	1868	335	Representation of the People (Scotland) Act 1868 (31 & 32 Vict. c. 48): the burgh is not altered
+1868	335	1832	1832:sct-stirling-boroughs	Representation of the People (Scotland) Act 1868 (31 & 32 Vict. c. 48): the burgh is not altered
+1832	1832:sct-stirlingshire	1868	336	Representation of the People (Scotland) Act 1868 (31 & 32 Vict. c. 48): the county is not altered
+1868	336	1832	1832:sct-stirlingshire	Representation of the People (Scotland) Act 1868 (31 & 32 Vict. c. 48): the county is not altered
+1832	1832:eng-stockport	1868	337	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1868	337	1832	1832:eng-stockport	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1832	1832:eng-stoke-on-trent	1868	338	Boundary Act 1868 (31 & 32 Vict. c. 46), First Schedule: the borough is the present borough with land added
+1832	1832:eng-stroud	1868	339	Boundary Act 1868 (31 & 32 Vict. c. 46), First Schedule: the borough is the present borough with land added
+1832	1832:eng-sunderland	1868	341	Boundary Act 1868 (31 & 32 Vict. c. 46), First Schedule: the borough is the present borough with land added
+1832	1832:sct-sutherland	1868	342	Representation of the People (Scotland) Act 1868 (31 & 32 Vict. c. 48): the county is not altered
+1868	342	1832	1832:sct-sutherland	Representation of the People (Scotland) Act 1868 (31 & 32 Vict. c. 48): the county is not altered
+1832	1832:wls-swansea-district	1868	343	Boundary Act 1868 (31 & 32 Vict. c. 46), First Schedule: the borough is the present borough with land added
+1832	1832:eng-tamworth	1868	344	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1868	344	1832	1832:eng-tamworth	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1832	1832:eng-taunton	1868	345	Boundary Act 1868 (31 & 32 Vict. c. 46), First Schedule: the borough is the present borough with land added
+1832	1832:eng-tavistock	1868	346	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1868	346	1832	1832:eng-tavistock	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1832	1832:eng-tewkesbury	1868	347	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1868	347	1832	1832:eng-tewkesbury	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1832	1832:eng-thirsk	1868	349	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1868	349	1832	1832:eng-thirsk	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1868	350	1832	1832:irl-tipperary	Representation of the People (Ireland) Act 1868 (31 & 32 Vict. c. 49) s. 9 only adds municipal land to boroughs, so each county lost land and gained none
+1832	1832:eng-tiverton	1868	351	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1868	351	1832	1832:eng-tiverton	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1868	353	1832	1832:eng-tower-hamlets	Representation of the People Act 1867 (30 & 31 Vict. c. 102) Schedule (C): the borough is divided into Tower Hamlets and Hackney
+1868	419	1832	1832:eng-tower-hamlets	Representation of the People Act 1867 (30 & 31 Vict. c. 102) Schedule (C): the borough is divided into Tower Hamlets and Hackney
+1832	1832:eng-truro	1868	355	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1868	355	1832	1832:eng-truro	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1832	1832:eng-tynemouth-and-north-shields	1868	356	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1868	356	1832	1832:eng-tynemouth-and-north-shields	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1868	357	1832	1832:irl-tyrone	Representation of the People (Ireland) Act 1868 (31 & 32 Vict. c. 49) s. 9 only adds municipal land to boroughs, so each county lost land and gained none
+1832	1832:eng-wallingford	1868	359	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1868	359	1832	1832:eng-wallingford	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1832	1832:eng-walsall	1868	360	Boundary Act 1868 (31 & 32 Vict. c. 46), First Schedule: the borough is the present borough with land added
+1832	1832:eng-wareham	1868	361	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1868	361	1832	1832:eng-wareham	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1832	1832:eng-warrington	1868	362	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1868	362	1832	1832:eng-warrington	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1832	1832:eng-warwick	1868	363	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1868	363	1832	1832:eng-warwick	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1868	364	1832	1832:irl-waterford	Representation of the People (Ireland) Act 1868 (31 & 32 Vict. c. 49) s. 9 only adds municipal land to boroughs, so each county lost land and gained none
+1832	1832:eng-wenlock	1868	367	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1868	367	1832	1832:eng-wenlock	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1868	368	1832	1832:eng-west-cornwall	Boundary Act 1868 (31 & 32 Vict. c. 46): the division lost land only to new or extended boroughs
+1832	1832:eng-west-cumberland	1868	369	Boundary Act 1868 (31 & 32 Vict. c. 46): no borough in the county is new, altered, or disfranchised
+1868	369	1832	1832:eng-west-cumberland	Boundary Act 1868 (31 & 32 Vict. c. 46): no borough in the county is new, altered, or disfranchised
+1868	370	1832	1832:eng-west-gloucestershire	Boundary Act 1868 (31 & 32 Vict. c. 46): the division lost land only to new or extended boroughs
+1832	1832:eng-west-suffolk	1868	375	Boundary Act 1868 (31 & 32 Vict. c. 46): no borough in the county is new, altered, or disfranchised
+1868	375	1832	1832:eng-west-suffolk	Boundary Act 1868 (31 & 32 Vict. c. 46): no borough in the county is new, altered, or disfranchised
+1868	378	1832	1832:eng-west-worcestershire	Boundary Act 1868 (31 & 32 Vict. c. 46): the division lost land only to new or extended boroughs
+1832	1832:eng-westbury	1868	379	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1868	379	1832	1832:eng-westbury	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1868	380	1832	1832:irl-westmeath	Representation of the People (Ireland) Act 1868 (31 & 32 Vict. c. 49) s. 9 only adds municipal land to boroughs, so each county lost land and gained none
+1832	1832:eng-westminster	1868	381	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1868	381	1832	1832:eng-westminster	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1832	1832:eng-westmorland	1868	382	Boundary Act 1868 (31 & 32 Vict. c. 46): no borough in the county is new, altered, or disfranchised
+1868	382	1832	1832:eng-westmorland	Boundary Act 1868 (31 & 32 Vict. c. 46): no borough in the county is new, altered, or disfranchised
+1868	383	1832	1832:irl-wexford	Representation of the People (Ireland) Act 1868 (31 & 32 Vict. c. 49) s. 9 only adds municipal land to boroughs, so each county lost land and gained none
+1832	1832:eng-weymouth-and-melcombe-regis	1868	385	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1868	385	1832	1832:eng-weymouth-and-melcombe-regis	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1832	1832:eng-whitby	1868	386	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1868	386	1832	1832:eng-whitby	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1832	1832:eng-whitehaven	1868	387	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1868	387	1832	1832:eng-whitehaven	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1832	1832:sct-wick-boroughs	1868	388	Representation of the People (Scotland) Act 1868 (31 & 32 Vict. c. 48): the burgh is not altered
+1868	388	1832	1832:sct-wick-boroughs	Representation of the People (Scotland) Act 1868 (31 & 32 Vict. c. 48): the burgh is not altered
+1868	389	1832	1832:irl-wicklow	Representation of the People (Ireland) Act 1868 (31 & 32 Vict. c. 49) s. 9 only adds municipal land to boroughs, so each county lost land and gained none
+1832	1832:eng-wigan	1868	390	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1868	390	1832	1832:eng-wigan	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1832	1832:sct-wigtown-boroughs	1868	391	Representation of the People (Scotland) Act 1868 (31 & 32 Vict. c. 48): the burgh is not altered
+1868	391	1832	1832:sct-wigtown-boroughs	Representation of the People (Scotland) Act 1868 (31 & 32 Vict. c. 48): the burgh is not altered
+1832	1832:sct-wigtownshire	1868	392	Representation of the People (Scotland) Act 1868 (31 & 32 Vict. c. 48): the county is not altered
+1868	392	1832	1832:sct-wigtownshire	Representation of the People (Scotland) Act 1868 (31 & 32 Vict. c. 48): the county is not altered
+1832	1832:eng-winchester	1868	394	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1868	394	1832	1832:eng-winchester	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1832	1832:eng-windsor	1868	395	Boundary Act 1868 (31 & 32 Vict. c. 46), First Schedule: the borough is the present borough with land added
+1832	1832:eng-wolverhampton	1868	396	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1868	396	1832	1832:eng-wolverhampton	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1832	1832:eng-woodstock	1868	397	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1868	397	1832	1832:eng-woodstock	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1832	1832:eng-worcester	1868	398	Boundary Act 1868 (31 & 32 Vict. c. 46), First Schedule: the borough is the present borough with land added
+1832	1832:eng-wycombe	1868	399	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1868	399	1832	1832:eng-wycombe	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1832	1832:eng-york	1868	400	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1868	400	1832	1832:eng-york	Boundary Act 1868 (31 & 32 Vict. c. 46): not in the First Schedule, so the boundary is not altered
+1868	411	1832	1832:eng-north-cheshire	Representation of the People Act 1867 (30 & 31 Vict. c. 102) Schedule (D) and Boundary Act 1868 (31 & 32 Vict. c. 46) s. 6 against Parliamentary Boundaries Act 1832 (2 & 3 Will. 4 c. 64) s. 1: the new division's hundreds all lay in the old one
+1868	443	1832	1832:eng-south-cheshire	Representation of the People Act 1867 (30 & 31 Vict. c. 102) Schedule (D) and Boundary Act 1868 (31 & 32 Vict. c. 46) s. 6 against Parliamentary Boundaries Act 1832 (2 & 3 Will. 4 c. 64) s. 1: the new division's hundreds all lay in the old one
+1868	312	1832	1832:eng-south-derbyshire	Representation of the People Act 1867 (30 & 31 Vict. c. 102) Schedule (D) against Parliamentary Boundaries Act 1832 (2 & 3 Will. 4 c. 64) s. 4: the new division's hundreds all lay in the old one
+1868	412	1832	1832:eng-north-derbyshire	Representation of the People Act 1867 (30 & 31 Vict. c. 102) Schedule (D) against Parliamentary Boundaries Act 1832 (2 & 3 Will. 4 c. 64) s. 4: the new division's hundreds all lay in the old one
+1868	315	1832	1832:eng-south-essex	Representation of the People Act 1867 (30 & 31 Vict. c. 102) Schedule (D) and Boundary Act 1868 (31 & 32 Vict. c. 46) s. 6 against Parliamentary Boundaries Act 1832 (2 & 3 Will. 4 c. 64) s. 7: the new division's hundreds all lay in the old one
+1868	371	1832	1832:eng-west-kent	Representation of the People Act 1867 (30 & 31 Vict. c. 102) Schedule (D) against Parliamentary Boundaries Act 1832 (2 & 3 Will. 4 c. 64) s. 10: West Kent is the Lathe of Sutton-at-Hone and Mid Kent the remainder of the old Western Division; East Kent lost land only to boroughs
+1868	423	1832	1832:eng-west-kent	Representation of the People Act 1867 (30 & 31 Vict. c. 102) Schedule (D) against Parliamentary Boundaries Act 1832 (2 & 3 Will. 4 c. 64) s. 10: West Kent is the Lathe of Sutton-at-Hone and Mid Kent the remainder of the old Western Division; East Kent lost land only to boroughs
+1868	118	1832	1832:eng-east-kent	Representation of the People Act 1867 (30 & 31 Vict. c. 102) Schedule (D) against Parliamentary Boundaries Act 1832 (2 & 3 Will. 4 c. 64) s. 10: West Kent is the Lathe of Sutton-at-Hone and Mid Kent the remainder of the old Western Division; East Kent lost land only to boroughs
+1868	253	1832	1832:eng-north-lincolnshire	Representation of the People Act 1867 (30 & 31 Vict. c. 102) Schedule (D): the new division's wapentakes all lay in the old Parts of Lindsey, or of Kesteven and Holland
+1868	319	1832	1832:eng-south-lincolnshire	Representation of the People Act 1867 (30 & 31 Vict. c. 102) Schedule (D): the new division's wapentakes all lay in the old Parts of Lindsey, or of Kesteven and Holland
+1868	259	1832	1832:eng-north-staffordshire	Representation of the People Act 1867 (30 & 31 Vict. c. 102) Schedule (D) against Parliamentary Boundaries Act 1832 (2 & 3 Will. 4 c. 64) s. 19: Totmonslow and North Pirehill lay in the old Northern Division
+1868	376	1832	1832:eng-west-surrey	Representation of the People Act 1867 (30 & 31 Vict. c. 102) Schedule (D): West Surrey is not divided and lost land only to boroughs
+1868	407	1832	1832:eng-middlesex	Representation of the People Act 1867 (30 & 31 Vict. c. 102) Schedule (B): Chelsea is formed from parishes of the undivided county
+1885	1885:sct-aberdeen-north	1868	1	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23), Sixth Schedule: the borough is divided, and it is not in the Fifth Schedule, so its boundary is not altered
+1885	1885:sct-aberdeen-south	1868	1	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23), Sixth Schedule: the borough is divided, and it is not in the Fifth Schedule, so its boundary is not altered
+1868	5	1885	1885:wls-anglesey	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23), First Schedule: Beaumaris ceases and merges into the undivided county, which loses nothing
+1868	7	1885	1885:sct-argyllshire	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the county is not divided, no borough in it ceases, and none is extended
+1885	1885:sct-argyllshire	1868	7	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the county is not divided, no borough in it ceases, and none is extended
+1868	12	1885	1885:eng-ashton-under-lyne	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23), Fifth Schedule: the borough is the present borough with land added
+1868	15	1885	1885:sct-ayr-burghs	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the borough is in neither the First, Fifth, nor Sixth Schedule, so it continues with its boundary
+1885	1885:sct-ayr-burghs	1868	15	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the borough is in neither the First, Fifth, nor Sixth Schedule, so it continues with its boundary
+1868	19	1885	1885:sct-banffshire	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the county is not divided, no borough in it ceases, and none is extended
+1885	1885:sct-banffshire	1868	19	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the county is not divided, no borough in it ceases, and none is extended
+1868	21	1885	1885:eng-bath	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the borough is in neither the First, Fifth, nor Sixth Schedule, so it continues with its boundary
+1885	1885:eng-bath	1868	21	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the borough is in neither the First, Fifth, nor Sixth Schedule, so it continues with its boundary
+1868	22	1885	1885:wls-anglesey	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23), First Schedule: the borough ceases and merges into Anglesey
+1868	23	1885	1885:eng-bedford	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the borough is in neither the First, Fifth, nor Sixth Schedule, so it continues with its boundary
+1885	1885:eng-bedford	1868	23	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the borough is in neither the First, Fifth, nor Sixth Schedule, so it continues with its boundary
+1885	1885:eng-biggleswade	1868	24	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23), Seventh Schedule: the county, undivided in 1868, is divided, and no borough in it ceases
+1885	1885:eng-luton	1868	24	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23), Seventh Schedule: the county, undivided in 1868, is divided, and no borough in it ceases
+1868	28	1885	1885:sct-berwickshire	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23), First Schedule: the Haddington district ceases, partly into the undivided county, which loses nothing
+1868	402	1885	1885:eng-birkenhead	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the borough is in neither the First, Fifth, nor Sixth Schedule, so it continues with its boundary
+1885	1885:eng-birkenhead	1868	402	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the borough is in neither the First, Fifth, nor Sixth Schedule, so it continues with its boundary
+1868	32	1885	1885:eng-blackburn	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23), Fifth Schedule: the borough is the present borough with land added
+1868	34	1885	1885:eng-bolton	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23), Fifth Schedule: the borough is the present borough with land added
+1868	37	1885	1885:wls-breconshire	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23), First Schedule: the borough ceases and merges into Breconshire
+1868	38	1885	1885:wls-breconshire	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23), First Schedule: Brecon ceases and merges into the undivided county, which loses nothing
+1868	42	1885	1885:eng-brighton	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the borough is in neither the First, Fifth, nor Sixth Schedule, so it continues with its boundary
+1885	1885:eng-brighton	1868	42	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the borough is in neither the First, Fifth, nor Sixth Schedule, so it continues with its boundary
+1868	406	1885	1885:eng-burnley	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the borough is in neither the First, Fifth, nor Sixth Schedule, so it continues with its boundary
+1885	1885:eng-burnley	1868	406	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the borough is in neither the First, Fifth, nor Sixth Schedule, so it continues with its boundary
+1868	46	1885	1885:eng-bury	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23), Fifth Schedule: the borough is the present borough with land added
+1868	47	1885	1885:eng-bury-st-edmunds	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the borough is in neither the First, Fifth, nor Sixth Schedule, so it continues with its boundary
+1885	1885:eng-bury-st-edmunds	1868	47	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the borough is in neither the First, Fifth, nor Sixth Schedule, so it continues with its boundary
+1868	48	1885	1885:sct-buteshire	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the county is not divided, no borough in it ceases, and none is extended
+1885	1885:sct-buteshire	1868	48	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the county is not divided, no borough in it ceases, and none is extended
+1868	51	1885	1885:sct-caithness	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the county is not divided, no borough in it ceases, and none is extended
+1885	1885:sct-caithness	1868	51	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the county is not divided, no borough in it ceases, and none is extended
+1868	53	1885	1885:eng-cambridge	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the borough is in neither the First, Fifth, nor Sixth Schedule, so it continues with its boundary
+1885	1885:eng-cambridge	1868	53	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the borough is in neither the First, Fifth, nor Sixth Schedule, so it continues with its boundary
+1885	1885:eng-wisbech	1868	55	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23), Seventh Schedule: the county, undivided in 1868, is divided, and no borough in it ceases
+1885	1885:eng-chesterton	1868	55	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23), Seventh Schedule: the county, undivided in 1868, is divided, and no borough in it ceases
+1885	1885:eng-newmarket	1868	55	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23), Seventh Schedule: the county, undivided in 1868, is divided, and no borough in it ceases
+1868	56	1885	1885:eng-canterbury	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the borough is in neither the First, Fifth, nor Sixth Schedule, so it continues with its boundary
+1885	1885:eng-canterbury	1868	56	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the borough is in neither the First, Fifth, nor Sixth Schedule, so it continues with its boundary
+1868	57	1885	1885:wls-cardiff	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23), Fifth Schedule: the borough is the present borough with land added
+1868	59	1885	1885:wls-cardiganshire	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23), First Schedule: the Cardigan district ceases, partly into the undivided county, which loses nothing
+1868	60	1885	1885:eng-carlisle	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the borough is in neither the First, Fifth, nor Sixth Schedule, so it continues with its boundary
+1885	1885:eng-carlisle	1868	60	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the borough is in neither the First, Fifth, nor Sixth Schedule, so it continues with its boundary
+1868	61	1885	1885:irl-carlow	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23), First Schedule: Carlow ceases, partly into the undivided county, which loses nothing
+1868	63	1885	1885:wls-carmarthen	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the borough is in neither the First, Fifth, nor Sixth Schedule, so it continues with its boundary
+1885	1885:wls-carmarthen	1868	63	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the borough is in neither the First, Fifth, nor Sixth Schedule, so it continues with its boundary
+1885	1885:irl-east-cavan	1868	67	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23), Seventh Schedule: the county, undivided in 1868, is divided, and no borough in it ceases
+1885	1885:irl-west-cavan	1868	67	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23), Seventh Schedule: the county, undivided in 1868, is divided, and no borough in it ceases
+1868	68	1885	1885:eng-chatham	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the borough is in neither the First, Fifth, nor Sixth Schedule, so it continues with its boundary
+1885	1885:eng-chatham	1868	68	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the borough is in neither the First, Fifth, nor Sixth Schedule, so it continues with its boundary
+1885	1885:eng-chelsea	1868	407	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23), Fourth and Sixth Schedules: each borough is one of the parishes of Chelsea, Kensington, Fulham, and Hammersmith, which Representation of the People Act 1867 (30 & 31 Vict. c. 102) Schedule (B) made the borough of Chelsea
+1885	1885:eng-kensington-north	1868	407	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23), Fourth and Sixth Schedules: each borough is one of the parishes of Chelsea, Kensington, Fulham, and Hammersmith, which Representation of the People Act 1867 (30 & 31 Vict. c. 102) Schedule (B) made the borough of Chelsea
+1885	1885:eng-kensington-south	1868	407	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23), Fourth and Sixth Schedules: each borough is one of the parishes of Chelsea, Kensington, Fulham, and Hammersmith, which Representation of the People Act 1867 (30 & 31 Vict. c. 102) Schedule (B) made the borough of Chelsea
+1885	1885:eng-fulham	1868	407	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23), Fourth and Sixth Schedules: each borough is one of the parishes of Chelsea, Kensington, Fulham, and Hammersmith, which Representation of the People Act 1867 (30 & 31 Vict. c. 102) Schedule (B) made the borough of Chelsea
+1885	1885:eng-hammersmith	1868	407	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23), Fourth and Sixth Schedules: each borough is one of the parishes of Chelsea, Kensington, Fulham, and Hammersmith, which Representation of the People Act 1867 (30 & 31 Vict. c. 102) Schedule (B) made the borough of Chelsea
+1868	69	1885	1885:eng-cheltenham	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23), Fifth Schedule: the borough is the present borough with land added
+1868	72	1885	1885:eng-christchurch	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the borough is in neither the First, Fifth, nor Sixth Schedule, so it continues with its boundary
+1885	1885:eng-christchurch	1868	72	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the borough is in neither the First, Fifth, nor Sixth Schedule, so it continues with its boundary
+1868	74	1885	1885:eng-city-of-chester	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the borough is in neither the First, Fifth, nor Sixth Schedule, so it continues with its boundary
+1885	1885:eng-city-of-chester	1868	74	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the borough is in neither the First, Fifth, nor Sixth Schedule, so it continues with its boundary
+1868	75	1885	1885:eng-city-of-london	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the borough is in neither the First, Fifth, nor Sixth Schedule, so it continues with its boundary
+1885	1885:eng-city-of-london	1868	75	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the borough is in neither the First, Fifth, nor Sixth Schedule, so it continues with its boundary
+1868	76	1885	1885:sct-clackmannanshire-and-kinross-shire	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the county is not divided, no borough in it ceases, and none is extended
+1885	1885:sct-clackmannanshire-and-kinross-shire	1868	76	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the county is not divided, no borough in it ceases, and none is extended
+1868	81	1885	1885:eng-colchester	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the borough is in neither the First, Fifth, nor Sixth Schedule, so it continues with its boundary
+1885	1885:eng-colchester	1868	81	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the borough is in neither the First, Fifth, nor Sixth Schedule, so it continues with its boundary
+1868	84	1885	1885:irl-cork-city	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the borough is in neither the First, Fifth, nor Sixth Schedule, so it continues with its boundary
+1885	1885:irl-cork-city	1868	84	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the borough is in neither the First, Fifth, nor Sixth Schedule, so it continues with its boundary
+1885	1885:irl-north-county-dublin	1868	85	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23), Seventh Schedule: the county, undivided in 1868, is divided, and no borough in it ceases
+1885	1885:irl-south-county-dublin	1868	85	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23), Seventh Schedule: the county, undivided in 1868, is divided, and no borough in it ceases
+1885	1885:irl-north-galway	1868	86	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23), Seventh Schedule: the county, undivided in 1868, is divided, and no borough in it ceases
+1885	1885:irl-south-galway	1868	86	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23), Seventh Schedule: the county, undivided in 1868, is divided, and no borough in it ceases
+1885	1885:irl-east-galway	1868	86	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23), Seventh Schedule: the county, undivided in 1868, is divided, and no borough in it ceases
+1885	1885:irl-galway-connemara	1868	86	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23), Seventh Schedule: the county, undivided in 1868, is divided, and no borough in it ceases
+1868	88	1885	1885:eng-coventry	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the borough is in neither the First, Fifth, nor Sixth Schedule, so it continues with its boundary
+1885	1885:eng-coventry	1868	88	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the borough is in neither the First, Fifth, nor Sixth Schedule, so it continues with its boundary
+1868	91	1885	1885:wls-denbigh-boroughs	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the borough is in neither the First, Fifth, nor Sixth Schedule, so it continues with its boundary
+1885	1885:wls-denbigh-boroughs	1868	91	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the borough is in neither the First, Fifth, nor Sixth Schedule, so it continues with its boundary
+1885	1885:wls-east-denbighshire	1868	92	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23), Seventh Schedule: the county, undivided in 1868, is divided, and no borough in it ceases
+1885	1885:wls-west-denbighshire	1868	92	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23), Seventh Schedule: the county, undivided in 1868, is divided, and no borough in it ceases
+1868	93	1885	1885:eng-derby	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23), Fifth Schedule: the borough is the present borough with land added
+1868	95	1885	1885:eng-devonport	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the borough is in neither the First, Fifth, nor Sixth Schedule, so it continues with its boundary
+1885	1885:eng-devonport	1868	95	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the borough is in neither the First, Fifth, nor Sixth Schedule, so it continues with its boundary
+1868	409	1885	1885:eng-dewsbury	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the borough is in neither the First, Fifth, nor Sixth Schedule, so it continues with its boundary
+1885	1885:eng-dewsbury	1868	409	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the borough is in neither the First, Fifth, nor Sixth Schedule, so it continues with its boundary
+1885	1885:irl-north-donegal	1868	96	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23), Seventh Schedule: the county, undivided in 1868, is divided, and no borough in it ceases
+1885	1885:irl-south-donegal	1868	96	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23), Seventh Schedule: the county, undivided in 1868, is divided, and no borough in it ceases
+1885	1885:irl-east-donegal	1868	96	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23), Seventh Schedule: the county, undivided in 1868, is divided, and no borough in it ceases
+1885	1885:irl-west-donegal	1868	96	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23), Seventh Schedule: the county, undivided in 1868, is divided, and no borough in it ceases
+1868	99	1885	1885:eng-dover	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the borough is in neither the First, Fifth, nor Sixth Schedule, so it continues with its boundary
+1885	1885:eng-dover	1868	99	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the borough is in neither the First, Fifth, nor Sixth Schedule, so it continues with its boundary
+1885	1885:irl-dublin-college-green	1868	104	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23), Sixth Schedule: the borough is divided, and it is not in the Fifth Schedule, so its boundary is not altered
+1885	1885:irl-dublin-harbour	1868	104	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23), Sixth Schedule: the borough is divided, and it is not in the Fifth Schedule, so its boundary is not altered
+1885	1885:irl-dublin-st-patrick-s	1868	104	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23), Sixth Schedule: the borough is divided, and it is not in the Fifth Schedule, so its boundary is not altered
+1885	1885:irl-dublin-st-stephen-s-green	1868	104	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23), Sixth Schedule: the borough is divided, and it is not in the Fifth Schedule, so its boundary is not altered
+1868	106	1885	1885:eng-dudley	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the borough is in neither the First, Fifth, nor Sixth Schedule, so it continues with its boundary
+1885	1885:eng-dudley	1868	106	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the borough is in neither the First, Fifth, nor Sixth Schedule, so it continues with its boundary
+1868	107	1885	1885:sct-dumfries-burghs	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the borough is in neither the First, Fifth, nor Sixth Schedule, so it continues with its boundary
+1885	1885:sct-dumfries-burghs	1868	107	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the borough is in neither the First, Fifth, nor Sixth Schedule, so it continues with its boundary
+1868	108	1885	1885:sct-dumfriesshire	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the county is not divided, no borough in it ceases, and none is extended
+1885	1885:sct-dumfriesshire	1868	108	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the county is not divided, no borough in it ceases, and none is extended
+1868	109	1885	1885:sct-dunbartonshire	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the county is not divided, no borough in it ceases, and none is extended
+1885	1885:sct-dunbartonshire	1868	109	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the county is not divided, no borough in it ceases, and none is extended
+1868	111	1885	1885:sct-dundee	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the borough is in neither the First, Fifth, nor Sixth Schedule, so it continues with its boundary
+1885	1885:sct-dundee	1868	111	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the borough is in neither the First, Fifth, nor Sixth Schedule, so it continues with its boundary
+1868	114	1885	1885:eng-durham	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the borough is in neither the First, Fifth, nor Sixth Schedule, so it continues with its boundary
+1885	1885:eng-durham	1868	114	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the borough is in neither the First, Fifth, nor Sixth Schedule, so it continues with its boundary
+1868	128	1885	1885:sct-elgin-burghs	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the borough is in neither the First, Fifth, nor Sixth Schedule, so it continues with its boundary
+1885	1885:sct-elgin-burghs	1868	128	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the borough is in neither the First, Fifth, nor Sixth Schedule, so it continues with its boundary
+1868	129	1885	1885:sct-elginshire-and-nairnshire	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the county is not divided, no borough in it ceases, and none is extended
+1885	1885:sct-elginshire-and-nairnshire	1868	129	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the county is not divided, no borough in it ceases, and none is extended
+1868	133	1885	1885:eng-exeter	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the borough is in neither the First, Fifth, nor Sixth Schedule, so it continues with its boundary
+1885	1885:eng-exeter	1868	133	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the borough is in neither the First, Fifth, nor Sixth Schedule, so it continues with its boundary
+1868	135	1885	1885:sct-falkirk	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23), Fifth Schedule: the borough is the present borough (Hamilton) with land added
+1885	1885:sct-east-fife	1868	137	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23), Seventh Schedule: the county, undivided in 1868, is divided, and no borough in it ceases
+1885	1885:sct-west-fife	1868	137	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23), Seventh Schedule: the county, undivided in 1868, is divided, and no borough in it ceases
+1885	1885:eng-islington-east	1868	138	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23), Fourth and Sixth Schedules: Islington is the parish of St Mary Islington, which Parliamentary Boundaries Act 1832 (2 & 3 Will. 4 c. 64) placed whole in Finsbury
+1885	1885:eng-islington-north	1868	138	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23), Fourth and Sixth Schedules: Islington is the parish of St Mary Islington, which Parliamentary Boundaries Act 1832 (2 & 3 Will. 4 c. 64) placed whole in Finsbury
+1885	1885:eng-islington-south	1868	138	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23), Fourth and Sixth Schedules: Islington is the parish of St Mary Islington, which Parliamentary Boundaries Act 1832 (2 & 3 Will. 4 c. 64) placed whole in Finsbury
+1885	1885:eng-islington-west	1868	138	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23), Fourth and Sixth Schedules: Islington is the parish of St Mary Islington, which Parliamentary Boundaries Act 1832 (2 & 3 Will. 4 c. 64) placed whole in Finsbury
+1868	139	1885	1885:wls-flint-boroughs	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the borough is in neither the First, Fifth, nor Sixth Schedule, so it continues with its boundary
+1885	1885:wls-flint-boroughs	1868	139	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the borough is in neither the First, Fifth, nor Sixth Schedule, so it continues with its boundary
+1868	140	1885	1885:wls-flintshire	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the county is not divided, no borough in it ceases, and none is extended
+1885	1885:wls-flintshire	1868	140	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the county is not divided, no borough in it ceases, and none is extended
+1868	141	1885	1885:sct-forfarshire	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the county is not divided, no borough in it ceases, and none is extended
+1885	1885:sct-forfarshire	1868	141	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the county is not divided, no borough in it ceases, and none is extended
+1868	143	1885	1885:irl-galway-city	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the borough is in neither the First, Fifth, nor Sixth Schedule, so it continues with its boundary
+1885	1885:irl-galway-city	1868	143	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the borough is in neither the First, Fifth, nor Sixth Schedule, so it continues with its boundary
+1868	144	1885	1885:eng-gateshead	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the borough is in neither the First, Fifth, nor Sixth Schedule, so it continues with its boundary
+1885	1885:eng-gateshead	1868	144	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the borough is in neither the First, Fifth, nor Sixth Schedule, so it continues with its boundary
+1885	1885:wls-east-glamorganshire	1868	145	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23), Seventh Schedule: the county, undivided in 1868, is divided, and no borough in it ceases
+1885	1885:wls-mid-glamorganshire	1868	145	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23), Seventh Schedule: the county, undivided in 1868, is divided, and no borough in it ceases
+1885	1885:wls-south-glamorganshire	1868	145	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23), Seventh Schedule: the county, undivided in 1868, is divided, and no borough in it ceases
+1885	1885:wls-rhondda	1868	145	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23), Seventh Schedule: the county, undivided in 1868, is divided, and no borough in it ceases
+1885	1885:wls-gower	1868	145	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23), Seventh Schedule: the county, undivided in 1868, is divided, and no borough in it ceases
+1868	147	1885	1885:eng-gloucester	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the borough is in neither the First, Fifth, nor Sixth Schedule, so it continues with its boundary
+1885	1885:eng-gloucester	1868	147	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the borough is in neither the First, Fifth, nor Sixth Schedule, so it continues with its boundary
+1868	148	1885	1885:eng-grantham	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the borough is in neither the First, Fifth, nor Sixth Schedule, so it continues with its boundary
+1885	1885:eng-grantham	1868	148	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the borough is in neither the First, Fifth, nor Sixth Schedule, so it continues with its boundary
+1868	418	1885	1885:eng-gravesend	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the borough is in neither the First, Fifth, nor Sixth Schedule, so it continues with its boundary
+1885	1885:eng-gravesend	1868	418	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the borough is in neither the First, Fifth, nor Sixth Schedule, so it continues with its boundary
+1868	149	1885	1885:eng-great-grimsby	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the borough is in neither the First, Fifth, nor Sixth Schedule, so it continues with its boundary
+1885	1885:eng-great-grimsby	1868	149	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the borough is in neither the First, Fifth, nor Sixth Schedule, so it continues with its boundary
+1868	152	1885	1885:sct-greenock	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23), Fifth Schedule: the borough is the present borough with land added
+1885	1885:eng-haggerston	1868	419	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23), Fourth and Sixth Schedules: Shoreditch and Bethnal Green are the parishes of St Leonard, Shoreditch, and St Matthew, Bethnal Green, which Representation of the People Act 1867 (30 & 31 Vict. c. 102) Schedule (C) placed in Hackney
+1885	1885:eng-hoxton	1868	419	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23), Fourth and Sixth Schedules: Shoreditch and Bethnal Green are the parishes of St Leonard, Shoreditch, and St Matthew, Bethnal Green, which Representation of the People Act 1867 (30 & 31 Vict. c. 102) Schedule (C) placed in Hackney
+1885	1885:eng-north-east-bethnal-green	1868	419	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23), Fourth and Sixth Schedules: Shoreditch and Bethnal Green are the parishes of St Leonard, Shoreditch, and St Matthew, Bethnal Green, which Representation of the People Act 1867 (30 & 31 Vict. c. 102) Schedule (C) placed in Hackney
+1885	1885:eng-south-west-bethnal-green	1868	419	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23), Fourth and Sixth Schedules: Shoreditch and Bethnal Green are the parishes of St Leonard, Shoreditch, and St Matthew, Bethnal Green, which Representation of the People Act 1867 (30 & 31 Vict. c. 102) Schedule (C) placed in Hackney
+1868	156	1885	1885:sct-haddingtonshire	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23), First Schedule: the Haddington district ceases, partly into the undivided county, which loses nothing
+1868	157	1885	1885:eng-halifax	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the borough is in neither the First, Fifth, nor Sixth Schedule, so it continues with its boundary
+1885	1885:eng-halifax	1868	157	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the borough is in neither the First, Fifth, nor Sixth Schedule, so it continues with its boundary
+1868	420	1885	1885:sct-hawick-burghs	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23), Fifth Schedule: the borough is the present borough (Galashiels) with land added
+1868	162	1885	1885:eng-hereford	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the borough is in neither the First, Fifth, nor Sixth Schedule, so it continues with its boundary
+1885	1885:eng-hereford	1868	162	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the borough is in neither the First, Fifth, nor Sixth Schedule, so it continues with its boundary
+1868	168	1885	1885:eng-huddersfield	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the borough is in neither the First, Fifth, nor Sixth Schedule, so it continues with its boundary
+1885	1885:eng-huddersfield	1868	168	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the borough is in neither the First, Fifth, nor Sixth Schedule, so it continues with its boundary
+1868	171	1885	1885:eng-hythe	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the borough is in neither the First, Fifth, nor Sixth Schedule, so it continues with its boundary
+1885	1885:eng-hythe	1868	171	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the borough is in neither the First, Fifth, nor Sixth Schedule, so it continues with its boundary
+1868	172	1885	1885:sct-inverness-burghs	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the borough is in neither the First, Fifth, nor Sixth Schedule, so it continues with its boundary
+1885	1885:sct-inverness-burghs	1868	172	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the borough is in neither the First, Fifth, nor Sixth Schedule, so it continues with its boundary
+1868	173	1885	1885:sct-inverness-shire	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the county is not divided, no borough in it ceases, and none is extended
+1885	1885:sct-inverness-shire	1868	173	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the county is not divided, no borough in it ceases, and none is extended
+1868	174	1885	1885:eng-ipswich	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the borough is in neither the First, Fifth, nor Sixth Schedule, so it continues with its boundary
+1885	1885:eng-ipswich	1868	174	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the borough is in neither the First, Fifth, nor Sixth Schedule, so it continues with its boundary
+1868	178	1885	1885:eng-kidderminster	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the borough is in neither the First, Fifth, nor Sixth Schedule, so it continues with its boundary
+1885	1885:eng-kidderminster	1868	178	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the borough is in neither the First, Fifth, nor Sixth Schedule, so it continues with its boundary
+1885	1885:irl-north-kildare	1868	179	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23), Seventh Schedule: the county, undivided in 1868, is divided, and no borough in it ceases
+1885	1885:irl-south-kildare	1868	179	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23), Seventh Schedule: the county, undivided in 1868, is divided, and no borough in it ceases
+1868	181	1885	1885:irl-kilkenny-city	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the borough is in neither the First, Fifth, nor Sixth Schedule, so it continues with its boundary
+1885	1885:irl-kilkenny-city	1868	181	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the borough is in neither the First, Fifth, nor Sixth Schedule, so it continues with its boundary
+1868	182	1885	1885:sct-kilmarnock-burghs	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23), Fifth Schedule: the borough is the present borough (Kilmarnock, Port Glasgow, and Renfrew) with land added
+1868	183	1885	1885:sct-kincardineshire	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the county is not divided, no borough in it ceases, and none is extended
+1885	1885:sct-kincardineshire	1868	183	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the county is not divided, no borough in it ceases, and none is extended
+1868	185	1885	1885:eng-king-s-lynn	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23), Fifth Schedule: the borough is the present borough with land added
+1868	188	1885	1885:sct-kirkcaldy-burghs	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23), Fifth Schedule: the borough is the present borough with land added
+1868	189	1885	1885:sct-kirkcudbrightshire	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23), First Schedule: the Wigtown district ceases, partly into the undivided county, which loses nothing
+1885	1885:eng-west-newington	1868	191	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23), Fourth and Sixth Schedules: Newington is the parish of St Mary Newington, which Parliamentary Boundaries Act 1832 (2 & 3 Will. 4 c. 64) placed whole in Lambeth
+1885	1885:eng-walworth	1868	191	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23), Fourth and Sixth Schedules: Newington is the parish of St Mary Newington, which Parliamentary Boundaries Act 1832 (2 & 3 Will. 4 c. 64) placed whole in Lambeth
+1885	1885:eng-leeds-central	1868	195	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23), Sixth Schedule: the borough is divided, and it is not in the Fifth Schedule, so its boundary is not altered
+1885	1885:eng-leeds-east	1868	195	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23), Sixth Schedule: the borough is divided, and it is not in the Fifth Schedule, so its boundary is not altered
+1885	1885:eng-leeds-north	1868	195	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23), Sixth Schedule: the borough is divided, and it is not in the Fifth Schedule, so its boundary is not altered
+1885	1885:eng-leeds-south	1868	195	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23), Sixth Schedule: the borough is divided, and it is not in the Fifth Schedule, so its boundary is not altered
+1885	1885:eng-leeds-west	1868	195	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23), Sixth Schedule: the borough is divided, and it is not in the Fifth Schedule, so its boundary is not altered
+1868	196	1885	1885:eng-leicester	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the borough is in neither the First, Fifth, nor Sixth Schedule, so it continues with its boundary
+1885	1885:eng-leicester	1868	196	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the borough is in neither the First, Fifth, nor Sixth Schedule, so it continues with its boundary
+1868	197	1885	1885:sct-leith-burghs	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the borough is in neither the First, Fifth, nor Sixth Schedule, so it continues with its boundary
+1885	1885:sct-leith-burghs	1868	197	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the borough is in neither the First, Fifth, nor Sixth Schedule, so it continues with its boundary
+1885	1885:irl-north-leitrim	1868	198	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23), Seventh Schedule: the county, undivided in 1868, is divided, and no borough in it ceases
+1885	1885:irl-south-leitrim	1868	198	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23), Seventh Schedule: the county, undivided in 1868, is divided, and no borough in it ceases
+1885	1885:irl-east-limerick	1868	202	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23), Seventh Schedule: the county, undivided in 1868, is divided, and no borough in it ceases
+1885	1885:irl-west-limerick	1868	202	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23), Seventh Schedule: the county, undivided in 1868, is divided, and no borough in it ceases
+1868	203	1885	1885:irl-limerick-city	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the borough is in neither the First, Fifth, nor Sixth Schedule, so it continues with its boundary
+1885	1885:irl-limerick-city	1868	203	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the borough is in neither the First, Fifth, nor Sixth Schedule, so it continues with its boundary
+1868	204	1885	1885:eng-lincoln	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23), Fifth Schedule: the borough is the present borough with land added
+1868	205	1885	1885:sct-linlithgowshire	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the county is not divided, no borough in it ceases, and none is extended
+1885	1885:sct-linlithgowshire	1868	205	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the county is not divided, no borough in it ceases, and none is extended
+1868	210	1885	1885:irl-londonderry-city	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the borough is in neither the First, Fifth, nor Sixth Schedule, so it continues with its boundary
+1885	1885:irl-londonderry-city	1868	210	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the borough is in neither the First, Fifth, nor Sixth Schedule, so it continues with its boundary
+1885	1885:irl-north-longford	1868	211	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23), Seventh Schedule: the county, undivided in 1868, is divided, and no borough in it ceases
+1885	1885:irl-south-longford	1868	211	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23), Seventh Schedule: the county, undivided in 1868, is divided, and no borough in it ceases
+1885	1885:eng-east-marylebone	1868	223	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23), Fourth and Sixth Schedules: Marylebone, Paddington, and St Pancras are each a whole parish, and Parliamentary Boundaries Act 1832 (2 & 3 Will. 4 c. 64) made those three parishes the borough of Marylebone
+1885	1885:eng-west-marylebone	1868	223	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23), Fourth and Sixth Schedules: Marylebone, Paddington, and St Pancras are each a whole parish, and Parliamentary Boundaries Act 1832 (2 & 3 Will. 4 c. 64) made those three parishes the borough of Marylebone
+1885	1885:eng-paddington-north	1868	223	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23), Fourth and Sixth Schedules: Marylebone, Paddington, and St Pancras are each a whole parish, and Parliamentary Boundaries Act 1832 (2 & 3 Will. 4 c. 64) made those three parishes the borough of Marylebone
+1885	1885:eng-paddington-south	1868	223	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23), Fourth and Sixth Schedules: Marylebone, Paddington, and St Pancras are each a whole parish, and Parliamentary Boundaries Act 1832 (2 & 3 Will. 4 c. 64) made those three parishes the borough of Marylebone
+1885	1885:eng-st-pancras-east	1868	223	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23), Fourth and Sixth Schedules: Marylebone, Paddington, and St Pancras are each a whole parish, and Parliamentary Boundaries Act 1832 (2 & 3 Will. 4 c. 64) made those three parishes the borough of Marylebone
+1885	1885:eng-st-pancras-north	1868	223	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23), Fourth and Sixth Schedules: Marylebone, Paddington, and St Pancras are each a whole parish, and Parliamentary Boundaries Act 1832 (2 & 3 Will. 4 c. 64) made those three parishes the borough of Marylebone
+1885	1885:eng-st-pancras-south	1868	223	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23), Fourth and Sixth Schedules: Marylebone, Paddington, and St Pancras are each a whole parish, and Parliamentary Boundaries Act 1832 (2 & 3 Will. 4 c. 64) made those three parishes the borough of Marylebone
+1885	1885:eng-st-pancras-west	1868	223	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23), Fourth and Sixth Schedules: Marylebone, Paddington, and St Pancras are each a whole parish, and Parliamentary Boundaries Act 1832 (2 & 3 Will. 4 c. 64) made those three parishes the borough of Marylebone
+1885	1885:irl-north-mayo	1868	224	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23), Seventh Schedule: the county, undivided in 1868, is divided, and no borough in it ceases
+1885	1885:irl-south-mayo	1868	224	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23), Seventh Schedule: the county, undivided in 1868, is divided, and no borough in it ceases
+1885	1885:irl-east-mayo	1868	224	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23), Seventh Schedule: the county, undivided in 1868, is divided, and no borough in it ceases
+1885	1885:irl-west-mayo	1868	224	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23), Seventh Schedule: the county, undivided in 1868, is divided, and no borough in it ceases
+1885	1885:irl-north-meath	1868	225	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23), Seventh Schedule: the county, undivided in 1868, is divided, and no borough in it ceases
+1885	1885:irl-south-meath	1868	225	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23), Seventh Schedule: the county, undivided in 1868, is divided, and no borough in it ceases
+1868	226	1885	1885:wls-merioneth	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the county is not divided, no borough in it ceases, and none is extended
+1885	1885:wls-merioneth	1868	226	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the county is not divided, no borough in it ceases, and none is extended
+1868	227	1885	1885:wls-merthyr-tydfil	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the borough is in neither the First, Fifth, nor Sixth Schedule, so it continues with its boundary
+1885	1885:wls-merthyr-tydfil	1868	227	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the borough is in neither the First, Fifth, nor Sixth Schedule, so it continues with its boundary
+1868	427	1885	1885:eng-middlesbrough	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23), Fifth Schedule: the borough is the present borough with land added
+1885	1885:eng-hampstead	1868	228	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23), Fourth Schedule: Hampstead is the parish of St John, Hampstead, in Middlesex, which no 1868 borough included
+1885	1885:sct-midlothian	1868	230	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23), Fifth Schedule: the county loses land to Edinburgh, and no burgh in it ceases
+1885	1885:irl-north-monaghan	1868	231	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23), Seventh Schedule: the county, undivided in 1868, is divided, and no borough in it ceases
+1885	1885:irl-south-monaghan	1868	231	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23), Seventh Schedule: the county, undivided in 1868, is divided, and no borough in it ceases
+1868	232	1885	1885:wls-monmouth-boroughs	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23), Fifth Schedule: the borough is the present borough (Newport) with land added
+1885	1885:wls-north-monmouthshire	1868	233	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23), Seventh Schedule: the county, undivided in 1868, is divided, and no borough in it ceases
+1885	1885:wls-south-monmouthshire	1868	233	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23), Seventh Schedule: the county, undivided in 1868, is divided, and no borough in it ceases
+1885	1885:wls-west-monmouthshire	1868	233	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23), Seventh Schedule: the county, undivided in 1868, is divided, and no borough in it ceases
+1868	234	1885	1885:wls-montgomery	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the county is not divided, no borough in it ceases, and none is extended
+1885	1885:wls-montgomery	1868	234	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the county is not divided, no borough in it ceases, and none is extended
+1868	235	1885	1885:wls-montgomery-boroughs	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the borough is in neither the First, Fifth, nor Sixth Schedule, so it continues with its boundary
+1885	1885:wls-montgomery-boroughs	1868	235	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the borough is in neither the First, Fifth, nor Sixth Schedule, so it continues with its boundary
+1868	236	1885	1885:sct-montrose-burghs	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the borough is in neither the First, Fifth, nor Sixth Schedule, so it continues with its boundary
+1885	1885:sct-montrose-burghs	1868	236	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the borough is in neither the First, Fifth, nor Sixth Schedule, so it continues with its boundary
+1868	237	1885	1885:eng-morpeth	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the borough is in neither the First, Fifth, nor Sixth Schedule, so it continues with its boundary
+1885	1885:eng-morpeth	1868	237	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the borough is in neither the First, Fifth, nor Sixth Schedule, so it continues with its boundary
+1868	242	1885	1885:eng-newcastle-under-lyme	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23), Fifth Schedule: the borough is the present borough with land added
+1868	241	1885	1885:eng-newcastle-upon-tyne	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the borough is in neither the First, Fifth, nor Sixth Schedule, so it continues with its boundary
+1885	1885:eng-newcastle-upon-tyne	1868	241	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the borough is in neither the First, Fifth, nor Sixth Schedule, so it continues with its boundary
+1868	244	1885	1885:irl-newry	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the borough is in neither the First, Fifth, nor Sixth Schedule, so it continues with its boundary
+1885	1885:irl-newry	1868	244	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the borough is in neither the First, Fifth, nor Sixth Schedule, so it continues with its boundary
+1868	263	1885	1885:eng-northampton	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the borough is in neither the First, Fifth, nor Sixth Schedule, so it continues with its boundary
+1885	1885:eng-northampton	1868	263	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the borough is in neither the First, Fifth, nor Sixth Schedule, so it continues with its boundary
+1868	264	1885	1885:eng-norwich	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the borough is in neither the First, Fifth, nor Sixth Schedule, so it continues with its boundary
+1885	1885:eng-norwich	1868	264	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the borough is in neither the First, Fifth, nor Sixth Schedule, so it continues with its boundary
+1868	266	1885	1885:eng-oldham	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23), Fifth Schedule: the borough is the present borough with land added
+1868	267	1885	1885:sct-orkney-and-shetland	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the county is not divided, no borough in it ceases, and none is extended
+1885	1885:sct-orkney-and-shetland	1868	267	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the county is not divided, no borough in it ceases, and none is extended
+1868	268	1885	1885:eng-oxford	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the borough is in neither the First, Fifth, nor Sixth Schedule, so it continues with its boundary
+1885	1885:eng-oxford	1868	268	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the borough is in neither the First, Fifth, nor Sixth Schedule, so it continues with its boundary
+1868	271	1885	1885:sct-paisley	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the borough is in neither the First, Fifth, nor Sixth Schedule, so it continues with its boundary
+1885	1885:sct-paisley	1868	271	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the borough is in neither the First, Fifth, nor Sixth Schedule, so it continues with its boundary
+1885	1885:sct-peebles-and-selkirk	1868	432	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23), Fifth Schedule: the county loses land to Galashiels, and no burgh in it ceases
+1868	273	1885	1885:wls-pembroke-and-haverfordwest	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23), Fifth Schedule: the borough is the present borough (Pembroke, with Haverfordwest) with land added
+1868	275	1885	1885:eng-penryn-and-falmouth	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the borough is in neither the First, Fifth, nor Sixth Schedule, so it continues with its boundary
+1885	1885:eng-penryn-and-falmouth	1868	275	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the borough is in neither the First, Fifth, nor Sixth Schedule, so it continues with its boundary
+1868	276	1885	1885:sct-perth	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the borough is in neither the First, Fifth, nor Sixth Schedule, so it continues with its boundary
+1885	1885:sct-perth	1868	276	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the borough is in neither the First, Fifth, nor Sixth Schedule, so it continues with its boundary
+1885	1885:sct-east-perthshire	1868	277	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23), Seventh Schedule: the county, undivided in 1868, is divided, and no borough in it ceases
+1885	1885:sct-west-perthshire	1868	277	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23), Seventh Schedule: the county, undivided in 1868, is divided, and no borough in it ceases
+1868	278	1885	1885:eng-peterborough	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the borough is in neither the First, Fifth, nor Sixth Schedule, so it continues with its boundary
+1885	1885:eng-peterborough	1868	278	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the borough is in neither the First, Fifth, nor Sixth Schedule, so it continues with its boundary
+1868	280	1885	1885:eng-plymouth	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the borough is in neither the First, Fifth, nor Sixth Schedule, so it continues with its boundary
+1885	1885:eng-plymouth	1868	280	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the borough is in neither the First, Fifth, nor Sixth Schedule, so it continues with its boundary
+1868	281	1885	1885:eng-pontefract	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the borough is in neither the First, Fifth, nor Sixth Schedule, so it continues with its boundary
+1885	1885:eng-pontefract	1868	281	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the borough is in neither the First, Fifth, nor Sixth Schedule, so it continues with its boundary
+1868	284	1885	1885:eng-portsmouth	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the borough is in neither the First, Fifth, nor Sixth Schedule, so it continues with its boundary
+1885	1885:eng-portsmouth	1868	284	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the borough is in neither the First, Fifth, nor Sixth Schedule, so it continues with its boundary
+1868	285	1885	1885:eng-preston	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23), Fifth Schedule: the borough is the present borough with land added
+1868	288	1885	1885:wls-radnorshire	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23), First Schedule: the Radnor district ceases, partly into the undivided county, which loses nothing
+1868	289	1885	1885:eng-reading	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23), Fifth Schedule: the borough is the present borough with land added
+1885	1885:sct-east-renfrewshire	1868	291	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23), Seventh Schedule: the county, undivided in 1868, is divided, and no borough in it ceases
+1885	1885:sct-west-renfrewshire	1868	291	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23), Seventh Schedule: the county, undivided in 1868, is divided, and no borough in it ceases
+1868	294	1885	1885:eng-rochdale	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the borough is in neither the First, Fifth, nor Sixth Schedule, so it continues with its boundary
+1885	1885:eng-rochdale	1868	294	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the borough is in neither the First, Fifth, nor Sixth Schedule, so it continues with its boundary
+1868	295	1885	1885:eng-rochester	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the borough is in neither the First, Fifth, nor Sixth Schedule, so it continues with its boundary
+1885	1885:eng-rochester	1868	295	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the borough is in neither the First, Fifth, nor Sixth Schedule, so it continues with its boundary
+1868	297	1885	1885:sct-ross-and-cromarty	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the county is not divided, no borough in it ceases, and none is extended
+1885	1885:sct-ross-and-cromarty	1868	297	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the county is not divided, no borough in it ceases, and none is extended
+1868	299	1885	1885:eng-rutland	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the county is not divided, no borough in it ceases, and none is extended
+1885	1885:eng-rutland	1868	299	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the county is not divided, no borough in it ceases, and none is extended
+1885	1885:eng-salford-north	1868	301	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23), Sixth Schedule: the borough is divided, and it is not in the Fifth Schedule, so its boundary is not altered
+1885	1885:eng-salford-south	1868	301	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23), Sixth Schedule: the borough is divided, and it is not in the Fifth Schedule, so its boundary is not altered
+1885	1885:eng-salford-west	1868	301	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23), Sixth Schedule: the borough is divided, and it is not in the Fifth Schedule, so its boundary is not altered
+1868	302	1885	1885:eng-salisbury	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23), Fifth Schedule: the borough is the present borough with land added
+1868	304	1885	1885:eng-scarborough	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the borough is in neither the First, Fifth, nor Sixth Schedule, so it continues with its boundary
+1885	1885:eng-scarborough	1868	304	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the borough is in neither the First, Fifth, nor Sixth Schedule, so it continues with its boundary
+1885	1885:eng-sheffield-attercliffe	1868	307	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23), Sixth Schedule: the borough is divided, and it is not in the Fifth Schedule, so its boundary is not altered
+1885	1885:eng-sheffield-brightside	1868	307	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23), Sixth Schedule: the borough is divided, and it is not in the Fifth Schedule, so its boundary is not altered
+1885	1885:eng-sheffield-central	1868	307	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23), Sixth Schedule: the borough is divided, and it is not in the Fifth Schedule, so its boundary is not altered
+1885	1885:eng-sheffield-ecclesall	1868	307	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23), Sixth Schedule: the borough is divided, and it is not in the Fifth Schedule, so its boundary is not altered
+1885	1885:eng-sheffield-hallam	1868	307	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23), Sixth Schedule: the borough is divided, and it is not in the Fifth Schedule, so its boundary is not altered
+1868	308	1885	1885:eng-shrewsbury	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the borough is in neither the First, Fifth, nor Sixth Schedule, so it continues with its boundary
+1885	1885:eng-shrewsbury	1868	308	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the borough is in neither the First, Fifth, nor Sixth Schedule, so it continues with its boundary
+1868	323	1885	1885:eng-south-shields	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the borough is in neither the First, Fifth, nor Sixth Schedule, so it continues with its boundary
+1885	1885:eng-south-shields	1868	323	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the borough is in neither the First, Fifth, nor Sixth Schedule, so it continues with its boundary
+1868	328	1885	1885:eng-southampton	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23), Fifth Schedule: the borough is the present borough with land added
+1885	1885:eng-southwark-west	1868	329	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23), Sixth Schedule: the borough is divided, and it is not in the Fifth Schedule, so its boundary is not altered
+1885	1885:eng-bermondsey	1868	329	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23), Sixth Schedule: the borough is divided, and it is not in the Fifth Schedule, so its boundary is not altered
+1885	1885:eng-rotherhithe	1868	329	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23), Sixth Schedule: the borough is divided, and it is not in the Fifth Schedule, so its boundary is not altered
+1868	331	1885	1885:sct-st-andrews-burghs	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the borough is in neither the First, Fifth, nor Sixth Schedule, so it continues with its boundary
+1885	1885:sct-st-andrews-burghs	1868	331	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the borough is in neither the First, Fifth, nor Sixth Schedule, so it continues with its boundary
+1868	333	1885	1885:eng-stafford	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23), Fifth Schedule: the borough is the present borough with land added
+1868	438	1885	1885:eng-stalybridge	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23), Fifth Schedule: the borough is the present borough with land added
+1868	335	1885	1885:sct-stirling-burghs	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the borough is in neither the First, Fifth, nor Sixth Schedule, so it continues with its boundary
+1885	1885:sct-stirling-burghs	1868	335	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the borough is in neither the First, Fifth, nor Sixth Schedule, so it continues with its boundary
+1868	336	1885	1885:sct-stirlingshire	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the county is not divided, no borough in it ceases, and none is extended
+1885	1885:sct-stirlingshire	1868	336	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the county is not divided, no borough in it ceases, and none is extended
+1868	337	1885	1885:eng-stockport	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the borough is in neither the First, Fifth, nor Sixth Schedule, so it continues with its boundary
+1885	1885:eng-stockport	1868	337	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the borough is in neither the First, Fifth, nor Sixth Schedule, so it continues with its boundary
+1868	439	1885	1885:eng-stockton-on-tees	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the borough is in neither the First, Fifth, nor Sixth Schedule, so it continues with its boundary
+1885	1885:eng-stockton-on-tees	1868	439	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the borough is in neither the First, Fifth, nor Sixth Schedule, so it continues with its boundary
+1868	341	1885	1885:eng-sunderland	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the borough is in neither the First, Fifth, nor Sixth Schedule, so it continues with its boundary
+1885	1885:eng-sunderland	1868	341	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the borough is in neither the First, Fifth, nor Sixth Schedule, so it continues with its boundary
+1868	342	1885	1885:sct-sutherland	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the county is not divided, no borough in it ceases, and none is extended
+1885	1885:sct-sutherland	1868	342	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the county is not divided, no borough in it ceases, and none is extended
+1885	1885:wls-swansea-town	1868	343	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23), Sixth Schedule: the borough is divided, and it is not in the Fifth Schedule, so its boundary is not altered
+1885	1885:wls-swansea-district	1868	343	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23), Sixth Schedule: the borough is divided, and it is not in the Fifth Schedule, so its boundary is not altered
+1868	345	1885	1885:eng-taunton	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the borough is in neither the First, Fifth, nor Sixth Schedule, so it continues with its boundary
+1885	1885:eng-taunton	1868	345	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the borough is in neither the First, Fifth, nor Sixth Schedule, so it continues with its boundary
+1868	440	1885	1885:eng-the-hartlepools	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the borough is in neither the First, Fifth, nor Sixth Schedule, so it continues with its boundary
+1885	1885:eng-the-hartlepools	1868	440	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the borough is in neither the First, Fifth, nor Sixth Schedule, so it continues with its boundary
+1885	1885:eng-bow-and-bromley	1868	353	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23), Sixth Schedule: the borough is divided, and it is not in the Fifth Schedule, so its boundary is not altered
+1885	1885:eng-limehouse	1868	353	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23), Sixth Schedule: the borough is divided, and it is not in the Fifth Schedule, so its boundary is not altered
+1885	1885:eng-mile-end	1868	353	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23), Sixth Schedule: the borough is divided, and it is not in the Fifth Schedule, so its boundary is not altered
+1885	1885:eng-poplar	1868	353	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23), Sixth Schedule: the borough is divided, and it is not in the Fifth Schedule, so its boundary is not altered
+1885	1885:eng-st-george	1868	353	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23), Sixth Schedule: the borough is divided, and it is not in the Fifth Schedule, so its boundary is not altered
+1885	1885:eng-stepney	1868	353	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23), Sixth Schedule: the borough is divided, and it is not in the Fifth Schedule, so its boundary is not altered
+1885	1885:eng-whitechapel	1868	353	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23), Sixth Schedule: the borough is divided, and it is not in the Fifth Schedule, so its boundary is not altered
+1868	356	1885	1885:eng-tynemouth	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the borough is in neither the First, Fifth, nor Sixth Schedule, so it continues with its boundary
+1885	1885:eng-tynemouth	1868	356	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the borough is in neither the First, Fifth, nor Sixth Schedule, so it continues with its boundary
+1868	358	1885	1885:eng-wakefield	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23), Fifth Schedule: the borough is the present borough with land added
+1868	360	1885	1885:eng-walsall	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the borough is in neither the First, Fifth, nor Sixth Schedule, so it continues with its boundary
+1885	1885:eng-walsall	1868	360	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the borough is in neither the First, Fifth, nor Sixth Schedule, so it continues with its boundary
+1868	362	1885	1885:eng-warrington	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the borough is in neither the First, Fifth, nor Sixth Schedule, so it continues with its boundary
+1885	1885:eng-warrington	1868	362	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the borough is in neither the First, Fifth, nor Sixth Schedule, so it continues with its boundary
+1868	363	1885	1885:eng-warwick-and-leamington	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23), Fifth Schedule: the borough is the present borough with land added
+1868	365	1885	1885:irl-waterford-city	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the borough is in neither the First, Fifth, nor Sixth Schedule, so it continues with its boundary
+1885	1885:irl-waterford-city	1868	365	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the borough is in neither the First, Fifth, nor Sixth Schedule, so it continues with its boundary
+1868	387	1885	1885:eng-whitehaven	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the borough is in neither the First, Fifth, nor Sixth Schedule, so it continues with its boundary
+1885	1885:eng-whitehaven	1868	387	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the borough is in neither the First, Fifth, nor Sixth Schedule, so it continues with its boundary
+1868	388	1885	1885:sct-wick-burghs	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the borough is in neither the First, Fifth, nor Sixth Schedule, so it continues with its boundary
+1885	1885:sct-wick-burghs	1868	388	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the borough is in neither the First, Fifth, nor Sixth Schedule, so it continues with its boundary
+1885	1885:irl-east-wicklow	1868	389	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23), Seventh Schedule: the county, undivided in 1868, is divided, and no borough in it ceases
+1885	1885:irl-west-wicklow	1868	389	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23), Seventh Schedule: the county, undivided in 1868, is divided, and no borough in it ceases
+1868	390	1885	1885:eng-wigan	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the borough is in neither the First, Fifth, nor Sixth Schedule, so it continues with its boundary
+1885	1885:eng-wigan	1868	390	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the borough is in neither the First, Fifth, nor Sixth Schedule, so it continues with its boundary
+1868	392	1885	1885:sct-wigtownshire	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23), First Schedule: the Wigtown district ceases, partly into the undivided county, which loses nothing
+1868	394	1885	1885:eng-winchester	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the borough is in neither the First, Fifth, nor Sixth Schedule, so it continues with its boundary
+1885	1885:eng-winchester	1868	394	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the borough is in neither the First, Fifth, nor Sixth Schedule, so it continues with its boundary
+1868	395	1885	1885:eng-windsor	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the borough is in neither the First, Fifth, nor Sixth Schedule, so it continues with its boundary
+1885	1885:eng-windsor	1868	395	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the borough is in neither the First, Fifth, nor Sixth Schedule, so it continues with its boundary
+1885	1885:eng-east-wolverhampton	1868	396	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23), Sixth Schedule: the borough is divided, and it is not in the Fifth Schedule, so its boundary is not altered
+1885	1885:eng-south-wolverhampton	1868	396	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23), Sixth Schedule: the borough is divided, and it is not in the Fifth Schedule, so its boundary is not altered
+1885	1885:eng-west-wolverhampton	1868	396	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23), Sixth Schedule: the borough is divided, and it is not in the Fifth Schedule, so its boundary is not altered
+1868	398	1885	1885:eng-worcester	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the borough is in neither the First, Fifth, nor Sixth Schedule, so it continues with its boundary
+1885	1885:eng-worcester	1868	398	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23): the borough is in neither the First, Fifth, nor Sixth Schedule, so it continues with its boundary
+1868	400	1885	1885:eng-york	Redistribution of Seats Act 1885 (48 & 49 Vict. c. 23), Fifth Schedule: the borough is the present borough with land added

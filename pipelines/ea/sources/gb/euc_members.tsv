@@ -1,0 +1,2230 @@
+order	name	pcon
+1978/1903	Northumbria	1974:eng-berwick-upon-tweed
+1978/1903	Northumbria	1974:eng-blyth
+1978/1903	Northumbria	1974:eng-hexham
+1978/1903	Northumbria	1974:eng-morpeth
+1978/1903	Northumbria	1974:eng-central-newcastle-upon-tyne
+1978/1903	Northumbria	1974:eng-east-newcastle-upon-tyne
+1978/1903	Northumbria	1974:eng-north-newcastle-upon-tyne
+1978/1903	Northumbria	1974:eng-west-newcastle-upon-tyne
+1978/1903	Northumbria	1974:eng-wallsend
+1978/1903	South Tyne and Wear	1974:eng-blaydon
+1978/1903	South Tyne and Wear	1974:eng-gateshead-east
+1978/1903	South Tyne and Wear	1974:eng-gateshead-west
+1978/1903	South Tyne and Wear	1974:eng-jarrow
+1978/1903	South Tyne and Wear	1974:eng-south-shields
+1978/1903	South Tyne and Wear	1974:eng-sunderland-north
+1978/1903	South Tyne and Wear	1974:eng-sunderland-south
+1978/1903	South Tyne and Wear	1974:eng-tynemouth
+1978/1903	Cumbria	1974:eng-barrow-in-furness
+1978/1903	Cumbria	1974:eng-carlisle
+1978/1903	Cumbria	1974:eng-lancaster
+1978/1903	Cumbria	1974:eng-morecambe-and-lonsdale
+1978/1903	Cumbria	1974:eng-north-fylde
+1978/1903	Cumbria	1974:eng-penrith-and-the-border
+1978/1903	Cumbria	1974:eng-westmorland
+1978/1903	Cumbria	1974:eng-whitehaven
+1978/1903	Cumbria	1974:eng-workington
+1978/1903	Durham	1974:eng-bishop-auckland
+1978/1903	Durham	1974:eng-chester-le-street
+1978/1903	Durham	1974:eng-consett
+1978/1903	Durham	1974:eng-darlington
+1978/1903	Durham	1974:eng-durham
+1978/1903	Durham	1974:eng-easington
+1978/1903	Durham	1974:eng-houghton-le-spring
+1978/1903	Durham	1974:eng-north-west-durham
+1978/1903	Cleveland	1974:eng-cleveland-and-whitby
+1978/1903	Cleveland	1974:eng-hartlepool
+1978/1903	Cleveland	1974:eng-richmond-yorks
+1978/1903	Cleveland	1974:eng-scarborough
+1978/1903	Cleveland	1974:eng-middlesbrough
+1978/1903	Cleveland	1974:eng-redcar
+1978/1903	Cleveland	1974:eng-stockton-on-tees
+1978/1903	Cleveland	1974:eng-thornaby
+1978/1903	Yorkshire North	1974:eng-barkston-ash
+1978/1903	Yorkshire North	1974:eng-goole
+1978/1903	Yorkshire North	1974:eng-harrogate
+1978/1903	Yorkshire North	1974:eng-ripon
+1978/1903	Yorkshire North	1974:eng-skipton
+1978/1903	Yorkshire North	1974:eng-thirsk-and-malton
+1978/1903	Yorkshire North	1974:eng-york
+1978/1903	Humberside	1974:eng-bridlington
+1978/1903	Humberside	1974:eng-brigg-and-scunthorpe
+1978/1903	Humberside	1974:eng-haltemprice
+1978/1903	Humberside	1974:eng-howden
+1978/1903	Humberside	1974:eng-central-kingston-upon-hull
+1978/1903	Humberside	1974:eng-east-kingston-upon-hull
+1978/1903	Humberside	1974:eng-west-kingston-upon-hull
+1978/1903	Lancashire Central	1974:eng-blackpool-north
+1978/1903	Lancashire Central	1974:eng-blackpool-south
+1978/1903	Lancashire Central	1974:eng-chorley
+1978/1903	Lancashire Central	1974:eng-preston-north
+1978/1903	Lancashire Central	1974:eng-preston-south
+1978/1903	Lancashire Central	1974:eng-south-fylde
+1978/1903	Lancashire Central	1974:eng-westhoughton
+1978/1903	Lancashire Central	1974:eng-wigan
+1978/1903	Lancashire East	1974:eng-accrington
+1978/1903	Lancashire East	1974:eng-blackburn
+1978/1903	Lancashire East	1974:eng-burnley
+1978/1903	Lancashire East	1974:eng-clitheroe
+1978/1903	Lancashire East	1974:eng-darwen
+1978/1903	Lancashire East	1974:eng-heywood-and-royton
+1978/1903	Lancashire East	1974:eng-nelson-and-colne
+1978/1903	Lancashire East	1974:eng-rossendale
+1978/1903	Yorkshire West	1974:eng-bradford-north
+1978/1903	Yorkshire West	1974:eng-bradford-south
+1978/1903	Yorkshire West	1974:eng-bradford-west
+1978/1903	Yorkshire West	1974:eng-brighouse-and-spenborough
+1978/1903	Yorkshire West	1974:eng-halifax
+1978/1903	Yorkshire West	1974:eng-keighley
+1978/1903	Yorkshire West	1974:eng-shipley
+1978/1903	Yorkshire West	1974:eng-sowerby
+1978/1903	Leeds	1974:eng-batley-and-morley
+1978/1903	Leeds	1974:eng-leeds-east
+1978/1903	Leeds	1974:eng-leeds-north-east
+1978/1903	Leeds	1974:eng-leeds-north-west
+1978/1903	Leeds	1974:eng-leeds-south
+1978/1903	Leeds	1974:eng-leeds-south-east
+1978/1903	Leeds	1974:eng-leeds-west
+1978/1903	Leeds	1974:eng-pudsey
+1978/1903	Liverpool	1974:eng-bootle
+1978/1903	Liverpool	1974:eng-liverpool-edge-hill
+1978/1903	Liverpool	1974:eng-liverpool-garston
+1978/1903	Liverpool	1974:eng-liverpool-kirkdale
+1978/1903	Liverpool	1974:eng-liverpool-scotland-exchange
+1978/1903	Liverpool	1974:eng-liverpool-toxteth
+1978/1903	Liverpool	1974:eng-liverpool-walton
+1978/1903	Liverpool	1974:eng-liverpool-wavertree
+1978/1903	Liverpool	1974:eng-liverpool-west-derby
+1978/1903	Lancashire West	1974:eng-crosby
+1978/1903	Lancashire West	1974:eng-huyton
+1978/1903	Lancashire West	1974:eng-ince
+1978/1903	Lancashire West	1974:eng-ormskirk
+1978/1903	Lancashire West	1974:eng-st-helens
+1978/1903	Lancashire West	1974:eng-southport
+1978/1903	Lancashire West	1974:eng-widnes
+1978/1903	Greater Manchester West	1974:eng-altrincham-and-sale
+1978/1903	Greater Manchester West	1974:eng-bolton-east
+1978/1903	Greater Manchester West	1974:eng-bolton-west
+1978/1903	Greater Manchester West	1974:eng-eccles
+1978/1903	Greater Manchester West	1974:eng-farnworth
+1978/1903	Greater Manchester West	1974:eng-leigh
+1978/1903	Greater Manchester West	1974:eng-salford-east
+1978/1903	Greater Manchester West	1974:eng-salford-west
+1978/1903	Greater Manchester West	1974:eng-stretford
+1978/1903	Greater Manchester South	1974:eng-cheadle
+1978/1903	Greater Manchester South	1974:eng-manchester-ardwick
+1978/1903	Greater Manchester South	1974:eng-manchester-blackley
+1978/1903	Greater Manchester South	1974:eng-manchester-central
+1978/1903	Greater Manchester South	1974:eng-manchester-moss-side
+1978/1903	Greater Manchester South	1974:eng-manchester-openshaw
+1978/1903	Greater Manchester South	1974:eng-manchester-withington
+1978/1903	Greater Manchester South	1974:eng-manchester-wythenshawe
+1978/1903	Greater Manchester South	1974:eng-stockport-north
+1978/1903	Greater Manchester South	1974:eng-stockport-south
+1978/1903	Greater Manchester North	1974:eng-ashton-under-lyne
+1978/1903	Greater Manchester North	1974:eng-bury-and-radcliffe
+1978/1903	Greater Manchester North	1974:eng-manchester-gorton
+1978/1903	Greater Manchester North	1974:eng-middleton-and-prestwich
+1978/1903	Greater Manchester North	1974:eng-oldham-east
+1978/1903	Greater Manchester North	1974:eng-oldham-west
+1978/1903	Greater Manchester North	1974:eng-rochdale
+1978/1903	Greater Manchester North	1974:eng-stalybridge-and-hyde
+1978/1903	Yorkshire South West	1974:eng-colne-valley
+1978/1903	Yorkshire South West	1974:eng-dewsbury
+1978/1903	Yorkshire South West	1974:eng-hemsworth
+1978/1903	Yorkshire South West	1974:eng-east-huddersfield
+1978/1903	Yorkshire South West	1974:eng-west-huddersfield
+1978/1903	Yorkshire South West	1974:eng-normanton
+1978/1903	Yorkshire South West	1974:eng-pontefract-and-castleford
+1978/1903	Yorkshire South West	1974:eng-wakefield
+1978/1903	Yorkshire South	1974:eng-barnsley
+1978/1903	Yorkshire South	1974:eng-dearne-valley
+1978/1903	Yorkshire South	1974:eng-doncaster
+1978/1903	Yorkshire South	1974:eng-don-valley
+1978/1903	Yorkshire South	1974:eng-penistone
+1978/1903	Yorkshire South	1974:eng-rotherham
+1978/1903	Yorkshire South	1974:eng-rother-valley
+1978/1903	Cheshire West	1974:eng-bebington-and-ellesmere-port
+1978/1903	Cheshire West	1974:eng-birkenhead
+1978/1903	Cheshire West	1974:eng-city-of-chester
+1978/1903	Cheshire West	1974:eng-nantwich
+1978/1903	Cheshire West	1974:eng-northwich
+1978/1903	Cheshire West	1974:eng-wallasey
+1978/1903	Cheshire West	1974:eng-wirral
+1978/1903	Cheshire East	1974:eng-crewe
+1978/1903	Cheshire East	1974:eng-hazel-grove
+1978/1903	Cheshire East	1974:eng-knutsford
+1978/1903	Cheshire East	1974:eng-macclesfield
+1978/1903	Cheshire East	1974:eng-newton
+1978/1903	Cheshire East	1974:eng-runcorn
+1978/1903	Cheshire East	1974:eng-warrington
+1978/1903	Derbyshire	1974:eng-belper
+1978/1903	Derbyshire	1974:eng-bolsover
+1978/1903	Derbyshire	1974:eng-derby-north
+1978/1903	Derbyshire	1974:eng-derby-south
+1978/1903	Derbyshire	1974:eng-high-peak
+1978/1903	Derbyshire	1974:eng-ilkeston
+1978/1903	Derbyshire	1974:eng-south-east-derbyshire
+1978/1903	Derbyshire	1974:eng-west-derbyshire
+1978/1903	Sheffield	1974:eng-chesterfield
+1978/1903	Sheffield	1974:eng-north-east-derbyshire
+1978/1903	Sheffield	1974:eng-sheffield-attercliffe
+1978/1903	Sheffield	1974:eng-sheffield-brightside
+1978/1903	Sheffield	1974:eng-sheffield-hallam
+1978/1903	Sheffield	1974:eng-sheffield-heeley
+1978/1903	Sheffield	1974:eng-sheffield-hillsborough
+1978/1903	Sheffield	1974:eng-sheffield-park
+1978/1903	Nottingham	1974:eng-ashfield
+1978/1903	Nottingham	1974:eng-bassetlaw
+1978/1903	Nottingham	1974:eng-beeston
+1978/1903	Nottingham	1974:eng-mansfield
+1978/1903	Nottingham	1974:eng-nottingham-east
+1978/1903	Nottingham	1974:eng-nottingham-north
+1978/1903	Nottingham	1974:eng-nottingham-west
+1978/1903	Lincolnshire	1974:eng-gainsborough
+1978/1903	Lincolnshire	1974:eng-grantham
+1978/1903	Lincolnshire	1974:eng-great-grimsby
+1978/1903	Lincolnshire	1974:eng-holland-with-boston
+1978/1903	Lincolnshire	1974:eng-horncastle
+1978/1903	Lincolnshire	1974:eng-lincoln
+1978/1903	Lincolnshire	1974:eng-louth
+1978/1903	Lincolnshire	1974:eng-rutland-and-stamford
+1978/1903	Salop and Stafford	1974:eng-ludlow
+1978/1903	Salop and Stafford	1974:eng-newcastle-under-lyme
+1978/1903	Salop and Stafford	1974:eng-oswestry
+1978/1903	Salop and Stafford	1974:eng-shrewsbury
+1978/1903	Salop and Stafford	1974:eng-south-west-staffordshire
+1978/1903	Salop and Stafford	1974:eng-stafford-and-stone
+1978/1903	Salop and Stafford	1974:eng-the-wrekin
+1978/1903	Staffordshire East	1974:eng-burton
+1978/1903	Staffordshire East	1974:eng-cannock
+1978/1903	Staffordshire East	1974:eng-leek
+1978/1903	Staffordshire East	1974:eng-lichfield-and-tamworth
+1978/1903	Staffordshire East	1974:eng-central-stoke-on-trent
+1978/1903	Staffordshire East	1974:eng-north-stoke-on-trent
+1978/1903	Staffordshire East	1974:eng-south-stoke-on-trent
+1978/1903	Midlands West	1974:eng-dudley-east
+1978/1903	Midlands West	1974:eng-dudley-west
+1978/1903	Midlands West	1974:eng-halesowen-and-stourbridge
+1978/1903	Midlands West	1974:eng-walsall-north
+1978/1903	Midlands West	1974:eng-walsall-south
+1978/1903	Midlands West	1974:eng-north-east-wolverhampton
+1978/1903	Midlands West	1974:eng-south-east-wolverhampton
+1978/1903	Midlands West	1974:eng-south-west-wolverhampton
+1978/1903	Birmingham North	1974:eng-aldridge-brownhills
+1978/1903	Birmingham North	1974:eng-birmingham-erdington
+1978/1903	Birmingham North	1974:eng-birmingham-perry-barr
+1978/1903	Birmingham North	1974:eng-birmingham-stechford
+1978/1903	Birmingham North	1974:eng-sutton-coldfield
+1978/1903	Birmingham North	1974:eng-warley-east
+1978/1903	Birmingham North	1974:eng-warley-west
+1978/1903	Birmingham North	1974:eng-west-bromwich-east
+1978/1903	Birmingham North	1974:eng-west-bromwich-west
+1978/1903	Birmingham South	1974:eng-birmingham-edgbaston
+1978/1903	Birmingham South	1974:eng-birmingham-hall-green
+1978/1903	Birmingham South	1974:eng-birmingham-handsworth
+1978/1903	Birmingham South	1974:eng-birmingham-ladywood
+1978/1903	Birmingham South	1974:eng-birmingham-northfield
+1978/1903	Birmingham South	1974:eng-birmingham-selly-oak
+1978/1903	Birmingham South	1974:eng-birmingham-small-heath
+1978/1903	Birmingham South	1974:eng-birmingham-sparkbrook
+1978/1903	Birmingham South	1974:eng-birmingham-yardley
+1978/1903	Midlands East	1974:eng-blaby
+1978/1903	Midlands East	1974:eng-bosworth
+1978/1903	Midlands East	1974:eng-loughborough
+1978/1903	Midlands East	1974:eng-meriden
+1978/1903	Midlands East	1974:eng-nuneaton
+1978/1903	Midlands East	1974:eng-rugby
+1978/1903	Leicester	1974:eng-carlton
+1978/1903	Leicester	1974:eng-leicester-east
+1978/1903	Leicester	1974:eng-leicester-south
+1978/1903	Leicester	1974:eng-leicester-west
+1978/1903	Leicester	1974:eng-melton
+1978/1903	Leicester	1974:eng-newark
+1978/1903	Leicester	1974:eng-rushcliffe
+1978/1903	Cambridgeshire	1974:eng-cambridge
+1978/1903	Cambridgeshire	1974:eng-cambridgeshire
+1978/1903	Cambridgeshire	1974:eng-huntingdonshire
+1978/1903	Cambridgeshire	1974:eng-isle-of-ely
+1978/1903	Cambridgeshire	1974:eng-peterborough
+1978/1903	Cambridgeshire	1974:eng-wellingborough
+1978/1903	Norfolk	1974:eng-north-norfolk
+1978/1903	Norfolk	1974:eng-north-west-norfolk
+1978/1903	Norfolk	1974:eng-norwich-north
+1978/1903	Norfolk	1974:eng-norwich-south
+1978/1903	Norfolk	1974:eng-south-norfolk
+1978/1903	Norfolk	1974:eng-south-west-norfolk
+1978/1903	Norfolk	1974:eng-great-yarmouth
+1978/1903	Suffolk	1974:eng-bury-st-edmunds
+1978/1903	Suffolk	1974:eng-eye
+1978/1903	Suffolk	1974:eng-harwich
+1978/1903	Suffolk	1974:eng-ipswich
+1978/1903	Suffolk	1974:eng-lowestoft
+1978/1903	Suffolk	1974:eng-sudbury-and-woodbridge
+1978/1903	Hereford and Worcester	1974:eng-bromsgrove-and-redditch
+1978/1903	Hereford and Worcester	1974:eng-hereford
+1978/1903	Hereford and Worcester	1974:eng-kidderminster
+1978/1903	Hereford and Worcester	1974:eng-leominster
+1978/1903	Hereford and Worcester	1974:eng-south-worcestershire
+1978/1903	Hereford and Worcester	1974:eng-west-gloucestershire
+1978/1903	Hereford and Worcester	1974:eng-worcester
+1978/1903	The Cotswolds	1974:eng-banbury
+1978/1903	The Cotswolds	1974:eng-cheltenham
+1978/1903	The Cotswolds	1974:eng-cirencester-and-tewkesbury
+1978/1903	The Cotswolds	1974:eng-gloucester
+1978/1903	The Cotswolds	1974:eng-mid-oxfordshire
+1978/1903	The Cotswolds	1974:eng-oxford
+1978/1903	The Cotswolds	1974:eng-stroud
+1978/1903	Midlands Central	1974:eng-coventry-north-east
+1978/1903	Midlands Central	1974:eng-coventry-north-west
+1978/1903	Midlands Central	1974:eng-coventry-south-east
+1978/1903	Midlands Central	1974:eng-coventry-south-west
+1978/1903	Midlands Central	1974:eng-solihull
+1978/1903	Midlands Central	1974:eng-stratford-on-avon
+1978/1903	Midlands Central	1974:eng-warwick-and-leamington
+1978/1903	Northamptonshire	1974:eng-aylesbury
+1978/1903	Northamptonshire	1974:eng-buckingham
+1978/1903	Northamptonshire	1974:eng-daventry
+1978/1903	Northamptonshire	1974:eng-harborough
+1978/1903	Northamptonshire	1974:eng-kettering
+1978/1903	Northamptonshire	1974:eng-northampton-north
+1978/1903	Northamptonshire	1974:eng-northampton-south
+1978/1903	Bedfordshire	1974:eng-bedford
+1978/1903	Bedfordshire	1974:eng-hemel-hempstead
+1978/1903	Bedfordshire	1974:eng-hitchin
+1978/1903	Bedfordshire	1974:eng-luton-east
+1978/1903	Bedfordshire	1974:eng-luton-west
+1978/1903	Bedfordshire	1974:eng-mid-bedfordshire
+1978/1903	Bedfordshire	1974:eng-south-bedfordshire
+1978/1903	Hertfordshire	1974:eng-east-hertfordshire
+1978/1903	Hertfordshire	1974:eng-hertford-and-stevenage
+1978/1903	Hertfordshire	1974:eng-st-albans
+1978/1903	Hertfordshire	1974:eng-south-hertfordshire
+1978/1903	Hertfordshire	1974:eng-south-west-hertfordshire
+1978/1903	Hertfordshire	1974:eng-watford
+1978/1903	Hertfordshire	1974:eng-welwyn-hatfield
+1978/1903	Essex South West	1974:eng-basildon
+1978/1903	Essex South West	1974:eng-brentwood-and-ongar
+1978/1903	Essex South West	1974:eng-chelmsford
+1978/1903	Essex South West	1974:eng-epping-forest
+1978/1903	Essex South West	1974:eng-harlow
+1978/1903	Essex South West	1974:eng-thurrock
+1978/1903	Essex North East	1974:eng-braintree
+1978/1903	Essex North East	1974:eng-colchester
+1978/1903	Essex North East	1974:eng-maldon
+1978/1903	Essex North East	1974:eng-saffron-walden
+1978/1903	Essex North East	1974:eng-south-east-essex
+1978/1903	Essex North East	1974:eng-southend-east
+1978/1903	Essex North East	1974:eng-southend-west
+1978/1903	Bristol	1974:eng-bristol-north-east
+1978/1903	Bristol	1974:eng-bristol-north-west
+1978/1903	Bristol	1974:eng-bristol-south
+1978/1903	Bristol	1974:eng-bristol-south-east
+1978/1903	Bristol	1974:eng-bristol-west
+1978/1903	Bristol	1974:eng-chippenham
+1978/1903	Bristol	1974:eng-kingswood
+1978/1903	Bristol	1974:eng-south-gloucestershire
+1978/1903	Upper Thames	1974:eng-abingdon
+1978/1903	Upper Thames	1974:eng-devizes
+1978/1903	Upper Thames	1974:eng-henley
+1978/1903	Upper Thames	1974:eng-newbury
+1978/1903	Upper Thames	1974:eng-reading-north
+1978/1903	Upper Thames	1974:eng-reading-south
+1978/1903	Upper Thames	1974:eng-swindon
+1978/1903	Thames Valley	1974:eng-beaconsfield
+1978/1903	Thames Valley	1974:eng-chesham-and-amersham
+1978/1903	Thames Valley	1974:eng-eton-and-slough
+1978/1903	Thames Valley	1974:eng-spelthorne
+1978/1903	Thames Valley	1974:eng-windsor-and-maidenhead
+1978/1903	Thames Valley	1974:eng-wokingham
+1978/1903	Thames Valley	1974:eng-wycombe
+1978/1903	Cornwall and Plymouth	1974:eng-bodmin
+1978/1903	Cornwall and Plymouth	1974:eng-falmouth-and-camborne
+1978/1903	Cornwall and Plymouth	1974:eng-north-cornwall
+1978/1903	Cornwall and Plymouth	1974:eng-plymouth-devonport
+1978/1903	Cornwall and Plymouth	1974:eng-plymouth-drake
+1978/1903	Cornwall and Plymouth	1974:eng-plymouth-sutton
+1978/1903	Cornwall and Plymouth	1974:eng-st-ives
+1978/1903	Cornwall and Plymouth	1974:eng-truro
+1978/1903	Devon	1974:eng-exeter
+1978/1903	Devon	1974:eng-honiton
+1978/1903	Devon	1974:eng-north-devon
+1978/1903	Devon	1974:eng-tiverton
+1978/1903	Devon	1974:eng-torbay
+1978/1903	Devon	1974:eng-totnes
+1978/1903	Devon	1974:eng-west-devon
+1978/1903	Somerset	1974:eng-bath
+1978/1903	Somerset	1974:eng-bridgwater
+1978/1903	Somerset	1974:eng-north-somerset
+1978/1903	Somerset	1974:eng-taunton
+1978/1903	Somerset	1974:eng-wells
+1978/1903	Somerset	1974:eng-weston-super-mare
+1978/1903	Somerset	1974:eng-yeovil
+1978/1903	Wessex	1974:eng-bournemouth-east
+1978/1903	Wessex	1974:eng-bournemouth-west
+1978/1903	Wessex	1974:eng-christchurch-and-lymington
+1978/1903	Wessex	1974:eng-north-dorset
+1978/1903	Wessex	1974:eng-poole
+1978/1903	Wessex	1974:eng-south-dorset
+1978/1903	Wessex	1974:eng-westbury
+1978/1903	Wessex	1974:eng-west-dorset
+1978/1903	Hampshire West	1974:eng-basingstoke
+1978/1903	Hampshire West	1974:eng-eastleigh
+1978/1903	Hampshire West	1974:eng-new-forest
+1978/1903	Hampshire West	1974:eng-salisbury
+1978/1903	Hampshire West	1974:eng-southampton-itchen
+1978/1903	Hampshire West	1974:eng-southampton-test
+1978/1903	Hampshire West	1974:eng-winchester
+1978/1903	Wight and Hampshire East	1974:eng-aldershot
+1978/1903	Wight and Hampshire East	1974:eng-fareham
+1978/1903	Wight and Hampshire East	1974:eng-farnham
+1978/1903	Wight and Hampshire East	1974:eng-gosport
+1978/1903	Wight and Hampshire East	1974:eng-isle-of-wight
+1978/1903	Wight and Hampshire East	1974:eng-petersfield
+1978/1903	Wight and Hampshire East	1974:eng-portsmouth-north
+1978/1903	Wight and Hampshire East	1974:eng-portsmouth-south
+1978/1903	Surrey	1974:eng-chertsey-and-walton
+1978/1903	Surrey	1974:eng-dorking
+1978/1903	Surrey	1974:eng-epsom-and-ewell
+1978/1903	Surrey	1974:eng-esher
+1978/1903	Surrey	1974:eng-guildford
+1978/1903	Surrey	1974:eng-north-west-surrey
+1978/1903	Surrey	1974:eng-reigate
+1978/1903	Surrey	1974:eng-woking
+1978/1903	Sussex West	1974:eng-arundel
+1978/1903	Sussex West	1974:eng-chichester
+1978/1903	Sussex West	1974:eng-havant-and-waterloo
+1978/1903	Sussex West	1974:eng-horsham-and-crawley
+1978/1903	Sussex West	1974:eng-mid-sussex
+1978/1903	Sussex West	1974:eng-shoreham
+1978/1903	Sussex West	1974:eng-worthing
+1978/1903	Sussex East	1974:eng-brighton-kemptown
+1978/1903	Sussex East	1974:eng-brighton-pavilion
+1978/1903	Sussex East	1974:eng-eastbourne
+1978/1903	Sussex East	1974:eng-east-grinstead
+1978/1903	Sussex East	1974:eng-hastings
+1978/1903	Sussex East	1974:eng-hove
+1978/1903	Sussex East	1974:eng-lewes
+1978/1903	Sussex East	1974:eng-rye
+1978/1903	Kent West	1974:eng-dartford
+1978/1903	Kent West	1974:eng-east-surrey
+1978/1903	Kent West	1974:eng-gillingham
+1978/1903	Kent West	1974:eng-gravesend
+1978/1903	Kent West	1974:eng-rochester-and-chatham
+1978/1903	Kent West	1974:eng-royal-tunbridge-wells
+1978/1903	Kent West	1974:eng-sevenoaks
+1978/1903	Kent West	1974:eng-tonbridge-and-malling
+1978/1903	Kent East	1974:eng-ashford
+1978/1903	Kent East	1974:eng-canterbury
+1978/1903	Kent East	1974:eng-dover-and-deal
+1978/1903	Kent East	1974:eng-faversham
+1978/1903	Kent East	1974:eng-folkestone-and-hythe
+1978/1903	Kent East	1974:eng-maidstone
+1978/1903	Kent East	1974:eng-east-thanet
+1978/1903	Kent East	1974:eng-west-thanet
+1978/1903	London West	1974:eng-acton
+1978/1903	London West	1974:eng-ealing-north
+1978/1903	London West	1974:eng-southall
+1978/1903	London West	1974:eng-hayes-and-harlington
+1978/1903	London West	1974:eng-ruislip-northwood
+1978/1903	London West	1974:eng-uxbridge
+1978/1903	London West	1974:eng-brentford-and-isleworth
+1978/1903	London West	1974:eng-feltham-and-heston
+1978/1903	London North West	1974:eng-chipping-barnet
+1978/1903	London North West	1974:eng-hendon-north
+1978/1903	London North West	1974:eng-hendon-south
+1978/1903	London North West	1974:eng-brent-east
+1978/1903	London North West	1974:eng-brent-north
+1978/1903	London North West	1974:eng-brent-south
+1978/1903	London North West	1974:eng-harrow-central
+1978/1903	London North West	1974:eng-harrow-east
+1978/1903	London North West	1974:eng-harrow-west
+1978/1903	London Central	1974:eng-hampstead
+1978/1903	London Central	1974:eng-holborn-and-st-pancras-south
+1978/1903	London Central	1974:eng-st-pancras-north
+1978/1903	London Central	1974:eng-city-of-london-and-westminster-south
+1978/1903	London Central	1974:eng-paddington
+1978/1903	London Central	1974:eng-st-marylebone
+1978/1903	London Central	1974:eng-fulham
+1978/1903	London Central	1974:eng-north-hammersmith
+1978/1903	London Central	1974:eng-chelsea
+1978/1903	London Central	1974:eng-kensington
+1978/1903	London North	1974:eng-finchley
+1978/1903	London North	1974:eng-edmonton
+1978/1903	London North	1974:eng-enfield-north
+1978/1903	London North	1974:eng-enfield-southgate
+1978/1903	London North	1974:eng-hornsey
+1978/1903	London North	1974:eng-tottenham
+1978/1903	London North	1974:eng-wood-green
+1978/1903	London North	1974:eng-islington-central
+1978/1903	London North	1974:eng-islington-north
+1978/1903	London North	1974:eng-islington-south-and-finsbury
+1978/1903	London North East	1974:eng-hackney-central
+1978/1903	London North East	1974:eng-hackney-north-and-stoke-newington
+1978/1903	London North East	1974:eng-hackney-south-and-shoreditch
+1978/1903	London North East	1974:eng-newham-north-west
+1978/1903	London North East	1974:eng-newham-south
+1978/1903	London North East	1974:eng-bethnal-green-and-bow
+1978/1903	London North East	1974:eng-stepney-and-poplar
+1978/1903	London North East	1974:eng-chingford
+1978/1903	London North East	1974:eng-leyton
+1978/1903	London North East	1974:eng-walthamstow
+1978/1903	London East	1974:eng-barking
+1978/1903	London East	1974:eng-dagenham
+1978/1903	London East	1974:eng-hornchurch
+1978/1903	London East	1974:eng-romford
+1978/1903	London East	1974:eng-upminster
+1978/1903	London East	1974:eng-newham-north-east
+1978/1903	London East	1974:eng-ilford-north
+1978/1903	London East	1974:eng-ilford-south
+1978/1903	London East	1974:eng-wanstead-and-woodford
+1978/1903	London South West	1974:eng-kingston-upon-thames
+1978/1903	London South West	1974:eng-surbiton
+1978/1903	London South West	1974:eng-lambeth-central
+1978/1903	London South West	1974:eng-vauxhall
+1978/1903	London South West	1974:eng-richmond-upon-thames
+1978/1903	London South West	1974:eng-twickenham
+1978/1903	London South West	1974:eng-battersea-north
+1978/1903	London South West	1974:eng-battersea-south
+1978/1903	London South West	1974:eng-putney
+1978/1903	London South West	1974:eng-tooting
+1978/1903	London South	1974:eng-croydon-central
+1978/1903	London South	1974:eng-croydon-north-east
+1978/1903	London South	1974:eng-croydon-north-west
+1978/1903	London South	1974:eng-croydon-south
+1978/1903	London South	1974:eng-mitcham-and-morden
+1978/1903	London South	1974:eng-wimbledon
+1978/1903	London South	1974:eng-sutton-and-cheam
+1978/1903	London South	1974:eng-carshalton
+1978/1903	London South Inner	1974:eng-greenwich
+1978/1903	London South Inner	1974:eng-norwood
+1978/1903	London South Inner	1974:eng-streatham
+1978/1903	London South Inner	1974:eng-lewisham-deptford
+1978/1903	London South Inner	1974:eng-lewisham-east
+1978/1903	London South Inner	1974:eng-lewisham-west
+1978/1903	London South Inner	1974:eng-bermondsey
+1978/1903	London South Inner	1974:eng-dulwich
+1978/1903	London South Inner	1974:eng-peckham
+1978/1903	London South East	1974:eng-bexleyheath
+1978/1903	London South East	1974:eng-erith-and-crayford
+1978/1903	London South East	1974:eng-sidcup
+1978/1903	London South East	1974:eng-beckenham
+1978/1903	London South East	1974:eng-chislehurst
+1978/1903	London South East	1974:eng-orpington
+1978/1903	London South East	1974:eng-ravensbourne
+1978/1903	London South East	1974:eng-woolwich-east
+1978/1903	London South East	1974:eng-woolwich-west
+1978/1904	North Wales	1974:wls-anglesey
+1978/1904	North Wales	1974:wls-caernarvon
+1978/1904	North Wales	1974:wls-conway
+1978/1904	North Wales	1974:wls-denbigh
+1978/1904	North Wales	1974:wls-east-flintshire
+1978/1904	North Wales	1974:wls-merioneth
+1978/1904	North Wales	1974:wls-montgomery
+1978/1904	North Wales	1974:wls-west-flintshire
+1978/1904	North Wales	1974:wls-wrexham
+1978/1904	Mid and West Wales	1974:wls-brecon-and-radnor
+1978/1904	Mid and West Wales	1974:wls-cardigan
+1978/1904	Mid and West Wales	1974:wls-carmarthen
+1978/1904	Mid and West Wales	1974:wls-gower
+1978/1904	Mid and West Wales	1974:wls-llanelli
+1978/1904	Mid and West Wales	1974:wls-pembrokeshire
+1978/1904	Mid and West Wales	1974:wls-swansea-east
+1978/1904	Mid and West Wales	1974:wls-swansea-west
+1978/1904	South-East Wales	1974:wls-aberdare
+1978/1904	South-East Wales	1974:wls-abertillery
+1978/1904	South-East Wales	1974:wls-bedwellty
+1978/1904	South-East Wales	1974:wls-caerphilly
+1978/1904	South-East Wales	1974:wls-ebbw-vale
+1978/1904	South-East Wales	1974:wls-merthyr-tydfil
+1978/1904	South-East Wales	1974:wls-monmouth
+1978/1904	South-East Wales	1974:wls-newport
+1978/1904	South-East Wales	1974:wls-pontypool
+1978/1904	South-East Wales	1974:wls-rhondda
+1978/1904	South Wales	1974:wls-aberavon
+1978/1904	South Wales	1974:wls-barry
+1978/1904	South Wales	1974:wls-cardiff-north
+1978/1904	South Wales	1974:wls-cardiff-north-west
+1978/1904	South Wales	1974:wls-cardiff-south-east
+1978/1904	South Wales	1974:wls-cardiff-west
+1978/1904	South Wales	1974:wls-neath
+1978/1904	South Wales	1974:wls-ogmore
+1978/1904	South Wales	1974:wls-pontypridd
+1978/1911	Highlands and Islands	1974:sct-orkney-and-shetland
+1978/1911	Highlands and Islands	1974:sct-western-isles
+1978/1911	Highlands and Islands	1974:sct-caithness-and-sutherland
+1978/1911	Highlands and Islands	1974:sct-ross-and-cromarty
+1978/1911	Highlands and Islands	1974:sct-inverness
+1978/1911	Highlands and Islands	1974:sct-moray-and-nairn
+1978/1911	Highlands and Islands	1974:sct-banffshire
+1978/1911	Highlands and Islands	1974:sct-argyll
+1978/1911	North East Scotland	1974:sct-east-aberdeenshire
+1978/1911	North East Scotland	1974:sct-west-aberdeenshire
+1978/1911	North East Scotland	1974:sct-aberdeen-north
+1978/1911	North East Scotland	1974:sct-aberdeen-south
+1978/1911	North East Scotland	1974:sct-north-angus-and-mearns
+1978/1911	North East Scotland	1974:sct-south-angus
+1978/1911	North East Scotland	1974:sct-dundee-west
+1978/1911	North East Scotland	1974:sct-dundee-east
+1978/1911	Mid Scotland and Fife	1974:sct-central-fife
+1978/1911	Mid Scotland and Fife	1974:sct-dunfermline
+1978/1911	Mid Scotland and Fife	1974:sct-east-fife
+1978/1911	Mid Scotland and Fife	1974:sct-kirkcaldy
+1978/1911	Mid Scotland and Fife	1974:sct-clackmannan-and-east-stirlingshire
+1978/1911	Mid Scotland and Fife	1974:sct-west-stirlingshire
+1978/1911	Mid Scotland and Fife	1974:sct-stirling-falkirk-and-grangemouth
+1978/1911	Mid Scotland and Fife	1974:sct-kinross-and-western-perthshire
+1978/1911	Mid Scotland and Fife	1974:sct-perth-and-east-perthshire
+1978/1911	Lothians	1974:sct-midlothian
+1978/1911	Lothians	1974:sct-west-lothian
+1978/1911	Lothians	1974:sct-edinburgh-central
+1978/1911	Lothians	1974:sct-edinburgh-east
+1978/1911	Lothians	1974:sct-edinburgh-leith
+1978/1911	Lothians	1974:sct-edinburgh-north
+1978/1911	Lothians	1974:sct-edinburgh-pentlands
+1978/1911	Lothians	1974:sct-edinburgh-south
+1978/1911	Lothians	1974:sct-edinburgh-west
+1978/1911	South of Scotland	1974:sct-berwick-and-east-lothian
+1978/1911	South of Scotland	1974:sct-roxburgh-selkirk-and-peebles
+1978/1911	South of Scotland	1974:sct-dumfries
+1978/1911	South of Scotland	1974:sct-galloway
+1978/1911	South of Scotland	1974:sct-south-ayrshire
+1978/1911	South of Scotland	1974:sct-ayr
+1978/1911	South of Scotland	1974:sct-central-ayrshire
+1978/1911	South of Scotland	1974:sct-lanark
+1978/1911	Strathclyde East	1974:sct-bothwell
+1978/1911	Strathclyde East	1974:sct-east-kilbride
+1978/1911	Strathclyde East	1974:sct-kilmarnock
+1978/1911	Strathclyde East	1974:sct-hamilton
+1978/1911	Strathclyde East	1974:sct-north-lanarkshire
+1978/1911	Strathclyde East	1974:sct-rutherglen
+1978/1911	Strathclyde East	1974:sct-coatbridge-and-airdrie
+1978/1911	Strathclyde East	1974:sct-motherwell-and-wishaw
+1978/1911	Strathclyde West	1974:sct-east-renfrewshire
+1978/1911	Strathclyde West	1974:sct-west-renfrewshire
+1978/1911	Strathclyde West	1974:sct-greenock-and-port-glasgow
+1978/1911	Strathclyde West	1974:sct-paisley
+1978/1911	Strathclyde West	1974:sct-east-dunbartonshire
+1978/1911	Strathclyde West	1974:sct-central-dunbartonshire
+1978/1911	Strathclyde West	1974:sct-west-dunbartonshire
+1978/1911	Strathclyde West	1974:sct-bute-and-north-ayrshire
+1978/1911	Glasgow	1974:sct-glasgow-cathcart
+1978/1911	Glasgow	1974:sct-glasgow-central
+1978/1911	Glasgow	1974:sct-glasgow-craigton
+1978/1911	Glasgow	1974:sct-glasgow-garscadden
+1978/1911	Glasgow	1974:sct-glasgow-govan
+1978/1911	Glasgow	1974:sct-glasgow-hillhead
+1978/1911	Glasgow	1974:sct-glasgow-kelvingrove
+1978/1911	Glasgow	1974:sct-glasgow-maryhill
+1978/1911	Glasgow	1974:sct-glasgow-pollok
+1978/1911	Glasgow	1974:sct-glasgow-provan
+1978/1911	Glasgow	1974:sct-glasgow-queen-s-park
+1978/1911	Glasgow	1974:sct-glasgow-shettleston
+1978/1911	Glasgow	1974:sct-glasgow-springburn
+1984/544	Northumbria	1983:eng-berwick-upon-tweed
+1984/544	Northumbria	1983:eng-blyth-valley
+1984/544	Northumbria	1983:eng-hexham
+1984/544	Northumbria	1983:eng-central-newcastle-upon-tyne
+1984/544	Northumbria	1983:eng-north-newcastle-upon-tyne
+1984/544	Northumbria	1983:eng-tynemouth
+1984/544	Northumbria	1983:eng-wallsend
+1984/544	Northumbria	1983:eng-wansbeck
+1984/544	Tyne and Wear	1983:eng-gateshead-east
+1984/544	Tyne and Wear	1983:eng-houghton-and-washington
+1984/544	Tyne and Wear	1983:eng-jarrow
+1984/544	Tyne and Wear	1983:eng-east-newcastle-upon-tyne
+1984/544	Tyne and Wear	1983:eng-south-shields
+1984/544	Tyne and Wear	1983:eng-sunderland-north
+1984/544	Tyne and Wear	1983:eng-sunderland-south
+1984/544	Tyne and Wear	1983:eng-tyne-bridge
+1984/544	Cumbria and Lancashire North	1983:eng-barrow-and-furness
+1984/544	Cumbria and Lancashire North	1983:eng-carlisle
+1984/544	Cumbria and Lancashire North	1983:eng-copeland
+1984/544	Cumbria and Lancashire North	1983:eng-lancaster
+1984/544	Cumbria and Lancashire North	1983:eng-morecambe-and-lunesdale
+1984/544	Cumbria and Lancashire North	1983:eng-penrith-and-the-border
+1984/544	Cumbria and Lancashire North	1983:eng-westmorland-and-lonsdale
+1984/544	Cumbria and Lancashire North	1983:eng-workington
+1984/544	Cumbria and Lancashire North	1983:eng-wyre
+1984/544	Durham	1983:eng-bishop-auckland
+1984/544	Durham	1983:eng-blaydon
+1984/544	Durham	1983:eng-city-of-durham
+1984/544	Durham	1983:eng-darlington
+1984/544	Durham	1983:eng-easington
+1984/544	Durham	1983:eng-north-durham
+1984/544	Durham	1983:eng-north-west-durham
+1984/544	Durham	1983:eng-sedgefield
+1984/544	Cleveland and Yorkshire North	1983:eng-hartlepool
+1984/544	Cleveland and Yorkshire North	1983:eng-langbaurgh
+1984/544	Cleveland and Yorkshire North	1983:eng-middlesbrough
+1984/544	Cleveland and Yorkshire North	1983:eng-redcar
+1984/544	Cleveland and Yorkshire North	1983:eng-richmond-yorks
+1984/544	Cleveland and Yorkshire North	1983:eng-skipton-and-ripon
+1984/544	Cleveland and Yorkshire North	1983:eng-stockton-north
+1984/544	Cleveland and Yorkshire North	1983:eng-stockton-south
+1984/544	York	1983:eng-boothferry
+1984/544	York	1983:eng-glanford-and-scunthorpe
+1984/544	York	1983:eng-harrogate
+1984/544	York	1983:eng-ryedale
+1984/544	York	1983:eng-scarborough
+1984/544	York	1983:eng-selby
+1984/544	York	1983:eng-york
+1984/544	Humberside	1983:eng-beverley
+1984/544	Humberside	1983:eng-bridlington
+1984/544	Humberside	1983:eng-brigg-and-cleethorpes
+1984/544	Humberside	1983:eng-great-grimsby
+1984/544	Humberside	1983:eng-east-kingston-upon-hull
+1984/544	Humberside	1983:eng-north-kingston-upon-hull
+1984/544	Humberside	1983:eng-west-kingston-upon-hull
+1984/544	Lancashire Central	1983:eng-blackpool-north
+1984/544	Lancashire Central	1983:eng-blackpool-south
+1984/544	Lancashire Central	1983:eng-chorley
+1984/544	Lancashire Central	1983:eng-fylde
+1984/544	Lancashire Central	1983:eng-preston
+1984/544	Lancashire Central	1983:eng-ribble-valley
+1984/544	Lancashire Central	1983:eng-south-ribble
+1984/544	Lancashire Central	1983:eng-west-lancashire
+1984/544	Lancashire East	1983:eng-blackburn
+1984/544	Lancashire East	1983:eng-burnley
+1984/544	Lancashire East	1983:eng-heywood-and-middleton
+1984/544	Lancashire East	1983:eng-hyndburn
+1984/544	Lancashire East	1983:eng-littleborough-and-saddleworth
+1984/544	Lancashire East	1983:eng-pendle
+1984/544	Lancashire East	1983:eng-rochdale
+1984/544	Lancashire East	1983:eng-rossendale-and-darwen
+1984/544	Yorkshire West	1983:eng-batley-and-spen
+1984/544	Yorkshire West	1983:eng-bradford-north
+1984/544	Yorkshire West	1983:eng-bradford-south
+1984/544	Yorkshire West	1983:eng-bradford-west
+1984/544	Yorkshire West	1983:eng-calder-valley
+1984/544	Yorkshire West	1983:eng-halifax
+1984/544	Yorkshire West	1983:eng-keighley
+1984/544	Yorkshire West	1983:eng-shipley
+1984/544	Leeds	1983:eng-elmet
+1984/544	Leeds	1983:eng-leeds-central
+1984/544	Leeds	1983:eng-leeds-east
+1984/544	Leeds	1983:eng-leeds-north-east
+1984/544	Leeds	1983:eng-leeds-north-west
+1984/544	Leeds	1983:eng-leeds-west
+1984/544	Leeds	1983:eng-morley-and-leeds-south
+1984/544	Leeds	1983:eng-pudsey
+1984/544	Merseyside West	1983:eng-bootle
+1984/544	Merseyside West	1983:eng-crosby
+1984/544	Merseyside West	1983:eng-liverpool-broadgreen
+1984/544	Merseyside West	1983:eng-liverpool-mossley-hill
+1984/544	Merseyside West	1983:eng-liverpool-riverside
+1984/544	Merseyside West	1983:eng-liverpool-walton
+1984/544	Merseyside West	1983:eng-liverpool-west-derby
+1984/544	Merseyside West	1983:eng-southport
+1984/544	Merseyside East	1983:eng-knowsley-north
+1984/544	Merseyside East	1983:eng-knowsley-south
+1984/544	Merseyside East	1983:eng-leigh
+1984/544	Merseyside East	1983:eng-liverpool-garston
+1984/544	Merseyside East	1983:eng-makerfield
+1984/544	Merseyside East	1983:eng-st-helens-north
+1984/544	Merseyside East	1983:eng-st-helens-south
+1984/544	Merseyside East	1983:eng-wigan
+1984/544	Greater Manchester West	1983:eng-bolton-north-east
+1984/544	Greater Manchester West	1983:eng-bolton-south-east
+1984/544	Greater Manchester West	1983:eng-bolton-west
+1984/544	Greater Manchester West	1983:eng-bury-north
+1984/544	Greater Manchester West	1983:eng-bury-south
+1984/544	Greater Manchester West	1983:eng-eccles
+1984/544	Greater Manchester West	1983:eng-salford-east
+1984/544	Greater Manchester West	1983:eng-worsley
+1984/544	Greater Manchester Central	1983:eng-altrincham-and-sale
+1984/544	Greater Manchester Central	1983:eng-davyhulme
+1984/544	Greater Manchester Central	1983:eng-manchester-blackley
+1984/544	Greater Manchester Central	1983:eng-manchester-central
+1984/544	Greater Manchester Central	1983:eng-manchester-gorton
+1984/544	Greater Manchester Central	1983:eng-manchester-withington
+1984/544	Greater Manchester Central	1983:eng-manchester-wythenshawe
+1984/544	Greater Manchester Central	1983:eng-stretford
+1984/544	Greater Manchester East	1983:eng-ashton-under-lyne
+1984/544	Greater Manchester East	1983:eng-cheadle
+1984/544	Greater Manchester East	1983:eng-denton-and-reddish
+1984/544	Greater Manchester East	1983:eng-hazel-grove
+1984/544	Greater Manchester East	1983:eng-oldham-central-and-royton
+1984/544	Greater Manchester East	1983:eng-oldham-west
+1984/544	Greater Manchester East	1983:eng-stalybridge-and-hyde
+1984/544	Greater Manchester East	1983:eng-stockport
+1984/544	Yorkshire South West	1983:eng-barnsley-west-and-penistone
+1984/544	Yorkshire South West	1983:eng-colne-valley
+1984/544	Yorkshire South West	1983:eng-dewsbury
+1984/544	Yorkshire South West	1983:eng-hemsworth
+1984/544	Yorkshire South West	1983:eng-huddersfield
+1984/544	Yorkshire South West	1983:eng-normanton
+1984/544	Yorkshire South West	1983:eng-pontefract-and-castleford
+1984/544	Yorkshire South West	1983:eng-wakefield
+1984/544	Yorkshire South	1983:eng-barnsley-central
+1984/544	Yorkshire South	1983:eng-barnsley-east
+1984/544	Yorkshire South	1983:eng-doncaster-central
+1984/544	Yorkshire South	1983:eng-doncaster-north
+1984/544	Yorkshire South	1983:eng-don-valley
+1984/544	Yorkshire South	1983:eng-rotherham
+1984/544	Yorkshire South	1983:eng-rother-valley
+1984/544	Yorkshire South	1983:eng-wentworth
+1984/544	Cheshire West	1983:eng-birkenhead
+1984/544	Cheshire West	1983:eng-city-of-chester
+1984/544	Cheshire West	1983:eng-eddisbury
+1984/544	Cheshire West	1983:eng-ellesmere-port-and-neston
+1984/544	Cheshire West	1983:eng-halton
+1984/544	Cheshire West	1983:eng-wallasey
+1984/544	Cheshire West	1983:eng-wirral-south
+1984/544	Cheshire West	1983:eng-wirral-west
+1984/544	Cheshire East	1983:eng-congleton
+1984/544	Cheshire East	1983:eng-crewe-and-nantwich
+1984/544	Cheshire East	1983:eng-macclesfield
+1984/544	Cheshire East	1983:eng-staffordshire-moorlands
+1984/544	Cheshire East	1983:eng-tatton
+1984/544	Cheshire East	1983:eng-warrington-north
+1984/544	Cheshire East	1983:eng-warrington-south
+1984/544	Derbyshire	1983:eng-amber-valley
+1984/544	Derbyshire	1983:eng-ashfield
+1984/544	Derbyshire	1983:eng-bolsover
+1984/544	Derbyshire	1983:eng-derby-north
+1984/544	Derbyshire	1983:eng-derby-south
+1984/544	Derbyshire	1983:eng-erewash
+1984/544	Derbyshire	1983:eng-high-peak
+1984/544	Derbyshire	1983:eng-west-derbyshire
+1984/544	Sheffield	1983:eng-chesterfield
+1984/544	Sheffield	1983:eng-north-east-derbyshire
+1984/544	Sheffield	1983:eng-sheffield-attercliffe
+1984/544	Sheffield	1983:eng-sheffield-brightside
+1984/544	Sheffield	1983:eng-sheffield-central
+1984/544	Sheffield	1983:eng-sheffield-hallam
+1984/544	Sheffield	1983:eng-sheffield-heeley
+1984/544	Sheffield	1983:eng-sheffield-hillsborough
+1984/544	Nottingham	1983:eng-broxtowe
+1984/544	Nottingham	1983:eng-gedling
+1984/544	Nottingham	1983:eng-mansfield
+1984/544	Nottingham	1983:eng-nottingham-east
+1984/544	Nottingham	1983:eng-nottingham-north
+1984/544	Nottingham	1983:eng-nottingham-south
+1984/544	Nottingham	1983:eng-rushcliffe
+1984/544	Nottingham	1983:eng-sherwood
+1984/544	Lincolnshire	1983:eng-bassetlaw
+1984/544	Lincolnshire	1983:eng-east-lindsey
+1984/544	Lincolnshire	1983:eng-gainsborough-and-horncastle
+1984/544	Lincolnshire	1983:eng-grantham
+1984/544	Lincolnshire	1983:eng-holland-with-boston
+1984/544	Lincolnshire	1983:eng-lincoln
+1984/544	Lincolnshire	1983:eng-newark
+1984/544	Lincolnshire	1983:eng-stamford-and-spalding
+1984/544	Shropshire and Stafford	1983:eng-cannock-and-burntwood
+1984/544	Shropshire and Stafford	1983:eng-ludlow
+1984/544	Shropshire and Stafford	1983:eng-newcastle-under-lyme
+1984/544	Shropshire and Stafford	1983:eng-north-shropshire
+1984/544	Shropshire and Stafford	1983:eng-shrewsbury-and-atcham
+1984/544	Shropshire and Stafford	1983:eng-south-staffordshire
+1984/544	Shropshire and Stafford	1983:eng-stafford
+1984/544	Shropshire and Stafford	1983:eng-the-wrekin
+1984/544	Staffordshire East	1983:eng-burton
+1984/544	Staffordshire East	1983:eng-mid-staffordshire
+1984/544	Staffordshire East	1983:eng-north-west-leicestershire
+1984/544	Staffordshire East	1983:eng-south-derbyshire
+1984/544	Staffordshire East	1983:eng-south-east-staffordshire
+1984/544	Staffordshire East	1983:eng-central-stoke-on-trent
+1984/544	Staffordshire East	1983:eng-north-stoke-on-trent
+1984/544	Staffordshire East	1983:eng-south-stoke-on-trent
+1984/544	Midlands West	1983:eng-dudley-east
+1984/544	Midlands West	1983:eng-dudley-west
+1984/544	Midlands West	1983:eng-halesowen-and-stourbridge
+1984/544	Midlands West	1983:eng-warley-east
+1984/544	Midlands West	1983:eng-warley-west
+1984/544	Midlands West	1983:eng-north-east-wolverhampton
+1984/544	Midlands West	1983:eng-south-east-wolverhampton
+1984/544	Midlands West	1983:eng-south-west-wolverhampton
+1984/544	Birmingham West	1983:eng-aldridge-brownhills
+1984/544	Birmingham West	1983:eng-birmingham-ladywood
+1984/544	Birmingham West	1983:eng-birmingham-perry-barr
+1984/544	Birmingham West	1983:eng-sutton-coldfield
+1984/544	Birmingham West	1983:eng-walsall-north
+1984/544	Birmingham West	1983:eng-walsall-south
+1984/544	Birmingham West	1983:eng-west-bromwich-east
+1984/544	Birmingham West	1983:eng-west-bromwich-west
+1984/544	Birmingham East	1983:eng-birmingham-edgbaston
+1984/544	Birmingham East	1983:eng-birmingham-erdington
+1984/544	Birmingham East	1983:eng-birmingham-hall-green
+1984/544	Birmingham East	1983:eng-birmingham-hodge-hill
+1984/544	Birmingham East	1983:eng-birmingham-northfield
+1984/544	Birmingham East	1983:eng-birmingham-selly-oak
+1984/544	Birmingham East	1983:eng-birmingham-small-heath
+1984/544	Birmingham East	1983:eng-birmingham-sparkbrook
+1984/544	Birmingham East	1983:eng-birmingham-yardley
+1984/544	Midlands Central	1983:eng-coventry-north-east
+1984/544	Midlands Central	1983:eng-coventry-north-west
+1984/544	Midlands Central	1983:eng-coventry-south-east
+1984/544	Midlands Central	1983:eng-coventry-south-west
+1984/544	Midlands Central	1983:eng-meriden
+1984/544	Midlands Central	1983:eng-rugby-and-kenilworth
+1984/544	Midlands Central	1983:eng-solihull
+1984/544	Midlands Central	1983:eng-warwick-and-leamington
+1984/544	Leicester	1983:eng-bosworth
+1984/544	Leicester	1983:eng-leicester-east
+1984/544	Leicester	1983:eng-leicester-south
+1984/544	Leicester	1983:eng-leicester-west
+1984/544	Leicester	1983:eng-loughborough
+1984/544	Leicester	1983:eng-north-warwickshire
+1984/544	Leicester	1983:eng-nuneaton
+1984/544	Leicester	1983:eng-rutland-and-melton
+1984/544	Cambridge and Bedfordshire North	1983:eng-cambridge
+1984/544	Cambridge and Bedfordshire North	1983:eng-huntingdon
+1984/544	Cambridge and Bedfordshire North	1983:eng-mid-bedfordshire
+1984/544	Cambridge and Bedfordshire North	1983:eng-north-bedfordshire
+1984/544	Cambridge and Bedfordshire North	1983:eng-north-east-cambridgeshire
+1984/544	Cambridge and Bedfordshire North	1983:eng-peterborough
+1984/544	Cambridge and Bedfordshire North	1983:eng-south-west-cambridgeshire
+1984/544	Norfolk	1983:eng-great-yarmouth
+1984/544	Norfolk	1983:eng-mid-norfolk
+1984/544	Norfolk	1983:eng-north-norfolk
+1984/544	Norfolk	1983:eng-north-west-norfolk
+1984/544	Norfolk	1983:eng-norwich-north
+1984/544	Norfolk	1983:eng-norwich-south
+1984/544	Norfolk	1983:eng-south-norfolk
+1984/544	Norfolk	1983:eng-south-west-norfolk
+1984/544	Suffolk	1983:eng-bury-st-edmunds
+1984/544	Suffolk	1983:eng-central-suffolk
+1984/544	Suffolk	1983:eng-ipswich
+1984/544	Suffolk	1983:eng-south-east-cambridgeshire
+1984/544	Suffolk	1983:eng-south-suffolk
+1984/544	Suffolk	1983:eng-suffolk-coastal
+1984/544	Suffolk	1983:eng-waveney
+1984/544	Hereford and Worcester	1983:eng-bromsgrove
+1984/544	Hereford and Worcester	1983:eng-hereford
+1984/544	Hereford and Worcester	1983:eng-leominster
+1984/544	Hereford and Worcester	1983:eng-mid-worcestershire
+1984/544	Hereford and Worcester	1983:eng-south-worcestershire
+1984/544	Hereford and Worcester	1983:eng-west-gloucestershire
+1984/544	Hereford and Worcester	1983:eng-worcester
+1984/544	Hereford and Worcester	1983:eng-wyre-forest
+1984/544	The Cotswolds	1983:eng-banbury
+1984/544	The Cotswolds	1983:eng-cheltenham
+1984/544	The Cotswolds	1983:eng-cirencester-and-tewkesbury
+1984/544	The Cotswolds	1983:eng-gloucester
+1984/544	The Cotswolds	1983:eng-stratford-on-avon
+1984/544	The Cotswolds	1983:eng-stroud
+1984/544	The Cotswolds	1983:eng-witney
+1984/544	Northamptonshire	1983:eng-blaby
+1984/544	Northamptonshire	1983:eng-corby
+1984/544	Northamptonshire	1983:eng-daventry
+1984/544	Northamptonshire	1983:eng-harborough
+1984/544	Northamptonshire	1983:eng-kettering
+1984/544	Northamptonshire	1983:eng-northampton-north
+1984/544	Northamptonshire	1983:eng-northampton-south
+1984/544	Northamptonshire	1983:eng-wellingborough
+1984/544	Oxford and Buckinghamshire	1983:eng-aylesbury
+1984/544	Oxford and Buckinghamshire	1983:eng-beaconsfield
+1984/544	Oxford and Buckinghamshire	1983:eng-buckingham
+1984/544	Oxford and Buckinghamshire	1983:eng-chesham-and-amersham
+1984/544	Oxford and Buckinghamshire	1983:eng-henley
+1984/544	Oxford and Buckinghamshire	1983:eng-oxford-east
+1984/544	Oxford and Buckinghamshire	1983:eng-oxford-west-and-abingdon
+1984/544	Oxford and Buckinghamshire	1983:eng-wycombe
+1984/544	Bedfordshire South	1983:eng-luton-south
+1984/544	Bedfordshire South	1983:eng-milton-keynes
+1984/544	Bedfordshire South	1983:eng-north-hertfordshire
+1984/544	Bedfordshire South	1983:eng-luton-north
+1984/544	Bedfordshire South	1983:eng-south-west-bedfordshire
+1984/544	Bedfordshire South	1983:eng-stevenage
+1984/544	Bedfordshire South	1983:eng-west-hertfordshire
+1984/544	Hertfordshire	1983:eng-broxbourne
+1984/544	Hertfordshire	1983:eng-hertford-and-stortford
+1984/544	Hertfordshire	1983:eng-hertsmere
+1984/544	Hertfordshire	1983:eng-st-albans
+1984/544	Hertfordshire	1983:eng-south-west-hertfordshire
+1984/544	Hertfordshire	1983:eng-watford
+1984/544	Hertfordshire	1983:eng-welwyn-hatfield
+1984/544	Essex South West	1983:eng-basildon
+1984/544	Essex South West	1983:eng-billericay
+1984/544	Essex South West	1983:eng-brentwood-and-ongar
+1984/544	Essex South West	1983:eng-castle-point
+1984/544	Essex South West	1983:eng-chelmsford
+1984/544	Essex South West	1983:eng-epping-forest
+1984/544	Essex South West	1983:eng-harlow
+1984/544	Essex South West	1983:eng-thurrock
+1984/544	Essex North East	1983:eng-braintree
+1984/544	Essex North East	1983:eng-harwich
+1984/544	Essex North East	1983:eng-colchester-north
+1984/544	Essex North East	1983:eng-rochford
+1984/544	Essex North East	1983:eng-saffron-walden
+1984/544	Essex North East	1983:eng-south-colchester-and-maldon
+1984/544	Essex North East	1983:eng-southend-east
+1984/544	Essex North East	1983:eng-southend-west
+1984/544	Bristol	1983:eng-bath
+1984/544	Bristol	1983:eng-bristol-east
+1984/544	Bristol	1983:eng-bristol-north-west
+1984/544	Bristol	1983:eng-bristol-south
+1984/544	Bristol	1983:eng-bristol-west
+1984/544	Bristol	1983:eng-kingswood
+1984/544	Bristol	1983:eng-northavon
+1984/544	Bristol	1983:eng-wansdyke
+1984/544	Wiltshire	1983:eng-devizes
+1984/544	Wiltshire	1983:eng-newbury
+1984/544	Wiltshire	1983:eng-north-wiltshire
+1984/544	Wiltshire	1983:eng-salisbury
+1984/544	Wiltshire	1983:eng-swindon
+1984/544	Wiltshire	1983:eng-wantage
+1984/544	Wiltshire	1983:eng-westbury
+1984/544	Thames Valley	1983:eng-east-berkshire
+1984/544	Thames Valley	1983:eng-reading-east
+1984/544	Thames Valley	1983:eng-reading-west
+1984/544	Thames Valley	1983:eng-slough
+1984/544	Thames Valley	1983:eng-spelthorne
+1984/544	Thames Valley	1983:eng-windsor-and-maidenhead
+1984/544	Thames Valley	1983:eng-wokingham
+1984/544	Cornwall and Plymouth	1983:eng-falmouth-and-camborne
+1984/544	Cornwall and Plymouth	1983:eng-north-cornwall
+1984/544	Cornwall and Plymouth	1983:eng-plymouth-devonport
+1984/544	Cornwall and Plymouth	1983:eng-plymouth-drake
+1984/544	Cornwall and Plymouth	1983:eng-plymouth-sutton
+1984/544	Cornwall and Plymouth	1983:eng-st-ives
+1984/544	Cornwall and Plymouth	1983:eng-south-east-cornwall
+1984/544	Cornwall and Plymouth	1983:eng-truro
+1984/544	Devon	1983:eng-exeter
+1984/544	Devon	1983:eng-honiton
+1984/544	Devon	1983:eng-north-devon
+1984/544	Devon	1983:eng-south-hams
+1984/544	Devon	1983:eng-teignbridge
+1984/544	Devon	1983:eng-tiverton
+1984/544	Devon	1983:eng-torbay
+1984/544	Devon	1983:eng-torridge-and-west-devon
+1984/544	Somerset and Dorset West	1983:eng-bridgwater
+1984/544	Somerset and Dorset West	1983:eng-somerton-and-frome
+1984/544	Somerset and Dorset West	1983:eng-taunton
+1984/544	Somerset and Dorset West	1983:eng-wells
+1984/544	Somerset and Dorset West	1983:eng-weston-super-mare
+1984/544	Somerset and Dorset West	1983:eng-west-dorset
+1984/544	Somerset and Dorset West	1983:eng-woodspring
+1984/544	Somerset and Dorset West	1983:eng-yeovil
+1984/544	Dorset East and Hampshire West	1983:eng-bournemouth-east
+1984/544	Dorset East and Hampshire West	1983:eng-bournemouth-west
+1984/544	Dorset East and Hampshire West	1983:eng-christchurch
+1984/544	Dorset East and Hampshire West	1983:eng-new-forest
+1984/544	Dorset East and Hampshire West	1983:eng-north-dorset
+1984/544	Dorset East and Hampshire West	1983:eng-poole
+1984/544	Dorset East and Hampshire West	1983:eng-romsey-and-waterside
+1984/544	Dorset East and Hampshire West	1983:eng-south-dorset
+1984/544	Hampshire Central	1983:eng-aldershot
+1984/544	Hampshire Central	1983:eng-basingstoke
+1984/544	Hampshire Central	1983:eng-eastleigh
+1984/544	Hampshire Central	1983:eng-north-west-hampshire
+1984/544	Hampshire Central	1983:eng-southampton-itchen
+1984/544	Hampshire Central	1983:eng-southampton-test
+1984/544	Hampshire Central	1983:eng-winchester
+1984/544	Wight and Hampshire East	1983:eng-east-hampshire
+1984/544	Wight and Hampshire East	1983:eng-fareham
+1984/544	Wight and Hampshire East	1983:eng-gosport
+1984/544	Wight and Hampshire East	1983:eng-havant
+1984/544	Wight and Hampshire East	1983:eng-isle-of-wight
+1984/544	Wight and Hampshire East	1983:eng-portsmouth-north
+1984/544	Wight and Hampshire East	1983:eng-portsmouth-south
+1984/544	Surrey West	1983:eng-chertsey-and-walton
+1984/544	Surrey West	1983:eng-esher
+1984/544	Surrey West	1983:eng-guildford
+1984/544	Surrey West	1983:eng-mole-valley
+1984/544	Surrey West	1983:eng-north-west-surrey
+1984/544	Surrey West	1983:eng-south-west-surrey
+1984/544	Surrey West	1983:eng-woking
+1984/544	West Sussex	1983:eng-arundel
+1984/544	West Sussex	1983:eng-chichester
+1984/544	West Sussex	1983:eng-crawley
+1984/544	West Sussex	1983:eng-horsham
+1984/544	West Sussex	1983:eng-mid-sussex
+1984/544	West Sussex	1983:eng-shoreham
+1984/544	West Sussex	1983:eng-worthing
+1984/544	East Sussex	1983:eng-bexhill-and-battle
+1984/544	East Sussex	1983:eng-brighton-kemptown
+1984/544	East Sussex	1983:eng-brighton-pavilion
+1984/544	East Sussex	1983:eng-eastbourne
+1984/544	East Sussex	1983:eng-hastings-and-rye
+1984/544	East Sussex	1983:eng-hove
+1984/544	East Sussex	1983:eng-lewes
+1984/544	East Sussex	1983:eng-wealden
+1984/544	Kent West	1983:eng-dartford
+1984/544	Kent West	1983:eng-gillingham
+1984/544	Kent West	1983:eng-gravesham
+1984/544	Kent West	1983:eng-medway
+1984/544	Kent West	1983:eng-mid-kent
+1984/544	Kent West	1983:eng-sevenoaks
+1984/544	Kent West	1983:eng-tonbridge-and-malling
+1984/544	Kent West	1983:eng-tunbridge-wells
+1984/544	Kent East	1983:eng-ashford
+1984/544	Kent East	1983:eng-canterbury
+1984/544	Kent East	1983:eng-dover
+1984/544	Kent East	1983:eng-faversham
+1984/544	Kent East	1983:eng-folkestone-and-hythe
+1984/544	Kent East	1983:eng-maidstone
+1984/544	Kent East	1983:eng-north-thanet
+1984/544	Kent East	1983:eng-south-thanet
+1984/544	London West	1983:eng-brentford-and-isleworth
+1984/544	London West	1983:eng-ealing-acton
+1984/544	London West	1983:eng-ealing-north
+1984/544	London West	1983:eng-ealing-southall
+1984/544	London West	1983:eng-feltham-and-heston
+1984/544	London West	1983:eng-hammersmith
+1984/544	London West	1983:eng-richmond-and-barnes
+1984/544	London West	1983:eng-twickenham
+1984/544	London North West	1983:eng-brent-east
+1984/544	London North West	1983:eng-brent-north
+1984/544	London North West	1983:eng-brent-south
+1984/544	London North West	1983:eng-harrow-east
+1984/544	London North West	1983:eng-harrow-west
+1984/544	London North West	1983:eng-hayes-and-harlington
+1984/544	London North West	1983:eng-ruislip-northwood
+1984/544	London North West	1983:eng-uxbridge
+1984/544	London Central	1983:eng-chelsea
+1984/544	London Central	1983:eng-fulham
+1984/544	London Central	1983:eng-hampstead-and-highgate
+1984/544	London Central	1983:eng-holborn-and-st-pancras
+1984/544	London Central	1983:eng-islington-north
+1984/544	London Central	1983:eng-islington-south-and-finsbury
+1984/544	London Central	1983:eng-kensington
+1984/544	London Central	1983:eng-city-of-london-and-westminster-south
+1984/544	London Central	1983:eng-westminster-north
+1984/544	London North	1983:eng-chipping-barnet
+1984/544	London North	1983:eng-edmonton
+1984/544	London North	1983:eng-enfield-north
+1984/544	London North	1983:eng-enfield-southgate
+1984/544	London North	1983:eng-finchley
+1984/544	London North	1983:eng-hendon-north
+1984/544	London North	1983:eng-hendon-south
+1984/544	London North	1983:eng-hornsey-and-wood-green
+1984/544	London North	1983:eng-tottenham
+1984/544	London North East	1983:eng-bethnal-green-and-stepney
+1984/544	London North East	1983:eng-bow-and-poplar
+1984/544	London North East	1983:eng-chingford
+1984/544	London North East	1983:eng-hackney-north-and-stoke-newington
+1984/544	London North East	1983:eng-hackney-south-and-shoreditch
+1984/544	London North East	1983:eng-leyton
+1984/544	London North East	1983:eng-newham-north-west
+1984/544	London North East	1983:eng-newham-south
+1984/544	London North East	1983:eng-walthamstow
+1984/544	London East	1983:eng-barking
+1984/544	London East	1983:eng-dagenham
+1984/544	London East	1983:eng-hornchurch
+1984/544	London East	1983:eng-ilford-north
+1984/544	London East	1983:eng-ilford-south
+1984/544	London East	1983:eng-newham-north-east
+1984/544	London East	1983:eng-romford
+1984/544	London East	1983:eng-upminster
+1984/544	London East	1983:eng-wanstead-and-woodford
+1984/544	London South and Surrey East	1983:eng-carshalton-and-wallington
+1984/544	London South and Surrey East	1983:eng-croydon-central
+1984/544	London South and Surrey East	1983:eng-croydon-north-east
+1984/544	London South and Surrey East	1983:eng-croydon-north-west
+1984/544	London South and Surrey East	1983:eng-croydon-south
+1984/544	London South and Surrey East	1983:eng-east-surrey
+1984/544	London South and Surrey East	1983:eng-reigate
+1984/544	London South and Surrey East	1983:eng-sutton-and-cheam
+1984/544	London South West	1983:eng-battersea
+1984/544	London South West	1983:eng-epsom-and-ewell
+1984/544	London South West	1983:eng-kingston-upon-thames
+1984/544	London South West	1983:eng-mitcham-and-morden
+1984/544	London South West	1983:eng-putney
+1984/544	London South West	1983:eng-surbiton
+1984/544	London South West	1983:eng-tooting
+1984/544	London South West	1983:eng-wimbledon
+1984/544	London South Inner	1983:eng-dulwich
+1984/544	London South Inner	1983:eng-lewisham-deptford
+1984/544	London South Inner	1983:eng-lewisham-east
+1984/544	London South Inner	1983:eng-lewisham-west
+1984/544	London South Inner	1983:eng-norwood
+1984/544	London South Inner	1983:eng-peckham
+1984/544	London South Inner	1983:eng-southwark-and-bermondsey
+1984/544	London South Inner	1983:eng-streatham
+1984/544	London South Inner	1983:eng-vauxhall
+1984/544	London South East	1983:eng-beckenham
+1984/544	London South East	1983:eng-bexleyheath
+1984/544	London South East	1983:eng-chislehurst
+1984/544	London South East	1983:eng-eltham
+1984/544	London South East	1983:eng-erith-and-crayford
+1984/544	London South East	1983:eng-greenwich
+1984/544	London South East	1983:eng-old-bexley-and-sidcup
+1984/544	London South East	1983:eng-orpington
+1984/544	London South East	1983:eng-ravensbourne
+1984/544	London South East	1983:eng-woolwich
+1984/545	North Wales	1983:wls-alyn-and-deeside
+1984/545	North Wales	1983:wls-caernarfon
+1984/545	North Wales	1983:wls-clwyd-north-west
+1984/545	North Wales	1983:wls-clwyd-south-west
+1984/545	North Wales	1983:wls-conwy
+1984/545	North Wales	1983:wls-delyn
+1984/545	North Wales	1983:wls-meirionnydd-nant-conwy
+1984/545	North Wales	1983:wls-montgomery
+1984/545	North Wales	1983:wls-wrexham
+1984/545	North Wales	1983:wls-ynys-mon
+1984/545	Mid and West Wales	1983:wls-brecon-and-radnor
+1984/545	Mid and West Wales	1983:wls-carmarthen
+1984/545	Mid and West Wales	1983:wls-ceredigion-and-pembroke-north
+1984/545	Mid and West Wales	1983:wls-gower
+1984/545	Mid and West Wales	1983:wls-llanelli
+1984/545	Mid and West Wales	1983:wls-neath
+1984/545	Mid and West Wales	1983:wls-pembrokeshire
+1984/545	Mid and West Wales	1983:wls-swansea-east
+1984/545	Mid and West Wales	1983:wls-swansea-west
+1984/545	South East Wales	1983:wls-blaenau-gwent
+1984/545	South East Wales	1983:wls-caerphilly
+1984/545	South East Wales	1983:wls-cynon-valley
+1984/545	South East Wales	1983:wls-islwyn
+1984/545	South East Wales	1983:wls-merthyr-tydfil-and-rhymney
+1984/545	South East Wales	1983:wls-monmouth
+1984/545	South East Wales	1983:wls-newport-east
+1984/545	South East Wales	1983:wls-newport-west
+1984/545	South East Wales	1983:wls-rhondda
+1984/545	South East Wales	1983:wls-torfaen
+1984/545	South Wales	1983:wls-aberavon
+1984/545	South Wales	1983:wls-bridgend
+1984/545	South Wales	1983:wls-cardiff-central
+1984/545	South Wales	1983:wls-cardiff-north
+1984/545	South Wales	1983:wls-cardiff-south-and-penarth
+1984/545	South Wales	1983:wls-cardiff-west
+1984/545	South Wales	1983:wls-ogmore
+1984/545	South Wales	1983:wls-pontypridd
+1984/545	South Wales	1983:wls-vale-of-glamorgan
+1984/548	Highlands and Islands	1983:sct-argyll-and-bute
+1984/548	Highlands and Islands	1983:sct-caithness-and-sutherland
+1984/548	Highlands and Islands	1983:sct-inverness-nairn-and-lochaber
+1984/548	Highlands and Islands	1983:sct-moray
+1984/548	Highlands and Islands	1983:sct-ross-cromarty-and-skye
+1984/548	Highlands and Islands	1983:sct-orkney-and-shetland
+1984/548	Highlands and Islands	1983:sct-western-isles
+1984/548	North East Scotland	1983:sct-aberdeen-north
+1984/548	North East Scotland	1983:sct-aberdeen-south
+1984/548	North East Scotland	1983:sct-banff-and-buchan
+1984/548	North East Scotland	1983:sct-gordon
+1984/548	North East Scotland	1983:sct-kincardine-and-deeside
+1984/548	North East Scotland	1983:sct-east-angus
+1984/548	North East Scotland	1983:sct-dundee-east
+1984/548	North East Scotland	1983:sct-dundee-west
+1984/548	North East Scotland	1983:sct-north-tayside
+1984/548	Mid Scotland and Fife	1983:sct-clackmannan
+1984/548	Mid Scotland and Fife	1983:sct-falkirk-east
+1984/548	Mid Scotland and Fife	1983:sct-falkirk-west
+1984/548	Mid Scotland and Fife	1983:sct-stirling
+1984/548	Mid Scotland and Fife	1983:sct-central-fife
+1984/548	Mid Scotland and Fife	1983:sct-dunfermline-east
+1984/548	Mid Scotland and Fife	1983:sct-dunfermline-west
+1984/548	Mid Scotland and Fife	1983:sct-kirkcaldy
+1984/548	Mid Scotland and Fife	1983:sct-north-east-fife
+1984/548	Mid Scotland and Fife	1983:sct-perth-and-kinross
+1984/548	Lothians	1983:sct-edinburgh-central
+1984/548	Lothians	1983:sct-edinburgh-east
+1984/548	Lothians	1983:sct-edinburgh-leith
+1984/548	Lothians	1983:sct-edinburgh-pentlands
+1984/548	Lothians	1983:sct-edinburgh-south
+1984/548	Lothians	1983:sct-edinburgh-west
+1984/548	Lothians	1983:sct-linlithgow
+1984/548	Lothians	1983:sct-livingston
+1984/548	Lothians	1983:sct-midlothian
+1984/548	South of Scotland	1983:sct-ayr
+1984/548	South of Scotland	1983:sct-carrick-cumnock-and-doon-valley
+1984/548	South of Scotland	1983:sct-clydesdale
+1984/548	South of Scotland	1983:sct-cunninghame-south
+1984/548	South of Scotland	1983:sct-dumfries
+1984/548	South of Scotland	1983:sct-galloway-and-upper-nithsdale
+1984/548	South of Scotland	1983:sct-east-lothian
+1984/548	South of Scotland	1983:sct-roxburgh-and-berwickshire
+1984/548	South of Scotland	1983:sct-tweeddale-ettrick-and-lauderdale
+1984/548	Strathclyde East	1983:sct-cumbernauld-and-kilsyth
+1984/548	Strathclyde East	1983:sct-east-kilbride
+1984/548	Strathclyde East	1983:sct-glasgow-rutherglen
+1984/548	Strathclyde East	1983:sct-hamilton
+1984/548	Strathclyde East	1983:sct-kilmarnock-and-loudoun
+1984/548	Strathclyde East	1983:sct-monklands-east
+1984/548	Strathclyde East	1983:sct-monklands-west
+1984/548	Strathclyde East	1983:sct-motherwell-north
+1984/548	Strathclyde East	1983:sct-motherwell-south
+1984/548	Strathclyde West	1983:sct-clydebank-and-milngavie
+1984/548	Strathclyde West	1983:sct-cunninghame-north
+1984/548	Strathclyde West	1983:sct-dumbarton
+1984/548	Strathclyde West	1983:sct-eastwood
+1984/548	Strathclyde West	1983:sct-greenock-and-port-glasgow
+1984/548	Strathclyde West	1983:sct-paisley-north
+1984/548	Strathclyde West	1983:sct-paisley-south
+1984/548	Strathclyde West	1983:sct-renfrew-west-and-inverclyde
+1984/548	Strathclyde West	1983:sct-strathkelvin-and-bearsden
+1984/548	Glasgow	1983:sct-glasgow-cathcart
+1984/548	Glasgow	1983:sct-glasgow-central
+1984/548	Glasgow	1983:sct-glasgow-garscadden
+1984/548	Glasgow	1983:sct-glasgow-govan
+1984/548	Glasgow	1983:sct-glasgow-hillhead
+1984/548	Glasgow	1983:sct-glasgow-maryhill
+1984/548	Glasgow	1983:sct-glasgow-pollok
+1984/548	Glasgow	1983:sct-glasgow-provan
+1984/548	Glasgow	1983:sct-glasgow-shettleston
+1984/548	Glasgow	1983:sct-glasgow-springburn
+1989/486	Durham	1983:eng-bishop-auckland
+1989/486	Durham	1983:eng-blaydon
+1989/486	Durham	1983:eng-city-of-durham
+1989/486	Durham	1983:eng-darlington
+1989/486	Durham	1983:eng-easington
+1989/486	Durham	1983:eng-north-durham
+1989/486	Durham	1983:eng-north-west-durham
+1989/486	Durham	1983:eng-sedgefield
+1989/486	Cleveland and Yorkshire North	1983:eng-hartlepool
+1989/486	Cleveland and Yorkshire North	1983:eng-langbaurgh
+1989/486	Cleveland and Yorkshire North	1983:eng-middlesbrough
+1989/486	Cleveland and Yorkshire North	1983:eng-redcar
+1989/486	Cleveland and Yorkshire North	1983:eng-richmond-yorks
+1989/486	Cleveland and Yorkshire North	1983:eng-skipton-and-ripon
+1989/486	Cleveland and Yorkshire North	1983:eng-stockton-north
+1989/486	Cleveland and Yorkshire North	1983:eng-stockton-south
+1989/486	York	1983:eng-boothferry
+1989/486	York	1983:eng-glanford-and-scunthorpe
+1989/486	York	1983:eng-harrogate
+1989/486	York	1983:eng-ryedale
+1989/486	York	1983:eng-scarborough
+1989/486	York	1983:eng-selby
+1989/486	York	1983:eng-york
+1989/486	Humberside	1983:eng-beverley
+1989/486	Humberside	1983:eng-bridlington
+1989/486	Humberside	1983:eng-brigg-and-cleethorpes
+1989/486	Humberside	1983:eng-great-grimsby
+1989/486	Humberside	1983:eng-east-kingston-upon-hull
+1989/486	Humberside	1983:eng-north-kingston-upon-hull
+1989/486	Humberside	1983:eng-west-kingston-upon-hull
+1989/486	Lancashire Central	1983:eng-blackpool-north
+1989/486	Lancashire Central	1983:eng-blackpool-south
+1989/486	Lancashire Central	1983:eng-chorley
+1989/486	Lancashire Central	1983:eng-fylde
+1989/486	Lancashire Central	1983:eng-preston
+1989/486	Lancashire Central	1983:eng-ribble-valley
+1989/486	Lancashire Central	1983:eng-south-ribble
+1989/486	Lancashire Central	1983:eng-west-lancashire
+1989/486	Lancashire East	1983:eng-blackburn
+1989/486	Lancashire East	1983:eng-burnley
+1989/486	Lancashire East	1983:eng-heywood-and-middleton
+1989/486	Lancashire East	1983:eng-hyndburn
+1989/486	Lancashire East	1983:eng-littleborough-and-saddleworth
+1989/486	Lancashire East	1983:eng-pendle
+1989/486	Lancashire East	1983:eng-rochdale
+1989/486	Lancashire East	1983:eng-rossendale-and-darwen
+1989/486	Yorkshire West	1983:eng-batley-and-spen
+1989/486	Yorkshire West	1983:eng-bradford-north
+1989/486	Yorkshire West	1983:eng-bradford-south
+1989/486	Yorkshire West	1983:eng-bradford-west
+1989/486	Yorkshire West	1983:eng-calder-valley
+1989/486	Yorkshire West	1983:eng-halifax
+1989/486	Yorkshire West	1983:eng-keighley
+1989/486	Yorkshire West	1983:eng-shipley
+1989/486	Cheshire West	1983:eng-birkenhead
+1989/486	Cheshire West	1983:eng-city-of-chester
+1989/486	Cheshire West	1983:eng-eddisbury
+1989/486	Cheshire West	1983:eng-ellesmere-port-and-neston
+1989/486	Cheshire West	1983:eng-halton
+1989/486	Cheshire West	1983:eng-wallasey
+1989/486	Cheshire West	1983:eng-wirral-south
+1989/486	Cheshire West	1983:eng-wirral-west
+1989/486	Cheshire East	1983:eng-congleton
+1989/486	Cheshire East	1983:eng-crewe-and-nantwich
+1989/486	Cheshire East	1983:eng-macclesfield
+1989/486	Cheshire East	1983:eng-staffordshire-moorlands
+1989/486	Cheshire East	1983:eng-tatton
+1989/486	Cheshire East	1983:eng-warrington-north
+1989/486	Cheshire East	1983:eng-warrington-south
+1989/486	Derbyshire	1983:eng-amber-valley
+1989/486	Derbyshire	1983:eng-ashfield
+1989/486	Derbyshire	1983:eng-bolsover
+1989/486	Derbyshire	1983:eng-derby-north
+1989/486	Derbyshire	1983:eng-derby-south
+1989/486	Derbyshire	1983:eng-erewash
+1989/486	Derbyshire	1983:eng-high-peak
+1989/486	Derbyshire	1983:eng-west-derbyshire
+1989/486	Sheffield	1983:eng-chesterfield
+1989/486	Sheffield	1983:eng-north-east-derbyshire
+1989/486	Sheffield	1983:eng-sheffield-attercliffe
+1989/486	Sheffield	1983:eng-sheffield-brightside
+1989/486	Sheffield	1983:eng-sheffield-central
+1989/486	Sheffield	1983:eng-sheffield-hallam
+1989/486	Sheffield	1983:eng-sheffield-heeley
+1989/486	Sheffield	1983:eng-sheffield-hillsborough
+1989/486	Nottingham	1983:eng-broxtowe
+1989/486	Nottingham	1983:eng-gedling
+1989/486	Nottingham	1983:eng-mansfield
+1989/486	Nottingham	1983:eng-nottingham-east
+1989/486	Nottingham	1983:eng-nottingham-north
+1989/486	Nottingham	1983:eng-nottingham-south
+1989/486	Nottingham	1983:eng-rushcliffe
+1989/486	Nottingham	1983:eng-sherwood
+1989/486	Lincolnshire	1983:eng-bassetlaw
+1989/486	Lincolnshire	1983:eng-east-lindsey
+1989/486	Lincolnshire	1983:eng-gainsborough-and-horncastle
+1989/486	Lincolnshire	1983:eng-grantham
+1989/486	Lincolnshire	1983:eng-holland-with-boston
+1989/486	Lincolnshire	1983:eng-lincoln
+1989/486	Lincolnshire	1983:eng-newark
+1989/486	Lincolnshire	1983:eng-stamford-and-spalding
+1989/486	Shropshire and Stafford	1983:eng-cannock-and-burntwood
+1989/486	Shropshire and Stafford	1983:eng-ludlow
+1989/486	Shropshire and Stafford	1983:eng-newcastle-under-lyme
+1989/486	Shropshire and Stafford	1983:eng-north-shropshire
+1989/486	Shropshire and Stafford	1983:eng-shrewsbury-and-atcham
+1989/486	Shropshire and Stafford	1983:eng-south-staffordshire
+1989/486	Shropshire and Stafford	1983:eng-stafford
+1989/486	Shropshire and Stafford	1983:eng-the-wrekin
+1989/486	Staffordshire East	1983:eng-burton
+1989/486	Staffordshire East	1983:eng-mid-staffordshire
+1989/486	Staffordshire East	1983:eng-north-west-leicestershire
+1989/486	Staffordshire East	1983:eng-south-derbyshire
+1989/486	Staffordshire East	1983:eng-south-east-staffordshire
+1989/486	Staffordshire East	1983:eng-central-stoke-on-trent
+1989/486	Staffordshire East	1983:eng-north-stoke-on-trent
+1989/486	Staffordshire East	1983:eng-south-stoke-on-trent
+1989/486	Midlands Central	1983:eng-coventry-north-east
+1989/486	Midlands Central	1983:eng-coventry-north-west
+1989/486	Midlands Central	1983:eng-coventry-south-east
+1989/486	Midlands Central	1983:eng-coventry-south-west
+1989/486	Midlands Central	1983:eng-meriden
+1989/486	Midlands Central	1983:eng-rugby-and-kenilworth
+1989/486	Midlands Central	1983:eng-solihull
+1989/486	Midlands Central	1983:eng-warwick-and-leamington
+1989/486	Leicester	1983:eng-bosworth
+1989/486	Leicester	1983:eng-leicester-east
+1989/486	Leicester	1983:eng-leicester-south
+1989/486	Leicester	1983:eng-leicester-west
+1989/486	Leicester	1983:eng-loughborough
+1989/486	Leicester	1983:eng-north-warwickshire
+1989/486	Leicester	1983:eng-nuneaton
+1989/486	Leicester	1983:eng-rutland-and-melton
+1989/486	Cambridge and Bedfordshire North	1983:eng-cambridge
+1989/486	Cambridge and Bedfordshire North	1983:eng-huntingdon
+1989/486	Cambridge and Bedfordshire North	1983:eng-mid-bedfordshire
+1989/486	Cambridge and Bedfordshire North	1983:eng-north-bedfordshire
+1989/486	Cambridge and Bedfordshire North	1983:eng-north-east-cambridgeshire
+1989/486	Cambridge and Bedfordshire North	1983:eng-peterborough
+1989/486	Cambridge and Bedfordshire North	1983:eng-south-west-cambridgeshire
+1989/486	Suffolk	1983:eng-bury-st-edmunds
+1989/486	Suffolk	1983:eng-central-suffolk
+1989/486	Suffolk	1983:eng-ipswich
+1989/486	Suffolk	1983:eng-south-east-cambridgeshire
+1989/486	Suffolk	1983:eng-south-suffolk
+1989/486	Suffolk	1983:eng-suffolk-coastal
+1989/486	Suffolk	1983:eng-waveney
+1989/486	Oxford and Buckinghamshire	1983:eng-aylesbury
+1989/486	Oxford and Buckinghamshire	1983:eng-beaconsfield
+1989/486	Oxford and Buckinghamshire	1983:eng-buckingham
+1989/486	Oxford and Buckinghamshire	1983:eng-chesham-and-amersham
+1989/486	Oxford and Buckinghamshire	1983:eng-henley
+1989/486	Oxford and Buckinghamshire	1983:eng-oxford-east
+1989/486	Oxford and Buckinghamshire	1983:eng-oxford-west-and-abingdon
+1989/486	Oxford and Buckinghamshire	1983:eng-wycombe
+1989/486	Bedfordshire South	1983:eng-luton-south
+1989/486	Bedfordshire South	1983:eng-milton-keynes
+1989/486	Bedfordshire South	1983:eng-north-hertfordshire
+1989/486	Bedfordshire South	1983:eng-luton-north
+1989/486	Bedfordshire South	1983:eng-south-west-bedfordshire
+1989/486	Bedfordshire South	1983:eng-stevenage
+1989/486	Bedfordshire South	1983:eng-west-hertfordshire
+1989/486	Hertfordshire	1983:eng-broxbourne
+1989/486	Hertfordshire	1983:eng-hertford-and-stortford
+1989/486	Hertfordshire	1983:eng-hertsmere
+1989/486	Hertfordshire	1983:eng-st-albans
+1989/486	Hertfordshire	1983:eng-south-west-hertfordshire
+1989/486	Hertfordshire	1983:eng-watford
+1989/486	Hertfordshire	1983:eng-welwyn-hatfield
+1989/486	Essex South West	1983:eng-basildon
+1989/486	Essex South West	1983:eng-billericay
+1989/486	Essex South West	1983:eng-brentwood-and-ongar
+1989/486	Essex South West	1983:eng-castle-point
+1989/486	Essex South West	1983:eng-chelmsford
+1989/486	Essex South West	1983:eng-epping-forest
+1989/486	Essex South West	1983:eng-harlow
+1989/486	Essex South West	1983:eng-thurrock
+1989/486	Essex North East	1983:eng-braintree
+1989/486	Essex North East	1983:eng-harwich
+1989/486	Essex North East	1983:eng-colchester-north
+1989/486	Essex North East	1983:eng-rochford
+1989/486	Essex North East	1983:eng-saffron-walden
+1989/486	Essex North East	1983:eng-south-colchester-and-maldon
+1989/486	Essex North East	1983:eng-southend-east
+1989/486	Essex North East	1983:eng-southend-west
+1989/486	Bristol	1983:eng-bath
+1989/486	Bristol	1983:eng-bristol-east
+1989/486	Bristol	1983:eng-bristol-north-west
+1989/486	Bristol	1983:eng-bristol-south
+1989/486	Bristol	1983:eng-bristol-west
+1989/486	Bristol	1983:eng-kingswood
+1989/486	Bristol	1983:eng-northavon
+1989/486	Bristol	1983:eng-wansdyke
+1989/486	Wiltshire	1983:eng-devizes
+1989/486	Wiltshire	1983:eng-newbury
+1989/486	Wiltshire	1983:eng-north-wiltshire
+1989/486	Wiltshire	1983:eng-salisbury
+1989/486	Wiltshire	1983:eng-swindon
+1989/486	Wiltshire	1983:eng-wantage
+1989/486	Wiltshire	1983:eng-westbury
+1989/486	Cornwall and Plymouth	1983:eng-falmouth-and-camborne
+1989/486	Cornwall and Plymouth	1983:eng-north-cornwall
+1989/486	Cornwall and Plymouth	1983:eng-plymouth-devonport
+1989/486	Cornwall and Plymouth	1983:eng-plymouth-drake
+1989/486	Cornwall and Plymouth	1983:eng-plymouth-sutton
+1989/486	Cornwall and Plymouth	1983:eng-st-ives
+1989/486	Cornwall and Plymouth	1983:eng-south-east-cornwall
+1989/486	Cornwall and Plymouth	1983:eng-truro
+1989/486	Devon	1983:eng-exeter
+1989/486	Devon	1983:eng-honiton
+1989/486	Devon	1983:eng-north-devon
+1989/486	Devon	1983:eng-south-hams
+1989/486	Devon	1983:eng-teignbridge
+1989/486	Devon	1983:eng-tiverton
+1989/486	Devon	1983:eng-torbay
+1989/486	Devon	1983:eng-torridge-and-west-devon
+1989/486	Somerset and Dorset West	1983:eng-bridgwater
+1989/486	Somerset and Dorset West	1983:eng-somerton-and-frome
+1989/486	Somerset and Dorset West	1983:eng-taunton
+1989/486	Somerset and Dorset West	1983:eng-wells
+1989/486	Somerset and Dorset West	1983:eng-west-dorset
+1989/486	Somerset and Dorset West	1983:eng-weston-super-mare
+1989/486	Somerset and Dorset West	1983:eng-woodspring
+1989/486	Somerset and Dorset West	1983:eng-yeovil
+1989/486	Dorset East and Hampshire West	1983:eng-bournemouth-east
+1989/486	Dorset East and Hampshire West	1983:eng-bournemouth-west
+1989/486	Dorset East and Hampshire West	1983:eng-christchurch
+1989/486	Dorset East and Hampshire West	1983:eng-new-forest
+1989/486	Dorset East and Hampshire West	1983:eng-north-dorset
+1989/486	Dorset East and Hampshire West	1983:eng-poole
+1989/486	Dorset East and Hampshire West	1983:eng-romsey-and-waterside
+1989/486	Dorset East and Hampshire West	1983:eng-south-dorset
+1989/486	Hampshire Central	1983:eng-aldershot
+1989/486	Hampshire Central	1983:eng-basingstoke
+1989/486	Hampshire Central	1983:eng-eastleigh
+1989/486	Hampshire Central	1983:eng-north-west-hampshire
+1989/486	Hampshire Central	1983:eng-southampton-itchen
+1989/486	Hampshire Central	1983:eng-southampton-test
+1989/486	Hampshire Central	1983:eng-winchester
+1989/486	Wight and Hampshire East	1983:eng-east-hampshire
+1989/486	Wight and Hampshire East	1983:eng-fareham
+1989/486	Wight and Hampshire East	1983:eng-gosport
+1989/486	Wight and Hampshire East	1983:eng-havant
+1989/486	Wight and Hampshire East	1983:eng-isle-of-wight
+1989/486	Wight and Hampshire East	1983:eng-portsmouth-north
+1989/486	Wight and Hampshire East	1983:eng-portsmouth-south
+1989/486	Kent West	1983:eng-dartford
+1989/486	Kent West	1983:eng-gillingham
+1989/486	Kent West	1983:eng-gravesham
+1989/486	Kent West	1983:eng-medway
+1989/486	Kent West	1983:eng-mid-kent
+1989/486	Kent West	1983:eng-sevenoaks
+1989/486	Kent West	1983:eng-tonbridge-and-malling
+1989/486	Kent West	1983:eng-tunbridge-wells
+1989/486	Kent East	1983:eng-ashford
+1989/486	Kent East	1983:eng-canterbury
+1989/486	Kent East	1983:eng-dover
+1989/486	Kent East	1983:eng-faversham
+1989/486	Kent East	1983:eng-folkestone-and-hythe
+1989/486	Kent East	1983:eng-maidstone
+1989/486	Kent East	1983:eng-north-thanet
+1989/486	Kent East	1983:eng-south-thanet
+1989/487	Mid and West Wales	1983:wls-brecon-and-radnor
+1989/487	Mid and West Wales	1983:wls-carmarthen
+1989/487	Mid and West Wales	1983:wls-ceredigion-and-pembroke-north
+1989/487	Mid and West Wales	1983:wls-gower
+1989/487	Mid and West Wales	1983:wls-llanelli
+1989/487	Mid and West Wales	1983:wls-neath
+1989/487	Mid and West Wales	1983:wls-pembrokeshire
+1989/487	Mid and West Wales	1983:wls-swansea-east
+1989/487	Mid and West Wales	1983:wls-swansea-west
+1989/487	South East Wales	1983:wls-blaenau-gwent
+1989/487	South East Wales	1983:wls-caerphilly
+1989/487	South East Wales	1983:wls-cynon-valley
+1989/487	South East Wales	1983:wls-islwyn
+1989/487	South East Wales	1983:wls-merthyr-tydfil-and-rhymney
+1989/487	South East Wales	1983:wls-monmouth
+1989/487	South East Wales	1983:wls-newport-east
+1989/487	South East Wales	1983:wls-newport-west
+1989/487	South East Wales	1983:wls-rhondda
+1989/487	South East Wales	1983:wls-torfaen
+1989/487	South Wales	1983:wls-aberavon
+1989/487	South Wales	1983:wls-bridgend
+1989/487	South Wales	1983:wls-cardiff-central
+1989/487	South Wales	1983:wls-cardiff-north
+1989/487	South Wales	1983:wls-cardiff-south-and-penarth
+1989/487	South Wales	1983:wls-cardiff-west
+1989/487	South Wales	1983:wls-ogmore
+1989/487	South Wales	1983:wls-pontypridd
+1989/487	South Wales	1983:wls-vale-of-glamorgan
+1989/494	Mid Scotland and Fife	1983:sct-clackmannan
+1989/494	Mid Scotland and Fife	1983:sct-falkirk-east
+1989/494	Mid Scotland and Fife	1983:sct-falkirk-west
+1989/494	Mid Scotland and Fife	1983:sct-stirling
+1989/494	Mid Scotland and Fife	1983:sct-central-fife
+1989/494	Mid Scotland and Fife	1983:sct-dunfermline-east
+1989/494	Mid Scotland and Fife	1983:sct-dunfermline-west
+1989/494	Mid Scotland and Fife	1983:sct-kirkcaldy
+1989/494	Mid Scotland and Fife	1983:sct-north-east-fife
+1989/494	Mid Scotland and Fife	1983:sct-perth-and-kinross
+1989/494	Lothians	1983:sct-edinburgh-central
+1989/494	Lothians	1983:sct-edinburgh-east
+1989/494	Lothians	1983:sct-edinburgh-leith
+1989/494	Lothians	1983:sct-edinburgh-pentlands
+1989/494	Lothians	1983:sct-edinburgh-south
+1989/494	Lothians	1983:sct-edinburgh-west
+1989/494	Lothians	1983:sct-linlithgow
+1989/494	Lothians	1983:sct-livingston
+1989/494	Lothians	1983:sct-midlothian
+1989/494	South of Scotland	1983:sct-ayr
+1989/494	South of Scotland	1983:sct-carrick-cumnock-and-doon-valley
+1989/494	South of Scotland	1983:sct-clydesdale
+1989/494	South of Scotland	1983:sct-cunninghame-south
+1989/494	South of Scotland	1983:sct-dumfries
+1989/494	South of Scotland	1983:sct-galloway-and-upper-nithsdale
+1989/494	South of Scotland	1983:sct-east-lothian
+1989/494	South of Scotland	1983:sct-roxburgh-and-berwickshire
+1989/494	South of Scotland	1983:sct-tweeddale-ettrick-and-lauderdale
+1989/494	Strathclyde East	1983:sct-cumbernauld-and-kilsyth
+1989/494	Strathclyde East	1983:sct-east-kilbride
+1989/494	Strathclyde East	1983:sct-glasgow-rutherglen
+1989/494	Strathclyde East	1983:sct-hamilton
+1989/494	Strathclyde East	1983:sct-kilmarnock-and-loudoun
+1989/494	Strathclyde East	1983:sct-monklands-east
+1989/494	Strathclyde East	1983:sct-monklands-west
+1989/494	Strathclyde East	1983:sct-motherwell-north
+1989/494	Strathclyde East	1983:sct-motherwell-south
+1989/494	Strathclyde West	1983:sct-clydebank-and-milngavie
+1989/494	Strathclyde West	1983:sct-cunninghame-north
+1989/494	Strathclyde West	1983:sct-dumbarton
+1989/494	Strathclyde West	1983:sct-eastwood
+1989/494	Strathclyde West	1983:sct-greenock-and-port-glasgow
+1989/494	Strathclyde West	1983:sct-paisley-north
+1989/494	Strathclyde West	1983:sct-paisley-south
+1989/494	Strathclyde West	1983:sct-renfrew-west-and-inverclyde
+1989/494	Strathclyde West	1983:sct-strathkelvin-and-bearsden
+1989/494	Glasgow	1983:sct-glasgow-cathcart
+1989/494	Glasgow	1983:sct-glasgow-central
+1989/494	Glasgow	1983:sct-glasgow-garscadden
+1989/494	Glasgow	1983:sct-glasgow-govan
+1989/494	Glasgow	1983:sct-glasgow-hillhead
+1989/494	Glasgow	1983:sct-glasgow-maryhill
+1989/494	Glasgow	1983:sct-glasgow-pollok
+1989/494	Glasgow	1983:sct-glasgow-provan
+1989/494	Glasgow	1983:sct-glasgow-shettleston
+1989/494	Glasgow	1983:sct-glasgow-springburn
+1992/236	Strathclyde West	1983:sct-clydebank-and-milngavie
+1992/236	Strathclyde West	1983:sct-cunninghame-north
+1992/236	Strathclyde West	1983:sct-dumbarton
+1992/236	Strathclyde West	1983:sct-eastwood
+1992/236	Strathclyde West	1983:sct-greenock-and-port-glasgow
+1992/236	Strathclyde West	1983:sct-paisley-north
+1992/236	Strathclyde West	1983:sct-paisley-south
+1992/236	Strathclyde West	1983:sct-renfrew-west-and-inverclyde
+1992/236	Strathclyde West	1983:sct-strathkelvin-and-bearsden
+1992/236	Strathclyde East	1983:sct-cumbernauld-and-kilsyth
+1992/236	Strathclyde East	1983:sct-east-kilbride
+1992/236	Strathclyde East	1983:sct-glasgow-rutherglen
+1992/236	Strathclyde East	1983:sct-hamilton
+1992/236	Strathclyde East	1983:sct-kilmarnock-and-loudoun
+1992/236	Strathclyde East	1983:sct-monklands-east
+1992/236	Strathclyde East	1983:sct-monklands-west
+1992/236	Strathclyde East	1983:sct-motherwell-north
+1992/236	Strathclyde East	1983:sct-motherwell-south
+1992/236	Glasgow	1983:sct-glasgow-cathcart
+1992/236	Glasgow	1983:sct-glasgow-central
+1992/236	Glasgow	1983:sct-glasgow-garscadden
+1992/236	Glasgow	1983:sct-glasgow-govan
+1992/236	Glasgow	1983:sct-glasgow-hillhead
+1992/236	Glasgow	1983:sct-glasgow-maryhill
+1992/236	Glasgow	1983:sct-glasgow-pollok
+1992/236	Glasgow	1983:sct-glasgow-provan
+1992/236	Glasgow	1983:sct-glasgow-shettleston
+1992/236	Glasgow	1983:sct-glasgow-springburn
+1992/236	Lothians	1983:sct-edinburgh-central
+1992/236	Lothians	1983:sct-edinburgh-east
+1992/236	Lothians	1983:sct-edinburgh-leith
+1992/236	Lothians	1983:sct-edinburgh-pentlands
+1992/236	Lothians	1983:sct-edinburgh-south
+1992/236	Lothians	1983:sct-edinburgh-west
+1992/236	Lothians	1983:sct-linlithgow
+1992/236	Lothians	1983:sct-livingston
+1992/236	Lothians	1983:sct-midlothian
+1992/236	South of Scotland	1983:sct-ayr
+1992/236	South of Scotland	1983:sct-carrick-cumnock-and-doon-valley
+1992/236	South of Scotland	1983:sct-clydesdale
+1992/236	South of Scotland	1983:sct-cunninghame-south
+1992/236	South of Scotland	1983:sct-dumfries
+1992/236	South of Scotland	1983:sct-east-lothian
+1992/236	South of Scotland	1983:sct-galloway-and-upper-nithsdale
+1992/236	South of Scotland	1983:sct-roxburgh-and-berwickshire
+1992/236	South of Scotland	1983:sct-tweeddale-ettrick-and-lauderdale
+1992/236	Mid Scotland and Fife	1983:sct-central-fife
+1992/236	Mid Scotland and Fife	1983:sct-clackmannan
+1992/236	Mid Scotland and Fife	1983:sct-dunfermline-east
+1992/236	Mid Scotland and Fife	1983:sct-dunfermline-west
+1992/236	Mid Scotland and Fife	1983:sct-falkirk-east
+1992/236	Mid Scotland and Fife	1983:sct-falkirk-west
+1992/236	Mid Scotland and Fife	1983:sct-kirkcaldy
+1992/236	Mid Scotland and Fife	1983:sct-north-east-fife
+1992/236	Mid Scotland and Fife	1983:sct-perth-and-kinross
+1992/236	Mid Scotland and Fife	1983:sct-stirling
+1992/236	North East Scotland	1983:sct-aberdeen-north
+1992/236	North East Scotland	1983:sct-aberdeen-south
+1992/236	North East Scotland	1983:sct-east-angus
+1992/236	North East Scotland	1983:sct-banff-and-buchan
+1992/236	North East Scotland	1983:sct-dundee-east
+1992/236	North East Scotland	1983:sct-dundee-west
+1992/236	North East Scotland	1983:sct-gordon
+1992/236	North East Scotland	1983:sct-kincardine-and-deeside
+1992/236	North East Scotland	1983:sct-north-tayside
+1994/427	Northumbria	1983:eng-berwick-upon-tweed
+1994/427	Northumbria	1983:eng-blyth-valley
+1994/427	Northumbria	1983:eng-hexham
+1994/427	Northumbria	1983:eng-central-newcastle-upon-tyne
+1994/427	Northumbria	1983:eng-north-newcastle-upon-tyne
+1994/427	Northumbria	1983:eng-tynemouth
+1994/427	Northumbria	1983:eng-wallsend
+1994/427	Northumbria	1983:eng-wansbeck
+1994/427	Cumbria and Lancashire North	1983:eng-barrow-and-furness
+1994/427	Cumbria and Lancashire North	1983:eng-carlisle
+1994/427	Cumbria and Lancashire North	1983:eng-copeland
+1994/427	Cumbria and Lancashire North	1983:eng-lancaster
+1994/427	Cumbria and Lancashire North	1983:eng-morecambe-and-lunesdale
+1994/427	Cumbria and Lancashire North	1983:eng-penrith-and-the-border
+1994/427	Cumbria and Lancashire North	1983:eng-westmorland-and-lonsdale
+1994/427	Cumbria and Lancashire North	1983:eng-workington
+1994/427	Tyne and Wear	1983:eng-gateshead-east
+1994/427	Tyne and Wear	1983:eng-houghton-and-washington
+1994/427	Tyne and Wear	1983:eng-jarrow
+1994/427	Tyne and Wear	1983:eng-east-newcastle-upon-tyne
+1994/427	Tyne and Wear	1983:eng-south-shields
+1994/427	Tyne and Wear	1983:eng-sunderland-north
+1994/427	Tyne and Wear	1983:eng-sunderland-south
+1994/427	Tyne and Wear	1983:eng-tyne-bridge
+1994/427	Durham	1983:eng-bishop-auckland
+1994/427	Durham	1983:eng-blaydon
+1994/427	Durham	1983:eng-city-of-durham
+1994/427	Durham	1983:eng-darlington
+1994/427	Durham	1983:eng-easington
+1994/427	Durham	1983:eng-north-durham
+1994/427	Durham	1983:eng-north-west-durham
+1994/427	Durham	1983:eng-sedgefield
+1994/427	Cleveland and Richmond	1983:eng-hartlepool
+1994/427	Cleveland and Richmond	1983:eng-langbaurgh
+1994/427	Cleveland and Richmond	1983:eng-middlesbrough
+1994/427	Cleveland and Richmond	1983:eng-redcar
+1994/427	Cleveland and Richmond	1983:eng-richmond-yorks
+1994/427	Cleveland and Richmond	1983:eng-stockton-north
+1994/427	Cleveland and Richmond	1983:eng-stockton-south
+1994/427	North Yorkshire	1983:eng-harrogate
+1994/427	North Yorkshire	1983:eng-ryedale
+1994/427	North Yorkshire	1983:eng-selby
+1994/427	North Yorkshire	1983:eng-skipton-and-ripon
+1994/427	North Yorkshire	1983:eng-scarborough
+1994/427	North Yorkshire	1983:eng-york
+1994/427	Humberside	1983:eng-beverley
+1994/427	Humberside	1983:eng-boothferry
+1994/427	Humberside	1983:eng-bridlington
+1994/427	Humberside	1983:eng-glanford-and-scunthorpe
+1994/427	Humberside	1983:eng-east-kingston-upon-hull
+1994/427	Humberside	1983:eng-north-kingston-upon-hull
+1994/427	Humberside	1983:eng-west-kingston-upon-hull
+1994/427	Lancashire Central	1983:eng-burnley
+1994/427	Lancashire Central	1983:eng-blackpool-north
+1994/427	Lancashire Central	1983:eng-blackpool-south
+1994/427	Lancashire Central	1983:eng-fylde
+1994/427	Lancashire Central	1983:eng-pendle
+1994/427	Lancashire Central	1983:eng-preston
+1994/427	Lancashire Central	1983:eng-ribble-valley
+1994/427	Lancashire Central	1983:eng-wyre
+1994/427	Lancashire South	1983:eng-blackburn
+1994/427	Lancashire South	1983:eng-bury-north
+1994/427	Lancashire South	1983:eng-chorley
+1994/427	Lancashire South	1983:eng-hyndburn
+1994/427	Lancashire South	1983:eng-rossendale-and-darwen
+1994/427	Lancashire South	1983:eng-south-ribble
+1994/427	Lancashire South	1983:eng-west-lancashire
+1994/427	Yorkshire West	1983:eng-bradford-north
+1994/427	Yorkshire West	1983:eng-bradford-south
+1994/427	Yorkshire West	1983:eng-bradford-west
+1994/427	Yorkshire West	1983:eng-calder-valley
+1994/427	Yorkshire West	1983:eng-halifax
+1994/427	Yorkshire West	1983:eng-keighley
+1994/427	Yorkshire West	1983:eng-shipley
+1994/427	Leeds	1983:eng-elmet
+1994/427	Leeds	1983:eng-leeds-central
+1994/427	Leeds	1983:eng-leeds-east
+1994/427	Leeds	1983:eng-leeds-north-east
+1994/427	Leeds	1983:eng-leeds-north-west
+1994/427	Leeds	1983:eng-leeds-west
+1994/427	Leeds	1983:eng-morley-and-leeds-south
+1994/427	Leeds	1983:eng-pudsey
+1994/427	Merseyside West	1983:eng-bootle
+1994/427	Merseyside West	1983:eng-crosby
+1994/427	Merseyside West	1983:eng-liverpool-broadgreen
+1994/427	Merseyside West	1983:eng-liverpool-mossley-hill
+1994/427	Merseyside West	1983:eng-liverpool-riverside
+1994/427	Merseyside West	1983:eng-liverpool-walton
+1994/427	Merseyside West	1983:eng-liverpool-west-derby
+1994/427	Merseyside West	1983:eng-southport
+1994/427	Merseyside East and Wigan	1983:eng-knowsley-north
+1994/427	Merseyside East and Wigan	1983:eng-knowsley-south
+1994/427	Merseyside East and Wigan	1983:eng-leigh
+1994/427	Merseyside East and Wigan	1983:eng-liverpool-garston
+1994/427	Merseyside East and Wigan	1983:eng-makerfield
+1994/427	Merseyside East and Wigan	1983:eng-st-helens-north
+1994/427	Merseyside East and Wigan	1983:eng-st-helens-south
+1994/427	Merseyside East and Wigan	1983:eng-wigan
+1994/427	Cheshire West and Wirral	1983:eng-birkenhead
+1994/427	Cheshire West and Wirral	1983:eng-city-of-chester
+1994/427	Cheshire West and Wirral	1983:eng-crewe-and-nantwich
+1994/427	Cheshire West and Wirral	1983:eng-eddisbury
+1994/427	Cheshire West and Wirral	1983:eng-ellesmere-port-and-neston
+1994/427	Cheshire West and Wirral	1983:eng-wallasey
+1994/427	Cheshire West and Wirral	1983:eng-wirral-south
+1994/427	Cheshire West and Wirral	1983:eng-wirral-west
+1994/427	Greater Manchester West	1983:eng-bolton-north-east
+1994/427	Greater Manchester West	1983:eng-bolton-south-east
+1994/427	Greater Manchester West	1983:eng-bolton-west
+1994/427	Greater Manchester West	1983:eng-bury-south
+1994/427	Greater Manchester West	1983:eng-davyhulme
+1994/427	Greater Manchester West	1983:eng-eccles
+1994/427	Greater Manchester West	1983:eng-salford-east
+1994/427	Greater Manchester West	1983:eng-worsley
+1994/427	Greater Manchester East	1983:eng-ashton-under-lyne
+1994/427	Greater Manchester East	1983:eng-denton-and-reddish
+1994/427	Greater Manchester East	1983:eng-heywood-and-middleton
+1994/427	Greater Manchester East	1983:eng-littleborough-and-saddleworth
+1994/427	Greater Manchester East	1983:eng-oldham-central-and-royton
+1994/427	Greater Manchester East	1983:eng-oldham-west
+1994/427	Greater Manchester East	1983:eng-rochdale
+1994/427	Greater Manchester East	1983:eng-stalybridge-and-hyde
+1994/427	Greater Manchester Central	1983:eng-cheadle
+1994/427	Greater Manchester Central	1983:eng-hazel-grove
+1994/427	Greater Manchester Central	1983:eng-manchester-blackley
+1994/427	Greater Manchester Central	1983:eng-manchester-central
+1994/427	Greater Manchester Central	1983:eng-manchester-gorton
+1994/427	Greater Manchester Central	1983:eng-manchester-withington
+1994/427	Greater Manchester Central	1983:eng-stockport
+1994/427	Greater Manchester Central	1983:eng-stretford
+1994/427	Cheshire East	1983:eng-altrincham-and-sale
+1994/427	Cheshire East	1983:eng-halton
+1994/427	Cheshire East	1983:eng-macclesfield
+1994/427	Cheshire East	1983:eng-manchester-wythenshawe
+1994/427	Cheshire East	1983:eng-tatton
+1994/427	Cheshire East	1983:eng-warrington-north
+1994/427	Cheshire East	1983:eng-warrington-south
+1994/427	Yorkshire South West	1983:eng-batley-and-spen
+1994/427	Yorkshire South West	1983:eng-colne-valley
+1994/427	Yorkshire South West	1983:eng-dewsbury
+1994/427	Yorkshire South West	1983:eng-hemsworth
+1994/427	Yorkshire South West	1983:eng-huddersfield
+1994/427	Yorkshire South West	1983:eng-normanton
+1994/427	Yorkshire South West	1983:eng-pontefract-and-castleford
+1994/427	Yorkshire South West	1983:eng-wakefield
+1994/427	Yorkshire South	1983:eng-barnsley-central
+1994/427	Yorkshire South	1983:eng-barnsley-east
+1994/427	Yorkshire South	1983:eng-doncaster-central
+1994/427	Yorkshire South	1983:eng-doncaster-north
+1994/427	Yorkshire South	1983:eng-don-valley
+1994/427	Yorkshire South	1983:eng-rother-valley
+1994/427	Yorkshire South	1983:eng-rotherham
+1994/427	Yorkshire South	1983:eng-wentworth
+1994/427	Sheffield	1983:eng-barnsley-west-and-penistone
+1994/427	Sheffield	1983:eng-sheffield-attercliffe
+1994/427	Sheffield	1983:eng-sheffield-brightside
+1994/427	Sheffield	1983:eng-sheffield-central
+1994/427	Sheffield	1983:eng-sheffield-hallam
+1994/427	Sheffield	1983:eng-sheffield-heeley
+1994/427	Sheffield	1983:eng-sheffield-hillsborough
+1994/427	Peak District	1983:eng-amber-valley
+1994/427	Peak District	1983:eng-ashfield
+1994/427	Peak District	1983:eng-broxtowe
+1994/427	Peak District	1983:eng-erewash
+1994/427	Peak District	1983:eng-high-peak
+1994/427	Peak District	1983:eng-staffordshire-moorlands
+1994/427	Peak District	1983:eng-west-derbyshire
+1994/427	Nottinghamshire North and Chesterfield	1983:eng-bassetlaw
+1994/427	Nottinghamshire North and Chesterfield	1983:eng-bolsover
+1994/427	Nottinghamshire North and Chesterfield	1983:eng-chesterfield
+1994/427	Nottinghamshire North and Chesterfield	1983:eng-mansfield
+1994/427	Nottinghamshire North and Chesterfield	1983:eng-newark
+1994/427	Nottinghamshire North and Chesterfield	1983:eng-north-east-derbyshire
+1994/427	Nottinghamshire North and Chesterfield	1983:eng-sherwood
+1994/427	Lincolnshire and Humberside South	1983:eng-brigg-and-cleethorpes
+1994/427	Lincolnshire and Humberside South	1983:eng-east-lindsey
+1994/427	Lincolnshire and Humberside South	1983:eng-gainsborough-and-horncastle
+1994/427	Lincolnshire and Humberside South	1983:eng-grantham
+1994/427	Lincolnshire and Humberside South	1983:eng-great-grimsby
+1994/427	Lincolnshire and Humberside South	1983:eng-holland-with-boston
+1994/427	Lincolnshire and Humberside South	1983:eng-lincoln
+1994/427	Staffordshire West and Congleton	1983:eng-congleton
+1994/427	Staffordshire West and Congleton	1983:eng-newcastle-under-lyme
+1994/427	Staffordshire West and Congleton	1983:eng-south-staffordshire
+1994/427	Staffordshire West and Congleton	1983:eng-stafford
+1994/427	Staffordshire West and Congleton	1983:eng-central-stoke-on-trent
+1994/427	Staffordshire West and Congleton	1983:eng-north-stoke-on-trent
+1994/427	Staffordshire West and Congleton	1983:eng-south-stoke-on-trent
+1994/427	Staffordshire East and Derby	1983:eng-burton
+1994/427	Staffordshire East and Derby	1983:eng-cannock-and-burntwood
+1994/427	Staffordshire East and Derby	1983:eng-derby-north
+1994/427	Staffordshire East and Derby	1983:eng-derby-south
+1994/427	Staffordshire East and Derby	1983:eng-mid-staffordshire
+1994/427	Staffordshire East and Derby	1983:eng-south-derbyshire
+1994/427	Staffordshire East and Derby	1983:eng-south-east-staffordshire
+1994/427	Nottingham and Leicestershire North West	1983:eng-bosworth
+1994/427	Nottingham and Leicestershire North West	1983:eng-gedling
+1994/427	Nottingham and Leicestershire North West	1983:eng-north-west-leicestershire
+1994/427	Nottingham and Leicestershire North West	1983:eng-nottingham-east
+1994/427	Nottingham and Leicestershire North West	1983:eng-nottingham-north
+1994/427	Nottingham and Leicestershire North West	1983:eng-nottingham-south
+1994/427	Nottingham and Leicestershire North West	1983:eng-rushcliffe
+1994/427	Leicester	1983:eng-harborough
+1994/427	Leicester	1983:eng-leicester-east
+1994/427	Leicester	1983:eng-leicester-south
+1994/427	Leicester	1983:eng-leicester-west
+1994/427	Leicester	1983:eng-loughborough
+1994/427	Leicester	1983:eng-rutland-and-melton
+1994/427	Leicester	1983:eng-stamford-and-spalding
+1994/427	Cambridgeshire	1983:eng-cambridge
+1994/427	Cambridgeshire	1983:eng-huntingdon
+1994/427	Cambridgeshire	1983:eng-north-east-cambridgeshire
+1994/427	Cambridgeshire	1983:eng-peterborough
+1994/427	Cambridgeshire	1983:eng-south-east-cambridgeshire
+1994/427	Cambridgeshire	1983:eng-south-west-cambridgeshire
+1994/427	Norfolk	1983:eng-great-yarmouth
+1994/427	Norfolk	1983:eng-mid-norfolk
+1994/427	Norfolk	1983:eng-north-norfolk
+1994/427	Norfolk	1983:eng-north-west-norfolk
+1994/427	Norfolk	1983:eng-norwich-north
+1994/427	Norfolk	1983:eng-norwich-south
+1994/427	Norfolk	1983:eng-south-norfolk
+1994/427	Herefordshire and Shropshire	1983:eng-hereford
+1994/427	Herefordshire and Shropshire	1983:eng-leominster
+1994/427	Herefordshire and Shropshire	1983:eng-ludlow
+1994/427	Herefordshire and Shropshire	1983:eng-north-shropshire
+1994/427	Herefordshire and Shropshire	1983:eng-shrewsbury-and-atcham
+1994/427	Herefordshire and Shropshire	1983:eng-the-wrekin
+1994/427	Herefordshire and Shropshire	1983:eng-wyre-forest
+1994/427	Birmingham West	1983:eng-aldridge-brownhills
+1994/427	Birmingham West	1983:eng-birmingham-ladywood
+1994/427	Birmingham West	1983:eng-birmingham-perry-barr
+1994/427	Birmingham West	1983:eng-sutton-coldfield
+1994/427	Birmingham West	1983:eng-walsall-north
+1994/427	Birmingham West	1983:eng-walsall-south
+1994/427	Birmingham West	1983:eng-west-bromwich-east
+1994/427	Birmingham West	1983:eng-west-bromwich-west
+1994/427	Midlands West	1983:eng-dudley-east
+1994/427	Midlands West	1983:eng-dudley-west
+1994/427	Midlands West	1983:eng-halesowen-and-stourbridge
+1994/427	Midlands West	1983:eng-warley-east
+1994/427	Midlands West	1983:eng-warley-west
+1994/427	Midlands West	1983:eng-north-east-wolverhampton
+1994/427	Midlands West	1983:eng-south-east-wolverhampton
+1994/427	Midlands West	1983:eng-south-west-wolverhampton
+1994/427	Birmingham East	1983:eng-birmingham-edgbaston
+1994/427	Birmingham East	1983:eng-birmingham-erdington
+1994/427	Birmingham East	1983:eng-birmingham-hall-green
+1994/427	Birmingham East	1983:eng-birmingham-hodge-hill
+1994/427	Birmingham East	1983:eng-birmingham-northfield
+1994/427	Birmingham East	1983:eng-birmingham-selly-oak
+1994/427	Birmingham East	1983:eng-birmingham-small-heath
+1994/427	Birmingham East	1983:eng-birmingham-sparkbrook
+1994/427	Birmingham East	1983:eng-birmingham-yardley
+1994/427	Coventry and North Warwickshire	1983:eng-coventry-north-east
+1994/427	Coventry and North Warwickshire	1983:eng-coventry-north-west
+1994/427	Coventry and North Warwickshire	1983:eng-coventry-south-east
+1994/427	Coventry and North Warwickshire	1983:eng-coventry-south-west
+1994/427	Coventry and North Warwickshire	1983:eng-meriden
+1994/427	Coventry and North Warwickshire	1983:eng-north-warwickshire
+1994/427	Coventry and North Warwickshire	1983:eng-nuneaton
+1994/427	Coventry and North Warwickshire	1983:eng-solihull
+1994/427	Northamptonshire and Blaby	1983:eng-blaby
+1994/427	Northamptonshire and Blaby	1983:eng-corby
+1994/427	Northamptonshire and Blaby	1983:eng-daventry
+1994/427	Northamptonshire and Blaby	1983:eng-kettering
+1994/427	Northamptonshire and Blaby	1983:eng-northampton-north
+1994/427	Northamptonshire and Blaby	1983:eng-northampton-south
+1994/427	Northamptonshire and Blaby	1983:eng-wellingborough
+1994/427	Suffolk and South West Norfolk	1983:eng-bury-st-edmunds
+1994/427	Suffolk and South West Norfolk	1983:eng-central-suffolk
+1994/427	Suffolk and South West Norfolk	1983:eng-ipswich
+1994/427	Suffolk and South West Norfolk	1983:eng-south-west-norfolk
+1994/427	Suffolk and South West Norfolk	1983:eng-suffolk-coastal
+1994/427	Suffolk and South West Norfolk	1983:eng-waveney
+1994/427	Worcestershire and South Warwickshire	1983:eng-bromsgrove
+1994/427	Worcestershire and South Warwickshire	1983:eng-mid-worcestershire
+1994/427	Worcestershire and South Warwickshire	1983:eng-rugby-and-kenilworth
+1994/427	Worcestershire and South Warwickshire	1983:eng-south-worcestershire
+1994/427	Worcestershire and South Warwickshire	1983:eng-stratford-on-avon
+1994/427	Worcestershire and South Warwickshire	1983:eng-warwick-and-leamington
+1994/427	Worcestershire and South Warwickshire	1983:eng-worcester
+1994/427	Bedfordshire and Milton Keynes	1983:eng-luton-south
+1994/427	Bedfordshire and Milton Keynes	1983:eng-mid-bedfordshire
+1994/427	Bedfordshire and Milton Keynes	1983:eng-south-west-milton-keynes
+1994/427	Bedfordshire and Milton Keynes	1983:eng-north-bedfordshire
+1994/427	Bedfordshire and Milton Keynes	1983:eng-north-east-milton-keynes
+1994/427	Bedfordshire and Milton Keynes	1983:eng-luton-north
+1994/427	Bedfordshire and Milton Keynes	1983:eng-south-west-bedfordshire
+1994/427	Essex North and Suffolk South	1983:eng-braintree
+1994/427	Essex North and Suffolk South	1983:eng-harwich
+1994/427	Essex North and Suffolk South	1983:eng-colchester-north
+1994/427	Essex North and Suffolk South	1983:eng-saffron-walden
+1994/427	Essex North and Suffolk South	1983:eng-south-colchester-and-maldon
+1994/427	Essex North and Suffolk South	1983:eng-south-suffolk
+1994/427	The Cotswolds	1983:eng-cheltenham
+1994/427	The Cotswolds	1983:eng-cirencester-and-tewkesbury
+1994/427	The Cotswolds	1983:eng-gloucester
+1994/427	The Cotswolds	1983:eng-stroud
+1994/427	The Cotswolds	1983:eng-west-gloucestershire
+1994/427	The Cotswolds	1983:eng-witney
+1994/427	Buckinghamshire and Oxfordshire East	1983:eng-aylesbury
+1994/427	Buckinghamshire and Oxfordshire East	1983:eng-banbury
+1994/427	Buckinghamshire and Oxfordshire East	1983:eng-beaconsfield
+1994/427	Buckinghamshire and Oxfordshire East	1983:eng-buckingham
+1994/427	Buckinghamshire and Oxfordshire East	1983:eng-chesham-and-amersham
+1994/427	Buckinghamshire and Oxfordshire East	1983:eng-henley
+1994/427	Buckinghamshire and Oxfordshire East	1983:eng-wycombe
+1994/427	Hertfordshire	1983:eng-hertsmere
+1994/427	Hertfordshire	1983:eng-north-hertfordshire
+1994/427	Hertfordshire	1983:eng-st-albans
+1994/427	Hertfordshire	1983:eng-south-west-hertfordshire
+1994/427	Hertfordshire	1983:eng-watford
+1994/427	Hertfordshire	1983:eng-welwyn-hatfield
+1994/427	Hertfordshire	1983:eng-west-hertfordshire
+1994/427	Essex West and Hertfordshire East	1983:eng-brentwood-and-ongar
+1994/427	Essex West and Hertfordshire East	1983:eng-broxbourne
+1994/427	Essex West and Hertfordshire East	1983:eng-chelmsford
+1994/427	Essex West and Hertfordshire East	1983:eng-epping-forest
+1994/427	Essex West and Hertfordshire East	1983:eng-harlow
+1994/427	Essex West and Hertfordshire East	1983:eng-hertford-and-stortford
+1994/427	Essex West and Hertfordshire East	1983:eng-stevenage
+1994/427	Essex South	1983:eng-basildon
+1994/427	Essex South	1983:eng-billericay
+1994/427	Essex South	1983:eng-castle-point
+1994/427	Essex South	1983:eng-rochford
+1994/427	Essex South	1983:eng-southend-east
+1994/427	Essex South	1983:eng-southend-west
+1994/427	Essex South	1983:eng-thurrock
+1994/427	Bristol	1983:eng-bristol-east
+1994/427	Bristol	1983:eng-bristol-north-west
+1994/427	Bristol	1983:eng-bristol-south
+1994/427	Bristol	1983:eng-bristol-west
+1994/427	Bristol	1983:eng-kingswood
+1994/427	Bristol	1983:eng-northavon
+1994/427	Bristol	1983:eng-woodspring
+1994/427	Wiltshire North and Bath	1983:eng-bath
+1994/427	Wiltshire North and Bath	1983:eng-devizes
+1994/427	Wiltshire North and Bath	1983:eng-north-wiltshire
+1994/427	Wiltshire North and Bath	1983:eng-swindon
+1994/427	Wiltshire North and Bath	1983:eng-wansdyke
+1994/427	Wiltshire North and Bath	1983:eng-westbury
+1994/427	Hampshire North and Oxford	1983:eng-aldershot
+1994/427	Hampshire North and Oxford	1983:eng-basingstoke
+1994/427	Hampshire North and Oxford	1983:eng-newbury
+1994/427	Hampshire North and Oxford	1983:eng-north-west-hampshire
+1994/427	Hampshire North and Oxford	1983:eng-oxford-east
+1994/427	Hampshire North and Oxford	1983:eng-oxford-west-and-abingdon
+1994/427	Hampshire North and Oxford	1983:eng-wantage
+1994/427	Thames Valley	1983:eng-east-berkshire
+1994/427	Thames Valley	1983:eng-reading-east
+1994/427	Thames Valley	1983:eng-reading-west
+1994/427	Thames Valley	1983:eng-slough
+1994/427	Thames Valley	1983:eng-spelthorne
+1994/427	Thames Valley	1983:eng-windsor-and-maidenhead
+1994/427	Thames Valley	1983:eng-wokingham
+1994/427	Surrey	1983:eng-chertsey-and-walton
+1994/427	Surrey	1983:eng-esher
+1994/427	Surrey	1983:eng-guildford
+1994/427	Surrey	1983:eng-mole-valley
+1994/427	Surrey	1983:eng-north-west-surrey
+1994/427	Surrey	1983:eng-reigate
+1994/427	Surrey	1983:eng-woking
+1994/427	Kent West	1983:eng-dartford
+1994/427	Kent West	1983:eng-gillingham
+1994/427	Kent West	1983:eng-gravesham
+1994/427	Kent West	1983:eng-maidstone
+1994/427	Kent West	1983:eng-medway
+1994/427	Kent West	1983:eng-mid-kent
+1994/427	Kent West	1983:eng-tonbridge-and-malling
+1994/427	Kent East	1983:eng-ashford
+1994/427	Kent East	1983:eng-canterbury
+1994/427	Kent East	1983:eng-dover
+1994/427	Kent East	1983:eng-faversham
+1994/427	Kent East	1983:eng-folkestone-and-hythe
+1994/427	Kent East	1983:eng-north-thanet
+1994/427	Kent East	1983:eng-south-thanet
+1994/427	Somerset and North Devon	1983:eng-bridgwater
+1994/427	Somerset and North Devon	1983:eng-north-devon
+1994/427	Somerset and North Devon	1983:eng-somerton-and-frome
+1994/427	Somerset and North Devon	1983:eng-taunton
+1994/427	Somerset and North Devon	1983:eng-wells
+1994/427	Somerset and North Devon	1983:eng-weston-super-mare
+1994/427	Somerset and North Devon	1983:eng-yeovil
+1994/427	Itchen, Test and Avon	1983:eng-christchurch
+1994/427	Itchen, Test and Avon	1983:eng-eastleigh
+1994/427	Itchen, Test and Avon	1983:eng-new-forest
+1994/427	Itchen, Test and Avon	1983:eng-romsey-and-waterside
+1994/427	Itchen, Test and Avon	1983:eng-salisbury
+1994/427	Itchen, Test and Avon	1983:eng-southampton-itchen
+1994/427	Itchen, Test and Avon	1983:eng-southampton-test
+1994/427	Wight and Hampshire South	1983:eng-fareham
+1994/427	Wight and Hampshire South	1983:eng-gosport
+1994/427	Wight and Hampshire South	1983:eng-isle-of-wight
+1994/427	Wight and Hampshire South	1983:eng-portsmouth-north
+1994/427	Wight and Hampshire South	1983:eng-portsmouth-south
+1994/427	Wight and Hampshire South	1983:eng-winchester
+1994/427	South Downs West	1983:eng-arundel
+1994/427	South Downs West	1983:eng-chichester
+1994/427	South Downs West	1983:eng-east-hampshire
+1994/427	South Downs West	1983:eng-havant
+1994/427	South Downs West	1983:eng-horsham
+1994/427	South Downs West	1983:eng-south-west-surrey
+1994/427	Sussex South and Crawley	1983:eng-brighton-kemptown
+1994/427	Sussex South and Crawley	1983:eng-brighton-pavilion
+1994/427	Sussex South and Crawley	1983:eng-crawley
+1994/427	Sussex South and Crawley	1983:eng-hove
+1994/427	Sussex South and Crawley	1983:eng-mid-sussex
+1994/427	Sussex South and Crawley	1983:eng-shoreham
+1994/427	Sussex South and Crawley	1983:eng-worthing
+1994/427	East Sussex and Kent South	1983:eng-bexhill-and-battle
+1994/427	East Sussex and Kent South	1983:eng-eastbourne
+1994/427	East Sussex and Kent South	1983:eng-hastings-and-rye
+1994/427	East Sussex and Kent South	1983:eng-lewes
+1994/427	East Sussex and Kent South	1983:eng-sevenoaks
+1994/427	East Sussex and Kent South	1983:eng-tunbridge-wells
+1994/427	East Sussex and Kent South	1983:eng-wealden
+1994/427	Cornwall and West Plymouth	1983:eng-falmouth-and-camborne
+1994/427	Cornwall and West Plymouth	1983:eng-north-cornwall
+1994/427	Cornwall and West Plymouth	1983:eng-plymouth-devonport
+1994/427	Cornwall and West Plymouth	1983:eng-plymouth-drake
+1994/427	Cornwall and West Plymouth	1983:eng-south-east-cornwall
+1994/427	Cornwall and West Plymouth	1983:eng-st-ives
+1994/427	Cornwall and West Plymouth	1983:eng-truro
+1994/427	Devon and East Plymouth	1983:eng-exeter
+1994/427	Devon and East Plymouth	1983:eng-plymouth-sutton
+1994/427	Devon and East Plymouth	1983:eng-south-hams
+1994/427	Devon and East Plymouth	1983:eng-teignbridge
+1994/427	Devon and East Plymouth	1983:eng-tiverton
+1994/427	Devon and East Plymouth	1983:eng-torbay
+1994/427	Devon and East Plymouth	1983:eng-torridge-and-west-devon
+1994/427	Dorset and East Devon	1983:eng-bournemouth-east
+1994/427	Dorset and East Devon	1983:eng-bournemouth-west
+1994/427	Dorset and East Devon	1983:eng-honiton
+1994/427	Dorset and East Devon	1983:eng-north-dorset
+1994/427	Dorset and East Devon	1983:eng-poole
+1994/427	Dorset and East Devon	1983:eng-south-dorset
+1994/427	Dorset and East Devon	1983:eng-west-dorset
+1994/427	London North West	1983:eng-brent-east
+1994/427	London North West	1983:eng-brent-north
+1994/427	London North West	1983:eng-brent-south
+1994/427	London North West	1983:eng-harrow-east
+1994/427	London North West	1983:eng-harrow-west
+1994/427	London North West	1983:eng-hayes-and-harlington
+1994/427	London North West	1983:eng-ruislip-northwood
+1994/427	London North West	1983:eng-uxbridge
+1994/427	London North	1983:eng-chipping-barnet
+1994/427	London North	1983:eng-edmonton
+1994/427	London North	1983:eng-enfield-north
+1994/427	London North	1983:eng-enfield-southgate
+1994/427	London North	1983:eng-finchley
+1994/427	London North	1983:eng-hendon-north
+1994/427	London North	1983:eng-hendon-south
+1994/427	London North	1983:eng-hornsey-and-wood-green
+1994/427	London North	1983:eng-tottenham
+1994/427	London East	1983:eng-barking
+1994/427	London East	1983:eng-dagenham
+1994/427	London East	1983:eng-hornchurch
+1994/427	London East	1983:eng-ilford-north
+1994/427	London East	1983:eng-ilford-south
+1994/427	London East	1983:eng-newham-north-east
+1994/427	London East	1983:eng-romford
+1994/427	London East	1983:eng-upminster
+1994/427	London East	1983:eng-wanstead-and-woodford
+1994/427	London South East	1983:eng-beckenham
+1994/427	London South East	1983:eng-bexleyheath
+1994/427	London South East	1983:eng-chislehurst
+1994/427	London South East	1983:eng-eltham
+1994/427	London South East	1983:eng-erith-and-crayford
+1994/427	London South East	1983:eng-old-bexley-and-sidcup
+1994/427	London South East	1983:eng-orpington
+1994/427	London South East	1983:eng-ravensbourne
+1994/427	London South East	1983:eng-woolwich
+1994/427	London South Inner	1983:eng-dulwich
+1994/427	London South Inner	1983:eng-greenwich
+1994/427	London South Inner	1983:eng-lewisham-deptford
+1994/427	London South Inner	1983:eng-lewisham-east
+1994/427	London South Inner	1983:eng-lewisham-west
+1994/427	London South Inner	1983:eng-norwood
+1994/427	London South Inner	1983:eng-peckham
+1994/427	London South Inner	1983:eng-southwark-and-bermondsey
+1994/427	London South Inner	1983:eng-vauxhall
+1994/427	London South West	1983:eng-battersea
+1994/427	London South West	1983:eng-kingston-upon-thames
+1994/427	London South West	1983:eng-mitcham-and-morden
+1994/427	London South West	1983:eng-putney
+1994/427	London South West	1983:eng-streatham
+1994/427	London South West	1983:eng-surbiton
+1994/427	London South West	1983:eng-tooting
+1994/427	London South West	1983:eng-wimbledon
+1994/427	London West	1983:eng-brentford-and-isleworth
+1994/427	London West	1983:eng-ealing-acton
+1994/427	London West	1983:eng-ealing-north
+1994/427	London West	1983:eng-ealing-southall
+1994/427	London West	1983:eng-feltham-and-heston
+1994/427	London West	1983:eng-hammersmith
+1994/427	London West	1983:eng-richmond-and-barnes
+1994/427	London West	1983:eng-twickenham
+1994/427	London Central	1983:eng-chelsea
+1994/427	London Central	1983:eng-city-of-london-and-westminster-south
+1994/427	London Central	1983:eng-fulham
+1994/427	London Central	1983:eng-hampstead-and-highgate
+1994/427	London Central	1983:eng-holborn-and-st-pancras
+1994/427	London Central	1983:eng-islington-north
+1994/427	London Central	1983:eng-islington-south-and-finsbury
+1994/427	London Central	1983:eng-kensington
+1994/427	London Central	1983:eng-westminster-north
+1994/427	London North East	1983:eng-bethnal-green-and-stepney
+1994/427	London North East	1983:eng-bow-and-poplar
+1994/427	London North East	1983:eng-chingford
+1994/427	London North East	1983:eng-hackney-north-and-stoke-newington
+1994/427	London North East	1983:eng-hackney-south-and-shoreditch
+1994/427	London North East	1983:eng-leyton
+1994/427	London North East	1983:eng-newham-north-west
+1994/427	London North East	1983:eng-newham-south
+1994/427	London North East	1983:eng-walthamstow
+1994/427	London South and Surrey East	1983:eng-carshalton-and-wallington
+1994/427	London South and Surrey East	1983:eng-croydon-central
+1994/427	London South and Surrey East	1983:eng-croydon-north-east
+1994/427	London South and Surrey East	1983:eng-croydon-north-west
+1994/427	London South and Surrey East	1983:eng-croydon-south
+1994/427	London South and Surrey East	1983:eng-east-surrey
+1994/427	London South and Surrey East	1983:eng-epsom-and-ewell
+1994/427	London South and Surrey East	1983:eng-sutton-and-cheam
+1994/428	North Wales	1983:wls-alyn-and-deeside
+1994/428	North Wales	1983:wls-caernarfon
+1994/428	North Wales	1983:wls-clwyd-north-west
+1994/428	North Wales	1983:wls-clwyd-south-west
+1994/428	North Wales	1983:wls-conwy
+1994/428	North Wales	1983:wls-delyn
+1994/428	North Wales	1983:wls-wrexham
+1994/428	North Wales	1983:wls-ynys-mon
+1994/428	Mid and West Wales	1983:wls-brecon-and-radnor
+1994/428	Mid and West Wales	1983:wls-carmarthen
+1994/428	Mid and West Wales	1983:wls-ceredigion-and-pembroke-north
+1994/428	Mid and West Wales	1983:wls-llanelli
+1994/428	Mid and West Wales	1983:wls-meirionnydd-nant-conwy
+1994/428	Mid and West Wales	1983:wls-montgomery
+1994/428	Mid and West Wales	1983:wls-pembrokeshire
+1994/428	South Wales West	1983:wls-aberavon
+1994/428	South Wales West	1983:wls-bridgend
+1994/428	South Wales West	1983:wls-gower
+1994/428	South Wales West	1983:wls-neath
+1994/428	South Wales West	1983:wls-ogmore
+1994/428	South Wales West	1983:wls-swansea-east
+1994/428	South Wales West	1983:wls-swansea-west
+1994/428	South Wales Central	1983:wls-cardiff-central
+1994/428	South Wales Central	1983:wls-cardiff-north
+1994/428	South Wales Central	1983:wls-cardiff-south-and-penarth
+1994/428	South Wales Central	1983:wls-cardiff-west
+1994/428	South Wales Central	1983:wls-cynon-valley
+1994/428	South Wales Central	1983:wls-pontypridd
+1994/428	South Wales Central	1983:wls-rhondda
+1994/428	South Wales Central	1983:wls-vale-of-glamorgan
+1994/428	South Wales East	1983:wls-blaenau-gwent
+1994/428	South Wales East	1983:wls-caerphilly
+1994/428	South Wales East	1983:wls-islwyn
+1994/428	South Wales East	1983:wls-merthyr-tydfil-and-rhymney
+1994/428	South Wales East	1983:wls-monmouth
+1994/428	South Wales East	1983:wls-newport-east
+1994/428	South Wales East	1983:wls-newport-west
+1994/428	South Wales East	1983:wls-torfaen
