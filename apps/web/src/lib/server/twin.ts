@@ -4,7 +4,7 @@ import { error, isHttpError, isRedirect, redirect } from "@sveltejs/kit";
 import { effective, stand } from "#lib/caucus.js";
 import { PARTS, label as reasonLabel, REASONS } from "#lib/coverage.js";
 import { count, date, percent, plural, points } from "#lib/format.js";
-import { isDerived } from "#lib/outcomes.js";
+import { isDerived, VACANCIES } from "#lib/outcomes.js";
 import { m } from "#lib/paraglide/messages.js";
 import { getLocale } from "#lib/paraglide/runtime.js";
 import { AFFILIATIONS, RELATIONS } from "#lib/relations.js";
@@ -1466,6 +1466,13 @@ function contestMarkdown(
     ...contest.notes.map((note) => `> ${note.body}`),
     ...compared,
     ...held,
+    ...(handover?.vacated == null
+      ? []
+      : [
+          (VACANCIES[handover.vacated.via ?? ""] ?? m.byes_reason_none)({
+            name: handover.vacated.name,
+          }),
+        ]),
     resultsMarkdown(contest, then),
     ...(lists == null ||
     lists.isRanked ||

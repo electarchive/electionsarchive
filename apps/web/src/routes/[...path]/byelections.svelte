@@ -3,6 +3,7 @@
   import { createQuery } from "@tanstack/svelte-query";
   import { SvelteMap } from "svelte/reactivity";
   import { count, date } from "#lib/format.js";
+  import { VACANCIES } from "#lib/outcomes.js";
   import { m } from "#lib/paraglide/messages.js";
   import { swatch } from "#lib/party.js";
   import { orpc } from "#lib/rpc.js";
@@ -35,17 +36,6 @@
         ? swatch(null, "")
         : swatch(info.get(key)?.color ?? null, `party:${key}`);
     const net = new SvelteMap<string, number>();
-    const reasons: Record<string, (input: { name: string }) => string> = {
-      died: m.byes_reason_died,
-      resigned: m.byes_reason_resigned,
-      elevated: m.byes_reason_elevated,
-      appointed: m.byes_reason_appointed,
-      expelled: m.byes_reason_expelled,
-      disqualified: m.byes_reason_disqualified,
-      annulled: m.byes_reason_annulled,
-      removed: m.byes_reason_removed,
-      withdrew: m.byes_reason_withdrew,
-    };
     const rows = data.rows.map((row) => {
       const to = fold(row.to);
       const from = fold(row.from);
@@ -68,7 +58,7 @@
         why:
           row.member == null
             ? null
-            : (reasons[row.reason ?? ""] ?? m.byes_reason_none)({
+            : (VACANCIES[row.reason ?? ""] ?? m.byes_reason_none)({
                 name: row.member.name,
               }),
       };

@@ -262,6 +262,11 @@ export const seats = {
           ),
           prior: v.object({ name: v.string(), path: v.nullable(v.string()) }),
           alliance: v.nullable(v.string()),
+          vacated: v.optional(
+            v.nullable(
+              v.object({ name: v.string(), via: v.nullable(v.string()) }),
+            ),
+          ),
           seats: v.optional(
             v.array(
               v.object({
@@ -296,6 +301,8 @@ export const seats = {
         before: Array<string>;
         isUs: boolean;
         alliance: string | null;
+        member: string | null;
+        via: string | null;
       }>(sql`
         with this as materialized (
           select c.id, c.body_id as body, c.district_area_id as area, e.date_from as day, e.kind, coalesce(c.magnitude, 1) as magnitude,
@@ -396,8 +403,23 @@ export const seats = {
               (select election from last),
               (select coalesce(e.parent_id, e.id) from contest c join election e on e.id = c.election_id where c.id = p.id),
               (select coalesce(e.parent_id, e.id) from contest c join election e on e.id = c.election_id where c.id = p.prior)
-            ) order by n.recorded_from desc, n.id limit 1) as alliance
+            ) order by n.recorded_from desc, n.id limit 1) as alliance,
+          v.person as member, v.via
         from paired p
+        left join lateral (
+          select coalesce(
+            (select coalesce(m.into_id, t.person_id)::text from tenure t left join entity_merge m on m.entity_id = t.person_id
+              where t.body_id = (select body from this) and t.to_date between p.day and (select day from this)
+                and t.person_id::text in (select x.person from won x where x.contest = p.prior)
+              order by t.to_date desc limit 1),
+            (select max(x.person) from won x where x.contest = p.prior having count(*) = 1)
+          ) as person,
+          (select t.ended_via::text from tenure t
+            where t.body_id = (select body from this) and t.to_date between p.day and (select day from this)
+              and t.person_id::text in (select x.person from won x where x.contest = p.prior)
+            order by t.to_date desc limit 1) as via
+          where (select kind from this) = 'by_election'
+        ) v on true
         left join lateral (select x.party from won x where x.contest = p.id order by x.k limit 1) w on true
         left join lateral (select x.party from won x where x.contest = p.prior order by x.k limit 1) b on true
         where p.prior is not null
@@ -419,7 +441,10 @@ export const seats = {
           ),
           row.since,
         ),
-        names([row.area], row.since),
+        names(
+          row.member == null ? [row.area] : [row.area, row.member],
+          row.since,
+        ),
         paths([row.prior]),
       ]);
       const party = (key: string) =>
@@ -454,6 +479,10 @@ export const seats = {
         },
         alliance:
           row.alliance === colored.get(now)?.label ? null : row.alliance,
+        vacated:
+          row.member == null
+            ? null
+            : { name: labels.full.get(row.member) ?? "", via: row.via },
         seats:
           row.now.length < 2
             ? undefined

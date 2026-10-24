@@ -15,7 +15,13 @@
     points,
     precision,
   } from "#lib/format.js";
-  import { explain, isDerived, MEASURES, OUTCOMES } from "#lib/outcomes.js";
+  import {
+    explain,
+    isDerived,
+    MEASURES,
+    OUTCOMES,
+    VACANCIES,
+  } from "#lib/outcomes.js";
   import { m } from "#lib/paraglide/messages.js";
   import { getLocale } from "#lib/paraglide/runtime.js";
   import { swatch } from "#lib/party.js";
@@ -1059,6 +1065,13 @@
           : hold({ party, majority })
     }${handover.basis === "same" ? "" : "*"}`;
   });
+  const vacancy = $derived(
+    handover?.vacated == null
+      ? null
+      : (VACANCIES[handover.vacated.via ?? ""] ?? m.byes_reason_none)({
+          name: handover.vacated.name,
+        }),
+  );
   const comeback = $derived.by(() => {
     if (question || contest.current == null) {
       return null;
@@ -1397,7 +1410,7 @@
       <p
         class="mbs-1 font-serif text-[clamp(1.0625rem,1.5vw,1.25rem)]/snug text-pretty max-inline-[60ch]"
       >
-        {#if held != null}{held}{" "}{/if}{verdict}{#if comeback != null}{" "}{comeback}{/if}
+        {#if held != null}{held}{" "}{/if}{verdict}{#if comeback != null}{" "}{comeback}{/if}{#if vacancy != null}{" "}{vacancy}{/if}
       </p>
     {/if}
     {#if held != null && handover != null && handover.basis !== "same"}

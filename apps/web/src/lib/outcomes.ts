@@ -10,6 +10,17 @@ export const OUTCOMES: Record<string, () => string> = {
   disqualified: m.outcome_disqualified,
 };
 export const LOST = new Set(["lost", "withdrew", "disqualified"]);
+export const VACANCIES: Record<string, (input: { name: string }) => string> = {
+  died: m.byes_reason_died,
+  resigned: m.byes_reason_resigned,
+  elevated: m.byes_reason_elevated,
+  appointed: m.byes_reason_appointed,
+  expelled: m.byes_reason_expelled,
+  disqualified: m.byes_reason_disqualified,
+  annulled: m.byes_reason_annulled,
+  removed: m.byes_reason_removed,
+  withdrew: m.byes_reason_withdrew,
+};
 export const MEASURES: Record<string, () => string> = {
   list_votes: m.measure_list_votes,
   electoral_votes: m.measure_electoral_votes,
