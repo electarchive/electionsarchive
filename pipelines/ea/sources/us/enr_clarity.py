@@ -1459,6 +1459,12 @@ def emit(
                     date_precision="day",
                     status="held",
                 )
+                name(parent, f"{day.year} {STATE_NAMES[st]} {kind} elections")
+                umbrella_path = f"us/{st.lower()}/{day}-{kind}"
+                if slugs.get(umbrella_path, parent) != parent:
+                    umbrella_path = f"{umbrella_path}-elections"
+                slugs[umbrella_path] = parent
+                cs.add("slug", path=umbrella_path, entity_id=parent)
             kind = parents.get(parent_key, kind) if kind not in ("primary", "runoff") else kind
             election = cs.key("us.election", f"{day}:{st}:{code}{suffix}")
             if (
