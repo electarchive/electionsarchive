@@ -286,6 +286,7 @@ SPECIALS = (
     ),
     (r"FRESH WATER SUPPLY DISTRICT|\bF ?W ?S ?D\b", "water", "Fresh Water Supply District"),
     (r"EMERGENCY SERVICES? DISTRICT|\bE ?S ?D\b", "fire", "Emergency Services District"),
+    (r"FIRE PROTECTION DISTRICT|FIRE DISTRICT", "fire-protection", "Fire Protection District"),
     (r"HOSPITAL DISTRICT", "hospital", "Hospital District"),
     (r"GROUNDWATER CONSERVATION DISTRICT", "conservation", "Groundwater Conservation District"),
     (r"(?:SOIL (?:AND|&) WATER )?CONSERVATION DISTRICT", "conservation", "Conservation District"),
@@ -643,8 +644,8 @@ def parse(
             if primary:
                 tagged = Counter(_party(choice["party"]) for choice in choices if choice["party"])
                 party = party or heading_party or next((key for key, _ in tagged.most_common() if key), None)
-                if party is None or question:
-                    skipped["primary question" if question else "primary with no party"] += 1
+                if question:
+                    skipped["primary question"] += 1
                     continue
             else:
                 party = None
@@ -664,6 +665,9 @@ def parse(
                 )
             if found is None:
                 skipped[re.sub(r"\d+", "N", plain)[:70]] += 1
+                continue
+            if primary and party is None and (found["scheme"] == "us.county" or found["key"] in PARTY_KEYS):
+                skipped["primary with no party"] += 1
                 continue
             if question:
                 found = {**found, "key": "question", "office": "", "body": False, "seat": None}
@@ -1844,7 +1848,7 @@ def emit(
                         if office_key in PARTY_KEYS
                         else f"{day.year} {party_name} primary for {office_title}"
                         if party
-                        else f"{day.year} {office_title} election"
+                        else f"{day.year} {office_title} {'primary' if kind == 'primary' else 'election'}"
                     )
                     + (f", {seat}" if seat else "")
                     + (" (unexpired term)" if first["remainder"] else "")
@@ -2010,7 +2014,7 @@ def emit(
                     for _, option, person_slug in ranked:
                         if person_slug in advancing[contest_key]:
                             cs.add("outcome", result_set_id=result_set, option_id=option, kind="advanced")
-                else:
+                elif not (kind == "primary" and not party):
                     cut = int(first["magnitude"])
                     total = sum(votes for votes, _, _ in ranked)
                     majority = st != "TX" or runoff or cut > 1 or ranked[0][0] * 2 > total
