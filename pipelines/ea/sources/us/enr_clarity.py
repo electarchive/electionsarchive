@@ -1503,6 +1503,8 @@ def emit(
                     if office_key == "mayor"
                     else f"{place} {party_name} {first['office']}"
                     if office_key in PARTY_KEYS
+                    else f"{place} {str(first['office']).removeprefix('County ')}"
+                    if st == "NY" and place.endswith(" County")
                     else f"{place} {first['office']}"
                 )
                 owner = cs.key("us.body" if first["body"] else "us.office", owner_key)
