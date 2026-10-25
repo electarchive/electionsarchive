@@ -139,7 +139,8 @@ def parse() -> None:
             scan(year, "roster").select("SQ_CANDIDATO", "DT_NASCIMENTO", "DS_GENERO").unique("SQ_CANDIDATO").collect()
         )
         frames["candidates"].append(
-            candidates.select(
+            candidates.unique(["NR_TURNO", "CD_CARGO", "SG_UF", "SQ_CANDIDATO"])
+            .select(
                 contest=contest,
                 year=pl.lit(year),
                 round="NR_TURNO",
