@@ -59,7 +59,8 @@ def fetch() -> None:
 
 def contests(page: str) -> Iterator[dict[str, Any]]:
     page = re.sub(r"<style.*?</style>|<script.*?</script>", "", page, flags=re.S)
-    cells = [html.unescape(cell).strip() for cell in re.split(r"[\r\n]+", re.sub(r"<[^>]+>", "\n", page)) if cell.strip()]
+    cells = [html.unescape(cell).strip() for cell in re.split(r"[\r\n]+", re.sub(r"<[^>]+>", "\n", page))]
+    cells = [cell for cell in cells if cell]
     index = 0
     while index < len(cells) - 3:
         if cells[index + 1] != "Choice":
@@ -76,6 +77,8 @@ def contests(page: str) -> Iterator[dict[str, Any]]:
             cell = cells[index]
             index += 1
             if cell.startswith("Cast Votes"):
+                if name is not None and len(numbers) >= 2:
+                    node["choices"].append({"text": name, "party": None, "total": numbers[-2].replace(",", ""), "places": []})
                 pairs = []
                 while index < len(cells) and not cells[index].startswith(("Overvotes", "Undervotes")):
                     pairs.append(cells[index])
@@ -89,8 +92,6 @@ def contests(page: str) -> Iterator[dict[str, Any]]:
             if name is not None and len(numbers) >= 2:
                 node["choices"].append({"text": name, "party": None, "total": numbers[-2].replace(",", ""), "places": []})
             name, numbers = cell, []
-        if name is not None and len(numbers) >= 2 and node["cast"] is None:
-            node["choices"].append({"text": name, "party": None, "total": numbers[-2].replace(",", ""), "places": []})
         if node["choices"]:
             yield node
 
