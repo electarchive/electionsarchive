@@ -29,6 +29,7 @@ import {
   results,
 } from "#lib/server/pages.js";
 import { router } from "#lib/server/rpc/router.js";
+import { comeback, verdict } from "#lib/verdict.js";
 
 type Data = Awaited<ReturnType<typeof load>>;
 type Link = (name: string, path: string | null) => string;
@@ -388,6 +389,7 @@ function markdown(data: Data, link: Link) {
         data.successors,
         data.statutes,
         data.lists,
+        data.rounds,
         link,
       );
     }
@@ -2174,6 +2176,7 @@ function contestMarkdown(
   successors: Extract<Data, { kind: "contest" }>["successors"],
   statutes: Extract<Data, { kind: "contest" }>["statutes"],
   lists: Extract<Data, { kind: "contest" }>["lists"],
+  rounds: Extract<Data, { kind: "contest" }>["rounds"],
   link: Link,
 ) {
   const groups: Record<string, () => string> = {
@@ -2332,23 +2335,9 @@ function contestMarkdown(
         ? `[${m.wording_link()}](${row.url ?? ""})`
         : `${row.kind === "text" ? m.wording_text() : m.wording_summary()}: ${row.body ?? ""} (${row.url == null ? source : `[${source}](${row.url})`})`;
     }),
-    ...(contest.kind === "ballot_question" &&
-    top?.current != null &&
-    next?.current != null
-      ? [
-          (["won", "elected"].includes(top.current.outcome ?? "")
-            ? m.race_lede_won
-            : m.race_lede_votes)({
-            party: top.label,
-            share: percent(top.current.share),
-            margin: points(top.current.share - next.current.share).replace(
-              /^\+/u,
-              "",
-            ),
-            runner: next.label,
-          }),
-        ]
-      : []),
+    [verdict(contest), comeback(contest, rounds)]
+      .filter((part) => part != null)
+      .join(" "),
     ...contest.notes.map((note) => `> ${note.body}`),
     ...compared,
     ...held,
@@ -2358,6 +2347,38 @@ function contestMarkdown(
       : [
           (VACANCIES[handover.vacated.via ?? ""] ?? m.byes_reason_none)({
             name: handover.vacated.name,
+          }),
+        ]),
+    ...(rounds.length < 2
+      ? []
+      : [
+          `## ${m.rounds_title()}`,
+          ...rounds.flatMap((round, index) => {
+            const label =
+              round.kind === "primary"
+                ? m.round_primary()
+                : round.kind === "runoff"
+                  ? m.round_runoff()
+                  : round.kind === "indirect"
+                    ? rounds.length === 2
+                      ? index === 0
+                        ? m.round_electoral()
+                        : m.round_indirect()
+                      : m.round_ballot({ round: index + 1 })
+                    : round.kind === "general"
+                      ? index === 0
+                        ? m.round_first()
+                        : m.round_general()
+                      : m.round_number({ round: index + 1 });
+            return [
+              `### ${round.isCurrent ? label : link(label, round.path)}${round.date == null ? "" : `, ${date(round.date)}`}`,
+              round.leaders
+                .map(
+                  (leader) =>
+                    `- ${leader.label}, ${percent(leader.share)}${leader.outcome == null ? "" : ` (${outcome(leader.outcome)})`}`,
+                )
+                .join("\n"),
+            ];
           }),
         ]),
     resultsMarkdown(contest, then),
