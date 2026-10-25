@@ -10,8 +10,8 @@ from ea.sources.gb import leh
 from ea.store import connect
 
 SOURCE = "gb.london"
-VERSION = "1"
-VOTES, INVALID = 1, 5
+VERSION = "2"
+VOTES, REGISTERED, BALLOTS, VALID, INVALID, EXHAUSTED = 1, 2, 3, 4, 5, 21
 REPORT_2004 = (
     "https://data.london.gov.uk/download/e585w/94efc8af-b7ce-4d60-9b18-e587084e207f/GLA-mayoral-election-2004.pdf"
 )
@@ -196,6 +196,12 @@ ELECTIONS: dict[int, tuple[date, str, str, str, int | None, list[Candidate]]] = 
     ),
 }
 SV_UNTIL = 2021
+COUNTED: dict[int, tuple[int, int, int]] = {
+    2000: (5089300, 1752303, 38141),
+    2004: (5197792, 1920560, 56874),
+    2008: (5435612, 2457918, 41032),
+    2024: (6162428, 2495559, 11127),
+}
 RESOLVED = {
     "The Conservative Party Candidate": "Conservative Party",
     "Conservative Party Candidate": "Conservative Party",
@@ -283,6 +289,7 @@ def emit() -> Path:
             figures = {votes for _, _, first, final in candidates for votes in (first, final) if votes is not None}
             if rejected is not None:
                 figures.add(rejected)
+            figures.update(COUNTED.get(year, ()))
             if missing := sorted(votes for votes in figures if str(votes) not in printed):
                 raise ValueError(f"{year}: {missing} not printed in {url}")
             if url not in sources:
@@ -340,17 +347,23 @@ def emit() -> Path:
             )
             cs.add("citation", entity_id=result_set, source_id=source)
             first_round = 1 if supplementary else 0
-            if rejected is not None:
+            registered, ballots, rejected = COUNTED.get(year, (None, None, rejected))
+            valid = sum(first for _, _, first, _ in candidates)
+            totals = {REGISTERED: registered, BALLOTS: ballots, VALID: valid, INVALID: rejected}
+            cells = [(measure, 0, value) for measure, value in totals.items() if value is not None]
+            if supplementary:
+                cells.append((EXHAUSTED, 2, valid - sum(final for _, _, _, final in candidates if final is not None)))
+            for measure, number, value in cells:
                 cs.add(
                     "result_value",
                     result_set_id=result_set,
                     unit_id=unit,
                     option_id=None,
                     channel=0,
-                    measure=INVALID,
-                    count_round=first_round,
+                    measure=measure,
+                    count_round=number,
                     flags=0,
-                    value=rejected,
+                    value=value,
                 )
             winner = max(candidates, key=lambda row: (row[3] or 0) if supplementary else row[2])[0]
             for full, party_code, first, final in candidates:
