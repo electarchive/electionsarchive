@@ -15,7 +15,7 @@ from ea.changeset import Changeset, slug
 from ea.store import DATA, connect
 
 SOURCE = "us.alged"
-VERSION = "4"
+VERSION = "5"
 PARSED = DATA / "parsed" / SOURCE
 URL = "https://osf.io/download/tbwzd/"
 PLACES = "https://www2.census.gov/geo/tiger/GENZ2020/shp/cb_2020_us_place_500k.zip"
@@ -27,6 +27,28 @@ TITLE = "American Local Government Elections Database"
 STATES = {"Utah": "UT", "Maryland": "MD"}
 WORDS = {"21": "Borough", "37": "Municipality", "43": "Town", "47": "Village", "53": "City and Borough"}
 DC = "1150000"
+POSTS = {
+    "0541000",
+    "1212875",
+    "1225175",
+    "1235000",
+    "1271000",
+    "12081",
+    "sd1200180",
+    "1304000",
+    "1319000",
+    "1369000",
+    "1608830",
+    "2255000",
+    "2938000",
+    "4659020",
+    "47093",
+    "4804000",
+    "4830464",
+    "4837000",
+    "sd4808940",
+    "49035",
+}
 TITLES = {
     (DC, "mayor"): "Mayor of the District of Columbia",
     (DC, "council"): "Council of the District of Columbia",
@@ -339,6 +361,7 @@ def emit() -> Path:
         elections: set[UUID] = set()
         persons: set[UUID] = set()
         districts: set[str] = set()
+        posts: set[UUID] = set()
         paths: set[str] = set()
         owned: dict[str, UUID] = dict(
             conn.execute(
@@ -477,6 +500,9 @@ def emit() -> Path:
             ):
                 label = re.sub(r"^synthetic ", "", text)
                 label = re.sub(r"^at-large [a-z]\b", "at-large", label)
+                label = re.sub(
+                    r"^(?:at-large[- ]?(\d+)|(\d+) at-large)$", lambda found: f"at-large {found[1] or found[2]}", label
+                )
                 if re.fullmatch(r"0*(\d+[a-z]?|[a-z])", label):
                     seat = f"District {label.lstrip('0').upper()}"
                 elif label:
@@ -509,6 +535,12 @@ def emit() -> Path:
             contest_key = f"alged:{contest_id}"
             contest = cs.key("us.contest", contest_key)
             magnitude = first["magnitude"]
+            post = None
+            if magnitude == 1 and first["fips"] in POSTS and seat and re.fullmatch(r"At-Large (?:Place )?\d+", seat):
+                post = cs.key("us.seat", f"{owner}:{seat}")
+                if post in cs.minted and post not in posts:
+                    cs.add("seat", id=post, body_id=owner, district_area_id=None, apportioned_area_id=whole, label=seat)
+                posts.add(post)
             cs.add(
                 "contest",
                 id=contest,
@@ -517,6 +549,7 @@ def emit() -> Path:
                 office_id=owner if kind else None,
                 body_id=None if kind else owner,
                 district_area_id=area,
+                seat_id=post,
                 magnitude=magnitude,
                 round_number=1,
                 electoral_system_id=systems["fptp" if magnitude == 1 else "block"],
