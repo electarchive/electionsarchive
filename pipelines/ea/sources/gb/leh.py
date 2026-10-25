@@ -432,6 +432,33 @@ POSTPONED_NOTE = (
     "The poll in Higham Ferrers was postponed from 1 May to 12 June 2025 after the death of a candidate, and the "
     "notice of election was published again. North Northamptonshire Council declared the result on 13 June."
 )
+DECLARED: dict[tuple[int, str], tuple[str, str, str, str | None, dict[str, int]]] = {
+    (2023, "E05005531"): (
+        "Oadby and Wigston Borough Council",
+        "Oadby Brocks Hill Ward Results - Borough Council Elections on 4 May 2023",
+        "https://www.oadby-wigston.gov.uk/news/2023/05/15/oadby_brocks_hill_ward_results_borough_council_elections_on_4_may",
+        (
+            "Oadby and Wigston Borough Council republished these figures on 15 May 2023. The Returning Officer found "
+            "that block votes had been entered as batches rather than bundles. The result declared on 5 May gave "
+            "Kaufman 342, Darr 286, Chander 231, and Alam 171. The same two candidates were elected."
+        ),
+        {},
+    ),
+    (2023, "E05007469"): (
+        "North Warwickshire Borough Council",
+        "Borough Election Results - 4 May 2023",
+        "https://www.northwarks.gov.uk/elections-voting/election-results-1/8",
+        None,
+        {"Jenns A.": 589},
+    ),
+    (2024, "E05014819"): (
+        "Bolton Council",
+        "Local election results 2024",
+        "https://www.bolton.gov.uk/news/article/1727/local-election-results-2024",
+        None,
+        {"Schofield J.": 1436},
+    ),
+}
 VOTES, REGISTERED, BALLOTS = 1, 2, 3
 SMALL_WORDS = {"And", "Of", "The", "Upon", "On", "In", "With", "By", "Cum", "Next", "At", "To", "Under"}
 COUNCIL_NAMES = {"E06000010": "Hull City Council"}
@@ -458,7 +485,7 @@ CODES = {
     (2024, "COMMUNIST FUTURE"): "Comm Fut",
     (2024, "FANT and OAKWOOD INDEPENDENTS"): "F & O Ind",
 }
-UNLISTED = {(2024, "AGS"): "Alliance For Green Socialism"}
+UNLISTED = {(2024, "AGS"): "Alliance For Green Socialism", (2024, "JUSTICE"): "Justice Party"}
 RESIDENTS_2023 = {
     "E07000209": "Residents for Guildford and Villages",
     "E07000077": "Residents for Uttlesford",
@@ -598,9 +625,7 @@ def emit() -> Path:
                     raise ValueError(f"{year}: {label} resolves to no existing party")
                 for raw_key in (slug(label),) if shared else (slug(abbreviation), slug(label)):
                     stale = own.get(raw_key)
-                    if stale is not None and stale != found and stale not in merged:
-                        if stale in party_ids.values():
-                            raise ValueError(f"{year} {abbreviation}: {stale} is both merged and in use")
+                    if stale is not None and stale != found and stale not in merged and stale not in party_ids.values():
                         merged.add(stale)
                         cs.merge(stale, found)
                 if found in merged:
@@ -633,6 +658,11 @@ def emit() -> Path:
             title="Election results for Higham Ferrers, 1 May 2025",
             url=POSTPONED_RESULTS,
         )
+        declared: dict[tuple[int, str], UUID] = {}
+        for place, (publisher, title, url, _, _) in DECLARED.items():
+            declared[place] = cs.source(publisher, title)
+            cs.add("source", id=declared[place], kind="official_body", publisher=publisher, title=title, url=url)
+
         slugs: set[str] = set()
         council_paths: dict[str, str] = {}
         council_names: dict[str, str] = {}
@@ -718,6 +748,13 @@ def emit() -> Path:
             groups = ballots.group_by("la_code", "ward_code", "ward_name", maintain_order=True)
             for (la_code, ward_code, ward_name), lines in groups:
                 lines = lines.sort("number")
+                corrected = DECLARED.get((year, ward_code), (None, None, None, None, {}))[4]
+                if missing := corrected.keys() - set(lines["name"]):
+                    raise ValueError(f"{year} {ward_code}: no candidates {sorted(missing)} to correct")
+                originals = dict(zip(lines["name"], lines["votes"], strict=True))
+                lines = lines.with_columns(
+                    votes=pl.col("name").replace_strict(corrected, default=pl.col("votes"), return_dtype=pl.Int64)
+                )
                 ward_row = ward_rows.get((la_code, ward_code))
                 code, label, is_county = council_of(la_code, ward_code, lines["county"][0])
                 council(code, label, is_county)
@@ -825,6 +862,23 @@ def emit() -> Path:
                 name(contest, f"{display} {'division' if is_county else 'ward'}, {council_names[code]}, {year}")
                 ward_slug = slug(display)
                 cs.add("slug", path=f"{path}/{poll}-local/{ward_slug}-{ward_code.lower()}", entity_id=contest)
+                if (year, ward_code) in DECLARED:
+                    publisher, _, _, note, _ = DECLARED[(year, ward_code)]
+                    if corrected:
+                        figures = [f"{text.split()[0]} {originals[text]:,}" for text in corrected]
+                        listed = (
+                            figures[0]
+                            if len(figures) == 1
+                            else " and ".join(figures)
+                            if len(figures) == 2
+                            else f"{', '.join(figures[:-1])}, and {figures[-1]}"
+                        )
+                        note = (
+                            f"The House of Commons Library workbook gives {listed}. The figures shown here are from "
+                            f"{publisher}'s declaration."
+                        )
+                    cs.add("note", entity_id=contest, kind="context", body_md=note)
+                    cs.add("citation", entity_id=contest, source_id=declared[(year, ward_code)])
                 result_set = cs.key("gb.leh.result_set", contest_key)
                 cs.add(
                     "result_set",
