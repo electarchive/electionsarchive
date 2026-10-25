@@ -22,6 +22,12 @@ SKIP_CONTEST = re.compile(
     r"(?i)^proposition\b|^city of houston\b|^harris county (?!(?:mud|m\.u\.d|municipal|utility|emergency|esd|hospital|flood|"
     r"department of education|water|improvement|fresh|conservation|drainage))"
 )
+COUNTY_OFFICE = re.compile(
+    r"(?i)\bjudge\b.*\bcourt\b|\bcounty (?:clerk|judge|tax|commissioner|treasurer|surveyor|attorney|sheriff|school)|"
+    r"\bdistrict (?:clerk|attorney)\b|\bconstable\b|\bjustice of the peace\b|\bsheriff\b|\bhcad\b|"
+    r"^(?:mayor|council ?(?:member|man)\b.*|councilman.*|trustee.*)$|^city controller|precinct chair|flood control|^harris county(?! mud)|woodlands township|\bgccisd"
+)
+ROMAN = {"I": "1", "II": "2", "III": "3", "IV": "4", "V": "5", "VI": "6", "VII": "7", "VIII": "8", "IX": "9"}
 NUMBER_WORDS = {"none": 0, "one": 1, "two": 2, "three": 3, "four": 4, "five": 5, "six": 6, "seven": 7}
 HEADING = re.compile(r"^(?P<title>\S.*?)(?:,|\s-)?\s+Vote [Ff]or\s+(?P<n>.+?)\s*$")
 PAIR = re.compile(r"(?<![\d,.])([\d,]+)\s+([\d.]+)%")
@@ -107,7 +113,8 @@ def _read(registry: Mapping[str, Mapping[str, str]]) -> Iterator[dict[str, Any]]
             )
             found = []
             for node in contests(text):
-                if SKIP_CONTEST.search(node["text"]):
+                node["text"] = normalize(node["text"])
+                if SKIP_CONTEST.search(node["text"]) or COUNTY_OFFICE.search(node["text"]):
                     continue
                 total = sum(int(choice["total"]) for choice in node["choices"])
                 if total != node["cast"]:
@@ -123,6 +130,19 @@ def _read(registry: Mapping[str, Mapping[str, str]]) -> Iterator[dict[str, Any]]
                 "primary": False,
                 "contests": found,
             }
+
+
+def normalize(text: str) -> str:
+    text = re.sub(r"\bI\.? ?S\.? ?D\.?(?=[\s,]|$)", "ISD", text, flags=re.I)
+    text = re.sub(r"\b(?:HC|H\.C\.) ?MUD\b|\bHCMUD\b", "Harris County MUD", text, flags=re.I)
+    text = re.sub(r"\bLSCS\b|\bLone Star College System\b", "Lone Star Community College District", text, flags=re.I)
+    text = re.sub(r"\bHCCSN?\b|\bHCC\b|\bHouston Comm(?:unity)? Col(?:lege)? Dist\w*(?: \d+)?", "Houston Community College District", text, flags=re.I)
+    text = re.sub(r"\bU D\b", "Utility District", text, flags=re.I)
+    text = re.sub(r"\bCity of W University\b", "City of West University", text, flags=re.I)
+    text = re.sub(r"\bAlder ?person\b", "Alderman", text, flags=re.I)
+    text = re.sub(r"\bREG WA\b", "Regional Water Authority", text, flags=re.I)
+    text = re.sub(r"\bDistrict (VIII|VII|VI|IV|IX|III|II|V|I)\b", lambda m: f"District {ROMAN[m[1].upper()]}", text, flags=re.I)
+    return text
 
 
 def parse() -> None:
