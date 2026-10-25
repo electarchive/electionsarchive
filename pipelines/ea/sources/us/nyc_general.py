@@ -920,7 +920,7 @@ def emit() -> Path:
                         "outcome",
                         result_set_id=result_set,
                         option_id=option_ids[candidate],
-                        kind="won" if rank < magnitude else "lost",
+                        kind=("advanced" if kind == "primary" else "elected") if rank < magnitude else "lost",
                     )
 
                 ballots = {}
