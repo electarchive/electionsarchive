@@ -97,6 +97,33 @@ CORRECTED = {
     "1978-04-13:sct-glasgow-garscadden": ("Donald Dewar", "Dewar, Donald", "Labour", "678", None, False),
     "1982-12-02:sct-glasgow-queen-s-park": ("Helen McElhone", "McElhone, Helen", "Labour", "977", None, False),
 }
+ALLIANCE_FROM, ALLIANCE_TO = date(1981, 6, 16), date(1988, 3, 3)
+ALLIANCE_LABELS = {"Liberal", "Social Democratic", "SDP-Liberal Alliance"}
+ALLIANCE_PARTIES = {
+    (date(1986, 5, 8), "Elizabeth Shields"): "Liberal",
+    (date(1986, 11, 13), "Rosie Cooper"): "Liberal",
+    (date(1987, 2, 26), "Rosie Barnes"): "Social Democratic",
+    (date(1987, 3, 12), "Matthew Taylor"): "Liberal",
+}
+PEOPLE = {
+    (date(1861, 7, 4), "Luke White"): ("wikidata", "Q6702449"),
+    (date(1876, 7, 26), "William Deedes"): ("wikidata", "Q11283925"),
+    (date(1889, 4, 16), "Edward Knatchbull-Hugessen"): ("wikidata", "Q5343962"),
+}
+RELABELED = {(date(2006, 6, 29), "Dai Davies"): "Blaenau Gwent People's Voice"}
+RELABELED_NOTE = (
+    "Umit's dataset lists this candidate as an Independent; the by-election's Wikipedia article gives Blaenau Gwent "
+    "People's Voice, the group Trish Law led at the 2007 Assembly election."
+)
+ALLIANCE_NOTE = (
+    "Umit's dataset labels this candidate with the SDP–Liberal Alliance; the party shown is the one of its two parties "
+    "the by-election's Wikipedia article gives."
+)
+REDATED = {
+    date(1921, 7, 8): (date(1921, 6, 8), "Walter Halls"),
+    date(1921, 6, 16): (date(1921, 7, 16), "Murray Sueter"),
+    date(1929, 9, 27): (date(1929, 11, 27), "Craigie Aitchison"),
+}
 CAUSES = {"1914-06-29:eng-brighton": "By-election held due to Gordon's resignation"}
 LIBRARY = "https://researchbriefings.files.parliament.uk/documents/SN02383/SN02383.xlsx"
 LIBRARY_TITLE = "UK parliamentary by-elections since 1945 (SN02383)"
@@ -421,8 +448,22 @@ def parse() -> None:
     )
     PARSED.mkdir(parents=True, exist_ok=True)
     pl.concat([frame, official], how="diagonal_relaxed").with_columns(
-        cause=pl.concat_str(pl.col("day").cast(pl.String), pl.lit(":"), "unit").replace_strict(
-            CAUSES, default=pl.col("cause")
+        cause=pl.concat_str(pl.col("day").cast(pl.String), pl.lit(":"), "unit")
+        .replace_strict(CAUSES, default=pl.col("cause"))
+        .str.replace(r"^By-election held due to to ", "By-election held due to ")
+        .str.replace_all(r"\ba a\b", "a")
+        .str.replace_all(r"\belevation the peerage", "elevation to the peerage")
+        .str.replace_all(r"\bdelared\b", "declared")
+        .str.replace_all(r"\bhas falsified\b", "had falsified")
+        .str.replace(
+            r"^By-election held due to the an election court found ",
+            "By-election held because an election court found ",
+        )
+        .str.replace_all(r"\bMcGuiness\b", "McGuinness")
+        .str.replace(
+            r"^By-election held due to ((?:the )?(?:MP|result|earlier by-election|\d{4} (?:general )?election"
+            r"(?: result| winner)?|election(?: result)?)|[A-Z][\w'-]+(?:'s election)?) (?:was|is) ",
+            "By-election held because $1 was ",
         )
     ).sort("day", "unit", pl.col("votes"), descending=[False, False, True], nulls_last=True).write_parquet(
         PARSED / "results.parquet"
@@ -527,20 +568,47 @@ def emit() -> Path:
         }
         parties: dict[str, UUID] = {}
         persons: dict[str, UUID] = {}
+        alliances: set[UUID] = set()
+        found: set[tuple[date, str]] = set()
+        articles = cs.source("Wikipedia", "UK by-election and SDP–Liberal Alliance articles")
+        cs.add(
+            "source",
+            id=articles,
+            kind="community",
+            publisher="Wikipedia",
+            title="UK by-election and SDP–Liberal Alliance articles",
+            url="https://en.wikipedia.org/wiki/SDP%E2%80%93Liberal_Alliance",
+            license="CC BY-SA 4.0",
+            license_url="https://creativecommons.org/licenses/by-sa/4.0/",
+            notes="The Alliance of the Liberal Party and the Social Democratic Party, June 1981 to March 1988, and the "
+            "party of the Alliance candidates at the Ryedale, Knowsley North, Greenwich, and Truro by-elections of "
+            "1986 and 1987.",
+        )
 
-        titles: dict[UUID, list[tuple[UUID, str]]] = {}
-        for id, entity, text in conn.execute(
-            """select n.id, n.entity_id, n.text from name n join changeset c on c.id = n.changeset_id and c.pipeline = %s
-               join election e on e.id = n.entity_id where n.is_preferred and n.lang = 'en'""",
+        titles: dict[UUID, list[tuple[UUID, str, bool]]] = {}
+        for id, entity, text, preferred in conn.execute(
+            """select n.id, n.entity_id, n.text, n.is_preferred from name n
+               join changeset c on c.id = n.changeset_id and c.pipeline = %s
+               join election e on e.id = n.entity_id where n.lang = 'en'""",
             [SOURCE],
         ).fetchall():
-            titles.setdefault(entity, []).append((id, text))
+            titles.setdefault(entity, []).append((id, text, preferred))
 
         def name(entity: UUID, text: str) -> None:
             cs.add("name", entity_id=entity, text=text, lang="en", kind="official", is_preferred=True)
-            for id, old in titles.get(entity, []):
-                if old != text:
+            for id, old, preferred in titles.get(entity, []):
+                if old == text:
+                    continue
+                if preferred:
                     cs.add("name", id=id, entity_id=entity, text=old, lang="en", kind="official", is_preferred=False)
+                elif re.search(r", \d{1,2} [A-Z][a-z]+ \d{4}$", old):
+                    cs.add(
+                        "name_drop",
+                        name_id=id,
+                        entity_id=entity,
+                        text=old,
+                        reason="By-election titles now give the date in American order.",
+                    )
 
         def party_of(label: str, year: int, country: str | None) -> UUID | None:
             if label in umit.NOT_PARTIES:
@@ -570,16 +638,17 @@ def emit() -> Path:
                     name(parties[key], umit.NAMES.get(key, label))
             return parties[key]
 
-        for (day,), on_day in frame.group_by("day", maintain_order=True):
-            election = cs.key(f"{SOURCE}.election", str(day))
-            spoken = f"{day.day} {day:%B %Y}"
+        for (dated,), on_day in frame.group_by("day", maintain_order=True):
+            election = cs.key(f"{SOURCE}.election", str(dated))
+            day, starter = REDATED.get(dated, (dated, None))
+            spoken = f"{day:%B} {day.day}, {day.year}"
             cs.add(
                 "election",
                 id=election,
                 polity_id=gb,
                 kind="by_election",
                 date_from=day,
-                date_to=on_day["day_to"].max(),
+                date_to=day if starter else on_day["day_to"].max(),
                 status="held",
             )
             name(election, f"By-elections, {spoken}")
@@ -589,7 +658,7 @@ def emit() -> Path:
             for (country,), in_nation in on_day.group_by("country", maintain_order=True):
                 if country not in NATIONS or (country == "NIR" and day < NIR_FROM):
                     continue
-                child = children[country] = cs.key(f"{SOURCE}.election", f"{day}:{country}")
+                child = children[country] = cs.key(f"{SOURCE}.election", f"{dated}:{country}")
                 cs.add(
                     "election",
                     id=child,
@@ -597,7 +666,7 @@ def emit() -> Path:
                     parent_id=election,
                     kind="by_election",
                     date_from=day,
-                    date_to=in_nation["day_to"].max(),
+                    date_to=day if starter else in_nation["day_to"].max(),
                     status="held",
                 )
                 seats = in_nation["constituency"].unique(maintain_order=True).to_list()
@@ -616,7 +685,7 @@ def emit() -> Path:
                     raise ValueError(f"no general election contest {first['general']}")
                 (district,) = conn.execute("select district_area_id from contest where id = %s", [general]).fetchone()
                 tacit = first["status"] in ("tacit", "unopposed")
-                contest_key = f"{day}:{unit_code}"
+                contest_key = f"{dated}:{unit_code}"
                 contest = cs.key(f"{SOURCE}.contest", contest_key)
                 cs.add(
                     "contest",
@@ -634,6 +703,16 @@ def emit() -> Path:
                 cs.add("slug", path=f"{path}/{slug(first['constituency'])}", entity_id=contest)
                 if first["cause"]:
                     cs.add("note", entity_id=contest, kind="context", body_md=first["cause"])
+                if starter:
+                    cs.add(
+                        "note",
+                        entity_id=contest,
+                        kind="context",
+                        body_md=f"Umit's dataset dates this by-election {dated:%B} {dated.day}, {dated.year}; Historic "
+                        f"Hansard gives {starter}'s service as beginning on {day:%B} {day.day}, {day.year}, the polling "
+                        "day used here.",
+                    )
+                    cs.add("citation", entity_id=contest, source_id=sources["hansard"])
                 result_set = cs.key(f"{SOURCE}.result_set", contest_key)
                 cs.add(
                     "result_set",
@@ -682,19 +761,56 @@ def emit() -> Path:
                         if persons[identity] in cs.minted:
                             cs.add("person", id=persons[identity], gender=line["gender"])
                             name(persons[identity], line["candidate"])
-                    party = party_of(line["party"], day.year, line["country"])
+                    own = ALLIANCE_PARTIES.get((day, line["candidate"]))
+                    relabel = RELABELED.get((day, line["candidate"]))
+                    party = party_of(own or relabel or line["party"], day.year, line["country"])
+                    joint = None
+                    if (
+                        ALLIANCE_FROM <= day < ALLIANCE_TO
+                        and line["party"] in ALLIANCE_LABELS
+                        and line["country"] != "NIR"
+                    ):
+                        joint = cs.key(f"{SOURCE}.alliance", f"{day}:{line['country']}:sdp-liberal")
+                        if joint not in alliances:
+                            alliances.add(joint)
+                            cs.add("alliance", id=joint, kind="electoral_alliance", election_id=held)
+                            cs.add(
+                                "name",
+                                entity_id=joint,
+                                text="SDP–Liberal Alliance",
+                                lang="en",
+                                kind="official",
+                                is_preferred=True,
+                            )
+                            for member in ("Liberal", "Social Democratic"):
+                                cs.add(
+                                    "alliance_member",
+                                    alliance_id=joint,
+                                    party_id=party_of(member, day.year, line["country"]),
+                                    role=None,
+                                )
+                            cs.add("citation", entity_id=joint, source_id=articles)
                     cs.add(
                         "contest_option",
                         id=option,
                         contest_id=contest,
                         kind="candidate",
                         party_id=party,
+                        alliance_id=joint,
                         ballot_label=line["candidate"],
                     )
+                    if own or relabel:
+                        found.add((day, line["candidate"]))
+                        cs.add(
+                            "note", entity_id=option, kind="context", body_md=ALLIANCE_NOTE if own else RELABELED_NOTE
+                        )
+                        cs.add("citation", entity_id=option, source_id=articles)
                     cs.add(
                         "candidacy",
                         id=cs.key(f"{SOURCE}.candidacy", option_key),
-                        person_id=persons[identity],
+                        person_id=cs.key(*PEOPLE[(day, line["candidate"])])
+                        if (day, line["candidate"]) in PEOPLE
+                        else persons[identity],
                         option_id=option,
                         role="head",
                         ballot_name=line["candidate"],
@@ -726,7 +842,8 @@ def emit() -> Path:
         )
         corrected = [cs.key(f"{SOURCE}.result_set", key) for key in CORRECTED]
         cs.manifest["scope"] = {"polity": "GB", "clears": [str(id) for id in corrected]}
-        if any(row["result_set_id"] in corrected for row in cs.rows["result_value"]):
+        winners_only = {*corrected, *(row["id"] for row in cs.rows["result_set"] if row["completeness"] == 0)}
+        if any(row["result_set_id"] in winners_only for row in cs.rows["result_value"]):
             raise ValueError("a winners-only by-election set carries vote values")
         kept = {row["id"] for row in cs.rows["contest_option"]}
         noted = {(row["entity_id"], row["body_md"]) for row in cs.rows["note"]}
@@ -771,5 +888,38 @@ def emit() -> Path:
                         body_md=text,
                         reason="The caveat described Umit's rows, which the winners-only set replaces.",
                     )
+        stale = 0
+        for note, entity, text in conn.execute(
+            """select n.id, n.entity_id, n.body_md from note n join changeset c on c.id = n.changeset_id
+               where n.entity_id = any(%s) and n.kind = 'context' and c.pipeline = %s""",
+            [[row["id"] for row in cs.rows["contest"]], SOURCE],
+        ).fetchall():
+            if (entity, text) not in noted:
+                stale += 1
+                cs.add(
+                    "note_drop",
+                    note_id=note,
+                    entity_id=entity,
+                    body_md=text,
+                    reason="The cause is reworded or corrected in this emit.",
+                )
+        groups = conn.execute(umit.NON_PARTY, [SOURCE]).fetchall()
+        for group, _ in groups:
+            cs.add("party", id=group, kind="independent_group", polity_id=gb)
+        print(f"{len(groups)} non-party labels marked independent_group: {', '.join(text for _, text in groups)}")
+        for (stray,) in conn.execute(
+            """select x.entity_id from external_id x join entity e on e.id = x.entity_id and e.retired_by is null
+               where x.scheme = 'gb.party' and x.value = 'social-democratic'
+                 and not exists (select from contest_option o where o.party_id = x.entity_id)"""
+        ).fetchall():
+            cs.add(
+                "entity_retirement",
+                entity_id=stray,
+                reason="The SDP's 1981 and 1982 by-election candidates now carry the Social Democratic Party of "
+                "1981; this copy of it has no candidates left.",
+            )
+        if {*ALLIANCE_PARTIES, *RELABELED} - found:
+            raise ValueError(f"not in the by-elections: {({*ALLIANCE_PARTIES, *RELABELED}) - found}")
+        print(f"{stale} stale cause notes dropped, {len(alliances)} Alliance tickets")
         print(f"{len(corrected)} winners-only sets cleared of facts, {dropped} copied candidacies or options dropped")
         return cs.write()

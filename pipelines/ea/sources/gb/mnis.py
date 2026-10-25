@@ -108,7 +108,14 @@ def emit() -> Path:
                where n.is_preferred and n.valid_from is null and n.valid_to is null"""
         ).fetchall():
             preferred.setdefault(entity, []).append((id, text, kind, pipeline, lang))
-        renamed = curated = unnamed = memberships = 0
+        held: dict[tuple[UUID, UUID], list[tuple[date | None, date | None]]] = {}
+        for person, party, since, until in conn.execute(
+            """select m.person_id, m.party_id, m.valid_from, m.valid_to from person_party_membership m
+               join changeset c on c.id = m.changeset_id where c.pipeline <> %s""",
+            [SOURCE],
+        ).fetchall():
+            held.setdefault((person, party), []).append((since, until))
+        renamed = curated = unnamed = memberships = overlapped = 0
         skipped: Counter[str] = Counter()
         samples: list[str] = []
         for person, number in members():
@@ -139,6 +146,12 @@ def emit() -> Path:
                 party = cs.key(*key)
                 if party in cs.minted:
                     raise ValueError(f"no party {key}")
+                if any(
+                    (start is None or until is None or start < until) and (end is None or since < end)
+                    for start, end in held.get((person, party), [])
+                ):
+                    overlapped += 1
+                    continue
                 cs.add(
                     "person_party_membership",
                     person_id=person,
