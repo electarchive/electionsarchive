@@ -910,12 +910,15 @@ def _rollup(
         *[
             key
             for (key,) in conn.execute(
-                """select result_set_k from result_rollup
-               where area_k in (select k from area where id = any(%s::uuid[]))
+                """select result_set_k from result_rollup_sum
+               where area_k in (select k from area where id = any(%(moved)s::uuid[]))
+               union
+               select result_set_k from result_rollup_unit
+               where area_k in (select k from area where id = any(%(moved)s::uuid[]))
                union
                select v.result_set_k from result_value v join reporting_unit u on u.k = v.unit_k
-               where u.id = any(%s::uuid[])""",
-                [moved, repointed],
+               where u.id = any(%(repointed)s::uuid[])""",
+                {"moved": moved, "repointed": repointed},
             ).fetchall()
         ],
         *(

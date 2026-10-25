@@ -1152,6 +1152,7 @@ export const resultRollupSum = pgTable("result_rollup_sum", {
 	complete: boolean().notNull(),
 	value: numeric().notNull(),
 }, (table) => [
+	index("result_rollup_sum_area_k_idx").using("btree", table.areaK.asc().nullsLast(), table.resultSetK.asc().nullsLast()),
 	primaryKey({ columns: [table.resultSetK, table.areaK, table.optionK, table.channel, table.measure, table.countRound], name: "result_rollup_sum_pkey"}),
 ]);
 
@@ -1160,6 +1161,7 @@ export const resultRollupUnit = pgTable("result_rollup_unit", {
 	areaK: integer("area_k").notNull(),
 	unitK: integer("unit_k").notNull(),
 }, (table) => [
+	index("result_rollup_unit_area_k_idx").using("btree", table.areaK.asc().nullsLast(), table.resultSetK.asc().nullsLast()),
 	primaryKey({ columns: [table.resultSetK, table.areaK], name: "result_rollup_unit_pkey"}),
 ]);
 
