@@ -749,7 +749,7 @@ def emit() -> Path:
         memberships: list[tuple[str, str, date, date, str]] = []
         values: list[pl.DataFrame] = []
         report: dict[str, int] = {}
-        for contest, election, day, statefips, stage, kind, district, district_scheme, first in contests:
+        for contest, election, day, statefips, stage, kind, district_area, district_scheme, first in contests:
             state = fips.get(statefips)
             lines = groups.get((day, state))
             if contest in filled or lines is None or state is None or first is None:
@@ -867,11 +867,11 @@ def emit() -> Path:
                     unit
                     for (unit,) in conn.execute(
                         "select unit_id::text from reporting_unit_area where area_id = %s and valid_from <= %s and valid_to > %s",
-                        [district, day, day],
+                        [district_area, day, day],
                     ).fetchall()
                 }
                 memberships.extend(
-                    (str(units[code]), str(district), day, day + timedelta(days=1), "contest")
+                    (str(units[code]), str(district_area), day, day + timedelta(days=1), "contest")
                     for code in mine
                     if str(units[code]) not in held
                 )
