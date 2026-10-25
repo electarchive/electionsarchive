@@ -646,6 +646,33 @@ async function children(
       where a.id not in (select id from anc)
     `);
   }
+  const linked = await db.execute<{ yes: boolean }>(sql`
+    select exists (select from reporting_unit_area m where m.area_id = ${area.id}::uuid) as yes
+  `);
+  const joined = linked.rows[0]?.yes
+    ? await db.execute<{ id: string; k: number; scheme: string }>(sql`
+      with r as materialized (
+        select distinct u.area_k from unnest(${sql.param(ks)}::int[]) as s(k)
+        join result_rollup_unit u on u.result_set_k = s.k
+      )
+      select a.id, a.k, a.scheme_code as scheme
+      from r join area a on a.k = r.area_k
+      where (select count(*) from r) <= 25000
+        and a.id <> ${area.id}::uuid
+        and a.scheme_code <> all(${sql.param([...new Set(found.rows.map((row) => row.scheme))])}::text[])
+        and exists (
+          select from reporting_unit ru
+          cross join lateral (
+            select from reporting_unit_area m
+            where m.unit_id = ru.id and m.area_id = ${area.id}::uuid and m.valid @> ${date}::date
+            limit 1
+          ) m
+          where ru.area_id = a.id
+        )
+    `)
+    : { rows: [] };
+  const members = new Set(joined.rows.map((row) => row.id));
+  found.rows.push(...joined.rows);
   if (found.rows.length === 0) {
     return [];
   }
@@ -682,7 +709,9 @@ async function children(
   return found.rows
     .toSorted(
       (a, b) =>
-        Number(deeper.has(a.id)) - Number(deeper.has(b.id)) || a.k - b.k,
+        Number(deeper.has(a.id)) - Number(deeper.has(b.id)) ||
+        Number(members.has(a.id)) - Number(members.has(b.id)) ||
+        a.k - b.k,
     )
     .map((row) => {
       const name = labels.full.get(row.id) ?? "";
@@ -696,6 +725,7 @@ async function children(
         noun: scheme.get(row.scheme)?.noun ?? "",
         kind: scheme.get(row.scheme)?.kind ?? "",
         rank: scheme.get(row.scheme)?.rank ?? 0,
+        isMember: members.has(row.id),
       };
     })
     .toSorted((a, b) =>
@@ -2199,8 +2229,12 @@ async function places(
     where c.allocation_parent_id = ${contest.id}::uuid
   `);
   const childPath = new Map(allocated.rows.map((row) => [row.area, row.path]));
+  const joined = new Set(
+    kids.filter((kid) => kid.isMember).map((kid) => kid.scheme),
+  );
   const levels = eligible.toSorted(
     (a, b) =>
+      Number(joined.has(a.code)) - Number(joined.has(b.code)) ||
       a.rank - b.rank ||
       Number(
         kids.some((kid) => kid.scheme === b.code && childPath.has(kid.id)),
