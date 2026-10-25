@@ -27,7 +27,7 @@ DAYS = {
 }
 RESULTS = "https://candidates.democracyclub.org.uk/media/csv-archives/results-{day}.csv"
 ARCHIVED = {2018, 2019, 2023}
-SAMPLED = {2018, 2019}
+SAMPLED = {2018, 2019, 2026}
 API = "https://candidates.democracyclub.org.uk/api/next/results/?election_date={day}"
 BALLOTS = (
     "https://elections.democracyclub.org.uk/api/elections/?poll_open_date={day}"
@@ -207,7 +207,8 @@ def result_pages(year: int) -> list[str]:
 
 def result_lines(year: int) -> pl.DataFrame:
     if year in ARCHIVED:
-        return pl.read_csv(raw.cached(SOURCE, RESULTS.format(day=DAYS[year])).path, infer_schema_length=0)
+        frame = pl.read_csv(raw.cached(SOURCE, RESULTS.format(day=DAYS[year])).path, infer_schema_length=0)
+        return frame.rename({"elected": "is_winner"}) if "is_winner" not in frame.columns else frame
     rows = []
     for url in result_pages(year):
         for record in json.loads(raw.cached(SOURCE, url).path.read_text())["results"]:
