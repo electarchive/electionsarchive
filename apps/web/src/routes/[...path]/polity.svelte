@@ -771,8 +771,9 @@
               class="font-figures text-[0.9375rem] tracking-[-0.02em] tabular-nums"
               >{year ?? ""}</span
             >
+            {const isOpenYear = $derived(opened.has(`year:${year}`))}
             <ul class="grid gap-1 text-sm">
-              {#each entries as election, index (index)}
+              {#each isOpenYear || entries.length <= 6 ? entries : entries.slice(0, 5) as election, index (index)}
                 {const dated = $derived(
                   election.name.replace(
                     new RegExp(`^(?:\\p{L}+ (?:\\d{1,2}, )?)?${year} `, "u"),
@@ -824,6 +825,27 @@
                   >
                 </li>
               {/each}
+              {#if entries.length > 6}
+                <li>
+                  <button
+                    type="button"
+                    class="text-[0.8125rem] font-semibold underline decoration-border underline-offset-4 hover:decoration-foreground pointer-coarse:py-2"
+                    aria-expanded={isOpenYear}
+                    onclick={() => {
+                      if (isOpenYear) {
+                        opened.delete(`year:${year}`);
+                      } else {
+                        opened.add(`year:${year}`);
+                      }
+                    }}
+                    >{isOpenYear
+                      ? m.regions_fewer()
+                      : m.regions_more({
+                          count: count(entries.length),
+                        })}</button
+                  >
+                </li>
+              {/if}
             </ul>
           </li>
         {/each}
