@@ -15,6 +15,7 @@ from ea.raw import Artifact
 from ea.store import DATA, Connection
 
 NAMESPACE = uuid5(NAMESPACE_URL, "https://electionsarchive.com/")
+CHUNK = 200_000
 LATE = ("name", "slug", "external_id", "note", "citation", "entity_merge", "entity_retirement")
 UUID_TEXT = re.compile(r"[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}")
 TRANSLITERATION = str.maketrans(
@@ -68,6 +69,7 @@ class Changeset:
         }
         self.rows: dict[str, list[dict[str, object]]] = {}
         self.frames: dict[str, list[pl.DataFrame]] = {}
+        self.chunks: dict[str, list[pl.DataFrame]] = {}
         self.minted: set[UUID] = set()
         self.artifacts: set[UUID] = set()
         self._known: dict[str, dict[str, UUID]] = {}
@@ -86,8 +88,32 @@ class Changeset:
         )
 
     def add(self, table: str, **row: object) -> None:
-        self.rows.setdefault(table, []).append(row)
+        rows = self.rows.setdefault(table, [])
+        rows.append(row)
         self.frames.setdefault(table, [])
+        if table in FACTS and len(rows) >= CHUNK:
+            self._chunk(table)
+
+    def _chunk(self, table: str) -> None:
+        self.chunks.setdefault(table, []).append(
+            pl.DataFrame(
+                [
+                    {
+                        column: str(value)
+                        if isinstance(value, UUID)
+                        else value.isoformat()
+                        if isinstance(value, datetime)
+                        else json.dumps(value)
+                        if isinstance(value, dict | list)
+                        else value
+                        for column, value in row.items()
+                    }
+                    for row in self.rows[table]
+                ],
+                infer_schema_length=None,
+            )
+        )
+        self.rows[table].clear()
 
     def frame(self, table: str, frame: pl.DataFrame) -> None:
         self.rows.setdefault(table, [])
@@ -294,7 +320,11 @@ class Changeset:
             return
         staged = {
             table: {str(row["result_set_id"]) for row in self.rows.get(table, [])}
-            | {str(id) for frame in self.frames.get(table, []) for id in frame["result_set_id"].to_list()}
+            | {
+                str(id)
+                for frame in [*self.chunks.get(table, []), *self.frames.get(table, [])]
+                for id in frame["result_set_id"].to_list()
+            }
             for table in ("result_value", "outcome")
         }
         copied: dict[tuple[UUID, UUID, UUID | None, int, int, int, int], int] = defaultdict(int)
@@ -344,37 +374,20 @@ class Changeset:
         folder.mkdir(parents=True)
         tables: dict[str, pl.DataFrame] = {}
         for table, rows in self.rows.items():
-            frames = list(self.frames[table])
             if rows:
-                frames.insert(
-                    0,
-                    pl.DataFrame(
-                        [
-                            {
-                                column: str(value)
-                                if isinstance(value, UUID)
-                                else value.isoformat()
-                                if isinstance(value, datetime)
-                                else json.dumps(value)
-                                if isinstance(value, dict | list)
-                                else value
-                                for column, value in row.items()
-                            }
-                            for row in rows
-                        ],
-                        infer_schema_length=None,
-                    ),
-                )
-            tables[table] = pl.concat(frames, how="diagonal_relaxed")
+                self._chunk(table)
+            tables[table] = pl.concat([*self.chunks.pop(table, []), *self.frames[table]], how="diagonal_relaxed")
         if "result_set" in tables and "result_value" in tables:
             sets, values = tables["result_set"], tables["result_value"]
             counted = sets.filter(pl.col("kind") == "counted")["id"].cast(pl.String)
             zeroed = (
-                values.with_columns(pl.col("result_set_id", "option_id").cast(pl.String))
+                values.lazy()
+                .select(pl.col("result_set_id", "option_id").cast(pl.String), "value")
                 .filter(pl.col("result_set_id").is_in(counted.implode()))
                 .group_by("result_set_id")
                 .agg(pl.col("value").abs().max().alias("most"), pl.col("option_id").unique().alias("options"))
                 .filter(pl.col("most") == 0)
+                .collect()
             )
             kinds: dict[str, str] = (
                 dict(tables["contest_option"].select(pl.col("id", "kind").cast(pl.String)).iter_rows())
@@ -417,7 +430,8 @@ class Changeset:
                     .then(0)
                     .otherwise(pl.col("completeness") if "completeness" in sets.columns else None),
                 )
-                tables["result_value"] = values.filter(~pl.col("result_set_id").cast(pl.String).is_in(tacit))
+                if tacit:
+                    tables["result_value"] = values.filter(~pl.col("result_set_id").cast(pl.String).is_in(tacit))
         for table, frame in tables.items():
             frame.write_parquet(folder / f"{table}.parquet")
         edges = self.conn.execute(
