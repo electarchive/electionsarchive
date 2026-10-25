@@ -98,6 +98,8 @@ def wide(rows: list[list[Any]]) -> Iterator[dict[str, Any]]:
                     if remainder == 0 and full > 0:
                         ratios.append(full)
         vote_for = max(ratios) if ratios.count(max(ratios, default=0)) >= 2 else 0
+        if vote_for == 0 and re.search(r"\(\d{1,2}-\d{1,2}-\d{2}\)", title):
+            vote_for = 1
         if not any(sum(entry) for entry in votes):
             continue
         choices = []
