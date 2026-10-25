@@ -1634,6 +1634,11 @@ def emit(
                 if question:
                     answer = "yes" if re.match(r"(?i)\s*(?:yes|for|si|bonds? yes)\b", choice) else "no"
                     option = options[same] = cs.key("us.option", f"{contest_key}:{answer}")
+                    if any(held == option for _, held, _ in ranked):
+                        ranked = [
+                            (total + votes if held == option else total, held, label) for total, held, label in ranked
+                        ]
+                        continue
                     cs.add(
                         "contest_option",
                         id=option,
@@ -1765,7 +1770,10 @@ def emit(
                 values,
                 schema={"result_set_id": pl.String, "unit_id": pl.String, "option_id": pl.String, "value": pl.Int64},
                 orient="row",
-            ).with_columns(
+            )
+            .group_by("result_set_id", "unit_id", "option_id", maintain_order=True)
+            .agg(pl.col("value").sum())
+            .with_columns(
                 channel=pl.lit(0, pl.Int16),
                 measure=pl.lit(1, pl.Int16),
                 count_round=pl.lit(0, pl.Int16),
