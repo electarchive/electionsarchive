@@ -480,7 +480,11 @@ def emit() -> Path:
             .iter_rows()
         ):
             parties[party_id] = cs.key(f"{SOURCE}.party", party_id)
-            cs.add("party", id=parties[party_id], kind="party", polity_id=gb)
+            descriptor = label.startswith("Independent ") and label not in (
+                "Independent Labour Party",
+                "Independent Irish",
+            )
+            cs.add("party", id=parties[party_id], kind="independent_group" if descriptor else "party", polity_id=gb)
             name(parties[party_id], label)
         persons: dict[str, UUID] = {}
         for qid, person, full, birth, precision in candidates.select(
