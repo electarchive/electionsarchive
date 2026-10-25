@@ -808,14 +808,16 @@ def parse() -> None:
                     else:
                         incorporated.append((code, json.dumps(shape.__geo_interface__), state, json.dumps(option)))
         for code, within, option in conn.execute(
-            """select f.code, array(select c.code from area a join area_code c on c.area_id = a.id
-                     join area_geometry g on g.area_id = a.id
-                     where a.scheme_code = 'us.county' and left(c.code, 2) = left(f.code, 2) and g.geom && s.geom
-                       and st_area(st_intersection(g.geom, s.geom)) > 0.01 * st_area(s.geom)
-                     order by st_area(st_intersection(g.geom, s.geom)) desc), f.option
+            """with county as materialized (select c.code, g.geom from area a join area_code c on c.area_id = a.id
+                 join area_geometry g on g.area_id = a.id
+                 where a.scheme_code = 'us.county' and g.valid && daterange('2016-01-01', null))
+               select f.code, array(select x.code from (select county.code,
+                     st_area(st_intersection(county.geom, s.geom)) as shared
+                   from county where left(county.code, 2) = left(f.code, 2) and county.geom && s.geom) x
+                 where x.shared > 0.01 * s.area order by x.shared desc), f.option
                from unnest(%s::text[], %s::text[], %s::text[]) as f(code, geojson, option)
-               cross join lateral (select st_makevalid(st_transform(st_setsrid(st_geomfromgeojson(f.geojson), 4269), 4326))
-                 as geom) s""",
+               cross join lateral (select geom, st_area(geom) as area
+                 from st_makevalid(st_transform(st_setsrid(st_geomfromgeojson(f.geojson), 4269), 4326)) as geom) s""",
             [
                 [code for code, _, _, _ in incorporated],
                 [geojson for _, geojson, _, _ in incorporated],
