@@ -43,6 +43,7 @@
           .toArray()
           .toSorted((a, b) => b.hits - a.hits || b.last - a.last)
           .slice(0, 2)
+          .toSorted((a, b) => a.key.localeCompare(b.key))
           .map((top) => {
             const party =
               top.entry?.party == null ? null : parties.get(top.entry.party);
