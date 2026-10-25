@@ -15473,17 +15473,19 @@ export const search = {
         left join lateral (
             select held.id, held.rank from (
               select coalesce(c.office_id, c.body_id) as id, el.date_from as at,
-                case when f.kind = 'mayor' then 0 when fp.kind in ('sovereign_state', 'supranational') then 3 when f.id is not null then 2
-                  when b.kind = 'upper_house' then 1 else 0 end as rank
+                case when f.kind = 'mayor' then 0 when f.kind = 'other' then 2 when fp.kind in ('sovereign_state', 'supranational') then 3
+                  when f.id is not null then 2 when b.kind = 'upper_house' then 1 else 0 end as rank
               from candidacy cy
               join outcome oc on oc.option_id = cy.option_id and oc.kind in ('elected', 'won')
+                and (oc.kind = 'elected' or not exists (select from outcome w where w.result_set_id = oc.result_set_id and w.seats > oc.seats))
               join contest_option o on o.id = cy.option_id
               join contest c on c.id = o.contest_id and c.party_scope_id is null
               join election el on el.id = c.election_id and el.kind <> 'primary'
               left join office f on f.id = c.office_id left join polity fp on fp.id = f.polity_id
               left join body b on b.id = c.body_id left join polity bp on bp.id = b.polity_id
               where cy.person_id = top.entity_id and cy.role = 'head' and (
-                f.kind in ('head_of_state', 'head_of_government', 'governor', 'mayor') and el.polity_id = f.polity_id
+                (f.kind in ('head_of_state', 'head_of_government', 'governor', 'mayor')
+                  or f.kind = 'other' and fp.kind in ('sovereign_state', 'supranational')) and el.polity_id = f.polity_id
                 or f.id is null and b.kind in ('upper_house', 'lower_house', 'unicameral') and bp.kind = 'sovereign_state')
               union all
               select t.office_id, t.from_date, case when fp.kind in ('sovereign_state', 'supranational') then 3 else 2 end
