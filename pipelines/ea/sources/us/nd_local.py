@@ -233,15 +233,11 @@ def emit() -> Path:
             cs.artifact(raw.cached(SOURCE, EXPORT + eid), source)
         census = cs.source("U.S. Census Bureau", "Cartographic Boundary Files, 1:500,000")
         cs.artifact(raw.cached(SOURCE, PLACES), census)
-        us = cs.polity("US")
         state = cs.polity("US-ND")
         systems = {key: cs.key("us.electoral_system", key) for key in ("fptp", "block", "referendum")}
         parties = {code: cs.key("us.party", key) for code, key in PARTIES.items()}
         if cs.minted & {*systems.values(), *parties.values()}:
             raise ValueError("the electoral systems and parties must already exist")
-        cs.add(
-            "scheme", code="us.special_district", polity_id=us, kind="administrative", rank=3, noun="special district"
-        )
 
         polities: dict[str, tuple[UUID, str, str, str, str]] = {}
 
