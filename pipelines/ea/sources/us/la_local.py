@@ -124,9 +124,7 @@ def fetch() -> None:
         if listed is None:
             continue
         files["ParishesInElection.htm"] = listed
-        parishes = [
-            entry["ParishValue"] for entry in many(json.loads(listed)["ParishesInElection"]["Parish"])
-        ]
+        parishes = [entry["ParishValue"] for entry in many(json.loads(listed)["ParishesInElection"]["Parish"])]
         names = [f"RacesCandidates/ByParish_{parish}.htm" for parish in parishes] + [
             f"VotesParish/Votes_{parish}.htm" for parish in parishes
         ]
@@ -138,7 +136,9 @@ def fetch() -> None:
                 f"VotesRaceByPrecinct/Votes_{race['ID']}_{parish}.htm"
                 for parish in parishes
                 if f"RacesCandidates/ByParish_{parish}.htm" in files
-                for race in many((json.loads(files[f"RacesCandidates/ByParish_{parish}.htm"]).get("Races") or {}).get("Race"))
+                for race in many(
+                    (json.loads(files[f"RacesCandidates/ByParish_{parish}.htm"]).get("Races") or {}).get("Race")
+                )
                 if race["IsMultiParish"] != "1"
             ]
             for name, content in zip(precincts, pool.map(lambda name: get(base + name), precincts), strict=True):
@@ -158,13 +158,35 @@ def fetch() -> None:
         )
         print(f"{day}: {len(files)} files", flush=True)
 
+    for day, official in days():
+        if day.year < FIRST_YEAR or not official or day >= date.today():
+            continue
+        for extra in ("RacesCandidates_Multiparish.htm", "Votes_Multiparish.htm"):
+            try:
+                raw.cached(SOURCE, bundle(day) + extra)
+                continue
+            except LookupError:
+                pass
+            content = get(bundle(day) + extra)
+            if content is not None:
+                raw.store(
+                    SOURCE,
+                    bundle(day) + extra,
+                    content,
+                    suffix=".json",
+                    retrieved_at=datetime.now(UTC),
+                    media_type="application/json",
+                )
+
 
 def parse() -> None:
     with connect() as conn:
         records = []
         with zipfile.ZipFile(raw.cached(SOURCE, PLACES).path) as archive:
             parts = {name.rsplit(".", 1)[1].lower(): archive.read(name) for name in archive.namelist()}
-        reader = shapefile.Reader(shp=io.BytesIO(parts["shp"]), shx=io.BytesIO(parts["shx"]), dbf=io.BytesIO(parts["dbf"]))
+        reader = shapefile.Reader(
+            shp=io.BytesIO(parts["shp"]), shx=io.BytesIO(parts["shx"]), dbf=io.BytesIO(parts["dbf"])
+        )
         for record, shape in zip(reader.records(), reader.shapes(), strict=True):
             if record is None or shape is None or record["LSAD"] not in KINDS:
                 continue
@@ -185,7 +207,10 @@ def parse() -> None:
             schema=["code", "name", "kind", "geom", "point"],
             orient="row",
         )
-    towns = {re.sub(r"[^A-Z]", "", name.upper().replace("SAINT", "ST")): code for code, name in places.select("code", "name").iter_rows()}
+    towns = {
+        re.sub(r"[^A-Z]", "", name.upper().replace("SAINT", "ST")): code
+        for code, name in places.select("code", "name").iter_rows()
+    }
     contests: dict[str, dict[str, Any]] = {}
     options: dict[tuple[str, str], dict[str, Any]] = {}
     results: list[dict[str, Any]] = []
@@ -199,26 +224,66 @@ def parse() -> None:
             continue
         with zipfile.ZipFile(artifact.path) as archive:
             names = set(archive.namelist())
-            for parish_entry in many(json.loads(archive.read("ParishesInElection.htm"))["ParishesInElection"]["Parish"]):
+            batches = []
+            for parish_entry in many(
+                json.loads(archive.read("ParishesInElection.htm"))["ParishesInElection"]["Parish"]
+            ):
                 number = parish_entry["ParishValue"]
-                fips = f"22{int(number) * 2 - 1:03}"
                 if f"RacesCandidates/ByParish_{number}.htm" not in names:
                     continue
-                listed = json.loads(archive.read(f"RacesCandidates/ByParish_{number}.htm"))
-                counted = {
-                    race["ID"]: {choice["ID"]: choice for choice in many(race["Choice"])}
-                    for race in many(
-                        (json.loads(archive.read(f"VotesParish/Votes_{number}.htm")).get("Races") or {}).get("Race")
+                batches.append(
+                    (
+                        number,
+                        f"22{int(number) * 2 - 1:03}",
+                        many(
+                            (json.loads(archive.read(f"RacesCandidates/ByParish_{number}.htm")).get("Races") or {}).get(
+                                "Race"
+                            )
+                        ),
+                        many(
+                            (json.loads(archive.read(f"VotesParish/Votes_{number}.htm")).get("Races") or {}).get("Race")
+                        ),
                     )
+                )
+            try:
+                batches.append(
+                    (
+                        "MP",
+                        "22",
+                        many(
+                            (
+                                json.loads(
+                                    raw.cached(SOURCE, bundle(day) + "RacesCandidates_Multiparish.htm").path.read_text()
+                                ).get("Races")
+                                or {}
+                            ).get("Race")
+                        ),
+                        many(
+                            (
+                                json.loads(
+                                    raw.cached(SOURCE, bundle(day) + "Votes_Multiparish.htm").path.read_text()
+                                ).get("Races")
+                                or {}
+                            ).get("Race")
+                        ),
+                    )
+                )
+            except LookupError:
+                pass
+            for number, fips, listed_races, counted_races in batches:
+                counted = {
+                    race["ID"]: {choice["ID"]: choice for choice in many(race["Choice"])} for race in counted_races
                 }
-                for race in many((listed.get("Races") or {}).get("Race")):
+                for race in listed_races:
                     level = int(race["OfficeLevel"])
-                    if level < 225 or race["IsMultiParish"] == "1" or race["ID"] not in counted:
+                    if level < 225 or (race["IsMultiParish"] == "1") != (number == "MP") or race["ID"] not in counted:
                         continue
                     title = re.sub(r"\s+", " ", race["SpecificTitle"]).strip()
                     if re.search(r"(?i)cancel", title):
                         continue
                     head, _, tail = title.partition(" -- ")
+                    if number == "36" and 300 <= level < 998 and tail and not PLACE.search(tail):
+                        tail = f"{tail}, City of New Orleans"
                     head = re.sub(r"(?i),?\s*(?:reg\.?\s*&\s*)?unexp[a-z.]*\s*(?:term)?\.?", "", head).strip(" ,")
                     remainder = re.search(r"(?i)unexp", title) is not None
                     code, kind, label, office, seat, body = fips, "parish", None, None, None, False
@@ -241,7 +306,7 @@ def parse() -> None:
                         elif prefix:
                             skipped.setdefault("place not found", set()).add(title)
                             continue
-                        elif re.match(r"(?i)(parish(wide)?|prop(osition)?\b|proposition)", head):
+                        elif re.match(r"(?i)(parish(wide)?|p[./-]?w\b|prop(osition)?\b|proposition)", head):
                             label = title
                         else:
                             name = head
@@ -250,10 +315,28 @@ def parse() -> None:
                                 (r"\bPro\.", "Protection"),
                                 (r"\bRec\.", "Recreation"),
                                 (r"\bCons\.", "Consolidated"),
+                                (r"\bPrev\b\.?", "Prevention"),
+                                (r"\bImprov?\b\.?", "Improvement"),
+                                (r"\bImp\b\.?", "Improvement"),
+                                (r"\bNeigh?\b\.?|\bNbrhd\b\.?|\bNeighbor\b", "Neighborhood"),
+                                (r"\bSec\b\.?", "Security"),
+                                (r"\bSubdiv\b\.?|\bSubd\b\.?|\bSub\b\.?", "Subdivision"),
+                                (r"\bF\.?P\.?D\.?(?=\s|$)", "Fire Protection District"),
+                                (r"\bFire Prot\b\.?|\bFire Protection Dist\b\.?", "Fire Protection District"),
+                                (r"\bSch\b\.?", "School"),
+                                (r"\bSys\b\.?|\bSystm\b", "System"),
+                                (r"\bComm\b\.?(?= School| Sch)", "Community"),
+                                (r"\bCrime Prev\w*\b", "Crime Prevention"),
+                                (r"\bEnf\b\.?", "Enforcement"),
+                                (r"\bEd\b\.?(?= Fac)", "Educational"),
+                                (r"\bFac\b\.?", "Facilities"),
+                                (r"\bNo\b(?!\.)", "No."),
+                                (r"\bNumber\b", "No."),
+                                (r"(?i),?\s*-?\s*prop(?:osition)?\.?\s*(?:no\.?\s*)?\d+(?:\s*of\s*\d+)?\s*$", ""),
                             ):
                                 name = re.sub(pattern, full, name, flags=re.IGNORECASE)
                             name = re.sub(r"\s*#\s*", " No. ", name).strip()
-                            code, kind, label = f"{fips}:{slug(name)}", "special", tail or head
+                            code, kind, label = f"{fips}:{slug(name)}", "special", title
                             office = name
                         office = office or "question"
                     else:
@@ -286,7 +369,9 @@ def parse() -> None:
                                         for size in range(len(prefix_words), 0, -1)
                                         if (
                                             key := re.sub(
-                                                r"[^A-Z]", "", " ".join(prefix_words[:size]).upper().replace("SAINT", "ST")
+                                                r"[^A-Z]",
+                                                "",
+                                                " ".join(prefix_words[:size]).upper().replace("SAINT", "ST"),
                                             )
                                         )
                                         in towns
@@ -330,6 +415,9 @@ def parse() -> None:
                             seat = re.sub(r"(?i)^(?:justices? of the peace|metro)\s+(?=district|ward)", "", seat)
                             seat = re.sub(r"(?i)^(?:in )?at[- ]large$", "At-Large", seat.strip(" ,"))
                             seat = ", ".join(part for part in (seat, hint) if part)
+                    if number == "MP" and kind != "place":
+                        skipped.setdefault("multiparish, not a place", set()).add(title)
+                        continue
                     scope = None
                     parties = set()
                     choices = many(race["Choice"])
@@ -425,7 +513,14 @@ def parse() -> None:
     latest: dict[tuple[object, ...], tuple[date, str]] = {}
     rounds, previous_keys = [], []
     for row in frame.iter_rows(named=True):
-        group = (row["code"], row["office"], row["seat"], row["remainder"], row["scope"], row["label"] if row["question"] else None)
+        group = (
+            row["code"],
+            row["office"],
+            row["seat"],
+            row["remainder"],
+            row["scope"],
+            row["label"] if row["question"] else None,
+        )
         before = latest.get(group)
         follows = before is not None and 0 < (row["day"] - before[0]).days <= 100 and before[1] in runs
         rounds.append(2 if follows else 1)
@@ -661,7 +756,9 @@ def emit() -> Path:
             polity, place, path, owner_kind = polities[code]
             question = row["question"]
             election_kind = kind_of[(day, code)]
-            label = {"general": "general", "local": "municipal", "runoff": "runoff", "primary": "primary"}[election_kind]
+            label = {"general": "general", "local": "municipal", "runoff": "runoff", "primary": "primary"}[
+                election_kind
+            ]
             if question:
                 title = place
             elif row["body"]:
@@ -677,12 +774,19 @@ def emit() -> Path:
             else:
                 title = f"{place} {row['label']}"
             if not question and (code, office) not in owners:
-                owner = owners[(code, office)] = cs.key("us.body" if row["body"] else "us.office", f"LA:{code}:{office}")
+                owner = owners[(code, office)] = cs.key(
+                    "us.body" if row["body"] else "us.office", f"LA:{code}:{office}"
+                )
                 if owner in cs.minted:
                     if row["body"]:
                         cs.add("body", id=owner, polity_id=polity, kind="council")
                     else:
-                        cs.add("office", id=owner, polity_id=polity, kind="mayor" if office.startswith("mayor") else "other")
+                        cs.add(
+                            "office",
+                            id=owner,
+                            polity_id=polity,
+                            kind="mayor" if office.startswith("mayor") else "other",
+                        )
                     name(owner, title)
             if (day, code) not in elections and f"{path}/{day}-{election_kind}" in foreign["election"]:
                 elections[(day, code)] = foreign["election"][f"{path}/{day}-{election_kind}"]
@@ -701,7 +805,11 @@ def emit() -> Path:
                 cs.add("slug", path=f"{path}/{day}-{election_kind}", entity_id=election)
             election = elections[(day, code)]
             scheme = (
-                "us.special_district" if owner_kind == "special" else "us.place" if owner_kind == "place" else "us.county"
+                "us.special_district"
+                if owner_kind == "special"
+                else "us.place"
+                if owner_kind == "place"
+                else "us.county"
             )
             whole = area = cs.area(scheme, code)
             unit = cs.unit(scheme, code)
@@ -872,9 +980,9 @@ def emit() -> Path:
                 elif line["outcome"] == "Runoff":
                     cs.add("outcome", result_set_id=result_set, option_id=option, kind="advanced", seats=None)
             cells: dict[tuple[UUID, UUID], int] = {}
-            for fips, precinct, candidate, votes in grouped[(row["ckey"],)].select(
-                "fips", "precinct", "name", "votes"
-            ).iter_rows():
+            for fips, precinct, candidate, votes in (
+                grouped[(row["ckey"],)].select("fips", "precinct", "name", "votes").iter_rows()
+            ):
                 target = unit
                 if precinct is not None:
                     place_code = f"{day}:LA:{fips}:{names[fips]}:{precinct}"
