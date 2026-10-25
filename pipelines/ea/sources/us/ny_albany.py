@@ -63,7 +63,10 @@ def contests(text: str) -> Iterator[dict[str, Any]]:
             party = PARTY.search(name)
             base = PARTY.sub("", name).strip()
             first = lines_by_candidate.get(base)
-            lines_by_candidate[base] = (first[0] if first else (party[1] if party else None), (first[1] if first else 0) + votes)
+            lines_by_candidate[base] = (
+                first[0] if first else (party[1] if party else None),
+                (first[1] if first else 0) + votes,
+            )
         if not lines_by_candidate:
             continue
         choices = [

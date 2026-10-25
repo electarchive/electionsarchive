@@ -26,7 +26,9 @@ UNWANTED = re.compile(
 TOTAL = re.compile(r"(?i)total")
 ED = re.compile(r"^(?:[A-Z]{2,6}(?: \d+)? ?\d+(?:-\d+)?[A-Z]?|\d+(?:st|nd|rd|th) District\b.*)$", re.I)
 COUNTY_TOTAL = re.compile(r"(?i)^(?:erie county total|office total|total|grand total)$")
-SKIP_COLUMNS = re.compile(r"(?i)^(?:blank|void|total|grand total|spec pres voters|fed voters|registered|blank, void.*)$")
+SKIP_COLUMNS = re.compile(
+    r"(?i)^(?:blank|void|total|grand total|spec pres voters|fed voters|registered|blank, void.*)$"
+)
 GAP = re.compile(r"\s{2,}|\n")
 VOTE_FOR = re.compile(r"(?i)\(?vote for (?:any )?(one|two|three|four|five|\d+)\)?")
 COUNTS = {"one": 1, "two": 2, "three": 3, "four": 4, "five": 5}
@@ -169,7 +171,12 @@ def _read(registry: Mapping[str, Mapping[str, str]]) -> Iterator[dict[str, Any]]
             if day.month == 5 and not re.search(r"(?i)buffalo", " ".join(found["title"])):
                 found["title"].insert(0, "Buffalo")
             contests.append(
-                {"key": found["key"], "text": re.sub(r"\bTFV\b", "To Fill Vacancy", " ".join(found["title"])), "vote_for": found["vote_for"], "choices": choices}
+                {
+                    "key": found["key"],
+                    "text": re.sub(r"\bTFV\b", "To Fill Vacancy", " ".join(found["title"])),
+                    "vote_for": found["vote_for"],
+                    "choices": choices,
+                }
             )
         yield {
             "tenant": tenant,
