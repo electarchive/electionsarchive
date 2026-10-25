@@ -16,7 +16,7 @@ from ea.changeset import Changeset, slug
 from ea.store import DATA, connect
 
 SOURCE = "us.houston_citysec"
-VERSION = "3"
+VERSION = "4"
 PARSED = DATA / "parsed" / SOURCE
 PAGES = DATA / "pages" / SOURCE
 SCANS = Path(__file__).with_name("houston_citysec_scans.tsv")
@@ -533,7 +533,7 @@ def emit() -> Path:
             if office == "mayor":
                 return "Mayor_mayor_1", "mayoral", "mayor"
             if office == "controller":
-                return "", "city controller", "controller"
+                return "", "City Controller", "controller"
             label = office.removeprefix("district-") if office.startswith("district") else f"at-large {office[-1]}"
             return f"City Council_{label}_1", "City Council", f"council-{office}"
 
