@@ -62,6 +62,7 @@ APPOINTMENTS = {
     "667000_2017_1_san francisco_CA_City Council_8_1",
     "667000_2017_12_san francisco_CA_Mayor_mayor_1",
     "667000_2018_7_san francisco_CA_City Council_5_1",
+    "4865000_2014_7_san antonio_TX_Mayor_mayor_1",
 }
 DISTRICT = (
     "Only part of the {whole} votes in this contest. The archive has no boundary for the district yet, so the "
@@ -323,13 +324,13 @@ def emit() -> Path:
                    union
                    select x.value from external_id x join contest c on c.id = x.entity_id
                    join changeset s on s.id = c.changeset_id
-                   where x.scheme = 'us.contest' and x.value like 'alged:%' and s.pipeline in ('us.wards', 'us.chicago_boe', 'us.ceda', 'us.houston_citysec', 'us.medsl_local', 'us.bexar', 'us.dallas_citysec')"""
+                   where x.scheme = 'us.contest' and x.value like 'alged:%' and s.pipeline in ('us.wards', 'us.chicago_boe', 'us.ceda', 'us.houston_citysec', 'us.medsl_local', 'us.bexar', 'us.dallas_citysec', 'us.electionsfl')"""
             )
         }
         for (contest_id,), rows in frame.sort("contest", "votes", descending=[False, True]).group_by(
             "contest", maintain_order=True
         ):
-            # us.wards owns San Francisco's merged county supervisor copies and citywide seats ALGED numbers as districts; us.chicago_boe owns Chicago's contests, us.ceda California's, us.houston_citysec Houston's, us.bexar San Antonio's, us.dallas_citysec Dallas's, and us.medsl_local the runoffs it chains to its first rounds
+            # us.wards owns San Francisco's merged county supervisor copies and citywide seats ALGED numbers as districts; us.chicago_boe owns Chicago's contests, us.ceda California's, us.houston_citysec Houston's, us.bexar San Antonio's, us.dallas_citysec Dallas's, us.electionsfl Jacksonville's, and us.medsl_local the runoffs it chains to its first rounds
             if f"alged:{contest_id}" in merged:
                 continue
             first = rows.row(0, named=True)

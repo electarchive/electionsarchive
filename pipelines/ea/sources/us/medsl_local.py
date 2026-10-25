@@ -13,6 +13,8 @@ from psycopg.rows import dict_row
 from ea import raw
 from ea.changeset import Changeset, slug
 from ea.sources.licenses import UNLICENSED
+from ea.sources.us.electionsfl import FIPS as FLORIDA
+from ea.sources.us.electionsfl import JACKSONVILLE, REPORTS, export
 from ea.sources.us.medsl import RECODED
 from ea.sources.us.medsl_state import DROPPED, EXPANDED, INDEPENDENT, NATIONAL, POOLED, PUBLISHER
 from ea.store import DATA, connect
@@ -228,7 +230,7 @@ COUNTYWIDE = {
 TERM = r"Term (?:Commencing|Beginning) (\d\d?)/(\d\d?)/(\d{4})"
 SCHOOLS = {"AL", "FL", "GA", "KY", "LA", "MD", "MS", "NV", "SC", "TN", "WV"}
 SEAT = re.compile(
-    r"(?:(?:DIST(?:RICT)?|PRECINCT|PCT|PLACE|POST|POSITION|POS|SEAT|WARD|ZONE|DIVISION|BEAT|AREA|NO|NUMBER|#)\.? ?#? ?[A-Z]?\d+[A-Z]?"
+    r"(?:(?:DIST(?:RICT)?|PRECINCT|PCT|PLACE|POST|POSITION|POS|SEAT|GROUP|WARD|ZONE|DIVISION|BEAT|AREA|NO|NUMBER|#)\.? ?#? ?[A-Z]?\d+[A-Z]?"
     r"|\d+(?:ST|ND|RD|TH)? (?:DIST(?:RICT)?\.?|PRECINCT|WARD|ZONE|DIVISION|BEAT|[A-Z]+ DISTRICT)|\d+|[A-Z]"
     r"|[A-Z][A-Z .'-]* (?:TOWNSHIP|DISTRICT|PRECINCT|DIVISION|WARD)(?: \d+)?|AT[- ]LARGE(?: [A-Z0-9])?"
     r"|NORTH|SOUTH|EAST|WEST|CENTRAL|TERM (?:COMMENCING|BEGINNING) \d\d?/\d\d?/\d{4})"
@@ -248,6 +250,12 @@ METHOD = (
     "Totals are the sums of the precinct rows in MEDSL's 2024 precinct file for the state. The file does not mark "
     "winners, so the winners shown are the candidates with the most votes, as many as the contest elects."
 )
+FLORIDA_TITLE = "Election night reporting precinct results (CSV exports)"
+FLORIDA_METHOD = (
+    "Totals are the sums of the precinct rows in the county Supervisor of Elections' election night reporting export "
+    "(VR Systems). The export does not mark winners, so the winners shown are the candidates with the most votes, as "
+    "many as the contest elects."
+)
 CONTRIBUTED = (
     "Totals are the sums of the precinct rows in OpenElections' precinct file for the state, which its volunteers "
     "transcribed from county results. The file does not mark winners, so the winners shown are the candidates with "
@@ -262,6 +270,7 @@ DISTRICT = (
     "results are shown for the district as a whole."
 )
 TOWNS = {
+    "FL": "12",
     "IA": "19",
     "IL": "17",
     "IN": "18",
@@ -330,6 +339,9 @@ MUNICIPAL = [
     ("tax-collector", "Tax Collector", False, r"TAX COLLECTOR|RECEIVER OF TAXES"),
     ("moderator", "Moderator", False, r"MODERATOR"),
     ("administrator", "Administrator", False, r"ADMINISTRATOR"),
+]
+COMMISSIONS = [
+    ("commission", "Commission", True, r"(?:(?:CITY|TOWN|VILLAGE) )?COMMISSION(?:ERS?)?(?: MEMBERS?)?"),
 ]
 UNLISTED = re.compile(
     r"QUESTION|PROPOSITION|MEASURE|FIRE|LIBRARY|REGIONAL|CONSOLIDATED|SHALL|OPEN SPACE|\b\d{4} TERM|RECALL|DEPUTY"
@@ -566,7 +578,7 @@ def _town(
         for form, explicit in ((f"{word} OF {base}", True), (f"{base} {word}", True), (base, False)):
             for match in re.finditer(rf"(?<![A-Z]){re.escape(form)}(?![A-Z])", text):
                 outside = text[: match.start()] + " " + text[match.end() :]
-                if explicit or re.search(rf"\b{word}\b", outside):
+                if explicit or state == "FL" or re.search(rf"\b{word}\b", outside):
                     hits.append((explicit, len(form), code, scheme, proper, kind, display, match.start(), match.end()))
     if not hits:
         return None
@@ -579,7 +591,7 @@ def _town(
         text = text[:start] + " " * (end - start) + text[end:]
     text = re.sub(rf"\b(?:{re.escape(county.upper())}|TOWNSHIP|TOWN|BOROUGH|VILLAGE|CITY)\b|[()]", " ", text)
     text = re.sub(r"\s+", " ", text).strip(" ,-:")
-    for key, title, body, pattern in MUNICIPAL:
+    for key, title, body, pattern in MUNICIPAL + (COMMISSIONS if state == "FL" else []):
         found = re.fullmatch(rf"(?:{pattern})(?:\s*[-,:]?\s*(.*))?", text)
         if found is None:
             continue
@@ -956,15 +968,69 @@ def parse() -> None:
         )
         for (state, day), commit in OPENELECTIONS_FILES.items()
     ]
+    florida = (
+        pl.read_parquet(raw.parsed("us.electionsfl") / "precincts.parquet")
+        .filter(
+            ~pl.col("title").str.contains("(?i)preference"),
+            pl.col("day") < date.today(),
+            (pl.col("county") != "DUV") | ~pl.col("election").is_in(list(JACKSONVILLE)),
+        )
+        .with_columns(party=pl.col("party").str.to_uppercase().fill_null(""))
+        .filter(
+            ~pl.col("title").str.contains("(?i)primary")
+            | pl.col("party").is_in(["", "NOP", "NON", "NP", "NPA"]).all().over("county", "election", "contest")
+        )
+    )
+    electionsfl = [
+        (
+            "FL",
+            frame.lazy().select(
+                "day",
+                pl.lit("FL").alias("state_po"),
+                office=pl.col("contest")
+                .str.to_uppercase()
+                .str.replace(count, "")
+                .str.replace(r"\bDISTRICT SUPERVISORS?\b", "DISTRICT")
+                .str.strip_chars(),
+                district=pl.lit(None, pl.String),
+                special=pl.lit("FALSE"),
+                county_fips="fips",
+                county_name="county_name",
+                precinct="precinct",
+                jurisdiction_fips="fips",
+                jurisdiction_name="county_name",
+                stage=pl.lit("GEN"),
+                mode=pl.lit("TOTAL"),
+                candidate=pl.when(pl.col("candidate").str.contains(r"(?i)^write[- ]?ins?$"))
+                .then(pl.lit("WRITE-IN"))
+                .otherwise("candidate"),
+                party_detailed=pl.col("party")
+                .replace(OPENELECTIONS_PARTIES)
+                .pipe(lambda party: pl.when(~party.is_in(["NON", "NP", "NPA", "NOP", ""])).then(party)),
+                writein=pl.when(pl.col("candidate").str.contains(r"(?i)^write[- ]?ins?$"))
+                .then(pl.lit("TRUE"))
+                .otherwise(pl.lit("FALSE")),
+                votes=pl.col("votes").cast(pl.String),
+                magnitude=pl.col("contest")
+                .str.extract(count)
+                .str.to_uppercase()
+                .replace(COUNTS)
+                .cast(pl.Int32, strict=False),
+                origin=pl.concat_str(pl.lit("electionsfl:"), "county"),
+            ),
+        )
+        for _, frame in sorted(florida.partition_by("day", as_dict=True).items())
+    ]
     for state, origin, scan in [
         *((state, "medsl", scan) for state, scan in inputs),
         *((state, "openelections", scan) for state, scan in openelections),
+        *((state, "electionsfl", scan) for state, scan in electionsfl),
     ]:
         if state in COVERED:
             continue
         frame = (
             scan.with_columns(
-                pl.lit(origin).alias("origin"),
+                pl.col("origin") if origin == "electionsfl" else pl.lit(origin).alias("origin"),
                 pl.col("candidate").str.strip_chars().str.replace_all(r"\s+", " "),
                 pl.col("votes").cast(pl.Float64, strict=False).cast(pl.Int64),
             )
@@ -980,7 +1046,9 @@ def parse() -> None:
         )
         if frame.height == 0:
             continue
-        year = frame["day"][0].year
+        held = frame["day"][0]
+        year = held.year
+        prefix = str(year) if held.month == 11 and held.day <= 8 and year % 2 == 0 else str(held)
         frame = frame.with_columns(pl.col("county_fips").str.zfill(5), pl.col("special").fill_null("FALSE"))
         recounted = frame.filter(pl.col("stage") == "GEN RECOUNT").select("office", "district", "county_fips").unique()
         frame = pl.concat(
@@ -1195,7 +1263,13 @@ def parse() -> None:
             problems.append(f"{year} {state}: {row['place']} {row['key']} {row['seat']} has several office labels")
         summary = summary.filter(pl.col("offices") == 1).with_columns(
             magnitude=pl.when(
-                pl.col("body") & pl.col("seat").is_null() & ((year == 2016) | (pl.col("origin") == "openelections"))
+                pl.col("body")
+                & pl.col("seat").is_null()
+                & (
+                    (year == 2016)
+                    | (pl.col("origin") == "openelections")
+                    | pl.col("origin").str.starts_with("electionsfl")
+                )
             )
             .then("magnitude")
             .otherwise(pl.col("magnitude").fill_null(1)),
@@ -1216,7 +1290,7 @@ def parse() -> None:
                 )
                 .then(
                     pl.concat_str(
-                        pl.lit(str(year)),
+                        pl.lit(prefix),
                         "state_po",
                         pl.col("county_fips").replace(RECODED),
                         pl.col("jurisdiction_name").fill_null(""),
@@ -1226,16 +1300,23 @@ def parse() -> None:
                 )
                 .otherwise(pl.lit(""))
             )
-            .group_by(*contest, "candidate", "pooled", "unit", "party_detailed")
+            .group_by(*contest, "origin", "candidate", "pooled", "unit", "party_detailed")
             .agg(
                 pl.when(pl.col("votes").is_null().all()).then(None).otherwise(pl.col("votes").sum()).alias("votes"),
             )
         )
     PARSED.mkdir(parents=True, exist_ok=True)
-    pl.concat(contests, how="diagonal_relaxed").sort("state_po", "code", "key", "seat", nulls_last=False).write_parquet(
-        PARSED / "contests.parquet"
-    )
-    pl.concat(lines).write_parquet(PARSED / "lines.parquet")
+    contest = ["day", "code", "key", "seat", "remainder"]
+    every = pl.concat(contests, how="diagonal_relaxed")
+    official = pl.col("origin").str.starts_with("electionsfl")
+    superseded = every.filter(~official).join(every.filter(official).select(contest), on=contest, nulls_equal=True)
+    every.join(superseded.select(*contest, "origin"), on=[*contest, "origin"], how="anti", nulls_equal=True).sort(
+        "state_po", "code", "key", "seat", nulls_last=False
+    ).write_parquet(PARSED / "contests.parquet")
+    pl.concat(lines).join(
+        superseded.select(*contest, "origin"), on=[*contest, "origin"], how="anti", nulls_equal=True
+    ).write_parquet(PARSED / "lines.parquet")
+    print(f"{superseded.height} MEDSL and OpenElections contests superseded by county election night reporting")
     used = set(pl.read_parquet(PARSED / "contests.parquet").filter(pl.col("scheme") != "us.county")["code"])
     with connect() as conn:
         pl.DataFrame(
@@ -1367,6 +1448,38 @@ def emit() -> Path:
                 raw.cached(SOURCE, OPENELECTIONS.format(state=state.lower(), commit=commit, day=day)),
                 contributed[state],
             )
+        florida = {}
+        held = pl.read_parquet(PARSED / "contests.parquet").filter(pl.col("origin").str.starts_with("electionsfl"))
+        reports = pl.read_parquet(raw.parsed("us.electionsfl") / "precincts.parquet").select(
+            "county", "election", "day"
+        )
+        for county in sorted({origin.split(":")[1] for origin in held["origin"]}):
+            found = conn.execute(
+                """select n.text from area_code c join polity_territory t on t.area_id = c.area_id
+                   join name n on n.entity_id = t.polity_id and n.is_preferred and n.lang = 'en' where c.code = %s""",
+                [FLORIDA[county]],
+            ).fetchone()
+            publisher = f"{found[0] if found else county} Supervisor of Elections"
+            source = florida[county] = cs.source(publisher, FLORIDA_TITLE)
+            cs.add(
+                "source",
+                id=source,
+                kind="official_body",
+                publisher=publisher,
+                title=FLORIDA_TITLE,
+                url=f"https://enr.electionsfl.org/{county}/",
+                license="Public record",
+            )
+            days = set(held.filter(pl.col("origin") == f"electionsfl:{county}")["day"])
+            for (number,) in (
+                reports.filter(pl.col("county") == county, pl.col("day").is_in(days))
+                .select("election")
+                .unique()
+                .sort("election")
+                .iter_rows()
+            ):
+                cs.artifact(raw.cached("us.electionsfl", REPORTS.format(county=county, election=number)), source)
+                cs.artifact(raw.cached("us.electionsfl", str(export(county, number))), source)
         cs.artifact(raw.cached(SOURCE, LOCAL2016), sources[date(2016, 11, 8)])
         cs.artifact(raw.cached(SOURCE, LOCAL2018), sources[date(2018, 11, 6)])
         taken = set(
@@ -1377,7 +1490,21 @@ def emit() -> Path:
                    join external_id x on x.entity_id = coalesce(c.office_id, c.body_id)
                      and x.scheme in ('us.office', 'us.body')
                    where e.date_from = any(%s) and r.source_id <> all(%s)""",
-                [list(DATASETS), [*sources.values(), *contributed.values()]],
+                [
+                    [*DATASETS, *set(contests.filter(pl.col("state_po") == "FL")["day"])],
+                    [*sources.values(), *contributed.values(), *florida.values()],
+                ],
+            ).fetchall()
+        )
+        held_fl = set(
+            conn.execute(
+                """select to_char(e.date_from, 'YYYY-MM'), x.value from contest c
+                   join election e on e.id = c.election_id
+                   join result_set r on r.contest_id = c.id
+                   join external_id x on x.entity_id = coalesce(c.office_id, c.body_id)
+                     and x.scheme in ('us.office', 'us.body') and x.value like 'FL:%%'
+                   where r.source_id <> all(%s)""",
+                [[*sources.values(), *contributed.values(), *florida.values()]],
             ).fetchall()
         )
         census = cs.source("U.S. Census Bureau", "Cartographic Boundary Files, 1:500,000")
@@ -1577,7 +1704,25 @@ def emit() -> Path:
                 continue
             polity, place, path = polities[(scheme, code)]
             parent = cs.key("us.election", f"{day}:{state}")
-            if parent in cs.minted:
+            official = row["origin"].startswith("electionsfl")
+            majority = state in ("GA", "LA") or official and day.month == 8
+            if official and (f"{day:%Y-%m}", f"{state}:{code}:{key}") in held_fl:
+                continue
+            if parent in cs.minted and official and parent not in elections.values():
+                elections[(day, "FL")] = parent
+                cs.add(
+                    "election",
+                    id=parent,
+                    polity_id=cs.polity("US-FL"),
+                    kind="local",
+                    date_from=day,
+                    date_to=day,
+                    date_precision="day",
+                    status="held",
+                )
+                name(parent, f"{day.year} Florida local elections")
+                cs.add("slug", path=f"us/fl/{day}-local", entity_id=parent)
+            elif parent in cs.minted and not official:
                 raise ValueError(f"no election {day}:{state}")
             if (day, f"{state}:{code}:{key}") in taken:
                 continue
@@ -1668,7 +1813,7 @@ def emit() -> Path:
                 round_number=1,
                 electoral_system_id=systems[
                     "two_round"
-                    if magnitude == 1 and (state in ("GA", "LA") or code in MAJORITY)
+                    if magnitude == 1 and (majority or code in MAJORITY)
                     else "fptp"
                     if magnitude == 1
                     else "block"
@@ -1704,7 +1849,14 @@ def emit() -> Path:
                 cs.add("note", entity_id=contest, kind="caveat", body_md=DISTRICT)
             if row["masked"]:
                 cs.add("note", entity_id=contest, kind="caveat", body_md=MASKED)
-            source = sources[day] if row["origin"] == "medsl" else contributed[state]
+            origin = row["origin"]
+            source = (
+                sources[day]
+                if origin == "medsl"
+                else florida[origin.split(":")[1]]
+                if origin.startswith("electionsfl")
+                else contributed[state]
+            )
             counted = grouped[(day, code, key, seat, row["remainder"])].with_columns(
                 token=pl.col("candidate").map_elements(slug, return_dtype=pl.String),
                 line=pl.col("party_detailed")
@@ -1756,7 +1908,11 @@ def emit() -> Path:
                 "note",
                 entity_id=result_set,
                 kind="methodology",
-                body_md=METHOD.replace("2024", str(day.year)) if row["origin"] == "medsl" else CONTRIBUTED,
+                body_md=METHOD.replace("2024", str(day.year))
+                if origin == "medsl"
+                else FLORIDA_METHOD
+                if origin.startswith("electionsfl")
+                else CONTRIBUTED,
             )
             rows = (
                 counted.group_by("token", "pooled")
@@ -1857,9 +2013,7 @@ def emit() -> Path:
             cast = rows["votes"].sum() or 0
             lead = [votes for votes, _ in totals[:2]] + [0, 0]
             rule = (
-                MAJORITY.get(code) or ("majority" if state in ("GA", "LA") else None)
-                if magnitude == 1 and len(totals) > 1
-                else None
+                MAJORITY.get(code) or ("majority" if majority else None) if magnitude == 1 and len(totals) > 1 else None
             )
             if rule is not None and not (
                 lead[0] * 2 > cast
