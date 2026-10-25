@@ -30,7 +30,9 @@
   import Electors from "./electors.svelte";
   import Gains from "./gains.svelte";
   import Councils from "./councils.svelte";
+  import Counties from "./counties.svelte";
   import Governments from "./governments.svelte";
+  import Local from "./local.svelte";
   import PlaceMap from "./map.svelte";
   import Places from "./places.svelte";
   import Preview from "./preview.svelte";
@@ -1853,6 +1855,12 @@
   othersTitle={m.cycle_parts()}
 />
 
+{#if sections.local != null}
+  <Local local={sections.local} isOwn={true} />
+{/if}
+{#if sections.counties != null}
+  <Counties counties={sections.counties} />
+{/if}
 {#if scope == null}
   <Alongside {id} />
   <Governments {id} {chamber} />

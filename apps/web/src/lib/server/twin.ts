@@ -397,6 +397,71 @@ function markdown(data: Data, link: Link) {
     case "election": {
       return electionMarkdown(data.election, data.sections, data.byes, link);
     }
+    case "day": {
+      const { local } = data;
+      const governments = local.tiers.flatMap((tier) => tier.governments);
+      return [
+        `# ${m.local_title({ year: data.date.slice(0, 4), place: local.name })}`,
+        `${local.breadcrumbs.map((crumb) => link(crumb.name, crumb.path)).join(" / ")}, ${date(data.date)}`,
+        m.local_lede({
+          governments: m.local_governments({ count: governments.length }),
+          contests: m.race_contests({
+            count: governments.flatMap((government) => government.contests)
+              .length,
+          }),
+        }),
+        ...local.tiers.flatMap((tier) => [
+          `## ${{ county: m.local_tier_county, municipal: m.local_tier_municipal, school: m.local_tier_school, special: m.local_tier_special }[tier.kind]()}`,
+          ...tier.governments.flatMap((government) => [
+            `### ${link(government.name, government.path)}`,
+            table(
+              [m.col_name(), m.col_leader(), m.col_share(), m.col_result()],
+              government.contests.map((contest) => {
+                const final =
+                  contest.runoff?.isWon === true ? contest.runoff : null;
+                const shown = final ?? contest;
+                const round =
+                  contest.runoff == null
+                    ? ""
+                    : (contest.runoff.isGeneral
+                        ? m.wards_round_general
+                        : m.wards_round_runoff)({
+                        date: new Intl.DateTimeFormat(getLocale(), {
+                          month: "long",
+                          day: "numeric",
+                          timeZone: "UTC",
+                        }).format(new Date(`${contest.runoff.date}T00:00:00Z`)),
+                      });
+                return [
+                  link(contest.name, contest.path),
+                  shown.leader,
+                  shown.share == null ? null : percent(shown.share),
+                  contest.runoff == null || contest.share == null
+                    ? null
+                    : final == null
+                      ? m.wards_pending({
+                          share: percent(contest.share),
+                          round,
+                        })
+                      : final.person != null && final.person === contest.person
+                        ? m.wards_kept({
+                            share: percent(contest.share),
+                            round,
+                            final: percent(final.share),
+                          })
+                        : m.wards_took({
+                            round,
+                            final: percent(final.share),
+                            name: contest.leader ?? "",
+                            share: percent(contest.share),
+                          }),
+                ];
+              }),
+            ),
+          ]),
+        ]),
+      ];
+    }
     default: {
       return contestMarkdown(
         data.contest,
@@ -1673,6 +1738,8 @@ function electionMarkdown(
     governments,
     regions,
     alongside,
+    local,
+    counties,
   }: Extract<Data, { kind: "election" }>["sections"],
   byes: Extract<Data, { kind: "election" }>["byes"],
   link: Link,
@@ -2284,6 +2351,108 @@ function electionMarkdown(
                       ]
                     : []),
                 ].join(" "),
+              ];
+            }),
+          ),
+        ]),
+    ...(local == null || local.tiers.every((tier) => tier.kind === "county")
+      ? []
+      : [
+          `## ${m.local_section({ place: local.name })}`,
+          m.local_lede({
+            governments: m.local_governments({
+              count: local.tiers
+                .filter((tier) => tier.kind !== "county")
+                .flatMap((tier) => tier.governments).length,
+            }),
+            contests: m.race_contests({
+              count: local.tiers
+                .filter((tier) => tier.kind !== "county")
+                .flatMap((tier) => tier.governments)
+                .flatMap((government) => government.contests).length,
+            }),
+          }),
+          ...local.tiers
+            .filter((tier) => tier.kind !== "county")
+            .flatMap((tier) => [
+              `### ${{ county: m.local_tier_county, municipal: m.local_tier_municipal, school: m.local_tier_school, special: m.local_tier_special }[tier.kind]()}`,
+              ...tier.governments.flatMap((government) => [
+                `#### ${link(government.name, government.path)}`,
+                table(
+                  [m.col_name(), m.col_leader(), m.col_share(), m.col_result()],
+                  government.contests.map((contest) => {
+                    const final =
+                      contest.runoff?.isWon === true ? contest.runoff : null;
+                    const shown = final ?? contest;
+                    const round =
+                      contest.runoff == null
+                        ? ""
+                        : (contest.runoff.isGeneral
+                            ? m.wards_round_general
+                            : m.wards_round_runoff)({
+                            date: new Intl.DateTimeFormat(getLocale(), {
+                              month: "long",
+                              day: "numeric",
+                              timeZone: "UTC",
+                            }).format(
+                              new Date(`${contest.runoff.date}T00:00:00Z`),
+                            ),
+                          });
+                    return [
+                      link(contest.name, contest.path),
+                      shown.leader,
+                      shown.share == null ? null : percent(shown.share),
+                      contest.runoff == null || contest.share == null
+                        ? null
+                        : final == null
+                          ? m.wards_pending({
+                              share: percent(contest.share),
+                              round,
+                            })
+                          : final.person != null &&
+                              final.person === contest.person
+                            ? m.wards_kept({
+                                share: percent(contest.share),
+                                round,
+                                final: percent(final.share),
+                              })
+                            : m.wards_took({
+                                round,
+                                final: percent(final.share),
+                                name: contest.leader ?? "",
+                                share: percent(contest.share),
+                              }),
+                    ];
+                  }),
+                ),
+              ]),
+            ]),
+        ]),
+    ...(counties == null || counties.counties.length === 0
+      ? []
+      : [
+          `## ${m.counties_title()}`,
+          m.counties_lede({
+            governments: m.local_governments({
+              count: counties.counties.flatMap((county) => county.governments)
+                .length,
+            }),
+            counties: m.local_counties({ count: counties.counties.length }),
+            contests: m.race_contests({ count: counties.contests }),
+          }),
+          table(
+            [m.col_county(), m.election_contests(), m.col_governments()],
+            counties.counties.map((county) => {
+              let held = 0;
+              for (const government of county.governments) {
+                held += government.contests;
+              }
+              return [
+                link(county.name, county.path),
+                count(held),
+                county.governments
+                  .map((government) => link(government.name, government.path))
+                  .join(", "),
               ];
             }),
           ),

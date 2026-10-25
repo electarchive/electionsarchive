@@ -120,6 +120,17 @@ async function card(segments: Array<string>, search: URLSearchParams) {
       bars: data.polity.latest?.races[0]?.results ?? [],
     };
   }
+  if (data.kind === "day") {
+    return {
+      kicker: data.local.breadcrumbs.map((crumb) => crumb.name).join(" / "),
+      title: m.local_title({
+        year: data.date.slice(0, 4),
+        place: data.local.name,
+      }),
+      line: date(data.date),
+      bars: [],
+    };
+  }
   if (data.kind === "election") {
     return {
       kicker: data.election.breadcrumbs.map((crumb) => crumb.name).join(" / "),

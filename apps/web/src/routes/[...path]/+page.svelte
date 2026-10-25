@@ -6,6 +6,7 @@
   import { WITHIN } from "#lib/party.js";
   import type { PageData } from "./$types";
   import Contest from "./contest.svelte";
+  import Day from "./day.svelte";
   import Election from "./election.svelte";
   import Polity from "./polity.svelte";
   import Preview from "./preview.svelte";
@@ -28,9 +29,17 @@
             ...data.election.breadcrumbs,
             ...(data.election.parent == null ? [] : [data.election.parent]),
           ]
-        : data.polity.breadcrumbs,
+        : data.kind === "day"
+          ? data.local.breadcrumbs
+          : data.polity.breadcrumbs,
   );
   const title = $derived.by(() => {
+    if (data.kind === "day") {
+      return m.local_title({
+        year: data.date.slice(0, 4),
+        place: data.local.name,
+      });
+    }
     if (data.kind !== "contest") {
       return data.kind === "election" ? data.election.name : data.polity.name;
     }
@@ -67,11 +76,13 @@
             name: data.election.name,
             date: date(data.election.date),
           })
-        : m.meta_polity({
-            name: data.polity.name,
-            first: String(Math.min(...years)),
-            last: String(Math.max(...years)),
-          }),
+        : data.kind === "day"
+          ? m.local_meta({ place: data.local.name, date: date(data.date) })
+          : m.meta_polity({
+              name: data.polity.name,
+              first: String(Math.min(...years)),
+              last: String(Math.max(...years)),
+            }),
   );
   const dataset = $derived({
     "@context": "https://schema.org",
@@ -92,16 +103,20 @@
           ? data.contest.scope.name
           : data.kind === "election"
             ? (data.election.breadcrumbs.at(-1)?.name ?? data.election.name)
-            : data.polity.name,
+            : data.kind === "day"
+              ? data.local.name
+              : data.polity.name,
     },
     temporalCoverage:
       data.kind === "contest"
         ? data.contest.election.date
         : data.kind === "election"
           ? data.election.date
-          : years.length === 0
-            ? null
-            : `${Math.min(...years)}/${Math.max(...years)}`,
+          : data.kind === "day"
+            ? data.date
+            : years.length === 0
+              ? null
+              : `${Math.min(...years)}/${Math.max(...years)}`,
     isBasedOn:
       data.kind === "contest"
         ? data.contest.sets.flatMap(({ source }) =>
@@ -202,6 +217,8 @@
           sections={data.sections}
         />
       {/key}
+    {:else if data.kind === "day"}
+      <Day {data} />
     {:else}
       <Polity id={data.id} polity={data.polity} />
     {/if}

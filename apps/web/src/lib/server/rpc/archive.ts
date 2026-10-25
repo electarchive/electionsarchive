@@ -8303,7 +8303,7 @@ async function races(
                           person: row.winner,
                           name: people.full.get(row.winner ?? "") ?? null,
                           share: row.won ?? 0,
-                          isWon: row.isDone === true,
+                          isWon: row.isDone === true || (row.won ?? 0) > 0.5,
                         },
                 }))
                 .toSorted((a, b) =>
@@ -10422,6 +10422,379 @@ export const elections = {
             null,
           color: row.color,
         })),
+      };
+    }),
+  local: os
+    .meta(
+      openapi({
+        method: "GET",
+        path: "/elections/local",
+        summary:
+          "List a county's local elections on one day: its own offices, then cities, school districts, and special districts, each contest with its leader and runoff",
+      }),
+    )
+    .input(
+      v.object({
+        polity: v.pipe(v.string(), v.uuid()),
+        date: v.pipe(v.string(), v.isoDate()),
+      }),
+    )
+    .output(
+      v.nullable(
+        v.object({
+          name: v.string(),
+          path: v.nullable(v.string()),
+          breadcrumbs: v.array(Link),
+          own: v.nullable(v.string()),
+          tiers: v.array(
+            v.object({
+              kind: v.picklist(["county", "municipal", "school", "special"]),
+              governments: v.array(
+                v.object({
+                  name: v.string(),
+                  path: v.nullable(v.string()),
+                  contests: v.array(
+                    v.object({
+                      name: v.string(),
+                      path: v.nullable(v.string()),
+                      person: v.nullable(v.string()),
+                      leader: v.nullable(v.string()),
+                      share: v.nullable(v.number()),
+                      isWon: v.boolean(),
+                      runoff: v.nullable(
+                        v.object({
+                          path: v.nullable(v.string()),
+                          date: v.string(),
+                          isGeneral: v.boolean(),
+                          person: v.nullable(v.string()),
+                          leader: v.nullable(v.string()),
+                          share: v.number(),
+                          isWon: v.boolean(),
+                        }),
+                      ),
+                    }),
+                  ),
+                }),
+              ),
+            }),
+          ),
+        }),
+      ),
+    )
+    .handler(async ({ input }) => {
+      const polity = input.polity.toLowerCase();
+      const found = await db.execute<{
+        id: string;
+        election: string;
+        polity: string;
+        kind: string;
+        population: number | null;
+        person: string | null;
+        answer: string | null;
+        share: number | null;
+        isWon: boolean | null;
+        runoff: string | null;
+        date: string | null;
+        isGeneral: boolean | null;
+        winner: string | null;
+        reply: string | null;
+        won: number | null;
+        isDone: boolean | null;
+      }>(sql`
+        with home as materialized (
+          select g.county from coverage_government g
+          where g.polity_id = ${polity}::uuid and g.kind = 'county' limit 1
+        ),
+        govs as materialized (
+          select distinct on (e.id) e.id as election, e.polity_id, p.kind::text as kind, g.population,
+            (select pt.area_id from polity_territory pt where pt.polity_id = e.polity_id and pt.valid @> e.date_from limit 1) as area
+          from home
+          join coverage_government g on g.county = home.county
+          join election e on e.polity_id = g.polity_id and e.date_from = ${input.date}::date and e.status::text <> 'annulled'
+          join polity p on p.id = e.polity_id
+          order by e.id, g.population desc nulls last
+        ),
+        rows as materialized (
+          select k.id, g.election, g.polity_id, g.kind, g.population, g.area, (
+            select n.id from contest n join election ne on ne.id = n.election_id
+            where n.previous_round_id = k.id order by ne.date_from limit 1
+          ) as runoff
+          from govs g
+          join contest k on k.election_id = g.election and k.allocation_parent_id is null and not k.notional
+        )
+        select g.id, g.election, g.polity_id as polity, g.kind, g.population,
+          f.person, f.answer, f.share, f.won as "isWon", g.runoff,
+          (select e.date_from::text from contest n join election e on e.id = n.election_id where n.id = g.runoff) as date,
+          (select e.kind = 'general' from contest n join election e on e.id = n.election_id where n.id = g.runoff) as "isGeneral",
+          r.person as winner, r.answer as reply, r.share as won, r.won as "isDone"
+        from rows g
+        left join lateral (
+          select coalesce(m.into_id, cy.person_id) as person, o.ballot_label as answer, t.value / nullif(t.total, 0) as share,
+            exists (
+              select from outcome x join result_set xs on xs.id = x.result_set_id and ${latest("xs")}
+              where x.option_id = o.id and x.kind in ('elected', 'won') and x.candidacy_id is null
+            ) as won
+          from contest kc
+          join area a on a.id = coalesce(kc.district_area_id, g.area)
+          join result_set rs on rs.contest_id = kc.id and ${latest("rs")}
+          cross join lateral (
+            select y.option_k, sum(y.value)::float8 as value, sum(sum(y.value)) over ()::float8 as total
+            from result_rollup y
+            where y.result_set_k = rs.k and y.area_k = a.k and y.measure = 1 and y.option_k <> 0
+              and y.count_round = (
+                select max(z.count_round) from result_rollup z
+                where z.result_set_k = rs.k and z.area_k = a.k and z.measure = 1 offset 0
+              )
+            group by y.option_k
+            offset 0
+          ) t
+          join contest_option o on o.k = t.option_k
+          left join candidacy cy on cy.option_id = o.id and cy.role = 'head'
+          left join entity_merge m on m.entity_id = cy.person_id
+          where kc.id = g.id
+          order by t.value desc limit 1
+        ) f on true
+        left join lateral (
+          select coalesce(m.into_id, cy.person_id) as person, o.ballot_label as answer, t.value / nullif(t.total, 0) as share,
+            exists (
+              select from outcome x join result_set xs on xs.id = x.result_set_id and ${latest("xs")}
+              where x.option_id = o.id and x.kind in ('elected', 'won') and x.candidacy_id is null
+            ) as won
+          from contest kc
+          join area a on a.id = coalesce(kc.district_area_id, g.area)
+          join result_set rs on rs.contest_id = kc.id and ${latest("rs")}
+          cross join lateral (
+            select y.option_k, sum(y.value)::float8 as value, sum(sum(y.value)) over ()::float8 as total
+            from result_rollup y
+            where y.result_set_k = rs.k and y.area_k = a.k and y.measure = 1 and y.option_k <> 0
+              and y.count_round = (
+                select max(z.count_round) from result_rollup z
+                where z.result_set_k = rs.k and z.area_k = a.k and z.measure = 1 offset 0
+              )
+            group by y.option_k
+            offset 0
+          ) t
+          join contest_option o on o.k = t.option_k
+          left join candidacy cy on cy.option_id = o.id and cy.role = 'head'
+          left join entity_merge m on m.entity_id = cy.person_id
+          where kc.id = g.runoff
+          order by t.value desc limit 1
+        ) r on true
+      `);
+      if (found.rows.length === 0) {
+        return null;
+      }
+      const [labels, links, crumbs, own] = await Promise.all([
+        names(
+          [
+            polity,
+            ...found.rows.flatMap((row) =>
+              [row.id, row.polity, row.person, row.winner].filter(
+                (id) => id != null,
+              ),
+            ),
+          ],
+          input.date,
+        ),
+        paths([
+          polity,
+          ...found.rows.flatMap((row) =>
+            [row.id, row.election, row.runoff].filter((id) => id != null),
+          ),
+        ]),
+        breadcrumbs(polity),
+        db.execute<{ path: string }>(sql`
+          select s.path from election e join slug s on s.entity_id = e.id and s.is_current
+          where e.polity_id = ${polity}::uuid and e.date_from = ${input.date}::date and e.status::text <> 'annulled'
+          order by e.parent_id is null desc limit 1
+        `),
+      ]);
+      const governments = new Map<
+        string,
+        {
+          kind: "county" | "municipal" | "school" | "special";
+          population: number;
+          name: string;
+          path: string | null;
+          contests: Array<{
+            name: string;
+            path: string | null;
+            person: string | null;
+            leader: string | null;
+            share: number | null;
+            isWon: boolean;
+            runoff: {
+              path: string | null;
+              date: string;
+              isGeneral: boolean;
+              person: string | null;
+              leader: string | null;
+              share: number;
+              isWon: boolean;
+            } | null;
+          }>;
+        }
+      >();
+      for (const row of found.rows) {
+        const government = governments.get(row.election) ?? {
+          kind:
+            row.polity === polity || row.kind === "county"
+              ? "county"
+              : row.kind === "municipality" || row.kind === "submunicipal"
+                ? "municipal"
+                : row.kind === "school_district"
+                  ? "school"
+                  : "special",
+          population: row.population ?? 0,
+          name: labels.full.get(row.polity) ?? "",
+          path: links.get(row.election) ?? null,
+          contests: [],
+        };
+        let name = (labels.full.get(row.id) ?? "").replace(/^\d{4} /u, "");
+        while (
+          government.name !== "" &&
+          name.startsWith(government.name) &&
+          /^[:,]? ./u.test(name.slice(government.name.length))
+        ) {
+          name = name.slice(government.name.length).replace(/^[:,]? /u, "");
+        }
+        government.contests.push({
+          name: name.charAt(0).toUpperCase() + name.slice(1),
+          path: links.get(row.id) ?? null,
+          person: row.person,
+          leader:
+            (row.person == null ? null : labels.full.get(row.person)) ??
+            row.answer,
+          share: row.share,
+          isWon: row.isWon === true,
+          runoff:
+            row.runoff == null || row.date == null
+              ? null
+              : {
+                  path: links.get(row.runoff) ?? null,
+                  date: row.date,
+                  isGeneral: row.isGeneral === true,
+                  person: row.winner,
+                  leader:
+                    (row.winner == null ? null : labels.full.get(row.winner)) ??
+                    row.reply,
+                  share: row.won ?? 0,
+                  isWon: row.isDone === true || (row.won ?? 0) > 0.5,
+                },
+        });
+        governments.set(row.election, government);
+      }
+      const ranked = [...governments.values()].toSorted(
+        (a, b) => b.population - a.population || a.name.localeCompare(b.name),
+      );
+      return {
+        name: labels.full.get(polity) ?? "",
+        path: links.get(polity) ?? null,
+        breadcrumbs: crumbs,
+        own: own.rows[0]?.path ?? null,
+        tiers: (["county", "municipal", "school", "special"] as const)
+          .map((kind) => ({
+            kind,
+            governments: ranked
+              .filter((government) => government.kind === kind)
+              .map((government) => ({
+                name: government.name,
+                path: government.path,
+                contests: government.contests.toSorted((a, b) =>
+                  a.name.localeCompare(b.name, undefined, { numeric: true }),
+                ),
+              })),
+          }))
+          .filter((tier) => tier.governments.length > 0),
+      };
+    }),
+  counties: os
+    .meta(
+      openapi({
+        method: "GET",
+        path: "/elections/counties",
+        summary:
+          "Count a US state's local elections on one day by county, largest county first, each with its governments",
+      }),
+    )
+    .input(
+      v.object({
+        polity: v.pipe(v.string(), v.uuid()),
+        date: v.pipe(v.string(), v.isoDate()),
+      }),
+    )
+    .output(
+      v.object({
+        contests: v.number(),
+        counties: v.array(
+          v.object({
+            name: v.string(),
+            path: v.nullable(v.string()),
+            governments: v.array(
+              v.object({
+                name: v.string(),
+                path: v.nullable(v.string()),
+                contests: v.number(),
+              }),
+            ),
+          }),
+        ),
+      }),
+    )
+    .handler(async ({ input }) => {
+      const found = await db.execute<{
+        election: string;
+        polity: string;
+        county: string | null;
+        contests: number;
+      }>(sql`
+        with st as materialized (
+          select substr(p.iso_code, 4) as code from polity p
+          where p.id = ${input.polity}::uuid and p.kind = 'federal_unit' and p.iso_code like 'US-%'
+        ),
+        govs as materialized (
+          select distinct on (e.id) e.id as election, e.polity_id, g.county, g.kind, g.population
+          from st
+          join coverage_government g on g.state = st.code
+          join election e on e.polity_id = g.polity_id and e.date_from = ${input.date}::date and e.status::text <> 'annulled'
+          order by e.id, g.population desc nulls last
+        )
+        select g.election, g.polity_id as polity, c.polity_id as county,
+          (select count(*)::int from contest k where k.election_id = g.election and k.allocation_parent_id is null and not k.notional) as contests
+        from govs g
+        left join lateral (
+          select x.polity_id, x.population from coverage_government x
+          where x.county = g.county and x.kind = 'county' limit 1
+        ) c on true
+        order by c.population desc nulls last, g.kind = 'county' desc, g.kind = 'special' asc, g.population desc nulls last
+      `);
+      const held = found.rows.filter((row) => row.contests > 0);
+      const counties = [...new Set(held.flatMap((row) => row.county ?? []))];
+      const [labels, links] = await Promise.all([
+        names([...counties, ...held.map((row) => row.polity)], input.date),
+        paths([...counties, ...held.map((row) => row.election)]),
+      ]);
+      let contests = 0;
+      for (const row of held) {
+        contests += row.contests;
+      }
+      return {
+        contests,
+        counties: Map.groupBy(held, (row) => row.county ?? "")
+          .entries()
+          .map(([county, rows]) => {
+            const home = links.get(county);
+            return {
+              name: labels.full.get(county) ?? "",
+              path: home == null ? null : `${home}/${input.date}`,
+              governments: rows.map((row) => ({
+                name: labels.full.get(row.polity) ?? "",
+                path: links.get(row.election) ?? null,
+                contests: row.contests,
+              })),
+            };
+          })
+          .toArray(),
       };
     }),
   alongside: os

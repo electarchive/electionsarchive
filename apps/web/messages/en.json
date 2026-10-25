@@ -422,6 +422,8 @@
   "places_unreconciled_official": "The totals at the top of the page are the official count.",
   "col_result": "Result",
   "col_leader": "Leader",
+  "col_county": "County",
+  "col_governments": "Governments",
   "col_margin": "Margin",
   "sort_by": "Sort by {column}",
   "results_more": "{count} more under 1%",
@@ -625,6 +627,45 @@
   "wards_led": "Led with {share}",
   "wards_round_runoff": "{date} runoff",
   "wards_round_general": "{date} general election",
+  "local_tier_county": "County offices",
+  "local_tier_municipal": "Cities and towns",
+  "local_tier_school": "School districts",
+  "local_tier_special": "Special districts",
+  "local_title": "{year} {place} local elections",
+  "local_section": "Local elections in {place}",
+  "local_lede": "{governments} held {contests}.",
+  "counties_title": "Local elections this day",
+  "counties_lede": "{governments} in {counties} held {contests}.",
+  "counties_more": "and {count} more",
+  "local_meta": "Results of every local election held in {place} on {date}: county offices, cities, school districts, and special districts.",
+  "local_governments": [
+    {
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural",
+        "local countText = count: number"
+      ],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "{countText} local government",
+        "countPlural=*": "{countText} local governments"
+      }
+    }
+  ],
+  "local_counties": [
+    {
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural",
+        "local countText = count: number"
+      ],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "{countText} county",
+        "countPlural=*": "{countText} counties"
+      }
+    }
+  ],
   "alongside_title": "Also on the ballot",
   "alongside_lede": "Contests held the same day by other governments that cover all or part of this area.",
   "col_holder": "Holder",

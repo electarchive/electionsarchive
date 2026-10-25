@@ -562,7 +562,13 @@ export async function archive(path: string, search: URLSearchParams) {
     limit 1
   `);
   const slug = result.rows[0];
-  if (slug == null || (slug.path !== path && slug.type !== "contest")) {
+  const isDay =
+    slug?.type === "polity" &&
+    /^\d{4}-\d{2}-\d{2}$/u.test(path.slice(slug.path.length + 1));
+  if (
+    slug == null ||
+    (slug.path !== path && slug.type !== "contest" && !isDay)
+  ) {
     error(404);
   }
   const unit = path.slice(slug.path.length + 1);
@@ -592,6 +598,25 @@ export async function archive(path: string, search: URLSearchParams) {
     limit 1
   `);
   const within = region.rows[0]?.id ?? null;
+  if (isDay) {
+    const local = await call(router.elections.local, {
+      polity: slug.entity_id,
+      date: unit,
+    });
+    if (local == null) {
+      error(404);
+    }
+    if (local.own != null) {
+      redirect(307, `/${local.own}`);
+    }
+    return {
+      kind: "day" as const,
+      id: slug.entity_id,
+      date: unit,
+      local,
+      within,
+    };
+  }
   if (slug.type === "contest") {
     const [
       contest,
@@ -682,32 +707,64 @@ export async function archive(path: string, search: URLSearchParams) {
   if (slug.type === "election") {
     const input = { id: slug.entity_id };
     const place = search.get("in");
-    const scoped = await db.execute<{ id: string; path: string }>(sql`
-      select s.entity_id as id, s.path from slug s join polity p on p.id = s.entity_id
-      where s.path = ${place} and s.is_current
-    `);
+    const [scoped, held] = await Promise.all([
+      db.execute<{ id: string; path: string }>(sql`
+        select s.entity_id as id, s.path from slug s join polity p on p.id = s.entity_id
+        where s.path = ${place} and s.is_current
+      `),
+      db.execute<{
+        polity: string;
+        date: string | null;
+        tier: string | null;
+      }>(sql`
+        select e.polity_id as polity, e.date_from::text as date,
+          case when p.kind = 'county' then 'county' when p.kind = 'federal_unit' and p.iso_code like 'US-%' then 'state' end as tier
+        from election e join polity p on p.id = e.polity_id where e.id = ${slug.entity_id}::uuid
+      `),
+    ]);
     const scope = scoped.rows[0] ?? null;
+    const day = held.rows[0];
     if (place != null && scope == null) {
       error(404);
     }
-    const [election, governments, regions, tiers, cycle, alongside] =
-      await found(
-        Promise.all([
-          call(router.elections.get, { ...input, within: scope?.id }),
-          call(router.elections.governments, input),
-          call(router.elections.regions, input),
-          call(router.elections.tiers, input),
-          call(router.elections.cycle, input),
-          call(router.elections.alongside, input),
-        ]),
-      );
+    const [
+      election,
+      governments,
+      regions,
+      tiers,
+      cycle,
+      alongside,
+      local,
+      counties,
+    ] = await found(
+      Promise.all([
+        call(router.elections.get, { ...input, within: scope?.id }),
+        call(router.elections.governments, input),
+        call(router.elections.regions, input),
+        call(router.elections.tiers, input),
+        call(router.elections.cycle, input),
+        call(router.elections.alongside, input),
+        scope != null || day?.date == null || day.tier !== "county"
+          ? null
+          : call(router.elections.local, {
+              polity: day.polity,
+              date: day.date,
+            }),
+        scope != null || day?.date == null || day.tier !== "state"
+          ? null
+          : call(router.elections.counties, {
+              polity: day.polity,
+              date: day.date,
+            }),
+      ]),
+    );
     return {
       kind: "election" as const,
       id: slug.entity_id,
       scope,
       election,
       cycle,
-      sections: { governments, regions, tiers, alongside },
+      sections: { governments, regions, tiers, alongside, local, counties },
       within,
     };
   }

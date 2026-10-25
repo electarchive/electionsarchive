@@ -194,7 +194,7 @@
       {#if data.election.contests.length > 0}
         {@render list(m.election_contests(), data.election.contests)}
       {/if}
-    {:else}
+    {:else if data.kind === "polity"}
       <div class="px-3 pbs-2.5 pbe-2">
         <p class="text-[1.0625rem]/tight font-[720] text-balance">
           {data.polity.name}
