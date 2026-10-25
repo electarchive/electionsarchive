@@ -35,7 +35,7 @@ export function isSeated(contest: Page["contest"]) {
 export function winners(contest: Page["contest"]) {
   const seated = contest.rows.filter((row) => (row.current?.seats ?? 0) > 0);
   const won =
-    seated.length === 0 && contest.isStv
+    seated.length === 0
       ? contest.rows.filter((row) => row.current?.outcome === "elected")
       : seated;
   return won.length > 1 &&
@@ -152,7 +152,7 @@ export function verdict(contest: Page["contest"]) {
             ),
           });
   }
-  if (isSeat || (members != null && contest.isStv)) {
+  if (isSeat || members != null) {
     let total = 0;
     for (const row of contest.rows) {
       total += row.current?.seats ?? 0;
@@ -160,7 +160,7 @@ export function verdict(contest: Page["contest"]) {
     if (total === 0) {
       total = members?.length ?? 0;
     }
-    if (members != null && (members.length <= 4 || contest.isStv)) {
+    if (members != null && (members.length <= 4 || contest.isStv || !isSeat)) {
       const list = (rows: typeof members) =>
         new Intl.ListFormat(getLocale(), {
           style: "long",
