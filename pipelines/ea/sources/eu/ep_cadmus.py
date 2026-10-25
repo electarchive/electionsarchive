@@ -17,7 +17,7 @@ from ea.sources.gb import umit
 from ea.store import DATA, connect
 
 SOURCE = "eu.ep_cadmus"
-VERSION = "4"
+VERSION = "5"
 PARSED = DATA / "parsed" / SOURCE
 URL = "https://cadmus.eui.eu/bitstreams/9a5261b3-8dea-5650-988a-fac4460a8f3c/download"
 DEMON = "https://web.archive.org/web/20200201142936id_/http://www.election.demon.co.uk:80/eplon.html"
@@ -31,6 +31,36 @@ REPLACED = {
             "prints it: Conservative 70,490, Labour 63,623, Liberal (SDP–Liberal Alliance) 32,268, and Ecology 3,066, a "
             "turnout of 33.9 percent of 499,272 electors."
         ),
+    ),
+}
+BY_ELECTION = (
+    date(1979, 9, 20),
+    513347,
+    99705,
+    (
+        (
+            "Shelagh Roberts",
+            "Miss S.M. Roberts",
+            ("gb.umit.person", "wls-caernarvon:roberts-shelagh-marjorie"),
+            "conservative",
+            41096,
+        ),
+        ("Tony Hart", "A.B. Hart", None, "labour", 32632),
+        ("Christopher Mayhew", "C.P. Mayhew", ("wikidata", "Q5112833"), "liberal", 23842),
+        (
+            "Oliver Smedley",
+            "W.O. Smedley",
+            ("gb.umit.person", "eng-saffron-walden:smedley-william-oliver"),
+            "anti-common-market-and-free-trade-party",
+            1830,
+        ),
+        ("D. Hussey", "D. Hussey", None, None, 305),
+    ),
+)
+BY_ELECTION_NOTES = {
+    "D. Hussey": (
+        "Election Demon labels Hussey an independent democrat: he stood as the candidate of the \u201cUnited "
+        "Democratic Party\u201d, a name used by a mid-1970s party he appears to have had no connection to."
     ),
 }
 WINDOWS = {
@@ -937,6 +967,127 @@ def emit() -> Path:
                         },
                     ),
                 )
+        day, electors, valid, candidates = BY_ELECTION
+        by_election = cs.key("eu.election", f"GB:{day}:european-parliament-by-election")
+        cs.add(
+            "election",
+            id=by_election,
+            polity_id=polities["GB"],
+            parent_id=None,
+            kind="by_election",
+            date_from=day,
+            date_to=day,
+            date_precision="day",
+            original_text=None,
+            status="held",
+        )
+        name(by_election, "1979 London South West European Parliament by-election")
+        by_path = f"gb/{day}-european-parliament-by-election"
+        cs.add("slug", path=by_path, entity_id=by_election)
+        cs.add(
+            "note",
+            entity_id=by_election,
+            kind="context",
+            body_md="Held after Shelagh Roberts, elected in June 1979, was disqualified for her membership of the "
+            "Occupational Pensions Board; she resigned from the board and won the by-election.",
+        )
+        demon = cs.source("Election Demon", "United Kingdom European Parliamentary Election results 1979-99: London")
+        scheme, code = "gb.euc", "1979:london-south-west"
+        contest_key = f"GB:{day}:{scheme}:{code}"
+        contest = cs.key("eu.contest", contest_key)
+        cs.add(
+            "contest",
+            id=contest,
+            election_id=by_election,
+            kind="body_seats",
+            body_id=parliament,
+            district_area_id=cs.area(scheme, code),
+            magnitude=1,
+            electoral_system_id=fptp,
+            default_result_kind="counted",
+        )
+        name(contest, "1979 London South West European Parliament by-election")
+        cs.add("slug", path=f"{by_path}/london-south-west", entity_id=contest)
+        result_set = cs.key("eu.ep_cadmus.result_set", contest_key)
+        cs.add(
+            "result_set",
+            id=result_set,
+            election_id=by_election,
+            contest_id=contest,
+            stage="official",
+            kind="counted",
+            status="active",
+            source_id=demon,
+            is_default=True,
+            completeness=1,
+        )
+        values = [(None, 2, electors), (None, 4, valid)]
+        for position, (full, ballot, person_key, party_key, votes) in enumerate(candidates, start=1):
+            option = cs.key("eu.ep_cadmus.option", f"{contest_key}:{slug(full)}")
+            party = None
+            if party_key is not None:
+                party = (
+                    cs.key(*umit.EXISTING[party_key]) if party_key in umit.EXISTING else cs.key("gb.party", party_key)
+                )
+                if party in cs.minted:
+                    cs.add("party", id=party, kind="party", polity_id=polities["GB"])
+                    name(party, "Anti-Common Market and Free Trade Party")
+            person = (
+                cs.key(*person_key) if person_key is not None else cs.key("eu.ep_cadmus.person", f"{day}:{slug(full)}")
+            )
+            if person in cs.minted:
+                if person_key is not None:
+                    raise ValueError(f"no person {person_key}")
+                cs.add("person", id=person)
+                name(person, full)
+            cs.add(
+                "contest_option",
+                id=option,
+                contest_id=contest,
+                kind="candidate",
+                party_id=party,
+                ballot_position=position,
+                ballot_label=ballot,
+            )
+            if full in BY_ELECTION_NOTES:
+                cs.add("note", entity_id=option, kind="context", body_md=BY_ELECTION_NOTES[full])
+            cs.add(
+                "candidacy",
+                id=cs.key("eu.ep_cadmus.candidacy", f"{contest_key}:{slug(full)}"),
+                person_id=person,
+                option_id=option,
+                role="head",
+                ballot_name=ballot,
+                member_of_party_id=party,
+                is_independent=party is None,
+            )
+            if position == 1:
+                cs.add("outcome", result_set_id=result_set, option_id=option, kind="elected", seats=1)
+            values.append((str(option), 1, votes))
+        frames.append(
+            pl.DataFrame(
+                {
+                    "result_set_id": [str(result_set)] * len(values),
+                    "unit_id": [str(units[(scheme, code)])] * len(values),
+                    "option_id": [value[0] for value in values],
+                    "channel": [0] * len(values),
+                    "measure": [value[1] for value in values],
+                    "count_round": [0] * len(values),
+                    "flags": [0] * len(values),
+                    "value": [value[2] for value in values],
+                },
+                schema={
+                    "result_set_id": pl.String,
+                    "unit_id": pl.String,
+                    "option_id": pl.String,
+                    "channel": pl.Int16,
+                    "measure": pl.Int16,
+                    "count_round": pl.Int16,
+                    "flags": pl.Int16,
+                    "value": pl.Float64,
+                },
+            ),
+        )
         cs.frame("result_value", pl.concat(frames))
         print(f"{sets} contests, {len(elections)} elections, {len(parties)} parties, skipped {skipped}")
         return cs.write()
