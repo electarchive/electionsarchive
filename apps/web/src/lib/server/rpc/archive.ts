@@ -4430,7 +4430,8 @@ export const contests = {
               )
           ),
           peers as (
-            select c.id, a.id as area, a.k, me.scheme, me.day, me.general
+            select c.id, a.id as area, a.k, me.scheme, me.day, me.general,
+              coalesce(c.rules_override ->> 'formula', es.rules ->> 'formula', '') = 'stv' as stv
             from me join contest c
               on (case when me.general is null then c.election_id = me.election_id
                 else c.id = me.id or (c.election_id = me.general and c.district_area_id <> me.district_area_id) end)
@@ -4438,12 +4439,13 @@ export const contests = {
               and c.body_id is not distinct from me.body_id and c.office_id is not distinct from me.office_id
               and c.party_scope_id is not distinct from me.party_scope_id and c.allocation_parent_id is null and not c.notional
             join area a on a.id = c.district_area_id and a.scheme_code = me.scheme
+            left join electoral_system es on es.id = c.electoral_system_id
           )
           select p.id, p.area, p.k, p.scheme, p.general,
             (select g.date_from::text from election g where g.id = p.general) as since, sc.noun, w.party, w.option, w.person, w.label,
             ${paint(sql`w.party`, sql`${contest.election}::uuid`, sql`p.day`)} as color,
             coalesce(w.valid, 0)::float8 as valid,
-            case when w.valid > 0 then ((w.first - w.second) / w.valid)::float8 end as margin,
+            case when w.valid > 0 and not p.stv then ((w.first - w.second) / w.valid)::float8 end as margin,
             coalesce(w.independent, false) as independent
           from peers p
           join scheme sc on sc.code = p.scheme
@@ -4458,13 +4460,14 @@ export const contests = {
               select rs.k, rs.id from result_set rs where rs.contest_id = p.id and ${latest("rs")} limit 1
             ) rs
             cross join lateral (
-              select (array_agg(r.option_k order by r.seats desc, r.value desc))[1] as top,
+              select (array_agg(r.option_k order by r.seats desc, case when r.filled > 1 then r.total else r.value end desc, r.value desc))[1] as top,
                 case when count(*) filter (where r.elected) > 1 then min(r.value) filter (where r.elected) else max(r.value) end as first,
                 case when count(*) filter (where r.elected) > 1 then coalesce(max(r.value) filter (where not r.elected), 0)
                   else coalesce((array_agg(r.value order by r.value desc))[2], 0) end as second,
                 sum(r.value) as valid
               from (
-                select r.option_k, r.value, r.elected, count(*) filter (where r.elected) over (partition by r.grp) as seats
+                select r.option_k, r.value, r.elected, count(*) filter (where r.elected) over (partition by r.grp) as seats,
+                  count(*) filter (where r.elected) over () as filled, sum(r.value) over (partition by r.grp) as total
                 from (
                   select r.option_k, r.value,
                     exists (
@@ -4481,9 +4484,13 @@ export const contests = {
                       where x.result_set_k = rs.k and x.area_k = p.k and x.measure = any(${COUNTED})
                       order by array_position(${COUNTED}, x.measure) limit 1
                     )
-                    and r.count_round = (
+                    and r.count_round = case when (
+                      select count(*) from outcome x where x.result_set_id = rs.id and x.kind in ('elected', 'won') and x.candidacy_id is null
+                    ) > 1 then (
+                      select min(x.count_round) from result_rollup x where x.result_set_k = rs.k and x.area_k = p.k and x.measure = any(${COUNTED})
+                    ) else (
                       select max(x.count_round) from result_rollup x where x.result_set_k = rs.k and x.area_k = p.k
-                    )
+                    ) end
                 ) r
               ) r
             ) t

@@ -197,7 +197,7 @@
                           "font-semibold": votes >= stv.quota,
                         })}>{figure(votes)}</span
                       >
-                      {#if change != null && Math.abs(change) >= 0.5}
+                      {#if change != null && Math.abs(change) >= 0.0005}
                         <span
                           class="font-figures text-xs text-muted-foreground tabular-nums"
                           >{signed(change)}</span
@@ -249,7 +249,7 @@
               {#if spent != null}
                 <span class="grid justify-items-end">
                   <span class="font-figures tabular-nums">{figure(spent)}</span>
-                  {#if prior != null && Math.abs(spent - prior) >= 0.5}
+                  {#if prior != null && Math.abs(spent - prior) >= 0.0005}
                     <span class="font-figures text-xs tabular-nums"
                       >{signed(spent - prior)}</span
                     >

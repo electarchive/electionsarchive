@@ -2696,7 +2696,7 @@ function countMarkdown(contest: Extract<Data, { kind: "contest" }>["contest"]) {
         ),
       );
     const signed = (value: number) =>
-      Math.abs(value) < 0.5
+      Math.abs(value) < 0.0005
         ? ""
         : ` (${value > 0 ? "+" : "−"}${count(Math.abs(value))})`;
     return [
