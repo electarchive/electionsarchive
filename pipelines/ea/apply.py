@@ -935,6 +935,7 @@ def _rollup(
             else []
         ),
     ]
+    conn.execute("select k from result_set where k = any(%s) order by k for update", [stale])
     conn.execute("delete from result_rollup_sum where result_set_k = any(%s)", [stale])
     conn.execute("delete from result_rollup_unit where result_set_k = any(%s)", [stale])
     conn.execute("delete from rollup_coverage where result_set_k = any(%s)", [stale])
