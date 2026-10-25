@@ -592,11 +592,20 @@
     ),
   );
   const drilled = $derived(contest.scope.noun != null);
+  const isLater = $derived(
+    contest.count != null &&
+      contest.count.stv == null &&
+      contest.count.round > 1,
+  );
   const counted = $derived(
     (contest.count?.stv != null && contest.count.round === 1) ||
       (contest.isStv && contest.count == null)
       ? m.stv_first()
-      : MEASURES[contest.current?.measure ?? ""]?.(),
+      : isLater && contest.count != null
+        ? contest.count.round === contest.count.last
+          ? m.stat_final_round()
+          : m.stat_round_votes({ round: contest.count.round })
+        : MEASURES[contest.current?.measure ?? ""]?.(),
   );
   const question = $derived(isQuestion(contest));
   const seated = $derived(isSeated(contest));
@@ -2186,7 +2195,9 @@
                 ? (counted ?? m.stat_valid())
                 : m.stat_votes_cast()}
               definition={contest.ballot == null
-                ? (DEFINITIONS[contest.current.measure]?.() ?? m.term_valid())
+                ? isLater
+                  ? m.term_final_round()
+                  : (DEFINITIONS[contest.current.measure]?.() ?? m.term_valid())
                 : m.term_votes_cast({ count: String(contest.ballot) })}
             />
           </dt>

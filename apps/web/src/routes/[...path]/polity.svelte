@@ -386,6 +386,13 @@
         })}{/if}
     </p>
   {/if}
+  {#if polity.latest == null && polity.results.length > 0 && ["county", "municipality", "school_district", "special_district"].includes(polity.kind)}
+    <p
+      class="text-[0.8125rem] text-pretty text-muted-foreground max-inline-[64ch]"
+    >
+      {m.polity_no_local({ place: polity.name })}
+    </p>
+  {/if}
 </header>
 
 {#if isMapped}

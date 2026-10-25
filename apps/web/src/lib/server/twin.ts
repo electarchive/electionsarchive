@@ -1251,6 +1251,13 @@ function polityMarkdown(
   return [
     `# ${polity.name}`,
     byline(polity.breadcrumbs, link, null),
+    ...(polity.latest == null &&
+    polity.results.length > 0 &&
+    ["county", "municipality", "school_district", "special_district"].includes(
+      polity.kind,
+    )
+      ? [m.polity_no_local({ place: polity.name })]
+      : []),
     ...(latest == null || latest.races.length === 0
       ? []
       : [
@@ -3110,7 +3117,7 @@ function resultsMarkdown(
           ...(hasOutcome ? [m.col_result()] : []),
         ],
         results,
-      )}\n\n${contest.ballot == null ? m.stat_valid() : m.stat_votes_cast()}: ${count(contest.current.valid)}${contest.ballot == null ? "" : ` ${m.term_votes_cast({ count: String(contest.ballot) })}`}${
+      )}\n\n${contest.ballot != null ? m.stat_votes_cast() : contest.count != null && contest.count.stv == null && contest.count.round > 1 ? m.stat_final_round() : m.stat_valid()}: ${count(contest.current.valid)}${contest.ballot == null ? "" : `. ${m.term_votes_cast({ count: String(contest.ballot) })}`}${
         contest.turnout == null || contest.turnout.registered === 0
           ? ""
           : `\n\n${m.stat_turnout()}: ${percent(contest.turnout.voters / contest.turnout.registered)} (${m.stat_turnout_count({ voters: count(contest.turnout.voters), registered: count(contest.turnout.registered) })})${contest.turnout.basis === "rejected" ? ` ${m.turnout_basis_rejected()}` : contest.turnout.basis === "valid" ? ` ${m.turnout_basis_valid()}` : ""}`
