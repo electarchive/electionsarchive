@@ -14,6 +14,7 @@
   import { cn } from "#lib/utils.js";
   import type { PageData } from "./$types";
   import PlaceMap from "./map.svelte";
+  import Offices from "./offices.svelte";
   import Preview from "./preview.svelte";
   import Timeline from "./record.svelte";
   import Scrubber from "./scrubber.svelte";
@@ -498,7 +499,7 @@
             <p
               class="font-figures text-[0.8125rem] text-muted-foreground tabular-nums"
             >
-              {m.record_filled({ count: race.contested })}
+              {m.record_seats_filled({ count: race.contested })}
             </p>
           {:else if race.results.length > 1}
             <div
@@ -550,6 +551,7 @@
 {/if}
 
 {#if isLocal}
+  <Offices {id} place={polity.name} />
   {#if shared != null}
     <section
       class="col-span-12 grid gap-1 bg-card px-3.5 pbs-4 pbe-1"

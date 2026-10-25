@@ -1250,7 +1250,7 @@ function polityMarkdown(
             return [
               `### ${link(race.name, race.path)}`,
               race.isPartyless
-                ? m.record_filled({ count: race.contested })
+                ? m.record_seats_filled({ count: race.contested })
                 : table(
                     [
                       m.col_option(),
@@ -1304,17 +1304,25 @@ function polityMarkdown(
                 : `${point.path}?in=${record.scope}`,
             ),
             series.isOffice
-              ? [
+              ? `${[
                   point.winner,
                   parties[0]?.label,
                   point.share == null ? null : percent(point.share),
                 ]
                   .filter((part) => part != null)
-                  .join(", ")
+                  .join(
+                    ", ",
+                  )}${point.isRunoff ? ` (${link(m.offices_runoff(), point.contest)})` : ""}`
               : point.parties.every(
                     (row) => row.party == null && row.isIndependent !== true,
                   )
-                ? m.record_filled({ count: point.filled })
+                ? (series.points.every((other) =>
+                    other.parties.every(
+                      (row) => row.party == null && row.isIndependent !== true,
+                    ),
+                  )
+                    ? m.record_seats_filled
+                    : m.record_filled)({ count: point.filled })
                 : parties
                     .slice(0, 4)
                     .map((row) => `${row.label} ${count(row.seats)}`)

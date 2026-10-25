@@ -11752,6 +11752,8 @@ export const polities = {
                 filled: v.number(),
                 share: v.nullable(v.number()),
                 winner: v.nullable(v.string()),
+                contest: v.nullable(v.string()),
+                isRunoff: v.boolean(),
                 parties: v.array(
                   v.object({
                     party: v.nullable(v.string()),
@@ -11800,6 +11802,8 @@ export const polities = {
         seats: number;
         share: number | null;
         winner: string | null;
+        decider: string | null;
+        isRunoff: boolean;
       }>(sql`
         with recursive later as materialized (
           select distinct r.parent_id as parent, r.id as election, coalesce(rc.office_id, rc.body_id) as seat
@@ -11964,6 +11968,8 @@ export const polities = {
             min(r.date) as day, min(r.year) as year, count(distinct r.id)::int as races,
             w.party, bool_or(w.independent) as independent, sum(w.seats)::int as seats, avg(sh.share)::float8 as share,
             case when count(distinct r.id) = 1 then (array_agg(w.person))[1] end as winner,
+            case when count(distinct r.id) = 1 then (array_agg(w.contest))[1] end as decider,
+            bool_or(w.contest <> w.root) as runoff,
             coalesce(sum(w.seats) filter (where r."isList"), 0)::int as listed
           from roots r
           join won w on w.root = r.id
@@ -11981,6 +11987,7 @@ export const polities = {
           select s.*, coalesce(s.total > s.size * 1.02 and s.lists >= s.size * 0.9, false) as "isMixed" from sized s
         )
         select seat, "isOffice", "isAbroad", bucket, link, day::text as date, year, races, party, share, winner,
+          decider, coalesce(runoff, false) as "isRunoff",
           party is null and independent as "isIndependent",
           case when "isMixed" then listed else seats end as seats
         from flagged
@@ -12020,7 +12027,13 @@ export const polities = {
           ...cabinets.rows.flatMap((row) => row.party ?? []),
         ]),
       ];
-      const links = [...new Set(found.rows.flatMap((row) => row.link ?? []))];
+      const links = [
+        ...new Set(
+          found.rows.flatMap((row) =>
+            [row.link ?? [], row.decider ?? []].flat(),
+          ),
+        ),
+      ];
       const [labels, slugs, colors, positions, homes, own, dated] =
         await Promise.all([
           names([
@@ -12130,6 +12143,11 @@ export const polities = {
                       group.length === 1 && first?.winner != null
                         ? (labels.full.get(first.winner) ?? null)
                         : null,
+                    contest:
+                      group.length === 1 && first?.decider != null
+                        ? (slugs.get(first.decider) ?? null)
+                        : null,
+                    isRunoff: group.length === 1 && first?.isRunoff === true,
                     parties: group
                       .map((row) => ({
                         party: row.party,

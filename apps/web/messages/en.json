@@ -55,6 +55,22 @@
       }
     }
   ],
+  "record_seats_filled": [
+    {
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural",
+        "local countText = count: number"
+      ],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "{countText} seat filled",
+        "countPlural=*": "{countText} seats filled"
+      }
+    }
+  ],
+  "offices_lede": "Winners of each election for {place}'s own offices, and seats filled on its councils. Select a year to open that race.",
+  "offices_runoff": "Runoff",
   "record_tabs": "Chamber or office",
   "record_governments": "Governments",
   "record_governments_key": "The strip shows which party governed between elections. Hover to see the cabinet.",
