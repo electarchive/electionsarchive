@@ -696,6 +696,7 @@ def parse(
                     "remainder": remainder,
                     "term": f"{NUMBERS.get(term[1], term[1])}-year term" if term else None,
                     "magnitude": node["vote_for"],
+                    "whole": bool(node.get("whole")),
                     **found,
                 }
             )
@@ -1383,7 +1384,11 @@ def emit(
             shares = made[(scheme, code)][2] if (scheme, code) in made else {code[:5]: 1.0}
             carried = set(rows["county"].to_list())
             whole = sum(shares.values()) or 1.0
-            missing = sorted(county for county, share in shares.items() if share >= 0.01 and county not in carried)
+            missing = (
+                []
+                if "whole" in rows.columns and rows["whole"].all()
+                else sorted(county for county, share in shares.items() if share >= 0.01 and county not in carried)
+            )
             completeness = 1.0 if not missing else round(sum(shares.get(county, 0.0) for county in carried) / whole, 3)
             if completeness < 0.5:
                 skipped["under half its area reported"] += 1

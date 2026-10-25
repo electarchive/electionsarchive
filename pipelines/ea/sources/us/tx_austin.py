@@ -80,7 +80,7 @@ def _read(registry: Mapping[str, Mapping[str, str]]) -> Iterator[dict[str, Any]]
             kind = re.search(r"Type of Election:</td>\s*<td>([^<]+)", page)
             kind = kind[1].strip() if kind else ""
             day = datetime.strptime(when[1].strip(), "%B %d, %Y").date()
-            nodes = [{**node, "key": str(index)} for index, node in enumerate(contests(page, kind))]
+            nodes = [{**node, "key": str(index), "whole": True} for index, node in enumerate(contests(page, kind))]
             yield {
                 "tenant": tenant,
                 "election": str(eid),
