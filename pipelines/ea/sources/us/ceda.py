@@ -2,9 +2,12 @@ import io
 import itertools
 import json
 import re
+import unicodedata
 import zipfile
 from datetime import date, timedelta
+from difflib import SequenceMatcher
 from pathlib import Path
+from typing import TypedDict
 from urllib.parse import urlencode
 from uuid import UUID
 
@@ -13,6 +16,7 @@ import shapefile
 
 from ea import raw
 from ea.changeset import Changeset, slug
+from ea.sources.us import alged
 from ea.store import DATA, connect
 
 SOURCE = "us.ceda"
@@ -61,6 +65,7 @@ CITY = {
     "POLICE CHIEF": ("police-chief", "Police Chief", False),
     "RENT CONTROL BOARD": ("rent-control-board", "Rent Control Board", True),
 }
+SUFFIXES = {"jr", "sr", "ii", "iii", "iv"}
 FILL = {"city", "joint", "union", "school", "district", "elementary", "high", "unified", "the", "of", "schools"}
 SKIPPED = re.compile(r"(?i)-\s*(?:R|P|RECALL|PROPOSED)$|\((?:PROPOSED|RECALL)\)|\bRECALL\b|\bPROPOSED\b")
 METHOD = (
@@ -395,8 +400,351 @@ def parse() -> None:
     (PARSED / "missing.txt").write_text("\n".join(sorted(missing)))
 
 
+TAKEOVER = "Replaced by the California Elections Data Archive's record of this contest"
+DISAGREE = (
+    "The American Local Government Elections Database's figures for this contest differ from the California Elections "
+    "Data Archive's, which are the default; both are kept."
+)
+EMPTIED = "An election the American Local Government Elections Database dated by month, whose contests moved to their election days"
+
+
+class Option(TypedDict):
+    option: UUID
+    surname: str
+    label: str | None
+    candidacy: UUID | None
+    person: UUID | None
+    votes: int
+    elected: bool
+
+
+class Entry(TypedDict):
+    contest: UUID
+    value: str
+    magnitude: int
+    election: UUID
+    area: UUID | None
+    set: UUID | None
+    options: list[Option]
+    names: list[tuple[UUID, str]]
+    notes: list[tuple[UUID, str]]
+    unit: UUID | None
+    row: dict[str, object] | None
+
+
+class Taken(Entry):
+    disagree: str | None
+    surnames: dict[str, str]
+
+
+class Race(TypedDict):
+    race: str
+    magnitude: int
+    votes: dict[str, int]
+    elected: set[str]
+    rcv: bool
+
+
+def surname(text: str) -> str:
+    plain = unicodedata.normalize("NFKD", text).encode("ascii", "ignore").decode().lower()
+    plain = re.sub(r"[\"'‘’“”(][^\"'‘’“”)]*[\"'‘’“”)]", " ", plain)
+    words = [word for word in re.findall(r"[a-z]+", plain) if word not in ("jr", "sr", "ii", "iii", "iv")]
+    return words[-1] if words else plain
+
+
+def takeovers(conn, frame: pl.DataFrame) -> tuple[dict[str, Taken], set[str], pl.DataFrame]:
+    contests: dict[tuple[object, ...], list[Entry]] = {}
+    for contest, value, owner, kind, magnitude, election, day, precision, area, district, alged_set in conn.execute(
+        """select c.id, x.value, coalesce(oe.value, be.value), c.kind::text, c.magnitude, e.id, e.date_from,
+                  e.date_precision::text, c.district_area_id,
+                  (select substring(ac.code from '(?:district|area)-([0-9a-z]+)$') from area_code ac
+                   join area a on a.id = ac.area_id and a.scheme_code = 'us.local_district'
+                   where ac.area_id = c.district_area_id limit 1),
+                  (select r.id from result_set r join source s on s.id = r.source_id
+                   where r.contest_id = c.id and s.title = %s order by r.is_default desc limit 1)
+           from contest c join external_id x on x.entity_id = c.id and x.scheme = 'us.contest' and x.value like 'alged:%%'
+           join entity n on n.id = c.id and n.retired_by is null
+           join changeset h on h.id = c.changeset_id and h.pipeline in ('us.alged', 'us.ceda')
+           join election e on e.id = c.election_id
+           left join external_id oe on oe.entity_id = c.office_id and oe.scheme = 'us.office'
+           left join external_id be on be.entity_id = c.body_id and be.scheme = 'us.body'
+           where coalesce(oe.value, be.value) like 'CA:%%'
+             and coalesce(oe.value, be.value) not similar to 'CA:(0667000|06075):%%'
+             and not exists (select from entity_merge m where m.entity_id = c.id)""",
+        [alged.TITLE],
+    ).fetchall():
+        if precision == "year":
+            continue
+        contests.setdefault((owner, day.year, day.month, kind, district), []).append(
+            Entry(
+                contest=contest,
+                value=value,
+                magnitude=magnitude,
+                election=election,
+                area=area,
+                set=alged_set,
+                options=[],
+                names=[],
+                notes=[],
+                unit=None,
+                row=None,
+            )
+        )
+    by_id = {entry["contest"]: entry for entries in contests.values() for entry in entries}
+    ids = list(by_id)
+    for contest, unit in conn.execute(
+        """select c.id, (select u.id from reporting_unit u where u.area_id = c.district_area_id
+                         and u.scheme_code in ('us.local_district', 'us.place', 'us.county', 'us.school_district') limit 1)
+           from contest c where c.id = any(%s)""",
+        [ids],
+    ).fetchall():
+        by_id[contest]["unit"] = unit
+    for contest, name_id, text in conn.execute(
+        """select n.entity_id, n.id, n.text from name n join changeset h on h.id = n.changeset_id
+           where n.entity_id = any(%s) and n.is_preferred and h.pipeline = %s""",
+        [ids, alged.SOURCE],
+    ).fetchall():
+        by_id[contest]["names"].append((name_id, text))
+    for contest, note_id, body in conn.execute(
+        """select n.entity_id, n.id, n.body_md from note n join changeset h on h.id = n.changeset_id
+           where n.entity_id = any(%s) and h.pipeline = %s""",
+        [ids, alged.SOURCE],
+    ).fetchall():
+        by_id[contest]["notes"].append((note_id, body))
+    for row in conn.execute(
+        """select id, election_id, contest_id, stage::text, kind::text, source_id, completeness from result_set
+           where contest_id = any(%s) and source_id in (select id from source where title = %s)""",
+        [ids, alged.TITLE],
+    ).fetchall():
+        if by_id[row[2]]["set"] == row[0]:
+            by_id[row[2]]["row"] = dict(
+                zip(("id", "election_id", "contest_id", "stage", "kind", "source_id", "completeness"), row, strict=True)
+            )
+    for contest, option, label, candidacy, person, votes, elected in conn.execute(
+        """select o.contest_id, o.id, o.ballot_label, cy.id, cy.person_id,
+                  (select sum(v.value) from result_value v join result_set r on r.k = v.result_set_k
+                   join source s on s.id = r.source_id
+                   where r.contest_id = o.contest_id and s.title = %s and v.option_k = o.k and v.measure = 1),
+                  exists (select from outcome t join result_set r on r.id = t.result_set_id join source s on s.id = r.source_id
+                          where t.option_id = o.id and t.kind = 'elected' and s.title = %s)
+           from contest_option o left join candidacy cy on cy.option_id = o.id and cy.role = 'head'
+           where o.contest_id = any(%s) and o.kind = 'candidate'""",
+        [alged.TITLE, alged.TITLE, list(by_id)],
+    ).fetchall():
+        by_id[contest]["options"].append(
+            {
+                "option": option,
+                "surname": surname(label or ""),
+                "label": label,
+                "candidacy": candidacy,
+                "person": person,
+                "votes": int(votes or 0),
+                "elected": elected,
+            }
+        )
+    races: dict[tuple[object, ...], list[Race]] = {}
+    for (race,), rows in frame.group_by("race"):
+        first = rows.row(0, named=True)
+        day = first["day"]
+        district = (first["area"] or "").lstrip("0").lower() or None
+        races.setdefault(
+            (
+                f"CA:{first['code']}:{first['key']}",
+                day.year,
+                day.month,
+                "body_seats" if first["body"] else "office",
+                district,
+            ),
+            [],
+        ).append(
+            {
+                "race": race,
+                "magnitude": first["magnitude"],
+                "votes": dict(zip(rows["name"].map_elements(surname, pl.String), rows["votes"], strict=True)),
+                "elected": {surname(name) for name, flag in rows.select("name", "elected").iter_rows() if flag == "1"},
+                "rcv": bool(rows["rcv"].any()),
+            }
+        )
+    matched: dict[str, Taken] = {}
+    held: set[str] = set()
+    report = []
+
+    def align(race: Race, entry: Entry) -> dict[str, str]:
+        names = {option["surname"] for option in entry["options"]}
+        mapping = {}
+        for name in race["votes"]:
+            close = [
+                other
+                for other in names
+                if other == name or (other[:1] == name[:1] and SequenceMatcher(None, other, name).ratio() >= 0.8)
+            ]
+            if name in names or len(close) == 1:
+                mapping[name] = name if name in names else close[0]
+        return mapping
+
+    for key, entries in contests.items():
+        candidates = races.get(key, [])
+        pairs = []
+        differ = set()
+        if (key[4] is not None or key[3] == "office") and len(entries) == 1 and len(candidates) == 1:
+            mapping = align(candidates[0], entries[0])
+            if mapping and 2 * len(set(mapping.values())) >= len(entries[0]["options"]):
+                pairs = [(entries[0], candidates[0], mapping)]
+            else:
+                differ.add(id(entries[0]))
+        else:
+            for entry in entries:
+                names = {option["surname"] for option in entry["options"]}
+                fits = []
+                for race in candidates:
+                    mapping = align(race, entry)
+                    if (
+                        race["magnitude"] == entry["magnitude"]
+                        and len(mapping) == len(race["votes"])
+                        and set(mapping.values()) == names
+                    ):
+                        fits.append((race, mapping))
+                if len(fits) == 1 and not any(fits[0][0] is other for _, other, _ in pairs):
+                    pairs.append((entry, *fits[0]))
+        paired = {id(entry) for entry, _, _ in pairs}
+        if len(paired) < len(entries):
+            for race in candidates:
+                if not any(race is other for _, other, _ in pairs):
+                    held.add(race["race"])
+        for entry in entries:
+            if id(entry) not in paired:
+                report.append(
+                    {
+                        "owner": key[0],
+                        "year": key[1],
+                        "month": key[2],
+                        "district": key[4],
+                        "alged": entry["value"],
+                        "race": None,
+                        "status": "candidates differ"
+                        if id(entry) in differ
+                        else "ambiguous"
+                        if candidates
+                        else "no CEDA race",
+                        "detail": ", ".join(sorted(option["surname"] for option in entry["options"])),
+                    }
+                )
+        for entry, race, mapping in pairs:
+            votes = {mapping.get(name, name): value for name, value in race["votes"].items()}
+            elected = {mapping.get(name, name) for name in race["elected"]}
+            winners = {option["surname"] for option in entry["options"] if option["elected"]}
+            off = [
+                f"{option['surname']} {option['votes']}/{votes[option['surname']]}"
+                for option in entry["options"]
+                if option["surname"] in votes
+                and abs(option["votes"] - votes[option["surname"]])
+                > 0.01 * max(option["votes"], votes[option["surname"]])
+            ]
+            missing = sorted({option["surname"] for option in entry["options"]} - set(votes))
+            disagree = (winners and winners != elected) or off
+            kind = (
+                "primary leader"
+                if winners and not elected and not off
+                else "ranked-choice rounds"
+                if off and race["rcv"]
+                else "winner"
+                if winners and winners != elected
+                else "votes"
+            )
+            detail = "; ".join(
+                part
+                for part in (
+                    f"winners ALGED {sorted(winners)} CEDA {sorted(elected)}" if winners and winners != elected else "",
+                    "votes " + ", ".join(off) if off else "",
+                    "ALGED only " + ", ".join(missing) if missing else "",
+                )
+                if part
+            )
+            matched[race["race"]] = Taken(**entry, disagree=detail if disagree else None, surnames=mapping)
+            report.append(
+                {
+                    "owner": key[0],
+                    "year": key[1],
+                    "month": key[2],
+                    "district": key[4],
+                    "alged": entry["value"],
+                    "race": race["race"],
+                    "status": f"disagrees: {kind}" if disagree else "matched",
+                    "detail": detail or None,
+                }
+            )
+    return matched, held, pl.DataFrame(report, infer_schema_length=None)
+
+
 def emit() -> Path:
     frame = pl.read_parquet(PARSED / "candidates.parquet")
+    into: dict[tuple[str, str], str] = {}
+    ballots: dict[tuple[str, str], list[str]] = {}
+    looser: list[str] = []
+    multi = frame.group_by("race").agg(pl.col("county").n_unique()).filter(pl.col("county") > 1)["race"]
+    for (race,), rows in frame.filter(pl.col("race").is_in(multi.implode())).group_by("race"):
+        entries = rows.select("candidate", "county", "name", "votes").rows()
+        clusters = {candidate: {candidate} for candidate, *_ in entries}
+        for (left, left_county, left_name, _), (right, right_county, right_name, _) in itertools.combinations(
+            entries, 2
+        ):
+            sides = []
+            for text in (left_name, right_name):
+                tokens = [t for t in re.split(r"[\s,.]+", re.sub(r"[()\"']", " ", text).lower()) if t]
+                sides.append(([t for t in tokens if t not in SUFFIXES], [t for t in tokens if t in SUFFIXES]))
+            (core, suffix), (other, other_suffix) = sides
+            if len(core) < 2 or len(other) < 2 or core[0] != other[0] or core[-1] != other[-1]:
+                continue
+            middle, other_middle = core[1:-1], other[1:-1]
+            close = (
+                middle == other_middle
+                or (not middle and len(other_middle) == 1 and len(other_middle[0]) == 1)
+                or (not other_middle and len(middle) == 1 and len(middle[0]) == 1)
+            ) and (suffix == other_suffix or not suffix or not other_suffix)
+            if left_county == right_county or not close:
+                looser.append(f"{race}: {left_name} ({left_county}) / {right_name} ({right_county})")
+                continue
+            joined = clusters[left] | clusters[right]
+            for candidate in joined:
+                clusters[candidate] = joined
+        counties = {candidate: county for candidate, county, *_ in entries}
+        spelled = {candidate: text for candidate, _, text, _ in entries}
+        for cluster in {frozenset(cluster) for cluster in clusters.values() if len(cluster) > 1}:
+            if len({counties[candidate] for candidate in cluster}) < len(cluster):
+                looser.append(f"{race}: " + " / ".join(f"{spelled[c]} ({counties[c]})" for c in sorted(cluster)))
+                continue
+            canonical = max(sorted(cluster), key=lambda c: (len(spelled[c].split()), len(spelled[c])))
+            for candidate in cluster - {canonical}:
+                into[(race, candidate)] = canonical
+            ballots[(race, canonical)] = sorted({spelled[c] for c in cluster} - {spelled[canonical]})
+    if into:
+        frame = (
+            frame.join(
+                pl.DataFrame(
+                    [(race, candidate, canonical) for (race, candidate), canonical in into.items()],
+                    schema=["race", "candidate", "into"],
+                    orient="row",
+                ),
+                on=["race", "candidate"],
+                how="left",
+            )
+            .with_columns(pl.col("into").fill_null(pl.col("candidate")))
+            .with_columns(
+                pl.col("votes").sum().over("race", "into"),
+                pl.col("incumbent").any().over("race", "into"),
+                pl.when((pl.col("elected") == "1").any().over("race", "into"))
+                .then(pl.lit("1"))
+                .when((pl.col("elected") == "3").any().over("race", "into"))
+                .then(pl.lit("3"))
+                .otherwise(pl.col("elected")),
+            )
+            .filter(pl.col("into") == pl.col("candidate"))
+            .drop("into")
+        )
+    print(f"{len(into)} county spellings merged into {len(ballots)} candidates")
+    merged = {race for race, _ in into}
+    for line in looser:
+        print(f"  looser, not merged: {line}")
     places = pl.read_parquet(PARSED / "places.parquet")
     grouped = {race: rows for (race,), rows in pl.read_parquet(PARSED / "precincts.parquet").group_by("race")}
     with connect() as conn:
@@ -505,10 +853,13 @@ def emit() -> Path:
                    join source s on s.id = r.source_id
                    join external_id x on x.entity_id = coalesce(c.office_id, c.body_id)
                      and x.scheme in ('us.office', 'us.body')
-                   where x.value like 'CA:%%' and s.title <> %s""",
-                [TITLE],
+                   where x.value like 'CA:%%' and s.title <> %s
+                     and (s.title <> %s or x.value similar to 'CA:(0667000|06075):%%')""",
+                [TITLE, alged.TITLE],
             ).fetchall()
         )
+        takeover, waiting, report = takeovers(conn, frame)
+        report.write_parquet(PARSED / "takeovers.parquet")
         held |= {
             ("CA:06075:board-of-supervisors", year, month)
             for value, year, month in held
@@ -591,6 +942,7 @@ def emit() -> Path:
                     lambda row: (f"CA:{row['code']}:{row['key']}", row["day"].year, row["day"].month) in held,
                     pl.Boolean,
                 )
+                & ~pl.col("race").is_in(list(waiting))
             )
             .sort("day", "race")
         )
@@ -606,16 +958,22 @@ def emit() -> Path:
         elections: set[UUID] = set()
         districts: set[str] = set()
         paths: set[str] = set()
+        stale = 0
+        absorbed: list[tuple[str, str, UUID]] = []
         values: list[tuple[str, str, str, int]] = []
+        used: set[UUID] = set()
+        moved: set[UUID] = set()
+        sources: set[UUID] = set()
         for (race,), rows in frame.sort("race", "votes", descending=[False, True]).group_by(
             "race", maintain_order=True
         ):
             first = rows.row(0, named=True)
             code, key, day = first["code"], first["key"], first["day"]
-            if (f"CA:{code}:{key}", day.year, day.month) in held:
+            if (f"CA:{code}:{key}", day.year, day.month) in held or race in waiting:
                 continue
+            taken_over = takeover.get(race)
             polity, place, path, word = polities[code]
-            title = place.removeprefix("City of ")
+            title = "San Francisco" if code == "06075" else place.removeprefix("City of ")
             geoid = code.removeprefix("sd")
             scheme = {5: "us.county", 7: "us.place"}.get(len(code), "us.school_district")
             office = f"Mayor of {title}" if key == "mayor" else f"{title} {first['title']}"
@@ -668,7 +1026,7 @@ def emit() -> Path:
                 label = area_text.lstrip("0") or area_text
                 seat = (
                     f"District {label}"
-                    if key == "board-of-supervisors"
+                    if key in ("board-of-supervisors", "council")
                     else f"Trustee Area {label}"
                     if key == "board-of-education"
                     else f"Office {label}"
@@ -680,14 +1038,13 @@ def emit() -> Path:
             unit = cs.unit(scheme, geoid)
             area = whole
             if partial:
-                district = f"06:{code}:{key}:{slug(seat)}"
+                district = f"06:{code}:{key}:{slug(seat if key != 'council' else f'Area {label}')}"
                 area = cs.area("us.local_district", district)
                 unit = cs.unit("us.local_district", district)
                 if area in cs.minted and district not in districts:
                     cs.add("area", id=area, scheme_code="us.local_district")
                     cs.add("area_code", area_id=area, code=district, valid_from=None)
                     cs.add("area_parent", area_id=area, parent_id=whole, valid_from=None)
-                    name(area, f"{office}, {seat}")
                     cs.add(
                         "reporting_unit",
                         id=unit,
@@ -698,9 +1055,17 @@ def emit() -> Path:
                         area_id=area,
                         kind="standard",
                     )
+                if district not in districts:
+                    name(area, f"{office}, {seat}")
                 districts.add(district)
-            contest_key = f"ceda:{race}"
+            if taken_over is not None:
+                moved.add(taken_over["contest"])
+                sources.add(taken_over["election"])
+                area = taken_over["area"] or area
+                unit = taken_over["unit"] or unit
+            contest_key = taken_over["value"] if taken_over is not None else f"ceda:{race}"
             contest = cs.key("us.contest", contest_key)
+            used.add(election)
             magnitude = first["magnitude"]
             rcv = rows["rcv"].any()
             cs.add(
@@ -713,7 +1078,11 @@ def emit() -> Path:
                 district_area_id=area,
                 magnitude=magnitude,
                 round_number=2 if race in previous else 1,
-                previous_round_id=cs.key("us.contest", f"ceda:{previous[race]}") if race in previous else None,
+                previous_round_id=cs.key(
+                    "us.contest", takeover.get(previous[race], {}).get("value", f"ceda:{previous[race]}")
+                )
+                if race in previous
+                else None,
                 electoral_system_id=kept.get(contest)
                 or systems[
                     "irv"
@@ -745,16 +1114,32 @@ def emit() -> Path:
                 suffix += 1
             paths.add(candidate)
             cs.add("slug", path=candidate, entity_id=contest)
-            if partial:
+            alged_notes = {body for _, body in (taken_over or {}).get("notes", [])}
+            if partial and DISTRICT.format(whole=word) not in alged_notes:
                 cs.add("note", entity_id=contest, kind="caveat", body_md=DISTRICT.format(whole=word))
+            if not partial and alged_notes:
+                stale += 1
             if rcv:
                 cs.add("note", entity_id=contest, kind="caveat", body_md=RCV)
             reported = None if contest in wards else grouped.get(race)
             superseded = None
-            result_set = cs.key(f"{SOURCE}.result_set", contest_key)
-            if reported is not None:
+            if taken_over is not None:
+                for name_id, text in taken_over["names"]:
+                    cs.add("name_drop", name_id=name_id, entity_id=contest, text=text, reason=TAKEOVER)
+                if taken_over["row"] is not None:
+                    cs.add(
+                        "result_set",
+                        **(taken_over["row"] | {"election_id": election}),
+                        is_default=False,
+                        status="superseded",
+                    )
+                    if taken_over["disagree"]:
+                        cs.add("note", entity_id=taken_over["set"], kind="context", body_md=DISAGREE)
+            if reported is None:
+                result_set = cs.key(f"{SOURCE}.result_set", contest_key)
+            else:
                 if contest_key in sets:
-                    superseded = result_set
+                    superseded = cs.key(f"{SOURCE}.result_set", contest_key)
                     cs.add(
                         "result_set",
                         id=superseded,
@@ -778,7 +1163,7 @@ def emit() -> Path:
                 status="active",
                 source_id=source if reported is None else counted[reported["fips"][0]],
                 is_default=True,
-                supersedes_id=superseded,
+                supersedes_id=superseded or (taken_over or {}).get("set"),
                 completeness=1,
             )
             cs.add(
@@ -789,24 +1174,47 @@ def emit() -> Path:
             )
 
             entries: list[tuple[UUID, str, int]] = []
+            unused = list((taken_over or {}).get("options", []))
             for candidate_id, ballot, incumbent, votes, elected in rows.select(
                 "candidate", "name", "incumbent", "votes", "elected"
             ).iter_rows():
-                person = cs.key(f"{SOURCE}.person", f"{race}:{candidate_id}")
+                known = taken_over["surnames"].get(surname(ballot)) if taken_over is not None else None
+                reused = next((entry for entry in unused if entry["surname"] == known), None)
+                if reused is not None:
+                    unused.remove(reused)
+                person = (
+                    reused["person"]
+                    if reused and reused["person"]
+                    else cs.key(f"{SOURCE}.person", f"{race}:{candidate_id}")
+                )
                 if person in cs.minted:
                     cs.add("person", id=person)
                     name(person, ballot)
-                option = cs.key("us.option", f"{contest_key}:{candidate_id}")
+                option = reused["option"] if reused else cs.key("us.option", f"{contest_key}:{candidate_id}")
                 cs.add("contest_option", id=option, contest_id=contest, kind="candidate", ballot_label=ballot)
+                candidacy = (
+                    reused["candidacy"]
+                    if reused and reused["candidacy"]
+                    else cs.key("us.candidacy", f"{contest_key}:{candidate_id}:head")
+                )
                 cs.add(
                     "candidacy",
-                    id=cs.key("us.candidacy", f"{contest_key}:{candidate_id}:head"),
+                    id=candidacy,
                     person_id=person,
                     option_id=option,
                     role="head",
                     ballot_name=ballot,
                     is_incumbent=incumbent,
                 )
+                for text in ballots.get((race, candidate_id), []):
+                    cs.add("name", entity_id=person, text=text, lang="en", kind="ballot", is_preferred=False)
+                for away, canonical in into.items():
+                    if away[0] == race and canonical == candidate_id:
+                        absorbed += [
+                            ("us.option", f"{contest_key}:{away[1]}", option),
+                            ("us.candidacy", f"{contest_key}:{away[1]}:head", candidacy),
+                            (f"{SOURCE}.person", f"{race}:{away[1]}", person),
+                        ]
                 if elected in ("1", "3"):
                     cs.add(
                         "outcome",
@@ -820,7 +1228,7 @@ def emit() -> Path:
                 option = cs.key("us.option", f"{contest_key}:write-ins")
                 cs.add("contest_option", id=option, contest_id=contest, kind="write_in", ballot_label="Write-ins")
                 entries.append((option, "write-ins", writeins))
-            for option, candidate_id, votes in entries if result_set in cs.minted else []:
+            for option, candidate_id, votes in entries if result_set in cs.minted or race in merged else []:
                 if reported is None:
                     values.append((str(result_set), str(unit), str(option), votes))
                     continue
@@ -833,6 +1241,25 @@ def emit() -> Path:
                     if area != counties[place.split(":")[2]][1]:
                         memberships.add((target, area, day))
                     values.append((str(result_set), str(target), str(option), value))
+        held_ids = {
+            (scheme, value): entity
+            for scheme, value, entity in conn.execute(
+                "select scheme, value, entity_id from external_id where (scheme, value) in (select * from unnest(%s::text[], %s::text[]))",
+                [[scheme for scheme, _, _ in absorbed], [value for _, value, _ in absorbed]],
+            ).fetchall()
+        }
+        for scheme, value, survivor in absorbed:
+            if (duplicate := held_ids.get((scheme, value))) is not None and duplicate != survivor:
+                cs.merge(duplicate, survivor)
+        for election, live in conn.execute(
+            """select c.election_id, array_agg(c.id) from contest c join entity n on n.id = c.id and n.retired_by is null
+               join entity v on v.id = c.election_id and v.retired_by is null
+               where c.election_id = any(%s) and not exists (select from entity_merge m where m.entity_id = c.id)
+               group by 1""",
+            [list(sources)],
+        ).fetchall():
+            if set(live) <= moved and election not in used:
+                cs.add("entity_retirement", entity_id=election, reason=EMPTIED)
         for place, day in minted.items():
             cs.add(
                 "reporting_unit",
@@ -868,4 +1295,5 @@ def emit() -> Path:
                 flags=pl.lit(0, pl.Int16),
             ),
         )
+        print(f"{stale} taken-over contests keep an ALGED partial-district caveat that CEDA's district does not need")
         return cs.write()
