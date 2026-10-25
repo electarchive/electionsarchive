@@ -53,7 +53,7 @@ export const stage = pgEnum("stage", ["live", "preliminary", "official", "certif
 export const tenureAffiliationKind = pgEnum("tenure_affiliation_kind", ["party", "parliamentary_group"])
 export const tenureEventKind = pgEnum("tenure_event_kind", ["elected", "certified", "certificate_denied", "certificate_reversed", "sworn_in", "suspended", "removed", "trustee_appointed", "reinstated", "resigned", "died", "immunity_lifted", "arrested", "switched_party", "became_independent", "expelled", "term_ended"])
 export const representationGapReason = pgEnum("representation_gap_reason", ["secession"])
-export const unitAreaMethod = pgEnum("unit_area_method", ["source_code", "city_universe", "shape_contained"])
+export const unitAreaMethod = pgEnum("unit_area_method", ["source_code", "city_universe", "shape_contained", "official_list"])
 
 
 export const alliance = pgTable("alliance", {
