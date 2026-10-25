@@ -15,14 +15,14 @@ from ea.sources.us import elstats, elstats_local, medsl, medsl_local, nc_local, 
 from ea.store import DATA, connect
 
 SOURCE = "us.city_precincts"
-VERSION = "3"
+VERSION = "4"
 PARSED = DATA / "parsed" / SOURCE
 OFFICE = r"MAYOR|COUNCIL|ALDER|WARD|COMMISSION|SELECT|CITY|TOWN|VILLAGE|BOROUGH|TRUSTEE"
 SUFFIXES = {"jr", "sr", "ii", "iii", "iv", "junior", "senior"}
 METHOD = (
-    "Precinct returns for city races from the North Carolina State Board of Elections', the MIT Election Data and "
-    "Science Lab's, or OpenElections' precinct files, matched to the city's official contest by candidate and checked against its official totals. Absentee, early, and provisional "
-    "ballots that a county reported only countywide stay in their own countywide rows."
+    "Precinct returns for city races from {publisher}'s precinct files, matched to the city's official contest by "
+    "candidate and checked against its official totals. Absentee, early, and provisional ballots that a county "
+    "reported only countywide stay in their own countywide rows."
 )
 
 
@@ -646,6 +646,7 @@ def emit() -> Path:
                 a + b for words in tokens for a, b in pairwise(words)
             }
             options.setdefault(str(contest), []).append((str(option), okind, texts, int(official or 0)))
+        publishers = dict(conn.execute("select id, publisher from source").fetchall())
         sources = {}
         for day, (title, _) in medsl_local.DATASETS.items():
             sources[day] = cs.source(medsl_local.PUBLISHER, title)
@@ -828,6 +829,13 @@ def emit() -> Path:
             taken.add(key)
             report["matched"] = report.get("matched", 0) + 1
             result_set = cs.key(f"{SOURCE}.result_set", str(contest))
+            source_id = (
+                sources[origin]
+                if origin in sources
+                else sources[day]
+                if origin == "medsl"
+                else sources[(state, day)]
+            )
             cs.add(
                 "result_set",
                 id=result_set,
@@ -836,11 +844,7 @@ def emit() -> Path:
                 stage=stage,
                 kind=kind,
                 status="active",
-                source_id=sources[origin]
-                if origin in sources
-                else sources[day]
-                if origin == "medsl"
-                else sources[(state, day)],
+                source_id=source_id,
                 is_default=False,
                 completeness=round(sum(counted.values()) / total, 4),
             )
@@ -897,7 +901,7 @@ def emit() -> Path:
                 id=notes.get(result_set),
                 entity_id=result_set,
                 kind="methodology",
-                body_md=METHOD,
+                body_md=METHOD.format(publisher=publishers.get(source_id, "the county")),
                 valid_from_precision="day",
                 valid_to_precision="day",
             )
