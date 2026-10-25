@@ -1,0 +1,470 @@
+{
+  "polity": "US-KY",
+  "publisher": "Kentucky State Board of Elections",
+  "license": "Public record",
+  "raw_source": "us.scans",
+  "title": "Kentucky official returns, general election 1968-11-05",
+  "file": {
+    "url": "https://elect.ky.gov/results/1973-1979/Documents/1968.pdf"
+  },
+  "contests": {
+    "house2": {
+      "year": 1968,
+      "chamber": "house",
+      "day": "1968-11-05",
+      "special": false,
+      "state": "KY",
+      "district": 2
+    },
+    "house7": {
+      "year": 1968,
+      "chamber": "house",
+      "day": "1968-11-05",
+      "special": false,
+      "state": "KY",
+      "district": 7
+    },
+    "house3": {
+      "year": 1968,
+      "chamber": "house",
+      "day": "1968-11-05",
+      "special": false,
+      "state": "KY",
+      "district": 3
+    },
+    "house6": {
+      "year": 1968,
+      "chamber": "house",
+      "day": "1968-11-05",
+      "special": false,
+      "state": "KY",
+      "district": 6
+    },
+    "house1": {
+      "year": 1968,
+      "chamber": "house",
+      "day": "1968-11-05",
+      "special": false,
+      "state": "KY",
+      "district": 1
+    },
+    "house4": {
+      "year": 1968,
+      "chamber": "house",
+      "day": "1968-11-05",
+      "special": false,
+      "state": "KY",
+      "district": 4
+    },
+    "house5": {
+      "year": 1968,
+      "chamber": "house",
+      "day": "1968-11-05",
+      "special": false,
+      "state": "KY",
+      "district": 5
+    }
+  },
+  "pages": [
+    {
+      "page": 2,
+      "id": "2-0",
+      "columns": [
+        {
+          "label": "Theodore H. Lavit Lebanon, Ky.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Robert D. Simmons Bowling Green, Ky.",
+          "contest": "house2",
+          "candidate": "Robert D. Simmons"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.18,
+        0.177,
+        0.372,
+        0.401
+      ],
+      "hint": "Read only the table headed 'UNITED STATES REPRESENTATIVE IN CONGRESS Second Congressional District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 2,
+      "id": "2-1",
+      "columns": [
+        {
+          "label": "Tom Layne Ashland, Ky.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Captain P. \"Woots\" Gardner Salyersville, Ky.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "James D. (Jim) Nickell Ashland, Ky.",
+          "contest": "house7",
+          "candidate": "James D. Nickell"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.419,
+        0.177,
+        0.65,
+        0.393
+      ],
+      "hint": "Read only the table headed 'Seventh Congressional District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 2,
+      "id": "2-2",
+      "columns": [
+        {
+          "label": "Raymond L. Suell Louisville, Ky.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "William O. Cowger Louisville, Ky.",
+          "contest": "house3",
+          "candidate": "William O. Cowger"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.18,
+        0.393,
+        0.372,
+        0.54
+      ],
+      "hint": "Read only the table headed 'Third Congressional District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 2,
+      "id": "2-3",
+      "columns": [
+        {
+          "label": "Howard A. Dickey, Jr. Lexington, Ky.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "John W. \"Billy\" Swope Lancaster, Ky.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Thornton D. Wright Lexington, Ky.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Russell G. Mobley Lexington, Ky.",
+          "contest": "house6",
+          "candidate": "Russell G. Mobley"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.159,
+        0.532,
+        0.39,
+        0.774
+      ],
+      "hint": "Read only the table headed 'UNITED STATES REPRESENTATIVE IN CONGRESS Sixth Congressional District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 4,
+      "id": "4-0",
+      "columns": [
+        {
+          "label": "Paul J. Durbin Fulton, Ky.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Frank A. Stubblefield Murray, Ky.",
+          "contest": "house1",
+          "candidate": "Frank A. Stubblefield"
+        },
+        {
+          "label": "Ervin E. Coleman Russellville, Ky.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Conrad Gene Stinson Morganfield, Ky.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.265,
+        0.183,
+        0.496,
+        0.41
+      ],
+      "hint": "Read only the table headed 'UNITED STATES REPRESENTATIVE IN CONGRESS First Congressional District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 4,
+      "id": "4-1",
+      "columns": [
+        {
+          "label": "Philip V. Baker Shively, Ky.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Tom Ray Louisville, Ky.",
+          "contest": "house3",
+          "candidate": "Tom Ray"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.288,
+        0.402,
+        0.479,
+        0.495
+      ],
+      "hint": "Read only the table headed 'Third Congressional District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 4,
+      "id": "4-2",
+      "columns": [
+        {
+          "label": "Wilton Benge Cupp Covington, Ky.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Henry C. Mathis LaGrange, Ky.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Gus Sheehan, Jr. Covington, Ky.",
+          "contest": "house4",
+          "candidate": "Gus Sheehan, Jr."
+        },
+        {
+          "label": "Paul Lynch Louisville, Ky.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.265,
+        0.487,
+        0.496,
+        0.638
+      ],
+      "hint": "Read only the table headed 'Fourth Congressional District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 4,
+      "id": "4-3",
+      "columns": [
+        {
+          "label": "John C. Watts Nicholasville, Ky.",
+          "contest": "house6",
+          "candidate": "John C. Watts"
+        },
+        {
+          "label": "J. Dan Chandler Versailles, Ky.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.288,
+        0.63,
+        0.479,
+        0.834
+      ],
+      "hint": "Read only the table headed 'UNITED STATES REPRESENTATIVE IN CONGRESS Sixth Congressional District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 5,
+      "id": "5-0",
+      "columns": [
+        {
+          "label": "Tim Lee Carter, Tompkinsville, Ky., Republican",
+          "contest": "house5",
+          "candidate": "Tim Lee Carter"
+        },
+        {
+          "label": "Thomas Jefferson Roberts, Middlesboro, Ky., Democrat",
+          "contest": "house5",
+          "candidate": "Thomas Jefferson Roberts"
+        },
+        {
+          "label": "Charles P. Peace, Corbin, Ky., American Anti-Communist Party",
+          "contest": "house5",
+          "candidate": "Charles P. Peace"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.773,
+        0.126,
+        1.0,
+        0.327
+      ],
+      "hint": "Read only the table headed '5TH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 5,
+      "id": "5-1",
+      "columns": [
+        {
+          "label": "Frank A. Stubblefield, Murray, Ky., Democrat",
+          "contest": "house1",
+          "candidate": "Frank A. Stubblefield"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.614,
+        0.127,
+        0.784,
+        0.292
+      ],
+      "hint": "Read only the table headed '1ST CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 5,
+      "id": "5-2",
+      "columns": [
+        {
+          "label": "Robert D. Simmons, Bowling Green, Ky., Republican",
+          "contest": "house2",
+          "candidate": "Robert D. Simmons"
+        },
+        {
+          "label": "William H. Natcher, Bowling Green, Ky., Democrat",
+          "contest": "house2",
+          "candidate": "William H. Natcher"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.614,
+        0.284,
+        0.784,
+        0.459
+      ],
+      "hint": "Read only the table headed '2ND CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 5,
+      "id": "5-3",
+      "columns": [
+        {
+          "label": "Russell G. Mobley, Lexington, Ky., Republican",
+          "contest": "house6",
+          "candidate": "Russell G. Mobley"
+        },
+        {
+          "label": "John C. Watts, Nicholasville, Ky., Democrat",
+          "contest": "house6",
+          "candidate": "John C. Watts"
+        },
+        {
+          "label": "J. Donald Graham, Berea, Ky., Independent",
+          "contest": "house6",
+          "candidate": "J. Donald Graham"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.773,
+        0.319,
+        1.0,
+        0.499
+      ],
+      "hint": "Read only the table headed '6TH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 5,
+      "id": "5-4",
+      "columns": [
+        {
+          "label": "William D. Cowger, Louisville, Ky., Republican",
+          "contest": "house3",
+          "candidate": "William O. Cowger"
+        },
+        {
+          "label": "Tom Ray, Louisville, Ky., Democrat",
+          "contest": "house3",
+          "candidate": "Tom Ray"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.614,
+        0.451,
+        0.784,
+        0.55
+      ],
+      "hint": "Read only the table headed '3RD CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 5,
+      "id": "5-5",
+      "columns": [
+        {
+          "label": "James D. (Jim) Nickell, Ashland, Ky., Republican",
+          "contest": "house7",
+          "candidate": "James D. Nickell"
+        },
+        {
+          "label": "Carl D. Perkins, Hindman, Ky., Democrat",
+          "contest": "house7",
+          "candidate": "Carl D. Perkins"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.773,
+        0.491,
+        1.0,
+        0.676
+      ],
+      "hint": "Read only the table headed '7TH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 5,
+      "id": "5-6",
+      "columns": [
+        {
+          "label": "M. G. \"Gene\" Snyder, Jeffersontown, Ky., Republican",
+          "contest": "house4",
+          "candidate": "M. G. (Gene) Snyder"
+        },
+        {
+          "label": "Gus Sheehan, Jr., Covington, Ky., Democrat",
+          "contest": "house4",
+          "candidate": "Gus Sheehan, Jr."
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.614,
+        0.542,
+        0.784,
+        0.676
+      ],
+      "hint": "Read only the table headed '4TH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    }
+  ]
+}

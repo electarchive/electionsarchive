@@ -1,0 +1,241 @@
+{
+  "polity": "US-SC",
+  "publisher": "South Carolina State Election Commission",
+  "license": "Public record",
+  "raw_source": "us.scans",
+  "title": "Report of the State Election Commission, votes cast in the general election held 1980-11-04",
+  "file": {
+    "url": "https://scvotes.gov/wp-content/uploads/2022/08/Election_Report_1980-1981.pdf"
+  },
+  "contests": {
+    "house1": {
+      "year": 1980,
+      "chamber": "house",
+      "day": "1980-11-04",
+      "special": false,
+      "state": "SC",
+      "district": 1
+    },
+    "house2": {
+      "year": 1980,
+      "chamber": "house",
+      "day": "1980-11-04",
+      "special": false,
+      "state": "SC",
+      "district": 2
+    },
+    "house3": {
+      "year": 1980,
+      "chamber": "house",
+      "day": "1980-11-04",
+      "special": false,
+      "state": "SC",
+      "district": 3
+    },
+    "house4": {
+      "year": 1980,
+      "chamber": "house",
+      "day": "1980-11-04",
+      "special": false,
+      "state": "SC",
+      "district": 4
+    },
+    "house5": {
+      "year": 1980,
+      "chamber": "house",
+      "day": "1980-11-04",
+      "special": false,
+      "state": "SC",
+      "district": 5
+    },
+    "house6": {
+      "year": 1980,
+      "chamber": "house",
+      "day": "1980-11-04",
+      "special": false,
+      "state": "SC",
+      "district": 6
+    }
+  },
+  "pages": [
+    {
+      "page": 42,
+      "id": "42-0",
+      "columns": [
+        {
+          "label": "(D) CHARLES RAVENEL D",
+          "contest": "house1",
+          "candidate": "Charles D. Ravenel"
+        },
+        {
+          "label": "(R) THOMAS F HARTNETT",
+          "contest": "house1",
+          "candidate": "Thomas F. Hartnett"
+        },
+        {
+          "label": "(W) MISC WRITE-INS",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.104,
+        0.182,
+        0.483,
+        0.532
+      ],
+      "hint": "Read only the table headed 'DISTRICT NO 001 REPRESENTATIVE IN CONGRESS'; ignore any other table visible in the image."
+    },
+    {
+      "page": 42,
+      "id": "42-1",
+      "columns": [
+        {
+          "label": "(D) TOM TURNIPSEED",
+          "contest": "house2",
+          "candidate": "Tom Turnipseed"
+        },
+        {
+          "label": "(R) FLOYD SPENCE",
+          "contest": "house2",
+          "candidate": "Floyd Spence"
+        },
+        {
+          "label": "(W) MISC WRITE-INS",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.635,
+        0.186,
+        1.0,
+        0.532
+      ],
+      "hint": "Read only the table headed 'DISTRICT NO 002 REPRESENTATIVE IN CONGRESS'; ignore any other table visible in the image."
+    },
+    {
+      "page": 43,
+      "id": "43-0",
+      "columns": [
+        {
+          "label": "(D) BUTLER DERRICK",
+          "contest": "house3",
+          "candidate": "Butler Derrick"
+        },
+        {
+          "label": "(R) MARSHALL PARKER",
+          "contest": "house3",
+          "candidate": "Marshall Parker"
+        },
+        {
+          "label": "(L) BOYCE LEE MULLER",
+          "contest": "house3",
+          "candidate": "Boyce Lee Muller"
+        },
+        {
+          "label": "(W) MISC WRITE-INS",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.0,
+        0.193,
+        0.495,
+        0.629
+      ],
+      "hint": "Read only the table headed 'DISTRICT NO 003 REPRESENTIVE IN CONGRESS'; ignore any other table visible in the image."
+    },
+    {
+      "page": 43,
+      "id": "43-1",
+      "columns": [
+        {
+          "label": "(R) CARROLL CAMPBELL",
+          "contest": "house4",
+          "candidate": "Carroll Campbell"
+        },
+        {
+          "label": "(L) THOMAS P WALDENFELS",
+          "contest": "house4",
+          "candidate": "Thomas P. Waldenfels"
+        },
+        {
+          "label": "(W) MISC WRITE-INS",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.589,
+        0.193,
+        1.0,
+        0.534
+      ],
+      "hint": "Read only the table headed 'DISTRICT NO 004 REPRESENTIVE IN CONGRESS'; ignore any other table visible in the image."
+    },
+    {
+      "page": 44,
+      "id": "44-0",
+      "columns": [
+        {
+          "label": "(D) KEN HOLLAND",
+          "contest": "house5",
+          "candidate": "Ken Holland"
+        },
+        {
+          "label": "(L) THOMAS CAMPBELL",
+          "contest": "house5",
+          "candidate": "Thomas Campbell"
+        },
+        {
+          "label": "(W) MISC WRITE-INS",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.095,
+        0.171,
+        0.478,
+        0.559
+      ],
+      "hint": "Read only the table headed 'DISTRICT NO 005 REPRESENTATIVE IN CONGRESS'; ignore any other table visible in the image."
+    },
+    {
+      "page": 44,
+      "id": "44-1",
+      "columns": [
+        {
+          "label": "(D) JOHN W JENRETTE JR",
+          "contest": "house6",
+          "candidate": "John W. Jenrette, Jr."
+        },
+        {
+          "label": "(R) JOHN L NAPIER",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "(W) MISC WRITE-INS",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.632,
+        0.171,
+        1.0,
+        0.559
+      ],
+      "hint": "Read only the table headed 'DISTRICT NO 006 REPRESENTATIVE IN CONGRESS'; ignore any other table visible in the image."
+    }
+  ]
+}

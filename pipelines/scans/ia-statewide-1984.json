@@ -1,0 +1,491 @@
+{
+  "polity": "US-IA",
+  "publisher": "Iowa Secretary of State",
+  "license": "Public record",
+  "raw_source": "us.ia_sos",
+  "title": "Iowa official canvass summary, general election 1984",
+  "file": {
+    "url": "https://sos.iowa.gov/elections/pdf/results/80s/1984gencanv.pdf",
+    "item": "https://sos.iowa.gov/elections/results/"
+  },
+  "contests": {
+    "president": {
+      "year": 1984,
+      "chamber": "president",
+      "day": "1984-11-06",
+      "special": false,
+      "state": "IA",
+      "district": null
+    },
+    "senate": {
+      "year": 1984,
+      "chamber": "senate",
+      "day": "1984-11-06",
+      "special": false,
+      "state": "IA",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 3,
+      "id": "3-0",
+      "columns": [
+        {
+          "label": "REPUBLICAN Ronald REAGAN",
+          "contest": "president",
+          "candidate": "Ronald Reagan"
+        },
+        {
+          "label": "DEMOCRATIC Walter F. MONDALE",
+          "contest": "president",
+          "candidate": "Walter F. Mondale"
+        },
+        {
+          "label": "NOM. BY PET. Lyndon H. LA ROUCHE, Jr.",
+          "contest": "president",
+          "candidate": "Lyndon H. LaRouche Jr."
+        },
+        {
+          "label": "NOM. BY PET. Dennis L. SERRETTE",
+          "contest": "president",
+          "candidate": "Dennis L. Serrette"
+        },
+        {
+          "label": "BIG DEAL Gerald BAKER",
+          "contest": "president",
+          "candidate": "Gerald Baker"
+        },
+        {
+          "label": "COMMUNIST Gus HALL",
+          "contest": "president",
+          "candidate": "Gus Hall"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.033,
+        0.135,
+        0.405,
+        1.0
+      ],
+      "hint": "Read only the table headed 'FOR THE OFFICE OF PRESIDENT OF THE UNITED STATES'; ignore any other table visible in the image.",
+      "turn": -90,
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1965
+      ]
+    },
+    {
+      "page": 3,
+      "id": "3-1",
+      "columns": [
+        {
+          "label": "SOC. WORKERS Mel MASON",
+          "contest": "president",
+          "candidate": "Mel Mason"
+        },
+        {
+          "label": "LIBERTARIAN David BERGLAND",
+          "contest": "president",
+          "candidate": "David Bergland"
+        },
+        {
+          "label": "SCATTERED",
+          "contest": "president",
+          "candidate": "Scattered"
+        },
+        {
+          "label": "TOTALS",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.545,
+        0.196,
+        0.918,
+        1.0
+      ],
+      "hint": "Read only the table headed 'FOR THE OFFICE OF PRESIDENT OF THE UNITED STATES'; ignore any other table visible in the image.",
+      "turn": -90,
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1294
+      ]
+    },
+    {
+      "page": 4,
+      "id": "4-0",
+      "columns": [
+        {
+          "label": "SOC. WORKERS Mel MASON",
+          "contest": "president",
+          "candidate": "Mel Mason"
+        },
+        {
+          "label": "LIBERTARIAN David BERGLAND",
+          "contest": "president",
+          "candidate": "David Bergland"
+        },
+        {
+          "label": "SCATTERED",
+          "contest": "president",
+          "candidate": "Scattered"
+        },
+        {
+          "label": "TOTALS",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.552,
+        0.224,
+        0.923,
+        0.759
+      ],
+      "hint": "Read only the table headed 'COUNTIES'; ignore any other table visible in the image.",
+      "turn": -90,
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0953
+      ]
+    },
+    {
+      "page": 4,
+      "id": "4-1",
+      "columns": [
+        {
+          "label": "REPUBLICAN Ronald REAGAN",
+          "contest": "president",
+          "candidate": "Ronald Reagan"
+        },
+        {
+          "label": "DEMOCRATIC Walter F. MONDALE",
+          "contest": "president",
+          "candidate": "Walter F. Mondale"
+        },
+        {
+          "label": "NOM. BY PET. Lyndon H. LA ROUCHE,Jr",
+          "contest": "president",
+          "candidate": "Lyndon H. LaRouche Jr."
+        },
+        {
+          "label": "NOM. BY PET. Dennis L. SERRETTE",
+          "contest": "president",
+          "candidate": "Dennis L. Serrette"
+        },
+        {
+          "label": "BIG DEAL Gerald BAKER",
+          "contest": "president",
+          "candidate": "Gerald Baker"
+        },
+        {
+          "label": "COMMUNIST Gus HALL",
+          "contest": "president",
+          "candidate": "Gus Hall"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.046,
+        0.242,
+        0.413,
+        0.775
+      ],
+      "hint": "Read only the table headed 'COUNTIES'; ignore any other table visible in the image.",
+      "turn": -90,
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0957
+      ]
+    },
+    {
+      "page": 5,
+      "id": "5-0",
+      "columns": [
+        {
+          "label": "REPUBLICAN George BUSH",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "DEMOCRATIC Geraldine A. FERRARO",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "NOM. BY PET. Billy M. DAVIS",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "NOM. BY PET. Nancy ROSS",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "BIG DEAL Ferris ALGER",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "COMMUNIST Angela DAVIS",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.029,
+        0.153,
+        0.398,
+        1.0
+      ],
+      "hint": "Read only the table headed 'FOR THE OFFICE OF VICE PRESIDENT OF THE UNITED STATES'; ignore any other table visible in the image.",
+      "turn": -90,
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1027
+      ]
+    },
+    {
+      "page": 5,
+      "id": "5-1",
+      "columns": [
+        {
+          "label": "SOC. WORKERS Matilde ZIMMERMAN",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "LIBERTARIAN Jim LEWIS",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "SCATTERED",
+          "contest": "president",
+          "candidate": "Scattered"
+        },
+        {
+          "label": "TOTALS",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.537,
+        0.196,
+        0.91,
+        1.0
+      ],
+      "hint": "Read only the table headed 'FOR THE OFFICE OF VICE PRESIDENT OF THE UNITED STATES'; ignore any other table visible in the image.",
+      "turn": -90,
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0435
+      ]
+    },
+    {
+      "page": 6,
+      "id": "6-0",
+      "columns": [
+        {
+          "label": "SOC. WORKERS Matilde ZIMMERMAN",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "LIBERTARIAN Jim LEWIS",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "SCATTERED",
+          "contest": "president",
+          "candidate": "Scattered"
+        },
+        {
+          "label": "TOTALS",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.535,
+        0.258,
+        0.908,
+        0.786
+      ],
+      "hint": "Read only the table headed 'COUNTIES'; ignore any other table visible in the image.",
+      "turn": -90,
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0909
+      ]
+    },
+    {
+      "page": 6,
+      "id": "6-1",
+      "columns": [
+        {
+          "label": "REPUBLICAN George BUSH",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "DEMOCRATIC Geraldine A. FERRARO",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "NOM. BY PET. Billy M. DAVIS",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "NOM. BY PET. Nancy ROSS",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "BIG DEAL Ferris ALGER",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "COMMUNIST Angela DAVIS",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.034,
+        0.268,
+        0.406,
+        1.0
+      ],
+      "hint": "Read only the table headed 'COUNTIES'; ignore any other table visible in the image.",
+      "turn": -90,
+      "bands": 2,
+      "header": [
+        0.0,
+        -0.026
+      ]
+    },
+    {
+      "page": 7,
+      "id": "7-0",
+      "columns": [
+        {
+          "label": "REPUBLICAN Roger W. JEPSEN",
+          "contest": "senate",
+          "candidate": "Roger W. Jepsen"
+        },
+        {
+          "label": "DEMOCRATIC Tom HARKIN",
+          "contest": "senate",
+          "candidate": "Tom Harkin"
+        },
+        {
+          "label": "NOM. BY PET. Garry DE YOUNG",
+          "contest": "senate",
+          "candidate": "Garry De Young"
+        },
+        {
+          "label": "SCATTERED",
+          "contest": "senate",
+          "candidate": "Scattered"
+        },
+        {
+          "label": "TOTALS",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.03,
+        0.148,
+        0.399,
+        1.0
+      ],
+      "hint": "Read only the table headed 'UNITED STATES SENATOR'; ignore any other table visible in the image.",
+      "turn": -90,
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1819
+      ]
+    },
+    {
+      "page": 7,
+      "id": "7-1",
+      "columns": [
+        {
+          "label": "REPUBLICAN Roger W. JEPSEN",
+          "contest": "senate",
+          "candidate": "Roger W. Jepsen"
+        },
+        {
+          "label": "DEMOCRATIC Tom HARKIN",
+          "contest": "senate",
+          "candidate": "Tom Harkin"
+        },
+        {
+          "label": "NOM. BY PET. Garry DE YOUNG",
+          "contest": "senate",
+          "candidate": "Garry De Young"
+        },
+        {
+          "label": "SCATTERED",
+          "contest": "senate",
+          "candidate": "Scattered"
+        },
+        {
+          "label": "TOTALS",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.541,
+        0.318,
+        0.916,
+        0.787
+      ],
+      "hint": "Read only the table headed 'UNITED STATES SENATOR'; ignore any other table visible in the image.",
+      "turn": -90,
+      "bands": 2,
+      "header": [
+        0.0,
+        -0.0192
+      ]
+    }
+  ]
+}

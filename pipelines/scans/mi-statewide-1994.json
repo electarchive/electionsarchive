@@ -1,0 +1,251 @@
+{
+  "polity": "US-MI",
+  "publisher": "Michigan Secretary of State",
+  "license": "Public record",
+  "raw_source": "us.sri",
+  "title": "State of Michigan General Election, 1994: Official Canvass",
+  "file": {
+    "url": "https://archive.org/download/micro_IA40706952_0453/micro_IA40706952_0453.pdf",
+    "item": "https://archive.org/details/micro_IA40706952_0453"
+  },
+  "contests": {
+    "governor": {
+      "year": 1994,
+      "chamber": "governor",
+      "day": "1994-11-08",
+      "special": false,
+      "state": "MI",
+      "district": null
+    },
+    "senate": {
+      "year": 1994,
+      "chamber": "senate",
+      "day": "1994-11-08",
+      "special": false,
+      "state": "MI",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 2,
+      "id": "2-0",
+      "columns": [
+        {
+          "label": "TOTAL BY COUNTY",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Wolpe Stabenow DEM",
+          "contest": "governor",
+          "candidate": "Howard Wolpe"
+        },
+        {
+          "label": "Engler Binsfeld REP",
+          "contest": "governor",
+          "candidate": "John Engler"
+        },
+        {
+          "label": "Write-In SCAT",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.061,
+        0.234,
+        0.451,
+        1.0
+      ],
+      "hint": "Read only the table headed 'GOVERNOR 4 YEAR TERM (1)'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0822
+      ]
+    },
+    {
+      "page": 3,
+      "id": "3-0",
+      "columns": [
+        {
+          "label": "TOTAL BY COUNTY",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Wolpe Stabenow DEM",
+          "contest": "governor",
+          "candidate": "Howard Wolpe"
+        },
+        {
+          "label": "Engler Binsfeld REP",
+          "contest": "governor",
+          "candidate": "John Engler"
+        },
+        {
+          "label": "Write-In SCAT",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.061,
+        0.199,
+        0.449,
+        1.0
+      ],
+      "hint": "Read only the table headed 'GOVERNOR 4 YEAR TERM (1)'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0362
+      ]
+    },
+    {
+      "page": 4,
+      "id": "4-0",
+      "columns": [
+        {
+          "label": "TOTAL BY COUNTY",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Wolpe Stabenow DEM",
+          "contest": "governor",
+          "candidate": "Howard Wolpe"
+        },
+        {
+          "label": "Engler Binsfeld REP",
+          "contest": "governor",
+          "candidate": "John Engler"
+        },
+        {
+          "label": "Write-In SCAT",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.058,
+        0.172,
+        0.448,
+        0.396
+      ],
+      "hint": "Read only the table headed 'GOVERNOR 4 YEAR TERM (1) (continued)'; ignore any other table visible in the image."
+    },
+    {
+      "page": 11,
+      "id": "11-0",
+      "columns": [
+        {
+          "label": "TOTAL BY COUNTY",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Bob Carr DEM",
+          "contest": "senate",
+          "candidate": "Bob Carr"
+        },
+        {
+          "label": "Spencer Abraham REP",
+          "contest": "senate",
+          "candidate": "Spencer Abraham"
+        },
+        {
+          "label": "William Roundtree WORW",
+          "contest": "senate",
+          "candidate": "William Roundtree"
+        },
+        {
+          "label": "Jon Coon LIB",
+          "contest": "senate",
+          "candidate": "Jon Coon"
+        },
+        {
+          "label": "Chris Wege NLP",
+          "contest": "senate",
+          "candidate": "Chris Wege"
+        },
+        {
+          "label": "Write-In SCAT",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.06,
+        0.19,
+        0.659,
+        1.0
+      ],
+      "hint": "Read only the table headed 'U.S. SENATE 6 YEAR TERM (1)'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0901
+      ]
+    },
+    {
+      "page": 12,
+      "id": "12-0",
+      "columns": [
+        {
+          "label": "TOTAL BY COUNTY",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Bob Carr DEM",
+          "contest": "senate",
+          "candidate": "Bob Carr"
+        },
+        {
+          "label": "Spencer Abraham REP",
+          "contest": "senate",
+          "candidate": "Spencer Abraham"
+        },
+        {
+          "label": "William Roundtree WORW",
+          "contest": "senate",
+          "candidate": "William Roundtree"
+        },
+        {
+          "label": "Jon Coon LIB",
+          "contest": "senate",
+          "candidate": "Jon Coon"
+        },
+        {
+          "label": "Chris Wege NLP",
+          "contest": "senate",
+          "candidate": "Chris Wege"
+        },
+        {
+          "label": "Write-In SCAT",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.047,
+        0.218,
+        0.653,
+        1.0
+      ],
+      "hint": "Read only the table headed 'U.S. SENATE 6 YEAR TERM (1)'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        -0.0077
+      ]
+    }
+  ]
+}

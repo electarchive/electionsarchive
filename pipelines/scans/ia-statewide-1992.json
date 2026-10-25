@@ -1,0 +1,620 @@
+{
+  "polity": "US-IA",
+  "publisher": "Iowa Secretary of State",
+  "license": "Public record",
+  "raw_source": "us.ia_sos",
+  "title": "Iowa official canvass summary, general election 1992",
+  "file": {
+    "url": "https://sos.iowa.gov/elections/pdf/results/90s/1992gencanv.pdf",
+    "item": "https://sos.iowa.gov/elections/results/"
+  },
+  "contests": {
+    "president": {
+      "year": 1992,
+      "chamber": "president",
+      "day": "1992-11-03",
+      "special": false,
+      "state": "IA",
+      "district": null
+    },
+    "senate": {
+      "year": 1992,
+      "chamber": "senate",
+      "day": "1992-11-03",
+      "special": false,
+      "state": "IA",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 15,
+      "id": "15-0",
+      "columns": [
+        {
+          "label": "DEMOCRATIC CLINTON GORE",
+          "contest": "president",
+          "candidate": "Bill Clinton"
+        },
+        {
+          "label": "REPUBLICAN BUSH QUAYLE",
+          "contest": "president",
+          "candidate": "George Bush"
+        },
+        {
+          "label": "NOMINATED BY PETITION YIAMOUYIANNIS MCCONE",
+          "contest": "president",
+          "candidate": "John Yiamouyiannis"
+        },
+        {
+          "label": "NOMINATED BY PETITION PEROT STOCKDALE",
+          "contest": "president",
+          "candidate": "Ross Perot"
+        },
+        {
+          "label": "NOMINATED BY PETITION EHLERS WENDT",
+          "contest": "president",
+          "candidate": "Delbert L. Ehlers"
+        },
+        {
+          "label": "GRASS ROOTS HERER GRIMMER",
+          "contest": "president",
+          "candidate": "Jack Herer"
+        },
+        {
+          "label": "LIBERTARIAN PARTY OF IOWA MARROU LORD",
+          "contest": "president",
+          "candidate": "Andre Marrou"
+        },
+        {
+          "label": "AMERICA FIRST GRITZ MINETT",
+          "contest": "president",
+          "candidate": "James Gritz"
+        },
+        {
+          "label": "SOCIALIST WORKERS WARREN REID",
+          "contest": "president",
+          "candidate": "James Mac Warren"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.035,
+        0.327,
+        1.0,
+        0.972
+      ],
+      "hint": "Read only the table headed 'PRESIDENT PART 1 PAGE 3'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1984
+      ]
+    },
+    {
+      "page": 16,
+      "id": "16-0",
+      "columns": [
+        {
+          "label": "DEMOCRATIC CLINTON GORE",
+          "contest": "president",
+          "candidate": "Bill Clinton"
+        },
+        {
+          "label": "REPUBLICAN BUSH QUAYLE",
+          "contest": "president",
+          "candidate": "George Bush"
+        },
+        {
+          "label": "NOMINATED BY PETITION YIAMOUYIANNIS MCCONE",
+          "contest": "president",
+          "candidate": "John Yiamouyiannis"
+        },
+        {
+          "label": "NOMINATED BY PETITION PEROT STOCKDALE",
+          "contest": "president",
+          "candidate": "Ross Perot"
+        },
+        {
+          "label": "NOMINATED BY PETITION EHLERS WENDT",
+          "contest": "president",
+          "candidate": "Delbert L. Ehlers"
+        },
+        {
+          "label": "GRASS ROOTS HERER GRIMMER",
+          "contest": "president",
+          "candidate": "Jack Herer"
+        },
+        {
+          "label": "LIBERTARIAN PARTY OF IOWA MARROU LORD",
+          "contest": "president",
+          "candidate": "Andre Marrou"
+        },
+        {
+          "label": "AMERICA FIRST GRITZ MINETT",
+          "contest": "president",
+          "candidate": "James Gritz"
+        },
+        {
+          "label": "SOCIALIST WORKERS WARREN REID",
+          "contest": "president",
+          "candidate": "James Mac Warren"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.025,
+        0.357,
+        0.987,
+        0.761
+      ],
+      "hint": "Read only the table headed 'PRESIDENT PART I PAGE 3'; ignore any other table visible in the image."
+    },
+    {
+      "page": 18,
+      "id": "18-0",
+      "columns": [
+        {
+          "label": "TAXPAYER PHILLIPS KNIGHT",
+          "contest": "president",
+          "candidate": "Howard Phillips"
+        },
+        {
+          "label": "NEW ALLIANCE FULANI MUNOZ",
+          "contest": "president",
+          "candidate": "Lenora Fulani"
+        },
+        {
+          "label": "INDEPENDENTS FOR ECONOMIC RECOVERY LAROUCHE, JR. BEVEL",
+          "contest": "president",
+          "candidate": "Lyndon LaRouche"
+        },
+        {
+          "label": "CAMPAIGN FOR A NEW TOMORROW DANIELS TUPAHACHE",
+          "contest": "president",
+          "candidate": "Ron Daniels"
+        },
+        {
+          "label": "NATURAL LAW HAGELIN TOMPKINS",
+          "contest": "president",
+          "candidate": "John Hagelin"
+        },
+        {
+          "label": "PRESIDENT SCATTERING",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "PRESIDENT TOTALS",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "VICE PRESIDENT SCATTERING",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "VICE PRESIDENT TOTALS",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.03,
+        0.237,
+        0.989,
+        1.0
+      ],
+      "hint": "Read only the table headed 'NOVEMBER 3, 1992 - GENERAL ELECTION PRESIDENT PART II PAGE 1'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1494
+      ]
+    },
+    {
+      "page": 19,
+      "id": "19-0",
+      "columns": [
+        {
+          "label": "TAXPAYER PHILLIPS KNIGHT",
+          "contest": "president",
+          "candidate": "Howard Phillips"
+        },
+        {
+          "label": "NEW ALLIANCE FULANI MUNOZ",
+          "contest": "president",
+          "candidate": "Lenora Fulani"
+        },
+        {
+          "label": "INDEPENDENTS FOR ECONOMIC RECOVERY LAROUCHE, JR. BEVEL",
+          "contest": "president",
+          "candidate": "Lyndon LaRouche"
+        },
+        {
+          "label": "CAMPAIGN FOR A NEW TOMORROW DANIELS TUPAHACHE",
+          "contest": "president",
+          "candidate": "Ron Daniels"
+        },
+        {
+          "label": "NATURAL LAW HAGELIN TOMPKINS",
+          "contest": "president",
+          "candidate": "John Hagelin"
+        },
+        {
+          "label": "PRESIDENT SCATTERING",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "PRESIDENT TOTALS",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "VICE PRESIDENT SCATTERING",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "VICE PRESIDENT TOTALS",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.03,
+        0.0,
+        0.989,
+        1.0
+      ],
+      "hint": "This page continues the table of the previous page and prints no headings."
+    },
+    {
+      "page": 21,
+      "id": "21-0",
+      "columns": [
+        {
+          "label": "TAXPAYER PHILLIPS KNIGHT",
+          "contest": "president",
+          "candidate": "Howard Phillips"
+        },
+        {
+          "label": "NEW ALLIANCE FULANI MUNOZ",
+          "contest": "president",
+          "candidate": "Lenora Fulani"
+        },
+        {
+          "label": "INDEPENDENTS FOR ECONOMIC RECOVERY LAROUCHE, JR. BEVEL",
+          "contest": "president",
+          "candidate": "Lyndon LaRouche"
+        },
+        {
+          "label": "CAMPAIGN FOR A NEW TOMORROW DANIELS TUPAHACHE",
+          "contest": "president",
+          "candidate": "Ron Daniels"
+        },
+        {
+          "label": "NATURAL LAW HAGELIN TOMPKINS",
+          "contest": "president",
+          "candidate": "John Hagelin"
+        },
+        {
+          "label": "PRESIDENT SCATTERING",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "PRESIDENT TOTALS",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "VICE PRESIDENT SCATTERING",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "VICE PRESIDENT TOTAL",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.039,
+        0.249,
+        0.998,
+        1.0
+      ],
+      "hint": "Read only the table headed 'NOVEMBER 3, 1992 - GENERAL ELECTION PRESIDENT PART II PAGE 1'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1425
+      ]
+    },
+    {
+      "page": 23,
+      "id": "23-0",
+      "columns": [
+        {
+          "label": "DEMOCRATIC JEAN LLOYD-JONES",
+          "contest": "senate",
+          "candidate": "Jean Lloyd-Jones"
+        },
+        {
+          "label": "REPUBLICAN CHARLES E. GRASSLEY",
+          "contest": "senate",
+          "candidate": "Charles E. Grassley"
+        },
+        {
+          "label": "NOMINATED BY PETITION MEL BORING",
+          "contest": "senate",
+          "candidate": "Mel Boring"
+        },
+        {
+          "label": "NOMINATED BY PETITION RICHARD O'DELL HUGHES",
+          "contest": "senate",
+          "candidate": "Richard Dell Hughes"
+        },
+        {
+          "label": "NOMINATED BY PETITION ROSANNE FREEBURG",
+          "contest": "senate",
+          "candidate": "Rosanne Freeburg"
+        },
+        {
+          "label": "NOMINATED BY PETITION SUE ATKINSON",
+          "contest": "senate",
+          "candidate": "Sue Atkinson"
+        },
+        {
+          "label": "GRASS ROOTS CARL ERIC OLSEN",
+          "contest": "senate",
+          "candidate": "Carl Eric Olsen"
+        },
+        {
+          "label": "SOCIALIST WORKERS CLEVE ANDREW PULLEY",
+          "contest": "senate",
+          "candidate": "Cleve Andrew Pulley"
+        },
+        {
+          "label": "NATURAL LAW STUART ZIMMERMAN",
+          "contest": "senate",
+          "candidate": "Stuart Zimmerman"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.037,
+        0.253,
+        0.998,
+        1.0
+      ],
+      "hint": "Read only the table headed 'NOVEMBER 3, 1992 - GENERAL ELECTION UNITED STATES SENATOR PART I PAGE 1'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1486
+      ]
+    },
+    {
+      "page": 24,
+      "id": "24-0",
+      "columns": [
+        {
+          "label": "DEMOCRATIC JEAN LLOYD-JONES",
+          "contest": "senate",
+          "candidate": "Jean Lloyd-Jones"
+        },
+        {
+          "label": "REPUBLICAN CHARLES E. GRASSLEY",
+          "contest": "senate",
+          "candidate": "Charles E. Grassley"
+        },
+        {
+          "label": "NOMINATED BY PETITION MEL BORING",
+          "contest": "senate",
+          "candidate": "Mel Boring"
+        },
+        {
+          "label": "NOMINATED BY PETITION RICHARD O'DELL HUGHES",
+          "contest": "senate",
+          "candidate": "Richard Dell Hughes"
+        },
+        {
+          "label": "NOMINATED BY PETITION ROSANNE FREEBURG",
+          "contest": "senate",
+          "candidate": "Rosanne Freeburg"
+        },
+        {
+          "label": "NOMINATED BY PETITION SUE ATKINSON",
+          "contest": "senate",
+          "candidate": "Sue Atkinson"
+        },
+        {
+          "label": "GRASS ROOTS CARL ERIC OLSEN",
+          "contest": "senate",
+          "candidate": "Carl Eric Olsen"
+        },
+        {
+          "label": "SOCIALIST WORKERS CLEVE ANDREW PULLEY",
+          "contest": "senate",
+          "candidate": "Cleve Andrew Pulley"
+        },
+        {
+          "label": "NATURAL LAW STUART ZIMMERMAN",
+          "contest": "senate",
+          "candidate": "Stuart Zimmerman"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.032,
+        0.258,
+        0.998,
+        1.0
+      ],
+      "hint": "Read only the table headed 'UNITED STATES SENATOR PART I PAGE 2'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1267
+      ]
+    },
+    {
+      "page": 25,
+      "id": "25-0",
+      "columns": [
+        {
+          "label": "DEMOCRATIC JEAN LLOYD-JONES",
+          "contest": "senate",
+          "candidate": "Jean Lloyd-Jones"
+        },
+        {
+          "label": "REPUBLICAN CHARLES E. GRASSLEY",
+          "contest": "senate",
+          "candidate": "Charles E. Grassley"
+        },
+        {
+          "label": "NOMINATED BY PETITION MEL BORING",
+          "contest": "senate",
+          "candidate": "Mel Boring"
+        },
+        {
+          "label": "NOMINATED BY PETITION RICHARD O'DELL HUGHES",
+          "contest": "senate",
+          "candidate": "Richard Dell Hughes"
+        },
+        {
+          "label": "NOMINATED BY PETITION ROSANNE FREEBURG",
+          "contest": "senate",
+          "candidate": "Rosanne Freeburg"
+        },
+        {
+          "label": "NOMINATED BY PETITION SUE ATKINSON",
+          "contest": "senate",
+          "candidate": "Sue Atkinson"
+        },
+        {
+          "label": "GRASS ROOTS CARL ERIC OLSEN",
+          "contest": "senate",
+          "candidate": "Carl Eric Olsen"
+        },
+        {
+          "label": "SOCIALIST WORKERS CLEVE ANDREW PULLEY",
+          "contest": "senate",
+          "candidate": "Cleve Andrew Pulley"
+        },
+        {
+          "label": "NATURAL L STUA ZIMMERM",
+          "contest": "senate",
+          "candidate": "Stuart Zimmerman"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.042,
+        0.267,
+        1.0,
+        0.765
+      ],
+      "hint": "Read only the table headed 'UNITED STATES SENATOR PART I PAGE 3'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1707
+      ]
+    },
+    {
+      "page": 26,
+      "id": "26-0",
+      "columns": [
+        {
+          "label": "SCATTERING",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "TOTALS",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.052,
+        0.27,
+        0.338,
+        1.0
+      ],
+      "hint": "Read only the table headed 'NOVEMBER 3, 1992 - GENERAL ELECTION UNITED STATES SENATOR PART II PAGE 1'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1493
+      ]
+    },
+    {
+      "page": 27,
+      "id": "27-0",
+      "columns": [
+        {
+          "label": "SCATTERING",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "TOTALS",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.031,
+        0.324,
+        0.324,
+        1.0
+      ],
+      "hint": "Read only the table headed 'UNITED STATES SENATOR PART II PAGE 2'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1731
+      ]
+    },
+    {
+      "page": 28,
+      "id": "28-0",
+      "columns": [
+        {
+          "label": "SCATTERING",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "TOTALS",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.05,
+        0.352,
+        0.343,
+        0.997
+      ],
+      "hint": "Read only the table headed 'UNITED STATES SENATOR PART 11 PAGE 3'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1938
+      ]
+    }
+  ]
+}

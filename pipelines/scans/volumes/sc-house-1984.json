@@ -1,0 +1,17 @@
+{
+  "polity": "US-SC",
+  "publisher": "South Carolina State Election Commission",
+  "license": "Public record",
+  "raw_source": "us.scans",
+  "year": 1984,
+  "day": "1984-11-06",
+  "title": "Report of the State Election Commission, votes cast in the general election held 1984-11-06",
+  "file": {
+    "url": "https://scvotes.gov/wp-content/uploads/2022/08/Election_Report_1984-1985.pdf"
+  },
+  "offices": {
+    "house": "Representative in Congress, one table per district, county rows"
+  },
+  "leaves": [65, 66],
+  "autorotate": true
+}

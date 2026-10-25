@@ -1,0 +1,411 @@
+{
+  "polity": "US-KS",
+  "publisher": "Kansas Secretary of State",
+  "license": "Public record",
+  "raw_source": "us.ks_es",
+  "title": "Kansas election statistics 1972, general election",
+  "file": {
+    "url": "https://kgi.contentdm.oclc.org/digital/api/collection/p16884coll129/id/63/download"
+  },
+  "contests": {
+    "senate": {
+      "year": 1972,
+      "chamber": "senate",
+      "day": "1972-11-07",
+      "special": false,
+      "state": "KS",
+      "district": null
+    },
+    "house1": {
+      "year": 1972,
+      "chamber": "house",
+      "day": "1972-11-07",
+      "special": false,
+      "state": "KS",
+      "district": 1
+    },
+    "governor": {
+      "year": 1972,
+      "chamber": "governor",
+      "day": "1972-11-07",
+      "special": false,
+      "state": "KS",
+      "district": null
+    },
+    "president": {
+      "year": 1972,
+      "chamber": "president",
+      "day": "1972-11-07",
+      "special": false,
+      "state": "KS",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 15,
+      "id": "15-0",
+      "columns": [
+        {
+          "label": "Harlan Dale House, Rep.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "James B. Pearson, Rep.",
+          "contest": "senate",
+          "candidate": "James B. Pearson"
+        },
+        {
+          "label": "Arch Tetzlaff, M. D., Dem.",
+          "contest": "senate",
+          "candidate": "Arch O. Tetzlaff"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.102,
+        0.088,
+        0.95,
+        0.804
+      ],
+      "hint": "Read only the table headed 'UNITED STATES SENATOR\u2014Concluded'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0964
+      ]
+    },
+    {
+      "page": 16,
+      "id": "16-0",
+      "columns": [
+        {
+          "label": "Keith A. Sebelius, Rep.",
+          "contest": "house1",
+          "candidate": "Keith G. Sebelius"
+        },
+        {
+          "label": "Morris Coover, Dem.",
+          "contest": "house1",
+          "candidate": "Morris Coover"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.055,
+        0.091,
+        0.906,
+        0.891
+      ],
+      "hint": "Read only the table headed 'FOR CONGRESSMAN, FIRST DISTRICT'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.09
+      ]
+    },
+    {
+      "page": 20,
+      "id": "20-0",
+      "columns": [
+        {
+          "label": "John Anderson, Jr., Rep.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Ray E. Frisbie, Rep.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Morris Kay, Rep.",
+          "contest": "governor",
+          "candidate": "Morris Kay"
+        },
+        {
+          "label": "Reynolds \"Ren\" Shultz, Rep.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Robert Docking, Dem.",
+          "contest": "governor",
+          "candidate": "Robert Docking"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.044,
+        0.096,
+        0.894,
+        0.814
+      ],
+      "hint": "Read only the table headed 'FOR GOVERNOR\u2014Concluded'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0961
+      ]
+    },
+    {
+      "page": 79,
+      "id": "79-0",
+      "columns": [
+        {
+          "label": "Nixon and Agnew, Rep.",
+          "contest": "president",
+          "candidate": "Nixon (Republican)"
+        },
+        {
+          "label": "McGovern and Shriver, Dem.",
+          "contest": "president",
+          "candidate": "McGovern (Democratic)"
+        },
+        {
+          "label": "Schmitz and Anderson, Con.",
+          "contest": "president",
+          "candidate": "Schmitz (American Independent)"
+        },
+        {
+          "label": "Munn and Uncapher, Prohib.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.043,
+        0.085,
+        0.892,
+        1.0
+      ],
+      "hint": "Read only the table headed 'FOR PRESIDENT AND VICE-PRESIDENT'; ignore any other table visible in the image.",
+      "bands": 3,
+      "header": [
+        0.0,
+        0.0874
+      ]
+    },
+    {
+      "page": 80,
+      "id": "80-0",
+      "columns": [
+        {
+          "label": "Nixon and Agnew, Rep.",
+          "contest": "president",
+          "candidate": "Nixon (Republican)"
+        },
+        {
+          "label": "McGovern and Shriver, Dem.",
+          "contest": "president",
+          "candidate": "McGovern (Democratic)"
+        },
+        {
+          "label": "Schmitz and Anderson, Con.",
+          "contest": "president",
+          "candidate": "Schmitz (American Independent)"
+        },
+        {
+          "label": "Munn and Uncapher, Prohib.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.079,
+        0.095,
+        0.928,
+        0.816
+      ],
+      "hint": "Read only the table headed 'FOR PRESIDENT AND VICE-PRESIDENT\u2014Concluded'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0971
+      ]
+    },
+    {
+      "page": 81,
+      "id": "81-0",
+      "columns": [
+        {
+          "label": "James B. Pearson, Rep.",
+          "contest": "senate",
+          "candidate": "James B. Pearson"
+        },
+        {
+          "label": "Arch Tetzlaff, M. D., Dem.",
+          "contest": "senate",
+          "candidate": "Arch O. Tetzlaff"
+        },
+        {
+          "label": "Gene F. Miller, Con.",
+          "contest": "senate",
+          "candidate": "Gene F. Miller"
+        },
+        {
+          "label": "Howard Hadin, Prohib.",
+          "contest": "senate",
+          "candidate": "Howard Hadin"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.051,
+        0.082,
+        0.898,
+        1.0
+      ],
+      "hint": "Read only the table headed 'FOR UNITED STATES SENATOR'; ignore any other table visible in the image.",
+      "bands": 3,
+      "header": [
+        0.0,
+        0.0828
+      ]
+    },
+    {
+      "page": 82,
+      "id": "82-0",
+      "columns": [
+        {
+          "label": "James B. Pearson, Rep.",
+          "contest": "senate",
+          "candidate": "James B. Pearson"
+        },
+        {
+          "label": "Arch Tetzlaff, M. D., Dem.",
+          "contest": "senate",
+          "candidate": "Arch O. Tetzlaff"
+        },
+        {
+          "label": "Gene F. Miller, Con.",
+          "contest": "senate",
+          "candidate": "Gene F. Miller"
+        },
+        {
+          "label": "Howard Hadin, Prohib.",
+          "contest": "senate",
+          "candidate": "Howard Hadin"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.088,
+        0.148,
+        0.938,
+        0.812
+      ],
+      "hint": "Read only the table headed 'FOR UNITED STATES SENATOR\u2014Concluded'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0181
+      ]
+    },
+    {
+      "page": 83,
+      "id": "83-0",
+      "columns": [
+        {
+          "label": "Keith G. Sebelius, Rep.",
+          "contest": "house1",
+          "candidate": "Keith G. Sebelius"
+        },
+        {
+          "label": "Morris Coover, Dem.",
+          "contest": "house1",
+          "candidate": "Morris Coover"
+        },
+        {
+          "label": "Daniel Scoggin, Prohib.",
+          "contest": "house1",
+          "candidate": "Daniel Scoggin"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.059,
+        0.08,
+        0.902,
+        0.899
+      ],
+      "hint": "Read only the table headed 'FOR CONGRESSMAN, FIRST DISTRICT'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0928
+      ]
+    },
+    {
+      "page": 86,
+      "id": "86-0",
+      "columns": [
+        {
+          "label": "Morris Kay, Rep.",
+          "contest": "governor",
+          "candidate": "Morris Kay"
+        },
+        {
+          "label": "Robert Docking, Dem.",
+          "contest": "governor",
+          "candidate": "Robert Docking"
+        },
+        {
+          "label": "Rolland E. Fisher, Prohib.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.094,
+        0.139,
+        0.95,
+        1.0
+      ],
+      "hint": "Read only the table headed 'FOR GOVERNOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0209
+      ]
+    },
+    {
+      "page": 87,
+      "id": "87-0",
+      "columns": [
+        {
+          "label": "Morris Kay, Rep.",
+          "contest": "governor",
+          "candidate": "Morris Kay"
+        },
+        {
+          "label": "Robert Docking, Dem.",
+          "contest": "governor",
+          "candidate": "Robert Docking"
+        },
+        {
+          "label": "Rolland E. Fisher, Prohib.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.054,
+        0.081,
+        0.891,
+        0.803
+      ],
+      "hint": "Read only the table headed 'FOR GOVERNOR\u2014Concluded'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.097
+      ]
+    }
+  ]
+}

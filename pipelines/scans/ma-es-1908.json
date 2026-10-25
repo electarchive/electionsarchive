@@ -1,0 +1,532 @@
+{
+  "polity": "US-MA",
+  "publisher": "Massachusetts Secretary of the Commonwealth",
+  "title": "A Manual for the Use of the General Court, 1908 Representatives in Congress by town",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/amanualforusege18taylgoog/page/n{page}_w2000.jpg",
+    "item": "https://archive.org/details/amanualforusege18taylgoog"
+  },
+  "raw_source": "us.scans",
+  "unit_scheme": "town",
+  "unit_codes": { "Gay Head": "25007" },
+  "contests": {
+    "house3": {
+      "year": 1908,
+      "chamber": "house",
+      "day": "1908-11-03",
+      "special": false,
+      "state": "MA",
+      "district": 3
+    },
+    "house4": {
+      "year": 1908,
+      "chamber": "house",
+      "day": "1908-11-03",
+      "special": false,
+      "state": "MA",
+      "district": 4
+    },
+    "house5": {
+      "year": 1908,
+      "chamber": "house",
+      "day": "1908-11-03",
+      "special": false,
+      "state": "MA",
+      "district": 5
+    },
+    "house6": {
+      "year": 1908,
+      "chamber": "house",
+      "day": "1908-11-03",
+      "special": false,
+      "state": "MA",
+      "district": 6
+    },
+    "house7": {
+      "year": 1908,
+      "chamber": "house",
+      "day": "1908-11-03",
+      "special": false,
+      "state": "MA",
+      "district": 7
+    },
+    "house8": {
+      "year": 1908,
+      "chamber": "house",
+      "day": "1908-11-03",
+      "special": false,
+      "state": "MA",
+      "district": 8
+    },
+    "house9": {
+      "year": 1908,
+      "chamber": "house",
+      "day": "1908-11-03",
+      "special": false,
+      "state": "MA",
+      "district": 9
+    },
+    "house10": {
+      "year": 1908,
+      "chamber": "house",
+      "day": "1908-11-03",
+      "special": false,
+      "state": "MA",
+      "district": 10
+    },
+    "house11": {
+      "year": 1908,
+      "chamber": "house",
+      "day": "1908-11-03",
+      "special": false,
+      "state": "MA",
+      "district": 11
+    },
+    "house12": {
+      "year": 1908,
+      "chamber": "house",
+      "day": "1908-11-03",
+      "special": false,
+      "state": "MA",
+      "district": 12
+    },
+    "house13": {
+      "year": 1908,
+      "chamber": "house",
+      "day": "1908-11-03",
+      "special": false,
+      "state": "MA",
+      "district": 13
+    },
+    "house14": {
+      "year": 1908,
+      "chamber": "house",
+      "day": "1908-11-03",
+      "special": false,
+      "state": "MA",
+      "district": 14
+    }
+  },
+  "pages": [
+    {
+      "page": 407,
+      "id": "407-0",
+      "columns": [
+        {
+          "label": "William I. McLoughlin of Worcester, Democratic.",
+          "contest": "house3",
+          "candidate": "William I McLoughlin"
+        },
+        {
+          "label": "Theodore P. Sturtevant of Webster, Independence League.",
+          "contest": "house3",
+          "candidate": "Theodore P Sturtevant"
+        },
+        {
+          "label": "Charles G. Washburn of Worcester, Republican.",
+          "contest": "house3",
+          "candidate": "Charles Grenfill Washburn"
+        },
+        { "label": "All others.", "contest": "house3", "candidate": "Others" }
+      ],
+      "orientation": "counties_down",
+      "crop": [0.164, 0.16, 0.881, 0.405],
+      "hint": "Read only the table headed 'CONGRESSIONAL DISTRICT No. 3\u2014Concluded.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 407,
+      "id": "407-1",
+      "columns": [
+        {
+          "label": "John J. Mitchell of Marlborough, Democratic.",
+          "contest": "house4",
+          "candidate": "John J Mitchell"
+        },
+        {
+          "label": "Charles Q. Tirrell of Natick, Republican.",
+          "contest": "house4",
+          "candidate": "Charles Quincy Tirrell"
+        },
+        { "label": "All others.", "contest": "house4", "candidate": "Others" }
+      ],
+      "orientation": "counties_down",
+      "crop": [0.162, 0.397, 0.881, 1.0],
+      "hint": "Read only the table headed 'CONGRESSIONAL DISTRICT No. 4.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [0.0, 0.2886]
+    },
+    {
+      "page": 408,
+      "id": "408-0",
+      "columns": [
+        {
+          "label": "John J. Mitchell of Marlborough, Democratic.",
+          "contest": "house4",
+          "candidate": "John J Mitchell"
+        },
+        {
+          "label": "Charles Q. Tirrell of Natick, Republican.",
+          "contest": "house4",
+          "candidate": "Charles Quincy Tirrell"
+        },
+        { "label": "All others.", "contest": "house4", "candidate": "Others" }
+      ],
+      "orientation": "counties_down",
+      "crop": [0.14, 0.16, 0.846, 0.655],
+      "hint": "Read only the table headed 'CONGRESSIONAL DISTRICT No. 4\u2014Concluded.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [0.0, 0.297]
+    },
+    {
+      "page": 408,
+      "id": "408-1",
+      "columns": [
+        {
+          "label": "Butler Ames of Lowell, Republican.",
+          "contest": "house5",
+          "candidate": "Butler Ames"
+        },
+        {
+          "label": "George Conley of Lowell, Independence League.",
+          "contest": "house5",
+          "candidate": "George Conley"
+        },
+        {
+          "label": "Joseph J. Flynn of Lawrence, Democratic Independent Nom. Paper. Democratic.",
+          "contest": "house5",
+          "candidate": "Joseph J Flynn"
+        },
+        { "label": "All others.", "contest": "house5", "candidate": "Others" }
+      ],
+      "orientation": "counties_down",
+      "crop": [0.14, 0.647, 0.846, 1.0],
+      "hint": "Read only the table headed 'CONGRESSIONAL DISTRICT No. 5.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 409,
+      "id": "409-0",
+      "columns": [
+        {
+          "label": "Butler Ames of Lowell, Republican.",
+          "contest": "house5",
+          "candidate": "Butler Ames"
+        },
+        {
+          "label": "George Conley of Lowell, Independence League.",
+          "contest": "house5",
+          "candidate": "George Conley"
+        },
+        {
+          "label": "Joseph J. Flynn of Lawrence, Democratic Independent Nom. Paper. Democratic.",
+          "contest": "house5",
+          "candidate": "Joseph J Flynn"
+        },
+        { "label": "All others.", "contest": "house5", "candidate": "Others" }
+      ],
+      "orientation": "counties_down",
+      "crop": [0.138, 0.16, 0.846, 0.552],
+      "hint": "Read only the table headed 'CONGRESSIONAL DISTRICT No. 5\u2014Concluded.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 409,
+      "id": "409-1",
+      "columns": [
+        {
+          "label": "Augustus P. Gardner of Hamilton, Republican.",
+          "contest": "house6",
+          "candidate": "Augustus Peabody Gardner"
+        },
+        {
+          "label": "Franklin H. Wentworth of Salem, Socialist.",
+          "contest": "house6",
+          "candidate": "Franklin H Wentworth"
+        },
+        {
+          "label": "Arthur Withington of Newburyport, Democratic.",
+          "contest": "house6",
+          "candidate": "Arthur Withington"
+        },
+        { "label": "All others.", "contest": "house6", "candidate": "Others" }
+      ],
+      "orientation": "counties_down",
+      "crop": [0.138, 0.544, 0.851, 1.0],
+      "hint": "Read only the table headed 'CONGRESSIONAL DISTRICT No. 6.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [0.0, 0.3816]
+    },
+    {
+      "page": 410,
+      "id": "410-0",
+      "columns": [
+        {
+          "label": "Augustus P. Gardner of Hamilton, Republican.",
+          "contest": "house6",
+          "candidate": "Augustus Peabody Gardner"
+        },
+        {
+          "label": "Franklin H. Wentworth of Salem, Socialist.",
+          "contest": "house6",
+          "candidate": "Franklin H Wentworth"
+        },
+        {
+          "label": "Arthur Withington of Newburyport, Democratic.",
+          "contest": "house6",
+          "candidate": "Arthur Withington"
+        },
+        { "label": "All others.", "contest": "house6", "candidate": "Others" }
+      ],
+      "orientation": "counties_down",
+      "crop": [0.123, 0.157, 0.83, 0.563],
+      "hint": "Read only the table headed 'CONGRESSIONAL DISTRICT No. 6\u2014Concluded.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 410,
+      "id": "410-1",
+      "columns": [
+        {
+          "label": "George Brickett of Melrose, Democratic.",
+          "contest": "house7",
+          "candidate": "George Brickett"
+        },
+        {
+          "label": "Clarence L. McIver of Saugus, Independence League.",
+          "contest": "house7",
+          "candidate": "Clarence L McIver"
+        },
+        {
+          "label": "Ernest W. Roberts of Chelsea, Republican.",
+          "contest": "house7",
+          "candidate": "Ernest William Roberts"
+        },
+        { "label": "All others.", "contest": null, "candidate": "" }
+      ],
+      "orientation": "counties_down",
+      "crop": [0.126, 0.555, 0.837, 0.921],
+      "hint": "Read only the table headed 'CONGRESSIONAL DISTRICT No. 7.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 411,
+      "id": "411-0",
+      "columns": [
+        {
+          "label": "Frederick S. Deitrick of Cambridge, Democratic.",
+          "contest": "house8",
+          "candidate": "Frederick S Deitrick"
+        },
+        {
+          "label": "George W. Jennings of Somerville, Independence League.",
+          "contest": "house8",
+          "candidate": "George W Jennings"
+        },
+        {
+          "label": "Samuel W. McCall of Winchester, Republican.",
+          "contest": "house8",
+          "candidate": "Samuel Walker McCall"
+        },
+        { "label": "All others.", "contest": "house8", "candidate": "Others" }
+      ],
+      "orientation": "counties_down",
+      "crop": [0.162, 0.141, 0.876, 0.482],
+      "hint": "Read only the table headed 'CONGRESSIONAL DISTRICT No. 8.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 411,
+      "id": "411-1",
+      "columns": [
+        {
+          "label": "Junius T. Auerbach of Boston, Independence League.",
+          "contest": "house9",
+          "candidate": "Junius T Auerbach"
+        },
+        {
+          "label": "John A. Campbell of Boston, Republican.",
+          "contest": "house9",
+          "candidate": "John A Campbell"
+        },
+        {
+          "label": "John A. Keliher of Boston, Democratic.",
+          "contest": "house9",
+          "candidate": "John Austin Keliher"
+        },
+        { "label": "All others.", "contest": "house9", "candidate": "Others" }
+      ],
+      "orientation": "counties_down",
+      "crop": [0.162, 0.474, 0.876, 0.762],
+      "hint": "Read only the table headed 'CONGRESSIONAL DISTRICT No. 9.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 412,
+      "id": "412-0",
+      "columns": [
+        {
+          "label": "J. Mitchell Galvin of Boston, Republican.",
+          "contest": "house10",
+          "candidate": "J Mitchell Galvin"
+        },
+        {
+          "label": "Charles J. Kidney of Boston, Independence League.",
+          "contest": "house10",
+          "candidate": "Charles J Kidney"
+        },
+        {
+          "label": "Joseph F. O'Connell of Boston, Democratic.",
+          "contest": "house10",
+          "candidate": "Joseph Francis O\u2019Connell"
+        },
+        {
+          "label": "Hazard Stevens of Boston, Free Trader.",
+          "contest": "house10",
+          "candidate": "Hazard Stevens"
+        },
+        { "label": "All others.", "contest": "house10", "candidate": "Others" }
+      ],
+      "orientation": "counties_down",
+      "crop": [0.119, 0.156, 0.829, 0.443],
+      "hint": "Read only the table headed 'CONGRESSIONAL DISTRICT No. 10.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 412,
+      "id": "412-1",
+      "columns": [
+        {
+          "label": "Daniel W. Lane of Boston, Republican.",
+          "contest": "house11",
+          "candidate": "Daniel W Lane"
+        },
+        {
+          "label": "Andrew J. Peters of Boston, Democratic.",
+          "contest": "house11",
+          "candidate": "Andrew James Peters"
+        },
+        {
+          "label": "Edwin M. White of Boston, Independence League.",
+          "contest": "house11",
+          "candidate": "Edwin M White"
+        },
+        { "label": "All others.", "contest": null, "candidate": "" }
+      ],
+      "orientation": "counties_down",
+      "crop": [0.123, 0.435, 0.83, 1.0],
+      "hint": "Read only the table headed 'CONGRESSIONAL DISTRICT No. 11.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [0.0, 0.3345]
+    },
+    {
+      "page": 413,
+      "id": "413-0",
+      "columns": [
+        {
+          "label": "Albert E. George of Walpole, Independence League.",
+          "contest": "house12",
+          "candidate": "Albert E George"
+        },
+        {
+          "label": "Jesse C. Ivy of Newton, Democratic.",
+          "contest": "house12",
+          "candidate": "Jesse C Ivy"
+        },
+        {
+          "label": "John W. Weeks of Newton, Republican.",
+          "contest": "house12",
+          "candidate": "John Wingate Weeks"
+        },
+        { "label": "All others.", "contest": "house12", "candidate": "Others" }
+      ],
+      "orientation": "counties_down",
+      "crop": [0.175, 0.156, 0.89, 0.844],
+      "hint": "Read only the table headed 'CONGRESSIONAL DISTRICT No. 12.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [0.0, 0.2195]
+    },
+    {
+      "page": 414,
+      "id": "414-0",
+      "columns": [
+        {
+          "label": "Charles W. Copeland of Fall River, Independence League.",
+          "contest": "house13",
+          "candidate": "Charles W Copeland"
+        },
+        {
+          "label": "William S. Greene of Fall River, Republican.",
+          "contest": "house13",
+          "candidate": "William Stedman Greene"
+        },
+        {
+          "label": "John F. McGuinness of New Bedford, Democratic.",
+          "contest": "house13",
+          "candidate": "John F McGuinness"
+        },
+        { "label": "All others.", "contest": "house13", "candidate": "Others" }
+      ],
+      "orientation": "counties_down",
+      "crop": [0.118, 0.151, 0.822, 0.679],
+      "hint": "Read only the table headed 'CONGRESSIONAL DISTRICT No. 13.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [0.0, 0.2917]
+    },
+    {
+      "page": 414,
+      "id": "414-1",
+      "columns": [
+        {
+          "label": "George J. Alcott of Bridgewater, Socialist.",
+          "contest": "house14",
+          "candidate": "George J Alcott"
+        },
+        {
+          "label": "Charles B. Drew of Hanover, Independence League.",
+          "contest": "house14",
+          "candidate": "Charles B Drew"
+        },
+        {
+          "label": "William C. Lovering of Taunton, Republican.",
+          "contest": "house14",
+          "candidate": "William Croad Lovering"
+        },
+        {
+          "label": "Eliot L. Packard of Brockton, Democratic.",
+          "contest": "house14",
+          "candidate": "Eliot L Packard"
+        },
+        { "label": "All others.", "contest": "house14", "candidate": "Others" }
+      ],
+      "orientation": "counties_down",
+      "crop": [0.118, 0.671, 0.822, 1.0],
+      "hint": "Read only the table headed 'CONGRESSIONAL DISTRICT No. 14.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 415,
+      "id": "415-0",
+      "columns": [
+        {
+          "label": "George J. Alcott of Bridgewater, Socialist.",
+          "contest": "house14",
+          "candidate": "George J Alcott"
+        },
+        {
+          "label": "Charles B. Drew of Hanover, Independence League.",
+          "contest": "house14",
+          "candidate": "Charles B Drew"
+        },
+        {
+          "label": "William C. Loverling of Taunton, Republican.",
+          "contest": "house14",
+          "candidate": "William Croad Lovering"
+        },
+        {
+          "label": "Elliot L. Packard of Brockton, Democratic.",
+          "contest": "house14",
+          "candidate": "Eliot L Packard"
+        },
+        { "label": "All others.", "contest": "house14", "candidate": "Others" }
+      ],
+      "orientation": "counties_down",
+      "crop": [0.162, 0.152, 0.876, 0.911],
+      "hint": "Read only the table headed 'CONGRESSIONAL DISTRICT No. 14\u2014 Concluded.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [0.0, 0.1924]
+    }
+  ]
+}

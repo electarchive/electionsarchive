@@ -1,0 +1,283 @@
+{
+  "polity": "US-IL",
+  "publisher": "Illinois State Board of Elections",
+  "license": "Public record",
+  "raw_source": "us.scans",
+  "title": "State of Illinois official vote cast at the general election, 1990",
+  "file": {
+    "url": "https://archive.org/download/officialvote90illi/officialvote90illi.pdf"
+  },
+  "contests": {
+    "senate": {
+      "year": 1990,
+      "chamber": "senate",
+      "day": "1990-11-06",
+      "special": false,
+      "state": "IL",
+      "district": null
+    },
+    "governor": {
+      "year": 1990,
+      "chamber": "governor",
+      "day": "1990-11-06",
+      "special": false,
+      "state": "IL",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 13,
+      "id": "13-0",
+      "columns": [
+        {
+          "label": "PLURALITY",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "DEM SIMON",
+          "contest": "senate",
+          "candidate": "Paul Simon"
+        },
+        {
+          "label": "REP MARTIN",
+          "contest": "senate",
+          "candidate": "Lynn Martin"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.262,
+        0.168,
+        0.83,
+        1.0
+      ],
+      "hint": "Read only the table headed 'UNITED STATES SENATOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1346
+      ]
+    },
+    {
+      "page": 14,
+      "id": "14-0",
+      "columns": [
+        {
+          "label": "PLURALITY",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "DEM SIMON",
+          "contest": "senate",
+          "candidate": "Paul Simon"
+        },
+        {
+          "label": "REP MARTIN",
+          "contest": "senate",
+          "candidate": "Lynn Martin"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.254,
+        0.106,
+        0.818,
+        1.0
+      ],
+      "hint": "Read only the table headed 'UNITED STATES SENATOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1331
+      ]
+    },
+    {
+      "page": 15,
+      "id": "15-0",
+      "columns": [
+        {
+          "label": "PLURALITY",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "DEM SIMON",
+          "contest": "senate",
+          "candidate": "Paul Simon"
+        },
+        {
+          "label": "REP MARTIN",
+          "contest": "senate",
+          "candidate": "Lynn Martin"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.247,
+        0.16,
+        0.753,
+        1.0
+      ],
+      "hint": "Read only the table headed 'UNITED STATES SENATOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0655
+      ]
+    },
+    {
+      "page": 16,
+      "id": "16-0",
+      "columns": [
+        {
+          "label": "PLURALITY",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "REP EDGAR KUSTRA",
+          "contest": "governor",
+          "candidate": "Jim Edgar"
+        },
+        {
+          "label": "DEM HARTIGAN BURNS",
+          "contest": "governor",
+          "candidate": "Neil F. Hartigan"
+        },
+        {
+          "label": "SOL FIELDS BROWN",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.197,
+        0.156,
+        0.913,
+        1.0
+      ],
+      "hint": "Read only the table headed 'GOVERNOR AND LIEUTENANT GOVERNOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2393
+      ]
+    },
+    {
+      "page": 17,
+      "id": "17-0",
+      "columns": [
+        {
+          "label": "PLURALITY",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "REP EDGAR KUSTRA",
+          "contest": "governor",
+          "candidate": "Jim Edgar"
+        },
+        {
+          "label": "DEM HARTIGAN BURNS",
+          "contest": "governor",
+          "candidate": "Neil F. Hartigan"
+        },
+        {
+          "label": "SOL FIELDS BROWN",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.178,
+        0.105,
+        0.811,
+        1.0
+      ],
+      "hint": "Read only the table headed 'GOVERNOR AND LIEUTENANT GOVERNOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1341
+      ]
+    },
+    {
+      "page": 18,
+      "id": "18-0",
+      "columns": [
+        {
+          "label": "PLURALITY",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "REP EDGAR KUSTRA",
+          "contest": "governor",
+          "candidate": "Jim Edgar"
+        },
+        {
+          "label": "DEM HARTIGAN BURNS",
+          "contest": "governor",
+          "candidate": "Neil F. Hartigan"
+        },
+        {
+          "label": "SOL FIELDS BROWN",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.212,
+        0.105,
+        0.843,
+        1.0
+      ],
+      "hint": "Read only the table headed 'GOVERNOR AND LIEUTENANT GOVERNOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1475
+      ]
+    },
+    {
+      "page": 19,
+      "id": "19-0",
+      "columns": [
+        {
+          "label": "PLURALITY",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "REP EDGAR KUSTRA",
+          "contest": "governor",
+          "candidate": "Jim Edgar"
+        },
+        {
+          "label": "DEM HARTIGAN BURNS",
+          "contest": "governor",
+          "candidate": "Neil F. Hartigan"
+        },
+        {
+          "label": "SOL FIELDS BROWN",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.212,
+        0.0,
+        0.843,
+        1.0
+      ],
+      "hint": "This page continues the table of the previous page and prints no headings."
+    }
+  ]
+}

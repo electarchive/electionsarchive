@@ -1,0 +1,498 @@
+{
+  "polity": "US-KS",
+  "publisher": "Kansas Secretary of State",
+  "license": "Public record",
+  "raw_source": "us.ks_es",
+  "title": "Kansas election statistics 1932, general election",
+  "file": {
+    "url": "https://kgi.contentdm.oclc.org/digital/api/collection/p16884coll129/id/29/download"
+  },
+  "contests": {
+    "president": {
+      "year": 1932,
+      "chamber": "president",
+      "day": "1932-11-08",
+      "special": false,
+      "state": "KS",
+      "district": null
+    },
+    "senate": {
+      "year": 1932,
+      "chamber": "senate",
+      "day": "1932-11-08",
+      "special": false,
+      "state": "KS",
+      "district": null
+    },
+    "house1": {
+      "year": 1932,
+      "chamber": "house",
+      "day": "1932-11-08",
+      "special": false,
+      "state": "KS",
+      "district": 1
+    },
+    "house2": {
+      "year": 1932,
+      "chamber": "house",
+      "day": "1932-11-08",
+      "special": false,
+      "state": "KS",
+      "district": 2
+    },
+    "house3": {
+      "year": 1932,
+      "chamber": "house",
+      "day": "1932-11-08",
+      "special": false,
+      "state": "KS",
+      "district": 3
+    },
+    "house4": {
+      "year": 1932,
+      "chamber": "house",
+      "day": "1932-11-08",
+      "special": false,
+      "state": "KS",
+      "district": 4
+    },
+    "governor": {
+      "year": 1932,
+      "chamber": "governor",
+      "day": "1932-11-08",
+      "special": false,
+      "state": "KS",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 2,
+      "id": "2-0",
+      "columns": [
+        {
+          "label": "Republican. Hoover and Curtis.",
+          "contest": "president",
+          "candidate": "Hoover (Republican)"
+        },
+        {
+          "label": "Democratic. Roosevelt and Garner.",
+          "contest": "president",
+          "candidate": "Roosevelt (Democratic)"
+        },
+        {
+          "label": "Socialist. Thomas and Maurer.",
+          "contest": "president",
+          "candidate": "Thomas (Socialist)"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.099,
+        0.127,
+        0.911,
+        1.0
+      ],
+      "hint": "Read only the table headed 'GENERAL ELECTION, NOVEMBER 8, 1932. FOR PRESIDENT AND VICE PRESIDENT.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2302
+      ]
+    },
+    {
+      "page": 3,
+      "id": "3-0",
+      "columns": [
+        {
+          "label": "Republican. Hoover and Curtis.",
+          "contest": "president",
+          "candidate": "Hoover (Republican)"
+        },
+        {
+          "label": "Democratic. Roosevelt and Garner.",
+          "contest": "president",
+          "candidate": "Roosevelt (Democratic)"
+        },
+        {
+          "label": "Socialist. Thomas and Maurer.",
+          "contest": "president",
+          "candidate": "Thomas (Socialist)"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.087,
+        0.143,
+        0.898,
+        0.904
+      ],
+      "hint": "Read only the table headed 'FOR PRESIDENT AND VICE PRESIDENT\u2014Concluded.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1078
+      ]
+    },
+    {
+      "page": 4,
+      "id": "4-0",
+      "columns": [
+        {
+          "label": "Ben S. Paulen, Rep.",
+          "contest": "senate",
+          "candidate": "Ben S. Paulen"
+        },
+        {
+          "label": "George McGill, Dem.",
+          "contest": "senate",
+          "candidate": "George McGill"
+        },
+        {
+          "label": "E. Haldeman-Julius, Soc.",
+          "contest": "senate",
+          "candidate": "E. Haldeman-Julius"
+        },
+        {
+          "label": "Geo. Alfred Brown, Ind.",
+          "contest": "senate",
+          "candidate": "George A. Brown"
+        },
+        {
+          "label": "J. F. Wm. Renker, Ind.",
+          "contest": "senate",
+          "candidate": "J. F. W. Renker"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.099,
+        0.122,
+        0.911,
+        1.0
+      ],
+      "hint": "Read only the table headed 'FOR UNITED STATES SENATOR.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0854
+      ]
+    },
+    {
+      "page": 5,
+      "id": "5-0",
+      "columns": [
+        {
+          "label": "Ben S. Paulen, Rep.",
+          "contest": "senate",
+          "candidate": "Ben S. Paulen"
+        },
+        {
+          "label": "George McGill, Dem.",
+          "contest": "senate",
+          "candidate": "George McGill"
+        },
+        {
+          "label": "E. Haldeman-Julius, Soc.",
+          "contest": "senate",
+          "candidate": "E. Haldeman-Julius"
+        },
+        {
+          "label": "Geo. Alfred Brown, Ind.",
+          "contest": "senate",
+          "candidate": "George A. Brown"
+        },
+        {
+          "label": "J. F. Wm. Renker, Ind.",
+          "contest": "senate",
+          "candidate": "J. F. W. Renker"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.09,
+        0.143,
+        0.908,
+        0.774
+      ],
+      "hint": "Read only the table headed 'FOR UNITED STATES SENATOR\u2014CONCLUDED.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0872
+      ]
+    },
+    {
+      "page": 6,
+      "id": "6-0",
+      "columns": [
+        {
+          "label": "W. P. Lambertson, Rep.",
+          "contest": "house1",
+          "candidate": "W. P. Lambertson"
+        },
+        {
+          "label": "M. R. Howard, Dem.",
+          "contest": "house1",
+          "candidate": "M. R. Howard"
+        },
+        {
+          "label": "Geo. C. Hall, Ind.",
+          "contest": "house1",
+          "candidate": "George C. Hall"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.094,
+        0.149,
+        0.903,
+        0.467
+      ],
+      "hint": "Read only the table headed 'FIRST CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 6,
+      "id": "6-1",
+      "columns": [
+        {
+          "label": "U. S. Guyer, Rep.",
+          "contest": "house2",
+          "candidate": "U. S. Guyer"
+        },
+        {
+          "label": "B. J. Sheridan, Dem.",
+          "contest": "house2",
+          "candidate": "B. J. Sheridan"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.096,
+        0.459,
+        0.903,
+        0.751
+      ],
+      "hint": "Read only the table headed 'SECOND CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 7,
+      "id": "7-0",
+      "columns": [
+        {
+          "label": "Harold McGugin, Rep.",
+          "contest": "house3",
+          "candidate": "Harold McGugin"
+        },
+        {
+          "label": "E. W. Patterson, Dem.",
+          "contest": "house3",
+          "candidate": "E. W. Patterson"
+        },
+        {
+          "label": "Mrs. V. J. VanSant Rowe, Soc.",
+          "contest": "house3",
+          "candidate": "Mrs. V. J. Van Zant Rowe"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.088,
+        0.124,
+        0.906,
+        0.422
+      ],
+      "hint": "Read only the table headed 'THIRD CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 7,
+      "id": "7-1",
+      "columns": [
+        {
+          "label": "Homer Hoch, Rep.",
+          "contest": "house4",
+          "candidate": "Homer Hoch"
+        },
+        {
+          "label": "Randolph Carpenter, Dem.",
+          "contest": "house4",
+          "candidate": "Randolph Carpenter"
+        },
+        {
+          "label": "F. M. Shonkwiler, Ind.",
+          "contest": "house4",
+          "candidate": "F. M. Shonkwiler"
+        },
+        {
+          "label": "Scattering.",
+          "contest": "house4",
+          "candidate": "Scattering"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.088,
+        0.414,
+        0.907,
+        0.808
+      ],
+      "hint": "Read only the table headed 'FOURTH CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 14,
+      "id": "14-0",
+      "columns": [
+        {
+          "label": "Alfred M. Landon. Rep.",
+          "contest": "governor",
+          "candidate": "Alfred M. Landon"
+        },
+        {
+          "label": "Harry H. Woodring, Dem.",
+          "contest": "governor",
+          "candidate": "Harry H. Woodring"
+        },
+        {
+          "label": "H. M. Perkins, Soc.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "John R. Brinkley, Ind.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Scattering.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.092,
+        0.115,
+        0.908,
+        1.0
+      ],
+      "hint": "Read only the table headed 'FOR GOVERNOR.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0915
+      ]
+    },
+    {
+      "page": 15,
+      "id": "15-0",
+      "columns": [
+        {
+          "label": "Alfred M. Landon, Rep.",
+          "contest": "governor",
+          "candidate": "Alfred M. Landon"
+        },
+        {
+          "label": "Harry H. Woodring, Dem.",
+          "contest": "governor",
+          "candidate": "Harry H. Woodring"
+        },
+        {
+          "label": "H. M. Perkins, Soc.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "John R. Brinkley, Ind.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Scattering.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.081,
+        0.119,
+        0.906,
+        0.767
+      ],
+      "hint": "Read only the table headed 'FOR GOVERNOR\u2014Concluded.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1096
+      ]
+    },
+    {
+      "page": 50,
+      "id": "50-0",
+      "columns": [
+        {
+          "label": "Republican. Hoover and Curtis.",
+          "contest": "president",
+          "candidate": "Hoover (Republican)"
+        },
+        {
+          "label": "Democratic. Roosevelt and Garner.",
+          "contest": "president",
+          "candidate": "Roosevelt (Democratic)"
+        },
+        {
+          "label": "Socialist. Thomas and Maurer.",
+          "contest": "president",
+          "candidate": "Thomas (Socialist)"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.126,
+        0.144,
+        0.923,
+        1.0
+      ],
+      "hint": "Read only the table headed 'ABSENT VOTE. FOR PRESIDENT AND VICE PRESIDENT.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2255
+      ]
+    },
+    {
+      "page": 51,
+      "id": "51-0",
+      "columns": [
+        {
+          "label": "Republican. Hoover and Curtis.",
+          "contest": "president",
+          "candidate": "Hoover (Republican)"
+        },
+        {
+          "label": "Democratic. Roosevelt and Garner.",
+          "contest": "president",
+          "candidate": "Roosevelt (Democratic)"
+        },
+        {
+          "label": "Socialist. Thomas and Maurer.",
+          "contest": "president",
+          "candidate": "Thomas (Socialist)"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.095,
+        0.143,
+        0.914,
+        0.897
+      ],
+      "hint": "Read only the table headed 'Absent Vote\u2014General Election, November 8, 1932. FOR PRESIDENT AND VICE PRESIDENT\u2014Concluded.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1088
+      ]
+    }
+  ]
+}

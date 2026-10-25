@@ -1,0 +1,275 @@
+{
+  "polity": "US-IA",
+  "publisher": "Iowa Secretary of State",
+  "license": "Public record",
+  "raw_source": "us.ia_sos",
+  "title": "Iowa official canvass summary, general election 1988",
+  "file": {
+    "url": "https://sos.iowa.gov/elections/pdf/results/80s/1988gencanv.pdf",
+    "item": "https://sos.iowa.gov/elections/results/"
+  },
+  "contests": {
+    "president": {
+      "year": 1988,
+      "chamber": "president",
+      "day": "1988-11-08",
+      "special": false,
+      "state": "IA",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 3,
+      "id": "3-0",
+      "columns": [
+        {
+          "label": "DEMOCRATIC DUKAKIS & BENTSEN",
+          "contest": "president",
+          "candidate": "Michael S. Dukakis"
+        },
+        {
+          "label": "REPUBLICAN BUSH & QUAYLE",
+          "contest": "president",
+          "candidate": "George Bush"
+        },
+        {
+          "label": "NOM. BY PETITION LA ROUCHE & FREEMAN",
+          "contest": "president",
+          "candidate": "Lyndon H. LaRouche"
+        },
+        {
+          "label": "LIBERTARIAN PAUL & MARROU",
+          "contest": "president",
+          "candidate": "Ronald E. Paul"
+        },
+        {
+          "label": "IOWA SOCIALIST KENOYER & EHRENREICH",
+          "contest": "president",
+          "candidate": "Willa Kenoyer"
+        },
+        {
+          "label": "WORKERS LEAGUE WINN & PORSTER",
+          "contest": "president",
+          "candidate": "Edward Winn"
+        },
+        {
+          "label": "PATRIOTIC PARTY, IA. DUKE & PARKER",
+          "contest": "president",
+          "candidate": "David E. Duke"
+        },
+        {
+          "label": "SOCIALIST WORKERS WARREN & MICKELLS",
+          "contest": "president",
+          "candidate": "James Mac Warren"
+        },
+        {
+          "label": "NEW ALLIANCE FULANI & DATTNER",
+          "contest": "president",
+          "candidate": "Lenora B. Fulani"
+        },
+        {
+          "label": "SCATTERING (WRITE-IN) SC. PRES.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "SCATTERING (WRITE-IN) SC. VP",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "TOTALS PRES.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "TOTALS V.PRES",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.032,
+        0.024,
+        0.993,
+        1.0
+      ],
+      "hint": "Read only the table headed 'PRESIDENT AND VICE PRESIDENT OF THE UNITED STATES'; ignore any other table visible in the image.",
+      "bands": 3,
+      "header": [
+        0.0,
+        0.127
+      ]
+    },
+    {
+      "page": 4,
+      "id": "4-0",
+      "columns": [
+        {
+          "label": "DEMOCRATIC DUKAKIS & BENTSEN",
+          "contest": "president",
+          "candidate": "Michael S. Dukakis"
+        },
+        {
+          "label": "REPUBLICAN BUSH & QUAYLE",
+          "contest": "president",
+          "candidate": "George Bush"
+        },
+        {
+          "label": "NOM. BY PETITION LA ROUCHE & FREEMAN",
+          "contest": "president",
+          "candidate": "Lyndon H. LaRouche"
+        },
+        {
+          "label": "LIBERTARIAN PAUL & MARROU",
+          "contest": "president",
+          "candidate": "Ronald E. Paul"
+        },
+        {
+          "label": "IOWA SOCIALIST KENOYER & EHRENREICH",
+          "contest": "president",
+          "candidate": "Willa Kenoyer"
+        },
+        {
+          "label": "WORKERS LEAGUE WINN & PORSTER",
+          "contest": "president",
+          "candidate": "Edward Winn"
+        },
+        {
+          "label": "PATRIOTIC PARTY, IA. DUKE & PARKER",
+          "contest": "president",
+          "candidate": "David E. Duke"
+        },
+        {
+          "label": "SOCIALIST WORKERS WARREN & MICKELLS",
+          "contest": "president",
+          "candidate": "James Mac Warren"
+        },
+        {
+          "label": "NEW ALLIANCE FULANI & DATTNER",
+          "contest": "president",
+          "candidate": "Lenora B. Fulani"
+        },
+        {
+          "label": "SCATTERING (WRITE-IN) SC. PRES.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "SC. VP",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "TOTALS PRES.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "TOTALS V.PRES",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.03,
+        0.051,
+        0.993,
+        0.954
+      ],
+      "hint": "Read only the table headed 'PRESIDENT AND VICE PRESIDENT OF THE UNITED STATES'; ignore any other table visible in the image.",
+      "bands": 3,
+      "header": [
+        0.0,
+        0.1373
+      ]
+    },
+    {
+      "page": 5,
+      "id": "5-0",
+      "columns": [
+        {
+          "label": "DEMOCRATIC DUKAKIS & BENTSEN",
+          "contest": "president",
+          "candidate": "Michael S. Dukakis"
+        },
+        {
+          "label": "REPUBLICAN BUSH & QUAYLE",
+          "contest": "president",
+          "candidate": "George Bush"
+        },
+        {
+          "label": "NOM. BY PETITION LA ROUCHE & FREEMAN",
+          "contest": "president",
+          "candidate": "Lyndon H. LaRouche"
+        },
+        {
+          "label": "LIBERTARIAN PAUL & MARROU",
+          "contest": "president",
+          "candidate": "Ronald E. Paul"
+        },
+        {
+          "label": "IOWA SOCIALIST KENOYER & EHRENREICH",
+          "contest": "president",
+          "candidate": "Willa Kenoyer"
+        },
+        {
+          "label": "WORKERS LEAGUE WINN & PORSTER",
+          "contest": "president",
+          "candidate": "Edward Winn"
+        },
+        {
+          "label": "PATRIOTIC PARTY, IA. DUKE & PARKER",
+          "contest": "president",
+          "candidate": "David E. Duke"
+        },
+        {
+          "label": "SOCIALIST WORKERS WARREN & NICKELLS",
+          "contest": "president",
+          "candidate": "James Mac Warren"
+        },
+        {
+          "label": "NEW ALLIANCE FULANI & DATTNER",
+          "contest": "president",
+          "candidate": "Lenora B. Fulani"
+        },
+        {
+          "label": "SCATTERING (WRITE-IN) SC. PRES.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "SCATTERING (WRITE-IN) SC. VP",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "TOTALS PRES.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "TOTALS V.PRES",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.032,
+        0.046,
+        0.993,
+        0.962
+      ],
+      "hint": "Read only the table headed 'PRESIDENT AND VICE PRESIDENT OF THE UNITED STATES'; ignore any other table visible in the image.",
+      "bands": 3,
+      "header": [
+        0.0,
+        0.1223
+      ]
+    }
+  ]
+}

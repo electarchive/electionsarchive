@@ -1,0 +1,167 @@
+{
+  "polity": "US-KY",
+  "publisher": "Kentucky State Board of Elections",
+  "license": "Public record",
+  "raw_source": "us.scans",
+  "title": "Kentucky official returns, general election 1964-11-03",
+  "file": {
+    "url": "https://elect.ky.gov/results/1973-1979/Documents/1964.pdf"
+  },
+  "contests": {
+    "house5": {
+      "year": 1964,
+      "chamber": "house",
+      "day": "1964-11-03",
+      "special": false,
+      "state": "KY",
+      "district": 5
+    }
+  },
+  "pages": [
+    {
+      "page": 6,
+      "id": "6-0",
+      "columns": [
+        {
+          "label": "REPUBLICAN DR. TIM LEE CARTER",
+          "contest": "house5",
+          "candidate": "Tim Lee Carter"
+        },
+        {
+          "label": "DEMOCRAT FRANCES JONES MILLS",
+          "contest": "house5",
+          "candidate": "Frances J. Mills"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.0,
+        0.023,
+        1.0,
+        0.684
+      ],
+      "hint": "Read only the table headed 'FIFTH DISTRICT GENERAL ELECTION NOVEMBER 3, 1964 U.S. HOUSE OF REPRESENTATIVES'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2042
+      ]
+    },
+    {
+      "page": 7,
+      "id": "7-0",
+      "columns": [
+        {
+          "label": "REPUBLICAN DR. TIM LEE CARTER",
+          "contest": "house5",
+          "candidate": "Tim Lee Carter"
+        },
+        {
+          "label": "DEMOCRAT FRANCES JONES MILLS",
+          "contest": "house5",
+          "candidate": "Frances J. Mills"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.0,
+        0.024,
+        1.0,
+        0.686
+      ],
+      "hint": "Read only the table headed 'FIFTH DISTRICT GENERAL ELECTION NOVEMBER 3, 1964 U.S. HOUSE OF REPRESENTATIVES'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2054
+      ]
+    },
+    {
+      "page": 9,
+      "id": "9-0",
+      "columns": [
+        {
+          "label": "REPUBLICAN DR. TIM LEE CARTER",
+          "contest": "house5",
+          "candidate": "Tim Lee Carter"
+        },
+        {
+          "label": "DEMOCRAT FRANCES JONES MILLS",
+          "contest": "house5",
+          "candidate": "Frances J. Mills"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.0,
+        0.021,
+        1.0,
+        0.689
+      ],
+      "hint": "Read only the table headed 'FIFTH DISTRICT GENERAL ELECTION NOVEMBER 3, 1964 U.S. HOUSE OF REPRESENTATIVES'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2081
+      ]
+    },
+    {
+      "page": 10,
+      "id": "10-0",
+      "columns": [
+        {
+          "label": "REPUBLICAN DR. TIM LEE CARTER",
+          "contest": "house5",
+          "candidate": "Tim Lee Carter"
+        },
+        {
+          "label": "DEMOCRAT FRANCES JONES MILLS",
+          "contest": "house5",
+          "candidate": "Frances J. Mills"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.0,
+        0.01,
+        1.0,
+        0.693
+      ],
+      "hint": "Read only the table headed 'FIFTH DISTRICT GENERAL ELECTION NOVEMBER 3, 1964 U.S. HOUSE OF REPRESENTATIVES'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2108
+      ]
+    },
+    {
+      "page": 11,
+      "id": "11-0",
+      "columns": [
+        {
+          "label": "REPUBLICAN DR. TIM LEE CARTER",
+          "contest": "house5",
+          "candidate": "Tim Lee Carter"
+        },
+        {
+          "label": "DEMOCRAT FRANCES JONES MILLS",
+          "contest": "house5",
+          "candidate": "Frances J. Mills"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.0,
+        0.0,
+        1.0,
+        0.661
+      ],
+      "hint": "Read only the table headed 'U.S. HOUSE OF REPRESENTATIVES'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1921
+      ]
+    }
+  ]
+}

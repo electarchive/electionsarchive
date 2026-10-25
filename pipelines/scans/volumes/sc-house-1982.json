@@ -1,0 +1,17 @@
+{
+  "polity": "US-SC",
+  "publisher": "South Carolina State Election Commission",
+  "license": "Public record",
+  "raw_source": "us.scans",
+  "year": 1982,
+  "day": "1982-11-02",
+  "title": "Report of the State Election Commission, votes cast in the general election held 1982-11-02",
+  "file": {
+    "url": "https://scvotes.gov/wp-content/uploads/2022/08/Election_Report_1982-1983.pdf"
+  },
+  "offices": {
+    "house": "Representative in Congress, one table per district, county rows"
+  },
+  "leaves": [28, 29, 30],
+  "autorotate": true
+}

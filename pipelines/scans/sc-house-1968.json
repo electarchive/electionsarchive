@@ -1,0 +1,226 @@
+{
+  "polity": "US-SC",
+  "publisher": "South Carolina State Election Commission",
+  "license": "Public record",
+  "raw_source": "us.scans",
+  "title": "Report of the State Election Commission, votes cast in the general election held 1968-11-05",
+  "file": {
+    "url": "https://scvotes.gov/wp-content/uploads/2022/08/Election_Report_1968.pdf"
+  },
+  "contests": {
+    "house1": {
+      "year": 1968,
+      "chamber": "house",
+      "day": "1968-11-05",
+      "special": false,
+      "state": "SC",
+      "district": 1
+    },
+    "house2": {
+      "year": 1968,
+      "chamber": "house",
+      "day": "1968-11-05",
+      "special": false,
+      "state": "SC",
+      "district": 2
+    },
+    "house3": {
+      "year": 1968,
+      "chamber": "house",
+      "day": "1968-11-05",
+      "special": false,
+      "state": "SC",
+      "district": 3
+    },
+    "house4": {
+      "year": 1968,
+      "chamber": "house",
+      "day": "1968-11-05",
+      "special": false,
+      "state": "SC",
+      "district": 4
+    },
+    "house5": {
+      "year": 1968,
+      "chamber": "house",
+      "day": "1968-11-05",
+      "special": false,
+      "state": "SC",
+      "district": 5
+    },
+    "house6": {
+      "year": 1968,
+      "chamber": "house",
+      "day": "1968-11-05",
+      "special": false,
+      "state": "SC",
+      "district": 6
+    }
+  },
+  "pages": [
+    {
+      "page": 12,
+      "id": "12-0",
+      "columns": [
+        {
+          "label": "Democrat L. Mendel Rivers",
+          "contest": "house1",
+          "candidate": "L. Mendel Rivers"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.353,
+        0.076,
+        0.613,
+        0.238
+      ],
+      "hint": "Read only the table headed 'FIRST DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 12,
+      "id": "12-1",
+      "columns": [
+        {
+          "label": "Democrat Frank K. Sloan",
+          "contest": "house2",
+          "candidate": "Frank K. Sloan"
+        },
+        {
+          "label": "Republican Albert W. Watson",
+          "contest": "house2",
+          "candidate": "Albert W. Watson"
+        },
+        {
+          "label": "Write-In",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.353,
+        0.23,
+        0.608,
+        0.325
+      ],
+      "hint": "Read only the table headed 'SECOND DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 12,
+      "id": "12-2",
+      "columns": [
+        {
+          "label": "Democrat Wm. J. Bryan Dorn",
+          "contest": "house3",
+          "candidate": "Wm. Jennings Bryan Dorn"
+        },
+        {
+          "label": "Republican John K. Grisso",
+          "contest": "house3",
+          "candidate": "John K. Grisso"
+        },
+        {
+          "label": "Independent J. Harold Morton",
+          "contest": "house3",
+          "candidate": "J. Harold Morton"
+        },
+        {
+          "label": "Write-In",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.353,
+        0.317,
+        0.613,
+        0.445
+      ],
+      "hint": "Read only the table headed 'THIRD DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 12,
+      "id": "12-3",
+      "columns": [
+        {
+          "label": "Democrat James R. Mann",
+          "contest": "house4",
+          "candidate": "James R. Mann"
+        },
+        {
+          "label": "Republican Charles Bradshaw",
+          "contest": "house4",
+          "candidate": "Charles Bradshaw"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.352,
+        0.437,
+        0.613,
+        0.509
+      ],
+      "hint": "Read only the table headed 'FOURTH DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 12,
+      "id": "12-4",
+      "columns": [
+        {
+          "label": "Democrat Thomas S. Gettys",
+          "contest": "house5",
+          "candidate": "Thomas S. Gettys"
+        },
+        {
+          "label": "Republican Hugh J. Boyd",
+          "contest": "house5",
+          "candidate": "Hugh J. Boyd"
+        },
+        {
+          "label": "Independent Bert Sumner",
+          "contest": "house5",
+          "candidate": "Bert Sumner"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.352,
+        0.501,
+        0.613,
+        0.621
+      ],
+      "hint": "Read only the table headed 'FIFTH DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 12,
+      "id": "12-5",
+      "columns": [
+        {
+          "label": "Democrat John L. McMillan",
+          "contest": "house6",
+          "candidate": "John L. McMillan"
+        },
+        {
+          "label": "Republican Ray Harris",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Independent Claude E. Harris",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.351,
+        0.613,
+        0.611,
+        0.73
+      ],
+      "hint": "Read only the table headed 'SIXTH DISTRICT'; ignore any other table visible in the image."
+    }
+  ]
+}

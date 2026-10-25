@@ -1,0 +1,404 @@
+{
+  "polity": "US-KS",
+  "publisher": "Kansas Secretary of State",
+  "license": "Public record",
+  "raw_source": "us.ks_es",
+  "title": "Kansas election statistics 1978, general election",
+  "file": {
+    "url": "https://kgi.contentdm.oclc.org/digital/api/collection/p16884coll129/id/66/download"
+  },
+  "contests": {
+    "senate": {
+      "year": 1978,
+      "chamber": "senate",
+      "day": "1978-11-07",
+      "special": false,
+      "state": "KS",
+      "district": null
+    },
+    "governor": {
+      "year": 1978,
+      "chamber": "governor",
+      "day": "1978-11-07",
+      "special": false,
+      "state": "KS",
+      "district": null
+    },
+    "house1": {
+      "year": 1978,
+      "chamber": "house",
+      "day": "1978-11-07",
+      "special": false,
+      "state": "KS",
+      "district": 1
+    }
+  },
+  "pages": [
+    {
+      "page": 19,
+      "id": "19-0",
+      "columns": [
+        {
+          "label": "Deryl K Schuster Rep",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "James R. Maher Dem",
+          "contest": "senate",
+          "candidate": "James R. Maher"
+        },
+        {
+          "label": "Roland Wes Preboth Dem",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Bill Roy Dem",
+          "contest": "senate",
+          "candidate": "Bill Roy"
+        },
+        {
+          "label": "Dorothy K White Dem",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.08,
+        0.092,
+        0.905,
+        1.0
+      ],
+      "hint": "Read only the table headed 'FOR UNITED STATES SENATOR\u2014Continued'; ignore any other table visible in the image.",
+      "bands": 3,
+      "header": [
+        0.0,
+        0.0738
+      ]
+    },
+    {
+      "page": 20,
+      "id": "20-0",
+      "columns": [
+        {
+          "label": "Deryl K Schuster Rep.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "James R. Maher Dem.",
+          "contest": "senate",
+          "candidate": "James R. Maher"
+        },
+        {
+          "label": "Roland Wes Preboth Dem.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Bill Roy Dem.",
+          "contest": "senate",
+          "candidate": "Bill Roy"
+        },
+        {
+          "label": "Dorothy K White Dem.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.102,
+        0.097,
+        0.918,
+        0.807
+      ],
+      "hint": "Read only the table headed 'FOR UNITED STATES SENATOR\u2014Concluded'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.093
+      ]
+    },
+    {
+      "page": 24,
+      "id": "24-0",
+      "columns": [
+        {
+          "label": "Bennett and Montgomery Rep.",
+          "contest": "governor",
+          "candidate": "Robert F. Bennett"
+        },
+        {
+          "label": "Knight and Carr Rep.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Sanders and Dunton Rep.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Carlin and Dugan Dem.",
+          "contest": "governor",
+          "candidate": "John Carlin"
+        },
+        {
+          "label": "Chaney and Smith Dem.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Wiles and Lang Dem.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.097,
+        0.08,
+        0.948,
+        1.0
+      ],
+      "hint": "Read only the table headed 'FOR GOVERNOR\u2014LIEUTENANT GOVERNOR'; ignore any other table visible in the image.",
+      "bands": 3,
+      "header": [
+        0.0,
+        0.0793
+      ]
+    },
+    {
+      "page": 25,
+      "id": "25-0",
+      "columns": [
+        {
+          "label": "Bennett and Montgomery Rep",
+          "contest": "governor",
+          "candidate": "Robert F. Bennett"
+        },
+        {
+          "label": "Knight and Carr Rep",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Sanders and Dunton Rep",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Carlin and Dugan Dem.",
+          "contest": "governor",
+          "candidate": "John Carlin"
+        },
+        {
+          "label": "Chaney and Smith Dem.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Wiles and Lang Dem",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.071,
+        0.088,
+        0.93,
+        0.797
+      ],
+      "hint": "Read only the table headed 'FOR GOVERNOR\u2014LIEUTENANT GOVERNOR\u2014Concluded'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0917
+      ]
+    },
+    {
+      "page": 60,
+      "id": "60-0",
+      "columns": [
+        {
+          "label": "Kassebaum, Nancy Rep",
+          "contest": "senate",
+          "candidate": "Nancy Landon Kassebaum"
+        },
+        {
+          "label": "Roy, Bill Dem.",
+          "contest": "senate",
+          "candidate": "Bill Roy"
+        },
+        {
+          "label": "Maher, James R Con",
+          "contest": "senate",
+          "candidate": "James R. Maher"
+        },
+        {
+          "label": "Mikels, Russell Pro",
+          "contest": "senate",
+          "candidate": "Russell Mikels"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.082,
+        0.087,
+        0.908,
+        1.0
+      ],
+      "hint": "Read only the table headed 'FOR UNITED STATES SENATOR'; ignore any other table visible in the image.",
+      "bands": 3,
+      "header": [
+        0.0,
+        0.0657
+      ]
+    },
+    {
+      "page": 61,
+      "id": "61-0",
+      "columns": [
+        {
+          "label": "Kassebaum, Nancy Rep.",
+          "contest": "senate",
+          "candidate": "Nancy Landon Kassebaum"
+        },
+        {
+          "label": "Roy, Bill Dem.",
+          "contest": "senate",
+          "candidate": "Bill Roy"
+        },
+        {
+          "label": "Maher, James R. Con.",
+          "contest": "senate",
+          "candidate": "James R. Maher"
+        },
+        {
+          "label": "Mikels, Russell Pro.",
+          "contest": "senate",
+          "candidate": "Russell Mikels"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.104,
+        0.09,
+        0.921,
+        0.784
+      ],
+      "hint": "Read only the table headed 'FOR UNITED STATES SENATOR\u2014Concluded'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0807
+      ]
+    },
+    {
+      "page": 62,
+      "id": "62-0",
+      "columns": [
+        {
+          "label": "Sebelius, Keith G. Rep.",
+          "contest": "house1",
+          "candidate": "Keith G. Sebelius"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.077,
+        0.086,
+        0.898,
+        0.88
+      ],
+      "hint": "Read only the table headed 'FOR U.S. REPRESENTATIVE, 1st DISTRICT'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0793
+      ]
+    },
+    {
+      "page": 65,
+      "id": "65-0",
+      "columns": [
+        {
+          "label": "Bennett and Montgomery Rep.",
+          "contest": "governor",
+          "candidate": "Robert F. Bennett"
+        },
+        {
+          "label": "Carlin and Dugan Dem.",
+          "contest": "governor",
+          "candidate": "John Carlin"
+        },
+        {
+          "label": "Shelton and Jackson Amer.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Beets and Martin Pro.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.105,
+        0.08,
+        0.933,
+        1.0
+      ],
+      "hint": "Read only the table headed 'FOR GOVERNOR\u2014LIEUTENANT GOVERNOR'; ignore any other table visible in the image.",
+      "bands": 3,
+      "header": [
+        0.0,
+        0.0804
+      ]
+    },
+    {
+      "page": 66,
+      "id": "66-0",
+      "columns": [
+        {
+          "label": "Bennett and Montgomery Rep.",
+          "contest": "governor",
+          "candidate": "Robert F. Bennett"
+        },
+        {
+          "label": "Carlin and Dugan Dem.",
+          "contest": "governor",
+          "candidate": "John Carlin"
+        },
+        {
+          "label": "Shelton and Jackson Amer.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Beets and Martin Pro.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.102,
+        0.093,
+        0.918,
+        0.802
+      ],
+      "hint": "Read only the table headed 'FOR GOVERNOR\u2014LIEUTENANT GOVERNOR\u2014Concluded'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0945
+      ]
+    }
+  ]
+}

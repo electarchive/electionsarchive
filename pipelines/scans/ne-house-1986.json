@@ -1,0 +1,56 @@
+{
+  "polity": "US-NE",
+  "publisher": "Nebraska Board of State Canvassers",
+  "license": "Public record",
+  "raw_source": "us.ne_usrep",
+  "title": "Nebraska Board of State Canvassers, primary and general election 1986, U.S. Representative District 3",
+  "file": {
+    "url": "https://govdocs.nebraska.gov/epubs/S1200/S001-1986prim_gen.pdf"
+  },
+  "contests": {
+    "house3": {
+      "year": 1986,
+      "chamber": "house",
+      "day": "1986-11-04",
+      "special": false,
+      "state": "NE",
+      "district": 3
+    }
+  },
+  "pages": [
+    {
+      "page": 32,
+      "id": "32-0",
+      "columns": [
+        {
+          "label": "DEMOCRAT SCOTT E SIDWELL",
+          "contest": "house3",
+          "candidate": "Scott E. Sidwell"
+        },
+        {
+          "label": "REPUBLICAN VIRGINIA SMITH",
+          "contest": "house3",
+          "candidate": "Virginia Smith"
+        },
+        {
+          "label": "WRITE IN",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.052,
+        0.068,
+        0.433,
+        0.579
+      ],
+      "hint": "Read only the table headed 'REPRESENTATIVE IN CONGRESS THIRD DISTRICT'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0744
+      ]
+    }
+  ]
+}

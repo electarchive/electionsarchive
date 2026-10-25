@@ -1,0 +1,35 @@
+{
+ "polity": "US-KS",
+ "publisher": "Kansas Secretary of State",
+ "license": "Public record",
+ "raw_source": "us.ks_es",
+ "year": 1978,
+ "day": "1978-11-07",
+ "title": "Kansas election statistics 1978, general election",
+ "file": {
+  "url": "https://kgi.contentdm.oclc.org/digital/api/collection/p16884coll129/id/66/download"
+ },
+ "offices": {
+  "president": "presidential electors (President and Vice President)",
+  "governor": "Governor",
+  "senate": "U.S. Senator",
+  "house": "U.S. Representative, one table per district or all districts in column groups, county rows"
+ },
+ "leaves": [
+  17,
+  18,
+  19,
+  20,
+  21,
+  24,
+  25,
+  26,
+  60,
+  61,
+  62,
+  65,
+  66,
+  67
+ ],
+ "autorotate": true
+}

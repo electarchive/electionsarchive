@@ -1,0 +1,696 @@
+{
+  "polity": "US-KS",
+  "publisher": "Kansas Secretary of State",
+  "license": "Public record",
+  "raw_source": "us.ks_es",
+  "title": "Kansas election statistics 1962, general election",
+  "file": {
+    "url": "https://kgi.contentdm.oclc.org/digital/api/collection/p16884coll129/id/58/download"
+  },
+  "contests": {
+    "senate": {
+      "year": 1962,
+      "chamber": "senate",
+      "day": "1962-11-06",
+      "special": false,
+      "state": "KS",
+      "district": null
+    },
+    "house1": {
+      "year": 1962,
+      "chamber": "house",
+      "day": "1962-11-06",
+      "special": false,
+      "state": "KS",
+      "district": 1
+    },
+    "house2": {
+      "year": 1962,
+      "chamber": "house",
+      "day": "1962-11-06",
+      "special": false,
+      "state": "KS",
+      "district": 2
+    },
+    "house3": {
+      "year": 1962,
+      "chamber": "house",
+      "day": "1962-11-06",
+      "special": false,
+      "state": "KS",
+      "district": 3
+    },
+    "house4": {
+      "year": 1962,
+      "chamber": "house",
+      "day": "1962-11-06",
+      "special": false,
+      "state": "KS",
+      "district": 4
+    },
+    "house5": {
+      "year": 1962,
+      "chamber": "house",
+      "day": "1962-11-06",
+      "special": false,
+      "state": "KS",
+      "district": 5
+    },
+    "governor": {
+      "year": 1962,
+      "chamber": "governor",
+      "day": "1962-11-06",
+      "special": false,
+      "state": "KS",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 13,
+      "id": "13-0",
+      "columns": [
+        {
+          "label": "Frank Carlson, Rep.",
+          "contest": "senate",
+          "candidate": "Frank Carlson"
+        },
+        {
+          "label": "Joe Corpstein, Rep.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Joseph J. Poizner, Dem.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "K. L. (Ken) Smith, Dem.",
+          "contest": "senate",
+          "candidate": "K. L. (Ken) Smith"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.054,
+        0.081,
+        0.943,
+        1.0
+      ],
+      "hint": "Read only the table headed 'FOR UNITED STATES SENATOR (Regular term)'; ignore any other table visible in the image.",
+      "bands": 3,
+      "header": [
+        0.0,
+        0.1077
+      ]
+    },
+    {
+      "page": 14,
+      "id": "14-0",
+      "columns": [
+        {
+          "label": "Frank Carlson, Rep.",
+          "contest": "senate",
+          "candidate": "Frank Carlson"
+        },
+        {
+          "label": "Joe Corpstein, Rep.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Joseph J. Poizner, Dem.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "K. L. (Ken) Smith, Dem.",
+          "contest": "senate",
+          "candidate": "K. L. (Ken) Smith"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.064,
+        0.088,
+        0.921,
+        0.831
+      ],
+      "hint": "Read only the table headed 'FOR UNITED STATES SENATOR\u2014Concluded (Regular term)'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1238
+      ]
+    },
+    {
+      "page": 17,
+      "id": "17-0",
+      "columns": [
+        {
+          "label": "Bob Dole, Rep.",
+          "contest": "house1",
+          "candidate": "Bob Dole"
+        },
+        {
+          "label": "J. Floyd Breeding, Dem.",
+          "contest": "house1",
+          "candidate": "J. Floyd Breeding"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.069,
+        0.084,
+        0.963,
+        0.932
+      ],
+      "hint": "Read only the table headed 'FOR REPRESENTATIVES IN CONGRESS - FIRST CONGRESSIONAL DISTRICT'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1132
+      ]
+    },
+    {
+      "page": 18,
+      "id": "18-0",
+      "columns": [
+        {
+          "label": "Wm. H. Avery, Rep.",
+          "contest": "house2",
+          "candidate": "William H. Avery"
+        },
+        {
+          "label": "Harry F. Kelioe, Dem.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.059,
+        0.116,
+        0.937,
+        0.429
+      ],
+      "hint": "Read only the table headed 'SECOND CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 18,
+      "id": "18-1",
+      "columns": [
+        {
+          "label": "Robert F. Ellsworth, Rep.",
+          "contest": "house3",
+          "candidate": "Robert F. Ellsworth"
+        },
+        {
+          "label": "Bill Sparks, Dem.",
+          "contest": "house3",
+          "candidate": "Bill Sparks"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.064,
+        0.421,
+        0.939,
+        0.666
+      ],
+      "hint": "Read only the table headed 'THIRD CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 18,
+      "id": "18-2",
+      "columns": [
+        {
+          "label": "Garner E. Shriver, Rep.",
+          "contest": "house4",
+          "candidate": "Garner E. Shriver"
+        },
+        {
+          "label": "Lawrence J. Wetzel, Dem.",
+          "contest": "house4",
+          "candidate": "Lawrence J. Wetzel"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.068,
+        0.658,
+        0.942,
+        0.877
+      ],
+      "hint": "Read only the table headed 'FOURTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 19,
+      "id": "19-0",
+      "columns": [
+        {
+          "label": "Ralph O. Brownfield, Rep.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Walter L. McVey, Rep.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Joe Skubitz, Rep.",
+          "contest": "house5",
+          "candidate": "Joe Skubitz"
+        },
+        {
+          "label": "J. Ed Thompson, Rep.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Denver D. Hargis, Dem.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Wade A. Myers, Dem.",
+          "contest": "house5",
+          "candidate": "Wade A. Myers"
+        },
+        {
+          "label": "Reb Russell, Dem.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.078,
+        0.072,
+        0.967,
+        0.448
+      ],
+      "hint": "Read only the table headed 'FOR REPRESENTATIVES IN CONGRESS\u2014Concluded. FIFTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 20,
+      "id": "20-0",
+      "columns": [
+        {
+          "label": "John Anderson, Jr., Rep.",
+          "contest": "governor",
+          "candidate": "John Jr. Anderson"
+        },
+        {
+          "label": "Harvey F. Crouch, Rep.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "George Hart, Dem.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Dale E. Saffels, Dem.",
+          "contest": "governor",
+          "candidate": "Dale E. Saffels"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.077,
+        0.159,
+        0.94,
+        1.0
+      ],
+      "hint": "Read only the table headed 'FOR GOVERNOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0155
+      ]
+    },
+    {
+      "page": 21,
+      "id": "21-0",
+      "columns": [
+        {
+          "label": "John Anderson, Jr., Rep.",
+          "contest": "governor",
+          "candidate": "John Jr. Anderson"
+        },
+        {
+          "label": "Harvey F. Crouch, Rep.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "George Hart, Dem.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Dale E. Saffels, Dem.",
+          "contest": "governor",
+          "candidate": "Dale E. Saffels"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.07,
+        0.098,
+        0.943,
+        0.807
+      ],
+      "hint": "Read only the table headed 'FOR GOVERNOR\u2014CONCLUDED'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0804
+      ]
+    },
+    {
+      "page": 51,
+      "id": "51-0",
+      "columns": [
+        {
+          "label": "Frank Carlson, Rep.",
+          "contest": "senate",
+          "candidate": "Frank Carlson"
+        },
+        {
+          "label": "K. L. (Ken) Smith, Dem.",
+          "contest": "senate",
+          "candidate": "K. L. (Ken) Smith"
+        },
+        {
+          "label": "George E. Kline, Prohib.",
+          "contest": "senate",
+          "candidate": "George E. Kline"
+        },
+        {
+          "label": "Scattering",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.069,
+        0.093,
+        0.963,
+        1.0
+      ],
+      "hint": "Read only the table headed 'FOR UNITED STATES SENATOR (Regular term)'; ignore any other table visible in the image.",
+      "bands": 3,
+      "header": [
+        0.0,
+        0.1092
+      ]
+    },
+    {
+      "page": 52,
+      "id": "52-0",
+      "columns": [
+        {
+          "label": "Frank Carlson, Rep.",
+          "contest": "senate",
+          "candidate": "Frank Carlson"
+        },
+        {
+          "label": "K. L. (Ken) Smith, Dem.",
+          "contest": "senate",
+          "candidate": "K. L. (Ken) Smith"
+        },
+        {
+          "label": "George E. Kline, Prohib.",
+          "contest": "senate",
+          "candidate": "George E. Kline"
+        },
+        {
+          "label": "Scattering",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.006,
+        0.12,
+        0.913,
+        0.864
+      ],
+      "hint": "Read only the table headed 'FOR UNITED STATES SENATOR\u2014CONCLUDED (Regular term)'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0847
+      ]
+    },
+    {
+      "page": 54,
+      "id": "54-0",
+      "columns": [
+        {
+          "label": "James B. Pearson, Rep.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Paul L. Aylward, Dem.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "C. E. Cowen, Prohib.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Scattering",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.03,
+        0.125,
+        0.913,
+        0.842
+      ],
+      "hint": "Read only the table headed 'FOR UNITED STATES SENATOR\u2014CONCLUDED (Unexpired term)'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0795
+      ]
+    },
+    {
+      "page": 55,
+      "id": "55-0",
+      "columns": [
+        {
+          "label": "Bob Dole, Rep.",
+          "contest": "house1",
+          "candidate": "Bob Dole"
+        },
+        {
+          "label": "J. Floyd Breeding, Dem.",
+          "contest": "house1",
+          "candidate": "J. Floyd Breeding"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.082,
+        0.128,
+        0.965,
+        0.957
+      ],
+      "hint": "Read only the table headed 'FOR REPRESENTATIVES IN CONGRESS - FIRST CONGRESSIONAL DISTRICT'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0881
+      ]
+    },
+    {
+      "page": 56,
+      "id": "56-0",
+      "columns": [
+        {
+          "label": "Wm. H. Avery, Rep.",
+          "contest": "house2",
+          "candidate": "William H. Avery"
+        },
+        {
+          "label": "Harry F. Kehoe, Dem.",
+          "contest": "house2",
+          "candidate": "Harry F. Kehoe"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.022,
+        0.104,
+        0.901,
+        0.412
+      ],
+      "hint": "Read only the table headed 'SECOND CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 56,
+      "id": "56-1",
+      "columns": [
+        {
+          "label": "Robert F. Ellsworth, Rep.",
+          "contest": "house3",
+          "candidate": "Robert F. Ellsworth"
+        },
+        {
+          "label": "Bill Sparks, Dem.",
+          "contest": "house3",
+          "candidate": "Bill Sparks"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.022,
+        0.404,
+        0.901,
+        0.639
+      ],
+      "hint": "Read only the table headed 'THIRD CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 56,
+      "id": "56-2",
+      "columns": [
+        {
+          "label": "Garner E. Shriver, Rep.",
+          "contest": "house4",
+          "candidate": "Garner E. Shriver"
+        },
+        {
+          "label": "Lawrence J. Wetzel, Dem.",
+          "contest": "house4",
+          "candidate": "Lawrence J. Wetzel"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.022,
+        0.631,
+        0.901,
+        0.846
+      ],
+      "hint": "Read only the table headed 'FOURTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 57,
+      "id": "57-0",
+      "columns": [
+        {
+          "label": "Joe Skubitz, Rep.",
+          "contest": "house5",
+          "candidate": "Joe Skubitz"
+        },
+        {
+          "label": "Wade A. Myers, Dem.",
+          "contest": "house5",
+          "candidate": "Wade A. Myers"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.083,
+        0.132,
+        0.964,
+        0.461
+      ],
+      "hint": "Read only the table headed 'FOR REPRESENTATIVES IN CONGRESS\u2014CONCLUDED FIFTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 58,
+      "id": "58-0",
+      "columns": [
+        {
+          "label": "John Anderson, Jr., Rep.",
+          "contest": "governor",
+          "candidate": "John Jr. Anderson"
+        },
+        {
+          "label": "Dale E. Saffels, Dem.",
+          "contest": "governor",
+          "candidate": "Dale E. Saffels"
+        },
+        {
+          "label": "Vearl A. Bacon, Prohib.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Scattering",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.031,
+        0.095,
+        0.904,
+        1.0
+      ],
+      "hint": "Read only the table headed 'FOR GOVERNOR'; ignore any other table visible in the image.",
+      "bands": 3,
+      "header": [
+        0.0,
+        0.0829
+      ]
+    },
+    {
+      "page": 59,
+      "id": "59-0",
+      "columns": [
+        {
+          "label": "John Anderson, Jr., Rep.",
+          "contest": "governor",
+          "candidate": "John Jr. Anderson"
+        },
+        {
+          "label": "Dale E. Saffels, Dem.",
+          "contest": "governor",
+          "candidate": "Dale E. Saffels"
+        },
+        {
+          "label": "Vearl A. Bacon, Prohib.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Scattering",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.073,
+        0.123,
+        0.962,
+        0.837
+      ],
+      "hint": "Read only the table headed 'FOR GOVERNOR\u2014CONCLUDED'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0798
+      ]
+    }
+  ]
+}

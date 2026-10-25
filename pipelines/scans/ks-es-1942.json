@@ -1,0 +1,485 @@
+{
+  "polity": "US-KS",
+  "publisher": "Kansas Secretary of State",
+  "license": "Public record",
+  "raw_source": "us.ks_es",
+  "title": "Kansas election statistics 1942, general election",
+  "file": {
+    "url": "https://kgi.contentdm.oclc.org/digital/api/collection/p16884coll129/id/39/download"
+  },
+  "contests": {
+    "senate": {
+      "year": 1942,
+      "chamber": "senate",
+      "day": "1942-11-03",
+      "special": false,
+      "state": "KS",
+      "district": null
+    },
+    "house1": {
+      "year": 1942,
+      "chamber": "house",
+      "day": "1942-11-03",
+      "special": false,
+      "state": "KS",
+      "district": 1
+    },
+    "house2": {
+      "year": 1942,
+      "chamber": "house",
+      "day": "1942-11-03",
+      "special": false,
+      "state": "KS",
+      "district": 2
+    },
+    "house3": {
+      "year": 1942,
+      "chamber": "house",
+      "day": "1942-11-03",
+      "special": false,
+      "state": "KS",
+      "district": 3
+    },
+    "house4": {
+      "year": 1942,
+      "chamber": "house",
+      "day": "1942-11-03",
+      "special": false,
+      "state": "KS",
+      "district": 4
+    },
+    "house5": {
+      "year": 1942,
+      "chamber": "house",
+      "day": "1942-11-03",
+      "special": false,
+      "state": "KS",
+      "district": 5
+    },
+    "house6": {
+      "year": 1942,
+      "chamber": "house",
+      "day": "1942-11-03",
+      "special": false,
+      "state": "KS",
+      "district": 6
+    },
+    "governor": {
+      "year": 1942,
+      "chamber": "governor",
+      "day": "1942-11-03",
+      "special": false,
+      "state": "KS",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 2,
+      "id": "2-0",
+      "columns": [
+        {
+          "label": "Arthur Capper, Rep.",
+          "contest": "senate",
+          "candidate": "Arthur Capper"
+        },
+        {
+          "label": "Geo. McGill, Dem.",
+          "contest": "senate",
+          "candidate": "George McGill"
+        },
+        {
+          "label": "C. Floyd Hester, Prohib.",
+          "contest": "senate",
+          "candidate": "C. Floyd Hester"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.097,
+        0.121,
+        0.925,
+        1.0
+      ],
+      "hint": "Read only the table headed 'FOR UNITED STATES SENATOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0887
+      ]
+    },
+    {
+      "page": 3,
+      "id": "3-0",
+      "columns": [
+        {
+          "label": "Arthur Capper, Rep.",
+          "contest": "senate",
+          "candidate": "Arthur Capper"
+        },
+        {
+          "label": "Geo. McGill, Dem.",
+          "contest": "senate",
+          "candidate": "George McGill"
+        },
+        {
+          "label": "C. Floyd Hester, Prohib.",
+          "contest": "senate",
+          "candidate": "C. Floyd Hester"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.09,
+        0.118,
+        0.91,
+        0.832
+      ],
+      "hint": "Read only the table headed 'FOR UNITED STATES SENATOR\u2014Concluded'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.105
+      ]
+    },
+    {
+      "page": 4,
+      "id": "4-0",
+      "columns": [
+        {
+          "label": "W. P. Lambertson, Rep.",
+          "contest": "house1",
+          "candidate": "William P. Lambertson"
+        },
+        {
+          "label": "John E. Barrett, Dem.",
+          "contest": "house1",
+          "candidate": "John E. Barrett"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.1,
+        0.11,
+        0.926,
+        0.469
+      ],
+      "hint": "Read only the table headed 'FIRST CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 4,
+      "id": "4-1",
+      "columns": [
+        {
+          "label": "U. S. Guyer, Rep.",
+          "contest": "house2",
+          "candidate": "U. S. Guyer"
+        },
+        {
+          "label": "Herbert L. Drake, Dem.",
+          "contest": "house2",
+          "candidate": "Herbert L. Drake"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.098,
+        0.461,
+        0.916,
+        0.742
+      ],
+      "hint": "Read only the table headed 'SECOND CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 5,
+      "id": "5-0",
+      "columns": [
+        {
+          "label": "Thomas D. Winter, Rep.",
+          "contest": "house3",
+          "candidate": "Thomas D. Winter"
+        },
+        {
+          "label": "William E. Murphy, Dem.",
+          "contest": "house3",
+          "candidate": "William E. Murphy"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.081,
+        0.148,
+        0.896,
+        0.41
+      ],
+      "hint": "Read only the table headed 'THIRD CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 5,
+      "id": "5-1",
+      "columns": [
+        {
+          "label": "Ed. H. Rees, Rep.",
+          "contest": "house4",
+          "candidate": "Edward H. Rees"
+        },
+        {
+          "label": "John M. Houston, Dem.",
+          "contest": "house4",
+          "candidate": "John M. Houston"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.081,
+        0.402,
+        0.896,
+        0.804
+      ],
+      "hint": "Read only the table headed 'FOURTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 6,
+      "id": "6-0",
+      "columns": [
+        {
+          "label": "Clifford R. Hope, Rep.",
+          "contest": "house5",
+          "candidate": "Clifford R. Hope"
+        },
+        {
+          "label": "S. S. Alexander, Dem.",
+          "contest": "house5",
+          "candidate": "S. S. Alexander"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.111,
+        0.088,
+        0.929,
+        0.873
+      ],
+      "hint": "Read only the table headed 'FOR REPRESENTATIVES IN CONGRESS\u2014CONTINUED FIFTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1248
+      ]
+    },
+    {
+      "page": 7,
+      "id": "7-0",
+      "columns": [
+        {
+          "label": "Frank Carlson, Rep.",
+          "contest": "house6",
+          "candidate": "Frank Carlson"
+        },
+        {
+          "label": "Lud W. Strnad, Dem.",
+          "contest": "house6",
+          "candidate": "Lud W. Strnad"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.08,
+        0.096,
+        0.894,
+        0.738
+      ],
+      "hint": "Read only the table headed 'FOR REPRESENTATIVES IN CONGRESS\u2014CONCLUDED SIXTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1464
+      ]
+    },
+    {
+      "page": 10,
+      "id": "10-0",
+      "columns": [
+        {
+          "label": "Andrew Schoeppel, Rep.",
+          "contest": "governor",
+          "candidate": "Andrew F. Schoeppel"
+        },
+        {
+          "label": "William H. Burke, Dem.",
+          "contest": "governor",
+          "candidate": "William H. Burke"
+        },
+        {
+          "label": "David C. White, Prohib.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Ida A. Beloof, Soc.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.111,
+        0.118,
+        0.932,
+        1.0
+      ],
+      "hint": "Read only the table headed 'FOR GOVERNOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0975
+      ]
+    },
+    {
+      "page": 11,
+      "id": "11-0",
+      "columns": [
+        {
+          "label": "Andrew Schoeppel, Rep.",
+          "contest": "governor",
+          "candidate": "Andrew F. Schoeppel"
+        },
+        {
+          "label": "William H. Burke, Dem.",
+          "contest": "governor",
+          "candidate": "William H. Burke"
+        },
+        {
+          "label": "David C. White, Prohib.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Ida A. Beloof, Soc.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.069,
+        0.14,
+        0.891,
+        0.831
+      ],
+      "hint": "Read only the table headed 'FOR GOVERNOR\u2014Concluded'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0767
+      ]
+    },
+    {
+      "page": 44,
+      "id": "44-0",
+      "columns": [
+        {
+          "label": "Arthur Capper, Rep.",
+          "contest": "senate",
+          "candidate": "Arthur Capper"
+        },
+        {
+          "label": "Geo. McGill, Dem.",
+          "contest": "senate",
+          "candidate": "George McGill"
+        },
+        {
+          "label": "C. Floyd Hester, Prohib.",
+          "contest": "senate",
+          "candidate": "C. Floyd Hester"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.116,
+        0.117,
+        0.941,
+        1.0
+      ],
+      "hint": "Read only the table headed 'ABSENT VOTE\u2014FOR UNITED STATES SENATOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0917
+      ]
+    },
+    {
+      "page": 45,
+      "id": "45-0",
+      "columns": [
+        {
+          "label": "Arthur Capper, Rep.",
+          "contest": "senate",
+          "candidate": "Arthur Capper"
+        },
+        {
+          "label": "Geo. McGill, Dem.",
+          "contest": "senate",
+          "candidate": "George McGill"
+        },
+        {
+          "label": "C. Floyd Hester, Prohib.",
+          "contest": "senate",
+          "candidate": "C. Floyd Hester"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.069,
+        0.114,
+        0.888,
+        0.809
+      ],
+      "hint": "Read only the table headed 'ABSENT VOTE\u2014FOR UNITED STATES SENATOR\u2014CONCLUDED'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1065
+      ]
+    },
+    {
+      "page": 49,
+      "id": "49-0",
+      "columns": [
+        {
+          "label": "Andrew Schoeppel, Rep.",
+          "contest": "governor",
+          "candidate": "Andrew F. Schoeppel"
+        },
+        {
+          "label": "William H. Burke, Dem.",
+          "contest": "governor",
+          "candidate": "William H. Burke"
+        },
+        {
+          "label": "David C. White, Prohib.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Ida A. Beloof, Soc.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.077,
+        0.143,
+        0.895,
+        0.809
+      ],
+      "hint": "Read only the table headed 'ABSENT VOTE\u2014FOR GOVERNOR\u2014CONCLUDED'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0736
+      ]
+    }
+  ]
+}

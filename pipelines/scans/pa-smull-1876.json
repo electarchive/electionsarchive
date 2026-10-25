@@ -1,0 +1,720 @@
+{
+  "polity": "US-PA",
+  "publisher": "Pennsylvania Senate (Smull's Legislative Hand Book)",
+  "title": "Smull's Legislative Hand Book, 1877, general election 1876-11-07, Representatives in Congress by county and district",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/smullslegislati00compgoog/page/n{page}_w2000.jpg",
+    "item": "https://archive.org/details/smullslegislati00compgoog"
+  },
+  "raw_source": "us.scans",
+  "contests": {
+    "house1": {
+      "year": 1876,
+      "chamber": "house",
+      "day": "1876-11-07",
+      "special": false,
+      "state": "PA",
+      "district": 1
+    },
+    "house2": {
+      "year": 1876,
+      "chamber": "house",
+      "day": "1876-11-07",
+      "special": false,
+      "state": "PA",
+      "district": 2
+    },
+    "house3": {
+      "year": 1876,
+      "chamber": "house",
+      "day": "1876-11-07",
+      "special": false,
+      "state": "PA",
+      "district": 3
+    },
+    "house4": {
+      "year": 1876,
+      "chamber": "house",
+      "day": "1876-11-07",
+      "special": false,
+      "state": "PA",
+      "district": 4
+    },
+    "house5": {
+      "year": 1876,
+      "chamber": "house",
+      "day": "1876-11-07",
+      "special": false,
+      "state": "PA",
+      "district": 5
+    },
+    "house6": {
+      "year": 1876,
+      "chamber": "house",
+      "day": "1876-11-07",
+      "special": false,
+      "state": "PA",
+      "district": 6
+    },
+    "house7": {
+      "year": 1876,
+      "chamber": "house",
+      "day": "1876-11-07",
+      "special": false,
+      "state": "PA",
+      "district": 7
+    },
+    "house8": {
+      "year": 1876,
+      "chamber": "house",
+      "day": "1876-11-07",
+      "special": false,
+      "state": "PA",
+      "district": 8
+    },
+    "house9": {
+      "year": 1876,
+      "chamber": "house",
+      "day": "1876-11-07",
+      "special": false,
+      "state": "PA",
+      "district": 9
+    },
+    "house10": {
+      "year": 1876,
+      "chamber": "house",
+      "day": "1876-11-07",
+      "special": false,
+      "state": "PA",
+      "district": 10
+    },
+    "house11": {
+      "year": 1876,
+      "chamber": "house",
+      "day": "1876-11-07",
+      "special": false,
+      "state": "PA",
+      "district": 11
+    },
+    "house12": {
+      "year": 1876,
+      "chamber": "house",
+      "day": "1876-11-07",
+      "special": false,
+      "state": "PA",
+      "district": 12
+    },
+    "house13": {
+      "year": 1876,
+      "chamber": "house",
+      "day": "1876-11-07",
+      "special": false,
+      "state": "PA",
+      "district": 13
+    },
+    "house14": {
+      "year": 1876,
+      "chamber": "house",
+      "day": "1876-11-07",
+      "special": false,
+      "state": "PA",
+      "district": 14
+    },
+    "house15": {
+      "year": 1876,
+      "chamber": "house",
+      "day": "1876-11-07",
+      "special": false,
+      "state": "PA",
+      "district": 15
+    },
+    "house16": {
+      "year": 1876,
+      "chamber": "house",
+      "day": "1876-11-07",
+      "special": false,
+      "state": "PA",
+      "district": 16
+    },
+    "house17": {
+      "year": 1876,
+      "chamber": "house",
+      "day": "1876-11-07",
+      "special": false,
+      "state": "PA",
+      "district": 17
+    },
+    "house18": {
+      "year": 1876,
+      "chamber": "house",
+      "day": "1876-11-07",
+      "special": false,
+      "state": "PA",
+      "district": 18
+    },
+    "house19": {
+      "year": 1876,
+      "chamber": "house",
+      "day": "1876-11-07",
+      "special": false,
+      "state": "PA",
+      "district": 19
+    },
+    "house20": {
+      "year": 1876,
+      "chamber": "house",
+      "day": "1876-11-07",
+      "special": false,
+      "state": "PA",
+      "district": 20
+    },
+    "house21": {
+      "year": 1876,
+      "chamber": "house",
+      "day": "1876-11-07",
+      "special": false,
+      "state": "PA",
+      "district": 21
+    },
+    "house24": {
+      "year": 1876,
+      "chamber": "house",
+      "day": "1876-11-07",
+      "special": false,
+      "state": "PA",
+      "district": 24
+    },
+    "house25": {
+      "year": 1876,
+      "chamber": "house",
+      "day": "1876-11-07",
+      "special": false,
+      "state": "PA",
+      "district": 25
+    },
+    "house26": {
+      "year": 1876,
+      "chamber": "house",
+      "day": "1876-11-07",
+      "special": false,
+      "state": "PA",
+      "district": 26
+    },
+    "house27": {
+      "year": 1876,
+      "chamber": "house",
+      "day": "1876-11-07",
+      "special": false,
+      "state": "PA",
+      "district": 27
+    }
+  },
+  "pages": [
+    {
+      "page": 298,
+      "id": "298-0",
+      "columns": [
+        {
+          "label": "Chapman Freeman, R.",
+          "contest": "house1",
+          "candidate": "Chapman Freeman"
+        },
+        {
+          "label": "J. S. Thackray, D.",
+          "contest": "house1",
+          "candidate": "J S Thackray"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [0.152, 0.239, 0.873, 0.443],
+      "hint": "Read only the table headed 'First District\u2014Philadelphia.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 298,
+      "id": "298-1",
+      "columns": [
+        {
+          "label": "Charles O'Neill, R.",
+          "contest": "house2",
+          "candidate": "Charles O\u2019Neill"
+        },
+        {
+          "label": "C. H. Gibson, D.",
+          "contest": "house2",
+          "candidate": "C H Gibson"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [0.152, 0.435, 0.873, 0.672],
+      "hint": "Read only the table headed 'Second District--Philadelphia.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 298,
+      "id": "298-2",
+      "columns": [
+        {
+          "label": "Samuel J. Randall, D.",
+          "contest": "house3",
+          "candidate": "Samuel Jackson Randall"
+        },
+        {
+          "label": "Benjamin L. Berry, R.",
+          "contest": "house3",
+          "candidate": "Benjamin L Berry"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [0.152, 0.664, 0.873, 0.897],
+      "hint": "Read only the table headed 'Third District--Philadelphia.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 299,
+      "id": "299-0",
+      "columns": [
+        {
+          "label": "William D. Kelly, R.",
+          "contest": "house4",
+          "candidate": "William Darrah Kelley"
+        },
+        { "label": "J. T. Scheel, D.", "contest": null, "candidate": "" }
+      ],
+      "orientation": "counties_down",
+      "crop": [0.152, 0.117, 0.874, 0.334],
+      "hint": "Read only the table headed 'Fourth District--Philadelphia.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 299,
+      "id": "299-1",
+      "columns": [
+        {
+          "label": "A. C. Harmer, R.",
+          "contest": "house5",
+          "candidate": "Alfred Crout Harmer"
+        },
+        {
+          "label": "Jacob Duvall, D.",
+          "contest": "house5",
+          "candidate": "Jacob Duvall"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [0.149, 0.326, 0.87, 0.565],
+      "hint": "Read only the table headed 'Fifth District--Philadelphia.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 299,
+      "id": "299-2",
+      "columns": [
+        {
+          "label": "William Ward, R.",
+          "contest": "house6",
+          "candidate": "William Ward"
+        },
+        {
+          "label": "W. D. Hartman, D.",
+          "contest": "house6",
+          "candidate": "W D Hartman"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [0.149, 0.557, 0.87, 0.734],
+      "hint": "Read only the table headed 'Sixth District.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 299,
+      "id": "299-3",
+      "columns": [
+        {
+          "label": "I. Newton Evans, R.",
+          "contest": "house7",
+          "candidate": "Isaac Newton Evans"
+        },
+        {
+          "label": "Abel Rambo, D.",
+          "contest": "house7",
+          "candidate": "Abel Rambo"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [0.146, 0.726, 0.866, 0.897],
+      "hint": "Read only the table headed 'Seventh District.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 300,
+      "id": "300-0",
+      "columns": [
+        {
+          "label": "Hiester Clymer, D",
+          "contest": "house8",
+          "candidate": "Hiester Clymer"
+        },
+        {
+          "label": "H. D. Markley, R",
+          "contest": "house8",
+          "candidate": "H D Markley"
+        },
+        {
+          "label": "C. Shearer, Greenback",
+          "contest": "house8",
+          "candidate": "C Shearer"
+        }
+      ],
+      "orientation": "counties_across",
+      "crop": [0.142, 0.133, 0.871, 0.198],
+      "hint": "Read only the table headed 'Eighth District--Berks.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 300,
+      "id": "300-1",
+      "columns": [
+        {
+          "label": "A. Herr Smith, R",
+          "contest": "house9",
+          "candidate": "Abraham Herr Smith"
+        },
+        {
+          "label": "George Nauman, D",
+          "contest": "house9",
+          "candidate": "George Nauman"
+        }
+      ],
+      "orientation": "counties_across",
+      "crop": [0.142, 0.19, 0.871, 0.249],
+      "hint": "Read only the table headed 'Ninth District--Lancaster.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 300,
+      "id": "300-2",
+      "columns": [
+        {
+          "label": "S. A. Bridges, D.",
+          "contest": "house10",
+          "candidate": "Samuel Augustus Bridges"
+        },
+        {
+          "label": "Howard J. Reeder, R.",
+          "contest": "house10",
+          "candidate": "Howard J Reeder"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [0.144, 0.241, 0.866, 0.398],
+      "hint": "Read only the table headed 'Tenth District.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 300,
+      "id": "300-3",
+      "columns": [
+        {
+          "label": "Francis D. Collins, D.",
+          "contest": "house11",
+          "candidate": "Francis Dolan Collins"
+        },
+        {
+          "label": "D. J. Waller, R.",
+          "contest": "house11",
+          "candidate": "D J Waller"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [0.139, 0.39, 0.865, 0.588],
+      "hint": "Read only the table headed 'Eleventh District.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 300,
+      "id": "300-4",
+      "columns": [
+        {
+          "label": "Long Term\u2014Hendrick B. Wright, D",
+          "contest": "house12",
+          "candidate": "Hendrick Bradley Wright"
+        },
+        {
+          "label": "H. B. Payne, R",
+          "contest": "house12",
+          "candidate": "H B Payne"
+        },
+        {
+          "label": "W. W. Winton, Pro",
+          "contest": "house12",
+          "candidate": "W W Winton"
+        },
+        {
+          "label": "Short Term\u2014W. H. Stanton, D",
+          "contest": null,
+          "candidate": ""
+        },
+        { "label": "Edward Jones, R", "contest": null, "candidate": "" },
+        { "label": "Calvin Parsons, Pro", "contest": null, "candidate": "" }
+      ],
+      "orientation": "counties_across",
+      "crop": [0.139, 0.58, 0.865, 0.69],
+      "hint": "Read only the table headed 'Twelfth District\u2014Luzerne, part of.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 300,
+      "id": "300-5",
+      "columns": [
+        {
+          "label": "J. B. Reilly, D",
+          "contest": "house13",
+          "candidate": "James Bernard Reilly"
+        },
+        {
+          "label": "J. S. Nutting, R",
+          "contest": "house13",
+          "candidate": "J S Nutting"
+        }
+      ],
+      "orientation": "counties_across",
+      "crop": [0.137, 0.682, 0.865, 0.744],
+      "hint": "Read only the table headed 'Thirteenth District--Schuylkill.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 300,
+      "id": "300-6",
+      "columns": [
+        {
+          "label": "J. W. Killinger, R.",
+          "contest": "house14",
+          "candidate": "John Weinland Killinger"
+        },
+        {
+          "label": "W. B. Wilson, D.",
+          "contest": "house14",
+          "candidate": "W B Wilson"
+        },
+        {
+          "label": "H. C. Demming, I. G.",
+          "contest": "house14",
+          "candidate": "H C Demming"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [0.138, 0.736, 0.858, 0.903],
+      "hint": "Read only the table headed 'Fourteenth District.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 301,
+      "id": "301-0",
+      "columns": [
+        { "label": "E. Overton, R.", "contest": null, "candidate": "" },
+        {
+          "label": "Jos. Powell, D.",
+          "contest": "house15",
+          "candidate": "Jos Powell"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [0.165, 0.119, 0.883, 0.3],
+      "hint": "Read only the table headed 'Fifteenth District.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 301,
+      "id": "301-1",
+      "columns": [
+        {
+          "label": "John I. Mitchell, R.",
+          "contest": "house16",
+          "candidate": "John Inscho Mitchell"
+        },
+        {
+          "label": "Henry White, D.",
+          "contest": "house16",
+          "candidate": "Henry White"
+        },
+        {
+          "label": "F. F. Davis, I. G.",
+          "contest": "house16",
+          "candidate": "F F Davis"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [0.165, 0.292, 0.883, 0.51],
+      "hint": "Read only the table headed 'Sixteenth District.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 301,
+      "id": "301-2",
+      "columns": [
+        {
+          "label": "J. M. Campbell, R.",
+          "contest": "house17",
+          "candidate": "Jacob Miller Campbell"
+        },
+        {
+          "label": "John Reilly, D.",
+          "contest": "house17",
+          "candidate": "John Reilly"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [0.162, 0.502, 0.883, 0.69],
+      "hint": "Read only the table headed 'Seventeenth District.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 301,
+      "id": "301-3",
+      "columns": [
+        {
+          "label": "W.S.Stenger, D.",
+          "contest": "house18",
+          "candidate": "William Shearer Stenger"
+        },
+        {
+          "label": "Thad. M. Mahon, R.",
+          "contest": "house18",
+          "candidate": "Thad M Mahon"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [0.162, 0.682, 0.883, 0.892],
+      "hint": "Read only the table headed 'Eighteenth District.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 302,
+      "id": "302-0",
+      "columns": [
+        {
+          "label": "Levi Maish, D.",
+          "contest": "house19",
+          "candidate": "Levi Maish"
+        },
+        {
+          "label": "C. H. Bressler, R.",
+          "contest": "house19",
+          "candidate": "C H Bressler"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [0.122, 0.116, 0.848, 0.275],
+      "hint": "Read only the table headed 'Nineteenth District.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 302,
+      "id": "302-1",
+      "columns": [
+        {
+          "label": "L. A. Mackey, D.",
+          "contest": "house20",
+          "candidate": "Levi Augustus Mackey"
+        },
+        {
+          "label": "R. V. B. Lincoln, R.",
+          "contest": "house20",
+          "candidate": "R V B Lincoln"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [0.122, 0.267, 0.848, 0.467],
+      "hint": "Read only the table headed 'Twentieth District.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 302,
+      "id": "302-2",
+      "columns": [
+        {
+          "label": "Jacob Turney, D.",
+          "contest": "house21",
+          "candidate": "Jacob Turney"
+        },
+        {
+          "label": "Jacob Rush, R.",
+          "contest": "house21",
+          "candidate": "Jacob Rush"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [0.122, 0.459, 0.848, 0.624],
+      "hint": "Read only the table headed 'Twenty-First District.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 302,
+      "id": "302-5",
+      "columns": [
+        {
+          "label": "W. S. Shallenberger, R.",
+          "contest": "house24",
+          "candidate": "William Shadrack Shallenberger"
+        },
+        { "label": "R. B. M'Comb, D.", "contest": null, "candidate": "" },
+        {
+          "label": "J. D. Glenn, PRO.",
+          "contest": "house24",
+          "candidate": "J D Glenn"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [0.127, 0.738, 0.853, 0.897],
+      "hint": "Read only the table headed 'Twenty-Fourth District.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 303,
+      "id": "303-0",
+      "columns": [
+        {
+          "label": "Harry White, R.",
+          "contest": "house25",
+          "candidate": "Harry White"
+        },
+        {
+          "label": "Geo. A. Jenks, D.",
+          "contest": "house25",
+          "candidate": "George A Jenks"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [0.122, 0.116, 0.844, 0.319],
+      "hint": "Read only the table headed 'Twenty-Fifth District.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 303,
+      "id": "303-1",
+      "columns": [
+        {
+          "label": "John M. Thompson, R.",
+          "contest": "house26",
+          "candidate": "John McCandless Thompson"
+        },
+        {
+          "label": "James Sheakley, D.",
+          "contest": "house26",
+          "candidate": "James Sheakley"
+        },
+        {
+          "label": "A. S. Thorne.",
+          "contest": "house26",
+          "candidate": "A S Thorne"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [0.122, 0.311, 0.842, 0.496],
+      "hint": "Read only the table headed 'Twenty-Sixth District.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 303,
+      "id": "303-2",
+      "columns": [
+        {
+          "label": "L. F. Watson, R.",
+          "contest": "house27",
+          "candidate": "Lewis Findlay Watson"
+        },
+        {
+          "label": "W. L. Scott, D.",
+          "contest": "house27",
+          "candidate": "W L Scott"
+        },
+        {
+          "label": "Samuel Axtell.",
+          "contest": "house27",
+          "candidate": "Samuel Axtell"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [0.122, 0.488, 0.842, 0.667],
+      "hint": "Read only the table headed 'Twenty-Seventh District.'; ignore any other table visible in the image."
+    }
+  ]
+}

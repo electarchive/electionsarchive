@@ -1,0 +1,320 @@
+{
+  "polity": "US-MI",
+  "publisher": "Michigan Secretary of State",
+  "license": "Public record",
+  "raw_source": "us.sri",
+  "title": "State of Michigan General Election, 1988: Official Canvass",
+  "file": {
+    "url": "https://archive.org/download/micro_IA40706932_0179/micro_IA40706932_0179.pdf",
+    "item": "https://archive.org/details/micro_IA40706932_0179"
+  },
+  "contests": {
+    "president": {
+      "year": 1988,
+      "chamber": "president",
+      "day": "1988-11-08",
+      "special": false,
+      "state": "MI",
+      "district": null
+    },
+    "senate": {
+      "year": 1988,
+      "chamber": "senate",
+      "day": "1988-11-08",
+      "special": false,
+      "state": "MI",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 3,
+      "id": "3-0",
+      "columns": [
+        {
+          "label": "TOTAL BY COUNTY",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Dukakis Bentsen DEM",
+          "contest": "president",
+          "candidate": "Michael S. Dukakis"
+        },
+        {
+          "label": "Bush Quayle REP",
+          "contest": "president",
+          "candidate": "George Bush"
+        },
+        {
+          "label": "Paul Marrou LIB",
+          "contest": "president",
+          "candidate": "Ronald E. Paul"
+        },
+        {
+          "label": "Winn Porreter WORL",
+          "contest": "president",
+          "candidate": "Edward Winn"
+        },
+        {
+          "label": "Fulani Moore NPA",
+          "contest": "president",
+          "candidate": "Lenora B. Fulani"
+        },
+        {
+          "label": "Holmes Cohen NPA1",
+          "contest": "president",
+          "candidate": "Larry Holmes"
+        },
+        {
+          "label": "McCarthy Rice NPA2",
+          "contest": "president",
+          "candidate": "Eugene J. McCarthy"
+        },
+        {
+          "label": "Warren Mickelle NPA3",
+          "contest": "president",
+          "candidate": "James Warren"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.037,
+        0.161,
+        0.84,
+        1.0
+      ],
+      "hint": "Read only the table headed 'PRESIDENT/VICE-PRESIDENT 4 YEAR TERM (1)'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0763
+      ]
+    },
+    {
+      "page": 4,
+      "id": "4-0",
+      "columns": [
+        {
+          "label": "TOTAL BY COUNTY",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Dukakis Bentsen DEM",
+          "contest": "president",
+          "candidate": "Michael S. Dukakis"
+        },
+        {
+          "label": "Bush Quayle REP",
+          "contest": "president",
+          "candidate": "George Bush"
+        },
+        {
+          "label": "Paul Marrou LIB",
+          "contest": "president",
+          "candidate": "Ronald E. Paul"
+        },
+        {
+          "label": "Winn Porter WORL",
+          "contest": "president",
+          "candidate": "Edward Winn"
+        },
+        {
+          "label": "Fulani Moore NPA",
+          "contest": "president",
+          "candidate": "Lenora B. Fulani"
+        },
+        {
+          "label": "Holmes Cohen NPA1",
+          "contest": "president",
+          "candidate": "Larry Holmes"
+        },
+        {
+          "label": "McCarthy Rice NPA2",
+          "contest": "president",
+          "candidate": "Eugene J. McCarthy"
+        },
+        {
+          "label": "Warren Mickelle NPA3",
+          "contest": "president",
+          "candidate": "James Warren"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.045,
+        0.187,
+        0.854,
+        0.617
+      ],
+      "hint": "Read only the table headed 'PRESIDENT/VICE-PRESIDENT 4 YEAR TERM (1)'; ignore any other table visible in the image."
+    },
+    {
+      "page": 5,
+      "id": "5-0",
+      "columns": [
+        {
+          "label": "Dodge Ormsby SCAT",
+          "contest": "president",
+          "candidate": "Earl Dodge"
+        },
+        {
+          "label": "Duke Parker SCAT",
+          "contest": "president",
+          "candidate": "David E. Duke"
+        },
+        {
+          "label": "Write-In SCAT",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.064,
+        0.149,
+        0.403,
+        1.0
+      ],
+      "hint": "Read only the table headed 'PRESIDENT/VICE-PRESIDENT 4 YEAR TERM (1)'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.074
+      ]
+    },
+    {
+      "page": 6,
+      "id": "6-0",
+      "columns": [
+        {
+          "label": "Dodge Ormsby SCAT",
+          "contest": "president",
+          "candidate": "Earl Dodge"
+        },
+        {
+          "label": "Duke Parker SCAT",
+          "contest": "president",
+          "candidate": "David E. Duke"
+        },
+        {
+          "label": "Write-In SCAT",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.054,
+        0.142,
+        0.386,
+        0.564
+      ],
+      "hint": "Read only the table headed 'PRESIDENT/VICE-PRESIDENT 4 YEAR TERM (1)'; ignore any other table visible in the image."
+    },
+    {
+      "page": 7,
+      "id": "7-0",
+      "columns": [
+        {
+          "label": "TOTAL BY COUNTY",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Donald Riegle Jr. DEM",
+          "contest": "senate",
+          "candidate": "Donald W. Riegle Jr."
+        },
+        {
+          "label": "Jim Dunn REP",
+          "contest": "senate",
+          "candidate": "Jim Dunn"
+        },
+        {
+          "label": "Dick Jacobs LIB",
+          "contest": "senate",
+          "candidate": "Dick Jacobs"
+        },
+        {
+          "label": "Sally Bier WAC",
+          "contest": "senate",
+          "candidate": "Sally Bier"
+        },
+        {
+          "label": "Mark Friedman NPA",
+          "contest": "senate",
+          "candidate": "Mark Friedman"
+        },
+        {
+          "label": "Write-In SCAT",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.042,
+        0.084,
+        0.7,
+        1.0
+      ],
+      "hint": "Read only the table headed 'U.S. SENATE 6 YEAR TERM (1)'; ignore any other table visible in the image.",
+      "bands": 3,
+      "header": [
+        0.0,
+        0.0742
+      ]
+    },
+    {
+      "page": 8,
+      "id": "8-0",
+      "columns": [
+        {
+          "label": "TOTAL BY COUNTY",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Donald Riegle Jr. DEM",
+          "contest": "senate",
+          "candidate": "Donald W. Riegle Jr."
+        },
+        {
+          "label": "Jim Dunn REP",
+          "contest": "senate",
+          "candidate": "Jim Dunn"
+        },
+        {
+          "label": "Dick Jacobs LIB",
+          "contest": "senate",
+          "candidate": "Dick Jacobs"
+        },
+        {
+          "label": "Sally Bier WAC",
+          "contest": "senate",
+          "candidate": "Sally Bier"
+        },
+        {
+          "label": "Mark Friedman HPA",
+          "contest": "senate",
+          "candidate": "Mark Friedman"
+        },
+        {
+          "label": "Write-In SCAT",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.044,
+        0.09,
+        0.702,
+        0.443
+      ],
+      "hint": "Read only the table headed 'U.S. SENATE 6 YEAR TERM (1)'; ignore any other table visible in the image."
+    }
+  ]
+}

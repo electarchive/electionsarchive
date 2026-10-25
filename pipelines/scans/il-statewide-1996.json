@@ -1,0 +1,743 @@
+{
+  "polity": "US-IL",
+  "publisher": "Illinois State Board of Elections",
+  "license": "Public record",
+  "raw_source": "us.scans",
+  "title": "State of Illinois official vote cast at the general election, 1996",
+  "file": {
+    "url": "https://archive.org/download/stateofillinois1996illi/stateofillinois1996illi.pdf"
+  },
+  "contests": {
+    "president": {
+      "year": 1996,
+      "chamber": "president",
+      "day": "1996-11-05",
+      "special": false,
+      "state": "IL",
+      "district": null
+    },
+    "senate": {
+      "year": 1996,
+      "chamber": "senate",
+      "day": "1996-11-05",
+      "special": false,
+      "state": "IL",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 16,
+      "id": "16-0",
+      "columns": [
+        {
+          "label": "PLURALITY",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "DEM CLINTON GORE",
+          "contest": "president",
+          "candidate": "Bill Clinton"
+        },
+        {
+          "label": "REP DOLE KEMP",
+          "contest": "president",
+          "candidate": "Bob Dole"
+        },
+        {
+          "label": "REF PEROT CHOATE",
+          "contest": "president",
+          "candidate": "Ross Perot"
+        },
+        {
+          "label": "LIB BROWNE JORGENSEN",
+          "contest": "president",
+          "candidate": "Harry Browne"
+        },
+        {
+          "label": "TAX PHILLIPS ZDONCZYK",
+          "contest": "president",
+          "candidate": "Howard Phillips"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.022,
+        0.536,
+        1.0,
+        1.0
+      ],
+      "hint": "Read only the table headed 'PRESIDENT AND VICE PRESIDENT OF THE UNITED STATES'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1272
+      ]
+    },
+    {
+      "page": 17,
+      "id": "17-0",
+      "columns": [
+        {
+          "label": "PLURALITY",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "DEM CLINTON GORE",
+          "contest": "president",
+          "candidate": "Bill Clinton"
+        },
+        {
+          "label": "REP DOLE KEMP",
+          "contest": "president",
+          "candidate": "Bob Dole"
+        },
+        {
+          "label": "REF PEROT CHOATE",
+          "contest": "president",
+          "candidate": "Ross Perot"
+        },
+        {
+          "label": "LIB BROWNE JORGENSEN",
+          "contest": "president",
+          "candidate": "Harry Browne"
+        },
+        {
+          "label": "TAX PHILLIPS ZDONCZYK",
+          "contest": "president",
+          "candidate": "Howard Phillips"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.07,
+        0.165,
+        0.968,
+        1.0
+      ],
+      "hint": "Read only the table headed 'PRESIDENT AND VICE PRESIDENT OF THE UNITED STATES'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.188
+      ]
+    },
+    {
+      "page": 18,
+      "id": "18-0",
+      "columns": [
+        {
+          "label": "PLURALITY",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "DEM CLINTON GORE",
+          "contest": "president",
+          "candidate": "Bill Clinton"
+        },
+        {
+          "label": "REP DOLE KEMP",
+          "contest": "president",
+          "candidate": "Bob Dole"
+        },
+        {
+          "label": "REF PEROT CHOATE",
+          "contest": "president",
+          "candidate": "Ross Perot"
+        },
+        {
+          "label": "LIB BROWNE JORGENSEN",
+          "contest": "president",
+          "candidate": "Harry Browne"
+        },
+        {
+          "label": "TAX PHILLIPS ZDONCZYK",
+          "contest": "president",
+          "candidate": "Howard Phillips"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.03,
+        0.165,
+        0.923,
+        1.0
+      ],
+      "hint": "Read only the table headed 'PRESIDENT AND VICE PRESIDENT OF THE UNITED STATES'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0575
+      ]
+    },
+    {
+      "page": 19,
+      "id": "19-0",
+      "columns": [
+        {
+          "label": "PLURALITY",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "DEM CLINTON GORE",
+          "contest": "president",
+          "candidate": "Bill Clinton"
+        },
+        {
+          "label": "REP DOLE KEMP",
+          "contest": "president",
+          "candidate": "Bob Dole"
+        },
+        {
+          "label": "REF PEROT CHOATE",
+          "contest": "president",
+          "candidate": "Ross Perot"
+        },
+        {
+          "label": "LIB BROWNE JORGENSEN",
+          "contest": "president",
+          "candidate": "Harry Browne"
+        },
+        {
+          "label": "TAX PHILLIPS ZDONCZYK",
+          "contest": "president",
+          "candidate": "Howard Phillips"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.067,
+        0.16,
+        0.958,
+        0.52
+      ],
+      "hint": "Read only the table headed 'PRESIDENT AND VICE PRESIDENT OF THE UNITED STATES'; ignore any other table visible in the image."
+    },
+    {
+      "page": 19,
+      "id": "19-1",
+      "columns": [
+        {
+          "label": "NAT HAGELIN TOMPKINS",
+          "contest": "president",
+          "candidate": "John Hagelin"
+        },
+        {
+          "label": "NADER",
+          "contest": "president",
+          "candidate": "Ralph Nader"
+        },
+        {
+          "label": "MARSHALL",
+          "contest": "president",
+          "candidate": "William P. Marshall"
+        },
+        {
+          "label": "RUST",
+          "contest": "president",
+          "candidate": "Johan K. Rust"
+        },
+        {
+          "label": "KOSHARSKY",
+          "contest": "president",
+          "candidate": "Jennifer \"Jenny\" Kay Kosharsky"
+        },
+        {
+          "label": "CARTER",
+          "contest": "president",
+          "candidate": "Willie Felix Carter"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.067,
+        0.516,
+        0.958,
+        1.0
+      ],
+      "hint": "Read only the table headed 'PRESIDENT AND VICE PRESIDENT OF THE UNITED STATES'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1653
+      ]
+    },
+    {
+      "page": 20,
+      "id": "20-0",
+      "columns": [
+        {
+          "label": "NAT HAGELIN TOMPKINS",
+          "contest": "president",
+          "candidate": "John Hagelin"
+        },
+        {
+          "label": "NADER",
+          "contest": "president",
+          "candidate": "Ralph Nader"
+        },
+        {
+          "label": "MARSHALL",
+          "contest": "president",
+          "candidate": "William P. Marshall"
+        },
+        {
+          "label": "RUST",
+          "contest": "president",
+          "candidate": "Johan K. Rust"
+        },
+        {
+          "label": "KOSHARSKY",
+          "contest": "president",
+          "candidate": "Jennifer \"Jenny\" Kay Kosharsky"
+        },
+        {
+          "label": "CARTER",
+          "contest": "president",
+          "candidate": "Willie Felix Carter"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.032,
+        0.1,
+        0.926,
+        1.0
+      ],
+      "hint": "Read only the table headed 'PRESIDENT AND VICE PRESIDENT OF THE UNITED STATES'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.13
+      ]
+    },
+    {
+      "page": 21,
+      "id": "21-0",
+      "columns": [
+        {
+          "label": "HAGELIN TOMPKINS",
+          "contest": "president",
+          "candidate": "John Hagelin"
+        },
+        {
+          "label": "NADER",
+          "contest": "president",
+          "candidate": "Ralph Nader"
+        },
+        {
+          "label": "MARSHALL",
+          "contest": "president",
+          "candidate": "William P. Marshall"
+        },
+        {
+          "label": "RUST",
+          "contest": "president",
+          "candidate": "Johan K. Rust"
+        },
+        {
+          "label": "KOSHARSKY",
+          "contest": "president",
+          "candidate": "Jennifer \"Jenny\" Kay Kosharsky"
+        },
+        {
+          "label": "CARTER",
+          "contest": "president",
+          "candidate": "Willie Felix Carter"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.06,
+        0.165,
+        0.955,
+        1.0
+      ],
+      "hint": "Read only the table headed 'PRESIDENT AND VICE PRESIDENT OF THE UNITED STATES'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1737
+      ]
+    },
+    {
+      "page": 22,
+      "id": "22-0",
+      "columns": [
+        {
+          "label": "NAT HAGELIN TOMPKINS",
+          "contest": "president",
+          "candidate": "John Hagelin"
+        },
+        {
+          "label": "NADER",
+          "contest": "president",
+          "candidate": "Ralph Nader"
+        },
+        {
+          "label": "MARSHALL",
+          "contest": "president",
+          "candidate": "William P. Marshall"
+        },
+        {
+          "label": "RUST",
+          "contest": "president",
+          "candidate": "Johan K. Rust"
+        },
+        {
+          "label": "KOSHARSKY",
+          "contest": "president",
+          "candidate": "Jennifer \"Jenny\" Kay Kosharsky"
+        },
+        {
+          "label": "CARTER",
+          "contest": "president",
+          "candidate": "Willie Felix Carter"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.057,
+        0.23,
+        0.953,
+        0.369
+      ],
+      "hint": "Read only the table headed 'PRESIDENT AND VICE PRESIDENT OF THE UNITED STATES'; ignore any other table visible in the image."
+    },
+    {
+      "page": 22,
+      "id": "22-1",
+      "columns": [
+        {
+          "label": "DODGE",
+          "contest": "president",
+          "candidate": "Earl F. Dodge"
+        },
+        {
+          "label": "SUTHERLAND",
+          "contest": "president",
+          "candidate": "Randy Sutherland"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.312,
+        0.365,
+        0.698,
+        1.0
+      ],
+      "hint": "Read only the table headed 'PRESIDENT AND VICE PRESIDENT OF THE UNITED STATES'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0756
+      ]
+    },
+    {
+      "page": 23,
+      "id": "23-0",
+      "columns": [
+        {
+          "label": "DODGE",
+          "contest": "president",
+          "candidate": "Earl F. Dodge"
+        },
+        {
+          "label": "SUTHERLAND",
+          "contest": "president",
+          "candidate": "Randy Sutherland"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.322,
+        0.095,
+        0.708,
+        1.0
+      ],
+      "hint": "Read only the table headed 'PRESIDENT AND VICE PRESIDENT OF THE UNITED STATES'; ignore any other table visible in the image.",
+      "bands": 3,
+      "header": [
+        0.0,
+        0.1138
+      ]
+    },
+    {
+      "page": 24,
+      "id": "24-0",
+      "columns": [
+        {
+          "label": "DODGE",
+          "contest": "president",
+          "candidate": "Earl F. Dodge"
+        },
+        {
+          "label": "SUTHERLAND",
+          "contest": "president",
+          "candidate": "Randy Sutherland"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.292,
+        0.09,
+        0.678,
+        1.0
+      ],
+      "hint": "Read only the table headed 'PRESIDENT AND VICE PRESIDENT OF THE UNITED STATES'; ignore any other table visible in the image.",
+      "bands": 3,
+      "header": [
+        0.0,
+        0.1121
+      ]
+    },
+    {
+      "page": 25,
+      "id": "25-0",
+      "columns": [
+        {
+          "label": "DODGE",
+          "contest": "president",
+          "candidate": "Earl F. Dodge"
+        },
+        {
+          "label": "SUTHERLAND",
+          "contest": "president",
+          "candidate": "Randy Sutherland"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.328,
+        0.268,
+        0.702,
+        1.0
+      ],
+      "hint": "Read only the table headed 'PRESIDENT AND VICE PRESIDENT OF THE UNITED STATES'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0683
+      ]
+    },
+    {
+      "page": 26,
+      "id": "26-0",
+      "columns": [
+        {
+          "label": "PLURALITY",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "DEM DURBIN",
+          "contest": "senate",
+          "candidate": "Richard J. Durbin"
+        },
+        {
+          "label": "REP SALVI",
+          "contest": "senate",
+          "candidate": "Al Salvi"
+        },
+        {
+          "label": "REF PERRY",
+          "contest": "senate",
+          "candidate": "Steven H. Perry"
+        },
+        {
+          "label": "LIB MILLER",
+          "contest": "senate",
+          "candidate": "Robin J. Miller"
+        },
+        {
+          "label": "TAX KOPPIE",
+          "contest": "senate",
+          "candidate": "Chad Koppie"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.042,
+        0.371,
+        0.948,
+        1.0
+      ],
+      "hint": "Read only the table headed 'UNITED STATES SENATOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0811
+      ]
+    },
+    {
+      "page": 27,
+      "id": "27-0",
+      "columns": [
+        {
+          "label": "PLURALITY",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "DEM DURBIN",
+          "contest": "senate",
+          "candidate": "Richard J. Durbin"
+        },
+        {
+          "label": "REP SALVI",
+          "contest": "senate",
+          "candidate": "Al Salvi"
+        },
+        {
+          "label": "REF PERRY",
+          "contest": "senate",
+          "candidate": "Steven H. Perry"
+        },
+        {
+          "label": "LIB MILLER",
+          "contest": "senate",
+          "candidate": "Robin J. Miller"
+        },
+        {
+          "label": "TAX KOPPIE",
+          "contest": "senate",
+          "candidate": "Chad Koppie"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.062,
+        0.123,
+        0.953,
+        1.0
+      ],
+      "hint": "Read only the table headed 'UNITED STATES SENATOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2075
+      ]
+    },
+    {
+      "page": 28,
+      "id": "28-0",
+      "columns": [
+        {
+          "label": "PLURALITY",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "DEM DURBIN",
+          "contest": "senate",
+          "candidate": "Richard J. Durbin"
+        },
+        {
+          "label": "REP SALVI",
+          "contest": "senate",
+          "candidate": "Al Salvi"
+        },
+        {
+          "label": "REF PERRY",
+          "contest": "senate",
+          "candidate": "Steven H. Perry"
+        },
+        {
+          "label": "LIB MILLER",
+          "contest": "senate",
+          "candidate": "Robin J. Miller"
+        },
+        {
+          "label": "TAX KOPPIE",
+          "contest": "senate",
+          "candidate": "Chad Koppie"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.062,
+        0.16,
+        0.956,
+        1.0
+      ],
+      "hint": "Read only the table headed 'UNITED STATES SENATOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1
+      ]
+    },
+    {
+      "page": 29,
+      "id": "29-0",
+      "columns": [
+        {
+          "label": "NAT DAVIS",
+          "contest": "senate",
+          "candidate": "James E. Davis"
+        },
+        {
+          "label": "DAHL",
+          "contest": "senate",
+          "candidate": "Steve Dahl"
+        },
+        {
+          "label": "RUDNER",
+          "contest": "senate",
+          "candidate": "Robert A. Rudner"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.267,
+        0.128,
+        0.772,
+        1.0
+      ],
+      "hint": "Read only the table headed 'UNITED STATES SENATOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1468
+      ]
+    },
+    {
+      "page": 30,
+      "id": "30-0",
+      "columns": [
+        {
+          "label": "NAT DAVIS",
+          "contest": "senate",
+          "candidate": "James E. Davis"
+        },
+        {
+          "label": "DAHL",
+          "contest": "senate",
+          "candidate": "Steve Dahl"
+        },
+        {
+          "label": "RUDNER",
+          "contest": "senate",
+          "candidate": "Robert A. Rudner"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.242,
+        0.108,
+        0.748,
+        1.0
+      ],
+      "hint": "Read only the table headed 'UNITED STATES SENATOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1401
+      ]
+    }
+  ]
+}

@@ -1,0 +1,219 @@
+{
+  "polity": "US-MI",
+  "publisher": "Michigan Secretary of State",
+  "license": "Public record",
+  "raw_source": "us.sri",
+  "title": "State of Michigan General Election, 1980: Official Canvass",
+  "file": {
+    "url": "https://archive.org/download/micro_IA40706905_0413/micro_IA40706905_0413.pdf",
+    "item": "https://archive.org/details/micro_IA40706905_0413"
+  },
+  "contests": {
+    "president": {
+      "year": 1980,
+      "chamber": "president",
+      "day": "1980-11-04",
+      "special": false,
+      "state": "MI",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 3,
+      "id": "3-0",
+      "columns": [
+        {
+          "label": "CARTER MONDALE DEM",
+          "contest": "president",
+          "candidate": "Jimmy Carter (Democratic)"
+        },
+        {
+          "label": "REAGAN BUSH REP",
+          "contest": "president",
+          "candidate": "Ronald Reagan (Republican)"
+        },
+        {
+          "label": "CLARK KOCH LIB",
+          "contest": "president",
+          "candidate": "Ed Clark (Libertarian)"
+        },
+        {
+          "label": "COMMONER HARRIS CIT",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "ANDERSON LUCEY AND C",
+          "contest": "president",
+          "candidate": "John Anderson (Independent)"
+        },
+        {
+          "label": "HALL DAVIS",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "WRITE-INS BUBAR DODGE PRO",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "WRITE-INS GREAVES VARNUM AIP",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "WRITE-INS GRISWOLD HOLMES WKR W",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.072,
+        0.111,
+        0.933,
+        1.0
+      ],
+      "hint": "Read only the table headed 'PRESIDENT AND VICE PRESIDENT'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0945
+      ]
+    },
+    {
+      "page": 4,
+      "id": "4-0",
+      "columns": [
+        {
+          "label": "CARTER MONDALE DEM",
+          "contest": "president",
+          "candidate": "Jimmy Carter (Democratic)"
+        },
+        {
+          "label": "REAGAN BUSH REP",
+          "contest": "president",
+          "candidate": "Ronald Reagan (Republican)"
+        },
+        {
+          "label": "CLARK KOCH LIB",
+          "contest": "president",
+          "candidate": "Ed Clark (Libertarian)"
+        },
+        {
+          "label": "COMMONER HARRIS CIT",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "ANDERSON LUCEY AND C",
+          "contest": "president",
+          "candidate": "John Anderson (Independent)"
+        },
+        {
+          "label": "HALL DAVIS",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "WRITE-INS BUBAR DODGE PRO",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "WRITE-INS GREAVES VARNUM AIP",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "WRITE-INS GRISWOLD HOLMES WKR W",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.067,
+        0.139,
+        0.943,
+        0.794
+      ],
+      "hint": "Read only the table headed 'PRESIDENT AND VICE PRESIDENT'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1267
+      ]
+    },
+    {
+      "page": 5,
+      "id": "5-0",
+      "columns": [
+        {
+          "label": "RARICK SHEARER AIP",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "SCATTERING WRITE INS",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "TOTAL BY COUNTY",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.064,
+        0.121,
+        0.938,
+        1.0
+      ],
+      "hint": "Read only the table headed 'PRESIDENT AND VICE PRESIDENT'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1035
+      ]
+    },
+    {
+      "page": 6,
+      "id": "6-0",
+      "columns": [
+        {
+          "label": "RARICK SHEARER AIP",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "SCATTERING WRITE INS",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "TOTAL BY COUNTY",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.067,
+        0.131,
+        0.908,
+        0.777
+      ],
+      "hint": "Read only the table headed 'PRESIDENT AND VICE PRESIDENT'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1316
+      ]
+    }
+  ]
+}

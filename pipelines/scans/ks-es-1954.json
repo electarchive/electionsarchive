@@ -1,0 +1,378 @@
+{
+  "polity": "US-KS",
+  "publisher": "Kansas Secretary of State",
+  "license": "Public record",
+  "raw_source": "us.ks_es",
+  "title": "Kansas election statistics 1954, general election",
+  "file": {
+    "url": "https://kgi.contentdm.oclc.org/digital/api/collection/p16884coll129/id/51/download"
+  },
+  "contests": {
+    "senate": {
+      "year": 1954,
+      "chamber": "senate",
+      "day": "1954-11-02",
+      "special": false,
+      "state": "KS",
+      "district": null
+    },
+    "house1": {
+      "year": 1954,
+      "chamber": "house",
+      "day": "1954-11-02",
+      "special": false,
+      "state": "KS",
+      "district": 1
+    },
+    "house2": {
+      "year": 1954,
+      "chamber": "house",
+      "day": "1954-11-02",
+      "special": false,
+      "state": "KS",
+      "district": 2
+    },
+    "house3": {
+      "year": 1954,
+      "chamber": "house",
+      "day": "1954-11-02",
+      "special": false,
+      "state": "KS",
+      "district": 3
+    },
+    "house4": {
+      "year": 1954,
+      "chamber": "house",
+      "day": "1954-11-02",
+      "special": false,
+      "state": "KS",
+      "district": 4
+    },
+    "house5": {
+      "year": 1954,
+      "chamber": "house",
+      "day": "1954-11-02",
+      "special": false,
+      "state": "KS",
+      "district": 5
+    },
+    "house6": {
+      "year": 1954,
+      "chamber": "house",
+      "day": "1954-11-02",
+      "special": false,
+      "state": "KS",
+      "district": 6
+    },
+    "governor": {
+      "year": 1954,
+      "chamber": "governor",
+      "day": "1954-11-02",
+      "special": false,
+      "state": "KS",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 2,
+      "id": "2-0",
+      "columns": [
+        {
+          "label": "Andrew F. Schoeppel, Rep.",
+          "contest": "senate",
+          "candidate": "Andrew F. Schoeppel"
+        },
+        {
+          "label": "George McGill, Dem.",
+          "contest": "senate",
+          "candidate": "George McGill"
+        },
+        {
+          "label": "David C. White, Prohib.",
+          "contest": "senate",
+          "candidate": "David C. White"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.111,
+        0.112,
+        0.918,
+        1.0
+      ],
+      "hint": "Read only the table headed 'FOR UNITED STATES SENATOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0901
+      ]
+    },
+    {
+      "page": 3,
+      "id": "3-0",
+      "columns": [
+        {
+          "label": "Andrew F. Schoeppel, Rep.",
+          "contest": "senate",
+          "candidate": "Andrew F. Schoeppel"
+        },
+        {
+          "label": "George McGill, Dem.",
+          "contest": "senate",
+          "candidate": "George McGill"
+        },
+        {
+          "label": "David C. White, Prohib.",
+          "contest": "senate",
+          "candidate": "David C. White"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.088,
+        0.138,
+        0.881,
+        0.809
+      ],
+      "hint": "Read only the table headed 'FOR UNITED STATES SENATOR\u2014CONCLUDED'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.073
+      ]
+    },
+    {
+      "page": 4,
+      "id": "4-0",
+      "columns": [
+        {
+          "label": "Wm. H. Avery, Rep.",
+          "contest": "house1",
+          "candidate": "William H. Avery"
+        },
+        {
+          "label": "Howard S. Miller, Dem.",
+          "contest": "house1",
+          "candidate": "Howard S. Miller"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.107,
+        0.14,
+        0.908,
+        0.394
+      ],
+      "hint": "Read only the table headed 'FIRST CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 4,
+      "id": "4-1",
+      "columns": [
+        {
+          "label": "Errett P. Scrivner, Rep.",
+          "contest": "house2",
+          "candidate": "Errett P. Scrivner"
+        },
+        {
+          "label": "Newell A. George, Dem",
+          "contest": "house2",
+          "candidate": "Newell A. George"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.107,
+        0.386,
+        0.908,
+        0.602
+      ],
+      "hint": "Read only the table headed 'SECOND CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 5,
+      "id": "5-0",
+      "columns": [
+        {
+          "label": "Myron V. George, Rep.",
+          "contest": "house3",
+          "candidate": "Myron V. George"
+        },
+        {
+          "label": "William W. Monypeny, Dem.",
+          "contest": "house3",
+          "candidate": "William W. Monypeny"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.094,
+        0.136,
+        0.886,
+        0.358
+      ],
+      "hint": "Read only the table headed 'FOR REPRESENTATIVES IN CONGRESS\u2014CONTINUED THIRD CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 5,
+      "id": "5-1",
+      "columns": [
+        {
+          "label": "Ed H. Rees, Rep.",
+          "contest": "house4",
+          "candidate": "Edward H. Rees"
+        },
+        {
+          "label": "Robert M. Green, Dem.",
+          "contest": "house4",
+          "candidate": "Robert M. Green"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.094,
+        0.35,
+        0.886,
+        0.642
+      ],
+      "hint": "Read only the table headed 'FOURTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 6,
+      "id": "6-0",
+      "columns": [
+        {
+          "label": "Clifford R. Hope, Rep.",
+          "contest": "house5",
+          "candidate": "Clifford R. Hope"
+        },
+        {
+          "label": "Robert L. Bock, Dem.",
+          "contest": "house5",
+          "candidate": "Robert L. Bock"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.109,
+        0.138,
+        0.908,
+        0.634
+      ],
+      "hint": "Read only the table headed 'FOR REPRESENTATIVES IN CONGRESS\u2014Continued, FIFTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1431
+      ]
+    },
+    {
+      "page": 7,
+      "id": "7-0",
+      "columns": [
+        {
+          "label": "Wint Smith, Rep.",
+          "contest": "house6",
+          "candidate": "Wint Smith"
+        },
+        {
+          "label": "Elmo J. Mahoney, Dem.",
+          "contest": "house6",
+          "candidate": "Elmo J. Mahoney"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.099,
+        0.096,
+        0.883,
+        0.549
+      ],
+      "hint": "Read only the table headed 'FOR REPRESENTATIVES IN CONGRESS\u2014CONCLUDED SIXTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2539
+      ]
+    },
+    {
+      "page": 10,
+      "id": "10-0",
+      "columns": [
+        {
+          "label": "Fred Hall, Rep.",
+          "contest": "governor",
+          "candidate": "Fred Hall"
+        },
+        {
+          "label": "George Docking, Dem.",
+          "contest": "governor",
+          "candidate": "George Docking"
+        },
+        {
+          "label": "Chester A. Roberts, Prohib.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "W. W. Tamplin, Soc.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.114,
+        0.116,
+        0.908,
+        1.0
+      ],
+      "hint": "Read only the table headed 'FOR GOVERNOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0837
+      ]
+    },
+    {
+      "page": 11,
+      "id": "11-0",
+      "columns": [
+        {
+          "label": "Fred Hall, Rep.",
+          "contest": "governor",
+          "candidate": "Fred Hall"
+        },
+        {
+          "label": "George Docking, Dem.",
+          "contest": "governor",
+          "candidate": "George Docking"
+        },
+        {
+          "label": "Chester A. Roberts, Prohib.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "W. W. Tamplin, Soc.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.095,
+        0.131,
+        0.888,
+        0.81
+      ],
+      "hint": "Read only the table headed 'FOR GOVERNOR\u2014CONCLUDED'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.081
+      ]
+    }
+  ]
+}

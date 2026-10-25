@@ -1,0 +1,384 @@
+{
+  "polity": "US-KS",
+  "publisher": "Kansas Secretary of State",
+  "license": "Public record",
+  "raw_source": "us.ks_es",
+  "title": "Kansas election statistics 1986, general election",
+  "file": {
+    "url": "https://kgi.contentdm.oclc.org/digital/api/collection/p16884coll129/id/70/download"
+  },
+  "contests": {
+    "senate": {
+      "year": 1986,
+      "chamber": "senate",
+      "day": "1986-11-04",
+      "special": false,
+      "state": "KS",
+      "district": null
+    },
+    "house1": {
+      "year": 1986,
+      "chamber": "house",
+      "day": "1986-11-04",
+      "special": false,
+      "state": "KS",
+      "district": 1
+    },
+    "governor": {
+      "year": 1986,
+      "chamber": "governor",
+      "day": "1986-11-04",
+      "special": false,
+      "state": "KS",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 19,
+      "id": "19-0",
+      "columns": [
+        {
+          "label": "Bob Dole Rep.",
+          "contest": "senate",
+          "candidate": "Robert Dole"
+        },
+        {
+          "label": "Shirley J. Ashley Landis Rep.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Darrell T. Ringer Dem.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Guy MacDonald Dem.",
+          "contest": "senate",
+          "candidate": "Guy MacDonald"
+        },
+        {
+          "label": "Jim Oyler Dem.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Lionel Kunst Dem.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "W.H. (Bill) Addington Dem.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.026,
+        0.084,
+        0.965,
+        0.895
+      ],
+      "hint": "Read only the table headed \"UNITED STATES SENATOR\u2014Cont'd\"; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0789
+      ]
+    },
+    {
+      "page": 20,
+      "id": "20-0",
+      "columns": [
+        {
+          "label": "Pat Roberts Rep.",
+          "contest": "house1",
+          "candidate": "Pat Roberts"
+        },
+        {
+          "label": "Dale Lyon Dem.",
+          "contest": "house1",
+          "candidate": "Dale Lyon"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.064,
+        0.061,
+        0.863,
+        1.0
+      ],
+      "hint": "Read only the table headed 'U.S. REPRESENTATIVE, 1st DISTRICT'; ignore any other table visible in the image.",
+      "bands": 3,
+      "header": [
+        0.0,
+        0.065
+      ]
+    },
+    {
+      "page": 23,
+      "id": "23-0",
+      "columns": [
+        {
+          "label": "Bicknell and Yost Rep.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Brier and Priddle Rep.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Hayden and Walker Rep.",
+          "contest": "governor",
+          "candidate": "Mike Hayden"
+        },
+        {
+          "label": "Jones and Burke Rep.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "McDonald and Ladlier Rep.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Peckham and Vincent Rep.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Pomeroy and Hale Rep.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Docking and Montgomery Dem.",
+          "contest": "governor",
+          "candidate": "Thomas R. Docking"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.027,
+        0.064,
+        0.973,
+        1.0
+      ],
+      "hint": "Read only the table headed 'GOVERNOR-LIEUTENANT GOVERNOR'; ignore any other table visible in the image.",
+      "bands": 3,
+      "header": [
+        0.0,
+        0.0844
+      ]
+    },
+    {
+      "page": 24,
+      "id": "24-0",
+      "columns": [
+        {
+          "label": "Bicknell and Yost Rep.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Brier and Priddle Rep.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Hayden and Walker Rep",
+          "contest": "governor",
+          "candidate": "Mike Hayden"
+        },
+        {
+          "label": "Jones and Burke Rep.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "McDonald and Laidler Rep",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Peckham and Vincent Rep",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Pomeroy and Hale Rep",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Docking and Montgomery Dem.",
+          "contest": "governor",
+          "candidate": "Thomas R. Docking"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.022,
+        0.072,
+        0.978,
+        0.924
+      ],
+      "hint": "Read only the table headed \"GOVERNOR-LIEUTENANT GOVERNOR\u2014Cont'd\"; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0892
+      ]
+    },
+    {
+      "page": 66,
+      "id": "66-0",
+      "columns": [
+        {
+          "label": "Bob Dole Rep.",
+          "contest": "senate",
+          "candidate": "Robert Dole"
+        },
+        {
+          "label": "Guy MacDonald Dem.",
+          "contest": "senate",
+          "candidate": "Guy MacDonald"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.05,
+        0.068,
+        0.883,
+        1.0
+      ],
+      "hint": "Read only the table headed 'UNITED STATES SENATOR'; ignore any other table visible in the image.",
+      "bands": 3,
+      "header": [
+        0.0,
+        0.059
+      ]
+    },
+    {
+      "page": 67,
+      "id": "67-0",
+      "columns": [
+        {
+          "label": "Bob Dole Rep.",
+          "contest": "senate",
+          "candidate": "Robert Dole"
+        },
+        {
+          "label": "Guy MacDonald Dem.",
+          "contest": "senate",
+          "candidate": "Guy MacDonald"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.089,
+        0.076,
+        0.898,
+        0.88
+      ],
+      "hint": "Read only the table headed \"UNITED STATES SENATOR\u2014Cont'd\"; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0634
+      ]
+    },
+    {
+      "page": 68,
+      "id": "68-0",
+      "columns": [
+        {
+          "label": "Pat Roberts Rep.",
+          "contest": "house1",
+          "candidate": "Pat Roberts"
+        },
+        {
+          "label": "Dale Lyon Dem.",
+          "contest": "house1",
+          "candidate": "Dale Lyon"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.05,
+        0.071,
+        0.858,
+        1.0
+      ],
+      "hint": "Read only the table headed 'U.S. REPRESENTATIVE, 1st DISTRICT'; ignore any other table visible in the image.",
+      "bands": 3,
+      "header": [
+        0.0,
+        0.0732
+      ]
+    },
+    {
+      "page": 71,
+      "id": "71-0",
+      "columns": [
+        {
+          "label": "Hayden and Walker Rep.",
+          "contest": "governor",
+          "candidate": "Mike Hayden"
+        },
+        {
+          "label": "Docking and Montgomery Dem.",
+          "contest": "governor",
+          "candidate": "Thomas R. Docking"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.093,
+        0.074,
+        0.91,
+        1.0
+      ],
+      "hint": "Read only the table headed 'GOVERNOR-LIEUTENANT GOVERNOR'; ignore any other table visible in the image.",
+      "bands": 3,
+      "header": [
+        0.0,
+        0.0756
+      ]
+    },
+    {
+      "page": 72,
+      "id": "72-0",
+      "columns": [
+        {
+          "label": "Hayden and Walker Rep",
+          "contest": "governor",
+          "candidate": "Mike Hayden"
+        },
+        {
+          "label": "Docking and Montgomery Dem",
+          "contest": "governor",
+          "candidate": "Thomas R. Docking"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.047,
+        0.128,
+        0.878,
+        0.912
+      ],
+      "hint": "Read only the table headed \"GOVERNOR-LIEUTENANT GOVERNOR\u2014Cont'd\"; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.023
+      ]
+    }
+  ]
+}

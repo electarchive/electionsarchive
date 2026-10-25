@@ -1,0 +1,469 @@
+{
+  "polity": "US-KS",
+  "publisher": "Kansas Secretary of State",
+  "license": "Public record",
+  "raw_source": "us.ks_es",
+  "title": "Kansas election statistics 1970, general election",
+  "file": {
+    "url": "https://kgi.contentdm.oclc.org/digital/api/collection/p16884coll129/id/62/download"
+  },
+  "contests": {
+    "house1": {
+      "year": 1970,
+      "chamber": "house",
+      "day": "1970-11-03",
+      "special": false,
+      "state": "KS",
+      "district": 1
+    },
+    "house2": {
+      "year": 1970,
+      "chamber": "house",
+      "day": "1970-11-03",
+      "special": false,
+      "state": "KS",
+      "district": 2
+    },
+    "house3": {
+      "year": 1970,
+      "chamber": "house",
+      "day": "1970-11-03",
+      "special": false,
+      "state": "KS",
+      "district": 3
+    },
+    "house4": {
+      "year": 1970,
+      "chamber": "house",
+      "day": "1970-11-03",
+      "special": false,
+      "state": "KS",
+      "district": 4
+    },
+    "house5": {
+      "year": 1970,
+      "chamber": "house",
+      "day": "1970-11-03",
+      "special": false,
+      "state": "KS",
+      "district": 5
+    },
+    "governor": {
+      "year": 1970,
+      "chamber": "governor",
+      "day": "1970-11-03",
+      "special": false,
+      "state": "KS",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 12,
+      "id": "12-0",
+      "columns": [
+        {
+          "label": "Keith G. Sebelius, Rep.",
+          "contest": "house1",
+          "candidate": "Keith G. Sebelius"
+        },
+        {
+          "label": "Billy D. Jellison, Dem.",
+          "contest": "house1",
+          "candidate": "Billy D. Jellison"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.089,
+        0.084,
+        0.929,
+        0.839
+      ],
+      "hint": "Read only the table headed 'FOR CONGRESSMAN, FIRST DISTRICT'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1007
+      ]
+    },
+    {
+      "page": 13,
+      "id": "13-0",
+      "columns": [
+        {
+          "label": "Chester L. Mize, Rep.",
+          "contest": "house2",
+          "candidate": "Chester L. Mize"
+        },
+        {
+          "label": "Dr. William R. Roy, Dem.",
+          "contest": "house2",
+          "candidate": "William R. Roy"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.022,
+        0.064,
+        0.875,
+        0.43
+      ],
+      "hint": "Read only the table headed 'Primary Election, August 4, 1970 FOR CONGRESSMAN, SECOND DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 13,
+      "id": "13-1",
+      "columns": [
+        {
+          "label": "A. O. Tetzlaff, Rep.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Larry Winn, Jr., Rep.",
+          "contest": "house3",
+          "candidate": "Larry Winn, Jr."
+        },
+        {
+          "label": "James H. (Jim) DeCoursey, Dem.",
+          "contest": "house3",
+          "candidate": "James H. (Jim) DeCoursey, Jr."
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.022,
+        0.422,
+        0.875,
+        0.644
+      ],
+      "hint": "Read only the table headed 'Primary Election, August 4, 1970 FOR CONGRESSMAN, THIRD DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 13,
+      "id": "13-2",
+      "columns": [
+        {
+          "label": "Dell Crozier, Rep.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Garner E. Shriver, Rep",
+          "contest": "house4",
+          "candidate": "Garner E. Shriver"
+        },
+        {
+          "label": "James C. \"Jim\" Juhnke, Dem.",
+          "contest": "house4",
+          "candidate": "James C. (Jim) Juhnke"
+        },
+        {
+          "label": "Robert G. Martin, Dem",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.027,
+        0.636,
+        0.878,
+        0.869
+      ],
+      "hint": "Read only the table headed 'Primary Election, August 4, 1970 FOR CONGRESSMAN, FOURTH DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 14,
+      "id": "14-0",
+      "columns": [
+        {
+          "label": "Joe Skubitz, Rep.",
+          "contest": "house5",
+          "candidate": "Joe Skubitz"
+        },
+        {
+          "label": "T. D. (Ted) Saar, Jr., Dem.",
+          "contest": "house5",
+          "candidate": "T. D. (Ted) Saar, Jr."
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.108,
+        0.073,
+        0.944,
+        0.496
+      ],
+      "hint": "Read only the table headed 'Primary Election, August 4, 1970 FOR CONGRESSMAN, FIFTH DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 16,
+      "id": "16-0",
+      "columns": [
+        {
+          "label": "Col. Donald R. Conard, (Ret.) Rep.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Kent Frizzell, Rep.",
+          "contest": "governor",
+          "candidate": "Kent Frizzell"
+        },
+        {
+          "label": "Rick Harman, Rep.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Joseph V. Lindahl, Rep.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Raymond J. Van Skiver, Rep",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Robert Docking, Dem.",
+          "contest": "governor",
+          "candidate": "Robert Docking"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.08,
+        0.093,
+        0.933,
+        0.821
+      ],
+      "hint": "Read only the table headed 'FOR GOVERNOR\u2014CONCLUDED'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1126
+      ]
+    },
+    {
+      "page": 68,
+      "id": "68-0",
+      "columns": [
+        {
+          "label": "Keith G. Sebelius, Rep.",
+          "contest": "house1",
+          "candidate": "Keith G. Sebelius"
+        },
+        {
+          "label": "Billy D. Jellison, Dem.",
+          "contest": "house1",
+          "candidate": "Billy D. Jellison"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.046,
+        0.094,
+        0.894,
+        0.855
+      ],
+      "hint": "Read only the table headed 'FOR CONGRESSMAN, FIRST DISTRICT'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1064
+      ]
+    },
+    {
+      "page": 69,
+      "id": "69-0",
+      "columns": [
+        {
+          "label": "Chester L. Mize, Rep.",
+          "contest": "house2",
+          "candidate": "Chester L. Mize"
+        },
+        {
+          "label": "Dr. William R. Roy, Dem.",
+          "contest": "house2",
+          "candidate": "William R. Roy"
+        },
+        {
+          "label": "Fred Kilian, Con.",
+          "contest": "house2",
+          "candidate": "Fred Kilian"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.108,
+        0.093,
+        0.958,
+        0.444
+      ],
+      "hint": "Read only the table headed 'FOR CONGRESSMAN, SECOND DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 69,
+      "id": "69-1",
+      "columns": [
+        {
+          "label": "Larry Winn, Jr., Rep.",
+          "contest": "house3",
+          "candidate": "Larry Winn, Jr."
+        },
+        {
+          "label": "James H. (Jim) DeCoursey, Jr., Dem.",
+          "contest": "house3",
+          "candidate": "James H. (Jim) DeCoursey, Jr."
+        },
+        {
+          "label": "Warren E. Redding, Con.",
+          "contest": "house3",
+          "candidate": "Warren E. Redding"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.108,
+        0.436,
+        0.958,
+        0.65
+      ],
+      "hint": "Read only the table headed 'FOR CONGRESSMAN, THIRD DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 69,
+      "id": "69-2",
+      "columns": [
+        {
+          "label": "Garner E. Shriver, Rep.",
+          "contest": "house4",
+          "candidate": "Garner E. Shriver"
+        },
+        {
+          "label": "James C. \"Jim\" Juhnke, Dem.",
+          "contest": "house4",
+          "candidate": "James C. (Jim) Juhnke"
+        },
+        {
+          "label": "George W. Snell, Con.",
+          "contest": "house4",
+          "candidate": "George W. Snell"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.108,
+        0.642,
+        0.951,
+        0.859
+      ],
+      "hint": "Read only the table headed 'FOR CONGRESSMAN, FOURTH DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 70,
+      "id": "70-0",
+      "columns": [
+        {
+          "label": "Joe Skubitz, Rep.",
+          "contest": "house5",
+          "candidate": "Joe Skubitz"
+        },
+        {
+          "label": "T. D. (Ted) Saar, Jr., Dem.",
+          "contest": "house5",
+          "candidate": "T. D. (Ted) Saar, Jr."
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.047,
+        0.096,
+        0.898,
+        0.509
+      ],
+      "hint": "Read only the table headed 'FOR CONGRESSMAN, FIFTH DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 71,
+      "id": "71-0",
+      "columns": [
+        {
+          "label": "Kent Frizzell, Rep.",
+          "contest": "governor",
+          "candidate": "Kent Frizzell"
+        },
+        {
+          "label": "Robert Docking, Dem.",
+          "contest": "governor",
+          "candidate": "Robert Docking"
+        },
+        {
+          "label": "P. Everett Sperry, Con.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Marshall Uncapher, Prohib.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.117,
+        0.104,
+        0.966,
+        1.0
+      ],
+      "hint": "Read only the table headed 'FOR GOVERNOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0826
+      ]
+    },
+    {
+      "page": 72,
+      "id": "72-0",
+      "columns": [
+        {
+          "label": "Kent Frizzell, Rep.",
+          "contest": "governor",
+          "candidate": "Kent Frizzell"
+        },
+        {
+          "label": "Robert Docking, Dem.",
+          "contest": "governor",
+          "candidate": "Robert Docking"
+        },
+        {
+          "label": "P. Everett Sperry, Con.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Marshall Uncapher, Prohib.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.042,
+        0.103,
+        0.892,
+        0.762
+      ],
+      "hint": "Read only the table headed 'FOR GOVERNOR\u2014Concluded'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1093
+      ]
+    }
+  ]
+}

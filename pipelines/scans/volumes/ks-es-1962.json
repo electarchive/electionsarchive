@@ -1,0 +1,45 @@
+{
+ "polity": "US-KS",
+ "publisher": "Kansas Secretary of State",
+ "license": "Public record",
+ "raw_source": "us.ks_es",
+ "year": 1962,
+ "day": "1962-11-06",
+ "title": "Kansas election statistics 1962, general election",
+ "file": {
+  "url": "https://kgi.contentdm.oclc.org/digital/api/collection/p16884coll129/id/58/download"
+ },
+ "offices": {
+  "president": "presidential electors (President and Vice President)",
+  "governor": "Governor",
+  "senate": "U.S. Senator",
+  "house": "U.S. Representative, one table per district or all districts in column groups, county rows"
+ },
+ "leaves": [
+  13,
+  14,
+  15,
+  16,
+  17,
+  18,
+  19,
+  20,
+  21,
+  22,
+  23,
+  24,
+  51,
+  52,
+  53,
+  54,
+  55,
+  56,
+  57,
+  58,
+  59,
+  60,
+  61,
+  62
+ ],
+ "autorotate": true
+}

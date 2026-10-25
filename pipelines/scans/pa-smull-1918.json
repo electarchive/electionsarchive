@@ -1,0 +1,1143 @@
+{
+  "polity": "US-PA",
+  "publisher": "Pennsylvania Senate (Smull's Legislative Hand Book)",
+  "title": "Smull's Legislative Hand Book, 1919, general election 1918-11-05, Representatives in Congress by county and district",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/smullslegislativ1919unse/page/n{page}_w2000.jpg",
+    "item": "https://archive.org/details/smullslegislativ1919unse"
+  },
+  "raw_source": "us.scans",
+  "contests": {
+    "house1": {
+      "year": 1918,
+      "chamber": "house",
+      "day": "1918-11-05",
+      "special": false,
+      "state": "PA",
+      "district": 1
+    },
+    "house2": {
+      "year": 1918,
+      "chamber": "house",
+      "day": "1918-11-05",
+      "special": false,
+      "state": "PA",
+      "district": 2
+    },
+    "house3": {
+      "year": 1918,
+      "chamber": "house",
+      "day": "1918-11-05",
+      "special": false,
+      "state": "PA",
+      "district": 3
+    },
+    "house4": {
+      "year": 1918,
+      "chamber": "house",
+      "day": "1918-11-05",
+      "special": false,
+      "state": "PA",
+      "district": 4
+    },
+    "house5": {
+      "year": 1918,
+      "chamber": "house",
+      "day": "1918-11-05",
+      "special": false,
+      "state": "PA",
+      "district": 5
+    },
+    "house6": {
+      "year": 1918,
+      "chamber": "house",
+      "day": "1918-11-05",
+      "special": false,
+      "state": "PA",
+      "district": 6
+    },
+    "house7": {
+      "year": 1918,
+      "chamber": "house",
+      "day": "1918-11-05",
+      "special": false,
+      "state": "PA",
+      "district": 7
+    },
+    "house8": {
+      "year": 1918,
+      "chamber": "house",
+      "day": "1918-11-05",
+      "special": false,
+      "state": "PA",
+      "district": 8
+    },
+    "house9": {
+      "year": 1918,
+      "chamber": "house",
+      "day": "1918-11-05",
+      "special": false,
+      "state": "PA",
+      "district": 9
+    },
+    "house10": {
+      "year": 1918,
+      "chamber": "house",
+      "day": "1918-11-05",
+      "special": false,
+      "state": "PA",
+      "district": 10
+    },
+    "house11": {
+      "year": 1918,
+      "chamber": "house",
+      "day": "1918-11-05",
+      "special": false,
+      "state": "PA",
+      "district": 11
+    },
+    "house12": {
+      "year": 1918,
+      "chamber": "house",
+      "day": "1918-11-05",
+      "special": false,
+      "state": "PA",
+      "district": 12
+    },
+    "house13": {
+      "year": 1918,
+      "chamber": "house",
+      "day": "1918-11-05",
+      "special": false,
+      "state": "PA",
+      "district": 13
+    },
+    "house14": {
+      "year": 1918,
+      "chamber": "house",
+      "day": "1918-11-05",
+      "special": false,
+      "state": "PA",
+      "district": 14
+    },
+    "house15": {
+      "year": 1918,
+      "chamber": "house",
+      "day": "1918-11-05",
+      "special": false,
+      "state": "PA",
+      "district": 15
+    },
+    "house16": {
+      "year": 1918,
+      "chamber": "house",
+      "day": "1918-11-05",
+      "special": false,
+      "state": "PA",
+      "district": 16
+    },
+    "house17": {
+      "year": 1918,
+      "chamber": "house",
+      "day": "1918-11-05",
+      "special": false,
+      "state": "PA",
+      "district": 17
+    },
+    "house18": {
+      "year": 1918,
+      "chamber": "house",
+      "day": "1918-11-05",
+      "special": false,
+      "state": "PA",
+      "district": 18
+    },
+    "house19": {
+      "year": 1918,
+      "chamber": "house",
+      "day": "1918-11-05",
+      "special": false,
+      "state": "PA",
+      "district": 19
+    },
+    "house20": {
+      "year": 1918,
+      "chamber": "house",
+      "day": "1918-11-05",
+      "special": false,
+      "state": "PA",
+      "district": 20
+    },
+    "house21": {
+      "year": 1918,
+      "chamber": "house",
+      "day": "1918-11-05",
+      "special": false,
+      "state": "PA",
+      "district": 21
+    },
+    "house22": {
+      "year": 1918,
+      "chamber": "house",
+      "day": "1918-11-05",
+      "special": false,
+      "state": "PA",
+      "district": 22
+    },
+    "house23": {
+      "year": 1918,
+      "chamber": "house",
+      "day": "1918-11-05",
+      "special": false,
+      "state": "PA",
+      "district": 23
+    },
+    "house24": {
+      "year": 1918,
+      "chamber": "house",
+      "day": "1918-11-05",
+      "special": false,
+      "state": "PA",
+      "district": 24
+    },
+    "house25": {
+      "year": 1918,
+      "chamber": "house",
+      "day": "1918-11-05",
+      "special": false,
+      "state": "PA",
+      "district": 25
+    },
+    "house26": {
+      "year": 1918,
+      "chamber": "house",
+      "day": "1918-11-05",
+      "special": false,
+      "state": "PA",
+      "district": 26
+    },
+    "house27": {
+      "year": 1918,
+      "chamber": "house",
+      "day": "1918-11-05",
+      "special": false,
+      "state": "PA",
+      "district": 27
+    },
+    "house28": {
+      "year": 1918,
+      "chamber": "house",
+      "day": "1918-11-05",
+      "special": false,
+      "state": "PA",
+      "district": 28
+    },
+    "house29": {
+      "year": 1918,
+      "chamber": "house",
+      "day": "1918-11-05",
+      "special": false,
+      "state": "PA",
+      "district": 29
+    },
+    "house30": {
+      "year": 1918,
+      "chamber": "house",
+      "day": "1918-11-05",
+      "special": false,
+      "state": "PA",
+      "district": 30
+    },
+    "house31": {
+      "year": 1918,
+      "chamber": "house",
+      "day": "1918-11-05",
+      "special": false,
+      "state": "PA",
+      "district": 31
+    }
+  },
+  "pages": [
+    {
+      "page": 941,
+      "id": "941-0",
+      "columns": [
+        { "label": "William S. Vare, Rep.", "contest": null, "candidate": "" },
+        { "label": "William S. Vare, Wash.", "contest": null, "candidate": "" },
+        {
+          "label": "William S. Vare, T. Meet.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Paul B. Cassidy, Dem.",
+          "contest": "house1",
+          "candidate": "Paul B Cassidy"
+        },
+        {
+          "label": "John Leonard Silvey, Soc.",
+          "contest": "house1",
+          "candidate": "John Leonard Silvey"
+        },
+        { "label": "Harvey McCort, Pro.", "contest": null, "candidate": "" },
+        { "label": "Harvey McCort, R. Prog.", "contest": null, "candidate": "" }
+      ],
+      "orientation": "counties_down",
+      "crop": [0.087, 0.368, 0.948, 0.572],
+      "hint": "Read only the table headed 'FIRST DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 941,
+      "id": "941-1",
+      "columns": [
+        { "label": "George S. Graham, Rep.", "contest": null, "candidate": "" },
+        {
+          "label": "George S. Graham, Wash.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "George S. Graham, T. Meet.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "John H. Berkley, Dem.",
+          "contest": "house2",
+          "candidate": "John H Berkley"
+        },
+        {
+          "label": "Harry Seidman, Soc.",
+          "contest": "house2",
+          "candidate": "Harry Seidman"
+        },
+        {
+          "label": "William Denick, Pro.",
+          "contest": "house2",
+          "candidate": "William Denick"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [0.087, 0.564, 0.948, 0.934],
+      "hint": "Read only the table headed 'SECOND DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 942,
+      "id": "942-0",
+      "columns": [
+        { "label": "J. Hampton Moore, Rep.", "contest": null, "candidate": "" },
+        { "label": "J. Hampton Moore, Pro.", "contest": null, "candidate": "" },
+        {
+          "label": "J. Hampton Moore, Wash.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. Hampton Moore, T. Meet.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "William A. Hayes, Dem.",
+          "contest": "house3",
+          "candidate": "William A Hayes"
+        },
+        {
+          "label": "John Fuchs, Soc.",
+          "contest": "house3",
+          "candidate": "John Fuchs"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [0.049, 0.049, 0.908, 0.449],
+      "hint": "Read only the table headed 'THIRD DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 942,
+      "id": "942-1",
+      "columns": [
+        {
+          "label": "George W. Edmonds, Rep.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "George W. Edmonds, Wash.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "George W. Edmonds, T. Meet.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Joseph E. Fabian, Dem.",
+          "contest": "house4",
+          "candidate": "Joseph E Fabian"
+        },
+        {
+          "label": "Jacob H. Root, Soc.",
+          "contest": "house4",
+          "candidate": "Jacob H Root"
+        },
+        {
+          "label": "John S. Hay, Pro.",
+          "contest": "house4",
+          "candidate": "John S Hay"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [0.049, 0.441, 0.91, 0.791],
+      "hint": "Read only the table headed 'FOURTH DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 943,
+      "id": "943-0",
+      "columns": [
+        {
+          "label": "Peter E. Costello, Rep.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Peter E. Costello, Soc.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Emanuel R. Clinton, Dem.",
+          "contest": "house5",
+          "candidate": "Emanuel R Clinton"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [0.07, 0.055, 0.93, 0.379],
+      "hint": "Read only the table headed 'FIFTH DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 943,
+      "id": "943-1",
+      "columns": [
+        { "label": "George P. Darrow, Rep.", "contest": null, "candidate": "" },
+        { "label": "George P. Darrow, Pro.", "contest": null, "candidate": "" },
+        {
+          "label": "John K. Laughlin, Dem.",
+          "contest": "house6",
+          "candidate": "John K Laughlin"
+        },
+        { "label": "John Fisler, Wash.", "contest": null, "candidate": "" },
+        { "label": "John Fisler, R. Prog.", "contest": null, "candidate": "" },
+        { "label": "John Fisler, T. Meet.", "contest": null, "candidate": "" }
+      ],
+      "orientation": "counties_down",
+      "crop": [0.059, 0.371, 0.921, 0.717],
+      "hint": "Read only the table headed 'SIXTH DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 943,
+      "id": "943-2",
+      "columns": [
+        {
+          "label": "Thomas S. Butler, Rep.",
+          "contest": "house7",
+          "candidate": "Thomas Stalker Butler"
+        },
+        {
+          "label": "James G. Milbourn, Dem.",
+          "contest": "house7",
+          "candidate": "James G Milbourn"
+        },
+        {
+          "label": "Howard B. Melody, Soc.",
+          "contest": "house7",
+          "candidate": "Howard B Melody"
+        },
+        {
+          "label": "Luther S. Kauffman, Pro.",
+          "contest": "house7",
+          "candidate": "Luther S Kauffman"
+        },
+        { "label": "Scattering.", "contest": null, "candidate": "" }
+      ],
+      "orientation": "counties_down",
+      "crop": [0.054, 0.709, 0.918, 0.968],
+      "hint": "Read only the table headed 'SEVENTH DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 944,
+      "id": "944-0",
+      "columns": [
+        {
+          "label": "Henry Winfield Watson. Rep.",
+          "contest": "house8",
+          "candidate": "Henry Winfield Watson"
+        },
+        { "label": "Harry E. Grim. Dem.", "contest": null, "candidate": "" },
+        {
+          "label": "Harry E. Grim. Fair Play.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Elmer H. Young. Soc.",
+          "contest": "house8",
+          "candidate": "Elmer H Young"
+        },
+        {
+          "label": "Theodore Koons. Pro.",
+          "contest": "house8",
+          "candidate": "Theodore Koons"
+        },
+        { "label": "Scattering.", "contest": null, "candidate": "" }
+      ],
+      "orientation": "counties_down",
+      "crop": [0.053, 0.042, 0.911, 0.347],
+      "hint": "Read only the table headed 'EIGHTH DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 944,
+      "id": "944-1",
+      "columns": [
+        {
+          "label": "William W. Griest. Rep.",
+          "contest": "house9",
+          "candidate": "William Walton Griest"
+        },
+        {
+          "label": "Austin E. McCullough. Dem.",
+          "contest": "house9",
+          "candidate": "Austin E McCullough"
+        },
+        {
+          "label": "S. S. Watts. Pro.",
+          "contest": "house9",
+          "candidate": "S S Watts"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [0.053, 0.339, 0.911, 0.658],
+      "hint": "Read only the table headed 'NINTH DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 944,
+      "id": "944-2",
+      "columns": [
+        { "label": "John R. Farr. Rep.", "contest": null, "candidate": "" },
+        { "label": "John R. Farr. Pro.", "contest": null, "candidate": "" },
+        { "label": "John R. Farr. Wash.", "contest": null, "candidate": "" },
+        { "label": "Patrick McLane. Dem.", "contest": null, "candidate": "" },
+        {
+          "label": "Patrick McLane. Fair Play.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Edward Robling. Soc.",
+          "contest": "house10",
+          "candidate": "Edward Robling"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [0.051, 0.65, 0.911, 0.929],
+      "hint": "Read only the table headed 'TENTH DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 945,
+      "id": "945-0",
+      "columns": [
+        {
+          "label": "Edmund N. Carpenter. Rep.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Edmund N. Carpenter. Pro.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Edmund N. Carpenter. Wash.",
+          "contest": null,
+          "candidate": ""
+        },
+        { "label": "John J. Casey. Dem.", "contest": null, "candidate": "" },
+        { "label": "John J. Casey. Soc.", "contest": null, "candidate": "" },
+        {
+          "label": "John J. Casey. R. Prog.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "John J. Casey. Fair Play.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [0.058, 0.041, 0.92, 0.332],
+      "hint": "Read only the table headed 'ELEVENTH DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 945,
+      "id": "945-1",
+      "columns": [
+        {
+          "label": "John Reber. Rep.",
+          "contest": "house12",
+          "candidate": "John Reber"
+        },
+        { "label": "James J. Moran. Dem.", "contest": null, "candidate": "" },
+        {
+          "label": "James J. Moran. Fair Play.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "F. C. Clarke. Soc.",
+          "contest": "house12",
+          "candidate": "F C Clarke"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [0.058, 0.324, 0.923, 0.664],
+      "hint": "Read only the table headed 'TWELFTH DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 945,
+      "id": "945-2",
+      "columns": [
+        { "label": "J. Wilmer Fisher. Rep.", "contest": null, "candidate": "" },
+        {
+          "label": "J. Wilmer Fisher. Wash.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. Wilmer Fisher. R. Prog.",
+          "contest": null,
+          "candidate": ""
+        },
+        { "label": "Arthur G. Dewalt. Dem.", "contest": null, "candidate": "" },
+        {
+          "label": "Arthur G. Dewalt. Fair Play.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "L. Birch Wilson, Jr. Soc.",
+          "contest": "house13",
+          "candidate": "L Birch Jr. Wilson"
+        },
+        {
+          "label": "E. J. Fithian. Pro.",
+          "contest": "house13",
+          "candidate": "E J Fithian"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [0.06, 0.656, 0.925, 0.979],
+      "hint": "Read only the table headed 'THIRTEENTH DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 946,
+      "id": "946-0",
+      "columns": [
+        {
+          "label": "Louis T. McFadden. Rep.",
+          "contest": "house14",
+          "candidate": "Louis Thomas McFadden"
+        },
+        {
+          "label": "A. M. Cornell. Dem.",
+          "contest": "house14",
+          "candidate": "A M Cornell"
+        },
+        {
+          "label": "William Shellenberger. Soc.",
+          "contest": "house14",
+          "candidate": "William Shellenberger"
+        },
+        {
+          "label": "Edwin P. Young. Pro.",
+          "contest": "house14",
+          "candidate": "Edwin P Young"
+        },
+        { "label": "Scattering.", "contest": null, "candidate": "" }
+      ],
+      "orientation": "counties_down",
+      "crop": [0.04, 0.036, 0.898, 0.334],
+      "hint": "Read only the table headed 'FOURTEENTH DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 946,
+      "id": "946-1",
+      "columns": [
+        { "label": "Edgar R. Kiess. Rep.", "contest": null, "candidate": "" },
+        { "label": "Edgar R. Kiess. Pro.", "contest": null, "candidate": "" },
+        {
+          "label": "Charles E. Spotts. Dem.",
+          "contest": "house15",
+          "candidate": "Charles E Spotts"
+        },
+        {
+          "label": "P. A. McGowan. Soc.",
+          "contest": "house15",
+          "candidate": "P A McGowan"
+        },
+        { "label": "Scattering.", "contest": null, "candidate": "" }
+      ],
+      "orientation": "counties_down",
+      "crop": [0.04, 0.326, 0.898, 0.642],
+      "hint": "Read only the table headed 'FIFTEENTH DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 946,
+      "id": "946-2",
+      "columns": [
+        {
+          "label": "Albert W. Duy. Rep.",
+          "contest": "house16",
+          "candidate": "Albert W Duy"
+        },
+        {
+          "label": "John V. Lesher. Dem.",
+          "contest": "house16",
+          "candidate": "John Vandling Lesher"
+        },
+        {
+          "label": "J. S. Ray. Soc.",
+          "contest": "house16",
+          "candidate": "J S Ray"
+        },
+        {
+          "label": "W. W. Haffner. Pro.",
+          "contest": "house16",
+          "candidate": "W W Haffner"
+        },
+        { "label": "Scattering.", "contest": null, "candidate": "" }
+      ],
+      "orientation": "counties_down",
+      "crop": [0.042, 0.634, 0.898, 0.934],
+      "hint": "Read only the table headed 'SIXTEENTH DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 947,
+      "id": "947-0",
+      "columns": [
+        {
+          "label": "Benjamin K. Focht. Rep.",
+          "contest": "house17",
+          "candidate": "Benjamin Kurtz Focht"
+        },
+        { "label": "Scott S. Leiby. Dem.", "contest": null, "candidate": "" },
+        { "label": "Scott S. Leiby. Pro.", "contest": null, "candidate": "" },
+        {
+          "label": "George Bingham. Soc.",
+          "contest": "house17",
+          "candidate": "George Bingham"
+        },
+        { "label": "Scattering.", "contest": null, "candidate": "" }
+      ],
+      "orientation": "counties_down",
+      "crop": [0.072, 0.031, 0.931, 0.357],
+      "hint": "Read only the table headed 'SEVENTEENTH DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 947,
+      "id": "947-1",
+      "columns": [
+        {
+          "label": "Aaron S. Kreider. Rep.",
+          "contest": "house18",
+          "candidate": "Aaron Shenk Kreider"
+        },
+        {
+          "label": "John W. Coldren. Soc.",
+          "contest": "house18",
+          "candidate": "John W Coldren"
+        },
+        {
+          "label": "John A. Sprenkle. Pro.",
+          "contest": "house18",
+          "candidate": "John A Sprenkle"
+        },
+        { "label": "Scattering.", "contest": null, "candidate": "" }
+      ],
+      "orientation": "counties_down",
+      "crop": [0.075, 0.349, 0.938, 0.638],
+      "hint": "Read only the table headed 'EIGHTEENTH DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 947,
+      "id": "947-2",
+      "columns": [
+        { "label": "John M. Rose. Rep.", "contest": null, "candidate": "" },
+        { "label": "John M. Rose. Pro.", "contest": null, "candidate": "" },
+        { "label": "John M. Rose. Wash.", "contest": null, "candidate": "" },
+        { "label": "John M. Rose. R. Prog.", "contest": null, "candidate": "" },
+        {
+          "label": "Bernard J. Clark. Dem.",
+          "contest": "house19",
+          "candidate": "Bernard J Clark"
+        },
+        {
+          "label": "R. G. Seaman. Soc.",
+          "contest": "house19",
+          "candidate": "R G Seaman"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [0.077, 0.63, 0.94, 0.916],
+      "hint": "Read only the table headed 'NINETEENTH DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 948,
+      "id": "948-0",
+      "columns": [
+        { "label": "Edward S. Brooks. Rep.", "contest": null, "candidate": "" },
+        {
+          "label": "Edward S. Brooks. Wash.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Andrew R. Brodbeck. Dem.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Andrew R. Brodbeck. Pro.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "C. Wm. Thompson. Soc.",
+          "contest": "house20",
+          "candidate": "C William Thompson"
+        },
+        { "label": "Scattering.", "contest": null, "candidate": "" }
+      ],
+      "orientation": "counties_down",
+      "crop": [0.044, 0.056, 0.906, 0.358],
+      "hint": "Read only the table headed 'TWENTIETH DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 948,
+      "id": "948-1",
+      "columns": [
+        { "label": "Evan J. Jones. Rep.", "contest": null, "candidate": "" },
+        { "label": "Evan J. Jones. Soc.", "contest": null, "candidate": "" },
+        { "label": "Evan J. Jones. Wash.", "contest": null, "candidate": "" },
+        {
+          "label": "William E. Tobias. Dem.",
+          "contest": "house21",
+          "candidate": "William E Tobias"
+        },
+        {
+          "label": "Harry W. Brown. Pro.",
+          "contest": "house21",
+          "candidate": "Harry W Brown"
+        },
+        { "label": "Scattering.", "contest": null, "candidate": "" }
+      ],
+      "orientation": "counties_down",
+      "crop": [0.044, 0.35, 0.906, 0.696],
+      "hint": "Read only the table headed 'TWENTY-FIRST DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 948,
+      "id": "948-2",
+      "columns": [
+        {
+          "label": "Edward E. Robbins. Rep.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Edward E. Robbins. Pro.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "George H. McWherter. Dem.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "George H. McWherter. Fair Play.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Max Cenis. Soc.",
+          "contest": "house22",
+          "candidate": "Max Cenis"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [0.044, 0.688, 0.906, 0.984],
+      "hint": "Read only the table headed 'TWENTY-SECOND DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 949,
+      "id": "949-0",
+      "columns": [
+        {
+          "label": "Samuel A. Kendall. Rep.",
+          "contest": "house23",
+          "candidate": "Samuel Austin Kendall"
+        },
+        {
+          "label": "Bruce F. Sterling. Dem.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Bruce F. Sterling, Pro.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Louis S. Mellinger. Soc.",
+          "contest": "house23",
+          "candidate": "Louis S Mellinger"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [0.072, 0.058, 0.936, 0.373],
+      "hint": "Read only the table headed 'TWENTY-THIRD DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 949,
+      "id": "949-1",
+      "columns": [
+        { "label": "Henry W. Temple. Rep.", "contest": null, "candidate": "" },
+        { "label": "Henry W. Temple. Pro.", "contest": null, "candidate": "" },
+        {
+          "label": "William M. Hartman. Dem.",
+          "contest": "house24",
+          "candidate": "William M Hartman"
+        },
+        {
+          "label": "Walter V. Tyler. Soc.",
+          "contest": "house24",
+          "candidate": "Walter V Tyler"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [0.076, 0.365, 0.94, 0.707],
+      "hint": "Read only the table headed 'TWENTY-FOURTH DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 949,
+      "id": "949-2",
+      "columns": [
+        { "label": "Milton W. Shreve. Rep.", "contest": null, "candidate": "" },
+        {
+          "label": "Milton W. Shreve. Wash.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Milton W. Shreve. R. Prog.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Charles N. Crosby. Dem.",
+          "contest": "house25",
+          "candidate": "Charles N Crosby"
+        },
+        {
+          "label": "Ralph W. Tillotson. Soc.",
+          "contest": "house25",
+          "candidate": "Ralph W Tillotson"
+        },
+        {
+          "label": "William H. Kerschner. Pro.",
+          "contest": "house25",
+          "candidate": "William H Kerschner"
+        },
+        { "label": "Scattering.", "contest": null, "candidate": "" }
+      ],
+      "orientation": "counties_down",
+      "crop": [0.078, 0.699, 0.942, 0.995],
+      "hint": "Read only the table headed 'TWENTY-FIFTH DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 950,
+      "id": "950-0",
+      "columns": [
+        {
+          "label": "Francis A. March, Jr. Rep.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Francis A. March, Jr. Wash.",
+          "contest": null,
+          "candidate": ""
+        },
+        { "label": "Henry J. Steele. Dem.", "contest": null, "candidate": "" },
+        {
+          "label": "Henry J. Steele. Fair Play.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "John B. Lerch. Soc.",
+          "contest": "house26",
+          "candidate": "John B Lerch"
+        },
+        {
+          "label": "Delbert Strader Bachman. Pro.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Delbert Strader Bachman. I. Prog.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [0.039, 0.052, 0.895, 0.343],
+      "hint": "Read only the table headed 'TWENTY-SIXTH DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 950,
+      "id": "950-1",
+      "columns": [
+        { "label": "Nathan L. Strong. Rep.", "contest": null, "candidate": "" },
+        { "label": "Nathan L. Strong. Pro.", "contest": null, "candidate": "" },
+        {
+          "label": "Don C. Corbett. Dem.",
+          "contest": "house27",
+          "candidate": "Don C Corbett"
+        },
+        {
+          "label": "Frank H. Brantlinger. Soc.",
+          "contest": "house27",
+          "candidate": "Frank H Brantinger"
+        },
+        { "label": "Scattering.", "contest": null, "candidate": "" }
+      ],
+      "orientation": "counties_down",
+      "crop": [0.037, 0.335, 0.897, 0.646],
+      "hint": "Read only the table headed 'TWENTY-SEVENTH DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 950,
+      "id": "950-2",
+      "columns": [
+        {
+          "label": "Willis J. Hulings. Rep.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Willis J. Hulings. Wash.",
+          "contest": null,
+          "candidate": ""
+        },
+        { "label": "Earl H. Beshlin. Dem.", "contest": null, "candidate": "" },
+        { "label": "Earl H. Beshlin. Pro.", "contest": null, "candidate": "" },
+        {
+          "label": "M. V. Ball. Soc.",
+          "contest": "house28",
+          "candidate": "M V Ball"
+        },
+        { "label": "Scattering.", "contest": null, "candidate": "" }
+      ],
+      "orientation": "counties_down",
+      "crop": [0.037, 0.638, 0.898, 0.952],
+      "hint": "Read only the table headed 'TWENTY-EIGHTH DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 951,
+      "id": "951-0",
+      "columns": [
+        {
+          "label": "Stephen G. Porter. Rep.",
+          "contest": "house29",
+          "candidate": "C G Porter"
+        },
+        {
+          "label": "Stephen G. Porter. Dem.",
+          "contest": "house29",
+          "candidate": "C G Porter"
+        },
+        {
+          "label": "Stephen G. Porter. Wash.",
+          "contest": "house29",
+          "candidate": "C G Porter"
+        },
+        {
+          "label": "Henry Peter. Soc.",
+          "contest": "house29",
+          "candidate": "Henry Peter"
+        },
+        {
+          "label": "C. G. Porter. Pro.",
+          "contest": "house29",
+          "candidate": "C G Porter"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [0.08, 0.048, 0.942, 0.348],
+      "hint": "Read only the table headed 'TWENTY-NINTH DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 951,
+      "id": "951-1",
+      "columns": [
+        { "label": "M. Clyde Kelly. Rep.", "contest": null, "candidate": "" },
+        { "label": "M. Clyde Kelly. Dem.", "contest": null, "candidate": "" },
+        { "label": "M. Clyde Kelly. Pro.", "contest": null, "candidate": "" },
+        { "label": "M. Clyde Kelly. Wash.", "contest": null, "candidate": "" },
+        {
+          "label": "M. Clyde Kelly. R. Prog.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "H. J. Lohr. Soc.",
+          "contest": "house30",
+          "candidate": "H J Lohr"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [0.08, 0.34, 0.942, 0.697],
+      "hint": "Read only the table headed 'THIRTIETH DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 951,
+      "id": "951-2",
+      "columns": [
+        { "label": "John M. Morin. Rep.", "contest": null, "candidate": "" },
+        { "label": "John M. Morin. Dem.", "contest": null, "candidate": "" },
+        { "label": "John M. Morin. Wash.", "contest": null, "candidate": "" },
+        {
+          "label": "John M. Morin. R. Prog.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "William A. Prosser. Soc.",
+          "contest": "house31",
+          "candidate": "William A Prosser"
+        },
+        {
+          "label": "F. C. Brittain. Pro.",
+          "contest": "house31",
+          "candidate": "F C Brittain"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [0.08, 0.689, 0.942, 0.992],
+      "hint": "Read only the table headed 'THIRTY-FIRST DISTRICT.'; ignore any other table visible in the image."
+    }
+  ]
+}

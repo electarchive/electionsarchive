@@ -1,0 +1,443 @@
+{
+  "polity": "US-MA",
+  "publisher": "Massachusetts Secretary of the Commonwealth",
+  "title": "A Manual for the Use of the General Court, 1888 Representatives in Congress by town",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/amanualforusege04coolgoog/page/n{page}_w2000.jpg",
+    "item": "https://archive.org/details/amanualforusege04coolgoog"
+  },
+  "raw_source": "us.scans",
+  "unit_scheme": "town",
+  "unit_codes": { "Gay Head": "25007" },
+  "contests": {
+    "house1": {
+      "year": 1888,
+      "chamber": "house",
+      "day": "1888-11-06",
+      "special": false,
+      "state": "MA",
+      "district": 1
+    },
+    "house2": {
+      "year": 1888,
+      "chamber": "house",
+      "day": "1888-11-06",
+      "special": false,
+      "state": "MA",
+      "district": 2
+    },
+    "house3": {
+      "year": 1888,
+      "chamber": "house",
+      "day": "1888-11-06",
+      "special": false,
+      "state": "MA",
+      "district": 3
+    },
+    "house4": {
+      "year": 1888,
+      "chamber": "house",
+      "day": "1888-11-06",
+      "special": false,
+      "state": "MA",
+      "district": 4
+    },
+    "house5": {
+      "year": 1888,
+      "chamber": "house",
+      "day": "1888-11-06",
+      "special": false,
+      "state": "MA",
+      "district": 5
+    },
+    "house6": {
+      "year": 1888,
+      "chamber": "house",
+      "day": "1888-11-06",
+      "special": false,
+      "state": "MA",
+      "district": 6
+    },
+    "house7": {
+      "year": 1888,
+      "chamber": "house",
+      "day": "1888-11-06",
+      "special": false,
+      "state": "MA",
+      "district": 7
+    },
+    "house8": {
+      "year": 1888,
+      "chamber": "house",
+      "day": "1888-11-06",
+      "special": false,
+      "state": "MA",
+      "district": 8
+    },
+    "house9": {
+      "year": 1888,
+      "chamber": "house",
+      "day": "1888-11-06",
+      "special": false,
+      "state": "MA",
+      "district": 9
+    },
+    "house10": {
+      "year": 1888,
+      "chamber": "house",
+      "day": "1888-11-06",
+      "special": false,
+      "state": "MA",
+      "district": 10
+    },
+    "house11": {
+      "year": 1888,
+      "chamber": "house",
+      "day": "1888-11-06",
+      "special": false,
+      "state": "MA",
+      "district": 11
+    },
+    "house12": {
+      "year": 1888,
+      "chamber": "house",
+      "day": "1888-11-06",
+      "special": false,
+      "state": "MA",
+      "district": 12
+    }
+  },
+  "pages": [
+    {
+      "page": 318,
+      "id": "318-0",
+      "columns": [
+        {
+          "label": "Randall.",
+          "contest": "house1",
+          "candidate": "Charles Sturtevant Randall"
+        },
+        { "label": "Cummings.", "contest": "house1", "candidate": "Cummings" },
+        { "label": "Delano.", "contest": "house1", "candidate": "Delano" },
+        { "label": "Miller.", "contest": "house1", "candidate": "Miller" },
+        { "label": "All others.", "contest": "house1", "candidate": "Others" }
+      ],
+      "orientation": "counties_down",
+      "crop": [0.135, 0.208, 0.9, 0.916],
+      "hint": "Read only the table headed 'Congressional District No. 1.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [0.0, 0.1667]
+    },
+    {
+      "page": 319,
+      "id": "319-0",
+      "columns": [
+        {
+          "label": "Morse.",
+          "contest": "house2",
+          "candidate": "Elijah Adams Morse"
+        },
+        { "label": "Quincy.", "contest": null, "candidate": "" },
+        { "label": "Phillips.", "contest": "house2", "candidate": "Phillips" },
+        { "label": "Josiah A. Quincy.", "contest": null, "candidate": "" },
+        { "label": "All others.", "contest": "house2", "candidate": "Others" }
+      ],
+      "orientation": "counties_down",
+      "crop": [0.087, 0.104, 0.848, 0.797],
+      "hint": "Read only the table headed 'Congressional District No. 2.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [0.0, 0.176]
+    },
+    {
+      "page": 320,
+      "id": "320-0",
+      "columns": [
+        {
+          "label": "Andrew.",
+          "contest": "house3",
+          "candidate": "John Forrester Andrew"
+        },
+        { "label": "Beard.", "contest": "house3", "candidate": "Beard" },
+        { "label": "Shugg.", "contest": "house3", "candidate": "Shugg" },
+        { "label": "All others.", "contest": "house3", "candidate": "Others" }
+      ],
+      "orientation": "counties_down",
+      "crop": [0.104, 0.176, 0.87, 0.54],
+      "hint": "Read only the table headed 'Congressional District No. 3.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 320,
+      "id": "320-1",
+      "columns": [
+        {
+          "label": "O'Neil.",
+          "contest": "house4",
+          "candidate": "Joseph Henry O\u2019Neil"
+        },
+        { "label": "Morrison.", "contest": "house4", "candidate": "Morrison" },
+        { "label": "Whitcomb.", "contest": "house4", "candidate": "Whitcomb" },
+        { "label": "All others.", "contest": "house4", "candidate": "Others" }
+      ],
+      "orientation": "counties_down",
+      "crop": [0.104, 0.532, 0.87, 0.848],
+      "hint": "Read only the table headed 'Congressional District No. 4.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 320,
+      "id": "320-2",
+      "columns": [
+        {
+          "label": "Banks.",
+          "contest": "house5",
+          "candidate": "Nathaniel Prentice Banks"
+        },
+        {
+          "label": "Higginson.",
+          "contest": "house5",
+          "candidate": "Higginson"
+        },
+        { "label": "Kendall.", "contest": "house5", "candidate": "Kendall" },
+        { "label": "All others.", "contest": "house5", "candidate": "Others" }
+      ],
+      "orientation": "counties_down",
+      "crop": [0.104, 0.84, 0.87, 1.0],
+      "hint": "Read only the table headed 'Congressional District No. 5.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 321,
+      "id": "321-0",
+      "columns": [
+        {
+          "label": "Lodge.",
+          "contest": "house6",
+          "candidate": "Henry Cabot Lodge"
+        },
+        { "label": "Usher.", "contest": "house6", "candidate": "Usher" },
+        { "label": "Crosman.", "contest": "house6", "candidate": "Crosman" },
+        { "label": "All others.", "contest": "house6", "candidate": "Others" }
+      ],
+      "orientation": "counties_down",
+      "crop": [0.119, 0.1, 0.881, 0.514],
+      "hint": "Read only the table headed 'Congressional District No. 6.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 321,
+      "id": "321-1",
+      "columns": [
+        {
+          "label": "Cogswell.",
+          "contest": "house7",
+          "candidate": "William Cogswell"
+        },
+        { "label": "Roads.", "contest": "house7", "candidate": "Roads" },
+        { "label": "Gregory.", "contest": "house7", "candidate": "Gregory" },
+        { "label": "All others.", "contest": null, "candidate": "" }
+      ],
+      "orientation": "counties_down",
+      "crop": [0.117, 0.506, 0.88, 1.0],
+      "hint": "Read only the table headed 'Congressional District No. 7.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [0.0, 0.2773]
+    },
+    {
+      "page": 322,
+      "id": "322-0",
+      "columns": [
+        {
+          "label": "Cogswell.",
+          "contest": "house7",
+          "candidate": "William Cogswell"
+        },
+        { "label": "Roads.", "contest": "house7", "candidate": "Roads" },
+        { "label": "Gregory.", "contest": "house7", "candidate": "Gregory" },
+        { "label": "All others.", "contest": null, "candidate": "" }
+      ],
+      "orientation": "counties_down",
+      "crop": [0.1, 0.137, 0.865, 0.518],
+      "hint": "Read only the table headed 'Congressional District No. 7\u2014Concluded.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 322,
+      "id": "322-1",
+      "columns": [
+        {
+          "label": "Greenhalge.",
+          "contest": "house8",
+          "candidate": "Frederic Thomas Greenhalge"
+        },
+        { "label": "Donovan.", "contest": "house8", "candidate": "Donovan" },
+        { "label": "Glidden.", "contest": "house8", "candidate": "Glidden" },
+        { "label": "All others.", "contest": "house8", "candidate": "Others" }
+      ],
+      "orientation": "counties_down",
+      "crop": [0.1, 0.51, 0.865, 1.0],
+      "hint": "Read only the table headed 'Congressional District No. 8.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [0.0, 0.2878]
+    },
+    {
+      "page": 323,
+      "id": "323-0",
+      "columns": [
+        {
+          "label": "Greenhalge.",
+          "contest": "house8",
+          "candidate": "Frederic Thomas Greenhalge"
+        },
+        { "label": "Donovan.", "contest": "house8", "candidate": "Donovan" },
+        { "label": "Glidden.", "contest": "house8", "candidate": "Glidden" },
+        { "label": "All others.", "contest": "house8", "candidate": "Others" }
+      ],
+      "orientation": "counties_down",
+      "crop": [0.117, 0.13, 0.898, 0.509],
+      "hint": "Read only the table headed 'Congressional District No. 8\u2014Concluded.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 323,
+      "id": "323-1",
+      "columns": [
+        {
+          "label": "Candler.",
+          "contest": "house9",
+          "candidate": "John Wilson Candler"
+        },
+        { "label": "Burnett.", "contest": "house9", "candidate": "Burnett" },
+        { "label": "Park.", "contest": "house9", "candidate": "Park" },
+        { "label": "All others.", "contest": "house9", "candidate": "Others" }
+      ],
+      "orientation": "counties_down",
+      "crop": [0.117, 0.501, 0.903, 1.0],
+      "hint": "Read only the table headed 'Congressional District No. 9.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [0.0, 0.2846]
+    },
+    {
+      "page": 324,
+      "id": "324-0",
+      "columns": [
+        {
+          "label": "Candler.",
+          "contest": "house9",
+          "candidate": "John Wilson Candler"
+        },
+        { "label": "Burnett.", "contest": "house9", "candidate": "Burnett" },
+        { "label": "Park.", "contest": "house9", "candidate": "Park" },
+        { "label": "All others.", "contest": "house9", "candidate": "Others" }
+      ],
+      "orientation": "counties_down",
+      "crop": [0.117, 0.14, 0.883, 0.622],
+      "hint": "Read only the table headed 'Congressional District No. 9 \u2014 Concluded.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [0.0, 0.2282]
+    },
+    {
+      "page": 324,
+      "id": "324-1",
+      "columns": [
+        {
+          "label": "Walker.",
+          "contest": "house10",
+          "candidate": "Joseph Henry Walker"
+        },
+        { "label": "Sayles.", "contest": "house10", "candidate": "Sayles" },
+        { "label": "Allen.", "contest": "house10", "candidate": "Allen" },
+        { "label": "All others.", "contest": "house10", "candidate": "Others" }
+      ],
+      "orientation": "counties_down",
+      "crop": [0.117, 0.614, 0.883, 1.0],
+      "hint": "Read only the table headed 'Congressional District No. 10.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 325,
+      "id": "325-0",
+      "columns": [
+        {
+          "label": "Walker.",
+          "contest": "house10",
+          "candidate": "Joseph Henry Walker"
+        },
+        { "label": "Sayles.", "contest": "house10", "candidate": "Sayles" },
+        { "label": "Allen.", "contest": "house10", "candidate": "Allen" },
+        { "label": "All others.", "contest": "house10", "candidate": "Others" }
+      ],
+      "orientation": "counties_down",
+      "crop": [0.124, 0.13, 0.89, 0.679],
+      "hint": "Read only the table headed 'Congressional District No. 10\u2014Concluded.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [0.0, 0.2004]
+    },
+    {
+      "page": 325,
+      "id": "325-1",
+      "columns": [
+        {
+          "label": "Wallace.",
+          "contest": "house11",
+          "candidate": "Rodney Wallace"
+        },
+        { "label": "Skinner.", "contest": "house11", "candidate": "Skinner" },
+        { "label": "Cowell.", "contest": "house11", "candidate": "Cowell" },
+        { "label": "All others.", "contest": "house11", "candidate": "Others" }
+      ],
+      "orientation": "counties_down",
+      "crop": [0.124, 0.671, 0.89, 1.0],
+      "hint": "Read only the table headed 'Congressional District No. 11.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 326,
+      "id": "326-0",
+      "columns": [
+        {
+          "label": "Wallace.",
+          "contest": "house11",
+          "candidate": "Rodney Wallace"
+        },
+        { "label": "Skinner.", "contest": "house11", "candidate": "Skinner" },
+        { "label": "Cowell.", "contest": "house11", "candidate": "Cowell" },
+        { "label": "All others.", "contest": "house11", "candidate": "Others" }
+      ],
+      "orientation": "counties_down",
+      "crop": [0.113, 0.143, 0.874, 1.0],
+      "hint": "Read only the table headed 'Congressional District No. 11 \u2014 Continued.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [0.0, 0.1307]
+    },
+    {
+      "page": 327,
+      "id": "327-0",
+      "columns": [
+        {
+          "label": "Wallace.",
+          "contest": "house11",
+          "candidate": "Rodney Wallace"
+        },
+        { "label": "Skinner.", "contest": "house11", "candidate": "Skinner" },
+        { "label": "Cowell.", "contest": "house11", "candidate": "Cowell" },
+        { "label": "All others.", "contest": "house11", "candidate": "Others" }
+      ],
+      "orientation": "counties_down",
+      "crop": [0.134, 0.118, 0.893, 0.483],
+      "hint": "Read only the table headed 'Congressional District No. 11 \u2014 Concluded.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 327,
+      "id": "327-1",
+      "columns": [
+        {
+          "label": "Rockwell.",
+          "contest": "house12",
+          "candidate": "Francis Williams Rockwell"
+        },
+        { "label": "Ely.", "contest": "house12", "candidate": "Ely" },
+        { "label": "Cutler.", "contest": "house12", "candidate": "Cutler" },
+        { "label": "All others.", "contest": "house12", "candidate": "Others" }
+      ],
+      "orientation": "counties_down",
+      "crop": [0.134, 0.475, 0.893, 1.0],
+      "hint": "Read only the table headed 'Congressional District No. 12.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [0.0, 0.261]
+    }
+  ]
+}

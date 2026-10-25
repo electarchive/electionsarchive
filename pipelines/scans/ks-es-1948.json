@@ -1,0 +1,469 @@
+{
+  "polity": "US-KS",
+  "publisher": "Kansas Secretary of State",
+  "license": "Public record",
+  "raw_source": "us.ks_es",
+  "title": "Kansas election statistics 1948, general election",
+  "file": {
+    "url": "https://kgi.contentdm.oclc.org/digital/api/collection/p16884coll129/id/45/download"
+  },
+  "contests": {
+    "president": {
+      "year": 1948,
+      "chamber": "president",
+      "day": "1948-11-02",
+      "special": false,
+      "state": "KS",
+      "district": null
+    },
+    "senate": {
+      "year": 1948,
+      "chamber": "senate",
+      "day": "1948-11-02",
+      "special": false,
+      "state": "KS",
+      "district": null
+    },
+    "house1": {
+      "year": 1948,
+      "chamber": "house",
+      "day": "1948-11-02",
+      "special": false,
+      "state": "KS",
+      "district": 1
+    },
+    "house2": {
+      "year": 1948,
+      "chamber": "house",
+      "day": "1948-11-02",
+      "special": false,
+      "state": "KS",
+      "district": 2
+    },
+    "house3": {
+      "year": 1948,
+      "chamber": "house",
+      "day": "1948-11-02",
+      "special": false,
+      "state": "KS",
+      "district": 3
+    },
+    "house4": {
+      "year": 1948,
+      "chamber": "house",
+      "day": "1948-11-02",
+      "special": false,
+      "state": "KS",
+      "district": 4
+    },
+    "house5": {
+      "year": 1948,
+      "chamber": "house",
+      "day": "1948-11-02",
+      "special": false,
+      "state": "KS",
+      "district": 5
+    },
+    "house6": {
+      "year": 1948,
+      "chamber": "house",
+      "day": "1948-11-02",
+      "special": false,
+      "state": "KS",
+      "district": 6
+    },
+    "governor": {
+      "year": 1948,
+      "chamber": "governor",
+      "day": "1948-11-02",
+      "special": false,
+      "state": "KS",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 2,
+      "id": "2-0",
+      "columns": [
+        {
+          "label": "Republican Dewey and Warren",
+          "contest": "president",
+          "candidate": "Thomas E. Dewey (Republican)"
+        },
+        {
+          "label": "Democratic Truman and Barkley",
+          "contest": "president",
+          "candidate": "Harry S. Truman (Democratic)"
+        },
+        {
+          "label": "Socialist Thomas and Smith",
+          "contest": "president",
+          "candidate": "Norman Thomas (Socialist)"
+        },
+        {
+          "label": "Prohibition Watson and Learn",
+          "contest": "president",
+          "candidate": "Prohibition"
+        },
+        {
+          "label": "Independent Wallace and Taylor",
+          "contest": "president",
+          "candidate": "Henry Wallace (Progressive)"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.112,
+        0.336,
+        0.943,
+        1.0
+      ],
+      "hint": "Read only the table headed 'FOR ELECTORS OF PRESIDENT AND VICE-PRESIDENT'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1084
+      ]
+    },
+    {
+      "page": 3,
+      "id": "3-0",
+      "columns": [
+        {
+          "label": "Republican Dewey and Warren",
+          "contest": "president",
+          "candidate": "Thomas E. Dewey (Republican)"
+        },
+        {
+          "label": "Democratic Truman and Barkley",
+          "contest": "president",
+          "candidate": "Harry S. Truman (Democratic)"
+        },
+        {
+          "label": "Socialist Thomas and Smith",
+          "contest": "president",
+          "candidate": "Norman Thomas (Socialist)"
+        },
+        {
+          "label": "Prohibition Watson and Learn",
+          "contest": "president",
+          "candidate": "Prohibition"
+        },
+        {
+          "label": "Independent Wallace and Taylor",
+          "contest": "president",
+          "candidate": "Henry Wallace (Progressive)"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.035,
+        0.11,
+        0.876,
+        0.934
+      ],
+      "hint": "Read only the table headed 'FOR ELECTORS OF PRESIDENT AND VICE-PRESIDENT\u2014Concluded'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1044
+      ]
+    },
+    {
+      "page": 4,
+      "id": "4-0",
+      "columns": [
+        {
+          "label": "Andrew F. Schoeppel, Rep.",
+          "contest": "senate",
+          "candidate": "Andrew F. Schoeppel"
+        },
+        {
+          "label": "George McGill, Dem.",
+          "contest": "senate",
+          "candidate": "George McGill"
+        },
+        {
+          "label": "C. Floyd Hester, Prohib.",
+          "contest": "senate",
+          "candidate": "C. Floyd Hester"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.11,
+        0.127,
+        0.953,
+        1.0
+      ],
+      "hint": "Read only the table headed 'FOR UNITED STATES SENATOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0653
+      ]
+    },
+    {
+      "page": 5,
+      "id": "5-0",
+      "columns": [
+        {
+          "label": "Andrew F. Schoeppel, Rep.",
+          "contest": "senate",
+          "candidate": "Andrew F. Schoeppel"
+        },
+        {
+          "label": "George McGill, Dem.",
+          "contest": "senate",
+          "candidate": "George McGill"
+        },
+        {
+          "label": "C. Floyd Hester, Prohib.",
+          "contest": "senate",
+          "candidate": "C. Floyd Hester"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.032,
+        0.13,
+        0.873,
+        0.809
+      ],
+      "hint": "Read only the table headed 'FOR UNITED STATES SENATOR\u2014CONCLUDED'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0825
+      ]
+    },
+    {
+      "page": 6,
+      "id": "6-0",
+      "columns": [
+        {
+          "label": "Albert M. Cole, Rep.",
+          "contest": "house1",
+          "candidate": "Albert M. Cole"
+        },
+        {
+          "label": "James L. Quinn, Dem.",
+          "contest": "house1",
+          "candidate": "James L. Quinn"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.1,
+        0.137,
+        0.946,
+        0.42
+      ],
+      "hint": "Read only the table headed 'FIRST CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 6,
+      "id": "6-1",
+      "columns": [
+        {
+          "label": "Errett P. Scrivner, Rep.",
+          "contest": "house2",
+          "candidate": "Errett P. Scrivner"
+        },
+        {
+          "label": "Philip A. Derganre, Dem.",
+          "contest": "house2",
+          "candidate": "Philip A. Dergance"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.102,
+        0.412,
+        0.945,
+        0.663
+      ],
+      "hint": "Read only the table headed 'SECOND CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 6,
+      "id": "6-2",
+      "columns": [
+        {
+          "label": "Herbert A. Meyer, Rep.",
+          "contest": "house3",
+          "candidate": "Herbert A. Meyer"
+        },
+        {
+          "label": "Marcus C. Black, Dem.",
+          "contest": "house3",
+          "candidate": "Marcus C. Black"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.102,
+        0.655,
+        0.943,
+        0.886
+      ],
+      "hint": "Read only the table headed 'THIRD CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 7,
+      "id": "7-0",
+      "columns": [
+        {
+          "label": "Ed H. Rees, Rep.",
+          "contest": "house4",
+          "candidate": "Edward H. Rees"
+        },
+        {
+          "label": "Wm. J. Kropp, Dem.",
+          "contest": "house4",
+          "candidate": "William J. Kropp"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.02,
+        0.135,
+        0.875,
+        0.432
+      ],
+      "hint": "Read only the table headed 'FOURTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 7,
+      "id": "7-1",
+      "columns": [
+        {
+          "label": "Clifford R. Hope, Rep.",
+          "contest": "house5",
+          "candidate": "Clifford R. Hope"
+        },
+        {
+          "label": "Henry D. Parkinson, Dem.",
+          "contest": "house5",
+          "candidate": "Henry D. Parkinson"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.02,
+        0.424,
+        0.875,
+        0.935
+      ],
+      "hint": "Read only the table headed 'FIFTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1624
+      ]
+    },
+    {
+      "page": 8,
+      "id": "8-0",
+      "columns": [
+        {
+          "label": "Wint Smith, Rep.",
+          "contest": "house6",
+          "candidate": "Wint Smith"
+        },
+        {
+          "label": "Leslie E. Davis, Dem.",
+          "contest": "house6",
+          "candidate": "Leslie E. Davis"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.101,
+        0.116,
+        0.957,
+        0.549
+      ],
+      "hint": "Read only the table headed 'FOR REPRESENTATIVES IN CONGRESS\u2014Concluded, SIXTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 11,
+      "id": "11-0",
+      "columns": [
+        {
+          "label": "Frank Carlson, Rep.",
+          "contest": "governor",
+          "candidate": "Frank Carlson"
+        },
+        {
+          "label": "Randolph Carpenter, Dem.",
+          "contest": "governor",
+          "candidate": "Randolph Carpenter"
+        },
+        {
+          "label": "W. W. Tamplin, Soc.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "N. W. Nice, Prohib.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.052,
+        0.124,
+        0.903,
+        1.0
+      ],
+      "hint": "Read only the table headed 'FOR GOVERNOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0856
+      ]
+    },
+    {
+      "page": 12,
+      "id": "12-0",
+      "columns": [
+        {
+          "label": "Frank Carlson, Rep.",
+          "contest": "governor",
+          "candidate": "Frank Carlson"
+        },
+        {
+          "label": "Randolph Carpenter, Dem.",
+          "contest": "governor",
+          "candidate": "Randolph Carpenter"
+        },
+        {
+          "label": "W. W. Tamplin, Soc.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "N. W. Nice, Prohib.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.13,
+        0.143,
+        0.976,
+        0.82
+      ],
+      "hint": "Read only the table headed 'FOR GOVERNOR\u2014CONCLUDED'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0768
+      ]
+    }
+  ]
+}

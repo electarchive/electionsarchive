@@ -1,0 +1,400 @@
+{
+  "polity": "US-KS",
+  "publisher": "Kansas Secretary of State",
+  "license": "Public record",
+  "raw_source": "us.ks_es",
+  "title": "Kansas election statistics 1926, general election",
+  "file": {
+    "url": "https://kgi.contentdm.oclc.org/digital/api/collection/p16884coll129/id/23/download"
+  },
+  "contests": {
+    "senate": {
+      "year": 1926,
+      "chamber": "senate",
+      "day": "1926-11-02",
+      "special": false,
+      "state": "KS",
+      "district": null
+    },
+    "house1": {
+      "year": 1926,
+      "chamber": "house",
+      "day": "1926-11-02",
+      "special": false,
+      "state": "KS",
+      "district": 1
+    },
+    "house2": {
+      "year": 1926,
+      "chamber": "house",
+      "day": "1926-11-02",
+      "special": false,
+      "state": "KS",
+      "district": 2
+    },
+    "house3": {
+      "year": 1926,
+      "chamber": "house",
+      "day": "1926-11-02",
+      "special": false,
+      "state": "KS",
+      "district": 3
+    },
+    "house4": {
+      "year": 1926,
+      "chamber": "house",
+      "day": "1926-11-02",
+      "special": false,
+      "state": "KS",
+      "district": 4
+    },
+    "house5": {
+      "year": 1926,
+      "chamber": "house",
+      "day": "1926-11-02",
+      "special": false,
+      "state": "KS",
+      "district": 5
+    },
+    "house6": {
+      "year": 1926,
+      "chamber": "house",
+      "day": "1926-11-02",
+      "special": false,
+      "state": "KS",
+      "district": 6
+    },
+    "house7": {
+      "year": 1926,
+      "chamber": "house",
+      "day": "1926-11-02",
+      "special": false,
+      "state": "KS",
+      "district": 7
+    },
+    "house8": {
+      "year": 1926,
+      "chamber": "house",
+      "day": "1926-11-02",
+      "special": false,
+      "state": "KS",
+      "district": 8
+    }
+  },
+  "pages": [
+    {
+      "page": 2,
+      "id": "2-0",
+      "columns": [
+        {
+          "label": "Charles Curtis, Rep.",
+          "contest": "senate",
+          "candidate": "Charles Curtis"
+        },
+        {
+          "label": "Charles Stephens, Dem.",
+          "contest": "senate",
+          "candidate": "Charles Stephens"
+        },
+        {
+          "label": "M. L. Phillips, Soc.",
+          "contest": "senate",
+          "candidate": "M. L. Phillips"
+        },
+        {
+          "label": "Scattering.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.09,
+        0.124,
+        0.911,
+        1.0
+      ],
+      "hint": "Read only the table headed 'FOR UNITED STATES SENATOR.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0845
+      ]
+    },
+    {
+      "page": 3,
+      "id": "3-0",
+      "columns": [
+        {
+          "label": "Charles Curtis, Rep.",
+          "contest": "senate",
+          "candidate": "Charles Curtis"
+        },
+        {
+          "label": "Charles Stephens, Dem.",
+          "contest": "senate",
+          "candidate": "Charles Stephens"
+        },
+        {
+          "label": "M. L. Phillips, Soc.",
+          "contest": "senate",
+          "candidate": "M. L. Phillips"
+        },
+        {
+          "label": "Scattering.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.064,
+        0.136,
+        0.888,
+        0.781
+      ],
+      "hint": "Read only the table headed 'FOR UNITED STATES SENATOR\u2014Concluded.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.107
+      ]
+    },
+    {
+      "page": 4,
+      "id": "4-0",
+      "columns": [
+        {
+          "label": "D. R. Anthony, Jr., Rep.",
+          "contest": "house1",
+          "candidate": "Daniel R. Anthony, jr."
+        },
+        {
+          "label": "Scattering.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.112,
+        0.137,
+        0.943,
+        0.351
+      ],
+      "hint": "Read only the table headed 'FIRST CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 4,
+      "id": "4-1",
+      "columns": [
+        {
+          "label": "U. S. Guyer, Rep.",
+          "contest": "house2",
+          "candidate": "U. S. Guyer"
+        },
+        {
+          "label": "Chauncey B. Little, Dem.",
+          "contest": "house2",
+          "candidate": "Chauncey B. Little"
+        },
+        {
+          "label": "Scattering.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.11,
+        0.343,
+        0.941,
+        0.573
+      ],
+      "hint": "Read only the table headed 'SECOND CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 4,
+      "id": "4-2",
+      "columns": [
+        {
+          "label": "W. H. Sproul, Rep.",
+          "contest": "house3",
+          "candidate": "W. H. Sproul"
+        },
+        {
+          "label": "Thurman Hill, Dem.",
+          "contest": "house3",
+          "candidate": "Thurman Hill"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.108,
+        0.565,
+        0.938,
+        0.784
+      ],
+      "hint": "Read only the table headed 'THIRD CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 5,
+      "id": "5-0",
+      "columns": [
+        {
+          "label": "Homer Hoch, Rep.",
+          "contest": "house4",
+          "candidate": "Homer Hoch"
+        },
+        {
+          "label": "Edwin F. Hammond, Dem.",
+          "contest": "house4",
+          "candidate": "Edwin F. Hammond"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.07,
+        0.139,
+        0.893,
+        0.371
+      ],
+      "hint": "Read only the table headed 'FOURTH CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 5,
+      "id": "5-1",
+      "columns": [
+        {
+          "label": "James G. Strong, Rep.",
+          "contest": "house5",
+          "candidate": "James G. Strong"
+        },
+        {
+          "label": "Rex Montgomery, Dem.",
+          "contest": "house5",
+          "candidate": "Rex Montgomery"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.07,
+        0.363,
+        0.893,
+        0.603
+      ],
+      "hint": "Read only the table headed 'FIFTH CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 5,
+      "id": "5-2",
+      "columns": [
+        {
+          "label": "Hays B. White, Rep.",
+          "contest": "house6",
+          "candidate": "Hays B. White"
+        },
+        {
+          "label": "W. H. Clark, Dem.",
+          "contest": "house6",
+          "candidate": "W. H. Clark"
+        },
+        {
+          "label": "Scattering.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.07,
+        0.595,
+        0.893,
+        0.949
+      ],
+      "hint": "Read only the table headed 'SIXTH CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 6,
+      "id": "6-0",
+      "columns": [
+        {
+          "label": "Clifford R. Hope, Rep.",
+          "contest": "house7",
+          "candidate": "Clifford R. Hope"
+        },
+        {
+          "label": "Harry F. Brown, Dem.",
+          "contest": "house7",
+          "candidate": "Harry F. Brown"
+        },
+        {
+          "label": "Scattering.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.111,
+        0.096,
+        0.947,
+        0.582
+      ],
+      "hint": "Read only the table headed 'FOR REPRESENTATIVES IN CONGRESS\u2014CONCLUDED. SEVENTH CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2243
+      ]
+    },
+    {
+      "page": 6,
+      "id": "6-1",
+      "columns": [
+        {
+          "label": "Fred L. Bell, Rep.",
+          "contest": "house8",
+          "candidate": "Fred L. Bell"
+        },
+        {
+          "label": "W. A. Ayres, Dem.",
+          "contest": "house8",
+          "candidate": "William A. Ayres"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.109,
+        0.574,
+        0.936,
+        0.754
+      ],
+      "hint": "Read only the table headed 'EIGHTH CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 35,
+      "id": "35-0",
+      "columns": [
+        {
+          "label": "Charles Curtis, Rep.",
+          "contest": "senate",
+          "candidate": "Charles Curtis"
+        },
+        {
+          "label": "Charles Stephens, Dem.",
+          "contest": "senate",
+          "candidate": "Charles Stephens"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.107,
+        0.166,
+        0.93,
+        0.503
+      ],
+      "hint": "Read only the table headed 'FEDERAL SERVICE VOTE. FOR UNITED STATES SENATOR.'; ignore any other table visible in the image."
+    }
+  ]
+}

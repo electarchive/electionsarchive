@@ -1,0 +1,312 @@
+{
+  "polity": "US-KS",
+  "publisher": "Kansas Secretary of State",
+  "license": "Public record",
+  "raw_source": "us.ks_es",
+  "title": "Kansas election statistics 1922, general election",
+  "file": {
+    "url": "https://kgi.contentdm.oclc.org/digital/api/collection/p16884coll129/id/19/download"
+  },
+  "contests": {
+    "house1": {
+      "year": 1922,
+      "chamber": "house",
+      "day": "1922-11-07",
+      "special": false,
+      "state": "KS",
+      "district": 1
+    },
+    "house2": {
+      "year": 1922,
+      "chamber": "house",
+      "day": "1922-11-07",
+      "special": false,
+      "state": "KS",
+      "district": 2
+    },
+    "house3": {
+      "year": 1922,
+      "chamber": "house",
+      "day": "1922-11-07",
+      "special": false,
+      "state": "KS",
+      "district": 3
+    },
+    "house4": {
+      "year": 1922,
+      "chamber": "house",
+      "day": "1922-11-07",
+      "special": false,
+      "state": "KS",
+      "district": 4
+    },
+    "house5": {
+      "year": 1922,
+      "chamber": "house",
+      "day": "1922-11-07",
+      "special": false,
+      "state": "KS",
+      "district": 5
+    },
+    "house6": {
+      "year": 1922,
+      "chamber": "house",
+      "day": "1922-11-07",
+      "special": false,
+      "state": "KS",
+      "district": 6
+    },
+    "governor": {
+      "year": 1922,
+      "chamber": "governor",
+      "day": "1922-11-07",
+      "special": false,
+      "state": "KS",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 2,
+      "id": "2-0",
+      "columns": [
+        {
+          "label": "D. R. Anthony, Jr., Rep.",
+          "contest": "house1",
+          "candidate": "D. R. Anthony, jr."
+        },
+        {
+          "label": "Frank Gragg, Dem.",
+          "contest": "house1",
+          "candidate": "Frank Gragg"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.084,
+        0.204,
+        0.938,
+        0.418
+      ],
+      "hint": "Read only the table headed 'FIRST CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 2,
+      "id": "2-1",
+      "columns": [
+        {
+          "label": "Edward C. Little, Rep.",
+          "contest": "house2",
+          "candidate": "Edward C. Little"
+        },
+        {
+          "label": "William H. Thompson, Dem.",
+          "contest": "house2",
+          "candidate": "William H. Thompson"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.082,
+        0.41,
+        0.932,
+        0.64
+      ],
+      "hint": "Read only the table headed 'SECOND CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 2,
+      "id": "2-2",
+      "columns": [
+        {
+          "label": "W. H. Sproul, Rep.",
+          "contest": "house3",
+          "candidate": "W. H. Sproul"
+        },
+        {
+          "label": "Charles Stephens, Dem.",
+          "contest": "house3",
+          "candidate": "Charles Stephens"
+        },
+        {
+          "label": "George W. Snyder, Soc.",
+          "contest": "house3",
+          "candidate": "George W. Snyder"
+        },
+        {
+          "label": "Scattering.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.077,
+        0.632,
+        0.928,
+        0.849
+      ],
+      "hint": "Read only the table headed 'THIRD CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 3,
+      "id": "3-0",
+      "columns": [
+        {
+          "label": "Homer Hoch, Rep.",
+          "contest": "house4",
+          "candidate": "Homer Hoch"
+        },
+        {
+          "label": "Walter W. Austin, Dem.",
+          "contest": "house4",
+          "candidate": "Walter W. Austin"
+        },
+        {
+          "label": "Thomas H. McGill, Soc.",
+          "contest": "house4",
+          "candidate": "Thomas H. McGill"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.065,
+        0.107,
+        0.898,
+        0.331
+      ],
+      "hint": "Read only the table headed 'FOURTH CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 3,
+      "id": "3-1",
+      "columns": [
+        {
+          "label": "James G. Strong, Rep.",
+          "contest": "house5",
+          "candidate": "James G. Strong"
+        },
+        {
+          "label": "Clarence E. Hatfield, Dem.",
+          "contest": "house5",
+          "candidate": "Clarence E. Hatfield"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.065,
+        0.323,
+        0.898,
+        0.554
+      ],
+      "hint": "Read only the table headed 'FIFTH CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 3,
+      "id": "3-2",
+      "columns": [
+        {
+          "label": "Hays B. White, Rep.",
+          "contest": "house6",
+          "candidate": "Hays B. White"
+        },
+        {
+          "label": "F. W. Boyd, Dem.",
+          "contest": "house6",
+          "candidate": "F. W. Boyd"
+        },
+        {
+          "label": "B. B. Bretthauer, Soc.",
+          "contest": "house6",
+          "candidate": "B. B. Brethauer"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.067,
+        0.546,
+        0.898,
+        0.89
+      ],
+      "hint": "Read only the table headed 'SIXTH CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 7,
+      "id": "7-0",
+      "columns": [
+        {
+          "label": "W. Y. Morgan, Republican",
+          "contest": "governor",
+          "candidate": "W. Y. Morgan"
+        },
+        {
+          "label": "Jonathan M. Davis, Democrat",
+          "contest": "governor",
+          "candidate": "Jonathan M. Davis"
+        },
+        {
+          "label": "M. L. Phillips, Socialist",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Scattering",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.079,
+        0.179,
+        0.901,
+        1.0
+      ],
+      "hint": "Read only the table headed 'GOVERNOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1839
+      ]
+    },
+    {
+      "page": 8,
+      "id": "8-0",
+      "columns": [
+        {
+          "label": "W. Y. Morgan, Republican.",
+          "contest": "governor",
+          "candidate": "W. Y. Morgan"
+        },
+        {
+          "label": "Jonathan M. Davis, Democrat.",
+          "contest": "governor",
+          "candidate": "Jonathan M. Davis"
+        },
+        {
+          "label": "M. L. Phillips, Socialist.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Scattering",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.089,
+        0.122,
+        0.923,
+        0.87
+      ],
+      "hint": "Read only the table headed 'GOVERNOR\u2014Concluded.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2781
+      ]
+    }
+  ]
+}

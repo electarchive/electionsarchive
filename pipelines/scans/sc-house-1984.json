@@ -1,0 +1,271 @@
+{
+  "polity": "US-SC",
+  "publisher": "South Carolina State Election Commission",
+  "license": "Public record",
+  "raw_source": "us.scans",
+  "title": "Report of the State Election Commission, votes cast in the general election held 1984-11-06",
+  "file": {
+    "url": "https://scvotes.gov/wp-content/uploads/2022/08/Election_Report_1984-1985.pdf"
+  },
+  "contests": {
+    "house1": {
+      "year": 1984,
+      "chamber": "house",
+      "day": "1984-11-06",
+      "special": false,
+      "state": "SC",
+      "district": 1
+    },
+    "house2": {
+      "year": 1984,
+      "chamber": "house",
+      "day": "1984-11-06",
+      "special": false,
+      "state": "SC",
+      "district": 2
+    },
+    "house3": {
+      "year": 1984,
+      "chamber": "house",
+      "day": "1984-11-06",
+      "special": false,
+      "state": "SC",
+      "district": 3
+    },
+    "house4": {
+      "year": 1984,
+      "chamber": "house",
+      "day": "1984-11-06",
+      "special": false,
+      "state": "SC",
+      "district": 4
+    },
+    "house5": {
+      "year": 1984,
+      "chamber": "house",
+      "day": "1984-11-06",
+      "special": false,
+      "state": "SC",
+      "district": 5
+    },
+    "house6": {
+      "year": 1984,
+      "chamber": "house",
+      "day": "1984-11-06",
+      "special": false,
+      "state": "SC",
+      "district": 6
+    }
+  },
+  "pages": [
+    {
+      "page": 65,
+      "id": "65-0",
+      "columns": [
+        {
+          "label": "(R) THOMAS F HARTNETT",
+          "contest": "house1",
+          "candidate": "Thomas F. Hartnett"
+        },
+        {
+          "label": "(D) ED PENDARVIS",
+          "contest": "house1",
+          "candidate": "Ed Pendarvis"
+        },
+        {
+          "label": "(W) MISC WRITE IN",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.079,
+        0.162,
+        0.401,
+        0.545
+      ],
+      "hint": "Read only the table headed 'DISTRICT NO 001 REPRESENTATIVE IN CONGRESS'; ignore any other table visible in the image."
+    },
+    {
+      "page": 65,
+      "id": "65-1",
+      "columns": [
+        {
+          "label": "(R) FLOYD D SPENCE",
+          "contest": "house2",
+          "candidate": "Floyd D. Spence"
+        },
+        {
+          "label": "(L) CYNTHIA E SULLIVAN",
+          "contest": "house2",
+          "candidate": "Cynthia Sullivan"
+        },
+        {
+          "label": "(D) KEN MOSELY",
+          "contest": "house2",
+          "candidate": "Ken Mosely"
+        },
+        {
+          "label": "(W) MISC WRITE IN",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.52,
+        0.162,
+        0.889,
+        0.54
+      ],
+      "hint": "Read only the table headed 'DISTRICT NO 002 REPRESENTATIVE IN CONGRESS'; ignore any other table visible in the image."
+    },
+    {
+      "page": 65,
+      "id": "65-2",
+      "columns": [
+        {
+          "label": "(R) CLARENCE E TAYLOR",
+          "contest": "house3",
+          "candidate": "Clarence E. Taylor"
+        },
+        {
+          "label": "(L) ROBERT MADDEN",
+          "contest": "house3",
+          "candidate": "Robert Madden"
+        },
+        {
+          "label": "(D) BUTLER DERRICK",
+          "contest": "house3",
+          "candidate": "Butler Derrick"
+        },
+        {
+          "label": "(W) MISC WRITE IN",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.085,
+        0.537,
+        0.459,
+        0.959
+      ],
+      "hint": "Read only the table headed 'DISTRICT NO 003 REPRESENTATIVE IN CONGRESS'; ignore any other table visible in the image."
+    },
+    {
+      "page": 65,
+      "id": "65-3",
+      "columns": [
+        {
+          "label": "(R) CARROLL A CAMPBELL",
+          "contest": "house4",
+          "candidate": "Carroll A. Campbell"
+        },
+        {
+          "label": "(L) WILLIAM R PIKE",
+          "contest": "house4",
+          "candidate": "William Ray Pike"
+        },
+        {
+          "label": "(D) JEFF SMITH",
+          "contest": "house4",
+          "candidate": "Jeff Smith"
+        },
+        {
+          "label": "(W) MISC WRITE IN",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.52,
+        0.532,
+        0.892,
+        0.887
+      ],
+      "hint": "Read only the table headed 'DISTRICT NO 004 REPRESENTATIVE IN CONGRESS'; ignore any other table visible in the image."
+    },
+    {
+      "page": 66,
+      "id": "66-0",
+      "columns": [
+        {
+          "label": "(L) LINDA LEVANS",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "(D) * JOHN SPRATT",
+          "contest": "house5",
+          "candidate": "John Spratt"
+        },
+        {
+          "label": "(A) DICK WINCHESTER",
+          "contest": "house5",
+          "candidate": "Dick Winchester"
+        },
+        {
+          "label": "(W) MISC WRITE IN",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.11,
+        0.238,
+        0.538,
+        0.739
+      ],
+      "hint": "Read only the table headed 'REPRESENTATIVE IN CONGRESS DISTRICT NO 005'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.6188
+      ]
+    },
+    {
+      "page": 66,
+      "id": "66-1",
+      "columns": [
+        {
+          "label": "(R) LOIS EAGLE",
+          "contest": "house6",
+          "candidate": "Lois Eargle"
+        },
+        {
+          "label": "(L) HUGH THOMPSON",
+          "contest": "house6",
+          "candidate": "Hugh Thompson"
+        },
+        {
+          "label": "(D) * ROBIN TALLON",
+          "contest": "house6",
+          "candidate": "Robin Tallon"
+        },
+        {
+          "label": "(W) MISC WRITE IN",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.612,
+        0.238,
+        1.0,
+        0.726
+      ],
+      "hint": "Read only the table headed 'REPRESENTATIVE IN CONGRESS DISTRICT NO 006'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.6352
+      ]
+    }
+  ]
+}

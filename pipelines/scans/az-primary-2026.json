@@ -1,0 +1,12 @@
+{
+  "polity": "US-AZ",
+  "publisher": "Arizona Secretary of State",
+  "license": "Public record",
+  "raw_source": "us.scans",
+  "title": "Arizona 2026 primary election canvass by county, report of 2026-08-06",
+  "file": {
+    "url": "manual://MF-058/20260806_Primary_Canvass.pdf"
+  },
+  "contests": {},
+  "pages": []
+}

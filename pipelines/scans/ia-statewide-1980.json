@@ -1,0 +1,243 @@
+{
+  "polity": "US-IA",
+  "publisher": "Iowa Secretary of State",
+  "license": "Public record",
+  "raw_source": "us.ia_sos",
+  "title": "Iowa official canvass summary, general election 1980",
+  "file": {
+    "url": "https://sos.iowa.gov/elections/pdf/results/80s/1980gencanv.pdf",
+    "item": "https://sos.iowa.gov/elections/results/"
+  },
+  "contests": {
+    "president": {
+      "year": 1980,
+      "chamber": "president",
+      "day": "1980-11-04",
+      "special": false,
+      "state": "IA",
+      "district": null
+    },
+    "senate": {
+      "year": 1980,
+      "chamber": "senate",
+      "day": "1980-11-04",
+      "special": false,
+      "state": "IA",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 3,
+      "id": "3-0",
+      "columns": [
+        {
+          "label": "REPUBLICAN Ronald Reagan",
+          "contest": "president",
+          "candidate": "Ronald Reagan (Republican)"
+        },
+        {
+          "label": "DEMOCRATIC Jimmy Carter",
+          "contest": "president",
+          "candidate": "Jimmy Carter (Democratic)"
+        },
+        {
+          "label": "NOM. BY PET. John B. Anderson",
+          "contest": "president",
+          "candidate": "John Anderson (Independent)"
+        },
+        {
+          "label": "LIBERTARIAN Ed Clark",
+          "contest": "president",
+          "candidate": "Ed Clark (Libertarian)"
+        },
+        {
+          "label": "SOCIALIST David McReynolds",
+          "contest": "president",
+          "candidate": "Socialist"
+        },
+        {
+          "label": "SOCIALIST WORKERS Clifton De Berry",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "AMERICAN Percy L. Greaves, Jr",
+          "contest": "president",
+          "candidate": "American"
+        },
+        {
+          "label": "COMMUNIST Gus Hall",
+          "contest": "president",
+          "candidate": "Communist"
+        },
+        {
+          "label": "STATESMAN Benjamin C. Bubar",
+          "contest": "president",
+          "candidate": "Statesman"
+        },
+        {
+          "label": "CITIZENS Barry Commoner",
+          "contest": "president",
+          "candidate": "Citizens"
+        },
+        {
+          "label": "Scattering",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "COUNTY TOTALS",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.054,
+        0.085,
+        0.945,
+        0.888
+      ],
+      "hint": "Read only the table headed 'PRESIDENT OF THE UNITED STATES'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0585
+      ]
+    },
+    {
+      "page": 4,
+      "id": "4-0",
+      "columns": [
+        {
+          "label": "REPUBLICAN George Bush",
+          "contest": "president",
+          "candidate": "Ronald Reagan (Republican)"
+        },
+        {
+          "label": "DEMOCRATIC Walter Mondale",
+          "contest": "president",
+          "candidate": "Jimmy Carter (Democratic)"
+        },
+        {
+          "label": "NOM. BY PET. Patrick J. Lucey",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "LIBERTARIAN David Koch",
+          "contest": "president",
+          "candidate": "Ed Clark (Libertarian)"
+        },
+        {
+          "label": "SOCIALIST Diane Drufenbrock",
+          "contest": "president",
+          "candidate": "Socialist"
+        },
+        {
+          "label": "SOCIALIST WORKERS Matilde Zimmerman",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "AMERICAN Frank Varnum",
+          "contest": "president",
+          "candidate": "American"
+        },
+        {
+          "label": "COMMUNIST Angela Davis",
+          "contest": "president",
+          "candidate": "Communist"
+        },
+        {
+          "label": "STATESMAN Earl F. Dodge",
+          "contest": "president",
+          "candidate": "Statesman"
+        },
+        {
+          "label": "CITIZENS LaDonna Harris",
+          "contest": "president",
+          "candidate": "Citizens"
+        },
+        {
+          "label": "Scattering",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "COUNTY TOTALS",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.053,
+        0.092,
+        0.963,
+        0.907
+      ],
+      "hint": "Read only the table headed 'VICE PRESIDENT OF THE UNITED STATES'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0577
+      ]
+    },
+    {
+      "page": 5,
+      "id": "5-0",
+      "columns": [
+        {
+          "label": "REPUBLICAN Charles E. Grassley",
+          "contest": "senate",
+          "candidate": "Charles E. Grassley"
+        },
+        {
+          "label": "DEMOCRATIC John Culver",
+          "contest": "senate",
+          "candidate": "John Culver"
+        },
+        {
+          "label": "LIBERTARIAN Robert V. Hengerer",
+          "contest": "senate",
+          "candidate": "Robert V. Hengerer"
+        },
+        {
+          "label": "NOM. BY PET. Garry De Young",
+          "contest": "senate",
+          "candidate": "Garry De Young"
+        },
+        {
+          "label": "NOM. BY PET. John Ingram Henderson",
+          "contest": "senate",
+          "candidate": "John Ingram Henderson"
+        },
+        {
+          "label": "Scattering",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "COUNTY TOTALS",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.141,
+        0.135,
+        0.62,
+        0.891
+      ],
+      "hint": "Read only the table headed 'UNITED STATES SENATOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0172
+      ]
+    }
+  ]
+}

@@ -1,0 +1,475 @@
+{
+  "polity": "US-IL",
+  "publisher": "Illinois State Board of Elections",
+  "license": "Public record",
+  "raw_source": "us.scans",
+  "title": "State of Illinois official vote cast at the general election, 1984",
+  "file": {
+    "url": "https://archive.org/download/officialvote84illi/officialvote84illi.pdf"
+  },
+  "contests": {
+    "president": {
+      "year": 1984,
+      "chamber": "president",
+      "day": "1984-11-06",
+      "special": false,
+      "state": "IL",
+      "district": null
+    },
+    "senate": {
+      "year": 1984,
+      "chamber": "senate",
+      "day": "1984-11-06",
+      "special": false,
+      "state": "IL",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 14,
+      "id": "14-0",
+      "columns": [
+        {
+          "label": "Plurality",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Democratic Walter F. Mondale Geraldine Ferraro",
+          "contest": "president",
+          "candidate": "Walter F. Mondale"
+        },
+        {
+          "label": "Republican Ronald Reagan George Bush",
+          "contest": "president",
+          "candidate": "Ronald Reagan"
+        },
+        {
+          "label": "Communist Gus Hall Angela Y. Davis",
+          "contest": "president",
+          "candidate": "Gus Hall"
+        },
+        {
+          "label": "Socialist Workers Mel Mason Matilde Zimmermann",
+          "contest": "president",
+          "candidate": "Mel Mason"
+        },
+        {
+          "label": "Libertarian David Bergland Jim Lewis",
+          "contest": "president",
+          "candidate": "David Bergland"
+        },
+        {
+          "label": "Citizens Sonia Johnson Richard J. Walton",
+          "contest": "president",
+          "candidate": "Sonia Johnson"
+        },
+        {
+          "label": "Independent Ed Winn Jean T. Brust",
+          "contest": "president",
+          "candidate": "Ed Winn"
+        },
+        {
+          "label": "Independent Dennis L. Serrette Nancy Ross",
+          "contest": "president",
+          "candidate": "Dennis Serrette"
+        },
+        {
+          "label": "Write-Ins",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.04,
+        0.058,
+        0.902,
+        1.0
+      ],
+      "hint": "Read only the table headed 'VOTE FOR PRESIDENT AND VICE PRESIDENT OF THE UNITED STATES NOVEMBER 6, 1984'; ignore any other table visible in the image.",
+      "turn": -90,
+      "bands": 3,
+      "header": [
+        0.0,
+        0.2548
+      ]
+    },
+    {
+      "page": 15,
+      "id": "15-0",
+      "columns": [
+        {
+          "label": "Plurality",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Democratic Walter F. Mondale Geraldine Ferraro",
+          "contest": "president",
+          "candidate": "Walter F. Mondale"
+        },
+        {
+          "label": "Republican Ronald Reagan George Bush",
+          "contest": "president",
+          "candidate": "Ronald Reagan"
+        },
+        {
+          "label": "Communist Gus Hall Angela Y. Davis",
+          "contest": "president",
+          "candidate": "Gus Hall"
+        },
+        {
+          "label": "Socialist Workers Mel Mason Matilde Zimmermann",
+          "contest": "president",
+          "candidate": "Mel Mason"
+        },
+        {
+          "label": "Libertarian David Bergland Jim Lewis",
+          "contest": "president",
+          "candidate": "David Bergland"
+        },
+        {
+          "label": "Citizens Sonia Johnson Richard J. Walton",
+          "contest": "president",
+          "candidate": "Sonia Johnson"
+        },
+        {
+          "label": "Independent Ed Winn Jean T. Brust",
+          "contest": "president",
+          "candidate": "Ed Winn"
+        },
+        {
+          "label": "Independent Dennis L. Serrette Nancy Ross",
+          "contest": "president",
+          "candidate": "Dennis Serrette"
+        },
+        {
+          "label": "Write-Ins",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.04,
+        0.0,
+        0.902,
+        1.0
+      ],
+      "hint": "This page continues the table of the previous page and prints no headings.",
+      "turn": -90
+    },
+    {
+      "page": 16,
+      "id": "16-0",
+      "columns": [
+        {
+          "label": "Plurality",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Democratic Walter F. Mondale Geraldine Ferraro",
+          "contest": "president",
+          "candidate": "Walter F. Mondale"
+        },
+        {
+          "label": "Republican Ronald Reagan George Bush",
+          "contest": "president",
+          "candidate": "Ronald Reagan"
+        },
+        {
+          "label": "Communist Gus Hall Angela Y. Davis",
+          "contest": "president",
+          "candidate": "Gus Hall"
+        },
+        {
+          "label": "Socialist Workers Mel Mason Matilde Zimmermann",
+          "contest": "president",
+          "candidate": "Mel Mason"
+        },
+        {
+          "label": "Libertarian David Bergland Jim Lewis",
+          "contest": "president",
+          "candidate": "David Bergland"
+        },
+        {
+          "label": "Citizens Sonia Johnson Richard J. Walton",
+          "contest": "president",
+          "candidate": "Sonia Johnson"
+        },
+        {
+          "label": "Independent Ed Winn Jean T. Brust",
+          "contest": "president",
+          "candidate": "Ed Winn"
+        },
+        {
+          "label": "Independent Dennis L. Serrette Nancy Ross",
+          "contest": "president",
+          "candidate": "Dennis Serrette"
+        },
+        {
+          "label": "Write-Ins",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.039,
+        0.06,
+        0.898,
+        0.942
+      ],
+      "hint": "Read only the table headed 'VOTE FOR PRESIDENT AND VICE PRESIDENT OF THE UNITED STATES NOVEMBER 6, 1984\u2014Continued'; ignore any other table visible in the image.",
+      "turn": -90,
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2721
+      ]
+    },
+    {
+      "page": 17,
+      "id": "17-0",
+      "columns": [
+        {
+          "label": "Democratic Walter F. Mondale Geraldine Ferraro",
+          "contest": "president",
+          "candidate": "Walter F. Mondale"
+        },
+        {
+          "label": "Republican Ronald Reagan George Bush",
+          "contest": "president",
+          "candidate": "Ronald Reagan"
+        },
+        {
+          "label": "Communist Gus Hall Angela Y. Davis",
+          "contest": "president",
+          "candidate": "Gus Hall"
+        },
+        {
+          "label": "Socialist Workers Mel Mason Matilde Zimmermann",
+          "contest": "president",
+          "candidate": "Mel Mason"
+        },
+        {
+          "label": "Libertarian David Bergland Jim Lewis",
+          "contest": "president",
+          "candidate": "David Bergland"
+        },
+        {
+          "label": "Citizens Sonia Johnson Richard J. Walton",
+          "contest": "president",
+          "candidate": "Sonia Johnson"
+        },
+        {
+          "label": "Independent Ed Winn Jean T. Brust",
+          "contest": "president",
+          "candidate": "Ed Winn"
+        },
+        {
+          "label": "Independent Dennis L. Serrette Nancy Ross",
+          "contest": "president",
+          "candidate": "Dennis Serrette"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.04,
+        0.068,
+        0.903,
+        1.0
+      ],
+      "hint": "Read only the table headed 'VOTE FOR PRESIDENT AND VICE PRESIDENT OF THE UNITED STATES\u2014COOK COUNTY\u2014NOVEMBER 6, 1984 (Information furnished by Clerk of Cook County)\u2014Continued'; ignore any other table visible in the image.",
+      "turn": -90,
+      "bands": 3,
+      "header": [
+        0.0,
+        0.2564
+      ]
+    },
+    {
+      "page": 18,
+      "id": "18-0",
+      "columns": [
+        {
+          "label": "Democratic Walter F. Mondale Geraldine Ferraro",
+          "contest": "president",
+          "candidate": "Walter F. Mondale"
+        },
+        {
+          "label": "Republican Ronald Reagan George Bush",
+          "contest": "president",
+          "candidate": "Ronald Reagan"
+        },
+        {
+          "label": "Communist Gus Hall Angela Y. Davis",
+          "contest": "president",
+          "candidate": "Gus Hall"
+        },
+        {
+          "label": "Socialist Workers Mel Mason Matilde Zimmermann",
+          "contest": "president",
+          "candidate": "Mel Mason"
+        },
+        {
+          "label": "Libertarian David Bergland Jim Lewis",
+          "contest": "president",
+          "candidate": "David Bergland"
+        },
+        {
+          "label": "Citizens Sonia Johnson Richard J. Walton",
+          "contest": "president",
+          "candidate": "Sonia Johnson"
+        },
+        {
+          "label": "Independent Ed Winn Jean T. Brust",
+          "contest": "president",
+          "candidate": "Ed Winn"
+        },
+        {
+          "label": "Independent Dennis L. Serrette Nancy Ross",
+          "contest": "president",
+          "candidate": "Dennis Serrette"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.043,
+        0.056,
+        0.906,
+        0.664
+      ],
+      "hint": "Read only the table headed 'VOTE FOR PRESIDENT AND VICE PRESIDENT OF THE UNITED STATES\u2014COOK COUNTY\u2014NOVEMBER 6, 1984'; ignore any other table visible in the image.",
+      "turn": -90,
+      "bands": 2,
+      "header": [
+        0.0,
+        0.4095
+      ]
+    },
+    {
+      "page": 19,
+      "id": "19-0",
+      "columns": [
+        {
+          "label": "Democratic Walter F. Mondale Geraldine Ferraro",
+          "contest": "president",
+          "candidate": "Walter F. Mondale"
+        },
+        {
+          "label": "Republican Ronald Reagan George Bush",
+          "contest": "president",
+          "candidate": "Ronald Reagan"
+        },
+        {
+          "label": "Communist Gus Hall Angela Y. Davis",
+          "contest": "president",
+          "candidate": "Gus Hall"
+        },
+        {
+          "label": "Socialist Workers Mel Mason Matilde Zimmermann",
+          "contest": "president",
+          "candidate": "Mel Mason"
+        },
+        {
+          "label": "Libertarian David Bergland Jim Lewis",
+          "contest": "president",
+          "candidate": "David Bergland"
+        },
+        {
+          "label": "Citizens Sonia Johnson Richard J. Walton",
+          "contest": "president",
+          "candidate": "Sonia Johnson"
+        },
+        {
+          "label": "Independent Ed Winn Jean T. Brust",
+          "contest": "president",
+          "candidate": "Ed Winn"
+        },
+        {
+          "label": "Independent Dennis L. Serrette Nancy Ross",
+          "contest": "president",
+          "candidate": "Dennis Serrette"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.042,
+        0.064,
+        0.905,
+        0.864
+      ],
+      "hint": "Read only the table headed 'VOTE FOR PRESIDENT AND VICE PRESIDENT OF THE UNITED STATES\u2014COOK COUNTY\u2014NOVEMBER 6, 1984'; ignore any other table visible in the image.",
+      "turn": -90,
+      "bands": 2,
+      "header": [
+        0.0,
+        0.3025
+      ]
+    },
+    {
+      "page": 20,
+      "id": "20-0",
+      "columns": [
+        {
+          "label": "Plurality",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Democratic Paul Simon",
+          "contest": "senate",
+          "candidate": "Paul Simon"
+        },
+        {
+          "label": "Republican Charles H. Percy",
+          "contest": "senate",
+          "candidate": "Charles H. Percy"
+        },
+        {
+          "label": "Communist Ishmael Flory",
+          "contest": "senate",
+          "candidate": "Ishmael Flory"
+        },
+        {
+          "label": "Socialist Workers Nelson Gonzalez",
+          "contest": "senate",
+          "candidate": "Nelson Gonzalez"
+        },
+        {
+          "label": "Libertarian Steven I. Givot",
+          "contest": "senate",
+          "candidate": "Steven I. Givot"
+        },
+        {
+          "label": "Citizens Marjorie H. Pries",
+          "contest": "senate",
+          "candidate": "Marjorie H. Pries"
+        },
+        {
+          "label": "Write-Ins",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.043,
+        0.051,
+        0.903,
+        1.0
+      ],
+      "hint": "Read only the table headed 'FOR UNITED STATES SENATOR\u2014NOVEMBER 6, 1984'; ignore any other table visible in the image.",
+      "turn": -90,
+      "bands": 3,
+      "header": [
+        0.0,
+        0.1886
+      ]
+    }
+  ]
+}

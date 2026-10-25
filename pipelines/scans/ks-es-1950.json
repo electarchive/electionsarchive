@@ -1,0 +1,398 @@
+{
+  "polity": "US-KS",
+  "publisher": "Kansas Secretary of State",
+  "license": "Public record",
+  "raw_source": "us.ks_es",
+  "title": "Kansas election statistics 1950, general election",
+  "file": {
+    "url": "https://kgi.contentdm.oclc.org/digital/api/collection/p16884coll129/id/47/download"
+  },
+  "contests": {
+    "senate": {
+      "year": 1950,
+      "chamber": "senate",
+      "day": "1950-11-07",
+      "special": false,
+      "state": "KS",
+      "district": null
+    },
+    "house1": {
+      "year": 1950,
+      "chamber": "house",
+      "day": "1950-11-07",
+      "special": false,
+      "state": "KS",
+      "district": 1
+    },
+    "house2": {
+      "year": 1950,
+      "chamber": "house",
+      "day": "1950-11-07",
+      "special": false,
+      "state": "KS",
+      "district": 2
+    },
+    "house3": {
+      "year": 1950,
+      "chamber": "house",
+      "day": "1950-11-07",
+      "special": false,
+      "state": "KS",
+      "district": 3
+    },
+    "house4": {
+      "year": 1950,
+      "chamber": "house",
+      "day": "1950-11-07",
+      "special": false,
+      "state": "KS",
+      "district": 4
+    },
+    "house5": {
+      "year": 1950,
+      "chamber": "house",
+      "day": "1950-11-07",
+      "special": false,
+      "state": "KS",
+      "district": 5
+    },
+    "house6": {
+      "year": 1950,
+      "chamber": "house",
+      "day": "1950-11-07",
+      "special": false,
+      "state": "KS",
+      "district": 6
+    },
+    "governor": {
+      "year": 1950,
+      "chamber": "governor",
+      "day": "1950-11-07",
+      "special": false,
+      "state": "KS",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 2,
+      "id": "2-0",
+      "columns": [
+        {
+          "label": "Regular term: Frank Carlson, Rep.",
+          "contest": "senate",
+          "candidate": "Frank Carlson"
+        },
+        {
+          "label": "Regular term: Paul Aiken, Dem.",
+          "contest": "senate",
+          "candidate": "Paul Aiken"
+        },
+        {
+          "label": "Regular term: Verne L. Damon, Prohib.",
+          "contest": "senate",
+          "candidate": "Verne L. Damon"
+        },
+        {
+          "label": "Unexpired term: Frank Carlson, Rep.",
+          "contest": "senate",
+          "candidate": "Frank Carlson"
+        },
+        {
+          "label": "Unexpired term: Paul Aiken, Dem",
+          "contest": "senate",
+          "candidate": "Paul Aiken"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.094,
+        0.092,
+        0.941,
+        1.0
+      ],
+      "hint": "Read only the table headed 'FOR UNITED STATES SENATOR'; ignore any other table visible in the image.",
+      "bands": 3,
+      "header": [
+        0.0,
+        0.1388
+      ]
+    },
+    {
+      "page": 3,
+      "id": "3-0",
+      "columns": [
+        {
+          "label": "Regular term: Frank Carlson, Rep.",
+          "contest": "senate",
+          "candidate": "Frank Carlson"
+        },
+        {
+          "label": "Regular term: Paul Aiken, Dem.",
+          "contest": "senate",
+          "candidate": "Paul Aiken"
+        },
+        {
+          "label": "Regular term: Verne L. Damon, Prohib.",
+          "contest": "senate",
+          "candidate": "Verne L. Damon"
+        },
+        {
+          "label": "Unexpired term: Frank Carlson, Rep.",
+          "contest": "senate",
+          "candidate": "Frank Carlson"
+        },
+        {
+          "label": "Unexpired term: Paul Aiken, Dem.",
+          "contest": "senate",
+          "candidate": "Paul Aiken"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.029,
+        0.13,
+        0.886,
+        0.842
+      ],
+      "hint": "Read only the table headed 'FOR UNITED STATES SENATOR\u2014CONCLUDED'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1152
+      ]
+    },
+    {
+      "page": 4,
+      "id": "4-1",
+      "columns": [
+        {
+          "label": "Albert M. Cole, Rep.",
+          "contest": "house1",
+          "candidate": "Albert M. Cole"
+        },
+        {
+          "label": "Ewell Stewart, Dem.",
+          "contest": "house1",
+          "candidate": "Ewell Stewart"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.098,
+        0.391,
+        0.947,
+        0.687
+      ],
+      "hint": "Read only the table headed 'FIRST CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 4,
+      "id": "4-2",
+      "columns": [
+        {
+          "label": "Errett P. Scrivner, Rep.",
+          "contest": "house2",
+          "candidate": "Errett P. Scrivner"
+        },
+        {
+          "label": "Milton Sullivant, Dem.",
+          "contest": "house2",
+          "candidate": "Milton Sullivant"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.098,
+        0.679,
+        0.941,
+        0.909
+      ],
+      "hint": "Read only the table headed 'SECOND CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 5,
+      "id": "5-0",
+      "columns": [
+        {
+          "label": "Myron V. George, Rep.",
+          "contest": "house3",
+          "candidate": "Myron V. George"
+        },
+        {
+          "label": "Barnes Griffith, Dem.",
+          "contest": "house3",
+          "candidate": "Barnes Griffith"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.027,
+        0.164,
+        0.883,
+        0.381
+      ],
+      "hint": "Read only the table headed 'THIRD CONGRESSIONAL DISTRICT (Regular Term)'; ignore any other table visible in the image."
+    },
+    {
+      "page": 5,
+      "id": "5-1",
+      "columns": [
+        {
+          "label": "Ed H. Rees, Rep.",
+          "contest": "house4",
+          "candidate": "Edward H. Rees"
+        },
+        {
+          "label": "Louis A. Donnell, Dem.",
+          "contest": "house4",
+          "candidate": "Louis A. Donnell"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.029,
+        0.373,
+        0.885,
+        0.673
+      ],
+      "hint": "Read only the table headed 'FOURTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 6,
+      "id": "6-0",
+      "columns": [
+        {
+          "label": "Clifford R. Hope, Rep.",
+          "contest": "house5",
+          "candidate": "Clifford R. Hope"
+        },
+        {
+          "label": "Robert L. Bock, Dem.",
+          "contest": "house5",
+          "candidate": "Robert L. Bock"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.099,
+        0.146,
+        0.957,
+        0.629
+      ],
+      "hint": "Read only the table headed 'FOR REPRESENTATIVES IN CONGRESS-CONTINUED FIFTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1097
+      ]
+    },
+    {
+      "page": 7,
+      "id": "7-0",
+      "columns": [
+        {
+          "label": "Wint Smith, Rep.",
+          "contest": "house6",
+          "candidate": "Wint Smith"
+        },
+        {
+          "label": "F. F. Wasinger, Dem.",
+          "contest": "house6",
+          "candidate": "F. F. Wasinger"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.023,
+        0.093,
+        0.882,
+        0.544
+      ],
+      "hint": "Read only the table headed 'FOR REPRESENTATIVES IN CONGRESS-Concluded SIXTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2439
+      ]
+    },
+    {
+      "page": 12,
+      "id": "12-0",
+      "columns": [
+        {
+          "label": "Edward F. Arn, Rep.",
+          "contest": "governor",
+          "candidate": "Edward F. Arn"
+        },
+        {
+          "label": "Kenneth T. Anderson, Dem.",
+          "contest": "governor",
+          "candidate": "Kenneth T. Anderson"
+        },
+        {
+          "label": "W. W. Tamplin, Socialist",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "C. Floyd Hester, Prohib.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.101,
+        0.108,
+        0.952,
+        1.0
+      ],
+      "hint": "Read only the table headed 'FOR GOVERNOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0886
+      ]
+    },
+    {
+      "page": 13,
+      "id": "13-0",
+      "columns": [
+        {
+          "label": "Edward F. Arn, Rep.",
+          "contest": "governor",
+          "candidate": "Edward F. Arn"
+        },
+        {
+          "label": "Kenneth T. Anderson, Dem.",
+          "contest": "governor",
+          "candidate": "Kenneth T. Anderson"
+        },
+        {
+          "label": "W. W. Tamplin, Socialist",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "C. Floyd Hester, Prohib.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.042,
+        0.197,
+        0.889,
+        0.819
+      ],
+      "hint": "Read only the table headed 'FOR GOVERNOR\u2014CONCLUDED'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        -0.0177
+      ]
+    }
+  ]
+}

@@ -1,0 +1,243 @@
+{
+  "polity": "US-KY",
+  "publisher": "Kentucky State Board of Elections",
+  "license": "Public record",
+  "raw_source": "us.scans",
+  "title": "Kentucky official returns, general election 1966-11-08",
+  "file": {
+    "url": "https://elect.ky.gov/results/1973-1979/Documents/1966.pdf"
+  },
+  "contests": {
+    "house1": {
+      "year": 1966,
+      "chamber": "house",
+      "day": "1966-11-08",
+      "special": false,
+      "state": "KY",
+      "district": 1
+    },
+    "house5": {
+      "year": 1966,
+      "chamber": "house",
+      "day": "1966-11-08",
+      "special": false,
+      "state": "KY",
+      "district": 5
+    },
+    "house2": {
+      "year": 1966,
+      "chamber": "house",
+      "day": "1966-11-08",
+      "special": false,
+      "state": "KY",
+      "district": 2
+    },
+    "house6": {
+      "year": 1966,
+      "chamber": "house",
+      "day": "1966-11-08",
+      "special": false,
+      "state": "KY",
+      "district": 6
+    },
+    "house3": {
+      "year": 1966,
+      "chamber": "house",
+      "day": "1966-11-08",
+      "special": false,
+      "state": "KY",
+      "district": 3
+    },
+    "house7": {
+      "year": 1966,
+      "chamber": "house",
+      "day": "1966-11-08",
+      "special": false,
+      "state": "KY",
+      "district": 7
+    },
+    "house4": {
+      "year": 1966,
+      "chamber": "house",
+      "day": "1966-11-08",
+      "special": false,
+      "state": "KY",
+      "district": 4
+    }
+  },
+  "pages": [
+    {
+      "page": 12,
+      "id": "12-0",
+      "columns": [
+        {
+          "label": "Frank A. Stubblefield, Democratic, Murray, Kentucky",
+          "contest": "house1",
+          "candidate": "Frank A. Stubblefield"
+        },
+        {
+          "label": "Richard Nicholson, Republican, Henderson, Kentucky",
+          "contest": "house1",
+          "candidate": "Richard Nicholson"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.235,
+        0.162,
+        0.406,
+        0.38
+      ],
+      "hint": "Read only the table headed '1ST DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 12,
+      "id": "12-1",
+      "columns": [
+        {
+          "label": "Eugene C. Harter, Jr., Dem. Campbellsville, Ky.",
+          "contest": "house5",
+          "candidate": "Eugene C. Harter, Jr."
+        },
+        {
+          "label": "Tim Lee Carter, Rep. Tompkinsville, Ky.",
+          "contest": "house5",
+          "candidate": "Tim Lee Carter"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.414,
+        0.162,
+        0.585,
+        0.405
+      ],
+      "hint": "Read only the table headed '5TH DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 12,
+      "id": "12-2",
+      "columns": [
+        {
+          "label": "William H. Natcher, Bowling Green, Ky., Dem.",
+          "contest": "house2",
+          "candidate": "William H. Natcher"
+        },
+        {
+          "label": "R. Douglas Ford, Owensboro, Ky., Rep.",
+          "contest": "house2",
+          "candidate": "R. Douglas Ford"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.235,
+        0.372,
+        0.406,
+        0.589
+      ],
+      "hint": "Read only the table headed '2ND DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 12,
+      "id": "12-3",
+      "columns": [
+        {
+          "label": "John C. Watts, Dem. Nicholasville, Ky.",
+          "contest": "house6",
+          "candidate": "John C. Watts"
+        },
+        {
+          "label": "William McKinley Hendren, Rep. Richmond, Ky.",
+          "contest": "house6",
+          "candidate": "William McK. Hendren"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.414,
+        0.397,
+        0.585,
+        0.649
+      ],
+      "hint": "Read only the table headed '6TH DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 12,
+      "id": "12-4",
+      "columns": [
+        {
+          "label": "Norbert Blume, Dem., Louisville, Kentucky",
+          "contest": "house3",
+          "candidate": "Norbert Blume"
+        },
+        {
+          "label": "William O. Cowger, Rep., Louisville, Kentucky",
+          "contest": "house3",
+          "candidate": "William O. Cowger"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.235,
+        0.581,
+        0.406,
+        0.693
+      ],
+      "hint": "Read only the table headed '3RD DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 12,
+      "id": "12-5",
+      "columns": [
+        {
+          "label": "Carl D. Perkins, Dem. Hindman, Kentucky",
+          "contest": "house7",
+          "candidate": "Carl D. Perkins"
+        },
+        {
+          "label": "C. F. See, Rep. Louisa, Kentucky",
+          "contest": "house7",
+          "candidate": "C. F. See"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.414,
+        0.641,
+        0.585,
+        0.851
+      ],
+      "hint": "Read only the table headed '7TH DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 12,
+      "id": "12-6",
+      "columns": [
+        {
+          "label": "Frank Chelf, Dem., Lebanon, Ky.",
+          "contest": "house4",
+          "candidate": "Frank Chelf"
+        },
+        {
+          "label": "M. G. \"Gene\" Snyder, Rep., Jeffersontown, Ky.",
+          "contest": "house4",
+          "candidate": "M. G. (Gene) Snyder"
+        },
+        {
+          "label": "John J. Moloney, Covington, Ky., Dec.",
+          "contest": "house4",
+          "candidate": "John J. Moloney"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.235,
+        0.685,
+        0.406,
+        0.855
+      ],
+      "hint": "Read only the table headed '4TH DISTRICT'; ignore any other table visible in the image."
+    }
+  ]
+}

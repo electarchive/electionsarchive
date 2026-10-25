@@ -1,0 +1,43 @@
+{
+ "polity": "US-KS",
+ "publisher": "Kansas Secretary of State",
+ "license": "Public record",
+ "raw_source": "us.ks_es",
+ "year": 1920,
+ "day": "1920-11-02",
+ "title": "Kansas election statistics 1920, general election",
+ "file": {
+  "url": "https://kgi.contentdm.oclc.org/digital/api/collection/p16884coll129/id/17/download"
+ },
+ "offices": {
+  "president": "presidential electors (President and Vice President)",
+  "governor": "Governor",
+  "senate": "U.S. Senator",
+  "house": "U.S. Representative, one table per district or all districts in column groups, county rows"
+ },
+ "leaves": [
+  2,
+  3,
+  5,
+  6,
+  7,
+  8,
+  10,
+  11,
+  13,
+  15,
+  16,
+  17,
+  19,
+  20,
+  21,
+  31,
+  32,
+  43,
+  44,
+  55,
+  56,
+  58
+ ],
+ "autorotate": true
+}

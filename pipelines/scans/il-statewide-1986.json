@@ -1,0 +1,318 @@
+{
+  "polity": "US-IL",
+  "publisher": "Illinois State Board of Elections",
+  "license": "Public record",
+  "raw_source": "us.scans",
+  "title": "State of Illinois official vote cast at the general election, 1986",
+  "file": {
+    "url": "https://archive.org/download/officialvote1986illi/officialvote1986illi.pdf"
+  },
+  "contests": {
+    "senate": {
+      "year": 1986,
+      "chamber": "senate",
+      "day": "1986-11-04",
+      "special": false,
+      "state": "IL",
+      "district": null
+    },
+    "governor": {
+      "year": 1986,
+      "chamber": "governor",
+      "day": "1986-11-04",
+      "special": false,
+      "state": "IL",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 16,
+      "id": "16-0",
+      "columns": [
+        {
+          "label": "Plurality",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "DEM Dixon",
+          "contest": "senate",
+          "candidate": "Alan J. Dixon"
+        },
+        {
+          "label": "REP Koehler",
+          "contest": "senate",
+          "candidate": "Judy Koehler"
+        },
+        {
+          "label": "SOL Dyhrkopp",
+          "contest": "senate",
+          "candidate": "Einar V. Dyhrkopp"
+        },
+        {
+          "label": "LIB Parrish",
+          "contest": "senate",
+          "candidate": "Donald M. Parrish Jr."
+        },
+        {
+          "label": "SWP Musa",
+          "contest": "senate",
+          "candidate": "Omari Musa"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.062,
+        0.104,
+        0.927,
+        1.0
+      ],
+      "hint": "Read only the table headed 'UNITED STATES SENATOR \u2014 NOVEMBER 4, 1986'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2578
+      ]
+    },
+    {
+      "page": 17,
+      "id": "17-0",
+      "columns": [
+        {
+          "label": "Plurality",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "DEM Dixon",
+          "contest": "senate",
+          "candidate": "Alan J. Dixon"
+        },
+        {
+          "label": "REP Koehler",
+          "contest": "senate",
+          "candidate": "Judy Koehler"
+        },
+        {
+          "label": "SOL Dyhrkopp",
+          "contest": "senate",
+          "candidate": "Einar V. Dyhrkopp"
+        },
+        {
+          "label": "LIB Parrish",
+          "contest": "senate",
+          "candidate": "Donald M. Parrish Jr."
+        },
+        {
+          "label": "SWP Musa",
+          "contest": "senate",
+          "candidate": "Omari Musa"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.07,
+        0.118,
+        0.934,
+        0.412
+      ],
+      "hint": "Read only the table headed 'UNITED STATES SENATOR \u2014 NOVEMBER 4, 1986 \u2014 Concluded'; ignore any other table visible in the image."
+    },
+    {
+      "page": 18,
+      "id": "18-0",
+      "columns": [
+        {
+          "label": "Plurality",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "REP Thompson Ryan",
+          "contest": "governor",
+          "candidate": "James R. Thompson"
+        },
+        {
+          "label": "SOL Stevenson Howlett",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "DEM No Candidate Fairchild",
+          "contest": "governor",
+          "candidate": "Mark Fairchild"
+        },
+        {
+          "label": "LIB Shilts Walsh",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "SWP Roling Little",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.057,
+        0.181,
+        0.926,
+        1.0
+      ],
+      "hint": "Read only the table headed 'GOVERNOR AND LIEUTENANT GOVERNOR \u2014 NOVEMBER 4, 1986'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.768
+      ]
+    },
+    {
+      "page": 19,
+      "id": "19-0",
+      "columns": [
+        {
+          "label": "Plurality",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "REP Thompson Ryan",
+          "contest": "governor",
+          "candidate": "James R. Thompson"
+        },
+        {
+          "label": "SOL Stevenson Howlett",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "DEM No Candidate Fairchild",
+          "contest": "governor",
+          "candidate": "Mark Fairchild"
+        },
+        {
+          "label": "LIB Shilts Walsh",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "SWP Roling Little",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.067,
+        0.198,
+        0.93,
+        1.0
+      ],
+      "hint": "Read only the table headed 'GOVERNOR AND LIEUTENANT GOVERNOR \u2014 NOVEMBER 4, 1986 \u2014 Continued'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0137
+      ]
+    },
+    {
+      "page": 20,
+      "id": "20-0",
+      "columns": [
+        {
+          "label": "Koen *",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Keeling *",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Bernabie *",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.068,
+        0.245,
+        0.506,
+        1.0
+      ],
+      "hint": "Read only the table headed 'GOVERNOR AND LIEUTENANT GOVERNOR \u2014 NOVEMBER 4, 1986 \u2014 Concluded'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0675
+      ]
+    },
+    {
+      "page": 20,
+      "id": "20-1",
+      "columns": [
+        {
+          "label": "Koen *",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Keeling *",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Bernabie *",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.49,
+        0.245,
+        0.928,
+        1.0
+      ],
+      "hint": "Read only the table headed 'GOVERNOR AND LIEUTENANT GOVERNOR \u2014 NOVEMBER 4, 1986 \u2014 Concluded'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0675
+      ]
+    },
+    {
+      "page": 21,
+      "id": "21-0",
+      "columns": [
+        {
+          "label": "Koen *",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Keeling *",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Bernabie *",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.49,
+        0.0,
+        0.928,
+        1.0
+      ],
+      "hint": "This page continues the table of the previous page and prints no headings."
+    }
+  ]
+}

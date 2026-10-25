@@ -1,0 +1,383 @@
+{
+  "polity": "US-KS",
+  "publisher": "Kansas Secretary of State",
+  "license": "Public record",
+  "raw_source": "us.ks_es",
+  "title": "Kansas election statistics 1952, general election",
+  "file": {
+    "url": "https://kgi.contentdm.oclc.org/digital/api/collection/p16884coll129/id/49/download"
+  },
+  "contests": {
+    "president": {
+      "year": 1952,
+      "chamber": "president",
+      "day": "1952-11-04",
+      "special": false,
+      "state": "KS",
+      "district": null
+    },
+    "house1": {
+      "year": 1952,
+      "chamber": "house",
+      "day": "1952-11-04",
+      "special": false,
+      "state": "KS",
+      "district": 1
+    },
+    "house2": {
+      "year": 1952,
+      "chamber": "house",
+      "day": "1952-11-04",
+      "special": false,
+      "state": "KS",
+      "district": 2
+    },
+    "house3": {
+      "year": 1952,
+      "chamber": "house",
+      "day": "1952-11-04",
+      "special": false,
+      "state": "KS",
+      "district": 3
+    },
+    "house4": {
+      "year": 1952,
+      "chamber": "house",
+      "day": "1952-11-04",
+      "special": false,
+      "state": "KS",
+      "district": 4
+    },
+    "house5": {
+      "year": 1952,
+      "chamber": "house",
+      "day": "1952-11-04",
+      "special": false,
+      "state": "KS",
+      "district": 5
+    },
+    "house6": {
+      "year": 1952,
+      "chamber": "house",
+      "day": "1952-11-04",
+      "special": false,
+      "state": "KS",
+      "district": 6
+    },
+    "governor": {
+      "year": 1952,
+      "chamber": "governor",
+      "day": "1952-11-04",
+      "special": false,
+      "state": "KS",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 2,
+      "id": "2-0",
+      "columns": [
+        {
+          "label": "Republican Eisenhower and Nixon",
+          "contest": "president",
+          "candidate": "Dwight D. Eisenhower (Republican)"
+        },
+        {
+          "label": "Prohibition Hamblen and Holtwick",
+          "contest": "president",
+          "candidate": "Stuart Hamblen (Prohibition)"
+        },
+        {
+          "label": "Socialist Hoopes and Friedman",
+          "contest": "president",
+          "candidate": "Socialist"
+        },
+        {
+          "label": "Democratic Stevenson and Sparkman",
+          "contest": "president",
+          "candidate": "Adlai Stevenson (Democratic)"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.094,
+        0.298,
+        0.941,
+        1.0
+      ],
+      "hint": "Read only the table headed 'FOR ELECTORS OF PRESIDENT AND VICE-PRESIDENT'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0954
+      ]
+    },
+    {
+      "page": 3,
+      "id": "3-0",
+      "columns": [
+        {
+          "label": "Republican Eisenhower and Nixon",
+          "contest": "president",
+          "candidate": "Dwight D. Eisenhower (Republican)"
+        },
+        {
+          "label": "Prohibition Hamblen and Holtwick",
+          "contest": "president",
+          "candidate": "Stuart Hamblen (Prohibition)"
+        },
+        {
+          "label": "Socialist Hoopes and Friedman",
+          "contest": "president",
+          "candidate": "Socialist"
+        },
+        {
+          "label": "Democratic Stevenson and Sparkman",
+          "contest": "president",
+          "candidate": "Adlai Stevenson (Democratic)"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.03,
+        0.143,
+        0.893,
+        0.945
+      ],
+      "hint": "Read only the table headed 'FOR ELECTORS OF PRESIDENT AND VICE-PRESIDENT\u2014CONCLUDED'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0798
+      ]
+    },
+    {
+      "page": 4,
+      "id": "4-0",
+      "columns": [
+        {
+          "label": "Albert M. Cole, Rep.",
+          "contest": "house1",
+          "candidate": "Albert M. Cole"
+        },
+        {
+          "label": "Howard S. Miller, Dem.",
+          "contest": "house1",
+          "candidate": "Howard S. Miller"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.094,
+        0.139,
+        0.955,
+        0.417
+      ],
+      "hint": "Read only the table headed 'FIRST CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 4,
+      "id": "4-1",
+      "columns": [
+        {
+          "label": "Errett P. Scrivner, Rep.",
+          "contest": "house2",
+          "candidate": "Errett P. Scrivner"
+        },
+        {
+          "label": "Claude L. Rice, Dem.",
+          "contest": "house2",
+          "candidate": "Claude L. Rice"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.094,
+        0.409,
+        0.953,
+        0.646
+      ],
+      "hint": "Read only the table headed 'SECOND CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 4,
+      "id": "4-2",
+      "columns": [
+        {
+          "label": "Myron V. George, Rep.",
+          "contest": "house3",
+          "candidate": "Myron V. George"
+        },
+        {
+          "label": "Fred L. Hedges, Dem.",
+          "contest": "house3",
+          "candidate": "Fred L. Hedges"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.092,
+        0.638,
+        0.95,
+        0.866
+      ],
+      "hint": "Read only the table headed 'THIRD CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 5,
+      "id": "5-0",
+      "columns": [
+        {
+          "label": "Ed H. Rees, Rep.",
+          "contest": "house4",
+          "candidate": "Edward H. Rees"
+        },
+        {
+          "label": "Bill Porter, Dem.",
+          "contest": "house4",
+          "candidate": "Bill Porter"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.026,
+        0.146,
+        0.888,
+        0.442
+      ],
+      "hint": "Read only the table headed 'FOURTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 5,
+      "id": "5-1",
+      "columns": [
+        {
+          "label": "Clifford R. Hope, Rep.",
+          "contest": "house5",
+          "candidate": "Clifford R. Hope"
+        },
+        {
+          "label": "Art McAnarney, Dem.",
+          "contest": "house5",
+          "candidate": "Art McAnarney"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.026,
+        0.434,
+        0.887,
+        0.946
+      ],
+      "hint": "Read only the table headed 'FIFTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.166
+      ]
+    },
+    {
+      "page": 6,
+      "id": "6-0",
+      "columns": [
+        {
+          "label": "Wint Smith, Rep.",
+          "contest": "house6",
+          "candidate": "Wint Smith"
+        },
+        {
+          "label": "Horace A. Santry, Dem.",
+          "contest": "house6",
+          "candidate": "Horace A. Santry"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.097,
+        0.127,
+        0.956,
+        0.557
+      ],
+      "hint": "Read only the table headed 'FOR REPRESENTATIVES IN CONGRESS\u2014CONCLUDED SIXTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 9,
+      "id": "9-0",
+      "columns": [
+        {
+          "label": "Edward F. Arn, Rep.",
+          "contest": "governor",
+          "candidate": "Edward F. Arn"
+        },
+        {
+          "label": "Charles Rooney, Dem.",
+          "contest": "governor",
+          "candidate": "Charles Rooney"
+        },
+        {
+          "label": "David C. White, Prohib.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "W. W. Tamplin, Soc.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.051,
+        0.136,
+        0.903,
+        1.0
+      ],
+      "hint": "Read only the table headed 'FOR GOVERNOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0683
+      ]
+    },
+    {
+      "page": 10,
+      "id": "10-0",
+      "columns": [
+        {
+          "label": "Edward F. Arn, Rep.",
+          "contest": "governor",
+          "candidate": "Edward F. Arn"
+        },
+        {
+          "label": "Charles Rooney, Dem.",
+          "contest": "governor",
+          "candidate": "Charles Rooney"
+        },
+        {
+          "label": "David C. White, Prohib.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "W. W. Tamplin, Soc.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.092,
+        0.137,
+        0.933,
+        0.811
+      ],
+      "hint": "Read only the table headed 'FOR GOVERNOR\u2014CONCLUDED'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0801
+      ]
+    }
+  ]
+}

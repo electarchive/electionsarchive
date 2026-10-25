@@ -1,0 +1,657 @@
+{
+  "polity": "US-OH",
+  "publisher": "Ohio Secretary of State",
+  "title": "Ohio Election Statistics, general election 1898-11-08, Representatives in Congress by county",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/ohioelectionsta01statgoog/page/n{page}_w2000.jpg",
+    "item": "https://archive.org/details/ohioelectionsta01statgoog"
+  },
+  "raw_source": "us.scans",
+  "contests": {
+    "house1": {
+      "year": 1898,
+      "chamber": "house",
+      "day": "1898-11-08",
+      "special": false,
+      "state": "OH",
+      "district": 1
+    },
+    "house2": {
+      "year": 1898,
+      "chamber": "house",
+      "day": "1898-11-08",
+      "special": false,
+      "state": "OH",
+      "district": 2
+    },
+    "house3": {
+      "year": 1898,
+      "chamber": "house",
+      "day": "1898-11-08",
+      "special": false,
+      "state": "OH",
+      "district": 3
+    },
+    "house4": {
+      "year": 1898,
+      "chamber": "house",
+      "day": "1898-11-08",
+      "special": false,
+      "state": "OH",
+      "district": 4
+    },
+    "house5": {
+      "year": 1898,
+      "chamber": "house",
+      "day": "1898-11-08",
+      "special": false,
+      "state": "OH",
+      "district": 5
+    },
+    "house6": {
+      "year": 1898,
+      "chamber": "house",
+      "day": "1898-11-08",
+      "special": false,
+      "state": "OH",
+      "district": 6
+    },
+    "house7": {
+      "year": 1898,
+      "chamber": "house",
+      "day": "1898-11-08",
+      "special": false,
+      "state": "OH",
+      "district": 7
+    },
+    "house8": {
+      "year": 1898,
+      "chamber": "house",
+      "day": "1898-11-08",
+      "special": false,
+      "state": "OH",
+      "district": 8
+    },
+    "house9": {
+      "year": 1898,
+      "chamber": "house",
+      "day": "1898-11-08",
+      "special": false,
+      "state": "OH",
+      "district": 9
+    },
+    "house10": {
+      "year": 1898,
+      "chamber": "house",
+      "day": "1898-11-08",
+      "special": false,
+      "state": "OH",
+      "district": 10
+    },
+    "house11": {
+      "year": 1898,
+      "chamber": "house",
+      "day": "1898-11-08",
+      "special": false,
+      "state": "OH",
+      "district": 11
+    },
+    "house12": {
+      "year": 1898,
+      "chamber": "house",
+      "day": "1898-11-08",
+      "special": false,
+      "state": "OH",
+      "district": 12
+    },
+    "house13": {
+      "year": 1898,
+      "chamber": "house",
+      "day": "1898-11-08",
+      "special": false,
+      "state": "OH",
+      "district": 13
+    },
+    "house14": {
+      "year": 1898,
+      "chamber": "house",
+      "day": "1898-11-08",
+      "special": false,
+      "state": "OH",
+      "district": 14
+    },
+    "house15": {
+      "year": 1898,
+      "chamber": "house",
+      "day": "1898-11-08",
+      "special": false,
+      "state": "OH",
+      "district": 15
+    },
+    "house16": {
+      "year": 1898,
+      "chamber": "house",
+      "day": "1898-11-08",
+      "special": false,
+      "state": "OH",
+      "district": 16
+    },
+    "house17": {
+      "year": 1898,
+      "chamber": "house",
+      "day": "1898-11-08",
+      "special": false,
+      "state": "OH",
+      "district": 17
+    },
+    "house18": {
+      "year": 1898,
+      "chamber": "house",
+      "day": "1898-11-08",
+      "special": false,
+      "state": "OH",
+      "district": 18
+    },
+    "house20": {
+      "year": 1898,
+      "chamber": "house",
+      "day": "1898-11-08",
+      "special": false,
+      "state": "OH",
+      "district": 20
+    },
+    "house21": {
+      "year": 1898,
+      "chamber": "house",
+      "day": "1898-11-08",
+      "special": false,
+      "state": "OH",
+      "district": 21
+    }
+  },
+  "pages": [
+    {
+      "page": 1271,
+      "id": "1271-0",
+      "columns": [
+        {
+          "label": "Republican. William B. Shattuc.",
+          "contest": "house1",
+          "candidate": "William Bunn Shattuc"
+        },
+        {
+          "label": "Democratic. John F. Follett.",
+          "contest": "house1",
+          "candidate": "John F Follett"
+        },
+        {
+          "label": "Union Reform. Will T. Cressler.",
+          "contest": "house1",
+          "candidate": "Will T Cressler"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [0.085, 0.151, 0.906, 0.395],
+      "hint": "Read only the table headed 'First Congressional District.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 1271,
+      "id": "1271-1",
+      "columns": [
+        {
+          "label": "Republican. Jacob H. Bromwell.",
+          "contest": "house2",
+          "candidate": "Jacob Henry Bromwell"
+        },
+        {
+          "label": "Democratic. Charles L. Swain.",
+          "contest": "house2",
+          "candidate": "Charles L Swain"
+        },
+        {
+          "label": "Union Reform. John D. Stuckey.",
+          "contest": "house2",
+          "candidate": "John D Stuckey"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [0.085, 0.387, 0.906, 0.641],
+      "hint": "Read only the table headed 'Second Congressional District.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 1271,
+      "id": "1271-2",
+      "columns": [
+        {
+          "label": "Republican. William J. White.",
+          "contest": "house3",
+          "candidate": "William J White"
+        },
+        {
+          "label": "Democratic. John L. Brenner.",
+          "contest": "house3",
+          "candidate": "John Lewis Brenner"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [0.085, 0.633, 0.906, 0.924],
+      "hint": "Read only the table headed 'Third Congressional District.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 1272,
+      "id": "1272-0",
+      "columns": [
+        {
+          "label": "Republican. Philip Sheets.",
+          "contest": "house4",
+          "candidate": "Philip Sheets"
+        },
+        {
+          "label": "Democratic. Robert B. Gordon.",
+          "contest": "house4",
+          "candidate": "Robert Bryarly Gordon"
+        },
+        {
+          "label": "Union Reform. William H. Murphy.",
+          "contest": "house4",
+          "candidate": "William H Murphy"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [0.097, 0.098, 0.915, 0.375],
+      "hint": "Read only the table headed 'Fourth Congressional District.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 1272,
+      "id": "1272-1",
+      "columns": [
+        {
+          "label": "Republican. Alfred N. Wilcox.",
+          "contest": "house5",
+          "candidate": "Alfred N Wilcox"
+        },
+        {
+          "label": "Democratic. David Meekison.",
+          "contest": "house5",
+          "candidate": "David Meekison"
+        },
+        {
+          "label": "Union Reform. Fred. D. Dunakin.",
+          "contest": "house5",
+          "candidate": "Fred D Dunakin"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [0.097, 0.367, 0.915, 0.656],
+      "hint": "Read only the table headed 'Fifth Congressional District.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 1272,
+      "id": "1272-2",
+      "columns": [
+        {
+          "label": "Republican. Seth W. Brown.",
+          "contest": "house6",
+          "candidate": "Seth W. Brown"
+        },
+        {
+          "label": "Democratic. Lewis H. Whiteman.",
+          "contest": "house6",
+          "candidate": "Lewis H Whiteman"
+        },
+        {
+          "label": "Union Reform. Perry McLaughlin.",
+          "contest": "house6",
+          "candidate": "Perry McLaughlin"
+        },
+        { "label": "Scattering.", "contest": null, "candidate": "" }
+      ],
+      "orientation": "counties_down",
+      "crop": [0.097, 0.648, 0.915, 0.936],
+      "hint": "Read only the table headed 'Sixth Congressional District.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 1273,
+      "id": "1273-0",
+      "columns": [
+        {
+          "label": "Republican. Walter L. Weaver.",
+          "contest": "house7",
+          "candidate": "Walter Lowrie Weaver"
+        },
+        {
+          "label": "Democratic. John L. Zimmerman.",
+          "contest": "house7",
+          "candidate": "John L Zimmerman"
+        },
+        {
+          "label": "Union Reform. Rei Rathbun.",
+          "contest": "house7",
+          "candidate": "Rei Rathbun"
+        },
+        { "label": "Scattering.", "contest": null, "candidate": "" }
+      ],
+      "orientation": "counties_down",
+      "crop": [0.08, 0.099, 0.904, 0.379],
+      "hint": "Read only the table headed 'Seventh Congressional District.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 1273,
+      "id": "1273-1",
+      "columns": [
+        {
+          "label": "Republican. Archibald Lybrand.",
+          "contest": "house8",
+          "candidate": "Archibald Lybrand"
+        },
+        {
+          "label": "Democratic. Harvey Walter Doty.",
+          "contest": "house8",
+          "candidate": "Harvey Walter Doty"
+        },
+        {
+          "label": "Union Reform. Spencer Garwood.",
+          "contest": "house8",
+          "candidate": "Spencer Garwood"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [0.08, 0.371, 0.901, 0.668],
+      "hint": "Read only the table headed 'Eighth Congressional District.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 1273,
+      "id": "1273-2",
+      "columns": [
+        {
+          "label": "Republican. James H. Southard.",
+          "contest": "house9",
+          "candidate": "James Harding Southard"
+        },
+        {
+          "label": "Democratic. Samuel E. Niece.",
+          "contest": "house9",
+          "candidate": "Samuel E Niece"
+        },
+        {
+          "label": "Union Reform. David Miley.",
+          "contest": "house9",
+          "candidate": "David Miley"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [0.08, 0.66, 0.901, 0.929],
+      "hint": "Read only the table headed 'Ninth Congressional District.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 1274,
+      "id": "1274-0",
+      "columns": [
+        {
+          "label": "Republican. Stephen Morgan.",
+          "contest": "house10",
+          "candidate": "Stephen Morgan"
+        },
+        {
+          "label": "Democratic. Alva Crabtree.",
+          "contest": "house10",
+          "candidate": "Alva Crabtree"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [0.095, 0.099, 0.916, 0.388],
+      "hint": "Read only the table headed 'Tenth Congressional District.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 1274,
+      "id": "1274-1",
+      "columns": [
+        {
+          "label": "Republican. Charles H. Grosvenor.",
+          "contest": "house11",
+          "candidate": "Charles Henry Grosvenor"
+        },
+        {
+          "label": "Democratic. Charles E. Peoples.",
+          "contest": "house11",
+          "candidate": "Charles E Peoples"
+        },
+        {
+          "label": "Union Reform. G. W. Dollison.",
+          "contest": "house11",
+          "candidate": "G W Dollison"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [0.093, 0.38, 0.913, 0.683],
+      "hint": "Read only the table headed 'Eleventh Congressional District.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 1274,
+      "id": "1274-2",
+      "columns": [
+        {
+          "label": "Republican. Edward N. Huggins.",
+          "contest": "house12",
+          "candidate": "Edward N Huggins"
+        },
+        {
+          "label": "Democratic. John J. Lentz.",
+          "contest": "house12",
+          "candidate": "John Jacob Lentz"
+        },
+        {
+          "label": "Prohibition. William W. Johnson.",
+          "contest": "house12",
+          "candidate": "William W Johnson"
+        },
+        {
+          "label": "Union Reform. Alexander M. Smith.",
+          "contest": "house12",
+          "candidate": "Alexander M Smith"
+        },
+        { "label": "Scattering.", "contest": null, "candidate": "" }
+      ],
+      "orientation": "counties_down",
+      "crop": [0.093, 0.675, 0.911, 0.929],
+      "hint": "Read only the table headed 'Twelfth Congressional District.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 1275,
+      "id": "1275-0",
+      "columns": [
+        {
+          "label": "Republican. Henry L. Wenner.",
+          "contest": "house13",
+          "candidate": "Henry L Wenner"
+        },
+        {
+          "label": "Democratic. James A. Norton.",
+          "contest": "house13",
+          "candidate": "James Albert Norton"
+        },
+        {
+          "label": "Prohibition. Walter S. Payne.",
+          "contest": "house13",
+          "candidate": "Walter S Payne"
+        },
+        {
+          "label": "Union Reform. Orrin J. Fry.",
+          "contest": "house13",
+          "candidate": "Orrin J Fry"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [0.18, 0.201, 0.888, 0.591],
+      "hint": "Read only the table headed 'Thirteenth Congressional District.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 1275,
+      "id": "1275-1",
+      "columns": [
+        {
+          "label": "Republican. Winfield S. Kerr.",
+          "contest": "house14",
+          "candidate": "Winfield Scott Kerr"
+        },
+        {
+          "label": "Democratic. Thomas A. Gruber.",
+          "contest": "house14",
+          "candidate": "Thomas A Gruber"
+        },
+        { "label": "Scattering.", "contest": null, "candidate": "" }
+      ],
+      "orientation": "counties_down",
+      "crop": [0.18, 0.583, 0.888, 0.971],
+      "hint": "Read only the table headed 'Fourteenth Congressional District.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 1275,
+      "id": "1275-2",
+      "columns": [
+        {
+          "label": "Republican. Henry Clay VanVoorhis.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Democratic. Henry R. Stanbery.",
+          "contest": "house15",
+          "candidate": "Henry R Stanbery"
+        },
+        { "label": "Scattering.", "contest": null, "candidate": "" }
+      ],
+      "orientation": "counties_down",
+      "crop": [0.18, 0.963, 0.888, 1.0],
+      "hint": "Read only the table headed 'Fifteenth Congressional District.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 1276,
+      "id": "1276-0",
+      "columns": [
+        {
+          "label": "Republican. Lorenzo Danford.",
+          "contest": "house16",
+          "candidate": "Lorenzo Danford"
+        },
+        {
+          "label": "Democratic. Elliott D. Moore.",
+          "contest": "house16",
+          "candidate": "Elliott D Moore"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [0.089, 0.096, 0.911, 0.376],
+      "hint": "Read only the table headed 'Sixteenth Congressional District.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 1276,
+      "id": "1276-1",
+      "columns": [
+        {
+          "label": "Republican. George E. Broome.",
+          "contest": "house17",
+          "candidate": "George E Broome"
+        },
+        {
+          "label": "Democratic. John A. McDowell.",
+          "contest": "house17",
+          "candidate": "John Anderson McDowell"
+        },
+        { "label": "Scattering.", "contest": null, "candidate": "" }
+      ],
+      "orientation": "counties_down",
+      "crop": [0.089, 0.368, 0.913, 0.655],
+      "hint": "Read only the table headed 'Seventeenth Congressional District.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 1276,
+      "id": "1276-2",
+      "columns": [
+        {
+          "label": "Republican. Robert W. Tayler.",
+          "contest": "house18",
+          "candidate": "Robert Walker Tayler"
+        },
+        {
+          "label": "Democratic. Charles C. Weybrecht.",
+          "contest": "house18",
+          "candidate": "Charles C Weybrecht"
+        },
+        {
+          "label": "Prohibition. George C. Harvey.",
+          "contest": "house18",
+          "candidate": "George C Harvey"
+        },
+        {
+          "label": "Socialist Labor. Samuel Borton.",
+          "contest": "house18",
+          "candidate": "Samuel Borton"
+        },
+        {
+          "label": "Union Reform. L. B. Logan.",
+          "contest": "house18",
+          "candidate": "L B Logan"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [0.089, 0.647, 0.913, 0.932],
+      "hint": "Read only the table headed 'Eighteenth Congressional District.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 1277,
+      "id": "1277-2",
+      "columns": [
+        {
+          "label": "Rep. Fremont O. Phillips.",
+          "contest": "house20",
+          "candidate": "Fremont Orestes Phillips"
+        },
+        {
+          "label": "Dem. William J. Hart.",
+          "contest": "house20",
+          "candidate": "William J Hart"
+        },
+        {
+          "label": "Soc. Labor. Robert Barthels.",
+          "contest": "house20",
+          "candidate": "Robert Barthels"
+        },
+        {
+          "label": "Union Reform. M. O. Morton.",
+          "contest": "house20",
+          "candidate": "M O Morton"
+        },
+        { "label": "Scattering.", "contest": null, "candidate": "" }
+      ],
+      "orientation": "counties_down",
+      "crop": [0.082, 0.666, 0.902, 0.943],
+      "hint": "Read only the table headed 'Twentieth Congressional District.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 1278,
+      "id": "1278-0",
+      "columns": [
+        {
+          "label": "Republican. Theodore E. Burton.",
+          "contest": "house21",
+          "candidate": "Theodore Elijah Burton"
+        },
+        {
+          "label": "Democratic. Lemuel A. Russell.",
+          "contest": "house21",
+          "candidate": "Lemuel A Russell"
+        },
+        {
+          "label": "Socialist Labor. John J. Koller.",
+          "contest": "house21",
+          "candidate": "John J Koller"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [0.092, 0.118, 0.91, 0.356],
+      "hint": "Read only the table headed 'Twenty-first Congressional District.'; ignore any other table visible in the image."
+    }
+  ]
+}

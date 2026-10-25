@@ -1,0 +1,218 @@
+{
+  "polity": "US-KS",
+  "publisher": "Kansas Secretary of State",
+  "license": "Public record",
+  "raw_source": "us.ks_es",
+  "title": "Kansas election statistics 1982, general election",
+  "file": {
+    "url": "https://kgi.contentdm.oclc.org/digital/api/collection/p16884coll129/id/68/download"
+  },
+  "contests": {
+    "governor": {
+      "year": 1982,
+      "chamber": "governor",
+      "day": "1982-11-02",
+      "special": false,
+      "state": "KS",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 21,
+      "id": "21-0",
+      "columns": [
+        {
+          "label": "Hardage and Thiessen Rep.",
+          "contest": "governor",
+          "candidate": "Sam Hardage"
+        },
+        {
+          "label": "Huffman and Humphrey Rep.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Klemp and Radtke Rep",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Lady and Griffiths Rep.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Owen and Casado Rep.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Carlin and Docking Dem.",
+          "contest": "governor",
+          "candidate": "John Carlin"
+        },
+        {
+          "label": "Montgomery and Wainscott Dem.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.029,
+        0.104,
+        0.958,
+        1.0
+      ],
+      "hint": "Read only the table headed 'FOR GOVERNOR-LIEUTENANT GOVERNOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0882
+      ]
+    },
+    {
+      "page": 22,
+      "id": "22-0",
+      "columns": [
+        {
+          "label": "Hardage and Thiessen Rep",
+          "contest": "governor",
+          "candidate": "Sam Hardage"
+        },
+        {
+          "label": "Huffman and Humphrey Rep",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Klemp and Radtke Rep",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Lady and Griffiths Rep",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Owen and Casado Rep",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Carlin and Docking Dem",
+          "contest": "governor",
+          "candidate": "John Carlin"
+        },
+        {
+          "label": "Montgomery and Wainscott Dem",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.012,
+        0.115,
+        0.973,
+        0.814
+      ],
+      "hint": "Read only the table headed 'FOR GOVERNOR-LIEUTENANT GOVERNOR\u2014Concluded'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0687
+      ]
+    },
+    {
+      "page": 64,
+      "id": "64-0",
+      "columns": [
+        {
+          "label": "Hardage and Thiessen Rep.",
+          "contest": "governor",
+          "candidate": "Sam Hardage"
+        },
+        {
+          "label": "Carlin and Docking Dem.",
+          "contest": "governor",
+          "candidate": "John Carlin"
+        },
+        {
+          "label": "Shelton and Jackson Am.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Ward and Warren Lib.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Martin and Williams Pro.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.054,
+        0.067,
+        0.888,
+        1.0
+      ],
+      "hint": "Read only the table headed 'FOR GOVERNOR-LIEUTENANT GOVERNOR'; ignore any other table visible in the image.",
+      "bands": 3,
+      "header": [
+        0.0,
+        0.074
+      ]
+    },
+    {
+      "page": 65,
+      "id": "65-0",
+      "columns": [
+        {
+          "label": "Hardage and Thiessen Rep.",
+          "contest": "governor",
+          "candidate": "Sam Hardage"
+        },
+        {
+          "label": "Carlin and Docking Dem.",
+          "contest": "governor",
+          "candidate": "John Carlin"
+        },
+        {
+          "label": "Shelton and Jackson Am.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Ward and Warren Lib.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Martin and Williams Pro.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.122,
+        0.083,
+        0.948,
+        0.779
+      ],
+      "hint": "Read only the table headed 'FOR GOVERNOR-LIEUTENANT GOVERNOR\u2014Concluded'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0819
+      ]
+    }
+  ]
+}

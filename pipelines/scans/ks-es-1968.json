@@ -1,0 +1,748 @@
+{
+  "polity": "US-KS",
+  "publisher": "Kansas Secretary of State",
+  "license": "Public record",
+  "raw_source": "us.ks_es",
+  "title": "Kansas election statistics 1968, general election",
+  "file": {
+    "url": "https://kgi.contentdm.oclc.org/digital/api/collection/p16884coll129/id/61/download"
+  },
+  "contests": {
+    "senate": {
+      "year": 1968,
+      "chamber": "senate",
+      "day": "1968-11-05",
+      "special": false,
+      "state": "KS",
+      "district": null
+    },
+    "house1": {
+      "year": 1968,
+      "chamber": "house",
+      "day": "1968-11-05",
+      "special": false,
+      "state": "KS",
+      "district": 1
+    },
+    "house2": {
+      "year": 1968,
+      "chamber": "house",
+      "day": "1968-11-05",
+      "special": false,
+      "state": "KS",
+      "district": 2
+    },
+    "house3": {
+      "year": 1968,
+      "chamber": "house",
+      "day": "1968-11-05",
+      "special": false,
+      "state": "KS",
+      "district": 3
+    },
+    "house4": {
+      "year": 1968,
+      "chamber": "house",
+      "day": "1968-11-05",
+      "special": false,
+      "state": "KS",
+      "district": 4
+    },
+    "house5": {
+      "year": 1968,
+      "chamber": "house",
+      "day": "1968-11-05",
+      "special": false,
+      "state": "KS",
+      "district": 5
+    },
+    "governor": {
+      "year": 1968,
+      "chamber": "governor",
+      "day": "1968-11-05",
+      "special": false,
+      "state": "KS",
+      "district": null
+    },
+    "president": {
+      "year": 1968,
+      "chamber": "president",
+      "day": "1968-11-05",
+      "special": false,
+      "state": "KS",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 12,
+      "id": "12-0",
+      "columns": [
+        {
+          "label": "Wm. H. Avery, Rep.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Bob Dole, Rep.",
+          "contest": "senate",
+          "candidate": "Bob Dole"
+        },
+        {
+          "label": "Irene Corn, Dem.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "James K. Logan, Dem.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "George A. Lopez, Dem.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "William I. Robinson, Dem.",
+          "contest": "senate",
+          "candidate": "William I. Robinson"
+        },
+        {
+          "label": "K.L.(Ken) Smith, Dem.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.026,
+        0.144,
+        0.934,
+        1.0
+      ],
+      "hint": "Read only the table headed 'FOR UNITED STATES SENATOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0456
+      ]
+    },
+    {
+      "page": 13,
+      "id": "13-0",
+      "columns": [
+        {
+          "label": "Wm. H. Avery, Rep.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Bob Dole, Rep.",
+          "contest": "senate",
+          "candidate": "Bob Dole"
+        },
+        {
+          "label": "Irene Corn, Dem.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "James K. Logan, Dem.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "George A. Lopez, Dem.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "William I. Robinson, Dem.",
+          "contest": "senate",
+          "candidate": "William I. Robinson"
+        },
+        {
+          "label": "K L (Ken) Smith, Dem.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.062,
+        0.125,
+        0.961,
+        0.791
+      ],
+      "hint": "Read only the table headed 'Primary Election, August 6, 1968 FOR UNITED STATES SENATOR\u2014Concluded'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0871
+      ]
+    },
+    {
+      "page": 14,
+      "id": "14-0",
+      "columns": [
+        {
+          "label": "W. H. (Bill) Crotinger, Rep.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Keith G. Sebelius, Rep.",
+          "contest": "house1",
+          "candidate": "Keith G. Sebelius"
+        },
+        {
+          "label": "Gerald Shadwick, Rep.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "George W. Meeker, Dem.",
+          "contest": "house1",
+          "candidate": "George W. Meeker"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.011,
+        0.095,
+        0.92,
+        0.864
+      ],
+      "hint": "Read only the table headed 'FOR CONGRESSMAN, FIRST DISTRICT'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.104
+      ]
+    },
+    {
+      "page": 15,
+      "id": "15-0",
+      "columns": [
+        {
+          "label": "Chester L. Mize, Rep.",
+          "contest": "house2",
+          "candidate": "Chester L. Mize"
+        },
+        {
+          "label": "Robert Austin Swan, Jr., Dem.",
+          "contest": "house2",
+          "candidate": "Robert Austin Swan, Jr."
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.057,
+        0.098,
+        0.958,
+        0.451
+      ],
+      "hint": "Read only the table headed 'FOR CONGRESSMAN, SECOND DISTRICT\u2014Continued'; ignore any other table visible in the image."
+    },
+    {
+      "page": 15,
+      "id": "15-1",
+      "columns": [
+        {
+          "label": "Larry Winn, Jr., Rep.",
+          "contest": "house3",
+          "candidate": "Larry Winn, Jr."
+        },
+        {
+          "label": "Newell A. George, Dem.",
+          "contest": "house3",
+          "candidate": "Newell A. George"
+        },
+        {
+          "label": "Dr. Jerome E. Holtzman, Dem.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.057,
+        0.443,
+        0.958,
+        0.652
+      ],
+      "hint": "Read only the table headed 'FOR CONGRESSMAN, THIRD DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 15,
+      "id": "15-2",
+      "columns": [
+        {
+          "label": "Garner E. Shriver, Rep.",
+          "contest": "house4",
+          "candidate": "Garner E. Shriver"
+        },
+        {
+          "label": "Patrick F. Kelly, Dem.",
+          "contest": "house4",
+          "candidate": "Patrick F. Kelly"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.057,
+        0.644,
+        0.958,
+        0.862
+      ],
+      "hint": "Read only the table headed 'FOR CONGRESSMAN, FOURTH DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 16,
+      "id": "16-0",
+      "columns": [
+        {
+          "label": "Joe Skubitz, Rep.",
+          "contest": "house5",
+          "candidate": "Joe Skubitz"
+        },
+        {
+          "label": "A. F. (Al) Bramble, Dem.",
+          "contest": "house5",
+          "candidate": "A. F. Bramble"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.009,
+        0.172,
+        0.906,
+        0.86
+      ],
+      "hint": "Read only the table headed 'FOR CONGRESSMAN, FIFTH DISTRICT\u2014Concluded'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1759
+      ]
+    },
+    {
+      "page": 17,
+      "id": "17-0",
+      "columns": [
+        {
+          "label": "John Crutcher, Rep.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Rick Harman, Rep.",
+          "contest": "governor",
+          "candidate": "Rick Harman"
+        },
+        {
+          "label": "Raymond J. Van Skiver, Rep.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Robert Docking, Dem.",
+          "contest": "governor",
+          "candidate": "Robert Docking"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.08,
+        0.1,
+        0.983,
+        1.0
+      ],
+      "hint": "Read only the table headed 'FOR GOVERNOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0856
+      ]
+    },
+    {
+      "page": 18,
+      "id": "18-0",
+      "columns": [
+        {
+          "label": "John Crutcher, Rep.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Rick Harman, Rep.",
+          "contest": "governor",
+          "candidate": "Rick Harman"
+        },
+        {
+          "label": "Raymond J. Van Skiver, Rep.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Robert Docking, Dem.",
+          "contest": "governor",
+          "candidate": "Robert Docking"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.023,
+        0.128,
+        0.92,
+        0.794
+      ],
+      "hint": "Read only the table headed 'Primary Election, August 6, 1968 FOR GOVERNOR\u2014Concluded'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0886
+      ]
+    },
+    {
+      "page": 75,
+      "id": "75-0",
+      "columns": [
+        {
+          "label": "Nixon and Agnew, Rep.",
+          "contest": "president",
+          "candidate": "Richard Nixon (Republican)"
+        },
+        {
+          "label": "Humphrey and Muskie, Dem.",
+          "contest": "president",
+          "candidate": "Hubert H. Humphrey (Democratic)"
+        },
+        {
+          "label": "Wallace and Griffin, Conserv.",
+          "contest": "president",
+          "candidate": "George Wallace (American Independent)"
+        },
+        {
+          "label": "Munn and Fisher, Prohib.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.047,
+        0.089,
+        0.943,
+        1.0
+      ],
+      "hint": "Read only the table headed 'FOR ELECTORS OF PRESIDENT AND VICE-PRESIDENT'; ignore any other table visible in the image.",
+      "bands": 3,
+      "header": [
+        0.0,
+        0.303
+      ]
+    },
+    {
+      "page": 76,
+      "id": "76-0",
+      "columns": [
+        {
+          "label": "Nixon and Agnew, Rep.",
+          "contest": "president",
+          "candidate": "Richard Nixon (Republican)"
+        },
+        {
+          "label": "Humphrey and Muskie, Dem.",
+          "contest": "president",
+          "candidate": "Hubert H. Humphrey (Democratic)"
+        },
+        {
+          "label": "Wallace and Griffin, Conserv.",
+          "contest": "president",
+          "candidate": "George Wallace (American Independent)"
+        },
+        {
+          "label": "Munn and Fisher, Prohib.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.032,
+        0.112,
+        0.933,
+        0.959
+      ],
+      "hint": "Read only the table headed 'FOR ELECTORS OF PRESIDENT AND VICE-PRESIDENT\u2014Concluded'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0779
+      ]
+    },
+    {
+      "page": 77,
+      "id": "77-0",
+      "columns": [
+        {
+          "label": "Bob Dole, Rep.",
+          "contest": "senate",
+          "candidate": "Bob Dole"
+        },
+        {
+          "label": "William I. Robinson, Dem.",
+          "contest": "senate",
+          "candidate": "William I. Robinson"
+        },
+        {
+          "label": "Joseph Fred Hyskell, Prohib.",
+          "contest": "senate",
+          "candidate": "Joseph Fred Hyskell"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.042,
+        0.075,
+        0.93,
+        1.0
+      ],
+      "hint": "Read only the table headed 'FOR UNITED STATES SENATOR'; ignore any other table visible in the image.",
+      "bands": 3,
+      "header": [
+        0.0,
+        0.0876
+      ]
+    },
+    {
+      "page": 78,
+      "id": "78-0",
+      "columns": [
+        {
+          "label": "Bob Dole, Rep.",
+          "contest": "senate",
+          "candidate": "Bob Dole"
+        },
+        {
+          "label": "William I. Robinson, Dem.",
+          "contest": "senate",
+          "candidate": "William I. Robinson"
+        },
+        {
+          "label": "Joseph Fred Hyskell, Prohib.",
+          "contest": "senate",
+          "candidate": "Joseph Fred Hyskell"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.02,
+        0.105,
+        0.92,
+        0.777
+      ],
+      "hint": "Read only the table headed 'FOR UNITED STATES SENATOR\u2014Concluded'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1116
+      ]
+    },
+    {
+      "page": 79,
+      "id": "79-0",
+      "columns": [
+        {
+          "label": "Keith G. Sebelius, Rep.",
+          "contest": "house1",
+          "candidate": "Keith G. Sebelius"
+        },
+        {
+          "label": "George W. Meeker, Dem.",
+          "contest": "house1",
+          "candidate": "George W. Meeker"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.036,
+        0.077,
+        0.94,
+        0.852
+      ],
+      "hint": "Read only the table headed 'FOR CONGRESSMAN, FIRST DISTRICT'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1071
+      ]
+    },
+    {
+      "page": 80,
+      "id": "80-0",
+      "columns": [
+        {
+          "label": "Chester L. Mize, Rep.",
+          "contest": "house2",
+          "candidate": "Chester L. Mize"
+        },
+        {
+          "label": "Robert Austin Swan, Jr., Dem.",
+          "contest": "house2",
+          "candidate": "Robert Austin Swan, Jr."
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.007,
+        0.103,
+        0.908,
+        0.511
+      ],
+      "hint": "Read only the table headed 'FOR CONGRESSMAN, SECOND DISTRICT\u2014Continued'; ignore any other table visible in the image."
+    },
+    {
+      "page": 80,
+      "id": "80-1",
+      "columns": [
+        {
+          "label": "Larry Winn, Jr., Rep.",
+          "contest": "house3",
+          "candidate": "Larry Winn, Jr."
+        },
+        {
+          "label": "Newell A. George, Dem.",
+          "contest": "house3",
+          "candidate": "Newell A. George"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.007,
+        0.503,
+        0.906,
+        0.74
+      ],
+      "hint": "Read only the table headed 'FOR CONGRESSMAN, THIRD DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 80,
+      "id": "80-2",
+      "columns": [
+        {
+          "label": "Garner E. Shriver, Rep.",
+          "contest": "house4",
+          "candidate": "Garner E. Shriver"
+        },
+        {
+          "label": "Patrick F. Kelly, Dem.",
+          "contest": "house4",
+          "candidate": "Patrick F. Kelly"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.007,
+        0.732,
+        0.906,
+        0.986
+      ],
+      "hint": "Read only the table headed 'FOR CONGRESSMAN, FOURTH DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 81,
+      "id": "81-0",
+      "columns": [
+        {
+          "label": "Joe Skubitz, Rep.",
+          "contest": "house5",
+          "candidate": "Joe Skubitz"
+        },
+        {
+          "label": "A. F. (Al) Bramble, Dem.",
+          "contest": "house5",
+          "candidate": "A. F. Bramble"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.07,
+        0.086,
+        0.97,
+        0.499
+      ],
+      "hint": "Read only the table headed 'FOR CONGRESSMAN, FIFTH DISTRICT\u2014Concluded'; ignore any other table visible in the image."
+    },
+    {
+      "page": 82,
+      "id": "82-0",
+      "columns": [
+        {
+          "label": "Rick Harman, Rep.",
+          "contest": "governor",
+          "candidate": "Rick Harman"
+        },
+        {
+          "label": "Robert Docking, Dem.",
+          "contest": "governor",
+          "candidate": "Robert Docking"
+        },
+        {
+          "label": "Marshall Uncapher, Prohib.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.021,
+        0.081,
+        0.93,
+        1.0
+      ],
+      "hint": "Read only the table headed 'FOR GOVERNOR'; ignore any other table visible in the image.",
+      "bands": 3,
+      "header": [
+        0.0,
+        0.0881
+      ]
+    },
+    {
+      "page": 83,
+      "id": "83-0",
+      "columns": [
+        {
+          "label": "Rick Harman, Rep.",
+          "contest": "governor",
+          "candidate": "Rick Harman"
+        },
+        {
+          "label": "Robert Docking, Dem.",
+          "contest": "governor",
+          "candidate": "Robert Docking"
+        },
+        {
+          "label": "Marshall Uncapher, Prohib.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.072,
+        0.097,
+        0.968,
+        0.747
+      ],
+      "hint": "Read only the table headed 'FOR GOVERNOR\u2014Concluded'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0892
+      ]
+    }
+  ]
+}

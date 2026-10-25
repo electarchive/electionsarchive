@@ -272,6 +272,7 @@ def finalize(
 ) -> str:
     overrides = json.loads((folder / "overrides.json").read_text()) if (folder / "overrides.json").exists() else {}
     accepted: list[str] = overrides.get("accept", [])
+    fixes: dict[str, int] = overrides.get("fix", {})
     keys = sorted({key for tables_ in outcome.values() for key in tables_})
     passed: list[dict[str, object]] = []
     review: list[str] = []
@@ -324,7 +325,7 @@ def finalize(
                 "title": office.replace("-", " ").title(),
                 "name": row["name"],
                 "party": row["party"],
-                "votes": row["votes"],
+                "votes": fixes.get(f"{label}|{row['name']}", row["votes"]),
                 "page": leaf,
                 "how": how,
             }

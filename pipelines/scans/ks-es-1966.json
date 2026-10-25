@@ -1,0 +1,782 @@
+{
+  "polity": "US-KS",
+  "publisher": "Kansas Secretary of State",
+  "license": "Public record",
+  "raw_source": "us.ks_es",
+  "title": "Kansas election statistics 1966, general election",
+  "file": {
+    "url": "https://kgi.contentdm.oclc.org/digital/api/collection/p16884coll129/id/60/download"
+  },
+  "contests": {
+    "senate": {
+      "year": 1966,
+      "chamber": "senate",
+      "day": "1966-11-08",
+      "special": false,
+      "state": "KS",
+      "district": null
+    },
+    "house1": {
+      "year": 1966,
+      "chamber": "house",
+      "day": "1966-11-08",
+      "special": false,
+      "state": "KS",
+      "district": 1
+    },
+    "house3": {
+      "year": 1966,
+      "chamber": "house",
+      "day": "1966-11-08",
+      "special": false,
+      "state": "KS",
+      "district": 3
+    },
+    "house4": {
+      "year": 1966,
+      "chamber": "house",
+      "day": "1966-11-08",
+      "special": false,
+      "state": "KS",
+      "district": 4
+    },
+    "house5": {
+      "year": 1966,
+      "chamber": "house",
+      "day": "1966-11-08",
+      "special": false,
+      "state": "KS",
+      "district": 5
+    },
+    "governor": {
+      "year": 1966,
+      "chamber": "governor",
+      "day": "1966-11-08",
+      "special": false,
+      "state": "KS",
+      "district": null
+    },
+    "house2": {
+      "year": 1966,
+      "chamber": "house",
+      "day": "1966-11-08",
+      "special": false,
+      "state": "KS",
+      "district": 2
+    }
+  },
+  "pages": [
+    {
+      "page": 14,
+      "id": "14-0",
+      "columns": [
+        {
+          "label": "Ava V. Anderson, Rep.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Robert Ellsworth, Rep.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "James B. Pearson, Rep.",
+          "contest": "senate",
+          "candidate": "James B. Pearson"
+        },
+        {
+          "label": "Wm. D. Tarrant, Rep.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. Floyd Breeding, Dem.",
+          "contest": "senate",
+          "candidate": "J. Floyd Breeding"
+        },
+        {
+          "label": "Harold S. Herd, Dem.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "K. L. (Ken) Smith, Dem.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Leigh Warner, Dem.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.023,
+        0.055,
+        0.955,
+        1.0
+      ],
+      "hint": "Read only the table headed 'Primary Election, August 2, 1966 FOR UNITED STATES SENATOR\u2014Continued'; ignore any other table visible in the image.",
+      "bands": 3,
+      "header": [
+        0.0,
+        0.1989
+      ]
+    },
+    {
+      "page": 15,
+      "id": "15-0",
+      "columns": [
+        {
+          "label": "Ava V. Anderson, Rep.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Robert Ellsworth, Rep.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "James B. Pearson, Rep.",
+          "contest": "senate",
+          "candidate": "James B. Pearson"
+        },
+        {
+          "label": "Wm. D. Tarrant, Rep.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. Floyd Breeding, Dem.",
+          "contest": "senate",
+          "candidate": "J. Floyd Breeding"
+        },
+        {
+          "label": "Harold S. Herd, Dem.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "K. L. (Ken) Smith, Dem.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Leigh Warner, Dem.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.027,
+        0.068,
+        0.951,
+        1.0
+      ],
+      "hint": "Read only the table headed 'FOR UNITED STATES SENATOR\u2014CONTINUED'; ignore any other table visible in the image.",
+      "bands": 3,
+      "header": [
+        0.0,
+        0.2178
+      ]
+    },
+    {
+      "page": 16,
+      "id": "16-0",
+      "columns": [
+        {
+          "label": "Ava V. Anderson, Rep.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Robert Ellsworth, Rep.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "James B. Pearson, Rep.",
+          "contest": "senate",
+          "candidate": "James B. Pearson"
+        },
+        {
+          "label": "Wm. D. Tarrant, Rep.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. Floyd Breeding, Dem.",
+          "contest": "senate",
+          "candidate": "J. Floyd Breeding"
+        },
+        {
+          "label": "Harold S. Herd, Dem.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "K. L. (Ken) Smith, Dem.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Leigh Warner, Dem.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.02,
+        0.19,
+        0.948,
+        0.719
+      ],
+      "hint": "Read only the table headed 'FOR UNITED STATES SENATOR\u2014CONCLUDED'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.293
+      ]
+    },
+    {
+      "page": 17,
+      "id": "17-0",
+      "columns": [
+        {
+          "label": "Bob Dole, Rep.",
+          "contest": "house1",
+          "candidate": "Robert Dole"
+        },
+        {
+          "label": "Mrs. Joseph (Berniece) Henkle, Sr., Dem.",
+          "contest": "house1",
+          "candidate": "Berniece Henkle"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.053,
+        0.072,
+        0.958,
+        0.91
+      ],
+      "hint": "Read only the table headed 'FOR REPRESENTATIVES IN CONGRESS FIRST CONGRESSIONAL DISTRICT'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1408
+      ]
+    },
+    {
+      "page": 18,
+      "id": "18-1",
+      "columns": [
+        {
+          "label": "Wayne Angell, Rep.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "George W. Haley, Rep.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Howard D. Neighbor, Rep.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "O. F. (Ole) Nesmith, Rep.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Richard D. Rixner, Rep.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Reynolds Shultz, Rep.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Larry Winn, Jr., Rep.",
+          "contest": "house3",
+          "candidate": "Larry Winn, Jr."
+        },
+        {
+          "label": "Joseph J. Poizner, Dem.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Marvin E. Rainey, Dem.",
+          "contest": "house3",
+          "candidate": "Marvin E. Rainey"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.02,
+        0.445,
+        0.913,
+        0.684
+      ],
+      "hint": "Read only the table headed 'THIRD CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 18,
+      "id": "18-2",
+      "columns": [
+        {
+          "label": "Albert J. \"Al\" Nirschl, Rep.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Garner E. Shriver, Rep.",
+          "contest": "house4",
+          "candidate": "Garner E. Shriver"
+        },
+        {
+          "label": "Gough W. Davis, Dem.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Paul H. Gerling, Dem.",
+          "contest": "house4",
+          "candidate": "Paul H. Gerling"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.022,
+        0.676,
+        0.913,
+        0.892
+      ],
+      "hint": "Read only the table headed 'FOURTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 19,
+      "id": "19-0",
+      "columns": [
+        {
+          "label": "Joe Skubitz, Rep.",
+          "contest": "house5",
+          "candidate": "Joe Skubitz"
+        },
+        {
+          "label": "Delno L. Bass, Dem.",
+          "contest": "house5",
+          "candidate": "Delno L. Bass"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.056,
+        0.118,
+        0.963,
+        0.528
+      ],
+      "hint": "Read only the table headed 'FOR REPRESENTATIVES IN CONGRESS\u2014Concluded: FIFTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 20,
+      "id": "20-0",
+      "columns": [
+        {
+          "label": "Wm. H. Avery, Rep.",
+          "contest": "governor",
+          "candidate": "William H. Avery"
+        },
+        {
+          "label": "Dell Crozier, Rep.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Robert Docking, Dem.",
+          "contest": "governor",
+          "candidate": "Robert Docking"
+        },
+        {
+          "label": "George Hart, Dem.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.044,
+        0.08,
+        0.933,
+        1.0
+      ],
+      "hint": "Read only the table headed 'FOR GOVERNOR'; ignore any other table visible in the image.",
+      "bands": 3,
+      "header": [
+        0.0,
+        0.0902
+      ]
+    },
+    {
+      "page": 21,
+      "id": "21-0",
+      "columns": [
+        {
+          "label": "Wm. H. Avery, Rep.",
+          "contest": "governor",
+          "candidate": "William H. Avery"
+        },
+        {
+          "label": "Dell Crozier, Rep.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Robert Docking, Dem.",
+          "contest": "governor",
+          "candidate": "Robert Docking"
+        },
+        {
+          "label": "George Hart, Dem.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.04,
+        0.084,
+        0.931,
+        0.774
+      ],
+      "hint": "Read only the table headed 'FOR GOVERNOR\u2014CONCLUDED'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1043
+      ]
+    },
+    {
+      "page": 70,
+      "id": "70-0",
+      "columns": [
+        {
+          "label": "James B. Pearson, Rep.",
+          "contest": "senate",
+          "candidate": "James B. Pearson"
+        },
+        {
+          "label": "J. Floyd Breeding, Dem.",
+          "contest": "senate",
+          "candidate": "J. Floyd Breeding"
+        },
+        {
+          "label": "Earl F. Dodge, Prohib.",
+          "contest": "senate",
+          "candidate": "Earl F. Dodge"
+        },
+        {
+          "label": "George W. Snell, Conserv.",
+          "contest": "senate",
+          "candidate": "George W. Snell"
+        },
+        {
+          "label": "Robert F. Ellsworth, (Write-in)",
+          "contest": "senate",
+          "candidate": "Write-in"
+        },
+        {
+          "label": "Arthur Peine, (Write-in)",
+          "contest": "senate",
+          "candidate": "Write-in"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.037,
+        0.09,
+        0.931,
+        1.0
+      ],
+      "hint": "Read only the table headed 'FOR UNITED STATES SENATOR'; ignore any other table visible in the image.",
+      "bands": 3,
+      "header": [
+        0.0,
+        0.0824
+      ]
+    },
+    {
+      "page": 71,
+      "id": "71-0",
+      "columns": [
+        {
+          "label": "James B. Pearson, Rep.",
+          "contest": "senate",
+          "candidate": "James B. Pearson"
+        },
+        {
+          "label": "J. Floyd Breeding, Dem.",
+          "contest": "senate",
+          "candidate": "J. Floyd Breeding"
+        },
+        {
+          "label": "Earl F. Dodge, Prohib.",
+          "contest": "senate",
+          "candidate": "Earl F. Dodge"
+        },
+        {
+          "label": "George W. Snell, Conserv.",
+          "contest": "senate",
+          "candidate": "George W. Snell"
+        },
+        {
+          "label": "Robert F. Ellsworth, (Write-in)",
+          "contest": "senate",
+          "candidate": "Write-in"
+        },
+        {
+          "label": "Arthur Peine, (Write-in)",
+          "contest": "senate",
+          "candidate": "Write-in"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.045,
+        0.097,
+        0.945,
+        0.828
+      ],
+      "hint": "Read only the table headed 'FOR UNITED STATES SENATOR\u2014CONCLUDED'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.093
+      ]
+    },
+    {
+      "page": 72,
+      "id": "72-0",
+      "columns": [
+        {
+          "label": "Bob Dole, Rep.",
+          "contest": "house1",
+          "candidate": "Robert Dole"
+        },
+        {
+          "label": "Mrs. Joseph (Berniece) Henkle, Dem.",
+          "contest": "house1",
+          "candidate": "Berniece Henkle"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.067,
+        0.073,
+        0.965,
+        0.867
+      ],
+      "hint": "Read only the table headed 'FOR REPRESENTATIVES IN CONGRESS FIRST CONGRESSIONAL DISTRICT'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1322
+      ]
+    },
+    {
+      "page": 73,
+      "id": "73-0",
+      "columns": [
+        {
+          "label": "Chester L. Mize, Rep.",
+          "contest": "house2",
+          "candidate": "Chester L. Mize"
+        },
+        {
+          "label": "Harry Wiles, Dem.",
+          "contest": "house2",
+          "candidate": "Harry G. Wiles"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.039,
+        0.125,
+        0.932,
+        0.472
+      ],
+      "hint": "Read only the table headed 'SECOND CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 73,
+      "id": "73-1",
+      "columns": [
+        {
+          "label": "Larry Winn, Jr., Rep.",
+          "contest": "house3",
+          "candidate": "Larry Winn, Jr."
+        },
+        {
+          "label": "Marvin E. Rainey, Dem.",
+          "contest": "house3",
+          "candidate": "Marvin E. Rainey"
+        },
+        {
+          "label": "Harold H. Shomber, Conserv.",
+          "contest": "house3",
+          "candidate": "Harold H. Shomber"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.039,
+        0.464,
+        0.932,
+        0.669
+      ],
+      "hint": "Read only the table headed 'THIRD CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 73,
+      "id": "73-2",
+      "columns": [
+        {
+          "label": "Garner E. Shriver, Rep.",
+          "contest": "house4",
+          "candidate": "Garner E. Shriver"
+        },
+        {
+          "label": "Paul H. Gerling, Dem.",
+          "contest": "house4",
+          "candidate": "Paul H. Gerling"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.039,
+        0.661,
+        0.932,
+        0.877
+      ],
+      "hint": "Read only the table headed 'FOURTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 74,
+      "id": "74-0",
+      "columns": [
+        {
+          "label": "Joe Skubitz, Rep.",
+          "contest": "house5",
+          "candidate": "Joe Skubitz"
+        },
+        {
+          "label": "Delno E. Bass, Dem.",
+          "contest": "house5",
+          "candidate": "Delno L. Bass"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.062,
+        0.068,
+        0.963,
+        0.524
+      ],
+      "hint": "Read only the table headed 'FOR REPRESENTATIVES IN CONGRESS\u2014Concluded. FIFTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2566
+      ]
+    },
+    {
+      "page": 75,
+      "id": "75-0",
+      "columns": [
+        {
+          "label": "Wm. H. Avery, Rep.",
+          "contest": "governor",
+          "candidate": "William H. Avery"
+        },
+        {
+          "label": "Robert Docking, Dem.",
+          "contest": "governor",
+          "candidate": "Robert Docking"
+        },
+        {
+          "label": "Rolland E. Fisher, Prohib.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Carson E. Crawford, Conserv.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.045,
+        0.091,
+        0.955,
+        1.0
+      ],
+      "hint": "Read only the table headed 'FOR GOVERNOR'; ignore any other table visible in the image.",
+      "bands": 3,
+      "header": [
+        0.0,
+        0.0836
+      ]
+    },
+    {
+      "page": 76,
+      "id": "76-0",
+      "columns": [
+        {
+          "label": "Wm. H. Avery, Rep.",
+          "contest": "governor",
+          "candidate": "William H. Avery"
+        },
+        {
+          "label": "Robert Docking, Dem.",
+          "contest": "governor",
+          "candidate": "Robert Docking"
+        },
+        {
+          "label": "Rolland E. Fisher, Prohib.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Carson E. Crawford, Conserv.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.06,
+        0.098,
+        0.945,
+        0.814
+      ],
+      "hint": "Read only the table headed 'FOR GOVERNOR\u2014CONCLUDED'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0824
+      ]
+    }
+  ]
+}

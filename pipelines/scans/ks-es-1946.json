@@ -1,0 +1,297 @@
+{
+  "polity": "US-KS",
+  "publisher": "Kansas Secretary of State",
+  "license": "Public record",
+  "raw_source": "us.ks_es",
+  "title": "Kansas election statistics 1946, general election",
+  "file": {
+    "url": "https://kgi.contentdm.oclc.org/digital/api/collection/p16884coll129/id/43/download"
+  },
+  "contests": {
+    "house1": {
+      "year": 1946,
+      "chamber": "house",
+      "day": "1946-11-05",
+      "special": false,
+      "state": "KS",
+      "district": 1
+    },
+    "house2": {
+      "year": 1946,
+      "chamber": "house",
+      "day": "1946-11-05",
+      "special": false,
+      "state": "KS",
+      "district": 2
+    },
+    "house3": {
+      "year": 1946,
+      "chamber": "house",
+      "day": "1946-11-05",
+      "special": false,
+      "state": "KS",
+      "district": 3
+    },
+    "house4": {
+      "year": 1946,
+      "chamber": "house",
+      "day": "1946-11-05",
+      "special": false,
+      "state": "KS",
+      "district": 4
+    },
+    "house5": {
+      "year": 1946,
+      "chamber": "house",
+      "day": "1946-11-05",
+      "special": false,
+      "state": "KS",
+      "district": 5
+    },
+    "house6": {
+      "year": 1946,
+      "chamber": "house",
+      "day": "1946-11-05",
+      "special": false,
+      "state": "KS",
+      "district": 6
+    },
+    "governor": {
+      "year": 1946,
+      "chamber": "governor",
+      "day": "1946-11-05",
+      "special": false,
+      "state": "KS",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 2,
+      "id": "2-0",
+      "columns": [
+        {
+          "label": "Albert M. Cole, Rep.",
+          "contest": "house1",
+          "candidate": "Albert M. Cole"
+        },
+        {
+          "label": "James W. Lowry, Dem.",
+          "contest": "house1",
+          "candidate": "James W. Lowry"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.14,
+        0.142,
+        0.938,
+        0.351
+      ],
+      "hint": "Read only the table headed 'FIRST CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 2,
+      "id": "2-1",
+      "columns": [
+        {
+          "label": "Errett P. Scrivner, Rep.",
+          "contest": "house2",
+          "candidate": "Errett P. Scrivner"
+        },
+        {
+          "label": "Murray H. Hodges, Dem.",
+          "contest": "house2",
+          "candidate": "Murray H. Hodges"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.14,
+        0.343,
+        0.938,
+        0.52
+      ],
+      "hint": "Read only the table headed 'SECOND CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 2,
+      "id": "2-2",
+      "columns": [
+        {
+          "label": "Herbert A. Meyer, Rep.",
+          "contest": "house3",
+          "candidate": "Herbert A. Meyer"
+        },
+        {
+          "label": "Jo E. Gaitskill, Dem.",
+          "contest": "house3",
+          "candidate": "Jo E. Gaitskill"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.14,
+        0.512,
+        0.938,
+        0.69
+      ],
+      "hint": "Read only the table headed 'THIRD CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 2,
+      "id": "2-3",
+      "columns": [
+        {
+          "label": "Ed H. Rees, Rep.",
+          "contest": "house4",
+          "candidate": "Edward H. Rees"
+        },
+        {
+          "label": "William P. Warren, Dem.",
+          "contest": "house4",
+          "candidate": "William P. Warren"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.14,
+        0.682,
+        0.938,
+        0.909
+      ],
+      "hint": "Read only the table headed 'FOURTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 3,
+      "id": "3-0",
+      "columns": [
+        {
+          "label": "Clifford R. Hope, Rep.",
+          "contest": "house5",
+          "candidate": "Clifford R. Hope"
+        },
+        {
+          "label": "Arthur L. Sparks, Dem.",
+          "contest": "house5",
+          "candidate": "Arthur L. Sparks"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.065,
+        0.143,
+        0.866,
+        0.552
+      ],
+      "hint": "Read only the table headed 'FIFTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 3,
+      "id": "3-1",
+      "columns": [
+        {
+          "label": "Wint Smith, Rep.",
+          "contest": "house6",
+          "candidate": "Wint Smith"
+        },
+        {
+          "label": "G. E. Bengtson, Dem.",
+          "contest": "house6",
+          "candidate": "G. E. Bengtson"
+        },
+        {
+          "label": "C. Floyd Hester, Proh.",
+          "contest": "house6",
+          "candidate": "C. Floyd Hester"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.065,
+        0.544,
+        0.866,
+        0.889
+      ],
+      "hint": "Read only the table headed 'SIXTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 13,
+      "id": "13-0",
+      "columns": [
+        {
+          "label": "Frank Carlson, Rep.",
+          "contest": "governor",
+          "candidate": "Frank Carlson"
+        },
+        {
+          "label": "Harry H. Woodring, Dem.",
+          "contest": "governor",
+          "candidate": "Harry H. Woodring"
+        },
+        {
+          "label": "Harry Graber, Soc.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "David C. White, Prohib.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.044,
+        0.109,
+        0.861,
+        1.0
+      ],
+      "hint": "Read only the table headed 'FOR GOVERNOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0853
+      ]
+    },
+    {
+      "page": 14,
+      "id": "14-0",
+      "columns": [
+        {
+          "label": "Frank Carlson, Rep.",
+          "contest": "governor",
+          "candidate": "Frank Carlson"
+        },
+        {
+          "label": "Harry H. Woodring, Dem.",
+          "contest": "governor",
+          "candidate": "Harry H. Woodring"
+        },
+        {
+          "label": "Harry Graber, Soc.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "David C. White, Prohib.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.146,
+        0.128,
+        0.961,
+        0.802
+      ],
+      "hint": "Read only the table headed 'FOR GOVERNOR\u2014CONCLUDED'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0801
+      ]
+    }
+  ]
+}

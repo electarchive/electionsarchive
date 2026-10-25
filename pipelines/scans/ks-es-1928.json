@@ -1,0 +1,309 @@
+{
+  "polity": "US-KS",
+  "publisher": "Kansas Secretary of State",
+  "license": "Public record",
+  "raw_source": "us.ks_es",
+  "title": "Kansas election statistics 1928, general election",
+  "file": {
+    "url": "https://kgi.contentdm.oclc.org/digital/api/collection/p16884coll129/id/25/download"
+  },
+  "contests": {
+    "president": {
+      "year": 1928,
+      "chamber": "president",
+      "day": "1928-11-06",
+      "special": false,
+      "state": "KS",
+      "district": null
+    },
+    "house1": {
+      "year": 1928,
+      "chamber": "house",
+      "day": "1928-11-06",
+      "special": false,
+      "state": "KS",
+      "district": 1
+    },
+    "house2": {
+      "year": 1928,
+      "chamber": "house",
+      "day": "1928-11-06",
+      "special": false,
+      "state": "KS",
+      "district": 2
+    },
+    "house3": {
+      "year": 1928,
+      "chamber": "house",
+      "day": "1928-11-06",
+      "special": false,
+      "state": "KS",
+      "district": 3
+    },
+    "house4": {
+      "year": 1928,
+      "chamber": "house",
+      "day": "1928-11-06",
+      "special": false,
+      "state": "KS",
+      "district": 4
+    },
+    "house5": {
+      "year": 1928,
+      "chamber": "house",
+      "day": "1928-11-06",
+      "special": false,
+      "state": "KS",
+      "district": 5
+    }
+  },
+  "pages": [
+    {
+      "page": 2,
+      "id": "2-0",
+      "columns": [
+        {
+          "label": "Republican. Hoover and Curtis.",
+          "contest": "president",
+          "candidate": "Herbert Hoover (Republican)"
+        },
+        {
+          "label": "Democrat. Smith and Robinson.",
+          "contest": "president",
+          "candidate": "Al Smith (Democratic)"
+        },
+        {
+          "label": "Socialist. Thomas and Maurer.",
+          "contest": "president",
+          "candidate": "Norman Thomas (Socialist)"
+        },
+        {
+          "label": "Independent. William Marshall.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Independent. Mary O'Sullivan",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Independent. Ivan Tubor.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.099,
+        0.194,
+        0.918,
+        1.0
+      ],
+      "hint": "Read only the table headed 'ELECTORS OF PRESIDENT AND VICE PRESIDENT.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2457
+      ]
+    },
+    {
+      "page": 3,
+      "id": "3-0",
+      "columns": [
+        {
+          "label": "Republican. Hoover and Curtis.",
+          "contest": "president",
+          "candidate": "Herbert Hoover (Republican)"
+        },
+        {
+          "label": "Democrat. Smith and Robinson.",
+          "contest": "president",
+          "candidate": "Al Smith (Democratic)"
+        },
+        {
+          "label": "Socialist. Thomas and Maurer.",
+          "contest": "president",
+          "candidate": "Norman Thomas (Socialist)"
+        },
+        {
+          "label": "Independent. William Marshall.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Independent. Mary O'Sullivan.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Independent. Ivan Tubor.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.087,
+        0.196,
+        0.909,
+        0.873
+      ],
+      "hint": "Read only the table headed 'PRESIDENT\u2014CONCLUDED.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0295
+      ]
+    },
+    {
+      "page": 4,
+      "id": "4-0",
+      "columns": [
+        {
+          "label": "W. P. Lambertson, Rep.",
+          "contest": "house1",
+          "candidate": "W. P. Lambertson"
+        },
+        {
+          "label": "Maurice P. O'Keefe, Dem.",
+          "contest": "house1",
+          "candidate": "Maurice P. O'Keefe"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.09,
+        0.138,
+        0.911,
+        0.418
+      ],
+      "hint": "Read only the table headed 'FIRST CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 4,
+      "id": "4-1",
+      "columns": [
+        {
+          "label": "U. S. Guyer, Rep.",
+          "contest": "house2",
+          "candidate": "U. S. Guyer"
+        },
+        {
+          "label": "Lee R. Hettick, Dem.",
+          "contest": "house2",
+          "candidate": "Lee R. Hettick"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.09,
+        0.41,
+        0.911,
+        0.69
+      ],
+      "hint": "Read only the table headed 'SECOND CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 5,
+      "id": "5-0",
+      "columns": [
+        {
+          "label": "W. H. Sproul, Rep.",
+          "contest": "house3",
+          "candidate": "W. H. Sproul"
+        },
+        {
+          "label": "Jo E. Gaitskill, Dem.",
+          "contest": "house3",
+          "candidate": "Joe E. Gaitskill"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.07,
+        0.121,
+        0.889,
+        0.381
+      ],
+      "hint": "Read only the table headed 'THIRD CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 5,
+      "id": "5-1",
+      "columns": [
+        {
+          "label": "Homer Hoch, Rep.",
+          "contest": "house4",
+          "candidate": "Homer Hoch"
+        },
+        {
+          "label": "C. T. Neihart, Dem.",
+          "contest": "house4",
+          "candidate": "C. T. Neihart"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.071,
+        0.373,
+        0.887,
+        0.654
+      ],
+      "hint": "Read only the table headed 'FOURTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 5,
+      "id": "5-2",
+      "columns": [
+        {
+          "label": "James G. Strong, Rep.",
+          "contest": "house5",
+          "candidate": "James G. Strong"
+        },
+        {
+          "label": "John F. Corder, Dem.",
+          "contest": "house5",
+          "candidate": "John F. Corder"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.072,
+        0.646,
+        0.886,
+        0.93
+      ],
+      "hint": "Read only the table headed 'FIFTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 45,
+      "id": "45-0",
+      "columns": [
+        {
+          "label": "Republican. Hoover and Curtis.",
+          "contest": "president",
+          "candidate": "Herbert Hoover (Republican)"
+        },
+        {
+          "label": "Democrat. Smith and Robinson.",
+          "contest": "president",
+          "candidate": "Al Smith (Democratic)"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.098,
+        0.139,
+        0.915,
+        0.901
+      ],
+      "hint": "Read only the table headed 'ELECTORS OF PRESIDENT AND VICE PRESIDENT.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2651
+      ]
+    }
+  ]
+}

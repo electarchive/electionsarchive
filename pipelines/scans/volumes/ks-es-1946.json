@@ -1,0 +1,29 @@
+{
+ "polity": "US-KS",
+ "publisher": "Kansas Secretary of State",
+ "license": "Public record",
+ "raw_source": "us.ks_es",
+ "year": 1946,
+ "day": "1946-11-05",
+ "title": "Kansas election statistics 1946, general election",
+ "file": {
+  "url": "https://kgi.contentdm.oclc.org/digital/api/collection/p16884coll129/id/43/download"
+ },
+ "offices": {
+  "president": "presidential electors (President and Vice President)",
+  "governor": "Governor",
+  "senate": "U.S. Senator",
+  "house": "U.S. Representative, one table per district or all districts in column groups, county rows"
+ },
+ "leaves": [
+  2,
+  3,
+  4,
+  13,
+  14,
+  15,
+  16,
+  17
+ ],
+ "autorotate": true
+}

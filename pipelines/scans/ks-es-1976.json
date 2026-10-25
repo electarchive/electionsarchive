@@ -1,0 +1,379 @@
+{
+  "polity": "US-KS",
+  "publisher": "Kansas Secretary of State",
+  "license": "Public record",
+  "raw_source": "us.ks_es",
+  "title": "Kansas election statistics 1976, general election",
+  "file": {
+    "url": "https://kgi.contentdm.oclc.org/digital/api/collection/p16884coll129/id/65/download"
+  },
+  "contests": {
+    "house1": {
+      "year": 1976,
+      "chamber": "house",
+      "day": "1976-11-02",
+      "special": false,
+      "state": "KS",
+      "district": 1
+    },
+    "house2": {
+      "year": 1976,
+      "chamber": "house",
+      "day": "1976-11-02",
+      "special": false,
+      "state": "KS",
+      "district": 2
+    },
+    "house3": {
+      "year": 1976,
+      "chamber": "house",
+      "day": "1976-11-02",
+      "special": false,
+      "state": "KS",
+      "district": 3
+    },
+    "house4": {
+      "year": 1976,
+      "chamber": "house",
+      "day": "1976-11-02",
+      "special": false,
+      "state": "KS",
+      "district": 4
+    },
+    "house5": {
+      "year": 1976,
+      "chamber": "house",
+      "day": "1976-11-02",
+      "special": false,
+      "state": "KS",
+      "district": 5
+    }
+  },
+  "pages": [
+    {
+      "page": 16,
+      "id": "16-0",
+      "columns": [
+        {
+          "label": "Keith G. Sebelius, Rep.",
+          "contest": "house1",
+          "candidate": "Keith G. Sebelius"
+        },
+        {
+          "label": "Bill Addington, Dem.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Randy Yowell, Dem.",
+          "contest": "house1",
+          "candidate": "Randy Yowell"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.077,
+        0.066,
+        0.963,
+        0.898
+      ],
+      "hint": "Read only the table headed 'Primary Election, August 3, 1976 FOR CONGRESSMAN, FIRST DISTRICT'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0962
+      ]
+    },
+    {
+      "page": 17,
+      "id": "17-1",
+      "columns": [
+        {
+          "label": "C. D. Rose, Rep.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Nina Strahm, Rep.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Martha Keys, Dem.",
+          "contest": "house2",
+          "candidate": "Martha Keys"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.024,
+        0.375,
+        0.907,
+        0.691
+      ],
+      "hint": "Read only the table headed 'FOR CONGRESSMAN, SECOND DISTRICT\u2014(Concluded)'; ignore any other table visible in the image."
+    },
+    {
+      "page": 17,
+      "id": "17-2",
+      "columns": [
+        {
+          "label": "Larry Winn, Jr., Rep.",
+          "contest": "house3",
+          "candidate": "Larry Winn, Jr."
+        },
+        {
+          "label": "Philip S. Rhoads, Dem.",
+          "contest": "house3",
+          "candidate": "Philip S. Rhoads"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.025,
+        0.683,
+        0.908,
+        0.842
+      ],
+      "hint": "Read only the table headed 'FOR CONGRESSMAN, THIRD DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 18,
+      "id": "18-0",
+      "columns": [
+        {
+          "label": "Garner E. Shriver, Rep.",
+          "contest": "house4",
+          "candidate": "Garner E. Shriver"
+        },
+        {
+          "label": "Dan Glickman, Dem.",
+          "contest": "house4",
+          "candidate": "Dan Glickman"
+        },
+        {
+          "label": "Bill Linker, Dem.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Aron R. Russell, Dem.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Jack Williams, Dem.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.082,
+        0.156,
+        0.963,
+        0.441
+      ],
+      "hint": "Read only the table headed 'FOR CONGRESSMAN, FOURTH DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 18,
+      "id": "18-1",
+      "columns": [
+        {
+          "label": "Joe Skubitz, Rep.",
+          "contest": "house5",
+          "candidate": "Joe Skubitz"
+        },
+        {
+          "label": "William F. Tyler, Rep.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "John A. Barnes, Dem.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Kay Camin, Dem.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Virgil Leon Olson, Dem.",
+          "contest": "house5",
+          "candidate": "Virgil Leon Olson"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.079,
+        0.433,
+        0.959,
+        0.669
+      ],
+      "hint": "Read only the table headed 'FOR CONGRESSMAN, FIFTH DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 74,
+      "id": "74-0",
+      "columns": [
+        {
+          "label": "Keith G. Sebelius, Rep.",
+          "contest": "house1",
+          "candidate": "Keith G. Sebelius"
+        },
+        {
+          "label": "Randy Yowell, Dem.",
+          "contest": "house1",
+          "candidate": "Randy Yowell"
+        },
+        {
+          "label": "Scattering",
+          "contest": "house1",
+          "candidate": "Scattering"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.05,
+        0.091,
+        0.908,
+        0.941
+      ],
+      "hint": "Read only the table headed 'FOR CONGRESSMAN, FIRST DISTRICT'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1035
+      ]
+    },
+    {
+      "page": 75,
+      "id": "75-0",
+      "columns": [
+        {
+          "label": "Ross Freeman, Rep.",
+          "contest": "house2",
+          "candidate": "Ross Freeman"
+        },
+        {
+          "label": "Martha Keys, Dem.",
+          "contest": "house2",
+          "candidate": "Martha Keys"
+        },
+        {
+          "label": "Charles V. \"Chuck\" Ijams, Amer.",
+          "contest": "house2",
+          "candidate": "Charles V. \"Chuck\" Ijams"
+        },
+        {
+          "label": "David N. Scoggins, Pro.",
+          "contest": "house2",
+          "candidate": "David N. Scoggin"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.065,
+        0.078,
+        0.963,
+        0.403
+      ],
+      "hint": "Read only the table headed 'FOR CONGRESSMAN, SECOND DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 75,
+      "id": "75-1",
+      "columns": [
+        {
+          "label": "Larry Winn, Jr., Rep.",
+          "contest": "house3",
+          "candidate": "Larry Winn, Jr."
+        },
+        {
+          "label": "Philip S. Rhoads, Dem.",
+          "contest": "house3",
+          "candidate": "Philip S. Rhoads"
+        },
+        {
+          "label": "William W. (Bill) Hyatt, Amer.",
+          "contest": "house3",
+          "candidate": "William W. \"Bill\" Hyatt"
+        },
+        {
+          "label": "Scattering",
+          "contest": "house3",
+          "candidate": "Scattering"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.067,
+        0.395,
+        0.964,
+        0.603
+      ],
+      "hint": "Read only the table headed 'FOR CONGRESSMAN, THIRD DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 75,
+      "id": "75-2",
+      "columns": [
+        {
+          "label": "Garner E. Shriver, Rep.",
+          "contest": "house4",
+          "candidate": "Garner E. Shriver"
+        },
+        {
+          "label": "Dan Glickman, Dem.",
+          "contest": "house4",
+          "candidate": "Dan Glickman"
+        },
+        {
+          "label": "Robert A. (Bob) Cowdrey, Amer.",
+          "contest": "house4",
+          "candidate": "Robert A. \"Bob\" Cowdrey"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.067,
+        0.595,
+        0.958,
+        0.803
+      ],
+      "hint": "Read only the table headed 'FOR CONGRESSMAN, FOURTH DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 76,
+      "id": "76-0",
+      "columns": [
+        {
+          "label": "Joe Skubitz, Rep.",
+          "contest": "house5",
+          "candidate": "Joe Skubitz"
+        },
+        {
+          "label": "Virgil Leon Olson, Dem.",
+          "contest": "house5",
+          "candidate": "Virgil Leon Olson"
+        },
+        {
+          "label": "Glen L. Rutherford, Amer.",
+          "contest": "house5",
+          "candidate": "Glen L. Rutherford"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.039,
+        0.094,
+        0.928,
+        0.518
+      ],
+      "hint": "Read only the table headed 'FOR CONGRESSMAN, FIFTH DISTRICT'; ignore any other table visible in the image."
+    }
+  ]
+}

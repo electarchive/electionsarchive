@@ -1,0 +1,469 @@
+{
+  "polity": "US-KS",
+  "publisher": "Kansas Secretary of State",
+  "license": "Public record",
+  "raw_source": "us.ks_es",
+  "title": "Kansas election statistics 1944, general election",
+  "file": {
+    "url": "https://kgi.contentdm.oclc.org/digital/api/collection/p16884coll129/id/41/download"
+  },
+  "contests": {
+    "president": {
+      "year": 1944,
+      "chamber": "president",
+      "day": "1944-11-07",
+      "special": false,
+      "state": "KS",
+      "district": null
+    },
+    "senate": {
+      "year": 1944,
+      "chamber": "senate",
+      "day": "1944-11-07",
+      "special": false,
+      "state": "KS",
+      "district": null
+    },
+    "house1": {
+      "year": 1944,
+      "chamber": "house",
+      "day": "1944-11-07",
+      "special": false,
+      "state": "KS",
+      "district": 1
+    },
+    "house2": {
+      "year": 1944,
+      "chamber": "house",
+      "day": "1944-11-07",
+      "special": false,
+      "state": "KS",
+      "district": 2
+    },
+    "house3": {
+      "year": 1944,
+      "chamber": "house",
+      "day": "1944-11-07",
+      "special": false,
+      "state": "KS",
+      "district": 3
+    },
+    "house4": {
+      "year": 1944,
+      "chamber": "house",
+      "day": "1944-11-07",
+      "special": false,
+      "state": "KS",
+      "district": 4
+    },
+    "house5": {
+      "year": 1944,
+      "chamber": "house",
+      "day": "1944-11-07",
+      "special": false,
+      "state": "KS",
+      "district": 5
+    },
+    "house6": {
+      "year": 1944,
+      "chamber": "house",
+      "day": "1944-11-07",
+      "special": false,
+      "state": "KS",
+      "district": 6
+    },
+    "governor": {
+      "year": 1944,
+      "chamber": "governor",
+      "day": "1944-11-07",
+      "special": false,
+      "state": "KS",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 2,
+      "id": "2-0",
+      "columns": [
+        {
+          "label": "Republican. Dewey and Bricker.",
+          "contest": "president",
+          "candidate": "Thomas E. Dewey (Republican)"
+        },
+        {
+          "label": "Democrat. Roosevelt and Truman.",
+          "contest": "president",
+          "candidate": "Franklin D. Roosevelt (Democratic)"
+        },
+        {
+          "label": "Socialist. Thomas and Hoopes.",
+          "contest": "president",
+          "candidate": "Norman Thomas (Socialist)"
+        },
+        {
+          "label": "Prohibition. Watson and Johnson.",
+          "contest": "president",
+          "candidate": "Prohibition"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.142,
+        0.128,
+        0.96,
+        1.0
+      ],
+      "hint": "Read only the table headed 'FOR ELECTORS OF PRESIDENT AND VICE-PRESIDENT'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2351
+      ]
+    },
+    {
+      "page": 3,
+      "id": "3-0",
+      "columns": [
+        {
+          "label": "Republican. Dewey and Bricker.",
+          "contest": "president",
+          "candidate": "Thomas E. Dewey (Republican)"
+        },
+        {
+          "label": "Democrat. Roosevelt and Truman.",
+          "contest": "president",
+          "candidate": "Franklin D. Roosevelt (Democratic)"
+        },
+        {
+          "label": "Socialist. Thomas and Hoopes.",
+          "contest": "president",
+          "candidate": "Norman Thomas (Socialist)"
+        },
+        {
+          "label": "Prohibition. Watson and Johnson.",
+          "contest": "president",
+          "candidate": "Prohibition"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.062,
+        0.118,
+        0.883,
+        0.894
+      ],
+      "hint": "Read only the table headed 'FOR ELECTORS FOR PRESIDENT AND VICE-PRESIDENT\u2014CONCLUDED'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1314
+      ]
+    },
+    {
+      "page": 4,
+      "id": "4-0",
+      "columns": [
+        {
+          "label": "Clyde M. Reed, Rep.",
+          "contest": "senate",
+          "candidate": "Clyde M. Reed"
+        },
+        {
+          "label": "Thurman Hill, Dem.",
+          "contest": "senate",
+          "candidate": "Thurman Hill"
+        },
+        {
+          "label": "Arthur Goodwin Billings, Soc.",
+          "contest": "senate",
+          "candidate": "Arthur Goodwin Billings"
+        },
+        {
+          "label": "L. B. Dubbs, Prohib.",
+          "contest": "senate",
+          "candidate": "L. B. Dubbs"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.133,
+        0.209,
+        0.959,
+        1.0
+      ],
+      "hint": "Read only the table headed 'FOR UNITED STATES SENATOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        -0.0114
+      ]
+    },
+    {
+      "page": 5,
+      "id": "5-0",
+      "columns": [
+        {
+          "label": "Clyde M. Reed, Rep.",
+          "contest": "senate",
+          "candidate": "Clyde M. Reed"
+        },
+        {
+          "label": "Thurman Hill, Dem.",
+          "contest": "senate",
+          "candidate": "Thurman Hill"
+        },
+        {
+          "label": "Arthur Goodwin Billings, Soc.",
+          "contest": "senate",
+          "candidate": "Arthur Goodwin Billings"
+        },
+        {
+          "label": "L. B. Dubbs, Prohib.",
+          "contest": "senate",
+          "candidate": "L. B. Dubbs"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.058,
+        0.143,
+        0.876,
+        0.809
+      ],
+      "hint": "Read only the table headed 'FOR UNITED STATES SENATOR\u2014Concluded'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0796
+      ]
+    },
+    {
+      "page": 6,
+      "id": "6-1",
+      "columns": [
+        {
+          "label": "Albert M. Cole, Rep.",
+          "contest": "house1",
+          "candidate": "Albert M. Cole"
+        },
+        {
+          "label": "Ralph Ulm, Dem.",
+          "contest": "house1",
+          "candidate": "Ralph Ulm"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.137,
+        0.398,
+        0.961,
+        0.732
+      ],
+      "hint": "Read only the table headed 'General Election, November 7, 1944 FOR REPRESENTATIVES IN CONGRESS FIRST CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 7,
+      "id": "7-0",
+      "columns": [
+        {
+          "label": "Errett P. Scrivner, Rep.",
+          "contest": "house2",
+          "candidate": "Errett P. Scrivner"
+        },
+        {
+          "label": "Albert Baker, Dem.",
+          "contest": "house2",
+          "candidate": "Albert Baker"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.076,
+        0.142,
+        0.893,
+        0.371
+      ],
+      "hint": "Read only the table headed 'SECOND CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 7,
+      "id": "7-1",
+      "columns": [
+        {
+          "label": "Thomas D. Winter, Rep.",
+          "contest": "house3",
+          "candidate": "Thomas D. Winter"
+        },
+        {
+          "label": "Herman L. Gees, Dem.",
+          "contest": "house3",
+          "candidate": "Herman L. Gees"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.078,
+        0.363,
+        0.893,
+        0.593
+      ],
+      "hint": "Read only the table headed 'THIRD CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 8,
+      "id": "8-0",
+      "columns": [
+        {
+          "label": "Ed H. Rees, Rep.",
+          "contest": "house4",
+          "candidate": "Edward H. Rees"
+        },
+        {
+          "label": "Wm. J. Kropp, Dem.",
+          "contest": "house4",
+          "candidate": "William J. Kropp"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.123,
+        0.144,
+        0.941,
+        0.43
+      ],
+      "hint": "Read only the table headed 'FOR REPRESENTATIVES IN CONGRESS\u2014CONTINUED FOURTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 8,
+      "id": "8-1",
+      "columns": [
+        {
+          "label": "Clifford R. Hope, Rep.",
+          "contest": "house5",
+          "candidate": "Clifford R. Hope"
+        },
+        {
+          "label": "A. E. Hawes, Dem.",
+          "contest": "house5",
+          "candidate": "A. E. Hawes"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.123,
+        0.422,
+        0.941,
+        0.934
+      ],
+      "hint": "Read only the table headed 'FIFTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1758
+      ]
+    },
+    {
+      "page": 9,
+      "id": "9-0",
+      "columns": [
+        {
+          "label": "Frank Carlson, Rep.",
+          "contest": "house6",
+          "candidate": "Frank Carlson"
+        },
+        {
+          "label": "Dan M. McCarthy, Dem.",
+          "contest": "house6",
+          "candidate": "Dan M. McCarthy"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.067,
+        0.121,
+        0.888,
+        0.549
+      ],
+      "hint": "Read only the table headed 'FOR REPRESENTATIVES IN CONGRESS\u2014CONCLUDED SIXTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 14,
+      "id": "14-0",
+      "columns": [
+        {
+          "label": "Andrew F. Schoeppel, Rep.",
+          "contest": "governor",
+          "candidate": "Andrew F. Schoeppel"
+        },
+        {
+          "label": "Robert S. Lemon, Dem.",
+          "contest": "governor",
+          "candidate": "Robert S. Lemon"
+        },
+        {
+          "label": "W. W. Tamplin, Soc.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "David C. White, Prohib.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.126,
+        0.133,
+        0.949,
+        1.0
+      ],
+      "hint": "Read only the table headed 'FOR GOVERNOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0681
+      ]
+    },
+    {
+      "page": 15,
+      "id": "15-0",
+      "columns": [
+        {
+          "label": "Andrew F. Schoeppel, Rep.",
+          "contest": "governor",
+          "candidate": "Andrew F. Schoeppel"
+        },
+        {
+          "label": "Robert S. Lemon, Dem.",
+          "contest": "governor",
+          "candidate": "Robert S. Lemon"
+        },
+        {
+          "label": "W. W. Tamplin, Soc.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "David C. White, Prohib.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.029,
+        0.136,
+        0.85,
+        0.814
+      ],
+      "hint": "Read only the table headed 'FOR GOVERNOR\u2014Concluded'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0796
+      ]
+    }
+  ]
+}

@@ -1,0 +1,49 @@
+{
+ "polity": "US-KS",
+ "publisher": "Kansas Secretary of State",
+ "license": "Public record",
+ "raw_source": "us.ks_es",
+ "year": 1984,
+ "day": "1984-11-06",
+ "title": "Kansas election statistics 1984, general election",
+ "file": {
+  "url": "https://kgi.contentdm.oclc.org/digital/api/collection/p16884coll129/id/69/download"
+ },
+ "offices": {
+  "president": "presidential electors (President and Vice President)",
+  "governor": "Governor",
+  "senate": "U.S. Senator",
+  "house": "U.S. Representative, one table per district or all districts in column groups, county rows"
+ },
+ "leaves": [
+  17,
+  18,
+  19,
+  20,
+  21,
+  28,
+  29,
+  49,
+  51,
+  55,
+  57,
+  66,
+  70,
+  72,
+  73,
+  74,
+  75,
+  82,
+  83,
+  103,
+  105,
+  109,
+  120,
+  122,
+  123,
+  124,
+  125,
+  136
+ ],
+ "autorotate": true
+}

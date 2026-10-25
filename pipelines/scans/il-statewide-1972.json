@@ -1,0 +1,807 @@
+{
+  "polity": "US-IL",
+  "publisher": "Illinois State Board of Elections",
+  "license": "Public record",
+  "raw_source": "us.scans",
+  "title": "State of Illinois official vote cast at the general election, 1972",
+  "file": {
+    "url": "https://archive.org/download/officialvote72illi/officialvote72illi.pdf"
+  },
+  "contests": {
+    "president": {
+      "year": 1972,
+      "chamber": "president",
+      "day": "1972-11-07",
+      "special": false,
+      "state": "IL",
+      "district": null
+    },
+    "senate": {
+      "year": 1972,
+      "chamber": "senate",
+      "day": "1972-11-07",
+      "special": false,
+      "state": "IL",
+      "district": null
+    },
+    "governor": {
+      "year": 1972,
+      "chamber": "governor",
+      "day": "1972-11-07",
+      "special": false,
+      "state": "IL",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 18,
+      "id": "18-0",
+      "columns": [
+        {
+          "label": "Plurality",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Richard M. Nixon and Spiro T. Agnew (Republican)",
+          "contest": "president",
+          "candidate": "Nixon (Republican)"
+        },
+        {
+          "label": "Per Cent (Republican)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "George McGovern and R. Sargent Shriver (Democratic)",
+          "contest": "president",
+          "candidate": "McGovern (Democratic)"
+        },
+        {
+          "label": "Per Cent (Democratic)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Louis Fisher and Genevieve Gunderson (Socialist Labor)",
+          "contest": "president",
+          "candidate": "Socialist Labor"
+        },
+        {
+          "label": "Per Cent (Socialist Labor)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Gus Hall and Jarvis Tyner (Communist)",
+          "contest": "president",
+          "candidate": "Communist"
+        },
+        {
+          "label": "Per Cent (Communist)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Write-In President John G Schmitz",
+          "contest": "president",
+          "candidate": "Schmitz (American Independent)"
+        },
+        {
+          "label": "Write-In Vice-President Thomas J Anderson",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Other Write-Ins President and Vice-President",
+          "contest": "president",
+          "candidate": "Others"
+        },
+        {
+          "label": "Other Write-Ins President",
+          "contest": "president",
+          "candidate": "Others"
+        },
+        {
+          "label": "Other Write-Ins Vice-President",
+          "contest": "president",
+          "candidate": "Others"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.059,
+        0.005,
+        0.911,
+        0.29
+      ],
+      "hint": "Read only the table headed 'VOTE FOR PRESIDENT AND VICE-PRESIDENT OF THE UNITED STATES\u2014NOVEMBER 7, 1972\u2014Concluded'; ignore any other table visible in the image.",
+      "turn": -90
+    },
+    {
+      "page": 20,
+      "id": "20-0",
+      "columns": [
+        {
+          "label": "Republican Richard M. Nixon and Spiro T. Agnew",
+          "contest": "president",
+          "candidate": "Nixon (Republican)"
+        },
+        {
+          "label": "Democratic George McGovern and R. Sargent Shriver",
+          "contest": "president",
+          "candidate": "McGovern (Democratic)"
+        },
+        {
+          "label": "Socialist Labor Louis Fisher and Genevieve Gunderson",
+          "contest": "president",
+          "candidate": "Socialist Labor"
+        },
+        {
+          "label": "Communist Party Gus Hall and Jarvis Tyner",
+          "contest": "president",
+          "candidate": "Communist"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.054,
+        0.078,
+        0.898,
+        0.884
+      ],
+      "hint": "Read only the table headed 'VOTE FOR PRESIDENT AND VICE PRESIDENT\u2014COOK COUNTY\u2014NOVEMBER 7, 1972 (Information furnished by Clerk of Cook County)'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2022
+      ]
+    },
+    {
+      "page": 21,
+      "id": "21-0",
+      "columns": [
+        {
+          "label": "Republican Richard M. Nixon and Spiro T. Agnew",
+          "contest": "president",
+          "candidate": "Nixon (Republican)"
+        },
+        {
+          "label": "Democratic George McGovern and R. Sargent Shriver",
+          "contest": "president",
+          "candidate": "McGovern (Democratic)"
+        },
+        {
+          "label": "Socialist Labor Louis Fisher and Genevieve Gunderson",
+          "contest": "president",
+          "candidate": "Socialist Labor"
+        },
+        {
+          "label": "Communist Party Gus Hall and Jarvis Tyner",
+          "contest": "president",
+          "candidate": "Communist"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.076,
+        0.128,
+        0.956,
+        0.947
+      ],
+      "hint": "Read only the table headed 'VOTE FOR PRESIDENT AND VICE PRESIDENT\u2014COOK COUNTY\u2014NOVEMBER 7, 1972\u2014Concluded'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2845
+      ]
+    },
+    {
+      "page": 22,
+      "id": "22-0",
+      "columns": [
+        {
+          "label": "Plurality",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Republican Charles H. Percy",
+          "contest": "senate",
+          "candidate": "Charles H. Percy"
+        },
+        {
+          "label": "Republican Per Cent",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Democratic Roman Pucinski",
+          "contest": "senate",
+          "candidate": "Roman C. Pucinski"
+        },
+        {
+          "label": "Democratic Per Cent",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Socialist Labor Edward C. Gross",
+          "contest": "senate",
+          "candidate": "Edward C. Gross"
+        },
+        {
+          "label": "Socialist Labor Per Cent",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Communist Arnold F. Becchetti",
+          "contest": "senate",
+          "candidate": "Arnold Becchetti"
+        },
+        {
+          "label": "Communist Per Cent",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Write-In Dakin Williams",
+          "contest": "senate",
+          "candidate": "Write-in"
+        },
+        {
+          "label": "Write-In Other Write-Ins",
+          "contest": "senate",
+          "candidate": "Write-in"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.058,
+        0.011,
+        0.909,
+        1.0
+      ],
+      "hint": "Read only the table headed 'VOTE FOR UNITED STATES SENATOR\u2014NOVEMBER 7, 1972'; ignore any other table visible in the image.",
+      "turn": -90,
+      "bands": 3,
+      "header": [
+        0.0,
+        0.1385
+      ]
+    },
+    {
+      "page": 23,
+      "id": "23-0",
+      "columns": [
+        {
+          "label": "Plurality",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Republican Charles H. Percy",
+          "contest": "senate",
+          "candidate": "Charles H. Percy"
+        },
+        {
+          "label": "Republican Per Cent",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Democratic Roman Pucinski",
+          "contest": "senate",
+          "candidate": "Roman C. Pucinski"
+        },
+        {
+          "label": "Democratic Per Cent",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Socialist Labor Edward C. Gross",
+          "contest": "senate",
+          "candidate": "Edward C. Gross"
+        },
+        {
+          "label": "Socialist Labor Per Cent",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Communist Arnold F. Becchetti",
+          "contest": "senate",
+          "candidate": "Arnold Becchetti"
+        },
+        {
+          "label": "Communist Per Cent",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Write-In Dakin Williams",
+          "contest": "senate",
+          "candidate": "Write-in"
+        },
+        {
+          "label": "Write-In Other Write-Ins",
+          "contest": "senate",
+          "candidate": "Write-in"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.058,
+        0.0,
+        0.909,
+        1.0
+      ],
+      "hint": "This page continues the table of the previous page and prints no headings.",
+      "turn": -90
+    },
+    {
+      "page": 24,
+      "id": "24-0",
+      "columns": [
+        {
+          "label": "Plurality",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Republican Charles H. Percy",
+          "contest": "senate",
+          "candidate": "Charles H. Percy"
+        },
+        {
+          "label": "Republican Per Cent",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Democratic Roman Pucinski",
+          "contest": "senate",
+          "candidate": "Roman C. Pucinski"
+        },
+        {
+          "label": "Democratic Per Cent",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Socialist Labor Edward C. Gross",
+          "contest": "senate",
+          "candidate": "Edward C. Gross"
+        },
+        {
+          "label": "Socialist Labor Per Cent",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Communist Arnold F. Becchetti",
+          "contest": "senate",
+          "candidate": "Arnold Becchetti"
+        },
+        {
+          "label": "Communist Per Cent",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Write-In Dakin Williams",
+          "contest": "senate",
+          "candidate": "Write-in"
+        },
+        {
+          "label": "Write-In Other Write-Ins",
+          "contest": "senate",
+          "candidate": "Write-in"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.057,
+        0.01,
+        0.908,
+        0.492
+      ],
+      "hint": "Read only the table headed 'VOTE FOR UNITED STATES SENATOR\u2014NOVEMBER 7, 1972\u2014Concluded'; ignore any other table visible in the image.",
+      "turn": -90,
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1805
+      ]
+    },
+    {
+      "page": 26,
+      "id": "26-0",
+      "columns": [
+        {
+          "label": "Republican Charles H. Percy",
+          "contest": "senate",
+          "candidate": "Charles H. Percy"
+        },
+        {
+          "label": "Democratic Roman Pucinski",
+          "contest": "senate",
+          "candidate": "Roman C. Pucinski"
+        },
+        {
+          "label": "Socialist Labor Edward C. Gross",
+          "contest": "senate",
+          "candidate": "Edward C. Gross"
+        },
+        {
+          "label": "Communist Party Arnold F. Becchetti",
+          "contest": "senate",
+          "candidate": "Arnold Becchetti"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.062,
+        0.081,
+        0.941,
+        0.854
+      ],
+      "hint": "Read only the table headed 'VOTE FOR UNITED STATES SENATOR\u2014COOK COUNTY\u2014NOVEMBER 7, 1972 (Information furnished by Clerk of Cook County)'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1695
+      ]
+    },
+    {
+      "page": 27,
+      "id": "27-0",
+      "columns": [
+        {
+          "label": "Republican Charles H. Percy",
+          "contest": "senate",
+          "candidate": "Charles H. Percy"
+        },
+        {
+          "label": "Democratic Roman Pucinski",
+          "contest": "senate",
+          "candidate": "Roman C. Pucinski"
+        },
+        {
+          "label": "Socialist Labor Edward C. Gross",
+          "contest": "senate",
+          "candidate": "Edward C. Gross"
+        },
+        {
+          "label": "Communist Party Arnold F. Becchetti",
+          "contest": "senate",
+          "candidate": "Arnold Becchetti"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.061,
+        0.136,
+        0.938,
+        0.906
+      ],
+      "hint": "Read only the table headed 'VOTE FOR UNITED STATES SENATOR\u2014COOK COUNTY\u2014NOVEMBER 7, 1972\u2014Concluded'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.239
+      ]
+    },
+    {
+      "page": 28,
+      "id": "28-0",
+      "columns": [
+        {
+          "label": "Plurality",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Republican Richard B. Ogilvie and James D. Nowlan",
+          "contest": "governor",
+          "candidate": "Richard B. Ogilvie"
+        },
+        {
+          "label": "Per Cent",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Democratic Daniel Walker and Neil F. Hartigan",
+          "contest": "governor",
+          "candidate": "Daniel Walker"
+        },
+        {
+          "label": "Per Cent",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Socialist Labor George A. LaForest and Stanley L. Prorok",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Per Cent",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Communist Ishmael Flory and Theodore Pearson",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Per Cent",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Write-Ins Governor",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Write-Ins Lieutenant Governor",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Other Write-Ins Governor and Lt. Governor",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.057,
+        0.024,
+        0.906,
+        1.0
+      ],
+      "hint": "Read only the table headed 'VOTE FOR GOVERNOR AND LIEUTENANT GOVERNOR\u2014NOVEMBER 7, 1972'; ignore any other table visible in the image.",
+      "turn": -90,
+      "bands": 3,
+      "header": [
+        0.0,
+        0.2059
+      ]
+    },
+    {
+      "page": 29,
+      "id": "29-0",
+      "columns": [
+        {
+          "label": "Plurality",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Republican Richard B. Ogilvie and James D. Nowlan",
+          "contest": "governor",
+          "candidate": "Richard B. Ogilvie"
+        },
+        {
+          "label": "Per Cent",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Democratic Daniel Walker and Neil F. Hartigan",
+          "contest": "governor",
+          "candidate": "Daniel Walker"
+        },
+        {
+          "label": "Per Cent",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Socialist Labor George A. LaForest and Stanley L. Prorok",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Per Cent",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Communist Ishmael Flory and Theodore Pearson",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Per Cent",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Write-Ins Governor",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Write-Ins Lieutenant Governor",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Other Write-Ins Governor and Lt. Governor",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.057,
+        0.0,
+        0.906,
+        1.0
+      ],
+      "hint": "This page continues the table of the previous page and prints no headings.",
+      "turn": -90
+    },
+    {
+      "page": 30,
+      "id": "30-0",
+      "columns": [
+        {
+          "label": "Plurality",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Republican Richard B. Ogilvie and James D. Nowlan",
+          "contest": "governor",
+          "candidate": "Richard B. Ogilvie"
+        },
+        {
+          "label": "Per Cent",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Democratic Daniel Walker and Neil F. Hartigan",
+          "contest": "governor",
+          "candidate": "Daniel Walker"
+        },
+        {
+          "label": "Per Cent",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Socialist Labor George A. LaForest and Stanley L. Prorok",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Per Cent",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Communist Ishmael Flory and Theodore Pearson",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Per Cent",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Write-Ins Governor",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Write-Ins Lieutenant Governor",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Other Write-Ins Governor and Lt. Governor",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.062,
+        0.028,
+        0.911,
+        0.344
+      ],
+      "hint": "Read only the table headed 'VOTE FOR GOVERNOR AND LIEUTENANT GOVERNOR\u2014NOVEMBER 7, 1972\u2014Concluded'; ignore any other table visible in the image.",
+      "turn": -90
+    },
+    {
+      "page": 32,
+      "id": "32-0",
+      "columns": [
+        {
+          "label": "Republican Richard B. Ogilvie And James D. Nowlan",
+          "contest": "governor",
+          "candidate": "Richard B. Ogilvie"
+        },
+        {
+          "label": "Democratic Daniel Walker And Neil F. Hartigan",
+          "contest": "governor",
+          "candidate": "Daniel Walker"
+        },
+        {
+          "label": "Socialist Labor George A. LaForest And Stanley L. Prorok",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Communist Party Ishmael Flory And Theodore Pearson",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.089,
+        0.154,
+        0.973,
+        0.922
+      ],
+      "hint": "Read only the table headed 'VOTE FOR GOVERNOR AND LIEUTENANT GOVERNOR\u2014 COOK COUNTY - NOVEMBER 7,1972 (Information furnished by Clerk of Cook County)'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1406
+      ]
+    },
+    {
+      "page": 33,
+      "id": "33-0",
+      "columns": [
+        {
+          "label": "Republican Richard B. Ogilvie and James D. Nowlan",
+          "contest": "governor",
+          "candidate": "Richard B. Ogilvie"
+        },
+        {
+          "label": "Democratic Daniel Walker and Neil F. Hartigan",
+          "contest": "governor",
+          "candidate": "Daniel Walker"
+        },
+        {
+          "label": "Socialist Labor George A. LaForest and Stanley L. Prorok",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Communist Party Ishmael Flory and Theodore Pearson",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.074,
+        0.148,
+        0.953,
+        0.944
+      ],
+      "hint": "Read only the table headed 'VOTE FOR GOVERNOR AND LIEUTENANT GOVERNOR COOK COUNTY\u2014NOVEMBER 7, 1972\u2014Concluded'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2626
+      ]
+    }
+  ]
+}

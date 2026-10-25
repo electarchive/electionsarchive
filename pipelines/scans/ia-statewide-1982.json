@@ -1,0 +1,81 @@
+{
+  "polity": "US-IA",
+  "publisher": "Iowa Secretary of State",
+  "license": "Public record",
+  "raw_source": "us.ia_sos",
+  "title": "Iowa official canvass summary, general election 1982",
+  "file": {
+    "url": "https://sos.iowa.gov/elections/pdf/results/80s/1982gencanv.pdf",
+    "item": "https://sos.iowa.gov/elections/results/"
+  },
+  "contests": {
+    "governor": {
+      "year": 1982,
+      "chamber": "governor",
+      "day": "1982-11-02",
+      "special": false,
+      "state": "IA",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 6,
+      "id": "6-0",
+      "columns": [
+        {
+          "label": "REPUBLICAN Terry E. BRANSTAD",
+          "contest": "governor",
+          "candidate": "Terry E. Branstad"
+        },
+        {
+          "label": "DEMOCRATIC Roxanne CONLIN",
+          "contest": "governor",
+          "candidate": "Roxanne Conlin"
+        },
+        { "label": "SOCIALIST Jim BITTNER", "contest": null, "candidate": "" },
+        {
+          "label": "LIBERTARIAN Marcia J. FARRINGTON",
+          "contest": null,
+          "candidate": ""
+        },
+        { "label": "SC", "contest": null, "candidate": "" },
+        { "label": "TOTALS", "contest": null, "candidate": "" }
+      ],
+      "orientation": "counties_down",
+      "crop": [0.097, 0.161, 0.958, 1.0],
+      "hint": "Read only the table headed 'FOR GOVERNOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [0.0, 0.0763]
+    },
+    {
+      "page": 7,
+      "id": "7-0",
+      "columns": [
+        {
+          "label": "REPUBLICAN Terry E. BRANSTAD",
+          "contest": "governor",
+          "candidate": "Terry E. Branstad"
+        },
+        {
+          "label": "DEMOCRATIC Roxanne CONLIN",
+          "contest": "governor",
+          "candidate": "Roxanne Conlin"
+        },
+        { "label": "SOCIALIST Jim BITTNER", "contest": null, "candidate": "" },
+        {
+          "label": "LIBERTARIAN Marcia J. FARRINGTON",
+          "contest": null,
+          "candidate": ""
+        },
+        { "label": "SC", "contest": null, "candidate": "" },
+        { "label": "TOTALS", "contest": null, "candidate": "" }
+      ],
+      "orientation": "counties_down",
+      "crop": [0.094, 0.052, 0.953, 0.994],
+      "hint": "Read only the table headed 'Canvass By Counties Of The Votes Cast For Statewide Offices FOR GOVERNOR'; ignore any other table visible in the image.",
+      "bands": 3,
+      "header": [0.0, 0.138]
+    }
+  ]
+}

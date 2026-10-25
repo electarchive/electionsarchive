@@ -1,0 +1,171 @@
+{
+  "polity": "US-SC",
+  "publisher": "South Carolina State Election Commission",
+  "license": "Public record",
+  "raw_source": "us.scans",
+  "title": "Report of the State Election Commission, votes cast in the general election held 1986-11-04",
+  "file": {
+    "url": "https://scvotes.gov/wp-content/uploads/2022/08/Election_Report_1986-1987.pdf"
+  },
+  "contests": {
+    "house1": {
+      "year": 1986,
+      "chamber": "house",
+      "day": "1986-11-04",
+      "special": false,
+      "state": "SC",
+      "district": 1
+    },
+    "house2": {
+      "year": 1986,
+      "chamber": "house",
+      "day": "1986-11-04",
+      "special": false,
+      "state": "SC",
+      "district": 2
+    },
+    "house3": {
+      "year": 1986,
+      "chamber": "house",
+      "day": "1986-11-04",
+      "special": false,
+      "state": "SC",
+      "district": 3
+    },
+    "house4": {
+      "year": 1986,
+      "chamber": "house",
+      "day": "1986-11-04",
+      "special": false,
+      "state": "SC",
+      "district": 4
+    }
+  },
+  "pages": [
+    {
+      "page": 23,
+      "id": "23-0",
+      "columns": [
+        {
+          "label": "(R) ARTHUR RAVENEL JR",
+          "contest": "house1",
+          "candidate": "Arthur Ravenel Jr."
+        },
+        {
+          "label": "(D) JIMMY STUCKEY",
+          "contest": "house1",
+          "candidate": "Jimmy Stuckey"
+        },
+        {
+          "label": "(W) WRITE INS",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.043,
+        0.199,
+        0.343,
+        0.524
+      ],
+      "hint": "Read only the table headed 'DISTRICT NO 001 REPRESENTIVE IN CONGRESS'; ignore any other table visible in the image.",
+      "turn": -90
+    },
+    {
+      "page": 23,
+      "id": "23-1",
+      "columns": [
+        {
+          "label": "(R) FLOYD SPENCE",
+          "contest": "house2",
+          "candidate": "Floyd D. Spence"
+        },
+        {
+          "label": "(D) FRED ZEIGLER",
+          "contest": "house2",
+          "candidate": "Fred Zeigler"
+        },
+        {
+          "label": "(W) WRITE INS",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.454,
+        0.199,
+        0.754,
+        0.504
+      ],
+      "hint": "Read only the table headed 'DISTRICT NO 002 REPRESENTIVE IN CONGRESS'; ignore any other table visible in the image.",
+      "turn": -90
+    },
+    {
+      "page": 24,
+      "id": "24-0",
+      "columns": [
+        {
+          "label": "(D) *BUTLER DERRICK",
+          "contest": "house3",
+          "candidate": "Butler Derrick"
+        },
+        {
+          "label": "(R) RICHARD DICKISON",
+          "contest": "house3",
+          "candidate": "Richard Dickison"
+        },
+        {
+          "label": "(W) WRITE INS",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.046,
+        0.077,
+        0.351,
+        0.446
+      ],
+      "hint": "Read only the table headed 'DISTRICT NO 003 REPRESENTIVE IN CONGRESS'; ignore any other table visible in the image.",
+      "turn": -90
+    },
+    {
+      "page": 24,
+      "id": "24-1",
+      "columns": [
+        {
+          "label": "(R) BILL WORKMAN",
+          "contest": "house4",
+          "candidate": "Bill Workman"
+        },
+        {
+          "label": "(A) BOB WILSON",
+          "contest": "house4",
+          "candidate": "Bob Wilson"
+        },
+        {
+          "label": "(D) *LIZ J PATTERSON",
+          "contest": "house4",
+          "candidate": "Liz J. Patterson"
+        },
+        {
+          "label": "(W) WRITE INS",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.465,
+        0.077,
+        0.827,
+        0.371
+      ],
+      "hint": "Read only the table headed 'DISTRICT NO 004 REPRESENTIVE IN CONGRESS'; ignore any other table visible in the image.",
+      "turn": -90
+    }
+  ]
+}

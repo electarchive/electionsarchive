@@ -1,0 +1,403 @@
+{
+  "polity": "US-IL",
+  "publisher": "Illinois State Board of Elections",
+  "license": "Public record",
+  "raw_source": "us.scans",
+  "title": "State of Illinois official vote cast at the general election, 1998",
+  "file": {
+    "url": "https://archive.org/download/officialvoteof1998illi/officialvoteof1998illi.pdf"
+  },
+  "contests": {
+    "governor": {
+      "year": 1998,
+      "chamber": "governor",
+      "day": "1998-11-03",
+      "special": false,
+      "state": "IL",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 14,
+      "id": "14-1",
+      "columns": [
+        {
+          "label": "PLURALITY",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "REP RYAN WOOD",
+          "contest": "governor",
+          "candidate": "George H. Ryan"
+        },
+        {
+          "label": "DEM POSHARD KEARNS",
+          "contest": "governor",
+          "candidate": "Glenn Poshard"
+        },
+        {
+          "label": "REF REDMOND NIRCHI",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "FRIEDMAN",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "STUDER",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.062,
+        0.298,
+        0.943,
+        1.0
+      ],
+      "hint": "Read only the table headed 'GOVERNOR AND LIEUTENANT GOVERNOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1026
+      ]
+    },
+    {
+      "page": 15,
+      "id": "15-0",
+      "columns": [
+        {
+          "label": "PLURALITY",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "REP RYAN WOOD",
+          "contest": "governor",
+          "candidate": "George H. Ryan"
+        },
+        {
+          "label": "DEM POSHARD KEARNS",
+          "contest": "governor",
+          "candidate": "Glenn Poshard"
+        },
+        {
+          "label": "REF REDMOND NIRCHI",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "FRIEDMAN",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "STUDER",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.047,
+        0.135,
+        0.933,
+        1.0
+      ],
+      "hint": "Read only the table headed 'GOVERNOR AND LIEUTENANT GOVERNOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1399
+      ]
+    },
+    {
+      "page": 16,
+      "id": "16-0",
+      "columns": [
+        {
+          "label": "PLURALITY",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "REP RYAN WOOD",
+          "contest": "governor",
+          "candidate": "George H. Ryan"
+        },
+        {
+          "label": "DEM POSHARD KEARNS",
+          "contest": "governor",
+          "candidate": "Glenn Poshard"
+        },
+        {
+          "label": "REF REDMOND NIRCHI",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "FRIEDMAN",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "STUDER",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.062,
+        0.082,
+        0.939,
+        1.0
+      ],
+      "hint": "Read only the table headed 'GOVERNOR AND LIEUTENANT GOVERNOR'; ignore any other table visible in the image.",
+      "bands": 3,
+      "header": [
+        0.0,
+        0.11
+      ]
+    },
+    {
+      "page": 17,
+      "id": "17-0",
+      "columns": [
+        {
+          "label": "PLURALITY",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "REP RYAN WOOD",
+          "contest": "governor",
+          "candidate": "George H. Ryan"
+        },
+        {
+          "label": "DEM POSHARD KEARNS",
+          "contest": "governor",
+          "candidate": "Glenn Poshard"
+        },
+        {
+          "label": "REF REDMOND NIRCHI",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "FRIEDMAN",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "STUDER",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.047,
+        0.183,
+        0.93,
+        0.372
+      ],
+      "hint": "Read only the table headed 'GOVERNOR AND LIEUTENANT GOVERNOR'; ignore any other table visible in the image."
+    },
+    {
+      "page": 17,
+      "id": "17-1",
+      "columns": [
+        {
+          "label": "LICHTENBERGER",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "KATZ",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "WEATHERS",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "JOHNSON",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.172,
+        0.364,
+        0.803,
+        1.0
+      ],
+      "hint": "Read only the table headed 'GOVERNOR AND LIEUTENANT GOVERNOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0991
+      ]
+    },
+    {
+      "page": 18,
+      "id": "18-0",
+      "columns": [
+        {
+          "label": "LICHTENBERGER",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "KATZ",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "WEATHERS",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "JOHNSON",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.182,
+        0.135,
+        0.813,
+        1.0
+      ],
+      "hint": "Read only the table headed 'GOVERNOR AND LIEUTENANT GOVERNOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0428
+      ]
+    },
+    {
+      "page": 19,
+      "id": "19-0",
+      "columns": [
+        {
+          "label": "LICHTENBERGER",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "KATZ",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "WEATHERS",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "JOHNSON",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.167,
+        0.095,
+        0.798,
+        1.0
+      ],
+      "hint": "Read only the table headed 'GOVERNOR AND LIEUTENANT GOVERNOR'; ignore any other table visible in the image.",
+      "bands": 3,
+      "header": [
+        0.0,
+        0.1381
+      ]
+    },
+    {
+      "page": 20,
+      "id": "20-0",
+      "columns": [
+        {
+          "label": "LICHTENBERGER",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "KATZ",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "WEATHERS",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "JOHNSON",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.2,
+        0.079,
+        0.828,
+        1.0
+      ],
+      "hint": "Read only the table headed 'GOVERNOR AND LIEUTENANT GOVERNOR'; ignore any other table visible in the image.",
+      "bands": 3,
+      "header": [
+        0.0,
+        0.1064
+      ]
+    },
+    {
+      "page": 21,
+      "id": "21-0",
+      "columns": [
+        {
+          "label": "LICHTENBERGER",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "KATZ",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "WEATHERS",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "JOHNSON",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.2,
+        0.0,
+        0.828,
+        1.0
+      ],
+      "hint": "This page continues the table of the previous page and prints no headings."
+    }
+  ]
+}

@@ -1,0 +1,687 @@
+{
+  "polity": "US-KS",
+  "publisher": "Kansas Secretary of State",
+  "license": "Public record",
+  "raw_source": "us.ks_es",
+  "title": "Kansas election statistics 1974, general election",
+  "file": {
+    "url": "https://kgi.contentdm.oclc.org/digital/api/collection/p16884coll129/id/64/download"
+  },
+  "contests": {
+    "senate": {
+      "year": 1974,
+      "chamber": "senate",
+      "day": "1974-11-05",
+      "special": false,
+      "state": "KS",
+      "district": null
+    },
+    "house1": {
+      "year": 1974,
+      "chamber": "house",
+      "day": "1974-11-05",
+      "special": false,
+      "state": "KS",
+      "district": 1
+    },
+    "house2": {
+      "year": 1974,
+      "chamber": "house",
+      "day": "1974-11-05",
+      "special": false,
+      "state": "KS",
+      "district": 2
+    },
+    "house3": {
+      "year": 1974,
+      "chamber": "house",
+      "day": "1974-11-05",
+      "special": false,
+      "state": "KS",
+      "district": 3
+    },
+    "house4": {
+      "year": 1974,
+      "chamber": "house",
+      "day": "1974-11-05",
+      "special": false,
+      "state": "KS",
+      "district": 4
+    },
+    "house5": {
+      "year": 1974,
+      "chamber": "house",
+      "day": "1974-11-05",
+      "special": false,
+      "state": "KS",
+      "district": 5
+    },
+    "governor": {
+      "year": 1974,
+      "chamber": "governor",
+      "day": "1974-11-05",
+      "special": false,
+      "state": "KS",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 12,
+      "id": "12-0",
+      "columns": [
+        {
+          "label": "Bob Dole, Rep.",
+          "contest": "senate",
+          "candidate": "Bob Dole"
+        },
+        {
+          "label": "George Hart, Dem.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Bill Roy, Dem.",
+          "contest": "senate",
+          "candidate": "Bill Roy"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.021,
+        0.071,
+        0.877,
+        1.0
+      ],
+      "hint": "Read only the table headed 'FOR UNITED STATES SENATOR'; ignore any other table visible in the image.",
+      "bands": 3,
+      "header": [
+        0.0,
+        0.0883
+      ]
+    },
+    {
+      "page": 13,
+      "id": "13-0",
+      "columns": [
+        {
+          "label": "Bob Dole, Rep.",
+          "contest": "senate",
+          "candidate": "Bob Dole"
+        },
+        {
+          "label": "George Hart, Dem.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Bill Roy, Dem.",
+          "contest": "senate",
+          "candidate": "Bill Roy"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.11,
+        0.098,
+        0.96,
+        0.839
+      ],
+      "hint": "Read only the table headed 'UNITED STATES SENATOR\u2014Concluded'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0931
+      ]
+    },
+    {
+      "page": 14,
+      "id": "14-0",
+      "columns": [
+        {
+          "label": "Keith G. Sebelius, Rep.",
+          "contest": "house1",
+          "candidate": "Keith G. Sebelius"
+        },
+        {
+          "label": "Homer Krucken-berg, Dem.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Don Smith, Dem.",
+          "contest": "house1",
+          "candidate": "Don Smith"
+        },
+        {
+          "label": "Chuck Wilson, Dem.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.015,
+        0.073,
+        0.876,
+        0.904
+      ],
+      "hint": "Read only the table headed 'FOR CONGRESSMAN, FIRST DISTRICT'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0963
+      ]
+    },
+    {
+      "page": 15,
+      "id": "15-0",
+      "columns": [
+        {
+          "label": "John C. Peterson, Rep.",
+          "contest": "house2",
+          "candidate": "John C. Peterson"
+        },
+        {
+          "label": "Edward F. Reilly, Jr., Rep.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "G. I. Burns, Dem.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Ed Engel, Dem.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Martha Keys, Dem.",
+          "contest": "house2",
+          "candidate": "Martha Keys"
+        },
+        {
+          "label": "Jacob W. \"Jake\" Miller, Dem.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Dwight J. Parscale, Dem.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.055,
+        0.123,
+        0.978,
+        0.421
+      ],
+      "hint": "Read only the table headed 'FOR CONGRESSMAN, SECOND DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 15,
+      "id": "15-1",
+      "columns": [
+        {
+          "label": "Larry Winn, Jr., Rep.",
+          "contest": "house3",
+          "candidate": "Larry Winn, Jr."
+        },
+        {
+          "label": "Jack R. Feagan, Dem.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Samuel J. Wells, Dem.",
+          "contest": "house3",
+          "candidate": "Samuel J. Wells"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.122,
+        0.413,
+        0.92,
+        0.638
+      ],
+      "hint": "Read only the table headed 'FOR CONGRESSMAN, THIRD DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 15,
+      "id": "15-2",
+      "columns": [
+        {
+          "label": "Garner E. Shriver, Rep.",
+          "contest": "house4",
+          "candidate": "Garner E. Shriver"
+        },
+        {
+          "label": "Robert F. Brandt, Dem.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Bert Chaney, Dem.",
+          "contest": "house4",
+          "candidate": "Bert Chaney"
+        },
+        {
+          "label": "Bill Linker, Dem.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.122,
+        0.63,
+        0.918,
+        0.85
+      ],
+      "hint": "Read only the table headed 'FOR CONGRESSMAN, FOURTH DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 16,
+      "id": "16-0",
+      "columns": [
+        {
+          "label": "Nat Leo, Rep.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Joe Skubitz, Rep.",
+          "contest": "house5",
+          "candidate": "Joe Skubitz"
+        },
+        {
+          "label": "Frank Gaines, Dem.",
+          "contest": "house5",
+          "candidate": "Frank Gaines"
+        },
+        {
+          "label": "Henry Grady Spencer, Dem.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.039,
+        0.082,
+        0.836,
+        0.52
+      ],
+      "hint": "Read only the table headed 'FOR CONGRESSMAN, FIFTH DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 17,
+      "id": "17-0",
+      "columns": [
+        {
+          "label": "Bennett-Smith, Rep.",
+          "contest": "governor",
+          "candidate": "Robert F. Bennett"
+        },
+        {
+          "label": "Clack-Lowe, Rep.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Concannon-Burns, Rep.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Robinson-Braun, Rep.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Miller-Steineger, Dem.",
+          "contest": "governor",
+          "candidate": "Vern Miller"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.102,
+        0.091,
+        0.936,
+        1.0
+      ],
+      "hint": "Read only the table headed 'FOR GOVERNOR-LIEUTENANT GOVERNOR'; ignore any other table visible in the image.",
+      "bands": 3,
+      "header": [
+        0.0,
+        0.0891
+      ]
+    },
+    {
+      "page": 18,
+      "id": "18-0",
+      "columns": [
+        {
+          "label": "Bennett-Smith, Rep.",
+          "contest": "governor",
+          "candidate": "Robert F. Bennett"
+        },
+        {
+          "label": "Clack-Lowe, Rep.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Concannon-Burns, Rep.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Robinson-Braun, Rep.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Miller-Steineger, Dem.",
+          "contest": "governor",
+          "candidate": "Vern Miller"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.028,
+        0.1,
+        0.872,
+        0.846
+      ],
+      "hint": "Read only the table headed 'FOR GOVERNOR-LIEUTENANT GOVERNOR\u2014Concluded'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0938
+      ]
+    },
+    {
+      "page": 71,
+      "id": "71-0",
+      "columns": [
+        {
+          "label": "Bob Dole, Rep.",
+          "contest": "senate",
+          "candidate": "Bob Dole"
+        },
+        {
+          "label": "Bill Roy, Dem.",
+          "contest": "senate",
+          "candidate": "Bill Roy"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.034,
+        0.079,
+        0.89,
+        1.0
+      ],
+      "hint": "Read only the table headed 'FOR UNITED STATES SENATOR'; ignore any other table visible in the image.",
+      "bands": 3,
+      "header": [
+        0.0,
+        0.0879
+      ]
+    },
+    {
+      "page": 72,
+      "id": "72-0",
+      "columns": [
+        {
+          "label": "Bob Dole, Rep.",
+          "contest": "senate",
+          "candidate": "Bob Dole"
+        },
+        {
+          "label": "Bill Roy, Dem.",
+          "contest": "senate",
+          "candidate": "Bill Roy"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.134,
+        0.09,
+        0.981,
+        0.827
+      ],
+      "hint": "Read only the table headed 'FOR UNITED STATES SENATOR\u2014Concluded'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.095
+      ]
+    },
+    {
+      "page": 73,
+      "id": "73-0",
+      "columns": [
+        {
+          "label": "Keith G. Sebelius, Rep.",
+          "contest": "house1",
+          "candidate": "Keith G. Sebelius"
+        },
+        {
+          "label": "Don Smith, Dem.",
+          "contest": "house1",
+          "candidate": "Don Smith"
+        },
+        {
+          "label": "Thelma Morgan, Amer.",
+          "contest": "house1",
+          "candidate": "Thelma Morgan"
+        },
+        {
+          "label": "Lorin P. Miller, Proh.",
+          "contest": "house1",
+          "candidate": "Lorin P. Miller"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.044,
+        0.095,
+        0.903,
+        0.988
+      ],
+      "hint": "Read only the table headed 'FOR CONGRESSMAN, FIRST DISTRICT'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0873
+      ]
+    },
+    {
+      "page": 74,
+      "id": "74-0",
+      "columns": [
+        {
+          "label": "John C. Peterson, Rep.",
+          "contest": "house2",
+          "candidate": "John C. Peterson"
+        },
+        {
+          "label": "Martha Keys, Dem.",
+          "contest": "house2",
+          "candidate": "Martha Keys"
+        },
+        {
+          "label": "David Scoggin, Proh.",
+          "contest": "house2",
+          "candidate": "David Scoggin"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.123,
+        0.08,
+        0.974,
+        0.403
+      ],
+      "hint": "Read only the table headed 'FOR CONGRESSMAN, SECOND DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 74,
+      "id": "74-1",
+      "columns": [
+        {
+          "label": "Larry Winn, Jr., Rep.",
+          "contest": "house3",
+          "candidate": "Larry Winn, Jr."
+        },
+        {
+          "label": "Samuel J. Wells, Dem.",
+          "contest": "house3",
+          "candidate": "Samuel J. Wells"
+        },
+        {
+          "label": "Ted F. Oakes, Amer.",
+          "contest": "house3",
+          "candidate": "Ted E. Oakes"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.124,
+        0.395,
+        0.971,
+        0.595
+      ],
+      "hint": "Read only the table headed 'FOR CONGRESSMAN, THIRD DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 74,
+      "id": "74-2",
+      "columns": [
+        {
+          "label": "Garner E. Shriver, Rep.",
+          "contest": "house4",
+          "candidate": "Garner E. Shriver"
+        },
+        {
+          "label": "Bert Chaney, Dem.",
+          "contest": "house4",
+          "candidate": "Bert Chaney"
+        },
+        {
+          "label": "John S. Stevens, Amer.",
+          "contest": "house4",
+          "candidate": "John S. Stevens"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.124,
+        0.587,
+        0.969,
+        0.793
+      ],
+      "hint": "Read only the table headed 'FOR CONGRESSMAN, FOURTH DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 75,
+      "id": "75-0",
+      "columns": [
+        {
+          "label": "Joe Skubitz, Rep.",
+          "contest": "house5",
+          "candidate": "Joe Skubitz"
+        },
+        {
+          "label": "Frank Gaines, Dem.",
+          "contest": "house5",
+          "candidate": "Frank Gaines"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.045,
+        0.095,
+        0.876,
+        0.527
+      ],
+      "hint": "Read only the table headed 'FOR CONGRESSMAN, FIFTH DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 76,
+      "id": "76-0",
+      "columns": [
+        {
+          "label": "Robert F. Bennett Shelby Smith Rep.",
+          "contest": "governor",
+          "candidate": "Robert F. Bennett"
+        },
+        {
+          "label": "Vern Miller Jack Steineger Dem.",
+          "contest": "governor",
+          "candidate": "Vern Miller"
+        },
+        {
+          "label": "Marshall Uncapher Roscoe Scoggin Proh.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.122,
+        0.095,
+        0.976,
+        1.0
+      ],
+      "hint": "Read only the table headed 'FOR GOVERNOR-LIEUTENANT GOVERNOR'; ignore any other table visible in the image.",
+      "bands": 3,
+      "header": [
+        0.0,
+        0.0884
+      ]
+    },
+    {
+      "page": 77,
+      "id": "77-0",
+      "columns": [
+        {
+          "label": "Robert F. Bennett Shelby Smith Rep.",
+          "contest": "governor",
+          "candidate": "Robert F. Bennett"
+        },
+        {
+          "label": "Vern Miller Jack Steineger Dem.",
+          "contest": "governor",
+          "candidate": "Vern Miller"
+        },
+        {
+          "label": "Marshall Uncapher Roscoe Scoggin Proh.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.032,
+        0.102,
+        0.891,
+        0.841
+      ],
+      "hint": "Read only the table headed 'FOR GOVERNOR-LIEUTENANT GOVERNOR\u2014Concluded'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1015
+      ]
+    }
+  ]
+}

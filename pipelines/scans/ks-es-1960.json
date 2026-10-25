@@ -1,0 +1,814 @@
+{
+  "polity": "US-KS",
+  "publisher": "Kansas Secretary of State",
+  "license": "Public record",
+  "raw_source": "us.ks_es",
+  "title": "Kansas election statistics 1960, general election",
+  "file": {
+    "url": "https://kgi.contentdm.oclc.org/digital/api/collection/p16884coll129/id/57/download"
+  },
+  "contests": {
+    "senate": {
+      "year": 1960,
+      "chamber": "senate",
+      "day": "1960-11-08",
+      "special": false,
+      "state": "KS",
+      "district": null
+    },
+    "house1": {
+      "year": 1960,
+      "chamber": "house",
+      "day": "1960-11-08",
+      "special": false,
+      "state": "KS",
+      "district": 1
+    },
+    "house2": {
+      "year": 1960,
+      "chamber": "house",
+      "day": "1960-11-08",
+      "special": false,
+      "state": "KS",
+      "district": 2
+    },
+    "house3": {
+      "year": 1960,
+      "chamber": "house",
+      "day": "1960-11-08",
+      "special": false,
+      "state": "KS",
+      "district": 3
+    },
+    "house4": {
+      "year": 1960,
+      "chamber": "house",
+      "day": "1960-11-08",
+      "special": false,
+      "state": "KS",
+      "district": 4
+    },
+    "house5": {
+      "year": 1960,
+      "chamber": "house",
+      "day": "1960-11-08",
+      "special": false,
+      "state": "KS",
+      "district": 5
+    },
+    "house6": {
+      "year": 1960,
+      "chamber": "house",
+      "day": "1960-11-08",
+      "special": false,
+      "state": "KS",
+      "district": 6
+    },
+    "governor": {
+      "year": 1960,
+      "chamber": "governor",
+      "day": "1960-11-08",
+      "special": false,
+      "state": "KS",
+      "district": null
+    },
+    "president": {
+      "year": 1960,
+      "chamber": "president",
+      "day": "1960-11-08",
+      "special": false,
+      "state": "KS",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 18,
+      "id": "18-0",
+      "columns": [
+        {
+          "label": "Henry P. Cleaver, Jr., Rep.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Andrew F. Schoeppel, Rep.",
+          "contest": "senate",
+          "candidate": "Andrew F. Schoeppel"
+        },
+        {
+          "label": "Joseph W. Henkle, Sr., Dem.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Frank Theis, Dem.",
+          "contest": "senate",
+          "candidate": "Frank Theis"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.104,
+        0.095,
+        0.919,
+        1.0
+      ],
+      "hint": "Read only the table headed 'FOR UNITED STATES SENATOR'; ignore any other table visible in the image.",
+      "bands": 3,
+      "header": [
+        0.0,
+        0.0851
+      ]
+    },
+    {
+      "page": 19,
+      "id": "19-0",
+      "columns": [
+        {
+          "label": "Henry P. Cleaver, Jr., Rep.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Andrew F. Schoeppel, Rep.",
+          "contest": "senate",
+          "candidate": "Andrew F. Schoeppel"
+        },
+        {
+          "label": "Joseph W. Henkle, Sr., Dem.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Frank Theis, Dem.",
+          "contest": "senate",
+          "candidate": "Frank Theis"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.081,
+        0.1,
+        0.894,
+        0.794
+      ],
+      "hint": "Read only the table headed 'FOR UNITED STATES SENATOR\u2014Concluded'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1009
+      ]
+    },
+    {
+      "page": 20,
+      "id": "20-0",
+      "columns": [
+        {
+          "label": "Wm. H. Avery, Rep.",
+          "contest": "house1",
+          "candidate": "William H. Avery"
+        },
+        {
+          "label": "Robert R. Turney, Rep.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Marshall Gephart Gardiner, Dem.",
+          "contest": "house1",
+          "candidate": "Marshall G. Gardiner"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.11,
+        0.103,
+        0.92,
+        0.385
+      ],
+      "hint": "Read only the table headed 'FIRST CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 20,
+      "id": "20-1",
+      "columns": [
+        {
+          "label": "Robert F. Ellsworth, Rep.",
+          "contest": "house2",
+          "candidate": "Robert F. Ellsworth"
+        },
+        {
+          "label": "Robert Allen Peck, Rep.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Edward H. Powers, Rep.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Newell A. George, Dem.",
+          "contest": "house2",
+          "candidate": "Newell A. George"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.112,
+        0.377,
+        0.92,
+        0.626
+      ],
+      "hint": "Read only the table headed 'SECOND CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 20,
+      "id": "20-2",
+      "columns": [
+        {
+          "label": "Ralph O. Brownfield, Rep.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Frank Layden, Rep.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Walter L. McVey, Rep.",
+          "contest": "house3",
+          "candidate": "Walter L. McVey"
+        },
+        {
+          "label": "Jack W. Shaw, Rep.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "John F. Vermillion, Rep.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Denver D. Hargis, Dem.",
+          "contest": "house3",
+          "candidate": "Denver D. Hargis"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.112,
+        0.618,
+        0.919,
+        0.849
+      ],
+      "hint": "Read only the table headed 'THIRD CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 21,
+      "id": "21-0",
+      "columns": [
+        {
+          "label": "Lester C. Arvin, Rep.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Garner E. Shriver, Rep.",
+          "contest": "house4",
+          "candidate": "Garner E. Shriver"
+        },
+        {
+          "label": "M. R. Lee, Dem.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Warner Moore, Dem.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "William I. Robinson, Dem.",
+          "contest": "house4",
+          "candidate": "William I. Robinson"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.098,
+        0.086,
+        0.911,
+        0.413
+      ],
+      "hint": "Read only the table headed 'FOR REPRESENTATIVES IN CONGRESS\u2014Continued: FOURTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 21,
+      "id": "21-1",
+      "columns": [
+        {
+          "label": "Joe W. Hunter, Rep.",
+          "contest": "house5",
+          "candidate": "Joe W. Hunter"
+        },
+        {
+          "label": "J. Floyd Breeding, Dem.",
+          "contest": "house5",
+          "candidate": "J. Floyd Breeding"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.101,
+        0.405,
+        0.913,
+        0.912
+      ],
+      "hint": "Read only the table headed 'FIFTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1716
+      ]
+    },
+    {
+      "page": 22,
+      "id": "22-0",
+      "columns": [
+        {
+          "label": "Robert (Bob) Dole, Rep.",
+          "contest": "house6",
+          "candidate": "Robert Dole"
+        },
+        {
+          "label": "Philip J. Doyle, Rep.",
+          "contest": "house6",
+          "candidate": "Robert Dole"
+        },
+        {
+          "label": "Keith G. Sebelius, Rep.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Wm. A. Davis, Dem.",
+          "contest": "house6",
+          "candidate": "William A. Davis"
+        },
+        {
+          "label": "E. C. Riley, Dem.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.089,
+        0.1,
+        0.891,
+        0.518
+      ],
+      "hint": "Read only the table headed 'FOR REPRESENTATIVES IN CONGRESS\u2014Concluded SIXTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 23,
+      "id": "23-0",
+      "columns": [
+        {
+          "label": "William H. Addington, Rep.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "John Anderson, Jr., Rep.",
+          "contest": "governor",
+          "candidate": "John Jr. Anderson"
+        },
+        {
+          "label": "McDill Boyd, Rep.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "George Docking, Dem.",
+          "contest": "governor",
+          "candidate": "George Docking"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.1,
+        0.118,
+        0.901,
+        1.0
+      ],
+      "hint": "Read only the table headed 'FOR GOVERNOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.085
+      ]
+    },
+    {
+      "page": 24,
+      "id": "24-0",
+      "columns": [
+        {
+          "label": "William H. Addington, Rep.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "John Anderson, Jr., Rep.",
+          "contest": "governor",
+          "candidate": "John Jr. Anderson"
+        },
+        {
+          "label": "McDill Boyd, Rep.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "George Docking, Dem.",
+          "contest": "governor",
+          "candidate": "George Docking"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.092,
+        0.104,
+        0.893,
+        0.804
+      ],
+      "hint": "Read only the table headed 'FOR GOVERNOR\u2014CONCLUDED'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1
+      ]
+    },
+    {
+      "page": 60,
+      "id": "60-0",
+      "columns": [
+        {
+          "label": "Republican Nixon and Lodge",
+          "contest": "president",
+          "candidate": "Richard Nixon (Republican)"
+        },
+        {
+          "label": "Democratic Kennedy and Johnson",
+          "contest": "president",
+          "candidate": "John F. Kennedy (Democratic)"
+        },
+        {
+          "label": "Prohibition Decker and Munn",
+          "contest": "president",
+          "candidate": "Prohibition"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.099,
+        0.092,
+        0.919,
+        1.0
+      ],
+      "hint": "Read only the table headed 'FOR ELECTORS OF PRESIDENT AND VICE-PRESIDENT'; ignore any other table visible in the image.",
+      "bands": 3,
+      "header": [
+        0.0,
+        0.2478
+      ]
+    },
+    {
+      "page": 61,
+      "id": "61-0",
+      "columns": [
+        {
+          "label": "Republican Nixon and Lodge",
+          "contest": "president",
+          "candidate": "Richard Nixon (Republican)"
+        },
+        {
+          "label": "Democratic Kennedy and Johnson",
+          "contest": "president",
+          "candidate": "John F. Kennedy (Democratic)"
+        },
+        {
+          "label": "Prohibition Decker and Munn",
+          "contest": "president",
+          "candidate": "Prohibition"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.065,
+        0.131,
+        0.886,
+        0.884
+      ],
+      "hint": "Read only the table headed 'FOR ELECTORS OF PRESIDENT AND VICE-PRESIDENT\u2014Concluded'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0837
+      ]
+    },
+    {
+      "page": 62,
+      "id": "62-0",
+      "columns": [
+        {
+          "label": "Andrew F. Schoeppel, Rep.",
+          "contest": "senate",
+          "candidate": "Andrew F. Schoeppel"
+        },
+        {
+          "label": "Frank Theis, Dem.",
+          "contest": "senate",
+          "candidate": "Frank Theis"
+        },
+        {
+          "label": "C. E. Cowen, Prohib.",
+          "contest": "senate",
+          "candidate": "C. E. Cowen"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.107,
+        0.093,
+        0.918,
+        1.0
+      ],
+      "hint": "Read only the table headed 'FOR UNITED STATES SENATOR'; ignore any other table visible in the image.",
+      "bands": 3,
+      "header": [
+        0.0,
+        0.0871
+      ]
+    },
+    {
+      "page": 63,
+      "id": "63-0",
+      "columns": [
+        {
+          "label": "Andrew F. Schoeppel, Rep.",
+          "contest": "senate",
+          "candidate": "Andrew F. Schoeppel"
+        },
+        {
+          "label": "Frank Theis, Dem.",
+          "contest": "senate",
+          "candidate": "Frank Theis"
+        },
+        {
+          "label": "C. E. Cowen, Prohib.",
+          "contest": "senate",
+          "candidate": "C. E. Cowen"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.07,
+        0.106,
+        0.89,
+        0.806
+      ],
+      "hint": "Read only the table headed 'FOR UNITED STATES SENATOR\u2014Concluded'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1029
+      ]
+    },
+    {
+      "page": 64,
+      "id": "64-0",
+      "columns": [
+        {
+          "label": "Wm. H. Avery, Rep.",
+          "contest": "house1",
+          "candidate": "William H. Avery"
+        },
+        {
+          "label": "Marshall Gephart Gardiner, Dem.",
+          "contest": "house1",
+          "candidate": "Marshall G. Gardiner"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.107,
+        0.121,
+        0.92,
+        0.399
+      ],
+      "hint": "Read only the table headed 'FIRST CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 64,
+      "id": "64-1",
+      "columns": [
+        {
+          "label": "Robert F. Ellsworth, Rep.",
+          "contest": "house2",
+          "candidate": "Robert F. Ellsworth"
+        },
+        {
+          "label": "Newell A. George, Dem.",
+          "contest": "house2",
+          "candidate": "Newell A. George"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.109,
+        0.391,
+        0.921,
+        0.629
+      ],
+      "hint": "Read only the table headed 'SECOND CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 64,
+      "id": "64-2",
+      "columns": [
+        {
+          "label": "Walter L. McVey, Rep.",
+          "contest": "house3",
+          "candidate": "Walter L. McVey"
+        },
+        {
+          "label": "Denver D. Hargis, Dem.",
+          "contest": "house3",
+          "candidate": "Denver D. Hargis"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.111,
+        0.621,
+        0.92,
+        0.847
+      ],
+      "hint": "Read only the table headed 'THIRD CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 65,
+      "id": "65-0",
+      "columns": [
+        {
+          "label": "Garner E. Shriver, Rep.",
+          "contest": "house4",
+          "candidate": "Garner E. Shriver"
+        },
+        {
+          "label": "William I. Robinson, Dem.",
+          "contest": "house4",
+          "candidate": "William I. Robinson"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.054,
+        0.092,
+        0.888,
+        0.423
+      ],
+      "hint": "Read only the table headed 'FOR REPRESENTATIVES IN CONGRESS\u2014CONTINUED FOURTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 65,
+      "id": "65-1",
+      "columns": [
+        {
+          "label": "Joe W. Hunter, Rep.",
+          "contest": "house5",
+          "candidate": "Joe W. Hunter"
+        },
+        {
+          "label": "J. Floyd Breeding, Dem.",
+          "contest": "house5",
+          "candidate": "J. Floyd Breeding"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.053,
+        0.415,
+        0.886,
+        0.94
+      ],
+      "hint": "Read only the table headed 'FIFTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1714
+      ]
+    },
+    {
+      "page": 66,
+      "id": "66-0",
+      "columns": [
+        {
+          "label": "Robert (Bob) Dole, Rep.",
+          "contest": "house6",
+          "candidate": "Robert Dole"
+        },
+        {
+          "label": "Wm. A. Davis, Dem.",
+          "contest": "house6",
+          "candidate": "William A. Davis"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.105,
+        0.079,
+        0.937,
+        0.534
+      ],
+      "hint": "Read only the table headed 'FOR REPRESENTATIVES IN CONGRESS\u2014CONCLUDED SIXTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2484
+      ]
+    },
+    {
+      "page": 67,
+      "id": "67-0",
+      "columns": [
+        {
+          "label": "John Anderson, Jr., Rep.",
+          "contest": "governor",
+          "candidate": "John Jr. Anderson"
+        },
+        {
+          "label": "George Docking, Dem.",
+          "contest": "governor",
+          "candidate": "George Docking"
+        },
+        {
+          "label": "J. J. Steele, Prohib.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.059,
+        0.111,
+        0.887,
+        1.0
+      ],
+      "hint": "Read only the table headed 'FOR GOVERNOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.09
+      ]
+    },
+    {
+      "page": 68,
+      "id": "68-0",
+      "columns": [
+        {
+          "label": "John Anderson, Jr., Rep.",
+          "contest": "governor",
+          "candidate": "John Jr. Anderson"
+        },
+        {
+          "label": "George Docking, Dem.",
+          "contest": "governor",
+          "candidate": "George Docking"
+        },
+        {
+          "label": "J. J. Steele, Prohib.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.105,
+        0.099,
+        0.935,
+        0.801
+      ],
+      "hint": "Read only the table headed 'FOR GOVERNOR\u2014CONCLUDED'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0969
+      ]
+    }
+  ]
+}

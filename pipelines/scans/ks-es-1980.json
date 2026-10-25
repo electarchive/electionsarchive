@@ -1,0 +1,206 @@
+{
+  "polity": "US-KS",
+  "publisher": "Kansas Secretary of State",
+  "license": "Public record",
+  "raw_source": "us.ks_es",
+  "title": "Kansas election statistics 1980, general election",
+  "file": {
+    "url": "https://kgi.contentdm.oclc.org/digital/api/collection/p16884coll129/id/67/download"
+  },
+  "contests": {
+    "president": {
+      "year": 1980,
+      "chamber": "president",
+      "day": "1980-11-04",
+      "special": false,
+      "state": "KS",
+      "district": null
+    },
+    "senate": {
+      "year": 1980,
+      "chamber": "senate",
+      "day": "1980-11-04",
+      "special": false,
+      "state": "KS",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 73,
+      "id": "73-0",
+      "columns": [
+        {
+          "label": "Reagan and Bush Rep.",
+          "contest": "president",
+          "candidate": "Ronald Reagan (Republican)"
+        },
+        {
+          "label": "Carter and Mondale Dem.",
+          "contest": "president",
+          "candidate": "Jimmy Carter (Democratic)"
+        },
+        {
+          "label": "Anderson and Lucey Ind.",
+          "contest": "president",
+          "candidate": "John Anderson (Independent)"
+        },
+        {
+          "label": "Bubar and Dodge St.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Clark and Koch Ind.",
+          "contest": "president",
+          "candidate": "Ed Clark (Libertarian)"
+        },
+        {
+          "label": "Hall and Davis Ind.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Patrick and Shearer Con.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Shelton and Jackson Amer.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.024,
+        0.099,
+        0.952,
+        1.0
+      ],
+      "hint": "Read only the table headed 'FOR PRESIDENT AND VICE-PRESIDENT'; ignore any other table visible in the image.",
+      "bands": 3,
+      "header": [
+        0.0,
+        0.0699
+      ]
+    },
+    {
+      "page": 74,
+      "id": "74-0",
+      "columns": [
+        {
+          "label": "Reagan and Bush Rep.",
+          "contest": "president",
+          "candidate": "Ronald Reagan (Republican)"
+        },
+        {
+          "label": "Carter and Mondale Dem.",
+          "contest": "president",
+          "candidate": "Jimmy Carter (Democratic)"
+        },
+        {
+          "label": "Anderson and Lucey Ind.",
+          "contest": "president",
+          "candidate": "John Anderson (Independent)"
+        },
+        {
+          "label": "Bubar and Dodge St.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Clark and Koch Ind.",
+          "contest": "president",
+          "candidate": "Ed Clark (Libertarian)"
+        },
+        {
+          "label": "Hall and Davis Ind.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Patrick and Shearer Con.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Shelton and Jackson Amer.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.02,
+        0.108,
+        0.948,
+        0.778
+      ],
+      "hint": "Read only the table headed 'FOR PRESIDENT AND VICE-PRESIDENT\u2014Concluded'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0627
+      ]
+    },
+    {
+      "page": 75,
+      "id": "75-0",
+      "columns": [
+        {
+          "label": "Bob Dole Rep",
+          "contest": "senate",
+          "candidate": "Bob Dole"
+        },
+        {
+          "label": "John Simpson Dem",
+          "contest": "senate",
+          "candidate": "John Simpson"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.114,
+        0.088,
+        0.926,
+        1.0
+      ],
+      "hint": "Read only the table headed 'FOR UNITED STATES SENATOR'; ignore any other table visible in the image.",
+      "bands": 3,
+      "header": [
+        0.0,
+        0.0691
+      ]
+    },
+    {
+      "page": 76,
+      "id": "76-0",
+      "columns": [
+        {
+          "label": "Bob Dole Rep.",
+          "contest": "senate",
+          "candidate": "Bob Dole"
+        },
+        {
+          "label": "John Simpson Dem.",
+          "contest": "senate",
+          "candidate": "John Simpson"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.061,
+        0.096,
+        0.866,
+        0.787
+      ],
+      "hint": "Read only the table headed 'FOR UNITED STATES SENATOR\u2014Concluded'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.081
+      ]
+    }
+  ]
+}

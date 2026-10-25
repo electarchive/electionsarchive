@@ -1,0 +1,651 @@
+{
+  "polity": "US-IL",
+  "publisher": "Illinois State Board of Elections",
+  "license": "Public record",
+  "raw_source": "us.scans",
+  "title": "State of Illinois official vote cast at the general election, 1976",
+  "file": {
+    "url": "https://archive.org/download/officialvoteofst1976illi/officialvoteofst1976illi.pdf"
+  },
+  "contests": {
+    "president": {
+      "year": 1976,
+      "chamber": "president",
+      "day": "1976-11-02",
+      "special": false,
+      "state": "IL",
+      "district": null
+    },
+    "governor": {
+      "year": 1976,
+      "chamber": "governor",
+      "day": "1976-11-02",
+      "special": false,
+      "state": "IL",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 16,
+      "id": "16-0",
+      "columns": [
+        {
+          "label": "Plurality",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Republican Gerald R. Ford Robert Dole",
+          "contest": "president",
+          "candidate": "Gerald Ford (Republican)"
+        },
+        {
+          "label": "Democratic Jimmy Carter Walter F. Mondale",
+          "contest": "president",
+          "candidate": "Jimmy Carter (Democratic)"
+        },
+        {
+          "label": "Communist Gus Hall Jarvis Tyner",
+          "contest": "president",
+          "candidate": "Communist"
+        },
+        {
+          "label": "Socialist Labor Julius Levin C. Blomen",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "U.S. Labor L.H. LaRouche,Jr. R.W. Evans",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Socialist Workers Peter Camejo W.M. Reid",
+          "contest": "president",
+          "candidate": "Socialist Workers"
+        },
+        {
+          "label": "Libertarian Roger L. MacBride David P. Bergland",
+          "contest": "president",
+          "candidate": "Roger MacBride (Libertarian)"
+        },
+        {
+          "label": "Independent Eugene J. McCarthy John E. Clay",
+          "contest": "president",
+          "candidate": "Eugene McCarthy (Independent)"
+        },
+        {
+          "label": "Write-Ins",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.07,
+        0.082,
+        0.923,
+        0.797
+      ],
+      "hint": "Read only the table headed 'VOTE FOR PRESIDENT AND VICE-PRESIDENT OF THE UNITED STATES\u2014NOVEMBER\u20142, 1976\u2014Concluded'; ignore any other table visible in the image.",
+      "turn": -90,
+      "bands": 2,
+      "header": [
+        0.0,
+        0.3329
+      ]
+    },
+    {
+      "page": 17,
+      "id": "17-0",
+      "columns": [
+        {
+          "label": "President Tom Anderson",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "President Ronald Regan",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "President Rufus Shackelford",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "President & Vice-President",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Other Write-Ins President",
+          "contest": "president",
+          "candidate": "Others"
+        },
+        {
+          "label": "Vice-President",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.087,
+        0.272,
+        0.918,
+        1.0
+      ],
+      "hint": "Read only the table headed 'WRITE-IN BREAKDOWN FOR\u2014 PRESIDENT AND VICE-PRESIDENT OF THE UNITED STATES\u2014 NOVEMBER 2, 1976'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0742
+      ]
+    },
+    {
+      "page": 18,
+      "id": "18-0",
+      "columns": [
+        {
+          "label": "President Tom Anderson",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "President Ronald Regan",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "President Rufus Shackelford",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "President & Vice-President",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Other Write-Ins President",
+          "contest": "president",
+          "candidate": "Others"
+        },
+        {
+          "label": "Vice-President",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.102,
+        0.157,
+        0.905,
+        0.857
+      ],
+      "hint": "Read only the table headed 'WRITE-IN BREAKDOWN FOR\u2014 PRESIDENT AND VICE-PRESIDENT OF THE UNITED STATES\u2014 NOVEMBER 2, 1976\u2014Continued'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.06
+      ]
+    },
+    {
+      "page": 19,
+      "id": "19-0",
+      "columns": [
+        {
+          "label": "Democratic Jimmy Carter Walter F. Mondale",
+          "contest": "president",
+          "candidate": "Jimmy Carter (Democratic)"
+        },
+        {
+          "label": "Republican Gerald R. Ford Robert Dole",
+          "contest": "president",
+          "candidate": "Gerald Ford (Republican)"
+        },
+        {
+          "label": "Communist Gus Hall Jarvis Tyner",
+          "contest": "president",
+          "candidate": "Communist"
+        },
+        {
+          "label": "Socialist Labor Julius Levin Constance Blomen",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "United States Labor Lyndon H. LaRouche, Jr. Ronald Wayne Evans",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Socialist Workers Peter Camejo Willie Mae Reid",
+          "contest": "president",
+          "candidate": "Socialist Workers"
+        },
+        {
+          "label": "Libertarian Roger L. MacBride David P. Bergland",
+          "contest": "president",
+          "candidate": "Roger MacBride (Libertarian)"
+        },
+        {
+          "label": "Independent Eugene J. McCarthy John E. Clay",
+          "contest": "president",
+          "candidate": "Eugene McCarthy (Independent)"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.102,
+        0.011,
+        0.851,
+        0.989
+      ],
+      "hint": "Read only the table headed 'VOTE FOR PRESIDENT AND VICE-PRESIDENT\u2014COOK COUNTY\u2014NOVEMBER 2, 1976'; ignore any other table visible in the image.",
+      "turn": -90,
+      "bands": 3,
+      "header": [
+        0.0,
+        0.1708
+      ]
+    },
+    {
+      "page": 20,
+      "id": "20-0",
+      "columns": [
+        {
+          "label": "Democratic Jimmy Carter Walter F. Mondale",
+          "contest": "president",
+          "candidate": "Jimmy Carter (Democratic)"
+        },
+        {
+          "label": "Republican Gerald R. Ford Robert Dole",
+          "contest": "president",
+          "candidate": "Gerald Ford (Republican)"
+        },
+        {
+          "label": "Communist Gus Hall Jarvis Tyner",
+          "contest": "president",
+          "candidate": "Communist"
+        },
+        {
+          "label": "Socialist Labor Julius Levin Constance Blomen",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "United States Labor Lyndon H. LaRouche, Jr. Ronald Wayne Evans",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Socialist Workers Peter Camejo Willie Mae Reid",
+          "contest": "president",
+          "candidate": "Socialist Workers"
+        },
+        {
+          "label": "Libertarian Roger L. MacBride David P. Bergland",
+          "contest": "president",
+          "candidate": "Roger MacBride (Libertarian)"
+        },
+        {
+          "label": "Independent Eugene J. McCarthy John E. Clay",
+          "contest": "president",
+          "candidate": "Eugene McCarthy (Independent)"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.142,
+        0.157,
+        0.898,
+        0.808
+      ],
+      "hint": "Read only the table headed 'VOTE FOR PRESIDENT AND VICE-PRESIDENT\u2014COOK COUNTY\u2014NOVEMBER 2, 1976\u2014Concluded'; ignore any other table visible in the image.",
+      "turn": -90,
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2535
+      ]
+    },
+    {
+      "page": 21,
+      "id": "21-0",
+      "columns": [
+        {
+          "label": "Plurality party",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Plurality",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Republican James R. Thompson Dave O'Neal",
+          "contest": "governor",
+          "candidate": "James R. Thompson"
+        },
+        {
+          "label": "Democratic Michael J. Howlett Neil F. Hartigan",
+          "contest": "governor",
+          "candidate": "Michael J. Howlett"
+        },
+        {
+          "label": "Communist Ishmael Flory Linda R. Appelhans",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Socialist Labor George A. LaForest Stanley A. Prorok",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "United States Labor Edward Waffle Peter Manti",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Socialist Workers Suzanne Haig Dennis Brasky",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Libertarian F. Joseph McCaffrey Georgia E. Shields",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Write-Ins Governor and Lieutenant Governor",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Write-Ins Governor",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Write-Ins Lieutenant Governor",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.066,
+        0.103,
+        0.913,
+        1.0
+      ],
+      "hint": "Read only the table headed 'VOTE FOR GOVERNOR AND LIEUTENANT GOVERNOR\u2014NOVEMBER\u20142, 1976'; ignore any other table visible in the image.",
+      "turn": -90,
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1839
+      ]
+    },
+    {
+      "page": 22,
+      "id": "22-0",
+      "columns": [
+        {
+          "label": "Plurality",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Republican James R. Thompson Dave O'Neal",
+          "contest": "governor",
+          "candidate": "James R. Thompson"
+        },
+        {
+          "label": "Democratic Michael J. Howlett Neil F. Hartigan",
+          "contest": "governor",
+          "candidate": "Michael J. Howlett"
+        },
+        {
+          "label": "Communist Ishmael Flory Linda R. Appelhans",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Socialist Labor George A. LaForest Stanley A. Prorok",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "United States Labor Edward Waffle Peter Manti",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Socialist Workers Suzanne Haig Dennis Brasky",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Libertarian F. Joseph McCaffrey Georgia E. Shields",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Write-Ins Governor and Lieutenant Governor",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Write-Ins Governor",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Write-Ins Lieutenant Governor",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.07,
+        0.045,
+        0.913,
+        1.0
+      ],
+      "hint": "Read only the table headed 'VOTE FOR GOVERNOR AND LIEUTENANT GOVERNOR\u2014NOVEMBER 2, 1976\u2014Continued'; ignore any other table visible in the image.",
+      "turn": -90,
+      "bands": 3,
+      "header": [
+        0.0,
+        0.1445
+      ]
+    },
+    {
+      "page": 23,
+      "id": "23-0",
+      "columns": [
+        {
+          "label": "Plurality",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Republican James R. Thompson Dave O'Neal",
+          "contest": "governor",
+          "candidate": "James R. Thompson"
+        },
+        {
+          "label": "Democratic Michael J. Howlett Neil F. Hartigan",
+          "contest": "governor",
+          "candidate": "Michael J. Howlett"
+        },
+        {
+          "label": "Communist Ishmael Flory Linda R. Appelhans",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Socialist Labor George A. LaForest Stanley A. Prorok",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "United States Labor Edward Waffle Peter Manti",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Socialist Workers Suzanne Haig Dennis Brasky",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Libertarian F. Joseph McCaffrey Georgia E. Shields",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Write-Ins Governor and Lieutenant Governor",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Write-Ins Governor",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Write-Ins Lieutenant Governor",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.07,
+        0.0,
+        0.913,
+        1.0
+      ],
+      "hint": "This page continues the table of the previous page and prints no headings.",
+      "turn": -90
+    },
+    {
+      "page": 24,
+      "id": "24-0",
+      "columns": [
+        {
+          "label": "Democratic Michael J. Howlett Neil F. Hartigan",
+          "contest": "governor",
+          "candidate": "Michael J. Howlett"
+        },
+        {
+          "label": "Republican James R. Thompson Dave O'Neal",
+          "contest": "governor",
+          "candidate": "James R. Thompson"
+        },
+        {
+          "label": "Communist Ishmael Flory Linda R. Appelhans",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Socialist Labor George A. LaForest Stanley A. Prorok",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "United States Labor Edward Waffle Peter Manti",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Socialist Workers Suzanne Haig Dennis Brasky",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Libertarian F. Joseph McCaffrey Georgia E. Shields",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.11,
+        0.224,
+        0.998,
+        1.0
+      ],
+      "hint": "Read only the table headed 'VOTE FOR GOVERNOR & LIEUTENANT GOVERNOR\u2014COOK COUNTY\u2014NOVEMBER 2, 1976 (Information furnished by Clerk of Cook County)'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.3196
+      ]
+    },
+    {
+      "page": 25,
+      "id": "25-0",
+      "columns": [
+        {
+          "label": "Democratic Michael J. Howlett Neil F. Hartigan",
+          "contest": "governor",
+          "candidate": "Michael J. Howlett"
+        },
+        {
+          "label": "Republican James R. Thompson Dave O'Neal",
+          "contest": "governor",
+          "candidate": "James R. Thompson"
+        },
+        {
+          "label": "Communist Ishmael Flory Linda R. Appelhans",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Socialist Labor George A. LaForest Stanley A. Prorok",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "United States Labor Edward Waffle Peter Manti",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Socialist Workers Suzanne Haig Dennis Brasky",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Libertarian F. Joseph McCaffrey Georgia E. Shields",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.159,
+        0.158,
+        0.967,
+        0.927
+      ],
+      "hint": "Read only the table headed 'VOTE FOR GOVERNOR & LIEUTENANT GOVERNOR\u2014COOK COUNTY\u2014NOVEMBER 2, 1976\u2014Concluded'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.3056
+      ]
+    }
+  ]
+}

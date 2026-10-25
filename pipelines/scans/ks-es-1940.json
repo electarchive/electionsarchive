@@ -1,0 +1,505 @@
+{
+  "polity": "US-KS",
+  "publisher": "Kansas Secretary of State",
+  "license": "Public record",
+  "raw_source": "us.ks_es",
+  "title": "Kansas election statistics 1940, general election",
+  "file": {
+    "url": "https://kgi.contentdm.oclc.org/digital/api/collection/p16884coll129/id/37/download"
+  },
+  "contests": {
+    "president": {
+      "year": 1940,
+      "chamber": "president",
+      "day": "1940-11-05",
+      "special": false,
+      "state": "KS",
+      "district": null
+    },
+    "house1": {
+      "year": 1940,
+      "chamber": "house",
+      "day": "1940-11-05",
+      "special": false,
+      "state": "KS",
+      "district": 1
+    },
+    "house2": {
+      "year": 1940,
+      "chamber": "house",
+      "day": "1940-11-05",
+      "special": false,
+      "state": "KS",
+      "district": 2
+    },
+    "house3": {
+      "year": 1940,
+      "chamber": "house",
+      "day": "1940-11-05",
+      "special": false,
+      "state": "KS",
+      "district": 3
+    },
+    "house4": {
+      "year": 1940,
+      "chamber": "house",
+      "day": "1940-11-05",
+      "special": false,
+      "state": "KS",
+      "district": 4
+    },
+    "house6": {
+      "year": 1940,
+      "chamber": "house",
+      "day": "1940-11-05",
+      "special": false,
+      "state": "KS",
+      "district": 6
+    },
+    "house7": {
+      "year": 1940,
+      "chamber": "house",
+      "day": "1940-11-05",
+      "special": false,
+      "state": "KS",
+      "district": 7
+    },
+    "governor": {
+      "year": 1940,
+      "chamber": "governor",
+      "day": "1940-11-05",
+      "special": false,
+      "state": "KS",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 2,
+      "id": "2-0",
+      "columns": [
+        {
+          "label": "Republican. Willkie and McNary.",
+          "contest": "president",
+          "candidate": "Wendell Willkie (Republican)"
+        },
+        {
+          "label": "Democrat. Roosevelt and Wallace.",
+          "contest": "president",
+          "candidate": "Franklin D. Roosevelt (Democratic)"
+        },
+        {
+          "label": "Socialist. Thomas and Krueger.",
+          "contest": "president",
+          "candidate": "Norman Thomas (Socialist)"
+        },
+        {
+          "label": "Prohibition. Babson and Moorman.",
+          "contest": "president",
+          "candidate": "Prohibition"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.092,
+        0.113,
+        0.94,
+        1.0
+      ],
+      "hint": "Read only the table headed 'FOR PRESIDENT AND VICE-PRESIDENT'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.239
+      ]
+    },
+    {
+      "page": 3,
+      "id": "3-0",
+      "columns": [
+        {
+          "label": "Republican. Willkie and McNary.",
+          "contest": "president",
+          "candidate": "Wendell Willkie (Republican)"
+        },
+        {
+          "label": "Democrat. Roosevelt and Wallace.",
+          "contest": "president",
+          "candidate": "Franklin D. Roosevelt (Democratic)"
+        },
+        {
+          "label": "Socialist. Thomas and Krueger.",
+          "contest": "president",
+          "candidate": "Norman Thomas (Socialist)"
+        },
+        {
+          "label": "Prohibition. Babson and Moorman.",
+          "contest": "president",
+          "candidate": "Prohibition"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.03,
+        0.108,
+        0.883,
+        0.924
+      ],
+      "hint": "Read only the table headed 'FOR PRESIDENT AND VICE-PRESIDENT\u2014Concluded'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.125
+      ]
+    },
+    {
+      "page": 4,
+      "id": "4-0",
+      "columns": [
+        {
+          "label": "W. P. Lambertson, Rep.",
+          "contest": "house1",
+          "candidate": "W. P. Lambertson"
+        },
+        {
+          "label": "Clive R. Lane, Dem.",
+          "contest": "house1",
+          "candidate": "Clive R. Lane"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.1,
+        0.146,
+        0.954,
+        0.491
+      ],
+      "hint": "Read only the table headed 'FIRST CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 4,
+      "id": "4-1",
+      "columns": [
+        {
+          "label": "U. S. Guyer, Rep.",
+          "contest": "house2",
+          "candidate": "U. S. Guyer"
+        },
+        {
+          "label": "Harold H. Harding, Dem.",
+          "contest": "house2",
+          "candidate": "Harold H. Harding"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.102,
+        0.483,
+        0.954,
+        0.806
+      ],
+      "hint": "Read only the table headed 'SECOND CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 5,
+      "id": "5-0",
+      "columns": [
+        {
+          "label": "Thomas D. Winter, Rep.",
+          "contest": "house3",
+          "candidate": "Thomas D. Winter"
+        },
+        {
+          "label": "W. E. Ledbetter, Dem.",
+          "contest": "house3",
+          "candidate": "W. E. Ledbetter"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.039,
+        0.128,
+        0.888,
+        0.443
+      ],
+      "hint": "Read only the table headed 'THIRD CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 5,
+      "id": "5-1",
+      "columns": [
+        {
+          "label": "Ed H. Rees, Rep.",
+          "contest": "house4",
+          "candidate": "Edward H. Rees"
+        },
+        {
+          "label": "Dudley Doolittle, Dem.",
+          "contest": "house4",
+          "candidate": "Dudley Doolittle"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.039,
+        0.435,
+        0.888,
+        0.85
+      ],
+      "hint": "Read only the table headed 'FOURTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 7,
+      "id": "7-0",
+      "columns": [
+        {
+          "label": "Frank Carlson, Rep.",
+          "contest": "house6",
+          "candidate": "Frank Carlson"
+        },
+        {
+          "label": "Max Jones, Dem.",
+          "contest": "house6",
+          "candidate": "Max Jones"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.058,
+        0.103,
+        0.91,
+        0.77
+      ],
+      "hint": "Read only the table headed 'FOR REPRESENTATIVES IN CONGRESS\u2014Continued, SIXTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1394
+      ]
+    },
+    {
+      "page": 8,
+      "id": "8-0",
+      "columns": [
+        {
+          "label": "Clifford R. Hope, Rep.",
+          "contest": "house7",
+          "candidate": "Clifford R. Hope"
+        },
+        {
+          "label": "Claude E. Main, Dem.",
+          "contest": "house7",
+          "candidate": "Claude E. Main"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.08,
+        0.113,
+        0.935,
+        0.909
+      ],
+      "hint": "Read only the table headed 'FOR REPRESENTATIVES IN CONGRESS\u2014CONCLUDED SEVENTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1206
+      ]
+    },
+    {
+      "page": 11,
+      "id": "11-0",
+      "columns": [
+        {
+          "label": "Payne Ratner, Rep.",
+          "contest": "governor",
+          "candidate": "Payne Ratner"
+        },
+        {
+          "label": "William H. Burke, Dem.",
+          "contest": "governor",
+          "candidate": "William H. Burke"
+        },
+        {
+          "label": "Ida A. Beloof, Soc.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "David C. White, Prohib.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.109,
+        0.101,
+        0.958,
+        1.0
+      ],
+      "hint": "Read only the table headed 'FOR GOVERNOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0945
+      ]
+    },
+    {
+      "page": 12,
+      "id": "12-0",
+      "columns": [
+        {
+          "label": "Payne Ratner, Rep.",
+          "contest": "governor",
+          "candidate": "Payne Ratner"
+        },
+        {
+          "label": "William H. Burke, Dem.",
+          "contest": "governor",
+          "candidate": "William H. Burke"
+        },
+        {
+          "label": "Ida A. Beloof, Soc.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "David C. White, Prohib.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.057,
+        0.098,
+        0.91,
+        0.839
+      ],
+      "hint": "Read only the table headed 'FOR GOVERNOR\u2014Concluded'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0985
+      ]
+    },
+    {
+      "page": 53,
+      "id": "53-0",
+      "columns": [
+        {
+          "label": "Republican Willkie and McNary",
+          "contest": "president",
+          "candidate": "Wendell Willkie (Republican)"
+        },
+        {
+          "label": "Democrat Roosevelt and Wallace",
+          "contest": "president",
+          "candidate": "Franklin D. Roosevelt (Democratic)"
+        },
+        {
+          "label": "Socialist Thomas and Krueger",
+          "contest": "president",
+          "candidate": "Norman Thomas (Socialist)"
+        },
+        {
+          "label": "Prohibition Babson and Moorman",
+          "contest": "president",
+          "candidate": "Prohibition"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.125,
+        0.081,
+        0.973,
+        1.0
+      ],
+      "hint": "Read only the table headed 'ABSENT VOTE OUTSIDE OF STATE FOR PRESIDENT AND VICE-PRESIDENT'; ignore any other table visible in the image.",
+      "bands": 3,
+      "header": [
+        0.0,
+        0.2753
+      ]
+    },
+    {
+      "page": 54,
+      "id": "54-0",
+      "columns": [
+        {
+          "label": "Republican. Willkie and McNary.",
+          "contest": "president",
+          "candidate": "Wendell Willkie (Republican)"
+        },
+        {
+          "label": "Democrat. Roosevelt and Wallace.",
+          "contest": "president",
+          "candidate": "Franklin D. Roosevelt (Democratic)"
+        },
+        {
+          "label": "Socialist. Thomas and Krueger.",
+          "contest": "president",
+          "candidate": "Norman Thomas (Socialist)"
+        },
+        {
+          "label": "Prohibition. Babson and Moorman.",
+          "contest": "president",
+          "candidate": "Prohibition"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.02,
+        0.099,
+        0.876,
+        0.915
+      ],
+      "hint": "Read only the table headed 'ABSENT VOTE\u2014FOR PRESIDENT AND VICE-PRESIDENT\u2014CONCLUDED'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1299
+      ]
+    },
+    {
+      "page": 58,
+      "id": "58-0",
+      "columns": [
+        {
+          "label": "Payne Ratner, Rep.",
+          "contest": "governor",
+          "candidate": "Payne Ratner"
+        },
+        {
+          "label": "William H. Burke, Dem.",
+          "contest": "governor",
+          "candidate": "William H. Burke"
+        },
+        {
+          "label": "Ida A. Beloof, Soc.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "David C. White, Prohib.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.011,
+        0.118,
+        0.866,
+        0.751
+      ],
+      "hint": "Read only the table headed 'ABSENT VOTE\u2014FOR GOVERNOR\u2014Concluded'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.09
+      ]
+    }
+  ]
+}

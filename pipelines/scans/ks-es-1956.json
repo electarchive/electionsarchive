@@ -1,0 +1,449 @@
+{
+  "polity": "US-KS",
+  "publisher": "Kansas Secretary of State",
+  "license": "Public record",
+  "raw_source": "us.ks_es",
+  "title": "Kansas election statistics 1956, general election",
+  "file": {
+    "url": "https://kgi.contentdm.oclc.org/digital/api/collection/p16884coll129/id/53/download"
+  },
+  "contests": {
+    "president": {
+      "year": 1956,
+      "chamber": "president",
+      "day": "1956-11-06",
+      "special": false,
+      "state": "KS",
+      "district": null
+    },
+    "senate": {
+      "year": 1956,
+      "chamber": "senate",
+      "day": "1956-11-06",
+      "special": false,
+      "state": "KS",
+      "district": null
+    },
+    "house1": {
+      "year": 1956,
+      "chamber": "house",
+      "day": "1956-11-06",
+      "special": false,
+      "state": "KS",
+      "district": 1
+    },
+    "house2": {
+      "year": 1956,
+      "chamber": "house",
+      "day": "1956-11-06",
+      "special": false,
+      "state": "KS",
+      "district": 2
+    },
+    "house3": {
+      "year": 1956,
+      "chamber": "house",
+      "day": "1956-11-06",
+      "special": false,
+      "state": "KS",
+      "district": 3
+    },
+    "house4": {
+      "year": 1956,
+      "chamber": "house",
+      "day": "1956-11-06",
+      "special": false,
+      "state": "KS",
+      "district": 4
+    },
+    "house5": {
+      "year": 1956,
+      "chamber": "house",
+      "day": "1956-11-06",
+      "special": false,
+      "state": "KS",
+      "district": 5
+    },
+    "house6": {
+      "year": 1956,
+      "chamber": "house",
+      "day": "1956-11-06",
+      "special": false,
+      "state": "KS",
+      "district": 6
+    },
+    "governor": {
+      "year": 1956,
+      "chamber": "governor",
+      "day": "1956-11-06",
+      "special": false,
+      "state": "KS",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 2,
+      "id": "2-0",
+      "columns": [
+        {
+          "label": "Republican Eisenhower and Nixon",
+          "contest": "president",
+          "candidate": "Dwight D. Eisenhower (Republican)"
+        },
+        {
+          "label": "Democratic Stevenson and Kefauver",
+          "contest": "president",
+          "candidate": "Adlai Stevenson (Democratic)"
+        },
+        {
+          "label": "Prohibition Holtwick and Cooper",
+          "contest": "president",
+          "candidate": "Prohibition"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.055,
+        0.093,
+        0.933,
+        1.0
+      ],
+      "hint": "Read only the table headed 'FOR ELECTORS OF PRESIDENT AND VICE-PRESIDENT'; ignore any other table visible in the image.",
+      "bands": 3,
+      "header": [
+        0.0,
+        0.2536
+      ]
+    },
+    {
+      "page": 3,
+      "id": "3-0",
+      "columns": [
+        {
+          "label": "Republican Eisenhower and Nixon",
+          "contest": "president",
+          "candidate": "Dwight D. Eisenhower (Republican)"
+        },
+        {
+          "label": "Democratic Stevenson and Kefauver",
+          "contest": "president",
+          "candidate": "Adlai Stevenson (Democratic)"
+        },
+        {
+          "label": "Prohibition Holtwick and Cooper",
+          "contest": "president",
+          "candidate": "Prohibition"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.009,
+        0.1,
+        0.898,
+        0.887
+      ],
+      "hint": "Read only the table headed 'FOR ELECTORS OF PRESIDENT AND VICE-PRESIDENT\u2014CONCLUDED'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0864
+      ]
+    },
+    {
+      "page": 4,
+      "id": "4-0",
+      "columns": [
+        {
+          "label": "Frank Carlson, Rep.",
+          "contest": "senate",
+          "candidate": "Frank Carlson"
+        },
+        {
+          "label": "George Hart, Dem.",
+          "contest": "senate",
+          "candidate": "George Hart"
+        },
+        {
+          "label": "C. Floyd Hester, Prohib.",
+          "contest": "senate",
+          "candidate": "C. Floyd Hester"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.069,
+        0.093,
+        0.936,
+        1.0
+      ],
+      "hint": "Read only the table headed 'FOR UNITED STATES SENATOR'; ignore any other table visible in the image.",
+      "bands": 3,
+      "header": [
+        0.0,
+        0.0904
+      ]
+    },
+    {
+      "page": 5,
+      "id": "5-0",
+      "columns": [
+        {
+          "label": "Frank Carlson, Rep.",
+          "contest": "senate",
+          "candidate": "Frank Carlson"
+        },
+        {
+          "label": "George Hart, Dem.",
+          "contest": "senate",
+          "candidate": "George Hart"
+        },
+        {
+          "label": "C. Floyd Hester, Prohib.",
+          "contest": "senate",
+          "candidate": "C. Floyd Hester"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.018,
+        0.084,
+        0.907,
+        0.82
+      ],
+      "hint": "Read only the table headed 'FOR UNITED STATES SENATOR\u2014CONCLUDED'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0978
+      ]
+    },
+    {
+      "page": 6,
+      "id": "6-0",
+      "columns": [
+        {
+          "label": "Wm. H. Avery, Rep.",
+          "contest": "house1",
+          "candidate": "William H. Avery"
+        },
+        {
+          "label": "Howard S. Miller, Dem.",
+          "contest": "house1",
+          "candidate": "Howard S. Miller"
+        },
+        {
+          "label": "Howard Hadin, Prohib.",
+          "contest": "house1",
+          "candidate": "Howard Hadin"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.053,
+        0.139,
+        0.932,
+        0.415
+      ],
+      "hint": "Read only the table headed 'FIRST CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 6,
+      "id": "6-1",
+      "columns": [
+        {
+          "label": "Errett P. Scrivner, Rep.",
+          "contest": "house2",
+          "candidate": "Errett P. Scrivner"
+        },
+        {
+          "label": "Newell A. George, Dem.",
+          "contest": "house2",
+          "candidate": "Newell A. George"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.052,
+        0.407,
+        0.929,
+        0.657
+      ],
+      "hint": "Read only the table headed 'SECOND CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 6,
+      "id": "6-2",
+      "columns": [
+        {
+          "label": "Myron V. George, Rep.",
+          "contest": "house3",
+          "candidate": "Myron V. George"
+        },
+        {
+          "label": "Denver D. Hargis, Dem.",
+          "contest": "house3",
+          "candidate": "Denver D. Hargis"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.052,
+        0.649,
+        0.927,
+        0.883
+      ],
+      "hint": "Read only the table headed 'THIRD CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 7,
+      "id": "7-0",
+      "columns": [
+        {
+          "label": "Ed H. Rees, Rep.",
+          "contest": "house4",
+          "candidate": "Edward H. Rees"
+        },
+        {
+          "label": "John D. Montgomery, Dem.",
+          "contest": "house4",
+          "candidate": "John D. Montgomery"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.014,
+        0.111,
+        0.906,
+        0.428
+      ],
+      "hint": "Read only the table headed 'FOURTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 7,
+      "id": "7-1",
+      "columns": [
+        {
+          "label": "John W. Crutcher, Rep.",
+          "contest": "house5",
+          "candidate": "John W. Crutcher"
+        },
+        {
+          "label": "J. Floyd Breeding, Dem.",
+          "contest": "house5",
+          "candidate": "J. Floyd Breeding"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.014,
+        0.42,
+        0.906,
+        0.957
+      ],
+      "hint": "Read only the table headed 'FIFTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1601
+      ]
+    },
+    {
+      "page": 8,
+      "id": "8-0",
+      "columns": [
+        {
+          "label": "Wint Smith, Rep.",
+          "contest": "house6",
+          "candidate": "Wint Smith"
+        },
+        {
+          "label": "Elmo J. Mahoney, Dem.",
+          "contest": "house6",
+          "candidate": "Elmo J. Mahoney"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.057,
+        0.134,
+        0.943,
+        0.943
+      ],
+      "hint": "Read only the table headed 'FOR REPRESENTATIVES IN CONGRESS\u2014CONCLUDED SIXTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2645
+      ]
+    },
+    {
+      "page": 13,
+      "id": "13-0",
+      "columns": [
+        {
+          "label": "Warren W. Shaw, Rep.",
+          "contest": "governor",
+          "candidate": "Warren W. Shaw"
+        },
+        {
+          "label": "George Docking, Dem.",
+          "contest": "governor",
+          "candidate": "George Docking"
+        },
+        {
+          "label": "Harry O. Lytle, Prohib.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.069,
+        0.101,
+        0.948,
+        1.0
+      ],
+      "hint": "Read only the table headed 'FOR GOVERNOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.089
+      ]
+    },
+    {
+      "page": 14,
+      "id": "14-0",
+      "columns": [
+        {
+          "label": "Warren W. Shaw, Rep.",
+          "contest": "governor",
+          "candidate": "Warren W. Shaw"
+        },
+        {
+          "label": "George Docking, Dem.",
+          "contest": "governor",
+          "candidate": "George Docking"
+        },
+        {
+          "label": "Harry O. Lytle, Prohib.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.051,
+        0.096,
+        0.932,
+        0.825
+      ],
+      "hint": "Read only the table headed 'FOR GOVERNOR\u2014CONCLUDED'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.096
+      ]
+    }
+  ]
+}

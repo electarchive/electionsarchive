@@ -1,0 +1,241 @@
+{
+  "polity": "US-SC",
+  "publisher": "South Carolina State Election Commission",
+  "license": "Public record",
+  "raw_source": "us.scans",
+  "title": "Report of the State Election Commission, votes cast in the general election held 1982-11-02",
+  "file": {
+    "url": "https://scvotes.gov/wp-content/uploads/2022/08/Election_Report_1982-1983.pdf"
+  },
+  "contests": {
+    "house1": {
+      "year": 1982,
+      "chamber": "house",
+      "day": "1982-11-02",
+      "special": false,
+      "state": "SC",
+      "district": 1
+    },
+    "house2": {
+      "year": 1982,
+      "chamber": "house",
+      "day": "1982-11-02",
+      "special": false,
+      "state": "SC",
+      "district": 2
+    },
+    "house3": {
+      "year": 1982,
+      "chamber": "house",
+      "day": "1982-11-02",
+      "special": false,
+      "state": "SC",
+      "district": 3
+    },
+    "house4": {
+      "year": 1982,
+      "chamber": "house",
+      "day": "1982-11-02",
+      "special": false,
+      "state": "SC",
+      "district": 4
+    },
+    "house5": {
+      "year": 1982,
+      "chamber": "house",
+      "day": "1982-11-02",
+      "special": false,
+      "state": "SC",
+      "district": 5
+    },
+    "house6": {
+      "year": 1982,
+      "chamber": "house",
+      "day": "1982-11-02",
+      "special": false,
+      "state": "SC",
+      "district": 6
+    }
+  },
+  "pages": [
+    {
+      "page": 28,
+      "id": "28-0",
+      "columns": [
+        {
+          "label": "(D) W MULLINS MCLEOD",
+          "contest": "house1",
+          "candidate": "W. Mullins McLeod"
+        },
+        {
+          "label": "(R) *THOMAS F HARTNETT",
+          "contest": "house1",
+          "candidate": "Thomas F. Hartnett"
+        },
+        {
+          "label": "(L) WALTER E SMITH",
+          "contest": "house1",
+          "candidate": "Walter E. Smith"
+        },
+        {
+          "label": "(W) MISC WRITE-INS",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.047,
+        0.186,
+        0.481,
+        0.532
+      ],
+      "hint": "Read only the table headed 'DISTRICT NO 001 REPRESENTATIVE IN CONGRESS'; ignore any other table visible in the image."
+    },
+    {
+      "page": 28,
+      "id": "28-1",
+      "columns": [
+        {
+          "label": "(D) KEN MOSELY",
+          "contest": "house2",
+          "candidate": "Ken Mosely"
+        },
+        {
+          "label": "(R) *FLOYD D SPENCE",
+          "contest": "house2",
+          "candidate": "Floyd D. Spence"
+        },
+        {
+          "label": "(W) MISC WRITE INS",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.563,
+        0.186,
+        0.934,
+        0.512
+      ],
+      "hint": "Read only the table headed 'DISTRICT NO 002 REPRESENTATIVE IN CONGRESS'; ignore any other table visible in the image."
+    },
+    {
+      "page": 29,
+      "id": "29-0",
+      "columns": [
+        {
+          "label": "(D) *BUTLER DERRICK",
+          "contest": "house3",
+          "candidate": "Butler Derrick"
+        },
+        {
+          "label": "(L) GORDON T DAVIS",
+          "contest": "house3",
+          "candidate": "Gordon T. Davis"
+        },
+        {
+          "label": "(W) MISC WRITE-INS",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.034,
+        0.196,
+        0.402,
+        0.572
+      ],
+      "hint": "Read only the table headed 'DISTRICT NO 003 REPRESENTATIVE IN CONGRESS'; ignore any other table visible in the image."
+    },
+    {
+      "page": 29,
+      "id": "29-1",
+      "columns": [
+        {
+          "label": "(D) MARION TYUS",
+          "contest": "house4",
+          "candidate": "Marion E. Tyus"
+        },
+        {
+          "label": "(R) *CARROLL CAMPBELL",
+          "contest": "house4",
+          "candidate": "Carroll A. Campbell"
+        },
+        {
+          "label": "(W) MISC WRITE-INS",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.545,
+        0.196,
+        0.914,
+        0.496
+      ],
+      "hint": "Read only the table headed 'DISTRICT NO 004 REPRESENTATIVE IN CONGRESS'; ignore any other table visible in the image."
+    },
+    {
+      "page": 30,
+      "id": "30-0",
+      "columns": [
+        {
+          "label": "(D) * JOHN SPRATT",
+          "contest": "house5",
+          "candidate": "John Spratt"
+        },
+        {
+          "label": "(R) JOHN S WILKERSON",
+          "contest": "house5",
+          "candidate": "John S. Wilkerson"
+        },
+        {
+          "label": "(W) MISC WRITE-INS",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.047,
+        0.181,
+        0.421,
+        0.455
+      ],
+      "hint": "Read only the table headed 'DISTRICT NO 005 REPRESENTIVE IN CONGRESS'; ignore any other table visible in the image."
+    },
+    {
+      "page": 30,
+      "id": "30-1",
+      "columns": [
+        {
+          "label": "(D) * ROBIN TALLON",
+          "contest": "house6",
+          "candidate": "Robin Tallon"
+        },
+        {
+          "label": "(R) JOHN L NAPIER",
+          "contest": "house6",
+          "candidate": "John L. Napier"
+        },
+        {
+          "label": "(W) MISC WRITE-INS",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.564,
+        0.181,
+        0.943,
+        0.451
+      ],
+      "hint": "Read only the table headed 'DISTRICT NO 006 REPRESENTIVE IN CONGRESS'; ignore any other table visible in the image."
+    }
+  ]
+}

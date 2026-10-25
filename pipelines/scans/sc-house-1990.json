@@ -1,0 +1,226 @@
+{
+  "polity": "US-SC",
+  "publisher": "South Carolina State Election Commission",
+  "license": "Public record",
+  "raw_source": "us.scans",
+  "title": "Report of the State Election Commission, votes cast in the general election held 1990-11-06",
+  "file": {
+    "url": "https://scvotes.gov/wp-content/uploads/2022/08/Election_Report_1990-1991.pdf"
+  },
+  "contests": {
+    "house1": {
+      "year": 1990,
+      "chamber": "house",
+      "day": "1990-11-06",
+      "special": false,
+      "state": "SC",
+      "district": 1
+    },
+    "house2": {
+      "year": 1990,
+      "chamber": "house",
+      "day": "1990-11-06",
+      "special": false,
+      "state": "SC",
+      "district": 2
+    },
+    "house3": {
+      "year": 1990,
+      "chamber": "house",
+      "day": "1990-11-06",
+      "special": false,
+      "state": "SC",
+      "district": 3
+    },
+    "house4": {
+      "year": 1990,
+      "chamber": "house",
+      "day": "1990-11-06",
+      "special": false,
+      "state": "SC",
+      "district": 4
+    },
+    "house5": {
+      "year": 1990,
+      "chamber": "house",
+      "day": "1990-11-06",
+      "special": false,
+      "state": "SC",
+      "district": 5
+    },
+    "house6": {
+      "year": 1990,
+      "chamber": "house",
+      "day": "1990-11-06",
+      "special": false,
+      "state": "SC",
+      "district": 6
+    }
+  },
+  "pages": [
+    {
+      "page": 95,
+      "id": "95-0",
+      "columns": [
+        {
+          "label": "(D) Eugene Pulaski Gettys",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "(R) Arthur Ravenel Jr.",
+          "contest": "house1",
+          "candidate": "Arthur Ravenel Jr."
+        },
+        {
+          "label": "(W) Write-in Mr. Nice",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.107,
+        0.058,
+        0.383,
+        0.344
+      ],
+      "hint": "Read only the table headed 'DISTRICT NO 001 REPRESENTATIVE IN CONGRESS'; ignore any other table visible in the image."
+    },
+    {
+      "page": 95,
+      "id": "95-1",
+      "columns": [
+        {
+          "label": "(R) Floyd Spence",
+          "contest": "house2",
+          "candidate": "Floyd D. Spence"
+        },
+        {
+          "label": "(L) Bernard Schemehorn",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "(W) Write-in Mr. Nice",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.482,
+        0.058,
+        0.763,
+        0.337
+      ],
+      "hint": "Read only the table headed 'DISTRICT NO 002 REPRESENTATIVE IN CONGRESS'; ignore any other table visible in the image."
+    },
+    {
+      "page": 95,
+      "id": "95-2",
+      "columns": [
+        {
+          "label": "(D) Butler Derrick",
+          "contest": "house3",
+          "candidate": "Butler Derrick"
+        },
+        {
+          "label": "(R) Ray Hartnett",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "(W) Write-in Mr. Nice",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.107,
+        0.336,
+        0.383,
+        0.672
+      ],
+      "hint": "Read only the table headed 'DISTRICT NO 003 REPRESENTATIVE IN CONGRESS'; ignore any other table visible in the image."
+    },
+    {
+      "page": 95,
+      "id": "95-3",
+      "columns": [
+        {
+          "label": "(D) Liz Patterson",
+          "contest": "house4",
+          "candidate": "Liz J. Patterson"
+        },
+        {
+          "label": "(R) Bill Workman",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "(W) Write-in Mr. Nice",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.482,
+        0.329,
+        0.763,
+        0.637
+      ],
+      "hint": "Read only the table headed 'DISTRICT NO 004 REPRESENTATIVE IN CONGRESS'; ignore any other table visible in the image."
+    },
+    {
+      "page": 95,
+      "id": "95-4",
+      "columns": [
+        {
+          "label": "(D) John Spratt",
+          "contest": "house5",
+          "candidate": "John Spratt Jr."
+        },
+        {
+          "label": "(W) Write-in Mr. Nice",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.115,
+        0.664,
+        0.346,
+        0.976
+      ],
+      "hint": "Read only the table headed 'DISTRICT NO 005 REP. IN CONGRESS'; ignore any other table visible in the image."
+    },
+    {
+      "page": 95,
+      "id": "95-5",
+      "columns": [
+        {
+          "label": "(D) Robert Tallon",
+          "contest": "house6",
+          "candidate": "Robin Tallon"
+        },
+        {
+          "label": "(W) Write-in Mr. Nice",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.492,
+        0.629,
+        0.723,
+        0.976
+      ],
+      "hint": "Read only the table headed 'DISTRICT NO 006 REP. IN CONGRESS'; ignore any other table visible in the image."
+    }
+  ]
+}

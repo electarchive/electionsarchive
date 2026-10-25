@@ -1,0 +1,16 @@
+{
+  "polity": "US-AZ",
+  "publisher": "Arizona Secretary of State",
+  "license": "Public record",
+  "raw_source": "us.scans",
+  "year": 2026,
+  "day": "2026-07-21",
+  "title": "Arizona 2026 primary election canvass by county, report of 2026-08-06",
+  "file": { "url": "manual://MF-058/20260806_Primary_Canvass.pdf" },
+  "offices": {
+    "house": "U.S. Representative in Congress, Districts 1 through 9, one table per district and party primary (REP, DEM, LBT, GRN, NOL); rows are candidates labeled (PARTY) Name with * marking the winner and (Write-In) for write-ins; the 15 county columns Apache, Cochise, Coconino, Gila, Graham, Greenlee, La Paz, Maricopa, Mohave, Navajo, Pima, Pinal, Santa Cruz, Yavapai, and Yuma, then TOTAL; a dash means not on the ballot in that county",
+    "governor": "Governor, page 3, party primaries, same row and column layout"
+  },
+  "leaves": [1, 2, 3],
+  "autorotate": true
+}

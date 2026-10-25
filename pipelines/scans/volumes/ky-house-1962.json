@@ -1,0 +1,22 @@
+{
+ "polity": "US-KY",
+ "publisher": "Kentucky State Board of Elections",
+ "license": "Public record",
+ "raw_source": "us.scans",
+ "year": 1962,
+ "day": "1962-11-06",
+ "title": "Kentucky official returns, general election 1962-11-06",
+ "file": {
+  "url": "https://elect.ky.gov/results/1973-1979/Documents/1962.pdf"
+ },
+ "offices": {
+  "house": "U.S. Representative, one table per district, county rows (candidate names may be printed vertically)"
+ },
+ "leaves": [
+  1,
+  2,
+  3,
+  4
+ ],
+ "autorotate": true
+}

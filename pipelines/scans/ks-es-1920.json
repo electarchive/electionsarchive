@@ -1,0 +1,885 @@
+{
+  "polity": "US-KS",
+  "publisher": "Kansas Secretary of State",
+  "license": "Public record",
+  "raw_source": "us.ks_es",
+  "title": "Kansas election statistics 1920, general election",
+  "file": {
+    "url": "https://kgi.contentdm.oclc.org/digital/api/collection/p16884coll129/id/17/download"
+  },
+  "contests": {
+    "president": {
+      "year": 1920,
+      "chamber": "president",
+      "day": "1920-11-02",
+      "special": false,
+      "state": "KS",
+      "district": null
+    },
+    "house1": {
+      "year": 1920,
+      "chamber": "house",
+      "day": "1920-11-02",
+      "special": false,
+      "state": "KS",
+      "district": 1
+    },
+    "house2": {
+      "year": 1920,
+      "chamber": "house",
+      "day": "1920-11-02",
+      "special": false,
+      "state": "KS",
+      "district": 2
+    },
+    "house3": {
+      "year": 1920,
+      "chamber": "house",
+      "day": "1920-11-02",
+      "special": false,
+      "state": "KS",
+      "district": 3
+    },
+    "house4": {
+      "year": 1920,
+      "chamber": "house",
+      "day": "1920-11-02",
+      "special": false,
+      "state": "KS",
+      "district": 4
+    },
+    "house5": {
+      "year": 1920,
+      "chamber": "house",
+      "day": "1920-11-02",
+      "special": false,
+      "state": "KS",
+      "district": 5
+    },
+    "house6": {
+      "year": 1920,
+      "chamber": "house",
+      "day": "1920-11-02",
+      "special": false,
+      "state": "KS",
+      "district": 6
+    }
+  },
+  "pages": [
+    {
+      "page": 2,
+      "id": "2-0",
+      "columns": [
+        {
+          "label": "Democrat. For President and Vice President, Cox and Roosevelt.",
+          "contest": "president",
+          "candidate": "James Cox (Democratic)"
+        },
+        {
+          "label": "Ed Armold.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Myrtle H. Blauer.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Mary Fitzwilliam Carney.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Lucy R. Clemans.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Geo. S. Currier.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Maude Dillard.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "H. C. Lemon.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "John M. Rodgers.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "D. M. Rothweiler.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "C. E. Scudder.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.079,
+        0.1,
+        0.926,
+        1.0
+      ],
+      "hint": "Read only the table headed 'PRESIDENT, VICE PRESIDENT, AND PRESIDENTIAL ELECTORS\u2014DEMOCRAT.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2222
+      ]
+    },
+    {
+      "page": 3,
+      "id": "3-0",
+      "columns": [
+        {
+          "label": "Democrat. For President and Vice President, Cox and Roosevelt.",
+          "contest": "president",
+          "candidate": "James Cox (Democratic)"
+        },
+        {
+          "label": "Ed Armold.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Myrtle H. Blauer.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Mary Fitzwilliam Carney.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Lucy R. Clemans.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Geo. S. Currier.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Maude Dillard.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "H. C. Lemon.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "John M. Rodgers.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "D. M. Rothweiler.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "C. E. Scudder.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.079,
+        0.0,
+        0.926,
+        1.0
+      ],
+      "hint": "This page continues the table of the previous page and prints no headings."
+    },
+    {
+      "page": 5,
+      "id": "5-0",
+      "columns": [
+        {
+          "label": "Democrat For President and Vice President, Cox and Roosevelt.",
+          "contest": "president",
+          "candidate": "James Cox (Democratic)"
+        },
+        {
+          "label": "Ed Armold.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Myrtle H. Blauer.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Mary Fitzwilliam Carney.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Lucy R. Clemans.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Geo. S. Currier.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Maude Dillard.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "H. C. Lemon.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "John M. Rodgers.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "D. M. Rothweiler.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "C. E. Scudder.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.067,
+        0.072,
+        0.918,
+        0.951
+      ],
+      "hint": "Read only the table headed 'PRESIDENT, VICE PRESIDENT, AND PRESIDENTIAL ELECTORS\u2014DEMOCRAT.\u2014CONCLUDED.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2196
+      ]
+    },
+    {
+      "page": 6,
+      "id": "6-0",
+      "columns": [
+        {
+          "label": "Socialist. For President and Vice President, Debs and Stedman.",
+          "contest": "president",
+          "candidate": "Eugene Debs (Socialist)"
+        },
+        {
+          "label": "Charles Clawson.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "S. O. Coble.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "John M. Dennis.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "E. F. Fisher.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Elva George.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Chas. Hohensee.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "A. A. Hook.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Ewald A. Seltmann.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Albert W. Wilkens.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.054,
+        0.026,
+        0.912,
+        1.0
+      ],
+      "hint": "Read only the table headed 'PRESIDENT, VICE PRESIDENT, AND PRESIDENTIAL ELECTORS\u2014SOCIALIST.'; ignore any other table visible in the image.",
+      "bands": 3,
+      "header": [
+        0.0,
+        0.2351
+      ]
+    },
+    {
+      "page": 7,
+      "id": "7-0",
+      "columns": [
+        {
+          "label": "Socialist. For President and Vice President, Debs and Stedman.",
+          "contest": "president",
+          "candidate": "Eugene Debs (Socialist)"
+        },
+        {
+          "label": "Charles Clawson.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "S. O. Coble.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "John M. Dennis.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "E. F. Fisher.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Elva George.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Chas. Hohensee.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "A. A. Hook.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Ewald A. Seltmann.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Albert W. Wilkens.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.062,
+        0.055,
+        0.913,
+        0.964
+      ],
+      "hint": "Read only the table headed 'PRESIDENT, VICE PRESIDENT, AND PRESIDENTIAL ELECTORS\u2014SOCIALIST\u2014Concluded'; ignore any other table visible in the image.",
+      "bands": 3,
+      "header": [
+        0.0,
+        0.242
+      ]
+    },
+    {
+      "page": 10,
+      "id": "10-0",
+      "columns": [
+        {
+          "label": "Republican For President and Vice President, Harding and Coolidge.",
+          "contest": "president",
+          "candidate": "Warren G. Harding (Republican)"
+        },
+        {
+          "label": "J. B. Adams.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "John W. Breyfogle.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Dorsey Green.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "F. R. Hammond.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Ella F. Hobble.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "C. C. Houston.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Matie Toothaker Kimball.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "E. Percy Roberson.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "C. W. Ryan.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Laura Kyner.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.059,
+        0.119,
+        0.904,
+        1.0
+      ],
+      "hint": "Read only the table headed 'General Election, November 2, 1920. PRESIDENT, VICE PRESIDENT, AND PRESIDENTIAL ELECTORS\u2014REPUBLICAN.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.252
+      ]
+    },
+    {
+      "page": 11,
+      "id": "11-0",
+      "columns": [
+        {
+          "label": "Republican For President and Vice President, Harding and Coolidge.",
+          "contest": "president",
+          "candidate": "Warren G. Harding (Republican)"
+        },
+        {
+          "label": "J. B. Adams.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "John W. Breyfogle.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Dorsey Green.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "F. R. Hammond.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Ella F. Hobble.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "C. C. Houston.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Matie Toothaker Kimball.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "E. Percy Roberson.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "C. W. Ryan.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Laura Kyner.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.059,
+        0.0,
+        0.904,
+        1.0
+      ],
+      "hint": "This page continues the table of the previous page and prints no headings."
+    },
+    {
+      "page": 13,
+      "id": "13-0",
+      "columns": [
+        {
+          "label": "Republican For President and Vice President, Harding and Coolidge.",
+          "contest": "president",
+          "candidate": "Warren G. Harding (Republican)"
+        },
+        {
+          "label": "J. B. Adams.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "John W. Breyfogle.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Dorsey Green.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "F. R. Hammond.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Ella F. Hobble.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "C. C. Houston.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Matie Toothaker Kimball.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "E. Percy Roberson.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "C. W. Ryan.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Laura Kyner.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.06,
+        0.047,
+        0.911,
+        0.947
+      ],
+      "hint": "Read only the table headed 'PRESIDENT, VICE PRESIDENT, AND PRESIDENTIAL ELECTORS\u2014REPUBLICAN\u2014CONCLUDED.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2444
+      ]
+    },
+    {
+      "page": 31,
+      "id": "31-0",
+      "columns": [
+        {
+          "label": "D. R. Anthony, Jr., Rep.",
+          "contest": "house1",
+          "candidate": "D. R. Anthony, jr."
+        },
+        {
+          "label": "J. B. Billard, Dem.",
+          "contest": "house1",
+          "candidate": "J. B. Billard"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.103,
+        0.156,
+        0.924,
+        0.385
+      ],
+      "hint": "Read only the table headed 'FIRST CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 31,
+      "id": "31-1",
+      "columns": [
+        {
+          "label": "Edward C. Little, Rep.",
+          "contest": "house2",
+          "candidate": "Edward C. Little"
+        },
+        {
+          "label": "C. A. Bowman, Dem.",
+          "contest": "house2",
+          "candidate": "C. A. Bowman"
+        },
+        {
+          "label": "A. W. Webster, Soc.",
+          "contest": "house2",
+          "candidate": "A. W. Webster"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.103,
+        0.377,
+        0.924,
+        0.626
+      ],
+      "hint": "Read only the table headed 'SECOND CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 31,
+      "id": "31-2",
+      "columns": [
+        {
+          "label": "P. P. Campbell, Rep.",
+          "contest": "house3",
+          "candidate": "P. P. Campbell"
+        },
+        {
+          "label": "J. D. Turkington, Dem.",
+          "contest": "house3",
+          "candidate": "J. D. Turkington"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.104,
+        0.618,
+        0.92,
+        0.854
+      ],
+      "hint": "Read only the table headed 'THIRD CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 32,
+      "id": "32-0",
+      "columns": [
+        {
+          "label": "Homer Hoch, Rep.",
+          "contest": "house4",
+          "candidate": "Homer Hoch"
+        },
+        {
+          "label": "Walter W. Austin, Dem.",
+          "contest": "house4",
+          "candidate": "Walter W. Austin"
+        },
+        {
+          "label": "Carlos A. Stebbins, Soc.",
+          "contest": "house4",
+          "candidate": "Carlos A. Stebbins"
+        },
+        {
+          "label": "Scattering.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.091,
+        0.121,
+        0.917,
+        0.363
+      ],
+      "hint": "Read only the table headed 'FOURTH CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 32,
+      "id": "32-1",
+      "columns": [
+        {
+          "label": "James G. Strong, Rep.",
+          "contest": "house5",
+          "candidate": "James G. Strong"
+        },
+        {
+          "label": "Thomas F. Johnson, Dem.",
+          "contest": "house5",
+          "candidate": "Thomas F. Johnson"
+        },
+        {
+          "label": "Ernest W. Powell, Soc.",
+          "contest": "house5",
+          "candidate": "Ernest W. Powell"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.092,
+        0.355,
+        0.918,
+        0.602
+      ],
+      "hint": "Read only the table headed 'FIFTH CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 32,
+      "id": "32-2",
+      "columns": [
+        {
+          "label": "Hays B. White, Rep.",
+          "contest": "house6",
+          "candidate": "Hays B. White"
+        },
+        {
+          "label": "J. C. Ruppenthal, Dem.",
+          "contest": "house6",
+          "candidate": "J. C. Ruppenthal"
+        },
+        {
+          "label": "M. L. Phillips, Soc.",
+          "contest": "house6",
+          "candidate": "M. L. Phillips"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.094,
+        0.594,
+        0.918,
+        0.956
+      ],
+      "hint": "Read only the table headed 'SIXTH CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 55,
+      "id": "55-0",
+      "columns": [
+        {
+          "label": "Republican For President and Vice President, Harding and Coolidge.",
+          "contest": "president",
+          "candidate": "Warren G. Harding (Republican)"
+        },
+        {
+          "label": "J. B. Adams.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "John W. Breyfogle.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Dorsey Green.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "F. R. Hammond.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Ella F. Hobble.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "C. C. Houston.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Matie Toothaker Kimball.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "E. Percy Roberson.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "C. W. Ryan.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Laura Kyner.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.072,
+        0.114,
+        0.926,
+        0.891
+      ],
+      "hint": "Read only the table headed 'Federal Service Vote\u2014General Election, November 2, 1920. PRESIDENT, VICE PRESIDENT, AND PRESIDENTIAL ELECTORS\u2014REPUBLICAN.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2947
+      ]
+    }
+  ]
+}

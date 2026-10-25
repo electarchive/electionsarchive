@@ -1,0 +1,297 @@
+{
+  "polity": "US-KS",
+  "publisher": "Kansas Secretary of State",
+  "license": "Public record",
+  "raw_source": "us.ks_es",
+  "title": "Kansas election statistics 1958, general election",
+  "file": {
+    "url": "https://kgi.contentdm.oclc.org/digital/api/collection/p16884coll129/id/55/download"
+  },
+  "contests": {
+    "house1": {
+      "year": 1958,
+      "chamber": "house",
+      "day": "1958-11-04",
+      "special": false,
+      "state": "KS",
+      "district": 1
+    },
+    "house2": {
+      "year": 1958,
+      "chamber": "house",
+      "day": "1958-11-04",
+      "special": false,
+      "state": "KS",
+      "district": 2
+    },
+    "house3": {
+      "year": 1958,
+      "chamber": "house",
+      "day": "1958-11-04",
+      "special": false,
+      "state": "KS",
+      "district": 3
+    },
+    "house4": {
+      "year": 1958,
+      "chamber": "house",
+      "day": "1958-11-04",
+      "special": false,
+      "state": "KS",
+      "district": 4
+    },
+    "house5": {
+      "year": 1958,
+      "chamber": "house",
+      "day": "1958-11-04",
+      "special": false,
+      "state": "KS",
+      "district": 5
+    },
+    "house6": {
+      "year": 1958,
+      "chamber": "house",
+      "day": "1958-11-04",
+      "special": false,
+      "state": "KS",
+      "district": 6
+    },
+    "governor": {
+      "year": 1958,
+      "chamber": "governor",
+      "day": "1958-11-04",
+      "special": false,
+      "state": "KS",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 2,
+      "id": "2-0",
+      "columns": [
+        {
+          "label": "Wm. H. Avery, Rep.",
+          "contest": "house1",
+          "candidate": "William H. Avery"
+        },
+        {
+          "label": "Robert W. Domme, Dem.",
+          "contest": "house1",
+          "candidate": "Robert W. Domme"
+        },
+        {
+          "label": "Marie I. Hadin, Prohib.",
+          "contest": "house1",
+          "candidate": "Marie I. Hadin"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.044,
+        0.108,
+        0.927,
+        0.4
+      ],
+      "hint": "Read only the table headed 'FIRST CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 2,
+      "id": "2-1",
+      "columns": [
+        {
+          "label": "Errett P. Scrivner, Rep.",
+          "contest": "house2",
+          "candidate": "Errett P. Scrivner"
+        },
+        {
+          "label": "Newell A. George, Dem.",
+          "contest": "house2",
+          "candidate": "Newell A. George"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.045,
+        0.392,
+        0.925,
+        0.644
+      ],
+      "hint": "Read only the table headed 'SECOND CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 2,
+      "id": "2-2",
+      "columns": [
+        {
+          "label": "Myron V. George, Rep.",
+          "contest": "house3",
+          "candidate": "Myron V. George"
+        },
+        {
+          "label": "Denver D. Hargis, Dem.",
+          "contest": "house3",
+          "candidate": "Denver D. Hargis"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.044,
+        0.636,
+        0.92,
+        0.876
+      ],
+      "hint": "Read only the table headed 'THIRD CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 3,
+      "id": "3-0",
+      "columns": [
+        {
+          "label": "Ed H. Rees, Rep.",
+          "contest": "house4",
+          "candidate": "Edward H. Rees"
+        },
+        {
+          "label": "Warner Moore, Dem.",
+          "contest": "house4",
+          "candidate": "Warner Moore"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.044,
+        0.106,
+        0.938,
+        0.417
+      ],
+      "hint": "Read only the table headed 'FOURTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 3,
+      "id": "3-1",
+      "columns": [
+        {
+          "label": "Clifford R. Hope, Jr., Rep.",
+          "contest": "house5",
+          "candidate": "Clifford R. Hope, Jr."
+        },
+        {
+          "label": "J. Floyd Breeding, Dem.",
+          "contest": "house5",
+          "candidate": "J. Floyd Breeding"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.044,
+        0.409,
+        0.938,
+        0.942
+      ],
+      "hint": "Read only the table headed 'FIFTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1689
+      ]
+    },
+    {
+      "page": 4,
+      "id": "4-0",
+      "columns": [
+        {
+          "label": "Wint Smith, Rep.",
+          "contest": "house6",
+          "candidate": "Wint Smith"
+        },
+        {
+          "label": "Elmo J. Mahoney, Dem.",
+          "contest": "house6",
+          "candidate": "Elmo J. Mahoney"
+        },
+        {
+          "label": "John C. Jones, Prohib.",
+          "contest": "house6",
+          "candidate": "John C. Jones"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.067,
+        0.12,
+        0.946,
+        0.549
+      ],
+      "hint": "Read only the table headed 'FOR REPRESENTATIVES IN CONGRESS\u2014CONCLUDED, SIXTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 7,
+      "id": "7-0",
+      "columns": [
+        {
+          "label": "Clyde M. Reed, Rep.",
+          "contest": "governor",
+          "candidate": "Clyde M. Reed"
+        },
+        {
+          "label": "George Docking, Dem.",
+          "contest": "governor",
+          "candidate": "George Docking"
+        },
+        {
+          "label": "Warren C. Martin, Prohib.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.064,
+        0.09,
+        0.95,
+        1.0
+      ],
+      "hint": "Read only the table headed 'FOR GOVERNOR'; ignore any other table visible in the image.",
+      "bands": 3,
+      "header": [
+        0.0,
+        0.0945
+      ]
+    },
+    {
+      "page": 8,
+      "id": "8-0",
+      "columns": [
+        {
+          "label": "Clyde M. Reed, Rep.",
+          "contest": "governor",
+          "candidate": "Clyde M. Reed"
+        },
+        {
+          "label": "George Docking, Dem.",
+          "contest": "governor",
+          "candidate": "George Docking"
+        },
+        {
+          "label": "Warren C. Martin, Prohib.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.058,
+        0.093,
+        0.941,
+        0.816
+      ],
+      "hint": "Read only the table headed 'FOR GOVERNOR\u2014Concluded'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0982
+      ]
+    }
+  ]
+}

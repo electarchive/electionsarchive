@@ -1,0 +1,500 @@
+{
+  "polity": "US-KS",
+  "publisher": "Kansas Secretary of State",
+  "license": "Public record",
+  "raw_source": "us.ks_es",
+  "title": "Kansas election statistics 1938, general election",
+  "file": {
+    "url": "https://kgi.contentdm.oclc.org/digital/api/collection/p16884coll129/id/35/download"
+  },
+  "contests": {
+    "senate": {
+      "year": 1938,
+      "chamber": "senate",
+      "day": "1938-11-08",
+      "special": false,
+      "state": "KS",
+      "district": null
+    },
+    "house1": {
+      "year": 1938,
+      "chamber": "house",
+      "day": "1938-11-08",
+      "special": false,
+      "state": "KS",
+      "district": 1
+    },
+    "house2": {
+      "year": 1938,
+      "chamber": "house",
+      "day": "1938-11-08",
+      "special": false,
+      "state": "KS",
+      "district": 2
+    },
+    "house3": {
+      "year": 1938,
+      "chamber": "house",
+      "day": "1938-11-08",
+      "special": false,
+      "state": "KS",
+      "district": 3
+    },
+    "house4": {
+      "year": 1938,
+      "chamber": "house",
+      "day": "1938-11-08",
+      "special": false,
+      "state": "KS",
+      "district": 4
+    },
+    "house6": {
+      "year": 1938,
+      "chamber": "house",
+      "day": "1938-11-08",
+      "special": false,
+      "state": "KS",
+      "district": 6
+    },
+    "house7": {
+      "year": 1938,
+      "chamber": "house",
+      "day": "1938-11-08",
+      "special": false,
+      "state": "KS",
+      "district": 7
+    },
+    "governor": {
+      "year": 1938,
+      "chamber": "governor",
+      "day": "1938-11-08",
+      "special": false,
+      "state": "KS",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 3,
+      "id": "3-0",
+      "columns": [
+        {
+          "label": "George McGill, Dem.",
+          "contest": "senate",
+          "candidate": "George McGill"
+        },
+        {
+          "label": "Clyde M. Reed, Rep.",
+          "contest": "senate",
+          "candidate": "Clyde M. Reed"
+        },
+        {
+          "label": "Joe Corpstein, (Written in).",
+          "contest": "senate",
+          "candidate": "Joe Corpstein"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.028,
+        0.137,
+        0.88,
+        0.864
+      ],
+      "hint": "Read only the table headed 'FOR UNITED STATES SENATOR\u2014Concluded'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0784
+      ]
+    },
+    {
+      "page": 4,
+      "id": "4-0",
+      "columns": [
+        {
+          "label": "George McGill, Dem.",
+          "contest": "senate",
+          "candidate": "George McGill"
+        },
+        {
+          "label": "Clyde M. Reed, Rep.",
+          "contest": "senate",
+          "candidate": "Clyde M. Reed"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.134,
+        0.106,
+        0.978,
+        1.0
+      ],
+      "hint": "Read only the table headed 'ABSENT VOTE\u2014FOR UNITED STATES SENATOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0928
+      ]
+    },
+    {
+      "page": 5,
+      "id": "5-0",
+      "columns": [
+        {
+          "label": "George McGill, Dem.",
+          "contest": "senate",
+          "candidate": "George McGill"
+        },
+        {
+          "label": "Clyde M. Reed, Rep.",
+          "contest": "senate",
+          "candidate": "Clyde M. Reed"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.028,
+        0.12,
+        0.874,
+        0.849
+      ],
+      "hint": "Read only the table headed 'ABSENT VOTE\u2014FOR UNITED STATES SENATOR\u2014CONCLUDED'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1043
+      ]
+    },
+    {
+      "page": 6,
+      "id": "6-0",
+      "columns": [
+        {
+          "label": "W. P. Lambertson, Rep.",
+          "contest": "house1",
+          "candidate": "W. P. Lambertson"
+        },
+        {
+          "label": "H. N. Hensley, Dem",
+          "contest": "house1",
+          "candidate": "H. N. Hensley"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.121,
+        0.133,
+        0.973,
+        0.473
+      ],
+      "hint": "Read only the table headed 'FOR REPRESENTATIVES IN CONGRESS - FIRST CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 6,
+      "id": "6-1",
+      "columns": [
+        {
+          "label": "U S Guyer, Rep.",
+          "contest": "house2",
+          "candidate": "U. S. Guyer"
+        },
+        {
+          "label": "W. F. Jackson, Dem.",
+          "contest": "house2",
+          "candidate": "W. F. Jackson"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.121,
+        0.465,
+        0.97,
+        0.791
+      ],
+      "hint": "Read only the table headed 'SECOND CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 7,
+      "id": "7-0",
+      "columns": [
+        {
+          "label": "Thomas D. Winter, Rep.",
+          "contest": "house3",
+          "candidate": "Thomas D. Winter"
+        },
+        {
+          "label": "Edward W. Patterson, Dem.",
+          "contest": "house3",
+          "candidate": "Edward W. Patterson"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.026,
+        0.13,
+        0.873,
+        0.467
+      ],
+      "hint": "Read only the table headed 'FOR REPRESENTATIVES IN CONGRESS\u2014CONTINUED THIRD CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 7,
+      "id": "7-1",
+      "columns": [
+        {
+          "label": "Ed. H. Rees, Rep.",
+          "contest": "house4",
+          "candidate": "Edward H. Rees"
+        },
+        {
+          "label": "J. Donald Coffin, Dem.",
+          "contest": "house4",
+          "candidate": "J. Donald Coffin"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.029,
+        0.459,
+        0.873,
+        0.885
+      ],
+      "hint": "Read only the table headed 'FOURTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 9,
+      "id": "9-0",
+      "columns": [
+        {
+          "label": "Frank Carlson, Rep.",
+          "contest": "house6",
+          "candidate": "Frank Carlson"
+        },
+        {
+          "label": "Roy L. Hamilton, Dem.",
+          "contest": "house6",
+          "candidate": "Roy L. Hamilton"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.038,
+        0.112,
+        0.879,
+        0.779
+      ],
+      "hint": "Read only the table headed 'FOR REPRESENTATIVES IN CONGRESS\u2014CONTINUED, SIXTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1454
+      ]
+    },
+    {
+      "page": 10,
+      "id": "10-0",
+      "columns": [
+        {
+          "label": "Clifford R. Hope, Rep.",
+          "contest": "house7",
+          "candidate": "Clifford R. Hope"
+        },
+        {
+          "label": "Claude E. Main, Dem.",
+          "contest": "house7",
+          "candidate": "Claude E. Main"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.116,
+        0.098,
+        0.96,
+        0.894
+      ],
+      "hint": "Read only the table headed 'FOR REPRESENTATIVES IN CONGRESS\u2014CONCLUDED SEVENTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1244
+      ]
+    },
+    {
+      "page": 15,
+      "id": "15-0",
+      "columns": [
+        {
+          "label": "Ida A. Beloof, Soc.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Jonathan M. Davis, Ind.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "C. Floyd Hester, Prohib.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Walter A. Huxman, Dem.",
+          "contest": "governor",
+          "candidate": "Walter A. Huxman"
+        },
+        {
+          "label": "Payne Ratner, Rep.",
+          "contest": "governor",
+          "candidate": "Payne Ratner"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.111,
+        0.099,
+        0.963,
+        1.0
+      ],
+      "hint": "Read only the table headed 'FOR GOVERNOR'; ignore any other table visible in the image.",
+      "bands": 3,
+      "header": [
+        0.0,
+        0.091
+      ]
+    },
+    {
+      "page": 16,
+      "id": "16-0",
+      "columns": [
+        {
+          "label": "Ida A. Beloof, Soc.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Jonathan M. Davis, Ind.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "C. Floyd Hester, Prohib.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Walter A. Huxman, Dem.",
+          "contest": "governor",
+          "candidate": "Walter A. Huxman"
+        },
+        {
+          "label": "Payne Ratner, Rep.",
+          "contest": "governor",
+          "candidate": "Payne Ratner"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.039,
+        0.124,
+        0.88,
+        0.861
+      ],
+      "hint": "Read only the table headed 'FOR GOVERNOR\u2014CONCLUDED'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1018
+      ]
+    },
+    {
+      "page": 17,
+      "id": "17-0",
+      "columns": [
+        {
+          "label": "Ida A. Beloof, Soc.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Jonathan M. Davis, Ind.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "C. Floyd Hester, Prohib.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Walter A. Huxman, Dem.",
+          "contest": "governor",
+          "candidate": "Walter A. Huxman"
+        },
+        {
+          "label": "Payne Ratner, Rep.",
+          "contest": "governor",
+          "candidate": "Payne Ratner"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.108,
+        0.108,
+        0.962,
+        1.0
+      ],
+      "hint": "Read only the table headed 'ABSENT VOTE\u2014FOR GOVERNOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0919
+      ]
+    },
+    {
+      "page": 18,
+      "id": "18-0",
+      "columns": [
+        {
+          "label": "Ida A. Beloof, Soc.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Jonathan M. Davis, Ind.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "C. Floyd Hester, Prohib.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Walter A. Huxman, Dem.",
+          "contest": "governor",
+          "candidate": "Walter A. Huxman"
+        },
+        {
+          "label": "Payne Ratner, Rep.",
+          "contest": "governor",
+          "candidate": "Payne Ratner"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.027,
+        0.118,
+        0.874,
+        0.842
+      ],
+      "hint": "Read only the table headed 'ABSENT VOTE\u2014FOR GOVERNOR\u2014Concluded'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.105
+      ]
+    }
+  ]
+}

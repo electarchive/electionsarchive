@@ -1,0 +1,290 @@
+{
+  "polity": "US-KY",
+  "publisher": "Kentucky State Board of Elections",
+  "license": "Public record",
+  "raw_source": "us.scans",
+  "title": "Kentucky official returns, general election 1958-11-04",
+  "file": {
+    "url": "https://elect.ky.gov/results/1973-1979/Documents/1958.pdf"
+  },
+  "contests": {
+    "house5": {
+      "year": 1958,
+      "chamber": "house",
+      "day": "1958-11-04",
+      "special": false,
+      "state": "KY",
+      "district": 5
+    },
+    "house4": {
+      "year": 1958,
+      "chamber": "house",
+      "day": "1958-11-04",
+      "special": false,
+      "state": "KY",
+      "district": 4
+    },
+    "house8": {
+      "year": 1958,
+      "chamber": "house",
+      "day": "1958-11-04",
+      "special": false,
+      "state": "KY",
+      "district": 8
+    },
+    "house1": {
+      "year": 1958,
+      "chamber": "house",
+      "day": "1958-11-04",
+      "special": false,
+      "state": "KY",
+      "district": 1
+    },
+    "house2": {
+      "year": 1958,
+      "chamber": "house",
+      "day": "1958-11-04",
+      "special": false,
+      "state": "KY",
+      "district": 2
+    },
+    "house3": {
+      "year": 1958,
+      "chamber": "house",
+      "day": "1958-11-04",
+      "special": false,
+      "state": "KY",
+      "district": 3
+    },
+    "house6": {
+      "year": 1958,
+      "chamber": "house",
+      "day": "1958-11-04",
+      "special": false,
+      "state": "KY",
+      "district": 6
+    },
+    "house7": {
+      "year": 1958,
+      "chamber": "house",
+      "day": "1958-11-04",
+      "special": false,
+      "state": "KY",
+      "district": 7
+    }
+  },
+  "pages": [
+    {
+      "page": 1,
+      "id": "1-0",
+      "columns": [
+        {
+          "label": "BRENT SPENCE (DEM.) FORT THOMAS, KY.",
+          "contest": "house5",
+          "candidate": "Brent Spence"
+        },
+        {
+          "label": "JULIE APPEL (REP.) FLORENCE, KY.",
+          "contest": "house5",
+          "candidate": "Jule Appel"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.382,
+        0.199,
+        0.678,
+        0.584
+      ],
+      "hint": "Read only the table headed 'FIFTH DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 1,
+      "id": "1-1",
+      "columns": [
+        {
+          "label": "FRANK CHELF (DEM.) LEBANON, KY.",
+          "contest": "house4",
+          "candidate": "Frank Chelf"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.042,
+        0.2,
+        0.218,
+        0.584
+      ],
+      "hint": "Read only the table headed 'FOURTH DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 2,
+      "id": "2-0",
+      "columns": [
+        {
+          "label": "illegible, Hazard(?), KY.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "illegible, Williamsburg, KY.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.05,
+        0.294,
+        0.405,
+        0.935
+      ],
+      "hint": "Read only the table headed 'EIGHTH DISTRICT'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2871
+      ]
+    },
+    {
+      "page": 3,
+      "id": "3-0",
+      "columns": [
+        {
+          "label": "FRANK A. STUBBLEFIELD (DEM.) MURRAY, KY.",
+          "contest": "house1",
+          "candidate": "Frank A. Stubblefield"
+        },
+        {
+          "label": "JAMES G. HANDY (REP.) GREENVILLE, KY.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.087,
+        0.181,
+        0.528,
+        0.719
+      ],
+      "hint": "Read only the table headed 'FIRST DISTRICT'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.3773
+      ]
+    },
+    {
+      "page": 3,
+      "id": "3-1",
+      "columns": [
+        {
+          "label": "WILLIAM H. NATCHER (DEM.) BOWLING GREEN, KY.",
+          "contest": "house2",
+          "candidate": "William H. Natcher"
+        },
+        {
+          "label": "WAYLAND RENDER (REP.) CENTERTOWN, KY.",
+          "contest": "house2",
+          "candidate": "Wayland Render"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.512,
+        0.181,
+        0.893,
+        0.694
+      ],
+      "hint": "Read only the table headed 'SECOND DISTRICT'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.3957
+      ]
+    },
+    {
+      "page": 3,
+      "id": "3-2",
+      "columns": [
+        {
+          "label": "FRANK W. BURKE (DEM.) LOUISVILLE, KY.",
+          "contest": "house3",
+          "candidate": "Frank W. Burke"
+        },
+        {
+          "label": "JOHN M. ROBSION, JR. (REP.) LOUISVILLE, KY.",
+          "contest": "house3",
+          "candidate": "John M. Robsion, Jr."
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.042,
+        0.711,
+        0.468,
+        1.0
+      ],
+      "hint": "Read only the table headed 'THIRD DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 4,
+      "id": "4-0",
+      "columns": [
+        {
+          "label": "JOHN C. WATTS (DEM.) NICHOLASVILLE, KY.",
+          "contest": "house6",
+          "candidate": "John C. Watts"
+        },
+        {
+          "label": "WALLACE WAH WAH JONES (WRITE IN)",
+          "contest": "house6",
+          "candidate": "Wallace Wah Wah Jones"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.067,
+        0.181,
+        0.508,
+        0.731
+      ],
+      "hint": "Read only the table headed 'SIXTH DISTRICT'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.3218
+      ]
+    },
+    {
+      "page": 4,
+      "id": "4-1",
+      "columns": [
+        {
+          "label": "CARL D. PERKINS (DEM.) HINDMAN, KY.",
+          "contest": "house7",
+          "candidate": "Carl D. Perkins"
+        },
+        {
+          "label": "G. W. \"BUD\" RAYBOURN (REP.) OLIVE HILL, KY.",
+          "contest": "house7",
+          "candidate": "E. L. Raybourn"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.487,
+        0.181,
+        0.868,
+        0.731
+      ],
+      "hint": "Read only the table headed 'SEVENTH DISTRICT'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.3218
+      ]
+    }
+  ]
+}

@@ -1,0 +1,867 @@
+{
+  "polity": "US-IL",
+  "publisher": "Illinois State Board of Elections",
+  "license": "Public record",
+  "raw_source": "us.scans",
+  "title": "State of Illinois official vote cast at the general election, 1992",
+  "file": {
+    "url": "https://archive.org/download/stateofillinois1992illi/stateofillinois1992illi.pdf"
+  },
+  "contests": {
+    "president": {
+      "year": 1992,
+      "chamber": "president",
+      "day": "1992-11-03",
+      "special": false,
+      "state": "IL",
+      "district": null
+    },
+    "senate": {
+      "year": 1992,
+      "chamber": "senate",
+      "day": "1992-11-03",
+      "special": false,
+      "state": "IL",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 31,
+      "id": "31-0",
+      "columns": [
+        {
+          "label": "PLURALITY",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "DEM CLINTON GORE",
+          "contest": "president",
+          "candidate": "Bill Clinton"
+        },
+        {
+          "label": "REP BUSH QUAYLE",
+          "contest": "president",
+          "candidate": "George Bush"
+        },
+        {
+          "label": "IND PEROT STOCKDALE",
+          "contest": "president",
+          "candidate": "Ross Perot"
+        },
+        {
+          "label": "LIB MARROU LORD",
+          "contest": "president",
+          "candidate": "Andre Marrou"
+        },
+        {
+          "label": "NAL FULANI MUNOZ",
+          "contest": "president",
+          "candidate": "Lenora Fulani"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.017,
+        1.008,
+        0.983,
+        1.0
+      ],
+      "hint": "Read only the table headed 'PRESIDENT AND VICE PRESIDENT OF THE UNITED STATES'; ignore any other table visible in the image."
+    },
+    {
+      "page": 32,
+      "id": "32-0",
+      "columns": [
+        {
+          "label": "PLURALITY",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "DEM CLINTON GORE",
+          "contest": "president",
+          "candidate": "Bill Clinton"
+        },
+        {
+          "label": "REP BUSH QUAYLE",
+          "contest": "president",
+          "candidate": "George Bush"
+        },
+        {
+          "label": "IND PEROT STOCKDALE",
+          "contest": "president",
+          "candidate": "Ross Perot"
+        },
+        {
+          "label": "LIB MARROU LORD",
+          "contest": "president",
+          "candidate": "Andre Marrou"
+        },
+        {
+          "label": "NAL FULANI MUNOZ",
+          "contest": "president",
+          "candidate": "Lenora Fulani"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.047,
+        0.182,
+        1.0,
+        1.0
+      ],
+      "hint": "Read only the table headed 'PRESIDENT AND VICE PRESIDENT OF THE UNITED STATES'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0746
+      ]
+    },
+    {
+      "page": 33,
+      "id": "33-0",
+      "columns": [
+        {
+          "label": "PLURALITY",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "DEM CLINTON GORE",
+          "contest": "president",
+          "candidate": "Bill Clinton"
+        },
+        {
+          "label": "REP BUSH QUAYLE",
+          "contest": "president",
+          "candidate": "George Bush"
+        },
+        {
+          "label": "IND PEROT STOCKDALE",
+          "contest": "president",
+          "candidate": "Ross Perot"
+        },
+        {
+          "label": "LIB MARROU LORD",
+          "contest": "president",
+          "candidate": "Andre Marrou"
+        },
+        {
+          "label": "NAL FULANI MUNOZ",
+          "contest": "president",
+          "candidate": "Lenora Fulani"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.007,
+        0.163,
+        0.983,
+        1.0
+      ],
+      "hint": "Read only the table headed 'PRESIDENT AND VICE PRESIDENT OF THE UNITED STATES'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0836
+      ]
+    },
+    {
+      "page": 34,
+      "id": "34-0",
+      "columns": [
+        {
+          "label": "PLURALITY",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "DEM CLINTON GORE",
+          "contest": "president",
+          "candidate": "Bill Clinton"
+        },
+        {
+          "label": "REP BUSH QUAYLE",
+          "contest": "president",
+          "candidate": "George Bush"
+        },
+        {
+          "label": "IND PEROT STOCKDALE",
+          "contest": "president",
+          "candidate": "Ross Perot"
+        },
+        {
+          "label": "LIB MARROU LORD",
+          "contest": "president",
+          "candidate": "Andre Marrou"
+        },
+        {
+          "label": "NAL FULANI MUNOZ",
+          "contest": "president",
+          "candidate": "Lenora Fulani"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.042,
+        0.268,
+        0.993,
+        0.559
+      ],
+      "hint": "Read only the table headed 'PRESIDENT AND VICE PRESIDENT OF THE UNITED STATES'; ignore any other table visible in the image."
+    },
+    {
+      "page": 34,
+      "id": "34-1",
+      "columns": [
+        {
+          "label": "POP GRITZ MINETT",
+          "contest": "president",
+          "candidate": "James Gritz"
+        },
+        {
+          "label": "LAW HAGELIN TOMPKINS",
+          "contest": "president",
+          "candidate": "John Hagelin"
+        },
+        {
+          "label": "SWP WARREN REID",
+          "contest": "president",
+          "candidate": "James Mac Warren"
+        },
+        {
+          "label": "TSONGAS",
+          "contest": "president",
+          "candidate": "Paul Tsongas"
+        },
+        {
+          "label": "BRISBEN",
+          "contest": "president",
+          "candidate": "John Quinn Brisben"
+        },
+        {
+          "label": "LaROUCHE",
+          "contest": "president",
+          "candidate": "Lyndon H. LaRouche"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.042,
+        0.555,
+        0.993,
+        1.0
+      ],
+      "hint": "Read only the table headed 'PRESIDENT AND VICE PRESIDENT OF THE UNITED STATES'; ignore any other table visible in the image."
+    },
+    {
+      "page": 35,
+      "id": "35-0",
+      "columns": [
+        {
+          "label": "POP GRITZ MINETT",
+          "contest": "president",
+          "candidate": "James Gritz"
+        },
+        {
+          "label": "LAW HAGELIN TOMPKINS",
+          "contest": "president",
+          "candidate": "John Hagelin"
+        },
+        {
+          "label": "SWP WARREN REID",
+          "contest": "president",
+          "candidate": "James Mac Warren"
+        },
+        {
+          "label": "TSONGAS",
+          "contest": "president",
+          "candidate": "Paul Tsongas"
+        },
+        {
+          "label": "BRISBEN",
+          "contest": "president",
+          "candidate": "John Quinn Brisben"
+        },
+        {
+          "label": "LaROUCHE",
+          "contest": "president",
+          "candidate": "Lyndon H. LaRouche"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.019,
+        0.099,
+        0.983,
+        1.0
+      ],
+      "hint": "Read only the table headed 'PRESIDENT AND VICE PRESIDENT OF THE UNITED STATES'; ignore any other table visible in the image.",
+      "bands": 3,
+      "header": [
+        0.0,
+        0.1487
+      ]
+    },
+    {
+      "page": 36,
+      "id": "36-0",
+      "columns": [
+        {
+          "label": "POP GRITZ MINETT",
+          "contest": "president",
+          "candidate": "James Gritz"
+        },
+        {
+          "label": "LAW HAGELIN TOMPKINS",
+          "contest": "president",
+          "candidate": "John Hagelin"
+        },
+        {
+          "label": "SWP WARREN REID",
+          "contest": "president",
+          "candidate": "James Mac Warren"
+        },
+        {
+          "label": "TSONGAS",
+          "contest": "president",
+          "candidate": "Paul Tsongas"
+        },
+        {
+          "label": "BRISBEN",
+          "contest": "president",
+          "candidate": "John Quinn Brisben"
+        },
+        {
+          "label": "LaROUCHE",
+          "contest": "president",
+          "candidate": "Lyndon H. LaRouche"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.042,
+        0.262,
+        0.998,
+        1.0
+      ],
+      "hint": "Read only the table headed 'PRESIDENT AND VICE PRESIDENT OF THE UNITED STATES'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        -0.0407
+      ]
+    },
+    {
+      "page": 37,
+      "id": "37-0",
+      "columns": [
+        {
+          "label": "POP GRITZ MINETT",
+          "contest": "president",
+          "candidate": "James Gritz"
+        },
+        {
+          "label": "LAW HAGELIN TOMPKINS",
+          "contest": "president",
+          "candidate": "John Hagelin"
+        },
+        {
+          "label": "SWP WARREN REID",
+          "contest": "president",
+          "candidate": "James Mac Warren"
+        },
+        {
+          "label": "TSONGAS",
+          "contest": "president",
+          "candidate": "Paul Tsongas"
+        },
+        {
+          "label": "BRISBEN",
+          "contest": "president",
+          "candidate": "John Quinn Brisben"
+        },
+        {
+          "label": "LaROUCHE",
+          "contest": "president",
+          "candidate": "Lyndon H. LaRouche"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.01,
+        0.178,
+        0.983,
+        0.698
+      ],
+      "hint": "Read only the table headed 'PRESIDENT AND VICE PRESIDENT OF THE UNITED STATES'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1077
+      ]
+    },
+    {
+      "page": 37,
+      "id": "37-1",
+      "columns": [
+        {
+          "label": "TYREE",
+          "contest": "president",
+          "candidate": "Roy Wayne Tyree"
+        },
+        {
+          "label": "MOYER ANDERSON",
+          "contest": "president",
+          "candidate": "Julie Moyer"
+        },
+        {
+          "label": "MOYER",
+          "contest": "president",
+          "candidate": "Julie Moyer"
+        },
+        {
+          "label": "HERN",
+          "contest": "president",
+          "candidate": "Eugene A. Hern"
+        },
+        {
+          "label": "CARTER",
+          "contest": "president",
+          "candidate": "Willie Felix Carter"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.082,
+        0.69,
+        0.908,
+        1.0
+      ],
+      "hint": "Read only the table headed 'PRESIDENT AND VICE PRESIDENT OF THE UNITED STATES'; ignore any other table visible in the image."
+    },
+    {
+      "page": 38,
+      "id": "38-0",
+      "columns": [
+        {
+          "label": "TYREE",
+          "contest": "president",
+          "candidate": "Roy Wayne Tyree"
+        },
+        {
+          "label": "MOYER ANDERSON",
+          "contest": "president",
+          "candidate": "Julie Moyer"
+        },
+        {
+          "label": "MOYER",
+          "contest": "president",
+          "candidate": "Julie Moyer"
+        },
+        {
+          "label": "HERN",
+          "contest": "president",
+          "candidate": "Eugene A. Hern"
+        },
+        {
+          "label": "CARTER",
+          "contest": "president",
+          "candidate": "Willie Felix Carter"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.112,
+        0.168,
+        0.943,
+        1.0
+      ],
+      "hint": "Read only the table headed 'PRESIDENT AND VICE PRESIDENT OF THE UNITED STATES'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0865
+      ]
+    },
+    {
+      "page": 39,
+      "id": "39-0",
+      "columns": [
+        {
+          "label": "TYREE",
+          "contest": "president",
+          "candidate": "Roy Wayne Tyree"
+        },
+        {
+          "label": "MOYER ANDERSON",
+          "contest": "president",
+          "candidate": "Julie Moyer"
+        },
+        {
+          "label": "MOYER",
+          "contest": "president",
+          "candidate": "Julie Moyer"
+        },
+        {
+          "label": "HERN",
+          "contest": "president",
+          "candidate": "Eugene A. Hern"
+        },
+        {
+          "label": "CARTER",
+          "contest": "president",
+          "candidate": "Willie Felix Carter"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.092,
+        0.1,
+        0.923,
+        1.0
+      ],
+      "hint": "Read only the table headed 'PRESIDENT AND VICE PRESIDENT OF THE UNITED STATES'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1478
+      ]
+    },
+    {
+      "page": 40,
+      "id": "40-0",
+      "columns": [
+        {
+          "label": "TYREE",
+          "contest": "president",
+          "candidate": "Roy Wayne Tyree"
+        },
+        {
+          "label": "MOYER ANDERSON",
+          "contest": "president",
+          "candidate": "Julie Moyer"
+        },
+        {
+          "label": "MOYER",
+          "contest": "president",
+          "candidate": "Julie Moyer"
+        },
+        {
+          "label": "HERN",
+          "contest": "president",
+          "candidate": "Eugene A. Hern"
+        },
+        {
+          "label": "CARTER",
+          "contest": "president",
+          "candidate": "Willie Felix Carter"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.122,
+        0.183,
+        0.943,
+        1.0
+      ],
+      "hint": "Read only the table headed 'PRESIDENT AND VICE PRESIDENT OF THE UNITED STATES'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0636
+      ]
+    },
+    {
+      "page": 41,
+      "id": "41-0",
+      "columns": [
+        {
+          "label": "PLURALITY",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "DEM BRAUN",
+          "contest": "senate",
+          "candidate": "Carol Moseley-Braun"
+        },
+        {
+          "label": "REP WILLIAMSON",
+          "contest": "senate",
+          "candidate": "Richard S. Williamson"
+        },
+        {
+          "label": "CPI KOPPIE",
+          "contest": "senate",
+          "candidate": "Chad Koppie"
+        },
+        {
+          "label": "LIB SPIEGEL",
+          "contest": "senate",
+          "candidate": "Andrew B. Spiegel"
+        },
+        {
+          "label": "LAW WINTER",
+          "contest": "senate",
+          "candidate": "Charles A. Winter"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.022,
+        0.371,
+        0.983,
+        1.0
+      ],
+      "hint": "Read only the table headed 'UNITED STATES SENATOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0779
+      ]
+    },
+    {
+      "page": 42,
+      "id": "42-0",
+      "columns": [
+        {
+          "label": "PLURALITY",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "DEM BRAUN",
+          "contest": "senate",
+          "candidate": "Carol Moseley-Braun"
+        },
+        {
+          "label": "REP WILLIAMSON",
+          "contest": "senate",
+          "candidate": "Richard S. Williamson"
+        },
+        {
+          "label": "CPI KOPPIE",
+          "contest": "senate",
+          "candidate": "Chad Koppie"
+        },
+        {
+          "label": "LIB SPIEGEL",
+          "contest": "senate",
+          "candidate": "Andrew B. Spiegel"
+        },
+        {
+          "label": "LAW WINTER",
+          "contest": "senate",
+          "candidate": "Charles A. Winter"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.047,
+        0.178,
+        0.993,
+        1.0
+      ],
+      "hint": "Read only the table headed 'UNITED STATES SENATOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0584
+      ]
+    },
+    {
+      "page": 43,
+      "id": "43-0",
+      "columns": [
+        {
+          "label": "PLURALITY",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "DEM BRAUN",
+          "contest": "senate",
+          "candidate": "Carol Moseley-Braun"
+        },
+        {
+          "label": "REP WILLIAMSON",
+          "contest": "senate",
+          "candidate": "Richard S. Williamson"
+        },
+        {
+          "label": "CPI KOPPIE",
+          "contest": "senate",
+          "candidate": "Chad Koppie"
+        },
+        {
+          "label": "LIB SPIEGEL",
+          "contest": "senate",
+          "candidate": "Andrew B. Spiegel"
+        },
+        {
+          "label": "LAW WINTER",
+          "contest": "senate",
+          "candidate": "Charles A. Winter"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.027,
+        0.158,
+        0.983,
+        1.0
+      ],
+      "hint": "Read only the table headed 'UNITED STATES SENATOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0641
+      ]
+    },
+    {
+      "page": 44,
+      "id": "44-0",
+      "columns": [
+        {
+          "label": "PLURALITY",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "DEM BRAUN",
+          "contest": "senate",
+          "candidate": "Carol Moseley-Braun"
+        },
+        {
+          "label": "REP WILLIAMSON",
+          "contest": "senate",
+          "candidate": "Richard S. Williamson"
+        },
+        {
+          "label": "CPI KOPPIE",
+          "contest": "senate",
+          "candidate": "Chad Koppie"
+        },
+        {
+          "label": "LIB SPIEGEL",
+          "contest": "senate",
+          "candidate": "Andrew B. Spiegel"
+        },
+        {
+          "label": "LAW WINTER",
+          "contest": "senate",
+          "candidate": "Charles A. Winter"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.042,
+        0.178,
+        0.998,
+        0.286
+      ],
+      "hint": "Read only the table headed 'UNITED STATES SENATOR'; ignore any other table visible in the image."
+    },
+    {
+      "page": 44,
+      "id": "44-1",
+      "columns": [
+        {
+          "label": "NAL PORT",
+          "contest": "senate",
+          "candidate": "Alan J. Port"
+        },
+        {
+          "label": "SWP KAKU",
+          "contest": "senate",
+          "candidate": "Kathleen Kaku"
+        },
+        {
+          "label": "POP JUSTICE",
+          "contest": "senate",
+          "candidate": "John Justice"
+        },
+        {
+          "label": "TORGERSEN",
+          "contest": "senate",
+          "candidate": "Don A. Torgersen"
+        },
+        {
+          "label": "FEISS",
+          "contest": "senate",
+          "candidate": "Walter A. Feiss"
+        },
+        {
+          "label": "CONN",
+          "contest": "senate",
+          "candidate": "Roe Conn"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.042,
+        0.282,
+        0.998,
+        1.0
+      ],
+      "hint": "Read only the table headed 'UNITED STATES SENATOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0877
+      ]
+    },
+    {
+      "page": 45,
+      "id": "45-0",
+      "columns": [
+        {
+          "label": "NAL PORT",
+          "contest": "senate",
+          "candidate": "Alan J. Port"
+        },
+        {
+          "label": "SWP KAKU",
+          "contest": "senate",
+          "candidate": "Kathleen Kaku"
+        },
+        {
+          "label": "POP JUSTICE",
+          "contest": "senate",
+          "candidate": "John Justice"
+        },
+        {
+          "label": "TORGERSEN",
+          "contest": "senate",
+          "candidate": "Don A. Torgersen"
+        },
+        {
+          "label": "FEISS",
+          "contest": "senate",
+          "candidate": "Walter A. Feiss"
+        },
+        {
+          "label": "CONN",
+          "contest": "senate",
+          "candidate": "Roe Conn"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.02,
+        0.303,
+        0.988,
+        1.0
+      ],
+      "hint": "Read only the table headed 'UNITED STATES SENATOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        -0.1105
+      ]
+    }
+  ]
+}

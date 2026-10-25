@@ -1,0 +1,335 @@
+{
+  "polity": "US-KS",
+  "publisher": "Kansas Secretary of State",
+  "license": "Public record",
+  "raw_source": "us.ks_es",
+  "title": "Kansas election statistics 1934, general election",
+  "file": {
+    "url": "https://kgi.contentdm.oclc.org/digital/api/collection/p16884coll129/id/31/download"
+  },
+  "contests": {
+    "house1": {
+      "year": 1934,
+      "chamber": "house",
+      "day": "1934-11-06",
+      "special": false,
+      "state": "KS",
+      "district": 1
+    },
+    "house2": {
+      "year": 1934,
+      "chamber": "house",
+      "day": "1934-11-06",
+      "special": false,
+      "state": "KS",
+      "district": 2
+    },
+    "house3": {
+      "year": 1934,
+      "chamber": "house",
+      "day": "1934-11-06",
+      "special": false,
+      "state": "KS",
+      "district": 3
+    },
+    "house4": {
+      "year": 1934,
+      "chamber": "house",
+      "day": "1934-11-06",
+      "special": false,
+      "state": "KS",
+      "district": 4
+    },
+    "house5": {
+      "year": 1934,
+      "chamber": "house",
+      "day": "1934-11-06",
+      "special": false,
+      "state": "KS",
+      "district": 5
+    },
+    "house6": {
+      "year": 1934,
+      "chamber": "house",
+      "day": "1934-11-06",
+      "special": false,
+      "state": "KS",
+      "district": 6
+    },
+    "house7": {
+      "year": 1934,
+      "chamber": "house",
+      "day": "1934-11-06",
+      "special": false,
+      "state": "KS",
+      "district": 7
+    },
+    "governor": {
+      "year": 1934,
+      "chamber": "governor",
+      "day": "1934-11-06",
+      "special": false,
+      "state": "KS",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 2,
+      "id": "2-0",
+      "columns": [
+        {
+          "label": "W. P. Lambertson, Rep.",
+          "contest": "house1",
+          "candidate": "W. P. Lambertson"
+        },
+        {
+          "label": "John H. Arnett, Dem.",
+          "contest": "house1",
+          "candidate": "John H. Arnett"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.117,
+        0.162,
+        0.96,
+        0.521
+      ],
+      "hint": "Read only the table headed 'FIRST CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 2,
+      "id": "2-1",
+      "columns": [
+        {
+          "label": "U. S. Guyer, Rep.",
+          "contest": "house2",
+          "candidate": "U. S. Guyer"
+        },
+        {
+          "label": "Howard E. Payne, Dem.",
+          "contest": "house2",
+          "candidate": "Howard E. Payne"
+        },
+        {
+          "label": "Arthur Roberts, Soc.",
+          "contest": "house2",
+          "candidate": "Arthur Roberts"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.117,
+        0.513,
+        0.958,
+        0.848
+      ],
+      "hint": "Read only the table headed 'SECOND CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 3,
+      "id": "3-0",
+      "columns": [
+        {
+          "label": "Harold McGugin, Rep.",
+          "contest": "house3",
+          "candidate": "Harold McGugin"
+        },
+        {
+          "label": "Edward W. Patterson, Dem.",
+          "contest": "house3",
+          "candidate": "Edward W. Patterson"
+        },
+        {
+          "label": "C. S. Bendure, Soc.",
+          "contest": "house3",
+          "candidate": "C. S. Bendure"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.037,
+        0.106,
+        0.903,
+        0.435
+      ],
+      "hint": "Read only the table headed 'THIRD CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 3,
+      "id": "3-1",
+      "columns": [
+        {
+          "label": "Hal E. Harlan, Rep.",
+          "contest": "house4",
+          "candidate": "Hal E. Harlan"
+        },
+        {
+          "label": "Randolph Carpenter, Dem.",
+          "contest": "house4",
+          "candidate": "Randolph Carpenter"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.037,
+        0.427,
+        0.903,
+        0.852
+      ],
+      "hint": "Read only the table headed 'FOURTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 4,
+      "id": "4-0",
+      "columns": [
+        {
+          "label": "Ira C. Watson, Rep.",
+          "contest": "house5",
+          "candidate": "Ira C. Watson"
+        },
+        {
+          "label": "John M. Houston, Dem.",
+          "contest": "house5",
+          "candidate": "John M. Houston"
+        },
+        {
+          "label": "Barney C. McCartney, Soc.",
+          "contest": "house5",
+          "candidate": "Barney C. McCartney"
+        },
+        {
+          "label": "C. F. Whitson, (written in).",
+          "contest": "house5",
+          "candidate": "C. F. Whitson"
+        },
+        {
+          "label": "Scattering.",
+          "contest": "house5",
+          "candidate": "Scattering"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.107,
+        0.096,
+        0.963,
+        0.326
+      ],
+      "hint": "Read only the table headed 'FIFTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 4,
+      "id": "4-1",
+      "columns": [
+        {
+          "label": "Frank Carlson, Rep.",
+          "contest": "house6",
+          "candidate": "Frank Carlson"
+        },
+        {
+          "label": "Kathryn O'Loughlin McCarthy, Dem.",
+          "contest": "house6",
+          "candidate": "Kathryn O'Loughlin McCarthy"
+        },
+        {
+          "label": "Scattering.",
+          "contest": "house6",
+          "candidate": "Scattering"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.107,
+        0.318,
+        0.963,
+        0.964
+      ],
+      "hint": "Read only the table headed 'SIXTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1254
+      ]
+    },
+    {
+      "page": 5,
+      "id": "5-0",
+      "columns": [
+        {
+          "label": "Clifford R. Hope, Rep.",
+          "contest": "house7",
+          "candidate": "Clifford R. Hope"
+        },
+        {
+          "label": "L. E. Webb, Dem.",
+          "contest": "house7",
+          "candidate": "L. E. Webb"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.05,
+        0.123,
+        0.91,
+        0.885
+      ],
+      "hint": "Read only the table headed 'SEVENTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0801
+      ]
+    },
+    {
+      "page": 39,
+      "id": "39-0",
+      "columns": [
+        {
+          "label": "Alf M. Landon, Rep.",
+          "contest": "governor",
+          "candidate": "Alfred M. Landon"
+        },
+        {
+          "label": "Omar B. Ketchum, Dem.",
+          "contest": "governor",
+          "candidate": "Omar B. Ketchum"
+        },
+        {
+          "label": "Geo. M. Whiteside, Soc.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Chas. W. Thompson, Rep.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "James B. Wood, Dem.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "C. R. Ingraham, Soc.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.089,
+        0.208,
+        0.928,
+        1.0
+      ],
+      "hint": "Read only the table headed 'FOR GOVERNOR AND LIEUTENANT GOVERNOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0101
+      ]
+    }
+  ]
+}

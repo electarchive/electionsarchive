@@ -1,0 +1,12 @@
+{
+  "polity": "US-KY",
+  "publisher": "Kentucky State Board of Elections",
+  "license": "Public record",
+  "raw_source": "us.scans",
+  "title": "Kentucky official returns, general election 1962-11-06",
+  "file": {
+    "url": "https://elect.ky.gov/results/1973-1979/Documents/1962.pdf"
+  },
+  "contests": {},
+  "pages": []
+}

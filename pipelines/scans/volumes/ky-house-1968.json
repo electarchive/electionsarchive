@@ -1,0 +1,23 @@
+{
+ "polity": "US-KY",
+ "publisher": "Kentucky State Board of Elections",
+ "license": "Public record",
+ "raw_source": "us.scans",
+ "year": 1968,
+ "day": "1968-11-05",
+ "title": "Kentucky official returns, general election 1968-11-05",
+ "file": {
+  "url": "https://elect.ky.gov/results/1973-1979/Documents/1968.pdf"
+ },
+ "offices": {
+  "house": "U.S. Representative, one table per district, county rows (candidate names may be printed vertically)"
+ },
+ "leaves": [
+  1,
+  2,
+  3,
+  4,
+  5
+ ],
+ "autorotate": true
+}

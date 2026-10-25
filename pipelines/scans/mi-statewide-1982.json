@@ -1,0 +1,277 @@
+{
+  "polity": "US-MI",
+  "publisher": "Michigan Secretary of State",
+  "license": "Public record",
+  "raw_source": "us.sri",
+  "title": "State of Michigan General Election, 1982: Official Canvass",
+  "file": {
+    "url": "https://archive.org/download/micro_IA40706913_0052/micro_IA40706913_0052.pdf",
+    "item": "https://archive.org/details/micro_IA40706913_0052"
+  },
+  "contests": {
+    "governor": {
+      "year": 1982,
+      "chamber": "governor",
+      "day": "1982-11-02",
+      "special": false,
+      "state": "MI",
+      "district": null
+    },
+    "senate": {
+      "year": 1982,
+      "chamber": "senate",
+      "day": "1982-11-02",
+      "special": false,
+      "state": "MI",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 3,
+      "id": "3-0",
+      "columns": [
+        {
+          "label": "JAMES J BLANCHARD DEM",
+          "contest": "governor",
+          "candidate": "James J. Blanchard"
+        },
+        {
+          "label": "RICHARD H HEADLEE REP",
+          "contest": "governor",
+          "candidate": "Richard H. Headlee"
+        },
+        {
+          "label": "JAMES O PHILLIPS AIP",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "DICK M JACOBS LIB",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "TIM CRAINE SOC W",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "MARTIN P MC LAUGHLIN WOR L",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "RUBERT E TISCH TIC",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "SCATTERING",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "TOTAL BY COUNTY",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.022,
+        0.078,
+        0.958,
+        1.0
+      ],
+      "hint": "Read only the table headed 'GOVERNOR'; ignore any other table visible in the image.",
+      "bands": 3,
+      "header": [
+        0.0,
+        0.0803
+      ]
+    },
+    {
+      "page": 4,
+      "id": "4-0",
+      "columns": [
+        {
+          "label": "JAMES J BLANCHARD DEM",
+          "contest": "governor",
+          "candidate": "James J. Blanchard"
+        },
+        {
+          "label": "RICHARD H HEADLEE REP",
+          "contest": "governor",
+          "candidate": "Richard H. Headlee"
+        },
+        {
+          "label": "JAMES O PHILLIPS AIP",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "DICK H JACOBS LIB",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "TIM CRAINE SOC W",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "MARTIN P MC LAUGHLIN WOR L",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "ROBERT E TISCH TIC",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "SCATTERING",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "TOTAL BY COUNTY",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.022,
+        0.088,
+        0.963,
+        0.822
+      ],
+      "hint": "Read only the table headed 'GOVERNOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0954
+      ]
+    },
+    {
+      "page": 9,
+      "id": "9-0",
+      "columns": [
+        {
+          "label": "DONALD W RIEGLE JR DEM",
+          "contest": "senate",
+          "candidate": "Donald W. Riegle Jr."
+        },
+        {
+          "label": "PHILIP E RUPPE REP",
+          "contest": "senate",
+          "candidate": "Philip E. Ruppe"
+        },
+        {
+          "label": "DANIEL ELLER AIP",
+          "contest": "senate",
+          "candidate": "Daniel Eller"
+        },
+        {
+          "label": "BETTE ERWIN LIB",
+          "contest": "senate",
+          "candidate": "Bette Erwin"
+        },
+        {
+          "label": "STEVE BEUMER SOC W",
+          "contest": "senate",
+          "candidate": "Steve Beumer"
+        },
+        {
+          "label": "HELEN HALYARD WOR L",
+          "contest": "senate",
+          "candidate": "Helen Halyard"
+        },
+        {
+          "label": "SCATTERING",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "TOTAL BY COUNTY",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.042,
+        0.116,
+        0.958,
+        1.0
+      ],
+      "hint": "Read only the table headed 'U S SENATE'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1086
+      ]
+    },
+    {
+      "page": 10,
+      "id": "10-0",
+      "columns": [
+        {
+          "label": "DONALD W RIEGLE JR DEM",
+          "contest": "senate",
+          "candidate": "Donald W. Riegle Jr."
+        },
+        {
+          "label": "PHILIP E RUPPE REP",
+          "contest": "senate",
+          "candidate": "Philip E. Ruppe"
+        },
+        {
+          "label": "DANIEL ELLER AIP",
+          "contest": "senate",
+          "candidate": "Daniel Eller"
+        },
+        {
+          "label": "BETTE ERWIN LIB",
+          "contest": "senate",
+          "candidate": "Bette Erwin"
+        },
+        {
+          "label": "STEVE BEUMER SOG W",
+          "contest": "senate",
+          "candidate": "Steve Beumer"
+        },
+        {
+          "label": "HELEN HALYARD WOR L",
+          "contest": "senate",
+          "candidate": "Helen Halyard"
+        },
+        {
+          "label": "SCATTERING",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "TOTAL BY COUNTY",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.027,
+        0.093,
+        0.958,
+        0.825
+      ],
+      "hint": "Read only the table headed 'U S SENATE'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1626
+      ]
+    }
+  ]
+}

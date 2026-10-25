@@ -1,0 +1,408 @@
+{
+  "polity": "US-MI",
+  "publisher": "Michigan Secretary of State",
+  "license": "Public record",
+  "raw_source": "us.sri",
+  "title": "State of Michigan General Election, 1984: Official Canvass",
+  "file": {
+    "url": "https://archive.org/download/micro_IA40706919_0158/micro_IA40706919_0158.pdf",
+    "item": "https://archive.org/details/micro_IA40706919_0158"
+  },
+  "contests": {
+    "president": {
+      "year": 1984,
+      "chamber": "president",
+      "day": "1984-11-06",
+      "special": false,
+      "state": "MI",
+      "district": null
+    },
+    "senate": {
+      "year": 1984,
+      "chamber": "senate",
+      "day": "1984-11-06",
+      "special": false,
+      "state": "MI",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 2,
+      "id": "2-0",
+      "columns": [
+        {
+          "label": "MONDALE FERRARO DEM",
+          "contest": "president",
+          "candidate": "Walter Mondale"
+        },
+        {
+          "label": "REAGAN BUSH REP",
+          "contest": "president",
+          "candidate": "Ronald Reagan"
+        },
+        {
+          "label": "BERGLAND LEWIS LIB",
+          "contest": "president",
+          "candidate": "David Bergland"
+        },
+        {
+          "label": "HOLMES LA RIVA WOR W",
+          "contest": "president",
+          "candidate": "Larry Holmes"
+        },
+        {
+          "label": "MASON ZIMMERMAN SOC W",
+          "contest": "president",
+          "candidate": "Mel Mason"
+        },
+        {
+          "label": "WINN HALYARD WOR L",
+          "contest": "president",
+          "candidate": "Ed Winn"
+        },
+        {
+          "label": "HALL DAVIS COM",
+          "contest": "president",
+          "candidate": "Gus Hall"
+        },
+        {
+          "label": "LA ROUCHE DAVIS IND",
+          "contest": "president",
+          "candidate": "Lyndon H. LaRouche Jr."
+        },
+        {
+          "label": "JOHNSON WALTON IND",
+          "contest": "president",
+          "candidate": "Sonia Johnson"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.062,
+        0.111,
+        0.913,
+        1.0
+      ],
+      "hint": "Read only the table headed 'PRESIDENT AND VICE PRESIDENT'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0776
+      ]
+    },
+    {
+      "page": 3,
+      "id": "3-0",
+      "columns": [
+        {
+          "label": "SERRETTE ROSS IND",
+          "contest": "president",
+          "candidate": "Dennis L. Serrette"
+        },
+        {
+          "label": "SCATTERING",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "TOTAL BY COUNTY",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.062,
+        0.145,
+        0.913,
+        1.0
+      ],
+      "hint": "Read only the table headed 'PRESIDENT AND VICE PRESIDENT'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0351
+      ]
+    },
+    {
+      "page": 4,
+      "id": "4-0",
+      "columns": [
+        {
+          "label": "MONDALE FERRARO DEM",
+          "contest": "president",
+          "candidate": "Walter Mondale"
+        },
+        {
+          "label": "REAGAN BUSH REP",
+          "contest": "president",
+          "candidate": "Ronald Reagan"
+        },
+        {
+          "label": "BERGLAND LEWIS LIB",
+          "contest": "president",
+          "candidate": "David Bergland"
+        },
+        {
+          "label": "HOLMES LA RIVA WOR W",
+          "contest": "president",
+          "candidate": "Larry Holmes"
+        },
+        {
+          "label": "MASON ZIMMERMAN SOC W",
+          "contest": "president",
+          "candidate": "Mel Mason"
+        },
+        {
+          "label": "WINN HALYARD WOR L",
+          "contest": "president",
+          "candidate": "Ed Winn"
+        },
+        {
+          "label": "HALL DAVIS COM",
+          "contest": "president",
+          "candidate": "Gus Hall"
+        },
+        {
+          "label": "LA ROUCHE DAVIS IND",
+          "contest": "president",
+          "candidate": "Lyndon H. LaRouche Jr."
+        },
+        {
+          "label": "JOHNSON WALTON IND",
+          "contest": "president",
+          "candidate": "Sonia Johnson"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.065,
+        0.163,
+        0.916,
+        0.615
+      ],
+      "hint": "Read only the table headed 'PRESIDENT AND VICE PRESIDENT'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0088
+      ]
+    },
+    {
+      "page": 5,
+      "id": "5-0",
+      "columns": [
+        {
+          "label": "SERRETTE ROSS IND",
+          "contest": "president",
+          "candidate": "Dennis L. Serrette"
+        },
+        {
+          "label": "SCATTERING",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "TOTAL BY COUNTY",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.06,
+        0.099,
+        0.92,
+        0.609
+      ],
+      "hint": "Read only the table headed 'PRESIDENT AND VICE PRESIDENT'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1294
+      ]
+    },
+    {
+      "page": 6,
+      "id": "6-0",
+      "columns": [
+        {
+          "label": "CARL LEVIN DEM",
+          "contest": "senate",
+          "candidate": "Carl Levin"
+        },
+        {
+          "label": "JACK LOUSMA REP",
+          "contest": "senate",
+          "candidate": "Jack Lousma"
+        },
+        {
+          "label": "ARTHUR TISCH TIS",
+          "contest": "senate",
+          "candidate": "Arthur Tisch"
+        },
+        {
+          "label": "LYNN JOHNSTON LIB",
+          "contest": "senate",
+          "candidate": "Lynn Johnston"
+        },
+        {
+          "label": "WILLIAM ROUNDTREE WOR W",
+          "contest": "senate",
+          "candidate": "William Roundtree"
+        },
+        {
+          "label": "HELEN MEYERS SOC W",
+          "contest": "senate",
+          "candidate": "Helen Meyers"
+        },
+        {
+          "label": "FRED MAZELIS WOR L",
+          "contest": "senate",
+          "candidate": "Fred Mazelis"
+        },
+        {
+          "label": "SAMUEL WEBB COM",
+          "contest": "senate",
+          "candidate": "Samuel Webb"
+        },
+        {
+          "label": "MAX DEAN IND",
+          "contest": "senate",
+          "candidate": "Max Dean"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.064,
+        0.119,
+        0.92,
+        1.0
+      ],
+      "hint": "Read only the table headed 'U S SENATOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0738
+      ]
+    },
+    {
+      "page": 7,
+      "id": "7-0",
+      "columns": [
+        {
+          "label": "SCATTERING",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "TOTAL BY COUNTY",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.057,
+        0.119,
+        0.904,
+        1.0
+      ],
+      "hint": "Read only the table headed 'U S SENATOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0772
+      ]
+    },
+    {
+      "page": 8,
+      "id": "8-0",
+      "columns": [
+        {
+          "label": "CARL LEVIN DEM",
+          "contest": "senate",
+          "candidate": "Carl Levin"
+        },
+        {
+          "label": "JACK LOUSMA REP",
+          "contest": "senate",
+          "candidate": "Jack Lousma"
+        },
+        {
+          "label": "ARTHUR TISCH TIS",
+          "contest": "senate",
+          "candidate": "Arthur Tisch"
+        },
+        {
+          "label": "LYNN JOHNSTON LIB",
+          "contest": "senate",
+          "candidate": "Lynn Johnston"
+        },
+        {
+          "label": "WILLIAM ROUNDTREE WOR W",
+          "contest": "senate",
+          "candidate": "William Roundtree"
+        },
+        {
+          "label": "HELEN MEYERS SOC W",
+          "contest": "senate",
+          "candidate": "Helen Meyers"
+        },
+        {
+          "label": "FRED MAZELIS WOR L",
+          "contest": "senate",
+          "candidate": "Fred Mazelis"
+        },
+        {
+          "label": "SAMUEL WEBB COM",
+          "contest": "senate",
+          "candidate": "Samuel Webb"
+        },
+        {
+          "label": "MAX DEAN IND",
+          "contest": "senate",
+          "candidate": "Max Dean"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.062,
+        0.196,
+        0.908,
+        0.799
+      ],
+      "hint": "Read only the table headed 'U S SENATOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.073
+      ]
+    },
+    {
+      "page": 9,
+      "id": "9-0",
+      "columns": [
+        {
+          "label": "SCATTERING",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "TOTAL BY COUNTY",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.062,
+        0.187,
+        0.913,
+        0.637
+      ],
+      "hint": "Read only the table headed 'U S SENATOR'; ignore any other table visible in the image."
+    }
+  ]
+}

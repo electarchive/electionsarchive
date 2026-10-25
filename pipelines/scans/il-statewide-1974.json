@@ -1,0 +1,188 @@
+{
+  "polity": "US-IL",
+  "publisher": "Illinois State Board of Elections",
+  "license": "Public record",
+  "raw_source": "us.scans",
+  "title": "State of Illinois official vote cast at the general election, 1974",
+  "file": {
+    "url": "https://archive.org/download/officialvote1974illi/officialvote1974illi.pdf"
+  },
+  "contests": {
+    "senate": {
+      "year": 1974,
+      "chamber": "senate",
+      "day": "1974-11-05",
+      "special": false,
+      "state": "IL",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 12,
+      "id": "12-0",
+      "columns": [
+        {
+          "label": "Plurality",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Democratic Adlai E. Stevenson",
+          "contest": "senate",
+          "candidate": "Adlai E. Stevenson III"
+        },
+        {
+          "label": "Republican George M. Burditt",
+          "contest": "senate",
+          "candidate": "George M. Burditt"
+        },
+        {
+          "label": "Socialist Workers Party Edward Thomas Heisler",
+          "contest": "senate",
+          "candidate": "Edward Thomas Heisler"
+        },
+        {
+          "label": "Communist Party Ishmael Flory",
+          "contest": "senate",
+          "candidate": "Ishmael Flory"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.057,
+        0.091,
+        0.798,
+        1.0
+      ],
+      "hint": "Read only the table headed 'VOTE FOR UNITED STATES SENATOR\u2014 NOVEMBER 5, 1974'; ignore any other table visible in the image.",
+      "bands": 3,
+      "header": [
+        0.0,
+        0.1177
+      ]
+    },
+    {
+      "page": 13,
+      "id": "13-0",
+      "columns": [
+        {
+          "label": "Plurality",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Democratic Adlai E. Stevenson",
+          "contest": "senate",
+          "candidate": "Adlai E. Stevenson III"
+        },
+        {
+          "label": "Republican George M. Burditt",
+          "contest": "senate",
+          "candidate": "George M. Burditt"
+        },
+        {
+          "label": "Socialist Workers Party Edward Thomas Heisler",
+          "contest": "senate",
+          "candidate": "Edward Thomas Heisler"
+        },
+        {
+          "label": "Communist Party Ishmael Flory",
+          "contest": "senate",
+          "candidate": "Ishmael Flory"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.037,
+        0.122,
+        0.81,
+        1.0
+      ],
+      "hint": "Read only the table headed 'VOTE FOR UNITED STATES SENATOR\u2014NOVEMBER 5, 1974\u2014Concluded'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1845
+      ]
+    },
+    {
+      "page": 14,
+      "id": "14-0",
+      "columns": [
+        {
+          "label": "Democratic Adlai E. Stevenson",
+          "contest": "senate",
+          "candidate": "Adlai E. Stevenson III"
+        },
+        {
+          "label": "Republican George M. Burditt",
+          "contest": "senate",
+          "candidate": "George M. Burditt"
+        },
+        {
+          "label": "Socialist Workers Party Edward Thomas Heisler",
+          "contest": "senate",
+          "candidate": "Edward Thomas Heisler"
+        },
+        {
+          "label": "Communist Party Ishmael Flory",
+          "contest": "senate",
+          "candidate": "Ishmael Flory"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.06,
+        0.134,
+        0.793,
+        0.964
+      ],
+      "hint": "Read only the table headed 'VOTE FOR UNITED STATES SENATOR\u2014COOK COUNTY\u2014 NOVEMBER 5, 1974 (Information furnished by Clerk of Cook County)'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1145
+      ]
+    },
+    {
+      "page": 15,
+      "id": "15-0",
+      "columns": [
+        {
+          "label": "Democratic Adlai E. Stevenson",
+          "contest": "senate",
+          "candidate": "Adlai E. Stevenson III"
+        },
+        {
+          "label": "Republican George M. Burditt",
+          "contest": "senate",
+          "candidate": "George M. Burditt"
+        },
+        {
+          "label": "Socialist Workers Party Edward Thomas Heisler",
+          "contest": "senate",
+          "candidate": "Edward Thomas Heisler"
+        },
+        {
+          "label": "Communist Party Ishmael Flory",
+          "contest": "senate",
+          "candidate": "Ishmael Flory"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.039,
+        0.127,
+        0.774,
+        0.837
+      ],
+      "hint": "Read only the table headed 'VOTE FOR UNITED STATES SENATOR\u2014COOK COUNTY\u2014NOVEMBER 5, 1974\u2014Concluded'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.269
+      ]
+    }
+  ]
+}

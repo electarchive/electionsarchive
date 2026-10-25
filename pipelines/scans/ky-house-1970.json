@@ -1,0 +1,313 @@
+{
+  "polity": "US-KY",
+  "publisher": "Kentucky State Board of Elections",
+  "license": "Public record",
+  "raw_source": "us.scans",
+  "title": "Kentucky official returns, general election 1970-11-03",
+  "file": {
+    "url": "https://elect.ky.gov/results/1973-1979/Documents/1970.pdf"
+  },
+  "contests": {
+    "house1": {
+      "year": 1970,
+      "chamber": "house",
+      "day": "1970-11-03",
+      "special": false,
+      "state": "KY",
+      "district": 1
+    },
+    "house2": {
+      "year": 1970,
+      "chamber": "house",
+      "day": "1970-11-03",
+      "special": false,
+      "state": "KY",
+      "district": 2
+    },
+    "house3": {
+      "year": 1970,
+      "chamber": "house",
+      "day": "1970-11-03",
+      "special": false,
+      "state": "KY",
+      "district": 3
+    },
+    "house4": {
+      "year": 1970,
+      "chamber": "house",
+      "day": "1970-11-03",
+      "special": false,
+      "state": "KY",
+      "district": 4
+    },
+    "house5": {
+      "year": 1970,
+      "chamber": "house",
+      "day": "1970-11-03",
+      "special": false,
+      "state": "KY",
+      "district": 5
+    },
+    "house6": {
+      "year": 1970,
+      "chamber": "house",
+      "day": "1970-11-03",
+      "special": false,
+      "state": "KY",
+      "district": 6
+    },
+    "house7": {
+      "year": 1970,
+      "chamber": "house",
+      "day": "1970-11-03",
+      "special": false,
+      "state": "KY",
+      "district": 7
+    }
+  },
+  "pages": [
+    {
+      "page": 1,
+      "id": "1-0",
+      "columns": [
+        {
+          "label": "Frank A. Stubblefield Murray, Ky. (D)",
+          "contest": "house1",
+          "candidate": "Frank A. Stubblefield"
+        },
+        {
+          "label": "Bobby Jo Sims (Write-in)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Bob Walkins (Write-in)",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.017,
+        0.014,
+        1.0,
+        0.989
+      ],
+      "hint": "Read only the table headed 'U. S. Representative In Congress, November 3, 1970, District 1st'; ignore any other table visible in the image.",
+      "bands": 3,
+      "header": [
+        0.0,
+        0.2092
+      ]
+    },
+    {
+      "page": 2,
+      "id": "2-0",
+      "columns": [
+        {
+          "label": "William H. Natcher Bowling Green, (D)",
+          "contest": "house2",
+          "candidate": "William H. Natcher"
+        },
+        {
+          "label": "T. C. Simmons (Write-in)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Sidney Griffin (Write-in)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Theron Kessinger (Write-in)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Robert Simmons (Write-in)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Dickie Loyd (Write-in)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Jesse Johnson (Write-in)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Jim Buck Hayes (Write-in)",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.016,
+        0.013,
+        1.0,
+        0.989
+      ],
+      "hint": "Read only the table headed 'U. S. Representative in Congress District 2nd'; ignore any other table visible in the image.",
+      "bands": 3,
+      "header": [
+        0.0,
+        0.208
+      ]
+    },
+    {
+      "page": 3,
+      "id": "3-0",
+      "columns": [
+        {
+          "label": "William O. COWGER Louisville, Ky. (Republican)",
+          "contest": "house3",
+          "candidate": "William O. Cowger"
+        },
+        {
+          "label": "Romano L. MAZZOLI Louisville, Ky. (Democrat)",
+          "contest": "house3",
+          "candidate": "Romano L. Mazzoli"
+        },
+        {
+          "label": "Ronald W. WATSON Louisville, Ky. (American Party)",
+          "contest": "house3",
+          "candidate": "Ronald W. Watson"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.0,
+        0.011,
+        0.998,
+        0.994
+      ],
+      "hint": "Read only the table headed 'OFFICE U. S. Representative in Congress DISTRICT Third'; ignore any other table visible in the image.",
+      "bands": 3,
+      "header": [
+        0.0,
+        0.1821
+      ]
+    },
+    {
+      "page": 4,
+      "id": "4-0",
+      "columns": [
+        {
+          "label": "M. Gene Snyder Jeffersontown (R)",
+          "contest": "house4",
+          "candidate": "Gene Snyder"
+        },
+        {
+          "label": "Charles W. Webster Carrollton (D)",
+          "contest": "house4",
+          "candidate": "Charles Webster"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.014,
+        0.016,
+        0.998,
+        0.994
+      ],
+      "hint": "Read only the table headed 'U. S. Representative in Congress, District 4th, Nov. 3, 1970'; ignore any other table visible in the image.",
+      "bands": 3,
+      "header": [
+        0.0,
+        0.2065
+      ]
+    },
+    {
+      "page": 5,
+      "id": "5-0",
+      "columns": [
+        {
+          "label": "Tim Lee Carter Tompkinsville (R)",
+          "contest": "house5",
+          "candidate": "Tim Lee Carter"
+        },
+        {
+          "label": "Lyle Leonard Willis Corbin, Ky. (D)",
+          "contest": "house5",
+          "candidate": "Lyle L. Willis"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.017,
+        0.011,
+        0.998,
+        0.989
+      ],
+      "hint": "Read only the table headed 'U. S. Representative in Congress, District 5th'; ignore any other table visible in the image.",
+      "bands": 3,
+      "header": [
+        0.0,
+        0.2086
+      ]
+    },
+    {
+      "page": 6,
+      "id": "6-0",
+      "columns": [
+        {
+          "label": "Gerald G. Gregory Lexington, Ky. (R)",
+          "contest": "house6",
+          "candidate": "Gerald G. Gregory"
+        },
+        {
+          "label": "John C. Watts Nicholasville (D)",
+          "contest": "house6",
+          "candidate": "John C. Watts"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.014,
+        0.014,
+        1.0,
+        0.994
+      ],
+      "hint": "Read only the table headed 'U. S Representative in Congress, District 6th'; ignore any other table visible in the image.",
+      "bands": 3,
+      "header": [
+        0.0,
+        0.2082
+      ]
+    },
+    {
+      "page": 7,
+      "id": "7-0",
+      "columns": [
+        {
+          "label": "Herbert E. Myers Louisa, Ky. (R)",
+          "contest": "house7",
+          "candidate": "Herbert E. Myers"
+        },
+        {
+          "label": "Carl D. Perkins Hindman, Ky. (D)",
+          "contest": "house7",
+          "candidate": "Carl D. Perkins"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.014,
+        0.016,
+        1.0,
+        0.994
+      ],
+      "hint": "Read only the table headed 'U. S. Representative in Congress, 7th District'; ignore any other table visible in the image.",
+      "bands": 3,
+      "header": [
+        0.0,
+        0.2065
+      ]
+    }
+  ]
+}

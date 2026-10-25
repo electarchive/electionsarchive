@@ -1,0 +1,133 @@
+{
+  "polity": "US-IA",
+  "publisher": "Iowa Secretary of State",
+  "license": "Public record",
+  "raw_source": "us.ia_sos",
+  "title": "Iowa official canvass summary, general election 1986",
+  "file": {
+    "url": "https://sos.iowa.gov/elections/pdf/results/80s/1986gencanv.pdf",
+    "item": "https://sos.iowa.gov/elections/results/"
+  },
+  "contests": {
+    "senate": {
+      "year": 1986,
+      "chamber": "senate",
+      "day": "1986-11-04",
+      "special": false,
+      "state": "IA",
+      "district": null
+    },
+    "governor": {
+      "year": 1986,
+      "chamber": "governor",
+      "day": "1986-11-04",
+      "special": false,
+      "state": "IA",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 2,
+      "id": "2-0",
+      "columns": [
+        {
+          "label": "REPUBLICAN CHARLES E. GRASSLEY",
+          "contest": "senate",
+          "candidate": "Charles E. Grassley"
+        },
+        {
+          "label": "DEMOCRATIC JOHN P. ROEHRICK",
+          "contest": "senate",
+          "candidate": "John P. Roehrick"
+        },
+        {
+          "label": "NOMINATED BY PETITION JOHN MASTERS",
+          "contest": "senate",
+          "candidate": "John Masters"
+        },
+        { "label": "SC.", "contest": null, "candidate": "" },
+        { "label": "TOTALS", "contest": null, "candidate": "" }
+      ],
+      "orientation": "counties_down",
+      "crop": [0.12, 0.058, 0.794, 1.0],
+      "hint": "Read only the table headed 'UNITED STATES SENATOR'; ignore any other table visible in the image.",
+      "bands": 3,
+      "header": [0.0, 0.1497]
+    },
+    {
+      "page": 3,
+      "id": "3-0",
+      "columns": [
+        {
+          "label": "REPUBLICAN CHARLES E. GRASSLEY",
+          "contest": "senate",
+          "candidate": "Charles E. Grassley"
+        },
+        {
+          "label": "DEMOCRATIC JOHN P. ROEHRICK",
+          "contest": "senate",
+          "candidate": "John P. Roehrick"
+        },
+        {
+          "label": "NOMINATED BY PETITION JOHN MASTERS",
+          "contest": "senate",
+          "candidate": "John Masters"
+        },
+        { "label": "SC.", "contest": null, "candidate": "" },
+        { "label": "TOTALS", "contest": null, "candidate": "" }
+      ],
+      "orientation": "counties_down",
+      "crop": [0.119, 0.045, 0.82, 0.966],
+      "hint": "Read only the table headed 'UNITED STATES SENATOR'; ignore any other table visible in the image.",
+      "bands": 3,
+      "header": [0.0, 0.1412]
+    },
+    {
+      "page": 8,
+      "id": "8-0",
+      "columns": [
+        {
+          "label": "REPUBLICAN TERRY E. BRANSTAD",
+          "contest": "governor",
+          "candidate": "Terry E. Branstad"
+        },
+        {
+          "label": "DEMOCRATIC LOWELL L. JUNKINS",
+          "contest": "governor",
+          "candidate": "Lowell L. Junkins"
+        },
+        { "label": "SC", "contest": null, "candidate": "" },
+        { "label": "TOTALS", "contest": null, "candidate": "" }
+      ],
+      "orientation": "counties_down",
+      "crop": [0.117, 0.029, 0.665, 1.0],
+      "hint": "Read only the table headed 'GOVERNOR'; ignore any other table visible in the image.",
+      "bands": 3,
+      "header": [0.0, 0.1267]
+    },
+    {
+      "page": 9,
+      "id": "9-0",
+      "columns": [
+        {
+          "label": "REPUBLICAN TERRY E. BRANSTAD",
+          "contest": "governor",
+          "candidate": "Terry E. Branstad"
+        },
+        {
+          "label": "DEMOCRATIC LOWELL L. JUNKINS",
+          "contest": "governor",
+          "candidate": "Lowell L. Junkins"
+        },
+        { "label": "SC", "contest": null, "candidate": "" },
+        { "label": "TOTALS", "contest": null, "candidate": "" }
+      ],
+      "orientation": "counties_down",
+      "crop": [0.121, 0.039, 0.659, 0.957],
+      "hint": "Read only the table headed 'GOVERNOR'; ignore any other table visible in the image.",
+      "bands": 3,
+      "header": [0.0, 0.1351]
+    }
+  ]
+}

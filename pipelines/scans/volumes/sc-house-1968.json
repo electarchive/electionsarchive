@@ -1,0 +1,17 @@
+{
+  "polity": "US-SC",
+  "publisher": "South Carolina State Election Commission",
+  "license": "Public record",
+  "raw_source": "us.scans",
+  "year": 1968,
+  "day": "1968-11-05",
+  "title": "Report of the State Election Commission, votes cast in the general election held 1968-11-05",
+  "file": {
+    "url": "https://scvotes.gov/wp-content/uploads/2022/08/Election_Report_1968.pdf"
+  },
+  "offices": {
+    "house": "Representative in Congress, one table per district, county rows"
+  },
+  "leaves": [12],
+  "autorotate": true
+}

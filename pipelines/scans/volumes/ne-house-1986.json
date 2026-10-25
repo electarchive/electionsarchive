@@ -1,0 +1,17 @@
+{
+ "polity": "US-NE",
+ "publisher": "Nebraska Board of State Canvassers",
+ "license": "Public record",
+ "raw_source": "us.ne_usrep",
+ "year": 1986,
+ "day": "1986-11-04",
+ "title": "Nebraska Board of State Canvassers, primary and general election 1986, U.S. Representative District 3",
+ "file": {
+  "url": "https://govdocs.nebraska.gov/epubs/S1200/S001-1986prim_gen.pdf"
+ },
+ "offices": {
+  "house": "Representative in Congress, Third District, county rows with District total; printed totals 59,182 / 136,965 / 17 are uncertain"
+ },
+ "leaves": [32],
+ "autorotate": true
+}

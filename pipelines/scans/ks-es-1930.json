@@ -1,0 +1,427 @@
+{
+  "polity": "US-KS",
+  "publisher": "Kansas Secretary of State",
+  "license": "Public record",
+  "raw_source": "us.ks_es",
+  "title": "Kansas election statistics 1930, general election",
+  "file": {
+    "url": "https://kgi.contentdm.oclc.org/digital/api/collection/p16884coll129/id/27/download"
+  },
+  "contests": {
+    "senate": {
+      "year": 1930,
+      "chamber": "senate",
+      "day": "1930-11-04",
+      "special": false,
+      "state": "KS",
+      "district": null
+    },
+    "house1": {
+      "year": 1930,
+      "chamber": "house",
+      "day": "1930-11-04",
+      "special": false,
+      "state": "KS",
+      "district": 1
+    },
+    "house2": {
+      "year": 1930,
+      "chamber": "house",
+      "day": "1930-11-04",
+      "special": false,
+      "state": "KS",
+      "district": 2
+    },
+    "house3": {
+      "year": 1930,
+      "chamber": "house",
+      "day": "1930-11-04",
+      "special": false,
+      "state": "KS",
+      "district": 3
+    },
+    "house4": {
+      "year": 1930,
+      "chamber": "house",
+      "day": "1930-11-04",
+      "special": false,
+      "state": "KS",
+      "district": 4
+    },
+    "house5": {
+      "year": 1930,
+      "chamber": "house",
+      "day": "1930-11-04",
+      "special": false,
+      "state": "KS",
+      "district": 5
+    },
+    "house6": {
+      "year": 1930,
+      "chamber": "house",
+      "day": "1930-11-04",
+      "special": false,
+      "state": "KS",
+      "district": 6
+    },
+    "house7": {
+      "year": 1930,
+      "chamber": "house",
+      "day": "1930-11-04",
+      "special": false,
+      "state": "KS",
+      "district": 7
+    }
+  },
+  "pages": [
+    {
+      "page": 2,
+      "id": "2-0",
+      "columns": [
+        {
+          "label": "Henry J. Allen, Rep.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "George McGill, Dem.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "H. M. Perkins, Soc.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Arthur Capper, Rep.",
+          "contest": "senate",
+          "candidate": "Arthur Capper"
+        },
+        {
+          "label": "Jonathan M. Davis, Dem.",
+          "contest": "senate",
+          "candidate": "Jonathan M. Davis"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.114,
+        0.174,
+        0.936,
+        1.0
+      ],
+      "hint": "Read only the table headed 'FOR UNITED STATES SENATOR.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1283
+      ]
+    },
+    {
+      "page": 3,
+      "id": "3-0",
+      "columns": [
+        {
+          "label": "Henry J. Allen, Rep.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "George McGill, Dem.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "H. M. Perkins, Soc.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Arthur Capper, Rep.",
+          "contest": "senate",
+          "candidate": "Arthur Capper"
+        },
+        {
+          "label": "Jonathan M. Davis, Dem",
+          "contest": "senate",
+          "candidate": "Jonathan M. Davis"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.124,
+        0.122,
+        0.933,
+        0.91
+      ],
+      "hint": "Read only the table headed 'FOR UNITED STATES SENATOR\u2014CONCLUDED.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1028
+      ]
+    },
+    {
+      "page": 4,
+      "id": "4-0",
+      "columns": [
+        {
+          "label": "Henry J. Allen, Rep.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "George McGill, Dem.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "H. M. Perkins, Soc.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Arthur Capper, Rep.",
+          "contest": "senate",
+          "candidate": "Arthur Capper"
+        },
+        {
+          "label": "Jonathan M. Davis, Dem.",
+          "contest": "senate",
+          "candidate": "Jonathan M. Davis"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.106,
+        0.116,
+        0.926,
+        1.0
+      ],
+      "hint": "Read only the table headed 'ABSENT VOTE\u2014FOR UNITED STATES SENATOR.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1233
+      ]
+    },
+    {
+      "page": 5,
+      "id": "5-0",
+      "columns": [
+        {
+          "label": "Henry J. Allen, Rep.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "George McGill, Dem.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "H. M. Perkins, Soc.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Arthur Capper, Rep.",
+          "contest": "senate",
+          "candidate": "Arthur Capper"
+        },
+        {
+          "label": "Jonathan M. Davis, Dem.",
+          "contest": "senate",
+          "candidate": "Jonathan M. Davis"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.106,
+        0.193,
+        0.92,
+        0.922
+      ],
+      "hint": "Read only the table headed 'ABSENT VOTE\u2014FOR UNITED STATES SENATOR\u2014CONCLUDED.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1811
+      ]
+    },
+    {
+      "page": 6,
+      "id": "6-0",
+      "columns": [
+        {
+          "label": "W. P. Lambertson, Rep.",
+          "contest": "house1",
+          "candidate": "W. P. Lambertson"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.12,
+        0.236,
+        0.945,
+        0.428
+      ],
+      "hint": "Read only the table headed 'FIRST CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 6,
+      "id": "6-1",
+      "columns": [
+        {
+          "label": "U. S. Guyer, Rep.",
+          "contest": "house2",
+          "candidate": "U. S. Guyer"
+        },
+        {
+          "label": "Chauncey B. Little, Dem.",
+          "contest": "house2",
+          "candidate": "Chauncey B. Little"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.12,
+        0.42,
+        0.943,
+        0.71
+      ],
+      "hint": "Read only the table headed 'SECOND CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 7,
+      "id": "7-0",
+      "columns": [
+        {
+          "label": "Harold McGugin, Rep.",
+          "contest": "house3",
+          "candidate": "Harold McGugin"
+        },
+        {
+          "label": "Earl Knight, Dem.",
+          "contest": "house3",
+          "candidate": "Earl Knight"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.101,
+        0.194,
+        0.916,
+        0.408
+      ],
+      "hint": "Read only the table headed 'THIRD CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 7,
+      "id": "7-1",
+      "columns": [
+        {
+          "label": "Homer Hoch, Rep.",
+          "contest": "house4",
+          "candidate": "Homer Hoch"
+        },
+        {
+          "label": "James E. Hilkey, Dem.",
+          "contest": "house4",
+          "candidate": "James E. Hilkey"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.103,
+        0.4,
+        0.92,
+        0.708
+      ],
+      "hint": "Read only the table headed 'FOURTH CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 8,
+      "id": "8-0",
+      "columns": [
+        {
+          "label": "James G. Strong, Rep.",
+          "contest": "house5",
+          "candidate": "James G. Strong"
+        },
+        {
+          "label": "Clyde Short, Dem.",
+          "contest": "house5",
+          "candidate": "Clyde Short"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.115,
+        0.148,
+        0.93,
+        0.431
+      ],
+      "hint": "Read only the table headed 'FIFTH CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 8,
+      "id": "8-1",
+      "columns": [
+        {
+          "label": "Charles I. Sparks, Rep.",
+          "contest": "house6",
+          "candidate": "Charles I. Sparks"
+        },
+        {
+          "label": "Robert Good, Dem.",
+          "contest": "house6",
+          "candidate": "Robert Good"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.114,
+        0.423,
+        0.934,
+        0.912
+      ],
+      "hint": "Read only the table headed 'SIXTH CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1697
+      ]
+    },
+    {
+      "page": 9,
+      "id": "9-0",
+      "columns": [
+        {
+          "label": "Clifford R. Hope, Rep.",
+          "contest": "house7",
+          "candidate": "Clifford R. Hope"
+        },
+        {
+          "label": "A. S. Allphin, Dem.",
+          "contest": "house7",
+          "candidate": "A. S. Allphin"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.101,
+        0.12,
+        0.926,
+        0.776
+      ],
+      "hint": "Read only the table headed 'FOR REPRESENTATIVES IN CONGRESS\u2014CONTINUED. SEVENTH CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1021
+      ]
+    }
+  ]
+}

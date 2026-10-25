@@ -1,0 +1,42 @@
+{
+  "polity": "US-OH",
+  "publisher": "Ohio Secretary of State",
+  "title": "Ohio Election Statistics, general election 1896-11-03, Representatives in Congress by county",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/ohioelectionsta00statgoog/page/n{page}_w2000.jpg",
+    "item": "https://archive.org/details/ohioelectionsta00statgoog"
+  },
+  "raw_source": "us.scans",
+  "contests": {
+    "house2": {
+      "year": 1896,
+      "chamber": "house",
+      "day": "1896-11-03",
+      "special": false,
+      "state": "OH",
+      "district": 2
+    }
+  },
+  "pages": [
+    {
+      "page": 272,
+      "id": "272-1",
+      "columns": [
+        {
+          "label": "Rep. Jacob H. Bromwell.",
+          "contest": "house2",
+          "candidate": "Jacob Henry Bromwell"
+        },
+        {
+          "label": "Dem. David S. Oliver.",
+          "contest": "house2",
+          "candidate": "David S Oliver"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [0.177, 0.524, 0.798, 0.801],
+      "hint": "Read only the table headed 'Second District\u2014Congressional Vote.'; ignore any other table visible in the image."
+    }
+  ]
+}

@@ -1,0 +1,253 @@
+{
+  "polity": "US-KY",
+  "publisher": "Kentucky State Board of Elections",
+  "license": "Public record",
+  "raw_source": "us.scans",
+  "title": "Kentucky official returns, general election 1972-11-07",
+  "file": {
+    "url": "https://elect.ky.gov/results/1973-1979/Documents/1972.pdf"
+  },
+  "contests": {
+    "house1": {
+      "year": 1972,
+      "chamber": "house",
+      "day": "1972-11-07",
+      "special": false,
+      "state": "KY",
+      "district": 1
+    },
+    "house2": {
+      "year": 1972,
+      "chamber": "house",
+      "day": "1972-11-07",
+      "special": false,
+      "state": "KY",
+      "district": 2
+    },
+    "house3": {
+      "year": 1972,
+      "chamber": "house",
+      "day": "1972-11-07",
+      "special": false,
+      "state": "KY",
+      "district": 3
+    },
+    "house4": {
+      "year": 1972,
+      "chamber": "house",
+      "day": "1972-11-07",
+      "special": false,
+      "state": "KY",
+      "district": 4
+    },
+    "house5": {
+      "year": 1972,
+      "chamber": "house",
+      "day": "1972-11-07",
+      "special": false,
+      "state": "KY",
+      "district": 5
+    },
+    "house6": {
+      "year": 1972,
+      "chamber": "house",
+      "day": "1972-11-07",
+      "special": false,
+      "state": "KY",
+      "district": 6
+    },
+    "house7": {
+      "year": 1972,
+      "chamber": "house",
+      "day": "1972-11-07",
+      "special": false,
+      "state": "KY",
+      "district": 7
+    }
+  },
+  "pages": [
+    {
+      "page": 4,
+      "id": "4-0",
+      "columns": [
+        {
+          "label": "Frank A. Stubblefield Democrat",
+          "contest": "house1",
+          "candidate": "Frank A. Stubblefield"
+        },
+        {
+          "label": "Charles T. Banken, Jr. Republican",
+          "contest": "house1",
+          "candidate": "Charles Thurman Banken, Jr."
+        },
+        {
+          "label": "John M. Katterjohn Less Federal Taxes",
+          "contest": "house1",
+          "candidate": "John M. Katterjohn"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.04,
+        0.065,
+        0.486,
+        0.235
+      ],
+      "hint": "Read only the table headed 'First Congressional District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 4,
+      "id": "4-1",
+      "columns": [
+        {
+          "label": "William H. Natcher Democrat",
+          "contest": "house2",
+          "candidate": "William H. Natcher"
+        },
+        {
+          "label": "J. C. Carter Republican",
+          "contest": "house2",
+          "candidate": "J. C. Carter"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.04,
+        0.227,
+        0.383,
+        0.369
+      ],
+      "hint": "Read only the table headed 'Second Congressional District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 4,
+      "id": "4-2",
+      "columns": [
+        {
+          "label": "Romano L. Mazzoli Democrat",
+          "contest": "house3",
+          "candidate": "Romano L. Mazzoli"
+        },
+        {
+          "label": "Phil Kaelin, Jr. Republican",
+          "contest": "house3",
+          "candidate": "Phil Kaelin, Jr."
+        },
+        {
+          "label": "William P. Chambers American Party",
+          "contest": "house3",
+          "candidate": "William P. Chambers"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.04,
+        0.361,
+        0.493,
+        0.4
+      ],
+      "hint": "Read only the table headed 'Third Congressional District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 4,
+      "id": "4-3",
+      "columns": [
+        {
+          "label": "James W. Rogers Democrat",
+          "contest": "house4",
+          "candidate": "James W. Rogers"
+        },
+        {
+          "label": "M. Gene Snyder Republican",
+          "contest": "house4",
+          "candidate": "M. Gene Snyder"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.04,
+        0.392,
+        0.383,
+        0.469
+      ],
+      "hint": "Read only the table headed 'Fourth Congressional District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 4,
+      "id": "4-4",
+      "columns": [
+        {
+          "label": "Lyle L. Willis Democrat",
+          "contest": "house5",
+          "candidate": "Lyle L. Willis"
+        },
+        {
+          "label": "Tim Lee Carter Republican",
+          "contest": "house5",
+          "candidate": "Tim Lee Carter"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.04,
+        0.461,
+        0.398,
+        0.651
+      ],
+      "hint": "Read only the table headed 'Fifth Congressional District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 4,
+      "id": "4-5",
+      "columns": [
+        {
+          "label": "John Breckinridge Democrat",
+          "contest": "house6",
+          "candidate": "John Breckinridge"
+        },
+        {
+          "label": "Laban P. Jackson Republican",
+          "contest": "house6",
+          "candidate": "Laban P. Jackson"
+        },
+        {
+          "label": "Thomas F. Lundeen People's Party",
+          "contest": "house6",
+          "candidate": "Thomas F. Lundeen"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.04,
+        0.643,
+        0.486,
+        0.769
+      ],
+      "hint": "Read only the table headed 'Sixth Congressional District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 4,
+      "id": "4-6",
+      "columns": [
+        {
+          "label": "Carl D. Perkins Democrat",
+          "contest": "house7",
+          "candidate": "Carl D. Perkins"
+        },
+        {
+          "label": "Robert Holcomb Republican",
+          "contest": "house7",
+          "candidate": "Robert Holcomb"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.032,
+        0.761,
+        0.383,
+        0.941
+      ],
+      "hint": "Read only the table headed 'Seventh Congressional District'; ignore any other table visible in the image."
+    }
+  ]
+}

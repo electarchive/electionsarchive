@@ -1,0 +1,119 @@
+{
+  "polity": "US-MI",
+  "publisher": "Michigan Secretary of State",
+  "license": "Public record",
+  "raw_source": "us.sri",
+  "title": "State of Michigan General Election, 1990: Official Canvass",
+  "file": {
+    "url": "https://archive.org/download/micro_IA40706939_0062/micro_IA40706939_0062.pdf",
+    "item": "https://archive.org/details/micro_IA40706939_0062"
+  },
+  "contests": {
+    "governor": {
+      "year": 1990,
+      "chamber": "governor",
+      "day": "1990-11-06",
+      "special": false,
+      "state": "MI",
+      "district": null
+    },
+    "senate": {
+      "year": 1990,
+      "chamber": "senate",
+      "day": "1990-11-06",
+      "special": false,
+      "state": "MI",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 2,
+      "id": "2-0",
+      "columns": [
+        {
+          "label": "TOTAL BY COUNTY",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Blanchard Maynard DEM",
+          "contest": "governor",
+          "candidate": "James J. Blanchard"
+        },
+        {
+          "label": "Engler Binsfeld REP",
+          "contest": "governor",
+          "candidate": "John Engler"
+        },
+        {
+          "label": "Roundtree Kirby WORW",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Write-In SCAT",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.07,
+        0.1,
+        0.588,
+        0.926
+      ],
+      "hint": "Read only the table headed 'GOVERNOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0702
+      ]
+    },
+    {
+      "page": 5,
+      "id": "5-0",
+      "columns": [
+        {
+          "label": "TOTAL BY COUNTY",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Carl Levin DEM",
+          "contest": "senate",
+          "candidate": "Carl Levin"
+        },
+        {
+          "label": "Bill Schuette REP",
+          "contest": "senate",
+          "candidate": "Bill Schuette"
+        },
+        {
+          "label": "Susan Farquhar WORW",
+          "contest": "senate",
+          "candidate": "Susan Farquhar"
+        },
+        {
+          "label": "Write-In SCAT",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.162,
+        0.09,
+        0.653,
+        0.851
+      ],
+      "hint": "Read only the table headed 'U.S. SENATE 6 YEAR TERM (1)'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0631
+      ]
+    }
+  ]
+}

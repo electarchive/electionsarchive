@@ -1,0 +1,106 @@
+{
+  "polity": "US-MI",
+  "publisher": "Michigan Secretary of State",
+  "license": "Public record",
+  "raw_source": "us.sri",
+  "title": "State of Michigan General Election, 1986: Official Canvass",
+  "file": {
+    "url": "https://archive.org/download/micro_IA40706925_0347/micro_IA40706925_0347.pdf",
+    "item": "https://archive.org/details/micro_IA40706925_0347"
+  },
+  "contests": {
+    "governor": {
+      "year": 1986,
+      "chamber": "governor",
+      "day": "1986-11-04",
+      "special": false,
+      "state": "MI",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 2,
+      "id": "2-0",
+      "columns": [
+        {
+          "label": "TOTAL BY COUNTY",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Blanchard Griffiths DEM",
+          "contest": "governor",
+          "candidate": "James J. Blanchard"
+        },
+        {
+          "label": "Lucas Engler REP",
+          "contest": "governor",
+          "candidate": "William Lucas"
+        },
+        {
+          "label": "McLaughlin Crivens WORL",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Write-In SCAT",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.072,
+        0.154,
+        0.563,
+        1.0
+      ],
+      "hint": "Read only the table headed '02000001 GOVERNOR 4 YEAR TERM (1)'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0745
+      ]
+    },
+    {
+      "page": 3,
+      "id": "3-0",
+      "columns": [
+        {
+          "label": "TOTAL BY COUNTY",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Blanchard Griffiths DEM",
+          "contest": "governor",
+          "candidate": "James J. Blanchard"
+        },
+        {
+          "label": "Lucas Engler REP",
+          "contest": "governor",
+          "candidate": "William Lucas"
+        },
+        {
+          "label": "McLaughlin Crivens WORL",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Write-In SCAT",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.052,
+        0.168,
+        0.54,
+        0.495
+      ],
+      "hint": "Read only the table headed 'GOVERNOR 4 YEAR TERM (1)'; ignore any other table visible in the image."
+    }
+  ]
+}
