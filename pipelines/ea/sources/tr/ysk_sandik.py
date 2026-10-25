@@ -284,8 +284,10 @@ def parse() -> None:
 
 
 def emit() -> Path:
-    frame = pl.read_parquet(PARSED / "neighborhoods.parquet").filter(
-        ~pl.col("slug").str.starts_with("2019") | (pl.col("plate") == "34")
+    frame = (
+        pl.read_parquet(PARSED / "neighborhoods.parquet")
+        .filter(~pl.col("slug").str.starts_with("2019") | (pl.col("plate") == "34"))
+        .with_columns(pl.col("slug", "plate", "district", "neighborhood", "label").cast(pl.Categorical))
     )
     ilce = pl.read_parquet(oveo.PARSED / "ilce.parquet")
     districts = {(plate, upper(name)): id for id, plate, name in ilce.iter_rows()}
@@ -521,7 +523,9 @@ def emit() -> Path:
 
         place = pl.concat_str("plate", "district", pl.col("neighborhood").fill_null(""), separator="\x1f")
         parliament = pl.col("slug").str.contains("milletvekilligi")
-        frame = frame.with_columns(
+        keys = ["slug", "plate", "district", "neighborhood"]
+        places = frame.select(keys).unique()
+        mapped = places.cast(pl.String).with_columns(
             unit=place.replace_strict(units),
             contest=pl.col("slug").replace_strict({slug: contest for slug, (_, contest) in CONTESTS.items()})
             + pl.when(parliament)
@@ -534,10 +538,14 @@ def emit() -> Path:
                 .otherwise(place.replace_strict(seats))
             )
             .otherwise(pl.lit("")),
+        )
+        labels = frame.select("slug", "label").unique()
+        labeled = labels.cast(pl.String).with_columns(
             option=pl.when(pl.col("slug").str.contains("cumhurbaskan"))
             .then(
                 pl.col("label").replace_strict(
-                    {upper(label): label for label, _ in CANDIDATES + CANDIDATES_2018 + CANDIDATES_2014}, default=None
+                    {upper(label): label for label, _ in CANDIDATES + CANDIDATES_2018 + CANDIDATES_2014},
+                    default=None,
                 )
             )
             .otherwise(
@@ -546,9 +554,24 @@ def emit() -> Path:
                 )
             ),
         )
-        if frame["option"].null_count():
-            raise ValueError(f"unknown candidates: {frame.filter(pl.col('option').is_null())['label'].unique()}")
-        votes = frame.group_by("contest", "unit", "option").agg(pl.col("votes").sum())
+        if labeled["option"].null_count():
+            raise ValueError(f"unknown candidates: {labeled.filter(pl.col('option').is_null())['label'].unique()}")
+        frame = frame.join(
+            mapped.with_columns(places.get_columns()).with_columns(pl.col("unit", "contest").cast(pl.Categorical)),
+            on=keys,
+            nulls_equal=True,
+            maintain_order="left",
+        ).join(
+            labeled.with_columns(labels.get_columns()).with_columns(pl.col("option").cast(pl.Categorical)),
+            on=["slug", "label"],
+            nulls_equal=True,
+            maintain_order="left",
+        )
+        votes = (
+            frame.group_by("contest", "unit", "option")
+            .agg(pl.col("votes").sum())
+            .with_columns(pl.col("contest", "unit", "option").cast(pl.String))
+        )
         independents = dict(
             votes.filter(pl.col("option") == INDEPENDENTS)
             .group_by(pl.col("contest").str.slice(0, 10))
@@ -567,10 +590,20 @@ def emit() -> Path:
         print(
             "March independents:",
             frame.filter((pl.col("contest") == f"{MARCH}:istanbul-mayor") & (pl.col("option") == "others"))["label"]
+            .cast(pl.String)
             .unique()
             .sort()
             .to_list(),
         )
+        neighborhood_places = (
+            frame.select("slug", "plate", "district", "neighborhood", "contest", "unit").unique().cast(pl.String)
+        )
+        neighborhood_valid = (
+            frame.group_by("contest", "unit")
+            .agg(pl.col("votes").sum())
+            .with_columns(pl.col("contest", "unit").cast(pl.String))
+        )
+        del frame
 
         parties: dict[str, UUID] = {}
         alliances = {
@@ -629,7 +662,7 @@ def emit() -> Path:
         unattributed = pl.read_parquet(PARSED / "unattributed.parquet").join(
             pl.concat(
                 [
-                    frame.select("slug", "plate", "district", "neighborhood", "contest", "unit"),
+                    neighborhood_places,
                     local.select("slug", "plate", "district", "neighborhood", "contest", "unit").unique(),
                 ],
                 how="vertical_relaxed",
@@ -639,7 +672,7 @@ def emit() -> Path:
         valid = (
             pl.concat(
                 [
-                    frame.group_by("contest", "unit").agg(pl.col("votes").sum()),
+                    neighborhood_valid,
                     local.group_by("contest", "unit").agg(pl.col("votes").sum()),
                     unattributed.select("contest", "unit", "votes"),
                 ],
