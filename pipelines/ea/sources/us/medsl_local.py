@@ -1732,11 +1732,11 @@ def emit() -> Path:
             if (scheme, code) not in polities:
                 continue
             polity, place, path = polities[(scheme, code)]
-            parent = cs.key("us.election", f"{day}:{state}")
             official = row["origin"].startswith("electionsfl")
-            majority = state in ("GA", "LA") or official and day.month == 8
             if official and (f"{day:%Y-%m}", f"{state}:{code}:{key}") in held_fl:
                 continue
+            parent = cs.key("us.election", f"{day}:{state}")
+            majority = state in ("GA", "LA") or official and day.month == 8
             if parent in cs.minted and official and parent not in elections.values():
                 elections[(day, "FL")] = parent
                 cs.add(
