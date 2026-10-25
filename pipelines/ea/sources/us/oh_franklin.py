@@ -97,7 +97,8 @@ def wide(rows: list[list[Any]]) -> Iterator[dict[str, Any]]:
                     full, remainder = divmod(sum(votes[n]) + int(float(row[under] or 0)), ballots[n])
                     if remainder == 0 and full > 0:
                         ratios.append(full)
-        vote_for = max(ratios) if ratios.count(max(ratios, default=0)) >= 2 else 0
+        voting = sum(1 for entry in votes if sum(entry))
+        vote_for = max(ratios) if ratios and ratios.count(max(ratios)) >= min(2, voting) else 0
         if vote_for == 0 and re.search(r"\(\d{1,2}-\d{1,2}-\d{2}\)", title):
             vote_for = 1
         if not any(sum(entry) for entry in votes):
