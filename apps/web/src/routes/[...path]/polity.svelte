@@ -14,6 +14,7 @@
   import { cn } from "#lib/utils.js";
   import type { PageData } from "./$types";
   import PlaceMap from "./map.svelte";
+  import Holders from "./holders.svelte";
   import Offices from "./offices.svelte";
   import Preview from "./preview.svelte";
   import Timeline from "./record.svelte";
@@ -603,6 +604,10 @@
       >
     {/if}
   </section>
+{/if}
+
+{#if !isNational && !["sovereign_state", "supranational", "federal_unit"].includes(polity.kind)}
+  <Holders {id} />
 {/if}
 
 {#if isState}

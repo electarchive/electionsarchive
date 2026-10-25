@@ -226,9 +226,18 @@ async function load(segments: Array<string>, search: URLSearchParams) {
       }),
     };
   }
-  return found.kind === "polity"
-    ? { ...found, record: await call(router.polities.record, { id: found.id }) }
-    : found;
+  if (found.kind !== "polity") {
+    return found;
+  }
+  const [record, holders] = await Promise.all([
+    call(router.polities.record, { id: found.id }),
+    ["sovereign_state", "supranational", "federal_unit"].includes(
+      found.polity.kind,
+    )
+      ? null
+      : call(router.polities.holders, { id: found.id }),
+  ]);
+  return { ...found, record, holders };
 }
 
 export async function twin({ request, url }: RequestEvent) {
@@ -383,7 +392,7 @@ function markdown(data: Data, link: Link) {
       return comparisonMarkdown(data, link);
     }
     case "polity": {
-      return polityMarkdown(data.polity, data.record, link);
+      return polityMarkdown(data.polity, data.record, data.holders, link);
     }
     case "election": {
       return electionMarkdown(data.election, data.sections, data.byes, link);
@@ -1232,6 +1241,7 @@ function partyMarkdown(
 function polityMarkdown(
   polity: Extract<Data, { kind: "polity" }>["polity"],
   record: Extract<Data, { kind: "polity" }>["record"],
+  holders: Extract<Data, { kind: "polity" }>["holders"],
   link: Link,
 ) {
   const latest = polity.latest;
@@ -1301,6 +1311,86 @@ function polityMarkdown(
                       ]),
                   ),
             ];
+          }),
+        ]),
+    ...(holders == null || holders.groups.length === 0
+      ? []
+      : [
+          `## ${m.holders_title()}`,
+          m.holders_lede(),
+          ...holders.groups.flatMap((group) => {
+            const rows = group.rows.map((row) => {
+              const party =
+                row.party == null
+                  ? null
+                  : holders.parties.find((entry) => entry.id === row.party);
+              const notes = [
+                row.isStale ? m.holders_stale() : null,
+                row.elected == null
+                  ? null
+                  : `${m.holders_won({ date: date(row.elected.date) })} ${link(row.elected.name ?? "", row.elected.person == null ? null : `id/${row.elected.person}`)}`,
+                row.next == null
+                  ? null
+                  : row.next.person != null && row.next.person === row.person
+                    ? m.holders_reelected({ date: date(row.next.date) })
+                    : `${m.holders_successor({ date: date(row.next.date) })} ${link(row.next.name ?? "", row.next.person == null ? null : `id/${row.next.person}`)}`,
+              ].filter((note) => note != null);
+              return {
+                label: row.label,
+                holder:
+                  row.via === "unknown"
+                    ? m.holders_unknown()
+                    : row.via === "vacant" || row.person == null
+                      ? m.holders_vacant()
+                      : [
+                          link(row.name ?? "", `id/${row.person}`),
+                          party == null ? null : (party.short ?? party.label),
+                        ]
+                          .filter((part) => part != null && part !== "")
+                          .join(", "),
+                since:
+                  row.since == null
+                    ? null
+                    : link(
+                        row.via === "unknown"
+                          ? m.holders_unknown_note({ date: date(row.since) })
+                          : (
+                              (
+                                {
+                                  elected: m.holders_elected,
+                                  acting: m.holders_acting,
+                                  appointed: m.holders_appointed,
+                                  trustee: m.holders_trustee,
+                                  vacant: m.holders_vacant_since,
+                                } as Record<
+                                  string,
+                                  (input: { date: string }) => string
+                                >
+                              )[row.via] ?? m.holders_since
+                            )({ date: date(row.since) }),
+                        row.contest,
+                      ),
+                notes: notes.join("; "),
+              };
+            });
+            const only = rows[0];
+            return !group.isBody && rows.length === 1 && only != null
+              ? [
+                  `- **${group.name}${only.label == null ? "" : `, ${only.label}`}**: ${[only.holder, only.since, only.notes].filter((part) => part != null && part !== "").join("; ")}`,
+                ]
+              : [
+                  `### ${group.name}`,
+                  table(
+                    [m.col_seat(), m.col_holder(), m.col_since()],
+                    rows.map((row) => [
+                      row.label ?? m.holders_at_large(),
+                      row.holder,
+                      [row.since, row.notes]
+                        .filter((part) => part != null && part !== "")
+                        .join("; "),
+                    ]),
+                  ),
+                ];
           }),
         ]),
     ...(record.series.length === 0

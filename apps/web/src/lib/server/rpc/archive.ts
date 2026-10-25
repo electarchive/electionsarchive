@@ -12405,6 +12405,345 @@ export const polities = {
         }),
       };
     }),
+  holders: os
+    .meta(
+      openapi({
+        method: "GET",
+        path: "/polities/{id}/holders",
+        summary:
+          "List who holds each of a polity's own offices and council seats, judgeships aside: the winners of the latest election we hold for each, or a later acting, appointed, or trustee holder from tenures, with vacant and unrecorded seats marked",
+      }),
+    )
+    .input(v.object({ id: v.pipe(v.string(), v.uuid()) }))
+    .output(
+      v.object({
+        groups: v.array(
+          v.object({
+            id: v.string(),
+            name: v.string(),
+            isBody: v.boolean(),
+            rows: v.array(
+              v.object({
+                label: v.nullable(v.string()),
+                person: v.nullable(v.string()),
+                name: v.nullable(v.string()),
+                party: v.nullable(v.string()),
+                via: v.string(),
+                since: v.nullable(v.string()),
+                contest: v.nullable(v.string()),
+                isStale: v.boolean(),
+                elected: v.nullable(
+                  v.object({
+                    person: v.nullable(v.string()),
+                    name: v.nullable(v.string()),
+                    date: v.string(),
+                  }),
+                ),
+                next: v.nullable(
+                  v.object({
+                    person: v.nullable(v.string()),
+                    name: v.nullable(v.string()),
+                    date: v.string(),
+                    contest: v.nullable(v.string()),
+                  }),
+                ),
+              }),
+            ),
+          }),
+        ),
+        parties: v.array(
+          v.object({
+            id: v.string(),
+            label: v.string(),
+            short: v.nullable(v.string()),
+            color: v.nullable(v.string()),
+          }),
+        ),
+      }),
+    )
+    .handler(async ({ input }) => {
+      const found = await db.execute<{
+        owner: string;
+        kind: string | null;
+        label: string | null;
+        person: string | null;
+        party: string | null;
+        via: string;
+        since: string | null;
+        contest: string | null;
+        isStale: boolean;
+        electedPerson: string | null;
+        electedDate: string | null;
+        nextPerson: string | null;
+        nextDate: string | null;
+        nextContest: string | null;
+      }>(sql`
+        with own as (
+          select area_id from polity_territory where polity_id = ${input.id}::uuid
+        ),
+        roots as materialized (
+          select c.id, c.seat_id, coalesce(c.office_id, c.body_id) as owner, c.office_id is not null as "isOffice",
+            e.date_from as date, e.kind::text as kind, coalesce(c.magnitude, 1) as magnitude,
+            case when c.district_area_id in (select area_id from own) then null else c.district_area_id end as district,
+            substring(n.text from '(?:election|elections|runoff|runoffs|primary)(?:, (.+))$') as suffix,
+            e.kind not in ('special', 'by_election') and extract(year from e.date_from) = extract(year from current_date)
+              and exists (select from slug s where s.entity_id = ${input.id}::uuid and s.is_current and s.path like 'us/%') as "isElect"
+          from contest c
+          join election e on e.id = c.election_id
+          left join name n on n.entity_id = c.id and n.is_preferred
+          where c.allocation_parent_id is null and c.party_scope_id is null and not c.notional
+            and c.kind in ('office', 'body_seats') and e.date_from <= current_date
+            and e.kind in ('general', 'local', 'runoff', 'special', 'by_election', 'primary')
+            and not exists (select from contest later where later.previous_round_id = c.id)
+            and not exists (select from entity_merge m where m.entity_id = c.id)
+            and (c.office_id in (select id from office where polity_id = ${input.id}::uuid)
+              or c.body_id in (select id from body where polity_id = ${input.id}::uuid))
+        ),
+        labeled as (
+          select r.*,
+            coalesce((select st.label from seat st where st.id = r.seat_id),
+              (select regexp_replace(dn.text, '^.*, ', '') from name dn where dn.entity_id = r.district and dn.is_preferred limit 1),
+              r.suffix) as label
+          from roots r
+        ),
+        keyed as materialized (
+          select l.*, l.owner::text || ':' || coalesce(lower(l.label), l.seat_id::text, '') as post from labeled l
+        ),
+        won as materialized (
+          select k.*, w.option, w.person, w.party
+          from keyed k
+          cross join lateral (
+            select o.id as option, coalesce(m.into_id, cy.person_id) as person, coalesce(pm.into_id, o.party_id) as party
+            from result_set rs
+            join outcome x on x.result_set_id = rs.id and x.kind in ('elected', 'won') and x.candidacy_id is null
+            join contest_option o on o.id = x.option_id
+            left join lateral (
+              select cy.person_id from candidacy cy where cy.option_id = o.id and cy.person_id is not null order by cy.id limit 1
+            ) cy on true
+            left join entity_merge m on m.entity_id = cy.person_id
+            left join entity_merge pm on pm.entity_id = o.party_id
+            where rs.contest_id = k.id and ${latest("rs")}
+          ) w
+        ),
+        last as (
+          select post, max(date) as date, bool_or(magnitude > 1) as multi from won where not "isElect" group by post
+        ),
+        terms as (
+          select post, max(gap) as days
+          from (
+            select post, gap, row_number() over (partition by post order by date desc) as at
+            from (
+              select post, date, date - lag(date) over (partition by post order by date) as gap
+              from (select distinct post, date from won where not "isElect") d
+            ) g
+            where gap >= 300
+          ) r
+          where at <= 3
+          group by post
+        ),
+        ran as (
+          select distinct k.post, coalesce(m.into_id, cy.person_id) as person
+          from keyed k
+          join last l on l.post = k.post and l.multi and k.date = l.date
+          join contest_option o on o.contest_id = k.id
+          join candidacy cy on cy.option_id = o.id and cy.person_id is not null
+          left join entity_merge m on m.entity_id = cy.person_id
+        ),
+        renewed as (
+          select l.post,
+            (select count(*) from won w where w.post = l.post and w.date = l.date) >= (
+              select count(*) from won w where w.post = l.post and w.date = (
+                select max(p.date) from won p where p.post = l.post and not p."isElect" and p.date < l.date
+              )
+            ) and exists (
+              select from won w join ran r on r.post = w.post and r.person = w.person
+              where w.post = l.post and w.date < l.date and w.date > l.date - interval '42 months'
+            ) as yes
+          from last l where l.multi
+        ),
+        held as (
+          select distinct on (w.post, coalesce(w.person::text, w.option::text)) w.post, w.owner, w."isOffice", w.label, w.person, w.party, w.date, w.id as contest
+          from won w join last l on l.post = w.post left join renewed rn on rn.post = w.post
+          where not w."isElect" and (w.date = l.date or (
+            l.multi and not coalesce(rn.yes, false) and w.date > l.date - interval '42 months'
+            and not exists (select from ran r where r.post = w.post and r.person = w.person)
+          ))
+          order by w.post, coalesce(w.person::text, w.option::text), w.date desc
+        ),
+        newest as (
+          select owner, max(date) as date from keyed group by owner
+        ),
+        posts as (
+          select distinct on (post) post, owner, "isOffice", label from keyed order by post, date desc
+        ),
+        pending as (
+          select distinct on (k.post) k.post, k.id, k.date
+          from keyed k left join last l on l.post = k.post
+          where k.kind <> 'primary' and not k."isElect" and (l.date is null or k.date > l.date)
+            and not exists (select from won w where w.id = k.id)
+          order by k.post, k.date desc
+        ),
+        elects as (
+          select distinct on (w.post) w.post, w.person, w.date, w.id from won w where w."isElect" order by w.post, w.date desc
+        ),
+        tenured as (
+          select distinct on (t.office_id) t.office_id, coalesce(m.into_id, t.person_id) as person, t.acquired_via::text as via, t.from_date
+          from tenure t left join entity_merge m on m.entity_id = t.person_id
+          where t.office_id in (select owner from posts where "isOffice") and (t.to_date is null or t.to_date > current_date)
+          order by t.office_id, t.from_date desc
+        ),
+        ended as (
+          select distinct on (t.office_id) t.office_id, t.to_date
+          from tenure t
+          where t.office_id in (select owner from posts where "isOffice") and t.to_date <= current_date
+          order by t.office_id, t.to_date desc
+        )
+        select p.owner::text, (select kind::text from office where id = p.owner) as kind, p.label,
+          case when pd.id is not null then null when tn.person is not null and (h.date is null or tn.from_date > h.date) then tn.person
+            when en.to_date is not null and en.to_date > h.date and tn.person is null then null else h.person end::text as person,
+          case when pd.id is null and (tn.person is null or (h.date is not null and tn.from_date <= h.date))
+            and not (en.to_date is not null and en.to_date > h.date and tn.person is null) then h.party end::text as party,
+          case when pd.id is not null then 'unknown' when tn.person is not null and (h.date is null or tn.from_date > h.date) then tn.via
+            when en.to_date is not null and en.to_date > h.date and tn.person is null then 'vacant' else 'elected' end as via,
+          case when pd.id is not null then pd.date when tn.person is not null and (h.date is null or tn.from_date > h.date) then tn.from_date
+            when en.to_date is not null and en.to_date > h.date and tn.person is null then en.to_date else h.date end::text as since,
+          case when pd.id is not null then pd.id when tn.person is not null and (h.date is null or tn.from_date > h.date) then null
+            when en.to_date is not null and en.to_date > h.date and tn.person is null then null else h.contest end::text as contest,
+          pd.id is null and el.post is null and h.date is not null and h.date + least(greatest(coalesce(tr.days, 1461), 700), 2200) + 120 < current_date
+            and not (tn.person is not null and tn.from_date > h.date) as "isStale",
+          case when pd.id is null and ((tn.person is not null and tn.from_date > h.date) or (en.to_date > h.date and tn.person is null)) then h.person end::text as "electedPerson",
+          case when pd.id is null and ((tn.person is not null and tn.from_date > h.date) or (en.to_date > h.date and tn.person is null)) then h.date end::text as "electedDate",
+          el.person::text as "nextPerson", el.date::text as "nextDate", el.id::text as "nextContest"
+        from posts p
+        left join held h on h.post = p.post
+        left join pending pd on pd.post = p.post
+        left join terms tr on tr.post = p.post
+        left join elects el on el.post = p.post
+        left join tenured tn on p."isOffice" and tn.office_id = p.owner
+        left join ended en on p."isOffice" and en.office_id = p.owner and h.person is not null
+        join newest nw on nw.owner = p.owner
+        where (h.post is not null or pd.post is not null or (p."isOffice" and tn.person is not null))
+          and coalesce(pd.date, h.date, tn.from_date) > nw.date - interval '6 years'
+      `);
+      const owners = [...new Set(found.rows.map((row) => row.owner))];
+      const people = found.rows.flatMap((row) =>
+        [row.person, row.electedPerson, row.nextPerson].filter(
+          (id) => id != null,
+        ),
+      );
+      const parties = [
+        ...new Set(found.rows.flatMap((row) => row.party ?? [])),
+      ];
+      const [labels, slugs, colors] = await Promise.all([
+        names([...owners, ...people]),
+        paths(
+          found.rows.flatMap((row) =>
+            [row.contest, row.nextContest].filter((id) => id != null),
+          ),
+        ),
+        refs(parties),
+      ]);
+      const groups = Map.groupBy(found.rows, (row) => row.owner)
+        .entries()
+        .filter(([id, rows]) => {
+          const name = labels.full.get(id) ?? "";
+          return (
+            rows[0]?.kind == null ||
+            !COURT.test(name) ||
+            /\bCounty Judge$/u.test(name)
+          );
+        })
+        .map(([id, rows]) => {
+          const name = labels.full.get(id) ?? "";
+          const isBody = rows[0]?.kind == null;
+          const at = [
+            /\bSheriff\b/u,
+            /\b(?:District Attorney|Prosecut\w*|State's Attorney|Commonwealth's Attorney|County Attorney)\b/u,
+            /\bClerk\b/u,
+          ].findIndex((pattern) => pattern.test(name));
+          const rank = isBody
+            ? 1
+            : rows[0]?.kind === "mayor" ||
+                rows[0]?.kind === "head_of_government" ||
+                /\b(?:Mayor|County Judge|County Executive|Executive)\b/u.test(
+                  name,
+                )
+              ? 0
+              : at < 0
+                ? 6
+                : at + 3;
+          return [
+            rank,
+            {
+              id,
+              name,
+              isBody,
+              rows: rows
+                .map((row) => ({
+                  label: row.label,
+                  person: row.person,
+                  name:
+                    row.person == null
+                      ? null
+                      : (labels.full.get(row.person) ?? null),
+                  party: row.party,
+                  via: row.via,
+                  since: row.since,
+                  contest:
+                    row.contest == null
+                      ? null
+                      : (slugs.get(row.contest) ?? null),
+                  isStale: row.isStale,
+                  elected:
+                    row.electedDate == null
+                      ? null
+                      : {
+                          person: row.electedPerson,
+                          name:
+                            row.electedPerson == null
+                              ? null
+                              : (labels.full.get(row.electedPerson) ?? null),
+                          date: row.electedDate,
+                        },
+                  next:
+                    row.nextDate == null
+                      ? null
+                      : {
+                          person: row.nextPerson,
+                          name:
+                            row.nextPerson == null
+                              ? null
+                              : (labels.full.get(row.nextPerson) ?? null),
+                          date: row.nextDate,
+                          contest:
+                            row.nextContest == null
+                              ? null
+                              : (slugs.get(row.nextContest) ?? null),
+                        },
+                }))
+                .toSorted(
+                  (a, b) =>
+                    (a.label ?? "").localeCompare(b.label ?? "", "en", {
+                      numeric: true,
+                    }) || (a.name ?? "").localeCompare(b.name ?? ""),
+                ),
+            },
+          ] as const;
+        })
+        .toArray()
+        .toSorted(
+          ([x, a], [y, b]) =>
+            x - y ||
+            (a.isBody ? b.rows.length - a.rows.length : 0) ||
+            a.name.localeCompare(b.name),
+        );
+      return {
+        groups: groups.map(([, group]) => group),
+        parties: parties.map(
+          (id) => colors.get(id) ?? { id, label: "", short: null, color: null },
+        ),
+      };
+    }),
   compare: os
     .meta(
       openapi({
