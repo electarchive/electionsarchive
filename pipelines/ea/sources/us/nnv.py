@@ -19,7 +19,7 @@ from ea.sources.us.party_labels import NATIONAL, UNAFFILIATED
 from ea.store import DATA, connect
 
 SOURCE = "us.nnv"
-VERSION = "5"
+VERSION = "6"
 COMMIT = "13e2f82692c76e3695f6cd609a5e710d6cab5e26"
 ARCHIVE = f"https://codeload.github.com/mapping-elections/nnv-xml/tar.gz/{COMMIT}"
 PUBLISHER = "American Antiquarian Society and Tufts University"
@@ -1309,11 +1309,6 @@ def emit() -> Path:
                         kind="caveat",
                         body_md=units_note,
                     )
-                if existing and not revise and not reopen:
-                    tally["NNV trials already on file, from THEA or an earlier emit"] += 1
-                    filled += len([line for line in lines.get(record, []) if line["elected"]])
-                    previous = contest
-                    continue
                 tallied = {
                     line["candidate"]: sums.get(line["candidate"], 0) if line["total"] is None else line["total"]
                     for line in lines.get(record, [])
@@ -1321,6 +1316,7 @@ def emit() -> Path:
                 }
                 chosen = {line["candidate"] for line in lines.get(record, []) if line["elected"]} & set(tallied)
                 magnitude: int | None = max(seats - filled, 1)
+                ranked = True
                 if (
                     body_label != "the House"
                     and chosen
@@ -1330,26 +1326,34 @@ def emit() -> Path:
                         if candidate not in chosen
                     )
                 ):
-                    magnitude = None
-                    tally["added, winners marked are not the top vote-getters (magnitude left open)"] += 1
+                    ranked = False
+                    tally["winners marked are not the top vote-getters (electoral system left open)"] += 1
                 if not chosen and body_label not in SINGLE:
                     magnitude = None
-                filled += len([line for line in lines.get(record, []) if line["elected"]])
-                cs.add(
-                    "contest",
-                    id=contest,
-                    election_id=election,
-                    seat_id=None,
-                    term="remainder" if special else "full",
-                    magnitude=magnitude,
-                    round_number=round_number,
-                    previous_round_id=previous,
-                    electoral_system_id=None
-                    if magnitude is None
+                row = {
+                    "id": contest,
+                    "election_id": election,
+                    "seat_id": None,
+                    "term": "remainder" if special else "full",
+                    "magnitude": magnitude,
+                    "round_number": round_number,
+                    "previous_round_id": previous,
+                    "electoral_system_id": None
+                    if magnitude is None or not ranked
                     else systems["majority" if postal in MAJORITY else "block" if magnitude > 1 else "fptp"],
-                    default_result_kind="counted",
+                    "default_result_kind": "counted",
                     **fields,
-                )
+                }
+                if existing and not revise and not reopen:
+                    if magnitude is not None and contest in magnitudes and magnitudes[contest] is None:
+                        cs.add("contest", **row)
+                        tally["NNV trials on file with an open magnitude, given their declared winners' count"] += 1
+                    tally["NNV trials already on file, from THEA or an earlier emit"] += 1
+                    filled += len([line for line in lines.get(record, []) if line["elected"]])
+                    previous = contest
+                    continue
+                filled += len([line for line in lines.get(record, []) if line["elected"]])
+                cs.add("contest", **row)
                 named(
                     contest,
                     f"{day.year} {title}"
