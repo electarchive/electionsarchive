@@ -47,6 +47,8 @@ def fetch() -> None:
 
 
 TOKEN = re.compile(r'"((?:[^"]|"")*)"|([^\s,"]+)')
+WRAPPED = re.compile(r'^"\d+,\d+,""')
+STATISTIC = re.compile(r"(?i)^(?:registered voters|times |number of )")
 UNUSED = re.compile(r"(?i)write-?ins?|^(?:over|under)votes?$|^total")
 METHOD = (
     "Precinct totals from Fresno County's Statement of Vote export (polling and vote-by-mail ballots, as the "
@@ -60,24 +62,34 @@ def parse() -> None:
     for day, url in FILES.items():
         taken = 0
         for line in raw.cached(SOURCE, url).path.read_text(encoding="latin-1").splitlines():
-            fields = [bare or quoted for quoted, bare in TOKEN.findall(line)]
-            if len(fields) < 23 or not fields[3] or not fields[4].isdigit() or int(fields[4]) >= 999990:
-                continue
-            if (
-                fields[19] != "999999"
-                or not fields[13].isdigit()
-                or int(fields[13]) >= 999990
-                or UNUSED.search(fields[14])
+            if WRAPPED.match(line):
+                line = line[1:].removesuffix('"').replace('""', '"')
+            fields = [bare or quoted for quoted, bare in TOKEN.findall(line.replace('\\"', ""))]
+            if len(fields) in (7, 8) and fields[-1].lstrip("-").isdigit():
+                if fields[5] != "Total" or STATISTIC.match(fields[3]) or UNUSED.search(fields[3]):
+                    continue
+                contest, precinct, candidate, votes = fields[2], fields[0].zfill(4), fields[3], int(fields[6])
+            elif (
+                len(fields) >= 23
+                and fields[3]
+                and fields[4].isdigit()
+                and int(fields[4]) < 999990
+                and fields[19] == "999999"
+                and fields[13].isdigit()
+                and int(fields[13]) < 999990
+                and not UNUSED.search(fields[14])
             ):
+                contest, precinct, candidate, votes = f"{fields[4]}:{fields[5]}", fields[3], fields[14], int(fields[22])
+            else:
                 continue
             rows.append(
                 {
                     "day": day,
                     "url": url,
-                    "contest": f"{fields[4]}:{fields[5].strip()}",
-                    "precinct": fields[3].strip(),
-                    "candidate": fields[14].strip(),
-                    "votes": int(fields[22]),
+                    "contest": contest.strip(),
+                    "precinct": precinct.strip(),
+                    "candidate": candidate.strip(),
+                    "votes": votes,
                     "registered": None,
                     "ballots": None,
                 }
