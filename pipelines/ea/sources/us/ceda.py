@@ -20,7 +20,7 @@ from ea.sources.us import alged
 from ea.store import DATA, connect
 
 SOURCE = "us.ceda"
-VERSION = "2"
+VERSION = "3"
 PARSED = DATA / "parsed" / SOURCE
 ACCESS = "https://scholars.csus.edu/view/fileRedirect?instCode=01CALS_USL&filePid={}&download=true"
 CODEBOOK = ACCESS.format("13306594360001671")
@@ -77,6 +77,8 @@ PRECINCT = (
     "Where the county's election database adds up to those totals for every candidate, the votes are the county's "
     "own precinct results instead, summed across voting methods."
 )
+WRITE_IN_WON = {"200400473": (date(2002, 6, 4), "alged:643000_2002_6_long beach_CA_Mayor_mayor_1")}
+MISDATED = "A contest the California Elections Data Archive dated to the wrong year, now held under its election day"
 RCV = "This contest was decided by ranked-choice voting; the archive shows the votes as the data archive reports them."
 DISTRICT = (
     "Only part of the {whole} votes in this contest. The archive has no boundary for the district yet, so the "
@@ -161,6 +163,12 @@ def parse() -> None:
             pl.col("csd") == "0",
             ~pl.col("office").str.contains(SKIPPED.pattern),
             ~pl.col("place").str.contains(SKIPPED.pattern),
+        )
+        .with_columns(
+            day=pl.col("race")
+            .replace_strict({race: day for race, (day, _) in WRITE_IN_WON.items()}, default=None, return_dtype=pl.Date)
+            .fill_null(pl.col("day")),
+            elected=pl.when(pl.col("race").is_in(list(WRITE_IN_WON))).then(pl.lit("2")).otherwise("elected"),
         )
     )
     shapes: list[tuple[str, str, str, str]] = []
@@ -673,6 +681,26 @@ def takeovers(conn, frame: pl.DataFrame) -> tuple[dict[str, Taken], set[str], pl
                     "detail": detail or None,
                 }
             )
+    for race, (_, value) in WRITE_IN_WON.items():
+        entry = next((entry for entries in contests.values() for entry in entries if entry["value"] == value), None)
+        found = next((other for others in races.values() for other in others if other["race"] == race), None)
+        if entry is None or found is None:
+            continue
+        held.discard(race)
+        winners = sorted(option["surname"] for option in entry["options"] if option["elected"])
+        matched[race] = Taken(**entry, disagree=f"winners ALGED {winners} CEDA write-ins", surnames=align(found, entry))
+        report.append(
+            {
+                "owner": None,
+                "year": None,
+                "month": None,
+                "district": None,
+                "alged": value,
+                "race": race,
+                "status": "disagrees: winner",
+                "detail": f"write-ins won; ALGED {winners}",
+            }
+        )
     return matched, held, pl.DataFrame(report, infer_schema_length=None)
 
 
@@ -1227,6 +1255,8 @@ def emit() -> Path:
             if writeins := first["writeins"]:
                 option = cs.key("us.option", f"{contest_key}:write-ins")
                 cs.add("contest_option", id=option, contest_id=contest, kind="write_in", ballot_label="Write-ins")
+                if race in WRITE_IN_WON:
+                    cs.add("outcome", result_set_id=result_set, option_id=option, kind="elected", seats=None)
                 entries.append((option, "write-ins", writeins))
             for option, candidate_id, votes in entries if result_set in cs.minted or race in merged else []:
                 if reported is None:
@@ -1260,6 +1290,12 @@ def emit() -> Path:
         ).fetchall():
             if set(live) <= moved and election not in used:
                 cs.add("entity_retirement", entity_id=election, reason=EMPTIED)
+        for (misdated,) in conn.execute(
+            """select x.entity_id from external_id x join entity n on n.id = x.entity_id and n.retired_by is null
+               where x.scheme = 'us.contest' and x.value = any(%s)""",
+            [[f"ceda:{race}" for race in WRITE_IN_WON if race in takeover]],
+        ).fetchall():
+            cs.add("entity_retirement", entity_id=misdated, reason=MISDATED)
         for place, day in minted.items():
             cs.add(
                 "reporting_unit",
