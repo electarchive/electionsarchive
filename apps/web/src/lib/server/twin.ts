@@ -918,7 +918,7 @@ function personMarkdown(
             table(
               [m.col_name(), m.person_years()],
               spells.map((spell) => [
-                `${spell.isBody ? link(spell.name, spell.path ?? `id/${spell.id}`) : spell.name}${
+                `${spell.isBody ? link(spell.name, spell.path ?? `id/${spell.id}`) : link(spell.name, spell.path)}${
                   "seats" in spell && spell.seats.length > 0
                     ? ` (${spell.seats
                         .map((seat) =>

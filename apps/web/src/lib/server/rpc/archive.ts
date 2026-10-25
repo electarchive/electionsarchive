@@ -12428,6 +12428,7 @@ export const polities = {
                 person: v.nullable(v.string()),
                 name: v.nullable(v.string()),
                 party: v.nullable(v.string()),
+                photo: Photo,
                 via: v.string(),
                 since: v.nullable(v.string()),
                 contest: v.nullable(v.string()),
@@ -12485,6 +12486,9 @@ export const polities = {
           select c.id, c.seat_id, coalesce(c.office_id, c.body_id) as owner, c.office_id is not null as "isOffice",
             e.date_from as date, e.kind::text as kind, coalesce(c.magnitude, 1) as magnitude,
             case when c.district_area_id in (select area_id from own) then null else c.district_area_id end as district,
+            (select a.k from area a where a.id = coalesce(c.district_area_id, (
+              select pt.area_id from polity_territory pt where pt.polity_id = e.polity_id and pt.valid @> e.date_from limit 1
+            ))) as place,
             substring(n.text from '(?:election|elections|runoff|runoffs|primary)(?:, (.+))$') as suffix,
             e.kind not in ('special', 'by_election') and extract(year from e.date_from) = extract(year from current_date)
               and exists (select from slug s where s.entity_id = ${input.id}::uuid and s.is_current and s.path like 'us/%') as "isElect"
@@ -12513,12 +12517,18 @@ export const polities = {
           select k.*, w.option, w.person, w.party
           from keyed k
           cross join lateral (
-            select o.id as option, coalesce(m.into_id, cy.person_id) as person, coalesce(pm.into_id, o.party_id) as party
+            select o.id as option, coalesce(m.into_id, cy.person_id) as person, coalesce(pm.into_id, o.party_id, cy.member_of_party_id, (
+                select ch.party_id from contest_option ch
+                join result_rollup y on y.result_set_k = rs.k and y.area_k = k.place and y.option_k = ch.k
+                  and y.measure = 1 and y.channel = 0 and y.count_round = 0
+                where ch.parent_option_id = o.id and ch.party_id is not null
+                order by y.value desc limit 1
+              )) as party
             from result_set rs
             join outcome x on x.result_set_id = rs.id and x.kind in ('elected', 'won') and x.candidacy_id is null
             join contest_option o on o.id = x.option_id
             left join lateral (
-              select cy.person_id from candidacy cy where cy.option_id = o.id and cy.person_id is not null order by cy.id limit 1
+              select cy.person_id, cy.member_of_party_id from candidacy cy where cy.option_id = o.id and cy.person_id is not null order by cy.id limit 1
             ) cy on true
             left join entity_merge m on m.entity_id = cy.person_id
             left join entity_merge pm on pm.entity_id = o.party_id
@@ -12634,7 +12644,7 @@ export const polities = {
       const parties = [
         ...new Set(found.rows.flatMap((row) => row.party ?? [])),
       ];
-      const [labels, slugs, colors] = await Promise.all([
+      const [labels, slugs, colors, faces] = await Promise.all([
         names([...owners, ...people]),
         paths(
           found.rows.flatMap((row) =>
@@ -12642,6 +12652,7 @@ export const polities = {
           ),
         ),
         refs(parties),
+        portraits(found.rows.flatMap((row) => row.person ?? [])),
       ]);
       const groups = Map.groupBy(found.rows, (row) => row.owner)
         .entries()
@@ -12687,6 +12698,8 @@ export const polities = {
                       ? null
                       : (labels.full.get(row.person) ?? null),
                   party: row.party,
+                  photo:
+                    row.person == null ? null : (faces.get(row.person) ?? null),
                   via: row.via,
                   since: row.since,
                   contest:
@@ -14556,7 +14569,10 @@ export const people = {
           : null;
       const housed = await db.execute<{ id: string; polity: string }>(sql`
         select id, polity_id::text as polity from body
-        where id = any(${sql.param([...spells, ...terms].filter((spell) => spell.isBody).map((spell) => spell.owner))}::uuid[])
+        where id = any(${sql.param([...spells, ...terms].map((spell) => spell.owner))}::uuid[])
+        union all
+        select id, polity_id::text from office
+        where id = any(${sql.param([...spells, ...terms].map((spell) => spell.owner))}::uuid[])
       `);
       const homes = [...new Set(housed.rows.map((row) => row.polity))];
       const [faces, owned, peers, homeSlugs] = await Promise.all([
@@ -14572,9 +14588,14 @@ export const people = {
         housed.rows.flatMap((row) => {
           const home = homeSlugs.get(row.polity);
           const slug = peers.get(row.id);
-          return home == null || slug == null
+          return home == null
             ? []
-            : [[row.id, `chambers/${home}/${slug}`] as const];
+            : [
+                [
+                  row.id,
+                  slug == null ? home : `chambers/${home}/${slug}`,
+                ] as const,
+              ];
         }),
       );
       const now = new Date();

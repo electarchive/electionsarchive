@@ -3,7 +3,7 @@
   import { createQuery } from "@tanstack/svelte-query";
   import { SvelteSet } from "svelte/reactivity";
   import Name from "#lib/components/name.svelte";
-  import { count, date } from "#lib/format.js";
+  import { count, credit, date } from "#lib/format.js";
   import { m } from "#lib/paraglide/messages.js";
   import { swatch } from "#lib/party.js";
   import { orpc } from "#lib/rpc.js";
@@ -134,12 +134,36 @@
             {const row = $derived(group.rows[0])}
             {#if row != null}
               <div
-                class="grid content-start gap-1 border-bs border-border pbs-2 text-sm"
+                class={cn(
+                  "grid content-start gap-x-3 gap-y-1 border-bs border-border pbs-2 text-sm",
+                  { "grid-cols-[auto_minmax(0,1fr)]": row.photo != null },
+                )}
               >
+                {#if row.photo != null}
+                  <dd class="row-span-3 grid content-start gap-1">
+                    <img
+                      class="aspect-4/5 rounded-sm bg-muted object-cover object-top ring-1 ring-border inline-12"
+                      src={row.photo.src}
+                      alt={m.photo_alt({ name: row.name ?? "" })}
+                      width="48"
+                      height="60"
+                      loading="lazy"
+                    />
+                  </dd>
+                {/if}
                 <dt class="text-xs font-semibold text-muted-foreground">
                   {group.name}{row.label == null ? "" : `, ${row.label}`}
                 </dt>
                 <dd class="text-[0.9375rem]">{@render holder(row)}</dd>
+                {#if row.photo != null}
+                  <dd>
+                    <a
+                      class="text-[0.6875rem] text-muted-foreground underline decoration-border underline-offset-4 hover:text-foreground hover:decoration-foreground"
+                      href={row.photo.source}
+                      rel="external noopener">{credit(row.photo)}</a
+                    >
+                  </dd>
+                {/if}
               </div>
             {/if}
           {/each}

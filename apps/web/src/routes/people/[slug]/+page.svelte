@@ -168,14 +168,16 @@
         <li
           class="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-4 gap-y-1 border-be border-border/60 py-1.5 last:border-be-0 sm:grid-cols-[minmax(0,18rem)_minmax(0,1fr)_auto]"
         >
-          {#if spell.isBody}
+          {#if spell.isBody || spell.path != null}
             <a
               class="truncate font-semibold hover:highlighter"
               href={spell.path == null
                 ? resolve("/id/[id]", { id: spell.id })
-                : resolve("/chambers/[...path]", {
-                    path: spell.path.replace(/^chambers\//u, ""),
-                  })}>{spell.name}</a
+                : spell.path.startsWith("chambers/")
+                  ? resolve("/chambers/[...path]", {
+                      path: spell.path.replace(/^chambers\//u, ""),
+                    })
+                  : resolve("/[...path]", { path: spell.path })}>{spell.name}</a
             >
           {:else}
             <span class="truncate font-semibold">{spell.name}</span>
