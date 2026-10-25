@@ -1188,6 +1188,12 @@ def emit(
                 [rf"^[0-9]{{4}}-[0-9]{{2}}-[0-9]{{2}}:({pattern})(:(primary|runoff|special))?$"],
             ).fetchall()
         )
+        special_before: dict[str, str] = dict(
+            conn.execute(
+                """select x.value, e.kind from external_id x join election e on e.id = x.entity_id
+                     where x.scheme = 'us.election' and e.kind = 'special' and x.value ~ '^[0-9-]{10}:TX:[0-9]+$'"""
+            ).fetchall()
+        )
         cs = Changeset(
             conn,
             pipeline=source,
@@ -1394,13 +1400,17 @@ def emit(
             if completeness < 0.5:
                 skipped["under half its area reported"] += 1
                 continue
+            uniform = st == "TX" and (
+                (day.month == 5 and day.weekday() == 5 and day.day <= 7)
+                or (day.month == 11 and day.weekday() == 1 and 2 <= day.day <= 8)
+            )
             kind = (
                 "primary"
                 if primary and not runoff
                 else "runoff"
                 if runoff
                 else "special"
-                if first["special"]
+                if first["special"] and not uniform
                 else "general"
                 if day.month == 11 and day.day <= 8
                 else "local"
@@ -1436,9 +1446,28 @@ def emit(
                     umbrella_path = f"{umbrella_path}-elections"
                 slugs[umbrella_path] = parent
                 cs.add("slug", path=umbrella_path, entity_id=parent)
+            if uniform and parents.get(parent_key) == "special" and parent not in elections:
+                elections.add(parent)
+                parents[parent_key] = kind
+                cs.add(
+                    "election",
+                    id=parent,
+                    polity_id=cs.polity(f"US-{st}"),
+                    kind=kind,
+                    date_from=day,
+                    date_to=day,
+                    date_precision="day",
+                    status="held",
+                )
             kind = parents.get(parent_key, kind) if kind not in ("primary", "runoff") else kind
             election = cs.key("us.election", f"{day}:{st}:{code}{suffix}")
-            if (election in cs.minted or st == "IL" and day == date(2021, 4, 6)) and election not in elections:
+            if (
+                election in cs.minted
+                or st == "IL"
+                and day == date(2021, 4, 6)
+                or uniform
+                and special_before.get(f"{day}:{st}:{code}{suffix}") == "special"
+            ) and election not in elections:
                 elections.add(election)
                 cs.add(
                     "election",
