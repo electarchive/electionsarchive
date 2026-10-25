@@ -13,7 +13,7 @@ from ea.sources.us.phila_returns import SOURCE as RETURNS
 from ea.store import connect
 
 SOURCE = "us.phila_local"
-VERSION = "5"
+VERSION = "6"
 FIPS = "42101"
 PLACE = "4260000"
 SPECIAL_DAYS = {
@@ -235,8 +235,9 @@ def emit() -> Path:
         for day, value in conn.execute(
             """select e.date_from, lower(x.value) from contest k join election e on e.id = k.election_id
                join external_id x on x.entity_id = k.id and x.scheme = 'us.contest'
-               where k.district_area_id in (%s, %s)""",
-            [place_area, county_area],
+               where k.district_area_id in (%s, %s) and not exists (
+                 select 1 from external_id y where y.scheme = %s and lower(y.value) = lower(x.value))""",
+            [place_area, county_area, f"{SOURCE}.result_set"],
         ).fetchall():
             existing[day].add(value)
         statewide_questions = {
