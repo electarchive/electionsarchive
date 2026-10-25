@@ -80,7 +80,14 @@ def contests(text: str) -> Iterator[dict[str, Any]]:
                 }
             )
         if total is not None and choices and sum(int(choice["total"]) for choice in choices) == total:
-            yield {"key": f"{start}", "text": header[1], "vote_for": int(header[2]), "choices": choices}
+            heading = re.sub(
+                r"(?i)\bDetroit (?:Community )?School District\b",
+                "Detroit Public Schools Community District",
+                header[1],
+            )
+            if re.fullmatch(r"(?i)detroit public schools community district board member", heading):
+                heading = "Board Member Detroit Public Schools Community District"
+            yield {"key": f"{start}", "text": heading, "vote_for": int(header[2]), "choices": choices}
             start += 1
 
 
