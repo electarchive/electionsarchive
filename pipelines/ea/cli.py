@@ -1,7 +1,10 @@
 import argparse
+import atexit
 import importlib
+import resource
 import subprocess
 import sys
+import time
 from pathlib import Path
 
 from ea import (
@@ -85,6 +88,16 @@ def main() -> None:
     caching.add_argument("source", nargs="?", help="limit verify, pin, push, or pull to one source, such as us.medsl")
     caching.add_argument("--quick", action="store_true", help="verify sizes only, without hashing")
     args = parser.parse_args()
+    atexit.register(
+        lambda: (
+            (DATA / "logs" / "ea-maxrss.tsv")
+            .open("a")
+            .write(
+                f"{time.time():.0f}\t{args.command}\t{getattr(args, 'source', '') if args.command in ('parse', 'emit') else ''}\t"
+                f"{max(resource.getrusage(who).ru_maxrss for who in (resource.RUSAGE_SELF, resource.RUSAGE_CHILDREN)) / 1048576:.3f}\n"
+            )
+        )
+    )
     match args.command:
         case "apply":
             print(apply(args.changeset))
