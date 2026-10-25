@@ -2079,6 +2079,11 @@ def emit() -> Path:
                 print(f"  runoff not held in the archive: {city} {day} {first}")
                 continue
             chained[city] += 1
+            runoff = {"previous_round_id": first, "round_number": 2, "electoral_system_id": two_round}
+            staged = next((row for row in cs.rows.get("contest", []) if row["id"] == later["id"]), None)
+            if staged is not None:
+                staged.update(runoff)
+                continue
             cs.add(
                 "contest",
                 **{
@@ -2086,7 +2091,7 @@ def emit() -> Path:
                     for column, value in later.items()
                     if column not in ("k", "changeset_id", "recorded_from", "notional")
                 }
-                | {"previous_round_id": first, "round_number": 2, "electoral_system_id": two_round},
+                | runoff,
             )
         print(f"{len(firsts)} first rounds short of the threshold; runoffs chained by city: {chained}")
         cs.frame(
