@@ -715,7 +715,7 @@ def committed(books: dict[str, dict[str, float]]) -> float:
         return sum(entries.values())
     if time.time() - billed["at"] > 6 * 3600:
         raise SystemExit("BLOCKED: billing is over 6 hours old; run anthropic-batch uv run ea scans reconcile")
-    since = billed["at"] - 6 * 3600
+    since = billed["at"] - 2 * 3600
     recent = sum(value for key, value in entries.items() if books.get("when", {}).get(key, 0) >= since)
     return billed["usd"] + recent
 
