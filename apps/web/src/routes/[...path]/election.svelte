@@ -584,6 +584,31 @@
         );
       const isTallied = isSplit && districts.length === race.count;
       const noun = race.places?.levels[0]?.noun ?? "";
+      const wards = race.wards ?? [];
+      const sent = wards.filter((row) => row.runoff != null);
+      const won = wards.filter((row) => row.runoff == null && row.isWon).length;
+      const first = sent[0]?.runoff;
+      const outright =
+        wards.length === 0
+          ? undefined
+          : first == null
+            ? won === wards.length
+              ? m.wards_lede_all({ count: count(wards.length) })
+              : null
+            : m.wards_lede({
+                won: count(won),
+                count: count(wards.length),
+                sent: count(sent.length),
+                round: (first.isGeneral
+                  ? m.wards_round_general
+                  : m.wards_round_runoff)({
+                  date: new Intl.DateTimeFormat(getLocale(), {
+                    month: "long",
+                    day: "numeric",
+                    timeZone: "UTC",
+                  }).format(new Date(`${first.date}T00:00:00Z`)),
+                }),
+              });
       let decided: {
         places: NonNullable<typeof race.places>;
         tones: Array<string>;
@@ -846,106 +871,111 @@
           nominated: row.nominated,
           supported: row.supported,
         })),
-        lede: race.isPrimaries
-          ? m.race_lede_primaries({ count: count(race.count) })
-          : elector != null
-            ? second?.votes === elector.votes
-              ? m.race_lede_electors_tied({
-                  party: elector.label,
-                  runner: second.label,
-                  seats: count(elector.votes),
-                  total: count(appointed),
-                })
-              : popular == null
-                ? m.race_lede_electors_only({
-                    party: elector.label,
-                    seats: count(elector.votes),
-                    total: count(appointed),
-                  })
-                : m.race_lede_electors({
-                    party: elector.label,
-                    seats: count(elector.votes),
-                    total: count(appointed),
-                    share: percent(popular.share),
-                  })
-            : leader == null || leader.key === "unrecorded"
-              ? null
-              : race.kind === "elector_slate" && seated.length > 0
-                ? m.race_lede_electors({
-                    party: definite(named(leader), true),
-                    seats: count(leader.seats ?? 0),
-                    total: count(total),
-                    share: percent(leader.share),
-                  })
-                : seated.length > 0 &&
-                    race.count > 1 &&
-                    leader.key.startsWith("person:")
-                  ? m.race_lede_districts({
-                      seats: count(total),
-                      count: count(race.count),
+        lede:
+          outright !== undefined
+            ? outright
+            : race.isPrimaries
+              ? m.race_lede_primaries({ count: count(race.count) })
+              : elector != null
+                ? second?.votes === elector.votes
+                  ? m.race_lede_electors_tied({
+                      party: elector.label,
+                      runner: second.label,
+                      seats: count(elector.votes),
+                      total: count(appointed),
                     })
-                  : seated.length > 0 && !race.isOffice && isSplit
-                    ? m.race_lede_split({
+                  : popular == null
+                    ? m.race_lede_electors_only({
+                        party: elector.label,
+                        seats: count(elector.votes),
+                        total: count(appointed),
+                      })
+                    : m.race_lede_electors({
+                        party: elector.label,
+                        seats: count(elector.votes),
+                        total: count(appointed),
+                        share: percent(popular.share),
+                      })
+                : leader == null || leader.key === "unrecorded"
+                  ? null
+                  : race.kind === "elector_slate" && seated.length > 0
+                    ? m.race_lede_electors({
                         party: definite(named(leader), true),
-                        seats: count(isTallied ? wins : (leader.seats ?? 0)),
-                        total: count(race.count),
-                        noun,
+                        seats: count(leader.seats ?? 0),
+                        total: count(total),
                         share: percent(leader.share),
                       })
                     : seated.length > 0 &&
-                        ((race.isTotal && leader.share === 0) ||
-                          (!race.isOffice &&
-                            ((race.unopposed?.seats ?? 0) * 10 >= total ||
-                              (race.multiple ?? 0) > 0)))
-                      ? m.race_lede_seats_only({
-                          party: definite(named(leader), true),
-                          seats: count(leader.seats ?? 0),
-                          total: count(
-                            race.size != null && race.size <= total + 2
-                              ? race.size
-                              : total,
-                          ),
+                        race.count > 1 &&
+                        leader.key.startsWith("person:")
+                      ? m.race_lede_districts({
+                          seats: count(total),
+                          count: count(race.count),
                         })
-                      : seated.length > 0 && !race.isOffice
-                        ? (race.kind === "body_seats" && race.body == null
-                            ? m.race_lede_tally
-                            : isRound && race.round === 1
-                              ? m.race_lede_seats_first
-                              : m.race_lede_seats)({
+                      : seated.length > 0 && !race.isOffice && isSplit
+                        ? m.race_lede_split({
                             party: definite(named(leader), true),
-                            seats: count(leader.seats ?? 0),
-                            total: count(
-                              race.size != null && race.size <= total + 2
-                                ? race.size
-                                : total,
+                            seats: count(
+                              isTallied ? wins : (leader.seats ?? 0),
                             ),
+                            total: count(race.count),
+                            noun,
                             share: percent(leader.share),
                           })
-                        : isShort
-                          ? m.race_lede_quorum({
-                              turnout: percent(turned),
-                              quorum: percent(race.quorum ?? 0),
-                              share: percent(leader.share),
+                        : seated.length > 0 &&
+                            ((race.isTotal && leader.share === 0) ||
+                              (!race.isOffice &&
+                                ((race.unopposed?.seats ?? 0) * 10 >= total ||
+                                  (race.multiple ?? 0) > 0)))
+                          ? m.race_lede_seats_only({
+                              party: definite(named(leader), true),
+                              seats: count(leader.seats ?? 0),
+                              total: count(
+                                race.size != null && race.size <= total + 2
+                                  ? race.size
+                                  : total,
+                              ),
                             })
-                          : race.kind === "ballot_question" &&
-                              race.results[0]?.isLost === true
-                            ? m.race_lede_lost({
-                                answer: named(leader),
+                          : seated.length > 0 && !race.isOffice
+                            ? (race.kind === "body_seats" && race.body == null
+                                ? m.race_lede_tally
+                                : isRound && race.round === 1
+                                  ? m.race_lede_seats_first
+                                  : m.race_lede_seats)({
+                                party: definite(named(leader), true),
+                                seats: count(leader.seats ?? 0),
+                                total: count(
+                                  race.size != null && race.size <= total + 2
+                                    ? race.size
+                                    : total,
+                                ),
                                 share: percent(leader.share),
                               })
-                            : runner == null
-                              ? null
-                              : (seated.length > 0 ||
-                                  race.results[0]?.isWon === true
-                                  ? m.race_lede_won
-                                  : m.race_lede_votes)({
-                                  party: definite(named(leader), true),
+                            : isShort
+                              ? m.race_lede_quorum({
+                                  turnout: percent(turned),
+                                  quorum: percent(race.quorum ?? 0),
                                   share: percent(leader.share),
-                                  margin: points(
-                                    leader.share - runner.share,
-                                  ).replace(/^\+/u, ""),
-                                  runner: definite(named(runner)),
-                                }),
+                                })
+                              : race.kind === "ballot_question" &&
+                                  race.results[0]?.isLost === true
+                                ? m.race_lede_lost({
+                                    answer: named(leader),
+                                    share: percent(leader.share),
+                                  })
+                                : runner == null
+                                  ? null
+                                  : (seated.length > 0 ||
+                                      race.results[0]?.isWon === true
+                                      ? m.race_lede_won
+                                      : m.race_lede_votes)({
+                                      party: definite(named(leader), true),
+                                      share: percent(leader.share),
+                                      margin: points(
+                                        leader.share - runner.share,
+                                      ).replace(/^\+/u, ""),
+                                      runner: definite(named(runner)),
+                                    }),
         next:
           race.runoff?.runner == null
             ? turned == null || isShort
@@ -1256,7 +1286,7 @@
         >
       {/if}
       {#if (race.wards ?? []).length > 0 && (!isFolding || index === 0 || opened[index] === true)}
-        {@render wards(race.wards ?? [], race.anchor)}
+        {@render wards(race.wards ?? [], race.anchor, race.lede)}
       {/if}
     </section>
   {/if}
@@ -1583,16 +1613,17 @@
                   "max-sm:hidden":
                     races.length > 4 &&
                     other.next == null &&
-                    !other.isPrimaries,
+                    !other.isPrimaries &&
+                    (other.wards ?? []).length === 0,
                 })}
               >
                 {@render lede(other, false)}
               </div>
             {/if}
           </div>
-          {#if other.results.length > 0}
+          {#if other.results.length > 0 && (other.wards ?? []).length === 0}
             {@render tally(other, false)}
-          {:else if !other.isPrimaries}
+          {:else if other.results.length === 0 && !other.isPrimaries}
             <p class="text-[0.9375rem] text-muted-foreground">
               {m.no_results()}
             </p>
@@ -1628,6 +1659,7 @@
 {#snippet wards(
   rows: NonNullable<(typeof races)[number]["wards"]>,
   anchor: string,
+  text: string | null,
 )}
   {const round = (runoff: { date: string; isGeneral: boolean }) => {
     const day = new Intl.DateTimeFormat(getLocale(), {
@@ -1639,22 +1671,9 @@
       ? m.wards_round_general({ date: day })
       : m.wards_round_runoff({ date: day });
   }}
-  {const sent = $derived(rows.filter((row) => row.runoff != null))}
-  {const won = $derived(
-    rows.filter((row) => row.runoff == null && row.isWon).length,
-  )}
   <div class="grid content-start gap-2 pbs-1 pbe-3">
     <p class="text-[0.9375rem] text-pretty max-inline-[64ch]">
-      {sent[0]?.runoff == null
-        ? won === rows.length
-          ? m.wards_lede_all({ count: count(rows.length) })
-          : null
-        : m.wards_lede({
-            won: count(won),
-            count: count(rows.length),
-            sent: count(sent.length),
-            round: round(sent[0].runoff),
-          })}
+      {text}
     </p>
     <ol
       class="grid grid-cols-[repeat(auto-fill,minmax(min(100%,19rem),1fr))] gap-x-6 text-sm"
