@@ -87,6 +87,7 @@ KINDS = {
 }
 BALLOTS = {"Erststimmen": 1, "Zweitstimmen": 2}
 ANNOTATION = re.compile(r"\s*\((Teil|Wkr\. [^)]*|in .+ enthalten|einschl\. .+)\)$")
+SMALL_WORDS = {"IN", "FÜR", "UND", "DER", "ZUR", "VON"}
 THRESHOLD = {"percent": 5, "level": "party", "scope": "national", "constituencies": 3}
 RESULTS_NOTE = (
     "Constituency and list candidates are named from the Bundeswahlleiterin's list of applicants as admitted on "
@@ -796,7 +797,9 @@ def emit() -> Path:
                 attribution=f"© Die Bundeswahlleiterin, Wiesbaden {held.year}",
                 notes=notes,
             )
-        candidates_source = cs.source("Die Bundeswahlleiterin", "Bundestagswahl 2025: Wahlbewerberinnen und Wahlbewerber")
+        candidates_source = cs.source(
+            "Die Bundeswahlleiterin", "Bundestagswahl 2025: Wahlbewerberinnen und Wahlbewerber"
+        )
         cs.add(
             "source",
             id=candidates_source,
@@ -961,11 +964,19 @@ def emit() -> Path:
         for code in units.filter(pl.col("kind") == "8")["code"]:
             cs.add("note", entity_id=UUID(unit_ids[code]), kind="caveat", body_md=UNASSIGNED)
 
+        def party_name(party: UUID, label: str) -> None:
+            if not (label.isupper() and " " in label):
+                name(party, label)
+                return
+            common = " ".join(word.lower() if word in SMALL_WORDS else word.title() for word in label.split(" "))
+            name(party, common)
+            cs.add("name", entity_id=party, text=label, lang="de", kind="official", is_preferred=False)
+
         party_ids: dict[str, UUID] = {}
         for short, label in parties.iter_rows():
             party_ids[short] = cs.key("de.party", short.upper())
             cs.add("party", id=party_ids[short], kind="party", polity_id=germany)
-            name(party_ids[short], label)
+            party_name(party_ids[short], label)
             if short != label:
                 name(party_ids[short], short, "de", "abbreviation")
             if short in COLORS:
@@ -978,7 +989,7 @@ def emit() -> Path:
                 continue
             european_party_ids[short] = cs.key("de.party", short.upper())
             cs.add("party", id=european_party_ids[short], kind="party", polity_id=germany)
-            name(european_party_ids[short], label)
+            party_name(european_party_ids[short], label)
             if short != label:
                 name(european_party_ids[short], short, "de", "abbreviation")
         bundestag = cs.key("de.body", "bundestag")
