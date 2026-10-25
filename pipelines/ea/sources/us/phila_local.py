@@ -13,12 +13,32 @@ from ea.sources.us.phila_returns import SOURCE as RETURNS
 from ea.store import connect
 
 SOURCE = "us.phila_local"
-VERSION = "1"
+VERSION = "2"
 FIPS = "42101"
 PLACE = "4260000"
+SPECIAL_DAYS = {
+    date(2011, 2, 1),
+    date(2015, 3, 24),
+    date(2015, 8, 11),
+    date(2016, 3, 15),
+    date(2017, 3, 21),
+    date(2019, 3, 12),
+    date(2024, 2, 13),
+}
+TRUNCATED = {date(2011, 2, 1): "185"}
+STATE_HOUSE = re.compile(r"^(?:SPECIAL ELECTION - )?REPRESENTATIVE IN THE GENERAL ASSEMBLY ?-? ?(\d+)")
+QUESTION = re.compile(r"^(?:PROPOSED )?(CHARTER CHANGE QUESTION|CITY BOND QUESTION|QUESTION)(?: ?#(\d+))?")
+WRITE_IN = re.compile(r"(?i)write.?in")
 ORDINAL = re.compile(r"(\d+)(?:ST|ND|RD|TH)")
 RETENTION = re.compile(r"^(.*?) (YES SI|NO NO)$")
 OFFICES = [
+    (
+        r"^SPECIAL ELECTION - COUNCIL AT[- ]?LARGE",
+        "council-at-large-special",
+        "Philadelphia City Council, at-large special election",
+        PLACE,
+        1,
+    ),
     (r"^MAYOR", "mayor", "Mayor of Philadelphia", PLACE, 1),
     (r"^COUNCIL AT[- ]?LARGE", "council-at-large", "Philadelphia City Council, at-large seats", PLACE, 7),
     (r"^DISTRICT COUNCIL", "council", "Philadelphia City Council", PLACE, 1),
@@ -33,6 +53,7 @@ OFFICES = [
     (r"^JUDGE OF THE TRAFFIC COURT", "traffic-court", "Judge of the Philadelphia Traffic Court", FIPS, None),
 ]
 COURTS = {
+    "COMMON PLEAS COURT": "common-pleas",
     "COURT OF COMMON PLEAS": "common-pleas",
     "MUNICIPAL COURT": "municipal-court",
     "TRAFFIC COURT": "traffic-court",
@@ -49,6 +70,12 @@ PARTIES = {
     "DEM": "democratic-party",
     "D": "democratic-party",
     "REPUBLICAN": "republican-party",
+    "LIBERTARIAN": "libertarian-party",
+    "LIB": "libertarian-party",
+    "GREEN": "green-party",
+    "GRN": "green-party",
+    "CST": "constitution-party",
+    "CONSTITUTION": "constitution-party",
     "REP": "republican-party",
     "R": "republican-party",
 }
@@ -59,7 +86,27 @@ NOTE = (
 )
 
 
-def office_of(contest: str, candidate: str) -> tuple[str, str | None, str | None, str | None] | None:
+def office_of(
+    day: date, contest: str, candidate: str
+) -> tuple[str, str | None, str | None, str | None, str | None] | None:
+    if day in SPECIAL_DAYS:
+        found = STATE_HOUSE.match(contest)
+        if found is not None:
+            return "state-house", TRUNCATED.get(day, found[1]), None, None, None
+    asked = QUESTION.match(contest)
+    if asked is not None:
+        kind = {"CHARTER CHANGE QUESTION": "charter-change", "CITY BOND QUESTION": "city-bond"}.get(
+            asked[1], "question"
+        )
+        number = asked[2] or (re.search(r"#(\\d+)", contest) or [None, None])[1]
+        answer = (
+            "Yes"
+            if re.match(r"(?i)yes|s[ií]\\b|for\\b", candidate)
+            else "No"
+            if re.match(r"(?i)no\\b", candidate)
+            else None
+        )
+        return None if answer is None else ("question", None, None, answer, f"{kind}-{number}" if number else kind)
     judge = None
     if contest.startswith("RETENTION - "):
         court, _, judge = contest.removeprefix("RETENTION - ").partition(" - ")
@@ -71,47 +118,71 @@ def office_of(contest: str, candidate: str) -> tuple[str, str | None, str | None
         court = None
     if court is not None:
         key = COURTS.get(court)
-        return None if key is None else (key, None, judge, "Yes" if candidate.upper().startswith("YES") else "No")
+        answer = (
+            "Yes"
+            if re.search(r"\bYES\b", candidate.upper())
+            else "No"
+            if re.search(r"\bNO\b", candidate.upper())
+            else None
+        )
+        return None if key is None or answer is None else (key, None, judge.strip(), answer, None)
     for pattern, key, _, _, _ in OFFICES:
         if re.match(pattern, contest):
             if key == "council":
                 found = ORDINAL.search(contest)
-                return None if found is None else (key, f"district-{int(found[1])}", None, None)
+                return None if found is None else (key, f"district-{int(found[1])}", None, None, None)
             vote = RETENTION.match(candidate)
             if vote is not None and key in COURTS.values():
-                return key, None, vote[1], "Yes" if vote[2].startswith("YES") else "No"
-            return key, None, None, None
+                return key, None, vote[1], "Yes" if vote[2].startswith("YES") else "No", None
+            return key, None, None, None, None
     return None
 
 
 def emit() -> Path:
     tallies: dict[tuple, dict[str, dict[str, int]]] = defaultdict(lambda: defaultdict(lambda: defaultdict(int)))
     labels: dict[tuple, dict[str, str | None]] = defaultdict(dict)
+    refs: dict[tuple, dict[str, tuple[str, str | None, str]]] = defaultdict(dict)
     urls: dict[date, str] = {}
     frame = pl.read_parquet(PARSED / "rows.parquet")
+    printed = {
+        (day, contest, ballot, candidate): (total, other)
+        for day, contest, ballot, candidate, total, other in pl.read_parquet(PARSED / "printed.parquet").iter_rows()
+    }
+    summaries: dict[tuple[date, str], list[int]] = defaultdict(list)
+    for day, candidate, total in pl.read_parquet(PARSED / "summaries.parquet").iter_rows():
+        summaries[(day, re.sub(r"[^A-Z0-9]", "", candidate.upper()))].append(total)
     for day, url, contest, precinct, candidate, votes, party, ballot in frame.select(
         "day", "url", "contest", "precinct", "candidate", "votes", "party", "ballot"
     ).iter_rows():
         name = contest.partition("|")[0]
-        found = office_of(name, candidate)
+        found = office_of(day, name, candidate)
         if found is None:
             continue
-        office, seat, judge, answer = found
+        office, seat, judge, answer, qkey = found
         retention = answer is not None
-        label = answer or candidate
-        sheet = (day, office, seat, BALLOTS.get(ballot or ""), judge and slug(judge))
+        write_in = WRITE_IN.match(candidate) is not None
+        label = "Write-ins" if write_in else answer or candidate
+        sheet = (day, office, seat, BALLOTS.get(ballot or ""), judge and slug(judge), qkey)
         tallies[sheet][label][precinct] += votes
+        refs[sheet].setdefault(label, (name, ballot, candidate))
         if not retention:
             labels[sheet][label] = PARTIES.get((party or ballot or "").upper())
         elif judge:
             labels[sheet]["judge"] = judge
+        if qkey:
+            labels[sheet]["name"] = name
         urls[day] = url
+    nominees: dict[tuple, set[str]] = defaultdict(set)
+    for sheet, options in tallies.items():
+        if sheet[3] is not None:
+            for candidate in options:
+                nominees[(sheet[0].year, sheet[1], sheet[2], slug(candidate))].add(sheet[3])
     with connect() as conn:
         cs = Changeset(
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Philadelphia's city and county elections by ward and division, 2007-2020",
+            summary="Philadelphia's city and county elections, questions, and special elections by ward and division, 2007-2026",
             polity="US-PA",
         )
         cs.scope_units("us.precinct", f"%:PA:{FIPS}:%")
@@ -146,7 +217,7 @@ def emit() -> Path:
         ).fetchone()
         place_area = cs.area("us.place", PLACE)
         systems = {name: cs.key("us.electoral_system", name) for name in ("fptp", "block", "referendum")}
-        parties = {name: cs.key("us.party", name) for name in ("democratic-party", "republican-party")}
+        parties = {name: cs.key("us.party", name) for name in sorted(set(PARTIES.values()))}
         if cs.minted & {*systems.values(), *parties.values()}:
             raise ValueError("the electoral systems and parties must already exist")
         existing = defaultdict(set)
@@ -157,16 +228,30 @@ def emit() -> Path:
             [place_area, county_area],
         ).fetchall():
             existing[day].add(value)
+        statewide_questions = {
+            day
+            for (day,) in conn.execute(
+                """select e.date_from from contest k join election e on e.id = k.election_id
+                   join slug s on s.entity_id = e.polity_id and s.path = 'us/pa'
+                   where k.kind = 'ballot_question'"""
+            ).fetchall()
+        }
         held = {
             path for (path,) in conn.execute("select path from slug where path like 'us/pa/philadelphia/%%'").fetchall()
         }
         made = {
             value
             for (value,) in conn.execute(
-                "select value from external_id where scheme = 'us.contest' and value ~ '^[0-9-]+:PA:(42101|4260000):'"
+                "select value from external_id where scheme = 'us.contest' and value ~ '^[0-9-]+:PA:(42101|4260000|house):'"
             ).fetchall()
         }
-        elections: dict[date, UUID] = {}
+        own = {
+            value
+            for (value,) in conn.execute(
+                "select value from external_id where scheme = %s", [f"{SOURCE}.result_set"]
+            ).fetchall()
+        }
+        elections: dict[tuple[date, bool], UUID] = {}
         owners: dict[str, UUID] = {}
         persons: dict[str, UUID] = {}
         districts: set[str] = set()
@@ -177,54 +262,90 @@ def emit() -> Path:
             cs.add("name", entity_id=entity, text=text, lang="en", kind="official", is_preferred=True)
 
         for sheet, options in sorted(tallies.items(), key=lambda item: (item[0][0], item[0][1], str(item[0][2:]))):
-            day, office, seat, ballot, judge = sheet
-            title, code, seats = next((t, c, s) for _, k, t, c, s in OFFICES if k == office)
+            day, office, seat, ballot, judge, qkey = sheet
+            question = office == "question"
+            house = office == "state-house"
+            if house:
+                title, code, seats = f"Pennsylvania House of Representatives, district {seat}", "house", 1
+            elif question:
+                title, code, seats = "Philadelphia ballot question", PLACE, None
+            else:
+                title, code, seats = next((t, c, s) for _, k, t, c, s in OFFICES if k == office)
+            if question and qkey.startswith("question-") and day in statewide_questions:
+                report["statewide question"] += 1
+                continue
             if any(hint in text for text in existing[day] for hint in [COVERED.get(office, "\0")]):
                 report["held by another pipeline"] += 1
                 continue
-            polity = polities[code][0]
-            if day not in elections:
-                found = conn.execute(
-                    """select e.id from election e where e.date_from = %s and e.polity_id = any(%s) limit 1""",
-                    [day, [polities[PLACE][0], polities[FIPS][0]]],
-                ).fetchone()
+            polity = state if house else polities[code][0]
+            civic = (day, house)
+            if civic not in elections:
+                if house:
+                    found = conn.execute(
+                        """select e.id from election e join slug s on s.entity_id = e.id
+                           where e.date_from = %s and s.path = %s limit 1""",
+                        [day, f"us/pa/{day}-special"],
+                    ).fetchone()
+                else:
+                    found = conn.execute(
+                        """select e.id from election e where e.date_from = %s and e.polity_id = any(%s) limit 1""",
+                        [day, [polities[PLACE][0], polities[FIPS][0]]],
+                    ).fetchone()
                 umbrella = conn.execute(
                     """select e.id from election e join slug s on s.entity_id = e.polity_id and s.path = 'us/pa'
                        where e.date_from = %s limit 1""",
                     [day],
                 ).fetchone()
                 if found is not None:
-                    elections[day] = found[0]
+                    elections[civic] = found[0]
                 else:
-                    kind = "primary" if ballot else "general" if day.year % 2 == 0 else "local"
-                    elections[day] = cs.key("us.election", f"{day}:PA:{PLACE}")
+                    kind = (
+                        "special"
+                        if day in SPECIAL_DAYS
+                        else "primary"
+                        if ballot or day.month < 7
+                        else "general"
+                        if day.year % 2 == 0
+                        else "local"
+                    )
+                    elections[civic] = cs.key("us.election", f"{day}:PA:{'house' if house else PLACE}")
                     cs.add(
                         "election",
-                        id=elections[day],
-                        polity_id=polities[PLACE][0],
-                        parent_id=None if umbrella is None else umbrella[0],
+                        id=elections[civic],
+                        polity_id=state if house else polities[PLACE][0],
+                        parent_id=None if house or umbrella is None else umbrella[0],
                         kind=kind,
                         date_from=day,
                         date_to=day,
                         status="held",
                     )
-                    name(elections[day], f"{day.year} Philadelphia {kind} election")
-                    cs.add("slug", path=f"{polities[PLACE][2]}/{day}-{kind}", entity_id=elections[day])
-            election = elections[day]
+                    name(
+                        elections[civic],
+                        f"{day.year} Pennsylvania special election ({day:%B} {day.day})"
+                        if house
+                        else f"{day.year} Philadelphia {kind} election",
+                    )
+                    cs.add(
+                        "slug",
+                        path=f"us/pa/{day}-special" if house else f"{polities[PLACE][2]}/{day}-{kind}",
+                        entity_id=elections[civic],
+                    )
+            election = elections[civic]
             folder = conn.execute("select path from slug where entity_id = %s", [election]).fetchone()
             folder = folder[0] if folder is not None else f"{polities[PLACE][2]}/{day}-local"
             retention = judge is not None
-            path = f"{folder}/{office}" + "".join(
-                f"-{part}" for part in (seat, f"retention-{judge}" if retention else None, ballot) if part
-            )
-            contest_key = f"{day}:PA:{code}:{office}" + "".join(
-                f":{part}" for part in (seat, f"retention-{judge}" if retention else None, ballot) if part
-            )
-            if path in held or contest_key in made:
+            parts = (seat, qkey, f"retention-{judge}" if retention else None, ballot)
+            if house:
+                path = f"{folder}/state-house-{seat}-special-election"
+                contest_key = f"{day}:PA:house:{seat}:s"
+            else:
+                path = f"{folder}/{office}" + "".join(f"-{part}" for part in parts if part)
+                contest_key = f"{day}:PA:{code}:{office}" + "".join(f":{part}" for part in parts if part)
+            if (path in held or contest_key in made) and contest_key not in own:
                 report["held by another pipeline"] += 1
                 continue
             owner_key = f"PA:{code}:{office}" + (f":retention:{judge}" if retention else "")
-            if owner_key not in owners:
+            if not house and not question and owner_key not in owners:
                 owners[owner_key] = cs.key("us.office", owner_key)
                 cs.add(
                     "office",
@@ -235,7 +356,9 @@ def emit() -> Path:
                 judge_name = labels[sheet].get("judge") if retention else None
                 name(owners[owner_key], f"{title}, retention of {judge_name.title()}" if retention else title)
             area = place_area if code == PLACE else county_area
-            if seat is not None:
+            if house:
+                area = cs.area("us.sldl", f"PA:{seat}")
+            elif seat is not None:
                 district = f"PA:{PLACE}:council:{seat}"
                 area = cs.area("us.local_district", district)
                 if district not in districts:
@@ -259,30 +382,84 @@ def emit() -> Path:
                 "contest",
                 id=contest,
                 election_id=election,
-                kind="office",
-                office_id=owners[owner_key],
+                kind="ballot_question" if question else "body_seats" if house else "office",
+                office_id=None if house or question else owners[owner_key],
                 district_area_id=area,
-                magnitude=1 if retention else seats,
+                magnitude=None if question else 1 if retention or house else seats,
                 round_number=1,
-                electoral_system_id=systems["referendum" if retention else "fptp" if seats == 1 else "block"],
+                electoral_system_id=systems[
+                    "referendum" if retention or question else "fptp" if seats == 1 else "block"
+                ],
                 default_result_kind="counted",
-                term="full",
+                term="remainder" if house or office == "council-at-large-special" else None if question else "full",
             )
-            label = (
-                f"{day.year} {title}"
-                + (f", {seat.replace('-', ' ')}" if seat else "")
-                + (f" ({ballot.title()} primary)" if ballot else "")
-            )
-            name(contest, f"{day.year} {title}, retention of {labels[sheet]['judge'].title()}" if retention else label)
+            if question:
+                cs.add("ballot_question", contest_id=contest, type="mandatory_referendum")
+            if house:
+                label = f"{day.year} Pennsylvania House, district {seat}, special election"
+            elif question:
+                label = f"{day.year} Philadelphia: {labels[sheet]['name'].title()}"
+            elif retention:
+                label = f"{day.year} {title}, retention of {labels[sheet]['judge'].title()}"
+            else:
+                label = (
+                    f"{day.year} {title}"
+                    + (f", {seat.replace('-', ' ')}" if seat else "")
+                    + (f" ({ballot.title()} primary)" if ballot else "")
+                )
+            name(contest, label)
             cs.add("slug", path=path, entity_id=contest)
-            if seat is not None:
+            if seat is not None and not house:
                 cs.add(
                     "note",
                     entity_id=contest,
                     kind="caveat",
                     body_md="The district is a label without a boundary here; division results are not assigned to it.",
                 )
+            sums = {candidate: sum(by_precinct.values()) for candidate, by_precinct in options.items()}
+            checked, differs, unchecked = 0, [], 0
+            gap = 0
+            for candidate, total in sums.items():
+                if candidate == "judge":
+                    continue
+                reference = refs[sheet].get(candidate)
+                if reference is None:
+                    continue
+                exact = printed.get((day, reference[0], reference[1], reference[2]))
+                if exact is not None:
+                    agrees = total + exact[1] == exact[0]
+                    expected = exact[0] - exact[1]
+                else:
+                    entries = summaries.get((day, re.sub(r"[^A-Z0-9]", "", reference[2].upper())))
+                    if not entries or WRITE_IN.match(candidate):
+                        unchecked += 1
+                        continue
+                    agrees = total in entries or total == sum(entries)
+                    expected = total if agrees else entries[0]
+                if agrees:
+                    checked += 1
+                else:
+                    differs.append(f"{candidate.title()}: divisions {total:,}, printed {expected:,}")
+                    gap += max(expected - total, 0)
+            if differs:
+                tie = "Division totals differ from the file's printed totals for " + "; ".join(differs) + "."
+            elif checked and not unchecked:
+                tie = (
+                    "Division totals agree with the City Commissioners' printed totals for every candidate in the "
+                    "workbook; the certified canvass itself is not linked on the archive page."
+                )
+            elif checked:
+                tie = (
+                    f"Division totals agree with the City Commissioners' printed totals for {checked} of "
+                    f"{checked + unchecked} options; the rest have no printed total in the workbook."
+                )
+            else:
+                tie = (
+                    "The file prints no totals, so the division sums are not checked against a certified count "
+                    "(contests also held at county level elsewhere in the archive are checked there)."
+                )
             result_set = cs.key(f"{SOURCE}.result_set", contest_key)
+            total_votes = sum(sums.values())
             cs.add(
                 "result_set",
                 id=result_set,
@@ -293,17 +470,34 @@ def emit() -> Path:
                 status="active",
                 source_id=source,
                 is_default=True,
-                completeness=1,
+                completeness=None if house else round(total_votes / (total_votes + gap), 4) if gap else 1,
             )
-            cs.add("note", entity_id=result_set, kind="methodology", body_md=NOTE)
+            cs.add("note", entity_id=result_set, kind="methodology", body_md=f"{NOTE} {tie}")
+            if differs:
+                cs.add("note", entity_id=result_set, kind="caveat", body_md=tie)
+            if house:
+                cs.add(
+                    "note",
+                    entity_id=result_set,
+                    kind="caveat",
+                    body_md="The file covers Philadelphia's divisions only; a district that reaches past the county line is incomplete here.",
+                )
             cells: dict[tuple[UUID, UUID], int] = {}
+            borrowed = 0
             for candidate, by_precinct in options.items():
                 if candidate == "judge":
                     continue
-                if retention:
+                if question or retention:
                     option = cs.key("us.option", f"{contest_key}:{candidate.lower()}")
-                    cs.add("contest_option", id=option, contest_id=contest, kind="answer", ballot_label=candidate)
-                    if candidate == "Yes":
+                    cs.add(
+                        "contest_option",
+                        id=option,
+                        contest_id=contest,
+                        kind="write_in" if candidate == "Write-ins" else "answer",
+                        ballot_position=(1 if candidate == "Yes" else 2) if question else None,
+                        ballot_label=candidate,
+                    )
+                    if retention and candidate == "Yes":
                         if judge not in persons:
                             persons[judge] = cs.key(f"{SOURCE}.person", judge)
                             cs.add("person", id=persons[judge])
@@ -318,6 +512,9 @@ def emit() -> Path:
                             ballot_name=labels[sheet]["judge"].title(),
                             is_independent=False,
                         )
+                elif candidate == "Write-ins":
+                    option = cs.key("us.option", f"{contest_key}:write-ins")
+                    cs.add("contest_option", id=option, contest_id=contest, kind="write_in", ballot_label="Write-ins")
                 else:
                     person_key = slug(candidate)
                     if person_key not in persons:
@@ -327,6 +524,11 @@ def emit() -> Path:
                     person = persons[person_key]
                     option = cs.key("us.option", f"{contest_key}:{person}")
                     party = labels[sheet].get(candidate)
+                    if party is None and ballot is None:
+                        ballots = nominees.get((day.year, office, seat, slug(candidate)), set())
+                        if len(ballots) == 1:
+                            party = PARTIES[next(iter(ballots)).upper()]
+                            borrowed += 1
                     cs.add(
                         "contest_option",
                         id=option,
@@ -350,6 +552,16 @@ def emit() -> Path:
                     if target in cs.minted and code_ not in minted:
                         minted[code_] = day
                     cells[(target, option)] = cells.get((target, option), 0) + votes
+            if borrowed:
+                cs.add(
+                    "note",
+                    entity_id=contest,
+                    kind="caveat",
+                    body_md=(
+                        "The workbook prints no party for the general election; a candidate's party here is the "
+                        "primary ballot they appear on in the Commissioners' files for the same office and year."
+                    ),
+                )
             for (target, option), votes in cells.items():
                 cs.add(
                     "result_value",

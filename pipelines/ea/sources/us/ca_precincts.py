@@ -24,6 +24,7 @@ def emit(
     listing: str,
     method: str,
     state_code: str = "CA",
+    names_only: bool = False,
 ) -> Path:
     days = sorted(set(rows["day"]))
     with connect() as conn:
@@ -112,7 +113,11 @@ def emit(
             for contest, election, _, stage, kind, first in by_day.get(day, []):
                 if contest in taken or first is None:
                     continue
-                known = [entry for entry in options.get(str(contest), []) if entry[1] != "write_in" and entry[3] > 0]
+                known = [
+                    entry
+                    for entry in options.get(str(contest), [])
+                    if entry[1] != "write_in" and (entry[3] > 0 or names_only)
+                ]
                 if len(known) != sums.height:
                     continue
                 picked: dict[str, tuple[str, int]] = {}
@@ -122,7 +127,7 @@ def emit(
                         option
                         for option, okind, texts, official in known
                         if option not in {chosen for chosen, _ in picked.values()}
-                        and official * 0.97 <= votes <= official * 1.0005 + 2
+                        and (official * 0.97 <= votes <= official * 1.0005 + 2 or (names_only and official == 0))
                         and (
                             (okind == "answer" and candidate.upper() in ("YES", "NO") and words[0] in texts)
                             or (
@@ -157,7 +162,7 @@ def emit(
                 status="active",
                 source_id=source,
                 is_default=False,
-                completeness=round(sum(votes for _, votes in picked.values()) / official, 4),
+                completeness=round(sum(votes for _, votes in picked.values()) / official, 4) if official else None,
             )
             codes = {
                 precinct: f"{day}:{state_code}:{fips}:{place}:{precinct}"
