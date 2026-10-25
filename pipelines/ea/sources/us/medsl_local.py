@@ -1889,4 +1889,6 @@ def emit() -> Path:
                 flags=pl.lit(0, pl.Int16),
             ),
         )
+        cs.pool("A scattering line in MEDSL's files read as a candidate")
+        cs.clear()
         return cs.write()

@@ -1,6 +1,7 @@
 import json
 import re
 import unicodedata
+from collections import defaultdict
 from collections.abc import Sequence
 from datetime import date, datetime
 from pathlib import Path
@@ -238,7 +239,9 @@ class Changeset:
 
     def pool(self, reason: str) -> None:
         pattern = r"^(write-?ins?|scattering|scattered)$"
-        staged = {str(row["id"]) for row in self.rows.get("contest_option", [])}
+        staged = {str(row["id"]) for row in self.rows.get("contest_option", [])} | {
+            str(row["option_id"]) for row in self.rows.get("option_drop", [])
+        }
         options = self.conn.execute(
             """select o.id, o.contest_id, o.parent_option_id, o.party_id, o.alliance_id, o.ballot_position, o.ballot_label
                from contest_option o join changeset c on c.id = o.changeset_id
@@ -270,6 +273,68 @@ class Changeset:
             [self.manifest["pipeline"], pattern],
         ).fetchall():
             self.add("entity_retirement", entity_id=person, reason=reason)
+
+    def clear(self) -> None:
+        pattern = r"^(under ?votes?|over ?votes?|blank( votes| ballots)?|spoiled( votes| ballots)?)$"
+        listed = [
+            id
+            for (id,) in self.conn.execute(
+                """select distinct r.id from result_set r join changeset w on w.id = r.changeset_id
+                   join contest_option o on o.contest_id = r.contest_id and o.kind = 'candidate' and o.ballot_label ~* %s
+                   where w.pipeline = %s
+                     and (exists (select from result_value v where v.result_set_k = r.k and v.option_k = o.k)
+                          or exists (select from outcome t where t.result_set_id = r.id and t.option_id = o.id))""",
+                [pattern, self.manifest["pipeline"]],
+            ).fetchall()
+        ]
+        if not listed:
+            return
+        staged = {
+            table: {str(row["result_set_id"]) for row in self.rows.get(table, [])}
+            | {str(id) for frame in self.frames.get(table, []) for id in frame["result_set_id"].to_list()}
+            for table in ("result_value", "outcome")
+        }
+        copied: dict[tuple[UUID, UUID, UUID | None, int, int, int, int], int] = defaultdict(int)
+        for result_set, unit, option, label, channel, measure, count_round, flags, value in self.conn.execute(
+            """select r.id, u.id, o.id, o.ballot_label, v.channel, v.measure, v.count_round, v.flags, v.value
+               from result_value v join result_set r on r.k = v.result_set_k join reporting_unit u on u.k = v.unit_k
+               left join contest_option o on o.k = v.option_k and v.option_k <> 0
+               where r.id = any(%s::uuid[])""",
+            [[id for id in listed if str(id) not in staged["result_value"]]],
+        ).fetchall():
+            if label is not None and re.match(pattern, label, re.IGNORECASE) is not None:
+                option, measure = None, 6 if re.match(r"(?i)(under|blank)", label) else 5
+            copied[result_set, unit, option, channel, measure, count_round, flags] += value
+        for (result_set, unit, option, channel, measure, count_round, flags), value in copied.items():
+            self.add(
+                "result_value",
+                result_set_id=result_set,
+                unit_id=unit,
+                option_id=option,
+                channel=channel,
+                measure=measure,
+                count_round=count_round,
+                flags=flags,
+                value=value,
+            )
+        for result_set, option, candidacy, kind, seats, notes in self.conn.execute(
+            """select t.result_set_id, t.option_id, t.candidacy_id, t.kind::text, t.seats, t.notes
+               from outcome t join changeset c on c.id = t.changeset_id join contest_option o on o.id = t.option_id
+               where t.result_set_id = any(%s::uuid[]) and c.pipeline = %s and o.ballot_label !~* %s""",
+            [[id for id in listed if str(id) not in staged["outcome"]], self.manifest["pipeline"], pattern],
+        ).fetchall():
+            self.add(
+                "outcome",
+                result_set_id=result_set,
+                option_id=option,
+                candidacy_id=candidacy,
+                kind=kind,
+                seats=seats,
+                notes=notes,
+            )
+        scope = self.manifest.get("scope")
+        self.manifest["scope"] = {**(scope if isinstance(scope, dict) else {}), "clears": [str(id) for id in listed]}
+        print(f"clears {len(listed)} result sets that still carry ballot remainders")
 
     def write(self) -> Path:
         folder = DATA / "changesets" / str(self.id)

@@ -1054,4 +1054,5 @@ def emit() -> Path:
                 valid_to=day + timedelta(days=1),
             )
         print(f"skipped {skipped} contests the local elections database already holds")
+        cs.clear()
         return cs.write()

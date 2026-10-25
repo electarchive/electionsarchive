@@ -221,12 +221,33 @@ def _publish_table(conn: Connection, stage: Stage, table: str) -> None:
                     + ", ".join(f"{count} by {column}" for column, count in missing.items())
                 )
         replaced = [key for (key,) in conn.execute(stage.replaced(table)).fetchall()]
+        if replaced and stage.clears:
+            cleared = conn.execute(
+                sql.SQL(
+                    """select current_setting('ea.changeset_id'), r.id::text,
+                              (select count(*) from public.{} v where v.result_set_k = r.k),
+                              (select count(*) from {} s where s.result_set_id = r.id)
+                       from public.result_set r where r.k = any(%s) and r.id = any(%s::uuid[]) order by r.id"""
+                ).format(target, staged),
+                [replaced, stage.clears],
+            ).fetchall()
+            with (DATA / "logs" / "clears.tsv").open("a", encoding="utf-8") as log:
+                log.writelines(
+                    f"{changeset}\t{table}\t{result_set}\t{removed}\t{restaged}\n"
+                    for changeset, result_set, removed, restaged in cleared
+                )
+            print(
+                f"{table}: cleared {sum(row[2] for row in cleared)} rows in {len(cleared)} listed sets, restaged {sum(row[3] for row in cleared)}"
+            )
         if replaced:
             conn.execute(
                 "update result_set set is_default = is_default where k = any(%s) and changeset_id <> ea_current_changeset()",
                 [replaced],
             )
-            for fact in (table, *(("result_rollup_sum", "result_rollup_unit", "rollup_coverage") if table == "result_value" else ())):
+            for fact in (
+                table,
+                *(("result_rollup_sum", "result_rollup_unit", "rollup_coverage") if table == "result_value" else ()),
+            ):
                 conn.execute(
                     sql.SQL("delete from public.{} where result_set_k = any(%s)").format(sql.Identifier(fact)),
                     [replaced],
@@ -826,6 +847,19 @@ def _publish_table(conn: Connection, stage: Stage, table: str) -> None:
             ).format(target=target, staged=staged, writers=stage.writers(table), overlaps=stage.overlaps(table))
         )
     if table in stage.parents:
+        if stage.parents[table] == "result_set_id" and stage.clears:
+            cleared = conn.execute(
+                sql.SQL(
+                    """select current_setting('ea.changeset_id'), p.result_set_id::text, count(*)
+                       from public.{} p, changeset c where {} and p.result_set_id = any(%s::uuid[]) group by 2 order by 2"""
+                ).format(target, stage.stale(table)),
+                [stage.clears],
+            ).fetchall()
+            with (DATA / "logs" / "clears.tsv").open("a", encoding="utf-8") as log:
+                log.writelines(
+                    f"{changeset}\t{table}\t{result_set}\t{removed}\t0\n" for changeset, result_set, removed in cleared
+                )
+            print(f"{table}: cleared {sum(row[2] for row in cleared)} rows in {len(cleared)} listed sets")
         conn.execute(sql.SQL("delete from public.{} p using changeset c where {}").format(target, stage.stale(table)))
     conn.execute(
         sql.SQL("insert into public.{} ({}) select distinct {} from {} s where not {}").format(
