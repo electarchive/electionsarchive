@@ -1,3 +1,4 @@
+import re
 from pathlib import Path
 
 import polars as pl
@@ -6,7 +7,7 @@ from ea.changeset import Changeset
 from ea.store import connect
 
 SOURCE = "us.ca_units"
-VERSION = "4"
+VERSION = "5"
 
 
 def emit() -> Path:
@@ -43,9 +44,10 @@ def emit() -> Path:
                    where x.unit_id = u.id)"""
         ).fetchall():
             day, state, county, place, precinct = code.split(":")
-            area = shapes.get(f"{day}:{state}:{county}:{precinct}") or shapes.get(
-                f"{day}:{state}:{county}:{precinct.lstrip('0').zfill(5)}"
-            )
+            keys = [precinct, precinct.lstrip("0").zfill(5)]
+            if (suffixed := re.match(r"^\d+-(\d+)-", precinct)) is not None:
+                keys.append(suffixed[1])
+            area = next((found for key in keys if (found := shapes.get(f"{day}:{state}:{county}:{key}")) is not None), None)
             if area is not None:
                 rows.append((unit, area, start, end, None))
             elif (areas := yearly.get(f"{day[:4]}:{state}:{county}:{place}:{precinct}")) is not None:
