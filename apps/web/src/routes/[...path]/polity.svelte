@@ -103,6 +103,7 @@
   const opened = new SvelteSet<string>();
   let isAllElections = $state(false);
   let isAllPlaces = $state(false);
+  let isAllRaces = $state(false);
 
   const sorts = $derived(
     polity.elections.map((election) => ({
@@ -475,7 +476,7 @@
     <ul
       class="grid grid-cols-[repeat(auto-fit,minmax(min(100%,17rem),1fr))] gap-x-6 gap-y-4"
     >
-      {#each polity.latest.races as race, index (index)}
+      {#each isAllRaces ? polity.latest.races : polity.latest.races.slice(0, 8) as race, index (index)}
         {const isSeated = $derived(
           race.contested > 1 &&
             race.results.filter((row) => (row.seats ?? 0) > 0).length > 1,
@@ -562,6 +563,19 @@
         </li>
       {/each}
     </ul>
+    {#if polity.latest.races.length > 8}
+      <button
+        type="button"
+        class="justify-self-start rounded-sm border border-input bg-card px-2.5 text-[0.8125rem] font-semibold keycap block-7 hover:bg-secondary pointer-coarse:block-10"
+        aria-expanded={isAllRaces}
+        onclick={() => (isAllRaces = !isAllRaces)}
+        >{isAllRaces
+          ? m.regions_fewer()
+          : m.regions_more({
+              count: count(polity.latest.races.length),
+            })}</button
+      >
+    {/if}
   </section>
 {/if}
 
@@ -876,7 +890,9 @@
                       ></span>
                     {/each}
                   </div>
-                  <div class="grid gap-0.5 text-[0.8125rem]">
+                  <div
+                    class="grid gap-0.5 text-[0.8125rem] pointer-coarse:gap-2"
+                  >
                     {#each [leader, runner] as row, index (index)}
                       {#if row != null}
                         <span

@@ -489,6 +489,8 @@ export async function paths(ids: Array<string>) {
   return new Map(result.rows.map((row) => [row.entity_id, row.path]));
 }
 
+const COURT = /\b(?:Judge|Justice|Court|Surrogate|Magistrate)\b/u;
+
 async function breadcrumbs(polity: string, keep: string | null = null) {
   const result = await db.execute<{ id: string }>(sql`
     with recursive chain(id, depth) as (
@@ -11654,6 +11656,10 @@ export const polities = {
                       ...raced.filter((race) => !tiers.includes(race)),
                     ]
                 )
+                  .toSorted(
+                    (a, b) =>
+                      Number(COURT.test(a.name)) - Number(COURT.test(b.name)),
+                  )
                   .map((race, _index, all) => {
                     let contested = 0;
                     for (const row of race.results) {
@@ -12166,7 +12172,6 @@ export const polities = {
         `),
         ]);
       const ranks = new Map(kinds.rows.map((row) => [row.id, row.rank ?? 5]));
-      const court = /\b(?:Judge|Justice|Court|Surrogate|Magistrate)\b/u;
       const owned = new Set(
         kinds.rows.filter((row) => row.isOwn).map((row) => row.id),
       );
@@ -12312,7 +12317,7 @@ export const polities = {
           .toSorted(
             (a, b) =>
               Number(a.isAbroad) - Number(b.isAbroad) ||
-              Number(court.test(a.name)) - Number(court.test(b.name)) ||
+              Number(COURT.test(a.name)) - Number(COURT.test(b.name)) ||
               (a.isOffice
                 ? a.points.every((point) => point.filled <= 1)
                   ? 0

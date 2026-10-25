@@ -16,6 +16,7 @@
   );
 
   const opened = new SvelteSet<string>();
+  let isAll = $state(false);
 
   const parties = $derived(
     new Map((record.data?.parties ?? []).map((party) => [party.id, party])),
@@ -45,7 +46,7 @@
     <div
       class="grid grid-cols-[repeat(auto-fit,minmax(min(100%,19rem),1fr))] gap-x-6 gap-y-5"
     >
-      {#each series as entry (entry.id)}
+      {#each isAll ? series : series.slice(0, 9) as entry (entry.id)}
         {const isPartyless = $derived(
           entry.points.every((point) =>
             point.parties.every(
@@ -156,5 +157,16 @@
         </div>
       {/each}
     </div>
+    {#if series.length > 9}
+      <button
+        type="button"
+        class="justify-self-start rounded-sm border border-input bg-card px-2.5 text-[0.8125rem] font-semibold keycap block-7 hover:bg-secondary pointer-coarse:block-10"
+        aria-expanded={isAll}
+        onclick={() => (isAll = !isAll)}
+        >{isAll
+          ? m.regions_fewer()
+          : m.regions_more({ count: count(series.length) })}</button
+      >
+    {/if}
   </section>
 {/if}
