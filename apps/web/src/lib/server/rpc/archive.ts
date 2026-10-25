@@ -15615,12 +15615,16 @@ export const search = {
               !["person", "party"].includes(b.type) &&
                 (segment(b.name) === segment(q) ||
                   (b.type === "polity" &&
+                    segment(b.name.replace(/^City of /u, "")) === segment(q)) ||
+                  (b.type === "polity" &&
                     !b.name.includes(" ") &&
                     segment(b.name.split("-")[0] ?? "") === segment(q))),
             ) -
             Number(
               !["person", "party"].includes(a.type) &&
                 (segment(a.name) === segment(q) ||
+                  (a.type === "polity" &&
+                    segment(a.name.replace(/^City of /u, "")) === segment(q)) ||
                   (a.type === "polity" &&
                     !a.name.includes(" ") &&
                     segment(a.name.split("-")[0] ?? "") === segment(q))),
