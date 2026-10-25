@@ -8219,13 +8219,14 @@ async function races(
                 join area a on a.id = c.district_area_id
                 join result_set rs on rs.contest_id = c.id and ${latest("rs")}
                 cross join lateral (
-                  select y.option_k, y.value::float8 as value, sum(y.value) over ()::float8 as total
+                  select y.option_k, sum(y.value)::float8 as value, sum(sum(y.value)) over ()::float8 as total
                   from result_rollup y
-                  where y.result_set_k = rs.k and y.area_k = a.k and y.measure = 1 and y.channel = 0 and y.option_k <> 0
+                  where y.result_set_k = rs.k and y.area_k = a.k and y.measure = 1 and y.option_k <> 0
                     and y.count_round = (
                       select max(z.count_round) from result_rollup z
                       where z.result_set_k = rs.k and z.area_k = a.k and z.measure = 1 offset 0
                     )
+                    group by y.option_k
                   offset 0
                 ) t
                 join contest_option o on o.k = t.option_k
@@ -8244,13 +8245,14 @@ async function races(
                 join area a on a.id = c.district_area_id
                 join result_set rs on rs.contest_id = c.id and ${latest("rs")}
                 cross join lateral (
-                  select y.option_k, y.value::float8 as value, sum(y.value) over ()::float8 as total
+                  select y.option_k, sum(y.value)::float8 as value, sum(sum(y.value)) over ()::float8 as total
                   from result_rollup y
-                  where y.result_set_k = rs.k and y.area_k = a.k and y.measure = 1 and y.channel = 0 and y.option_k <> 0
+                  where y.result_set_k = rs.k and y.area_k = a.k and y.measure = 1 and y.option_k <> 0
                     and y.count_round = (
                       select max(z.count_round) from result_rollup z
                       where z.result_set_k = rs.k and z.area_k = a.k and z.measure = 1 offset 0
                     )
+                    group by y.option_k
                   offset 0
                 ) t
                 join contest_option o on o.k = t.option_k
@@ -10497,13 +10499,14 @@ export const elections = {
           from area a
           join result_set rs on rs.contest_id = c.id and ${latest("rs")}
           cross join lateral (
-            select y.option_k, y.value::float8 as value, sum(y.value) over ()::float8 as total
+            select y.option_k, sum(y.value)::float8 as value, sum(sum(y.value)) over ()::float8 as total
             from result_rollup y
-            where y.result_set_k = rs.k and y.area_k = a.k and y.measure = 1 and y.channel = 0 and y.option_k <> 0
+            where y.result_set_k = rs.k and y.area_k = a.k and y.measure = 1 and y.option_k <> 0
               and y.count_round = (
                 select max(z.count_round) from result_rollup z
                 where z.result_set_k = rs.k and z.area_k = a.k and z.measure = 1 offset 0
               )
+              group by y.option_k
             offset 0
           ) t
           join contest_option o on o.k = t.option_k
