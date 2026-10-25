@@ -1,5 +1,8 @@
+import csv
+import io
 import re
 import time
+import zipfile
 from datetime import date
 from difflib import SequenceMatcher
 from pathlib import Path
@@ -14,7 +17,7 @@ from ea.sources.us.chicago_boe import fold
 from ea.store import DATA, connect
 
 SOURCE = "us.electionsfl"
-VERSION = "1"
+VERSION = "2"
 PARSED = DATA / "parsed" / SOURCE
 REPORTS = "https://enr.electionsfl.org/{county}/{election}/Reports"
 EXPORT = re.compile(
@@ -32,7 +35,11 @@ JACKSONVILLE = {
     3124: date(2022, 2, 22),
     3353: date(2023, 3, 21),
     3385: date(2023, 5, 16),
+    20030415: date(2003, 4, 15),
+    20030513: date(2003, 5, 13),
 }
+ARCHIVE = "https://web.archive.org/web/2016id_/http://www.duvalelections.com/portals/duval/archive/{}"
+ARCHIVES = {20030415: "ElectionResults_2003-4-15.zip", 20030513: "ElectionResults_2003-5-13.zip"}
 COLUMNS = {
     "Contest": "contest",
     "Candidate_Issue": "candidate",
@@ -153,6 +160,8 @@ def fetch() -> None:
             time.sleep(1)
         if (link := export(county, election)) is not None:
             raw.fetch(SOURCE, link, suffix=".csv")
+    for file in ARCHIVES.values():
+        raw.fetch(SOURCE, ARCHIVE.format(file), suffix=".zip")
 
 
 def parse() -> None:
@@ -198,13 +207,64 @@ def parse() -> None:
                 title=pl.lit(re.sub(r"\s+", " ", title[1]).strip()),
             ).unique(maintain_order=True)
         )
+    for number, file in ARCHIVES.items():
+        with zipfile.ZipFile(raw.cached(SOURCE, ARCHIVE.format(file)).path) as archive:
+            text = max((archive.read(item) for item in archive.namelist()), key=len).decode("latin-1")
+        rows = [
+            row
+            for row in csv.reader(io.StringIO(text), skipinitialspace=True)
+            if len(row) >= 21 and row[5] != "Race Statistics" and row[18] == "Total" and int(row[13]) < 999990
+        ]
+        totals = {row[2] for row in rows} == {"Election Total"}
+        frames.append(
+            pl.DataFrame(
+                [
+                    {
+                        "contest": re.sub(
+                            r"^Council District",
+                            "City Council District",
+                            re.sub(r"^Council-At-Large Group (\d+)$", r"City Council At-Large - Group \1", row[5]),
+                        ),
+                        "candidate": row[14].strip(),
+                        "party": row[15],
+                        "precinct": None if totals else row[2].strip(),
+                        "votes": int(row[20]),
+                    }
+                    for row in rows
+                    if totals or row[2] != "Election Total"
+                ],
+                schema={
+                    "contest": pl.String,
+                    "candidate": pl.String,
+                    "party": pl.String,
+                    "precinct": pl.String,
+                    "votes": pl.Int64,
+                },
+            ).with_columns(
+                county=pl.lit("DUV"),
+                fips=pl.lit(FIPS["DUV"]),
+                county_name=pl.lit(names[FIPS["DUV"]]),
+                election=pl.lit(number),
+                day=pl.lit(JACKSONVILLE[number]),
+                title=pl.lit(
+                    f"{JACKSONVILLE[number].year} {'General' if ('DUV', number) in RUNOFFS else 'First'} Election"
+                ),
+            )
+        )
     frame = pl.concat(frames, how="diagonal")
     PARSED.mkdir(parents=True, exist_ok=True)
     frame.write_parquet(PARSED / "precincts.parquet")
     print(frame.group_by("county").agg(pl.col("election").n_unique().alias("elections"), pl.len()).sort("county"))
 
 
-RUNOFFS = {("DUV", 1276): 1251, ("DUV", 2125): 2085, ("DUV", 3124): 3089, ("DUV", 3385): 3353}
+STAGES = {date(2014, 12, 16): "primary", date(2015, 2, 17): "general"}
+RUNOFFS = {
+    ("DUV", 20030513): 20030415,
+    ("DUV", 1276): 1251,
+    ("DUV", 2125): 2085,
+    ("DUV", 3124): 3089,
+    ("DUV", 3385): 3353,
+}
 PLACE = "1235000"
 COUNTY_OFFICES = {
     "sheriff": "Sheriff",
@@ -212,7 +272,18 @@ COUNTY_OFFICES = {
     "property appraiser": "Property Appraiser",
     "tax collector": "Tax Collector",
 }
-PARTIES = {"DEM": "democratic-party", "REP": "republican-party", "LPF": "libertarian-party"}
+PARTIES = {
+    "DEM": "democratic-party",
+    "REP": "republican-party",
+    "LPF": "libertarian-party",
+    "LIB": "libertarian-party",
+}
+ARCHIVE_METHOD = (
+    "Results from the Duval County Supervisor of Elections' archived text exports, by precinct where the export "
+    "gives precincts and as county totals where it gives only the election total. Jacksonville elects its mayor, "
+    "council, and Duval County's constitutional officers in a first election open to every candidate; a seat no "
+    "candidate won with a majority goes to the top two in the general election."
+)
 METHOD = (
     "Precinct results from the county Supervisor of Elections' election night reporting exports (VR Systems). "
     "Jacksonville elects its mayor, council, and Duval County's constitutional officers in a first election open to "
@@ -280,7 +351,19 @@ def emit() -> Path:
             url="https://enr.electionsfl.org/DUV/",
             license="Public record",
         )
-        for number in JACKSONVILLE:
+        archived = cs.source(publisher, "Election results archive")
+        cs.add(
+            "source",
+            id=archived,
+            kind="official_body",
+            publisher=publisher,
+            title="Election results archive",
+            url="https://www.duvalelections.com/Data-Maps-Research/Past-Election-Results/Elections-2002-2013",
+            license="Public record",
+        )
+        for file in ARCHIVES.values():
+            cs.artifact(raw.cached(SOURCE, ARCHIVE.format(file)), archived)
+        for number in set(JACKSONVILLE) - set(ARCHIVES):
             cs.artifact(raw.cached(SOURCE, REPORTS.format(county="DUV", election=number)), source)
             cs.artifact(raw.cached(SOURCE, str(export("DUV", number))), source)
         polities = {}
@@ -377,7 +460,7 @@ def emit() -> Path:
             )
             label = "Jacksonville" if code == PLACE else "Duval County"
             stem = "jacksonville" if code == PLACE else "duval-county"
-            name(entity, f"{day.year} {label} {'general' if runoff else 'first'} election")
+            name(entity, f"{day.year} {label} {STAGES.get(day, 'general' if runoff else 'first')} election")
             elections[(day, code)] = (entity, place(entity, f"us/fl/{stem}/{day}-{kind}"))
             return elections[(day, code)]
 
@@ -469,7 +552,8 @@ def emit() -> Path:
             prior = conn.execute(
                 f"select {', '.join(columns)} from result_set where contest_id = %s and is_default", [contest]
             ).fetchone()
-            if prior is not None and prior[5] != source:
+            origin = archived if number in ARCHIVES else source
+            if prior is not None and prior[5] != origin:
                 cs.add("result_set", **dict(zip(columns, prior, strict=True)), is_default=False, status="superseded")
             else:
                 prior = None
@@ -482,12 +566,17 @@ def emit() -> Path:
                 stage="official",
                 kind="counted",
                 status="active",
-                source_id=source,
+                source_id=origin,
                 is_default=True,
                 completeness=1,
                 supersedes_id=prior[0] if prior else None,
             )
-            cs.add("note", entity_id=result_set, kind="methodology", body_md=METHOD)
+            cs.add(
+                "note",
+                entity_id=result_set,
+                kind="methodology",
+                body_md=ARCHIVE_METHOD if number in ARCHIVES else METHOD,
+            )
             options: list[tuple[list[str], UUID, UUID | None, UUID | None]] = []
             for option, label, person, candidacy in conn.execute(
                 """select o.id, o.ballot_label, cy.person_id, cy.id from contest_option o
@@ -570,6 +659,9 @@ def emit() -> Path:
                     kind=("elected" if decided else "advanced") if rank < (1 if decided else 2) else "lost",
                 )
             for precinct, candidate, votes in rows.select("precinct", "candidate", "votes").iter_rows():
+                if precinct is None:
+                    values.append((str(result_set), str(county_unit), str(chosen[candidate]), votes))
+                    continue
                 code_ = f"{day}:FL:12031:DUVAL:{precinct}"
                 unit = cs.unit("us.precinct", code_)
                 if unit in cs.minted and code_ not in minted:
