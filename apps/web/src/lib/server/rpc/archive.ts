@@ -7365,10 +7365,14 @@ function standing(
 export function inside(polity: string, area: SQL, day: SQL) {
   return sql`
     exists (
-        select from polity_territory t
-        join area_parent ap on ap.area_id = ${area} and ap.valid @> ${day}
-        left join area_parent up on up.area_id = ap.parent_id and up.valid @> ${day}
-        where t.polity_id = ${polity}::uuid and t.valid @> ${day} and t.area_id in (ap.parent_id, up.parent_id)
+        with recursive up(id, depth) as (
+          select ap.parent_id, 1 from area_parent ap where ap.area_id = ${area} and ap.valid @> ${day}
+          union
+          select ap.parent_id, up.depth + 1 from up join area_parent ap on ap.area_id = up.id and ap.valid @> ${day}
+          where up.depth < 8
+        )
+        select from polity_territory t join up on up.id = t.area_id
+        where t.polity_id = ${polity}::uuid and t.valid @> ${day}
       )
   `;
 }
@@ -11864,10 +11868,14 @@ export const polities = {
               (select yes from bare) and c.district_area_id is not null
               and (select polity_id from body where id = c.body_id) in (select id from anc)
               and exists (
-                select from polity_territory t
-                join area_parent ap on ap.area_id = c.district_area_id
-                left join area_parent up on up.area_id = ap.parent_id
-                where t.polity_id = ${input.id}::uuid and t.valid @> e.date_from and t.area_id in (ap.parent_id, up.parent_id)
+                with recursive up(id, depth) as (
+                  select ap.parent_id, 1 from area_parent ap where ap.area_id = c.district_area_id
+                  union
+                  select ap.parent_id, up.depth + 1 from up join area_parent ap on ap.area_id = up.id
+                  where up.depth < 8
+                )
+                select from polity_territory t join up on up.id = t.area_id
+                where t.polity_id = ${input.id}::uuid and t.valid @> e.date_from
               )
             ))
         ),
