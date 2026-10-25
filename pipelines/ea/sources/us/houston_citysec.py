@@ -16,7 +16,7 @@ from ea.changeset import Changeset, slug
 from ea.store import DATA, connect
 
 SOURCE = "us.houston_citysec"
-VERSION = "2"
+VERSION = "3"
 PARSED = DATA / "parsed" / SOURCE
 PAGES = DATA / "pages" / SOURCE
 SCANS = Path(__file__).with_name("houston_citysec_scans.tsv")
@@ -470,6 +470,7 @@ def emit() -> Path:
             people[(words[0], words[-1])] = person
             preferred[person] = text
         renamed: set[UUID] = set()
+        seats: set[UUID] = set()
         minted: set[str] = set()
         elections: dict[date, tuple[UUID, str]] = {}
         firsts: dict[tuple[int, str], UUID] = {}
@@ -547,6 +548,20 @@ def emit() -> Path:
 
         def contest_row(contest: UUID, office: str, election_id: UUID, runoff: bool, previous: UUID | None) -> None:
             council = office.startswith(("district", "at-large"))
+            post = None
+            if office.startswith("at-large"):
+                body = owner(office)
+                post = cs.key("us.seat", f"{body}:At-Large {office[-1]}")
+                if post in cs.minted and post not in seats:
+                    seats.add(post)
+                    cs.add(
+                        "seat",
+                        id=post,
+                        body_id=body,
+                        district_area_id=None,
+                        apportioned_area_id=cs.area("us.place", PLACE),
+                        label=f"At-Large {office[-1]}",
+                    )
             cs.add(
                 "contest",
                 id=contest,
@@ -557,6 +572,7 @@ def emit() -> Path:
                 district_area_id=cs.area("us.local_district", f"48:{PLACE}:council:{office}")
                 if office.startswith("district")
                 else cs.area("us.place", PLACE),
+                seat_id=post,
                 magnitude=1,
                 round_number=2 if runoff else 1,
                 previous_round_id=previous,
