@@ -13,7 +13,7 @@ from ea.changeset import Changeset
 from ea.store import DATA, connect
 
 SOURCE = "us.swdb_precincts"
-VERSION = "1"
+VERSION = "2"
 PARSED = DATA / "parsed" / SOURCE
 SWDB = "https://statewidedatabase.org/pub/data/"
 PUBLISHER = "Statewide Database, University of California, Berkeley"
@@ -57,6 +57,7 @@ KINDS = ("srprec", "mprec")
 BROKEN = {("P14", "mprec")}
 TOLERANCE = 0.00002
 VEST = {"G16", "G20"}
+RELEASED_VEST = {"G20": ("06001", "06037", "06059", "06095")}
 OVERLAP = 0.02
 
 
@@ -292,6 +293,17 @@ def parse() -> None:
 def emit() -> Path:
     released = pl.read_parquet(PARSED / "released.parquet")
     matched = pl.read_parquet(PARSED / "matches.parquet")
+    released = pl.concat(
+        [
+            released,
+            *(
+                pl.read_parquet(PARSED / f"{election}_srprec.parquet", columns=["county", "precinct"])
+                .filter(pl.col("county").is_in(counties))
+                .select(election=pl.lit(election), kind=pl.lit("srprec"), key=pl.col("county") + pl.col("precinct"))
+                for election, counties in RELEASED_VEST.items()
+            ),
+        ]
+    )
     with connect() as conn:
         cs = Changeset(
             conn,
