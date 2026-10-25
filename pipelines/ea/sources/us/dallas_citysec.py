@@ -13,7 +13,7 @@ from ea.changeset import Changeset, slug
 from ea.store import DATA, connect
 
 SOURCE = "us.dallas_citysec"
-VERSION = "1"
+VERSION = "2"
 PARSED = DATA / "parsed" / SOURCE
 PUBLISHER = "City of Dallas, Office of the City Secretary"
 TITLE = "History of Mayors and City Councils"
@@ -22,6 +22,12 @@ MASTER = "https://citysecretary2.dallascityhall.com/pdf/Elections/ElectMasterLis
 PLACE = "4819000"
 FIRST = date(1991, 11, 5)
 COUNTY_ONLY = date(2023, 5, 6)
+CANVASS = "https://citysecretary2.dallascityhall.com/pdf/Elections/2023/Canvassing%20Reports/"
+REPORTS = {
+    "Dallas": CANVASS + "DALLAS/SummaryResults.pdf",
+    "Collin": CANVASS + "COLLIN/Precinct-by-Precinct%20Totals.pdf",
+    "Denton": CANVASS + "DENTON/Precinct-by-Precinct%20Totals.pdf",
+}
 DAY = re.compile(r"(?:\w+day,\s+)?(\w+)\s+(\d{1,2}),\s+(\d{4})")
 SEAT = re.compile(
     r"^(?:(Mayor/Place ?(?:No\. ?)?15|Place (?:No\.? ?)?15[/,] ?Mayor|Place (?:No\.? ?)?\d+)\s*:?|(Mayor):)(?=\s|$)"
@@ -31,6 +37,11 @@ METHOD = (
     "Citywide canvassed totals, across the Dallas, Collin, and Denton county parts of the city, from the City "
     "Secretary's history of mayors and city councils. A seat no candidate won with a majority went to a runoff "
     "between the top two."
+)
+METHOD_2023 = (
+    "Citywide totals summed from the county reports the City Secretary posted with the canvass: Dallas County's "
+    "summary and Collin and Denton counties' precinct reports. Write-ins are counted together. A seat no candidate "
+    "won with a majority went to a runoff between the top two."
 )
 
 
@@ -44,6 +55,8 @@ def when(text: str) -> date | None:
 def fetch() -> None:
     raw.fetch(SOURCE, LISTING, suffix=".html")
     raw.fetch(SOURCE, MASTER, suffix=".pdf")
+    for url in REPORTS.values():
+        raw.fetch(SOURCE, url, suffix=".pdf")
 
 
 def parse() -> None:
@@ -101,6 +114,48 @@ def parse() -> None:
                     }
                 )
     frame = pl.DataFrame(rows).unique(maintain_order=True)
+    canvassed: dict[tuple[str, str], int] = {}
+    for county, url in REPORTS.items():
+        report = raw.cached(SOURCE, url).path
+        pages = subprocess.run(["pdftotext", "-layout", str(report), "-"], capture_output=True, check=True)
+        for page in pages.stdout.decode().split("\f"):
+            if county == "Denton" and not page.lstrip().startswith("Dallas Precinct"):
+                continue
+            lines = page.splitlines()
+            seat = None
+            for number, line in enumerate(lines):
+                stripped = line.strip()
+                header = number + 1 < len(lines) and lines[number + 1].strip().startswith("Vote For")
+                if header or stripped.startswith("City of Dallas Place/District"):
+                    found = re.search(r"(Mayor)|(?:Place|District) (\d+)", stripped)
+                    seat = (
+                        None if found is None else "mayor" if found[1] or found[2] == "15" else f"district-{found[2]}"
+                    )
+                    continue
+                if seat is None:
+                    continue
+                if county == "Denton":
+                    found = re.match(r"(\S.*?)\s{2,}(\d.*)$", stripped)
+                    counts = re.findall(r"([\d,]+)\s+[\d.]+%", found[2]) if found else []
+                else:
+                    found = re.match(r"(\S.*?)\s{2,}([\d,]+)\s+[\d.]+%", stripped)
+                    counts = [found[2]] if found else []
+                if not counts or re.match(r"(Total Votes Cast|Cast Votes|Write-In:|Not Assigned)", found[1]):
+                    continue
+                candidate = "Write-in" if re.search(r"Write-In Totals|\(W\)$", found[1]) else found[1]
+                canvassed[(seat, candidate)] = canvassed.get((seat, candidate), 0) + int(counts[-1].replace(",", ""))
+    frame = pl.concat(
+        [
+            frame,
+            pl.DataFrame(
+                [
+                    {"day": COUNTY_ONLY, "kind": "general", "office": seat, "candidate": candidate, "votes": votes}
+                    for (seat, candidate), votes in canvassed.items()
+                ],
+                schema=frame.schema,
+            ),
+        ]
+    )
     PARSED.mkdir(parents=True, exist_ok=True)
     frame.write_parquet(PARSED / "rows.parquet")
     print(frame.group_by("day", "kind").agg(pl.col("office").n_unique().alias("contests"), pl.len()).sort("day"))
@@ -155,6 +210,8 @@ def emit() -> Path:
         )
         cs.artifact(raw.cached(SOURCE, LISTING), source)
         cs.artifact(raw.cached(SOURCE, MASTER), source)
+        for url in REPORTS.values():
+            cs.artifact(raw.cached(SOURCE, url), source)
         system = cs.key("us.electoral_system", "two_round")
         if system in cs.minted:
             raise ValueError("the two-round system must already exist")
@@ -305,6 +362,10 @@ def emit() -> Path:
             prior = conn.execute(
                 f"select {', '.join(columns)} from result_set where contest_id = %s and is_default", [contest]
             ).fetchone()
+            replaced = None
+            if prior is not None and prior[0] == cs.key(f"{SOURCE}.result_set", contest_key):
+                replaced = conn.execute("select supersedes_id from result_set where id = %s", [prior[0]]).fetchone()[0]
+                prior = None
             kept = False
             if prior is not None and not kept:
                 held = dict(zip(columns, prior, strict=True))
@@ -324,9 +385,11 @@ def emit() -> Path:
                 source_id=source,
                 is_default=not kept,
                 completeness=1,
-                supersedes_id=prior[0] if prior is not None and not kept else None,
+                supersedes_id=prior[0] if prior is not None and not kept else replaced,
             )
-            cs.add("note", entity_id=result_set, kind="methodology", body_md=METHOD)
+            cs.add(
+                "note", entity_id=result_set, kind="methodology", body_md=METHOD_2023 if day == COUNTY_ONLY else METHOD
+            )
             options: list[tuple[list[str], UUID, UUID | None, UUID | None, str]] = []
             for option, label, person, candidacy in conn.execute(
                 """select o.id, o.ballot_label, cy.person_id, cy.id from contest_option o
