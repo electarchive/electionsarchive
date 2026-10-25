@@ -23,7 +23,10 @@ TABLE = re.compile(r"^Wards/Towns")
 TOKEN = re.compile(r"\S+(?: \S+)*")
 ROW = re.compile(r"^(?P<label>\S.*?)?\s{2,}(?P<district>\d{2,3}[A-Z]?)\s{2,}(?P<numbers>\d[\d,]*(?:\s+\d[\d,]*)*)\s*$")
 TOTAL = re.compile(r"^(?:WARD|TOWN|GRAND) TOTAL\s+(?P<numbers>\d[\d,]*(?:\s+\d[\d,]*)*)\s*$")
-FOR = re.compile(r"\s*\(?VOTE FOR (\d+)\)?(?: - VOTE FOR \d+)?\s*$")
+NUMBERS = {"ONE": 1, "TWO": 2, "THREE": 3, "FOUR": 4, "FIVE": 5, "SIX": 6}
+FOR = re.compile(
+    r"\s*\(?VOTE FOR (\d+|ONE|TWO|THREE|FOUR|FIVE|SIX)\)?(?: - VOTE FOR (?:\d+|ONE|TWO|THREE|FOUR|FIVE|SIX))?\s*$"
+)
 CHOICE = re.compile(r"^(?P<name>.+?)(?: \((?P<party>[A-Z ]+)\))?$")
 
 
@@ -74,8 +77,11 @@ def contests(text: str) -> Iterator[dict[str, Any]]:
             end += 1
         names = header(lines[start:end])
         title = re.sub(r"\s*Rows Continued\s*$", "", title).strip()
-        vote_for = int((FOR.search(title) or [None, 1])[1])
-        title = FOR.sub("", re.sub(r"\(VOTE FOR \d+\)", "", title)).strip(" -")
+        counted = (FOR.search(title) or [None, "1"])[1]
+        vote_for = NUMBERS.get(counted) or int(counted)
+        title = re.sub(
+            r"\bCOUNCILORS?\b", "COUNCIL MEMBER", FOR.sub("", re.sub(r"\(VOTE FOR \w+\)", "", title)).strip(" -")
+        )
         key = (title, tuple(names))
         entry = seen.setdefault(key, {"text": title, "names": names, "vote_for": vote_for, "rows": [], "grand": None})
         label = ""
