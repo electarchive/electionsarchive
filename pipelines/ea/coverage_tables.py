@@ -439,7 +439,17 @@ CALENDAR: dict[tuple[str, str], tuple[int, int, str | None]] = {
         "S.C. Code § 48-9-1220, https://www.scstatehouse.gov/code/t48c009.php",
     ),
     ("SD", "Soil and water conservation"): (2, 0, "SDCL 38-8-39, https://sdlegislature.gov/Statutes/38-8-39"),
+    ("VA", "Soil and water conservation"): (
+        4,
+        3,
+        "Va. Code § 10.1-523(D), https://law.lis.virginia.gov/vacode/title10.1/chapter5/section10.1-523/",
+    ),
     ("WV", "Soil and water conservation"): (2, 0, "W. Va. Code § 19-21A-6, https://code.wvlegislature.gov/19-21A-6/"),
+    ("WY", "Soil and water conservation"): (
+        2,
+        0,
+        "W.S. §§ 11-16-120, 22-2-101(a)(ix), https://wyoleg.gov/statutes/compress/title11.pdf",
+    ),
     ("NC", "Soil and water conservation"): (
         2,
         0,
