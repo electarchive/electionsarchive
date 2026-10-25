@@ -1357,6 +1357,7 @@ def emit(
         elections: set[UUID] = set()
         persons: set[UUID] = set()
         districts: set[str] = set()
+        seats: set[UUID] = set()
         minted: dict[str, tuple[str, date]] = {}
         memberships: set[tuple[UUID, UUID, date]] = set()
         values: list[tuple[str, str, str, int]] = []
@@ -1580,6 +1581,19 @@ def emit(
                             area_id=area,
                             kind="standard",
                         )
+                post = None
+                if first["body"] and seat and re.fullmatch(r"(?:Place|Position) \d+", seat):
+                    post = cs.key("us.seat", f"{owner}:{seat}")
+                    if post in cs.minted and post not in seats:
+                        seats.add(post)
+                        cs.add(
+                            "seat",
+                            id=post,
+                            body_id=owner,
+                            district_area_id=None,
+                            apportioned_area_id=whole_area,
+                            label=seat,
+                        )
                 magnitude = int(first["magnitude"]) or None
                 cs.add(
                     "contest",
@@ -1589,6 +1603,7 @@ def emit(
                     office_id=None if first["body"] else owner,
                     body_id=owner if first["body"] else None,
                     district_area_id=area,
+                    seat_id=post,
                     party_scope_id=parties[party] if party else None,
                     magnitude=magnitude,
                     round_number=2 if runoff else 1,
