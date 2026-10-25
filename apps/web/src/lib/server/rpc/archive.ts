@@ -4006,7 +4006,8 @@ export const contests = {
           party_short: string | null;
         }>(sql`
            with recursive grp(root, id) as (
-             select id, id from contest where id = any(${sql.param([...sameRace.map((row) => row.id), contest.root])}::uuid[])
+             select r.id, coalesce((select n.id from contest n where n.previous_round_id = r.id order by n.round_number desc limit 1), r.id)
+             from contest r where r.id = any(${sql.param([...sameRace.map((row) => row.id), contest.root])}::uuid[])
              union all
              select grp.root, c.id from contest c join grp on c.allocation_parent_id = grp.id
            ),
@@ -11286,11 +11287,20 @@ export const polities = {
           row.date <= today,
       );
       const recent =
-        held.find(
-          (row) =>
-            row.kind === "general" &&
-            Date.parse(held[0]?.date ?? "") - Date.parse(row.date ?? "") < 9e10,
-        ) ??
+        ((held[0]?.kind === "local" || held[0]?.kind === "runoff") &&
+        ![
+          "sovereign_state",
+          "supranational",
+          "federal_unit",
+          "region",
+        ].includes(polity.kind)
+          ? held[0]
+          : held.find(
+              (row) =>
+                row.kind === "general" &&
+                Date.parse(held[0]?.date ?? "") - Date.parse(row.date ?? "") <
+                  9e10,
+            )) ??
         held[0] ??
         (fallback == null
           ? null
