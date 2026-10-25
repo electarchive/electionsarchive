@@ -1382,7 +1382,14 @@ def emit(
             )
             name(area, f"{display}, {st}")
             cs.add("polity_territory", polity_id=polity, area_id=area)
-            if geom is not None:
+            has_geometry, has_unit = conn.execute(
+                """select exists (select 1 from area_geometry x join changeset g on g.id = x.changeset_id
+                                  where x.area_id = %s and g.pipeline <> %s),
+                          exists (select 1 from reporting_unit x join changeset g on g.id = x.changeset_id
+                                  where x.id = %s and g.pipeline <> %s)""",
+                [area, source, cs.unit(scheme, code), source],
+            ).fetchone()
+            if geom is not None and not has_geometry:
                 cs.add(
                     "area_geometry",
                     area_id=area,
@@ -1392,17 +1399,18 @@ def emit(
                     quality="official",
                     source_id=census,
                 )
-            cs.add(
-                "reporting_unit",
-                id=cs.unit(scheme, code),
-                polity_id=polity,
-                scheme_code=scheme,
-                code=code,
-                area_relation="equals",
-                area_id=area,
-                kind="standard",
-                valid_from=None,
-            )
+            if not has_unit:
+                cs.add(
+                    "reporting_unit",
+                    id=cs.unit(scheme, code),
+                    polity_id=polity,
+                    scheme_code=scheme,
+                    code=code,
+                    area_relation="equals",
+                    area_id=area,
+                    kind="standard",
+                    valid_from=None,
+                )
         for scheme, code in used:
             held = polities.get(f"{scheme}:{code}")
             if (
