@@ -150,6 +150,25 @@ APPOINTED_COLLEGES = {
     "42": "24 P.S. § 19-1904-A(a), https://www.palegis.us/statutes/unconsolidated/law-information/view-statute?act=014&chpt=19A&sessInd=0&smthLwInd=0&txtType=HTM&yr=1949",
     "55": "Wis. Stat. § 38.08, https://docs.legis.wisconsin.gov/statutes/statutes/38/08",
 }
+SOIL_BALLOT = {
+    "06": "Cal. Pub. Res. Code §§ 9314, 9351, https://www.conservation.ca.gov/dlrp/RCD/Documents/DIVISION%209.pdf",
+    "12": "Fla. Stat. § 582.18, https://www.flsenate.gov/Laws/Statutes/2025/582.18",
+    "16": "Idaho Code § 22-2721, https://swc.idaho.gov/wp-content/uploads/2025/01/ELECTION-GUIDANCE-DOC.pdf",
+    "19": "Iowa Code § 161A.5, https://www.legis.iowa.gov/docs/code/2026/161A.5.pdf",
+    "21": "KRS 262.210, https://apps.legislature.ky.gov/law/statutes/statute.aspx?id=12731",
+    "27": "Minn. Stat. § 103C.305, https://www.revisor.mn.gov/statutes/cite/103C.305",
+    "30": "MCA § 76-15-305, https://leg.mt.gov/bills/mca/title_0760/chapter_0150/part_0030/section_0050/0760-0150-0030-0050.html",
+    "31": "Neb. Rev. Stat. § 32-513, https://www.nebraskalegislature.gov/laws/statutes.php?statute=32-513",
+    "32": "NRS 548.285, https://www.leg.state.nv.us/nrs/nrs-548.html",
+    "37": "N.C. Gen. Stat. § 139-6, https://www.ncleg.gov/EnactedLegislation/Statutes/HTML/BySection/Chapter_139/GS_139-6.html",
+    "38": "N.D.C.C. § 4.1-20-18, https://ndlegis.gov/cencode/t04-1c20.pdf",
+    "41": "ORS 568.520, 568.560, https://www.oregonlegislature.gov/bills_laws/ors/ors568.html",
+    "45": "S.C. Code §§ 48-9-1210, 48-9-1220, https://www.scstatehouse.gov/code/t48c009.php",
+    "46": "SDCL 38-8-39, https://sdlegislature.gov/Statutes/38-8-39",
+    "51": "Va. Code § 10.1-527, https://law.lis.virginia.gov/vacode/title10.1/chapter5/section10.1-527/",
+    "54": "W. Va. Code § 19-21A-6, https://code.wvlegislature.gov/19-21A-6/",
+    "56": "W.S. 11-16-120, https://wyoleg.gov/statutes/compress/title11.pdf",
+}
 COUNTS = {"county": 3031, "municipality": 19491, "township": 16214, "special": 39555, "school": 12546}
 
 
@@ -289,6 +308,10 @@ def parse() -> None:
                 pl.col("kind").is_in(["school", "dependent_school"])
                 & pl.col("name").map_elements(lambda name: COLLEGE.search(name) is not None, return_dtype=pl.Boolean)
                 & pl.col("state_fips").is_in(list(APPOINTED_COLLEGES))
+            )
+            & (
+                pl.col("function").str.starts_with("88 - ").fill_null(False).not_()
+                | pl.col("state_fips").is_in(list(SOIL_BALLOT))
             )
         ).alias("elected")
     ).drop("board")

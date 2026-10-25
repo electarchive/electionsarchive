@@ -386,6 +386,60 @@ CALENDAR: dict[tuple[str, str], tuple[int, int, str | None]] = {
         0,
         "N.C. Gen. Stat. § 115C-37(a), https://www.ncleg.gov/EnactedLegislation/Statutes/HTML/BySection/Chapter_115C/GS_115C-37.html",
     ),
+    ("CA", "Soil and water conservation"): (
+        2,
+        0,
+        "Cal. Pub. Res. Code § 9314, https://www.conservation.ca.gov/dlrp/RCD/Documents/DIVISION%209.pdf",
+    ),
+    ("FL", "Soil and water conservation"): (
+        2,
+        0,
+        "Fla. Stat. § 582.18, https://www.flsenate.gov/Laws/Statutes/2025/582.18",
+    ),
+    ("IA", "Soil and water conservation"): (
+        2,
+        0,
+        "Iowa Code § 161A.5, https://www.legis.iowa.gov/docs/code/2026/161A.5.pdf",
+    ),
+    ("ID", "Soil and water conservation"): (
+        2,
+        0,
+        "Idaho Code § 22-2721, https://swc.idaho.gov/wp-content/uploads/2025/01/ELECTION-GUIDANCE-DOC.pdf",
+    ),
+    ("KY", "Soil and water conservation"): (
+        2,
+        0,
+        "KRS 262.210, https://apps.legislature.ky.gov/law/statutes/statute.aspx?id=12731",
+    ),
+    ("MN", "Soil and water conservation"): (
+        2,
+        0,
+        "Minn. Stat. § 103C.305, https://www.revisor.mn.gov/statutes/cite/103C.305",
+    ),
+    ("MT", "Soil and water conservation"): (
+        2,
+        0,
+        "MCA § 76-15-305, https://leg.mt.gov/bills/mca/title_0760/chapter_0150/part_0030/section_0050/0760-0150-0030-0050.html",
+    ),
+    ("ND", "Soil and water conservation"): (2, 0, "N.D.C.C. § 4.1-20-18, https://ndlegis.gov/cencode/t04-1c20.pdf"),
+    ("NE", "Soil and water conservation"): (
+        2,
+        0,
+        "Neb. Rev. Stat. § 32-513, https://www.nebraskalegislature.gov/laws/statutes.php?statute=32-513",
+    ),
+    ("NV", "Soil and water conservation"): (2, 0, "NRS 548.285, https://www.leg.state.nv.us/nrs/nrs-548.html"),
+    ("OR", "Soil and water conservation"): (
+        2,
+        0,
+        "ORS 568.560, https://www.oregonlegislature.gov/bills_laws/ors/ors568.html",
+    ),
+    ("SC", "Soil and water conservation"): (
+        2,
+        0,
+        "S.C. Code § 48-9-1220, https://www.scstatehouse.gov/code/t48c009.php",
+    ),
+    ("SD", "Soil and water conservation"): (2, 0, "SDCL 38-8-39, https://sdlegislature.gov/Statutes/38-8-39"),
+    ("WV", "Soil and water conservation"): (2, 0, "W. Va. Code § 19-21A-6, https://code.wvlegislature.gov/19-21A-6/"),
     ("NC", "Soil and water conservation"): (
         2,
         0,
