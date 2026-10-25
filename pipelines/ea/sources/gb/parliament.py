@@ -17,7 +17,7 @@ from ea.sources.gb.os import BOROUGHS, COUNTIES, DIRECTIONS, IRISH, RIDINGS
 from ea.store import DATA, connect
 
 SOURCE = "gb.parliament"
-VERSION = "2"
+VERSION = "3"
 PARSED = DATA / "parsed" / SOURCE
 BASE = "https://api.parliament.uk/uk-general-elections"
 INDEX = f"{BASE}/general-elections/10"
@@ -42,7 +42,7 @@ PARTITION = date(1922, 12, 6)
 GENERAL_ELECTION = "Q2074525"
 PETITION_SEATED = "Q56123417"
 PETITION = "election petition"
-NOT_PARTIES = ("Independent", "Speaker")
+NOT_PARTIES = ("Independent",)
 WALES = {
     "Anglesey",
     "Brecknockshire",
@@ -479,6 +479,12 @@ def emit() -> Path:
             .sort("party_id")
             .iter_rows()
         ):
+            if label == "Speaker":
+                parties[party_id] = cs.key("gb.party", "speaker")
+                if parties[party_id] in cs.minted:
+                    cs.add("party", id=parties[party_id], kind="independent_group", polity_id=gb)
+                    name(parties[party_id], label)
+                continue
             parties[party_id] = cs.key(f"{SOURCE}.party", party_id)
             descriptor = label.startswith("Independent ") and label not in (
                 "Independent Labour Party",
@@ -504,6 +510,13 @@ def emit() -> Path:
             name(persons[identity], f"{forenames} {surname}".strip())
 
         by_page = {page: frame for (page,), frame in candidates.group_by("page")}
+        universities = dict(
+            conn.execute(
+                """select distinct n.text, a.id from area a join name n on n.entity_id = a.id
+                   join changeset x on x.id = a.changeset_id and x.pipeline = 'gb.university_seats'
+                   where a.scheme_code = 'gb.pcon'"""
+            ).fetchall()
+        )
         for (
             page,
             label,
@@ -515,7 +528,9 @@ def emit() -> Path:
             magnitude,
             double_return,
         ) in contests.iter_rows():
-            area = None
+            area = universities.get(label) if university else None
+            if university and area is None:
+                raise ValueError(f"no university seat area for {label}")
             if not university:
                 area = cs.area("gb.pcon", constituency)
                 cs.add("area", id=area, scheme_code="gb.pcon")
@@ -538,7 +553,7 @@ def emit() -> Path:
                 polity_id=gb,
                 scheme_code="gb.pcon",
                 code=constituency,
-                area_relation="unlocated" if university else "equals",
+                area_relation="equals",
                 area_id=area,
                 kind="standard",
                 valid_from=None,
