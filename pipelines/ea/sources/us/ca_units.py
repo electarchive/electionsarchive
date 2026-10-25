@@ -5,7 +5,7 @@ import polars as pl
 from ea.changeset import Changeset
 from ea.store import connect
 
-SOURCE = "us.ca_la_units"
+SOURCE = "us.ca_units"
 VERSION = "1"
 
 
@@ -15,20 +15,23 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Los Angeles County's election precincts placed on the county's precinct shapes for the same election",
+            summary="California counties' election precincts placed on the precinct shapes for the same election",
             polity="US",
         )
         shapes = dict(
             conn.execute(
                 """select c.code, a.id::text from area a join area_code c on c.area_id = a.id
-                   where a.scheme_code = 'us.precinct' and c.code ~ '^[0-9-]{10}:CA:06037:[^:]+$'"""
+                   where a.scheme_code = 'us.precinct' and c.code ~ '^[0-9-]{10}:CA:[0-9]{5}:[^:]+$'"""
             ).fetchall()
         )
         rows = []
         unplaced = 0
         for unit, code, start, end in conn.execute(
             """select u.id::text, u.code, lower(u.valid), upper(u.valid) from reporting_unit u
-               where u.scheme_code = 'us.precinct' and u.code ~ '^[0-9-]{10}:CA:06037:[^:]+:[^:]+$'"""
+               where u.scheme_code = 'us.precinct' and u.code ~ '^[0-9-]{10}:CA:[0-9]{5}:[^:]+:[^:]+$'
+                 and not exists (
+                   select 1 from reporting_unit_area x join area a on a.id = x.area_id and a.scheme_code = 'us.precinct'
+                   where x.unit_id = u.id)"""
         ).fetchall():
             day, state, county, _, precinct = code.split(":")
             area = shapes.get(f"{day}:{state}:{county}:{precinct}")
