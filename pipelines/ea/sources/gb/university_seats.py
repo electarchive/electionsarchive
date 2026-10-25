@@ -5,7 +5,7 @@ from ea.changeset import Changeset
 from ea.store import connect
 
 SOURCE = "gb.university_seats"
-VERSION = "1"
+VERSION = "2"
 UNION = date(1801, 1, 1)
 PARTITION = date(1922, 12, 6)
 REFORM_1868 = date(1868, 11, 17)
@@ -143,13 +143,8 @@ def emit() -> Path:
             cs.add("area_code", area_id=area, code=code, valid_from=start, valid_to=end)
             cs.add("name", entity_id=area, text=label, lang="en", kind="official", is_preferred=True)
             cs.add("note", entity_id=area, kind="context", body_md=body)
-            for spans in (
-                ((start, min(end, PARTITION)), (max(start, PARTITION), end))
-                if start < PARTITION < end
-                else ((start, end),)
-            ):
-                parent = cs.area("gb.country", COUNTRIES[code[:3]], on=spans[0])
-                if parent in cs.minted:
-                    raise ValueError(f"no gb.country {COUNTRIES[code[:3]]} on {spans[0]}")
-                cs.add("area_parent", area_id=area, parent_id=parent, valid_from=spans[0], valid_to=spans[1])
+            parent = cs.area("gb.country", COUNTRIES[code[:3]], on=start)
+            if parent in cs.minted:
+                raise ValueError(f"no gb.country {COUNTRIES[code[:3]]} on {start}")
+            cs.add("area_parent", area_id=area, parent_id=parent, valid_from=start, valid_to=end)
         return cs.write()
