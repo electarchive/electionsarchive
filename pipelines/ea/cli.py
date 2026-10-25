@@ -53,6 +53,11 @@ def main() -> None:
     portal = commands.add_parser("portals", help="find county results portals and record them in us-portals.csv")
     portal.add_argument("action", choices=("census",))
     portal.add_argument("state", help="two-letter state code, such as TX")
+    portal.add_argument(
+        "--only",
+        help="comma-separated platforms (clarity, enhanced_voting, hosted_static) to probe; skips the crawl and keeps "
+        "the state's other registry rows",
+    )
     scanning = commands.add_parser(
         "scans", help="batch vision pipeline for scanned county tables (manifests in pipelines/scans)"
     )
@@ -84,7 +89,7 @@ def main() -> None:
         case "apply":
             print(apply(args.changeset))
         case "portals":
-            print(portals.census(args.state.upper()))
+            print(portals.census(args.state.upper(), args.only.split(",") if args.only else None))
         case "scans":
             print(
                 scans.status()

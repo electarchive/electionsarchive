@@ -185,7 +185,14 @@ def seeds(st: str, counties: dict[str, str]) -> dict[str, list[str]]:
     for name in counties.values():
         if found.get(name):
             continue
-        state_name = {"TX": "Texas", "PA": "Pennsylvania"}.get(st, st)
+        state_name = {
+            "TX": "Texas",
+            "PA": "Pennsylvania",
+            "IN": "Indiana",
+            "MI": "Michigan",
+            "IL": "Illinois",
+            "WI": "Wisconsin",
+        }.get(st, st)
         try:
             response = httpx.post(
                 "https://mcp.exa.ai/mcp",
@@ -251,7 +258,7 @@ def crawl(starts: list[str]) -> list[dict[str, str]]:
     return list(hits.values())
 
 
-def census(st: str) -> str:
+def census(st: str, only: list[str] | None = None) -> str:
     with connect() as conn:
         counties = dict(
             conn.execute(
@@ -290,9 +297,10 @@ def census(st: str) -> str:
                 ),
             )
 
+    probed = only or ["clarity", "enhanced_voting", "hosted_static"]
     with ThreadPoolExecutor(3) as pool:
-        list(pool.map(probe, ("clarity", "enhanced_voting", "hosted_static")))
-    found = seeds(st, counties)
+        list(pool.map(probe, probed))
+    found = {} if only else seeds(st, counties)
     names = {name: fips for fips, name in counties.items()}
     with ThreadPoolExecutor(8) as pool:
         crawled = list(
@@ -309,7 +317,11 @@ def census(st: str) -> str:
     kept = []
     if REGISTRY.exists():
         with REGISTRY.open() as file:
-            kept = [row for row in csv.DictReader(file) if row["state"] != st or row["pinned"]]
+            kept = [
+                row
+                for row in csv.DictReader(file)
+                if row["state"] != st or row["pinned"] or (only and row["platform"] not in only)
+            ]
     pinned = {(row["county_fips"], row["platform"]) for row in kept if row["state"] == st}
     merged = kept + [row for key, row in rows.items() if key not in pinned]
     merged.sort(key=lambda row: (row["state"], row["county_fips"], row["platform"]))
