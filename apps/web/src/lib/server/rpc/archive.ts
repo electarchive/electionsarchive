@@ -6178,6 +6178,7 @@ export const contests = {
         day: v.object({
           date: v.nullable(v.string()),
           path: v.nullable(v.string()),
+          place: v.string(),
           part: v.nullable(Link),
           groups: v.array(
             v.object({
@@ -6286,6 +6287,7 @@ export const contests = {
           isHead: boolean;
           isPart: boolean;
           top: string;
+          topPolity: string;
           election: string;
         }>(sql`
           with recursive up(id, parent) as (
@@ -6331,6 +6333,7 @@ export const contests = {
             bool_or(id = ${contest.root}::uuid) as "isCurrent", bool_or(okind = 'head_of_state') as "isHead",
             bool_and(part) as "isPart",
             (select id from up where parent is null) as top,
+            (select t.polity_id from election t where t.id = (select id from up where parent is null)) as "topPolity",
             (select election_id from contest where id = ${contest.id}::uuid) as election
           from classed group by kind, owner
         `),
@@ -6410,6 +6413,7 @@ export const contests = {
       );
       const top = day.rows[0]?.top ?? null;
       const election = day.rows[0]?.election ?? null;
+      const topPolity = day.rows[0]?.topPolity ?? null;
       const parties = [
         ...steps.flatMap((row) => row.party ?? []),
         ...others.flatMap((row) => row.party ?? []),
@@ -6423,7 +6427,7 @@ export const contests = {
             ...locals,
             ...groups.flatMap((row) => row.owner ?? []),
             ...groups.map((row) => row.sample),
-            ...(election == null ? [] : [election]),
+            ...[election, topPolity].filter((id) => id != null),
           ],
           contest.date,
         ),
@@ -6521,6 +6525,7 @@ export const contests = {
         day: {
           date: contest.date,
           path: hub,
+          place: labels.full.get(topPolity ?? "") ?? "",
           part:
             election == null || election === top
               ? null

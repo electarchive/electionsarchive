@@ -7,7 +7,7 @@
   import Term from "#lib/components/term.svelte";
   import { Combobox } from "#lib/components/ui/combobox/index.js";
   import * as Tooltip from "#lib/components/ui/tooltip/index.js";
-  import { count, date, percent, points } from "#lib/format.js";
+  import { count, date, definite, percent, points } from "#lib/format.js";
   import {
     explain,
     isDerived,
@@ -78,15 +78,15 @@
     match: string;
   } = $props();
 
-  const DAY: Record<string, () => string> = {
+  const DAY: Record<string, (place: string) => string> = {
     owner: () => "",
     governor: m.cycle_governor,
     legislature: m.cycle_legislature,
     regional_office: m.cycle_regional_office,
     national_measure: m.cycle_national_measure,
     regional_measure: m.cycle_regional_measure,
-    local: m.cycle_local,
-    local_measure: m.cycle_local_measure,
+    local: (place) => m.cycle_local({ place }),
+    local_measure: (place) => m.cycle_local_measure({ place }),
   };
   const STAGES: Record<string, () => string> = {
     live: m.stage_live,
@@ -1921,7 +1921,10 @@
               ...group,
               path: group.path,
               key: `${group.kind}:${index}`,
-              label: group.label ?? DAY[group.kind]?.() ?? "",
+              label:
+                group.label ??
+                DAY[group.kind]?.(definite(cycle.day.place)) ??
+                "",
             },
           ],
     ),

@@ -2657,15 +2657,15 @@ function contestMarkdown(
   rounds: Extract<Data, { kind: "contest" }>["rounds"],
   link: Link,
 ) {
-  const groups: Record<string, () => string> = {
+  const groups: Record<string, (place: string) => string> = {
     owner: () => "",
     governor: m.cycle_governor,
     legislature: m.cycle_legislature,
     regional_office: m.cycle_regional_office,
     national_measure: m.cycle_national_measure,
     regional_measure: m.cycle_regional_measure,
-    local: m.cycle_local,
-    local_measure: m.cycle_local_measure,
+    local: (place) => m.cycle_local({ place }),
+    local_measure: (place) => m.cycle_local_measure({ place }),
   };
   const steps = [
     ...cycle.primaries.map((step) => ({
@@ -3251,7 +3251,7 @@ function contestMarkdown(
           day
             .map(
               (group) =>
-                `- ${link(group.label ?? groups[group.kind]?.() ?? "", group.path)}${group.count > 1 ? ` (${count(group.count)})` : ""}`,
+                `- ${link(group.label ?? groups[group.kind]?.(definite(cycle.day.place)) ?? "", group.path)}${group.count > 1 ? ` (${count(group.count)})` : ""}`,
             )
             .join("\n"),
         ]),
