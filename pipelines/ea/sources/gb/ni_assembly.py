@@ -17,7 +17,7 @@ from ea.sources.gb import umit
 from ea.store import DATA, connect
 
 SOURCE = "gb.ni_assembly"
-VERSION = "1"
+VERSION = "2"
 PARSED = DATA / "parsed" / SOURCE
 VOTES, REGISTERED, BALLOTS, VALID, INVALID, EXHAUSTED, QUOTA = 1, 2, 3, 4, 5, 21, 26
 DERIVED = 1
@@ -465,7 +465,8 @@ def parse() -> None:
 PARTIES = (
     (r"women", "NI Women's Coalition"),
     (r"d\.?u\.?p|demo?cratic unionist|demoratic unionist", "Democratic Unionist Party"),
-    (r"united unionist|ulster unionist|^u\.?u\.?p\b|^uup$|ufster unionist|pariy", "Ulster Unionist Party"),
+    (r"united unionist coalition", "United Unionist Assembly Party"),
+    (r"ulster unionist|^u\.?u\.?p\b|^uup$|ufster unionist|pariy", "Ulster Unionist Party"),
     (r"s\.?d\.?l\.?p|social democratic and labour", "Social Democratic and Labour Party"),
     (r"sinn f", "Sinn Féin"),
     (r"alliance party|^alliance", "Alliance Party"),
@@ -505,6 +506,17 @@ PARTIES = (
     (r"community and enviro", "Community and Environmental Conservation Campaign"),
     (r"independ|ind\. |^unionist$|^$|economics|ulster's ind|nationalist", None),
 )
+
+
+RELABELED = {
+    (2003, "Hamilton, Mary Scott"): (
+        "Ulster Unionist Party",
+        (
+            "Her ballot paper describes her as an independent; ARK and the Electoral Office for Northern Ireland "
+            "count her as the Ulster Unionist candidate, the party she represented in the Assembly from 1998."
+        ),
+    ),
+}
 
 
 def party_of(description: str) -> str | None:
@@ -794,7 +806,8 @@ def emit() -> Path:
                         row["stage"]: row["votes"]
                         for row in lines.filter(pl.col("number") == candidate["number"]).iter_rows(named=True)
                     }
-                    canonical = party_of(candidate["party"])
+                    relabeled = RELABELED.get((year, candidate["name"]))
+                    canonical = relabeled[0] if relabeled else party_of(candidate["party"])
                     owner = party_id(canonical)
                     independent = canonical is None and ("independ" in candidate["party"].lower() or candidate["party"].strip() in ("", "Unionist"))
                     full = display(candidate["name"]) if "," in candidate["name"] else candidate["name"]
@@ -806,6 +819,8 @@ def emit() -> Path:
                         cs.add("person", id=person, gender={"M": "male", "F": "female"}.get(candidate["gender"]))
                         name(person, full)
                     cs.add("contest_option", id=option, contest_id=contest, kind="candidate", party_id=owner, ballot_label=full)
+                    if relabeled:
+                        cs.add("note", entity_id=option, kind="context", body_md=relabeled[1])
                     cs.add(
                         "candidacy",
                         id=cs.key("gb.ni_assembly.candidacy", option_key),
