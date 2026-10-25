@@ -94,6 +94,20 @@ SKIPPED = {
     "4865000_2014_7_san antonio_TX_Mayor_mayor_1",
     "4804000_2001_5_arlington_TX_Mayor_mayor_1",
     "4804000_2003_5_arlington_TX_Mayor_mayor_1",
+    "1714000_1990_12_chicago_IL_City Council_19_1",
+    "1714000_1993_1_chicago_IL_City Council_2_1",
+    "1714000_1993_3_chicago_IL_City Council_38_1",
+    "1714000_1997_12_chicago_IL_City Council_11_1",
+    "1714000_2000_1_chicago_IL_City Council_37_1",
+    "1714000_2002_12_chicago_IL_City Council_44_1",
+    "1714000_2006_12_chicago_IL_City Council_18_1",
+    "1714000_2009_7_chicago_IL_City Council_26_1",
+    "1714000_2009_10_chicago_IL_City Council_36_1",
+    "1714000_2010_3_chicago_IL_City Council_1_1",
+    "1714000_2013_2_chicago_IL_City Council_7_1",
+    "1714000_2013_7_chicago_IL_City Council_33_1",
+    "1714000_2016_4_chicago_IL_City Council_4_1",
+    "1714000_2018_6_chicago_IL_City Council_23_1",
 }
 UNELECTED = "Not an election for this office: an appointment, or a race the database filed under the wrong office"
 DISTRICT = (
@@ -102,6 +116,7 @@ DISTRICT = (
 )
 MONTH = "The database gives only the month of this election, not the day."
 YEAR = "The database gives only the year of this election."
+FIRSTLESS = "This was a runoff. The database records only the deciding round, and the archive does not hold the first."
 
 
 def fetch() -> None:
@@ -146,14 +161,12 @@ def parse() -> None:
     cycles = {
         key: sorted(set(rows["year"])) for key, rows in contests.filter(pl.col("votes") > 5).group_by("fips", "office")
     }
-    phantoms = []
+    phantoms = sorted(SKIPPED)
     for contest, rows, votes, fips, office, year, month in contests.select(
         "contest", "rows", "votes", "fips", "office", "year", "month"
     ).iter_rows():
         years = cycles.get((fips, office), [])
-        if contest in SKIPPED:
-            phantoms.append(contest)
-        elif rows == 1 and (votes or 0) <= 1 and month is not None and len(years) >= 3:
+        if contest not in SKIPPED and rows == 1 and (votes or 0) <= 1 and month is not None and len(years) >= 3:
             step = math.gcd(*[other - years[0] for other in years[1:]])
             if step >= 2 and (year - years[0]) % step:
                 phantoms.append(contest)
@@ -352,9 +365,31 @@ def emit() -> Path:
             valid_to=None,
             as_of=date(2020, 1, 1),
         )
-        systems = {"fptp": cs.key("us.electoral_system", "fptp"), "block": cs.key("us.electoral_system", "block")}
+        systems = {key: cs.key("us.electoral_system", key) for key in ("fptp", "block", "two_round", "top_two")}
         if cs.minted & set(systems.values()):
-            raise ValueError("the fptp and block systems must already exist")
+            raise ValueError("the fptp, block, two_round, and top_two systems must already exist")
+        advanced: dict[tuple[str, str], list[tuple[date, UUID, UUID, set[str]]]] = {}
+        for city, suffix, day, first, system, labels in conn.execute(
+            """select regexp_replace(s.path, '/[^/]+/[^/]+$', ''), regexp_replace(s.path, '^.*/', ''), e.date_from, c.id,
+                 c.electoral_system_id, array_agg(co.ballot_label)
+               from outcome o join result_set rs on rs.id = o.result_set_id and rs.is_default
+               join contest c on c.id = rs.contest_id join entity n on n.id = c.id and n.retired_by is null
+               join election e on e.id = c.election_id join contest_option co on co.id = o.option_id
+               join slug s on s.entity_id = c.id and s.is_current
+               where o.kind = 'advanced' and s.path like 'us/%%'
+               group by 1, 2, 3, 4, 5"""
+        ).fetchall():
+            advanced.setdefault((city, suffix), []).append(
+                (
+                    day,
+                    first,
+                    system,
+                    {
+                        re.sub(r",? (?:jr|sr|ii|iii|iv)\.?$", "", label.lower().strip()).split(" ")[-1]
+                        for label in labels
+                    },
+                )
+            )
 
         frame = frame.with_columns(fips=pl.col("fips").replace(aliases))
         owners: set[UUID] = set()
@@ -468,6 +503,19 @@ def emit() -> Path:
                         "slug", path=f"us/{usps.lower()}/{day}-{'general' if general else 'local'}", entity_id=parent
                     )
             stage = "general" if general else "local"
+            runoff = month is not None and (
+                code == "4835000"
+                and month == 12
+                or code == "1714000"
+                and office == "City Council"
+                and month == 4
+                and year % 4 == 3
+                and year < 2003
+                or code == "0644000"
+                and month in (5, 6)
+                and year % 2 == 1
+                and 1993 <= year <= 2003
+            )
             election = parent if code == DC and parent is not None else cs.key("us.election", f"{part}:{usps}:{code}")
             if code == DC and election not in cs.minted and election not in elections:
                 elections.add(election)
@@ -498,7 +546,7 @@ def emit() -> Path:
                 first["geo_name"],
                 "NA",
             ):
-                label = re.sub(r"^synthetic ", "", text)
+                label = re.sub(r"^synthetic ", "", text).replace("countu judge", "county judge")
                 label = re.sub(r"^at-large [a-z]\b", "at-large", label)
                 label = re.sub(
                     r"^(?:at-large[- ]?(\d+)|(\d+) at-large)$", lambda found: f"at-large {found[1] or found[2]}", label
@@ -508,7 +556,7 @@ def emit() -> Path:
                 elif label:
                     seat = re.sub(r"\b([a-z])", lambda found: found[1].upper(), label)
             remainder = "special" in text
-            partial = seat is not None and not re.search(r"(?i)at[- ]?large", seat)
+            partial = seat is not None and not re.search(r"(?i)at[- ]?large|county judge", seat)
             whole = cs.area(scheme, geoid)
             unit = cs.unit(scheme, geoid)
             area = whole
@@ -520,7 +568,6 @@ def emit() -> Path:
                     cs.add("area", id=area, scheme_code="us.local_district")
                     cs.add("area_code", area_id=area, code=district, valid_from=None)
                     cs.add("area_parent", area_id=area, parent_id=whole, valid_from=None)
-                    name(area, f"{title}, {seat}")
                     cs.add(
                         "reporting_unit",
                         id=unit,
@@ -531,10 +578,33 @@ def emit() -> Path:
                         area_id=area,
                         kind="standard",
                     )
+                if district not in districts:
+                    name(area, f"{title}, {re.sub(r'^District', 'Ward', seat) if geoid == '1714000' else seat}")
                 districts.add(district)
             contest_key = f"alged:{contest_id}"
             contest = cs.key("us.contest", contest_key)
             magnitude = first["magnitude"]
+            names = {
+                re.sub(r",? (?:jr|sr|ii|iii|iv)\.?$", "", full_name.lower().strip()).split(" ")[-1]
+                for full_name in rows["full_name"]
+                if not re.fullmatch(r"(?i)scattering|write-?ins?", full_name)
+            }
+            previous, system = next(
+                (
+                    (
+                        first_round,
+                        first_system
+                        if first_system not in (None, systems["fptp"], systems["block"])
+                        else systems["top_two" if usps == "WA" else "two_round"],
+                    )
+                    for held, first_round, first_system, finalists in advanced.get(
+                        (path, key + (f"-{slug(seat)}" if seat else "") + ("-special" if remainder else "")), []
+                    )
+                    if magnitude == 1 and finalists == names and 0 < (day - held).days <= 260
+                ),
+                (None, systems["two_round"]),
+            )
+            runoff = (runoff and magnitude == 1 and len(names) <= 2) or previous is not None
             post = None
             if magnitude == 1 and first["fips"] in POSTS and seat and re.fullmatch(r"At-Large (?:Place )?\d+", seat):
                 post = cs.key("us.seat", f"{owner}:{seat}")
@@ -551,8 +621,9 @@ def emit() -> Path:
                 district_area_id=area,
                 seat_id=post,
                 magnitude=magnitude,
-                round_number=1,
-                electoral_system_id=systems["fptp" if magnitude == 1 else "block"],
+                round_number=2 if runoff else 1,
+                previous_round_id=previous,
+                electoral_system_id=system if runoff else systems["fptp" if magnitude == 1 else "block"],
                 default_result_kind="counted",
                 term="remainder" if remainder else "full",
             )
@@ -580,6 +651,8 @@ def emit() -> Path:
                     kind="caveat",
                     body_md=DISTRICT.format(whole=word.lower()),
                 )
+            if runoff and previous is None:
+                cs.add("note", entity_id=contest, kind="caveat", body_md=FIRSTLESS)
             tacit = rows.select(pl.col("votes").max() <= 1).item()
             result_set = cs.key(f"{SOURCE}.result_set", contest_key)
             cs.add(
