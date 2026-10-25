@@ -9,6 +9,7 @@ const pool = new pg.Pool({
   connectionString: DATABASE_URL,
   idleTimeoutMillis: 30_000,
   connectionTimeoutMillis: 10_000,
+  statement_timeout: 300_000,
   application_name: PROJECT,
 });
 pool.on("error", (error) => {
