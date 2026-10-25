@@ -1976,6 +1976,70 @@ function electionMarkdown(
               ),
               share: percent(leader.share ?? 0),
             });
+      const wards = race.wards ?? [];
+      if (wards.length > 0) {
+        const round = (runoff: { date: string; isGeneral: boolean }) => {
+          const day = new Intl.DateTimeFormat(getLocale(), {
+            month: "long",
+            day: "numeric",
+            timeZone: "UTC",
+          }).format(new Date(`${runoff.date}T00:00:00Z`));
+          return runoff.isGeneral
+            ? m.wards_round_general({ date: day })
+            : m.wards_round_runoff({ date: day });
+        };
+        const sent = wards.filter((row) => row.runoff != null);
+        const won = wards.filter(
+          (row) => row.runoff == null && row.isWon,
+        ).length;
+        const first = sent[0]?.runoff;
+        return [
+          `## ${link(race.name, race.path)}`,
+          ...(first == null
+            ? won === wards.length
+              ? [m.wards_lede_all({ count: count(wards.length) })]
+              : []
+            : [
+                m.wards_lede({
+                  won: count(won),
+                  count: count(wards.length),
+                  sent: count(sent.length),
+                  round: round(first),
+                }),
+              ]),
+          table(
+            [m.col_seat(), m.col_candidate(), m.col_result()],
+            wards.map((row) => {
+              const final = row.runoff?.isWon === true ? row.runoff : null;
+              return [
+                link(row.label, row.path),
+                (final ?? row).name,
+                row.runoff == null
+                  ? (row.isWon ? m.wards_won : m.wards_led)({
+                      share: percent(row.share),
+                    })
+                  : final == null
+                    ? m.wards_pending({
+                        share: percent(row.share),
+                        round: round(row.runoff),
+                      })
+                    : final.person != null && final.person === row.person
+                      ? m.wards_kept({
+                          share: percent(row.share),
+                          round: round(row.runoff),
+                          final: percent(final.share),
+                        })
+                      : m.wards_took({
+                          round: round(row.runoff),
+                          final: percent(final.share),
+                          name: row.name ?? "",
+                          share: percent(row.share),
+                        }),
+              ];
+            }),
+          ),
+        ];
+      }
       const districts = race.isPrimaries ? race.places : null;
       if (districts != null) {
         return [

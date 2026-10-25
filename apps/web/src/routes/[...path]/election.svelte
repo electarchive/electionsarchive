@@ -7,7 +7,7 @@
     useQueryClient,
   } from "@tanstack/svelte-query";
   import { tick, untrack } from "svelte";
-  import { MediaQuery } from "svelte/reactivity";
+  import { MediaQuery, SvelteSet } from "svelte/reactivity";
   import {
     count,
     date,
@@ -16,6 +16,7 @@
     plural,
     points,
   } from "#lib/format.js";
+  import Name from "#lib/components/name.svelte";
   import { MEASURES } from "#lib/outcomes.js";
   import { m } from "#lib/paraglide/messages.js";
   import { getLocale } from "#lib/paraglide/runtime.js";
@@ -432,6 +433,8 @@
 
   const named = (row: { label: string; short: string | null }) =>
     row.label.length > 28 ? (row.short ?? row.label) : row.label;
+  const unfolded = new SvelteSet<string>();
+
   const races = $derived(
     ordered.map((race) => {
       const winners = race.results.filter((row) => (row.seats ?? 0) > 0);
@@ -1181,7 +1184,7 @@
   {#if index === 0 && isBallot}
     {@render board()}
   {/if}
-  {#if index === 0 && !isBallot && race.results.length > 0 && (others.length > 0 || race.balance.parts.some((part) => part.value > 0))}
+  {#if index === 0 && !isBallot && race.results.length > 0 && (race.wards ?? []).length === 0 && (others.length > 0 || race.balance.parts.some((part) => part.value > 0))}
     <section
       id="race-{race.anchor}"
       class="col-span-12 grid scroll-mbs-4 gap-x-10 gap-y-3 bg-card px-3.5 pbs-4 pbe-3 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)]"
@@ -1217,7 +1220,7 @@
         </h2>
         {@render meta(race)}
       </div>
-      {#if race.lede != null && (index === 0 || race.isLater)}
+      {#if race.lede != null && (index === 0 || race.isLater) && (race.wards ?? []).length === 0}
         <p
           class={cn("text-pretty max-inline-[64ch]", {
             "text-[1.0625rem]": index === 0,
@@ -1227,7 +1230,7 @@
           {race.lede}
         </p>
       {/if}
-      {#if race.results.length === 0 && !race.isPrimaries}
+      {#if race.results.length === 0 && !race.isPrimaries && (race.wards ?? []).length === 0}
         <p class="text-[0.9375rem] text-muted-foreground">{m.no_results()}</p>
       {:else if isFolding && index > 0}
         <button
@@ -1245,9 +1248,12 @@
           /></button
         >
       {/if}
+      {#if (race.wards ?? []).length > 0 && (!isFolding || index === 0 || opened[index] === true)}
+        {@render wards(race.wards ?? [], race.anchor)}
+      {/if}
     </section>
   {/if}
-  {#if (race.results.length > 1 || race.isPrimaries || (index === 0 && race.results.length > 0)) && (!isFolding || index === 0 || opened[index] === true)}
+  {#if (race.wards ?? []).length === 0 && (race.results.length > 1 || race.isPrimaries || (index === 0 && race.results.length > 0)) && (!isFolding || index === 0 || opened[index] === true)}
     {#if race.electors != null && race.electors.rows.length > 0 && races.length === 1}
       <Electors electors={race.electors} />
     {/if}
@@ -1610,6 +1616,110 @@
       {/if}
     {/if}
   </p>
+{/snippet}
+
+{#snippet wards(
+  rows: NonNullable<(typeof races)[number]["wards"]>,
+  anchor: string,
+)}
+  {const round = (runoff: { date: string; isGeneral: boolean }) => {
+    const day = new Intl.DateTimeFormat(getLocale(), {
+      month: "long",
+      day: "numeric",
+      timeZone: "UTC",
+    }).format(new Date(`${runoff.date}T00:00:00Z`));
+    return runoff.isGeneral
+      ? m.wards_round_general({ date: day })
+      : m.wards_round_runoff({ date: day });
+  }}
+  {const sent = $derived(rows.filter((row) => row.runoff != null))}
+  {const won = $derived(
+    rows.filter((row) => row.runoff == null && row.isWon).length,
+  )}
+  <div class="grid content-start gap-2 pbs-1 pbe-3">
+    <p class="text-[0.9375rem] text-pretty max-inline-[64ch]">
+      {sent[0]?.runoff == null
+        ? won === rows.length
+          ? m.wards_lede_all({ count: count(rows.length) })
+          : null
+        : m.wards_lede({
+            won: count(won),
+            count: count(rows.length),
+            sent: count(sent.length),
+            round: round(sent[0].runoff),
+          })}
+    </p>
+    <ol
+      class="grid grid-cols-[repeat(auto-fill,minmax(min(100%,19rem),1fr))] gap-x-6 text-sm"
+    >
+      {#each unfolded.has(anchor) || rows.length <= 20 ? rows : rows.slice(0, 18) as row (row.label)}
+        {const final = $derived(row.runoff?.isWon === true ? row.runoff : null)}
+        <li
+          class="grid grid-cols-[minmax(4.5rem,auto)_minmax(0,1fr)] items-baseline gap-x-3 border-be border-border/60 py-1.5 pointer-coarse:py-2"
+        >
+          {#if row.path == null}
+            <span class="text-[0.8125rem] text-muted-foreground"
+              >{row.label}</span
+            >
+          {:else}
+            <a
+              class="text-[0.8125rem] text-muted-foreground underline decoration-border underline-offset-2 hover:text-foreground hover:decoration-foreground"
+              href={resolve("/[...path]", { path: row.path })}>{row.label}</a
+            >
+          {/if}
+          <span class="grid gap-0.5 min-inline-0">
+            <Name
+              class="justify-self-start font-semibold"
+              label={(final ?? row).name ?? ""}
+              person={(final ?? row).person}
+            />
+            <span class="text-xs text-muted-foreground">
+              {#if row.runoff == null}
+                {(row.isWon ? m.wards_won : m.wards_led)({
+                  share: percent(row.share, 1),
+                })}
+              {:else if final == null}
+                {m.wards_pending({
+                  share: percent(row.share, 1),
+                  round: round(row.runoff),
+                })}
+              {:else if final.person != null && final.person === row.person}
+                {m.wards_kept({
+                  share: percent(row.share, 1),
+                  round: round(row.runoff),
+                  final: percent(final.share, 1),
+                })}
+              {:else}
+                {m.wards_took({
+                  round: round(row.runoff),
+                  final: percent(final.share, 1),
+                  name: row.name ?? "",
+                  share: percent(row.share, 1),
+                })}
+              {/if}
+            </span>
+          </span>
+        </li>
+      {/each}
+    </ol>
+    {#if rows.length > 20}
+      <button
+        type="button"
+        class="justify-self-start text-[0.8125rem] font-semibold underline decoration-border underline-offset-4 hover:decoration-foreground pointer-coarse:py-2"
+        aria-expanded={unfolded.has(anchor)}
+        onclick={() => {
+          if (unfolded.has(anchor)) {
+            unfolded.delete(anchor);
+          } else {
+            unfolded.add(anchor);
+          }
+        }}
+        >{unfolded.has(anchor)
+          ? m.regions_fewer()
+          : m.regions_more({ count: count(rows.length) })}</button
+      >
+    {/if}
+  </div>
 {/snippet}
 
 {#snippet meta(race: (typeof races)[number])}

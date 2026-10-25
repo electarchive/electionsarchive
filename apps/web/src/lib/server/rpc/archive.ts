@@ -8004,7 +8004,7 @@ async function races(
             (other[0].kind === "body_seats" ||
               other[0].kind === "list_allocation"),
         );
-      const [map, previous, runoff, seated, asked] = await Promise.all([
+      const [map, previous, runoff, seated, asked, wards] = await Promise.all([
         level == null || isBrief || isPrimaries
           ? null
           : sketch(
@@ -8176,6 +8176,135 @@ async function races(
               null,
             ),
         poll(single?.id ?? null, place.k, head?.kind === "ballot_question"),
+        isBrief ||
+        results.some((row) => row.key.startsWith("party:")) ||
+        group.length < 2 ||
+        head?.kind !== "body_seats"
+          ? null
+          : (async () => {
+              const found = await db.execute<{
+                id: string;
+                area: string | null;
+                seat: string | null;
+                person: string | null;
+                share: number | null;
+                isWon: boolean | null;
+                runoff: string | null;
+                date: string | null;
+                isGeneral: boolean | null;
+                winner: string | null;
+                won: number | null;
+                isDone: boolean | null;
+              }>(sql`
+                select g.id, c.district_area_id as area, (select st.label from seat st where st.id = c.seat_id) as seat,
+                  f.person, f.share, f.won as "isWon", g.runoff,
+                  (select e.date_from::text from contest n join election e on e.id = n.election_id where n.id = g.runoff) as date,
+                  (select e.kind = 'general' from contest n join election e on e.id = n.election_id where n.id = g.runoff) as "isGeneral",
+                  r.person as winner, r.share as won, r.won as "isDone"
+                from (
+                  select x.id, (
+                    select n.id from contest n join election ne on ne.id = n.election_id
+                    where n.previous_round_id = x.id order by ne.date_from limit 1
+                  ) as runoff
+                  from unnest(${sql.param(group.map((row) => row.id))}::uuid[]) as x(id)
+                ) g
+                join contest c on c.id = g.id
+                left join lateral (
+                select coalesce(m.into_id, cy.person_id) as person, t.value / nullif(t.total, 0) as share,
+                  exists (
+                    select from outcome x join result_set xs on xs.id = x.result_set_id and ${latest("xs")}
+                    where x.option_id = o.id and x.kind in ('elected', 'won') and x.candidacy_id is null
+                  ) as won
+                from contest c
+                join area a on a.id = c.district_area_id
+                join result_set rs on rs.contest_id = c.id and ${latest("rs")}
+                cross join lateral (
+                  select y.option_k, y.value::float8 as value, sum(y.value) over ()::float8 as total
+                  from result_rollup y
+                  where y.result_set_k = rs.k and y.area_k = a.k and y.measure = 1 and y.channel = 0 and y.option_k <> 0
+                    and y.count_round = (
+                      select max(z.count_round) from result_rollup z
+                      where z.result_set_k = rs.k and z.area_k = a.k and z.measure = 1 offset 0
+                    )
+                  offset 0
+                ) t
+                join contest_option o on o.k = t.option_k
+                left join candidacy cy on cy.option_id = o.id and cy.role = 'head'
+                left join entity_merge m on m.entity_id = cy.person_id
+                where c.id = g.id
+                order by t.value desc limit 1
+                ) f on true
+                left join lateral (
+                select coalesce(m.into_id, cy.person_id) as person, t.value / nullif(t.total, 0) as share,
+                  exists (
+                    select from outcome x join result_set xs on xs.id = x.result_set_id and ${latest("xs")}
+                    where x.option_id = o.id and x.kind in ('elected', 'won') and x.candidacy_id is null
+                  ) as won
+                from contest c
+                join area a on a.id = c.district_area_id
+                join result_set rs on rs.contest_id = c.id and ${latest("rs")}
+                cross join lateral (
+                  select y.option_k, y.value::float8 as value, sum(y.value) over ()::float8 as total
+                  from result_rollup y
+                  where y.result_set_k = rs.k and y.area_k = a.k and y.measure = 1 and y.channel = 0 and y.option_k <> 0
+                    and y.count_round = (
+                      select max(z.count_round) from result_rollup z
+                      where z.result_set_k = rs.k and z.area_k = a.k and z.measure = 1 offset 0
+                    )
+                  offset 0
+                ) t
+                join contest_option o on o.k = t.option_k
+                left join candidacy cy on cy.option_id = o.id and cy.role = 'head'
+                left join entity_merge m on m.entity_id = cy.person_id
+                where c.id = g.runoff
+                order by t.value desc limit 1
+                ) r on true
+              `);
+              const [people, links] = await Promise.all([
+                names(
+                  found.rows.flatMap((row) =>
+                    [row.area, row.person, row.winner].filter(
+                      (id) => id != null,
+                    ),
+                  ),
+                  date,
+                ),
+                paths(
+                  found.rows.flatMap((row) =>
+                    [row.id, row.runoff].filter((id) => id != null),
+                  ),
+                ),
+              ]);
+              return found.rows
+                .map((row) => ({
+                  path: links.get(row.id) ?? null,
+                  label:
+                    row.seat ??
+                    (people.full.get(row.area ?? "") ?? "").replace(
+                      /^.*, /u,
+                      "",
+                    ),
+                  person: row.person,
+                  name: people.full.get(row.person ?? "") ?? null,
+                  share: row.share ?? 0,
+                  isWon: row.isWon === true,
+                  runoff:
+                    row.runoff == null
+                      ? null
+                      : {
+                          path: links.get(row.runoff) ?? null,
+                          date: row.date ?? "",
+                          isGeneral: row.isGeneral === true,
+                          person: row.winner,
+                          name: people.full.get(row.winner ?? "") ?? null,
+                          share: row.won ?? 0,
+                          isWon: row.isDone === true,
+                        },
+                }))
+                .toSorted((a, b) =>
+                  a.label.localeCompare(b.label, undefined, { numeric: true }),
+                );
+            })(),
       ]);
       const straddled = Math.max(
         0,
@@ -8200,6 +8329,7 @@ async function races(
         whole: isTier && straddled === 0 ? (previous?.rows ?? null) : null,
         filled,
         runoff,
+        wards: wards ?? undefined,
         turnout: asked.turnout,
         quorum: asked.quorum,
         contest: single?.id ?? null,
@@ -8754,6 +8884,29 @@ export const elections = {
                 margin: v.number(),
                 isWon: v.boolean(),
               }),
+            ),
+            wards: v.optional(
+              v.array(
+                v.object({
+                  path: v.nullable(v.string()),
+                  label: v.string(),
+                  person: v.nullable(v.string()),
+                  name: v.nullable(v.string()),
+                  share: v.number(),
+                  isWon: v.boolean(),
+                  runoff: v.nullable(
+                    v.object({
+                      path: v.nullable(v.string()),
+                      date: v.string(),
+                      isGeneral: v.boolean(),
+                      person: v.nullable(v.string()),
+                      name: v.nullable(v.string()),
+                      share: v.number(),
+                      isWon: v.boolean(),
+                    }),
+                  ),
+                }),
+              ),
             ),
             map: v.nullable(Sketch),
           }),
