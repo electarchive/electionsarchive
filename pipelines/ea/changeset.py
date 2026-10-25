@@ -169,11 +169,19 @@ class Changeset:
         return self.survivors.get(id, id)
 
     def merge(self, entity: UUID, into: UUID) -> None:
-        if entity == into:
+        into = self.survivors.get(into, into)
+        if entity == into or entity in self.survivors:
             return
         self.add("entity_merge", entity_id=entity, into_id=into)
         self.survivors[entity] = into
-        self.merged.setdefault(str(into), []).append(str(entity))
+        absorbed = self.merged.pop(str(entity), [])
+        if absorbed:
+            for row in self.rows.get("entity_merge", []):
+                if row["into_id"] == entity:
+                    row["into_id"] = into
+            for earlier in absorbed:
+                self.survivors[UUID(earlier)] = into
+        self.merged.setdefault(str(into), []).extend([*absorbed, str(entity)])
 
     def polity(self, iso: str) -> UUID:
         return self._resolve("polity", iso, "select iso_code, id from polity where iso_code is not null")
