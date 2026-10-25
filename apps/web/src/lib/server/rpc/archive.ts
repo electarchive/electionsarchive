@@ -11133,6 +11133,7 @@ export const polities = {
                 join area_geometry g on g.area_id = candidates.area_id and upper_inf(g.valid)
                 join county on st_contains(county.geom, coalesce(g.label_point, st_pointonsurface(g.geom)))
                   or (g.geom && county.point and st_contains(g.geom, county.point))
+                  or (g.geom && county.geom and st_area(st_intersection(g.geom, county.geom)) > 0.1 * st_area(g.geom))
               ) seed
               union
               select p.polity_id, below.top from polity_parent p join below on p.parent_id = below.id
