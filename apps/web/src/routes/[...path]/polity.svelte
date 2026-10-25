@@ -604,6 +604,7 @@
   <section
     class={cn("col-span-12 grid content-start gap-2.5 bg-card px-3.5 py-3", {
       "lg:col-span-8": polity.polities.length > 0,
+      "max-lg:order-1": isLocal && polity.polities.length > 0,
     })}
     aria-labelledby="{uid}-elections"
   >
