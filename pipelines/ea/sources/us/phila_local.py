@@ -13,7 +13,7 @@ from ea.sources.us.phila_returns import SOURCE as RETURNS
 from ea.store import connect
 
 SOURCE = "us.phila_local"
-VERSION = "7"
+VERSION = "8"
 FIPS = "42101"
 PLACE = "4260000"
 SPECIAL_DAYS = {
@@ -512,6 +512,13 @@ def emit() -> Path:
                 completeness=None if house else round(total_votes / (total_votes + gap), 4) if gap else 1,
             )
             cs.add("note", entity_id=result_set, kind="methodology", body_md=f"{NOTE} {tie}")
+            if council and ballot is None:
+                cs.add(
+                    "note",
+                    entity_id=result_set,
+                    kind="caveat",
+                    body_md="The file prints no winners; the candidates elected are those with the most votes for the seats on offer.",
+                )
             if differs:
                 cs.add("note", entity_id=result_set, kind="caveat", body_md=tie)
             if house:
@@ -523,6 +530,10 @@ def emit() -> Path:
                 )
             cells: dict[tuple[UUID, UUID], int] = {}
             borrowed = 0
+            winners = set()
+            if council and ballot is None:
+                ranked = sorted((total, candidate) for candidate, total in sums.items() if candidate != "Write-ins")
+                winners = {candidate for _, candidate in ranked[-seats:]}
             for candidate, by_precinct in options.items():
                 if candidate == "judge":
                     continue
@@ -585,6 +596,8 @@ def emit() -> Path:
                         ballot_name=tidy(candidate),
                         is_independent=False,
                     )
+                    if candidate in winners:
+                        cs.add("outcome", result_set_id=result_set, option_id=option, kind="elected", seats=None)
                 for precinct, votes in by_precinct.items():
                     code_ = f"{day}:PA:{FIPS}:PHILADELPHIA:{precinct}"
                     target = cs.unit("us.precinct", code_)
