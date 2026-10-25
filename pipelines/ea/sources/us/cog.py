@@ -118,7 +118,7 @@ ELECTED = re.compile(
     r"heads?|members? of (the|a|each) (county|city|town|municipal|participating|member)))",
     re.IGNORECASE,
 )
-STOP = {"DISTRICT", "OF", "AND", "THE", "FOR", "LAW", "ACT", "COUNTY", "IN", "A"}
+STOP = {"DISTRICT", "OF", "AND", "OR", "THE", "FOR", "LAW", "ACT", "COUNTY", "IN", "A"}
 GENERIC = {
     "AUTHORITY",
     "COMMISSION",
@@ -138,6 +138,7 @@ GENERIC = {
     "CREATED",
     "UNDER",
 } | {word.upper() for state in STATES for word in state.split()}
+COLLEGE = re.compile(r"COLLEGE|CMTY COL|TECHNICAL|JUNIOR|UNIVERSITY", re.IGNORECASE)
 COUNTS = {"county": 3031, "municipality": 19491, "township": 16214, "special": 39555, "school": 12546}
 
 
@@ -176,7 +177,7 @@ def boards() -> dict[str, list[tuple[frozenset[str], str | None]]]:
         for _, _, bold, content in sorted(items):
             if bold and re.fullmatch(r"SPECIAL DISTRICT GOVERNMENTS\d?", content):
                 inside = True
-            elif bold and content.isupper():
+            elif bold and re.fullmatch(r"[A-Z][A-Z,—-]*(?: [A-Z,—-]+)+", content):
                 inside = False
             elif (
                 inside
@@ -318,6 +319,14 @@ def parse() -> None:
         elif population:
             match = PREFIX.match(name)
             places[(st, county)].append(((name if match is None else match[2]).strip(), population))
+    covered: dict[tuple[str, str], int] = defaultdict(int)
+    for gid, name, st, county in (
+        governments.filter(pl.col("kind").is_in(["school", "dependent_school"]))
+        .select("id", "name", "state_fips", "county_fips")
+        .iter_rows()
+    ):
+        if gid in figures and not COLLEGE.search(name):
+            covered[(st, county)] += figures[gid][0]
     sharing: dict[tuple[str, str, str, str | None, str], list[str]] = defaultdict(list)
     for gid, kind, name, st, county in (
         governments.filter(pl.col("kind").is_in(["special", "school", "dependent_school"]))
@@ -337,13 +346,16 @@ def parse() -> None:
             key=lambda pair: len(pair[0]),
             default=None,
         )
-        group = "special" if kind == "special" else "school"
+        group = "special" if kind == "special" else "college" if COLLEGE.search(name) else "school"
         if place is not None:
             sharing[("place", st, county, place[0], group)].append(gid)
             figures[gid] = (place[1], "place")
         elif (st, county) in counties:
             sharing[("county", st, county, None, group)].append(gid)
-            figures[gid] = (counties[(st, county)], "county")
+            figures[gid] = (
+                max(0, counties[(st, county)] - (covered[(st, county)] if group == "school" else 0)),
+                "county",
+            )
     for gids in sharing.values():
         for gid in gids:
             figures[gid] = (figures[gid][0] // len(gids), figures[gid][1])

@@ -386,6 +386,11 @@ CALENDAR: dict[tuple[str, str], tuple[int, int, str | None]] = {
         0,
         "N.C. Gen. Stat. § 115C-37(a), https://www.ncleg.gov/EnactedLegislation/Statutes/HTML/BySection/Chapter_115C/GS_115C-37.html",
     ),
+    ("NC", "Soil and water conservation"): (
+        2,
+        0,
+        "N.C. Gen. Stat. § 139-6, https://www.ncleg.gov/EnactedLegislation/Statutes/HTML/BySection/Chapter_139/GS_139-6.html",
+    ),
     ("ND", "county"): (2, 0, None),
     ("ND", "municipality"): (2, 0, "N.D. Cent. Code § 40-21-02, https://ndlegis.gov/cencode/t40c21.pdf"),
     ("ND", "school"): (
@@ -647,7 +652,9 @@ ABBREVIATIONS = {
     "TWP": "TOWNSHIP",
     "TWNSHP": "TOWNSHIP",
     "HS": "HIGH",
+    "COM": "COMMUNITY",
     "COMM": "COMMUNITY",
+    "CMTY": "COMMUNITY",
     "CMNTY": "COMMUNITY",
     "CONS": "CONSOLIDATED",
     "CONSOL": "CONSOLIDATED",
@@ -1014,7 +1021,7 @@ def build() -> str:
             if ranked and ranked[0][0] >= 0.75 and (len(ranked) == 1 or ranked[1][0] < ranked[0][0]):
                 found = [ranked[0][1]]
             else:
-                found = [g for _, g in ranked if mine < g[2]]
+                found = [g for _, g in ranked if mine < g[2] and "COLLEGE" not in g[2] - mine]
         if len(found) == 1 and found[0][0] not in link:
             link[found[0][0]] = pid
             taken.add(pid)
@@ -1122,7 +1129,9 @@ def build() -> str:
     for g in governments:
         group = (g["state"], g["kind"])
         if g["period"] is None:
-            period, phase, cite = CALENDAR.get(group, (None, None, None))
+            period, phase, cite = CALENDAR.get(
+                (g["state"], g["function"] or ""), CALENDAR.get(group, (None, None, None))
+            )
             common = [p for p, _ in patterns[group].most_common() if period is None or p[0] == period]
             if g["phase"] is not None:
                 if period is None:
@@ -1143,6 +1152,7 @@ def build() -> str:
             expected = (
                 g["active"]
                 and g["elected"]
+                and not g["id"].startswith("polity:")
                 and 2000 <= year <= today.year
                 and (year - g["phase"]) % g["period"] == 0
                 and (year < today.year or (g["month"] is not None and g["month"] < today.month))
