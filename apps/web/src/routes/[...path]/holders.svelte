@@ -44,6 +44,7 @@
     acting: m.holders_acting,
     appointed: m.holders_appointed,
     trustee: m.holders_trustee,
+    list_replacement: m.holders_list_replacement,
     vacant: m.holders_vacant_since,
   };
 </script>

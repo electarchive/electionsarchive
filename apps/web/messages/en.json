@@ -612,6 +612,7 @@
   "holders_acting": "Acting since {date}",
   "holders_appointed": "Appointed {date}",
   "holders_trustee": "Trustee since {date}",
+  "holders_list_replacement": "Took the seat on {date}",
   "holders_since": "In office since {date}",
   "holders_vacant": "Vacant",
   "holders_vacant_since": "Vacant since {date}",

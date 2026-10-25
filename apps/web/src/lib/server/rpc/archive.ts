@@ -13460,6 +13460,11 @@ export const polities = {
         ),
         roots as materialized (
           select c.id, c.seat_id, coalesce(c.office_id, c.body_id) as owner, c.office_id is not null as "isOffice",
+            c.kind = 'list_allocation' as "isList",
+            c.kind <> 'list_allocation' or exists (
+              select from result_set rs join outcome x on x.result_set_id = rs.id
+              where rs.contest_id = c.id and x.candidacy_id is not null and x.kind in ('elected', 'won')
+            ) as "isNamed",
             e.date_from as date, e.kind::text as kind, coalesce(c.magnitude, 1) as magnitude,
             case when c.district_area_id in (select area_id from own) then null else c.district_area_id end as district,
             (select a.k from area a where a.id = coalesce(c.district_area_id, (
@@ -13472,7 +13477,7 @@ export const polities = {
           join election e on e.id = c.election_id
           left join name n on n.entity_id = c.id and n.is_preferred
           where c.allocation_parent_id is null and c.party_scope_id is null and not c.notional
-            and c.kind in ('office', 'body_seats') and e.date_from <= current_date
+            and c.kind in ('office', 'body_seats', 'list_allocation') and e.date_from <= current_date
             and e.kind in ('general', 'local', 'runoff', 'special', 'by_election', 'primary')
             and not exists (select from contest later where later.previous_round_id = c.id)
             and not exists (select from entity_merge m where m.entity_id = c.id)
@@ -13493,7 +13498,7 @@ export const polities = {
           select k.*, w.option, w.person, w.party
           from keyed k
           cross join lateral (
-            select o.id as option, coalesce(m.into_id, cy.person_id) as person, coalesce(pm.into_id, o.party_id, cy.member_of_party_id, (
+            select o.id as option, coalesce(m.into_id, xc.person_id, cy.person_id) as person, coalesce(pm.into_id, o.party_id, xc.member_of_party_id, cy.member_of_party_id, (
                 select ch.party_id from contest_option ch
                 cross join lateral (
                   select sum(y.value) as value from result_rollup y
@@ -13504,14 +13509,15 @@ export const polities = {
                 order by y.value desc limit 1
               )) as party
             from result_set rs
-            join outcome x on x.result_set_id = rs.id and x.kind in ('elected', 'won') and x.candidacy_id is null
+            join outcome x on x.result_set_id = rs.id and x.kind in ('elected', 'won') and (x.candidacy_id is not null) = k."isList"
             join contest_option o on o.id = x.option_id
+            left join candidacy xc on xc.id = x.candidacy_id
             left join lateral (
               select cy.person_id, cy.member_of_party_id from candidacy cy where cy.option_id = o.id and cy.person_id is not null order by cy.id limit 1
             ) cy on true
-            left join entity_merge m on m.entity_id = cy.person_id
+            left join entity_merge m on m.entity_id = coalesce(xc.person_id, cy.person_id)
             left join entity_merge pm on pm.entity_id = o.party_id
-            where rs.contest_id = k.id and ${latest("rs")}
+            where rs.contest_id = k.id and ${latest("rs")} and (not k."isList" or xc.person_id is not null)
           ) w
         ),
         last as (
@@ -13568,7 +13574,7 @@ export const polities = {
         pending as (
           select distinct on (k.post) k.post, k.id, k.date
           from keyed k left join last l on l.post = k.post
-          where k.kind <> 'primary' and not k."isElect" and (l.date is null or k.date > l.date)
+          where k.kind <> 'primary' and not k."isElect" and k."isNamed" and (l.date is null or k.date > l.date)
             and not exists (select from won w where w.id = k.id)
           order by k.post, k.date desc
         ),
@@ -13581,6 +13587,13 @@ export const polities = {
           where t.office_id in (select owner from posts where "isOffice") and (t.to_date is null or t.to_date > current_date)
           order by t.office_id, t.from_date desc
         ),
+        successors as materialized (
+          select f.body_id, f.person_id as before, coalesce(m.into_id, t.person_id) as person, t.acquired_via::text as via, t.from_date
+          from tenure t
+          join tenure f on f.id = t.succeeds_tenure_id
+          left join entity_merge m on m.entity_id = t.person_id
+          where t.body_id in (select owner from posts where not "isOffice") and (t.to_date is null or t.to_date > current_date)
+        ),
         ended as (
           select distinct on (t.office_id) t.office_id, t.to_date
           from tenure t
@@ -13590,7 +13603,7 @@ export const polities = {
         select p.owner::text, (select kind::text from office where id = p.owner) as kind, p.label,
           case when pd.id is not null then null when tn.person is not null and (h.date is null or tn.from_date > h.date) then tn.person
             when en.to_date is not null and en.to_date > h.date and tn.person is null then null else h.person end::text as person,
-          case when pd.id is null and (tn.person is null or (h.date is not null and tn.from_date <= h.date))
+          case when pd.id is null and (tn.person is null or (h.date is not null and tn.from_date <= h.date) or rp.via = 'list_replacement')
             and not (en.to_date is not null and en.to_date > h.date and tn.person is null) then h.party end::text as party,
           case when pd.id is not null then 'unknown' when tn.person is not null and (h.date is null or tn.from_date > h.date) then tn.via
             when en.to_date is not null and en.to_date > h.date and tn.person is null then 'vacant' else 'elected' end as via,
@@ -13608,7 +13621,16 @@ export const polities = {
         left join pending pd on pd.post = p.post
         left join terms tr on tr.post = p.post
         left join elects el on el.post = p.post
-        left join tenured tn on p."isOffice" and tn.office_id = p.owner
+        left join tenured tf on p."isOffice" and tf.office_id = p.owner
+        left join lateral (
+          select sc.person, sc.via, sc.from_date from successors sc
+          where not p."isOffice" and sc.body_id = p.owner and sc.before = h.person and sc.from_date > h.date
+          order by sc.from_date desc limit 1
+        ) rp on true
+        cross join lateral (
+          select coalesce(tf.person, rp.person) as person, coalesce(tf.via, rp.via) as via,
+            coalesce(tf.from_date, rp.from_date) as from_date
+        ) tn
         left join ended en on p."isOffice" and en.office_id = p.owner and h.person is not null
         join newest nw on nw.owner = p.owner
         where (h.post is not null or pd.post is not null or (p."isOffice" and tn.person is not null))
