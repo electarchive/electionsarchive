@@ -8373,6 +8373,22 @@ export const elections = {
             color: v.nullable(v.string()),
             seats: v.number(),
             total: v.number(),
+            isRolled: v.optional(v.boolean()),
+          }),
+        ),
+        composition: v.nullable(
+          v.object({
+            rows: v.array(
+              v.object({
+                key: v.string(),
+                label: v.string(),
+                short: v.nullable(v.string()),
+                color: v.nullable(v.string()),
+                before: v.nullable(v.number()),
+                after: v.number(),
+              }),
+            ),
+            hasBefore: v.boolean(),
           }),
         ),
         councils: v.array(
@@ -8397,6 +8413,7 @@ export const elections = {
                 color: v.nullable(v.string()),
                 seats: v.number(),
                 total: v.number(),
+                isRolled: v.optional(v.boolean()),
               }),
             ),
           }),
@@ -8935,6 +8952,121 @@ export const elections = {
         election.date,
       );
       const held = new Map(whole.rows.map((row) => [row.sample, row]));
+      const rolled =
+        within != null || !whole.rows.some((row) => row.isStaggered)
+          ? []
+          : (
+              await db.execute<{
+                origin: string;
+                isNow: boolean;
+                party: string | null;
+                seats: number;
+                size: number | null;
+                cycles: number;
+                isWhole: boolean;
+              }>(sql`
+                with t0 as (
+                  select distinct e.id as target, c.body_id as body, e.date_from as day
+                  from election e join contest c on c.election_id = e.id and c.body_id is not null
+                  where e.id = any(${sql.param(whole.rows.filter((row) => row.isStaggered).map((row) => row.election))}::uuid[])
+                ),
+                p as (
+                  select distinct on (t0.target) t0.target as origin, e.id as target, t0.body, e.date_from as day
+                  from t0 join contest c on c.body_id = t0.body and c.allocation_parent_id is null and not c.notional
+                  join election e on e.id = c.election_id and e.kind = 'local' and e.date_from < t0.day
+                  order by t0.target, e.date_from desc
+                ),
+                t as (
+                  select target as origin, target, body, day, true as "isNow" from t0
+                  union all
+                  select origin, target, body, day, false from p
+                ),
+                runs as (
+                  select t.origin, t."isNow", t.body, t.day as at, e.id as election,
+                    row_number() over (partition by t.origin, t."isNow" order by e.date_from desc) as n,
+                    count(*) filter (where k.magnitude > 1) * 2 > count(*) as "isWhole"
+                  from t
+                  join contest k on k.body_id = t.body and k.kind = 'body_seats' and k.allocation_parent_id is null and not k.notional
+                  join election e on e.id = k.election_id and e.kind = 'local'
+                    and e.date_from <= t.day and e.date_from > t.day - interval '6 years'
+                  group by t.origin, t."isNow", t.body, t.day, e.id, e.date_from
+                ),
+                wnd as (
+                  select r.* from runs r
+                  where r.n <= coalesce((select min(x.n) from runs x where x.origin = r.origin and x."isNow" = r."isNow" and x."isWhole"), 3)
+                ),
+                won as (
+                  select w.origin, w."isNow", w.n, w."isWhole", k.district_area_id as area, coalesce(k.magnitude, 1) as magnitude,
+                    coalesce(pm.into_id, o.party_id)::text as party, y.votes
+                  from wnd w
+                  join contest k on k.election_id = w.election and k.body_id = w.body and k.kind = 'body_seats'
+                    and k.allocation_parent_id is null and not k.notional
+                  join area a on a.id = k.district_area_id
+                  join result_set rs on rs.contest_id = k.id and ${latest("rs")}
+                  join outcome x on x.result_set_id = rs.id and x.kind in ('elected', 'won') and x.candidacy_id is null
+                  join contest_option o on o.id = x.option_id
+                  left join entity_merge pm on pm.entity_id = o.party_id
+                  left join lateral (
+                    select max(v.value) as votes from (
+                      select y.value from result_rollup y
+                      where y.result_set_k = rs.k and y.area_k = a.k and y.option_k = o.k and y.measure = 1 and y.channel = 0 and y.count_round = 0 offset 0
+                    ) v
+                  ) y on true
+                ),
+                sized as (
+                  select origin, "isNow", area,
+                    case when bool_or("isWhole") then max(magnitude) filter (where "isWhole") else count(distinct n) end as size
+                  from won group by origin, "isNow", area
+                ),
+                kept as (
+                  select r.* from (
+                    select won.*, row_number() over (partition by origin, "isNow", area order by n, votes desc nulls last) as at
+                    from won
+                  ) r join sized z using (origin, "isNow", area)
+                  where r.at <= z.size
+                )
+                select k.origin::text as origin, k."isNow", k.party, count(*)::int as seats,
+                  (select z.seats from body_size z where z.body_id = (select body from t where t.origin = k.origin and t."isNow" = k."isNow")
+                    and z.valid @> (select day from t where t.origin = k.origin and t."isNow" = k."isNow") limit 1) as size,
+                  (select count(*)::int from wnd w where w.origin = k.origin and w."isNow" = k."isNow") as cycles,
+                  (select bool_or(w."isWhole") from wnd w where w.origin = k.origin and w."isNow" = k."isNow") as "isWhole"
+                from kept k
+                group by k.origin, k."isNow", k.party
+              `)
+            ).rows;
+      const compositions = new Map<string, Map<boolean, Map<string, number>>>();
+      for (const [key, rows] of Map.groupBy(
+        rolled,
+        (row) => `${row.origin}|${row.isNow}`,
+      )) {
+        const first = rows[0];
+        let total = 0;
+        for (const row of rows) {
+          total += row.seats;
+        }
+        if (
+          first == null ||
+          first.size !== total ||
+          (first.cycles < 3 && !first.isWhole)
+        ) {
+          continue;
+        }
+        const [origin = ""] = key.split("|");
+        const sides = compositions.get(origin) ?? new Map();
+        sides.set(
+          first.isNow,
+          new Map(rows.map((row) => [row.party ?? "independent", row.seats])),
+        );
+        compositions.set(origin, sides);
+      }
+      const rolledParties = await refs(
+        [
+          ...new Set(
+            rolled.flatMap((row) => (row.party == null ? [] : [row.party])),
+          ),
+        ],
+        election.date,
+      );
       const standings = councils.map((race) => {
         const found = held.get(race.sample ?? race.contest ?? "");
         let total = 0;
@@ -8945,6 +9077,19 @@ export const elections = {
           (a, b) => (b.seats ?? 0) - (a.seats ?? 0),
         )[0];
         const isMajority = top != null && (top.seats ?? 0) * 2 > total;
+        const sides = compositions.get(found?.election ?? "");
+        const after = sides?.get(true);
+        let size = 0;
+        for (const seats of after?.values() ?? []) {
+          size += seats;
+        }
+        const [lead, most = 0] =
+          [...(after?.entries() ?? [])].toSorted((a, b) => b[1] - a[1])[0] ??
+          [];
+        const party =
+          lead == null || lead === "independent"
+            ? null
+            : rolledParties.get(lead);
         return {
           race,
           path: slugs.get(found?.election ?? "") ?? null,
@@ -8958,7 +9103,62 @@ export const elections = {
                   seats: top?.seats ?? 0,
                   total,
                 }
-              : null,
+              : after != null && found?.isStaggered === true
+                ? {
+                    key:
+                      party != null && most * 2 > size
+                        ? (race.results.find((row) => row.party === lead)
+                            ?.key ??
+                          lead ??
+                          null)
+                        : null,
+                    label:
+                      party != null && most * 2 > size
+                        ? (race.results.find((row) => row.party === lead)
+                            ?.label ?? party.label)
+                        : null,
+                    color:
+                      party != null && most * 2 > size
+                        ? (party.color ?? null)
+                        : null,
+                    seats: most,
+                    total: size,
+                    isRolled: true,
+                  }
+                : null,
+          composition:
+            after == null
+              ? null
+              : [
+                  ...new Set([
+                    ...after.keys(),
+                    ...(sides?.get(false)?.keys() ?? []),
+                  ]),
+                ]
+                  .map((key) => ({
+                    key,
+                    label:
+                      key === "independent"
+                        ? m.seats_independents()
+                        : (rolledParties.get(key)?.label ?? ""),
+                    short:
+                      key === "independent"
+                        ? null
+                        : (rolledParties.get(key)?.short ?? null),
+                    color:
+                      key === "independent"
+                        ? null
+                        : (rolledParties.get(key)?.color ?? null),
+                    before: sides?.get(false)?.get(key) ?? null,
+                    after: after.get(key) ?? 0,
+                  }))
+                  .toSorted(
+                    (a, b) =>
+                      b.after - a.after ||
+                      (b.before ?? 0) - (a.before ?? 0) ||
+                      a.label.localeCompare(b.label),
+                  ),
+          hasBefore: sides?.has(false) === true,
         };
       });
       const isUmbrella =
@@ -8993,6 +9193,13 @@ export const elections = {
                 },
         notes: notes.rows,
         control: councils.length === 1 ? (standings[0]?.control ?? null) : null,
+        composition:
+          councils.length === 1 && standings[0]?.composition != null
+            ? {
+                rows: standings[0].composition,
+                hasBefore: standings[0].hasBefore,
+              }
+            : null,
         councils: isUmbrella
           ? standings.map(({ race, path, total, control }) => ({
               name:

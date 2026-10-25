@@ -1078,11 +1078,74 @@
             })}
       </span>
       <span class="text-[0.8125rem] text-muted-foreground"
-        >{m.control_derived()}</span
+        >{election.control.isRolled === true
+          ? m.control_rolled()
+          : m.control_derived()}</span
       >
     </p>
   {/if}
 </header>
+
+{#if election.composition != null}
+  {const composition = $derived(election.composition)}
+  <section class="col-span-12 grid gap-2 bg-card px-3.5 py-3">
+    <h2 class="text-[0.8125rem] font-bold">{m.composition_title()}</h2>
+    <table class="border-collapse text-sm inline-full sm:inline-auto">
+      <thead>
+        <tr class="border-be text-[0.8125rem] text-muted-foreground">
+          <th class="pe-6 pbe-1.5 text-start font-normal" scope="col">
+            {m.col_party()}
+          </th>
+          {#if composition.hasBefore}
+            <th class="px-2 pbe-1.5 text-end font-normal" scope="col">
+              {m.col_before()}
+            </th>
+          {/if}
+          <th class="px-2 pbe-1.5 text-end font-normal" scope="col">
+            {m.col_after()}
+          </th>
+          {#if composition.hasBefore}
+            <th class="ps-2 pbe-1.5 text-end font-normal" scope="col">
+              {m.col_change()}
+            </th>
+          {/if}
+        </tr>
+      </thead>
+      <tbody>
+        {#each composition.rows as row (row.key)}
+          <tr class="border-be border-border/60 last:border-be-0">
+            <th class="py-1.5 pe-6 text-start font-normal" scope="row">
+              <span class="inline-flex items-center gap-1.5">
+                <span
+                  class="shrink-0 rounded-xs block-2.5 inline-2.5"
+                  style:background={swatch(row.color, row.key)}
+                ></span>
+                {row.short ?? row.label}
+              </span>
+            </th>
+            {#if composition.hasBefore}
+              <td
+                class="px-2 py-1.5 text-end font-figures text-muted-foreground tabular-nums"
+              >
+                {count(row.before ?? 0)}
+              </td>
+            {/if}
+            <td
+              class="px-2 py-1.5 text-end font-figures font-semibold tabular-nums"
+            >
+              {count(row.after)}
+            </td>
+            {#if composition.hasBefore}
+              <td class="py-1.5 ps-2 text-end font-figures tabular-nums">
+                {points((row.after - (row.before ?? 0)) / 100, 0)}
+              </td>
+            {/if}
+          </tr>
+        {/each}
+      </tbody>
+    </table>
+  </section>
+{/if}
 
 {#if election.councils.length > 0}
   <Councils councils={election.councils} />

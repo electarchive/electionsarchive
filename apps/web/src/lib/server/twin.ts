@@ -1553,7 +1553,30 @@ function electionMarkdown(
                   seats: count(election.control.seats),
                   total: count(election.control.total),
                 })
-          }. ${m.control_derived()}`,
+          }. ${election.control.isRolled === true ? m.control_rolled() : m.control_derived()}`,
+        ]),
+    ...(election.composition == null
+      ? []
+      : [
+          `## ${m.composition_title()}`,
+          table(
+            [
+              m.col_party(),
+              ...(election.composition.hasBefore ? [m.col_before()] : []),
+              m.col_after(),
+              ...(election.composition.hasBefore ? [m.col_change()] : []),
+            ],
+            election.composition.rows.map((row) => [
+              row.label,
+              ...(election.composition?.hasBefore === true
+                ? [count(row.before ?? 0)]
+                : []),
+              count(row.after),
+              ...(election.composition?.hasBefore === true
+                ? [points((row.after - (row.before ?? 0)) / 100, 0)]
+                : []),
+            ]),
+          ),
         ]),
     ...councilsMarkdown(election.councils, link),
     ...(tiered[0] == null
