@@ -11756,6 +11756,7 @@ export const polities = {
             name: v.string(),
             isOffice: v.boolean(),
             isAbroad: v.boolean(),
+            isOwn: v.boolean(),
             points: v.array(
               v.object({
                 name: v.string(),
@@ -12095,12 +12096,18 @@ export const polities = {
             and not (lower_inf(n.valid) and upper_inf(n.valid))
             and exists (select from name p where p.entity_id = n.entity_id and p.kind in ('official', 'english') and p.is_preferred)
         `),
-          db.execute<{ id: string; rank: number | null }>(sql`
-          select id::text, array_position(array['head_of_state', 'head_of_government', 'governor', 'mayor'], kind::text) as rank
+          db.execute<{ id: string; rank: number | null; isOwn: boolean }>(sql`
+          select id::text, array_position(array['head_of_state', 'head_of_government', 'governor', 'mayor'], kind::text) as rank,
+            polity_id = ${input.id}::uuid as "isOwn"
           from office where id = any(${sql.param(seats)}::uuid[])
+          union all
+          select id::text, null, polity_id = ${input.id}::uuid from body where id = any(${sql.param(seats)}::uuid[])
         `),
         ]);
       const ranks = new Map(kinds.rows.map((row) => [row.id, row.rank ?? 5]));
+      const owned = new Set(
+        kinds.rows.filter((row) => row.isOwn).map((row) => row.id),
+      );
       const renamed = Map.groupBy(dated.rows, (row) => row.party);
       const lean = new Map(
         positions.rows.map((row) => [row.party_id, row.lean]),
@@ -12136,6 +12143,7 @@ export const polities = {
               name: labels.short.get(seat) ?? labels.full.get(seat) ?? "",
               isOffice: rows.some((row) => row.isOffice),
               isAbroad: rows.some((row) => row.isAbroad),
+              isOwn: owned.has(seat),
               points: Map.groupBy(rows, (row) => row.bucket)
                 .values()
                 .map((group) => {

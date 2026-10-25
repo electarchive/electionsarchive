@@ -40,7 +40,12 @@
   );
   const current = $derived(
     series.find((entry) => entry.id === chosen) ??
-      series.toSorted((a, b) => b.points.length - a.points.length)[0] ??
+      series.toSorted(
+        (a, b) =>
+          Number(b.isOwn && !b.isOffice && b.points.length > 2) -
+            Number(a.isOwn && !a.isOffice && a.points.length > 2) ||
+          b.points.length - a.points.length,
+      )[0] ??
       null,
   );
   const isSingle = $derived(
