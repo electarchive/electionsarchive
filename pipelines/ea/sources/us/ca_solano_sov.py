@@ -32,6 +32,11 @@ PAGES = {
 }
 ANCHOR = re.compile(r'<a [^>]*(?:recinct|Pct)[^>]*href="/archival-document\?document=([^"&]+)')
 HEADER = re.compile(r"^(\d+)(?: - .+?)?\s{2,}([\d,]+) of ([\d,]+) registered voters")
+OLD_HEADER = re.compile(r"^\s*(\d{4}) .+? \d{5}$")
+OLD_CANDIDATE = re.compile(r"^\s+(.+?)[ .]{3,}(\d[\d,]*)\s+\d*\.\d+(?:\s|$)")
+OLD_REGISTERED = re.compile(r"^\s*REGISTERED VOTERS - TOTAL[ .]+([\d,]+)\s*$")
+OLD_BALLOTS = re.compile(r"^\s*BALLOTS CAST - TOTAL[ .]+([\d,]+)")
+PARTY = re.compile(r"\s*\([A-Z-]+\)$")
 CANDIDATE = re.compile(r"^(.+?)\s{2,}(?:[A-Z]{2,4}\s+)?(\d[\d,]*\s+[\d.]+%.*)$")
 AMOUNT = re.compile(r"([\d,]+)\s+[\d.]+%")
 UNUSED = re.compile(r"(?i)\(W\)|write-?in|^(?:cast votes|undervotes|overvotes|unresolved)")
@@ -71,6 +76,28 @@ def parse() -> None:
             found = HEADER.match(line)
             if found is not None:
                 precinct, ballots, registered = found[1], int(found[2].replace(",", "")), int(found[3].replace(",", ""))
+            elif (old := OLD_HEADER.match(line)) is not None:
+                precinct, registered, ballots, contest = old[1], None, None, None
+            elif (count := OLD_REGISTERED.match(line)) is not None:
+                registered = int(count[1].replace(",", ""))
+            elif (count := OLD_BALLOTS.match(line)) is not None:
+                ballots = int(count[1].replace(",", ""))
+            elif line.strip().startswith("Vote for"):
+                contest = previous
+            elif contest is not None and precinct is not None and (old := OLD_CANDIDATE.match(line)) is not None:
+                if not UNUSED.match(old[1].strip()) and not re.match(r"(?i)^(?:over|under) votes", old[1].strip()):
+                    rows.append(
+                        {
+                            "day": day,
+                            "url": url,
+                            "contest": contest,
+                            "precinct": precinct,
+                            "registered": registered,
+                            "ballots": ballots,
+                            "candidate": PARTY.sub("", old[1].strip()).strip(" ."),
+                            "votes": int(old[2].replace(",", "")),
+                        }
+                    )
             elif line.startswith("Choice "):
                 contest = previous
             else:
