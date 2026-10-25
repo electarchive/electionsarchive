@@ -595,9 +595,13 @@ def _publish_table(conn: Connection, stage: Stage, table: str) -> None:
                     f"{relation}.{column} {entity} ({rows} rows)"
                     for entity, rows in conn.execute(
                         sql.SQL(
-                            "select {0}::text, count(*) from public.{1} where {0} = any(%s::uuid[]) group by 1"
-                        ).format(sql.Identifier(column), sql.Identifier(relation)),
-                        [ids],
+                            "select {0}::text, count(*) from public.{1} where {0} = any(%s::uuid[]) {2} group by 1"
+                        ).format(
+                            sql.Identifier(column),
+                            sql.Identifier(relation),
+                            sql.SQL("and id <> all(%s::uuid[])" if relation == kind else ""),
+                        ),
+                        [ids, ids] if relation == kind else [ids],
                     ).fetchall()
                 ]
             for relation, column, parent in checks.references(conn):
