@@ -448,6 +448,7 @@ def _publish_table(conn: Connection, stage: Stage, table: str) -> None:
                             ),
                         )
                     )
+            conn.execute("select set_config('ea.repointing', 'on', true)")
             conn.execute(
                 sql.SQL(
                     "update public.{target} t set {moved} = s.into_id{extra} from {staged} s where t.{moved} = s.entity_id{guard}"
@@ -477,6 +478,7 @@ def _publish_table(conn: Connection, stage: Stage, table: str) -> None:
                     else sql.SQL(""),
                 )
             )
+            conn.execute("select set_config('ea.repointing', 'off', true)")
         for relation, column, parent in checks.references(conn):
             if parent not in types:
                 continue
@@ -1538,9 +1540,10 @@ def revert(conn: Connection, changeset_id: str, reason: str) -> None:
             superseder
             for (superseder,) in conn.execute(
                 sql.SQL(
-                    "select distinct superseded_by::text from {} where changeset_id = %s and superseded_by <> %s"
+                    """select distinct superseded_by::text from {} where superseded_by <> %(id)s
+                       and (changeset_id = %(id)s or lower(recorded) = (select published_at from changeset where id = %(id)s))"""
                 ).format(sql.Identifier(f"{table}_history")),
-                [changeset_id, changeset_id],
+                {"id": changeset_id},
             ).fetchall()
         )
     for child, column, parent, key in conn.execute(
@@ -1672,7 +1675,13 @@ def revert(conn: Connection, changeset_id: str, reason: str) -> None:
                 )
             else:
                 listed = sql.SQL(", ").join(sql.Identifier(column) for column, _ in columns)
-                conn.execute(sql.SQL("delete from {} where changeset_id = %s").format(target), [changeset_id])
+                conn.execute(
+                    sql.SQL(
+                        "delete from {} where changeset_id = %(id)s"
+                        " or recorded_from = (select published_at from changeset where id = %(id)s)"
+                    ).format(target),
+                    {"id": changeset_id},
+                )
                 conn.execute(
                     sql.SQL(
                         "insert into {} ({}) overriding system value select {} from {} where superseded_by = %s"
