@@ -175,7 +175,9 @@ def parse() -> None:
         held = re.search(r"Election Date:\s*(\d+)/(\d+)/(\d{4})", page)
         if title is None or held is None:
             raise ValueError(f"{county} {election}: no title or date on the Reports page")
-        frame = pl.read_csv(raw.cached(SOURCE, link).path, infer_schema=False)
+        frame = pl.read_csv(
+            raw.cached(SOURCE, link).path, infer_schema=False, truncate_ragged_lines=True, encoding="utf8-lossy"
+        )
         frame = frame.select(
             [pl.col(column).alias(name) for column, name in COLUMNS.items() if column in frame.columns]
         )
