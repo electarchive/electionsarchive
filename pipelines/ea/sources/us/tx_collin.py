@@ -46,8 +46,16 @@ def fetch() -> None:
         raw.fetch(SOURCE, link, suffix=suffix)
 
 
+OLD_COUNCIL = re.compile(
+    r"(?i)^(?:C |CITY OF )?(.+?)(?: CITY)? (?:COUNCIL ?MEMBER|COUNCILMAN|COUNCIL|ALDER(?:MAN)?) ?(PLACE |P|D)(\d+)(?: \1)?$"
+)
+
+
 def entity_first(text: str) -> str:
     text = re.sub(r"\s+", " ", text.replace("–", " - ")).strip()
+    old = OLD_COUNCIL.match(text)
+    if old:
+        return f"City of {old[1].title()}, Council Member, {'District' if old[2].upper() == 'D' else 'Place'} {old[3]}"
     found = re.match(r"^(.+?), (City|Town|Village) of - (.+)$", text)
     if found:
         text = f"{found[2]} of {found[1]}, {found[3]}"
