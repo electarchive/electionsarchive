@@ -148,6 +148,9 @@ COUNTY_OFFICES = (
     (r"SHERIFF", "sheriff", "Sheriff", False),
     (r"STATE ?S ATTORNEY", "state-s-attorney", "State's Attorney", False),
     (r"CIRCUIT CLERK", "circuit-clerk", "Circuit Clerk", False),
+    (r"COUNTY ASSESSOR", "assessor", "Assessor", False),
+    (r"COUNTY BOARD PRESIDENT", "board-president", "Board President", False),
+    (r"BOARD OF REVIEW", "board-of-review", "Board of Review", True),
     (r"COUNTY BOARD(?: MEMBER)?", "board-of-commissioners", "Board of Commissioners", True),
     (
         r"REGIONAL SUPERINTENDENT(?: OF SCHOOLS)?",
@@ -296,6 +299,7 @@ SPECIALS = (
         "college",
         "Community College District",
     ),
+    (r"WATER RECLAMATION DIST(?:RICT)?", "reclamation", "Water Reclamation District"),
     (r"WATER (?:SUPPLY |IMPROVEMENT )?DISTRICT|WATER AUTHORITY|RIVER AUTHORITY", "water", "Water District"),
 )
 SPECIAL_ROLES = re.compile(
@@ -635,7 +639,7 @@ def parse(
                     continue
             else:
                 party = None
-            remainder = REMAINDER.search(plain) is not None
+            remainder = REMAINDER.search(plain) is not None and not (st == "IL" and "VACANCY OF" in plain)
             term = TERM.search(plain)
             found = _classify(plain, st, county, county_name, names, school_names, munis.get(county, []))
             if (found is None or found.get("loose")) and (prefix := _prefix(heading, plain, names, school_names)):
@@ -939,6 +943,27 @@ def _classify(
     initials = "".join(word[0] for word in county_name.split())
     if len(initials) > 1:
         plain = re.sub(rf"\b{initials}C\b", "COUNTY", plain)
+    if st == "IL" and (vacancy := re.search(r"\bVACANCY OF (.+)$", plain)):
+        if subcircuit := re.search(r"\b(\d+) SUBCIRCUIT\b", plain):
+            number = int(subcircuit[1])
+            suffix = "th" if 10 <= number % 100 <= 20 else {1: "st", 2: "nd", 3: "rd"}.get(number % 10, "th")
+            key, office = f"subcircuit-{number}", f"Circuit Court, {number}{suffix} Subcircuit"
+        elif "APPELLATE" in plain:
+            key, office = "appellate-court", "Appellate Court"
+        elif "CIRCUIT" in plain:
+            key, office = "circuit-court", "Circuit Court"
+        else:
+            key = office = None
+        if key is not None:
+            return {
+                "scheme": "us.county",
+                "code": county,
+                "key": key,
+                "office": office,
+                "body": True,
+                "seat": f"Vacancy of {_title(vacancy[1])}",
+                "label": re.sub(r"\s+", " ", plain).strip(),
+            }
     for pattern, kind, noun in SPECIALS:
         if found := next(reversed(list(re.finditer(rf"\b(?:{pattern})", plain))), None):
             head = SPECIAL_ROLES.sub(" ", plain[: found.start()])
@@ -958,6 +983,8 @@ def _classify(
             if kind == "college" and re.search(r"\bACC\b|AUSTIN", plain):
                 head, noun = "AUSTIN", "Community College District"
             display = f"{_title(head)} {noun}" + (f" {number[1]}" if number else "")
+            if kind == "reclamation":
+                display = "Metropolitan Water Reclamation District of Greater Chicago"
             return {
                 "scheme": "us.special_district",
                 "code": f"{county}:{kind}:{slug(display)}",
