@@ -307,7 +307,20 @@ def finish(year: int, dea: str, facts: dict[str, float], candidates: list[dict[s
         raise ValueError(f"{year} {dea}: no DEA in the official list")
     dea_code, dea_name, council_code = areas[key]
     completed = 0
+    listed = 0
     for candidate in candidates:
+        if year == 2011 and not candidate["party"].strip():
+            words = re.sub(r"^[^A-Za-z]+", "", candidate["name"]).replace(",", " ").split()
+            surname = squeeze(words[0] if len(words) > 1 and len(words[-1]) == 1 else words[-1] if "," not in candidate["name"] else words[0])
+            found = [
+                (full, label)
+                for full, label in WP_PARTIES.get(f"{year}|{round(candidate['totals'][0])}", [])
+                if squeeze(full.split()[-1])[:3] == surname[:3]
+            ]
+            if len(found) == 1:
+                listed += 1
+                candidate["name"] = f"{found[0][0].split()[-1]}, {' '.join(found[0][0].split()[:-1])}"
+                candidate["party"] = "" if found[0][1].startswith("Independent") else found[0][1]
         candidate["name"] = re.sub(r"^[^A-Za-z]+", "", candidate["name"])
         words = candidate["name"].split()
         given = candidate["name"].partition(",")[2].strip()
@@ -350,6 +363,10 @@ def finish(year: int, dea: str, facts: dict[str, float], candidates: list[dict[s
         notes.append(
             "The published sheet stops before the last stage. The candidates continuing at its last tied stage are treated as "
             "elected when they equal the vacancies, after excluding the lowest where one too many continues."
+        )
+    if listed:
+        notes.append(
+            f"The ARK sheet prints surnames only and no party for {listed} candidates; their names and parties come from Wikipedia's council election tables, matched on surname and first-preference votes."
         )
     if completed:
         notes.append(
@@ -556,6 +573,7 @@ def parse_2014(areas: dict[str, tuple[str, str, str]]) -> tuple[list[dict[str, o
 
 
 ARK = {2011: "lg11", 2005: "lg05"}
+WP_PARTIES: dict[str, list[tuple[str, str]]] = json.loads((Path(__file__).parent / "ni_council_wp.json").read_text())
 FULL_NAMES: dict[str, list[str]] = json.loads((Path(__file__).parent / "ni_council_names.json").read_text())
 
 
@@ -756,7 +774,8 @@ EXTRA_PARTIES = (
     (r"^democrats (and|&) vetera", "Democrats and Veterans Party"),
     (r"^0$", None),
     (r"^ni2[12]$|northern ireland 21", "NI21"),
-    (r"^-$|^valarie$|^upu$|^aa$|^up$|^0\s+0$|^official anti-trimble", None),
+    (r"^-$|^upu$|^aa$|^up$|^0\s+0$|^official anti-trimble", None),
+    (r"^valarie$", "Sinn Féin"),
     (r"^ap$", "Alliance Party"),
     (r"^gp$", "Green Party Northern Ireland"),
     (r"^spni$", "Socialist Party"),

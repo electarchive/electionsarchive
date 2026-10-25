@@ -184,6 +184,17 @@ def collect() -> None:
     STATE.write_text(json.dumps(current))
 
 
+def surname_first(printed: str) -> str:
+    name = re.sub(r"^[,\s]+", "", printed.strip())
+    if "," in name:
+        return name
+    words = name.split()
+    lead = 0
+    while lead < len(words) - 1 and len(words[lead]) > 2 and re.search(r"[A-Z]{2}", words[lead]):
+        lead += 1
+    return f"{' '.join(words[:lead])}, {' '.join(words[lead:])}" if lead else name
+
+
 def read(model: str, key: str, target: dict[str, str], areas: dict[str, tuple[str, str, str]]) -> tuple[dict[str, object], list[dict[str, object]]]:
     message = json.loads(raw.cached(SOURCE, f"read:{model}:{key}").path.read_text())
     text = "".join(block["text"] for block in message["content"] if block["type"] == "text")
@@ -191,7 +202,7 @@ def read(model: str, key: str, target: dict[str, str], areas: dict[str, tuple[st
     sizes = [] if grid(target["url"]) is not None else images(target["url"])
     candidates = [
         {
-            "name": candidate["name"].strip(),
+            "name": surname_first(candidate["name"]),
             "party": (candidate["description"] or "").strip(),
             "elected": bool(candidate["elected"]),
             "totals": [float(value or 0) for value in candidate["stages"]],
@@ -219,6 +230,8 @@ def read(model: str, key: str, target: dict[str, str], areas: dict[str, tuple[st
             _, pixel_width, pixel_height = sizes[min(page, len(sizes)) - 1]
             x0, y0, x1, y1 = located["bbox"]
             row |= {"page": page, "x0": x0 / 1000 * pixel_width, "y0": y0 / 1000 * pixel_height, "x1": x1 / 1000 * pixel_width, "y1": y1 / 1000 * pixel_height}
+    if sizes:
+        unit["note"] = " ".join(filter(None, [unit["note"], "Each value's box is the candidate's whole row on the scanned sheet, the same for every stage; the model read rows, not cells."]))
     unit["reader"] = model
     return unit, rows
 
