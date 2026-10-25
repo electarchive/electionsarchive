@@ -41,6 +41,7 @@ export default defineConfig(({ command }) => {
         "@better-auth/api-key/client",
         "maplibre-gl",
         "modern-screenshot",
+        "svelte-sonner",
       ],
     },
   };
