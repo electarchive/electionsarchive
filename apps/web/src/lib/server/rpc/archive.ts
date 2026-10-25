@@ -4,11 +4,12 @@ import { ancestry, compare } from "@ea/analytics";
 import { openapi } from "@orpc/openapi";
 import { call, ORPCError } from "@orpc/server";
 import { sql } from "drizzle-orm";
+import { createHash } from "node:crypto";
 import { existsSync } from "node:fs";
 import path from "node:path";
 import * as v from "valibot";
 import { m } from "#lib/paraglide/messages.js";
-import { os } from "#lib/server/cache.js";
+import { os, remember } from "#lib/server/cache.js";
 import { db } from "#lib/server/db/index.js";
 
 const stored = (tiles: string | null | undefined) =>
@@ -1729,14 +1730,24 @@ async function chamber(
     where c.id = ${contest.id}::uuid and ${isRoot}::boolean and c.kind in ('body_seats', 'list_allocation')
   `);
   const shape = found.rows[0];
+  const whole =
+    shape == null
+      ? ""
+      : createHash("sha1")
+          .update(
+            `${shape.nation}:${contest.date}:${shape.roots.toSorted().join(",")}`,
+          )
+          .digest("hex");
   const [loaded, named, current] = await Promise.all([
     shape?.nation == null || shape.roots.length === 0
       ? null
-      : load(
-          shape.roots,
-          [shape.nation],
-          contest.date ?? "infinity",
-          shape.roots,
+      : remember(`chamber:${whole}`, () =>
+          load(
+            shape.roots,
+            [shape.nation ?? 0],
+            contest.date ?? "infinity",
+            shape.roots,
+          ),
         ),
     names(
       [shape?.area, shape?.polity].filter((id) => id != null),
@@ -1769,26 +1780,45 @@ async function chamber(
   const here = new Map(own.map((row) => [row.key, row]));
   const rows = isFocus ? wide : own;
   const isAlone = shape == null || shape.roots.length === 0;
-  const parties = await names(
-    rows.flatMap((row) =>
-      row.key.startsWith("party:") ? [row.key.slice("party:".length)] : [],
+  const isSingle = isFocus && own.length === 1 && owned === 1;
+  const [parties, holding] = await Promise.all([
+    names(
+      rows.flatMap((row) =>
+        row.key.startsWith("party:") ? [row.key.slice("party:".length)] : [],
+      ),
+      contest.date,
     ),
-    contest.date,
-  );
-  const { places, seats } = await holders(
-    isAlone ? [contest.id] : shape.roots,
-    contest.date,
-    lineage,
-    new Set(rows.map((row) => row.key)),
-    isAlone && shape?.isParent !== true
-      ? await units(
-          contest.id,
-          area,
-          contest.date ?? "infinity",
-          shape?.base ?? null,
-        )
-      : null,
-  );
+    isSingle
+      ? null
+      : isAlone
+        ? (async () =>
+            holders(
+              [contest.id],
+              contest.date,
+              lineage,
+              new Set(rows.map((row) => row.key)),
+              shape?.isParent === true
+                ? null
+                : await units(
+                    contest.id,
+                    area,
+                    contest.date ?? "infinity",
+                    shape?.base ?? null,
+                  ),
+            ))()
+        : remember(
+            `holders:${whole}:${JSON.stringify(lineage)}:${rows.map((row) => row.key).join(",")}`,
+            () =>
+              holders(
+                shape.roots,
+                contest.date,
+                lineage,
+                new Set(rows.map((row) => row.key)),
+                null,
+              ),
+          ),
+  ]);
+  const places = holding?.places ?? [];
   const at = places.findIndex((place) => place.id === contest.id);
   return {
     link: isFocus
@@ -1811,7 +1841,7 @@ async function chamber(
       lean: row.lean,
       seats: row.current?.seats ?? 0,
       here: here.get(row.key)?.current?.seats ?? 0,
-      members: seats.get(row.key) ?? [],
+      members: holding?.seats.get(row.key) ?? [],
     })),
   };
 }
@@ -3758,10 +3788,37 @@ export const contests = {
             select b.id from area a
             join crosswalk c on c.method in ('exact', 'area', 'population')
             join boundary_set bf on bf.id = c.from_boundary_set_id and bf.scheme_code = a.scheme_code
-            join boundary_set bt on bt.id = c.to_boundary_set_id
-            join crosswalk_weight w on w.crosswalk_id = c.id and w.weight >= 0.5
-              and ((bt.valid_from > bf.valid_from and w.from_k = a.k) or (bt.valid_from < bf.valid_from and w.to_k = a.k))
-            join area b on b.k = case when w.from_k = a.k then w.to_k else w.from_k end
+            join boundary_set bt on bt.id = c.to_boundary_set_id and bt.valid_from > bf.valid_from
+            join crosswalk_weight w on w.crosswalk_id = c.id and w.from_k = a.k
+            join area b on b.k = w.to_k
+            where a.id = later.id
+              and (
+                w.weight >= 0.5
+                or exists (
+                  select from crosswalk rc
+                  join crosswalk_weight r on r.crosswalk_id = rc.id and r.from_k = w.to_k and r.to_k = a.k and r.weight >= 0.5
+                  where rc.from_boundary_set_id = c.to_boundary_set_id and rc.to_boundary_set_id = c.from_boundary_set_id
+                    and rc.method = c.method
+                )
+              )
+              and (
+                exists (
+                  select from name na join name nb on nb.entity_id = b.id and lower(nb.text) = lower(na.text)
+                  where na.entity_id = a.id
+                )
+                or c.method = 'exact' and exists (
+                  select from area_geometry ga join area_geometry gb on gb.area_id = b.id
+                  where ga.area_id = a.id
+                    and least(ST_Area(ga.geom), ST_Area(gb.geom)) >= 0.5 * greatest(ST_Area(ga.geom), ST_Area(gb.geom))
+                )
+              )
+            union
+            select b.id from area a
+            join crosswalk c on c.method = 'exact'
+            join boundary_set bt on bt.id = c.to_boundary_set_id and bt.scheme_code = a.scheme_code
+            join boundary_set bf on bf.id = c.from_boundary_set_id and bf.valid_from > bt.valid_from
+            join crosswalk_weight w on w.crosswalk_id = c.id and w.to_k = a.k and w.weight >= 0.5
+            join area b on b.k = w.from_k
             where a.id = later.id
               and (
                 exists (
@@ -3808,10 +3865,37 @@ export const contests = {
             select b.id from area a
             join crosswalk c on c.method in ('exact', 'area', 'population')
             join boundary_set bf on bf.id = c.from_boundary_set_id and bf.scheme_code = a.scheme_code
-            join boundary_set bt on bt.id = c.to_boundary_set_id
-            join crosswalk_weight w on w.crosswalk_id = c.id and w.weight >= 0.5
-              and ((bt.valid_from < bf.valid_from and w.from_k = a.k) or (bt.valid_from > bf.valid_from and w.to_k = a.k))
-            join area b on b.k = case when w.from_k = a.k then w.to_k else w.from_k end
+            join boundary_set bt on bt.id = c.to_boundary_set_id and bt.valid_from < bf.valid_from
+            join crosswalk_weight w on w.crosswalk_id = c.id and w.from_k = a.k
+            join area b on b.k = w.to_k
+            where a.id = earlier.id
+              and (
+                w.weight >= 0.5
+                or exists (
+                  select from crosswalk rc
+                  join crosswalk_weight r on r.crosswalk_id = rc.id and r.from_k = w.to_k and r.to_k = a.k and r.weight >= 0.5
+                  where rc.from_boundary_set_id = c.to_boundary_set_id and rc.to_boundary_set_id = c.from_boundary_set_id
+                    and rc.method = c.method
+                )
+              )
+              and (
+                exists (
+                  select from name na join name nb on nb.entity_id = b.id and lower(nb.text) = lower(na.text)
+                  where na.entity_id = a.id
+                )
+                or c.method = 'exact' and exists (
+                  select from area_geometry ga join area_geometry gb on gb.area_id = b.id
+                  where ga.area_id = a.id
+                    and least(ST_Area(ga.geom), ST_Area(gb.geom)) >= 0.5 * greatest(ST_Area(ga.geom), ST_Area(gb.geom))
+                )
+              )
+            union
+            select b.id from area a
+            join crosswalk c on c.method = 'exact'
+            join boundary_set bt on bt.id = c.to_boundary_set_id and bt.scheme_code = a.scheme_code
+            join boundary_set bf on bf.id = c.from_boundary_set_id and bf.valid_from < bt.valid_from
+            join crosswalk_weight w on w.crosswalk_id = c.id and w.to_k = a.k and w.weight >= 0.5
+            join area b on b.k = w.from_k
             where a.id = earlier.id
               and (
                 exists (
@@ -3859,8 +3943,8 @@ export const contests = {
             where r.id = ${contest.root}::uuid and r.district_area_id is null and r.body_id is not null
               and substring(sx.path from '[^/]+$') = ${path?.split("/").at(-1) ?? ""}
           ) hit
-          join contest c on c.id = hit.id
-          join election e on e.id = c.election_id
+          cross join lateral (select c.* from contest c where c.id = hit.id offset 0) c
+          cross join lateral (select e.* from election e where e.id = c.election_id offset 0) e
         ),
         grp(root, id) as materialized (
           select id, id from roots
@@ -4059,10 +4143,15 @@ export const contests = {
           )
           select distinct on (grp.root) grp.root, grp.id as contest, anc.depth
           from grp
-          join contest c on c.id = grp.id
-          join election e on e.id = c.election_id
-          left join polity_territory pt on pt.polity_id = e.polity_id and pt.valid @> e.date_from
-          join anc on anc.id = coalesce(c.district_area_id, pt.area_id)
+          cross join lateral (
+            select coalesce(c.district_area_id, (
+              select pt.area_id from election e
+              join polity_territory pt on pt.polity_id = e.polity_id and pt.valid @> e.date_from
+              where e.id = c.election_id limit 1
+            )) as area
+            from contest c where c.id = grp.id offset 0
+          ) c
+          join anc on anc.id = c.area
           order by grp.root, anc.depth
         `),
         db.execute<{
@@ -4475,124 +4564,147 @@ export const contests = {
         if (!isRoot || contest.place == null) {
           return null;
         }
-        const found = await db.execute<{
-          id: string;
-          area: string;
-          k: number;
-          scheme: string;
-          general: string | null;
-          since: string | null;
-          noun: string;
-          party: string | null;
-          option: number | null;
-          person: string | null;
-          label: string | null;
-          color: string | null;
-          valid: number;
-          margin: number | null;
-          independent: boolean;
-        }>(sql`
-          with me as (
-            select c.*, a.scheme_code as scheme, e.date_from as day,
-              (
-                select g.id from election g
-                where e.kind = 'by_election' and g.polity_id = e.polity_id and g.kind = 'general' and g.date_from < e.date_from
-                order by g.date_from desc limit 1
-              ) as general
-            from contest c join area a on a.id = c.district_area_id join election e on e.id = c.election_id
-            where c.id = ${contest.root}::uuid
-              and not exists (
-                select from boundary_set bs
-                where bs.scheme_code = ${grid?.level ?? ""} and bs.valid @> e.date_from
-              )
-          ),
-          peers as (
-            select c.id, a.id as area, a.k, me.scheme, me.day, me.general,
-              coalesce(c.rules_override ->> 'formula', es.rules ->> 'formula', '') = 'stv' as stv
-            from me join contest c
-              on (case when me.general is null then c.election_id = me.election_id
-                else c.id = me.id or (c.election_id = me.general and c.district_area_id <> me.district_area_id) end)
-              and c.kind = me.kind and c.round_number = me.round_number
-              and c.body_id is not distinct from me.body_id and c.office_id is not distinct from me.office_id
-              and c.party_scope_id is not distinct from me.party_scope_id and c.allocation_parent_id is null and not c.notional
-            join area a on a.id = c.district_area_id and a.scheme_code = me.scheme
-            left join electoral_system es on es.id = c.electoral_system_id
-          )
-          select p.id, p.area, p.k, p.scheme, p.general,
-            (select g.date_from::text from election g where g.id = p.general) as since, sc.noun, w.party, w.option, w.person, w.label,
-            ${paint(sql`w.party`, sql`${contest.election}::uuid`, sql`p.day`)} as color,
-            coalesce(w.valid, 0)::float8 as valid,
-            case when w.valid > 0 and not p.stv then ((w.first - w.second) / w.valid)::float8 end as margin,
-            coalesce(w.independent, false) as independent
-          from peers p
-          join scheme sc on sc.code = p.scheme
-          left join lateral (
-            select coalesce(pm.into_id, o.party_id) as party, o.k as option, o.ballot_label as label,
-              (select coalesce(m.into_id, ca.person_id) from candidacy ca
-                left join entity_merge m on m.entity_id = ca.person_id
-                where ca.option_id = o.id and ca.role = 'head' limit 1) as person,
-              exists (select from candidacy cy where cy.option_id = o.id and cy.role = 'head' and cy.is_independent) as independent,
-              t.first, t.second, t.valid
-            from (
-              select rs.k, rs.id from result_set rs where rs.contest_id = p.id and ${latest("rs")} limit 1
-            ) rs
-            cross join lateral (
-              select (array_agg(r.option_k order by r.seats desc, case when r.filled > 1 then r.total else r.value end desc, r.value desc))[1] as top,
-                case when count(*) filter (where r.elected) > 1 then min(r.value) filter (where r.elected) else max(r.value) end as first,
-                case when count(*) filter (where r.elected) > 1 then coalesce(max(r.value) filter (where not r.elected), 0)
-                  else coalesce((array_agg(r.value order by r.value desc))[2], 0) end as second,
-                sum(r.value) as valid
-              from (
-                select r.option_k, r.value, r.elected, count(*) filter (where r.elected) over (partition by r.grp) as seats,
-                  count(*) filter (where r.elected) over () as filled, sum(r.value) over (partition by r.grp) as total
-                from (
-                  select r.option_k, r.value,
-                    exists (
-                      select from outcome x where x.result_set_id = rs.id and x.option_id = ro.id
-                        and x.kind in ('elected', 'won') and x.candidacy_id is null
-                    ) as elected,
-                    coalesce(ro.party_id::text, case when exists (
-                      select from candidacy cy where cy.option_id = ro.id and cy.role = 'head' and cy.is_independent
-                    ) then 'independent' else ro.k::text end) as grp
-                  from result_rollup r join contest_option ro on ro.k = r.option_k
-                  where r.result_set_k = rs.k and r.area_k = p.k and r.option_k <> 0
-                    and r.measure = (
-                      select x.measure from result_rollup x
-                      where x.result_set_k = rs.k and x.area_k = p.k and x.measure = any(${COUNTED})
-                      order by array_position(${COUNTED}, x.measure) limit 1
-                    )
-                    and r.count_round = case when (
-                      select count(*) from outcome x where x.result_set_id = rs.id and x.kind in ('elected', 'won') and x.candidacy_id is null
-                    ) > 1 then (
-                      select min(x.count_round) from result_rollup x where x.result_set_k = rs.k and x.area_k = p.k and x.measure = any(${COUNTED})
-                    ) else (
-                      select max(x.count_round) from result_rollup x where x.result_set_k = rs.k and x.area_k = p.k
-                    ) end
-                ) r
-              ) r
-            ) t
-            join contest_option o on o.k = t.top
-            left join entity_merge pm on pm.entity_id = o.party_id
-          ) w on true
+        const shape = await db.execute<{ isBy: boolean; scheme: string }>(sql`
+          select e.kind = 'by_election' as "isBy", a.scheme_code as scheme
+          from contest c join election e on e.id = c.election_id join area a on a.id = c.district_area_id
+          where c.id = ${contest.root}::uuid
         `);
-        const [first] = found.rows;
-        if (first == null || found.rows.length < 2) {
+        const kind = shape.rows[0];
+        const cached = await remember(
+          kind?.isBy === false
+            ? `locator:${contest.election}:${contest.series}:${kind.scheme}:${grid?.level ?? ""}`
+            : `locator:${contest.root}:${grid?.level ?? ""}`,
+          async () => {
+            const found = await db.execute<{
+              id: string;
+              area: string;
+              k: number;
+              scheme: string;
+              general: string | null;
+              since: string | null;
+              noun: string;
+              party: string | null;
+              option: number | null;
+              person: string | null;
+              label: string | null;
+              color: string | null;
+              valid: number;
+              margin: number | null;
+              independent: boolean;
+            }>(sql`
+              with me as (
+                select c.*, a.scheme_code as scheme, e.date_from as day,
+                  (
+                    select g.id from election g
+                    where e.kind = 'by_election' and g.polity_id = e.polity_id and g.kind = 'general' and g.date_from < e.date_from
+                    order by g.date_from desc limit 1
+                  ) as general
+                from contest c join area a on a.id = c.district_area_id join election e on e.id = c.election_id
+                where c.id = ${contest.root}::uuid
+                  and not exists (
+                    select from boundary_set bs
+                    where bs.scheme_code = ${grid?.level ?? ""} and bs.valid @> e.date_from
+                  )
+              ),
+              peers as (
+                select c.id, a.id as area, a.k, me.scheme, me.day, me.general,
+                  coalesce(c.rules_override ->> 'formula', es.rules ->> 'formula', '') = 'stv' as stv
+                from me join contest c
+                  on (case when me.general is null then c.election_id = me.election_id
+                    else c.id = me.id or (c.election_id = me.general and c.district_area_id <> me.district_area_id) end)
+                  and c.kind = me.kind and c.round_number = me.round_number
+                  and c.body_id is not distinct from me.body_id and c.office_id is not distinct from me.office_id
+                  and c.party_scope_id is not distinct from me.party_scope_id and c.allocation_parent_id is null and not c.notional
+                join area a on a.id = c.district_area_id and a.scheme_code = me.scheme
+                left join electoral_system es on es.id = c.electoral_system_id
+              )
+              select p.id, p.area, p.k, p.scheme, p.general,
+                (select g.date_from::text from election g where g.id = p.general) as since, sc.noun, w.party, w.option, w.person, w.label,
+                ${paint(sql`w.party`, sql`${contest.election}::uuid`, sql`p.day`)} as color,
+                coalesce(w.valid, 0)::float8 as valid,
+                case when w.valid > 0 and not p.stv then ((w.first - w.second) / w.valid)::float8 end as margin,
+                coalesce(w.independent, false) as independent
+              from peers p
+              join scheme sc on sc.code = p.scheme
+              left join lateral (
+                select coalesce(pm.into_id, o.party_id) as party, o.k as option, o.ballot_label as label,
+                  (select coalesce(m.into_id, ca.person_id) from candidacy ca
+                    left join entity_merge m on m.entity_id = ca.person_id
+                    where ca.option_id = o.id and ca.role = 'head' limit 1) as person,
+                  exists (select from candidacy cy where cy.option_id = o.id and cy.role = 'head' and cy.is_independent) as independent,
+                  t.first, t.second, t.valid
+                from (
+                  select rs.k, rs.id from result_set rs where rs.contest_id = p.id and ${latest("rs")} limit 1
+                ) rs
+                cross join lateral (
+                  select (array_agg(r.option_k order by r.seats desc, case when r.filled > 1 then r.total else r.value end desc, r.value desc))[1] as top,
+                    case when count(*) filter (where r.elected) > 1 then min(r.value) filter (where r.elected) else max(r.value) end as first,
+                    case when count(*) filter (where r.elected) > 1 then coalesce(max(r.value) filter (where not r.elected), 0)
+                      else coalesce((array_agg(r.value order by r.value desc))[2], 0) end as second,
+                    sum(r.value) as valid
+                  from (
+                    select r.option_k, r.value, r.elected, count(*) filter (where r.elected) over (partition by r.grp) as seats,
+                      count(*) filter (where r.elected) over () as filled, sum(r.value) over (partition by r.grp) as total
+                    from (
+                      select r.option_k, r.value,
+                        exists (
+                          select from outcome x where x.result_set_id = rs.id and x.option_id = ro.id
+                            and x.kind in ('elected', 'won') and x.candidacy_id is null
+                        ) as elected,
+                        coalesce(ro.party_id::text, case when exists (
+                          select from candidacy cy where cy.option_id = ro.id and cy.role = 'head' and cy.is_independent
+                        ) then 'independent' else ro.k::text end) as grp
+                      from result_rollup r join contest_option ro on ro.k = r.option_k
+                      where r.result_set_k = rs.k and r.area_k = p.k and r.option_k <> 0
+                        and r.measure = (
+                          select x.measure from result_rollup x
+                          where x.result_set_k = rs.k and x.area_k = p.k and x.measure = any(${COUNTED})
+                          order by array_position(${COUNTED}, x.measure) limit 1
+                        )
+                        and r.count_round = case when (
+                          select count(*) from outcome x where x.result_set_id = rs.id and x.kind in ('elected', 'won') and x.candidacy_id is null
+                        ) > 1 then (
+                          select min(x.count_round) from result_rollup x where x.result_set_k = rs.k and x.area_k = p.k and x.measure = any(${COUNTED})
+                        ) else (
+                          select max(x.count_round) from result_rollup x where x.result_set_k = rs.k and x.area_k = p.k
+                        ) end
+                    ) r
+                  ) r
+                ) t
+                join contest_option o on o.k = t.top
+                left join entity_merge pm on pm.entity_id = o.party_id
+              ) w on true
+            `);
+            if (found.rows.length < 2) {
+              return null;
+            }
+            const [labels, slugs] = await Promise.all([
+              names(
+                found.rows.flatMap((row) => [
+                  row.area,
+                  ...(row.party == null ? [] : [row.party]),
+                  ...(row.person == null ? [] : [row.person]),
+                ]),
+                contest.date,
+              ),
+              paths([
+                ...found.rows.map((row) => row.id),
+                ...found.rows.flatMap((row) =>
+                  row.general == null ? [] : [row.general],
+                ),
+              ]),
+            ]);
+            return { found, labels, slugs };
+          },
+        );
+        if (cached == null) {
           return null;
         }
-        const [labels, slugs] = await Promise.all([
-          names(
-            found.rows.flatMap((row) => [
-              row.area,
-              ...(row.party == null ? [] : [row.party]),
-              ...(row.person == null ? [] : [row.person]),
-            ]),
-            contest.date,
-          ),
-          paths([
-            ...found.rows.map((row) => row.id),
-            ...(first.general == null ? [] : [first.general]),
-          ]),
-        ]);
+        const { found, labels, slugs } = cached;
+        const [first] = found.rows;
+        if (first == null) {
+          return null;
+        }
         const isPersonal =
           new Set(found.rows.map((row) => row.party)).size <= 1 &&
           found.rows.some((row) => row.person != null);
@@ -5362,10 +5474,15 @@ export const contests = {
         select c.id, anc.id as place, anc.depth,
           (select count(*) from contest k where k.allocation_parent_id = c.id)::int as parts
         from grp
-        join contest c on c.id = grp.id
-        join election e on e.id = c.election_id
-        left join polity_territory pt on pt.polity_id = e.polity_id and pt.valid @> e.date_from
-        join anc on anc.id = coalesce(c.district_area_id, pt.area_id)
+        cross join lateral (
+          select c.id, c.allocation_parent_id, coalesce(c.district_area_id, (
+            select pt.area_id from election e
+            join polity_territory pt on pt.polity_id = e.polity_id and pt.valid @> e.date_from
+            where e.id = c.election_id limit 1
+          )) as area
+          from contest c where c.id = grp.id offset 0
+        ) c
+        join anc on anc.id = c.area
         order by anc.depth, c.allocation_parent_id is null
         limit 1
       `);
@@ -11325,25 +11442,28 @@ export const polities = {
             )
           `),
         db.execute<{ date: string }>(sql`
-            select e.date_from::text as date
-            from election e
-            join contest c on c.election_id = e.id and (c.allocation_parent_id is null or c.kind = 'elector_slate') and c.party_scope_id is null and not c.notional
-            join polity_territory pt on pt.polity_id = e.polity_id and pt.valid @> e.date_from
-            where e.polity_id = ${input.id}::uuid and e.status = 'held' and e.date_from <= current_date
-              and (c.district_area_id is null or c.district_area_id = pt.area_id)
-              and exists (
-                select from result_set rs
-                where rs.contest_id = c.id and ${latest("rs")} and exists (
-                  select from (
-                    select u.area_k from result_rollup_unit u where u.result_set_k = rs.k
-                    union all
-                    select s.area_k from result_rollup_sum s where s.result_set_k = rs.k
-                  ) r
-                  join area a on a.k = r.area_k
-                  where exists (select from area_parent ap where ap.area_id = a.id and ap.parent_id = pt.area_id offset 0)
-                )
+            select x.date from (
+              select e.date_from::text as date, c.id, pt.area_id
+              from election e
+              join contest c on c.election_id = e.id and (c.allocation_parent_id is null or c.kind = 'elector_slate') and c.party_scope_id is null and not c.notional
+              join polity_territory pt on pt.polity_id = e.polity_id and pt.valid @> e.date_from
+              where e.polity_id = ${input.id}::uuid and e.status = 'held' and e.date_from <= current_date
+                and (c.district_area_id is null or c.district_area_id = pt.area_id)
+              order by c.kind = 'ballot_question', e.date_from desc
+              offset 0
+            ) x
+            where exists (
+              select from result_set rs
+              where rs.contest_id = x.id and ${latest("rs")} and exists (
+                select from (
+                  select u.area_k from result_rollup_unit u where u.result_set_k = rs.k
+                  union all
+                  select s.area_k from result_rollup_sum s where s.result_set_k = rs.k
+                ) r
+                join area a on a.k = r.area_k
+                where exists (select from area_parent ap where ap.area_id = a.id and ap.parent_id = x.area_id offset 0)
               )
-            order by c.kind = 'ballot_question', e.date_from desc
+            )
             limit 1
           `),
         db.execute<{
@@ -11957,8 +12077,8 @@ export const polities = {
       }>(sql`
         with recursive later as materialized (
           select distinct r.parent_id as parent, r.id as election, coalesce(rc.office_id, rc.body_id) as seat
-          from contest rc join election r on r.id = rc.election_id
-          where rc.round_number > 1 and r.parent_id is not null
+          from election g join election r on r.parent_id = g.id join contest rc on rc.election_id = r.id
+          where g.polity_id = ${input.id}::uuid and rc.round_number > 1
         ),
         anc(id) as (
           select parent_id from polity_parent where polity_id = ${input.id}::uuid
@@ -11990,7 +12110,17 @@ export const polities = {
                   and extract(year from n.date_from) = extract(year from e.date_from) and not exists (select from entity_merge m where m.entity_id = n.id)
                 order by n.parent_id is null desc, abs(n.date_from - e.date_from) limit 1
               ) end as link
-          from contest c
+          from (
+            select x.id from body b join contest x on x.body_id = b.id where b.polity_id = ${input.id}::uuid
+            union
+            select x.id from body b join contest x on x.body_id = b.id
+            where (select yes from bare) and b.polity_id in (select id from anc)
+            union
+            select x.id from office o join contest x on x.office_id = o.id where o.polity_id = ${input.id}::uuid
+            union
+            select x.id from election y join contest x on x.election_id = y.id where y.polity_id = ${input.id}::uuid
+          ) k
+          join contest c on c.id = k.id
           join election e on e.id = c.election_id
           join election g on g.id = coalesce(e.parent_id, e.id)
           left join polity_territory pt on pt.polity_id = e.polity_id and pt.valid @> e.date_from
@@ -12055,8 +12185,8 @@ export const polities = {
             where o.contest_id = t.id
             offset 0
           ) o
-          where not exists (select from contest k where k.allocation_parent_id = t.id and k.party_scope_id is null)
-            and (t.id = t.root or not exists (select from contest sc where sc.id = t.id and sc.party_scope_id is not null))
+          where not exists (select from contest k where k.allocation_parent_id = t.id and k.party_scope_id is null offset 0)
+            and (t.id = t.root or not exists (select from contest sc where sc.id = t.id and sc.party_scope_id is not null offset 0))
             and not (o.kind = 'list' and ${pooled(sql`o.id`)})
             and not (o.kind = 'candidate' and not ${pooled(sql`o.parent_option_id`)} and exists (
               select from contest_option l
@@ -12130,8 +12260,8 @@ export const polities = {
             (array_agg(r.link))[1] as link,
             min(r.date) as day, min(r.year) as year, count(distinct r.id)::int as races,
             w.party, bool_or(w.independent) as independent, sum(w.seats)::int as seats, avg(sh.share)::float8 as share,
-            case when count(distinct r.id) = 1 then (array_agg(w.person))[1] end as winner,
-            case when count(distinct r.id) = 1 then (array_agg(w.contest))[1] end as decider,
+            case when count(distinct r.id) = 1 then (array_agg(w.person order by w.contest <> w.root, exists (select from contest k where k.id = w.contest and k.allocation_parent_id is not null), w.person))[1] end as winner,
+            case when count(distinct r.id) = 1 then (array_agg(w.contest order by w.contest <> w.root, exists (select from contest k where k.id = w.contest and k.allocation_parent_id is not null), w.person))[1] end as decider,
             bool_or(w.contest <> w.root) as runoff,
             coalesce(sum(w.seats) filter (where r."isList"), 0)::int as listed
           from roots r
