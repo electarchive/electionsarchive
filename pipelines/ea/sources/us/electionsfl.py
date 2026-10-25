@@ -187,7 +187,7 @@ def parse() -> None:
                 pl.col("contest").str.strip_chars().str.replace_all(r"\s+", " "),
                 pl.col("candidate").str.strip_chars(),
                 pl.col("precinct").str.strip_chars(),
-                pl.col("votes").str.replace_all(",", "").cast(pl.Int64),
+                pl.col("votes").str.replace_all(",", "").cast(pl.Int64, strict=False),
                 county=pl.lit(county),
                 fips=pl.lit(FIPS[county]),
                 county_name=pl.lit(names[FIPS[county]]),
