@@ -103,6 +103,11 @@ def wide(rows: list[list[Any]]) -> Iterator[dict[str, Any]]:
             vote_for = 1
         if not any(sum(entry) for entry in votes):
             continue
+        inside = [
+            n
+            for n, row in enumerate(body)
+            if sum(votes[n]) + sum(int(float(row[column] or 0)) for column in (over, under) if column is not None) > 0
+        ]
         choices = []
         for index, column in enumerate(candidates):
             name = html.unescape(str(rows[2][column])).strip()
@@ -112,7 +117,7 @@ def wide(rows: list[list[Any]]) -> Iterator[dict[str, Any]]:
                     "text": found[2] if found else name,
                     "party": found[1].upper() if found else None,
                     "total": str(sum(entry[index] for entry in votes)),
-                    "places": [(str(row[2]).strip(), str(votes[n][index])) for n, row in enumerate(body)],
+                    "places": [(str(body[n][2]).strip(), str(votes[n][index])) for n in inside],
                 }
             )
         yield {"text": PLACE.sub(r"\2 \1", re.sub(r"^For ", "", title)), "vote_for": vote_for, "choices": choices}
