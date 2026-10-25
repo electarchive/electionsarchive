@@ -21,6 +21,9 @@ DAYS = {
     2018: date(2018, 5, 3),
     2019: date(2019, 5, 2),
     2023: date(2023, 5, 4),
+    2024: date(2024, 5, 2),
+    2025: date(2025, 5, 1),
+    2026: date(2026, 5, 7),
 }
 RESULTS = "https://candidates.democracyclub.org.uk/media/csv-archives/results-{day}.csv"
 ARCHIVED = {2018, 2019, 2023}
@@ -36,13 +39,23 @@ LEEDS = {
     2019: "https://datamillnorth.org/download/20jwj/8333f34b-f819-4d1a-8ed2-f63c31486a8c/Copy%20of%20Results%20Local%202019.csv",
 }
 LEEDS_CODE = "E08000035"
+CROYDON = {
+    2018: "https://docs.google.com/spreadsheets/d/e/2PACX-1vQrPyR0SkO96jeaAn6_MlJtPGlRfek6ooqzMmbk8hzFvTHPbhhSjx1R2JDVWG58KhfNWTGk5xyu1af0/pub?output=csv"
+}
+CROYDON_CODE = "E09000008"
+CROYDON_PAGE = "https://www.croydon.gov.uk/council-and-elections/voting-and-elections/previous-election-results/local-election-results-3-may-2018"
+FILES = {LEEDS_CODE: LEEDS, CROYDON_CODE: CROYDON}
 ONS = "https://services1.arcgis.com/ESMARspQHYMw9BZ9/arcgis/rest/services"
+PAGE = 2000
 LOOKUPS = {
-    2016: ("WD16_LAD16_CTY16_OTH_UK_LU_486872e2469d4a6eb50d6e69d869b560", "16", 9130),
-    2017: ("WD17_LAD17_CTY17_OTH_UK_LUv2_c8956eca906348fd9e3bb1f6af54f2ce", "17", 9131),
-    2018: ("WD18_LAD18_CTY18_OTH_UK_LU_971f977f4a444d09842fcfbfd51f8982", "18", 9114),
-    2019: ("WD19_LAD19_CTY19_OTH_UK_LU_89ea1f028be347e7a44d71743c96b60d", "19", 8887),
-    2023: ("WD23_LAD23_CTY23_OTH_UK_LU", "23", 8441),
+    2016: ("WD16_LAD16_CTY16_OTH_UK_LU_486872e2469d4a6eb50d6e69d869b560", "16", 9130, PAGE),
+    2017: ("WD17_LAD17_CTY17_OTH_UK_LUv2_c8956eca906348fd9e3bb1f6af54f2ce", "17", 9131, PAGE),
+    2018: ("WD18_LAD18_CTY18_OTH_UK_LU_971f977f4a444d09842fcfbfd51f8982", "18", 9114, PAGE),
+    2019: ("WD19_LAD19_CTY19_OTH_UK_LU_89ea1f028be347e7a44d71743c96b60d", "19", 8887, PAGE),
+    2023: ("WD23_LAD23_CTY23_OTH_UK_LU", "23", 8441, 1000),
+    2024: ("WD24_LAD24_UK_LU", "24", 8396, 1000),
+    2025: ("WD25_LAD25_UK_LU_v2", "25", 8405, 1000),
+    2026: ("WD26_LAD26_UK_LU", "26", 8413, 1000),
 }
 LAYERS = {
     "wd16": (
@@ -103,8 +116,31 @@ LAYERS = {
         2000,
         "Local Authority Districts (December 2023) Boundaries UK BGC",
     ),
+    "wd24": ("Wards_May_2024_Boundaries_UK_BGC", "WD24CD", 8396, 1000, "Wards (May 2024) Boundaries UK BGC"),
+    "lad24": (
+        "Local_Authority_Districts_May_2024_Boundaries_UK_BGC",
+        "LAD24CD",
+        361,
+        2000,
+        "Local Authority Districts (May 2024) Boundaries UK BGC",
+    ),
+    "wd25": ("WD_MAY_2025_UK_BGC_V2", "WD25CD", 8405, 1000, "Wards (May 2025) Boundaries UK BGC (V2)"),
+    "lad25": (
+        "LAD_MAY_2025_UK_BGC_V2",
+        "LAD25CD",
+        361,
+        2000,
+        "Local Authority Districts (May 2025) Boundaries UK BGC (V2)",
+    ),
+    "wd26": ("WD_MAY_2026_UK_BGC", "WD26CD", 8413, 1000, "Wards (May 2026) Boundaries UK BGC"),
+    "lad26": (
+        "Local_Authority_Districts_May_2026_Boundaries_UK_BGC",
+        "LAD26CD",
+        361,
+        2000,
+        "Local Authority Districts (May 2026) Boundaries UK BGC",
+    ),
 }
-PAGE = 2000
 PRESS = (
     "birminghammail.co.uk",
     "chroniclelive.co.uk",
@@ -213,11 +249,11 @@ def ballot_pages(year: int) -> list[str]:
 
 
 def lookup_pages(year: int) -> list[str]:
-    service, suffix, count = LOOKUPS[year]
+    service, suffix, count, size = LOOKUPS[year]
     return [
         f"{ONS}/{service}/FeatureServer/0/query?where=1%3D1&outFields=*&returnGeometry=false&orderByFields=WD{suffix}CD"
-        f"&resultOffset={offset}&resultRecordCount={PAGE}&f=json"
-        for offset in range(0, count, PAGE)
+        f"&resultOffset={offset}&resultRecordCount={size}&f=json"
+        for offset in range(0, count, size)
     ]
 
 
@@ -249,8 +285,9 @@ def fetch() -> None:
                             raise
                         time.sleep(30)
                 time.sleep(4)
-        if year in LEEDS:
-            raw.fetch(SOURCE, LEEDS[year], suffix=".csv")
+        for files in FILES.values():
+            if year in files:
+                raw.fetch(SOURCE, files[year], suffix=".csv")
         for url in ballot_pages(year):
             raw.fetch(SOURCE, url, suffix=".json")
             time.sleep(1)
@@ -261,7 +298,7 @@ def fetch() -> None:
 
 def parse() -> None:
     wards, candidates, lookups = [], [], []
-    for year, (_, suffix, _) in LOOKUPS.items():
+    for year, (_, suffix, _, _) in LOOKUPS.items():
         rows = [
             feature["attributes"]
             for url in lookup_pages(year)
@@ -344,7 +381,10 @@ def parse() -> None:
             .then(pl.lit("code not in the ONS ward lookup"))
             .when(pl.col("source").str.contains(r"(?i)andrewteale|\bLEAP\b"))
             .then(pl.lit("source is LEAP"))
-            .when(press | pl.col("source").str.contains(r"https?://|www\.").not_())
+            .when(
+                (press | pl.col("source").str.contains(r"https?://|www\.").not_())
+                & (pl.col("ballot").str.starts_with("local.croydon.") & pl.lit(year in CROYDON)).not_()
+            )
             .then(pl.lit("source is not the council"))
             .when(pl.col("winners") != pl.col("seats"))
             .then(pl.lit("winners do not equal seats"))
@@ -372,11 +412,24 @@ def parse() -> None:
     wards = pl.concat(wards)
     loaded = wards.filter((pl.col("status") == "loaded") | pl.col("status").str.starts_with("source is"))
     leeds = []
-    for year in DAYS:
-        if year not in LEEDS:
-            continue
-        frame = pl.read_csv(raw.cached(SOURCE, LEEDS[year]).path, infer_schema_length=0, encoding="utf8-lossy")
-        if year == 2016:
+    for (code, year), url in sorted(
+        ((code, year), url) for code, files in FILES.items() for year, url in files.items() if year in DAYS
+    ):
+        frame = pl.read_csv(raw.cached(SOURCE, url).path, infer_schema_length=0, encoding="utf8-lossy")
+        if code == CROYDON_CODE:
+            frame = frame.select(
+                ward=pl.col("Ward").str.strip_chars(),
+                surname=pl.col("Name").str.split(", ").list.first(),
+                name=pl.concat_str(
+                    pl.col("Name").str.split(", ").list.last(),
+                    pl.col("Name").str.split(", ").list.first(),
+                    separator=" ",
+                ),
+                votes="Votes",
+                elected=pl.col("Elected").str.strip_chars() == "Elected",
+                spoilt=pl.lit(None, dtype=pl.String),
+            )
+        elif year == 2016:
             frame = frame.select(
                 ward=pl.col("ConstituencyURL").str.extract(r"/(E05\d{6})$"),
                 surname=pl.col("CandidateName").str.extract(r"^((?:[A-Z'-]+ )*[A-Z'-]+) "),
@@ -400,9 +453,10 @@ def parse() -> None:
             )
         leeds.append(
             frame.select(
+                council=pl.lit(code),
                 year=pl.lit(year),
                 ward=pl.col("ward")
-                if year == 2016
+                if code == LEEDS_CODE and year == 2016
                 else pl.col("ward").map_elements(
                     lambda text: " ".join(word for word in leh.fold(text.replace("-", " ")).split() if word != "and"),
                     return_dtype=pl.String,
@@ -479,6 +533,13 @@ def emit() -> Path:
             ).is_in(published)
         )
         defaults: dict[int, int] = {}
+        handbook = {
+            contest
+            for (contest,) in conn.execute(
+                "select rs.contest_id from result_set rs join changeset c on c.id = rs.changeset_id "
+                "where c.pipeline = 'gb.leh' and rs.is_default"
+            ).fetchall()
+        }
         cs = Changeset(
             conn,
             pipeline=SOURCE,
@@ -526,31 +587,45 @@ def emit() -> Path:
                 cs.artifact(raw.cached(SOURCE, url), sources[year])
             for url in ballot_pages(year):
                 cs.artifact(raw.cached(SOURCE, url), sources[year])
-        leeds_sources: dict[int, UUID] = {}
+        leeds_sources: dict[tuple[str, int], UUID] = {}
         for year, day in days.items():
-            if year not in LEEDS:
-                continue
-            title = f"Local election results, {day}"
-            leeds_sources[year] = cs.source("Leeds City Council", title)
-            cs.add(
-                "source",
-                id=leeds_sources[year],
-                kind="official_body",
-                publisher="Leeds City Council",
-                title=title,
-                url=LEEDS[year],
-                license="Open Government Licence v3.0",
-                license_url="https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/",
-                attribution="Contains public sector information licensed under the Open Government Licence v3.0.",
-                notes="Leeds City Council's results file on Data Mill North, one row per candidate.",
-            )
-            cs.artifact(raw.cached(SOURCE, LEEDS[year]), leeds_sources[year])
-        council_rows: dict[tuple[int, str], list[dict[str, object]]] = {}
+            if year in LEEDS:
+                title = f"Local election results, {day}"
+                leeds_sources[(LEEDS_CODE, year)] = cs.source("Leeds City Council", title)
+                cs.add(
+                    "source",
+                    id=leeds_sources[(LEEDS_CODE, year)],
+                    kind="official_body",
+                    publisher="Leeds City Council",
+                    title=title,
+                    url=LEEDS[year],
+                    license="Open Government Licence v3.0",
+                    license_url="https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/",
+                    attribution="Contains public sector information licensed under the Open Government Licence v3.0.",
+                    notes="Leeds City Council's results file on Data Mill North, one row per candidate.",
+                )
+                cs.artifact(raw.cached(SOURCE, LEEDS[year]), leeds_sources[(LEEDS_CODE, year)])
+            if year in CROYDON:
+                title = f"Local election results, {day}: results data"
+                leeds_sources[(CROYDON_CODE, year)] = cs.source("Croydon Council", title)
+                cs.add(
+                    "source",
+                    id=leeds_sources[(CROYDON_CODE, year)],
+                    kind="official_body",
+                    publisher="Croydon Council",
+                    title=title,
+                    url=CROYDON_PAGE,
+                    notes="Croydon Council's results spreadsheet, one row per candidate, which the council's results "
+                    "page links as its data (a published Google Sheet, read as CSV). The council's scanned "
+                    "declaration notices are linked from the same page.",
+                )
+                cs.artifact(raw.cached(SOURCE, CROYDON[year]), leeds_sources[(CROYDON_CODE, year)])
+        council_rows: dict[tuple[str, int, str], list[dict[str, object]]] = {}
         for row in (
             pl.read_parquet(PARSED / "leeds.parquet").filter(pl.col("year").is_in(list(days))).iter_rows(named=True)
         ):
-            council_rows.setdefault((row["year"], row["ward"]), []).append(row)
-        used: set[tuple[int, str]] = set()
+            council_rows.setdefault((row["council"], row["year"], row["ward"]), []).append(row)
+        used: set[tuple[str, int, str]] = set()
         ons: dict[str, UUID] = {}
         for key, (service, _, _, _, title) in LAYERS.items():
             if int(key[-2:]) + 2000 not in days:
@@ -712,16 +787,17 @@ def emit() -> Path:
                 cs.add("external_id", entity_id=contest, scheme="democracyclub.ballot", value=ward["ballot"])
                 ballot_lines = lines.filter(pl.col("ballot") == ward["ballot"]).rows(named=True)
                 place = (
-                    (year, ward_code)
-                    if (year, ward_code) in council_rows
+                    (code, year, ward_code)
+                    if (code, year, ward_code) in council_rows
                     else (
+                        code,
                         year,
                         " ".join(
                             word for word in leh.fold(ward["division"].replace("-", " ")).split() if word != "and"
                         ),
                     )
                 )
-                council = council_rows.get(place) if code == LEEDS_CODE and year in LEEDS else None
+                council = council_rows.get(place)
                 tallies = {line["person_id"]: (line["votes"], line["elected"]) for line in ballot_lines}
                 counted = tallies
                 if council is not None:
@@ -752,7 +828,7 @@ def emit() -> Path:
                         (
                             cs.key("gb.dc_local.result_set", contest_key),
                             sources[year],
-                            council is None and not withdrawn,
+                            council is None and not withdrawn and contest not in handbook,
                             {"ballot_paper_id": ward["ballot"], "council_source": ward["source"]},
                             ward["spoilt"],
                             tallies,
@@ -763,7 +839,7 @@ def emit() -> Path:
                     sets.append(
                         (
                             leeds_set,
-                            leeds_sources[year],
+                            leeds_sources[(code, year)],
                             True,
                             {"ward": ward["division"]},
                             council[0]["spoilt"],
@@ -775,8 +851,8 @@ def emit() -> Path:
                             "note",
                             entity_id=leeds_set,
                             kind="caveat",
-                            body_md=f"Democracy Club gives {line['person_name']} {line['votes']} votes; Leeds City "
-                            f"Council's results file gives {counted[line['person_id']][0]}.",
+                            body_md=f"Democracy Club gives {line['person_name']} {line['votes']} votes; "
+                            f"{council_name}'s results file gives {counted[line['person_id']][0]}.",
                         )
                 for result_set, source, default, locator, spoilt, _ in sets:
                     cs.add(

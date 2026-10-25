@@ -97,8 +97,11 @@ def fetch() -> None:
         time.sleep(2)
 
 
+SEATS = {"Ward 1 Barraigh agus Bhatarsaigh": 2, "Ward 6 Sgìr’ Ùige agus Carlabhagh": 2}
+ARRANGEMENTS = "https://www.legislation.gov.uk/ssi/2021/369/schedule/made"
 CHECKED: dict[str, str] = {
     "S12000005": "https://www.clacks.gov.uk/document/6700.pdf",
+    "S12000036": "https://www.edinburgh.gov.uk/downloads/file/31146/candidate-votes-per-stage",
 }
 ALIASES = {"comhairle nan eilean siar": "na h eileanan siar", "comhairle eilean siar": "na h eileanan siar"}
 NUMBER = r"-?[\d,]+(?:\.\d+)?"
@@ -384,7 +387,7 @@ def parse() -> None:
                 "emb_ward": description,
                 "ward_code": ons["WD22CD"] if ons else None,
                 "ward_name": ons["WD22NM"] if ons else None,
-                "seats": len(lines),
+                "seats": SEATS.get(description, len(lines)),
                 "electorate": emb_facts[key][0],
                 "ballots": None,
                 "valid": None,
@@ -448,6 +451,12 @@ def emit() -> Path:
         if (p := feature["properties"])["WD22CD"].startswith("S13")
     }
     emb = pl.read_excel(raw.cached(SOURCE, EMB).path, sheet_name="RawDetails", engine="calamine")
+    spellings = {
+        word.lower(): word
+        for label in emb["CandidateName"].drop_nulls().to_list()
+        for word in str(label).split()
+        if not word.isupper() and not word.islower()
+    }
     authorities = {}
     for authority in emb["Authority Name"].unique().to_list():
         key = council_key(authority)
@@ -672,6 +681,15 @@ def emit() -> Path:
             )
             if uncontested:
                 cs.add("citation", entity_id=result_set, source_id=emb_source, locator={"ward": unit_row["emb_ward"]})
+                if unit_row["emb_ward"] in SEATS:
+                    cs.add(
+                        "note",
+                        entity_id=result_set,
+                        kind="context",
+                        body_md=f"The ward returns {unit_row['seats']} councillors under the [Na h-Eileanan an Iar "
+                        f"(Electoral Arrangements) Regulations 2021]({ARRANGEMENTS}), but only one candidate was "
+                        "nominated, so one seat was left vacant.",
+                    )
             elif emb_only:
                 cs.add("citation", entity_id=result_set, source_id=emb_source, locator={"ward": unit_row["emb_ward"]})
                 cs.add(
@@ -736,7 +754,16 @@ def emit() -> Path:
             ):
                 owner = party_of(candidate["party"])
                 full = " ".join(
-                    word.capitalize() if word.isupper() and len(word) > 1 else word
+                    spellings.get(
+                        word.lower(),
+                        re.sub(
+                            r"\b(Mc)([a-z])",
+                            lambda found: found.group(1) + found.group(2).upper(),
+                            re.sub(r"[^\W\d_]+", lambda part: part.group(0).capitalize(), word),
+                        ),
+                    )
+                    if word.isupper() and len(word) > 1
+                    else word
                     for word in candidate["name"].split()
                 )
                 option_key = f"{contest_key}:{candidate['number']}"

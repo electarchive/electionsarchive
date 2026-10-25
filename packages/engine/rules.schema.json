@@ -224,6 +224,22 @@
     {
       "type": "object",
       "properties": {
+        "formula": { "const": "supplementary" },
+        "majority": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "default": 0.5
+        },
+        "advance": { "type": "integer", "minimum": 2, "default": 2 },
+        "preferences": { "type": "integer", "minimum": 2, "default": 2 },
+        "tieBreak": { "enum": ["votes", "lot"], "type": "string" }
+      },
+      "required": ["formula"]
+    },
+    {
+      "type": "object",
+      "properties": {
         "formula": { "const": "top_two" },
         "advance": { "type": "integer", "minimum": 2, "default": 2 },
         "tieBreak": { "enum": ["votes", "lot"], "type": "string" }

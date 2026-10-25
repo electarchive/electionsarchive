@@ -77,6 +77,13 @@ export const rules = v.variant("formula", [
     tieBreak,
   }),
   v.object({
+    formula: v.literal("supplementary"),
+    majority: v.optional(v.pipe(v.number(), v.minValue(0), v.maxValue(1)), 0.5),
+    advance: v.optional(v.pipe(v.number(), v.integer(), v.minValue(2)), 2),
+    preferences: v.optional(v.pipe(v.number(), v.integer(), v.minValue(2)), 2),
+    tieBreak,
+  }),
+  v.object({
     formula: v.literal("top_two"),
     advance: v.optional(v.pipe(v.number(), v.integer(), v.minValue(2)), 2),
     tieBreak,

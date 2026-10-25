@@ -8,6 +8,7 @@ type Allocating = Exclude<
     formula:
       | "referendum"
       | "two_round"
+      | "supplementary"
       | "top_two"
       | "irv"
       | "stv"
