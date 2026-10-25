@@ -85,7 +85,7 @@ def _read(registry: Mapping[str, Mapping[str, str]]) -> Iterator[dict[str, Any]]
                 "tenant": tenant,
                 "election": str(eid),
                 "day": day,
-                "title": f"City of Austin {kind.replace(',', ', ')} election".replace("  ", " "),
+                "title": f"City of Austin {kind.replace(',', ', ').replace('Run-Off', 'Runoff')} election".replace("  ", " "),
                 "official": True,
                 "primary": False,
                 "contests": nodes,

@@ -7,6 +7,7 @@ import zipfile
 from collections import Counter
 from collections.abc import Callable, Iterator, Mapping
 from datetime import date, datetime, timedelta
+from difflib import SequenceMatcher
 from pathlib import Path
 from typing import Any
 from uuid import UUID
@@ -331,6 +332,11 @@ PARTIAL = (
     "Only part of this jurisdiction's vote is here: the counties that report it on their election night sites "
     "cover about {share} of its land area. Votes cast in {missing} are missing, so no winner is recorded."
 )
+SUPERSEDED = (
+    "A city-wide official count of this contest, covering the whole jurisdiction, replaces this county-part count as the "
+    "default result set; this set stays as the counties' own figures."
+)
+WHOLE = "Votes are the city-wide official totals published by {publisher}, which cover every county the jurisdiction lies in."
 UNOFFICIAL = (
     "The county's site does not mark these results as official or certified; they are the last count it posted, "
     "at least two weeks after election day."
@@ -1177,6 +1183,24 @@ def emit(
                 [source, states],
             ).fetchall()
         }
+        keyed = {
+            value
+            for (value,) in conn.execute(
+                """select x.value from external_id x
+                   join result_set r on r.contest_id = x.entity_id
+                   join changeset g on g.id = r.changeset_id
+                   where x.scheme = 'us.contest' and g.pipeline <> %s and split_part(x.value, ':', 2) = any(%s)""",
+                [source, states],
+            ).fetchall()
+        }
+        superseded = {
+            value
+            for (value,) in conn.execute(
+                """select s.supersedes_id from result_set s join result_set r on r.id = s.supersedes_id
+                   join changeset g on g.id = r.changeset_id where g.pipeline = %s""",
+                [source],
+            ).fetchall()
+        }
         precincts: dict[str, UUID] = dict(
             conn.execute(
                 """select code, id from reporting_unit where scheme_code = 'us.precinct'
@@ -1395,6 +1419,124 @@ def emit(
                 f"{st}:{code}:"
                 + {"commissioners-court": "commission", "council": "city-council"}.get(office_key, office_key),
             }
+            if not question and contest_key in keyed and "whole" in rows.columns and rows["whole"].all():
+                existing = cs.key("us.contest", contest_key)
+                found_options = [
+                    (frozenset(re.findall(r"[a-z0-9]+", label.lower())), option_id, label)
+                    for option_id, label in conn.execute(
+                        "select id, ballot_label from contest_option where contest_id = %s and kind = 'candidate'",
+                        [existing],
+                    ).fetchall()
+                ]
+                counted = pl.concat(
+                    [
+                        grouped[(county, election_id, xml)]
+                        for county, election_id, xml in rows.select("county", "election", "contest").iter_rows()
+                    ]
+                )
+                totals = (
+                    counted.filter(pl.col("place").is_null())
+                    .with_columns(same=pl.col("choice").str.to_lowercase().str.replace_all(r"[^a-z0-9]+", ""))
+                    .group_by("same")
+                    .agg(pl.col("choice").first(), pl.col("votes").sum())
+                    .sort("votes", "choice", descending=[True, False])
+                )
+                matched: list[tuple[int, UUID, str]] = []
+                for choice, votes in totals.select("choice", "votes").iter_rows():
+                    words = frozenset(re.findall(r"[a-z0-9]+", re.sub(r"\(.*?\)", "", choice).lower()))
+                    pair = next((entry for entry in found_options if entry[0] == words), None) or next(
+                        (
+                            entry
+                            for entry in found_options
+                            if len(entry[0]) > 1 and len(words) > 1 and (entry[0] <= words or words <= entry[0])
+                        ),
+                        None,
+                    )
+                    if pair is None:
+                        pair = max(
+                            found_options,
+                            key=lambda entry: SequenceMatcher(
+                                None, " ".join(sorted(entry[0])), " ".join(sorted(words))
+                            ).ratio(),
+                            default=None,
+                        )
+                        if (
+                            pair is not None
+                            and SequenceMatcher(None, " ".join(sorted(pair[0])), " ".join(sorted(words))).ratio() < 0.85
+                        ):
+                            pair = None
+                    if pair is None:
+                        break
+                    found_options.remove(pair)
+                    matched.append((votes, pair[1], slug(_title(choice))))
+                if len(matched) != len(totals) or not matched:
+                    print(f"whole set not matched to {contest_key}: {totals['choice'].to_list()}")
+                    skipped["whole set without matching options"] += 1
+                    continue
+                prior = conn.execute(
+                    "select id, election_id, contest_id, stage, kind, source_id, completeness, supersedes_id from result_set "
+                    "where contest_id = %s and is_default",
+                    [existing],
+                ).fetchone()
+                result_set = cs.key(f"{source}.result_set", contest_key)
+                replaced = None
+                if prior is not None and prior[0] == result_set:
+                    replaced, prior = prior[7], None
+                if prior is not None:
+                    cs.add(
+                        "result_set",
+                        id=prior[0],
+                        election_id=prior[1],
+                        contest_id=prior[2],
+                        stage=prior[3],
+                        kind=prior[4],
+                        source_id=prior[5],
+                        completeness=prior[6],
+                        is_default=False,
+                        status="superseded",
+                    )
+                    cs.add("note", entity_id=prior[0], kind="caveat", body_md=SUPERSEDED)
+                cs.add(
+                    "result_set",
+                    id=result_set,
+                    election_id=prior[1]
+                    if prior
+                    else conn.execute("select election_id from contest where id = %s", [existing]).fetchone()[0],
+                    contest_id=existing,
+                    stage="official"
+                    if all(stage == "official" for stage in rows["stage"].to_list())
+                    else "preliminary",
+                    kind="counted",
+                    status="active",
+                    source_id=sources[rows["county"][0]],
+                    is_default=True,
+                    completeness=1.0,
+                    supersedes_id=prior[0] if prior else replaced,
+                )
+                cs.add(
+                    "note",
+                    entity_id=result_set,
+                    kind="methodology",
+                    body_md=WHOLE.format(publisher=publishers[rows["county"][0]].split(",")[0]),
+                )
+                unit = cs.unit(scheme, code)
+                for votes, option_id, _ in matched:
+                    values.append((str(result_set), str(unit), str(option_id), votes))
+                total = sum(votes for votes, _, _ in matched)
+                cut = int(first["magnitude"])
+                if contest_key in advancing:
+                    for _, option_id, person_slug in matched:
+                        if person_slug in advancing[contest_key]:
+                            cs.add("outcome", result_set_id=result_set, option_id=option_id, kind="advanced")
+                elif (
+                    cut > 0
+                    and (st != "TX" or runoff or cut > 1 or matched[0][0] * 2 > total)
+                    and (len(matched) <= cut or matched[cut - 1][0] != matched[cut][0])
+                ):
+                    for _, option_id, _ in matched[:cut]:
+                        cs.add("outcome", result_set_id=result_set, option_id=option_id, kind="elected", seats=1)
+                skipped["whole set added to a held contest"] += 1
+                continue
             if (
                 contest_key in held
                 or (not question and any((day, alias) in taken for alias in aliases))
@@ -1659,9 +1801,9 @@ def emit(
                 contest_id=contest,
                 stage="official" if all(stage == "official" for stage in rows["stage"].to_list()) else "preliminary",
                 kind="counted",
-                status="active",
+                status="superseded" if result_set in superseded else "active",
                 source_id=sources[main],
-                is_default=True,
+                is_default=result_set not in superseded,
                 completeness=completeness,
             )
             counted = pl.concat(
