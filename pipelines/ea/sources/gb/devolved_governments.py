@@ -8,7 +8,7 @@ from ea.changeset import Changeset
 from ea.store import connect
 
 SOURCE = "gb.devolved_governments"
-VERSION = "1"
+VERSION = "2"
 WIKI = "https://en.wikipedia.org/w/api.php?format=json&formatversion=2&action=parse&prop=wikitext%7Crevid&oldid="
 LAB = UUID("9b4f1b0f-ec6f-56e4-8513-f44cf208b2ba")
 LD = UUID("09417919-fdab-5547-ac3a-39f5b8e75603")
@@ -100,66 +100,81 @@ GOVERNMENTS = {
             None,
             date(1999, 12, 2),
             "1998-06-25",
-            [(UUP, "head"), (SDLP, "member"), (DUP, "member"), (SF, "member")],
+            [(UUP, "head"), (SDLP, "head"), (DUP, "member"), (SF, "member")],
         ),
         (
             "Executive of the 3rd Northern Ireland Assembly",
             "Paisley",
             date(2007, 5, 8),
             "2007-03-07",
-            [(DUP, "head"), (SF, "member"), (UUP, "member"), (SDLP, "member")],
+            [(DUP, "head"), (SF, "head"), (UUP, "member"), (SDLP, "member")],
         ),
         (
             "Executive of the 3rd Northern Ireland Assembly",
             "Robinson",
             date(2008, 6, 5),
             "2007-03-07",
-            [(DUP, "head"), (SF, "member"), (UUP, "member"), (SDLP, "member"), (APNI, "member")],
+            [(DUP, "head"), (SF, "head"), (UUP, "member"), (SDLP, "member"), (APNI, "member")],
         ),
         (
             "Executive of the 4th Northern Ireland Assembly",
             "Robinson",
             date(2011, 5, 16),
             "2011-05-05",
-            [(DUP, "head"), (SF, "member"), (UUP, "member"), (SDLP, "member"), (APNI, "member")],
+            [(DUP, "head"), (SF, "head"), (UUP, "member"), (SDLP, "member"), (APNI, "member")],
         ),
         (
             "Executive of the 4th Northern Ireland Assembly",
             "Foster",
             date(2016, 1, 11),
             "2011-05-05",
-            [(DUP, "head"), (SF, "member"), (SDLP, "member"), (APNI, "member")],
+            [(DUP, "head"), (SF, "head"), (SDLP, "member"), (APNI, "member")],
         ),
         (
             "Executive of the 5th Northern Ireland Assembly",
             None,
             date(2016, 5, 26),
             "2016-05-05",
-            [(DUP, "head"), (SF, "member")],
+            [(DUP, "head"), (SF, "head")],
         ),
         (
             "Executive of the 6th Northern Ireland Assembly",
             "Foster",
             date(2020, 1, 11),
             "2017-03-02",
-            [(DUP, "head"), (SF, "member"), (SDLP, "member"), (UUP, "member"), (APNI, "member")],
+            [(DUP, "head"), (SF, "head"), (SDLP, "member"), (UUP, "member"), (APNI, "member")],
         ),
         (
             "Executive of the 6th Northern Ireland Assembly",
             "Givan",
             date(2021, 6, 17),
             "2017-03-02",
-            [(DUP, "head"), (SF, "member"), (SDLP, "member"), (UUP, "member"), (APNI, "member")],
+            [(DUP, "head"), (SF, "head"), (SDLP, "member"), (UUP, "member"), (APNI, "member")],
         ),
         (
             "Executive of the 7th Northern Ireland Assembly",
             None,
             date(2024, 2, 3),
             "2022-05-05",
-            [(SF, "head"), (DUP, "member"), (APNI, "member"), (UUP, "member")],
+            [(SF, "head"), (DUP, "head"), (APNI, "member"), (UUP, "member")],
         ),
     ],
 }
+APPOINTED = {
+    date(2001, 11, 27): date(2001, 11, 22),
+    date(2024, 3, 21): date(2024, 3, 20),
+    date(2026, 5, 13): date(2026, 5, 12),
+}
+ORDINALS = {"First": "I", "Second": "II", "Third": "III", "Fourth": "IV"}
+SEATS = """with recursive tree(id) as (
+        select entity_id from slug where path = %s
+        union all select e.id from election e join tree t on e.parent_id = t.id
+    )
+    select co.party_id, sum(coalesce(o.seats, 1))::int from tree
+    join result_set r on r.election_id = tree.id and r.is_default
+    join outcome o on o.result_set_id = r.id and o.kind = 'elected'
+    join contest_option co on co.id = o.option_id
+    where co.party_id is not null group by 1"""
 ENDED = {
     date(1999, 12, 2): date(2002, 10, 14),
     date(2016, 5, 26): date(2017, 1, 16),
@@ -256,9 +271,13 @@ def emit() -> Path:
                 raise ValueError(f"no office {office_key}")
             rows = GOVERNMENTS[nation]
             previous = None
-            for index, (title, head_name, start, held, parties) in enumerate(rows):
-                government = cs.key(f"{SOURCE}.government", f"{nation}:{start}")
-                end = ENDED.get(start) or (rows[index + 1][2] if index + 1 < len(rows) else None)
+            shorts: list[tuple[UUID, str]] = []
+            for index, (title, head_name, formed, held, parties) in enumerate(rows):
+                government = cs.key(f"{SOURCE}.government", f"{nation}:{formed}")
+                start = APPOINTED.get(formed, formed)
+                end = ENDED.get(formed) or (
+                    APPOINTED.get(rows[index + 1][2], rows[index + 1][2]) if index + 1 < len(rows) else None
+                )
                 head = [
                     person
                     for held_office, begin, stop, person in heads
@@ -287,17 +306,39 @@ def emit() -> Path:
                 cs.add(
                     "name",
                     entity_id=government,
-                    text=f"{title} ({head_name})" if head_name else title,
+                    text=(f"{title} ({head_name})" if head_name else title).replace("Ap Iorwerth", "ap Iorwerth"),
                     lang="en",
                     kind="official",
                     is_preferred=True,
                 )
+                words = title.replace("Ap Iorwerth", "ap Iorwerth").split()
+                if nation == "northern-ireland":
+                    full = conn.execute(
+                        "select text from name where entity_id = %s and is_preferred", [head[0]]
+                    ).fetchone()
+                    if full is None:
+                        raise ValueError(f"{title}: First Minister {head[0]} has no name")
+                    shorts.append((government, full[0].split()[-1]))
+                elif words[0] in ORDINALS:
+                    shorts.append((government, f"{' '.join(words[1:-1])} {ORDINALS[words[0]]}"))
+                elif words[0] == "Interim":
+                    shorts.append((government, f"{' '.join(words[1:-1])} (interim)"))
+                else:
+                    shorts.append((government, " ".join(words[:-1])))
+                seats = dict(conn.execute(SEATS, [f"gb/{nation}/{held}-general"]).fetchall())
                 for party, role in parties:
-                    cs.add("government_party", government_id=government, party_id=party, role=role, seats=None)
+                    if party not in seats:
+                        raise ValueError(f"{title}: no seats for {party} at {held}")
+                    cs.add("government_party", government_id=government, party_id=party, role=role, seats=seats[party])
                 if title in NOTES:
                     cs.add("note", entity_id=government, kind="context", body_md=NOTES[title])
                 cs.add("citation", entity_id=government, source_id=sources[title])
                 previous = government
+            numerals = list(ORDINALS.values())
+            for government, short in shorts:
+                same = [other for other, text in shorts if text == short]
+                text = f"{short} {numerals[same.index(government)]}" if len(same) > 1 else short
+                cs.add("name", entity_id=government, text=text, lang="en", kind="short", is_preferred=False)
         for nation, label in (
             ("scotland", "Deputy First Minister of Scotland"),
             ("wales", "Deputy First Minister of Wales"),

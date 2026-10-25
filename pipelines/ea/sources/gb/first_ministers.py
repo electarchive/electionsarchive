@@ -1,3 +1,4 @@
+from datetime import date
 from pathlib import Path
 from uuid import UUID
 
@@ -9,7 +10,7 @@ from ea.sources.gb.tenures import ENDED
 from ea.store import connect
 
 SOURCE = "gb.first_ministers"
-VERSION = "1"
+VERSION = "2"
 TITLE = "First Ministers of Scotland (P39 Q1362216) and Wales (P39 Q18996)"
 OFFICES = (
     ("scotland", "GB-SCT", "First Minister of Scotland", query("Q1362216"), "Scottish Parliament"),
@@ -18,6 +19,7 @@ OFFICES = (
 LEFT = {"Q333158": "died"}
 RESIGNED = {"Q333820", "Q10652", "Q19397", "Q333141", "Q111840", "Q6767407", "Q7917285"}
 ACTING = {"Q333807"}
+APPOINTED = {"scotland": {date(1999, 5, 13): date(1999, 5, 17), date(2007, 5, 16): date(2007, 5, 17)}}
 
 
 def fetch() -> None:
@@ -62,9 +64,9 @@ def emit() -> Path:
                     person_id=person,
                     office_id=office,
                     body_id=None,
-                    from_date=start,
+                    from_date=APPOINTED.get(code, {}).get(start, start),
                     from_precision="day",
-                    to_date=end,
+                    to_date=None if end is None else APPOINTED.get(code, {}).get(end, end),
                     to_precision="day",
                     acquired_via="acting" if item in ACTING else "appointed",
                     ended_via=None
