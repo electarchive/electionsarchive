@@ -8,6 +8,7 @@ from uuid import UUID, uuid5
 
 import polars as pl
 import shapefile
+from psycopg.rows import dict_row
 
 from ea import raw
 from ea.changeset import Changeset, slug
@@ -411,6 +412,21 @@ SPECIAL_TAIL = re.compile(
     r"|\s+(?:BOARD MEMBERS?|BOARD OF (?:DIRECTORS|TRU?E?STEES|COMMISSIONERS|SUPERVISORS)|ADVISORY BOARD|BOARD|TRUSTEES?"
     r"|DIRECTORS?|DIR|SUPERVISORS?|COMMISSIONERS?|COMMISSION|COMMITTEE|MEMBERS?|LEVEE BOARD|BOARD DISTRICT TRUSTEE)"
     r"|\s+POS\.?)+$"
+)
+MAJORITY = {
+    "0455000": "majority",
+    "2270000": "majority",
+    "4828068": "majority",
+    "4841980": "majority",
+    "4820344": "majority",
+    "4814920": "majority",
+    "0523290": "arkansas",
+    "0535710": "arkansas",
+    "0541000": "forty",
+}
+RUNOFF = (
+    "No candidate reached the vote share this city requires to win outright, so the leading candidates advanced to a "
+    "runoff."
 )
 SPECIAL_WORDS = {
     r"\bDIST\b\.?": "DISTRICT",
@@ -1512,6 +1528,7 @@ def emit() -> Path:
                 valid_from=None,
             )
         systems = {key: cs.key("us.electoral_system", key) for key in ("fptp", "block", "two_round")}
+        firsts: list[tuple[UUID, UUID, UUID, date, str]] = []
         if cs.minted & set(systems.values()):
             raise ValueError("the fptp, block, and two_round systems must already exist")
 
@@ -1650,7 +1667,11 @@ def emit() -> Path:
                 magnitude=magnitude,
                 round_number=1,
                 electoral_system_id=systems[
-                    "two_round" if magnitude == 1 and state in ("GA", "LA") else "fptp" if magnitude == 1 else "block"
+                    "two_round"
+                    if magnitude == 1 and (state in ("GA", "LA") or code in MAJORITY)
+                    else "fptp"
+                    if magnitude == 1
+                    else "block"
                 ],
                 default_result_kind="counted",
                 term="remainder" if row["remainder"] else "full",
@@ -1833,8 +1854,59 @@ def emit() -> Path:
                     values[cell] = values.get(cell, 0) + votes
             if magnitude is None or len(totals) > magnitude and totals[magnitude - 1][0] == totals[magnitude][0]:
                 continue
+            cast = rows["votes"].sum() or 0
+            lead = [votes for votes, _ in totals[:2]] + [0, 0]
+            rule = (
+                MAJORITY.get(code) or ("majority" if state in ("GA", "LA") else None)
+                if magnitude == 1 and len(totals) > 1
+                else None
+            )
+            if rule is not None and not (
+                lead[0] * 2 > cast
+                or rule == "arkansas"
+                and lead[0] * 10 >= cast * 4
+                and (lead[0] - lead[1]) * 5 >= cast
+                or rule == "forty"
+                and lead[0] * 10 >= cast * 4
+            ):
+                for _, option in totals[:2]:
+                    cs.add("outcome", result_set_id=result_set, option_id=option, kind="advanced", seats=None)
+                cs.add("note", entity_id=result_set, kind="context", body_md=RUNOFF)
+                firsts.append((contest, owners[(code, key)], area, day, city))
+                continue
             for _, option in totals[:magnitude]:
                 cs.add("outcome", result_set_id=result_set, option_id=option, kind="elected", seats=1)
+        chained: dict[str, int] = {}
+        two_round = systems["two_round"]
+        for first, owner, area, day, city in firsts:
+            later = (
+                conn.cursor(row_factory=dict_row)
+                .execute(
+                    """select c.* from contest c join election e on e.id = c.election_id
+                   join entity n on n.id = c.id and n.retired_by is null
+                   where (c.office_id = %(owner)s or c.body_id = %(owner)s)
+                     and c.district_area_id is not distinct from %(area)s
+                     and e.date_from > %(day)s and e.date_from <= %(day)s::date + 150 and c.id <> %(first)s
+                   order by e.date_from limit 1""",
+                    {"owner": owner, "area": area, "day": day, "first": first},
+                )
+                .fetchone()
+            )
+            chained.setdefault(city, 0)
+            if later is None:
+                print(f"  runoff not held in the archive: {city} {day} {first}")
+                continue
+            chained[city] += 1
+            cs.add(
+                "contest",
+                **{
+                    column: value
+                    for column, value in later.items()
+                    if column not in ("k", "changeset_id", "recorded_from")
+                }
+                | {"previous_round_id": first, "round_number": 2, "electoral_system_id": two_round},
+            )
+        print(f"{len(firsts)} first rounds short of the threshold; runoffs chained by city: {chained}")
         cs.frame(
             "reporting_unit",
             pl.DataFrame(
