@@ -12275,6 +12275,7 @@ export const polities = {
           v.object({
             name: v.nullable(v.string()),
             isQuestion: v.boolean(),
+            rank: v.number(),
             kind: v.picklist(KINDS),
             points: v.array(
               v.object({
@@ -12571,9 +12572,12 @@ export const polities = {
             ]);
           }),
         ),
-        db.execute<{ id: string; rank: number }>(sql`
-          select id, array_position(array['head_of_state', 'head_of_government', 'governor', 'body', 'mayor', 'other'], kind::text) as rank
+        db.execute<{ id: string; rank: number | null }>(sql`
+          select id, array_position(array['head_of_state', 'head_of_government', 'governor', 'upper_house', 'body', 'mayor', 'other'], kind::text) as rank
           from office where id = any(${sql.param([...new Set(rows.flatMap((row) => row.owner ?? []))])}::uuid[])
+          union all
+          select id, array_position(array['head_of_state', 'head_of_government', 'governor', 'upper_house'], kind::text)
+          from body where id = any(${sql.param([...new Set(rows.flatMap((row) => row.owner ?? []))])}::uuid[])
         `),
       ]);
       const ranks = new Map(offices.rows.map((row) => [row.id, row.rank]));
@@ -12625,7 +12629,7 @@ export const polities = {
                   null),
             isQuestion: group[0]?.isQuestion ?? false,
             rank:
-              group[0]?.owner == null ? 7 : (ranks.get(group[0].owner) ?? 4),
+              group[0]?.owner == null ? 8 : (ranks.get(group[0].owner) ?? 5),
             kind: group[0]?.kind ?? "shared",
             points: group.map((point) => ({
               name: labels.full.get(point.id) ?? "",

@@ -77,6 +77,7 @@
       .toSorted(
         (a, b) =>
           Number(b.points.length > 1) - Number(a.points.length > 1) ||
+          Math.min(a.entry.rank, 5) - Math.min(b.entry.rank, 5) ||
           (b.points.at(-1)?.date ?? "").localeCompare(
             a.points.at(-1)?.date ?? "",
           ) ||
