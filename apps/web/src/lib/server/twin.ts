@@ -1320,7 +1320,11 @@ function polityMarkdown(
               ? `${[
                   point.winner,
                   parties[0]?.label,
-                  point.share == null ? null : percent(point.share),
+                  point.share == null
+                    ? null
+                    : point.share >= 1
+                      ? m.map_unopposed()
+                      : percent(point.share),
                 ]
                   .filter((part) => part != null)
                   .join(
