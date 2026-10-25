@@ -333,12 +333,15 @@ def emit() -> Path:
             current[entity] = path
             return path
 
+        parents: set[UUID] = set()
+
         def election(day: date, runoff: bool, code: str) -> tuple[UUID, str]:
             if (day, code) in elections:
                 return elections[(day, code)]
             kind = "runoff" if runoff else "local"
             parent = cs.key("us.election", f"{day}:FL")
-            if parent in cs.minted:
+            if parent in cs.minted and parent not in parents:
+                parents.add(parent)
                 cs.add(
                     "election",
                     id=parent,
