@@ -1,4 +1,6 @@
+import json
 import re
+import time
 from datetime import date, timedelta
 from pathlib import Path
 from uuid import UUID
@@ -14,13 +16,18 @@ SOURCE = "us.ca_la_sov"
 VERSION = "1"
 PARSED = DATA / "parsed" / SOURCE
 FIPS = "06037"
+RESULTS = "https://results.lavote.gov/ElectionResults"
+NUMBERS = {"one": 1, "two": 2, "three": 3, "four": 4, "five": 5, "six": 6, "seven": 7}
 PLACE = "LOS ANGELES"
 NOTE = (
     "Precinct totals from the Los Angeles County Registrar-Recorder/County Clerk's Statement of Votes Cast, one "
     "Excel file per contest. The county leaves out the selections of precincts with a single ballot cast, so precinct "
-    "sums can fall slightly short of the contest's totals. The file names no seat count, so a contest without a "
-    "trustee area or council district carries no seat count and no declared winners."
+    "sums can fall slightly short of the contest's totals. The file declares no winners: where a seat count is stated, "
+    "the top vote-getters up to that count are recorded as elected, and in a nonpartisan primary a candidate with a "
+    "majority is elected and otherwise the top two advance."
 )
+SEATS = ' The seat count is the Registrar\'s own "Vote for no more than" line for the contest on results.lavote.gov.'
+NO_SEATS = " No seat count is stated for this at-large contest, so no outcomes are recorded."
 PARTIAL = " The jurisdiction extends beyond Los Angeles County; these are the county's precincts only."
 
 CITIES = {
@@ -276,6 +283,43 @@ def classify(label: str) -> dict[str, object] | None:
     return None
 
 
+def fetch() -> None:
+    for year in json.loads(raw.fetch(SOURCE, f"{RESULTS}/GetMenuYears", suffix=".json").path.read_bytes())["Data"]:
+        listing = raw.fetch(SOURCE, f"{RESULTS}/GetMenuElections?year={year}", suffix=".json").path
+        for found in json.loads(listing.read_bytes())["Data"]:
+            raw.fetch(SOURCE, f"{RESULTS}/GetElectionData?electionID={found['ID']}", suffix=".json")
+            time.sleep(1)
+
+
+def seat_counts() -> tuple[dict[tuple[date, bool], list[tuple[str, int]]], set[tuple[date, str]], list[raw.Artifact]]:
+    counts: dict[tuple[date, bool], list[tuple[str, int]]] = {}
+    primaries: set[tuple[date, str]] = set()
+    artifacts = []
+    for year in json.loads(raw.cached(SOURCE, f"{RESULTS}/GetMenuYears").path.read_bytes())["Data"]:
+        listing = raw.cached(SOURCE, f"{RESULTS}/GetMenuElections?year={year}").path
+        for found in json.loads(listing.read_bytes())["Data"]:
+            artifact = raw.cached(SOURCE, f"{RESULTS}/GetElectionData?electionID={found['ID']}")
+            artifacts.append(artifact)
+            data = json.loads(artifact.path.read_bytes())["Data"]
+            day = date.fromisoformat(data["Date"][:10])
+            for group in data["ContestGroups"]:
+                for contest in group["Contests"]:
+                    nominating = re.match(
+                        r"(?:CITY OF )?(.+?)(?: CITY)?(?: COUNCIL DISTRICT \d+)?(?: SPECIAL)? PRIMARY\b(?!.*MEASURE)",
+                        contest["Title"],
+                    )
+                    if nominating is not None:
+                        primaries.add((day, nominating.group(1).replace(" ", "")))
+                    stated = re.fullmatch(r"Vote for no more than (\w+)", contest["VoteFor"] or "")
+                    if stated is None or stated.group(1).lower() not in NUMBERS:
+                        continue
+                    unexpired = re.search(r"unexpired|U/T|special election", contest["Title"], flags=re.IGNORECASE)
+                    counts.setdefault((day, unexpired is not None), []).append(
+                        (contest["Title"].upper(), NUMBERS[stated.group(1).lower()])
+                    )
+    return counts, primaries, artifacts
+
+
 def parse() -> None:
     rows = pl.read_parquet(ca_la_svc.PARSED / "rows.parquet")
     labels = []
@@ -320,6 +364,20 @@ def emit() -> Path:
         systems = {"fptp": cs.key("us.electoral_system", "fptp"), "block": cs.key("us.electoral_system", "block")}
         if cs.minted & set(systems.values()):
             raise ValueError("the fptp and block systems must already exist")
+        counts, primaries, results = seat_counts()
+        results_source = cs.source(ca_la_svc.PUBLISHER, "Election results (results.lavote.gov)")
+        if results_source in cs.minted:
+            cs.add(
+                "source",
+                id=results_source,
+                kind="official_body",
+                publisher=ca_la_svc.PUBLISHER,
+                title="Election results (results.lavote.gov)",
+                url="https://results.lavote.gov/",
+                license="Public record",
+            )
+        for artifact in results:
+            cs.artifact(artifact, results_source)
         source = cs.source(ca_la_svc.PUBLISHER, ca_la_svc.TITLE)
         if source in cs.minted:
             raise ValueError("the Statement of Votes Cast source must already exist")
@@ -343,7 +401,26 @@ def emit() -> Path:
                     text,
                 )
             ] = (pid, code, path)
-        taken = {path for (path,) in conn.execute("select path from slug where path like 'us/ca/%'").fetchall()}
+        taken = {
+            path
+            for (path,) in conn.execute(
+                """select s.path from slug s join changeset c on c.id = s.changeset_id
+                   where s.path like 'us/ca/%%' and c.pipeline <> %s""",
+                [SOURCE],
+            ).fetchall()
+        }
+        own_areas = {
+            area
+            for (area,) in conn.execute(
+                "select a.id from area a join changeset c on c.id = a.changeset_id where c.pipeline = %s", [SOURCE]
+            ).fetchall()
+        }
+        territories = dict(
+            conn.execute(
+                "select distinct on (polity_id) polity_id, area_id from polity_territory order by polity_id, valid_from desc nulls last"
+            ).fetchall()
+        )
+        state_area = cs.area("us.state", "06")
 
         report: dict[str, int] = {}
         made: dict[tuple[str, str], tuple[UUID, str, str]] = {}
@@ -370,6 +447,48 @@ def emit() -> Path:
                 report[f"no polity: {kind} {text}"] = 0
                 continue
             made[(kind, text)] = found
+
+        for (kind, text), (pid, code, path) in made.items():
+            if pid in territories or not code.startswith(("special:06037:", "school:06:")):
+                continue
+            scheme = "us.school_district" if kind == "college" else "us.special_district"
+            area = cs.area(scheme, code.partition(":")[2])
+            cs.add("area", id=area, scheme_code=scheme)
+            cs.add("area_code", area_id=area, code=code.partition(":")[2], valid_from=None)
+            cs.add("area_parent", area_id=area, parent_id=state_area if kind == "college" else county[1])
+            name(area, text)
+            cs.add("polity_territory", polity_id=pid, area_id=area)
+            territories[pid] = area
+            own_areas.add(area)
+        for pid, text, short in conn.execute(
+            """select p.id, n.text, case n.text when 'Los Angeles Unified School District' then 'LAUSD'
+                   when 'Los Angeles Community College District' then 'LACCD' end
+               from polity p join name n on n.entity_id = p.id and n.is_preferred
+               where n.text in ('Los Angeles Unified School District', 'Los Angeles Community College District')"""
+        ).fetchall():
+            if not conn.execute(
+                "select 1 from name where entity_id = %s and kind = 'abbreviation' and text = %s", [pid, short]
+            ).fetchone():
+                cs.add("name", entity_id=pid, text=short, lang="en", kind="abbreviation", is_preferred=False)
+
+        people: dict[tuple[UUID, str, str], UUID] = {}
+        for person, label, election_polity in conn.execute(
+            """select distinct p.id, n.text, e.polity_id from person p
+               join name n on n.entity_id = p.id and n.is_preferred
+               join candidacy y on y.person_id = p.id
+               join contest_option o on o.id = y.option_id
+               join contest k on k.id = o.contest_id
+               join election e on e.id = k.election_id
+               join changeset c on c.id = p.changeset_id
+               where e.polity_id = any(%s) and c.pipeline <> %s
+               order by p.id""",
+            [[found[0] for found in made.values()], SOURCE],
+        ).fetchall():
+            parts = [
+                w for w in re.sub(r"[^a-z ]", " ", label.lower()).split() if w not in ("jr", "sr", "ii", "iii", "iv")
+            ]
+            if len(parts) >= 2:
+                people.setdefault((election_polity, parts[0], parts[-1]), person)
 
         elections: dict[tuple[date, UUID], tuple[UUID, str]] = {}
         owners: dict[tuple[UUID, str], UUID] = {}
@@ -400,10 +519,11 @@ def emit() -> Path:
                 known = conn.execute(
                     """select lower(coalesce(o.ballot_label, '')), lower(coalesce(n.text, '')) from contest k
                        join election e on e.id = k.election_id
+                       join changeset kc on kc.id = k.changeset_id and kc.pipeline <> %s
                        left join contest_option o on o.contest_id = k.id
                        left join name n on n.entity_id = k.id and n.is_preferred
                        where e.polity_id = %s and e.date_from = %s""",
-                    [pid, day],
+                    [SOURCE, pid, day],
                 ).fetchall()
                 labels_known = {label for label, _ in known}
                 names_known = " ".join({text for _, text in known})
@@ -456,6 +576,8 @@ def emit() -> Path:
                     if row["kind"] == "county"
                     else "division"
                     if row["kind"] == "special"
+                    else "seat"
+                    if row["name"] == "Los Angeles Community College District"
                     else "trustee area"
                 )
                 body_title = (
@@ -482,10 +604,16 @@ def emit() -> Path:
                 if seat_text is not None:
                     district_code = f"06:{key_body}:{body_kind}:district-{slug(seat_text)}"
                     area = cs.area("us.local_district", district_code)
-                    if area in cs.minted and district_code not in districts:
+                    if (area in cs.minted or area in own_areas) and district_code not in districts:
                         districts.add(district_code)
-                        cs.add("area", id=area, scheme_code="us.local_district")
-                        cs.add("area_code", area_id=area, code=district_code, valid_from=None)
+                        if area in cs.minted:
+                            cs.add("area", id=area, scheme_code="us.local_district")
+                            cs.add("area_code", area_id=area, code=district_code, valid_from=None)
+                        if pid in territories and (
+                            area in cs.minted
+                            or not conn.execute("select 1 from area_parent where area_id = %s", [area]).fetchone()
+                        ):
+                            cs.add("area_parent", area_id=area, parent_id=territories[pid])
                         name(
                             area,
                             f"{body_title}, {seat_label} {seat_text}",
@@ -505,6 +633,20 @@ def emit() -> Path:
                 )
                 contest_kind, office_id, body_id = "body_seats", None, owner
                 magnitude = 1 if seat_text is not None else None
+                if magnitude is None:
+                    jurisdictions = {}
+                    for title, seats in counts.get((day, row["term"] != "full"), []):
+                        position = re.split(r" (?:MEMBER|GOVERNING BOARD|CITY COUNCILMEMBER)\b", title)[0]
+                        position = re.sub(r"^CITY OF ", "", position)
+                        position = re.sub(
+                            r"(?: CITY)?(?: (?:GENERAL|REGULAR))?(?: AND SPECIAL)?(?: MUNICIPAL)?(?: SPECIAL)? ELECTIONS?$",
+                            "",
+                            position,
+                        )
+                        if "RENT CONTROL" not in title and "REGULAR AND UNEXPIRED" not in title:
+                            jurisdictions.setdefault(position.replace(" ", ""), set()).add(seats)
+                    found = jurisdictions.get(row["name"].upper().replace(" ", ""), set())
+                    magnitude = next(iter(found)) if len(found) == 1 else None
             elif row["type"] == "office":
                 office_key = f"CA:{key_body}:{row['office']}"
                 existing_office = conn.execute(
@@ -520,7 +662,11 @@ def emit() -> Path:
                 area = None
                 contest_key = f"{day}:CA:{key_body}:{row['office']}"
                 contest_slug = row["office"]
-                contest_title = f"{day.year} {row['name']} {row['title']} election"
+                contest_title = (
+                    f"{day.year} {row['name']} mayoral election"
+                    if row["office"] == "mayor"
+                    else f"{day.year} {row['name']} {row['title']} election"
+                )
                 contest_kind, office_id, body_id = "office", owner, None
                 magnitude = 1
             else:
@@ -537,9 +683,6 @@ def emit() -> Path:
             seen.add(contest_key)
             taken.add(f"{election_path}/{contest_slug}")
             contest = cs.key("us.contest", contest_key)
-            if contest not in cs.minted:
-                report["already loaded"] = report.get("already loaded", 0) + 1
-                continue
             if area is None:
                 area = cs.area("us.place", code.partition(":")[2]) if code.startswith("place:") else None
             cs.add(
@@ -552,7 +695,7 @@ def emit() -> Path:
                 district_area_id=area,
                 magnitude=magnitude,
                 round_number=1,
-                electoral_system_id=None if magnitude is None else systems["fptp"],
+                electoral_system_id=None if magnitude is None else systems["block" if magnitude > 1 else "fptp"],
                 default_result_kind="counted",
                 term=row["term"],
             )
@@ -573,7 +716,19 @@ def emit() -> Path:
                 is_default=True,
                 completeness=None if partial else 1,
             )
-            cs.add("note", entity_id=result_set, kind="methodology", body_md=NOTE + (PARTIAL if partial else ""))
+            cs.add(
+                "note",
+                entity_id=result_set,
+                kind="methodology",
+                body_md=NOTE
+                + (
+                    SEATS
+                    if row["type"] in ("council", "board") and row["seat"] is None and magnitude is not None
+                    else ""
+                )
+                + (NO_SEATS if row["type"] in ("council", "board") and magnitude is None else "")
+                + (PARTIAL if partial else ""),
+            )
             options: dict[str, UUID] = {}
             for position, candidate in enumerate(sums.sort("votes", descending=True)["candidate"], start=1):
                 option = options[candidate] = cs.key("us.option", f"{contest_key}:{slug(candidate)}")
@@ -597,9 +752,20 @@ def emit() -> Path:
                         ballot_label=label,
                     )
                     if not write_in:
+                        parts = [
+                            w
+                            for w in re.sub(r"[^a-z ]", " ", label.lower()).split()
+                            if w not in ("jr", "sr", "ii", "iii", "iv")
+                        ]
                         person = cs.key(f"{SOURCE}.person", f"{contest_key}:{slug(candidate)}")
-                        cs.add("person", id=person)
-                        name(person, label)
+                        matched = people.get((pid, parts[0], parts[-1])) if len(parts) >= 2 else None
+                        if matched is not None and matched != person:
+                            if person not in cs.minted:
+                                cs.merge(person, matched)
+                            person = matched
+                        elif person in cs.minted:
+                            cs.add("person", id=person)
+                            name(person, label)
                         cs.add(
                             "candidacy",
                             id=cs.key("us.candidacy", f"{contest_key}:{slug(candidate)}:head"),
@@ -611,6 +777,33 @@ def emit() -> Path:
                         )
             if row["type"] in ("measure", "recall"):
                 cs.add("ballot_question", contest_id=contest, type="mandatory_referendum")
+            elif magnitude is not None:
+                named = [
+                    (candidate, votes)
+                    for candidate, votes in sums.sort("votes", descending=True).iter_rows()
+                    if "WRITE" not in candidate.upper()
+                ]
+                primary = (
+                    (day, row["name"].upper().replace(" ", "")) in primaries
+                    or (
+                        row["name"] in ("Los Angeles Unified School District", "Los Angeles Community College District")
+                        and day.month in (3, 6)
+                    )
+                    or (row["kind"] == "county" and day.month in (3, 6) and day.year % 2 == 0)
+                )
+                if primary:
+                    if named[0][1] * 2 > sums["votes"].sum():
+                        decided = [(named[0][0], "elected")]
+                    elif len(named) >= 2 and (len(named) == 2 or named[1][1] > named[2][1]):
+                        decided = [(candidate, "advanced") for candidate, _ in named[:2]]
+                    else:
+                        decided = []
+                elif len(named) <= magnitude or named[magnitude - 1][1] > named[magnitude][1]:
+                    decided = [(candidate, "elected") for candidate, _ in named[:magnitude]]
+                else:
+                    decided = []
+                for candidate, outcome in decided:
+                    cs.add("outcome", result_set_id=result_set, option_id=options[candidate], kind=outcome, seats=None)
 
             frame = frame.group_by("precinct", "candidate", maintain_order=True).agg(
                 pl.col("votes").sum(), pl.col("registered").sum(), pl.col("ballots").sum()
