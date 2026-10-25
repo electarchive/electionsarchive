@@ -994,24 +994,26 @@ def _rollup(
               join area dated on dated.id = ua.area_id left join area own on own.id = g.area_id
             ),
             ancestors as (
-              select unit_k, area_id, on_date, true as complete from grain
+              select unit_k, area_id, on_date, true as complete, area_id as origin_id from grain
               where not exists (
                 select from links l where l.unit_k = grain.unit_k and l.on_date = grain.on_date
                   and l.own_id = grain.area_id and l.rival
               )
               union
-              select unit_k, area_id, on_date, not partial from links
+              select unit_k, area_id, on_date, not partial, area_id from links
               union
-              select a.unit_k, p.parent_id, a.on_date, a.complete
+              select a.unit_k, p.parent_id, a.on_date, a.complete, a.origin_id
               from ancestors a join area_parent p on p.area_id = a.area_id and p.valid @> a.on_date
             ),
             climbed as (
-              select u.result_set_k, u.unit_k, a.area_id, a.complete
+              select u.result_set_k, u.unit_k, a.area_id, bool_or(a.complete) as complete
               from (select distinct result_set_k, unit_k, coalesce(on_date, 'infinity') as day from units) u
-              join (
-                select unit_k, coalesce(on_date, 'infinity') as day, area_id, bool_or(complete) as complete
-                from ancestors group by unit_k, on_date, area_id
-              ) a on a.unit_k = u.unit_k and a.day = u.day
+              join rs on rs.k = u.result_set_k
+              left join area district on district.id = rs.district_area_id
+              join ancestors a on a.unit_k = u.unit_k and coalesce(a.on_date, 'infinity') = u.day
+              left join area origin on origin.id = a.origin_id
+              where district.id is null or origin.id = district.id or origin.scheme_code is distinct from district.scheme_code
+              group by u.result_set_k, u.unit_k, a.area_id
             ),
             spans as (
               select rs.k as result_set_k, dc.county_area_id
