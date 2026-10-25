@@ -4,7 +4,11 @@ import { contents } from "#lib/server/pages.js";
 
 export async function rebuild() {
   const started = Date.now();
-  const listed = await db.execute<{ id: string; stale: boolean }>(sql`
+  const listed = await db.execute<{
+    id: string;
+    stale: boolean;
+    old: boolean;
+  }>(sql`
     with recursive
       used as (
         select distinct party_id as id from contest_option where party_id is not null
@@ -19,7 +23,7 @@ export async function rebuild() {
         select o.id from owners o join entity e on e.id = o.id
         where e.retired_by is null and not exists (select from entity_merge m where m.entity_id = o.id)
       ),
-      since as (select greatest(coalesce(min(built_at), now()), now() - interval '1 day') as at from party_page),
+      since as (select greatest(coalesce(min(built_at), now()), now() - interval '2 days') as at from party_page),
       elections(id, at) as (
         select id, recorded_from from election where recorded_from > (select at from since)
         union all select id, upper(recorded) from election_history where upper(recorded) > (select at from since)
@@ -92,12 +96,16 @@ export async function rebuild() {
           left join entity_merge m on m.entity_id = pr.to_party_id
       ),
       changed as (select id, max(at) as at from expanded group by id)
-    select l.id, p.party_id is null or p.built_at < now() - interval '1 day' or x.at > p.built_at as stale
+    select l.id, p.party_id is null or x.at > p.built_at as stale, p.built_at < now() - interval '1 day' as old
     from listed l left join party_page p on p.party_id = l.id left join changed x on x.id = l.id
-    order by l.id
+    order by p.built_at nulls first, l.id
   `);
-  const queue = listed.rows.filter((row) => row.stale).map((row) => row.id);
-  const stale = queue.length;
+  const stale = listed.rows.filter((row) => row.stale).map((row) => row.id);
+  const refreshed = listed.rows
+    .filter((row) => !row.stale && row.old)
+    .slice(0, Math.ceil(listed.rows.length / 8))
+    .map((row) => row.id);
+  const queue = [...refreshed.toReversed(), ...stale];
   let built = 0;
   let failed = 0;
   await Promise.all(
@@ -124,5 +132,5 @@ export async function rebuild() {
     where not (party_id = any(${sql.param(listed.rows.map((row) => row.id))}::uuid[]))
   `);
   await db.execute(sql`analyze party_page`);
-  return `${built} of ${stale} stale party pages rebuilt (${listed.rows.length} listed), ${failed} failed, ${removed.rowCount ?? 0} removed, in ${Math.round((Date.now() - started) / 1000)}s`;
+  return `${built} of ${stale.length} stale and ${refreshed.length} day-old party pages rebuilt (${listed.rows.length} listed), ${failed} failed, ${removed.rowCount ?? 0} removed, in ${Math.round((Date.now() - started) / 1000)}s`;
 }
