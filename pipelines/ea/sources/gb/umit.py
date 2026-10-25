@@ -110,6 +110,18 @@ DECLARED = {
     ("1945-07-05", "eng-combined-english-universities"): ("Lindsay, Kenneth Martin", "Rathbone, Eleanor Florence"),
     ("1945-07-05", "eng-oxford-university"): ("Herbert, Alan Patrick", "Salter, James Arthur"),
     ("1945-07-05", "sct-combined-scottish-universities"): ("Anderson, John", "Kerr, John Graham", "Orr, John Boyd"),
+    ("1857-03-27", "eng-huntingdonshire"): ("Rust, James", "Fellowes, Edward"),
+    ("1859-04-28", "eng-west-suffolk"): ("Hervey, Frederick William John", "Parker, William"),
+    ("1841-06-29", "eng-thetford"): ("Baring, Bingham", "Flower, James"),
+    ("1865-07-11", "eng-north-durham"): ("Williamson, Hedworth", "Shafto, Robert Duncombe"),
+    ("1874-01-31", "eng-south-lincolnshire"): ("Turnor, Edmund", "Welby, William Earle"),
+}
+HANSARD = {
+    ("1857-03-27", "eng-huntingdonshire"),
+    ("1859-04-28", "eng-west-suffolk"),
+    ("1841-06-29", "eng-thetford"),
+    ("1865-07-11", "eng-north-durham"),
+    ("1874-01-31", "eng-south-lincolnshire"),
 }
 NAMESAKES = (
     ("eng-tamworth", "Peel, Robert", 1832, 1847, "@1788"),
@@ -118,9 +130,54 @@ NAMESAKES = (
     ("irl-kerry", "Herbert, Henry Arthur", 1866, 1880, "@1840"),
     ("eng-richmond-yorks", "Dundas, John Charles", 1873, 1885, "@1845"),
     ("eng-york", "Dundas, John Charles", 1886, 1886, "@1845"),
+    ("eng-berkshire", "Walter, John", 1852, 1880, "@1818"),
+    ("eng-cambridgeshire", "Yorke, Charles Philip", 1865, 1865, "@1836"),
+    ("eng-clitheroe", "Fort, Richard", 1880, 1880, "@1856"),
+    ("eng-clitheroe", "Fort, Richard", 1945, 1955, "@1907"),
+    ("eng-dorchester", "Williams, Robert", 1835, 1837, "@1811"),
+    ("eng-great-grimsby", "Heneage, Edward", 1880, 1895, "@1840"),
+    ("eng-hertford", "Smith, Abel", 1900, 1906, "@1862"),
+    ("eng-hertfordshire", "Smith, Abel", 1859, 1880, "@1829"),
+    ("eng-horsham", "Hurst, Robert Henry", 1865, 1874, "@1817"),
+    ("eng-leeds", "Baines, Edward", 1859, 1874, "@1800"),
+    ("eng-lewes", "Beamish, Tufton Victor Hamilton", 1945, 1959, "@1917"),
+    ("eng-lymington", "Mackinnon, William Alexander", 1857, 1865, "@1813"),
+    ("eng-rye", "Mackinnon, William Alexander", 1852, 1852, "@1813"),
+    ("eng-newcastle-upon-tyne", "Cowen, Joseph", 1874, 1885, "@1829"),
+    ("eng-north-shropshire", "Hill, Rowland", 1857, 1857, "@1833"),
+    ("eng-south-dorset", "Gascoyne-Cecil, Robert Arthur James", 1929, 1935, "@1893"),
+    ("eng-south-molton", "Lambert, George", 1945, 1945, "@1909"),
+    ("eng-sunderland", "Storey, Samuel", 1931, 1945, "@1896"),
+    ("eng-the-hartlepools", "Richardson, Thomas", 1892, 1900, "@1846"),
+    ("eng-west-derbyshire", "White, Charles Frederick", 1945, 1945, "@1891"),
+    ("eng-westmorland", "Lowther, William", 1874, 1880, "@1821"),
+    ("eng-westmorland", "Taylour, Thomas", 1874, 1880, "@1844"),
+    ("sct-dumfriesshire", "Hope-Johnstone, John James", 1874, 1874, "@1841"),
+    ("sct-renfrewshire", "Mure, William", 1874, 1880, "@1830"),
+    ("wls-brecon", "Morgan, Charles Rodney", 1852, 1852, "@1828"),
+    ("wls-carmarthenshire", "Jones, John", 1874, 1880, "@1812"),
+    ("wls-montgomery", "Williams-Wynn, Charles Watkin", 1865, 1885, "@1822"),
+    ("wls-radnorshire", "Walsh, Arthur Henry John", 1885, 1886, "@1859"),
 )
 DUPLICATES = ((1955, "eng-finchley", "Sykes, A. M. P. H."),)
-WORKING_NOTE = re.compile(r"^\s*[\d,]+\s*$|\bnot in (?:the )?book\b|\bnot in (?:EH|FWSC)\b", re.IGNORECASE)
+PRINTED = {
+    "ec2005": (
+        "Electoral Commission",
+        "Election 2005: constituencies, candidates and results",
+        (
+            "https://web.archive.org/web/20110615071530id_/http://www.electoralcommission.org.uk/__data/assets/pdf_file/0007/47185/"
+            "Election2005_constituencies,candidatesandresultsFINAL_20719-15241__E__N__S__W__.pdf"
+        ),
+    ),
+}
+RECOUNTED = {
+    (date(2005, 5, 5), "eng-east-kingston-upon-hull", "Lindsay, Katy"): (4138, 4038, "ec2005"),
+    (date(2005, 5, 5), "nir-upper-bann", "Trimble, David"): (11381, 11281, "ec2005"),
+    (date(2005, 5, 5), "eng-workington", "Pattinson, Judith"): (11659, 12659, "ec2005"),
+}
+WORKING_NOTE = re.compile(
+    r"^\s*[\d,]+\s*$|^Succession of \w+$|\bnot in (?:the )?book\b|\bnot in (?:EH|FWSC)\b", re.IGNORECASE
+)
 ALLIANCE = (
     ("1983-06-09", "eng-truro", "Penhaligon, David", "Liberal"),
     ("1987-06-11", "eng-truro", "Taylor, Matthew", "Liberal"),
@@ -154,7 +211,18 @@ COUNTRIES = {
 NOT_PARTIES = ("Independent", "No label")
 SHAPED = date(2010, 5, 6)
 REDISTRIBUTIONS = (1832, 1868, 1885, 1918, 1950, 1955, 1974, 1983, 1997)
+NON_PARTY = """select p.id, n.text from party p join changeset c on c.id = p.changeset_id and c.pipeline = %s
+    join name n on n.entity_id = p.id and n.is_preferred
+    join entity e on e.id = p.id and e.retired_by is null
+    where p.kind = 'party'
+      and (n.text ~ '^Independent ' and n.text not in ('Independent Labour Party', 'Independent Irish')
+           or n.text = 'Anti H-Block')
+      and exists (select from contest_option o where o.party_id = p.id)
+      and not exists (select from contest_option o join contest k on k.id = o.contest_id
+                      join election x on x.id = k.election_id where o.party_id = p.id and x.date_from >= '2001-02-16')
+    order by n.text"""
 MISSPELLED = {"RoxBoroughshire": "Roxburghshire", "East Suex": "East Sussex"}
+SPLIT = {(date(1880, 3, 31), "eng-east-sussex"): ("eng-east-suex", "East Suex")}
 RENAMED = {
     "Central Newcastle upon Tyne": "Newcastle upon Tyne Central",
     "Central Stoke-on-Trent": "Stoke-on-Trent Central",
@@ -282,6 +350,91 @@ UCUNF_NOTE = (
     "New Force, the joint ticket of the Conservatives and the Ulster Unionists, which the Commons Library's "
     "constituency results (CBP-8647) count with the Ulster Unionists."
 )
+ARTICLES_TITLE = "UK Parliament constituency articles"
+ARTICLES_NOTE = (
+    "Umit's dataset labels this candidate {label}; the party shown is the one the constituency's Wikipedia article "
+    "gives{basis}."
+)
+ARTICLES_BASIS = (
+    ", citing Craig's British Parliamentary Election Results and Walker's Parliamentary Election Results in Ireland"
+)
+EARLY_LABELS = {"Liberal": ("Whig", 1859), "Repeal Association and Whig": ("Repeal Association", 1885)}
+ARTICLE_LABELS = {
+    (date(1835, 1, 6), "irl-county-louth", "Bellew, Richard Montesquieu"): "Whig",
+    (date(1837, 7, 24), "irl-athlone", "O'Connell, John"): "Radicals",
+    (date(1852, 7, 7), "irl-cavan", "Ellis, Hercules"): "Tenant Right League",
+    (date(1852, 7, 7), "irl-londonderry", "Greer, Samuel MacCurdy"): "Radicals",
+    (date(1852, 7, 7), "irl-tralee", "O'Connell, Maurice"): "Radicals",
+    (date(1857, 3, 27), "irl-londonderry", "Greer, Samuel MacCurdy"): "Radicals",
+    (date(1983, 6, 9), "eng-barnsley-west-and-penistone", "Evans, J"): "Social Democratic",
+    (date(1983, 6, 9), "eng-bournemouth-east", "Millward, John"): "Liberal",
+    (date(1983, 6, 9), "eng-canterbury", "Purchese, J"): "Liberal",
+    (date(1983, 6, 9), "eng-christchurch", "Alexander, S"): "Social Democratic",
+    (date(1983, 6, 9), "eng-coventry-south-east", "Kilby, G"): "Liberal",
+    (date(1983, 6, 9), "eng-croydon-south", "Forrest, J"): "Liberal",
+    (date(1983, 6, 9), "eng-dagenham", "Horne, J"): "Social Democratic",
+    (date(1983, 6, 9), "eng-hackney-north-and-stoke-newington", "Ash, D"): "Liberal",
+    (date(1983, 6, 9), "eng-loughborough", "Frears, JR"): "Social Democratic",
+    (date(1983, 6, 9), "eng-north-hertfordshire", "Binney, G"): "Liberal",
+    (date(1983, 6, 9), "eng-orpington", "Cook, JW"): "Liberal",
+    (date(1983, 6, 9), "eng-ravensbourne", "Boston, CM"): "Liberal",
+    (date(1983, 6, 9), "eng-reading-east", "Huhne, Chris"): "Social Democratic",
+    (date(1983, 6, 9), "eng-richmond-and-barnes", "Watson, Alan"): "Liberal",
+    (date(1983, 6, 9), "eng-sevenoaks", "Jakobi, Stephen"): "Liberal",
+    (date(1983, 6, 9), "eng-sheffield-central", "Major, Patricia"): "Social Democratic",
+    (date(1983, 6, 9), "eng-swindon", "Scott, DJ"): "Social Democratic",
+    (date(1983, 6, 9), "eng-teignbridge", "Alderson, J"): "Liberal",
+    (date(1983, 6, 9), "eng-thurrock", "Benson, D"): "Social Democratic",
+    (date(1983, 6, 9), "eng-woking", "Goldenberg, Philip"): "Liberal",
+    (date(1983, 6, 9), "wls-carmarthen", "Colin, J"): "Liberal",
+    (date(1987, 6, 11), "eng-bournemouth-east", "Millward, John"): "Liberal",
+    (date(1987, 6, 11), "eng-canterbury", "Purchese, John"): "Liberal",
+    (date(1987, 6, 11), "eng-christchurch", "McKenzie, HJ"): "Social Democratic",
+    (date(1987, 6, 11), "eng-croydon-south", "Morrison, I"): "Liberal",
+    (date(1987, 6, 11), "eng-dagenham", "Carter, John"): "Social Democratic",
+    (date(1987, 6, 11), "eng-gillingham", "Andrews, Leighton"): "Liberal",
+    (date(1987, 6, 11), "eng-hackney-north-and-stoke-newington", "Taylor, Simon"): "Liberal",
+    (date(1987, 6, 11), "eng-loughborough", "Fox, Roger"): "Social Democratic",
+    (date(1987, 6, 11), "eng-north-hertfordshire", "Binney, G"): "Liberal",
+    (date(1987, 6, 11), "eng-orpington", "Fryer, Jonathan"): "Liberal",
+    (date(1987, 6, 11), "eng-ravensbourne", "Campbell, G"): "Liberal",
+    (date(1987, 6, 11), "eng-reading-east", "Baring, Susan"): "Social Democratic",
+    (date(1987, 6, 11), "eng-richmond-and-barnes", "Watson, Alan"): "Liberal",
+    (date(1987, 6, 11), "eng-sevenoaks", "Jakobi, Stephen"): "Liberal",
+    (date(1987, 6, 11), "eng-sheffield-central", "Hornby, Fiona"): "Social Democratic",
+    (date(1987, 6, 11), "eng-swindon", "Scott, DJ"): "Social Democratic",
+    (date(1987, 6, 11), "eng-teignbridge", "Ryder, RD"): "Liberal",
+    (date(1987, 6, 11), "eng-woking", "Goldenberg, Philip"): "Liberal",
+    (date(1987, 6, 11), "wls-carmarthen", "Jones, Gwynoro"): "Social Democratic",
+}
+ALLIANCE_DAYS = {date(1983, 6, 9), date(1987, 6, 11)}
+ALLIANCE_NAME = "SDP–Liberal Alliance"
+ALLIANCE_TITLE = "SDP–Liberal Alliance"
+ALLIANCE_URL = "https://en.wikipedia.org/wiki/SDP%E2%80%93Liberal_Alliance"
+ALLIANCE_LABELS = {"Liberal", "Social Democratic", "SDP-Liberal Alliance"}
+CRAIG_TOTALS = {
+    date(
+        1832, 12, 8
+    ): "the Whigs 441 seats and 554,719 votes, the Tories 175 and 241,284, and the Repeal Association 42 and 31,773",
+    date(1852, 7, 7): "the Conservatives 330 seats and 311,481 votes and the Whigs 324 and 430,882",
+    date(
+        1857, 3, 27
+    ): "the Whigs 377 seats and 464,127 votes, the Conservatives 264 and 239,712, and the Independent Irish "
+    "13 and 12,099",
+    date(1865, 7, 11): "the Liberals 369 seats and 508,821 votes and the Conservatives 289 and 346,035, 854,856 in all",
+}
+CRAIG_NOTE = (
+    "Craig's British Parliamentary Election Results 1832–1885, as Wikipedia's article on this election cites it, gives "
+    "{totals}. The constituency results here agree with the Craig figures each constituency's Wikipedia article "
+    "cites; the national figures differ because Craig's national table groups and counts candidates its own way, so "
+    "the totals here are not forced to match it."
+)
+ELECTIONS_TITLE = "UK general election articles, 1832–1880"
+SAME_PERSON = {"eng-liverpool:temple-henry-john": ("wikidata", "Q193656")}
+COMPACT_DAY = date(1837, 7, 24)
+COMPACT_NAME = "Lichfield House compact"
+COMPACT_TITLE = "Lichfield House Compact"
+COMPACT_URL = "https://en.wikipedia.org/wiki/Lichfield_House_Compact"
 RELABELED = {
     (date(1950, 2, 23), "eng-widnes", "MacColl, James Eugene"): (
         "Labour",
@@ -350,8 +503,8 @@ RELABELED = {
     ),
 }
 ERAS = {
-    ("Liberal", 1992): "liberal-party-1989",
-    ("Social Democratic", 1983): "social-democratic-party-1981",
+    ("Liberal", 1989): "liberal-party-1989",
+    ("Social Democratic", 1981): "social-democratic-party-1981",
     ("Social Democratic", 1992): "social-democratic-party-1990",
     ("Communist", 1922): "communist-party-of-great-britain",
     ("Communist", 1992): "communist-party-of-britain",
@@ -362,6 +515,11 @@ ERAS = {
     ("Reform UK", 1997): "reform-uk-2001",
     ("Reform UK", 2018): "reform-uk",
     ("Scottish Unionist", 1986): "scottish-unionist-party",
+    ("Irish Nationalist", 1885): "irish-parliamentary",
+    ("Irish Nationalist", 1891): "irish-national-federation",
+    ("Irish Nationalist", 1900): "irish-parliamentary",
+    ("Irish Nationalist", 1919): "irish-nationalist",
+    ("Whig", 1974): "whig-1974",
 }
 NAMES = {
     "scottish-unionist": "Unionist Party (Scotland)",
@@ -412,6 +570,10 @@ DECLARED_CAVEAT = (
     "Umit's dataset marks no winners here. The candidates shown as elected are the members Wikidata records as "
     "returned for this seat at this election."
 )
+HANSARD_CAVEAT = (
+    "Umit's dataset leaves at least one seat here without a winner. The candidates shown as elected are the members "
+    "Parliament's Historic Hansard records as sitting for this seat from this election."
+)
 COUNTED = {("1929-05-30", "eng-combined-english-universities")}
 COUNTED_CAVEAT = (
     "Umit's dataset marks no winners here. The candidates shown as elected are those the House of Commons Library's "
@@ -435,6 +597,8 @@ def fetch() -> None:
     raw.fetch(SOURCE, LIBRARY, suffix=".xlsx")
     raw.fetch(SOURCE, REGISTER, suffix=".pdf")
     raw.fetch(SOURCE, REFORM, suffix=".pdf")
+    for _, _, url in PRINTED.values():
+        raw.fetch(SOURCE, url, suffix=".pdf")
 
 
 def library() -> pl.DataFrame:
@@ -474,6 +638,14 @@ def parse() -> None:
     frame = frame.with_columns(
         unit=pl.col("country").str.to_lowercase() + "-" + pl.col("constituency").map_elements(slug, pl.String)
     )
+    for (day, unit), (into, label) in SPLIT.items():
+        chosen = (pl.col("date_start") == day) & (pl.col("unit") == unit)
+        if frame.filter(chosen).height == 0:
+            raise ValueError(f"no {unit} rows on {day}")
+        frame = frame.with_columns(
+            unit=pl.when(chosen).then(pl.lit(into)).otherwise("unit"),
+            constituency=pl.when(chosen).then(pl.lit(label)).otherwise("constituency"),
+        )
     usual = frame.group_by("unit").agg(usual=pl.col("seats").drop_nulls().mode().max())
     usual = usual.with_columns(usual=pl.when(pl.col("unit").is_in(TWO_MEMBER)).then(2).otherwise("usual"))
     frame = (
@@ -494,6 +666,22 @@ def parse() -> None:
             )
             .otherwise("correction"),
             seats=pl.when(chosen).then(seats).otherwise("seats"),
+        )
+    frame = frame.with_columns(printed=pl.lit(None, pl.String))
+    for (day, unit, candidate), (votes, other, tag) in RECOUNTED.items():
+        chosen = (pl.col("date_start") == day) & (pl.col("unit") == unit) & (pl.col("candidate") == candidate)
+        found = frame.filter(chosen)["votes"].to_list()
+        if found not in ([votes], [other]):
+            raise ValueError(f"{candidate} in {unit} on {day} has {found} votes, neither {votes:,} nor {other:,}")
+        publisher, title, _ = PRINTED[tag]
+        given = (
+            "Umit's dataset" if found == [other] else "the House of Commons Library's constituency results (CBP-8647)"
+        )
+        frame = frame.with_columns(
+            votes=pl.when(chosen).then(votes).otherwise("votes"),
+            printed=pl.when(chosen)
+            .then(pl.lit(f"{publisher}, {title}, prints {votes:,} votes; {given} gives {other:,}."))
+            .otherwise("printed"),
         )
     if frame["seats"].is_null().any():
         raise ValueError("a constituency has no seat count in any election")
@@ -565,7 +753,8 @@ def parse() -> None:
         if frame.filter(chosen).height == 0:
             raise ValueError(f"{candidate} does not stand in {unit} from {first} to {last}")
         frame = frame.with_columns(
-            suffix=pl.when(chosen).then(pl.concat_str("suffix", pl.lit(mark))).otherwise("suffix")
+            suffix=pl.when(chosen).then(pl.concat_str("suffix", pl.lit(mark))).otherwise("suffix"),
+            member=pl.when(chosen).then("mp_id_mnis").otherwise("member"),
         )
     registers = library()
     found: dict[tuple[date, str], int] = {}
@@ -614,7 +803,9 @@ def parse() -> None:
             separator=" ",
             ignore_nulls=True,
         ),
-        revised=pl.col("correction").is_not_null() | pl.col("registered").is_not_null(),
+        revised=pl.col("correction").is_not_null()
+        | pl.col("registered").is_not_null()
+        | pl.col("printed").is_not_null().any().over("date_start", "unit"),
         electorate=pl.coalesce("registered", "electorate"),
         library=pl.col("registered").is_not_null(),
     ).with_columns(correction=pl.when(pl.col("correction") != "").then("correction"))
@@ -678,10 +869,20 @@ def parse() -> None:
         "correction",
         "revised",
         "library",
+        "printed",
     ).sort("date_start", "unit", pl.col("votes"), descending=[False, False, True]).write_parquet(
         PARSED / "results.parquet"
     )
     print(frame.group_by("status").agg(pl.col("unit").n_unique()).sort("status"))
+    short = (
+        frame.group_by("date_start", "unit")
+        .agg(pl.col("seats").first(), pl.col("elected").sum())
+        .group_by("date_start")
+        .agg(seats=pl.col("seats").sum(), elected=pl.col("elected").sum(), contests=pl.len())
+        .filter(pl.col("seats") != pl.col("elected"))
+        .sort("date_start")
+    )
+    print(f"general elections whose elected candidates differ from their seats: {short.rows()}")
     print(f"{frame.height} candidacies in {frame['date_start'].n_unique()} elections")
 
 
@@ -753,6 +954,67 @@ def emit() -> Path:
         )
         cs.artifact(raw.cached(SOURCE, RESULTS), source)
         cs.artifact(raw.cached(SOURCE, README), source)
+        articles = cs.source("Wikipedia", ARTICLES_TITLE)
+        cs.add(
+            "source",
+            id=articles,
+            kind="community",
+            publisher="Wikipedia",
+            title=ARTICLES_TITLE,
+            url="https://en.wikipedia.org/wiki/Category:Parliamentary_constituencies_in_the_United_Kingdom",
+            license="CC BY-SA 4.0",
+            license_url="https://creativecommons.org/licenses/by-sa/4.0/",
+            attribution="Party labels from Wikipedia's UK Parliament constituency articles, CC BY-SA 4.0.",
+            notes="Each article's election boxes cite Craig's British Parliamentary Election Results 1832–1885 or "
+            "Walker's Parliamentary Election Results in Ireland 1801–1922 for the candidates' parties.",
+        )
+        election_articles = cs.source("Wikipedia", ELECTIONS_TITLE)
+        cs.add(
+            "source",
+            id=election_articles,
+            kind="community",
+            publisher="Wikipedia",
+            title=ELECTIONS_TITLE,
+            url="https://en.wikipedia.org/wiki/List_of_United_Kingdom_general_elections",
+            license="CC BY-SA 4.0",
+            license_url="https://creativecommons.org/licenses/by-sa/4.0/",
+            notes="Each article's results table gives Craig's national seat and vote totals.",
+        )
+        alliance_source = cs.source("Wikipedia", ALLIANCE_TITLE)
+        cs.add(
+            "source",
+            id=alliance_source,
+            kind="community",
+            publisher="Wikipedia",
+            title=ALLIANCE_TITLE,
+            url=ALLIANCE_URL,
+            license="CC BY-SA 4.0",
+            license_url="https://creativecommons.org/licenses/by-sa/4.0/",
+            notes="The Liberal Party and the Social Democratic Party fought the 1983 and 1987 general elections as one "
+            "alliance, with one candidate from either party in each seat in Great Britain.",
+        )
+        retiring_slugs = {
+            path
+            for (path,) in conn.execute(
+                """select s.path from slug s join external_id x on x.entity_id = s.entity_id
+                   join entity e on e.id = s.entity_id and e.retired_by is null
+                   where x.scheme = 'gb.contest' and x.value = any(%s)""",
+                [[f"{day}:{unit}" for day, unit in SPLIT]],
+            ).fetchall()
+        }
+        compact_source = cs.source("Wikipedia", COMPACT_TITLE)
+        cs.add(
+            "source",
+            id=compact_source,
+            kind="community",
+            publisher="Wikipedia",
+            title=COMPACT_TITLE,
+            url=COMPACT_URL,
+            license="CC BY-SA 4.0",
+            license_url="https://creativecommons.org/licenses/by-sa/4.0/",
+            notes="The February 1835 agreement between the Whigs, Radicals, and O'Connell's Irish Repealers, after the "
+            "January 1835 general election, under which Repealers stood with Whig support in 1837.",
+        )
         commons_library = cs.source("House of Commons Library", LIBRARY_TITLE)
         cs.add(
             "source",
@@ -766,6 +1028,11 @@ def emit() -> Path:
             notes="Read through the Internet Archive's copy of the workbook, since the Library's file host refuses scripts.",
         )
         cs.artifact(raw.cached(SOURCE, LIBRARY), commons_library)
+        printed_sources = {}
+        for tag, (publisher, title, url) in PRINTED.items():
+            printed_sources[tag] = cs.source(publisher, title)
+            cs.add("source", id=printed_sources[tag], kind="official_body", publisher=publisher, title=title, url=url)
+            cs.artifact(raw.cached(SOURCE, url), printed_sources[tag])
 
         old = cs.area("gb.nation", "GBI")
         if old in cs.minted:
@@ -789,11 +1056,19 @@ def emit() -> Path:
         districts = {
             (fold(text), country, start): area
             for text, country, start, area in conn.execute(
-                """select n.text, p.code, lower(c.valid), a.id from area a
+                """select n.text, k.code, lower(c.valid), a.id from area a
                    join area_code c on c.area_id = a.id
                    join name n on n.entity_id = a.id and n.is_preferred
                    join area_parent ap on ap.area_id = a.id and ap.valid && c.valid
                    join area_code p on p.area_id = ap.parent_id
+                   join lateral (
+                       select coalesce(
+                           (select r.code from area_parent rp join area_code r on r.area_id = rp.parent_id
+                            where rp.area_id = ap.parent_id and p.code ~ '^E12' limit 1),
+                           p.code
+                       ) as code
+                   ) k on true
+                   join changeset x on x.id = a.changeset_id and x.pipeline <> 'gb.university_seats'
                    where a.scheme_code = 'gb.pcon' and lower(c.valid) is not null and c.code !~ '^[0-9]{4}:'"""
             ).fetchall()
         }
@@ -879,23 +1154,32 @@ def emit() -> Path:
                     )
             return parties[key]
 
+        universities = dict(
+            conn.execute(
+                """select c.code, a.id from area a join area_code c on c.area_id = a.id
+                   join changeset x on x.id = a.changeset_id and x.pipeline = 'gb.university_seats'
+                   where a.scheme_code = 'gb.pcon'"""
+            ).fetchall()
+        )
         units: dict[str, UUID] = {}
         for unit_code, country, label in (
             rows.sort("date_start").group_by("unit", maintain_order=True).agg(pl.col("country", "constituency").last())
         ).iter_rows():
             units[unit_code] = cs.unit("gb.pcon", unit_code)
-            if units[unit_code] in cs.minted:
+            minted = units[unit_code] in cs.minted
+            if minted or unit_code in universities:
                 cs.add(
                     "reporting_unit",
                     id=units[unit_code],
                     polity_id=gb,
                     scheme_code="gb.pcon",
                     code=unit_code,
-                    area_relation="within",
-                    area_id=countries[country],
+                    area_relation="equals" if unit_code in universities else "within",
+                    area_id=universities.get(unit_code, countries[country]),
                     kind="standard",
                     valid_from=None,
                 )
+            if minted:
                 name(units[unit_code], label)
 
         era = (
@@ -910,13 +1194,20 @@ def emit() -> Path:
         reformed = {
             (fold(text), country): area
             for text, country, area in conn.execute(
-                """select distinct on (n.text, p.code) n.text, p.code, a.id from area a
+                """select distinct on (n.text, k.code) n.text, k.code, a.id from area a
                    join area_code c on c.area_id = a.id
                    join name n on n.entity_id = a.id and n.is_preferred
                    join area_parent ap on ap.area_id = a.id
                    join area_code p on p.area_id = ap.parent_id
+                   join lateral (
+                       select coalesce(
+                           (select r.code from area_parent rp join area_code r on r.area_id = rp.parent_id
+                            where rp.area_id = ap.parent_id and p.code ~ '^E12' limit 1),
+                           p.code
+                       ) as code
+                   ) k on true
                    where a.scheme_code = 'gb.pcon' and lower(c.valid) is null
-                   order by n.text, p.code, a.id"""
+                   order by n.text, k.code, a.id"""
             ).fetchall()
         }
         plans = dict(conn.execute("select vintage, id from boundary_set where scheme_code = 'gb.pcon'").fetchall())
@@ -970,8 +1261,16 @@ def emit() -> Path:
 
         spans: dict[tuple[str, UUID], list[date]] = {}
         persons: dict[str, UUID] = {}
+        for identity, (scheme, value) in SAME_PERSON.items():
+            duplicate, into = cs.key(f"{SOURCE}.person", identity), cs.key(scheme, value)
+            if duplicate in cs.minted or into in cs.minted:
+                raise ValueError(f"{identity} or {scheme}:{value} is not in the database")
+            if conn.execute("select from entity_merge where entity_id = %s", [duplicate]).fetchone() is None:
+                cs.merge(duplicate, into)
+            persons[identity] = into
         restaged: set[UUID] = set()
         relabeled: set[tuple[date, str, str]] = set()
+        early_seen: set[tuple[date, str, str]] = set()
         for (start, end, label, year), held in rows.group_by(
             "date_start", "date_end", "election", "year", maintain_order=True
         ):
@@ -996,6 +1295,30 @@ def emit() -> Path:
                 for member in ("Conservative", "Ulster Unionist Party"):
                     cs.add("alliance_member", alliance_id=ucunf, party_id=party_of(member, year, "NIR"), role=None)
                 cs.add("citation", entity_id=ucunf, source_id=commons_library)
+            if start in CRAIG_TOTALS:
+                cs.add(
+                    "note",
+                    entity_id=election,
+                    kind="context",
+                    body_md=CRAIG_NOTE.format(totals=CRAIG_TOTALS[start]),
+                )
+                cs.add("citation", entity_id=election, source_id=election_articles)
+            compact = None
+            if start == COMPACT_DAY:
+                compact = cs.key(f"{SOURCE}.alliance", f"{start}:lichfield-house")
+                cs.add("alliance", id=compact, kind="electoral_alliance", election_id=election)
+                cs.add("name", entity_id=compact, text=COMPACT_NAME, lang="en", kind="official", is_preferred=True)
+                for member in ("Repeal Association", "Whig"):
+                    cs.add("alliance_member", alliance_id=compact, party_id=party_of(member, year, "IRL"), role=None)
+                cs.add("citation", entity_id=compact, source_id=compact_source)
+            alliance = None
+            if start in ALLIANCE_DAYS:
+                alliance = cs.key(f"{SOURCE}.alliance", f"{start}:sdp-liberal")
+                cs.add("alliance", id=alliance, kind="electoral_alliance", election_id=election)
+                cs.add("name", entity_id=alliance, text=ALLIANCE_NAME, lang="en", kind="official", is_preferred=True)
+                for member in ("Liberal", "Social Democratic"):
+                    cs.add("alliance_member", alliance_id=alliance, party_id=party_of(member, year, "ENG"), role=None)
+                cs.add("citation", entity_id=alliance, source_id=alliance_source)
             cs.add("slug", path=path, entity_id=election)
             for (unit_code,), lines in held.group_by("unit", maintain_order=True):
                 first = lines.row(0, named=True)
@@ -1016,7 +1339,9 @@ def emit() -> Path:
                 since = max((day for day in shaped if day <= start), default=None)
                 constituency = first["constituency"]
                 district = (
-                    reformed.get(
+                    universities[unit_code]
+                    if unit_code in universities
+                    else reformed.get(
                         (
                             fold(
                                 MISSPELLED.get(constituency, constituency).replace(
@@ -1049,8 +1374,10 @@ def emit() -> Path:
                     electoral_system_id=systems[system],
                     default_result_kind="tacit" if tacit else "counted",
                 )
-                name(contest, f"{label.removesuffix(' General Election')} general election in {first['constituency']}")
-                cs.add("slug", path=f"{path}/{slug(first['constituency'])}", entity_id=contest)
+                shown = MISSPELLED.get(constituency, constituency)
+                name(contest, f"{label.removesuffix(' General Election')} general election in {shown}")
+                if f"{path}/{slug(shown)}" not in retiring_slugs:
+                    cs.add("slug", path=f"{path}/{slug(shown)}", entity_id=contest)
                 notes = {
                     note
                     for note in set(lines["notes"].drop_nulls()) | set(lines["correction"].drop_nulls())
@@ -1084,6 +1411,8 @@ def emit() -> Path:
                 caveat = (
                     COUNTED_CAVEAT
                     if (str(start), unit_code) in COUNTED
+                    else HANSARD_CAVEAT
+                    if (str(start), unit_code) in HANSARD
                     else DECLARED_CAVEAT
                     if first["declared"]
                     else {
@@ -1188,8 +1517,21 @@ def emit() -> Path:
                     )
                     if relabel is not None:
                         relabeled.add((start, unit_code, line["candidate"]))
+                    early = ARTICLE_LABELS.get((start, unit_code, line["candidate"]))
+                    if early is None and line["party"] in EARLY_LABELS and year < EARLY_LABELS[line["party"]][1]:
+                        early = EARLY_LABELS[line["party"]][0]
+                    if early is not None:
+                        printed, relabel = (
+                            early,
+                            ARTICLES_NOTE.format(label=line["party"], basis=ARTICLES_BASIS if year < 1900 else ""),
+                        )
+                        early_seen.add((start, unit_code, line["candidate"]))
                     joint = ucunf if ucunf is not None and (unit_code, line["candidate"]) in UCUNF else None
-                    if joint is not None:
+                    if compact is not None and line["party"] == "Repeal Association and Whig":
+                        joint = compact
+                    if alliance is not None and line["party"] in ALLIANCE_LABELS and line["country"] != "NIR":
+                        joint = alliance
+                    if joint is not None and joint == ucunf:
                         printed, relabel, cited = None, UCUNF_NOTE, True
                         relabeled.add((start, unit_code, line["candidate"]))
                     party = party_of(printed, year, line["country"]) if printed is not None else None
@@ -1206,6 +1548,15 @@ def emit() -> Path:
                         cs.add("note", entity_id=option, kind="context", body_md=relabel)
                         if cited:
                             cs.add("citation", entity_id=option, source_id=commons_library)
+                        if early is not None:
+                            cs.add("citation", entity_id=option, source_id=articles)
+                    if line["printed"] is not None:
+                        cs.add("note", entity_id=option, kind="context", body_md=line["printed"])
+                        cs.add(
+                            "citation",
+                            entity_id=option,
+                            source_id=printed_sources[RECOUNTED[(start, unit_code, line["candidate"])][2]],
+                        )
                     cs.add(
                         "candidacy",
                         id=cs.key("gb.candidacy", option_key),
@@ -1230,6 +1581,8 @@ def emit() -> Path:
                         )
                     if line["elected"]:
                         cs.add("outcome", result_set_id=result_set, option_id=option, kind="elected")
+        if set(ARTICLE_LABELS) - early_seen:
+            raise ValueError(f"not in Umit's dataset: {set(ARTICLE_LABELS) - early_seen}")
         expected = set(RELABELED) | {(UCUNF_DAY, unit, candidate) for unit, candidate in UCUNF}
         if relabeled != expected:
             raise ValueError(f"not in Umit's dataset: {expected - relabeled}")
@@ -1241,6 +1594,42 @@ def emit() -> Path:
                 valid_from=min(held_on),
                 valid_to=following.get(max(held_on)),
             )
+        orphans = conn.execute(
+            """select o.id, array_remove(array_agg(y.id), null) from contest_option o
+               join changeset c on c.id = o.changeset_id and c.pipeline = %s
+               left join candidacy y on y.option_id = o.id
+               where o.contest_id = any(%s) and o.id <> all(%s)
+                 and not exists (select 1 from outcome t where t.option_id = o.id)
+                 and not exists (select 1 from result_value v where v.option_k = o.k)
+               group by o.id""",
+            [
+                SOURCE,
+                list({row["contest_id"] for row in cs.rows["contest_option"]}),
+                [row["id"] for row in cs.rows["contest_option"]],
+            ],
+        ).fetchall()
+        reason = "A candidate's identity key changed, so this emit writes their option afresh; this one has no votes."
+        for _, candidacies in orphans:
+            for candidacy in candidacies:
+                cs.add("entity_retirement", entity_id=candidacy, reason=reason)
+        for option, _ in orphans:
+            cs.add("entity_retirement", entity_id=option, reason=reason)
+        print(f"{len(orphans)} orphaned options retired")
+        for (contest,) in conn.execute(
+            """select x.entity_id from external_id x join entity e on e.id = x.entity_id and e.retired_by is null
+               where x.scheme = 'gb.contest' and x.value = any(%s)""",
+            [[f"{day}:{unit}" for day, unit in SPLIT]],
+        ).fetchall():
+            cs.add(
+                "entity_retirement",
+                entity_id=contest,
+                reason="Umit's dataset splits this election's East Sussex candidates under two spellings of the seat; "
+                "they are one contest.",
+            )
+        groups = conn.execute(NON_PARTY, [SOURCE]).fetchall()
+        for group, _ in groups:
+            cs.add("party", id=group, kind="independent_group", polity_id=gb)
+        print(f"{len(groups)} non-party labels marked independent_group: {', '.join(text for _, text in groups)}")
         for (placeholder,) in conn.execute(
             "select entity_id from external_id where scheme = 'gb.party' and value = 'no-label'"
         ).fetchall():
@@ -1265,4 +1654,7 @@ def emit() -> Path:
             )
             cs.artifact(raw.cached(SOURCE, REGISTER), register)
             cs.add("citation", entity_id=parties["scottish-unionist-party"], source_id=register)
+        voice = cs.key("gb.party", "blaenau-gwent-people-s-voice")
+        cs.merge(cs.key("gb.party", "peoples-voice"), voice)
+        cs.add("name", entity_id=voice, text="People's Voice", lang="en", kind="short", is_preferred=False)
         return cs.write()
