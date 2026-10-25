@@ -1301,7 +1301,7 @@ function polityMarkdown(
                 labels.get(row.party ?? "") ??
                 (row.isIndependent === true
                   ? m.person_parties_none()
-                  : series.isOffice
+                  : series.isOffice && point.winner != null
                     ? null
                     : m.record_none()),
               seats: row.seats,
@@ -1316,7 +1316,7 @@ function polityMarkdown(
                 ? point.path
                 : `${point.path}?in=${record.scope}`,
             ),
-            series.isOffice
+            series.isOffice && point.winner != null
               ? `${[
                   point.winner,
                   parties[0]?.label,

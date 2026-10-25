@@ -21,13 +21,9 @@
     new Map((record.data?.parties ?? []).map((party) => [party.id, party])),
   );
   const series = $derived(
-    (record.data?.series ?? [])
-      .filter((entry) => !entry.isAbroad && entry.points.length > 0)
-      .toSorted(
-        (a, b) =>
-          Number(b.isOffice) - Number(a.isOffice) ||
-          b.points.length - a.points.length,
-      ),
+    (record.data?.series ?? []).filter(
+      (entry) => !entry.isAbroad && entry.points.length > 0,
+    ),
   );
 </script>
 

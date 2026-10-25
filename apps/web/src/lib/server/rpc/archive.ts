@@ -12042,7 +12042,7 @@ export const polities = {
           ),
         ),
       ];
-      const [labels, slugs, colors, positions, homes, own, dated] =
+      const [labels, slugs, colors, positions, homes, own, dated, kinds] =
         await Promise.all([
           names([
             ...seats,
@@ -12085,7 +12085,12 @@ export const polities = {
             and not (lower_inf(n.valid) and upper_inf(n.valid))
             and exists (select from name p where p.entity_id = n.entity_id and p.kind in ('official', 'english') and p.is_preferred)
         `),
+          db.execute<{ id: string; rank: number | null }>(sql`
+          select id::text, array_position(array['head_of_state', 'head_of_government', 'governor', 'mayor'], kind::text) as rank
+          from office where id = any(${sql.param(seats)}::uuid[])
+        `),
         ]);
+      const ranks = new Map(kinds.rows.map((row) => [row.id, row.rank ?? 5]));
       const renamed = Map.groupBy(dated.rows, (row) => row.party);
       const lean = new Map(
         positions.rows.map((row) => [row.party_id, row.lean]),
@@ -12144,7 +12149,9 @@ export const polities = {
                     races: Math.max(...group.map((row) => row.races)),
                     filled,
                     share:
-                      group.length === 1 && first?.isOffice === true
+                      group.length === 1 &&
+                      first?.isOffice === true &&
+                      first.races === 1
                         ? first.share
                         : null,
                     winner:
@@ -12155,7 +12162,10 @@ export const polities = {
                       group.length === 1 && first?.decider != null
                         ? (slugs.get(first.decider) ?? null)
                         : null,
-                    isRunoff: group.length === 1 && first?.isRunoff === true,
+                    isRunoff:
+                      group.length === 1 &&
+                      first?.races === 1 &&
+                      first.isRunoff,
                     parties: group
                       .map((row) => ({
                         party: row.party,
@@ -12190,6 +12200,8 @@ export const polities = {
                     next.filled += point.filled;
                     next.share = null;
                     next.winner = null;
+                    next.contest = null;
+                    next.isRunoff = false;
                     const merged = new Map(
                       next.parties.map((entry) => [entry.party, entry.seats]),
                     );
@@ -12221,6 +12233,7 @@ export const polities = {
             (a, b) =>
               Number(a.isAbroad) - Number(b.isAbroad) ||
               Number(b.isOffice) - Number(a.isOffice) ||
+              (ranks.get(a.id) ?? 5) - (ranks.get(b.id) ?? 5) ||
               Math.max(...b.points.map((point) => point.filled)) -
                 Math.max(...a.points.map((point) => point.filled)),
           ),
