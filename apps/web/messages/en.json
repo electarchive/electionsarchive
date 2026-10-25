@@ -1585,6 +1585,7 @@
   "coverage_group_other": "Other local bodies",
   "coverage_expand": "Expand {name}",
   "coverage_collapse": "Collapse {name}",
+  "coverage_open": "Open the {name} page",
   "coverage_loading": "Loading",
   "coverage_country_title": "{name} coverage",
   "coverage_country_lede": "This shows how much of the election record the archive holds, measured against official counts of the elections that took place. Counts come directly from the database.",

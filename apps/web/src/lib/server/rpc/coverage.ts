@@ -302,7 +302,12 @@ export const coverage = {
     )
     .output(
       v.array(
-        v.object({ key: v.string(), label: v.nullable(v.string()), ...counts }),
+        v.object({
+          key: v.string(),
+          label: v.nullable(v.string()),
+          path: v.nullable(v.string()),
+          ...counts,
+        }),
       ),
     )
     .handler(async ({ input }) => {
@@ -312,13 +317,15 @@ export const coverage = {
         state == null ? "g.state" : level == null ? "g.level" : "g.year::text",
       );
       const found = await db.execute<
-        { key: string; label: string | null } & Counts
+        { key: string; label: string | null; path: string | null } & Counts
       >(sql`
         select r.*,
           case when ${state}::text is not null then null
             when ${input.polity} = 'us' then (select n.text from polity p join name n on n.entity_id = p.id and n.is_preferred
               where p.iso_code = 'US-' || r.key order by n.lang <> 'en', n.recorded_from desc, n.id limit 1)
-            else (select c.regions ->> r.key from coverage_polity c where c.polity = ${input.polity}) end as label
+            else (select c.regions ->> r.key from coverage_polity c where c.polity = ${input.polity}) end as label,
+          case when ${state}::text is null then (select s.path from polity p join slug s on s.entity_id = p.id and s.is_current
+            where p.iso_code = upper(${input.polity}) || '-' || r.key limit 1) end as path
         from (
           select ${key} as key, ${SUMS} from coverage_goal g
           where g.polity = ${input.polity} and g.goal = ${input.goal}

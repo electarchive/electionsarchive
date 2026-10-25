@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { resolve } from "$app/paths";
+  import ArrowUpRightIcon from "@lucide/svelte/icons/arrow-up-right";
   import ChevronRightIcon from "@lucide/svelte/icons/chevron-right";
   import { createQuery } from "@tanstack/svelte-query";
   import { SvelteSet } from "svelte/reactivity";
@@ -26,7 +28,9 @@
     goal: Goal;
     order: "gap" | "name";
     current: boolean;
-    rows?: Array<Counts & { key: string; label: string | null }> | null;
+    rows?: Array<
+      Counts & { key: string; label: string | null; path: string | null }
+    > | null;
     place?: string | null;
     level?: string | null;
     start?: number;
@@ -114,6 +118,14 @@
           />
           <span class="truncate">{name}</span>
         </button>
+        {#if row.path != null}
+          <a
+            class="flex shrink-0 items-center justify-center rounded-xs text-muted-foreground block-6 inline-6 hover:text-foreground focus-visible:outline-2 focus-visible:outline-ring pointer-coarse:block-9 pointer-coarse:inline-9"
+            href={resolve("/[...path]", { path: row.path })}
+            aria-label={m.coverage_open({ name })}
+            ><ArrowUpRightIcon class="block-3.5 inline-3.5" /></a
+          >
+        {/if}
       {:else}
         <span class="truncate">{name}</span>
       {/if}

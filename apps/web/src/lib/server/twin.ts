@@ -606,8 +606,11 @@ function countryMarkdown(
             data.gaps.map((row) => [
               data.isFlat
                 ? levelLabel(data.polity, row.key)
-                : (row.label ??
-                  (row.key === "" ? m.coverage_region_none() : row.key)),
+                : link(
+                    row.label ??
+                      (row.key === "" ? m.coverage_region_none() : row.key),
+                    row.path,
+                  ),
               count(row.total - row.complete),
               share(row),
             ]),
