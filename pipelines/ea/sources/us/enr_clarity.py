@@ -681,7 +681,7 @@ def parse(
     checked = (
         totals.join(counted, on=["county", "election", "contest", "choice"], how="left")
         .group_by("county", "election", "contest")
-        .agg((pl.col("votes") == pl.col("counted")).all().alias("balanced"))
+        .agg((pl.col("votes") == pl.col("counted")).fill_null(False).all().alias("balanced"))
     )
     table = table.join(checked, on=["county", "election", "contest"], how="left")
     base = pl.concat_str(
