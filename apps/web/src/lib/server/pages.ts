@@ -690,22 +690,24 @@ export async function archive(path: string, search: URLSearchParams) {
     if (place != null && scope == null) {
       error(404);
     }
-    const [election, governments, regions, tiers, cycle] = await found(
-      Promise.all([
-        call(router.elections.get, { ...input, within: scope?.id }),
-        call(router.elections.governments, input),
-        call(router.elections.regions, input),
-        call(router.elections.tiers, input),
-        call(router.elections.cycle, input),
-      ]),
-    );
+    const [election, governments, regions, tiers, cycle, alongside] =
+      await found(
+        Promise.all([
+          call(router.elections.get, { ...input, within: scope?.id }),
+          call(router.elections.governments, input),
+          call(router.elections.regions, input),
+          call(router.elections.tiers, input),
+          call(router.elections.cycle, input),
+          call(router.elections.alongside, input),
+        ]),
+      );
     return {
       kind: "election" as const,
       id: slug.entity_id,
       scope,
       election,
       cycle,
-      sections: { governments, regions, tiers },
+      sections: { governments, regions, tiers, alongside },
       within,
     };
   }

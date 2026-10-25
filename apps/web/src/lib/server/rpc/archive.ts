@@ -10420,6 +10420,170 @@ export const elections = {
         })),
       };
     }),
+  alongside: os
+    .meta(
+      openapi({
+        method: "GET",
+        path: "/elections/{id}/alongside",
+        summary:
+          "List the contests other governments held the same day across a local election's territory",
+      }),
+    )
+    .input(v.object({ id: v.pipe(v.string(), v.uuid()) }))
+    .output(
+      v.array(
+        v.object({
+          name: v.string(),
+          path: v.nullable(v.string()),
+          contests: v.array(
+            v.object({
+              name: v.string(),
+              path: v.nullable(v.string()),
+              leader: v.nullable(v.string()),
+              share: v.nullable(v.number()),
+              isWon: v.boolean(),
+            }),
+          ),
+        }),
+      ),
+    )
+    .handler(async ({ input }) => {
+      const found = await db.execute<{
+        id: string;
+        election: string;
+        polity: string;
+        date: string;
+        overlap: number;
+        person: string | null;
+        answer: string | null;
+        share: number | null;
+        isWon: boolean | null;
+      }>(sql`
+        with me as materialized (
+          select e.id, e.date_from, e.polity_id, g.geom
+          from election e
+          join polity p on p.id = e.polity_id and p.kind in ('municipality', 'submunicipal', 'school_district', 'special_district')
+          join polity_territory pt on pt.polity_id = e.polity_id and pt.valid @> e.date_from
+          join area_geometry g on g.area_id = pt.area_id and g.valid @> e.date_from
+          where e.id = ${input.id}::uuid
+          limit 1
+        ),
+        day as materialized (
+          select o.id, o.polity_id, pt.area_id
+          from me
+          join election o on o.date_from = me.date_from and o.id <> me.id and o.polity_id <> me.polity_id and o.status::text <> 'annulled'
+          join polity_territory pt on pt.polity_id = o.polity_id and pt.valid @> o.date_from
+        ),
+        hit as materialized (
+          select d.id, d.polity_id, d.area_id, x.overlap
+          from day d cross join me
+          join area_geometry g on g.area_id = d.area_id and g.valid @> me.date_from and g.geom && me.geom
+          cross join lateral (
+            select case when st_covers(g.geom, me.geom) then 1
+              else st_area(st_intersection(g.geom, me.geom)) / nullif(least(st_area(g.geom), st_area(me.geom)), 0) end as overlap
+          ) x
+          where x.overlap >= 0.02
+        )
+        select c.id, h.id as election, h.polity_id as polity, me.date_from::text as date, h.overlap,
+          top.person, top.answer, top.share, top.won as "isWon"
+        from hit h cross join me
+        join contest c on c.election_id = h.id and c.allocation_parent_id is null and not c.notional
+        left join lateral (
+          select coalesce(m.into_id, cy.person_id) as person, o.ballot_label as answer, t.value / nullif(t.total, 0) as share,
+            exists (
+              select from outcome x join result_set xs on xs.id = x.result_set_id and ${latest("xs")}
+              where x.option_id = o.id and x.kind in ('elected', 'won') and x.candidacy_id is null
+            ) as won
+          from area a
+          join result_set rs on rs.contest_id = c.id and ${latest("rs")}
+          cross join lateral (
+            select y.option_k, y.value::float8 as value, sum(y.value) over ()::float8 as total
+            from result_rollup y
+            where y.result_set_k = rs.k and y.area_k = a.k and y.measure = 1 and y.channel = 0 and y.option_k <> 0
+              and y.count_round = (
+                select max(z.count_round) from result_rollup z
+                where z.result_set_k = rs.k and z.area_k = a.k and z.measure = 1 offset 0
+              )
+            offset 0
+          ) t
+          join contest_option o on o.k = t.option_k
+          left join candidacy cy on cy.option_id = o.id and cy.role = 'head'
+          left join entity_merge m on m.entity_id = cy.person_id
+          where a.id = coalesce(c.district_area_id, h.area_id)
+          order by t.value desc limit 1
+        ) top on true
+        where c.district_area_id is null
+          or not exists (select from area_geometry dg where dg.area_id = c.district_area_id)
+          or exists (
+            select from area_geometry dg
+            where dg.area_id = c.district_area_id and dg.valid @> me.date_from and dg.geom && me.geom
+              and (st_covers(dg.geom, me.geom)
+                or st_area(st_intersection(dg.geom, me.geom)) / nullif(least(st_area(dg.geom), st_area(me.geom)), 0) >= 0.02)
+          )
+      `);
+      const day = found.rows[0]?.date ?? null;
+      const [labels, links] = await Promise.all([
+        names(
+          found.rows.flatMap((row) =>
+            [row.id, row.polity, row.person].filter((id) => id != null),
+          ),
+          day,
+        ),
+        paths(found.rows.flatMap((row) => [row.id, row.election])),
+      ]);
+      const groups = new Map<
+        string,
+        {
+          overlap: number;
+          name: string;
+          path: string | null;
+          contests: Array<{
+            name: string;
+            path: string | null;
+            leader: string | null;
+            share: number | null;
+            isWon: boolean;
+          }>;
+        }
+      >();
+      for (const row of found.rows) {
+        const group = groups.get(row.election) ?? {
+          overlap: row.overlap,
+          name: labels.full.get(row.polity) ?? "",
+          path: links.get(row.election) ?? null,
+          contests: [],
+        };
+        let name = (labels.full.get(row.id) ?? "").replace(/^\d{4} /u, "");
+        while (
+          group.name !== "" &&
+          name.startsWith(group.name) &&
+          /^[:,]? ./u.test(name.slice(group.name.length))
+        ) {
+          name = name.slice(group.name.length).replace(/^[:,]? /u, "");
+        }
+        group.contests.push({
+          name: name.charAt(0).toUpperCase() + name.slice(1),
+          path: links.get(row.id) ?? null,
+          leader:
+            (row.person == null ? null : labels.full.get(row.person)) ??
+            row.answer,
+          share: row.share,
+          isWon: row.isWon === true,
+        });
+        groups.set(row.election, group);
+      }
+      return [...groups.values()]
+        .toSorted(
+          (a, b) => b.overlap - a.overlap || a.name.localeCompare(b.name),
+        )
+        .map((group) => ({
+          name: group.name,
+          path: group.path,
+          contests: group.contests.toSorted((a, b) =>
+            a.name.localeCompare(b.name, undefined, { numeric: true }),
+          ),
+        }));
+    }),
   regional: os
     .meta(
       openapi({

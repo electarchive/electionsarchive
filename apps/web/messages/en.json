@@ -625,6 +625,8 @@
   "wards_led": "Led with {share}",
   "wards_round_runoff": "{date} runoff",
   "wards_round_general": "{date} general election",
+  "alongside_title": "Also on the ballot",
+  "alongside_lede": "Contests held the same day by other governments that cover all or part of this area.",
   "col_holder": "Holder",
   "col_since": "Since",
   "polity_largest_cities": "Largest cities",

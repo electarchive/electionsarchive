@@ -1669,7 +1669,11 @@ function councilsMarkdown(
 
 function electionMarkdown(
   election: Extract<Data, { kind: "election" }>["election"],
-  { governments, regions }: Extract<Data, { kind: "election" }>["sections"],
+  {
+    governments,
+    regions,
+    alongside,
+  }: Extract<Data, { kind: "election" }>["sections"],
   byes: Extract<Data, { kind: "election" }>["byes"],
   link: Link,
 ) {
@@ -2283,6 +2287,23 @@ function electionMarkdown(
               ];
             }),
           ),
+        ]),
+    ...(alongside.length === 0
+      ? []
+      : [
+          `## ${m.alongside_title()}`,
+          m.alongside_lede(),
+          ...alongside.flatMap((group) => [
+            `### ${link(group.name, group.path)}`,
+            table(
+              [m.col_name(), m.col_leader(), m.col_share()],
+              group.contests.map((contest) => [
+                link(contest.name, contest.path),
+                contest.leader,
+                contest.share == null ? null : percent(contest.share),
+              ]),
+            ),
+          ]),
         ]),
     ...regions.flatMap((chamber) => {
       const info = new Map(chamber.parties.map((party) => [party.id, party]));

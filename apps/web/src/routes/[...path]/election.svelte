@@ -24,6 +24,7 @@
   import { orpc } from "#lib/rpc.js";
   import { cn } from "#lib/utils.js";
   import type { PageData } from "./$types";
+  import Alongside from "./alongside.svelte";
   import ByElections from "./byelections.svelte";
   import Cycle from "./cycle.svelte";
   import Electors from "./electors.svelte";
@@ -72,6 +73,10 @@
     client.setQueryData(
       orpc.elections.tiers.queryKey({ input: { id } }),
       sections.tiers,
+    );
+    client.setQueryData(
+      orpc.elections.alongside.queryKey({ input: { id } }),
+      sections.alongside,
     );
   });
 
@@ -1849,6 +1854,7 @@
 />
 
 {#if scope == null}
+  <Alongside {id} />
   <Governments {id} {chamber} />
   <Regions {id} />
 {/if}
