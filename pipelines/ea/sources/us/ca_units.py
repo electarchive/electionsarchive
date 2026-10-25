@@ -6,7 +6,7 @@ from ea.changeset import Changeset
 from ea.store import connect
 
 SOURCE = "us.ca_units"
-VERSION = "3"
+VERSION = "4"
 
 
 def emit() -> Path:
@@ -24,14 +24,15 @@ def emit() -> Path:
                    where a.scheme_code = 'us.precinct' and c.code ~ '^[0-9-]{10}:CA:[0-9]{5}:[^:]+$'"""
             ).fetchall()
         )
-        yearly: dict[str, list[str]] = {}
-        for code, area in conn.execute(
-            """select s.code, x.area_id::text from reporting_unit s
-               join reporting_unit_area x on x.unit_id = s.id
-               join area a on a.id = x.area_id and a.scheme_code = 'us.precinct'
-               where s.scheme_code = 'us.precinct' and s.code ~ '^[0-9]{4}:CA:[0-9]{5}:[^:]+:[^:]+$'"""
-        ).fetchall():
-            yearly.setdefault(code, []).append(area)
+        yearly: dict[str, list[str]] = {
+            code: [area]
+            for code, area in conn.execute(
+                """select s.code, s.area_id::text from reporting_unit s
+                   join area a on a.id = s.area_id and a.scheme_code = 'us.precinct'
+                   where s.scheme_code = 'us.precinct' and s.area_relation = 'equals'
+                     and s.code ~ '^[0-9]{4}:CA:[0-9]{5}:[^:]+:[^:]+$'"""
+            ).fetchall()
+        }
         rows = []
         unplaced = 0
         for unit, code, start, end in conn.execute(
