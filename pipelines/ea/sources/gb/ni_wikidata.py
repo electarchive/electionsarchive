@@ -39,6 +39,8 @@ def emit() -> Path:
         start = binding.get("start", {}).get("value", "")[:10]
         if not start[:1].isdigit():
             continue
+        if date.fromisoformat(start) < ELECTIONS[0]:
+            continue
         item = binding["item"]["value"].rsplit("/", 1)[1]
         labels[item] = binding.get("name", {}).get("value", item)
         term = max(election for election in ELECTIONS if election <= date.fromisoformat(start))
