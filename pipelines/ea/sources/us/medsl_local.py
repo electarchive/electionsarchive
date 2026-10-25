@@ -20,8 +20,18 @@ from ea.sources.us.medsl_state import DROPPED, EXPANDED, INDEPENDENT, NATIONAL, 
 from ea.store import DATA, connect
 
 SOURCE = "us.medsl_local"
-VERSION = "7"
+VERSION = "8"
 PARSED = DATA / "parsed" / SOURCE
+ABBREVIATED = {
+    "DAD": {"MIA": "MIAMI"},
+    "CIT": {"CR": "CRYSTAL RIVER", "INV": "INVERNESS"},
+    "POL": {"HC": "HAINES CITY", "LW": "LAKE WALES", "BT": "BARTOW", "FM": "FORT MEADE"},
+    "VOL": {"NSB": "NEW SMYRNA BEACH", "DBS": "DAYTONA BEACH SHORES", "LH": "LAKE HELEN"},
+    "CLA": {"GCS": "GREEN COVE SPRINGS", "KH": "KEYSTONE HEIGHTS"},
+    "OKA": {"FW": "FORT WALTON BEACH", "NV": "NICEVILLE"},
+    "MON": {"KW": "KEY WEST"},
+    "MAN": {"HB": "HOLMES BEACH"},
+}
 LISTING = "https://dataverse.harvard.edu/api/datasets/:persistentId/?persistentId=doi:10.7910/DVN/NYTPDU"
 LISTING2022 = "https://dataverse.harvard.edu/api/datasets/:persistentId/?persistentId=doi:10.7910/DVN/UYQIEP"
 LISTING2020 = "https://dataverse.harvard.edu/api/datasets/:persistentId/?persistentId=doi:10.7910/DVN/NT66Z3"
@@ -976,6 +986,17 @@ def parse() -> None:
             (pl.col("county") != "DUV") | ~pl.col("election").is_in(list(JACKSONVILLE)),
         )
         .with_columns(party=pl.col("party").str.to_uppercase().fill_null(""))
+        .with_columns(
+            contest=pl.concat_str("county", pl.lit("|"), "contest")
+            .str.replace_many(
+                {
+                    f"{county}|{short} ": f"{county}|{long} "
+                    for county, places in ABBREVIATED.items()
+                    for short, long in places.items()
+                }
+            )
+            .str.replace(r"^[^|]*\|", "")
+        )
         .filter(
             ~pl.col("title").str.contains("(?i)primary")
             | pl.col("party").is_in(["", "NOP", "NON", "NP", "NPA"]).all().over("county", "election", "contest")
