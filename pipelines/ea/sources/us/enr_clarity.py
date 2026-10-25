@@ -357,9 +357,13 @@ def fetch() -> None:
             print(f"{tenant}: {status}")
             continue
         fetched = skipped = 0
-        for listed in json.loads(body):
-            day = datetime.strptime(listed["Date"].split()[0], "%m/%d/%Y").date()
-            election = listed["EID"]
+        listings = [
+            (datetime.strptime(listed["Date"].split()[0], "%m/%d/%Y").date(), listed["EID"])
+            for listed in json.loads(body)
+        ]
+        for token in re.findall(r"eids=([\d,]+)", row["evidence"]):
+            listings += [(date.min, eid) for eid in token.split(",") if eid not in {eid for _, eid in listings}]
+        for day, election in listings:
             if day > cutoff:
                 skipped += 1
                 continue
