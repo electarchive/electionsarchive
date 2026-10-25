@@ -14094,9 +14094,14 @@ export const people = {
         .map((entry) => ({
           entry: {
             ...entry,
-            ballots: entry.ballots.toSorted((a, b) =>
-              a.date.localeCompare(b.date),
-            ),
+            ballots: entry.ballots
+              .map((ballot) =>
+                ballot.how === "nominated" &&
+                entry.ballots.some((other) => other.how === "line")
+                  ? { ...ballot, how: "line" as const }
+                  : ballot,
+              )
+              .toSorted((a, b) => a.date.localeCompare(b.date)),
           },
           start:
             [
