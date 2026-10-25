@@ -15,7 +15,7 @@ from ea.sources.us import elstats, elstats_local, medsl, medsl_local, nc_local, 
 from ea.store import DATA, connect
 
 SOURCE = "us.city_precincts"
-VERSION = "2"
+VERSION = "3"
 PARSED = DATA / "parsed" / SOURCE
 OFFICE = r"MAYOR|COUNCIL|ALDER|WARD|COMMISSION|SELECT|CITY|TOWN|VILLAGE|BOROUGH|TRUSTEE"
 SUFFIXES = {"jr", "sr", "ii", "iii", "iv", "junior", "senior"}
@@ -599,7 +599,7 @@ def emit() -> Path:
         )
         days = sorted(set(rows["day"]))
         contests = conn.execute(
-            """select distinct on (k.id) k.id, k.election_id, e.date_from, left(m.place, 2), rs.stage, rs.kind,
+            """select distinct on (k.id) k.id, k.election_id, e.date_from, left(m.place, 2), rs.stage, rs.kind, a.id, a.scheme_code,
                       (select min(v.count_round) from result_value v where v.result_set_k = rs.k and v.measure = 1)
                from contest k join election e on e.id = k.election_id
                join area a on a.id = k.district_area_id join area_code c on c.area_id = a.id
@@ -746,9 +746,10 @@ def emit() -> Path:
                     if len(word) > 1 and word not in SUFFIXES:
                         index.setdefault((day, state), {}).setdefault(word, set()).add(candidate)
         taken: set[str] = set()
+        memberships: list[tuple[str, str, date, date, str]] = []
         values: list[pl.DataFrame] = []
         report: dict[str, int] = {}
-        for contest, election, day, statefips, stage, kind, first in contests:
+        for contest, election, day, statefips, stage, kind, district, district_scheme, first in contests:
             state = fips.get(statefips)
             lines = groups.get((day, state))
             if contest in filled or lines is None or state is None or first is None:
@@ -861,6 +862,19 @@ def emit() -> Path:
                         valid_from=day,
                         valid_to=day + timedelta(days=1),
                     )
+            if origin == "clarity" and district_scheme == "us.place":
+                held = {
+                    unit
+                    for (unit,) in conn.execute(
+                        "select unit_id::text from reporting_unit_area where area_id = %s and valid_from <= %s and valid_to > %s",
+                        [district, day, day],
+                    ).fetchall()
+                }
+                memberships.extend(
+                    (str(units[code]), str(district), day, day + timedelta(days=1), "contest")
+                    for code in mine
+                    if str(units[code]) not in held
+                )
             values.append(
                 race.filter((pl.col("measure") != 1) | pl.col("candidate").is_in(list(picked)))
                 .select(
@@ -889,5 +903,20 @@ def emit() -> Path:
             )
         if values:
             cs.frame("result_value", pl.concat(values))
+        if memberships:
+            cs.frame(
+                "reporting_unit_area",
+                pl.DataFrame(
+                    memberships,
+                    schema={
+                        "unit_id": pl.String,
+                        "area_id": pl.String,
+                        "valid_from": pl.Date,
+                        "valid_to": pl.Date,
+                        "method": pl.String,
+                    },
+                    orient="row",
+                ),
+            )
         print(report)
         return cs.write()
