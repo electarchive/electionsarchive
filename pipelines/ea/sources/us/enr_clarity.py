@@ -1582,8 +1582,16 @@ def emit(
                             kind="standard",
                         )
                 post = None
-                if first["body"] and seat and re.fullmatch(r"(?:Place|Position) \d+", seat):
-                    post = cs.key("us.seat", f"{owner}:{seat}")
+                heading = str(first["text"]).upper()
+                label = (
+                    f"At-Large {mark[1]}"
+                    if (mark := re.search(r"\bAT[ -]?LARGE\b\D{0,20}?(\d{1,2})\b", heading))
+                    else f"Post {mark[1]}"
+                    if (mark := re.search(r"\bPOST\b ?(?:NO\b\.? ?|NUMBER ?|#)?(\d{1,2})\b", heading))
+                    else seat
+                )
+                if first["body"] and label and re.fullmatch(r"(?:Place|Position|At-Large|Post) \d+", label):
+                    post = cs.key("us.seat", f"{owner}:{label}")
                     if post in cs.minted and post not in seats:
                         seats.add(post)
                         cs.add(
@@ -1592,7 +1600,7 @@ def emit(
                             body_id=owner,
                             district_area_id=None,
                             apportioned_area_id=whole_area,
-                            label=seat,
+                            label=label,
                         )
                 magnitude = int(first["magnitude"]) or None
                 cs.add(
