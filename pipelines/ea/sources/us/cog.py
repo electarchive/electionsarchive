@@ -9,7 +9,7 @@ import fastexcel
 import polars as pl
 
 from ea import raw
-from ea.coverage_tables import PREFIX, tokens
+from ea.coverage_tables import COLLEGE, PREFIX, tokens
 from ea.store import DATA
 
 SOURCE = "us.cog"
@@ -138,7 +138,6 @@ GENERIC = {
     "CREATED",
     "UNDER",
 } | {word.upper() for state in STATES for word in state.split()}
-COLLEGE = re.compile(r"COLLEGE|CMTY COL|TECHNICAL|JUNIOR|UNIVERSITY", re.IGNORECASE)
 COUNTS = {"county": 3031, "municipality": 19491, "township": 16214, "special": 39555, "school": 12546}
 
 
@@ -325,7 +324,7 @@ def parse() -> None:
         .select("id", "name", "state_fips", "county_fips")
         .iter_rows()
     ):
-        if gid in figures and not COLLEGE.search(name):
+        if gid in figures and not (COLLEGE.search(name) or "TECHNICAL" in name):
             covered[(st, county)] += figures[gid][0]
     sharing: dict[tuple[str, str, str, str | None, str], list[str]] = defaultdict(list)
     for gid, kind, name, st, county in (
@@ -346,7 +345,9 @@ def parse() -> None:
             key=lambda pair: len(pair[0]),
             default=None,
         )
-        group = "special" if kind == "special" else "college" if COLLEGE.search(name) else "school"
+        group = (
+            "special" if kind == "special" else "college" if COLLEGE.search(name) or "TECHNICAL" in name else "school"
+        )
         if place is not None:
             sharing[("place", st, county, place[0], group)].append(gid)
             figures[gid] = (place[1], "place")

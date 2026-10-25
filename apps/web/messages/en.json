@@ -1600,6 +1600,7 @@
   "coverage_group_municipality": "Municipalities",
   "coverage_group_township": "Townships and towns",
   "coverage_group_school": "School districts",
+  "coverage_group_college": "College districts",
   "coverage_group_special": "Special districts",
   "coverage_group_other": "Other local bodies",
   "coverage_expand": "Expand {name}",

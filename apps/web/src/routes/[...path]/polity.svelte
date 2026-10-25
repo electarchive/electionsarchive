@@ -71,6 +71,7 @@
     municipality: m.coverage_group_municipality,
     township: m.coverage_group_township,
     school: m.coverage_group_school,
+    college: m.coverage_group_college,
     special: m.coverage_group_special,
     other: m.coverage_group_other,
   };

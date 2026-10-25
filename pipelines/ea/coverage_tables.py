@@ -709,6 +709,7 @@ PREFIX = re.compile(
     r"^((?:CHARTER )?TOWNSHIP|CITY AND COUNTY|CITY|TOWN|VILLAGE|BOROUGH|COUNTY|PLANTATION|"
     r"(?:METRO|METROPOLITAN|UNIFIED|CONSOLIDATED) GOVERNMENT) OF (.+)$"
 )
+COLLEGE = re.compile(r"COLLEGE|CMTY COL|JUNIOR COL|UNIVERSITY", re.IGNORECASE)
 
 LOCAL_SQL = """
 create temp table lc as
@@ -1053,7 +1054,9 @@ def build() -> str:
                 "id": gid,
                 "state": states[st][0],
                 "county": None if county is None else st + county,
-                "kind": {"dependent_school": "school"}.get(kind, kind),
+                "kind": "college"
+                if kind in ("school", "dependent_school") and COLLEGE.search(name)
+                else {"dependent_school": "school"}.get(kind, kind),
                 "name": polities[pid][2]
                 if pid is not None
                 else " ".join(
@@ -1084,6 +1087,8 @@ def build() -> str:
                 "county": None,
                 "kind": "township"
                 if prefix == "town" and kind == "municipality"
+                else "college"
+                if kind == "school_district" and COLLEGE.search(name)
                 else {"county": "county", "municipality": "municipality", "school_district": "school"}.get(
                     kind, "special" if kind == "special_district" else "other"
                 ),
@@ -1130,7 +1135,10 @@ def build() -> str:
         group = (g["state"], g["kind"])
         if g["period"] is None:
             period, phase, cite = CALENDAR.get(
-                (g["state"], g["function"] or ""), CALENDAR.get(group, (None, None, None))
+                (g["state"], g["function"] or ""),
+                CALENDAR.get(group, CALENDAR.get((g["state"], "school"), (None, None, None)))
+                if g["kind"] == "college"
+                else CALENDAR.get(group, (None, None, None)),
             )
             common = [p for p, _ in patterns[group].most_common() if period is None or p[0] == period]
             if g["phase"] is not None:

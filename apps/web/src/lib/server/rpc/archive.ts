@@ -11359,7 +11359,7 @@ export const polities = {
             where p.id = ${input.id}::uuid and p.iso_code like 'US-%' and g.goal = 'local' and g.polity = 'us'
               and g.year < extract(year from current_date)
             group by g.level
-            order by array_position(array['county', 'municipality', 'township', 'school', 'special', 'other'], g.level)
+            order by array_position(array['county', 'municipality', 'township', 'school', 'college', 'special', 'other'], g.level)
           `),
       ]);
       const newest = mapped.rows[0]?.date;
