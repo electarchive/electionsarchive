@@ -233,7 +233,12 @@ NY_COUNTY_OFFICES = (
 )
 NY_MUNI_OFFICES = (
     (r"(?:TOWN |VILLAGE )?JUSTICE", "justice", "Justice", False),
-    (r"(?:CHIEF )?(?:JUDGE OF THE )?(?:CITY )?COURT JUDGE|CHIEF JUDGE OF THE (?:CITY )?COURT|CITY JUDGE|CITY COURT", "city-court", "Judge, City Court", False),
+    (
+        r"(?:CHIEF )?(?:JUDGE OF THE )?(?:CITY )?COURT JUDGE|CHIEF JUDGE OF THE (?:CITY )?COURT|CITY JUDGE|CITY COURT",
+        "city-court",
+        "Judge, City Court",
+        False,
+    ),
     (
         r"(?:TOWN )?SUPT\.? OF HIGHWAYS?|(?:TOWN )?SUPERINTENDENT OF HIGHWAYS?|HIGHWAY SUPERINTENDENT|HIGHWAY SUPT",
         "highway-superintendent",
@@ -250,7 +255,12 @@ NY_MUNI_OFFICES = (
     (r"(?:CITY )?TREASURER", "treasurer", "Treasurer", False),
     (r"(?:CHIEF )?(?:CITY )?AUDITOR", "auditor", "Auditor", False),
     (r"TRUSTEES?", "board-of-trustees", "Board of Trustees", True),
-    (r"(?:COMMON |CITY |TOWN )?COUNCILM[AE]N|COUNCILWOMAN|(?:COMMON |CITY |TOWN )?COUNCIL ?MEMBERS?|COUNCILPERSON|ALDERM\w+|TOWN BOARD|COMMON COUNCIL|COUNCIL", "council", "Council", True),
+    (
+        r"(?:COMMON |CITY |TOWN )?COUNCILM[AE]N|COUNCILWOMAN|(?:COMMON |CITY |TOWN )?COUNCIL ?MEMBERS?|COUNCILPERSON|ALDERM\w+|TOWN BOARD|COMMON COUNCIL|COUNCIL",
+        "council",
+        "Council",
+        True,
+    ),
 )
 SPECIALS = (
     (r"MUNICIPAL UTILITY DISTRICT|\bM ?U ?D\b", "utility", "Municipal Utility District"),
@@ -898,7 +908,9 @@ def _classify(
                     "scheme": "us.school_district",
                     "code": code,
                     "key": "board-of-education",
-                    "office": {"TX": "Board of Trustees", "NY": "Board of Education"}.get(st, "Board of School Directors"),
+                    "office": {"TX": "Board of Trustees", "NY": "Board of Education"}.get(
+                        st, "Board of School Directors"
+                    ),
                     "body": True,
                     "seat": seat,
                     "label": label,
@@ -1028,7 +1040,9 @@ def _classify(
         found_seat = f"{'Ward' if st == 'PA' else 'Place'} {int(bare[1])}"
         rest = rest.replace(bare[0], " ", 1)
     seat = ", ".join(part for part in (seat, found_seat) if part) or None
-    offices = NY_MUNI_OFFICES if st == "NY" else (*MI_MUNI_OFFICES, *MUNI_OFFICES) if st in ("IL", "MI") else MUNI_OFFICES
+    offices = (
+        NY_MUNI_OFFICES if st == "NY" else (*MI_MUNI_OFFICES, *MUNI_OFFICES) if st in ("IL", "MI") else MUNI_OFFICES
+    )
     for pattern, key, office, body in offices:
         if re.search(rf"\b(?:{pattern})\b", rest):
             break
@@ -1292,6 +1306,26 @@ def emit(
                 kind="standard",
                 valid_from=None,
             )
+        for scheme, code in used:
+            held = polities.get(f"{scheme}:{code}")
+            if (
+                code[:2] in ("34", "36", "39", "42")
+                and held is not None
+                and held[0] not in cs.minted
+                and cs.area(scheme, code) not in cs.minted
+                and cs.unit(scheme, code) in cs.minted
+            ):
+                cs.add(
+                    "reporting_unit",
+                    id=cs.unit(scheme, code),
+                    polity_id=held[0],
+                    scheme_code=scheme,
+                    code=code,
+                    area_relation="equals",
+                    area_id=cs.area(scheme, code),
+                    kind="standard",
+                    valid_from=None,
+                )
         firsts: dict[str, list[tuple[date, str]]] = {}
         for key, day, runoff in contests.select("contest_key", "day", "runoff").unique().iter_rows():
             if not runoff:
@@ -1503,7 +1537,7 @@ def emit(
                             area_id=area,
                             kind="standard",
                         )
-                magnitude = int(first["magnitude"])
+                magnitude = int(first["magnitude"]) or None
                 cs.add(
                     "contest",
                     id=contest,
@@ -1516,7 +1550,7 @@ def emit(
                     magnitude=magnitude,
                     round_number=2 if runoff else 1,
                     previous_round_id=done.get(previous.get(contest_key, "")),
-                    electoral_system_id=systems["fptp" if magnitude == 1 else "block"],
+                    electoral_system_id=systems["fptp" if magnitude == 1 else "block"] if magnitude else None,
                     default_result_kind="counted",
                     term="remainder" if first["remainder"] else "full",
                 )
@@ -1697,7 +1731,7 @@ def emit(
                     cut = int(first["magnitude"])
                     total = sum(votes for votes, _, _ in ranked)
                     majority = st != "TX" or runoff or cut > 1 or ranked[0][0] * 2 > total
-                    if majority and (len(ranked) <= cut or ranked[cut - 1][0] != ranked[cut][0]):
+                    if cut > 0 and majority and (len(ranked) <= cut or ranked[cut - 1][0] != ranked[cut][0]):
                         for _, option, _ in ranked[:cut]:
                             cs.add(
                                 "outcome",
