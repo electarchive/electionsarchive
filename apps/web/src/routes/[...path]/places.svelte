@@ -533,6 +533,13 @@
         ])}
     />
   </div>
+  {#if !isMapped && places.rows.length > 1 && places.level !== ""}
+    <p
+      class="text-[0.8125rem] text-pretty text-muted-foreground max-inline-[64ch]"
+    >
+      {m.places_unmapped({ noun })}
+    </p>
+  {/if}
   {#if span != null && !comparing}
     <p class="-mbs-1.5 text-[0.8125rem] text-muted-foreground">
       {m.places_no_earlier({ year: span.forward ? span.to : span.from })}

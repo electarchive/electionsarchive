@@ -3333,8 +3333,31 @@ function placesMarkdown(
     places.levels.find((level) => level.code === places.level)?.noun ??
     places.level;
   const hasMargin = places.rows.some((row) => row.margin != null);
+  const led = Map.groupBy(
+    places.rows.filter((row) => row.leader != null && row.valid > 0),
+    (row) => row.leader ?? -1,
+  )
+    .entries()
+    .toArray()
+    .toSorted((a, b) => b[1].length - a[1].length);
   return [
     `## ${m.places_title({ noun })}`,
+    ...(led.length === 0 || places.rows.length < 3
+      ? []
+      : [
+          led
+            .map(([index, rows]) =>
+              m.places_leads({
+                label: places.legend[index]?.label ?? "",
+                count: m.map_won({
+                  count: count(rows.length),
+                  noun,
+                  nouns: plural(noun),
+                }),
+              }),
+            )
+            .join("; ") + ".",
+        ]),
     table(
       [
         m.col_name(),

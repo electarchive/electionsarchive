@@ -377,6 +377,7 @@
   "places_shared": "Located in {place}",
   "places_deeper": "View {noun} results by {finer}",
   "places_title": "Results by {noun}",
+  "places_unmapped": "We don't have {noun} boundaries for this election yet, so these results aren't shown on the map.",
   "places_unrecorded": "No results recorded",
   "places_no_votes": "No votes reported",
   "places_no_earlier": "{year} has no results at this level; shifts cannot be shown.",
