@@ -1,8 +1,11 @@
+import json
 import re
 import subprocess
 from datetime import date
 from pathlib import Path
 from uuid import UUID
+
+import fastexcel
 
 from ea import raw
 from ea.changeset import Changeset, slug
@@ -10,7 +13,7 @@ from ea.sources.gb import leh
 from ea.store import connect
 
 SOURCE = "gb.london"
-VERSION = "2"
+VERSION = "3"
 VOTES, REGISTERED, BALLOTS, VALID, INVALID, EXHAUSTED = 1, 2, 3, 4, 5, 21
 REPORT_2004 = (
     "https://data.london.gov.uk/download/e585w/94efc8af-b7ce-4d60-9b18-e587084e207f/GLA-mayoral-election-2004.pdf"
@@ -202,6 +205,149 @@ COUNTED: dict[int, tuple[int, int, int]] = {
     2008: (5435612, 2457918, 41032),
     2024: (6162428, 2495559, 11127),
 }
+CONSTITUENCIES = {
+    "E32000001": "Barnet and Camden",
+    "E32000002": "Bexley and Bromley",
+    "E32000003": "Brent and Harrow",
+    "E32000004": "City and East",
+    "E32000005": "Croydon and Sutton",
+    "E32000006": "Ealing and Hillingdon",
+    "E32000007": "Enfield and Haringey",
+    "E32000008": "Greenwich and Lewisham",
+    "E32000009": "Havering and Redbridge",
+    "E32000010": "Lambeth and Southwark",
+    "E32000011": "Merton and Wandsworth",
+    "E32000012": "North East",
+    "E32000013": "South West",
+    "E32000014": "West Central",
+}
+LAC_SHAPES = (
+    "https://services1.arcgis.com/ESMARspQHYMw9BZ9/arcgis/rest/services/London_Assembly_Constituencies_Dec_2018_FCB_EN_2022"
+    "/FeatureServer/0/query?where=1%3D1&outFields=*&outSR=27700&f=geojson"
+)
+LAC_NOTE = (
+    "The 14 London Assembly constituencies have kept the boroughs the Greater London Authority Act 1999 gave them "
+    "since the first election in 2000, so the Office for National Statistics' December 2018 full-extent boundaries "
+    "are drawn for every election."
+)
+DATASTORE = "https://data.london.gov.uk/download"
+FILE_2000 = f"{DATASTORE}/2l8n5/8b819146-fafb-4b75-86b4-619519857ad1/gla-elections-2000.xls"
+LONDON_ELECTS = "https://www.londonelects.org.uk/files"
+WARDS_2021 = f"{LONDON_ELECTS}/2021%20London%20Elects%20-%20Ward%20Level%20Data%20Release.xlsx"
+Sheet = tuple[str, str, str, int, int, int | None, list[int], int, int, int, int | None]
+SHEETS: dict[int, list[Sheet]] = {
+    2004: [
+        (
+            "lad",
+            f"{DATASTORE}/e585w/db2ee60f-6788-438f-85a5-ada35ef8a3e7/gla-elections-votes-party-borough-2004.xls",
+            "2004",
+            2,
+            1,
+            2,
+            list(range(3, 13)),
+            13,
+            18,
+            34,
+            None,
+        )
+    ],
+    2008: [
+        (
+            "lad",
+            f"{DATASTORE}/2nplx/5b19e7ba-3014-4cd5-a13a-dca1c6c40a44/gla-elections-votes-party-borough-2008.xls",
+            "2008",
+            2,
+            1,
+            2,
+            list(range(3, 13)),
+            13,
+            20,
+            35,
+            None,
+        )
+    ],
+    2012: [
+        (
+            "lac",
+            f"{DATASTORE}/e79kk/0de17f91-560c-42a9-9128-c2530a430972/gla-elections-2012-constituency.xls",
+            "Mayoral",
+            1,
+            0,
+            None,
+            list(range(5, 12)),
+            12,
+            13,
+            2,
+            None,
+        )
+    ],
+    2016: [
+        (
+            "lad",
+            f"{DATASTORE}/emq4p/01f4ff3a-c562-4d61-977f-c2dfb36694ce/gla-elections-votes-all-2016.xlsx",
+            "Boroughs",
+            2,
+            0,
+            2,
+            list(range(8, 20)),
+            20,
+            26,
+            5,
+            None,
+        ),
+        (
+            "lac",
+            f"{DATASTORE}/emq4p/01f4ff3a-c562-4d61-977f-c2dfb36694ce/gla-elections-votes-all-2016.xlsx",
+            "Constituencies",
+            2,
+            1,
+            None,
+            list(range(6, 18)),
+            18,
+            24,
+            3,
+            None,
+        ),
+    ],
+    2021: [("ward", WARDS_2021, "All", 1, 0, 3, list(range(5, 25)), 25, 31, 4, 32)],
+    2024: [
+        (
+            "lac",
+            f"{LONDON_ELECTS}/GLA%20Election%20May%202024%20Results%20Summary.xlsx",
+            "1. Mayor of London",
+            2,
+            0,
+            None,
+            list(range(1, 14)),
+            14,
+            19,
+            21,
+            20,
+        )
+    ],
+}
+SHEET_TITLES = {
+    FILE_2000: (GLA, "London Elections Results, 2000"),
+    SHEETS[2004][0][1]: (GLA, "London Elections Results 2004, Borough"),
+    SHEETS[2008][0][1]: (GLA, "London Elections Results 2008, Borough"),
+    SHEETS[2012][0][1]: (GLA, "London Elections Results 2012, Constituency"),
+    SHEETS[2016][0][1]: (GLA, "London Elections Results 2016, Wards, Boroughs, Constituency"),
+    WARDS_2021: ("London Elects", "2021 London Elects Ward Level Data Release"),
+    SHEETS[2024][0][1]: ("London Elects", "GLA Election May 2024 Results Summary"),
+}
+DECLARATIONS_2021 = {
+    code: f"{LONDON_ELECTS}/{name.replace(' ', '%20')}%202021.pdf" for code, name in CONSTITUENCIES.items()
+}
+CORRECTED = {
+    (2008, "E09000016", "Boris Johnson"): 50506,
+    (2008, "E09000030", "Ken Livingstone"): 37631,
+    (2008, "E09000030", "Lindsey German"): 796,
+}
+CORRECTED_NOTE = (
+    "The GLA's 2008 borough file gives Boris Johnson 50,507 votes in Havering, and Ken Livingstone 37,630 and "
+    "Lindsey German 797 in Tower Hamlets. Its report, The 2008 London Elections, prints 50,506, 37,631, and 796, "
+    "which sum to the declared London totals, so the report's figures are shown."
+)
 RESOLVED = {
     "The Conservative Party Candidate": "Conservative Party",
     "Conservative Party Candidate": "Conservative Party",
@@ -223,8 +369,11 @@ RESOLVED = {
 
 
 def fetch() -> None:
-    for _, url, _, _, _, _ in ELECTIONS.values():
+    for url in [*(url for _, url, _, _, _, _ in ELECTIONS.values()), *DECLARATIONS_2021.values()]:
         raw.fetch(SOURCE, url, suffix=".pdf")
+    for url in SHEET_TITLES:
+        raw.fetch(SOURCE, url, suffix=Path(url).suffix)
+    raw.fetch(SOURCE, LAC_SHAPES, suffix=".geojson")
 
 
 def emit() -> Path:
@@ -234,7 +383,8 @@ def emit() -> Path:
             pipeline=SOURCE,
             version=VERSION,
             summary="Mayor of London elections 2000-2024, London-wide first and second rounds from the Greater London "
-            "Returning Officer's declarations and the GLA's election reports",
+            "Returning Officer's declarations and the GLA's election reports, with first choices by Assembly "
+            "constituency and borough from the GLA's and London Elects' result files",
             polity="GB",
         )
 
@@ -273,6 +423,97 @@ def emit() -> Path:
             valid_from=None,
         )
         name(unit, "London")
+        if conn.execute("select 1 from scheme where code = 'gb.lac'").fetchone() is None:
+            cs.add(
+                "scheme", code="gb.lac", polity_id=gb, kind="electoral_district", rank=3, noun="Assembly constituency"
+            )
+        shapes = raw.cached(SOURCE, LAC_SHAPES)
+        ons = cs.source(
+            "Office for National Statistics", "London Assembly Constituencies (December 2018) Boundaries EN BFC"
+        )
+        cs.add(
+            "source",
+            id=ons,
+            kind="official_body",
+            publisher="Office for National Statistics",
+            title="London Assembly Constituencies (December 2018) Boundaries EN BFC",
+            url="https://geoportal.statistics.gov.uk/datasets/6ab20f2a06a546eea6709ffa890362ca",
+            license="Open Government Licence v3.0",
+            license_url="https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/",
+            attribution="Source: Office for National Statistics licensed under the Open Government Licence v.3.0. "
+            "Contains OS data © Crown copyright and database right",
+        )
+        cs.artifact(shapes, ons)
+        first_day = ELECTIONS[2000][0]
+        constituency_areas: dict[str, UUID] = {}
+        constituency_units: dict[str, UUID] = {}
+        for feature in json.loads(shapes.path.read_bytes())["features"]:
+            code = feature["properties"]["lac18cd"]
+            if feature["properties"]["lac18nm"] != CONSTITUENCIES[code]:
+                raise ValueError(f"{code}: ONS names it {feature['properties']['lac18nm']}")
+            area = constituency_areas[code] = cs.area("gb.lac", code)
+            if area in cs.minted:
+                cs.add("area", id=area, scheme_code="gb.lac")
+                cs.add("area_code", area_id=area, code=code, valid_from=None, valid_to=None)
+                cs.add("area_parent", area_id=area, parent_id=region, valid_from=None, valid_to=None)
+            name(area, CONSTITUENCIES[code])
+            geom, point = conn.execute(
+                """select encode(st_asewkb(st_multi(st_transform(g, 4326))), 'hex'),
+                          encode(st_asewkb(st_transform(st_pointonsurface(g), 4326)), 'hex')
+                   from (select st_multi(st_collectionextract(st_makevalid(st_simplifypreservetopology(
+                           st_setsrid(st_geomfromgeojson(%s), 27700), 5)), 3)) as g) s""",
+                [json.dumps(feature["geometry"])],
+            ).fetchone()
+            cs.add(
+                "area_geometry",
+                area_id=area,
+                valid_from=first_day,
+                valid_from_precision="day",
+                valid_to=None,
+                valid_to_precision="day",
+                geom=geom,
+                label_point=point,
+                quality="official",
+                source_id=ons,
+            )
+            cs.add("note", entity_id=area, kind="context", body_md=LAC_NOTE)
+            constituency_units[code] = cs.unit("gb.lac", code)
+            cs.add(
+                "reporting_unit",
+                id=constituency_units[code],
+                polity_id=london,
+                scheme_code="gb.lac",
+                code=code,
+                area_relation="equals",
+                area_id=area,
+                kind="standard",
+                valid_from=None,
+            )
+            name(constituency_units[code], CONSTITUENCIES[code])
+        if len(constituency_areas) != len(CONSTITUENCIES):
+            raise ValueError(f"{len(constituency_areas)} ONS shapes for {len(CONSTITUENCIES)} constituencies")
+        plans = dict(conn.execute("select vintage, id from boundary_set where scheme_code = 'gb.lac'").fetchall())
+        cs.add(
+            "boundary_set",
+            **({"id": plans["2000"]} if "2000" in plans else {}),
+            scheme_code="gb.lac",
+            vintage="2000",
+            valid_from=first_day,
+            valid_to=None,
+            as_of=first_day,
+        )
+        constituency_codes = {leh.fold(text): code for code, text in CONSTITUENCIES.items()}
+        constituency_codes["city and east london"] = "E32000004"
+        borough_names = dict(
+            conn.execute(
+                """select c.code, n.text from area a join area_code c on c.area_id = a.id
+                   join name n on n.entity_id = a.id and n.is_preferred
+                   where a.scheme_code = 'gb.lad' and c.code like 'E09%'"""
+            ).fetchall()
+        )
+        borough_names["E09000001"] = "City of London"
+        borough_codes = {leh.fold(text): code for code, text in borough_names.items()}
+        borough_units: dict[str, UUID] = {}
         fptp = cs.key("gb.electoral_system", "fptp")
         sv = cs.key("gb.electoral_system", "sv")
         if fptp in cs.minted or sv in cs.minted:
@@ -297,6 +538,108 @@ def emit() -> Path:
                 cs.add("source", id=sources[url], kind="official_body", publisher=publisher, title=title, url=url)
                 cs.artifact(artifact, sources[url])
             source = sources[url]
+            names = [full for full, *_ in candidates]
+            surnames = {leh.fold(full).split()[-1]: full for full in names}
+            grains: dict[str, dict[str, dict[str, int | None]]] = {"lac": {}, "lad": {}}
+            files: dict[str, str] = {}
+            derived: set[str] = set()
+            specs = SHEETS.get(year, [])
+            if year == 2000:
+                book = fastexcel.read_excel(raw.cached(SOURCE, FILE_2000).path)
+                mayor, turnout, spoils = (
+                    book.load_sheet(sheet, header_row=None).to_polars().rows()
+                    for sheet in ("Mayoral by constituency", "Turnout", "Spoils")
+                )
+                specs = [("lac", FILE_2000, "", 1, 0, None, list(range(1, 23, 2)), 0, 0, 0, None)]
+                merged: dict[str, dict[str, object]] = {}
+                for row in turnout:
+                    if (code := constituency_codes.get(leh.fold(str(row[0] or "")))) is not None:
+                        merged.setdefault(code, {}).update(registered=row[1], ballots=row[2])
+                for row in spoils:
+                    if (code := constituency_codes.get(leh.fold(str(row[0] or "")))) is not None:
+                        merged.setdefault(code, {}).update(invalid=row[6], valid=row[8])
+            for grain, file, sheet, header, name_col, lac_col, columns, good, spoiled, electorate, counted in specs:
+                rows = (
+                    mayor
+                    if year == 2000
+                    else fastexcel.read_excel(raw.cached(SOURCE, file).path)
+                    .load_sheet(sheet, header_row=None)
+                    .to_polars()
+                    .rows()
+                )
+                order = []
+                for column in columns:
+                    person = leh.fold(re.split(r" - |\n| \(", str(rows[header][column]))[0]).split()
+                    found = [full for surname, full in surnames.items() if surname in person]
+                    if len(found) != 1:
+                        raise ValueError(f"{year} {sheet}: {rows[header][column]!r} matches {found}")
+                    order.append(found[0])
+                if sorted(order) != sorted(names):
+                    raise ValueError(f"{year} {sheet}: columns {order} against {names}")
+                whole = any(spec[0] == "lac" for spec in specs)
+                for row in rows[header + 1 :]:
+                    place = leh.fold(str(row[name_col] or ""))
+                    if grain == "lac":
+                        targets = [("lac", constituency_codes.get(place))]
+                    else:
+                        targets = [("lad", borough_codes.get(place))]
+                        if not whole:
+                            targets.append(("lac", constituency_codes.get(leh.fold(str(row[lac_col] or "")))))
+                    if any(code is None for _, code in targets):
+                        continue
+                    if year == 2000:
+                        found = merged[targets[0][1]]
+                        figures = {"valid": found["valid"], "invalid": found["invalid"]}
+                        figures |= {"registered": found["registered"], "ballots": found["ballots"]}
+                    else:
+                        figures = {"valid": row[good], "invalid": row[spoiled], "registered": row[electorate]}
+                        figures["ballots"] = None if counted is None else row[counted]
+                    figures |= {full: row[column] for full, column in zip(order, columns, strict=True)}
+                    if grain == "lad":
+                        figures |= {full: CORRECTED.get((year, targets[0][1], full), figures[full]) for full in order}
+                    for target, code in targets:
+                        entry = grains[target].setdefault(code, {})
+                        for key, value in figures.items():
+                            entry[key] = None if value is None else (entry.get(key) or 0) + round(float(value))
+                        files[target] = file
+                    if grain == "ward":
+                        derived.add("lad")
+                    if not whole:
+                        derived.add("lac")
+            for entry in grains["lad"].values() if "lad" in derived else []:
+                entry["registered"] = None
+            for grain, entries in grains.items():
+                if not entries:
+                    continue
+                if len(entries) != (len(CONSTITUENCIES) if grain == "lac" else 33):
+                    raise ValueError(f"{year} {grain}: {len(entries)} areas")
+                for full, _, first, _ in candidates:
+                    if (summed := sum(entry[full] or 0 for entry in entries.values())) != first:
+                        raise ValueError(f"{year} {grain}: {full} sums to {summed}, declared {first}")
+            if "lac" in derived:
+                declarations = (
+                    {code: DECLARATIONS_2021[code] for code in CONSTITUENCIES}
+                    if year == 2021
+                    else {code: url for code in CONSTITUENCIES}
+                )
+                for code, entry in grains["lac"].items():
+                    text = subprocess.run(
+                        ["pdftotext", "-layout", str(raw.cached(SOURCE, declarations[code]).path), "-"],
+                        check=True,
+                        capture_output=True,
+                    ).stdout.decode(errors="replace")
+                    shown = set(re.findall(r"\d+", re.sub(r"(?<=\d)[,.](?=\d{3})", "", text)))
+                    if year == 2021:
+                        entry["registered"] = int(re.findall(r"Electorate +(\d+)", text)[-1])
+                    if missing := sorted(
+                        f"{key} {value}"
+                        for key, value in entry.items()
+                        if value is not None and str(value) not in shown
+                    ):
+                        raise ValueError(f"{year} {code}: {missing} not printed in {declarations[code]}")
+                derived.discard("lac")
+                if year == 2021:
+                    files["lac"] = "declarations"
             national = conn.execute(
                 "select entity_id from external_id where scheme = 'gb.election' and value = %s", [f"{day}:local:gb"]
             ).fetchone()
@@ -350,10 +693,22 @@ def emit() -> Path:
             registered, ballots, rejected = COUNTED.get(year, (None, None, rejected))
             valid = sum(first for _, _, first, _ in candidates)
             totals = {REGISTERED: registered, BALLOTS: ballots, VALID: valid, INVALID: rejected}
-            cells = [(measure, 0, value) for measure, value in totals.items() if value is not None]
+            cells = [(measure, 0, value, 0) for measure, value in totals.items() if value is not None]
+            if year not in COUNTED:
+                for measure, key in ((REGISTERED, "registered"), (BALLOTS, "ballots"), (INVALID, "invalid")):
+                    summed = [entry[key] for entry in grains["lac"].values()]
+                    if totals[measure] is None and summed and None not in summed:
+                        cells.append((measure, 0, sum(summed), 1))
+                    elif (
+                        totals[measure] is not None and summed and None not in summed and sum(summed) != totals[measure]
+                    ):
+                        raise ValueError(
+                            f"{year}: constituencies sum {key} to {sum(summed)}, declared {totals[measure]}"
+                        )
             if supplementary:
-                cells.append((EXHAUSTED, 2, valid - sum(final for _, _, _, final in candidates if final is not None)))
-            for measure, number, value in cells:
+                exhausted = valid - sum(final for _, _, _, final in candidates if final is not None)
+                cells.append((EXHAUSTED, 2, exhausted, 0))
+            for measure, number, value, flags in cells:
                 cs.add(
                     "result_value",
                     result_set_id=result_set,
@@ -362,9 +717,10 @@ def emit() -> Path:
                     channel=0,
                     measure=measure,
                     count_round=number,
-                    flags=0,
+                    flags=flags,
                     value=value,
                 )
+            options: dict[str, UUID] = {}
             winner = max(candidates, key=lambda row: (row[3] or 0) if supplementary else row[2])[0]
             for full, party_code, first, final in candidates:
                 label = PARTIES.get(party_code, party_code) if year <= 2008 else party_code
@@ -390,7 +746,7 @@ def emit() -> Path:
                         cs.add("person", id=persons[full])
                         name(persons[full], full)
                 option_key = f"{contest_key}:{slug(full)}"
-                option = cs.key("gb.london.option", option_key)
+                option = options[full] = cs.key("gb.london.option", option_key)
                 cs.add(
                     "contest_option",
                     id=option,
@@ -432,4 +788,94 @@ def emit() -> Path:
                     kinds = ("lost",)
                 for kind in kinds:
                     cs.add("outcome", result_set_id=result_set, option_id=option, kind=kind)
+            for grain, entries in grains.items():
+                if not entries:
+                    continue
+                file = files[grain]
+                if file not in sources:
+                    if file == "declarations":
+                        publisher, title = "London Elects", "GLA 2021 Elections: constituency results and local totals"
+                        page = "https://www.londonelects.org.uk/im-voter/election-results/results-2021"
+                    else:
+                        (publisher, title), page = SHEET_TITLES[file], file
+                    sources[file] = cs.source(publisher, title)
+                    cs.add("source", id=sources[file], kind="official_body", publisher=publisher, title=title, url=page)
+                    for link in DECLARATIONS_2021.values() if file == "declarations" else [file]:
+                        cs.artifact(raw.cached(SOURCE, link), sources[file])
+                own = source if grain == "lac" and year in (2004, 2008) else sources[file]
+                grain_set = cs.key("gb.london.result_set", f"{contest_key}:{grain}")
+                cs.add(
+                    "result_set",
+                    id=grain_set,
+                    election_id=election,
+                    contest_id=contest,
+                    stage="official",
+                    kind="counted",
+                    status="active",
+                    source_id=own,
+                    is_default=False,
+                    completeness=1,
+                )
+                cs.add("citation", entity_id=grain_set, source_id=own)
+                if own != sources[file]:
+                    cs.add("citation", entity_id=grain_set, source_id=sources[file])
+                if grain == "lad" and any(key[0] == year for key in CORRECTED):
+                    cs.add("note", entity_id=grain_set, kind="context", body_md=CORRECTED_NOTE)
+                flags = 1 if grain in derived else 0
+                for code, entry in entries.items():
+                    if grain == "lac":
+                        place = constituency_units[code]
+                    else:
+                        if code not in borough_units:
+                            borough_units[code] = cs.unit("gb.lad", code)
+                            if borough_units[code] in cs.minted:
+                                area = cs.area("gb.lad", code)
+                                if area in cs.minted:
+                                    cs.add("area", id=area, scheme_code="gb.lad")
+                                    cs.add("area_code", area_id=area, code=code, valid_from=None, valid_to=None)
+                                    cs.add(
+                                        "area_parent",
+                                        area_id=area,
+                                        parent_id=cs.area("gb.country", "ENG"),
+                                        valid_from=None,
+                                        valid_to=None,
+                                    )
+                                    name(area, "City of London")
+                                cs.add(
+                                    "reporting_unit",
+                                    id=borough_units[code],
+                                    polity_id=london,
+                                    scheme_code="gb.lad",
+                                    code=code,
+                                    area_relation="equals",
+                                    area_id=area,
+                                    kind="standard",
+                                    valid_from=None,
+                                )
+                                name(borough_units[code], borough_names[code])
+                        place = borough_units[code]
+                    values = [
+                        (None, measure, 0, entry[key])
+                        for measure, key in (
+                            (REGISTERED, "registered"),
+                            (BALLOTS, "ballots"),
+                            (VALID, "valid"),
+                            (INVALID, "invalid"),
+                        )
+                    ]
+                    values += [(options[full], VOTES, first_round, entry[full]) for full in names]
+                    for option_id, measure, number, value in values:
+                        if value is None:
+                            continue
+                        cs.add(
+                            "result_value",
+                            result_set_id=grain_set,
+                            unit_id=place,
+                            option_id=option_id,
+                            channel=0,
+                            measure=measure,
+                            count_round=number,
+                            flags=flags,
+                            value=value,
+                        )
         return cs.write()
