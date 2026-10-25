@@ -7823,6 +7823,22 @@ async function races(
                   and c.allocation_parent_id is null and c.party_scope_id is null
                   and e.kind = (select kind from same) and e.date_from < ${date}::date - 120
               ),
+              nwin as materialized (
+                select o.id, o.contest_id as contest, o.party_id
+                from contest nc
+                join election ne on ne.id = nc.election_id
+                join area na on na.id = nc.district_area_id
+                join result_set rs on rs.contest_id = nc.id and rs.is_default and rs.stage = 'notional'
+                cross join lateral (
+                  select o.id, o.contest_id, o.party_id from contest_option o
+                  join result_rollup y on y.result_set_k = rs.k and y.area_k = na.k and y.option_k = o.k
+                    and y.measure = 1 and y.channel = 0 and y.count_round = 0
+                  where o.contest_id = nc.id
+                  order by y.value desc limit 1
+                ) o
+                where nc.notional and coalesce(nc.body_id, nc.office_id) = ${head.owner}::uuid
+                  and ne.date_from between (select day from last) - 200 and (select day from last)
+              ),
               roots as (
                 select c.id, not ${isInside} or ${inside(polity, sql`c.district_area_id`, sql`e.date_from`)} as inside,
                   (select count(*) from area_parent ap where ap.area_id = c.district_area_id and ap.valid @> e.date_from) as parents
@@ -7867,18 +7883,7 @@ async function races(
                   ))
                 group by o.id, o.contest_id, o.party_id
                 union all
-                select o.id, o.contest_id, o.party_id, 1
-                from tree t
-                join contest nc on nc.id = t.id and nc.notional
-                join area na on na.id = nc.district_area_id
-                cross join lateral (
-                  select o.id, o.contest_id, o.party_id from contest_option o
-                  join result_set rs on rs.contest_id = o.contest_id and rs.is_default and rs.stage = 'notional'
-                  join result_rollup y on y.result_set_k = rs.k and y.area_k = na.k and y.option_k = o.k
-                    and y.measure = 1 and y.channel = 0 and y.count_round = 0
-                  where o.contest_id = nc.id
-                  order by y.value desc limit 1
-                ) o
+                select n.id, n.contest, n.party_id, 1 from nwin n where n.contest in (select id from tree)
               ),
               leads as (
                 select distinct on (ch.parent_option_id) ch.parent_option_id as parent, ch.party_id
