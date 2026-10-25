@@ -243,13 +243,15 @@ export function verdict(contest: Page["contest"]) {
           ? m.race_lede_final
           : m.race_lede_final_led)({
           party: definite(named(first), true),
-          share: percent((first.votes[last] ?? 0) / total),
-          margin: count(
-            Math.round(
-              (((first.votes[last] ?? 0) - (second.votes[last] ?? 0)) / total) *
-                1000,
-            ) / 10,
+          share: percent(
+            (first.votes[last] ?? 0) / total,
+            precision(
+              ((first.votes[last] ?? 0) - (second.votes[last] ?? 0)) / total,
+            ),
           ),
+          margin: points(
+            ((first.votes[last] ?? 0) - (second.votes[last] ?? 0)) / total,
+          ).replace(/^\+/u, ""),
           runner: definite(named(second)),
         });
   }
