@@ -11094,7 +11094,7 @@ export const polities = {
             within: number;
           }>(sql`
             with recursive county as materialized (
-              select cg.geom, cp.parent_id from polity c
+              select cg.geom, coalesce(cg.label_point, st_pointonsurface(cg.geom)) as point, cp.parent_id from polity c
               join polity_territory ct on ct.polity_id = c.id and upper_inf(ct.valid)
               join area_geometry cg on cg.area_id = ct.area_id and upper_inf(cg.valid)
               join polity_parent cp on cp.polity_id = c.id
@@ -11113,6 +11113,7 @@ export const polities = {
                 select candidates.id, candidates.id from candidates
                 join area_geometry g on g.area_id = candidates.area_id and upper_inf(g.valid)
                 join county on st_contains(county.geom, coalesce(g.label_point, st_pointonsurface(g.geom)))
+                  or (g.geom && county.point and st_contains(g.geom, county.point))
               ) seed
               union
               select p.polity_id, below.top from polity_parent p join below on p.parent_id = below.id
