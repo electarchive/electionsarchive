@@ -1452,7 +1452,10 @@ function electionMarkdown(
   const byeRows = (byes?.rows ?? []).map((row) => ({
     ...row,
     isGain:
-      row.to != null && row.from != null && label(row.to) !== label(row.from),
+      row.to != null &&
+      row.from != null &&
+      !row.isOther &&
+      label(row.to) !== label(row.from),
   }));
   const gained = byeRows.filter((row) => row.isGain).length;
   const listed =
@@ -2079,7 +2082,9 @@ function electionMarkdown(
                 ? null
                 : row.isGain
                   ? m.gains_seat({ to: label(row.to), from: label(row.from) })
-                  : m.byes_hold({ party: label(row.to) }),
+                  : row.from != null && label(row.to) !== label(row.from)
+                    ? m.byes_change_other()
+                    : m.byes_hold({ party: label(row.to) }),
               row.majority == null ? null : count(row.majority),
               row.member == null
                 ? row.cause
@@ -2176,10 +2181,15 @@ function contestMarkdown(
     top?.current != null && next?.current != null && top.current.votes > 0
       ? count(top.current.votes - next.current.votes)
       : null;
-  const [gain, hold, allied] =
+  const [gain, hold, allied, other] =
     handover?.lead === "margin"
-      ? [m.change_gain_margin, m.change_hold_margin, m.change_allied_margin]
-      : [m.change_gain, m.change_hold, m.change_allied];
+      ? [
+          m.change_gain_margin,
+          m.change_hold_margin,
+          m.change_allied_margin,
+          m.change_other_margin,
+        ]
+      : [m.change_gain, m.change_hold, m.change_allied, m.change_other];
   const won = contest.rows.filter((row) => (row.current?.seats ?? 0) > 0);
   const held =
     handover == null || contest.current == null
@@ -2253,10 +2263,14 @@ function contestMarkdown(
                 : majority == null
                   ? handover.isGain
                     ? m.change_gain_bare({ party, from })
-                    : m.change_hold_bare({ party })
+                    : handover.isOther
+                      ? m.change_other_bare({ party, from })
+                      : m.change_hold_bare({ party })
                   : handover.isGain
                     ? gain({ party, from, majority })
-                    : hold({ party, majority })
+                    : handover.isOther
+                      ? other({ party, from, majority })
+                      : hold({ party, majority })
           }${handover.basis === "same" ? "" : "*"}`,
           ...(handover.basis === "same"
             ? []

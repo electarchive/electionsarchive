@@ -1089,10 +1089,15 @@
       top?.current != null && next?.current != null && top.current.votes > 0
         ? count(top.current.votes - next.current.votes)
         : null;
-    const [gain, hold, allied] =
+    const [gain, hold, allied, other] =
       handover.lead === "margin"
-        ? [m.change_gain_margin, m.change_hold_margin, m.change_allied_margin]
-        : [m.change_gain, m.change_hold, m.change_allied];
+        ? [
+            m.change_gain_margin,
+            m.change_hold_margin,
+            m.change_allied_margin,
+            m.change_other_margin,
+          ]
+        : [m.change_gain, m.change_hold, m.change_allied, m.change_other];
     const party = handover.alliance ?? label;
     if (handover.alliance != null) {
       return `${majority == null ? m.change_allied_bare({ party, label }) : allied({ party, label, majority })}${handover.basis === "same" ? "" : "*"}`;
@@ -1101,10 +1106,14 @@
       majority == null
         ? handover.isGain
           ? m.change_gain_bare({ party, from })
-          : m.change_hold_bare({ party })
+          : handover.isOther
+            ? m.change_other_bare({ party, from })
+            : m.change_hold_bare({ party })
         : handover.isGain
           ? gain({ party, from, majority })
-          : hold({ party, majority })
+          : handover.isOther
+            ? other({ party, from, majority })
+            : hold({ party, majority })
     }${handover.basis === "same" ? "" : "*"}`;
   });
   const vacancy = $derived(

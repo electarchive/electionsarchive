@@ -69,6 +69,7 @@ export const seats = {
         election: string | null;
         notional: boolean;
         isChair: boolean;
+        others: Array<string>;
       }>(sql`
         with recursive tree(id) as (
           select e.id from election e
@@ -239,7 +240,11 @@ export const seats = {
             join party sx on sx.id::text = w.party and sx.kind = 'independent_group'
             join name sn on sn.entity_id = sx.id and sn.text = 'Speaker'
             where w.contest = p.id
-          ) as "isChair"
+          ) as "isChair",
+          array(
+            select x.id::text from party x
+            where x.kind = 'independent_group' and x.id::text in (select w.party from won w where w.contest in (p.id, p.prior))
+          ) as others
         from paired p
         order by p.id
       `);
@@ -277,6 +282,11 @@ export const seats = {
       if (since == null || compared.length === 0) {
         return null;
       }
+      const others = new Set(found.rows.flatMap((row) => row.others));
+      const isOther = (key: string | null) =>
+        key != null && (key.startsWith("person:") || others.has(key));
+      const isMoved = (row: (typeof compared)[number]) =>
+        row.now !== row.before && !(isOther(row.now) && isOther(row.before));
       const held = (side: "now" | "before", key: string) =>
         compared.filter((row) => row[side] === key).length;
       const keys = [
@@ -289,7 +299,7 @@ export const seats = {
           held("before", b) - held("before", a) ||
           a.localeCompare(b),
       );
-      const changed = compared.filter((row) => row.now !== row.before);
+      const changed = compared.filter(isMoved);
       const parties = keys.filter((key) => !key.startsWith("person:"));
       const people = keys.flatMap((key) =>
         key.startsWith("person:") ? [key.slice(7)] : [],
@@ -300,7 +310,10 @@ export const seats = {
         paths(changed.map((row) => row.id)),
         paths([found.rows[0]?.election ?? ""]),
       ]);
-      const flows = Map.groupBy(compared, (row) => `${row.now}|${row.before}`)
+      const flows = Map.groupBy(
+        compared,
+        (row) => `${row.now}|${isMoved(row) ? row.before : row.now}`,
+      )
         .entries()
         .map(([pair, rows]) => {
           const [to = "", from = ""] = pair.split("|", 2);
@@ -356,6 +369,7 @@ export const seats = {
         v.object({
           since: v.number(),
           isGain: v.boolean(),
+          isOther: v.boolean(),
           lead: v.picklist(["majority", "margin"]),
           basis: v.picklist(["notional", "same", "area", "name"]),
           party: v.nullable(
@@ -409,6 +423,7 @@ export const seats = {
         alliance: string | null;
         member: string | null;
         via: string | null;
+        isOther: boolean;
       }>(sql`
         with this as materialized (
           select c.id, c.body_id as body, c.district_area_id as area, e.date_from as day, e.kind, coalesce(c.magnitude, 1) as magnitude,
@@ -578,20 +593,22 @@ export const seats = {
               (select coalesce(e.parent_id, e.id) from contest c join election e on e.id = c.election_id where c.id = p.id),
               (select coalesce(e.parent_id, e.id) from contest c join election e on e.id = c.election_id where c.id = p.prior)
             ) order by n.recorded_from desc, n.id limit 1) as alliance,
-          v.person as member, v.via
+          v.person as member, v.via,
+          (w.party is null or exists (select from party x where x.id::text = w.party and x.kind = 'independent_group'))
+            and (b.party is null or exists (select from party x where x.id::text = b.party and x.kind = 'independent_group')) as "isOther"
         from paired p
         join contest pc on pc.id = p.prior
         left join lateral (
           select coalesce(
             (select coalesce(m.into_id, t.person_id)::text from tenure t left join entity_merge m on m.entity_id = t.person_id
               where t.body_id = (select body from this) and t.to_date between p.day and (select day from this)
-                and t.person_id::text in (select x.person from won x where x.contest = p.prior)
+                and (t.contest_id = p.prior or t.person_id::text in (select x.person from won x where x.contest = p.prior))
               order by t.to_date desc limit 1),
             (select max(x.person) from won x where x.contest = p.prior having count(*) = 1)
           ) as person,
           (select t.ended_via::text from tenure t
             where t.body_id = (select body from this) and t.to_date between p.day and (select day from this)
-              and t.person_id::text in (select x.person from won x where x.contest = p.prior)
+              and (t.contest_id = p.prior or t.person_id::text in (select x.person from won x where x.contest = p.prior))
             order by t.to_date desc limit 1) as via
           where (select kind from this) = 'by_election'
         ) v on true
@@ -646,7 +663,10 @@ export const seats = {
       }
       return {
         since: Number(row.since.slice(0, 4)),
-        isGain: row.alliance == null && gained.length > 0,
+        isGain: row.alliance == null && gained.length > 0 && !row.isOther,
+        isOther:
+          row.isOther &&
+          (party(now)?.label ?? null) !== (party(before, true)?.label ?? null),
         lead: row.isUs ? "margin" : "majority",
         basis: row.basis,
         party: party(now),
@@ -763,6 +783,7 @@ export const seats = {
               ),
               reason: v.nullable(v.string()),
               cause: v.nullable(v.string()),
+              isOther: v.boolean(),
               isHere: v.boolean(),
             }),
           ),
@@ -781,6 +802,7 @@ export const seats = {
         member: string | null;
         via: string | null;
         cause: string | null;
+        isOther: boolean;
         majority: number | null;
         general: string;
         since: string;
@@ -831,14 +853,16 @@ export const seats = {
                 and c.allocation_parent_id is null and e.kind in ('general', 'by_election') and e.date_from < b.day and not c.notional
             ) q
             order by (
-              select max(t.to_date) from result_set rs
-              join outcome x on x.result_set_id = rs.id and x.kind in ('elected', 'won') and x.candidacy_id is null
-              join candidacy cy on cy.option_id = x.option_id and cy.role = 'head'
-              left join entity_merge cm on cm.entity_id = cy.person_id
-              join tenure t on t.body_id = b.body and t.to_date > q.newest and t.to_date <= b.day
+              select max(t.to_date) from tenure t
               left join entity_merge tm on tm.entity_id = t.person_id
-              where rs.contest_id = q.id and q.day >= (select day from general)
-                and coalesce(tm.into_id, t.person_id) = coalesce(cm.into_id, cy.person_id)
+              where t.body_id = b.body and t.to_date > q.newest and t.to_date <= b.day and q.day >= (select day from general)
+                and (t.contest_id = q.id or coalesce(tm.into_id, t.person_id) in (
+                  select coalesce(cm.into_id, cy.person_id) from result_set rs
+                  join outcome x on x.result_set_id = rs.id and x.kind in ('elected', 'won') and x.candidacy_id is null
+                  join candidacy cy on cy.option_id = x.option_id and cy.role = 'head'
+                  left join entity_merge cm on cm.entity_id = cy.person_id
+                  where rs.contest_id = q.id
+                ))
             ) desc nulls last, q.day desc limit 1
           ) p
         ),
@@ -867,7 +891,7 @@ export const seats = {
             select coalesce(m.into_id, t.person_id)::text as person, t.ended_via::text as via
             from tenure t left join entity_merge m on m.entity_id = t.person_id
             where t.body_id = b.body and t.to_date between p.since and b.day
-              and coalesce(m.into_id, t.person_id)::text in (select w.person from won w where w.contest = p.prior)
+              and (t.contest_id = p.prior or coalesce(m.into_id, t.person_id)::text in (select w.person from won w where w.contest = p.prior))
             order by t.to_date desc limit 1
           ) t
         ),
@@ -893,7 +917,12 @@ export const seats = {
           (select person from won w where w.contest = b.id order by w.k limit 1) as winner,
           coalesce(
             (select coalesce(w.party, 'person:' || w.person) from won w join left_seat l on l.id = b.id and l.person = w.person where w.contest = p.prior limit 1),
-            (select max(coalesce(w.party, 'person:' || w.person)) from won w where w.contest = p.prior having count(*) = 1)
+            (select max(coalesce(w.party, 'person:' || w.person)) from won w where w.contest = p.prior having count(*) = 1),
+            (select max(coalesce(w.party, 'person:' || w.person)) from won w
+              join name wn on wn.entity_id = w.person::uuid and wn.is_preferred
+              join name ln on ln.entity_id = l.person::uuid and ln.is_preferred
+              where w.contest = p.prior and substring(wn.text from '[^ ]+$') = substring(ln.text from '[^ ]+$')
+              having count(*) = 1)
           ) as before,
           coalesce(l.person, (select max(w.person) from won w where w.contest = p.prior having count(*) = 1)) as member,
           l.via,
@@ -902,7 +931,11 @@ export const seats = {
         )
         select q.id, q.area, q.day, q.until, q.general, q.since, q."isHere", q.now, q.winner,
           coalesce(sp.party, q.before) as before, q.member, q.via, q.majority,
-          (select n.body_md from note n where n.entity_id = q.id::uuid and n.kind = 'context' order by n.id limit 1) as cause
+          (select n.body_md from note n where n.entity_id = q.id::uuid and n.kind = 'context' order by n.id limit 1) as cause,
+          (q.now like 'person:%' or exists (select from party x where x.id::text = q.now and x.kind = 'independent_group'))
+            and (coalesce(sp.party, q.before) like 'person:%' or exists (
+              select from party x where x.id::text = coalesce(sp.party, q.before) and x.kind = 'independent_group'
+            )) as "isOther"
         from listed q
         left join lateral (
           select coalesce(pm.into_id, co.party_id)::text as party
@@ -995,6 +1028,7 @@ export const seats = {
           member: person(row.member),
           reason: row.via,
           cause: row.via == null ? row.cause : null,
+          isOther: row.isOther === true,
           isHere: row.isHere,
         })),
       };

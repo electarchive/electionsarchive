@@ -39,7 +39,7 @@
     const rows = data.rows.map((row) => {
       const to = fold(row.to);
       const from = fold(row.from);
-      const isGain = to != null && from != null && to !== from;
+      const isGain = to != null && from != null && to !== from && !row.isOther;
       if (isGain) {
         net.set(to, (net.get(to) ?? 0) + 1);
         net.set(from, (net.get(from) ?? 0) - 1);
@@ -54,7 +54,9 @@
             ? null
             : isGain
               ? m.gains_seat({ to: label(to), from: label(from) })
-              : m.byes_hold({ party: label(to) }),
+              : from != null && label(to) !== label(from)
+                ? m.byes_change_other()
+                : m.byes_hold({ party: label(to) }),
         why:
           row.member == null
             ? row.cause
