@@ -497,18 +497,22 @@ async function breadcrumbs(polity: string, keep: string | null = null) {
       select p.parent_id, chain.depth + 1 from polity_parent p join chain on p.polity_id = chain.id where chain.depth < 8
     ),
     county as (
-      select c.id from polity y
-      join polity_parent pp on pp.polity_id = y.id
-      join polity s on s.id = pp.parent_id and s.kind = 'federal_unit'
-      join polity_territory t on t.polity_id = y.id and upper_inf(t.valid)
-      join area_geometry g on g.area_id = t.area_id and upper_inf(g.valid)
-      join polity_parent cp on cp.parent_id = pp.parent_id
-      join polity c on c.id = cp.polity_id and c.kind = 'county'
-      join polity_territory ct on ct.polity_id = c.id and upper_inf(ct.valid)
-      join area_geometry cg on cg.area_id = ct.area_id and upper_inf(cg.valid)
-      where y.id = ${polity}::uuid and y.kind in ('municipality', 'school_district', 'special_district')
-        and st_contains(cg.geom, coalesce(g.label_point, st_pointonsurface(g.geom)))
-        and not st_contains(g.geom, coalesce(cg.label_point, st_pointonsurface(cg.geom)))
+      select id from (
+        select c.id, st_contains(cg.geom, coalesce(g.label_point, st_pointonsurface(g.geom))) as holds,
+          count(*) filter (where st_contains(g.geom, coalesce(cg.label_point, st_pointonsurface(cg.geom)))) over () as inside
+        from polity y
+        join polity_parent pp on pp.polity_id = y.id
+        join polity s on s.id = pp.parent_id and s.kind = 'federal_unit'
+        join polity_territory t on t.polity_id = y.id and upper_inf(t.valid)
+        join area_geometry g on g.area_id = t.area_id and upper_inf(g.valid)
+        join polity_parent cp on cp.parent_id = pp.parent_id
+        join polity c on c.id = cp.polity_id and c.kind = 'county'
+        join polity_territory ct on ct.polity_id = c.id and upper_inf(ct.valid)
+        join area_geometry cg on cg.area_id = ct.area_id and upper_inf(cg.valid)
+        where y.id = ${polity}::uuid and y.kind in ('municipality', 'school_district', 'special_district')
+          and cg.geom && g.geom
+      ) x
+      where holds and inside < 2
       limit 1
     )
     select id from (
@@ -11112,35 +11116,36 @@ export const polities = {
             last: number | null;
             within: number;
           }>(sql`
-            with recursive county as materialized (
-              select cg.geom, coalesce(cg.label_point, st_pointonsurface(cg.geom)) as point, cp.parent_id from polity c
+            with recursive host as materialized (
+              select cg.geom, coalesce(cg.label_point, st_pointonsurface(cg.geom)) as point, cp.parent_id, c.kind = 'county' as "isCounty" from polity c
               join polity_territory ct on ct.polity_id = c.id and upper_inf(ct.valid)
               join area_geometry cg on cg.area_id = ct.area_id and upper_inf(cg.valid)
               join polity_parent cp on cp.polity_id = c.id
-              where c.id = ${input.id}::uuid and c.kind = 'county'
+              where c.id = ${input.id}::uuid and c.kind in ('county', 'municipality')
             ),
             candidates as materialized (
-              select k.id, t.area_id from county
-              join polity_parent sp on sp.parent_id = county.parent_id
-              join polity k on k.id = sp.polity_id and k.kind in ('municipality', 'school_district', 'special_district')
+              select k.id, t.area_id from host
+              join polity_parent sp on sp.parent_id = host.parent_id
+              join polity k on k.id = sp.polity_id and k.id <> ${input.id}::uuid
+                and k.kind in ('municipality', 'school_district', 'special_district') and (host."isCounty" or k.kind <> 'municipality')
               join polity_territory t on t.polity_id = k.id and upper_inf(t.valid)
             ),
-            below(id, top) as (
+            below(id, top, "isNested") as (
               select * from (
-                select distinct polity_id, polity_id from polity_parent where parent_id = ${input.id}::uuid
+                select distinct polity_id, polity_id, true from polity_parent where parent_id = ${input.id}::uuid
                 union
-                select candidates.id, candidates.id from candidates
+                select candidates.id, candidates.id, host."isCounty" from candidates
                 join area_geometry g on g.area_id = candidates.area_id and upper_inf(g.valid)
-                join county on st_contains(county.geom, coalesce(g.label_point, st_pointonsurface(g.geom)))
-                  or (g.geom && county.point and st_contains(g.geom, county.point))
-                  or (g.geom && county.geom and st_area(st_intersection(g.geom, county.geom)) > 0.1 * st_area(g.geom))
+                join host on (host."isCounty" and st_contains(host.geom, coalesce(g.label_point, st_pointonsurface(g.geom))))
+                  or (host."isCounty" and g.geom && host.point and st_contains(g.geom, host.point))
+                  or (g.geom && host.geom and st_area(st_intersection(g.geom, host.geom)) > 0.1 * least(st_area(g.geom), st_area(host.geom)))
               ) seed
               union
-              select p.polity_id, below.top from polity_parent p join below on p.parent_id = below.id
+              select p.polity_id, below.top, below."isNested" from polity_parent p join below on p.parent_id = below.id
             )
             select below.top as id, (select kind::text from polity where id = below.top) as kind, count(e.id)::int as elections,
               min(extract(year from e.date_from))::int as first, max(extract(year from e.date_from))::int as last,
-              sum(count(e.id)) over ()::int as within
+              sum(case when bool_or(below."isNested") then count(e.id) else 0 end) over ()::int as within
             from below left join lateral (
               select e.id, e.date_from from election e
               where e.polity_id = below.id

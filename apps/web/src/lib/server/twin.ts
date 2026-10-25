@@ -1426,7 +1426,7 @@ function polityMarkdown(
     ...(polity.polities.length === 0
       ? []
       : [
-          `## ${m.polity_subdivisions()}`,
+          `## ${polity.kind === "municipality" ? m.polity_districts() : m.polity_subdivisions()}`,
           ...Map.groupBy(polity.polities, (child) => child.kind)
             .entries()
             .toArray()

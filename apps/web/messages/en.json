@@ -594,6 +594,7 @@
   "seats_change_notional": "Changes are measured against notional {year} results on the new boundaries, estimated by Rallings and Thrasher.",
   "seats_change_resized": "Changes compare with the {year} election, when the chamber had {before} seats. It now has {now}.",
   "polity_subdivisions": "Subdivisions",
+  "polity_districts": "Districts",
   "polity_local_one": "Local: {place}",
   "polity_local_more": "Local: {place} and {count} more",
   "polity_elections": "Elections",

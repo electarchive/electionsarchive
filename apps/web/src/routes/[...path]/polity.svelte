@@ -730,7 +730,9 @@
       <h2 id="{uid}-places" class="text-[0.8125rem] font-bold">
         {kinds.length === 2
           ? (KINDS[kinds[1] ?? ""]?.() ?? m.polity_subdivisions())
-          : m.polity_subdivisions()}
+          : polity.kind === "municipality"
+            ? m.polity_districts()
+            : m.polity_subdivisions()}
       </h2>
       {#if kinds.length > 2}
         <div class="flex" role="group" aria-label={m.polity_kind_label()}>
