@@ -597,6 +597,7 @@ def _publish_table(conn: Connection, stage: Stage, table: str) -> None:
                                 ),
                                 [ids],
                             )
+                conn.execute("delete from public.ballot_question where contest_id = any(%s::uuid[])", [ids])
                 conn.execute("delete from public.result_set where contest_id = any(%s::uuid[])", [ids])
                 conn.execute(
                     "delete from public.candidacy where option_id in (select id from public.contest_option where contest_id = any(%s::uuid[]))",
