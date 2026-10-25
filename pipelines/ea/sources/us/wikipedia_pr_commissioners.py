@@ -14,7 +14,7 @@ from ea.sources.us.wikipedia_guam_governors import count, fields_of, plain, temp
 from ea.store import DATA, connect
 
 SOURCE = "us.wikipedia_pr_commissioners"
-VERSION = "1"
+VERSION = "2"
 PARSED = DATA / "parsed" / SOURCE
 API = "https://en.wikipedia.org/w/api.php?"
 TITLE = "Puerto Rican general election articles, Resident Commissioner results"
@@ -160,21 +160,22 @@ def emit() -> Path:
         ).fetchone()
         plans = conn.execute("select id, valid_from, valid_to from boundary_set where scheme_code = 'us.cd'").fetchall()
         holders = [
-            (person, tokens)
-            for person, tokens in (
-                (
-                    person,
-                    re.sub(
-                        r"[^a-z ]", " ", unicodedata.normalize("NFKD", text).encode("ascii", "ignore").decode().lower()
-                    ).split(),
-                )
-                for person, text in conn.execute(
-                    """select t.person_id, n.text from tenure t
-                       join external_id x on x.entity_id = t.seat_id and x.scheme = 'us.seat'
-                       join name n on n.entity_id = t.person_id and n.is_preferred
-                       where x.value = 'house:PR'"""
-                ).fetchall()
+            (
+                person,
+                re.sub(
+                    r"[^a-z ]", " ", unicodedata.normalize("NFKD", text).encode("ascii", "ignore").decode().lower()
+                ).split(),
+                start,
+                end,
             )
+            for person, text, start, end in conn.execute(
+                """select t.person_id, n.text, extract(year from t.from_date)::int,
+                          coalesce(extract(year from t.to_date)::int, 9999)
+                   from tenure t
+                   join external_id x on x.entity_id = t.seat_id and x.scheme = 'us.seat'
+                   join name n on n.entity_id = t.person_id and n.is_preferred
+                   where x.value = 'house:PR'"""
+            ).fetchall()
         ]
         parties_known = {value for (value,) in conn.execute("select value from external_id where scheme = 'us.party'")}
         created: set[UUID] = set()
@@ -290,8 +291,10 @@ def emit() -> Path:
                     person = next(
                         (
                             holder
-                            for holder, tokens in holders
-                            if words[-1] in tokens and tokens[0][0] == candidate[0].lower()
+                            for holder, tokens, start, end in holders
+                            if words[-1] in tokens
+                            and tokens[0][0] == candidate[0].lower()
+                            and start - 4 <= year <= end + 4
                         ),
                         None,
                     )
