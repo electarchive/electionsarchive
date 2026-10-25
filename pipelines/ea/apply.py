@@ -1012,7 +1012,10 @@ def _rollup(
               left join area district on district.id = rs.district_area_id
               join ancestors a on a.unit_k = u.unit_k and coalesce(a.on_date, 'infinity') = u.day
               left join area origin on origin.id = a.origin_id
-              where district.id is null or origin.id = district.id or origin.scheme_code is distinct from district.scheme_code
+              left join area reached on reached.id = a.area_id
+              where district.id is null
+                 or (origin.id = district.id or origin.scheme_code is distinct from district.scheme_code)
+                and (reached.id = district.id or reached.scheme_code is distinct from district.scheme_code)
               group by u.result_set_k, u.unit_k, a.area_id
             ),
             spans as (
