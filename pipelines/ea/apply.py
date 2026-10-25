@@ -1199,6 +1199,7 @@ def publish(conn: Connection, changeset_id: str) -> None:
                select c.entity_id, c.into_id from chain c
                where not exists (select from entity_merge m where m.entity_id = c.into_id)"""
         )
+        conn.execute("analyze survivor")
         types = [
             kind
             for (kind,) in conn.execute(
