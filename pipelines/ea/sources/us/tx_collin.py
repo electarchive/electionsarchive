@@ -53,12 +53,15 @@ def entity_first(text: str) -> str:
         text = f"{found[2]} of {found[1]}, {found[3]}"
     elif " - " in text:
         left, _, right = text.partition(" - ")
-        if ENTITY.search(left) and not ENTITY.search(right):
+        if re.match(r"(?i)(?:city|town|village) of\b", right):
+            text = f"{right}, {left}"
+        elif ENTITY.search(left) and not ENTITY.search(right):
             text = f"{left}, {right}"
         elif ENTITY.search(right) and not ENTITY.search(left):
             text = f"{right}, {left}"
     if not ENTITY.search(text) and re.search(r"(?i)trustee|school board", text):
         text += " ISD"
+    text = re.sub(r"(?i)\b(District|At-Large|Place|Position) No\.? ?(\d)", r"\1 \2", text)
     words = text.split()
     if len(words) > 3 and words[-1].lower() == words[0].lower():
         text = " ".join(words[:-1])
