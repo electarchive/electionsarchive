@@ -1,3 +1,4 @@
+import csv
 import html
 import re
 import subprocess
@@ -8,19 +9,41 @@ from pathlib import Path
 from uuid import UUID
 
 import polars as pl
+from PIL import Image
 
 from ea import raw
 from ea.changeset import Changeset, slug
 from ea.store import DATA, connect
 
 SOURCE = "us.houston_citysec"
-VERSION = "1"
+VERSION = "2"
 PARSED = DATA / "parsed" / SOURCE
+PAGES = DATA / "pages" / SOURCE
+SCANS = Path(__file__).with_name("houston_citysec_scans.tsv")
 PUBLISHER = "City of Houston, Office of the City Secretary"
 TITLE = "Canvass of general and runoff elections"
 LISTING = "https://www.houstontx.gov/citysec/elections/electionsindex.html"
 FILE = "https://www.houstontx.gov/citysec/elections/{name}.pdf"
 FILES = {
+    "110591": (date(1991, 11, 5), "scan"),
+    "120791": (date(1991, 12, 7), "scan"),
+    "110293": (date(1993, 11, 2), "scan"),
+    "120493": (date(1993, 12, 4), "scan"),
+    "110795": (date(1995, 11, 7), "scan"),
+    "120995": (date(1995, 12, 9), "scan"),
+    "110497": (date(1997, 11, 4), "scan"),
+    "120697": (date(1997, 12, 6), "scan"),
+    "110299": (date(1999, 11, 2), "scan"),
+    "120499": (date(1999, 12, 4), "scan"),
+    "110601": (date(2001, 11, 6), "scan"),
+    "120101": (date(2001, 12, 1), "scan"),
+    "110403": (date(2003, 11, 4), "scan"),
+    "120603": (date(2003, 12, 6), "scan"),
+    "110805": (date(2005, 11, 8), "scan"),
+    "121005": (date(2005, 12, 10), "scan"),
+    "110607": (date(2007, 11, 6), "scan"),
+    "120807": (date(2007, 12, 8), "scan"),
+    "110513": (date(2013, 11, 5), "scan"),
     "110309": (date(2009, 11, 3), "summary"),
     "110811": (date(2011, 11, 8), "summary"),
     "121011": (date(2011, 12, 10), "summary"),
@@ -28,7 +51,13 @@ FILES = {
     "110723": (date(2023, 11, 7), "summary"),
     "120923": (date(2023, 12, 9), "canvass"),
 }
-RUNOFFS = {2009: date(2009, 12, 12), 2011: date(2011, 12, 10), 2019: date(2019, 12, 14), 2023: date(2023, 12, 9)}
+RUNOFFS = {
+    2009: date(2009, 12, 12),
+    2013: date(2013, 12, 14),
+    2011: date(2011, 12, 10),
+    2019: date(2019, 12, 14),
+    2023: date(2023, 12, 9),
+}
 PLACE = "4835000"
 OFFICES = ("mayor", "controller", "district", "at-large")
 WORD = re.compile(r'<word xMin="([\d.]+)" yMin="([\d.]+)" xMax="([\d.]+)" yMax="([\d.]+)">([^<]*)</word>')
@@ -44,6 +73,11 @@ SKIP = re.compile(
 METHOD = (
     "City totals from the City Secretary's canvass, summed over Harris, Fort Bend, and Montgomery counties where the "
     "canvass reports each county. A seat no candidate won with a majority went to a runoff between the top two."
+)
+SCANNED = (
+    "City totals from the City Secretary's combined summary for Harris, Fort Bend, and Montgomery counties, a scanned "
+    "page. Each count was read by two independent readers and checked against the percentage printed beside it. A "
+    "seat no candidate won with a majority went to a runoff between the top two."
 )
 
 type Word = tuple[float, float, float, float, str]
@@ -246,9 +280,37 @@ def fetch() -> None:
 
 def parse() -> None:
     rows = []
+    with SCANS.open(newline="") as handle:
+        scanned = list(csv.DictReader(handle, delimiter="\t"))
     for name, (day, kind) in FILES.items():
         url = FILE.format(name=name)
         path = raw.cached(SOURCE, url).path
+        if kind == "scan":
+            groups: dict[str, list[dict[str, str]]] = {}
+            for row in scanned:
+                if row["file"] == name:
+                    groups.setdefault(row["office"], []).append(row)
+            if not groups:
+                raise ValueError(f"{name}: no transcription")
+            for office, group in groups.items():
+                total = sum(int(row["votes"]) for row in group if row["check"] != "unprinted")
+                for row in group:
+                    if row["check"] == "" and abs(100 * int(row["votes"]) / total - float(row["percent"])) > 0.011:
+                        raise ValueError(f"{name}: {office} {row['candidate']} does not tie to its percentage")
+                    rows.append(
+                        {
+                            "day": day,
+                            "url": url,
+                            "office": office,
+                            "county": "Combined",
+                            "candidate": row["candidate"],
+                            "votes": int(row["votes"]),
+                            "misprint": row["percent"] if row["check"] == "misprint" else None,
+                            "page": int(row["page"]),
+                            "box": [float(row[edge]) for edge in ("x0", "y0", "x1", "y1")],
+                        }
+                    )
+            continue
         if kind == "canvass":
             for office, where, names, values in canvass(path):
                 if names is None:
@@ -295,7 +357,11 @@ def parse() -> None:
             rows.append(
                 {"day": day, "url": url, "office": office, "county": where, "candidate": candidate, "votes": votes}
             )
-    frame = pl.DataFrame(rows)
+    frame = pl.DataFrame(
+        [{"misprint": None, "page": None, "box": None, **row} for row in rows],
+        schema_overrides={"misprint": pl.Utf8, "page": pl.Int32, "box": pl.List(pl.Float64)},
+        infer_schema_length=None,
+    )
     PARSED.mkdir(parents=True, exist_ok=True)
     frame.write_parquet(PARSED / "rows.parquet")
     print(frame.group_by("day").agg(pl.col("office").n_unique().alias("contests"), pl.len()).sort("day"))
@@ -306,7 +372,9 @@ def display(text: str) -> str:
     text = re.sub(r"\s+", " ", text.replace("“", '"').replace("”", '"').replace(" .", ".")).strip()
     if re.sub("Mc", "", text) != re.sub("Mc", "", text).upper():
         return text
-    text = re.sub(r"[A-Z]+", lambda found: found[0] if found[0] in ("II", "III", "IV") else found[0].capitalize(), text)
+    text = re.sub(
+        r"[^\W\d_]+", lambda found: found[0] if found[0] in ("II", "III", "IV") else found[0].capitalize(), text
+    )
     return re.sub(r"\bMc([a-z])", lambda found: "Mc" + found[1].upper(), text)
 
 
@@ -325,7 +393,7 @@ def emit() -> Path:
             pipeline=SOURCE,
             version=VERSION,
             summary=(
-                "Houston mayor, controller, and City Council 2009-2023 from the City Secretary's canvasses, on their "
+                "Houston mayor, controller, and City Council 1991-2023 from the City Secretary's canvasses, on their "
                 "election days with runoffs chained to their first rounds"
             ),
             polity="US-TX",
@@ -350,8 +418,31 @@ def emit() -> Path:
             license="Public record",
         )
         cs.artifact(raw.cached(SOURCE, LISTING), source)
-        for url in sorted(set(frame["url"])):
-            cs.artifact(raw.cached(SOURCE, url), source)
+        artifacts = {url: cs.artifact(raw.cached(SOURCE, url), source) for url in sorted(set(frame["url"]))}
+        pages: dict[tuple[str, int], UUID] = {}
+        for url, number in (
+            frame.filter(pl.col("page").is_not_null()).select("url", "page").unique().sort("url", "page").iter_rows()
+        ):
+            artifact = raw.cached(SOURCE, url)
+            page = pages[(url, number)] = cs.page(artifacts[url], number)
+            image = PAGES / f"{artifact.sha256}-{number}.png"
+            if not image.exists():
+                PAGES.mkdir(parents=True, exist_ok=True)
+                subprocess.run(
+                    ["pdftoppm", "-r", "100", "-png", "-f", str(number), "-l", str(number), "-singlefile"]
+                    + [str(artifact.path), str(image.with_suffix(""))],
+                    check=True,
+                )
+            with Image.open(image) as opened:
+                cs.add(
+                    "source_page",
+                    id=page,
+                    artifact_id=artifacts[url],
+                    page_number=number,
+                    image_key=f"pages/{SOURCE}/{image.name}",
+                    width=opened.width,
+                    height=opened.height,
+                )
         system = cs.key("us.electoral_system", "two_round")
         if system in cs.minted:
             raise ValueError("the two-round system must already exist")
@@ -382,7 +473,8 @@ def emit() -> Path:
         minted: set[str] = set()
         elections: dict[date, tuple[UUID, str]] = {}
         firsts: dict[tuple[int, str], UUID] = {}
-        values: list[tuple[str, str, str, int]] = []
+        values: list[tuple[str, str, str, int, int]] = []
+        locators: list[tuple[str, str, str, str, float, float, float, float]] = []
         report: dict[str, int] = {"taken over": 0, "new": 0, "runoffs chained": 0, "unmatched options": 0}
         differences: list[str] = []
 
@@ -509,6 +601,10 @@ def emit() -> Path:
             prior = conn.execute(
                 f"select {', '.join(columns)} from result_set where contest_id = %s and is_default", [contest]
             ).fetchone()
+            replaced = None
+            if prior is not None and prior[0] == cs.key(f"{SOURCE}.result_set", contest_key):
+                replaced = conn.execute("select supersedes_id from result_set where id = %s", [prior[0]]).fetchone()[0]
+                prior = None
             if prior is not None:
                 kept = dict(zip(columns, prior, strict=True))
                 kept["election_id"] = election_id
@@ -525,9 +621,22 @@ def emit() -> Path:
                 source_id=source,
                 is_default=True,
                 completeness=1,
-                supersedes_id=prior[0] if prior else None,
+                supersedes_id=prior[0] if prior else replaced,
             )
-            cs.add("note", entity_id=result_set, kind="methodology", body_md=METHOD)
+            scan = FILES[Path(rows["url"][0]).stem][1] == "scan"
+            cs.add("note", entity_id=result_set, kind="methodology", body_md=SCANNED if scan else METHOD)
+            for candidate, votes, printed in (
+                rows.filter(pl.col("misprint").is_not_null()).select("candidate", "votes", "misprint").iter_rows()
+            ):
+                cs.add(
+                    "note",
+                    entity_id=result_set,
+                    kind="caveat",
+                    body_md=(
+                        f"The canvass prints {votes:,} votes for {display(candidate)} beside {printed} percent, "
+                        "which does not match that count; the count is stored as printed."
+                    ),
+                )
             options: list[tuple[list[str], UUID, UUID | None, UUID | None, str]] = []
             for option, label, person, candidacy in conn.execute(
                 """select o.id, o.ballot_label, cy.person_id, cy.id from contest_option o
@@ -550,31 +659,36 @@ def emit() -> Path:
                 else {}
             )
             totals: dict[tuple[str, ...], list] = {}
-            for candidate, votes in rows.select("candidate", "votes").iter_rows():
+            for candidate, votes, number, box in rows.select("candidate", "votes", "page", "box").iter_rows():
                 write_in = bool(re.search(r"\((W|WRITE[- ]IN)\)", candidate, re.IGNORECASE))
                 group = ("write-in",) if write_in else tuple(fold(display(candidate)))
-                entry = totals.setdefault(group, [display(candidate), 0, write_in])
+                entry = totals.setdefault(group, [display(candidate), 0, write_in, []])
                 entry[1] += votes
+                entry[3].append((number, box))
             ranked: list[tuple[int, UUID]] = []
             chosen: dict[tuple[str, ...], UUID] = {}
-            for group, (label, votes, write_in) in sorted(totals.items(), key=lambda item: -item[1][1]):
+            for group, (label, votes, write_in, _) in sorted(totals.items(), key=lambda item: -item[1][1]):
                 if write_in:
                     option = cs.key("us.option", f"{contest_key}:write_in")
                     cs.add("contest_option", id=option, contest_id=contest, kind="write_in", ballot_label="Write-ins")
                     chosen[group] = option
                     continue
                 words = list(group)
-                match = next((entry for entry in options if entry[0][-1] == words[-1]), None) or next(
-                    (
-                        entry
-                        for entry in options
-                        if entry[0][0] == words[0]
-                        and (
-                            set(entry[0][1:]) & set(words[1:])
-                            or SequenceMatcher(None, entry[0][-1], words[-1]).ratio() >= 0.8
-                        )
-                    ),
-                    None,
+                match = (
+                    next((entry for entry in options if entry[0][-1] == words[-1]), None)
+                    or next(
+                        (
+                            entry
+                            for entry in options
+                            if entry[0][0] == words[0]
+                            and (
+                                set(entry[0][1:]) & set(words[1:])
+                                or SequenceMatcher(None, entry[0][-1], words[-1]).ratio() >= 0.8
+                            )
+                        ),
+                        None,
+                    )
+                    or next((entry for entry in options if set(entry[0]) == set(words)), None)
                 )
                 option, person, candidacy = (None, None, None) if match is None else match[1:4]
                 if match is not None:
@@ -607,6 +721,7 @@ def emit() -> Path:
                 chosen[group] = option
                 ranked.append((votes, option))
             report["unmatched options"] += len(options)
+            differences += [f"{title(day, office, runoff)}: unmatched {entry[4]}" for entry in options]
             total = sum(entry[1] for entry in totals.values())
             decided = runoff or ranked[0][0] * 2 > total
             for rank, (_, option) in enumerate(ranked):
@@ -623,8 +738,12 @@ def emit() -> Path:
             )
             if unit in cs.minted:
                 raise ValueError(f"no reporting unit for {office}")
-            for group, (_, votes, _) in totals.items():
-                values.append((str(result_set), str(unit), str(chosen[group]), votes))
+            for group, (_, votes, _, located) in totals.items():
+                found = located[0] if len(located) == 1 and located[0][0] is not None else None
+                values.append((str(result_set), str(unit), str(chosen[group]), votes, 8 if found else 0))
+                if found:
+                    page_id = pages[(rows["url"][0], found[0])]
+                    locators.append((str(result_set), str(unit), str(chosen[group]), str(page_id), *found[1]))
         for year, day in RUNOFFS.items():
             election_id, path = election(day)
             for office in sorted({office for (y, office) in firsts if y == year}):
@@ -652,11 +771,27 @@ def emit() -> Path:
             print("  differs:", line)
         cs.frame(
             "result_value",
-            pl.DataFrame(values, schema=["result_set_id", "unit_id", "option_id", "value"], orient="row").with_columns(
+            pl.DataFrame(
+                values, schema=["result_set_id", "unit_id", "option_id", "value", "flags"], orient="row"
+            ).with_columns(
                 channel=pl.lit(0, pl.Int16),
                 measure=pl.lit(1, pl.Int16),
                 count_round=pl.lit(0, pl.Int16),
-                flags=pl.lit(0, pl.Int16),
+                flags=pl.col("flags").cast(pl.Int16),
             ),
         )
+        if locators:
+            cs.frame(
+                "value_locator",
+                pl.DataFrame(
+                    locators,
+                    schema=["result_set_id", "unit_id", "option_id", "page_id", "x0", "y0", "x1", "y1"],
+                    orient="row",
+                ).with_columns(
+                    channel=pl.lit(0, pl.Int16),
+                    measure=pl.lit(1, pl.Int16),
+                    count_round=pl.lit(0, pl.Int16),
+                    source_id=pl.lit(None, pl.Utf8),
+                ),
+            )
         return cs.write()
