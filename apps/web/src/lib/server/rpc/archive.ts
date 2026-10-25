@@ -4289,9 +4289,20 @@ export const contests = {
         party: string | null;
         color: string | null;
         label: string | null;
+        seats: number | null;
+        votes: number | null;
       }>(sql`
         select distinct on (c.id, o.k) c.id as root, head.person, x.party, ${paint(sql`x.party`, sql`e.id`, sql`e.date_from`)} as color,
-          coalesce(o.ballot_label, o.kind::text) as label
+          coalesce(o.ballot_label, o.kind::text) as label, w.seats, (
+            select sum(y.value)::float8 from result_rollup y
+            where y.result_set_k = rs.k and y.option_k = o.k and y.measure = any(${COUNTED}) and y.count_round in (0, 1)
+              and y.area_k = (
+                select a.k from area a where a.id = coalesce(c.district_area_id, (
+                  select pt.area_id from polity_territory pt where pt.polity_id = e.polity_id and pt.valid @> e.date_from limit 1
+                ))
+              )
+            offset 0
+          ) as votes
         from contest c
         join election e on e.id = c.election_id
         join result_set rs on rs.contest_id = c.id and ${latest("rs")}
@@ -4335,7 +4346,12 @@ export const contests = {
             measure: MEASURES.get(row.measure) ?? "votes",
             seats: seated
               .get(row.root)
-              ?.map((seat) => ({
+              ?.toSorted(
+                (a, b) =>
+                  (b.seats ?? 0) - (a.seats ?? 0) ||
+                  (b.votes ?? 0) - (a.votes ?? 0),
+              )
+              .map((seat) => ({
                 key:
                   seat.party == null
                     ? `person:${seat.person ?? ""}`
