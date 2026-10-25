@@ -555,7 +555,7 @@ def emit() -> Path:
                 for row in turnout:
                     if (code := constituency_codes.get(leh.fold(str(row[0] or "")))) is not None:
                         merged.setdefault(code, {}).update(registered=row[1], ballots=row[2])
-                for row in spoils:
+                for row in spoils[6:20]:
                     if (code := constituency_codes.get(leh.fold(str(row[0] or "")))) is not None:
                         merged.setdefault(code, {}).update(invalid=row[6], valid=row[8])
             for grain, file, sheet, header, name_col, lac_col, columns, good, spoiled, electorate, counted in specs:
@@ -693,7 +693,11 @@ def emit() -> Path:
             registered, ballots, rejected = COUNTED.get(year, (None, None, rejected))
             valid = sum(first for _, _, first, _ in candidates)
             totals = {REGISTERED: registered, BALLOTS: ballots, VALID: valid, INVALID: rejected}
-            cells = [(measure, 0, value, 0) for measure, value in totals.items() if value is not None]
+            cells = [
+                (measure, first_round if measure == VALID else 0, value, 0)
+                for measure, value in totals.items()
+                if value is not None
+            ]
             if year not in COUNTED:
                 for measure, key in ((REGISTERED, "registered"), (BALLOTS, "ballots"), (INVALID, "invalid")):
                     summed = [entry[key] for entry in grains["lac"].values()]
@@ -855,7 +859,7 @@ def emit() -> Path:
                                 name(borough_units[code], borough_names[code])
                         place = borough_units[code]
                     values = [
-                        (None, measure, 0, entry[key])
+                        (None, measure, first_round if measure == VALID else 0, entry[key])
                         for measure, key in (
                             (REGISTERED, "registered"),
                             (BALLOTS, "ballots"),
