@@ -62,7 +62,11 @@ def _read(registry: Mapping[str, Mapping[str, str]]) -> Iterator[dict[str, Any]]
                 for node in tx_harris.contests(text):
                     node["text"] = tx_harris.normalize(node["text"])
                     total = sum(int(choice["total"]) for choice in node["choices"])
-                    if tx_harris.COUNTY_OFFICE.search(node["text"]) or total != node["cast"]:
+                    if (
+                        tx_harris.COUNTY_OFFICE.search(node["text"])
+                        or re.match(r"(?i)city of fort worth city council\b", node["text"])
+                        or total != node["cast"]
+                    ):
                         if total != node["cast"]:
                             print(f"{day} {node['text']}: candidates add to {total}, printed {node['cast']}; skipped")
                         continue
