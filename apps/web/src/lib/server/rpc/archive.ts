@@ -15309,6 +15309,7 @@ export const search = {
         eu: "european union",
         nyc: "new york city",
         dc: "district of columbia",
+        "washington dc": "district of columbia",
       };
       const district = /^([a-z]{2})[-\s]?(\d{1,2}|al)$/iu.exec(input.q);
       const states =
@@ -15324,8 +15325,13 @@ export const search = {
       const q =
         state == null
           ? input.q.replace(
-              /^(?:great britain|u\.s\.|u\.k\.|uk|gb|britain|usa|us|eu|nyc|dc)(?=\s|$)/iu,
-              (word) => ALIASES[word.toLowerCase()] ?? word,
+              /^(?:washington,? d\.?c\.?|great britain|u\.s\.|u\.k\.|uk|gb|britain|usa|us|eu|nyc|dc)(?=\s|$)/iu,
+              (word) =>
+                ALIASES[word.toLowerCase()] ??
+                ALIASES[
+                  word.toLowerCase().replaceAll(".", "").replace(",", "")
+                ] ??
+                word,
             )
           : `${state}'s ${
               Number.isNaN(seat)
@@ -15467,7 +15473,7 @@ export const search = {
         left join lateral (
             select held.id, held.rank from (
               select coalesce(c.office_id, c.body_id) as id, el.date_from as at,
-                case when fp.kind in ('sovereign_state', 'supranational') then 3 when f.id is not null then 2
+                case when f.kind = 'mayor' then 0 when fp.kind in ('sovereign_state', 'supranational') then 3 when f.id is not null then 2
                   when b.kind = 'upper_house' then 1 else 0 end as rank
               from candidacy cy
               join outcome oc on oc.option_id = cy.option_id and oc.kind in ('elected', 'won')
@@ -15477,7 +15483,7 @@ export const search = {
               left join office f on f.id = c.office_id left join polity fp on fp.id = f.polity_id
               left join body b on b.id = c.body_id left join polity bp on bp.id = b.polity_id
               where cy.person_id = top.entity_id and cy.role = 'head' and (
-                f.kind in ('head_of_state', 'head_of_government', 'governor') and el.polity_id = f.polity_id
+                f.kind in ('head_of_state', 'head_of_government', 'governor', 'mayor') and el.polity_id = f.polity_id
                 or f.id is null and b.kind in ('upper_house', 'lower_house', 'unicameral') and bp.kind = 'sovereign_state')
               union all
               select t.office_id, t.from_date, case when fp.kind in ('sovereign_state', 'supranational') then 3 else 2 end
@@ -15587,11 +15593,17 @@ export const search = {
           (a, b) =>
             Number(
               !["person", "party"].includes(b.type) &&
-                segment(b.name) === segment(q),
+                (segment(b.name) === segment(q) ||
+                  (b.type === "polity" &&
+                    !b.name.includes(" ") &&
+                    segment(b.name.split("-")[0] ?? "") === segment(q))),
             ) -
             Number(
               !["person", "party"].includes(a.type) &&
-                segment(a.name) === segment(q),
+                (segment(a.name) === segment(q) ||
+                  (a.type === "polity" &&
+                    !a.name.includes(" ") &&
+                    segment(a.name.split("-")[0] ?? "") === segment(q))),
             ),
         )
         .slice(0, input.limit);
