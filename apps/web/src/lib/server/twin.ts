@@ -3857,7 +3857,7 @@ function chamberMarkdown(
               m.council_col_runoffs(),
             ],
             council.elections.map((election) => [
-              date(election.date),
+              date(election.when),
               `${link(election.name, election.path)}${election.isSpecial ? ` (${m.council_special()})` : ""}`,
               count(election.up),
               count(election.held),
@@ -3869,7 +3869,7 @@ function chamberMarkdown(
           ...council.elections
             .filter((election) => election.changes.length > 0)
             .flatMap((election) => [
-              `### ${election.name}, ${date(election.date)}`,
+              `### ${election.name}, ${date(election.when)}`,
               election.changes
                 .map(
                   (change) =>

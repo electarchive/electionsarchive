@@ -178,7 +178,7 @@
           {/if}
           <span
             class="font-figures text-[0.8125rem] text-muted-foreground tabular-nums"
-            >{date(election.date)}</span
+            >{date(election.when)}</span
           >
           {#if election.isSpecial}
             <span class="text-xs text-muted-foreground"

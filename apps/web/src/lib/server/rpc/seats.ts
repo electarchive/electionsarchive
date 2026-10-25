@@ -54,6 +54,7 @@ export const seats = {
           elections: v.array(
             v.object({
               date: v.string(),
+              when: v.string(),
               name: v.string(),
               path: v.nullable(v.string()),
               isSpecial: v.boolean(),
@@ -101,6 +102,7 @@ export const seats = {
         contest: string;
         election: string;
         date: string;
+        when: string;
         isSpecial: boolean;
         isPrimary: boolean;
         kind: string;
@@ -116,7 +118,7 @@ export const seats = {
         votes: number | null;
       }>(sql`
         with cs as materialized (
-          select c.id, c.election_id, e.date_from, e.kind = 'special' or c.term = 'remainder' as special, e.kind = 'primary' as primary,
+          select c.id, c.election_id, e.date_from, case e.date_precision when 'month' then to_char(e.date_from, 'YYYY-MM') when 'year' then to_char(e.date_from, 'YYYY') else e.date_from::text end as "when", e.kind = 'special' or c.term = 'remainder' as special, e.kind = 'primary' as primary,
             c.round_number, c.previous_round_id, c.district_area_id,
             c.district_area_id is null or c.district_area_id = (
               select pt.area_id from polity_territory pt where pt.polity_id = b.polity_id and pt.valid @> e.date_from limit 1
@@ -129,7 +131,7 @@ export const seats = {
           where b.id = ${id}::uuid and c.allocation_parent_id is null and c.party_scope_id is null
             and not c.notional and c.kind = 'body_seats' and c.magnitude = 1
         )
-        select cs.id::text as contest, cs.election_id::text as election, cs.date_from::text as date, cs.special as "isSpecial",
+        select cs.id::text as contest, cs.election_id::text as election, cs.date_from::text as date, cs."when", cs.special as "isSpecial",
           cs.primary as "isPrimary", o.kind::text as kind, cs.round_number as round, cs.previous_round_id::text as prior, cs.district_area_id::text as area, cs.wide as "isWide",
           coalesce(cs.segment, '') as segment, ca.person_id::text as person, coalesce(ca.ballot_name, o.ballot_label) as label,
           coalesce(o.party_id, ca.member_of_party_id, (
@@ -248,6 +250,7 @@ export const seats = {
               path: slugs.get(contest) ?? null,
               election: head.election,
               date: head.date,
+              when: head.when,
               decidedOn: rows[0]?.date ?? head.date,
               isSpecial: head.isSpecial,
               isMinor: head.isSpecial,
@@ -317,6 +320,7 @@ export const seats = {
         string,
         {
           date: string;
+          when: string;
           name: string;
           path: string | null;
           isSpecial: boolean;
@@ -357,6 +361,7 @@ export const seats = {
         const before = seat.holders.at(-1);
         const election = elections.get(entry.election) ?? {
           date: entry.date,
+          when: entry.when,
           name: labels.full.get(entry.election) ?? "",
           path: slugs.get(entry.election) ?? null,
           isSpecial: entry.isSpecial,
