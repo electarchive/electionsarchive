@@ -885,21 +885,35 @@
         total = members?.length ?? 0;
       }
       if (members != null && (members.length <= 4 || contest.isStv)) {
-        const names = new Intl.ListFormat(getLocale(), {
-          style: "long",
-          type: "conjunction",
-        }).format(
-          members.map((row) => {
-            const party =
-              row.short ??
-              (row.current?.isIndependent === true
-                ? m.seats_independents()
-                : null);
-            return party == null
-              ? row.label
-              : m.race_member({ name: row.label, party });
-          }),
-        );
+        const list = (rows: typeof members) =>
+          new Intl.ListFormat(getLocale(), {
+            style: "long",
+            type: "conjunction",
+          }).format(
+            rows.map((row) => {
+              const party =
+                row.short ??
+                (row.current?.isIndependent === true
+                  ? m.seats_independents()
+                  : null);
+              return party == null
+                ? row.label
+                : m.race_member({ name: row.label, party });
+            }),
+          );
+        const returned =
+          contest.isStv && contest.count != null
+            ? members.filter((row) => (row.current?.votes ?? 0) === 0)
+            : [];
+        if (returned.length === 1 && members.length > 1) {
+          return m.race_lede_members_stv_returned({
+            names: list(members.filter((row) => !returned.includes(row))),
+            seats: count(members.length - returned.length),
+            total: count(total),
+            returned: list(returned),
+          });
+        }
+        const names = list(members);
         return contest.isStv && contest.count == null
           ? m.race_lede_members_stv_first({
               names,

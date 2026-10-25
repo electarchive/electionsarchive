@@ -491,6 +491,7 @@
   "race_member": "{name} ({party})",
   "race_lede_members": "{names} won the {total} seats.",
   "race_lede_members_stv": "{names} won the {total} seats by single transferable vote.",
+  "race_lede_members_stv_returned": "{names} won {seats} of the {total} seats by single transferable vote. {returned} was returned automatically, without a contest.",
   "race_lede_members_stv_first": "{names} won the {total} seats by single transferable vote. The archive publishes only first preferences, so the transfers that decided the later seats are not shown. The Droop quota, calculated from the valid votes, was {quota}.",
   "term_margin_last": "The gap between the share of the last candidate elected and the share of the best-placed candidate who lost, in percentage points.",
   "race_unopposed": [
