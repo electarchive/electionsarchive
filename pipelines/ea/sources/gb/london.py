@@ -14,7 +14,7 @@ from ea.sources.gb import leh
 from ea.store import connect
 
 SOURCE = "gb.london"
-VERSION = "4"
+VERSION = "5"
 VOTES, REGISTERED, BALLOTS, VALID, INVALID, EXHAUSTED = 1, 2, 3, 4, 5, 21
 REPORT_2004 = (
     "https://data.london.gov.uk/download/e585w/94efc8af-b7ce-4d60-9b18-e587084e207f/GLA-mayoral-election-2004.pdf"
@@ -507,6 +507,78 @@ ASSEMBLY_PEOPLE = {
     "Alessandro Georgiou": "Q125777501",
 }
 ALIASES = {"Anne Marie Bates Clarke": "Anne Clarke"}
+PERSON_NAMES = {"Huge De Burgh": "Hugo de Burgh"}
+WIKIPEDIA = "https://en.wikipedia.org/wiki/"
+FORMER_MEMBERS = "https://www.london.gov.uk/who-we-are/what-london-assembly-does/about-london-assembly/former-members-london-assembly"
+RESULTS_2024 = "https://gla.moderngov.co.uk/documents/s111325/"
+REPLACEMENTS: dict[tuple[int, str], tuple[str, date, str, date, str, list[str]]] = {
+    (2000, "lammy"): ("Jennette Arnold", date(2000, 7, 4), "day", date(2000, 7, 4), "day", ["David_Lammy"]),
+    (2000, "bloom"): (
+        "Mike Tuffrey",
+        date(2002, 2, 18),
+        "day",
+        date(2002, 2, 18),
+        "day",
+        ["Mike_Tuffrey", "Louise_Bloom"],
+    ),
+    (2000, "phillips"): (
+        "Diana Johnson",
+        date(2003, 3, 1),
+        "day",
+        date(2003, 2, 1),
+        "month",
+        ["Diana_Johnson", "Trevor_Phillips"],
+    ),
+    (2000, "anderson"): (
+        "Noel Lynch",
+        date(2003, 5, 2),
+        "day",
+        date(2003, 3, 30),
+        "day",
+        ["Noel_Lynch", "Victor_Anderson_(Green_politician)"],
+    ),
+    (2004, "featherstone"): (
+        "Geoff Pope",
+        date(2005, 6, 6),
+        "day",
+        date(2005, 6, 1),
+        "month",
+        ["Geoff_Pope_(politician)"],
+    ),
+    (2012, "borwick"): (
+        "Kemi Badenoch",
+        date(2015, 9, 16),
+        "day",
+        date(2015, 9, 16),
+        "day",
+        ["Victoria_Borwick", "Kemi_Badenoch"],
+    ),
+    (2016, "badenoch"): (
+        "Susan Hall",
+        date(2017, 6, 20),
+        "day",
+        date(2017, 6, 8),
+        "day",
+        ["Kemi_Badenoch", "Susan_Hall"],
+    ),
+    (2016, "copley"): (
+        "Alison Moore",
+        date(2020, 3, 25),
+        "day",
+        date(2020, 3, 22),
+        "day",
+        ["Tom_Copley", "Alison_Moore_(politician)"],
+    ),
+    (2016, "twycross"): (
+        "Murad Qureshi",
+        date(2020, 3, 25),
+        "day",
+        date(2020, 3, 22),
+        "day",
+        ["Fiona_Twycross", "Murad_Qureshi"],
+    ),
+    (2024, "berry"): ("Zoë Garbett", date(2024, 5, 7), "day", date(2024, 5, 7), "day", ["Zoë_Garbett"]),
+}
 WINNERS_2012 = {"LAB": "Labour", "CON": "Conservative", "GREEN": "Green Party", "LD": "Liberal Democrats"}
 LIST_MEMBERS: dict[int, dict[str, list[str]]] = {
     2000: {
@@ -590,6 +662,7 @@ def emit() -> Path:
         office = cs.key("gb.office", "mayor:london")
         cs.add("office", id=office, polity_id=london, body_id=None, kind="mayor")
         name(office, "Mayor of London")
+        terms: list[tuple[str, int, date, UUID, UUID, str]] = []
         unit = cs.unit("gb.region", "E12000007")
         cs.add(
             "reporting_unit",
@@ -972,6 +1045,8 @@ def emit() -> Path:
                     kinds = ("lost",)
                 for kind in kinds:
                     cs.add("outcome", result_set_id=result_set, option_id=option, kind=kind)
+                if full == winner:
+                    terms.append(("mayor", year, day, persons[full], contest, full))
             for grain, entries in grains.items():
                 if not entries:
                     continue
@@ -1147,7 +1222,8 @@ def emit() -> Path:
                 people[key] = cs.key(*key)
                 if people[key] in cs.minted:
                     cs.add("person", id=people[key])
-                    name(people[key], full if qid is None else labels_by.get(qid, full))
+                    label = PERSON_NAMES.get(full, full) if qid is None else labels_by.get(qid, full)
+                    name(people[key], re.sub(r"^(?:Sir|Dame|Lord|Lady|Baroness|Baron) ", "", label))
             return people[key]
 
         for year, (day, *_) in ELECTIONS.items():
@@ -1572,6 +1648,9 @@ def emit() -> Path:
                 ]
                 for full, (label, value) in standing.items():
                     owner = None if label is None else party_of(label)
+                    person = person_of(full, full == winners[code])
+                    if full == winners[code]:
+                        terms.append(("assembly", year, day, person, contest, full))
                     option_key = f"{contest_key}:{slug(full)}"
                     option = cs.key("gb.london.option", option_key)
                     cs.add(
@@ -1585,7 +1664,7 @@ def emit() -> Path:
                     cs.add(
                         "candidacy",
                         id=cs.key("gb.london.candidacy", option_key),
-                        person_id=person_of(full, full == winners[code]),
+                        person_id=person,
                         option_id=option,
                         role="head",
                         ballot_name=full,
@@ -1691,10 +1770,13 @@ def emit() -> Path:
                     for label, entries in rosters.items():
                         for position, full, elected in entries:
                             candidacy = cs.key("gb.london.candidacy", f"{contest_key}:{slug(label)}:{slug(full)}")
+                            person = person_of(full, elected)
+                            if elected:
+                                terms.append(("assembly", year, day, person, contest, full))
                             cs.add(
                                 "candidacy",
                                 id=candidacy,
-                                person_id=person_of(full, elected),
+                                person_id=person,
                                 option_id=options[label],
                                 role="list_member",
                                 list_position=position,
@@ -1737,6 +1819,90 @@ def emit() -> Path:
                             flags=0 if printed is None or year not in (2004, 2008) or str(value) in printed else 1,
                             value=value,
                         )
+        wiki: dict[str, UUID] = {}
+        for page in sorted({page for *_, pages in REPLACEMENTS.values() for page in pages}):
+            title = page.replace("_", " ")
+            wiki[page] = cs.source("Wikipedia", title)
+            cs.add(
+                "source",
+                id=wiki[page],
+                kind="community",
+                publisher="Wikipedia",
+                title=title,
+                url=WIKIPEDIA + page,
+                license="CC BY-SA 4.0",
+                license_url="https://creativecommons.org/licenses/by-sa/4.0/",
+                notes="Infobox dates of the London Assembly membership.",
+            )
+        former = cs.source(GLA, "Former Members of the London Assembly")
+        cs.add(
+            "source",
+            id=former,
+            kind="official_body",
+            publisher=GLA,
+            title="Former Members of the London Assembly",
+            url=FORMER_MEMBERS,
+        )
+        results_2024 = cs.source(GLA, "Results of 2024 GLA Elections")
+        cs.add(
+            "source",
+            id=results_2024,
+            kind="official_body",
+            publisher=GLA,
+            title="Results of 2024 GLA Elections",
+            url=RESULTS_2024,
+            notes="Report to the London Assembly; footnote 1 records Zoë Garbett taking the seat Siân Berry was elected to.",
+        )
+        polls = sorted(day for day, *_ in ELECTIONS.values())
+        used: set[tuple[int, str]] = set()
+        for kind, year, day, person, contest, full in terms:
+            later = [poll for poll in polls if poll > day]
+            end = later[0] if later else None
+            base = f"{kind}:{year}:{slug(full)}"
+            tenure = cs.key("gb.london.tenure", base)
+            place = (year, leh.fold(full).split()[-1])
+            replaced = REPLACEMENTS.get(place) if kind == "assembly" else None
+            row = {
+                "id": tenure,
+                "person_id": person,
+                "office_id": office if kind == "mayor" else None,
+                "body_id": body if kind == "assembly" else None,
+                "from_date": day,
+                "from_precision": "day",
+                "to_date": end,
+                "to_precision": "day",
+                "acquired_via": "elected",
+                "contest_id": contest,
+                "ended_via": "term_end" if end else None,
+            }
+            if replaced is None:
+                cs.add("tenure", **row)
+                continue
+            used.add(place)
+            successor, start, start_precision, until, until_precision, pages = replaced
+            cs.add("tenure", **{**row, "to_date": until, "to_precision": until_precision, "ended_via": "resigned"})
+            cs.add("citation", entity_id=tenure, source_id=former)
+            follow = cs.key("gb.london.tenure", f"{base}:successor")
+            cs.add(
+                "tenure",
+                id=follow,
+                person_id=person_of(successor, True),
+                office_id=None,
+                body_id=body,
+                from_date=start,
+                from_precision=start_precision,
+                to_date=end,
+                to_precision="day",
+                acquired_via="list_replacement",
+                contest_id=contest,
+                ended_via="term_end" if end else None,
+                succeeds_tenure_id=tenure,
+            )
+            for page in pages:
+                cs.add("citation", entity_id=follow, source_id=wiki[page])
+            cs.add("citation", entity_id=follow, source_id=results_2024 if year == 2024 else former)
+        if missing := sorted(set(REPLACEMENTS) - used):
+            raise ValueError(f"replacements with no elected list member: {missing}")
         if unmatched:
             print(f"elected with no Wikidata match: {unmatched}")
         return cs.write()
