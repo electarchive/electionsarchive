@@ -18,8 +18,9 @@ from ea.sources.us.alged import SOURCE as ALGED
 from ea.store import DATA, connect
 
 SOURCE = "us.elstats_local"
-VERSION = "9"
+VERSION = "10"
 PARSED = DATA / "parsed" / SOURCE
+PAGE = "https://electionstats.sos.nm.gov/contest/{contest}"
 TOWNS = "https://www2.census.gov/geo/tiger/GENZ2020/shp/cb_2020_09_cousub_500k.zip"
 COUNTY = ("board-of-commissioners", "Board of Commissioners", None)
 SHERIFF = ("sheriff", "Sheriff", "other")
@@ -253,6 +254,12 @@ def fetch() -> None:
     for state, (first, *_) in STATES.items():
         for year in range(first, 2026):
             elstats.gaps(elstats.TENANTS[state][0], url(state, year), fetching=True, source=SOURCE)
+    for year in range(STATES["NM"][0], 2026):
+        frame = elstats.searched(elstats.TENANTS["NM"][0], url("NM", year), source=SOURCE)
+        if frame.height == 0:
+            continue
+        for contest in frame.filter(pl.col("office_name").is_in(list(STATES["NM"][1])))["contest_id"].unique().sort():
+            raw.fetch(SOURCE, PAGE.format(contest=contest), suffix=".html")
 
 
 def parse() -> None:
@@ -318,6 +325,47 @@ def parse() -> None:
             "state", "contest", "day", "stage", "scope", "office", "type", "district", "candidate", "name", "magnitude"
         )
         .agg(pl.col("party").drop_nulls().first(), pl.col("votes").sum(), pl.col("winner").mean() > 0.5)
+    )
+    pages = []
+    for contest in frame.filter(pl.col("state") == "NM")["contest"].unique():
+        try:
+            text = raw.cached(SOURCE, PAGE.format(contest=contest)).path.read_text()
+        except LookupError:
+            continue
+        found = re.search(r'<script id="__NEXT_DATA__"[^>]*>(.*?)</script>', text, re.DOTALL)
+        if found is None:
+            continue
+        for candidate in json.loads(found.group(1))["props"]["pageProps"]["contest"]["candidates"]:
+            name = re.sub(r"\s+", " ", candidate["displayName"]).strip()
+            if not re.match(r"(?i)total ", name):
+                pages.append(
+                    {
+                        "state": "NM",
+                        "contest": contest,
+                        "name": "Write-ins" if re.match(r"(?i)write", name) else name,
+                        "page": candidate["nVotes"],
+                    }
+                )
+    pages = pl.DataFrame(
+        pages, schema={"state": pl.String, "contest": pl.String, "name": pl.String, "page": pl.Int64}
+    ).unique(["state", "contest", "name"], keep="none")
+    joined = frame.join(pages, on=["state", "contest", "name"], how="left")
+    replaced = (
+        joined.group_by("state", "contest")
+        .agg(
+            pl.col("page").is_not_null().all().alias("whole"),
+            (pl.col("page") != pl.col("votes")).any().alias("differs"),
+            pl.len().alias("rows"),
+        )
+        .join(pages.group_by("state", "contest").len(), on=["state", "contest"])
+        .filter(pl.col("whole") & pl.col("differs") & (pl.col("rows") == pl.col("len")))
+        .select("state", "contest", pl.lit(True).alias("replaced"))
+    )
+    print(f"{replaced.height} New Mexico contests take the Secretary of State's contest page totals")
+    frame = (
+        joined.join(replaced, on=["state", "contest"], how="left")
+        .with_columns(votes=pl.when(pl.col("replaced")).then(pl.col("page")).otherwise(pl.col("votes")))
+        .drop("page", "replaced")
     )
     with zipfile.ZipFile(raw.cached(ALGED, SCHOOLS[0]).path) as archive:
         parts = {name.rsplit(".", 1)[1].lower(): archive.read(name) for name in archive.namelist()}
