@@ -68,6 +68,14 @@ const KINDS: Record<string, () => string> = {
   caucus: m.party_kind_caucus,
 };
 
+const PLACE_KINDS: Record<string, () => string> = {
+  county: m.polity_kind_county,
+  municipality: m.polity_kind_municipality,
+  school_district: m.polity_kind_school_district,
+  special_district: m.polity_kind_special_district,
+  judicial_district: m.polity_kind_judicial_district,
+};
+
 const OUTCOMES: Record<string, () => string> = {
   elected: m.outcome_elected,
   won: m.outcome_won,
@@ -1390,14 +1398,27 @@ function polityMarkdown(
       ? []
       : [
           `## ${m.polity_subdivisions()}`,
-          table(
-            [m.col_name(), m.polity_elections(), m.person_years()],
-            polity.polities.map((child) => [
-              link(child.name, child.path),
-              count(child.elections),
-              span(child.first, child.last),
+          ...Map.groupBy(polity.polities, (child) => child.kind)
+            .entries()
+            .toArray()
+            .toSorted(
+              ([a], [b]) =>
+                (Object.keys(PLACE_KINDS).indexOf(a) + 1 || 99) -
+                (Object.keys(PLACE_KINDS).indexOf(b) + 1 || 99),
+            )
+            .flatMap(([kind, children], _, groups) => [
+              ...(groups.length > 1
+                ? [`### ${PLACE_KINDS[kind]?.() ?? m.polity_subdivisions()}`]
+                : []),
+              table(
+                [m.col_name(), m.polity_elections(), m.person_years()],
+                children.map((child) => [
+                  link(child.name, child.path),
+                  count(child.elections),
+                  span(child.first, child.last),
+                ]),
+              ),
             ]),
-          ),
         ]),
   ].filter((block) => block !== "");
 }

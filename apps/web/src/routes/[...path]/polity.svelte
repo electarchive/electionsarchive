@@ -158,9 +158,8 @@
   const kind = $derived(
     picked != null && kinds.includes(picked)
       ? picked
-      : kinds.includes("county")
-        ? "county"
-        : "all",
+      : (["county", "municipality"].find((key) => kinds.includes(key)) ??
+          "all"),
   );
   const children = $derived(
     polity.polities.filter(

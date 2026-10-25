@@ -11093,8 +11093,27 @@ export const polities = {
             last: number | null;
             within: number;
           }>(sql`
-            with recursive below(id, top) as (
-              select distinct polity_id, polity_id from polity_parent where parent_id = ${input.id}::uuid
+            with recursive county as materialized (
+              select cg.geom, cp.parent_id from polity c
+              join polity_territory ct on ct.polity_id = c.id and upper_inf(ct.valid)
+              join area_geometry cg on cg.area_id = ct.area_id and upper_inf(cg.valid)
+              join polity_parent cp on cp.polity_id = c.id
+              where c.id = ${input.id}::uuid and c.kind = 'county'
+            ),
+            candidates as materialized (
+              select k.id, t.area_id from county
+              join polity_parent sp on sp.parent_id = county.parent_id
+              join polity k on k.id = sp.polity_id and k.kind in ('municipality', 'school_district', 'special_district')
+              join polity_territory t on t.polity_id = k.id and upper_inf(t.valid)
+            ),
+            below(id, top) as (
+              select * from (
+                select distinct polity_id, polity_id from polity_parent where parent_id = ${input.id}::uuid
+                union
+                select candidates.id, candidates.id from candidates
+                join area_geometry g on g.area_id = candidates.area_id and upper_inf(g.valid)
+                join county on st_contains(county.geom, coalesce(g.label_point, st_pointonsurface(g.geom)))
+              ) seed
               union
               select p.polity_id, below.top from polity_parent p join below on p.parent_id = below.id
             )
@@ -11226,7 +11245,7 @@ export const polities = {
                     select s.area_k from result_rollup_sum s where s.result_set_k = rs.k
                   ) r
                   join area a on a.k = r.area_k
-                  join area_parent ap on ap.area_id = a.id and ap.parent_id = pt.area_id
+                  where exists (select from area_parent ap where ap.area_id = a.id and ap.parent_id = pt.area_id offset 0)
                 )
               )
             order by c.kind = 'ballot_question', e.date_from desc
@@ -12250,10 +12269,20 @@ export const polities = {
           .toSorted(
             (a, b) =>
               Number(a.isAbroad) - Number(b.isAbroad) ||
-              Number(b.isOffice) - Number(a.isOffice) ||
+              (a.isOffice
+                ? a.points.every((point) => point.filled <= 1)
+                  ? 0
+                  : 2
+                : 1) -
+                (b.isOffice
+                  ? b.points.every((point) => point.filled <= 1)
+                    ? 0
+                    : 2
+                  : 1) ||
               (ranks.get(a.id) ?? 5) - (ranks.get(b.id) ?? 5) ||
               Math.max(...b.points.map((point) => point.filled)) -
-                Math.max(...a.points.map((point) => point.filled)),
+                Math.max(...a.points.map((point) => point.filled)) ||
+              b.points.length - a.points.length,
           ),
         governments: cabinets.rows.map((row) => ({
           name: row.name ?? "",
