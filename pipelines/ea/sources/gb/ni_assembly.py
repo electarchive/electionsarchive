@@ -523,7 +523,7 @@ def display(name: str) -> str:
         words.append(word.capitalize() if word.isupper() and len(word) > 3 and "." not in word else word)
     for word in surname.split():
         if word.isupper() and len(word) > 1 and "." not in word:
-            word = re.sub(r"\b(Mc|O')([a-z])", lambda found: found.group(1) + found.group(2).upper(), word.capitalize())
+            word = re.sub(r"\b(Mc|O['’])([a-z])", lambda found: found.group(1) + found.group(2).upper(), word.capitalize())
         words.append(word)
     return re.sub(
         r"\bO(Dowd|Neill|Connor|Hara|Loan|Brien|Donnell|Rourke|Kane|Meara|Reilly|Rawe|Fachina|Callaghan|Driscoll|Hagan)\b",

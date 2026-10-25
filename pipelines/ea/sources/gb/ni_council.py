@@ -814,8 +814,8 @@ def display_word(word: str) -> str:
     parts = []
     for part in word.split("-"):
         if re.search(r"[A-Z]{2}", part):
-            found = re.fullmatch(r"(MC|Mc|O')(.+)", part)
-            part = found.group(1).capitalize().replace("O'", "O'") + found.group(2).capitalize() if found else part.capitalize()
+            found = re.fullmatch(r"(MC|Mc|O['’])(.+)", part)
+            part = found.group(1).capitalize() + found.group(2).capitalize() if found else part.capitalize()
         parts.append(part)
     return "-".join(parts)
 
