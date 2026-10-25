@@ -74,10 +74,10 @@ def electionware(text: str) -> Iterator[dict[str, Any]]:
             if not row or stripped.startswith(("TOTAL", "Day", "Write-In:", "Not Assigned", "Overvotes", "Undervotes", "Registered")):
                 continue
             name = "Write-ins" if stripped.startswith("Write-In Totals") else row["name"].strip()
-            party = re.match(r"^(DEM|REP|LIB|CON|GRE)\s+(.+)$", name)
+            party = re.match(r"^(DEM|REP|LIB|CON|GRE)\s+(.+)$", name, re.I)
             if party:
                 name = party[2]
-            choices.append({"text": name, "party": PARTIES[party[1]] if party else None, "total": row["total"].replace(",", ""), "places": []})
+            choices.append({"text": name, "party": PARTIES[party[1].upper()] if party else None, "total": row["total"].replace(",", ""), "places": []})
         if choices:
             yield {"text": title, "vote_for": int(re.search(r"\d+", line)[0]), "choices": choices, "cast": cast}
 
