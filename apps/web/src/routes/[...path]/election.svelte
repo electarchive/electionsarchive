@@ -438,8 +438,14 @@
     return { size: best.size, seats };
   });
 
-  const named = (row: { label: string; short: string | null }) =>
-    row.label.length > 28 ? (row.short ?? row.label) : row.label;
+  const named = (row: {
+    label: string;
+    short: string | null;
+    person?: string | null;
+  }) =>
+    row.label.length > 28 && row.person == null
+      ? (row.short ?? row.label)
+      : row.label;
   const unfolded = new SvelteSet<string>();
 
   const races = $derived(
@@ -772,9 +778,11 @@
                       }
                       return {
                         key: row.key,
-                        label: row.key.startsWith("alliance:")
-                          ? row.label
-                          : (row.short ?? row.label),
+                        label:
+                          row.key.startsWith("alliance:") ||
+                          row.key.startsWith("person:")
+                            ? row.label
+                            : (row.short ?? row.label),
                         color: swatch(row.color, row.key),
                         value: isTallied
                           ? districts.filter((place) =>
