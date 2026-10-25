@@ -15,7 +15,7 @@ from ea.changeset import Changeset, slug
 from ea.store import DATA, connect
 
 SOURCE = "us.alged"
-VERSION = "3"
+VERSION = "4"
 PARSED = DATA / "parsed" / SOURCE
 URL = "https://osf.io/download/tbwzd/"
 PLACES = "https://www2.census.gov/geo/tiger/GENZ2020/shp/cb_2020_us_place_500k.zip"
@@ -31,6 +31,7 @@ TITLES = {
     (DC, "mayor"): "Mayor of the District of Columbia",
     (DC, "council"): "Council of the District of Columbia",
     ("4752006", "council"): "Metropolitan Council",
+    ("2148000", "council"): "Louisville Metro Council",
 }
 BOARDS = {
     **dict.fromkeys(["AZ", "CA", "IA", "MS", "VA", "WI"], "Board of Supervisors"),
@@ -63,13 +64,16 @@ METHOD = (
     "is the archive's. Party, gender, and race in the database are statistical estimates and are not recorded here."
 )
 TACIT = "The database records no vote count for this race, which had a single candidate or was otherwise uncontested."
-APPOINTMENTS = {
+SKIPPED = {
     "667000_2007_9_san francisco_CA_City Council_4_1",
     "667000_2017_1_san francisco_CA_City Council_8_1",
     "667000_2017_12_san francisco_CA_Mayor_mayor_1",
     "667000_2018_7_san francisco_CA_City Council_5_1",
     "4865000_2014_7_san antonio_TX_Mayor_mayor_1",
+    "4804000_2001_5_arlington_TX_Mayor_mayor_1",
+    "4804000_2003_5_arlington_TX_Mayor_mayor_1",
 }
+UNELECTED = "Not an election for this office: an appointment, or a race the database filed under the wrong office"
 DISTRICT = (
     "Only part of the {whole} votes in this contest. The archive has no boundary for the district yet, so the "
     "results are shown for the district as a whole."
@@ -87,7 +91,7 @@ def fetch() -> None:
 def parse() -> None:
     frame = pl.read_csv(raw.cached(SOURCE, URL).path, infer_schema=False).select(
         pl.col("ledb_candid").alias("candidate"),
-        "full_name",
+        pl.col("full_name").str.replace_all(r"\s+", " ").str.strip_chars(),
         "fips",
         "geo_name",
         pl.col("state_abb").replace(STATES).alias("state"),
@@ -125,7 +129,7 @@ def parse() -> None:
         "contest", "rows", "votes", "fips", "office", "year", "month"
     ).iter_rows():
         years = cycles.get((fips, office), [])
-        if contest in APPOINTMENTS:
+        if contest in SKIPPED:
             phantoms.append(contest)
         elif rows == 1 and (votes or 0) <= 1 and month is not None and len(years) >= 3:
             step = math.gcd(*[other - years[0] for other in years[1:]])
@@ -529,8 +533,10 @@ def emit() -> Path:
             contest_path += "-special" if remainder else ""
             suffix = 1
             while (
-                candidate := contest_path if suffix == 1 else f"{contest_path}-{suffix}"
-            ) in paths or candidate in taken or owned.get(candidate, contest) != contest:
+                (candidate := contest_path if suffix == 1 else f"{contest_path}-{suffix}") in paths
+                or candidate in taken
+                or owned.get(candidate, contest) != contest
+            ):
                 suffix += 1
             paths.add(candidate)
             cs.add("slug", path=candidate, entity_id=contest)
@@ -600,5 +606,21 @@ def emit() -> Path:
                         flags=0,
                         value=votes,
                     )
+        for (skipped,) in conn.execute(
+            """select x.entity_id from external_id x join entity n on n.id = x.entity_id and n.retired_by is null
+               join contest c on c.id = x.entity_id join changeset h on h.id = c.changeset_id and h.pipeline = %s
+               where x.scheme = 'us.contest' and x.value = any(%s)""",
+            [SOURCE, [f"alged:{contest}" for contest in SKIPPED]],
+        ).fetchall():
+            cs.add("entity_retirement", entity_id=skipped, reason=UNELECTED)
+        for note, entity, text in conn.execute(
+            """select n.id, n.entity_id, n.body_md from note n join changeset c on c.id = n.changeset_id
+               join election e on e.id = n.entity_id
+               where c.pipeline = %s and e.date_precision = 'day' and n.body_md = any(%s)""",
+            [SOURCE, [MONTH, YEAR]],
+        ).fetchall():
+            cs.add(
+                "note_drop", note_id=note, entity_id=entity, body_md=text, reason="The election is now dated to the day"
+            )
         cs.pool("A scattering or write-in line in ALGED read as a candidate")
         return cs.write()
