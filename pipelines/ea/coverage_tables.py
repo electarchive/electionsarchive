@@ -709,7 +709,9 @@ PREFIX = re.compile(
     r"^((?:CHARTER )?TOWNSHIP|CITY AND COUNTY|CITY|TOWN|VILLAGE|BOROUGH|COUNTY|PLANTATION|"
     r"(?:METRO|METROPOLITAN|UNIFIED|CONSOLIDATED) GOVERNMENT) OF (.+)$"
 )
-COLLEGE = re.compile(r"^(?!.*\b(?:SCH|SCHOOLS?|ISD|ACADEMY)\b).*(?:COLLEGE|CMTY COL|JUNIOR COL|UNIVERSITY)", re.IGNORECASE)
+COLLEGE = re.compile(
+    r"^(?!.*\b(?:SCH|SCHOOLS?|ISD|ACADEMY)\b).*(?:COLLEGE|CMTY COL|JUNIOR COL|UNIVERSITY)", re.IGNORECASE
+)
 
 LOCAL_SQL = """
 create temp table lc as
@@ -816,6 +818,18 @@ select st, extract(year from date_from)::int, kind,
     count(*) filter (where not (ballots or registered or survey))
 from days group by 1, 2, 3
 """
+
+
+def cycle(weights: dict[int, int]) -> tuple[int, int] | None:
+    total = sum(weights.values())
+    for period in (4, 2):
+        shares: Counter = Counter()
+        for year, weight in weights.items():
+            shares[year % period] += weight
+        phase, n = shares.most_common(1)[0]
+        if n >= 0.9 * total:
+            return period, phase
+    return None
 
 
 def tokens(text: str) -> frozenset[str]:
@@ -1108,19 +1122,30 @@ def build() -> str:
         years = held.get(g["polity_id"] or "", {})
         regular = sorted(y for y, v in years.items() if v[2] and 2000 <= y <= today.year)
         g["month"] = Counter(years[y][3] for y in regular).most_common(1)[0][0] if regular else None
-        g["period"] = g["phase"] = None
+        g["period"] = g["phase"] = g["era"] = None
         if len(regular) >= 2:
-            total = sum(years[y][2] for y in regular)
-            g["period"], g["phase"] = 1, 0
-            for period in (4, 2):
-                shares: Counter = Counter()
-                for y in regular:
-                    shares[y % period] += years[y][2]
-                phase, n = shares.most_common(1)[0]
-                if n >= 0.9 * total:
-                    g["period"], g["phase"] = period, phase
-                    break
+            weights = {y: years[y][2] for y in regular}
+            g["period"], g["phase"] = cycle(weights) or (1, 0)
             g["basis"] = "own"
+            if g["period"] == 1:
+                splits = [
+                    (
+                        sum(weights[y] for y in regular[:i] if (y - early[1]) % early[0] == 0)
+                        + sum(weights[y] for y in regular[i:] if (y - late[1]) % late[0] == 0),
+                        i,
+                        early,
+                        late,
+                    )
+                    for i in range(2, len(regular) - 1)
+                    if (early := cycle({y: weights[y] for y in regular[:i]})) is not None
+                    and (late := cycle({y: weights[y] for y in regular[i:]})) is not None
+                    and early != late
+                ]
+                if splits:
+                    _, i, early, late = max(splits)
+                    g["period"], g["phase"] = late
+                    g["era"] = (regular[i - 1], regular[i], early)
+                    g["basis"] = "own, two eras"
             patterns[(g["state"], g["kind"])][(g["period"], g["phase"])] += 1
         elif regular:
             g["phase"] = regular[0]
@@ -1157,12 +1182,15 @@ def build() -> str:
             g["month"] = months[group].most_common(1)[0][0]
         years = held.get(g["polity_id"] or "", {})
         for year in sorted(set(years) | set(range(2000, today.year + 1))):
+            era = g["era"]
+            due = (g["period"], g["phase"]) if era is None or year >= era[1] else era[2] if year <= era[0] else None
             expected = (
                 g["active"]
                 and g["elected"]
                 and not g["id"].startswith("polity:")
                 and 2000 <= year <= today.year
-                and (year - g["phase"]) % g["period"] == 0
+                and due is not None
+                and (year - due[1]) % due[0] == 0
                 and (year < today.year or (g["month"] is not None and g["month"] < today.month))
             )
             n, precinct, _, _, precincts, shaped, generals = years.get(year, [0, 0, 0, None, 0, 0, 0])
