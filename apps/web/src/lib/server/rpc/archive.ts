@@ -3684,6 +3684,7 @@ export const contests = {
         counted: boolean;
         own: boolean;
         lineage: boolean;
+        notional: boolean;
       }>(sql`
         with recursive anc(id) as (
           select ${area.id}::uuid
@@ -3754,7 +3755,7 @@ export const contests = {
           select c.id, case when c.kind = 'ballot_question' then c.id::text
             else concat_ws(':', c.office_id, c.body_id, c.kind, c.round_number, c.party_scope_id) end as series,
             e.id as election, e.kind = 'indirect' as indirect, e.date_from, ${CYCLE} as year, e.status,
-            c.term is not distinct from 'remainder' as "isRemainder",
+            c.term is not distinct from 'remainder' as "isRemainder", c.notional,
             c.district_area_id is not distinct from ${contest.place?.id ?? null}::uuid as own,
             c.district_area_id is distinct from ${contest.place?.id ?? null}::uuid
               and c.district_area_id in (select id from later union select id from earlier) as lineage
@@ -3814,7 +3815,7 @@ export const contests = {
         )
         select * from (
           select r.id, r.series, r.election, r.indirect, r.date_from::text as date, r.year, r.status::text as status,
-            r."isRemainder", r.id in (select root from tallied) as counted, r.own, r.lineage, r.date_from
+            r."isRemainder", r.id in (select root from tallied) as counted, r.own, r.lineage, r.notional, r.date_from
           from roots r
           where r.id <> ${contest.root}::uuid
         ) r
@@ -3840,7 +3841,9 @@ export const contests = {
       const held = new Set([
         contest.election,
         ...covering.rows
-          .filter((row) => row.series === contest.series && row.own)
+          .filter(
+            (row) => row.series === contest.series && row.own && !row.notional,
+          )
           .map((row) => row.election),
       ]);
       const sameRace = covering.rows.filter(
@@ -4227,6 +4230,7 @@ export const contests = {
             indirect: row.indirect,
             annulled: row.status === "annulled",
             isRemainder: row.isRemainder,
+            notional: row.notional,
             winner: winners.get(row.id) ?? null,
           };
         }),
@@ -4239,6 +4243,7 @@ export const contests = {
           indirect: contest.indirect,
           annulled: contest.status === "annulled",
           isRemainder: contest.isRemainder,
+          notional: false,
           winner: winners.get(contest.root) ?? null,
         },
       ];
@@ -4256,6 +4261,7 @@ export const contests = {
         .toSorted(
           (a, b) =>
             (a.date ?? "").localeCompare(b.date ?? "") ||
+            Number(b.notional) - Number(a.notional) ||
             a.name.localeCompare(b.name, undefined, { numeric: true }),
         )
         .map((entry, index, list) => ({
