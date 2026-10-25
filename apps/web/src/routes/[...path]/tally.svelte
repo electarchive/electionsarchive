@@ -159,23 +159,28 @@
             {/each}
           </tr>
         {/each}
-        <tr class="text-[0.8125rem] text-muted-foreground">
-          <th
-            class="sticky inset-s-0 z-10 bg-card py-1.5 pe-3 text-start font-normal"
-            scope="row"
-          >
-            <Term label={m.count_exhausted()} definition={m.term_exhausted()} />
-          </th>
-          {#each count.exhausted as spent, index (index)}
-            <td
-              class={cn("px-2 py-1.5 text-end font-figures tabular-nums", {
-                "bg-secondary": index + 1 === count.round,
-              })}
+        {#if count.exhausted.some((spent) => spent != null)}
+          <tr class="text-[0.8125rem] text-muted-foreground">
+            <th
+              class="sticky inset-s-0 z-10 bg-card py-1.5 pe-3 text-start font-normal"
+              scope="row"
             >
-              {spent == null ? "" : figure(spent)}
-            </td>
-          {/each}
-        </tr>
+              <Term
+                label={m.count_exhausted()}
+                definition={m.term_exhausted()}
+              />
+            </th>
+            {#each count.exhausted as spent, index (index)}
+              <td
+                class={cn("px-2 py-1.5 text-end font-figures tabular-nums", {
+                  "bg-secondary": index + 1 === count.round,
+                })}
+              >
+                {spent == null ? "" : figure(spent)}
+              </td>
+            {/each}
+          </tr>
+        {/if}
       </tbody>
     </table>
   </div>

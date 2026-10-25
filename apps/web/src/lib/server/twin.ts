@@ -2994,12 +2994,16 @@ function countMarkdown(contest: Extract<Data, { kind: "contest" }>["contest"]) {
               : `${count(votes)} (${percent(votes / (totals[round] ?? 1))})`;
           }),
         ]),
-        [
-          m.count_exhausted(),
-          ...tally.exhausted.map((spent) =>
-            spent == null ? null : count(spent),
-          ),
-        ],
+        ...(tally.exhausted.every((spent) => spent == null)
+          ? []
+          : [
+              [
+                m.count_exhausted(),
+                ...tally.exhausted.map((spent) =>
+                  spent == null ? null : count(spent),
+                ),
+              ],
+            ]),
       ],
     ),
   ];

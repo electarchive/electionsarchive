@@ -1828,7 +1828,7 @@ async function tally(
     return null;
   }
   const rounds = Array.from({ length: last }, (_, index) => index + 1);
-  const [sides, spent] = await Promise.all([
+  const [sides, spent, system] = await Promise.all([
     Promise.all(
       rounds.map(async (step) =>
         load(
@@ -1850,6 +1850,11 @@ async function tally(
       where rs.contest_id = ${contest.id}::uuid and ${latest("rs")}
       group by r.measure, r.count_round
       order by r.count_round
+    `),
+    db.execute<{ isSupplementary: boolean }>(sql`
+      select coalesce(c.rules_override ->> 'formula', es.rules ->> 'formula', '') = 'supplementary' as "isSupplementary"
+      from contest c left join electoral_system es on es.id = c.electoral_system_id
+      where c.id = ${contest.root}::uuid
     `),
   ]);
   const lines = new Map<
@@ -1940,6 +1945,7 @@ async function tally(
         (b.votes[reach(b.votes)] ?? 0) - (a.votes[reach(a.votes)] ?? 0),
     ),
     exhausted: rounds.map((step) => exhausted.get(step) ?? null),
+    isSupplementary: system.rows[0]?.isSupplementary ?? false,
     stv:
       filled == null
         ? null
@@ -3167,6 +3173,7 @@ export const contests = {
             ),
             exhausted: v.array(v.nullable(v.number())),
             initial: v.number(),
+            isSupplementary: v.boolean(),
             stv: v.nullable(
               v.object({
                 seats: v.number(),
@@ -13805,15 +13812,17 @@ export const people = {
             select f.root, f.option, sum(f.value) as value, co.kind in ('candidate', 'ticket') as named, exists (
               select from outcome x join result_set rs on rs.id = x.result_set_id and ${latest("rs")}
               where x.option_id = co.id and x.candidacy_id is null and x.kind in ('elected', 'won')
-            ) as elected
+            ) as elected, f.first <> f.last as "isCounted"
             from fetched f join mains m on m.root = f.root and m.main = f.measure
               join contest_option co on co.k = f.option
-            where f.first = f.last and f.option <> 0
-            group by f.root, f.option, co.id, co.kind
+            where f.count_round = f.last and f.option <> 0 and (
+              f.first = f.last or (select coalesce(c.magnitude, 1) <= 1 from contest c where c.id = f.root)
+            )
+            group by f.root, f.option, co.id, co.kind, f.first, f.last
           ) o
           where not exists (select from contest c where c.allocation_parent_id = o.root)
           group by o.root
-          having count(distinct o.option) = (select count(*) from contest_option co where co.contest_id = o.root)
+          having (bool_or(o."isCounted") or count(distinct o.option) = (select count(*) from contest_option co where co.contest_id = o.root))
             and not exists (
               select from contest_option co where co.contest_id = o.root and co.kind not in ('candidate', 'ticket', 'write_in', 'others')
             )
