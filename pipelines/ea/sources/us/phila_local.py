@@ -13,7 +13,7 @@ from ea.sources.us.phila_returns import SOURCE as RETURNS
 from ea.store import connect
 
 SOURCE = "us.phila_local"
-VERSION = "4"
+VERSION = "5"
 FIPS = "42101"
 PLACE = "4260000"
 SPECIAL_DAYS = {
@@ -275,6 +275,18 @@ def emit() -> Path:
                    where c.pipeline = %s and n.is_preferred and n.lang = 'en'""",
                 [SOURCE],
             ).fetchall()
+        )
+        names.update(
+            {
+                entity: name_id
+                for entity, name_id, text in conn.execute(
+                    """select n.entity_id, n.id, n.text from name n
+                       join external_id x on x.entity_id = n.entity_id and x.scheme = %s
+                       where n.is_preferred and n.lang = 'en'""",
+                    [f"{SOURCE}.person"],
+                ).fetchall()
+                if text.isupper()
+            }
         )
 
         def name(entity: UUID, text: str) -> None:
