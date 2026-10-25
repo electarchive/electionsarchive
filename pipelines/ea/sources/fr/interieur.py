@@ -7,6 +7,7 @@ from uuid import UUID
 
 import polars as pl
 import shapefile
+from psycopg import sql
 
 from ea import raw
 from ea.changeset import Changeset, slug
@@ -449,6 +450,44 @@ def emit() -> Path:
                 kind="standard",
                 valid_from=REDISTRICTING,
             )
+        stale = [
+            str(area)
+            for (area,) in conn.execute(
+                """select distinct c.area_id from area_code c join area a on a.id = c.area_id
+                   join changeset w on w.id = c.changeset_id
+                   where a.scheme_code = 'fr.circonscription' and w.pipeline = 'fr.interieur' and c.valid_from >= %s
+                     and c.area_id <> all(%s::uuid[])""",
+                [REDISTRICTING, [str(area) for area in areas.values()]],
+            ).fetchall()
+        ]
+        drops: dict[str, dict[str, object]] = {}
+        for table in ("area_code", "area_parent", "area_geometry"):
+            held = [
+                str(area)
+                for (area,) in conn.execute(
+                    sql.SQL(
+                        """select distinct p.area_id from {} p join changeset w on w.id = p.changeset_id
+                           where w.pipeline = 'fr.interieur' and p.valid_from >= %s and p.area_id = any(%s::uuid[])"""
+                    ).format(sql.Identifier(table)),
+                    [REDISTRICTING, stale],
+                ).fetchall()
+            ]
+            if held:
+                drops[table] = {"areas": held, "from": REDISTRICTING.isoformat()}
+        cs.manifest["scope"] = {"polity": "FR", "drops": drops}
+        cs.frame(
+            "unit_area_drop",
+            pl.DataFrame(
+                conn.execute(
+                    """select distinct m.unit_id::text, m.area_id::text from reporting_unit_area m
+                       join changeset w on w.id = m.changeset_id
+                       where w.pipeline = 'fr.interieur' and m.area_id = any(%s::uuid[])""",
+                    [stale],
+                ).fetchall(),
+                schema={"unit_id": pl.String, "area_id": pl.String},
+                orient="row",
+            ).with_columns(reason=pl.lit("membership moved to the 2012 circonscription area")),
+        )
         cs.add(
             "boundary_set",
             scheme_code="fr.circonscription",
