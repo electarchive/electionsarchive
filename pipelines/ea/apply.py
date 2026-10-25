@@ -1,5 +1,6 @@
 import io
 import json
+import time
 import unicodedata
 from collections import Counter
 from pathlib import Path
@@ -1175,8 +1176,17 @@ def publish(conn: Connection, changeset_id: str) -> None:
     with conn.transaction():
         conn.execute("select set_config('ea.changeset_id', %s, true)", [changeset_id])
         if "entity_merge" in stage.tables or "entity_retirement" in stage.tables:
-            conn.execute("select pg_advisory_xact_lock(hashtext('ea.search'))")
-            conn.execute("select pg_advisory_xact_lock(%s)", [MERGE_LOCK])
+            for _ in range(240):
+                taken = conn.execute(
+                    "select pg_try_advisory_xact_lock(hashtext('ea.search')) and pg_try_advisory_xact_lock(%s)",
+                    [MERGE_LOCK],
+                ).fetchone()
+                if taken is not None and taken[0]:
+                    break
+                time.sleep(5)
+            else:
+                conn.execute("select pg_advisory_xact_lock(hashtext('ea.search'))")
+                conn.execute("select pg_advisory_xact_lock(%s)", [MERGE_LOCK])
         else:
             conn.execute("select pg_advisory_xact_lock_shared(%s)", [MERGE_LOCK])
         conn.execute(
@@ -1420,8 +1430,16 @@ def revert(conn: Connection, changeset_id: str, reason: str) -> None:
                 [f"Rejected: {reason}", changeset_id],
             )
         return
-    conn.execute("select pg_advisory_xact_lock(hashtext('ea.search'))")
-    conn.execute("select pg_advisory_xact_lock(%s)", [MERGE_LOCK])
+    for _ in range(240):
+        taken = conn.execute(
+            "select pg_try_advisory_xact_lock(hashtext('ea.search')) and pg_try_advisory_xact_lock(%s)", [MERGE_LOCK]
+        ).fetchone()
+        if taken is not None and taken[0]:
+            break
+        time.sleep(5)
+    else:
+        conn.execute("select pg_advisory_xact_lock(hashtext('ea.search'))")
+        conn.execute("select pg_advisory_xact_lock(%s)", [MERGE_LOCK])
     logged = conn.execute(
         "select distinct relation, key_column from fact_rekey where changeset_id = %s order by 1, 2", [changeset_id]
     ).fetchall()
