@@ -1,18 +1,25 @@
 <script lang="ts">
+  import PlaceMap from "#routes/[...path]/map.svelte";
   import { resolve } from "$app/paths";
+  import { createQuery } from "@tanstack/svelte-query";
   import { SvelteSet } from "svelte/reactivity";
   import Name from "#lib/components/name.svelte";
   import { count, date } from "#lib/format.js";
   import { m } from "#lib/paraglide/messages.js";
   import { swatch } from "#lib/party.js";
+  import { orpc } from "#lib/rpc.js";
   import { cn } from "#lib/utils.js";
   import type { PageData } from "./$types";
 
   const {
     council,
     hasTenures,
-  }: { council: NonNullable<PageData["council"]>; hasTenures: boolean } =
-    $props();
+    name,
+  }: {
+    council: NonNullable<PageData["council"]>;
+    hasTenures: boolean;
+    name: string;
+  } = $props();
 
   const uid = $props.id();
 
@@ -30,6 +37,66 @@
     council.elections.filter((election) => !election.isMinor),
   );
   const latest = $derived(regular[0]?.date ?? "");
+  const hub = createQuery(() => ({
+    ...orpc.elections.get.queryOptions({ input: { id: regular[0]?.id ?? "" } }),
+    enabled: regular[0] != null,
+  }));
+  const kinds = [
+    { key: "seat:returned", label: m.council_map_returned(), color: "#0e7c86" },
+    { key: "seat:open", label: m.council_map_open(), color: "#d08a00" },
+    { key: "seat:defeated", label: m.council_map_defeated(), color: "#7a3fb0" },
+  ].map((kind) => ({ ...kind, short: null, person: null, party: null }));
+  const mapped = $derived.by(() => {
+    const race = hub.data?.races.find(
+      (entry) =>
+        entry.name === name && entry.map != null && entry.places != null,
+    );
+    const newest = regular[0];
+    if (
+      race?.map == null ||
+      race.places == null ||
+      newest == null ||
+      (race.map.shaped ?? 0) * 2 < race.places.rows.length
+    ) {
+      return null;
+    }
+    const changed = new Map(
+      newest.changes.map((change) => [change.seat, change.kind]),
+    );
+    const decided = new Set(newest.filled);
+    return {
+      map: race.map,
+      noun: race.places.levels[0]?.noun ?? "",
+      places: {
+        ...race.places,
+        legend: kinds,
+        districts: undefined,
+        rows: race.places.rows.map((row) => {
+          const seat = row.name.split(", ").at(-1) ?? "";
+          const kind = changed.get(seat);
+          const spot =
+            row.leader == null || !decided.has(seat)
+              ? null
+              : kind === "defeated"
+                ? 2
+                : kind == null
+                  ? 0
+                  : 1;
+          const share = row.leader == null ? 0 : (row.shares[row.leader] ?? 0);
+          return {
+            ...row,
+            shares: kinds.map((_, at) => (at === spot ? share : 0)),
+            leader: spot,
+            also: null,
+            margin: null,
+            earlier: null,
+            prior: null,
+            declared: null,
+          };
+        }),
+      },
+    };
+  });
   const people = $derived(
     new Set(
       council.seats.flatMap((seat) =>
@@ -97,6 +164,33 @@
       </dd>
     </div>
   </dl>
+{/if}
+
+{#if mapped != null}
+  <section
+    class="col-span-12 grid content-start gap-2 bg-card px-3.5 pbs-3 pbe-3.5 min-inline-0"
+    aria-labelledby="{uid}-map"
+  >
+    <h2 id="{uid}-map" class="text-[0.8125rem] font-bold">
+      {m.council_map_title({ election: regular[0]?.name ?? "" })}
+    </h2>
+    <PlaceMap
+      places={mapped.places}
+      colors={kinds.map((kind) => swatch(kind.color, kind.key))}
+      tiles={mapped.map.tiles}
+      own={mapped.map.own}
+      nested={mapped.map.nested}
+      frames={mapped.map.frames}
+      blank={mapped.map.blank ?? null}
+      isApproximate={mapped.map.isApproximate}
+      sources={mapped.map.credits}
+      noun={mapped.noun}
+      votes={m.col_votes()}
+      names={kinds.map((kind) => kind.label)}
+      levels={[]}
+      span={null}
+    />
+  </section>
 {/if}
 
 <section

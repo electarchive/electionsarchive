@@ -644,7 +644,7 @@
       {/if}
     {/if}
     {#if council != null}
-      <Council {council} hasTenures={body.tenures > 0} />
+      <Council {council} hasTenures={body.tenures > 0} name={body.name} />
     {/if}
   </article>
 </main>

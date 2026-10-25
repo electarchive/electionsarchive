@@ -53,6 +53,7 @@ export const seats = {
           ),
           elections: v.array(
             v.object({
+              id: v.string(),
               date: v.string(),
               when: v.string(),
               name: v.string(),
@@ -60,6 +61,7 @@ export const seats = {
               isSpecial: v.boolean(),
               isMinor: v.boolean(),
               up: v.number(),
+              filled: v.array(v.string()),
               held: v.number(),
               open: v.number(),
               defeated: v.number(),
@@ -319,6 +321,7 @@ export const seats = {
       const elections = new Map<
         string,
         {
+          id: string;
           date: string;
           when: string;
           name: string;
@@ -326,6 +329,7 @@ export const seats = {
           isSpecial: boolean;
           isMinor: boolean;
           up: number;
+          filled: Array<string>;
           held: number;
           open: number;
           defeated: number;
@@ -360,6 +364,7 @@ export const seats = {
         seats.set(entry.key, seat);
         const before = seat.holders.at(-1);
         const election = elections.get(entry.election) ?? {
+          id: entry.election,
           date: entry.date,
           when: entry.when,
           name: labels.full.get(entry.election) ?? "",
@@ -367,6 +372,7 @@ export const seats = {
           isSpecial: entry.isSpecial,
           isMinor: entry.isMinor,
           up: 0,
+          filled: [],
           held: 0,
           open: 0,
           defeated: 0,
@@ -375,6 +381,7 @@ export const seats = {
         };
         elections.set(entry.election, election);
         election.up += 1;
+        election.filled.push(entry.label);
         election.runoffs += Number(entry.isRunoff);
         const isSame = before != null && same(before, entry.winner);
         if (before != null && isSame) {
