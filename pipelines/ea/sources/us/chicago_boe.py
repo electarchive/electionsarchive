@@ -308,9 +308,9 @@ def emit() -> Path:
                 contest,
                 f"{day.year} Chicago {title} "
                 + ("runoff" if runoff else "election")
-                + (f", District {ward}" if ward else ""),
+                + (f", Ward {ward}" if ward else ""),
             )
-            place(contest, f"{path}/" + (f"council-district-{ward}" if ward else office))
+            place(contest, f"{path}/" + (f"council-ward-{ward}" if ward else office))
             prior = conn.execute(
                 f"select {', '.join(columns)} from result_set where contest_id = %s and is_default", [contest]
             ).fetchone()
