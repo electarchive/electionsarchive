@@ -10,7 +10,7 @@ from ea.sources.us import ceda
 from ea.store import DATA, connect
 
 SOURCE = "us.ceda_measures"
-VERSION = "1"
+VERSION = "2"
 PARSED = DATA / "parsed" / SOURCE
 TYPES = {
     "Initiative": "initiative",
@@ -179,6 +179,22 @@ def emit() -> Path:
                 [SOURCE],
             ).fetchall()
         )
+        official = {
+            (area, day, yes, no): contest
+            for contest, area, day, yes, no in conn.execute(
+                """select c.id, c.district_area_id, e.date_from,
+                          sum(v.value) filter (where o.ballot_label = 'Yes')::int,
+                          sum(v.value) filter (where o.ballot_label = 'No')::int
+                   from contest c join election e on e.id = c.election_id
+                   join changeset ch on ch.id = c.changeset_id and ch.pipeline <> %s
+                   join result_set r on r.contest_id = c.id and r.is_default and r.status = 'active'
+                   join result_value v on v.result_set_k = r.k
+                   join contest_option o on o.k = v.option_k
+                   where c.kind = 'ballot_question' and e.date_from = any(%s) and e.polity_id = any(%s)
+                   group by 1, 2, 3""",
+                [SOURCE, sorted(set(frame["day"])), [polity for polity, *_ in polities.values()]],
+            ).fetchall()
+        }
         elections: set[UUID] = set()
         units: set[UUID] = set()
         for measure, code, day, letter, question, kind, required, yes, no, passed in (
@@ -187,6 +203,10 @@ def emit() -> Path:
             .iter_rows()
         ):
             polity, area, place, path = polities[code]
+            if (survivor := official.get((area, day, yes, no))) is not None:
+                if (own := cs.key("us.contest", f"ceda:measure:{measure}")) not in cs.minted:
+                    cs.merge(own, survivor)
+                continue
             title = place.removeprefix("City of ")
             geoid = code.removeprefix("sd")
             scheme = {5: "us.county", 7: "us.place"}.get(len(code), "us.school_district")
