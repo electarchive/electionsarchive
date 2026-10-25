@@ -771,7 +771,7 @@ export const seats = {
     .handler(async ({ input }) => {
       const found = await db.execute<{
         id: string;
-        area: string;
+        area: string | null;
         day: string;
         until: string | null;
         now: string | null;
@@ -812,14 +812,18 @@ export const seats = {
           from held h join contest c on c.body_id = h.body join election e on e.id = c.election_id
           where e.kind = 'by_election' and e.date_from > (select day from general)
             and e.date_from < coalesce((select day from next), 'infinity')
-            and c.kind = 'body_seats' and c.allocation_parent_id is null and c.district_area_id is not null
+            and c.kind = 'body_seats' and c.allocation_parent_id is null
             and ${input.within == null ? sql`true` : inside(input.within, sql`c.district_area_id`, sql`e.date_from`)}
         ),
         prior as materialized (
           select b.id, p.id as prior, p.day as since
           from bys b cross join lateral (
             select c.id, e.date_from as day from contest c join election e on e.id = c.election_id
-            where c.body_id = b.body and c.district_area_id = b.area and c.kind = 'body_seats'
+            where c.body_id = b.body and c.kind = 'body_seats'
+              and (c.district_area_id = b.area or (b.area is null and c.district_area_id is null and exists (
+                select from slug sc join slug sb on sb.entity_id = b.id and sb.is_current
+                where sc.entity_id = c.id and sc.is_current and substring(sc.path from '[^/]+$') = substring(sb.path from '[^/]+$')
+              )))
               and c.allocation_parent_id is null and e.kind in ('general', 'by_election') and e.date_from < b.day and not c.notional
             order by e.date_from desc limit 1
           ) p
@@ -856,7 +860,12 @@ export const seats = {
         votes as (
           select b.id, sum(x.value)::float8 as votes, row_number() over (partition by b.id order by sum(x.value) desc) as place
           from bys b join result_set rs on rs.contest_id = b.id and ${latest("rs")}
-          join area a on a.id = b.area
+          cross join lateral (
+            select coalesce((select a.k from area a where a.id = b.area), (
+              select y.area_k from result_rollup y where y.result_set_k = rs.k and y.measure = 1 and y.option_k <> 0
+              group by y.area_k order by sum(y.value) desc, y.area_k limit 1
+            )) as k
+          ) a
           cross join lateral (
             select x.option_k, x.value from result_rollup x
             where x.result_set_k = rs.k and x.area_k = a.k and x.measure = 1 and x.option_k <> 0 offset 0
@@ -924,7 +933,7 @@ export const seats = {
           keys.filter((key) => !key.startsWith("person:")),
           day,
         ),
-        names([...people, ...found.rows.map((row) => row.area)], day),
+        names([...people, ...found.rows.map((row) => row.area ?? row.id)], day),
         paths([
           ...people,
           ...found.rows.map((row) => row.id),
@@ -959,7 +968,10 @@ export const seats = {
           }),
         rows: found.rows.map((row) => ({
           date: row.day,
-          name: labels.full.get(row.area) ?? "",
+          name:
+            row.area == null
+              ? (labels.short.get(row.id) ?? labels.full.get(row.id) ?? "")
+              : (labels.full.get(row.area) ?? ""),
           path: slugs.get(row.id) ?? null,
           to: row.now,
           from: row.before,
