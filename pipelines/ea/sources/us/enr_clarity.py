@@ -341,6 +341,11 @@ SUPERSEDED = (
     "default result set; this set stays as the counties' own figures."
 )
 WHOLE = "Votes are the city-wide official totals published by {publisher}, which cover every county the jurisdiction lies in."
+PLURALITY = (
+    "No candidate won a majority and the district has no runoff in the archive. Texas Education Code section 11.057 "
+    "elects the candidate with the most votes to a numbered or single-member trustee seat unless the board has "
+    "required a majority, so the plurality leader is recorded as elected."
+)
 UNOFFICIAL = (
     "The county's site does not mark these results as official or certified; they are the last count it posted, "
     "at least two weeks after election day."
@@ -1229,6 +1234,16 @@ def emit(
                 [source],
             ).fetchall()
         }
+        runoff_schools = {
+            value
+            for (value,) in conn.execute(
+                """select distinct a.code from contest c join area_code a on a.area_id = c.district_area_id
+                   join area r on r.id = a.area_id
+                   where c.round_number = 2 and r.scheme_code = 'us.school_district' and left(a.code, 2) = any(%s)""",
+                [fips],
+            ).fetchall()
+        } | set(contests.filter(pl.col("runoff") & (pl.col("scheme") == "us.school_district"))["code"].to_list())
+        plurality: Counter[str] = Counter()
         precincts: dict[str, UUID] = dict(
             conn.execute(
                 """select code, id from reporting_unit where scheme_code = 'us.precinct'
@@ -1980,7 +1995,21 @@ def emit(
                     cut = int(first["magnitude"])
                     total = sum(votes for votes, _, _ in ranked)
                     majority = st != "TX" or runoff or cut > 1 or ranked[0][0] * 2 > total
-                    if cut > 0 and majority and (len(ranked) <= cut or ranked[cut - 1][0] != ranked[cut][0]):
+                    statute = (
+                        not majority
+                        and first["scheme"] == "us.school_district"
+                        and cut == 1
+                        and re.match(r"(?:Place|Position|District) \d+", seat or "") is not None
+                        and first["code"] not in runoff_schools
+                    )
+                    if (
+                        cut > 0
+                        and (majority or statute)
+                        and (len(ranked) <= cut or ranked[cut - 1][0] != ranked[cut][0])
+                    ):
+                        if statute:
+                            plurality[first["code"]] += 1
+                            cs.add("note", entity_id=result_set, kind="methodology", body_md=PLURALITY)
                         for _, option, _ in ranked[:cut]:
                             cs.add(
                                 "outcome",
@@ -2016,6 +2045,8 @@ def emit(
         print(
             f"{len(emitted)} contests emitted; skipped: "
             + ", ".join(f"{reason} {count}" for reason, count in skipped.most_common())
+            + f"; plurality under TEC 11.057: {sum(plurality.values())} contests in {len(plurality)} districts, "
+            f"{len(runoff_schools)} districts excluded for having a runoff"
         )
         columns = ("id", "election_id", "contest_id", "stage", "kind", "source_id", "is_default", "completeness")
         for row in conn.execute(
