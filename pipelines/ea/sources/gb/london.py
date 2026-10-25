@@ -3,6 +3,7 @@ import re
 import subprocess
 from datetime import date
 from pathlib import Path
+from urllib.parse import quote
 from uuid import UUID
 
 import fastexcel
@@ -13,7 +14,7 @@ from ea.sources.gb import leh
 from ea.store import connect
 
 SOURCE = "gb.london"
-VERSION = "3"
+VERSION = "4"
 VOTES, REGISTERED, BALLOTS, VALID, INVALID, EXHAUSTED = 1, 2, 3, 4, 5, 21
 REPORT_2004 = (
     "https://data.london.gov.uk/download/e585w/94efc8af-b7ce-4d60-9b18-e587084e207f/GLA-mayoral-election-2004.pdf"
@@ -338,6 +339,9 @@ SHEET_TITLES = {
 DECLARATIONS_2021 = {
     code: f"{LONDON_ELECTS}/{name.replace(' ', '%20')}%202021.pdf" for code, name in CONSTITUENCIES.items()
 }
+DECLARATIONS_2016 = {
+    code: f"{LONDON_ELECTS}/{quote(name.replace(' and ', ' & '))}%202016.pdf" for code, name in CONSTITUENCIES.items()
+}
 CORRECTED = {
     (2008, "E09000016", "Boris Johnson"): 50506,
     (2008, "E09000030", "Ken Livingstone"): 37631,
@@ -365,6 +369,178 @@ RESOLVED = {
     "Vote Women's Equality Party on orange": "Women's Equality Party",
     "Animal Welfare Party-People, Animals, Environment": "Animal Welfare Party",
     "Animal Welfare Party - People, Animals, Environment": "Animal Welfare Party",
+    "Labour": "Labour Party",
+    "The Labour Party": "Labour Party",
+    "Labour and Co-operative Party": "Labour Party",
+    "Conservative": "Conservative Party",
+    "Conservatives": "Conservative Party",
+    "Conservative And Unionist Party": "Conservative Party",
+    "Conservative and Unionist Party": "Conservative Party",
+    "Green": "Green Party",
+    "Green Party candidate": "Green Party",
+    'Green Party - "vote Green on orange"': "Green Party",
+    "Green Party – “vote Green on orange”": "Green Party",
+    "Caroline Pidgeon's London Liberal Democrats": "Liberal Democrats",
+    "Caroline Pidgeon’s London Liberal Democrats": "Liberal Democrats",
+    "Lib Dem": "Liberal Democrats",
+    "United Kingdom Independence Party": "UK Independence Party",
+    "UK Independent Party": "UK Independence Party",
+    "BNP": "British National Party",
+    "Respect - The Unity Coalition": "Respect",
+    "Respect - The Unity Coalition (George Galloway)": "Respect",
+    "Communist": "Communist Party of Britain",
+    "ReformUK": "Reform UK",
+    "ReformUK - London Deserves Better": "Reform UK",
+    "Heritage Party - Free Speech and Liberty": "Heritage Party",
+    "The Socialist Party of Great Britain": "Socialist Party of Great Britain",
+    "The Socialist Party (GB)": "Socialist Party of Great Britain",
+    "The Socialist Party (SP-GB)": "Socialist Party of Great Britain",
+    "Residents’ Association of London": "Residents' Association of London",
+    "The Christain Choice": "Christian Choice",
+    "English Democrats Party": "English Democrats",
+    "The House Party - Homes for Londoners": "The House Party",
+    "One London (Leader Damian Hockney)": "One London",
+    "The Conservative Party candidate": "Conservative Party",
+}
+ASSEMBLY_SEATS = 25
+LIST_SEATS = 11
+FACTSHEET_2000 = f"{LONDON_ELECTS}/Results%20factsheet%202000.pdf"
+LIST_2016 = f"{LONDON_ELECTS}/London-wide%20Assembly%202016.pdf"
+FACTSHEET_2016 = f"{LONDON_ELECTS}/Results%20Factsheet%202016.pdf"
+LIST_2021 = f"{LONDON_ELECTS}/London%20Assembly%20Final%20Results%202021.pdf"
+MEMBERS_QUERY = (
+    "SELECT ?p ?pLabel WHERE { ?p p:P39/ps:P39 wd:Q56573014 . "
+    'SERVICE wikibase:label { bd:serviceParam wikibase:language "en". } }'
+)
+MEMBERS_WIKIDATA = f"https://query.wikidata.org/sparql?format=json&query={quote(MEMBERS_QUERY)}"
+ASSEMBLY_TITLES = {
+    FACTSHEET_2000: ("London Elects", "Results factsheet 2000"),
+    LIST_2016: (GLRO, "2016 GLA elections: declaration of the London-wide Assembly Member results"),
+    FACTSHEET_2016: ("London Elects", "Results Factsheet 2016"),
+    LIST_2021: (GLRO, "GLA 2021 elections: declaration of the London-wide Assembly Member results"),
+}
+AMS_NOTE = (
+    "The London Assembly has 25 members. Fourteen are elected by first past the post in 14 constituencies, and 11 "
+    "are elected from London-wide lists. Each voter has two Assembly votes: one for a constituency candidate and "
+    "one for a party list or an individual candidate across London. Parties and candidates with less than 5 percent "
+    "of the London-wide vote are excluded. The 11 London-wide seats are allocated to the remaining parties using the "
+    "D'Hondt method. This divides each party's London-wide votes by one more than the number of seats it already "
+    "holds, including constituency seats, so the list seats offset disproportion in the constituency results. The "
+    "rules schema cannot yet express this adjusted divisor, so the declared seats are stored as published."
+)
+LIST_2000 = {
+    "LAB": "Labour Party",
+    "CON": "Conservative Party",
+    "LD": "Liberal Democrats",
+    "GRE": "Green Party",
+    "CPA": "Christian Peoples Alliance",
+    "BNP": "British National Party",
+    "UKIP": "UK Independence Party",
+    "LSA": "London Socialist Alliance",
+    "IND": "Peter Tatchell",
+    "CATP": "Campaign Against Tube Privatisation",
+    "SLAB": "Socialist Labour Party",
+    "PMSS": "Pro-Motorist Small Shop",
+    "NLP": "Natural Law Party",
+    "COMM": "Communist Party of Britain",
+}
+SUFFIXES_2004 = {
+    "Conservative Party": "Conservative Party",
+    "Labour Party": "Labour Party",
+    "Liberal Democrats": "Liberal Democrats",
+    "Green Party": "Green Party",
+    "Green": "Green Party",
+    "UK Independence Party": "UK Independence Party",
+    "UK Independent Party": "UK Independence Party",
+    "Socialist Alternative/Respect": "Socialist Alternative/Respect",
+    "Respect": "Respect",
+    "Christian Peoples Alliance": "Christian Peoples Alliance",
+    "Communist Party of Britain": "Communist Party of Britain",
+    "Residents’ Association of London": "Residents' Association of London",
+    "Third Way": "Third Way",
+    "Independent": None,
+}
+ABBREVIATIONS_2008 = {
+    "AC": "Animals Count",
+    "BNP": "British National Party",
+    "CPACP": "Christian Peoples Alliance",
+    "Cons": "Conservative Party",
+    "EngDem": "English Democrats",
+    "FEP": "Free England Party",
+    "Green": "Green Party",
+    "ISQMH": "Independents to Save Queen Mary's Hospital",
+    "Ind": None,
+    "Lab": "Labour Party",
+    "LeftList": "Left List",
+    "LibDem": "Liberal Democrats",
+    "NF": "National Front",
+    "Res": "Respect",
+    "SA": "Socialist Alternative",
+    "SP": "Socialist Party",
+    "UKIP": "UK Independence Party",
+    "Veritas": "Veritas",
+}
+HAVERING_2008 = {
+    "evans": 78493,
+    "saund": 35468,
+    "islam": 12443,
+    "webb": 12203,
+    "gunstock": 9126,
+    "brookes": 6487,
+    "warren": 5533,
+    "thorogood": 3450,
+    "vincent": 1473,
+}
+HAVERING_2008_LIST = [3846, 18973, 5358, 67603, 2577, 7747, 36785, 813, 10810, 175, 3622, 6298, 337, 386]
+HAVERING_2008_FIGURES = (164676, 3246, 165330, 2594)
+ASSEMBLY_PEOPLE = {
+    "Robert James Macgillivray Neill": "Q577771",
+    "Robert J.M. Neill": "Q577771",
+    "Robert John Blackman": "Q263875",
+    "Robert J. Blackman": "Q263875",
+    "Trevor Phillips": "Q7839374",
+    "Louise Bloom": "Q6688641",
+    "Elly Baker": "Q106777868",
+    "Thomas Frederick Turrell": "Q76363534",
+    "Bassam Mahfouz": "Q125772957",
+    "James Tacuma Small-Edwards": "Q125789915",
+    "Alessandro Georgiou": "Q125777501",
+}
+ALIASES = {"Anne Marie Bates Clarke": "Anne Clarke"}
+WINNERS_2012 = {"LAB": "Labour", "CON": "Conservative", "GREEN": "Green Party", "LD": "Liberal Democrats"}
+LIST_MEMBERS: dict[int, dict[str, list[str]]] = {
+    2000: {
+        "Liberal Democrats": ["Sally Hamwee", "Graham Tope", "Lynne Featherstone", "Louise Bloom"],
+        "Green Party": ["Darren Johnson", "Victor Anderson", "Jenny Jones"],
+        "Labour Party": ["Trevor Phillips", "Samantha Heath", "David Lammy"],
+        "Conservative Party": ["Eric Ollerenshaw"],
+    },
+    2004: {
+        "Liberal Democrats": [
+            "Lynne Choona Featherstone",
+            "Graham Norman Tope",
+            "Sally Rachel Hamwee",
+            "Michael William Tuffrey",
+            "Dee Doocey",
+        ],
+        "Green Party": ["Jenny Jones", "Darren Johnson"],
+        "UK Independence Party": ["Nicholas Damian Hockney", "Peter Kenneth Hulme Cross"],
+        "Labour Party": ["Felicia Nicolette Gavron", "Murad Qureshi"],
+    },
+    2008: {
+        "British National Party": ["Richard Barnbrook"],
+        "Conservative Party": ["Andrew Boff", "Victoria Borwick", "Gareth Bacon"],
+        "Green Party": ["Jenny Jones", "Darren Johnson"],
+        "Labour Party": ["Nicolette Gavron", "Murad Qureshi"],
+        "Liberal Democrats": ["Caroline Pidgeon", "Michael Tuffrey", "Dee Doocey"],
+    },
+    2016: {
+        "Green Party": ["Sian Berry", "Caroline Russell"],
+        "UK Independence Party": ["Peter Whittle", "David Kurten"],
+        "Liberal Democrats": ["Caroline Pidgeon"],
+        "Conservative Party": ["Kemi Badenoch", "Andrew Boff", "Shaun Bailey"],
+        "Labour Party": ["Fiona Twycross", "Tom Copley", "Nicky Gavron"],
+    },
 }
 
 
@@ -374,6 +550,9 @@ def fetch() -> None:
     for url in SHEET_TITLES:
         raw.fetch(SOURCE, url, suffix=Path(url).suffix)
     raw.fetch(SOURCE, LAC_SHAPES, suffix=".geojson")
+    for url in [*ASSEMBLY_TITLES, *DECLARATIONS_2016.values()]:
+        raw.fetch(SOURCE, url, suffix=".pdf")
+    raw.fetch(SOURCE, MEMBERS_WIKIDATA, suffix=".json")
 
 
 def emit() -> Path:
@@ -384,7 +563,8 @@ def emit() -> Path:
             version=VERSION,
             summary="Mayor of London elections 2000-2024, London-wide first and second rounds from the Greater London "
             "Returning Officer's declarations and the GLA's election reports, with first choices by Assembly "
-            "constituency and borough from the GLA's and London Elects' result files",
+            "constituency and borough from the GLA's and London Elects' result files, and London Assembly elections "
+            "2000-2024, constituency members and the London-wide list with its members, from the same files",
             polity="GB",
         )
 
@@ -882,4 +1062,681 @@ def emit() -> Path:
                             flags=flags,
                             value=value,
                         )
+        body = cs.key("gb.body", "london-assembly")
+        if body in cs.minted:
+            cs.add("body", id=body, polity_id=london, kind="unicameral")
+            name(body, "London Assembly")
+        cs.add("body_size", body_id=body, seats=ASSEMBLY_SEATS, valid_from=first_day)
+        ams = cs.key("gb.electoral_system", "london-ams-list")
+        if ams in cs.minted:
+            cs.add(
+                "electoral_system",
+                id=ams,
+                polity_id=london,
+                rules={
+                    "formula": "dhondt",
+                    "threshold": {"percent": 5, "level": "party"},
+                    "lists": {"order": "closed", "vacancy": "next_on_list"},
+                },
+                rules_version=1,
+            )
+            name(ams, "Additional member system, London-wide list (London Assembly)")
+            cs.add("note", entity_id=ams, kind="methodology", body_md=AMS_NOTE)
+
+        def party_of(label: str) -> UUID:
+            label = RESOLVED.get(label, label)
+            if label not in parties:
+                found = cs.key(*leh.RESOLVED[label]) if label in leh.RESOLVED else known.get(leh.fold(label))
+                if found is None:
+                    found = cs.key("gb.party", slug(label))
+                    if found in cs.minted:
+                        print(f"new party: {label}")
+                        cs.add("party", id=found, kind="party", polity_id=gb)
+                        name(found, label)
+                parties[label] = found
+            return parties[label]
+
+        def cite(url: str) -> UUID:
+            if url == "declarations-2016" and url not in sources:
+                publisher, title = "London Elects", "GLA 2016 Elections: constituency results and local totals"
+                sources[url] = cs.source(publisher, title)
+                page = "https://www.londonelects.org.uk/im-voter/election-results/results-2016"
+                cs.add("source", id=sources[url], kind="official_body", publisher=publisher, title=title, url=page)
+                for link in DECLARATIONS_2016.values():
+                    cs.artifact(raw.cached(SOURCE, link), sources[url])
+            if url not in sources:
+                publisher, title = ASSEMBLY_TITLES.get(url) or SHEET_TITLES[url]
+                sources[url] = cs.source(publisher, title)
+                cs.add("source", id=sources[url], kind="official_body", publisher=publisher, title=title, url=url)
+                cs.artifact(raw.cached(SOURCE, url), sources[url])
+            return sources[url]
+
+        def pdf(url: str) -> str:
+            return subprocess.run(
+                ["pdftotext", "-layout", str(raw.cached(SOURCE, url).path), "-"], check=True, capture_output=True
+            ).stdout.decode(errors="replace")
+
+        def numbers(text: str) -> set[str]:
+            return set(re.findall(r"\d+", re.sub(r"(?<=\d)[,.](?=\d{3})", "", text)))
+
+        def capitals(words: list[str]) -> str:
+            return re.sub(r"\bMc([a-z])", lambda m: f"Mc{m[1].upper()}", " ".join(words).title())
+
+        members_by: dict[str, dict[str, str]] = {}
+        labels_by: dict[str, str] = {}
+        for binding in json.loads(raw.cached(SOURCE, MEMBERS_WIKIDATA).path.read_bytes())["results"]["bindings"]:
+            qid = binding["p"]["value"].rsplit("/", 1)[1]
+            labels_by[qid] = binding["pLabel"]["value"].split(",")[0]
+            words = leh.fold(labels_by[qid]).split()
+            members_by.setdefault(words[-1], {})[words[0]] = qid
+        people: dict[tuple[str, str], UUID] = {}
+        unmatched: list[str] = []
+
+        def person_of(full: str, elected: bool) -> UUID:
+            full = ALIASES.get(full, full)
+            words = leh.fold(full).split()
+            found = members_by.get(words[-1], {})
+            qid = ASSEMBLY_PEOPLE.get(full) or found.get(words[0])
+            if qid is None and elected:
+                close = [q for first, q in found.items() if any(word[0] == first[0] for word in words[:-1])]
+                qid = close[0] if len(close) == 1 else None
+            if qid is None and elected:
+                unmatched.append(full)
+            key = ("wikidata", qid) if qid is not None else ("gb.london.person", full)
+            if key not in people:
+                people[key] = cs.key(*key)
+                if people[key] in cs.minted:
+                    cs.add("person", id=people[key])
+                    name(people[key], full if qid is None else labels_by.get(qid, full))
+            return people[key]
+
+        for year, (day, *_) in ELECTIONS.items():
+            candidates_by: dict[str, dict[str, tuple[str | None, int]]] = {code: {} for code in CONSTITUENCIES}
+            seat_figures: dict[str, dict[str, int]] = {code: {} for code in CONSTITUENCIES}
+            by_lac: dict[str, dict[str, int]] = {code: {} for code in CONSTITUENCIES}
+            lac_figures: dict[str, dict[str, int]] = {code: {} for code in CONSTITUENCIES}
+            individual: set[str] = set()
+            london_figures: dict[str, int] = {}
+            members: list[tuple[str, str]] = []
+            positions: dict[str, list[tuple[int, str, bool]]] = {}
+            printed: set[str] | None = None
+            if year == 2000:
+                book = fastexcel.read_excel(raw.cached(SOURCE, FILE_2000).path)
+                rows = book.load_sheet("Constituency Assembly", header_row=None).to_polars().rows()
+                legend = {str(row[0]).strip(): " ".join(str(row[1]).split()) for row in rows[23:] if row[0] and row[1]}
+                for row in rows[3:17]:
+                    code = constituency_codes[leh.fold(str(row[0]))]
+                    for column in range(3, 35, 2):
+                        if row[column] is None:
+                            continue
+                        text = " ".join(str(row[column]).replace(",", ", ").split())
+                        surname, _, forenames = text.partition(", ")
+                        label = legend[rows[1][column]]
+                        candidates_by[code][f"{forenames} {surname}" if forenames else text] = (
+                            None if label.startswith("Ind") else label,
+                            int(row[column + 1]),
+                        )
+                spoils = book.load_sheet("Spoils", header_row=None).to_polars().rows()
+                for row in spoils[28:42]:
+                    seat_figures[constituency_codes[leh.fold(str(row[0]))]].update(
+                        ballots=int(row[1]), invalid=int(row[6]), valid=int(row[8])
+                    )
+                for row in book.load_sheet("Turnout", header_row=None).to_polars().rows():
+                    if (code := constituency_codes.get(leh.fold(str(row[0] or "")))) is not None:
+                        seat_figures[code]["registered"] = int(row[1])
+                rows = book.load_sheet("Assembly List by constituency", header_row=None).to_polars().rows()
+                for row in rows[2:16]:
+                    code = constituency_codes[leh.fold(str(row[0]))]
+                    by_lac[code] = {LIST_2000[rows[0][c]]: int(row[c]) for c in range(1, 15) if row[c] is not None}
+                for row in spoils[50:64]:
+                    lac_figures[constituency_codes[leh.fold(str(row[0]))]] = {
+                        "ballots": int(row[1]),
+                        "invalid": int(row[6]),
+                        "valid": int(row[8]),
+                    }
+                london_figures = {"ballots": int(spoils[64][1]), "invalid": int(spoils[64][6])}
+                london_figures |= {"valid": int(spoils[64][8]), "registered": COUNTED[2000][0]}
+                individual.add("Peter Tatchell")
+                printed = numbers(pdf(FACTSHEET_2000))
+                list_sources = [FILE_2000, FACTSHEET_2000]
+                seat_sources = [FILE_2000]
+            elif year in (2004, 2008):
+                file = SHEETS[year][0][1]
+                rows = fastexcel.read_excel(raw.cached(SOURCE, file).path).load_sheet(str(year), header_row=None)
+                rows = rows.to_polars().rows()
+                electorate, votes, good, spoiled, names, list_columns, list_good, list_spoiled = (
+                    (34, range(70, 80), 80, 85, 86, range(54, 63), 63, 68)
+                    if year == 2004
+                    else (36, range(60, 72), 72, 78, 79, range(38, 52), 52, 58)
+                )
+                list_labels = {c: " ".join(str(rows[2][c]).split()) for c in list_columns}
+                for c, label in list_labels.items():
+                    if ", " in label:
+                        surname, forenames = label.split(", ")
+                        list_labels[c] = f"{forenames} {surname}"
+                        individual.add(list_labels[c])
+                for row in rows[3:]:
+                    if (code := constituency_codes.get(leh.fold(str(row[2] or "")))) is None:
+                        continue
+                    if year == 2008 and row[1] == "Havering":
+                        continue
+                    entry = seat_figures[code]
+                    for column in votes:
+                        text = " ".join(str(row[column - votes[0] + names] or "").split())
+                        if not text:
+                            if row[column] not in (None, 0, "0", "NA"):
+                                raise ValueError(f"{year} {code}: votes {row[column]} with no candidate")
+                            continue
+                        if year == 2004:
+                            suffix = max((s for s in SUFFIXES_2004 if text.endswith(s)), key=len)
+                            label = SUFFIXES_2004[suffix]
+                            surname, _, forenames = text[: -len(suffix)].strip().partition(",")
+                            full = " ".join(f"{forenames} {surname}".split())
+                        else:
+                            full, abbreviation = text.rsplit(" - ", 1)
+                            label = ABBREVIATIONS_2008[abbreviation]
+                        previous = candidates_by[code].get(full, (label, 0))[1]
+                        candidates_by[code][full] = (label, previous + round(float(row[column] or 0)))
+                    for key, column in (("valid", good), ("invalid", spoiled), ("registered", electorate)):
+                        entry[key] = entry.get(key, 0) + round(float(row[column]))
+                    for c, label in list_labels.items():
+                        by_lac[code][label] = by_lac[code].get(label, 0) + round(float(row[c] or 0))
+                    for key, column in (("valid", list_good), ("invalid", list_spoiled)):
+                        lac_figures[code][key] = (lac_figures[code].get(key) or 0) + round(float(row[column]))
+                london_figures = {"registered": COUNTED[year][0]}
+                report = ELECTIONS[year][1]
+                text = pdf(report)
+                printed = numbers(text)
+                if year == 2008:
+                    surnames = {leh.fold(full).split()[-1]: full for full in candidates_by["E32000009"]}
+                    candidates_by["E32000009"] = {
+                        surnames[surname]: (candidates_by["E32000009"][surnames[surname]][0], value)
+                        for surname, value in HAVERING_2008.items()
+                    }
+                    by_lac["E32000009"] = dict(zip(list_labels.values(), HAVERING_2008_LIST, strict=True))
+                    valid, invalid, list_valid, list_invalid = HAVERING_2008_FIGURES
+                    seat_figures["E32000009"].update(valid=valid, invalid=invalid)
+                    lac_figures["E32000009"] = {"valid": list_valid, "invalid": list_invalid}
+                    shown = [*HAVERING_2008.values(), *HAVERING_2008_LIST, *HAVERING_2008_FIGURES]
+                    if missing := sorted(value for value in shown if str(value) not in printed):
+                        raise ValueError(f"2008 Havering and Redbridge: {missing} not printed in {report}")
+                for line in text.splitlines():
+                    parts = re.split(r"\s{2,}", line.strip())
+                    if (
+                        line[:1].isalpha()
+                        and len(parts) >= 8
+                        and (code := constituency_codes.get(leh.fold(parts[0]))) is not None
+                        and all(re.fullmatch(r"\d{1,3}(,\d{3})+", parts[i]) for i in (1, 2, 4, 6))
+                        and all(re.fullmatch(r"\d+\.\d", parts[i]) for i in (3, 5, 7))
+                        and "ballots" not in seat_figures[code]
+                    ):
+                        seat_figures[code].update(
+                            registered=int(parts[1].replace(",", "")), ballots=int(parts[4].replace(",", ""))
+                        )
+                        lac_figures[code]["ballots"] = int(parts[6].replace(",", ""))
+                for code, entry in seat_figures.items():
+                    for figures in (entry, lac_figures[code]):
+                        if figures["valid"] + figures["invalid"] != figures["ballots"]:
+                            raise ValueError(f"{year} {code}: {figures} against the report's ballot papers")
+                for code, standing in candidates_by.items():
+                    for full, (_, value) in standing.items():
+                        if str(value) not in printed:
+                            raise ValueError(f"{year} {code}: {full} {value} not printed in {report}")
+                list_sources = [file, report]
+                seat_sources = [file, report]
+            elif year == 2012:
+                file = SHEETS[2012][0][1]
+                book = fastexcel.read_excel(raw.cached(SOURCE, file).path)
+                rows = book.load_sheet("Constituency member", header_row=None).to_polars().rows()
+                for row in rows[2:16]:
+                    code = constituency_codes[leh.fold(str(row[0]))]
+                    for column in range(3, 17):
+                        if row[column] is not None:
+                            label = rows[1][column]
+                            full = str(row[column + 34]).strip().rstrip("*").strip()
+                            candidates_by[code][full] = (
+                                None if label == "Independent/Other" else label,
+                                int(row[column]),
+                            )
+                    seat_figures[code].update(valid=int(row[17]), invalid=int(row[18]))
+                for row in book.load_sheet("Mayoral", header_row=None).to_polars().rows()[2:]:
+                    if (code := constituency_codes.get(leh.fold(str(row[0] or "")))) is not None:
+                        seat_figures[code]["registered"] = int(row[2])
+                rows = book.load_sheet("Londonwide-list", header_row=None).to_polars().rows()
+                list_labels = {c: str(rows[1][c]) for c in range(2, 15)}
+                for c, label in list_labels.items():
+                    if label.endswith(" (Independent)"):
+                        list_labels[c] = label.removesuffix(" (Independent)")
+                        individual.add(list_labels[c])
+                for row in rows[2:16]:
+                    code = constituency_codes[leh.fold(str(row[0]))]
+                    by_lac[code] = {label: int(row[c]) for c, label in list_labels.items() if row[c] is not None}
+                    lac_figures[code] = {"valid": int(row[15]), "invalid": int(row[16])}
+                for row in book.load_sheet("Londonwide seat allocation", header_row=None).to_polars().rows()[3:14]:
+                    members.append((WINNERS_2012[row[10]], str(row[11]).strip()))
+                printed = numbers(pdf(ELECTIONS[2012][1]))
+                list_sources = [file, ELECTIONS[2012][1]]
+                seat_sources = [file]
+            elif year in (2016, 2021):
+                declarations, file, key = (
+                    (DECLARATIONS_2016, LIST_2016, "declarations-2016")
+                    if year == 2016
+                    else (DECLARATIONS_2021, LIST_2021, "declarations")
+                )
+                for code, url in declarations.items():
+                    text = pdf(url)
+                    first = text.rindex("CONSTITUENCY MEMBER OF THE LONDON ASSEMBLY RESULTS")
+                    section = text[first : text.index("Turnout", first)]
+                    first = text.index("LONDON MEMBER (AT CONSTITUENCY LEVEL)")
+                    rest = text[first : text.index("Turnout", first)]
+                    current: list[str] | None = None
+                    listed: list[tuple[list[str], int]] = []
+                    for line in section[
+                        section.index("(if any)") : section.index("Total number of good votes")
+                    ].splitlines()[1:]:
+                        if (match := re.match(r"^\s{1,4}(\S.*?)(?:\s{2,}(\S.*?))?\s{2,}(\d+)$", line)) is not None:
+                            current = [match[1], match[2] or ""]
+                            listed.append((current, int(match[3])))
+                        elif line.strip() and current is not None:
+                            if line.strip().isupper():
+                                joint = "" if current[0].endswith("-") else " "
+                                current[0] = f"{current[0]}{joint}{line.strip()}"
+                            else:
+                                current[1] = f"{current[1]} {line.strip()}"
+                    for (written, label), value in listed:
+                        words = written.split()
+                        cut = next(i for i, word in enumerate(words) if word.upper() == word and len(word) > 1)
+                        full = f"{' '.join(words[:cut])} {capitals(words[cut:])}"
+                        label = label.strip()
+                        candidates_by[code][full] = (None if label in ("", "Independent") else label, value)
+                    seat_figures[code].update(
+                        ballots=int(re.findall(r"ballot papers counted\s+(\d+)", section)[0]),
+                        valid=int(re.findall(r"Total number of good votes\s+(\d+)", section)[0]),
+                        invalid=int(re.findall(r"Total number of Rejected ballots\s+(\d+)", section)[0]),
+                        registered=int(re.findall(r"System Logged Electorate\s+(\d+)", section)[0]),
+                    )
+                    lac_figures[code] = {
+                        "ballots": int(re.findall(r"ballot papers counted\s+(\d+)", rest)[0]),
+                        "valid": int(re.findall(r"Total number of good votes\s+(\d+)", rest)[0]),
+                        "invalid": int(re.findall(r"\n\s+Total\s+(\d+)\n", rest)[0]),
+                    }
+                    by_lac[code] = {
+                        match[1].strip(): int(match[2])
+                        for match in re.finditer(
+                            r"^\s{1,4}(\S.*?)\s{2,}(\d+)$", rest[rest.index("Independent") :], re.MULTILINE
+                        )
+                        if not match[1].startswith(("Total", "(", "System", "Turnout"))
+                    }
+                text = pdf(file)
+                head = text[: text.index("LONDON MEMBER AGGREGATED")]
+                totals = {
+                    match[1].strip(): int(match[2])
+                    for match in re.finditer(
+                        r"^(\S.*?)\s{2,}(\d+)$",
+                        head[head.index("Total Votes") : head.index("Total number of good")],
+                        re.MULTILINE,
+                    )
+                }
+                for code, printed_lines in by_lac.items():
+                    by_lac[code] = {}
+                    for label, value in printed_lines.items():
+                        owner = max((t for t in totals if label.startswith(t)), key=len)
+                        by_lac[code][owner] = by_lac[code].get(owner, 0) + value
+                if year == 2021:
+                    for match in re.finditer(
+                        r"^\s+\d+ (\S.*?)\s{2,}(\S.*)$", head[head.index("filled") :], re.MULTILINE
+                    ):
+                        words = match[2].split()
+                        cut = next(i for i, word in enumerate(words) if word.upper() != word)
+                        members.append((match[1].strip(), f"{' '.join(words[cut:])} {capitals(words[:cut])}"))
+                else:
+                    factsheet = pdf(FACTSHEET_2016)
+                    for names in LIST_MEMBERS[2016].values():
+                        for full in names:
+                            if full not in factsheet:
+                                raise ValueError(f"2016: {full} not printed in {FACTSHEET_2016}")
+                london_figures = {
+                    "ballots": int(re.findall(r"ballot papers counted\s+(\d+)", text)[0]),
+                    "invalid": int(re.findall(r"\n\s+Total\s+(\d+)\n", head)[0]),
+                }
+                if electorate := re.findall(r"System Logged Electorate\s+(\d+)", text):
+                    london_figures["registered"] = int(electorate[0])
+                printed = numbers(head)
+                list_sources = [file, key, *([FACTSHEET_2016] if year == 2016 else [])]
+                seat_sources = [key]
+            else:
+                file = SHEETS[2024][0][1]
+                book = fastexcel.read_excel(raw.cached(SOURCE, file).path)
+                for row in book.load_sheet("2. Constituency Assembly Pt 1", header_row=None).to_polars().rows()[2:]:
+                    if row[0] is None or (code := constituency_codes.get(leh.fold(str(row[2] or "")))) is None:
+                        continue
+                    surname, _, forenames = str(row[0]).partition(", ")
+                    label = " ".join(str(row[1]).split())
+                    candidates_by[code][f"{forenames} {surname}".strip()] = (
+                        None if label.endswith("Independent") else label,
+                        int(row[3]),
+                    )
+                for row in book.load_sheet("3. Constituency Assembly Pt 2", header_row=None).to_polars().rows()[3:17]:
+                    seat_figures[constituency_codes[leh.fold(str(row[0]))]].update(
+                        valid=int(row[1]), invalid=int(row[7]), ballots=int(row[8]), registered=int(row[9])
+                    )
+                rows = book.load_sheet("4. London-wide Assembly", header_row=None).to_polars().rows()
+                list_labels = {}
+                for c in range(1, 16):
+                    label = " ".join(str(rows[2][c]).split())
+                    if (match := re.fullmatch(r"([A-Z'\- ]+), (.+?)(?: Independent)?", label)) is not None:
+                        label = f"{match[2]} {capitals(match[1].split())}"
+                        individual.add(label)
+                    list_labels[c] = label
+                for row in rows[3:17]:
+                    code = constituency_codes[leh.fold(str(row[0]))]
+                    by_lac[code] = {label: int(row[c]) for c, label in list_labels.items()}
+                    lac_figures[code] = {"valid": int(row[16]), "invalid": int(row[22]), "ballots": int(row[23])}
+                london_figures = {"invalid": int(rows[18][22]), "ballots": int(rows[18][23])}
+                london_figures |= {"registered": int(rows[18][24]), "valid": int(rows[18][16])}
+                by_party = {party_of(label): label for label in list_labels.values() if label not in individual}
+                rows = book.load_sheet("7. London-wide Elected", header_row=None).to_polars().rows()
+                for c in range(1, len(rows[0])):
+                    header = " ".join(str(rows[0][c] or "").split())
+                    if not header or re.match(r"[A-Z'\- ]+, ", header) is not None:
+                        continue
+                    owner = by_party[party_of(header)]
+                    for row in rows[1:]:
+                        cell = str(row[c] or "").strip()
+                        if not cell:
+                            continue
+                        full = re.sub(r"\s*\(Elected .*\)$", "", cell)
+                        elected = "Elected In Round" in cell
+                        positions.setdefault(owner, []).append((int(row[0]), full, elected))
+                        if elected:
+                            members.append((owner, full))
+                printed = None
+                list_sources = [file]
+                seat_sources = [file]
+            for label, names in LIST_MEMBERS.get(year, {}).items():
+                members += [(label, full) for full in names]
+            if year in (2004, 2008):
+                text = pdf(ELECTIONS[year][1])
+                for _, full in members:
+                    if full not in text:
+                        raise ValueError(f"{year}: {full} not printed in {ELECTIONS[year][1]}")
+            if year == 2000:
+                text = pdf(FACTSHEET_2000)
+                for _, full in members:
+                    if full not in text:
+                        raise ValueError(f"2000: {full} not printed in {FACTSHEET_2000}")
+            if len(members) != LIST_SEATS:
+                raise ValueError(f"{year}: {len(members)} London-wide members")
+            for code, standing in candidates_by.items():
+                if len(standing) < 2:
+                    raise ValueError(f"{year} {code}: {len(standing)} standing")
+                if (summed := sum(value for _, value in standing.values())) != seat_figures[code]["valid"]:
+                    raise ValueError(f"{year} {code}: standing sum to {summed}, good {seat_figures[code]['valid']}")
+                if sum(by_lac[code].values()) != lac_figures[code]["valid"]:
+                    raise ValueError(f"{year} {code}: list votes sum to {sum(by_lac[code].values())}")
+            list_votes: dict[str, int] = {}
+            for counted in by_lac.values():
+                for label, value in counted.items():
+                    list_votes[label] = list_votes.get(label, 0) + value
+            for key in ("valid", "invalid", "ballots"):
+                parts = [figures[key] for figures in lac_figures.values() if key in figures]
+                if len(parts) != len(lac_figures):
+                    continue
+                if key not in london_figures:
+                    london_figures[key] = sum(parts)
+                elif london_figures[key] != sum(parts):
+                    raise ValueError(
+                        f"{year}: constituency list {key} sums to {sum(parts)}, declared {london_figures[key]}"
+                    )
+            if london_figures["valid"] != sum(list_votes.values()):
+                raise ValueError(
+                    f"{year}: list votes sum to {sum(list_votes.values())}, good {london_figures['valid']}"
+                )
+            if year == 2021 and list_votes != totals:
+                raise ValueError(f"2021: constituency list votes {list_votes} against {totals}")
+            if printed is not None and (
+                missing := sorted(f"{l} {v}" for l, v in list_votes.items() if str(v) not in printed)
+            ):
+                raise ValueError(f"{year}: London-wide votes {missing} not printed")
+            winners: dict[str, str] = {}
+            held: dict[UUID, int] = {}
+            for code, standing in candidates_by.items():
+                winners[code] = max(standing, key=lambda full: standing[full][1])
+                label = standing[winners[code]][0]
+                if label is not None:
+                    held[party_of(label)] = held.get(party_of(label), 0) + 1
+            eligible = {
+                label: value
+                for label, value in list_votes.items()
+                if label not in individual and value * 20 >= london_figures["valid"]
+            }
+            won: dict[UUID, int] = {}
+            for _ in range(LIST_SEATS):
+                label = max(
+                    eligible,
+                    key=lambda label: (
+                        eligible[label] / (held.get(party_of(label), 0) + won.get(party_of(label), 0) + 1)
+                    ),
+                )
+                won[party_of(label)] = won.get(party_of(label), 0) + 1
+            declared: dict[UUID, int] = {}
+            for label, _ in members:
+                declared[party_of(label)] = declared.get(party_of(label), 0) + 1
+            if won != declared:
+                raise ValueError(f"{year}: D'Hondt gives {won}, declared {declared}")
+            election = cs.key("gb.election", f"{day}:gla")
+            path = f"gb/london/{day}-general"
+            for code, standing in candidates_by.items():
+                entry = seat_figures[code]
+                constituency = CONSTITUENCIES[code]
+                contest_key = f"{day}:assembly:{slug(constituency)}"
+                contest = cs.key("gb.contest", contest_key)
+                cs.add(
+                    "contest",
+                    id=contest,
+                    election_id=election,
+                    kind="body_seats",
+                    body_id=body,
+                    district_area_id=constituency_areas[code],
+                    magnitude=1,
+                    round_number=1,
+                    electoral_system_id=fptp,
+                    default_result_kind="counted",
+                )
+                name(contest, f"{year} London Assembly election in {constituency}")
+                cs.add("slug", path=f"{path}/{slug(constituency)}", entity_id=contest)
+                result_set = cs.key("gb.london.result_set", contest_key)
+                own = [cite(url) for url in seat_sources]
+                cs.add(
+                    "result_set",
+                    id=result_set,
+                    election_id=election,
+                    contest_id=contest,
+                    stage="official",
+                    kind="counted",
+                    status="active",
+                    source_id=own[0],
+                    is_default=True,
+                    completeness=1,
+                )
+                for source_id in own:
+                    cs.add("citation", entity_id=result_set, source_id=source_id)
+                cells: list[tuple[UUID | None, int, int | None]] = [
+                    (None, measure, entry.get(key))
+                    for measure, key in (
+                        (REGISTERED, "registered"),
+                        (BALLOTS, "ballots"),
+                        (VALID, "valid"),
+                        (INVALID, "invalid"),
+                    )
+                ]
+                for full, (label, value) in standing.items():
+                    owner = None if label is None else party_of(label)
+                    option_key = f"{contest_key}:{slug(full)}"
+                    option = cs.key("gb.london.option", option_key)
+                    cs.add(
+                        "contest_option",
+                        id=option,
+                        contest_id=contest,
+                        kind="candidate",
+                        party_id=owner,
+                        ballot_label=full,
+                    )
+                    cs.add(
+                        "candidacy",
+                        id=cs.key("gb.london.candidacy", option_key),
+                        person_id=person_of(full, full == winners[code]),
+                        option_id=option,
+                        role="head",
+                        ballot_name=full,
+                        member_of_party_id=owner,
+                        is_independent=owner is None,
+                    )
+                    cs.add(
+                        "outcome",
+                        result_set_id=result_set,
+                        option_id=option,
+                        kind="elected" if full == winners[code] else "lost",
+                    )
+                    cells.append((option, VOTES, value))
+                for option_id, measure, value in cells:
+                    if value is None:
+                        continue
+                    cs.add(
+                        "result_value",
+                        result_set_id=result_set,
+                        unit_id=constituency_units[code],
+                        option_id=option_id,
+                        channel=0,
+                        measure=measure,
+                        count_round=0,
+                        flags=0 if printed is None or year not in (2004, 2008) or str(value) in printed else 1,
+                        value=value,
+                    )
+            contest_key = f"{day}:assembly:london-wide"
+            contest = cs.key("gb.contest", contest_key)
+            cs.add(
+                "contest",
+                id=contest,
+                election_id=election,
+                kind="list_allocation",
+                body_id=body,
+                district_area_id=region,
+                magnitude=LIST_SEATS,
+                round_number=1,
+                electoral_system_id=ams,
+                default_result_kind="counted",
+            )
+            name(contest, f"{year} London Assembly election, London-wide list")
+            cs.add("slug", path=f"{path}/london-wide-assembly", entity_id=contest)
+            options = {}
+            for label in list_votes:
+                option = options[label] = cs.key("gb.london.option", f"{contest_key}:{slug(label)}")
+                cs.add(
+                    "contest_option",
+                    id=option,
+                    contest_id=contest,
+                    kind="candidate" if label in individual else "list",
+                    party_id=None if label in individual else party_of(label),
+                    ballot_label=label,
+                )
+                if label in individual:
+                    cs.add(
+                        "candidacy",
+                        id=cs.key("gb.london.candidacy", f"{contest_key}:{slug(label)}"),
+                        person_id=person_of(label, False),
+                        option_id=option,
+                        role="head",
+                        ballot_name=label,
+                        member_of_party_id=None,
+                        is_independent=True,
+                    )
+            by_party = {party_of(label): label for label in list_votes if label not in individual}
+            seated: dict[str, list[str]] = {}
+            for label, full in members:
+                seated.setdefault(by_party[party_of(label)], []).append(full)
+            for label in positions:
+                if label not in options:
+                    raise ValueError(f"{year}: list {label} has no votes")
+            for suffix, votes_by, figures_by in (
+                ("", {"": list_votes}, {"": london_figures}),
+                (":lac", by_lac, lac_figures),
+            ):
+                result_set = cs.key("gb.london.result_set", f"{contest_key}{suffix}")
+                own = [cite(url) for url in list_sources]
+                cs.add(
+                    "result_set",
+                    id=result_set,
+                    election_id=election,
+                    contest_id=contest,
+                    stage="official",
+                    kind="counted",
+                    status="active",
+                    source_id=own[0],
+                    is_default=suffix == "",
+                    completeness=1,
+                )
+                for source_id in own:
+                    cs.add("citation", entity_id=result_set, source_id=source_id)
+                if suffix == "":
+                    for label, names in seated.items():
+                        cs.add(
+                            "outcome", result_set_id=result_set, option_id=options[label], kind="won", seats=len(names)
+                        )
+                    rosters = {
+                        label: positions.get(label) or [(None, full, True) for full in seated.get(label, [])]
+                        for label in options
+                        if label not in individual
+                    }
+                    for label, entries in rosters.items():
+                        for position, full, elected in entries:
+                            candidacy = cs.key("gb.london.candidacy", f"{contest_key}:{slug(label)}:{slug(full)}")
+                            cs.add(
+                                "candidacy",
+                                id=candidacy,
+                                person_id=person_of(full, elected),
+                                option_id=options[label],
+                                role="list_member",
+                                list_position=position,
+                                ballot_name=full,
+                                member_of_party_id=party_of(label),
+                                is_independent=False,
+                            )
+                            if elected:
+                                cs.add(
+                                    "outcome",
+                                    result_set_id=result_set,
+                                    option_id=options[label],
+                                    candidacy_id=candidacy,
+                                    kind="elected",
+                                )
+                for code, found in votes_by.items():
+                    place = unit if code == "" else constituency_units[code]
+                    figures = figures_by[code]
+                    cells = [
+                        (None, measure, figures.get(key))
+                        for measure, key in (
+                            (REGISTERED, "registered"),
+                            (BALLOTS, "ballots"),
+                            (VALID, "valid"),
+                            (INVALID, "invalid"),
+                        )
+                    ]
+                    cells += [(options[label], VOTES, value) for label, value in found.items()]
+                    for option_id, measure, value in cells:
+                        if value is None:
+                            continue
+                        cs.add(
+                            "result_value",
+                            result_set_id=result_set,
+                            unit_id=place,
+                            option_id=option_id,
+                            channel=0,
+                            measure=measure,
+                            count_round=0,
+                            flags=0 if printed is None or year not in (2004, 2008) or str(value) in printed else 1,
+                            value=value,
+                        )
+        if unmatched:
+            print(f"elected with no Wikidata match: {unmatched}")
         return cs.write()
