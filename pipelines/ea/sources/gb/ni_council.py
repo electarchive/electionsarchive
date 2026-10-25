@@ -39,6 +39,8 @@ def links(url: str, pattern: str) -> list[str]:
 
 def fetch() -> None:
     raw.fetch(SOURCE, DEAS, suffix=".xls")
+    for year in ARK:
+        raw.fetch(SOURCE, f"https://web.archive.org/web/2020if_/https://www.ark.ac.uk/elections/xls/lgov/{year}.rar", suffix=".rar")
     for path in links(PAGE_2023, r'href="(/media/[^"]+\.(?:xlsx|pdf))"'):
         raw.fetch(SOURCE, f"{EONI}{path}", suffix=Path(path).suffix)
     for url in links(OPENDATANI_2014, r'href="(https://admin\.opendatani\.gov\.uk/dataset/[^"]+/download/(?:2014-ni-councils-elections|local-council-elections-2014)-[^"]+\.csv)"'):
@@ -118,16 +120,16 @@ def grid_sheet(grid: list[list[str | None]], dea: str, scan: int = 14, width: in
                 (
                     key
                     for key, words in (
-                        ("electorate", ("eligible electorate",)),
+                        ("electorate", ("eligible electorate", "total no of electors", "no. of electors")),
                         ("polled", ("votes polled", "total votes polled")),
                         ("seats", ("number to be elected", "number of members to be elected")),
-                        ("invalid", ("invalid votes",)),
-                        ("valid", ("total valid votes", "valid votes", "total vailid votes")),
+                        ("invalid", ("invalid votes", "number of invalid votes")),
+                        ("valid", ("total valid votes", "valid votes", "total vailid votes", "number of valid votes", "vaild votes")),
                         ("quota", ("electoral quota",)),
                     )
                     if any(label.startswith(word) for word in words)
                 ),
-                None,
+                "seats" if re.match(r"number\b.*\bele(?:c|tc)", label) and "elector" not in label else None,
             )
             if key is not None:
                 value = next((number(c) for c in row[index + 1 :] if number(c) is not None), None)
@@ -149,7 +151,9 @@ def grid_sheet(grid: list[list[str | None]], dea: str, scan: int = 14, width: in
     description_col = name_col + 1
     totals_row = next((index for index in range(header + 1, len(grid)) if (grid[index][description_col] or "").strip().lower().startswith("totals")), len(grid))
     nontransferable_row = next(
-        index for index in range(header + 1, totals_row) if (grid[index][description_col] or "").strip().lower().startswith("non")
+        index
+        for index in range(header + 1, totals_row)
+        if (grid[index][description_col] or "").strip().lower().startswith("non") and "tran" in (grid[index][description_col] or "").lower()
     )
     rows = [
         row
@@ -169,6 +173,17 @@ def grid_sheet(grid: list[list[str | None]], dea: str, scan: int = 14, width: in
         for stage, col in enumerate(total_cols, start=1)
     }
     tied = tie(stage_totals, facts["valid"], len(rows))
+    printed = next(
+        (number(grid[index][first]) for index in range(header + 1, len(grid)) if (grid[index][description_col] or "").strip().lower() in ("total", "totals")),
+        None,
+    )
+    if not tied and stage_totals and printed is not None and printed != facts["valid"] and abs(stage_totals[1] - printed) < 0.5:
+        tied = tie(stage_totals, printed, len(rows))
+        facts["caveat"] = (
+            f"The sheet prints {facts['valid']:,.0f} valid votes, but its own totals row and the candidates' first "
+            f"preferences give {printed:,.0f}; the valid votes stored are {printed:,.0f}."
+        )
+        facts["valid"] = printed
     candidates = [
         {
             "name": row[name_col].strip(),
@@ -572,7 +587,7 @@ def parse_2014(areas: dict[str, tuple[str, str, str]]) -> tuple[list[dict[str, o
     return units, totals
 
 
-ARK = {2011: "lg11", 2005: "lg05"}
+ARK = {2011: "lg11", 2005: "lg05", 2001: "lg01", 1997: "lg97", 1993: "lg93", 1989: "lg89", 1985: "lg85", 1981: "lg81", 1977: "lg77", 1973: "lg73"}
 WP_PARTIES: dict[str, list[tuple[str, str]]] = json.loads((Path(__file__).parent / "ni_council_wp.json").read_text())
 FULL_NAMES: dict[str, list[str]] = json.loads((Path(__file__).parent / "ni_council_names.json").read_text())
 
@@ -586,8 +601,11 @@ def parse_ark(year: int) -> tuple[list[dict[str, object]], list[dict[str, object
     units: list[dict[str, object]] = []
     totals: list[dict[str, object]] = []
     failed: list[str] = []
-    for path in sorted(folder.rglob(f"{ARK[year]}-*.xls*")):
+    for path in sorted(path for path in folder.rglob("*.xls*") if path.name.lower().startswith(f"{ARK[year]}-")):
         _, abbr, *rest = path.stem.split("-")
+        rest = [word for word in rest if word.lower() != "corrected"]
+        abbr = {code.upper(): code for code in LEGACY_NAMES}.get(abbr.upper(), abbr)
+        era = "1973:" if year < 1985 else "1985:" if year < 1993 else ""
         grid = [list(row) for row in pl.read_excel(path, has_header=False, infer_schema_length=0).iter_rows()]
         dea = None
         for row in grid:
@@ -595,13 +613,15 @@ def parse_ark(year: int) -> tuple[list[dict[str, object]], list[dict[str, object
                 if text.lower().startswith("district electo") and dea is None:
                     dea = re.sub(r"^district electo\w* area\W*(?:of\s+|for\s+)?", "", text, flags=re.IGNORECASE).strip()
         dea = dea or " ".join(rest)
+        if era == "1973:" and len(rest) == 2 and rest[0].lower() == "area":
+            dea = f"Area {rest[1].upper()}"
         try:
             sheet = grid_sheet(grid, dea, 40, 80)
             if sheet["tied"] < sheet["stages"]:
                 raise ValueError(f"tied through stage {sheet['tied']} of {sheet['stages']}")
-            candidates = [{**c, "elected": re.fullmatch(r"e|elected|e\d+", c["flag"]) is not None} for c in sheet["candidates"] if re.search("[A-Za-z]", c["name"])]
-            unit, rows = finish(year, dea, sheet["facts"], candidates, sheet["exhausted"], sheet["stages"], url, {squeeze(dea): (f"{abbr}/{slug('-'.join(rest))}", dea, abbr)})
-        except (ValueError, KeyError, StopIteration) as error:
+            candidates = [{**c, "elected": re.fullmatch(r"e|elected|e\d+|e'.*|.*stage e", c["flag"]) is not None} for c in sheet["candidates"] if re.search("[A-Za-z]", c["name"])]
+            unit, rows = finish(year, dea, sheet["facts"], candidates, sheet["exhausted"], sheet["stages"], url, {squeeze(dea): (f"{era}{abbr}/{slug('-'.join(rest))}", dea, abbr)})
+        except (ValueError, KeyError, StopIteration, IndexError, TypeError) as error:
             print(f"FAILED {year} {path.name}: {error!r}")
             failed.append(path.name)
             continue
@@ -742,6 +762,14 @@ DAYS = {
     2014: date(2014, 5, 22),
     2011: date(2011, 5, 5),
     2005: date(2005, 5, 5),
+    2001: date(2001, 6, 7),
+    1997: date(1997, 5, 21),
+    1993: date(1993, 5, 19),
+    1989: date(1989, 5, 17),
+    1985: date(1985, 5, 15),
+    1981: date(1981, 5, 20),
+    1977: date(1977, 5, 18),
+    1973: date(1973, 5, 30),
 }
 COUNCILS = {
     "N09000001": "Antrim and Newtownabbey Borough Council",
@@ -795,12 +823,50 @@ EXTRA_PARTIES = (
 )
 
 
-def party_of(description: str) -> str | None:
+HISTORIC_PARTIES = (
+    (r"^unitedunionistassemblyparty$", "United Unionist Assembly Party"),
+    (r"^nor?thernirelandunionistparty$", "Northern Ireland Unionist Party"),
+    (r"^(?:ul)?uuup$|^unitedu[nl]\w*uu[uc]|^unitedulun$|^untiedunuuuc$", "United Ulster Unionist"),
+    (r"^van|^vupp$", "Vanguard"),
+    (r"^(?:o|of|off|on)(?:ul|u)?u?n?(?:uuuc)?$|^ouu|^ou$|^uu(?!uc$)|^ulun?$|^ulu$|^offic?i?al(?:unionist|ulster)|^ulster(?:uni|unio|llninni)|ulsterun|^mayoruup$|^farmerunionist$", "Ulster Unionist Party"),
+    (r"^(?:d|du|dun|dulun|loydu|condu)(?:uuuc|uuc)?$|^dup$|^democratic,?uni|^ulsterdemocracticunionist|demoraticunion", "Democratic Unionist Party"),
+    (r"^a$|^ap$|^alliance|alliance$|^allliance", "Alliance Party"),
+    (r"^(?:the)?wp(?:r)?(?:ep)?clubs|^repclubswp$|^wp$|^twp$", "Workers' Party"),
+    (r"^repclubs?$|^therepclubs$", "Republican Clubs"),
+    (r"^replp$", "Republican Labour"),
+    (r"^sf$", "Sinn Féin"),
+    (r"^sdl[po]$|^spdl$", "Social Democratic and Labour Party"),
+    (r"^n?ilp$|^nlip$|^nllp$|^nilabourparty$|^northernirelandlabourparty|^labourpartyofnorthernireland$|^lpni$|^newtownabbeylabourpartynilp$", "Northern Ireland Labour Party"),
+    (r"^upni|^upn$", "Unionist Party of Northern Ireland"),
+    (r"^iip", "Irish Independence"),
+    (r"^irsp$|^irishrepsocp$", "Irish Republican Socialist Party"),
+    (r"^pro(?:g|gressive|gressuve|grssive|eressive)?u(?:n|nionist|party)?\w*$|^progun|^prou$|^unionistprogressiveparty$", "Progressive Unionist Party"),
+    (r"^ulsterpopularunionist", "Ulster Popular Unionist"),
+    (r"^ulsterloyalistdemocratic|^uldp", "Ulster Democratic"),
+    (r"^comm(?:unist)?p(?:arty)?ofir|^cpi$", "Communist Party of Ireland"),
+    (r"^peoplesdemocracy$|^pd$", "People's Democracy"),
+    (r"^ecolog|^ep$", "Ecology Party"),
+    (r"labourparty87$|^lp87$", "Labour '87"),
+    (r"^democraticleft|^dl$", "Democratic Left"),
+    (r"^militantlabour$", "Militant Labour"),
+    (r"^nationalfront$|^nf$|britishnatfront", "National Front"),
+    (r"^ulsterliberalparty$|^lib$", "Ulster Liberal"),
+    (r"^nat$", "Nationalist Party"),
+)
+
+
+def party_of(description: str, year: int | None = None) -> str | None:
     text = re.sub(r"\s+", " ", description.strip().lower())
     for pattern, canonical in EXTRA_PARTIES:
         if re.search(pattern, text):
             return canonical
-    return assembly_party(description)
+    try:
+        return assembly_party(description)
+    except ValueError:
+        if year is None or year >= 2005:
+            raise
+    squashed = re.sub(r"[^a-z,]", "", text)
+    return next((canonical for pattern, canonical in HISTORIC_PARTIES if re.search(pattern, squashed)), None)
 
 
 def fold(text: str) -> str:
@@ -838,9 +904,10 @@ def parse() -> None:
     covered = {unit["dea_code"] for unit in official_units}
     units += official_units + [unit for unit in ark_units if unit["dea_code"] not in covered]
     totals += official_totals + [row for row in ark_totals if row["dea_code"] not in covered]
-    ark_units, ark_totals = parse_ark(2005)
-    units += ark_units
-    totals += ark_totals
+    for year in (2005, 2001, 1997, 1993, 1989, 1985, 1981, 1977, 1973):
+        ark_units, ark_totals = parse_ark(year)
+        units += ark_units
+        totals += ark_totals
     scanned = DATA / "parsed" / "gb.ni_scans"
     units = pl.DataFrame(units, infer_schema_length=None)
     totals = pl.DataFrame(totals, infer_schema_length=None)
@@ -880,6 +947,10 @@ def emit() -> Path:
             cs.add("scheme", code="gb.dea", polity_id=gb, kind="electoral_district", rank=3, noun="district electoral area")
         if conn.execute("select 1 from scheme where code = 'gb.ni_dea_1993'").fetchone() is None:
             cs.add("scheme", code="gb.ni_dea_1993", polity_id=gb, kind="electoral_district", rank=3, noun="district electoral area (1993 to 2014)")
+        if conn.execute("select 1 from scheme where code = 'gb.ni_dea_1985'").fetchone() is None:
+            cs.add("scheme", code="gb.ni_dea_1985", polity_id=gb, kind="electoral_district", rank=3, noun="district electoral area (1985 to 1989)")
+        if conn.execute("select 1 from scheme where code = 'gb.ni_dea_1973'").fetchone() is None:
+            cs.add("scheme", code="gb.ni_dea_1973", polity_id=gb, kind="electoral_district", rank=3, noun="district electoral area (1973 to 1981)")
         if conn.execute("select 1 from scheme where code = 'gb.ni_lgd_1973'").fetchone() is None:
             cs.add("scheme", code="gb.ni_lgd_1973", polity_id=gb, kind="administrative", rank=2, noun="local government district (1973 to 2015)")
         councils = dict(COUNCILS)
@@ -999,7 +1070,15 @@ def emit() -> Path:
                     name(council_elections[(year, code)], f"{year} {councils[code]} election")
                     cs.add("slug", path=f"{paths[code]}/{day}-local", entity_id=council_elections[(year, code)])
                 election = council_elections[(year, code)]
-                dea_scheme = "gb.dea" if dea_code.startswith("N10") else "gb.ni_dea_1993"
+                dea_scheme = (
+                    "gb.dea"
+                    if dea_code.startswith("N10")
+                    else "gb.ni_dea_1985"
+                    if dea_code.startswith("1985:")
+                    else "gb.ni_dea_1973"
+                    if dea_code.startswith("1973:")
+                    else "gb.ni_dea_1993"
+                )
                 if dea_code not in dea_areas:
                     dea_areas[dea_code] = cs.area(dea_scheme, dea_code)
                     if dea_areas[dea_code] in cs.minted:
@@ -1102,7 +1181,7 @@ def emit() -> Path:
                         row["stage"]: row["votes"]
                         for row in lines.filter(pl.col("number") == candidate["number"]).iter_rows(named=True)
                     }
-                    canonical = party_of(candidate["party"])
+                    canonical = party_of(candidate["party"], year)
                     owner = party_id(canonical)
                     independent = canonical is None and (
                         re.sub(r"[\s0\-]+", "", candidate["party"]) == "" or re.match(r"ind|i$", candidate["party"].strip().lower()) is not None
