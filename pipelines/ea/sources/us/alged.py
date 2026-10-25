@@ -57,6 +57,12 @@ METHOD = (
     "is the archive's. Party, gender, and race in the database are statistical estimates and are not recorded here."
 )
 TACIT = "The database records no vote count for this race, which had a single candidate or was otherwise uncontested."
+APPOINTMENTS = {
+    "667000_2007_9_san francisco_CA_City Council_4_1",
+    "667000_2017_1_san francisco_CA_City Council_8_1",
+    "667000_2017_12_san francisco_CA_Mayor_mayor_1",
+    "667000_2018_7_san francisco_CA_City Council_5_1",
+}
 DISTRICT = (
     "Only part of the {whole} votes in this contest. The archive has no boundary for the district yet, so the "
     "results are shown for the district as a whole."
@@ -112,7 +118,9 @@ def parse() -> None:
         "contest", "rows", "votes", "fips", "office", "year", "month"
     ).iter_rows():
         years = cycles.get((fips, office), [])
-        if rows == 1 and (votes or 0) <= 1 and month is not None and len(years) >= 3:
+        if contest in APPOINTMENTS:
+            phantoms.append(contest)
+        elif rows == 1 and (votes or 0) <= 1 and month is not None and len(years) >= 3:
             step = math.gcd(*[other - years[0] for other in years[1:]])
             if step >= 2 and (year - years[0]) % step:
                 phantoms.append(contest)
@@ -315,13 +323,13 @@ def emit() -> Path:
                    union
                    select x.value from external_id x join contest c on c.id = x.entity_id
                    join changeset s on s.id = c.changeset_id
-                   where x.scheme = 'us.contest' and x.value like 'alged:%' and s.pipeline = 'us.wards'"""
+                   where x.scheme = 'us.contest' and x.value like 'alged:%' and s.pipeline in ('us.wards', 'us.chicago_boe', 'us.ceda', 'us.houston_citysec', 'us.medsl_local', 'us.bexar', 'us.dallas_citysec')"""
             )
         }
         for (contest_id,), rows in frame.sort("contest", "votes", descending=[False, True]).group_by(
             "contest", maintain_order=True
         ):
-            # us.wards owns these: San Francisco's merged county supervisor copies, and citywide seats ALGED numbers as districts
+            # us.wards owns San Francisco's merged county supervisor copies and citywide seats ALGED numbers as districts; us.chicago_boe owns Chicago's contests, us.ceda California's, us.houston_citysec Houston's, us.bexar San Antonio's, us.dallas_citysec Dallas's, and us.medsl_local the runoffs it chains to its first rounds
             if f"alged:{contest_id}" in merged:
                 continue
             first = rows.row(0, named=True)
