@@ -1835,6 +1835,14 @@ function electionMarkdown(
               }),
             ]
           : []),
+        ...(race.covered != null && race.size != null
+          ? [
+              m.race_partial_seats({
+                count: count(race.covered),
+                total: count(race.size),
+              }),
+            ]
+          : []),
         ...((race.multiple ?? 0) > 0
           ? [
               m.race_multiple({

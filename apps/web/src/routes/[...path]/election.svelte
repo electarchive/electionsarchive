@@ -1393,6 +1393,14 @@
             })}
           </p>
         {/if}
+        {#if race.covered != null && race.size != null}
+          <p class="px-1.5 pbs-1 text-[0.8125rem] text-muted-foreground">
+            {m.race_partial_seats({
+              count: count(race.covered),
+              total: count(race.size),
+            })}
+          </p>
+        {/if}
         {#if (race.multiple ?? 0) > 0}
           <p class="px-1.5 text-[0.8125rem] text-muted-foreground">
             {m.race_multiple({

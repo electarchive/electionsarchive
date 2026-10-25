@@ -427,6 +427,7 @@
   "seats_seceded": "Seceded",
   "seats_held": "Not up",
   "race_staggered": "{count} of the council's {total} seats were up for election.",
+  "race_partial_seats": "The archive has results for {count} of the council's {total} seats so far. The rest are missing.",
   "seats_official": "Officially {count} seats, {majority} for a majority",
   "electors_title": "Electoral votes",
   "electors_majority": "{count} to win",

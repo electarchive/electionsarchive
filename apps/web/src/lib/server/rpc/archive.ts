@@ -2926,16 +2926,19 @@ export const contests = {
             or 'person:' || cy.person_id::text = ${input.key}
         ),
         hits as (
-          select vl.*, vl.unit_k = coalesce(${input.area}::int, (select k from top)) as exact, sets.source_id as set_source
+          select vl.*, ru.area_relation = 'equals' and ua.k is not distinct from coalesce(${input.area}::int, (select k from top)) as exact,
+            sets.source_id as set_source
           from value_locator vl join sets on sets.k = vl.result_set_k
+          join reporting_unit ru on ru.k = vl.unit_k
+          left join area ua on ua.id = ru.area_id
           where (vl.option_k in (select k from options) or (${input.key}::text is null and vl.option_k = 0))
-            and (${input.area}::int is null or vl.unit_k = ${input.area}::int)
+            and (${input.area}::int is null or ua.k = ${input.area}::int)
         )
-        select count(*) over ()::int as total, p.image_key as image, p.page_number as page, p.width, p.height,
+        select (select count(distinct unit_k) from hits)::int as total, p.image_key as image, p.page_number as page, p.width, p.height,
           h.x0, h.y0, h.x1, h.y1, h.exact, s.publisher, s.title, s.url
         from hits h join source_page p on p.id = h.page_id
         join source s on s.id = coalesce(h.source_id, h.set_source)
-        order by h.exact desc, h.option_k = 0 desc, h.measure, p.page_number
+        order by h.exact desc, h.option_k = 0 desc, h.measure, h.count_round, p.page_number
         limit 3
       `);
       return {
@@ -8423,6 +8426,7 @@ export const elections = {
             ),
             size: v.nullable(v.number()),
             isStaggered: v.optional(v.boolean()),
+            covered: v.optional(v.nullable(v.number())),
             straddled: v.optional(v.number()),
             unopposed: v.optional(
               v.nullable(
@@ -8861,6 +8865,7 @@ export const elections = {
           election: string;
           isWhole: boolean;
           isStaggered: boolean;
+          covered: number | null;
         }>(sql`
           select c.id::text as sample, c.election_id::text as election, exists (
             select from external_id x where x.entity_id = c.election_id and x.scheme = 'gb.leh.type'
@@ -8873,8 +8878,11 @@ export const elections = {
           ) as "isWhole", exists (
             select from external_id x where x.entity_id = c.election_id and x.scheme = 'gb.leh.type'
               and split_part(x.value, ':', 1) in ('SDT', 'UAT', 'MB')
-          ) as "isStaggered"
+          ) as "isStaggered", case when coalesce(c.rules_override ->> 'formula', es.rules ->> 'formula', '') = 'stv' then (
+            select sum(k.magnitude)::int from contest k where k.election_id = c.election_id and k.body_id = c.body_id and k.allocation_parent_id is null and not k.notional
+          ) end as covered
           from contest c
+          left join electoral_system es on es.id = c.electoral_system_id
           where c.id = any(${sql.param(councils.flatMap((race) => race.sample ?? []))}::uuid[])
         `),
         db.execute<{
@@ -9010,57 +9018,73 @@ export const elections = {
                           voters: earlier.voters,
                         },
                 },
-        races: (isUmbrella ? [] : raced).map((race, index) => ({
-          ...race,
-          isStaggered: held.get(race.sample ?? "")?.isStaggered === true,
-          anchor: raced
-            .slice(0, index)
-            .some((other) => other.anchor === race.anchor)
-            ? `${race.anchor}-${index + 1}`
-            : race.anchor,
-          results: race.results.map((row) => {
-            const own = nominations.rows
-              .filter(
-                (entry) =>
-                  row.person != null &&
-                  entry.contest === race.contest &&
-                  entry.person === row.person,
-              )
-              .map((entry) => ({
-                kind: entry.kind,
-                party: entry.party,
-                isOwn: entry.isOwn,
-                label:
-                  nominators.short.get(entry.party) ??
-                  nominators.full.get(entry.party) ??
-                  "",
-              }))
-              .filter((entry) => entry.label !== "")
-              .toSorted(
-                (a, b) =>
-                  Number(b.isOwn) - Number(a.isOwn) ||
-                  a.label.localeCompare(b.label),
-              );
-            const nominated = own.filter((entry) => entry.kind === "nominated");
-            return {
-              ...row,
-              photo: faces.get(row.person ?? "") ?? null,
-              nominated:
-                nominated.length > 1 || nominated[0]?.isOwn === false
-                  ? nominated.map(({ party, label }) => ({ party, label }))
-                  : [],
-              supported: own
+        races: (isUmbrella ? [] : raced).map((race, index) => {
+          const council = held.get(race.sample ?? "");
+          return {
+            ...race,
+            isStaggered: council?.isStaggered === true,
+            covered:
+              council == null ||
+              council.isWhole ||
+              council.isStaggered ||
+              council.covered == null ||
+              race.size == null ||
+              council.covered >= race.size
+                ? null
+                : council.covered,
+            anchor: raced
+              .slice(0, index)
+              .some((other) => other.anchor === race.anchor)
+              ? `${race.anchor}-${index + 1}`
+              : race.anchor,
+            results: race.results.map((row) => {
+              const own = nominations.rows
                 .filter(
                   (entry) =>
-                    entry.kind === "supported" ||
-                    (entry.kind === "endorsed" &&
-                      !entry.isOwn &&
-                      nominated.every((other) => other.party !== entry.party)),
+                    row.person != null &&
+                    entry.contest === race.contest &&
+                    entry.person === row.person,
                 )
-                .map(({ party, label }) => ({ party, label })),
-            };
-          }),
-        })),
+                .map((entry) => ({
+                  kind: entry.kind,
+                  party: entry.party,
+                  isOwn: entry.isOwn,
+                  label:
+                    nominators.short.get(entry.party) ??
+                    nominators.full.get(entry.party) ??
+                    "",
+                }))
+                .filter((entry) => entry.label !== "")
+                .toSorted(
+                  (a, b) =>
+                    Number(b.isOwn) - Number(a.isOwn) ||
+                    a.label.localeCompare(b.label),
+                );
+              const nominated = own.filter(
+                (entry) => entry.kind === "nominated",
+              );
+              return {
+                ...row,
+                photo: faces.get(row.person ?? "") ?? null,
+                nominated:
+                  nominated.length > 1 || nominated[0]?.isOwn === false
+                    ? nominated.map(({ party, label }) => ({ party, label }))
+                    : [],
+                supported: own
+                  .filter(
+                    (entry) =>
+                      entry.kind === "supported" ||
+                      (entry.kind === "endorsed" &&
+                        !entry.isOwn &&
+                        nominated.every(
+                          (other) => other.party !== entry.party,
+                        )),
+                  )
+                  .map(({ party, label }) => ({ party, label })),
+              };
+            }),
+          };
+        }),
         coverage:
           isUmbrella ||
           partial?.noun == null ||
