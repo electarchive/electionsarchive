@@ -857,6 +857,7 @@ def _classify(
 ) -> dict[str, object] | None:
     plain = re.sub(r"\b(PRECINCT|PCT) (\d+) (CHAIR\w*)", r"\3 \1 \2", plain)
     plain = re.sub(r"\bCHARTER (?=TOWNSHIP|TWP)", "", plain)
+    plain = re.sub(r"\bAT- LARGE\b", "AT-LARGE", plain)
     if st in ("IL", "MI"):
         plain = re.sub(r"\b(\d+) (DISTRICT|DIST)\b", r"\2 \1", plain)
     if st == "NY":
