@@ -898,7 +898,11 @@ def emit() -> Path:
                 for line in ballot_lines:
                     label = line["party_name"]
                     if label not in party_ids:
-                        found = known.get(leh.fold(ALIASES.get(label, label)))
+                        found = (
+                            cs.key(*leh.RESOLVED[label])
+                            if label in leh.RESOLVED
+                            else known.get(leh.fold(ALIASES.get(label, label)))
+                        )
                         if found is None:
                             found = cs.key("gb.party", slug(label))
                             if found in cs.minted and found not in party_ids.values():
