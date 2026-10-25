@@ -1,4 +1,3 @@
-import math
 import re
 import subprocess
 import sys
@@ -1092,11 +1091,16 @@ def build() -> str:
         g["month"] = Counter(years[y][3] for y in regular).most_common(1)[0][0] if regular else None
         g["period"] = g["phase"] = None
         if len(regular) >= 2:
-            step = 0
-            for y in regular[1:]:
-                step = math.gcd(step, y - regular[0])
-            g["period"] = 4 if step % 4 == 0 else 2 if step % 2 == 0 else 1
-            g["phase"] = regular[0] % g["period"]
+            total = sum(years[y][2] for y in regular)
+            g["period"], g["phase"] = 1, 0
+            for period in (4, 2):
+                shares: Counter = Counter()
+                for y in regular:
+                    shares[y % period] += years[y][2]
+                phase, n = shares.most_common(1)[0]
+                if n >= 0.9 * total:
+                    g["period"], g["phase"] = period, phase
+                    break
             g["basis"] = "own"
             patterns[(g["state"], g["kind"])][(g["period"], g["phase"])] += 1
         elif regular:
