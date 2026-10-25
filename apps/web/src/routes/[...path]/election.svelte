@@ -1350,6 +1350,15 @@
         {m.seats_change_notional({ year: race.since })}
       </p>
     {/if}
+    {#if race.resized != null && race.change != null && race.since != null && race.size != null}
+      <p class="col-span-12 bg-card px-3.5 py-2 text-xs text-muted-foreground">
+        {m.seats_change_resized({
+          year: race.since,
+          before: count(race.resized),
+          now: count(race.size),
+        })}
+      </p>
+    {/if}
     {#if (race.straddled ?? 0) > 0}
       <p class="col-span-12 bg-card px-3.5 py-2 text-xs text-muted-foreground">
         {m.seats_change_straddled()}

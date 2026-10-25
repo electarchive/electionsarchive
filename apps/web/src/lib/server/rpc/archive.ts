@@ -7279,7 +7279,11 @@ function reckon(
 }
 
 function carried(
-  rows: Array<{ party: string | null; seats: number }> | null,
+  rows: Array<{
+    party: string | null;
+    seats: number;
+    size?: number | null;
+  }> | null,
   filled: number,
   parentOf: Map<string, string>,
 ) {
@@ -7290,7 +7294,8 @@ function carried(
   for (const row of rows) {
     earlier += row.seats;
   }
-  if (earlier < filled * 0.9 || earlier > filled * 1.1) {
+  const expected = rows[0]?.size ?? filled;
+  if (earlier < expected * 0.9 || earlier > expected * 1.1) {
     return null;
   }
   return Map.groupBy([...rows, { party: null, seats: 0 }], (row) =>
@@ -7827,6 +7832,8 @@ async function races(
               seats: number;
               doubt: number;
               notional: boolean;
+              size: number | null;
+              day: string | null;
             }>(sql`
               with recursive same as (
                 select case when x.kind = 'local' then 'local' else 'general' end::election_kind as kind
@@ -7929,7 +7936,9 @@ async function races(
               select coalesce(bm.into_id, br.parent_party_id, lin.party, pm.into_id, w.party_id, ld.party_id) as party,
                 sum(w.seats)::int as seats,
                 (select count(*)::int from roots where ${isInside} and parents <> 1) as doubt,
-                exists (select from roots r join contest n on n.id = r.id where n.notional) as notional
+                exists (select from roots r join contest n on n.id = r.id where n.notional) as notional,
+                (select z.seats from body_size z where z.body_id = ${head.owner}::uuid and z.valid @> (select day from last) limit 1) as size,
+                (select day::text from last) as day
               from winners w
               left join leads ld on ld.parent = w.id
               left join entity_merge pm on pm.entity_id = coalesce(w.party_id, ld.party_id)
@@ -7953,7 +7962,7 @@ async function races(
               ) lin on true
               group by 1
               union all
-              select distinct coalesce(bm.into_id, br.parent_party_id, pm.into_id, o.party_id), 0, 0, false
+              select distinct coalesce(bm.into_id, br.parent_party_id, pm.into_id, o.party_id), 0, 0, false, null::int, null::text
               from tree t
               join contest_option o on o.contest_id = t.id and o.party_id is not null
               left join entity_merge pm on pm.entity_id = o.party_id
@@ -7987,6 +7996,12 @@ async function races(
         before,
         isNotional:
           before != null && (previous?.rows ?? []).some((row) => row.notional),
+        resized:
+          before != null &&
+          previous?.rows[0]?.size != null &&
+          previous.rows[0].size !== size
+            ? previous.rows[0].size
+            : null,
         whole: isTier && straddled === 0 ? (previous?.rows ?? null) : null,
         filled,
         runoff,
@@ -8019,7 +8034,11 @@ async function races(
         noun: first?.noun ?? "",
         nonvoting: group.filter((row) => !row.isVoting).length,
         sample: table?.sample ?? null,
-        since: table?.since ?? null,
+        since:
+          table?.since ??
+          (before == null
+            ? null
+            : (previous?.rows[0]?.day?.slice(0, 4) ?? null)),
         size,
         straddled,
         unopposed:
@@ -8507,6 +8526,7 @@ export const elections = {
               v.array(v.object({ key: v.string(), seats: v.number() })),
             ),
             isNotional: v.optional(v.boolean()),
+            resized: v.optional(v.nullable(v.number())),
             overall: v.nullable(
               v.array(v.object({ key: v.string(), seats: v.number() })),
             ),

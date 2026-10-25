@@ -1683,7 +1683,7 @@ function electionMarkdown(
         race.isOffice ||
         race.isPrimaries ||
         race.electors != null ||
-        race.kind !== "body_seats" ||
+        (race.kind !== "body_seats" && race.kind !== "list_allocation") ||
         race.body == null ||
         tiered.includes(entry) ||
         leader.key === "unrecorded" ||
@@ -1791,6 +1791,18 @@ function electionMarkdown(
             ]),
         ...(isChanged && race.isNotional === true && race.since != null
           ? [m.seats_change_notional({ year: race.since })]
+          : []),
+        ...(isChanged &&
+        race.resized != null &&
+        race.size != null &&
+        race.since != null
+          ? [
+              m.seats_change_resized({
+                year: race.since,
+                before: count(race.resized),
+                now: count(race.size),
+              }),
+            ]
           : []),
         ...race.results.flatMap((row) =>
           row.supported.length === 0
