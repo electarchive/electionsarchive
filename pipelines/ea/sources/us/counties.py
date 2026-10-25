@@ -5,7 +5,8 @@ from ea.changeset import Changeset, slug
 from ea.store import connect
 
 SOURCE = "us.counties"
-VERSION = "1"
+VERSION = "2"
+DC = "11001"
 
 
 def emit() -> Path:
@@ -22,10 +23,18 @@ def emit() -> Path:
         for code, official in conn.execute(
             """select c.code, n.text from area a join area_code c on c.area_id = a.id
                join name n on n.entity_id = a.id and n.kind = 'official'
-               where a.scheme_code = 'us.county' order by c.code"""
+               join changeset ch on ch.id = n.changeset_id
+               where a.scheme_code = 'us.county' and ch.pipeline <> 'us.ahcb' order by c.code"""
         ).fetchall():
             text, usps = official.rsplit(", ", 1)
             if f"US-{usps}" not in states:
+                continue
+            if code == DC:
+                for (county,) in conn.execute(
+                    "select entity_id from external_id where scheme = 'us.polity' and value = %s and entity_id <> %s",
+                    [f"county:{DC}", states["US-DC"]],
+                ).fetchall():
+                    cs.merge(county, states["US-DC"])
                 continue
             city = re.fullmatch(r"(.+) city", text)
             text = f"City of {city[1]}" if city else text.removesuffix(" Municipio")
