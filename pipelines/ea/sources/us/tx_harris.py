@@ -34,6 +34,7 @@ COUNTY_OFFICE = re.compile(
 ROMAN = {"I": "1", "II": "2", "III": "3", "IV": "4", "V": "5", "VI": "6", "VII": "7", "VIII": "8", "IX": "9"}
 NUMBER_WORDS = {"none": 0, "one": 1, "two": 2, "three": 3, "four": 4, "five": 5, "six": 6, "seven": 7}
 HEADING = re.compile(r"^(?P<title>\S.*?)(?:,|\s-)?\s+Vote [Ff]or\s+(?P<n>.+?)\s*$")
+SUFFIX = re.compile(r"^(.*\S)\s+(Dem|Rep|Lib|Grn|Ind|Npa|Una)$", re.IGNORECASE)
 PAIR = re.compile(r"(?<![\d,.])([\d,]+)\s+([\d.]+)%")
 PAGE_LINE = re.compile(r"\bPage \d+( of \d+)?\s*$")
 CAST = re.compile(r"^\s*Cast Votes:")
@@ -106,8 +107,11 @@ def contests(text: str) -> Iterator[dict[str, Any]]:
         label = line[: pairs[0].start()]
         tagged = re.match(r"\s*([A-Z]{2,4})\s{2,}(\S.*)", label)
         name = re.sub(r"\s+", " ", tagged[2] if tagged else label).strip()
+        trailing = SUFFIX.match(name)
+        if trailing:
+            name = trailing[1]
         if name:
-            node["choices"].append({"text": name, "party": tagged[1] if tagged else None, "total": pairs[-1][1].replace(",", ""), "places": []})
+            node["choices"].append({"text": name, "party": tagged[1] if tagged else trailing[2].upper() if trailing else None, "total": pairs[-1][1].replace(",", ""), "places": []})
 
 
 def _read(registry: Mapping[str, Mapping[str, str]]) -> Iterator[dict[str, Any]]:

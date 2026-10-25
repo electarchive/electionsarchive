@@ -97,6 +97,8 @@ def electionware(text: str) -> Iterator[dict[str, Any]]:
             if pair is None:
                 continue
             name = re.sub(r"\s+", " ", other[: pair.start()]).strip()
+            trailing = tx_harris.SUFFIX.match(name)
+            name = trailing[1] if trailing else name
             if name:
                 choices.append({"text": name, "party": None, "total": pair[1].replace(",", ""), "places": []})
         if cast is not None and choices:

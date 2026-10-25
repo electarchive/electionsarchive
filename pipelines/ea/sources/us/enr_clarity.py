@@ -681,6 +681,8 @@ def parse(
                 if prefix := re.match(r"(?:\(([RD])\)|(DEM|REP|LIB|GRN|IND))\s+(?=\S)", label):
                     tag = tag or _party(prefix[1] or prefix[2])
                     label = label[prefix.end() :]
+                if tag and (suffix := re.match(r"(.*\S)\s+([A-Za-z]{3})$", label)) and _party(suffix[2]) == tag:
+                    label = suffix[1]
                 if (
                     WRITE_IN.match(label)
                     or primary
@@ -1304,6 +1306,7 @@ def emit(
             for layer in LAYERS:
                 cs.artifact(raw.cached(source, CENSUS.format(fips=code, layer=layer)), census)
         sources: dict[str, UUID] = {}
+        staged: set[UUID] = set()
         publishers: dict[str, str] = {}
         for row in listed:
             county = row["county_fips"]
@@ -1315,7 +1318,8 @@ def emit(
                 else f"{row['county']} County, {STATE_NAMES[row['state']]}"
             )
             sources[county] = cs.source(publishers[county], TITLE)
-            if sources[county] in cs.minted:
+            if sources[county] in cs.minted and sources[county] not in staged:
+                staged.add(sources[county])
                 cs.add(
                     "source",
                     id=sources[county],
