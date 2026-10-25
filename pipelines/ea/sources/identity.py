@@ -763,6 +763,231 @@ PEOPLE = {
         ("wikidata", "Q7173106"),
         ("us.alged.person", "13139"),
     ),
+    "Adrián García, Houston City Council candidate": (
+        ("us.alged.person", "50587"),
+        ("us.alged.person", "50586"),
+    ),
+    "F. Michael Kubosh, Houston City Council candidate": (
+        ("us.alged.person", "50675"),
+        ("us.houston_citysec.person", "michael:kubosh"),
+    ),
+    "Ana Cubas, Los Angeles City Council candidate": (
+        ("us.ceda.person", "201300082:201300330"),
+        ("us.alged.person", "69905"),
+    ),
+    "Augusto Bisani, Los Angeles City Council candidate": (
+        ("us.alged.person", "69902"),
+        ("us.ceda.person", "200900143:200900522"),
+    ),
+    "Bob Blumenfield, Los Angeles City Council candidate": (
+        ("us.alged.person", "69918"),
+        ("us.ceda.person", "202200883:202202056"),
+    ),
+    "Carolyn Ramsay, Los Angeles City Council candidate": (
+        ("us.alged.person", "69944"),
+        ("us.ceda.person", "201500058:201500229"),
+    ),
+    "Christine Essel, Los Angeles City Council candidate": (
+        ("us.ceda.person", "200900143:200900524"),
+        ("us.alged.person", "69935"),
+    ),
+    "Cindy Montanez, Los Angeles City Council candidate": (
+        ("us.alged.person", "69941"),
+        ("us.ceda.person", "201300139:201300516"),
+    ),
+    "Curren D. Price, Jr., Los Angeles City Council candidate": (
+        ("us.ceda.person", "202200886:202202064"),
+        ("us.ceda.person", "201300082:201300329"),
+        ("us.alged.person", "69943"),
+    ),
+    "David Ryu, Los Angeles City Council candidate": (
+        ("us.ceda.person", "202000546:202001636"),
+        ("us.ceda.person", "201500058:201500230"),
+        ("us.alged.person", "69959"),
+    ),
+    "David 'Ty' Vahedi, Los Angeles City Council candidate": (
+        ("us.alged.person", "69963"),
+        ("us.ceda.person", "200900095:200900399"),
+    ),
+    "Gilbert 'Gil' Cedillo, Los Angeles City Council candidate": (
+        ("us.alged.person", "69980"),
+        ("us.ceda.person", "202200879:202202038"),
+        ("us.ceda.person", "201300075:201300296"),
+        ("us.ceda.person", "201700051:201700196"),
+    ),
+    "Grace Yoo, Los Angeles City Council candidate": (
+        ("us.ceda.person", "202400545:202401574"),
+        ("us.ceda.person", "202000542:202001623"),
+        ("us.ceda.person", "202400635:202401835"),
+        ("us.alged.person", "69988"),
+    ),
+    "Jay Beeber, Los Angeles City Council candidate": (
+        ("us.ceda.person", "201500058:201500237"),
+        ("us.ceda.person", "201900034:201900117"),
+    ),
+    "Joe Bray-Ali, Los Angeles City Council candidate": (
+        ("us.ceda.person", "201700051:201700195"),
+        ("us.alged.person", "69996"),
+    ),
+    "John J. Choi, Los Angeles City Council candidate": (
+        ("us.ceda.person", "201300077:201300304"),
+        ("us.alged.person", "70001"),
+    ),
+    "John S. Lee, Los Angeles City Council candidate": (
+        ("us.ceda.person", "202400546:202401575"),
+        ("us.ceda.person", "201900034:201900123"),
+        ("us.alged.person", "70019"),
+    ),
+    "Jose A. Gardea, Los Angeles City Council candidate": (
+        ("us.ceda.person", "201300075:201300297"),
+        ("us.alged.person", "70009"),
+    ),
+    "Karo Torossian, Los Angeles City Council candidate": (
+        ("us.ceda.person", "201700057:201700233"),
+        ("us.alged.person", "70042"),
+    ),
+    "Kevin De León, Los Angeles City Council candidate": (
+        ("us.ceda.person", "202400547:202401582"),
+        ("us.ceda.person", "202000544:202001626"),
+        ("us.ceda.person", "202400636:202401837"),
+        ("us.alged.person", "70040"),
+    ),
+    "Krystee Clark, Los Angeles City Council candidate": (
+        ("us.ceda.person", "201700057:201700219"),
+        ("us.alged.person", "70039"),
+    ),
+    "Loraine Lundquist, Los Angeles City Council candidate": (
+        ("us.alged.person", "70047"),
+        ("us.ceda.person", "201900034:201900124"),
+    ),
+    "Mark Ridley-Thomas, Los Angeles City Council candidate": (
+        ("us.ceda.person", "202000542:202001620"),
+        ("us.alged.person", "70066"),
+    ),
+    "Marqueece Harris-Dawson, Los Angeles City Council candidate": (
+        ("us.alged.person", "70061"),
+        ("us.ceda.person", "202400551:202401599"),
+    ),
+    "Mike Schaefer, Los Angeles City Council candidate": (
+        ("us.ceda.person", "201500058:201500240"),
+        ("us.ceda.person", "201700057:201700232"),
+    ),
+    "Mitch O'Farrell, Los Angeles City Council candidate": (
+        ("us.ceda.person", "202200980:202202345"),
+        ("us.ceda.person", "201300077:201300303"),
+        ("us.ceda.person", "202200881:202202048"),
+        ("us.alged.person", "70065"),
+    ),
+    "Monica Rodriguez, Los Angeles City Council candidate": (
+        ("us.alged.person", "70067"),
+        ("us.ca_la_sov.person", "2026-06-02:CA:0644000:council:7:monica-rodriguez"),
+        ("us.ceda.person", "202200885:202202062"),
+        ("us.ceda.person", "201700057:201700230"),
+    ),
+    "Nadine Momoyo Diaz, Los Angeles City Council candidate": (
+        ("us.alged.person", "70073"),
+        ("us.ceda.person", "202400547:202401578"),
+    ),
+    "Navraj Singh, Los Angeles City Council candidate": (
+        ("us.alged.person", "70079"),
+        ("us.ceda.person", "201900034:201900128"),
+    ),
+    "Nicole Chase, Los Angeles City Council candidate": (
+        ("us.alged.person", "70072"),
+        ("us.ceda.person", "201700057:201700218"),
+    ),
+    "Nury Martinez, Los Angeles City Council candidate": (
+        ("us.alged.person", "70076"),
+        ("us.ceda.person", "201300139:201300517"),
+    ),
+    "Paul Koretz, Los Angeles City Council candidate": (
+        ("us.ceda.person", "200900095:200900396"),
+        ("us.alged.person", "70086"),
+    ),
+    "Paul Krekorian, Los Angeles City Council candidate": (
+        ("us.alged.person", "70087"),
+        ("us.ceda.person", "200900143:200900526"),
+    ),
+    "Rudy Melendez, Los Angeles City Council candidate": (
+        ("us.ceda.person", "202400548:202401590"),
+        ("us.alged.person", "70101"),
+    ),
+    "Sam Kbushyan, Los Angeles City Council candidate": (
+        ("us.ceda.person", "202400548:202401589"),
+        ("us.ceda.person", "201300077:201300305"),
+    ),
+    "Scott Silverstein, Los Angeles City Council candidate": (
+        ("us.alged.person", "70120"),
+        ("us.ceda.person", "202200883:202202057"),
+    ),
+    "Tomas O'Grady, Los Angeles City Council candidate": (
+        ("us.alged.person", "70126"),
+        ("us.ceda.person", "201500058:201500231"),
+    ),
+    "Tony Cárdenas, Los Angeles City Council candidate": (
+        ("us.alged.person", "70122"),
+        ("us.alged.person", "70121"),
+    ),
+    "Chi Ajani Osse, New York City Council candidate": (
+        ("us.alged.person", "34826"),
+        ("us.nyc_boe.person", "chi-a-osse"),
+        ("us.nyc_general.person", "2023-11-07:new-york-city:council-district-36:chi-a-osse"),
+        ("us.nyc_boe.person", "chi-ajani-osse"),
+    ),
+    "Danniel S. Maio, New York City Council candidate": (
+        ("us.nyc_general.person", "2023-11-07:new-york-city:council-district-29:danniel-s-maio"),
+        ("us.alged.person", "34874"),
+    ),
+    "Francesca M. Castellanos, New York City Council candidate": (
+        ("us.nyc_boe.person", "francesca-m-castellanos"),
+        ("us.nyc_boe.person", "francesca-castellanos"),
+        ("us.nyc_general.person", "2017-09-12:new-york-city:council-district-10-democratic:francesca-m-castellanos"),
+        ("us.alged.person", "34939"),
+    ),
+    "Jonathan D. Rinaldi, New York City Council candidate": (
+        ("us.nyc_general.person", "2023-11-07:new-york-city:council-district-24:jonathan-d-rinaldi"),
+        ("us.nyc_general.person", "2025-11-04:new-york-city:council-district-29:jonathan-rinaldi"),
+    ),
+    "Justin Brannan, New York City Council candidate": (
+        ("us.alged.person", "35037"),
+        ("us.nyc_general.person", "2023-11-07:new-york-city:council-district-47:justin-brannan"),
+    ),
+    "Justin E. Sanchez, New York City Council candidate": (
+        ("us.nyc_boe.person", "justin-e-sanchez"),
+        ("us.alged.person", "81057"),
+    ),
+    "Pamela Hamilton-Johnson, New York City Council candidate": (
+        ("us.alged.person", "35327"),
+        ("us.alged.person", "35324"),
+        ("us.nyc_boe.person", "pamela-a-hamilton-johnson"),
+        ("us.nyc_general.person", "2017-09-12:new-york-city:council-district-12-democratic:pamela-a-hamilton-johnson"),
+    ),
+    "Pierina Ana Sanchez, New York City Council candidate": (
+        ("us.nyc_boe.person", "pierina-a-sanchez"),
+        ("us.nyc_general.person", "2023-11-07:new-york-city:council-district-14:pierina-a-sanchez"),
+        ("us.alged.person", "35340"),
+        ("us.nyc_boe.person", "pierina-ana-sanchez"),
+    ),
+    "Shah Shahidul Haque, New York City Council candidate": (
+        ("us.nyc_general.person", "2025-11-04:new-york-city:council-district-25:shah-s-haque"),
+        ("us.alged.person", "35443"),
+    ),
+    "Simcha Felder, New York City Council candidate": (
+        ("us.alged.person", "35436"),
+        ("us.nyc_general.person", "2025-11-04:new-york-city:council-district-44:simcha-felder"),
+    ),
+    "Stylo Sapaskis, New York City Council candidate": (
+        ("us.nyc_general.person", "2025-11-04:new-york-city:council-district-11:stylo-sapaskis"),
+        ("us.alged.person", "35470"),
+    ),
+    "Tanya Carmichael, New York City Council candidate": (
+        ("us.nyc_general.person", "2023-11-07:new-york-city:council-district-16:tanya-carmichael"),
+        ("us.alged.person", "35486"),
+    ),
+    "Yu-Ching James Pai, New York City Council candidate": (
+        ("us.alged.person", "35551"),
+        ("us.nyc_general.person", "2023-11-07:new-york-city:council-district-20:yu-ching-james-pai"),
+    ),
 }
 HONORIFICS = re.compile(
     r"^(?:(?:the\s+)?(?:rt\.?\s+hon\.?|right\s+honou?rable|honou?rable|very\s+rev(?:erend|d)?\.?|rev(?:erend|d)?\.?)\s+"
