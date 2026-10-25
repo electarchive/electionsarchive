@@ -88,7 +88,12 @@ COUNTY_OFFICES = (
     (r"STATE ?S ATTORNEY", "state-s-attorney", "State's Attorney", False),
     (r"CIRCUIT CLERK", "circuit-clerk", "Circuit Clerk", False),
     (r"COUNTY BOARD(?: MEMBER)?", "board-of-commissioners", "Board of Commissioners", True),
-    (r"REGIONAL SUPERINTENDENT(?: OF SCHOOLS)?", "regional-superintendent", "Regional Superintendent of Schools", False),
+    (
+        r"REGIONAL SUPERINTENDENT(?: OF SCHOOLS)?",
+        "regional-superintendent",
+        "Regional Superintendent of Schools",
+        False,
+    ),
     (r"(?:COUNTY )?PROSECUTING ATTORNEY", "prosecuting-attorney", "Prosecuting Attorney", False),
     (r"(?:COUNTY )?DRAIN COMMISSIONER", "drain-commissioner", "Drain Commissioner", False),
     (r"(?:COUNTY )?ROAD COMMISSIONER", "road-commissioner", "Road Commissioner", False),
@@ -732,6 +737,19 @@ def _prefix(heading: str, plain: str, names: list[str], school_names: list[tuple
     return f"{kind[1] or kind[2]} OF {muni}" if kind else muni
 
 
+def _precinct_key(name: str) -> tuple[str, str] | None:
+    plain = re.sub(r"\s+", " ", name.upper().replace(",", " ").replace("&AMP;", "&").replace(" CHARTER", "")).strip()
+    if match := re.fullmatch(r"(.+?) (\d+[A-Z]?) WARD \d+", plain):
+        return match.group(1), match.group(2)
+    if match := re.fullmatch(r"CITY OF (.+?)(?: WARD \d+)?(?: PRECINCT (\d+[A-Z]?)(?:-[A-Z]+)?)?", plain):
+        return (f"{match.group(1)} CITY", match.group(2)) if match.group(2) else None
+    if match := re.fullmatch(r"(.+?)(?: WARD \d+)? PRECINCT (\d+[A-Z]?)", plain):
+        return match.group(1), match.group(2)
+    if match := re.fullmatch(r"(.+? (?:CITY|TOWNSHIP|VILLAGE))(?: WARD \d+)? (\d+[A-Z]?)", plain):
+        return match.group(1), match.group(2)
+    return None
+
+
 def _classify(
     plain: str,
     st: str,
@@ -847,7 +865,16 @@ def _classify(
         if seat is None and (bare := re.search(r"\b(\d+)\b(?! ?(?:YR|YEAR))", rest)):
             noun = "Court" if "court" in key else "Precinct"
             seat, rest = f"{noun} {int(bare[1])}", re.sub(rf"\b{bare[1]}\b", " ", rest)
-        if _residue(rest, *(office[0] for office in held), r"JUDGE|COURT|CT|CRT|LAW|PCT|PRECINCT|COMM|CRIMINAL", re.escape(county_name), r"TERM ENDING [0-9/]+", r"FULL", r"UNEXPIRED", r"VOTE FOR \d+"):
+        if _residue(
+            rest,
+            *(office[0] for office in held),
+            r"JUDGE|COURT|CT|CRT|LAW|PCT|PRECINCT|COMM|CRIMINAL",
+            re.escape(county_name),
+            r"TERM ENDING [0-9/]+",
+            r"FULL",
+            r"UNEXPIRED",
+            r"VOTE FOR \d+",
+        ):
             return None
         if len(held) > 1 and not any(office[3] for office in held):
             key = "-and-".join(office[1] for office in held)
@@ -1436,12 +1463,42 @@ def emit(
                     for county, election_id, xml in rows.select("county", "election", "contest").iter_rows()
                 ]
             )
+            aliases: dict[tuple[str, str], str] = {}
+            for county in carried:
+                prefix = f"{day.year}:{st}:{county}:{county_names[county]}:"
+                known: dict[tuple[str, str] | None, list[str]] = {}
+                for code in precincts:
+                    if code.startswith(prefix):
+                        known.setdefault(_precinct_key(code[len(prefix) :]), []).append(code[len(prefix) :])
+                for place_name in counted.filter(pl.col("county") == county)["place"].drop_nulls().unique():
+                    if prefix + place_name not in precincts:
+                        found = known.get(_precinct_key(place_name)) if known else None
+                        if found is not None and len(found) == 1:
+                            aliases[(county, place_name)] = found[0]
+            if aliases:
+                counted = (
+                    counted.join(
+                        pl.DataFrame(
+                            [(county, place_name, alias) for (county, place_name), alias in aliases.items()],
+                            schema=["county", "place", "alias"],
+                            orient="row",
+                        ),
+                        on=["county", "place"],
+                        how="left",
+                    )
+                    .with_columns(place=pl.coalesce("alias", "place"))
+                    .drop("alias")
+                )
             balanced = dict(zip(rows["county"].to_list(), rows["balanced"].to_list(), strict=True))
             precise: dict[str, bool] = {}
             for county in carried:
                 prefix = f"{day.year}:{st}:{county}"
                 names = (
-                    counted.filter((pl.col("county") == county) & pl.col("place").is_not_null())["place"]
+                    counted.filter(
+                        (pl.col("county") == county)
+                        & pl.col("place").is_not_null()
+                        & ~pl.col("place").str.contains(r"\((?:OUT OF COUNTY|[A-Z. ]+ COUNTY)\)\s*$")
+                    )["place"]
                     .unique()
                     .to_list()
                 )
