@@ -23,6 +23,13 @@ STATE_LEVELS = (
     "state_lower",
     "statewide_measure",
 )
+BALANCES = {
+    "3011390": "3011397",
+    "4752004": "4752006",
+    "1303436": "1303440",
+    "2148003": "2148006",
+    "2028410": "2028412",
+}
 OFFSETS = {"us_house": 2, "state_lower": 2, "us_senate": 6}
 JUDICIAL = {
     **dict.fromkeys(
@@ -965,7 +972,7 @@ def build() -> str:
     for gid, kind, st, county, place in cog.select("id", "kind", "state_fips", "county_fips", "place_fips").iter_rows():
         candidates = [f"county:{st}{county}"] if kind == "county" else []
         if kind in ("municipality", "township") and place is not None:
-            candidates = [f"place:{st}{place}", f"town:{st}{county}{place}"]
+            candidates = [f"place:{BALANCES.get(st + place, st + place)}", f"town:{st}{county}{place}"]
             if county is not None and county >= "500":
                 candidates.append(f"county:{st}{county}")
             if st + place == "3651000":
