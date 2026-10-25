@@ -13,7 +13,7 @@ from ea.changeset import Changeset, slug
 from ea.store import DATA, connect
 
 SOURCE = "us.dc_boe"
-VERSION = "2"
+VERSION = "3"
 PARSED = DATA / "parsed" / SOURCE
 HOST = "https://electionresults.dcboe.org"
 INFO = HOST + "/electionResults/getElectionInfo/{year}-General-Election"
@@ -171,7 +171,14 @@ def emit() -> Path:
         for year in YEARS:
             for url in (INFO.format(year=year), csv(year), CITYWIDE.format(year=year)):
                 cs.artifact(raw.cached(SOURCE, url), source)
-        keys = {value for (value,) in conn.execute("select value from external_id where scheme = 'us.contest'")}
+        keys = {
+            value
+            for (value,) in conn.execute(
+                """select x.value from external_id x join contest c on c.id = x.entity_id
+                   join changeset s on s.id = x.changeset_id where x.scheme = 'us.contest' and s.pipeline <> %s""",
+                [SOURCE],
+            )
+        }
         offices = {value for (value,) in conn.execute("select value from external_id where scheme = 'us.office'")}
         ((county, county_area),) = conn.execute(
             "select id, area_id from reporting_unit where scheme_code = 'us.county' and code = '11001'"
@@ -196,8 +203,8 @@ def emit() -> Path:
         minted: dict[str, date] = {}
         memberships: set[tuple[UUID, UUID, date]] = set()
         districts: set[str] = set()
+        minted_districts: set[str] = set()
         persons: set[str] = set()
-        elections: set[UUID] = set()
         for (year,), rows in lines.group_by("year", maintain_order=True):
             when = day(year)
             units: dict[int, str] = {}
@@ -222,8 +229,10 @@ def emit() -> Path:
                 """select c.id, c.magnitude, (select text from name where entity_id = c.id and is_preferred limit 1),
                           (select value from external_id where entity_id = c.id and scheme = 'us.contest' limit 1)
                    from contest c join external_id x on x.entity_id = c.election_id
-                   where x.scheme = 'us.election' and x.value = %s""",
-                [f"{when}:DC:{PLACE}"],
+                   where x.scheme = 'us.election' and x.value = %s
+                     and not exists (select from external_id k join changeset s on s.id = k.changeset_id
+                                     where k.entity_id = c.id and k.scheme = 'us.contest' and s.pipeline = %s)""",
+                [f"{when}:DC:{PLACE}", SOURCE],
             ).fetchall()
             for (office, seat), cells in rows.group_by("office", "seat", maintain_order=True):
                 municipal = office in ("mayor", "chair", "at-large", "ward")
@@ -248,24 +257,9 @@ def emit() -> Path:
                     contest = cs.key("us.contest", contest_key)
                     found = [(contest, contest_key)] if contest_key in keys else []
                 result_set = cs.key(f"{SOURCE}.result_set", f"{contest_key}:precinct")
-                election = cs.key("us.election", f"{when}:DC:{PLACE}" if municipal else f"{when}:DC")
-                if election in cs.minted and election not in elections:
-                    elections.add(election)
-                    parent = cs.key("us.election", f"{when}:DC")
-                    if not municipal or parent in cs.minted:
-                        raise ValueError(f"no election for {contest_key}")
-                    cs.add(
-                        "election",
-                        id=election,
-                        polity_id=polity,
-                        parent_id=parent,
-                        kind="general",
-                        date_from=when,
-                        date_to=when,
-                        status="held",
-                    )
-                    name(election, f"{year} Washington general election")
-                    cs.add("slug", path=f"us/dc/washington/{when}-general", entity_id=election)
+                election = cs.key("us.election", f"{when}:DC")
+                if election in cs.minted:
+                    raise ValueError(f"no election for {contest_key}")
                 options: dict[str, UUID] = {}
                 if found:
                     existing = conn.execute(
@@ -340,15 +334,18 @@ def emit() -> Path:
                         raise ValueError(f"{contest_key} is taken")
                     contest = cs.key("us.contest", contest_key)
                     area = state_area
-                    if office == "ward":
-                        district = f"DC:{PLACE}:council:{slug(shown)}"
+                    if office == "ward" or (not municipal and seat):
+                        ward = f"Ward {seat}"
+                        district = f"DC:{PLACE}:council:{slug(ward)}"
                         area = cs.area("us.local_district", district)
-                        if area in cs.minted and district not in districts:
+                        if district not in districts:
                             districts.add(district)
+                            name(area, f"{ward}, District of Columbia")
+                        if area in cs.minted and district not in minted_districts:
+                            minted_districts.add(district)
                             cs.add("area", id=area, scheme_code="us.local_district")
                             cs.add("area_code", area_id=area, code=district, valid_from=None)
                             cs.add("area_parent", area_id=area, parent_id=city, valid_from=None)
-                            name(area, f"Washington City Council, {shown}")
                             cs.add(
                                 "reporting_unit",
                                 id=cs.unit("us.local_district", district),
@@ -387,12 +384,12 @@ def emit() -> Path:
                         default_result_kind="counted",
                     )
                     if municipal:
-                        name(contest, f"{year} Washington City Council election, {shown}")
-                        path = f"us/dc/washington/{when}-general/council-{slug(shown)}"
+                        name(contest, f"{year} Council of the District of Columbia election, {shown}")
+                        path = f"us/dc/{when}-general/council-{slug(shown)}"
                     else:
                         name(
                             contest,
-                            f"{year} District of Columbia {office} election" + (f" ({shown})" if shown else ""),
+                            f"{year} District of Columbia {office} election" + (f" (Ward {seat})" if seat else ""),
                         )
                         path = f"us/dc/{when}-general/{slug(office)}" + (f"-{slug(shown)}" if shown else "")
                     cs.add("slug", path=path, entity_id=contest)
