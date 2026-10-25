@@ -28,6 +28,7 @@ DAYS = {
 RESULTS = "https://candidates.democracyclub.org.uk/media/csv-archives/results-{day}.csv"
 ARCHIVED = {2018, 2019, 2023}
 SAMPLED = {2018, 2019, 2026}
+CROSS_CHECKS: set[int] = set()
 API = "https://candidates.democracyclub.org.uk/api/next/results/?election_date={day}"
 BALLOTS = (
     "https://elections.democracyclub.org.uk/api/elections/?poll_open_date={day}"
@@ -510,7 +511,7 @@ def parse() -> None:
 
 
 def emit() -> Path:
-    days = {year: day for year, day in DAYS.items() if year in SAMPLED}
+    days = {year: day for year, day in DAYS.items() if year in SAMPLED | CROSS_CHECKS}
     wards = pl.read_parquet(PARSED / "wards.parquet")
     candidates = pl.read_parquet(PARSED / "candidates.parquet")
     shapes = {
@@ -829,7 +830,7 @@ def emit() -> Path:
                         (
                             cs.key("gb.dc_local.result_set", contest_key),
                             sources[year],
-                            council is None and not withdrawn and contest not in handbook,
+                            council is None and not withdrawn and contest not in handbook and year not in CROSS_CHECKS,
                             {"ballot_paper_id": ward["ballot"], "council_source": ward["source"]},
                             ward["spoilt"],
                             tallies,
