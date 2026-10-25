@@ -13,10 +13,11 @@ import shapefile
 
 from ea import raw
 from ea.changeset import Changeset, slug
+from ea.sources.us.enr_clarity import _title
 from ea.store import DATA, connect
 
 SOURCE = "us.clarity_local"
-VERSION = "1"
+VERSION = "2"
 PARSED = DATA / "parsed" / SOURCE
 CLARITY = "https://results.enr.clarityelections.com/{state}/{county}/{election}/{version}/reports/detailxml.zip"
 TITLE = "Election night reporting results"
@@ -632,7 +633,9 @@ def emit() -> Path:
             summary="City, village, borough, and township elections and local questions from county election night reporting sites in Illinois, Kansas, Michigan, Nebraska, Ohio, and Pennsylvania",
             polity="US",
         )
-        zeroed = cs.zeroed()
+        zeroed = cs.zeroed() | cs.remainders(
+            "A scattered-votes line in Clarity's results read as a candidate", r"^scattered$"
+        )
 
         cs.renamed.update(RENAMED)
 
@@ -931,12 +934,16 @@ def emit() -> Path:
                         ballot_position=1 if answer == "yes" else 2,
                         ballot_label=answer.capitalize(),
                     )
-                elif re.match(r"(?i)write|scattering|personal choice", choice):
-                    option = options[choice] = cs.key("us.option", f"{contest_key}:write-ins")
-                    cs.add("contest_option", id=option, contest_id=contest, kind="write_in", ballot_label="Write-ins")
+                elif re.match(r"(?i)write|scatter(?:ing|ed)|personal choice", choice):
+                    option = cs.key("us.option", f"{contest_key}:write-ins")
+                    if option not in options.values():
+                        cs.add(
+                            "contest_option", id=option, contest_id=contest, kind="write_in", ballot_label="Write-ins"
+                        )
+                    options[choice] = option
                     continue
                 else:
-                    ballot = title(re.sub(r"\s*\((?:DEM|REP|IND|NON|NP|NPA|LIB|GRN)\)$", "", choice))
+                    ballot = _title(re.sub(r"\s*\((?:DEM|REP|IND|NON|NP|NPA|LIB|GRN)\)$", "", choice))
                     person_key = (code, slug(ballot))
                     if person_key not in persons:
                         persons[person_key] = cs.key(f"{SOURCE}.person", f"{st}:{code}:{slug(ballot)}")
@@ -1022,7 +1029,10 @@ def emit() -> Path:
                 values,
                 schema={"result_set_id": pl.String, "unit_id": pl.String, "option_id": pl.String, "value": pl.Int64},
                 orient="row",
-            ).with_columns(
+            )
+            .group_by("result_set_id", "unit_id", "option_id", maintain_order=True)
+            .agg(pl.col("value").sum())
+            .with_columns(
                 channel=pl.lit(0, pl.Int16),
                 measure=pl.lit(1, pl.Int16),
                 count_round=pl.lit(0, pl.Int16),
