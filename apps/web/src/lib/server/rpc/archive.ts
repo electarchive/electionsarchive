@@ -8049,9 +8049,12 @@ async function races(
                 join result_set rs on rs.contest_id = nc.id and rs.is_default and rs.stage = 'notional'
                 cross join lateral (
                   select o.id, o.contest_id, o.party_id from contest_option o
-                  join result_rollup y on y.result_set_k = rs.k and y.area_k = na.k and y.option_k = o.k
-                    and y.measure = 1 and y.channel = 0 and y.count_round = 0
-                  where o.contest_id = nc.id
+                  cross join lateral (
+                    select sum(y.value) as value from result_rollup y
+                    where y.result_set_k = rs.k and y.area_k = na.k and y.option_k = o.k
+                      and y.measure = 1 and y.count_round = 0 offset 0
+                  ) y
+                  where o.contest_id = nc.id and y.value is not null
                   order by y.value desc limit 1
                 ) o
                 where nc.notional and coalesce(nc.body_id, nc.office_id) = ${head.owner}::uuid
@@ -9357,10 +9360,9 @@ export const elections = {
                   join contest_option o on o.id = x.option_id
                   left join entity_merge pm on pm.entity_id = o.party_id
                   left join lateral (
-                    select max(v.value) as votes from (
-                      select y.value from result_rollup y
-                      where y.result_set_k = rs.k and y.area_k = a.k and y.option_k = o.k and y.measure = 1 and y.channel = 0 and y.count_round = 0 offset 0
-                    ) v
+                    select sum(y.value) as votes from result_rollup y
+                    where y.result_set_k = rs.k and y.area_k = a.k and y.option_k = o.k and y.measure = 1 and y.count_round = 0
+                    offset 0
                   ) y on true
                 ),
                 sized as (
@@ -13010,9 +13012,12 @@ export const polities = {
           cross join lateral (
             select o.id as option, coalesce(m.into_id, cy.person_id) as person, coalesce(pm.into_id, o.party_id, cy.member_of_party_id, (
                 select ch.party_id from contest_option ch
-                join result_rollup y on y.result_set_k = rs.k and y.area_k = k.place and y.option_k = ch.k
-                  and y.measure = 1 and y.channel = 0 and y.count_round = 0
-                where ch.parent_option_id = o.id and ch.party_id is not null
+                cross join lateral (
+                  select sum(y.value) as value from result_rollup y
+                  where y.result_set_k = rs.k and y.area_k = k.place and y.option_k = ch.k
+                    and y.measure = 1 and y.count_round = 0 offset 0
+                ) y
+                where ch.parent_option_id = o.id and ch.party_id is not null and y.value is not null
                 order by y.value desc limit 1
               )) as party
             from result_set rs
