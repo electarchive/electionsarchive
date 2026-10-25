@@ -20,7 +20,7 @@ from ea.sources.us import alged
 from ea.store import DATA, connect
 
 SOURCE = "us.ceda"
-VERSION = "3"
+VERSION = "4"
 PARSED = DATA / "parsed" / SOURCE
 ACCESS = "https://scholars.csus.edu/view/fileRedirect?instCode=01CALS_USL&filePid={}&download=true"
 CODEBOOK = ACCESS.format("13306594360001671")
@@ -401,6 +401,23 @@ def parse() -> None:
         .agg(pl.col("votes").sum())
     )
     print(f"{precincts['race'].n_unique()} races by precinct")
+    finalists: set[tuple[str, str]] = set()
+    for _, group in frame.group_by("code", "key", "area", "remainder", pl.col("day").dt.year().alias("year")):
+        rounds = sorted(
+            group.group_by("race").agg(pl.first("day"), pl.col("name").str.to_lowercase()).iter_rows(),
+            key=lambda row: row[1],
+        )
+        for (race, _, names), (_, _, later) in itertools.pairwise(rounds):
+            if len(later) >= 2 and set(later) <= set(names):
+                finalists |= {(race, name) for name in later}
+    advanced = pl.struct("race", pl.col("name").str.to_lowercase()).map_elements(
+        lambda row: (row["race"], row["name"]) in finalists, pl.Boolean
+    )
+    raced = pl.col("race").is_in(list({race for race, _ in finalists}))
+    frame = frame.with_columns(
+        elected=pl.when(raced & advanced).then(pl.lit("3")).when(raced).then(pl.lit("2")).otherwise("elected")
+    )
+    print(f"{len({race for race, _ in finalists})} first rounds whose finalists meet again later that year")
     PARSED.mkdir(parents=True, exist_ok=True)
     frame.write_parquet(PARSED / "candidates.parquet")
     precincts.write_parquet(PARSED / "precincts.parquet")
