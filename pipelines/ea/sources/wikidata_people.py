@@ -4,12 +4,14 @@ import unicodedata
 from pathlib import Path
 from urllib.parse import urlencode
 
-from ea import raw
+import httpx
+
+from ea import names, raw
 from ea.changeset import Changeset
 from ea.store import DATA, connect
 
 SOURCE = "wikidata_people"
-VERSION = "2"
+VERSION = "3"
 TITLE = "English labels of people"
 LABELS = """SELECT ?item ?label WHERE {{ VALUES ?item {{ {items} }} ?item rdfs:label ?label . FILTER(LANG(?label) = "en") }}"""
 CHUNK = 400
@@ -44,15 +46,26 @@ def _fold(text: str) -> str:
 
 
 def fetch() -> None:
-    for url in _urls():
-        raw.fetch(SOURCE, url, suffix=".json")
+    urls = _urls()
+    failed = 0
+    for url in urls:
+        try:
+            raw.fetch(SOURCE, url, suffix=".json")
+        except httpx.HTTPError:
+            failed += 1
+    print(f"{len(urls) - failed} of {len(urls)} batches fetched; rerun to retry the rest")
 
 
 def emit() -> Path:
     labels: dict[str, str] = {}
-    urls = _urls()
-    for url in urls:
-        for binding in json.loads(raw.cached(SOURCE, url).path.read_text(encoding="utf-8"))["results"]["bindings"]:
+    artifacts: list[raw.Artifact] = []
+    for url in _urls():
+        try:
+            artifact = raw.cached(SOURCE, url)
+        except LookupError:
+            continue
+        artifacts.append(artifact)
+        for binding in json.loads(artifact.path.read_text(encoding="utf-8"))["results"]["bindings"]:
             labels[binding["item"]["value"].rsplit("/", 1)[1]] = binding["label"]["value"]
     with connect() as conn:
         people: dict[str, list[tuple[str, list[str]]]] = {}
@@ -110,8 +123,8 @@ def emit() -> Path:
             license="CC0 1.0",
             license_url="https://creativecommons.org/publicdomain/zero/1.0/",
         )
-        for url in urls:
-            cs.artifact(raw.cached(SOURCE, url), source)
+        for artifact in artifacts:
+            cs.artifact(artifact, source)
         added = 0
         held: list[tuple[str, str, str, str]] = []
         for item, label in labels.items():
@@ -126,7 +139,15 @@ def emit() -> Path:
             if not words:
                 continue
             for entity, texts in people.get(item, []):
-                if not texts or _fold(text) in {_fold(name) for name in texts}:
+                if (
+                    not texts
+                    or text in texts
+                    or (
+                        _fold(text) in {_fold(name) for name in texts}
+                        and names.PARTICLE.sub(lambda match: match[0].lower(), text)
+                        not in {names.PARTICLE.sub(lambda match: match[0].lower(), name) for name in texts}
+                    )
+                ):
                     continue
                 codes = countries.get(entity, set())
                 if "tr" in codes:
