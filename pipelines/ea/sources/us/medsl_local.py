@@ -20,7 +20,7 @@ from ea.sources.us.medsl_state import DROPPED, EXPANDED, INDEPENDENT, NATIONAL, 
 from ea.store import DATA, connect
 
 SOURCE = "us.medsl_local"
-VERSION = "6"
+VERSION = "7"
 PARSED = DATA / "parsed" / SOURCE
 LISTING = "https://dataverse.harvard.edu/api/datasets/:persistentId/?persistentId=doi:10.7910/DVN/NYTPDU"
 LISTING2022 = "https://dataverse.harvard.edu/api/datasets/:persistentId/?persistentId=doi:10.7910/DVN/UYQIEP"
@@ -1660,6 +1660,14 @@ def emit() -> Path:
             raise ValueError("the fptp, block, and two_round systems must already exist")
 
         owners: dict[tuple[str, str], UUID] = {}
+        untyped = dict(
+            conn.execute(
+                """select o.id, o.polity_id from office o join changeset c on c.id = o.changeset_id
+                   join name n on n.entity_id = o.id and n.is_preferred
+                   where c.pipeline = %s and o.kind = 'other' and n.text like 'Mayor of %%'""",
+                [SOURCE],
+            ).fetchall()
+        )
         elections: dict[tuple[date, str], UUID] = {}
         persons: dict[tuple[str, str], UUID] = {}
         districts: set[str] = set()
@@ -1748,6 +1756,7 @@ def emit() -> Path:
                     kind="general",
                     date_from=day,
                     date_to=day,
+                    date_precision="day",
                     status="held",
                 )
                 name(election, f"{day.year} {place} general election")
@@ -1766,17 +1775,15 @@ def emit() -> Path:
             )
             if (code, key) not in owners:
                 owner = owners[(code, key)] = cs.key("us.body" if body else "us.office", f"{state}:{code}:{key}")
+                mayoral = key == "mayor" and bool(row["stem"] or office_title.startswith("Mayor of "))
                 if owner in cs.minted:
                     if body:
                         cs.add("body", id=owner, polity_id=polity, kind="council")
                     else:
-                        cs.add(
-                            "office",
-                            id=owner,
-                            polity_id=polity,
-                            kind="mayor" if key == "mayor" and row["stem"] else "other",
-                        )
+                        cs.add("office", id=owner, polity_id=polity, kind="mayor" if mayoral else "other")
                     name(owner, office_title)
+                elif mayoral and owner in untyped:
+                    cs.add("office", id=owner, polity_id=untyped[owner], kind="mayor")
             whole, unit = cs.area(scheme, code), cs.unit(scheme, code)
             area = whole
             if row["district"]:
@@ -2056,7 +2063,7 @@ def emit() -> Path:
                 **{
                     column: value
                     for column, value in later.items()
-                    if column not in ("k", "changeset_id", "recorded_from")
+                    if column not in ("k", "changeset_id", "recorded_from", "notional")
                 }
                 | {"previous_round_id": first, "round_number": 2, "electoral_system_id": two_round},
             )
