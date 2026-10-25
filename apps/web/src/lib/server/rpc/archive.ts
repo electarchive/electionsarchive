@@ -7891,7 +7891,7 @@ async function races(
                 join outcome x on x.option_id = o.id and x.kind in ('elected', 'won') and x.candidacy_id is null
                 join result_set rs on rs.id = x.result_set_id and ${latest("rs")}
                 where not exists (select from contest k where k.allocation_parent_id = t.id)
-                  and not (o.kind = 'candidate' and exists (
+                  and not (o.kind = 'candidate' and o.parent_option_id is not null and exists (
                     select from contest_option l
                     join outcome lx on lx.option_id = l.id and lx.kind in ('elected', 'won') and lx.candidacy_id is null
                     join result_set lr on lr.id = lx.result_set_id and ${latest("lr")}
