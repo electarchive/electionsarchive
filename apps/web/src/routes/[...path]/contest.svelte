@@ -1143,10 +1143,9 @@
       <p
         class="mbs-1 font-serif text-[clamp(1.0625rem,1.5vw,1.25rem)]/snug text-pretty max-inline-[60ch]"
       >
-        {#if held != null}{held}
-        {/if}{verdict}{#if comeback != null}
-          {comeback}{/if}{#if vacancy != null}
-          {vacancy}{/if}
+        {[held, verdict, comeback, vacancy]
+          .filter((part) => part != null)
+          .join(" ")}
       </p>
     {/if}
     {#if held != null && handover != null && handover.basis !== "same"}

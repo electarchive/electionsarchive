@@ -285,10 +285,10 @@ export function verdict(contest: Page["contest"]) {
       precision(top.current.share - next.current.share),
     ),
     margin: points(top.current.share - next.current.share).replace(/^\+/u, ""),
-    runner: named(next),
+    runner: definite(named(next)),
   });
   return isWon && withdrew != null && withdrew.key !== next.key
-    ? `${lede} ${m.race_lede_withdrew({ name: named(withdrew) })}`
+    ? `${lede} ${m.race_lede_withdrew({ name: definite(named(withdrew), true) })}`
     : lede;
 }
 
