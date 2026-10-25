@@ -3,6 +3,7 @@ import re
 import unicodedata
 from collections import Counter, defaultdict
 from datetime import UTC, date, datetime, timedelta
+from itertools import pairwise
 from pathlib import Path
 from urllib.parse import urlencode
 from uuid import UUID
@@ -11,6 +12,7 @@ import polars as pl
 
 from ea import raw
 from ea.changeset import Changeset
+from ea.sources.gb import mnis as gb_mnis
 from ea.store import DATA, connect
 
 SOURCE = "gb.tenures"
@@ -38,9 +40,11 @@ ENDED = {
     "Q4021063": "elevated",
     "Q46993416": "appointed",
     "Q52112831": "appointed",
+    "Q50393121": "chose_another_seat",
     "Q51212178": "appointed",
 }
-VACATED = {*ENDED, "Q50393121"}
+VACATED = set(ENDED)
+UNMATCHED = {(date(1838, 5, 21), "hope"), (date(1847, 1, 30), "grosvenor"), (date(1867, 2, 12), "morris")}
 DOUBLE = re.compile(
     r"also (?:being )?(?:elected|returned)|deci(?:ding|sion) to sit|option to sit|opting to sit|opted to sit"
 )
@@ -307,6 +311,16 @@ def emit() -> Path:
             if contest is not None:
                 held[(contest, person)] = entity
         emitted: set[UUID] = set()
+        sitting_elsewhere: dict[tuple[UUID, UUID], list[tuple[date, date | None]]] = defaultdict(list)
+        for person, area, begin, stop in conn.execute(
+            """select t.person_id, c.district_area_id, t.from_date, t.to_date from tenure t
+               join contest c on c.id = t.contest_id join changeset s on s.id = t.changeset_id
+               join entity e on e.id = t.id and e.retired_by is null
+               where s.pipeline <> %s and c.district_area_id is not null""",
+            [SOURCE],
+        ).fetchall():
+            sitting_elsewhere[(person, area)].append((begin, stop))
+        continued = 0
         split: list[tuple[date, UUID, UUID, UUID]] = []
         matched = joined = left = ended = unresolved = declined = dead = unmatched = 0
         assigned: dict[UUID, list[tuple[date, list[dict[str, object]]]]] = defaultdict(list)
@@ -409,6 +423,8 @@ def emit() -> Path:
                 else:
                     pool = [record for record in open_seats[area] if record["from"] < day and "successor" not in record]
                     named = [PREDECESSORS[str(contest)]] if str(contest) in PREDECESSORS else cause_name(cause)
+                    if named is not None and not own and not any(record["words"][-1:] == named for record in pool):
+                        pool = []
                     if len(pool) > len(people) and named is not None:
                         pool = [record for record in pool if record["words"][-1:] == named] or pool
                     if len(pool) > len(people):
@@ -444,12 +460,22 @@ def emit() -> Path:
                             record["stop"], record["steward"] = appointed[0], True
                             resigned += 1
                 for index, (person, words, party) in enumerate(people):
+                    if kind == "appointed" and any(
+                        begin <= day and (stop is None or day < stop)
+                        for begin, stop in sitting_elsewhere.get((person, area), [])
+                    ):
+                        continued += 1
+                        continue
                     if kind == "died" and any(record["person"] == person for record in previous):
                         print(f"REVIEW {day} {contest}: the winner is the member whose death caused the by-election")
                         dead += 1
                         continue
-                    member = pick(
-                        [member for member in later if abs((member["start"] - day).days) <= 60], person, words
+                    member = (
+                        None
+                        if (day, "".join(words[-1:])) in UNMATCHED
+                        else pick(
+                            [member for member in later if abs((member["start"] - day).days) <= 60], person, words
+                        )
                     )
                     tenure = held.get((contest, person)) or cs.key(
                         f"{SOURCE}.tenure",
@@ -537,6 +563,28 @@ def emit() -> Path:
                 print(f"REVIEW {member['start']} {names[item]} ({item}): joined with no by-election winner to match")
                 records.append(record)
                 unmatched += 1
+            mnis: dict[UUID, list[tuple[date, date | None, UUID]]] = {}
+            for person, number in gb_mnis.members():
+                try:
+                    artifact = raw.cached(gb_mnis.SOURCE, gb_mnis.BIOGRAPHY.format(number))
+                except LookupError:
+                    continue
+                for affiliation in json.loads(artifact.path.read_text(encoding="utf-8"))["value"]["partyAffiliations"]:
+                    if affiliation["house"] != 1 or not affiliation["startDate"]:
+                        continue
+                    since = date.fromisoformat(affiliation["startDate"][:10])
+                    key = gb_mnis.PARTIES.get(affiliation["name"]) or next(
+                        (key for before, key in gb_mnis.DATED.get(affiliation["name"], ()) if since < before), None
+                    )
+                    if key is None:
+                        continue
+                    group = cs.key(*key)
+                    if group in cs.minted:
+                        raise ValueError(f"no party {key}")
+                    until = date.fromisoformat(affiliation["endDate"][:10]) if affiliation["endDate"] else None
+                    mnis.setdefault(person, []).append((since, until, group))
+                mnis.get(person, []).sort()
+            floor_crossings = 0
             for record in records:
                 tenure, stop = record["tenure"], record["stop"]
                 emitted.add(tenure)
@@ -559,6 +607,16 @@ def emit() -> Path:
                 spans = record["spans"] or (
                     [(record["from"], stop, record["party"])] if record["party"] is not None else []
                 )
+                crossed = [
+                    (max(since, record["from"]), until, group)
+                    for since, until, group in mnis.get(record["person"], [])
+                    if (stop is None or since < stop) and (until is None or until > record["from"])
+                ]
+                if len({group for *_, group in crossed}) > 1 and all(
+                    until is not None and until <= after for (_, until, _), (after, _, _) in pairwise(crossed)
+                ):
+                    spans = crossed
+                    floor_crossings += 1
                 for index, (since, until, group) in enumerate(spans):
                     if group is None:
                         continue
@@ -579,13 +637,15 @@ def emit() -> Path:
                 "entity_retirement",
                 entity_id=tenure,
                 reason="A Commons tenure this pipeline no longer emits: a seat the member declined after a double "
-                "return, or a member joining between elections now held on the by-election contest",
+                "return, a member joining between elections now held on the by-election contest, or a minister's "
+                "re-election that continues the tenure from the general election",
             )
         print(
             f"{matched} general winners matched, {joined} by-election winners, {left} left early per Wikidata, "
             f"{ended} predecessors ended by a by-election, {resigned} on the day they took a stewardship, {unresolved} by-elections with no predecessor found, "
             f"{declined} declined seats, {len(stale)} tenures retired, {len(split)} by-election winners held apart "
-            f"from their Wikidata person, {dead} by-election winners who caused the vacancy by dying, {unmatched} "
-            "joiners with no by-election winner"
+            f"from their Wikidata person, {dead} by-election winners who caused the vacancy by dying, {continued} ministers re-elected "
+            f"within a tenure, {unmatched} "
+            f"joiners with no by-election winner, {floor_crossings} tenures split at a party change in MNIS"
         )
         return cs.write()
