@@ -606,7 +606,8 @@ def _publish_table(conn: Connection, stage: Stage, table: str) -> None:
                    where c.contype = 'f' and c.connamespace = 'public'::regnamespace
                      and c.confrelid::regclass::text = any(%s)
                      and c.conrelid::regclass::text not in
-                       ('name', 'note', 'external_id', 'slug', 'label', 'flag', 'search_document', 'entity_retirement')
+                       ('name', 'note', 'external_id', 'slug', 'label', 'flag', 'search_document', 'entity_retirement',
+                        'name_drop', 'note_drop', 'entity_subtype_drop')
                      and (c.conrelid::regclass::text, a.attname) <> (%s, 'id')
                      and (c.conrelid::regclass::text, c.confrelid::regclass::text)
                        <> ('candidacy_nomination', 'candidacy')""",
