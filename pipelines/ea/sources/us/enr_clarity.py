@@ -226,6 +226,30 @@ MUNI_OFFICES = (
         True,
     ),
 )
+NY_COUNTY_OFFICES = (
+    (r"COUNTY LEG(?:ISLATORS?|S)?\b|LEGISLATOR", "legislature", "County Legislature", True),
+    (r"FAMILY COURT(?: JUDGE)?", "family-court", "Judge, Family Court", False),
+    (r"SURROGATE(?:S|'S)?(?: COURT)?(?: JUDGE)?", "surrogate", "Surrogate", False),
+)
+NY_MUNI_OFFICES = (
+    (r"(?:TOWN |VILLAGE )?JUSTICE", "justice", "Justice", False),
+    (r"(?:CHIEF )?(?:JUDGE OF THE )?(?:CITY )?COURT JUDGE|CHIEF JUDGE OF THE (?:CITY )?COURT|CITY JUDGE|CITY COURT", "city-court", "Judge, City Court", False),
+    (
+        r"(?:TOWN )?SUPT\.? OF HIGHWAYS?|(?:TOWN )?SUPERINTENDENT OF HIGHWAYS?|HIGHWAY SUPERINTENDENT|HIGHWAY SUPT",
+        "highway-superintendent",
+        "Highway Superintendent",
+        False,
+    ),
+    (r"RECEIVER OF TAXES(?: (?:AND|&) ASSESSMENTS)?", "receiver-of-taxes", "Receiver of Taxes", False),
+    (r"(?:TOWN |VILLAGE |CITY )?CLERK(?: (?:AND|&) (?:TAX )?COLLECTOR)?|CLERK", "clerk", "Clerk", False),
+    (r"(?:TAX )?COLLECTOR", "collector", "Tax Collector", False),
+    (r"ASSESSOR", "assessor", "Assessor", False),
+    (r"(?:TOWN )?SUPERVISOR", "supervisor", "Supervisor", False),
+    (r"MAYOR", "mayor", "Mayor", False),
+    (r"(?:CITY )?COMPTROLLER", "controller", "Controller", False),
+    (r"TRUSTEES?", "board-of-trustees", "Board of Trustees", True),
+    (r"COUNCILM[AE]N|COUNCILWOMAN|COUNCIL ?MEMBERS?|COUNCILPERSON|ALDERM\w+|COUNCIL", "council", "Council", True),
+)
 SPECIALS = (
     (r"MUNICIPAL UTILITY DISTRICT|\bM ?U ?D\b", "utility", "Municipal Utility District"),
     (r"MUNICIPAL UTILITY AUTHORITY", "utility", "Municipal Utility Authority"),
@@ -514,6 +538,8 @@ def parse(
             if scheme == "us.school_district":
                 bare = re.sub(r"\s+", " ", SCHOOL_WORDS.sub(" ", _plain(display))).strip()
                 schools.setdefault(county, []).append((bare, code))
+                if county.startswith("36") and bare.endswith(" CITY"):
+                    schools[county].append((bare[:-5], code))
                 initials = "".join(word[0] for word in _plain(display).split())
                 if len(initials) >= 5 and initials.endswith("ISD"):
                     schools[county].append((initials, code))
@@ -749,6 +775,8 @@ def parse(
         parsed / "lines.parquet"
     )
     shapes = {(scheme, code): geom for scheme, code, geom in geoms}
+    if "display" not in table.columns:
+        table = table.with_columns(display=pl.lit(None, pl.String))
     used = table.filter(pl.col("scheme") != "us.county").unique(["scheme", "code"]).sort("scheme", "code")
     pl.DataFrame(
         [
@@ -818,6 +846,9 @@ def _classify(
     plain = re.sub(r"\bCHARTER (?=TOWNSHIP|TWP)", "", plain)
     if st in ("IL", "MI"):
         plain = re.sub(r"\b(\d+) (DISTRICT|DIST)\b", r"\2 \1", plain)
+    if st == "NY":
+        plain = re.sub(r"\s+", " ", TERM.sub(" ", plain))
+        plain = re.sub(r"\b(\d+) (WARD|DISTRICT|DIST)\b", r"\2 \1", plain)
     for options, scope in ((PARTY_OFFICES, "party"), (OFFICERS, "officer")):
         for pattern, key, office in options:
             if found := re.search(rf"\b(?:{pattern})\b", plain):
@@ -847,7 +878,7 @@ def _classify(
                 }
     plain = re.sub(rf"\b{re.escape(county_name)} (?:COUNTY|CO)\b", "COUNTY", plain)
     label = re.sub(r"\s+", " ", plain).strip()
-    if SCHOOL.search(plain) and school_names:
+    if (SCHOOL.search(plain) or st == "NY" and "EDUCATION" in plain) and school_names:
         bare = re.sub(r"\s+", " ", SCHOOL_WORDS.sub(" ", plain)).strip()
         for name, code in school_names:
             if name and re.search(
@@ -859,11 +890,13 @@ def _classify(
                 seat, rest = _seat(rest)
                 if seat is None and (region := re.search(r"\b(\d+[A-Z]?)\b(?! ?(?:YR|YEAR))", rest)):
                     seat = f"Region {region[1]}"
+                if seat is None and st == "NY":
+                    seat = _title(_residue(rest, "EDUCATION|ED|SCHOOLS?")) or None
                 return {
                     "scheme": "us.school_district",
                     "code": code,
                     "key": "board-of-education",
-                    "office": "Board of Trustees" if st == "TX" else "Board of School Directors",
+                    "office": {"TX": "Board of Trustees", "NY": "Board of Education"}.get(st, "Board of School Directors"),
                     "body": True,
                     "seat": seat,
                     "label": label,
@@ -905,7 +938,7 @@ def _classify(
                 "label": label,
             }
     held, spans = [], []
-    for office in COUNTY_OFFICES:
+    for office in (*NY_COUNTY_OFFICES, *COUNTY_OFFICES) if st == "NY" else COUNTY_OFFICES:
         found = re.search(rf"\b(?:{office[0]})\b", plain)
         if found and not any(found.start() < end and start < found.end() for start, end in spans):
             held.append(office)
@@ -993,14 +1026,18 @@ def _classify(
         found_seat = f"{'Ward' if st == 'PA' else 'Place'} {int(bare[1])}"
         rest = rest.replace(bare[0], " ", 1)
     seat = ", ".join(part for part in (seat, found_seat) if part) or None
-    for pattern, key, office, body in (*MI_MUNI_OFFICES, *MUNI_OFFICES) if st in ("IL", "MI") else MUNI_OFFICES:
+    offices = NY_MUNI_OFFICES if st == "NY" else (*MI_MUNI_OFFICES, *MUNI_OFFICES) if st in ("IL", "MI") else MUNI_OFFICES
+    for pattern, key, office, body in offices:
         if re.search(rf"\b(?:{pattern})\b", rest):
             break
     else:
         if seat is None or kind == "township":
             return None
         pattern, key, office, body = "", "council", "Council", True
-    if _residue(rest, pattern, "JUDGE") if pattern else _residue(rest):
+    left = _residue(rest, pattern, "JUDGE") if pattern else _residue(rest)
+    if left and st == "NY" and key == "council" and seat is None:
+        seat, left = _title(left), ""
+    if left:
         return None
     if kind == "township" and key == "council":
         key, office = "board-of-commissioners", "Board of Commissioners"
