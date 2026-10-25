@@ -715,6 +715,54 @@ PEOPLE = {
         ("gb.umit.person", "nir-lagan-valley:poots-edwin"),
         ("gb.ni_assembly.person", "2022-05-05:ni-assembly:belfast-south:12"),
     ),
+    "Michelle O'Neill, Dungannon councillor for Torrent from 2005 and MLA for Mid Ulster from 2007": (
+        ("gb.ni_assembly.person", "2007-03-07:ni-assembly:mid-ulster:12"),
+        ("gb.ni_council.person", "2005-05-05:local:DUN/torrent:8"),
+    ),
+    "Arlene Foster, Fermanagh councillor for Enniskillen from 2005 and MLA for Fermanagh and South Tyrone from 2003": (
+        ("gb.ni_assembly.person", "2003-11-26:ni-assembly:fermanagh-and-south-tyrone:4"),
+        ("gb.ni_council.person", "2005-05-05:local:FER/enniskillen:6"),
+    ),
+    "Nicol Stephen, MP for Kincardine and Deeside 1991-1992 and MSP for Aberdeen South 1999-2011": (
+        ("mnis", "4239"),
+        ("gb.scottish_parliament.person", "nicol-stephen"),
+    ),
+    "Count Binface, London mayoral candidate 2021-2024 and parliamentary candidate from 2017": (
+        ("gb.london.person", "Count Binface"),
+        ("gb.umit.person", "eng-uxbridge-and-south-ruislip:binface-count"),
+        ("gb.umit.person", "eng-richmond-and-northallerton:binface-count"),
+        ("gb.byelections.person", "2023-07-20:eng-uxbridge-and-south-ruislip:count-binface"),
+        ("gb.byelections.person", "2026-06-18:eng-makerfield:count-binface"),
+        ("gb.byelections.person", "2026-08-13:eng-clacton:count-binface"),
+    ),
+    "Siân Berry, London Assembly member from 2016, Camden councillor, and MP for Brighton Pavilion from 2024": (
+        ("mnis", "5314"),
+        ("gb.dc_local.person", "34835"),
+    ),
+    "Gale Brewer, New York City Council member 2002-2013 and from 2022, and Manhattan Borough President 2014-2021": (
+        ("us.alged.person", "34967"),
+        ("us.nyc_general.person", "2017-11-07:new-york-city:borough-president-manhattan:gale-a-brewer"),
+        ("us.nyc_general.person", "2023-11-07:new-york-city:council-district-6:gale-a-brewer"),
+        ("us.nyc_general.person", "2025-11-04:new-york-city:council-district-6:gale-a-brewer"),
+    ),
+    "Mark Levine, New York City Council member 2014-2021, Manhattan Borough President 2022-2025, and Comptroller": (
+        ("us.alged.person", "35254"),
+        ("us.nyc_boe.person", "mark-d-levine"),
+    ),
+    "Sheila Jackson Lee, Houston City Council member 1990-1994, US Representative 1995-2024, and 2023 mayoral candidate": (
+        ("bioguide", "J000032"),
+        ("us.alged.person", "50841"),
+        ("us.wikipedia_mayors.person", "TX:4835000:sheila-jackson-lee"),
+    ),
+    "Nithya Raman, Los Angeles City Council member for District 4 from 2020 and 2026 mayoral candidate": (
+        ("us.alged.person", "70078"),
+        ("us.ceda.person", "202000546:202001635"),
+        ("us.ceda.person", "202400549:202401593"),
+    ),
+    "Pete Buttigieg, Mayor of South Bend 2012-2020 and Secretary of Transportation 2021-2025": (
+        ("wikidata", "Q7173106"),
+        ("us.alged.person", "13139"),
+    ),
 }
 HONORIFICS = re.compile(
     r"^(?:(?:the\s+)?(?:rt\.?\s+hon\.?|right\s+honou?rable|honou?rable|very\s+rev(?:erend|d)?\.?|rev(?:erend|d)?\.?)\s+"
@@ -1248,6 +1296,36 @@ def emit() -> Path:
             for person in dict.fromkeys(found[1:]):
                 if person != found[0] and person not in cs.survivors:
                     cs.merge(person, found[0])
+        if "gb.tenures" not in busy:
+            sitting = 0
+            for winner, member in conn.execute(
+                """select distinct cy.person_id, t.person_id
+                   from tenure t join changeset w on w.id = t.changeset_id and w.pipeline = 'gb.tenures'
+                   join contest c on c.id = t.contest_id and c.magnitude = 1
+                   join election e on e.id = c.election_id and e.kind = 'by_election'
+                   join contest_option o on o.contest_id = c.id
+                   join candidacy cy on cy.option_id = o.id and cy.person_id is not null
+                   join outcome x on x.option_id = o.id and x.kind in ('elected', 'won')
+                     and (x.candidacy_id is null or x.candidacy_id = cy.id)
+                   where cy.person_id <> t.person_id
+                     and not exists (select from entity_merge m where m.entity_id in (cy.person_id, t.person_id))
+                     and not exists (
+                       select from external_id a join external_id b on b.scheme = a.scheme and b.value <> a.value
+                       where a.entity_id = cy.person_id and b.entity_id = t.person_id
+                         and a.scheme in ('mnis', 'wikidata', 'bioguide')
+                     )
+                     and not exists (
+                       select from tenure a join tenure b on b.person_id = t.person_id
+                         and daterange(a.from_date, a.to_date) && daterange(b.from_date, b.to_date)
+                         and a.seat_id is distinct from b.seat_id
+                       where a.person_id = cy.person_id
+                     )"""
+            ).fetchall():
+                winner, member = cs.survivors.get(winner, winner), cs.survivors.get(member, member)
+                if winner != member and winner not in cs.survivors:
+                    cs.merge(winner, member)
+                    sitting += 1
+            print(f"{sitting} by-election winners joined to the member whose tenure the by-election began")
         with open(Path(__file__).with_name("identity_bioguide.tsv"), newline="") as twins:
             for twin in csv.DictReader(twins, delimiter="\t"):
                 member = conn.execute(
@@ -1342,6 +1420,37 @@ def emit() -> Path:
                 is_preferred=False,
             )
         columns = ("id", "entity_id", "text", "lang", "script", "kind", "source_id")
+        staged = {row["id"] for row in cs.rows.get("name", []) if row.get("id") is not None}
+        assembly = 0
+        for row in conn.execute(
+            """select p.id, p.entity_id, p.text, p.lang, p.script, p.kind, p.source_id,
+                      array_agg(m.id order by m.recorded_from, m.id), array_agg(m.text order by m.recorded_from, m.id)
+               from name p join entity e on e.id = p.entity_id and e.type = 'person'
+               join name m on m.entity_id = p.entity_id and m.id <> p.id and m.lang = p.lang and m.text ~ ' '
+                 and m.text <> p.text and m.valid_from is null and m.valid_to is null
+               join changeset c on c.id = m.changeset_id and c.pipeline = 'gb.ni_mlas'
+               where p.is_preferred and p.valid_from is null and p.valid_to is null
+                 and not exists (select from entity_merge x where x.entity_id = p.entity_id)
+               group by p.id""",
+        ).fetchall():
+            tokens = row[2].split()
+            fits = {
+                text: name
+                for name, text in zip(row[7], row[8], strict=True)
+                if len(text.split()) <= len(tokens) and text.split()[-1].lower() == tokens[-1].lower()
+            }
+            shortest = [text for text in fits if len(text.split()) == min((len(t.split()) for t in fits), default=0)]
+            if len(shortest) != 1 or row[0] in staged or fits[shortest[0]] in staged:
+                continue
+            chosen = conn.execute(
+                "select id, entity_id, text, lang, script, kind, source_id from name where id = %s",
+                [fits[shortest[0]]],
+            ).fetchone()
+            assert chosen is not None
+            cs.add("name", **dict(zip(columns, row[:7], strict=True)), is_preferred=False)
+            cs.add("name", **dict(zip(columns, chosen, strict=True)), is_preferred=True)
+            assembly += 1
+        print(f"{assembly} Northern Ireland Assembly members take the Assembly's own name for them")
         fuller: set[UUID] = set()
         for row in conn.execute(
             """select distinct on (p.id) p.id, p.entity_id, p.text, p.lang, p.script, p.kind, p.source_id,
@@ -1355,6 +1464,40 @@ def emit() -> Path:
             cs.add("name", **dict(zip(columns, row[:7], strict=True)), is_preferred=False)
             cs.add("name", **dict(zip(columns, row[7:], strict=True)), is_preferred=True)
             fuller.add(row[1])
+        recased = 0
+        for row in conn.execute(
+            """select p.id, p.entity_id, p.text, p.lang, p.script, p.kind, p.source_id,
+                      array_agg(distinct f.text) filter (where w.pipeline = 'wikidata_people'),
+                      array_agg(distinct f.text)
+               from name p join entity e on e.id = p.entity_id and e.type = 'person'
+               join name f on f.entity_id = p.entity_id and f.id <> p.id and lower(f.text) = lower(p.text)
+                 and f.text <> p.text and f.valid_from is null and f.valid_to is null
+               join changeset w on w.id = f.changeset_id
+               where p.is_preferred and p.valid_from is null and p.valid_to is null
+                 and p.text ~ '[^ ] ([Dd]e|[Vv]an|[Vv]on|[Ll]a) [^ ]'
+                 and not exists (select from entity_merge m where m.entity_id = p.entity_id)
+               group by p.id""",
+        ).fetchall():
+            if row[1] in fuller:
+                continue
+            plain = names.PARTICLE.sub(lambda match: match[0].lower(), row[2])
+            spellings = {
+                text
+                for text in row[7] or row[8]
+                if names.PARTICLE.sub(lambda match: match[0].lower(), text) == plain
+                and names.PARTICLE.findall(text) != names.PARTICLE.findall(row[2])
+                and (row[7] is not None or text == plain)
+            }
+            if len(spellings) != 1:
+                continue
+            cs.add("name", **dict(zip(columns, row[:7], strict=True)), is_preferred=False)
+            cs.add(
+                "name",
+                **dict(zip(columns, row[:7], strict=True)) | {"id": None, "text": spellings.pop()},
+                is_preferred=True,
+            )
+            recased += 1
+        print(f"{recased} preferred names take a particle's case from a source's own spelling")
         staged = {row["id"] for row in cs.rows.get("name", []) if row.get("id") is not None}
         for name, entity, text, lang, script, kind, source, pipeline in conn.execute(
             """select n.id, n.entity_id, n.text, n.lang, n.script, n.kind, n.source_id, c.pipeline from name n
