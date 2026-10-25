@@ -11906,7 +11906,16 @@ export const polities = {
           left join polity_territory pt on pt.polity_id = e.polity_id and pt.valid @> e.date_from
           left join area a on a.id = coalesce(c.district_area_id, pt.area_id)
           where c.allocation_parent_id is null and c.party_scope_id is null and not c.notional
-            and e.kind in ('general', 'local') and c.kind in ('body_seats', 'list_allocation', 'office')
+            and (e.kind in ('general', 'local') or (
+              e.kind = 'primary'
+              and not exists (select from contest n where n.previous_round_id = c.id)
+              and not exists (
+                select from contest n join election ne on ne.id = n.election_id
+                where coalesce(n.office_id, n.body_id) = coalesce(c.office_id, c.body_id) and n.seat_id is not distinct from c.seat_id
+                  and ne.kind in ('general', 'local', 'runoff') and ne.date_from > e.date_from and ne.date_from < e.date_from + 365
+              )
+              and exists (select from result_set rs join outcome o on o.result_set_id = rs.id where rs.contest_id = c.id and o.kind = 'elected')
+            )) and c.kind in ('body_seats', 'list_allocation', 'office')
             and coalesce((select st.voting from seat st where st.id = c.seat_id), true)
             and not exists (
               select from contest pc join election pe on pe.id = pc.election_id
