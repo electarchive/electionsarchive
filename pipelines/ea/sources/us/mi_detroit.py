@@ -39,12 +39,12 @@ def fetch() -> None:
             raise RuntimeError(f"no results PDF found on detroitmi.gov/media/{media}")
 
 
-def contests(text: str) -> Iterator[dict[str, Any]]:
+def contests(text: str, keep: re.Pattern[str] = SCHOOL) -> Iterator[dict[str, Any]]:
     lines = text.splitlines()
     start = 0
     for index, line in enumerate(lines):
         header = re.fullmatch(r"\s*(.+?)\s*\(Vote for (\d+)\)\s*", line)
-        if header is None or not SCHOOL.search(header[1]) or "Precincts Reported" in header[1]:
+        if header is None or not keep.search(header[1]) or "Precincts Reported" in header[1]:
             continue
         choices: list[dict[str, Any]] = []
         total = None
@@ -80,14 +80,7 @@ def contests(text: str) -> Iterator[dict[str, Any]]:
                 }
             )
         if total is not None and choices and sum(int(choice["total"]) for choice in choices) == total:
-            heading = re.sub(
-                r"(?i)\bDetroit (?:Community )?School District\b",
-                "Detroit Public Schools Community District",
-                header[1],
-            )
-            if re.fullmatch(r"(?i)detroit public schools community district board member", heading):
-                heading = "Board Member Detroit Public Schools Community District"
-            yield {"key": f"{start}", "text": heading, "vote_for": int(header[2]), "choices": choices}
+            yield {"key": f"{start}", "text": header[1], "vote_for": int(header[2]), "choices": choices}
             start += 1
 
 
@@ -107,7 +100,24 @@ def _read(registry: Mapping[str, Mapping[str, str]]) -> Iterator[dict[str, Any]]
             "title": title,
             "official": True,
             "primary": False,
-            "contests": list(contests(text)),
+            "contests": [
+                {
+                    **contest,
+                    "text": (
+                        "Board Member Detroit Public Schools Community District"
+                        if re.fullmatch(r"(?i)detroit public schools community district board member", heading)
+                        else heading
+                    ),
+                }
+                for contest in contests(text)
+                for heading in [
+                    re.sub(
+                        r"(?i)\bDetroit (?:Community )?School District\b",
+                        "Detroit Public Schools Community District",
+                        contest["text"],
+                    )
+                ]
+            ],
         }
 
 
