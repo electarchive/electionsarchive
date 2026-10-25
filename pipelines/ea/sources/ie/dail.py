@@ -21,6 +21,7 @@ DERIVED = 1
 VOTES, REGISTERED, BALLOTS, VALID, INVALID, EXHAUSTED, QUOTA = 1, 2, 3, 4, 5, 21, 26
 DATASETS = "https://opendata.housing.gov.ie/dataset"
 ELECTIONS = {
+    2002: (date(2002, 5, 17), 1998, date(1998, 6, 16), 166),
     2007: (date(2007, 5, 24), 2005, date(2005, 7, 9), 166),
     2011: (date(2011, 2, 25), 2009, date(2009, 2, 24), 166),
     2016: (date(2016, 2, 26), 2013, date(2013, 3, 20), 158),
@@ -28,6 +29,7 @@ ELECTIONS = {
     2024: (date(2024, 11, 29), 2023, date(2023, 12, 19), 174),
 }
 ACTS = {
+    1998: "Electoral (Amendment) (No. 2) Act 1998",
     2005: "Electoral (Amendment) Act 2005",
     2009: "Electoral (Amendment) Act 2009",
     2013: "Electoral (Amendment) (Dáil Constituencies) Act 2013",
@@ -47,7 +49,7 @@ CSVS = {
     },
 }
 MEMBERS = "https://api.oireachtas.ie/v1/members?chamber=dail&house_no={house}&limit=1000"
-HOUSES = {2007: 30, 2011: 31, 2016: 32, 2020: 33, 2024: 34}
+HOUSES = {2002: 29, 2007: 30, 2011: 31, 2016: 32, 2020: 33, 2024: 34}
 FIRST_HOUSE = 29
 REGISTERED_NAMES = {
     "Anti-Austerity Alliance - People Before Profit": "Anti-Austerity Alliance–People Before Profit",
@@ -61,18 +63,98 @@ SUCCESSIONS = {
     2024: ("Solidarity - People Before Profit", "People Before Profit–Solidarity"),
 }
 ACT_NAMES = {
+    2002: (
+        "Carlow-Kilkenny",
+        "Cavan-Monaghan",
+        "Clare",
+        "Cork East",
+        "Cork North-Central",
+        "Cork North-West",
+        "Cork South-Central",
+        "Cork South-West",
+        "Donegal North-East",
+        "Donegal South-West",
+        "Dublin Central",
+        "Dublin Mid-West",
+        "Dublin North",
+        "Dublin North-Central",
+        "Dublin North-East",
+        "Dublin North-West",
+        "Dublin South",
+        "Dublin South-Central",
+        "Dublin South-East",
+        "Dublin South-West",
+        "Dublin West",
+        "Dún Laoghaire",
+        "Galway East",
+        "Galway West",
+        "Kerry North",
+        "Kerry South",
+        "Kildare North",
+        "Kildare South",
+        "Laoighis-Offaly",
+        "Limerick East",
+        "Limerick West",
+        "Longford-Roscommon",
+        "Louth",
+        "Mayo",
+        "Meath",
+        "Sligo-Leitrim",
+        "Tipperary North",
+        "Tipperary South",
+        "Waterford",
+        "Westmeath",
+        "Wexford",
+        "Wicklow",
+    ),
     2007: (
-        "Carlow-Kilkenny", "Cavan-Monaghan", "Clare", "Cork East", "Cork North-Central", "Cork North-West",
-        "Cork South-Central", "Cork South-West", "Donegal North-East", "Donegal South-West", "Dublin Central",
-        "Dublin Mid-West", "Dublin North", "Dublin North-Central", "Dublin North-East", "Dublin North-West",
-        "Dublin South", "Dublin South-Central", "Dublin South-East", "Dublin South-West", "Dublin West",
-        "Dún Laoghaire", "Galway East", "Galway West", "Kerry North", "Kerry South", "Kildare North",
-        "Kildare South", "Laois-Offaly", "Limerick East", "Limerick West", "Longford-Westmeath", "Louth", "Mayo",
-        "Meath East", "Meath West", "Roscommon-South Leitrim", "Sligo-North Leitrim", "Tipperary North",
-        "Tipperary South", "Waterford", "Wexford", "Wicklow",
+        "Carlow-Kilkenny",
+        "Cavan-Monaghan",
+        "Clare",
+        "Cork East",
+        "Cork North-Central",
+        "Cork North-West",
+        "Cork South-Central",
+        "Cork South-West",
+        "Donegal North-East",
+        "Donegal South-West",
+        "Dublin Central",
+        "Dublin Mid-West",
+        "Dublin North",
+        "Dublin North-Central",
+        "Dublin North-East",
+        "Dublin North-West",
+        "Dublin South",
+        "Dublin South-Central",
+        "Dublin South-East",
+        "Dublin South-West",
+        "Dublin West",
+        "Dún Laoghaire",
+        "Galway East",
+        "Galway West",
+        "Kerry North",
+        "Kerry South",
+        "Kildare North",
+        "Kildare South",
+        "Laois-Offaly",
+        "Limerick East",
+        "Limerick West",
+        "Longford-Westmeath",
+        "Louth",
+        "Mayo",
+        "Meath East",
+        "Meath West",
+        "Roscommon-South Leitrim",
+        "Sligo-North Leitrim",
+        "Tipperary North",
+        "Tipperary South",
+        "Waterford",
+        "Wexford",
+        "Wicklow",
     ),
 }
 PDFS = {
+    2002: "https://data.oireachtas.ie/ie/oireachtas/electoralProcess/electionResults/dail/2002/2002-07-21_dail-general-election-may-2002-results-and-transfer-of-votes_en.pdf",
     2007: "https://data.oireachtas.ie/ie/oireachtas/electoralProcess/electionResults/dail/2007/2007-10-23_dail-general-election-may-2007-results-and-transfer-of-votes_en.pdf",
     2011: "https://data.oireachtas.ie/ie/oireachtas/electoralProcess/electionResults/dail/2011/2011-05-23_dail-general-election-2011-results_en.pdf",
 }
@@ -105,10 +187,13 @@ PARTY_CODES = {
     "Independents 4 Change": "I4C",
 }
 NON_PARTY = "Non-Party"
-PARTY_OVERRIDES = {(2007, "Seamus Healy"): "Workers and Unemployed Action Group", (2011, "Seamus Healy"): "Workers and Unemployed Action Group"}
+PARTY_OVERRIDES = {
+    (2007, "Seamus Healy"): "Workers and Unemployed Action Group",
+    (2011, "Seamus Healy"): "Workers and Unemployed Action Group",
+}
 STATUTORY = {(2020, "Kildare South"): 4}
-CEANN_COMHAIRLE = {(2007, "Cavan-Monaghan"): 5, (2011, "Louth"): 5}
-AUTOMATIC = {(2007, "Cavan-Monaghan"): "Rory O'Hanlon", (2011, "Louth"): "Seamus Kirk"}
+CEANN_COMHAIRLE = {(2002, "Carlow-Kilkenny"): 5, (2007, "Cavan-Monaghan"): 5, (2011, "Louth"): 5}
+AUTOMATIC = {(2002, "Carlow-Kilkenny"): "Seamus Pattison", (2007, "Cavan-Monaghan"): "Rory O'Hanlon", (2011, "Louth"): "Seamus Kirk"}
 HYPHENS = {
     "Laois Offaly": "Laois-Offaly",
     "Roscommon - Galway": "Roscommon-Galway",
@@ -166,15 +251,23 @@ def tidy(text: str) -> str:
     if text != text.upper():
 
         def mixed(token: str) -> str:
+            if re.fullmatch(r"(?:[A-Za-z]\.){2,}", token):
+                return token.upper()
             if re.fullmatch(r"(Mc|Mac)[A-Z]{2,}", token):
                 return token[: token.index("c") + 1] + token[token.index("c") + 1 :].capitalize()
             if re.fullmatch(r"[A-Z]{2,}[a-z]+|[A-Z][a-z]+[A-Z]", token):
                 return token.capitalize()
             return token
 
-        return re.sub(r"O([’'])([a-z])", lambda m: "O" + m[1] + m[2].upper(), re.sub(r"[^\s'’\-]+", lambda m: mixed(m.group()), text))
+        return re.sub(
+            r"O([’'])([a-z])",
+            lambda m: "O" + m[1] + m[2].upper(),
+            re.sub(r"[^\s'’\-]+", lambda m: mixed(m.group()), text),
+        )
 
     def word(token: str) -> str:
+        if re.fullmatch(r"(?:[A-Za-z]\.){2,}", token):
+            return token.upper()
         token = token.capitalize()
         if re.match(r"^Mc[a-z]{2,}", token):
             token = "Mc" + token[2:].capitalize()
@@ -219,7 +312,9 @@ def parse() -> None:
         gender_key = next(c for c in people.columns if c.lower().startswith("gender"))
         by_candidate = {(r["Constituency Number"], r["Candidate Id"]): r for r in people.iter_rows(named=True)}
         labels = {
-            r["Constituency Number"]: HYPHENS.get(re.sub(r"\s+", " ", r["Constituency Name"]).strip(), re.sub(r"\s+", " ", r["Constituency Name"]).strip())
+            r["Constituency Number"]: HYPHENS.get(
+                re.sub(r"\s+", " ", r["Constituency Name"]).strip(), re.sub(r"\s+", " ", r["Constituency Name"]).strip()
+            )
             for r in count_rows.iter_rows(named=True)
         }
         for row in unit_rows.iter_rows(named=True):
@@ -227,9 +322,16 @@ def parse() -> None:
             seats_in = number(row["Seats in Constituency" if year == 2016 else "SeatsinConstit"])
             seats_in = STATUTORY.get((year, label), seats_in)
             contested = number(row["Number of Seats"])
-            valid, poll, spoiled, quota = number(row["Valid Poll"]), number(row["Total Poll"]), number(row["Spoiled"]), number(row["Quota"])
+            valid, poll, spoiled, quota = (
+                number(row["Valid Poll"]),
+                number(row["Total Poll"]),
+                number(row["Spoiled"]),
+                number(row["Quota"]),
+            )
             if poll != valid + spoiled or quota != valid // (contested + 1) + 1:
-                raise ValueError(f"{year} {label}: poll {poll}, valid {valid}, spoiled {spoiled}, quota {quota} do not tie")
+                raise ValueError(
+                    f"{year} {label}: poll {poll}, valid {valid}, spoiled {spoiled}, quota {quota} do not tie"
+                )
             units.append(
                 {
                     "year": year,
@@ -281,7 +383,9 @@ def parse() -> None:
     sheets = workbook.sheet_names
     codes = {
         str(r[0]).strip(): re.sub(r"\s+", " ", str(r[1])).strip()
-        for r in workbook.load_sheet_by_name("Party_Codes", header_row=None, dtype_coercion="coerce").to_polars().iter_rows()
+        for r in workbook.load_sheet_by_name("Party_Codes", header_row=None, dtype_coercion="coerce")
+        .to_polars()
+        .iter_rows()
         if r[0] not in (None, "")
     }
     stats = workbook.load_sheet_by_name("General Statistics 2024", header_row=None, dtype_coercion="coerce").to_polars()
@@ -293,7 +397,11 @@ def parse() -> None:
         rows = [list(r) for r in sheet.iter_rows()]
         header = next(i for i, r in enumerate(rows) if str(r[0]).startswith("NAMES OF CANDIDATES"))
         rounds = 0
-        while rounds + 2 < len(rows[header]) and rows[header][rounds + 2] not in (None, "") and "Count" in str(rows[header][rounds + 2]):
+        while (
+            rounds + 2 < len(rows[header])
+            and rows[header][rounds + 2] not in (None, "")
+            and "Count" in str(rows[header][rounds + 2])
+        ):
             rounds += 1
         quota = number(next(r[27] for r in rows[:8] if r[25] and "Quota" in str(r[25])))
         cursor = header + 2
@@ -321,12 +429,20 @@ def parse() -> None:
             )
             for count in range(1, rounds + 1):
                 counts.append(
-                    {"year": 2024, "constituency": label, "candidate": str(cursor), "count": count, "total": number(total[1 + count])}
+                    {
+                        "year": 2024,
+                        "constituency": label,
+                        "candidate": str(cursor),
+                        "count": count,
+                        "total": number(total[1 + count]),
+                    }
                 )
             cursor += 2
         nontransferable = rows[cursor + 1]
         for count in range(1, rounds + 1):
-            printed.append({"year": 2024, "constituency": label, "count": count, "value": number(nontransferable[1 + count])})
+            printed.append(
+                {"year": 2024, "constituency": label, "count": count, "value": number(nontransferable[1 + count])}
+            )
         valid = number(stat[7])
         if number(rows[cursor + 2][2]) != valid:
             raise ValueError(f"2024 {label}: printed totals differ from the valid poll")
@@ -364,7 +480,9 @@ def parse() -> None:
     count_frame = count_frame.with_columns(pl.col("candidate").cast(pl.String))
     for (year, name), party in PARTY_OVERRIDES.items():
         cand_frame = cand_frame.with_columns(
-            party=pl.when((pl.col("year") == year) & (pl.col("name") == name)).then(pl.lit(party)).otherwise(pl.col("party"))
+            party=pl.when((pl.col("year") == year) & (pl.col("name") == name))
+            .then(pl.lit(party))
+            .otherwise(pl.col("party"))
         )
     for u in unit_frame.iter_rows(named=True):
         key = (pl.col("year") == u["year"]) & (pl.col("constituency") == u["constituency"])
@@ -380,12 +498,20 @@ def parse() -> None:
         if any(b < a or a < 0 for a, b in zip(rest, rest[1:])) or rest[0] != 0:
             raise ValueError(f"{u['year']} {u['constituency']}: non-transferable papers {rest} are not cumulative")
         for row in printed:
-            if row["year"] == u["year"] and row["constituency"] == u["constituency"] and row["value"] != rest[row["count"] - 1]:
-                raise ValueError(f"{u['year']} {u['constituency']}: printed non-transferable differs at count {row['count']}")
+            if (
+                row["year"] == u["year"]
+                and row["constituency"] == u["constituency"]
+                and row["value"] != rest[row["count"] - 1]
+            ):
+                raise ValueError(
+                    f"{u['year']} {u['constituency']}: printed non-transferable differs at count {row['count']}"
+                )
         for winner in winners.iter_rows(named=True):
             series = lines.filter(pl.col("candidate") == winner["candidate"]).sort("count")["total"].to_list()
             if max(series) < u["quota"] and series[-1] == 0:
-                raise ValueError(f"{u['year']} {u['constituency']}: {winner['name']} elected below the quota and excluded")
+                raise ValueError(
+                    f"{u['year']} {u['constituency']}: {winner['name']} elected below the quota and excluded"
+                )
     seated: list[dict[str, object]] = []
     for house in range(FIRST_HOUSE, max(HOUSES.values()) + 1):
         for result in json.loads(raw.cached(SOURCE, MEMBERS.format(house=house)).path.read_bytes())["results"]:
@@ -405,9 +531,7 @@ def parse() -> None:
                         "start": term["dateRange"]["start"],
                     }
                 )
-    member_frame = pl.DataFrame(seated).with_columns(
-        original=pl.col("start") == pl.col("start").min().over("house")
-    )
+    member_frame = pl.DataFrame(seated).with_columns(original=pl.col("start") == pl.col("start").min().over("house"))
     links: list[dict[str, object]] = []
     for year, house in HOUSES.items():
         found: dict[tuple[str, str], list[dict[str, object]]] = {}
@@ -420,7 +544,15 @@ def parse() -> None:
                     own = other.head(1)
             if own["code"].n_unique() == 1:
                 found.setdefault((person["constituency"], own["code"][0]), []).append(
-                    {"year": year, "constituency": person["constituency"], "candidate": person["candidate"], "code": own["code"][0], "member_name": own["name"][0], "member_party": own["party"][-1], "party": person["party"]}
+                    {
+                        "year": year,
+                        "constituency": person["constituency"],
+                        "candidate": person["candidate"],
+                        "code": own["code"][0],
+                        "member_name": own["name"][0],
+                        "member_party": own["party"][-1],
+                        "party": person["party"],
+                    }
                 )
         for rows in found.values():
             if len(rows) > 1:
@@ -433,9 +565,9 @@ def parse() -> None:
     unit_frame.write_parquet(PARSED / "units.parquet")
     cand_frame.write_parquet(PARSED / "candidates.parquet")
     count_frame.write_parquet(PARSED / "counts.parquet")
-    pl.DataFrame(printed, schema={"year": pl.Int32, "constituency": pl.String, "count": pl.Int32, "value": pl.Int64}).write_parquet(
-        PARSED / "printed.parquet"
-    )
+    pl.DataFrame(
+        printed, schema={"year": pl.Int32, "constituency": pl.String, "count": pl.Int32, "value": pl.Int64}
+    ).write_parquet(PARSED / "printed.parquet")
 
 
 def emit() -> Path:
@@ -455,19 +587,28 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Dáil Éireann general elections 2011, 2016, 2020, and 2024 by constituency, with every STV count, from the Oireachtas results book and the Department of Housing's open data",
+            summary="Dáil Éireann general elections 2002, 2007, 2011, 2016, 2020, and 2024 by constituency, with every STV count, from the Oireachtas results book and the Department of Housing's open data",
             polity="IE",
         )
 
         def name(entity: UUID, text: str, lang: str = "en", kind: str = "official") -> None:
-            cs.add("name", entity_id=entity, text=text, lang=lang, kind=kind, is_preferred=kind == "official" and lang == "en")
+            cs.add(
+                "name",
+                entity_id=entity,
+                text=text,
+                lang=lang,
+                kind=kind,
+                is_preferred=kind == "official" and lang == "en",
+            )
 
         ireland = cs.polity("IE")
         nation = cs.area("ie.nation", "IE")
         if nation in cs.minted:
             raise ValueError("publish ie.returning_officer before the Dáil")
         if conn.execute("select 1 from scheme where code = 'ie.dail'").fetchone() is None:
-            cs.add("scheme", code="ie.dail", polity_id=ireland, kind="electoral_district", rank=1, noun="Dáil constituency")
+            cs.add(
+                "scheme", code="ie.dail", polity_id=ireland, kind="electoral_district", rank=1, noun="Dáil constituency"
+            )
         system = cs.key("ie.electoral_system", "dail-eireann")
         cs.add(
             "electoral_system",
@@ -502,7 +643,9 @@ def emit() -> Path:
             known.setdefault(fold(text), []).append(party)
         strays = {
             str(value): entity
-            for value, entity in conn.execute("select value, entity_id from external_id where scheme = 'ie.dail.party'").fetchall()
+            for value, entity in conn.execute(
+                "select value, entity_id from external_id where scheme = 'ie.dail.party'"
+            ).fetchall()
         }
         parties: dict[str, UUID | None] = {}
 
@@ -589,7 +732,9 @@ def emit() -> Path:
                 cs.artifact(raw.cached(SOURCE, MEMBERS.format(house=HOUSES[year])), api)
 
             election = cs.key("ie.election", f"{day}:dail-eireann")
-            cs.add("election", id=election, polity_id=ireland, kind="general", date_from=day, date_to=day, status="held")
+            cs.add(
+                "election", id=election, polity_id=ireland, kind="general", date_from=day, date_to=day, status="held"
+            )
             name(election, f"{year} Irish general election")
             path = f"ie/{day}-general"
             cs.add("slug", path=path, entity_id=election)
@@ -711,7 +856,11 @@ def emit() -> Path:
                     )
                     if person not in added:
                         added.add(person)
-                        cs.add("person", id=person, gender={"M": "male", "F": "female"}.get(str(candidate["gender"]).strip()[:1].upper()))
+                        cs.add(
+                            "person",
+                            id=person,
+                            gender={"M": "male", "F": "female"}.get(str(candidate["gender"]).strip()[:1].upper()),
+                        )
                         name(person, shown_name)
                     cs.add(
                         "contest_option",
@@ -827,10 +976,13 @@ def emit() -> Path:
         pl.DataFrame(roster).write_parquet(PARSED / "roster.parquet")
         for year, (before, after) in SUCCESSIONS.items():
             successor, predecessor = party_id(after), party_id(before)
-            if conn.execute(
-                "select 1 from party_relation where from_party_id = %s and to_party_id = %s and kind = 'successor_of'",
-                [successor, predecessor],
-            ).fetchone() is None:
+            if (
+                conn.execute(
+                    "select 1 from party_relation where from_party_id = %s and to_party_id = %s and kind = 'successor_of'",
+                    [successor, predecessor],
+                ).fetchone()
+                is None
+            ):
                 cs.add(
                     "party_relation",
                     from_party_id=successor,
@@ -845,5 +997,11 @@ def emit() -> Path:
                where n.entity_id = any(%s) and n.kind = 'caveat' and c.pipeline = %s""",
             [[row["id"] for row in cs.rows["result_set"]], SOURCE],
         ).fetchall():
-            cs.add("note_drop", note_id=note, entity_id=entity, body_md=text, reason="A re-emit writes the result set's caveats afresh.")
+            cs.add(
+                "note_drop",
+                note_id=note,
+                entity_id=entity,
+                body_md=text,
+                reason="A re-emit writes the result set's caveats afresh.",
+            )
         return cs.write()

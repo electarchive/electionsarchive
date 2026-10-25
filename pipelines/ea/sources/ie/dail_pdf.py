@@ -2,6 +2,7 @@ import html
 import re
 import statistics
 import subprocess
+import unicodedata
 from statistics import median
 
 ORDINALS = [
@@ -271,6 +272,7 @@ ABBREVIATIONS = {
     "SKI": "South Kerry Independent Alliance",
     "NONP": "Non-Party",
     "PD": "Progressive Democrats",
+    "NONPARTY": "Non-Party",
 }
 
 
@@ -335,6 +337,114 @@ def finish(book: dict[str, object], year: int, abbreviations: dict[str, str]) ->
     return {**book, "candidates": candidates, "elected": elected, "rounds": rounds}
 
 
+LAYOUT_LABELS = (
+    "TOTAL ELECTORATE",
+    "INVALID BALLOT PAPERS",
+    "VALID POLL",
+    "NUMBER OF SEATS",
+    "QUOTA",
+    "CONSTITUENCY OF",
+    "GENERAL ELECTION",
+    "NAMES OF CANDIDATES ELECTED",
+)
+CELL = re.compile(r"^(?:\d[\d,]*|—)$")
+
+
+def read_book_2002(pdf: str) -> list[dict[str, object]]:
+    text = subprocess.run(["pdftotext", "-layout", pdf, "-"], check=True, capture_output=True, text=True).stdout
+    text = unicodedata.normalize("NFC", text).replace("ı\u0301", "í").replace("ı", "i")
+    books: list[dict[str, object]] = []
+    for page_number, page in enumerate(text.split("\f"), 1):
+        if "NAMES OF CANDIDATES ELECTED" not in page or "CONSTITUENCY OF" not in page or "Transfer of" not in page:
+            continue
+        lines = page.splitlines()
+        header = next(i for i, line in enumerate(lines) if re.search(r"\bFirst\b", line) and "Count" in "".join(lines[i : i + 2]))
+        head = lines[:header]
+        title = next(line for line in head if "NAMES OF CANDIDATES ELECTED" in line).index("NAMES OF CANDIDATES ELECTED")
+        values: dict[str, int] = {}
+        for key, label in (
+            ("electorate", "TOTAL ELECTORATE"),
+            ("invalid", "INVALID BALLOT PAPERS"),
+            ("valid", "VALID POLL"),
+            ("seats", "NUMBER OF SEATS"),
+            ("quota", "QUOTA"),
+        ):
+            values[key] = number(re.search(rf"{label}\s+(\d[\d,]*)", page).group(1))
+        constituency = ""
+        elected: list[str] = []
+        automatic: list[str] = []
+        for line in head:
+            for match in re.finditer(r"\S+(?: \S+)*", line):
+                chunk = match[0]
+                if any(label in chunk for label in LAYOUT_LABELS) or re.fullmatch(r"[\d,]+", chunk):
+                    continue
+                if not re.search(r"[A-Za-zÀ-ÿ]", chunk) or chunk.startswith("Page ") or chunk == "CYANBLACK":
+                    continue
+                if match.start() >= title - 25:
+                    (automatic if chunk.startswith("†") else elected).append(chunk.lstrip("† "))
+                elif match.start() < title - 40 and re.fullmatch(r"[A-ZÚÁÉÍÓ\- ]+", chunk) and not constituency:
+                    constituency = chunk
+        constituency = re.sub(r"\s*-\s*", "-", constituency).strip()
+        rounds = max(
+            ORDINALS.index(word) + 1 for line in lines[header : header + 2] for word in re.findall(r"[A-Z][a-z-]+", line) if word in ORDINALS
+        )
+        names: list[str] = []
+        series: list[dict[int, int]] = []
+        nt: dict[int, int] = {}
+        total: dict[int, int] = {}
+        awaiting = False
+        for line in lines[header + 1 :]:
+            stripped = re.sub(r"^\d+\s+(?=[A-Za-z])", "", line.strip())
+            if not stripped:
+                continue
+            if "†Deemed" in stripped:
+                break
+            tokens = re.split(r"\s+", stripped)
+            cells = [t for t in tokens if CELL.match(t)]
+            is_numbers = len(cells) == len(tokens)
+            if awaiting and is_numbers and len(cells) == rounds:
+                nt.update({i + 1: 0 if c == "—" else number(c) for i, c in enumerate(cells)})
+                awaiting = False
+                continue
+            if stripped.upper().startswith("NON-TRANSFER"):
+                inline = tokens[len(tokens) - rounds :]
+                if all(CELL.match(t) for t in inline):
+                    nt.update({i + 1: 0 if c == "—" else number(c) for i, c in enumerate(inline)})
+                else:
+                    awaiting = True
+                continue
+            if stripped.startswith("TOTAL"):
+                total.update({i + 1: number(c) for i, c in enumerate(cells)})
+                continue
+            if is_numbers or all(t[:1] in "+−-" for t in tokens if t) or len(cells) < rounds:
+                continue
+            tail = tokens[len(tokens) - rounds :]
+            if not all(CELL.match(t) for t in tail):
+                continue
+            label = " ".join(tokens[: len(tokens) - rounds]).strip()
+            if not label or "," not in label:
+                continue
+            row = {i + 1: 0 if c == "—" else number(c) for i, c in enumerate(tail)}
+            if label.endswith("†"):
+                continue
+            names.append(label)
+            series.append(row)
+        books.append(
+            {
+                "constituency": constituency,
+                "elected": elected,
+                "automatic": automatic,
+                "names": names,
+                "series": series,
+                "nt": nt,
+                "total": total,
+                "page": page_number,
+                **values,
+            }
+        )
+    return books
+
+
 def rows(pdf: str, year: int, names: tuple[str, ...] = ()) -> dict[str, list[dict[str, object]]]:
     statutory: dict[str, tuple[str, int]] = {fold(n): (n, 0) for n in names}
     for words in read_pages(pdf) if not names else ():
@@ -347,8 +457,8 @@ def rows(pdf: str, year: int, names: tuple[str, ...] = ()) -> dict[str, list[dic
     candidates: list[dict[str, object]] = []
     counts: list[dict[str, object]] = []
     printed: list[dict[str, object]] = []
-    for book in read_book(pdf):
-        done = finish(assemble(book), year, ABBREVIATIONS)
+    for book in read_book_2002(pdf) if year == 2002 else read_book(pdf):
+        done = finish(book if year == 2002 else assemble(book), year, ABBREVIATIONS)
         label, total_seats = statutory[fold(str(done["constituency"]))]
         total_seats = int(done["seats"])
         valid, invalid = int(done["valid"]), int(done["invalid"])
