@@ -384,9 +384,10 @@ export async function chamber(path: string) {
       slug: segments.at(-1) ?? "",
     }),
   );
-  const [body, record] = await Promise.all([
+  const [body, record, council] = await Promise.all([
     call(router.bodies.get, { id }),
     call(router.polities.record, { id: polity, body: id }),
+    call(router.seats.council, { id }),
   ]);
   const size = (on: string) =>
     (
@@ -524,6 +525,7 @@ export async function chamber(path: string) {
     kind: "chamber" as const,
     id,
     body,
+    council,
     terms,
     basis: isSeated
       ? earlier.length > 0 || later.length > 0

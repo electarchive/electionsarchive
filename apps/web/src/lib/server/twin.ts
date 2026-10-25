@@ -3738,7 +3738,13 @@ function sourcesMarkdown(
 }
 
 function chamberMarkdown(
-  { body, terms, parties, members }: Extract<Data, { kind: "chamber" }>,
+  {
+    body,
+    terms,
+    parties,
+    members,
+    council,
+  }: Extract<Data, { kind: "chamber" }>,
   link: Link,
 ) {
   const KINDS: Record<string, () => string> = {
@@ -3767,6 +3773,120 @@ function chamberMarkdown(
         (a.place ?? "").localeCompare(b.place ?? "") ||
         (a.from ?? "").localeCompare(b.from ?? ""),
     );
+  const isParty = council == null || council.isPartisan;
+  const partyOf = new Map(
+    (council?.parties ?? []).map((party) => [party.id, party.label]),
+  );
+  const year = (value: string | null) => value?.slice(0, 4) ?? "";
+  const latest =
+    council?.elections.find((election) => !election.isMinor)?.date ?? "";
+  const councilBlocks =
+    council == null
+      ? []
+      : [
+          `## ${m.council_members_title()}`,
+          m.council_members_lede(),
+          table(
+            [
+              m.council_col_seat(),
+              m.council_col_member(),
+              ...(council.isPartisan ? [m.col_party()] : []),
+              m.council_col_since(),
+              m.council_col_wins(),
+            ],
+            council.seats
+              .filter((seat) => seat.isCurrent)
+              .flatMap((seat) => {
+                const holder = seat.holders.at(-1);
+                return holder == null
+                  ? []
+                  : [
+                      [
+                        seat.label,
+                        `${holder.person == null ? holder.name : link(holder.name, `id/${holder.person}`)}${holder.wins === 1 && holder.from >= latest ? ` (${m.council_new()})` : ""}`,
+                        ...(council.isPartisan
+                          ? [
+                              holder.party == null
+                                ? m.record_none()
+                                : (partyOf.get(holder.party) ?? ""),
+                            ]
+                          : []),
+                        year(holder.from),
+                        count(holder.wins),
+                      ],
+                    ];
+              }),
+          ),
+          `## ${m.council_changes_title()}`,
+          m.council_changes_lede(),
+          table(
+            [
+              m.col_date(),
+              m.chamber_elected(),
+              m.council_col_filled(),
+              m.council_col_held(),
+              m.council_col_open(),
+              m.council_col_defeated(),
+              m.council_col_runoffs(),
+            ],
+            council.elections.map((election) => [
+              date(election.date),
+              `${link(election.name, election.path)}${election.isSpecial ? ` (${m.council_special()})` : ""}`,
+              count(election.up),
+              count(election.held),
+              count(election.open),
+              count(election.defeated),
+              count(election.runoffs),
+            ]),
+          ),
+          ...council.elections
+            .filter((election) => election.changes.length > 0)
+            .flatMap((election) => [
+              `### ${election.name}, ${date(election.date)}`,
+              election.changes
+                .map(
+                  (change) =>
+                    `- ${link(change.seat, change.path)}: ${
+                      change.kind === "new" || change.previous == null
+                        ? m.council_change_new({ winner: change.winner.name })
+                        : (change.kind === "defeated"
+                            ? m.council_change_defeated
+                            : m.council_change_open)({
+                            winner: change.winner.name,
+                            previous: change.previous.name,
+                          })
+                    }`,
+                )
+                .join("\n"),
+            ]),
+          `## ${m.council_holders_title()}`,
+          `${m.council_holders_lede()}${body.tenures > 0 ? "" : ` ${m.council_tenures_note()}`}`,
+          council.seats
+            .map(
+              (seat) =>
+                `- ${seat.label}: ${seat.holders
+                  .map(
+                    (holder) =>
+                      `${holder.name}${holder.via === "special" ? `, ${m.council_special().toLocaleLowerCase()}` : ""} (${holder.until == null ? m.polity_span({ first: year(holder.from), last: m.governments_present() }) : year(holder.from) === year(holder.until) ? year(holder.from) : m.polity_span({ first: year(holder.from), last: year(holder.until) })}${holder.wins > 1 ? `, ${m.council_wins({ count: holder.wins })}` : ""})`,
+                  )
+                  .join("; ")}`,
+            )
+            .join("\n"),
+          ...(council.sizes.length === 0
+            ? []
+            : [
+                `## ${m.council_sizes_title()}`,
+                m.council_sizes_lede({
+                  year: year(council.sizes[0]?.from ?? null),
+                }),
+                council.sizes
+                  .map(
+                    (size) =>
+                      `- ${m.council_size_entry({ seats: count(size.seats), year: year(size.from) })}`,
+                  )
+                  .join("\n"),
+              ]),
+        ];
   return [
     `# ${body.name}`,
     byline(body.crumbs, link, null),
@@ -3774,64 +3894,71 @@ function chamberMarkdown(
       kind: (KINDS[body.kind] ?? m.chamber_kind_other)(),
       polity: link(body.polity.name, body.polity.path),
     }),
-    `## ${m.chamber_makeup_title()}`,
-    terms.length === 0
-      ? m.chamber_no_election()
-      : table(
-          [
-            m.col_date(),
-            m.chamber_elected(),
-            m.chamber_seats(),
-            m.chamber_largest(),
-          ],
-          terms.toReversed().map((term) => {
-            const seats = new Map<string | null, number>();
-            for (const entry of term.parties) {
-              const key = caucuses.get(entry.party ?? "") ?? entry.party;
-              seats.set(key, (seats.get(key) ?? 0) + entry.seats);
-            }
-            const largest = [...seats]
-              .map(([party, held]) => ({ party, seats: held }))
-              .toSorted((a, b) => b.seats - a.seats)[0];
-            return [
-              date(term.start),
-              term.election == null
-                ? null
-                : link(term.election.name, term.election.path),
-              count(term.size ?? term.total),
-              largest == null
-                ? null
-                : `${label(largest.party)} (${count(largest.seats)})`,
-            ];
-          }),
-        ),
-    ...(sitting.length === 0
-      ? []
-      : [
-          `## ${(members?.isSeated === true ? m.chamber_members_title : m.chamber_members_returned)({ span: first === final ? first : m.polity_span({ first, last: final }) })}`,
-          sitting.some((member) => member.from != null || member.to != null)
-            ? table(
-                [
-                  m.col_name(),
-                  m.col_party(),
-                  m.chamber_joined(),
-                  m.chamber_left(),
-                ],
-                sitting.map((member) => [
-                  `${link(member.name, `id/${member.person}`)}${member.place == null ? "" : ` (${link(member.place, member.path)})`}`,
-                  label(effective(member)),
-                  date(member.from),
-                  date(member.to),
-                ]),
-              )
+    ...(isParty
+      ? [
+          `## ${m.chamber_makeup_title()}`,
+          terms.length === 0
+            ? m.chamber_no_election()
             : table(
-                [m.col_name(), m.col_party()],
-                sitting.map((member) => [
-                  `${link(member.name, `id/${member.person}`)}${member.place == null ? "" : ` (${link(member.place, member.path)})`}`,
-                  label(effective(member)),
-                ]),
+                [
+                  m.col_date(),
+                  m.chamber_elected(),
+                  m.chamber_seats(),
+                  m.chamber_largest(),
+                ],
+                terms.toReversed().map((term) => {
+                  const seats = new Map<string | null, number>();
+                  for (const entry of term.parties) {
+                    const key = caucuses.get(entry.party ?? "") ?? entry.party;
+                    seats.set(key, (seats.get(key) ?? 0) + entry.seats);
+                  }
+                  const largest = [...seats]
+                    .map(([party, held]) => ({ party, seats: held }))
+                    .toSorted((a, b) => b.seats - a.seats)[0];
+                  return [
+                    date(term.start),
+                    term.election == null
+                      ? null
+                      : link(term.election.name, term.election.path),
+                    count(term.size ?? term.total),
+                    largest == null
+                      ? null
+                      : `${label(largest.party)} (${count(largest.seats)})`,
+                  ];
+                }),
               ),
-        ]),
+          ...(sitting.length === 0 || council != null
+            ? []
+            : [
+                `## ${(members?.isSeated === true ? m.chamber_members_title : m.chamber_members_returned)({ span: first === final ? first : m.polity_span({ first, last: final }) })}`,
+                sitting.some(
+                  (member) => member.from != null || member.to != null,
+                )
+                  ? table(
+                      [
+                        m.col_name(),
+                        m.col_party(),
+                        m.chamber_joined(),
+                        m.chamber_left(),
+                      ],
+                      sitting.map((member) => [
+                        `${link(member.name, `id/${member.person}`)}${member.place == null ? "" : ` (${link(member.place, member.path)})`}`,
+                        label(effective(member)),
+                        date(member.from),
+                        date(member.to),
+                      ]),
+                    )
+                  : table(
+                      [m.col_name(), m.col_party()],
+                      sitting.map((member) => [
+                        `${link(member.name, `id/${member.person}`)}${member.place == null ? "" : ` (${link(member.place, member.path)})`}`,
+                        label(effective(member)),
+                      ]),
+                    ),
+              ]),
+        ]
+      : []),
+    ...councilBlocks,
   ].filter((block) => block !== "");
 }
 

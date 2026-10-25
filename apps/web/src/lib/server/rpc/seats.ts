@@ -10,6 +10,491 @@ import { inside, latest, names, paths, refs } from "#lib/server/rpc/archive.js";
 const fold = (key: string) => (key.startsWith("person:") ? "independent" : key);
 
 export const seats = {
+  council: os
+    .meta(
+      openapi({
+        method: "GET",
+        path: "/bodies/{id}/council",
+        summary:
+          "A local council seat by seat: each seat's holders from the elections that filled it, each election's re-elected members, open seats, defeated incumbents, and runoffs, and the council's size over time",
+      }),
+    )
+    .input(v.object({ id: v.pipe(v.string(), v.uuid()) }))
+    .output(
+      v.nullable(
+        v.object({
+          isPartisan: v.boolean(),
+          parties: v.array(
+            v.object({
+              id: v.string(),
+              label: v.string(),
+              short: v.nullable(v.string()),
+              color: v.nullable(v.string()),
+            }),
+          ),
+          seats: v.array(
+            v.object({
+              key: v.string(),
+              label: v.string(),
+              isCurrent: v.boolean(),
+              holders: v.array(
+                v.object({
+                  person: v.nullable(v.string()),
+                  name: v.string(),
+                  party: v.nullable(v.string()),
+                  from: v.string(),
+                  until: v.nullable(v.string()),
+                  wins: v.number(),
+                  via: v.picklist(["elected", "runoff", "special"]),
+                  path: v.nullable(v.string()),
+                }),
+              ),
+            }),
+          ),
+          elections: v.array(
+            v.object({
+              date: v.string(),
+              name: v.string(),
+              path: v.nullable(v.string()),
+              isSpecial: v.boolean(),
+              isMinor: v.boolean(),
+              up: v.number(),
+              held: v.number(),
+              open: v.number(),
+              defeated: v.number(),
+              runoffs: v.number(),
+              changes: v.array(
+                v.object({
+                  seat: v.string(),
+                  path: v.nullable(v.string()),
+                  kind: v.picklist(["open", "defeated", "new"]),
+                  isRunoff: v.boolean(),
+                  winner: v.object({
+                    person: v.nullable(v.string()),
+                    name: v.string(),
+                    party: v.nullable(v.string()),
+                  }),
+                  previous: v.nullable(
+                    v.object({
+                      person: v.nullable(v.string()),
+                      name: v.string(),
+                      party: v.nullable(v.string()),
+                    }),
+                  ),
+                }),
+              ),
+            }),
+          ),
+          sizes: v.array(
+            v.object({
+              seats: v.number(),
+              from: v.string(),
+              to: v.nullable(v.string()),
+            }),
+          ),
+        }),
+      ),
+    )
+    .handler(async ({ input }) => {
+      const id = input.id.toLowerCase();
+      const found = await db.execute<{
+        contest: string;
+        election: string;
+        date: string;
+        isSpecial: boolean;
+        isPrimary: boolean;
+        kind: string;
+        round: number;
+        prior: string | null;
+        area: string | null;
+        isWide: boolean;
+        segment: string;
+        person: string | null;
+        label: string | null;
+        party: string | null;
+        outcome: string | null;
+        votes: number | null;
+      }>(sql`
+        with cs as materialized (
+          select c.id, c.election_id, e.date_from, e.kind = 'special' or c.term = 'remainder' as special, e.kind = 'primary' as primary,
+            c.round_number, c.previous_round_id, c.district_area_id,
+            c.district_area_id is null or c.district_area_id = (
+              select pt.area_id from polity_territory pt where pt.polity_id = b.polity_id and pt.valid @> e.date_from limit 1
+            ) as wide,
+            (select split_part(s.path, '/', -1) from slug s where s.entity_id = c.id and s.is_current limit 1) as segment
+          from body b
+          join polity p on p.id = b.polity_id and p.kind in ('municipality', 'submunicipal', 'county', 'school_district', 'special_district')
+          join contest c on c.body_id = b.id
+          join election e on e.id = c.election_id and e.status = 'held'
+          where b.id = ${id}::uuid and c.allocation_parent_id is null and c.party_scope_id is null
+            and not c.notional and c.kind = 'body_seats' and c.magnitude = 1
+        )
+        select cs.id::text as contest, cs.election_id::text as election, cs.date_from::text as date, cs.special as "isSpecial",
+          cs.primary as "isPrimary", o.kind::text as kind, cs.round_number as round, cs.previous_round_id::text as prior, cs.district_area_id::text as area, cs.wide as "isWide",
+          coalesce(cs.segment, '') as segment, ca.person_id::text as person, coalesce(ca.ballot_name, o.ballot_label) as label,
+          coalesce(o.party_id, ca.member_of_party_id, (
+            select k.party_id from contest_option k where k.parent_option_id = o.id and k.party_id is not null
+            order by k.ballot_position nulls last, k.k limit 1
+          ))::text as party,
+          w.kind::text as outcome, t.votes
+        from cs
+        join contest_option o on o.contest_id = cs.id and o.parent_option_id is null
+        left join candidacy ca on ca.option_id = o.id
+        left join lateral (
+          select rs.id, rs.k from result_set rs where rs.contest_id = cs.id and ${latest("rs")} limit 1
+        ) rs on true
+        left join lateral (
+          select w.kind from outcome w where w.result_set_id = rs.id and w.option_id = o.id limit 1
+        ) w on true
+        left join lateral (
+          select sum(y.value)::float8 as votes from area a
+          cross join lateral (
+            select y.value from result_rollup y
+            where y.result_set_k = rs.k and y.area_k = a.k and y.option_k = o.k and y.measure = 1
+              and y.count_round = (select max(z.count_round) from result_rollup z where z.result_set_k = rs.k and z.area_k = a.k and z.measure = 1 offset 0)
+            offset 0
+          ) y
+          where a.id = cs.district_area_id
+        ) t on true
+      `);
+      if (found.rows.length === 0) {
+        return null;
+      }
+      const contests = Map.groupBy(found.rows, (row) => row.contest);
+      const later = new Set(found.rows.flatMap((row) => row.prior ?? []));
+      const [labels, slugs, colors] = await Promise.all([
+        names([
+          ...new Set([
+            id,
+            ...found.rows.flatMap((row) => [
+              row.election,
+              row.contest,
+              ...(row.area == null ? [] : [row.area]),
+              ...(row.person == null ? [] : [row.person]),
+            ]),
+          ]),
+        ]),
+        paths([
+          ...new Set(found.rows.flatMap((row) => [row.contest, row.election])),
+        ]),
+        refs(found.rows.flatMap((row) => row.party ?? [])),
+      ]);
+      const body = labels.full.get(id) ?? "";
+      const strip = (text: string) =>
+        text.startsWith(`${body}, `) ? text.slice(body.length + 2) : text;
+      const first = (contest: string) => {
+        let current = contests.get(contest)?.[0];
+        while (current?.prior != null && contests.has(current.prior)) {
+          current = contests.get(current.prior)?.[0];
+        }
+        return current;
+      };
+      const person = (row: (typeof found.rows)[number]) => ({
+        person: row.person,
+        name: labels.full.get(row.person ?? "") ?? row.label ?? "",
+        party: row.party,
+      });
+      const decided = contests
+        .entries()
+        .filter(([contest]) => !later.has(contest))
+        .flatMap(([contest, rows]) => {
+          let sum = 0;
+          for (const row of rows) {
+            sum += row.votes ?? 0;
+          }
+          const ranked = rows
+            .filter((row) => row.kind === "candidate")
+            .toSorted((a, b) => (b.votes ?? 0) - (a.votes ?? 0));
+          const declared = ranked.find(
+            (row) => row.outcome === "elected" || row.outcome === "won",
+          );
+          const top = ranked[0];
+          const isRunoff = (rows[0]?.round ?? 1) > 1;
+          const isOpen =
+            rows[0]?.isPrimary !== true &&
+            rows.every((row) => row.outcome == null);
+          const winner =
+            declared ??
+            (isOpen &&
+            top != null &&
+            (isRunoff || ranked.length === 1 || (top.votes ?? 0) > 0.5 * sum)
+              ? top
+              : undefined);
+          const head = first(contest);
+          if (winner == null || head == null) {
+            return [];
+          }
+          const ran = [
+            ...rows,
+            ...(head.contest === contest
+              ? []
+              : (contests.get(head.contest) ?? [])),
+          ].map((row) => person(row));
+          const key = head.isWide
+            ? head.segment.replace(/-short-term$/u, "")
+            : (labels.full.get(head.area ?? "") ?? head.segment);
+          const label = head.isWide
+            ? (labels.full.get(head.contest) ?? head.segment)
+                .replace(/^\d{4} /u, "")
+                .replace(`${body} election, `, "")
+                .replace(`${body}, `, "")
+                .replace(/ election$/u, "")
+            : strip(labels.full.get(head.area ?? "") ?? head.segment);
+          return [
+            {
+              key,
+              label,
+              contest,
+              path: slugs.get(contest) ?? null,
+              election: head.election,
+              date: head.date,
+              decidedOn: rows[0]?.date ?? head.date,
+              isSpecial: head.isSpecial,
+              isMinor: head.isSpecial,
+              isWide: head.isWide,
+              isRunoff,
+              winner: person(winner),
+              ran,
+            },
+          ];
+        })
+        .toArray()
+        .toSorted((a, b) => a.decidedOn.localeCompare(b.decidedOn));
+      const norm = (name: string) => {
+        const tokens = name
+          .normalize("NFD")
+          .replaceAll(/\p{M}/gu, "")
+          .toLocaleLowerCase()
+          .replaceAll(/(['"‘’“”]).*?\1|\(.*?\)/gu, " ")
+          .split(/[^\p{L}\p{N}]+/u)
+          .filter(
+            (token) =>
+              token.length > 1 &&
+              !["jr", "sr", "ii", "iii", "iv"].includes(token),
+          );
+        return tokens.length < 2
+          ? name.toLocaleLowerCase()
+          : `${tokens[0] ?? ""} ${tokens.at(-1) ?? ""}`;
+      };
+      const same = (
+        a: { person: string | null; name: string },
+        b: { person: string | null; name: string },
+      ) =>
+        (a.person != null && a.person === b.person) ||
+        (a.name !== "" && norm(a.name) === norm(b.name));
+      const filled = Map.groupBy(decided, (entry) => entry.election);
+      let typical = 0;
+      for (const rows of filled.values()) {
+        typical = Math.max(typical, rows.length);
+      }
+      for (const rows of filled.values()) {
+        if (rows.length <= Math.max(2, 0.15 * typical)) {
+          for (const entry of rows) {
+            entry.isMinor = true;
+          }
+        }
+      }
+      const seats = new Map<
+        string,
+        {
+          key: string;
+          label: string;
+          isWide: boolean;
+          last: string;
+          holders: Array<{
+            person: string | null;
+            name: string;
+            party: string | null;
+            from: string;
+            until: string | null;
+            wins: number;
+            via: "elected" | "runoff" | "special";
+            path: string | null;
+          }>;
+        }
+      >();
+      const elections = new Map<
+        string,
+        {
+          date: string;
+          name: string;
+          path: string | null;
+          isSpecial: boolean;
+          isMinor: boolean;
+          up: number;
+          held: number;
+          open: number;
+          defeated: number;
+          runoffs: number;
+          changes: Array<{
+            seat: string;
+            path: string | null;
+            kind: "open" | "defeated" | "new";
+            isRunoff: boolean;
+            winner: {
+              person: string | null;
+              name: string;
+              party: string | null;
+            };
+            previous: {
+              person: string | null;
+              name: string;
+              party: string | null;
+            } | null;
+          }>;
+        }
+      >();
+      const opening = decided[0]?.date ?? "";
+      for (const entry of decided) {
+        const seat = seats.get(entry.key) ?? {
+          key: entry.key,
+          label: entry.label,
+          isWide: entry.isWide,
+          last: entry.date,
+          holders: [],
+        };
+        seats.set(entry.key, seat);
+        const before = seat.holders.at(-1);
+        const election = elections.get(entry.election) ?? {
+          date: entry.date,
+          name: labels.full.get(entry.election) ?? "",
+          path: slugs.get(entry.election) ?? null,
+          isSpecial: entry.isSpecial,
+          isMinor: entry.isMinor,
+          up: 0,
+          held: 0,
+          open: 0,
+          defeated: 0,
+          runoffs: 0,
+          changes: [],
+        };
+        elections.set(entry.election, election);
+        election.up += 1;
+        election.runoffs += Number(entry.isRunoff);
+        const isSame = before != null && same(before, entry.winner);
+        if (before != null && isSame) {
+          election.held += 1;
+          before.wins += 1;
+        } else {
+          if (before != null) {
+            before.until = entry.decidedOn;
+          }
+          seat.holders.push({
+            ...entry.winner,
+            from: entry.decidedOn,
+            until: null,
+            wins: 1,
+            via: entry.isSpecial
+              ? "special"
+              : entry.isRunoff
+                ? "runoff"
+                : "elected",
+            path: entry.path,
+          });
+          if (before == null && entry.date === opening) {
+            continue;
+          }
+          const kind =
+            before == null
+              ? ("new" as const)
+              : entry.ran.some((row) => same(row, before))
+                ? ("defeated" as const)
+                : ("open" as const);
+          election.open += Number(kind !== "defeated");
+          election.defeated += Number(kind === "defeated");
+          election.changes.push({
+            seat: entry.label,
+            path: entry.path,
+            kind,
+            isRunoff: entry.isRunoff,
+            winner: entry.winner,
+            previous:
+              before == null
+                ? null
+                : {
+                    person: before.person,
+                    name: before.name,
+                    party: before.party,
+                  },
+          });
+        }
+        if (!entry.isMinor) {
+          seat.last = entry.date;
+        }
+      }
+      const regular = decided.filter((entry) => !entry.isMinor);
+      const spans = new Map<string, { first: number; last: number }>();
+      const gaps: Array<number> = [];
+      for (const [key, rows] of Map.groupBy(regular, (entry) => entry.key)) {
+        const dates = [...new Set(rows.map((entry) => Date.parse(entry.date)))];
+        for (let at = 1; at < dates.length; at += 1) {
+          gaps.push((dates[at] ?? 0) - (dates[at - 1] ?? 0));
+        }
+        spans.set(key, { first: dates[0] ?? 0, last: dates.at(-1) ?? 0 });
+      }
+      const window =
+        (gaps.toSorted((a, b) => a - b)[Math.floor(gaps.length * 0.75)] ??
+          4 * 3.156e10) * 1.25;
+      const newest = Date.parse(regular.at(-1)?.date ?? "");
+      const start = Date.parse(regular[0]?.date ?? "") + window / 1.25 - 3.9e9;
+      const sizes: Array<{ seats: number; from: string; to: string | null }> =
+        [];
+      for (const day of new Set(regular.map((entry) => entry.date))) {
+        const at = Date.parse(day);
+        if (at < start) {
+          continue;
+        }
+        let alive = 0;
+        for (const span of spans.values()) {
+          alive += Number(span.first <= at && at - span.last < window);
+        }
+        const last = sizes.at(-1);
+        if (last?.seats === alive) {
+          continue;
+        }
+        if (last != null && last.from.slice(0, 4) === day.slice(0, 4)) {
+          sizes.pop();
+        }
+        const prior = sizes.at(-1);
+        if (prior?.seats === alive) {
+          prior.to = null;
+          continue;
+        }
+        if (prior != null) {
+          prior.to = day;
+        }
+        sizes.push({ seats: alive, from: day, to: null });
+      }
+      const winners = regular
+        .filter((entry) => entry.date === regular.at(-1)?.date)
+        .map((entry) => entry.winner);
+      const isPartisan =
+        winners.filter((entry) => entry.party != null).length >
+        0.5 * winners.length;
+      return {
+        isPartisan,
+        parties: [...colors.values()],
+        seats: seats
+          .values()
+          .toArray()
+          .toSorted(
+            (a, b) =>
+              Number(a.isWide) - Number(b.isWide) ||
+              a.label.localeCompare(b.label, undefined, { numeric: true }),
+          )
+          .map((seat) => ({
+            key: seat.key,
+            label: seat.label,
+            isCurrent: newest - Date.parse(seat.last) < window,
+            holders: seat.holders,
+          })),
+        elections: elections
+          .values()
+          .toArray()
+          .toSorted((a, b) => b.date.localeCompare(a.date)),
+        sizes,
+      };
+    }),
   gains: os
     .meta(
       openapi({

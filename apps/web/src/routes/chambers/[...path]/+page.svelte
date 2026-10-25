@@ -14,6 +14,7 @@
   import { orpc } from "#lib/rpc.js";
   import { cn } from "#lib/utils.js";
   import type { PageData } from "./$types";
+  import Council from "./council.svelte";
   import Roster from "./roster.svelte";
   import Stream from "./stream.svelte";
 
@@ -28,6 +29,8 @@
   let selected = $derived(Math.max(0, data.terms.length - 1));
 
   const body = $derived(data.body);
+  const council = $derived(data.council);
+  const isParty = $derived(council == null || council.isPartisan);
   const term = $derived(data.terms[selected] ?? null);
   const previous = $derived(data.terms[selected - 1] ?? null);
   const latest = $derived(data.terms.at(-1) ?? null);
@@ -365,7 +368,7 @@
       </div>
     </header>
 
-    {#if latest != null}
+    {#if latest != null && isParty}
       <dl
         class="col-span-12 flex flex-wrap items-baseline gap-x-7 gap-y-1.5 bg-card px-3.5 py-3"
       >
@@ -430,7 +433,7 @@
       />
     {/if}
 
-    {#if term != null}
+    {#if term != null && isParty}
       <div
         class="col-span-12 flex flex-wrap items-center justify-between gap-x-4 gap-y-2 bg-card px-3.5 py-2.5"
       >
@@ -627,7 +630,7 @@
         {/if}
       </section>
 
-      {#if roll.length > 0}
+      {#if roll.length > 0 && council == null}
         <Roster
           mode="all"
           members={roll}
@@ -639,6 +642,9 @@
             : m.chamber_members_returned({ span: span(term.start, term.end) })}
         />
       {/if}
+    {/if}
+    {#if council != null}
+      <Council {council} hasTenures={body.tenures > 0} />
     {/if}
   </article>
 </main>

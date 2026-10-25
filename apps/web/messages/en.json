@@ -1815,5 +1815,45 @@
   "map_turnout_change_key": "Turnout change since the compared election",
   "map_turnout_fell": "Decrease",
   "map_turnout_rose": "Increase",
-  "map_turnout_bins": "Steps at {low}, {mid}, and {high} points"
+  "map_turnout_bins": "Steps at {low}, {mid}, and {high} points",
+  "council_members_title": "Members",
+  "council_members_lede": "Who holds each seat, as of the latest election for it.",
+  "council_col_seat": "Seat",
+  "council_col_member": "Member",
+  "council_col_since": "Since",
+  "council_col_wins": "Elections won",
+  "council_new": "New",
+  "council_special": "Special election",
+  "council_changes_title": "Seats changing hands",
+  "council_changes_lede": "Each election's seats: members returned, open seats, and incumbents who lost.",
+  "council_col_filled": "Seats filled",
+  "council_col_held": "Returned",
+  "council_col_open": "Open",
+  "council_col_defeated": "Incumbents defeated",
+  "council_col_runoffs": "Runoffs",
+  "council_change_defeated": "{winner} defeated {previous}",
+  "council_change_open": "{winner} succeeded {previous}",
+  "council_change_new": "{winner} won a new seat",
+  "council_holders_title": "Holders by seat",
+  "council_holders_lede": "Each seat's members, in the order elections chose them.",
+  "council_sizes_title": "Size over time",
+  "council_size_entry": "{seats} seats from {year}",
+  "council_sizes_lede": "Counted from the seats filled at each election, starting in {year}, the first year the archive covers a full term.",
+  "council_tenures_note": "The archive doesn't hold appointments, resignations, or deaths for this council yet, so each member's time runs from one election to the next.",
+  "council_elections": "Elections",
+  "council_people": "People elected",
+  "council_wins": [
+    {
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural",
+        "local countText = count: number"
+      ],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "{countText} win",
+        "countPlural=*": "{countText} wins"
+      }
+    }
+  ]
 }
