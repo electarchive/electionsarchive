@@ -11021,6 +11021,16 @@ export const polities = {
             elections: v.number(),
             first: v.nullable(v.number()),
             last: v.nullable(v.number()),
+            population: v.nullable(v.number()),
+          }),
+        ),
+        holdings: v.array(
+          v.object({
+            level: v.string(),
+            total: v.number(),
+            complete: v.number(),
+            population: v.number(),
+            covered: v.number(),
           }),
         ),
         within: v.number(),
@@ -11102,29 +11112,37 @@ export const polities = {
       }),
     )
     .handler(async ({ input }) => {
-      const [found, subdivisions, electionRows, crumbs, here, mapped] =
-        await Promise.all([
-          db.execute<{
-            kind: string;
-            parent: string | null;
-            isTerritorial: boolean;
-          }>(
-            sql`
+      const [
+        found,
+        subdivisions,
+        electionRows,
+        crumbs,
+        here,
+        mapped,
+        holdings,
+      ] = await Promise.all([
+        db.execute<{
+          kind: string;
+          parent: string | null;
+          isTerritorial: boolean;
+        }>(
+          sql`
               select p.kind::text, (
                 select pp.parent_id from polity_parent pp where pp.polity_id = p.id
                 order by upper_inf(pp.valid) desc, upper(pp.valid) desc limit 1
               ) as parent, (p.kind = 'region' or (p.kind = 'federal_unit' and exists (select from polity_parent pp join slug ps on ps.entity_id = pp.parent_id and ps.is_current and ps.path = 'ca' where pp.polity_id = p.id))) as "isTerritorial"
               from polity p where p.id = ${input.id}::uuid
             `,
-          ),
-          db.execute<{
-            id: string;
-            kind: string;
-            elections: number;
-            first: number | null;
-            last: number | null;
-            within: number;
-          }>(sql`
+        ),
+        db.execute<{
+          id: string;
+          kind: string;
+          elections: number;
+          first: number | null;
+          last: number | null;
+          population: number | null;
+          within: number;
+        }>(sql`
             with recursive host as materialized (
               select cg.geom, coalesce(cg.label_point, st_pointonsurface(cg.geom)) as point, cp.parent_id, c.kind = 'county' as "isCounty" from polity c
               join polity_territory ct on ct.polity_id = c.id and upper_inf(ct.valid)
@@ -11154,6 +11172,7 @@ export const polities = {
             )
             select below.top as id, (select kind::text from polity where id = below.top) as kind, count(e.id)::int as elections,
               min(extract(year from e.date_from))::int as first, max(extract(year from e.date_from))::int as last,
+              (select max(g.population) from coverage_government g where g.polity_id = below.top and g.kind = 'municipality')::float8 as population,
               sum(case when bool_or(below."isNested") then count(e.id) else 0 end) over ()::int as within
             from below left join lateral (
               select e.id, e.date_from from election e
@@ -11175,16 +11194,16 @@ export const polities = {
             ) e on true
             group by below.top
           `),
-          db.execute<{
-            id: string;
-            date: string | null;
-            precision: string;
-            year: number | null;
-            kind: string;
-            status: string;
-            top: string | null;
-            parts: number | null;
-          }>(sql`
+        db.execute<{
+          id: string;
+          date: string | null;
+          precision: string;
+          year: number | null;
+          kind: string;
+          status: string;
+          top: string | null;
+          parts: number | null;
+        }>(sql`
             select e.id, e.date_from::text as date, e.date_precision::text as precision, ${CYCLE} as year, e.kind::text as kind, e.status::text as status,
               case when lead.population is not null then lead.top end as top, lead.parts
             from election e
@@ -11203,22 +11222,22 @@ export const polities = {
               and not exists (select from entity_merge m where m.entity_id = e.id)
             order by e.date_from desc nulls last
           `),
-          breadcrumbs(input.id, "all"),
-          db.execute<{
-            id: string;
-            parent: string | null;
-            host: string;
-            election: string;
-            kind: string;
-            status: string;
-            path: string;
-            date: string;
-            year: number | null;
-            area: string;
-            k: number;
-            tier: number;
-            scoped: boolean;
-          }>(sql`
+        breadcrumbs(input.id, "all"),
+        db.execute<{
+          id: string;
+          parent: string | null;
+          host: string;
+          election: string;
+          kind: string;
+          status: string;
+          path: string;
+          date: string;
+          year: number | null;
+          area: string;
+          k: number;
+          tier: number;
+          scoped: boolean;
+        }>(sql`
             with recursive up(id) as (
               select parent_id from polity_parent where polity_id = ${input.id}::uuid
               union
@@ -11264,7 +11283,7 @@ export const polities = {
               ) offset 0
             )
           `),
-          db.execute<{ date: string }>(sql`
+        db.execute<{ date: string }>(sql`
             select e.date_from::text as date
             from election e
             join contest c on c.election_id = e.id and (c.allocation_parent_id is null or c.kind = 'elector_slate') and c.party_scope_id is null and not c.notional
@@ -11286,7 +11305,22 @@ export const polities = {
             order by c.kind = 'ballot_question', e.date_from desc
             limit 1
           `),
-        ]);
+        db.execute<{
+          level: string;
+          total: number;
+          complete: number;
+          population: number;
+          covered: number;
+        }>(sql`
+            select g.level, sum(g.total)::int as total, sum(g.complete)::int as complete,
+              sum(g.population_total)::float8 as population, sum(g.population_complete)::float8 as covered
+            from polity p join coverage_goal g on g.state = substr(p.iso_code, 4)
+            where p.id = ${input.id}::uuid and p.iso_code like 'US-%' and g.goal = 'local' and g.polity = 'us'
+              and g.year < extract(year from current_date)
+            group by g.level
+            order by array_position(array['county', 'municipality', 'township', 'school', 'special', 'other'], g.level)
+          `),
+      ]);
       const newest = mapped.rows[0]?.date;
       const ranked =
         newest == null
@@ -11516,10 +11550,12 @@ export const polities = {
             elections: row.elections,
             first: row.first,
             last: row.last,
+            population: row.population,
           }))
           .toSorted((a, b) =>
             a.name.localeCompare(b.name, undefined, { numeric: true }),
           ),
+        holdings: holdings.rows.filter((row) => row.population > 0),
         within: subdivisions.rows[0]?.within ?? 0,
         dates: sizes.length,
         held:

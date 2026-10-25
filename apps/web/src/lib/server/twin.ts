@@ -1430,6 +1430,44 @@ function polityMarkdown(
             ),
           ),
         ]),
+    ...(polity.holdings.length === 0
+      ? []
+      : [
+          `## ${m.polity_holdings_title()}`,
+          m.polity_holdings_lede({ place: polity.name }),
+          table(
+            [m.col_government(), m.col_share()],
+            polity.holdings.map((row) => [
+              (
+                {
+                  county: m.coverage_group_county,
+                  municipality: m.coverage_group_municipality,
+                  township: m.coverage_group_township,
+                  school: m.coverage_group_school,
+                  special: m.coverage_group_special,
+                  other: m.coverage_group_other,
+                } as Record<string, () => string>
+              )[row.level]?.() ?? row.level,
+              percent(row.covered / row.population, 0),
+            ]),
+          ),
+        ]),
+    ...(polity.holdings.length === 0
+      ? []
+      : [
+          `## ${m.polity_largest_cities()}`,
+          polity.polities
+            .filter(
+              (child) =>
+                child.kind === "municipality" && child.population != null,
+            )
+            .toSorted((a, b) => (b.population ?? 0) - (a.population ?? 0))
+            .slice(0, 10)
+            .map(
+              (child, index) => `${index + 1}. ${link(child.name, child.path)}`,
+            )
+            .join("\n"),
+        ]),
     ...(polity.polities.length === 0
       ? []
       : [

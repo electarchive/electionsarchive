@@ -54,6 +54,25 @@
       ),
   );
   const above = $derived(polity.breadcrumbs.at(-1)?.name ?? "");
+  const isState = $derived(
+    polity.kind === "federal_unit" && polity.breadcrumbs.at(-1)?.path === "us",
+  );
+  const largest = $derived(
+    polity.polities
+      .filter(
+        (child) => child.kind === "municipality" && child.population != null,
+      )
+      .toSorted((a, b) => (b.population ?? 0) - (a.population ?? 0))
+      .slice(0, 10),
+  );
+  const GROUPS: Record<string, () => string> = {
+    county: m.coverage_group_county,
+    municipality: m.coverage_group_municipality,
+    township: m.coverage_group_township,
+    school: m.coverage_group_school,
+    special: m.coverage_group_special,
+    other: m.coverage_group_other,
+  };
   const versus = createQuery(() => ({
     ...orpc.polities.compare.queryOptions({
       input: { a: id, b: polity.parent ?? id },
@@ -586,6 +605,92 @@
   </section>
 {/if}
 
+{#if isState}
+  {#if polity.polities.length > 0}
+    {@render places()}
+  {/if}
+  {#if largest.length > 0}
+    <section
+      class="col-span-12 grid content-start gap-2.5 bg-card px-3.5 py-3 lg:col-span-6"
+      aria-labelledby="{uid}-largest"
+    >
+      <h2 id="{uid}-largest" class="text-[0.8125rem] font-bold">
+        {m.polity_largest_cities()}
+      </h2>
+      <ol class="grid text-sm">
+        {#each largest as child, index (index)}
+          <li
+            class="grid grid-cols-[1.5rem_minmax(0,1fr)_auto] items-baseline gap-x-2 border-be border-border/60 py-1 last:border-be-0 pointer-coarse:py-2"
+          >
+            <span
+              class="font-figures text-xs text-muted-foreground tabular-nums"
+              >{index + 1}</span
+            >
+            {#if child.path == null}
+              <span class="truncate">{child.name}</span>
+            {:else}
+              <Preview class="truncate hover:highlighter" path={child.path}
+                >{child.name}</Preview
+              >
+            {/if}
+            {#if child.elections > 0}
+              <span class="text-xs text-muted-foreground tabular-nums"
+                >{m.home_elections({ count: child.elections })}</span
+              >
+            {/if}
+          </li>
+        {/each}
+      </ol>
+    </section>
+  {/if}
+  <Offices {id} place={polity.name} />
+  {#if polity.holdings.length > 0}
+    <section
+      class="col-span-12 grid content-start gap-2.5 bg-card px-3.5 py-3"
+      aria-labelledby="{uid}-holdings"
+    >
+      <div class="grid gap-0.5">
+        <h2 id="{uid}-holdings" class="text-[0.8125rem] font-bold">
+          {m.polity_holdings_title()}
+        </h2>
+        <p
+          class="text-[0.8125rem] text-pretty text-muted-foreground max-inline-[64ch]"
+        >
+          {m.polity_holdings_lede({ place: polity.name })}
+        </p>
+      </div>
+      <dl
+        class="grid grid-cols-[repeat(auto-fit,minmax(min(100%,10rem),1fr))] gap-x-6 gap-y-2"
+      >
+        {#each polity.holdings as row (row.level)}
+          <div class="grid gap-1">
+            <dt class="text-[0.8125rem] text-muted-foreground">
+              {GROUPS[row.level]?.() ?? row.level}
+            </dt>
+            <dd class="font-figures text-xl font-[760] tabular-nums">
+              {percent(row.covered / row.population, 0)}
+            </dd>
+            <dd
+              class="overflow-hidden rounded-xs bg-muted block-1.5"
+              aria-hidden="true"
+            >
+              <span
+                class="block bg-foreground block-full"
+                style:inline-size="{(row.covered / row.population) * 100}%"
+              ></span>
+            </dd>
+          </div>
+        {/each}
+      </dl>
+      <a
+        class="justify-self-start text-[0.8125rem] font-semibold underline decoration-border underline-offset-4 hover:decoration-foreground"
+        href={resolve("/coverage/[cc]", { cc: "us" })}
+        >{m.polity_holdings_link()}</a
+      >
+    </section>
+  {/if}
+{/if}
+
 {#if isLocal}
   <Offices {id} place={polity.name} />
   {#if shared != null}
@@ -624,7 +729,7 @@
 {#if polity.elections.length > 0 || polity.results.length === 0}
   <section
     class={cn("col-span-12 grid content-start gap-2.5 bg-card px-3.5 py-3", {
-      "lg:col-span-8": polity.polities.length > 0,
+      "lg:col-span-8": polity.polities.length > 0 && !isState,
       "max-lg:order-1": isLocal && polity.polities.length > 0,
     })}
     aria-labelledby="{uid}-elections"
@@ -742,9 +847,16 @@
   {@render inPlace()}
 {/if}
 
-{#if polity.polities.length > 0}
+{#if polity.polities.length > 0 && !isState}
+  {@render places()}
+{/if}
+
+{#snippet places()}
   <section
-    class="col-span-12 grid content-start gap-2.5 bg-card px-3.5 py-3 lg:col-span-4"
+    class={cn("col-span-12 grid content-start gap-2.5 bg-card px-3.5 py-3", {
+      "lg:col-span-4": !isState,
+      "lg:col-span-6": isState,
+    })}
     aria-labelledby="{uid}-places"
   >
     <div class="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
@@ -828,7 +940,7 @@
       {/if}
     {/if}
   </section>
-{/if}
+{/snippet}
 
 {#snippet inPlace()}
   {#if polity.results.length > 0}
