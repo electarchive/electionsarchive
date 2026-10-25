@@ -711,7 +711,11 @@ def parse(
                     if ambiguous > 1:
                         variants.append((group["tenant"][0], group["election"][0], contest, f"contest-{ambiguous}"))
     table = table.join(
-        pl.DataFrame(variants, schema=["tenant", "election", "contest", "variant"], orient="row"),
+        pl.DataFrame(
+            variants,
+            schema={"tenant": pl.String, "election": pl.String, "contest": pl.String, "variant": pl.String},
+            orient="row",
+        ),
         on=["tenant", "election", "contest"],
         how="left",
     ).with_columns(
