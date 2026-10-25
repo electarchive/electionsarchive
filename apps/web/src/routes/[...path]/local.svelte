@@ -30,6 +30,20 @@
     school: m.local_tier_school,
     special: m.local_tier_special,
   };
+  const top = $derived(
+    isOwn
+      ? []
+      : tiers
+          .filter((tier) => tier.kind === "county" || tier.kind === "municipal")
+          .flatMap((tier) => tier.governments)
+          .flatMap((government) => {
+            const contest = government.contests.find(
+              (entry) => entry.person != null,
+            );
+            return contest == null ? [] : [{ government, contest }];
+          })
+          .slice(0, 3),
+  );
   const round = (runoff: { date: string; isGeneral: boolean }) => {
     const day = new Intl.DateTimeFormat(getLocale(), {
       month: "long",
@@ -41,6 +55,35 @@
       : m.wards_round_runoff({ date: day });
   };
 </script>
+
+{#snippet note(
+  contest: (typeof local.tiers)[number]["governments"][number]["contests"][number],
+)}
+  {const final = $derived(
+    contest.runoff?.isWon === true ? contest.runoff : null,
+  )}
+  {#if contest.runoff != null && contest.share != null}
+    {#if final == null}
+      {m.wards_pending({
+        share: percent(contest.share, 1),
+        round: round(contest.runoff),
+      })}
+    {:else if final.person != null && final.person === contest.person}
+      {m.wards_kept({
+        share: percent(contest.share, 1),
+        round: round(contest.runoff),
+        final: percent(final.share, 1),
+      })}
+    {:else}
+      {m.wards_took({
+        round: round(contest.runoff),
+        final: percent(final.share, 1),
+        name: contest.leader ?? "",
+        share: percent(contest.share, 1),
+      })}
+    {/if}
+  {/if}
+{/snippet}
 
 {#if tiers.length > 0}
   <section
@@ -65,6 +108,60 @@
             }),
           })}
         </p>
+      </div>
+    {/if}
+    {#if top.length > 0 && top.length < local.tiers.flatMap( (tier) => tier.governments.flatMap((government) => government.contests) ).length}
+      <div class="grid content-start gap-3">
+        <h3 class="text-lg/tight font-[740] tracking-[-0.012em]">
+          {m.local_top()}
+        </h3>
+        <ol
+          class="grid grid-cols-[repeat(auto-fill,minmax(min(100%,18rem),1fr))] gap-x-8 gap-y-4"
+        >
+          {#each top as entry (entry.contest.path ?? entry.contest.name)}
+            {const final = $derived(
+              entry.contest.runoff?.isWon === true
+                ? entry.contest.runoff
+                : null,
+            )}
+            {const shown = $derived(final ?? entry.contest)}
+            <li class="grid content-start gap-1 border-bs border-border pbs-2">
+              <p class="text-[0.8125rem] font-semibold text-muted-foreground">
+                {entry.government.name}
+              </p>
+              <h4 class="text-lg/tight font-[740] tracking-[-0.012em]">
+                {#if entry.contest.path == null}
+                  {entry.contest.name}
+                {:else}
+                  <Preview
+                    class="underline decoration-transparent underline-offset-4 hover:decoration-foreground"
+                    path={entry.contest.path}>{entry.contest.name}</Preview
+                  >
+                {/if}
+              </h4>
+              {#if shown.leader != null}
+                <p class="flex flex-wrap items-baseline gap-x-3">
+                  <Name
+                    class={cn("text-[0.9375rem]", {
+                      "font-semibold": shown.isWon,
+                    })}
+                    label={shown.leader}
+                    person={shown.person}
+                  />
+                  {#if shown.share != null}
+                    <span
+                      class="font-figures text-xl font-[760] tracking-[-0.015em] tabular-nums"
+                      >{percent(shown.share, 1)}</span
+                    >
+                  {/if}
+                </p>
+              {/if}
+              <p class="text-xs text-pretty text-muted-foreground">
+                {@render note(entry.contest)}
+              </p>
+            </li>
+          {/each}
+        </ol>
       </div>
     {/if}
     {#each tiers as tier (tier.kind)}
@@ -139,25 +236,7 @@
                     {/if}
                     {#if contest.runoff != null && contest.share != null}
                       <span class="col-span-2 text-xs text-muted-foreground">
-                        {#if final == null}
-                          {m.wards_pending({
-                            share: percent(contest.share, 1),
-                            round: round(contest.runoff),
-                          })}
-                        {:else if final.person != null && final.person === contest.person}
-                          {m.wards_kept({
-                            share: percent(contest.share, 1),
-                            round: round(contest.runoff),
-                            final: percent(final.share, 1),
-                          })}
-                        {:else}
-                          {m.wards_took({
-                            round: round(contest.runoff),
-                            final: percent(final.share, 1),
-                            name: contest.leader ?? "",
-                            share: percent(contest.share, 1),
-                          })}
-                        {/if}
+                        {@render note(contest)}
                       </span>
                     {/if}
                   </li>

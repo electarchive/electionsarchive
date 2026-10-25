@@ -410,6 +410,33 @@ function markdown(data: Data, link: Link) {
               .length,
           }),
         }),
+        ...[
+          local.tiers
+            .filter(
+              (tier) => tier.kind === "county" || tier.kind === "municipal",
+            )
+            .flatMap((tier) => tier.governments)
+            .flatMap((government) => {
+              const contest = government.contests.find(
+                (entry) => entry.person != null,
+              );
+              if (contest == null) {
+                return [];
+              }
+              const shown =
+                contest.runoff?.isWon === true ? contest.runoff : contest;
+              return [
+                `- ${government.name}: ${link(contest.name, contest.path)}${shown.leader == null ? "" : `, ${shown.leader}${shown.share == null ? "" : ` ${percent(shown.share)}`}`}`,
+              ];
+            })
+            .slice(0, 3),
+        ].flatMap((top) =>
+          top.length > 0 &&
+          top.length <
+            governments.flatMap((government) => government.contests).length
+            ? [`## ${m.local_top()}`, top.join("\n")]
+            : [],
+        ),
         ...local.tiers.flatMap((tier) => [
           `## ${{ county: m.local_tier_county, municipal: m.local_tier_municipal, school: m.local_tier_school, special: m.local_tier_special }[tier.kind]()}`,
           ...tier.governments.flatMap((government) => [

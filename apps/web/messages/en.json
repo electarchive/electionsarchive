@@ -629,6 +629,7 @@
   "wards_round_general": "{date} general election",
   "local_tier_county": "County offices",
   "local_tier_municipal": "Cities and towns",
+  "local_top": "Top races",
   "local_tier_school": "School districts",
   "local_tier_special": "Special districts",
   "local_title": "{year} {place} local elections",
