@@ -15,8 +15,13 @@ SITE = "https://hubdocs.blob.core.windows.net/docs/ongov/rec/"
 LISTING = "https://onondaga.gov/elections/election-results/"
 FIPS = "36"
 BOOKS = (
+    (date(2019, 11, 5), SITE + "28266/attachments/GE19OFFICIALRESULTS.pdf"),
+    (date(2020, 11, 3), SITE + "28267/attachments/GE20OFFICIALRESULTS.pdf"),
+    (date(2021, 11, 2), SITE + "29133/attachments/GE21OFFICIALRESULTS.pdf"),
     (date(2022, 11, 8), SITE + "38200/attachments/GE22%20OFFICIAL%20RESULTS.pdf"),
     (date(2023, 11, 7), SITE + "44468/attachments/GE23%20Official%20Results.pdf"),
+    (date(2024, 11, 5), SITE + "52654/attachments/GE24%20Official%20Results.pdf"),
+    (date(2025, 11, 4), SITE + "60179/attachments/2025%20General%20Election.pdf"),
 )
 HEAD = re.compile(r"^\s*A WHOLE NUMBER")
 TABLE = re.compile(r"^Wards/Towns")
