@@ -88,7 +88,9 @@ def _read(registry: Mapping[str, Mapping[str, str]]) -> Iterator[dict[str, Any]]
                 ["pdftotext", "-layout", str(raw.cached(SOURCE, href).path), "-"], capture_output=True, check=True
             ).stdout.decode(errors="replace")
             nodes = []
-            for node in tx_collin.electionware(text):
+            for node in tx_collin.electionware(re.sub(r"(?m)^(Vote For \d+)\s*$", r"  \1", text)):
+                for choice in node["choices"]:
+                    choice["text"] = re.sub(r"^(?:REP|DEM|LIB|GRN|IND|NPA|UNA)\s+", "", choice["text"])
                 node["text"] = tx_harris.normalize(tx_collin.entity_first(PORTION.sub("", node["text"])))
                 total = sum(int(choice["total"]) for choice in node["choices"])
                 if tx_harris.COUNTY_OFFICE.search(node["text"]):
