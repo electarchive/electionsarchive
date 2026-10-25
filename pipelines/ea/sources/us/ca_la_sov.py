@@ -346,14 +346,6 @@ def emit() -> Path:
         taken = {path for (path,) in conn.execute("select path from slug where path like 'us/ca/%'").fetchall()}
 
         report: dict[str, int] = {}
-        for stray in conn.execute(
-            """select entity_id from external_id where scheme = 'us.contest' and value like '%%:CA:06037:board:%%'"""
-        ).fetchall():
-            cs.add(
-                "entity_retirement",
-                entity_id=stray[0],
-                reason="Filed under the county board of education body by mistake",
-            )
         made: dict[tuple[str, str], tuple[UUID, str, str]] = {}
         for kind, text in sorted({(r["kind"], r["name"]) for r in labels.iter_rows(named=True)}):
             if kind == "college":
