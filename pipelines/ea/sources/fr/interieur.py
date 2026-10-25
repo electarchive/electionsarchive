@@ -10,6 +10,7 @@ import shapefile
 
 from ea import raw
 from ea.changeset import Changeset, slug
+from ea.sources.fr.names import person_name
 from ea.store import DATA, connect
 
 SOURCE = "fr.interieur"
@@ -407,8 +408,16 @@ def emit() -> Path:
             name(departments[department], label)
         areas: dict[str, UUID] = {}
         circ_units: dict[str, UUID] = {}
+        current_areas = dict(
+            conn.execute(
+                """select c.code, a.id from area a join area_code c on c.area_id = a.id
+               where a.scheme_code = 'fr.circonscription' and c.valid_from = %s and c.valid_to is null
+                 and not exists (select from area_code o where o.area_id = a.id and o.valid_from < %s)""",
+                [REDISTRICTING, REDISTRICTING],
+            ).fetchall()
+        )
         for circ, department, department_label, label in circs.iter_rows():
-            areas[circ] = cs.area("fr.circonscription", circ)
+            areas[circ] = current_areas.get(circ) or cs.area("fr.circonscription", circ)
             cs.add("area", id=areas[circ], scheme_code="fr.circonscription")
             cs.add("area_code", area_id=areas[circ], code=circ, valid_from=REDISTRICTING)
             cs.add(
@@ -631,7 +640,7 @@ def emit() -> Path:
                 if person_key not in persons:
                     persons[person_key] = cs.key(f"{SOURCE}.person", person_key)
                     cs.add("person", id=persons[person_key], gender={"FEMININ": "female", "MASCULIN": "male"}.get(sex))
-                    name(persons[person_key], f"{forename} {surname}")
+                    name(persons[person_key], person_name(forename, surname))
                 option = cs.key("fr.option", f"{contest_key}:{panel}")
                 options[f"{number}:{circ}:{panel}"] = str(option)
                 cs.add(

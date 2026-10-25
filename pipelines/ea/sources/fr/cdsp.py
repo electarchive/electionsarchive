@@ -11,6 +11,7 @@ import polars as pl
 
 from ea import raw
 from ea.changeset import Changeset, slug
+from ea.sources.fr.names import person_name
 from ea.store import DATA, connect
 
 SOURCE = "fr.cdsp"
@@ -970,12 +971,20 @@ def emit() -> Path:
             )
             .agg(pl.col("day").min(), pl.col("dept").first())
         )
+        current_areas = dict(
+            conn.execute(
+                """select c.code, a.id from area a join area_code c on c.area_id = a.id
+                   where a.scheme_code = 'fr.circonscription' and c.valid_from = %s and c.valid_to is null
+                     and not exists (select from area_code o where o.area_id = a.id and o.valid_from < %s)""",
+                [MAPS[3][0], MAPS[3][0]],
+            ).fetchall()
+        )
         circ_areas: dict[tuple[str, int], UUID] = {}
         circ_units: dict[tuple[str, int], UUID] = {}
         for circ, era, seen, dept in first_seen.sort("era", "circ").iter_rows():
             if era == 3:
                 circ_units[(circ, era)] = cs.unit("fr.circonscription", circ, on=MAPS[3][0])
-                circ_areas[(circ, era)] = cs.area("fr.circonscription", circ, on=MAPS[3][0])
+                circ_areas[(circ, era)] = current_areas.get(circ) or cs.area("fr.circonscription", circ, on=MAPS[3][0])
                 if circ_units[(circ, era)] in cs.minted or circ_areas[(circ, era)] in cs.minted:
                     raise ValueError(f"constituency {circ} is not in the database")
                 continue
@@ -1068,21 +1077,8 @@ def emit() -> Path:
                 persons[key] = cs.key(f"{SOURCE}.person", key)
                 if persons[key] in cs.minted:
                     cs.add("person", id=persons[key], gender={"F": "female", "M": "male"}.get(sex or ""))
-                    name(persons[key], display)
+                name(persons[key], display)
             return persons[key]
-
-        def proper(text: str) -> str:
-            words = text.title().split(" ")
-            return (
-                " ".join(
-                    word.lower()
-                    if index and word.lower() in ("de", "du", "des", "d'", "le", "la") and index < len(words) - 1
-                    else word
-                    for index, word in enumerate(words)
-                ).replace("D'", "d'")
-                if text.isupper()
-                else text
-            )
 
         def value_row(result_set: UUID, unit: UUID, option: UUID | None, measure: int, value: int) -> None:
             cs.add(
@@ -1362,7 +1358,7 @@ def emit() -> Path:
                                 )
                                 person = person_of(
                                     f"{dept}:{fold(line['surname'])}:{fold(line['forename'] or '')}",
-                                    proper(f"{line['forename'] or ''} {line['surname']}".strip()),
+                                    person_name(line["forename"], line["surname"]),
                                     line["sex"],
                                 )
                                 cs.add(
