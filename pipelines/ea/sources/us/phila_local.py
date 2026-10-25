@@ -13,7 +13,7 @@ from ea.sources.us.phila_returns import SOURCE as RETURNS
 from ea.store import connect
 
 SOURCE = "us.phila_local"
-VERSION = "2"
+VERSION = "3"
 FIPS = "42101"
 PLACE = "4260000"
 SPECIAL_DAYS = {
@@ -84,6 +84,17 @@ NOTE = (
     + " Write-in votes are not included. The file prints no winners, so no outcomes are recorded, and the seat count "
     "is stored only where Philadelphia's charter fixes it."
 )
+
+
+def tidy(text: str) -> str:
+    if text.isupper():
+        text = re.sub(
+            r"[A-Za-z']+",
+            lambda m: m[0] if m[0] in ("II", "III", "IV") else m[0][0] + m[0][1:].lower(),
+            text,
+        )
+        text = re.sub(r"\b(Mc|O'|D')([a-z])", lambda m: m[1] + m[2].upper(), text)
+    return re.sub(r"\b([A-Z])\b(?![.'])", r"\1.", text)
 
 
 def office_of(
@@ -354,7 +365,7 @@ def emit() -> Path:
                     kind="mayor" if office == "mayor" else "other",
                 )
                 judge_name = labels[sheet].get("judge") if retention else None
-                name(owners[owner_key], f"{title}, retention of {judge_name.title()}" if retention else title)
+                name(owners[owner_key], f"{title}, retention of {tidy(judge_name)}" if retention else title)
             area = place_area if code == PLACE else county_area
             if house:
                 area = cs.area("us.sldl", f"PA:{seat}")
@@ -400,12 +411,12 @@ def emit() -> Path:
             elif question:
                 label = f"{day.year} Philadelphia: {labels[sheet]['name'].title()}"
             elif retention:
-                label = f"{day.year} {title}, retention of {labels[sheet]['judge'].title()}"
+                label = f"{day.year} {title}, retention of {tidy(labels[sheet]['judge'])}"
             else:
                 label = (
                     f"{day.year} {title}"
                     + (f", {seat.replace('-', ' ')}" if seat else "")
-                    + (f" ({ballot.title()} primary)" if ballot else "")
+                    + (f", {ballot.title()} primary" if ballot else "")
                 )
             name(contest, label)
             cs.add("slug", path=path, entity_id=contest)
@@ -501,7 +512,7 @@ def emit() -> Path:
                         if judge not in persons:
                             persons[judge] = cs.key(f"{SOURCE}.person", judge)
                             cs.add("person", id=persons[judge])
-                            name(persons[judge], labels[sheet]["judge"].title())
+                            name(persons[judge], tidy(labels[sheet]["judge"]))
                         person = persons[judge]
                         cs.add(
                             "candidacy",
@@ -509,7 +520,7 @@ def emit() -> Path:
                             person_id=person,
                             option_id=option,
                             role="head",
-                            ballot_name=labels[sheet]["judge"].title(),
+                            ballot_name=tidy(labels[sheet]["judge"]),
                             is_independent=False,
                         )
                 elif candidate == "Write-ins":
@@ -520,7 +531,7 @@ def emit() -> Path:
                     if person_key not in persons:
                         persons[person_key] = cs.key(f"{SOURCE}.person", person_key)
                         cs.add("person", id=persons[person_key])
-                        name(persons[person_key], candidate)
+                        name(persons[person_key], tidy(candidate))
                     person = persons[person_key]
                     option = cs.key("us.option", f"{contest_key}:{person}")
                     party = labels[sheet].get(candidate)
@@ -535,7 +546,7 @@ def emit() -> Path:
                         contest_id=contest,
                         kind="candidate",
                         party_id=parties.get(party),
-                        ballot_label=candidate,
+                        ballot_label=tidy(candidate),
                     )
                     cs.add(
                         "candidacy",
@@ -543,7 +554,7 @@ def emit() -> Path:
                         person_id=person,
                         option_id=option,
                         role="head",
-                        ballot_name=candidate,
+                        ballot_name=tidy(candidate),
                         is_independent=False,
                     )
                 for precinct, votes in by_precinct.items():
