@@ -1,18 +1,22 @@
+import io
 import json
 import re
+import zipfile
 from datetime import date
 from pathlib import Path
 from urllib.parse import urlencode
 from uuid import UUID
 
 import polars as pl
+import shapefile
 
 from ea import raw
 from ea.changeset import Changeset, slug
+from ea.sources.us import alged
 from ea.store import DATA, connect
 
 SOURCE = "us.wikipedia_mayors"
-VERSION = "1"
+VERSION = "2"
 PARSED = DATA / "parsed" / SOURCE
 API = "https://en.wikipedia.org/w/api.php?"
 TITLE = "Mayoral election articles, results boxes"
@@ -125,6 +129,7 @@ CITIES = {
     "Tulsa": ("OK", "4075000", None),
     "Washington, D.C.": ("DC", "1150000", None),
 }
+BALANCES = {"Indianapolis": "1836003"}
 ARTICLES: dict[tuple[int, str], tuple[str, ...]] = {
     (2022, "Austin"): ("2022-11-08 first", "2022-12-13 runoff"),
     (2022, "Charlotte"): ("2022-05-17 Democratic", "2022-05-17 Republican", "2022-07-26 won"),
@@ -331,6 +336,17 @@ def parse() -> None:
                 )
     PARSED.mkdir(parents=True, exist_ok=True)
     pl.DataFrame(rows).write_parquet(PARSED / "candidates.parquet")
+    with zipfile.ZipFile(raw.cached(alged.SOURCE, alged.PLACES).path) as archive:
+        parts = {name.rsplit(".", 1)[1].lower(): archive.read(name) for name in archive.namelist()}
+    reader = shapefile.Reader(shp=io.BytesIO(parts["shp"]), shx=io.BytesIO(parts["shx"]), dbf=io.BytesIO(parts["dbf"]))
+    pl.DataFrame(
+        [
+            {"code": str(record["GEOID"]), "geojson": json.dumps(shape.__geo_interface__)}
+            for record, shape in zip(reader.iterRecords(), reader.iterShapes(), strict=True)
+            if record is not None and shape is not None and str(record["GEOID"]) in BALANCES.values()
+        ],
+        schema={"code": pl.String, "geojson": pl.String},
+    ).write_parquet(PARSED / "places.parquet")
 
 
 def emit() -> Path:
@@ -370,13 +386,58 @@ def emit() -> Path:
         polities = {
             code: (polity, path)
             for code, polity, path in conn.execute(
-                """select c.code, t.polity_id, s.path from area a join area_code c on c.area_id = a.id
+                """select c.code, coalesce(m.into_id, t.polity_id), s.path from area a join area_code c on c.area_id = a.id
                    join polity_territory t on t.area_id = a.id
-                   join slug s on s.entity_id = t.polity_id and s.is_current
+                   left join entity_merge m on m.entity_id = t.polity_id
+                   join slug s on s.entity_id = coalesce(m.into_id, t.polity_id) and s.is_current
                    where a.scheme_code in ('us.county', 'us.place') and c.code = any(%s)""",
-                [[code for _, code, _ in CITIES.values()]],
+                [[code for _, code, _ in CITIES.values()] + list(BALANCES.values())],
             ).fetchall()
         }
+        census = cs.source("U.S. Census Bureau", "Cartographic Boundary Files, 1:500,000")
+        cs.artifact(raw.cached(alged.SOURCE, alged.PLACES), census)
+        for city, code in BALANCES.items():
+            if code in polities:
+                continue
+            state = CITIES[city][0]
+            ((geom, point),) = conn.execute(
+                """select encode(st_asewkb(g), 'hex'), encode(st_asewkb(st_pointonsurface(g)), 'hex')
+                   from (select st_multi(st_collectionextract(st_makevalid(st_transform(
+                           st_setsrid(st_geomfromgeojson(%s), 4269), 4326)), 3)) as g) shape""",
+                [pl.read_parquet(PARSED / "places.parquet").filter(pl.col("code") == code)["geojson"].item()],
+            ).fetchall()
+            polity, path = cs.key("us.polity", f"place:{code}"), f"us/{state.lower()}/{slug(city)}"
+            polities[code] = (polity, path)
+            cs.add("polity", id=polity, kind="municipality", iso_code=None)
+            name(polity, city)
+            cs.add("polity_parent", polity_id=polity, parent_id=cs.polity(f"US-{state}"))
+            cs.add("slug", path=path, entity_id=polity)
+            area = cs.area("us.place", code)
+            cs.add("area", id=area, scheme_code="us.place")
+            cs.add("area_code", area_id=area, code=code, valid_from=None)
+            cs.add("area_parent", area_id=area, parent_id=cs.area("us.state", code[:2]))
+            name(area, f"{city}, {state}")
+            cs.add("polity_territory", polity_id=polity, area_id=area)
+            cs.add(
+                "area_geometry",
+                area_id=area,
+                valid_from=None,
+                geom=geom,
+                label_point=point,
+                quality="official",
+                source_id=census,
+            )
+            cs.add(
+                "reporting_unit",
+                id=cs.unit("us.place", code),
+                polity_id=polity,
+                scheme_code="us.place",
+                code=code,
+                area_relation="equals",
+                area_id=area,
+                kind="standard",
+                valid_from=None,
+            )
         known = {value for (value,) in conn.execute("select value from external_id where scheme = 'us.election'")}
         taken = {path for (path,) in conn.execute("select path from slug where path like 'us/%'").fetchall()}
         rounds: dict[tuple[str, date], UUID] = {}
@@ -398,8 +459,10 @@ def emit() -> Path:
                    join result_set r on r.contest_id = c.id
                    join source s on s.id = r.source_id
                    join external_id x on x.entity_id = c.office_id and x.scheme = 'us.office'
-                   where s.title <> %s and ch.pipeline <> %s and x.value like any(%s)""",
-                [TITLE, SOURCE, [f"{state}:{code}:%" for state, code, _ in CITIES.values()]],
+                   where s.title <> %s and ch.pipeline <> %s and x.value like any(%s)
+                     and not exists (select from external_id k join changeset kc on kc.id = k.changeset_id
+                                     where k.entity_id = c.id and k.scheme = 'us.contest' and kc.pipeline = %s)""",
+                [TITLE, SOURCE, [f"{state}:{code}:%" for state, code, _ in CITIES.values()], SOURCE],
             ).fetchall()
         )
         mine = dict(
@@ -422,7 +485,7 @@ def emit() -> Path:
             if entity in paths:
                 return paths[entity]
             path = mine.get(entity)
-            if path is None:
+            if path is None or path.rsplit("/", 1)[0] != base.rsplit("/", 1)[0]:
                 path, n = base, 1
                 while path in taken:
                     n += 1
@@ -440,12 +503,15 @@ def emit() -> Path:
                 skipped += 1
                 continue
             display = re.sub(r", (?:[A-Z][a-z]+(?: [A-Z][a-z]+)?|D\.C\.)$", "", city)
-            polity, polity_path = polities[code]
+            moved = city in BALANCES
+            where = BALANCES.get(city, code)
+            polity, polity_path = polities[where]
             owner = cs.key("us.office", owner_key)
-            if owner in cs.minted and owner not in seen:
+            if (owner in cs.minted or moved) and owner not in seen:
                 seen.add(owner)
                 cs.add("office", id=owner, polity_id=polity, kind="mayor")
-                name(owner, f"Mayor of {display}")
+                if owner in cs.minted:
+                    name(owner, f"Mayor of {display}")
             party = stage if stage in PARTIES else None
             primary = party is not None or stage.startswith("primary")
             kind = (
@@ -474,7 +540,7 @@ def emit() -> Path:
                 place(parent, f"us/{state.lower()}/{day}-{kind}")
             election_key = f"{day}:{state}:{code}" + (":primary" if primary else "")
             election = cs.key("us.election", election_key)
-            if election in cs.minted and election not in paths:
+            if (election in cs.minted or moved) and election not in paths:
                 cs.add(
                     "election",
                     id=election,
@@ -486,7 +552,8 @@ def emit() -> Path:
                     date_precision="day",
                     status="held",
                 )
-                name(election, f"{day.year} {display} {kind} election")
+                if election in cs.minted:
+                    name(election, f"{day.year} {display} {kind} election")
                 elections[election_key] = place(election, f"{polity_path}/{day}-{kind}")
             contest_key = f"wikipedia:{day}:{state}:{code}:mayor" + (f":{slug(party)}" if party else "")
             contest = cs.key("us.contest", contest_key)
@@ -518,7 +585,7 @@ def emit() -> Path:
                 kind="office",
                 office_id=owner,
                 party_scope_id=cs.key("us.party", PARTIES[party]) if party else None,
-                district_area_id=cs.area("us.county" if len(code) == 5 else "us.place", code),
+                district_area_id=cs.area("us.county" if len(where) == 5 else "us.place", where),
                 magnitude=1,
                 round_number=2 if stage == "runoff" or previous is not None else 1,
                 previous_round_id=previous,
@@ -553,7 +620,7 @@ def emit() -> Path:
                 completeness=1,
             )
             cs.add("note", entity_id=result_set, kind="methodology", body_md=METHOD.format(year=year, city=display))
-            unit = cs.unit("us.county" if len(code) == 5 else "us.place", code)
+            unit = cs.unit("us.county" if len(where) == 5 else "us.place", where)
             ranked: list[tuple[int, UUID]] = []
             write_ins = 0
             for candidate, write_in, label, independent, votes in rows.select(
