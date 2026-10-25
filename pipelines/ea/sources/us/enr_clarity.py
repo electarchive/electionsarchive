@@ -26,6 +26,15 @@ HOST = "results.enr.clarityelections.com"
 CENSUS = "https://www2.census.gov/geo/tiger/GENZ2020/shp/cb_2020_{fips}_{layer}_500k.zip"
 LAYERS = ("place", "cousub", "unsd")
 TITLE = "Election night reporting results"
+OWN_MEMBERSHIPS = {
+    "us.oh_franklin",
+    "us.pa_montgomery",
+    "us.pa_allegheny",
+    "us.ny_erie",
+    "us.ny_albany",
+    "us.ny_saratoga",
+}
+STALE_MEMBERSHIP = "The pipeline's earlier emit placed the precinct in an area it does not vote in"
 DAY_FIXES = {("https://results.enr.clarityelections.com/IL/McHenry/", "109015"): date(2021, 4, 6)}
 STATE_NAMES = {
     "AL": "Alabama",
@@ -1868,6 +1877,15 @@ def emit(
             cs.add(
                 "reporting_unit_area", unit_id=target, area_id=area, valid_from=day, valid_to=day + timedelta(days=1)
             )
+        if source in OWN_MEMBERSHIPS:
+            current = {(target, area) for target, area, _ in memberships}
+            for unit, area in conn.execute(
+                """select m.unit_id, m.area_id from reporting_unit_area m join changeset g on g.id = m.changeset_id
+                   where g.pipeline = %s and g.status = 'published' and m.unit_id = any(%s)""",
+                [source, list({target for target, _ in current})],
+            ).fetchall():
+                if (unit, area) not in current:
+                    cs.add("unit_area_drop", unit_id=unit, area_id=area, reason=STALE_MEMBERSHIP)
         cs.frame(
             "result_value",
             pl.DataFrame(
