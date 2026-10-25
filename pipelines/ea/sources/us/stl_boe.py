@@ -59,11 +59,21 @@ def _links() -> list[str]:
     return sorted(link for link in links if not EXCLUDED.search(link.rsplit("/", 1)[1]))
 
 
+def _precinct_links() -> list[str]:
+    page = raw.cached(SOURCE, LISTING).path.read_text(errors="replace")
+    links = {urljoin(LISTING, href) for href in re.findall(r'href="([^"]*\.pdf)"', page, re.I)}
+    return sorted(
+        link
+        for link in links
+        if re.match(r"(?i)(?:jan|feb|mar|apr|may|jun|jul|aug|sep|nov|dec)2[3-9]-.*(?:precinct|pct)", link.rsplit("/", 1)[1])
+    )
+
+
 def fetch() -> None:
     raw.fetch(SOURCE, LISTING, suffix=".html")
     for layer in enr_clarity.LAYERS:
         raw.fetch(SOURCE, enr_clarity.CENSUS.format(fips="29", layer=layer), suffix=".zip")
-    for link in _links():
+    for link in (*_links(), *_precinct_links()):
         raw.fetch(SOURCE, link, suffix=".pdf")
 
 
@@ -96,16 +106,37 @@ def cumulative(text: str) -> Iterator[dict[str, Any]]:
             yield {"text": title, "vote_for": 1, "choices": choices, "cast": cast}
 
 
+def precinct(text: str) -> Iterator[dict[str, Any]]:
+    merged: dict[str, dict[str, Any]] = {}
+    for page in text.split("\f"):
+        found = re.search(r"^(Ward \d+ Precinct \d+)", page, re.M)
+        if not found:
+            continue
+        for node in cumulative(page):
+            if node["cast"] is not None and sum(int(choice["total"]) for choice in node["choices"]) != node["cast"]:
+                continue
+            entry = merged.setdefault(node["text"], {"text": node["text"], "vote_for": 1, "choices": {}, "cast": None})
+            for choice in node["choices"]:
+                row = entry["choices"].setdefault(choice["text"], {**choice, "total": 0, "places": []})
+                row["total"] += int(choice["total"])
+                row["places"].append((found[1], choice["total"]))
+    for entry in merged.values():
+        yield {**entry, "choices": [{**choice, "total": str(choice["total"])} for choice in entry["choices"].values()]}
+
+
 def _read(registry: Mapping[str, Mapping[str, str]]) -> Iterator[dict[str, Any]]:
     tenant = next(iter(registry))
-    for link in _links():
+    precinct_days: set[Any] = set()
+    for link in (*_precinct_links(), *_links()):
         path = raw.cached(SOURCE, link).path
         text = subprocess.run(["pdftotext", "-layout", str(path), "-"], capture_output=True).stdout.decode(errors="replace")
-        head = text[:1200]
+        head = text[:4000]
         if "Election Summary Report" in head[:300]:
             parser = kceb.gems
         elif "Cumulative Results Report" in head[:300]:
             parser = cumulative
+        elif "Precinct Results Report" in head[:300]:
+            parser = precinct
         else:
             print(f"{link}: layout not read; skipped")
             continue
@@ -117,6 +148,10 @@ def _read(registry: Mapping[str, Mapping[str, str]]) -> Iterator[dict[str, Any]]
         else:
             print(f"{link}: no date; skipped")
             continue
+        if parser is not precinct and day in precinct_days:
+            continue
+        if parser is precinct:
+            precinct_days.add(day)
         title = next(
             (
                 segment
