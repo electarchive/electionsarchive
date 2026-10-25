@@ -8,7 +8,7 @@ from typing import Any
 from urllib.parse import urljoin
 
 from ea import raw
-from ea.sources.us import enr_clarity
+from ea.sources.us import enr_clarity, tx_collin
 
 SOURCE = "us.tx_frisco"
 VERSION = "1"
@@ -88,13 +88,17 @@ def _read(registry: Mapping[str, Mapping[str, str]]) -> Iterator[dict[str, Any]]
             text = subprocess.run(
                 ["pdftotext", "-layout", str(path), "-"], capture_output=True, check=True
             ).stdout.decode(errors="replace")
+            found = list(contests(text))
+            if not found:
+                titles: set[str] = set()
+                for node in tx_collin.electionware(text):
+                    place = re.search(r"Place (\d+)", node["text"])
+                    if place is not None and place[0] not in titles:
+                        titles.add(place[0])
+                        found.append({**node, "text": place[0]})
             nodes = []
-            for node in contests(text):
-                node["text"] = (
-                    "City of Frisco City Council, " + node["text"]
-                    if node["text"] != "Mayor"
-                    else "City of Frisco City Council, Mayor"
-                )
+            for node in found:
+                node["text"] = f"City of Frisco City Council, {node['text']}"
                 nodes.append({**node, "key": str(len(nodes)), "whole": True})
             yield {
                 "tenant": tenant,
