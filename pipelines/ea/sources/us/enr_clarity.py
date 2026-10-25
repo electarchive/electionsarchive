@@ -320,8 +320,7 @@ TOTALS = (
 )
 PARTIAL = (
     "Only part of this jurisdiction's vote is here: the counties that report it on their election night sites "
-    "cover about {share} of its land area. Votes cast in {missing} are missing. A winner is recorded only when the reported part covers at least 80% of the land "
-    "and the lead is larger than the most the missing part could add, estimated at the same votes per land area as the reported part."
+    "cover about {share} of its land area. Votes cast in {missing} are missing, so no winner is recorded."
 )
 UNOFFICIAL = (
     "The county's site does not mark these results as official or certified; they are the last count it posted, "
@@ -1722,10 +1721,9 @@ def emit(
                         is_independent=False,
                     )
                 ranked.append((votes, option, slug(_title(choice))))
-            slack = 0 if not missing else sum(votes for votes, _, _ in ranked) * (1 - completeness) / completeness
-            if ranked and (not missing or completeness >= 0.8):
+            if not missing and ranked:
                 if question:
-                    if len(ranked) == 2 and ranked[0][0] - ranked[1][0] > slack:
+                    if len(ranked) == 2 and ranked[0][0] != ranked[1][0]:
                         cs.add("outcome", result_set_id=result_set, option_id=ranked[0][1], kind="won")
                 elif contest_key in advancing:
                     for _, option, person_slug in ranked:
@@ -1734,8 +1732,8 @@ def emit(
                 else:
                     cut = int(first["magnitude"])
                     total = sum(votes for votes, _, _ in ranked)
-                    majority = st != "TX" or runoff or cut > 1 or ranked[0][0] * 2 > total + slack
-                    if cut > 0 and majority and (len(ranked) <= cut or ranked[cut - 1][0] - ranked[cut][0] > slack):
+                    majority = st != "TX" or runoff or cut > 1 or ranked[0][0] * 2 > total
+                    if cut > 0 and majority and (len(ranked) <= cut or ranked[cut - 1][0] != ranked[cut][0]):
                         for _, option, _ in ranked[:cut]:
                             cs.add(
                                 "outcome",
