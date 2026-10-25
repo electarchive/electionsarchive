@@ -15420,17 +15420,62 @@ export const search = {
           `);
       const state = states?.rows[0]?.name;
       const seat = Number(district?.[2]);
+      const units = (
+        await db.execute<{ code: string; name: string; label: string }>(sql`
+          select lower(substr(p.iso_code, 4)) as code, lower(n.text) as name, n.text as label
+          from polity p join name n on n.entity_id = p.id and n.kind = 'official' and n.is_preferred
+          where p.iso_code like 'US-%'
+        `)
+      ).rows;
+      const lowered = input.q.toLowerCase();
+      const unit =
+        district != null ||
+        units.some((row) => row.name === lowered) ||
+        ALIASES[lowered.replaceAll(".", "").replace(",", "")] != null
+          ? undefined
+          : units
+              .filter((row) =>
+                [row.name, row.code].some((label) =>
+                  new RegExp(
+                    `.(?:,\\s*|\\s+)${RegExp.escape(label)}$`,
+                    "u",
+                  ).test(lowered),
+                ),
+              )
+              .toSorted((a, b) => b.name.length - a.name.length)[0];
+      const asked =
+        unit == null
+          ? input.q
+          : input.q
+              .slice(
+                0,
+                lowered.endsWith(unit.name)
+                  ? -unit.name.length
+                  : -unit.code.length,
+              )
+              .replace(/[,\s]+$/u, "");
+      const room = unit == null ? input.limit : 50;
       const q =
         state == null
-          ? input.q.replace(
-              /^(?:washington,? d\.?c\.?|great britain|u\.s\.|u\.k\.|uk|gb|britain|usa|us|eu|nyc|dc)(?=\s|$)/iu,
-              (word) =>
-                ALIASES[word.toLowerCase()] ??
-                ALIASES[
-                  word.toLowerCase().replaceAll(".", "").replace(",", "")
-                ] ??
-                word,
-            )
+          ? asked
+              .replace(
+                /\b(c?isd|usd)\b/giu,
+                (word) =>
+                  ({
+                    isd: "independent school district",
+                    cisd: "consolidated independent school district",
+                    usd: "unified school district",
+                  })[word.toLowerCase()] ?? word,
+              )
+              .replace(
+                /^(?:washington,? d\.?c\.?|great britain|u\.s\.|u\.k\.|uk|gb|britain|usa|us|eu|nyc|dc)(?=\s|$)/iu,
+                (word) =>
+                  ALIASES[word.toLowerCase()] ??
+                  ALIASES[
+                    word.toLowerCase().replaceAll(".", "").replace(",", "")
+                  ] ??
+                  word,
+              )
           : `${state}'s ${
               Number.isNaN(seat)
                 ? "at-large"
@@ -15488,7 +15533,7 @@ export const search = {
           select d.entity_id, d.type, word_similarity(q.t, d.text) + d.rank_boost * 0.15, false, false
           from search_document d, q, terms
           where q.t <% d.text and not d.tsv @@ terms.tq
-            and (select count(*) from (select from strict limit ${input.limit * 2}) enough) < ${input.limit * 2}
+            and (select count(*) from (select from strict limit ${room * 2}) enough) < ${room * 2}
         ),
         pool as (select * from hits order by score desc limit ${q.length < 3 ? 1000 : 50_000}),
         seats as (
@@ -15561,7 +15606,7 @@ export const search = {
               else 0
             end as score
           from tiered t cross join q
-          order by score desc nulls last, t.date_from desc nulls last limit ${input.limit * 2}
+          order by score desc nulls last, t.date_from desc nulls last limit ${room * 2}
         )
         select top.entity_id as id, top.type::text as type, x.target, x.context,
           coalesce(x.date, (select e.date_from from contest c join election e on e.id = c.election_id where c.id = x.target and top.type = 'person'))::text as date,
@@ -15676,13 +15721,26 @@ export const search = {
                 ? `id/${row.id}`
                 : (slugs.get(row.target ?? "") ?? null),
           context:
-            labels.full.get(
-              (row.type === "person"
-                ? row.isExecutive === true
-                  ? row.office
-                  : row.target
-                : row.context) ?? "",
-            ) ?? null,
+            [
+              labels.full.get(
+                (row.type === "person"
+                  ? row.isExecutive === true
+                    ? row.office
+                    : row.target
+                  : row.context) ?? "",
+              ),
+              row.type === "body"
+                ? units.find(
+                    (entry) =>
+                      entry.code ===
+                      /^us\/([a-z]{2})\/./u.exec(
+                        slugs.get(row.context ?? "") ?? "",
+                      )?.[1],
+                  )?.label
+                : undefined,
+            ]
+              .filter((part) => part != null)
+              .join(", ") || null,
           date: row.isExecutive === true ? null : row.date,
           photo: faces.get(row.id)?.src ?? null,
           office: labels.full.get(row.office ?? "") ?? null,
@@ -15709,6 +15767,20 @@ export const search = {
                     !a.name.includes(" ") &&
                     segment(a.name.split("-")[0] ?? "") === segment(q))),
             ),
+        )
+        .toSorted((a, b) =>
+          unit == null
+            ? 0
+            : Number(
+                b.path === `us/${unit.code}` ||
+                  b.path?.startsWith(`us/${unit.code}/`) === true ||
+                  b.path?.includes(`/us/${unit.code}/`) === true,
+              ) -
+              Number(
+                a.path === `us/${unit.code}` ||
+                  a.path?.startsWith(`us/${unit.code}/`) === true ||
+                  a.path?.includes(`/us/${unit.code}/`) === true,
+              ),
         )
         .slice(0, input.limit);
       const people = ranked.filter((row) => row.type === "person");
