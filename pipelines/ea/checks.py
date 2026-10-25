@@ -93,19 +93,19 @@ class Stage:
     def replaced(self, table: str) -> sql.Composed:
         return sql.SQL(
             """select r.k from public.result_set r join public.changeset c on c.id = r.changeset_id
-               where c.pipeline = {} and (r.id in (select result_set_id from {}) or r.id = any({}::uuid[]))"""
+               where c.pipeline = {} and r.id in (select result_set_id from {} union all select unnest({}::uuid[]))"""
         ).format(sql.Literal(self.pipeline), self.staged(table), sql.Literal(self.clears))
 
     def stale(self, table: str) -> sql.Composable:
         parent = sql.Identifier(self.parents[table])
         return sql.SQL(
             """c.id = {owner} and c.pipeline = {pipeline}
-               and (p.{parent} in (select {parent} from {staged}){cleared})
+               and p.{parent} in (select {parent} from {staged}{cleared})
                and not exists (select from {staged} x where {same})"""
         ).format(
             cleared=sql.SQL(
-                """ or p.{parent} in (select r.id from public.result_set r join public.changeset w on w.id = r.changeset_id
-                                      where w.pipeline = {pipeline} and r.id = any({clears}::uuid[]))"""
+                """ union all select r.id from public.result_set r join public.changeset w on w.id = r.changeset_id
+                               where w.pipeline = {pipeline} and r.id = any({clears}::uuid[])"""
             ).format(parent=parent, pipeline=sql.Literal(self.pipeline), clears=sql.Literal(self.clears))
             if self.parents[table] == "result_set_id" and self.clears
             else sql.SQL(""),
@@ -323,7 +323,9 @@ def _references(conn: Connection, stage: Stage) -> list[tuple[str, sql.Composed]
                             facts=sql.Identifier(table),
                             key=sql.Identifier(column),
                             parent=sql.Identifier(parent),
-                            fresh=sql.SQL(" and r.k not in ({})").format(stage.replaced(table))
+                            fresh=sql.SQL(" and not exists (select from ({}) x where x.k = r.k)").format(
+                                stage.replaced(table)
+                            )
                             if table in stage.tables
                             else sql.SQL(""),
                         ),
