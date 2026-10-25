@@ -26,7 +26,9 @@ PARTY = re.compile(r"^(Dem|Rep|Lib|Grn|Ind|Con)\s+(.+)$")
 PLACE = re.compile(r"^(.*?) ((?:City|Village|Township) of .+)$")
 FILLER = {"OVER VOTES", "UNDER VOTES"}
 PARTIES = {"DEM", "REP", "LIB", "GRE", "GRN", "IND", "CON", "NON", "SOC", "SWP", "NPA", "REF", "WRI"}
-SINGLE = re.compile(r"(?i)\b(?:mayor|auditor|treasurer|clerk|president of council|city attorney|solicitor|prosecutor|sheriff|recorder|engineer|coroner|governor|attorney general|secretary of state)\b")
+SINGLE = re.compile(
+    r"(?i)\b(?:mayor|auditor|treasurer|clerk|president of council|city attorney|solicitor|prosecutor|sheriff|recorder|engineer|coroner|governor|attorney general|secretary of state)\b"
+)
 
 
 def page(year: int) -> str:
@@ -155,7 +157,14 @@ def legacy(rows: list[list[Any]]) -> Iterator[dict[str, Any]]:
     name_col = next((c for c in range(min(width, 30)) if any(v.upper() == "PRECINCT NAME" for v in labels[c])), None)
     if name_col is None:
         return
-    sub = next((n for n, row in enumerate(head) if sum(1 for c in range(width) if str(row[c]).strip().upper() in ("TOTAL", "TOTAL VOTE")) >= 3), None)
+    sub = next(
+        (
+            n
+            for n, row in enumerate(head)
+            if sum(1 for c in range(width) if str(row[c]).strip().upper() in ("TOTAL", "TOTAL VOTE")) >= 3
+        ),
+        None,
+    )
 
     def row_party(n: int) -> bool:
         cells = [str(head[n][c]).strip().upper() for c in range(name_col + 1, width) if head[n][c] not in (None, "")]
@@ -163,20 +172,47 @@ def legacy(rows: list[list[Any]]) -> Iterator[dict[str, Any]]:
 
     parties = next((n for n in range(len(head)) if n != sub and row_party(n)), None)
     contested = [n for n in range(len(head)) if n not in (sub, parties)]
+
     def count(n: int) -> int:
         return sum(1 for c in range(name_col + 1, width) if head[n][c] not in (None, ""))
-    names = max(contested, key=lambda n: (sum(1 for c in range(name_col + 1, width) if str(head[n][c]).strip().upper() in FILLER | {"RACE TOTAL"}), count(n)), default=None)
-    titles = next((n for n in contested if n != names and count(n) > 0 and max((len(str(head[n][c])) for c in range(width) if head[n][c] not in (None, "")), default=0) > 14), None)
+
+    names = max(
+        contested,
+        key=lambda n: (
+            sum(1 for c in range(name_col + 1, width) if str(head[n][c]).strip().upper() in FILLER | {"RACE TOTAL"}),
+            count(n),
+        ),
+        default=None,
+    )
+    titles = next(
+        (
+            n
+            for n in contested
+            if n != names
+            and count(n) > 0
+            and max((len(str(head[n][c])) for c in range(width) if head[n][c] not in (None, "")), default=0) > 14
+        ),
+        None,
+    )
     if names is None or titles is None:
         return
     meta = re.compile(r"(?i)registered|ballots|voters|precinct|\bsos\b|total|location|district no|ward")
     first = next(
-        (c for c in range(name_col + 1, width) if head[titles][c] not in (None, "") and not meta.search(str(head[titles][c]))),
+        (
+            c
+            for c in range(name_col + 1, width)
+            if head[titles][c] not in (None, "") and not meta.search(str(head[titles][c]))
+        ),
         width,
     )
     cells = [c for c in range(first, width) if head[names][c] not in (None, "")]
-    ballots_labels = [c for c in range(width) if re.search(r"(?i)^\s*(?:total voters|ballots cast(?: -)? ?total|ballots cast)\s*$", " ".join(labels[c][:3]))]
+    ballots_labels = [
+        c
+        for c in range(width)
+        if re.search(r"(?i)^\s*(?:total voters|ballots cast(?: -)? ?total|ballots cast)\s*$", " ".join(labels[c][:3]))
+    ]
     ballots = ballots_labels[0] if ballots_labels else None
+
     def block_total(c: int, end: int) -> int:
         if sub is None:
             return c
@@ -184,8 +220,16 @@ def legacy(rows: list[list[Any]]) -> Iterator[dict[str, Any]]:
             (k for k in range(c, end) if str(head[sub][k]).strip().upper() in ("TOTAL", "TOTAL VOTE")),
             c,
         )
+
     if ballots is not None and sub is not None:
-        nxt = next((c for c in range(ballots + 1, width) if head[names][c] not in (None, "") or head[titles][c] not in (None, "")), width)
+        nxt = next(
+            (
+                c
+                for c in range(ballots + 1, width)
+                if head[names][c] not in (None, "") or head[titles][c] not in (None, "")
+            ),
+            width,
+        )
         ballots = block_total(ballots, nxt)
     candidates = []
     for index, c in enumerate(cells):
@@ -278,7 +322,11 @@ def legacy(rows: list[list[Any]]) -> Iterator[dict[str, Any]]:
                     "text": plain,
                     "party": None if code in (None, "NON", "NPA", "WRI") else code,
                     "total": str(sum(entry[position] for entry in votes)),
-                    "places": [(str(merged_name), str(votes[n][position])) for n, merged_name in enumerate(merged) if n in inside],
+                    "places": [
+                        (str(merged_name), str(votes[n][position]))
+                        for n, merged_name in enumerate(merged)
+                        if n in inside
+                    ],
                 }
             )
         text = re.sub(r"^For ", "", title.replace(" - ", " "))
@@ -291,7 +339,12 @@ def _read(registry: Mapping[str, Mapping[str, str]]) -> Iterator[dict[str, Any]]
     for year, link in files():
         book = fastexcel.read_excel(raw.cached(SOURCE, link).path.read_bytes())
         rows = [list(row) for row in book.load_sheet(0, header_row=None).to_polars().iter_rows()]
-        nodes = [{**node, "key": str(n)} for n, node in enumerate(wide(rows) if rows and str(rows[0][0]).strip() == "COUNTY NUMBER" else legacy(rows))]
+        nodes = [
+            {**node, "key": str(n)}
+            for n, node in enumerate(
+                wide(rows) if rows and str(rows[0][0]).strip() == "COUNTY NUMBER" else legacy(rows)
+            )
+        ]
         if not nodes:
             print(f"{year} {link[-50:]}: layout not read")
             continue

@@ -168,7 +168,9 @@ def _read(registry: Mapping[str, Mapping[str, str]]) -> Iterator[dict[str, Any]]
                             "text": label,
                             "party": party,
                             "total": str(sum(votes)),
-                            "places": [(place, str(vote)) for (place, _), vote in zip(node["rows"], votes, strict=True)],
+                            "places": [
+                                (place, str(vote)) for (place, _), vote in zip(node["rows"], votes, strict=True)
+                            ],
                         }
                         for label, (party, votes) in options.items()
                     ],
