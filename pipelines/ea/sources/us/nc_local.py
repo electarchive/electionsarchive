@@ -16,9 +16,78 @@ from ea.sources.us.ncsbe import SOURCE as NCSBE
 from ea.store import DATA, connect
 
 SOURCE = "us.nc_local"
-VERSION = "4"
+VERSION = "5"
 PARSED = DATA / "parsed" / SOURCE
-DAYS = [date(year, 11, 2 + (-date(year, 11, 1).weekday()) % 7) for year in range(2014, 2026)]
+DAYS = [
+    date(int(text[:4]), int(text[4:6]), int(text[6:]))
+    for text in [
+        "20081104",
+        "20100504",
+        "20100622",
+        "20101102",
+        "20120508",
+        "20120717",
+        "20121106",
+        "20140506",
+        "20140715",
+        "20141104",
+        "20150915",
+        "20151006",
+        "20151103",
+        "20160315",
+        "20160607",
+        "20161108",
+        "20170912",
+        "20171010",
+        "20171107",
+        "20180508",
+        "20180626",
+        "20181106",
+        "20190514",
+        "20190910",
+        "20191008",
+        "20191105",
+        "20200303",
+        "20200623",
+        "20201103",
+        "20211005",
+        "20211102",
+        "20220517",
+        "20220726",
+        "20221108",
+        "20221206",
+        "20230307",
+        "20230912",
+        "20231010",
+        "20231107",
+        "20240305",
+        "20241105",
+        "20250909",
+        "20251007",
+        "20251104",
+    ]
+]
+SECOND = {
+    date(2010, 6, 22): date(2010, 5, 4),
+    date(2012, 7, 17): date(2012, 5, 8),
+    date(2014, 7, 15): date(2014, 5, 6),
+    date(2016, 6, 7): date(2016, 3, 15),
+    date(2018, 6, 26): date(2018, 5, 8),
+    date(2020, 6, 23): date(2020, 3, 3),
+    date(2022, 7, 26): date(2022, 5, 17),
+}
+SCOPES = {
+    "DEM": "Democratic",
+    "REP": "Republican",
+    "LIB": "Libertarian",
+    "GRE": "Green",
+    "CST": "Constitution",
+    "UNA": "Unaffiliated",
+    "LBT": "Libertarian",
+}
+SPECIAL_DAYS = {date(2019, 5, 14), date(2022, 12, 6), date(2023, 3, 7)}
+PARTY_SUFFIX = re.compile(r"\s*\((DEM|REP|LIB|GRE|CST|UNA|LBT)\)\s*$")
+SINGLE = {"sheriff", "register-of-deeds", "clerk-of-superior-court", "coroner", "surveyor", "mayor"}
 PLACES = "https://www2.census.gov/geo/tiger/GENZ2020/shp/cb_2020_37_place_500k.zip"
 KINDS = {"25": "City", "43": "Town", "47": "Village"}
 COLUMNS = {
@@ -31,6 +100,9 @@ COLUMNS = {
     "choice party": "party",
     "total votes": "votes",
     "vote for": "vote_for",
+    "vote_for": "vote_for",
+    "contest type": "ctype",
+    "contest_type": "ctype",
 }
 OFFICES = {
     "board-of-commissioners-chair": (
@@ -145,6 +217,10 @@ def parse() -> None:
         frame = frame.rename(
             {column: COLUMNS[column.strip().lower()] for column in frame.columns if column.strip().lower() in COLUMNS}
         )
+        if "ctype" in frame.columns:
+            frame = frame.filter(pl.col("ctype").str.strip_chars() == "C")
+        if "vote_for" not in frame.columns:
+            frame = frame.with_columns(vote_for=pl.lit(None, dtype=pl.String))
         frame = frame.select(
             "county",
             "precinct",
@@ -157,7 +233,10 @@ def parse() -> None:
         labels: list[dict[str, object]] = []
         for county, contest in frame.select("county", "contest").unique().iter_rows():
             fips, short = counties[re.sub(r"[^A-Z]", "", county.upper())]
-            name = re.sub(r"\s*\(\d+ SEATS?\)", "", contest)
+            party = PARTY_SUFFIX.search(contest)
+            name = PARTY_SUFFIX.sub("", contest)
+            seats = re.search(r"\((\d+) SEATS?\)", name)
+            name = re.sub(r"\s*\(\d+ SEATS?\)", "", name)
             name = re.sub(r"\s*-?\s*\(?\bUN-?EX\w*\b.*$", "", name)
             remainder = re.search(r"\bUN-?EX", contest) is not None
             if re.search(r"REFERENDUM|STRUCTURE|METHOD|RUNOFF|BONDS?\b|ELECTION$", name):
@@ -175,6 +254,8 @@ def parse() -> None:
                         "office": "special",
                         "seat": None,
                         "remainder": remainder,
+                        "scope": party[1] if party else None,
+                        "seats": int(seats[1]) if seats else None,
                         "word": special[1].replace("REIGELWOOD", "RIEGELWOOD").title()
                         + (
                             " Hospital"
@@ -233,6 +314,8 @@ def parse() -> None:
                     "office": office[0],
                     "seat": seat,
                     "remainder": remainder,
+                    "scope": party[1] if party else None,
+                    "seats": int(seats[1]) if seats else None,
                     "word": next((board for board in BOARDS if word and word.startswith(board)), None),
                 }
             )
@@ -256,7 +339,16 @@ def parse() -> None:
                     "remainder": first["remainder"],
                     "word": first["word"],
                     "district": rows.select(pl.struct("county", "precinct").n_unique()).item() < 0.9 * widths[code],
-                    "magnitude": rows["vote_for"].max(),
+                    "scope": first["scope"],
+                    "magnitude": rows["vote_for"].max()
+                    or first["seats"]
+                    or (
+                        1
+                        if first["office"] in SINGLE
+                        or first["office"].endswith("-chair")
+                        or re.match(r"(?:District|Ward|Seat|Post|Precinct) \w+$", first["seat"] or "")
+                        else None
+                    ),
                 }
             )
             results.append(
@@ -304,7 +396,7 @@ def parse() -> None:
         .drop("home")
         .unique(["day", "code", "contest"], keep="first", maintain_order=True)
     )
-    duplicated = frame.filter(pl.struct("day", "code", "office", "seat", "remainder").is_duplicated())
+    duplicated = frame.filter(pl.struct("day", "code", "office", "seat", "remainder", "scope").is_duplicated())
     if duplicated.height:
         raise ValueError(f"contests that share a key: {duplicated.rows()[:10]}")
     frame.write_parquet(PARSED / "contests.parquet")
@@ -321,7 +413,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="North Carolina's county and municipal elections, 2014–2025",
+            summary="North Carolina's county, municipal, and school board elections, 2008–2025",
             polity="US-NC",
         )
 
@@ -346,6 +438,17 @@ def emit() -> Path:
                    join slug s on s.entity_id = p.id
                    where a.scheme_code = 'us.county' and c.code like '37%'"""
             ).fetchall()
+        }
+        foreign = {
+            table: dict(
+                conn.execute(
+                    f"""select s.path, s.entity_id from slug s join {table} t on t.id = s.entity_id
+                        join changeset c on c.id = t.changeset_id
+                        where s.path like 'us/nc/%%' and c.pipeline <> %s""",
+                    [SOURCE],
+                ).fetchall()
+            )
+            for table in ("election", "contest")
         }
         taken = {path for (path,) in conn.execute("select path from slug where path like 'us/nc/%'").fetchall()}
         for code, text, kind, geom, point in places.iter_rows():
@@ -432,7 +535,7 @@ def emit() -> Path:
 
         owners: dict[tuple[str, str], UUID] = {}
         elections: dict[tuple[date, str], UUID] = {}
-        persons: dict[tuple[str, str], UUID] = {}
+        persons: dict[UUID, str] = {}
         districts: set[str] = set()
         grouped = {keys: rows for keys, rows in results.group_by("day", "code", "contest")}
         precincts: dict[str, UUID] = dict(
@@ -451,6 +554,12 @@ def emit() -> Path:
             for (value,) in conn.execute(
                 "select value from external_id where scheme = %s", [f"{SOURCE}.result_set"]
             ).fetchall()
+        }
+        present = {
+            (day, code, office, seat, remainder, scope)
+            for day, code, office, seat, remainder, scope in contests.select(
+                "day", "code", "office", "seat", "remainder", "scope"
+            ).iter_rows()
         }
         minted: dict[str, date] = {}
         memberships: set[tuple[UUID, UUID, date]] = set()
@@ -471,6 +580,25 @@ def emit() -> Path:
                 title = f"{place.removesuffix(' County')} {OFFICES[office][1]}"
             else:
                 title = f"{place} {OFFICES[office][1]}"
+            general = day.year % 2 == 0
+            kind_of = (
+                ("general" if general else "local")
+                if day.month == 11
+                else "runoff"
+                if day in SECOND
+                else "special"
+                if day in SPECIAL_DAYS
+                else "primary"
+            )
+            label = {"general": "general", "local": "municipal", "runoff": "primary runoff"}.get(kind_of, kind_of)
+            contest_path = (
+                f"{path}/{day}-{kind_of}/{office}"
+                + (f"-{slug(row['seat'])}" if row["seat"] else "")
+                + ("-unexpired" if row["remainder"] else "")
+                + (f"-{row['scope'].lower()}" if row["scope"] else "")
+            )
+            if contest_path in foreign["contest"]:
+                continue
             if (code, office) not in owners:
                 owner = owners[(code, office)] = cs.key(
                     "us.body" if office in BODIES else "us.office", f"NC:{code}:{office}"
@@ -480,34 +608,34 @@ def emit() -> Path:
                 else:
                     cs.add("office", id=owner, polity_id=polity, kind="mayor" if office == "mayor" else "other")
                 name(owner, title)
-            general = day.year % 2 == 0
-            kind_of = "general" if general else "local"
             if not general and (day, "37") not in elections:
                 umbrella = elections[(day, "37")] = cs.key("us.election", f"{day}:NC")
                 cs.add(
                     "election",
                     id=umbrella,
                     polity_id=state,
-                    kind="local",
+                    kind="local" if kind_of == "primary" else kind_of,
                     date_from=day,
                     date_to=day,
                     status="held",
                 )
-                name(umbrella, f"{day.year} North Carolina municipal elections")
-                cs.add("slug", path=f"us/nc/{day}-local", entity_id=umbrella)
+                name(umbrella, f"{day.year} North Carolina municipal {label} elections")
+                cs.add("slug", path=f"us/nc/{day}-{'local' if kind_of == 'primary' else kind_of}", entity_id=umbrella)
+            if (day, code) not in elections and f"{path}/{day}-{kind_of}" in foreign["election"]:
+                elections[(day, code)] = foreign["election"][f"{path}/{day}-{kind_of}"]
             if (day, code) not in elections:
                 election = elections[(day, code)] = cs.key("us.election", f"{day}:NC:{code}")
                 cs.add(
                     "election",
                     id=election,
                     polity_id=polity,
-                    parent_id=cs.key("us.election", f"{day}:NC"),
+                    parent_id=cs.key("us.election", f"{day}:NC") if day.month == 11 or not general else None,
                     kind=kind_of,
                     date_from=day,
                     date_to=day,
                     status="held",
                 )
-                name(election, f"{day.year} {place} {'general' if general else 'municipal'} election")
+                name(election, f"{day.year} {place} {label} election")
                 cs.add("slug", path=f"{path}/{day}-{kind_of}", entity_id=election)
             election = elections[(day, code)]
             whole = area = cs.area(scheme, code)
@@ -537,9 +665,16 @@ def emit() -> Path:
                 f"{day}:NC:{code}:{office}"
                 + (f":{slug(seat)}" if seat else "")
                 + (":remainder" if row["remainder"] else "")
+                + (f":{row['scope'].lower()}" if row["scope"] else "")
             )
             contest = cs.key("us.contest", contest_key)
             magnitude = row["magnitude"]
+            first_day = SECOND.get(day)
+            previous_round = (
+                cs.key("us.contest", contest_key.replace(str(day), str(first_day), 1))
+                if first_day is not None and (first_day, code, office, seat, row["remainder"], row["scope"]) in present
+                else None
+            )
             cs.add(
                 "contest",
                 id=contest,
@@ -549,8 +684,10 @@ def emit() -> Path:
                 body_id=owners[(code, office)] if office in BODIES else None,
                 district_area_id=area if row["district"] else whole,
                 magnitude=magnitude,
-                round_number=1,
-                electoral_system_id=systems["fptp" if magnitude == 1 else "block"],
+                round_number=2 if first_day else 1,
+                previous_round_id=previous_round,
+                party_scope_id=parties.get(row["scope"]),
+                electoral_system_id=None if magnitude is None else systems["block" if magnitude > 1 else "fptp"],
                 default_result_kind="counted",
                 term="remainder" if row["remainder"] else "full",
             )
@@ -558,13 +695,12 @@ def emit() -> Path:
                 contest,
                 (f"{day.year} {place} mayoral election" if office == "mayor" else f"{day.year} {title} election")
                 + (f", {seat}" if seat else "")
-                + (" (unexpired term)" if row["remainder"] else ""),
+                + (" (unexpired term)" if row["remainder"] else "")
+                + (f" ({SCOPES[row['scope']]} primary)" if row["scope"] else ""),
             )
             cs.add(
                 "slug",
-                path=f"{path}/{day}-{kind_of}/{office}"
-                + (f"-{slug(seat)}" if seat else "")
-                + ("-unexpired" if row["remainder"] else ""),
+                path=contest_path,
                 entity_id=contest,
             )
             if row["district"]:
@@ -610,6 +746,12 @@ def emit() -> Path:
             counted = grouped[(day, code, row["contest"])].with_columns(
                 writein=pl.col("choice").str.contains(r"(?i)write-?\s*in")
             )
+            merged_choices: dict[UUID, str] = {}
+            canon = {
+                choice: merged_choices.setdefault(cs.key(f"{SOURCE}.person", f"{code}:{slug(choice)}"), choice)
+                for choice in counted.filter(~pl.col("writein"))["choice"].unique().sort()
+            }
+            counted = counted.with_columns(pl.col("choice").replace(canon))
             lines = (
                 counted.group_by(
                     pl.when("writein").then(pl.lit("Write-ins")).otherwise("choice").alias("choice"), "writein"
@@ -625,11 +767,11 @@ def emit() -> Path:
                     cs.add("contest_option", id=option, contest_id=contest, kind="write_in", ballot_label="Write-ins")
                 else:
                     rank += 1
-                    if (code, slug(choice)) not in persons:
-                        persons[(code, slug(choice))] = cs.key(f"{SOURCE}.person", f"{code}:{slug(choice)}")
-                        cs.add("person", id=persons[(code, slug(choice))])
-                        name(persons[(code, slug(choice))], choice)
-                    person = persons[(code, slug(choice))]
+                    person = cs.key(f"{SOURCE}.person", f"{code}:{slug(choice)}")
+                    if person not in persons:
+                        persons[person] = choice
+                        cs.add("person", id=person)
+                        name(person, choice)
                     option = cs.key("us.option", f"{contest_key}:{person}")
                     cs.add(
                         "contest_option",
@@ -648,7 +790,7 @@ def emit() -> Path:
                         ballot_name=choice,
                         is_independent=party == "UNA",
                     )
-                    if rank <= magnitude:
+                    if magnitude is not None and rank <= magnitude and kind_of in ("general", "local", "special"):
                         cs.add("outcome", result_set_id=result_set, option_id=option, kind="elected", seats=None)
                 options[choice] = option
                 if result_set in cs.minted and town:
