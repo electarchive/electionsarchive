@@ -13,7 +13,7 @@ from ea.changeset import Changeset
 from ea.store import DATA, connect
 
 SOURCE = "wikidata_match"
-VERSION = "3"
+VERSION = "4"
 TITLE = "Labels and positions held (P39) of people"
 BUCKETS = 300
 SLACK = 1
@@ -176,7 +176,7 @@ def emit() -> Path:
             summary=(
                 "Wikidata items for people without one who won an executive office or a legislative seat since 2016, "
                 "where the item's label is their name and it held that office or chamber within a year of the win; "
-                "a winner whose item another person already holds is merged into that person"
+                "a winner whose item another person already holds, or another winner also claims, is merged into that person"
             ),
             polity=None,
             kind="match",
@@ -194,27 +194,26 @@ def emit() -> Path:
         )
         for url in fetched:
             cs.artifact(raw.cached(SOURCE, url), source)
-        linked = ambiguous = taken = 0
+        linked = ambiguous = 0
         joined: list[str] = []
         for person, items in sorted(matches.items()):
             item = next(iter(items))
-            if len(items) > 1 or len(claimants[item]) > 1:
+            if len(items) > 1 or any(len(matches[other]) > 1 for other in claimants[item]):
                 ambiguous += 1
-            elif item in held:
-                holder = cs.survivors.get(held[item], held[item])
-                if holder != person and person not in cs.survivors:
-                    cs.merge(person, holder)
-                    joined.append(
-                        f"{person}\t{holder}\t{item}\t{' | '.join(sorted(text for text, _ in targets[person]['names']))}\n"
-                    )
-                taken += 1
-            else:
+                continue
+            holder = held.get(item, min(claimants[item]))
+            holder = cs.survivors.get(holder, holder)
+            if holder == person:
                 cs.add("external_id", entity_id=person, scheme="wikidata", value=item)
                 linked += 1
+            elif person not in cs.survivors:
+                cs.merge(person, holder)
+                joined.append(
+                    f"{person}\t{holder}\t{item}\t{' | '.join(sorted(text for text, _ in targets[person]['names']))}\n"
+                )
         (DATA / "logs" / "wikidata_match_joined.tsv").write_text("".join(joined), encoding="utf-8")
         print(
             f"{len(targets)} people without an item, {len(fetched)} of {len(urls)} batches fetched: "
-            f"{linked} linked, {ambiguous} ambiguous, {taken} items already held by another person, "
-            f"{len(joined)} of them merged into that person"
+            f"{linked} linked, {ambiguous} ambiguous, {len(joined)} merged into the person holding or taking the item"
         )
         return cs.write()
