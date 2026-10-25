@@ -57,10 +57,12 @@
               : m.byes_hold({ party: label(to) }),
         why:
           row.member == null
-            ? null
-            : (VACANCIES[row.reason ?? ""] ?? m.byes_reason_none)({
-                name: row.member.name,
-              }),
+            ? row.cause
+            : row.reason == null && row.cause != null
+              ? row.cause
+              : (VACANCIES[row.reason ?? ""] ?? m.byes_reason_none)({
+                  name: row.member.name,
+                }),
       };
     });
     return {

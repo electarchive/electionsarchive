@@ -762,6 +762,7 @@ export const seats = {
                 v.object({ name: v.string(), path: v.nullable(v.string()) }),
               ),
               reason: v.nullable(v.string()),
+              cause: v.nullable(v.string()),
               isHere: v.boolean(),
             }),
           ),
@@ -779,6 +780,7 @@ export const seats = {
         before: string | null;
         member: string | null;
         via: string | null;
+        cause: string | null;
         majority: number | null;
         general: string;
         since: string;
@@ -818,14 +820,26 @@ export const seats = {
         prior as materialized (
           select b.id, p.id as prior, p.day as since
           from bys b cross join lateral (
-            select c.id, e.date_from as day from contest c join election e on e.id = c.election_id
-            where c.body_id = b.body and c.kind = 'body_seats'
-              and (c.district_area_id = b.area or (b.area is null and c.district_area_id is null and exists (
-                select from slug sc join slug sb on sb.entity_id = b.id and sb.is_current
-                where sc.entity_id = c.id and sc.is_current and substring(sc.path from '[^/]+$') = substring(sb.path from '[^/]+$')
-              )))
-              and c.allocation_parent_id is null and e.kind in ('general', 'by_election') and e.date_from < b.day and not c.notional
-            order by e.date_from desc limit 1
+            select q.id, q.day from (
+              select c.id, e.date_from as day, max(e.date_from) over () as newest
+              from contest c join election e on e.id = c.election_id
+              where c.body_id = b.body and c.kind = 'body_seats'
+                and (c.district_area_id = b.area or (b.area is null and c.district_area_id is null and exists (
+                  select from slug sc join slug sb on sb.entity_id = b.id and sb.is_current
+                  where sc.entity_id = c.id and sc.is_current and substring(sc.path from '[^/]+$') = substring(sb.path from '[^/]+$')
+                )))
+                and c.allocation_parent_id is null and e.kind in ('general', 'by_election') and e.date_from < b.day and not c.notional
+            ) q
+            order by (
+              select max(t.to_date) from result_set rs
+              join outcome x on x.result_set_id = rs.id and x.kind in ('elected', 'won') and x.candidacy_id is null
+              join candidacy cy on cy.option_id = x.option_id and cy.role = 'head'
+              left join entity_merge cm on cm.entity_id = cy.person_id
+              join tenure t on t.body_id = b.body and t.to_date > q.newest and t.to_date <= b.day
+              left join entity_merge tm on tm.entity_id = t.person_id
+              where rs.contest_id = q.id and q.day >= (select day from general)
+                and coalesce(tm.into_id, t.person_id) = coalesce(cm.into_id, cy.person_id)
+            ) desc nulls last, q.day desc limit 1
           ) p
         ),
         won as materialized (
@@ -887,7 +901,8 @@ export const seats = {
         from bys b left join prior p on p.id = b.id left join left_seat l on l.id = b.id
         )
         select q.id, q.area, q.day, q.until, q.general, q.since, q."isHere", q.now, q.winner,
-          coalesce(sp.party, q.before) as before, q.member, q.via, q.majority
+          coalesce(sp.party, q.before) as before, q.member, q.via, q.majority,
+          (select n.body_md from note n where n.entity_id = q.id::uuid and n.kind = 'context' order by n.id limit 1) as cause
         from listed q
         left join lateral (
           select coalesce(pm.into_id, co.party_id)::text as party
@@ -979,6 +994,7 @@ export const seats = {
           winner: person(row.winner),
           member: person(row.member),
           reason: row.via,
+          cause: row.via == null ? row.cause : null,
           isHere: row.isHere,
         })),
       };

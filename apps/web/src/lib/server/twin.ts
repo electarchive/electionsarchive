@@ -2082,10 +2082,13 @@ function electionMarkdown(
                   : m.byes_hold({ party: label(row.to) }),
               row.majority == null ? null : count(row.majority),
               row.member == null
-                ? null
+                ? row.cause
                 : (reasons[row.reason ?? ""]?.({
                     name: link(row.member.name, row.member.path),
-                  }) ?? link(row.member.name, row.member.path)),
+                  }) ??
+                  (row.cause == null
+                    ? link(row.member.name, row.member.path)
+                    : `${link(row.member.name, row.member.path)}: ${row.cause}`)),
             ]),
           ),
           ...(listed.length < byeRows.length
