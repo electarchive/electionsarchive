@@ -6442,8 +6442,43 @@ export const contests = {
         order by x.contest, o.ballot_position nulls last, o.k
       `);
       const locals = located.values().toArray();
+      const lone = day.rows.filter(
+        (row) =>
+          row.count === 1 &&
+          !row.isCurrent &&
+          [
+            "owner",
+            "legislature",
+            "regional_office",
+            "local",
+            "local_measure",
+          ].includes(row.kind),
+      );
+      const here = focus?.id ?? contest.place?.id;
+      const away =
+        lone.length === 0 || here == null
+          ? new Set<string>()
+          : new Set(
+              (
+                await db.execute<{ id: string }>(sql`
+                  select x.id from unnest(${sql.param(lone.map((row) => row.sample))}::uuid[]) as x(id)
+                  join contest c on c.id = x.id
+                  join election e on e.id = c.election_id
+                  left join polity_territory pt on pt.polity_id = e.polity_id and pt.valid @> e.date_from
+                  cross join lateral (
+                    select g.geom from area_geometry g
+                    where g.area_id = coalesce(c.district_area_id, pt.area_id) and g.valid @> e.date_from limit 1
+                  ) a
+                  cross join lateral (
+                    select g.geom from area_geometry g
+                    where g.area_id = ${here}::uuid and g.valid @> e.date_from limit 1
+                  ) h
+                  where not st_relate(a.geom, h.geom, 'T********')
+                `)
+              ).rows.map((row) => row.id),
+            );
       const groups = day.rows.filter(
-        (row) => !(row.isCurrent && row.count === 1),
+        (row) => !(row.isCurrent && row.count === 1) && !away.has(row.sample),
       );
       const top = day.rows[0]?.top ?? null;
       const election = day.rows[0]?.election ?? null;
