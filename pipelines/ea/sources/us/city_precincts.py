@@ -871,7 +871,7 @@ def emit() -> Path:
                     ).fetchall()
                 }
                 memberships.extend(
-                    (str(units[code]), str(district_area), day, day + timedelta(days=1), "contest")
+                    (str(units[code]), str(district_area), day, day + timedelta(days=1), "city_universe")
                     for code in mine
                     if str(units[code]) not in held
                 )
