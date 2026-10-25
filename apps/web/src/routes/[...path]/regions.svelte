@@ -129,7 +129,7 @@
   );
 </script>
 
-{#each chambers as chamber, at (chamber.name)}
+{#each chambers as chamber, at (`${chamber.name}:${chamber.noun}`)}
   {const index = $derived(
     sorted == null
       ? -1

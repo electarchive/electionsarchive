@@ -10437,19 +10437,44 @@ export const elections = {
               const rows = all.filter((row) => row.region != null);
               const unplaced = all.filter((row) => row.region == null);
               const leaves = new Set(rows.map((row) => row.leaf)).size;
-              const chosen = Map.groupBy(rows, (row) => row.scheme)
+              const levels = Map.groupBy(rows, (row) => row.scheme)
                 .entries()
                 .map(([scheme, group]) => ({
                   scheme,
                   rows: group,
-                  leaves: new Set(group.map((row) => row.leaf)).size,
+                  covered: new Set(group.map((row) => row.leaf)),
                   regions: new Set(group.map((row) => row.region)).size,
                 }))
+                .toArray();
+              const chosen = levels
                 .filter(
-                  (entry) => entry.leaves === leaves && entry.regions >= 4,
+                  (entry) =>
+                    entry.covered.size === leaves && entry.regions >= 4,
                 )
-                .toArray()
                 .toSorted((a, b) => a.regions - b.regions)[0];
+              const finer = levels
+                .filter(
+                  (entry) =>
+                    chosen != null &&
+                    entry.covered.size < leaves &&
+                    entry.covered.size * 2 >= leaves &&
+                    entry.regions > chosen.regions,
+                )
+                .toSorted((a, b) => b.covered.size - a.covered.size)[0];
+              const rest = (chosen?.rows ?? []).filter(
+                (row) => finer != null && !finer.covered.has(row.leaf),
+              );
+              const shared = new Set(
+                (chosen?.rows ?? [])
+                  .filter((row) => finer?.covered.has(row.leaf) === true)
+                  .map((row) => row.region),
+              );
+              const mixed =
+                finer == null ||
+                rest.length === 0 ||
+                rest.some((row) => shared.has(row.region))
+                  ? null
+                  : [...finer.rows, ...rest, ...unplaced];
               const counted = [...(chosen?.rows ?? []), ...unplaced];
               let seats = 0;
               for (const row of counted) {
@@ -10465,11 +10490,18 @@ export const elections = {
                       scheme: chosen.scheme ?? "",
                       seats,
                       rows: counted,
+                      mixed:
+                        mixed == null || finer == null
+                          ? null
+                          : { scheme: finer.scheme ?? "", rows: mixed },
                     },
                   ];
             })
             .toSorted((a, b) => b.seats - a.seats)
-            .slice(0, 1);
+            .slice(0, 1)
+            .flatMap(({ mixed, ...chamber }) =>
+              mixed == null ? [chamber] : [chamber, { ...chamber, ...mixed }],
+            );
         })
         .toArray();
       const parties = [
@@ -10592,6 +10624,7 @@ export const elections = {
                     : (labels.full.get(region) ?? "").slice(shared),
                 scope: scoped.get(region ?? "") ?? null,
                 isPlaced: region != null,
+                isFiner: rows[0]?.scheme === chamber.scheme,
                 seats: won,
                 parties: tally,
               };
@@ -10600,9 +10633,10 @@ export const elections = {
             .toSorted(
               (a, b) =>
                 Number(b.isPlaced) - Number(a.isPlaced) ||
+                Number(b.isFiner) - Number(a.isFiner) ||
                 a.name.localeCompare(b.name, undefined, { numeric: true }),
             )
-            .map(({ isPlaced: _, ...entry }) => entry),
+            .map(({ isPlaced: _, isFiner: __, ...entry }) => entry),
           parties: [
             ...new Set(chamber.rows.flatMap((row) => row.party ?? [])),
           ].map((id) => ({
