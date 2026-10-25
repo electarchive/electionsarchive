@@ -1017,6 +1017,12 @@ export const polityPeriod = pgTable("polity_period", {
 	recordedFrom: timestamp("recorded_from", { withTimezone: true }).default(sql`now()`).notNull(),
 });
 
+export const polityRecord = pgTable("polity_record", {
+	polityId: uuid("polity_id").primaryKey(),
+	record: jsonb().notNull(),
+	builtAt: timestamp("built_at", { withTimezone: true }).default(sql`now()`).notNull(),
+});
+
 export const polityRelation = pgTable("polity_relation", {
 	id: uuid().default(sql`uuidv7()`).primaryKey(),
 	fromPolityId: uuid("from_polity_id").notNull().references(() => polity.id),
