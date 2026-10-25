@@ -103,6 +103,8 @@ def listing() -> list[dict[str, str]]:
             day = held[1] if held.lastindex == 2 else f"{held[3]}{int(held[1]):02d}{held[2]}"
             event = held[2] if held.lastindex == 2 else held[4]
             name = match[3]
+            if day == "20190625" and "45th Council District" in name:
+                day, event = "20190514", "Special Election"
             if OUT_OF_SCOPE.search(name) or (STATE_FEDERAL.search(name) and not CITY.search(name)):
                 continue
             found.append(
@@ -596,6 +598,19 @@ def emit() -> Path:
                 party = parties[body] if body else None
                 adjective = body
                 seat_path = f"{seat}-{slug(body)}" if body else seat
+
+                if day == date(2019, 5, 14):
+                    stale = conn.execute(
+                        """select x.entity_id from external_id x join entity e on e.id = x.entity_id
+                           where x.scheme = 'us.contest' and x.value = %s and e.retired_by is null""",
+                        [f"2019-06-25:new-york-city:{seat_path}"],
+                    ).fetchone()
+                    if stale is not None:
+                        cs.add(
+                            "entity_retirement",
+                            entity_id=stale[0],
+                            reason="A special election held on 2019-05-14, filed by the Board of Elections under the June 25 primary",
+                        )
 
                 existing = (
                     []
