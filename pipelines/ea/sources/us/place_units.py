@@ -254,7 +254,8 @@ def emit() -> Path:
                    from reporting_unit u join changeset c on c.id = u.changeset_id
                    left join area own on own.id = u.area_id
                    left join name n on n.entity_id = u.area_id and n.kind = 'official' and n.is_preferred
-                   where u.scheme_code = 'us.precinct' and split_part(u.code, ':', 2) = %s and lower(u.valid) is not null""",
+                   where u.scheme_code = 'us.precinct' and split_part(u.code, ':', 2) = %s and lower(u.valid) is not null
+                     and u.code !~ ':99999$'""",
                 [abbr],
             ).fetchall()
             by_day: dict[date, list[tuple[str, str, date, date, str, bool, str | None, str]]] = {}
@@ -288,7 +289,7 @@ def emit() -> Path:
                    join result_set r on r.contest_id = c.id and r.status = 'active'
                    join election e on e.id = r.election_id
                    join lateral (select distinct unit_k from result_value v where v.result_set_k = r.k offset 0) v on true
-                   join reporting_unit u on u.k = v.unit_k and u.scheme_code = 'us.precinct'
+                   join reporting_unit u on u.k = v.unit_k and u.scheme_code = 'us.precinct' and u.code !~ ':99999$'
                    left join area own on own.id = u.area_id
                    where ac.code = any(%s)
                    group by 1, 2, 3, 4""",
