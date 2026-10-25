@@ -12150,6 +12150,7 @@ export const polities = {
         `),
         ]);
       const ranks = new Map(kinds.rows.map((row) => [row.id, row.rank ?? 5]));
+      const court = /\b(?:Judge|Justice|Court|Surrogate|Magistrate)\b/u;
       const owned = new Set(
         kinds.rows.filter((row) => row.isOwn).map((row) => row.id),
       );
@@ -12295,6 +12296,7 @@ export const polities = {
           .toSorted(
             (a, b) =>
               Number(a.isAbroad) - Number(b.isAbroad) ||
+              Number(court.test(a.name)) - Number(court.test(b.name)) ||
               (a.isOffice
                 ? a.points.every((point) => point.filled <= 1)
                   ? 0
