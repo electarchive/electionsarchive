@@ -15,7 +15,7 @@ from ea.changeset import Changeset, slug
 from ea.store import DATA, connect
 
 SOURCE = "us.alged"
-VERSION = "2"
+VERSION = "3"
 PARSED = DATA / "parsed" / SOURCE
 URL = "https://osf.io/download/tbwzd/"
 PLACES = "https://www2.census.gov/geo/tiger/GENZ2020/shp/cb_2020_us_place_500k.zip"
@@ -26,6 +26,12 @@ PUBLISHER = "de Benedictis-Kessner, Lee, Velez, and Warshaw"
 TITLE = "American Local Government Elections Database"
 STATES = {"Utah": "UT", "Maryland": "MD"}
 WORDS = {"21": "Borough", "37": "Municipality", "43": "Town", "47": "Village", "53": "City and Borough"}
+DC = "1150000"
+TITLES = {
+    (DC, "mayor"): "Mayor of the District of Columbia",
+    (DC, "council"): "Council of the District of Columbia",
+    ("4752006", "council"): "Metropolitan Council",
+}
 BOARDS = {
     **dict.fromkeys(["AZ", "CA", "IA", "MS", "VA", "WI"], "Board of Supervisors"),
     **dict.fromkeys(["AL", "AR", "TN"], "County Commission"),
@@ -248,6 +254,20 @@ def emit() -> Path:
                 [SOURCE],
             ).fetchall()
         }
+        dc = cs.polity("US-DC")
+        polities[DC] = (dc, "District of Columbia", "us/dc", "District")
+        for (washington,) in conn.execute(
+            """select p.id from external_id x join polity p on p.id = x.entity_id and p.id <> %s
+               where x.scheme = 'us.polity' and x.value = %s""",
+            [dc, f"place:{DC}"],
+        ).fetchall():
+            cs.merge(washington, dc)
+            for election, parent in conn.execute(
+                """select e.id, e.parent_id from election e join election p on p.id = e.parent_id
+                   where e.polity_id = %s and p.polity_id = %s""",
+                [washington, dc],
+            ).fetchall():
+                cs.merge(election, parent)
         aliases: dict[str, str] = {}
         for code, text, usps, lsad, geom, point in places.iter_rows():
             text = re.sub(r"(?: city| (?:consolidated|unified|metro|metropolitan) government)? \(balance\)$", "", text)
@@ -316,6 +336,13 @@ def emit() -> Path:
         persons: set[UUID] = set()
         districts: set[str] = set()
         paths: set[str] = set()
+        owned: dict[str, UUID] = dict(
+            conn.execute(
+                """select s.path, s.entity_id from slug s join changeset c on c.id = s.changeset_id
+                   where c.pipeline = %s and s.path like 'us/%%'""",
+                [SOURCE],
+            ).fetchall()
+        )
         merged = {
             value
             for (value,) in conn.execute(
@@ -374,13 +401,15 @@ def emit() -> Path:
             else:
                 role = PROSECUTORS.get(usps, "District Attorney")
                 key, title, kind = slug(role), f"{place} {role}", "other"
-            title = re.sub(r"\b(County|Parish|City) \1\b", r"\1", title)
+            title = TITLES.get((code, key), re.sub(r"\b(County|Parish|City) \1\b", r"\1", title))
             owner = cs.key("us.office" if kind else "us.body", f"{usps}:{code}:{key}")
             if owner in cs.minted and owner not in owners:
                 if kind:
                     cs.add("office", id=owner, polity_id=polity, kind=kind)
                 else:
                     cs.add("body", id=owner, polity_id=polity, kind="council")
+                name(owner, title)
+            elif (code, key) in TITLES and owner not in owners:
                 name(owner, title)
             owners.add(owner)
 
@@ -412,7 +441,12 @@ def emit() -> Path:
                         "slug", path=f"us/{usps.lower()}/{day}-{'general' if general else 'local'}", entity_id=parent
                     )
             stage = "general" if general else "local"
-            election = cs.key("us.election", f"{part}:{usps}:{code}")
+            election = parent if code == DC and parent is not None else cs.key("us.election", f"{part}:{usps}:{code}")
+            if code == DC and election not in cs.minted and election not in elections:
+                elections.add(election)
+                if election != parent:
+                    name(election, f"{year} {place} {stage} election")
+                    cs.add("slug", path=f"{path}/{part}-{stage}", entity_id=election)
             if election in cs.minted and election not in elections:
                 elections.add(election)
                 cs.add(
@@ -496,7 +530,7 @@ def emit() -> Path:
             suffix = 1
             while (
                 candidate := contest_path if suffix == 1 else f"{contest_path}-{suffix}"
-            ) in paths or candidate in taken:
+            ) in paths or candidate in taken or owned.get(candidate, contest) != contest:
                 suffix += 1
             paths.add(candidate)
             cs.add("slug", path=candidate, entity_id=contest)
@@ -525,7 +559,6 @@ def emit() -> Path:
             for candidate_id, full_name, votes, won in rows.select(
                 "candidate", "full_name", "votes", "won"
             ).iter_rows():
-                person = cs.key(f"{SOURCE}.person", candidate_id)
                 ballot = re.sub(r"\b([a-z])", lambda found: found[1].upper(), full_name)
                 ballot = re.sub(r"\bMc([a-z])", lambda found: f"Mc{found[1].upper()}", ballot)
                 ballot = re.sub(r"\b(Ii|Iii|Iv)\b", lambda found: found[1].upper(), ballot)
@@ -539,6 +572,7 @@ def emit() -> Path:
                         ballot_label="Others" if pooled[1] else "Write-ins",
                     )
                 else:
+                    person = cs.key(f"{SOURCE}.person", candidate_id)
                     if person in cs.minted and person not in persons:
                         cs.add("person", id=person)
                         name(person, ballot)
