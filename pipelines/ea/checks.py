@@ -142,12 +142,40 @@ class Stage:
 
 
 def _accounting(stage: Stage) -> list[tuple[str, sql.Composed]]:
+    staged = stage.tables.get("result_set", [])
+    empty = (
+        [
+            (
+                "accounting.empty",
+                sql.SQL(
+                    """select null::uuid, s.id, jsonb_build_object('completeness', s.completeness)
+                       from {result_sets} s left join public.result_set p on p.id = s.id
+                       where {kind} = 'counted' and {status} = 'active' and s.completeness > 0{unstaged}
+                         and (s.id = any({clears}::uuid[]) or p.k is null
+                              or not exists (select from public.result_value v where v.result_set_k = p.k))"""
+                ).format(
+                    result_sets=stage.staged("result_set"),
+                    kind=sql.SQL("s.kind" if "kind" in staged else "coalesce(p.kind, 'counted')"),
+                    status=sql.SQL("s.status" if "status" in staged else "coalesce(p.status, 'active')"),
+                    unstaged=sql.SQL(" and not exists (select from {} v where v.result_set_id = s.id)").format(
+                        stage.staged("result_value")
+                    )
+                    if "result_value" in stage.tables
+                    else sql.SQL(""),
+                    clears=sql.Literal(stage.clears),
+                ),
+            )
+        ]
+        if "completeness" in staged
+        else []
+    )
     if "result_value" not in stage.tables:
-        return []
+        return empty
     facts = stage.staged("result_value")
     contests = stage.either("contest", "id", "magnitude")
     result_sets = stage.either("result_set", "id", "contest_id")
     return [
+        *empty,
         (
             "accounting.votes_valid",
             sql.SQL(
