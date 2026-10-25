@@ -17,7 +17,7 @@ from ea.sources.us.chicago_boe import fold
 from ea.store import DATA, connect
 
 SOURCE = "us.electionsfl"
-VERSION = "2"
+VERSION = "3"
 PARSED = DATA / "parsed" / SOURCE
 REPORTS = "https://enr.electionsfl.org/{county}/{election}/Reports"
 EXPORT = re.compile(
@@ -38,6 +38,7 @@ JACKSONVILLE = {
     20030415: date(2003, 4, 15),
     20030513: date(2003, 5, 13),
 }
+MIAMI = {3882: date(2025, 11, 4), 3900: date(2025, 12, 9)}
 ARCHIVE = "https://web.archive.org/web/2016id_/http://www.duvalelections.com/portals/duval/archive/{}"
 ARCHIVES = {20030415: "ElectionResults_2003-4-15.zip", 20030513: "ElectionResults_2003-5-13.zip"}
 COLUMNS = {
@@ -264,8 +265,15 @@ RUNOFFS = {
     ("DUV", 2125): 2085,
     ("DUV", 3124): 3089,
     ("DUV", 3385): 3353,
+    ("DAD", 3900): 3882,
 }
 PLACE = "1235000"
+MIAMI_PLACE = "1245000"
+CITIES = {
+    PLACE: ("Jacksonville", "jacksonville"),
+    MIAMI_PLACE: ("Miami", "miami"),
+    "12031": ("Duval County", "duval-county"),
+}
 COUNTY_OFFICES = {
     "sheriff": "Sheriff",
     "supervisor of elections": "Supervisor of Elections",
@@ -284,6 +292,10 @@ ARCHIVE_METHOD = (
     "council, and Duval County's constitutional officers in a first election open to every candidate; a seat no "
     "candidate won with a majority goes to the top two in the general election."
 )
+MIAMI_METHOD = (
+    "Precinct results from the Miami-Dade County Supervisor of Elections' election night reporting exports (VR "
+    "Systems). Miami elects its mayor by majority; when no candidate wins one, the top two meet in a runoff."
+)
 METHOD = (
     "Precinct results from the county Supervisor of Elections' election night reporting exports (VR Systems). "
     "Jacksonville elects its mayor, council, and Duval County's constitutional officers in a first election open to "
@@ -293,7 +305,7 @@ METHOD = (
 
 def seat(contest: str) -> tuple[str, str | None] | None:
     text = contest.lower()
-    if text == "mayor":
+    if text in ("mayor", "mia mayor", "miami mayor"):
         return "mayor", None
     if text in COUNTY_OFFICES:
         return text, None
@@ -306,7 +318,10 @@ def seat(contest: str) -> tuple[str, str | None] | None:
 
 def emit() -> Path:
     frame = pl.read_parquet(PARSED / "precincts.parquet").filter(
-        pl.col("county") == "DUV", pl.col("election").is_in(list(JACKSONVILLE))
+        (pl.col("county") == "DUV") & pl.col("election").is_in(list(JACKSONVILLE))
+        | (pl.col("county") == "DAD")
+        & pl.col("election").is_in(list(MIAMI))
+        & pl.col("contest").is_in(["MIA Mayor", "Miami Mayor"])
     )
     seats = {contest: seat(contest) for contest in frame["contest"].unique()}
     frame = frame.with_columns(
@@ -320,7 +335,8 @@ def emit() -> Path:
             version=VERSION,
             summary=(
                 "Jacksonville mayor and City Council and Duval County's constitutional officers 2015-2023 by precinct "
-                "from the Duval County Supervisor of Elections, general elections chained to their first elections"
+                "from the Duval County Supervisor of Elections, general elections chained to their first elections, "
+                "and Miami's 2025 mayoral election and runoff from the Miami-Dade County Supervisor of Elections"
             ),
             polity="US-FL",
         )
@@ -366,8 +382,21 @@ def emit() -> Path:
         for number in set(JACKSONVILLE) - set(ARCHIVES):
             cs.artifact(raw.cached(SOURCE, REPORTS.format(county="DUV", election=number)), source)
             cs.artifact(raw.cached(SOURCE, str(export("DUV", number))), source)
+        miami = cs.source("Miami-Dade County Supervisor of Elections", title)
+        cs.add(
+            "source",
+            id=miami,
+            kind="official_body",
+            publisher="Miami-Dade County Supervisor of Elections",
+            title=title,
+            url="https://enr.electionsfl.org/DAD/",
+            license="Public record",
+        )
+        for number in MIAMI:
+            cs.artifact(raw.cached(SOURCE, REPORTS.format(county="DAD", election=number)), miami)
+            cs.artifact(raw.cached(SOURCE, str(export("DAD", number))), miami)
         polities = {}
-        for code in (PLACE, "12031"):
+        for code in (PLACE, MIAMI_PLACE, "12031"):
             found = conn.execute(
                 "select t.polity_id from area_code c join polity_territory t on t.area_id = c.area_id where c.code = %s",
                 [code],
@@ -375,12 +404,13 @@ def emit() -> Path:
             if found is None:
                 raise ValueError(f"no polity holds area {code}")
             polities[code] = found[0]
-        found = conn.execute(
-            "select id, area_id from reporting_unit where scheme_code = 'us.county' and code = '12031'"
-        ).fetchone()
-        if found is None:
-            raise ValueError("Duval County's unit is missing")
-        county_unit, county_area = found
+        county_units = {
+            fips: (unit, area)
+            for fips, unit, area in conn.execute(
+                "select code, id, area_id from reporting_unit where scheme_code = 'us.county' and code in ('12031', '12086')"
+            ).fetchall()
+        }
+        county_area = county_units["12031"][1]
         current = dict(conn.execute("select entity_id, path from slug where is_current").fetchall())
         taken = {path for (path,) in conn.execute("select path from slug where path like 'us/fl/%%'").fetchall()}
         columns = ("id", "election_id", "contest_id", "stage", "kind", "source_id", "completeness")
@@ -447,6 +477,8 @@ def emit() -> Path:
                     break
                 found = None
             entity = found[0] if found else cs.key("us.election", f"{day}:FL:{code}")
+            if code == MIAMI_PLACE:
+                kind = "general"
             cs.add(
                 "election",
                 id=entity,
@@ -458,9 +490,11 @@ def emit() -> Path:
                 date_precision="day",
                 status="held",
             )
-            label = "Jacksonville" if code == PLACE else "Duval County"
-            stem = "jacksonville" if code == PLACE else "duval-county"
-            name(entity, f"{day.year} {label} {STAGES.get(day, 'general' if runoff else 'first')} election")
+            label, stem = CITIES[code]
+            stage = STAGES.get(day, "general" if runoff else "first")
+            if code == MIAMI_PLACE:
+                stage = "runoff" if runoff else "general"
+            name(entity, f"{day.year} {label} {stage} election")
             elections[(day, code)] = (entity, place(entity, f"us/fl/{stem}/{day}-{kind}"))
             return elections[(day, code)]
 
@@ -476,7 +510,7 @@ def emit() -> Path:
             "county", "election", "day", "office", "seat", maintain_order=True
         ):
             runoff = (county, number) in RUNOFFS
-            code = PLACE if office in ("mayor", "council") else "12031"
+            code = (MIAMI_PLACE if county == "DAD" else PLACE) if office in ("mayor", "council") else "12031"
             election_id, path = election(day, runoff, code)
             stem = (
                 "mayor"
@@ -488,7 +522,7 @@ def emit() -> Path:
             if office == "mayor":
                 existing = [
                     f"alged:{PLACE}_{day.year}_{day.month}_jacksonville_FL_Mayor_mayor_1",
-                    f"wikipedia:{day}:FL:{PLACE}:mayor",
+                    f"wikipedia:{day}:FL:{code}:mayor",
                 ]
             elif office == "council":
                 number_ = seat_.rsplit("-", 1)[1]
@@ -526,8 +560,8 @@ def emit() -> Path:
                 body_id=owner if office == "council" else None,
                 district_area_id=cs.area("us.local_district", f"12:{PLACE}:council:{seat_}")
                 if seat_ is not None and seat_.startswith("district")
-                else cs.area("us.place", PLACE)
-                if code == PLACE
+                else cs.area("us.place", code)
+                if code in (PLACE, MIAMI_PLACE)
                 else county_area,
                 magnitude=1,
                 round_number=2 if runoff else 1,
@@ -539,7 +573,7 @@ def emit() -> Path:
             title = (
                 "mayoral" if office == "mayor" else "City Council" if office == "council" else COUNTY_OFFICES[office]
             )
-            where = "Jacksonville" if code == PLACE else "Duval County"
+            where = CITIES[code][0]
             suffix = ""
             if seat_ is not None:
                 suffix = (
@@ -552,7 +586,7 @@ def emit() -> Path:
             prior = conn.execute(
                 f"select {', '.join(columns)} from result_set where contest_id = %s and is_default", [contest]
             ).fetchone()
-            origin = archived if number in ARCHIVES else source
+            origin = archived if number in ARCHIVES else miami if county == "DAD" else source
             if prior is not None and prior[5] != origin:
                 cs.add("result_set", **dict(zip(columns, prior, strict=True)), is_default=False, status="superseded")
             else:
@@ -575,7 +609,7 @@ def emit() -> Path:
                 "note",
                 entity_id=result_set,
                 kind="methodology",
-                body_md=ARCHIVE_METHOD if number in ARCHIVES else METHOD,
+                body_md=ARCHIVE_METHOD if number in ARCHIVES else MIAMI_METHOD if county == "DAD" else METHOD,
             )
             options: list[tuple[list[str], UUID, UUID | None, UUID | None]] = []
             for option, label, person, candidacy in conn.execute(
@@ -658,11 +692,12 @@ def emit() -> Path:
                     option_id=option,
                     kind=("elected" if decided else "advanced") if rank < (1 if decided else 2) else "lost",
                 )
+            fips, county_name = rows["fips"][0], rows["county_name"][0]
             for precinct, candidate, votes in rows.select("precinct", "candidate", "votes").iter_rows():
                 if precinct is None:
-                    values.append((str(result_set), str(county_unit), str(chosen[candidate]), votes))
+                    values.append((str(result_set), str(county_units[fips][0]), str(chosen[candidate]), votes))
                     continue
-                code_ = f"{day}:FL:12031:DUVAL:{precinct}"
+                code_ = f"{day}:FL:{fips}:{county_name}:{precinct}"
                 unit = cs.unit("us.precinct", code_)
                 if unit in cs.minted and code_ not in minted:
                     minted.add(code_)
@@ -672,9 +707,9 @@ def emit() -> Path:
                         polity_id=cs.polity("US-FL"),
                         scheme_code="us.precinct",
                         code=code_,
-                        parent_id=county_unit,
+                        parent_id=county_units[fips][0],
                         area_relation="within",
-                        area_id=county_area,
+                        area_id=county_units[fips][1],
                         kind="standard",
                         valid_from=day,
                         valid_to=date.fromordinal(day.toordinal() + 1),
