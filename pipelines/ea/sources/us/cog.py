@@ -138,6 +138,18 @@ GENERIC = {
     "CREATED",
     "UNDER",
 } | {word.upper() for state in STATES for word in state.split()}
+APPOINTED_COLLEGES = {
+    "11": "D.C. Code § 38-1202.01(c), https://code.dccouncil.gov/us/dc/council/code/sections/38-1202.01",
+    "12": "Fla. Stat. § 1001.61(2), https://www.flsenate.gov/Laws/Statutes/2025/1001.61",
+    "24": "Md. Code, Educ. § 16-101(c), https://mgaleg.maryland.gov/2024RS/Statute_Web/ged/16-101.pdf",
+    "28": "Miss. Code § 37-29-65(6), https://codes.findlaw.com/ms/title-37-education/ms-code-sect-37-29-65/",
+    "34": "N.J. Stat. § 18A:64A-8, https://law.onecle.com/new-jersey/title-18a/18a-64a-8.html",
+    "36": "N.Y. Educ. Law § 6306(1), https://www.nysenate.gov/legislation/laws/EDN/6306",
+    "37": "N.C. Gen. Stat. § 115D-12(a), https://www.ncleg.gov/EnactedLegislation/Statutes/HTML/BySection/Chapter_115D/GS_115D-12.html",
+    "39": "Ohio Rev. Code § 3354.05, https://codes.ohio.gov/ohio-revised-code/section-3354.05",
+    "42": "24 P.S. § 19-1904-A(a), https://www.palegis.us/statutes/unconsolidated/law-information/view-statute?act=014&chpt=19A&sessInd=0&smthLwInd=0&txtType=HTM&yr=1949",
+    "55": "Wis. Stat. § 38.08, https://docs.legis.wisconsin.gov/statutes/statutes/38/08",
+}
 COUNTS = {"county": 3031, "municipality": 19491, "township": 16214, "special": 39555, "school": 12546}
 
 
@@ -270,9 +282,16 @@ def parse() -> None:
             )
             .drop("share")
         )
-    governments = governments.with_columns((pl.col("board") != "appointed").fill_null(True).alias("elected")).drop(
-        "board"
-    )
+    governments = governments.with_columns(
+        (
+            (pl.col("board") != "appointed").fill_null(True)
+            & ~(
+                pl.col("kind").is_in(["school", "dependent_school"])
+                & pl.col("name").map_elements(lambda name: COLLEGE.search(name) is not None, return_dtype=pl.Boolean)
+                & pl.col("state_fips").is_in(list(APPOINTED_COLLEGES))
+            )
+        ).alias("elected")
+    ).drop("board")
     held = dict(governments.group_by("kind").len().iter_rows())
     for kind, count in COUNTS.items():
         if held.get(kind) != count:
