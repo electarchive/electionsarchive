@@ -32,6 +32,10 @@ ABBREVIATED = {
     "MON": {"KW": "KEY WEST"},
     "MAN": {"HB": "HOLMES BEACH"},
 }
+PLACED = {
+    **{f"ORA:{election}": "ORLANDO" for election in (3462, 3596, 3603, 3872, 3905)},
+    **{f"LEO:{election}": "TALLAHASSEE" for election in (1791, 2665, 2878)},
+}
 LISTING = "https://dataverse.harvard.edu/api/datasets/:persistentId/?persistentId=doi:10.7910/DVN/NYTPDU"
 LISTING2022 = "https://dataverse.harvard.edu/api/datasets/:persistentId/?persistentId=doi:10.7910/DVN/UYQIEP"
 LISTING2020 = "https://dataverse.harvard.edu/api/datasets/:persistentId/?persistentId=doi:10.7910/DVN/NT66Z3"
@@ -445,6 +449,8 @@ MAJORITY = {
     "0523290": "arkansas",
     "0535710": "arkansas",
     "0541000": "forty",
+    "1253000": "majority",
+    "1270600": "majority",
 }
 RUNOFF = (
     "No candidate reached the vote share this city requires to win outright, so the leading candidates advanced to a "
@@ -987,7 +993,31 @@ def parse() -> None:
             pl.col("day") < date.today(),
             (pl.col("county") != "DUV") | ~pl.col("election").is_in(list(JACKSONVILLE)),
         )
-        .with_columns(party=pl.col("party").str.to_uppercase().fill_null(""))
+        .with_columns(
+            party=pl.col("party").str.to_uppercase().fill_null(""),
+            placed=pl.concat_str("county", pl.lit(":"), "election").replace_strict(PLACED, default=None),
+        )
+        .with_columns(
+            contest=pl.when(
+                pl.col("placed").is_not_null()
+                & pl.col("contest").str.contains(r"(?i)^(?:interim )?(?:city comm|mayor\b)")
+            )
+            .then(
+                pl.concat_str(
+                    "placed",
+                    pl.lit(" "),
+                    pl.when(pl.col("placed") == "ORLANDO")
+                    .then(
+                        pl.col("contest")
+                        .str.replace(r"(?i)^interim city commissioner(.*)$", "City Council$1 Unexpired")
+                        .str.replace(r"(?i)^city commissioner", "City Council")
+                    )
+                    .otherwise("contest"),
+                )
+            )
+            .otherwise("contest")
+        )
+        .drop("placed")
         .with_columns(
             contest=pl.concat_str("county", pl.lit("|"), "contest")
             .str.replace_many(
@@ -1297,7 +1327,10 @@ def parse() -> None:
             .then("magnitude")
             .otherwise(pl.col("magnitude").fill_null(1)),
             district=pl.col("seat").is_not_null()
-            & (pl.col("precincts") < 0.9 * pl.col("precincts").max().over("code")),
+            & (
+                (pl.col("precincts") < 0.9 * pl.col("precincts").max().over("code"))
+                | (pl.col("code") == "1253000") & pl.col("seat").str.starts_with("District")
+            ),
         )
         contests.append(summary.drop("offices", "precincts"))
         lines.append(
@@ -1519,6 +1552,7 @@ def emit() -> Path:
                 ],
             ).fetchall()
         )
+        taken |= {(day, re.sub(r"-members?$", "", value)) for day, value in taken}
         held_fl = set(
             conn.execute(
                 """select to_char(e.date_from, 'YYYY-MM'), x.value from contest c
@@ -2076,6 +2110,20 @@ def emit() -> Path:
                 )
                 .fetchone()
             )
+            if later is None:
+                dates = {row["id"]: date.fromisoformat(str(row["date_from"])) for row in cs.rows.get("election", [])}
+                later = min(
+                    (
+                        row
+                        for row in cs.rows.get("contest", [])
+                        if owner in (row.get("office_id"), row.get("body_id"))
+                        and row.get("district_area_id") == area
+                        and row["id"] != first
+                        and day < dates.get(row["election_id"], day) <= day + timedelta(days=150)
+                    ),
+                    key=lambda row: dates[row["election_id"]],
+                    default=None,
+                )
             chained.setdefault(city, 0)
             if later is None:
                 print(f"  runoff not held in the archive: {city} {day} {first}")
