@@ -17,6 +17,7 @@ KEYS = {
     "from_option_id": "contest_option",
 }
 REPLACEABLE = ("area_geometry", "area_parent", "tenure_affiliation")
+DROPPABLE = ("area_code", "area_parent", "area_geometry")
 RULES = Draft7Validator(json.loads((ROOT / "packages" / "engine" / "rules.schema.json").read_text()))
 
 
@@ -54,13 +55,25 @@ class Stage:
     replaces: dict[str, list[str]]
     nullable: dict[str, set[str]] = field(default_factory=dict)
     clears: list[str] = field(default_factory=list)
+    drops: dict[str, dict[str, object]] = field(default_factory=dict)
 
     def __post_init__(self) -> None:
+        if unknown := sorted(set(self.drops) - set(DROPPABLE)):
+            raise ValueError(f"scope.drops may name only {', '.join(DROPPABLE)}, not {', '.join(unknown)}")
+        if unstaged := sorted(set(self.drops) - set(self.tables)):
+            raise ValueError(f"scope.drops names {', '.join(unstaged)}, which the changeset does not stage")
         if unknown := sorted(set(self.replaces) - set(REPLACEABLE)):
             raise ValueError(f"scope.replaces may name only {', '.join(REPLACEABLE)}, not {', '.join(unknown)}")
 
     def writers(self, table: str) -> sql.Composable:
         return sql.Literal([self.pipeline, *self.replaces.get(table, [])])
+
+    def dropped(self, table: str) -> sql.Composable:
+        drop = self.drops[table]
+        return sql.SQL(
+            """p.changeset_id = c.id and c.pipeline = {pipeline} and p.area_id = any({areas}::uuid[])
+               and p.valid_from >= {start}::date"""
+        ).format(pipeline=sql.Literal(self.pipeline), areas=sql.Literal(drop["areas"]), start=sql.Literal(drop["from"]))
 
     def staged(self, table: str) -> sql.Composable:
         return sql.SQL("{}.{}").format(sql.Identifier(self.schema), sql.Identifier(table))
@@ -442,6 +455,25 @@ def _memberships(stage: Stage) -> list[tuple[str, sql.Composed]]:
 
 def _scope(stage: Stage) -> list[tuple[str, sql.Composed]]:
     queries: list[tuple[str, sql.Composed]] = []
+    for table, drop in stage.drops.items():
+        queries.append(
+            (
+                "scope.drops",
+                sql.SQL(
+                    """select l.id, null::uuid, jsonb_build_object('table', {table}, 'from', {start}::text)
+                       from unnest({areas}::uuid[]) l(id)
+                       where not exists (select 1 from public.{target} p, changeset c where p.area_id = l.id
+                                         and c.id = p.changeset_id and c.pipeline = {pipeline}
+                                         and p.valid_from >= {start}::date)"""
+                ).format(
+                    table=sql.Literal(table),
+                    target=sql.Identifier(table),
+                    areas=sql.Literal(drop["areas"]),
+                    start=sql.Literal(drop["from"]),
+                    pipeline=sql.Literal(stage.pipeline),
+                ),
+            )
+        )
     for table, columns in stage.tables.items():
         entity = sql.SQL("s.id" if table in stage.entities and "id" in columns else "null::uuid")
         if "polity_id" in columns and table != "polity_parent":

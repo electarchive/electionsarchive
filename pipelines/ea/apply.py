@@ -19,11 +19,11 @@ MERGE_LOCK = 1700949316
 
 def _stage(conn: Connection, changeset_id: str) -> Stage:
     row = conn.execute(
-        "select pipeline, scope ->> 'polity', artifact_keys, scope -> 'replaces', scope -> 'clears' from changeset where id = %s",
+        "select pipeline, scope ->> 'polity', artifact_keys, scope -> 'replaces', scope -> 'clears', scope -> 'drops' from changeset where id = %s",
         [changeset_id],
     ).fetchone()
     assert row is not None, changeset_id
-    pipeline, polity, keys, replaces, clears = row
+    pipeline, polity, keys, replaces, clears, drops = row
     schema = f"cs_{changeset_id.replace('-', '')}"
     tables: dict[str, list[str]] = {}
     for key in keys:
@@ -94,7 +94,18 @@ def _stage(conn: Connection, changeset_id: str) -> Stage:
     }
     nullable = {table: set(keys) - _not_null(conn, table) for table, keys in temporal.items()}
     return Stage(
-        schema, tables, entities, pipeline, polity, temporal, parents, owners, replaces or {}, nullable, clears or []
+        schema,
+        tables,
+        entities,
+        pipeline,
+        polity,
+        temporal,
+        parents,
+        owners,
+        replaces or {},
+        nullable,
+        clears or [],
+        drops or {},
     )
 
 
@@ -158,6 +169,14 @@ def _diff(conn: Connection, stage: Stage) -> dict[str, dict[str, int]]:
             "unchanged": row[2],
             "delete": row[3] if table in FACTS else 0,
         }
+        if table in stage.drops:
+            dropped = conn.execute(
+                sql.SQL("select count(*) from public.{} p, changeset c where {}").format(
+                    sql.Identifier(table), stage.dropped(table)
+                )
+            ).fetchone()
+            assert dropped is not None
+            diff[table]["delete"] = dropped[0]
         if table in stage.parents:
             deleted = conn.execute(
                 sql.SQL("select count(*) from public.{} p, changeset c where {}").format(
@@ -866,6 +885,8 @@ def _publish_table(conn: Connection, stage: Stage, table: str) -> None:
                    where p.entity_id = s.entity_id and not p.is_current and p.path = s.path"""
             ).format(staged)
         )
+    if table in stage.drops:
+        conn.execute(sql.SQL("delete from public.{} p using changeset c where {}").format(target, stage.dropped(table)))
     if table in stage.temporal:
         conn.execute(
             sql.SQL(
