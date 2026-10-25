@@ -945,7 +945,11 @@ def _rollup(
         sql.SQL(
             """with recursive
             rs as (
-              select r.k, e.date_from as on_date, bs.valid_from as plan_from, c.id as contest_id, c.district_area_id, c.allocation_parent_id
+              select r.k,
+                     case when c.notional then greatest(e.date_from, (select min(lower(p.valid)) from area_parent p
+                                                                      where p.area_id = c.district_area_id))
+                          else e.date_from end as on_date,
+                     bs.valid_from as plan_from, c.id as contest_id, c.district_area_id, c.allocation_parent_id
               from result_set r join election e on e.id = r.election_id join contest c on c.id = r.contest_id
               left join boundary_set bs on bs.id = c.boundary_set_id
               where r.id in ({facts}) or r.k = any({stale})
@@ -1748,6 +1752,7 @@ def apply(folder: Path) -> str:
                     buffer = io.BytesIO()
                     chunk.write_csv(buffer, include_header=False, quote_style="non_numeric")
                     copy.write(buffer.getvalue())
+            conn.execute(sql.SQL("analyze {}.{}").format(schema, sql.Identifier(table)))
         stage = _stage(conn, changeset_id)
         if "entity_merge" in stage.tables:
             staged = stage.staged("entity_merge")
