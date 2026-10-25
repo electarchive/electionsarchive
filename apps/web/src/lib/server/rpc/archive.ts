@@ -8845,6 +8845,14 @@ export const elections = {
         ),
         ...(election.parent == null ? [] : [election.parent]),
         ...allied.rows.map((row) => row.id),
+        ...raced.flatMap((race) =>
+          race.contest == null
+            ? []
+            : [
+                ...(race.body == null ? [] : [race.body]),
+                ...race.results.flatMap((row) => row.party ?? []),
+              ],
+        ),
       ];
       const councils = raced.filter(
         (race) =>
@@ -8883,7 +8891,7 @@ export const elections = {
           ) end as covered
           from contest c
           left join electoral_system es on es.id = c.electoral_system_id
-          where c.id = any(${sql.param(councils.flatMap((race) => race.sample ?? []))}::uuid[])
+          where c.id = any(${sql.param(councils.flatMap((race) => race.sample ?? race.contest ?? []))}::uuid[])
         `),
         db.execute<{
           contest: string;
@@ -8908,7 +8916,7 @@ export const elections = {
       );
       const held = new Map(whole.rows.map((row) => [row.sample, row]));
       const standings = councils.map((race) => {
-        const found = held.get(race.sample ?? "");
+        const found = held.get(race.sample ?? race.contest ?? "");
         let total = 0;
         for (const row of race.results) {
           total += row.seats ?? 0;
@@ -8967,20 +8975,52 @@ export const elections = {
         control: councils.length === 1 ? (standings[0]?.control ?? null) : null,
         councils: isUmbrella
           ? standings.map(({ race, path, total, control }) => ({
-              name: race.name,
+              name:
+                race.contest == null
+                  ? race.name
+                  : (labels.short.get(race.body ?? "") ??
+                    labels.full.get(race.body ?? "") ??
+                    race.name),
               path,
               up: total,
               size: race.size,
-              parties: race.results
-                .filter((row) => (row.seats ?? 0) > 0)
-                .toSorted((a, b) => (b.seats ?? 0) - (a.seats ?? 0))
-                .map((row) => ({
-                  key: row.key,
-                  label: row.label,
-                  short: row.short,
-                  color: row.color,
-                  seats: row.seats ?? 0,
-                })),
+              parties: (race.contest == null
+                ? race.results
+                    .filter((row) => (row.seats ?? 0) > 0)
+                    .map((row) => ({
+                      key: row.key,
+                      label: row.label,
+                      short: row.short,
+                      color: row.color,
+                      seats: row.seats ?? 0,
+                    }))
+                : Map.groupBy(
+                    race.results.filter((row) => (row.seats ?? 0) > 0),
+                    (row) =>
+                      row.party == null ? "independent" : `party:${row.party}`,
+                  )
+                    .entries()
+                    .map(([key, [lead, ...rest]]) => {
+                      let seats = lead?.seats ?? 0;
+                      for (const row of rest) {
+                        seats += row.seats ?? 0;
+                      }
+                      return {
+                        key,
+                        label:
+                          lead?.party == null
+                            ? m.seats_independents()
+                            : (labels.full.get(lead.party) ??
+                              lead.short ??
+                              lead.label),
+                        short:
+                          lead?.party == null ? null : (lead.short ?? null),
+                        color: lead?.color ?? null,
+                        seats,
+                      };
+                    })
+                    .toArray()
+              ).toSorted((a, b) => b.seats - a.seats),
               control,
             }))
           : [],
@@ -9019,7 +9059,7 @@ export const elections = {
                         },
                 },
         races: (isUmbrella ? [] : raced).map((race, index) => {
-          const council = held.get(race.sample ?? "");
+          const council = held.get(race.sample ?? race.contest ?? "");
           return {
             ...race,
             isStaggered: council?.isStaggered === true,
