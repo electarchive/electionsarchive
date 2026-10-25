@@ -12649,6 +12649,7 @@ export const polities = {
           k: number;
           tier: number;
           scoped: boolean;
+          isPrimary: boolean;
         }>(sql`
             with recursive up(id) as (
               select parent_id from polity_parent where polity_id = ${input.id}::uuid
@@ -12667,6 +12668,7 @@ export const polities = {
               e.status::text as status, s.path, e.date_from::text as date, ${CYCLE} as year,
               place.id as area, place.k,
               exists (select from polity_territory t where t.polity_id = ${input.id}::uuid and t.valid @> e.date_from) as scoped,
+              (c.party_scope_id is not null or e.kind = 'primary') as "isPrimary",
               case
                 when c.kind = 'ballot_question' then 5
                 when c.kind = 'elector_slate' or o.kind in ('head_of_state', 'head_of_government') then 0
@@ -12825,6 +12827,17 @@ export const polities = {
         shown.add(day);
         total += size;
       }
+      const general = kept
+        .filter((row) => !row.isPrimary && row.tier <= 1)
+        .toSorted((a, b) => b.date.localeCompare(a.date))[0];
+      if (
+        general != null &&
+        !kept.some(
+          (row) => !row.isPrimary && row.tier <= 1 && shown.has(row.date),
+        )
+      ) {
+        shown.add(general.date);
+      }
       const [labels, slugs, raced, built] = await Promise.all([
         names(ids),
         paths(ids),
@@ -12948,6 +12961,7 @@ export const polities = {
           .filter((row) => row != null)
           .toSorted(
             (a, b) =>
+              Number(a.isPrimary) - Number(b.isPrimary) ||
               Number(a.tier > 1) - Number(b.tier > 1) ||
               b.date.localeCompare(a.date) ||
               a.tier - b.tier,

@@ -428,16 +428,21 @@
       </p>
     {:else}
       <h2 class="text-[0.8125rem] font-bold">
-        {m.polity_map_title({
-          race:
-            loaded == null
-              ? (headline?.name ?? "")
-              : /\b\d{4}\b/u.test(loaded.contest.name) ||
-                  loaded.contest.election.date == null
-                ? loaded.contest.name
-                : `${loaded.contest.election.date.slice(0, 4)} ${loaded.contest.name}`,
-          noun: drawn.noun,
-        })}
+        {const race = $derived(
+          loaded == null
+            ? (headline?.name ?? "")
+            : /\b\d{4}\b/u.test(loaded.contest.name) ||
+                loaded.contest.election.date == null
+              ? loaded.contest.name
+              : `${loaded.contest.election.date.slice(0, 4)} ${loaded.contest.name}`,
+        )}
+        {source?.unit != null && loaded?.around == null
+          ? m.polity_map_title_in({
+              race,
+              place: polity.name,
+              noun: drawn.noun,
+            })
+          : m.polity_map_title({ race, noun: drawn.noun })}
       </h2>
       <PlaceMap
         places={drawn.places}
