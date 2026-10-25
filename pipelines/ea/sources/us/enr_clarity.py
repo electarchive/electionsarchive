@@ -227,7 +227,7 @@ MUNI_OFFICES = (
     ),
 )
 NY_COUNTY_OFFICES = (
-    (r"COUNTY LEG(?:ISLATORS?|S)?\b|LEGISLATOR", "legislature", "County Legislature", True),
+    (r"COUNTY LEG\w*\b|LEGISLATOR|LEGISLATIVE", "legislature", "County Legislature", True),
     (r"FAMILY COURT(?: JUDGE)?", "family-court", "Judge, Family Court", False),
     (r"SURROGATE(?:S|'S)?(?: COURT)?(?: JUDGE)?", "surrogate", "Surrogate", False),
 )
@@ -247,8 +247,10 @@ NY_MUNI_OFFICES = (
     (r"(?:TOWN )?SUPERVISOR", "supervisor", "Supervisor", False),
     (r"MAYOR", "mayor", "Mayor", False),
     (r"(?:CITY )?COMPTROLLER", "controller", "Controller", False),
+    (r"(?:CITY )?TREASURER", "treasurer", "Treasurer", False),
+    (r"(?:CHIEF )?(?:CITY )?AUDITOR", "auditor", "Auditor", False),
     (r"TRUSTEES?", "board-of-trustees", "Board of Trustees", True),
-    (r"COUNCILM[AE]N|COUNCILWOMAN|COUNCIL ?MEMBERS?|COUNCILPERSON|ALDERM\w+|COUNCIL", "council", "Council", True),
+    (r"(?:COMMON |CITY |TOWN )?COUNCILM[AE]N|COUNCILWOMAN|(?:COMMON |CITY |TOWN )?COUNCIL ?MEMBERS?|COUNCILPERSON|ALDERM\w+|TOWN BOARD|COMMON COUNCIL|COUNCIL", "council", "Council", True),
 )
 SPECIALS = (
     (r"MUNICIPAL UTILITY DISTRICT|\bM ?U ?D\b", "utility", "Municipal Utility District"),
