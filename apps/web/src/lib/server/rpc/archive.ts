@@ -3754,6 +3754,26 @@ export const contests = {
               and rc.from_boundary_set_id = fc.to_boundary_set_id and rc.to_boundary_set_id = fc.from_boundary_set_id
             join area b on b.k = f.to_k
             where a.id = later.id
+            union
+            select b.id from area a
+            join crosswalk c on c.method in ('exact', 'area', 'population')
+            join boundary_set bf on bf.id = c.from_boundary_set_id and bf.scheme_code = a.scheme_code
+            join boundary_set bt on bt.id = c.to_boundary_set_id
+            join crosswalk_weight w on w.crosswalk_id = c.id and w.weight >= 0.5
+              and ((bt.valid_from > bf.valid_from and w.from_k = a.k) or (bt.valid_from < bf.valid_from and w.to_k = a.k))
+            join area b on b.k = case when w.from_k = a.k then w.to_k else w.from_k end
+            where a.id = later.id
+              and (
+                exists (
+                  select from name na join name nb on nb.entity_id = b.id and lower(nb.text) = lower(na.text)
+                  where na.entity_id = a.id
+                )
+                or c.method = 'exact' and exists (
+                  select from area_geometry ga join area_geometry gb on gb.area_id = b.id
+                  where ga.area_id = a.id
+                    and least(ST_Area(ga.geom), ST_Area(gb.geom)) >= 0.5 * greatest(ST_Area(ga.geom), ST_Area(gb.geom))
+                )
+              )
           ) x
         ),
         earlier(id) as (
@@ -3784,6 +3804,26 @@ export const contests = {
               and rc.from_boundary_set_id = fc.to_boundary_set_id and rc.to_boundary_set_id = fc.from_boundary_set_id
             join area b on b.k = f.to_k
             where a.id = earlier.id
+            union
+            select b.id from area a
+            join crosswalk c on c.method in ('exact', 'area', 'population')
+            join boundary_set bf on bf.id = c.from_boundary_set_id and bf.scheme_code = a.scheme_code
+            join boundary_set bt on bt.id = c.to_boundary_set_id
+            join crosswalk_weight w on w.crosswalk_id = c.id and w.weight >= 0.5
+              and ((bt.valid_from < bf.valid_from and w.from_k = a.k) or (bt.valid_from > bf.valid_from and w.to_k = a.k))
+            join area b on b.k = case when w.from_k = a.k then w.to_k else w.from_k end
+            where a.id = earlier.id
+              and (
+                exists (
+                  select from name na join name nb on nb.entity_id = b.id and lower(nb.text) = lower(na.text)
+                  where na.entity_id = a.id
+                )
+                or c.method = 'exact' and exists (
+                  select from area_geometry ga join area_geometry gb on gb.area_id = b.id
+                  where ga.area_id = a.id
+                    and least(ST_Area(ga.geom), ST_Area(gb.geom)) >= 0.5 * greatest(ST_Area(ga.geom), ST_Area(gb.geom))
+                )
+              )
           ) x
         ),
         roots as (
@@ -3865,6 +3905,7 @@ export const contests = {
             select from area_geometry h
             where h.area_id = g.area_id and h.valid && daterange(upper(g.valid), upper(g.valid) + 365)
           )
+          and exists (select from area_geometry h where h.area_id = g.area_id and lower(h.valid) > upper(g.valid))
       `);
       const fence =
         gaps.rows
