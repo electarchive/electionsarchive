@@ -1356,6 +1356,35 @@ function polityMarkdown(
         }),
       ),
     ]),
+    ...(record.governments.length === 0
+      ? []
+      : [
+          `## ${m.governments_title()}`,
+          table(
+            [
+              m.col_name(),
+              m.col_led_by(),
+              m.col_party(),
+              m.col_from(),
+              m.col_to(),
+            ],
+            record.governments
+              .toReversed()
+              .map((government) => [
+                government.isCaretaker
+                  ? `${government.name} (${m.governments_caretaker()})`
+                  : government.name,
+                government.head,
+                government.party == null
+                  ? null
+                  : (labels.get(government.party) ?? null),
+                date(government.from),
+                government.to == null
+                  ? m.governments_present()
+                  : date(government.to),
+              ]),
+          ),
+        ]),
     `## ${m.polity_elections()}`,
     polity.elections.length === 0
       ? m.polity_no_elections()
