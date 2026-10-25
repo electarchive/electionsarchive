@@ -13,7 +13,7 @@ from ea.sources.us.phila_returns import SOURCE as RETURNS
 from ea.store import connect
 
 SOURCE = "us.phila_local"
-VERSION = "3"
+VERSION = "4"
 FIPS = "42101"
 PLACE = "4260000"
 SPECIAL_DAYS = {
@@ -269,8 +269,18 @@ def emit() -> Path:
         minted: dict[str, date] = {}
         report: dict[str, int] = defaultdict(int)
 
+        names = dict(
+            conn.execute(
+                """select n.entity_id, n.id from name n join changeset c on c.id = n.changeset_id
+                   where c.pipeline = %s and n.is_preferred and n.lang = 'en'""",
+                [SOURCE],
+            ).fetchall()
+        )
+
         def name(entity: UUID, text: str) -> None:
-            cs.add("name", entity_id=entity, text=text, lang="en", kind="official", is_preferred=True)
+            cs.add(
+                "name", id=names.get(entity), entity_id=entity, text=text, lang="en", kind="official", is_preferred=True
+            )
 
         for sheet, options in sorted(tallies.items(), key=lambda item: (item[0][0], item[0][1], str(item[0][2:]))):
             day, office, seat, ballot, judge, qkey = sheet
