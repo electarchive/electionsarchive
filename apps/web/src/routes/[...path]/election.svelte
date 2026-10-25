@@ -615,6 +615,50 @@
                   }).format(new Date(`${first.date}T00:00:00Z`)),
                 }),
               });
+      const kinds = [
+        {
+          key: "ward:outright",
+          label: m.map_ward_outright(),
+          color: "#0e7c86",
+        },
+        {
+          key: "ward:runoff",
+          label:
+            first?.isGeneral === true
+              ? m.map_ward_general()
+              : m.map_ward_runoff(),
+          color: "#d08a00",
+        },
+      ].map((kind) => ({ ...kind, short: null, person: null, party: null }));
+      const outcomes =
+        wards.length === 0 || race.places == null
+          ? null
+          : {
+              places: {
+                ...race.places,
+                legend: kinds,
+                districts: undefined,
+                rows: race.places.rows.map((row) => {
+                  const ward = wards.find((entry) => entry.path === row.path);
+                  const spot =
+                    ward == null ? null : ward.runoff == null ? 0 : 1;
+                  return {
+                    ...row,
+                    shares: kinds.map((_, at) =>
+                      at === spot ? (ward?.share ?? 0) : 0,
+                    ),
+                    leader: spot,
+                    also: null,
+                    margin: null,
+                    earlier: null,
+                    prior: null,
+                    declared: null,
+                  };
+                }),
+              },
+              tones: kinds.map((kind) => swatch(kind.color, kind.key)),
+              titles: kinds.map((kind) => kind.label),
+            };
       let decided: {
         places: NonNullable<typeof race.places>;
         tones: Array<string>;
@@ -820,6 +864,7 @@
                   isWhole: false,
                 },
         isLater: isRound && (race.round ?? 1) > 1,
+        outcomes,
         name:
           isRound && decided == null
             ? m.race_round({ name: race.name, round: race.round ?? 1 })
@@ -1294,6 +1339,26 @@
         >
       {/if}
       {#if (race.wards ?? []).length > 0 && (!isFolding || index === 0 || opened[index] === true)}
+        {#if race.outcomes != null && race.map != null && (race.map.shaped ?? 0) * 2 >= race.outcomes.places.rows.length}
+          <div class="grid gap-2 pbs-1">
+            <PlaceMap
+              places={race.outcomes.places}
+              colors={race.outcomes.tones}
+              tiles={race.map.tiles}
+              own={race.map.own}
+              nested={race.map.nested}
+              frames={race.map.frames}
+              blank={race.map.blank ?? null}
+              isApproximate={race.map.isApproximate}
+              sources={race.map.credits}
+              noun={race.places?.levels[0]?.noun ?? ""}
+              votes={race.votes}
+              names={race.outcomes.titles}
+              levels={[]}
+              span={null}
+            />
+          </div>
+        {/if}
         {@render wards(race.wards ?? [], race.anchor, race.lede)}
       {/if}
     </section>
