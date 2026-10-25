@@ -970,32 +970,48 @@ def _rollup(
                 where s.allocation_parent_id = rs.allocation_parent_id and s.id <> rs.contest_id
               )
             ),
+            vals as materialized (
+              select v.result_set_k, v.unit_k, v.option_k, v.channel, v.measure, v.count_round, v.value
+              from (select distinct k from rs) s cross join lateral (
+                select * from result_value v where v.result_set_k = s.k offset 0) v
+            ),
             units as (
               select rs.k as result_set_k, ru.k as unit_k, ru.id as unit_id,
                      coalesce(ru.area_id, pt.area_id) as area_id, rs.on_date
               from rs
-              join (select distinct result_set_k, unit_k from result_value where result_set_k in (select k from rs)) v
+              join (select distinct result_set_k, unit_k from vals) v
                 on v.result_set_k = rs.k
               join reporting_unit ru on ru.k = v.unit_k
               left join polity_territory pt on pt.polity_id = ru.polity_id and pt.valid @> rs.on_date
             ),
+            grain as (
+              select distinct unit_k, unit_id, area_id, on_date from units
+            ),
+            links as materialized (
+              select g.unit_k, g.area_id as own_id, g.on_date, ua.area_id, ua.partial,
+                     not ua.partial and dated.scheme_code = own.scheme_code and dated.id <> own.id as rival
+              from grain g join reporting_unit_area ua on ua.unit_id = g.unit_id and ua.valid @> g.on_date and not ua.approximate
+              join area dated on dated.id = ua.area_id left join area own on own.id = g.area_id
+            ),
             ancestors as (
-              select result_set_k, unit_k, area_id, on_date, true as complete from units
+              select unit_k, area_id, on_date, true as complete from grain
               where not exists (
-                select from reporting_unit_area ua
-                join area own on own.id = units.area_id join area dated on dated.id = ua.area_id
-                where ua.unit_id = units.unit_id and ua.valid @> units.on_date and not ua.approximate
-                  and not ua.partial and dated.scheme_code = own.scheme_code and dated.id <> own.id
+                select from links l where l.unit_k = grain.unit_k and l.on_date = grain.on_date
+                  and l.own_id = grain.area_id and l.rival
               )
               union
-              select u.result_set_k, u.unit_k, ua.area_id, u.on_date, not ua.partial
-              from units u join reporting_unit_area ua on ua.unit_id = u.unit_id and ua.valid @> u.on_date and not ua.approximate
+              select unit_k, area_id, on_date, not partial from links
               union
-              select a.result_set_k, a.unit_k, p.parent_id, a.on_date, a.complete
+              select a.unit_k, p.parent_id, a.on_date, a.complete
               from ancestors a join area_parent p on p.area_id = a.area_id and p.valid @> a.on_date
             ),
             climbed as (
-              select result_set_k, unit_k, area_id, bool_or(complete) as complete from ancestors group by result_set_k, unit_k, area_id
+              select u.result_set_k, u.unit_k, a.area_id, a.complete
+              from (select distinct result_set_k, unit_k, coalesce(on_date, 'infinity') as day from units) u
+              join (
+                select unit_k, coalesce(on_date, 'infinity') as day, area_id, bool_or(complete) as complete
+                from ancestors group by unit_k, on_date, area_id
+              ) a on a.unit_k = u.unit_k and a.day = u.day
             ),
             spans as (
               select rs.k as result_set_k, dc.county_area_id
@@ -1049,11 +1065,10 @@ def _rollup(
                    bool_and(a.complete) and not exists (
                      select from coverage s where s.result_set_k = v.result_set_k and s.area_id = area.id
                        and s.reporting <> s.expected), sum(v.value)
-            from result_value v
+            from vals v
             join reached a on a.result_set_k = v.result_set_k and a.unit_k = v.unit_k
             join counted c on c.result_set_k = a.result_set_k and c.area_id = a.area_id and c.summed
             join area on area.id = a.area_id
-            where v.result_set_k in (select k from rs)
             group by v.result_set_k, area.k, area.id, v.option_k, v.channel, v.measure, v.count_round"""
         ).format(facts=facts, stale=sql.Literal(stale))
     )
