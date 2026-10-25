@@ -291,7 +291,11 @@ def emit() -> Path:
             for row in rows:
                 label = row["party_name"] or "Independent"
                 if label not in party_ids:
-                    found = known.get(leh.fold(dc_local.ALIASES.get(label, label)))
+                    found = (
+                        cs.key(*leh.RESOLVED[label])
+                        if label in leh.RESOLVED
+                        else known.get(leh.fold(dc_local.ALIASES.get(label, label)))
+                    )
                     if found is None:
                         found = cs.key("gb.party", slug(label))
                         if found in cs.minted and found not in party_ids.values():
