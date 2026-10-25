@@ -22,6 +22,10 @@ SKIP_CONTEST = re.compile(
     r"(?i)^proposition\b|^city of houston\b|^harris county (?!(?:mud|m\.u\.d|municipal|utility|emergency|esd|hospital|flood|"
     r"department of education|water|improvement|fresh|conservation|drainage))"
 )
+COUNTY_EXECUTIVE = re.compile(
+    r"(?i)^(?:county judge(?!.*court)|sheriff|district attorney|county attorney|county clerk|district clerk|"
+    r"(?:county )?tax assessor|county treasurer|county commissioner)\b"
+)
 COUNTY_OFFICE = re.compile(
     r"(?i)\bjudge\b.*\bcourt\b|\bcounty (?:clerk|judge|tax|commissioner|treasurer|surveyor|attorney|sheriff|school)|"
     r"\bdistrict (?:clerk|attorney)\b|\bconstable\b|\bjustice of the peace\b|\bsheriff\b|\bhcad\b|"
@@ -99,9 +103,11 @@ def contests(text: str) -> Iterator[dict[str, Any]]:
         pairs = list(PAIR.finditer(line))
         if not pairs or stripped.startswith(("Choice", "Party")):
             continue
-        name = re.sub(r"\s+", " ", line[: pairs[0].start()]).strip()
+        label = line[: pairs[0].start()]
+        tagged = re.match(r"\s*([A-Z]{2,4})\s{2,}(\S.*)", label)
+        name = re.sub(r"\s+", " ", tagged[2] if tagged else label).strip()
         if name:
-            node["choices"].append({"text": name, "party": None, "total": pairs[-1][1].replace(",", ""), "places": []})
+            node["choices"].append({"text": name, "party": tagged[1] if tagged else None, "total": pairs[-1][1].replace(",", ""), "places": []})
 
 
 def _read(registry: Mapping[str, Mapping[str, str]]) -> Iterator[dict[str, Any]]:
@@ -114,7 +120,9 @@ def _read(registry: Mapping[str, Mapping[str, str]]) -> Iterator[dict[str, Any]]
             found = []
             for node in contests(text):
                 node["text"] = normalize(node["text"])
-                if SKIP_CONTEST.search(node["text"]) or COUNTY_OFFICE.search(node["text"]):
+                if not COUNTY_EXECUTIVE.search(node["text"]) and (
+                    SKIP_CONTEST.search(node["text"]) or COUNTY_OFFICE.search(node["text"])
+                ):
                     continue
                 total = sum(int(choice["total"]) for choice in node["choices"])
                 if total != node["cast"]:
