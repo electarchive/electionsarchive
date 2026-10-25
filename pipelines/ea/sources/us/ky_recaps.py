@@ -415,8 +415,9 @@ def emit() -> Path:
 
             existing_election = conn.execute(
                 """select e.id, s.path from election e join slug s on s.entity_id = e.id and s.is_current
+                   join changeset c on c.id = e.changeset_id and c.pipeline <> %s
                    where e.polity_id = %s and e.date_from = %s order by e.date_to limit 1""",
-                [pid, day],
+                [SOURCE, pid, day],
             ).fetchone()
             key_body = code.partition(":")[2].replace(":", "-")
             suffix = f":{party.lower()}" if party else ""
