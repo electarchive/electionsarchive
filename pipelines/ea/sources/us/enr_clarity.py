@@ -340,6 +340,10 @@ SUPERSEDED = (
     "A city-wide official count of this contest, covering the whole jurisdiction, replaces this county-part count as the "
     "default result set; this set stays as the counties' own figures."
 )
+SUMMED = (
+    "Votes are the sum of each county elections office's results for this jurisdiction, from every county it lies "
+    "in, and every one of those counties is loaded."
+)
 WHOLE = "Votes are the city-wide official totals published by {publisher}, which cover every county the jurisdiction lies in."
 PLURALITY = (
     "No candidate won a majority and the district has no runoff in the archive. Texas Education Code section 11.057 "
@@ -725,6 +729,7 @@ def parse(
                     "term": f"{NUMBERS.get(term[1], term[1])}-year term" if term else None,
                     "magnitude": node["vote_for"],
                     "whole": bool(node.get("whole")),
+                    "summed": bool(node.get("summed")),
                     **found,
                 }
             )
@@ -1300,7 +1305,11 @@ def emit(
             county = row["county_fips"]
             if county not in counties_listed:
                 continue
-            publishers[county] = f"{row['county']} County, {STATE_NAMES[row['state']]}"
+            publishers[county] = (
+                "Texas county elections offices"
+                if row["platform"] == "tx_citysum"
+                else f"{row['county']} County, {STATE_NAMES[row['state']]}"
+            )
             sources[county] = cs.source(publishers[county], TITLE)
             if sources[county] in cs.minted:
                 cs.add(
@@ -1560,7 +1569,9 @@ def emit(
                     "note",
                     entity_id=result_set,
                     kind="methodology",
-                    body_md=WHOLE.format(publisher=publishers[rows["county"][0]].split(",")[0]),
+                    body_md=SUMMED
+                    if "summed" in rows.columns and rows["summed"].all()
+                    else WHOLE.format(publisher=publishers[rows["county"][0]].split(",")[0]),
                 )
                 unit = cs.unit(scheme, code)
                 for votes, option_id, _ in matched:
