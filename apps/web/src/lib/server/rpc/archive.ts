@@ -10713,6 +10713,10 @@ export const elections = {
         ) {
           name = name.slice(government.name.length).replace(/^[:,]? /u, "");
         }
+        name = name
+          .replace(/^[^,]+, (?=(?:Proposition|Measure|Question) \S+$)/u, "")
+          .replace(/^mayoral election$/iu, "Mayor")
+          .replace(/^(.+?) election(?=, |$)/u, "$1");
         government.contests.push({
           name: name.charAt(0).toUpperCase() + name.slice(1),
           path: links.get(row.id) ?? null,
@@ -10755,8 +10759,11 @@ export const elections = {
               .map((government) => ({
                 name: government.name,
                 path: government.path,
-                contests: government.contests.toSorted((a, b) =>
-                  a.name.localeCompare(b.name, undefined, { numeric: true }),
+                contests: government.contests.toSorted(
+                  (a, b) =>
+                    Number(!a.name.startsWith("Mayor")) -
+                      Number(!b.name.startsWith("Mayor")) ||
+                    a.name.localeCompare(b.name, undefined, { numeric: true }),
                 ),
               })),
           }))
