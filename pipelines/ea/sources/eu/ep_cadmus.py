@@ -17,9 +17,22 @@ from ea.sources.gb import umit
 from ea.store import DATA, connect
 
 SOURCE = "eu.ep_cadmus"
-VERSION = "3"
+VERSION = "4"
 PARSED = DATA / "parsed" / SOURCE
 URL = "https://cadmus.eui.eu/bitstreams/9a5261b3-8dea-5650-988a-fac4460a8f3c/download"
+DEMON = "https://web.archive.org/web/20200201142936id_/http://www.election.demon.co.uk:80/eplon.html"
+REPLACED = {
+    (1984, "London South West"): (
+        {"Conservative Party": 70490, "Labour Party": 63623, "Alliance Party": 32268, "Others": 3066},
+        169447,
+        (
+            "Cadmus gives this seat the result of the London South West by-election of 20 September 1979 (Conservative "
+            "41,096, Labour 32,632, Liberal 23,842, others 2,135). The votes shown are the 1984 result as Election Demon "
+            "prints it: Conservative 70,490, Labour 63,623, Liberal (SDP–Liberal Alliance) 32,268, and Ecology 3,066, a "
+            "turnout of 33.9 percent of 499,272 electors."
+        ),
+    ),
+}
 WINDOWS = {
     1979: (date(1979, 6, 7), date(1979, 6, 10)),
     1984: (date(1984, 6, 14), date(1984, 6, 17)),
@@ -338,6 +351,7 @@ def wikidata_items(fetching: bool) -> tuple[pl.DataFrame, pl.DataFrame]:
 
 def fetch() -> None:
     raw.fetch(SOURCE, URL, suffix=".xlsx")
+    raw.fetch(SOURCE, DEMON, suffix=".html")
     wikidata_items(True)
     for item in NAMED_ITEMS:
         try:
@@ -480,7 +494,9 @@ def emit() -> Path:
         ).fetchall():
             by_item[item].add(entity)
         party_names: dict[UUID, set[str]] = defaultdict(set)
-        for entity, text in conn.execute("select entity_id, text from name").fetchall():
+        for entity, text in conn.execute(
+            "select n.entity_id, n.text from name n join party p on p.id = n.entity_id"
+        ).fetchall():
             party_names[entity].add(fold(text))
         labels: dict[str, set[str]] = defaultdict(set)
         parlgov_items, parlgov_members = wikidata_items(False)
@@ -673,6 +689,12 @@ def emit() -> Path:
                 if euc and year not in (1979, 1984):
                     skipped[f"{country} {constituency}"] = skipped.get(f"{country} {constituency}", 0) + 1
                     continue
+                replaced = REPLACED.get((year, constituency)) if iso == "GB" else None
+                if replaced is not None:
+                    rows = rows.with_columns(
+                        votes=pl.col("party_original").replace_strict(replaced[0], return_dtype=pl.Int64),
+                        votes_valid=pl.lit(replaced[1], dtype=pl.Int64),
+                    )
                 college = iso == "BE" or constituency == "Greenland"
                 if euc:
                     label = EUC_NAMES.get((year, constituency), constituency)
@@ -775,6 +797,22 @@ def emit() -> Path:
                     body_md="The source omits parties with under 0.5 percent of the vote and no seats, so the listed "
                     "votes may fall short of the valid votes. Votes for the omitted parties are not recorded.",
                 )
+                if replaced is not None:
+                    demon = cs.source(
+                        "Election Demon", "United Kingdom European Parliamentary Election results 1979-99: London"
+                    )
+                    cs.add(
+                        "source",
+                        id=demon,
+                        kind="aggregator",
+                        publisher="Election Demon",
+                        title="United Kingdom European Parliamentary Election results 1979-99: London",
+                        url="http://www.election.demon.co.uk/eplon.html",
+                        notes="David Boothroyd's compilation of the returning officers' declarations (archived copy).",
+                    )
+                    cs.artifact(raw.cached(SOURCE, DEMON), demon)
+                    cs.add("note", entity_id=result_set, kind="caveat", body_md=replaced[2])
+                    cs.add("citation", entity_id=result_set, source_id=demon)
                 values = []
                 for position, row in enumerate(rows.iter_rows(named=True), start=1):
                     label_text = row["party_original"] or row["party"]
