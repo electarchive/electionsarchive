@@ -262,17 +262,20 @@ class Changeset:
                     ballot_position=position,
                     ballot_label="Write-ins" if written else "Others",
                 )
+        retired = {str(row["entity_id"]) for row in self.rows.get("entity_retirement", [])}
         for (candidacy,) in self.conn.execute(
             "select id from candidacy where option_id = any(%s::uuid[])", [[row[0] for row in options]]
         ).fetchall():
-            self.add("entity_retirement", entity_id=candidacy, reason=reason)
+            if str(candidacy) not in retired:
+                self.add("entity_retirement", entity_id=candidacy, reason=reason)
         for (person,) in self.conn.execute(
             """select p.id from person p join changeset c on c.id = p.changeset_id
                join name n on n.entity_id = p.id and n.is_preferred
                where c.pipeline = %s and n.text ~* %s and not exists (select from candidacy where person_id = p.id)""",
             [self.manifest["pipeline"], pattern],
         ).fetchall():
-            self.add("entity_retirement", entity_id=person, reason=reason)
+            if str(person) not in retired:
+                self.add("entity_retirement", entity_id=person, reason=reason)
 
     def clear(self) -> None:
         pattern = r"^(under ?votes?|over ?votes?|blank( votes| ballots)?|spoiled( votes| ballots)?)$"
