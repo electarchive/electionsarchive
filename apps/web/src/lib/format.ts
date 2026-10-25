@@ -13,10 +13,21 @@ export function precision(margin: number | null | undefined) {
 }
 
 export function percent(value: number, digits = 1) {
+  let shown = digits;
+  while (
+    shown < 4 &&
+    [0.5, 1].some(
+      (line) =>
+        value < line &&
+        Math.round(value * 10 ** (shown + 2)) >= line * 10 ** (shown + 2),
+    )
+  ) {
+    shown += 1;
+  }
   const format = new Intl.NumberFormat(getLocale(), {
     style: "percent",
-    minimumFractionDigits: digits,
-    maximumFractionDigits: digits,
+    minimumFractionDigits: shown,
+    maximumFractionDigits: shown,
   });
   const floor = 10 ** -(digits + 2);
   return value > 0 && value < floor / 2
