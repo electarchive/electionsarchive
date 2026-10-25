@@ -495,15 +495,34 @@ async function breadcrumbs(polity: string, keep: string | null = null) {
       select ${polity}::uuid, 0
       union all
       select p.parent_id, chain.depth + 1 from polity_parent p join chain on p.polity_id = chain.id where chain.depth < 8
+    ),
+    county as (
+      select c.id from polity y
+      join polity_parent pp on pp.polity_id = y.id
+      join polity s on s.id = pp.parent_id and s.kind = 'federal_unit'
+      join polity_territory t on t.polity_id = y.id and upper_inf(t.valid)
+      join area_geometry g on g.area_id = t.area_id and upper_inf(g.valid)
+      join polity_parent cp on cp.parent_id = pp.parent_id
+      join polity c on c.id = cp.polity_id and c.kind = 'county'
+      join polity_territory ct on ct.polity_id = c.id and upper_inf(ct.valid)
+      join area_geometry cg on cg.area_id = ct.area_id and upper_inf(cg.valid)
+      where y.id = ${polity}::uuid and y.kind in ('municipality', 'school_district', 'special_district')
+        and st_contains(cg.geom, coalesce(g.label_point, st_pointonsurface(g.geom)))
+        and not st_contains(g.geom, coalesce(cg.label_point, st_pointonsurface(cg.geom)))
+      limit 1
     )
-    select chain.id from chain join polity y on y.id = chain.id
-    where chain.id = ${polity}::uuid or y.kind <> 'supranational'
-      or ${keep}::text = 'all'
-      or exists (
-        select from election e join election up on up.id = e.parent_id
-        where e.id::text = ${keep}::text and up.polity_id = chain.id
-      )
-    group by chain.id order by max(chain.depth) desc
+    select id from (
+      select chain.id, chain.depth::numeric as depth from chain join polity y on y.id = chain.id
+      where chain.id = ${polity}::uuid or y.kind <> 'supranational'
+        or ${keep}::text = 'all'
+        or exists (
+          select from election e join election up on up.id = e.parent_id
+          where e.id::text = ${keep}::text and up.polity_id = chain.id
+        )
+      union all
+      select id, 0.5 from county
+    ) x
+    group by id order by max(depth) desc
   `);
   const ids = result.rows.map((row) => row.id);
   const [labels, slugs] = await Promise.all([names(ids), paths(ids)]);
