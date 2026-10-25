@@ -29,6 +29,9 @@ def _listing(row: Mapping[str, str]) -> Iterator[tuple[date, str]]:
 
 
 def fetch() -> None:
+    for fips in sorted({row["county_fips"][:2] for row in enr_clarity.tenants(PLATFORM)}):
+        for layer in enr_clarity.LAYERS:
+            raw.fetch(SOURCE, enr_clarity.CENSUS.format(fips=fips, layer=layer), suffix=".zip")
     for row in enr_clarity.tenants(PLATFORM):
         tenant = row["tenant"]
         raw.fetch(SOURCE, f"{tenant}elections.json?v=1", suffix=".json")
