@@ -1193,6 +1193,7 @@ export const resultValue = pgTable("result_value", {
 	flags: smallint().default(0).notNull(),
 	value: numeric().notNull(),
 }, (table) => [
+	index("result_value_unit_k_idx").using("btree", table.unitK.asc().nullsLast()),
 	primaryKey({ columns: [table.resultSetK, table.unitK, table.optionK, table.channel, table.measure, table.countRound], name: "result_value_pkey"}),
 ]);
 
