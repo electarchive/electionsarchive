@@ -419,7 +419,9 @@ def parse() -> None:
     ):
         frame = pl.read_csv(raw.cached(SOURCE, url).path, infer_schema_length=0, encoding="utf8-lossy")
         if code == CROYDON_CODE:
-            frame = frame.select(
+            frame = frame.with_columns(
+                Name=pl.col("Name").str.strip_chars().str.replace(r"^((?:[A-Z'’-]+ )*[A-Z'’-]+) ([A-Z][a-z])", "$1, $2")
+            ).select(
                 ward=pl.col("Ward").str.strip_chars(),
                 surname=pl.col("Name").str.split(", ").list.first(),
                 name=pl.concat_str(
