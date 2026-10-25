@@ -25,6 +25,22 @@ GEMS_NOISE = re.compile(r"^(Total|Number of Precincts|Precincts Reporting|Total 
 PARTIES = {"DEM": "Democratic", "REP": "Republican", "LIB": "Libertarian", "CON": "Constitution", "GRE": "Green"}
 
 
+OTHER = re.compile(
+    r"(?i)jackson|co at|co leg|county|cir crt|circ|school district|hickman|raytown|grandview|lee'?s summit|center|independence|"
+    r"\bR-?\d|\bC-?\d|mcc|trustee|library|tdd|rail|state|u\.?s\.?\b|senat|governor|auditor|treasurer|attorney|amend|president|judge ?\w* ?(circuit|court of)"
+)
+SCHOOL = re.compile(r"(?i)^(kc\s*(sub|at)|kcps|kansas city public)|school board|director (sub|at)")
+CITY = re.compile(r"(?i)mayor|council|\bcity\b|^kc\b|municipal judge|^prop|^question|^q\d")
+
+
+def _entity(title: str) -> str:
+    if SCHOOL.search(title) and not re.search(r"(?i)hickman|raytown|grandview|lee'?s|center|independence", title):
+        return f"Kansas City 33 School District, {title}"
+    if CITY.search(title) and not OTHER.search(title):
+        return f"City of Kansas City, {title}"
+    return title
+
+
 def _links() -> list[str]:
     page = raw.cached(SOURCE, LISTING).path.read_text(errors="replace")
     links = {urljoin(LISTING, href) for href in re.findall(r'href="([^"]*\.pdf)"', page)}
@@ -33,6 +49,8 @@ def _links() -> list[str]:
 
 def fetch() -> None:
     raw.fetch(SOURCE, LISTING, suffix=".html")
+    for layer in enr_clarity.LAYERS:
+        raw.fetch(SOURCE, enr_clarity.CENSUS.format(fips="29", layer=layer), suffix=".zip")
     for link in _links():
         raw.fetch(SOURCE, link, suffix=".pdf")
 
@@ -133,7 +151,7 @@ def _read(registry: Mapping[str, Mapping[str, str]]) -> Iterator[dict[str, Any]]
             if node["text"] in seen:
                 continue
             seen.add(node["text"])
-            nodes.append({**node, "key": str(len(nodes))})
+            nodes.append({**node, "text": _entity(node["text"]), "key": str(len(nodes))})
         yield {
             "tenant": tenant,
             "election": day.isoformat(),
@@ -150,4 +168,4 @@ def parse() -> None:
 
 
 def emit() -> Path:
-    return enr_clarity.emit(SOURCE, PLATFORM, lambda link, tenant: True)
+    return enr_clarity.emit(SOURCE, PLATFORM, lambda link, tenant: True, floor=0.4)

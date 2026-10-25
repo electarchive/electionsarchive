@@ -1132,6 +1132,7 @@ def emit(
     source: str = SOURCE,
     platform: str = "clarity",
     owns: Callable[[str, str], bool] = lambda link, tenant: link.startswith(tenant) and link.endswith("detailxml.zip"),
+    floor: float = 0.5,
 ) -> Path:
     parsed = DATA / "parsed" / source
     listed = tenants(platform)
@@ -1580,7 +1581,7 @@ def emit(
                 else sorted(county for county, share in shares.items() if share >= 0.01 and county not in carried)
             )
             completeness = 1.0 if not missing else round(sum(shares.get(county, 0.0) for county in carried) / whole, 3)
-            if completeness < 0.5:
+            if completeness < floor:
                 skipped["under half its area reported"] += 1
                 continue
             uniform = st == "TX" and (
