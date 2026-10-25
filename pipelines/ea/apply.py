@@ -67,7 +67,19 @@ def _stage(conn: Connection, changeset_id: str) -> Stage:
         if table in tables
         and table not in temporal
         and table
-        not in (*FACTS, "external_id", "slug", "entity_merge", "entity_retirement", "entity_subtype_drop", "name_drop", "membership_drop", "unit_area_drop", "note_drop", "option_drop")
+        not in (
+            *FACTS,
+            "external_id",
+            "slug",
+            "entity_merge",
+            "entity_retirement",
+            "entity_subtype_drop",
+            "name_drop",
+            "membership_drop",
+            "unit_area_drop",
+            "note_drop",
+            "option_drop",
+        )
     }
     owners: dict[str, str] = {
         table: owner
@@ -80,7 +92,9 @@ def _stage(conn: Connection, changeset_id: str) -> Stage:
         if table in parents
     }
     nullable = {table: set(keys) - _not_null(conn, table) for table, keys in temporal.items()}
-    return Stage(schema, tables, entities, pipeline, polity, temporal, parents, owners, replaces or {}, nullable, clears or [])
+    return Stage(
+        schema, tables, entities, pipeline, polity, temporal, parents, owners, replaces or {}, nullable, clears or []
+    )
 
 
 def _not_null(conn: Connection, table: str) -> set[str]:
@@ -584,7 +598,10 @@ def _publish_table(conn: Connection, stage: Stage, table: str) -> None:
                                 [ids],
                             )
                 conn.execute("delete from public.result_set where contest_id = any(%s::uuid[])", [ids])
-                conn.execute("delete from public.candidacy where option_id in (select id from public.contest_option where contest_id = any(%s::uuid[]))", [ids])
+                conn.execute(
+                    "delete from public.candidacy where option_id in (select id from public.contest_option where contest_id = any(%s::uuid[]))",
+                    [ids],
+                )
                 conn.execute("delete from public.contest_option where contest_id = any(%s::uuid[])", [ids])
             if kind == "person":
                 conn.execute("delete from public.person_image where person_id = any(%s::uuid[])", [ids])
@@ -776,7 +793,8 @@ def _publish_table(conn: Connection, stage: Stage, table: str) -> None:
             if writer != stage.pipeline:
                 raise ValueError(f"option {option} was written by {writer}, not {stage.pipeline}")
             sets = [
-                row[0] for row in conn.execute("select k from public.result_set where contest_id = %s", [contest]).fetchall()
+                row[0]
+                for row in conn.execute("select k from public.result_set where contest_id = %s", [contest]).fetchall()
             ]
             used = [
                 f"{relation}.{column} ({rows} rows)"
@@ -795,7 +813,11 @@ def _publish_table(conn: Connection, stage: Stage, table: str) -> None:
                 ).fetchall()
                 if rows
             ]
-            for relation, column in (("candidacy", "option_id"), ("outcome", "option_id"), ("contest_option", "parent_option_id")):
+            for relation, column in (
+                ("candidacy", "option_id"),
+                ("outcome", "option_id"),
+                ("contest_option", "parent_option_id"),
+            ):
                 (rows,) = conn.execute(
                     sql.SQL("select count(*) from public.{} where {} = %s").format(
                         sql.Identifier(relation), sql.Identifier(column)
@@ -873,7 +895,13 @@ def _rollup(
     conn: Connection, stage: Stage | None, moved: list[str], repointed: list[str], sets: list[int] | None = None
 ) -> None:
     universe = stage is not None and "area_universe" in stage.tables
-    if (stage is None or "result_value" not in stage.tables) and not universe and not moved and not repointed and not sets:
+    if (
+        (stage is None or "result_value" not in stage.tables)
+        and not universe
+        and not moved
+        and not repointed
+        and not sets
+    ):
         return
     stale = [
         *(sets or []),
