@@ -2439,8 +2439,12 @@ function contestMarkdown(
     ...(additional == null
       ? []
       : [
-          `## ${m.ams_title()}`,
-          `${m.ams_lede({ seats: count(additional.seats) })} ${
+          `## ${additional.isTopUp ? m.ams_title() : m.pr_title()}`,
+          `${(additional.isTopUp ? m.ams_lede : m.pr_lede)({ seats: count(additional.seats) })} ${
+            additional.threshold == null
+              ? ""
+              : `${m.pr_threshold({ percent: String(additional.threshold) })} `
+          }${
             additional.isCounted
               ? additional.isReproduced
                 ? m.ams_reproduced()
@@ -2466,11 +2470,11 @@ function contestMarkdown(
             [
               m.col_party(),
               ...(additional.isCounted ? [m.col_list_votes()] : []),
-              m.col_constituency_seats(),
+              ...(additional.isTopUp ? [m.col_constituency_seats()] : []),
               ...additional.picks.map((_, seat) =>
                 m.ams_seat({ count: seat + 1 }),
               ),
-              m.col_list_seats(),
+              ...(additional.isTopUp ? [m.col_list_seats()] : []),
               m.col_total_seats(),
             ],
             additional.parties
@@ -2486,7 +2490,7 @@ function contestMarkdown(
                 ...(additional.isCounted
                   ? [party.votes == null ? null : count(party.votes)]
                   : []),
-                count(party.constituencies),
+                ...(additional.isTopUp ? [count(party.constituencies)] : []),
                 ...additional.picks.map((pick, seat) => {
                   const quotient = party.quotients[seat];
                   return quotient == null
@@ -2495,7 +2499,7 @@ function contestMarkdown(
                       ? `**${count(Math.round(quotient))}**`
                       : count(Math.round(quotient));
                 }),
-                count(party.declared),
+                ...(additional.isTopUp ? [count(party.declared)] : []),
                 count(party.constituencies + party.declared),
               ]),
           ),
@@ -2508,17 +2512,21 @@ function contestMarkdown(
                   )?.label ?? "",
                 quotient: count(Math.round(additional.next.quotient)),
               }),
-          `### ${m.ams_constituency_members()}`,
-          additional.constituencies
-            .map(
-              (seat) =>
-                `- ${link(seat.name, seat.path)}${seat.member == null ? "" : `: ${link(seat.member, seat.memberPath)}`}`,
-            )
-            .join("\n"),
+          ...(additional.isTopUp
+            ? [
+                `### ${m.ams_constituency_members()}`,
+                additional.constituencies
+                  .map(
+                    (seat) =>
+                      `- ${link(seat.name, seat.path)}${seat.member == null ? "" : `: ${link(seat.member, seat.memberPath)}`}`,
+                  )
+                  .join("\n"),
+              ]
+            : []),
           ...(additional.members.length === 0
             ? []
             : [
-                `### ${m.ams_list_members()}`,
+                `### ${additional.isTopUp ? m.ams_list_members() : m.pr_members()}`,
                 Map.groupBy(additional.members, (member) => member.key)
                   .entries()
                   .map(

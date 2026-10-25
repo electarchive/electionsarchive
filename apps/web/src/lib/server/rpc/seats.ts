@@ -1128,6 +1128,8 @@ export const seats = {
       v.nullable(
         v.object({
           seats: v.number(),
+          isTopUp: v.boolean(),
+          threshold: v.nullable(v.number()),
           isCounted: v.boolean(),
           isReproduced: v.boolean(),
           parties: v.array(
@@ -1180,12 +1182,16 @@ export const seats = {
         ballot: string | null;
         magnitude: number;
         day: string;
+        kind: string;
+        threshold: number | null;
       }>(sql`
         with c as materialized (
-          select c.id, c.election_id, c.district_area_id as region, a.k as region_k, c.magnitude, e.date_from as day
+          select c.id, c.election_id, c.district_area_id as region, a.k as region_k, c.magnitude, e.date_from as day, c.kind::text as kind,
+            (coalesce(c.rules_override -> 'threshold', es.rules -> 'threshold') ->> 'percent')::float8 as threshold
           from contest c join election e on e.id = c.election_id join area a on a.id = c.district_area_id
           join electoral_system es on es.id = c.electoral_system_id
-          where c.id = ${input.id}::uuid and c.kind = 'list_allocation' and es.rules ->> 'formula' = 'dhondt'
+          where c.id = ${input.id}::uuid and coalesce(c.rules_override ->> 'formula', es.rules ->> 'formula') = 'dhondt'
+            and (c.kind = 'list_allocation' or (c.kind = 'body_seats' and c.magnitude > 1))
             and c.allocation_parent_id is null and c.magnitude is not null
         ),
         tiers as (
@@ -1204,6 +1210,8 @@ export const seats = {
           join candidacy cy on cy.option_id = o.id and cy.role in ('list_member', 'head')
           join result_set rs on rs.contest_id = c.id and ${latest("rs")}
           where exists (select from outcome x where x.result_set_id = rs.id and x.option_id = o.id and x.kind in ('won', 'elected'))
+            and (exists (select from outcome x where x.result_set_id = rs.id and x.candidacy_id = cy.id and x.kind in ('won', 'elected'))
+              or not exists (select from outcome x where x.result_set_id = rs.id and x.candidacy_id is not null))
           union all
           select 'seat', k.id, o.party_id, o.kind::text, o.ballot_label, null, 1, cy.person_id, cy.ballot_name
           from c join contest k on k.election_id = c.election_id and k.kind = 'body_seats' and k.allocation_parent_id is null
@@ -1218,7 +1226,7 @@ export const seats = {
         select t.tier, t.id::text, coalesce(bm.into_id, br.parent_party_id, pm.into_id, t.party_id, t.id)::text as key,
           coalesce(pm.into_id, t.party_id)::text as own, t.ballot_label as label,
           t.party_id is null and t.kind <> 'list' as is_person, t.kind = 'others' as is_pool, t.votes, t.seats, t.person::text, t.ballot,
-          c.magnitude, c.day::text
+          c.magnitude, c.day::text, c.kind, c.threshold
         from tiers t cross join c
         left join entity_merge pm on pm.entity_id = t.party_id
         left join party_affiliation br on br.party_id = coalesce(pm.into_id, t.party_id)
@@ -1227,7 +1235,10 @@ export const seats = {
       `);
       const first = found.rows[0];
       const seated = found.rows.filter((row) => row.tier === "seat");
-      if (first == null || seated.length === 0) {
+      if (
+        first == null ||
+        (seated.length === 0 && first.kind !== "body_seats")
+      ) {
         return null;
       }
       const listed = found.rows.filter(
@@ -1260,6 +1271,13 @@ export const seats = {
         declared.set(row.key, (declared.get(row.key) ?? 0) + (row.seats ?? 0));
       }
       const isCounted = votes.size > 0;
+      let valid = 0;
+      for (const row of found.rows) {
+        if (row.tier === "list" && row.person == null) {
+          valid += row.votes ?? 0;
+        }
+      }
+      const floor = ((first.threshold ?? 0) * valid) / 100;
       const solo = new Set(
         listed.filter((row) => row.is_person).map((row) => row.key),
       );
@@ -1277,7 +1295,7 @@ export const seats = {
           const total = votes.get(key);
           const isOut = solo.has(key) && (taken.get(key) ?? 0) > 0;
           const quotient =
-            total == null || isOut
+            total == null || isOut || total < floor
               ? null
               : total /
                 ((won.get(key)?.length ?? 0) + (taken.get(key) ?? 0) + 1);
@@ -1336,6 +1354,8 @@ export const seats = {
         );
       return {
         seats: first.magnitude,
+        isTopUp: seated.length > 0,
+        threshold: first.threshold,
         isCounted,
         isReproduced:
           isCounted &&

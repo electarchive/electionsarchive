@@ -76,11 +76,18 @@
   aria-labelledby="{uid}-title"
 >
   <div class="grid gap-1">
-    <h2 id="{uid}-title" class="text-lg font-bold">{m.ams_title()}</h2>
+    <h2 id="{uid}-title" class="text-lg font-bold">
+      {additional.isTopUp ? m.ams_title() : m.pr_title()}
+    </h2>
     <p
       class="text-[0.8125rem] text-pretty text-muted-foreground max-inline-[72ch]"
     >
-      {m.ams_lede({ seats: figure(additional.seats) })}
+      {(additional.isTopUp ? m.ams_lede : m.pr_lede)({
+        seats: figure(additional.seats),
+      })}
+      {#if additional.threshold != null}
+        {m.pr_threshold({ percent: String(additional.threshold) })}
+      {/if}
       {status}
     </p>
   </div>
@@ -102,12 +109,14 @@
               {m.col_list_votes()}
             </th>
           {/if}
-          <th
-            class="px-2 pbe-1.5 text-end align-bottom font-normal"
-            scope="col"
-          >
-            {m.col_constituency_seats()}
-          </th>
+          {#if additional.isTopUp}
+            <th
+              class="px-2 pbe-1.5 text-end align-bottom font-normal"
+              scope="col"
+            >
+              {m.col_constituency_seats()}
+            </th>
+          {/if}
           {#each seats as seat (seat)}
             <th
               class="px-2 pbe-1.5 text-end align-bottom font-normal min-inline-20"
@@ -119,12 +128,14 @@
               />
             </th>
           {/each}
-          <th
-            class="px-2 pbe-1.5 text-end align-bottom font-normal"
-            scope="col"
-          >
-            {m.col_list_seats()}
-          </th>
+          {#if additional.isTopUp}
+            <th
+              class="px-2 pbe-1.5 text-end align-bottom font-normal"
+              scope="col"
+            >
+              {m.col_list_seats()}
+            </th>
+          {/if}
           <th
             class="ps-2 pbe-1.5 text-end align-bottom font-normal"
             scope="col"
@@ -153,9 +164,11 @@
                 {party.votes == null ? "" : figure(party.votes)}
               </td>
             {/if}
-            <td class="px-2 py-1.5 text-end font-figures tabular-nums">
-              {figure(party.constituencies)}
-            </td>
+            {#if additional.isTopUp}
+              <td class="px-2 py-1.5 text-end font-figures tabular-nums">
+                {figure(party.constituencies)}
+              </td>
+            {/if}
             {#each seats as seat (seat)}
               {const quotient = $derived(party.quotients[seat])}
               {const isPick = $derived(additional.picks[seat] === party.key)}
@@ -171,9 +184,11 @@
                 {quotient == null ? "" : figure(Math.round(quotient))}
               </td>
             {/each}
-            <td class="px-2 py-1.5 text-end font-figures tabular-nums">
-              {figure(party.declared)}
-            </td>
+            {#if additional.isTopUp}
+              <td class="px-2 py-1.5 text-end font-figures tabular-nums">
+                {figure(party.declared)}
+              </td>
+            {/if}
             <td
               class="py-1.5 ps-2 text-end font-figures font-semibold tabular-nums"
             >
@@ -193,36 +208,41 @@
     </p>
   {/if}
   <div class="grid gap-x-6 gap-y-3 sm:grid-cols-2">
-    <div class="grid content-start gap-1.5">
-      <h3 class="text-sm font-semibold">{m.ams_constituency_members()}</h3>
-      <ul class="grid gap-1 text-sm">
-        {#each additional.constituencies as seat (seat.name)}
-          {const party = $derived(labels.get(seat.key))}
-          <li class="flex flex-wrap gap-x-1.5">
-            {#if seat.path == null}
-              <span>{seat.name}</span>
-            {:else}
-              <a
-                class="underline decoration-border underline-offset-2 hover:decoration-foreground"
-                href={resolve("/[...path]", { path: seat.path })}>{seat.name}</a
-              >
-            {/if}
-            <span class="text-muted-foreground">
-              {#if seat.member != null}
-                <Name
-                  label={seat.member}
-                  color={swatch(party?.color ?? null, seat.key)}
-                  party={party?.isParty ? seat.key : null}
-                />
+    {#if additional.isTopUp}
+      <div class="grid content-start gap-1.5">
+        <h3 class="text-sm font-semibold">{m.ams_constituency_members()}</h3>
+        <ul class="grid gap-1 text-sm">
+          {#each additional.constituencies as seat (seat.name)}
+            {const party = $derived(labels.get(seat.key))}
+            <li class="flex flex-wrap gap-x-1.5">
+              {#if seat.path == null}
+                <span>{seat.name}</span>
+              {:else}
+                <a
+                  class="underline decoration-border underline-offset-2 hover:decoration-foreground"
+                  href={resolve("/[...path]", { path: seat.path })}
+                  >{seat.name}</a
+                >
               {/if}
-            </span>
-          </li>
-        {/each}
-      </ul>
-    </div>
+              <span class="text-muted-foreground">
+                {#if seat.member != null}
+                  <Name
+                    label={seat.member}
+                    color={swatch(party?.color ?? null, seat.key)}
+                    party={party?.isParty ? seat.key : null}
+                  />
+                {/if}
+              </span>
+            </li>
+          {/each}
+        </ul>
+      </div>
+    {/if}
     {#if members.length > 0}
       <div class="grid content-start gap-1.5">
-        <h3 class="text-sm font-semibold">{m.ams_list_members()}</h3>
+        <h3 class="text-sm font-semibold">
+          {additional.isTopUp ? m.ams_list_members() : m.pr_members()}
+        </h3>
         <ul class="grid gap-1 text-sm">
           {#each members as [key, elected] (key)}
             {const party = $derived(labels.get(key))}
