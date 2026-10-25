@@ -25,7 +25,7 @@ SKIP_CONTEST = re.compile(
 COUNTY_OFFICE = re.compile(
     r"(?i)\bjudge\b.*\bcourt\b|\bcounty (?:clerk|judge|tax|commissioner|treasurer|surveyor|attorney|sheriff|school)|"
     r"\bdistrict (?:clerk|attorney)\b|\bconstable\b|\bjustice of the peace\b|\bsheriff\b|\bhcad\b|"
-    r"^(?:mayor|council ?(?:member|man)\b.*|councilman.*|trustee.*)$|^city controller|precinct chair|flood control|^harris county(?! mud)|woodlands township|\bgccisd"
+    r"^(?:mayor|council ?(?:member|man)\b.*|councilman.*|trustee.*)$|^city controller|(?:precinct|county|party) chair|flood control|^harris county(?! mud)|woodlands township|\bgccisd"
 )
 ROMAN = {"I": "1", "II": "2", "III": "3", "IV": "4", "V": "5", "VI": "6", "VII": "7", "VIII": "8", "IX": "9"}
 NUMBER_WORDS = {"none": 0, "one": 1, "two": 2, "three": 3, "four": 4, "five": 5, "six": 6, "seven": 7}

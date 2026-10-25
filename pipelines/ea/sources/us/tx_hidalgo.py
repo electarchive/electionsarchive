@@ -21,7 +21,7 @@ PERCENT = re.compile(r"[\d.]+%")
 
 def anchors(page: str) -> Iterator[tuple[str, str]]:
     for href, label in re.findall(r'<a [^>]*href="([^"]+)"[^>]*>(.*?)</a>', page, flags=re.S):
-        yield urljoin(SITE, html.unescape(href)), re.sub(r"\s+", " ", re.sub(r"<[^>]+>", "", html.unescape(label))).strip()
+        yield urljoin(SITE, html.unescape(href)).replace("tx-hidalgocounty.civicplus.com", "www.hidalgocounty.us"), re.sub(r"\s+", " ", re.sub(r"<[^>]+>", "", html.unescape(label))).strip()
 
 
 def election_pages() -> list[str]:
