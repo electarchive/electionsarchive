@@ -10,7 +10,7 @@
   import type { Counts, Goal } from "#lib/coverage.js";
   import Bar from "./bar.svelte";
   import Self from "./gaps.svelte";
-  import { levelLabel } from "#lib/coverage.js";
+  import { levelLabel, weighted } from "#lib/coverage.js";
 
   const {
     polity,
@@ -122,10 +122,13 @@
       {count(row.total - row.complete)}
     </span>
     <span role="gridcell" class="grid gap-1">
+      {const done = $derived(
+        goal === "local" && row.populationTotal > 0 ? weighted(row) : row,
+      )}
       <span class="text-xs text-muted-foreground">
-        {percent(row.complete / Math.max(1, row.total), 1)}
+        {percent(done.complete / Math.max(1, done.total), 1)}
       </span>
-      <Bar counts={row} {goal} {polity} class="block-2" />
+      <Bar counts={done} {goal} {polity} class="block-2" />
     </span>
   </div>
   {#if isOpen}

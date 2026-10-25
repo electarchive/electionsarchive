@@ -13,7 +13,7 @@
   import type { Counts, Reason, UsGoal } from "#lib/coverage.js";
   import Bar from "#routes/coverage/bar.svelte";
   import Gaps from "#routes/coverage/gaps.svelte";
-  import { GOALS, label, PARTS, REASONS } from "#lib/coverage.js";
+  import { GOALS, label, PARTS, REASONS, weighted } from "#lib/coverage.js";
   import Tone from "#routes/coverage/tone.svelte";
 
   const { data }: { data: PageData } = $props();
@@ -78,12 +78,26 @@
 
 {#snippet progress(row: { goal: UsGoal } & Counts, isLead: boolean)}
   {const held = $derived(row.total - row.absent)}
+  {const isWeighted = $derived(row.goal === "local" && row.populationTotal > 0)}
   <div class="grid gap-3">
-    <p class="flex flex-wrap items-baseline gap-x-3 gap-y-1 tabular-nums">
-      <span
-        class={cn("font-bold tracking-[-0.01em]", {
+    {#if isWeighted}
+      <p
+        class={cn("font-bold tracking-[-0.01em] tabular-nums", {
           "text-3xl": isLead,
           "text-xl": !isLead,
+        })}
+      >
+        {m.coverage_progress_local_population({
+          percent: percent(row.populationComplete / row.populationTotal, 1),
+        })}
+      </p>
+    {/if}
+    <p class="flex flex-wrap items-baseline gap-x-3 gap-y-1 tabular-nums">
+      <span
+        class={cn({
+          "font-bold tracking-[-0.01em]": !isWeighted,
+          "text-3xl": isLead && !isWeighted,
+          "text-xl": !isLead && !isWeighted,
         })}
       >
         {(row.goal === "local"
@@ -109,7 +123,11 @@
         {m.coverage_short({ count: count(row.total - row.complete) })}
       </span>
     </p>
-    <Bar counts={row} goal={row.goal} class={isLead ? "block-4" : "block-3"} />
+    <Bar
+      counts={isWeighted ? weighted(row) : row}
+      goal={row.goal}
+      class={isLead ? "block-4" : "block-3"}
+    />
     <ul class="grid gap-x-6 gap-y-2 text-sm sm:grid-cols-2">
       {#each REASONS[row.goal].filter((reason) => reason === "complete" || row[reason] > 0) as reason (reason)}
         {const definition = $derived(
@@ -186,6 +204,14 @@
       <p class="text-sm text-muted-foreground">
         {m.coverage_goal_local_note()}
       </p>
+      {#if isWeighted}
+        <p class="text-sm text-muted-foreground">
+          {m.coverage_local_weights()}
+          {m.coverage_local_estimated({
+            percent: percent(row.populationEstimated / row.populationTotal, 1),
+          })}
+        </p>
+      {/if}
     {:else if row.goal === "shapes" || row.goal === "shapes_history"}
       <p class="text-sm text-muted-foreground">
         {m.coverage_goal_shapes_note()}
@@ -294,6 +320,14 @@
                 <span
                   class="text-sm text-muted-foreground tabular-nums group-open:hidden"
                 >
+                  {#if row.goal === "local" && row.populationTotal > 0}
+                    {m.coverage_progress_local_population({
+                      percent: percent(
+                        row.populationComplete / row.populationTotal,
+                        1,
+                      ),
+                    })};
+                  {/if}
                   {(row.goal === "local"
                     ? m.coverage_progress_local
                     : row.goal === "turnout"
@@ -307,7 +341,9 @@
                   })}
                 </span>
                 <Bar
-                  counts={row}
+                  counts={row.goal === "local" && row.populationTotal > 0
+                    ? weighted(row)
+                    : row}
                   goal={row.goal}
                   class="block-1.5 max-inline-80 group-open:hidden"
                 />
@@ -376,7 +412,12 @@
           </div>
         </div>
         <p class="text-sm text-muted-foreground">{TITLES[goal]()}</p>
-        <p class="text-xs text-muted-foreground">{m.coverage_column_note()}</p>
+        <p class="text-xs text-muted-foreground">
+          {m.coverage_column_note()}
+          {#if goal === "local"}
+            {m.coverage_column_note_local()}
+          {/if}
+        </p>
       </div>
       <div role="treegrid" aria-label={m.coverage_where()} class="grid gap-px">
         <div

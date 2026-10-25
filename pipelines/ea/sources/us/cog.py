@@ -2,12 +2,14 @@ import io
 import re
 import subprocess
 import zipfile
+from collections import defaultdict
 from xml.etree import ElementTree
 
 import fastexcel
 import polars as pl
 
 from ea import raw
+from ea.coverage_tables import PREFIX, tokens
 from ea.store import DATA
 
 SOURCE = "us.cog"
@@ -20,6 +22,43 @@ SHEETS = {
 }
 TYPES = {"1 - COUNTY": "county", "2 - MUNICIPAL": "municipality", "3 - TOWNSHIP": "township"}
 ISD = "https://www.census.gov/content/dam/Census/library/publications/2024/econ/2022ISD.pdf"
+SAIPE = "https://www2.census.gov/programs-surveys/saipe/datasets/2022/2022-school-districts/ussd22.xls"
+NUMBERING = {"R", "C", "RE", "UF", "CUSD", "UNION", "FREE", "I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X"}
+SCHOOL_WORDS = {
+    "CITY",
+    "LOCAL",
+    "COMMUNITY",
+    "BORO",
+    "BOROUGH",
+    "TOWN",
+    "TOWNSHIP",
+    "ELEMENTARY",
+    "HIGH",
+    "UNIFIED",
+    "UNIT",
+    "CONSOLIDATED",
+    "INDEPENDENT",
+    "JOINT",
+    "REGIONAL",
+    "BOARD",
+    "EDUCATION",
+    "PUB",
+    "COOP",
+    "COOPERATIVE",
+    "AREA",
+    "EXEMPTED",
+    "VILLAGE",
+    "VLG",
+    "EX",
+    "RURAL",
+    "REORGANIZED",
+    "REORG",
+    "ADMIN",
+    "ADMINISTRATIVE",
+    "DEPARTMENT",
+    "CENTRAL",
+    "COUNTY",
+}
 STATES = {
     "Alabama": "01",
     "Alaska": "02",
@@ -105,6 +144,7 @@ COUNTS = {"county": 3031, "municipality": 19491, "township": 16214, "special": 3
 def fetch() -> None:
     raw.fetch(SOURCE, URL, suffix=".zip")
     raw.fetch(SOURCE, ISD, suffix=".pdf")
+    raw.fetch(SOURCE, SAIPE, suffix=".xls")
 
 
 def words(text: str) -> frozenset[str]:
@@ -237,6 +277,103 @@ def parse() -> None:
     for kind, count in COUNTS.items():
         if held.get(kind) != count:
             raise ValueError(f"{kind}: {held.get(kind)} units, the Census Bureau reports {count}")
+    saipe = (
+        fastexcel.read_excel(raw.cached(SOURCE, SAIPE).path.read_bytes())
+        .load_sheet(0, header_row=2, dtypes="string")
+        .to_polars()
+    )
+    index: list[dict[tuple[str, object], list[int]]] = [defaultdict(list) for _ in range(4)]
+    schools: list[tuple[str, str, tuple[object, ...]]] = []
+    for gid, st, name, population in [
+        (None, st, name, int(population))
+        for st, name, population in saipe.select("State FIPS Code", "Name", "Estimated Total Population").iter_rows()
+    ] + [
+        (gid, st, name, 0)
+        for gid, st, name in governments.filter(pl.col("kind").is_in(["school", "dependent_school"]))
+        .select("id", "state_fips", "name")
+        .iter_rows()
+    ]:
+        exact = tokens(name)
+        plain = frozenset(w for w in exact if not any(c.isdigit() for c in w) and w not in NUMBERING)
+        keys = (exact, plain, "".join(sorted(re.sub(r"[^A-Z]", "", w) for w in plain)), plain - SCHOOL_WORDS)
+        if gid is None:
+            for i, key in enumerate(keys):
+                index[i][(st, key)].append(population)
+        else:
+            schools.append((gid, st, keys))
+    figures: dict[str, tuple[int, str]] = {}
+    for gid, st, keys in schools:
+        hits = next((hits for i, key in enumerate(keys) if len(hits := index[i].get((st, key), [])) == 1), None)
+        if hits is not None:
+            figures[gid] = (hits[0], "saipe")
+    counties: dict[tuple[str, str], int] = {}
+    places: dict[tuple[str, str], list[tuple[str, int]]] = defaultdict(list)
+    for kind, name, st, county, population in (
+        governments.filter(pl.col("kind").is_in(["county", "municipality", "township"]))
+        .select("kind", "name", "state_fips", "county_fips", "population")
+        .iter_rows()
+    ):
+        if kind == "county":
+            counties[(st, county)] = population
+        elif population:
+            match = PREFIX.match(name)
+            places[(st, county)].append(((name if match is None else match[2]).strip(), population))
+    sharing: dict[tuple[str, str, str, str | None, str], list[str]] = defaultdict(list)
+    for gid, kind, name, st, county in (
+        governments.filter(pl.col("kind").is_in(["special", "school", "dependent_school"]))
+        .select("id", "kind", "name", "state_fips", "county_fips")
+        .iter_rows()
+    ):
+        if gid in figures:
+            continue
+        place = max(
+            (
+                (prefix, population)
+                for prefix, population in places.get((st, county), [])
+                if kind == "special"
+                and name.startswith(prefix + " ")
+                and name[len(prefix) + 1 :].split(" ", 1)[0] not in ("COUNTY", "PARISH")
+            ),
+            key=lambda pair: len(pair[0]),
+            default=None,
+        )
+        group = "special" if kind == "special" else "school"
+        if place is not None:
+            sharing[("place", st, county, place[0], group)].append(gid)
+            figures[gid] = (place[1], "place")
+        elif (st, county) in counties:
+            sharing[("county", st, county, None, group)].append(gid)
+            figures[gid] = (counties[(st, county)], "county")
+    for gids in sharing.values():
+        for gid in gids:
+            figures[gid] = (figures[gid][0] // len(gids), figures[gid][1])
+    governments = (
+        governments.with_columns(
+            pl.col("id")
+            .replace_strict({gid: figure[0] for gid, figure in figures.items()}, default=None)
+            .alias("figure"),
+            pl.col("id")
+            .replace_strict({gid: figure[1] for gid, figure in figures.items()}, default=None)
+            .alias("population_basis"),
+        )
+        .with_columns(
+            pl.when(pl.col("kind").is_in(["county", "municipality", "township"]))
+            .then(pl.col("population"))
+            .otherwise(pl.col("figure"))
+            .cast(pl.Int64)
+            .alias("population"),
+            pl.when(pl.col("kind").is_in(["county", "municipality", "township"]))
+            .then(pl.lit("census"))
+            .otherwise(pl.col("population_basis"))
+            .alias("population_basis"),
+        )
+        .drop("figure")
+    )
+    print(
+        governments.group_by("kind", "population_basis")
+        .agg(pl.len().alias("governments"), pl.col("population").sum().alias("population"))
+        .sort("kind", "population_basis")
+    )
     out = DATA / "parsed" / SOURCE
     out.mkdir(parents=True, exist_ok=True)
     governments.write_parquet(out / "governments.parquet")

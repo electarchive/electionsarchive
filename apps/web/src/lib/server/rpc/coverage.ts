@@ -34,6 +34,10 @@ const counts = {
   units: v.number(),
   undrawn: v.number(),
   icpsr: v.number(),
+  populationTotal: v.number(),
+  populationComplete: v.number(),
+  populationAbsent: v.number(),
+  populationEstimated: v.number(),
 };
 type Counts = Record<keyof typeof counts, number>;
 const Current = v.optional(
@@ -46,7 +50,13 @@ const Current = v.optional(
 const Code = v.pipe(v.string(), v.regex(/^[a-z]{2}$/));
 const SUMS = sql.raw(
   Object.keys(counts)
-    .map((key) => `sum(g.${key})::int as ${key}`)
+    .map((key) => {
+      const column = key.replaceAll(
+        /[A-Z]/g,
+        (letter) => `_${letter.toLowerCase()}`,
+      );
+      return `sum(g.${column})::${column.startsWith("population_") ? "float8" : "int"} as "${key}"`;
+    })
     .join(", "),
 );
 const Note = v.object({
@@ -317,7 +327,8 @@ export const coverage = {
             and (${input.current} or g.year <> extract(year from current_date))
           group by 1
         ) r
-        order by r.total - r.complete desc, r.key desc
+        order by case when ${input.goal} = 'local' then r."populationTotal" - r."populationComplete"
+          else r.total - r.complete end desc, r.key desc
       `);
       return found.rows;
     }),

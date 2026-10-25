@@ -40,9 +40,28 @@ export type Reason =
   | "unshaped"
   | "undrawn";
 export type Counts = Record<
-  Reason | "total" | "turnout" | "precincts" | "shaped" | "icpsr",
+  | Reason
+  | "total"
+  | "turnout"
+  | "precincts"
+  | "shaped"
+  | "icpsr"
+  | "populationTotal"
+  | "populationComplete"
+  | "populationAbsent"
+  | "populationEstimated",
   number
 >;
+
+export const weighted = (row: Counts): Counts => ({
+  ...row,
+  total: row.populationTotal,
+  complete: row.populationComplete,
+  absent: row.populationAbsent,
+  totals: 0,
+  bare: 0,
+  icpsr: 0,
+});
 
 export const REASONS: Record<Goal, Array<Reason>> = {
   county: ["complete", "partial", "totals", "bare", "absent"],

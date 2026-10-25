@@ -417,11 +417,26 @@ function coverageMarkdown(
       .flatMap((row) => [
         `## ${TITLES[row.goal]()}`,
         [
+          ...(row.goal === "local" && row.populationTotal > 0
+            ? [
+                m.coverage_progress_local_population({
+                  percent: percent(
+                    row.populationComplete / row.populationTotal,
+                    1,
+                  ),
+                }),
+              ]
+            : []),
           `${(row.goal === "local" ? m.coverage_progress_local : row.goal === "turnout" ? m.coverage_progress_turnout : m.coverage_progress)({ complete: count(row.complete), total: count(row.total) })}, ${share(row)}`,
           ...(row.icpsr > 0
             ? [m.coverage_icpsr_of({ count: count(row.icpsr) })]
             : []),
         ].join(", "),
+        ...(row.goal === "local" && row.populationTotal > 0
+          ? [
+              `${m.coverage_local_weights()} ${m.coverage_local_estimated({ percent: percent(row.populationEstimated / row.populationTotal, 1) })}`,
+            ]
+          : []),
         ...(row.goal === "history" || row.goal === "turnout"
           ? [
               data.parts

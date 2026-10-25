@@ -462,6 +462,10 @@ export const coverageGoal = pgTable("coverage_goal", {
 	units: integer().default(0).notNull(),
 	undrawn: integer().default(0).notNull(),
 	icpsr: integer().default(0).notNull(),
+	populationTotal: bigint("population_total", { mode: "number" }).default(0).notNull(),
+	populationComplete: bigint("population_complete", { mode: "number" }).default(0).notNull(),
+	populationAbsent: bigint("population_absent", { mode: "number" }).default(0).notNull(),
+	populationEstimated: bigint("population_estimated", { mode: "number" }).default(0).notNull(),
 }, (table) => [
 	primaryKey({ columns: [table.polity, table.goal, table.state, table.level, table.year], name: "coverage_goal_pkey"}),
 ]);
@@ -494,6 +498,7 @@ export const coverageGovernment = pgTable("coverage_government", {
 	phase: integer(),
 	month: integer(),
 	basis: text().notNull(),
+	populationBasis: text("population_basis"),
 }, (table) => [
 	index("coverage_government_polity_idx").using("btree", table.polityId.asc().nullsLast()),
 	index("coverage_government_state_idx").using("btree", table.state.asc().nullsLast(), table.kind.asc().nullsLast()),

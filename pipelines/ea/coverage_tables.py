@@ -1014,8 +1014,17 @@ def build() -> str:
             taken.add(pid)
 
     governments: list[dict] = []
-    for gid, kind, name, st, county, function, population, active, elected in cog.select(
-        "id", "kind", "name", "state_fips", "county_fips", "function", "population", "active", "elected"
+    for gid, kind, name, st, county, function, population, population_basis, active, elected in cog.select(
+        "id",
+        "kind",
+        "name",
+        "state_fips",
+        "county_fips",
+        "function",
+        "population",
+        "population_basis",
+        "active",
+        "elected",
     ).iter_rows():
         pid = link.get(gid)
         match = PREFIX.match(name)
@@ -1044,6 +1053,7 @@ def build() -> str:
                 ),
                 "function": None if function is None else function.split(" - ", 1)[-1].capitalize(),
                 "population": population,
+                "population_basis": population_basis,
                 "active": active,
                 "elected": elected,
                 "polity_id": pid,
@@ -1067,6 +1077,7 @@ def build() -> str:
                 "name": name,
                 "function": None,
                 "population": None,
+                "population_basis": None,
                 "active": True,
                 "elected": True,
                 "polity_id": pid,
@@ -1141,7 +1152,7 @@ def build() -> str:
                     )
                 )
     names = dict(states.values())
-    goals: dict[tuple[str, str, str, int], list[int]] = defaultdict(lambda: [0] * 14)
+    goals: dict[tuple[str, str, str, int], list[int]] = defaultdict(lambda: [0] * 18)
     for st, year, level, total, complete, unshaped, units, undrawn in shapes:
         if level not in STATE_LEVELS or st not in names:
             continue
@@ -1190,9 +1201,9 @@ def build() -> str:
         cell[2] += absent
         cell[5] += partial
         cell[6] += coarse
-    kinds = {g["id"]: (g["state"], g["kind"]) for g in governments}
+    kinds = {g["id"]: (g["state"], g["kind"], g["population"] or 0, g["population_basis"]) for g in governments}
     for gid, year, expected, n, _, _, precincts, shaped in years_out:
-        st, kind = kinds[gid]
+        st, kind, population, population_basis = kinds[gid]
         if st not in names or not 2000 <= year <= today.year or not (expected or n):
             continue
         cell = goals[("local", st, kind, year)]
@@ -1201,13 +1212,17 @@ def build() -> str:
         cell[2] += n == 0
         cell[8] += precincts
         cell[9] += shaped
+        cell[14] += population
+        cell[15] += population if n > 0 else 0
+        cell[16] += population if n == 0 else 0
+        cell[17] += population if population_basis in ("place", "county") else 0
 
     with connect() as conn, conn.transaction():
         conn.execute("delete from coverage_goal where polity = 'us'")
         conn.execute("truncate coverage_government_year, coverage_government")
         with conn.cursor().copy(
-            "copy coverage_government (id, state, county, kind, name, function, population, active, polity_id, period,"
-            " phase, month, basis) from stdin"
+            "copy coverage_government (id, state, county, kind, name, function, population, population_basis, active,"
+            " polity_id, period, phase, month, basis) from stdin"
         ) as copy:
             for g in governments:
                 copy.write_row(
@@ -1221,6 +1236,7 @@ def build() -> str:
                             "name",
                             "function",
                             "population",
+                            "population_basis",
                             "active",
                             "polity_id",
                             "period",
@@ -1238,7 +1254,8 @@ def build() -> str:
                 copy.write_row(row)
         with conn.cursor().copy(
             "copy coverage_goal (goal, state, level, year, total, complete, absent, bare, totals, partial, coarse,"
-            " turnout, precincts, shaped, unshaped, units, undrawn, icpsr) from stdin"
+            " turnout, precincts, shaped, unshaped, units, undrawn, icpsr, population_total, population_complete,"
+            " population_absent, population_estimated) from stdin"
         ) as copy:
             for key, values in goals.items():
                 copy.write_row([*key, *values])
