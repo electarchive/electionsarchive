@@ -340,6 +340,9 @@ def parse() -> None:
                 for precinct, name, channel, value in files[url][1]:
                     if value is not None:
                         values.append((key, precinct, name, channel, value))
+                if block is not None:
+                    for c in block["candidates"]:
+                        values.append((key, "OFFICIAL", c["name"], 0, c["votes"]))
             elif block is not None:
                 for c in block["candidates"]:
                     values.append((key, "", c["name"], 0, c["votes"]))
@@ -442,7 +445,15 @@ def emit() -> Path:
             [["place:32%", "school:32%", "special:32003:%", "county:32003"]],
         ).fetchall():
             existing[text_.upper()] = (pid, code, path)
-        taken = {path for (path,) in conn.execute("select path from slug where path like 'us/nv/%'").fetchall()}
+        taken = {
+            path
+            for (path,) in conn.execute(
+                """select s.path from slug s where s.path like 'us/nv/%%' and not exists (
+                     select from contest k join changeset c on c.id = k.changeset_id
+                     where k.id = s.entity_id and c.pipeline = %s)""",
+                [SOURCE],
+            ).fetchall()
+        }
         territories = dict(
             conn.execute(
                 "select distinct on (polity_id) polity_id, area_id from polity_territory order by polity_id, valid_from desc nulls last"
@@ -550,7 +561,8 @@ def emit() -> Path:
         seen: set[str] = set()
         minted_units: set[str] = set()
         values: list[pl.DataFrame] = []
-        known_names: dict[tuple[UUID, date], list[tuple[str, str]]] = {}
+        known_names: dict[tuple[UUID, date], dict[UUID, list]] = {}
+        superseding: list[tuple] = []
         made_people: set[UUID] = set()
         for row in contests.filter(pl.col("jur").is_not_null()).sort("day", "kind", "jur", "label").iter_rows(named=True):
             polity = made.get((row["kind"], row["jur"]))
@@ -571,7 +583,14 @@ def emit() -> Path:
                     return_dtype=pl.String,
                 )
             )
-            sums = frame.group_by("display").agg(pl.col("votes").filter(pl.col("channel") == 0).sum()).filter(pl.col("votes") > 0)
+            official = frame.filter(pl.col("precinct") == "OFFICIAL")
+            frame = frame.filter(pl.col("precinct") != "OFFICIAL")
+            if not official.is_empty() and not set(official["display"]) <= set(frame["display"]):
+                report["official names differ"] = report.get("official names differ", 0) + 1
+                official = official.clear()
+            sums = (official if not official.is_empty() else frame.filter(pl.col("channel") == 0)).group_by("display").agg(
+                pl.col("votes").sum()
+            ).filter(pl.col("votes") > 0)
             if sums.is_empty():
                 sums = frame.group_by("display").agg(pl.col("votes").sum()).filter(pl.col("votes") > 0)
             if sums.is_empty():
@@ -584,21 +603,47 @@ def emit() -> Path:
             ).fetchone()
             if existing_election is not None:
                 if (pid, day) not in known_names:
-                    known_names[(pid, day)] = conn.execute(
-                        """select lower(coalesce(o.ballot_label, '')), lower(n.text) from contest k
+                    found = {}
+                    for contest_id, contest_key_, label, kind, parent, option_id in conn.execute(
+                        """select k.id, (select x.value from external_id x where x.entity_id = k.id and x.scheme = 'us.contest' limit 1),
+                                  o.ballot_label, o.kind, o.parent_option_id, o.id from contest k
                            join election e on e.id = k.election_id
                            join changeset kc on kc.id = k.changeset_id and kc.pipeline <> %s
-                           join name n on n.entity_id = k.id and n.is_preferred
                            left join contest_option o on o.contest_id = k.id
                            where e.polity_id = %s and e.date_from = %s""",
                         [SOURCE, pid, day],
-                    ).fetchall()
-                surnames = {c.split()[-1].lower() for c in sums["display"] if c not in ("Yes", "No", "Write-in", "None of These Candidates")}
-                if bool(surnames) and any(
-                    label.split()[-1] in surnames for label, _ in known_names[(pid, day)] if label.split()
-                ):
-                    report["exists"] = report.get("exists", 0) + 1
-                    continue
+                    ).fetchall():
+                        entry = found.setdefault(contest_id, [contest_key_, []])
+                        if label is not None:
+                            entry[1].append((label, kind, parent, option_id))
+                    known_names[(pid, day)] = found
+                surnames = {
+                    c.split()[-1].lower()
+                    for c in sums["display"]
+                    if c not in ("Yes", "No", "Write-in", "None of These Candidates")
+                }
+                if surnames:
+                    best = None
+                    for contest_id, (contest_key_, listed) in known_names[(pid, day)].items():
+                        theirs = {
+                            re.sub(r"[^a-z]", "", label.split()[-1].lower())
+                            for label, kind, parent, _ in listed
+                            if kind in ("candidate", "ticket") and parent is None and label.split()
+                        }
+                        mine = {re.sub(r"[^a-z]", "", c) for c in surnames}
+                        if mine <= theirs and (best is None or len(theirs) < best[0]):
+                            best = (len(theirs), contest_id, contest_key_, listed)
+                    if best is not None and row["has_precincts"] and best[2] is not None:
+                        superseding.append((row, pid, sums, frame, official, best[1:]))
+                        continue
+                    if any(
+                        label.split()[-1].lower() in surnames
+                        for found in known_names[(pid, day)].values()
+                        for label, _, _, _ in found[1]
+                        if label.split()
+                    ):
+                        report["exists"] = report.get("exists", 0) + 1
+                        continue
             if (day, pid) not in elections:
                 if existing_election is not None:
                     elections[(day, pid)] = existing_election
@@ -883,7 +928,219 @@ def emit() -> Path:
                     value=pl.col("votes"),
                 )
             )
+            if not official.is_empty():
+                residual = (
+                    official.group_by("display")
+                    .agg(pl.col("votes").sum())
+                    .join(
+                        frame.filter(pl.col("channel") == 0).group_by("display").agg(pl.col("votes").sum()),
+                        on="display",
+                        how="left",
+                        suffix="_precincts",
+                    )
+                    .with_columns(votes=pl.col("votes") - pl.col("votes_precincts").fill_null(0))
+                    .filter((pl.col("votes") > 0) & pl.col("display").is_in(list(options)))
+                )
+                if not residual.is_empty():
+                    unit_code = f"{day}:NV:{FIPS}:CLARK:UNREPORTED:{slug(contest_key)}"
+                    unit = cs.unit("us.precinct", unit_code)
+                    if unit in cs.minted:
+                        cs.add(
+                            "reporting_unit",
+                            id=unit,
+                            polity_id=state,
+                            scheme_code="us.precinct",
+                            code=unit_code,
+                            parent_id=county[0],
+                            area_relation="within",
+                            area_id=county[1],
+                            kind="aggregate",
+                            valid_from=day,
+                            valid_to=day + timedelta(days=1),
+                        )
+                    values.append(
+                        residual.select(
+                            result_set_id=pl.lit(str(result_set)),
+                            unit_id=pl.lit(str(unit)),
+                            option_id=pl.col("display").replace_strict({k: str(v) for k, v in options.items()}),
+                            channel=pl.lit(0, pl.Int16),
+                            measure=pl.lit(1, pl.Int16),
+                            count_round=pl.lit(1, pl.Int16),
+                            flags=pl.lit(32, pl.Int16),
+                            value=pl.col("votes"),
+                        )
+                    )
             report["new"] = report.get("new", 0) + 1
+
+        misses: list[str] = []
+        taken_targets: set[UUID] = set()
+        columns = ("id", "election_id", "contest_id", "stage", "kind", "source_id", "completeness")
+        for row, pid, sums, frame, official, (contest, contest_key, listed) in superseding:
+            day = row["day"]
+            if contest in taken_targets:
+                report["supersede duplicate target"] = report.get("supersede duplicate target", 0) + 1
+                continue
+            existing_options = {}
+            for label, kind, parent, option_id in listed:
+                if parent is None and label.split():
+                    words = re.sub(r"[^a-z ]", " ", label.lower()).split()
+                    existing_options.setdefault((words[-1], words[0][:1]), option_id)
+            chosen: dict[str, UUID] = {}
+            missed = []
+            for candidate in sums["display"]:
+                if candidate in ("Write-in", "None of These Candidates"):
+                    kind = "write_in" if candidate == "Write-in" else "none_of_the_above"
+                    found = next((option_id for label, k, parent, option_id in listed if k == kind), None)
+                    chosen[candidate] = found or cs.key("us.option", f"{contest_key}:{SOURCE}:{slug(candidate)}")
+                    continue
+                words = re.sub(r"[^a-z ]", " ", candidate.lower()).split()
+                match = existing_options.get((words[-1], words[0][:1]))
+                if match is None:
+                    missed.append(candidate)
+                else:
+                    chosen[candidate] = match
+            if missed:
+                misses += [f"{contest_key}: {name_}" for name_ in missed]
+                report["supersede skipped"] = report.get("supersede skipped", 0) + 1
+                continue
+            taken_targets.add(contest)
+            prior = conn.execute(f"select {', '.join(columns)} from result_set where contest_id = %s and is_default", [contest]).fetchone()
+            result_set = cs.key(f"{SOURCE}.result_set", contest_key)
+            replaced = None
+            if prior is not None and prior[0] == result_set:
+                replaced = conn.execute("select supersedes_id from result_set where id = %s", [prior[0]]).fetchone()[0]
+                prior = None
+            if prior is not None:
+                cs.add("result_set", **dict(zip(columns, prior, strict=True)), is_default=False, status="superseded")
+            cs.add(
+                "result_set",
+                id=result_set,
+                election_id=conn.execute("select election_id from contest where id = %s", [contest]).fetchone()[0],
+                contest_id=contest,
+                stage="certified",
+                kind="counted",
+                status="active",
+                source_id=source,
+                is_default=True,
+                completeness=1 if row["kind"] != "special" else None,
+                supersedes_id=prior[0] if prior else replaced,
+            )
+            cs.add("note", entity_id=result_set, kind="methodology", body_md=NOTE)
+            for candidate, option in chosen.items():
+                if candidate in ("Write-in", "None of These Candidates") and option in cs.minted:
+                    cs.add(
+                        "contest_option",
+                        id=option,
+                        contest_id=contest,
+                        kind="write_in" if candidate == "Write-in" else "none_of_the_above",
+                        ballot_label=candidate,
+                    )
+            raw_names = dict(frame.select("display", "name").unique(subset=["display"]).iter_rows())
+            winners = row["winners"] or []
+            if winners:
+                by_person = {person(raw_names[c]): c for c in chosen if c in raw_names}
+                picked = [by_person[w] for w in winners if w in by_person]
+                total = sums["votes"].sum()
+                tally = dict(sums.iter_rows())
+                outcome = (
+                    "advanced"
+                    if row["party"] in PARTY_TITLES
+                    or (
+                        "PRIMARY" in row["election_label"].upper()
+                        and not (len(picked) == 1 and tally.get(picked[0], 0) * 2 > total)
+                    )
+                    else "elected"
+                )
+                for candidate in picked:
+                    cs.add("outcome", result_set_id=result_set, option_id=chosen[candidate], kind=outcome, seats=None)
+            unit_ids = {}
+            for precinct in frame["precinct"].unique().to_list():
+                unit_code = f"{day}:NV:{FIPS}:CLARK:{precinct}"
+                unit_ids[precinct] = cs.unit("us.precinct", unit_code)
+                if unit_ids[precinct] in cs.minted and unit_code not in minted_units:
+                    minted_units.add(unit_code)
+                    cs.add(
+                        "reporting_unit",
+                        id=unit_ids[precinct],
+                        polity_id=state,
+                        scheme_code="us.precinct",
+                        code=unit_code,
+                        parent_id=county[0],
+                        area_relation="within",
+                        area_id=county[1],
+                        kind="standard",
+                        valid_from=day,
+                        valid_to=day + timedelta(days=1),
+                    )
+            lines = frame.filter(pl.col("display").is_in(list(chosen))).group_by("precinct", "display", "channel").agg(pl.col("votes").sum())
+            complete = (
+                lines.filter(pl.col("channel") > 0)
+                .group_by("precinct", "display")
+                .agg(pl.col("channel").n_unique().alias("channels"))
+                .group_by("precinct")
+                .agg(pl.col("channels").min().alias("least"), pl.col("display").n_unique().alias("options"))
+                .filter((pl.col("least") == 3) & (pl.col("options") == len(chosen)))["precinct"]
+                .to_list()
+            )
+            lines = lines.filter(
+                pl.when(pl.col("precinct").is_in(complete)).then(pl.col("channel") > 0).otherwise(pl.col("channel") == 0)
+            )
+            values.append(
+                lines.select(
+                    result_set_id=pl.lit(str(result_set)),
+                    unit_id=pl.col("precinct").replace_strict({k: str(v) for k, v in unit_ids.items()}),
+                    option_id=pl.col("display").replace_strict({k: str(v) for k, v in chosen.items()}),
+                    channel=pl.col("channel").cast(pl.Int16),
+                    measure=pl.lit(1, pl.Int16),
+                    count_round=pl.lit(1, pl.Int16),
+                    flags=pl.lit(0, pl.Int16),
+                    value=pl.col("votes"),
+                )
+            )
+            if not official.is_empty():
+                residual = (
+                    official.group_by("display")
+                    .agg(pl.col("votes").sum())
+                    .join(
+                        frame.filter(pl.col("channel") == 0).group_by("display").agg(pl.col("votes").sum()),
+                        on="display",
+                        how="left",
+                        suffix="_precincts",
+                    )
+                    .with_columns(votes=pl.col("votes") - pl.col("votes_precincts").fill_null(0))
+                    .filter((pl.col("votes") > 0) & pl.col("display").is_in(list(chosen)))
+                )
+                if not residual.is_empty():
+                    unit_code = f"{day}:NV:{FIPS}:CLARK:UNREPORTED:{slug(contest_key)}"
+                    unit = cs.unit("us.precinct", unit_code)
+                    if unit in cs.minted:
+                        cs.add(
+                            "reporting_unit",
+                            id=unit,
+                            polity_id=state,
+                            scheme_code="us.precinct",
+                            code=unit_code,
+                            parent_id=county[0],
+                            area_relation="within",
+                            area_id=county[1],
+                            kind="aggregate",
+                            valid_from=day,
+                            valid_to=day + timedelta(days=1),
+                        )
+                    values.append(
+                        residual.select(
+                            result_set_id=pl.lit(str(result_set)),
+                            unit_id=pl.lit(str(unit)),
+                            option_id=pl.col("display").replace_strict({k: str(v) for k, v in chosen.items()}),
+                            channel=pl.lit(0, pl.Int16),
+                            measure=pl.lit(1, pl.Int16),
+                            count_round=pl.lit(1, pl.Int16),
+                            flags=pl.lit(32, pl.Int16),
+                            value=pl.col("votes"),
+                        )
+                    )
+            report["superseded"] = report.get("superseded", 0) + 1
+        (PARSED / "supersede-misses.txt").write_text("\n".join(misses))
         print(report)
         if values:
             cs.frame("result_value", pl.concat(values))
