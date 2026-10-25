@@ -16,7 +16,7 @@ from ea.sources.gb import umit
 from ea.store import connect
 
 SOURCE = "gb.ep_fptp"
-VERSION = "1"
+VERSION = "2"
 ELECTIONS = {1989: date(1989, 6, 15), 1994: date(1994, 6, 9)}
 TERMS = {1989: 3, 1994: 4}
 TERM_START = {1989: date(1989, 7, 25), 1994: date(1994, 7, 19)}
@@ -214,8 +214,8 @@ def emit() -> Path:
             polity="GB",
         )
 
-        def name(entity: UUID, text: str) -> None:
-            cs.add("name", entity_id=entity, text=text, lang="en", kind="official", is_preferred=True)
+        def name(entity: UUID, text: str, id: UUID | None = None) -> None:
+            cs.add("name", id=id, entity_id=entity, text=text, lang="en", kind="official", is_preferred=True)
 
         library = cs.source("House of Commons Library", LIBRARY_TITLE)
         cs.add(
@@ -467,7 +467,12 @@ def emit() -> Path:
                     electoral_system_id=fptp,
                     default_result_kind="counted",
                 )
-                name(contest, f"{year} European Parliament election in United Kingdom, {text}")
+                stored = cs.conn.execute(
+                    "select id from name where entity_id = %s and is_preferred and kind = 'official' and lang = 'en'"
+                    " and text = %s",
+                    [contest, f"{year} European Parliament election in United Kingdom, {text}"],
+                ).fetchone()
+                name(contest, f"{year} European Parliament election in {text}", None if stored is None else stored[0])
                 cs.add("slug", path=f"{path}/{slug(text)}", entity_id=contest)
                 result_set = cs.key(f"{SOURCE}.result_set", held_key)
                 cs.add(

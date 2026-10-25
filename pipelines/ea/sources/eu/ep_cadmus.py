@@ -17,7 +17,7 @@ from ea.sources.gb import umit
 from ea.store import DATA, connect
 
 SOURCE = "eu.ep_cadmus"
-VERSION = "2"
+VERSION = "3"
 PARSED = DATA / "parsed" / SOURCE
 URL = "https://cadmus.eui.eu/bitstreams/9a5261b3-8dea-5650-988a-fac4460a8f3c/download"
 WINDOWS = {
@@ -410,9 +410,17 @@ def emit() -> Path:
         )
         cs.artifact(artifact, source)
 
-        def name(entity: UUID, text: str, lang: str = "en", kind: str = "official", preferred: bool = True) -> None:
+        def name(
+            entity: UUID,
+            text: str,
+            lang: str = "en",
+            kind: str = "official",
+            preferred: bool = True,
+            id: UUID | None = None,
+        ) -> None:
             cs.add(
                 "name",
+                id=id,
                 entity_id=entity,
                 text=text,
                 lang=lang,
@@ -551,8 +559,8 @@ def emit() -> Path:
                         reason="The source's English rendering of the party; the party's own name is already on the surviving entity",
                     )
             cs.merge(entity, survivor)
-        for entity in (cadmus_parties[label] for label in NO_PARTY):
-            if entity not in cs.retired:
+        for entity in (cadmus_parties.get(label) for label in NO_PARTY):
+            if entity is not None and entity not in cs.retired:
                 cs.add(
                     "entity_retirement",
                     entity_id=entity,
@@ -723,10 +731,23 @@ def emit() -> Path:
                     ),
                     default_result_kind="counted",
                 )
-                title = f"{year} European Parliament election in {country}" + (
-                    "" if constituency == "National" else f", {label}"
+                title = (
+                    f"{year} European Parliament election in {country}"
+                    if constituency == "National"
+                    else f"{year} European Parliament election in {label}"
+                    if iso == "GB"
+                    else f"{year} European Parliament election in {country}, {label}"
                 )
-                name(contest, title)
+                stored = (
+                    conn.execute(
+                        "select id from name where entity_id = %s and is_preferred and kind = 'official' and lang = 'en'"
+                        " and text = %s",
+                        [contest, f"{year} European Parliament election in {country}, {label}"],
+                    ).fetchone()
+                    if iso == "GB" and constituency != "National"
+                    else None
+                )
+                name(contest, title, id=None if stored is None else stored[0])
                 cs.add(
                     "slug",
                     path=f"{path}/european-parliament" if constituency == "National" else f"{path}/{fold(label)}",
