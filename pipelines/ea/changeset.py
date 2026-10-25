@@ -5,10 +5,11 @@ from collections import defaultdict
 from collections.abc import Sequence
 from datetime import date, datetime
 from pathlib import Path
-from typing import LiteralString
+from typing import LiteralString, cast
 from uuid import NAMESPACE_URL, UUID, uuid5, uuid7
 
 import polars as pl
+from psycopg import sql
 
 from ea.checks import FACTS, KEYS
 from ea.raw import Artifact
@@ -86,6 +87,21 @@ class Changeset:
         self.retired: dict[UUID, UUID] = dict(
             conn.execute("select id, retired_by from entity where retired_by is not null").fetchall()
         )
+        constant = conn.execute(
+            r"""select c.relname, a.attname, pg_get_expr(d.adbin, d.adrelid) from pg_attrdef d
+               join pg_class c on c.oid = d.adrelid join pg_attribute a on a.attrelid = d.adrelid and a.attnum = d.adnum
+               where c.relnamespace = 'public'::regnamespace and c.relkind in ('r', 'p') and not c.relispartition
+                 and pg_get_expr(d.adbin, d.adrelid) !~ '\w\('"""
+        ).fetchall()
+        values = conn.execute(
+            sql.SQL("select {}").format(
+                sql.SQL(", ").join(sql.SQL(cast(LiteralString, default)) for _, _, default in constant)
+            )
+        ).fetchone()
+        assert values is not None
+        self.defaults: dict[str, dict[str, object]] = {}
+        for (table, column, _), value in zip(constant, values, strict=True):
+            self.defaults.setdefault(table, {})[column] = json.dumps(value) if isinstance(value, dict | list) else value
 
     def add(self, table: str, **row: object) -> None:
         rows = self.rows.setdefault(table, [])
@@ -95,6 +111,9 @@ class Changeset:
             self._chunk(table)
 
     def _chunk(self, table: str) -> None:
+        defaults = self.defaults.get(table, {})
+        keys = {key for row in self.rows[table] for key in row}
+        fill = {column: defaults[column] for column in keys & defaults.keys()}
         self.chunks.setdefault(table, []).append(
             pl.DataFrame(
                 [
@@ -108,7 +127,12 @@ class Changeset:
                         else value
                         for column, value in row.items()
                     }
-                    for row in self.rows[table]
+                    for row in (
+                        row
+                        if not fill or len(row) == len(keys)
+                        else row | {column: value for column, value in fill.items() if column not in row}
+                        for row in self.rows[table]
+                    )
                 ],
                 infer_schema_length=None,
             )
@@ -376,7 +400,16 @@ class Changeset:
         for table, rows in self.rows.items():
             if rows:
                 self._chunk(table)
-            tables[table] = pl.concat([*self.chunks.pop(table, []), *self.frames[table]], how="diagonal_relaxed")
+            parts = [*self.chunks.pop(table, []), *self.frames[table]]
+            defaults = self.defaults.get(table, {})
+            columns = {column for part in parts for column in part.columns} & defaults.keys()
+            tables[table] = pl.concat(
+                [
+                    part.with_columns(pl.lit(defaults[column]).alias(column) for column in columns - set(part.columns))
+                    for part in parts
+                ],
+                how="diagonal_relaxed",
+            )
         if "result_set" in tables and "result_value" in tables:
             sets, values = tables["result_set"], tables["result_value"]
             counted = sets.filter(pl.col("kind") == "counted")["id"].cast(pl.String)
