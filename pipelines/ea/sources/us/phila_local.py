@@ -13,7 +13,7 @@ from ea.sources.us.phila_returns import SOURCE as RETURNS
 from ea.store import connect
 
 SOURCE = "us.phila_local"
-VERSION = "6"
+VERSION = "7"
 FIPS = "42101"
 PLACE = "4260000"
 SPECIAL_DAYS = {
@@ -231,6 +231,9 @@ def emit() -> Path:
         parties = {name: cs.key("us.party", name) for name in sorted(set(PARTIES.values()))}
         if cs.minted & {*systems.values(), *parties.values()}:
             raise ValueError("the electoral systems and parties must already exist")
+        council_body = conn.execute(
+            "select b.id from body b join name n on n.entity_id = b.id and n.is_preferred where n.text = 'Philadelphia City Council'"
+        ).fetchone()[0]
         existing = defaultdict(set)
         for day, value in conn.execute(
             """select e.date_from, lower(x.value) from contest k join election e on e.id = k.election_id
@@ -379,7 +382,8 @@ def emit() -> Path:
                 report["held by another pipeline"] += 1
                 continue
             owner_key = f"PA:{code}:{office}" + (f":retention:{judge}" if retention else "")
-            if not house and not question and owner_key not in owners:
+            council = office.startswith("council")
+            if not house and not question and not council and owner_key not in owners:
                 owners[owner_key] = cs.key("us.office", owner_key)
                 cs.add(
                     "office",
@@ -416,8 +420,9 @@ def emit() -> Path:
                 "contest",
                 id=contest,
                 election_id=election,
-                kind="ballot_question" if question else "body_seats" if house else "office",
-                office_id=None if house or question else owners[owner_key],
+                kind="ballot_question" if question else "body_seats" if house or council else "office",
+                office_id=None if house or question or council else owners[owner_key],
+                body_id=council_body if council else None,
                 district_area_id=area,
                 magnitude=None if question else 1 if retention or house else seats,
                 round_number=1,
