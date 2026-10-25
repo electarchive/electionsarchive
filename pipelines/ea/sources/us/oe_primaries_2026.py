@@ -21,7 +21,7 @@ from ea.sources.us import elstats
 from ea.store import DATA, connect
 
 SOURCE = "us.oe_primaries_2026"
-VERSION = "1"
+VERSION = "2"
 BASE = "https://raw.githubusercontent.com/openelections/openelections-data-{}/master/2026/{}"
 OK_RACES = ("12001", "12010", "12011", "12012", "12013", "12014", "13001", "13010", "13012", "13013", "13014", "13015")
 NH_FILES = [*(f"2026-sp-{race}-{party}.xlsx" for race in ("governor-summary", "us-senator-summary", "congressional-district-1", "congressional-district-2") for party in ("republican", "democratic"))]
@@ -162,7 +162,7 @@ MANUAL = {
     "oh": (DATA / "inbox" / "manual" / "MF-050", "https://www.ohiosos.gov/elections/election-results-and-data/2026-official-elections-results/", ".xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"),
 }
 POOLED = re.compile(r"write-?ins?\b|^scattering$", re.I)
-JUNK = re.compile(r"^void$|^(under|over) votes$|^\* withdrawn candidate$|^total|blank|registered voters", re.I)
+JUNK = re.compile(r"^void$|^(under|over) ?votes$|^\* withdrawn candidate$|^total|blank|registered voters", re.I)
 ORDINALS = {1: "st", 2: "nd", 3: "rd"}
 CAVEAT = "Held under the 2026 congressional map, which the archive has not yet loaded as a boundary set, so this contest is not yet tied to a district shape."
 OFFICIAL = {

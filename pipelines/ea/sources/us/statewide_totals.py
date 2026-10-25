@@ -12,7 +12,7 @@ from ea.changeset import Changeset, slug
 from ea.store import DATA, connect
 
 SOURCE = "us.statewide_totals"
-VERSION = "1"
+VERSION = "2"
 PARSED = DATA / "parsed" / SOURCE
 FOLDER = Path(__file__).with_name("totals")
 DPI = 100
@@ -189,6 +189,15 @@ def emit(
                 [list(ours)],
             )
         }
+        pools: dict[tuple[str, str], list[UUID]] = {}
+        for contest_key, kind, option in conn.execute(
+            """select k.value, o.kind::text, o.id from contest_option o
+               join external_id k on k.entity_id = o.contest_id and k.scheme = 'us.contest'
+               where k.value = any(%s) and o.kind in ('write_in', 'others')
+               order by o.id""",
+            [list(ours)],
+        ).fetchall():
+            pools.setdefault((contest_key, kind), []).append(option)
         deaths: dict[UUID, date] = dict(
             conn.execute("select id, death_date from person where death_date is not null").fetchall()
         )
@@ -366,47 +375,65 @@ def emit(
             for candidate, party_label, votes, winner, page in (
                 lines.sort("votes", descending=True).select("name", "party", "votes", "winner", "page").iter_rows()
             ):
-                probe = f"{plain(candidate.split()[0])}|{surname(candidate)}"
-                found = {
-                    person
-                    for person, seen in people[str(state)].get(probe, [])
-                    if abs(seen - year) <= 16 and deaths.get(person, on) >= on
-                }
-                person = prior.get((key, candidate))
-                if person is not None and (deaths.get(person, on) < on or (key, candidate) in SPLITS):
-                    split = cs.key(f"{pipeline}.person", f"{state}:{slug(candidate)}:{year}")
-                    cs.renamed[str(split)] = str(person)
-                    person = split
-                if person is None:
-                    person = (
-                        next(iter(found))
-                        if len(found) == 1
-                        else cs.key(f"{pipeline}.person", f"{state}:{slug(candidate)}:{year}")
+                pooled = re.fullmatch(r"(?i)scatter(?:ing|ed)|write-?ins?", candidate) is not None
+                if pooled:
+                    written = candidate.lower().startswith("write")
+                    kind = "write_in" if written else "others"
+                    spare = pools.get((key, kind), [])
+                    option = (
+                        spare.pop(0)
+                        if spare
+                        else cs.key("us.option", f"{key}:{prior.get((key, candidate)) or slug(candidate)}")
                     )
-                if person in cs.minted and person not in minted:
-                    minted.add(person)
-                    cs.add("person", id=person)
-                    name(person, candidate)
-                    people[str(state)].setdefault(probe, []).append((person, year))
-                label, independent = party(str(state), party_label)
-                option = cs.key("us.option", f"{key}:{person}")
-                cs.add(
-                    "contest_option",
-                    id=option,
-                    contest_id=contest,
-                    kind="candidate",
-                    party_id=label,
-                    ballot_label=candidate,
-                )
-                cs.add(
-                    "candidacy",
-                    id=cs.key("us.candidacy", f"{key}:{person}:head"),
-                    person_id=person,
-                    option_id=option,
-                    role="head",
-                    ballot_name=candidate,
-                    is_independent=independent,
-                )
+                    cs.add(
+                        "contest_option",
+                        id=option,
+                        contest_id=contest,
+                        kind=kind,
+                        ballot_label="Write-ins" if written else "Others",
+                    )
+                else:
+                    probe = f"{plain(candidate.split()[0])}|{surname(candidate)}"
+                    found = {
+                        person
+                        for person, seen in people[str(state)].get(probe, [])
+                        if abs(seen - year) <= 16 and deaths.get(person, on) >= on
+                    }
+                    person = prior.get((key, candidate))
+                    if person is not None and (deaths.get(person, on) < on or (key, candidate) in SPLITS):
+                        split = cs.key(f"{pipeline}.person", f"{state}:{slug(candidate)}:{year}")
+                        cs.renamed[str(split)] = str(person)
+                        person = split
+                    if person is None:
+                        person = (
+                            next(iter(found))
+                            if len(found) == 1
+                            else cs.key(f"{pipeline}.person", f"{state}:{slug(candidate)}:{year}")
+                        )
+                    if person in cs.minted and person not in minted:
+                        minted.add(person)
+                        cs.add("person", id=person)
+                        name(person, candidate)
+                        people[str(state)].setdefault(probe, []).append((person, year))
+                    label, independent = party(str(state), party_label)
+                    option = cs.key("us.option", f"{key}:{person}")
+                    cs.add(
+                        "contest_option",
+                        id=option,
+                        contest_id=contest,
+                        kind="candidate",
+                        party_id=label,
+                        ballot_label=candidate,
+                    )
+                    cs.add(
+                        "candidacy",
+                        id=cs.key("us.candidacy", f"{key}:{person}:head"),
+                        person_id=person,
+                        option_id=option,
+                        role="head",
+                        ballot_name=candidate,
+                        is_independent=independent,
+                    )
                 cs.add(
                     "result_value",
                     result_set_id=result_set,
@@ -468,6 +495,8 @@ def emit(
                         x1=1.0,
                         y1=1.0,
                     )
+                if pooled:
+                    continue
                 totals[option] = votes
                 if winner == 1:
                     declared = option
@@ -486,4 +515,5 @@ def emit(
                     cs.add("outcome", result_set_id=result_set, option_id=option, kind="advanced" if more else "won")
             filled += 1
         print(filled, "contests,", skipped, "skipped")
+        cs.pool("A scattering or write-in line in a state manual read as a candidate")
         return cs.write()

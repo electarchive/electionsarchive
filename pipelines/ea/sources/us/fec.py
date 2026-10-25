@@ -26,7 +26,7 @@ from ea.changeset import Changeset, slug
 from ea.store import DATA, connect
 
 SOURCE = "us.fec"
-VERSION = "3"
+VERSION = "4"
 PARSED = DATA / "parsed" / SOURCE
 DOCUMENTS = "https://www.fec.gov/documents/"
 FILES = {
@@ -6328,20 +6328,28 @@ def emit() -> Path:
                         ballot_label=f"{ballot} ({slogan})" if slogan else ballot,
                     )
                     head = cs.key("us.candidacy", f"{option_key}:head")
-                    cs.add(
-                        "candidacy",
-                        id=head,
-                        person_id=UUID(person),
-                        option_id=root,
-                        role="head",
-                        ballot_name=ballot,
-                        is_independent=not nominated
-                        and any(label in INDEPENDENT - unlabeled or (state, label) in slogans for label in labels),
-                        is_incumbent=None
-                        if all(row["is_incumbent"] is None for row in lines_of)
-                        else any(row["is_incumbent"] for row in lines_of),
-                    )
-                    if not preference:
+                    if ballot == "Scattered":
+                        if head not in cs.minted:
+                            cs.add(
+                                "entity_retirement",
+                                entity_id=head,
+                                reason="A scattered write-in line the FEC filed under a candidate's ID",
+                            )
+                    else:
+                        cs.add(
+                            "candidacy",
+                            id=head,
+                            person_id=UUID(person),
+                            option_id=root,
+                            role="head",
+                            ballot_name=ballot,
+                            is_independent=not nominated
+                            and any(label in INDEPENDENT - unlabeled or (state, label) in slogans for label in labels),
+                            is_incumbent=None
+                            if all(row["is_incumbent"] is None for row in lines_of)
+                            else any(row["is_incumbent"] for row in lines_of),
+                        )
+                    if not preference and ballot != "Scattered":
                         for party in nominated:
                             cs.add("candidacy_nomination", candidacy_id=head, party_id=party, kind="nominated")
                     for row in lines_of:

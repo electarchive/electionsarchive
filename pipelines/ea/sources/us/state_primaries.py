@@ -38,7 +38,7 @@ from ea.sources.us.ncsbe import COLUMNS, FILES, HEADERLESS, PUBLISHER, TITLE
 from ea.store import DATA, connect
 
 SOURCE = "us.state_primaries"
-VERSION = "1"
+VERSION = "2"
 PARSED = DATA / "parsed" / SOURCE
 NC_DAYS = {
     date(2002, 9, 10): None,
@@ -2767,7 +2767,7 @@ def parse() -> None:
             if set(ia_blocks) != ia_done:
                 raise ValueError(f"Iowa {ia_year} {ia_plain}: {sorted(set(ia_blocks) - ia_done)} have no totals")
         for ia_title, ia_candidate, ia_votes in ia_entries:
-            if ia_candidate.upper() in ("OVER VOTES", "UNDER VOTES"):
+            if ia_candidate.upper() in ("OVER VOTES", "UNDER VOTES", "BLANK"):
                 continue
             ia_upper = IA_FEDERAL.fullmatch(ia_title.upper())
             if ia_upper is not None:
@@ -4225,6 +4225,9 @@ def emit() -> Path:
                      where v.result_set_k = r.k and u.scheme_code <> 'us.town')""",
                 [SOURCE],
             ).fetchall()
+        } | {
+            str(id)
+            for id in cs.remainders("A blank-ballot line in Iowa's primary results read as a candidate", r"^blank$")
         }
         frame = lines.join(
             pl.DataFrame(

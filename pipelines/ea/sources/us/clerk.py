@@ -1442,4 +1442,5 @@ def emit() -> Path:
             ).fetchall()
         for (entity,) in junk:
             cs.add("entity_retirement", entity_id=entity, reason=reason)
+        cs.pool("A write-in line in the Clerk's statistics read as a candidate")
         return cs.write()
