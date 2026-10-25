@@ -188,7 +188,7 @@ def emit() -> Path:
         county_area = held[0]
         current = dict(conn.execute("select entity_id, path from slug where is_current").fetchall())
         taken = {path for (path,) in conn.execute("select path from slug where path like 'us/il/%%'").fetchall()}
-        columns = ("id", "election_id", "contest_id", "stage", "kind", "source_id", "completeness")
+        columns = ("id", "election_id", "contest_id", "stage", "kind", "source_id", "completeness", "supersedes_id")
         people: dict[tuple[str, str], UUID] = {}
         preferred: dict[UUID, str] = {}
         for person, ballot, text in conn.execute(
@@ -314,9 +314,10 @@ def emit() -> Path:
             prior = conn.execute(
                 f"select {', '.join(columns)} from result_set where contest_id = %s and is_default", [contest]
             ).fetchone()
-            if prior is not None:
-                cs.add("result_set", **dict(zip(columns, prior, strict=True)), is_default=False, status="superseded")
             result_set = cs.key(f"{SOURCE}.result_set", contest_key)
+            earlier = dict(zip(columns, prior, strict=True)) if prior is not None else None
+            if earlier is not None and earlier["id"] != result_set:
+                cs.add("result_set", **earlier, is_default=False, status="superseded")
             cs.add(
                 "result_set",
                 id=result_set,
@@ -328,7 +329,11 @@ def emit() -> Path:
                 source_id=source,
                 is_default=True,
                 completeness=1,
-                supersedes_id=prior[0] if prior else None,
+                supersedes_id=None
+                if earlier is None
+                else earlier["supersedes_id"]
+                if earlier["id"] == result_set
+                else earlier["id"],
             )
             cs.add("note", entity_id=result_set, kind="methodology", body_md=METHOD)
             options: list[tuple[list[str], UUID, UUID | None, UUID | None]] = []

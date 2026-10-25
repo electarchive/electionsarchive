@@ -603,8 +603,17 @@ def emit() -> Path:
             polity="BR",
         )
 
-        def name(entity: UUID, text: str, lang: str = "pt", kind: str = "official") -> None:
-            cs.add("name", entity_id=entity, text=text, lang=lang, kind=kind, is_preferred=kind == "official")
+        def name(
+            entity: UUID, text: str, lang: str = "pt", kind: str = "official", preferred: bool | None = None
+        ) -> None:
+            cs.add(
+                "name",
+                entity_id=entity,
+                text=text,
+                lang=lang,
+                kind=kind,
+                is_preferred=kind == "official" if preferred is None else preferred,
+            )
 
         sources = {
             key: cs.source("Tribunal Superior Eleitoral", title)
@@ -701,9 +710,9 @@ def emit() -> Path:
             ),
         )
 
-        unit_ids = {code: str(cs.unit("br.secao", code)) for code in sections["section"]}
+        unit_ids = {code: str(cs.unit("br.secao", code, DAYS[FIRST])) for code in sections["section"]}
         counted = values.filter(~pl.col("section").str.contains(":")).select(municipality="section").unique()
-        unit_ids |= {code: str(cs.unit("br.municipality", code)) for code in counted["municipality"]}
+        unit_ids |= {code: str(cs.unit("br.municipality", code, DAYS[FIRST])) for code in counted["municipality"]}
         cs.frame(
             "reporting_unit",
             counted.select(
@@ -952,7 +961,12 @@ def emit() -> Path:
                         birth_date=row["birth"],
                         birth_precision="day" if row["birth"] is not None else None,
                     )
-                    name(persons[person_key], proper(row["name"]))
+                    civil, urna = proper(row["name"]), proper(row["ballot"])
+                    if urna in ("", "#Nulo") or urna == civil:
+                        name(persons[person_key], civil)
+                    else:
+                        name(persons[person_key], urna, kind="ballot", preferred=True)
+                        name(persons[person_key], civil, preferred=False)
                 group = f"federation:{row['federation']}" if row["federation"] is not None else row["party"]
                 if row["role"] == "running_mate":
                     option = tickets[row["number"]]
