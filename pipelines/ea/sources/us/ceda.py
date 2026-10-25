@@ -20,7 +20,7 @@ from ea.sources.us import alged
 from ea.store import DATA, connect
 
 SOURCE = "us.ceda"
-VERSION = "4"
+VERSION = "5"
 PARSED = DATA / "parsed" / SOURCE
 ACCESS = "https://scholars.csus.edu/view/fileRedirect?instCode=01CALS_USL&filePid={}&download=true"
 CODEBOOK = ACCESS.format("13306594360001671")
@@ -898,7 +898,7 @@ def emit() -> Path:
                    join source s on s.id = r.source_id
                    join external_id x on x.entity_id = coalesce(c.office_id, c.body_id)
                      and x.scheme in ('us.office', 'us.body')
-                   where x.value like 'CA:%%' and s.title <> %s
+                   where x.value like 'CA:%%' and r.is_default and s.title <> %s
                      and (s.title <> %s or x.value similar to 'CA:(0667000|06075):%%')""",
                 [TITLE, alged.TITLE],
             ).fetchall()
@@ -975,6 +975,14 @@ def emit() -> Path:
         systems = {key: cs.key("us.electoral_system", key) for key in ("fptp", "block", "irv", "two_round")}
         if cs.minted & set(systems.values()):
             raise ValueError("the fptp, block, irv, and two-round systems must already exist")
+        own = dict(
+            conn.execute(
+                """select x.value, c.id from external_id x join contest c on c.id = x.entity_id
+                   join changeset g on g.id = c.changeset_id
+                   where x.scheme = 'us.contest' and x.value like 'ceda:%%' and g.pipeline = %s""",
+                [SOURCE],
+            ).fetchall()
+        )
         previous: dict[str, str] = {}
         races = (
             frame.group_by("race")
@@ -983,9 +991,12 @@ def emit() -> Path:
                 advanced=(pl.col("elected") == "3").any(),
             )
             .filter(
-                ~pl.struct("code", "key", "day").map_elements(
-                    lambda row: (f"CA:{row['code']}:{row['key']}", row["day"].year, row["day"].month) in held,
-                    pl.Boolean,
+                (
+                    ~pl.struct("code", "key", "day").map_elements(
+                        lambda row: (f"CA:{row['code']}:{row['key']}", row["day"].year, row["day"].month) in held,
+                        pl.Boolean,
+                    )
+                    | pl.format("ceda:{}", "race").is_in(list(own))
                 )
                 & ~pl.col("race").is_in(list(waiting))
             )
@@ -1009,12 +1020,15 @@ def emit() -> Path:
         used: set[UUID] = set()
         moved: set[UUID] = set()
         sources: set[UUID] = set()
+        chained: set[str] = set()
         for (race,), rows in frame.sort("race", "votes", descending=[False, True]).group_by(
             "race", maintain_order=True
         ):
             first = rows.row(0, named=True)
             code, key, day = first["code"], first["key"], first["day"]
             if (f"CA:{code}:{key}", day.year, day.month) in held or race in waiting:
+                if race in previous and f"ceda:{race}" in own and race not in waiting:
+                    chained.add(race)
                 continue
             taken_over = takeover.get(race)
             polity, place, path, word = polities[code]
@@ -1288,6 +1302,31 @@ def emit() -> Path:
                     if area != counties[place.split(":")[2]][1]:
                         memberships.add((target, area, day))
                     values.append((str(result_set), str(target), str(option), value))
+        fields = (
+            "id",
+            "election_id",
+            "kind",
+            "office_id",
+            "body_id",
+            "district_area_id",
+            "magnitude",
+            "electoral_system_id",
+            "default_result_kind",
+            "term",
+        )
+        for row in conn.execute(
+            f"select {', '.join(fields)} from contest where id = any(%s)", [[own[f"ceda:{race}"] for race in chained]]
+        ).fetchall():
+            race = next(race for race in chained if own[f"ceda:{race}"] == row[0])
+            cs.add(
+                "contest",
+                **dict(zip(fields, row, strict=True)),
+                round_number=2,
+                previous_round_id=cs.key(
+                    "us.contest", takeover.get(previous[race], {}).get("value", f"ceda:{previous[race]}")
+                ),
+            )
+        print(f"{len(chained)} runoffs held by another source's default set chained in place")
         held_ids = {
             (scheme, value): entity
             for scheme, value, entity in conn.execute(
