@@ -16,7 +16,7 @@ from ea.sources.us.ncsbe import SOURCE as NCSBE
 from ea.store import DATA, connect
 
 SOURCE = "us.nc_local"
-VERSION = "5"
+VERSION = "6"
 PARSED = DATA / "parsed" / SOURCE
 DAYS = [
     date(int(text[:4]), int(text[4:6]), int(text[6:]))
@@ -89,7 +89,13 @@ SPECIAL_DAYS = {date(2019, 5, 14), date(2022, 12, 6), date(2023, 3, 7)}
 PARTY_SUFFIX = re.compile(r"\s*\((DEM|REP|LIB|GRE|CST|UNA|LBT)\)\s*$")
 SINGLE = {"sheriff", "register-of-deeds", "clerk-of-superior-court", "coroner", "surveyor", "mayor"}
 PLACES = "https://www2.census.gov/geo/tiger/GENZ2020/shp/cb_2020_37_place_500k.zip"
+SCHOOLS = "https://www2.census.gov/geo/tiger/GENZ2020/shp/cb_2020_37_unsd_500k.zip"
 KINDS = {"25": "City", "43": "Town", "47": "Village"}
+SCHOOL = re.compile(
+    r"(?:CITY OF )?(.+?) (?:(?:CITY|PUBLIC|GRADED) )?(?:SCHOOLS? )?(?:SYSTEM )?"
+    r"(?:BOARD OF EDUCATION|BD OF EDUCATION|SCHOOL BOARD)\b\s*-?\s*(.*)"
+)
+SCHOOL_WORDS = re.compile(r"\b(CITY|SCHOOLS?|PUBLIC|GRADED|SYSTEM|OF)\b")
 COLUMNS = {
     "county": "county",
     "precinct": "precinct",
@@ -162,6 +168,7 @@ def fetch() -> None:
     for day in DAYS:
         raw.fetch(NCSBE, FILES.format(day=day), suffix=".zip")
     raw.fetch(SOURCE, PLACES, suffix=".zip")
+    raw.fetch(SOURCE, SCHOOLS, suffix=".zip")
 
 
 def parse() -> None:
@@ -174,16 +181,24 @@ def parse() -> None:
                    where u.scheme_code = 'us.county' and u.code like '37%'"""
             ).fetchall()
         }
-        with zipfile.ZipFile(raw.cached(SOURCE, PLACES).path) as archive:
-            parts = {name.rsplit(".", 1)[1].lower(): archive.read(name) for name in archive.namelist()}
-        reader = shapefile.Reader(
-            shp=io.BytesIO(parts["shp"]), shx=io.BytesIO(parts["shx"]), dbf=io.BytesIO(parts["dbf"])
-        )
-        records = [
-            (record.as_dict(), json.dumps(shape.__geo_interface__))
-            for record, shape in zip(reader.records(), reader.shapes(), strict=True)
-            if record is not None and shape is not None and record["LSAD"] in KINDS
-        ]
+        records = []
+        for url in (PLACES, SCHOOLS):
+            with zipfile.ZipFile(raw.cached(SOURCE, url).path) as archive:
+                parts = {name.rsplit(".", 1)[1].lower(): archive.read(name) for name in archive.namelist()}
+            reader = shapefile.Reader(
+                shp=io.BytesIO(parts["shp"]), shx=io.BytesIO(parts["shx"]), dbf=io.BytesIO(parts["dbf"])
+            )
+            for record, shape in zip(reader.records(), reader.shapes(), strict=True):
+                if record is None or shape is None:
+                    continue
+                fields = record.as_dict()
+                if url == SCHOOLS:
+                    if str(fields["NAME"]).endswith(" County Schools") or str(fields["GEOID"]).startswith("3737"):
+                        continue
+                    fields = {"GEOID": f"sd{fields['GEOID']}", "NAME": fields["NAME"], "LSAD": "sd"}
+                elif fields["LSAD"] not in KINDS:
+                    continue
+                records.append((fields, json.dumps(shape.__geo_interface__)))
         places = pl.DataFrame(
             conn.execute(
                 """select code, name, kind, encode(st_asewkb(geom), 'hex'), encode(st_asewkb(st_pointonsurface(geom)), 'hex')
@@ -193,14 +208,21 @@ def parse() -> None:
                 [
                     [str(record["GEOID"]) for record, _ in records],
                     [str(record["NAME"]) for record, _ in records],
-                    [KINDS[str(record["LSAD"])] for record, _ in records],
+                    [KINDS.get(str(record["LSAD"]), "School district") for record, _ in records],
                     [geojson for _, geojson in records],
                 ],
             ).fetchall(),
             schema=["code", "name", "kind", "geom", "point"],
             orient="row",
         )
-    towns = {re.sub(r"[^A-Z]", "", name.upper()): code for code, name in places.select("code", "name").iter_rows()}
+    towns = {
+        re.sub(r"[^A-Z]", "", name.upper()): code
+        for code, name in places.filter(~pl.col("code").str.starts_with("sd")).select("code", "name").iter_rows()
+    }
+    schools = {
+        re.sub(r"[^A-Z]", "", SCHOOL_WORDS.sub("", name.upper())): code
+        for code, name in places.filter(pl.col("code").str.starts_with("sd")).select("code", "name").iter_rows()
+    }
     contests: list[dict[str, object]] = []
     results: list[pl.DataFrame] = []
     for day in DAYS:
@@ -231,8 +253,41 @@ def parse() -> None:
             pl.col("vote_for").cast(pl.Int16),
         ).filter(pl.col("choice").is_not_null())
         labels: list[dict[str, object]] = []
+        answers = {
+            (county, contest): {choice.lower() for choice in choices}
+            for county, contest, choices in frame.group_by("county", "contest")
+            .agg(pl.col("choice").unique())
+            .iter_rows()
+        }
         for county, contest in frame.select("county", "contest").unique().iter_rows():
             fips, short = counties[re.sub(r"[^A-Z]", "", county.upper())]
+            if answers[(county, contest)] <= {"yes", "no", "for", "against"}:
+                question = re.sub(r"\s*-?\s*\(?(?:REFERENDUM|ELECTION)\)?$", "", contest)
+                prefix = re.match(r"(?:CITY|TOWN|VILLAGE) OF (.+)", question)
+                words = prefix[1].split(" ") if prefix else []
+                town = next(
+                    (
+                        (towns[key], " ".join(words[size:]))
+                        for size in range(len(words), 0, -1)
+                        if (key := re.sub(r"[^A-Z]", "", " ".join(words[:size]))) in towns
+                    ),
+                    None,
+                )
+                text = town[1] if town else re.sub(rf"^{re.escape(short.upper())}( COUNTY)?( -)? ", "", question)
+                labels.append(
+                    {
+                        "county": county,
+                        "contest": contest,
+                        "code": town[0] if town else fips,
+                        "office": "question",
+                        "seat": text.strip(" -").capitalize() or "Question",
+                        "remainder": False,
+                        "scope": None,
+                        "seats": None,
+                        "word": None,
+                    }
+                )
+                continue
             party = PARTY_SUFFIX.search(contest)
             name = PARTY_SUFFIX.sub("", contest)
             seats = re.search(r"\((\d+) SEATS?\)", name)
@@ -277,7 +332,11 @@ def parse() -> None:
             )
             if office is not None and office[1].startswith("OF "):
                 continue
-            prefix = re.match(r"(?:CITY|TOWN|VILLAGE) OF (.+)", name)
+            school = SCHOOL.fullmatch(name) if office is None else None
+            if school and re.sub(r"[^A-Z]", "", SCHOOL_WORDS.sub("", school[1])) in schools:
+                code = schools[re.sub(r"[^A-Z]", "", SCHOOL_WORDS.sub("", school[1]))]
+                office = ("board-of-education", school[2])
+            prefix = re.match(r"(?:CITY|TOWN|VILLAGE) OF (.+)", name) if office is None else None
             if prefix:
                 words = prefix[1].split(" ")
                 town = next(
@@ -338,7 +397,8 @@ def parse() -> None:
                     "seat": first["seat"],
                     "remainder": first["remainder"],
                     "word": first["word"],
-                    "district": rows.select(pl.struct("county", "precinct").n_unique()).item() < 0.9 * widths[code],
+                    "district": first["office"] != "question"
+                    and rows.select(pl.struct("county", "precinct").n_unique()).item() < 0.9 * widths[code],
                     "scope": first["scope"],
                     "magnitude": rows["vote_for"].max()
                     or first["seats"]
@@ -401,7 +461,9 @@ def parse() -> None:
         raise ValueError(f"contests that share a key: {duplicated.rows()[:10]}")
     frame.write_parquet(PARSED / "contests.parquet")
     merged.write_parquet(PARSED / "results.parquet")
-    places.write_parquet(PARSED / "places.parquet")
+    places.filter(~pl.col("code").str.starts_with("sd") | pl.col("code").is_in(frame["code"])).write_parquet(
+        PARSED / "places.parquet"
+    )
 
 
 def emit() -> Path:
@@ -425,6 +487,7 @@ def emit() -> Path:
             cs.artifact(raw.cached(NCSBE, FILES.format(day=day)), source)
         census = cs.source("U.S. Census Bureau", "Cartographic Boundary Files, 1:500,000")
         cs.artifact(raw.cached(SOURCE, PLACES), census)
+        cs.artifact(raw.cached(SOURCE, SCHOOLS), census)
         us = cs.polity("US")
         state = cs.polity("US-NC")
         polities = {
@@ -451,18 +514,36 @@ def emit() -> Path:
             for table in ("election", "contest")
         }
         taken = {path for (path,) in conn.execute("select path from slug where path like 'us/nc/%'").fetchall()}
+        held = {
+            geoid: (polity, text, path, "school district")
+            for geoid, polity, text, path in conn.execute(
+                """select c.code, t.polity_id, n.text, s.path from area a
+                   join area_code c on c.area_id = a.id
+                   join polity_territory t on t.area_id = a.id
+                   join polity p on p.id = t.polity_id and p.kind = 'school_district'
+                   join name n on n.entity_id = p.id and n.is_preferred and n.lang = 'en'
+                   join slug s on s.entity_id = p.id
+                   where a.scheme_code = 'us.school_district' and c.code like '37%'"""
+            ).fetchall()
+        }
         for code, text, kind, geom, point in places.iter_rows():
-            polity = cs.key("us.polity", f"place:{code}")
+            school = kind == "School district"
+            if school and code[2:] in held:
+                polities[code] = held[code[2:]]
+                continue
+            scheme_of = "us.school_district" if school else "us.place"
+            code = code[2:] if school else code
+            polity = cs.key("us.polity", f"{'school' if school else 'place'}:{code}")
             path = f"us/nc/{slug(text)}"
             if path in taken and polity in cs.minted:
                 raise ValueError(f"{text} would take {path}")
-            polities[code] = (polity, text, path, kind)
-            cs.add("polity", id=polity, kind="municipality", iso_code=None)
+            polities[f"sd{code}" if school else code] = (polity, text, path, kind)
+            cs.add("polity", id=polity, kind="school_district" if school else "municipality", iso_code=None)
             name(polity, text)
             cs.add("polity_parent", polity_id=polity, parent_id=state)
             cs.add("slug", path=path, entity_id=polity)
-            area = cs.area("us.place", code)
-            cs.add("area", id=area, scheme_code="us.place")
+            area = cs.area(scheme_of, code)
+            cs.add("area", id=area, scheme_code=scheme_of)
             cs.add("area_code", area_id=area, code=code, valid_from=None)
             cs.add("area_parent", area_id=area, parent_id=cs.area("us.state", "37"))
             name(area, f"{text}, NC")
@@ -478,9 +559,9 @@ def emit() -> Path:
             )
             cs.add(
                 "reporting_unit",
-                id=cs.unit("us.place", code),
+                id=cs.unit(scheme_of, code),
                 polity_id=polity,
-                scheme_code="us.place",
+                scheme_code=scheme_of,
                 code=code,
                 area_relation="equals",
                 area_id=area,
@@ -495,11 +576,15 @@ def emit() -> Path:
             valid_to=None,
             as_of=date(2020, 1, 1),
         )
-        systems = {"fptp": cs.key("us.electoral_system", "fptp"), "block": cs.key("us.electoral_system", "block")}
+        systems = {
+            "fptp": cs.key("us.electoral_system", "fptp"),
+            "block": cs.key("us.electoral_system", "block"),
+            "referendum": cs.key("us.electoral_system", "referendum"),
+        }
         cs.add("electoral_system", id=systems["block"], polity_id=us, rules={"formula": "block"}, rules_version=1)
         name(systems["block"], "Block vote")
         parties = {code: cs.key("us.party", key) for code, key in PARTIES.items()}
-        if cs.minted & {systems["fptp"], *parties.values()}:
+        if cs.minted & {systems["fptp"], systems["referendum"], *parties.values()}:
             raise ValueError("the fptp system and the parties must already exist")
         cs.add("scheme", code="us.local_district", polity_id=us, kind="electoral_district", rank=3, noun="district")
         cs.add(
@@ -561,6 +646,18 @@ def emit() -> Path:
                 "day", "code", "office", "seat", "remainder", "scope"
             ).iter_rows()
         }
+        rounds: dict[tuple[str, str, str | None, bool, str | None], list[date]] = {}
+        for day, code, office, seat, remainder, scope in contests.select(
+            "day", "code", "office", "seat", "remainder", "scope"
+        ).iter_rows():
+            if day.year % 2 == 1:
+                rounds.setdefault((code, office, seat, remainder, scope), []).append(day)
+        decided = {
+            (day, code)
+            for (code, office, seat, remainder, scope), days in rounds.items()
+            for day in days
+            if scope is None and day == max(d for d in days if d.year == day.year)
+        }
         minted: dict[str, date] = {}
         memberships: set[tuple[UUID, UUID, date]] = set()
         for row in contests.sort("day", "code", "office", "seat", descending=[True, False, False, False]).iter_rows(
@@ -568,8 +665,18 @@ def emit() -> Path:
         ):
             day, code, office = row["day"], row["code"], row["office"]
             polity, place, path, kind = polities[code]
-            town = len(code) == 7
-            scheme = "us.special_district" if office == "special" else "us.place" if town else "us.county"
+            school = code.startswith("sd")
+            town = len(code) == 7 or school
+            geo = code.removeprefix("sd")
+            scheme = (
+                "us.special_district"
+                if office == "special"
+                else "us.school_district"
+                if school
+                else "us.place"
+                if town
+                else "us.county"
+            )
             if office == "special":
                 title = f"{place} Board of {'Trustees' if place.endswith('Hospital') else 'Directors'}"
             elif office == "mayor":
@@ -578,8 +685,11 @@ def emit() -> Path:
                 title = f"{place} {BOARDS[row['word']].format(kind=kind)}"
             elif office == "soil-and-water":
                 title = f"{place.removesuffix(' County')} {OFFICES[office][1]}"
+            elif office == "question":
+                title = place
             else:
                 title = f"{place} {OFFICES[office][1]}"
+            question = office == "question"
             general = day.year % 2 == 0
             kind_of = (
                 ("general" if general else "local")
@@ -588,6 +698,8 @@ def emit() -> Path:
                 if day in SECOND
                 else "special"
                 if day in SPECIAL_DAYS
+                else "local"
+                if (day, code) in decided
                 else "primary"
             )
             label = {"general": "general", "local": "municipal", "runoff": "primary runoff"}.get(kind_of, kind_of)
@@ -599,7 +711,7 @@ def emit() -> Path:
             )
             if contest_path in foreign["contest"]:
                 continue
-            if (code, office) not in owners:
+            if office != "question" and (code, office) not in owners:
                 owner = owners[(code, office)] = cs.key(
                     "us.body" if office in BODIES else "us.office", f"NC:{code}:{office}"
                 )
@@ -638,8 +750,8 @@ def emit() -> Path:
                 name(election, f"{day.year} {place} {label} election")
                 cs.add("slug", path=f"{path}/{day}-{kind_of}", entity_id=election)
             election = elections[(day, code)]
-            whole = area = cs.area(scheme, code)
-            unit = cs.unit(scheme, code)
+            whole = area = cs.area(scheme, geo)
+            unit = cs.unit(scheme, geo)
             seat = row["seat"]
             if row["district"]:
                 district = f"37:{code}:{office}:{slug(seat or 'whole')}"
@@ -669,7 +781,11 @@ def emit() -> Path:
             )
             contest = cs.key("us.contest", contest_key)
             magnitude = row["magnitude"]
-            first_day = SECOND.get(day)
+            same_year = sorted(
+                d for d in rounds.get((code, office, seat, row["remainder"], row["scope"]), []) if d.year == day.year
+            )
+            first_day = SECOND.get(day) or (same_year[same_year.index(day) - 1] if day in same_year[1:] else None)
+            final = row["scope"] is None and (not same_year or day == same_year[-1])
             previous_round = (
                 cs.key("us.contest", contest_key.replace(str(day), str(first_day), 1))
                 if first_day is not None and (first_day, code, office, seat, row["remainder"], row["scope"]) in present
@@ -679,21 +795,29 @@ def emit() -> Path:
                 "contest",
                 id=contest,
                 election_id=election,
-                kind="body_seats" if office in BODIES else "office",
-                office_id=None if office in BODIES else owners[(code, office)],
+                kind="ballot_question" if question else "body_seats" if office in BODIES else "office",
+                office_id=None if question or office in BODIES else owners[(code, office)],
                 body_id=owners[(code, office)] if office in BODIES else None,
                 district_area_id=area if row["district"] else whole,
                 magnitude=magnitude,
                 round_number=2 if first_day else 1,
                 previous_round_id=previous_round,
                 party_scope_id=parties.get(row["scope"]),
-                electoral_system_id=None if magnitude is None else systems["block" if magnitude > 1 else "fptp"],
+                electoral_system_id=systems["referendum"]
+                if question
+                else None
+                if magnitude is None
+                else systems["block" if magnitude > 1 else "fptp"],
                 default_result_kind="counted",
-                term="remainder" if row["remainder"] else "full",
+                term=None if question else "remainder" if row["remainder"] else "full",
             )
+            if question:
+                cs.add("ballot_question", contest_id=contest, type="mandatory_referendum")
             name(
                 contest,
-                (f"{day.year} {place} mayoral election" if office == "mayor" else f"{day.year} {title} election")
+                f"{day.year} {place}: {seat}"
+                if question
+                else (f"{day.year} {place} mayoral election" if office == "mayor" else f"{day.year} {title} election")
                 + (f", {seat}" if seat else "")
                 + (" (unexpired term)" if row["remainder"] else "")
                 + (f" ({SCOPES[row['scope']]} primary)" if row["scope"] else ""),
@@ -746,10 +870,17 @@ def emit() -> Path:
             counted = grouped[(day, code, row["contest"])].with_columns(
                 writein=pl.col("choice").str.contains(r"(?i)write-?\s*in")
             )
+            if question:
+                counted = counted.with_columns(
+                    pl.col("choice")
+                    .str.to_lowercase()
+                    .replace({"for": "Yes", "against": "No", "yes": "Yes", "no": "No"})
+                )
             merged_choices: dict[UUID, str] = {}
             canon = {
                 choice: merged_choices.setdefault(cs.key(f"{SOURCE}.person", f"{code}:{slug(choice)}"), choice)
                 for choice in counted.filter(~pl.col("writein"))["choice"].unique().sort()
+                if not question
             }
             counted = counted.with_columns(pl.col("choice").replace(canon))
             lines = (
@@ -762,7 +893,17 @@ def emit() -> Path:
             options: dict[str, UUID] = {}
             rank = 0
             for choice, writein, party, votes in lines.iter_rows():
-                if writein:
+                if question:
+                    option = cs.key("us.option", f"{contest_key}:{choice.lower()}")
+                    cs.add(
+                        "contest_option",
+                        id=option,
+                        contest_id=contest,
+                        kind="answer",
+                        ballot_position=1 if choice == "Yes" else 2,
+                        ballot_label=choice,
+                    )
+                elif writein:
                     option = cs.key("us.option", f"{contest_key}:write-ins")
                     cs.add("contest_option", id=option, contest_id=contest, kind="write_in", ballot_label="Write-ins")
                 else:
@@ -790,7 +931,12 @@ def emit() -> Path:
                         ballot_name=choice,
                         is_independent=party == "UNA",
                     )
-                    if magnitude is not None and rank <= magnitude and kind_of in ("general", "local", "special"):
+                    if (
+                        magnitude is not None
+                        and rank <= magnitude
+                        and kind_of in ("general", "local", "special")
+                        and (general or final)
+                    ):
                         cs.add("outcome", result_set_id=result_set, option_id=option, kind="elected", seats=None)
                 options[choice] = option
                 if result_set in cs.minted and town:
