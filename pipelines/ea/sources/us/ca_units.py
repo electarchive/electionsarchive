@@ -6,7 +6,7 @@ from ea.changeset import Changeset
 from ea.store import connect
 
 SOURCE = "us.ca_units"
-VERSION = "1"
+VERSION = "2"
 
 
 def emit() -> Path:
@@ -34,7 +34,9 @@ def emit() -> Path:
                    where x.unit_id = u.id)"""
         ).fetchall():
             day, state, county, _, precinct = code.split(":")
-            area = shapes.get(f"{day}:{state}:{county}:{precinct}")
+            area = shapes.get(f"{day}:{state}:{county}:{precinct}") or shapes.get(
+                f"{day}:{state}:{county}:{precinct.lstrip('0').zfill(5)}"
+            )
             if area is None:
                 unplaced += 1
             else:
