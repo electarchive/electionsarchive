@@ -178,6 +178,21 @@
   const results = $derived(
     isAllYears ? (full.data?.results ?? polity.results) : polity.results,
   );
+  const sourced = $derived.by(() => {
+    const tally = new Map<string, number>();
+    for (const group of results) {
+      for (const race of group.races) {
+        if (race.source != null) {
+          tally.set(race.source, (tally.get(race.source) ?? 0) + 1);
+        }
+      }
+    }
+    const usual = tally
+      .entries()
+      .toArray()
+      .toSorted((a, b) => b[1] - a[1])[0]?.[0];
+    return usual == null ? null : { usual, isMixed: tally.size > 1 };
+  });
   const isNational = $derived(
     ["sovereign_state", "supranational"].includes(polity.kind),
   );
@@ -804,8 +819,13 @@
         </h2>
         <p class="text-[0.8125rem] text-muted-foreground">
           {m.polity_results_lede({ place: polity.name })}
-          {#if results.some( (group) => group.races.some((race) => race.source != null) )}
-            {m.polity_results_sourced({ place: polity.name })}
+          {#if sourced != null}
+            {(sourced.isMixed
+              ? m.polity_results_sourced_most
+              : m.polity_results_sourced_one)({
+              place: polity.name,
+              publisher: sourced.usual,
+            })}
           {/if}
         </p>
       </div>
@@ -834,7 +854,7 @@
                         ? race.name.slice(String(group.year).length + 1)
                         : race.name}</Preview
                     >
-                    {#if race.source != null}
+                    {#if race.source != null && race.source !== sourced?.usual}
                       <span class="text-xs text-muted-foreground"
                         >{m.polity_results_source({
                           publisher: race.source,

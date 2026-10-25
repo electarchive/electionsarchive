@@ -1227,6 +1227,19 @@ function polityMarkdown(
   const labels = new Map(
     record.parties.map((party) => [party.id, party.short ?? party.label]),
   );
+  const tally = new Map<string, number>();
+  for (const group of polity.results) {
+    for (const race of group.races) {
+      if (race.source != null) {
+        tally.set(race.source, (tally.get(race.source) ?? 0) + 1);
+      }
+    }
+  }
+  const usual = tally
+    .entries()
+    .toArray()
+    .toSorted((a, b) => b[1] - a[1])[0]?.[0];
+  const sourced = usual == null ? null : { usual, isMixed: tally.size > 1 };
   return [
     `# ${polity.name}`,
     byline(polity.breadcrumbs, link, null),
@@ -1345,12 +1358,22 @@ function polityMarkdown(
       ? []
       : [
           `## ${m.polity_results_title({ place: polity.name })}`,
+          ...(sourced == null
+            ? []
+            : [
+                (sourced.isMixed
+                  ? m.polity_results_sourced_most
+                  : m.polity_results_sourced_one)({
+                  place: polity.name,
+                  publisher: sourced.usual,
+                }),
+              ]),
           table(
             [m.col_date(), m.col_contest(), m.col_leader(), m.col_share()],
             polity.results.flatMap((group) =>
               group.races.map((race) => [
                 date(group.date),
-                race.source == null
+                race.source == null || race.source === sourced?.usual
                   ? link(race.name, race.path)
                   : `${link(race.name, race.path)} (${m.polity_results_source({ publisher: race.source })})`,
                 race.leaders[0]?.label ?? null,
