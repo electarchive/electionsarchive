@@ -357,8 +357,21 @@
                   : 1
                 : 0.3}
               role="presentation"
-              onpointerenter={() => (seated = span.from)}
-              onpointerleave={() => (seated = null)}
+              onpointerenter={(event) => {
+                if (event.pointerType === "mouse") {
+                  seated = span.from;
+                }
+              }}
+              onpointerleave={(event) => {
+                if (event.pointerType === "mouse") {
+                  seated = null;
+                }
+              }}
+              onpointerup={(event) => {
+                if (event.pointerType !== "mouse") {
+                  seated = seated === span.from ? null : span.from;
+                }
+              }}
             />
           {/each}
           {#each timeline.runs as run (run.from)}
@@ -464,8 +477,21 @@
                   : 1
                 : 0.3}
               role="presentation"
-              onpointerenter={() => (seated = span.from)}
-              onpointerleave={() => (seated = null)}
+              onpointerenter={(event) => {
+                if (event.pointerType === "mouse") {
+                  seated = span.from;
+                }
+              }}
+              onpointerleave={(event) => {
+                if (event.pointerType === "mouse") {
+                  seated = null;
+                }
+              }}
+              onpointerup={(event) => {
+                if (event.pointerType !== "mouse") {
+                  seated = seated === span.from ? null : span.from;
+                }
+              }}
             />
           {/each}
           {#each ticks as column (column.index)}

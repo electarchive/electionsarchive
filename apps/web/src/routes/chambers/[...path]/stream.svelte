@@ -518,8 +518,21 @@
               : 1
             : 0.3}
           role="presentation"
-          onpointerenter={() => (seated = cabinet.from)}
-          onpointerleave={() => (seated = null)}
+          onpointerenter={(event) => {
+            if (event.pointerType === "mouse") {
+              seated = cabinet.from;
+            }
+          }}
+          onpointerleave={(event) => {
+            if (event.pointerType === "mouse") {
+              seated = null;
+            }
+          }}
+          onpointerup={(event) => {
+            if (event.pointerType !== "mouse") {
+              seated = seated === cabinet.from ? null : cabinet.from;
+            }
+          }}
         />
       {/each}
       {#each years as year (year.year)}

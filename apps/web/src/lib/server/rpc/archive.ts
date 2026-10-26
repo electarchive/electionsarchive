@@ -15654,7 +15654,8 @@ export const people = {
             (select party_scope_id is not null from contest where id = o.contest_id) as scoped
           from candidacy cd join contest_option o on o.id = cd.option_id
           cross join lateral (
-            select coalesce(cd.member_of_party_id, o.party_id, ${fused(sql`o.id`, sql`o.contest_id`)}) as party
+            select coalesce(cd.member_of_party_id, o.party_id, ${fused(sql`o.id`, sql`o.contest_id`)},
+              (select party_scope_id from contest where id = o.contest_id)) as party
           ) lp
           left join entity_merge pm on pm.entity_id = lp.party
           where cd.person_id in (select id from ids) and cd.role in ('head', 'list_member')

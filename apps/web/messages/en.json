@@ -73,7 +73,7 @@
   "offices_runoff": "Runoff",
   "record_tabs": "Chamber or office",
   "record_governments": "Governments",
-  "record_governments_key": "The strip shows which party governed between elections. Hover to see the cabinet.",
+  "record_governments_key": "The strip shows which party governed between elections. Hover or tap it to see the cabinet.",
   "record_governments_lede": "All cabinets in the archive, colored by the party of the head of government.",
   "record_governments_head": "Led by {name}",
   "record_list": "Elections by decade",

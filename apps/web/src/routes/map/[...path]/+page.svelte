@@ -2156,7 +2156,7 @@
     <section
       class={cn(
         "absolute inset-s-3 inset-be-3 z-10 grid gap-3 overflow-y-auto rounded-sm bg-card/96 p-3.5 shadow-menu ring-1 ring-border inline-[min(19.5rem,calc(100%-1.5rem))] max-block-[calc(100%-1.5rem)] max-sm:max-block-[60%]",
-        { "max-sm:hidden": !isKeyOpen },
+        { "max-sm:hidden [@media(max-height:30rem)]:hidden": !isKeyOpen },
       )}
       aria-labelledby="{uid}-key"
     >
@@ -2411,7 +2411,7 @@
     <button
       type="button"
       class={cn(
-        "absolute inset-s-3 inset-be-3 z-10 flex items-center gap-2 rounded-sm bg-card px-3 text-[0.8125rem] font-semibold shadow-menu ring-1 ring-border block-10 sm:hidden",
+        "absolute inset-s-3 inset-be-3 z-10 flex items-center gap-2 rounded-sm bg-card px-3 text-[0.8125rem] font-semibold shadow-menu ring-1 ring-border block-10 [@media(min-width:40rem)_and_(min-height:30rem)]:hidden",
         { hidden: isKeyOpen || pinned != null },
       )}
       onclick={() => (isKeyOpen = true)}
@@ -2422,7 +2422,7 @@
     {#if isKeyOpen}
       <button
         type="button"
-        class="absolute inset-e-3 inset-be-3 z-20 grid place-items-center rounded-sm bg-card shadow-menu ring-1 ring-border block-10 inline-10 sm:hidden"
+        class="absolute inset-e-3 inset-be-3 z-20 grid place-items-center rounded-sm bg-card shadow-menu ring-1 ring-border block-10 inline-10 [@media(min-width:40rem)_and_(min-height:30rem)]:hidden"
         aria-label={m.atlas_key_close()}
         onclick={() => (isKeyOpen = false)}
         ><XIcon class="block-4 inline-4" /></button
@@ -2433,7 +2433,10 @@
       <aside
         class={cn(
           "absolute inset-e-3 inset-bs-3 z-10 overflow-y-auto rounded-sm bg-card/96 p-3.5 shadow-menu ring-1 ring-border inline-[min(19.5rem,calc(100%-1.5rem))] max-block-[calc(100%-1.5rem)] max-sm:inset-bs-auto max-sm:inset-be-3 max-sm:max-block-[55%]",
-          { "max-sm:hidden": pinned == null || isKeyOpen },
+          {
+            "max-sm:hidden [@media(max-height:30rem)]:hidden":
+              pinned == null || isKeyOpen,
+          },
         )}
         aria-live="polite"
       >
