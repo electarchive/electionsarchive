@@ -154,6 +154,16 @@
       "title": "Élections législatives 2024 : les résultats définitifs",
       "publisher": "Ministère de l'Intérieur",
       "url": "https://www.interieur.gouv.fr/actualites/actualites-du-ministere/elections-legislatives-2024-resultats-definitifs"
+    },
+    "vp-cm-1985": {
+      "title": "Conseil des ministres du 10 avril 1985: le mode de scrutin pour l'élection des députés à l'Assemblée nationale",
+      "publisher": "vie-publique.fr",
+      "url": "https://www.vie-publique.fr/discours/153720-conseil-des-ministres-10041985-mode-de-scrutin-election-des-deputes"
+    },
+    "senat-381-1985": {
+      "title": "Rapport n° 381 (1984-1985) sur le projet de loi relatif à l'élection des députés des territoires d'outre-mer, de Mayotte et de Saint-Pierre-et-Miquelon",
+      "publisher": "Sénat",
+      "url": "https://www.senat.fr/rap/1984-1985/i1984_1985_0381.pdf"
     }
   },
   "levels": [
@@ -236,9 +246,11 @@
         },
         {
           "date": "1986-03-16",
-          "contests": null,
-          "note": "In 1986, deputies were elected by list in each département, but the number of those constituencies has not yet been confirmed from an official source.",
-          "research_note": "Seats 577 from the official stats: 555 metropolitan, 15 DOM, 5 TOM, 1 Mayotte, 1 Saint-Pierre-et-Miquelon. The list-constituency count (départements plus overseas units) is not confirmed. Under the 1985 law the département forms the circonscription (Assemblée nationale proposition, l15b4013, quotes L. 123 of the 1985 version: \"Le département forme une circonscription.\"), but the number of départements and overseas units was not counted from an official text, so contests is null. Includes overseas units."
+          "contests": 105,
+          "seats": 577,
+          "source": "vp-cm-1985",
+          "quote": "Ce projet porte à 571 le nombre des députés des 101 départements. (Sénat rapport n° 381: \"le territoire de la Nouvelle-Calédonie et dépendances, le territoire de la Polynésie française et le territoire de Wallis-et-Futuna forment chacun une circonscription électorale unique\"; \"la circonscription électorale de Mayotte ne comprend qu'un seul siège\")",
+          "note": "In 1986, each département elected its deputies by list as a single constituency: 96 in metropolitan France and 4 overseas. New Caledonia, French Polynesia, Wallis-et-Futuna, Mayotte, and Saint-Pierre-et-Miquelon were one constituency each, for 105 in all."
         },
         {
           "date": "1988-06-05",

@@ -104,6 +104,21 @@
       "title": "Archivio storico delle elezioni: Regionali (each date's Area ITALIA page, Regione list; saved 2026-10-26, MF-108)",
       "publisher": "Ministero dell'Interno, DAIT (Eligendo)",
       "url": "https://elezionistorico.interno.gov.it/index.php?tpel=R"
+    },
+    "dait_camera_1948": {
+      "title": "Camera dei deputati 1948: risultati per comune",
+      "publisher": "Ministero dell'Interno, DAIT (open data)",
+      "url": "https://dait.interno.gov.it/documenti/opendata/camera/camera-19480418.zip"
+    },
+    "dait_camera_1953": {
+      "title": "Camera dei deputati 1953: risultati per comune",
+      "publisher": "Ministero dell'Interno, DAIT (open data)",
+      "url": "https://dait.interno.gov.it/documenti/opendata/camera/camera-19530607.zip"
+    },
+    "dait_camera_1958": {
+      "title": "Camera dei deputati 1958: risultati per comune",
+      "publisher": "Ministero dell'Interno, DAIT (open data)",
+      "url": "https://dait.interno.gov.it/documenti/opendata/camera/camera-19580525.zip"
     }
   },
   "levels": [
@@ -138,21 +153,27 @@
       "elections": [
         {
           "date": "1948-04-18",
-          "contests": null,
-          "note": "The number of constituencies at this election has not yet been confirmed from an official source.",
-          "research_note": "Date verified. Circoscrizioni and seats left null: the Camera page (camera_conoscere_1948_1994) says 32 circoscrizioni for the postwar Chamber as a whole, but no year-specific quote for 1948 was captured. Wikipedia gives 31 for 1948 to 1958 (Trieste as XXXII from 1957 per its Trieste article), which conflicts and was not used. Seat count 574 is only in the Eligendo archive (elezionistorico.interno.gov.it), which is blocked here, so it is not cited."
+          "contests": 31,
+          "seats": 574,
+          "source": "dait_camera_1948",
+          "quote": "31 distinct values in the CIRCOSCRIZIONE column of camera-19480418.txt",
+          "note": "Counted as 31 circoscrizioni. Trieste was outside Italy until 1954 and didn't vote."
         },
         {
           "date": "1953-06-07",
-          "contests": null,
-          "note": "The number of constituencies at this election has not yet been confirmed from an official source.",
-          "research_note": "Date verified. Circoscrizioni and seats not quoted from an official source in this run (see 1948 note). Wikipedia gives 590 seats, not used."
+          "contests": 31,
+          "seats": 590,
+          "source": "dait_camera_1953",
+          "quote": "31 distinct values in the CIRCOSCRIZIONE column of camera-19530607.txt",
+          "note": "Counted as 31 circoscrizioni. Trieste was outside Italy until 1954 and didn't vote."
         },
         {
           "date": "1958-05-25",
-          "contests": null,
-          "note": "The number of constituencies at this election has not yet been confirmed from an official source.",
-          "research_note": "Date verified. Circoscrizioni and seats not quoted from an official source in this run. The Trieste circoscrizione (XXXII) question for 1958 is unresolved; Wikipedia gives 31 circoscrizioni for 1958, and the Tabella A text was not fetched. Wikipedia gives 596 seats, not used."
+          "contests": 32,
+          "seats": 596,
+          "source": "dait_camera_1958",
+          "quote": "32 distinct values in the CIRCOSCRIZIONE column of camera-19580525.txt",
+          "note": "Counted as 32 circoscrizioni. Trieste voted as its own circoscrizione for the first time."
         },
         {
           "date": "1963-04-28",
