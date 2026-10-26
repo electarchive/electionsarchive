@@ -3,17 +3,23 @@
   import { resolve } from "$app/paths";
   import { page } from "$app/state";
   import { count, percent } from "#lib/format.js";
+  import { cn } from "#lib/utils.js";
   import { m } from "#lib/paraglide/messages.js";
   import { Switch } from "#lib/components/ui/switch/index.js";
   import { getLocale } from "#lib/paraglide/runtime.js";
   import type { PageData } from "./$types";
-  import type { Tier } from "#lib/coverage.js";
-  import { TIER_LABELS } from "#lib/coverage.js";
+  import type { CountryTier, Tier } from "#lib/coverage.js";
+  import { COUNTRY_TIERS, TIER_LABELS } from "#lib/coverage.js";
   import Tone from "./tone.svelte";
 
   const { data }: { data: PageData } = $props();
 
   const year = String(new Date().getFullYear());
+  const columns: Partial<Record<Tier, CountryTier>> = {
+    federal: "national",
+    statewide: "subnational",
+    legislative: "subnational",
+  };
 
   $effect(() => {
     if (!data.building) {
@@ -82,18 +88,28 @@
       <h2 id="coverage-countries" class="sr-only">
         {m.coverage_overview_column_country()}
       </h2>
+      <p class="border-be px-3.5 py-2 text-xs text-muted-foreground">
+        {m.coverage_overview_column_tiers()}.
+        <a
+          href="#coverage-explain"
+          class="text-foreground underline underline-offset-2 focus-visible:outline-2 focus-visible:outline-ring"
+          >{m.coverage_overview_how()}</a
+        >
+      </p>
       <div
         aria-hidden="true"
-        class="hidden border-be px-3.5 py-1.5 text-xs/tight font-bold lg:grid lg:grid-cols-[minmax(0,12rem)_minmax(0,1fr)_6.5rem] lg:gap-x-5"
+        class="hidden border-be px-3.5 py-1.5 text-xs/tight font-bold lg:grid lg:grid-cols-[minmax(0,11rem)_repeat(5,minmax(0,1fr))_6.5rem] lg:gap-x-5"
       >
         <span>{m.coverage_overview_column_country()}</span>
-        <span>{m.coverage_overview_column_tiers()}</span>
+        {#each COUNTRY_TIERS as column (column)}
+          <span>{TIER_LABELS[column]()}</span>
+        {/each}
         <span>{m.coverage_overview_column_span()}</span>
       </div>
       <ul class="grid">
         {#each data.polities as polity (polity.polity)}
           <li
-            class="relative grid gap-x-5 gap-y-2 border-be px-3.5 py-3 hover:bg-muted/60 lg:grid-cols-[minmax(0,12rem)_minmax(0,1fr)_6.5rem] lg:items-start"
+            class="relative grid gap-x-5 gap-y-2 border-be px-3.5 py-3 hover:bg-muted/60 lg:grid-cols-[minmax(0,11rem)_repeat(5,minmax(0,1fr))_6.5rem] lg:items-start"
           >
             <a
               href={resolve("/coverage/[cc]", { cc: polity.polity })}
@@ -101,45 +117,66 @@
               >{polity.name}</a
             >
             <ul
-              class="grid grid-cols-2 gap-x-4 gap-y-2.5 text-sm tabular-nums sm:grid-cols-3 xl:grid-cols-5"
+              class="grid grid-cols-2 gap-x-4 gap-y-2.5 text-sm tabular-nums sm:grid-cols-3 lg:contents"
             >
-              {#each polity.tiers as tier (tier.key)}
-                <li class="grid content-start gap-0.5">
-                  <span class="text-xs text-muted-foreground"
-                    >{TIER_LABELS[tier.key as Tier]()}</span
-                  >
-                  {#if tier.cell == null || tier.cell.total === 0}
-                    <span class="text-xs text-muted-foreground"
-                      >{m.coverage_cell_none()}</span
-                    >
-                  {:else}
-                    <span class="font-semibold"
-                      >{percent(tier.cell.complete / tier.cell.total, 1)}</span
-                    >
-                    <span
-                      aria-hidden="true"
-                      class="flex overflow-hidden rounded-xs bg-muted block-1 max-inline-28"
-                    >
-                      <span
-                        class="block-full"
-                        style:inline-size="{(tier.cell.complete /
-                          tier.cell.total) *
-                          100}%"
-                      >
-                        <Tone
-                          reason="complete"
-                          class="block block-full inline-full"
-                        />
-                      </span>
-                    </span>
-                    <span class="text-xs text-muted-foreground"
-                      >{m.coverage_cell_of({
-                        complete: count(tier.cell.complete),
-                        total: count(tier.cell.total),
-                      })}</span
-                    >
-                  {/if}
-                </li>
+              {#each COUNTRY_TIERS as column (column)}
+                {const tiers = $derived(
+                  polity.tiers.filter(
+                    (tier) =>
+                      (columns[tier.key as Tier] ?? tier.key) === column,
+                  ),
+                )}
+                {#if tiers.length === 0}
+                  <li aria-hidden="true" class="hidden lg:block">
+                    <span class="text-xs text-muted-foreground">–</span>
+                  </li>
+                {:else}
+                  <li class="grid content-start gap-2.5">
+                    {#each tiers as tier (tier.key)}
+                      <div class="grid content-start gap-0.5">
+                        <span
+                          class={cn("text-xs text-muted-foreground", {
+                            "lg:sr-only": tier.key === column,
+                          })}>{TIER_LABELS[tier.key as Tier]()}</span
+                        >
+                        {#if tier.cell == null || tier.cell.total === 0}
+                          <span class="text-xs text-muted-foreground"
+                            >{m.coverage_cell_none()}</span
+                          >
+                        {:else}
+                          <span class="font-semibold"
+                            >{percent(
+                              tier.cell.complete / tier.cell.total,
+                              1,
+                            )}</span
+                          >
+                          <span
+                            aria-hidden="true"
+                            class="flex overflow-hidden rounded-xs bg-muted block-1 max-inline-28"
+                          >
+                            <span
+                              class="block-full"
+                              style:inline-size="{(tier.cell.complete /
+                                tier.cell.total) *
+                                100}%"
+                            >
+                              <Tone
+                                reason="complete"
+                                class="block block-full inline-full"
+                              />
+                            </span>
+                          </span>
+                          <span class="text-xs text-muted-foreground"
+                            >{m.coverage_cell_of({
+                              complete: count(tier.cell.complete),
+                              total: count(tier.cell.total),
+                            })}</span
+                          >
+                        {/if}
+                      </div>
+                    {/each}
+                  </li>
+                {/if}
               {/each}
             </ul>
             <p class="text-sm tabular-nums">

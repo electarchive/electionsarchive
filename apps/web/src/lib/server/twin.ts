@@ -534,7 +534,11 @@ function coverageMarkdown(
   const year = String(new Date().getFullYear());
   const { summary } = data;
   const isUs = data.polity === "us";
-  const columns: ReadonlyArray<Column> = isUs ? US_COLUMNS : COUNTRY_COLUMNS;
+  const columns: ReadonlyArray<Column> = isUs
+    ? US_COLUMNS
+    : COUNTRY_COLUMNS.filter((column) =>
+        data.tiers.some((row) => row.cells[column] != null),
+      );
   const slot = (column: Column, tier: string): Column =>
     tier === "turnout" && column === "before_any"
       ? "before"

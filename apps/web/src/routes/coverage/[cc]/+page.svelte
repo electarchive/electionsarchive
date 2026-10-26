@@ -96,7 +96,11 @@
   const isUs = $derived(data.polity === "us");
   const summary = $derived(data.summary);
   const columns = $derived<ReadonlyArray<Column>>(
-    isUs ? US_COLUMNS : COUNTRY_COLUMNS,
+    isUs
+      ? US_COLUMNS
+      : COUNTRY_COLUMNS.filter((column) =>
+          data.tiers.some((row) => row.cells[column] != null),
+        ),
   );
   const slot = (column: Column, tier: string): Column =>
     tier === "turnout" && column === "before_any"
