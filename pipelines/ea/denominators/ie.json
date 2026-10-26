@@ -103,6 +103,17 @@
       "title": "Electoral (Amendment) Act 2005, Schedule",
       "publisher": "Irish Statute Book (eISB)",
       "url": "https://www.irishstatutebook.ie/eli/2005/act/16/enacted/en/print.html"
+    },
+    "dhlgh-president": {
+      "title": "Toghcháin Uachtaráin 1938 – 2025 Presidential Elections",
+      "publisher": "Department of Housing, Local Government and Heritage",
+      "url": "https://www.presidentialelection.ie/wp-content/uploads/2026/01/Presidential-Elections-1938-2025.pdf",
+      "note": "November 2025. The Holders of the Office of President table marks each of the 15 elections since 1938 as contested or uncontested."
+    },
+    "cib-relate-2014": {
+      "title": "Relate, May 2014: Local and European elections 2014",
+      "publisher": "Citizens Information Board",
+      "url": "https://www.citizensinformationboard.ie/downloads/relate/relate_2014_05.pdf"
     }
   },
   "levels": [
@@ -428,52 +439,104 @@
       ],
       "elections": [
         {
-          "year": 2025,
+          "year": 1938,
           "contests": 1,
-          "source": "ec-president",
-          "quote": "There will be three candidates on the ballot paper.",
-          "note": "The Electoral Commission page describes the 2025 election (ballot with three candidates). The polling date is not quoted from a fetched source."
+          "source": "dhlgh-president",
+          "quote": "| 1938 | Uncontested | Only one person nominated | 1 |",
+          "note": "Uncontested: the only nominee was declared elected without a poll."
         },
         {
           "year": 1945,
-          "note": "Listed in the brief as a poll; not verified. The Department's Presidential Election Results 1938-2025 (gov.ie) returned HTTP 403 to WebFetch and curl."
+          "contests": 1,
+          "source": "dhlgh-president",
+          "quote": "| 1945 | Contested | | 3 |"
+        },
+        {
+          "year": 1952,
+          "contests": 1,
+          "source": "dhlgh-president",
+          "quote": "| 1952 | Uncontested | Incumbent only nominee | 1 |",
+          "note": "Uncontested: the only nominee was declared elected without a poll."
         },
         {
           "year": 1959,
-          "note": "Listed in the brief as a poll; not verified against an official source."
+          "contests": 1,
+          "source": "dhlgh-president",
+          "quote": "| 1959 | Contested | | 2 |"
         },
         {
           "year": 1966,
-          "note": "Listed in the brief as a poll; not verified. Check whether a 1966 presidential election was held and contested."
+          "contests": 1,
+          "source": "dhlgh-president",
+          "quote": "| 1966 | Contested | | 2 |"
         },
         {
           "year": 1973,
-          "note": "Listed in the brief as a poll; not verified. Check whether the 1973 election was contested."
+          "contests": 1,
+          "source": "dhlgh-president",
+          "quote": "| 1973 | Contested | | 2 |"
+        },
+        {
+          "year": 1974,
+          "contests": 1,
+          "source": "dhlgh-president",
+          "quote": "| 1974 | Uncontested | Death of incumbent; only one person nominated | 1 |",
+          "note": "Uncontested: the only nominee was declared elected without a poll."
+        },
+        {
+          "year": 1976,
+          "contests": 1,
+          "source": "dhlgh-president",
+          "quote": "| 1976 | Uncontested | Resignation of incumbent; only one person nominated | 1 |",
+          "note": "Uncontested: the only nominee was declared elected without a poll."
+        },
+        {
+          "year": 1983,
+          "contests": 1,
+          "source": "dhlgh-president",
+          "quote": "| 1983 | Uncontested | Only one nominated | 1 |",
+          "note": "Uncontested: the only nominee was declared elected without a poll."
         },
         {
           "year": 1990,
-          "note": "Listed in the brief as a poll; open-data excerpts indicate a count but no official page was quoted."
+          "contests": 1,
+          "source": "dhlgh-president",
+          "quote": "| 1990 | Contested | | 3 |"
         },
         {
           "year": 1997,
-          "note": "Listed in the brief as a poll; open-data excerpts indicate a count but no official page was quoted."
+          "contests": 1,
+          "source": "dhlgh-president",
+          "quote": "| 1997 | Contested | | 5 |"
+        },
+        {
+          "year": 2004,
+          "contests": 1,
+          "source": "dhlgh-president",
+          "quote": "| 2004 | Uncontested | Incumbent only person nominated | 1 |",
+          "note": "Uncontested: the only nominee was declared elected without a poll."
         },
         {
           "year": 2011,
-          "note": "Listed in the brief as a poll; open-data excerpts indicate a count but no official page was quoted."
+          "contests": 1,
+          "source": "dhlgh-president",
+          "quote": "| 2011 | Contested | | 7 |"
         },
         {
           "year": 2018,
-          "note": "Listed in the brief as a poll; not verified. Check whether the 2018 election was contested."
+          "contests": 1,
+          "source": "dhlgh-president",
+          "quote": "| 2018 | Contested | | 6 |"
+        },
+        {
+          "year": 2025,
+          "contests": 1,
+          "source": "dhlgh-president",
+          "quote": "| 2025 | Contested | | 3 |"
         }
       ],
-      "gaps": [
-        {
-          "from": 1938,
-          "to": 2018,
-          "note": "There is a poll only when more than one candidate is nominated, and the years that went to a poll haven't been confirmed from an official list yet."
-        }
-      ]
+      "gaps": [],
+      "note": "Elections with only one nominee count as races too, when that candidate is declared elected without a poll (1938, 1952, 1974, 1976, 1983, and 2004)."
     },
     {
       "key": "referendums",
@@ -707,6 +770,13 @@
       ],
       "elections": [
         {
+          "year": 2014,
+          "contests": 137,
+          "source": "cib-relate-2014",
+          "quote": "There are 137 local electoral areas for the 31 local authorities.",
+          "note": "The Local Electoral Area Boundary Committee's 2013 report set these areas; the Minister also gave 137 in a Dáil reply on 12 June 2013."
+        },
+        {
           "year": 2019,
           "contests": 166,
           "source": "dhlgh-local-guide",
@@ -723,7 +793,7 @@
       "gaps": [
         {
           "from": 1999,
-          "to": 2014,
+          "to": 2009,
           "note": "No official count of local electoral areas at these elections has been compiled yet."
         }
       ]
