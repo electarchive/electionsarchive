@@ -91,7 +91,7 @@ def contest(title: str) -> tuple[str, int | None] | None:
     }.get(name, name)
     if name in STATEWIDE:
         return STATEWIDE[name], None
-    if name == "UNITED STATES REPRESENTATIVE":
+    if name in ("UNITED STATES REPRESENTATIVE", "US REP, DIST."):
         return "house", 0
     if name.startswith("PRESIDENT AND VICE") or name in ("PRESIDENT", "PRESIDENT OF THE UNITED STATES"):
         return "president", None
@@ -116,7 +116,7 @@ def contest(title: str) -> tuple[str, int | None] | None:
     if matched := re.match(r"STATE REPRESENTATIVE D\d+ DISTRICT (\d+)$", name):
         return f"house:{int(matched[1])}:g", None
     if matched := re.match(
-        r"(?:UNITED STATES REPRESENTATIVE|US HOUSE)(?:,| -) (?:CONGRESSIONAL )?(?:DISTRICT )?(\d+)(?:ST|ND|RD|TH)?(?: CONGRESSIONAL(?: DISTRICT)?)?$",
+        r"(?:UNITED STATES REPRESENTATIVE|US HOUSE)(?:,| -)? (?:CONGRESSIONAL )?(?:DISTRICT )?(\d+)(?:ST|ND|RD|TH)?(?: CONGRESSIONAL(?: DISTRICT)?)?$",
         name,
     ):
         return "house", int(matched[1])
