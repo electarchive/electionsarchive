@@ -2,6 +2,7 @@ import io
 import json
 import re
 import zipfile
+from collections import defaultdict
 from datetime import date, timedelta
 from pathlib import Path
 from uuid import UUID, uuid5
@@ -16,11 +17,34 @@ from ea.sources.licenses import UNLICENSED
 from ea.sources.us.electionsfl import FIPS as FLORIDA
 from ea.sources.us.electionsfl import JACKSONVILLE, REPORTS, export
 from ea.sources.us.medsl import RECODED
-from ea.sources.us.medsl_state import DROPPED, EXPANDED, INDEPENDENT, NATIONAL, POOLED, PUBLISHER
+from ea.sources.us.medsl_state import DROPPED, EXPANDED, INDEPENDENT, NATIONAL, POOLED, PUBLISHER, finer, resolve
 from ea.store import DATA, connect
 
 SOURCE = "us.medsl_local"
-VERSION = "8"
+GOVERNING = {
+    "commission",
+    "board-of-commissioners",
+    "board-of-supervisors",
+    "council",
+    "commissioners-court",
+    "county-commission",
+    "county-legislature",
+    "county-board",
+    "board-of-county-commissioners",
+    "legislature",
+    "parish-council",
+    "fiscal-court",
+    "quorum-court",
+}
+SYNONYMS = {
+    "county-executive": "executive",
+    "executive": "executive",
+    "chief-executive-officer": "executive",
+    "chief-executive": "executive",
+    "state-s-attorney": "states-attorney",
+    "states-attorney": "states-attorney",
+}
+VERSION = "9"
 PARSED = DATA / "parsed" / SOURCE
 ABBREVIATED = {
     "DAD": {"MIA": "MIAMI"},
@@ -119,7 +143,7 @@ OFFICES = [
     ("board-of-supervisors", "Board of Supervisors", True, r"(?:COUNTY )?(?:BOARD OF )?SUPERVISORS?"),
     ("council", "Council", True, r"COUNTY COUNCIL(?: ?(?:MEMBERS?|MAN|WOMAN|PERSON|ORS?))?|COUNTY COUNCILOR"),
     ("legislature", "Legislature", True, r"COUNTY LEGISLA(?:TURE|TORS?)"),
-    ("county-board", "Board", True, r"COUNTY BOARD(?: MEMBERS?)?"),
+    ("county-board", "Board", True, r"COUNTY BOARD(?! OF EDUCATION)(?: MEMBERS?)?"),
     ("quorum-court", "Quorum Court", True, r"QUORUM COURT(?: JUSTICES?)?"),
     ("justice-of-the-peace", "Justice of the Peace", False, r"JUSTICES? OF THE PEACE"),
     ("magistrate", "Magistrate", False, r"MAGISTRATE"),
@@ -1751,6 +1775,71 @@ def emit() -> Path:
         grouped = {
             keys: rows for keys, rows in lines.group_by("day", "code", "key", "seat", "remainder", maintain_order=True)
         }
+        surnamed = {
+            group: rows["candidate"].unique().to_list()
+            for group, rows in grouped.items()
+            if rows.filter(~pl.col("pooled"))["candidate"].str.contains(r"^[A-Z'-]+$").any()
+        }
+        states = dict(zip(contests["code"], contests["state_po"], strict=True))
+        same_day = finer({day for day, *_ in surnamed})
+        history: dict[str, list[tuple[str, UUID | None]]] = defaultdict(list)
+        held_by_contest: dict[tuple[date, str, UUID], list[tuple[str, UUID | None]]] = defaultdict(list)
+        for day, value, contest, text, person in conn.execute(
+            """select e.date_from, x.value, c.id, n.text, k.person_id from contest c
+               join election e on e.id = c.election_id
+               join external_id x on x.entity_id = coalesce(c.office_id, c.body_id) and x.scheme in ('us.office', 'us.body')
+               join contest_option o on o.contest_id = c.id
+               join candidacy k on k.option_id = o.id and k.role = 'head'
+               join name n on n.entity_id = k.person_id and n.is_preferred
+               join changeset g on g.id = k.changeset_id and g.pipeline <> %s
+               where x.value = any(%s)""",
+            [SOURCE, list({f"{states[code]}:{code}:{key}" for _, code, key, *_ in surnamed})],
+        ).fetchall():
+            history[value].append((text, person))
+            held_by_contest[(day, value.split(":")[1], contest)].append((text, person))
+        for (day, code, _), pool in held_by_contest.items():
+            same_day[(day, code)].append(pool)
+        surnames: set[str] = set()
+        survivors: dict[tuple[str, str], tuple[UUID, str, str]] = {}
+        absorbed: dict[str, UUID] = {}
+        for value, body, pipeline, text in conn.execute(
+            """select x.value, b.id, g.pipeline, n.text
+               from (select id, polity_id, changeset_id from body union all select id, polity_id, changeset_id from office) b
+               join entity e on e.id = b.id and e.retired_by is null
+               join polity p on p.id = b.polity_id and p.kind = 'county'
+               join changeset g on g.id = b.changeset_id
+               join external_id x on x.entity_id = b.id and x.scheme in ('us.body', 'us.office')
+               left join name n on n.entity_id = b.id and n.is_preferred and n.lang = 'en'
+               where x.value ~ '^[A-Z]{2}:[0-9]{5}:[a-z-]+$'
+                 and not exists (select from entity_merge m where m.entity_id = b.id)
+               order by (select count(*) from contest c where b.id in (c.body_id, c.office_id)), b.id"""
+        ).fetchall():
+            state, code, tail = value.split(":")
+            role = (
+                ("council" if state == "IN" and tail == "council" else "governing")
+                if tail in GOVERNING
+                else SYNONYMS.get(tail)
+            )
+            if role is not None and pipeline == SOURCE:
+                absorbed[value] = body
+            elif role is not None:
+                survivors[(code, role)] = (body, tail, text)
+        local_areas = dict(
+            conn.execute(
+                "select c.code, c.area_id from area_code c join area a on a.id = c.area_id"
+                " where a.scheme_code = 'us.local_district'"
+            ).fetchall()
+        )
+        local_units = dict(
+            conn.execute("select code, id from reporting_unit where scheme_code = 'us.local_district'").fetchall()
+        )
+        resolved = {
+            (*group, name): full
+            for group, names in surnamed.items()
+            for name, full in resolve(
+                names, same_day.get((group[0], group[1]), []), history[f"{states[group[1]]}:{group[1]}:{group[2]}"]
+            ).items()
+        }
         starts: dict[tuple[date, str, str], int] = {}
         for row in contests.iter_rows(named=True):
             if re.fullmatch(TERM, row["seat"] or "", re.IGNORECASE):
@@ -1789,7 +1878,19 @@ def emit() -> Path:
                 cs.add("slug", path=f"us/fl/{day}-local", entity_id=parent)
             elif parent in cs.minted and not official:
                 raise ValueError(f"no election {day}:{state}")
-            if (day, f"{state}:{code}:{key}") in taken:
+            survivor = (
+                survivors.get(
+                    (
+                        code,
+                        ("council" if state == "IN" and key == "council" else "governing")
+                        if row["body"]
+                        else SYNONYMS.get(key, ""),
+                    )
+                )
+                if scheme == "us.county" and (key in GOVERNING if row["body"] else key in SYNONYMS)
+                else None
+            )
+            if (day, f"{state}:{code}:{key}") in taken or survivor and (day, f"{state}:{code}:{survivor[1]}") in taken:
                 continue
             contest_key = (
                 f"{day}:{state}:{code}:{key}"
@@ -1830,6 +1931,12 @@ def emit() -> Path:
                 if key == "city-council"
                 else f"{place} {row['title']}"
             )
+            if (code, key) not in owners and survivor is not None:
+                owners[(code, key)] = survivor[0]
+                if f"{state}:{code}:{key}" in absorbed:
+                    cs.merge(absorbed[f"{state}:{code}:{key}"], survivor[0])
+                if key == "council" and (survivor[2] or "").endswith("Board of Commissioners"):
+                    name(survivor[0], office_title)
             if (code, key) not in owners:
                 owner = owners[(code, key)] = cs.key("us.body" if body else "us.office", f"{state}:{code}:{key}")
                 mayoral = key == "mayor" and bool(row["stem"] or office_title.startswith("Mayor of "))
@@ -1845,6 +1952,13 @@ def emit() -> Path:
             area = whole
             if row["district"]:
                 district = f"{code[:2]}:{code}:{key}:{slug(seat)}"
+                theirs = None if survivor is None else f"{code[:2]}:{code}:{survivor[1]}:{slug(seat)}"
+                if theirs is not None and theirs in local_areas and theirs != district:
+                    if district in local_areas:
+                        cs.merge(local_areas[district], local_areas[theirs])
+                    if district in local_units and theirs in local_units:
+                        cs.merge(local_units[district], local_units[theirs])
+                    district = theirs
                 area, unit = cs.area("us.local_district", district), cs.unit("us.local_district", district)
                 if area in cs.minted and district not in districts:
                     districts.add(district)
@@ -1952,7 +2066,7 @@ def emit() -> Path:
                     status="superseded",
                     source_id=source,
                     is_default=False,
-                    completeness=None if row["masked"] else 1,
+                    completeness=None if row["masked"] else 0 if counted["votes"].fill_null(0).sum() == 0 else 1,
                 )
             result_set = cs.key(f"{SOURCE}.result_set", f"{stem}:lines" if fused else stem)
             cs.add(
@@ -1966,7 +2080,7 @@ def emit() -> Path:
                 source_id=source,
                 is_default=True,
                 supersedes_id=previous,
-                completeness=None if row["masked"] else 1,
+                completeness=None if row["masked"] else 0 if counted["votes"].fill_null(0).sum() == 0 else 1,
             )
             cs.add(
                 "note",
@@ -1999,14 +2113,20 @@ def emit() -> Path:
                     option = cs.key("us.option", f"{contest_key}:write-ins")
                     cs.add("contest_option", id=option, contest_id=contest, kind="write_in", ballot_label="Write-ins")
                 else:
-                    ballot = title(candidate)
+                    full, known_person = resolved.get(
+                        (day, code, key, seat, row["remainder"], candidate), (candidate, None)
+                    )
+                    if full != candidate:
+                        surnames.add(f"{state}:{code}:{slug(candidate)}")
+                    ballot = title(full) if full.isupper() else full
                     party_id, independent = (None, False) if token in fused else party(state, label)
-                    person_key = (code, slug(candidate))
+                    person_key = (code, slug(full))
                     if person_key not in persons:
-                        persons[person_key] = cs.key(f"{SOURCE}.person", f"{state}:{code}:{slug(candidate)}")
-                        cs.add("person", id=persons[person_key])
-                        if persons[person_key] in cs.minted:
-                            name(persons[person_key], ballot)
+                        persons[person_key] = known_person or cs.key(f"{SOURCE}.person", f"{state}:{code}:{slug(full)}")
+                        if known_person is None:
+                            cs.add("person", id=persons[person_key])
+                            if persons[person_key] in cs.minted:
+                                name(persons[person_key], ballot)
                     option = cs.key("us.option", f"{contest_key}:{slug(candidate)}")
                     cs.add(
                         "contest_option",
@@ -2198,6 +2318,23 @@ def emit() -> Path:
                 flags=pl.lit(0, pl.Int16),
             ),
         )
+        used = set(persons.values())
+        for (person,) in conn.execute(
+            """select x.entity_id from external_id x
+               where x.scheme = %s and x.value = any(%s)
+                 and not exists (select from entity_merge m where m.into_id = x.entity_id)
+                 and not exists (
+                   select from candidacy d join changeset c on c.id = d.changeset_id
+                   where d.person_id = x.entity_id and c.pipeline <> %s
+                 )""",
+            [f"{SOURCE}.person", sorted(surnames), SOURCE],
+        ).fetchall():
+            if person not in used:
+                cs.add(
+                    "entity_retirement",
+                    entity_id=person,
+                    reason="A surname-only name in MEDSL's files, resolved to the full name",
+                )
         cs.pool("A scattering line in MEDSL's files read as a candidate")
         cs.clear()
         return cs.write()
