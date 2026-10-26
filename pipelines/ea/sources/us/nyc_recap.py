@@ -65,6 +65,37 @@ STATE_OFFICES = re.compile(
 )
 
 
+STATE_SEATS = (
+    (re.compile(r"^PRESIDENT/VICE PRESIDENT"), "president"),
+    (re.compile(r"^GOVERNOR"), "governor"),
+    (re.compile(r"^LIEUTENANT GOVERNOR"), "lieutenant-governor"),
+    (re.compile(r"^ATTORNEY GENERAL"), "attorney-general"),
+    (re.compile(r"^STATE COMPTROLLER"), "state-comptroller"),
+    (re.compile(r"^UNITED STATES SENATOR"), "us-senator"),
+)
+NUMBERED_SEATS = (
+    (re.compile(r"^REPRESENTATIVE IN CONGRESS \((\d+)"), "house"),
+    (re.compile(r"^STATE SENAT(?:OR|E) \((\d+)"), "state-senate"),
+    (re.compile(r"^MEMBER OF THE ASSEMBLY \((\d+)"), "assembly"),
+)
+STATE_TARGETS = {
+    "president": ("electoral_college", "us.state"),
+    "governor": ("governor:NY", "us.state"),
+    "lieutenant-governor": ("lieutenant-governor:NY", "us.state"),
+    "attorney-general": ("attorney-general:NY", "us.state"),
+    "state-comptroller": ("comptroller:NY", "us.state"),
+    "us-senator": ("senate", "us.state"),
+    "house": ("house", "us.cd"),
+    "state-senate": ("NY:senate", "us.sldu"),
+    "assembly": ("NY:assembly", "us.sldl"),
+}
+BODY_KEYS = {"electoral_college", "senate", "house", "NY:senate", "NY:assembly"}
+NOTE_STATE = (
+    " The Board's report covers only the city's part of a contest that reaches beyond it; the official total for "
+    "the whole contest is the default set."
+)
+
+
 def num(text: str) -> int:
     return int(text.replace(",", ""))
 
@@ -178,6 +209,17 @@ def classify(office_text: str, county: str | None) -> dict[str, str | int | None
     text = re.sub(r"^FOR ", "", text)
     party = PARTY_SCOPE.match(text)
     bare = text[party.end() :] if party else text
+    if re.search(r"COMMITTEE|LEADER|DELEGATE|CONVENTION", bare):
+        return None
+    for pattern, seat in STATE_SEATS:
+        if pattern.match(bare):
+            if seat == "us-senator":
+                seat += "-unexpired" if "UNEXPIRED" in bare else "-full" if "FULL TERM" in bare else ""
+            return {"seat": seat, "party": party[1] if party else None, "county": None, "state": 1}
+    for pattern, seat in NUMBERED_SEATS:
+        matched = pattern.match(bare)
+        if matched:
+            return {"seat": seat, "number": int(matched[1]), "party": party[1] if party else None, "county": None, "state": 1}
     if STATE_OFFICES.search(bare.replace("BOROUGH PRESIDENT", "")):
         return None
     for seat, pattern in OFFICES.items():
@@ -331,7 +373,10 @@ def emit() -> Path:
                 urls.setdefault(county, url)
             rows = rows.filter(pl.col("url").is_in(list(urls.values())))
             counties = sorted(urls)
-            wide = seat in ("mayor", "public-advocate", "comptroller")
+            target_seat = "us-senator" if seat.startswith("us-senator") else seat
+            is_state = target_seat in STATE_TARGETS
+            statewide = target_seat in ("president", "governor", "lieutenant-governor", "attorney-general", "state-comptroller", "us-senator")
+            wide = seat in ("mayor", "public-advocate", "comptroller") or statewide
             if wide and len(counties) < 5:
                 skipped.append(f"{label}: only {counties}")
                 continue
@@ -353,7 +398,36 @@ def emit() -> Path:
                 continue
             rows = pl.concat(parts)
             era = "2002" if day_text < "2012-01-01" else "2012"
-            if kind == "General":
+            if is_state:
+                state_kind = "general" if kind == "General" else "primary" if kind == "Primary" else "runoff"
+                election = None
+                for value in ([f"{day}:NY"] if state_kind == "general" else [f"{day}:NY:primary"]):
+                    election = conn.execute(
+                        "select x.entity_id, s.path from external_id x left join slug s on s.entity_id = x.entity_id "
+                        "where x.scheme = 'us.election' and x.value = %s limit 1",
+                        [value],
+                    ).fetchone()
+                if election is None:
+                    if state_kind == "general":
+                        skipped.append(f"{label}: the state's election is not in the archive")
+                        continue
+                    election = (cs.key("us.election", f"{day}:NY:{state_kind}"), f"us/ny/{day}-{state_kind}")
+                    if election[0] in cs.minted and election[0] not in added:
+                        added.add(election[0])
+                        cs.add(
+                            "election",
+                            id=election[0],
+                            polity_id=cs.polity("US-NY"),
+                            kind=state_kind,
+                            date_from=day,
+                            date_to=day,
+                            date_precision="day",
+                            status="held",
+                        )
+                        name(election[0], f"{day.year} New York {state_kind} election")
+                        cs.add("slug", path=election[1], entity_id=election[0])
+                election, election_path = election[0], election[1] or f"us/ny/{day}-{state_kind}"
+            elif kind == "General":
                 election = conn.execute(
                     "select id from election where polity_id = %s and date_from = %s and kind in ('local', 'general') order by kind = 'local' desc",
                     [city, day],
@@ -391,13 +465,27 @@ def emit() -> Path:
                         cs.add("slug", path=f"us/ny/new-york-city/{day}-{election_kind}", entity_id=election)
                 else:
                     election = election[0]
-            election_path = conn.execute("select path from slug where entity_id = %s limit 1", [election]).fetchone()
-            election_path = election_path[0] if election_path else f"us/ny/new-york-city/{day}-{'primary' if kind == 'Primary' else 'runoff'}"
+            if not is_state:
+                election_path = conn.execute("select path from slug where entity_id = %s limit 1", [election]).fetchone()
+                election_path = election_path[0] if election_path else f"us/ny/new-york-city/{day}-{'primary' if kind == 'Primary' else 'runoff'}"
             office = body_id = None
             area = None
             county_name = only_county
             nickname = BOROUGHS[county_name][1] if county_name else None
-            if seat == "mayor":
+            if is_state:
+                key, scheme = STATE_TARGETS[target_seat]
+                path = f"{seat}-{number}" if number is not None else seat
+                title = {
+                    "house": f"U.S. House, New York's {number} congressional district",
+                    "state-senate": f"New York State Senate, District {number}",
+                    "assembly": f"New York State Assembly, District {number}",
+                }.get(seat, {"president": "President", "governor": "Governor", "lieutenant-governor": "Lieutenant Governor", "attorney-general": "Attorney General", "state-comptroller": "State Comptroller"}.get(seat, "U.S. Senator"))
+                area = cs.area(scheme, "36" if scheme == "us.state" else f"36{number:02d}" if scheme == "us.cd" else f"NY:{number}")
+                if key in BODY_KEYS:
+                    body_id = cs.key("us.body", key)
+                else:
+                    office = cs.key("us.office", key)
+            elif seat == "mayor":
                 path, title, office, area = "mayor", "New York City Mayor", cs.key("us.office", "NY:3651000:mayor"), place
             elif seat in ("public-advocate", "comptroller"):
                 path, title = seat, f"New York City {seat.replace('-', ' ').title()}"
@@ -426,7 +514,7 @@ def emit() -> Path:
                     name(office, title)
             party = party_id(scope.title())[0] if scope is not None else None
             seat_path = f"{path}-{slug(scope)}" if scope else path
-            if (office is not None and office in cs.minted and office not in added) or (area is not None and area in cs.minted):
+            if (office is not None and office in cs.minted and office not in added) or (area is not None and area in cs.minted) or (body_id is not None and body_id in cs.minted):
                 skipped.append(f"{label}: its office or district is not in the archive")
                 continue
             found = conn.execute(
@@ -439,13 +527,28 @@ def emit() -> Path:
             if len(found) > 1:
                 skipped.append(f"{label}: several contests match")
                 continue
+            if not found and is_state:
+                found = conn.execute(
+                    "select entity_id from external_id where scheme = 'us.contest' and value = %s",
+                    [f"{day}:NY:{path.replace('-', ':')}" + (f":{slug(scope)}" if scope else "")],
+                ).fetchall()
             part = None
-            if seat == "council":
+            if seat in ("house", "state-senate"):
+                part = f"{seat}-{number}/{era}"
+            elif seat == "council":
                 part = f"council-{number}/{'2003' if day_text < '2013-01-01' else '2013'}"
             elif seat == "civil-court-district":
                 part = f"civil-district-{number}"
             magnitude = int(rows["size"][0])
             attach = bool(found)
+            inside = False
+            if is_state and area is not None:
+                outside = conn.execute(
+                    """select st_area(st_difference(g.geom, st_buffer(n.geom, 0.002))) / st_area(g.geom)
+                       from area_geometry g, area_geometry n where g.area_id = %s and g.valid @> %s::date and n.area_id = %s""",
+                    [area, day, place],
+                ).fetchone()
+                inside = outside is not None and outside[0] <= 0.01
             if attach:
                 contest = found[0][0]
                 contest_key = conn.execute(
@@ -465,12 +568,19 @@ def emit() -> Path:
                     skipped.append(f"{label}: no single default set to compare with")
                     continue
                 completeness = round(min(mine / float(prior[0][1]), 1), 4)
-                if completeness < 0.995 or mine > float(prior[0][1]) * 1.005:
+                if (completeness < 0.995 and not is_state) or mine > float(prior[0][1]) * 1.005:
                     skipped.append(f"{label}: totals disagree ({mine} against {prior[0][1]})")
                     continue
-                whole = completeness >= 0.999
+                whole = completeness >= 0.999 and (inside or not is_state)
+            elif is_state and not inside:
+                skipped.append(f"{label}: not in the archive and not wholly inside the city")
+                continue
             else:
-                contest_key = f"{day}:new-york-city:{seat_path}"
+                contest_key = (
+                    f"{day}:NY:{path.replace('-', ':')}" + (f":{slug(scope)}" if scope else "")
+                    if is_state
+                    else f"{day}:new-york-city:{seat_path}"
+                )
                 contest = cs.key("us.contest", contest_key)
                 whole = True
                 completeness = 1
@@ -525,7 +635,7 @@ def emit() -> Path:
                 is_default=whole,
                 completeness=completeness,
             )
-            cs.add("note", entity_id=result_set, kind="methodology", body_md=NOTE)
+            cs.add("note", entity_id=result_set, kind="methodology", body_md=NOTE + (NOTE_STATE if not whole else ""))
             real = rows.filter(pl.col("party").is_null() | (pl.col("party") != "WRITE-IN")).with_columns(
                 pl.col("name").str.replace_all(r"\s+", " ").alias("name")
             )
@@ -541,7 +651,7 @@ def emit() -> Path:
                        where o.contest_id = %s and o.parent_option_id is null and o.kind in ('candidate', 'ticket')""",
                     [contest],
                 ).fetchall():
-                    words = [w for w in re.sub(r"[^a-z ]", " ", ballot_name.lower()).split() if w not in ("jr", "sr", "ii", "iii")]
+                    words = [w for w in re.sub(r"[^a-z ]", " ", ballot_name.lower().split("/")[0]).split() if w not in ("jr", "sr", "ii", "iii")]
                     token = (words[0], words[-1])
                     if token in known:
                         clash.add(token)
@@ -549,7 +659,7 @@ def emit() -> Path:
             for rank, candidate in enumerate(ranked["name"]):
                 label_text = candidate.title()
                 root_key = f"{contest_key}:{slug(candidate)}"
-                words = [w for w in re.sub(r"[^a-z ]", " ", label_text.lower()).split() if w not in ("jr", "sr", "ii", "iii")]
+                words = [w for w in re.sub(r"[^a-z ]", " ", label_text.lower().split("/")[0]).split() if w not in ("jr", "sr", "ii", "iii")]
                 if attach and len(words) >= 2 and (words[0], words[-1]) in known and (words[0], words[-1]) not in clash:
                     roots[candidate] = known[(words[0], words[-1])]
                     if whole:
