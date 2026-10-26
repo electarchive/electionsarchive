@@ -212,6 +212,10 @@ TURNOUT_NOTE = (
     "police on duty, and voters temporarily abroad. As a result, a polling section or a country abroad can show more "
     "voters than electors. Hospital sections have no electors of their own."
 )
+REFERENDUM_TURNOUT = (
+    "Italy's registered voters and voters, summed from the first question's municipal counts. The quorum is tested "
+    "against this count; later questions' ballots can differ by a few thousand and sit on each question's own result set."
+)
 REFERENDUM_METHODOLOGY = (
     "An abrogative referendum repeals a law, in whole or in part, only if more than half of all registered voters, "
     "including those abroad, take part and a majority of valid votes is Yes (art. 75 of the Constitution)."
@@ -1524,6 +1528,34 @@ def emit() -> Path:
                 round(section_valid[number] / municipal_valid[number], 4),
                 default=False,
             )
+            if number == 1:
+                turnout_set = result_set(f"{VOTING[0]}:referendum:turnout", referendum, None, "preliminary", interno, 1)
+                cs.add("note", entity_id=turnout_set, kind="methodology", body_md=REFERENDUM_TURNOUT)
+                cs.frame(
+                    "result_value",
+                    pl.DataFrame(
+                        [
+                            (
+                                str(turnout_set),
+                                str(cs.unit("it.nation", "IT")),
+                                None,
+                                measure,
+                                comuni_totals[number, measure, None],
+                            )
+                            for measure in (REGISTERED, VOTERS)
+                        ],
+                        schema={
+                            "result_set_id": pl.String,
+                            "unit_id": pl.String,
+                            "option_id": pl.String,
+                            "measure": pl.Int16,
+                            "value": pl.Int64,
+                        },
+                        orient="row",
+                    ).with_columns(
+                        channel=pl.lit(0, pl.Int16), count_round=pl.lit(0, pl.Int16), flags=pl.lit(0, pl.Int16)
+                    ),
+                )
             turnout = comuni_totals[number, VOTERS, None] / comuni_totals[number, REGISTERED, None]
             yes = comuni_totals[number, VOTES, "yes"] / comuni_totals[number, VALID, None]
             cs.add(
