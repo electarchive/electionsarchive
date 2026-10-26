@@ -16,6 +16,76 @@
       "publisher": "Yüksek Seçim Kurulu (YSK)",
       "url": "https://www.ysk.gov.tr/doc/dosyalar/docs/14%20May%C4%B1s%202023%20Cumhurba%C5%9Fkan%C4%B1%20ve%2025.%20D%C3%B6nem%20MV%20Genel%20Se%C3%A7imleri%20%C4%B0statistikleri.pdf",
       "note": "Section 2.6 gives seats per province for 2018 and 2023 (TOPLAM 600 in both). Section 4.3.3 is the constituency table for 2023: 87 rows, with 81 provinces and Ankara, Bursa, İstanbul, and İzmir split into 3, 2, 3, and 2 constituencies. The Kahramanmaraş row shows 5 in its İL TOPLAM cell, but its party cells and section 2.6 both give 8; 8 is used, and the column then sums to 600."
+    },
+    "ysk-1963-bb": {
+      "title": "17 Kasım 1963 Belediye Başkanlığı Seçim Sonuçları",
+      "publisher": "Yüksek Seçim Kurulu (YSK)",
+      "url": "https://www.ysk.gov.tr/doc/dosyalar/docs/Mahalli/1963/KesinSecimSonuclari/1963_Belediye_Baskanligi_Secimleri_Sonucu.pdf"
+    },
+    "ysk-1968-bb": {
+      "title": "2 Haziran 1968 Belediye Başkanlığı Seçim Sonuçları",
+      "publisher": "Yüksek Seçim Kurulu (YSK)",
+      "url": "https://www.ysk.gov.tr/doc/dosyalar/docs/Mahalli/1968/KesinSecimSonuclari/1968_Belediye_Ba%C5%9Fkanligi_Secimleri_Sonucu.pdf"
+    },
+    "ysk-1973-bb": {
+      "title": "9 Aralık 1973 Belediye Başkanlığı Seçim Sonuçları",
+      "publisher": "Yüksek Seçim Kurulu (YSK)",
+      "url": "https://www.ysk.gov.tr/doc/dosyalar/docs/Mahalli/1973/KesinSecimSonuclari/1973_Belediye_Baskanl%C4%B1g%C4%B1_Secimleri_Sonucu.pdf"
+    },
+    "ysk-1977-bb": {
+      "title": "11 Aralık 1977 Belediye Başkanlığı Seçim Sonuçları",
+      "publisher": "Yüksek Seçim Kurulu (YSK)",
+      "url": "https://www.ysk.gov.tr/doc/dosyalar/docs/Mahalli/1977/KesinSecimSonuclari/1977_Belediye_Baskanligi_Secimleri_Sonucu.pdf"
+    },
+    "ysk-2004-bb": {
+      "title": "28 Mart 2004, Belediye Başkanlığı ve Belediye Meclisi Üyeliği Seçimleri",
+      "publisher": "Yüksek Seçim Kurulu (YSK)",
+      "url": "https://www.ysk.gov.tr/doc/dosyalar/docs/2004MahalliIdareler/belediyebsk/Belediyebsk.pdf"
+    },
+    "ysk-2004-bsb": {
+      "title": "28 Mart 2004, Büyükşehir Belediyesi Başkanlığı Seçimi Sonucu (Liste 2)",
+      "publisher": "Yüksek Seçim Kurulu (YSK)",
+      "url": "https://www.ysk.gov.tr/doc/dosyalar/docs/2004MahalliIdareler/buyuksehir/Buyuksehir.pdf"
+    },
+    "ysk-2009-bb": {
+      "title": "29 Mart 2009, Belediye Başkanlığı Seçimleri Sonucu",
+      "publisher": "Yüksek Seçim Kurulu (YSK)",
+      "url": "https://www.ysk.gov.tr/doc/dosyalar/docs/2009MahalliIdareler/ResmiGazete/BelediyeBaskanligi.pdf"
+    },
+    "ysk-2009-bsb": {
+      "title": "29 Mart 2009, Büyükşehir Belediye Başkanlığı Seçimleri (Liste 2)",
+      "publisher": "Yüksek Seçim Kurulu (YSK)",
+      "url": "https://www.ysk.gov.tr/doc/dosyalar/docs/2009MahalliIdareler/ResmiGazete/Buyuksehir.pdf"
+    },
+    "ysk-2014-bb": {
+      "title": "30 Mart 2014, Belediye Başkanlığı Seçimleri Sonucu (Liste 3)",
+      "publisher": "Yüksek Seçim Kurulu (YSK)",
+      "url": "https://www.ysk.gov.tr/doc/dosyalar/docs/2014MahalliIdareler/BelediyeBaskanligi2014.pdf"
+    },
+    "ysk-2014-bsb": {
+      "title": "30 Mart 2014, Büyükşehir Belediye Başkanlığı Seçimleri Sonucu (Liste 2)",
+      "publisher": "Yüksek Seçim Kurulu (YSK)",
+      "url": "https://www.ysk.gov.tr/doc/dosyalar/docs/2014MahalliIdareler/Buyuksehir2014.pdf"
+    },
+    "ysk-2019-bb": {
+      "title": "31 Mart 2019, Belediye Başkanlığı Seçimleri Sonucu (Liste 3)",
+      "publisher": "Yüksek Seçim Kurulu (YSK)",
+      "url": "https://www.ysk.gov.tr/doc/dosyalar/docs/2019MahalliIdareler/KesinSecimSonuclari/2019Mahalli-Liste-3.pdf"
+    },
+    "ysk-2019-bsb": {
+      "title": "31 Mart 2019, Büyükşehir Belediye Başkanlığı Seçimleri Sonucu (Liste 2)",
+      "publisher": "Yüksek Seçim Kurulu (YSK)",
+      "url": "https://www.ysk.gov.tr/doc/dosyalar/docs/2019MahalliIdareler/KesinSecimSonuclari/2019Mahalli-Liste-2.pdf"
+    },
+    "ysk-2024-bb": {
+      "title": "31 Mart 2024, Belediye Başkanlığı Seçimleri Sonucu",
+      "publisher": "Yüksek Seçim Kurulu (YSK)",
+      "url": "https://www.ysk.gov.tr/doc/dosyalar/docs/2024MahalliIdareler/2024KesinSecimSonucları/BELEDIYEBASKANLIGI.pdf"
+    },
+    "ysk-2024-bsb": {
+      "title": "31 Mart 2024, Büyükşehir Belediye Başkanlığı Seçimleri Sonucu",
+      "publisher": "Yüksek Seçim Kurulu (YSK)",
+      "url": "https://www.ysk.gov.tr/doc/dosyalar/docs/2024MahalliIdareler/2024KesinSecimSonucları/BUYUKSEHIRBELEDIYEBASKANLIGI.pdf"
     }
   },
   "levels": [
@@ -296,12 +366,68 @@
       ],
       "gaps": [
         {
-          "from": 1963,
-          "to": 2024,
-          "note": "No official count has been compiled yet."
+          "from": 1984,
+          "to": 1999,
+          "note": "YSK's results for these elections give votes by province but not the number of mayoralties, so they aren't counted yet."
         }
       ],
-      "elections": []
+      "elections": [
+        {
+          "date": "1963-11-17",
+          "contests": 1028,
+          "source": "ysk-1963-bb",
+          "quote": "Seçim Yapılan Belde Sayısı: 1.028"
+        },
+        {
+          "date": "1968-06-02",
+          "contests": 1238,
+          "source": "ysk-1968-bb",
+          "quote": "Seçimi Yapılan Belediye Başkanlığı Sayısı: 1.238"
+        },
+        {
+          "date": "1973-12-09",
+          "contests": 1620,
+          "source": "ysk-1973-bb",
+          "quote": "Seçimi Yapılan Başkanlık Sayısı: 1.620"
+        },
+        {
+          "date": "1977-12-11",
+          "contests": 1710,
+          "source": "ysk-1977-bb",
+          "quote": "Seçimi Yapılan Başkanlık Sayısı: 1.710"
+        },
+        {
+          "date": "2004-03-28",
+          "contests": 3209,
+          "source": "ysk-2004-bb",
+          "quote": "SEÇİMİ YAPILAN BAŞKANLIK SAYISI 3.193 (Belediyebsk.pdf), plus SEÇİMİ YAPILAN BAŞKANLIK SAYISI 16 (Buyuksehir.pdf, metropolitan mayors)."
+        },
+        {
+          "date": "2009-03-29",
+          "contests": 2919,
+          "source": "ysk-2009-bb",
+          "quote": "SEÇİMİ YAPILAN BAŞKANLIK SAYISI 2903 (BelediyeBaskanligi.pdf), plus SEÇİMİ YAPILAN BAŞKANLIK SAYISI 16 (Buyuksehir.pdf, metropolitan mayors)."
+        },
+        {
+          "date": "2014-03-30",
+          "contests": 1381,
+          "source": "ysk-2014-bb",
+          "quote": "SEÇİMİ YAPILAN BAŞKANLIK SAYISI 1.351 (Liste 3), plus SEÇİMİ YAPILAN BAŞKANLIK SAYISI 30 (Liste 2, metropolitan mayors)."
+        },
+        {
+          "date": "2019-03-31",
+          "contests": 1384,
+          "source": "ysk-2019-bb",
+          "quote": "SEÇİMİ YAPILAN BAŞKANLIK SAYISI 1.355 (Liste 3), plus SEÇİMİ YAPILAN BAŞKANLIK SAYISI 29 (Liste 2, metropolitan mayors; Istanbul annulled and not included)."
+        },
+        {
+          "date": "2024-03-31",
+          "contests": 1386,
+          "source": "ysk-2024-bb",
+          "quote": "SEÇİMİ YAPILAN BAŞKANLIK SAYISI 1.356 (BELEDIYEBASKANLIGI.pdf), plus SEÇİMİ YAPILAN BAŞKANLIK SAYISI 30 (BUYUKSEHIRBELEDIYEBASKANLIGI.pdf, metropolitan mayors)."
+        }
+      ],
+      "note": "Counted per mayoralty: every metropolitan, provincial, district, and town (belde) mayor elected at each nationwide local election, as the Supreme Election Council (YSK) reports it. YSK leaves out races it annulled, which were rerun weeks later, such as Istanbul's metropolitan mayor in 2019; the archive counts a rerun with its original election. Council and village headman (muhtar) elections aren't counted here."
     },
     {
       "key": "referendums",

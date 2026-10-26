@@ -150,7 +150,7 @@ IT_REGIONS = {
 }
 
 
-def region(cc: str, scheme: str | None, code: str | None, parent: str | None, election_iso: str) -> str:
+def region(cc: str, scheme: str | None, code: str | None, parent: str | None, election_iso: str | None) -> str:
     if cc == "eu":
         return election_iso.split("-")[0]
     if parent is not None:
@@ -175,7 +175,7 @@ def region(cc: str, scheme: str | None, code: str | None, parent: str | None, el
             return IT_REGIONS.get(name, "")
         if cc in ("br", "ch") and scheme in ("br.uf", "ch.canton"):
             return code
-    if "-" in election_iso:
+    if election_iso is not None and "-" in election_iso:
         return election_iso.split("-", 1)[1]
     return ""
 
@@ -456,7 +456,7 @@ def tally(cc: str, data: dict) -> tuple[dict, list[dict], list[dict]]:
     return goals, elections_out, notes
 
 
-def place_of(cc: str, data: dict, area: str | None, election_iso: str) -> str:
+def place_of(cc: str, data: dict, area: str | None, election_iso: str | None) -> str:
     if area is None:
         return region(cc, None, None, None, election_iso)
     scheme, code, parent = data["places"].get(area, (None, None, None))

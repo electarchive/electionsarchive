@@ -17,6 +17,196 @@
       "title": "45th General Election: 1. Preparing for the General Election (Electoral Districts)",
       "publisher": "Elections Canada",
       "url": "https://www.elections.ca/content.aspx?section=res&dir=rep%2Foff%2Fsta_ge45&document=p1&lang=e"
+    },
+    "ca-prov-on": {
+      "title": "Dates of General Elections, Dates of Opening and Dissolution of Legislatures",
+      "publisher": "Elections Ontario",
+      "url": "https://results.elections.on.ca/api/report-groups/45/report-outputs/1045/pdf/en"
+    },
+    "ca-prov-on-2025": {
+      "title": "Elections Ontario: 2025 general election",
+      "publisher": "Elections Ontario",
+      "url": "https://results.elections.on.ca/en/data-explorer?electionId=527&electionType=GE&fromYear=1867&levelOfDetail=election&toYear=2025"
+    },
+    "ca-prov-qc": {
+      "title": "Statistiques sur les élections générales tenues depuis 1867",
+      "publisher": "Élections Québec",
+      "url": "https://www.electionsquebec.qc.ca/resultats-et-statistiques/statistiques-sur-les-elections-generales-tenues-depuis-1867/"
+    },
+    "ca-prov-qc-2026": {
+      "title": "Élections Québec: 2026 general election",
+      "publisher": "Élections Québec",
+      "url": "https://www.electionsquebec.qc.ca/resultats-et-statistiques/resultats-generales/2026-10-05/"
+    },
+    "ca-prov-nb": {
+      "title": "Provincial Election Results",
+      "publisher": "Elections New Brunswick",
+      "url": "https://www.electionsnb.ca/content/enb/en/resources/publications/election-results.html"
+    },
+    "ca-prov-ns": {
+      "title": "Election and Dissolution Dates",
+      "publisher": "Nova Scotia Legislature",
+      "url": "https://nslegislature.ca/about/history/elections"
+    },
+    "ca-prov-pe": {
+      "title": "Prince Edward Island Historical Review of Provincial Election Results 1900-2009 (Section 1, Chronological Listing)",
+      "publisher": "Elections PEI",
+      "url": "https://www.electionspei.ca/sites/www.electionspei.ca/files/Prince%20Edward%20Island%20Historical%20Review%20of%20Provincial%20Election%20Results%201900-2009.pdf"
+    },
+    "ca-prov-pe-1873": {
+      "title": "Elections PEI: 1873 general election",
+      "publisher": "Elections PEI",
+      "url": "https://www.electionspei.ca/sites/www.electionspei.ca/files/1873_APRILREPORT.pdf"
+    },
+    "ca-prov-pe-1876": {
+      "title": "Elections PEI: 1876 general election",
+      "publisher": "Elections PEI",
+      "url": "https://www.electionspei.ca/sites/www.electionspei.ca/files/1876_AUG17_REPORT.pdf"
+    },
+    "ca-prov-pe-1879": {
+      "title": "Elections PEI: 1879 general election",
+      "publisher": "Elections PEI",
+      "url": "https://www.electionspei.ca/sites/www.electionspei.ca/files/1879_APRIL2_REPORT.pdf"
+    },
+    "ca-prov-pe-1882": {
+      "title": "Elections PEI: 1882 general election",
+      "publisher": "Elections PEI",
+      "url": "https://www.electionspei.ca/sites/www.electionspei.ca/files/1882_MAY8_REPORT.pdf"
+    },
+    "ca-prov-pe-1886": {
+      "title": "Elections PEI: 1886 general election",
+      "publisher": "Elections PEI",
+      "url": "https://www.electionspei.ca/sites/www.electionspei.ca/files/1886_JUNE30_REPORT.pdf"
+    },
+    "ca-prov-pe-1890": {
+      "title": "Elections PEI: 1890 general election",
+      "publisher": "Elections PEI",
+      "url": "https://www.electionspei.ca/sites/www.electionspei.ca/files/1890_JAN30_REPORT.pdf"
+    },
+    "ca-prov-pe-1893": {
+      "title": "Elections PEI: 1893 general election",
+      "publisher": "Elections PEI",
+      "url": "https://www.electionspei.ca/sites/www.electionspei.ca/files/1893_DEC13_REPORT.pdf"
+    },
+    "ca-prov-pe-1897": {
+      "title": "Elections PEI: 1897 general election",
+      "publisher": "Elections PEI",
+      "url": "https://www.electionspei.ca/sites/www.electionspei.ca/files/1897_JULY28_report.pdf"
+    },
+    "ca-prov-pe-1989": {
+      "title": "Elections PEI: 1989 general election",
+      "publisher": "Elections PEI",
+      "url": "https://www.electionspei.ca/sites/www.electionspei.ca/files/PEIVotingStats.pdf"
+    },
+    "ca-prov-pe-1993": {
+      "title": "Elections PEI: 1993 general election",
+      "publisher": "Elections PEI",
+      "url": "https://www.electionspei.ca/sites/www.electionspei.ca/files/PEIVotingStats.pdf"
+    },
+    "ca-prov-pe-1996": {
+      "title": "Elections PEI: 1996 general election",
+      "publisher": "Elections PEI",
+      "url": "https://www.electionspei.ca/resources/history-of-elections-on-pei"
+    },
+    "ca-prov-pe-2000": {
+      "title": "Elections PEI: 2000 general election",
+      "publisher": "Elections PEI",
+      "url": "https://www.electionspei.ca/sites/www.electionspei.ca/files/PEIVotingStats.pdf"
+    },
+    "ca-prov-pe-2003": {
+      "title": "Elections PEI: 2003 general election",
+      "publisher": "Elections PEI",
+      "url": "https://www.electionspei.ca/resources/history-of-elections-on-pei"
+    },
+    "ca-prov-pe-2007": {
+      "title": "Elections PEI: 2007 general election",
+      "publisher": "Elections PEI",
+      "url": "https://www.electionspei.ca/sites/www.electionspei.ca/files/PEIVotingStats.pdf"
+    },
+    "ca-prov-pe-2011": {
+      "title": "Elections PEI: 2011 general election",
+      "publisher": "Elections PEI",
+      "url": "https://www.electionspei.ca/sites/www.electionspei.ca/files/PEIVotingStats.pdf"
+    },
+    "ca-prov-pe-2015": {
+      "title": "Elections PEI: 2015 general election",
+      "publisher": "Elections PEI",
+      "url": "https://www.electionspei.ca/sites/www.electionspei.ca/files/2015%20General%20Election%20Results.pdf"
+    },
+    "ca-prov-pe-2019": {
+      "title": "Elections PEI: 2019 general election",
+      "publisher": "Elections PEI",
+      "url": "https://www.electionspei.ca/sites/www.electionspei.ca/files/PEIVotingStats.pdf"
+    },
+    "ca-prov-pe-2023": {
+      "title": "Elections PEI: 2023 general election",
+      "publisher": "Elections PEI",
+      "url": "https://www.electionspei.ca/resources/history-of-elections-on-pei"
+    },
+    "ca-prov-mb": {
+      "title": "Provincial General Elections",
+      "publisher": "Elections Manitoba",
+      "url": "https://www.electionsmanitoba.ca/en/Resources/General_Elections"
+    },
+    "ca-prov-bc": {
+      "title": "Electoral History of British Columbia, 1871-1986 (general election summary and per-election dates), with the 1987-2001 and 2002-2013 supplements and Elections BC's 2026 election page",
+      "publisher": "Elections British Columbia and the Legislative Library of British Columbia",
+      "url": "https://elections.bc.ca/docs/rpt/1871-1986_ElectoralHistoryofBC.pdf"
+    },
+    "ca-prov-ab": {
+      "title": "Historical General Election Results and Data Tables (1905-Present): Seat Distribution by Party (1905-2023), Date of Election column",
+      "publisher": "Elections Alberta",
+      "url": "https://www.elections.ab.ca/elections/election-results/historical-results/"
+    },
+    "ca-prov-sk": {
+      "title": "Election results: list of provincial general elections (First Provincial General Election, 1905, through the 30th Provincial General Election, 2024)",
+      "publisher": "Elections Saskatchewan",
+      "url": "https://www.elections.sk.ca/reports-data/election-results/"
+    },
+    "ca-prov-nl": {
+      "title": "NL General Election Dates",
+      "publisher": "Legislative Library, House of Assembly of Newfoundland and Labrador (October 2025)",
+      "url": "https://assembly.nl.ca/pdfs/GeneralElectionDatesWritPeriods.pdf"
+    },
+    "ca-prov-yt": {
+      "title": "General Elections",
+      "publisher": "Elections Yukon (Wayback Machine capture dated 2007-01-08)",
+      "url": "https://web.archive.org/web/20070108174544/http:/www.electionsyukon.gov.yk.ca/gen-elections.html"
+    },
+    "ca-prov-yt-2006": {
+      "title": "Reports of the Chief Electoral Officer of Yukon on general elections",
+      "publisher": "Government of Yukon",
+      "url": "https://open.yukon.ca/information/reports-of-the-chief-electoral-officer-of-yukon-on-general-elections"
+    },
+    "ca-prov-yt-2011": {
+      "title": "Reports of the Chief Electoral Officer of Yukon on general elections",
+      "publisher": "Government of Yukon",
+      "url": "https://open.yukon.ca/information/reports-of-the-chief-electoral-officer-of-yukon-on-general-elections"
+    },
+    "ca-prov-yt-2016": {
+      "title": "Reports of the Chief Electoral Officer of Yukon on general elections",
+      "publisher": "Government of Yukon",
+      "url": "https://open.yukon.ca/information/reports-of-the-chief-electoral-officer-of-yukon-on-general-elections"
+    },
+    "ca-prov-yt-2021": {
+      "title": "Reports of the Chief Electoral Officer of Yukon on general elections",
+      "publisher": "Government of Yukon",
+      "url": "https://open.yukon.ca/information/reports-of-the-chief-electoral-officer-of-yukon-on-general-elections"
+    },
+    "ca-prov-yt-2025": {
+      "title": "Yukon election",
+      "publisher": "Government of Yukon",
+      "url": "https://yukon.ca/en/election"
+    },
+    "ca-prov-nt": {
+      "title": "Official Voting Results (Historical)",
+      "publisher": "Elections NWT",
+      "url": "https://www.electionsnwt.ca/en/official-voting-results-historical"
+    },
+    "ca-prov-nu": {
+      "title": "Territorial Elections (news and events)",
+      "publisher": "Elections Nunavut",
+      "url": "https://www.elections.nu.ca/en/news-events/territorial-elections"
     }
   },
   "levels": [
@@ -486,14 +676,3682 @@
       "schemes": [
         "ca.provincial_district"
       ],
-      "gaps": [
+      "gaps": [],
+      "elections": [
         {
-          "from": 1867,
-          "to": 2026,
-          "note": "No official count of provincial and territorial constituencies at each election has been compiled yet."
+          "date": "1867-08-01",
+          "contests": 1,
+          "regions": {
+            "QC": 1
+          },
+          "source": "ca-prov-qc",
+          "quote": "QC: 1867 | août et sept."
+        },
+        {
+          "date": "1867-09-03",
+          "contests": 1,
+          "regions": {
+            "ON": 1
+          },
+          "source": "ca-prov-on",
+          "quote": "ON: Sep 03 1867"
+        },
+        {
+          "date": "1867-09-18",
+          "contests": 1,
+          "regions": {
+            "NS": 1
+          },
+          "source": "ca-prov-ns",
+          "quote": "NS: 24th General Assembly of Nova Scotia | 1867 - 1871 | September 18, 1867"
+        },
+        {
+          "date": "1870-12-27",
+          "contests": 1,
+          "regions": {
+            "MB": 1
+          },
+          "source": "ca-prov-mb",
+          "quote": "MB: 1st ... December 27, 1870"
+        },
+        {
+          "date": "1871-03-21",
+          "contests": 1,
+          "regions": {
+            "ON": 1
+          },
+          "source": "ca-prov-on",
+          "quote": "ON: Mar 21 1871"
+        },
+        {
+          "date": "1871-05-16",
+          "contests": 1,
+          "regions": {
+            "NS": 1
+          },
+          "source": "ca-prov-ns",
+          "quote": "NS: 25th General Assembly of Nova Scotia | 1871 - 1874 | May 16, 1871"
+        },
+        {
+          "date": "1871-06-01",
+          "contests": 1,
+          "regions": {
+            "QC": 1
+          },
+          "source": "ca-prov-qc",
+          "quote": "QC: 1871 | juin et juillet"
+        },
+        {
+          "date": "1871-10-16",
+          "contests": 1,
+          "regions": {
+            "BC": 1
+          },
+          "source": "ca-prov-bc",
+          "quote": "BC: 1ST GENERAL ELECTION 1871 ... Polling Day ... 16 October - 15 December 1871"
+        },
+        {
+          "date": "1873-04-01",
+          "contests": 1,
+          "regions": {
+            "PE": 1
+          },
+          "source": "ca-prov-pe-1873",
+          "quote": "PE: Election Date: April 1873"
+        },
+        {
+          "date": "1874-12-17",
+          "contests": 1,
+          "regions": {
+            "NS": 1
+          },
+          "source": "ca-prov-ns",
+          "quote": "NS: 26th General Assembly of Nova Scotia | 1874 - 1878 | December 17, 1874"
+        },
+        {
+          "date": "1874-12-30",
+          "contests": 1,
+          "regions": {
+            "MB": 1
+          },
+          "source": "ca-prov-mb",
+          "quote": "MB: 2nd ... December 30, 1874"
+        },
+        {
+          "date": "1875-01-18",
+          "contests": 1,
+          "regions": {
+            "ON": 1
+          },
+          "source": "ca-prov-on",
+          "quote": "ON: Jan 18 1875"
+        },
+        {
+          "date": "1875-07-07",
+          "contests": 1,
+          "regions": {
+            "QC": 1
+          },
+          "source": "ca-prov-qc",
+          "quote": "QC: 1875 | 7 juillet"
+        },
+        {
+          "date": "1875-09-11",
+          "contests": 1,
+          "regions": {
+            "BC": 1
+          },
+          "source": "ca-prov-bc",
+          "quote": "BC: 4 Polling Day ... 16 Oct- 11 Sep / 15 Dec 25 Oct"
+        },
+        {
+          "date": "1876-08-17",
+          "contests": 1,
+          "regions": {
+            "PE": 1
+          },
+          "source": "ca-prov-pe-1876",
+          "quote": "PE: Election Date: 17 August 1876"
+        },
+        {
+          "date": "1878-05-01",
+          "contests": 1,
+          "regions": {
+            "QC": 1
+          },
+          "source": "ca-prov-qc",
+          "quote": "QC: 1878 | 1er mai"
+        },
+        {
+          "date": "1878-05-22",
+          "contests": 1,
+          "regions": {
+            "BC": 1
+          },
+          "source": "ca-prov-bc",
+          "quote": "BC: 22May 24 Jul"
+        },
+        {
+          "date": "1878-09-17",
+          "contests": 1,
+          "regions": {
+            "NS": 1
+          },
+          "source": "ca-prov-ns",
+          "quote": "NS: 27th General Assembly of Nova Scotia | 1878 - 1882 | September 17, 1878"
+        },
+        {
+          "date": "1878-12-18",
+          "contests": 1,
+          "regions": {
+            "MB": 1
+          },
+          "source": "ca-prov-mb",
+          "quote": "MB: 3rd ... December 18, 1878"
+        },
+        {
+          "date": "1879-04-02",
+          "contests": 1,
+          "regions": {
+            "PE": 1
+          },
+          "source": "ca-prov-pe-1879",
+          "quote": "PE: Election Date: 2 April 1879"
+        },
+        {
+          "date": "1879-06-05",
+          "contests": 1,
+          "regions": {
+            "ON": 1
+          },
+          "source": "ca-prov-on",
+          "quote": "ON: Jun 05 1879"
+        },
+        {
+          "date": "1879-12-16",
+          "contests": 1,
+          "regions": {
+            "MB": 1
+          },
+          "source": "ca-prov-mb",
+          "quote": "MB: 4th ... December 16, 1879"
+        },
+        {
+          "date": "1881-12-02",
+          "contests": 1,
+          "regions": {
+            "QC": 1
+          },
+          "source": "ca-prov-qc",
+          "quote": "QC: 1881 | 2 décembre"
+        },
+        {
+          "date": "1882-05-08",
+          "contests": 1,
+          "regions": {
+            "PE": 1
+          },
+          "source": "ca-prov-pe-1882",
+          "quote": "PE: Election Date: 8 May 1882"
+        },
+        {
+          "date": "1882-06-20",
+          "contests": 1,
+          "regions": {
+            "NS": 1
+          },
+          "source": "ca-prov-ns",
+          "quote": "NS: 28th General Assembly of Nova Scotia | 1882 - 1886 | June 20, 1882"
+        },
+        {
+          "date": "1882-07-24",
+          "contests": 1,
+          "regions": {
+            "BC": 1
+          },
+          "source": "ca-prov-bc",
+          "quote": "BC: 22May 24 Jul"
+        },
+        {
+          "date": "1883-01-23",
+          "contests": 1,
+          "regions": {
+            "MB": 1
+          },
+          "source": "ca-prov-mb",
+          "quote": "MB: 5th ... January 23, 1883"
+        },
+        {
+          "date": "1883-02-27",
+          "contests": 1,
+          "regions": {
+            "ON": 1
+          },
+          "source": "ca-prov-on",
+          "quote": "ON: Feb 27 1883"
+        },
+        {
+          "date": "1886-06-15",
+          "contests": 1,
+          "regions": {
+            "NS": 1
+          },
+          "source": "ca-prov-ns",
+          "quote": "NS: 29th General Assembly of Nova Scotia | 1886 - 1890 | June 15, 1886"
+        },
+        {
+          "date": "1886-06-30",
+          "contests": 1,
+          "regions": {
+            "PE": 1
+          },
+          "source": "ca-prov-pe-1886",
+          "quote": "PE: Election Date: 30 June 1886"
+        },
+        {
+          "date": "1886-07-07",
+          "contests": 1,
+          "regions": {
+            "BC": 1
+          },
+          "source": "ca-prov-bc",
+          "quote": "BC: STH GENERAL ELECTION 1886 ... Polling day ... 7 July 1886"
+        },
+        {
+          "date": "1886-10-14",
+          "contests": 1,
+          "regions": {
+            "QC": 1
+          },
+          "source": "ca-prov-qc",
+          "quote": "QC: 1886 | 14 octobre"
+        },
+        {
+          "date": "1886-12-09",
+          "contests": 1,
+          "regions": {
+            "MB": 1
+          },
+          "source": "ca-prov-mb",
+          "quote": "MB: 6th ... December 9, 1886"
+        },
+        {
+          "date": "1886-12-28",
+          "contests": 1,
+          "regions": {
+            "ON": 1
+          },
+          "source": "ca-prov-on",
+          "quote": "ON: Dec 28 1886"
+        },
+        {
+          "date": "1888-07-11",
+          "contests": 1,
+          "regions": {
+            "MB": 1
+          },
+          "source": "ca-prov-mb",
+          "quote": "MB: 7th ... July 11, 1888"
+        },
+        {
+          "date": "1890-01-30",
+          "contests": 1,
+          "regions": {
+            "PE": 1
+          },
+          "source": "ca-prov-pe-1890",
+          "quote": "PE: Election Date: 30 January 1890"
+        },
+        {
+          "date": "1890-05-21",
+          "contests": 1,
+          "regions": {
+            "NS": 1
+          },
+          "source": "ca-prov-ns",
+          "quote": "NS: 30th General Assembly of Nova Scotia | 1890 - 1894 | May 21, 1890"
+        },
+        {
+          "date": "1890-06-05",
+          "contests": 1,
+          "regions": {
+            "ON": 1
+          },
+          "source": "ca-prov-on",
+          "quote": "ON: Jun 05 1890"
+        },
+        {
+          "date": "1890-06-13",
+          "contests": 1,
+          "regions": {
+            "BC": 1
+          },
+          "source": "ca-prov-bc",
+          "quote": "BC: 6TH GENERAL ELECTION 1890 ... Polling day ... 13 June 1890"
+        },
+        {
+          "date": "1890-06-17",
+          "contests": 1,
+          "regions": {
+            "QC": 1
+          },
+          "source": "ca-prov-qc",
+          "quote": "QC: 1890 | 17 juin"
+        },
+        {
+          "date": "1892-03-08",
+          "contests": 1,
+          "regions": {
+            "QC": 1
+          },
+          "source": "ca-prov-qc",
+          "quote": "QC: 1892 | 8 mars"
+        },
+        {
+          "date": "1892-07-23",
+          "contests": 1,
+          "regions": {
+            "MB": 1
+          },
+          "source": "ca-prov-mb",
+          "quote": "MB: 8th ... July 23, 1892"
+        },
+        {
+          "date": "1893-12-13",
+          "contests": 1,
+          "regions": {
+            "PE": 1
+          },
+          "source": "ca-prov-pe-1893",
+          "quote": "PE: Election Date: 13 December 1893"
+        },
+        {
+          "date": "1894-03-15",
+          "contests": 1,
+          "regions": {
+            "NS": 1
+          },
+          "source": "ca-prov-ns",
+          "quote": "NS: 31st General Assembly of Nova Scotia | 1894 - 1897 | March 15, 1894"
+        },
+        {
+          "date": "1894-06-26",
+          "contests": 1,
+          "regions": {
+            "ON": 1
+          },
+          "source": "ca-prov-on",
+          "quote": "ON: Jun 26 1894"
+        },
+        {
+          "date": "1894-07-07",
+          "contests": 1,
+          "regions": {
+            "BC": 1
+          },
+          "source": "ca-prov-bc",
+          "quote": "BC: 7 Jul 13 Jun 7 Jul 9 Jul"
+        },
+        {
+          "date": "1896-01-15",
+          "contests": 1,
+          "regions": {
+            "MB": 1
+          },
+          "source": "ca-prov-mb",
+          "quote": "MB: 9th ... January 15, 1896"
+        },
+        {
+          "date": "1897-04-20",
+          "contests": 1,
+          "regions": {
+            "NS": 1
+          },
+          "source": "ca-prov-ns",
+          "quote": "NS: 32nd General Assembly of Nova Scotia | 1897 - 1901 | April 20, 1897"
+        },
+        {
+          "date": "1897-05-11",
+          "contests": 1,
+          "regions": {
+            "QC": 1
+          },
+          "source": "ca-prov-qc",
+          "quote": "QC: 1897 | 11 mai"
+        },
+        {
+          "date": "1897-07-28",
+          "contests": 1,
+          "regions": {
+            "PE": 1
+          },
+          "source": "ca-prov-pe-1897",
+          "quote": "PE: Election Date: 28 July 1897"
+        },
+        {
+          "date": "1898-03-01",
+          "contests": 1,
+          "regions": {
+            "ON": 1
+          },
+          "source": "ca-prov-on",
+          "quote": "ON: Mar 01 1898"
+        },
+        {
+          "date": "1898-07-09",
+          "contests": 1,
+          "regions": {
+            "BC": 1
+          },
+          "source": "ca-prov-bc",
+          "quote": "BC: 7 Jul 13 Jun 7 Jul 9 Jul"
+        },
+        {
+          "date": "1899-12-07",
+          "contests": 1,
+          "regions": {
+            "MB": 1
+          },
+          "source": "ca-prov-mb",
+          "quote": "MB: 10th ... December 7, 1899"
+        },
+        {
+          "date": "1900-06-09",
+          "contests": 1,
+          "regions": {
+            "BC": 1
+          },
+          "source": "ca-prov-bc",
+          "quote": "BC: 1900 1903 1906/7 1909 1912 1916 1920 1924 ... Polling Day ... 9 Jun 3 Oct 2 Feb 25 Nov 28 Mar 14 Sep 1 Dec 20 Jun"
+        },
+        {
+          "date": "1900-12-07",
+          "contests": 1,
+          "regions": {
+            "QC": 1
+          },
+          "source": "ca-prov-qc",
+          "quote": "QC: 1900 | 7 décembre"
+        },
+        {
+          "date": "1900-12-12",
+          "contests": 1,
+          "regions": {
+            "PE": 1
+          },
+          "source": "ca-prov-pe",
+          "quote": "PE: 12 December | Provincial General Election - (LIB)"
+        },
+        {
+          "date": "1901-10-02",
+          "contests": 1,
+          "regions": {
+            "NS": 1
+          },
+          "source": "ca-prov-ns",
+          "quote": "NS: 33rd General Assembly of Nova Scotia | 1901 - 1906 | October 2, 1901"
+        },
+        {
+          "date": "1902-05-29",
+          "contests": 1,
+          "regions": {
+            "ON": 1
+          },
+          "source": "ca-prov-on",
+          "quote": "ON: May 29 1902"
+        },
+        {
+          "date": "1903-07-20",
+          "contests": 1,
+          "regions": {
+            "MB": 1
+          },
+          "source": "ca-prov-mb",
+          "quote": "MB: 11th ... July 20, 1903"
+        },
+        {
+          "date": "1903-10-03",
+          "contests": 1,
+          "regions": {
+            "BC": 1
+          },
+          "source": "ca-prov-bc",
+          "quote": "BC: 1900 1903 1906/7 1909 1912 1916 1920 1924 ... Polling Day ... 9 Jun 3 Oct 2 Feb 25 Nov 28 Mar 14 Sep 1 Dec 20 Jun"
+        },
+        {
+          "date": "1904-11-25",
+          "contests": 1,
+          "regions": {
+            "QC": 1
+          },
+          "source": "ca-prov-qc",
+          "quote": "QC: 1904 | 25 novembre"
+        },
+        {
+          "date": "1904-12-07",
+          "contests": 1,
+          "regions": {
+            "PE": 1
+          },
+          "source": "ca-prov-pe",
+          "quote": "PE: 7 December | Provincial General Election - (LIB)"
+        },
+        {
+          "date": "1905-01-25",
+          "contests": 1,
+          "regions": {
+            "ON": 1
+          },
+          "source": "ca-prov-on",
+          "quote": "ON: Jan 25 1905"
+        },
+        {
+          "date": "1905-11-09",
+          "contests": 1,
+          "regions": {
+            "AB": 1
+          },
+          "source": "ca-prov-ab",
+          "quote": "AB: 1905, Thursday, November 9"
+        },
+        {
+          "date": "1905-12-13",
+          "contests": 1,
+          "regions": {
+            "SK": 1
+          },
+          "source": "ca-prov-sk",
+          "quote": "SK: First Provincial General Election. December 13, 1905."
+        },
+        {
+          "date": "1906-06-20",
+          "contests": 1,
+          "regions": {
+            "NS": 1
+          },
+          "source": "ca-prov-ns",
+          "quote": "NS: 34th General Assembly of Nova Scotia | 1906 - 1911 | June 20, 1906"
+        },
+        {
+          "date": "1907-02-02",
+          "contests": 1,
+          "regions": {
+            "BC": 1
+          },
+          "source": "ca-prov-bc",
+          "quote": "BC: 1900 1903 1906/7 1909 1912 1916 1920 1924 ... Polling Day ... 9 Jun 3 Oct 2 Feb 25 Nov 28 Mar 14 Sep 1 Dec 20 Jun"
+        },
+        {
+          "date": "1907-03-07",
+          "contests": 1,
+          "regions": {
+            "MB": 1
+          },
+          "source": "ca-prov-mb",
+          "quote": "MB: 12th ... March 7, 1907"
+        },
+        {
+          "date": "1908-06-08",
+          "contests": 2,
+          "regions": {
+            "ON": 1,
+            "QC": 1
+          },
+          "source": "ca-prov-on",
+          "quote": "ON: Jun 08 1908 | QC: 1908 | 8 juin"
+        },
+        {
+          "date": "1908-08-14",
+          "contests": 1,
+          "regions": {
+            "SK": 1
+          },
+          "source": "ca-prov-sk",
+          "quote": "SK: Second Provincial General Election. August 14, 1908."
+        },
+        {
+          "date": "1908-11-18",
+          "contests": 1,
+          "regions": {
+            "PE": 1
+          },
+          "source": "ca-prov-pe",
+          "quote": "PE: 18 November | Provincial General Election - (LIB)"
+        },
+        {
+          "date": "1909-03-22",
+          "contests": 1,
+          "regions": {
+            "AB": 1
+          },
+          "source": "ca-prov-ab",
+          "quote": "AB: 1909, Monday, March 22"
+        },
+        {
+          "date": "1909-06-28",
+          "contests": 1,
+          "regions": {
+            "YT": 1
+          },
+          "source": "ca-prov-yt",
+          "quote": "YT: 1909 | June 28"
+        },
+        {
+          "date": "1909-11-25",
+          "contests": 1,
+          "regions": {
+            "BC": 1
+          },
+          "source": "ca-prov-bc",
+          "quote": "BC: 1900 1903 1906/7 1909 1912 1916 1920 1924 ... Polling Day ... 9 Jun 3 Oct 2 Feb 25 Nov 28 Mar 14 Sep 1 Dec 20 Jun"
+        },
+        {
+          "date": "1910-07-11",
+          "contests": 1,
+          "regions": {
+            "MB": 1
+          },
+          "source": "ca-prov-mb",
+          "quote": "MB: 13th ... July 11, 1910"
+        },
+        {
+          "date": "1911-06-14",
+          "contests": 1,
+          "regions": {
+            "NS": 1
+          },
+          "source": "ca-prov-ns",
+          "quote": "NS: 35th General Assembly of Nova Scotia | 1911 - 1916 | June 14, 1911"
+        },
+        {
+          "date": "1911-12-11",
+          "contests": 1,
+          "regions": {
+            "ON": 1
+          },
+          "source": "ca-prov-on",
+          "quote": "ON: Dec 11 1911"
+        },
+        {
+          "date": "1912-01-03",
+          "contests": 1,
+          "regions": {
+            "PE": 1
+          },
+          "source": "ca-prov-pe",
+          "quote": "PE: 3 January | Provincial General Election - (CON)"
+        },
+        {
+          "date": "1912-03-28",
+          "contests": 1,
+          "regions": {
+            "BC": 1
+          },
+          "source": "ca-prov-bc",
+          "quote": "BC: 1900 1903 1906/7 1909 1912 1916 1920 1924 ... Polling Day ... 9 Jun 3 Oct 2 Feb 25 Nov 28 Mar 14 Sep 1 Dec 20 Jun"
+        },
+        {
+          "date": "1912-04-29",
+          "contests": 1,
+          "regions": {
+            "YT": 1
+          },
+          "source": "ca-prov-yt",
+          "quote": "YT: 1912 | April 29"
+        },
+        {
+          "date": "1912-05-15",
+          "contests": 1,
+          "regions": {
+            "QC": 1
+          },
+          "source": "ca-prov-qc",
+          "quote": "QC: 1912 | 15 mai"
+        },
+        {
+          "date": "1912-07-11",
+          "contests": 1,
+          "regions": {
+            "SK": 1
+          },
+          "source": "ca-prov-sk",
+          "quote": "SK: Third Provincial General Election. July 11, 1912."
+        },
+        {
+          "date": "1913-04-17",
+          "contests": 1,
+          "regions": {
+            "AB": 1
+          },
+          "source": "ca-prov-ab",
+          "quote": "AB: 1913, Thursday, April 17"
+        },
+        {
+          "date": "1914-06-29",
+          "contests": 1,
+          "regions": {
+            "ON": 1
+          },
+          "source": "ca-prov-on",
+          "quote": "ON: Jun 29 1914"
+        },
+        {
+          "date": "1914-07-10",
+          "contests": 1,
+          "regions": {
+            "MB": 1
+          },
+          "source": "ca-prov-mb",
+          "quote": "MB: 14th ... July 10, 1914"
+        },
+        {
+          "date": "1915-03-04",
+          "contests": 1,
+          "regions": {
+            "YT": 1
+          },
+          "source": "ca-prov-yt",
+          "quote": "YT: 1915 | March 4"
+        },
+        {
+          "date": "1915-08-06",
+          "contests": 1,
+          "regions": {
+            "MB": 1
+          },
+          "source": "ca-prov-mb",
+          "quote": "MB: 15th ... August 6, 1915"
+        },
+        {
+          "date": "1915-09-16",
+          "contests": 1,
+          "regions": {
+            "PE": 1
+          },
+          "source": "ca-prov-pe",
+          "quote": "PE: 16 September | Provincial General Election - (CON)"
+        },
+        {
+          "date": "1916-05-22",
+          "contests": 1,
+          "regions": {
+            "QC": 1
+          },
+          "source": "ca-prov-qc",
+          "quote": "QC: 1916 | 22 mai"
+        },
+        {
+          "date": "1916-06-20",
+          "contests": 1,
+          "regions": {
+            "NS": 1
+          },
+          "source": "ca-prov-ns",
+          "quote": "NS: 36th General Assembly of Nova Scotia | 1916 - 1920 | June 20, 1916"
+        },
+        {
+          "date": "1916-09-14",
+          "contests": 1,
+          "regions": {
+            "BC": 1
+          },
+          "source": "ca-prov-bc",
+          "quote": "BC: 1900 1903 1906/7 1909 1912 1916 1920 1924 ... Polling Day ... 9 Jun 3 Oct 2 Feb 25 Nov 28 Mar 14 Sep 1 Dec 20 Jun"
+        },
+        {
+          "date": "1917-03-15",
+          "contests": 1,
+          "regions": {
+            "YT": 1
+          },
+          "source": "ca-prov-yt",
+          "quote": "YT: 1917 | March 15"
+        },
+        {
+          "date": "1917-06-07",
+          "contests": 1,
+          "regions": {
+            "AB": 1
+          },
+          "source": "ca-prov-ab",
+          "quote": "AB: 1917, Thursday, June 7"
+        },
+        {
+          "date": "1917-06-26",
+          "contests": 1,
+          "regions": {
+            "SK": 1
+          },
+          "source": "ca-prov-sk",
+          "quote": "SK: Fourth Provincial General Election. June 26, 1917."
+        },
+        {
+          "date": "1919-06-23",
+          "contests": 1,
+          "regions": {
+            "QC": 1
+          },
+          "source": "ca-prov-qc",
+          "quote": "QC: 1919 | 23 juin"
+        },
+        {
+          "date": "1919-07-24",
+          "contests": 1,
+          "regions": {
+            "PE": 1
+          },
+          "source": "ca-prov-pe",
+          "quote": "PE: 24 July | Provincial General Election - (LIB)"
+        },
+        {
+          "date": "1919-10-20",
+          "contests": 1,
+          "regions": {
+            "ON": 1
+          },
+          "source": "ca-prov-on",
+          "quote": "ON: Oct 20 1919"
+        },
+        {
+          "date": "1920-02-25",
+          "contests": 1,
+          "regions": {
+            "YT": 1
+          },
+          "source": "ca-prov-yt",
+          "quote": "YT: 1920 | February 25"
+        },
+        {
+          "date": "1920-06-29",
+          "contests": 1,
+          "regions": {
+            "MB": 1
+          },
+          "source": "ca-prov-mb",
+          "quote": "MB: 16th ... June 29, 1920"
+        },
+        {
+          "date": "1920-07-27",
+          "contests": 1,
+          "regions": {
+            "NS": 1
+          },
+          "source": "ca-prov-ns",
+          "quote": "NS: 37th General Assembly of Nova Scotia | 1920 - 1925 | July 27, 1920"
+        },
+        {
+          "date": "1920-12-01",
+          "contests": 1,
+          "regions": {
+            "BC": 1
+          },
+          "source": "ca-prov-bc",
+          "quote": "BC: 1900 1903 1906/7 1909 1912 1916 1920 1924 ... Polling Day ... 9 Jun 3 Oct 2 Feb 25 Nov 28 Mar 14 Sep 1 Dec 20 Jun"
+        },
+        {
+          "date": "1921-06-09",
+          "contests": 1,
+          "regions": {
+            "SK": 1
+          },
+          "source": "ca-prov-sk",
+          "quote": "SK: Fifth Provincial General Election. June 9, 1921."
+        },
+        {
+          "date": "1921-07-18",
+          "contests": 1,
+          "regions": {
+            "AB": 1
+          },
+          "source": "ca-prov-ab",
+          "quote": "AB: 1921, Monday, July 18"
+        },
+        {
+          "date": "1922-07-18",
+          "contests": 1,
+          "regions": {
+            "MB": 1
+          },
+          "source": "ca-prov-mb",
+          "quote": "MB: 17th ... July 18, 1922"
+        },
+        {
+          "date": "1922-08-12",
+          "contests": 1,
+          "regions": {
+            "YT": 1
+          },
+          "source": "ca-prov-yt",
+          "quote": "YT: 1922 | August 12"
+        },
+        {
+          "date": "1923-02-05",
+          "contests": 1,
+          "regions": {
+            "QC": 1
+          },
+          "source": "ca-prov-qc",
+          "quote": "QC: 1923 | 5 février"
+        },
+        {
+          "date": "1923-06-25",
+          "contests": 1,
+          "regions": {
+            "ON": 1
+          },
+          "source": "ca-prov-on",
+          "quote": "ON: Jun 25 1923"
+        },
+        {
+          "date": "1923-07-24",
+          "contests": 1,
+          "regions": {
+            "PE": 1
+          },
+          "source": "ca-prov-pe",
+          "quote": "PE: 24 July | Provincial General Election - (CON)"
+        },
+        {
+          "date": "1924-06-20",
+          "contests": 1,
+          "regions": {
+            "BC": 1
+          },
+          "source": "ca-prov-bc",
+          "quote": "BC: 1900 1903 1906/7 1909 1912 1916 1920 1924 ... Polling Day ... 9 Jun 3 Oct 2 Feb 25 Nov 28 Mar 14 Sep 1 Dec 20 Jun"
+        },
+        {
+          "date": "1925-06-02",
+          "contests": 1,
+          "regions": {
+            "SK": 1
+          },
+          "source": "ca-prov-sk",
+          "quote": "SK: Sixth Provincial General Election. June 2, 1925."
+        },
+        {
+          "date": "1925-06-25",
+          "contests": 1,
+          "regions": {
+            "NS": 1
+          },
+          "source": "ca-prov-ns",
+          "quote": "NS: 38th General Assembly of Nova Scotia | 1925 - 1928 | June 25, 1925"
+        },
+        {
+          "date": "1925-09-07",
+          "contests": 1,
+          "regions": {
+            "YT": 1
+          },
+          "source": "ca-prov-yt",
+          "quote": "YT: 1925 | September 7"
+        },
+        {
+          "date": "1926-06-28",
+          "contests": 1,
+          "regions": {
+            "AB": 1
+          },
+          "source": "ca-prov-ab",
+          "quote": "AB: 1926, Monday, June 28"
+        },
+        {
+          "date": "1926-12-01",
+          "contests": 1,
+          "regions": {
+            "ON": 1
+          },
+          "source": "ca-prov-on",
+          "quote": "ON: Dec 01 1926"
+        },
+        {
+          "date": "1927-05-16",
+          "contests": 1,
+          "regions": {
+            "QC": 1
+          },
+          "source": "ca-prov-qc",
+          "quote": "QC: 1927 | 16 mai"
+        },
+        {
+          "date": "1927-06-25",
+          "contests": 1,
+          "regions": {
+            "PE": 1
+          },
+          "source": "ca-prov-pe",
+          "quote": "PE: 25 June | Provincial General Election - (LIB)"
+        },
+        {
+          "date": "1927-06-28",
+          "contests": 1,
+          "regions": {
+            "MB": 1
+          },
+          "source": "ca-prov-mb",
+          "quote": "MB: 18th ... June 28, 1927"
+        },
+        {
+          "date": "1928-07-16",
+          "contests": 1,
+          "regions": {
+            "YT": 1
+          },
+          "source": "ca-prov-yt",
+          "quote": "YT: 1928 | July 16"
+        },
+        {
+          "date": "1928-07-18",
+          "contests": 1,
+          "regions": {
+            "BC": 1
+          },
+          "source": "ca-prov-bc",
+          "quote": "BC: 1928 1933 1937 1941 1945 1949 1952 1953 ... 4 Polling Day ... 18 Jul | 2Nov | 1 Jun | 21 Oct | 25 Oct | 15 Jun | 12 Jun | 9Jun"
+        },
+        {
+          "date": "1928-10-01",
+          "contests": 1,
+          "regions": {
+            "NS": 1
+          },
+          "source": "ca-prov-ns",
+          "quote": "NS: 39th General Assembly of Nova Scotia | 1928 - 1933 | October 1, 1928"
+        },
+        {
+          "date": "1929-06-06",
+          "contests": 1,
+          "regions": {
+            "SK": 1
+          },
+          "source": "ca-prov-sk",
+          "quote": "SK: Seventh Provincial General Election. June 6, 1929."
+        },
+        {
+          "date": "1929-10-30",
+          "contests": 1,
+          "regions": {
+            "ON": 1
+          },
+          "source": "ca-prov-on",
+          "quote": "ON: Oct 30 1929"
+        },
+        {
+          "date": "1930-06-19",
+          "contests": 1,
+          "regions": {
+            "AB": 1
+          },
+          "source": "ca-prov-ab",
+          "quote": "AB: 1930, Thursday, June 19"
+        },
+        {
+          "date": "1931-08-06",
+          "contests": 1,
+          "regions": {
+            "PE": 1
+          },
+          "source": "ca-prov-pe",
+          "quote": "PE: 6 August | Provincial General Election - (CON)"
+        },
+        {
+          "date": "1931-08-10",
+          "contests": 1,
+          "regions": {
+            "YT": 1
+          },
+          "source": "ca-prov-yt",
+          "quote": "YT: 1931 | August 10"
+        },
+        {
+          "date": "1931-08-24",
+          "contests": 1,
+          "regions": {
+            "QC": 1
+          },
+          "source": "ca-prov-qc",
+          "quote": "QC: 1931 | 24 août"
+        },
+        {
+          "date": "1932-06-16",
+          "contests": 1,
+          "regions": {
+            "MB": 1
+          },
+          "source": "ca-prov-mb",
+          "quote": "MB: 19th ... June 16, 1932"
+        },
+        {
+          "date": "1933-08-22",
+          "contests": 1,
+          "regions": {
+            "NS": 1
+          },
+          "source": "ca-prov-ns",
+          "quote": "NS: 40th General Assembly of Nova Scotia | 1933 - 1937 | August 22, 1933"
+        },
+        {
+          "date": "1933-11-02",
+          "contests": 1,
+          "regions": {
+            "BC": 1
+          },
+          "source": "ca-prov-bc",
+          "quote": "BC: 4 Polling Day ... 18 Jul | 2Nov | 1 Jun | 21 Oct | 25 Oct | 15 Jun | 12 Jun | 9Jun"
+        },
+        {
+          "date": "1934-06-19",
+          "contests": 2,
+          "regions": {
+            "ON": 1,
+            "SK": 1
+          },
+          "source": "ca-prov-on",
+          "quote": "ON: Jun 19 1934 | SK: Eighth Provincial General Election. June 19, 1934."
+        },
+        {
+          "date": "1934-09-17",
+          "contests": 1,
+          "regions": {
+            "YT": 1
+          },
+          "source": "ca-prov-yt",
+          "quote": "YT: 1934 | September 17"
+        },
+        {
+          "date": "1935-07-23",
+          "contests": 1,
+          "regions": {
+            "PE": 1
+          },
+          "source": "ca-prov-pe",
+          "quote": "PE: 23 July | Provincial General Election - (LIB)"
+        },
+        {
+          "date": "1935-08-22",
+          "contests": 1,
+          "regions": {
+            "AB": 1
+          },
+          "source": "ca-prov-ab",
+          "quote": "AB: 1935, Thursday, August 22"
+        },
+        {
+          "date": "1935-11-25",
+          "contests": 1,
+          "regions": {
+            "QC": 1
+          },
+          "source": "ca-prov-qc",
+          "quote": "QC: 1935 | 25 novembre"
+        },
+        {
+          "date": "1936-07-27",
+          "contests": 1,
+          "regions": {
+            "MB": 1
+          },
+          "source": "ca-prov-mb",
+          "quote": "MB: 20th ... July 27, 1936"
+        },
+        {
+          "date": "1936-08-17",
+          "contests": 1,
+          "regions": {
+            "QC": 1
+          },
+          "source": "ca-prov-qc",
+          "quote": "QC: 1936 | 17 août"
+        },
+        {
+          "date": "1937-06-01",
+          "contests": 1,
+          "regions": {
+            "BC": 1
+          },
+          "source": "ca-prov-bc",
+          "quote": "BC: 4 Polling Day ... 18 Jul | 2Nov | 1 Jun | 21 Oct | 25 Oct | 15 Jun | 12 Jun | 9Jun"
+        },
+        {
+          "date": "1937-06-29",
+          "contests": 1,
+          "regions": {
+            "NS": 1
+          },
+          "source": "ca-prov-ns",
+          "quote": "NS: 41st General Assembly of Nova Scotia | 1937 - 1941 | June 29, 1937"
+        },
+        {
+          "date": "1937-08-27",
+          "contests": 1,
+          "regions": {
+            "YT": 1
+          },
+          "source": "ca-prov-yt",
+          "quote": "YT: 1937 | August 27"
+        },
+        {
+          "date": "1937-10-06",
+          "contests": 1,
+          "regions": {
+            "ON": 1
+          },
+          "source": "ca-prov-on",
+          "quote": "ON: Oct 06 1937"
+        },
+        {
+          "date": "1938-06-08",
+          "contests": 1,
+          "regions": {
+            "SK": 1
+          },
+          "source": "ca-prov-sk",
+          "quote": "SK: Ninth Provincial General Election. June 8, 1938."
+        },
+        {
+          "date": "1939-05-18",
+          "contests": 1,
+          "regions": {
+            "PE": 1
+          },
+          "source": "ca-prov-pe",
+          "quote": "PE: 18 May | Provincial General Election - (LIB)"
+        },
+        {
+          "date": "1939-10-25",
+          "contests": 1,
+          "regions": {
+            "QC": 1
+          },
+          "source": "ca-prov-qc",
+          "quote": "QC: 1939 | 25 octobre"
+        },
+        {
+          "date": "1940-03-21",
+          "contests": 1,
+          "regions": {
+            "AB": 1
+          },
+          "source": "ca-prov-ab",
+          "quote": "AB: 1940, Thursday, March 21"
+        },
+        {
+          "date": "1940-11-25",
+          "contests": 1,
+          "regions": {
+            "YT": 1
+          },
+          "source": "ca-prov-yt",
+          "quote": "YT: 1940 | November 25"
+        },
+        {
+          "date": "1941-04-22",
+          "contests": 1,
+          "regions": {
+            "MB": 1
+          },
+          "source": "ca-prov-mb",
+          "quote": "MB: 21st ... April 22, 1941"
+        },
+        {
+          "date": "1941-10-21",
+          "contests": 1,
+          "regions": {
+            "BC": 1
+          },
+          "source": "ca-prov-bc",
+          "quote": "BC: 4 Polling Day ... 18 Jul | 2Nov | 1 Jun | 21 Oct | 25 Oct | 15 Jun | 12 Jun | 9Jun"
+        },
+        {
+          "date": "1941-10-28",
+          "contests": 1,
+          "regions": {
+            "NS": 1
+          },
+          "source": "ca-prov-ns",
+          "quote": "NS: 42nd General Assembly of Nova Scotia | 1941 - 1945 | October 28, 1941"
+        },
+        {
+          "date": "1943-08-04",
+          "contests": 1,
+          "regions": {
+            "ON": 1
+          },
+          "source": "ca-prov-on",
+          "quote": "ON: Aug 04 1943"
+        },
+        {
+          "date": "1943-09-15",
+          "contests": 1,
+          "regions": {
+            "PE": 1
+          },
+          "source": "ca-prov-pe",
+          "quote": "PE: 15 September | Provincial General Election - (LIB)"
+        },
+        {
+          "date": "1944-02-09",
+          "contests": 1,
+          "regions": {
+            "YT": 1
+          },
+          "source": "ca-prov-yt",
+          "quote": "YT: 1944 | February 9"
+        },
+        {
+          "date": "1944-06-15",
+          "contests": 1,
+          "regions": {
+            "SK": 1
+          },
+          "source": "ca-prov-sk",
+          "quote": "SK: Tenth Provincial General Election. June 15, 1944."
+        },
+        {
+          "date": "1944-08-08",
+          "contests": 2,
+          "regions": {
+            "QC": 1,
+            "AB": 1
+          },
+          "source": "ca-prov-qc",
+          "quote": "QC: 1944 | 8 août | AB: 1944, Tuesday, August 8"
+        },
+        {
+          "date": "1945-06-04",
+          "contests": 1,
+          "regions": {
+            "ON": 1
+          },
+          "source": "ca-prov-on",
+          "quote": "ON: Jun 04 1945"
+        },
+        {
+          "date": "1945-10-15",
+          "contests": 1,
+          "regions": {
+            "MB": 1
+          },
+          "source": "ca-prov-mb",
+          "quote": "MB: 22nd ... October 15, 1945"
+        },
+        {
+          "date": "1945-10-23",
+          "contests": 1,
+          "regions": {
+            "NS": 1
+          },
+          "source": "ca-prov-ns",
+          "quote": "NS: 43rd General Assembly of Nova Scotia | 1945 - 1949 | October 23, 1945"
+        },
+        {
+          "date": "1945-10-25",
+          "contests": 1,
+          "regions": {
+            "BC": 1
+          },
+          "source": "ca-prov-bc",
+          "quote": "BC: 4 Polling Day ... 18 Jul | 2Nov | 1 Jun | 21 Oct | 25 Oct | 15 Jun | 12 Jun | 9Jun"
+        },
+        {
+          "date": "1947-02-13",
+          "contests": 1,
+          "regions": {
+            "YT": 1
+          },
+          "source": "ca-prov-yt",
+          "quote": "YT: 1947 | February 13"
+        },
+        {
+          "date": "1947-12-11",
+          "contests": 1,
+          "regions": {
+            "PE": 1
+          },
+          "source": "ca-prov-pe",
+          "quote": "PE: 11 December | Provincial General Election - (LIB)"
+        },
+        {
+          "date": "1948-06-07",
+          "contests": 1,
+          "regions": {
+            "ON": 1
+          },
+          "source": "ca-prov-on",
+          "quote": "ON: Jun 07 1948"
+        },
+        {
+          "date": "1948-06-24",
+          "contests": 1,
+          "regions": {
+            "SK": 1
+          },
+          "source": "ca-prov-sk",
+          "quote": "SK: Eleventh Provincial General Election. June 24, 1948."
+        },
+        {
+          "date": "1948-07-28",
+          "contests": 1,
+          "regions": {
+            "QC": 1
+          },
+          "source": "ca-prov-qc",
+          "quote": "QC: 1948 | 28 juillet"
+        },
+        {
+          "date": "1948-08-17",
+          "contests": 1,
+          "regions": {
+            "AB": 1
+          },
+          "source": "ca-prov-ab",
+          "quote": "AB: 1948, Tuesday, August 17"
+        },
+        {
+          "date": "1949-05-27",
+          "contests": 1,
+          "regions": {
+            "NL": 1
+          },
+          "source": "ca-prov-nl",
+          "quote": "NL: 1949 May 27"
+        },
+        {
+          "date": "1949-06-09",
+          "contests": 1,
+          "regions": {
+            "NS": 1
+          },
+          "source": "ca-prov-ns",
+          "quote": "NS: 44th General Assembly of Nova Scotia | 1949 - 1953 | June 9, 1949"
+        },
+        {
+          "date": "1949-06-15",
+          "contests": 1,
+          "regions": {
+            "BC": 1
+          },
+          "source": "ca-prov-bc",
+          "quote": "BC: 4 Polling Day ... 18 Jul | 2Nov | 1 Jun | 21 Oct | 25 Oct | 15 Jun | 12 Jun | 9Jun"
+        },
+        {
+          "date": "1949-07-25",
+          "contests": 1,
+          "regions": {
+            "YT": 1
+          },
+          "source": "ca-prov-yt",
+          "quote": "YT: 1949 | July 25"
+        },
+        {
+          "date": "1949-11-10",
+          "contests": 1,
+          "regions": {
+            "MB": 1
+          },
+          "source": "ca-prov-mb",
+          "quote": "MB: 23rd ... November 10, 1949"
+        },
+        {
+          "date": "1951-04-26",
+          "contests": 1,
+          "regions": {
+            "PE": 1
+          },
+          "source": "ca-prov-pe",
+          "quote": "PE: 26 April | Provincial General Election - (LIB)"
+        },
+        {
+          "date": "1951-11-22",
+          "contests": 1,
+          "regions": {
+            "ON": 1
+          },
+          "source": "ca-prov-on",
+          "quote": "ON: Nov 22 1951"
+        },
+        {
+          "date": "1951-11-26",
+          "contests": 1,
+          "regions": {
+            "NL": 1
+          },
+          "source": "ca-prov-nl",
+          "quote": "NL: 1951 November 26"
+        },
+        {
+          "date": "1952-06-11",
+          "contests": 1,
+          "regions": {
+            "SK": 1
+          },
+          "source": "ca-prov-sk",
+          "quote": "SK: Twelfth Provincial General Election. June 11, 1952."
+        },
+        {
+          "date": "1952-06-12",
+          "contests": 1,
+          "regions": {
+            "BC": 1
+          },
+          "source": "ca-prov-bc",
+          "quote": "BC: 4 Polling Day ... 18 Jul | 2Nov | 1 Jun | 21 Oct | 25 Oct | 15 Jun | 12 Jun | 9Jun"
+        },
+        {
+          "date": "1952-07-16",
+          "contests": 1,
+          "regions": {
+            "QC": 1
+          },
+          "source": "ca-prov-qc",
+          "quote": "QC: 1952 | 16 juillet"
+        },
+        {
+          "date": "1952-08-05",
+          "contests": 1,
+          "regions": {
+            "AB": 1
+          },
+          "source": "ca-prov-ab",
+          "quote": "AB: 1952, Tuesday, August 5"
+        },
+        {
+          "date": "1952-08-20",
+          "contests": 1,
+          "regions": {
+            "YT": 1
+          },
+          "source": "ca-prov-yt",
+          "quote": "YT: 1952 | August 20"
+        },
+        {
+          "date": "1953-05-26",
+          "contests": 1,
+          "regions": {
+            "NS": 1
+          },
+          "source": "ca-prov-ns",
+          "quote": "NS: 45th General Assembly of Nova Scotia | 1953 - 1956 | May 26, 1953"
+        },
+        {
+          "date": "1953-06-08",
+          "contests": 1,
+          "regions": {
+            "MB": 1
+          },
+          "source": "ca-prov-mb",
+          "quote": "MB: 24th ... June 8, 1953"
+        },
+        {
+          "date": "1953-06-09",
+          "contests": 1,
+          "regions": {
+            "BC": 1
+          },
+          "source": "ca-prov-bc",
+          "quote": "BC: 4 Polling Day ... 18 Jul | 2Nov | 1 Jun | 21 Oct | 25 Oct | 15 Jun | 12 Jun | 9Jun"
+        },
+        {
+          "date": "1955-05-25",
+          "contests": 1,
+          "regions": {
+            "PE": 1
+          },
+          "source": "ca-prov-pe",
+          "quote": "PE: 25 May | Provincial General Election - (LIB)"
+        },
+        {
+          "date": "1955-06-09",
+          "contests": 1,
+          "regions": {
+            "ON": 1
+          },
+          "source": "ca-prov-on",
+          "quote": "ON: Jun 09 1955"
+        },
+        {
+          "date": "1955-06-29",
+          "contests": 1,
+          "regions": {
+            "AB": 1
+          },
+          "source": "ca-prov-ab",
+          "quote": "AB: 1955, Wednesday, June 29"
+        },
+        {
+          "date": "1955-09-28",
+          "contests": 1,
+          "regions": {
+            "YT": 1
+          },
+          "source": "ca-prov-yt",
+          "quote": "YT: 1955 | September 28"
+        },
+        {
+          "date": "1956-06-20",
+          "contests": 2,
+          "regions": {
+            "QC": 1,
+            "SK": 1
+          },
+          "source": "ca-prov-qc",
+          "quote": "QC: 1956 | 20 juin | SK: Thirteenth Provincial General Election. June 20, 1956."
+        },
+        {
+          "date": "1956-09-19",
+          "contests": 1,
+          "regions": {
+            "BC": 1
+          },
+          "source": "ca-prov-bc",
+          "quote": "BC: 1956 1960 1963 1966 1969 1972 1975 1979 1983 1986 ... 4 Polling Day ... 19 Sep 12 Sep 30 Sep 12 Sep 27 Aug 30 Aug 11 Dec 10 May 5May 22 Oct"
+        },
+        {
+          "date": "1956-10-02",
+          "contests": 1,
+          "regions": {
+            "NL": 1
+          },
+          "source": "ca-prov-nl",
+          "quote": "NL: 1956 October 02"
+        },
+        {
+          "date": "1956-10-30",
+          "contests": 1,
+          "regions": {
+            "NS": 1
+          },
+          "source": "ca-prov-ns",
+          "quote": "NS: 46th General Assembly of Nova Scotia | 1956 - 1960 | October 30, 1956"
+        },
+        {
+          "date": "1958-06-16",
+          "contests": 1,
+          "regions": {
+            "MB": 1
+          },
+          "source": "ca-prov-mb",
+          "quote": "MB: 25th ... June 16, 1958"
+        },
+        {
+          "date": "1958-09-08",
+          "contests": 1,
+          "regions": {
+            "YT": 1
+          },
+          "source": "ca-prov-yt",
+          "quote": "YT: 1958 | September 8"
+        },
+        {
+          "date": "1959-05-14",
+          "contests": 1,
+          "regions": {
+            "MB": 1
+          },
+          "source": "ca-prov-mb",
+          "quote": "MB: 26th ... May 14, 1959"
+        },
+        {
+          "date": "1959-06-11",
+          "contests": 1,
+          "regions": {
+            "ON": 1
+          },
+          "source": "ca-prov-on",
+          "quote": "ON: Jun 11 1959"
+        },
+        {
+          "date": "1959-06-18",
+          "contests": 1,
+          "regions": {
+            "AB": 1
+          },
+          "source": "ca-prov-ab",
+          "quote": "AB: 1959, Thursday, June 18"
+        },
+        {
+          "date": "1959-08-20",
+          "contests": 1,
+          "regions": {
+            "NL": 1
+          },
+          "source": "ca-prov-nl",
+          "quote": "NL: 1959 August 20"
+        },
+        {
+          "date": "1959-09-01",
+          "contests": 1,
+          "regions": {
+            "PE": 1
+          },
+          "source": "ca-prov-pe",
+          "quote": "PE: 1 September | Provincial General Election - (PC)"
+        },
+        {
+          "date": "1960-06-07",
+          "contests": 1,
+          "regions": {
+            "NS": 1
+          },
+          "source": "ca-prov-ns",
+          "quote": "NS: 47th General Assembly of Nova Scotia | 1960 - 1963 | June 7, 1960"
+        },
+        {
+          "date": "1960-06-08",
+          "contests": 1,
+          "regions": {
+            "SK": 1
+          },
+          "source": "ca-prov-sk",
+          "quote": "SK: Fourteenth Provincial General Election. June 8, 1960."
+        },
+        {
+          "date": "1960-06-22",
+          "contests": 1,
+          "regions": {
+            "QC": 1
+          },
+          "source": "ca-prov-qc",
+          "quote": "QC: 1960 | 22 juin"
+        },
+        {
+          "date": "1960-09-12",
+          "contests": 1,
+          "regions": {
+            "BC": 1
+          },
+          "source": "ca-prov-bc",
+          "quote": "BC: 4 Polling Day ... 19 Sep 12 Sep 30 Sep 12 Sep 27 Aug 30 Aug 11 Dec 10 May 5May 22 Oct"
+        },
+        {
+          "date": "1961-09-11",
+          "contests": 1,
+          "regions": {
+            "YT": 1
+          },
+          "source": "ca-prov-yt",
+          "quote": "YT: 1961 | September 11"
+        },
+        {
+          "date": "1962-11-14",
+          "contests": 1,
+          "regions": {
+            "QC": 1
+          },
+          "source": "ca-prov-qc",
+          "quote": "QC: 1962 | 14 novembre"
+        },
+        {
+          "date": "1962-11-19",
+          "contests": 1,
+          "regions": {
+            "NL": 1
+          },
+          "source": "ca-prov-nl",
+          "quote": "NL: 1962 November 19"
+        },
+        {
+          "date": "1962-12-10",
+          "contests": 1,
+          "regions": {
+            "PE": 1
+          },
+          "source": "ca-prov-pe",
+          "quote": "PE: 10 December | Provincial General Election - (PC)"
+        },
+        {
+          "date": "1962-12-14",
+          "contests": 1,
+          "regions": {
+            "MB": 1
+          },
+          "source": "ca-prov-mb",
+          "quote": "MB: 27th ... December 14, 1962"
+        },
+        {
+          "date": "1963-06-17",
+          "contests": 1,
+          "regions": {
+            "AB": 1
+          },
+          "source": "ca-prov-ab",
+          "quote": "AB: 1963, Monday, June 17"
+        },
+        {
+          "date": "1963-09-25",
+          "contests": 1,
+          "regions": {
+            "ON": 1
+          },
+          "source": "ca-prov-on",
+          "quote": "ON: Sep 25 1963"
+        },
+        {
+          "date": "1963-09-30",
+          "contests": 1,
+          "regions": {
+            "BC": 1
+          },
+          "source": "ca-prov-bc",
+          "quote": "BC: 4 Polling Day ... 19 Sep 12 Sep 30 Sep 12 Sep 27 Aug 30 Aug 11 Dec 10 May 5May 22 Oct"
+        },
+        {
+          "date": "1963-10-08",
+          "contests": 1,
+          "regions": {
+            "NS": 1
+          },
+          "source": "ca-prov-ns",
+          "quote": "NS: 48th General Assembly of Nova Scotia | 1963 - 1967 | October 8, 1963"
+        },
+        {
+          "date": "1964-04-22",
+          "contests": 1,
+          "regions": {
+            "SK": 1
+          },
+          "source": "ca-prov-sk",
+          "quote": "SK: Fifteenth Provincial General Election. April 22, 1964."
+        },
+        {
+          "date": "1964-09-08",
+          "contests": 1,
+          "regions": {
+            "YT": 1
+          },
+          "source": "ca-prov-yt",
+          "quote": "YT: 1964 | September 8"
+        },
+        {
+          "date": "1966-05-30",
+          "contests": 1,
+          "regions": {
+            "PE": 1
+          },
+          "source": "ca-prov-pe",
+          "quote": "PE: 30 May | Provincial General Election - (LIB)"
+        },
+        {
+          "date": "1966-06-05",
+          "contests": 1,
+          "regions": {
+            "QC": 1
+          },
+          "source": "ca-prov-qc",
+          "quote": "QC: 1966 | 5 juin"
+        },
+        {
+          "date": "1966-06-23",
+          "contests": 1,
+          "regions": {
+            "MB": 1
+          },
+          "source": "ca-prov-mb",
+          "quote": "MB: 28th ... June 23, 1966"
+        },
+        {
+          "date": "1966-09-08",
+          "contests": 1,
+          "regions": {
+            "NL": 1
+          },
+          "source": "ca-prov-nl",
+          "quote": "NL: 1966 September 08"
+        },
+        {
+          "date": "1966-09-12",
+          "contests": 1,
+          "regions": {
+            "BC": 1
+          },
+          "source": "ca-prov-bc",
+          "quote": "BC: 4 Polling Day ... 19 Sep 12 Sep 30 Sep 12 Sep 27 Aug 30 Aug 11 Dec 10 May 5May 22 Oct"
+        },
+        {
+          "date": "1967-05-23",
+          "contests": 1,
+          "regions": {
+            "AB": 1
+          },
+          "source": "ca-prov-ab",
+          "quote": "AB: 1967, Tuesday, May 23"
+        },
+        {
+          "date": "1967-05-30",
+          "contests": 1,
+          "regions": {
+            "NS": 1
+          },
+          "source": "ca-prov-ns",
+          "quote": "NS: 49th General Assembly of Nova Scotia | 1967 - 1970 | May 30, 1967"
+        },
+        {
+          "date": "1967-09-11",
+          "contests": 1,
+          "regions": {
+            "YT": 1
+          },
+          "source": "ca-prov-yt",
+          "quote": "YT: 1967 | September 11"
+        },
+        {
+          "date": "1967-10-11",
+          "contests": 1,
+          "regions": {
+            "SK": 1
+          },
+          "source": "ca-prov-sk",
+          "quote": "SK: Sixteenth Provincial General Election. October 11, 1967."
+        },
+        {
+          "date": "1967-10-17",
+          "contests": 1,
+          "regions": {
+            "ON": 1
+          },
+          "source": "ca-prov-on",
+          "quote": "ON: Oct 17 1967"
+        },
+        {
+          "date": "1967-10-23",
+          "contests": 1,
+          "regions": {
+            "NB": 1
+          },
+          "source": "ca-prov-nb",
+          "quote": "NB: Twenty-sixth General Elections, October 23, 1967"
+        },
+        {
+          "date": "1969-06-25",
+          "contests": 1,
+          "regions": {
+            "MB": 1
+          },
+          "source": "ca-prov-mb",
+          "quote": "MB: 29th ... June 25, 1969"
+        },
+        {
+          "date": "1969-08-27",
+          "contests": 1,
+          "regions": {
+            "BC": 1
+          },
+          "source": "ca-prov-bc",
+          "quote": "BC: 4 Polling Day ... 19 Sep 12 Sep 30 Sep 12 Sep 27 Aug 30 Aug 11 Dec 10 May 5May 22 Oct"
+        },
+        {
+          "date": "1970-04-29",
+          "contests": 1,
+          "regions": {
+            "QC": 1
+          },
+          "source": "ca-prov-qc",
+          "quote": "QC: 1970 | 29 avril"
+        },
+        {
+          "date": "1970-05-11",
+          "contests": 1,
+          "regions": {
+            "PE": 1
+          },
+          "source": "ca-prov-pe",
+          "quote": "PE: 11 May | Provincial General Election - (LIB)"
+        },
+        {
+          "date": "1970-09-08",
+          "contests": 1,
+          "regions": {
+            "YT": 1
+          },
+          "source": "ca-prov-yt",
+          "quote": "YT: 1970 | September 8"
+        },
+        {
+          "date": "1970-10-13",
+          "contests": 1,
+          "regions": {
+            "NS": 1
+          },
+          "source": "ca-prov-ns",
+          "quote": "NS: 50th General Assembly of Nova Scotia | 1970 - 1974 | October 13, 1970"
+        },
+        {
+          "date": "1970-10-26",
+          "contests": 1,
+          "regions": {
+            "NB": 1
+          },
+          "source": "ca-prov-nb",
+          "quote": "NB: Twenty-seventh General Election, October 26, 1970"
+        },
+        {
+          "date": "1971-06-23",
+          "contests": 1,
+          "regions": {
+            "SK": 1
+          },
+          "source": "ca-prov-sk",
+          "quote": "SK: Seventeenth Provincial General Election. June 23, 1971."
+        },
+        {
+          "date": "1971-08-30",
+          "contests": 1,
+          "regions": {
+            "AB": 1
+          },
+          "source": "ca-prov-ab",
+          "quote": "AB: 1971, Monday, August 30"
+        },
+        {
+          "date": "1971-10-21",
+          "contests": 1,
+          "regions": {
+            "ON": 1
+          },
+          "source": "ca-prov-on",
+          "quote": "ON: Oct 21 1971"
+        },
+        {
+          "date": "1971-10-28",
+          "contests": 1,
+          "regions": {
+            "NL": 1
+          },
+          "source": "ca-prov-nl",
+          "quote": "NL: 1971 October 28"
+        },
+        {
+          "date": "1972-03-24",
+          "contests": 1,
+          "regions": {
+            "NL": 1
+          },
+          "source": "ca-prov-nl",
+          "quote": "NL: 1972 March 24"
+        },
+        {
+          "date": "1972-08-30",
+          "contests": 1,
+          "regions": {
+            "BC": 1
+          },
+          "source": "ca-prov-bc",
+          "quote": "BC: 4 Polling Day ... 19 Sep 12 Sep 30 Sep 12 Sep 27 Aug 30 Aug 11 Dec 10 May 5May 22 Oct"
+        },
+        {
+          "date": "1973-06-28",
+          "contests": 1,
+          "regions": {
+            "MB": 1
+          },
+          "source": "ca-prov-mb",
+          "quote": "MB: 30th ... June 28, 1973"
+        },
+        {
+          "date": "1973-10-29",
+          "contests": 1,
+          "regions": {
+            "QC": 1
+          },
+          "source": "ca-prov-qc",
+          "quote": "QC: 1973 | 29 octobre"
+        },
+        {
+          "date": "1974-04-02",
+          "contests": 1,
+          "regions": {
+            "NS": 1
+          },
+          "source": "ca-prov-ns",
+          "quote": "NS: 51st General Assembly of Nova Scotia | 1974 - 1978 | April 2, 1974"
+        },
+        {
+          "date": "1974-04-29",
+          "contests": 1,
+          "regions": {
+            "PE": 1
+          },
+          "source": "ca-prov-pe",
+          "quote": "PE: 29 April | Provincial General Election - (LIB)"
+        },
+        {
+          "date": "1974-11-18",
+          "contests": 2,
+          "regions": {
+            "NB": 1,
+            "YT": 1
+          },
+          "source": "ca-prov-nb",
+          "quote": "NB: Twenty-eighth General Election, November 18, 1974 | YT: 1974 | November 18"
+        },
+        {
+          "date": "1975-03-10",
+          "contests": 1,
+          "regions": {
+            "NT": 1
+          },
+          "source": "ca-prov-nt",
+          "quote": "NT: Official Voting Results 1975"
+        },
+        {
+          "date": "1975-03-26",
+          "contests": 1,
+          "regions": {
+            "AB": 1
+          },
+          "source": "ca-prov-ab",
+          "quote": "AB: 1975, Wednesday, March 26"
+        },
+        {
+          "date": "1975-06-11",
+          "contests": 1,
+          "regions": {
+            "SK": 1
+          },
+          "source": "ca-prov-sk",
+          "quote": "SK: Eighteenth Provincial General Election. June 11, 1975."
+        },
+        {
+          "date": "1975-09-16",
+          "contests": 1,
+          "regions": {
+            "NL": 1
+          },
+          "source": "ca-prov-nl",
+          "quote": "NL: 1975 September 16"
+        },
+        {
+          "date": "1975-09-18",
+          "contests": 1,
+          "regions": {
+            "ON": 1
+          },
+          "source": "ca-prov-on",
+          "quote": "ON: Sep 18 1975"
+        },
+        {
+          "date": "1975-12-11",
+          "contests": 1,
+          "regions": {
+            "BC": 1
+          },
+          "source": "ca-prov-bc",
+          "quote": "BC: 4 Polling Day ... 19 Sep 12 Sep 30 Sep 12 Sep 27 Aug 30 Aug 11 Dec 10 May 5May 22 Oct"
+        },
+        {
+          "date": "1976-11-15",
+          "contests": 1,
+          "regions": {
+            "QC": 1
+          },
+          "source": "ca-prov-qc",
+          "quote": "QC: 1976 | 15 novembre"
+        },
+        {
+          "date": "1977-06-09",
+          "contests": 1,
+          "regions": {
+            "ON": 1
+          },
+          "source": "ca-prov-on",
+          "quote": "ON: Jun 09 1977"
+        },
+        {
+          "date": "1977-10-11",
+          "contests": 1,
+          "regions": {
+            "MB": 1
+          },
+          "source": "ca-prov-mb",
+          "quote": "MB: 31st ... October 11, 1977"
+        },
+        {
+          "date": "1978-04-24",
+          "contests": 1,
+          "regions": {
+            "PE": 1
+          },
+          "source": "ca-prov-pe",
+          "quote": "PE: 24 April | Provincial General Election - LIB"
+        },
+        {
+          "date": "1978-09-19",
+          "contests": 1,
+          "regions": {
+            "NS": 1
+          },
+          "source": "ca-prov-ns",
+          "quote": "NS: 52nd General Assembly of Nova Scotia | 1978 - 1981 | September 19, 1978"
+        },
+        {
+          "date": "1978-10-18",
+          "contests": 1,
+          "regions": {
+            "SK": 1
+          },
+          "source": "ca-prov-sk",
+          "quote": "SK: Nineteenth Provincial General Election. October 18, 1978."
+        },
+        {
+          "date": "1978-10-23",
+          "contests": 1,
+          "regions": {
+            "NB": 1
+          },
+          "source": "ca-prov-nb",
+          "quote": "NB: Twenty-ninth General Election, October 23, 1978"
+        },
+        {
+          "date": "1978-11-20",
+          "contests": 1,
+          "regions": {
+            "YT": 1
+          },
+          "source": "ca-prov-yt",
+          "quote": "YT: 1978 | November 20"
+        },
+        {
+          "date": "1979-03-14",
+          "contests": 1,
+          "regions": {
+            "AB": 1
+          },
+          "source": "ca-prov-ab",
+          "quote": "AB: 1979, Wednesday, March 14"
+        },
+        {
+          "date": "1979-04-23",
+          "contests": 1,
+          "regions": {
+            "PE": 1
+          },
+          "source": "ca-prov-pe",
+          "quote": "PE: 23 April | Provincial General Election - (PC)"
+        },
+        {
+          "date": "1979-05-10",
+          "contests": 1,
+          "regions": {
+            "BC": 1
+          },
+          "source": "ca-prov-bc",
+          "quote": "BC: 4 Polling Day ... 19 Sep 12 Sep 30 Sep 12 Sep 27 Aug 30 Aug 11 Dec 10 May 5May 22 Oct"
+        },
+        {
+          "date": "1979-06-18",
+          "contests": 1,
+          "regions": {
+            "NL": 1
+          },
+          "source": "ca-prov-nl",
+          "quote": "NL: 1979 June 18"
+        },
+        {
+          "date": "1979-10-01",
+          "contests": 1,
+          "regions": {
+            "NT": 1
+          },
+          "source": "ca-prov-nt",
+          "quote": "NT: Official Voting Results 1979"
+        },
+        {
+          "date": "1981-03-19",
+          "contests": 1,
+          "regions": {
+            "ON": 1
+          },
+          "source": "ca-prov-on",
+          "quote": "ON: Mar 19 1981"
+        },
+        {
+          "date": "1981-04-13",
+          "contests": 1,
+          "regions": {
+            "QC": 1
+          },
+          "source": "ca-prov-qc",
+          "quote": "QC: 1981 | 13 avril"
+        },
+        {
+          "date": "1981-10-06",
+          "contests": 1,
+          "regions": {
+            "NS": 1
+          },
+          "source": "ca-prov-ns",
+          "quote": "NS: 53rd General Assembly of Nova Scotia | 1981 - 1984 | October 6, 1981"
+        },
+        {
+          "date": "1981-11-17",
+          "contests": 1,
+          "regions": {
+            "MB": 1
+          },
+          "source": "ca-prov-mb",
+          "quote": "MB: 32nd ... November 17, 1981"
+        },
+        {
+          "date": "1982-04-06",
+          "contests": 1,
+          "regions": {
+            "NL": 1
+          },
+          "source": "ca-prov-nl",
+          "quote": "NL: 1982 April 06"
+        },
+        {
+          "date": "1982-04-26",
+          "contests": 1,
+          "regions": {
+            "SK": 1
+          },
+          "source": "ca-prov-sk",
+          "quote": "SK: Twentieth Provincial General Election. April 26, 1982."
+        },
+        {
+          "date": "1982-06-07",
+          "contests": 1,
+          "regions": {
+            "YT": 1
+          },
+          "source": "ca-prov-yt",
+          "quote": "YT: 1982 | June 7"
+        },
+        {
+          "date": "1982-09-27",
+          "contests": 1,
+          "regions": {
+            "PE": 1
+          },
+          "source": "ca-prov-pe",
+          "quote": "PE: 27 September | Provincial General Election - (PC)"
+        },
+        {
+          "date": "1982-10-12",
+          "contests": 1,
+          "regions": {
+            "NB": 1
+          },
+          "source": "ca-prov-nb",
+          "quote": "NB: Thirtieth General Election, October 12, 1982"
+        },
+        {
+          "date": "1982-11-02",
+          "contests": 1,
+          "regions": {
+            "AB": 1
+          },
+          "source": "ca-prov-ab",
+          "quote": "AB: 1982, Tuesday, November 2"
+        },
+        {
+          "date": "1983-05-05",
+          "contests": 1,
+          "regions": {
+            "BC": 1
+          },
+          "source": "ca-prov-bc",
+          "quote": "BC: 4 Polling Day ... 19 Sep 12 Sep 30 Sep 12 Sep 27 Aug 30 Aug 11 Dec 10 May 5May 22 Oct"
+        },
+        {
+          "date": "1983-11-21",
+          "contests": 1,
+          "regions": {
+            "NT": 1
+          },
+          "source": "ca-prov-nt",
+          "quote": "NT: Official Voting Results 1983"
+        },
+        {
+          "date": "1984-11-06",
+          "contests": 1,
+          "regions": {
+            "NS": 1
+          },
+          "source": "ca-prov-ns",
+          "quote": "NS: 54th General Assembly of Nova Scotia | 1984 - 1988 | November 6, 1984"
+        },
+        {
+          "date": "1985-04-02",
+          "contests": 1,
+          "regions": {
+            "NL": 1
+          },
+          "source": "ca-prov-nl",
+          "quote": "NL: 1985 April 02"
+        },
+        {
+          "date": "1985-05-02",
+          "contests": 1,
+          "regions": {
+            "ON": 1
+          },
+          "source": "ca-prov-on",
+          "quote": "ON: May 02 1985"
+        },
+        {
+          "date": "1985-05-13",
+          "contests": 1,
+          "regions": {
+            "YT": 1
+          },
+          "source": "ca-prov-yt",
+          "quote": "YT: 1985 | May 13"
+        },
+        {
+          "date": "1985-12-02",
+          "contests": 1,
+          "regions": {
+            "QC": 1
+          },
+          "source": "ca-prov-qc",
+          "quote": "QC: 1985 | 2 décembre"
+        },
+        {
+          "date": "1986-03-18",
+          "contests": 1,
+          "regions": {
+            "MB": 1
+          },
+          "source": "ca-prov-mb",
+          "quote": "MB: 33rd ... March 18, 1986"
+        },
+        {
+          "date": "1986-04-21",
+          "contests": 1,
+          "regions": {
+            "PE": 1
+          },
+          "source": "ca-prov-pe",
+          "quote": "PE: 21 April | Provincial General Election - (LIB)"
+        },
+        {
+          "date": "1986-05-08",
+          "contests": 1,
+          "regions": {
+            "AB": 1
+          },
+          "source": "ca-prov-ab",
+          "quote": "AB: 1986, Thursday, May 8"
+        },
+        {
+          "date": "1986-10-20",
+          "contests": 1,
+          "regions": {
+            "SK": 1
+          },
+          "source": "ca-prov-sk",
+          "quote": "SK: Twenty-First Provincial General Election. October 20, 1986."
+        },
+        {
+          "date": "1986-10-22",
+          "contests": 1,
+          "regions": {
+            "BC": 1
+          },
+          "source": "ca-prov-bc",
+          "quote": "BC: 4 Polling Day ... 19 Sep 12 Sep 30 Sep 12 Sep 27 Aug 30 Aug 11 Dec 10 May 5May 22 Oct"
+        },
+        {
+          "date": "1987-09-10",
+          "contests": 1,
+          "regions": {
+            "ON": 1
+          },
+          "source": "ca-prov-on",
+          "quote": "ON: Sep 10 1987"
+        },
+        {
+          "date": "1987-10-05",
+          "contests": 1,
+          "regions": {
+            "NT": 1
+          },
+          "source": "ca-prov-nt",
+          "quote": "NT: Official Voting Results 1987"
+        },
+        {
+          "date": "1987-10-13",
+          "contests": 1,
+          "regions": {
+            "NB": 1
+          },
+          "source": "ca-prov-nb",
+          "quote": "NB: Thirty-First General Election, October 13, 1987"
+        },
+        {
+          "date": "1988-04-26",
+          "contests": 1,
+          "regions": {
+            "MB": 1
+          },
+          "source": "ca-prov-mb",
+          "quote": "MB: 34th ... April 26, 1988"
+        },
+        {
+          "date": "1988-09-06",
+          "contests": 1,
+          "regions": {
+            "NS": 1
+          },
+          "source": "ca-prov-ns",
+          "quote": "NS: 55th General Assembly of Nova Scotia | 1988 - 1993 | September 6, 1988"
+        },
+        {
+          "date": "1989-02-20",
+          "contests": 1,
+          "regions": {
+            "YT": 1
+          },
+          "source": "ca-prov-yt",
+          "quote": "YT: 1989 | February 20"
+        },
+        {
+          "date": "1989-03-20",
+          "contests": 1,
+          "regions": {
+            "AB": 1
+          },
+          "source": "ca-prov-ab",
+          "quote": "AB: 1989, Monday, March 20"
+        },
+        {
+          "date": "1989-04-20",
+          "contests": 1,
+          "regions": {
+            "NL": 1
+          },
+          "source": "ca-prov-nl",
+          "quote": "NL: 1989 April 20"
+        },
+        {
+          "date": "1989-05-29",
+          "contests": 1,
+          "regions": {
+            "PE": 1
+          },
+          "source": "ca-prov-pe-1989",
+          "quote": "PE: 1989, May 29 Assemblymen"
+        },
+        {
+          "date": "1989-09-25",
+          "contests": 1,
+          "regions": {
+            "QC": 1
+          },
+          "source": "ca-prov-qc",
+          "quote": "QC: 1989 | 25 septembre"
+        },
+        {
+          "date": "1990-09-06",
+          "contests": 1,
+          "regions": {
+            "ON": 1
+          },
+          "source": "ca-prov-on",
+          "quote": "ON: Sep 06 1990"
+        },
+        {
+          "date": "1990-09-11",
+          "contests": 1,
+          "regions": {
+            "MB": 1
+          },
+          "source": "ca-prov-mb",
+          "quote": "MB: 35th ... September 11, 1990"
+        },
+        {
+          "date": "1991-09-23",
+          "contests": 1,
+          "regions": {
+            "NB": 1
+          },
+          "source": "ca-prov-nb",
+          "quote": "NB: Thirty-Second General Election, September 23, 1991"
+        },
+        {
+          "date": "1991-10-15",
+          "contests": 1,
+          "regions": {
+            "NT": 1
+          },
+          "source": "ca-prov-nt",
+          "quote": "NT: Official Voting Results 1991"
+        },
+        {
+          "date": "1991-10-17",
+          "contests": 1,
+          "regions": {
+            "BC": 1
+          },
+          "source": "ca-prov-bc",
+          "quote": "BC: RECALL AND INITIATIVE REFERENDUM - 35TH GENERAL ELECTION - 17 OCTOBER 1991 ... Polling day ... 17 October 1991"
+        },
+        {
+          "date": "1991-10-21",
+          "contests": 1,
+          "regions": {
+            "SK": 1
+          },
+          "source": "ca-prov-sk",
+          "quote": "SK: Twenty-Second Provincial General Election. October 21, 1991."
+        },
+        {
+          "date": "1992-10-19",
+          "contests": 1,
+          "regions": {
+            "YT": 1
+          },
+          "source": "ca-prov-yt",
+          "quote": "YT: 1992 | October 19"
+        },
+        {
+          "date": "1993-03-29",
+          "contests": 1,
+          "regions": {
+            "PE": 1
+          },
+          "source": "ca-prov-pe-1993",
+          "quote": "PE: 1993, March 29 Assemblymen"
+        },
+        {
+          "date": "1993-05-03",
+          "contests": 1,
+          "regions": {
+            "NL": 1
+          },
+          "source": "ca-prov-nl",
+          "quote": "NL: 1993 May 03"
+        },
+        {
+          "date": "1993-05-25",
+          "contests": 1,
+          "regions": {
+            "NS": 1
+          },
+          "source": "ca-prov-ns",
+          "quote": "NS: 56th General Assembly of Nova Scotia | 1993 - 1998 | May 25, 1993"
+        },
+        {
+          "date": "1993-06-15",
+          "contests": 1,
+          "regions": {
+            "AB": 1
+          },
+          "source": "ca-prov-ab",
+          "quote": "AB: 1993, Tuesday, June 15"
+        },
+        {
+          "date": "1994-09-12",
+          "contests": 1,
+          "regions": {
+            "QC": 1
+          },
+          "source": "ca-prov-qc",
+          "quote": "QC: 1994 | 12 septembre"
+        },
+        {
+          "date": "1995-04-25",
+          "contests": 1,
+          "regions": {
+            "MB": 1
+          },
+          "source": "ca-prov-mb",
+          "quote": "MB: 36th ... April 25, 1995"
+        },
+        {
+          "date": "1995-06-08",
+          "contests": 1,
+          "regions": {
+            "ON": 1
+          },
+          "source": "ca-prov-on",
+          "quote": "ON: Jun 08 1995"
+        },
+        {
+          "date": "1995-06-21",
+          "contests": 1,
+          "regions": {
+            "SK": 1
+          },
+          "source": "ca-prov-sk",
+          "quote": "SK: Twenty-Third Provincial General Election. June 21, 1995."
+        },
+        {
+          "date": "1995-09-11",
+          "contests": 1,
+          "regions": {
+            "NB": 1
+          },
+          "source": "ca-prov-nb",
+          "quote": "NB: Thirty-Third General Election, September 11, 1995"
+        },
+        {
+          "date": "1995-10-16",
+          "contests": 1,
+          "regions": {
+            "NT": 1
+          },
+          "source": "ca-prov-nt",
+          "quote": "NT: Official Voting Results 1995"
+        },
+        {
+          "date": "1996-02-22",
+          "contests": 1,
+          "regions": {
+            "NL": 1
+          },
+          "source": "ca-prov-nl",
+          "quote": "NL: 1996 February 22"
+        },
+        {
+          "date": "1996-05-28",
+          "contests": 1,
+          "regions": {
+            "BC": 1
+          },
+          "source": "ca-prov-bc",
+          "quote": "BC: 1996 Statement of Votes - 36th Provincial General Election - May 28, 1996"
+        },
+        {
+          "date": "1996-09-30",
+          "contests": 1,
+          "regions": {
+            "YT": 1
+          },
+          "source": "ca-prov-yt",
+          "quote": "YT: 1996 | September 30"
+        },
+        {
+          "date": "1996-11-18",
+          "contests": 1,
+          "regions": {
+            "PE": 1
+          },
+          "source": "ca-prov-pe-1996",
+          "quote": "PE: Nov 18 - Provincial general election was held based on the newly designed electoral districts"
+        },
+        {
+          "date": "1997-03-11",
+          "contests": 1,
+          "regions": {
+            "AB": 1
+          },
+          "source": "ca-prov-ab",
+          "quote": "AB: 1997, Tuesday, March 11"
+        },
+        {
+          "date": "1998-03-24",
+          "contests": 1,
+          "regions": {
+            "NS": 1
+          },
+          "source": "ca-prov-ns",
+          "quote": "NS: 57th General Assembly of Nova Scotia | 1998 - 1999 | March 24, 1998"
+        },
+        {
+          "date": "1998-11-30",
+          "contests": 1,
+          "regions": {
+            "QC": 1
+          },
+          "source": "ca-prov-qc",
+          "quote": "QC: 1998 | 30 novembre"
+        },
+        {
+          "date": "1999-02-09",
+          "contests": 1,
+          "regions": {
+            "NL": 1
+          },
+          "source": "ca-prov-nl",
+          "quote": "NL: 1999 February 09"
+        },
+        {
+          "date": "1999-02-15",
+          "contests": 1,
+          "regions": {
+            "NU": 1
+          },
+          "source": "ca-prov-nu",
+          "quote": "NU: was held on February 15"
+        },
+        {
+          "date": "1999-06-03",
+          "contests": 1,
+          "regions": {
+            "ON": 1
+          },
+          "source": "ca-prov-on",
+          "quote": "ON: Jun 03 1999"
+        },
+        {
+          "date": "1999-06-07",
+          "contests": 1,
+          "regions": {
+            "NB": 1
+          },
+          "source": "ca-prov-nb",
+          "quote": "NB: Thirty-Fourth General Election, June 7, 1999"
+        },
+        {
+          "date": "1999-07-27",
+          "contests": 1,
+          "regions": {
+            "NS": 1
+          },
+          "source": "ca-prov-ns",
+          "quote": "NS: 58th General Assembly of Nova Scotia | 1999 - 2003 | July 27, 1999"
+        },
+        {
+          "date": "1999-09-16",
+          "contests": 1,
+          "regions": {
+            "SK": 1
+          },
+          "source": "ca-prov-sk",
+          "quote": "SK: Twenty-Fourth Provincial General Election. September 16, 1999."
+        },
+        {
+          "date": "1999-09-21",
+          "contests": 1,
+          "regions": {
+            "MB": 1
+          },
+          "source": "ca-prov-mb",
+          "quote": "MB: 37th ... September 21, 1999"
+        },
+        {
+          "date": "1999-12-06",
+          "contests": 1,
+          "regions": {
+            "NT": 1
+          },
+          "source": "ca-prov-nt",
+          "quote": "NT: Official Voting Results 1999"
+        },
+        {
+          "date": "2000-04-17",
+          "contests": 2,
+          "regions": {
+            "PE": 1,
+            "YT": 1
+          },
+          "source": "ca-prov-pe-2000",
+          "quote": "PE: 2000, April 17 | YT: 2000 | April 17"
+        },
+        {
+          "date": "2001-03-12",
+          "contests": 1,
+          "regions": {
+            "AB": 1
+          },
+          "source": "ca-prov-ab",
+          "quote": "AB: 2001, Monday, March 12"
+        },
+        {
+          "date": "2001-05-16",
+          "contests": 1,
+          "regions": {
+            "BC": 1
+          },
+          "source": "ca-prov-bc",
+          "quote": "BC: The 37th Provincial General Election is held on May 16, 2001."
+        },
+        {
+          "date": "2002-11-04",
+          "contests": 1,
+          "regions": {
+            "YT": 1
+          },
+          "source": "ca-prov-yt",
+          "quote": "YT: 2002 | November 4"
+        },
+        {
+          "date": "2003-04-14",
+          "contests": 1,
+          "regions": {
+            "QC": 1
+          },
+          "source": "ca-prov-qc",
+          "quote": "QC: 2003 | 14 avril"
+        },
+        {
+          "date": "2003-06-03",
+          "contests": 1,
+          "regions": {
+            "MB": 1
+          },
+          "source": "ca-prov-mb",
+          "quote": "MB: 38th ... June 3, 2003"
+        },
+        {
+          "date": "2003-06-09",
+          "contests": 1,
+          "regions": {
+            "NB": 1
+          },
+          "source": "ca-prov-nb",
+          "quote": "NB: Thirty-Fifth General Election, June 9, 2003"
+        },
+        {
+          "date": "2003-08-05",
+          "contests": 1,
+          "regions": {
+            "NS": 1
+          },
+          "source": "ca-prov-ns",
+          "quote": "NS: 59th General Assembly of Nova Scotia | 2003 - 2006 | August 5, 2003"
+        },
+        {
+          "date": "2003-09-29",
+          "contests": 1,
+          "regions": {
+            "PE": 1
+          },
+          "source": "ca-prov-pe-2003",
+          "quote": "PE: September 29 - general election held electing the third Legislative Assembly"
+        },
+        {
+          "date": "2003-10-02",
+          "contests": 1,
+          "regions": {
+            "ON": 1
+          },
+          "source": "ca-prov-on",
+          "quote": "ON: Oct 02 2003"
+        },
+        {
+          "date": "2003-10-21",
+          "contests": 1,
+          "regions": {
+            "NL": 1
+          },
+          "source": "ca-prov-nl",
+          "quote": "NL: 2003 October 21"
+        },
+        {
+          "date": "2003-11-05",
+          "contests": 1,
+          "regions": {
+            "SK": 1
+          },
+          "source": "ca-prov-sk",
+          "quote": "SK: Twenty-Fifth Provincial General Election. November 5, 2003."
+        },
+        {
+          "date": "2003-11-24",
+          "contests": 1,
+          "regions": {
+            "NT": 1
+          },
+          "source": "ca-prov-nt",
+          "quote": "NT: Official Voting Results 2003"
+        },
+        {
+          "date": "2004-02-16",
+          "contests": 1,
+          "regions": {
+            "NU": 1
+          },
+          "source": "ca-prov-nu",
+          "quote": "NU: Conduct of the 2nd General Election – February 16, 2004"
+        },
+        {
+          "date": "2004-11-22",
+          "contests": 1,
+          "regions": {
+            "AB": 1
+          },
+          "source": "ca-prov-ab",
+          "quote": "AB: 2004, Monday, November 22"
+        },
+        {
+          "date": "2005-05-17",
+          "contests": 1,
+          "regions": {
+            "BC": 1
+          },
+          "source": "ca-prov-bc",
+          "quote": "BC: 2005 Statement of Votes - 38th Provincial General Election - May 17, 2005"
+        },
+        {
+          "date": "2006-06-13",
+          "contests": 1,
+          "regions": {
+            "NS": 1
+          },
+          "source": "ca-prov-ns",
+          "quote": "NS: 60th General Assembly of Nova Scotia | 2006 - 2009 | June 13, 2006"
+        },
+        {
+          "date": "2006-09-18",
+          "contests": 1,
+          "regions": {
+            "NB": 1
+          },
+          "source": "ca-prov-nb",
+          "quote": "NB: Thirty-Sixth General Election, September 18, 2006"
+        },
+        {
+          "date": "2006-10-10",
+          "contests": 1,
+          "regions": {
+            "YT": 1
+          },
+          "source": "ca-prov-yt-2006",
+          "quote": "YT: General Election held October 10, 2006"
+        },
+        {
+          "date": "2007-03-26",
+          "contests": 1,
+          "regions": {
+            "QC": 1
+          },
+          "source": "ca-prov-qc",
+          "quote": "QC: 2007 | 26 mars"
+        },
+        {
+          "date": "2007-05-22",
+          "contests": 1,
+          "regions": {
+            "MB": 1
+          },
+          "source": "ca-prov-mb",
+          "quote": "MB: 39th ... May 22, 2007"
+        },
+        {
+          "date": "2007-05-28",
+          "contests": 1,
+          "regions": {
+            "PE": 1
+          },
+          "source": "ca-prov-pe-2007",
+          "quote": "PE: 2007, May 28"
+        },
+        {
+          "date": "2007-10-01",
+          "contests": 1,
+          "regions": {
+            "NT": 1
+          },
+          "source": "ca-prov-nt",
+          "quote": "NT: Official Voting Results 2007"
+        },
+        {
+          "date": "2007-10-09",
+          "contests": 1,
+          "regions": {
+            "NL": 1
+          },
+          "source": "ca-prov-nl",
+          "quote": "NL: 2007 October 09"
+        },
+        {
+          "date": "2007-10-10",
+          "contests": 1,
+          "regions": {
+            "ON": 1
+          },
+          "source": "ca-prov-on",
+          "quote": "ON: Oct 10 2007"
+        },
+        {
+          "date": "2007-11-07",
+          "contests": 1,
+          "regions": {
+            "SK": 1
+          },
+          "source": "ca-prov-sk",
+          "quote": "SK: Twenty-Sixth Provincial General Election. November 7, 2007."
+        },
+        {
+          "date": "2008-03-03",
+          "contests": 1,
+          "regions": {
+            "AB": 1
+          },
+          "source": "ca-prov-ab",
+          "quote": "AB: 2008, Monday, March 3"
+        },
+        {
+          "date": "2008-10-27",
+          "contests": 1,
+          "regions": {
+            "NU": 1
+          },
+          "source": "ca-prov-nu",
+          "quote": "NU: report on the October 27, 2008 General Election"
+        },
+        {
+          "date": "2008-12-08",
+          "contests": 1,
+          "regions": {
+            "QC": 1
+          },
+          "source": "ca-prov-qc",
+          "quote": "QC: 2008 | 8 décembre"
+        },
+        {
+          "date": "2009-05-12",
+          "contests": 1,
+          "regions": {
+            "BC": 1
+          },
+          "source": "ca-prov-bc",
+          "quote": "BC: 2009 Statement of Votes - 39th Provincial General Election - May 12, 2009"
+        },
+        {
+          "date": "2009-06-09",
+          "contests": 1,
+          "regions": {
+            "NS": 1
+          },
+          "source": "ca-prov-ns",
+          "quote": "NS: 61st General Assembly of Nova Scotia | 2009 - 2013 | June 9, 2009"
+        },
+        {
+          "date": "2010-09-27",
+          "contests": 1,
+          "regions": {
+            "NB": 1
+          },
+          "source": "ca-prov-nb",
+          "quote": "NB: Thirty-Seventh General Election, September 27, 2010"
+        },
+        {
+          "date": "2011-10-03",
+          "contests": 2,
+          "regions": {
+            "PE": 1,
+            "NT": 1
+          },
+          "source": "ca-prov-pe-2011",
+          "quote": "PE: 2011, October 3 | NT: Official Voting Results 2011"
+        },
+        {
+          "date": "2011-10-04",
+          "contests": 1,
+          "regions": {
+            "MB": 1
+          },
+          "source": "ca-prov-mb",
+          "quote": "MB: 40th ... October 4, 2011"
+        },
+        {
+          "date": "2011-10-06",
+          "contests": 1,
+          "regions": {
+            "ON": 1
+          },
+          "source": "ca-prov-on",
+          "quote": "ON: Oct 06 2011"
+        },
+        {
+          "date": "2011-10-11",
+          "contests": 2,
+          "regions": {
+            "NL": 1,
+            "YT": 1
+          },
+          "source": "ca-prov-nl",
+          "quote": "NL: 2011 October 11 | YT: General Election held October 11, 2011"
+        },
+        {
+          "date": "2011-11-07",
+          "contests": 1,
+          "regions": {
+            "SK": 1
+          },
+          "source": "ca-prov-sk",
+          "quote": "SK: Twenty-Seventh Provincial General Election. November 7, 2011."
+        },
+        {
+          "date": "2012-04-23",
+          "contests": 1,
+          "regions": {
+            "AB": 1
+          },
+          "source": "ca-prov-ab",
+          "quote": "AB: 2012, Monday, April 23"
+        },
+        {
+          "date": "2012-09-04",
+          "contests": 1,
+          "regions": {
+            "QC": 1
+          },
+          "source": "ca-prov-qc",
+          "quote": "QC: 2012 | 4 septembre"
+        },
+        {
+          "date": "2013-05-14",
+          "contests": 1,
+          "regions": {
+            "BC": 1
+          },
+          "source": "ca-prov-bc",
+          "quote": "BC: 2013 Statement of Votes - 40th Provincial General Election - May 14, 2013"
+        },
+        {
+          "date": "2013-10-08",
+          "contests": 1,
+          "regions": {
+            "NS": 1
+          },
+          "source": "ca-prov-ns",
+          "quote": "NS: 62nd General Assembly of Nova Scotia | 2013 - 2017 | October 8, 2013"
+        },
+        {
+          "date": "2013-10-28",
+          "contests": 1,
+          "regions": {
+            "NU": 1
+          },
+          "source": "ca-prov-nu",
+          "quote": "NU: General Election October 28, 2013"
+        },
+        {
+          "date": "2014-04-07",
+          "contests": 1,
+          "regions": {
+            "QC": 1
+          },
+          "source": "ca-prov-qc",
+          "quote": "QC: 2014 | 7 avril"
+        },
+        {
+          "date": "2014-06-12",
+          "contests": 1,
+          "regions": {
+            "ON": 1
+          },
+          "source": "ca-prov-on",
+          "quote": "ON: Jun 12 2014"
+        },
+        {
+          "date": "2014-09-22",
+          "contests": 1,
+          "regions": {
+            "NB": 1
+          },
+          "source": "ca-prov-nb",
+          "quote": "NB: Thirty-Eighth General Election, September 22, 2014"
+        },
+        {
+          "date": "2015-05-04",
+          "contests": 1,
+          "regions": {
+            "PE": 1
+          },
+          "source": "ca-prov-pe-2015",
+          "quote": "PE: Election Date: Monday May 4, 2015"
+        },
+        {
+          "date": "2015-05-05",
+          "contests": 1,
+          "regions": {
+            "AB": 1
+          },
+          "source": "ca-prov-ab",
+          "quote": "AB: 2015, Tuesday, May 5"
+        },
+        {
+          "date": "2015-11-23",
+          "contests": 1,
+          "regions": {
+            "NT": 1
+          },
+          "source": "ca-prov-nt",
+          "quote": "NT: Official Voting Results 2015"
+        },
+        {
+          "date": "2015-11-30",
+          "contests": 1,
+          "regions": {
+            "NL": 1
+          },
+          "source": "ca-prov-nl",
+          "quote": "NL: 2015 November 30"
+        },
+        {
+          "date": "2016-04-04",
+          "contests": 1,
+          "regions": {
+            "SK": 1
+          },
+          "source": "ca-prov-sk",
+          "quote": "SK: 28th Provincial General Election, April 4, 2016"
+        },
+        {
+          "date": "2016-04-19",
+          "contests": 1,
+          "regions": {
+            "MB": 1
+          },
+          "source": "ca-prov-mb",
+          "quote": "MB: 41st ... April 19, 2016"
+        },
+        {
+          "date": "2016-11-07",
+          "contests": 1,
+          "regions": {
+            "YT": 1
+          },
+          "source": "ca-prov-yt-2016",
+          "quote": "YT: General Election held November 7, 2016"
+        },
+        {
+          "date": "2017-05-09",
+          "contests": 1,
+          "regions": {
+            "BC": 1
+          },
+          "source": "ca-prov-bc",
+          "quote": "BC: Statement of Votes - 41 st Provincial General Election - May 9, 2017"
+        },
+        {
+          "date": "2017-05-30",
+          "contests": 1,
+          "regions": {
+            "NS": 1
+          },
+          "source": "ca-prov-ns",
+          "quote": "NS: 63rd General Assembly of Nova Scotia | 2017 - 2021 | May 30, 2017"
+        },
+        {
+          "date": "2017-10-30",
+          "contests": 1,
+          "regions": {
+            "NU": 1
+          },
+          "source": "ca-prov-nu",
+          "quote": "NU: a General Election would be held on October 30, 2017"
+        },
+        {
+          "date": "2018-06-07",
+          "contests": 1,
+          "regions": {
+            "ON": 1
+          },
+          "source": "ca-prov-on",
+          "quote": "ON: Jun 07 2018"
+        },
+        {
+          "date": "2018-09-24",
+          "contests": 1,
+          "regions": {
+            "NB": 1
+          },
+          "source": "ca-prov-nb",
+          "quote": "NB: Thirty-Ninth General Election, September 24, 2018"
+        },
+        {
+          "date": "2018-10-01",
+          "contests": 1,
+          "regions": {
+            "QC": 1
+          },
+          "source": "ca-prov-qc",
+          "quote": "QC: 2018 | 1 er octobre"
+        },
+        {
+          "date": "2019-04-16",
+          "contests": 1,
+          "regions": {
+            "AB": 1
+          },
+          "source": "ca-prov-ab",
+          "quote": "AB: 2019, Tuesday, April 16"
+        },
+        {
+          "date": "2019-04-23",
+          "contests": 1,
+          "regions": {
+            "PE": 1
+          },
+          "source": "ca-prov-pe-2019",
+          "quote": "PE: 2019, April 23"
+        },
+        {
+          "date": "2019-05-16",
+          "contests": 1,
+          "regions": {
+            "NL": 1
+          },
+          "source": "ca-prov-nl",
+          "quote": "NL: 2019 May 16"
+        },
+        {
+          "date": "2019-09-10",
+          "contests": 1,
+          "regions": {
+            "MB": 1
+          },
+          "source": "ca-prov-mb",
+          "quote": "MB: 42nd ... September 10, 2019"
+        },
+        {
+          "date": "2019-10-01",
+          "contests": 1,
+          "regions": {
+            "NT": 1
+          },
+          "source": "ca-prov-nt",
+          "quote": "NT: Official Voting Results 2019"
+        },
+        {
+          "date": "2020-09-14",
+          "contests": 1,
+          "regions": {
+            "NB": 1
+          },
+          "source": "ca-prov-nb",
+          "quote": "NB: Fortieth General Election, September 14, 2020"
+        },
+        {
+          "date": "2020-10-24",
+          "contests": 1,
+          "regions": {
+            "BC": 1
+          },
+          "source": "ca-prov-bc",
+          "quote": "BC: Statement of Votes - 42 nd Provincial General Election - October 24, 2020"
+        },
+        {
+          "date": "2020-10-26",
+          "contests": 1,
+          "regions": {
+            "SK": 1
+          },
+          "source": "ca-prov-sk",
+          "quote": "SK: 29th Provincial General Election, October 26, 2020"
+        },
+        {
+          "date": "2021-02-13",
+          "contests": 1,
+          "regions": {
+            "NL": 1
+          },
+          "source": "ca-prov-nl",
+          "quote": "NL: 2021 February 13*"
+        },
+        {
+          "date": "2021-04-12",
+          "contests": 1,
+          "regions": {
+            "YT": 1
+          },
+          "source": "ca-prov-yt-2021",
+          "quote": "YT: Territorial General Election held on April 12, 2021"
+        },
+        {
+          "date": "2021-08-17",
+          "contests": 1,
+          "regions": {
+            "NS": 1
+          },
+          "source": "ca-prov-ns",
+          "quote": "NS: 64th General Assembly of Nova Scotia | 2021 - 2024 | August 17, 2021"
+        },
+        {
+          "date": "2021-10-25",
+          "contests": 1,
+          "regions": {
+            "NU": 1
+          },
+          "source": "ca-prov-nu",
+          "quote": "NU: The Election Day will be October 25."
+        },
+        {
+          "date": "2022-06-02",
+          "contests": 1,
+          "regions": {
+            "ON": 1
+          },
+          "source": "ca-prov-on",
+          "quote": "ON: Jun 02 2022"
+        },
+        {
+          "date": "2022-10-03",
+          "contests": 1,
+          "regions": {
+            "QC": 1
+          },
+          "source": "ca-prov-qc",
+          "quote": "QC: 2022 | 3 octobre"
+        },
+        {
+          "date": "2023-04-03",
+          "contests": 1,
+          "regions": {
+            "PE": 1
+          },
+          "source": "ca-prov-pe-2023",
+          "quote": "PE: April 3, 2023: Provincial General Election:"
+        },
+        {
+          "date": "2023-05-29",
+          "contests": 1,
+          "regions": {
+            "AB": 1
+          },
+          "source": "ca-prov-ab",
+          "quote": "AB: 2023, Monday, May 29"
+        },
+        {
+          "date": "2023-10-03",
+          "contests": 1,
+          "regions": {
+            "MB": 1
+          },
+          "source": "ca-prov-mb",
+          "quote": "MB: 43rd ... October 3, 2023"
+        },
+        {
+          "date": "2023-11-14",
+          "contests": 1,
+          "regions": {
+            "NT": 1
+          },
+          "source": "ca-prov-nt",
+          "quote": "NT: Official Voting Results 2023"
+        },
+        {
+          "date": "2024-10-19",
+          "contests": 1,
+          "regions": {
+            "BC": 1
+          },
+          "source": "ca-prov-bc",
+          "quote": "BC: Statement of Votes - 43 rd Provincial General Election - October 19, 2024"
+        },
+        {
+          "date": "2024-10-21",
+          "contests": 1,
+          "regions": {
+            "NB": 1
+          },
+          "source": "ca-prov-nb",
+          "quote": "NB: Forty-first General Election, October 21, 2024"
+        },
+        {
+          "date": "2024-10-28",
+          "contests": 1,
+          "regions": {
+            "SK": 1
+          },
+          "source": "ca-prov-sk",
+          "quote": "SK: 30th Provincial General Election, October 28, 2024"
+        },
+        {
+          "date": "2024-11-26",
+          "contests": 1,
+          "regions": {
+            "NS": 1
+          },
+          "source": "ca-prov-ns",
+          "quote": "NS: 65th General Assembly of Nova Scotia | 2024 - | November 26, 2024"
+        },
+        {
+          "date": "2025-02-27",
+          "contests": 1,
+          "regions": {
+            "ON": 1
+          },
+          "source": "ca-prov-on-2025",
+          "quote": "ON: 2025 | Feb 27 2025 February 27 2025 | General Election"
+        },
+        {
+          "date": "2025-10-14",
+          "contests": 1,
+          "regions": {
+            "NL": 1
+          },
+          "source": "ca-prov-nl",
+          "quote": "NL: 2025 October 14"
+        },
+        {
+          "date": "2025-10-27",
+          "contests": 1,
+          "regions": {
+            "NU": 1
+          },
+          "source": "ca-prov-nu",
+          "quote": "NU: The Election Day will be October 27."
+        },
+        {
+          "date": "2025-11-03",
+          "contests": 1,
+          "regions": {
+            "YT": 1
+          },
+          "source": "ca-prov-yt-2025",
+          "quote": "YT: The last election was held on November 3, 2025."
+        },
+        {
+          "date": "2026-10-05",
+          "contests": 1,
+          "regions": {
+            "QC": 1
+          },
+          "source": "ca-prov-qc-2026",
+          "quote": "QC: Résultats des élections générales du 5 octobre 2026 – Élections Québec"
+        },
+        {
+          "date": "2026-10-24",
+          "contests": 1,
+          "regions": {
+            "BC": 1
+          },
+          "source": "ca-prov-bc",
+          "quote": "BC: Final Voting Day was October 24, 2026."
         }
       ],
-      "elections": []
+      "unit": "polity",
+      "note": "Counted per election, not per riding: each province's or territory's general election counts once, from the date list its elections agency or legislature publishes. An election counts once the archive holds its results. Yukon counts from 1909 and the Northwest Territories from 1975, when their councils became wholly elected. New Brunswick's agency lists its elections only from 1967, so its 24 earlier elections aren't counted yet. Where the official list gives only a month (Quebec in 1867 and 1871, Prince Edward Island in 1873), the election is dated to the first of that month."
     }
   ]
 }
