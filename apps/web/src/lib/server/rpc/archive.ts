@@ -5335,6 +5335,9 @@ export const contests = {
           votes: row.votes,
         }))
         .toSorted((a, b) => b.votes - a.votes);
+      const electoral = new Map(
+        ballots == null ? [] : electors.map((row) => [row.person, row.votes]),
+      );
       const [faces, attended, backers] = await Promise.all([
         portraits(
           rows.flatMap(
@@ -5449,6 +5452,15 @@ export const contests = {
           const nominated = own.filter((entry) => entry.kind === "nominated");
           return {
             ...row,
+            current:
+              row.current?.seats == null ||
+              row.current.person == null ||
+              !electoral.has(row.current.person)
+                ? row.current
+                : {
+                    ...row.current,
+                    seats: electoral.get(row.current.person) ?? 0,
+                  },
             photo:
               faces.get(row.current?.person ?? row.earlier?.person ?? "") ??
               null,
