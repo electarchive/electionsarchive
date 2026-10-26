@@ -76,6 +76,7 @@ def _stage(conn: Connection, changeset_id: str) -> Stage:
             "entity_retirement",
             "entity_subtype_drop",
             "name_drop",
+            "external_id_drop",
             "membership_drop",
             "unit_area_drop",
             "note_drop",
@@ -647,7 +648,7 @@ def _publish_table(conn: Connection, stage: Stage, table: str) -> None:
                      and c.confrelid::regclass::text = any(%s)
                      and c.conrelid::regclass::text not in
                        ('name', 'note', 'external_id', 'slug', 'label', 'flag', 'search_document', 'entity_retirement',
-                        'name_drop', 'note_drop', 'entity_subtype_drop')
+                        'name_drop', 'external_id_drop', 'note_drop', 'entity_subtype_drop')
                      and (c.conrelid::regclass::text, a.attname) <> (%s, 'id')
                      and (c.conrelid::regclass::text, c.confrelid::regclass::text)
                        <> ('candidacy_nomination', 'candidacy')""",
@@ -788,6 +789,20 @@ def _publish_table(conn: Connection, stage: Stage, table: str) -> None:
                            and not exists (select from public.name o where o.entity_id = n.entity_id and o.is_preferred)
                          order by n.entity_id, n.recorded_from desc) pick
                    where n.id = pick.id"""
+            ).format(staged)
+        )
+    if table == "external_id_drop":
+        for scheme, value, entity, held in conn.execute(
+            sql.SQL(
+                """select s.scheme, s.value, s.entity_id::text, x.entity_id::text
+                   from {} s left join public.external_id x using (scheme, value)"""
+            ).format(staged)
+        ).fetchall():
+            if held != entity:
+                raise ValueError(f"external id {scheme} {value} is not on {entity}")
+        conn.execute(
+            sql.SQL(
+                "delete from public.external_id x using {} s where x.scheme = s.scheme and x.value = s.value"
             ).format(staged)
         )
     if table == "note_drop":

@@ -642,6 +642,17 @@ export const externalId = pgTable("external_id", {
 	index("external_id_entity_idx").using("btree", table.entityId.asc().nullsLast()),
 ]);
 
+export const externalIdDrop = pgTable("external_id_drop", {
+	entityId: uuid("entity_id").notNull().references(() => entity.id, { onDelete: "cascade" } ),
+	scheme: text().notNull(),
+	value: text().notNull(),
+	reason: text().notNull(),
+	changesetId: uuid("changeset_id").notNull().references(() => changeset.id),
+	recordedFrom: timestamp("recorded_from", { withTimezone: true }).default(sql`now()`).notNull(),
+}, (table) => [
+	primaryKey({ columns: [table.scheme, table.value, table.changesetId], name: "external_id_drop_pkey"}),
+	check("external_id_drop_reason_check", sql`(reason <> ''::text)`),]);
+
 export const factRekey = pgTable("fact_rekey", {
 	changesetId: uuid("changeset_id").notNull().references(() => changeset.id),
 	relation: text().notNull(),
