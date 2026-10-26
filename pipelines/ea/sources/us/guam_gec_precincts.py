@@ -17,6 +17,7 @@ REPORTS = {
 }
 DRIVE = {
     2020: (date(2020, 11, 3), "https://gec.guam.gov/2020-general-election-unofficial-results-detail/"),
+    "2020R": (date(2020, 11, 17), "https://gec.guam.gov/2020-runoff-election-unofficial-results-precinct-report/"),
     2022: (date(2022, 11, 8), "https://drive.google.com/embeddedfolderview?id=1o8HEFW7NFB8VfQGP-dJkBF0JF2mcvHiv"),
 }
 CSV24 = (date(2024, 11, 5), "https://drive.google.com/uc?export=download&id=1EZZ2Qjrl8JOSAaFyKtPxppaQCNTjVKUt")
@@ -132,7 +133,7 @@ def emit() -> Path:
                 lowered = re.sub(r"\s*\((dem|rep|ind)\)\s*$", "", re.sub(r"^(DEM|REP|IND|NPP) ", "", name).lower()).strip()
                 if lowered in ("write-in", "write-ins", "write-in totals"):
                     found = [option for option, _, kind in labels if kind == "write_in"] or [option for option, label, _ in labels if "aguon" in label]
-                elif lowered.startswith(("over", "under")):
+                elif lowered.startswith(("overvote", "undervote")):
                     continue
                 elif section == "governor":
                     head = lowered.split("/")[0].strip()
@@ -143,7 +144,7 @@ def emit() -> Path:
                 if len(found) != 1:
                     raise ValueError(f"{key}: {len(found)} options for {name}")
                 picked[name] = found[0]
-            source_title = f"{day.year} General Election official results by precinct"
+            source_title = f"{day.year} {'Runoff' if day == date(2020, 11, 17) else 'General'} Election official results by precinct"
             source = cs.source(PUBLISHER, source_title)
             if source in cs.minted and not any(r["id"] == source for r in cs.rows.get("source", [])):
                 cs.add("source", id=source, kind="official_body", publisher=PUBLISHER, title=source_title, url="https://gec.guam.gov/", license="Public record")
