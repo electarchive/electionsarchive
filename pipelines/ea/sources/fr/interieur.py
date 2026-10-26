@@ -41,7 +41,7 @@ NUANCES = {
     "RDG": "Parti radical de gauche",
     "VEC": "Les Écologistes",
     "DVG": "Divers gauche",
-    "UG": "Union de la gauche",
+    "UG": "Nouveau Front populaire",
     "ECO": "Écologistes",
     "REG": "Régionaliste",
     "DIV": "Divers",
@@ -571,6 +571,18 @@ def emit() -> Path:
             cs.add("party", id=nuances[code], kind="nuance", polity_id=france)
             name(nuances[code], label)
             name(nuances[code], code, "fr", "abbreviation")
+        name(nuances["UG"], "New Popular Front", "en")
+        name(nuances["UG"], "Union de la gauche", "fr", "ballot")
+        for name_id, text in conn.execute(
+            "select id, text from name where entity_id = %s and text = 'Union of the Left'", [nuances["UG"]]
+        ).fetchall():
+            cs.add(
+                "name_drop",
+                name_id=name_id,
+                entity_id=nuances["UG"],
+                text=text,
+                reason="Wikidata's Union of the Left is the 1970s alliance; the 2024 nuance is the New Popular Front",
+            )
         assembly = cs.key("fr.body", "national-assembly")
         cs.add("body", id=assembly, polity_id=france, kind="lower_house")
         name(assembly, "National Assembly", "en")

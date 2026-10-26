@@ -105,7 +105,7 @@ MATCHES: dict[tuple[str, str], str | None] = {
     ("FR", "EXD"): "Q127282704",
     ("FR", "EXG"): "Q127294071",
     ("FR", "REG"): "Q127282254",
-    ("FR", "UG"): "Q3550075",
+    ("FR", "UG"): None,
     ("FR", "UXD"): "Q127038776",
     ("IT", "Alleanza Verdi e Sinistra"): "Q113168799",
     ("IT", "Azione – Italia Viva"): "Q114246565",
