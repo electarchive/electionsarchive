@@ -264,6 +264,35 @@ NEW = {
     "CIVICA POPOLARE LORENZIN": ("Civica Popolare", None, "list_vehicle"),
     "PARTITO COMUNISTA": ("Partito Comunista", None, "party"),
     "VALLEE D'AOSTE": ("Vallée d'Aoste", None, "list_vehicle"),
+    "MOV.ASSOCIATIVO ITALIANI ALL'ESTERO": ("Movimento Associativo Italiani all'Estero", "MAIE", "party"),
+    "MOVIMENTO ASSOCIATIVO ITALIANI ALL'ESTERO - MAIE": ("Movimento Associativo Italiani all'Estero", "MAIE", "party"),
+    "U.S.E.I.": ("Unione Sudamericana Emigrati Italiani", "USEI", "party"),
+    "USEI": ("Unione Sudamericana Emigrati Italiani", "USEI", "party"),
+    "UNIONE SUDAMERICANA EMIGRATI ITALIANI - USEI": ("Unione Sudamericana Emigrati Italiani", "USEI", "party"),
+    "ASS.ITAL.SUD AMERICA": ("Associazioni Italiane in Sud America", "AISA", "party"),
+    "LEGA - FORZA ITALIA - FRATELLI D'ITALIA CON GIORGIA MELONI": (
+        "Lega – Forza Italia – Fratelli d'Italia con Giorgia Meloni",
+        None,
+        "list_vehicle",
+    ),
+    "LEGA PER SALVINI PREMIER - FORZA ITALIA - FRATELLI D'ITALIA": (
+        "Lega per Salvini Premier – Forza Italia – Fratelli d'Italia",
+        None,
+        "list_vehicle",
+    ),
+    "L'ITALIA DEL MERIDIONE": ("L'Italia del Meridione", None, "party"),
+    "MOVIMENTO DELLE LIBERTA'": ("Movimento delle Libertà", None, "party"),
+    "PARTITO REPUBBLICANO ITALIANO - ALA": ("Partito Repubblicano Italiano – ALA", None, "list_vehicle"),
+    "FREE FLIGHTS TO ITALY": ("Free Flights to Italy", None, "party"),
+    "UNITAL": ("Unital", None, "party"),
+}
+ABROAD_JOINT = {
+    "LEGA - FORZA ITALIA - FRATELLI D'ITALIA CON GIORGIA MELONI",
+    "LEGA PER SALVINI PREMIER - FORZA ITALIA - FRATELLI D'ITALIA",
+}
+ABROAD_GROUPS = {
+    "PARTITO DEMOCRATICO - ITALIA DEMOCRATICA E PROGRESSISTA": "PARTITO DEMOCRATICO",
+    "LEGA PER SALVINI PREMIER - FORZA ITALIA - FRATELLI D'ITALIA": "LEGA",
 }
 NEW_OVERRIDES = {("CENTRO DEMOCRATICO", 2013): ("Centro Democratico", "CD", "party")}
 SYMBOLS = {
@@ -1100,6 +1129,8 @@ def emit() -> Path:
                     name(persons[scheme, key], display, "it")
             return persons[scheme, key]
 
+        joined: set[tuple[UUID, UUID]] = set()
+
         def abroad_contests(day: date, election: UUID, path: str, year: int) -> None:
             day_abroad = abroad.filter(pl.col("day") == day)
             for ripartizione, (code, english) in RIPARTIZIONI.items() if day >= CALDEROLI else ():
@@ -1195,14 +1226,24 @@ def emit() -> Path:
                         value_row(abroad_set, units[country], None, VALID, valid)
                 for label in sorted(set(rows.filter(pl.col("votes") > 0)["label"])):
                     option = cs.key("it.option", f"{abroad_key}:{slug(label)}")
+                    party = (
+                        existing("it.party", slug(INTERNO_PARTIES[label][0]))
+                        if day == NEXT and label in INTERNO_PARTIES
+                        else party_of(label, year)
+                    )
+                    joint = None
+                    if label in ABROAD_JOINT:
+                        joint = cs.key("it.alliance", f"{day}:{slug(CENTER_RIGHT[0])}")
+                        if (joint, party) not in joined:
+                            joined.add((joint, party))
+                            cs.add("alliance_member", alliance_id=joint, party_id=party)
                     cs.add(
                         "contest_option",
                         id=option,
                         contest_id=abroad_contest,
                         kind="list",
-                        party_id=existing("it.party", slug(INTERNO_PARTIES[label][0]))
-                        if day == NEXT and label in INTERNO_PARTIES
-                        else party_of(label, year),
+                        party_id=party,
+                        alliance_id=joint,
                         ballot_label=label,
                     )
                     if label in abroad_won:
@@ -1226,6 +1267,9 @@ def emit() -> Path:
                             person_id=person_of("it.camera.persona", deputy, display, None, None),
                             option_id=option,
                             role="list_member",
+                            member_of_party_id=party_of(ABROAD_GROUPS[label], year)
+                            if label in ABROAD_GROUPS
+                            else party,
                             ballot_name=f"{surname} {forename}",
                         )
                         cs.add(
