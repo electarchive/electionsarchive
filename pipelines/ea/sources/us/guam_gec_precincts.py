@@ -15,7 +15,23 @@ REPORTS = {
     2016: (date(2016, 11, 8), "https://gec.guam.gov/wp-content/uploads/2016/11/2016-ge-unofficial-prec{:04d}.htm"),
     2018: (date(2018, 11, 6), "https://gec.guam.gov/wp-content/uploads/2018/11/2018-ge-official-prec{:04d}.htm"),
 }
+DRIVE = {
+    2020: (date(2020, 11, 3), "https://gec.guam.gov/2020-general-election-unofficial-results-detail/"),
+    2022: (date(2022, 11, 8), "https://drive.google.com/embeddedfolderview?id=1o8HEFW7NFB8VfQGP-dJkBF0JF2mcvHiv"),
+}
 CSV24 = (date(2024, 11, 5), "https://drive.google.com/uc?export=download&id=1EZZ2Qjrl8JOSAaFyKtPxppaQCNTjVKUt")
+
+
+def drive_links(listing: str) -> list[str]:
+    page = raw.cached(SOURCE, listing).path.read_text(encoding="utf-8", errors="replace")
+    links = []
+    for href, label in re.findall(r'<a[^>]+href="https://drive\.google\.com/file/d/([^/"]+)[^"]*"[^>]*>(.*?)</a>', page, flags=re.S):
+        text = re.sub(r"\s+", " ", re.sub(r"<[^>]+>", "", label)).strip()
+        if re.match(r"Precinct_", text) or re.search(r"\b\d+[A-Z]? \(", text):
+            link = f"https://drive.google.com/uc?export=download&id={href}"
+            if link not in links:
+                links.append(link)
+    return links
 
 
 def fetch() -> None:
@@ -28,6 +44,18 @@ def fetch() -> None:
                 body = subprocess.run(["curl", "-skL", "-m", "60", "-A", raw.USER_AGENT, "-w", "%{http_code}", url], capture_output=True, check=True).stdout
                 if body.endswith(b"200"):
                     raw.store(SOURCE, url, body[:-3], suffix=".htm", retrieved_at=datetime.now(UTC), media_type="text/html")
+    for _, listing in DRIVE.values():
+        try:
+            raw.cached(SOURCE, listing)
+        except LookupError:
+            body = subprocess.run(["curl", "-skL", "-m", "60", listing], capture_output=True, check=True).stdout
+            raw.store(SOURCE, listing, body, suffix=".html", retrieved_at=datetime.now(UTC), media_type="text/html")
+        for link in drive_links(listing):
+            try:
+                raw.cached(SOURCE, link)
+            except LookupError:
+                body = subprocess.run(["curl", "-sL", "-m", "90", link], capture_output=True, check=True).stdout
+                raw.store(SOURCE, link, body, suffix=".pdf", retrieved_at=datetime.now(UTC), media_type="application/pdf")
     try:
         raw.cached(SOURCE, CSV24[1])
     except LookupError:
@@ -54,6 +82,22 @@ def emit() -> Path:
                 if found and section is not None:
                     results.setdefault((day, section), {}).setdefault(code, {})[found[1].strip(" .")] = int(found[2].replace(",", ""))
                 elif stripped and not re.match(r"(?i)(vote for|mark no more|total|over votes|under votes|\(with|votes|registered|ballots|voter)", stripped):
+                    lowered = stripped.lower()
+                    section = "governor" if lowered.startswith("governor") else "house:0" if lowered.startswith("non-voting delegate") else None
+    for year, (day, listing) in DRIVE.items():
+        for link in drive_links(listing):
+            artifact = raw.cached(SOURCE, link)
+            artifacts.setdefault(day, []).append(artifact)
+            text = subprocess.run(["pdftotext", "-layout", str(artifact.path), "-"], capture_output=True, check=True, text=True).stdout
+            label = re.search(r"(?m)^Precinct (\S+)", text)[1]
+            code = f"{year}:GU:{label}"
+            section = None
+            for line in text.splitlines():
+                stripped = line.strip()
+                found = re.match(r"^(?:(?:DEM|REP|IND|NPP)\s+)?(.*?)\s{2,}(\d[\d,]*)\s+[\d.]+%\s*$", stripped)
+                if found and section is not None and not found[1].startswith("Total Votes"):
+                    results.setdefault((day, section), {}).setdefault(code, {})[found[1].strip()] = int(found[2].replace(",", ""))
+                elif stripped and not re.match(r"(?i)(vote for|total|overvotes|undervotes|contest totals|statistics|registered|ballots|voter|summary|precinct|guam general|guam 2020|november|report generated|official)", stripped):
                     lowered = stripped.lower()
                     section = "governor" if lowered.startswith("governor") else "house:0" if lowered.startswith("non-voting delegate") else None
     day, url = CSV24
@@ -86,7 +130,7 @@ def emit() -> Path:
             picked = {}
             for name in {name for votes in precincts.values() for name in votes}:
                 lowered = re.sub(r"\s*\((dem|rep|ind)\)\s*$", "", re.sub(r"^(DEM|REP|IND|NPP) ", "", name).lower()).strip()
-                if lowered in ("write-in", "write-ins"):
+                if lowered in ("write-in", "write-ins", "write-in totals"):
                     found = [option for option, _, kind in labels if kind == "write_in"] or [option for option, label, _ in labels if "aguon" in label]
                 elif lowered.startswith(("over", "under")):
                     continue
