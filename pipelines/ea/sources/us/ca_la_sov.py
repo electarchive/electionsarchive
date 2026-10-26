@@ -26,6 +26,11 @@ NOTE = (
     "the top vote-getters up to that count are recorded as elected, and in a nonpartisan primary a candidate with a "
     "majority is elected and otherwise the top two advance."
 )
+MEASURE_NOTE = (
+    "Precinct totals from the Los Angeles County Registrar-Recorder/County Clerk's Statement of Votes Cast, one "
+    "Excel file per contest. The county leaves out the selections of precincts with a single ballot cast, so precinct "
+    "sums can fall slightly short of the measure's totals. The file declares no outcome, so none is recorded."
+)
 SEATS = ' The seat count is the Registrar\'s own "Vote for no more than" line for the contest on results.lavote.gov.'
 NO_SEATS = " No seat count is stated for this at-large contest, so no outcomes are recorded."
 PARTIAL = " The jurisdiction extends beyond Los Angeles County; these are the county's precincts only."
@@ -720,7 +725,7 @@ def emit() -> Path:
                 "note",
                 entity_id=result_set,
                 kind="methodology",
-                body_md=NOTE
+                body_md=(MEASURE_NOTE if row["type"] in ("measure", "recall") else NOTE)
                 + (
                     SEATS
                     if row["type"] in ("council", "board") and row["seat"] is None and magnitude is not None
