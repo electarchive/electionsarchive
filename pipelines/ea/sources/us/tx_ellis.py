@@ -69,6 +69,37 @@ def documents() -> Iterator[tuple[str, str, str]]:
                 yield day, label, href
 
 
+def group_detail(text: str) -> Iterator[dict[str, Any]]:
+    lines = text.splitlines()
+    for index, line in enumerate(lines):
+        vote_for = re.match(r"^VOTE FOR (\d+)\s*$", line.strip())
+        if vote_for is None:
+            continue
+        title = next((other.strip() for other in reversed(lines[:index]) if other.strip()), "")
+        choices: list[dict[str, Any]] = []
+        for other in lines[index + 1 : index + 40]:
+            found = re.match(r"^\s*(.+?)[ .]{2,}([\d,]+)\s+[\d.]+\s", other)
+            total = re.match(r"^\s*Total[ .]+([\d,]+)", other)
+            if total:
+                if choices:
+                    yield {
+                        "text": title,
+                        "vote_for": int(vote_for[1]),
+                        "choices": choices,
+                        "cast": int(total[1].replace(",", "")),
+                    }
+                break
+            if found and not other.strip().startswith(("(", "WITH")):
+                choices.append(
+                    {
+                        "text": re.sub(r"[ .]+$", "", found[1]).strip(),
+                        "party": None,
+                        "total": found[2].replace(",", ""),
+                        "places": [],
+                    }
+                )
+
+
 def fetch() -> None:
     raw.fetch(SOURCE, LISTING, suffix=".html")
     for layer in enr_clarity.LAYERS:
@@ -88,7 +119,10 @@ def _read(registry: Mapping[str, Mapping[str, str]]) -> Iterator[dict[str, Any]]
                 ["pdftotext", "-layout", str(raw.cached(SOURCE, href).path), "-"], capture_output=True, check=True
             ).stdout.decode(errors="replace")
             nodes = []
-            for node in tx_collin.electionware(re.sub(r"(?m)^(Vote For \d+)\s*$", r"  \1", text)):
+            parsed = list(tx_collin.electionware(re.sub(r"(?m)^(Vote For \d+)\s*$", r"  \1", text))) or list(
+                group_detail(text)
+            )
+            for node in parsed:
                 for choice in node["choices"]:
                     choice["text"] = re.sub(r"^(?:REP|DEM|LIB|GRN|IND|NPA|UNA)\s+", "", choice["text"])
                 node["text"] = tx_harris.normalize(tx_collin.entity_first(PORTION.sub("", node["text"])))
