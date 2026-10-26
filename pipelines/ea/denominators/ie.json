@@ -42,6 +42,67 @@
       "title": "Constituency Commission Report on European Parliament Constituencies, 2003",
       "publisher": "Constituency Commission (Ireland)",
       "url": "https://www.electoralcommission.ie/app/uploads/2025/04/euro.pdf"
+    },
+    "ie-ea-1923": {
+      "title": "Electoral Act, 1923, Eighth Schedule",
+      "publisher": "Irish Statute Book (eISB)",
+      "url": "https://www.irishstatutebook.ie/eli/1923/act/12/schedule/8/enacted/en/html"
+    },
+    "ie-ea-1935": {
+      "title": "Electoral (Revision of Constituencies) Act, 1935, First Schedule",
+      "publisher": "Irish Statute Book (eISB)",
+      "url": "https://www.irishstatutebook.ie/eli/1935/act/5/schedule/1/enacted/en/html",
+      "note": "The universities' seats were abolished in 1936, so the 1937 to 1944 elections used only the 34 constituencies in this schedule."
+    },
+    "ie-ea-1947": {
+      "title": "Electoral (Amendment) Act, 1947, First Schedule",
+      "publisher": "Irish Statute Book (eISB)",
+      "url": "https://www.irishstatutebook.ie/eli/1947/act/31/schedule/1/enacted/en/html"
+    },
+    "ie-ea-1961": {
+      "title": "Electoral (Amendment) Act, 1961, Schedule",
+      "publisher": "Irish Statute Book (eISB)",
+      "url": "https://www.irishstatutebook.ie/eli/1961/act/19/enacted/en/print.html"
+    },
+    "ie-ea-1969": {
+      "title": "Electoral (Amendment) Act, 1969, Schedule",
+      "publisher": "Irish Statute Book (eISB)",
+      "url": "https://www.irishstatutebook.ie/eli/1969/act/3/enacted/en/print.html"
+    },
+    "ie-ea-1974": {
+      "title": "Electoral (Amendment) Act, 1974, Schedule",
+      "publisher": "Irish Statute Book (eISB)",
+      "url": "https://www.irishstatutebook.ie/eli/1974/act/7/enacted/en/print.html"
+    },
+    "ie-ea-1980": {
+      "title": "Electoral (Amendment) Act, 1980, Schedule",
+      "publisher": "Irish Statute Book (eISB)",
+      "url": "https://www.irishstatutebook.ie/eli/1980/act/17/enacted/en/print.html"
+    },
+    "ie-ea-1983": {
+      "title": "Electoral (Amendment) Act, 1983, Schedule",
+      "publisher": "Irish Statute Book (eISB)",
+      "url": "https://www.irishstatutebook.ie/eli/1983/act/36/enacted/en/print.html"
+    },
+    "ie-ea-1990": {
+      "title": "Electoral (Amendment) Act, 1990, Schedule",
+      "publisher": "Irish Statute Book (eISB)",
+      "url": "https://www.irishstatutebook.ie/eli/1990/act/36/enacted/en/print.html"
+    },
+    "ie-ea-1995": {
+      "title": "Electoral (Amendment) Act, 1995, Schedule",
+      "publisher": "Irish Statute Book (eISB)",
+      "url": "https://www.irishstatutebook.ie/eli/1995/act/21/enacted/en/print.html"
+    },
+    "ie-ea-1998": {
+      "title": "Electoral (Amendment) (No. 2) Act, 1998, Schedule",
+      "publisher": "Irish Statute Book (eISB)",
+      "url": "https://www.irishstatutebook.ie/eli/1998/act/19/enacted/en/print.html"
+    },
+    "ie-ea-2005": {
+      "title": "Electoral (Amendment) Act 2005, Schedule",
+      "publisher": "Irish Statute Book (eISB)",
+      "url": "https://www.irishstatutebook.ie/eli/2005/act/16/enacted/en/print.html"
     }
   },
   "levels": [
@@ -65,6 +126,222 @@
       ],
       "fine_note": "Dáil votes are counted and declared by constituency; the tallies by ballot box are kept by parties, not published by returning officers.",
       "elections": [
+        {
+          "date": "1923-08-27",
+          "contests": 30,
+          "seats": 153,
+          "source": "ie-ea-1923",
+          "quote": "Eighth Schedule: 3 borough constituencies (Part I), 25 county constituencies (Part II), and 2 university constituencies (Part III); section 50(1): The Dáil shall consist of 153 members",
+          "note": "Constituencies counted from the schedule's rows; the polling date is not quoted from a fetched source."
+        },
+        {
+          "date": "1927-06-09",
+          "contests": 30,
+          "seats": 153,
+          "source": "ie-ea-1923",
+          "quote": "Eighth Schedule: 3 borough constituencies (Part I), 25 county constituencies (Part II), and 2 university constituencies (Part III); section 50(1): The Dáil shall consist of 153 members",
+          "note": "Constituencies counted from the schedule's rows; the polling date is not quoted from a fetched source."
+        },
+        {
+          "date": "1927-09-15",
+          "contests": 30,
+          "seats": 153,
+          "source": "ie-ea-1923",
+          "quote": "Eighth Schedule: 3 borough constituencies (Part I), 25 county constituencies (Part II), and 2 university constituencies (Part III); section 50(1): The Dáil shall consist of 153 members",
+          "note": "Constituencies counted from the schedule's rows; the polling date is not quoted from a fetched source."
+        },
+        {
+          "date": "1932-02-16",
+          "contests": 30,
+          "seats": 153,
+          "source": "ie-ea-1923",
+          "quote": "Eighth Schedule: 3 borough constituencies (Part I), 25 county constituencies (Part II), and 2 university constituencies (Part III); section 50(1): The Dáil shall consist of 153 members",
+          "note": "Constituencies counted from the schedule's rows; the polling date is not quoted from a fetched source."
+        },
+        {
+          "date": "1933-01-24",
+          "contests": 30,
+          "seats": 153,
+          "source": "ie-ea-1923",
+          "quote": "Eighth Schedule: 3 borough constituencies (Part I), 25 county constituencies (Part II), and 2 university constituencies (Part III); section 50(1): The Dáil shall consist of 153 members",
+          "note": "Constituencies counted from the schedule's rows; the polling date is not quoted from a fetched source."
+        },
+        {
+          "date": "1937-07-01",
+          "contests": 34,
+          "seats": 138,
+          "source": "ie-ea-1935",
+          "quote": "First Schedule: 34 borough and county constituencies; section 3: Dáil Eireann shall consist of one hundred and thirty-eight members returned by borough constituencies and county constituencies",
+          "note": "Constituencies counted from the schedule's rows; the polling date is not quoted from a fetched source."
+        },
+        {
+          "date": "1938-06-17",
+          "contests": 34,
+          "seats": 138,
+          "source": "ie-ea-1935",
+          "quote": "First Schedule: 34 borough and county constituencies; section 3: Dáil Eireann shall consist of one hundred and thirty-eight members returned by borough constituencies and county constituencies",
+          "note": "Constituencies counted from the schedule's rows; the polling date is not quoted from a fetched source."
+        },
+        {
+          "date": "1943-06-23",
+          "contests": 34,
+          "seats": 138,
+          "source": "ie-ea-1935",
+          "quote": "First Schedule: 34 borough and county constituencies; section 3: Dáil Eireann shall consist of one hundred and thirty-eight members returned by borough constituencies and county constituencies",
+          "note": "Constituencies counted from the schedule's rows; the polling date is not quoted from a fetched source."
+        },
+        {
+          "date": "1944-05-30",
+          "contests": 34,
+          "seats": 138,
+          "source": "ie-ea-1935",
+          "quote": "First Schedule: 34 borough and county constituencies; section 3: Dáil Eireann shall consist of one hundred and thirty-eight members returned by borough constituencies and county constituencies",
+          "note": "Constituencies counted from the schedule's rows; the polling date is not quoted from a fetched source."
+        },
+        {
+          "date": "1948-02-04",
+          "contests": 40,
+          "seats": 147,
+          "source": "ie-ea-1947",
+          "quote": "First Schedule: 40 constituencies, members totaling 147",
+          "note": "Constituencies counted from the schedule's rows; the polling date is not quoted from a fetched source."
+        },
+        {
+          "date": "1951-05-30",
+          "contests": 40,
+          "seats": 147,
+          "source": "ie-ea-1947",
+          "quote": "First Schedule: 40 constituencies, members totaling 147",
+          "note": "Constituencies counted from the schedule's rows; the polling date is not quoted from a fetched source."
+        },
+        {
+          "date": "1954-05-18",
+          "contests": 40,
+          "seats": 147,
+          "source": "ie-ea-1947",
+          "quote": "First Schedule: 40 constituencies, members totaling 147",
+          "note": "Constituencies counted from the schedule's rows; the polling date is not quoted from a fetched source."
+        },
+        {
+          "date": "1957-03-05",
+          "contests": 40,
+          "seats": 147,
+          "source": "ie-ea-1947",
+          "quote": "First Schedule: 40 constituencies, members totaling 147",
+          "note": "Constituencies counted from the schedule's rows; the polling date is not quoted from a fetched source."
+        },
+        {
+          "date": "1961-10-04",
+          "contests": 38,
+          "seats": 144,
+          "source": "ie-ea-1961",
+          "quote": "Schedule: 38 constituencies, members totaling 144",
+          "note": "Constituencies counted from the schedule's rows; the polling date is not quoted from a fetched source."
+        },
+        {
+          "date": "1965-04-07",
+          "contests": 38,
+          "seats": 144,
+          "source": "ie-ea-1961",
+          "quote": "Schedule: 38 constituencies, members totaling 144",
+          "note": "Constituencies counted from the schedule's rows; the polling date is not quoted from a fetched source."
+        },
+        {
+          "date": "1969-06-18",
+          "contests": 42,
+          "seats": 144,
+          "source": "ie-ea-1969",
+          "quote": "Schedule: 42 constituencies, members totaling 144",
+          "note": "Constituencies counted from the schedule's rows; the polling date is not quoted from a fetched source."
+        },
+        {
+          "date": "1973-02-28",
+          "contests": 42,
+          "seats": 144,
+          "source": "ie-ea-1969",
+          "quote": "Schedule: 42 constituencies, members totaling 144",
+          "note": "Constituencies counted from the schedule's rows; the polling date is not quoted from a fetched source."
+        },
+        {
+          "date": "1977-06-16",
+          "contests": 42,
+          "seats": 148,
+          "source": "ie-ea-1974",
+          "quote": "Schedule: 42 constituencies, members totaling 148",
+          "note": "Constituencies counted from the schedule's rows; the polling date is not quoted from a fetched source."
+        },
+        {
+          "date": "1981-06-11",
+          "contests": 41,
+          "seats": 166,
+          "source": "ie-ea-1980",
+          "quote": "Schedule: 41 constituencies, members totaling 166",
+          "note": "Constituencies counted from the schedule's rows; the polling date is not quoted from a fetched source."
+        },
+        {
+          "date": "1982-02-18",
+          "contests": 41,
+          "seats": 166,
+          "source": "ie-ea-1980",
+          "quote": "Schedule: 41 constituencies, members totaling 166",
+          "note": "Constituencies counted from the schedule's rows; the polling date is not quoted from a fetched source."
+        },
+        {
+          "date": "1982-11-24",
+          "contests": 41,
+          "seats": 166,
+          "source": "ie-ea-1980",
+          "quote": "Schedule: 41 constituencies, members totaling 166",
+          "note": "Constituencies counted from the schedule's rows; the polling date is not quoted from a fetched source."
+        },
+        {
+          "date": "1987-02-17",
+          "contests": 41,
+          "seats": 166,
+          "source": "ie-ea-1983",
+          "quote": "Schedule: 41 constituencies, members totaling 166",
+          "note": "Constituencies counted from the schedule's rows; the polling date is not quoted from a fetched source."
+        },
+        {
+          "date": "1989-06-15",
+          "contests": 41,
+          "seats": 166,
+          "source": "ie-ea-1983",
+          "quote": "Schedule: 41 constituencies, members totaling 166",
+          "note": "Constituencies counted from the schedule's rows; the polling date is not quoted from a fetched source."
+        },
+        {
+          "date": "1992-11-25",
+          "contests": 41,
+          "seats": 166,
+          "source": "ie-ea-1990",
+          "quote": "Schedule: 41 constituencies, members totaling 166",
+          "note": "Constituencies counted from the schedule's rows; the polling date is not quoted from a fetched source."
+        },
+        {
+          "date": "1997-06-06",
+          "contests": 41,
+          "seats": 166,
+          "source": "ie-ea-1995",
+          "quote": "Schedule: 41 constituencies, members totaling 166",
+          "note": "Constituencies counted from the schedule's rows; the polling date is not quoted from a fetched source."
+        },
+        {
+          "date": "2002-05-17",
+          "contests": 42,
+          "seats": 166,
+          "source": "ie-ea-1998",
+          "quote": "Schedule: 42 constituencies, members totaling 166",
+          "note": "Constituencies counted from the schedule's rows; the polling date is not quoted from a fetched source."
+        },
+        {
+          "date": "2007-05-24",
+          "contests": 43,
+          "seats": 166,
+          "source": "ie-ea-2005",
+          "quote": "Schedule: 43 constituencies, members totaling 166",
+          "note": "Constituencies counted from the schedule's rows; the polling date is not quoted from a fetched source."
+        },
         {
           "date": "2011-02-25",
           "contests": 43,
@@ -100,8 +377,8 @@
       "gaps": [
         {
           "from": 1922,
-          "to": 2007,
-          "note": "No official count of constituencies at these elections has been compiled yet."
+          "to": 1922,
+          "note": "The 1922 election used the constituencies set by the Government of Ireland Act 1920. No official list of them has been found yet, so this election isn't counted."
         }
       ]
     },

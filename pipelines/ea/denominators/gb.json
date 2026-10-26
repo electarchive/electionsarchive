@@ -648,9 +648,10 @@
         },
         {
           "year": 1950,
-          "contests": 9,
+          "contests": 10,
           "source": "hoc-cbp7529",
-          "quote": "Tables 13, 14a, and 14b list 9 by-elections dated 1950"
+          "quote": "Tables 13, 14a, and 14b list 9 by-elections dated 1950",
+          "note": "The tables give 9; Table 14a omits the uncontested Belfast East by-election of 29 November 1950. The missing by-elections are in Resul Umit's by-election dataset (the archive's gb.byelections source) and were checked against the archive's results."
         },
         {
           "year": 1951,
@@ -660,9 +661,10 @@
         },
         {
           "year": 1952,
-          "contests": 9,
+          "contests": 10,
           "source": "hoc-cbp7529",
-          "quote": "Tables 13, 14a, and 14b list 9 by-elections dated 1952"
+          "quote": "Tables 13, 14a, and 14b list 9 by-elections dated 1952",
+          "note": "The tables give 9; Table 14a omits the Belfast South by-election of 4 November 1952. The missing by-elections are in Resul Umit's by-election dataset (the archive's gb.byelections source) and were checked against the archive's results."
         },
         {
           "year": 1953,
@@ -696,15 +698,17 @@
         },
         {
           "year": 1958,
-          "contests": 15,
+          "contests": 14,
           "source": "hoc-cbp7529",
-          "quote": "Tables 13, 14a, and 14b list 15 by-elections dated 1958"
+          "quote": "Tables 13, 14a, and 14b list 15 by-elections dated 1958",
+          "note": "The tables give 15, but one is the Galloway by-election of 9 April 1959, which Table 13 misdates to 1958; it is counted in 1959."
         },
         {
           "year": 1959,
-          "contests": 5,
+          "contests": 7,
           "source": "hoc-cbp7529",
-          "quote": "Tables 13, 14a, and 14b list 5 by-elections dated 1959"
+          "quote": "Tables 13, 14a, and 14b list 5 by-elections dated 1959",
+          "note": "The tables give 5; Table 14a omits the Belfast East by-election of 19 March 1959, and Table 13 misdates the Galloway by-election of 9 April 1959 to 1958. The missing by-elections are in Resul Umit's by-election dataset (the archive's gb.byelections source) and were checked against the archive's results."
         },
         {
           "year": 1960,
@@ -726,9 +730,10 @@
         },
         {
           "year": 1963,
-          "contests": 15,
+          "contests": 16,
           "source": "hoc-cbp7529",
-          "quote": "Tables 13, 14a, and 14b list 15 by-elections dated 1963"
+          "quote": "Tables 13, 14a, and 14b list 15 by-elections dated 1963",
+          "note": "The tables give 15; Table 14a omits the Belfast South by-election of 22 October 1963. The missing by-elections are in Resul Umit's by-election dataset (the archive's gb.byelections source) and were checked against the archive's results."
         },
         {
           "year": 1964,
