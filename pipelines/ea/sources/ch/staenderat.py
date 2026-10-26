@@ -108,8 +108,10 @@ MISSPELLED = {"COUTEAU GILBERT": 51, "CAVELTI LUREGN MATHIAS": 43}
 DATE_FIXES = {
     (1991, "ZH", 1): (
         "1991-10-20",
-        "The Federal Statistical Office dates this vote 20 October 1990; it was held on 20 October 1991, the day "
-        "of the federal election (Parliamentary Services, Ständeratswahlen 44. Legislatur).",
+        (
+            "The Federal Statistical Office dates this vote 20 October 1990; it was held on 20 October 1991, the day "
+            "of the federal election (Parliamentary Services, Ständeratswahlen 44. Legislatur)."
+        ),
     ),
     (2003, "VD", 2): (
         "2003-11-09",
@@ -128,9 +130,11 @@ TACIT_SECOND = {
 ANNULLED = {
     (2023, "SH"): (
         "Stocker Simon",
-        "Simon Stocker was declared elected in the second round. The Federal Supreme Court annulled his election "
-        "in 2025 (BGE 1C_467/2024), and Schaffhausen elected a successor on 29 June 2025. The Federal Statistical "
-        "Office now lists him as not elected; the declared result is kept here.",
+        (
+            "Simon Stocker was declared elected in the second round. The Federal Supreme Court annulled his election "
+            "in 2025 (BGE 1C_467/2024), and Schaffhausen elected a successor on 29 June 2025. The Federal Statistical "
+            "Office now lists him as not elected; the declared result is kept here."
+        ),
     )
 }
 SHORT_TOTALS = {
@@ -189,7 +193,13 @@ def day(cell: object) -> str | None:
     if "Stille Wahl" in text:
         return "tacit"
     if match := re.fullmatch(r"(\d{1,2})\.(\d{1,2})\.(\d{2}|\d{4})", text):
-        year = int(match[3]) if len(match[3]) == 4 else 1900 + int(match[3]) if int(match[3]) > 50 else 2000 + int(match[3])
+        year = (
+            int(match[3])
+            if len(match[3]) == 4
+            else 1900 + int(match[3])
+            if int(match[3]) > 50
+            else 2000 + int(match[3])
+        )
         return date(year, int(match[2]), int(match[1])).isoformat()
     return datetime.fromisoformat(text).date().isoformat()
 
@@ -310,9 +320,16 @@ def parse() -> None:
                 rows.append({"cycle": cycle, "canton": canton, "kind": "total", "list": listing, "votes1": values[1]})
                 continue
             if text == "Total":
-                if proportional and rows[-1]["kind"] == "legend" and not any(
-                    entry["kind"] == "total" and entry["list"] == listing and entry["cycle"] == cycle
-                    and entry["canton"] == canton for entry in rows
+                if (
+                    proportional
+                    and rows[-1]["kind"] == "legend"
+                    and not any(
+                        entry["kind"] == "total"
+                        and entry["list"] == listing
+                        and entry["cycle"] == cycle
+                        and entry["canton"] == canton
+                        for entry in rows
+                    )
                 ):
                     rows.append(
                         {"cycle": cycle, "canton": canton, "kind": "total", "list": listing, "votes1": values[1]}
@@ -362,7 +379,9 @@ def parse() -> None:
     wrong = totals.filter(pl.col("votes1") != pl.col("sum"))
     if set(wrong.select("cycle", "canton", "list").rows()) != set(SHORT_TOTALS):
         raise ValueError(f"list totals differ from their candidates and additional votes: {wrong}")
-    labels = set(entries.filter(pl.col("kind") == "candidate")["party"].drop_nulls()) | set(entries["list"].drop_nulls())
+    labels = set(entries.filter(pl.col("kind") == "candidate")["party"].drop_nulls()) | set(
+        entries["list"].drop_nulls()
+    )
     if unknown := labels - set(LABELS) - UNAFFILIATED:
         raise ValueError(f"unknown party labels: {unknown}")
     if (lost := entries.filter(pl.col("kind").is_in(["total", "legend"]), pl.col("list").is_null())).height:
@@ -379,7 +398,9 @@ def parse() -> None:
                     "first": record["FirstName"],
                     "last": record["LastName"],
                     "gender": {"m": "male", "f": "female"}.get(record["GenderAsString"] or ""),
-                    "born": None if born is None else datetime.fromtimestamp(int(born[0]) / 1000, UTC).date().isoformat(),
+                    "born": None
+                    if born is None
+                    else datetime.fromtimestamp(int(born[0]) / 1000, UTC).date().isoformat(),
                     "member_canton": record["CantonAbbreviation"],
                 }
             )
@@ -404,17 +425,21 @@ def parse() -> None:
         if exact.height > 1:
             raise ValueError(f"ambiguous member matches for {canton} {printed}: {exact}")
 
-        def close(first: str, last: str) -> bool:
+        def close(first: str, last: str, tokens: set[str] = tokens, won: bool = won) -> bool:
             surname = [token for token in fold(last).split() if token not in PARTICLES]
             given = fold(first).split()
             if not surname or not given or surname[0] not in tokens:
                 return False
-            return given[0] in tokens or won and any(
-                token[:3] == given[0][:3] and len(token) > 2 for token in tokens - {surname[0]}
+            return (
+                given[0] in tokens
+                or won
+                and any(token[:3] == given[0][:3] and len(token) > 2 for token in tokens - {surname[0]})
             )
 
         near = roster.filter(pl.col("member_canton") == canton).filter(
-            pl.struct("first", "last").map_elements(lambda row: close(row["first"], row["last"]), return_dtype=pl.Boolean)
+            pl.struct("first", "last").map_elements(
+                lambda row: close(row["first"], row["last"]), return_dtype=pl.Boolean
+            )
         )
         if near.height == 1:
             found.append({"canton": canton, "printed": printed, **near.row(0, named=True)})
@@ -423,7 +448,9 @@ def parse() -> None:
         else:
             found.append({"canton": canton, "printed": printed})
     people = pl.DataFrame(found, infer_schema_length=None)
-    unmatched = wins.filter("elected").join(people.filter(pl.col("person").is_null()), on=["canton", "printed"], how="semi")
+    unmatched = wins.filter("elected").join(
+        people.filter(pl.col("person").is_null()), on=["canton", "printed"], how="semi"
+    )
     print(f"{people['person'].is_not_null().sum()} of {people.height} candidates matched to members")
     print(f"elected without a member match: {unmatched.select('canton', 'printed').rows()}")
     contests.write_parquet(PARSED / "contests.parquet")
@@ -573,7 +600,9 @@ def emit() -> Path:
 
         elections: dict[tuple[str, str | None], UUID] = {}
 
-        def election(when: date, canton: str | None, kind: str, parent: UUID, precision: str, printed: str | None) -> UUID:
+        def election(
+            when: date, canton: str | None, kind: str, parent: UUID, precision: str, printed: str | None
+        ) -> UUID:
             label = f"{when:%Y-%m}" if precision == "month" else str(when)
             if (label, canton) in elections:
                 return elections[label, canton]
@@ -678,11 +707,7 @@ def emit() -> Path:
                 contest = cs.key("ch.contest", contest_key)
                 field = f"votes{number}"
                 result_kind = (
-                    "tacit"
-                    if tacit
-                    else "show_of_hands"
-                    if assembly and number == 1 and uncounted
-                    else "counted"
+                    "tacit" if tacit else "show_of_hands" if assembly and number == 1 and uncounted else "counted"
                 )
                 counted = result_kind == "counted"
                 cs.add(
@@ -744,13 +769,21 @@ def emit() -> Path:
                         )
                         if (cycle, canton, listing) in SHORT_TOTALS:
                             note(result_set, "caveat", SHORT_TOTALS[cycle, canton, listing])
-                        seats = standing.filter(pl.col("list") == listing, pl.col("printed").is_in(list(winners))).height
+                        seats = standing.filter(
+                            pl.col("list") == listing, pl.col("printed").is_in(list(winners))
+                        ).height
                         if seats:
                             cs.add("outcome", result_set_id=result_set, option_id=option, kind="won", seats=seats)
                     for kind, measure in (("total", 8), ("legend", 9)):
                         for listing, value in here.filter(pl.col("kind") == kind).select("list", "votes1").iter_rows():
                             values.append(
-                                {"set": result_set, "canton": canton, "option": lists[listing], "measure": measure, "value": value}
+                                {
+                                    "set": result_set,
+                                    "canton": canton,
+                                    "option": lists[listing],
+                                    "measure": measure,
+                                    "value": value,
+                                }
                             )
                 for row in standing.iter_rows(named=True):
                     option = cs.key("ch.option", f"{contest_key}:{fold(row['printed'])}")
@@ -780,7 +813,13 @@ def emit() -> Path:
                         cs.add("outcome", result_set_id=result_set, option_id=option, kind="elected")
                     if counted and row[field] is not None:
                         values.append(
-                            {"set": result_set, "canton": canton, "option": option, "measure": 10 if pr else 1, "value": row[field]}
+                            {
+                                "set": result_set,
+                                "canton": canton,
+                                "option": option,
+                                "measure": 10 if pr else 1,
+                                "value": row[field],
+                            }
                         )
                 if counted:
                     for printed, value in (
@@ -790,10 +829,19 @@ def emit() -> Path:
                     ):
                         option = cs.key("ch.option", f"{contest_key}:scattered")
                         cs.add("contest_option", id=option, contest_id=contest, kind="write_in", ballot_label=printed)
-                        values.append({"set": result_set, "canton": canton, "option": option, "measure": 1, "value": value})
+                        values.append(
+                            {"set": result_set, "canton": canton, "option": option, "measure": 1, "value": value}
+                        )
                     if spec["turnout"] is not None:
                         values.append(
-                            {"set": result_set, "canton": canton, "option": None, "measure": 14, "value": spec["turnout"], "flags": 4}
+                            {
+                                "set": result_set,
+                                "canton": canton,
+                                "option": None,
+                                "measure": 14,
+                                "value": spec["turnout"],
+                                "flags": 4,
+                            }
                         )
                         note(result_set, "methodology", TURNOUT_NOTE)
                 previous = contest
@@ -808,7 +856,7 @@ def emit() -> Path:
                     "measure": [row["measure"] for row in values],
                     "count_round": [0] * len(values),
                     "flags": [row.get("flags", 0) for row in values],
-                    "value": [float(row["value"]) for row in values],
+                    "value": [float(str(row["value"])) for row in values],
                 },
                 schema_overrides={"channel": pl.Int16, "measure": pl.Int16, "count_round": pl.Int16, "flags": pl.Int16},
             ),

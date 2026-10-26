@@ -48,7 +48,9 @@ SELECT DISTINCT ?d ?titolo ?inizio WHERE {
   ?a ocd:rif_gruppoParlamentare ?g ; ocd:startDate ?inizio . ?g dc:title ?titolo
 }
 """
-GROUPS = "https://dati.camera.it/sparql?" + urlencode({"query": GROUPS_QUERY, "format": "application/sparql-results+json"})
+GROUPS = "https://dati.camera.it/sparql?" + urlencode(
+    {"query": GROUPS_QUERY, "format": "application/sparql-results+json"}
+)
 GROUP_LISTS = {
     "FRATELLI D'ITALIA": "FRATELLI D'ITALIA CON GIORGIA MELONI",
     "PARTITO DEMOCRATICO": "PARTITO DEMOCRATICO - ITALIA DEMOCRATICA E PROGRESSISTA",
@@ -184,8 +186,7 @@ METHODOLOGY = (
 )
 ELECTION_NOTE = (
     "Vote counts are the Interior Ministry's provisional count. Outcomes come from the proclamation as recorded in "
-    "the Chamber's mandates. The eight seats elected abroad and the Senate election held the same day are not yet in "
-    "the archive."
+    "the Chamber's mandates. The Senate election held the same day is not yet in the archive."
 )
 LEGEND_NOTE = (
     "Votes marked only on a single-member candidate are stored on a Candidate only option for each coalition in "
