@@ -250,7 +250,15 @@ def emit() -> Path:
                         entity_id=elections[election_key],
                     )
             contest = contests[key] = cs.key("us.contest", key)
-            previous = contests.get(key.removesuffix(":runoff")) if runoff else None
+            previous = (
+                next(
+                    contests[earlier]
+                    for earlier in sorted(contests, reverse=True)
+                    if earlier[10:] == key[10:].removesuffix(":runoff") and earlier < key
+                )
+                if runoff
+                else None
+            )
             cs.add(
                 "contest",
                 id=contest,
