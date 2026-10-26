@@ -259,7 +259,7 @@ def emit() -> Path:
             )
             if count > 1
         }
-        unit_cache: dict[tuple[str, str, str], UUID] = {}
+        unit_cache: dict[tuple[str, str, str, str | None], UUID] = {}
         added: set[UUID] = set()
 
         def party_id(line: str) -> list[UUID]:
@@ -278,11 +278,11 @@ def emit() -> Path:
                 found.append(entity)
             return found
 
-        def unit_for(era: str, bid: str, county: str) -> UUID:
-            if (era, bid) not in crossing:
+        def unit_for(era: str, bid: str, county: str, part: str | None = None) -> UUID:
+            if part is None and (era, bid) not in crossing:
                 return cs.unit("us.sldl", f"NY:{int(bid)}")
-            code = f"NY:{int(bid)}:{fips[county]}"
-            if (key := (era, bid, county)) not in unit_cache:
+            code = f"NY:{int(bid)}:{fips[county]}" + (f"/{part}" if part else "")
+            if (key := (era, bid, county, part)) not in unit_cache:
                 unit_cache[key] = cs.unit("us.sldl", code)
                 if unit_cache[key] in cs.minted and unit_cache[key] not in added:
                     added.add(unit_cache[key])
@@ -429,35 +429,68 @@ def emit() -> Path:
             if (office is not None and office in cs.minted and office not in added) or (area is not None and area in cs.minted):
                 skipped.append(f"{label}: its office or district is not in the archive")
                 continue
-            if conn.execute(
-                """select 1 from contest c join entity e on e.id = c.id and e.retired_by is null
+            found = conn.execute(
+                """select c.id from contest c join entity e on e.id = c.id and e.retired_by is null
                    where c.election_id = %s and c.office_id is not distinct from %s and c.body_id is not distinct from %s
                    and c.district_area_id is not distinct from %s and c.party_scope_id is not distinct from %s
                    and c.changeset_id not in (select id from changeset where pipeline = %s)""",
                 [election, office, body_id, area, party, SOURCE],
-            ).fetchone():
-                skipped.append(f"{label}: already in the archive")
+            ).fetchall()
+            if len(found) > 1:
+                skipped.append(f"{label}: several contests match")
                 continue
+            part = None
+            if seat == "council":
+                part = f"council-{number}/{'2003' if day_text < '2013-01-01' else '2013'}"
+            elif seat == "civil-court-district":
+                part = f"civil-district-{number}"
             magnitude = int(rows["size"][0])
-            contest_key = f"{day}:new-york-city:{seat_path}"
-            contest = cs.key("us.contest", contest_key)
-            cs.add(
-                "contest",
-                id=contest,
-                election_id=election,
-                kind="body_seats" if body_id else "office",
-                office_id=office,
-                body_id=body_id,
-                party_scope_id=party,
-                district_area_id=area,
-                magnitude=magnitude,
-                round_number=1,
-                electoral_system_id=fptp if magnitude == 1 else block,
-                default_result_kind="counted",
-                term="full",
-            )
-            name(contest, f"{day.year} {scope.title() + ' primary for ' if scope else ''}{title}{'' if scope else ' election'}")
-            cs.add("slug", path=f"{election_path}/{seat_path}", entity_id=contest)
+            attach = bool(found)
+            if attach:
+                contest = found[0][0]
+                contest_key = conn.execute(
+                    "select value from external_id where entity_id = %s and scheme = 'us.contest' limit 1", [contest]
+                ).fetchone()[0]
+                mine = int(rows["votes"].sum())
+                prior = conn.execute(
+                    """select rs.id, sum(v.value) from result_set rs
+                       join result_value v on v.result_set_k = rs.k and v.measure = 1
+                       join contest_option o on o.k = v.option_k
+                       where rs.contest_id = %s and rs.is_default
+                         and not exists (select 1 from contest_option ch where ch.parent_option_id = o.id)
+                       group by rs.id""",
+                    [contest],
+                ).fetchall()
+                if len(prior) != 1 or not prior[0][1]:
+                    skipped.append(f"{label}: no single default set to compare with")
+                    continue
+                completeness = round(min(mine / float(prior[0][1]), 1), 4)
+                if completeness < 0.995 or mine > float(prior[0][1]) * 1.005:
+                    skipped.append(f"{label}: totals disagree ({mine} against {prior[0][1]})")
+                    continue
+                whole = completeness >= 0.999
+            else:
+                contest_key = f"{day}:new-york-city:{seat_path}"
+                contest = cs.key("us.contest", contest_key)
+                whole = True
+                completeness = 1
+                cs.add(
+                    "contest",
+                    id=contest,
+                    election_id=election,
+                    kind="body_seats" if body_id else "office",
+                    office_id=office,
+                    body_id=body_id,
+                    party_scope_id=party,
+                    district_area_id=area,
+                    magnitude=magnitude,
+                    round_number=1,
+                    electoral_system_id=fptp if magnitude == 1 else block,
+                    default_result_kind="counted",
+                    term="full",
+                )
+                name(contest, f"{day.year} {scope.title() + ' primary for ' if scope else ''}{title}{'' if scope else ' election'}")
+                cs.add("slug", path=f"{election_path}/{seat_path}", entity_id=contest)
             source_title = f"{TITLE}, {kind} {day}"
             source = cs.source(PUBLISHER, source_title)
             if source in cs.minted and source not in added:
@@ -466,6 +499,20 @@ def emit() -> Path:
             for url in urls.values():
                 cs.artifact(raw.cached(SOURCE, url), source)
             result_set = cs.key(f"{SOURCE}.result_set", contest_key)
+            declared = {}
+            if attach and whole:
+                columns = ("id", "election_id", "contest_id", "stage", "kind", "status", "source_id", "as_of", "completeness", "supersedes_id")
+                for row in conn.execute(
+                    f"select {', '.join(columns)} from result_set where contest_id = %s and is_default and id <> %s", [contest, result_set]
+                ).fetchall():
+                    cs.add("result_set", **dict(zip(columns, row, strict=True)), is_default=False)
+                declared = dict(
+                    conn.execute(
+                        """select o.option_id, o.kind from outcome o join result_set r on r.id = o.result_set_id
+                           where r.contest_id = %s and r.is_default and r.id <> %s""",
+                        [contest, result_set],
+                    ).fetchall()
+                )
             cs.add(
                 "result_set",
                 id=result_set,
@@ -475,8 +522,8 @@ def emit() -> Path:
                 kind="counted",
                 status="active",
                 source_id=source,
-                is_default=True,
-                completeness=1,
+                is_default=whole,
+                completeness=completeness,
             )
             cs.add("note", entity_id=result_set, kind="methodology", body_md=NOTE)
             real = rows.filter(pl.col("party").is_null() | (pl.col("party") != "WRITE-IN")).with_columns(
@@ -485,11 +532,30 @@ def emit() -> Path:
             ranked = real.group_by("name").agg(pl.col("votes").sum()).sort("votes", "name", descending=[True, False])
             margin = magnitude > 0 and ranked.height > magnitude and ranked["votes"][magnitude - 1] == ranked["votes"][magnitude]
             roots: dict[str, UUID] = {}
+            tickets: dict[tuple[str, str | None], UUID] = {}
+            known: dict[tuple[str, str], UUID] = {}
+            clash: set[tuple[str, str]] = set()
+            if attach:
+                for option_id, ballot_name in conn.execute(
+                    """select o.id, ca.ballot_name from contest_option o join candidacy ca on ca.option_id = o.id and ca.role = 'head'
+                       where o.contest_id = %s and o.parent_option_id is null and o.kind in ('candidate', 'ticket')""",
+                    [contest],
+                ).fetchall():
+                    words = [w for w in re.sub(r"[^a-z ]", " ", ballot_name.lower()).split() if w not in ("jr", "sr", "ii", "iii")]
+                    token = (words[0], words[-1])
+                    if token in known:
+                        clash.add(token)
+                    known[token] = option_id
             for rank, candidate in enumerate(ranked["name"]):
                 label_text = candidate.title()
                 root_key = f"{contest_key}:{slug(candidate)}"
-                roots[candidate] = cs.key("us.option", root_key)
                 words = [w for w in re.sub(r"[^a-z ]", " ", label_text.lower()).split() if w not in ("jr", "sr", "ii", "iii")]
+                if attach and len(words) >= 2 and (words[0], words[-1]) in known and (words[0], words[-1]) not in clash:
+                    roots[candidate] = known[(words[0], words[-1])]
+                    if whole:
+                        cs.add("outcome", result_set_id=result_set, option_id=roots[candidate], kind=declared.get(roots[candidate], "lost"))
+                    continue
+                roots[candidate] = cs.key("us.option", root_key)
                 matched = people.get((words[0], words[-1])) if len(words) >= 2 else None
                 if matched is not None and len(matched) == 1:
                     person = matched[0]
@@ -508,18 +574,25 @@ def emit() -> Path:
                     for line in real.filter(pl.col("name") == candidate)["party"].drop_nulls().unique().sort():
                         for entity in party_id(line):
                             cs.add("candidacy_nomination", candidacy_id=head, party_id=entity, kind="nominated")
-                if not margin:
+                if whole and attach:
+                    cs.add("outcome", result_set_id=result_set, option_id=roots[candidate], kind="lost")
+                elif not margin and whole:
                     cs.add(
                         "outcome",
                         result_set_id=result_set,
                         option_id=roots[candidate],
                         kind=("advanced" if kind != "General" else "elected") if rank < magnitude else "lost",
                     )
-            tickets: dict[tuple[str, str | None], UUID] = {}
             write_in = None
             if rows.filter(pl.col("party") == "WRITE-IN").height:
-                write_in = cs.key("us.option", f"{contest_key}:write_in")
-                cs.add("contest_option", id=write_in, contest_id=contest, kind="write_in", ballot_label="Write-ins")
+                write_in = conn.execute(
+                    "select id from contest_option where contest_id = %s and kind = 'write_in' limit 1", [contest]
+                ).fetchone() if attach else None
+                if write_in is not None:
+                    write_in = write_in[0]
+                else:
+                    write_in = cs.key("us.option", f"{contest_key}:write_in")
+                    cs.add("contest_option", id=write_in, contest_id=contest, kind="write_in", ballot_label="Write-ins")
             summed: dict[tuple[UUID, UUID], int] = {}
             for county, bkind, bid, candidate, line, votes in (
                 rows.with_columns(pl.col("name").str.replace_all(r"\s+", " "))
@@ -527,28 +600,39 @@ def emit() -> Path:
                 .agg(pl.col("votes").sum())
                 .iter_rows()
             ):
-                unit = unit_for(era, bid, county) if bkind == "ad" else county_units[county]
+                unit = unit_for(era, bid, county, part) if bkind == "ad" else county_units[county]
                 if line == "WRITE-IN":
                     option = write_in
                 elif line is None:
                     option = roots[candidate]
                 else:
                     if (candidate, line) not in tickets:
-                        tickets[(candidate, line)] = cs.key("us.option", f"{contest_key}:{slug(candidate)}:{slug(line)}")
-                        cs.add(
-                            "contest_option",
-                            id=tickets[(candidate, line)],
-                            contest_id=contest,
-                            parent_option_id=roots[candidate],
-                            kind="ticket",
-                            party_id=party_id(line)[0],
-                            ballot_label=f"{candidate.title()} ({line.title()})",
+                        reused = (
+                            conn.execute(
+                                "select id from contest_option where parent_option_id = %s and party_id = %s limit 1",
+                                [roots[candidate], party_id(line)[0]],
+                            ).fetchone()
+                            if attach
+                            else None
                         )
+                        if reused is not None:
+                            tickets[(candidate, line)] = reused[0]
+                        else:
+                            tickets[(candidate, line)] = cs.key("us.option", f"{contest_key}:{slug(candidate)}:{slug(line)}")
+                            cs.add(
+                                "contest_option",
+                                id=tickets[(candidate, line)],
+                                contest_id=contest,
+                                parent_option_id=roots[candidate],
+                                kind="ticket",
+                                party_id=party_id(line)[0],
+                                ballot_label=f"{candidate.title()} ({line.title()})",
+                            )
                     option = tickets[(candidate, line)]
                 summed[(unit, option)] = summed.get((unit, option), 0) + votes
             values.extend((str(result_set), str(unit), str(option), 1, votes) for (unit, option), votes in summed.items())
             for county, bkind, bid in rows.select("county", "bkind", "bid").unique().iter_rows():
-                unit = unit_for(era, bid, county) if bkind == "ad" else county_units[county]
+                unit = unit_for(era, bid, county, part) if bkind == "ad" else county_units[county]
                 cast = ballots.filter((pl.col("url") == urls[county]) & (pl.col("bkind") == bkind) & (pl.col("bid") == bid) & pl.col("office").is_in(rows["office"].unique().to_list()))["votes"]
                 if bkind == "ad" and not cast.is_empty():
                     values.append((str(result_set), str(unit), None, 3, int(cast[0])))
