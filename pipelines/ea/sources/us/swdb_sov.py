@@ -1,10 +1,12 @@
 import io
 import re
+import struct
 import zipfile
 from datetime import date, timedelta
 from pathlib import Path
 
 import polars as pl
+import shapefile
 
 from ea import raw
 from ea.changeset import Changeset
@@ -16,69 +18,160 @@ VERSION = "1"
 PARSED = DATA / "parsed" / SOURCE
 SWDB = "https://statewidedatabase.org/pub/data/"
 ELECTIONS = {
+    "G02": date(2002, 11, 5),
+    "G04": date(2004, 11, 2),
+    "G06": date(2006, 11, 7),
+    "G08": date(2008, 11, 4),
+    "G10": date(2010, 11, 2),
+    "G12": date(2012, 11, 6),
+    "G14": date(2014, 11, 4),
     "G16": date(2016, 11, 8),
     "G18": date(2018, 11, 6),
     "G20": date(2020, 11, 3),
     "G22": date(2022, 11, 8),
     "G24": date(2024, 11, 5),
+    "P12": date(2012, 6, 5),
+    "P14": date(2014, 6, 3),
+    "P16": date(2016, 6, 7),
+    "P18": date(2018, 6, 5),
+    "P20": date(2020, 3, 3),
+    "P22": date(2022, 6, 7),
+    "P24": date(2024, 3, 5),
 }
-OFFICES = {"PRS": ("president", False), "USS": ("senate", False), "USP": ("senate", True), "GOV": ("governor", False)}
+OFFICES = {
+    "PRS": ("president", False),
+    "USS": ("senate", False),
+    "USP": ("senate", True),
+    "GOV": ("governor", False),
+    "CNG": ("house", False),
+}
+PARTIES = {
+    "DEM": "Democratic Party",
+    "REP": "Republican Party",
+    "LIB": "Libertarian Party",
+    "GRN": "Green Party",
+    "AIP": "American Independent Party",
+    "PAF": "Peace and Freedom Party",
+    "NLP": "Natural Law Party",
+    "REF": "Reform Party",
+}
+COUNTIES = [f"{number:03d}" for number in range(1, 116, 2)]
 PUBLISHER = "Statewide Database, University of California, Berkeley"
 TITLE = "Statement of Vote data by SOV precinct"
+CODE = re.compile(r"^([A-Z]{3}(?:\d\d)?[A-Z]{3}(?:\d\d)?)(?:\t|\s{2,})(.+?)(?:(?:\t|\s{2,})-?\d+)?\s*$")
+OFFICE = re.compile(r"(PRS|USS|USP|GOV|CNG)(?!VNC)([A-Z]{3})(\d\d)?")
 
 
 def sov(election: str) -> str:
     return f"{SWDB}{election}/state/state_{election.lower()}_sov_data_by_{election.lower()}_svprec.zip"
 
 
-def codes(election: str) -> str:
-    return f"{SWDB}{election}/c001/001.codes"
+def codes(election: str, county: str) -> str:
+    return f"{SWDB}{election}/c{county}/{county}.codes"
 
 
 def fetch() -> None:
     for election in ELECTIONS:
-        for address in (sov(election), codes(election)):
+        for address in (sov(election), *(codes(election, county) for county in COUNTIES)):
             try:
                 raw.cached(SOURCE, address)
             except LookupError:
                 raw.fetch(SOURCE, address, suffix=".zip" if address.endswith(".zip") else ".txt")
 
 
+def read(election: str) -> pl.DataFrame:
+    with zipfile.ZipFile(raw.cached(SOURCE, sov(election)).path) as archive:
+        (member,) = [name for name in archive.namelist() if name.lower().endswith((".csv", ".dbf"))]
+        if member.lower().endswith(".csv"):
+            return pl.read_csv(io.BytesIO(archive.read(member)), infer_schema_length=0)
+        data = bytearray(archive.read(member))
+        count, start, size = struct.unpack("<IHH", data[4:12])
+        for offset in range(start, start + count * size, size):
+            if data[offset] == 0:
+                data[offset] = 32
+        reader = shapefile.Reader(dbf=io.BytesIO(bytes(data)))
+        fields = [field[0] for field in reader.fields[1:]]
+        keep = [
+            field for field in fields if field in ("FIPS", "COUNTY_COD", "SVPREC", "CDDIST") or OFFICE.fullmatch(field)
+        ]
+        return pl.DataFrame(
+            [[None if value is None else str(value) for value in record] for record in reader.iterRecords(fields=keep)],
+            schema=keep,
+            orient="row",
+        ).rename({"COUNTY_COD": "FIPS"}, strict=False)
+
+
 def parse() -> None:
     frames = []
-    for election, day in ELECTIONS.items():
-        names = {
-            code: name
-            for code, name, _ in (
-                line.split("\t")
-                for line in raw.cached(SOURCE, codes(election)).path.read_text(errors="replace").splitlines()
-                if line.count("\t") == 2
-            )
+    with connect() as conn:
+        ballots = {
+            (date.fromisoformat(key[:10]), int(key.rsplit(":", 1)[1]), party): name
+            for key, party, name in conn.execute(
+                """select x.value, pn.text, min(n.text)
+                   from external_id x
+                   join contest_option o on o.contest_id = x.entity_id
+                   join candidacy cy on cy.option_id = o.id and cy.role = 'head'
+                   join name n on n.entity_id = cy.person_id and n.is_preferred
+                   join name pn on pn.entity_id = o.party_id and pn.is_preferred
+                   where x.scheme = 'us.contest' and x.value ~ '^20[0-9-]{8}:CA:house:[0-9]+$'
+                   group by 1, 2 having count(*) = 1"""
+            ).fetchall()
         }
-        with zipfile.ZipFile(raw.cached(SOURCE, sov(election)).path) as archive:
-            (member,) = [name for name in archive.namelist() if name.lower().endswith(".csv")]
-            frame = pl.read_csv(io.BytesIO(archive.read(member)), infer_schema_length=0)
-        columns = [column for column in frame.columns if re.fullmatch(r"(PRS|USS|USP|GOV)[A-Z]{3}\d\d", column)]
-        missing = [column for column in columns if column not in names]
-        if missing:
-            raise ValueError(f"{election}: {missing} have no name in the codes")
-        frames.append(
+    for election, day in ELECTIONS.items():
+        names = {}
+        for county in COUNTIES:
+            found = [
+                (matched[1] if matched[1][-2:].isdigit() else matched[1] + "01", matched[2])
+                for line in raw.cached(SOURCE, codes(election, county)).path.read_text(errors="replace").splitlines()
+                if (matched := CODE.match(line))
+            ]
+            shifted = {code[:-5] for code, name in found if name.strip().lower() == "percent"}
+            names |= {code: name for code, name in found if code[:-5] not in shifted}
+        for (held, district, party), name in ballots.items():
+            for code, label in PARTIES.items():
+                if held == day and party == label:
+                    names.setdefault(f"CNG{district:02d}{code}01", name)
+        frame = read(election)
+        columns = [column for column in frame.columns if OFFICE.fullmatch(column)]
+        long = (
             frame.filter(~pl.col("SVPREC").str.to_uppercase().str.contains("TOT"))
-            .unpivot(columns, index=["FIPS", "SVPREC"], variable_name="column", value_name="votes")
-            .with_columns(pl.col("votes").replace("***", None).cast(pl.Int64))
-            .filter(pl.col("votes").is_not_null())
-            .select(
+            .unpivot(columns, index=["FIPS", "SVPREC", "CDDIST"], variable_name="column", value_name="votes")
+            .with_columns(pl.col("votes").replace("***", None).cast(pl.Float64).cast(pl.Int64))
+            .filter(pl.col("votes").is_not_null() & (pl.col("votes") != 0))
+            .with_columns(
+                office=pl.col("column").str.slice(0, 3),
+                district=pl.when(pl.col("column").str.starts_with("CNG")).then(
+                    pl.col("CDDIST").cast(pl.Float64).cast(pl.Int16)
+                ),
+            )
+            .with_columns(
+                named=pl.concat_str(
+                    "office",
+                    pl.col("district").cast(pl.String).str.zfill(2),
+                    pl.col("column").str.slice(3, 3),
+                    pl.col("column").str.slice(6, 2).replace("", "01"),
+                    ignore_nulls=True,
+                )
+            )
+        )
+        missing = long.filter(~pl.col("named").is_in(list(names)))
+        if missing.height:
+            print(f"{election}: {sorted(set(missing['named']))} have no reliable name in the codes, skipped")
+            contest = pl.col("named").str.replace(r"[A-Z]{3}\d\d$", "")
+            long = long.filter(~contest.is_in(list(set(missing.select(contest).to_series()))))
+        frames.append(
+            long.select(
                 year=pl.lit(day.year),
                 day=pl.lit(day),
-                chamber=pl.col("column").str.slice(0, 3).replace_strict({k: v for k, (v, _) in OFFICES.items()}),
-                special=pl.col("column").str.slice(0, 3).replace_strict({k: s for k, (_, s) in OFFICES.items()}),
+                chamber=pl.col("office").replace_strict({k: v for k, (v, _) in OFFICES.items()}),
+                special=pl.col("office").replace_strict({k: s for k, (_, s) in OFFICES.items()}),
                 state=pl.lit("CA"),
-                district=pl.lit(None, pl.Int16),
+                district="district",
                 fips=pl.col("FIPS").str.zfill(5),
                 code=pl.concat_str(
                     pl.lit(f"{day.year}:CA:"), pl.col("FIPS").str.zfill(5), pl.lit(":SOV:"), pl.col("SVPREC")
                 ),
-                candidate=pl.col("column").replace_strict(names).str.to_uppercase(),
+                candidate=pl.col("named").replace_strict(names).str.replace(r"\*$", "").str.to_uppercase(),
                 votes="votes",
             )
         )
@@ -111,28 +204,16 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="California's president, U.S. Senate, and governor general elections by Statement of Vote precinct "
-            "2016–2024 from the Statewide Database, for contests no other source holds by precinct",
+            summary="California's president, U.S. Senate, U.S. House, and governor general elections and top-two primaries by Statement of "
+            "Vote precinct 2002–2024 from the Statewide Database, for contests no other source holds by precinct",
             polity="US",
         )
-        wanted = {
-            key
-            for (key,) in conn.execute(
-                """select x.value from external_id x
-                   where x.scheme = 'us.contest' and x.value ~ %s and x.value like '%%:CA:%%'
-                     and not exists (
-                       select from result_set r join changeset c on c.id = r.changeset_id
-                       where r.contest_id = x.entity_id and r.status <> 'withdrawn' and c.pipeline <> %s
-                         and coalesce(r.completeness, 1) >= 0.98
-                         and exists (select from coverage_cache_unit cu join reporting_unit u on u.k = cu.unit_k
-                                     where cu.result_set_k = r.k and u.scheme_code = 'us.precinct'))""",
-                [oe_federal.CONTESTS, SOURCE],
-            ).fetchall()
-        }
+        wanted = oe_federal.wanted(conn, SOURCE, "CA")
         key = pl.concat_str(
             pl.col("day").cast(pl.String),
             "state",
             "chamber",
+            pl.col("district").cast(pl.String),
             pl.when("special").then(pl.lit("special")),
             separator=":",
             ignore_nulls=True,
@@ -152,7 +233,7 @@ def emit() -> Path:
             )
         for election, day in ELECTIONS.items():
             if day.year in set(returns["year"]):
-                for address in (sov(election), codes(election)):
+                for address in (sov(election), *(codes(election, county) for county in COUNTIES)):
                     cs.artifact(raw.cached(SOURCE, address), source)
         medsl.attach(cs, conn, returns, {"CA": source}, grain="precinct")
         used = set(pl.concat(cs.frames["result_value"])["unit_id"].unique()) if cs.frames.get("result_value") else set()
