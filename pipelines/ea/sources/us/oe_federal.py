@@ -17,12 +17,11 @@ from ea.store import DATA, connect
 SOURCE = "us.oe_federal"
 VERSION = "1"
 PARSED = DATA / "parsed" / SOURCE
-YEARS = range(2016, 2026)
+YEARS = range(2000, 2026)
 STATES = {state for state in os.environ.get("OE_STATES", "").upper().split(",") if state}
 COMMITS = openelections.COMMITS | {}
-CONTESTS = (
-    r"^20(1[6-9]|2[0-5])-1[01]-[0-9]{2}:[A-Z]{2}(-[0-9]{2})?:(president|senate|governor|house:[0-9]+)(:special)?$"
-)
+TOP_TWO = {"WA", "AK"}
+CONTESTS = r"^20([01][0-9]|2[0-5])-[01][0-9]-[0-9]{2}:[A-Z]{2}(-[0-9]{2})?:(president|senate|governor|house:[0-9]+)(:special)?$"
 
 
 def wanted(conn: Connection, pipeline: str, state: str = "%", pattern: str = CONTESTS) -> set[str]:
@@ -53,7 +52,8 @@ def picks(states: set[str] = STATES) -> list[tuple[str, int, str]]:
         found: dict[str, dict[bool, list[str]]] = defaultdict(lambda: defaultdict(list))
         for entry in tree["tree"]:
             matched = re.fullmatch(
-                rf"(\d{{4}})/(?:counties/)?((\d{{4}})1[01]\d{{2}})__{state.lower()}__general(__[a-z_]+)?__(?:precinct|ward)\.csv",
+                rf"(\d{{4}})/(?:counties/)?((\d{{4}})\d{{4}})__{state.lower()}__(?:general{'|primary' if state in TOP_TWO else ''})"
+                rf"(__[a-z_]+)?__(?:precinct|ward)\.csv",
                 entry["path"],
             )
             if entry["type"] == "blob" and matched and int(matched[3]) in YEARS and matched[1] == matched[3]:
@@ -112,7 +112,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="President, U.S. Senate, U.S. House, and governor general elections by precinct 2016–2025 from "
+            summary="President, U.S. Senate, U.S. House, and governor general elections by precinct 2000–2025 from "
             "OpenElections, for contests no other source holds by precinct",
             polity="US",
         )
@@ -122,7 +122,7 @@ def emit() -> Path:
             """select n.text, k.value from name n join candidacy cy on cy.person_id = n.entity_id and cy.role = 'head'
                join contest_option o on o.id = cy.option_id
                join external_id k on k.entity_id = o.contest_id and k.scheme = 'us.contest'
-               where n.is_preferred and k.value ~ '^20(1[6-9]|2[0-5])-1[01]-[0-9]{2}:[A-Z]{2}:(president|governor)$'"""
+               where n.is_preferred and k.value ~ '^20([01][0-9]|2[0-5])-[01][0-9]-[0-9]{2}:[A-Z]{2}:(president|governor)$'"""
         ).fetchall():
             heads[(int(key[:4]), key[11:13], key[14:])].update(
                 re.sub(r"[^a-z]", "", word.lower()) for word in text.split()
