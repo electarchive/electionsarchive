@@ -79,7 +79,7 @@ function load() {
       const name = `${key}/${z}/${x}/${y}`;
       let pending = rasters.get(name);
       if (pending == null) {
-        pending = archive(PMTiles, `${key}.ids`)
+        pending = archive(PMTiles, key)
           .getZxy(Number(z), Number(x), Number(y))
           .then((found) => {
             if (found == null) {

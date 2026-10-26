@@ -1,7 +1,7 @@
 import { mkdirSync, writeFileSync } from "node:fs";
 import { chromium } from "playwright-core";
 
-const base = process.argv[2] ?? "http://localhost:5174";
+const base = process.argv[2] ?? "http://localhost:5173";
 const out = process.argv[3] ?? "../../data/tmp/map-qa";
 const only = process.argv[4] ?? "";
 mkdirSync(out, { recursive: true });
@@ -292,56 +292,70 @@ for (const test of picked) {
         await page.mouse.click(middle.x + 3, middle.y + 3);
         await page.waitForTimeout(test.isFull ? 1500 : 300);
         if (test.isFull) {
+          check(
+            await page
+              .getByText(/^[\d,]+ votes$/u)
+              .first()
+              .waitFor({ timeout: 5000 })
+              .then(() => true)
+              .catch(() => false),
+            "clicking a place did not open its card",
+          );
           const alone = page
             .getByRole("button", { name: /^Map .+ alone$/u })
             .first();
-          check(
-            await alone.isVisible(),
-            "clicking a place did not open its card",
-          );
+          let [from, to] = [unpinned, null];
           if (await alone.isVisible()) {
             await alone.click();
-            await page.waitForTimeout(2500);
-            await settle(page);
-            const drilled = page.url();
-            check(
-              drilled !== unpinned,
-              "drilling into a place did not change the URL",
-            );
-            const inner = await view(page);
-            check(
-              inner != null && inside(inner, inner.limit),
-              "after drilling in the view left the frame",
-            );
-            check(
-              inner != null && Math.abs(inner.zoom - inner.min) < 0.05,
-              "after drilling in the map is not at the fit zoom",
-            );
-            await page.screenshot({ path: `${out}/${label}-drilled.png` });
-            await page.goBack();
-            await page.waitForTimeout(2500);
-            await settle(page);
-            check(
-              page.url() === unpinned,
-              "back did not return to the whole map",
-            );
-            const outer = await view(page);
-            check(
-              outer != null && Math.abs(outer.zoom - outer.min) < 0.05,
-              "after going back the map is not at the fit zoom",
-            );
-            await page.goForward();
-            await page.waitForTimeout(2500);
-            await settle(page);
-            check(
-              page.url() === drilled,
-              "forward did not return to the drilled place",
-            );
-            check((await inks(page)) > 3, "map blank after back and forward");
-            await page.goBack();
-            await page.waitForTimeout(1500);
-            await settle(page);
+          } else {
+            const [bare, query = ""] = test.path.split("?");
+            const deep = `${bare}/georgia${query === "" ? "" : `?${query}`}`;
+            if (!bare.endsWith("/georgia")) {
+              await page.goto(`${base}${deep}`, {
+                waitUntil: "domcontentloaded",
+              });
+              await page.waitForSelector("[data-view]", { timeout: 120_000 });
+              await settle(page);
+            }
+            from = page.url();
+            await page
+              .getByRole("link", { name: /^United States$/u })
+              .first()
+              .click();
           }
+          await page.waitForTimeout(2500);
+          await settle(page);
+          to = page.url();
+          check(to !== from, "drilling did not change the URL");
+          const inner = await view(page);
+          check(
+            inner != null && inside(inner, inner.limit),
+            "after drilling the view left the frame",
+          );
+          check(
+            inner != null && Math.abs(inner.zoom - inner.min) < 0.05,
+            "after drilling the map is not at the fit zoom",
+          );
+          await page.screenshot({ path: `${out}/${label}-drilled.png` });
+          await page.goBack();
+          await page.waitForTimeout(2500);
+          await settle(page);
+          check(page.url() === from, "back did not return to the previous map");
+          const outer = await view(page);
+          check(
+            outer != null && Math.abs(outer.zoom - outer.min) < 0.05,
+            "after going back the map is not at the fit zoom",
+          );
+          await page.goForward();
+          await page.waitForTimeout(2500);
+          await settle(page);
+          check(page.url() === to, "forward did not return to the drilled map");
+          check((await inks(page)) > 3, "map blank after back and forward");
+          await page.goto(`${base}${test.path}`, {
+            waitUntil: "domcontentloaded",
+          });
+          await page.waitForSelector("[data-view]", { timeout: 120_000 });
+          await settle(page);
         }
         if (!test.isFull) {
           await page.goto(`${base}${test.path}`, {
@@ -350,7 +364,6 @@ for (const test of picked) {
           await page.waitForSelector("[data-view]", { timeout: 120_000 });
           await settle(page);
         }
-
         await page.setViewportSize({ width: 390, height: 844 });
         await settle(page);
         const narrow = await view(page);
