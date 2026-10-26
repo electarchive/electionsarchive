@@ -59,6 +59,19 @@ where r.status <> 'withdrawn' and r.contest_id = any(%s::uuid[])
 group by 1, 2
 """
 
+SETS_SQL = """
+select r.contest_id::text, r.k, r.completeness::float, u.scheme_code, count(distinct u.k)
+from result_set r
+join coverage_cache_unit cu on cu.result_set_k = r.k
+join reporting_unit u on u.k = cu.unit_k
+where r.status <> 'withdrawn' and r.contest_id = any(%s::uuid[])
+    and exists (
+        select from result_value v
+        where v.result_set_k = r.k and v.option_k <> 0 and v.measure in (1, 7, 8, 9, 10) and v.value > 0
+    )
+group by 1, 2, 3, 4
+"""
+
 UNIT_AREAS_SQL = """
 select distinct r.contest_id::text, u.area_id::text
 from result_set r
@@ -228,6 +241,9 @@ def measure(conn, cc: str) -> dict:
     units: dict[str, dict[str, tuple[int, int]]] = defaultdict(dict)
     for cid, scheme, n, shaped in conn.execute(UNITS_SQL, [ids]):
         units[cid][scheme] = (n, shaped)
+    sets: dict[str, dict[int, tuple[float | None, dict[str, int]]]] = defaultdict(dict)
+    for cid, k, completeness, scheme, n in conn.execute(SETS_SQL, [ids]):
+        sets[cid].setdefault(k, (completeness, {}))[1][scheme] = n
     schemes = sorted({s for level in levels for s in level.get("schemes", [])})
     unit_areas: dict[str, set[str]] = defaultdict(set)
     for cid, aid in conn.execute(UNIT_AREAS_SQL, [ids, schemes]):
@@ -256,6 +272,7 @@ def measure(conn, cc: str) -> dict:
         "spec": spec,
         "picked": picked,
         "units": units,
+        "sets": sets,
         "unit_areas": unit_areas,
         "places": places,
         "geometry": geometry,
@@ -352,22 +369,39 @@ def tally(cc: str, data: dict) -> tuple[dict, list[dict], list[dict]]:
             for r in rows:
                 cid, tacit, district, scheme = r[0], r[7], r[8], r[9]
                 got = data["units"].get(cid, {})
+                voted = data["sets"].get(cid, {}).values()
                 results = bool(got)
-                at_grain = sum(n_ for s, n_ in ((s, v[0]) for s, v in got.items()) if s in grain)
-                finer = any(s in fine for s in got)
+                need = level.get("units") or 1
+                whole = schemes | grain if unit == "district" else grain
+                good = [
+                    by_scheme
+                    for completeness, by_scheme in voted
+                    if (completeness >= 0.98 if completeness is not None else not whole or whole & by_scheme.keys())
+                    and (
+                        unit == "district"
+                        or not grain
+                        or completeness is not None
+                        or sum(n_ for s, n_ in by_scheme.items() if s in grain) >= need
+                    )
+                ]
+                finer = any(
+                    completeness is not None and completeness >= 0.98 and fine & by_scheme.keys()
+                    for completeness, by_scheme in voted
+                )
                 if unit == "district":
                     if scheme in schemes:
                         k = cid if level.get("by_contest") else district
-                        ok = results or tacit
-                        if ok or status.get(k) != "complete":
-                            status[k] = "complete" if ok else "bare"
+                        current = "complete" if tacit or good else "partial" if voted else "bare"
+                        rank = {"complete": 0, "partial": 1, "bare": 2}
+                        if k not in status or rank[current] < rank[status[k]]:
+                            status[k] = current
                         fine_ok[k] = fine_ok.get(k, False) or finer
                         place[k] = place_of(cc, data, district, r[6])
                         shape[k] = shaped_on(data["geometry"].get(district, []), r[2])
                     elif not own:
                         found = data["unit_areas"].get(cid, set())
                         for k in found:
-                            status[k] = "complete"
+                            status[k] = "complete" if good else "partial" if voted else "bare"
                             fine_ok[k] = fine_ok.get(k, False) or finer
                             place[k] = place_of(cc, data, k, r[6])
                             shape[k] = shaped_on(data["geometry"].get(k, []), r[2])
@@ -377,10 +411,10 @@ def tally(cc: str, data: dict) -> tuple[dict, list[dict], list[dict]]:
                         coarse_only = coarse_only or False
                 else:
                     k = r[10] if unit == "polity" else cid
-                    need = level.get("units") or 1
-                    ok = tacit or (at_grain >= 0.9 * need or finer if grain else results)
-                    current = "complete" if ok else "totals" if results else "bare"
-                    rank = {"complete": 0, "totals": 1, "bare": 2}
+                    at_grain = any(grain & by_scheme.keys() or fine & by_scheme.keys() for by_scheme in good)
+                    ok = tacit or (at_grain if grain else bool(good))
+                    current = "complete" if ok else "totals" if good else "partial" if voted else "bare"
+                    rank = {"complete": 0, "partial": 1, "totals": 2, "bare": 3}
                     if k not in status or rank[current] < rank[status[k]]:
                         status[k] = current
                     fine_ok[k] = fine_ok.get(k, False) or finer
@@ -397,24 +431,25 @@ def tally(cc: str, data: dict) -> tuple[dict, list[dict], list[dict]]:
                 cell[1] += st == "complete"
                 cell[3] += st == "bare"
                 cell[4] += st == "totals"
+                cell[5] += st == "partial"
             held_n = len(status)
             if regions_expected:
                 for reg, want in regions_expected.items():
                     cell = by_region[reg]
-                    have = cell[1] + cell[3] + cell[4]
+                    have = cell[1] + cell[3] + cell[4] + cell[5]
                     gap = max(0, want - have)
                     cell[4 if coarse_only else 2] += gap
                     cell[0] = max(want, have)
                 for reg, cell in by_region.items():
                     if reg not in regions_expected:
-                        cell[0] = cell[1] + cell[3] + cell[4]
+                        cell[0] = cell[1] + cell[3] + cell[4] + cell[5]
                 rest = count_total - sum(max(w, 0) for w in regions_expected.values())
                 if rest > 0:
                     by_region[""][0] += rest
                     by_region[""][4 if coarse_only else 2] += rest
             else:
                 for cell in by_region.values():
-                    cell[0] = cell[1] + cell[3] + cell[4]
+                    cell[0] = cell[1] + cell[3] + cell[4] + cell[5]
                 gap = max(0, count_total - held_n)
                 if gap:
                     cell = by_region[""]
@@ -444,6 +479,7 @@ def tally(cc: str, data: dict) -> tuple[dict, list[dict], list[dict]]:
                     f[2] += cell[2]
                     f[3] += cell[3]
                     f[4] += cell[4]
+                    f[5] += cell[5]
                     f[6] += cell[1] - done
             if unit == "district":
                 for reg, cell in by_region.items():
@@ -464,6 +500,7 @@ def tally(cc: str, data: dict) -> tuple[dict, list[dict], list[dict]]:
                     "held": held_n,
                     "complete": complete,
                     "bare": sum(1 for s in status.values() if s == "bare"),
+                    "partial": sum(1 for s in status.values() if s == "partial"),
                     "totals": sum(1 for s in status.values() if s == "totals")
                     + (max(0, count_total - held_n) if coarse_only else 0),
                     "absent": 0 if coarse_only else max(0, count_total - held_n),

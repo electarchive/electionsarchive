@@ -82,6 +82,7 @@
   };
   const COUNTRY_REASONS: Partial<Record<Reason, () => string>> = {
     coarse: m.coverage_country_reason_coarse_def,
+    partial: m.coverage_country_reason_partial_def,
     totals: m.coverage_country_reason_totals_def,
     bare: m.coverage_country_reason_bare_def,
     absent: m.coverage_country_reason_absent_def,

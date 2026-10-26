@@ -291,12 +291,12 @@ export const REASONS: Record<Goal, Array<Reason>> = {
   ],
   shapes: ["complete", "units", "unshaped", "undrawn"],
   shapes_history: ["complete", "units", "unshaped", "undrawn"],
-  local: ["complete", "totals", "bare", "absent"],
-  national: ["complete", "totals", "bare", "absent"],
-  fine: ["complete", "coarse", "totals", "bare", "absent"],
-  subnational: ["complete", "totals", "bare", "absent"],
-  referendums: ["complete", "totals", "bare", "absent"],
-  ep: ["complete", "totals", "bare", "absent"],
+  local: ["complete", "partial", "totals", "bare", "absent"],
+  national: ["complete", "partial", "totals", "bare", "absent"],
+  fine: ["complete", "coarse", "partial", "totals", "bare", "absent"],
+  subnational: ["complete", "partial", "totals", "bare", "absent"],
+  referendums: ["complete", "partial", "totals", "bare", "absent"],
+  ep: ["complete", "partial", "totals", "bare", "absent"],
   turnout: ["complete", "partial", "coarse", "absent"],
 };
 
@@ -321,6 +321,7 @@ const TURNOUT_LABELS: Partial<Record<Reason, () => string>> = {
 
 const COUNTRY_LABELS: Partial<Record<Reason, () => string>> = {
   coarse: m.coverage_country_reason_coarse,
+  partial: m.coverage_country_reason_partial,
   unshaped: m.coverage_country_reason_unshaped,
   undrawn: m.coverage_country_reason_undrawn,
 };
