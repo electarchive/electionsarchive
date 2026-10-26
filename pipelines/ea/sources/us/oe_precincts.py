@@ -59,6 +59,9 @@ COUNTIES = {
     ("NY", "schenectedy"): "schenectady",
     ("KY", "breckenridge"): "breckinridge",
     ("KY", "bulter"): "butler",
+    ("TX", "hildalgo"): "hidalgo",
+    ("MI", "shiawasse"): "shiawassee",
+    ("MI", "stjosephs"): "stjoseph",
 }
 MICHIGAN = "2022/20221108__mi__general__precinct.csv"
 PLACE_WORDS = r"\b(charter|township|twp|precinc\w*|pct|city|village|of|the)\b"
@@ -171,13 +174,14 @@ def lines(files: list[tuple[str, int, str, bytes]]) -> pl.DataFrame:
         fips[state][typo] = fips[state][plain]
     frames = []
     for state, year, path, text in files:
+        bare = state == "PA" and b"county" not in text[:200].lower()
         frame = pl.read_csv(
             io.BytesIO(text.replace(b"\r\n", b"\n").replace(b"\r", b"\n")),
             infer_schema_length=0,
             truncate_ragged_lines=True,
-            has_header=state != "PA",
+            has_header=not bare,
         )
-        if state == "PA":
+        if bare:
             frame = frame.select(
                 county=(
                     pl.lit("42") + (pl.col("column_2").cast(pl.Int32) * 2 - 1).cast(pl.String).str.zfill(3)

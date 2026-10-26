@@ -103,9 +103,18 @@ def parse() -> None:
 
 
 def emit() -> Path:
-    frame = pl.concat(
-        [pl.read_parquet(path) for path in sorted(PARSED.glob("lines_*.parquet"))], how="diagonal_relaxed"
-    ).filter(pl.col("state").is_in(list(STATES)) if STATES else pl.lit(True))
+    frame = (
+        pl.concat(
+            [
+                pl.read_parquet(path).with_columns(parsed=pl.lit(path.stat().st_mtime))
+                for path in sorted(PARSED.glob("lines_*.parquet"))
+            ],
+            how="diagonal_relaxed",
+        )
+        .filter(pl.col("parsed") == pl.col("parsed").max().over("path"))
+        .drop("parsed")
+        .filter(pl.col("state").is_in(list(STATES)) if STATES else pl.lit(True))
+    )
     office = pl.col("office").str.to_lowercase()
     with connect() as conn:
         cs = Changeset(
