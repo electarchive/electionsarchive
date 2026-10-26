@@ -140,7 +140,13 @@
       <span class="text-xs text-muted-foreground">
         {percent(done.complete / Math.max(1, done.total), 1)}
       </span>
-      <Bar counts={done} {goal} {polity} class="block-2" />
+      <Bar
+        counts={done}
+        {goal}
+        {polity}
+        population={goal === "local" && row.populationTotal > 0}
+        class="block-2"
+      />
     </span>
   </div>
   {#if isOpen}

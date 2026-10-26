@@ -12,8 +12,15 @@
     counts,
     goal,
     polity = "us",
+    population = false,
     class: className,
-  }: { counts: Counts; goal: Goal; polity?: string; class?: string } = $props();
+  }: {
+    counts: Counts;
+    goal: Goal;
+    polity?: string;
+    population?: boolean;
+    class?: string;
+  } = $props();
 
   const tether = TooltipPrimitive.createTether<Reason | "icpsr">();
   const parts = $derived(
@@ -25,13 +32,20 @@
   );
   const label = (part: Reason | "icpsr") =>
     part === "icpsr" ? m.coverage_icpsr() : reasonLabel(goal, part, polity);
+  const share = (part: Reason | "icpsr") =>
+    percent(counts[part] / Math.max(1, counts.total), 1);
 </script>
 
 <span
   role="img"
   aria-label={parts
     .map((reason) =>
-      m.coverage_count({ label: label(reason), count: count(counts[reason]) }),
+      m.coverage_count({
+        label: label(reason),
+        count: population
+          ? m.coverage_population_share({ percent: share(reason) })
+          : count(counts[reason]),
+      }),
     )
     .join(", ")}
   class={cn("flex overflow-hidden rounded-xs bg-muted", className)}
@@ -62,10 +76,9 @@
       <Tooltip.Content collisionPadding={8} class="grid gap-0.5 leading-snug">
         <span class="font-semibold">{label(reason)}</span>
         <span class="tabular-nums"
-          >{count(counts[reason])} · {percent(
-            counts[reason] / Math.max(1, counts.total),
-            1,
-          )}</span
+          >{population
+            ? m.coverage_population_share({ percent: share(reason) })
+            : `${count(counts[reason])} · ${share(reason)}`}</span
         >
       </Tooltip.Content>
     {/if}

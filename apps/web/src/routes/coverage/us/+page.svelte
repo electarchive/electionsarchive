@@ -79,6 +79,7 @@
 {#snippet progress(row: { goal: UsGoal } & Counts, isLead: boolean)}
   {const held = $derived(row.total - row.absent)}
   {const isWeighted = $derived(row.goal === "local" && row.populationTotal > 0)}
+  {const shown = $derived(isWeighted ? weighted(row) : row)}
   <div class="grid gap-3">
     {#if isWeighted}
       <p
@@ -100,11 +101,13 @@
           "text-xl": !isLead && !isWeighted,
         })}
       >
-        {(row.goal === "local"
-          ? m.coverage_progress_local
-          : row.goal === "turnout"
-            ? m.coverage_progress_turnout
-            : m.coverage_progress)({
+        {(isWeighted
+          ? m.coverage_progress_local_count
+          : row.goal === "local"
+            ? m.coverage_progress_local
+            : row.goal === "turnout"
+              ? m.coverage_progress_turnout
+              : m.coverage_progress)({
           complete: count(row.complete),
           total: count(row.total),
         })}
@@ -124,12 +127,13 @@
       </span>
     </p>
     <Bar
-      counts={isWeighted ? weighted(row) : row}
+      counts={shown}
       goal={row.goal}
+      population={isWeighted}
       class={isLead ? "block-4" : "block-3"}
     />
     <ul class="grid gap-x-6 gap-y-2 text-sm sm:grid-cols-2">
-      {#each REASONS[row.goal].filter((reason) => reason === "complete" || row[reason] > 0) as reason (reason)}
+      {#each REASONS[row.goal].filter((reason) => reason === "complete" || shown[reason] > 0) as reason (reason)}
         {const definition = $derived(
           reason === "complete"
             ? {
@@ -160,9 +164,15 @@
           <Tone {reason} class="mbs-1 rounded-xs block-3 inline-3" />
           <span>
             <span class="font-semibold">{label(row.goal, reason)}</span>
-            <span class="tabular-nums">{count(row[reason])}</span>
+            <span class="tabular-nums"
+              >{isWeighted
+                ? m.coverage_population_share({
+                    percent: percent(shown[reason] / shown.total, 1),
+                  })
+                : count(row[reason])}</span
+            >
             <span class="block text-muted-foreground">{definition}</span>
-            {#if reason === "complete" && row.icpsr > 0}
+            {#if reason === "complete" && shown.icpsr > 0}
               <span
                 class="mbs-2 grid grid-cols-[0.75rem_minmax(0,1fr)] gap-x-2"
               >
@@ -205,6 +215,9 @@
         {m.coverage_goal_local_note()}
       </p>
       {#if isWeighted}
+        <p class="text-sm text-muted-foreground">
+          {m.coverage_local_two_measures()}
+        </p>
         <p class="text-sm text-muted-foreground">
           {m.coverage_local_weights()}
           {m.coverage_local_estimated({
@@ -326,13 +339,15 @@
                         row.populationComplete / row.populationTotal,
                         1,
                       ),
-                    })};
+                    })}.
                   {/if}
-                  {(row.goal === "local"
-                    ? m.coverage_progress_local
-                    : row.goal === "turnout"
-                      ? m.coverage_progress_turnout
-                      : m.coverage_progress)({
+                  {(row.goal === "local" && row.populationTotal > 0
+                    ? m.coverage_progress_local_count
+                    : row.goal === "local"
+                      ? m.coverage_progress_local
+                      : row.goal === "turnout"
+                        ? m.coverage_progress_turnout
+                        : m.coverage_progress)({
                     complete: count(row.complete),
                     total: count(row.total),
                   })},
@@ -345,6 +360,7 @@
                     ? weighted(row)
                     : row}
                   goal={row.goal}
+                  population={row.goal === "local" && row.populationTotal > 0}
                   class="block-1.5 max-inline-80 group-open:hidden"
                 />
               </span>
