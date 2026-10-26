@@ -147,6 +147,14 @@ def fetch() -> None:
 
 
 def parse() -> None:
+    frame = lines(
+        [(state, year, path, raw.cached(SOURCE, url(state, path)).path.read_bytes()) for state, year, path in picks()]
+    )
+    PARSED.mkdir(parents=True, exist_ok=True)
+    frame.write_parquet(PARSED / "lines.parquet")
+
+
+def lines(files: list[tuple[str, int, str, bytes]]) -> pl.DataFrame:
     with connect() as conn:
         fips = openelections.counties(conn)
         towns = {
@@ -159,8 +167,7 @@ def parse() -> None:
     for (state, typo), plain in COUNTIES.items():
         fips[state][typo] = fips[state][plain]
     frames = []
-    for state, year, path in picks():
-        text = raw.cached(SOURCE, url(state, path)).path.read_bytes()
+    for state, year, path, text in files:
         frame = pl.read_csv(
             io.BytesIO(text.replace(b"\r\n", b"\n").replace(b"\r", b"\n")),
             infer_schema_length=0,
@@ -274,10 +281,7 @@ def parse() -> None:
         print(
             lost.group_by("state", "year", "county").agg(pl.col("votes").sum()).sort("votes", descending=True).head(40)
         )
-    PARSED.mkdir(parents=True, exist_ok=True)
-    frame.filter(pl.col("fips").is_not_null(), ~pl.col("precinct").str.contains(TOTALS)).write_parquet(
-        PARSED / "lines.parquet"
-    )
+    return frame.filter(pl.col("fips").is_not_null(), ~pl.col("precinct").str.contains(TOTALS))
 
 
 def emit() -> Path:
