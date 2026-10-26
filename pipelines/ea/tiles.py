@@ -4,19 +4,17 @@ import tempfile
 import time
 from pathlib import Path
 
+from ea import plane
 from ea.store import DATA, ROOT, connect
 
-AREAS_SQL = """
-select '{"type":"Feature","id":' || a.k || ',"properties":{},"geometry":' || ST_AsGeoJSON(g.geom, 6) || '}'
-from area a join area_geometry g on g.area_id = a.id
-where a.scheme_code = %s and g.valid @> %s::date
-"""
-
-LABELS_SQL = """
-select '{"type":"Feature","id":' || a.k || ',"properties":{},"geometry":'
-    || ST_AsGeoJSON(coalesce(g.label_point, ST_PointOnSurface(g.geom)), 6) || '}'
-from area a join area_geometry g on g.area_id = a.id
-where a.scheme_code = %s and g.valid @> %s::date
+FEATURES_SQL = """
+select '{{"type":"Feature","id":' || k || ',"properties":{{}},"geometry":' || ST_AsGeoJSON(p, 1, 0) || '}}'
+from (
+    select a.k, {plane} as p
+    from area a join area_geometry g on g.area_id = a.id
+    where a.scheme_code = %s and g.valid @> %s::date
+) x
+where p is not null
 """
 
 DENSE = {"us.nyc_ed": 14}
@@ -46,7 +44,11 @@ def build(prefix: str | None) -> str:
             labels_path = Path(scratch) / "labels.geojsonl"
             output = Path(scratch) / "out.pmtiles"
             with connect() as conn, areas_path.open("w") as areas_file, labels_path.open("w") as labels_file:
-                for query, handle in ((AREAS_SQL, areas_file), (LABELS_SQL, labels_file)):
+                for column, handle in (
+                    ("g.geom", areas_file),
+                    ("coalesce(g.label_point, ST_PointOnSurface(g.geom))", labels_file),
+                ):
+                    query = FEATURES_SQL.format(plane=plane.sql(column, scheme_code))
                     with conn.cursor(name="features") as cursor:
                         cursor.itersize = 10_000
                         cursor.execute(query, [scheme_code, as_of])
@@ -58,6 +60,7 @@ def build(prefix: str | None) -> str:
                     f"--output={output}",
                     "--force",
                     "--quiet",
+                    "--projection=EPSG:3857",
                     f"--attribution={attribution or ''}",
                     "--minimum-zoom=0",
                     f"--maximum-zoom={DENSE.get(scheme_code, 12 if features >= 5_000 else 10)}",
@@ -67,14 +70,19 @@ def build(prefix: str | None) -> str:
                     *(
                         ["--no-feature-limit", "--no-tile-size-limit", "--no-tiny-polygon-reduction", "--drop-rate=1"]
                         if scheme_code in DENSE
-                        else ["--no-tiny-polygon-reduction-at-maximum-zoom", "--coalesce-smallest-as-needed"]
+                        else [
+                            "--no-tiny-polygon-reduction"
+                            if features >= 5_000
+                            else "--no-tiny-polygon-reduction-at-maximum-zoom",
+                            "--coalesce-smallest-as-needed",
+                        ]
                     ),
                     f"--named-layer=areas:{areas_path}",
                     f"--named-layer=labels:{labels_path}",
                 ],
                 check=True,
             )
-            destination = DATA / "tiles" / scheme_code / f"{vintage}.pmtiles"
+            destination = DATA / "plane" / scheme_code / f"{vintage}.pmtiles"
             destination.parent.mkdir(parents=True, exist_ok=True)
             shutil.move(output, destination)
             size_mb = destination.stat().st_size / 1_000_000
