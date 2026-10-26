@@ -93,7 +93,12 @@
           point.sides[0]?.[0]?.party != null,
       );
     const series = data.series
-      .filter((entry) => !entry.isQuestion && entry.points.length > 1)
+      .filter(
+        (entry) =>
+          !entry.isQuestion &&
+          entry.points.filter((point) => point.sides[0]?.[0] != null).length >
+            1,
+      )
       .map((entry) => ({ entry, points: contested(entry) }))
       .toSorted(
         (a, b) =>
@@ -262,36 +267,47 @@
     const stop = new AbortController();
     void (async () => {
       try {
-        const contest = await orpc.contests.get.call({
-          id: wanted.id,
-          unit: wanted.unit,
-        });
-        const bounds = await orpc.contests.boundaries.call({
-          id: wanted.id,
-          unit: wanted.unit,
-          level: contest.places?.level,
-        });
+        const steps = wanted.unit?.split("/") ?? [];
+        const up = steps.length > 1 ? steps.slice(0, -1).join("/") : undefined;
+        const [[contest, bounds], wider] = await Promise.all([
+          (async () => {
+            const own = await orpc.contests.get.call({
+              id: wanted.id,
+              unit: wanted.unit,
+            });
+            return [
+              own,
+              await orpc.contests.boundaries.call({
+                id: wanted.id,
+                unit: wanted.unit,
+                level: own.places?.level,
+              }),
+            ] as const;
+          })(),
+          wanted.unit == null
+            ? null
+            : (async () => {
+                const whole = await orpc.contests.get.call({
+                  id: wanted.id,
+                  unit: up,
+                });
+                return whole.places == null
+                  ? null
+                  : {
+                      contest: whole,
+                      bounds: await orpc.contests.boundaries.call({
+                        id: wanted.id,
+                        unit: up,
+                        level: whole.places.level,
+                      }),
+                    };
+              })(),
+        ]);
         const isDrawn = bounds.some(
           (entry) =>
             entry.scheme === contest.places?.level && entry.tiles != null,
         );
-        const steps = wanted.unit?.split("/") ?? [];
-        const up = steps.length > 1 ? steps.slice(0, -1).join("/") : undefined;
-        const whole =
-          isDrawn || wanted.unit == null
-            ? null
-            : await orpc.contests.get.call({ id: wanted.id, unit: up });
-        const around =
-          whole?.places == null
-            ? null
-            : {
-                contest: whole,
-                bounds: await orpc.contests.boundaries.call({
-                  id: wanted.id,
-                  unit: up,
-                  level: whole.places.level,
-                }),
-              };
+        const around = isDrawn ? null : wider;
         if (!stop.signal.aborted) {
           loaded = { id: wanted.key, contest, bounds, around };
         }
@@ -418,7 +434,13 @@
 
 {#if isMapped}
   <div
-    class="col-span-12 grid content-start gap-2 bg-card px-3.5 pbs-3 pbe-3.5 min-inline-0 lg:col-span-8"
+    class={cn(
+      "col-span-12 grid content-start gap-2 bg-card px-3.5 pbs-3 pbe-3.5 min-inline-0",
+      {
+        "lg:col-span-8":
+          polity.latest != null && polity.latest.races.length > 0,
+      },
+    )}
   >
     {#if drawn == null}
       <p
@@ -726,12 +748,18 @@
       </h2>
       <p class="flex flex-wrap items-baseline gap-x-3 gap-y-1 text-[0.9375rem]">
         <span class="text-pretty text-muted-foreground"
-          >{m.polity_versus_lede({ place: polity.name, parent: above })}</span
+          >{m.polity_versus_lede({
+            place: polity.name,
+            parent: versus.data?.places[1]?.name ?? above,
+          })}</span
         >
         <a
           class="text-[0.8125rem] font-semibold underline decoration-border underline-offset-4 hover:decoration-foreground"
           href={resolve(`/compare?a=${id}&b=${polity.parent ?? ""}`)}
-          >{m.polity_versus_all({ place: polity.name, parent: above })}</a
+          >{m.polity_versus_all({
+            place: polity.name,
+            parent: versus.data?.places[1]?.name ?? above,
+          })}</a
         >
       </p>
     </section>
@@ -1015,7 +1043,22 @@
               class="font-figures text-[0.9375rem] tracking-[-0.02em] tabular-nums"
               datetime={group.date}>{group.year ?? ""}</time
             >
+            {const common = $derived(
+              group.races.every(
+                (race) =>
+                  race.source != null &&
+                  race.source !== sourced?.usual &&
+                  race.source === group.races[0]?.source,
+              )
+                ? (group.races[0]?.source ?? null)
+                : null,
+            )}
             <ul class="grid gap-2">
+              {#if common != null}
+                <li class="text-xs text-muted-foreground">
+                  {m.polity_results_source({ publisher: common })}
+                </li>
+              {/if}
               {#each opened.has(group.date) ? group.races : group.races.slice(0, 8) as race (race.id)}
                 {const leader = $derived(race.leaders[0])}
                 {const runner = $derived(race.leaders[1])}
@@ -1031,7 +1074,7 @@
                         ? race.name.slice(String(group.year).length + 1)
                         : race.name}</Preview
                     >
-                    {#if race.source != null && race.source !== sourced?.usual}
+                    {#if common == null && race.source != null && race.source !== sourced?.usual}
                       <span class="text-xs text-muted-foreground"
                         >{m.polity_results_source({
                           publisher: race.source,

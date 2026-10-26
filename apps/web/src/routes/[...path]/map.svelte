@@ -307,6 +307,13 @@
   );
   const missing = $derived((blank ?? []).filter((entry) => entry.isHeld));
   const idle = $derived((blank ?? []).filter((entry) => !entry.isHeld));
+  const skipped = $derived.by(() => {
+    if (typeof view !== "number") {
+      return [];
+    }
+    const index = view;
+    return places.rows.filter((row) => row.absent?.includes(index) === true);
+  });
   const scopes = $derived(
     frames.map((frame): Maplibre.FilterSpecification | null => {
       if (frames.length < 2) {
@@ -490,6 +497,7 @@
     }
     const index = view;
     const sorted = places.rows
+      .filter((row) => row.absent?.includes(index) !== true)
       .map((row) => row.shares[index] ?? 0)
       .toSorted((a, b) => a - b);
     const cuts = [0.2, 0.4, 0.6, 0.8].map(
@@ -764,8 +772,55 @@
     };
   }
 
+  function tile(shape: "hatch" | "absent" | "norun", color: string) {
+    const canvas = document.createElement("canvas");
+    canvas.width = 8;
+    canvas.height = 8;
+    const pen = canvas.getContext("2d", { willReadFrequently: true });
+    if (pen != null) {
+      pen.strokeStyle = color;
+      pen.fillStyle = color;
+      pen.lineWidth = 1;
+      pen.beginPath();
+      if (shape === "hatch") {
+        pen.moveTo(0, 8);
+        pen.lineTo(8, 0);
+        pen.stroke();
+      }
+      if (shape === "absent") {
+        pen.moveTo(3, 2);
+        pen.arc(2, 2, 1, 0, Math.PI * 2);
+        pen.moveTo(7, 6);
+        pen.arc(6, 6, 1, 0, Math.PI * 2);
+        pen.fill();
+      }
+      if (shape === "norun") {
+        pen.moveTo(1, 2.5);
+        pen.lineTo(5, 2.5);
+        pen.moveTo(5, 6.5);
+        pen.lineTo(8, 6.5);
+        pen.moveTo(0, 6.5);
+        pen.lineTo(1, 6.5);
+        pen.stroke();
+      }
+    }
+    return {
+      width: 8,
+      height: 8,
+      data: new Uint8Array(
+        pen?.getImageData(0, 0, 8, 8).data.buffer ?? new ArrayBuffer(256),
+      ),
+    };
+  }
+
   function fills(read: (css: string) => string) {
     const result: Array<[number, string]> = [];
+    const empty = read(
+      "color-mix(in oklab, var(--muted-foreground) 6%, var(--card))",
+    );
+    for (const entry of missing) {
+      result.push([entry.k, empty]);
+    }
     for (const row of [...places.rows, ...(places.districts ?? [])]) {
       if (view === "turnout_change") {
         const change = surges.get(row.k);
@@ -865,6 +920,10 @@
           ] ?? "var(--muted-foreground)";
       }
       if (typeof view === "number") {
+        if (row.absent?.includes(view) === true) {
+          result.push([row.k, empty]);
+          continue;
+        }
         const share = row.shares[view] ?? 0;
         let step = 0;
         for (const edge of edges) {
@@ -974,18 +1033,6 @@
       cleanup.push(tones.done);
       const colorsNow = style(tones.read);
       const origin = globalThis.location.origin;
-      const hatch = document.createElement("canvas");
-      hatch.width = 8;
-      hatch.height = 8;
-      const pen = hatch.getContext("2d", { willReadFrequently: true });
-      if (pen != null) {
-        pen.strokeStyle = colorsNow.hatch;
-        pen.lineWidth = 1;
-        pen.beginPath();
-        pen.moveTo(0, 8);
-        pen.lineTo(8, 0);
-        pen.stroke();
-      }
       const shaft = document.createElement("canvas");
       shaft.width = 64;
       shaft.height = 24;
@@ -1093,9 +1140,17 @@
                         ["id"],
                         ["literal", missing.map((entry) => entry.k)],
                       ] as Maplibre.FilterSpecification,
-                      paint: { "fill-pattern": "hatch" },
+                      paint: { "fill-pattern": "absent" },
                     },
                   ]),
+              {
+                id: "norun",
+                type: "fill" as const,
+                source: "places",
+                "source-layer": "areas",
+                filter: ["in", ["id"], ["literal", []]],
+                paint: { "fill-pattern": "norun" },
+              },
               {
                 id: "unmatched",
                 type: "fill" as const,
@@ -1404,13 +1459,9 @@
           },
           { sdf: true },
         );
-        map.addImage("hatch", {
-          width: 8,
-          height: 8,
-          data: new Uint8Array(
-            pen?.getImageData(0, 0, 8, 8).data.buffer ?? new ArrayBuffer(256),
-          ),
-        });
+        for (const shape of ["hatch", "absent", "norun"] as const) {
+          map.addImage(shape, tile(shape, colorsNow.hatch));
+        }
         map.on("mousemove", "fill", (event) => {
           const id = map.queryRenderedFeatures(event.point, { layers: hit })[0]
             ?.id;
@@ -1777,6 +1828,7 @@
             .map((row) => row.k)
         : []),
     ];
+    const absent = skipped.map((row) => row.k);
     const tips = [0, 1].map((index) =>
       tones.read(colors[index] ?? "var(--muted-foreground)"),
     );
@@ -1822,6 +1874,10 @@
           }
         }
         map.setFilter("unmatched", ["in", ["id"], ["literal", hatched]]);
+        map.setFilter("norun", ["in", ["id"], ["literal", absent]]);
+        for (const shape of ["hatch", "absent", "norun"] as const) {
+          map.updateImage(shape, tile(shape, colorsNow.hatch));
+        }
         for (const { color, image } of splits) {
           if (map.hasImage(image)) {
             continue;
@@ -2687,6 +2743,20 @@
           </span>
           <span>{percent(edges.at(-1) ?? 0)}</span>
         </span>
+        {#if skipped.length > 0}
+          {@render gap(
+            "norun",
+            m.map_norun_key(),
+            skipped.map((row) => row.name),
+          )}
+        {/if}
+        {#if missing.length > 0}
+          {@render gap(
+            "absent",
+            m.map_blank_key(),
+            missing.map((entry) => entry.name),
+          )}
+        {/if}
       </div>
     {:else}
       <div class="flex flex-wrap gap-1.5">
@@ -2747,18 +2817,11 @@
           </span>
         {/if}
         {#if missing.length > 0}
-          <span
-            class="flex items-center gap-1.5 px-1.5 text-[0.8125rem] text-muted-foreground block-7"
-            title={missing.map((entry) => entry.name).join(", ")}
-          >
-            <span
-              class="rounded-xs bg-[repeating-linear-gradient(135deg,var(--muted-foreground)_0_1px,transparent_1px_3px)] ring-1 ring-border block-2.5 inline-2.5"
-            ></span>
-            <span>{m.map_blank_key()}</span>
-            <span class="font-figures text-xs tabular-nums"
-              >{missing.length}</span
-            >
-          </span>
+          {@render gap(
+            "absent",
+            m.map_blank_key(),
+            missing.map((entry) => entry.name),
+          )}
         {/if}
         {const splits = $derived(
           view === "winner" && only == null
@@ -3012,6 +3075,30 @@
     </div>
   {/if}
 </div>
+
+{#snippet gap(shape: "absent" | "norun", label: string, names: Array<string>)}
+  <span
+    class="flex items-center gap-1.5 px-1.5 text-[0.8125rem] text-muted-foreground block-7"
+    title={names.join(", ")}
+  >
+    <svg
+      viewBox="0 0 10 10"
+      class="rounded-xs bg-[color-mix(in_oklab,var(--muted-foreground)_6%,var(--card))] ring-1 ring-border block-2.5 inline-2.5"
+      aria-hidden="true"
+    >
+      <path
+        d={shape === "absent"
+          ? "M2.5 2.5h.01M7.5 7.5h.01M7.5 2.5h.01M2.5 7.5h.01"
+          : "M1 3h4M6 7h4M0 7h1"}
+        stroke="currentColor"
+        stroke-width={shape === "absent" ? 1.75 : 1}
+        stroke-linecap={shape === "absent" ? "round" : "butt"}
+      />
+    </svg>
+    <span>{label}</span>
+    <span class="font-figures text-xs tabular-nums">{names.length}</span>
+  </span>
+{/snippet}
 
 {#snippet readout(isSheet = false)}
   {#if current != null}

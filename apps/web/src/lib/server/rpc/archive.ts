@@ -404,6 +404,7 @@ const PlaceRow = v.object({
   isRemainder: v.boolean(),
   valid: v.number(),
   shares: v.array(FINE),
+  absent: v.optional(v.array(v.number())),
   leader: v.nullable(v.number()),
   also: v.optional(v.nullable(v.number())),
   margin: v.nullable(FINE),
@@ -2943,6 +2944,14 @@ async function tabulate(
             !entry.key.startsWith("kind:") &&
             entry.key !== leader?.key,
         );
+        const absent =
+          valid > 0
+            ? kept.flatMap((item, index) =>
+                result.find((entry) => entry.key === item.key)?.current == null
+                  ? [index]
+                  : [],
+              )
+            : [];
         return {
           k: row.k,
           name: row.name,
@@ -2956,6 +2965,7 @@ async function tabulate(
               result.find((entry) => entry.key === item.key)?.current?.share ??
               0,
           ),
+          absent: absent.length > 0 ? absent : undefined,
           leader:
             position.get(
               leader?.key ?? unopposed.get(row.owner ?? "")?.key ?? "",
@@ -5788,7 +5798,7 @@ export const contests = {
           y: v.array(v.nullable(v.number())),
           leader: v.array(v.nullable(v.number())),
           prior: v.array(v.nullable(v.number())),
-          shares: v.array(v.array(v.number())),
+          shares: v.array(v.array(v.nullable(v.number()))),
           before: v.array(v.array(v.nullable(v.number()))),
           redrawn: v.array(v.nullable(v.number())),
         }),
@@ -6178,7 +6188,11 @@ export const contests = {
           leader: rows.map((row) => row.leader),
           prior: rows.map((row) => row.prior),
           shares: tabulated.legend.map((_, index) =>
-            rows.map((row) => Math.round((row.shares[index] ?? 0) * 10_000)),
+            rows.map((row) =>
+              row.absent?.includes(index) === true
+                ? null
+                : Math.round((row.shares[index] ?? 0) * 10_000),
+            ),
           ),
           before: tabulated.legend.map((_, index) =>
             rows.map((row) =>
@@ -7651,9 +7665,19 @@ async function universe(
       union all
       select up.start, p.parent_id, up.depth + 1 from area_parent p join up on p.area_id = up.id
       where p.valid @> ${day}::date and up.depth < 4
+    ),
+    down(id, depth) as (
+      select ${area}::uuid, 0
+      union all
+      select p.area_id, down.depth + 1 from area_parent p join down on p.parent_id = down.id
+      where p.valid @> ${day}::date and down.depth < 4 and not exists (select from candidate)
     )
     select distinct candidate.id, candidate.k, candidate.held from candidate
     join up on up.start = candidate.id where up.id = ${area}::uuid
+    union
+    select a.id, a.k, true from down
+    join area a on a.id = down.id and a.scheme_code = ${level}
+    where down.depth > 0 and exists (select from area_geometry g where g.area_id = a.id and g.valid @> ${day}::date)
   `);
   return found.rows;
 }

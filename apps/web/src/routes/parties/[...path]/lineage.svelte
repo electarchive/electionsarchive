@@ -213,7 +213,14 @@
     const low = Math.min(...found);
     const high = Math.max(...found);
     const pad = Math.max(1, (high - low) * 0.02);
-    return { low: low - pad, high: high + pad };
+    if (!Number.isFinite(main.from) || !Number.isFinite(main.to)) {
+      return { low: low - pad, high: high + pad };
+    }
+    const room = Math.max(4, (main.to - main.from) * 0.35);
+    return {
+      low: Math.max(low - pad, main.from - room),
+      high: Math.min(high + pad, main.to + room),
+    };
   });
   const axis = $derived(4 - placed.top);
   const height = $derived(axis + placed.bottom + 30);
@@ -311,9 +318,11 @@
                   ),
               ),
             )}
+            {const isCutStart = $derived(lane.from < extent.low)}
+            {const isCutEnd = $derived(lane.to > extent.high)}
             {const span = $derived.by(() => {
-              let from = sx(lane.from);
-              let to = sx(lane.to);
+              let from = sx(Math.max(lane.from, extent.low));
+              let to = sx(Math.min(lane.to, extent.high));
               for (const { x, isInto } of marks) {
                 if (isInto && to <= x + 1) {
                   to = Math.max(from, x - turn);
@@ -376,6 +385,59 @@
                 stroke-width="4"
                 stroke-linecap="round"
               />
+              {#if isCutStart && span.to - span.from > 0.5}
+                <path
+                  d="M{span.from + 5},{y - 5} L{span.from},{y} L{span.from +
+                    5},{y + 5}"
+                  fill="none"
+                  class="stroke-card"
+                  stroke-width="5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+                <path
+                  d="M{span.from + 5},{y - 5} L{span.from},{y} L{span.from +
+                    5},{y + 5}"
+                  fill="none"
+                  class="stroke-foreground"
+                  stroke-width="1.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+                <text
+                  x={span.from + 9}
+                  y={y - 6}
+                  class="fill-muted-foreground font-figures text-[0.625rem] tabular-nums"
+                  >{Math.floor(lane.from)}</text
+                >
+              {/if}
+              {#if isCutEnd && span.to - span.from > 0.5}
+                <path
+                  d="M{span.to - 5},{y - 5} L{span.to},{y} L{span.to - 5},{y +
+                    5}"
+                  fill="none"
+                  class="stroke-card"
+                  stroke-width="5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+                <path
+                  d="M{span.to - 5},{y - 5} L{span.to},{y} L{span.to - 5},{y +
+                    5}"
+                  fill="none"
+                  class="stroke-foreground"
+                  stroke-width="1.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+                <text
+                  x={span.to - 9}
+                  y={y - 6}
+                  text-anchor="end"
+                  class="fill-muted-foreground font-figures text-[0.625rem] tabular-nums"
+                  >{Math.floor(lane.to)}</text
+                >
+              {/if}
               <a href={resolve("/id/[id]", { id: lane.party.id })}>
                 <text
                   x="0"

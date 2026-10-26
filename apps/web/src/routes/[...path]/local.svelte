@@ -116,7 +116,7 @@
           {m.local_top()}
         </h3>
         <ol
-          class="grid grid-cols-[repeat(auto-fill,minmax(min(100%,18rem),1fr))] gap-x-8 gap-y-4"
+          class="grid grid-cols-[repeat(auto-fit,minmax(min(100%,18rem),1fr))] gap-x-8 gap-y-4"
         >
           {#each top as entry (entry.contest.path ?? entry.contest.name)}
             {const final = $derived(
@@ -172,7 +172,11 @@
         </h3>
         <div class="columns-[24rem] gap-x-8">
           {#each isOpen || tier.governments.length <= 14 ? tier.governments : tier.governments.slice(0, 12) as government (government.path ?? government.name)}
-            <div class="grid break-inside-avoid content-start gap-1 pbe-5">
+            <div
+              class={cn("grid content-start gap-1 pbe-5", {
+                "break-inside-avoid": government.contests.length <= 8,
+              })}
+            >
               <h4 class="text-sm font-semibold">
                 {#if government.path == null}
                   {government.name}
@@ -191,7 +195,7 @@
                   )}
                   {const shown = $derived(final ?? contest)}
                   <li
-                    class="grid grid-cols-[minmax(0,1fr)_auto] items-baseline gap-x-4 gap-y-0.5 border-be border-border/60 py-1.5 last:border-be-0 pointer-coarse:py-2"
+                    class="grid break-inside-avoid grid-cols-[minmax(0,1fr)_auto] items-baseline gap-x-4 gap-y-0.5 border-be border-border/60 py-1.5 last:border-be-0 pointer-coarse:py-2"
                   >
                     {#if contest.path == null}
                       <span>{contest.name}</span>

@@ -207,7 +207,8 @@
     const columns = set.places.shares;
     const at = (key: string | undefined) => {
       const index = set.legend.findIndex((item) => item.key === key);
-      return index < 0 ? 0 : (columns[index]?.[i] ?? 0) / 10_000;
+      const value = index < 0 ? 0 : columns[index]?.[i];
+      return value == null ? null : value / 10_000;
     };
     const was = (key: string | undefined) => {
       const index = set.legend.findIndex((item) => item.key === key);
@@ -225,7 +226,7 @@
         next = value;
       }
     }
-    const margin = at(first?.key) - at(second?.key);
+    const margin = (at(first?.key) ?? 0) - (at(second?.key) ?? 0);
     const then = [was(first?.key), was(second?.key)];
     const leader = set.places.leader[i] ?? null;
     const prior = set.places.prior[i] ?? null;
@@ -246,6 +247,7 @@
       swing,
       value,
       isFlip: prior != null && leader != null && prior !== leader,
+      isAbsent: shown === "share" && leader != null && at(whom?.key) == null,
       isUnmatched:
         isCompared &&
         leader != null &&
@@ -275,6 +277,9 @@
     }
     if (!admits(set, reading)) {
       return DIM;
+    }
+    if (reading.isAbsent) {
+      return "color-mix(in oklab, var(--muted-foreground) 6%, var(--card))";
     }
     if (shown === "share") {
       return mix(
@@ -817,6 +822,25 @@
     );
     gl.addLayer(
       {
+        id: `norun:${id}`,
+        type: "fill",
+        source: id,
+        "source-layer": "areas",
+        minzoom: from,
+        paint: {
+          "fill-pattern": "norun",
+          "fill-opacity": [
+            "case",
+            ["boolean", ["feature-state", "absent"], false],
+            1,
+            0,
+          ],
+        },
+      },
+      before,
+    );
+    gl.addLayer(
+      {
         id: `seam:${id}`,
         type: "line",
         source: id,
@@ -896,7 +920,14 @@
       },
       "anchor-focus",
     );
-    layers.push(fill, `hatch:${id}`, `seam:${id}`, `edge:${id}`, `focus:${id}`);
+    layers.push(
+      fill,
+      `hatch:${id}`,
+      `norun:${id}`,
+      `seam:${id}`,
+      `edge:${id}`,
+      `focus:${id}`,
+    );
     groups.push({ rank, first: fill });
     return id;
   }
@@ -1066,6 +1097,7 @@
         color: isDotted ? ground : color,
         on: true,
         hatched: needsBefore && (set.estimated || read(set, i).isUnmatched),
+        absent: read(set, i).isAbsent,
       };
       gl.setFeatureState({ source: id, sourceLayer: "areas", id: k }, state);
       for (const mini of minis) {
@@ -1520,6 +1552,22 @@
         { width: 12, height: 12, data: stripes },
         { pixelRatio: 2 },
       );
+      const [ir = 0, ig = 0, ib = 0] = (
+        reader.color("var(--foreground)").match(/[\d.]+/g) ?? []
+      ).map(Number);
+      const dashes = new Uint8Array(8 * 8 * 4);
+      for (let x = 0; x < 8; x += 1) {
+        if (x >= 1 && x < 5) {
+          dashes.set([ir, ig, ib, 96], (2 * 8 + x) * 4);
+        }
+        if (x >= 5 || x < 1) {
+          dashes.set([ir, ig, ib, 96], (6 * 8 + x) * 4);
+        }
+      }
+      if (gl.hasImage("norun")) {
+        gl.removeImage("norun");
+      }
+      gl.addImage("norun", { width: 8, height: 8, data: dashes });
       for (const id of layers) {
         if (id.startsWith("seam:") || id.startsWith("edge:")) {
           gl.setPaintProperty(id, "line-color", paper);
@@ -1610,7 +1658,14 @@
           column.every((value) => value == null),
         )
       ) {
-        for (const kind of ["fill", "hatch", "seam", "edge", "focus"]) {
+        for (const kind of [
+          "fill",
+          "hatch",
+          "norun",
+          "seam",
+          "edge",
+          "focus",
+        ]) {
           if (gl.getLayer(`${kind}:${held.source}`) != null) {
             gl.setLayoutProperty(
               `${kind}:${held.source}`,
@@ -2163,6 +2218,31 @@
           label={m.atlas_range()}
           bind:range
         />
+      {/if}
+      {const skipped = $derived(
+        sheet.places.name.filter((_, i) => read(sheet, i).isAbsent),
+      )}
+      {#if skipped.length > 0}
+        <p
+          class="flex flex-wrap items-center gap-x-1.5 text-[0.8125rem]"
+          title={skipped.join(", ")}
+        >
+          <svg
+            viewBox="0 0 16 12"
+            class="rounded-xs bg-[color-mix(in_oklab,var(--muted-foreground)_6%,var(--card))] text-muted-foreground ring-1 ring-border block-3 inline-4"
+            aria-hidden="true"
+          >
+            <path
+              d="M2 3.5h6M10 8.5h6M0 8.5h2"
+              stroke="currentColor"
+              stroke-width="1"
+            />
+          </svg>
+          <span class="font-semibold">{m.map_norun_key()}</span>
+          <span class="font-figures text-xs text-muted-foreground tabular-nums"
+            >{count(skipped.length)}</span
+          >
+        </p>
       {/if}
       {#if sheet.target != null && !isCompared}
         <p class="text-[0.8125rem] text-muted-foreground">
