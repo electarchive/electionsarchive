@@ -341,6 +341,10 @@ STATE = {
 }
 BODIES = {"electoral_college", "senate", "house", "NY:senate", "NY:assembly"}
 FEDERAL = {"electoral_college", "president", "senate", "house"}
+PARTY_POSITION = re.compile(
+    r"^((Male|Female) )?(Alternate )?(County Committee|State Committee( Member)?|District Leader|"
+    r"Delegate to (the )?(Judicial|National) Convention)$"
+)
 STATE_PROPOSALS = {
     ("20231107", "removal-of-small-city-school-districts"): "2023-11-07:NY:question:5496",
     ("20231107", "extending-sewage-project-debt-exclusion"): "2023-11-07:NY:question:5497",
@@ -375,6 +379,7 @@ def emit() -> Path:
     contests = pl.read_parquet(PARSED / "contests.parquet").filter(pl.col("ok"))
     contests = contests.filter(
         pl.col("office").str.contains(OFFICES.pattern)
+        | pl.col("office").str.contains(PARTY_POSITION.pattern)
         | pl.col("office").is_in(list(STATE))
         | pl.struct("date", "office").map_elements(
             lambda row: any(
@@ -620,7 +625,8 @@ def emit() -> Path:
                     ),
                     None,
                 )
-                question = state is None and OFFICES.match(office_text) is None
+                position = PARTY_POSITION.match(office_text)
+                question = state is None and OFFICES.match(office_text) is None and position is None
                 contest_election, contest_path, partial, state_kind = election, election_path, False, None
                 if state is not None or proposal is not None:
                     state_kind = (
@@ -692,6 +698,28 @@ def emit() -> Path:
                         "NY:senate": f"New York State Senate, District {number}",
                         "NY:assembly": f"New York State Assembly, District {number}",
                     }.get(key, office_text)
+                elif position is not None:
+                    key = str(district).lower()
+                    seat = f"party-{slug(office_text)}-{key}"
+                    office = cs.key("us.office", f"NY:party:{slug(body)}:{slug(office_text)}")
+                    if office in cs.minted and office not in added_offices:
+                        added_offices.add(office)
+                        cs.add("office", id=office, polity_id=cs.polity("US-NY"), kind="other")
+                        name(office, f"{body} Party {office_text}")
+                    if "County Committee" in office_text:
+                        area = places.get(key, (None,))[0]
+                        label = f"Assembly District {key[:2]}, Election District {key[2:]}"
+                    elif "National Convention" in office_text:
+                        area = cs.area("us.cd", f"36{int(key):02d}")
+                        label = f"{ordinal_text or key} Congressional District"
+                    elif "Judicial District" in title_text:
+                        area, label = None, f"{ordinal_text or key} Judicial District"
+                    else:
+                        area = cs.area("us.sldl", f"NY:{int(key[:2])}")
+                        label = f"Assembly District {int(key[:2])}" + (
+                            f", Part {key[2:].upper()}" if office_text.endswith("District Leader") and key[2:] else ""
+                        )
+                    title = f"{office_text}, {label}"
                 elif question:
                     seat, title, area = f"proposal-{slug(office_text)[:48].rstrip('-')}", office_text, place
                 elif office_text == "Mayor":
@@ -787,7 +815,7 @@ def emit() -> Path:
                     [(cs.key("us.contest", proposal),)]
                     if proposal is not None
                     else []
-                    if question
+                    if question or position is not None
                     else conn.execute(
                         """select c.id from contest c join entity e on e.id = c.id and e.retired_by is null
                        where c.election_id = %s and c.office_id is not distinct from %s
@@ -1088,11 +1116,12 @@ def emit() -> Path:
                 )
                 if totals.is_empty():
                     continue
-                if (
-                    not partial
+                tied = (
+                    magnitude > 0
                     and totals.height > magnitude
                     and totals["votes"][magnitude - 1] == totals["votes"][magnitude]
-                ):
+                )
+                if tied and not partial and position is None:
                     raise ValueError(f"{day}: {title} has a tie at the margin")
 
                 known = {}
@@ -1212,60 +1241,64 @@ def emit() -> Path:
                             party_id=party,
                             ballot_label=candidate,
                         )
-                        if candidate in PERSONS:
-                            person = cs.key(*PERSONS[candidate])
-                            if person in cs.minted:
-                                raise ValueError(f"{candidate} must already exist")
-                        elif (peer := peers.get(token)) is not None:
-                            person = peer
-                        else:
-                            person = cs.key(f"{SOURCE}.person", f"{contest_key}:{slug(candidate)}")
-                            if person in cs.minted:
-                                cs.add("person", id=person)
-                                name(person, candidate)
-                        head = cs.key("us.candidacy", f"{root_key}:head")
-                        cs.add(
-                            "candidacy",
-                            id=head,
-                            person_id=person,
-                            option_id=option_ids[candidate],
-                            role="head",
-                            ballot_name=candidate,
-                            is_independent=False,
-                        )
-                        if " / " in candidate:
-                            mate = candidate.split(" / ", 1)[1]
-                            mate_words = [
-                                w
-                                for w in re.sub(r"[^a-z ]", "", slug(mate).replace("-", " ")).split()
-                                if w not in SUFFIXES
-                            ]
-                            mate_person = peers.get((mate_words[0], mate_words[-1])) if mate_words else None
-                            if mate_person is None:
-                                mate_person = cs.key(f"{SOURCE}.person", f"{contest_key}:{slug(mate)}")
-                                if mate_person in cs.minted:
-                                    cs.add("person", id=mate_person)
-                                    name(mate_person, mate)
+                        if position is None:
+                            if candidate in PERSONS:
+                                person = cs.key(*PERSONS[candidate])
+                                if person in cs.minted:
+                                    raise ValueError(f"{candidate} must already exist")
+                            elif (peer := peers.get(token)) is not None:
+                                person = peer
+                            else:
+                                person = cs.key(f"{SOURCE}.person", f"{contest_key}:{slug(candidate)}")
+                                if person in cs.minted:
+                                    cs.add("person", id=person)
+                                    name(person, candidate)
+                            head = cs.key("us.candidacy", f"{root_key}:head")
                             cs.add(
                                 "candidacy",
-                                id=cs.key("us.candidacy", f"{root_key}:running_mate"),
-                                person_id=mate_person,
+                                id=head,
+                                person_id=person,
                                 option_id=option_ids[candidate],
-                                role="running_mate",
-                                ballot_name=mate,
+                                role="head",
+                                ballot_name=candidate,
                                 is_independent=False,
                             )
-                        if party is not None:
-                            cs.add("candidacy_nomination", candidacy_id=head, party_id=party, kind="nominated")
-                        for line in (
-                            rows.filter(pl.col("unit").str.starts_with(f"{candidate} ("))["unit"].unique().sort()
-                        ):
-                            line_text = line.removeprefix(f"{candidate} (").removesuffix(")")
-                            for line_party in joint.get(line_text, [parties[line_text]]):
-                                if line_party is not None:
-                                    cs.add(
-                                        "candidacy_nomination", candidacy_id=head, party_id=line_party, kind="nominated"
-                                    )
+                            if " / " in candidate:
+                                mate = candidate.split(" / ", 1)[1]
+                                mate_words = [
+                                    w
+                                    for w in re.sub(r"[^a-z ]", "", slug(mate).replace("-", " ")).split()
+                                    if w not in SUFFIXES
+                                ]
+                                mate_person = peers.get((mate_words[0], mate_words[-1])) if mate_words else None
+                                if mate_person is None:
+                                    mate_person = cs.key(f"{SOURCE}.person", f"{contest_key}:{slug(mate)}")
+                                    if mate_person in cs.minted:
+                                        cs.add("person", id=mate_person)
+                                        name(mate_person, mate)
+                                cs.add(
+                                    "candidacy",
+                                    id=cs.key("us.candidacy", f"{root_key}:running_mate"),
+                                    person_id=mate_person,
+                                    option_id=option_ids[candidate],
+                                    role="running_mate",
+                                    ballot_name=mate,
+                                    is_independent=False,
+                                )
+                            if party is not None:
+                                cs.add("candidacy_nomination", candidacy_id=head, party_id=party, kind="nominated")
+                            for line in (
+                                rows.filter(pl.col("unit").str.starts_with(f"{candidate} ("))["unit"].unique().sort()
+                            ):
+                                line_text = line.removeprefix(f"{candidate} (").removesuffix(")")
+                                for line_party in joint.get(line_text, [parties[line_text]]):
+                                    if line_party is not None:
+                                        cs.add(
+                                            "candidacy_nomination",
+                                            candidacy_id=head,
+                                            party_id=line_party,
+                                            kind="nominated",
+                                        )
                     if whole and declared:
                         cs.add(
                             "outcome",
@@ -1273,7 +1306,7 @@ def emit() -> Path:
                             option_id=option_ids[candidate],
                             kind=declared.get(option_ids[candidate], "lost"),
                         )
-                    elif not partial:
+                    elif not partial and not (tied and position is not None):
                         cs.add(
                             "outcome",
                             result_set_id=result_set,
