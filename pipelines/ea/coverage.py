@@ -313,7 +313,7 @@ with c as (
                 or stage in ('general', 'special') and level in ('state_lower', 'state_upper') and st in ('AR', 'FL', 'HI', 'LA', 'OK', 'TX')
                 or stage in ('general', 'special') and level = 'statewide_exec' and st in ('FL', 'LA', 'OK')
                 or stage in ('general', 'special') and exists (select from published p
-                    where p.st = cc.st and p.year = cc.year and p.level = cc.level and p.finest = 'none'))
+                    where p.st = cc.st and p.year = cc.year and p.level = cc.level and p.county = '' and p.finest = 'none'))
             as cancelled
     from cc left join cg on cg.contest_id = cc.id
 )
@@ -521,14 +521,14 @@ def matrix(conn: Connection, last: int = LAST) -> list[dict]:
     conn.execute("set statement_timeout = 0")
     for statement in CONTESTS_SQL.split(";\n\n"):
         conn.execute(statement)
-    conn.execute("create temp table published (st text, year integer, level text, finest text)")
+    conn.execute("create temp table published (st text, year integer, level text, county text, finest text)")
     published = ROOT / ".agents" / "spec" / "finest-reported.csv"
     if published.exists():
         with published.open() as f:
             for row in csv.DictReader(f):
                 conn.execute(
-                    "insert into published values (%s, %s, %s, %s)",
-                    [row["state"], int(row["year"]), row["level"], row["finest"]],
+                    "insert into published values (%s, %s, %s, %s, %s)",
+                    [row["state"], int(row["year"]), row["level"], row.get("county") or "", row["finest"]],
                 )
     held = {
         (st, year, level, stage): {
