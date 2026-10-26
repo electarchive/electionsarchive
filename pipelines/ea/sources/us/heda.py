@@ -21,8 +21,11 @@ FILE = "https://dataverse.harvard.edu/api/access/datafile/{id}"
 TITLE = "Precinct-Level Election Data"
 PUBLISHER = "Harvard Election Data Archive"
 VOTES = re.compile(r"g(\d{4})_([A-Z]+)_([drt])v(\d*)")
-DISTRICTS = {"STH": "ld", "STS": "sd"}
+AT_LARGE = {"AK", "DE", "MT", "ND", "SD", "VT", "WY"}
+DISTRICTS = {"STH": "ld", "STS": "sd", "USH": "cd"}
 OFFICES = {
+    "USP": ("president",),
+    "USS": ("senate",),
     "GOV": ("governor",),
     "LTG": ("lieutenant-governor",),
     "ATG": ("attorney-general",),
@@ -176,7 +179,8 @@ def parse() -> None:
             seat = f"{district}{split if split not in ('', '1') else ''}" if district else None
             if office == "STH" and "ld_name" in frame.columns and split in ("", "1"):
                 seat = "ld_name"
-            if seat is not None and seat not in frame.columns:
+            at_large = office == "USH" and seat not in frame.columns and state in AT_LARGE
+            if seat is not None and seat not in frame.columns and not at_large:
                 continue
             frames.append(
                 frame.filter(pl.col("fips").is_not_null()).select(
@@ -184,7 +188,11 @@ def parse() -> None:
                     year=pl.lit(int(year)),
                     file=pl.lit(name),
                     office=pl.lit(office),
-                    district=pl.col(seat).str.strip_chars() if seat else pl.lit(None, pl.String),
+                    district=pl.lit("0")
+                    if at_large
+                    else pl.col(seat).str.strip_chars()
+                    if seat
+                    else pl.lit(None, pl.String),
                     fips="fips",
                     precinct="precinct",
                     party=pl.lit(party),
@@ -210,7 +218,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="State legislative and statewide general elections by precinct 2000–2012, Democratic and "
+            summary="Federal, state legislative, and statewide general elections by precinct 2000–2012, Democratic and "
             "Republican votes, from the Harvard Election Data Archive",
             polity="US",
         )
@@ -236,6 +244,9 @@ def emit() -> Path:
         for state, year, office, district in lines.select("state", "year", "office", "district").unique().iter_rows():
             if office in OFFICES:
                 tried = [f"{name}{suffix}" for name in OFFICES[office] for suffix in ("", ":special")]
+            elif office == "USH":
+                number = re.sub(r"\.0$", "", district or "")
+                tried = [f"house:{int(number)}"] if number.isdigit() else []
             else:
                 body = (
                     "legislature"
