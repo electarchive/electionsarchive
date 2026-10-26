@@ -22,17 +22,23 @@
     class?: string;
   } = $props();
 
-  const tether = TooltipPrimitive.createTether<Reason | "icpsr">();
+  const tether = TooltipPrimitive.createTether<
+    Reason | "icpsr" | "published"
+  >();
   const parts = $derived(
     REASONS[goal]
-      .flatMap((reason): Array<Reason | "icpsr"> =>
-        reason === "complete" ? [reason, "icpsr"] : [reason],
+      .flatMap((reason): Array<Reason | "icpsr" | "published"> =>
+        reason === "complete" ? [reason, "icpsr", "published"] : [reason],
       )
       .filter((part) => counts[part] > 0),
   );
-  const label = (part: Reason | "icpsr") =>
-    part === "icpsr" ? m.coverage_icpsr() : reasonLabel(goal, part, polity);
-  const share = (part: Reason | "icpsr") =>
+  const label = (part: Reason | "icpsr" | "published") =>
+    part === "icpsr"
+      ? m.coverage_icpsr()
+      : part === "published"
+        ? m.coverage_published()
+        : reasonLabel(goal, part, polity);
+  const share = (part: Reason | "icpsr" | "published") =>
     percent(counts[part] / Math.max(1, counts.total), 1);
 </script>
 
@@ -57,7 +63,7 @@
           {...props}
           class="block-full"
           style:inline-size="{((reason === 'complete'
-            ? counts.complete - counts.icpsr
+            ? counts.complete - counts.icpsr - counts.published
             : counts[reason]) /
             Math.max(1, counts.total)) *
             100}%"

@@ -258,6 +258,7 @@ export type Counts = Record<
   | "precincts"
   | "shaped"
   | "icpsr"
+  | "published"
   | "populationTotal"
   | "populationComplete"
   | "populationAbsent"
@@ -273,6 +274,7 @@ export const weighted = (row: Counts): Counts => ({
   totals: 0,
   bare: 0,
   icpsr: 0,
+  published: 0,
 });
 
 export const REASONS: Record<Goal, Array<Reason>> = {

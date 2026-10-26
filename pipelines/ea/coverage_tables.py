@@ -1273,7 +1273,7 @@ def build() -> str:
                     )
                 )
     names = dict(states.values())
-    goals: dict[tuple[str, str, str, int], list[int]] = defaultdict(lambda: [0] * 19)
+    goals: dict[tuple[str, str, str, int], list[int]] = defaultdict(lambda: [0] * 20)
     for st, year, level, total, complete, unshaped, units, undrawn in shapes:
         if level not in STATE_LEVELS or st not in names:
             continue
@@ -1294,9 +1294,10 @@ def build() -> str:
         totals = max(0, count - county - partial - bare)
         precinct = c["precinct"]
         major = c.get("major_only", 0)
+        published = c.get("published", 0)
         if coverage.target(st, level, year) == "total":
             county = precinct = count - bare
-            partial = totals = major = 0
+            partial = totals = major = published = 0
         if year >= 2000:
             for goal, complete, coarse in (
                 ("county", county, 0),
@@ -1311,6 +1312,7 @@ def build() -> str:
                     cell[8] += c["precincts"]
                     cell[9] += c["shaped_precincts"]
                     cell[18] += major
+                    cell[19] += published
                 else:
                     cell[13] += c.get("icpsr_only", 0)
         elif coverage.target(st, level, year) == "county" or level in ("state_upper", "state_lower"):
@@ -1381,7 +1383,7 @@ def build() -> str:
         with conn.cursor().copy(
             "copy coverage_goal (goal, state, level, year, total, complete, absent, bare, totals, partial, coarse,"
             " turnout, precincts, shaped, unshaped, units, undrawn, icpsr, population_total, population_complete,"
-            " population_absent, population_estimated, major) from stdin"
+            " population_absent, population_estimated, major, published) from stdin"
         ) as copy:
             for key, values in goals.items():
                 copy.write_row([*key, *values])

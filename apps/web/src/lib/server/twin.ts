@@ -654,6 +654,9 @@ function coverageMarkdown(
                 ...(row.icpsr > 0
                   ? [m.coverage_icpsr_of({ count: count(row.icpsr) })]
                   : []),
+                ...(row.published > 0
+                  ? [m.coverage_published_of({ count: count(row.published) })]
+                  : []),
                 m.coverage_short({ count: count(row.total - row.complete) }),
               ].join(", ")}`,
               REASONS[item.goal]
@@ -662,6 +665,9 @@ function coverageMarkdown(
                   `- ${reasonLabel(item.goal, reason, data.polity)}: ${count(row[reason])}${isWeighted ? ` (${m.coverage_population_share({ percent: percent(weighted(row)[reason] / Math.max(1, row.populationTotal), 1) })})` : ""}`,
                   ...(reason === "complete" && row.icpsr > 0
                     ? [`  - ${m.coverage_icpsr()}: ${count(row.icpsr)}`]
+                    : []),
+                  ...(reason === "complete" && row.published > 0
+                    ? [`  - ${m.coverage_published()}: ${count(row.published)}`]
                     : []),
                 ])
                 .join("\n"),

@@ -314,18 +314,55 @@ with c as (
                 or stage in ('general', 'special') and level = 'statewide_exec' and st in ('FL', 'LA', 'OK')
                 or stage in ('general', 'special') and exists (select from published p
                     where p.st = cc.st and p.year = cc.year and p.level = cc.level and p.county = '' and p.finest = 'none'))
-            as cancelled
+            as cancelled,
+        coalesce(cg.county, false) and exists (select from published p where p.st = cc.st and p.year = cc.year
+            and p.level = cc.level and p.county = '' and p.finest in ('county', 'town'))
+        or exists (select from pubc where pubc.id = cc.id) as published
     from cc left join cg on cg.contest_id = cc.id
 )
 select st, year, level, stage, count(*), count(*) filter (where results),
-    count(*) filter (where county or precinct or major or cancelled or single), count(*) filter (where precinct or cancelled),
-    count(*) filter (where major and not coalesce(precinct, false) and not coalesce(cancelled, false)),
+    count(*) filter (where county or precinct or major or cancelled or single), count(*) filter (where precinct or cancelled or published),
+    count(*) filter (where major and not coalesce(precinct, false) and not coalesce(cancelled, false) and not published),
     count(*) filter (where county and not county_free and not coalesce(precinct, false) and not single_free),
     count(*) filter (where turnout), count(*) filter (where not tacit and (multi or stage <> 'primary')),
     count(*) filter (where any_county and not (coalesce(county, false) or coalesce(precinct, false) or coalesce(major, false)
         or coalesce(cancelled, false) or single)),
-    count(*) filter (where not results and not coalesce(cancelled, false))
+    count(*) filter (where not results and not coalesce(cancelled, false)),
+    count(*) filter (where published and not coalesce(precinct, false) and not coalesce(cancelled, false))
 from c group by 1, 2, 3, 4
+"""
+
+PUBLISHED_SQL = """
+create temp table pubv as
+select cc.id, cc.st, cc.year, cc.level, rs.k as rs_k, rs.major, rs.whole, ug.grain, u.scheme_code,
+    case when u.scheme_code = 'us.county' then u.code else pu.code end as county,
+    (select coalesce(sum(v.value), 0) from result_value v where v.result_set_k = rs.k and v.unit_k = u.k
+        and v.measure = 1 and v.channel = 0 and v.count_round = 0 and v.option_k <> 0) as votes
+from cc
+join rs on rs.contest_id = cc.id
+join rsu on rsu.result_set_k = rs.k
+join ug on ug.k = rsu.unit_k and ug.grain in ('precinct', 'county')
+join reporting_unit u on u.k = rsu.unit_k
+left join reporting_unit pu on pu.id = u.parent_id and pu.scheme_code = 'us.county'
+where exists (select from published p where p.st = cc.st and p.year = cc.year and p.level = cc.level and p.county <> '');
+
+create temp table pubc as
+with pv as (
+    select id, county, rs_k, bool_and(whole) as whole, sum(votes) as votes
+    from pubv where grain = 'precinct' and not major and county is not null group by 1, 2, 3
+),
+cv as (select id, county, max(votes) as votes from pubv where scheme_code = 'us.county' group by 1, 2),
+k as (select distinct id, st, year, level, county from pubv where county is not null)
+select k.id
+from k
+group by k.id
+having bool_and(
+    exists (select from published p where p.st = k.st and p.year = k.year and p.level = k.level and p.county = k.county
+        and (p.finest = 'none' or p.finest in ('county', 'town')
+            and exists (select from pubv a where a.id = k.id and a.county = k.county and a.grain = 'county')))
+    or exists (select from pv where pv.id = k.id and pv.county = k.county
+        and coalesce((select abs(pv.votes - cv.votes) <= 0.005 * cv.votes from cv
+            where cv.id = k.id and cv.county = k.county), pv.whole)));
 """
 
 SHAPES_SIGNATURE_SQL = """
@@ -530,6 +567,8 @@ def matrix(conn: Connection, last: int = LAST) -> list[dict]:
                     "insert into published values (%s, %s, %s, %s, %s)",
                     [row["state"], int(row["year"]), row["level"], row.get("county") or "", row["finest"]],
                 )
+    for statement in PUBLISHED_SQL.split(";\n\n"):
+        conn.execute(statement)
     held = {
         (st, year, level, stage): {
             "held": n,
@@ -542,10 +581,25 @@ def matrix(conn: Connection, last: int = LAST) -> list[dict]:
             "contested": contested,
             "partial": partial,
             "bare": bare,
+            "published": published_count,
         }
-        for st, year, level, stage, n, results, county, precinct, major, icpsr, turnout, contested, partial, bare in conn.execute(
-            COUNT_SQL
-        )
+        for (
+            st,
+            year,
+            level,
+            stage,
+            n,
+            results,
+            county,
+            precinct,
+            major,
+            icpsr,
+            turnout,
+            contested,
+            partial,
+            bare,
+            published_count,
+        ) in conn.execute(COUNT_SQL)
     }
     conn.execute(
         "create table if not exists coverage_cache_shapes (key text primary key, signature text not null, "
@@ -840,6 +894,7 @@ def matrix(conn: Connection, last: int = LAST) -> list[dict]:
                 "turnout": 0,
                 "partial": 0,
                 "bare": 0,
+                "published": 0,
             },
         )
         exp = expected.get(key)
@@ -877,6 +932,7 @@ def matrix(conn: Connection, last: int = LAST) -> list[dict]:
                 "target": goal,
                 "gap": base - attained,
                 "icpsr_only": cell["icpsr_only"],
+                "published": cell["published"],
                 "owner": owner(level, pipelines.get(key, set())),
                 "pipelines": " ".join(sorted(pipelines.get(key, set()))),
             }

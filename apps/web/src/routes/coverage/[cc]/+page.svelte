@@ -433,6 +433,21 @@
               </span>
             </span>
           {/if}
+          {#if reason === "complete" && counts.published > 0}
+            <span class="mbs-2 grid grid-cols-[0.75rem_minmax(0,1fr)] gap-x-2">
+              <Tone
+                reason="published"
+                class="mbs-1 rounded-xs block-3 inline-3"
+              />
+              <span>
+                <span class="font-semibold">{m.coverage_published()}</span>
+                <span class="tabular-nums">{count(counts.published)}</span>
+                <span class="block text-xs text-muted-foreground"
+                  >{m.coverage_published_def()}</span
+                >
+              </span>
+            </span>
+          {/if}
         </span>
       </li>
     {/each}
@@ -480,6 +495,11 @@
       {#if counts.icpsr > 0}
         <span class="text-muted-foreground">
           {m.coverage_icpsr_of({ count: count(counts.icpsr) })}
+        </span>
+      {/if}
+      {#if counts.published > 0}
+        <span class="text-muted-foreground">
+          {m.coverage_published_of({ count: count(counts.published) })}
         </span>
       {/if}
       <span class="text-muted-foreground">
@@ -687,8 +707,10 @@
             {TIER_LABELS[row.key as Tier]()}
           </h2>
           <p class="text-sm text-muted-foreground max-inline-[72ch]">
-            {((isUs ? US_DEFINITIONS[row.key] : undefined) ??
-              DEFINITIONS[row.key])?.()}
+            {(
+              (isUs ? US_DEFINITIONS[row.key] : undefined) ??
+              DEFINITIONS[row.key]
+            )?.()}
           </p>
           {#if isUs && (row.key === "local" || row.key === "turnout")}
             <p class="text-sm text-muted-foreground max-inline-[72ch]">

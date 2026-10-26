@@ -41,6 +41,7 @@ const counts = {
   undrawn: v.number(),
   icpsr: v.number(),
   major: v.number(),
+  published: v.number(),
   populationTotal: v.number(),
   populationComplete: v.number(),
   populationAbsent: v.number(),

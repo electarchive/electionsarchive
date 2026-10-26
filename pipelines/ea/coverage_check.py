@@ -1,3 +1,4 @@
+import csv
 import json
 import os
 import urllib.request
@@ -5,7 +6,7 @@ from collections import defaultdict
 from datetime import date
 
 from ea import coverage_countries
-from ea.store import connect
+from ea.store import ROOT, connect
 
 BASE = os.environ.get("EA_BASE", "http://localhost:5173")
 US = {
@@ -42,6 +43,28 @@ def database(conn) -> list[str]:
         " totals, partial, coarse, shaped, unshaped) < 0"
     ):
         problems.append(f"{polity} {goal} {level} {state} {year}: complete {complete} of {total}, lowest value {low}")
+    for polity, goal, level, state, year, complete, icpsr, published in conn.execute(
+        "select polity, goal, level, state, year, complete, icpsr, published from coverage_goal"
+        " where icpsr < 0 or published < 0 or icpsr + published > complete"
+        " or published > 0 and (polity <> 'us' or goal <> 'precinct')"
+    ):
+        problems.append(
+            f"{polity} {goal} {level} {state} {year}: icpsr {icpsr} and published {published} against complete {complete}"
+        )
+    with (ROOT / ".agents" / "spec" / "finest-reported.csv").open() as f:
+        for row in csv.DictReader(f):
+            county = row.get("county") or ""
+            if row["finest"] not in ("none", "county", "town"):
+                problems.append(f"finest-reported {row['state']} {row['year']} {row['level']}: finest {row['finest']}")
+            if (
+                county
+                and not conn.execute(
+                    "select from reporting_unit u join polity p on p.id = u.polity_id"
+                    " where u.scheme_code = 'us.county' and u.code = %s and p.iso_code = %s",
+                    [county, f"US-{row['state']}"],
+                ).fetchone()
+            ):
+                problems.append(f"finest-reported {row['state']} {row['year']} {row['level']}: no county {county}")
     sums: dict[tuple[str, str, int], int] = defaultdict(int)
     for polity, level, goal, year, total in conn.execute(
         "select polity, level, goal, year, sum(total) from coverage_goal where polity <> 'us' group by 1, 2, 3, 4"
@@ -106,8 +129,9 @@ def pages(conn) -> list[str]:
                         )
                     )
                     low, high = {"before": (0, 1999), "since": (2000, 9999)}.get(era, (0, 9999))
-                    total, complete = conn.execute(
-                        "select coalesce(sum(total), 0), coalesce(sum(complete), 0) from coverage_goal where polity = %s"
+                    total, complete, icpsr, published = conn.execute(
+                        "select coalesce(sum(total), 0), coalesce(sum(complete), 0), coalesce(sum(icpsr), 0),"
+                        " coalesce(sum(published), 0) from coverage_goal where polity = %s"
                         " and goal = %s and level = any(%s) and year <> %s and year between %s and %s",
                         [cc, goal, keys, current, low, high],
                     ).fetchone()
@@ -115,6 +139,17 @@ def pages(conn) -> list[str]:
                         problems.append(
                             f"{cc} {key} {level} {column}: page {cell['complete']}/{cell['total']} db {complete}/{total}"
                         )
+                    if total and (icpsr, published) != (cell["icpsr"], cell["published"]):
+                        problems.append(
+                            f"{cc} {key} {level} {column}: page icpsr {cell['icpsr']} published {cell['published']}"
+                            f" db {icpsr} {published}"
+                        )
+                    for count, phrase in (
+                        (cell["icpsr"], "rely on ICPSR alone"),
+                        (cell["published"], "at the finest unit published"),
+                    ):
+                        if level is None and count > 0 and f"{count:,} {phrase}" not in markdown:
+                            problems.append(f"{cc} {key} {column}: {count:,} {phrase} not in the twin")
                     if (
                         level is None
                         and cell["total"] > 0
