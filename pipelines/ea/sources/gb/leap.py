@@ -567,7 +567,7 @@ def emit() -> Path:
                         id=election,
                         polity_id=polity,
                         parent_id=national,
-                        kind="local",
+                        kind="by_election" if code in only_by else "local",
                         date_from=day,
                         date_to=day,
                         status="held",
@@ -621,6 +621,7 @@ def emit() -> Path:
                     round_number=1,
                     electoral_system_id=systems["fptp" if seats == 1 else "block"],
                     default_result_kind="tacit" if tacit else "counted",
+                    term="remainder" if by else None,
                 )
                 noun = "division" if is_county else "ward"
                 name(contest, f"{display} {noun}{' by-election' if by else ''}, {council_name}, {year}")

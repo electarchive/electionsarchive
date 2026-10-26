@@ -104,10 +104,10 @@ ENDED_VIA = {
     "death in office": "died",
     "election petition": "annulled",
     "resignation": "resigned",
-    "succession to a peerage": "disqualified",
-    "elevation to the House of Lords": "disqualified",
-    "appointed as a judge": "disqualified",
-    "official appointment": "disqualified",
+    "succession to a peerage": "elevated",
+    "elevation to the House of Lords": "elevated",
+    "appointed as a judge": "appointed",
+    "official appointment": "appointed",
     "disqualification": "disqualified",
 }
 PRECISION = {"11": "day", "10": "month", "9": "year"}
@@ -493,6 +493,12 @@ def emit() -> Path:
             cs.add("party", id=parties[party_id], kind="independent_group" if descriptor else "party", polity_id=gb)
             name(parties[party_id], label)
         persons: dict[str, UUID] = {}
+        elsewhere = {
+            id
+            for (id,) in conn.execute(
+                "select p.id from person p join changeset c on c.id = p.changeset_id where c.pipeline <> %s", [SOURCE]
+            ).fetchall()
+        }
         for qid, person, full, birth, precision in candidates.select(
             "qid", "person", "full", "birth", "birth_precision"
         ).iter_rows():
@@ -500,12 +506,13 @@ def emit() -> Path:
             if identity in persons:
                 continue
             persons[identity] = cs.key("wikidata", qid) if qid else cs.key(f"{SOURCE}.person", f"{ELECTION}:{person}")
-            cs.add(
-                "person",
-                id=persons[identity],
-                birth_date=None if birth is None else date.fromisoformat(birth),
-                birth_precision=precision,
-            )
+            if persons[identity] not in elsewhere:
+                cs.add(
+                    "person",
+                    id=persons[identity],
+                    birth_date=None if birth is None else date.fromisoformat(birth),
+                    birth_precision=precision,
+                )
             surname, _, forenames = full.partition(", ")
             name(persons[identity], f"{forenames} {surname}".strip())
 

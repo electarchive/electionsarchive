@@ -677,6 +677,12 @@ def emit() -> Path:
                 name(national[year], f"{year} local elections in England and Wales")
                 cs.add("slug", path=f"gb/{day}-local", entity_id=national[year])
             lines = candidates.join(wards.filter(pl.col("year") == year).select("ballot"), on="ballot")
+            only_by = set(
+                wards.filter(pl.col("year") == year)
+                .group_by("la_code")
+                .agg(pl.col("by").all())
+                .filter(pl.col("by"))["la_code"]
+            )
             for ward in wards.filter(pl.col("year") == year).sort("ballot").iter_rows(named=True):
                 code, ward_code = ward["la_code"], ward["ward_code"]
                 if code not in councils:
@@ -730,12 +736,12 @@ def emit() -> Path:
                         id=election,
                         polity_id=polity,
                         parent_id=national[year],
-                        kind="local",
+                        kind="by_election" if code in only_by else "local",
                         date_from=day,
                         date_to=day,
                         status="held",
                     )
-                    name(election, f"{year} {council_name} election")
+                    name(election, f"{year} {council_name} {'by-election' if code in only_by else 'election'}")
                     cs.add("slug", path=f"{path}/{day}-local", entity_id=election)
                 display = ward["ons_name"]
                 display = " ".join(
@@ -780,6 +786,7 @@ def emit() -> Path:
                     round_number=1,
                     electoral_system_id=systems["fptp" if seats == 1 else "block"],
                     default_result_kind="counted",
+                    term="remainder" if ward["by"] else None,
                 )
                 by = " by-election" if ward["by"] else ""
                 name(contest, f"{display} ward{by}, {council_name}, {year}")

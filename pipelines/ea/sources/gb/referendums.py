@@ -76,6 +76,15 @@ ELECTIONS = {
     "1979-03-01": "1979 Scottish and Welsh devolution referendums",
     "1997-09-11": "1997 Scottish devolution referendum",
 }
+REGIONS = {
+    "1973-03-08": "GB-NIR",
+    "1998-05-22": "GB-NIR",
+    "1998-05-07": "GB-ENG",
+    "1997-09-11": "GB-SCT",
+    "1997-09-18": "GB-WLS",
+    "2011-03-03": "GB-WLS",
+    "2014-09-18": "GB-SCT",
+}
 GIBRALTAR = (
     "Gibraltar voted in the South West England region, which is how the Electoral Commission counted it. Its votes "
     "therefore count toward England, not toward a nation of their own."
@@ -795,7 +804,7 @@ def emit() -> Path:
                 cs.add(
                     "election",
                     id=election,
-                    polity_id=gb,
+                    polity_id=cs.polity(REGIONS[day]) if day in REGIONS else gb,
                     kind="referendum",
                     date_from=when,
                     date_to=when,
