@@ -129,6 +129,11 @@
       "title": "European elections, 23-26 May 2019, country sheet: Ireland",
       "publisher": "European Parliament",
       "url": "https://www.europarl.europa.eu/news/en/press-room/20190516BKG51011/european-elections-2019-country-sheets/13/ireland"
+    },
+    "goi-1920": {
+      "title": "Government of Ireland Act 1920, Fifth Schedule (constituencies in Southern Ireland and Northern Ireland)",
+      "publisher": "legislation.gov.uk",
+      "url": "https://www.legislation.gov.uk/ukpga/Geo5/10-11/67/enacted"
     }
   },
   "levels": [
@@ -152,6 +157,14 @@
       ],
       "fine_note": "Dáil votes are counted and declared by constituency; the tallies by ballot box are kept by parties, not published by returning officers.",
       "elections": [
+        {
+          "date": "1922-06-16",
+          "contests": 28,
+          "seats": 128,
+          "source": "goi-1920",
+          "quote": "Fifth Schedule, Part I: 4 borough constituencies (Mid Dublin, North West Dublin, South City, Cork), 22 county constituencies, and 2 universities (Dublin University, National University); \"Total Members 128\"",
+          "note": "Counted as 28 constituencies, from the seats the Government of Ireland Act 1920 gave Southern Ireland: 4 borough, 22 county, and 2 university constituencies, electing 128 members."
+        },
         {
           "date": "1923-08-27",
           "contests": 30,
@@ -398,13 +411,6 @@
           "source": "oir-34dail",
           "quote": "The general election of Members forming the Thirty-fourth Dáil took place on Friday, 29 November 2024. The election returned 174 TDs to Dáil Éireann from 43 constituencies",
           "note": "Official statement. The search excerpt's count of 39 for 2024 is the 2020 count and is not used."
-        }
-      ],
-      "gaps": [
-        {
-          "from": 1922,
-          "to": 1922,
-          "note": "The 1922 election used the constituencies set by the Government of Ireland Act 1920. No official list of them has been found yet, so this election isn't counted."
         }
       ]
     },

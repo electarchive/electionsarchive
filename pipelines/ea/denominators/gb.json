@@ -242,6 +242,46 @@
       "title": "General election results from 1918 to 2019 (CBP-8647), constituency results workbook",
       "publisher": "House of Commons Library",
       "url": "https://commonslibrary.parliament.uk/research-briefings/cbp-8647/"
+    },
+    "ukparl-ge": {
+      "title": "UK General Elections Results 1832–2019",
+      "publisher": "UK Parliament",
+      "url": "https://api.parliament.uk/uk-general-elections/general-elections"
+    },
+    "goi-1920": {
+      "title": "Government of Ireland Act 1920, Fifth Schedule (constituencies in Southern Ireland and Northern Ireland)",
+      "publisher": "legislation.gov.uk",
+      "url": "https://www.legislation.gov.uk/ukpga/Geo5/10-11/67/enacted"
+    },
+    "ark-nihoc": {
+      "title": "The Northern Ireland House of Commons, 1921-1972",
+      "publisher": "ARK (Queen's University Belfast and Ulster University)",
+      "url": "https://www.ark.ac.uk/elections/hnihoc.htm"
+    },
+    "ni-ela-1968": {
+      "title": "Electoral Law Act (Northern Ireland) 1968",
+      "publisher": "legislation.gov.uk",
+      "url": "https://www.legislation.gov.uk/apni/1968/20"
+    },
+    "ark-fa73": {
+      "title": "Northern Ireland Assembly Elections 1973",
+      "publisher": "ARK (Queen's University Belfast and Ulster University)",
+      "url": "https://www.ark.ac.uk/elections/fa73.htm"
+    },
+    "ark-fc75": {
+      "title": "Northern Ireland Constitutional Convention Elections 1975",
+      "publisher": "ARK (Queen's University Belfast and Ulster University)",
+      "url": "https://www.ark.ac.uk/elections/fc75.htm"
+    },
+    "ark-fa82": {
+      "title": "Northern Ireland Assembly Elections 1982",
+      "publisher": "ARK (Queen's University Belfast and Ulster University)",
+      "url": "https://www.ark.ac.uk/elections/fa82.htm"
+    },
+    "ark-ff96": {
+      "title": "Northern Ireland Forum Elections 1996",
+      "publisher": "ARK (Queen's University Belfast and Ulster University)",
+      "url": "https://www.ark.ac.uk/elections/ff96.htm"
     }
   },
   "levels": [
@@ -264,14 +304,147 @@
         "gb.pcon"
       ],
       "fine_note": "Returning officers declare Westminster results by constituency only, so there is no finer official count to collect.",
-      "gaps": [
-        {
-          "from": 1832,
-          "to": 1910,
-          "note": "Before 1918, many constituencies returned two or more members, and the archive hasn't yet found an official count of constituencies (the House of Commons Library counts seats). These elections aren't counted yet."
-        }
-      ],
       "elections": [
+        {
+          "date": "1832-12-08",
+          "contests": 401,
+          "source": "ukparl-ge",
+          "quote": "general-elections/1 (1832 General Election): \"There are 401 elections.\"",
+          "note": "Counted from UK Parliament's results site for general elections since 1832, which lists one election per constituency, including the two-member boroughs and the university seats. The site doesn't say which nation each constituency was in, so these years aren't split by nation."
+        },
+        {
+          "date": "1835-01-06",
+          "contests": 401,
+          "source": "ukparl-ge",
+          "quote": "general-elections/2 (1835 General Election): \"There are 401 elections.\"",
+          "note": "Counted from UK Parliament's results site for general elections since 1832, which lists one election per constituency, including the two-member boroughs and the university seats. The site doesn't say which nation each constituency was in, so these years aren't split by nation."
+        },
+        {
+          "date": "1837-07-24",
+          "contests": 401,
+          "source": "ukparl-ge",
+          "quote": "general-elections/3 (1837 General Election): \"There are 401 elections.\"",
+          "note": "Counted from UK Parliament's results site for general elections since 1832, which lists one election per constituency, including the two-member boroughs and the university seats. The site doesn't say which nation each constituency was in, so these years aren't split by nation."
+        },
+        {
+          "date": "1841-06-29",
+          "contests": 401,
+          "source": "ukparl-ge",
+          "quote": "general-elections/4 (1841 General Election): \"There are 401 elections.\"",
+          "note": "Counted from UK Parliament's results site for general elections since 1832, which lists one election per constituency, including the two-member boroughs and the university seats. The site doesn't say which nation each constituency was in, so these years aren't split by nation."
+        },
+        {
+          "date": "1847-07-29",
+          "contests": 400,
+          "source": "ukparl-ge",
+          "quote": "general-elections/5 (1847 General Election): \"There are 400 elections.\"",
+          "note": "Counted from UK Parliament's results site for general elections since 1832, which lists one election per constituency, including the two-member boroughs and the university seats. The site doesn't say which nation each constituency was in, so these years aren't split by nation."
+        },
+        {
+          "date": "1852-07-07",
+          "contests": 399,
+          "source": "ukparl-ge",
+          "quote": "general-elections/6 (1852 General Election): \"There are 399 elections.\"",
+          "note": "Counted from UK Parliament's results site for general elections since 1832, which lists one election per constituency, including the two-member boroughs and the university seats. The site doesn't say which nation each constituency was in, so these years aren't split by nation."
+        },
+        {
+          "date": "1857-03-27",
+          "contests": 399,
+          "source": "ukparl-ge",
+          "quote": "general-elections/7 (1857 General Election): \"There are 399 elections.\"",
+          "note": "Counted from UK Parliament's results site for general elections since 1832, which lists one election per constituency, including the two-member boroughs and the university seats. The site doesn't say which nation each constituency was in, so these years aren't split by nation."
+        },
+        {
+          "date": "1859-04-28",
+          "contests": 399,
+          "source": "ukparl-ge",
+          "quote": "general-elections/8 (1859 General Election): \"There are 399 elections.\"",
+          "note": "Counted from UK Parliament's results site for general elections since 1832, which lists one election per constituency, including the two-member boroughs and the university seats. The site doesn't say which nation each constituency was in, so these years aren't split by nation."
+        },
+        {
+          "date": "1865-07-11",
+          "contests": 401,
+          "source": "ukparl-ge",
+          "quote": "general-elections/9 (1865 General Election): \"There are 401 elections.\"",
+          "note": "Counted from UK Parliament's results site for general elections since 1832, which lists one election per constituency, including the two-member boroughs and the university seats. The site doesn't say which nation each constituency was in, so these years aren't split by nation."
+        },
+        {
+          "date": "1868-11-17",
+          "contests": 420,
+          "source": "ukparl-ge",
+          "quote": "general-elections/10 (1868 General Election): \"There are 420 elections.\"",
+          "note": "Counted from UK Parliament's results site for general elections since 1832, which lists one election per constituency, including the two-member boroughs and the university seats. The site doesn't say which nation each constituency was in, so these years aren't split by nation."
+        },
+        {
+          "date": "1874-01-31",
+          "contests": 416,
+          "source": "ukparl-ge",
+          "quote": "general-elections/11 (1874 General Election): \"There are 416 elections.\"",
+          "note": "Counted from UK Parliament's results site for general elections since 1832, which lists one election per constituency, including the two-member boroughs and the university seats. The site doesn't say which nation each constituency was in, so these years aren't split by nation."
+        },
+        {
+          "date": "1880-03-31",
+          "contests": 416,
+          "source": "ukparl-ge",
+          "quote": "general-elections/12 (1880 General Election): \"There are 416 elections.\"",
+          "note": "Counted from UK Parliament's results site for general elections since 1832, which lists one election per constituency, including the two-member boroughs and the university seats. The site doesn't say which nation each constituency was in, so these years aren't split by nation."
+        },
+        {
+          "date": "1885-11-24",
+          "contests": 643,
+          "source": "ukparl-ge",
+          "quote": "general-elections/13 (1885 General Election): \"There are 643 elections.\"",
+          "note": "Counted from UK Parliament's results site for general elections since 1832, which lists one election per constituency, including the two-member boroughs and the university seats. The site doesn't say which nation each constituency was in, so these years aren't split by nation."
+        },
+        {
+          "date": "1886-07-01",
+          "contests": 643,
+          "source": "ukparl-ge",
+          "quote": "general-elections/14 (1886 General Election): \"There are 643 elections.\"",
+          "note": "Counted from UK Parliament's results site for general elections since 1832, which lists one election per constituency, including the two-member boroughs and the university seats. The site doesn't say which nation each constituency was in, so these years aren't split by nation."
+        },
+        {
+          "date": "1892-07-04",
+          "contests": 643,
+          "source": "ukparl-ge",
+          "quote": "general-elections/15 (1892 General Election): \"There are 643 elections.\"",
+          "note": "Counted from UK Parliament's results site for general elections since 1832, which lists one election per constituency, including the two-member boroughs and the university seats. The site doesn't say which nation each constituency was in, so these years aren't split by nation."
+        },
+        {
+          "date": "1895-07-13",
+          "contests": 643,
+          "source": "ukparl-ge",
+          "quote": "general-elections/16 (1895 General Election): \"There are 643 elections.\"",
+          "note": "Counted from UK Parliament's results site for general elections since 1832, which lists one election per constituency, including the two-member boroughs and the university seats. The site doesn't say which nation each constituency was in, so these years aren't split by nation."
+        },
+        {
+          "date": "1900-09-26",
+          "contests": 643,
+          "source": "ukparl-ge",
+          "quote": "general-elections/17 (1900 General Election): \"There are 643 elections.\"",
+          "note": "Counted from UK Parliament's results site for general elections since 1832, which lists one election per constituency, including the two-member boroughs and the university seats. The site doesn't say which nation each constituency was in, so these years aren't split by nation."
+        },
+        {
+          "date": "1906-01-12",
+          "contests": 643,
+          "source": "ukparl-ge",
+          "quote": "general-elections/18 (1906 General Election): \"There are 643 elections.\"",
+          "note": "Counted from UK Parliament's results site for general elections since 1832, which lists one election per constituency, including the two-member boroughs and the university seats. The site doesn't say which nation each constituency was in, so these years aren't split by nation."
+        },
+        {
+          "date": "1910-01-15",
+          "contests": 643,
+          "source": "ukparl-ge",
+          "quote": "general-elections/19 (January 1910 General Election): \"There are 643 elections.\"",
+          "note": "Counted from UK Parliament's results site for general elections since 1832, which lists one election per constituency, including the two-member boroughs and the university seats. The site doesn't say which nation each constituency was in, so these years aren't split by nation."
+        },
+        {
+          "date": "1910-12-03",
+          "contests": 643,
+          "source": "ukparl-ge",
+          "quote": "general-elections/20 (December 1910 General Election): \"There are 643 elections.\"",
+          "note": "Counted from UK Parliament's results site for general elections since 1832, which lists one election per constituency, including the two-member boroughs and the university seats. The site doesn't say which nation each constituency was in, so these years aren't split by nation."
+        },
         {
           "date": "1918-12-14",
           "contests": 688,
@@ -1349,6 +1522,38 @@
       ],
       "elections": [
         {
+          "date": "1973-06-28",
+          "contests": 12,
+          "seats": 78,
+          "source": "ark-fa73",
+          "quote": "\"the 52 members of the old Stormont House of Commons and the 26 members of the Senate; they were elected by proportional respresentation from the existing Westminster seats, or rather from the new boundaries that had been approved shortly after the 1970 Westminster election\"",
+          "note": "Counted as 12 constituencies, Northern Ireland's Westminster seats as drawn in 1970, which together elected 78 members by single transferable vote."
+        },
+        {
+          "date": "1975-05-01",
+          "contests": 12,
+          "seats": 78,
+          "source": "ark-fc75",
+          "quote": "\"The 78 members were elected on the same basis as the 1973 Assembly, with the same distribution of members among the 12 parliamentary seats.\"",
+          "note": "The Constitutional Convention. Counted as 12 constituencies, with the same seats and the same 78 members as the 1973 Assembly."
+        },
+        {
+          "date": "1982-10-20",
+          "contests": 12,
+          "seats": 78,
+          "source": "ark-fa82",
+          "quote": "\"The Assembly elections on 20 October 1982\"; \"the last full elections held on the boundaries that had been set at the end of 1970\" (12 seats, 78 members)",
+          "note": "Counted as 12 constituencies, the Westminster seats drawn in 1970, electing 78 members by single transferable vote."
+        },
+        {
+          "date": "1996-05-30",
+          "contests": 19,
+          "seats": 110,
+          "source": "ark-ff96",
+          "quote": "\"Each of the 18 new constituencies elected five representatives from closed party lists using the d'Hondt formula. In addition, each of the ten parties with the most votes across Northern Ireland elected another two representatives. The total number of potential delegates/Forum members was thus 110.\"",
+          "note": "The Northern Ireland Forum. Counted as 19 contests: 18 constituencies electing five members each from party lists, plus one Northern Ireland-wide count that gave two more seats to each of the ten parties with the most votes."
+        },
+        {
           "date": "1998-06-25",
           "contests": 18,
           "seats": 108,
@@ -1397,13 +1602,6 @@
           "source": "hoc-cbp7529",
           "quote": "Table 18, seats won total 90; section 9.4: eighteen constituencies"
         }
-      ],
-      "gaps": [
-        {
-          "from": 1973,
-          "to": 1997,
-          "note": "The assemblies of 1973 and 1982, the 1975 Constitutional Convention, and the 1996 Forum aren't counted yet."
-        }
       ]
     },
     {
@@ -1424,14 +1622,104 @@
       "schemes": [
         "gb.stormont"
       ],
-      "gaps": [
+      "elections": [
         {
-          "from": 1921,
-          "to": 1969,
-          "note": "The House of Commons Library gives Stormont's 52 seats at each election but not its constituencies, several of which returned more than one member."
+          "year": 1921,
+          "contests": 10,
+          "seats": 52,
+          "source": "goi-1920",
+          "quote": "Fifth Schedule, Part II: East, North, South, and West Belfast (4 each); Antrim 7, Armagh 4, Fermanagh and Tyrone 8, Londonderry 5, Down 8; Queen's University of Belfast 4; \"Total members 52\"",
+          "note": "Counted as 10 constituencies, from the Government of Ireland Act 1920: Belfast's four divisions, five county constituencies, and Queen's University, electing 52 members by single transferable vote."
+        },
+        {
+          "year": 1925,
+          "contests": 10,
+          "seats": 52,
+          "source": "goi-1920",
+          "quote": "Fifth Schedule, Part II: East, North, South, and West Belfast (4 each); Antrim 7, Armagh 4, Fermanagh and Tyrone 8, Londonderry 5, Down 8; Queen's University of Belfast 4; \"Total members 52\"",
+          "note": "Counted as 10 constituencies, from the Government of Ireland Act 1920: Belfast's four divisions, five county constituencies, and Queen's University, electing 52 members by single transferable vote."
+        },
+        {
+          "year": 1929,
+          "contests": 49,
+          "seats": 52,
+          "source": "ark-nihoc",
+          "quote": "\"For the 1929 election the Unionist government abolished PR and carved out 48 single-member seats from the city and county constituencies\"; Queen's University kept its four seats until 1968",
+          "note": "Counted as 49 constituencies: the 48 single-member seats drawn in 1929, and Queen's University, which elected four members."
+        },
+        {
+          "year": 1933,
+          "contests": 49,
+          "seats": 52,
+          "source": "ark-nihoc",
+          "quote": "\"For the 1929 election the Unionist government abolished PR and carved out 48 single-member seats from the city and county constituencies\"; Queen's University kept its four seats until 1968",
+          "note": "Counted as 49 constituencies: the 48 single-member seats drawn in 1929, and Queen's University, which elected four members."
+        },
+        {
+          "year": 1938,
+          "contests": 49,
+          "seats": 52,
+          "source": "ark-nihoc",
+          "quote": "\"For the 1929 election the Unionist government abolished PR and carved out 48 single-member seats from the city and county constituencies\"; Queen's University kept its four seats until 1968",
+          "note": "Counted as 49 constituencies: the 48 single-member seats drawn in 1929, and Queen's University, which elected four members."
+        },
+        {
+          "year": 1945,
+          "contests": 49,
+          "seats": 52,
+          "source": "ark-nihoc",
+          "quote": "\"For the 1929 election the Unionist government abolished PR and carved out 48 single-member seats from the city and county constituencies\"; Queen's University kept its four seats until 1968",
+          "note": "Counted as 49 constituencies: the 48 single-member seats drawn in 1929, and Queen's University, which elected four members."
+        },
+        {
+          "year": 1949,
+          "contests": 49,
+          "seats": 52,
+          "source": "ark-nihoc",
+          "quote": "\"For the 1929 election the Unionist government abolished PR and carved out 48 single-member seats from the city and county constituencies\"; Queen's University kept its four seats until 1968",
+          "note": "Counted as 49 constituencies: the 48 single-member seats drawn in 1929, and Queen's University, which elected four members."
+        },
+        {
+          "year": 1953,
+          "contests": 49,
+          "seats": 52,
+          "source": "ark-nihoc",
+          "quote": "\"For the 1929 election the Unionist government abolished PR and carved out 48 single-member seats from the city and county constituencies\"; Queen's University kept its four seats until 1968",
+          "note": "Counted as 49 constituencies: the 48 single-member seats drawn in 1929, and Queen's University, which elected four members."
+        },
+        {
+          "year": 1958,
+          "contests": 49,
+          "seats": 52,
+          "source": "ark-nihoc",
+          "quote": "\"For the 1929 election the Unionist government abolished PR and carved out 48 single-member seats from the city and county constituencies\"; Queen's University kept its four seats until 1968",
+          "note": "Counted as 49 constituencies: the 48 single-member seats drawn in 1929, and Queen's University, which elected four members."
+        },
+        {
+          "year": 1962,
+          "contests": 49,
+          "seats": 52,
+          "source": "ark-nihoc",
+          "quote": "\"For the 1929 election the Unionist government abolished PR and carved out 48 single-member seats from the city and county constituencies\"; Queen's University kept its four seats until 1968",
+          "note": "Counted as 49 constituencies: the 48 single-member seats drawn in 1929, and Queen's University, which elected four members."
+        },
+        {
+          "year": 1965,
+          "contests": 49,
+          "seats": 52,
+          "source": "ark-nihoc",
+          "quote": "\"For the 1929 election the Unionist government abolished PR and carved out 48 single-member seats from the city and county constituencies\"; Queen's University kept its four seats until 1968",
+          "note": "Counted as 49 constituencies: the 48 single-member seats drawn in 1929, and Queen's University, which elected four members."
+        },
+        {
+          "year": 1969,
+          "contests": 52,
+          "seats": 52,
+          "source": "ni-ela-1968",
+          "quote": "Long title: \"An Act to abolish the university constituency for the purposes of elections to the Parliament of Northern Ireland; to create four new constituencies\" (48 + 4)",
+          "note": "Counted as 52 single-member constituencies. The Electoral Law Act (Northern Ireland) 1968 abolished the university seats and created four new constituencies."
         }
-      ],
-      "elections": []
+      ]
     },
     {
       "key": "councils",

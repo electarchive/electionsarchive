@@ -197,6 +197,11 @@
       "title": "Resmî Gazete, 10 Ekim 1986, sayı 19247: Yüksek Seçim Kurulu bildirisi (milletvekili ara seçimi)",
       "publisher": "Resmî Gazete (T.C. Cumhurbaşkanlığı)",
       "url": "https://www.resmigazete.gov.tr/arsiv/19247.pdf"
+    },
+    "tbmm-4918": {
+      "title": "4918 sayılı Milletvekilleri Seçimi Kanunu (kabul 5 Haziran 1946)",
+      "publisher": "Türkiye Büyük Millet Meclisi",
+      "url": "https://www5.tbmm.gov.tr/tutanaklar/KANUNLAR_KARARLAR/kanuntbmmc028/kanuntbmmc028/kanuntbmmc02804918.pdf"
     }
   },
   "levels": [
@@ -230,10 +235,11 @@
       "elections": [
         {
           "date": "1946-07-21",
+          "contests": 63,
           "seats": 465,
           "source": "tuik",
-          "quote": "Table 3, row 1946: Toplam milletvekili sayısı 465",
-          "note": "TÜİK says province-level results for 1946 are not available, so the number of constituencies (provinces) is not stated."
+          "quote": "Tablo 6, \"Siyasi parti ve bağımsızlara göre illerin çıkardığı milletvekili sayısı, 1946\": 63 province rows (Adana (Seyhan) to Zonguldak), Toplam 465; Law 4918, art. 1: \"Her il bir seçim çevresidir.\"",
+          "note": "Counted as 63 constituencies. The 1946 election law made each province one constituency, and TÜİK's table of seats by province lists 63 provinces. TÜİK has no votes by province for 1946."
         },
         {
           "date": "1950-05-14",
@@ -390,13 +396,6 @@
           "source": "ysk2023",
           "quote": "Section 4.3.3 (SEÇİM ÇEVRESİ table): 87 rows, 81 provinces with Ankara, Bursa, İstanbul, and İzmir split; TOPLAM 600",
           "note": "Count of constituency rows in section 4.3.3 (Kahramanmaraş total corrected to 8, see source note)."
-        }
-      ],
-      "gaps": [
-        {
-          "from": 1946,
-          "to": 1946,
-          "note": "Neither TÜİK nor the Grand National Assembly publishes the 1946 results by province, so the number of constituencies isn't known and this election isn't counted yet."
         }
       ]
     },
