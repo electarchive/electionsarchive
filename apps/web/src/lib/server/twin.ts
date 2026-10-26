@@ -1412,14 +1412,17 @@ function polityMarkdown(
       : [
           `## ${m.holders_title()}`,
           m.holders_lede(),
-          ...holders.groups.flatMap((group) => {
+          ...holders.groups.flatMap((group, index) => {
             const rows = group.rows.map((row) => {
               const party =
                 row.party == null
                   ? null
                   : holders.parties.find((entry) => entry.id === row.party);
               const notes = [
-                row.isStale ? m.holders_stale() : null,
+                row.isStale && !group.isFormer ? m.holders_stale() : null,
+                row.due == null
+                  ? null
+                  : m.holders_due({ year: String(row.due) }),
                 row.elected == null
                   ? null
                   : `${m.holders_won({ date: date(row.elected.date) })} ${link(row.elected.name ?? "", row.elected.person == null ? null : `id/${row.elected.person}`)}`,
@@ -1469,12 +1472,26 @@ function polityMarkdown(
               };
             });
             const only = rows[0];
+            const former =
+              group.isFormer && holders.groups[index - 1]?.isFormer !== true
+                ? [`### ${m.holders_former()}`]
+                : [];
             return !group.isBody && rows.length === 1 && only != null
               ? [
+                  ...former,
                   `- **${group.name}${only.label == null ? "" : `, ${only.label}`}**: ${[only.holder, only.since, only.notes].filter((part) => part != null && part !== "").join("; ")}`,
                 ]
               : [
-                  `### ${group.name}`,
+                  ...former,
+                  `${group.isFormer ? "####" : "###"} ${group.name}`,
+                  ...(group.seats == null
+                    ? []
+                    : [
+                        m.holders_partial({
+                          count: count(rows.length),
+                          total: count(group.seats),
+                        }),
+                      ]),
                   table(
                     [m.col_seat(), m.col_holder(), m.col_since()],
                     rows.map((row) => [

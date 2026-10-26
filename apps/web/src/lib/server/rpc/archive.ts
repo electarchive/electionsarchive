@@ -8668,6 +8668,12 @@ async function races(
             a.rank - b.rank ||
             Number(a.rank === 1 && b.count === 1) -
               Number(a.rank === 1 && a.count === 1) ||
+            (a.body != null &&
+            a.body === b.body &&
+            a.count === 1 &&
+            b.count === 1
+              ? a.name.localeCompare(b.name, undefined, { numeric: true })
+              : 0) ||
             b.valid - a.valid),
     )
     .map(
@@ -13415,6 +13421,8 @@ export const polities = {
             id: v.string(),
             name: v.string(),
             isBody: v.boolean(),
+            isFormer: v.boolean(),
+            seats: v.nullable(v.number()),
             rows: v.array(
               v.object({
                 label: v.nullable(v.string()),
@@ -13426,6 +13434,7 @@ export const polities = {
                 since: v.nullable(v.string()),
                 contest: v.nullable(v.string()),
                 isStale: v.boolean(),
+                due: v.nullable(v.number()),
                 elected: v.nullable(
                   v.object({
                     person: v.nullable(v.string()),
@@ -13471,6 +13480,9 @@ export const polities = {
         nextPerson: string | null;
         nextDate: string | null;
         nextContest: string | null;
+        due: number | null;
+        labels: Array<string> | null;
+        size: number | null;
       }>(sql`
         with own as (
           select area_id from polity_territory where polity_id = ${input.id}::uuid
@@ -13483,6 +13495,8 @@ export const polities = {
               where rs.contest_id = c.id and x.candidacy_id is not null and x.kind in ('elected', 'won')
             ) as "isNamed",
             e.date_from as date, e.kind::text as kind, coalesce(c.magnitude, 1) as magnitude,
+            case when n.text ~* '\\mspecial\\M' then 'special' else coalesce((select pe.kind::text from contest pc join election pe on pe.id = pc.election_id where pc.id = c.previous_round_id), e.kind::text) end as "firstKind",
+            coalesce((select pe.date_from from contest pc join election pe on pe.id = pc.election_id where pc.id = c.previous_round_id), e.date_from) as "firstDate",
             case when c.district_area_id in (select area_id from own) then null else c.district_area_id end as district,
             (select a.k from area a where a.id = coalesce(c.district_area_id, (
               select pt.area_id from polity_territory pt where pt.polity_id = e.polity_id and pt.valid @> e.date_from limit 1
@@ -13505,7 +13519,7 @@ export const polities = {
           select r.*,
             coalesce((select st.label from seat st where st.id = r.seat_id),
               (select regexp_replace(dn.text, '^.*, ', '') from name dn where dn.entity_id = r.district and dn.is_preferred limit 1),
-              r.suffix) as label
+              case when r.suffix !~* '^(runoff|(first|second|third|final) round|round \\d+)$' then r.suffix end) as label
           from roots r
         ),
         keyed as materialized (
@@ -13616,6 +13630,29 @@ export const polities = {
           from tenure t
           where t.office_id in (select owner from posts where "isOffice") and t.to_date <= current_date
           order by t.office_id, t.to_date desc
+        ),
+        cycles as (
+          select distinct on (p.owner) p.owner, round(g.gap / 365.25)::int as years
+          from (
+            select post, date, date - lag(date) over (partition by post order by date) as gap
+            from (select distinct post, "firstDate" as date from won where not "isElect" and "firstKind" not in ('special', 'by_election')) d
+          ) g
+          join posts p on p.post = g.post
+          where g.gap >= 300 and exists (select from slug s where s.entity_id = ${input.id}::uuid and s.is_current and (s.path = 'us' or s.path like 'us/%'))
+          group by p.owner, round(g.gap / 365.25)
+          order by p.owner, count(*) desc, max(g.date) desc
+        ),
+        bases as (
+          select w.post, max(w."firstDate") as date, cy.years,
+            mode() within group (order by extract(year from w."firstDate")::int % cy.years) as residue
+          from won w join posts p on p.post = w.post join cycles cy on cy.owner = p.owner
+          where not w."isElect" and w."firstKind" not in ('special', 'by_election') and cy.years > 0
+          group by w.post, cy.years
+        ),
+        owned as (
+          select owner, array_agg(distinct label) filter (where label is not null) as labels,
+            (select z.seats from body_size z where z.body_id = owner and z.valid @> current_date limit 1) as size
+          from keyed group by owner
         )
         select p.owner::text, (select kind::text from office where id = p.owner) as kind, p.label,
           case when pd.id is not null then null when tn.person is not null and (h.date is null or tn.from_date > h.date) then tn.person
@@ -13632,8 +13669,13 @@ export const polities = {
             and not (tn.person is not null and tn.from_date > h.date) as "isStale",
           case when pd.id is null and ((tn.person is not null and tn.from_date > h.date) or (en.to_date > h.date and tn.person is null)) then h.person end::text as "electedPerson",
           case when pd.id is null and ((tn.person is not null and tn.from_date > h.date) or (en.to_date > h.date and tn.person is null)) then h.date end::text as "electedDate",
-          el.person::text as "nextPerson", el.date::text as "nextDate", el.id::text as "nextContest"
+          el.person::text as "nextPerson", el.date::text as "nextDate", el.id::text as "nextContest",
+          case when pd.id is null and bs.date + make_interval(years => bs.years) > current_date then extract(year from bs.date)::int + bs.years
+            - ((extract(year from bs.date)::int + bs.years - bs.residue) % bs.years + bs.years) % bs.years end as due,
+          od.labels, od.size
         from posts p
+        left join bases bs on bs.post = p.post
+        join owned od on od.owner = p.owner
         left join held h on h.post = p.post
         left join pending pd on pd.post = p.post
         left join terms tr on tr.post = p.post
@@ -13672,6 +13714,37 @@ export const polities = {
         refs(parties),
         portraits(found.rows.flatMap((row) => row.person ?? [])),
       ]);
+      const year = new Date().getFullYear();
+      const parse = (label: string | null) => {
+        const text = (label ?? "").toLowerCase().trim();
+        const match = /^(.*?)[\s-]+(\d+|[ivxlcdm]+|[a-z])$/u.exec(text);
+        const tail = match?.[2];
+        if (tail == null) {
+          return { scheme: text, seat: null, isRoman: false };
+        }
+        if (!/^[ivxlcdm]+$/u.test(tail)) {
+          return {
+            scheme: match?.[1] ?? "",
+            seat: /^\d+$/u.test(tail) ? String(Number(tail)) : tail,
+            isRoman: false,
+          };
+        }
+        const ROMAN: Record<string, number> = {
+          i: 1,
+          v: 5,
+          x: 10,
+          l: 50,
+          c: 100,
+          d: 500,
+          m: 1000,
+        };
+        let value = 0;
+        for (const [at, char] of [...tail].entries()) {
+          const digit = ROMAN[char] ?? 0;
+          value += digit < (ROMAN[tail[at + 1] ?? ""] ?? 0) ? -digit : digit;
+        }
+        return { scheme: match?.[1] ?? "", seat: String(value), isRoman: true };
+      };
       const groups = Map.groupBy(found.rows, (row) => row.owner)
         .entries()
         .filter(([id, rows]) => {
@@ -13701,15 +13774,85 @@ export const polities = {
               : at < 0
                 ? 6
                 : at + 3;
+          const parsed = rows
+            .map((row) => ({ row, ...parse(row.label) }))
+            .filter(
+              ({ row }, _, all) =>
+                row.via !== "unknown" ||
+                row.label != null ||
+                all.every((entry) => entry.row.label == null),
+            );
+          const fresh = parsed.filter(({ row }) => !row.isStale);
+          const kept = parsed.filter(({ row, scheme, seat }) => {
+            return (
+              !row.isStale ||
+              !(
+                fresh.some(
+                  (entry) =>
+                    row.person != null && entry.row.person === row.person,
+                ) ||
+                parsed.some(
+                  (entry) =>
+                    seat != null &&
+                    entry.row !== row &&
+                    entry.scheme === scheme &&
+                    entry.seat === seat &&
+                    (entry.row.since ?? "") > (row.since ?? ""),
+                ) ||
+                (fresh.some(
+                  (entry) => entry.seat != null && entry.scheme !== scheme,
+                ) &&
+                  !fresh.some((entry) => entry.scheme === scheme))
+              )
+            );
+          });
+          const schemes = new Set(
+            fresh
+              .map((entry) => entry.scheme)
+              .filter((scheme) => scheme !== ""),
+          );
+          const [scheme] = schemes;
+          const seats =
+            rows[0]?.size ??
+            (schemes.size === 1 && fresh.every((entry) => entry.seat != null)
+              ? new Set(
+                  (rows[0]?.labels ?? [])
+                    .map((label) => parse(label))
+                    .filter((entry) => entry.scheme === scheme)
+                    .map((entry) => entry.seat),
+                ).size
+              : null);
           return [
             rank,
             {
               id,
               name,
               isBody,
-              rows: rows
-                .map((row) => ({
-                  label: row.label,
+              isFormer: false,
+              seats: seats != null && seats > kept.length ? seats : null,
+              rows: kept
+                .map(({ row, scheme: own, seat, isRoman }) => ({
+                  label:
+                    row.label == null
+                      ? null
+                      : (isRoman &&
+                        seat != null &&
+                        kept.some(
+                          (entry) =>
+                            entry.scheme === own &&
+                            entry.seat != null &&
+                            !entry.isRoman &&
+                            /\d$/u.test(entry.row.label ?? ""),
+                        )
+                          ? row.label.replace(/[ivxlcdm]+$/iu, seat)
+                          : row.label
+                        ).replaceAll(
+                          /^\p{Ll}/u.test(row.label)
+                            ? /(^|[\s-])(\p{Ll})/gu
+                            : /^$/gu,
+                          (_, before: string, letter: string) =>
+                            before + letter.toUpperCase(),
+                        ),
                   person: row.person,
                   name:
                     row.person == null
@@ -13725,6 +13868,13 @@ export const polities = {
                       ? null
                       : (slugs.get(row.contest) ?? null),
                   isStale: row.isStale,
+                  due:
+                    row.due == null ||
+                    row.isStale ||
+                    row.nextDate != null ||
+                    row.due < year
+                      ? null
+                      : row.due,
                   elected:
                     row.electedDate == null
                       ? null
@@ -13768,8 +13918,17 @@ export const polities = {
             (a.isBody ? b.rows.length - a.rows.length : 0) ||
             a.name.localeCompare(b.name),
         );
+      const formed = groups.map(([rank, group]) => {
+        const isFormer =
+          group.rows.every((row) => row.isStale) &&
+          groups.some(([, other]) => other.rows.some((row) => !row.isStale));
+        return [
+          rank + (isFormer ? 10 : 0),
+          { ...group, isFormer, seats: isFormer ? null : group.seats },
+        ] as const;
+      });
       return {
-        groups: groups.map(([, group]) => group),
+        groups: formed.toSorted(([x], [y]) => x - y).map(([, group]) => group),
         parties: parties.map(
           (id) => colors.get(id) ?? { id, label: "", short: null, color: null },
         ),

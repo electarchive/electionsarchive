@@ -27,7 +27,7 @@
     const result: Array<
       { cards: typeof groups } | { list: (typeof groups)[number] }
     > = [];
-    for (const group of groups) {
+    for (const group of groups.filter((entry) => !entry.isFormer)) {
       const last = result.at(-1);
       if (group.isBody || group.rows.length > 1) {
         result.push({ list: group });
@@ -39,6 +39,7 @@
     }
     return result;
   });
+  const formers = $derived(groups.filter((group) => group.isFormer));
   const VIA: Record<string, (input: { date: string }) => string> = {
     elected: m.holders_elected,
     acting: m.holders_acting,
@@ -49,7 +50,10 @@
   };
 </script>
 
-{#snippet holder(row: (typeof groups)[number]["rows"][number])}
+{#snippet holder(
+  row: (typeof groups)[number]["rows"][number],
+  isFormer: boolean,
+)}
   {const party = $derived(row.party == null ? null : parties.get(row.party))}
   <span class="grid gap-0.5 min-inline-0">
     {#if row.via === "unknown"}
@@ -82,7 +86,7 @@
           >
         {/if}
       {/if}
-      {#if row.isStale}
+      {#if row.isStale && !isFormer}
         <span class="highlighter px-1 font-semibold text-foreground"
           >{m.holders_stale()}</span
         >
@@ -108,7 +112,66 @@
         {/if}
       </span>
     {/if}
+    {#if row.due != null}
+      <span class="text-xs text-muted-foreground"
+        >{m.holders_due({ year: String(row.due) })}</span
+      >
+    {/if}
   </span>
+{/snippet}
+
+{#snippet list(group: (typeof groups)[number])}
+  {const isOpen = $derived(opened.has(group.id))}
+  {const isLabeled = $derived(group.rows.some((entry) => entry.label != null))}
+  <div class="grid content-start gap-1.5">
+    <div class="grid gap-0.5">
+      <h3 class="text-sm font-semibold">{group.name}</h3>
+      {#if group.seats != null}
+        <p class="text-[0.8125rem] text-muted-foreground">
+          {m.holders_partial({
+            count: count(group.rows.length),
+            total: count(group.seats),
+          })}
+        </p>
+      {/if}
+    </div>
+    <ol
+      class="grid grid-cols-[repeat(auto-fill,minmax(min(100%,19rem),1fr))] gap-x-6 text-sm"
+    >
+      {#each isOpen || group.rows.length <= 14 ? group.rows : group.rows.slice(0, 12) as row, at (at)}
+        <li
+          class={cn(
+            "grid items-baseline gap-x-3 border-be border-border/60 py-1.5 pointer-coarse:py-2",
+            { "grid-cols-[minmax(4.5rem,auto)_minmax(0,1fr)]": isLabeled },
+          )}
+        >
+          {#if isLabeled}
+            <span class="text-[0.8125rem] text-muted-foreground"
+              >{row.label ?? m.holders_at_large()}</span
+            >
+          {/if}
+          {@render holder(row, group.isFormer)}
+        </li>
+      {/each}
+    </ol>
+    {#if group.rows.length > 14}
+      <button
+        type="button"
+        class="justify-self-start text-[0.8125rem] font-semibold underline decoration-border underline-offset-4 hover:decoration-foreground pointer-coarse:py-2"
+        aria-expanded={isOpen}
+        onclick={() => {
+          if (isOpen) {
+            opened.delete(group.id);
+          } else {
+            opened.add(group.id);
+          }
+        }}
+        >{isOpen
+          ? m.regions_fewer()
+          : m.regions_more({ count: count(group.rows.length) })}</button
+      >
+    {/if}
+  </div>
 {/snippet}
 
 {#if groups.length > 0}
@@ -155,7 +218,7 @@
                 <dt class="text-xs font-semibold text-muted-foreground">
                   {group.name}{row.label == null ? "" : `, ${row.label}`}
                 </dt>
-                <dd class="text-[0.9375rem]">{@render holder(row)}</dd>
+                <dd class="text-[0.9375rem]">{@render holder(row, false)}</dd>
                 {#if row.photo != null}
                   <dd>
                     <a
@@ -170,51 +233,25 @@
           {/each}
         </dl>
       {:else}
-        {const group = $derived(block.list)}
-        {const isOpen = $derived(opened.has(group.id))}
-        <div class="grid content-start gap-1.5">
-          <h3 class="text-sm font-semibold">{group.name}</h3>
-          <ol
-            class="grid grid-cols-[repeat(auto-fill,minmax(min(100%,19rem),1fr))] gap-x-6 text-sm"
-          >
-            {#each isOpen || group.rows.length <= 14 ? group.rows : group.rows.slice(0, 12) as row, at (at)}
-              <li
-                class={cn(
-                  "grid items-baseline gap-x-3 border-be border-border/60 py-1.5 pointer-coarse:py-2",
-                  {
-                    "grid-cols-[minmax(4.5rem,auto)_minmax(0,1fr)]":
-                      group.rows.some((entry) => entry.label != null),
-                  },
-                )}
-              >
-                {#if group.rows.some((entry) => entry.label != null)}
-                  <span class="text-[0.8125rem] text-muted-foreground"
-                    >{row.label ?? m.holders_at_large()}</span
-                  >
-                {/if}
-                {@render holder(row)}
-              </li>
-            {/each}
-          </ol>
-          {#if group.rows.length > 14}
-            <button
-              type="button"
-              class="justify-self-start text-[0.8125rem] font-semibold underline decoration-border underline-offset-4 hover:decoration-foreground pointer-coarse:py-2"
-              aria-expanded={isOpen}
-              onclick={() => {
-                if (isOpen) {
-                  opened.delete(group.id);
-                } else {
-                  opened.add(group.id);
-                }
-              }}
-              >{isOpen
-                ? m.regions_fewer()
-                : m.regions_more({ count: count(group.rows.length) })}</button
-            >
-          {/if}
-        </div>
+        {@render list(block.list)}
       {/if}
     {/each}
+    {#if formers.length > 0}
+      <details class="grid content-start gap-3">
+        <summary
+          class="cursor-pointer justify-self-start text-[0.8125rem] font-semibold underline decoration-border underline-offset-4 hover:decoration-foreground pointer-coarse:py-2"
+        >
+          {m.holders_former()}
+          <span class="font-normal text-muted-foreground"
+            >({count(formers.length)})</span
+          >
+        </summary>
+        <div class="grid content-start gap-4 pbs-3">
+          {#each formers as group (group.id)}
+            {@render list(group)}
+          {/each}
+        </div>
+      </details>
+    {/if}
   </section>
 {/if}

@@ -520,15 +520,24 @@
         {const short = $derived(
           plain.replace(new RegExp(`^${RegExp.escape(polity.name)} `, "u"), ""),
         )}
+        {const local = $derived(
+          plain.replace(
+            new RegExp(`^(?:${RegExp.escape(polity.name)}[:,]? )+`, "u"),
+            "",
+          ),
+        )}
         {const stripped = $derived(
-          polity.parent != null ||
-            polity.latest.races.some(
-              (other) =>
-                other !== race &&
-                other.name.replace(/ election$/u, "").endsWith(` ${short}`),
-            )
-            ? plain
-            : short,
+          polity.parent != null
+            ? /^\p{Lu}\S*\s/u.test(local)
+              ? local
+              : plain
+            : polity.latest.races.some(
+                  (other) =>
+                    other !== race &&
+                    other.name.replace(/ election$/u, "").endsWith(` ${short}`),
+                )
+              ? plain
+              : short,
         )}
         {const label = $derived(
           stripped.charAt(0).toUpperCase() + stripped.slice(1),
