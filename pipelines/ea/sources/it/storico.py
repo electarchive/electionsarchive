@@ -27,6 +27,26 @@ RIPARTIZIONE = (
     "https://elezionistorico.interno.gov.it/index.php?tpel=C&dtel={day:%d/%m/%Y}&tpa=E&tpe=T&lev0=0&levsut0=0"
     "&lev1={n}&levsut1=1&ne1={n}&es0=S&es1=S&ms=S"
 )
+COUNTRIES = {
+    "BOSNIAERZEGOVINA": "BIH",
+    "CONGO": "COG",
+    "EXREPUBBLICAJUGOSLAVADIMACEDONIA": "MKD",
+    "FEDERAZIONERUSSA": "RUS",
+    "REPUBBLICADICOREA": "KOR",
+    "REPUBBLICADIMACEDONIA": "MKD",
+    "REPUBBLICADISERBIA": "SRB",
+    "REPUBBLICAPOPOLARECINESE": "CHN",
+    "REPUBBLICAPOPOLAREDEMOCRATICADICOREA": "PRK",
+    "SANTASEDE": "VAT",
+    "STATOCITTADELVATICANO": "VAT",
+    "STATODELLACITTADELVATICANO": "VAT",
+    "SWAZILAND": "SWZ",
+    "TIMORORIENTALE": "TLS",
+}
+UNION_NOTE = (
+    "This shape is the union of Natural Earth's outlines of the countries whose voters this division includes. The law "
+    "defines the division by continent, not by a drawn boundary."
+)
 RIPARTIZIONI = {
     "EUROPA": ("europe", "Europe"),
     "AMERICA MERIDIONALE": ("south-america", "South America"),
@@ -1130,6 +1150,17 @@ def emit() -> Path:
             return persons[scheme, key]
 
         joined: set[tuple[UUID, UUID]] = set()
+        cs.add(
+            "scheme", code="it.ripartizione", polity_id=italy, kind="electoral_district", rank=1, noun="division abroad"
+        )
+        divisions: dict[str, UUID] = {}
+        for ripartizione, (code, english) in RIPARTIZIONI.items():
+            divisions[code] = cs.area("it.ripartizione", code)
+            cs.add("area", id=divisions[code], scheme_code="it.ripartizione")
+            cs.add("area_code", area_id=divisions[code], code=code, valid_from=None)
+            name(divisions[code], english)
+            name(divisions[code], ripartizione.title().replace(" E ", " e "), "it", "native")
+            cs.add("note", entity_id=divisions[code], kind="methodology", body_md=UNION_NOTE)
 
         def abroad_contests(day: date, election: UUID, path: str, year: int) -> None:
             day_abroad = abroad.filter(pl.col("day") == day)
@@ -1147,6 +1178,7 @@ def emit() -> Path:
                     election_id=election,
                     kind="body_seats",
                     body_id=chamber,
+                    district_area_id=divisions[code],
                     magnitude=sum(abroad_won.values()),
                     electoral_system_id=systems["camera-estero"],
                     default_result_kind="counted",
@@ -1541,4 +1573,56 @@ def emit() -> Path:
                     for label in sorted(labels):
                         cs.add("alliance_member", alliance_id=alliances[coalition], party_id=party_of(label, year))
         abroad_contests(NEXT, existing("it.election", f"{NEXT}:general"), f"it/{NEXT}-general", NEXT.year)
+        world: dict[str, UUID] = {}
+        for code, text, area in conn.execute(
+            """select ac.code, n.text, a.id from area a join area_code ac on ac.area_id = a.id
+               join name n on n.entity_id = a.id where a.scheme_code = 'world.country' and n.lang in ('it', 'en')
+               order by n.lang desc"""
+        ).fetchall():
+            world.setdefault(fold(text), area)
+            world.setdefault(code, area)
+        division_of = {
+            estero_key(country): RIPARTIZIONI[ripartizione][0]
+            for ripartizione, country in abroad.select("ripartizione", "country").unique().iter_rows()
+        }
+        members: dict[str, set[UUID]] = {code: set() for code in divisions}
+        for code, unit in conn.execute(
+            """select r.code, r.id from reporting_unit r where r.scheme_code = 'it.estero'
+               and not exists (select from entity_merge m where m.entity_id = r.id) order by r.code"""
+        ).fetchall():
+            country = world.get(COUNTRIES.get(code, code))
+            if country is not None:
+                cs.add("reporting_unit_area", unit_id=unit, area_id=country, valid_from=None, method="source_code")
+                if code in division_of:
+                    members[division_of[code]].add(country)
+            if code in division_of:
+                cs.add(
+                    "reporting_unit_area",
+                    unit_id=unit,
+                    area_id=divisions[division_of[code]],
+                    valid_from=None,
+                    method="source_code",
+                )
+        natural_earth = cs.source("Natural Earth", "Admin 0 – Countries, 1:10m")
+        for code, countries in members.items():
+            geom, point = conn.execute(
+                """with u as (
+                     select st_multi(st_collectionextract(st_makevalid(st_union(geom)), 3)) as geom
+                     from area_geometry where area_id = any(%s)
+                   )
+                   select encode(st_asewkb(geom), 'hex'),
+                          encode(st_asewkb((select st_pointonsurface(d.geom) from st_dump(geom) d
+                                            order by st_area(d.geom::geography) desc limit 1)), 'hex')
+                   from u""",
+                [list(countries)],
+            ).fetchall()[0]
+            cs.add(
+                "area_geometry",
+                area_id=divisions[code],
+                valid_from=None,
+                geom=geom,
+                label_point=point,
+                quality="academic",
+                source_id=natural_earth,
+            )
         return cs.write()
