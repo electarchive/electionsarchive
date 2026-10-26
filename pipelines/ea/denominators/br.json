@@ -23,6 +23,36 @@
       "title": "Detalhe da apuração por município e zona, 2006",
       "publisher": "Tribunal Superior Eleitoral, Portal de Dados Abertos",
       "url": "https://cdn.tse.jus.br/estatistica/sead/odsele/detalhe_votacao_munzona/detalhe_votacao_munzona_2006.zip"
+    },
+    "tse-mun-1996": {
+      "title": "A evolução da urna eletrônica",
+      "publisher": "Tribunal Superior Eleitoral (Revista Eletrônica da EJE, n. 6)",
+      "url": "https://www.tse.jus.br/o-tse/escola-judiciaria-eleitoral/publicacoes/revistas-da-eje/artigos/revista-eletronica-eje-n.-6-ano-2/a-evolucao-da-urna-eletronica"
+    },
+    "senado-2004": {
+      "title": "Eleições 2004 em números (Fonte: Tribunal Superior Eleitoral)",
+      "publisher": "Agência Senado",
+      "url": "https://www12.senado.leg.br/noticias/materias/2004/10/01/eleicoes-2004-em-numeros"
+    },
+    "tse-mun-2008": {
+      "title": "Revista Eletrônica da EJE ano II, n. 5, ago./set. 2012",
+      "publisher": "Tribunal Superior Eleitoral",
+      "url": "https://www.tse.jus.br/institucional/escola-judiciaria-eleitoral/publicacoes/revistas-da-eje/revista-eletronica-da-eje"
+    },
+    "tse-mun-2016": {
+      "title": "TSE realizou maior eleição municipal da história em 2016",
+      "publisher": "Tribunal Superior Eleitoral",
+      "url": "https://www.tse.jus.br/comunicacao/noticias/2017/Julho/tse-realizou-maior-eleicao-municipal-da-historia-em-2016"
+    },
+    "tse-mun-2020": {
+      "title": "Diplomação do prefeito eleito em Macapá (AP) será dia 29 de dezembro",
+      "publisher": "Tribunal Superior Eleitoral",
+      "url": "https://www.tse.jus.br/comunicacao/noticias/2020/Dezembro/diplomacao-do-prefeito-eleito-em-macapa-ap-sera-dia-29-de-dezembro"
+    },
+    "tse-mun-2024": {
+      "title": "Retrospectiva 2024: números confirmam a realização do maior pleito municipal da história",
+      "publisher": "Tribunal Superior Eleitoral",
+      "url": "https://www.tse.jus.br/comunicacao/noticias/2024/Dezembro/retrospectiva-2024-numeros-confirmam-a-realizacao-do-maior-pleito-municipal-da-historia"
     }
   },
   "levels": [
@@ -501,14 +531,87 @@
           "iso": "*"
         }
       ],
-      "gaps": [
+      "gaps": [],
+      "elections": [
         {
-          "from": 1996,
-          "to": 2024,
-          "note": "No official count is compiled yet."
+          "date": "1996-10-03",
+          "contests": 5507,
+          "source": "tse-mun-1996",
+          "quote": "Nº de municípios | 5.507 | 5.513 | 5.559"
+        },
+        {
+          "date": "2000-10-01",
+          "contests": 5559,
+          "source": "tse-mun-1996",
+          "quote": "Nº de municípios | 5.507 | 5.513 | 5.559"
+        },
+        {
+          "date": "2004-10-03",
+          "contests": 5563,
+          "source": "senado-2004",
+          "quote": "Municípios: 5.563"
+        },
+        {
+          "date": "2008-10-05",
+          "contests": 5564,
+          "source": "tse-mun-2008",
+          "quote": "5.564 cidades no Brasil"
+        },
+        {
+          "date": "2012-10-07",
+          "contests": 5568,
+          "source": "tse-mun-2008",
+          "quote": "serão 138.544.348 eleitores de 5.568 municípios aptos a digitar seus votos nas 501.923 urnas em outubro"
+        },
+        {
+          "date": "2016-10-02",
+          "contests": 5568,
+          "source": "tse-mun-2016",
+          "quote": "nos 5.568 municípios para escolher seus representantes, entre prefeitos e vereadores"
+        },
+        {
+          "date": "2020-11-15",
+          "contests": 5568,
+          "source": "tse-mun-2020",
+          "quote": "O novo prefeito assumirá o mandato no dia 1º de janeiro de 2021, juntamente com os demais eleitos nos 5.568 municípios que realizaram eleições este ano."
+        },
+        {
+          "date": "2024-10-06",
+          "contests": 5569,
+          "source": "tse-mun-2024",
+          "quote": "Participaram das eleições deste ano 5.569 cidades",
+          "regions": {
+            "RO": 52,
+            "AC": 22,
+            "AM": 62,
+            "RR": 15,
+            "PA": 144,
+            "AP": 16,
+            "TO": 139,
+            "MA": 217,
+            "PI": 224,
+            "CE": 184,
+            "RN": 167,
+            "PB": 223,
+            "PE": 184,
+            "AL": 102,
+            "SE": 75,
+            "BA": 417,
+            "MG": 853,
+            "ES": 78,
+            "RJ": 92,
+            "SP": 645,
+            "PR": 399,
+            "SC": 295,
+            "RS": 497,
+            "MS": 79,
+            "MT": 142,
+            "GO": 246
+          },
+          "note": "Regions from IBGE, Anuário Estatístico do Brasil 2024, table 2.7.1.2, citing the TSE."
         }
       ],
-      "elections": []
+      "note": "Counted per municipality: each municipality that elected its mayor and council counts once, runoff included, from the Superior Electoral Court's counts (2004 from the Federal Senate's news agency, citing the court). Brasília and Fernando de Noronha hold no municipal elections. In 2020 Macapá voted in December, after a blackout postponed its election, and it counts with the rest."
     }
   ]
 }

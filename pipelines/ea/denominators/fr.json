@@ -119,6 +119,16 @@
       "title": "Élections régionales 2021, résultats du 1er tour",
       "publisher": "Ministère de l'Intérieur, on data.gouv.fr",
       "url": "https://www.data.gouv.fr/datasets/elections-regionales-2021-resultats-du-1er-tour-1"
+    },
+    "senat-q900610160": {
+      "title": "Question écrite n° 10160 (JO Sénat 1990), réponse du ministère de l'Intérieur",
+      "publisher": "Sénat",
+      "url": "https://www.senat.fr/questions/base/1990/qSEQ900610160.html"
+    },
+    "cevipof-municipales-2026": {
+      "title": "Panorama des élections municipales (Pierre-Henri Bono, mars 2026), tableau 1 « Nombre de municipalités » (source : ministère de l'Intérieur)",
+      "publisher": "Sciences Po CEVIPOF",
+      "url": "https://www.sciencespo.fr/cevipof/sites/sciencespo.fr.cevipof/files/MUNICIPALES_PH_Panorama_mars26.pdf"
     }
   },
   "levels": [
@@ -1817,11 +1827,54 @@
       "gaps": [
         {
           "from": 1959,
-          "to": 2020,
-          "note": "No official count is compiled yet."
+          "to": 1983,
+          "note": "No count of the communes that voted has been found for these years yet."
+        },
+        {
+          "from": 1995,
+          "to": 1995,
+          "note": "No count of the communes that voted has been found for these years yet."
         }
       ],
-      "elections": []
+      "elections": [
+        {
+          "date": "1989-03-12",
+          "contests": 36547,
+          "source": "senat-q900610160",
+          "quote": "Sur les 36 547 maires élus à la suite du renouvellement général des conseils municipaux de mars 1989"
+        },
+        {
+          "date": "2001-03-11",
+          "contests": 36707,
+          "source": "cevipof-municipales-2026",
+          "quote": "Tableau 1, row 'Nombre de municipalités(1)', column 2001: 36 707; footnote (1): 'Communes et arrondissements.' Sources : ministère de l'Intérieur."
+        },
+        {
+          "date": "2008-03-09",
+          "contests": 36805,
+          "source": "cevipof-municipales-2026",
+          "quote": "Tableau 1, row 'Nombre de municipalités(1)', column 2008: 36 805; footnote (1): 'Communes et arrondissements.' Sources : ministère de l'Intérieur."
+        },
+        {
+          "date": "2014-03-23",
+          "contests": 36681,
+          "source": "cevipof-municipales-2026",
+          "quote": "Tableau 1, row 'Nombre de municipalités(1)', column 2014: 36 681; footnote (1): 'Communes et arrondissements.' Sources : ministère de l'Intérieur."
+        },
+        {
+          "date": "2020-03-15",
+          "contests": 34968,
+          "source": "cevipof-municipales-2026",
+          "quote": "Tableau 1, row 'Nombre de municipalités(1)', column 2020: 34 968; footnote (1): 'Communes et arrondissements.' Sources : ministère de l'Intérieur."
+        },
+        {
+          "date": "2026-03-15",
+          "contests": 34986,
+          "source": "cevipof-municipales-2026",
+          "quote": "Tableau 1, row 'Nombre de municipalités(1)', column 2026: 34 986; footnote (1): 'Communes et arrondissements.' Sources : ministère de l'Intérieur."
+        }
+      ],
+      "note": "Counted per municipality: each commune that renewed its council counts once, both rounds together. The counts for 2001 to 2026 are the Interior Ministry's, as published by Sciences Po's CEVIPOF, which counts the arrondissements of Paris, Lyon, and Marseille with the communes. 1989 is the Interior Ministry's count of mayors elected after that year's renewal, one per commune."
     },
     {
       "key": "referendums",
@@ -1983,6 +2036,7 @@
     }
   ],
   "region_labels": {
+    "20": "Corse",
     "ZZ": "French residents overseas"
   }
 }
