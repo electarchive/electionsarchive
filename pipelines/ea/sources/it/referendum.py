@@ -169,6 +169,11 @@ METHODOLOGY = (
     "less valid and blank ballots. Votes abroad, counted since 2003, are the Ministry's national totals for the "
     "foreign constituency from its Eligendo archive, and Italy's totals match Eligendo's national figures."
 )
+TURNOUT = (
+    "Italy's registered voters and voters on the day, as the Interior Ministry's Eligendo archive gives them for the "
+    "first question. The count is the one the quorum is tested against; later questions' ballots can differ by a few "
+    "thousand and sit on each question's own result set."
+)
 NATIONAL = (
     "Italy's totals are the Interior Ministry's national figures from its Eligendo archive, with votes abroad, "
     "counted since 2003, as the foreign constituency's total. The Ministry's open data file for this question does "
@@ -515,6 +520,8 @@ def emit() -> Path:
                                 )
                 result_set = cs.key(f"{SOURCE}.result_set", contest_key)
                 total = eligendo.select(pl.col("registered", "voters", "yes", "no").sum()).row(0, named=True)
+                if number == 1:
+                    first_total = total
                 yes = total["yes"] / (total["yes"] + total["no"])
                 turnout = total["voters"] / total["registered"]
                 if kind == "abrogative" and turnout <= 0.5:
@@ -538,6 +545,22 @@ def emit() -> Path:
                             option_id=option,
                             kind="won" if answer == winner else "lost",
                         )
+            turnout_set = cs.key(f"{SOURCE}.result_set", f"{day}:referendum:turnout")
+            cs.add(
+                "result_set",
+                id=turnout_set,
+                election_id=election,
+                contest_id=None,
+                stage="preliminary",
+                kind="counted",
+                status="active",
+                source_id=interno,
+                is_default=True,
+                completeness=1,
+            )
+            cs.add("note", entity_id=turnout_set, kind="methodology", body_md=TURNOUT)
+            for measure, value in ((REGISTERED, first_total["registered"]), (VOTERS, first_total["voters"])):
+                values.append((str(turnout_set), str(nation), None, measure, value))
         cs.frame(
             "result_value",
             pl.DataFrame(
