@@ -1,0 +1,878 @@
+{
+  "gb": {
+    "stormont": [
+      {
+        "from": 1921,
+        "to": 1969,
+        "title": "Northern Ireland House of Commons elections, constituency results",
+        "publisher": "ARK, Queen's University Belfast (Nicholas Whyte)",
+        "url": "https://www.ark.ac.uk/elections/hnihoc.htm",
+        "format": "HTML tables",
+        "grain": "constituency",
+        "effort": "election",
+        "first": true,
+        "note": "The page covers 1921 to 1972, but its per-election result tables were not opened in this pass; sources.md says ark.ac.uk serves a UserCheck page to scripts, so fetch it in a browser."
+      }
+    ],
+    "ni_assembly": [
+      {
+        "from": 1973,
+        "to": 1996,
+        "title": "Northern Ireland Elections Excel archive: Assembly, Convention, and Forum counts",
+        "publisher": "ARK, Queen's University Belfast, with the McDougall Trust",
+        "url": "https://www.ark.ac.uk/elections/gexcel.htm",
+        "format": "XLSX per election, every STV count",
+        "grain": "constituency",
+        "effort": "election",
+        "first": true,
+        "note": "Separate workbooks cover 1973, 1975 (Convention), 1982, and 1996 (Forum and talks); the 1973 HTML results are at ark.ac.uk/elections/fa73.htm."
+      }
+    ],
+    "commons": [
+      {
+        "from": 1880,
+        "to": 1880,
+        "title": "UK House of Commons Election Results at Candidate Level (Umit dataset)",
+        "publisher": "Resul Umit, Harvard Dataverse",
+        "url": "https://doi.org/10.7910/DVN/S83HOA",
+        "format": "CSV (21 MB, original format)",
+        "grain": "constituency",
+        "effort": "series",
+        "first": true,
+        "note": "Already the gb.umit source for 1832 to 2024 except 1868; the 1880 Dungannon contest is lost to a date issue in the pipeline, so this is a fix."
+      }
+    ],
+    "ep": [
+      {
+        "from": 1979,
+        "to": 2019,
+        "title": "EP Election Results at Constituency Level, 1979 to 2019",
+        "publisher": "European University Institute, European Governance and Politics Programme",
+        "url": "https://europeangovernanceandpolitics.eui.eu/project/ep-election-results-at-constituency-level/",
+        "format": "dataset download (format not checked)",
+        "grain": "constituency",
+        "effort": "series",
+        "first": false,
+        "note": "Covers every member state, so it also serves as a cross-check for the 1989 and 1994 UK contests."
+      }
+    ],
+    "councils": [
+      {
+        "from": 2002,
+        "to": 2017,
+        "title": "Local Elections Archive Project, England and Wales council wards",
+        "publisher": "Andrew Teale",
+        "url": "https://andrewteale.me.uk/leap/",
+        "format": "compiled zip per year (MF-073)",
+        "grain": "ward",
+        "effort": "election",
+        "first": false,
+        "note": "Already compiled as gb.leap for 2002 to 2017, so the 2003 and 2011 gaps are coverage gaps, not a new source."
+      },
+      {
+        "from": 2016,
+        "to": 2019,
+        "title": "Democracy Club local results CSV archive",
+        "publisher": "Democracy Club (CC BY-SA)",
+        "url": "https://candidates.democracyclub.org.uk/media/csv-archives/",
+        "format": "CSV per ballot date (results-YYYY-MM-DD.csv)",
+        "grain": "ward",
+        "effort": "election",
+        "first": false,
+        "note": "Already the gb.dc_local source; 2019 is the gap year it covers."
+      },
+      {
+        "from": 2007,
+        "to": 2017,
+        "title": "Scottish council STV count reports (Candidate Votes per Stage)",
+        "publisher": "Each of the 32 Scottish councils",
+        "url": "https://stv-results.prorep.org.uk/",
+        "format": "text-layer PDF per ward, read with pdftotext",
+        "grain": "ward",
+        "effort": "election",
+        "first": false,
+        "note": "The council sites hold the 2007, 2012, and 2017 reports; the prorep mirror was checked only for 2022, so confirm it holds the earlier years."
+      }
+    ]
+  },
+  "ch": {
+    "national_council": [
+      {
+        "from": 1848,
+        "to": 1917,
+        "title": "Bundesblatt lists of elected National Council members by constituency and round",
+        "publisher": "Die Bundesversammlung, published in the Bundesblatt; held by the Federal Archives",
+        "url": "https://www.bar.admin.ch/de/amtsdruckschriften-weitere-digitalisierte-unterlagen",
+        "format": "scanned PDF with an automatic text view",
+        "grain": "constituency (Wahlkreis)",
+        "effort": "scan",
+        "first": true,
+        "note": "The lists name the winners and the round, not vote totals; the 1911 list (BBl 1911 V 87, fedlex.admin.ch/eli/fga/1911/5_87__/de) is confirmed, and the other years were not opened."
+      },
+      {
+        "from": 1919,
+        "to": 1967,
+        "title": "Bundesblatt lists of elected National Council members by constituency and round",
+        "publisher": "Die Bundesversammlung, published in the Bundesblatt; held by the Federal Archives",
+        "url": "https://www.bar.admin.ch/de/amtsdruckschriften-weitere-digitalisierte-unterlagen",
+        "format": "scanned PDF with an automatic text view",
+        "grain": "constituency (Wahlkreis)",
+        "effort": "scan",
+        "first": false,
+        "note": "Same series as the 1848 to 1917 lead; the years were not opened, so confirm each Gesamterneuerung list exists."
+      },
+      {
+        "from": 1919,
+        "to": 1967,
+        "title": "Politischer Atlas der Schweiz: Nationalratswahlen",
+        "publisher": "Bundesamt fur Statistik (BFS)",
+        "url": "https://www.bfs.admin.ch/bfsstatic/dam/assets/348735/master",
+        "format": "PDF tables and maps",
+        "grain": "canton (1919 to 1943), district (1947 to 1967)",
+        "effort": "election",
+        "first": false,
+        "note": "Gives party vote shares, not constituency winners, so use it as a cross-check."
+      }
+    ],
+    "council_of_states": [
+      {
+        "from": 1848,
+        "to": 1917,
+        "title": "Bundesblatt lists of elected Council of States members (Verzeichnis der Mitglieder des schweizerischen Standerates)",
+        "publisher": "Die Bundesversammlung, published in the Bundesblatt; held by the Federal Archives",
+        "url": "https://www.bar.admin.ch/de/amtsdruckschriften-weitere-digitalisierte-unterlagen",
+        "format": "scanned PDF with an automatic text view",
+        "grain": "canton",
+        "effort": "scan",
+        "first": true,
+        "note": "The 1911 list is BBl 1911 V 104, seen in the Fedlex index; the other years were not opened."
+      },
+      {
+        "from": 1848,
+        "to": 1987,
+        "title": "Ratsmitglieder seit 1848 (Council members since 1848, historic list)",
+        "publisher": "Parlamentsdienste der Bundesversammlung",
+        "url": "https://www.parlament.ch/de/ratsmitglieder",
+        "format": "machine-readable export (XLSX from the web service)",
+        "grain": "canton and election date per member",
+        "effort": "series",
+        "first": false,
+        "note": "Gives each member's canton and dates, which is enough to name the winner of each cantonal seat on its election date; the export was not downloaded."
+      }
+    ],
+    "federal_votes": [
+      {
+        "from": 1848,
+        "to": 1848,
+        "title": "swissvotes.ch: federal votes since 1848",
+        "publisher": "swissvotes.ch (Swiss Democracy Foundation)",
+        "url": "https://swissvotes.ch/",
+        "format": "CSV dataset (DOI 10.48620/365)",
+        "grain": "canton and commune",
+        "effort": "series",
+        "first": false,
+        "note": "Licensed CC BY 4.0 per sources.md."
+      },
+      {
+        "from": 2024,
+        "to": 2025,
+        "title": "Federal vote results and commune status, real-time and final",
+        "publisher": "Federal Statistical Office (BFS) via opendata.swiss",
+        "url": "https://opendata.swiss",
+        "format": "JSON and CSV",
+        "grain": "commune",
+        "effort": "series",
+        "first": false,
+        "note": "The dataset identifiers are listed in sources.md, but were not checked for these two years."
+      }
+    ]
+  },
+  "ie": {
+    "dail": [
+      {
+        "from": 1922,
+        "to": 1922,
+        "title": "ElectionsIreland.org: Dáil general election results by constituency",
+        "publisher": "ElectionsIreland.org",
+        "format": "HTML page per constituency (result.cfm?cons=…&election=YEAR)",
+        "grain": "constituency (first preferences and counts)",
+        "effort": "election",
+        "url": "https://www.electionsireland.org/result.cfm?cons=734&election=1922",
+        "first": true,
+        "note": "Each 1922 constituency has a page with candidates, first preferences, quota, and counts (Galway and Cavan checked); unopposed constituencies list the members returned. Check the site's reuse terms, and tie totals to the party summary before loading."
+      },
+      {
+        "from": 1923,
+        "to": 1951,
+        "title": "ElectionsIreland.org: Dáil general election results by constituency",
+        "publisher": "ElectionsIreland.org",
+        "format": "HTML page per constituency (result.cfm?cons=…&election=YEAR)",
+        "grain": "constituency (first preferences and counts)",
+        "effort": "election",
+        "url": "https://www.electionsireland.org/result.cfm?cons=734&election=1922",
+        "first": false,
+        "note": "The same site covers every Dáil election; no official count volumes before 1954 were found online."
+      },
+      {
+        "from": 1954,
+        "to": 1997,
+        "title": "Election results and transfer of votes in general election (Stationery Office volumes)",
+        "publisher": "Dail Eireann, Stationery Office; Oireachtas Library",
+        "url": "https://opac.oireachtas.ie/Data/Library3/Official%20Publications/pdf/28thDail_June1997.pdf",
+        "format": "PDF volumes with a text layer (seen for 1957, 1961, 1965, and 1969)",
+        "grain": "constituency (count sheets)",
+        "effort": "election",
+        "first": false,
+        "note": "One volume per general election, with the by-elections of the outgoing Dáil; file names follow 26thDail_June1989.pdf and 20thDail_February1973_ByeElections19th_1969_1973.pdf. Volumes for 1973, 1981, 1982, 1987, 1989, 1992, and 1997 were seen; earlier ones down to 1954 are in the National Library's holdings list."
+      }
+    ],
+    "president": [
+      {
+        "from": 1938,
+        "to": 2025,
+        "title": "Toghcháin Uachtaráin 1938 to 2025: Presidential Elections, results per constituency",
+        "publisher": "Presidential Returning Officer (Department of Housing, Local Government and Heritage)",
+        "url": "https://www.presidentialelection.ie/previous-presidential-elections/index.html",
+        "format": "text-layer PDF booklet",
+        "grain": "constituency",
+        "effort": "series",
+        "first": false,
+        "note": "One booklet covers every presidential election since 1938, linked from the page."
+      },
+      {
+        "from": 1945,
+        "to": 2011,
+        "title": "Presidential election count CSVs (1945, 1990, 1997, and 2011 seen)",
+        "publisher": "Department of Housing, Local Government and Heritage (DHLGH Open Data)",
+        "url": "https://data.gov.ie/dataset/the-first-count-of-the-presidential-election-of-1990",
+        "format": "CSV per count",
+        "grain": "constituency",
+        "effort": "election",
+        "first": false,
+        "note": "Only the years listed on data.gov.ie were seen; the 1973 and 1976 contests were not checked."
+      }
+    ],
+    "referendums": [
+      {
+        "from": 1937,
+        "to": 2024,
+        "title": "Referendum Results 1937 to 2024 (booklet, per constituency)",
+        "publisher": "Department of Housing, Local Government and Heritage",
+        "url": "https://www.gov.ie/en/department-of-housing-local-government-and-heritage/publications/1937-2024-referendum-results/",
+        "format": "PDF booklet with a text layer",
+        "grain": "constituency",
+        "effort": "series",
+        "first": false,
+        "note": "The same booklet is linked from referendum.ie, which lists every referendum since 1937."
+      }
+    ],
+    "local": [
+      {
+        "from": 2019,
+        "to": 2019,
+        "title": "Local Elections 2019: Results, Transfer of Votes and Statistics",
+        "publisher": "Department of Housing, Local Government and Heritage",
+        "url": "https://www.gov.ie/en/department-of-housing-local-government-and-heritage/publications/local-elections-2019-results-transfer-of-votes-and-statistics/",
+        "format": "PDF results book with a text layer (DHLGH Open Data copy, 21 MB)",
+        "grain": "local electoral area",
+        "effort": "election",
+        "first": false,
+        "note": "Count sheets for each local electoral area; the book is the official count."
+      },
+      {
+        "from": 2014,
+        "to": 2024,
+        "title": "Local election results 2014 and 2024 (DHLGH local elections page)",
+        "publisher": "Department of Housing, Local Government and Heritage",
+        "url": "https://www.gov.ie/en/department-of-housing-local-government-and-heritage/publications/local-elections/",
+        "format": "PDF results books (not checked)",
+        "grain": "local electoral area",
+        "effort": "election",
+        "first": false,
+        "note": "The same publisher issues the 2019 book; the 2014 and 2024 files were not opened, so confirm them before use."
+      }
+    ]
+  },
+  "ca": {
+    "provincial": [
+      {
+        "from": 1867,
+        "to": 2025,
+        "title": "Elections Ontario historical results: Data Explorer and statistical reports",
+        "publisher": "Elections Ontario",
+        "url": "https://results.elections.on.ca/en/data-explorer",
+        "format": "web data explorer; CSV reports per election through an API",
+        "grain": "electoral district",
+        "effort": "election",
+        "first": false,
+        "note": "Covers Ontario only; no free source was confirmed for the other provinces, so most provincial gaps stay open."
+      }
+    ],
+    "commons_by": [
+      {
+        "from": 1885,
+        "to": 2004,
+        "title": "History of the Federal Electoral Ridings, general and by-elections",
+        "publisher": "Library of Parliament",
+        "url": "https://open.canada.ca/data/en/dataset/ea8f2c37-90b6-4fee-857e-984d3060184e",
+        "format": "CSV (hfer_e.csv), one row per candidacy",
+        "grain": "riding",
+        "effort": "series",
+        "first": false,
+        "note": "Already in ca.lop with by-elections (type B/P) back to 1867, so this gap is loader coverage."
+      },
+      {
+        "from": 2005,
+        "to": 2014,
+        "title": "Elections Canada by-election reports (ovr_{year} folders)",
+        "publisher": "Elections Canada",
+        "url": "https://www.elections.ca/res/rep/off/ovr_2016/home.html",
+        "format": "HTML home page and CSV per riding (pollresults_resultatsbureau{FED}.csv)",
+        "grain": "polling station",
+        "effort": "election",
+        "first": false,
+        "note": "The pattern is verified for 2016 and later; the 2005 to 2014 folders were not opened."
+      }
+    ],
+    "commons": [
+      {
+        "from": 1949,
+        "to": 1949,
+        "title": "History of the Federal Electoral Ridings, 1949 general election",
+        "publisher": "Library of Parliament",
+        "url": "https://open.canada.ca/data/en/dataset/ea8f2c37-90b6-4fee-857e-984d3060184e",
+        "format": "CSV (hfer_e.csv)",
+        "grain": "riding",
+        "effort": "series",
+        "first": false,
+        "note": "Already in ca.lop, so this gap is loader coverage."
+      }
+    ]
+  },
+  "fr": {
+    "municipales": [
+      {
+        "from": 1989,
+        "to": 1989,
+        "title": "Elections municipales 1989, resultats du 2e tour pour les communes de plus de 9000 habitants",
+        "publisher": "Sciences Po CIDSP (Ministry of the Interior source)",
+        "url": "https://doi.org/10.21410/7E4/MQ50V3",
+        "format": "dataverse file (format not checked)",
+        "grain": "commune",
+        "effort": "election",
+        "first": false,
+        "note": "Round 2 only, and only for communes over 9,000 people; the smaller communes need another source."
+      },
+      {
+        "from": 2001,
+        "to": 2001,
+        "title": "Resultats des elections municipales 2001 (Interior Ministry)",
+        "publisher": "Ministere de l'Interieur",
+        "url": "https://www.interieur.gouv.fr/Elections/Les-resultats/Municipales/elecresult__Resultats-des-elections-municipales-2001/%28path%29/Resultats-des-elections-municipales-2001/index.html",
+        "format": "XLS for France as a whole, ZIP per commune over 9,000 (rounds 1 and 2)",
+        "grain": "commune",
+        "effort": "election",
+        "first": false,
+        "note": "Data.sciencespo also holds the 2001 rounds for communes of 3,500 and over, under its own DOIs."
+      },
+      {
+        "from": 2008,
+        "to": 2008,
+        "title": "Elections municipales 2008: Resultats (communes over 3,500 and under 3,500)",
+        "publisher": "Ministere de l'Interieur, via data.gouv.fr",
+        "url": "https://www.data.gouv.fr/datasets/elections-municipales-2008-resultats-572150",
+        "format": "XLS (two datasets, one for each size class)",
+        "grain": "commune",
+        "effort": "election",
+        "first": false,
+        "note": "A polling-station dataset for communes over 3,500 is also on data.gouv.fr for 2008."
+      },
+      {
+        "from": 2014,
+        "to": 2020,
+        "title": "Resultats des elections municipales et communautaires 2014 and 2020",
+        "publisher": "Ministere de l'Interieur",
+        "url": "https://www.archives-resultats-elections.interieur.gouv.fr/",
+        "format": "not checked",
+        "grain": "commune",
+        "effort": "election",
+        "first": false,
+        "note": "The archive lists both elections; file formats were not opened."
+      }
+    ],
+    "departementales": [
+      {
+        "from": 2015,
+        "to": 2021,
+        "title": "Resultats des elections departementales 2015 and 2021",
+        "publisher": "Ministere de l'Interieur",
+        "url": "https://www.elections.interieur.gouv.fr/resultats/resultats-de-toutes-elections",
+        "format": "downloadable results (formats not checked)",
+        "grain": "canton",
+        "effort": "election",
+        "first": false,
+        "note": "Both elections are listed on the Interior results page."
+      },
+      {
+        "from": 1988,
+        "to": 2011,
+        "title": "Resultats des elections cantonales (archive)",
+        "publisher": "Ministere de l'Interieur",
+        "url": "https://www.archives-resultats-elections.interieur.gouv.fr/",
+        "format": "not checked",
+        "grain": "canton",
+        "effort": "election",
+        "first": false,
+        "note": "The archive lists cantonales 2011 and earlier years; the exact years were not confirmed."
+      }
+    ],
+    "regionales": [
+      {
+        "from": 1986,
+        "to": 2021,
+        "title": "Resultats des elections regionales (Interior archive)",
+        "publisher": "Ministere de l'Interieur",
+        "url": "https://www.archives-resultats-elections.interieur.gouv.fr/",
+        "format": "not checked",
+        "grain": "department (list results)",
+        "effort": "election",
+        "first": false,
+        "note": "Only the archive index was seen; the regional years and file formats need confirming."
+      }
+    ],
+    "assemblee": [
+      {
+        "from": 1958,
+        "to": 1993,
+        "title": "Legislative election results by constituency, 1958 to 2012 (except 1986)",
+        "publisher": "Sciences Po CDSP, via data.gouv.fr",
+        "url": "https://www.data.gouv.fr/datasets/547744abc751df097472f5d4",
+        "format": "CSV zip, one file per round",
+        "grain": "constituency",
+        "effort": "series",
+        "first": false,
+        "note": "Already loaded as fr.cdsp, so the gap is loader coverage."
+      }
+    ],
+    "president": [
+      {
+        "from": 2017,
+        "to": 2022,
+        "title": "Donnees des elections agregees (data.gouv.fr)",
+        "publisher": "Ministere de l'Interieur, via data.gouv.fr",
+        "url": "https://www.data.gouv.fr/datasets/6481e741d4cf002ec0efec9d",
+        "format": "parquet files",
+        "grain": "polling station",
+        "effort": "series",
+        "first": false,
+        "note": "The sources.md entry marks 2017 and 2022 as verified, so this gap is loader coverage."
+      }
+    ],
+    "ep": [
+      {
+        "from": 2024,
+        "to": 2024,
+        "title": "European Parliament election results, 2024",
+        "publisher": "European Parliament, official results portal",
+        "url": "https://results.elections.europa.eu/",
+        "format": "HTML",
+        "grain": "national (verify)",
+        "effort": "election",
+        "first": false,
+        "note": "Official, but the portal is national in grain, so check whether French constituency results exist."
+      }
+    ]
+  },
+  "br": {
+    "camara": [
+      {
+        "title": "Dados estatísticos: eleições federal, estadual e municipal (TSE volumes from 1945)",
+        "publisher": "Tribunal Superior Eleitoral; Departamento de Imprensa Nacional (digitized by the Câmara dos Deputados library)",
+        "url": "https://bd.camara.leg.br/bd/items/05ae27bf-5a2c-430f-857e-caef52b418c0",
+        "format": "scanned PDF volumes",
+        "grain": "state (UF), with candidate votes",
+        "effort": "scan",
+        "first": true,
+        "from": 1945,
+        "to": 1974,
+        "note": "Volume 1 covers 1945 to 1949, volume 2 covers 1950, volume 4 covers 1958, volume 9 covers 1970, and volume 11 covers 1974. Open each volume for its Chamber tables; IBGE's yearbooks hold the seat counts used for the denominator."
+      },
+      {
+        "from": 1982,
+        "to": 1982,
+        "title": "Anuário Estatístico do Brasil 1983: Votos apurados, por partido político, segundo as Unidades da Federação, 1982",
+        "publisher": "IBGE, Estatísticas do Século XX",
+        "url": "https://seculoxx.ibge.gov.br/populacionais-sociais-politicas-e-culturais/busca-por-temas/representacao-politica/3485-1981-a-1990",
+        "format": "scanned PDF table",
+        "grain": "state (UF), party votes only",
+        "effort": "scan",
+        "first": true,
+        "note": "The yearbook prints party votes and the winners' counts by state (p. 354), not candidate votes; the TSE's 1982 volume is the fuller source if it turns up."
+      }
+    ],
+    "senado": [
+      {
+        "title": "Dados estatísticos: eleições federal, estadual e municipal (TSE volumes from 1945)",
+        "publisher": "Tribunal Superior Eleitoral; Departamento de Imprensa Nacional (digitized by the Câmara dos Deputados library)",
+        "url": "https://bd.camara.leg.br/bd/items/05ae27bf-5a2c-430f-857e-caef52b418c0",
+        "format": "scanned PDF volumes",
+        "grain": "state (UF), with candidate votes",
+        "effort": "scan",
+        "first": true,
+        "from": 1945,
+        "to": 1974,
+        "note": "The same volumes carry the Senate tables for each federal election; open each volume for its Senate section."
+      },
+      {
+        "from": 1982,
+        "to": 1982,
+        "title": "Anuário Estatístico do Brasil 1983: Votos apurados, por partido político, segundo as Unidades da Federação, 1982",
+        "publisher": "IBGE, Estatísticas do Século XX",
+        "url": "https://seculoxx.ibge.gov.br/populacionais-sociais-politicas-e-culturais/busca-por-temas/representacao-politica/3485-1981-a-1990",
+        "format": "scanned PDF table",
+        "grain": "state (UF), party votes only",
+        "effort": "scan",
+        "first": true,
+        "note": "The yearbook prints party votes and the winners' counts by state (p. 354), not candidate votes; the TSE's 1982 volume is the fuller source if it turns up."
+      },
+      {
+        "from": 2022,
+        "to": 2022,
+        "title": "Votacao por secao 2022 (all offices but president)",
+        "publisher": "Tribunal Superior Eleitoral, Dados Abertos",
+        "url": "https://cdn.tse.jus.br/estatistica/sead/odsele/votacao_secao/votacao_secao_2022_BR.zip",
+        "format": "CSV zip (Latin-1, semicolon-separated); per state as votacao_secao_2022_{UF}.zip",
+        "grain": "polling section",
+        "effort": "series",
+        "first": false,
+        "note": "Verified in sources.md; the per-state zips carry the senate, governor, and assembly races."
+      }
+    ],
+    "governor": [
+      {
+        "title": "Dados estatísticos: eleições federal, estadual e municipal (TSE volumes from 1945)",
+        "publisher": "Tribunal Superior Eleitoral; Departamento de Imprensa Nacional (digitized by the Câmara dos Deputados library)",
+        "url": "https://bd.camara.leg.br/bd/items/05ae27bf-5a2c-430f-857e-caef52b418c0",
+        "format": "scanned PDF volumes",
+        "grain": "state (UF), with candidate votes",
+        "effort": "scan",
+        "first": true,
+        "from": 1947,
+        "to": 1962,
+        "note": "The volumes cover the state elections from 1947; governors' terms were staggered, so each volume holds the states that voted that year."
+      },
+      {
+        "from": 1982,
+        "to": 1982,
+        "title": "Anuário Estatístico do Brasil 1983: Votos apurados, por partido político, segundo as Unidades da Federação, 1982",
+        "publisher": "IBGE, Estatísticas do Século XX",
+        "url": "https://seculoxx.ibge.gov.br/populacionais-sociais-politicas-e-culturais/busca-por-temas/representacao-politica/3485-1981-a-1990",
+        "format": "scanned PDF table",
+        "grain": "state (UF), party votes only",
+        "effort": "scan",
+        "first": true,
+        "note": "The yearbook prints party votes and the winners' counts by state (p. 354), not candidate votes; the TSE's 1982 volume is the fuller source if it turns up."
+      },
+      {
+        "from": 2022,
+        "to": 2022,
+        "title": "Votacao por secao 2022 (governor)",
+        "publisher": "Tribunal Superior Eleitoral, Dados Abertos",
+        "url": "https://cdn.tse.jus.br/estatistica/sead/odsele/votacao_secao/votacao_secao_2022_BR.zip",
+        "format": "CSV zip (Latin-1, semicolon-separated)",
+        "grain": "polling section",
+        "effort": "series",
+        "first": false,
+        "note": "Verified in sources.md."
+      }
+    ],
+    "assemblies": [
+      {
+        "title": "Dados estatísticos: eleições federal, estadual e municipal (TSE volumes from 1945)",
+        "publisher": "Tribunal Superior Eleitoral; Departamento de Imprensa Nacional (digitized by the Câmara dos Deputados library)",
+        "url": "https://bd.camara.leg.br/bd/items/05ae27bf-5a2c-430f-857e-caef52b418c0",
+        "format": "scanned PDF volumes",
+        "grain": "state (UF), with candidate votes",
+        "effort": "scan",
+        "first": true,
+        "from": 1947,
+        "to": 1974,
+        "note": "The volumes cover the state assembly elections from 1947; open each volume for its Assembly tables."
+      },
+      {
+        "from": 1982,
+        "to": 1982,
+        "title": "Anuário Estatístico do Brasil 1983: Votos apurados, por partido político, segundo as Unidades da Federação, 1982",
+        "publisher": "IBGE, Estatísticas do Século XX",
+        "url": "https://seculoxx.ibge.gov.br/populacionais-sociais-politicas-e-culturais/busca-por-temas/representacao-politica/3485-1981-a-1990",
+        "format": "scanned PDF table",
+        "grain": "state (UF), party votes only",
+        "effort": "scan",
+        "first": true,
+        "note": "The yearbook prints party votes and the winners' counts by state (p. 354), not candidate votes; the TSE's 1982 volume is the fuller source if it turns up."
+      },
+      {
+        "from": 2022,
+        "to": 2022,
+        "title": "Votacao por secao 2022 (state assemblies)",
+        "publisher": "Tribunal Superior Eleitoral, Dados Abertos",
+        "url": "https://cdn.tse.jus.br/estatistica/sead/odsele/votacao_secao/votacao_secao_2022_BR.zip",
+        "format": "CSV zip (Latin-1, semicolon-separated)",
+        "grain": "polling section",
+        "effort": "series",
+        "first": false,
+        "note": "Verified in sources.md."
+      }
+    ],
+    "president": [
+      {
+        "title": "Dados estatísticos: eleições federal, estadual e municipal (TSE volumes from 1945)",
+        "publisher": "Tribunal Superior Eleitoral; Departamento de Imprensa Nacional (digitized by the Câmara dos Deputados library)",
+        "url": "https://bd.camara.leg.br/bd/items/05ae27bf-5a2c-430f-857e-caef52b418c0",
+        "format": "scanned PDF volumes",
+        "grain": "state (UF), with candidate votes",
+        "effort": "scan",
+        "first": true,
+        "from": 1945,
+        "to": 1960,
+        "note": "Presidential tables are expected in volumes 1, 2, 3, and 5, which have not been opened yet."
+      }
+    ],
+    "municipal": [
+      {
+        "from": 1996,
+        "to": 2016,
+        "title": "Votacao candidato, partido, and detalhe por municipio e zona (votacao_candidato_munzona_{year}.zip)",
+        "publisher": "Tribunal Superior Eleitoral, Dados Abertos",
+        "url": "https://dadosabertos.tse.jus.br/",
+        "format": "CSV zip (Latin-1), one _BRASIL.csv member per year",
+        "grain": "municipality and zone",
+        "effort": "election",
+        "first": false,
+        "note": "Verified for 1994 to 2018 in sources.md (br.tse_history), so the gap is loader coverage for the municipal years."
+      },
+      {
+        "from": 2020,
+        "to": 2024,
+        "title": "Municipal election results 2020 and 2024 (TSE open data)",
+        "publisher": "Tribunal Superior Eleitoral, Dados Abertos",
+        "url": "https://dadosabertos.tse.jus.br/",
+        "format": "CSV zip (not checked)",
+        "grain": "municipality, zone, or section (verify)",
+        "effort": "election",
+        "first": false,
+        "note": "The TSE portal should hold these years; the file layout was not checked."
+      }
+    ]
+  },
+  "tr": {
+    "local": [
+      {
+        "from": 1963,
+        "to": 2009,
+        "title": "YSK local election archive (text-layer PDFs, and XLSX for 2014)",
+        "publisher": "Yuksek Secim Kurulu (YSK)",
+        "url": "https://www.ysk.gov.tr/",
+        "format": "text-layer PDF per year",
+        "grain": "municipality (belde) and district (ilce)",
+        "effort": "election",
+        "first": false,
+        "note": "Already the tr.ysk_local source for 1963 to 2014; the missing years need their archive pages checked, since the files may be scans."
+      }
+    ],
+    "tbmm_by": [
+      {
+        "from": 1951,
+        "to": 1986,
+        "title": "YSK by-election decisions in the Resmi Gazete",
+        "publisher": "Yuksek Secim Kurulu and Resmi Gazete",
+        "url": "https://www.resmigazete.gov.tr/arsiv/",
+        "format": "scanned PDF per issue",
+        "grain": "electoral district",
+        "effort": "scan",
+        "first": false,
+        "note": "The tr.gazette pipeline already reads Resmi Gazete scans, and the by-election decisions sit in the issues for each year; the issues were not located."
+      }
+    ],
+    "senate": [
+      {
+        "from": 1964,
+        "to": 1964,
+        "title": "YSK Senate results notice in Resmi Gazete 11735 (decision 1471)",
+        "publisher": "Yuksek Secim Kurulu and Resmi Gazete",
+        "url": "https://www.resmigazete.gov.tr/arsiv/11735.pdf",
+        "format": "scanned PDF (fetch with a browser-like user agent)",
+        "grain": "electoral district",
+        "effort": "scan",
+        "first": false,
+        "note": "Already noted in sources.md as tr.gazette's Senate source for 1961 to 1979, so this is a loader gap."
+      }
+    ],
+    "tbmm": [
+      {
+        "from": 1946,
+        "to": 1946,
+        "title": "Milletvekili Genel Seçimleri, 1923-2011 (TÜİK publication 3685), Tablo 6: seats by party for each province, 1946",
+        "publisher": "Türkiye İstatistik Kurumu (TÜİK), hosted by YSK",
+        "url": "https://www.ysk.gov.tr/doc/dosyalar/1923-2011-MVSecimleri-Tuik.pdf",
+        "format": "text-layer PDF",
+        "grain": "province (seats by party, no votes)",
+        "effort": "series",
+        "first": true,
+        "note": "TÜİK says no votes by province survive for 1946, so these contests can only be held as winners by party (bare). Members' names by province are in the TBMM's 8th-term member list."
+      }
+    ]
+  },
+  "it": {
+    "senato": [
+      {
+        "from": 1948,
+        "to": 2022,
+        "title": "Eligendo Archivio: Senate results since 1948 (Elezioni politiche open data)",
+        "publisher": "Ministero dell'Interno, DAIT",
+        "url": "https://elezionistorico.interno.gov.it/eligendo/opendata.php",
+        "format": "zip per election (file names not checked)",
+        "grain": "collegio and comune",
+        "effort": "series",
+        "first": false,
+        "note": "The open data page lists Politiche from 1948, and the Senate result pages for 1948 and 1992 were seen; the existing it.storico loader covers the Chamber, so the Senate is an extension of it."
+      }
+    ],
+    "camera": [
+      {
+        "from": 1948,
+        "to": 2018,
+        "title": "Chamber of Deputies historical archive (camera-{YYYYMMDD}.zip)",
+        "publisher": "Ministero dell'Interno, DAIT",
+        "url": "https://dait.interno.gov.it/documenti/opendata/camera/",
+        "format": "zip with latin1 CSV (1948 to 1992 as TXT)",
+        "grain": "collegio and comune",
+        "effort": "series",
+        "first": false,
+        "note": "Verified in sources.md as it.storico for 1948 to 2018, so these gaps are loader coverage."
+      }
+    ],
+    "regionali": [
+      {
+        "from": 1970,
+        "to": 2025,
+        "title": "Eligendo Archivio: general cycles of regional elections since 1970",
+        "publisher": "Ministero dell'Interno, DAIT",
+        "url": "https://elezionistorico.interno.gov.it/eligendo/opendata.php",
+        "format": "zip per cycle (layout not checked)",
+        "grain": "region (verify comune-level files)",
+        "effort": "election",
+        "first": false,
+        "note": "The open data page lists Cicli generali di elezioni regionali dal 1970."
+      }
+    ],
+    "ep": [
+      {
+        "from": 2024,
+        "to": 2024,
+        "title": "Eligendo Archivio: European elections since 1979",
+        "publisher": "Ministero dell'Interno, DAIT",
+        "url": "https://elezionistorico.interno.gov.it/eligendo/opendata.php",
+        "format": "zip (layout not checked)",
+        "grain": "comune (verify)",
+        "effort": "election",
+        "first": false,
+        "note": "The open data page lists Elezioni europee dal 1979."
+      }
+    ],
+    "referendums": [
+      {
+        "from": 1946,
+        "to": 1946,
+        "title": "Eligendo Archivio: referendums since 1946",
+        "publisher": "Ministero dell'Interno, DAIT",
+        "url": "https://elezionistorico.interno.gov.it/eligendo/opendata.php",
+        "format": "zip (layout not checked)",
+        "grain": "comune (verify)",
+        "effort": "election",
+        "first": false,
+        "note": "The open data page lists Referendum dal 1946; the 1946 institutional vote is one contest."
+      }
+    ]
+  },
+  "de": {
+    "landtage": [
+      {
+        "from": 1946,
+        "to": 2025,
+        "title": "Ergebnisse fruherer Landtagswahlen (Land-level results since 1946)",
+        "publisher": "Die Bundeswahlleiterin",
+        "url": "https://www.bundeswahlleiterin.de/dam/jcr/a333e523-0717-42ad-a772-d5ad7e7e97cc/ltw_erg_gesamt.pdf",
+        "format": "text-layer PDF, one file for all years",
+        "grain": "Land",
+        "effort": "series",
+        "first": false,
+        "note": "Gives voters, votes, and seats by party for every Land since 1946, per the table of contents."
+      },
+      {
+        "from": 1946,
+        "to": 2026,
+        "title": "GERDA state election data (municipality, unharmonized; constituency 1990 to 2026)",
+        "publisher": "Hilbig, Heddesheimer, Sichart, and Wiedemann (german-elections.com)",
+        "url": "https://german-elections.com/election-data/",
+        "format": "CSV and RDS",
+        "grain": "municipality (1946 to 2026); constituency (1990 to 2026)",
+        "effort": "series",
+        "first": false,
+        "note": "Municipal results sum to Land level; the license was not checked."
+      },
+      {
+        "from": 1990,
+        "to": 2025,
+        "title": "Land statistical offices: Landtag results by Wahlkreis",
+        "publisher": "Statistische Landesamter (for example Sachsen-Anhalt and Thuringen)",
+        "url": "https://statistik.sachsen-anhalt.de/themen/gebiet-und-wahlen/wahlen/wahlergebnisse-vergangener-landtagswahlen",
+        "format": "CSV and XLSX per election",
+        "grain": "Wahlkreis",
+        "effort": "election",
+        "first": false,
+        "note": "One set per Land; Sachsen-Anhalt offers CSV from 1990, and Thuringen offers Excel from 1994."
+      }
+    ]
+  },
+  "eu": {
+    "ep": [
+      {
+        "from": 1989,
+        "to": 2007,
+        "title": "EP Election Results at Constituency Level, 1979 to 2019",
+        "publisher": "European University Institute, European Governance and Politics Programme",
+        "url": "https://europeangovernanceandpolitics.eui.eu/project/ep-election-results-at-constituency-level/",
+        "format": "dataset download (format not checked)",
+        "grain": "constituency",
+        "effort": "series",
+        "first": false,
+        "note": "Covers the 1989, 1994, 1995, and 2007 contests if the file holds every member state, which its title says."
+      },
+      {
+        "from": 1979,
+        "to": 2019,
+        "title": "EU-NED, EU election results at NUTS level (Schraff et al.)",
+        "publisher": "ETH Zurich Research Collection",
+        "url": "https://www.research-collection.ethz.ch/",
+        "format": "dataset download (format not checked)",
+        "grain": "NUTS region",
+        "effort": "series",
+        "first": false,
+        "note": "NUTS-level, so it does not give constituency winners; coverage years were not checked."
+      },
+      {
+        "from": 2024,
+        "to": 2024,
+        "title": "European Parliament results portal, 2024 election",
+        "publisher": "European Parliament",
+        "url": "https://results.elections.europa.eu/",
+        "format": "HTML",
+        "grain": "national (verify)",
+        "effort": "election",
+        "first": false,
+        "note": "The sources.md BLUE_EP compilation (municipal, 2019 and 2024) is the other candidate, but its URL is not recorded there."
+      }
+    ]
+  }
+}
