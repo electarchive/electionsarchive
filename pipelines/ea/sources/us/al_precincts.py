@@ -41,6 +41,7 @@ FILES = [
     (date(2010, 11, 2), BASE + "2010-general-precinctLevel.zip"),
     (date(2012, 11, 6), BASE + "2012General-PrecinctLevel.zip"),
     (date(2014, 11, 4), BASE + "2014General-precinctLevel.zip"),
+    (date(2016, 11, 8), BASE + "2016-General-PrecinctLevel.zip"),
 ]
 SS = "{urn:schemas-microsoft-com:office:spreadsheet}"
 COUNTYWIDE = r"ABSENTEE|PROVISIONAL|MAIL|CURBSIDE"
@@ -172,7 +173,7 @@ def sheet_records(day: date, county: str, rows: list[list[str]]) -> list[tuple[d
         owner = ""
         offices = []
         for label in rows[0]:
-            owner = label.strip() if label.strip() else owner
+            owner = re.sub(r"(?i)^district (\d+)$", r"U.S. House #\1", label.strip()) if label.strip() else owner
             offices.append(owner)
         for row in rows[2:]:
             if len(row) < 3 or not row[1].strip() or re.search(TOTALS, row[1].upper()):
@@ -275,7 +276,7 @@ def parse() -> None:
                     re.sub(
                         r"[^a-z]",
                         "",
-                        re.sub(r"(?i)^2014-general-|[ _-]*2014 general precinct", "", Path(member).stem).lower(),
+                        re.sub(r"(?i)^20(?:14|16)-general-|[ _-]*2014 general precinct", "", Path(member).stem).lower(),
                     )
                     .removesuffix("xls")
                     .removesuffix("gen")
@@ -600,6 +601,7 @@ def emit() -> Path:
         checked = (pl.col("chamber") == "house") & (
             ((pl.col("day") == date(2008, 11, 4)) & (pl.col("district") == 3))
             | ((pl.col("day") == date(2000, 11, 7)) & (pl.col("district") == 2))
+            | ((pl.col("day") == date(2016, 11, 8)) & (pl.col("district") == 1))
         )
         medsl.attach(
             cs,
@@ -616,6 +618,6 @@ def emit() -> Path:
                 frame.filter(checked).drop("county_code"),
                 {"AL": source},
                 grain="precinct",
-                authoritative="Source: the Secretary of State's precinct returns, which match the county book's candidate totals.",
+                authoritative="Source: the Secretary of State's official precinct returns; the FEC totals differ.",
             )
         return cs.write()
