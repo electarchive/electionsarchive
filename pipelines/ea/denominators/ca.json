@@ -494,13 +494,11 @@
         },
         {
           "date": "1972-10-30",
-          "contests": null,
+          "contests": 264,
           "seats": 265,
-          "source": "heo",
-          "quote": "Parliaments table, 29th: 109/265",
-          "note": "Elections Canada gives 265 seats for 1972, which doesn't match the 264 ridings of the 1966 representation order, so 1972 stays uncounted until that is settled.",
-          "regions": null,
-          "research_note": "Elections Canada's Parliaments table gives 265 seats, which does not match the 264 ridings of the 1966 representation order; left uncounted until settled."
+          "source": "lop-hfer",
+          "quote": "264 distinct ridings with Election Type Gen on 1972-10-30",
+          "note": "Seats come from Elections Canada's Parliaments table (109 of 265). The Library of Parliament lists 264 ridings for 1972, the number set by the 1966 representation order. So the race count is 264. Elections Canada's 265 isn't a count of ridings."
         },
         {
           "date": "1974-07-08",

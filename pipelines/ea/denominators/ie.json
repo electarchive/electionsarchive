@@ -114,6 +114,21 @@
       "title": "Relate, May 2014: Local and European elections 2014",
       "publisher": "Citizens Information Board",
       "url": "https://www.citizensinformationboard.ie/downloads/relate/relate_2014_05.pdf"
+    },
+    "ie_2009": {
+      "title": "Electoral (Amendment) Act 2009, section 8",
+      "publisher": "Irish Statute Book (eISB)",
+      "url": "https://www.irishstatutebook.ie/eli/2009/act/4/section/8/enacted/en/html"
+    },
+    "ie_2014": {
+      "title": "European Parliament Elections (Amendment) Act 2014, section 3",
+      "publisher": "Irish Statute Book (eISB)",
+      "url": "https://www.irishstatutebook.ie/eli/2014/act/2/section/3/enacted/en/html"
+    },
+    "ep_ee19_ie": {
+      "title": "European elections, 23-26 May 2019, country sheet: Ireland",
+      "publisher": "European Parliament",
+      "url": "https://www.europarl.europa.eu/news/en/press-room/20190516BKG51011/european-elections-2019-country-sheets/13/ireland"
     }
   },
   "levels": [
@@ -867,24 +882,26 @@
         },
         {
           "date": "2009-06-05",
-          "note": "The number of constituencies in 2009 hasn't been confirmed from an official source yet.",
-          "research_note": "Not verified. The number of constituencies and seats for 2009 was not found in an official source within the budget. The date is not quoted from a fetched source."
+          "note": "Constituencies as set by the Act in force at this election.",
+          "contests": 4,
+          "source": "ie_2009",
+          "quote": "Dublin | The counties of: Dún Laoghaire-Rathdown, Fingal and South Dublin; and the city of Dublin. | 3 | East | The counties of: Carlow, Kildare, Kilkenny, Laois, Louth, Meath, Offaly, Wexford and Wicklow. | 3 | North-West | The counties of: Cavan, Clare, Donegal, Galway, Leitrim, Longford, Mayo, Monaghan, Roscommon, Sligo and Westmeath; and the city of Galway. | 3 | South | The counties of: Cork, Kerry, Limerick, North Tipperary, South Tipperary and Waterford; and the cities of Cork, Limerick and Waterford. | 3"
         },
         {
           "date": "2014-05-23",
           "seats": 11,
-          "source": "ep-results-2024",
-          "quote": "Total Number of Seats 11 13 14",
-          "note": "The number of constituencies in 2014 hasn't been confirmed from an official source yet.",
-          "research_note": "Seats from the 2014, 2019, and 2024 columns of the 'Comparison 1979-2024' table. The constituency count for 2014 is not quoted here. The date is not quoted from a fetched source."
+          "source": "ie_2014",
+          "quote": "Dublin | The counties of: Dun Laoghaire-Rathdown, Fingal and South Dublin; and the city of Dublin. | 3 | Midlands-North-West | The counties of: Cavan, Donegal, Galway, Kildare, Laois, Leitrim, Longford, Louth, Mayo, Meath, Monaghan, Offaly, Roscommon, Sligo and Westmeath; and the city of Galway. | 4 | South | The counties of: Carlow, Clare, Cork, Kerry, Kilkenny, Limerick, North Tipperary, South Tipperary, Waterford, Wexford and Wicklow; and the cities of Cork, Limerick and Waterford. | 4",
+          "note": "Constituencies as set by the Act in force at this election.",
+          "contests": 3
         },
         {
           "date": "2019-05-24",
           "seats": 13,
-          "source": "ep-results-2024",
-          "quote": "Total Number of Seats 11 13 14",
-          "note": "The number of constituencies in 2019 hasn't been confirmed from an official source yet.",
-          "research_note": "Seats from the 2019 column of the same table. The constituency count for 2019 is not quoted here. The date is not quoted from a fetched source."
+          "source": "ep_ee19_ie",
+          "quote": "Number of constituencies 3",
+          "note": "Constituencies as set by the Act in force at this election.",
+          "contests": 3
         },
         {
           "date": "2024-06-07",
