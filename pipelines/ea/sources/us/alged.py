@@ -15,7 +15,7 @@ from ea.changeset import Changeset, slug
 from ea.store import DATA, connect
 
 SOURCE = "us.alged"
-VERSION = "5"
+VERSION = "6"
 PARSED = DATA / "parsed" / SOURCE
 URL = "https://osf.io/download/tbwzd/"
 PLACES = "https://www2.census.gov/geo/tiger/GENZ2020/shp/cb_2020_us_place_500k.zip"
@@ -220,8 +220,21 @@ def parse() -> None:
     places.write_parquet(PARSED / "places.parquet")
 
 
+def _short(name: str) -> tuple[str, str]:
+    words = [slug(word) for word in re.sub(r"\b(?:Jr|Sr|II|III|IV)\b\.?", " ", name).replace(",", " ").split()]
+    words = [word for word in words if len(word) > 1]
+    return (words[0], words[-1]) if words else ("", "")
+
+
 def emit() -> Path:
     frame = pl.read_parquet(PARSED / "candidates.parquet")
+    harris = {
+        (int(day[:4]), *_short(candidate)): party
+        for day, candidate, party in pl.read_csv(Path(__file__).with_name("alged_harris_party.csv"))
+        .filter(pl.col("party").is_in(["democratic", "republican", "libertarian", "green"]))
+        .select("date", "candidate", "party")
+        .iter_rows()
+    }
     places = pl.read_parquet(PARSED / "places.parquet")
     with connect() as conn:
         cs = Changeset(
@@ -689,7 +702,15 @@ def emit() -> Path:
                         cs.add("person", id=person)
                         name(person, ballot)
                     persons.add(person)
-                    cs.add("contest_option", id=option, contest_id=contest, kind="candidate", ballot_label=ballot)
+                    label = harris.get((year, *_short(ballot))) if code == "48201" else None
+                    cs.add(
+                        "contest_option",
+                        id=option,
+                        contest_id=contest,
+                        kind="candidate",
+                        party_id=None if label is None else cs.key("us.party", f"{label}-party"),
+                        ballot_label=ballot,
+                    )
                     cs.add(
                         "candidacy",
                         id=cs.key("us.candidacy", f"{contest_key}:{candidate_id}:head"),
