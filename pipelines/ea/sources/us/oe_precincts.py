@@ -56,6 +56,9 @@ COUNTIES = {
     ("IL", "cityofgalesburg"): "knox",
     ("IL", "cityofeaststlouis"): "stclair",
     ("IL", "cityofdanville"): "vermilion",
+    ("NY", "schenectedy"): "schenectady",
+    ("KY", "breckenridge"): "breckinridge",
+    ("KY", "bulter"): "butler",
 }
 MICHIGAN = "2022/20221108__mi__general__precinct.csv"
 PLACE_WORDS = r"\b(charter|township|twp|precinc\w*|pct|city|village|of|the)\b"

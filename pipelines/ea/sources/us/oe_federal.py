@@ -7,6 +7,7 @@ from pathlib import Path
 from uuid import UUID
 
 import polars as pl
+from psycopg import Connection
 
 from ea import raw
 from ea.changeset import Changeset
@@ -19,13 +20,32 @@ PARSED = DATA / "parsed" / SOURCE
 YEARS = range(2016, 2026)
 STATES = {state for state in os.environ.get("OE_STATES", "").upper().split(",") if state}
 COMMITS = openelections.COMMITS | {}
-CONTESTS = r"^20(1[6-9]|2[0-5])-1[01]-[0-9]{2}:[A-Z]{2}(-[0-9]{2})?:(president|senate|house|governor)(:|$)"
+CONTESTS = (
+    r"^20(1[6-9]|2[0-5])-1[01]-[0-9]{2}:[A-Z]{2}(-[0-9]{2})?:(president|senate|governor|house:[0-9]+)(:special)?$"
+)
 
 
-def picks() -> list[tuple[str, int, str]]:
+def wanted(conn: Connection, pipeline: str, state: str = "%", pattern: str = CONTESTS) -> set[str]:
+    return {
+        key
+        for (key,) in conn.execute(
+            """select x.value from external_id x
+               where x.scheme = 'us.contest' and x.value ~ %s and split_part(x.value, ':', 2) like %s
+                 and not exists (
+                   select from result_set r join changeset c on c.id = r.changeset_id
+                   where r.contest_id = x.entity_id and r.status <> 'withdrawn' and c.pipeline <> %s
+                     and coalesce(r.completeness, 1) >= 0.98
+                     and exists (select from coverage_cache_unit cu join reporting_unit u on u.k = cu.unit_k
+                                 where cu.result_set_k = r.k and u.scheme_code = 'us.precinct'))""",
+            [pattern, state + "%", pipeline],
+        ).fetchall()
+    }
+
+
+def picks(states: set[str] = STATES) -> list[tuple[str, int, str]]:
     chosen: list[tuple[str, int, str]] = []
     for state, commit in COMMITS.items():
-        if STATES and state not in STATES:
+        if states and state not in states:
             continue
         tree = json.loads(
             raw.cached(SOURCE, openelections.TREE.format(state=state.lower(), commit=commit)).path.read_text()
@@ -96,48 +116,78 @@ def emit() -> Path:
             "OpenElections, for contests no other source holds by precinct",
             polity="US",
         )
-        wanted = {
-            key
-            for (key,) in conn.execute(
-                """select x.value from external_id x
-                   where x.scheme = 'us.contest' and x.value ~ %s
-                     and not exists (
-                       select from result_set r join changeset c on c.id = r.changeset_id
-                       where r.contest_id = x.entity_id and r.status <> 'withdrawn' and c.pipeline <> %s
-                         and coalesce(r.completeness, 1) >= 0.98
-                         and exists (select from coverage_cache_unit cu join reporting_unit u on u.k = cu.unit_k
-                                     where cu.result_set_k = r.k and u.scheme_code = 'us.precinct'))""",
-                [CONTESTS, SOURCE],
-            ).fetchall()
-        }
-        heads: dict[tuple[int, str], set[str]] = defaultdict(set)
+        gaps = wanted(conn, SOURCE)
+        heads: dict[tuple[int, str, str], set[str]] = defaultdict(set)
         for text, key in conn.execute(
             """select n.text, k.value from name n join candidacy cy on cy.person_id = n.entity_id and cy.role = 'head'
                join contest_option o on o.id = cy.option_id
                join external_id k on k.entity_id = o.contest_id and k.scheme = 'us.contest'
-               where n.is_preferred and k.value ~ '^20(1[6-9]|2[0-4])-11-[0-9]{2}:[A-Z]{2}:president$'"""
+               where n.is_preferred and k.value ~ '^20(1[6-9]|2[0-5])-1[01]-[0-9]{2}:[A-Z]{2}:(president|governor)$'"""
         ).fetchall():
-            heads[(int(key[:4]), key[11:13])].update(re.sub(r"[^a-z]", "", word.lower()) for word in text.split())
+            heads[(int(key[:4]), key[11:13], key[14:])].update(
+                re.sub(r"[^a-z]", "", word.lower()) for word in text.split()
+            )
 
         def head(row: dict[str, object]) -> str:
             candidate = str(row["candidate"])
-            halves = [half.strip() for half in re.split(r"&|/| and ", candidate) if half.strip()]
-            known = heads[(int(str(row["year"])), str(row["state"]))]
+            known = heads[(int(str(row["year"])), str(row["state"]), str(row["chamber"]))]
+            halves = [half.strip() for half in re.split(r"&|/|\\| and ", candidate) if half.strip()]
+            if len(halves) == 1 and known:
+                words = candidate.split()
+                found = [index for index, word in enumerate(words) if re.sub(r"[^a-z]", "", word.lower()) in known]
+                return " ".join(words[: found[-1] + 1]) if found else candidate
+            if len(halves) != 2:
+                return candidate
             named = [half for half in halves if re.sub(r"[^a-z]", "", half.split(",")[0].split()[-1].lower()) in known]
-            return named[0] if len(halves) == 2 and len(named) == 1 else candidate
+            return named[0] if len(named) == 1 else halves[0]
 
+        base = pl.concat_str(
+            pl.col("day").cast(pl.String),
+            "state",
+            "chamber",
+            pl.col("district").cast(pl.String),
+            separator=":",
+            ignore_nulls=True,
+        )
+        frame = frame.with_columns(
+            seat=pl.when(pl.col("chamber") == "house").then(
+                pl.coalesce(pl.col("district").fill_null("").str.extract(r"(\d+)"), office.str.extract(r"(\d+)")).cast(
+                    pl.Int16, strict=False
+                )
+            ),
+            name=pl.col("candidate").str.to_uppercase().str.replace_all(r"[^A-Z]", ""),
+        )
+        seats = (
+            frame.filter(
+                (pl.col("chamber") == "house")
+                & pl.col("seat").is_not_null()
+                & ~pl.col("name").str.contains("WRITE|VOTE|^$|SCATTER|BLANK|OVER|UNDER")
+            )
+            .group_by("state", "year", "name", "seat")
+            .agg(pl.col("votes").sum())
+            .sort("votes", descending=True)
+            .group_by("state", "year", "name")
+            .agg(pl.col("seat").first().alias("held"))
+        )
         returns = (
-            frame.with_columns(
+            frame.join(seats, on=["state", "year", "name"], how="left")
+            .with_columns(
                 special=office.str.contains("special|unexpired|vacancy")
                 | pl.col("district").fill_null("").str.to_lowercase().str.contains("special|unexpired|vacancy"),
-                district=pl.when(pl.col("chamber") == "house").then(
-                    pl.coalesce(
-                        pl.col("district").fill_null("").str.extract(r"(\d+)"), office.str.extract(r"(\d+)")
-                    ).cast(pl.Int16, strict=False)
-                ),
+                district=pl.when(pl.col("chamber") == "house").then(pl.coalesce("held", "seat")),
                 code=pl.concat_str("year", "state", "fips", pl.lit(""), "precinct", separator=":"),
             )
-            .with_columns(candidate=pl.struct("candidate", "year", "state").map_elements(head, return_dtype=pl.String))
+            .filter(
+                pl.when("special").then(base + ":special").otherwise(base).is_in(list(gaps))
+                | (pl.col("chamber") == "house")
+                & ~pl.col("special")
+                & pl.concat_str(pl.col("day").cast(pl.String), "state", pl.lit("house:0"), separator=":").is_in(
+                    list(gaps)
+                )
+            )
+            .with_columns(
+                candidate=pl.struct("candidate", "year", "state", "chamber").map_elements(head, return_dtype=pl.String)
+            )
             .with_columns(candidate=pl.col("candidate").str.to_uppercase())
             .filter(~pl.col("candidate").str.contains(openelections.NOT_COUNTED), pl.col("candidate") != "")
             .with_columns(
@@ -150,27 +200,9 @@ def emit() -> Path:
             .agg(pl.col("writein").any(), pl.col("votes").sum())
             .with_columns(kind=pl.lit("precinct"), source="state")
         )
-        base = pl.concat_str(
-            pl.col("day").cast(pl.String),
-            "state",
-            "chamber",
-            pl.col("district").cast(pl.String),
-            separator=":",
-            ignore_nulls=True,
-        )
-        returns = returns.filter(
-            pl.when("special").then(base + ":special").otherwise(base).is_in(list(wanted))
-            | (pl.col("chamber") == "house")
-            & ~pl.col("special")
-            & pl.concat_str(pl.col("day").cast(pl.String), "state", pl.lit("house:0"), separator=":").is_in(
-                list(wanted)
-            )
-        )
         print(returns.group_by("state", "year", "chamber").agg(pl.col("district").n_unique()).sort("state", "year"))
         sources: dict[str, UUID] = {}
-        for state, _, path in picks():
-            if state not in set(returns["state"]):
-                continue
+        for state, _, path in picks(set(returns["state"])):
             title = f"{state} precinct-level results"
             if state not in sources:
                 sources[state] = cs.source("OpenElections", title)
