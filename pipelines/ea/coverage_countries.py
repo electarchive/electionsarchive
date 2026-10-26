@@ -342,13 +342,13 @@ def tally(cc: str, data: dict) -> tuple[dict, list[dict], list[dict]]:
                 finer = any(s in fine for s in got)
                 if unit == "district":
                     if scheme in schemes:
-                        k = district
+                        k = cid if level.get("by_contest") else district
                         ok = results or tacit
                         if ok or status.get(k) != "complete":
                             status[k] = "complete" if ok else "bare"
                         fine_ok[k] = fine_ok.get(k, False) or finer
-                        place[k] = place_of(cc, data, k, r[6])
-                        shape[k] = shaped_on(data["geometry"].get(k, []), r[2])
+                        place[k] = place_of(cc, data, district, r[6])
+                        shape[k] = shaped_on(data["geometry"].get(district, []), r[2])
                     elif not own:
                         found = data["unit_areas"].get(cid, set())
                         for k in found:

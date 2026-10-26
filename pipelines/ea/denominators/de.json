@@ -19,6 +19,11 @@
       "publisher": "Die Bundeswahlleiterin",
       "url": "https://www.bundeswahlleiterin.de/dam/jcr/a333e523-0717-42ad-a772-d5ad7e7e97cc/ltw_erg_gesamt.pdf",
       "note": "Table 1 lists every Landtag, Bürgerschaft, and Abgeordnetenhaus election by Land since 1946. Footnote 3: Bremen's first Bürgerschaft (13.10.1946) was a municipal election. Footnotes 5 and 6 are partial repeat elections; footnote 7 is Berlin's full repeat election of 12.02.2023."
+    },
+    "euwg-2": {
+      "title": "Europawahlgesetz (EuWG), § 2 Wahlsystem, Sitzverteilung",
+      "publisher": "Bundesministerium der Justiz (gesetze-im-internet.de)",
+      "url": "https://www.gesetze-im-internet.de/euwg/__2.html"
     }
   },
   "levels": [
@@ -2176,14 +2181,70 @@
         "eu.member_state",
         "de.nation"
       ],
-      "gaps": [
+      "gaps": [],
+      "elections": [
         {
-          "from": 1979,
-          "to": 2024,
-          "note": "No official count of German European Parliament constituencies is compiled yet."
+          "year": 1979,
+          "contests": 1,
+          "source": "euwg-2",
+          "quote": "Listenwahlvorschläge können für ein Land oder als gemeinsame Liste für alle Länder aufgestellt werden. … Jeder Wahlvorschlag erhält so viele Sitze, wie sich nach Teilung seiner gesamten Stimmen im Wahlgebiet durch einen Zuteilungsdivisor ergeben."
+        },
+        {
+          "year": 1984,
+          "contests": 1,
+          "source": "euwg-2",
+          "quote": "Listenwahlvorschläge können für ein Land oder als gemeinsame Liste für alle Länder aufgestellt werden. … Jeder Wahlvorschlag erhält so viele Sitze, wie sich nach Teilung seiner gesamten Stimmen im Wahlgebiet durch einen Zuteilungsdivisor ergeben."
+        },
+        {
+          "year": 1989,
+          "contests": 1,
+          "source": "euwg-2",
+          "quote": "Listenwahlvorschläge können für ein Land oder als gemeinsame Liste für alle Länder aufgestellt werden. … Jeder Wahlvorschlag erhält so viele Sitze, wie sich nach Teilung seiner gesamten Stimmen im Wahlgebiet durch einen Zuteilungsdivisor ergeben."
+        },
+        {
+          "year": 1994,
+          "contests": 1,
+          "source": "euwg-2",
+          "quote": "Listenwahlvorschläge können für ein Land oder als gemeinsame Liste für alle Länder aufgestellt werden. … Jeder Wahlvorschlag erhält so viele Sitze, wie sich nach Teilung seiner gesamten Stimmen im Wahlgebiet durch einen Zuteilungsdivisor ergeben."
+        },
+        {
+          "year": 1999,
+          "contests": 1,
+          "source": "euwg-2",
+          "quote": "Listenwahlvorschläge können für ein Land oder als gemeinsame Liste für alle Länder aufgestellt werden. … Jeder Wahlvorschlag erhält so viele Sitze, wie sich nach Teilung seiner gesamten Stimmen im Wahlgebiet durch einen Zuteilungsdivisor ergeben."
+        },
+        {
+          "year": 2004,
+          "contests": 1,
+          "source": "euwg-2",
+          "quote": "Listenwahlvorschläge können für ein Land oder als gemeinsame Liste für alle Länder aufgestellt werden. … Jeder Wahlvorschlag erhält so viele Sitze, wie sich nach Teilung seiner gesamten Stimmen im Wahlgebiet durch einen Zuteilungsdivisor ergeben."
+        },
+        {
+          "year": 2009,
+          "contests": 1,
+          "source": "euwg-2",
+          "quote": "Listenwahlvorschläge können für ein Land oder als gemeinsame Liste für alle Länder aufgestellt werden. … Jeder Wahlvorschlag erhält so viele Sitze, wie sich nach Teilung seiner gesamten Stimmen im Wahlgebiet durch einen Zuteilungsdivisor ergeben."
+        },
+        {
+          "year": 2014,
+          "contests": 1,
+          "source": "euwg-2",
+          "quote": "Listenwahlvorschläge können für ein Land oder als gemeinsame Liste für alle Länder aufgestellt werden. … Jeder Wahlvorschlag erhält so viele Sitze, wie sich nach Teilung seiner gesamten Stimmen im Wahlgebiet durch einen Zuteilungsdivisor ergeben."
+        },
+        {
+          "year": 2019,
+          "contests": 1,
+          "source": "euwg-2",
+          "quote": "Listenwahlvorschläge können für ein Land oder als gemeinsame Liste für alle Länder aufgestellt werden. … Jeder Wahlvorschlag erhält so viele Sitze, wie sich nach Teilung seiner gesamten Stimmen im Wahlgebiet durch einen Zuteilungsdivisor ergeben."
+        },
+        {
+          "year": 2024,
+          "contests": 1,
+          "source": "euwg-2",
+          "quote": "Listenwahlvorschläge können für ein Land oder als gemeinsame Liste für alle Länder aufgestellt werden. … Jeder Wahlvorschlag erhält so viele Sitze, wie sich nach Teilung seiner gesamten Stimmen im Wahlgebiet durch einen Zuteilungsdivisor ergeben."
         }
       ],
-      "elections": []
+      "note": "Counted per election: Germany elects its members of the European Parliament as one electoral area, so each election counts once (Europawahlgesetz, section 2). Parties may run a list in each Land instead of one federal list, but seats are shared out on their combined national vote."
     }
   ]
 }

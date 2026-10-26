@@ -1,7 +1,215 @@
 {
   "polity": "EU",
   "name": "European Union",
-  "sources": {},
+  "sources": {
+    "ep_factsheet": {
+      "title": "The European Parliament: electoral procedures (Fact Sheet on the European Union, sheet 21)",
+      "publisher": "European Parliament",
+      "url": "https://www.europarl.europa.eu/factsheets/en/sheet/21/elections-to-the-european-parliament"
+    },
+    "eprs_2014": {
+      "title": "The European elections: EU legislation, national provisions and civic participation (revised edition, PE 493.047)",
+      "publisher": "European Parliament, Policy Department C (Wilhelm Lehmann)",
+      "url": "https://www.europarl.europa.eu/RegData/etudes/STUD/2014/493047/IPOL-AFCO_ET(2014)493047_EN.pdf"
+    },
+    "eprs_2009": {
+      "title": "The European elections: EU legislation, national provisions and civic participation (PE 410.672, March 2009)",
+      "publisher": "European Parliament, Policy Department C (Wilhelm Lehmann)",
+      "url": "https://www.europarl.europa.eu/multimedia/eplive/cont/20090303MLT50670/media_20090303MLT50670.pdf"
+    },
+    "eprs_christie_2019": {
+      "title": "The European Elections of May 2019: Electoral systems and outcomes (EPRS_STU(2020)652037)",
+      "publisher": "European Parliament Research Service (Aidan Christie)",
+      "url": "https://www.europarl.europa.eu/RegData/etudes/STUD/2020/652037/EPRS_STU(2020)652037_EN.pdf"
+    },
+    "ep_w13": {
+      "title": "Legislation governing elections to the European Parliament (3), working paper W13 (POLI)",
+      "publisher": "European Parliament",
+      "url": "https://www.europarl.europa.eu/workingpapers/poli/w13/theme_en.htm"
+    },
+    "fr_an": {
+      "title": "Assemblée nationale, XVe législature, report on the bill on the European Parliament electoral system (l15b0609_rapport-fond.pdf)",
+      "publisher": "Assemblée nationale (France)",
+      "url": "https://www.assemblee-nationale.fr/dyn/15/rapports/cion_lois/l15b0609_rapport-fond.pdf"
+    },
+    "pl_senat": {
+      "title": "Opinia OE-267 on the Polish European Parliament electoral law (Biuro Analiz, Dokumentacji i Korespondencji)",
+      "publisher": "Senat of the Republic of Poland",
+      "url": "https://www.senat.gov.pl/gfx/senat/pl/senatekspertyzy/4842/plik/oe-267.pdf"
+    },
+    "ro_law_33_2007": {
+      "title": "Legea nr. 33/2007 privind organizarea și desfășurarea alegerilor pentru Parlamentul European (consolidated text)",
+      "publisher": "Parlamentul României (copy hosted by the European Parliament)",
+      "url": "https://www.europarl.europa.eu/external/appendix/ee2019/legea-nr-33-2007-privind-organizarea-si-desfasurarea-alegerilor-pentru-parlamentul-european.pdf"
+    },
+    "hr_sabor": {
+      "title": "The Republic of Croatia European Parliamentary Elections Act (English text)",
+      "publisher": "Croatian Parliament (Sabor)",
+      "url": "http://www.sabor.hr/en/information-access/important-legislation/republic-croatia-european-parliamentary-elections-act"
+    },
+    "ie_1997": {
+      "title": "European Parliament Elections Act, 1997, Third Schedule (Constituencies), as enacted",
+      "publisher": "Irish Statute Book (eISB)",
+      "url": "https://www.irishstatutebook.ie/eli/1997/act/2/schedule/3/enacted/en/html"
+    },
+    "ie_2009": {
+      "title": "Electoral (Amendment) Act 2009, section 8",
+      "publisher": "Irish Statute Book (eISB)",
+      "url": "https://www.irishstatutebook.ie/eli/2009/act/4/section/8/enacted/en/html"
+    },
+    "ie_2014": {
+      "title": "European Parliament Elections (Amendment) Act 2014, section 3",
+      "publisher": "Irish Statute Book (eISB)",
+      "url": "https://www.irishstatutebook.ie/eli/2014/act/2/section/3/enacted/en/html"
+    },
+    "uk_1999": {
+      "title": "European Parliamentary Elections Act 1999 (c. 1), section 2",
+      "publisher": "legislation.gov.uk (UK Parliament)",
+      "url": "https://www.legislation.gov.uk/ukpga/1999/1/enacted/data.xht?view=snippet&wrap=true"
+    },
+    "uk_2002": {
+      "title": "European Parliamentary Elections Act 2002 (c. 24), section 1 (revised to 1 May 2004)",
+      "publisher": "legislation.gov.uk (UK Parliament)",
+      "url": "https://www.legislation.gov.uk/ukpga/2002/24/2004-05-01/data.xht"
+    },
+    "ec_uk_2014": {
+      "title": "European Parliament elections 2014: electoral data report",
+      "publisher": "Electoral Commission (UK)",
+      "url": "https://www.electoralcommission.org.uk/sites/default/files/2019-07/European-Parliament-Elections-2014-Electoral-data-report.pdf"
+    },
+    "it_law18": {
+      "title": "Legge 24 gennaio 1979, n. 18, with Tabella A and its amendment notes (consolidated copy)",
+      "publisher": "Repubblica Italiana (consolidated text via Regione Piemonte)",
+      "url": "https://www.cr.piemonte.it/dwd/web/media/files/L_%2024%20gennaio%201979,%20n_%2018.pdf"
+    },
+    "it_vademecum_2014": {
+      "title": "Vademecum: Elezione dei membri del Parlamento europeo spettanti all'Italia, 25 maggio 2014",
+      "publisher": "Ministero dell'Interno (Italy)",
+      "url": "https://www1.interno.gov.it/mininterno/export/sites/default/it/assets/files/28_2014/2014_05_20_vademecum_Europee2014.pdf"
+    },
+    "ep_ee19_at": {
+      "title": "European elections, 23-26 May 2019, country sheet: Austria",
+      "publisher": "European Parliament",
+      "url": "https://www.europarl.europa.eu/news/en/press-room/20190516BKG51011/european-elections-2019-country-sheets/0/austria"
+    },
+    "ep_ee19_bg": {
+      "title": "European elections, 23-26 May 2019, country sheet: Bulgaria",
+      "publisher": "European Parliament",
+      "url": "https://www.europarl.europa.eu/news/en/press-room/20190516BKG51011/european-elections-2019-country-sheets/2/bulgaria"
+    },
+    "ep_ee19_dk": {
+      "title": "European elections, 23-26 May 2019, country sheet: Denmark",
+      "publisher": "European Parliament",
+      "url": "https://www.europarl.europa.eu/news/en/press-room/20190516BKG51011/european-elections-2019-country-sheets/6/denmark"
+    },
+    "ep_ee19_es": {
+      "title": "European elections, 23-26 May 2019, country sheet: Spain",
+      "publisher": "European Parliament",
+      "url": "https://www.europarl.europa.eu/news/en/press-room/20190516BKG51011/european-elections-2019-country-sheets/25/spain"
+    },
+    "ep_ee19_gr": {
+      "title": "European elections, 23-26 May 2019, country sheet: Greece",
+      "publisher": "European Parliament",
+      "url": "https://www.europarl.europa.eu/news/en/press-room/20190516BKG51011/european-elections-2019-country-sheets/11/greece"
+    },
+    "ep_ee19_hu": {
+      "title": "European elections, 23-26 May 2019, country sheet: Hungary",
+      "publisher": "European Parliament",
+      "url": "https://www.europarl.europa.eu/news/en/press-room/20190516BKG51011/european-elections-2019-country-sheets/12/hungary"
+    },
+    "ep_ee19_ie": {
+      "title": "European elections, 23-26 May 2019, country sheet: Ireland",
+      "publisher": "European Parliament",
+      "url": "https://www.europarl.europa.eu/news/en/press-room/20190516BKG51011/european-elections-2019-country-sheets/13/ireland"
+    },
+    "ep_ee19_lu": {
+      "title": "European elections, 23-26 May 2019, country sheet: Luxembourg",
+      "publisher": "European Parliament",
+      "url": "https://www.europarl.europa.eu/news/en/press-room/20190516BKG51011/european-elections-2019-country-sheets/17/luxembourg"
+    },
+    "ep_ee19_nl": {
+      "title": "European elections, 23-26 May 2019, country sheet: Netherlands",
+      "publisher": "European Parliament",
+      "url": "https://www.europarl.europa.eu/news/en/press-room/20190516BKG51011/european-elections-2019-country-sheets/19/netherlands"
+    },
+    "ep_ee19_gb": {
+      "title": "European elections, 23-26 May 2019, country sheet: United Kingdom",
+      "publisher": "European Parliament",
+      "url": "https://www.europarl.europa.eu/news/en/press-room/20190516BKG51011/european-elections-2019-country-sheets/27/united-kingdom"
+    },
+    "ep_ee24_at": {
+      "title": "European elections, 6-9 June 2024, country sheet: Austria",
+      "publisher": "European Parliament",
+      "url": "https://www.europarl.europa.eu/news/en/press-room/20240527BKG21656/european-elections-2024-country-sheets/0/austria"
+    },
+    "ep_ee24_bg": {
+      "title": "European elections, 6-9 June 2024, country sheet: Bulgaria",
+      "publisher": "European Parliament",
+      "url": "https://www.europarl.europa.eu/news/en/press-room/20240527BKG21656/european-elections-2024-country-sheets/2/bulgaria"
+    },
+    "ep_ee24_hr": {
+      "title": "European elections, 6-9 June 2024, country sheet: Croatia",
+      "publisher": "European Parliament",
+      "url": "https://www.europarl.europa.eu/news/en/press-room/20240527BKG21656/european-elections-2024-country-sheets/3/croatia"
+    },
+    "ep_ee24_dk": {
+      "title": "European elections, 6-9 June 2024, country sheet: Denmark",
+      "publisher": "European Parliament",
+      "url": "https://www.europarl.europa.eu/news/en/press-room/20240527BKG21656/european-elections-2024-country-sheets/6/denmark"
+    },
+    "ep_ee24_gr": {
+      "title": "European elections, 6-9 June 2024, country sheet: Greece",
+      "publisher": "European Parliament",
+      "url": "https://www.europarl.europa.eu/news/en/press-room/20240527BKG21656/european-elections-2024-country-sheets/11/greece"
+    },
+    "ep_ee24_ie": {
+      "title": "European elections, 6-9 June 2024, country sheet: Ireland",
+      "publisher": "European Parliament",
+      "url": "https://www.europarl.europa.eu/news/en/press-room/20240527BKG21656/european-elections-2024-country-sheets/13/ireland"
+    },
+    "ep_ee24_it": {
+      "title": "European elections, 6-9 June 2024, country sheet: Italy",
+      "publisher": "European Parliament",
+      "url": "https://www.europarl.europa.eu/news/en/press-room/20240527BKG21656/european-elections-2024-country-sheets/14/italy"
+    },
+    "ep_ee24_pl": {
+      "title": "European elections, 6-9 June 2024, country sheet: Poland",
+      "publisher": "European Parliament",
+      "url": "https://www.europarl.europa.eu/news/en/press-room/20240527BKG21656/european-elections-2024-country-sheets/20/poland"
+    },
+    "ep_ee24_pt": {
+      "title": "European elections, 6-9 June 2024, country sheet: Portugal",
+      "publisher": "European Parliament",
+      "url": "https://www.europarl.europa.eu/news/en/press-room/20240527BKG21656/european-elections-2024-country-sheets/21/portugal"
+    },
+    "ep_ee24_es": {
+      "title": "European elections, 6-9 June 2024, country sheet: Spain",
+      "publisher": "European Parliament",
+      "url": "https://www.europarl.europa.eu/news/en/press-room/20240527BKG21656/european-elections-2024-country-sheets/25/spain"
+    },
+    "ep_ee24_se": {
+      "title": "European elections, 6-9 June 2024, country sheet: Sweden",
+      "publisher": "European Parliament",
+      "url": "https://www.europarl.europa.eu/news/en/press-room/20240527BKG21656/european-elections-2024-country-sheets/26/sweden"
+    },
+    "euwg-2": {
+      "title": "Europawahlgesetz (EuWG), § 2 Wahlsystem, Sitzverteilung",
+      "publisher": "Bundesministerium der Justiz (gesetze-im-internet.de)",
+      "url": "https://www.gesetze-im-internet.de/euwg/__2.html"
+    },
+    "be-1989": {
+      "title": "Loi du 23 mars 1989 relative à l'élection du Parlement européen, article 10",
+      "publisher": "Service public fédéral Justice (Justel)",
+      "url": "https://www.ejustice.just.fgov.be/eli/loi/1989/03/23/1989000145/justel",
+      "note": "Article 10 originally formed two electoral colleges (French and Dutch); the German-speaking college was added before the 1994 election."
+    },
+    "fi-714-1998": {
+      "title": "Election Act (714/1998), section 7 (English translation, as amended to 2004)",
+      "publisher": "Ministry of Justice, Finland (copy hosted by ConstitutionNet)",
+      "url": "https://constitutionnet.org/sites/default/files/Election%20Act%201998%2C%20%20amended%202004.pdf",
+      "note": "In force from 2 October 1998."
+    }
+  },
   "levels": [
     {
       "key": "ep",
@@ -25,16 +233,874 @@
         "fr.ep_constituency",
         "it.ep_constituency",
         "ie.ep_constituency",
-        "pl.ep_constituency"
+        "pl.ep_constituency",
+        "de.nation"
       ],
       "gaps": [
         {
           "from": 1979,
-          "to": 2024,
-          "note": "No official count of each member state's constituencies at each election is compiled yet."
+          "to": 1996,
+          "note": "For the elections before 1999 and in 2004, no official source found so far gives the number of constituencies in every member state, so those elections aren't counted yet."
+        },
+        {
+          "from": 2004,
+          "to": 2004,
+          "note": "For the elections before 1999 and in 2004, no official source found so far gives the number of constituencies in every member state, so those elections aren't counted yet."
         }
       ],
-      "elections": []
+      "elections": [
+        {
+          "year": 1999,
+          "contests": 35,
+          "regions": {
+            "AT": 1,
+            "BE": 3,
+            "DE": 1,
+            "DK": 1,
+            "ES": 1,
+            "FI": 1,
+            "FR": 1,
+            "GB": 12,
+            "GR": 1,
+            "IE": 4,
+            "IT": 5,
+            "LU": 1,
+            "NL": 1,
+            "PT": 1,
+            "SE": 1
+          },
+          "source": "ep_w13",
+          "quote": "In nine Member States (Austria, Denmark, Spain, France, Greece, Luxembourg, the Netherlands, Portugal and Sweden) the whole country forms a single constituency.",
+          "states": {
+            "AT": {
+              "constituencies": 1,
+              "source": "ep_w13",
+              "quote": "In nine Member States (Austria, Denmark, Spain, France, Greece, Luxembourg, the Netherlands, Portugal and Sweden) the whole country forms a single constituency."
+            },
+            "BE": {
+              "constituencies": 3,
+              "source": "be-1989",
+              "quote": "Art. 10. § 1er Il y a trois collèges électoraux: un collège français, un collège néerlandais et un collège germanophone.",
+              "note": "Counted by electoral college; the law's four constituencies are polling areas that feed the three colleges."
+            },
+            "DE": {
+              "constituencies": 1,
+              "source": "euwg-2",
+              "quote": "Listenwahlvorschläge können für ein Land oder als gemeinsame Liste für alle Länder aufgestellt werden. … Jeder Wahlvorschlag erhält so viele Sitze, wie sich nach Teilung seiner gesamten Stimmen im Wahlgebiet durch einen Zuteilungsdivisor ergeben.",
+              "note": "The CDU/CSU's Land lists share one national seat allocation."
+            },
+            "DK": {
+              "constituencies": 1,
+              "source": "ep_w13",
+              "quote": "In nine Member States (Austria, Denmark, Spain, France, Greece, Luxembourg, the Netherlands, Portugal and Sweden) the whole country forms a single constituency."
+            },
+            "ES": {
+              "constituencies": 1,
+              "source": "ep_w13",
+              "quote": "In nine Member States (Austria, Denmark, Spain, France, Greece, Luxembourg, the Netherlands, Portugal and Sweden) the whole country forms a single constituency."
+            },
+            "FI": {
+              "constituencies": 1,
+              "source": "fi-714-1998",
+              "quote": "In the Presidential election and European Parliamentary elections, the country is one electoral district."
+            },
+            "FR": {
+              "constituencies": 1,
+              "source": "ep_w13",
+              "quote": "In nine Member States (Austria, Denmark, Spain, France, Greece, Luxembourg, the Netherlands, Portugal and Sweden) the whole country forms a single constituency."
+            },
+            "GB": {
+              "constituencies": 12,
+              "source": "uk_1999",
+              "quote": "(2)England shall be divided into nine electoral regions. (3)Scotland, Wales and Northern Ireland shall each constitute a single electoral region."
+            },
+            "GR": {
+              "constituencies": 1,
+              "source": "ep_w13",
+              "quote": "In nine Member States (Austria, Denmark, Spain, France, Greece, Luxembourg, the Netherlands, Portugal and Sweden) the whole country forms a single constituency."
+            },
+            "IE": {
+              "constituencies": 4,
+              "source": "ie_1997",
+              "quote": "Connacht-Ulster | The administrative counties of: Cavan, Donegal, Galway, Leitrim, Mayo, Monaghan, Roscommon and Sligo; and the county borough of Galway. | 3 | Dublin | The administrative counties of: Dún Laoghaire-Rathdown, Fingal and South Dublin; and the county borough of Dublin. | 4 | Leinster | The administrative counties of: Carlow, Kildare, Kilkenny, Laoighis, Longford, Louth, Meath, Offaly, Westmeath, Wexford and Wicklow. | 4 | Munster | The administrative counties of: Clare, Cork, Kerry, Limerick, Tipperary North Riding, Tipperary South Riding and Waterford; and the county boroughs of: Cork, Limerick and Waterford. | 4"
+            },
+            "IT": {
+              "constituencies": 5,
+              "source": "it_law18",
+              "quote": "V Italia insulare (Sicilia - Sardegna) Palermo"
+            },
+            "LU": {
+              "constituencies": 1,
+              "source": "ep_w13",
+              "quote": "In nine Member States (Austria, Denmark, Spain, France, Greece, Luxembourg, the Netherlands, Portugal and Sweden) the whole country forms a single constituency."
+            },
+            "NL": {
+              "constituencies": 1,
+              "source": "ep_w13",
+              "quote": "In nine Member States (Austria, Denmark, Spain, France, Greece, Luxembourg, the Netherlands, Portugal and Sweden) the whole country forms a single constituency."
+            },
+            "PT": {
+              "constituencies": 1,
+              "source": "ep_w13",
+              "quote": "In nine Member States (Austria, Denmark, Spain, France, Greece, Luxembourg, the Netherlands, Portugal and Sweden) the whole country forms a single constituency."
+            },
+            "SE": {
+              "constituencies": 1,
+              "source": "ep_w13",
+              "quote": "In nine Member States (Austria, Denmark, Spain, France, Greece, Luxembourg, the Netherlands, Portugal and Sweden) the whole country forms a single constituency."
+            }
+          }
+        },
+        {
+          "year": 2007,
+          "contests": 2,
+          "regions": {
+            "BG": 1,
+            "RO": 1
+          },
+          "source": "eprs_2009",
+          "quote": "Bulgaria elected 18 MEPs on 20 May 2007 and Romania held the EP elections on 25 November 2007, electing 35 MEPs.",
+          "states": {
+            "BG": {
+              "constituencies": 1,
+              "source": "eprs_2014",
+              "quote": "The country, including voting stations outside Bulgaria, is a single multi-member constituency."
+            },
+            "RO": {
+              "constituencies": 1,
+              "source": "ro_law_33_2007",
+              "quote": "Pentru alegerea membrilor din România în Parlamentul European, teritoriul României constituie o singură circumscripție electorală."
+            }
+          }
+        },
+        {
+          "year": 2009,
+          "contests": 66,
+          "regions": {
+            "AT": 1,
+            "BE": 3,
+            "BG": 1,
+            "CY": 1,
+            "CZ": 1,
+            "DE": 1,
+            "DK": 1,
+            "EE": 1,
+            "ES": 1,
+            "FI": 1,
+            "FR": 8,
+            "GB": 12,
+            "GR": 1,
+            "HU": 1,
+            "IE": 4,
+            "IT": 5,
+            "LT": 1,
+            "LU": 1,
+            "LV": 1,
+            "MT": 1,
+            "NL": 1,
+            "PL": 13,
+            "PT": 1,
+            "RO": 1,
+            "SE": 1,
+            "SI": 1,
+            "SK": 1
+          },
+          "source": "eprs_2009",
+          "quote": "Four Member States (Belgium, France, Ireland and the United Kingdom) have divided their national territory into a number of regional constituencies.",
+          "states": {
+            "AT": {
+              "constituencies": 1,
+              "source": "eprs_2009",
+              "quote": "Four Member States (Belgium, France, Ireland and the United Kingdom) have divided their national territory into a number of regional constituencies."
+            },
+            "BE": {
+              "constituencies": 3,
+              "source": "be-1989",
+              "quote": "Art. 10. § 1er Il y a trois collèges électoraux: un collège français, un collège néerlandais et un collège germanophone.",
+              "note": "Counted by electoral college; the law's four constituencies are polling areas that feed the three colleges."
+            },
+            "BG": {
+              "constituencies": 1,
+              "source": "eprs_2009",
+              "quote": "Four Member States (Belgium, France, Ireland and the United Kingdom) have divided their national territory into a number of regional constituencies."
+            },
+            "CY": {
+              "constituencies": 1,
+              "source": "eprs_2009",
+              "quote": "Four Member States (Belgium, France, Ireland and the United Kingdom) have divided their national territory into a number of regional constituencies."
+            },
+            "CZ": {
+              "constituencies": 1,
+              "source": "eprs_2009",
+              "quote": "Four Member States (Belgium, France, Ireland and the United Kingdom) have divided their national territory into a number of regional constituencies."
+            },
+            "DE": {
+              "constituencies": 1,
+              "source": "euwg-2",
+              "quote": "Listenwahlvorschläge können für ein Land oder als gemeinsame Liste für alle Länder aufgestellt werden. … Jeder Wahlvorschlag erhält so viele Sitze, wie sich nach Teilung seiner gesamten Stimmen im Wahlgebiet durch einen Zuteilungsdivisor ergeben.",
+              "note": "The CDU/CSU's Land lists share one national seat allocation."
+            },
+            "DK": {
+              "constituencies": 1,
+              "source": "eprs_2009",
+              "quote": "Four Member States (Belgium, France, Ireland and the United Kingdom) have divided their national territory into a number of regional constituencies."
+            },
+            "EE": {
+              "constituencies": 1,
+              "source": "eprs_2009",
+              "quote": "Four Member States (Belgium, France, Ireland and the United Kingdom) have divided their national territory into a number of regional constituencies."
+            },
+            "ES": {
+              "constituencies": 1,
+              "source": "eprs_2009",
+              "quote": "Four Member States (Belgium, France, Ireland and the United Kingdom) have divided their national territory into a number of regional constituencies."
+            },
+            "FI": {
+              "constituencies": 1,
+              "source": "eprs_2009",
+              "quote": "Four Member States (Belgium, France, Ireland and the United Kingdom) have divided their national territory into a number of regional constituencies."
+            },
+            "FR": {
+              "constituencies": 8,
+              "source": "fr_an",
+              "quote": "Alors que le territoire de la République formait auparavant une circonscription électorale unique, la loi du 11 avril 2003 a créé huit circonscriptions interrégionales."
+            },
+            "GB": {
+              "constituencies": 12,
+              "source": "uk_2002",
+              "quote": "(a) [F3 the area of England and Gibraltar is] divided into the nine electoral regions specified in Schedule 1; and (b) Scotland, Wales and Northern Ireland are each single electoral regions.",
+              "note": "The 2002 Act as revised in 2004 was still in force in 2009."
+            },
+            "GR": {
+              "constituencies": 1,
+              "source": "eprs_2009",
+              "quote": "Four Member States (Belgium, France, Ireland and the United Kingdom) have divided their national territory into a number of regional constituencies."
+            },
+            "HU": {
+              "constituencies": 1,
+              "source": "eprs_2009",
+              "quote": "Four Member States (Belgium, France, Ireland and the United Kingdom) have divided their national territory into a number of regional constituencies."
+            },
+            "IE": {
+              "constituencies": 4,
+              "source": "ie_2009",
+              "quote": "Dublin | The counties of: Dún Laoghaire-Rathdown, Fingal and South Dublin; and the city of Dublin. | 3 | East | The counties of: Carlow, Kildare, Kilkenny, Laois, Louth, Meath, Offaly, Wexford and Wicklow. | 3 | North-West | The counties of: Cavan, Clare, Donegal, Galway, Leitrim, Longford, Mayo, Monaghan, Roscommon, Sligo and Westmeath; and the city of Galway. | 3 | South | The counties of: Cork, Kerry, Limerick, North Tipperary, South Tipperary and Waterford; and the cities of Cork, Limerick and Waterford. | 3"
+            },
+            "IT": {
+              "constituencies": 5,
+              "source": "it_law18",
+              "quote": "V Italia insulare (Sicilia - Sardegna) Palermo"
+            },
+            "LT": {
+              "constituencies": 1,
+              "source": "eprs_2009",
+              "quote": "Four Member States (Belgium, France, Ireland and the United Kingdom) have divided their national territory into a number of regional constituencies."
+            },
+            "LU": {
+              "constituencies": 1,
+              "source": "eprs_2009",
+              "quote": "Four Member States (Belgium, France, Ireland and the United Kingdom) have divided their national territory into a number of regional constituencies."
+            },
+            "LV": {
+              "constituencies": 1,
+              "source": "eprs_2009",
+              "quote": "Four Member States (Belgium, France, Ireland and the United Kingdom) have divided their national territory into a number of regional constituencies."
+            },
+            "MT": {
+              "constituencies": 1,
+              "source": "eprs_2009",
+              "quote": "Four Member States (Belgium, France, Ireland and the United Kingdom) have divided their national territory into a number of regional constituencies."
+            },
+            "NL": {
+              "constituencies": 1,
+              "source": "eprs_2009",
+              "quote": "Four Member States (Belgium, France, Ireland and the United Kingdom) have divided their national territory into a number of regional constituencies."
+            },
+            "PL": {
+              "constituencies": 13,
+              "source": "pl_senat",
+              "quote": "Zgodnie z ordynacją wyborczą w celu przeprowadzenia wyborów utworzonych było jednak 13 terytorialnych okręgów wyborczych"
+            },
+            "PT": {
+              "constituencies": 1,
+              "source": "eprs_2009",
+              "quote": "Four Member States (Belgium, France, Ireland and the United Kingdom) have divided their national territory into a number of regional constituencies."
+            },
+            "RO": {
+              "constituencies": 1,
+              "source": "eprs_2009",
+              "quote": "Four Member States (Belgium, France, Ireland and the United Kingdom) have divided their national territory into a number of regional constituencies."
+            },
+            "SE": {
+              "constituencies": 1,
+              "source": "eprs_2009",
+              "quote": "Four Member States (Belgium, France, Ireland and the United Kingdom) have divided their national territory into a number of regional constituencies."
+            },
+            "SI": {
+              "constituencies": 1,
+              "source": "eprs_2009",
+              "quote": "Four Member States (Belgium, France, Ireland and the United Kingdom) have divided their national territory into a number of regional constituencies."
+            },
+            "SK": {
+              "constituencies": 1,
+              "source": "eprs_2009",
+              "quote": "Four Member States (Belgium, France, Ireland and the United Kingdom) have divided their national territory into a number of regional constituencies."
+            }
+          }
+        },
+        {
+          "year": 2013,
+          "contests": 1,
+          "regions": {
+            "HR": 1
+          },
+          "source": "hr_sabor",
+          "quote": "The territory of the Republic of Croatia, including polling stations outside of its borders, shall constitute a single electoral unit.",
+          "states": {
+            "HR": {
+              "constituencies": 1,
+              "source": "hr_sabor",
+              "quote": "The territory of the Republic of Croatia, including polling stations outside of its borders, shall constitute a single electoral unit."
+            }
+          }
+        },
+        {
+          "year": 2014,
+          "contests": 66,
+          "regions": {
+            "AT": 1,
+            "BE": 3,
+            "BG": 1,
+            "CY": 1,
+            "CZ": 1,
+            "DE": 1,
+            "DK": 1,
+            "EE": 1,
+            "ES": 1,
+            "FI": 1,
+            "FR": 8,
+            "GB": 12,
+            "GR": 1,
+            "HR": 1,
+            "HU": 1,
+            "IE": 3,
+            "IT": 5,
+            "LT": 1,
+            "LU": 1,
+            "LV": 1,
+            "MT": 1,
+            "NL": 1,
+            "PL": 13,
+            "PT": 1,
+            "RO": 1,
+            "SE": 1,
+            "SI": 1,
+            "SK": 1
+          },
+          "source": "eprs_2014",
+          "quote": "Five Member States (Belgium, France, Ireland, Italy and the United Kingdom) have divided their national territory into a number of regional constituencies.",
+          "states": {
+            "AT": {
+              "constituencies": 1,
+              "source": "eprs_2014",
+              "quote": "Five Member States (Belgium, France, Ireland, Italy and the United Kingdom) have divided their national territory into a number of regional constituencies."
+            },
+            "BE": {
+              "constituencies": 3,
+              "source": "be-1989",
+              "quote": "Art. 10. § 1er Il y a trois collèges électoraux: un collège français, un collège néerlandais et un collège germanophone.",
+              "note": "Counted by electoral college; the law's four constituencies are polling areas that feed the three colleges."
+            },
+            "BG": {
+              "constituencies": 1,
+              "source": "eprs_2014",
+              "quote": "Five Member States (Belgium, France, Ireland, Italy and the United Kingdom) have divided their national territory into a number of regional constituencies."
+            },
+            "CY": {
+              "constituencies": 1,
+              "source": "eprs_2014",
+              "quote": "Five Member States (Belgium, France, Ireland, Italy and the United Kingdom) have divided their national territory into a number of regional constituencies."
+            },
+            "CZ": {
+              "constituencies": 1,
+              "source": "eprs_2014",
+              "quote": "Five Member States (Belgium, France, Ireland, Italy and the United Kingdom) have divided their national territory into a number of regional constituencies."
+            },
+            "DE": {
+              "constituencies": 1,
+              "source": "euwg-2",
+              "quote": "Listenwahlvorschläge können für ein Land oder als gemeinsame Liste für alle Länder aufgestellt werden. … Jeder Wahlvorschlag erhält so viele Sitze, wie sich nach Teilung seiner gesamten Stimmen im Wahlgebiet durch einen Zuteilungsdivisor ergeben.",
+              "note": "The CDU/CSU's Land lists share one national seat allocation."
+            },
+            "DK": {
+              "constituencies": 1,
+              "source": "eprs_2014",
+              "quote": "Five Member States (Belgium, France, Ireland, Italy and the United Kingdom) have divided their national territory into a number of regional constituencies."
+            },
+            "EE": {
+              "constituencies": 1,
+              "source": "eprs_2014",
+              "quote": "Five Member States (Belgium, France, Ireland, Italy and the United Kingdom) have divided their national territory into a number of regional constituencies."
+            },
+            "ES": {
+              "constituencies": 1,
+              "source": "eprs_2014",
+              "quote": "Five Member States (Belgium, France, Ireland, Italy and the United Kingdom) have divided their national territory into a number of regional constituencies."
+            },
+            "FI": {
+              "constituencies": 1,
+              "source": "eprs_2014",
+              "quote": "Five Member States (Belgium, France, Ireland, Italy and the United Kingdom) have divided their national territory into a number of regional constituencies."
+            },
+            "FR": {
+              "constituencies": 8,
+              "source": "fr_an",
+              "quote": "Alors que le territoire de la République formait auparavant une circonscription électorale unique, la loi du 11 avril 2003 a créé huit circonscriptions interrégionales."
+            },
+            "GB": {
+              "constituencies": 12,
+              "source": "ec_uk_2014",
+              "quote": "England was divided into nine electoral regions"
+            },
+            "GR": {
+              "constituencies": 1,
+              "source": "eprs_2014",
+              "quote": "Five Member States (Belgium, France, Ireland, Italy and the United Kingdom) have divided their national territory into a number of regional constituencies."
+            },
+            "HR": {
+              "constituencies": 1,
+              "source": "hr_sabor",
+              "quote": "The territory of the Republic of Croatia, including polling stations outside of its borders, shall constitute a single electoral unit."
+            },
+            "HU": {
+              "constituencies": 1,
+              "source": "eprs_2014",
+              "quote": "Five Member States (Belgium, France, Ireland, Italy and the United Kingdom) have divided their national territory into a number of regional constituencies."
+            },
+            "IE": {
+              "constituencies": 3,
+              "source": "ie_2014",
+              "quote": "Dublin | The counties of: Dun Laoghaire-Rathdown, Fingal and South Dublin; and the city of Dublin. | 3 | Midlands-North-West | The counties of: Cavan, Donegal, Galway, Kildare, Laois, Leitrim, Longford, Louth, Mayo, Meath, Monaghan, Offaly, Roscommon, Sligo and Westmeath; and the city of Galway. | 4 | South | The counties of: Carlow, Clare, Cork, Kerry, Kilkenny, Limerick, North Tipperary, South Tipperary, Waterford, Wexford and Wicklow; and the cities of Cork, Limerick and Waterford. | 4"
+            },
+            "IT": {
+              "constituencies": 5,
+              "source": "it_vademecum_2014",
+              "quote": "Ai fini dell’elezione dei 73 membri spettanti all’Italia, il territorio nazionale è diviso in cinque circoscrizioni territoriali"
+            },
+            "LT": {
+              "constituencies": 1,
+              "source": "eprs_2014",
+              "quote": "Five Member States (Belgium, France, Ireland, Italy and the United Kingdom) have divided their national territory into a number of regional constituencies."
+            },
+            "LU": {
+              "constituencies": 1,
+              "source": "eprs_2014",
+              "quote": "Five Member States (Belgium, France, Ireland, Italy and the United Kingdom) have divided their national territory into a number of regional constituencies."
+            },
+            "LV": {
+              "constituencies": 1,
+              "source": "eprs_2014",
+              "quote": "Five Member States (Belgium, France, Ireland, Italy and the United Kingdom) have divided their national territory into a number of regional constituencies."
+            },
+            "MT": {
+              "constituencies": 1,
+              "source": "eprs_2014",
+              "quote": "Five Member States (Belgium, France, Ireland, Italy and the United Kingdom) have divided their national territory into a number of regional constituencies."
+            },
+            "NL": {
+              "constituencies": 1,
+              "source": "eprs_2014",
+              "quote": "Five Member States (Belgium, France, Ireland, Italy and the United Kingdom) have divided their national territory into a number of regional constituencies."
+            },
+            "PL": {
+              "constituencies": 13,
+              "source": "pl_senat",
+              "quote": "Zgodnie z ordynacją wyborczą w celu przeprowadzenia wyborów utworzonych było jednak 13 terytorialnych okręgów wyborczych"
+            },
+            "PT": {
+              "constituencies": 1,
+              "source": "eprs_2014",
+              "quote": "Five Member States (Belgium, France, Ireland, Italy and the United Kingdom) have divided their national territory into a number of regional constituencies."
+            },
+            "RO": {
+              "constituencies": 1,
+              "source": "eprs_2014",
+              "quote": "Five Member States (Belgium, France, Ireland, Italy and the United Kingdom) have divided their national territory into a number of regional constituencies."
+            },
+            "SE": {
+              "constituencies": 1,
+              "source": "eprs_2014",
+              "quote": "Five Member States (Belgium, France, Ireland, Italy and the United Kingdom) have divided their national territory into a number of regional constituencies."
+            },
+            "SI": {
+              "constituencies": 1,
+              "source": "eprs_2014",
+              "quote": "Five Member States (Belgium, France, Ireland, Italy and the United Kingdom) have divided their national territory into a number of regional constituencies."
+            },
+            "SK": {
+              "constituencies": 1,
+              "source": "eprs_2014",
+              "quote": "Five Member States (Belgium, France, Ireland, Italy and the United Kingdom) have divided their national territory into a number of regional constituencies."
+            }
+          }
+        },
+        {
+          "year": 2019,
+          "contests": 59,
+          "regions": {
+            "AT": 1,
+            "BE": 3,
+            "BG": 1,
+            "CY": 1,
+            "CZ": 1,
+            "DE": 1,
+            "DK": 1,
+            "EE": 1,
+            "ES": 1,
+            "FI": 1,
+            "FR": 1,
+            "GB": 12,
+            "GR": 1,
+            "HR": 1,
+            "HU": 1,
+            "IE": 3,
+            "IT": 5,
+            "LT": 1,
+            "LU": 1,
+            "LV": 1,
+            "MT": 1,
+            "NL": 1,
+            "PL": 13,
+            "PT": 1,
+            "RO": 1,
+            "SE": 1,
+            "SI": 1,
+            "SK": 1
+          },
+          "source": "eprs_christie_2019",
+          "quote": "At the 2019 elections twenty-two Member States treated their territory as a single electoral constituency.",
+          "states": {
+            "AT": {
+              "constituencies": 1,
+              "source": "ep_ee19_at",
+              "quote": "Number of constituencies 1"
+            },
+            "BE": {
+              "constituencies": 3,
+              "source": "be-1989",
+              "quote": "Art. 10. § 1er Il y a trois collèges électoraux: un collège français, un collège néerlandais et un collège germanophone.",
+              "note": "Counted by electoral college; the law's four constituencies are polling areas that feed the three colleges."
+            },
+            "BG": {
+              "constituencies": 1,
+              "source": "ep_ee19_bg",
+              "quote": "Number of constituencies 1"
+            },
+            "CY": {
+              "constituencies": 1,
+              "source": "eprs_christie_2019",
+              "quote": "At the 2019 elections twenty-two Member States treated their territory as a single electoral constituency."
+            },
+            "CZ": {
+              "constituencies": 1,
+              "source": "eprs_christie_2019",
+              "quote": "At the 2019 elections twenty-two Member States treated their territory as a single electoral constituency."
+            },
+            "DE": {
+              "constituencies": 1,
+              "source": "euwg-2",
+              "quote": "Listenwahlvorschläge können für ein Land oder als gemeinsame Liste für alle Länder aufgestellt werden. … Jeder Wahlvorschlag erhält so viele Sitze, wie sich nach Teilung seiner gesamten Stimmen im Wahlgebiet durch einen Zuteilungsdivisor ergeben.",
+              "note": "The CDU/CSU's Land lists share one national seat allocation."
+            },
+            "DK": {
+              "constituencies": 1,
+              "source": "ep_ee19_dk",
+              "quote": "Number of constituencies 1"
+            },
+            "EE": {
+              "constituencies": 1,
+              "source": "eprs_christie_2019",
+              "quote": "At the 2019 elections twenty-two Member States treated their territory as a single electoral constituency."
+            },
+            "ES": {
+              "constituencies": 1,
+              "source": "ep_ee19_es",
+              "quote": "Number of constituencies 1"
+            },
+            "FI": {
+              "constituencies": 1,
+              "source": "eprs_christie_2019",
+              "quote": "At the 2019 elections twenty-two Member States treated their territory as a single electoral constituency."
+            },
+            "FR": {
+              "constituencies": 1,
+              "source": "eprs_christie_2019",
+              "quote": "At the 2019 elections twenty-two Member States treated their territory as a single electoral constituency."
+            },
+            "GB": {
+              "constituencies": 12,
+              "source": "ep_ee19_gb",
+              "quote": "Number of constituencies 12"
+            },
+            "GR": {
+              "constituencies": 1,
+              "source": "ep_ee19_gr",
+              "quote": "Number of constituencies 1"
+            },
+            "HR": {
+              "constituencies": 1,
+              "source": "eprs_christie_2019",
+              "quote": "At the 2019 elections twenty-two Member States treated their territory as a single electoral constituency."
+            },
+            "HU": {
+              "constituencies": 1,
+              "source": "ep_ee19_hu",
+              "quote": "Number of constituencies 1"
+            },
+            "IE": {
+              "constituencies": 3,
+              "source": "ep_ee19_ie",
+              "quote": "Number of constituencies 3"
+            },
+            "IT": {
+              "constituencies": 5,
+              "source": "eprs_christie_2019",
+              "quote": "DE is subdivided into 16 districts, IT 5, PL 13."
+            },
+            "LT": {
+              "constituencies": 1,
+              "source": "eprs_christie_2019",
+              "quote": "At the 2019 elections twenty-two Member States treated their territory as a single electoral constituency."
+            },
+            "LU": {
+              "constituencies": 1,
+              "source": "ep_ee19_lu",
+              "quote": "Number of constituencies 1"
+            },
+            "LV": {
+              "constituencies": 1,
+              "source": "eprs_christie_2019",
+              "quote": "At the 2019 elections twenty-two Member States treated their territory as a single electoral constituency."
+            },
+            "MT": {
+              "constituencies": 1,
+              "source": "eprs_christie_2019",
+              "quote": "At the 2019 elections twenty-two Member States treated their territory as a single electoral constituency."
+            },
+            "NL": {
+              "constituencies": 1,
+              "source": "ep_ee19_nl",
+              "quote": "Number of constituencies 1"
+            },
+            "PL": {
+              "constituencies": 13,
+              "source": "eprs_christie_2019",
+              "quote": "DE is subdivided into 16 districts, IT 5, PL 13."
+            },
+            "PT": {
+              "constituencies": 1,
+              "source": "eprs_christie_2019",
+              "quote": "At the 2019 elections twenty-two Member States treated their territory as a single electoral constituency."
+            },
+            "RO": {
+              "constituencies": 1,
+              "source": "eprs_christie_2019",
+              "quote": "At the 2019 elections twenty-two Member States treated their territory as a single electoral constituency."
+            },
+            "SE": {
+              "constituencies": 1,
+              "source": "eprs_christie_2019",
+              "quote": "At the 2019 elections twenty-two Member States treated their territory as a single electoral constituency."
+            },
+            "SI": {
+              "constituencies": 1,
+              "source": "eprs_christie_2019",
+              "quote": "At the 2019 elections twenty-two Member States treated their territory as a single electoral constituency."
+            },
+            "SK": {
+              "constituencies": 1,
+              "source": "eprs_christie_2019",
+              "quote": "At the 2019 elections twenty-two Member States treated their territory as a single electoral constituency."
+            }
+          }
+        },
+        {
+          "year": 2024,
+          "contests": 47,
+          "regions": {
+            "AT": 1,
+            "BE": 3,
+            "BG": 1,
+            "CY": 1,
+            "CZ": 1,
+            "DE": 1,
+            "DK": 1,
+            "EE": 1,
+            "ES": 1,
+            "FI": 1,
+            "FR": 1,
+            "GR": 1,
+            "HR": 1,
+            "HU": 1,
+            "IE": 3,
+            "IT": 5,
+            "LT": 1,
+            "LU": 1,
+            "LV": 1,
+            "MT": 1,
+            "NL": 1,
+            "PL": 13,
+            "PT": 1,
+            "RO": 1,
+            "SE": 1,
+            "SI": 1,
+            "SK": 1
+          },
+          "source": "ep_factsheet",
+          "quote": "However, four Member States (Belgium, Ireland, Italy and Poland) have divided their national territory into a number of regional constituencies.",
+          "states": {
+            "AT": {
+              "constituencies": 1,
+              "source": "ep_ee24_at",
+              "quote": "Number of constituencies: 1"
+            },
+            "BE": {
+              "constituencies": 3,
+              "source": "be-1989",
+              "quote": "Art. 10. § 1er Il y a trois collèges électoraux: un collège français, un collège néerlandais et un collège germanophone.",
+              "note": "Counted by electoral college; the law's four constituencies are polling areas that feed the three colleges."
+            },
+            "BG": {
+              "constituencies": 1,
+              "source": "ep_ee24_bg",
+              "quote": "Number of constituencies: 1"
+            },
+            "CY": {
+              "constituencies": 1,
+              "source": "ep_factsheet",
+              "quote": "However, four Member States (Belgium, Ireland, Italy and Poland) have divided their national territory into a number of regional constituencies."
+            },
+            "CZ": {
+              "constituencies": 1,
+              "source": "ep_factsheet",
+              "quote": "However, four Member States (Belgium, Ireland, Italy and Poland) have divided their national territory into a number of regional constituencies."
+            },
+            "DE": {
+              "constituencies": 1,
+              "source": "euwg-2",
+              "quote": "Listenwahlvorschläge können für ein Land oder als gemeinsame Liste für alle Länder aufgestellt werden. … Jeder Wahlvorschlag erhält so viele Sitze, wie sich nach Teilung seiner gesamten Stimmen im Wahlgebiet durch einen Zuteilungsdivisor ergeben.",
+              "note": "The CDU/CSU's Land lists share one national seat allocation."
+            },
+            "DK": {
+              "constituencies": 1,
+              "source": "ep_ee24_dk",
+              "quote": "Number of constituencies: 1"
+            },
+            "EE": {
+              "constituencies": 1,
+              "source": "ep_factsheet",
+              "quote": "However, four Member States (Belgium, Ireland, Italy and Poland) have divided their national territory into a number of regional constituencies."
+            },
+            "ES": {
+              "constituencies": 1,
+              "source": "ep_ee24_es",
+              "quote": "Number of constituencies: 1"
+            },
+            "FI": {
+              "constituencies": 1,
+              "source": "ep_factsheet",
+              "quote": "However, four Member States (Belgium, Ireland, Italy and Poland) have divided their national territory into a number of regional constituencies."
+            },
+            "FR": {
+              "constituencies": 1,
+              "source": "ep_factsheet",
+              "quote": "However, four Member States (Belgium, Ireland, Italy and Poland) have divided their national territory into a number of regional constituencies."
+            },
+            "GR": {
+              "constituencies": 1,
+              "source": "ep_ee24_gr",
+              "quote": "Number of constituencies: 1"
+            },
+            "HR": {
+              "constituencies": 1,
+              "source": "ep_ee24_hr",
+              "quote": "Number of constituencies: 1"
+            },
+            "HU": {
+              "constituencies": 1,
+              "source": "ep_factsheet",
+              "quote": "However, four Member States (Belgium, Ireland, Italy and Poland) have divided their national territory into a number of regional constituencies."
+            },
+            "IE": {
+              "constituencies": 3,
+              "source": "ep_ee24_ie",
+              "quote": "Number of constituencies: 3"
+            },
+            "IT": {
+              "constituencies": 5,
+              "source": "ep_ee24_it",
+              "quote": "Number of constituencies: 5"
+            },
+            "LT": {
+              "constituencies": 1,
+              "source": "ep_factsheet",
+              "quote": "However, four Member States (Belgium, Ireland, Italy and Poland) have divided their national territory into a number of regional constituencies."
+            },
+            "LU": {
+              "constituencies": 1,
+              "source": "ep_factsheet",
+              "quote": "However, four Member States (Belgium, Ireland, Italy and Poland) have divided their national territory into a number of regional constituencies."
+            },
+            "LV": {
+              "constituencies": 1,
+              "source": "ep_factsheet",
+              "quote": "However, four Member States (Belgium, Ireland, Italy and Poland) have divided their national territory into a number of regional constituencies."
+            },
+            "MT": {
+              "constituencies": 1,
+              "source": "ep_factsheet",
+              "quote": "However, four Member States (Belgium, Ireland, Italy and Poland) have divided their national territory into a number of regional constituencies."
+            },
+            "NL": {
+              "constituencies": 1,
+              "source": "ep_factsheet",
+              "quote": "However, four Member States (Belgium, Ireland, Italy and Poland) have divided their national territory into a number of regional constituencies."
+            },
+            "PL": {
+              "constituencies": 13,
+              "source": "ep_ee24_pl",
+              "quote": "Number of constituencies: 13"
+            },
+            "PT": {
+              "constituencies": 1,
+              "source": "ep_ee24_pt",
+              "quote": "Number of constituencies: 1"
+            },
+            "RO": {
+              "constituencies": 1,
+              "source": "ro_law_33_2007",
+              "quote": "Pentru alegerea membrilor din România în Parlamentul European, teritoriul României constituie o singură circumscripție electorală."
+            },
+            "SE": {
+              "constituencies": 1,
+              "source": "ep_ee24_se",
+              "quote": "Number of constituencies: 1"
+            },
+            "SI": {
+              "constituencies": 1,
+              "source": "ep_factsheet",
+              "quote": "However, four Member States (Belgium, Ireland, Italy and Poland) have divided their national territory into a number of regional constituencies."
+            },
+            "SK": {
+              "constituencies": 1,
+              "source": "ep_factsheet",
+              "quote": "However, four Member States (Belgium, Ireland, Italy and Poland) have divided their national territory into a number of regional constituencies."
+            }
+          }
+        }
+      ],
+      "by_contest": true,
+      "note": "Each member state's constituencies count as separate races. Belgium is counted by electoral college (Dutch-speaking, French-speaking, and, since 1994, German-speaking), because each college elects its own members."
     }
   ]
 }
