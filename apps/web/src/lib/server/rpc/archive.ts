@@ -6,7 +6,15 @@ import { call, ORPCError } from "@orpc/server";
 import { sql } from "drizzle-orm";
 import { createHash } from "node:crypto";
 import { existsSync } from "node:fs";
-import { mkdir, readdir, readFile, rename, rm, stat, writeFile } from "node:fs/promises";
+import {
+  mkdir,
+  readdir,
+  readFile,
+  rename,
+  rm,
+  stat,
+  writeFile,
+} from "node:fs/promises";
 import path from "node:path";
 import * as v from "valibot";
 import { m } from "#lib/paraglide/messages.js";
@@ -3617,22 +3625,18 @@ async function mosaic(input: { id: string; vs?: string; group: Grouping }) {
       const before = legend.map(() => null as number | null);
       for (const [index, column] of set.places.shares.entries()) {
         const value = column[i];
-        shares[at[index] ?? 0] =
-          value == null ? null : Math.round(value / 10);
+        shares[at[index] ?? 0] = value == null ? null : Math.round(value / 10);
       }
       for (const [index, column] of set.places.before.entries()) {
         const value = column[i];
-        before[at[index] ?? 0] =
-          value == null ? null : Math.round(value / 10);
+        before[at[index] ?? 0] = value == null ? null : Math.round(value / 10);
       }
       const leader = set.places.leader[i];
       const prior = set.places.prior[i];
       rows.push({
         k,
         name:
-          middle != null && set === sets[0]
-            ? (set.places.name[i] ?? "")
-            : "",
+          middle != null && set === sets[0] ? (set.places.name[i] ?? "") : "",
         valid: set.places.valid[i] ?? 0,
         leader: leader == null ? null : (at[leader] ?? null),
         prior: prior == null ? null : (at[prior] ?? null),
@@ -3702,11 +3706,13 @@ export async function rebuildMosaics(only?: Array<string>) {
   await mkdir(folder, { recursive: true });
   const listed =
     only ??
-    (await db.execute<{ id: string }>(sql`
+    (
+      await db.execute<{ id: string }>(sql`
       select c.id from contest c
       where c.allocation_parent_id is null
         and exists (select from contest k where k.allocation_parent_id = c.id offset 2)
-    `)).rows.map((row) => row.id);
+    `)
+    ).rows.map((row) => row.id);
   const ids = new Set(listed);
   if (only == null) {
     for (const name of await readdir(folder)) {
