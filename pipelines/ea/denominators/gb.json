@@ -27,6 +27,206 @@
       "title": "The Parliamentary Constituencies Order 2023 (SI 2023/1230)",
       "publisher": "legislation.gov.uk",
       "url": "https://www.legislation.gov.uk/uksi/2023/1230/made"
+    },
+    "bs-1995": {
+      "title": "Local government electoral arrangements in Scotland: 1995 onwards",
+      "publisher": "Boundaries Scotland",
+      "url": "https://www.boundaries.scot/wp-content/uploads/2026/03/Local_government_electoral_1995_onwards.pdf"
+    },
+    "senedd-lg": {
+      "title": "Local government in Wales: a timeline (Research paper 18-050)",
+      "publisher": "Senedd Research",
+      "url": "https://senedd.wales/media/e2laky1h/18-050-web-english.pdf"
+    },
+    "wsi-2012-686": {
+      "title": "The Isle of Anglesey (Local Government Elections) Order 2012 (SI 2012/686)",
+      "publisher": "legislation.gov.uk",
+      "url": "https://www.legislation.gov.uk/wsi/2012/686/pdfs/wsi_20120686_mi.pdf"
+    },
+    "cain-2014": {
+      "title": "Local Government Elections (NI) Thursday 22 May 2014",
+      "publisher": "CAIN, Ulster University",
+      "url": "https://www.cain.ulster.ac.uk/issues/politics/election/2014lg/rd2014.htm"
+    },
+    "ec-ni-2023": {
+      "title": "Report on the May 2023 local elections in Northern Ireland",
+      "publisher": "Electoral Commission",
+      "url": "https://www.electoralcommission.org.uk/research-reports-and-data/our-reports-and-data-past-elections-and-referendums/report-may-2023-local-elections-northern-ireland"
+    },
+    "ni-1973": {
+      "title": "CAIN: Politics: Elections: Results of Elections Held in Northern Ireland Since 1968",
+      "publisher": "CAIN, Ulster University",
+      "url": "https://www.cain.ulster.ac.uk/issues/politics/election/elect.htm"
+    },
+    "ni-1977": {
+      "title": "Local Government Elections (NI) Wednesday 18 May 1977",
+      "publisher": "CAIN, Ulster University",
+      "url": "https://cain.ulster.ac.uk/issues/politics/election/rd1977.htm"
+    },
+    "ni-1981": {
+      "title": "CAIN: Politics: Elections: Results of Elections Held in Northern Ireland Since 1968",
+      "publisher": "CAIN, Ulster University",
+      "url": "https://www.cain.ulster.ac.uk/issues/politics/election/elect.htm"
+    },
+    "ni-1985": {
+      "title": "CAIN: Politics: Elections: Local Government Election (NI) Wednesday 15 May 1985",
+      "publisher": "CAIN, Ulster University",
+      "url": "https://www.cain.ulster.ac.uk/issues/politics/election/rd1985.htm"
+    },
+    "ni-1989": {
+      "title": "CAIN: Politics: Elections: Local Government Election (NI) Wednesday 17 May 1989",
+      "publisher": "CAIN, Ulster University",
+      "url": "https://www.cain.ulster.ac.uk/issues/politics/election/rd1989.htm"
+    },
+    "ni-1993": {
+      "title": "Local Government Elections 1993",
+      "publisher": "ARK (Access Research Knowledge), Queen's University Belfast, Nicholas Whyte",
+      "url": "https://www.ark.ac.uk/elections/flg93.htm"
+    },
+    "ni-1997": {
+      "title": "Local Government Elections 1997",
+      "publisher": "ARK (Access Research Knowledge), Queen's University Belfast, Nicholas Whyte",
+      "url": "https://www.ark.ac.uk/elections/flg97.htm"
+    },
+    "ni-2001": {
+      "title": "Local Government Elections 2001",
+      "publisher": "ARK (Access Research Knowledge), Queen's University Belfast, Nicholas Whyte",
+      "url": "https://www.ark.ac.uk/elections/flg01.htm"
+    },
+    "ni-2005": {
+      "title": "Local Government Elections 2005",
+      "publisher": "ARK (Access Research Knowledge), Queen's University Belfast, Nicholas Whyte",
+      "url": "https://www.ark.ac.uk/elections/flg05.htm"
+    },
+    "ni-2011": {
+      "title": "Local Government Elections 2011",
+      "publisher": "ARK (Access Research Knowledge), Queen's University Belfast, Nicholas Whyte",
+      "url": "https://www.ark.ac.uk/elections/flg11.htm"
+    },
+    "ark-2019": {
+      "title": "Northern Ireland Elections",
+      "publisher": "ARK (Access Research Knowledge)",
+      "url": "https://www.ark.ac.uk/elections/"
+    },
+    "leh-2002": {
+      "title": "Local Elections Handbook 2002",
+      "publisher": "Colin Rallings and Michael Thrasher, The Elections Centre (LGC Elections Centre, University of Plymouth)",
+      "url": "https://www.electionscentre.co.uk/wp-content/uploads/2015/07/Local-Elections-Handbook-2002-complete.pdf"
+    },
+    "leh-2003": {
+      "title": "Local Elections Handbook 2003",
+      "publisher": "Colin Rallings and Michael Thrasher, The Elections Centre (LGC Elections Centre, University of Plymouth)",
+      "url": "https://www.electionscentre.co.uk/wp-content/uploads/2015/07/Local-Elections-Handbook-2003-complete.pdf"
+    },
+    "leh-2004": {
+      "title": "Local Elections Handbook 2004",
+      "publisher": "Colin Rallings and Michael Thrasher, The Elections Centre (LGC Elections Centre, University of Plymouth)",
+      "url": "https://www.electionscentre.co.uk/wp-content/uploads/2015/07/Local-Elections-Handbook-2004-complete.pdf"
+    },
+    "leh-2005": {
+      "title": "Local Elections Handbook 2005",
+      "publisher": "Colin Rallings and Michael Thrasher, The Elections Centre (LGC Elections Centre, University of Plymouth)",
+      "url": "https://www.electionscentre.co.uk/wp-content/uploads/2015/07/Local-Elections-Handbook-2005-complete.pdf"
+    },
+    "leh-2006": {
+      "title": "Local Elections Handbook 2006",
+      "publisher": "Colin Rallings and Michael Thrasher, The Elections Centre (LGC Elections Centre, University of Plymouth)",
+      "url": "http://www.electionscentre.co.uk/wp-content/uploads/2015/07/Local-Elections-Handbook-2006-complete.pdf"
+    },
+    "leh-2007": {
+      "title": "Local Elections Handbook 2007",
+      "publisher": "Colin Rallings and Michael Thrasher, The Elections Centre (LGC Elections Centre, University of Plymouth)",
+      "url": "http://www.electionscentre.co.uk/wp-content/uploads/2015/07/Local-Elections-Handbook-2007-complete.pdf"
+    },
+    "leh-2008": {
+      "title": "Local Elections Handbook 2008",
+      "publisher": "Colin Rallings and Michael Thrasher, The Elections Centre (LGC Elections Centre, University of Plymouth)",
+      "url": "https://www.electionscentre.co.uk/wp-content/uploads/2015/07/Local-Elections-Handbook-2008complete.pdf"
+    },
+    "leh-2009": {
+      "title": "Local Elections Handbook 2009",
+      "publisher": "Colin Rallings and Michael Thrasher, The Elections Centre (LGC Elections Centre, University of Plymouth)",
+      "url": "https://www.electionscentre.co.uk/wp-content/uploads/2015/07/Local-Elections-Handbook-2009-complete.pdf"
+    },
+    "leh-2010": {
+      "title": "Local Elections Handbook 2010",
+      "publisher": "Colin Rallings and Michael Thrasher, The Elections Centre (LGC Elections Centre, University of Plymouth)",
+      "url": "https://www.electionscentre.co.uk/wp-content/uploads/2015/07/Local-Elections-Handbook-2010-complete.pdf"
+    },
+    "leh-2011": {
+      "title": "Local Elections Handbook 2011",
+      "publisher": "Colin Rallings and Michael Thrasher, The Elections Centre (LGC Elections Centre, University of Plymouth)",
+      "url": "https://www.electionscentre.co.uk/wp-content/uploads/2015/07/Local-Elections-Handbook-2011-complete.pdf"
+    },
+    "ec-2012": {
+      "title": "Results and turnout at the 2012 Greater London Authority elections (summary of the Rallings and Thrasher local elections report)",
+      "publisher": "Electoral Commission",
+      "url": "https://www.electoralcommission.org.uk/research-reports-and-data/our-reports-and-data-past-elections-and-referendums/results-and-turnout-2012-greater-london-authority-elections"
+    },
+    "hocl-2013": {
+      "title": "Local Elections 2013 (RP 13/30)",
+      "publisher": "House of Commons Library",
+      "url": "https://commonslibrary.parliament.uk/research-briefings/rp13-30/"
+    },
+    "hocl-2014": {
+      "title": "Local elections 2014 (RP 14/33)",
+      "publisher": "House of Commons Library",
+      "url": "https://commonslibrary.parliament.uk/research-briefings/rp14-33/"
+    },
+    "ec-2015": {
+      "title": "Local Elections in England May 2015 (including Mayoral elections)",
+      "publisher": "Colin Rallings and Michael Thrasher, The Elections Centre, published by the Electoral Commission",
+      "url": "https://www.electoralcommission.org.uk/sites/default/files/pdf_file/Plymouth-locals-electoral-data-report-final-WEB.pdf"
+    },
+    "hocl-2016": {
+      "title": "Local Elections 2016 (CBP 7596)",
+      "publisher": "House of Commons Library",
+      "url": "https://commonslibrary.parliament.uk/research-briefings/cbp-7596/"
+    },
+    "ec-2017": {
+      "title": "Local Elections in England, May 2017",
+      "publisher": "Electoral Commission",
+      "url": "https://www.electoralcommission.org.uk/sites/default/files/pdf_file/May-2017-England-locals-electoral-data-report.pdf"
+    },
+    "hocl-2018": {
+      "title": "Local Elections 2018 (CBP 8306)",
+      "publisher": "House of Commons Library",
+      "url": "https://commonslibrary.parliament.uk/research-briefings/cbp-8306/"
+    },
+    "leh-2019": {
+      "title": "Local Elections Handbook 2019",
+      "publisher": "Colin Rallings and Michael Thrasher, The Elections Centre",
+      "url": "https://www.electionscentre.co.uk/wp-content/uploads/2021/02/LEH2019-complete.pdf"
+    },
+    "hocl-2021": {
+      "title": "May 2021 local elections (Briefing Paper CBP 9228)",
+      "publisher": "House of Commons Library",
+      "url": "https://commonslibrary.parliament.uk/research-briefings/cbp-9228/"
+    },
+    "hocl-2022": {
+      "title": "Local Elections 2022: Results and analysis (CBP 9545)",
+      "publisher": "House of Commons Library",
+      "url": "https://commonslibrary.parliament.uk/research-briefings/cbp-9545/"
+    },
+    "hocl-2023": {
+      "title": "2023 Local Elections Handbook and dataset",
+      "publisher": "House of Commons Library",
+      "url": "https://commonslibrary.parliament.uk/2023-local-elections-handbook-and-dataset/"
+    },
+    "hocl-2024": {
+      "title": "2024 Local Elections Handbook and dataset",
+      "publisher": "House of Commons Library",
+      "url": "https://commonslibrary.parliament.uk/2024-local-elections-handbook-and-dataset/"
+    },
+    "hocl-2025": {
+      "title": "Local elections 2025: Results and analysis (CBP 10272)",
+      "publisher": "House of Commons Library",
+      "url": "https://commonslibrary.parliament.uk/research-briefings/cbp-10272/"
+    },
+    "ec-2026": {
+      "title": "Report on the 2026 England mayoral and local government elections",
+      "publisher": "Electoral Commission",
+      "url": "https://www.electoralcommission.org.uk/sites/default/files/2026-09/Report%20on%20the%202026%20England%20mayoral%20and%20local%20government%20elections.pdf"
     }
   },
   "levels": [
@@ -1157,11 +1357,237 @@
       "gaps": [
         {
           "from": 1973,
-          "to": 2026,
-          "note": "No official count of the councils holding elections each year has been compiled yet."
+          "to": 2001,
+          "note": "Before 2002, only Northern Ireland's council elections are counted. Counts of the councils that voted each year in England, Scotland, and Wales before 2002 haven't been compiled yet."
         }
       ],
-      "elections": []
+      "elections": [
+        {
+          "date": "1973-05-30",
+          "contests": 26,
+          "source": "ni-1973",
+          "quote": "1973 Local Government Election (Wednesday 30 May 1973)",
+          "note": "Northern Ireland's 26 district councils."
+        },
+        {
+          "date": "1977-05-18",
+          "contests": 26,
+          "source": "ni-1977",
+          "quote": "The elections were held to elect 526 councillors to the 26 District Councils of Northern Ireland.",
+          "note": "Northern Ireland's 26 district councils."
+        },
+        {
+          "date": "1981-05-20",
+          "contests": 26,
+          "source": "ni-1981",
+          "quote": "1981 Local Government Election (Wednesday 20 May 1981)",
+          "note": "Northern Ireland's 26 district councils."
+        },
+        {
+          "date": "1985-05-15",
+          "contests": 26,
+          "source": "ni-1985",
+          "quote": "The elections on 15 May 1985 were held to elect 566 councilors to the 26 District Councils of Northern Ireland.",
+          "note": "Northern Ireland's 26 district councils."
+        },
+        {
+          "date": "1989-05-17",
+          "contests": 26,
+          "source": "ni-1989",
+          "quote": "The following is a first draft (v1) of the results of the 1989 District Council (local government) elections held in Northern Ireland on Wednesday 17 May 1989.",
+          "note": "Northern Ireland's 26 district councils."
+        },
+        {
+          "date": "1993-05-19",
+          "contests": 26,
+          "source": "ni-1993",
+          "quote": "The elections for Northern Ireland's 26 local councils took place on 19 May 1993.",
+          "note": "Northern Ireland's 26 district councils."
+        },
+        {
+          "date": "1997-05-21",
+          "contests": 26,
+          "source": "ni-1997",
+          "quote": "The elections for Northern Ireland's 26 local councils took place on May 21, 1997",
+          "note": "Northern Ireland's 26 district councils."
+        },
+        {
+          "date": "2001-06-07",
+          "contests": 26,
+          "source": "ni-2001",
+          "quote": "The elections for Northern Ireland's 26 local councils took place on 7 June, 2001",
+          "note": "Northern Ireland's 26 district councils."
+        },
+        {
+          "date": "2002-05-02",
+          "contests": 174,
+          "source": "leh-2002",
+          "quote": "The headline figures, shown in Table 1, show that there were elections for 5,914 seats in 3,342 wards across 174 councils in England.",
+          "note": "England 174. Academic research centre, not an official source. No Commons Library or Electoral Commission count for 2002 was found."
+        },
+        {
+          "date": "2003-05-01",
+          "contests": 340,
+          "source": "leh-2003",
+          "quote": "In 2003 there were elections in England for a total of 308 local authorities comprising 36 metropolitan boroughs, 40 unitary councils and 232 shire district councils.",
+          "note": "England 308; Scotland 32 (Boundaries Scotland: 'The Local Government etc. (Scotland) Act 1994 created the 32 single-tier local government areas that cover Scotland.'). Academic research centre, not an official source."
+        },
+        {
+          "date": "2004-06-10",
+          "contests": 166,
+          "source": "leh-2004",
+          "quote": "Local elections in 2004 were held in England for the 36 metropolitan boroughs, for 89 shire districts and 19 unitary councils.",
+          "note": "England 144; Wales 22 (Senedd Research: 'A single tier of 22 unitary authorities was created'). Count is the sum of the three categories in the quoted sentence (36 + 89 + 19). Election held 10 June 2004 alongside the European Parliament election. Academic research centre, not an official source."
+        },
+        {
+          "date": "2005-05-05",
+          "contests": 63,
+          "source": "leh-2005",
+          "quote": "Local elections in 2005 were held in England for 34 county and 3 unitary councils.",
+          "note": "England 37; Northern Ireland 26 (ni-2005: 'The elections for Northern Ireland's 26 local councils took place on 5 May, 2005'). Count is the sum of the two categories in the quoted sentence (34 + 3). The handbook's Using the Handbook section repeats the 37 figure but labels it 2004, which looks like a typo. Academic research centre, not an official source."
+        },
+        {
+          "date": "2006-05-04",
+          "contests": 176,
+          "source": "leh-2006",
+          "quote": "In 2006 there were elections in England for a total of 176 local authorities comprising 32 London boroughs, 36 metropolitan boroughs, 20 unitary authorities and 88 shire districts.",
+          "note": "England 176. Academic research centre, not an official source. The same count appears in Rallings and Thrasher, Representation (2006)."
+        },
+        {
+          "date": "2007-05-03",
+          "contests": 344,
+          "source": "leh-2007",
+          "quote": "In England, 312 local authorities held elections, the majority of which were of the whole council.",
+          "note": "England 312; Scotland 32 (Boundaries Scotland: 'The Local Government etc. (Scotland) Act 1994 created the 32 single-tier local government areas that cover Scotland.'). Academic research centre, not an official source. The handbook's introduction says England and Scotland voted on 3 May 2007."
+        },
+        {
+          "date": "2008-05-01",
+          "contests": 159,
+          "source": "leh-2008",
+          "quote": "In 2008 there were elections in England for a total of 137 local authorities comprising 36 metropolitan boroughs, 19 current and 4 ‘shadow’ unitary authorities and 78 shire districts.",
+          "note": "England 137; Wales 22 (Senedd Research: 'A single tier of 22 unitary authorities was created'). Academic research centre, not an official source."
+        },
+        {
+          "date": "2009-06-04",
+          "contests": 34,
+          "source": "leh-2009",
+          "quote": "In 2009 there were elections in England for a total of 34 local authorities comprising 27 counties and 7 unitary authorities, three of which, Cornwall, Shropshire and Wiltshire, were replacing former counties.",
+          "note": "England 34. Held 4 June 2009 alongside the European Parliament election. Academic research centre, not an official source."
+        },
+        {
+          "date": "2010-05-06",
+          "contests": 164,
+          "source": "leh-2010",
+          "quote": "In 2010 there were elections in England for a total of 164 local authorities comprising 32 London boroughs, 36 metropolitan boroughs, 20 unitary authorities and 76 shire districts.",
+          "note": "England 164. Academic research centre, not an official source. The House of Commons Library briefing Local elections 2010 (rp10-44, https://commonslibrary.parliament.uk/research-briefings/rp10-44/) lists the same categories (32 + 36 + 20 + 76 = 164) but states no total."
+        },
+        {
+          "date": "2011-05-05",
+          "contests": 305,
+          "source": "leh-2011",
+          "quote": "In 2011 there were elections in England for a total of 279 local authorities comprising 36 metropolitan boroughs, 49 unitary authorities and 194 shire districts.",
+          "note": "England 279; Northern Ireland 26 (ni-2011: 'The elections for Northern Ireland's 26 local councils took place on 5 May, 2011'). Academic research centre, not an official source. The same date is the UK referendum on voting reform."
+        },
+        {
+          "date": "2012-05-03",
+          "contests": 181,
+          "source": "ec-2012",
+          "quote": "Local elections were held for just under 2,400 seats in 128 authorities in England.",
+          "note": "England 128; Scotland 32 (Boundaries Scotland: 'The Local Government etc. (Scotland) Act 1994 created the 32 single-tier local government areas that cover Scotland.'); Wales 21 (22 unitary authorities less Anglesey, postponed to 2013 by SI 2012/686). Conflict: the Electoral Commission's Local elections and referendums in England 2012 report (July 2012, https://www.markpack.org.uk/files/2016/05/Electoral-Commission-Report-Into-May-2012-Elections.pdf, hosted copy) states 'On 3 May 2012 there were local elections to 103 local authorities in England.' The House of Commons Library briefing SN06194 (January 2012) gives 128 before the poll. The 128 figure is used here; the 103 figure is unexplained and should be checked against the report's data."
+        },
+        {
+          "date": "2013-05-02",
+          "contests": 35,
+          "source": "hocl-2013",
+          "quote": "Elections were held in all 27 shire counties in England (all seats) and seven English unitary authorities",
+          "note": "England 34; Wales 1 (the Isle of Anglesey, per the same Commons Library paper). Count is the sum of 27 county councils and 7 unitary authorities named in the briefing. Wikipedia's figure of 35 includes one Welsh council (Anglesey), which is excluded here."
+        },
+        {
+          "date": "2014-05-22",
+          "contests": 172,
+          "source": "hocl-2014",
+          "quote": "In England, elections were held in all 32 London boroughs, 36 metropolitan boroughs, 19 unitary authorities, and 74 shire districts.",
+          "note": "England 161; Northern Ireland 11 (cain-2014: 'held to choose 462 councillors for the new 11 District Councils in Northern Ireland.'). Count is the sum of the four categories in the quoted sentence (32 + 36 + 19 + 74). The Electoral Commission's report on the 22 May 2014 elections says local elections covered 'approximately one third of English local authority areas', which is not a count."
+        },
+        {
+          "date": "2015-05-07",
+          "contests": 279,
+          "source": "ec-2015",
+          "quote": "Local elections were held for just over 9,200 seats in 279 authorities in England.",
+          "note": "England 279. The Electoral Commission's 2015 UK general election administration report gives the 7 May 2015 English local authority areas as 36 metropolitan boroughs, 194 district authorities and 49 unitary authorities, which sums to 279."
+        },
+        {
+          "date": "2016-05-05",
+          "contests": 124,
+          "source": "hocl-2016",
+          "quote": "Local elections were held for 2,782 seats on 124 local councils in England on 5 May 2016.",
+          "note": "England 124. Components in the briefing: 70 district councils, 19 unitary authorities, and 35 metropolitan boroughs (sums to 124)."
+        },
+        {
+          "date": "2017-05-04",
+          "contests": 88,
+          "source": "ec-2017",
+          "quote": "Local elections were scheduled in 27 counties and seven unitary and metropolitan authorities on 4 May 2017.",
+          "note": "England 34; Scotland 32 (Boundaries Scotland: 'The Local Government etc. (Scotland) Act 1994 created the 32 single-tier local government areas that cover Scotland.'); Wales 22 (Senedd Research: 'A single tier of 22 unitary authorities was created'). Commons Library Local Elections 2017 (CBP 7975, https://commonslibrary.parliament.uk/research-briefings/cbp-7975/) gives 27 county councils, 6 unitary authorities, and 1 metropolitan borough in England, which also sums to 34."
+        },
+        {
+          "date": "2018-05-03",
+          "contests": 150,
+          "source": "hocl-2018",
+          "quote": "Elections were held for 4,404 seats in 150 local councils in England on 3 May 2018.",
+          "note": "England 150. The Electoral Commission's Results and turnout 2018 May England local elections report gives 67 district, 17 unitary, 34 metropolitan, and 32 London borough councils, which also sums to 150."
+        },
+        {
+          "date": "2019-05-02",
+          "contests": 259,
+          "source": "leh-2019",
+          "quote": "In 2019 there were elections in England for a total of 248 local authorities comprising 33 Metropolitan boroughs, 47 Unitary councils and 168 shire district councils.",
+          "note": "England 248; Northern Ireland 11 (ark-2019: 'The 11 District Councils.'). Academic research centre, not an official source. No Commons Library or Electoral Commission total for 2019 was found in the search."
+        },
+        {
+          "date": "2021-05-06",
+          "contests": 143,
+          "source": "hocl-2021",
+          "quote": "143 councils in England held local elections on 6 May 2021, along with some that held by-elections to fill seats that had fallen vacant.",
+          "note": "England 143. The election was held on 6 May 2021, not in June as the brief stated. The Elections Centre Local Elections Handbook 2021 gives the same total (143 = 21 county + 28 unitary + 35 metropolitan + 59 district)."
+        },
+        {
+          "date": "2022-05-05",
+          "contests": 200,
+          "source": "hocl-2022",
+          "quote": "England held elections in 146 councils, while all 32 councils in Scotland and 22 Welsh councils were up for election.",
+          "note": "England 146; Scotland 32 (Boundaries Scotland: 'The Local Government etc. (Scotland) Act 1994 created the 32 single-tier local government areas that cover Scotland.'); Wales 22 (Senedd Research: 'A single tier of 22 unitary authorities was created'). Conflict: the Electoral Commission's Report on the May 2022 local elections in England (https://www.electoralcommission.org.uk/research-reports-and-data/our-reports-and-data-past-elections-and-referendums/report-may-2022-local-elections-england) says 'Elections took place in 165 local authorities in England'. The Commons Library and the Elections Centre handbook (32 + 33 + 21 + 60 = 146) agree on 146, so 146 is used here."
+        },
+        {
+          "date": "2023-05-04",
+          "contests": 241,
+          "source": "hocl-2023",
+          "quote": "Elections were held in 230 councils in England on 4 May 2023.",
+          "note": "England 230; Northern Ireland 11 (ec-ni-2023: 'A total of 807 candidates contested 462 seats across the 11 councils in Northern Ireland.'). The same page gives 152 district councils, 32 metropolitan districts, and 46 unitary authorities, which sums to 230."
+        },
+        {
+          "date": "2024-05-02",
+          "contests": 107,
+          "source": "hocl-2024",
+          "quote": "In 2024 there were elections for a total of 107 local authorities across England.",
+          "note": "England 107"
+        },
+        {
+          "date": "2025-05-01",
+          "contests": 23,
+          "source": "hocl-2025",
+          "quote": "On 1 May 2025, local elections were held in 23 of England's councils.",
+          "note": "England 23. The 2025 cycle was reduced because the government postponed nine county council elections to 2026. The Electoral Commission's Report on the May 2025 local elections in England gives 14 county councils, eight unitary authorities, and one metropolitan borough, which also sums to 23."
+        },
+        {
+          "date": "2026-05-07",
+          "contests": 136,
+          "source": "ec-2026",
+          "quote": "In England, scheduled elections were held for 136 authorities with metropolitan, unitary, district, London borough and county council elections taking place.",
+          "note": "England 136. Published 14 September 2026. The Commons Library has not yet published a 2026 local elections briefing that was found in the search."
+        }
+      ],
+      "note": "Counted per council: each council that held its scheduled elections on the year's local polling day counts once, whether it elected every member or a third of them. By-elections don't count. England's figures come from the House of Commons Library, the Electoral Commission, and the Elections Centre's Local Elections Handbooks; Scotland's 32 councils, Wales's 22, and Northern Ireland's 26 (11 from 2014) are added in the years they voted. In 2012 Wales counts 21, because Anglesey's election was moved to 2013."
     },
     {
       "key": "referendums",

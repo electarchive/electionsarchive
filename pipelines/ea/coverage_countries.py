@@ -27,7 +27,7 @@ with recursive t(id) as (
     union select pp.polity_id from polity_parent pp join t on pp.parent_id = t.id
 )
 select c.id::text, e.id::text, e.date_from, e.kind::text, coalesce(b.kind::text, o.kind::text, c.kind::text),
-    op.iso_code, ep.iso_code, c.default_result_kind = 'tacit', c.district_area_id::text, a.scheme_code,
+    op.iso_code, ep.iso_code, c.default_result_kind in ('tacit', 'show_of_hands'), c.district_area_id::text, a.scheme_code,
     coalesce(b.polity_id, o.polity_id, e.polity_id)::text
 from contest c
 join election e on e.id = c.election_id
@@ -298,6 +298,8 @@ def tally(cc: str, data: dict) -> tuple[dict, list[dict], list[dict]]:
             day = row[2]
             if by_year:
                 slot = str(day.year)
+                if level.get("cycle"):
+                    slot = next((y for y in sorted(slots) if int(y) >= day.year), slot)
             else:
                 near = min(dates, key=lambda d: abs(d[0] - day), default=None)
                 slot = near[1] if near is not None and abs(near[0] - day) <= WINDOW else day.isoformat()
