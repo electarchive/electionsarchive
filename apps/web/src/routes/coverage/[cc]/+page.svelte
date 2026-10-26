@@ -382,12 +382,15 @@
   shown: Counts,
   goal: Goal,
   isWeighted: boolean,
+  tierKey: string,
 )}
   <ul class="grid gap-y-2 text-sm">
     {#each REASONS[goal].filter((reason) => reason === "complete" || shown[reason] > 0) as reason (reason)}
       {const definition = $derived(
         (reason === "complete"
-          ? (isUs ? COMPLETE : COUNTRY_COMPLETE)[goal]
+          ? isUs && goal === "history" && tierKey === "legislative"
+            ? m.coverage_reason_complete_district_def
+            : (isUs ? COMPLETE : COUNTRY_COMPLETE)[goal]
           : !isUs
             ? COUNTRY_REASONS[reason]
             : reason === "absent" && goal === "local"
@@ -481,7 +484,7 @@
       class="block-3"
     />
     <div class="hidden pbs-1 md:block">
-      {@render legend(counts, shown, goal, isWeighted)}
+      {@render legend(counts, shown, goal, isWeighted, tierKey)}
     </div>
     <details class="group md:hidden">
       <summary
@@ -493,7 +496,7 @@
         {m.coverage_legend()}
       </summary>
       <div class="pbs-2">
-        {@render legend(counts, shown, goal, isWeighted)}
+        {@render legend(counts, shown, goal, isWeighted, tierKey)}
       </div>
     </details>
     {#if isUs && goal === "history" && tierKey !== "legislative"}
