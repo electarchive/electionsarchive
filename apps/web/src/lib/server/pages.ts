@@ -2,6 +2,7 @@ import { call, ORPCError } from "@orpc/server";
 import { error, redirect } from "@sveltejs/kit";
 import { sql } from "drizzle-orm";
 import { effective, stand } from "#lib/caucus.js";
+import { headline } from "#lib/coverage.js";
 import { db } from "#lib/server/db/index.js";
 import { latest } from "#lib/server/rpc/archive.js";
 import { router } from "#lib/server/rpc/router.js";
@@ -200,12 +201,23 @@ export async function coverage(polity: string, search: URLSearchParams) {
   );
   const isFlat =
     polity !== "us" && Object.keys(goals.summary.regions).length === 0;
-  const gaps = await call(router.coverage.gaps, {
-    polity,
-    goal: polity === "us" ? "county" : "national",
-    state: isFlat ? "" : undefined,
-    current: isCurrent,
-  });
+  const gaps = Object.fromEntries(
+    await Promise.all(
+      goals.tiers.map(
+        async (tier) =>
+          [
+            tier.key,
+            await call(router.coverage.gaps, {
+              polity,
+              goal: headline(polity, tier.key).goal,
+              tier: tier.key,
+              state: isFlat ? "" : undefined,
+              current: isCurrent,
+            }),
+          ] as const,
+      ),
+    ),
+  );
   return {
     kind: "coverage" as const,
     polity,

@@ -22,13 +22,130 @@ export type UsGoal = (typeof GOALS)[number];
 export type CountryGoal = (typeof COUNTRY_GOALS)[number];
 export type Goal = UsGoal | CountryGoal;
 
-export function isGoal(goal: string): goal is UsGoal {
-  return (GOALS as ReadonlyArray<string>).includes(goal);
+export const US_TIERS = {
+  federal: ["president", "us_senate", "us_house"],
+  statewide: ["governor", "statewide_exec", "judicial", "statewide_measure"],
+  legislative: ["state_upper", "state_lower"],
+  local: [
+    "county",
+    "municipality",
+    "township",
+    "school",
+    "college",
+    "special",
+    "other",
+  ],
+  turnout: ["general", "primary", "runoff", "referendum"],
+} as const;
+export const COUNTRY_TIERS = [
+  "national",
+  "subnational",
+  "local",
+  "referendums",
+  "ep",
+] as const;
+export type UsTier = keyof typeof US_TIERS;
+export type CountryTier = (typeof COUNTRY_TIERS)[number];
+export type Tier = UsTier | CountryTier;
+
+export const US_COLUMNS = [
+  "before_any",
+  "before_county",
+  "before_shapes",
+  "since_any",
+  "since_county",
+  "since_precinct",
+  "since_shapes",
+] as const;
+export const COUNTRY_COLUMNS = [
+  "any",
+  "constituency",
+  "fine",
+  "shapes",
+] as const;
+export type Column =
+  | (typeof US_COLUMNS)[number]
+  | (typeof COUNTRY_COLUMNS)[number]
+  | "before"
+  | "since";
+
+export const TIER_LABELS: Record<Tier, () => string> = {
+  federal: m.coverage_tier_federal,
+  statewide: m.coverage_tier_statewide,
+  legislative: m.coverage_tier_legislative,
+  local: m.coverage_tier_local,
+  turnout: m.coverage_tier_turnout,
+  national: m.coverage_tier_national,
+  subnational: m.coverage_tier_subnational,
+  referendums: m.coverage_tier_referendums,
+  ep: m.coverage_tier_ep,
+};
+
+export const COLUMN_LABELS: Record<Column, () => string> = {
+  before_any: m.coverage_column_any,
+  before_county: m.coverage_column_county,
+  before_shapes: m.coverage_column_shapes,
+  since_any: m.coverage_column_any,
+  since_county: m.coverage_column_county,
+  since_precinct: m.coverage_column_precinct,
+  since_shapes: m.coverage_column_shapes,
+  any: m.coverage_column_any,
+  constituency: m.coverage_column_constituency,
+  fine: m.coverage_column_fine,
+  shapes: m.coverage_column_shapes,
+  before: m.coverage_column_any,
+  since: m.coverage_column_any,
+};
+
+export function headline(polity: string, tier: string) {
+  if (polity !== "us") {
+    return {
+      column: "constituency",
+      goal: tier as Goal,
+      title:
+        tier === "referendums"
+          ? m.coverage_headline_region
+          : m.coverage_headline_country,
+      progress:
+        tier === "referendums"
+          ? m.coverage_progress_referendums
+          : m.coverage_progress_races,
+    } as const;
+  }
+  if (tier === "local") {
+    return {
+      column: "since_any",
+      goal: "local",
+      title: m.coverage_headline_local,
+      progress: m.coverage_progress_local,
+    } as const;
+  }
+  if (tier === "turnout") {
+    return {
+      column: "since",
+      goal: "turnout",
+      title: m.coverage_headline_turnout,
+      progress: m.coverage_progress_turnout,
+    } as const;
+  }
+  return {
+    column: "since_county",
+    goal: "county",
+    title: m.coverage_headline_us,
+    progress: m.coverage_progress,
+  } as const;
 }
 
-export function isCountryGoal(goal: string): goal is CountryGoal {
-  return (COUNTRY_GOALS as ReadonlyArray<string>).includes(goal);
+export function grains(polity: string, tier: string): Array<Goal> {
+  if (polity !== "us") {
+    return [tier as Goal, "fine", "shapes"];
+  }
+  if (tier === "local" || tier === "turnout") {
+    return [tier];
+  }
+  return ["county", "precinct", "shapes", "history", "shapes_history"];
 }
+
 export type Reason =
   | "complete"
   | "coarse"
@@ -109,13 +226,6 @@ export function label(goal: Goal, reason: Reason, polity = "us") {
     LABELS[reason]
   )();
 }
-
-export const PARTS = {
-  national: m.coverage_part_national,
-  legislature: m.coverage_part_legislature,
-  recent: m.coverage_part_turnout_recent,
-  earlier: m.coverage_part_turnout_earlier,
-};
 
 export const LEVELS: Record<string, () => string> = {
   president: m.coverage_level_president,

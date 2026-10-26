@@ -17,6 +17,7 @@
   const {
     polity,
     goal,
+    tier = null,
     order,
     rows = null,
     place = null,
@@ -26,6 +27,7 @@
   }: {
     polity: string;
     goal: Goal;
+    tier?: string | null;
     order: "gap" | "name";
     current: boolean;
     rows?: Array<
@@ -41,6 +43,7 @@
       input: {
         polity,
         goal,
+        tier: tier ?? undefined,
         state: place ?? undefined,
         level: level ?? undefined,
         current,
@@ -67,7 +70,12 @@
       : named;
   });
   let isAll = $state(false);
-  const list = $derived(isAll ? all : all.slice(0, 10));
+  let isDone = $state(false);
+  const missing = $derived(
+    all.filter(({ row }) => isDone || row.total > row.complete),
+  );
+  const done = $derived(all.length - missing.length);
+  const list = $derived(isAll ? missing : missing.slice(0, 10));
   const opened = new SvelteSet<string>();
 </script>
 
@@ -154,6 +162,7 @@
       {polity}
       {goal}
       {order}
+      {tier}
       place={depth === 0 ? row.key : place}
       level={depth === 1 ? row.key : null}
       {start}
@@ -161,7 +170,7 @@
     />
   {/if}
 {/each}
-{#if !isAll && all.length > list.length}
+{#if !isAll && missing.length > list.length}
   <div role="row" class="bg-card px-3.5 py-1.5 text-sm">
     <span
       role="gridcell"
@@ -171,7 +180,22 @@
         type="button"
         class="text-muted-foreground underline-offset-2 hover:text-foreground hover:underline focus-visible:outline-2 focus-visible:outline-ring"
         onclick={() => (isAll = true)}
-        >{m.coverage_show_all({ count: count(all.length) })}</button
+        >{m.coverage_show_all({ count: count(missing.length) })}</button
+      >
+    </span>
+  </div>
+{/if}
+{#if done > 0 && (isAll || missing.length <= list.length)}
+  <div role="row" class="bg-card px-3.5 py-1.5 text-sm">
+    <span
+      role="gridcell"
+      class={cn({ "ps-5": depth - start === 1, "ps-10": depth - start === 2 })}
+    >
+      <button
+        type="button"
+        class="text-muted-foreground underline-offset-2 hover:text-foreground hover:underline focus-visible:outline-2 focus-visible:outline-ring"
+        onclick={() => (isDone = true)}
+        >{m.coverage_region_complete({ count: count(done) })}</button
       >
     </span>
   </div>

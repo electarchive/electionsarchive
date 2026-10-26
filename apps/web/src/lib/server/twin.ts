@@ -3,14 +3,18 @@ import { call } from "@orpc/server";
 import { error, isHttpError, isRedirect, redirect } from "@sveltejs/kit";
 import { effective, stand } from "#lib/caucus.js";
 import {
-  COUNTRY_GOALS,
-  isCountryGoal,
-  isGoal,
+  COLUMN_LABELS,
+  COUNTRY_COLUMNS,
+  headline,
   levelLabel,
-  PARTS,
   label as reasonLabel,
   REASONS,
   spans,
+  TIER_LABELS,
+  US_COLUMNS,
+  type Column,
+  type Counts,
+  type Tier,
 } from "#lib/coverage.js";
 import { count, date, definite, percent, plural, points } from "#lib/format.js";
 import { isDerived, VACANCIES } from "#lib/outcomes.js";
@@ -33,16 +37,6 @@ import { comeback, verdict } from "#lib/verdict.js";
 
 type Data = Awaited<ReturnType<typeof load>>;
 type Link = (name: string, path: string | null) => string;
-
-const TITLES = {
-  county: m.coverage_goal_county,
-  history: m.coverage_goal_history,
-  turnout: m.coverage_goal_turnout,
-  precinct: m.coverage_goal_precinct,
-  shapes: m.coverage_goal_shapes,
-  shapes_history: m.coverage_goal_shapes_history,
-  local: m.coverage_goal_local,
-};
 
 const TYPES = {
   json: "application/json; charset=utf-8",
@@ -372,9 +366,7 @@ function markdown(data: Data, link: Link) {
       return homeMarkdown(data, link);
     }
     case "coverage": {
-      return data.polity === "us"
-        ? coverageMarkdown(data, link)
-        : countryMarkdown(data, link);
+      return coverageMarkdown(data, link);
     }
     case "coverage_overview": {
       return overviewMarkdown(data, link);
@@ -515,109 +507,49 @@ function coverageMarkdown(
   link: Link,
 ) {
   const year = String(new Date().getFullYear());
-  return [
-    `# ${m.coverage_title()}`,
-    m.coverage_lede(),
-    (data.current ? m.twin_coverage_current_on : m.twin_coverage_current)({
-      year,
-    }),
-    ...data.goals
-      .flatMap((goal) =>
-        isGoal(goal.goal) ? [{ ...goal, goal: goal.goal }] : [],
-      )
-      .flatMap((row) => [
-        `## ${TITLES[row.goal]()}`,
-        [
-          ...(row.goal === "local" && row.populationTotal > 0
-            ? [
-                `${m.coverage_progress_local_population({
-                  percent: percent(
-                    row.populationComplete / row.populationTotal,
-                    1,
-                  ),
-                })}.`,
-              ]
-            : []),
-          [
-            `${(row.goal === "local" && row.populationTotal > 0 ? m.coverage_progress_local_count : row.goal === "local" ? m.coverage_progress_local : row.goal === "turnout" ? m.coverage_progress_turnout : m.coverage_progress)({ complete: count(row.complete), total: count(row.total) })}, ${share(row)}`,
-            ...(row.icpsr > 0
-              ? [m.coverage_icpsr_of({ count: count(row.icpsr) })]
-              : []),
-          ].join(", "),
-        ].join(" "),
-        ...(row.goal === "local" && row.populationTotal > 0
-          ? [
-              `${m.coverage_local_two_measures()} ${m.coverage_local_weights()} ${m.coverage_local_estimated({ percent: percent(row.populationEstimated / row.populationTotal, 1) })}`,
-            ]
-          : []),
-        ...(row.goal === "history" || row.goal === "turnout"
-          ? [
-              data.parts
-                .filter((part) => part.goal === row.goal)
-                .map(
-                  (part) =>
-                    `- ${PARTS[part.part]({ complete: count(part.complete), total: count(part.total), percent: percent(part.complete / Math.max(1, part.total), 1) })}`,
-                )
-                .join("\n"),
-              (row.goal === "history"
-                ? m.coverage_goal_history_note
-                : m.coverage_goal_turnout_note)(),
-            ]
-          : []),
-        REASONS[row.goal]
-          .flatMap((reason) => [
-            `- ${reasonLabel(row.goal, reason)}: ${count(row[reason])}`,
-            ...(reason === "complete" && row.icpsr > 0
-              ? [`  - ${m.coverage_icpsr()}: ${count(row.icpsr)}`]
-              : []),
-          ])
-          .join("\n"),
-      ]),
-    `## ${m.coverage_where()}`,
-    TITLES.county(),
-    table(
-      [
-        m.coverage_column_name(),
-        m.coverage_column_short(),
-        m.coverage_column_done(),
-      ],
-      data.gaps.map((row) => [
-        link(row.label ?? row.key, null),
-        count(row.total - row.complete),
-        share(row),
-      ]),
-    ),
-  ];
-}
-
-function countryMarkdown(
-  data: Extract<Data, { kind: "coverage" }>,
-  link: Link,
-) {
-  const year = String(new Date().getFullYear());
   const { summary } = data;
-  const titles = {
-    national: m.coverage_country_goal_national,
-    fine: m.coverage_country_goal_fine,
-    shapes: m.coverage_country_goal_shapes,
-    subnational: m.coverage_country_goal_subnational,
-    local: m.coverage_country_goal_local,
-    referendums: m.coverage_country_goal_referendums,
-    ep: m.coverage_country_goal_ep,
+  const isUs = data.polity === "us";
+  const columns: ReadonlyArray<Column> = isUs ? US_COLUMNS : COUNTRY_COLUMNS;
+  const slot = (column: Column, tier: string): Column =>
+    tier === "turnout" && column === "before_any"
+      ? "before"
+      : tier === "turnout" && column === "since_any"
+        ? "since"
+        : column;
+  const heading = (column: Column) =>
+    isUs
+      ? `${(column.startsWith("before") ? m.coverage_era_before : m.coverage_era_since)()}, ${COLUMN_LABELS[column]().toLowerCase()}`
+      : COLUMN_LABELS[column]();
+  const cell = (counts: Counts | null | undefined) =>
+    counts == null
+      ? "–"
+      : counts.total === 0
+        ? m.coverage_cell_none()
+        : `${percent(counts.complete / counts.total, 1)} (${m.coverage_cell_of({ complete: count(counts.complete), total: count(counts.total) })})`;
+  const notesFor = (level: string) =>
+    summary.notes.filter(
+      (note) => note.level === level && note.goal !== "fine",
+    );
+  const definitions: Record<string, () => string> = {
+    federal: m.coverage_tier_def_federal,
+    statewide: m.coverage_tier_def_statewide,
+    legislative: m.coverage_tier_def_legislative,
+    local: isUs ? m.coverage_tier_def_local_us : m.coverage_tier_def_local,
+    turnout: m.coverage_tier_def_turnout,
+    national: m.coverage_tier_def_national,
+    subnational: m.coverage_tier_def_subnational,
+    referendums: m.coverage_tier_def_referendums,
+    ep: m.coverage_tier_def_ep,
   };
-  const rows = data.goals.flatMap((row) =>
-    isCountryGoal(row.goal) ? [{ ...row, goal: row.goal }] : [],
-  );
   return [
-    `# ${m.coverage_country_title({ name: summary.name })}`,
-    m.coverage_country_lede(),
+    `# ${isUs ? m.coverage_title() : m.coverage_country_title({ name: summary.name })}`,
+    (isUs ? m.coverage_lede : m.coverage_country_lede)(),
     ...(summary.first == null || summary.last == null
       ? []
       : [
           [
             m.coverage_country_facts({
               elections: count(summary.elections),
-              contests: count(summary.contests),
               first: String(summary.first),
               last: String(summary.last),
             }),
@@ -629,96 +561,161 @@ function countryMarkdown(
     (data.current ? m.twin_coverage_current_on : m.twin_coverage_current)({
       year,
     }),
-    ...COUNTRY_GOALS.flatMap((goal) => {
-      const row = rows.find((found) => found.goal === goal);
-      const levels = summary.levels.filter((level) =>
-        goal === "fine"
-          ? level.fine
-          : goal === "shapes"
-            ? level.goal === "national" && level.unit === "district"
-            : level.goal === goal,
-      );
-      if (row == null && levels.length === 0) {
-        return [];
-      }
+    `## ${m.coverage_glance()}`,
+    `${(isUs ? m.coverage_glance_hint_us : m.coverage_glance_hint_country)()} ${m.coverage_glance_none_hint()}`,
+    table(
+      [m.coverage_column_kind(), ...columns.map(heading)],
+      data.tiers.map((tier) => [
+        TIER_LABELS[tier.key as Tier](),
+        ...columns.map((column) => cell(tier.cells[slot(column, tier.key)])),
+      ]),
+    ),
+    ...data.tiers.flatMap((tier) => {
+      const lead = headline(data.polity, tier.key);
+      const row = tier.cells[lead.column];
+      const isWeighted =
+        lead.goal === "local" && row != null && row.populationTotal > 0;
       return [
-        `## ${goal === "national" ? `${m.coverage_goal_now()}: ` : ""}${titles[goal]()}`,
-        row == null
+        `## ${TIER_LABELS[tier.key as Tier]()}`,
+        [
+          definitions[tier.key]?.() ?? "",
+          ...(isUs && tier.key === "local"
+            ? [m.coverage_goal_local_note()]
+            : isUs && tier.key === "turnout"
+              ? [m.coverage_goal_turnout_note()]
+              : []),
+        ].join(" "),
+        row == null || row.total === 0
           ? m.coverage_country_none()
           : [
-              `${m.coverage_progress({ complete: count(row.complete), total: count(row.total) })}, ${share(row)}`,
-              REASONS[goal]
+              `**${lead.title()}**: ${[
+                ...(isWeighted
+                  ? [
+                      m.coverage_progress_local_population({
+                        percent: percent(
+                          row.populationComplete / row.populationTotal,
+                          1,
+                        ),
+                      }),
+                    ]
+                  : []),
+                `${(isWeighted ? m.coverage_progress_local_count : lead.progress)({ complete: count(row.complete), total: count(row.total) })}, ${share(row)}`,
+                ...(row.icpsr > 0
+                  ? [m.coverage_icpsr_of({ count: count(row.icpsr) })]
+                  : []),
+              ].join(isWeighted ? ". " : ", ")}`,
+              REASONS[lead.goal]
                 .filter((reason) => reason === "complete" || row[reason] > 0)
-                .map(
-                  (reason) =>
-                    `- ${reasonLabel(goal, reason, data.polity)}: ${count(row[reason])}`,
-                )
+                .flatMap((reason) => [
+                  `- ${reasonLabel(lead.goal, reason, data.polity)}: ${count(row[reason])}`,
+                  ...(reason === "complete" && row.icpsr > 0
+                    ? [`  - ${m.coverage_icpsr()}: ${count(row.icpsr)}`]
+                    : []),
+                ])
                 .join("\n"),
+              ...(isWeighted
+                ? [
+                    `${m.coverage_local_two_measures()} ${m.coverage_local_weights()} ${m.coverage_local_estimated({ percent: percent(row.populationEstimated / row.populationTotal, 1) })}`,
+                  ]
+                : []),
             ].join("\n\n"),
         `### ${m.coverage_ledger()}`,
-        levels
-          .map((level) => {
-            const notes = summary.notes.filter(
-              (note) =>
-                note.level === level.key &&
-                (note.goal === level.goal || note.goal === goal),
-            );
-            const gaps = notes.filter(
-              (note) => note.from != null && note.listed !== false,
-            );
+        table(
+          [
+            m.coverage_column_kind(),
+            ...(isUs ? [] : [m.coverage_column_years()]),
+            ...columns
+              .filter((column) => slot(column, tier.key) in tier.cells)
+              .map(heading),
+          ],
+          tier.levels.map((level) => {
             const counted = spans(
-              data.counted.find((found) => found.level === level.key)?.years ??
-                [],
-              gaps.flatMap((note) => (note.from == null ? [] : [note.from])),
-            );
-            const unlisted = notes.filter(
-              (note) => note.listed === false && note.from != null,
+              level.years,
+              notesFor(level.key).flatMap((note) =>
+                note.from == null || note.listed === false ? [] : [note.from],
+              ),
             );
             return [
-              `- ${levelLabel(data.polity, level.key)}: ${counted === "" ? m.coverage_ledger_nothing() : `${m.coverage_ledger_counted()} ${counted}`}`,
-              ...gaps.map(
-                (note) =>
-                  `  - ${m.coverage_ledger_uncounted()} ${note.from === note.to ? note.from : `${note.from}–${note.to}`}. ${note.note}${(note.held ?? 0) > 0 ? ` ${m.coverage_ledger_held({ count: count(note.held ?? 0) })}` : ""}`,
-              ),
-              ...notes
-                .filter((note) => note.from == null)
-                .map((note) => `  - ${note.note}`),
-              ...(unlisted.length === 0
+              levelLabel(data.polity, level.key),
+              ...(isUs
                 ? []
-                : [
-                    `  - ${m.coverage_ledger_unlisted({ years: unlisted.map((note) => `${note.from} (${count(note.held ?? 0)})`).join(", ") })}`,
-                  ]),
-            ].join("\n");
-          })
-          .join("\n"),
+                : [counted === "" ? m.coverage_ledger_nothing() : counted]),
+              ...columns
+                .filter((column) => slot(column, tier.key) in tier.cells)
+                .map((column) => cell(level.cells[slot(column, tier.key)])),
+            ];
+          }),
+        ),
+        ...tier.levels.flatMap((level) => {
+          const notes = notesFor(level.key);
+          const unlisted = notes.filter(
+            (note) => note.listed === false && note.from != null,
+          );
+          const lines = [
+            ...notes
+              .filter((note) => note.from != null && note.listed !== false)
+              .map(
+                (note) =>
+                  `- ${m.coverage_ledger_uncounted()} ${note.from === note.to ? note.from : `${note.from}–${note.to}`}. ${note.note}${(note.held ?? 0) > 0 ? ` ${m.coverage_ledger_held({ count: count(note.held ?? 0) })}` : ""}`,
+              ),
+            ...notes
+              .filter((note) => note.from == null)
+              .map((note) => `- ${note.note}`),
+            ...(unlisted.length === 0
+              ? []
+              : [
+                  `- ${m.coverage_ledger_unlisted({ years: unlisted.map((note) => `${note.from} (${count(note.held ?? 0)})`).join(", ") })}`,
+                ]),
+          ];
+          return lines.length === 0
+            ? []
+            : [`#### ${levelLabel(data.polity, level.key)}`, lines.join("\n")];
+        }),
       ];
     }),
-    ...(data.gaps.length === 0
-      ? []
-      : [
-          `## ${m.coverage_where()}`,
-          titles.national(),
-          table(
-            [
-              (data.isFlat
-                ? m.coverage_column_name_flat
-                : m.coverage_column_name_country)(),
-              m.coverage_column_short(),
-              m.coverage_column_done(),
-            ],
-            data.gaps.map((row) => [
-              data.isFlat
-                ? levelLabel(data.polity, row.key)
-                : link(
-                    row.label ??
-                      (row.key === "" ? m.coverage_region_none() : row.key),
-                    row.path,
+    `## ${m.coverage_where()}`,
+    m.coverage_column_note(),
+    ...data.tiers.flatMap((tier) => {
+      const rows = data.gaps[tier.key] ?? [];
+      const missing = rows.filter((row) => row.total > row.complete);
+      const done = rows.length - missing.length;
+      return rows.length === 0
+        ? []
+        : [
+            `### ${TIER_LABELS[tier.key as Tier]()}`,
+            ...(missing.length === 0
+              ? []
+              : [
+                  table(
+                    [
+                      (isUs
+                        ? m.coverage_column_name
+                        : data.isFlat
+                          ? m.coverage_column_name_flat
+                          : m.coverage_column_name_country)(),
+                      m.coverage_column_short(),
+                      m.coverage_column_done(),
+                    ],
+                    missing.map((row) => [
+                      data.isFlat
+                        ? levelLabel(data.polity, row.key)
+                        : link(
+                            row.label ??
+                              (row.key === ""
+                                ? m.coverage_region_none()
+                                : row.key),
+                            row.path,
+                          ),
+                      count(row.total - row.complete),
+                      share(row),
+                    ]),
                   ),
-              count(row.total - row.complete),
-              share(row),
-            ]),
-          ),
-        ]),
+                ]),
+            ...(done === 0
+              ? []
+              : [m.twin_coverage_done({ count: count(done) })]),
+          ];
+    }),
     ...(Object.keys(summary.sources).length === 0
       ? []
       : [
@@ -758,42 +755,26 @@ function overviewMarkdown(
     table(
       [
         m.coverage_overview_column_country(),
-        m.coverage_overview_column_goal(),
+        m.coverage_overview_column_tiers(),
         m.coverage_overview_column_span(),
-        m.coverage_overview_column_finest(),
-        m.coverage_overview_column_shapes(),
       ],
-      data.polities.map((polity) => {
-        const lead = polity.goals.find(
-          (row) =>
-            row.goal === (polity.polity === "us" ? "county" : "national"),
-        );
-        const shapes = polity.goals.find((row) => row.goal === "shapes");
-        return [
-          link(polity.name, `coverage/${polity.polity}`),
-          lead == null
-            ? m.coverage_overview_none()
-            : `${(polity.polity === "us" ? m.coverage_overview_goal_us : m.coverage_overview_goal_national)()}: ${m.coverage_progress({ complete: count(lead.complete), total: count(lead.total) })}, ${percent(lead.complete / Math.max(1, lead.total), 1)}`,
-          polity.first == null || polity.last == null
-            ? ""
-            : `${polity.first}–${polity.last}`,
-          polity.finestNoun ?? "",
-          shapes == null
-            ? m.coverage_overview_shapes_none()
-            : m.coverage_overview_shapes({
-                percent: percent(
-                  shapes.complete / Math.max(1, shapes.total),
-                  1,
-                ),
-              }),
-        ];
-      }),
+      data.polities.map((polity) => [
+        link(polity.name, `coverage/${polity.polity}`),
+        polity.tiers
+          .map(
+            (tier) =>
+              `${TIER_LABELS[tier.key as Tier]()}: ${tier.cell == null || tier.cell.total === 0 ? m.coverage_cell_none() : `${percent(tier.cell.complete / tier.cell.total, 1)} (${m.coverage_cell_of({ complete: count(tier.cell.complete), total: count(tier.cell.total) })})`}`,
+          )
+          .join("; "),
+        polity.first == null || polity.last == null
+          ? ""
+          : `${polity.first}–${polity.last}`,
+      ]),
     ),
-    `## ${m.coverage_overview_explain()}`,
+    `## ${m.coverage_overview_done()}`,
+    m.coverage_overview_done_body(),
     m.coverage_overview_explain_count(),
-    m.coverage_overview_explain_goal(),
     m.coverage_overview_explain_gaps(),
-    m.coverage_overview_explain_shapes(),
   ];
 }
 
