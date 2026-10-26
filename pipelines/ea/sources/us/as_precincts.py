@@ -11,8 +11,27 @@ SOURCE = "us.as_precincts"
 VERSION = "1"
 PUBLISHER = "American Samoa Election Office"
 CLOUD = "https://dehayf5mhw1h7.cloudfront.net/wp-content/uploads/sites/594/"
-ROUND_ONE = "https://www.talanei.com/2024/11/13/no-challenges-election-office-certifies-results-of-general-election/"
-ROUND_ONE_TOTALS = {"pula": 4284, "lemanu": 3660, "vaitautolu": 2169}
+ROUND_ONE = "https://dehayf5mhw1h7.cloudfront.net/wp-content/uploads/sites/594/2024/11/06063739/2024-governor-lt-governor-tally.webp"
+ROUND_ONE_ROWS = {
+    "central": (3, 2, 4),
+    "d01": (170, 105, 256),
+    "d02": (118, 69, 139),
+    "d03": (235, 220, 67),
+    "d04": (183, 159, 46),
+    "d05": (158, 190, 82),
+    "d06": (162, 85, 45),
+    "d07": (122, 129, 76),
+    "d08": (119, 225, 46),
+    "d09": (200, 472, 30),
+    "d10": (69, 97, 39),
+    "d11": (100, 226, 17),
+    "d12": (427, 379, 453),
+    "d13": (235, 356, 112),
+    "d14": (241, 119, 53),
+    "d15": (682, 1032, 491),
+    "d16": (316, 261, 102),
+    "d17": (120, 158, 111),
+}
 FILES = [
     (date(2016, 11, 8), "house:0", "https://aceproject.org/ero-en/misc/american-samoa-general-election-2016-results-1/at_download/file", ["amata", "chapman", "jamias", "jones", "finau"]),
     (
@@ -39,7 +58,7 @@ def fetch() -> None:
         raw.cached(SOURCE, ROUND_ONE)
     except LookupError:
         body = subprocess.run(["curl", "-skL", "-m", "120", ROUND_ONE], capture_output=True, check=True).stdout
-        raw.store(SOURCE, ROUND_ONE, body, suffix=".html", retrieved_at=datetime.now(UTC), media_type="text/html")
+        raw.store(SOURCE, ROUND_ONE, body, suffix=".webp", retrieved_at=datetime.now(UTC), media_type="image/webp")
 
 
 def emit() -> Path:
@@ -145,53 +164,31 @@ def emit() -> Path:
                 options[(contest, name)] = option
                 cs.add("contest_option", id=option, contest_id=contest, kind="candidate", ballot_label=labels[name])
                 cs.add("candidacy", id=cs.key("us.candidacy", f"{contest}:{name}"), person_id=persons[name], option_id=option, role="head", is_independent=True)
-        round_one_source = cs.source("Talanei", "No challenges, Election Office certifies results of General Election")
+        for column, total in enumerate((3660, 4284, 2169)):
+            if sum(row[column] for row in ROUND_ONE_ROWS.values()) != total:
+                raise ValueError("round one transcription does not tie to the certified totals")
+        title = "2024 general election results by polling district (governor, election-night sheet)"
+        sources[(date(2024, 11, 5), "governor")] = cs.source(PUBLISHER, title)
         cs.add(
             "source",
-            id=round_one_source,
-            kind="news_agency",
-            publisher="Talanei",
-            title="No challenges, Election Office certifies results of General Election",
+            id=sources[(date(2024, 11, 5), "governor")],
+            kind="official_body",
+            publisher=PUBLISHER,
+            title=title,
             url=ROUND_ONE,
             license="Public record",
         )
-        cs.artifact(raw.cached(SOURCE, ROUND_ONE), round_one_source)
-        round_one_set = cs.key(f"{SOURCE}.result_set", "2024-11-05:AS:governor:territory")
-        cs.add(
-            "result_set",
-            id=round_one_set,
-            election_id=general_24,
-            contest_id=round_one,
-            stage="certified",
-            kind="counted",
-            status="active",
-            source_id=round_one_source,
-            is_default=True,
-            completeness=1,
-        )
-        cs.add(
-            "note",
-            entity_id=round_one_set,
-            kind="methodology",
-            body_md="Territory totals as the Election Office certified them on November 13, 2024, reported by Talanei; the Office's by-district file for the first round was not located.",
-        )
-        for name, count in ROUND_ONE_TOTALS.items():
-            cs.add(
-                "result_value",
-                result_set_id=round_one_set,
-                unit_id=parent,
-                option_id=options[(round_one, name)],
-                channel=0,
-                measure=1,
-                count_round=0,
-                flags=0,
-                value=count,
-            )
+        cs.artifact(raw.cached(SOURCE, ROUND_ONE), sources[(date(2024, 11, 5), "governor")])
+        results[(date(2024, 11, 5), "governor")] = {
+            f"{date(2024, 11, 5)}:AS:{code}": dict(zip(("lemanu", "pula", "vaitautolu"), row, strict=True)) for code, row in ROUND_ONE_ROWS.items()
+        }
         units = {}
         for (day, section), districts in results.items():
             key = f"{day}:AS:{section}"
             if section == "governor" and day == date(2024, 11, 19):
                 contest, election = round_two, runoff_election
+            elif section == "governor" and day == date(2024, 11, 5):
+                contest, election = round_one, general_24
             else:
                 contest, election = conn.execute(
                     "select c.id, c.election_id from contest c join external_id x on x.entity_id = c.id and x.scheme = 'us.contest' and x.value = %s",
@@ -223,7 +220,8 @@ def emit() -> Path:
                 counted = sum(count for votes in districts.values() for count in votes.values())
                 completeness = round(float(counted) / float(official), 4)
             else:
-                cs.add("outcome", result_set_id=result_set, option_id=picked[ranked[0]], kind="elected", seats=None)
+                if contest == round_two:
+                    cs.add("outcome", result_set_id=result_set, option_id=picked[ranked[0]], kind="elected", seats=None)
                 completeness = 1
             cs.add(
                 "result_set",
@@ -237,7 +235,7 @@ def emit() -> Path:
                 is_default=True,
                 completeness=completeness,
             )
-            cs.add("note", entity_id=result_set, kind="methodology", body_md="Votes by polling district from the Election Office's results sheets; the central office row holds Swains Island and, where the sheet says so, absentee ballots.")
+            cs.add("note", entity_id=result_set, kind="methodology", body_md="Votes by polling district from the Election Office's results sheets; the central office row holds Swains Island and, where the sheet says so, absentee ballots." + (" The first-round sheet is an image published as the election-night unofficial results; its figures were transcribed by hand and each column sums to the totals the Office certified on November 12, 2024 (reported by Talanei)." if key == "2024-11-05:AS:governor" else ""))
             for code, votes in districts.items():
                 if code not in units:
                     units[code] = cs.unit("us.precinct", code)
