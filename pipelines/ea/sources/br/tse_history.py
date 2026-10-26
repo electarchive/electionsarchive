@@ -1,3 +1,4 @@
+import csv
 import io
 import json
 import shutil
@@ -31,6 +32,77 @@ FILES = {
         ("detail", "detalhe_votacao_munzona"),
         ("roster", "consulta_cand"),
     )
+}
+POLLING_PLACES = {
+    year: f"{TSE}eleitorado_locais_votacao/eleitorado_local_votacao_{year}.zip"
+    for year in (2010, 2014, 2018, 2022, 2026)
+}
+COUNTRIES = {
+    "BOSNIAEHERZ": "BIH",
+    "BRAZZAVILLE": "COG",
+    "CINGAPURA": "SGP",
+    "COREIA": "KOR",
+    "EMIRADOSARABES": "ARE",
+    "GUIANAFRANCESA": "FRA",
+    "INGLATERRA": "GBR",
+    "EDIMBURGO": "GBR",
+    "IRLANDA": "IRL",
+    "IRA": "IRN",
+    "KATMANDU": "NPL",
+    "KAZAQUISTAO": "KAZ",
+    "KUAITE": "KWT",
+    "KUWAIT": "KWT",
+    "KENIA": "KEN",
+    "NAGOYA": "JPN",
+    "REPDOMINICANA": "DOM",
+    "REPUBLICADOMINICANA": "DOM",
+    "REPUBLICAESLOVACA": "SVK",
+    "REPUBLICATCHECA": "CZE",
+    "TERRITPALESTINOS": "PSE",
+    "TRINIDADTOBAGO": "TTO",
+    "PORTORICO": "PRI",
+    "DACCA": "BGD",
+    "MARSELHA": "FRA",
+    "ORLANDO": "USA",
+    "ATLANTA": "USA",
+    "PYONGYANG": "PRK",
+    "SANTAELENADEUAIREN": "VEN",
+}
+ABROAD_CODES = {
+    "29874": "COD",
+    "30120": "ITA",
+    "30287": "FRA",
+    "30457": "NLD",
+    "30481": "CHL",
+    "30627": "JPN",
+    "30848": "CHN",
+    "30864": "CHE",
+    "30139": "JPN",
+    "30236": "JPN",
+    "30724": "JPN",
+    "99104": "GEO",
+    "99139": "ALB",
+    "99147": "ATG",
+    "99155": "ARG",
+    "99171": "IRQ",
+    "99180": "BHS",
+    "99198": "NGA",
+    "99210": "BOL",
+    "99236": "BOL",
+    "99244": "URY",
+    "99252": "VAT",
+    "99287": "ZMB",
+    "99317": "EST",
+    "99325": "ETH",
+    "99333": "FRA",
+    "99341": "MWI",
+    "99350": "MLI",
+    "99376": "MMR",
+    "99384": "LCA",
+    "99406": "SLE",
+    "99422": "GUY",
+    "99430": "JAM",
+    "99473": "BHR",
 }
 OFFICES = {"1": "president", "3": "governor", "5": "senate", "6": "chamber", "7": "assembly", "8": "assembly"}
 ELECTED = ["ELEITO", "ELEITO POR QP", "ELEITO POR MÉDIA", "MÉDIA"]
@@ -85,7 +157,7 @@ EXCESS = (
 
 
 def fetch() -> None:
-    for url in FILES.values():
+    for url in [*FILES.values(), *POLLING_PLACES.values()]:
         raw.fetch(SOURCE, url, suffix=".zip")
 
     def get(path: str) -> bytes:
@@ -430,6 +502,20 @@ def parse() -> None:
     legends.write_parquet(PARSED / "legends.parquet")
     detail.write_parquet(PARSED / "detail.parquet")
     places.write_parquet(PARSED / "places.parquet")
+    abroad: list[tuple[int, str, str, str]] = []
+    for year, url in POLLING_PLACES.items():
+        with zipfile.ZipFile(raw.cached(SOURCE, url).path) as archive:
+            member = next(name for name in archive.namelist() if name.endswith(".csv"))
+            with archive.open(member) as source:
+                reader = csv.DictReader(io.TextIOWrapper(source, encoding="latin-1"), delimiter=";")
+                abroad.extend(
+                    (year, row["CD_MUNICIPIO"].zfill(5), row["NM_MUNICIPIO"], row["NM_BAIRRO"])
+                    for row in reader
+                    if row["SG_UF"] == "ZZ"
+                )
+    pl.DataFrame(abroad, schema=["year", "municipality", "label", "country"], orient="row").unique().write_parquet(
+        PARSED / "abroad_places.parquet"
+    )
     excess.write_parquet(PARSED / "excess.parquet")
 
 
@@ -598,12 +684,59 @@ def emit() -> Path:
                 cs.add("area", id=areas[code], scheme_code="br.municipality")
                 cs.add("area_parent", area_id=areas[code], parent_id=states[uf], valid_from=None)
                 name(areas[code], proper(label))
+
+        def fold(text: str) -> str:
+            return "".join(
+                character
+                for character in unicodedata.normalize("NFKD", text).encode("ascii", "ignore").decode().upper()
+                if character.isalnum()
+            )
+
+        world: dict[str, UUID] = {}
+        for code, text, area in conn.execute(
+            """select ac.code, n.text, a.id from area a join area_code ac on ac.area_id = a.id
+               join name n on n.entity_id = a.id where a.scheme_code = 'world.country' and n.lang in ('pt', 'en')
+               order by n.lang desc"""
+        ).fetchall():
+            world.setdefault(fold(text), area)
+            world.setdefault(code, area)
+
+        def country_of(text: str) -> UUID | None:
+            return world.get(COUNTRIES.get(fold(text), fold(text)))
+
+        countries: dict[str, UUID] = {}
+        for code, named in (
+            pl.read_parquet(PARSED / "abroad_places.parquet")
+            .group_by("municipality")
+            .agg(pl.col("country").unique().sort())
+            .iter_rows()
+        ):
+            found = {country for country in map(country_of, named) if country is not None}
+            if len(found) > 1:
+                raise ValueError(f"abroad municipality {code} sits in several countries: {named}")
+            if found:
+                countries[code] = found.pop()
+        countries |= {code: world[country] for code, country in ABROAD_CODES.items()}
         units: dict[str, str] = {}
         rows: list[dict[str, object]] = []
-        for year, code, uf in places.unique(["year", "municipality"]).select("year", "municipality", "uf").iter_rows():
+        for year, code, uf, label in (
+            places.unique(["year", "municipality"]).select("year", "municipality", "uf", "label").iter_rows()
+        ):
             first, last = dates[f"{year}:1"], dates[f"{year}:2"]
             unit = cs.unit("br.municipality", code, first)
             units[f"{year}:{code}"] = str(unit)
+            if uf in ("ZZ", "VT"):
+                cs.add("name", entity_id=unit, text=proper(label), lang="pt", kind="official", is_preferred=True)
+            country = countries.get(code) or (country_of(label) if uf == "ZZ" else None)
+            if country is not None:
+                cs.add(
+                    "reporting_unit_area",
+                    unit_id=unit,
+                    area_id=country,
+                    valid_from=first,
+                    valid_to=last + timedelta(days=1),
+                    method="source_code",
+                )
             rows.append(
                 {
                     "id": str(unit),
@@ -618,6 +751,17 @@ def emit() -> Path:
                 }
             )
         cs.frame("reporting_unit", pl.DataFrame(rows))
+        for code, section in conn.execute(
+            "select code, id from reporting_unit where scheme_code = 'br.secao' and kind = 'abroad_mission'"
+        ).fetchall():
+            if code.split(":")[0] in countries:
+                cs.add(
+                    "reporting_unit_area",
+                    unit_id=section,
+                    area_id=countries[code.split(":")[0]],
+                    valid_from=None,
+                    method="source_code",
+                )
 
         parties: dict[str, UUID] = {}
         by_abbreviation: dict[tuple[int, str], UUID] = {}
