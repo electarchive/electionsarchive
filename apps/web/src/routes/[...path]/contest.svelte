@@ -312,6 +312,28 @@
     )[0];
     return top?.current == null || top.current.votes < total * 0.9 ? null : top;
   });
+  const cast = $derived.by(() => {
+    let sum = 0;
+    for (const row of contest.channels ?? []) {
+      sum += row.votes;
+    }
+    return sum;
+  });
+  const CHANNEL_LABELS: Record<
+    NonNullable<typeof contest.channels>[number]["code"],
+    () => string
+  > = {
+    all: m.channel_all,
+    election_day: m.channel_election_day,
+    early: m.channel_early,
+    postal: m.channel_postal,
+    abroad: m.channel_abroad,
+    provisional: m.channel_provisional,
+    mobile: m.channel_mobile,
+    prison: m.channel_prison,
+    customs: m.channel_customs,
+    special_rules: m.channel_special_rules,
+  };
   const placed = $derived(
     contest.places == null ||
       (contest.places.rows.length > 0 &&
@@ -1068,6 +1090,20 @@
           return note.side === "target"
             ? m.note_alternative_target({ publisher })
             : m.note_alternative_current({ publisher });
+        }
+        if (note.code === "channels") {
+          const methods = (note.value ?? "")
+            .split(",")
+            .map((code) =>
+              (
+                CHANNEL_LABELS[code as keyof typeof CHANNEL_LABELS] ??
+                m.channel_all
+              )(),
+            )
+            .join(", ");
+          return note.side === "target"
+            ? m.note_channels_target({ methods })
+            : m.note_channels_current({ methods });
         }
         return {
           no_target: m.note_no_target,
@@ -1851,6 +1887,63 @@
   <Members parties={contest.chamber.parties} places={contest.chamber.places} />
 {/if}
 
+{#if contest.channels != null && contest.channels.length > 1}
+  <section
+    class="col-span-12 bg-card px-3.5 py-3"
+    aria-labelledby="key-channels"
+  >
+    <h2 id="key-channels" class="mbe-1.5 text-[0.8125rem] font-bold">
+      {m.channels_title()}
+    </h2>
+    <table class="w-full max-w-3xl border-collapse text-sm">
+      <thead>
+        <tr class="text-start text-xs text-muted-foreground">
+          <th class="py-1 pe-3 text-start font-normal">
+            {m.channels_method()}
+          </th>
+          <th class="py-1 pe-3 text-end font-normal">{m.col_votes()}</th>
+          <th class="hidden py-1 pe-3 text-end font-normal sm:table-cell">
+            {m.channels_share()}
+          </th>
+          <th class="py-1 text-start font-normal">{m.channels_leader()}</th>
+        </tr>
+      </thead>
+      <tbody>
+        {#each contest.channels as row (row.code)}
+          <tr class="border-bs border-border align-baseline">
+            <th scope="row" class="py-1.5 pe-3 text-start font-medium">
+              {CHANNEL_LABELS[row.code]()}
+            </th>
+            <td class="py-1.5 pe-3 text-end font-figures tabular-nums">
+              {count(row.votes)}
+            </td>
+            <td
+              class="hidden py-1.5 pe-3 text-end font-figures tabular-nums sm:table-cell"
+            >
+              {percent(row.votes / cast)}
+            </td>
+            <td class="py-1.5">
+              {#if row.leader != null}
+                <span class="flex items-baseline gap-2 min-inline-0">
+                  <Name
+                    class="truncate font-semibold min-inline-0"
+                    label={row.leader.label}
+                    color={swatch(row.leader.color, row.leader.label)}
+                  />
+                  <span
+                    class="font-figures text-[0.8125rem] text-muted-foreground tabular-nums"
+                    >{percent(row.leader.share)}</span
+                  >
+                </span>
+              {/if}
+            </td>
+          </tr>
+        {/each}
+      </tbody>
+    </table>
+  </section>
+{/if}
+
 {#if placed != null}
   {#if drawn == null}
     {@render caveat()}
@@ -1863,6 +1956,9 @@
       {publishers}
       isMapped={drawn != null}
       deeper={contest.deeper ?? null}
+      total={["votes", "list_votes"].includes(contest.current?.measure ?? "")
+        ? (contest.current?.valid ?? null)
+        : null}
       votes={placed.isOpening === true
         ? m.stv_first()
         : (counted ?? m.col_votes())}

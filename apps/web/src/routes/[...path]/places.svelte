@@ -26,6 +26,7 @@
     deeper = null,
     limit = 10,
     trace = null,
+    total = null,
     only = $bindable(null),
     focus = $bindable(null),
   }: {
@@ -44,11 +45,41 @@
     deeper?: string | null;
     limit?: number;
     trace?: string | null;
+    total?: number | null;
     only?: number | string | null;
     focus?: number | null;
   } = $props();
 
   const uid = $props.id();
+  const reconciled = $derived.by(() => {
+    if (total == null || total <= 0) {
+      return null;
+    }
+    let placed = 0;
+    let pooled = 0;
+    for (const row of places.rows) {
+      if (row.isPool === true) {
+        pooled += row.valid;
+      } else {
+        placed += row.valid;
+      }
+    }
+    if ((total - placed - pooled) / total >= 0.001) {
+      return isMapped || placed + pooled === 0
+        ? null
+        : m.places_reconcile_short({
+            sum: count(placed + pooled),
+            total: count(total),
+          });
+    }
+    return pooled > 0
+      ? m.places_reconcile({
+          nouns: plural(noun),
+          sum: count(placed),
+          total: count(total),
+        })
+      : null;
+  });
 
   let query = $state("");
   let picked = $state<{
@@ -1066,6 +1097,13 @@
       onclick={() => (all = true)}
       >{m.places_show_all({ count: count(filtered.length) })}</button
     >
+  {/if}
+  {#if reconciled != null}
+    <p
+      class="text-[0.8125rem] text-pretty text-muted-foreground max-inline-[72ch]"
+    >
+      {reconciled}
+    </p>
   {/if}
   {#if foreign.length > 0}
     <p

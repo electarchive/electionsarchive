@@ -120,6 +120,19 @@ const leading = (
   ];
 };
 
+const CHANNEL_LABELS = {
+  all: m.channel_all,
+  election_day: m.channel_election_day,
+  early: m.channel_early,
+  postal: m.channel_postal,
+  abroad: m.channel_abroad,
+  provisional: m.channel_provisional,
+  mobile: m.channel_mobile,
+  prison: m.channel_prison,
+  customs: m.channel_customs,
+  special_rules: m.channel_special_rules,
+};
+
 const span = (first: number | null, last: number | null) => {
   if (first == null || last == null) {
     return "";
@@ -3196,7 +3209,31 @@ function contestMarkdown(
             .join("\n"),
         ]),
     ...countMarkdown(contest),
-    ...placesMarkdown(contest.places, link, then),
+    ...(contest.channels == null || contest.channels.length < 2
+      ? []
+      : [
+          `## ${m.channels_title()}`,
+          [
+            `| ${m.channels_method()} | ${m.col_votes()} | ${m.channels_share()} | ${m.channels_leader()} |`,
+            "| --- | --- | --- | --- |",
+            ...contest.channels.map((row) => {
+              let cast = 0;
+              for (const other of contest.channels ?? []) {
+                cast += other.votes;
+              }
+              const label = CHANNEL_LABELS[row.code]();
+              return `| ${label} | ${count(row.votes)} | ${percent(row.votes / cast)} | ${row.leader == null ? "" : `${row.leader.label}, ${percent(row.leader.share)}`} |`;
+            }),
+          ].join("\n"),
+        ]),
+    ...placesMarkdown(
+      contest.places,
+      link,
+      then,
+      ["votes", "list_votes"].includes(contest.current?.measure ?? "")
+        ? (contest.current?.valid ?? null)
+        : null,
+    ),
     ...(contest.children.length === 0
       ? []
       : [
@@ -3643,6 +3680,20 @@ function comparedMarkdown(
             ? m.note_alternative_target({ publisher })
             : m.note_alternative_current({ publisher });
         }
+        if (note.code === "channels") {
+          const methods = (note.value ?? "")
+            .split(",")
+            .map((code) =>
+              (
+                CHANNEL_LABELS[code as keyof typeof CHANNEL_LABELS] ??
+                m.channel_all
+              )(),
+            )
+            .join(", ");
+          return note.side === "target"
+            ? m.note_channels_target({ methods })
+            : m.note_channels_current({ methods });
+        }
         return {
           no_target: m.note_no_target,
           not_covered: m.note_not_covered,
@@ -3658,6 +3709,7 @@ function placesMarkdown(
   places: Extract<Data, { kind: "contest" }>["contest"]["places"],
   link: Link,
   then: string | null,
+  total: number | null,
 ) {
   if (
     places == null ||
@@ -3672,8 +3724,36 @@ function placesMarkdown(
     places.levels.find((level) => level.code === places.level)?.noun ??
     places.level;
   const hasMargin = places.rows.some((row) => row.margin != null);
+  let placed = 0;
+  let pooled = 0;
+  for (const row of places.rows) {
+    if (row.isPool === true) {
+      pooled += row.valid;
+    } else {
+      placed += row.valid;
+    }
+  }
+  const reconciled =
+    total == null || total <= 0
+      ? null
+      : (total - placed - pooled) / total >= 0.001
+        ? placed + pooled === 0
+          ? null
+          : m.places_reconcile_short({
+              sum: count(placed + pooled),
+              total: count(total),
+            })
+        : pooled > 0
+          ? m.places_reconcile({
+              nouns: plural(noun),
+              sum: count(placed),
+              total: count(total),
+            })
+          : null;
   const led = Map.groupBy(
-    places.rows.filter((row) => row.leader != null && row.valid > 0),
+    places.rows.filter(
+      (row) => row.leader != null && row.valid > 0 && row.isCounted !== false,
+    ),
     (row) => row.leader ?? -1,
   )
     .entries()
@@ -3734,6 +3814,7 @@ function placesMarkdown(
         ];
       }),
     ),
+    ...(reconciled == null ? [] : [reconciled]),
     ...(isCompared && places.estimated === true
       ? [m.atlas_estimated_note({ year: then })]
       : []),

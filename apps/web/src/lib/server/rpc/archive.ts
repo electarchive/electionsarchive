@@ -36,11 +36,83 @@ const MEASURES = new Map([
 ]);
 const KINDS = ["shared", "each", "combined"] as const;
 const COUNTED = sql`${sql.param(MEASURES.keys().toArray())}::int2[]`;
+const CHANNELS = [
+  "all",
+  "election_day",
+  "early",
+  "postal",
+  "abroad",
+  "provisional",
+  "mobile",
+  "prison",
+  "customs",
+  "special_rules",
+] as const;
+const POOLS = [
+  "abroad_mission",
+  "customs_gate",
+  "abroad_aggregate",
+  "postal_district",
+  "mobile",
+  "prison",
+  "aggregate",
+  "standard",
+] as const;
+const POOLED = sql`
+  u.area_relation = 'unlocated' and (u.kind <> 'standard' or u.parent_id is null)
+`;
+const POOLED_NAMES: Record<(typeof POOLS)[number], () => string> = {
+  abroad_mission: m.places_pool_abroad,
+  customs_gate: m.places_pool_customs,
+  abroad_aggregate: m.places_pool_abroad_customs,
+  postal_district: m.places_pool_postal,
+  mobile: m.places_pool_mobile,
+  prison: m.places_pool_prison,
+  aggregate: m.places_pool_other,
+  standard: m.places_pool_other,
+};
+const POOLED_CHANNELS: Partial<Record<number, () => string>> = {
+  3: m.places_pool_postal,
+  4: m.places_pool_abroad,
+  6: m.places_pool_mobile,
+  7: m.places_pool_prison,
+  8: m.places_pool_customs,
+  9: m.places_pool_special,
+};
+const PLACED = sql`
+  u.area_relation = 'within' and u.kind <> 'standard'
+`;
+const POOL = sql`
+  case when u.kind = 'aggregate' and exists (
+    select from reporting_unit c where c.parent_id = u.id and c.kind = 'abroad_mission'
+  ) then 'abroad_aggregate' else u.kind::text end
+`;
 const FACTS = {
   area: (set: SQL, area: SQL) =>
     sql`
       select r.result_set_k, r.area_k, r.option_k, r.measure, r.count_round, r.value, r.complete
             from result_rollup r where r.result_set_k = ${set} and r.area_k = ${area} offset 0
+    `,
+  pool: (set: SQL, area: SQL) =>
+    sql`
+      select v.result_set_k, ${area} as area_k, v.option_k, v.measure, v.count_round, sum(v.value) as value, true as complete
+      from (select * from result_value x where (-(${area}) - 1) / 16 = 0 and x.result_set_k = ${set} offset 0) v
+      cross join lateral (select * from reporting_unit y where y.k = v.unit_k offset 0) u
+      where ${POOLED} and ${POOL} = (${sql.param([...POOLS])}::text[])[(-(${area}) - 1) % 16 + 1]
+        and not exists (
+          select from reporting_unit c join result_value w on w.result_set_k = ${set} and w.unit_k = c.k where c.parent_id = u.id
+        )
+      group by 1, 2, 3, 4, 5
+      union all
+      select v.result_set_k, ${area} as area_k, v.option_k, v.measure, v.count_round, sum(v.value) as value, true as complete
+      from area pa
+      join reporting_unit u on u.area_id = pa.id and ${PLACED}
+      join result_value v on v.result_set_k = ${set} and v.unit_k = u.k
+      where pa.k = (-(${area}) - 1) / 16 and ${POOL} = (${sql.param([...POOLS])}::text[])[(-(${area}) - 1) % 16 + 1]
+        and not exists (
+          select from reporting_unit c join result_value w on w.result_set_k = ${set} and w.unit_k = c.k where c.parent_id = u.id
+        )
+      group by 1, 2, 3, 4, 5
     `,
   unit: (set: SQL, unit: SQL) =>
     sql`
@@ -354,6 +426,7 @@ const PlaceRow = v.object({
     ),
   ),
   isRecorded: v.optional(v.boolean()),
+  isPool: v.optional(v.boolean()),
 });
 
 const Places = v.nullable(
@@ -2111,17 +2184,25 @@ async function places(
       code: string;
       scheme: string;
       noun: string;
+      kind: (typeof POOLS)[number];
+      channel: number | null;
       isDefault: boolean;
     }>(sql`
-      select u.k, u.id, u.code, u.scheme_code as scheme, s.noun,
+      select u.k, u.id, u.code, u.scheme_code as scheme, s.noun, ${POOL} as kind,
+        (select v.channel from result_value v where v.result_set_k = any(${sql.param(sets.rows.map((row) => row.k))}::int[]) and v.unit_k = u.k and v.measure = any(${COUNTED}) and v.option_k <> 0 limit 1) as channel,
         exists (
           select from result_value v
           where v.result_set_k = any(${sql.param(defaults)}::int[]) and v.unit_k = u.k
             and v.measure = any(${COUNTED})
         ) as "isDefault"
       from reporting_unit u join scheme s on s.code = u.scheme_code
-      where u.area_relation = 'within'
-        and (u.area_id = any(${sql.param(within)}::uuid[]) or u.id in (select m.unit_id from reporting_unit_area m where m.area_id = any(${sql.param(within)}::uuid[])))
+      where u.k in (
+          select x.k from reporting_unit x where x.area_relation = 'within'
+            and (x.area_id = any(${sql.param(within)}::uuid[]) or x.id in (select m.unit_id from reporting_unit_area m where m.area_id = any(${sql.param(within)}::uuid[])))
+          union
+          select v.unit_k from result_value v join reporting_unit x on x.k = v.unit_k and x.area_id is null and x.kind <> 'standard'
+          where v.result_set_k = any(${sql.param(sets.rows.map((row) => row.k))}::int[])
+        )
         and exists (
           select from result_value v
           where v.result_set_k = any(${sql.param(sets.rows.map((row) => row.k))}::int[]) and v.unit_k = u.k
@@ -2152,8 +2233,11 @@ async function places(
       group.map((row) => row.id),
       contest.date,
     );
+    const isMixed = group.some((row) => row.kind === "standard");
     const rows = group
       .map((row) => {
+        const isPool =
+          isMixed && !["standard", "mobile", "prison"].includes(row.kind);
         const code =
           row.scheme === "us.precinct"
             ? row.code.split(":").slice(4).join(":")
@@ -2168,20 +2252,31 @@ async function places(
                   : word,
             );
         const noun = row.noun.charAt(0).toUpperCase() + row.noun.slice(1);
+        const pooled = (
+          POOLED_CHANNELS[row.channel ?? 0] ?? POOLED_NAMES[row.kind]
+        )();
+        const ordinal = /\d+$/u.exec(code)?.[0];
         return {
           k: row.k,
           name:
             labels.full.get(row.id) ??
-            (/^\d/u.test(cased)
-              ? `${noun} ${cased.replace(/^0+(?=\d)/u, "")}`
-              : cased),
+            (isPool
+              ? ordinal == null
+                ? pooled
+                : `${pooled} ${ordinal.replace(/^0+(?=\d)/u, "")}`
+              : /^\d/u.test(cased)
+                ? `${noun} ${cased.replace(/^0+(?=\d)/u, "")}`
+                : cased),
           path: null,
           isContest: false,
           owner: null,
+          isPool,
         };
       })
-      .toSorted((a, b) =>
-        a.name.localeCompare(b.name, undefined, { numeric: true }),
+      .toSorted(
+        (a, b) =>
+          Number(a.isPool) - Number(b.isPool) ||
+          a.name.localeCompare(b.name, undefined, { numeric: true }),
       );
     const tabulated = await tabulate(
       [contest.root],
@@ -2202,7 +2297,11 @@ async function places(
       })),
       level: `unit:${group[0]?.scheme ?? ""}`,
       ...tabulated,
-      rows: tabulated.rows.map((row) => ({ ...row, at: null })),
+      rows: tabulated.rows.map((row, index) => ({
+        ...row,
+        at: null,
+        ...(rows[index]?.isPool === true && { isPool: true }),
+      })),
     };
   }
   const allocated = await db.execute<{
@@ -2273,6 +2372,66 @@ async function places(
       owner: null,
     };
   });
+  const pooled = await db.execute<{
+    pool: (typeof POOLS)[number];
+    isPlaced: boolean;
+    channels: Array<number>;
+  }>(sql`
+    with recursive grp(id) as (
+      select ${contest.root}::uuid
+      union all
+      select c.id from contest c join grp on c.allocation_parent_id = grp.id
+    ),
+    sets as materialized (
+      select rs.k from grp join result_set rs on rs.contest_id = grp.id and rs.status = 'active'
+    ),
+    short as materialized (
+      select ${isRoot && contest.place?.k === area.k ? sql`true` : sql`false`} and (
+        select sum(r.value) from sets cross join lateral (
+          select r.value from result_rollup r
+          where r.result_set_k = sets.k and r.area_k = ${area.k} and r.measure = any(${COUNTED}) and r.option_k <> 0 offset 0
+        ) r
+      ) > (
+        select coalesce(sum(r.value), 0) from sets cross join unnest(${sql.param(shown.map((kid) => kid.k))}::int[]) as kid(k) cross join lateral (
+          select r.value from result_rollup r
+          where r.result_set_k = sets.k and r.area_k = kid.k and r.measure = any(${COUNTED}) and r.option_k <> 0 offset 0
+        ) r
+      ) as "isShort"
+    )
+    select u.pool, u."isPlaced", array_agg(distinct u.channel) as channels from (
+      select ${POOL} as pool, false as "isPlaced", (
+        select v.channel from result_value v where v.result_set_k = any(select k from sets) and v.unit_k = u.k and v.measure = any(${COUNTED}) and v.option_k <> 0 limit 1
+      ) as channel
+      from reporting_unit u
+      where (select "isShort" from short) and u.area_id is null and ${POOLED}
+        and exists (select from result_value v where v.unit_k = u.k and v.result_set_k = any(select k from sets))
+      union all
+      select ${POOL}, true, (
+        select v.channel from result_value v where v.result_set_k = any(select k from sets) and v.unit_k = u.k and v.measure = any(${COUNTED}) and v.option_k <> 0 limit 1
+      )
+      from reporting_unit u
+      where u.area_id = ${area.id}::uuid and ${PLACED}
+        and exists (select from result_value v where v.unit_k = u.k and v.result_set_k = any(select k from sets))
+    ) u
+    group by 1, 2
+  `);
+  const pools = pooled.rows
+    .map((row) => ({ ...row, index: POOLS.indexOf(row.pool) }))
+    .toSorted(
+      (a, b) => Number(a.isPlaced) - Number(b.isPlaced) || a.index - b.index,
+    )
+    .map((row) => ({
+      k: -((row.isPlaced ? area.k * 16 : 0) + row.index + 1),
+      name: (
+        (row.index >= POOLS.indexOf("aggregate") && row.channels.length === 1
+          ? POOLED_CHANNELS[row.channels[0] ?? 0]
+          : null) ?? POOLED_NAMES[row.pool]
+      )(),
+      path: null,
+      isContest: false,
+      isCounted: false,
+      owner: null,
+    }));
   const parents = new Map(shown.map((kid) => [kid.id, kid.k]));
   const nested = allocated.rows.filter(
     (row) =>
@@ -2284,6 +2443,7 @@ async function places(
   );
   const listed = [
     ...rows,
+    ...pools,
     ...nested.map((row) => ({
       k: row.k,
       name: nestedNames.full.get(row.area) ?? "",
@@ -2400,15 +2560,16 @@ async function places(
     ...tabulated,
     estimated: spread.size > 0,
     rows: tabulated.rows
-      .slice(0, rows.length)
+      .slice(0, rows.length + pools.length)
       .map((row) => ({
         ...row,
         ...turnouts(row),
         at: at.get(row.k) ?? null,
         seats: seats.get(row.k) ?? null,
+        ...(row.k < 0 && { isPool: true }),
       })),
     districts: tabulated.rows
-      .slice(rows.length)
+      .slice(rows.length + pools.length)
       .map((row, index) => ({
         ...row,
         ...turnouts(row),
@@ -2445,14 +2606,16 @@ async function tabulate(
 ) {
   const ks = rows.map((row) => row.k);
   const depth = new Map<number, number>();
-  const tier = rows.map((row) => {
+  const stacked = rows.map((row) => {
     const n = depth.get(row.k) ?? 0;
     depth.set(row.k, n + 1);
     return n;
   });
+  const top = Math.max(0, ...stacked) + 1;
+  const tier = stacked.map((n, index) => ((rows[index]?.k ?? 0) < 0 ? top : n));
   const [now, then] = await Promise.all([
     Promise.all(
-      Array.from({ length: Math.max(0, ...tier) + 1 }, async (_, n) => {
+      Array.from({ length: top + 1 }, async (_, n) => {
         const batch = rows.filter((_row, index) => tier[index] === n);
         return load(
           roots,
@@ -2461,7 +2624,7 @@ async function tabulate(
           [],
           batch.flatMap((row) => (row.owner == null ? [] : [row.owner])),
           round,
-          facts,
+          n === top ? "pool" : facts,
         );
       }),
     ),
@@ -2829,7 +2992,8 @@ type Note = {
     | "annulled"
     | "partial"
     | "alternative"
-    | "redrawn";
+    | "redrawn"
+    | "channels";
   side: "current" | "target" | null;
   value: string | null;
 };
@@ -3207,6 +3371,21 @@ export const contests = {
         quorum: v.nullable(v.number()),
         ballot: v.optional(v.nullable(v.number())),
         isStv: v.optional(v.boolean()),
+        channels: v.optional(
+          v.array(
+            v.object({
+              code: v.picklist(CHANNELS),
+              votes: v.number(),
+              leader: v.nullable(
+                v.object({
+                  label: v.string(),
+                  color: v.nullable(v.string()),
+                  share: v.number(),
+                }),
+              ),
+            }),
+          ),
+        ),
         partial: v.nullable(v.object({ held: v.number(), of: v.number() })),
         turnout: v.nullable(
           v.object({
@@ -3343,6 +3522,7 @@ export const contests = {
                 "partial",
                 "alternative",
                 "redrawn",
+                "channels",
               ]),
               side: v.nullable(v.picklist(["current", "target"])),
               value: v.nullable(v.string()),
@@ -3408,7 +3588,7 @@ export const contests = {
       const isRoot = scoped == null;
       const area = scoped ?? contest.place;
       const unit = chain.map((entry) => entry.segment);
-      const [parts, ancestors, cited, home, roll, reach, counted] =
+      const [parts, ancestors, cited, home, roll, reach, counted, split] =
         await Promise.all([
           db.execute<{ id: string }>(sql`
             select id from contest where allocation_parent_id = ${contest.id}::uuid
@@ -3510,6 +3690,33 @@ export const contests = {
               where c.id = ${contest.id}::uuid and c.magnitude > 1
                 and coalesce(c.rules_override ->> 'formula', es.rules ->> 'formula') = 'stv'
             ) stv on true
+          `),
+          db.execute<{
+            channel: number;
+            option: number;
+            person: string | null;
+            party: string | null;
+            value: number;
+          }>(sql`
+            with facts as (
+              select r.channel, r.option_k, r.measure, r.count_round, r.value
+              from result_set rs cross join lateral (
+                select x.channel, x.option_k, x.measure, x.count_round, x.value from result_rollup x
+                where x.result_set_k = rs.k and x.area_k = ${area?.k ?? null}::int and x.measure = any(${COUNTED}) and x.option_k <> 0 offset 0
+              ) r
+              where rs.contest_id = ${contest.id}::uuid and ${latest("rs")}
+            ),
+            first as (
+              select measure, count_round from facts
+              order by array_position(${COUNTED}, measure), count_round limit 1
+            )
+            select f.channel, f.option_k as option,
+              (select cy.person_id from candidacy cy where o.kind = 'candidate' and cy.option_id = o.id order by cy.role <> 'head' limit 1) as person,
+              o.party_id as party, sum(f.value)::float8 as value
+            from facts f join first using (measure, count_round)
+            join contest_option o on o.k = f.option_k
+            group by 1, 2, 3, 4
+            having (select count(distinct channel) from facts) > 1
           `),
         ]);
       const [
@@ -3627,14 +3834,16 @@ export const contests = {
         ]);
       const declaredParties = [
         ...new Set(
-          declared.rows.map((row) => row.party).filter((id) => id != null),
+          [...declared.rows, ...split.rows]
+            .map((row) => row.party)
+            .filter((id) => id != null),
         ),
       ];
       const [declaredLabels, declaredColors] = await Promise.all([
         names(
           [
             ...declaredParties,
-            ...declared.rows
+            ...[...declared.rows, ...split.rows]
               .map((row) => row.person)
               .filter((id) => id != null),
           ],
@@ -3765,6 +3974,42 @@ export const contests = {
         quorum: roll.quorum,
         ballot: roll.ballot,
         isStv: roll.isStv,
+        channels: Map.groupBy(split.rows, (row) => row.channel)
+          .entries()
+          .map(([channel, rows]) => {
+            let votes = 0;
+            const sums = new Map<string, (typeof rows)[number]>();
+            for (const row of rows) {
+              votes += row.value;
+              const key = row.person ?? row.party ?? String(row.option);
+              const sum = sums.get(key);
+              sums.set(
+                key,
+                sum == null ? row : { ...sum, value: sum.value + row.value },
+              );
+            }
+            const [lead] = sums
+              .values()
+              .toArray()
+              .toSorted((a, b) => b.value - a.value);
+            return {
+              code: CHANNELS[channel] ?? "all",
+              votes,
+              leader:
+                lead == null || votes <= 0
+                  ? null
+                  : {
+                      label:
+                        declaredLabels.full.get(
+                          lead.person ?? lead.party ?? "",
+                        ) ?? "",
+                      color: declaredColor.get(lead.party ?? "") ?? null,
+                      share: lead.value / votes,
+                    },
+            };
+          })
+          .toArray()
+          .toSorted((a, b) => b.votes - a.votes),
         partial:
           reach.rows.find((row) => row.held > 0 && row.held < row.of) ?? null,
         count: null,
@@ -4979,6 +5224,44 @@ export const contests = {
         ...caveats("current", current.sets),
         ...caveats("target", earlier?.sets ?? []),
       ];
+      if (earlier != null) {
+        const methods = await db.execute<{
+          channel: number;
+          isCurrent: boolean;
+        }>(sql`
+          select distinct r.channel, s."isCurrent"
+          from (
+            select unnest(${sql.param(current.ks)}::int[]) as k, true as "isCurrent"
+            union all
+            select unnest(${sql.param(earlier.ks)}::int[]), false
+          ) s
+          cross join lateral (
+            select x.channel from result_rollup x
+            where x.result_set_k = s.k and x.area_k = ${area.k}::int and x.channel <> 0 and x.measure = any(${COUNTED}) offset 0
+          ) r
+        `);
+        for (const isCurrent of [true, false]) {
+          const only = methods.rows.filter(
+            (row) =>
+              row.isCurrent === isCurrent &&
+              methods.rows.every(
+                (other) =>
+                  other.isCurrent === isCurrent ||
+                  other.channel !== row.channel,
+              ),
+          );
+          if (only.length > 0) {
+            notesOut.push({
+              code: "channels",
+              side: isCurrent ? "current" : "target",
+              value: only
+                .map((row) => CHANNELS[row.channel] ?? "all")
+                .toSorted()
+                .join(","),
+            });
+          }
+        }
+      }
       const target =
         chosen == null || earlier == null
           ? null
@@ -13206,13 +13489,20 @@ export const polities = {
                       Number(COURT.test(a.name)) - Number(COURT.test(b.name)),
                   )
                   .map((race, _index, all) => {
-                    let contested = 0;
-                    for (const row of race.results) {
-                      contested += row.seats ?? 0;
-                    }
                     const namesakes = all.filter(
                       (other) => other !== race && other.name === race.name,
                     );
+                    const isOpening = all.some(
+                      (other) =>
+                        race.kind === "office" &&
+                        other.kind === race.kind &&
+                        other.anchor === race.anchor &&
+                        (other.round ?? 1) > (race.round ?? 1),
+                    );
+                    let contested = 0;
+                    for (const row of race.results) {
+                      contested += isOpening ? 0 : (row.seats ?? 0);
+                    }
                     return {
                       contest: race.contest,
                       name:
@@ -13246,11 +13536,15 @@ export const polities = {
                               !row.isIndependent),
                         ),
                       measure: race.measure,
-                      results: (contested > 0
-                        ? race.results.toSorted(
-                            (a, b) => (b.seats ?? 0) - (a.seats ?? 0),
-                          )
-                        : race.results
+                      results: (isOpening
+                        ? race.results
+                            .map((row) => ({ ...row, seats: null }))
+                            .toSorted((a, b) => b.votes - a.votes)
+                        : contested > 0
+                          ? race.results.toSorted(
+                              (a, b) => (b.seats ?? 0) - (a.seats ?? 0),
+                            )
+                          : race.results
                       )
                         .filter(
                           (row) =>
