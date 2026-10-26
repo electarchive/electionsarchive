@@ -648,6 +648,9 @@ function coverageMarkdown(
         ),
         ...tier.levels.flatMap((level) => {
           const notes = notesFor(level.key);
+          const note = summary.levels.find(
+            (found) => found.key === level.key,
+          )?.note;
           const unlisted = notes.filter(
             (note) => note.listed === false && note.from != null,
           );
@@ -658,6 +661,7 @@ function coverageMarkdown(
                 (note) =>
                   `- ${m.coverage_ledger_uncounted()} ${note.from === note.to ? note.from : `${note.from}–${note.to}`}. ${note.note}${(note.held ?? 0) > 0 ? ` ${m.coverage_ledger_held({ count: count(note.held ?? 0) })}` : ""}`,
               ),
+            ...(note == null ? [] : [`- ${note}`]),
             ...notes
               .filter((note) => note.from == null)
               .map((note) => `- ${note.note}`),

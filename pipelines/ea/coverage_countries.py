@@ -485,6 +485,7 @@ def build(conn) -> tuple[list[tuple], list[tuple]]:
                             "goal": lv["goal"],
                             "fine": bool(lv.get("fine")),
                             "unit": lv.get("unit", "district"),
+                            "note": lv.get("note"),
                         }
                         for lv in spec["levels"]
                     ]

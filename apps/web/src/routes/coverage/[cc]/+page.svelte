@@ -551,9 +551,13 @@
                     (note) => note.listed === false && note.from != null,
                   ),
                 )}
-                {const general = $derived(
-                  notes.filter((note) => note.from == null),
-                )}
+                {const general = $derived([
+                  ...(summary.levels.find((found) => found.key === level.key)
+                    ?.note ?? []),
+                  ...notes.flatMap((note) =>
+                    note.from == null ? [note.note] : [],
+                  ),
+                ])}
                 {const counted = $derived(
                   spans(
                     level.years,
@@ -622,7 +626,7 @@
                           </span>
                         {/each}
                         {#each general as note, index (index)}
-                          <span>{note.note}</span>
+                          <span>{note}</span>
                         {/each}
                         {#if unlisted.length > 0}
                           <span
@@ -680,6 +684,13 @@
                     >
                   {/if}
                   {@render cards(level.cells, row.key)}
+                  {const remark = $derived(
+                    summary.levels.find((found) => found.key === level.key)
+                      ?.note,
+                  )}
+                  {#if remark != null}
+                    <p class="text-sm text-muted-foreground">{remark}</p>
+                  {/if}
                   {#each notes as note, index (index)}
                     <p class="text-sm text-muted-foreground">
                       {#if note.from != null && note.listed !== false}
@@ -695,6 +706,11 @@
                             years: `${note.from} (${count(note.held ?? 0)})`,
                           })
                         : note.note}
+                      {#if note.listed !== false && (note.held ?? 0) > 0}
+                        {m.coverage_ledger_held({
+                          count: count(note.held ?? 0),
+                        })}
+                      {/if}
                     </p>
                   {/each}
                 </li>

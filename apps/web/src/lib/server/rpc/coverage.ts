@@ -91,6 +91,7 @@ const Summary = v.object({
       goal: v.string(),
       fine: v.boolean(),
       unit: v.string(),
+      note: v.optional(v.nullable(v.string())),
     }),
   ),
   notes: v.array(Note),

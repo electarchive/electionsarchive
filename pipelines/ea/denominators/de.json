@@ -13,6 +13,12 @@
       "publisher": "Die Bundeswahlleiterin",
       "url": "https://www.bundeswahlleiterin.de/bundestagswahlen/2025/wahlkreiseinteilung.html",
       "note": "Fetched directly. Wahlkreiseinteilung per Land; the table's Anzahl Wahlkreise column sums to 299."
+    },
+    "bwl-ltw": {
+      "title": "Ergebnisse früherer Landtagswahlen (Stand: 13. Oktober 2026), Table 1: Wahltermine seit 1946",
+      "publisher": "Die Bundeswahlleiterin",
+      "url": "https://www.bundeswahlleiterin.de/dam/jcr/a333e523-0717-42ad-a772-d5ad7e7e97cc/ltw_erg_gesamt.pdf",
+      "note": "Table 1 lists every Landtag, Bürgerschaft, and Abgeordnetenhaus election by Land since 1946. Footnote 3: Bremen's first Bürgerschaft (13.10.1946) was a municipal election. Footnotes 5 and 6 are partial repeat elections; footnote 7 is Berlin's full repeat election of 12.02.2023."
     }
   },
   "levels": [
@@ -237,11 +243,1919 @@
       "gaps": [
         {
           "from": 1946,
-          "to": 2026,
-          "note": "No official count of Landtag constituencies at each election has been compiled yet."
+          "to": 1950,
+          "note": "Before Baden-Württemberg was formed in 1952, Württemberg-Baden, Baden, and Württemberg-Hohenzollern held their own elections. They aren't counted yet."
         }
       ],
-      "elections": []
+      "elections": [
+        {
+          "date": "1946-10-13",
+          "contests": 1,
+          "regions": {
+            "HH": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 13.10.1946: HH 1."
+        },
+        {
+          "date": "1946-12-01",
+          "contests": 2,
+          "regions": {
+            "BY": 1,
+            "HE": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 01.12.1946: BY 1.; HE 1."
+        },
+        {
+          "date": "1947-04-20",
+          "contests": 2,
+          "regions": {
+            "NW": 1,
+            "SH": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 20.04.1947: NW 1.; SH 1."
+        },
+        {
+          "date": "1947-05-18",
+          "contests": 1,
+          "regions": {
+            "RP": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 18.05.1947: RP 1."
+        },
+        {
+          "date": "1947-10-05",
+          "contests": 1,
+          "regions": {
+            "SL": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 05.10.1947: SL 1."
+        },
+        {
+          "date": "1947-10-12",
+          "contests": 2,
+          "regions": {
+            "HB": 1,
+            "NI": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 12.10.1947: HB 2.; NI 1."
+        },
+        {
+          "date": "1949-10-16",
+          "contests": 1,
+          "regions": {
+            "HH": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 16.10.1949: HH 2."
+        },
+        {
+          "date": "1950-06-18",
+          "contests": 1,
+          "regions": {
+            "NW": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 18.06.1950: NW 2."
+        },
+        {
+          "date": "1950-07-09",
+          "contests": 1,
+          "regions": {
+            "SH": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 09.07.1950: SH 2."
+        },
+        {
+          "date": "1950-11-19",
+          "contests": 1,
+          "regions": {
+            "HE": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 19.11.1950: HE 2."
+        },
+        {
+          "date": "1950-11-26",
+          "contests": 1,
+          "regions": {
+            "BY": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 26.11.1950: BY 2."
+        },
+        {
+          "date": "1950-12-03",
+          "contests": 1,
+          "regions": {
+            "BE": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 03.12.1950: BE 1."
+        },
+        {
+          "date": "1951-04-29",
+          "contests": 1,
+          "regions": {
+            "RP": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 29.04.1951: RP 2."
+        },
+        {
+          "date": "1951-05-06",
+          "contests": 1,
+          "regions": {
+            "NI": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 06.05.1951: NI 2."
+        },
+        {
+          "date": "1951-10-07",
+          "contests": 1,
+          "regions": {
+            "HB": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 07.10.1951: HB 3."
+        },
+        {
+          "date": "1952-03-09",
+          "contests": 1,
+          "regions": {
+            "BW": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 09.03.1952: BW 2."
+        },
+        {
+          "date": "1952-11-30",
+          "contests": 1,
+          "regions": {
+            "SL": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 30.11.1952: SL 2."
+        },
+        {
+          "date": "1953-11-01",
+          "contests": 1,
+          "regions": {
+            "HH": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 01.11.1953: HH 3."
+        },
+        {
+          "date": "1954-06-27",
+          "contests": 1,
+          "regions": {
+            "NW": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 27.06.1954: NW 3."
+        },
+        {
+          "date": "1954-09-12",
+          "contests": 1,
+          "regions": {
+            "SH": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 12.09.1954: SH 3."
+        },
+        {
+          "date": "1954-11-28",
+          "contests": 2,
+          "regions": {
+            "BY": 1,
+            "HE": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 28.11.1954: BY 3.; HE 3."
+        },
+        {
+          "date": "1954-12-05",
+          "contests": 1,
+          "regions": {
+            "BE": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 05.12.1954: BE 2."
+        },
+        {
+          "date": "1955-04-24",
+          "contests": 1,
+          "regions": {
+            "NI": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 24.04.1955: NI 3."
+        },
+        {
+          "date": "1955-05-15",
+          "contests": 1,
+          "regions": {
+            "RP": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 15.05.1955: RP 3."
+        },
+        {
+          "date": "1955-10-09",
+          "contests": 1,
+          "regions": {
+            "HB": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 09.10.1955: HB 4."
+        },
+        {
+          "date": "1955-12-18",
+          "contests": 1,
+          "regions": {
+            "SL": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 18.12.1955: SL 3."
+        },
+        {
+          "date": "1956-03-04",
+          "contests": 1,
+          "regions": {
+            "BW": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 04.03.1956: BW 3."
+        },
+        {
+          "date": "1957-11-10",
+          "contests": 1,
+          "regions": {
+            "HH": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 10.11.1957: HH 4."
+        },
+        {
+          "date": "1958-07-06",
+          "contests": 1,
+          "regions": {
+            "NW": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 06.07.1958: NW 4."
+        },
+        {
+          "date": "1958-09-28",
+          "contests": 1,
+          "regions": {
+            "SH": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 28.09.1958: SH 4."
+        },
+        {
+          "date": "1958-11-23",
+          "contests": 2,
+          "regions": {
+            "BY": 1,
+            "HE": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 23.11.1958: BY 4.; HE 4."
+        },
+        {
+          "date": "1958-12-07",
+          "contests": 1,
+          "regions": {
+            "BE": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 07.12.1958: BE 3."
+        },
+        {
+          "date": "1959-04-19",
+          "contests": 2,
+          "regions": {
+            "NI": 1,
+            "RP": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 19.04.1959: NI 4.; RP 4."
+        },
+        {
+          "date": "1959-10-11",
+          "contests": 1,
+          "regions": {
+            "HB": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 11.10.1959: HB 5."
+        },
+        {
+          "date": "1960-05-15",
+          "contests": 1,
+          "regions": {
+            "BW": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 15.05.1960: BW 4."
+        },
+        {
+          "date": "1960-12-04",
+          "contests": 1,
+          "regions": {
+            "SL": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 04.12.1960: SL 4."
+        },
+        {
+          "date": "1961-11-12",
+          "contests": 1,
+          "regions": {
+            "HH": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 12.11.1961: HH 5."
+        },
+        {
+          "date": "1962-07-08",
+          "contests": 1,
+          "regions": {
+            "NW": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 08.07.1962: NW 5."
+        },
+        {
+          "date": "1962-09-23",
+          "contests": 1,
+          "regions": {
+            "SH": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 23.09.1962: SH 5."
+        },
+        {
+          "date": "1962-11-11",
+          "contests": 1,
+          "regions": {
+            "HE": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 11.11.1962: HE 5."
+        },
+        {
+          "date": "1962-11-25",
+          "contests": 1,
+          "regions": {
+            "BY": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 25.11.1962: BY 5."
+        },
+        {
+          "date": "1963-02-17",
+          "contests": 1,
+          "regions": {
+            "BE": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 17.02.1963: BE 4."
+        },
+        {
+          "date": "1963-03-31",
+          "contests": 1,
+          "regions": {
+            "RP": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 31.03.1963: RP 5."
+        },
+        {
+          "date": "1963-05-19",
+          "contests": 1,
+          "regions": {
+            "NI": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 19.05.1963: NI 5."
+        },
+        {
+          "date": "1963-09-29",
+          "contests": 1,
+          "regions": {
+            "HB": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 29.09.1963: HB 6."
+        },
+        {
+          "date": "1964-04-26",
+          "contests": 1,
+          "regions": {
+            "BW": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 26.04.1964: BW 5."
+        },
+        {
+          "date": "1965-06-27",
+          "contests": 1,
+          "regions": {
+            "SL": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 27.06.1965: SL 5."
+        },
+        {
+          "date": "1966-03-27",
+          "contests": 1,
+          "regions": {
+            "HH": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 27.03.1966: HH 6."
+        },
+        {
+          "date": "1966-07-10",
+          "contests": 1,
+          "regions": {
+            "NW": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 10.07.1966: NW 6."
+        },
+        {
+          "date": "1966-11-06",
+          "contests": 1,
+          "regions": {
+            "HE": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 06.11.1966: HE 6."
+        },
+        {
+          "date": "1966-11-20",
+          "contests": 1,
+          "regions": {
+            "BY": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 20.11.1966: BY 6."
+        },
+        {
+          "date": "1967-03-12",
+          "contests": 1,
+          "regions": {
+            "BE": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 12.03.1967: BE 5."
+        },
+        {
+          "date": "1967-04-23",
+          "contests": 2,
+          "regions": {
+            "RP": 1,
+            "SH": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 23.04.1967: RP 6.; SH 6."
+        },
+        {
+          "date": "1967-06-04",
+          "contests": 1,
+          "regions": {
+            "NI": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 04.06.1967: NI 6."
+        },
+        {
+          "date": "1967-10-01",
+          "contests": 1,
+          "regions": {
+            "HB": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 01.10.1967: HB 7."
+        },
+        {
+          "date": "1968-04-28",
+          "contests": 1,
+          "regions": {
+            "BW": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 28.04.1968: BW 6."
+        },
+        {
+          "date": "1970-03-22",
+          "contests": 1,
+          "regions": {
+            "HH": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 22.03.1970: HH 7."
+        },
+        {
+          "date": "1970-06-14",
+          "contests": 3,
+          "regions": {
+            "SL": 1,
+            "NI": 1,
+            "NW": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 14.06.1970: SL 6.; NI 7.; NW 7."
+        },
+        {
+          "date": "1970-11-08",
+          "contests": 1,
+          "regions": {
+            "HE": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 08.11.1970: HE 7."
+        },
+        {
+          "date": "1970-11-22",
+          "contests": 1,
+          "regions": {
+            "BY": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 22.11.1970: BY 7."
+        },
+        {
+          "date": "1971-03-14",
+          "contests": 1,
+          "regions": {
+            "BE": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 14.03.1971: BE 6."
+        },
+        {
+          "date": "1971-03-21",
+          "contests": 1,
+          "regions": {
+            "RP": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 21.03.1971: RP 7."
+        },
+        {
+          "date": "1971-04-25",
+          "contests": 1,
+          "regions": {
+            "SH": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 25.04.1971: SH 7."
+        },
+        {
+          "date": "1971-10-10",
+          "contests": 1,
+          "regions": {
+            "HB": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 10.10.1971: HB 8."
+        },
+        {
+          "date": "1972-04-23",
+          "contests": 1,
+          "regions": {
+            "BW": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 23.04.1972: BW 7."
+        },
+        {
+          "date": "1974-03-03",
+          "contests": 1,
+          "regions": {
+            "HH": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 03.03.1974: HH 8."
+        },
+        {
+          "date": "1974-06-09",
+          "contests": 1,
+          "regions": {
+            "NI": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 09.06.1974: NI 8."
+        },
+        {
+          "date": "1974-10-27",
+          "contests": 2,
+          "regions": {
+            "BY": 1,
+            "HE": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 27.10.1974: BY 8.; HE 8."
+        },
+        {
+          "date": "1975-03-02",
+          "contests": 1,
+          "regions": {
+            "BE": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 02.03.1975: BE 7."
+        },
+        {
+          "date": "1975-03-09",
+          "contests": 1,
+          "regions": {
+            "RP": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 09.03.1975: RP 8."
+        },
+        {
+          "date": "1975-04-13",
+          "contests": 1,
+          "regions": {
+            "SH": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 13.04.1975: SH 8."
+        },
+        {
+          "date": "1975-05-04",
+          "contests": 2,
+          "regions": {
+            "SL": 1,
+            "NW": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 04.05.1975: SL 7.; NW 8."
+        },
+        {
+          "date": "1975-09-28",
+          "contests": 1,
+          "regions": {
+            "HB": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 28.09.1975: HB 9."
+        },
+        {
+          "date": "1976-04-04",
+          "contests": 1,
+          "regions": {
+            "BW": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 04.04.1976: BW 8."
+        },
+        {
+          "date": "1978-06-04",
+          "contests": 2,
+          "regions": {
+            "HH": 1,
+            "NI": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 04.06.1978: HH 9.; NI 9."
+        },
+        {
+          "date": "1978-10-08",
+          "contests": 1,
+          "regions": {
+            "HE": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 08.10.1978: HE 9."
+        },
+        {
+          "date": "1978-10-15",
+          "contests": 1,
+          "regions": {
+            "BY": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 15.10.1978: BY 9."
+        },
+        {
+          "date": "1979-03-18",
+          "contests": 2,
+          "regions": {
+            "BE": 1,
+            "RP": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 18.03.1979: BE 8.; RP 9."
+        },
+        {
+          "date": "1979-04-29",
+          "contests": 1,
+          "regions": {
+            "SH": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 29.04.1979: SH 9."
+        },
+        {
+          "date": "1979-10-07",
+          "contests": 1,
+          "regions": {
+            "HB": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 07.10.1979: HB 10."
+        },
+        {
+          "date": "1980-03-16",
+          "contests": 1,
+          "regions": {
+            "BW": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 16.03.1980: BW 9."
+        },
+        {
+          "date": "1980-04-27",
+          "contests": 1,
+          "regions": {
+            "SL": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 27.04.1980: SL 8."
+        },
+        {
+          "date": "1980-05-11",
+          "contests": 1,
+          "regions": {
+            "NW": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 11.05.1980: NW 9."
+        },
+        {
+          "date": "1981-05-10",
+          "contests": 1,
+          "regions": {
+            "BE": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 10.05.1981: BE 9."
+        },
+        {
+          "date": "1982-03-21",
+          "contests": 1,
+          "regions": {
+            "NI": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 21.03.1982: NI 10."
+        },
+        {
+          "date": "1982-06-06",
+          "contests": 1,
+          "regions": {
+            "HH": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 06.06.1982: HH 10."
+        },
+        {
+          "date": "1982-09-26",
+          "contests": 1,
+          "regions": {
+            "HE": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 26.09.1982: HE 10."
+        },
+        {
+          "date": "1982-10-10",
+          "contests": 1,
+          "regions": {
+            "BY": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 10.10.1982: BY 10."
+        },
+        {
+          "date": "1982-12-19",
+          "contests": 1,
+          "regions": {
+            "HH": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 19.12.1982: HH 11."
+        },
+        {
+          "date": "1983-03-06",
+          "contests": 1,
+          "regions": {
+            "RP": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 06.03.1983: RP 10."
+        },
+        {
+          "date": "1983-03-13",
+          "contests": 1,
+          "regions": {
+            "SH": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 13.03.1983: SH 10."
+        },
+        {
+          "date": "1983-09-25",
+          "contests": 2,
+          "regions": {
+            "HB": 1,
+            "HE": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 25.09.1983: HB 11.; HE 11."
+        },
+        {
+          "date": "1984-03-25",
+          "contests": 1,
+          "regions": {
+            "BW": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 25.03.1984: BW 10."
+        },
+        {
+          "date": "1985-03-10",
+          "contests": 2,
+          "regions": {
+            "BE": 1,
+            "SL": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 10.03.1985: BE 10.; SL 9."
+        },
+        {
+          "date": "1985-05-12",
+          "contests": 1,
+          "regions": {
+            "NW": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 12.05.1985: NW 10."
+        },
+        {
+          "date": "1986-06-15",
+          "contests": 1,
+          "regions": {
+            "NI": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 15.06.1986: NI 11."
+        },
+        {
+          "date": "1986-10-12",
+          "contests": 1,
+          "regions": {
+            "BY": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 12.10.1986: BY 11."
+        },
+        {
+          "date": "1986-11-09",
+          "contests": 1,
+          "regions": {
+            "HH": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 09.11.1986: HH 12."
+        },
+        {
+          "date": "1987-04-05",
+          "contests": 1,
+          "regions": {
+            "HE": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 05.04.1987: HE 12."
+        },
+        {
+          "date": "1987-05-17",
+          "contests": 2,
+          "regions": {
+            "HH": 1,
+            "RP": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 17.05.1987: HH 13.; RP 11."
+        },
+        {
+          "date": "1987-09-13",
+          "contests": 2,
+          "regions": {
+            "HB": 1,
+            "SH": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 13.09.1987: HB 12.; SH 11."
+        },
+        {
+          "date": "1988-03-20",
+          "contests": 1,
+          "regions": {
+            "BW": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 20.03.1988: BW 11."
+        },
+        {
+          "date": "1988-05-08",
+          "contests": 1,
+          "regions": {
+            "SH": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 08.05.1988: SH 12."
+        },
+        {
+          "date": "1989-01-29",
+          "contests": 1,
+          "regions": {
+            "BE": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 29.01.1989: BE 11."
+        },
+        {
+          "date": "1990-01-28",
+          "contests": 1,
+          "regions": {
+            "SL": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 28.01.1990: SL 10."
+        },
+        {
+          "date": "1990-05-13",
+          "contests": 2,
+          "regions": {
+            "NW": 1,
+            "NI": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 13.05.1990: NW 11.; NI 12."
+        },
+        {
+          "date": "1990-10-14",
+          "contests": 6,
+          "regions": {
+            "BB": 1,
+            "MV": 1,
+            "BY": 1,
+            "SN": 1,
+            "ST": 1,
+            "TH": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 14.10.1990: BB 1.; MV 1.; BY 12.; SN 1.; ST 1.; TH 1."
+        },
+        {
+          "date": "1990-12-02",
+          "contests": 1,
+          "regions": {
+            "BE": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 02.12.1990: BE 12."
+        },
+        {
+          "date": "1991-01-20",
+          "contests": 1,
+          "regions": {
+            "HE": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 20.01.1991: HE 13."
+        },
+        {
+          "date": "1991-04-21",
+          "contests": 1,
+          "regions": {
+            "RP": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 21.04.1991: RP 12."
+        },
+        {
+          "date": "1991-06-02",
+          "contests": 1,
+          "regions": {
+            "HH": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 02.06.1991: HH 14."
+        },
+        {
+          "date": "1991-09-29",
+          "contests": 1,
+          "regions": {
+            "HB": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 29.09.1991: HB 13."
+        },
+        {
+          "date": "1992-04-05",
+          "contests": 2,
+          "regions": {
+            "BW": 1,
+            "SH": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 05.04.1992: BW 12.; SH 13."
+        },
+        {
+          "date": "1993-09-19",
+          "contests": 1,
+          "regions": {
+            "HH": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 19.09.1993: HH 15."
+        },
+        {
+          "date": "1994-03-13",
+          "contests": 1,
+          "regions": {
+            "NI": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 13.03.1994: NI 13."
+        },
+        {
+          "date": "1994-06-26",
+          "contests": 1,
+          "regions": {
+            "ST": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 26.06.1994: ST 2."
+        },
+        {
+          "date": "1994-09-11",
+          "contests": 2,
+          "regions": {
+            "BB": 1,
+            "SN": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 11.09.1994: BB 2.; SN 2."
+        },
+        {
+          "date": "1994-09-25",
+          "contests": 1,
+          "regions": {
+            "BY": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 25.09.1994: BY 13."
+        },
+        {
+          "date": "1994-10-16",
+          "contests": 3,
+          "regions": {
+            "MV": 1,
+            "TH": 1,
+            "SL": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 16.10.1994: MV 2.; TH 2.; SL 11."
+        },
+        {
+          "date": "1995-02-19",
+          "contests": 1,
+          "regions": {
+            "HE": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 19.02.1995: HE 14."
+        },
+        {
+          "date": "1995-05-14",
+          "contests": 2,
+          "regions": {
+            "HB": 1,
+            "NW": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 14.05.1995: HB 14.; NW 12."
+        },
+        {
+          "date": "1995-10-22",
+          "contests": 1,
+          "regions": {
+            "BE": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 22.10.1995: BE 13."
+        },
+        {
+          "date": "1996-03-24",
+          "contests": 3,
+          "regions": {
+            "BW": 1,
+            "RP": 1,
+            "SH": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 24.03.1996: BW 13.; RP 13.; SH 14."
+        },
+        {
+          "date": "1997-09-21",
+          "contests": 1,
+          "regions": {
+            "HH": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 21.09.1997: HH 16."
+        },
+        {
+          "date": "1998-03-01",
+          "contests": 1,
+          "regions": {
+            "NI": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 01.03.1998: NI 14."
+        },
+        {
+          "date": "1998-04-26",
+          "contests": 1,
+          "regions": {
+            "ST": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 26.04.1998: ST 3."
+        },
+        {
+          "date": "1998-09-13",
+          "contests": 1,
+          "regions": {
+            "BY": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 13.09.1998: BY 14."
+        },
+        {
+          "date": "1998-09-27",
+          "contests": 1,
+          "regions": {
+            "MV": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 27.09.1998: MV 3."
+        },
+        {
+          "date": "1999-02-07",
+          "contests": 1,
+          "regions": {
+            "HE": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 07.02.1999: HE 15."
+        },
+        {
+          "date": "1999-06-06",
+          "contests": 1,
+          "regions": {
+            "HB": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 06.06.1999: HB 15."
+        },
+        {
+          "date": "1999-09-05",
+          "contests": 2,
+          "regions": {
+            "BB": 1,
+            "SL": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 05.09.1999: BB 3.; SL 12."
+        },
+        {
+          "date": "1999-09-12",
+          "contests": 1,
+          "regions": {
+            "TH": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 12.09.1999: TH 3."
+        },
+        {
+          "date": "1999-09-19",
+          "contests": 1,
+          "regions": {
+            "SN": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 19.09.1999: SN 3."
+        },
+        {
+          "date": "1999-10-10",
+          "contests": 1,
+          "regions": {
+            "BE": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 10.10.1999: BE 14."
+        },
+        {
+          "date": "2000-02-27",
+          "contests": 1,
+          "regions": {
+            "SH": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 27.02.2000: SH 15."
+        },
+        {
+          "date": "2000-05-14",
+          "contests": 1,
+          "regions": {
+            "NW": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 14.05.2000: NW 13."
+        },
+        {
+          "date": "2001-03-25",
+          "contests": 2,
+          "regions": {
+            "BW": 1,
+            "RP": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 25.03.2001: BW 14.; RP 14."
+        },
+        {
+          "date": "2001-09-23",
+          "contests": 1,
+          "regions": {
+            "HH": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 23.09.2001: HH 17."
+        },
+        {
+          "date": "2001-10-21",
+          "contests": 1,
+          "regions": {
+            "BE": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 21.10.2001: BE 15."
+        },
+        {
+          "date": "2002-04-21",
+          "contests": 1,
+          "regions": {
+            "ST": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 21.04.2002: ST 4."
+        },
+        {
+          "date": "2002-09-22",
+          "contests": 1,
+          "regions": {
+            "MV": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 22.09.2002: MV 4."
+        },
+        {
+          "date": "2003-02-02",
+          "contests": 2,
+          "regions": {
+            "HE": 1,
+            "NI": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 02.02.2003: HE 16.; NI 15."
+        },
+        {
+          "date": "2003-05-25",
+          "contests": 1,
+          "regions": {
+            "HB": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 25.05.2003: HB 16."
+        },
+        {
+          "date": "2003-09-21",
+          "contests": 1,
+          "regions": {
+            "BY": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 21.09.2003: BY 15."
+        },
+        {
+          "date": "2004-02-29",
+          "contests": 1,
+          "regions": {
+            "HH": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 29.02.2004: HH 18."
+        },
+        {
+          "date": "2004-06-13",
+          "contests": 1,
+          "regions": {
+            "TH": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 13.06.2004: TH 4."
+        },
+        {
+          "date": "2004-09-05",
+          "contests": 1,
+          "regions": {
+            "SL": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 05.09.2004: SL 13."
+        },
+        {
+          "date": "2004-09-19",
+          "contests": 2,
+          "regions": {
+            "BB": 1,
+            "SN": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 19.09.2004: BB 4.; SN 4."
+        },
+        {
+          "date": "2005-02-20",
+          "contests": 1,
+          "regions": {
+            "SH": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 20.02.2005: SH 16."
+        },
+        {
+          "date": "2005-05-22",
+          "contests": 1,
+          "regions": {
+            "NW": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 22.05.2005: NW 14."
+        },
+        {
+          "date": "2006-03-26",
+          "contests": 3,
+          "regions": {
+            "BW": 1,
+            "ST": 1,
+            "RP": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 26.03.2006: BW 15.; ST 5.; RP 15."
+        },
+        {
+          "date": "2006-09-17",
+          "contests": 2,
+          "regions": {
+            "MV": 1,
+            "BE": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 17.09.2006: MV 5.; BE 16."
+        },
+        {
+          "date": "2007-05-13",
+          "contests": 1,
+          "regions": {
+            "HB": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 13.05.2007: HB 17."
+        },
+        {
+          "date": "2008-01-27",
+          "contests": 2,
+          "regions": {
+            "HE": 1,
+            "NI": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 27.01.2008: HE 17.; NI 16."
+        },
+        {
+          "date": "2008-02-24",
+          "contests": 1,
+          "regions": {
+            "HH": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 24.02.2008: HH 19."
+        },
+        {
+          "date": "2008-09-28",
+          "contests": 1,
+          "regions": {
+            "BY": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 28.09.2008: BY 16."
+        },
+        {
+          "date": "2009-01-18",
+          "contests": 1,
+          "regions": {
+            "HE": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 18.01.2009: HE 18."
+        },
+        {
+          "date": "2009-08-30",
+          "contests": 3,
+          "regions": {
+            "SN": 1,
+            "TH": 1,
+            "SL": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 30.08.2009: SN 5.; TH 5.; SL 14."
+        },
+        {
+          "date": "2009-09-27",
+          "contests": 2,
+          "regions": {
+            "BB": 1,
+            "SH": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 27.09.2009: BB 5.; SH 17."
+        },
+        {
+          "date": "2010-05-09",
+          "contests": 1,
+          "regions": {
+            "NW": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 09.05.2010: NW 15."
+        },
+        {
+          "date": "2011-02-20",
+          "contests": 1,
+          "regions": {
+            "HH": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 20.02.2011: HH 20."
+        },
+        {
+          "date": "2011-03-20",
+          "contests": 1,
+          "regions": {
+            "ST": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 20.03.2011: ST 6."
+        },
+        {
+          "date": "2011-03-27",
+          "contests": 2,
+          "regions": {
+            "BW": 1,
+            "RP": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 27.03.2011: BW 16.; RP 16."
+        },
+        {
+          "date": "2011-05-22",
+          "contests": 1,
+          "regions": {
+            "HB": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 22.05.2011: HB 18."
+        },
+        {
+          "date": "2011-09-04",
+          "contests": 1,
+          "regions": {
+            "MV": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 04.09.2011: MV 6."
+        },
+        {
+          "date": "2011-09-18",
+          "contests": 1,
+          "regions": {
+            "BE": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 18.09.2011: BE 17."
+        },
+        {
+          "date": "2012-03-25",
+          "contests": 1,
+          "regions": {
+            "SL": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 25.03.2012: SL 15."
+        },
+        {
+          "date": "2012-05-06",
+          "contests": 1,
+          "regions": {
+            "SH": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 06.05.2012: SH 18."
+        },
+        {
+          "date": "2012-05-13",
+          "contests": 1,
+          "regions": {
+            "NW": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 13.05.2012: NW 16."
+        },
+        {
+          "date": "2013-01-20",
+          "contests": 1,
+          "regions": {
+            "NI": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 20.01.2013: NI 17."
+        },
+        {
+          "date": "2013-09-15",
+          "contests": 1,
+          "regions": {
+            "BY": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 15.09.2013: BY 17."
+        },
+        {
+          "date": "2013-09-22",
+          "contests": 1,
+          "regions": {
+            "HE": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 22.09.2013: HE 19."
+        },
+        {
+          "date": "2014-08-31",
+          "contests": 1,
+          "regions": {
+            "SN": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 31.08.2014: SN 6."
+        },
+        {
+          "date": "2014-09-14",
+          "contests": 2,
+          "regions": {
+            "BB": 1,
+            "TH": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 14.09.2014: BB 6.; TH 6."
+        },
+        {
+          "date": "2015-02-15",
+          "contests": 1,
+          "regions": {
+            "HH": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 15.02.2015: HH 21."
+        },
+        {
+          "date": "2015-05-10",
+          "contests": 1,
+          "regions": {
+            "HB": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 10.05.2015: HB 19."
+        },
+        {
+          "date": "2016-03-13",
+          "contests": 3,
+          "regions": {
+            "BW": 1,
+            "ST": 1,
+            "RP": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 13.03.2016: BW 17.; ST 7.; RP 17."
+        },
+        {
+          "date": "2016-09-04",
+          "contests": 1,
+          "regions": {
+            "MV": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 04.09.2016: MV 7."
+        },
+        {
+          "date": "2016-09-18",
+          "contests": 1,
+          "regions": {
+            "BE": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 18.09.2016: BE 18."
+        },
+        {
+          "date": "2017-03-26",
+          "contests": 1,
+          "regions": {
+            "SL": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 26.03.2017: SL 16."
+        },
+        {
+          "date": "2017-05-07",
+          "contests": 1,
+          "regions": {
+            "SH": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 07.05.2017: SH 19."
+        },
+        {
+          "date": "2017-05-14",
+          "contests": 1,
+          "regions": {
+            "NW": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 14.05.2017: NW 17."
+        },
+        {
+          "date": "2017-10-15",
+          "contests": 1,
+          "regions": {
+            "NI": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 15.10.2017: NI 18."
+        },
+        {
+          "date": "2018-10-14",
+          "contests": 1,
+          "regions": {
+            "BY": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 14.10.2018: BY 18."
+        },
+        {
+          "date": "2018-10-28",
+          "contests": 1,
+          "regions": {
+            "HE": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 28.10.2018: HE 20."
+        },
+        {
+          "date": "2019-05-26",
+          "contests": 1,
+          "regions": {
+            "HB": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 26.05.2019: HB 20."
+        },
+        {
+          "date": "2019-09-01",
+          "contests": 2,
+          "regions": {
+            "BB": 1,
+            "SN": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 01.09.2019: BB 7.; SN 7."
+        },
+        {
+          "date": "2019-10-27",
+          "contests": 1,
+          "regions": {
+            "TH": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 27.10.2019: TH 7."
+        },
+        {
+          "date": "2020-02-23",
+          "contests": 1,
+          "regions": {
+            "HH": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 23.02.2020: HH 22."
+        },
+        {
+          "date": "2021-03-14",
+          "contests": 2,
+          "regions": {
+            "BW": 1,
+            "RP": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 14.03.2021: BW 18.; RP 18."
+        },
+        {
+          "date": "2021-06-06",
+          "contests": 1,
+          "regions": {
+            "ST": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 06.06.2021: ST 8."
+        },
+        {
+          "date": "2021-09-26",
+          "contests": 2,
+          "regions": {
+            "MV": 1,
+            "BE": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 26.09.2021: MV 8.; BE 19."
+        },
+        {
+          "date": "2022-03-27",
+          "contests": 1,
+          "regions": {
+            "SL": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 27.03.2022: SL 17."
+        },
+        {
+          "date": "2022-05-08",
+          "contests": 1,
+          "regions": {
+            "SH": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 08.05.2022: SH 20."
+        },
+        {
+          "date": "2022-05-15",
+          "contests": 1,
+          "regions": {
+            "NW": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 15.05.2022: NW 18."
+        },
+        {
+          "date": "2022-10-09",
+          "contests": 1,
+          "regions": {
+            "NI": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 09.10.2022: NI 19."
+        },
+        {
+          "date": "2023-02-12",
+          "contests": 1,
+          "regions": {
+            "BE": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 12.02.2023: BE 19. Wiederholungswahl (footnote 7)"
+        },
+        {
+          "date": "2023-05-14",
+          "contests": 1,
+          "regions": {
+            "HB": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 14.05.2023: HB 21."
+        },
+        {
+          "date": "2023-10-08",
+          "contests": 2,
+          "regions": {
+            "BY": 1,
+            "HE": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 08.10.2023: BY 19.; HE 21."
+        },
+        {
+          "date": "2024-09-01",
+          "contests": 2,
+          "regions": {
+            "SN": 1,
+            "TH": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 01.09.2024: SN 8.; TH 8."
+        },
+        {
+          "date": "2024-09-22",
+          "contests": 1,
+          "regions": {
+            "BB": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 22.09.2024: BB 8."
+        },
+        {
+          "date": "2025-03-02",
+          "contests": 1,
+          "regions": {
+            "HH": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 02.03.2025: HH 23."
+        },
+        {
+          "date": "2026-03-08",
+          "contests": 1,
+          "regions": {
+            "BW": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 08.03.2026: BW 19."
+        },
+        {
+          "date": "2026-03-22",
+          "contests": 1,
+          "regions": {
+            "RP": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 22.03.2026: RP 19."
+        },
+        {
+          "date": "2026-09-06",
+          "contests": 1,
+          "regions": {
+            "ST": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 06.09.2026: ST 9."
+        },
+        {
+          "date": "2026-09-20",
+          "contests": 2,
+          "regions": {
+            "MV": 1,
+            "BE": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 1, 20.09.2026: MV 9.; BE 20."
+        }
+      ],
+      "unit": "polity",
+      "note": "Counted per election, not per constituency: the Federal Returning Officer lists every Landtag election since 1946, but not how many constituencies each one had. An election counts once the archive holds its results. Bremen's first Bürgerschaft was chosen in a municipal election in October 1946, which the Federal Returning Officer doesn't treat as comparable, so it isn't counted."
     },
     {
       "key": "ep",
