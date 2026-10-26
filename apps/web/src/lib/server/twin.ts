@@ -3532,6 +3532,10 @@ function resultsMarkdown(
     contest.rows.some(
       (row) => (row.current?.seats ?? 0) > 0 && row.current?.person == null,
     );
+  const hasElectors =
+    !hasSeats &&
+    ["office", "elector_slate", "delegate_allocation"].includes(contest.kind) &&
+    contest.rows.filter((row) => (row.current?.seats ?? 0) > 0).length > 1;
   const hasParty = contest.rows.some(
     (row) => row.current?.person != null && row.short != null,
   );
@@ -3547,7 +3551,8 @@ function resultsMarkdown(
             : null)),
     ]),
   );
-  const hasOutcome = contest.rows.some((row) => row.current?.outcome != null);
+  const hasOutcome =
+    !hasElectors && contest.rows.some((row) => row.current?.outcome != null);
   const results = contest.rows
     .filter(
       (row) => row.current != null || (then != null && row.earlier != null),
@@ -3566,7 +3571,7 @@ function resultsMarkdown(
       ...(current == null || (current.votes === 0 && (current.seats ?? 0) > 0)
         ? [null, null]
         : [count(current.votes), percent(current.share)]),
-      ...(hasSeats
+      ...(hasSeats || hasElectors
         ? [current?.seats == null ? null : count(current.seats)]
         : []),
       ...(then == null
@@ -3614,6 +3619,13 @@ function resultsMarkdown(
             : m.col_votes(),
           m.col_share(),
           ...(hasSeats ? [m.col_seats()] : []),
+          ...(hasElectors
+            ? [
+                contest.kind === "delegate_allocation"
+                  ? m.col_delegates()
+                  : m.col_electors(),
+              ]
+            : []),
           ...(then == null
             ? []
             : [m.col_share_in({ year: then }), m.col_change()]),

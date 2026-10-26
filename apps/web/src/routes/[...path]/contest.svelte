@@ -630,7 +630,11 @@
         : MEASURES[contest.current?.measure ?? ""]?.(),
   );
   const question = $derived(isQuestion(contest));
-  const seated = $derived(isSeated(contest));
+  const seated = $derived(
+    isSeated(contest) ||
+      (contest.kind in SEATS &&
+        contest.rows.filter((row) => (row.current?.seats ?? 0) > 0).length > 1),
+  );
   const phrases = $derived.by(() => {
     const mine = contest.name.replace(/^\d{4}\s+/u, "").split(" ");
     return new Map(
