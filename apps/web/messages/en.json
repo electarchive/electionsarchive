@@ -385,6 +385,7 @@
   "places_filter": "Filter by name",
   "places_filter_empty": "No place matches “{query}”.",
   "places_leads": "{label} leads in {count}",
+  "places_opening": "This map and table show first preferences. Second preferences were counted only for the whole area, not place by place.",
   "map_won": [
     {
       "declarations": [

@@ -1394,7 +1394,9 @@
           explore={here}
           neighbors={around}
           up={upward}
-          votes={counted ?? m.col_votes()}
+          votes={placed.isOpening === true
+            ? m.stv_first()
+            : (counted ?? m.col_votes())}
           names={titles}
           {levels}
           {span}
@@ -1415,6 +1417,11 @@
       {#if unmapped >= 0.01}
         <p class="px-1 pbs-1 text-xs text-pretty text-muted-foreground">
           {m.map_unmapped({ percent: percent(unmapped) })}
+        </p>
+      {/if}
+      {#if placed.isOpening === true}
+        <p class="px-1 pbs-1 text-xs text-pretty text-muted-foreground">
+          {m.places_opening()}
         </p>
       {/if}
     </div>
@@ -1856,7 +1863,9 @@
       {publishers}
       isMapped={drawn != null}
       deeper={contest.deeper ?? null}
-      votes={counted ?? m.col_votes()}
+      votes={placed.isOpening === true
+        ? m.stv_first()
+        : (counted ?? m.col_votes())}
       bind:only={
         () => only,
         (value: number | string | null) =>

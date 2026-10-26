@@ -374,6 +374,7 @@ const Places = v.nullable(
     ),
     rows: v.array(PlaceRow),
     districts: v.optional(v.array(PlaceRow)),
+    isOpening: v.optional(v.boolean()),
     sources: v.array(v.string()),
     unreconciled: v.optional(
       v.array(v.object({ ...Unreconciled.entries, publisher: v.string() })),
@@ -3472,8 +3473,17 @@ export const contests = {
             round: number | null;
             derived: boolean;
             seats: number | null;
+            isShallow: boolean;
           }>(sql`
             select coalesce(t.last, 1) as last,
+              t.last > 1 and (
+                select 2 * count(distinct x.area_k) filter (where x.count_round = t.last) < count(distinct x.area_k) filter (where x.count_round = 1)
+                from result_set rs cross join lateral (
+                  select x.area_k, x.count_round from result_rollup x
+                  where x.result_set_k = rs.k and x.count_round in (1, t.last) and x.measure = any(${COUNTED}) offset 0
+                ) x
+                where rs.contest_id = ${contest.id}::uuid and rs.status = 'active'
+              ) as "isShallow",
               case when t.last > 1 then least(greatest(coalesce(nullif(${input.round}::int, 0), case when stv.seats is null then t.last else 1 end), 1), t.last) end as round,
               stv.seats,
               exists (
@@ -3503,11 +3513,12 @@ export const contests = {
           `),
         ]);
       const [
-        { last, round, derived, seats: elects } = {
+        { last, round, derived, seats: elects, isShallow } = {
           last: 1,
           round: null,
           derived: false,
           seats: null,
+          isShallow: false,
         },
       ] = counted.rows;
       const childIds = parts.rows.map((row) => row.id);
@@ -4584,7 +4595,11 @@ export const contests = {
             lineage,
             input.match,
             input.group,
-            round,
+            isShallow && round === last ? 1 : round,
+          ).then((found) =>
+            found != null && isShallow && round === last
+              ? { ...found, isOpening: true }
+              : found,
           ),
           counterpart?.indirect === true
             ? load(

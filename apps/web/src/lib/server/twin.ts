@@ -3607,7 +3607,11 @@ function placesMarkdown(
   link: Link,
   then: string | null,
 ) {
-  if (places == null || places.rows.length === 0) {
+  if (
+    places == null ||
+    places.rows.length === 0 ||
+    places.rows.every((row) => row.valid === 0)
+  ) {
     return [];
   }
   const isCompared =
@@ -3625,6 +3629,7 @@ function placesMarkdown(
     .toSorted((a, b) => b[1].length - a[1].length);
   return [
     `## ${m.places_title({ noun })}`,
+    ...(places.isOpening === true ? [m.places_opening()] : []),
     ...(led.length === 0 || places.rows.length < 3
       ? []
       : [
