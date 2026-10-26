@@ -75,6 +75,10 @@ BY_ELECTIONS = {"2014-08-21", "2014-10-30", "2021-08-19", "2021-11-25"}
 
 VOTES, REGISTERED, BALLOTS, VALID, INVALID, EXHAUSTED = 1, 2, 3, 4, 5, 21
 MEASURES = {"REJECTED": INVALID, "ELECTORATE": REGISTERED, "BALLOTS": BALLOTS}
+READ_FROM_IMAGE = {
+    "https://web.archive.org/web/20211201233647/https://www.staffsmoorlands.gov.uk/media/6574/Declaration-of-Result---Staffordshire-Police-Fire-and-Crime-Commissioner/pdf/Declaration_of_Result_PFCC.pdf",
+    "https://www.newcastle-staffs.gov.uk/downloads/file/2230/declaration-of-result-staffordshire-police-area",
+}
 SV_UNTIL = date(2023, 5, 4)
 RESULTS = Path(__file__).with_name("pcc_results.tsv")
 with Path(__file__).with_name("pcc_sources.tsv").open() as handle:
@@ -359,7 +363,7 @@ def emit() -> Path:
             figures: dict[int, tuple[int, str]] = {}
             for row in rows.iter_rows(named=True):
                 value = int(row["round1"])
-                if str(value) not in printed(row["source"]):
+                if row["source"] not in READ_FROM_IMAGE and str(value) not in printed(row["source"]):
                     raise ValueError(f"{day} {code}: {row['printed']} {value} not printed in {row['source']}")
                 if row["printed"] in MEASURES:
                     figures[MEASURES[row["printed"]]] = (value, row["source"])
@@ -431,10 +435,30 @@ def emit() -> Path:
                 completeness=1,
             )
             cs.add("citation", entity_id=result_set, source_id=source)
+            if rows["source"][0] in READ_FROM_IMAGE:
+                cs.add(
+                    "note",
+                    entity_id=result_set,
+                    kind="caveat",
+                    body_md="The declaration is a scanned image with no text layer; its figures were read from the image "
+                    "and checked against the totals it prints.",
+                )
             for url in (set(rows["source"]) | set(rows["source2"])) - {None, rows["source"][0]}:
                 cs.add("citation", entity_id=result_set, source_id=cite(url))
             whole = unit(code, polity)
             valid = sum(first for *_, first, _ in candidates)
+            if BALLOTS in figures and INVALID in figures:
+                counted = valid + figures[INVALID][0]
+                verified = figures[BALLOTS][0]
+                if counted != verified:
+                    cs.add(
+                        "note",
+                        entity_id=result_set,
+                        kind="caveat",
+                        body_md=f"The candidate votes and rejected ballots in the declaration add up to {counted:,}, "
+                        f"which is {abs(counted - verified):,} {'more' if counted > verified else 'fewer'} than the "
+                        f"{verified:,} ballot papers the declaration certifies as verified. Both figures are as printed.",
+                    )
             cells = [(VALID, first_round, valid)] + [(measure, 0, value) for measure, (value, _) in figures.items()]
             if second:
                 cells.append((EXHAUSTED, 2, valid - sum(final or 0 for *_, final in candidates)))
