@@ -100,7 +100,8 @@ def emit() -> Path:
         ).fetchall():
             cs.add("outcome", result_set_id=result_set, option_id=option, kind=outcome_kind, seats=seats)
         official = conn.execute(
-            "select sum(v.value) from result_set r join result_value v on v.result_set_k = r.k where r.contest_id = %s and r.is_default and v.measure = 1",
+            """select sum(v.value) from result_set r join result_value v on v.result_set_k = r.k
+               join source s on s.id = r.source_id where r.contest_id = %s and s.publisher like 'Clerk%%' and v.measure = 1""",
             [contest],
         ).fetchone()[0]
         counted = sum(values[column] for values in rows.values() for column in PARTIES)
