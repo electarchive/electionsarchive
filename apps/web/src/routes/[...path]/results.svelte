@@ -19,6 +19,7 @@
     votes,
     seats,
     trace = null,
+    place = null,
   }: {
     rows: Extract<PageData, { kind: "contest" }>["contest"]["rows"];
     span: {
@@ -30,6 +31,7 @@
     votes: string;
     seats: string | null;
     trace?: string | null;
+    place?: string | null;
   } = $props();
 
   let expanded = $state(false);
@@ -234,7 +236,8 @@
   <button
     type="button"
     class="cursor-help underline decoration-transparent decoration-dotted underline-offset-4 hover:decoration-current focus-visible:decoration-current"
-    onclick={() => {
+    onclick={(event) => {
+      provenance.anchor = event.currentTarget;
       provenance.value = {
         label: `${row.label}, ${{ votes, share: m.col_share(), seats: seats ?? "" }[measure].toLocaleLowerCase()}`,
         figure: text,
@@ -242,6 +245,14 @@
         path: trace,
         key: row.key,
         area: null,
+        place,
+        math:
+          measure === "share" && row.current != null && row.current.share > 0
+            ? {
+                votes: row.current.votes,
+                valid: Math.round(row.current.votes / row.current.share),
+              }
+            : null,
       };
       provenance.isOpen = true;
     }}>{text}</button

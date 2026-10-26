@@ -329,7 +329,9 @@
     type="button"
     tabindex={-1}
     class="relative z-1 cursor-help underline decoration-transparent decoration-dotted underline-offset-4 hover:decoration-current focus-visible:decoration-current"
-    onclick={() => {
+    onclick={(event) => {
+      const ranked = row.shares.toSorted((a, b) => b - a);
+      provenance.anchor = event.currentTarget;
       provenance.value = {
         label: `${row.name}, ${label}`,
         figure: text,
@@ -340,6 +342,16 @@
             ? (places.legend[row.leader]?.key ?? null)
             : null,
         area: row.k,
+        place: null,
+        math:
+          measure === "share" && row.leader != null
+            ? {
+                votes: Math.round((row.shares[row.leader] ?? 0) * row.valid),
+                valid: row.valid,
+              }
+            : measure === "margin"
+              ? { first: ranked[0] ?? 0, second: ranked[1] ?? 0 }
+              : null,
       };
       provenance.isOpen = true;
     }}>{text}</button

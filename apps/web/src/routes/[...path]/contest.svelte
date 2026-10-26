@@ -2432,6 +2432,7 @@
     <Results
       rows={contest.rows}
       trace={page.url.pathname.slice(1)}
+      place={drilled ? contest.scope.home : null}
       {span}
       votes={counted ?? m.col_votes()}
       seats={seated ? (SEATS[contest.kind]?.() ?? m.col_seats()) : null}

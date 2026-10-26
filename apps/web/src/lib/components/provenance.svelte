@@ -1,11 +1,24 @@
 <script lang="ts">
+  import ArrowUpRightIcon from "@lucide/svelte/icons/arrow-up-right";
   import XIcon from "@lucide/svelte/icons/x";
   import { createQuery } from "@tanstack/svelte-query";
   import { MediaQuery } from "svelte/reactivity";
   import * as Drawer from "#lib/components/ui/drawer/index.js";
+  import * as Popover from "#lib/components/ui/popover/index.js";
+  import { count, date, percent } from "#lib/format.js";
   import { m } from "#lib/paraglide/messages.js";
   import { provenance } from "#lib/provenance.svelte.js";
   import { orpc } from "#lib/rpc.js";
+
+  const STAGES: Record<string, () => string> = {
+    live: m.stage_live,
+    preliminary: m.stage_preliminary,
+    official: m.stage_official,
+    certified: m.stage_certified,
+    court_revised: m.stage_court_revised,
+    recount: m.stage_recount,
+    alternative: m.stage_alternative,
+  };
 
   const wide = new MediaQuery("min-width: 640px");
   let sources = $state<Array<string>>([]);
@@ -17,27 +30,27 @@
         path: value?.path ?? "",
         key: value?.key ?? null,
         area: value?.area ?? null,
+        place: value?.place ?? null,
       },
     }),
     enabled: provenance.isOpen && value?.path != null,
     staleTime: Infinity,
     meta: { quiet: true },
   }));
-  const methods = $derived(
-    [
-      value?.measure === "share" ? m.method_share() : null,
-      value?.measure === "votes" || value?.measure === "share"
-        ? m.term_valid()
-        : null,
-      value?.measure === "margin" ? m.term_margin() : null,
-      value?.measure === "swing" ? m.method_swing() : null,
-      value == null || value.measure === "seats" ? m.method_seats() : null,
-      m.method_stage(),
-    ].filter((line) => line != null),
+  const note = $derived(
+    value == null
+      ? null
+      : {
+          share: m.provenance_share_note(),
+          votes: m.term_valid(),
+          margin: m.term_margin(),
+          swing: m.method_swing(),
+          seats: m.method_seats(),
+        }[value.measure],
   );
 
   $effect(() => {
-    if (provenance.isOpen) {
+    if (provenance.isOpen && provenance.value == null) {
       sources = [
         ...new Set(
           [...document.querySelectorAll<HTMLElement>("[data-source]")].flatMap(
@@ -51,43 +64,119 @@
       ].filter((source) => source !== "");
     }
   });
+
+  function restore(event: Event) {
+    event.preventDefault();
+    provenance.anchor?.focus({ preventScroll: true });
+  }
 </script>
 
-<Drawer.Root
-  bind:open={provenance.isOpen}
-  direction={wide.current ? "right" : "bottom"}
-  shouldScaleBackground={false}
->
-  <Drawer.Content class="sm:max-inline-md">
-    <div
-      class="grid gap-5 px-5 pbs-5 pbe-[max(1.25rem,env(safe-area-inset-bottom))]"
-    >
-      <div class="flex items-start justify-between gap-3">
-        <div class="grid gap-1">
-          <Drawer.Title class="heading">
-            {value == null ? m.provenance_title() : m.provenance_value_title()}
-          </Drawer.Title>
-          {#if value != null}
-            <Drawer.Description class="flex items-baseline gap-2 text-sm">
-              <span class="text-muted-foreground">{value.label}</span>
-              <span class="font-figures font-semibold tabular-nums"
-                >{value.figure}</span
-              >
-            </Drawer.Description>
-          {/if}
+{#snippet body()}
+  <div class="grid gap-4 p-4">
+    <div class="flex items-start justify-between gap-3">
+      {#if value == null}
+        <h2 class="text-base font-semibold">{m.provenance_title()}</h2>
+      {:else}
+        <div class="grid gap-0.5 min-inline-0">
+          <p class="text-[0.8125rem] text-pretty text-muted-foreground">
+            {value.label}
+          </p>
+          <p
+            class="font-figures text-2xl/none font-[760] tracking-[-0.015em] tabular-nums"
+          >
+            {value.figure}
+          </p>
         </div>
-        <Drawer.Close
-          class="-me-2 grid shrink-0 place-items-center rounded-sm text-muted-foreground block-9 inline-9 hover:bg-secondary"
-          aria-label={m.map_sheet_close()}
-        >
-          <XIcon class="block-4 inline-4" />
-        </Drawer.Close>
-      </div>
+      {/if}
+      <button
+        type="button"
+        class="-me-2 -mbs-1.5 grid shrink-0 place-items-center rounded-sm text-muted-foreground block-8 inline-8 hover:bg-secondary hover:text-foreground"
+        aria-label={m.map_sheet_close()}
+        onclick={() => (provenance.isOpen = false)}
+      >
+        <XIcon class="block-4 inline-4" />
+      </button>
+    </div>
 
-      {#if value?.path != null}
+    {#if value != null && (value.math != null || note != null)}
+      <section class="grid gap-1.5">
+        <h3 class="text-xs font-semibold text-muted-foreground">
+          {m.provenance_calculation()}
+        </h3>
+        {#if value.math != null}
+          <p class="font-figures text-sm tabular-nums">
+            {#if "votes" in value.math}
+              {count(value.math.votes)} ÷ {m.provenance_valid_votes({
+                valid: count(value.math.valid),
+              })} =
+            {:else}
+              {percent(value.math.first)} − {percent(value.math.second)} =
+            {/if}
+            <span class="font-semibold">{value.figure}</span>
+          </p>
+        {/if}
+        {#if note != null}
+          <p class="text-[0.8125rem] text-pretty text-muted-foreground">
+            {note}
+          </p>
+        {/if}
+      </section>
+    {/if}
+
+    {#if value?.path != null}
+      <section class="grid gap-2">
+        <h3 class="text-xs font-semibold text-muted-foreground">
+          {m.provenance_source()}
+        </h3>
         {#if trace.isPending}
-          <p class="text-sm text-muted-foreground">{m.provenance_loading()}</p>
-        {:else if trace.data != null && trace.data.pages.length > 0}
+          <p class="text-[0.8125rem] text-muted-foreground">
+            {m.provenance_loading()}
+          </p>
+        {:else if trace.data != null}
+          <ul class="grid gap-3">
+            {#each trace.data.trail as entry (`${entry.changeset}:${entry.stage}:${entry.title}`)}
+              <li class="grid gap-0.5 text-[0.8125rem]">
+                {#if entry.url == null}
+                  <span class="text-sm font-semibold text-pretty"
+                    >{entry.title}</span
+                  >
+                {:else}
+                  <a
+                    class="text-sm font-semibold text-pretty underline decoration-border underline-offset-4 hover:decoration-foreground"
+                    href={entry.url}
+                    rel="external noopener"
+                    target="_blank"
+                    >{entry.title}<ArrowUpRightIcon
+                      class="ms-0.5 inline-block align-[-0.1em] text-muted-foreground block-3.5 inline-3.5"
+                      aria-hidden="true"
+                    /></a
+                  >
+                {/if}
+                <span>{entry.publisher}</span>
+                <span class="text-muted-foreground"
+                  ><span class="font-semibold text-foreground"
+                    >{STAGES[entry.stage]?.() ?? entry.stage}</span
+                  >{#if entry.retrieved != null}{" · "}{m.provenance_retrieved({
+                      date: date(entry.retrieved),
+                    })}{/if}{#if entry.sets > 1}{" · "}{m.provenance_sets({
+                      count: count(entry.sets),
+                    })}{/if}</span
+                >
+                <span
+                  class="text-muted-foreground"
+                  title={entry.pipeline == null
+                    ? undefined
+                    : m.provenance_pipeline({ pipeline: entry.pipeline })}
+                  >{m.provenance_changeset({
+                    id: entry.changeset.slice(0, 8),
+                    date: date(entry.published),
+                  })}{#if entry.changesets > 1}{" · "}{m.provenance_changesets({
+                      count: count(entry.changesets),
+                    })}{/if}</span
+                >
+              </li>
+            {/each}
+          </ul>
           {const scan = $derived(trace.data.pages[0])}
           {#if scan != null}
             {const x0 = $derived(scan.box[0])}
@@ -100,7 +189,7 @@
               Math.min(1, x1 + 0.18) * scan.width - left,
             )}
             {const down = $derived(Math.min(1, y1 + 0.05) * scan.height - top)}
-            <figure class="grid gap-2">
+            <figure class="grid gap-1.5">
               <svg
                 class="rounded-sm bg-white ring-1 ring-border inline-full"
                 viewBox="{left} {top} {across} {down}"
@@ -122,7 +211,9 @@
                   stroke-width="1.5"
                 />
               </svg>
-              <figcaption class="grid gap-1 text-[0.8125rem] text-pretty">
+              <figcaption
+                class="grid gap-1 text-[0.8125rem] text-pretty text-muted-foreground"
+              >
                 <span
                   >{m.provenance_scan({
                     page: scan.page,
@@ -130,35 +221,26 @@
                   })}</span
                 >
                 {#if !scan.isExact}
-                  <span class="text-muted-foreground"
-                    >{m.provenance_parts({ count: trace.data.count })}</span
-                  >
+                  <span>{m.provenance_parts({ count: trace.data.count })}</span>
                 {/if}
-                <span class="flex flex-wrap gap-x-4 gap-y-1">
-                  <a
-                    class="font-semibold underline decoration-border underline-offset-4 hover:decoration-foreground"
-                    href="/pages/{scan.image}"
-                    rel="external">{m.provenance_open_page()}</a
-                  >
-                  {#if scan.url != null}
-                    <a
-                      class="font-semibold underline decoration-border underline-offset-4 hover:decoration-foreground"
-                      href={scan.url}
-                      rel="external noopener">{scan.publisher}</a
-                    >
-                  {/if}
-                </span>
+                <a
+                  class="font-semibold text-foreground underline decoration-border underline-offset-4 hover:decoration-foreground"
+                  href="/pages/{scan.image}"
+                  rel="external">{m.provenance_open_page()}</a
+                >
               </figcaption>
             </figure>
           {/if}
-        {:else}
-          <p class="text-sm text-muted-foreground">{m.provenance_file()}</p>
         {/if}
-      {/if}
+      </section>
+    {/if}
 
+    {#if value == null}
       {#if sources.length > 0}
         <section class="grid gap-1.5">
-          <h3 class="text-[0.8125rem] font-bold">{m.provenance_sources()}</h3>
+          <h3 class="text-xs font-semibold text-muted-foreground">
+            {m.provenance_sources()}
+          </h3>
           <ul class="grid gap-1.5 text-sm/snug">
             {#each sources as source (source)}
               <li class="wrap-break-word">
@@ -180,17 +262,52 @@
           </ul>
         </section>
       {/if}
-
       <section class="grid gap-1.5">
-        <h3 class="text-[0.8125rem] font-bold">{m.provenance_methods()}</h3>
+        <h3 class="text-xs font-semibold text-muted-foreground">
+          {m.provenance_methods()}
+        </h3>
         <ul
-          class="grid list-disc gap-1.5 ps-4 text-sm/snug text-pretty text-muted-foreground"
+          class="grid list-disc gap-1.5 ps-4 text-[0.8125rem] text-pretty text-muted-foreground"
         >
-          {#each methods as line (line)}
-            <li>{line}</li>
-          {/each}
+          <li>{m.method_share()}</li>
+          <li>{m.term_valid()}</li>
+          <li>{m.method_stage()}</li>
         </ul>
       </section>
-    </div>
-  </Drawer.Content>
-</Drawer.Root>
+    {/if}
+  </div>
+{/snippet}
+
+{#if wide.current}
+  <Popover.Root bind:open={provenance.isOpen}>
+    <Popover.Content
+      customAnchor={provenance.anchor}
+      side="bottom"
+      align="start"
+      sideOffset={6}
+      collisionPadding={12}
+      aria-label={value == null
+        ? m.provenance_title()
+        : m.provenance_value_title()}
+      class="block overflow-y-auto p-0 inline-[min(24rem,calc(100vw-1.5rem))] max-block-[min(36rem,var(--bits-popover-content-available-height))]"
+      onCloseAutoFocus={restore}
+    >
+      {@render body()}
+    </Popover.Content>
+  </Popover.Root>
+{:else}
+  <Drawer.Root
+    bind:open={provenance.isOpen}
+    shouldScaleBackground={false}
+    autoFocus
+  >
+    <Drawer.Content onCloseAutoFocus={restore}>
+      <Drawer.Title class="sr-only">
+        {value == null ? m.provenance_title() : m.provenance_value_title()}
+      </Drawer.Title>
+      <div class="pbe-[env(safe-area-inset-bottom)]">
+        {@render body()}
+      </div>
+    </Drawer.Content>
+  </Drawer.Root>
+{/if}

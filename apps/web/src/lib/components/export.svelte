@@ -246,6 +246,7 @@
       <DropdownMenu.Separator />
       <DropdownMenu.Item
         onSelect={() => {
+          provenance.anchor = trigger;
           provenance.value = null;
           provenance.isOpen = true;
         }}

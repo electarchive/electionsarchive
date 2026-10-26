@@ -3782,6 +3782,7 @@ export const contests = {
         path: v.string(),
         key: v.nullable(v.string()),
         area: v.nullable(v.number()),
+        place: v.optional(v.nullable(v.string())),
       }),
     )
     .output(
@@ -3800,10 +3801,95 @@ export const contests = {
             url: v.nullable(v.string()),
           }),
         ),
+        trail: v.array(
+          v.object({
+            publisher: v.string(),
+            title: v.string(),
+            url: v.nullable(v.string()),
+            retrieved: v.nullable(v.string()),
+            stage: v.string(),
+            sets: v.number(),
+            changeset: v.string(),
+            changesets: v.number(),
+            pipeline: v.nullable(v.string()),
+            published: v.nullable(v.string()),
+          }),
+        ),
       }),
     )
     .handler(async ({ input }) => {
-      const found = await db.execute<{
+      const area =
+        input.area ??
+        (input.place == null
+          ? null
+          : ((
+              await db.execute<{ k: number }>(sql`
+                select a.k from slug s
+                join polity_territory pt on pt.polity_id = s.entity_id
+                join area a on a.id = pt.area_id
+                where s.path = ${input.place}
+                order by upper_inf(pt.valid) desc, upper(pt.valid) desc limit 1
+              `)
+            ).rows[0]?.k ?? null));
+      const prefixes = input.path
+        .split("/")
+        .map((_, index, parts) => parts.slice(0, index + 1).join("/"));
+      const trail = db.execute<{
+        publisher: string;
+        title: string;
+        url: string | null;
+        retrieved: string | null;
+        stage: string;
+        sets: number;
+        changeset: string;
+        changesets: number;
+        pipeline: string | null;
+        published: string | null;
+      }>(sql`
+        with recursive head as (
+          select s.entity_id as id from slug s join entity e on e.id = s.entity_id
+          where s.path = any(${sql.param(prefixes)}::text[]) and e.type = 'contest'
+          order by length(s.path) desc, s.is_current desc limit 1
+        ),
+        tree(id) as (
+          select id from head
+          union all
+          select c.id from contest c join tree on c.allocation_parent_id = tree.id
+        ),
+        every as (
+          select rs.k, rs.source_id, rs.stage, rs.changeset_id, rs.is_default, rs.completeness, ${latest("rs")} as is_latest
+          from tree cross join lateral (select * from result_set x where x.contest_id = tree.id offset 0) rs
+        ),
+        target as (
+          select ${area}::int as k where ${area}::int is not null
+        ),
+        picked as (
+          select every.* from every cross join target
+          where exists (select from result_rollup_unit u where u.result_set_k = every.k and u.area_k = target.k)
+            or exists (select from result_rollup_sum r where r.result_set_k = every.k and r.area_k = target.k)
+          order by
+            exists (select from source s where s.id = every.source_id and s.license ilike '%ICPSR%'),
+            (exists (select from source s where s.id = every.source_id and s.kind = 'official_body')
+              and exists (select from result_rollup_unit u where u.result_set_k = every.k and u.area_k = target.k)) desc,
+            every.is_default desc, array_position(${STAGES}, every.stage), every.completeness desc nulls last
+          limit 1
+        ),
+        chosen as (
+          select * from picked
+          union all
+          select * from every where is_latest and not exists (select from picked)
+        )
+        select s.publisher, s.title, s.url, chosen.stage::text as stage, count(*)::int as sets,
+          (select max(a.retrieved_at)::date::text from source_artifact a where a.source_id = s.id) as retrieved,
+          (array_agg(c.id::text order by c.published_at desc nulls last))[1] as changeset,
+          count(distinct c.id)::int as changesets,
+          (array_agg(c.pipeline order by c.published_at desc nulls last))[1] as pipeline,
+          max(c.published_at)::date::text as published
+        from chosen join source s on s.id = chosen.source_id join changeset c on c.id = chosen.changeset_id
+        group by s.id, chosen.stage
+        order by count(*) desc, s.publisher
+      `);
+      const pending = db.execute<{
         total: number;
         image: string;
         page: number;
@@ -3820,8 +3906,8 @@ export const contests = {
       }>(sql`
         with recursive head as (
           select s.entity_id as id from slug s join entity e on e.id = s.entity_id
-          where s.path = ${input.path} and e.type = 'contest'
-          order by s.is_current desc limit 1
+          where s.path = any(${sql.param(prefixes)}::text[]) and e.type = 'contest'
+          order by length(s.path) desc, s.is_current desc limit 1
         ),
         tree(id) as (
           select id from head
@@ -3843,13 +3929,13 @@ export const contests = {
             or 'person:' || cy.person_id::text = ${input.key}
         ),
         hits as (
-          select vl.*, ru.area_relation = 'equals' and ua.k is not distinct from coalesce(${input.area}::int, (select k from top)) as exact,
+          select vl.*, ru.area_relation = 'equals' and ua.k is not distinct from coalesce(${area}::int, (select k from top)) as exact,
             sets.source_id as set_source
           from value_locator vl join sets on sets.k = vl.result_set_k
           join reporting_unit ru on ru.k = vl.unit_k
           left join area ua on ua.id = ru.area_id
           where (vl.option_k in (select k from options) or (${input.key}::text is null and vl.option_k = 0))
-            and (${input.area}::int is null or ua.k = ${input.area}::int)
+            and (${area}::int is null or ua.k = ${area}::int)
         )
         select (select count(distinct unit_k) from hits)::int as total, p.image_key as image, p.page_number as page, p.width, p.height,
           h.x0, h.y0, h.x1, h.y1, h.exact, s.publisher, s.title, s.url
@@ -3858,8 +3944,10 @@ export const contests = {
         order by h.exact desc, h.option_k = 0 desc, h.measure, h.count_round, p.page_number
         limit 3
       `);
+      const [listed, found] = await Promise.all([trail, pending]);
       return {
         count: found.rows[0]?.total ?? 0,
+        trail: listed.rows,
         pages: found.rows.map((row) => ({
           image: row.image.replace(/^pages\//, ""),
           page: row.page,
