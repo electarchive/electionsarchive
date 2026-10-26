@@ -1,4 +1,5 @@
 import csv
+import html
 import io
 import os
 import re
@@ -18,6 +19,43 @@ SOURCE = "gb.leap"
 VERSION = "1"
 PARSED = DATA / "parsed" / SOURCE
 INBOX = DATA / "inbox" / "manual" / "MF-073"
+PAGES = DATA / "inbox" / "manual" / "MF-105"
+PAGE_YEARS = (2002, 2003, 2004, 2005)
+PAGE_CODES = {"Bedfordshire": "E10000001"}
+SCOTLAND = {
+    "Aberdeen",
+    "Aberdeenshire",
+    "Angus",
+    "Argyll and Bute",
+    "Clackmannanshire",
+    "Dumfries and Galloway",
+    "Dundee",
+    "East Ayrshire",
+    "East Dunbartonshire",
+    "East Lothian",
+    "East Renfrewshire",
+    "Edinburgh",
+    "Eilean Siar",
+    "Falkirk",
+    "Fife",
+    "Glasgow",
+    "Highland",
+    "Inverclyde",
+    "Midlothian",
+    "Moray",
+    "North Ayrshire",
+    "North Lanarkshire",
+    "Orkney",
+    "Perth and Kinross",
+    "Renfrewshire",
+    "Scottish Borders",
+    "Shetland",
+    "South Ayrshire",
+    "South Lanarkshire",
+    "Stirling",
+    "West Dunbartonshire",
+    "West Lothian",
+}
 SITE = "https://www.andrewteale.me.uk"
 FILES = {
     2006: ("/pdf/2006/2006_results.csv.zip", "/pdf/2006/2006-source.zip"),
@@ -51,6 +89,7 @@ NATIONAL = {
     "Lib": "Liberal Party",
     "SDP": "Social Democratic Party",
     "Veritas": "Veritas",
+    "SocAll": "Socialist Alliance",
 }
 DROPPED = {(2006, "Daventry", "Warley")}
 RESOLVED = {**leh.RESOLVED, "Social Democratic Party": ("gb.party", "social-democratic-party-1990")}
@@ -69,6 +108,14 @@ METHODOLOGY = (
 
 def fetch() -> None:
     raw.fetch(SOURCE, CHD, suffix=".zip")
+    for year in PAGE_YEARS:
+        url = f"{SITE}/leap/councils/{year}/"
+        try:
+            raw.cached(SOURCE, url)
+        except LookupError:
+            file = PAGES / f"leap-results-{year}.html"
+            stamp = datetime.fromtimestamp(file.stat().st_mtime, UTC)
+            raw.store(SOURCE, url, file.read_bytes(), suffix=".html", retrieved_at=stamp, media_type="text/html")
     for paths in FILES.values():
         for path in paths:
             if path is None:
@@ -150,6 +197,7 @@ def parse() -> None:
         if council not in (None, "Abbreviations"):
             by_council.setdefault((council, code), {})[year] = label
     rows = []
+    known: dict[str, dict[int, str]] = {}
     for year, (results, _) in FILES.items():
         (content,) = members(SITE + results, ".csv").values()
         for number, line in enumerate(csv.reader(io.StringIO(content.decode("utf-8")))):
@@ -170,6 +218,8 @@ def parse() -> None:
                 raise ValueError(f"{year} {council}: council code {la} has no GSS equivalent")
             first_code = la_code
             la_code, la_name = recoded.get(la_code, (la_code, la_name))
+            if council is not None:
+                known.setdefault(council, {})[year] = la_code
             ward_gss = gss.get(ward_code, (ward_code, None))[0] if ward_code else None
             if ward_code and (
                 ward_code[: len(la)] != la
@@ -202,6 +252,96 @@ def parse() -> None:
                     "elected": elected == "1",
                 }
             )
+    for held in PAGE_YEARS:
+        text = raw.cached(SOURCE, f"{SITE}/leap/councils/{held}/").path.read_text(encoding="utf-8")
+        pages = re.split(r"<!-- (https://www\.andrewteale\.me\.uk/leap/results/\S+) -->", text)[1:]
+        for url, page in zip(pages[::2], pages[1::2], strict=True):
+            title = re.search(r"<title>Local Elections Archive Project - \d{4} - (.+?)</title>", page)
+            if title is None:
+                raise ValueError(f"{url}: no title")
+            council = html.unescape(title.group(1))
+            if council in PAGE_CODES:
+                la_code = PAGE_CODES[council]
+            elif council in known:
+                codes = known[council]
+                choices = [code for code in codes.values() if held != 2005 or not code.startswith("E07")] or list(
+                    codes.values()
+                )
+                la_code = min(
+                    choices, key=lambda code: min(abs(seen - held) for seen, value in codes.items() if value == code)
+                )
+            elif council in SCOTLAND:
+                continue
+            else:
+                raise ValueError(f"{held} {council}: no council code")
+            consolidated = re.search(r'id="consol">.*?<table>(.*?)</table>', page, re.DOTALL)
+            totals = {
+                html.unescape(label): int(votes)
+                for label, votes in re.findall(
+                    r'<td class="cand">(.*?)</td>\s*<td class="votes">(\d+)</td>',
+                    consolidated.group(1) if consolidated else "",
+                )
+            }
+            wards = []
+            for heading, table in re.findall(
+                r'<h4 id="ward\d+"><a href="/leap/ward/\d+/">(.+?)</a></h4>\s*<table>(.*?)</table>', page, re.DOTALL
+            ):
+                found = re.fullmatch(r"(.+?)(?: \((\d+)\))?", html.unescape(heading).strip())
+                entries = [
+                    (
+                        html.unescape(person).strip(),
+                        html.unescape(party).strip(),
+                        int(votes) if votes.strip().isdigit() else 0,
+                    )
+                    for person, party, votes in re.findall(
+                        r'<th class="cand">([^<]*)</th>\s*<td class="party">([^<]*)</td>\s*<td class="(?:votes|unop)">([^<]*)</td>',
+                        table,
+                        re.DOTALL,
+                    )
+                ]
+                if found is None:
+                    raise ValueError(f"{url}: ward heading {heading!r}")
+                wards.append((found.group(1), int(found.group(2) or 1), entries))
+            sums: dict[str, int] = {}
+            for _, _, entries in wards:
+                for _, party, votes in entries:
+                    sums[party] = sums.get(party, 0) + votes
+            spelled = {
+                party: matches[0]
+                for party, total in sums.items()
+                if party not in NATIONAL and party != "Ind" and total
+                for matches in [[label for label, votes in totals.items() if votes == total]]
+                if len(matches) == 1
+            }
+            for ward, seats, entries in wards:
+                order = sorted(range(len(entries)), key=lambda index: -entries[index][2])
+                winners = set(order[:seats]) if any(votes for _, _, votes in entries) else set(range(len(entries)))
+                for index, (person, party, votes) in enumerate(entries):
+                    label = None
+                    if party in NATIONAL:
+                        label = NATIONAL[party]
+                    elif party and party != "Ind":
+                        council_labels = by_council.get((council, party), {})
+                        label = spelled.get(party) or (council_labels[min(council_labels)] if council_labels else None)
+                        if label is None and len(general.get(party, ())) == 1:
+                            label = next(iter(general[party]))
+                    rows.append(
+                        {
+                            "year": held,
+                            "number": len(rows),
+                            "council": council,
+                            "la_code": la_code,
+                            "la_name": council,
+                            "ward": ward,
+                            "ward_code": None,
+                            "old_code": None,
+                            "name": person or None,
+                            "party": party or None,
+                            "label": label,
+                            "votes": votes,
+                            "elected": index in winners,
+                        }
+                    )
     frame = pl.DataFrame(rows)
     shared = (
         frame.filter(pl.col("ward_code").is_not_null())
@@ -234,6 +374,10 @@ def parse() -> None:
 
 
 DAYS = {
+    2002: date(2002, 5, 2),
+    2003: date(2003, 5, 1),
+    2004: date(2004, 6, 10),
+    2005: date(2005, 5, 5),
     2006: date(2006, 5, 4),
     2007: date(2007, 5, 3),
     2008: date(2008, 5, 1),
@@ -311,9 +455,12 @@ def emit() -> Path:
                 attribution=ATTRIBUTION,
                 notes=METHODOLOGY,
             )
-            for path in FILES[year]:
-                if path is not None:
-                    cs.artifact(raw.cached(SOURCE, SITE + path), sources[year])
+            for url in (
+                [SITE + path for path in FILES[year] if path is not None]
+                if year in FILES
+                else [f"{SITE}/leap/councils/{year}/"]
+            ):
+                cs.artifact(raw.cached(SOURCE, url), sources[year])
         chd = cs.source("Office for National Statistics", "Code History Database (June 2026) for the UK")
         cs.add(
             "source",
@@ -496,6 +643,14 @@ def emit() -> Path:
                     is_default=contest not in others,
                     completeness=1,
                 )
+                if year in PAGE_YEARS and not tacit:
+                    cs.add(
+                        "note",
+                        entity_id=result_set,
+                        kind="caveat",
+                        body_md="The Local Elections Archive's results pages for this year do not mark the winners; the "
+                        "candidates with the most votes, as many as the seats, are shown as elected.",
+                    )
                 locator = {"council": lines["council"][0], "ward": ward_name}
                 if old_code is not None:
                     locator["ons_code"] = old_code
