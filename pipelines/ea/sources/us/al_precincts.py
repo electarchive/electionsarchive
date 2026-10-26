@@ -23,16 +23,21 @@ PUBLISHER = "Alabama Secretary of State"
 TITLE = "Election Data Downloads: precinct-level general election results"
 LANDING = "https://www.sos.alabama.gov/alabama-votes/voter/election-data"
 BASE = "https://www.sos.alabama.gov/sites/default/files/election-data/2017-06/"
+VOTER_PDFS = "https://www.sos.alabama.gov/sites/default/files/voter-pdfs/"
 FILES = [
     *[
         (date(2000, 11, 7), f"https://www.sos.alabama.gov/sites/default/files/election-data/2023-06/2000genp{pack}.zip")
-        for pack in (1, 2, 4, 5, 6, 7)
+        for pack in (1, 2, 3, 4, 5, 6, 7)
     ],
     (
         date(2004, 11, 2),
         "https://www.sos.alabama.gov/sites/default/files/election-data/2023-06/2004-GeneralElection-PrecinctLevel.zip",
     ),
+    (date(2000, 11, 7), BASE + "Walker-2000genp.xls"),
+    (date(2000, 11, 7), BASE + "Wilcox-2000genp.xls"),
     (date(2002, 11, 5), BASE + "2002-GeneralElection-PrecinctLevel_0.xls"),
+    (date(2006, 11, 7), VOTER_PDFS + "2006/2006GeneralElection-PrecinctLevel.zip"),
+    (date(2008, 11, 4), VOTER_PDFS + "2008/2008GeneralElectionPrecinctLevelResults.xls"),
     (date(2010, 11, 2), BASE + "2010-general-precinctLevel.zip"),
     (date(2012, 11, 6), BASE + "2012General-PrecinctLevel.zip"),
     (date(2014, 11, 4), BASE + "2014General-precinctLevel.zip"),
@@ -86,9 +91,11 @@ def contest(title: str) -> tuple[str, int | None] | None:
     }.get(name, name)
     if name in STATEWIDE:
         return STATEWIDE[name], None
-    if name.startswith("PRESIDENT AND VICE") or name == "PRESIDENT":
+    if name == "UNITED STATES REPRESENTATIVE":
+        return "house", 0
+    if name.startswith("PRESIDENT AND VICE") or name in ("PRESIDENT", "PRESIDENT OF THE UNITED STATES"):
         return "president", None
-    if name == "UNITED STATES SENATOR":
+    if name in ("UNITED STATES SENATOR", "U.S. SENATE", "US SENATE"):
         return "senate", None
     if matched := re.match(r"UNITED STATES REPRESENTATIVE, (\d+)\w* CONGRESSIONAL", name):
         return "house", int(matched[1])
@@ -108,6 +115,17 @@ def contest(title: str) -> tuple[str, int | None] | None:
         return f"senate:{int(matched[1])}:g", None
     if matched := re.match(r"STATE REPRESENTATIVE D\d+ DISTRICT (\d+)$", name):
         return f"house:{int(matched[1])}:g", None
+    if matched := re.match(
+        r"(?:UNITED STATES REPRESENTATIVE|US HOUSE)(?:,| -) (?:CONGRESSIONAL )?(?:DISTRICT )?(\d+)(?:ST|ND|RD|TH)?(?: CONGRESSIONAL(?: DISTRICT)?)?$",
+        name,
+    ):
+        return "house", int(matched[1])
+    if matched := re.match(r"U\.? ?S\.? REPRESENTATIVE,? (\d+)\w* CONGRESSIONAL DISTRICT$", name):
+        return "house", int(matched[1])
+    if matched := re.match(r"(\d+)(?:ST|ND|RD|TH) CONGRESSIONAL DIST(?:RICT)?\.?$", name):
+        return "house", int(matched[1])
+    if matched := re.match(r"U\.?S\.? HOUSE,? ?#?(\d+)$", name):
+        return "house", int(matched[1])
     if matched := re.match(r"U\.?S\.? HSE?\.?(?:OUSE)? (\d+)$", name):
         return "house", int(matched[1])
     if matched := re.match(r"US REP[,.] DIST\.? ?(\d+)$", name):
@@ -119,6 +137,78 @@ def contest(title: str) -> tuple[str, int | None] | None:
     if matched := re.match(r"PUBLIC SERVICE (?:COMMISSION,? (?:PLACE|PL)\.? (?:NO\. )?|PL ?)(\d+)", name):
         return f"public-service-commissioner:place-{matched[1]}", None
     return None
+
+
+def sheet_records(day: date, county: str, rows: list[list[str]]) -> list[tuple[date, str, str, str, str, str, str]]:
+    found: list[tuple[date, str, str, str, str, str, str]] = []
+    if rows[0][:3] == ["Office", "Party", "Candidate"]:
+        for row in rows[1:]:
+            if len(row) < 4 or contest(row[0]) is None:
+                continue
+            for precinct, value in zip(rows[0][3:], row[3:], strict=False):
+                if precinct and not re.search(TOTALS, precinct.upper()):
+                    found.append((day, county, row[0], precinct, row[2], value, row[1]))
+        return found
+    if len(rows) > 4 and rows[3][:2] == ["PRECINCT NO.", "BOX  NO."]:
+        owner = ""
+        titles = []
+        for upper, lower in zip(rows[0], rows[1], strict=False):
+            owner = f"{upper} {lower}".strip() if upper.strip() else owner
+            titles.append(owner)
+        for row in rows[4:]:
+            if len(row) < 4 or not row[2].strip() or re.search(TOTALS, row[2].upper()):
+                continue
+            for position in range(4, min(len(row), len(rows[3]), len(titles))):
+                title = re.sub(
+                    r"(?i)for u s representative (\d+)\w* congressional.*", r"United States Representative, District \1", titles[position]
+                )
+                if contest(title) is not None and rows[3][position].strip():
+                    name = re.sub(r"\s+(Democrat|Republican|Independent|Libertarian)\w*\s*$", "", rows[3][position].strip())
+                    found.append(
+                        (day, county, title, f"{row[0]}-{row[1]} {row[2].strip()}", "WRITE-INS" if name.lower() == "write-in" else name, row[position], "")
+                    )
+        return found
+    if len(rows) > 2 and rows[1][:2] == ["County ID", "Precinct"]:
+        owner = ""
+        offices = []
+        for label in rows[0]:
+            owner = label.strip() if label.strip() else owner
+            offices.append(owner)
+        for row in rows[2:]:
+            if len(row) < 3 or not row[1].strip() or re.search(TOTALS, row[1].upper()):
+                continue
+            for position in range(2, min(len(row), len(rows[1]), len(offices))):
+                label = rows[1][position].strip()
+                if label and contest(offices[position]) is not None:
+                    name = re.sub(r"\s+-\s+[A-Z]{1,3}$", "", label)
+                    found.append(
+                        (day, county, offices[position], row[1].strip(), "WRITE-INS" if re.fullmatch(r"(?i)w\.?i\.?|write-?ins?", name) else name, row[position], "")
+                    )
+        return found
+    top = next((i for i, row in enumerate(rows[:8]) if any(contest(cell) is not None for cell in row)), None)
+    if top is None or top + 2 >= len(rows):
+        return found
+    owner = ""
+    offices = []
+    for label in rows[top]:
+        owner = label.strip() if label.strip() else owner
+        offices.append(owner)
+    seen: dict[str, int] = {}
+    for row in rows[top + 2 :]:
+        if not row or not row[0].strip() or re.search(TOTALS, row[0].upper()):
+            continue
+        place = row[0].strip()
+        seen[place] = seen.get(place, 0) + 1
+        if seen[place] > 1:
+            place = f"{place} #{seen[place]}"
+        for position in range(1, min(len(row), len(rows[top + 1]), len(offices))):
+            label = rows[top + 1][position].strip()
+            if label and contest(offices[position]) is not None:
+                name = re.sub(r"\s*\(\s*[A-Z ]*\)\s*$", "", label).strip()
+                found.append(
+                    (day, county, offices[position], place, "WRITE-INS" if re.fullmatch(r"(?i)w\.?i\.?", name) else name, row[position], "")
+                )
+    return found
 
 
 def parse() -> None:
@@ -140,6 +230,15 @@ def parse() -> None:
             for sheet, frame in book.items():
                 rows = [[cell or "" for cell in row] for row in frame.iter_rows()]
                 header = next((i for i, row in enumerate(rows) if row[0].strip() == "County Code"), None)
+                if header is None and day.year in (2000, 2008):
+                    if rows:
+                        county = (
+                            re.sub(r"[^a-z]", "", sheet.lower())
+                            if day.year == 2008
+                            else re.sub(r"[^a-z]", "", url.rsplit("/", 1)[-1].split("-")[0].lower())
+                        )
+                        records.extend(sheet_records(day, county, rows))
+                    continue
                 if header is None or header == 0:
                     continue
                 county = re.sub(r"[^a-z]", "", sheet.lower())
@@ -221,6 +320,9 @@ def parse() -> None:
                     sheets = [[[cell or "" for cell in row] for row in frame.iter_rows()] for frame in book.values()]
                 for rows in sheets:
                     if not rows:
+                        continue
+                    if day.year == 2006 or (len(rows) > 1 and rows[1][:2] == ["County ID", "Precinct"]):
+                        records.extend(sheet_records(day, county, rows))
                         continue
                     if rows[0][0] in ("Contest Title", "Contest Title "):
                         precincts = rows[0][3:]
@@ -346,6 +448,36 @@ def parse() -> None:
             candidate=pl.col("choice").str.to_uppercase().str.replace(r" ?/ ?.*$", "").str.strip_chars(),
             place=pl.col("place").str.replace_all("\x00", "").str.strip_chars(),
         )
+        .with_columns(surname=pl.col("candidate").str.extract(r"([A-Z'\-]+)$"))
+    )
+    people = ~pl.col("candidate").str.contains("WRITE|VOTES|STRAIGHT|PARTY") & ~pl.col("candidate").is_in(list(medsl.PSEUDO))
+    named = frame.filter((pl.col("chamber") == "house") & people & (pl.col("district") > 0))
+    owners = (
+        named.group_by("day", "surname", "district")
+        .len()
+        .sort("len", descending=True)
+        .group_by("day", "surname", maintain_order=True)
+        .agg(owner=pl.col("district").first())
+    )
+    seats = (
+        frame.filter((pl.col("chamber") == "house") & people)
+        .join(owners, on=["day", "surname"], how="left")
+        .group_by("day", "county", "title")
+        .agg(seat=pl.col("owner").drop_nulls().mode().first())
+    )
+    frame = (
+        frame.join(owners, on=["day", "surname"], how="left")
+        .join(seats, on=["day", "county", "title"], how="left")
+        .with_columns(
+            district=pl.when(pl.col("chamber") != "house")
+            .then("district")
+            .otherwise(pl.coalesce(pl.when(people).then("owner"), "seat", "district"))
+        )
+        .filter((pl.col("chamber") != "house") | (pl.col("district") > 0))
+        .drop("owner", "seat", "surname")
+    )
+    frame = (
+        frame
         .with_columns(
             measure=pl.col("candidate").replace_strict(medsl.PSEUDO, default=1, return_dtype=pl.Int16),
             writein=pl.col("candidate").is_in(list(medsl.POOLED)) | pl.col("candidate").str.contains("WRITE"),
@@ -465,12 +597,25 @@ def emit() -> Path:
                 valid_to=pl.col("day") + timedelta(days=1),
             ),
         )
+        checked = (pl.col("chamber") == "house") & (
+            ((pl.col("day") == date(2008, 11, 4)) & (pl.col("district") == 3))
+            | ((pl.col("day") == date(2000, 11, 7)) & (pl.col("district") == 2))
+        )
         medsl.attach(
             cs,
             conn,
-            frame.drop("county_code"),
+            frame.filter(~checked).drop("county_code"),
             {"AL": source},
             grain="precinct",
             partial="the Secretary of State's file has no precinct results for some counties",
         )
+        if frame.filter(checked).height:
+            medsl.attach(
+                cs,
+                conn,
+                frame.filter(checked).drop("county_code"),
+                {"AL": source},
+                grain="precinct",
+                authoritative="Source: the Secretary of State's precinct returns, which match the county book's candidate totals.",
+            )
         return cs.write()
