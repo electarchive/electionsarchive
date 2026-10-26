@@ -94,7 +94,7 @@ def parse() -> None:
         .then(pl.lit("senate"))
         .when(office.str.contains(openelections.HOUSE.pattern) & ~office.str.contains(r"\bstate\b"))
         .then(pl.lit("house"))
-        .when(office.str.contains(r"^governor\b") & ~office.str.contains("lieutenant"))
+        .when(office.str.contains(r"^governor\b"))
         .then(pl.lit("governor")),
         day=pl.col("path").str.extract(r"(\d{8})__").str.to_date("%Y%m%d"),
     ).filter(pl.col("chamber").is_not_null()).write_parquet(
@@ -226,7 +226,14 @@ def emit() -> Path:
                         license="No license stated: facts published with attribution, raw files not redistributed",
                     )
             cs.artifact(raw.cached(SOURCE, url(state, path)), sources[state])
-        medsl.attach(cs, conn, returns, sources, grain="precinct")
+        medsl.attach(
+            cs,
+            conn,
+            returns,
+            sources,
+            grain="precinct",
+            redone=frozenset(os.environ.get("OE_REDONE", "").split(",")) - {""},
+        )
         used = set(pl.concat(cs.frames["result_value"])["unit_id"].unique()) if cs.frames.get("result_value") else set()
         counties = {
             code: (unit, area)
