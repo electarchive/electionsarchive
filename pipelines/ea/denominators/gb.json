@@ -237,6 +237,11 @@
       "title": "By-elections in the 2024 Parliament (CBP-10268, 9 October 2026)",
       "publisher": "House of Commons Library",
       "url": "https://commonslibrary.parliament.uk/research-briefings/cbp-10268/"
+    },
+    "hoc-cbp8647": {
+      "title": "General election results from 1918 to 2019 (CBP-8647), constituency results workbook",
+      "publisher": "House of Commons Library",
+      "url": "https://commonslibrary.parliament.uk/research-briefings/cbp-8647/"
     }
   },
   "levels": [
@@ -262,66 +267,122 @@
       "gaps": [
         {
           "from": 1832,
-          "to": 1945,
-          "note": "Before 1950, some constituencies returned two or more members. The House of Commons Library's statistics, which start in 1918, give seats rather than constituencies. These elections aren't counted yet."
+          "to": 1910,
+          "note": "Before 1918, many constituencies returned two or more members, and the archive hasn't yet found an official count of constituencies (the House of Commons Library counts seats). These elections aren't counted yet."
         }
       ],
       "elections": [
         {
           "date": "1918-12-14",
-          "contests": null,
+          "contests": 688,
           "seats": 707,
-          "source": "hoc-cbp7529",
-          "note": "Before 1950 some constituencies returned two or more members (two-member boroughs and university seats), so the seat count of the briefing is not a count of constituencies."
+          "regions": {
+            "ENG": 478,
+            "WLS": 36,
+            "SCT": 71,
+            "IRL": 103
+          },
+          "source": "hoc-cbp8647",
+          "quote": "Sheet 1918: 688 constituency rows (territorial sheet rows plus the university seats), whose Seats column sums to 707",
+          "note": "Counted from the House of Commons Library's constituency results (CBP-8647): one race per constituency, including the two-member boroughs and the university seats."
         },
         {
           "date": "1922-11-15",
-          "contests": null,
+          "contests": 595,
           "seats": 615,
-          "source": "hoc-cbp7529",
-          "note": "Before 1950 some constituencies returned two or more members (two-member boroughs and university seats), so the seat count of the briefing is not a count of constituencies."
+          "regions": {
+            "ENG": 478,
+            "WLS": 36,
+            "SCT": 71,
+            "NIR": 10
+          },
+          "source": "hoc-cbp8647",
+          "quote": "Sheet 1922: 595 constituency rows (territorial sheet rows plus the university seats), whose Seats column sums to 615",
+          "note": "Counted from the House of Commons Library's constituency results (CBP-8647): one race per constituency, including the two-member boroughs and the university seats."
         },
         {
           "date": "1923-12-06",
-          "contests": null,
+          "contests": 595,
           "seats": 615,
-          "source": "hoc-cbp7529",
-          "note": "Before 1950 some constituencies returned two or more members (two-member boroughs and university seats), so the seat count of the briefing is not a count of constituencies."
+          "regions": {
+            "ENG": 478,
+            "WLS": 36,
+            "SCT": 71,
+            "NIR": 10
+          },
+          "source": "hoc-cbp8647",
+          "quote": "Sheet 1923: 595 constituency rows (territorial sheet rows plus the university seats), whose Seats column sums to 615",
+          "note": "Counted from the House of Commons Library's constituency results (CBP-8647): one race per constituency, including the two-member boroughs and the university seats."
         },
         {
           "date": "1924-10-29",
-          "contests": null,
+          "contests": 595,
           "seats": 615,
-          "source": "hoc-cbp7529",
-          "note": "Before 1950 some constituencies returned two or more members (two-member boroughs and university seats), so the seat count of the briefing is not a count of constituencies."
+          "regions": {
+            "ENG": 478,
+            "WLS": 36,
+            "SCT": 71,
+            "NIR": 10
+          },
+          "source": "hoc-cbp8647",
+          "quote": "Sheet 1924: 595 constituency rows (territorial sheet rows plus the university seats), whose Seats column sums to 615",
+          "note": "Counted from the House of Commons Library's constituency results (CBP-8647): one race per constituency, including the two-member boroughs and the university seats."
         },
         {
           "date": "1929-05-30",
-          "contests": null,
+          "contests": 595,
           "seats": 615,
-          "source": "hoc-cbp7529",
-          "note": "Before 1950 some constituencies returned two or more members (two-member boroughs and university seats), so the seat count of the briefing is not a count of constituencies."
+          "regions": {
+            "ENG": 478,
+            "WLS": 36,
+            "SCT": 71,
+            "NIR": 10
+          },
+          "source": "hoc-cbp8647",
+          "quote": "Sheet 1929: 595 constituency rows (territorial sheet rows plus the university seats), whose Seats column sums to 615",
+          "note": "Counted from the House of Commons Library's constituency results (CBP-8647): one race per constituency, including the two-member boroughs and the university seats."
         },
         {
           "date": "1931-10-27",
-          "contests": null,
+          "contests": 595,
           "seats": 615,
-          "source": "hoc-cbp7529",
-          "note": "Before 1950 some constituencies returned two or more members (two-member boroughs and university seats), so the seat count of the briefing is not a count of constituencies."
+          "regions": {
+            "ENG": 478,
+            "WLS": 36,
+            "SCT": 71,
+            "NIR": 10
+          },
+          "source": "hoc-cbp8647",
+          "quote": "Sheet 1931: 595 constituency rows (territorial sheet rows plus the university seats), whose Seats column sums to 615",
+          "note": "Counted from the House of Commons Library's constituency results (CBP-8647): one race per constituency, including the two-member boroughs and the university seats."
         },
         {
           "date": "1935-11-14",
-          "contests": null,
+          "contests": 595,
           "seats": 615,
-          "source": "hoc-cbp7529",
-          "note": "Before 1950 some constituencies returned two or more members (two-member boroughs and university seats), so the seat count of the briefing is not a count of constituencies."
+          "regions": {
+            "ENG": 478,
+            "WLS": 36,
+            "SCT": 71,
+            "NIR": 10
+          },
+          "source": "hoc-cbp8647",
+          "quote": "Sheet 1935: 595 constituency rows (territorial sheet rows plus the university seats), whose Seats column sums to 615",
+          "note": "Counted from the House of Commons Library's constituency results (CBP-8647): one race per constituency, including the two-member boroughs and the university seats."
         },
         {
           "date": "1945-07-05",
-          "contests": null,
+          "contests": 620,
           "seats": 640,
-          "source": "hoc-cbp7529",
-          "note": "Before 1950 some constituencies returned two or more members (two-member boroughs and university seats), so the seat count of the briefing is not a count of constituencies."
+          "regions": {
+            "ENG": 503,
+            "WLS": 36,
+            "SCT": 71,
+            "NIR": 10
+          },
+          "source": "hoc-cbp8647",
+          "quote": "Sheet 1945: 620 constituency rows (territorial sheet rows plus the university seats), whose Seats column sums to 640",
+          "note": "Counted from the House of Commons Library's constituency results (CBP-8647): one race per constituency, including the two-member boroughs and the university seats."
         },
         {
           "date": "1950-02-23",

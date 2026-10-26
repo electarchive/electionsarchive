@@ -164,6 +164,16 @@
       "title": "Rapport n° 381 (1984-1985) sur le projet de loi relatif à l'élection des députés des territoires d'outre-mer, de Mayotte et de Saint-Pierre-et-Miquelon",
       "publisher": "Sénat",
       "url": "https://www.senat.fr/rap/1984-1985/i1984_1985_0381.pdf"
+    },
+    "qe-52861": {
+      "title": "Question écrite n° 52861 (XIIe législature), réponse du ministre de l'intérieur: nombre de députés élus aux élections législatives depuis 1876",
+      "publisher": "Assemblée nationale",
+      "url": "https://www.assemblee-nationale.fr/dyn/12/questions/QANR5L12QE52861"
+    },
+    "senat-34-1978": {
+      "title": "Rapport n° 34 (1977-1978) sur le projet de loi modifiant l'ordonnance n° 59-227 du 4 février 1959 (députés des territoires d'outre-mer)",
+      "publisher": "Sénat",
+      "url": "https://www.senat.fr/rap/1977-1978/i1977_1978_0034.pdf"
     }
   },
   "levels": [
@@ -200,9 +210,11 @@
         },
         {
           "date": "1962-11-18",
-          "contests": null,
-          "note": "The number of constituencies at this election has not yet been confirmed from an official source.",
-          "research_note": "No official quote fetched. Assemblée statistics for 1962 are not at the URL tested (404). 482 appears in secondary sources only and is not used."
+          "contests": 481,
+          "seats": 482,
+          "source": "qe-52861",
+          "quote": "18 et 25 novembre 1962 465 17 482 (Sénat rapport n° 34: \"Dans le Territoire des Comores, chaque liste doit comprendre un nombre de candidats égal au nombre de députés à élire\"; the territories' table \"resté sans changement depuis 1961\")",
+          "note": "Counted as 481 constituencies: 465 in metropolitan France, 10 in the overseas départements, and 6 in the overseas territories. The Comores elected their two deputies by list in a single constituency."
         },
         {
           "date": "1967-03-05",
