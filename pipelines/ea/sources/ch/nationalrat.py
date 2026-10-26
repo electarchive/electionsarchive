@@ -617,7 +617,7 @@ def emit() -> Path:
                     )
                 for key, count in frame.filter(pl.col("seats") > 0).select("party", "seats").iter_rows():
                     cs.add("outcome", result_set_id=result_set, option_id=options[key], kind="won", seats=count)
-                if counted and result_set in cs.minted:
+                if counted:
                     located = {
                         "result_set_id": pl.lit(str(result_set)),
                         "channel": pl.col("unit").replace_strict(channels, return_dtype=pl.Int16),
@@ -636,7 +636,7 @@ def emit() -> Path:
                             **located,
                             unit_id=pl.col("unit").replace_strict({c: str(u) for c, u in units.items()}),
                             option_id=pl.col("party").replace_strict(options),
-                            measure=pl.lit(1 if magnitude == 1 else 8, pl.Int16),
+                            measure=pl.lit(8, pl.Int16),
                             value="votes",
                         )
                     )
