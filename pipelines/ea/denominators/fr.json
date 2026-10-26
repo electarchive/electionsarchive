@@ -129,6 +129,31 @@
       "title": "Panorama des élections municipales (Pierre-Henri Bono, mars 2026), tableau 1 « Nombre de municipalités » (source : ministère de l'Intérieur)",
       "publisher": "Sciences Po CEVIPOF",
       "url": "https://www.sciencespo.fr/cevipof/sites/sciencespo.fr.cevipof/files/MUNICIPALES_PH_Panorama_mars26.pdf"
+    },
+    "an-1997": {
+      "title": "Résultats des élections législatives des 25 mai et 1er juin 1997",
+      "publisher": "Assemblée nationale",
+      "url": "https://www.assemblee-nationale.fr/connaissance/elections-1997.asp"
+    },
+    "an-2002": {
+      "title": "Élections législatives des 9 et 16 juin 2002",
+      "publisher": "Assemblée nationale",
+      "url": "https://www.assemblee-nationale.fr/elections/"
+    },
+    "an-2017": {
+      "title": "Élections législatives des 11 et 18 juin 2017 : 1 pays, 577 circonscriptions",
+      "publisher": "Assemblée nationale",
+      "url": "https://www2.assemblee-nationale.fr/qui/elections-legislatives-des-11-et-18-juin-2017/elections-legislatives-mode-d-emploi/1-pays-577-circonscriptions"
+    },
+    "mi-legislatives": {
+      "title": "Élections législatives : je suis électeur",
+      "publisher": "Ministère de l'Intérieur",
+      "url": "https://www.elections.interieur.gouv.fr/scrutins/elections-legislatives/elections-legislatives-je-suis-electeur"
+    },
+    "mi-2024": {
+      "title": "Élections législatives 2024 : les résultats définitifs",
+      "publisher": "Ministère de l'Intérieur",
+      "url": "https://www.interieur.gouv.fr/actualites/actualites-du-ministere/elections-legislatives-2024-resultats-definitifs"
     }
   },
   "levels": [
@@ -231,15 +256,19 @@
         },
         {
           "date": "1997-05-25",
-          "contests": null,
-          "note": "The number of constituencies at this election has not yet been confirmed from an official source.",
-          "research_note": "No official quote fetched. The statistics PDF for 1997 is not at the URL tested (404). Date unverified."
+          "contests": 577,
+          "note": "One deputy per constituency.",
+          "seats": 577,
+          "source": "an-1997",
+          "quote": "Résultats en voix - 1er tour - 25 mai 1997 - France entière (577 circonscriptions)"
         },
         {
           "date": "2002-06-09",
-          "contests": null,
-          "note": "The number of constituencies at this election has not yet been confirmed from an official source.",
-          "research_note": "No official quote fetched. Date unverified."
+          "contests": 577,
+          "note": "One deputy per constituency.",
+          "seats": 577,
+          "source": "an-2002",
+          "quote": "elles se déroulent simultanément dans les 577 circonscriptions de France métropolitaine, d'Outre-mer et de l'étranger"
         },
         {
           "contests": 577,
@@ -257,21 +286,27 @@
         },
         {
           "date": "2017-06-11",
-          "contests": null,
-          "note": "The number of constituencies at this election has not yet been confirmed from an official source.",
-          "research_note": "No official quote fetched; date not verified. Expected 577 with 11 SFE constituencies, not confirmed. Not entered."
+          "contests": 577,
+          "note": "One deputy per constituency.",
+          "seats": 577,
+          "source": "an-2017",
+          "quote": "Les 577 circonscriptions sont ainsi réparties : 539 en France métropolitaine, 19 dans les départements d'Outre-Mer, 8 dans les collectivités d'Outre-Mer et 11 représentant les Français de l'étranger."
         },
         {
           "date": "2022-06-12",
-          "contests": null,
-          "note": "The number of constituencies at this election has not yet been confirmed from an official source.",
-          "research_note": "No official quote fetched; date not verified. Not entered."
+          "contests": 577,
+          "note": "The Ministry's page describes current legislative elections; the 2010 map (ordonnance n° 2009-935) used since 2012 was unchanged in 2022.",
+          "seats": 577,
+          "source": "mi-legislatives",
+          "quote": "Elles sont organisées simultanément dans les 577 circonscriptions de France métropolitaine, d'outre-mer et de l'étranger."
         },
         {
           "date": "2024-06-30",
-          "contests": null,
-          "note": "The number of constituencies at this election has not yet been confirmed from an official source.",
-          "research_note": "No official quote fetched; date not verified. Not entered."
+          "contests": 577,
+          "note": "One deputy per constituency.",
+          "seats": 577,
+          "source": "mi-2024",
+          "quote": "Vous pouvez désormais découvrir le nom des députés élus dans les 577 circonscriptions en consultant les résultats définitifs des élections législatives anticipées 2024."
         }
       ]
     },
