@@ -207,6 +207,16 @@
       "title": "Territorial Elections (news and events)",
       "publisher": "Elections Nunavut",
       "url": "https://www.elections.nu.ca/en/news-events/territorial-elections"
+    },
+    "lop-hfer": {
+      "title": "History of Federal Electoral Ridings, 1867-2010 (hfer_e.csv, Election Type B/P)",
+      "publisher": "Library of Parliament (Open Government Portal)",
+      "url": "https://open.canada.ca/data/dataset/ea8f2c37-90b6-4fee-857e-984d3060184e"
+    },
+    "ec-byelections": {
+      "title": "By-elections and Official Voting Results reports",
+      "publisher": "Elections Canada",
+      "url": "https://www.elections.ca/content.aspx?dir=pas&document=byel&lang=e&section=ele"
     }
   },
   "levels": [
@@ -648,14 +658,970 @@
           "iso": "CA"
         }
       ],
-      "gaps": [
+      "gaps": [],
+      "elections": [
         {
-          "from": 1867,
-          "to": 2026,
-          "note": "No official count of by-elections has been compiled yet."
+          "year": 1867,
+          "contests": 2,
+          "source": "lop-hfer",
+          "quote": "2 distinct by-elections (date and riding) with Election Type B/P dated 1867"
+        },
+        {
+          "year": 1868,
+          "contests": 8,
+          "source": "lop-hfer",
+          "quote": "8 distinct by-elections (date and riding) with Election Type B/P dated 1868"
+        },
+        {
+          "year": 1869,
+          "contests": 12,
+          "source": "lop-hfer",
+          "quote": "12 distinct by-elections (date and riding) with Election Type B/P dated 1869"
+        },
+        {
+          "year": 1870,
+          "contests": 10,
+          "source": "lop-hfer",
+          "quote": "10 distinct by-elections (date and riding) with Election Type B/P dated 1870"
+        },
+        {
+          "year": 1871,
+          "contests": 14,
+          "source": "lop-hfer",
+          "quote": "14 distinct by-elections (date and riding) with Election Type B/P dated 1871"
+        },
+        {
+          "year": 1872,
+          "contests": 1,
+          "source": "lop-hfer",
+          "quote": "1 distinct by-elections (date and riding) with Election Type B/P dated 1872"
+        },
+        {
+          "year": 1873,
+          "contests": 26,
+          "source": "lop-hfer",
+          "quote": "26 distinct by-elections (date and riding) with Election Type B/P dated 1873"
+        },
+        {
+          "year": 1874,
+          "contests": 30,
+          "source": "lop-hfer",
+          "quote": "30 distinct by-elections (date and riding) with Election Type B/P dated 1874"
+        },
+        {
+          "year": 1875,
+          "contests": 30,
+          "source": "lop-hfer",
+          "quote": "30 distinct by-elections (date and riding) with Election Type B/P dated 1875"
+        },
+        {
+          "year": 1876,
+          "contests": 15,
+          "source": "lop-hfer",
+          "quote": "15 distinct by-elections (date and riding) with Election Type B/P dated 1876"
+        },
+        {
+          "year": 1877,
+          "contests": 9,
+          "source": "lop-hfer",
+          "quote": "9 distinct by-elections (date and riding) with Election Type B/P dated 1877"
+        },
+        {
+          "year": 1878,
+          "contests": 17,
+          "source": "lop-hfer",
+          "quote": "17 distinct by-elections (date and riding) with Election Type B/P dated 1878"
+        },
+        {
+          "year": 1879,
+          "contests": 10,
+          "source": "lop-hfer",
+          "quote": "10 distinct by-elections (date and riding) with Election Type B/P dated 1879"
+        },
+        {
+          "year": 1880,
+          "contests": 14,
+          "source": "lop-hfer",
+          "quote": "14 distinct by-elections (date and riding) with Election Type B/P dated 1880"
+        },
+        {
+          "year": 1881,
+          "contests": 9,
+          "source": "lop-hfer",
+          "quote": "9 distinct by-elections (date and riding) with Election Type B/P dated 1881"
+        },
+        {
+          "year": 1882,
+          "contests": 7,
+          "source": "lop-hfer",
+          "quote": "7 distinct by-elections (date and riding) with Election Type B/P dated 1882"
+        },
+        {
+          "year": 1883,
+          "contests": 11,
+          "source": "lop-hfer",
+          "quote": "11 distinct by-elections (date and riding) with Election Type B/P dated 1883"
+        },
+        {
+          "year": 1884,
+          "contests": 11,
+          "source": "lop-hfer",
+          "quote": "11 distinct by-elections (date and riding) with Election Type B/P dated 1884"
+        },
+        {
+          "year": 1885,
+          "contests": 11,
+          "source": "lop-hfer",
+          "quote": "11 distinct by-elections (date and riding) with Election Type B/P dated 1885"
+        },
+        {
+          "year": 1886,
+          "contests": 2,
+          "source": "lop-hfer",
+          "quote": "2 distinct by-elections (date and riding) with Election Type B/P dated 1886"
+        },
+        {
+          "year": 1887,
+          "contests": 15,
+          "source": "lop-hfer",
+          "quote": "15 distinct by-elections (date and riding) with Election Type B/P dated 1887"
+        },
+        {
+          "year": 1888,
+          "contests": 25,
+          "source": "lop-hfer",
+          "quote": "25 distinct by-elections (date and riding) with Election Type B/P dated 1888"
+        },
+        {
+          "year": 1889,
+          "contests": 6,
+          "source": "lop-hfer",
+          "quote": "6 distinct by-elections (date and riding) with Election Type B/P dated 1889"
+        },
+        {
+          "year": 1890,
+          "contests": 8,
+          "source": "lop-hfer",
+          "quote": "8 distinct by-elections (date and riding) with Election Type B/P dated 1890"
+        },
+        {
+          "year": 1891,
+          "contests": 1,
+          "source": "lop-hfer",
+          "quote": "1 distinct by-elections (date and riding) with Election Type B/P dated 1891"
+        },
+        {
+          "year": 1892,
+          "contests": 58,
+          "source": "lop-hfer",
+          "quote": "58 distinct by-elections (date and riding) with Election Type B/P dated 1892"
+        },
+        {
+          "year": 1893,
+          "contests": 7,
+          "source": "lop-hfer",
+          "quote": "7 distinct by-elections (date and riding) with Election Type B/P dated 1893"
+        },
+        {
+          "year": 1894,
+          "contests": 2,
+          "source": "lop-hfer",
+          "quote": "2 distinct by-elections (date and riding) with Election Type B/P dated 1894"
+        },
+        {
+          "year": 1895,
+          "contests": 10,
+          "source": "lop-hfer",
+          "quote": "10 distinct by-elections (date and riding) with Election Type B/P dated 1895"
+        },
+        {
+          "year": 1896,
+          "contests": 20,
+          "source": "lop-hfer",
+          "quote": "20 distinct by-elections (date and riding) with Election Type B/P dated 1896"
+        },
+        {
+          "year": 1897,
+          "contests": 15,
+          "source": "lop-hfer",
+          "quote": "15 distinct by-elections (date and riding) with Election Type B/P dated 1897"
+        },
+        {
+          "year": 1898,
+          "contests": 7,
+          "source": "lop-hfer",
+          "quote": "7 distinct by-elections (date and riding) with Election Type B/P dated 1898"
+        },
+        {
+          "year": 1899,
+          "contests": 3,
+          "source": "lop-hfer",
+          "quote": "3 distinct by-elections (date and riding) with Election Type B/P dated 1899"
+        },
+        {
+          "year": 1900,
+          "contests": 8,
+          "source": "lop-hfer",
+          "quote": "8 distinct by-elections (date and riding) with Election Type B/P dated 1900"
+        },
+        {
+          "year": 1901,
+          "contests": 3,
+          "source": "lop-hfer",
+          "quote": "3 distinct by-elections (date and riding) with Election Type B/P dated 1901"
+        },
+        {
+          "year": 1902,
+          "contests": 20,
+          "source": "lop-hfer",
+          "quote": "20 distinct by-elections (date and riding) with Election Type B/P dated 1902"
+        },
+        {
+          "year": 1903,
+          "contests": 7,
+          "source": "lop-hfer",
+          "quote": "7 distinct by-elections (date and riding) with Election Type B/P dated 1903"
+        },
+        {
+          "year": 1904,
+          "contests": 13,
+          "source": "lop-hfer",
+          "quote": "13 distinct by-elections (date and riding) with Election Type B/P dated 1904"
+        },
+        {
+          "year": 1905,
+          "contests": 12,
+          "source": "lop-hfer",
+          "quote": "12 distinct by-elections (date and riding) with Election Type B/P dated 1905"
+        },
+        {
+          "year": 1906,
+          "contests": 19,
+          "source": "lop-hfer",
+          "quote": "19 distinct by-elections (date and riding) with Election Type B/P dated 1906"
+        },
+        {
+          "year": 1907,
+          "contests": 14,
+          "source": "lop-hfer",
+          "quote": "14 distinct by-elections (date and riding) with Election Type B/P dated 1907"
+        },
+        {
+          "year": 1908,
+          "contests": 2,
+          "source": "lop-hfer",
+          "quote": "2 distinct by-elections (date and riding) with Election Type B/P dated 1908"
+        },
+        {
+          "year": 1909,
+          "contests": 10,
+          "source": "lop-hfer",
+          "quote": "10 distinct by-elections (date and riding) with Election Type B/P dated 1909"
+        },
+        {
+          "year": 1910,
+          "contests": 2,
+          "source": "lop-hfer",
+          "quote": "2 distinct by-elections (date and riding) with Election Type B/P dated 1910"
+        },
+        {
+          "year": 1911,
+          "contests": 15,
+          "source": "lop-hfer",
+          "quote": "15 distinct by-elections (date and riding) with Election Type B/P dated 1911"
+        },
+        {
+          "year": 1912,
+          "contests": 7,
+          "source": "lop-hfer",
+          "quote": "7 distinct by-elections (date and riding) with Election Type B/P dated 1912"
+        },
+        {
+          "year": 1913,
+          "contests": 7,
+          "source": "lop-hfer",
+          "quote": "7 distinct by-elections (date and riding) with Election Type B/P dated 1913"
+        },
+        {
+          "year": 1914,
+          "contests": 2,
+          "source": "lop-hfer",
+          "quote": "2 distinct by-elections (date and riding) with Election Type B/P dated 1914"
+        },
+        {
+          "year": 1915,
+          "contests": 7,
+          "source": "lop-hfer",
+          "quote": "7 distinct by-elections (date and riding) with Election Type B/P dated 1915"
+        },
+        {
+          "year": 1916,
+          "contests": 1,
+          "source": "lop-hfer",
+          "quote": "1 distinct by-elections (date and riding) with Election Type B/P dated 1916"
+        },
+        {
+          "year": 1917,
+          "contests": 1,
+          "source": "lop-hfer",
+          "quote": "1 distinct by-elections (date and riding) with Election Type B/P dated 1917"
+        },
+        {
+          "year": 1918,
+          "contests": 1,
+          "source": "lop-hfer",
+          "quote": "1 distinct by-elections (date and riding) with Election Type B/P dated 1918"
+        },
+        {
+          "year": 1919,
+          "contests": 8,
+          "source": "lop-hfer",
+          "quote": "8 distinct by-elections (date and riding) with Election Type B/P dated 1919"
+        },
+        {
+          "year": 1920,
+          "contests": 7,
+          "source": "lop-hfer",
+          "quote": "7 distinct by-elections (date and riding) with Election Type B/P dated 1920"
+        },
+        {
+          "year": 1921,
+          "contests": 4,
+          "source": "lop-hfer",
+          "quote": "4 distinct by-elections (date and riding) with Election Type B/P dated 1921"
+        },
+        {
+          "year": 1922,
+          "contests": 25,
+          "source": "lop-hfer",
+          "quote": "25 distinct by-elections (date and riding) with Election Type B/P dated 1922"
+        },
+        {
+          "year": 1923,
+          "contests": 9,
+          "source": "lop-hfer",
+          "quote": "9 distinct by-elections (date and riding) with Election Type B/P dated 1923"
+        },
+        {
+          "year": 1924,
+          "contests": 7,
+          "source": "lop-hfer",
+          "quote": "7 distinct by-elections (date and riding) with Election Type B/P dated 1924"
+        },
+        {
+          "year": 1925,
+          "contests": 1,
+          "source": "lop-hfer",
+          "quote": "1 distinct by-elections (date and riding) with Election Type B/P dated 1925"
+        },
+        {
+          "year": 1926,
+          "contests": 20,
+          "source": "lop-hfer",
+          "quote": "20 distinct by-elections (date and riding) with Election Type B/P dated 1926"
+        },
+        {
+          "year": 1927,
+          "contests": 4,
+          "source": "lop-hfer",
+          "quote": "4 distinct by-elections (date and riding) with Election Type B/P dated 1927"
+        },
+        {
+          "year": 1928,
+          "contests": 3,
+          "source": "lop-hfer",
+          "quote": "3 distinct by-elections (date and riding) with Election Type B/P dated 1928"
+        },
+        {
+          "year": 1929,
+          "contests": 6,
+          "source": "lop-hfer",
+          "quote": "6 distinct by-elections (date and riding) with Election Type B/P dated 1929"
+        },
+        {
+          "year": 1930,
+          "contests": 19,
+          "source": "lop-hfer",
+          "quote": "19 distinct by-elections (date and riding) with Election Type B/P dated 1930"
+        },
+        {
+          "year": 1931,
+          "contests": 2,
+          "source": "lop-hfer",
+          "quote": "2 distinct by-elections (date and riding) with Election Type B/P dated 1931"
+        },
+        {
+          "year": 1932,
+          "contests": 4,
+          "source": "lop-hfer",
+          "quote": "4 distinct by-elections (date and riding) with Election Type B/P dated 1932"
+        },
+        {
+          "year": 1933,
+          "contests": 3,
+          "source": "lop-hfer",
+          "quote": "3 distinct by-elections (date and riding) with Election Type B/P dated 1933"
+        },
+        {
+          "year": 1934,
+          "contests": 6,
+          "source": "lop-hfer",
+          "quote": "6 distinct by-elections (date and riding) with Election Type B/P dated 1934"
+        },
+        {
+          "year": 1935,
+          "contests": 1,
+          "source": "lop-hfer",
+          "quote": "1 distinct by-elections (date and riding) with Election Type B/P dated 1935"
+        },
+        {
+          "year": 1936,
+          "contests": 7,
+          "source": "lop-hfer",
+          "quote": "7 distinct by-elections (date and riding) with Election Type B/P dated 1936"
+        },
+        {
+          "year": 1937,
+          "contests": 8,
+          "source": "lop-hfer",
+          "quote": "8 distinct by-elections (date and riding) with Election Type B/P dated 1937"
+        },
+        {
+          "year": 1938,
+          "contests": 8,
+          "source": "lop-hfer",
+          "quote": "8 distinct by-elections (date and riding) with Election Type B/P dated 1938"
+        },
+        {
+          "year": 1939,
+          "contests": 5,
+          "source": "lop-hfer",
+          "quote": "5 distinct by-elections (date and riding) with Election Type B/P dated 1939"
+        },
+        {
+          "year": 1940,
+          "contests": 5,
+          "source": "lop-hfer",
+          "quote": "5 distinct by-elections (date and riding) with Election Type B/P dated 1940"
+        },
+        {
+          "year": 1941,
+          "contests": 1,
+          "source": "lop-hfer",
+          "quote": "1 distinct by-elections (date and riding) with Election Type B/P dated 1941"
+        },
+        {
+          "year": 1942,
+          "contests": 7,
+          "source": "lop-hfer",
+          "quote": "7 distinct by-elections (date and riding) with Election Type B/P dated 1942"
+        },
+        {
+          "year": 1943,
+          "contests": 4,
+          "source": "lop-hfer",
+          "quote": "4 distinct by-elections (date and riding) with Election Type B/P dated 1943"
+        },
+        {
+          "year": 1944,
+          "contests": 0,
+          "source": "lop-hfer",
+          "quote": "0 distinct by-elections (date and riding) with Election Type B/P dated 1944"
+        },
+        {
+          "year": 1945,
+          "contests": 2,
+          "source": "lop-hfer",
+          "quote": "2 distinct by-elections (date and riding) with Election Type B/P dated 1945"
+        },
+        {
+          "year": 1946,
+          "contests": 4,
+          "source": "lop-hfer",
+          "quote": "4 distinct by-elections (date and riding) with Election Type B/P dated 1946"
+        },
+        {
+          "year": 1947,
+          "contests": 3,
+          "source": "lop-hfer",
+          "quote": "3 distinct by-elections (date and riding) with Election Type B/P dated 1947"
+        },
+        {
+          "year": 1948,
+          "contests": 9,
+          "source": "lop-hfer",
+          "quote": "9 distinct by-elections (date and riding) with Election Type B/P dated 1948"
+        },
+        {
+          "year": 1949,
+          "contests": 9,
+          "source": "lop-hfer",
+          "quote": "9 distinct by-elections (date and riding) with Election Type B/P dated 1949"
+        },
+        {
+          "year": 1950,
+          "contests": 9,
+          "source": "lop-hfer",
+          "quote": "9 distinct by-elections (date and riding) with Election Type B/P dated 1950"
+        },
+        {
+          "year": 1951,
+          "contests": 5,
+          "source": "lop-hfer",
+          "quote": "5 distinct by-elections (date and riding) with Election Type B/P dated 1951"
+        },
+        {
+          "year": 1952,
+          "contests": 8,
+          "source": "lop-hfer",
+          "quote": "8 distinct by-elections (date and riding) with Election Type B/P dated 1952"
+        },
+        {
+          "year": 1953,
+          "contests": 0,
+          "source": "lop-hfer",
+          "quote": "0 distinct by-elections (date and riding) with Election Type B/P dated 1953"
+        },
+        {
+          "year": 1954,
+          "contests": 10,
+          "source": "lop-hfer",
+          "quote": "10 distinct by-elections (date and riding) with Election Type B/P dated 1954"
+        },
+        {
+          "year": 1955,
+          "contests": 7,
+          "source": "lop-hfer",
+          "quote": "7 distinct by-elections (date and riding) with Election Type B/P dated 1955"
+        },
+        {
+          "year": 1956,
+          "contests": 0,
+          "source": "lop-hfer",
+          "quote": "0 distinct by-elections (date and riding) with Election Type B/P dated 1956"
+        },
+        {
+          "year": 1957,
+          "contests": 3,
+          "source": "lop-hfer",
+          "quote": "3 distinct by-elections (date and riding) with Election Type B/P dated 1957"
+        },
+        {
+          "year": 1958,
+          "contests": 4,
+          "source": "lop-hfer",
+          "quote": "4 distinct by-elections (date and riding) with Election Type B/P dated 1958"
+        },
+        {
+          "year": 1959,
+          "contests": 2,
+          "source": "lop-hfer",
+          "quote": "2 distinct by-elections (date and riding) with Election Type B/P dated 1959"
+        },
+        {
+          "year": 1960,
+          "contests": 4,
+          "source": "lop-hfer",
+          "quote": "4 distinct by-elections (date and riding) with Election Type B/P dated 1960"
+        },
+        {
+          "year": 1961,
+          "contests": 4,
+          "source": "lop-hfer",
+          "quote": "4 distinct by-elections (date and riding) with Election Type B/P dated 1961"
+        },
+        {
+          "year": 1962,
+          "contests": 1,
+          "source": "lop-hfer",
+          "quote": "1 distinct by-elections (date and riding) with Election Type B/P dated 1962"
+        },
+        {
+          "year": 1963,
+          "contests": 0,
+          "source": "lop-hfer",
+          "quote": "0 distinct by-elections (date and riding) with Election Type B/P dated 1963"
+        },
+        {
+          "year": 1964,
+          "contests": 6,
+          "source": "lop-hfer",
+          "quote": "6 distinct by-elections (date and riding) with Election Type B/P dated 1964"
+        },
+        {
+          "year": 1965,
+          "contests": 0,
+          "source": "lop-hfer",
+          "quote": "0 distinct by-elections (date and riding) with Election Type B/P dated 1965"
+        },
+        {
+          "year": 1966,
+          "contests": 3,
+          "source": "lop-hfer",
+          "quote": "3 distinct by-elections (date and riding) with Election Type B/P dated 1966"
+        },
+        {
+          "year": 1967,
+          "contests": 8,
+          "source": "lop-hfer",
+          "quote": "8 distinct by-elections (date and riding) with Election Type B/P dated 1967"
+        },
+        {
+          "year": 1968,
+          "contests": 0,
+          "source": "lop-hfer",
+          "quote": "0 distinct by-elections (date and riding) with Election Type B/P dated 1968"
+        },
+        {
+          "year": 1969,
+          "contests": 2,
+          "source": "lop-hfer",
+          "quote": "2 distinct by-elections (date and riding) with Election Type B/P dated 1969"
+        },
+        {
+          "year": 1970,
+          "contests": 4,
+          "source": "lop-hfer",
+          "quote": "4 distinct by-elections (date and riding) with Election Type B/P dated 1970"
+        },
+        {
+          "year": 1971,
+          "contests": 5,
+          "source": "lop-hfer",
+          "quote": "5 distinct by-elections (date and riding) with Election Type B/P dated 1971"
+        },
+        {
+          "year": 1972,
+          "contests": 0,
+          "source": "lop-hfer",
+          "quote": "0 distinct by-elections (date and riding) with Election Type B/P dated 1972"
+        },
+        {
+          "year": 1973,
+          "contests": 0,
+          "source": "lop-hfer",
+          "quote": "0 distinct by-elections (date and riding) with Election Type B/P dated 1973"
+        },
+        {
+          "year": 1974,
+          "contests": 0,
+          "source": "lop-hfer",
+          "quote": "0 distinct by-elections (date and riding) with Election Type B/P dated 1974"
+        },
+        {
+          "year": 1975,
+          "contests": 2,
+          "source": "lop-hfer",
+          "quote": "2 distinct by-elections (date and riding) with Election Type B/P dated 1975"
+        },
+        {
+          "year": 1976,
+          "contests": 2,
+          "source": "lop-hfer",
+          "quote": "2 distinct by-elections (date and riding) with Election Type B/P dated 1976"
+        },
+        {
+          "year": 1977,
+          "contests": 6,
+          "source": "lop-hfer",
+          "quote": "6 distinct by-elections (date and riding) with Election Type B/P dated 1977"
+        },
+        {
+          "year": 1978,
+          "contests": 15,
+          "source": "lop-hfer",
+          "quote": "15 distinct by-elections (date and riding) with Election Type B/P dated 1978"
+        },
+        {
+          "year": 1979,
+          "contests": 2,
+          "source": "lop-hfer",
+          "quote": "2 distinct by-elections (date and riding) with Election Type B/P dated 1979"
+        },
+        {
+          "year": 1980,
+          "contests": 1,
+          "source": "lop-hfer",
+          "quote": "1 distinct by-elections (date and riding) with Election Type B/P dated 1980"
+        },
+        {
+          "year": 1981,
+          "contests": 5,
+          "source": "lop-hfer",
+          "quote": "5 distinct by-elections (date and riding) with Election Type B/P dated 1981"
+        },
+        {
+          "year": 1982,
+          "contests": 3,
+          "source": "lop-hfer",
+          "quote": "3 distinct by-elections (date and riding) with Election Type B/P dated 1982"
+        },
+        {
+          "year": 1983,
+          "contests": 3,
+          "source": "lop-hfer",
+          "quote": "3 distinct by-elections (date and riding) with Election Type B/P dated 1983"
+        },
+        {
+          "year": 1984,
+          "contests": 0,
+          "source": "lop-hfer",
+          "quote": "0 distinct by-elections (date and riding) with Election Type B/P dated 1984"
+        },
+        {
+          "year": 1985,
+          "contests": 0,
+          "source": "lop-hfer",
+          "quote": "0 distinct by-elections (date and riding) with Election Type B/P dated 1985"
+        },
+        {
+          "year": 1986,
+          "contests": 2,
+          "source": "lop-hfer",
+          "quote": "2 distinct by-elections (date and riding) with Election Type B/P dated 1986"
+        },
+        {
+          "year": 1987,
+          "contests": 3,
+          "source": "lop-hfer",
+          "quote": "3 distinct by-elections (date and riding) with Election Type B/P dated 1987"
+        },
+        {
+          "year": 1988,
+          "contests": 1,
+          "source": "lop-hfer",
+          "quote": "1 distinct by-elections (date and riding) with Election Type B/P dated 1988"
+        },
+        {
+          "year": 1989,
+          "contests": 1,
+          "source": "lop-hfer",
+          "quote": "1 distinct by-elections (date and riding) with Election Type B/P dated 1989"
+        },
+        {
+          "year": 1990,
+          "contests": 5,
+          "source": "lop-hfer",
+          "quote": "5 distinct by-elections (date and riding) with Election Type B/P dated 1990"
+        },
+        {
+          "year": 1991,
+          "contests": 0,
+          "source": "lop-hfer",
+          "quote": "0 distinct by-elections (date and riding) with Election Type B/P dated 1991"
+        },
+        {
+          "year": 1992,
+          "contests": 0,
+          "source": "lop-hfer",
+          "quote": "0 distinct by-elections (date and riding) with Election Type B/P dated 1992"
+        },
+        {
+          "year": 1993,
+          "contests": 0,
+          "source": "lop-hfer",
+          "quote": "0 distinct by-elections (date and riding) with Election Type B/P dated 1993"
+        },
+        {
+          "year": 1994,
+          "contests": 0,
+          "source": "lop-hfer",
+          "quote": "0 distinct by-elections (date and riding) with Election Type B/P dated 1994"
+        },
+        {
+          "year": 1995,
+          "contests": 3,
+          "source": "lop-hfer",
+          "quote": "3 distinct by-elections (date and riding) with Election Type B/P dated 1995"
+        },
+        {
+          "year": 1996,
+          "contests": 7,
+          "source": "lop-hfer",
+          "quote": "7 distinct by-elections (date and riding) with Election Type B/P dated 1996"
+        },
+        {
+          "year": 1997,
+          "contests": 0,
+          "source": "lop-hfer",
+          "quote": "0 distinct by-elections (date and riding) with Election Type B/P dated 1997"
+        },
+        {
+          "year": 1998,
+          "contests": 2,
+          "source": "lop-hfer",
+          "quote": "2 distinct by-elections (date and riding) with Election Type B/P dated 1998"
+        },
+        {
+          "year": 1999,
+          "contests": 5,
+          "source": "lop-hfer",
+          "quote": "5 distinct by-elections (date and riding) with Election Type B/P dated 1999"
+        },
+        {
+          "year": 2000,
+          "contests": 3,
+          "source": "lop-hfer",
+          "quote": "3 distinct by-elections (date and riding) with Election Type B/P dated 2000"
+        },
+        {
+          "year": 2001,
+          "contests": 0,
+          "source": "lop-hfer",
+          "quote": "0 distinct by-elections (date and riding) with Election Type B/P dated 2001"
+        },
+        {
+          "year": 2002,
+          "contests": 9,
+          "source": "lop-hfer",
+          "quote": "9 distinct by-elections (date and riding) with Election Type B/P dated 2002"
+        },
+        {
+          "year": 2003,
+          "contests": 3,
+          "source": "lop-hfer",
+          "quote": "3 distinct by-elections (date and riding) with Election Type B/P dated 2003"
+        },
+        {
+          "year": 2004,
+          "contests": 0,
+          "source": "lop-hfer",
+          "quote": "0 distinct by-elections (date and riding) with Election Type B/P dated 2004"
+        },
+        {
+          "year": 2005,
+          "contests": 1,
+          "source": "lop-hfer",
+          "quote": "1 distinct by-elections (date and riding) with Election Type B/P dated 2005"
+        },
+        {
+          "year": 2006,
+          "contests": 2,
+          "source": "lop-hfer",
+          "quote": "2 distinct by-elections (date and riding) with Election Type B/P dated 2006"
+        },
+        {
+          "year": 2007,
+          "contests": 3,
+          "source": "lop-hfer",
+          "quote": "3 distinct by-elections (date and riding) with Election Type B/P dated 2007"
+        },
+        {
+          "year": 2008,
+          "contests": 4,
+          "source": "lop-hfer",
+          "quote": "4 distinct by-elections (date and riding) with Election Type B/P dated 2008"
+        },
+        {
+          "year": 2009,
+          "contests": 4,
+          "source": "lop-hfer",
+          "quote": "4 distinct by-elections (date and riding) with Election Type B/P dated 2009"
+        },
+        {
+          "year": 2010,
+          "contests": 3,
+          "source": "lop-hfer",
+          "quote": "3 distinct by-elections (date and riding) with Election Type B/P dated 2010"
+        },
+        {
+          "year": 2011,
+          "contests": 0,
+          "source": "ec-byelections",
+          "quote": "Elections Canada lists no by-election held in 2011"
+        },
+        {
+          "year": 2012,
+          "contests": 4,
+          "source": "ec-byelections",
+          "quote": "November 26, 2012 by-elections: Calgary Centre (AB), Durham (ON), Victoria (BC) | March 19, 2012 by-elections: Toronto–Danforth (ON)"
+        },
+        {
+          "year": 2013,
+          "contests": 5,
+          "source": "ec-byelections",
+          "quote": "November 25, 2013 by-elections: Bourassa (QC), Brandon–Souris (MB), Provencher (MB), Toronto Centre (ON) | May 13, 2013 by-election: Labrador (NL)"
+        },
+        {
+          "year": 2014,
+          "contests": 6,
+          "source": "ec-byelections",
+          "quote": "November 17, 2014 by-elections: Whitby–Oshawa (ON), Yellowhead (AB) | June 30, 2014 by-elections: Trinity–Spadina (ON), Scarborough–Agincourt (ON), Fort McMurray–Athabasca (AB), Macleod (AB)"
+        },
+        {
+          "year": 2015,
+          "contests": 0,
+          "source": "ec-byelections",
+          "quote": "Elections Canada lists no by-election held in 2015"
+        },
+        {
+          "year": 2016,
+          "contests": 1,
+          "source": "ec-byelections",
+          "quote": "October 24, 2016 by-election: Medicine Hat–Cardston–Warner (AB)"
+        },
+        {
+          "year": 2017,
+          "contests": 11,
+          "source": "ec-byelections",
+          "quote": "December 11, 2017 by-elections: Bonavista–Burin–Trinity (NL), Scarborough–Agincourt (ON), Battlefords–Lloydminster (SK), South Surrey–White Rock (BC) | October 23, 2017 by-elections: Lac-Saint-Jean (QC), Sturgeon River–Parkland (AB) | April 3, 2017 by-elections: Saint-Laurent (QC), Markham–Thornhill (ON), Ottawa–Vanier (ON), Calgary Heritage (AB), Calgary Midnapore (AB)"
+        },
+        {
+          "year": 2018,
+          "contests": 2,
+          "source": "ec-byelections",
+          "quote": "December 3, 2018 by-election: Leeds–Grenville–Thousand Islands and Rideau Lakes (ON) | June 18, 2018 by-election: Chicoutimi–Le Fjord (QC)"
+        },
+        {
+          "year": 2019,
+          "contests": 4,
+          "source": "ec-byelections",
+          "quote": "May 6, 2019 by-election: Nanaimo–Ladysmith (BC) | February 25, 2019 by-elections: Outremont (QC), York–Simcoe (ON), Burnaby South (BC)"
+        },
+        {
+          "year": 2020,
+          "contests": 2,
+          "source": "ec-byelections",
+          "quote": "October 26, 2020 by-elections: Toronto Centre (ON), York Centre (ON)"
+        },
+        {
+          "year": 2021,
+          "contests": 0,
+          "source": "ec-byelections",
+          "quote": "Elections Canada lists no by-election held in 2021"
+        },
+        {
+          "year": 2022,
+          "contests": 1,
+          "source": "ec-byelections",
+          "quote": "December 12, 2022 by-election: Mississauga–Lakeshore (ON)"
+        },
+        {
+          "year": 2023,
+          "contests": 5,
+          "source": "ec-byelections",
+          "quote": "July 24, 2023 by-election: Calgary Heritage (AB) | June 19, 2023 by-elections: Notre-Dame-de-Grâce–Westmount (QC), Oxford (ON), Portage–Lisgar (MB), Winnipeg South Centre (MB)"
+        },
+        {
+          "year": 2024,
+          "contests": 5,
+          "source": "ec-byelections",
+          "quote": "I am pleased to provide my report on the by-elections held in 2024 in the following federal electoral districts: On March 4, 2024: Durham (Ontario) | On June 24, 2024: Toronto–St. Paul's (Ontario) | On September 16, 2024: LaSalle–Émard–Verdun (Québec) and Elmwood–Transcona (Manitoba) | December 16, 2024: Cloverdale–Langley City (British Columbia)"
+        },
+        {
+          "year": 2025,
+          "contests": 1,
+          "source": "ec-byelections",
+          "quote": "August 18, 2025, By-election: Battle River–Crowfoot (AB)"
+        },
+        {
+          "year": 2026,
+          "contests": 6,
+          "source": "ec-byelections",
+          "quote": "April 13, 2025, By-elections: Terrebonne (QC), Scarborough Southwest (ON), University–Rosedale (ON) | The validated results for the August 31, 2026 by-elections are posted here. Chicoutimi–Le Fjord (Quebec), Beaches–East York (Ontario), North Vancouver–Capilano (British Columbia)"
         }
       ],
-      "elections": []
+      "note": "Counted per by-election: each riding's by-election counts once, including those won by acclamation. The counts to 2010 come from the Library of Parliament's History of Federal Electoral Ridings, and those from 2011 from Elections Canada's by-election reports."
     },
     {
       "key": "provincial",

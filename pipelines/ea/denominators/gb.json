@@ -227,6 +227,16 @@
       "title": "Report on the 2026 England mayoral and local government elections",
       "publisher": "Electoral Commission",
       "url": "https://www.electoralcommission.org.uk/sites/default/files/2026-09/Report%20on%20the%202026%20England%20mayoral%20and%20local%20government%20elections.pdf"
+    },
+    "hoc-cbp9225": {
+      "title": "By-elections in the 2019 Parliament (CBP-9225, 3 May 2024)",
+      "publisher": "House of Commons Library",
+      "url": "https://commonslibrary.parliament.uk/research-briefings/cbp-9225/"
+    },
+    "hoc-cbp10268": {
+      "title": "By-elections in the 2024 Parliament (CBP-10268, 9 October 2026)",
+      "publisher": "House of Commons Library",
+      "url": "https://commonslibrary.parliament.uk/research-briefings/cbp-10268/"
     }
   },
   "levels": [
@@ -609,11 +619,6 @@
           "from": 1832,
           "to": 1945,
           "note": "The House of Commons Library lists every by-election only from 1945 on, and Northern Ireland's from 1922."
-        },
-        {
-          "from": 2023,
-          "to": 2026,
-          "note": "By-elections since August 2023 aren't counted yet."
         }
       ],
       "elections": [
@@ -1078,6 +1083,30 @@
           "contests": 6,
           "source": "hoc-cbp7529",
           "quote": "Tables 13, 14a, and 14b list 6 by-elections dated 2022"
+        },
+        {
+          "year": 2023,
+          "contests": 7,
+          "source": "hoc-cbp9225",
+          "quote": "Results listed for West Lancashire – 9 February 2023; Uxbridge and South Ruislip, Selby and Ainsty, and Somerton and Frome – 20 July 2023; Rutherglen and Hamilton West – 5 October 2023; Mid Bedfordshire and Tamworth – 19 October 2023"
+        },
+        {
+          "year": 2024,
+          "contests": 4,
+          "source": "hoc-cbp9225",
+          "quote": "Results listed for Kingswood and Wellingborough – 15 Feb 2024; Rochdale – 29 Feb 2024; Blackpool South – 2 May 2024; the 2024 Parliament briefing (CBP-10268) lists none in 2024"
+        },
+        {
+          "year": 2025,
+          "contests": 1,
+          "source": "hoc-cbp10268",
+          "quote": "Results listed for Runcorn and Helsby – 1 May 2025"
+        },
+        {
+          "year": 2026,
+          "contests": 6,
+          "source": "hoc-cbp10268",
+          "quote": "Results listed for Gorton and Denton (26 February 2026); Makerfield, Aberdeen South, and Arbroath and Broughty Ferry (18 June 2026); Clacton (13 August 2026); Holborn and St Pancras (8 October 2026)"
         }
       ]
     },

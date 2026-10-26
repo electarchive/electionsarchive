@@ -86,6 +86,56 @@
       "title": "31 Mart 2024, Büyükşehir Belediye Başkanlığı Seçimleri Sonucu",
       "publisher": "Yüksek Seçim Kurulu (YSK)",
       "url": "https://www.ysk.gov.tr/doc/dosyalar/docs/2024MahalliIdareler/2024KesinSecimSonucları/BUYUKSEHIRBELEDIYEBASKANLIGI.pdf"
+    },
+    "tr-nat-1": {
+      "title": "Yüksek Seçim Kurulu Kararı 3719 (15/8/2014), 10 Ağustos 2014 Cumhurbaşkanı Seçimi kesin sonuçları",
+      "publisher": "Yüksek Seçim Kurulu (published in Resmî Gazete, 28 August 2014)",
+      "url": "https://www.resmigazete.gov.tr/eskiler/2014/08/20140828M1.htm"
+    },
+    "tr-nat-2": {
+      "title": "24 Haziran 2018 Seçimleri (Cumhurbaşkanı Seçimi ve 27. Dönem Milletvekili Genel Seçimi)",
+      "publisher": "Yüksek Seçim Kurulu",
+      "url": "https://ysk.gov.tr/tr/24-haziran-2018-secimleri/77536"
+    },
+    "tr-nat-3": {
+      "title": "Yüksek Seçim Kurulu Karar No: 2023/254 (Cumhurbaşkanı adayları ve seçim tarihleri)",
+      "publisher": "Yüksek Seçim Kurulu",
+      "url": "https://www.ysk.gov.tr/doc/karar/dosya/82595/2023-254.pdf"
+    },
+    "tr-nat-4": {
+      "title": "28 Mayıs 2023 Cumhurbaşkanı Seçimi 2. Oylama Bülteni",
+      "publisher": "Yüksek Seçim Kurulu, Seçmen Kütüğü Genel Müdürlüğü",
+      "url": "https://www.ysk.gov.tr/doc/dosyalar/docs/28%20May%C4%B1s%202023%20Cumhurba%C5%9Fkan%C4%B1%20Se%C3%A7imi%202.%20Oylama%20B%C3%BClteni.pdf"
+    },
+    "tr-nat-5": {
+      "title": "1961 Anayasası (Türkiye Büyük Millet Meclisi, 1961 Anayasası genel bilgiler)",
+      "publisher": "Türkiye Büyük Millet Meclisi",
+      "url": "https://www.tbmm.gov.tr/anayasa/altmis-bir-anayasasi"
+    },
+    "tr-nat-6": {
+      "title": "7 Kasım 1982 Anayasa Değişikliği Halk Oylaması",
+      "publisher": "Yüksek Seçim Kurulu, Halkoylaması Arşivi",
+      "url": "https://ysk.gov.tr/tr/halkoylamasi-arsivi/2648"
+    },
+    "tr-nat-7": {
+      "title": "Yüksek Seçim Kurulu Karar No: 873 (30/10/2007), 21 Ekim 2007 halkoylaması sonuçları",
+      "publisher": "Yüksek Seçim Kurulu (published in Resmî Gazete, 31 October 2007)",
+      "url": "https://www.resmigazete.gov.tr/eskiler/2007/10/20071031-16.htm"
+    },
+    "tr-nat-8": {
+      "title": "Cumhuriyet Senatosu Seçimleri ve Kastamonu Senatörleri (1961-1980)",
+      "publisher": "Emine Pür, Karadeniz Araştırmaları Enstitüsü Dergisi (KTÜ), DOI 10.31765/karen.1126846",
+      "url": "https://www.ktu.edu.tr/dosyalar/karendergi_a7c78.pdf"
+    },
+    "tr-nat-9": {
+      "title": "Açık Parlamento Üyeliklerinin Ara Seçimleri yoluyla ya da Yedeklerle Doldurulması",
+      "publisher": "Doç. Dr. Hikmet Sami Türk (academic article, DergiPark)",
+      "url": "https://dergipark.org.tr/tr/download/article-file/630540"
+    },
+    "tr-nat-10": {
+      "title": "1966 Cumhuriyet Senatosu üyeleri kısmî seçim sonuçları",
+      "publisher": "HathiTrust catalog record (publication of Türkiye İstatistik Kurumu / DİE results)",
+      "url": "https://catalog.hathitrust.org/Record/003539600"
     }
   },
   "levels": [
@@ -285,14 +335,34 @@
       "grain": [
         "tr.il"
       ],
-      "gaps": [
+      "gaps": [],
+      "elections": [
         {
-          "from": 2014,
-          "to": 2023,
-          "note": "No official count has been compiled yet."
+          "date": "2014-08-10",
+          "contests": 1,
+          "source": "tr-nat-1",
+          "quote": "10 Ağustos 2014 Pazar günü yapılan Cumhurbaşkanı Seçimi geçici sonuçları"
+        },
+        {
+          "date": "2018-06-24",
+          "contests": 1,
+          "source": "tr-nat-2",
+          "quote": "24 Haziran 2018 Pazar günü birlikte yapılacak olan Cumhurbaşkanı Seçimi ile 27. Dönem Milletvekili Genel Seçiminde uygulanacak Seçim Takvimi"
+        },
+        {
+          "date": "2023-05-14",
+          "contests": 1,
+          "source": "tr-nat-3",
+          "quote": "14 Mayıs 2023 Pazar günü, Cumhurbaşkanı Seçiminin ikinci oylamaya kalması durumunda 28 Mayıs 2023 Pazar günü yapılmasına karar verilmiştir."
+        },
+        {
+          "date": "2023-05-28",
+          "contests": 1,
+          "source": "tr-nat-4",
+          "quote": "Hazırlamış olduğumuz bu bülten 28 Mayıs 2023 Cumhurbaşkanı 2. Oylama Seçimi sonuçlarını ve bu seçime ilişkin istatistikleri içermektedir."
         }
       ],
-      "elections": []
+      "note": "Counted per round: each nationwide presidential vote counts once, the 2023 runoff included, from the Supreme Election Council's decisions and bulletins."
     },
     {
       "key": "senate",
@@ -313,14 +383,73 @@
         "tr.il",
         "tr.senato_cevresi"
       ],
-      "gaps": [
+      "gaps": [],
+      "elections": [
         {
-          "from": 1961,
-          "to": 1979,
-          "note": "No official count has been compiled yet."
+          "date": "1961-10-15",
+          "contests": 67,
+          "source": "tr-nat-8",
+          "quote": "Cumhuriyet Senatosu seçimleri, 15 Ekim 1961 Pazar günü ülke genelinde yapılmıştır.",
+          "note": "The article says the election covered all provinces (Bütün illerde). The count of 67 comes from the YSK 9 July 1961 referendum result, which lists 67 provinces (https://ysk.gov.tr/doc/dosyalar/docs/1961Referandum/9-Temmuz-1961-Halk-Oylaması.pdf), so it is derived, not stated."
+        },
+        {
+          "date": "1964-06-07",
+          "contests": 26,
+          "source": "tr-nat-9",
+          "quote": "7 Haziran 1964 günü Cumhuriyet Senatosu C Grubu illeri üçte bir yenileme seçimleri ile birlikte Cumhuriyet Senatosu ara seçimi yapılan illerden",
+          "note": "Derived: 24 C Group provinces (names listed in footnote 15 of Çakırbaş 2020, https://doi.org/10.9737/hist.2020.889, counted) plus Çorum and Eskişehir Senate by-elections (Türk, Tablo 7). Wikipedia's 1964 article describes one by-election seat, which conflicts with Türk's two; the count follows Türk."
+        },
+        {
+          "date": "1964-09-20",
+          "contests": 1,
+          "source": "tr-nat-9",
+          "quote": "20.9.1964 günü bu ilde yeniden seçim yapılmıştır",
+          "note": "Artvin only. The 7 June 1964 Artvin Senate vote was annulled by YSK decision of 8.7.1964 and re-run on this date (Resmî Gazete, 16.7.1964, per Türk's note 1)."
+        },
+        {
+          "date": "1966-06-05",
+          "contests": 22,
+          "source": "tr-nat-10",
+          "quote": "İstanbul ve Maraş illerinde boş bulunan birer Cumhuriyet Senatosu üyeliği seçimi sonuçları",
+          "note": "Derived: 20 B Group provinces (names in Çakırbaş 2020 footnote 15, counted) plus Istanbul and Kahramanmaraş Senate by-elections (Türk, Tablo 7; the catalog record also names them)."
+        },
+        {
+          "date": "1968-06-02",
+          "contests": 24,
+          "source": "tr-nat-8",
+          "quote": "2 Haziran 1968 Pazar günü yapılmıştır. 24 ilde kayıtlı 5.416.153 seçmenden",
+          "note": "Stated number. It equals 22 A Group provinces plus Balıkesir and Bitlis Senate by-elections (Türk, Tablo 7). Armağan, Memleketimizde Son Parlamento Seçimleri (DergiPark iuhfm/issue/9112), also says 24 provinces, citing Resmî Gazete, 12 June 1968."
+        },
+        {
+          "date": "1973-10-14",
+          "contests": 27,
+          "source": "tr-nat-9",
+          "quote": "14 Ekim 1973 günü Millet Meclisi genel ve Cumhuriyet Senatosu üçte bir yenileme seçimleri ile birlikte Cumhuriyet Senatosu ara seçimi yapılan illerden Sivas'ta",
+          "note": "Derived: 24 C Group provinces plus Eskişehir, Sivas, and Urfa Senate by-elections (Türk, Tablo 7). Wikipedia's 1973 article says two by-election seats; Türk's table lists three, and Armağan names only Sivas and Urfa because it lists only seats that changed party."
+        },
+        {
+          "date": "1975-10-12",
+          "contests": 24,
+          "source": "tr-nat-9",
+          "quote": "12 Ekim 1975 günü Cumhuriyet Senatosu B Grubu illeri üçte bir yenileme seçimleri",
+          "note": "Derived: 20 B Group provinces plus Balıkesir (a renewal of one seat, Türk's note 2) plus Istanbul, Konya, and Samsun Senate by-elections (Türk, Tablo 7). Wikipedia's 1975 article describes four vacant seats, which matches these four."
+        },
+        {
+          "date": "1977-06-05",
+          "contests": 22,
+          "source": "tr-nat-8",
+          "quote": "A Grubu illeri kapsayan 22 ilde yapılan bu seçimde",
+          "note": "Stated number. The article heads this election 5 Haziran 1977. The TBMM biographies volume gives 5 Ekim 1977, which looks like a typo. Türk's table lists no Senate by-election on this date."
+        },
+        {
+          "date": "1979-10-14",
+          "contests": 25,
+          "source": "tr-nat-9",
+          "quote": "14 Ekim 1979 günü Cumhuriyet Senatosu C Grubu illeri üçte bir yenileme seçimleri ile birlikte Manisa'da bir Cumhuriyet Senatosu üyeliği",
+          "note": "Derived: 24 C Group provinces plus Manisa Senate by-election (Türk, Tablo 7 and intro)."
         }
       ],
-      "elections": []
+      "note": "Counted per province: each province that elected senators on an election day counts once, including by-elections held the same day. The Senate was elected in full in all 67 provinces in 1961 and then renewed a third at a time. The 1968 and 1977 counts are stated in Emine Pür's study of Senate elections; the other renewals are counted from the province groups and by-election tables in studies by Hikmet Sami Türk and Çakırbaş."
     },
     {
       "key": "tbmm_by",
@@ -448,14 +577,52 @@
       "grain": [
         "tr.il"
       ],
-      "gaps": [
+      "gaps": [],
+      "elections": [
         {
-          "from": 1961,
-          "to": 2017,
-          "note": "No official count has been compiled yet."
+          "date": "1961-07-09",
+          "contests": 1,
+          "source": "tr-nat-5",
+          "quote": "Daha sonra 9 Temmuz 1961 tarihinde halkoyuna sunulan Anayasa, % 61,5 oranında kabul edilerek yürürlüğe girmiştir."
+        },
+        {
+          "date": "1982-11-07",
+          "contests": 1,
+          "source": "tr-nat-6",
+          "quote": "7 Kasım 1982 Anayasa Değişikliği Halk Oylaması"
+        },
+        {
+          "date": "1987-09-06",
+          "contests": 1,
+          "source": "tr-nat-6",
+          "quote": "6 Eylül 1987 Anayasa Değişikliği Halk Oylaması"
+        },
+        {
+          "date": "1988-09-25",
+          "contests": 1,
+          "source": "tr-nat-6",
+          "quote": "25 Eylül 1988 Anayasa Değişikliği Halk Oylaması"
+        },
+        {
+          "date": "2007-10-21",
+          "contests": 1,
+          "source": "tr-nat-7",
+          "quote": "21/10/2007 tarihinde yapılan halkoylaması sonuçları aynı gün Kurulumuza ulaşmaya başlamış olup"
+        },
+        {
+          "date": "2010-09-12",
+          "contests": 1,
+          "source": "tr-nat-6",
+          "quote": "12 Eylül 2010 Anayasa Değişikliği Halkoylaması"
+        },
+        {
+          "date": "2017-04-16",
+          "contests": 1,
+          "source": "tr-nat-6",
+          "quote": "16 Nisan 2017 Anayasa Değişikliği Halkoylaması"
         }
       ],
-      "elections": []
+      "note": "Counted per referendum: each nationwide vote counts once, from the Supreme Election Council's referendum archive and, for 1961, the Grand National Assembly."
     }
   ]
 }
