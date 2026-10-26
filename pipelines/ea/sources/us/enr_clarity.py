@@ -1422,7 +1422,7 @@ def emit(
         for scheme, code in used:
             held = polities.get(f"{scheme}:{code}")
             if (
-                code[:2] in ("34", "36", "39", "42")
+                code[:2] in ("17", "26", "34", "36", "39", "42")
                 and held is not None
                 and held[0] not in cs.minted
                 and cs.area(scheme, code) not in cs.minted
