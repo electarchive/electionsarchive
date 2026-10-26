@@ -132,6 +132,29 @@ def emit() -> Path:
             ).fetchone()[0]
             counted = sum(int(row[column] or 0) for row in rows for column in columns)
             result_set = cs.key(f"{SOURCE}.result_set", f"{key}:colegio")
+            columns = (
+                "id",
+                "election_id",
+                "contest_id",
+                "stage",
+                "kind",
+                "status",
+                "source_id",
+                "as_of",
+                "completeness",
+                "supersedes_id",
+            )
+            for prior in conn.execute(
+                f"select {', '.join(columns)} from result_set where contest_id = %s and is_default and id <> %s",
+                [contest, result_set],
+            ).fetchall():
+                cs.add("result_set", **dict(zip(columns, prior, strict=True)), is_default=False)
+            for option, kind, seats in conn.execute(
+                """select o.option_id, o.kind, o.seats from outcome o
+                   join result_set rs on rs.id = o.result_set_id and rs.is_default where rs.contest_id = %s and rs.id <> %s""",
+                [contest, result_set],
+            ).fetchall():
+                cs.add("outcome", result_set_id=result_set, option_id=option, kind=kind, seats=seats)
             cs.add(
                 "result_set",
                 id=result_set,
@@ -141,7 +164,7 @@ def emit() -> Path:
                 kind="counted",
                 status="active",
                 source_id=source,
-                is_default=False,
+                is_default=True,
                 completeness=round(float(counted) / float(official), 4),
             )
             cs.add(
