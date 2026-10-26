@@ -241,6 +241,7 @@ export function grains(polity: string, tier: string): Array<Goal> {
 
 export type Reason =
   | "complete"
+  | "major"
   | "coarse"
   | "partial"
   | "totals"
@@ -276,7 +277,15 @@ export const weighted = (row: Counts): Counts => ({
 export const REASONS: Record<Goal, Array<Reason>> = {
   county: ["complete", "partial", "totals", "bare", "absent"],
   history: ["complete", "partial", "totals", "bare", "absent"],
-  precinct: ["complete", "coarse", "partial", "totals", "bare", "absent"],
+  precinct: [
+    "complete",
+    "major",
+    "coarse",
+    "partial",
+    "totals",
+    "bare",
+    "absent",
+  ],
   shapes: ["complete", "units", "unshaped", "undrawn"],
   shapes_history: ["complete", "units", "unshaped", "undrawn"],
   local: ["complete", "totals", "bare", "absent"],
@@ -290,6 +299,7 @@ export const REASONS: Record<Goal, Array<Reason>> = {
 
 export const LABELS: Record<Reason, () => string> = {
   complete: m.coverage_reason_complete,
+  major: m.coverage_reason_major,
   coarse: m.coverage_reason_coarse,
   partial: m.coverage_reason_partial,
   totals: m.coverage_reason_totals,

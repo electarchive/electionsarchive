@@ -1273,7 +1273,7 @@ def build() -> str:
                     )
                 )
     names = dict(states.values())
-    goals: dict[tuple[str, str, str, int], list[int]] = defaultdict(lambda: [0] * 18)
+    goals: dict[tuple[str, str, str, int], list[int]] = defaultdict(lambda: [0] * 19)
     for st, year, level, total, complete, unshaped, units, undrawn in shapes:
         if level not in STATE_LEVELS or st not in names:
             continue
@@ -1293,11 +1293,15 @@ def build() -> str:
         bare = c.get("no_results", 0)
         totals = max(0, count - county - partial - bare)
         precinct = c["precinct"]
+        major = c.get("major_only", 0)
         if coverage.target(st, level, year) == "total":
             county = precinct = count - bare
-            partial = totals = 0
+            partial = totals = major = 0
         if year >= 2000:
-            for goal, complete, coarse in (("county", county, 0), ("precinct", precinct, max(0, county - precinct))):
+            for goal, complete, coarse in (
+                ("county", county, 0),
+                ("precinct", precinct, max(0, county - precinct - major)),
+            ):
                 cell = goals[(goal, st, level, year)]
                 for i, value in enumerate(
                     [base, complete, base - count, bare, totals, partial, coarse, c.get("with_turnout", 0)]
@@ -1306,6 +1310,7 @@ def build() -> str:
                 if goal == "precinct":
                     cell[8] += c["precincts"]
                     cell[9] += c["shaped_precincts"]
+                    cell[18] += major
                 else:
                     cell[13] += c.get("icpsr_only", 0)
         elif coverage.target(st, level, year) == "county" or level in ("state_upper", "state_lower"):
@@ -1376,7 +1381,7 @@ def build() -> str:
         with conn.cursor().copy(
             "copy coverage_goal (goal, state, level, year, total, complete, absent, bare, totals, partial, coarse,"
             " turnout, precincts, shaped, unshaped, units, undrawn, icpsr, population_total, population_complete,"
-            " population_absent, population_estimated) from stdin"
+            " population_absent, population_estimated, major) from stdin"
         ) as copy:
             for key, values in goals.items():
                 copy.write_row([*key, *values])

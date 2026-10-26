@@ -16,7 +16,8 @@
     className,
     {
       "bg-(--yes)": reason === "complete" || reason === "icpsr",
-      "bg-(--done-most)": reason === "coarse" || reason === "units",
+      "bg-(--done-most)":
+        reason === "coarse" || reason === "units" || reason === "major",
       "bg-(--done-half)": reason === "partial" || reason === "unshaped",
       "bg-(--done-some)": reason === "totals",
       "bg-muted-foreground/45": reason === "bare" || reason === "undrawn",
@@ -27,7 +28,7 @@
     },
     {
       "bg-[repeating-linear-gradient(135deg,var(--card)_0_1.5px,transparent_1.5px_4.5px)]":
-        reason === "icpsr",
+        reason === "icpsr" || reason === "major",
     },
   )}
 ></span>

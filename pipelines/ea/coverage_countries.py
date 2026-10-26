@@ -290,6 +290,7 @@ def tally(cc: str, data: dict) -> tuple[dict, list[dict], list[dict]]:
             notes.append({"goal": "fine", "level": key, "from": None, "to": None, "note": level["fine_note"]})
         groups: dict[str, list[tuple]] = defaultdict(list)
         slots: dict[str, dict] = {}
+        over: list[str] = []
         for e in expected:
             slot = str(e["year"]) if by_year else e["date"]
             slots[slot] = e
@@ -411,6 +412,9 @@ def tally(cc: str, data: dict) -> tuple[dict, list[dict], list[dict]]:
                 for i, v in enumerate(cell):
                     target[i] += v
             total = max(count_total, held_n)
+            shown = sum(cell[0] for cell in by_region.values())
+            if shown > count_total:
+                over.append(f"{year} ({shown:,} against {count_total:,})")
             complete = sum(1 for s in status.values() if s == "complete")
             if fine:
                 for reg, cell in by_region.items():
@@ -453,6 +457,20 @@ def tally(cc: str, data: dict) -> tuple[dict, list[dict], list[dict]]:
                     "total": total,
                     "source": e.get("source", ""),
                     "day": day.isoformat(),
+                }
+            )
+        if over:
+            listed = (
+                over[0] if len(over) == 1 else f"{', '.join(over[:-1])}{',' if len(over) > 2 else ''} and {over[-1]}"
+            )
+            notes.append(
+                {
+                    "goal": goal,
+                    "level": key,
+                    "from": None,
+                    "to": None,
+                    "note": "In some years the archive holds more races than the official count lists, so those years' "
+                    f"totals use the archive's own count: {listed}.",
                 }
             )
     return goals, elections_out, notes

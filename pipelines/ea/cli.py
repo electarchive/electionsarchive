@@ -11,6 +11,7 @@ from ea import (
     cache,
     checks,
     coverage,
+    coverage_check,
     coverage_countries,
     coverage_tables,
     fixtures,
@@ -52,8 +53,9 @@ def main() -> None:
     commands.add_parser(
         "coverage",
         help="measure a country's coverage against its goals and write .agents/spec/us-coverage.md or "
-        ".agents/spec/coverage/{cc}-coverage.md, or refresh the coverage tables the app's coverage pages read",
-    ).add_argument("polity", choices=("us", "refresh", *coverage_countries.countries()))
+        ".agents/spec/coverage/{cc}-coverage.md, refresh the coverage tables the app's coverage pages read, "
+        "or check them against the cited counts, the pages, their twins, and REST",
+    ).add_argument("polity", choices=("us", "refresh", "check", *coverage_countries.countries()))
     portal = commands.add_parser("portals", help="find county results portals and record them in us-portals.csv")
     portal.add_argument("action", choices=("census",))
     portal.add_argument("state", help="two-letter state code, such as TX")
@@ -134,10 +136,14 @@ def main() -> None:
             )
         case "records":
             subprocess.run(
-                ["node", "scripts/polity-records.js"], cwd=Path(__file__).resolve().parents[2] / "apps" / "web", check=True
+                ["node", "scripts/polity-records.js"],
+                cwd=Path(__file__).resolve().parents[2] / "apps" / "web",
+                check=True,
             )
         case "coverage" if args.polity == "refresh":
             print(coverage_tables.refresh())
+        case "coverage" if args.polity == "check":
+            print(coverage_check.check())
         case "coverage" if args.polity == "us":
             print(coverage.us())
         case "coverage":

@@ -1613,6 +1613,8 @@
   "coverage_reason_complete_precinct_def": "The archive has results by precinct. Primaries canceled because no one ran against the nominee are included.",
   "coverage_reason_complete_local_def": "The archive holds at least one of the government's contests that year.",
   "coverage_reason_complete_shapes_def": "The contest's district has a shape for the election date, as does every county, town, or Alaska house district in its results. Statewide contests use the state's shape.",
+  "coverage_reason_major": "Major parties only",
+  "coverage_reason_major_def": "The archive has precinct results, but they leave out at least one candidate who won 0.5% or more of the vote, usually because the source lists only the Democratic and Republican candidates. These results don't count toward the goal until an official or complete precinct source replaces them.",
   "coverage_reason_coarse": "County results only",
   "coverage_reason_coarse_def": "The archive has results by county or town, but not yet by precinct.",
   "coverage_reason_partial": "Some counties missing",

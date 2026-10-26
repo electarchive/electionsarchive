@@ -99,6 +99,11 @@
       "title": "DPR 13 gennaio 2026, Indizione del referendum popolare confermativo (GU n. 10, 14 gennaio 2026)",
       "publisher": "Gazzetta Ufficiale della Repubblica italiana",
       "url": "https://www.gazzettaufficiale.it/eli/id/2026/01/14/26A00167/sg"
+    },
+    "eligendo-regionali": {
+      "title": "Archivio storico delle elezioni: Regionali (each date's Area ITALIA page, Regione list; saved 2026-10-26, MF-108)",
+      "publisher": "Ministero dell'Interno, DAIT (Eligendo)",
+      "url": "https://elezionistorico.interno.gov.it/index.php?tpel=R"
     }
   },
   "levels": [
@@ -461,14 +466,476 @@
       "schemes": [
         "it.regione"
       ],
-      "gaps": [
+      "gaps": [],
+      "elections": [
         {
-          "from": 1970,
-          "to": 2025,
-          "note": "No official count is compiled yet."
+          "date": "1970-06-07",
+          "contests": 15,
+          "regions": {
+            "13": 1,
+            "17": 1,
+            "18": 1,
+            "15": 1,
+            "08": 1,
+            "12": 1,
+            "07": 1,
+            "03": 1,
+            "11": 1,
+            "14": 1,
+            "01": 1,
+            "16": 1,
+            "09": 1,
+            "10": 1,
+            "05": 1
+          },
+          "source": "eligendo-regionali",
+          "quote": "Regionali 07/06/1970, Area ITALIA, Regione: ABRUZZO, BASILICATA, CALABRIA, CAMPANIA, EMILIA-ROMAGNA, LAZIO, LIGURIA, LOMBARDIA, MARCHE, MOLISE, PIEMONTE, PUGLIA, TOSCANA, UMBRIA, VENETO"
+        },
+        {
+          "date": "1975-06-15",
+          "contests": 15,
+          "regions": {
+            "13": 1,
+            "17": 1,
+            "18": 1,
+            "15": 1,
+            "08": 1,
+            "12": 1,
+            "07": 1,
+            "03": 1,
+            "11": 1,
+            "14": 1,
+            "01": 1,
+            "16": 1,
+            "09": 1,
+            "10": 1,
+            "05": 1
+          },
+          "source": "eligendo-regionali",
+          "quote": "Regionali 15/06/1975, Area ITALIA, Regione: ABRUZZO, BASILICATA, CALABRIA, CAMPANIA, EMILIA-ROMAGNA, LAZIO, LIGURIA, LOMBARDIA, MARCHE, MOLISE, PIEMONTE, PUGLIA, TOSCANA, UMBRIA, VENETO"
+        },
+        {
+          "date": "1980-06-08",
+          "contests": 15,
+          "regions": {
+            "13": 1,
+            "17": 1,
+            "18": 1,
+            "15": 1,
+            "08": 1,
+            "12": 1,
+            "07": 1,
+            "03": 1,
+            "11": 1,
+            "14": 1,
+            "01": 1,
+            "16": 1,
+            "09": 1,
+            "10": 1,
+            "05": 1
+          },
+          "source": "eligendo-regionali",
+          "quote": "Regionali 08/06/1980, Area ITALIA, Regione: ABRUZZO, BASILICATA, CALABRIA, CAMPANIA, EMILIA-ROMAGNA, LAZIO, LIGURIA, LOMBARDIA, MARCHE, MOLISE, PIEMONTE, PUGLIA, TOSCANA, UMBRIA, VENETO"
+        },
+        {
+          "date": "1985-05-12",
+          "contests": 15,
+          "regions": {
+            "13": 1,
+            "17": 1,
+            "18": 1,
+            "15": 1,
+            "08": 1,
+            "12": 1,
+            "07": 1,
+            "03": 1,
+            "11": 1,
+            "14": 1,
+            "01": 1,
+            "16": 1,
+            "09": 1,
+            "10": 1,
+            "05": 1
+          },
+          "source": "eligendo-regionali",
+          "quote": "Regionali 12/05/1985, Area ITALIA, Regione: ABRUZZO, BASILICATA, CALABRIA, CAMPANIA, EMILIA-ROMAGNA, LAZIO, LIGURIA, LOMBARDIA, MARCHE, MOLISE, PIEMONTE, PUGLIA, TOSCANA, UMBRIA, VENETO"
+        },
+        {
+          "date": "1990-05-06",
+          "contests": 15,
+          "regions": {
+            "13": 1,
+            "17": 1,
+            "18": 1,
+            "15": 1,
+            "08": 1,
+            "12": 1,
+            "07": 1,
+            "03": 1,
+            "11": 1,
+            "14": 1,
+            "01": 1,
+            "16": 1,
+            "09": 1,
+            "10": 1,
+            "05": 1
+          },
+          "source": "eligendo-regionali",
+          "quote": "Regionali 06/05/1990, Area ITALIA, Regione: ABRUZZO, BASILICATA, CALABRIA, CAMPANIA, EMILIA-ROMAGNA, LAZIO, LIGURIA, LOMBARDIA, MARCHE, MOLISE, PIEMONTE, PUGLIA, TOSCANA, UMBRIA, VENETO"
+        },
+        {
+          "date": "1995-04-23",
+          "contests": 15,
+          "regions": {
+            "13": 1,
+            "17": 1,
+            "18": 1,
+            "15": 1,
+            "08": 1,
+            "12": 1,
+            "07": 1,
+            "03": 1,
+            "11": 1,
+            "14": 1,
+            "01": 1,
+            "16": 1,
+            "09": 1,
+            "10": 1,
+            "05": 1
+          },
+          "source": "eligendo-regionali",
+          "quote": "Regionali 23/04/1995, Area ITALIA, Regione: ABRUZZO, BASILICATA, CALABRIA, CAMPANIA, EMILIA-ROMAGNA, LAZIO, LIGURIA, LOMBARDIA, MARCHE, MOLISE, PIEMONTE, PUGLIA, TOSCANA, UMBRIA, VENETO"
+        },
+        {
+          "date": "2000-04-16",
+          "contests": 15,
+          "regions": {
+            "13": 1,
+            "17": 1,
+            "18": 1,
+            "15": 1,
+            "08": 1,
+            "12": 1,
+            "07": 1,
+            "03": 1,
+            "11": 1,
+            "14": 1,
+            "01": 1,
+            "16": 1,
+            "09": 1,
+            "10": 1,
+            "05": 1
+          },
+          "source": "eligendo-regionali",
+          "quote": "Regionali 16/04/2000, Area ITALIA, Regione: ABRUZZO, BASILICATA, CALABRIA, CAMPANIA, EMILIA-ROMAGNA, LAZIO, LIGURIA, LOMBARDIA, MARCHE, MOLISE, PIEMONTE, PUGLIA, TOSCANA, UMBRIA, VENETO"
+        },
+        {
+          "date": "2001-11-11",
+          "contests": 1,
+          "regions": {
+            "14": 1
+          },
+          "source": "eligendo-regionali",
+          "quote": "Regionali 11/11/2001, Area ITALIA, Regione: MOLISE"
+        },
+        {
+          "date": "2005-04-03",
+          "contests": 13,
+          "regions": {
+            "13": 1,
+            "18": 1,
+            "15": 1,
+            "08": 1,
+            "12": 1,
+            "07": 1,
+            "03": 1,
+            "11": 1,
+            "01": 1,
+            "16": 1,
+            "09": 1,
+            "10": 1,
+            "05": 1
+          },
+          "source": "eligendo-regionali",
+          "quote": "Regionali 03/04/2005, Area ITALIA, Regione: ABRUZZO, CALABRIA, CAMPANIA, EMILIA-ROMAGNA, LAZIO, LIGURIA, LOMBARDIA, MARCHE, PIEMONTE, PUGLIA, TOSCANA, UMBRIA, VENETO"
+        },
+        {
+          "date": "2005-04-17",
+          "contests": 1,
+          "regions": {
+            "17": 1
+          },
+          "source": "eligendo-regionali",
+          "quote": "Regionali 17/04/2005, Area ITALIA, Regione: BASILICATA"
+        },
+        {
+          "date": "2006-11-05",
+          "contests": 1,
+          "regions": {
+            "14": 1
+          },
+          "source": "eligendo-regionali",
+          "quote": "Regionali 05/11/2006, Area ITALIA, Regione: MOLISE"
+        },
+        {
+          "date": "2008-12-14",
+          "contests": 1,
+          "regions": {
+            "13": 1
+          },
+          "source": "eligendo-regionali",
+          "quote": "Regionali 14/12/2008, Area ITALIA, Regione: ABRUZZO"
+        },
+        {
+          "date": "2010-03-28",
+          "contests": 13,
+          "regions": {
+            "17": 1,
+            "18": 1,
+            "15": 1,
+            "08": 1,
+            "12": 1,
+            "07": 1,
+            "03": 1,
+            "11": 1,
+            "01": 1,
+            "16": 1,
+            "09": 1,
+            "10": 1,
+            "05": 1
+          },
+          "source": "eligendo-regionali",
+          "quote": "Regionali 28/03/2010, Area ITALIA, Regione: BASILICATA, CALABRIA, CAMPANIA, EMILIA-ROMAGNA, LAZIO, LIGURIA, LOMBARDIA, MARCHE, PIEMONTE, PUGLIA, TOSCANA, UMBRIA, VENETO"
+        },
+        {
+          "date": "2011-10-16",
+          "contests": 1,
+          "regions": {
+            "14": 1
+          },
+          "source": "eligendo-regionali",
+          "quote": "Regionali 16/10/2011, Area ITALIA, Regione: MOLISE"
+        },
+        {
+          "date": "2013-02-24",
+          "contests": 3,
+          "regions": {
+            "12": 1,
+            "03": 1,
+            "14": 1
+          },
+          "source": "eligendo-regionali",
+          "quote": "Regionali 24/02/2013, Area ITALIA, Regione: LAZIO, LOMBARDIA, MOLISE"
+        },
+        {
+          "date": "2013-11-17",
+          "contests": 1,
+          "regions": {
+            "17": 1
+          },
+          "source": "eligendo-regionali",
+          "quote": "Regionali 17/11/2013, Area ITALIA, Regione: BASILICATA"
+        },
+        {
+          "date": "2014-05-25",
+          "contests": 2,
+          "regions": {
+            "13": 1,
+            "01": 1
+          },
+          "source": "eligendo-regionali",
+          "quote": "Regionali 25/05/2014, Area ITALIA, Regione: ABRUZZO, PIEMONTE"
+        },
+        {
+          "date": "2014-11-23",
+          "contests": 2,
+          "regions": {
+            "18": 1,
+            "08": 1
+          },
+          "source": "eligendo-regionali",
+          "quote": "Regionali 23/11/2014, Area ITALIA, Regione: CALABRIA, EMILIA-ROMAGNA"
+        },
+        {
+          "date": "2015-05-31",
+          "contests": 7,
+          "regions": {
+            "15": 1,
+            "07": 1,
+            "11": 1,
+            "16": 1,
+            "09": 1,
+            "10": 1,
+            "05": 1
+          },
+          "source": "eligendo-regionali",
+          "quote": "Regionali 31/05/2015, Area ITALIA, Regione: CAMPANIA, LIGURIA, MARCHE, PUGLIA, TOSCANA, UMBRIA, VENETO"
+        },
+        {
+          "date": "2018-03-04",
+          "contests": 2,
+          "regions": {
+            "12": 1,
+            "03": 1
+          },
+          "source": "eligendo-regionali",
+          "quote": "Regionali 04/03/2018, Area ITALIA, Regione: LAZIO, LOMBARDIA"
+        },
+        {
+          "date": "2019-02-10",
+          "contests": 1,
+          "regions": {
+            "13": 1
+          },
+          "source": "eligendo-regionali",
+          "quote": "Regionali 10/02/2019, Area ITALIA, Regione: ABRUZZO"
+        },
+        {
+          "date": "2019-03-24",
+          "contests": 1,
+          "regions": {
+            "17": 1
+          },
+          "source": "eligendo-regionali",
+          "quote": "Regionali 24/03/2019, Area ITALIA, Regione: BASILICATA"
+        },
+        {
+          "date": "2019-05-26",
+          "contests": 1,
+          "regions": {
+            "01": 1
+          },
+          "source": "eligendo-regionali",
+          "quote": "Regionali 26/05/2019, Area ITALIA, Regione: PIEMONTE"
+        },
+        {
+          "date": "2019-10-27",
+          "contests": 1,
+          "regions": {
+            "10": 1
+          },
+          "source": "eligendo-regionali",
+          "quote": "Regionali 27/10/2019, Area ITALIA, Regione: UMBRIA"
+        },
+        {
+          "date": "2020-01-26",
+          "contests": 2,
+          "regions": {
+            "18": 1,
+            "08": 1
+          },
+          "source": "eligendo-regionali",
+          "quote": "Regionali 26/01/2020, Area ITALIA, Regione: CALABRIA, EMILIA-ROMAGNA"
+        },
+        {
+          "date": "2020-09-20",
+          "contests": 5,
+          "regions": {
+            "15": 1,
+            "07": 1,
+            "16": 1,
+            "09": 1,
+            "05": 1
+          },
+          "source": "eligendo-regionali",
+          "quote": "Regionali 20/09/2020, Area ITALIA, Regione: CAMPANIA, LIGURIA, PUGLIA, TOSCANA, VENETO"
+        },
+        {
+          "date": "2021-10-03",
+          "contests": 1,
+          "regions": {
+            "18": 1
+          },
+          "source": "eligendo-regionali",
+          "quote": "Regionali 03/10/2021, Area ITALIA, Regione: CALABRIA"
+        },
+        {
+          "date": "2023-02-12",
+          "contests": 2,
+          "regions": {
+            "12": 1,
+            "03": 1
+          },
+          "source": "eligendo-regionali",
+          "quote": "Regionali 12/02/2023, Area ITALIA, Regione: LAZIO, LOMBARDIA"
+        },
+        {
+          "date": "2024-03-10",
+          "contests": 1,
+          "regions": {
+            "13": 1
+          },
+          "source": "eligendo-regionali",
+          "quote": "Regionali 10/03/2024, Area ITALIA, Regione: ABRUZZO"
+        },
+        {
+          "date": "2024-04-21",
+          "contests": 1,
+          "regions": {
+            "17": 1
+          },
+          "source": "eligendo-regionali",
+          "quote": "Regionali 21/04/2024, Area ITALIA, Regione: BASILICATA"
+        },
+        {
+          "date": "2024-06-09",
+          "contests": 1,
+          "regions": {
+            "01": 1
+          },
+          "source": "eligendo-regionali",
+          "quote": "Regionali 09/06/2024, Area ITALIA, Regione: PIEMONTE"
+        },
+        {
+          "date": "2024-10-27",
+          "contests": 1,
+          "regions": {
+            "07": 1
+          },
+          "source": "eligendo-regionali",
+          "quote": "Regionali 27/10/2024, Area ITALIA, Regione: LIGURIA"
+        },
+        {
+          "date": "2024-11-17",
+          "contests": 2,
+          "regions": {
+            "08": 1,
+            "10": 1
+          },
+          "source": "eligendo-regionali",
+          "quote": "Regionali 17/11/2024, Area ITALIA, Regione: EMILIA-ROMAGNA, UMBRIA"
+        },
+        {
+          "date": "2025-10-05",
+          "contests": 1,
+          "regions": {
+            "18": 1
+          },
+          "source": "eligendo-regionali",
+          "quote": "Regionali 05/10/2025, Area ITALIA, Regione: CALABRIA"
+        },
+        {
+          "date": "2025-10-12",
+          "contests": 1,
+          "regions": {
+            "09": 1
+          },
+          "source": "eligendo-regionali",
+          "quote": "Regionali 12/10/2025, Area ITALIA, Regione: TOSCANA"
+        },
+        {
+          "date": "2025-11-23",
+          "contests": 3,
+          "regions": {
+            "15": 1,
+            "16": 1,
+            "05": 1
+          },
+          "source": "eligendo-regionali",
+          "quote": "Regionali 23/11/2025, Area ITALIA, Regione: CAMPANIA, PUGLIA, VENETO"
         }
       ],
-      "elections": []
+      "note": "Counted per region: each regional council election counts once, from the Interior Ministry's historical archive (Eligendo), which lists the 15 ordinary-statute regions' elections since 1970. Sicily, Sardinia, Aosta Valley, Trentino-Alto Adige, and Friuli-Venezia Giulia elect their councils under their own statutes, and Eligendo doesn't list them, so they aren't counted yet. Neither are four ordinary-statute elections that Eligendo leaves out: Marche in 2020 and 2025 and Molise in 2018 and 2023."
     },
     {
       "key": "referendums",

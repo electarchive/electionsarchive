@@ -60,6 +60,7 @@
     ep: m.coverage_country_def_ep,
   };
   const US_REASONS: Partial<Record<Reason, () => string>> = {
+    major: m.coverage_reason_major_def,
     coarse: m.coverage_reason_coarse_def,
     partial: m.coverage_reason_partial_def,
     totals: m.coverage_reason_totals_def,

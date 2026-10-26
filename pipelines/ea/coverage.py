@@ -180,7 +180,14 @@ select r.k, r.contest_id, cs.pipeline,
                 and coalesce((select sum(v.value) from result_value v
                     where v.result_set_k = r.k and v.option_k = o.k and v.measure = 1), 0)
                 <> coalesce((select sum(v.value) from result_value v
-                    where v.result_set_k = d.k and v.option_k = o.k and v.measure = 1), 0))) as whole
+                    where v.result_set_k = d.k and v.option_k = o.k and v.measure = 1), 0))) as whole,
+    r.completeness >= 0.98 and r.completeness < 1 and exists (
+        select from result_set d join contest_option o on o.contest_id = r.contest_id and o.kind = 'candidate'
+        where d.contest_id = r.contest_id and d.is_default and d.status = 'active' and d.k <> r.k
+            and not exists (select from result_value v where v.result_set_k = r.k and v.option_k = o.k and v.measure = 1)
+            and (select coalesce(sum(v.value), 0) from result_value v
+                where v.result_set_k = d.k and v.option_k = o.k and v.measure = 1)
+                >= 0.005 * (select sum(v.value) from result_value v where v.result_set_k = d.k and v.measure = 1)) as major
 from result_set r join cc on cc.id = r.contest_id join changeset cs on cs.id = r.changeset_id
 left join source s on s.id = r.source_id
 where r.status <> 'withdrawn';
@@ -271,7 +278,8 @@ group by cd.contest_id, cx.n;
 
 create temp table cg as
 select rs.contest_id,
-    bool_or(ug.grain = 'precinct' and rs.whole) as precinct,
+    bool_or(ug.grain = 'precinct' and rs.whole and not rs.major) as precinct,
+    bool_or(ug.grain = 'precinct' and rs.whole and rs.major) as major,
     bool_or(ug.grain in ('county', 'precinct')) as any_county,
     bool_or(ug.grain = 'county' and rs.whole and (ug.scheme_code <> 'us.county' or cu.contest_id is null
         or cu.expected = 0 or cu.present >= 0.9 * cu.expected)) as county,
@@ -288,7 +296,7 @@ CACHE_SQL = CONTESTS_SQL[
 
 COUNT_SQL = """
 with c as (
-    select cc.*, cg.precinct, cg.county, cg.county_free, cg.any_county, exists (select from rs where rs.contest_id = cc.id) as results,
+    select cc.*, cg.precinct, cg.major, cg.county, cg.county_free, cg.any_county, exists (select from rs where rs.contest_id = cc.id) as results,
         (exists (select from sc where sc.id = cc.id) or cc.st = 'AK' and cc.level = 'state_lower')
             and exists (select from rs where rs.contest_id = cc.id and rs.whole) as single,
         (exists (select from sc where sc.id = cc.id) or cc.st = 'AK' and cc.level = 'state_lower')
@@ -310,10 +318,12 @@ with c as (
     from cc left join cg on cg.contest_id = cc.id
 )
 select st, year, level, stage, count(*), count(*) filter (where results),
-    count(*) filter (where county or precinct or cancelled or single), count(*) filter (where precinct or cancelled),
+    count(*) filter (where county or precinct or major or cancelled or single), count(*) filter (where precinct or cancelled),
+    count(*) filter (where major and not coalesce(precinct, false) and not coalesce(cancelled, false)),
     count(*) filter (where county and not county_free and not coalesce(precinct, false) and not single_free),
     count(*) filter (where turnout), count(*) filter (where not tacit and (multi or stage <> 'primary')),
-    count(*) filter (where any_county and not (coalesce(county, false) or coalesce(precinct, false) or coalesce(cancelled, false) or single)),
+    count(*) filter (where any_county and not (coalesce(county, false) or coalesce(precinct, false) or coalesce(major, false)
+        or coalesce(cancelled, false) or single)),
     count(*) filter (where not results and not coalesce(cancelled, false))
 from c group by 1, 2, 3, 4
 """
@@ -526,13 +536,14 @@ def matrix(conn: Connection, last: int = LAST) -> list[dict]:
             "results": results,
             "county": county,
             "precinct": precinct,
+            "major": major,
             "icpsr_only": icpsr,
             "turnout": turnout,
             "contested": contested,
             "partial": partial,
             "bare": bare,
         }
-        for st, year, level, stage, n, results, county, precinct, icpsr, turnout, contested, partial, bare in conn.execute(
+        for st, year, level, stage, n, results, county, precinct, major, icpsr, turnout, contested, partial, bare in conn.execute(
             COUNT_SQL
         )
     }
@@ -813,6 +824,7 @@ def matrix(conn: Connection, last: int = LAST) -> list[dict]:
                 "results": 0,
                 "county": 0,
                 "precinct": 0,
+                "major": 0,
                 "icpsr_only": 0,
                 "turnout": 0,
                 "partial": 0,
@@ -838,6 +850,7 @@ def matrix(conn: Connection, last: int = LAST) -> list[dict]:
                 "county_partial": cell["partial"],
                 "no_results": cell["bare"],
                 "precinct": cell["precinct"],
+                "major_only": cell["major"],
                 "with_turnout": cell["turnout"],
                 "precinct_share": round(cell["precinct"] / cell["held"], 3) if cell["held"] else 0,
                 "grain": "precinct"
@@ -1093,7 +1106,7 @@ Generated by `ea coverage us` on {today} from the database, measured against the
 - Level comes from the contest's office or body and its polity: the president (state slates, national contests, Electoral College votes, and primary delegate allocations), the US Senate and House, governors, other statewide offices (`judicial` when the office names a justice, judge, or court), state upper and lower chambers (Nebraska's unicameral counts as upper), county, municipal, and school district offices and bodies (county and city offices naming a school or education board count as school), and statewide and local ballot questions. No special district polities exist yet, so that level is empty.
 - Stage: `runoff` for runoff elections (general and primary), `primary` for party-scoped contests and primary, top-two, and caucus elections, `special` for special elections and remainder terms on a regular day, and `general` otherwise.
 - Grain: a contest is `precinct` when any of its result sets has a precinct unit (`us.precinct`, `us.nyc_ed`, Iowa caucus precincts), `county` when any has a county, town, county part, Alaska house district, or place unit, `total` when it has any result set, and `none` otherwise. A U.S. House or state legislative contest (multi-member districts included) with results whose district shape on the election date lies at least 98% inside one county shape of that date, or at least half inside one with no other county shape taking more than 2% (the rest is water the county shapes leave out), counts as `county`, since its district total is that county's return (a district with no shape dated for the election does not qualify); an Alaska State House contest counts the same way, since its district is the Alaska house district unit that stands in for counties (`district_county` caches the overlay: the county under the district's point on surface, by shape vintage, with `rest` the largest share another county takes). A precinct has a shape when its unit equals an area with geometry. `icpsr_only` counts contests whose only county-level results come from ICPSR or from Algara and Amlani's returns, which are compiled from ICPSR and CQ (`us.icpsr`, `us.algara`, `us.algara_federal`; the ICPSR replacement lane's work). A result set is matched by its source's publisher, not by the changeset that last wrote it, since another pipeline that makes a set non-default restages it.
-- Target: precinct from 2000, county from 1824 to 1999 (total for local offices, local measures, and state legislative districts, whose county breakdowns before 2000 are not measured), and the contest total before 1824 and in the territories that have no counties (American Samoa, Guam, the Northern Mariana Islands, and the Virgin Islands). `gap` is the larger of contests expected and held, less those reaching the target. A primary or runoff listed as unopposed with no vote (the FEC's `Unopposed`, held as a tacit result), or with no more candidates than seats outside Colorado, needs no breakdown in the states whose law cancels an uncontested primary and declares the lone candidate nominated: Alabama, Arkansas, Colorado (when the whole primary is canceled), Connecticut, Delaware, Florida, Kentucky, Louisiana, Minnesota, Mississippi, New York, North Carolina, Oklahoma, South Carolina, South Dakota, Utah, and Virginia. Neither does a Florida contest held as a tacit result, or a state legislative general or special in Arkansas, Florida, Hawaii, Louisiana, Oklahoma, or Texas with no more candidates than seats, or a statewide executive general or special in Florida, Louisiana, or Oklahoma with one candidate, where an unopposed candidate is left off the ballot and declared elected with no vote (Ark. Code § 7-5-207, Fla. Stat. 101.151(7), Haw. Rev. Stat. §12-41(a), Texas Election Code §2.056). Neither does a general or special with no more candidates than seats in a state, year, and office level that `finest-reported.csv` lists with `finest` none, where the official body published no vote (Oklahoma's U.S. House races left off the ballot under 26 O.S. § 6-102). A result set whose completeness is below 0.98 (a county sum short of the official total, or an unfinished count) reaches neither county nor precinct grain, and its contest counts as partial, unless every named candidate's votes in it equal that candidate's votes in the contest's default result set, so only write-in or scattered votes differ.
+- Target: precinct from 2000, county from 1824 to 1999 (total for local offices, local measures, and state legislative districts, whose county breakdowns before 2000 are not measured), and the contest total before 1824 and in the territories that have no counties (American Samoa, Guam, the Northern Mariana Islands, and the Virgin Islands). `gap` is the larger of contests expected and held, less those reaching the target. A primary or runoff listed as unopposed with no vote (the FEC's `Unopposed`, held as a tacit result), or with no more candidates than seats outside Colorado, needs no breakdown in the states whose law cancels an uncontested primary and declares the lone candidate nominated: Alabama, Arkansas, Colorado (when the whole primary is canceled), Connecticut, Delaware, Florida, Kentucky, Louisiana, Minnesota, Mississippi, New York, North Carolina, Oklahoma, South Carolina, South Dakota, Utah, and Virginia. Neither does a Florida contest held as a tacit result, or a state legislative general or special in Arkansas, Florida, Hawaii, Louisiana, Oklahoma, or Texas with no more candidates than seats, or a statewide executive general or special in Florida, Louisiana, or Oklahoma with one candidate, where an unopposed candidate is left off the ballot and declared elected with no vote (Ark. Code § 7-5-207, Fla. Stat. 101.151(7), Haw. Rev. Stat. §12-41(a), Texas Election Code §2.056). Neither does a general or special with no more candidates than seats in a state, year, and office level that `finest-reported.csv` lists with `finest` none, where the official body published no vote (Oklahoma's U.S. House races left off the ballot under 26 O.S. § 6-102). A result set whose completeness is below 0.98 (a county sum short of the official total, or an unfinished count) reaches neither county nor precinct grain, and its contest counts as partial, unless every named candidate's votes in it equal that candidate's votes in the contest's default result set, so only write-in or scattered votes differ. A precinct result set that reaches 0.98 but has no votes for a candidate the contest's default result set gives at least 0.5% of its votes (HEDA's Democratic and Republican sets among them) counts as `major_only`, not precinct, until an official or complete precinct set replaces it.
 - Expected contests: presidential slates for each state casting electoral votes from 1824 (less the states whose legislatures chose electors, and Maine's and Nebraska's districts), House seats from `us.cd` districts in force at each Congress's start, with a state's at-large seat counted only when it has no numbered districts or a source holds an at-large race that cycle (each race filed under the even year before the Congress its winner was seated in, or, with no seated winner, the Congress its date falls in), regular Senate elections from each state's seat classes since 1914 (1960 in Alaska and Hawaii), governors from 1974 by each state's cycle and before 1974 wherever any source holds one, state legislative generals as Klarner holds them 1967–2022 (Vermont 1968–1984 and North Carolina 1968, which Klarner lacks, at their next counts) and 2023–2025 at the count four years earlier (2024 lower houses at 2022's count, or 2020's where 2016 and 2020 match and 2022, a redistricting year, differs by more than a tenth, as in North Dakota's staggered House; Delaware's and Texas's 2024 senates at the 10 and 15 seats those states put up after redistricting; or, where at least nine in ten contests held that year have two or more candidates, as in Florida, Hawaii, Louisiana, and Oklahoma, whose sources hold only contested races, the earlier year's contests with two or more candidates), other statewide offices from the `statewide_office_year` table (one contest for each office a state has elected in at least two general elections since 1990, in every year of its cycle from the first year its holders are known, or from the state's first governor election, and before 1990 in the years the state elected its governor when the office's modern cycle matches the governor's; lieutenant governors on the governor's ticket have no contest of their own and are not counted, and an office won outright in a nonpartisan primary, as California's superintendent of public instruction can be, expects no general; Georgia's Public Service Commission, whose 2022 and 2024 elections the courts postponed, is expected in 2025, and Colorado's State Board of Education and University of Colorado regents, elected mostly by congressional district with an at-large seat only in some years, count only what is held; North Dakota's attorney general, secretary of state, agriculture commissioner, and tax commissioner were elected in presidential years through 2004 and in midterm years from 2006, so 1994, 1998, and 2002 expect none; and Indiana's superintendent of public instruction, appointed from 2021, was last elected in 2016), and 2024 House and presidential primaries at the larger of their 2022 and 2020 counts of contests, and 2024 Senate primaries (the 2018 seat class) at the 2018 count of contests with two or more candidates and a counted result, since 2024's sources hold only contested primaries. Runoffs are expected where a first round we hold leaves no candidate above its state's threshold (see below), and House and Senate specials where a member's term begins mid-term. Judicial races, ballot measures, local races, other specials, and anything before these windows have no calendar, so they count only what is held.
 - Runoffs: the rule table in `coverage.RUNOFFS` gives each state's first-round stage, offices, years, and threshold: a majority in Alabama, Arkansas, Georgia, Mississippi, Oklahoma, South Carolina, and Texas primaries, Florida's primaries through 2000, South Dakota's 35 percent for Congress and governor, Georgia's general elections from 1964, Louisiana's majority elections (statewide and legislative from 1975, Congress 1978–2006 and from 2012), and the jungle specials of Georgia, Louisiana, Mississippi, and Texas. Each first round (a contest with no earlier round) whose default result set has a top vote share at or below the threshold, or which already has a runoff chained to it, expects one runoff, filed under the year of the runoff held (chained, or found by office and district within 130 days) and otherwise the first round's year. A first round chained to a contest that is not stage `runoff` (Louisiana's November generals) adds nothing. North Carolina's second primary is held only when the runner-up asks for one (N.C. Gen. Stat. § 163-111), so its runoffs count only what is held. A first round whose default result set has a `withdrew` outcome (the runner-up withdrew and the leader was declared elected) expects no runoff unless one is held.
 - Secession: for the eleven Confederate states, a House cell for the Congresses of 1860 through 1866 expects at most as many contests as the Clerk's Biographical Directory (congress-legislators' terms) seats members from that state starting between that Congress's convening and the next (the state's delegation was absent during secession, and readmitted states seated members from 1868), or as many as we hold if more.
