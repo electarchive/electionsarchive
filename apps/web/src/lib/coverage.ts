@@ -24,7 +24,7 @@ export type Goal = UsGoal | CountryGoal;
 
 export const US_TIERS = {
   federal: ["president", "us_senate", "us_house"],
-  statewide: ["governor", "statewide_exec", "judicial", "statewide_measure"],
+  statewide: ["governor", "statewide_exec", "judicial"],
   legislative: ["state_upper", "state_lower"],
   local: [
     "county",
@@ -35,6 +35,7 @@ export const US_TIERS = {
     "special",
     "other",
   ],
+  referendums: ["statewide_measure"],
   turnout: ["general", "primary", "runoff", "referendum"],
 } as const;
 export const COUNTRY_TIERS = [

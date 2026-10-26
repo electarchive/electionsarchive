@@ -35,11 +35,16 @@
     federal: m.coverage_tier_def_federal,
     statewide: m.coverage_tier_def_statewide,
     legislative: m.coverage_tier_def_legislative,
+    local: m.coverage_tier_def_local,
     turnout: m.coverage_tier_def_turnout,
     national: m.coverage_tier_def_national,
     subnational: m.coverage_tier_def_subnational,
     referendums: m.coverage_tier_def_referendums,
     ep: m.coverage_tier_def_ep,
+  };
+  const US_DEFINITIONS: Record<string, () => string> = {
+    local: m.coverage_tier_def_local_us,
+    referendums: m.coverage_tier_def_referendums_us,
   };
   const COMPLETE: Partial<Record<Goal, () => string>> = {
     county: m.coverage_reason_complete_county_def,
@@ -682,11 +687,8 @@
             {TIER_LABELS[row.key as Tier]()}
           </h2>
           <p class="text-sm text-muted-foreground max-inline-[72ch]">
-            {(row.key === "local"
-              ? isUs
-                ? m.coverage_tier_def_local_us
-                : m.coverage_tier_def_local
-              : DEFINITIONS[row.key])?.()}
+            {((isUs ? US_DEFINITIONS[row.key] : undefined) ??
+              DEFINITIONS[row.key])?.()}
           </p>
           {#if isUs && (row.key === "local" || row.key === "turnout")}
             <p class="text-sm text-muted-foreground max-inline-[72ch]">

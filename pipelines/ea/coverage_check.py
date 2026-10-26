@@ -10,9 +10,10 @@ from ea.store import connect
 BASE = os.environ.get("EA_BASE", "http://localhost:5173")
 US = {
     "federal": ["president", "us_senate", "us_house"],
-    "statewide": ["governor", "statewide_exec", "judicial", "statewide_measure"],
+    "statewide": ["governor", "statewide_exec", "judicial"],
     "legislative": ["state_upper", "state_lower"],
     "local": ["county", "municipality", "township", "school", "college", "special", "other"],
+    "referendums": ["statewide_measure"],
     "turnout": ["general", "primary", "runoff", "referendum"],
 }
 US_GOALS = {

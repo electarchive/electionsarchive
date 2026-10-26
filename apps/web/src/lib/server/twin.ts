@@ -567,7 +567,9 @@ function coverageMarkdown(
     turnout: m.coverage_tier_def_turnout,
     national: m.coverage_tier_def_national,
     subnational: m.coverage_tier_def_subnational,
-    referendums: m.coverage_tier_def_referendums,
+    referendums: isUs
+      ? m.coverage_tier_def_referendums_us
+      : m.coverage_tier_def_referendums,
     ep: m.coverage_tier_def_ep,
   };
   return [
