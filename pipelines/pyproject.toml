@@ -9,6 +9,7 @@ dependencies = [
   "jsonschema==4.26.0",
   "numpy>=2.5.4",
   "pillow>=13.0.0",
+  "pmtiles>=3.8.1",
   "polars>=2.0.0",
   "psycopg[binary]>=3.3.6",
   "pyproj>=3.8.0",

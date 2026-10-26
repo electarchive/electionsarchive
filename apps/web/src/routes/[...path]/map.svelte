@@ -98,7 +98,8 @@
     } | null;
   } = $props();
 
-  const BINS = [0.05, 0.1, 0.2];
+  const BINS = [0.05, 0.1, 0.2, 0.3, 0.45];
+  const LEANS = [26, 40, 54, 68, 84, 100];
   const STRENGTHS = [34, 54, 76, 100];
   const STEPS = [16, 36, 56, 78, 100];
   const SWINGS = [0.02, 0.05, 0.1];
@@ -868,7 +869,7 @@
         ? 10
         : isDeclared || row.valid === 0 || !isShaded
           ? 100
-          : (STRENGTHS[bin(row.margin)] ?? 100);
+          : (LEANS[bin(row.margin)] ?? 100);
       let tone = colors[row.leader] ?? "var(--muted-foreground)";
       const [red = 0, green = 0, blue = 0] = (
         /\d+, \d+, \d+/u.exec(read(tone))?.[0] ?? ""
@@ -2857,15 +2858,15 @@
           >
             <span>{m.map_margin_under({ points: "5" })}</span>
             <span class="flex">
-              {#each STRENGTHS as strength (strength)}
+              {#each LEANS as strength (strength)}
                 <span
-                  class="block-3 inline-6 first:rounded-s-xs last:rounded-e-xs"
+                  class="block-3 inline-5 first:rounded-s-xs last:rounded-e-xs"
                   style:background-color="color-mix(in oklab, #3d434b {strength}%,
                   var(--map-low))"
                 ></span>
               {/each}
             </span>
-            <span>{m.map_margin_over({ points: "20" })}</span>
+            <span>{m.map_margin_over({ points: "45" })}</span>
           </span>
           <button
             type="button"

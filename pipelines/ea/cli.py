@@ -17,6 +17,7 @@ from ea import (
     fixtures,
     layout,
     portals,
+    rasters,
     raw,
     scans,
     search,
@@ -42,6 +43,13 @@ def main() -> None:
     commands.add_parser("fixtures", help="export the engine's golden-test fixtures from the database")
     commands.add_parser("tiles", help="build one PMTiles archive per boundary set").add_argument(
         "scheme", nargs="?", help="scheme_code prefix, such as tr or tr.il; omit to build every set"
+    )
+    commands.add_parser(
+        "rasters", help="build one area-ID raster PMTiles archive per boundary set of 1,000 or more areas"
+    ).add_argument(
+        "scheme",
+        nargs="?",
+        help="scheme_code prefix, or one set as scheme/vintage, such as us.precinct/2024; omit to build every set",
     )
     commands.add_parser("search", help="rebuild the search index from names and slugs")
     commands.add_parser("parties", help="rebuild the precomputed party pages the app serves")
@@ -128,6 +136,8 @@ def main() -> None:
             print(fixtures.export())
         case "tiles":
             print(tiles.build(args.scheme))
+        case "rasters":
+            print(rasters.build(args.scheme))
         case "search":
             print(search.build())
         case "parties":

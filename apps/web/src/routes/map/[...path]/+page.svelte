@@ -38,7 +38,8 @@
 
   const MID = 4.4;
   const FINE = 7;
-  const BINS = [0.05, 0.1, 0.2];
+  const BINS = [0.05, 0.1, 0.2, 0.3, 0.45];
+  const LEANS = [26, 40, 54, 68, 84, 100];
   const STRENGTHS = [34, 54, 76, 100];
   const SHARES = [0.3, 0.4, 0.5, 0.6, 0.7];
   const STEPS = [14, 30, 48, 66, 84, 100];
@@ -110,6 +111,25 @@
   >([]);
   let isQueued = false;
   let isFramed = true;
+  let mosaic = $state.raw<{
+    key: string;
+    set: Sheet;
+    layers: Array<{ code: string; tiles: string }>;
+  } | null>(null);
+  let tinted = "";
+  let drawn = 0;
+  let ink = 0;
+  let spotted = 0;
+  const colors = new Map<number, number>();
+  const named = new Set<string>();
+  const tiles = new Map<
+    string,
+    Promise<{ ids: Uint32Array; index: Uint8Array | Uint16Array } | null>
+  >();
+  const ready = new Map<
+    string,
+    { ids: Uint32Array; index: Uint8Array | Uint16Array }
+  >();
 
   const isCompared = $derived(
     sheet.target != null &&
@@ -307,7 +327,7 @@
       hue(set, reading.leader),
       set.places.valid[i] === 0
         ? 100
-        : (STRENGTHS[step(reading.lead, BINS)] ?? 100),
+        : (LEANS[step(reading.lead, BINS)] ?? 100),
     );
   }
 
@@ -346,9 +366,9 @@
             : mix(
                 tones[(middle >= 0 ? first : second)?.key ?? ""] ??
                   "var(--muted-foreground)",
-                STRENGTHS[
-                  step(Math.abs(middle), shown === "swing" ? SWINGS : BINS)
-                ] ?? 100,
+                (shown === "swing"
+                  ? STRENGTHS[step(Math.abs(middle), SWINGS)]
+                  : LEANS[step(Math.abs(middle), BINS)]) ?? 100,
               );
         return {
           count: tallied,
@@ -403,7 +423,8 @@
   const focus = $derived(pinned ?? hovered);
   const entry = $derived.by(() => {
     void seen;
-    return focus == null ? null : (lookup[focus] ?? null);
+    const hit = focus == null ? null : lookup[focus];
+    return hit == null ? null : { ...hit };
   });
   const glance = $derived.by(() => {
     void seen;
@@ -1132,7 +1153,11 @@
     const base = sheet;
     const wanted: Array<{ key: string; where: string; level: string | null }> =
       [];
-    if (mid?.tiles != null && zoom >= MID - 0.5) {
+    if (
+      mid?.tiles != null &&
+      zoom >= MID - 0.5 &&
+      !(mosaic?.layers.some((layer) => layer.code === mid.code) ?? false)
+    ) {
       wanted.push({ key: "mid", where: "", level: mid.code });
     }
     if (zoom >= FINE - 0.6) {
@@ -1184,6 +1209,122 @@
           pending -= 1;
         });
     }
+  }
+
+  function drape(gl: Maplibre.Map, next: NonNullable<typeof mosaic>) {
+    for (const [i, k] of next.set.places.k.entries()) {
+      lookup[k] ??= { set: next.set, i, source: "ids" };
+    }
+    seen += 1;
+    const before =
+      groups.toSorted((a, b) => a.rank - b.rank).find((group) => group.rank > 0)
+        ?.first ?? "anchor-fills";
+    for (const layer of next.layers) {
+      for (const [id, isFocus] of [
+        [`ids:${layer.tiles}`, false],
+        [`focus:ids:${layer.tiles}`, true],
+      ] as const) {
+        if (gl.getSource(id) == null) {
+          gl.addSource(id, {
+            type: "raster",
+            tiles: [
+              `ids://${layer.tiles}/{z}/{x}/{y}?v=${drawn}${isFocus ? `&focus=${spotted}` : ""}`,
+            ],
+            tileSize: 256,
+            maxzoom: 8,
+          });
+          sources.push(id);
+        }
+        if (gl.getLayer(id) == null) {
+          gl.addLayer(
+            {
+              id,
+              type: "raster",
+              source: id,
+              paint: { "raster-fade-duration": 0 },
+            },
+            isFocus ? "anchor-focus" : before,
+          );
+          layers.push(id);
+        }
+      }
+    }
+    if (mid?.tiles != null && gl.getLayer("lines") == null) {
+      const reader = probe(gl.getContainer());
+      gl.addLayer(
+        {
+          id: "lines",
+          type: "line",
+          source: source(gl, mid.tiles),
+          "source-layer": "areas",
+          paint: {
+            "line-color": reader.color("var(--card)"),
+            "line-width": [
+              "interpolate",
+              ["linear"],
+              ["zoom"],
+              4.5,
+              0,
+              6,
+              0.5,
+              9,
+              1,
+            ],
+            "line-opacity": 0.7,
+          },
+        },
+        "anchor-edges",
+      );
+      reader.done();
+      layers.push("lines");
+    }
+  }
+
+  function pick(gl: Maplibre.Map, point: Maplibre.Point, at: Maplibre.LngLat) {
+    if (veiled(at.lng, at.lat)) {
+      return null;
+    }
+    const fills = groups
+      .toSorted((a, b) => b.rank - a.rank)
+      .map((group) => group.first)
+      .filter((id) => gl.getLayer(id) != null);
+    const base = groups.find((group) => group.rank === 0)?.first;
+    const found = gl
+      .queryRenderedFeatures(point, { layers: fills })
+      .flatMap((feature) =>
+        typeof feature.id === "number" && lookup[feature.id] != null
+          ? [{ k: feature.id, layer: feature.layer.id }]
+          : [],
+      );
+    const fine = found.find((hit) => hit.layer !== base);
+    if (fine != null) {
+      return fine.k;
+    }
+    const sin = Math.sin((at.lat * Math.PI) / 180);
+    const top = Math.min(8, Math.max(0, Math.round(gl.getZoom() + 1)));
+    for (const layer of mosaic?.layers.toReversed() ?? []) {
+      for (const z of [8, 7, 6, 5, 4, 3, 2, 1, 0].filter((z) => z <= top)) {
+        const world = 512 * 2 ** z;
+        const x = ((at.lng + 180) / 360) * world;
+        const y =
+          (0.5 - Math.log((1 + sin) / (1 - sin)) / (4 * Math.PI)) * world;
+        const tile = ready.get(
+          `${layer.tiles}/${z}/${Math.floor(x / 512)}/${Math.floor(y / 512)}`,
+        );
+        if (tile == null) {
+          continue;
+        }
+        const k =
+          tile.ids[
+            tile.index[(Math.floor(y) % 512) * 512 + (Math.floor(x) % 512)] ?? 0
+          ] ?? 0;
+        if (colors.has(k) && lookup[k] != null) {
+          return k;
+        }
+        break;
+      }
+    }
+    return found[0]?.k ?? null;
   }
 
   function frame(gl: Maplibre.Map, set: Sheet, isAnimated: boolean) {
@@ -1336,7 +1477,7 @@
     const stop = new AbortController();
     let built: Maplibre.Map | null = null;
     void (async () => {
-      const [maplibre, { Protocol }, worker] = await Promise.all([
+      const [maplibre, { Protocol, PMTiles }, worker] = await Promise.all([
         import("maplibre-gl"),
         import("pmtiles"),
         import("maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url"),
@@ -1347,6 +1488,90 @@
       }
       maplibre.setWorkerUrl(worker.default);
       maplibre.addProtocol("pmtiles", new Protocol().tile);
+      const archives: Record<string, InstanceType<typeof PMTiles>> = {};
+      maplibre.addProtocol("ids", async ({ url }) => {
+        const match =
+          /^ids:\/\/(.+)\/(\d+)\/(\d+)\/(\d+)\?v=\d+(?:&focus=(\d+))?$/u.exec(
+            url,
+          );
+        const [, key = "", z = "0", x = "0", y = "0", focus] = match ?? [];
+        if (focus === "0") {
+          return { data: await createImageBitmap(new ImageData(1, 1)) };
+        }
+        const name = `${key}/${z}/${x}/${y}`;
+        let pending = tiles.get(name);
+        if (pending == null) {
+          archives[key] ??= new PMTiles(
+            `${globalThis.location.origin}/tiles/${key}.pmtiles`,
+          );
+          pending = archives[key]
+            .getZxy(Number(z), Number(x), Number(y))
+            .then((found) => {
+              if (found == null) {
+                return null;
+              }
+              const view = new DataView(found.data);
+              const total = view.getUint32(0, true);
+              const ids = new Uint32Array(total);
+              let id = 0;
+              for (const j of ids.keys()) {
+                id += view.getInt32(4 + 4 * j, true);
+                ids[j] = id;
+              }
+              const tile = {
+                ids,
+                index:
+                  total <= 256
+                    ? new Uint8Array(found.data, 4 + 4 * total, 512 * 512)
+                    : new Uint16Array(found.data, 4 + 4 * total, 512 * 512),
+              };
+              ready.set(name, tile);
+              return tile;
+            });
+          tiles.set(name, pending);
+          if (tiles.size > 240) {
+            const oldest = tiles.keys().next().value ?? "";
+            tiles.delete(oldest);
+            ready.delete(oldest);
+          }
+        }
+        const tile = await pending;
+        const pixels = new Uint32Array(512 * 512);
+        if (tile != null && focus == null) {
+          const lut = tile.ids.map((k) => colors.get(k) ?? 0);
+          let p = 0;
+          for (const value of tile.index) {
+            pixels[p] = lut[value] ?? 0;
+            p += 1;
+          }
+        } else if (tile != null) {
+          const target = tile.ids.indexOf(Number(focus));
+          const { index } = tile;
+          let p = 0;
+          for (const value of target < 0 ? [] : index) {
+            if (value === target) {
+              const column = p % 512;
+              const row = (p - column) / 512;
+              for (const d of [1, 2]) {
+                if (
+                  (column >= d && index[p - d] !== target) ||
+                  (column < 512 - d && index[p + d] !== target) ||
+                  (row >= d && index[p - 512 * d] !== target) ||
+                  (row < 512 - d && index[p + 512 * d] !== target)
+                ) {
+                  pixels[p] = ink;
+                }
+              }
+            }
+            p += 1;
+          }
+        }
+        return {
+          data: await createImageBitmap(
+            new ImageData(new Uint8ClampedArray(pixels.buffer), 512, 512),
+          ),
+        };
+      });
       library = maplibre;
       const reader = probe(host);
       const gl = new maplibre.Map({
@@ -1426,19 +1651,7 @@
         }
       });
       gl.on("mousemove", (event) => {
-        const fills = groups
-          .toSorted((a, b) => b.rank - a.rank)
-          .map((group) => group.first)
-          .filter((id) => gl.getLayer(id) != null);
-        let k: number | null = null;
-        for (const feature of veiled(event.lngLat.lng, event.lngLat.lat)
-          ? []
-          : gl.queryRenderedFeatures(event.point, { layers: fills })) {
-          if (typeof feature.id === "number" && lookup[feature.id] != null) {
-            k = feature.id;
-            break;
-          }
-        }
+        const k = pick(gl, event.point, event.lngLat);
         hovered = k;
         pointer = { x: event.point.x, y: event.point.y };
         gl.getCanvas().style.cursor = k == null ? "" : "pointer";
@@ -1448,19 +1661,7 @@
         pointer = null;
       });
       gl.on("click", (event) => {
-        const fills = groups
-          .toSorted((a, b) => b.rank - a.rank)
-          .map((group) => group.first)
-          .filter((id) => gl.getLayer(id) != null);
-        let k: number | null = null;
-        for (const feature of veiled(event.lngLat.lng, event.lngLat.lat)
-          ? []
-          : gl.queryRenderedFeatures(event.point, { layers: fills })) {
-          if (typeof feature.id === "number" && lookup[feature.id] != null) {
-            k = feature.id;
-            break;
-          }
-        }
+        const k = pick(gl, event.point, event.lngLat);
         if (k == null || pinned === k) {
           pinned = null;
           return;
@@ -1616,6 +1817,107 @@
   });
 
   $effect(() => {
+    const [where = "", , vs = "", group = ""] = asked.split("|");
+    const key = [data.contest, vs, group].join("|");
+    if (where !== "" || untrack(() => mosaic?.key) === key) {
+      return;
+    }
+    void orpc.contests.mosaic
+      .call({
+        id: data.contest,
+        vs: vs === "" ? undefined : vs,
+        group: group === "" ? undefined : group,
+      })
+      .then((found) => {
+        if (found.layers.length === 0 || !asked.startsWith("|")) {
+          return;
+        }
+        const k: Array<number> = [];
+        let at = 0;
+        for (const delta of found.places.k) {
+          at += delta;
+          k.push(at);
+        }
+        const empty = k.map(() => null);
+        const base = untrack(() => sheet);
+        mosaic = {
+          key,
+          layers: found.layers,
+          set: {
+            ...base,
+            scope: { ...base.scope, name: "" },
+            legend: found.legend,
+            places: {
+              k,
+              name: found.places.name,
+              valid: found.places.valid,
+              x: empty,
+              y: empty,
+              leader: found.places.leader,
+              prior: found.places.prior.length > 0 ? found.places.prior : empty,
+              shares: found.places.shares.map((column) =>
+                column.map((value) => (value == null ? null : value * 10)),
+              ),
+              before:
+                found.places.before.length > 0
+                  ? found.places.before.map((column) =>
+                      column.map((value) =>
+                        value == null ? null : value * 10,
+                      ),
+                    )
+                  : found.legend.map(() => empty),
+              redrawn: empty,
+            },
+          },
+        };
+      });
+  });
+
+  $effect(() => {
+    const k = focus;
+    const held = mosaic;
+    const gl = map;
+    const hit = k == null ? null : lookup[k];
+    if (
+      gl == null ||
+      held == null ||
+      hit?.set !== held.set ||
+      held.set.places.name[hit.i] !== ""
+    ) {
+      return;
+    }
+    const timer = setTimeout(() => {
+      const base = groups.find((group) => group.rank === 0)?.first;
+      const id =
+        pointer == null || base == null
+          ? null
+          : gl.queryRenderedFeatures([pointer.x, pointer.y], {
+              layers: [base],
+            })[0]?.id;
+      const part = sheet.parts.find((entry) => entry.k === id);
+      if (part == null || named.has(`${held.key}|${part.unit}`)) {
+        return;
+      }
+      named.add(`${held.key}|${part.unit}`);
+      const [, , vs = ""] = asked.split("|");
+      void request(
+        part.unit,
+        held.layers.at(-1)?.code ?? null,
+        vs === "" ? null : vs,
+      ).then((set) => {
+        for (const [j, place] of set.places.k.entries()) {
+          const at = lookup[place];
+          if (at?.set === held.set) {
+            held.set.places.name[at.i] = set.places.name[j] ?? "";
+          }
+        }
+        seen += 1;
+      });
+    }, 200);
+    return () => clearTimeout(timer);
+  });
+
+  $effect(() => {
     void minis;
     const mark = JSON.stringify([
       shown,
@@ -1631,6 +1933,8 @@
     const gl = map;
     const tiers = detail;
     const base = sheet;
+    const held = mosaic;
+    void seen;
     if (gl == null) {
       return;
     }
@@ -1639,8 +1943,62 @@
       if (level?.tiles != null) {
         paint(gl, base, `t:${level.tiles}`, mark);
       }
-      for (const held of Object.values(tiers)) {
-        paint(gl, held.set, held.source, mark);
+      for (const tier of Object.values(tiers)) {
+        paint(gl, tier.set, tier.source, mark);
+      }
+      if (held == null || tinted === mark) {
+        return;
+      }
+      tinted = mark;
+      const reader = probe(gl.getContainer());
+      const ground =
+        shown === "votes"
+          ? reader.color(
+              "color-mix(in oklab, var(--muted-foreground) 15%, var(--card))",
+            )
+          : null;
+      const packed = new Map<string, number>();
+      const pack = (css: string) => {
+        const [r = 0, g = 0, b = 0, a = 1] = (css.match(/[\d.]+/g) ?? []).map(
+          Number,
+        );
+        return (r | (g << 8) | (b << 16) | (Math.round(a * 255) << 24)) >>> 0;
+      };
+      colors.clear();
+      for (const [i, k] of held.set.places.k.entries()) {
+        if (held.set.places.leader[i] == null) {
+          continue;
+        }
+        const css = ground ?? reader.color(tone(held.set, i));
+        let value = packed.get(css);
+        if (value == null) {
+          value = pack(css);
+          packed.set(css, value);
+        }
+        colors.set(k, value);
+      }
+      ink = pack(reader.color("var(--foreground)"));
+      reader.done();
+      drawn += 1;
+      for (const target of [gl, ...minis]) {
+        for (const layer of held.layers) {
+          target
+            ?.getSource<Maplibre.RasterTileSource>(`ids:${layer.tiles}`)
+            ?.setTiles([`ids://${layer.tiles}/{z}/{x}/{y}?v=${drawn}`]);
+        }
+      }
+    });
+  });
+
+  $effect(() => {
+    const gl = map;
+    const next = mosaic;
+    if (gl == null || next == null || sheet.scope.unit !== "") {
+      return;
+    }
+    untrack(() => {
+      if (gl.getSource(`ids:${next.layers[0]?.tiles}`) == null) {
+        drape(gl, next);
       }
     });
   });
@@ -1699,12 +2057,25 @@
         }
       }
       marked = [];
+      const target =
+        strong != null && lookup[strong]?.source === "ids" ? strong : 0;
+      if (target !== spotted) {
+        spotted = target;
+        drawn += 1;
+        for (const layer of mosaic?.layers ?? []) {
+          gl.getSource<Maplibre.RasterTileSource>(
+            `focus:ids:${layer.tiles}`,
+          )?.setTiles([
+            `ids://${layer.tiles}/{z}/{x}/{y}?v=${drawn}&focus=${spotted}`,
+          ]);
+        }
+      }
       for (const [k, state] of [
         [strong, { focus: true }],
         [light, { hover: true }],
       ] as const) {
         const hit = k == null ? null : lookup[k];
-        if (k != null && hit != null) {
+        if (k != null && hit != null && hit.source !== "ids") {
           gl.setFeatureState(
             { source: hit.source, sourceLayer: "areas", id: k },
             state,
@@ -1866,7 +2237,9 @@
     <div class="grid gap-0.5">
       <div class="flex items-start justify-between gap-3">
         <h2 class="text-lg/6 font-[720] text-balance">
-          {hit.set.places.name[hit.i]}
+          {hit.set.places.name[hit.i] === ""
+            ? m.atlas_loading()
+            : hit.set.places.name[hit.i]}
         </h2>
         {#if pinned != null}
           <button
@@ -1887,7 +2260,7 @@
           hit.set === sheet ? null : hit.set.scope.name,
           m.atlas_votes({ votes: count(hit.set.places.valid[hit.i] ?? 0) }),
         ]
-          .filter((part) => part != null)
+          .filter((part) => part != null && part !== "")
           .join(", ")}
       </p>
     </div>
@@ -2372,7 +2745,7 @@
             {/each}
           </div>
         </div>
-      {:else if isParts}
+      {:else if isParts && mosaic == null}
         <p class="text-xs text-muted-foreground">{m.atlas_zoom_hint()}</p>
       {/if}
       {#if sheet.isAllied || grouped}

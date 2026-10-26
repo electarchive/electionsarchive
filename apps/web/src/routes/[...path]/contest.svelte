@@ -503,7 +503,9 @@
     const rungs = rows.flatMap((row) => {
       const item = places?.legend[row.leader ?? -1];
       const margin = row.margin ?? 0;
-      const strength = [0.05, 0.1, 0.2].filter((edge) => margin >= edge).length;
+      const strength = [0.05, 0.1, 0.2, 0.3, 0.45].filter(
+        (edge) => margin >= edge,
+      ).length;
       return row.seats == null || item == null
         ? []
         : [
@@ -515,7 +517,7 @@
               side: sides.findIndex((side) => side.person === item.person),
               leader: titles[row.leader ?? -1] ?? "",
               margin,
-              color: `color-mix(in oklab, ${tones[row.leader ?? -1]} ${[34, 54, 76, 100][strength]}%, var(--map-low))`,
+              color: `color-mix(in oklab, ${tones[row.leader ?? -1]} ${[26, 40, 54, 68, 84, 100][strength]}%, var(--map-low))`,
             },
           ];
     });

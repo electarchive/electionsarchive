@@ -11,7 +11,7 @@ const ROOT = path.resolve("../../data/tiles");
 export const GET: RequestHandler = async ({ params, request }) => {
   if (
     !/^[a-z]{2}\.[a-z_]+$/u.test(params.scheme) ||
-    !/^[\w-]+\.pmtiles$/u.test(params.file)
+    !/^[\w-]+(?:\.ids)?\.pmtiles$/u.test(params.file)
   ) {
     error(404);
   }
