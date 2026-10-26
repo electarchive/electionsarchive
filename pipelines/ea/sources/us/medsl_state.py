@@ -183,6 +183,57 @@ def _surname(name: str) -> str:
     return words[-1] if words else name
 
 
+def _tokens(text: str) -> list[str]:
+    text = re.sub(r'"[^"]*"|\([^)]*\)', " ", text.upper())
+    text = re.sub(r",? (?:JR|SR|II|III|IV)\.?(?= |$)|,? (?:DEM|REP|LIB|GRN|IND)$", " ", text)
+    return [token for token in (re.sub(r"[^A-Z]", "", word) for word in text.split()) if token]
+
+
+def finer(days: set[date]) -> dict[tuple[date, str], list[list[tuple[str, UUID | None]]]]:
+    pools: dict[tuple[date, str], list[list[tuple[str, UUID | None]]]] = defaultdict(list)
+    harris = pl.read_parquet(
+        raw.parsed("us.tx_harris") / "lines.parquet", columns=["county", "election", "contest", "choice"]
+    )
+    harris = harris.with_columns(day=pl.col("election").str.slice(0, 10).str.to_date()).filter(
+        pl.col("day").is_in(days)
+    )
+    for (county, day, _), rows in harris.unique(["county", "day", "contest", "choice"]).group_by(
+        "county", "day", "contest"
+    ):
+        pools[(day, county)].append([(choice, None) for choice in rows["choice"].to_list()])
+    return pools
+
+
+def resolve(
+    names: list[str], same_day: list[list[tuple[str, UUID | None]]], history: list[tuple[str, UUID | None]]
+) -> dict[str, tuple[str, UUID | None]]:
+    def hits(name: str, pool: list[tuple[str, UUID | None]]) -> dict[str, tuple[str, UUID | None]]:
+        bare = "".join(_tokens(name))
+        found: dict[str, tuple[str, UUID | None]] = {}
+        for text, person in pool:
+            tokens = _tokens(text)
+            if bare and any("".join(tokens[start:]) == bare for start in range(1, len(tokens))):
+                found.setdefault(" ".join(tokens), (text, person))
+                if person is not None:
+                    found[" ".join(tokens)] = (text, person)
+        return found
+
+    single = [name for name in names if re.fullmatch(r"[A-Z'-]+", name)]
+    proposals: dict[str, dict[str, tuple[str, UUID | None]]] = defaultdict(dict)
+    for pool in same_day:
+        matched = {name: hits(name, pool) for name in names}
+        if single and all(len(matched[name]) == 1 for name in single):
+            for name, found in matched.items():
+                if len(found) == 1:
+                    proposals[name].update(found)
+    for name in names:
+        if name not in proposals:
+            found = hits(name, history)
+            if len(found) == 1:
+                proposals[name].update(found)
+    return {name: next(iter(found.values())) for name, found in proposals.items() if len(found) == 1}
+
+
 def parse() -> None:
     frame = (
         pl.scan_csv(raw.cached(SOURCE, RETURNS).path, infer_schema_length=0)
@@ -555,9 +606,11 @@ def emit() -> Path:
         ).fetchall():
             codes[scheme].add(code)
         past: dict[tuple[str, str], dict[str, set[UUID]]] = defaultdict(lambda: defaultdict(set))
-        for body, code, person, ballot in conn.execute(
-            """select distinct b.value, ac.code, cd.person_id, cd.ballot_name
+        known_names: dict[UUID, str] = {}
+        for body, code, person, ballot, known in conn.execute(
+            """select distinct b.value, ac.code, cd.person_id, cd.ballot_name, pn.text
                from candidacy cd join contest_option o on o.id = cd.option_id
+               join name pn on pn.entity_id = cd.person_id and pn.is_preferred and pn.lang = 'en'
                join contest ct on ct.id = o.contest_id join election e on e.id = ct.election_id
                join external_id b on b.entity_id = ct.body_id and b.scheme = 'us.body'
                join area_code ac on ac.area_id = ct.district_area_id
@@ -566,12 +619,22 @@ def emit() -> Path:
         ).fetchall():
             if ballot is None:
                 continue
+            known_names[person] = known
             words = re.sub(r"[^A-Z ]", "", ballot.upper().replace(",", " ")).split()
             words = [word for word in words if word not in {"JR", "SR", "II", "III", "IV"}]
             if not words:
                 continue
             past[(body, words[-1])][code].add(person)
             past[(body, f"{words[0]} {words[-1]}")][code].add(person)
+        surnamed = {
+            person
+            for (person,) in conn.execute(
+                """select p.id from person p join changeset c on c.id = p.changeset_id and c.pipeline = %s
+                   join name n on n.entity_id = p.id and n.is_preferred and n.text !~ ' '""",
+                [SOURCE],
+            ).fetchall()
+        }
+        harris = [pool for pools in finer({date(2024, 11, 5)}).values() for pool in pools]
         held: dict[UUID, UUID] = dict(
             conn.execute(
                 """select cd.id, cd.person_id from candidacy cd join changeset c on c.id = cd.changeset_id
@@ -846,6 +909,7 @@ def emit() -> Path:
                     "note", entity_id=contest, kind="caveat", body_md=MEDSL if contest_key in RANKED_ROUNDS else RANKED
                 )
             totals: list[tuple[int, UUID]] = []
+            full_names = resolve(group.filter(~pl.col("pooled"))["candidate"].unique().to_list(), harris, [])
             for (candidate, pooled), rows in group.group_by("candidate", "pooled", maintain_order=True):
                 option_key = f"{contest_key}:write-ins" if pooled else f"{contest_key}:{slug(str(candidate))}"
                 root = cs.key("us.option", option_key)
@@ -866,20 +930,26 @@ def emit() -> Path:
                         )
                         if len(found) == 1:
                             break
-                    person_key = (state, str(candidate))
                     head = cs.key("us.candidacy", f"{option_key}:head")
-                    if head in held:
+                    single = re.fullmatch(r"[A-Z'-]+", str(candidate)) is not None
+                    if single and len(found) == 1:
+                        ballot = initials(known_names[next(iter(found))])
+                    elif single and candidate in full_names:
+                        text = full_names[str(candidate)][0]
+                        ballot = initials(title(text) if text.isupper() else text)
+                    person_key = (state, ballot.upper() if single else str(candidate))
+                    if head in held and held[head] not in surnamed:
                         person = held[head]
                     elif len(found) == 1:
                         person = next(iter(found))
                     else:
                         person = persons.get(person_key) or cs.key(
-                            f"{SOURCE}.person", f"{state}:{slug(str(candidate))}"
+                            f"{SOURCE}.person", f"{state}:{slug(ballot if single else str(candidate))}"
                         )
                         if person in cs.minted and person_key not in persons:
                             cs.add("person", id=person)
                             name(person, ballot)
-                            if len(str(candidate).split()) == 1:
+                            if single and " " not in ballot:
                                 problems.append(f"surname only: {state} {office} {district} {candidate}")
                     persons[person_key] = person
                     cs.add(
@@ -949,5 +1019,11 @@ def emit() -> Path:
                 flags=pl.lit(0, pl.Int16),
             ),
         )
+        for person in surnamed - set(persons.values()):
+            cs.add(
+                "entity_retirement",
+                entity_id=person,
+                reason="A surname-only name in MEDSL's files, resolved to the full name",
+            )
         (PARSED / "problems.txt").write_text("\n".join(problems))
         return cs.write()
