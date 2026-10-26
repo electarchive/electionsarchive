@@ -105,9 +105,89 @@
       "url": "https://seculoxx.ibge.gov.br/images/seculoxx/arquivos_download/representacao_politica/1957/rep_polit_1957m_aeb_150_3.pdf"
     },
     "ibge-1963-gov": {
-      "title": "Anuário Estatístico do Brasil: Representação Política: Resultados das eleições para governador, 1960/62",
+      "title": "Anuário Estatístico do Brasil: Representação Política: Resultados das eleições para governador, 1960/62; Constituição do Congresso Nacional, 1963 (Senado)",
       "publisher": "IBGE",
       "url": "https://seculoxx.ibge.gov.br/images/seculoxx/arquivos_download/representacao_politica/1963/rep_polit_1963m_aeb_83.pdf"
+    },
+    "cf46": {
+      "title": "Constituição dos Estados Unidos do Brasil de 1946, with its Ato das Disposições Constitucionais Transitórias",
+      "publisher": "Presidência da República (Planalto)",
+      "url": "https://www.planalto.gov.br/ccivil_03/constituicao/constituicao46.htm"
+    },
+    "ibge-1948-cn": {
+      "title": "Anuário Estatístico do Brasil 1948: Representação Política V: Constituição do Congresso Nacional, 1947",
+      "publisher": "IBGE",
+      "url": "https://seculoxx.ibge.gov.br/images/seculoxx/arquivos_download/representacao_politica/1948/rep_polit_1948m_aeb_89.pdf"
+    },
+    "ibge-1949-ae": {
+      "title": "Anuário Estatístico do Brasil 1949: Representação Política: Resultado das eleições para as câmaras estaduais, 19-I-1947",
+      "publisher": "IBGE",
+      "url": "https://seculoxx.ibge.gov.br/images/seculoxx/arquivos_download/representacao_politica/1949/rep_polit1949m_aeb_93_1a95.pdf"
+    },
+    "ibge-1954-cn": {
+      "title": "Anuário Estatístico do Brasil 1954: Representação Política VII–VIII: Constituição do Congresso Nacional (Câmara dos Deputados) e das assembleias legislativas estaduais, 1950",
+      "publisher": "IBGE",
+      "url": "https://seculoxx.ibge.gov.br/images/seculoxx/arquivos_download/representacao_politica/1954/rep_polit_1954m_aeb_210_1.pdf"
+    },
+    "ibge-1954-sen": {
+      "title": "Anuário Estatístico do Brasil 1954: Representação Política VII: Constituição do Congresso Nacional, 1950 (Senado)",
+      "publisher": "IBGE",
+      "url": "https://seculoxx.ibge.gov.br/images/seculoxx/arquivos_download/representacao_politica/1954/rep_polit_1954m_aeb_209.pdf"
+    },
+    "ibge-1955-sen": {
+      "title": "Anuário Estatístico do Brasil 1955: Representação Política VII: Constituição do Congresso Nacional, 1954 (Senado)",
+      "publisher": "IBGE",
+      "url": "https://seculoxx.ibge.gov.br/images/seculoxx/arquivos_download/representacao_politica/1955/rep_polit_1955aeb_5.pdf"
+    },
+    "ibge-1955-cam": {
+      "title": "Anuário Estatístico do Brasil 1955: Representação Política VII: Constituição do Congresso Nacional, 1954 (Câmara dos Deputados)",
+      "publisher": "IBGE",
+      "url": "https://seculoxx.ibge.gov.br/images/seculoxx/arquivos_download/representacao_politica/1955/rep_polit_1955aeb_6.pdf"
+    },
+    "ibge-1955-ae": {
+      "title": "Anuário Estatístico do Brasil 1955: Representação Política VIII: Constituição das assembleias legislativas estaduais, 1954",
+      "publisher": "IBGE",
+      "url": "https://seculoxx.ibge.gov.br/images/seculoxx/arquivos_download/representacao_politica/1955/rep_polit_1955aeb_7.pdf"
+    },
+    "ibge-1959-cn": {
+      "title": "Anuário Estatístico do Brasil 1959: Representação Política VI: Constituição do Congresso Nacional, 1954/58",
+      "publisher": "IBGE",
+      "url": "https://seculoxx.ibge.gov.br/images/seculoxx/arquivos_download/representacao_politica/1959/rep_polit_1959m_aeb_136_1.pdf"
+    },
+    "ibge-1959-ae": {
+      "title": "Anuário Estatístico do Brasil 1959: Representação Política VII: Constituição das assembleias legislativas estaduais, 1958",
+      "publisher": "IBGE",
+      "url": "https://seculoxx.ibge.gov.br/images/seculoxx/arquivos_download/representacao_politica/1959/rep_polit_1959m_aeb_137.pdf"
+    },
+    "ibge-1963-cn": {
+      "title": "Anuário Estatístico do Brasil 1963: Representação Política: Constituição do Congresso Nacional (Câmara dos Deputados) e das assembleias estaduais, 1963",
+      "publisher": "IBGE",
+      "url": "https://seculoxx.ibge.gov.br/images/seculoxx/arquivos_download/representacao_politica/1963/rep_polit_1963m_aeb_84.pdf"
+    },
+    "ibge-1969-cn": {
+      "title": "Anuário Estatístico do Brasil 1969: Resultado das eleições para o Congresso Nacional (Câmara Federal) e para a Assembleia Legislativa, por Unidades da Federação, 1966",
+      "publisher": "IBGE (source: Tribunal Superior Eleitoral)",
+      "url": "https://seculoxx.ibge.gov.br/images/seculoxx/arquivos_download/representacao_politica/1969/rep_polit_1969_aeb_03_1.pdf"
+    },
+    "ibge-1969-sen": {
+      "title": "Anuário Estatístico do Brasil 1969: Resultado das eleições para o Congresso Nacional (Senado Federal), por Unidades da Federação, 1966",
+      "publisher": "IBGE (source: Tribunal Superior Eleitoral)",
+      "url": "https://seculoxx.ibge.gov.br/images/seculoxx/arquivos_download/representacao_politica/1969/rep_polit_1969_aeb_02_1.pdf"
+    },
+    "ibge-1971-sen": {
+      "title": "Anuário Estatístico do Brasil 1971: Número de Senadores eleitos, segundo as siglas partidárias, por Unidades da Federação, 15-11-1970",
+      "publisher": "IBGE (source: Tribunal Superior Eleitoral)",
+      "url": "https://seculoxx.ibge.gov.br/images/seculoxx/arquivos_download/representacao_politica/1971/rep_polit_m1971aeb_243_1.pdf"
+    },
+    "ibge-1975-sen": {
+      "title": "Anuário Estatístico do Brasil 1975: Número de Senadores eleitos, segundo as siglas partidárias, por Unidades da Federação, 15-11-1974",
+      "publisher": "IBGE (source: Tribunal Superior Eleitoral)",
+      "url": "https://seculoxx.ibge.gov.br/images/seculoxx/arquivos_download/representacao_politica/1975/rep_polit_1975_aeb_06_1.pdf"
+    },
+    "ibge-1983": {
+      "title": "Anuário Estatístico do Brasil 1983: Candidatos eleitos por partido político, segundo as Unidades da Federação, 1982",
+      "publisher": "IBGE (source: Tribunal Superior Eleitoral)",
+      "url": "https://seculoxx.ibge.gov.br/images/seculoxx/arquivos_download/representacao_politica/1983/rep_polit_1983m_aeb_262.pdf"
     }
   },
   "levels": [
@@ -249,14 +329,14 @@
       ],
       "gaps": [
         {
-          "from": 1954,
-          "to": 1966,
-          "note": "These elections aren't counted yet. The TSE's statistics volumes and IBGE's statistical yearbooks have the numbers, but the archive has not yet processed them for these years."
+          "from": 1978,
+          "to": 1978,
+          "note": "This election isn't counted yet. IBGE's statistical yearbooks don't print seats or results for it."
         },
         {
-          "from": 1978,
+          "from": 1986,
           "to": 1990,
-          "note": "These elections aren't counted yet. The TSE's statistics volumes and IBGE's statistical yearbooks have the numbers, but the archive has not yet processed them for these years."
+          "note": "These elections aren't counted yet. IBGE's statistical yearbooks don't print seats or results for them. The TSE's 1986 results volume is in the Câmara dos Deputados library, and the TSE's 1990 seat resolution covers 1990."
         }
       ],
       "elections": [
@@ -277,6 +357,37 @@
           "note": "Counted per unit of the federation that elected members: the states, the federal district, and the federal territories that had seats."
         },
         {
+          "date": "1954-10-03",
+          "contests": 25,
+          "seats": 340,
+          "source": "ibge-1955-cam",
+          "quote": "p. 616, VII — Constituição do Congresso Nacional — 1954, 2. Câmara dos Deputados: 25 rows (Guaporé to Goiás), BRASIL 340",
+          "note": "IBGE's table gives the chamber's makeup at the start of the legislature, with one row for each unit that elected members."
+        },
+        {
+          "date": "1958-10-03",
+          "contests": 25,
+          "seats": 326,
+          "source": "ibge-1959-cn",
+          "quote": "p. 475, VI — Constituição do Congresso Nacional — 1954/58, 2. Câmara dos Deputados: 25 rows (Rondônia to Goiás), BRASIL 326",
+          "note": "IBGE's table gives the chamber's makeup at the start of the legislature, with one row for each unit that elected members."
+        },
+        {
+          "date": "1962-10-07",
+          "contests": 25,
+          "seats": 409,
+          "source": "ibge-1963-cn",
+          "quote": "p. 428, Constituição do Congresso Nacional — 1963, 2. Câmara dos Deputados: 25 rows (Rondônia to Goiás), BRASIL 409",
+          "note": "IBGE's table gives the chamber's makeup at the start of the legislature, with one row for each unit that elected members."
+        },
+        {
+          "date": "1966-11-15",
+          "contests": 25,
+          "source": "ibge-1969-cn",
+          "quote": "p. 703, 6.4.1.5 Resultado das eleições para o Congresso Nacional — 1966, b) Câmara Federal: 25 rows (Rondônia to Goiás), votos BRASIL 17 285 556",
+          "note": "For this election IBGE prints votes by unit, not seats, so seats are left out."
+        },
+        {
           "date": "1970-11-15",
           "contests": 25,
           "seats": 310,
@@ -290,6 +401,14 @@
           "seats": 364,
           "source": "ibge-1975",
           "quote": "Tablo 6.4.1.7 (15-11-1974): 25 Unidades da Federação rows (Rondônia to Goiás), BRASIL 364",
+          "note": "Counted per unit of the federation that elected members: the states, the federal district, and the federal territories that had seats."
+        },
+        {
+          "date": "1982-11-15",
+          "contests": 25,
+          "seats": 479,
+          "source": "ibge-1983",
+          "quote": "p. 354, Candidatos eleitos em 15-11 — 1982, Deputados federais: 25 rows (Rondônia to Goiás), BRASIL 479",
           "note": "Counted per unit of the federation that elected members: the states, the federal district, and the federal territories that had seats."
         },
         {
@@ -382,9 +501,14 @@
       ],
       "gaps": [
         {
-          "from": 1947,
+          "from": 1978,
+          "to": 1978,
+          "note": "This election isn't counted yet. IBGE's statistical yearbooks don't print seats or results for it."
+        },
+        {
+          "from": 1986,
           "to": 1990,
-          "note": "These elections aren't counted yet. The TSE's statistics volumes and IBGE's statistical yearbooks have the numbers, but the archive has not yet processed them for these years."
+          "note": "These elections aren't counted yet. IBGE's statistical yearbooks don't print seats or results for them. The TSE's 1986 results volume is in the Câmara dos Deputados library, and the TSE's 1990 seat resolution covers 1990."
         }
       ],
       "elections": [
@@ -395,6 +519,71 @@
           "source": "senado-noticias",
           "quote": "Em dezembro daquele ano, cada estado escolheu dois senadores para a Assembleia Nacional Constituinte.",
           "note": "Counted per unit of the federation that elected members: the states, the federal district, and the federal territories that had seats."
+        },
+        {
+          "date": "1947-01-19",
+          "contests": 21,
+          "seats": 21,
+          "source": "ibge-1948-cn",
+          "quote": "p. 545, V — Constituição do Congresso Nacional — 1947, 1. Senado: 21 units with 3 each (Amazonas to Goiás, Distrito Federal included; Acre none), BRASIL 63",
+          "note": "The 1946 Constitution's transitional provisions (art. 11, § 2) called this election in every state and the federal district to fill each one's third Senate seat."
+        },
+        {
+          "date": "1950-10-03",
+          "contests": 21,
+          "source": "ibge-1954-sen",
+          "quote": "p. 541, VII — Constituição do Congresso Nacional — 1950, 1. Senado: 21 units with 3 each, BRASIL 63",
+          "note": "IBGE's table gives the whole Senate, three members per unit. Under the 1946 Constitution (art. 60, § 3), each unit renewed one or two of its three seats at every election, so each unit with senators counts as one contest."
+        },
+        {
+          "date": "1954-10-03",
+          "contests": 21,
+          "source": "ibge-1955-sen",
+          "quote": "p. 615, VII — Constituição do Congresso Nacional — 1954, 1. Senado: 21 units with 3 each (Guaporé, Acre, Rio Branco, and Amapá none), BRASIL 63",
+          "note": "IBGE's table gives the whole Senate, three members per unit. Under the 1946 Constitution (art. 60, § 3), each unit renewed one or two of its three seats at every election, so each unit with senators counts as one contest."
+        },
+        {
+          "date": "1958-10-03",
+          "contests": 21,
+          "source": "ibge-1959-cn",
+          "quote": "p. 475, VI — Constituição do Congresso Nacional — 1954/58, 1. Senado: 21 units with 3 each, BRASIL 63",
+          "note": "IBGE's table gives the whole Senate, three members per unit. Under the 1946 Constitution (art. 60, § 3), each unit renewed one or two of its three seats at every election, so each unit with senators counts as one contest."
+        },
+        {
+          "date": "1962-10-07",
+          "contests": 22,
+          "source": "ibge-1963-gov",
+          "quote": "p. 427, Constituição do Congresso Nacional — 1963, 1. Senado: 22 units with 3 each (Acre to Goiás), BRASIL 66",
+          "note": "IBGE's table gives the whole Senate, three members per unit. Under the 1946 Constitution (art. 60, § 3), each unit renewed one or two of its three seats at every election, so each unit with senators counts as one contest."
+        },
+        {
+          "date": "1966-11-15",
+          "contests": 22,
+          "source": "ibge-1969-sen",
+          "quote": "p. 702, 6.4.1.5 Resultado das eleições para o Congresso Nacional — 1966, a) Senado Federal: 22 rows (Acre to Goiás), votos BRASIL 17 259 598",
+          "note": "For this election IBGE prints votes by unit, not seats, so seats are left out."
+        },
+        {
+          "date": "1970-11-15",
+          "contests": 22,
+          "seats": 46,
+          "source": "ibge-1971-sen",
+          "quote": "p. 818, Número de Senadores eleitos — 15-11-1970: 22 rows (Acre to Goiás), BRASIL 46 (ARENA 41, MDB 5)"
+        },
+        {
+          "date": "1974-11-15",
+          "contests": 22,
+          "seats": 22,
+          "source": "ibge-1975-sen",
+          "quote": "p. 988, Número de Senadores eleitos — 15-11-1974: 22 rows (Acre to Goiás), BRASIL 22 (ARENA 6, MDB 16)"
+        },
+        {
+          "date": "1982-11-15",
+          "contests": 23,
+          "seats": 25,
+          "source": "ibge-1983",
+          "quote": "p. 354, Candidatos eleitos em 15-11 — 1982, Senadores: 23 units (Rondônia 3, the other 22 states 1 each; Roraima and Amapá —), BRASIL 25",
+          "note": "Rondônia, a new state, elected three senators and every other state elected one. Roraima and Amapá were still territories and had no senators."
         },
         {
           "date": "1994-10-03",
@@ -482,9 +671,14 @@
       ],
       "gaps": [
         {
-          "from": 1962,
+          "from": 1965,
+          "to": 1965,
+          "note": "Eleven states elected governors directly in October 1965. These elections aren't counted yet, because IBGE's statistical yearbooks don't print them. From 1966 to 1978, governors were chosen indirectly, so there was no popular vote."
+        },
+        {
+          "from": 1986,
           "to": 1990,
-          "note": "These elections aren't counted yet. The TSE's statistics volumes and IBGE's statistical yearbooks have the numbers, but the archive has not yet processed them for these years. From 1966 to 1978, governors were chosen indirectly, so there was no popular vote."
+          "note": "These elections aren't counted yet. IBGE's statistical yearbooks don't print seats or results for them. The TSE's 1986 results volume is in the Câmara dos Deputados library, and the TSE's 1990 seat resolution covers 1990."
         }
       ],
       "elections": [
@@ -519,6 +713,20 @@
           "contests": 11,
           "source": "ibge-1963-gov",
           "quote": "RESULTADOS DAS ELEICOES PARA GOVERNADOR — 1960/62 ... Luiz de Souza Cavalcante ... UDN ... 38 915 ... 1960 ... Carlos Frederico Werncck de Lacerd ... UDN ... 357 153 ... 1960 ... José de Magalhaes Pinto ... UDN ... 760 427 ... 1960 ... Fernando Corréa da Costa ... UDN ... 66 208 ... 1960"
+        },
+        {
+          "date": "1962-10-07",
+          "contests": 11,
+          "source": "ibge-1963-gov",
+          "quote": "p. 427, Resultados das eleições para governador — 1960/62: 1962 for Acre, Amazonas, Piauí, Ceará, Pernambuco, Sergipe, Bahia, Rio de Janeiro, Guanabara, São Paulo, and Rio Grande do Sul",
+          "note": "Governors' terms were staggered: eleven states elected governors in 1960 and eleven in 1962."
+        },
+        {
+          "date": "1982-11-15",
+          "contests": 22,
+          "source": "ibge-1983",
+          "quote": "p. 354, Candidatos eleitos em 15-11 — 1982, Governadores: 22 states, BRASIL 22; Rondônia — (1) Lei Complementar n.º 41, 22-12-81",
+          "note": "Rondônia's first governor was appointed under Lei Complementar 41 of 1981, so 22 states voted."
         },
         {
           "date": "1994-10-03",
@@ -605,17 +813,63 @@
       ],
       "gaps": [
         {
-          "from": 1947,
-          "to": 1966,
-          "note": "These elections aren't counted yet. The TSE's statistics volumes and IBGE's statistical yearbooks have the numbers, but the archive has not yet processed them for these years."
+          "from": 1978,
+          "to": 1978,
+          "note": "This election isn't counted yet. IBGE's statistical yearbooks don't print seats or results for it."
         },
         {
-          "from": 1978,
+          "from": 1986,
           "to": 1990,
-          "note": "These elections aren't counted yet. The TSE's statistics volumes and IBGE's statistical yearbooks have the numbers, but the archive has not yet processed them for these years."
+          "note": "These elections aren't counted yet. IBGE's statistical yearbooks don't print seats or results for them. The TSE's 1986 results volume is in the Câmara dos Deputados library, and the TSE's 1990 seat resolution covers 1990."
         }
       ],
       "elections": [
+        {
+          "date": "1947-01-19",
+          "contests": 20,
+          "seats": 855,
+          "source": "ibge-1949-ae",
+          "quote": "p. 641, Resultado das eleições para as câmaras estaduais — 19-I-1947, 2. Deputados eleitos: 21 rows, BRASIL 905, of which Distrito Federal (5) 50",
+          "note": "The table's row for the federal district is the Rio de Janeiro city council, not a state assembly, so it is left out of the count and the seats."
+        },
+        {
+          "date": "1950-10-03",
+          "contests": 20,
+          "seats": 880,
+          "source": "ibge-1954-cn",
+          "quote": "p. 542, VIII — Constituição das assembleias legislativas estaduais — 1950: 21 rows, BRASIL 930, of which Distrito Federal (1) 50",
+          "note": "The table's row for the federal district is the Rio de Janeiro city council, not a state assembly, so it is left out of the count and the seats."
+        },
+        {
+          "date": "1954-10-03",
+          "contests": 20,
+          "seats": 886,
+          "source": "ibge-1955-ae",
+          "quote": "p. 617, VIII — Constituição das assembleias legislativas estaduais — 1954: 21 rows, BRASIL 936, of which Distrito Federal (1) 50",
+          "note": "The table's row for the federal district is the Rio de Janeiro city council, not a state assembly, so it is left out of the count and the seats."
+        },
+        {
+          "date": "1958-10-03",
+          "contests": 20,
+          "seats": 913,
+          "source": "ibge-1959-ae",
+          "quote": "p. 476, VII — Constituição das assembleias legislativas estaduais — 1958: 21 rows, BRASIL 963, of which Distrito Federal (1) 50",
+          "note": "The table's row for the federal district is the Rio de Janeiro city council, not a state assembly, so it is left out of the count and the seats."
+        },
+        {
+          "date": "1962-10-07",
+          "contests": 22,
+          "seats": 1073,
+          "source": "ibge-1963-cn",
+          "quote": "p. 428, Constituição das assembleias estaduais — 1963: 22 rows (Acre to Goiás), BRASIL 1 073"
+        },
+        {
+          "date": "1966-11-15",
+          "contests": 22,
+          "source": "ibge-1969-cn",
+          "quote": "p. 703, 6.4.1.6 Resultado das eleições para a Assembléia Legislativa — 1966: 22 rows (Acre to Goiás), votos BRASIL 17 260 382",
+          "note": "For this election IBGE prints votes by unit, not seats, so seats are left out."
+        },
         {
           "date": "1970-11-15",
           "contests": 22,
@@ -629,6 +883,14 @@
           "seats": 787,
           "source": "ibge-1975",
           "quote": "Tablo 6.4.1.8 (15-11-1974): 22 Unidades da Federação rows (Acre to Goiás), BRASIL 787"
+        },
+        {
+          "date": "1982-11-15",
+          "contests": 23,
+          "seats": 947,
+          "source": "ibge-1983",
+          "quote": "p. 354, Candidatos eleitos em 15-11 — 1982, Deputados estaduais: 23 units (Rondônia and the 22 states; Roraima and Amapá —), BRASIL 947",
+          "note": "The 22 states and the new state of Rondônia elected assemblies. Roraima and Amapá were still territories and had none."
         },
         {
           "date": "1994-10-03",
