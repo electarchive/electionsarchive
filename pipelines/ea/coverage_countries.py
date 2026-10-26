@@ -158,6 +158,8 @@ def region(cc: str, scheme: str | None, code: str | None, parent: str | None, el
     if code is not None:
         if cc == "gb" and ":" in code:
             return code.split(":", 1)[1][:3].upper()
+        if cc == "gb" and code[:4] in ("eng-", "sct-", "wls-", "irl-"):
+            return code[:3].upper()
         if cc == "fr" and scheme == "fr.circonscription":
             return code[:3] if code.startswith("97") else code[:-2].zfill(2)
         if cc == "fr" and scheme == "fr.departement":
