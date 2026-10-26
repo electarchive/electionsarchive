@@ -1226,12 +1226,7 @@ def publish(conn: Connection, changeset_id: str) -> None:
                where not exists (select from entity_merge m where m.entity_id = c.into_id)"""
         )
         conn.execute("analyze survivor")
-        types = [
-            kind
-            for (kind,) in conn.execute(
-                "select distinct e.type::text from survivor s join entity e on e.id = s.entity_id"
-            ).fetchall()
-        ]
+        types = [kind for (kind,) in conn.execute("select unnest(enum_range(null::entity_type))::text").fetchall()]
         referencing = {
             (relation, column)
             for relation, column in conn.execute(
