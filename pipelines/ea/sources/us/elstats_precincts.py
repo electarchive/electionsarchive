@@ -1,8 +1,10 @@
 import csv
+import io
 import json
 import re
 import time
-from datetime import timedelta
+import zipfile
+from datetime import date, timedelta
 from pathlib import Path
 from urllib.parse import urlencode
 
@@ -20,7 +22,9 @@ TENANTS = {"VA": elstats.TENANTS["VA"]}
 YEARS = range(2000, 2026)
 OFFICES = ["President", "Governor", "U.S. Senate", "U.S. House", "United States", "Congress"]
 FLAWED = {"2010-11-02:VA:house:3"}
-TALLIES = {"Total Votes Cast", "Undervotes", "Overvotes", "Total Ballots Cast", "Blank", "Over Votes", "Under Votes"}
+MA_CHAMBERS = {1: "president", 3: "governor", 5: "house", 6: "senate"}
+MA_STAGES = {"General Election": False, "Special General Election": True}
+TALLIES = {"Total Votes Cast", "Undervotes", "Overvotes", "Total Ballots Cast", "Blank", "Blanks", "Over Votes", "Under Votes"}
 
 
 def search(tenant: str, year: int) -> str:
@@ -73,7 +77,35 @@ def contests(state: str) -> pl.DataFrame:
     )
 
 
+def ma_contests() -> list[tuple[str, int, bool, str, int | None]]:
+    found = []
+    for office, chamber in MA_CHAMBERS.items():
+        listing = raw.cached(SOURCE, f"{elstats.MASSACHUSETTS}search/year_from:2000/year_to:2025/office_id:{office}")
+        for election, year, district, stage in elstats.MA_ROW.findall(listing.path.read_text()):
+            if stage in MA_STAGES:
+                number = re.match(r"(\d+)", district)
+                found.append((election, int(year), MA_STAGES[stage], chamber, int(number[1]) if number else None))
+    return found
+
+
+def ma_table(election: str) -> str:
+    return f"{elstats.MASSACHUSETTS}download/{election}/precincts_include:1/"
+
+
 def fetch() -> None:
+    for office in MA_CHAMBERS:
+        url = f"{elstats.MASSACHUSETTS}search/year_from:2000/year_to:2025/office_id:{office}"
+        try:
+            raw.cached(SOURCE, url)
+        except LookupError:
+            raw.fetch(SOURCE, url, suffix=".html")
+            time.sleep(1)
+    for election, *_ in ma_contests():
+        try:
+            raw.cached(SOURCE, ma_table(election))
+        except LookupError:
+            raw.fetch(SOURCE, ma_table(election), suffix=".csv")
+            time.sleep(1)
     for state, (tenant, _, _) in TENANTS.items():
         for year in YEARS:
             try:
@@ -139,6 +171,76 @@ def parse() -> None:
                     source=pl.lit(state),
                 )
             )
+    with zipfile.ZipFile(raw.cached(elstats.SOURCE, elstats.GAZETTEER).path) as archive:
+        gazetteer = pl.read_csv(
+            io.BytesIO(archive.read(archive.namelist()[0])), separator="\t", infer_schema=False
+        ).filter(pl.col("USPS") == "MA")
+    places: dict[str, str] = {}
+    for geoid, name in gazetteer.select("GEOID", "NAME").iter_rows():
+        places.setdefault(elstats.plain(name), geoid[:5])
+        places.setdefault(elstats.plain(re.sub(elstats.SUFFIXES, "", name.lower())), geoid[:5])
+    with connect() as conn:
+        specials = [key for key in oe_federal.wanted(conn, SOURCE, "MA") if key.endswith(":special")]
+    for election, year, special, chamber, district in ma_contests():
+        lines = raw.cached(SOURCE, ma_table(election)).path.read_text().splitlines()
+        names = [re.sub(r"\s+", " ", name).strip() for name in next(csv.reader(lines[:1]))]
+        grid = pl.read_csv(
+            "\n".join(lines[2:]).encode(), has_header=False, infer_schema=False, truncate_ragged_lines=True
+        )
+        grid = grid.rename({column: f"c{index}" for index, column in enumerate(grid.columns)})
+        columns = [f"c{index}" for index, name in enumerate(names) if index >= 3 and name and name not in TALLIES]
+        if special:
+            keys = [
+                key for key in specials if key[:4] == str(year) and f":{chamber}" in key
+                and (chamber != "house" or f":house:{district}:" in key)
+            ]
+            if len(keys) != 1:
+                continue
+            day = date.fromisoformat(keys[0][:10])
+        else:
+            day = date(year, 11, 2 + (-date(year, 11, 1).weekday()) % 7)
+        town = (
+            pl.col("c0")
+            .str.replace(r"^N\. ", "North ")
+            .str.replace(r"^S\. ", "South ")
+            .str.replace(r"^E\. ", "East ")
+            .str.replace(r"^W\. ", "West ")
+        )
+        fips = town.map_elements(elstats.plain, return_dtype=pl.String).replace_strict(places, default=None)
+        frames.append(
+            grid.filter(pl.col("c0").is_not_null(), pl.col("c0") != "TOTALS", pl.col("c2").is_not_null())
+            .unpivot(columns, index=["c0", "c1", "c2"], variable_name="column", value_name="votes")
+            .with_columns(
+                locality=town,
+                fips=fips,
+                candidate=pl.col("column").replace_strict({f"c{index}": name for index, name in enumerate(names)}),
+            )
+            .select(
+                year=pl.lit(day.year, pl.Int32),
+                chamber=pl.lit(chamber),
+                day=pl.lit(day),
+                special=pl.lit(special),
+                state=pl.lit("MA"),
+                district=pl.lit(district if chamber == "house" else None, pl.Int16),
+                fips="fips",
+                locality="locality",
+                code=pl.concat_str(
+                    pl.lit(f"{day.year}:MA:"),
+                    "fips",
+                    pl.lit(":ES:"),
+                    "locality",
+                    pl.when(pl.col("c1") != "-").then(pl.lit(" Ward ") + pl.col("c1")).otherwise(pl.lit("")),
+                    pl.lit(" Precinct "),
+                    "c2",
+                ),
+                candidate=pl.col("candidate").str.to_uppercase().str.replace(r"/.*$", "").str.strip_chars(),
+                measure=pl.lit(1, pl.Int16),
+                writein=pl.col("candidate").str.contains("(?i)write|all others"),
+                votes=pl.col("votes").str.replace_all(",", "").cast(pl.Int64),
+                kind=pl.lit("precinct"),
+                source=pl.lit("MA"),
+            )
+        )
     frame = pl.concat(frames)
     lost = frame.filter(pl.col("fips").is_null())
     if lost.height:
@@ -193,6 +295,22 @@ def emit() -> Path:
                 "contest_id"
             ]:
                 cs.artifact(raw.cached(SOURCE, table(tenant, contest)), sources[state])
+        if "MA" in frame["state"].to_list():
+            sources["MA"] = cs.source(elstats.MA_PUBLISHER, elstats.TITLE)
+            if sources["MA"] in cs.minted:
+                cs.add(
+                    "source",
+                    id=sources["MA"],
+                    kind="official_body",
+                    publisher=elstats.MA_PUBLISHER,
+                    title=elstats.TITLE,
+                    url="https://electionstats.state.ma.us",
+                    license="Public record",
+                )
+            kept = set(frame.filter(pl.col("state") == "MA")["year"])
+            for election, year, *_ in ma_contests():
+                if year in kept:
+                    cs.artifact(raw.cached(SOURCE, ma_table(election)), sources["MA"])
         medsl.attach(cs, conn, frame, sources, grain="precinct")
         used = set(pl.concat(cs.frames["result_value"])["unit_id"].unique()) if cs.frames.get("result_value") else set()
         counties = {
