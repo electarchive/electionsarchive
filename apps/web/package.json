@@ -57,6 +57,7 @@
     "formsnap": "catalog:",
     "maplibre-gl": "catalog:",
     "mode-watcher": "catalog:",
+    "playwright-core": "catalog:",
     "pmtiles": "catalog:",
     "shadcn-svelte": "catalog:",
     "svelte": "catalog:",

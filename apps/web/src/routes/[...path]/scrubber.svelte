@@ -595,7 +595,7 @@
               tiles={race.map.tiles}
               own={race.map.own}
               nested={race.map.nested}
-              frames={race.map.frames}
+              frame={race.map.frame}
               isApproximate={race.map.isApproximate}
               sources={race.map.credits}
               noun={places.levels[0]?.noun ?? ""}

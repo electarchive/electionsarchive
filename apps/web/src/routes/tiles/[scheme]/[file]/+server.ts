@@ -6,11 +6,11 @@ import path from "node:path";
 import { Readable } from "node:stream";
 import type { RequestHandler } from "./$types";
 
-const ROOT = path.resolve("../../data/tiles");
+const ROOT = path.resolve("../../data/plane");
 
 export const GET: RequestHandler = async ({ params, request }) => {
   if (
-    !/^[a-z]{2}\.[a-z_]+$/u.test(params.scheme) ||
+    !/^[a-z]{2,5}\.[a-z_]+$/u.test(params.scheme) ||
     !/^[\w-]+(?:\.ids)?\.pmtiles$/u.test(params.file)
   ) {
     error(404);

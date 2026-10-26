@@ -138,7 +138,7 @@
           )}
           tiles={shape.map.tiles}
           own={shape.map.own}
-          frames={shape.map.frames}
+          frame={shape.map.frame}
           isApproximate={shape.map.isApproximate}
           sources={shape.map.credits}
           noun={shape.places.levels[0]?.noun ?? ""}

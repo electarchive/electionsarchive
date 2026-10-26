@@ -679,7 +679,7 @@ export async function archive(path: string, search: URLSearchParams) {
       if (
         siblings == null ||
         contest.locator != null ||
-        (own != null && level?.tiles != null && own.frames.length > 0)
+        (own != null && level?.tiles != null && own.frame != null)
       ) {
         return null;
       }

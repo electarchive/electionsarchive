@@ -173,10 +173,7 @@
     const own = found.find(
       (entry) => entry.k != null && entry.scheme !== places?.level,
     );
-    return places == null ||
-      level?.tiles == null ||
-      own == null ||
-      own.frames.length === 0
+    return places == null || level?.tiles == null || own?.frame == null
       ? null
       : {
           places,
@@ -185,7 +182,7 @@
             own.tiles == null || own.k == null
               ? null
               : { tiles: own.tiles, k: own.k },
-          frames: own.frames,
+          frame: own.frame,
           isApproximate: level.isApproximate,
           noun:
             places.levels.find((entry) => entry.code === places.level)?.noun ??
@@ -1135,7 +1132,7 @@
                     colors={legend.map((item) => swatch(item.color, item.key))}
                     tiles={drawn.tiles}
                     own={drawn.own}
-                    frames={drawn.frames}
+                    frame={drawn.frame}
                     isApproximate={drawn.isApproximate}
                     noun={drawn.noun}
                     votes={m.col_votes()}

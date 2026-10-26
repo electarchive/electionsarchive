@@ -114,7 +114,7 @@
           )}
           tiles={found.map.tiles}
           own={found.map.own}
-          frames={found.map.frames}
+          frame={found.map.frame}
           isApproximate={found.map.isApproximate}
           {noun}
           votes={m.col_votes()}

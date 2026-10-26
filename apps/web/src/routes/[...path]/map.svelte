@@ -5,6 +5,7 @@
 
 <script lang="ts">
   import type * as Maplibre from "maplibre-gl";
+  import type { Box } from "#lib/map/engine.svelte.js";
   import { goto, preloadData } from "$app/navigation";
   import { resolve } from "$app/paths";
   import { page } from "$app/state";
@@ -13,11 +14,11 @@
   import PlusIcon from "@lucide/svelte/icons/plus";
   import ScanIcon from "@lucide/svelte/icons/scan";
   import XIcon from "@lucide/svelte/icons/x";
-  import { mode } from "mode-watcher";
   import { untrack } from "svelte";
   import { on } from "svelte/events";
   import { fade, fly } from "svelte/transition";
   import Export from "#lib/components/export.svelte";
+  import { Engine } from "#lib/map/engine.svelte.js";
   import * as Select from "#lib/components/ui/select/index.js";
   import { count, percent, plural, points, precision } from "#lib/format.js";
   import { keep } from "#lib/linked.js";
@@ -37,7 +38,7 @@
     tiles,
     own,
     nested = null,
-    frames,
+    frame,
     blank = null,
     isApproximate,
     noun,
@@ -62,7 +63,7 @@
     tiles: string;
     own: { tiles: string; k: number } | null;
     nested?: { tiles: string; ks: Array<number> } | null;
-    frames: Array<{ west: number; south: number; east: number; north: number }>;
+    frame: Box;
     blank?: Array<{ k: number; name: string; isHeld: boolean }> | null;
     isApproximate: boolean;
     noun: string;
@@ -115,9 +116,6 @@
   ] as const;
 
   const uid = $props.id();
-  let maps = $state<Array<Maplibre.Map>>([]);
-  const ready = new WeakSet<Maplibre.Map>();
-  let isLoaded = $state(false);
   let opening = $state<number | null>(null);
   let still = $state(
     untrack(() =>
@@ -129,7 +127,6 @@
   );
   handoff = null;
   let dwell: ReturnType<typeof setTimeout> | undefined;
-  let credits = $state<Array<string>>([]);
   let pinned = $state<number | null>(null);
   let empty = $state<number | null>(null);
   let pointer = $state<{ x: number; y: number } | null>(null);
@@ -139,7 +136,6 @@
     Array<{ k: number; name: string; path: string; isAdjacent: boolean }>
   >([]);
   let seen = $state<Array<number>>([]);
-  let isMoved = false;
   let boxWidth = $state(0);
   let boxHeight = $state(0);
   let cardWidth = $state(0);
@@ -183,21 +179,100 @@
       keep({ shade: shading === shade ? null : String(shading) });
     }
   });
-  let fit: Maplibre.PaddingOptions = {
-    top: 24,
-    right: 24,
-    bottom: 24,
-    left: 24,
-  };
-  let snug: {
-    zoom: number;
-    center: Maplibre.LngLat;
-    wide: number;
-    tall: number;
-    across: number;
-    down: number;
-  } | null = null;
-  let traced: Array<[number, number]> | null = null;
+  const engine = new Engine(
+    untrack(() => frame),
+    (width, height) => {
+      const edge = Math.max(24, Math.round(Math.min(width, height) * 0.06));
+      return {
+        top: edge + (up == null ? 0 : 20),
+        right: edge + 36,
+        bottom: edge,
+        left: edge,
+      };
+    },
+    {
+      cooperative: true,
+      gestures: {
+        "CooperativeGesturesHandler.WindowsHelpText": m.map_gesture_windows(),
+        "CooperativeGesturesHandler.MacHelpText": m.map_gesture_mac(),
+        "CooperativeGesturesHandler.MobileHelpText": m.map_gesture_mobile(),
+      },
+      onReady: () => untrack(setup),
+      onMoveEnd: () => {
+        if (own != null) {
+          seen = engine.rendered("veil");
+        }
+      },
+      onPointer: ({ kind, point, isTouch }) => {
+        if (kind === "leave") {
+          clearTimeout(dwell);
+          pointer = null;
+          empty = null;
+          engine.cursor(false);
+          if (pinned == null) {
+            focus = null;
+          }
+          if (!nearPinned) {
+            near = null;
+          }
+          return;
+        }
+        const id = engine.pick(point);
+        const k = id != null && rows.has(id) ? id : null;
+        const other =
+          k == null && own != null ? engine.pick(point, ["veil"]) : null;
+        const next = other == null ? undefined : besides.get(other);
+        if (kind === "move") {
+          pointer = point;
+          const path = k == null ? null : rows.get(k)?.path;
+          empty = k == null && id != null && blanks.has(id) ? id : null;
+          if (!nearPinned) {
+            near = next?.k ?? null;
+          }
+          engine.cursor(path != null || next != null);
+          if (pinned == null && focus !== k) {
+            focus = k;
+            clearTimeout(dwell);
+            if (path != null) {
+              dwell = setTimeout(() => {
+                const href = resolve("/[...path]", { path });
+                if (focus === k && warmed[href] !== true) {
+                  warmed[href] = true;
+                  void preloadData(href);
+                }
+              }, 350);
+            }
+          }
+          return;
+        }
+        if (k == null) {
+          pinned = null;
+          focus = null;
+          if (next == null) {
+            nearPinned = false;
+            near = null;
+          } else if (isTouch && !(nearPinned && near === next.k)) {
+            near = next.k;
+            nearPinned = true;
+          } else {
+            void goto(resolve("/[...path]", { path: next.path }));
+          }
+        } else if (isTouch && pinned !== k) {
+          nearPinned = false;
+          near = null;
+          pinned = k;
+          focus = k;
+        } else {
+          open(k);
+        }
+      },
+    },
+  );
+  const source = engine.tiles(untrack(() => tiles));
+  const outer = untrack(() => (own == null ? null : engine.tiles(own.tiles)));
+  const inside = untrack(() =>
+    nested == null ? null : engine.tiles(nested.tiles),
+  );
 
   const pools = $derived(places.rows.filter((row) => row.isPool === true));
   const rows = $derived(
@@ -206,7 +281,6 @@
     ),
   );
   let isHex = $state(true);
-  let reader = $state<((css: string) => string) | null>(null);
   const grid = $derived.by(() => {
     if (hexes == null) {
       return null;
@@ -276,13 +350,14 @@
     };
   });
   const isHexView = $derived(grid != null && isHex);
-  const tinted = $derived(
-    isHexView && reader != null
-      ? new Map(fills(reader))
-      : new Map<number, string>(),
-  );
+  const tinted = $derived.by(() => {
+    void engine.theme;
+    return isHexView
+      ? new Map(fills((css) => engine.read(css)))
+      : new Map<number, string>();
+  });
   const credited = $derived([
-    ...(sources ?? credits),
+    ...(sources ?? engine.credits),
     ...(isHexView && hexes != null
       ? [m.map_hex_credit({ credit: hexes.credit })]
       : []),
@@ -315,43 +390,6 @@
     const index = view;
     return places.rows.filter((row) => row.absent?.includes(index) === true);
   });
-  const scopes = $derived(
-    frames.map((frame): Maplibre.FilterSpecification | null => {
-      if (frames.length < 2) {
-        return null;
-      }
-      const padX = ((frame.east - frame.west + 360) % 360 || 360) * 0.06;
-      const padY = (frame.north - frame.south) * 0.06;
-      const west = frame.west - padX;
-      const east = frame.east + padX;
-      return [
-        "any",
-        ["in", ["id"], ["literal", [...blanks.keys()]]],
-        [
-          "in",
-          ["id"],
-          [
-            "literal",
-            [...places.rows, ...(places.districts ?? [])].flatMap((row) => {
-              const at = row.at;
-              if (at == null) {
-                return [row.k];
-              }
-              const [x, y] = at;
-              const isAcross =
-                west <= east ? x >= west && x <= east : x >= west || x <= east;
-              return isAcross &&
-                y >= frame.south - padY &&
-                y <= frame.north + padY
-                ? [row.k]
-                : [];
-            }),
-          ],
-        ],
-      ];
-    }),
-  );
-  const hit = $derived(nested == null ? ["fill"] : ["nested-fill", "fill"]);
   const isCompared = $derived(
     span != null &&
       places.rows.some((row) => row.earlier != null || row.redrawn != null),
@@ -457,18 +495,11 @@
     if (isHexView && grid != null) {
       return Math.min(2, Math.max(0.6, grid.width / grid.height));
     }
-    const frame = frames[0];
-    if (frame == null) {
-      return 4 / 3;
-    }
     const y = (latitude: number) =>
       Math.log(Math.tan(Math.PI / 4 + (latitude * Math.PI) / 360));
     const wide = ((frame.east - frame.west) * Math.PI) / 180;
     const tall = y(frame.north) - y(frame.south);
-    return Math.min(
-      frames.length > 1 ? 1.5 : 2,
-      Math.max(0.8, (wide / Math.max(tall, 0.0001)) * 1.04),
-    );
+    return Math.min(2, Math.max(0.8, (wide / Math.max(tall, 0.0001)) * 1.04));
   });
   let isKeyed = $state(false);
   const leads = $derived(
@@ -580,13 +611,11 @@
     if (anchor == null && isHexView && current != null) {
       anchor = place(current.k);
     }
-    if (
-      anchor == null &&
-      !isHexView &&
-      current?.at != null &&
-      maps[0] != null
-    ) {
-      const projected = maps[0].project(current.at);
+    const projected =
+      anchor == null && !isHexView && current?.at != null
+        ? engine.project(current.at)
+        : null;
+    if (projected != null) {
       anchor =
         projected.x >= 0 &&
         projected.y >= 0 &&
@@ -632,30 +661,8 @@
       return;
     }
     const href = resolve("/[...path]", { path });
-    const map = maps[0];
-    const parts =
-      map?.querySourceFeatures("places", {
-        sourceLayer: "areas",
-        filter: ["==", ["id"], k],
-      }) ?? [];
-    const box = [Infinity, Infinity, -Infinity, -Infinity];
-    for (const part of parts) {
-      for (const pair of JSON.stringify(part.geometry).matchAll(
-        /\[([\d.e-]+),([\d.e-]+)\]/g,
-      )) {
-        const x = Number(pair[1]);
-        const y = Number(pair[2]);
-        box[0] = Math.min(box[0] ?? x, x);
-        box[1] = Math.min(box[1] ?? y, y);
-        box[2] = Math.max(box[2] ?? x, x);
-        box[3] = Math.max(box[3] ?? y, y);
-      }
-    }
-    if (
-      map == null ||
-      !Number.isFinite(box[0]) ||
-      matchMedia("(prefers-reduced-motion: reduce)").matches
-    ) {
+    const box = engine.shape(engine.tiles(tiles), k);
+    if (box == null || calm) {
       void goto(href);
       return;
     }
@@ -663,37 +670,12 @@
     opening = k;
     pinned = k;
     focus = k;
-    const frame = frames[0];
-    const x = ((box[0] ?? 0) + (box[2] ?? 0)) / 2;
-    const y = ((box[1] ?? 0) + (box[3] ?? 0)) / 2;
-    if (
-      frames.length > 1 &&
-      frame != null &&
-      (x < frame.west || x > frame.east || y < frame.south || y > frame.north)
-    ) {
-      isLoaded = false;
-      const go = async () => {
-        try {
-          await goto(href);
-        } finally {
-          opening = null;
-        }
-      };
-      void loading.then(go, go);
-      return;
-    }
     let isGone = false;
     const leave = () => {
       if (!isGone) {
         isGone = true;
-        try {
-          handoff = {
-            path: href,
-            image: map.getCanvas().toDataURL("image/webp", 0.85),
-          };
-        } catch {
-          handoff = null;
-        }
+        const image = engine.snapshot();
+        handoff = image == null ? null : { path: href, image };
         void goto(href).finally(() => {
           opening = null;
         });
@@ -711,107 +693,14 @@
           leave();
           return;
         }
-        map.once("moveend", leave);
         setTimeout(leave, 1200);
-        map.fitBounds(
-          [
-            [box[0] ?? 0, box[1] ?? 0],
-            [box[2] ?? 0, box[3] ?? 0],
-          ],
-          { padding: fit, duration: 650, essential: false },
-        );
+        engine.fit(box, leave);
       },
       () => {
         opening = null;
         void goto(href);
       },
     );
-  }
-
-  function paint(host: HTMLElement) {
-    const probe = document.createElement("span");
-    host.append(probe);
-    const context = document
-      .createElement("canvas")
-      .getContext("2d", { willReadFrequently: true });
-    const cache: Record<string, string> = {};
-    const read = (css: string) => {
-      const known = cache[css];
-      if (known != null) {
-        return known;
-      }
-      probe.style.color = css;
-      const computed = getComputedStyle(probe).color;
-      let value = computed;
-      if (context != null) {
-        context.clearRect(0, 0, 1, 1);
-        context.fillStyle = computed;
-        context.fillRect(0, 0, 1, 1);
-        const [r = 0, g = 0, b = 0, a = 255] = context.getImageData(
-          0,
-          0,
-          1,
-          1,
-        ).data;
-        value = `rgba(${r}, ${g}, ${b}, ${(a / 255).toFixed(3)})`;
-      }
-      cache[css] = value;
-      return value;
-    };
-    return { read, done: () => probe.remove() };
-  }
-
-  function style(read: (css: string) => string) {
-    return {
-      paper: read("var(--card)"),
-      ground: read(
-        "color-mix(in oklab, var(--muted-foreground) 14%, var(--card))",
-      ),
-      seam: read("var(--card)"),
-      ink: read("var(--foreground)"),
-      hatch: read("color-mix(in oklab, var(--foreground) 32%, transparent)"),
-    };
-  }
-
-  function tile(shape: "hatch" | "absent" | "norun", color: string) {
-    const canvas = document.createElement("canvas");
-    canvas.width = 8;
-    canvas.height = 8;
-    const pen = canvas.getContext("2d", { willReadFrequently: true });
-    if (pen != null) {
-      pen.strokeStyle = color;
-      pen.fillStyle = color;
-      pen.lineWidth = 1;
-      pen.beginPath();
-      if (shape === "hatch") {
-        pen.moveTo(0, 8);
-        pen.lineTo(8, 0);
-        pen.stroke();
-      }
-      if (shape === "absent") {
-        pen.moveTo(3, 2);
-        pen.arc(2, 2, 1, 0, Math.PI * 2);
-        pen.moveTo(7, 6);
-        pen.arc(6, 6, 1, 0, Math.PI * 2);
-        pen.fill();
-      }
-      if (shape === "norun") {
-        pen.moveTo(1, 2.5);
-        pen.lineTo(5, 2.5);
-        pen.moveTo(5, 6.5);
-        pen.lineTo(8, 6.5);
-        pen.moveTo(0, 6.5);
-        pen.lineTo(1, 6.5);
-        pen.stroke();
-      }
-    }
-    return {
-      width: 8,
-      height: 8,
-      data: new Uint8Array(
-        pen?.getImageData(0, 0, 8, 8).data.buffer ?? new ArrayBuffer(256),
-      ),
-    };
   }
 
   function fills(read: (css: string) => string) {
@@ -983,841 +872,277 @@
     };
   };
 
-  const mount = (host: HTMLElement) => {
-    const stop = new AbortController();
-    const built: Array<Maplibre.Map> = [];
-    const cleanup: Array<() => void> = [];
-    void (async () => {
-      const [maplibre, { Protocol, PMTiles }, worker] = await Promise.all([
-        import("maplibre-gl"),
-        import("pmtiles"),
-        import("maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url"),
-        import("maplibre-gl/dist/maplibre-gl.css"),
-      ]);
-      if (stop.signal.aborted) {
-        return;
-      }
-      maplibre.setWorkerUrl(worker.default);
-      const protocol = new Protocol();
-      maplibre.addProtocol("pmtiles", protocol.tile);
-      void Promise.all(
-        [tiles, own?.tiles, nested?.tiles].flatMap((name) => {
-          if (name == null) {
-            return [];
-          }
-          const archive = new PMTiles(
-            `${globalThis.location.origin}/tiles/${name}.pmtiles`,
-          );
-          protocol.add(archive);
-          return [
-            archive
-              .getMetadata()
-              .then((meta) =>
-                String((meta as { attribution?: unknown }).attribution ?? ""),
-              ),
-          ];
-        }),
-      ).then((found) => {
-        if (!stop.signal.aborted) {
-          credits = [
-            ...new Set(
-              found.flatMap((text) =>
-                text
-                  .split(text.includes("\n") ? "\n" : "; ")
-                  .filter((part) => part.trim() !== ""),
-              ),
-            ),
-          ];
-        }
-      });
-      const tones = paint(host);
-      cleanup.push(tones.done);
-      const colorsNow = style(tones.read);
-      const origin = globalThis.location.origin;
-      const shaft = document.createElement("canvas");
-      shaft.width = 64;
-      shaft.height = 24;
-      const arrow = shaft.getContext("2d", { willReadFrequently: true });
-      if (arrow != null) {
-        arrow.fillStyle = "#fff";
-        arrow.shadowColor = "#fff";
-        arrow.shadowBlur = 3;
-        arrow.beginPath();
-        arrow.moveTo(4, 9.5);
-        arrow.lineTo(40, 9.5);
-        arrow.lineTo(40, 3.5);
-        arrow.lineTo(59, 12);
-        arrow.lineTo(40, 20.5);
-        arrow.lineTo(40, 14.5);
-        arrow.lineTo(4, 14.5);
-        arrow.closePath();
-        arrow.fill();
-      }
-      const surfaces = [
-        ...host.querySelectorAll<HTMLElement>("[data-map-surface]"),
-      ];
-      const edge = Math.max(
-        24,
-        Math.round(Math.min(host.clientWidth, host.clientHeight) * 0.06),
+  function setup() {
+    engine.tiles(tiles);
+    if (own != null) {
+      engine.tiles(own.tiles);
+    }
+    if (nested != null) {
+      engine.tiles(nested.tiles);
+    }
+    const areas = { source, "source-layer": "areas" } as const;
+    const shown = (key: string): Maplibre.ExpressionSpecification => [
+      "case",
+      ["boolean", ["feature-state", key], false],
+      1,
+      0,
+    ];
+    engine.add(
+      {
+        id: "fill",
+        type: "fill",
+        ...areas,
+        paint: {
+          "fill-color": [
+            "coalesce",
+            ["feature-state", "color"],
+            "color-mix(in oklab, var(--muted-foreground) 14%, var(--card))",
+          ],
+        },
+      },
+      "fills",
+      { rank: 0 },
+    );
+    for (const [id, image] of [
+      ["split", "hatch"],
+      ["blank", "absent"],
+      ["norun", "norun"],
+      ["unmatched", "hatch"],
+    ] as const) {
+      engine.add(
+        {
+          id,
+          type: "fill",
+          ...areas,
+          filter: [
+            "in",
+            ["id"],
+            ["literal", id === "blank" ? missing.map((entry) => entry.k) : []],
+          ],
+          paint: { "fill-pattern": image },
+        },
+        "fills",
       );
-      const room = {
-        top: edge + (up == null ? 0 : 20),
-        right: edge + 36,
-        bottom: edge,
-        left: edge,
-      };
-      fit = room;
-      for (const [index, surface] of surfaces.entries()) {
-        const frame = frames[index];
-        const map = new maplibre.Map({
-          container: surface,
-          style: {
-            version: 8,
-            projection: { type: "globe" },
-            sources: {
-              places: {
-                type: "vector",
-                url: `pmtiles://${origin}/tiles/${tiles}.pmtiles`,
-              },
-              dots: { type: "geojson", data: dots },
-              arrows: {
-                type: "geojson",
-                data: { type: "FeatureCollection", features: [] },
-              },
-              ...(own == null
-                ? {}
-                : {
-                    own: {
-                      type: "vector" as const,
-                      url: `pmtiles://${origin}/tiles/${own.tiles}.pmtiles`,
-                    },
-                  }),
-              ...(nested == null
-                ? {}
-                : {
-                    nested: {
-                      type: "vector" as const,
-                      url: `pmtiles://${origin}/tiles/${nested.tiles}.pmtiles`,
-                    },
-                  }),
-            },
-            layers: [
-              {
-                id: "paper",
-                type: "background",
-                paint: { "background-color": colorsNow.paper },
-              },
-              {
-                id: "fill",
-                type: "fill",
-                source: "places",
-                "source-layer": "areas",
-                paint: {
-                  "fill-color": [
-                    "coalesce",
-                    ["feature-state", "color"],
-                    colorsNow.ground,
-                  ],
-                },
-              },
-              {
-                id: "split",
-                type: "fill" as const,
-                source: "places",
-                "source-layer": "areas",
-                filter: ["in", ["id"], ["literal", []]],
-                paint: { "fill-pattern": "hatch" },
-              },
-              ...(missing.length === 0
-                ? []
-                : [
-                    {
-                      id: "blank",
-                      type: "fill" as const,
-                      source: "places",
-                      "source-layer": "areas",
-                      filter: [
-                        "in",
-                        ["id"],
-                        ["literal", missing.map((entry) => entry.k)],
-                      ] as Maplibre.FilterSpecification,
-                      paint: { "fill-pattern": "absent" },
-                    },
-                  ]),
-              {
-                id: "norun",
-                type: "fill" as const,
-                source: "places",
-                "source-layer": "areas",
-                filter: ["in", ["id"], ["literal", []]],
-                paint: { "fill-pattern": "norun" },
-              },
-              {
-                id: "unmatched",
-                type: "fill" as const,
-                source: "places",
-                "source-layer": "areas",
-                filter: ["in", ["id"], ["literal", []]],
-                paint: { "fill-pattern": "hatch" },
-              },
-              ...(isApproximate
-                ? [
-                    {
-                      id: "hatch",
-                      type: "fill" as const,
-                      source: "places",
-                      "source-layer": "areas",
-                      paint: { "fill-pattern": "hatch" },
-                    },
-                  ]
-                : []),
-              {
-                id: "seam",
-                type: "line",
-                source: "places",
-                "source-layer": "areas",
-                paint: {
-                  "line-color": colorsNow.seam,
-                  "line-width": [
-                    "interpolate",
-                    ["linear"],
-                    ["zoom"],
-                    2,
-                    0.6,
-                    6,
-                    1,
-                    10,
-                    1.6,
-                  ],
-                },
-              },
-              ...(own == null
-                ? []
-                : [
-                    {
-                      id: "veil",
-                      type: "fill" as const,
-                      source: "own",
-                      "source-layer": "areas",
-                      filter: [
-                        "!=",
-                        ["id"],
-                        own.k,
-                      ] as Maplibre.FilterSpecification,
-                      paint: {
-                        "fill-color": colorsNow.paper,
-                        "fill-opacity": [
-                          "case",
-                          ["boolean", ["feature-state", "near"], false],
-                          0.35,
-                          0.6,
-                        ] as Maplibre.ExpressionSpecification,
-                      },
-                    },
-                  ]),
-              ...(nested == null
-                ? []
-                : [
-                    {
-                      id: "nested-fill",
-                      type: "fill" as const,
-                      source: "nested",
-                      "source-layer": "areas",
-                      filter: [
-                        "in",
-                        ["id"],
-                        ["literal", nested.ks],
-                      ] as Maplibre.FilterSpecification,
-                      paint: {
-                        "fill-color": [
-                          "coalesce",
-                          ["feature-state", "color"],
-                          "rgba(0, 0, 0, 0)",
-                        ] as Maplibre.ExpressionSpecification,
-                      },
-                    },
-                    {
-                      id: "nested-seam",
-                      type: "line" as const,
-                      source: "nested",
-                      "source-layer": "areas",
-                      filter: [
-                        "in",
-                        ["id"],
-                        ["literal", nested.ks],
-                      ] as Maplibre.FilterSpecification,
-                      paint: {
-                        "line-color": colorsNow.seam,
-                        "line-width": 0.75,
-                      },
-                    },
-                    {
-                      id: "nested-focus",
-                      type: "line" as const,
-                      source: "nested",
-                      "source-layer": "areas",
-                      filter: [
-                        "in",
-                        ["id"],
-                        ["literal", nested.ks],
-                      ] as Maplibre.FilterSpecification,
-                      paint: {
-                        "line-color": colorsNow.ink,
-                        "line-width": 2.25,
-                        "line-opacity": [
-                          "case",
-                          ["boolean", ["feature-state", "focus"], false],
-                          1,
-                          0,
-                        ] as Maplibre.ExpressionSpecification,
-                      },
-                    },
-                  ]),
-              ...(own == null
-                ? []
-                : [
-                    {
-                      id: "outline",
-                      type: "line" as const,
-                      source: "own",
-                      "source-layer": "areas",
-                      filter: [
-                        "==",
-                        ["id"],
-                        own.k,
-                      ] as Maplibre.FilterSpecification,
-                      paint: {
-                        "line-color": colorsNow.ink,
-                        "line-width": 1.75,
-                      },
-                    },
-                    {
-                      id: "near",
-                      type: "line" as const,
-                      source: "own",
-                      "source-layer": "areas",
-                      filter: [
-                        "!=",
-                        ["id"],
-                        own.k,
-                      ] as Maplibre.FilterSpecification,
-                      paint: {
-                        "line-color": colorsNow.ink,
-                        "line-width": 1.5,
-                        "line-dasharray": [3, 2],
-                        "line-opacity": [
-                          "case",
-                          ["boolean", ["feature-state", "near"], false],
-                          1,
-                          0,
-                        ] as Maplibre.ExpressionSpecification,
-                      },
-                    },
-                  ]),
-              {
-                id: "bubble",
-                type: "circle",
-                source: "dots",
-                paint: {
-                  "circle-radius": ["coalesce", ["feature-state", "radius"], 0],
-                  "circle-color": [
-                    "coalesce",
-                    ["feature-state", "color"],
-                    colorsNow.ground,
-                  ],
-                  "circle-opacity": 0.86,
-                  "circle-stroke-color": colorsNow.seam,
-                  "circle-stroke-width": [
-                    "case",
-                    [">", ["coalesce", ["feature-state", "radius"], 0], 0],
-                    0.75,
-                    0,
-                  ],
-                },
-              },
-              {
-                id: "arrow",
-                type: "symbol",
-                source: "arrows",
-                layout: {
-                  "icon-image": "arrow",
-                  "icon-size": ["get", "size"],
-                  "icon-rotate": ["get", "rotate"],
-                  "icon-rotation-alignment": "map",
-                  "icon-anchor": "left",
-                  "icon-allow-overlap": true,
-                  "icon-ignore-placement": true,
-                  "symbol-sort-key": ["get", "order"],
-                },
-                paint: {
-                  "icon-color": ["get", "color"],
-                  "icon-halo-color": colorsNow.seam,
-                  "icon-halo-width": 1,
-                },
-              },
-              {
-                id: "focus",
-                type: "line",
-                source: "places",
-                "source-layer": "areas",
-                paint: {
-                  "line-color": colorsNow.ink,
-                  "line-width": 2.25,
-                  "line-opacity": [
-                    "case",
-                    ["boolean", ["feature-state", "focus"], false],
-                    1,
-                    0,
-                  ],
-                },
-              },
+    }
+    if (isApproximate) {
+      engine.add(
+        {
+          id: "hatch",
+          type: "fill",
+          ...areas,
+          paint: { "fill-pattern": "hatch" },
+        },
+        "fills",
+      );
+    }
+    const side = Math.sqrt(
+      (boxWidth * boxHeight) / Math.max(1, places.rows.length),
+    );
+    const settled = engine.gl?.getZoom() ?? 0;
+    engine.add(
+      {
+        id: "seam",
+        type: "line",
+        ...areas,
+        paint: {
+          "line-color": "var(--card)",
+          "line-width":
+            side < 16
+              ? [
+                  "interpolate",
+                  ["exponential", 2],
+                  ["zoom"],
+                  settled,
+                  Math.max(0.15, side / 16),
+                  settled + 4,
+                  1.6,
+                ]
+              : ["interpolate", ["linear"], ["zoom"], 2, 0.6, 6, 1, 10, 1.6],
+        },
+      },
+      "fills",
+    );
+    if (own != null && outer != null) {
+      const ownAreas = { source: outer, "source-layer": "areas" } as const;
+      engine.add(
+        {
+          id: "veil",
+          type: "fill",
+          ...ownAreas,
+          filter: ["!=", ["id"], own.k],
+          paint: {
+            "fill-color": "var(--card)",
+            "fill-opacity": [
+              "case",
+              ["boolean", ["feature-state", "near"], false],
+              0.35,
+              0.6,
             ],
           },
-          renderWorldCopies: false,
-          attributionControl: false,
-          canvasContextAttributes: { preserveDrawingBuffer: true },
-          interactive: index === 0,
-          cooperativeGestures: index === 0,
-          dragRotate: false,
-          transformCameraUpdate:
-            index !== 0
-              ? null
-              : ({ center, zoom }) => {
-                  if (snug == null) {
-                    return {};
-                  }
-                  const k = 2 ** (zoom - snug.zoom);
-                  const give = Math.min(1, Math.max(0, k - 1));
-                  const wide =
-                    Math.max(
-                      0,
-                      (snug.wide * k - surface.clientWidth) / 2 +
-                        surface.clientWidth * 0.15 * give,
-                    ) /
-                    (snug.across * k);
-                  const tall =
-                    Math.max(
-                      0,
-                      (snug.tall * k - surface.clientHeight) / 2 +
-                        surface.clientHeight * 0.15 * give,
-                    ) /
-                    (snug.down * k);
-                  const shift =
-                    ((((center.lng - snug.center.lng + 540) % 360) + 360) %
-                      360) -
-                    180;
-                  return {
-                    center: new maplibre.LngLat(
-                      snug.center.lng + Math.min(wide, Math.max(-wide, shift)),
-                      Math.min(
-                        snug.center.lat + tall,
-                        Math.max(snug.center.lat - tall, center.lat),
-                      ),
-                    ),
-                  };
-                },
-          pitchWithRotate: false,
-          touchPitch: false,
-          locale: {
-            "CooperativeGesturesHandler.WindowsHelpText":
-              m.map_gesture_windows(),
-            "CooperativeGesturesHandler.MacHelpText": m.map_gesture_mac(),
-            "CooperativeGesturesHandler.MobileHelpText": m.map_gesture_mobile(),
+        },
+        "fills",
+      );
+      engine.add(
+        {
+          id: "outline",
+          type: "line",
+          ...ownAreas,
+          filter: ["==", ["id"], own.k],
+          paint: { "line-color": "var(--foreground)", "line-width": 1.75 },
+        },
+        "lines",
+      );
+      engine.add(
+        {
+          id: "near",
+          type: "line",
+          ...ownAreas,
+          filter: ["!=", ["id"], own.k],
+          paint: {
+            "line-color": "var(--foreground)",
+            "line-width": 1.5,
+            "line-dasharray": [3, 2],
+            "line-opacity": shown("near"),
           },
-        });
-        map.once("style.load", () => {
-          if (frame != null) {
-            map.fitBounds([frame.west, frame.south, frame.east, frame.north], {
-              padding: index === 0 ? room : 6,
-              animate: false,
-            });
-            if (index === 0) {
-              map.setMinZoom(Math.max(0, map.getZoom() - 1.25));
-            }
-          }
-        });
-        if (index === 0) {
-          map.on("movestart", (event) => {
-            if (event.originalEvent != null) {
-              isMoved = true;
-            }
-          });
-        }
-        map.touchZoomRotate.disableRotation();
-        map.keyboard.disable();
-        map.getCanvas().removeAttribute("role");
-        map.getCanvas().removeAttribute("aria-label");
-        map.getCanvas().tabIndex = -1;
-        map.addImage(
-          "arrow",
-          {
-            width: 64,
-            height: 24,
-            data: new Uint8Array(
-              arrow?.getImageData(0, 0, 64, 24).data.buffer ??
-                new ArrayBuffer(6144),
-            ),
+        },
+        "lines",
+      );
+      seen = engine.rendered("veil");
+      neighbors?.().then(
+        (list) => {
+          nearby = list;
+        },
+        () => {
+          nearby = [];
+        },
+      );
+    }
+    if (nested != null && inside != null) {
+      const nestedAreas: {
+        source: string;
+        "source-layer": string;
+        filter: Maplibre.FilterSpecification;
+      } = {
+        source: inside,
+        "source-layer": "areas",
+        filter: ["in", ["id"], ["literal", nested.ks]],
+      };
+      engine.add(
+        {
+          id: "nested-fill",
+          type: "fill",
+          ...nestedAreas,
+          paint: {
+            "fill-color": [
+              "coalesce",
+              ["feature-state", "color"],
+              "rgba(0, 0, 0, 0)",
+            ],
           },
-          { sdf: true },
-        );
-        for (const shape of ["hatch", "absent", "norun"] as const) {
-          map.addImage(shape, tile(shape, colorsNow.hatch));
-        }
-        map.on("mousemove", "fill", (event) => {
-          const id = map.queryRenderedFeatures(event.point, { layers: hit })[0]
-            ?.id;
-          const k = typeof id === "number" && rows.has(id) ? id : null;
-          const path = k == null ? null : rows.get(k)?.path;
-          empty =
-            k == null && typeof id === "number" && blanks.has(id) ? id : null;
-          map.getCanvas().style.cursor = path != null ? "pointer" : "";
-          if (pinned == null && focus !== k) {
-            focus = k;
-            clearTimeout(dwell);
-            if (path != null) {
-              dwell = setTimeout(() => {
-                const href = resolve("/[...path]", { path });
-                if (focus === k && warmed[href] !== true) {
-                  warmed[href] = true;
-                  void preloadData(href);
-                }
-              }, 350);
-            }
-          }
-        });
-        map.on("mouseleave", "fill", () => {
-          clearTimeout(dwell);
-          empty = null;
-          map.getCanvas().style.cursor = "";
-          if (pinned == null) {
-            focus = null;
-          }
-        });
-        map.on("mousemove", (event) => {
-          const bounds = host.getBoundingClientRect();
-          pointer = {
-            x: event.originalEvent.clientX - bounds.left,
-            y: event.originalEvent.clientY - bounds.top,
-          };
-          if (own == null || nearPinned) {
-            return;
-          }
-          const place = map
-            .queryRenderedFeatures(event.point, { layers: hit })
-            .find(
-              (feature) =>
-                typeof feature.id === "number" && rows.has(feature.id),
-            )?.id;
-          const id =
-            place == null
-              ? map.queryRenderedFeatures(event.point, { layers: ["veil"] })[0]
-                  ?.id
-              : null;
-          const k = typeof id === "number" && besides.has(id) ? id : null;
-          if (k !== near) {
-            near = k;
-          }
-          map.getCanvas().style.cursor =
-            k != null ||
-            (typeof place === "number" && rows.get(place)?.path != null)
-              ? "pointer"
-              : "";
-        });
-        map.on("mouseout", () => {
-          pointer = null;
-          if (!nearPinned) {
-            near = null;
-          }
-        });
-        map.on("click", (event) => {
-          const [feature] = map.queryRenderedFeatures(event.point, {
-            layers: hit,
-          });
-          const k =
-            typeof feature?.id === "number" && rows.has(feature.id)
-              ? feature.id
-              : null;
-          const isTouch =
-            (event.originalEvent as PointerEvent).pointerType === "touch";
-          if (k == null) {
-            pinned = null;
-            focus = null;
-            const id =
-              own == null
-                ? null
-                : map.queryRenderedFeatures(event.point, {
-                    layers: ["veil"],
-                  })[0]?.id;
-            const next = typeof id === "number" ? besides.get(id) : undefined;
-            if (next == null) {
-              nearPinned = false;
-              near = null;
-            } else if (isTouch && !(nearPinned && near === next.k)) {
-              near = next.k;
-              nearPinned = true;
-            } else {
-              void goto(resolve("/[...path]", { path: next.path }));
-            }
-          } else if (isTouch && pinned !== k) {
-            nearPinned = false;
-            near = null;
-            pinned = k;
-            focus = k;
-          } else {
-            open(k);
-          }
-        });
-        map.once("idle", () => {
-          if (index === 0) {
-            still = null;
-          }
-        });
-        map.on("load", () => {
-          ready.add(map);
-          if (index === 0) {
-            const settle = () => {
-              if (frame != null && !isMoved && opening == null) {
-                snug = null;
-                map.resize();
-                map.setMinZoom(0);
-                map.fitBounds(
-                  [frame.west, frame.south, frame.east, frame.north],
-                  { padding: room, animate: false },
-                );
-                if (traced == null && !map.areTilesLoaded()) {
-                  map.once("idle", settle);
-                  return;
-                }
-                if (traced == null) {
-                  const kept = places.rows.flatMap((row) =>
-                    row.at != null &&
-                    row.at[0] >= frame.west &&
-                    row.at[0] <= frame.east &&
-                    row.at[1] >= frame.south &&
-                    row.at[1] <= frame.north
-                      ? [row.k]
-                      : [],
-                  );
-                  const found = [
-                    ...map.querySourceFeatures("places", {
-                      sourceLayer: "areas",
-                      filter: ["in", ["id"], ["literal", kept]],
-                    }),
-                    ...(own == null || map.getSource("own") == null
-                      ? []
-                      : map.querySourceFeatures("own", {
-                          sourceLayer: "areas",
-                          filter: ["==", ["id"], own.k],
-                        })),
-                  ].flatMap((feature) =>
-                    JSON.stringify(feature.geometry)
-                      .matchAll(/\[([\d.e-]+),([\d.e-]+)\]/g)
-                      .map((pair): [number, number] => [
-                        Number(pair[1]),
-                        Number(pair[2]),
-                      ])
-                      .filter(
-                        ([lng, lat]) =>
-                          lng >= frame.west &&
-                          lng <= frame.east &&
-                          lat >= frame.south &&
-                          lat <= frame.north,
-                      )
-                      .toArray(),
-                  );
-                  traced = found.length > 0 ? found : null;
-                }
-                const points: Array<[number, number]> = [];
-                const extent = {
-                  left: Infinity,
-                  top: Infinity,
-                  right: -Infinity,
-                  bottom: -Infinity,
-                };
-                for (const pair of traced ?? []) {
-                  const point = map.project(pair);
-                  points.push([point.x, point.y]);
-                  extent.left = Math.min(extent.left, point.x);
-                  extent.top = Math.min(extent.top, point.y);
-                  extent.right = Math.max(extent.right, point.x);
-                  extent.bottom = Math.max(extent.bottom, point.y);
-                }
-                const canvas = map.getCanvas();
-                const origin = canvas.getBoundingClientRect();
-                const strip =
-                  surfaces[1]?.parentElement?.parentElement?.getBoundingClientRect();
-                const reserve =
-                  strip == null
-                    ? 0
-                    : Math.max(
-                        0,
-                        origin.bottom - strip.top + edge - room.bottom,
-                      );
-                const middle = {
-                  x: (extent.left + extent.right) / 2,
-                  y: (extent.top + extent.bottom) / 2,
-                };
-                let size = {
-                  wide: canvas.clientWidth,
-                  tall: canvas.clientHeight,
-                };
-                for (let step = 0; step <= 8; step++) {
-                  const bottom = room.bottom + (reserve * step) / 8;
-                  const scale =
-                    Math.min(
-                      (canvas.clientWidth - room.left - room.right) /
-                        (extent.right - extent.left),
-                      (canvas.clientHeight - room.top - bottom) /
-                        (extent.bottom - extent.top),
-                    ) * 0.98;
-                  const x =
-                    room.left +
-                    (canvas.clientWidth - room.left - room.right) / 2;
-                  const y =
-                    room.top + (canvas.clientHeight - room.top - bottom) / 2;
-                  if (
-                    !Number.isFinite(scale) ||
-                    scale < 0.25 ||
-                    scale > 4 ||
-                    (step < 8 &&
-                      strip != null &&
-                      points.some(([px, py]) => {
-                        const sx = x + (px - middle.x) * scale;
-                        const sy = y + (py - middle.y) * scale;
-                        return (
-                          sx >= strip.left - origin.left - 6 &&
-                          sx <= strip.right - origin.left + 6 &&
-                          sy >= strip.top - origin.top - 6
-                        );
-                      }))
-                  ) {
-                    continue;
-                  }
-                  map.jumpTo({
-                    center: map.unproject([middle.x, middle.y]),
-                    zoom: map.getZoom() + Math.log2(scale),
-                  });
-                  map.panBy(
-                    [canvas.clientWidth / 2 - x, canvas.clientHeight / 2 - y],
-                    { animate: false },
-                  );
-                  fit = { ...room, bottom };
-                  size = {
-                    wide: (extent.right - extent.left) * scale,
-                    tall: (extent.bottom - extent.top) * scale,
-                  };
-                  break;
-                }
-                const center = map.getCenter();
-                snug = {
-                  center,
-                  zoom: map.getZoom(),
-                  ...size,
-                  across:
-                    map.project([center.lng + 0.5, center.lat]).x -
-                    map.project([center.lng - 0.5, center.lat]).x,
-                  down:
-                    map.project([center.lng, center.lat - 0.5]).y -
-                    map.project([center.lng, center.lat + 0.5]).y,
-                };
-                map.setMinZoom(map.getZoom());
-              }
-              isLoaded = true;
-            };
-            const watcher = new ResizeObserver(settle);
-            watcher.observe(host);
-            cleanup.push(() => watcher.disconnect());
-            if (own != null && neighbors != null) {
-              const look = () => {
-                seen = [
-                  ...new Set(
-                    map
-                      .queryRenderedFeatures({ layers: ["veil"] })
-                      .flatMap((feature) =>
-                        typeof feature.id === "number" ? [feature.id] : [],
-                      ),
-                  ),
-                ];
-              };
-              map.once("idle", look);
-              map.on("moveend", look);
-              neighbors().then(
-                (list) => {
-                  if (!stop.signal.aborted) {
-                    nearby = list;
-                  }
-                },
-                () => {
-                  nearby = [];
-                },
-              );
-            }
-          }
-          const box = map.getCanvas();
-          const side = Math.sqrt(
-            (box.clientWidth * box.clientHeight) /
-              Math.max(1, places.rows.length),
-          );
-          const settled = map.getZoom();
-          if (side < 16) {
-            map.setPaintProperty("seam", "line-width", [
-              "interpolate",
-              ["exponential", 2],
-              ["zoom"],
-              settled,
-              Math.max(0.15, side / 16),
-              settled + 4,
-              1.6,
-            ]);
-          }
-        });
-        built.push(map);
-      }
-      maps = built;
-    })();
-    return () => {
-      stop.abort();
-      clearTimeout(dwell);
-      for (const map of built) {
-        map.remove();
-      }
-      for (const done of cleanup) {
-        done();
-      }
-      maps = [];
-      isLoaded = false;
-    };
-  };
-
-  let repaint = $state(0);
-  $effect(() => {
-    const bump = () => requestAnimationFrame(() => (repaint += 1));
-    const observer = new MutationObserver(bump);
-    observer.observe(document.documentElement, {
-      attributes: true,
-      attributeFilter: ["class", "style", "data-theme"],
-    });
-    const offScheme = on(
-      matchMedia("(prefers-color-scheme: dark)"),
-      "change",
-      bump,
+        },
+        "fills",
+        { rank: 1 },
+      );
+      engine.add(
+        {
+          id: "nested-seam",
+          type: "line",
+          ...nestedAreas,
+          paint: { "line-color": "var(--card)", "line-width": 0.75 },
+        },
+        "fills",
+      );
+      engine.add(
+        {
+          id: "nested-focus",
+          type: "line",
+          ...nestedAreas,
+          paint: {
+            "line-color": "var(--foreground)",
+            "line-width": 2.25,
+            "line-opacity": shown("focus"),
+          },
+        },
+        "focus",
+      );
+    }
+    engine.points("dots", []);
+    engine.points("arrows", []);
+    engine.add(
+      {
+        id: "bubble",
+        type: "circle",
+        source: "dots",
+        paint: {
+          "circle-radius": ["coalesce", ["feature-state", "radius"], 0],
+          "circle-color": [
+            "coalesce",
+            ["feature-state", "color"],
+            "color-mix(in oklab, var(--muted-foreground) 14%, var(--card))",
+          ],
+          "circle-opacity": 0.86,
+          "circle-stroke-color": "var(--card)",
+          "circle-stroke-width": [
+            "case",
+            [">", ["coalesce", ["feature-state", "radius"], 0], 0],
+            0.75,
+            0,
+          ],
+        },
+      },
+      "points",
     );
-    return () => {
-      observer.disconnect();
-      offScheme();
-    };
+    engine.add(
+      {
+        id: "arrow",
+        type: "symbol",
+        source: "arrows",
+        layout: {
+          "icon-image": "arrow",
+          "icon-size": ["get", "size"],
+          "icon-rotate": ["get", "rotate"],
+          "icon-rotation-alignment": "map",
+          "icon-anchor": "left",
+          "icon-allow-overlap": true,
+          "icon-ignore-placement": true,
+          "symbol-sort-key": ["get", "order"],
+        },
+        paint: {
+          "icon-color": ["get", "color"],
+          "icon-halo-color": "var(--card)",
+          "icon-halo-width": 1,
+        },
+      },
+      "points",
+    );
+    engine.add(
+      {
+        id: "focus",
+        type: "line",
+        ...areas,
+        paint: {
+          "line-color": "var(--foreground)",
+          "line-width": 2.25,
+          "line-opacity": shown("focus"),
+        },
+      },
+      "focus",
+    );
+  }
+
+  $effect(() => {
+    if (engine.isLoaded) {
+      still = null;
+    }
   });
 
   $effect(() => {
-    const theme = mode.current;
-    void repaint;
-    const host = maps[0]?.getContainer().closest<HTMLElement>("[data-map]");
-    if (host == null || theme == null) {
+    void engine.theme;
+    if (engine.gl == null) {
       return;
     }
-    const tones = paint(host);
-    const colorsNow = style(tones.read);
-    const painted = fills(tones.read);
+    const read = (css: string) => engine.read(css);
+    const painted = fills(read);
     const hatched = [
       ...(isUnmatched ? unmatched.keys() : []),
       ...(isEstimated ? changes.keys() : []),
@@ -1829,245 +1154,121 @@
             .map((row) => row.k)
         : []),
     ];
-    const absent = skipped.map((row) => row.k);
-    const tips = [0, 1].map((index) =>
-      tones.read(colors[index] ?? "var(--muted-foreground)"),
-    );
     const splits =
       view === "winner" && only == null
-        ? places.rows.flatMap((row) => {
-            if (row.also == null || row.leader == null || inner.has(row.k)) {
-              return [];
-            }
-            const color = tones.read(
-              colors[row.also] ?? "var(--muted-foreground)",
-            );
-            return [{ k: row.k, color, image: `split:${color}` }];
-          })
+        ? places.rows.flatMap((row) =>
+            row.also == null || row.leader == null || inner.has(row.k)
+              ? []
+              : [
+                  {
+                    k: row.k,
+                    image: engine.stripe(
+                      colors[row.also] ?? "var(--muted-foreground)",
+                    ),
+                  },
+                ],
+          )
         : [];
-    const arrows = (scale: number) =>
-      places.rows.flatMap((row) => {
-        const change = changes.get(row.k)?.swing;
-        if (row.at == null || change == null || Math.abs(change) < 0.001) {
-          return [];
-        }
-        const size = Math.min(1, Math.abs(change) / 0.2);
-        const tilt = 12 + size * 48;
-        return [
-          {
-            type: "Feature" as const,
-            properties: {
-              color: tips[change >= 0 ? 0 : 1] ?? "",
-              size: (0.35 + size * 0.95) * scale,
-              rotate: change >= 0 ? -tilt : 180 + tilt,
-              order: size,
-            },
-            geometry: { type: "Point" as const, coordinates: row.at },
-          },
-        ];
-      });
-    tones.done();
-    for (const [index, map] of maps.entries()) {
-      const apply = () => {
-        for (const layer of ["fill", "hatch", "seam"]) {
-          if (map.getLayer(layer) != null) {
-            map.setFilter(layer, scopes[index] ?? null);
+    const tips = [0, 1].map((index) =>
+      read(colors[index] ?? "var(--muted-foreground)"),
+    );
+    untrack(() => {
+      engine.filter("unmatched", ["in", ["id"], ["literal", hatched]]);
+      engine.filter("norun", [
+        "in",
+        ["id"],
+        ["literal", skipped.map((row) => row.k)],
+      ]);
+      engine.filter("split", [
+        "in",
+        ["id"],
+        ["literal", splits.map((entry) => entry.k)],
+      ]);
+      engine.style(
+        "split",
+        "fill-pattern",
+        splits[0] == null
+          ? "hatch"
+          : [
+              "match",
+              ["id"],
+              ...splits.flatMap((entry) => [entry.k, entry.image]),
+              splits[0].image,
+            ],
+      );
+      engine.points(
+        "dots",
+        places.rows.flatMap((row) =>
+          row.at == null ? [] : [{ k: row.k, at: row.at }],
+        ),
+      );
+      engine.points(
+        "arrows",
+        view === "arrows"
+          ? places.rows.flatMap((row) => {
+              const change = changes.get(row.k)?.swing;
+              if (
+                row.at == null ||
+                change == null ||
+                Math.abs(change) < 0.001
+              ) {
+                return [];
+              }
+              const size = Math.min(1, Math.abs(change) / 0.2);
+              const tilt = 12 + size * 48;
+              return [
+                {
+                  at: row.at,
+                  properties: {
+                    color: tips[change >= 0 ? 0 : 1] ?? "",
+                    size: 0.35 + size * 0.95,
+                    rotate: change >= 0 ? -tilt : 180 + tilt,
+                    order: size,
+                  },
+                },
+              ];
+            })
+          : [],
+      );
+      const areas = new Map<number, Record<string, string | number>>();
+      const deeper = new Map<number, Record<string, string | number>>();
+      const bubbles = new Map<number, Record<string, string | number>>();
+      for (const [k, color] of painted) {
+        if (inner.has(k)) {
+          if (view !== "bubbles") {
+            deeper.set(k, { color });
           }
-        }
-        map.setFilter("unmatched", ["in", ["id"], ["literal", hatched]]);
-        map.setFilter("norun", ["in", ["id"], ["literal", absent]]);
-        for (const shape of ["hatch", "absent", "norun"] as const) {
-          map.updateImage(shape, tile(shape, colorsNow.hatch));
-        }
-        for (const { color, image } of splits) {
-          if (map.hasImage(image)) {
-            continue;
-          }
-          const tile = document.createElement("canvas");
-          tile.width = 8;
-          tile.height = 8;
-          const pen = tile.getContext("2d", { willReadFrequently: true });
-          if (pen == null) {
-            continue;
-          }
-          pen.strokeStyle = color;
-          pen.lineWidth = 2.5;
-          pen.beginPath();
-          for (const shift of [-8, 0, 8]) {
-            pen.moveTo(shift, 8);
-            pen.lineTo(shift + 8, 0);
-          }
-          pen.stroke();
-          map.addImage(image, {
-            width: 8,
-            height: 8,
-            data: new Uint8Array(pen.getImageData(0, 0, 8, 8).data.buffer),
+        } else if (view === "bubbles") {
+          bubbles.set(k, {
+            color,
+            radius: Math.sqrt((rows.get(k)?.valid ?? 0) / biggest) * 28,
           });
+        } else {
+          areas.set(k, { color });
         }
-        const split: Maplibre.FilterSpecification = [
-          "in",
-          ["id"],
-          ["literal", splits.map((entry) => entry.k)],
-        ];
-        map.setFilter(
-          "split",
-          scopes[index] == null
-            ? split
-            : (["all", scopes[index], split] as Maplibre.FilterSpecification),
-        );
-        map.setPaintProperty(
-          "split",
-          "fill-pattern",
-          splits[0] == null
-            ? "hatch"
-            : ([
-                "match",
-                ["id"],
-                ...splits.flatMap((entry) => [entry.k, entry.image]),
-                splits[0].image,
-              ] as Maplibre.ExpressionSpecification),
-        );
-        map.setPaintProperty("paper", "background-color", colorsNow.paper);
-        map.setPaintProperty("fill", "fill-color", [
-          "coalesce",
-          ["feature-state", "color"],
-          colorsNow.ground,
-        ]);
-        map.setPaintProperty("seam", "line-color", colorsNow.seam);
-        map.setPaintProperty("focus", "line-color", colorsNow.ink);
-        if (map.getLayer("outline") != null) {
-          map.setPaintProperty("outline", "line-color", colorsNow.ink);
-          map.setPaintProperty("veil", "fill-color", colorsNow.paper);
-          map.setPaintProperty("near", "line-color", colorsNow.ink);
-        }
-        map.setPaintProperty("bubble", "circle-stroke-color", colorsNow.seam);
-        map.setPaintProperty("arrow", "icon-halo-color", colorsNow.seam);
-        if (map.getLayer("nested-seam") != null) {
-          map.setPaintProperty("nested-seam", "line-color", colorsNow.seam);
-          map.setPaintProperty("nested-focus", "line-color", colorsNow.ink);
-          map.removeFeatureState({ source: "nested", sourceLayer: "areas" });
-        }
-        const source = map.getSource("dots");
-        if (source?.type === "geojson") {
-          void (source as Maplibre.GeoJSONSource).setData(dots);
-        }
-        const pointers = map.getSource("arrows");
-        if (pointers?.type === "geojson") {
-          void (pointers as Maplibre.GeoJSONSource).setData({
-            type: "FeatureCollection",
-            features: view === "arrows" ? arrows(index === 0 ? 1 : 0.4) : [],
-          });
-        }
-        map.removeFeatureState({ source: "places", sourceLayer: "areas" });
-        map.removeFeatureState({ source: "dots" });
-        for (const [k, color] of painted) {
-          if (inner.has(k)) {
-            if (view !== "bubbles") {
-              map.setFeatureState(
-                { source: "nested", sourceLayer: "areas", id: k },
-                { color },
-              );
-            }
-          } else if (view === "bubbles") {
-            map.setFeatureState(
-              { source: "dots", id: k },
-              {
-                color,
-                radius:
-                  Math.sqrt((rows.get(k)?.valid ?? 0) / biggest) *
-                  (index === 0 ? 28 : 9),
-              },
-            );
-          } else {
-            map.setFeatureState(
-              { source: "places", sourceLayer: "areas", id: k },
-              { color },
-            );
-          }
-        }
-        const k = untrack(() => focus);
-        if (k != null) {
-          map.setFeatureState(
-            {
-              source: inner.has(k) ? "nested" : "places",
-              sourceLayer: "areas",
-              id: k,
-            },
-            { focus: true },
-          );
-        }
-      };
-      if (ready.has(map)) {
-        apply();
-      } else {
-        map.once("load", apply);
       }
-    }
+      engine.paint(source, areas);
+      engine.paint("dots", bubbles);
+      if (inside != null) {
+        engine.paint(inside, deeper);
+      }
+    });
   });
 
-  let lit: number | null = null;
   $effect(() => {
     const k = near;
-    for (const map of maps) {
-      const apply = () => {
-        if (map.getSource("own") == null) {
-          return;
-        }
-        if (lit != null) {
-          map.setFeatureState(
-            { source: "own", sourceLayer: "areas", id: lit },
-            { near: false },
-          );
-        }
-        if (k != null) {
-          map.setFeatureState(
-            { source: "own", sourceLayer: "areas", id: k },
-            { near: true },
-          );
-        }
-      };
-      if (ready.has(map)) {
-        apply();
-      } else {
-        map.once("load", apply);
-      }
+    if (engine.gl != null) {
+      untrack(() => engine.mark("near", outer, k));
     }
-    lit = k;
   });
 
-  let shown: number | null = null;
   $effect(() => {
     const k = focus;
-    for (const map of maps) {
-      const apply = () => {
-        if (shown != null) {
-          map.setFeatureState(
-            {
-              source: inner.has(shown) ? "nested" : "places",
-              sourceLayer: "areas",
-              id: shown,
-            },
-            { focus: false },
-          );
-        }
-        if (k != null) {
-          map.setFeatureState(
-            {
-              source: inner.has(k) ? "nested" : "places",
-              sourceLayer: "areas",
-              id: k,
-            },
-            { focus: true },
-          );
-        }
-      };
-      if (ready.has(map)) {
-        apply();
-      } else {
-        map.once("load", apply);
-      }
+    if (engine.gl != null) {
+      untrack(() =>
+        engine.mark("focus", k != null && inner.has(k) ? inside : source, k),
+      );
     }
-    shown = k;
   });
 </script>
 
@@ -2242,15 +1443,14 @@
     style:aspect-ratio={ratio}
     bind:clientWidth={boxWidth}
     bind:clientHeight={boxHeight}
-    {@attach mount}
   >
     <div
       class={cn(
         "transition-opacity duration-500 ease-out block-full inline-full motion-reduce:transition-none",
-        { "opacity-0": !isLoaded },
+        { "opacity-0": !engine.isLoaded },
         { invisible: isHexView },
       )}
-      data-map-surface
+      {@attach engine.mount}
     ></div>
     {#if isHexView && grid != null}
       <svg
@@ -2258,14 +1458,6 @@
         viewBox="{grid.x} {grid.y} {grid.width} {grid.height}"
         role="group"
         aria-label={m.map_label({ noun })}
-        {@attach (node: SVGSVGElement) => {
-          const tones = paint(node.parentElement ?? document.body);
-          reader = tones.read;
-          return () => {
-            tones.done();
-            reader = null;
-          };
-        }}
         onpointerleave={() => {
           pointer = null;
           if (pinned == null) {
@@ -2397,7 +1589,7 @@
         alt=""
         out:fade={{ duration: calm ? 0 : 180 }}
       />
-    {:else if !isLoaded}
+    {:else if !engine.isLoaded}
       <p
         class="absolute inset-0 grid place-items-center text-[0.8125rem] text-muted-foreground"
       >
@@ -2417,17 +1609,6 @@
         {m.map_opening({ place: rows.get(opening)?.name ?? "" })}
       </p>
     {/if}
-    {#if frames.length > 1}
-      <div class="pointer-events-none absolute inset-s-2 inset-be-2 flex gap-2">
-        {#each frames.slice(1) as _frame, index (index)}
-          <div
-            class="pointer-events-auto relative overflow-hidden rounded-xs bg-card ring-1 ring-border block-11 inline-15 sm:block-20 sm:inline-28"
-          >
-            <div class="block-full inline-full" data-map-surface></div>
-          </div>
-        {/each}
-      </div>
-    {/if}
     <div
       class={cn(
         "absolute inset-e-2 inset-bs-2 flex flex-col overflow-hidden rounded-sm bg-card shadow-menu ring-1 ring-border max-sm:inset-bs-auto max-sm:inset-be-2",
@@ -2440,10 +1621,7 @@
         class="grid place-items-center block-8 inline-8 hover:bg-secondary pointer-coarse:block-10 pointer-coarse:inline-10"
         aria-label={m.map_zoom_in()}
         title={m.map_zoom_in()}
-        onclick={() => {
-          isMoved = true;
-          maps[0]?.zoomIn();
-        }}
+        onclick={() => engine.zoomIn()}
       >
         <PlusIcon class="block-4 inline-4" />
       </button>
@@ -2452,10 +1630,7 @@
         class="grid place-items-center border-bs border-border block-8 inline-8 hover:bg-secondary pointer-coarse:block-10 pointer-coarse:inline-10"
         aria-label={m.map_zoom_out()}
         title={m.map_zoom_out()}
-        onclick={() => {
-          isMoved = true;
-          maps[0]?.zoomOut();
-        }}
+        onclick={() => engine.zoomOut()}
       >
         <MinusIcon class="block-4 inline-4" />
       </button>
@@ -2464,12 +1639,7 @@
         class="grid place-items-center border-bs border-border block-8 inline-8 hover:bg-secondary pointer-coarse:block-10 pointer-coarse:inline-10"
         aria-label={m.map_reset()}
         title={m.map_reset()}
-        onclick={() => {
-          if (snug != null) {
-            isMoved = false;
-            maps[0]?.easeTo({ center: snug.center, zoom: snug.zoom });
-          }
-        }}
+        onclick={() => engine.reset()}
       >
         <ScanIcon class="block-4 inline-4" />
       </button>

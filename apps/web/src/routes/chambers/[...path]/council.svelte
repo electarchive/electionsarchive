@@ -180,7 +180,7 @@
       tiles={mapped.map.tiles}
       own={mapped.map.own}
       nested={mapped.map.nested}
-      frames={mapped.map.frames}
+      frame={mapped.map.frame}
       blank={mapped.map.blank ?? null}
       isApproximate={mapped.map.isApproximate}
       sources={mapped.map.credits}

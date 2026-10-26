@@ -20,10 +20,11 @@ import * as v from "valibot";
 import { m } from "#lib/paraglide/messages.js";
 import { os, remember } from "#lib/server/cache.js";
 import { db } from "#lib/server/db/index.js";
+import { plane, spot } from "#lib/server/plane.js";
 
 const stored = (tiles: string | null | undefined) =>
   tiles != null &&
-  existsSync(path.resolve("../../data/tiles", `${tiles}.pmtiles`))
+  existsSync(path.resolve("../../data/plane", `${tiles}.pmtiles`))
     ? tiles
     : null;
 
@@ -475,14 +476,12 @@ const Sketch = v.object({
   nested: v.optional(
     v.nullable(v.object({ tiles: v.string(), ks: v.array(v.number()) })),
   ),
-  frames: v.array(
-    v.object({
-      west: v.number(),
-      south: v.number(),
-      east: v.number(),
-      north: v.number(),
-    }),
-  ),
+  frame: v.object({
+    west: v.number(),
+    south: v.number(),
+    east: v.number(),
+    north: v.number(),
+  }),
   blank: v.optional(
     v.array(v.object({ k: v.number(), name: v.string(), isHeld: v.boolean() })),
   ),
@@ -3323,7 +3322,7 @@ async function atlas(input: {
     levels.at(-1) ??
     null;
   const shown = level == null ? [] : (counted.get(level.code) ?? []);
-  const [labels, slugs, frames, targets, relations] = await Promise.all([
+  const [labels, slugs, frame, targets, relations] = await Promise.all([
     names(
       [
         contest.id,
@@ -3335,7 +3334,7 @@ async function atlas(input: {
     ),
     paths([contest.id]),
     input.isLean === true
-      ? []
+      ? null
       : framing(
           area.id,
           day,
@@ -3478,7 +3477,7 @@ async function atlas(input: {
     ],
     date: contest.date,
     outline: stored(known.get(own.rows[0]?.scheme ?? "")?.tiles),
-    frames,
+    frame,
     levels: levels.map(({ rank: _rank, ...entry }) => entry),
     level: level?.code ?? null,
     parts,
@@ -3553,7 +3552,7 @@ async function mosaic(input: { id: string; vs?: string; group: Grouping }) {
     });
   const rastered = (tiles: string | null) =>
     tiles != null &&
-    existsSync(path.resolve("../../data/tiles", `${tiles}.ids.pmtiles`));
+    existsSync(path.resolve("../../data/plane", `${tiles}.ids.pmtiles`));
   const base = await load(undefined, undefined);
   const middle = base.levels.findLast(
     (level) => level.code !== base.level && rastered(level.tiles),
@@ -3722,11 +3721,11 @@ export async function rebuildMosaics(only?: Array<string>) {
     }
   }
   const rasters: Array<string> = [];
-  for (const name of await readdir(path.resolve("../../data/tiles"), {
+  for (const name of await readdir(path.resolve("../../data/plane"), {
     recursive: true,
   })) {
     if (name.endsWith(".ids.pmtiles")) {
-      const info = await stat(path.resolve("../../data/tiles", name));
+      const info = await stat(path.resolve("../../data/plane", name));
       rasters.push(`${name}@${info.mtimeMs}`);
     }
   }
@@ -6238,7 +6237,7 @@ export const contests = {
           blank: v.array(
             v.object({ k: v.number(), name: v.string(), isHeld: v.boolean() }),
           ),
-          frames: v.array(
+          frame: v.nullable(
             v.object({
               west: v.number(),
               south: v.number(),
@@ -6302,7 +6301,7 @@ export const contests = {
         kids.filter((kid) => kid.scheme === input.level).map((kid) => kid.k),
       );
       const absent = whole.filter((row) => !present.has(row.k));
-      const [frames, blankLabels] = await Promise.all([
+      const [frame, blankLabels] = await Promise.all([
         framing(area.id, own.rows[0]?.shaped ?? day, [
           ...present,
           ...whole.map((row) => row.k),
@@ -6378,7 +6377,7 @@ export const contests = {
                 .map((id) => labels.full.get(id) ?? "")
                 .toSorted((a, b) => a.localeCompare(b)),
               k: group.ids.includes(area.id) ? area.k : null,
-              frames: group.ids.includes(area.id) ? frames : [],
+              frame: group.ids.includes(area.id) ? frame : null,
               blank: group.scheme === input.level ? blank : [],
             },
           ];
@@ -6416,7 +6415,7 @@ export const contests = {
         trail: v.array(v.object({ name: v.string(), unit: v.string() })),
         date: v.nullable(v.string()),
         outline: v.nullable(v.string()),
-        frames: v.array(
+        frame: v.nullable(
           v.object({
             west: v.number(),
             south: v.number(),
@@ -7749,12 +7748,13 @@ async function turnout(contest: string | null, ks: Array<number>) {
 
 async function anchors(ks: Array<number>, day: string) {
   const points = await db.execute<{ k: number; x: number; y: number }>(sql`
-    select distinct on (a.k) a.k,
-      ST_X(coalesce(g.label_point, ST_PointOnSurface(g.geom))) as x,
-      ST_Y(coalesce(g.label_point, ST_PointOnSurface(g.geom))) as y
-    from area a join area_geometry g on g.area_id = a.id
-    where a.k = any(${sql.param(ks)}::int[]) and g.valid @> ${day}::date
-    order by a.k
+    select k, ST_X(p) as x, ST_Y(p) as y from (
+      select distinct on (a.k) a.k,
+        ${spot("coalesce(g.label_point, ST_PointOnSurface(g.geom))", "a.scheme_code")} as p
+      from area a join area_geometry g on g.area_id = a.id
+      where a.k = any(${sql.param(ks)}::int[]) and g.valid @> ${day}::date
+      order by a.k
+    ) x where p is not null
   `);
   return new Map(
     points.rows.map((row) => [row.k, [row.x, row.y] as [number, number]]),
@@ -7998,46 +7998,27 @@ async function universe(
 }
 
 async function framing(area: string, day: string, ks: Array<number> = []) {
-  const parts = await db.execute<{
+  const found = await db.execute<{
     west: number;
     south: number;
     east: number;
     north: number;
-    share: number;
-    isFilled: boolean;
   }>(sql`
     with parts as (
-      select (ST_Dump(g.geom)).geom as geom
-      from area_geometry g
-      where g.area_id = ${area}::uuid and g.valid @> ${day}::date
+      select ST_Simplify(d.geom, 0.01, true) as geom, a.scheme_code as scheme
+      from area a
+      join area_geometry g on g.area_id = a.id and g.valid @> ${day}::date
+      cross join lateral ST_Dump(g.geom) d
+      where ${ks.length === 0 ? sql`a.id = ${area}::uuid` : sql`a.k = any(${sql.param(ks)}::int[])`}
     ),
-    clustered as (
-      select geom, ST_ClusterDBSCAN(ST_Envelope(geom), eps := 2, minpoints := 1) over () as cluster
+    framed as (
+      select ST_Transform(ST_SetSRID(ST_Extent(${plane("geom", "scheme")})::geometry, 3857), 4326) as box
       from parts
-    ),
-    grouped as (
-      select ST_Extent(geom) as box, sum(ST_Area(geom) * cos(radians(ST_Y(ST_Centroid(geom))))) as size
-      from clustered group by cluster
     )
-    select ST_XMin(box) as west, ST_YMin(box) as south, ST_XMax(box) as east, ST_YMax(box) as north,
-      size / nullif(sum(size) over (), 0) as share,
-      cardinality(${sql.param(ks)}::int[]) = 0 or exists (
-        select from area x
-        cross join lateral (select g.geom from area_geometry g where g.area_id = x.id and g.valid @> ${day}::date offset 0) g
-        where x.k = any(${sql.param(ks)}::int[]) and g.geom && ST_SetSRID(box::geometry, 4326)
-      ) as "isFilled"
-    from grouped order by size desc
+    select ST_XMin(box) as west, ST_YMin(box) as south, ST_XMax(box) as east, ST_YMax(box) as north
+    from framed where box is not null
   `);
-  const filled = parts.rows.filter((part) => part.isFilled);
-  return (filled.length > 0 ? filled : parts.rows)
-    .filter((part) => part.share >= 0.0005)
-    .slice(0, 6)
-    .map((part) => ({
-      west: part.west,
-      south: part.south,
-      east: part.east,
-      north: part.north,
-    }));
+  return found.rows[0] ?? null;
 }
 
 async function sketch(
@@ -8052,7 +8033,7 @@ async function sketch(
     contest == null ? [] : await universe(contest, level, area.id, day);
   const counted = new Set(ks);
   const absent = whole.filter((row) => !counted.has(row.k));
-  const [frames, found, nested, labels] = await Promise.all([
+  const [frame, found, nested, labels] = await Promise.all([
     framing(area.id, day, [...ks, ...whole.map((row) => row.k)]),
     db.execute<{
       scheme: string;
@@ -8105,13 +8086,13 @@ async function sketch(
   const own = found.rows.find(
     (row) => row.scheme !== level && stored(row.tiles) != null,
   );
-  return tiled == null || frames.length === 0
+  return tiled == null || frame == null
     ? null
     : {
         tiles: tiled.tiles,
         own: own == null ? null : { tiles: own.tiles, k: area.k },
         nested: inside == null ? null : { tiles: inside, ks: inner },
-        frames,
+        frame,
         blank: absent
           .map((row) => ({
             k: row.k,
@@ -11031,13 +11012,13 @@ export const elections = {
           y: number | null;
         }>(sql`
           select a.id, a.k, a.scheme_code as scheme, sc.noun,
-            ST_X(coalesce(g.label_point, ST_PointOnSurface(g.geom))) as x,
-            ST_Y(coalesce(g.label_point, ST_PointOnSurface(g.geom))) as y
+            ST_X(at.p) as x, ST_Y(at.p) as y
           from area a join scheme sc on sc.code = a.scheme_code
           left join lateral (
             select g.label_point, g.geom from area_geometry g
             where g.area_id = a.id and g.valid @> ${date}::date limit 1
           ) g on true
+          cross join lateral (select ${spot("coalesce(g.label_point, ST_PointOnSurface(g.geom))", "a.scheme_code")} as p) at
           where a.id = any(${sql.param([...new Set([...groups, ...found.rows.flatMap((row) => row.area ?? [])])])}::uuid[])
         `),
         db.execute<{ id: string; k: number }>(sql`
@@ -11851,13 +11832,13 @@ export const elections = {
         y: number | null;
       }>(sql`
         select a.id, a.k,
-          ST_X(coalesce(g.label_point, ST_PointOnSurface(g.geom))) as x,
-          ST_Y(coalesce(g.label_point, ST_PointOnSurface(g.geom))) as y
+          ST_X(at.p) as x, ST_Y(at.p) as y
         from area a
         left join lateral (
           select g.label_point, g.geom from area_geometry g
           where g.area_id = a.id and g.valid @> ${date}::date limit 1
         ) g on true
+        cross join lateral (select ${spot("coalesce(g.label_point, ST_PointOnSurface(g.geom))", "a.scheme_code")} as p) at
         where a.k = any(${sql.param(level.ks)}::int[])
       `);
       const [labels, slugs] = await Promise.all([

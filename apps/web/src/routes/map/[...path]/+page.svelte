@@ -14,7 +14,6 @@
   import ScanIcon from "@lucide/svelte/icons/scan";
   import SlidersHorizontalIcon from "@lucide/svelte/icons/sliders-horizontal";
   import XIcon from "@lucide/svelte/icons/x";
-  import { mode } from "mode-watcher";
   import { untrack } from "svelte";
   import { on } from "svelte/events";
   import { SvelteURLSearchParams } from "svelte/reactivity";
@@ -30,6 +29,7 @@
   import { swatch } from "#lib/party.js";
   import { orpc } from "#lib/rpc.js";
   import { cn } from "#lib/utils.js";
+  import { Engine } from "#lib/map/engine.svelte.js";
   import Histogram from "./histogram.svelte";
 
   type Sheet = PageData["atlas"];
@@ -98,8 +98,6 @@
   let pointer = $state<{ x: number; y: number } | null>(null);
   let term = $state("");
   let isKeyOpen = $state(false);
-  let credits = $state<Array<string>>([]);
-  let map = $state.raw<Maplibre.Map | null>(null);
   let detail = $state.raw<
     Record<string, { set: Sheet; source: string; rank: number }>
   >({});
@@ -110,26 +108,13 @@
     Array<{ k: number; name: string; x: number; y: number }>
   >([]);
   let isQueued = false;
-  let isFramed = true;
   let mosaic = $state.raw<{
     key: string;
     set: Sheet;
     layers: Array<{ code: string; tiles: string }>;
   } | null>(null);
   let tinted = "";
-  let drawn = 0;
-  let ink = 0;
-  let spotted = 0;
-  const colors = new Map<number, number>();
   const named = new Set<string>();
-  const tiles = new Map<
-    string,
-    Promise<{ ids: Uint32Array; index: Uint8Array | Uint16Array } | null>
-  >();
-  const ready = new Map<
-    string,
-    { ids: Uint32Array; index: Uint8Array | Uint16Array }
-  >();
 
   const isCompared = $derived(
     sheet.target != null &&
@@ -594,224 +579,88 @@
     });
   });
 
-  function probe(host: HTMLElement) {
-    const span = document.createElement("span");
-    host.append(span);
-    const context = document
-      .createElement("canvas")
-      .getContext("2d", { willReadFrequently: true });
-    const known: Record<string, string> = {};
-    const color = (css: string) => {
-      const hit = known[css];
-      if (hit != null) {
-        return hit;
-      }
-      span.style.color = css;
-      let value = getComputedStyle(span).color;
-      if (context != null) {
-        context.clearRect(0, 0, 1, 1);
-        context.fillStyle = value;
-        context.fillRect(0, 0, 1, 1);
-        const [r = 0, g = 0, b = 0, a = 255] = context.getImageData(
-          0,
-          0,
-          1,
-          1,
-        ).data;
-        value = `rgba(${r}, ${g}, ${b}, ${(a / 255).toFixed(3)})`;
-      }
-      known[css] = value;
-      return value;
-    };
-    return { color, done: () => span.remove() };
-  }
+  const padding = (width: number) => {
+    const side = Math.round(Math.min(320, width * 0.16));
+    return width >= 768
+      ? { top: 64, right: side, bottom: 24, left: side }
+      : { top: 64, right: 16, bottom: 120, left: 16 };
+  };
 
-  let layers: Array<string> = [];
-  let sources: Array<string> = [];
-  let groups: Array<{ rank: number; first: string }> = [];
+  const engine = new Engine(
+    untrack(() => sheet.frame) ?? {
+      west: -20,
+      south: -20,
+      east: 20,
+      north: 20,
+    },
+    padding,
+    {
+      onReady: () => build(untrack(() => sheet)),
+      onMove: () => {
+        if (!isQueued) {
+          isQueued = true;
+          requestAnimationFrame(letter);
+        }
+      },
+      onMoveEnd: deepen,
+      onPointer: ({ kind, point }) => {
+        if (kind === "leave") {
+          hovered = null;
+          pointer = null;
+          return;
+        }
+        const k = pick(point);
+        if (kind === "move") {
+          hovered = k;
+          pointer = point;
+          engine.cursor(k != null);
+          return;
+        }
+        if (k == null || pinned === k) {
+          pinned = null;
+          return;
+        }
+        pinned = k;
+        hovered = k;
+        if (
+          isParts &&
+          lookup[k]?.set === sheet &&
+          (engine.gl?.getZoom() ?? 0) < MID
+        ) {
+          zoomTo(k);
+        }
+      },
+    },
+  );
+
   let painted: Record<string, string> = {};
-  let marked: Array<{ source: string; k: number }> = [];
-  let library: typeof Maplibre | null = null;
-  let minis = $state.raw<Array<Maplibre.Map | null>>([]);
-  let away = $state<Array<boolean>>([]);
-  const surfaces: Array<HTMLElement | null> = [];
-  const dressed = new WeakSet<Maplibre.Map>();
+  const base = $derived.by(() => {
+    const level = sheet.levels.find((entry) => entry.code === sheet.level);
+    return level?.tiles == null ? null : `fill:t:${level.tiles}`;
+  });
 
-  const veiled = (x: number, y: number) =>
-    sheet.frames.some(
-      (box, i) =>
-        away[i] === true &&
-        x >= box.west &&
-        x <= box.east &&
-        y >= box.south &&
-        y <= box.north,
-    );
-
-  function survey(gl: Maplibre.Map) {
-    const base = sheet.frames[0];
-    const overview =
-      base == null
-        ? 0
-        : (gl.cameraForBounds([base.west, base.south, base.east, base.north], {
-            padding: room(),
-          })?.zoom ?? 0);
-    const width = gl.getCanvas().clientWidth;
-    const height = gl.getCanvas().clientHeight;
-    const isWide = sheet.frames.length > 1 && gl.getZoom() <= overview + 1.5;
-    away = sheet.frames.map((box) => {
-      const at = gl.project([
-        (box.west + box.east) / 2,
-        (box.south + box.north) / 2,
-      ]);
-      return (
-        isWide &&
-        !(
-          at.x >= width * 0.15 &&
-          at.x <= width * 0.85 &&
-          at.y >= height * 0.15 &&
-          at.y <= height * 0.85
-        )
-      );
-    });
-    for (const [i, target] of [gl, ...minis].entries()) {
-      const veil = target?.getSource("veil");
-      if (
-        target == null ||
-        veil?.type !== "geojson" ||
-        (i > 0 && dressed.has(target))
-      ) {
-        continue;
-      }
-      dressed.add(target);
-      void (veil as Maplibre.GeoJSONSource).setData({
-        type: "FeatureCollection",
-        features: sheet.frames.flatMap((box, j) =>
-          (i === 0 ? away[j] === true : j !== i - 1)
-            ? [
-                {
-                  type: "Feature" as const,
-                  properties: {},
-                  geometry: {
-                    type: "Polygon" as const,
-                    coordinates: [
-                      [
-                        [box.west - 0.3, box.south - 0.3],
-                        [box.east + 0.3, box.south - 0.3],
-                        [box.east + 0.3, box.north + 0.3],
-                        [box.west - 0.3, box.north + 0.3],
-                        [box.west - 0.3, box.south - 0.3],
-                      ],
-                    ],
-                  },
-                },
-              ]
-            : [],
-        ),
-      });
-    }
-  }
-
-  function mirror(gl: Maplibre.Map, next: Sheet) {
-    for (const mini of minis) {
-      mini?.remove();
-    }
-    minis = [];
-    const maplibre = library;
-    if (maplibre == null || next.frames.length < 2) {
-      return;
-    }
-    const style = gl.getStyle();
-    const made = next.frames.map((box, i) => {
-      const surface = surfaces[i];
-      return surface == null
-        ? null
-        : new maplibre.Map({
-            container: surface,
-            style,
-            bounds: [box.west, box.south, box.east, box.north],
-            fitBoundsOptions: { padding: 6 },
-            interactive: false,
-            attributionControl: false,
-            renderWorldCopies: false,
-            fadeDuration: 0,
-          });
-    });
-    let waiting = made.filter((mini) => mini != null).length;
-    for (const mini of made) {
-      mini?.once("style.load", () => {
-        for (const id of gl.listImages()) {
-          const image = gl.getImage(id);
-          if (!mini.hasImage(id)) {
-            mini.addImage(id, image.data, { pixelRatio: image.pixelRatio });
-          }
-        }
-        waiting -= 1;
-        if (waiting === 0 && map === gl) {
-          painted = {};
-          minis = made;
-          survey(gl);
-        }
-      });
-    }
-  }
-
-  function credit(tiles: string) {
-    void import("pmtiles").then(async ({ PMTiles }) => {
-      const meta = (await new PMTiles(
-        `${globalThis.location.origin}/tiles/${tiles}.pmtiles`,
-      ).getMetadata()) as { attribution?: unknown };
-      const text = String(meta.attribution ?? "");
-      credits = [
-        ...new Set([
-          ...credits,
-          ...text
-            .split(text.includes("\n") ? "\n" : "; ")
-            .filter((part) => part.trim() !== ""),
-        ]),
-      ];
-    });
-  }
-
-  function source(gl: Maplibre.Map, tiles: string) {
-    const id = `t:${tiles}`;
-    if (gl.getSource(id) == null) {
-      gl.addSource(id, {
-        type: "vector",
-        url: `pmtiles://${globalThis.location.origin}/tiles/${tiles}.pmtiles`,
-      });
-      sources.push(id);
-      credit(tiles);
-    }
-    return id;
-  }
-
-  function tier(
-    gl: Maplibre.Map,
-    tiles: string,
-    rank: number,
-    from: number,
-    isDense: boolean,
-  ) {
-    const id = source(gl, tiles);
-    const fill = `fill:${id}`;
-    if (gl.getLayer(fill) != null) {
+  function tier(tiles: string, rank: number, from: number, isDense: boolean) {
+    const id = engine.tiles(tiles, "sheet");
+    if (engine.has(`fill:${id}`)) {
       return id;
     }
-    const reader = probe(gl.getContainer());
-    const paper = reader.color("var(--card)");
-    const ink = reader.color("var(--foreground)");
-    reader.done();
-    const before =
-      groups
-        .toSorted((a, b) => a.rank - b.rank)
-        .find((group) => group.rank > rank)?.first ?? "anchor-fills";
-    gl.addLayer(
+    const on: Maplibre.ExpressionSpecification = [
+      "case",
+      ["boolean", ["feature-state", "on"], false],
+      1,
+      0,
+    ];
+    const layer = {
+      source: id,
+      "source-layer": "areas",
+      minzoom: from,
+    } as const;
+    const options = { group: "sheet", rank };
+    engine.add(
       {
-        id: fill,
+        id: `fill:${id}`,
         type: "fill",
-        source: id,
-        "source-layer": "areas",
-        minzoom: from,
+        ...layer,
         paint: {
           "fill-color": [
             "coalesce",
@@ -820,55 +669,39 @@
           ],
         },
       },
-      before,
+      "fills",
+      options,
     );
-    gl.addLayer(
-      {
-        id: `hatch:${id}`,
-        type: "fill",
-        source: id,
-        "source-layer": "areas",
-        minzoom: from,
-        paint: {
-          "fill-pattern": "hatch",
-          "fill-opacity": [
-            "case",
-            ["boolean", ["feature-state", "hatched"], false],
-            1,
-            0,
-          ],
+    for (const [shape, flag] of [
+      ["hatch", "hatched"],
+      ["norun", "absent"],
+    ] as const) {
+      engine.add(
+        {
+          id: `${shape}:${id}`,
+          type: "fill",
+          ...layer,
+          paint: {
+            "fill-pattern": shape,
+            "fill-opacity": [
+              "case",
+              ["boolean", ["feature-state", flag], false],
+              1,
+              0,
+            ],
+          },
         },
-      },
-      before,
-    );
-    gl.addLayer(
-      {
-        id: `norun:${id}`,
-        type: "fill",
-        source: id,
-        "source-layer": "areas",
-        minzoom: from,
-        paint: {
-          "fill-pattern": "norun",
-          "fill-opacity": [
-            "case",
-            ["boolean", ["feature-state", "absent"], false],
-            1,
-            0,
-          ],
-        },
-      },
-      before,
-    );
-    gl.addLayer(
+        "fills",
+        options,
+      );
+    }
+    engine.add(
       {
         id: `seam:${id}`,
         type: "line",
-        source: id,
-        "source-layer": "areas",
-        minzoom: from,
+        ...layer,
         paint: {
-          "line-color": paper,
+          "line-color": "var(--card)",
           "line-width": [
             "interpolate",
             ["linear"],
@@ -882,45 +715,34 @@
             13,
             1.2,
           ],
-          "line-opacity": [
-            "case",
-            ["boolean", ["feature-state", "on"], false],
-            1,
-            0,
-          ],
+          "line-opacity": on,
         },
       },
-      before,
+      "fills",
+      options,
     );
-    gl.addLayer(
+    engine.add(
       {
         id: `edge:${id}`,
         type: "line",
-        source: id,
-        "source-layer": "areas",
+        ...layer,
         minzoom: rank === 0 ? MID : FINE,
         paint: {
-          "line-color": paper,
+          "line-color": "var(--card)",
           "line-width": rank === 0 ? 2 : 1.25,
-          "line-opacity": [
-            "case",
-            ["boolean", ["feature-state", "on"], false],
-            1,
-            0,
-          ],
+          "line-opacity": on,
         },
       },
-      "anchor-edges",
+      "lines",
+      options,
     );
-    gl.addLayer(
+    engine.add(
       {
         id: `focus:${id}`,
         type: "line",
-        source: id,
-        "source-layer": "areas",
-        minzoom: from,
+        ...layer,
         paint: {
-          "line-color": ink,
+          "line-color": "var(--foreground)",
           "line-width": [
             "case",
             ["boolean", ["feature-state", "focus"], false],
@@ -939,59 +761,44 @@
           ],
         },
       },
-      "anchor-focus",
+      "focus",
+      { group: "sheet" },
     );
-    layers.push(
-      fill,
-      `hatch:${id}`,
-      `norun:${id}`,
-      `seam:${id}`,
-      `edge:${id}`,
-      `focus:${id}`,
-    );
-    groups.push({ rank, first: fill });
     return id;
   }
 
-  function index(gl: Maplibre.Map, set: Sheet, id: string, rank: number) {
+  function index(set: Sheet, id: string, rank: number) {
     for (const [i, k] of set.places.k.entries()) {
       lookup[k] = { set, i, source: id };
     }
     seen += 1;
     const dots = `dots:${id}:${set.scope.k}:${set.level ?? ""}`;
-    if (gl.getSource(dots) != null) {
+    if (engine.has(dots)) {
       return;
     }
-    gl.addSource(dots, {
-      type: "geojson",
-      data: {
-        type: "FeatureCollection",
-        features: set.places.k.flatMap((k, i) => {
-          const x = set.places.x[i];
-          const y = set.places.y[i];
-          return x == null || y == null
-            ? []
-            : [
-                {
-                  type: "Feature" as const,
-                  id: k,
-                  properties: { votes: set.places.valid[i] ?? 0 },
-                  geometry: { type: "Point" as const, coordinates: [x, y] },
-                },
-              ];
-        }),
-      },
-    });
-    sources.push(dots);
-    const reader = probe(gl.getContainer());
-    const paper = reader.color("var(--card)");
-    reader.done();
+    engine.points(
+      dots,
+      set.places.k.flatMap((k, i) => {
+        const x = set.places.x[i];
+        const y = set.places.y[i];
+        return x == null || y == null
+          ? []
+          : [
+              {
+                k,
+                at: [x, y] as [number, number],
+                properties: { votes: set.places.valid[i] ?? 0 },
+              },
+            ];
+      }),
+      "sheet",
+    );
     const size: Maplibre.ExpressionSpecification = [
       "coalesce",
       ["feature-state", "size"],
       0,
     ];
-    gl.addLayer(
+    engine.add(
       {
         id: dots,
         type: "circle",
@@ -1015,142 +822,110 @@
             "rgba(0, 0, 0, 0)",
           ],
           "circle-opacity": 0.9,
-          "circle-stroke-color": paper,
+          "circle-stroke-color": "var(--card)",
           "circle-stroke-width": ["case", [">", size, 0], 0.6, 0],
         },
       },
-      "anchor-edges",
+      "points",
+      { group: "sheet" },
     );
-    layers.push(dots);
   }
 
-  function build(gl: Maplibre.Map, next: Sheet) {
-    for (const id of layers.toReversed()) {
-      if (gl.getLayer(id) != null) {
-        gl.removeLayer(id);
-      }
-    }
-    for (const id of sources) {
-      if (gl.getSource(id) != null) {
-        gl.removeSource(id);
-      }
-    }
-    layers = [];
-    sources = [];
-    groups = [];
+  function build(next: Sheet) {
+    engine.drop("sheet");
+    engine.credits = [];
     painted = {};
-    marked = [];
     lookup = {};
-    credits = [];
-    const reader = probe(gl.getContainer());
+    tinted = "";
     if (next.outline != null) {
-      const id = source(gl, next.outline);
-      gl.addLayer(
+      const id = engine.tiles(next.outline, "sheet");
+      engine.add(
         {
           id: "context",
           type: "fill",
           source: id,
           "source-layer": "areas",
           paint: {
-            "fill-color": reader.color(
+            "fill-color":
               "color-mix(in oklab, var(--muted-foreground) 9%, var(--card))",
-            ),
           },
         },
-        "anchor-fills",
+        "fills",
+        { group: "sheet" },
       );
-      gl.addLayer(
+      engine.add(
         {
           id: "context-seam",
           type: "line",
           source: id,
           "source-layer": "areas",
-          paint: { "line-color": reader.color("var(--card)"), "line-width": 1 },
+          paint: { "line-color": "var(--card)", "line-width": 1 },
         },
-        "anchor-fills",
+        "fills",
+        { group: "sheet" },
       );
-      layers.push("context", "context-seam");
       if (next.trail.length > 1) {
-        gl.addLayer(
+        engine.add(
           {
             id: "scope",
             type: "line",
             source: id,
             "source-layer": "areas",
             filter: ["==", ["id"], next.scope.k],
-            paint: {
-              "line-color": reader.color("var(--foreground)"),
-              "line-width": 1.5,
-            },
+            paint: { "line-color": "var(--foreground)", "line-width": 1.5 },
           },
-          "anchor-focus",
+          "focus",
+          { group: "sheet" },
         );
-        layers.push("scope");
       }
     }
-    reader.done();
     const level = next.levels.find((entry) => entry.code === next.level);
     if (level?.tiles != null) {
-      index(
-        gl,
-        next,
-        tier(gl, level.tiles, 0, 0, next.places.k.length > 400),
-        0,
-      );
+      index(next, tier(level.tiles, 0, 0, next.places.k.length > 400), 0);
     }
-    mirror(gl, next);
   }
 
-  function paint(gl: Maplibre.Map, set: Sheet, id: string, mark: string) {
-    if (painted[`${id}|${set.scope.k}|${set.level}`] === mark) {
+  function paint(set: Sheet, id: string, mark: string) {
+    const key = `${id}|${set.scope.k}|${set.level}`;
+    if (painted[key] === mark) {
       return;
     }
-    painted[`${id}|${set.scope.k}|${set.level}`] = mark;
-    const reader = probe(gl.getContainer());
+    painted[key] = mark;
     const dots = `dots:${id}:${set.scope.k}:${set.level ?? ""}`;
-    const isDotted = shown === "votes" && gl.getSource(dots) != null;
-    const ground = reader.color(
-      "color-mix(in oklab, var(--muted-foreground) 15%, var(--card))",
-    );
+    const isDotted = shown === "votes" && engine.has(dots);
+    const fills = new Map<number, Record<string, string | number | boolean>>();
+    const marks = new Map<number, Record<string, string | number | boolean>>();
     for (const [i, k] of set.places.k.entries()) {
-      const color = reader.color(tone(set, i));
-      const state = {
-        color: isDotted ? ground : color,
+      const reading = read(set, i);
+      const color = tone(set, i);
+      fills.set(k, {
+        color: isDotted
+          ? "color-mix(in oklab, var(--muted-foreground) 15%, var(--card))"
+          : color,
         on: true,
-        hatched: needsBefore && (set.estimated || read(set, i).isUnmatched),
-        absent: read(set, i).isAbsent,
-      };
-      gl.setFeatureState({ source: id, sourceLayer: "areas", id: k }, state);
-      for (const mini of minis) {
-        if (mini?.getSource(id) != null) {
-          mini.setFeatureState(
-            { source: id, sourceLayer: "areas", id: k },
-            state,
-          );
-        }
-      }
-      if (gl.getSource(dots) != null) {
-        gl.setFeatureState(
-          { source: dots, id: k },
-          {
-            dot: color,
-            size: isDotted ? 0.015 * Math.sqrt(set.places.valid[i] ?? 0) : 0,
-          },
-        );
-      }
+        hatched: needsBefore && (set.estimated || reading.isUnmatched),
+        absent: reading.isAbsent,
+      });
+      marks.set(k, {
+        dot: color,
+        size: isDotted ? 0.015 * Math.sqrt(set.places.valid[i] ?? 0) : 0,
+      });
     }
-    reader.done();
+    engine.paint(id, fills, true);
+    if (engine.has(dots)) {
+      engine.paint(dots, marks);
+    }
   }
 
   function deepen() {
-    const gl = map;
+    const gl = engine.gl;
     if (gl == null || !isParts) {
       return;
     }
     const zoom = gl.getZoom();
     const [, , compared = ""] = asked.split("|");
     const vs = compared === "" ? null : compared;
-    const base = sheet;
+    const start = sheet;
     const wanted: Array<{ key: string; where: string; level: string | null }> =
       [];
     if (
@@ -1160,10 +935,8 @@
     ) {
       wanted.push({ key: "mid", where: "", level: mid.code });
     }
-    if (zoom >= FINE - 0.6) {
-      const ids = gl
-        .queryRenderedFeatures({ layers: groups.map((group) => group.first) })
-        .map((feature) => feature.id);
+    if (zoom >= FINE - 0.6 && base != null) {
+      const ids = engine.rendered(base);
       const middle = gl.getCenter();
       const near = sheet.parts
         .filter((part) => ids.includes(part.k))
@@ -1192,8 +965,7 @@
         .then((set) => {
           const level = set.levels.find((entry) => entry.code === set.level);
           if (
-            sheet !== base ||
-            map !== gl ||
+            sheet !== start ||
             level?.tiles == null ||
             detail[want.key] != null ||
             (want.key !== "mid" && set.level === mid?.code)
@@ -1201,8 +973,8 @@
             return;
           }
           const rank = want.key === "mid" ? 1 : 2;
-          const id = tier(gl, level.tiles, rank, rank === 1 ? MID : FINE, true);
-          index(gl, set, id, rank);
+          const id = tier(level.tiles, rank, rank === 1 ? MID : FINE, true);
+          index(set, id, rank);
           detail = { ...detail, [want.key]: { set, source: id, rank } };
         })
         .finally(() => {
@@ -1211,54 +983,24 @@
     }
   }
 
-  function drape(gl: Maplibre.Map, next: NonNullable<typeof mosaic>) {
+  function drape(next: NonNullable<typeof mosaic>) {
     for (const [i, k] of next.set.places.k.entries()) {
       lookup[k] ??= { set: next.set, i, source: "ids" };
     }
     seen += 1;
-    const before =
-      groups.toSorted((a, b) => a.rank - b.rank).find((group) => group.rank > 0)
-        ?.first ?? "anchor-fills";
-    for (const layer of next.layers) {
-      for (const [id, isFocus] of [
-        [`ids:${layer.tiles}`, false],
-        [`focus:ids:${layer.tiles}`, true],
-      ] as const) {
-        if (gl.getSource(id) == null) {
-          gl.addSource(id, {
-            type: "raster",
-            tiles: [
-              `ids://${layer.tiles}/{z}/{x}/{y}?v=${drawn}${isFocus ? `&focus=${spotted}` : ""}`,
-            ],
-            tileSize: 256,
-            maxzoom: 8,
-          });
-          sources.push(id);
-        }
-        if (gl.getLayer(id) == null) {
-          gl.addLayer(
-            {
-              id,
-              type: "raster",
-              source: id,
-              paint: { "raster-fade-duration": 0 },
-            },
-            isFocus ? "anchor-focus" : before,
-          );
-          layers.push(id);
-        }
-      }
-    }
-    if (mid?.tiles != null && gl.getLayer("lines") == null) {
-      const reader = probe(gl.getContainer());
-      gl.addLayer(
+    engine.drape(
+      next.layers.map((layer) => layer.tiles),
+      "sheet",
+    );
+    if (mid?.tiles != null && !engine.has("lines")) {
+      engine.add(
         {
           id: "lines",
           type: "line",
-          source: source(gl, mid.tiles),
+          source: engine.tiles(mid.tiles, "sheet"),
           "source-layer": "areas",
           paint: {
-            "line-color": reader.color("var(--card)"),
+            "line-color": "var(--card)",
             "line-width": [
               "interpolate",
               ["linear"],
@@ -1273,149 +1015,54 @@
             "line-opacity": 0.7,
           },
         },
-        "anchor-edges",
+        "lines",
+        { group: "sheet" },
       );
-      reader.done();
-      layers.push("lines");
     }
   }
 
-  function pick(gl: Maplibre.Map, point: Maplibre.Point, at: Maplibre.LngLat) {
-    if (veiled(at.lng, at.lat)) {
-      return null;
-    }
-    const fills = groups
-      .toSorted((a, b) => b.rank - a.rank)
-      .map((group) => group.first)
-      .filter((id) => gl.getLayer(id) != null);
-    const base = groups.find((group) => group.rank === 0)?.first;
-    const found = gl
-      .queryRenderedFeatures(point, { layers: fills })
-      .flatMap((feature) =>
-        typeof feature.id === "number" && lookup[feature.id] != null
-          ? [{ k: feature.id, layer: feature.layer.id }]
-          : [],
-      );
-    const fine = found.find((hit) => hit.layer !== base);
-    if (fine != null) {
-      return fine.k;
-    }
-    const sin = Math.sin((at.lat * Math.PI) / 180);
-    const top = Math.min(8, Math.max(0, Math.round(gl.getZoom() + 1)));
-    for (const layer of mosaic?.layers.toReversed() ?? []) {
-      for (const z of [8, 7, 6, 5, 4, 3, 2, 1, 0].filter((z) => z <= top)) {
-        const world = 512 * 2 ** z;
-        const x = ((at.lng + 180) / 360) * world;
-        const y =
-          (0.5 - Math.log((1 + sin) / (1 - sin)) / (4 * Math.PI)) * world;
-        const tile = ready.get(
-          `${layer.tiles}/${z}/${Math.floor(x / 512)}/${Math.floor(y / 512)}`,
-        );
-        if (tile == null) {
-          continue;
-        }
-        const k =
-          tile.ids[
-            tile.index[(Math.floor(y) % 512) * 512 + (Math.floor(x) % 512)] ?? 0
-          ] ?? 0;
-        if (colors.has(k) && lookup[k] != null) {
-          return k;
-        }
-        break;
-      }
-    }
-    return found[0]?.k ?? null;
-  }
-
-  function frame(gl: Maplibre.Map, set: Sheet, isAnimated: boolean) {
-    const box = set.frames[0];
-    if (box == null) {
-      return;
-    }
-    gl.fitBounds([box.west, box.south, box.east, box.north], {
-      padding: room(),
-      animate: isAnimated && !calm,
-      duration: 900,
-    });
-    isFramed = true;
-  }
-
-  function room() {
-    const width = globalThis.innerWidth;
-    const side = Math.round(Math.min(320, width * 0.16));
-    return width >= 768
-      ? { top: 64, right: side, bottom: 24, left: side }
-      : { top: 64, right: 16, bottom: 120, left: 16 };
+  function pick(point: { x: number; y: number }) {
+    const k = engine.pick(point);
+    return k != null && lookup[k] != null ? k : null;
   }
 
   function fly(k: number) {
-    const gl = map;
+    const gl = engine.gl;
     const hit = lookup[k];
-    if (gl == null || hit == null) {
+    const x = hit?.set.places.x[hit.i];
+    const y = hit?.set.places.y[hit.i];
+    if (gl == null || hit == null || x == null || y == null) {
       return;
     }
-    const x = hit.set.places.x[hit.i];
-    const y = hit.set.places.y[hit.i];
-    const box = hit.set.frames[0];
-    if (x == null || y == null) {
-      return;
-    }
-    const base =
-      box == null
-        ? gl.getZoom()
-        : (gl.cameraForBounds([box.west, box.south, box.east, box.north], {
-            padding: room(),
-          })?.zoom ?? gl.getZoom());
     const zoom = Math.min(
       15,
       Math.max(
         gl.getZoom(),
-        base + Math.log2(Math.sqrt(hit.set.places.k.length)) - 0.4,
+        engine.fitZoom(hit.set.frame ?? undefined) +
+          Math.log2(Math.sqrt(hit.set.places.k.length)) -
+          0.4,
       ),
     );
     pinned = k;
-    isFramed = false;
-    gl.flyTo({ center: [x, y], zoom, duration: calm ? 0 : 1100 });
+    engine.fly([x, y], zoom);
   }
 
   function zoomTo(k: number) {
-    const gl = map;
     const hit = lookup[k];
-    if (gl == null || hit == null) {
-      return;
-    }
-    const box = [Infinity, Infinity, -Infinity, -Infinity];
-    for (const part of gl.querySourceFeatures(hit.source, {
-      sourceLayer: "areas",
-      filter: ["==", ["id"], k],
-    })) {
-      for (const pair of JSON.stringify(part.geometry).matchAll(
-        /\[([\d.e-]+),([\d.e-]+)\]/g,
-      )) {
-        const x = Number(pair[1]);
-        const y = Number(pair[2]);
-        box[0] = Math.min(box[0] ?? x, x);
-        box[1] = Math.min(box[1] ?? y, y);
-        box[2] = Math.max(box[2] ?? x, x);
-        box[3] = Math.max(box[3] ?? y, y);
-      }
-    }
-    if (!Number.isFinite(box[0])) {
+    const box = hit == null ? null : engine.shape(hit.source, k);
+    if (box == null) {
       fly(k);
       return;
     }
-    isFramed = false;
-    gl.fitBounds(
-      [
-        [box[0] ?? 0, box[1] ?? 0],
-        [box[2] ?? 0, box[3] ?? 0],
-      ],
-      { padding: room(), duration: calm ? 0 : 900 },
-    );
+    engine.fit(box);
   }
 
-  function letter(gl: Maplibre.Map) {
+  function letter() {
     isQueued = false;
+    const gl = engine.gl;
+    if (gl == null) {
+      return;
+    }
     const held = detail.mid;
     const set = held != null && gl.getZoom() >= MID ? held.set : sheet;
     const finest = sheet.levels.findLast((level) => level.tiles != null);
@@ -1429,7 +1076,7 @@
     const order: Array<number> = [];
     for (const [i, x] of set.places.x.entries()) {
       const y = set.places.y[i];
-      if (x != null && y != null && box.contains([x, y]) && !veiled(x, y)) {
+      if (x != null && y != null && box.contains([x, y])) {
         order.push(i);
       }
     }
@@ -1473,217 +1120,9 @@
     labels = next;
   }
 
-  const mount = (host: HTMLElement) => {
-    const stop = new AbortController();
-    let built: Maplibre.Map | null = null;
-    void (async () => {
-      const [maplibre, { Protocol, PMTiles }, worker] = await Promise.all([
-        import("maplibre-gl"),
-        import("pmtiles"),
-        import("maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url"),
-        import("maplibre-gl/dist/maplibre-gl.css"),
-      ]);
-      if (stop.signal.aborted) {
-        return;
-      }
-      maplibre.setWorkerUrl(worker.default);
-      maplibre.addProtocol("pmtiles", new Protocol().tile);
-      const archives: Record<string, InstanceType<typeof PMTiles>> = {};
-      maplibre.addProtocol("ids", async ({ url }) => {
-        const match =
-          /^ids:\/\/(.+)\/(\d+)\/(\d+)\/(\d+)\?v=\d+(?:&focus=(\d+))?$/u.exec(
-            url,
-          );
-        const [, key = "", z = "0", x = "0", y = "0", focus] = match ?? [];
-        if (focus === "0") {
-          return { data: await createImageBitmap(new ImageData(1, 1)) };
-        }
-        const name = `${key}/${z}/${x}/${y}`;
-        let pending = tiles.get(name);
-        if (pending == null) {
-          archives[key] ??= new PMTiles(
-            `${globalThis.location.origin}/tiles/${key}.pmtiles`,
-          );
-          pending = archives[key]
-            .getZxy(Number(z), Number(x), Number(y))
-            .then((found) => {
-              if (found == null) {
-                return null;
-              }
-              const view = new DataView(found.data);
-              const total = view.getUint32(0, true);
-              const ids = new Uint32Array(total);
-              let id = 0;
-              for (const j of ids.keys()) {
-                id += view.getInt32(4 + 4 * j, true);
-                ids[j] = id;
-              }
-              const tile = {
-                ids,
-                index:
-                  total <= 256
-                    ? new Uint8Array(found.data, 4 + 4 * total, 512 * 512)
-                    : new Uint16Array(found.data, 4 + 4 * total, 512 * 512),
-              };
-              ready.set(name, tile);
-              return tile;
-            });
-          tiles.set(name, pending);
-          if (tiles.size > 240) {
-            const oldest = tiles.keys().next().value ?? "";
-            tiles.delete(oldest);
-            ready.delete(oldest);
-          }
-        }
-        const tile = await pending;
-        const pixels = new Uint32Array(512 * 512);
-        if (tile != null && focus == null) {
-          const lut = tile.ids.map((k) => colors.get(k) ?? 0);
-          let p = 0;
-          for (const value of tile.index) {
-            pixels[p] = lut[value] ?? 0;
-            p += 1;
-          }
-        } else if (tile != null) {
-          const target = tile.ids.indexOf(Number(focus));
-          const { index } = tile;
-          let p = 0;
-          for (const value of target < 0 ? [] : index) {
-            if (value === target) {
-              const column = p % 512;
-              const row = (p - column) / 512;
-              for (const d of [1, 2]) {
-                if (
-                  (column >= d && index[p - d] !== target) ||
-                  (column < 512 - d && index[p + d] !== target) ||
-                  (row >= d && index[p - 512 * d] !== target) ||
-                  (row < 512 - d && index[p + 512 * d] !== target)
-                ) {
-                  pixels[p] = ink;
-                }
-              }
-            }
-            p += 1;
-          }
-        }
-        return {
-          data: await createImageBitmap(
-            new ImageData(new Uint8ClampedArray(pixels.buffer), 512, 512),
-          ),
-        };
-      });
-      library = maplibre;
-      const reader = probe(host);
-      const gl = new maplibre.Map({
-        container: host,
-        style: {
-          version: 8,
-          projection: { type: "globe" },
-          sources: {
-            veil: {
-              type: "geojson",
-              data: { type: "FeatureCollection", features: [] },
-            },
-          },
-          layers: [
-            {
-              id: "paper",
-              type: "background",
-              paint: { "background-color": reader.color("var(--card)") },
-            },
-            ...["anchor-fills", "anchor-edges", "anchor-focus"].map((id) => ({
-              id,
-              type: "background" as const,
-              layout: { visibility: "none" as const },
-            })),
-            {
-              id: "veil",
-              type: "fill",
-              source: "veil",
-              paint: { "fill-color": reader.color("var(--card)") },
-            },
-          ],
-        },
-        renderWorldCopies: false,
-        attributionControl: false,
-        dragRotate: false,
-        pitchWithRotate: false,
-        touchPitch: false,
-        maxZoom: 16,
-      });
-      reader.done();
-      built = gl;
-      gl.touchZoomRotate.disableRotation();
-      gl.once("style.load", () => {
-        frame(
-          gl,
-          untrack(() => sheet),
-          false,
-        );
-        build(
-          gl,
-          untrack(() => sheet),
-        );
-        map = gl;
-      });
-      gl.on("movestart", (event) => {
-        if (event.originalEvent != null) {
-          isFramed = false;
-        }
-      });
-      gl.on("resize", () => {
-        if (isFramed && map != null) {
-          frame(
-            gl,
-            untrack(() => sheet),
-            false,
-          );
-        }
-      });
-      gl.on("moveend", deepen);
-      gl.on("move", () => {
-        if (!isQueued) {
-          isQueued = true;
-          requestAnimationFrame(() => {
-            survey(gl);
-            letter(gl);
-          });
-        }
-      });
-      gl.on("mousemove", (event) => {
-        const k = pick(gl, event.point, event.lngLat);
-        hovered = k;
-        pointer = { x: event.point.x, y: event.point.y };
-        gl.getCanvas().style.cursor = k == null ? "" : "pointer";
-      });
-      gl.on("mouseout", () => {
-        hovered = null;
-        pointer = null;
-      });
-      gl.on("click", (event) => {
-        const k = pick(gl, event.point, event.lngLat);
-        if (k == null || pinned === k) {
-          pinned = null;
-          return;
-        }
-        pinned = k;
-        hovered = k;
-        if (isParts && lookup[k]?.set === sheet && gl.getZoom() < MID) {
-          zoomTo(k);
-        }
-      });
-    })();
-    return () => {
-      stop.abort();
-      built?.remove();
-      map = null;
-    };
-  };
-
   $effect(() => {
     const next = sheet;
-    const gl = map;
-    if (gl == null) {
+    if (engine.gl == null) {
       return;
     }
     untrack(() => {
@@ -1691,128 +1130,16 @@
         return;
       }
       detail = {};
-      build(gl, next);
-      frame(gl, next, true);
+      build(next);
+      if (next.frame != null) {
+        engine.frame(next.frame, true);
+      }
     });
   });
 
   $effect(() => {
-    const gl = map;
-    if (gl != null) {
-      letter(gl);
-    }
-  });
-
-  let shade = $state(0);
-  $effect(() => {
-    const bump = () => requestAnimationFrame(() => (shade += 1));
-    const observer = new MutationObserver(bump);
-    observer.observe(document.documentElement, {
-      attributes: true,
-      attributeFilter: ["class", "style", "data-theme"],
-    });
-    const offScheme = on(
-      matchMedia("(prefers-color-scheme: dark)"),
-      "change",
-      bump,
-    );
-    return () => {
-      observer.disconnect();
-      offScheme();
-    };
-  });
-
-  $effect(() => {
-    const theme = mode.current;
-    void shade;
-    const gl = map;
-    if (gl == null || theme == null) {
-      return;
-    }
-    untrack(() => {
-      const reader = probe(gl.getContainer());
-      const paper = reader.color("var(--card)");
-      gl.setPaintProperty("paper", "background-color", paper);
-      gl.setPaintProperty("veil", "fill-color", paper);
-      const [r = 255, g = 255, b = 255] = (paper.match(/[\d.]+/g) ?? []).map(
-        Number,
-      );
-      const stripes = new Uint8Array(12 * 12 * 4);
-      for (let y = 0; y < 12; y += 1) {
-        for (let x = 0; x < 12; x += 1) {
-          if ((x + y) % 12 < 2) {
-            stripes.set([r, g, b, 150], (y * 12 + x) * 4);
-          }
-        }
-      }
-      if (gl.hasImage("hatch")) {
-        gl.removeImage("hatch");
-      }
-      gl.addImage(
-        "hatch",
-        { width: 12, height: 12, data: stripes },
-        { pixelRatio: 2 },
-      );
-      const [ir = 0, ig = 0, ib = 0] = (
-        reader.color("var(--foreground)").match(/[\d.]+/g) ?? []
-      ).map(Number);
-      const dashes = new Uint8Array(8 * 8 * 4);
-      for (let x = 0; x < 8; x += 1) {
-        if (x >= 1 && x < 5) {
-          dashes.set([ir, ig, ib, 96], (2 * 8 + x) * 4);
-        }
-        if (x >= 5 || x < 1) {
-          dashes.set([ir, ig, ib, 96], (6 * 8 + x) * 4);
-        }
-      }
-      if (gl.hasImage("norun")) {
-        gl.removeImage("norun");
-      }
-      gl.addImage("norun", { width: 8, height: 8, data: dashes });
-      for (const id of layers) {
-        if (id.startsWith("seam:") || id.startsWith("edge:")) {
-          gl.setPaintProperty(id, "line-color", paper);
-        }
-        if (id.startsWith("dots:")) {
-          gl.setPaintProperty(id, "circle-stroke-color", paper);
-        }
-        if (id.startsWith("focus:") || id === "scope") {
-          gl.setPaintProperty(
-            id,
-            "line-color",
-            reader.color("var(--foreground)"),
-          );
-        }
-      }
-      if (gl.getLayer("context") != null) {
-        gl.setPaintProperty(
-          "context",
-          "fill-color",
-          reader.color(
-            "color-mix(in oklab, var(--muted-foreground) 9%, var(--card))",
-          ),
-        );
-        gl.setPaintProperty("context-seam", "line-color", paper);
-      }
-      reader.done();
-      painted = {};
-      mirror(gl, sheet);
-    });
-  });
-
-  $effect(() => {
-    for (const [i, isAway] of away.entries()) {
-      const mini = minis[i];
-      const box = sheet.frames[i];
-      if (isAway && mini != null && box != null) {
-        requestAnimationFrame(() => {
-          mini.resize();
-          mini.fitBounds([box.west, box.south, box.east, box.north], {
-            padding: 6,
-            animate: false,
-          });
-        });
-      }
+    if (engine.gl != null) {
+      letter();
     }
   });
 
@@ -1839,13 +1166,13 @@
           k.push(at);
         }
         const empty = k.map(() => null);
-        const base = untrack(() => sheet);
+        const start = untrack(() => sheet);
         mosaic = {
           key,
           layers: found.layers,
           set: {
-            ...base,
-            scope: { ...base.scope, name: "" },
+            ...start,
+            scope: { ...start.scope, name: "" },
             legend: found.legend,
             places: {
               k,
@@ -1876,10 +1203,9 @@
   $effect(() => {
     const k = focus;
     const held = mosaic;
-    const gl = map;
     const hit = k == null ? null : lookup[k];
     if (
-      gl == null ||
+      engine.gl == null ||
       held == null ||
       hit?.set !== held.set ||
       held.set.places.name[hit.i] !== ""
@@ -1887,13 +1213,8 @@
       return;
     }
     const timer = setTimeout(() => {
-      const base = groups.find((group) => group.rank === 0)?.first;
       const id =
-        pointer == null || base == null
-          ? null
-          : gl.queryRenderedFeatures([pointer.x, pointer.y], {
-              layers: [base],
-            })[0]?.id;
+        pointer == null || base == null ? null : engine.pick(pointer, [base]);
       const part = sheet.parts.find((entry) => entry.k === id);
       if (part == null || named.has(`${held.key}|${part.unit}`)) {
         return;
@@ -1918,95 +1239,64 @@
   });
 
   $effect(() => {
-    void minis;
     const mark = JSON.stringify([
       shown,
       whom?.key,
       range,
       only,
       isFlippedOnly,
-      mode.current,
-      shade,
       first?.key,
       $state.snapshot(palette),
     ]);
-    const gl = map;
     const tiers = detail;
-    const base = sheet;
+    const start = sheet;
     const held = mosaic;
     void seen;
-    if (gl == null) {
+    if (engine.gl == null) {
       return;
     }
     untrack(() => {
-      const level = base.levels.find((entry) => entry.code === base.level);
+      const level = start.levels.find((entry) => entry.code === start.level);
       if (level?.tiles != null) {
-        paint(gl, base, `t:${level.tiles}`, mark);
+        paint(start, `t:${level.tiles}`, mark);
       }
       for (const tier of Object.values(tiers)) {
-        paint(gl, tier.set, tier.source, mark);
+        paint(tier.set, tier.source, mark);
       }
       if (held == null || tinted === mark) {
         return;
       }
       tinted = mark;
-      const reader = probe(gl.getContainer());
-      const ground =
-        shown === "votes"
-          ? reader.color(
-              "color-mix(in oklab, var(--muted-foreground) 15%, var(--card))",
-            )
-          : null;
-      const packed = new Map<string, number>();
-      const pack = (css: string) => {
-        const [r = 0, g = 0, b = 0, a = 1] = (css.match(/[\d.]+/g) ?? []).map(
-          Number,
-        );
-        return (r | (g << 8) | (b << 16) | (Math.round(a * 255) << 24)) >>> 0;
-      };
-      colors.clear();
+      const colors = new Map<number, string>();
       for (const [i, k] of held.set.places.k.entries()) {
-        if (held.set.places.leader[i] == null) {
-          continue;
-        }
-        const css = ground ?? reader.color(tone(held.set, i));
-        let value = packed.get(css);
-        if (value == null) {
-          value = pack(css);
-          packed.set(css, value);
-        }
-        colors.set(k, value);
-      }
-      ink = pack(reader.color("var(--foreground)"));
-      reader.done();
-      drawn += 1;
-      for (const target of [gl, ...minis]) {
-        for (const layer of held.layers) {
-          target
-            ?.getSource<Maplibre.RasterTileSource>(`ids:${layer.tiles}`)
-            ?.setTiles([`ids://${layer.tiles}/{z}/{x}/{y}?v=${drawn}`]);
+        if (held.set.places.leader[i] != null) {
+          colors.set(
+            k,
+            shown === "votes"
+              ? "color-mix(in oklab, var(--muted-foreground) 15%, var(--card))"
+              : tone(held.set, i),
+          );
         }
       }
+      engine.tint(colors);
     });
   });
 
   $effect(() => {
-    const gl = map;
     const next = mosaic;
-    if (gl == null || next == null || sheet.scope.unit !== "") {
+    if (engine.gl == null || next == null || sheet.scope.unit !== "") {
       return;
     }
     untrack(() => {
-      if (gl.getSource(`ids:${next.layers[0]?.tiles}`) == null) {
-        drape(gl, next);
+      if (!engine.has(`ids:${next.layers[0]?.tiles}`)) {
+        drape(next);
       }
     });
   });
 
   $effect(() => {
-    const gl = map;
     const hide = needsBefore;
-    if (gl == null) {
+    if (engine.gl == null) {
       return;
     }
     for (const held of Object.values(detail)) {
@@ -2024,13 +1314,7 @@
           "edge",
           "focus",
         ]) {
-          if (gl.getLayer(`${kind}:${held.source}`) != null) {
-            gl.setLayoutProperty(
-              `${kind}:${held.source}`,
-              "visibility",
-              hide ? "none" : "visible",
-            );
-          }
+          engine.show(`${kind}:${held.source}`, !hide);
         }
       }
     }
@@ -2040,48 +1324,25 @@
   });
 
   $effect(() => {
-    const gl = map;
     const strong = focus;
     const light = pinned != null && hovered !== pinned ? hovered : null;
     void seen;
-    if (gl == null) {
+    if (engine.gl == null) {
       return;
     }
     untrack(() => {
-      for (const mark of marked) {
-        if (gl.getSource(mark.source) != null) {
-          gl.setFeatureState(
-            { source: mark.source, sourceLayer: "areas", id: mark.k },
-            { focus: false, hover: false },
-          );
-        }
-      }
-      marked = [];
-      const target =
-        strong != null && lookup[strong]?.source === "ids" ? strong : 0;
-      if (target !== spotted) {
-        spotted = target;
-        drawn += 1;
-        for (const layer of mosaic?.layers ?? []) {
-          gl.getSource<Maplibre.RasterTileSource>(
-            `focus:ids:${layer.tiles}`,
-          )?.setTiles([
-            `ids://${layer.tiles}/{z}/{x}/{y}?v=${drawn}&focus=${spotted}`,
-          ]);
-        }
-      }
-      for (const [k, state] of [
-        [strong, { focus: true }],
-        [light, { hover: true }],
+      const near = strong == null ? null : lookup[strong];
+      engine.spot(near?.source === "ids" ? strong : null);
+      for (const [key, k] of [
+        ["focus", strong],
+        ["hover", light],
       ] as const) {
         const hit = k == null ? null : lookup[k];
-        if (k != null && hit != null && hit.source !== "ids") {
-          gl.setFeatureState(
-            { source: hit.source, sourceLayer: "areas", id: k },
-            state,
-          );
-          marked.push({ source: hit.source, k });
-        }
+        engine.mark(
+          key,
+          hit == null || hit.source === "ids" ? null : hit.source,
+          k,
+        );
       }
     });
   });
@@ -2434,70 +1695,8 @@
       aria-label={m.map_label({ noun: current?.noun ?? "" })}
       aria-describedby="{uid}-hint"
     >
-      <div class="block-full inline-full" {@attach mount}></div>
+      <div class="block-full inline-full" {@attach engine.mount}></div>
     </div>
-    {#if sheet.frames.length > 1}
-      <div
-        class="pointer-events-none absolute inset-s-3 inset-bs-3 z-10 flex gap-2"
-      >
-        {#each sheet.frames as box, i (i)}
-          {const place = $derived.by(() => {
-            if (i === 0) {
-              return sheet.scope.name;
-            }
-            const inside = sheet.places.k.flatMap((_, j) => {
-              const x = sheet.places.x[j];
-              const y = sheet.places.y[j];
-              return x != null &&
-                y != null &&
-                x >= box.west &&
-                x <= box.east &&
-                y >= box.south &&
-                y <= box.north
-                ? [sheet.places.name[j] ?? ""]
-                : [];
-            });
-            return inside.length === 1 ? (inside[0] ?? null) : null;
-          })}
-          <button
-            type="button"
-            class={cn(
-              "pointer-events-auto relative overflow-hidden rounded-sm bg-card shadow-menu ring-1 ring-border block-16 inline-24 hover:ring-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring sm:block-22 sm:inline-32",
-              { hidden: away[i] !== true },
-            )}
-            aria-label={place == null
-              ? m.map_inset_part()
-              : m.map_inset_show({ place })}
-            title={place == null
-              ? m.map_inset_part()
-              : m.map_inset_show({ place })}
-            onclick={() => {
-              isFramed = false;
-              map?.fitBounds([box.west, box.south, box.east, box.north], {
-                padding: room(),
-                duration: calm ? 0 : 900,
-              });
-            }}
-          >
-            <div
-              class="pointer-events-none block-full inline-full"
-              {@attach (node: HTMLElement) => {
-                surfaces[i] = node;
-                return () => {
-                  surfaces[i] = null;
-                };
-              }}
-            ></div>
-            {#if place != null}
-              <span
-                class="pointer-events-none absolute inset-s-1.5 inset-be-1 truncate text-[0.6875rem] font-semibold text-foreground [-webkit-text-stroke:3px_var(--card)] [paint-order:stroke_fill] max-inline-[calc(100%-0.75rem)]"
-                >{place}</span
-              >
-            {/if}
-          </button>
-        {/each}
-      </div>
-    {/if}
     <div
       class="pointer-events-none absolute inset-0 overflow-hidden"
       aria-hidden="true"
@@ -2828,7 +2027,7 @@
         class="pointer-events-none absolute z-20 grid gap-0.5 rounded-sm bg-card px-2.5 py-1.5 text-[0.8125rem] shadow-menu ring-1 ring-border max-inline-64 max-sm:hidden"
         style:inset-inline-start="{pointer.x + 14}px"
         style:translate={pointer.x >
-        (map?.getContainer().clientWidth ?? 0) - 360
+        (engine.gl?.getContainer().clientWidth ?? 0) - 360
           ? "calc(-100% - 28px) 0"
           : undefined}
         style:inset-block-start="{pointer.y + 14}px"
@@ -2864,7 +2063,7 @@
         class="grid place-items-center block-8 inline-8 hover:bg-secondary"
         aria-label={m.map_zoom_in()}
         title={m.map_zoom_in()}
-        onclick={() => map?.zoomIn()}
+        onclick={() => engine.zoomIn()}
         ><PlusIcon class="block-4 inline-4" /></button
       >
       <button
@@ -2872,7 +2071,7 @@
         class="grid place-items-center border-bs border-border block-8 inline-8 hover:bg-secondary"
         aria-label={m.map_zoom_out()}
         title={m.map_zoom_out()}
-        onclick={() => map?.zoomOut()}
+        onclick={() => engine.zoomOut()}
         ><MinusIcon class="block-4 inline-4" /></button
       >
       <button
@@ -2880,14 +2079,11 @@
         class="grid place-items-center border-bs border-border block-8 inline-8 hover:bg-secondary"
         aria-label={m.map_reset()}
         title={m.map_reset()}
-        onclick={() => {
-          if (map != null) {
-            frame(map, sheet, true);
-          }
-        }}><ScanIcon class="block-4 inline-4" /></button
+        onclick={() => engine.reset()}
+        ><ScanIcon class="block-4 inline-4" /></button
       >
     </div>
-    {#if credits.length > 0}
+    {#if engine.credits.length > 0}
       <p
         class="pointer-events-none absolute inset-e-14 inset-be-1 z-0 truncate text-[0.625rem] text-muted-foreground max-inline-[40%] max-sm:hidden"
       >
@@ -2900,9 +2096,9 @@
               )?.[1],
         )}
         {vintage == null
-          ? m.map_boundaries({ publishers: credits.join("; ") })
+          ? m.map_boundaries({ publishers: engine.credits.join("; ") })
           : m.map_boundaries_dated({
-              publishers: credits.join("; "),
+              publishers: engine.credits.join("; "),
               date: date(vintage),
             })}
       </p>

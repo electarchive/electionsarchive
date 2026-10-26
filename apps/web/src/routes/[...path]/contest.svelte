@@ -372,7 +372,7 @@
     const noun = places?.levels.find(
       (entry) => entry.code === places.level,
     )?.noun;
-    return level?.tiles == null || own == null || own.frames.length === 0
+    return level?.tiles == null || own?.frame == null
       ? null
       : {
           tiles: level.tiles,
@@ -384,7 +384,7 @@
             inner?.tiles == null || districts.length === 0
               ? null
               : { tiles: inner.tiles, ks: districts.map((row) => row.k) },
-          frames: own.frames,
+          frame: own.frame,
           blank: level.blank,
           isApproximate: level.isApproximate,
           noun: noun ?? level.noun,
@@ -428,13 +428,14 @@
   });
   const locating = $derived.by(() => {
     const own = boundaries.find(
-      (entry) => entry.k != null && entry.frames.length > 0,
+      (entry) => entry.k != null && entry.frame != null,
     );
     const places = contest.locator ?? surround?.places ?? null;
     if (
       drawn != null ||
       places == null ||
       own?.tiles == null ||
+      own.frame == null ||
       own.k == null ||
       places.rows.every((row) => row.k === own.k)
     ) {
@@ -442,24 +443,18 @@
     }
     const legend = places.legend;
     const parent = surround?.bounds.find(
-      (entry) => entry.k != null && entry.frames.length > 0,
+      (entry) => entry.k != null && entry.frame != null,
     );
     return {
       places,
       tiles: own.tiles,
       own: { tiles: own.tiles, k: own.k },
-      frames:
-        parent?.frames ??
-        own.frames.map((frame) => {
-          const wide = (frame.east - frame.west) * 1.5;
-          const tall = (frame.north - frame.south) * 1.5;
-          return {
-            west: frame.west - wide,
-            south: frame.south - tall,
-            east: frame.east + wide,
-            north: frame.north + tall,
-          };
-        }),
+      frame: parent?.frame ?? {
+        west: own.frame.west - (own.frame.east - own.frame.west) * 1.5,
+        south: own.frame.south - (own.frame.north - own.frame.south) * 1.5,
+        east: own.frame.east + (own.frame.east - own.frame.west) * 1.5,
+        north: own.frame.north + (own.frame.north - own.frame.south) * 1.5,
+      },
       isApproximate: own.isApproximate,
       noun: own.noun,
       sources: [
@@ -1428,7 +1423,7 @@
           tiles={drawn.tiles}
           own={drawn.own}
           nested={drawn.nested}
-          frames={drawn.frames}
+          frame={drawn.frame}
           blank={drawn.blank}
           isApproximate={drawn.isApproximate}
           noun={drawn.noun}
@@ -1543,7 +1538,7 @@
         colors={locating.colors}
         tiles={locating.tiles}
         own={locating.own}
-        frames={locating.frames}
+        frame={locating.frame}
         isApproximate={locating.isApproximate}
         noun={locating.noun}
         sources={locating.sources}

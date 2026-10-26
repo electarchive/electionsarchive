@@ -345,7 +345,7 @@
             entry.tiles != null,
         );
     const districts = places.districts ?? [];
-    return level?.tiles == null || own == null || own.frames.length === 0
+    return level?.tiles == null || own?.frame == null
       ? null
       : {
           places,
@@ -358,18 +358,16 @@
             inner?.tiles == null || districts.length === 0
               ? null
               : { tiles: inner.tiles, ks: districts.map((row) => row.k) },
-          frames: isAround
-            ? own.frames.map((frame) => {
-                const wide = (frame.east - frame.west) * 1.5;
-                const tall = (frame.north - frame.south) * 1.5;
-                return {
-                  west: frame.west - wide,
-                  south: frame.south - tall,
-                  east: frame.east + wide,
-                  north: frame.north + tall,
-                };
-              })
-            : own.frames,
+          frame: isAround
+            ? {
+                west: own.frame.west - (own.frame.east - own.frame.west) * 1.5,
+                south:
+                  own.frame.south - (own.frame.north - own.frame.south) * 1.5,
+                east: own.frame.east + (own.frame.east - own.frame.west) * 1.5,
+                north:
+                  own.frame.north + (own.frame.north - own.frame.south) * 1.5,
+              }
+            : own.frame,
           isApproximate: level.isApproximate,
           noun:
             places.levels.find((entry) => entry.code === places.level)?.noun ??
@@ -472,7 +470,7 @@
         tiles={drawn.tiles}
         own={drawn.own}
         nested={drawn.nested}
-        frames={drawn.frames}
+        frame={drawn.frame}
         isApproximate={drawn.isApproximate}
         noun={drawn.noun}
         votes={m.col_votes()}

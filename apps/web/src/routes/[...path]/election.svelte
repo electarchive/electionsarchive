@@ -1347,7 +1347,7 @@
               tiles={race.map.tiles}
               own={race.map.own}
               nested={race.map.nested}
-              frames={race.map.frames}
+              frame={race.map.frame}
               blank={race.map.blank ?? null}
               isApproximate={race.map.isApproximate}
               sources={race.map.credits}
@@ -1434,7 +1434,7 @@
               hexes={hexes.data ?? null}
               own={shape.own}
               nested={shape.nested}
-              frames={shape.frames}
+              frame={shape.frame}
               blank={shape.blank ?? null}
               isApproximate={shape.isApproximate}
               sources={shape.credits}
