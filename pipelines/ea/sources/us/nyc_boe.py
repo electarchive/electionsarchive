@@ -269,10 +269,12 @@ def emit() -> Path:
         cs.add("polity_territory", polity_id=city, area_id=area)
         geom, point = conn.execute(
             """select encode(st_asewkb(geom), 'hex'), encode(st_asewkb(st_pointonsurface(geom)), 'hex')
-               from (select st_multi(st_union(g.geom)) as geom from area_geometry g
-                     join area_code c on c.area_id = g.area_id
-                     join area a on a.id = g.area_id and a.scheme_code = 'us.county'
-                     where c.code = any(%s)) city""",
+               from (select st_multi(st_union(latest.geom)) as geom from (
+                       select distinct on (g.area_id) g.geom from area_geometry g
+                       join area_code c on c.area_id = g.area_id
+                       join area a on a.id = g.area_id and a.scheme_code = 'us.county'
+                       where c.code = any(%s)
+                       order by g.area_id, g.valid_from desc nulls last) latest) city""",
             [list(COUNTIES)],
         ).fetchone() or (None, None)
         cs.add(
