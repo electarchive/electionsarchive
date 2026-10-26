@@ -83,6 +83,11 @@
         </p>
       </div>
       <p class="text-xs text-muted-foreground">{built}</p>
+      {#if data.stale}
+        <p role="status" class="text-sm font-semibold text-(--no)">
+          {m.coverage_stale()}
+        </p>
+      {/if}
     </header>
     <section aria-labelledby="coverage-countries" class="grid bg-card">
       <h2 id="coverage-countries" class="sr-only">

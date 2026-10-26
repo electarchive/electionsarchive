@@ -406,6 +406,9 @@ export const coverageBuild = pgTable("coverage_build", {
 	requestedAt: timestamp("requested_at", { withTimezone: true }),
 	startedAt: timestamp("started_at", { withTimezone: true }),
 	builtAt: timestamp("built_at", { withTimezone: true }),
+	commit: text(),
+	inputs: jsonb(),
+	latest: jsonb(),
 }, (table) => [
 check("coverage_build_id_check", sql`id`),]);
 

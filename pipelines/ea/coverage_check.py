@@ -94,13 +94,25 @@ def database(conn) -> list[str]:
 def pages(conn) -> list[str]:
     problems = []
     current = date.today().year
-    overview = {row["polity"]: row for row in json.loads(fetch("/api/v1/coverage"))["polities"]}
+    listing = json.loads(fetch("/api/v1/coverage"))
+    overview = {row["polity"]: row for row in listing["polities"]}
+    stale = conn.execute("select latest is not null and inputs is distinct from latest from coverage_build").fetchone()[
+        0
+    ]
+    if listing["stale"] != stale or (("Rebuilt before the latest" in fetch("/coverage.md").decode()) != stale):
+        problems.append(
+            f"overview: stale is {listing['stale']} in REST, {stale} in the database, or the twin disagrees"
+        )
     for cc, summary in overview.items():
         rest = json.loads(fetch(f"/api/v1/coverage/{cc}"))
         twin = json.loads(fetch(f"/coverage/{cc}.json"))
+        if rest["stale"] != stale:
+            problems.append(f"{cc}: stale is {rest['stale']} in REST and {stale} in the database")
         if rest["tiers"] != twin["tiers"]:
             problems.append(f"{cc}: REST and JSON twin tiers differ")
         markdown = fetch(f"/coverage/{cc}.md").decode()
+        if ("Rebuilt before the latest" in markdown) != stale:
+            problems.append(f"{cc}: the twin's stale line does not match the database")
         levels = {lv["key"]: lv for lv in rest["summary"]["levels"]}
         for tier in rest["tiers"]:
             scopes = [(tier["key"], None, tier["cells"])] + [
@@ -168,7 +180,16 @@ def pages(conn) -> list[str]:
 
 def check() -> str:
     with connect() as conn:
+        behind = coverage_countries.record(conn)
+        conn.commit()
         problems = database(conn) + pages(conn)
+        if behind:
+            commit = conn.execute("select commit from coverage_build").fetchone()[0]
+            built = "an unstamped build" if commit is None else f"commit {commit[:12]}"
+            problems.append(
+                f"STALE: the coverage tables come from {built}, which predates main's {', '.join(behind)};"
+                " the next ea-coverage refresh rebuilds them, and until then the pages say so"
+            )
     if problems:
         raise SystemExit("\n".join(problems))
     return "coverage checks pass"

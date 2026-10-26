@@ -592,6 +592,7 @@ function coverageMarkdown(
     (data.current ? m.twin_coverage_current_on : m.twin_coverage_current)({
       year,
     }),
+    ...(data.stale ? [`> ${m.coverage_stale()}`] : []),
     `## ${m.coverage_glance()}`,
     `${(isUs ? m.coverage_glance_hint_us : m.coverage_glance_hint_country)()} ${m.coverage_glance_none_hint()}`,
     table(
@@ -839,6 +840,7 @@ function overviewMarkdown(
     (data.current ? m.twin_coverage_current_on : m.twin_coverage_current)({
       year,
     }),
+    ...(data.stale ? [`> ${m.coverage_stale()}`] : []),
     table(
       [
         m.coverage_overview_column_country(),

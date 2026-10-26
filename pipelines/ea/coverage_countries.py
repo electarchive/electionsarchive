@@ -1,5 +1,6 @@
 import csv
 import json
+import subprocess
 import time
 from collections import defaultdict
 from datetime import date, timedelta
@@ -9,6 +10,14 @@ from ea import coverage
 from ea.store import ROOT, connect
 
 DENOMINATORS = Path(__file__).parent / "denominators"
+INPUTS = (
+    "pipelines/ea/coverage.py",
+    "pipelines/ea/coverage_tables.py",
+    "pipelines/ea/coverage_countries.py",
+    "pipelines/ea/statewide_table.py",
+    "pipelines/ea/sources/us/ncsl_measures.csv",
+    ".agents/spec/finest-reported.csv",
+)
 GOALS = ("national", "fine", "shapes", "subnational", "local", "referendums", "ep")
 WINDOW = timedelta(days=75)
 EP_SCHEMES = {
@@ -646,9 +655,36 @@ EFFORT = {
 }
 
 
+def inputs(ref: str | None = None) -> dict[str, str]:
+    folder = str(DENOMINATORS.relative_to(ROOT))
+    if ref is not None:
+        listed = subprocess.run(
+            ["git", "ls-tree", "-r", ref, "--", *INPUTS, folder], cwd=ROOT, capture_output=True, text=True, check=True
+        ).stdout
+        return {
+            path: line.split()[2]
+            for line in listed.splitlines()
+            if (path := line.split("\t")[1]) in INPUTS or path.endswith(".json")
+        }
+    paths = [*INPUTS, *(str(f.relative_to(ROOT)) for f in sorted(DENOMINATORS.glob("*.json")))]
+    hashed = subprocess.run(
+        ["git", "hash-object", "--", *paths], cwd=ROOT, capture_output=True, text=True, check=True
+    ).stdout.split()
+    return dict(zip(paths, hashed, strict=True))
+
+
+def record(conn) -> list[str]:
+    latest = inputs("main")
+    conn.execute("update coverage_build set latest = %s", [json.dumps(latest)])
+    row = conn.execute("select commit, inputs from coverage_build").fetchone()
+    built = (row[1] if row else None) or {}
+    return sorted(path for path in latest.keys() | built.keys() if latest.get(path) != built.get(path))
+
+
 def world() -> str:
     leads = json.loads((Path(__file__).parent / "world_leads.json").read_text())
     with connect() as conn:
+        record(conn)
         rows = list(conn.execute(WORLD_SQL, [date.today().year]))
     specs = {cc: load(cc) for cc in countries()}
     spans: dict[tuple, dict] = {}

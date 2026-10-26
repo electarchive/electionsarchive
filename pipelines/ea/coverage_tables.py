@@ -1,10 +1,10 @@
+import json
 import re
 import subprocess
 import sys
 import time
 from collections import Counter, defaultdict
 from datetime import date
-from pathlib import Path
 
 import polars as pl
 
@@ -930,15 +930,10 @@ from changeset
 """
 
 
-def fingerprint(conn) -> str:
+def fingerprint(conn, stamp: dict[str, str]) -> str:
     row = conn.execute(FINGERPRINT_SQL).fetchone()
-    files = [
-        Path(__file__).parent / name
-        for name in ("coverage.py", "coverage_tables.py", "coverage_countries.py", "statewide_table.py")
-    ]
-    files += sorted(coverage_countries.DENOMINATORS.glob("*.json"))
-    files += sorted(raw.parsed("us.cog").glob("*.parquet"))
-    return ":".join([row[0] if row else "", *(f"{f.name}{f.stat().st_mtime_ns}" for f in files)])
+    files = sorted(raw.parsed("us.cog").glob("*.parquet"))
+    return ":".join([row[0] if row else "", *stamp.values(), *(f"{f.name}{f.stat().st_mtime_ns}" for f in files)])
 
 
 def refresh() -> str:
@@ -956,7 +951,11 @@ def refresh() -> str:
                 ).fetchone()
             ) is not None:
                 conn.execute("create table if not exists coverage_cache_state (fingerprint text not null)")
-                current = fingerprint(conn)
+                stamp = coverage_countries.inputs()
+                commit = subprocess.run(
+                    ["git", "rev-parse", "HEAD"], cwd=ROOT, capture_output=True, text=True, check=True
+                ).stdout.strip()
+                current = fingerprint(conn, stamp)
                 previous = conn.execute("select fingerprint from coverage_cache_state").fetchone()
                 if previous is not None and previous[0] == current:
                     built.append("nothing has changed since the last build")
@@ -964,7 +963,11 @@ def refresh() -> str:
                     built.append(build())
                     conn.execute("delete from coverage_cache_state")
                     conn.execute("insert into coverage_cache_state values (%s)", [current])
-                conn.execute("update coverage_build set built_at = %s", [started[0]])
+                conn.execute(
+                    "update coverage_build set built_at = %s, commit = %s, inputs = %s",
+                    [started[0], commit, json.dumps(stamp)],
+                )
+                coverage_countries.record(conn)
             conn.execute("select pg_advisory_unlock(%s)", [LOCK])
             pending = conn.execute("select built_at is null or requested_at > built_at from coverage_build").fetchone()
             if pending is None or not pending[0]:

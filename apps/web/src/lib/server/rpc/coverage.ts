@@ -235,12 +235,18 @@ async function build() {
   const built = await db.execute<{
     builtAt: string | null;
     building: boolean;
+    commit: string | null;
+    stale: boolean;
   }>(sql`
-    select built_at::text as "builtAt", built_at is null or started_at > built_at as building from coverage_build
+    select built_at::text as "builtAt", built_at is null or started_at > built_at as building, commit,
+      latest is not null and inputs is distinct from latest as stale
+    from coverage_build
   `);
   return {
     builtAt: built.rows[0]?.builtAt ?? null,
     building: built.rows[0]?.building ?? false,
+    commit: built.rows[0]?.commit ?? null,
+    stale: built.rows[0]?.stale ?? false,
   };
 }
 
@@ -272,6 +278,8 @@ export const coverage = {
       v.object({
         builtAt: v.nullable(v.string()),
         building: v.boolean(),
+        commit: v.nullable(v.string()),
+        stale: v.boolean(),
         totals: v.object({
           elections: v.number(),
           contests: v.number(),
@@ -370,6 +378,8 @@ export const coverage = {
       v.object({
         builtAt: v.nullable(v.string()),
         building: v.boolean(),
+        commit: v.nullable(v.string()),
+        stale: v.boolean(),
         summary: Summary,
         tiers: v.array(
           v.object({

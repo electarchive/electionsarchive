@@ -625,6 +625,11 @@
           {/if}
         {/if}
       </div>
+      {#if data.stale}
+        <p role="status" class="text-sm font-semibold text-(--no)">
+          {m.coverage_stale()}
+        </p>
+      {/if}
     </header>
 
     <section aria-labelledby="coverage-glance" class="grid gap-3 bg-card pbs-4">
