@@ -1216,14 +1216,15 @@ export const rollupCoverage = pgTable("rollup_coverage", {
 
 export const scheme = pgTable("scheme", {
 	code: text().primaryKey(),
-	polityId: uuid("polity_id").notNull().references(() => polity.id),
+	polityId: uuid("polity_id").references(() => polity.id),
 	kind: schemeKind().notNull(),
 	rank: smallint().notNull(),
 	noun: text().notNull(),
 	changesetId: uuid("changeset_id").notNull().references(() => changeset.id),
 	recordedFrom: timestamp("recorded_from", { withTimezone: true }).default(sql`now()`).notNull(),
 }, (table) => [
-check("scheme_code_check", sql`(code ~ '^[a-z]{2,3}(-[a-z0-9]+)?\.[a-z0-9_]+$'::text)`),]);
+check("scheme_code_check", sql`(code ~ '^([a-z]{2,3}(-[a-z0-9]+)?|world)\.[a-z0-9_]+$'::text)`),
+check("scheme_polity_check", sql`((polity_id IS NOT NULL) OR (code ~~ 'world.%'::text))`),]);
 
 export const searchDocument = pgTable("search_document", {
 	entityId: uuid("entity_id").primaryKey().references(() => entity.id, { onDelete: "cascade" } ),
