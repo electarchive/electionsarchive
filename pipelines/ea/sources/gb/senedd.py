@@ -197,7 +197,7 @@ LABELS = {
     "ver": ("Veritas", "veritas"),
     "wcp": ("Welsh Christian Party", "welsh-christian-party"),
     "cpw": ("Welsh Christian Party", "welsh-christian-party"),
-    "christian": ("Christian Party", "christian-party"),
+    "christian": ("Christian Party", "christian-party-proclaiming-christ-s-lordship"),
     "tusac": ("Trade Unionist and Socialist Coalition", "trade-unionist-and-socialist-coalition"),
     "tusc": ("Trade Unionist and Socialist Coalition", "trade-unionist-and-socialist-coalition"),
     "mrlp": ("The Official Monster Raving Loony Party", "official-monster-raving-loony-party"),
@@ -803,6 +803,18 @@ def emit() -> Path:
                         cs.add("party", id=parties[key], kind="party", polity_id=gb)
                         name(parties[key], umit.NAMES.get(key, label or key))
             return parties[key]
+
+        christian = party_of("christian-party-proclaiming-christ-s-lordship", None)
+        stray = conn.execute("select entity_id from external_id where scheme = 'gb.party' and value = 'christian-party'").fetchone()
+        if stray is not None and stray[0] != christian:
+            cs.merge(stray[0], christian)
+        official = 'Christian Party "Proclaiming Christ\'s Lordship"'
+        for name_id, text in conn.execute(
+            "select id, text from name where entity_id = %s and kind = 'official' and is_preferred and text <> %s",
+            (christian, official),
+        ).fetchall():
+            cs.add("name_drop", name_id=name_id, entity_id=christian, text=text, reason="The Electoral Commission register gives the party's name with its description in quotation marks.")
+        name(christian, official)
 
         starts = sorted(ERA_STARTS)
         ends = dict(itertools.pairwise(starts))

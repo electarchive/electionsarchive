@@ -140,6 +140,10 @@ LISTS_2016 = {
     "TUSC": "Trade Unionist and Socialist Coalition",
 }
 PARTY_KEYS = {
+    "natural law party": "natural-law",
+    "pro-life alliance": "prolife-alliance",
+    "humanist party": "humanist",
+    "liberal": "liberal-party-1989",
     "conservative": "conservative",
     "conservative and unionist party": "conservative",
     "scottish conservative and unionist party": "conservative",
@@ -827,6 +831,30 @@ def emit() -> Path:
         ).fetchone()
         if duplicate is not None:
             cs.merge(duplicate[0], party_of("Edinburgh and East Lothian People"))
+        for name_id, entity, text in conn.execute(
+            "select id, entity_id, text from name where text = %s", ("Scottish Women'S Equality Party",)
+        ).fetchall():
+            cs.add(
+                "name",
+                entity_id=entity,
+                text="Scottish Women's Equality Party",
+                lang="en",
+                kind="official",
+                is_preferred=True,
+            )
+            cs.add(
+                "name_drop", name_id=name_id, entity_id=entity, text=text, reason="Title-casing broke the possessive."
+            )
+        for old, label in (
+            ("natural-law-party", "Natural Law Party"),
+            ("pro-life-alliance", "Pro-Life Alliance"),
+            ("humanist-party", "Humanist Party"),
+        ):
+            held = conn.execute(
+                "select entity_id from external_id where scheme = 'gb.party' and value = %s", (old,)
+            ).fetchone()
+            if held is not None and held[0] != party_of(label):
+                cs.merge(held[0], party_of(label))
 
         starts = sorted(set(ERAS.values()))
         ends = dict(itertools.pairwise(starts))
@@ -1180,12 +1208,14 @@ def emit() -> Path:
                         and " - " not in source_label.split(",")[0]
                     )
                     other = source_label in ("Others", "Ind", "IND")
-                    independent = source_label.startswith(("Independent", "Margo", "MP for", "MSP for")) and not source_label.upper().startswith(
-                        "INDEPENDENT GREEN"
-                    )
+                    independent = source_label.startswith(
+                        ("Independent", "Margo", "MP for", "MSP for")
+                    ) and not source_label.upper().startswith("INDEPENDENT GREEN")
                     if individual:
                         surname, forename = source_label.split(", ", 1)
                         full = f"{forename} {surname.title()}"
+                    elif source_label.startswith(("MP for", "MSP for")):
+                        full = "Independent"
                     elif year in (2021, 2026):
                         full = (
                             source_label.title()
@@ -1195,6 +1225,7 @@ def emit() -> Path:
                             .replace("Reform Uk", "Reform UK")
                             .replace("Advance Uk", "Advance UK")
                             .replace("’S", "’s")
+                            .replace("'S", "'s")
                         )
                     else:
                         full = expansions.get(source_label, source_label)

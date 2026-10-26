@@ -101,6 +101,22 @@ WALES_CHANGES = (
         "Sat as an independent after it emerged he would be prosecuted.",
     ),
     (
+        "2012-10-15",
+        "day",
+        "Bethan Sayed",
+        "Plaid Cymru",
+        "Independent politician",
+        "Suspended and sat as an independent until spring 2013.",
+    ),
+    (
+        "2013-01-01",
+        "year",
+        "Bethan Sayed",
+        "Independent politician",
+        "Plaid Cymru",
+        "Returned to the Plaid Cymru group in spring 2013; the page gives no day.",
+    ),
+    (
         "2022-11-08",
         "day",
         "Rhys ab Owen",
@@ -336,7 +352,9 @@ def emit() -> Path:
         )
         for url in (*CHANGE_PAGES.values(), SENEDD_CHANGES):
             cs.artifact(raw.cached(SOURCE, url), wikipedia)
-        parliament = cs.source("Scottish Parliament", "Members' pages, Business Bulletin, and the cumulative list of MSPs by party")
+        parliament = cs.source(
+            "Scottish Parliament", "Members' pages, Business Bulletin, and the cumulative list of MSPs by party"
+        )
         cs.add(
             "source",
             id=parliament,
@@ -375,6 +393,7 @@ def emit() -> Path:
             if (tenure, kind, when) in dated_events:
                 return dated_events[(tenure, kind, when)]
             return held[0] if len(held) == 1 else uuid5(NAMESPACE, f"{SOURCE}.event:{tenure}:{kind}:{when}")
+
         specs: list[dict[str, object]] = []
         for body_name, (item, pattern) in BODIES.items():
             body = conn.execute(
