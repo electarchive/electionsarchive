@@ -1076,7 +1076,18 @@ def emit() -> Path:
         name(general, "Elezioni politiche del 2022", "it", "native")
         path = f"it/{GENERAL}-general"
         cs.add("slug", path=path, entity_id=general)
-        cs.add("note", entity_id=general, kind="context", body_md=ELECTION_NOTE)
+        earlier = conn.execute(
+            """select n.id from note n join changeset c on c.id = n.changeset_id
+               where c.pipeline = %s and n.entity_id = %s and n.kind = 'context' order by n.id limit 1""",
+            [SOURCE, general],
+        ).fetchone()
+        cs.add(
+            "note",
+            **({"id": earlier[0]} if earlier else {}),
+            entity_id=general,
+            kind="context",
+            body_md=ELECTION_NOTE,
+        )
         groups: dict[str, list[str]] = {}
         for label, group in lists.items():
             groups.setdefault(group, []).append(label)
