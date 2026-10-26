@@ -15,6 +15,7 @@ from ea import raw
 from ea.changeset import Changeset, slug
 from ea.sources.it.interno import MANDATES, proper
 from ea.sources.it.interno import PARTIES as INTERNO_PARTIES
+from ea.sources.it.interno import key as estero_key
 from ea.store import DATA, connect
 
 SOURCE = "it.storico"
@@ -926,6 +927,10 @@ def emit() -> Path:
             raise ValueError("publish it.interno before it.storico")
         cs.artifact(raw.cached("it.interno", MANDATES), chamber_record)
         minted_countries: set[str] = set()
+        restaged: dict[str, UUID] = {}
+        estero_units: dict[str, UUID] = dict(
+            conn.execute("select code, id from reporting_unit where scheme_code = 'it.estero'").fetchall()
+        )
 
         short = dict(
             conn.execute(
@@ -1138,19 +1143,44 @@ def emit() -> Path:
                 )
                 units: dict[str, UUID] = {}
                 for country in sorted(set(rows["country"]) | set(turnout_abroad["country"])):
-                    units[country] = cs.unit("it.estero", country)
-                    if units[country] in cs.minted and country not in minted_countries:
-                        minted_countries.add(country)
-                        cs.add(
-                            "reporting_unit",
-                            id=units[country],
-                            polity_id=italy,
-                            scheme_code="it.estero",
-                            code=country,
-                            area_relation="unlocated",
-                            kind="abroad_mission",
-                        )
-                        name(units[country], country.title().replace(" E ", " e ").replace(" Di ", " di "), "it")
+                    folded = estero_key(country)
+                    if folded in estero_units:
+                        units[country] = estero_units[folded]
+                        if country != folded and country in estero_units and country not in minted_countries:
+                            minted_countries.add(country)
+                            cs.merge(estero_units[country], units[country])
+                    elif folded in restaged and country in estero_units:
+                        units[country] = restaged[folded]
+                        if units[country] != estero_units[country] and country not in minted_countries:
+                            minted_countries.add(country)
+                            cs.merge(estero_units[country], units[country])
+                    elif country in estero_units:
+                        units[country] = restaged[folded] = estero_units[country]
+                        if country not in minted_countries:
+                            minted_countries.add(country)
+                            cs.add(
+                                "reporting_unit",
+                                id=units[country],
+                                polity_id=italy,
+                                scheme_code="it.estero",
+                                code=folded,
+                                area_relation="unlocated",
+                                kind="abroad_mission",
+                            )
+                    else:
+                        units[country] = cs.unit("it.estero", folded)
+                        if units[country] in cs.minted and folded not in minted_countries:
+                            minted_countries.add(folded)
+                            cs.add(
+                                "reporting_unit",
+                                id=units[country],
+                                polity_id=italy,
+                                scheme_code="it.estero",
+                                code=folded,
+                                area_relation="unlocated",
+                                kind="abroad_mission",
+                            )
+                            name(units[country], country.title().replace(" E ", " e ").replace(" Di ", " di "), "it")
                 fresh_abroad = abroad_set in cs.minted
                 if fresh_abroad:
                     for country, registered, voters, blank, valid in (
