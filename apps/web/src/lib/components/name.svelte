@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { goto } from "$app/navigation";
   import { resolve } from "$app/paths";
   import { getContext } from "svelte";
   import PartyCard from "#lib/components/party-card.svelte";
@@ -47,31 +46,26 @@
   <HoverCard.Root bind:open openDelay={280} closeDelay={120}>
     <HoverCard.Trigger>
       {#snippet child({ props })}
-        <button
+        <a
           {...props}
-          type="button"
+          href={resolve("/id/[id]", { id: person ?? party ?? "" })}
           {tabindex}
           class={cn(
-            "cursor-pointer text-start underline decoration-transparent decoration-1 underline-offset-[0.22em] transition-[text-decoration-color] hover:decoration-current focus-visible:decoration-current",
+            "underline decoration-transparent decoration-1 underline-offset-[0.22em] transition-[text-decoration-color] hover:decoration-current focus-visible:decoration-current",
             className,
           )}
           onclick={(event) => {
             if (
-              !(event instanceof PointerEvent) ||
-              event.pointerType !== "mouse"
+              event instanceof PointerEvent &&
+              (event.pointerType === "touch" || event.pointerType === "pen")
             ) {
+              event.preventDefault();
               open = !open;
-              return;
             }
-            event.preventDefault();
-            event.stopPropagation();
-            const href = resolve("/id/[id]", { id: person ?? party ?? "" });
-            if (event.metaKey || event.ctrlKey) {
-              window.open(href, "_blank", "noopener");
-            } else {
-              void goto(href);
-            }
-          }}>{@render face()}</button
+          }}
+          role={undefined}
+          aria-haspopup={undefined}
+          aria-expanded={undefined}>{@render face()}</a
         >
       {/snippet}
     </HoverCard.Trigger><HoverCard.Content
