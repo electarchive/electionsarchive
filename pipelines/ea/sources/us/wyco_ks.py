@@ -82,15 +82,15 @@ def _title(title: str) -> str:
     return title.strip()
 
 
-def dotted(text: str) -> Iterator[dict[str, Any]]:
+def dotted(text: str, joined: bool = False) -> Iterator[dict[str, Any]]:
     lines = text.splitlines()
     for index, line in enumerate(lines):
-        if not re.match(r"^\s*\(VOTE FOR\)\s*(\d+)\s*$", line, re.I) or index == 0:
+        if not re.match(r"^\s*\(VOTE FOR\s*\)\s*(\d+)\s*$", line, re.I) or index == 0:
             continue
         choices: list[dict[str, Any]] = []
         for other in lines[index + 1 : index + 60]:
             stripped = other.strip()
-            if not stripped or re.match(r"(?i)\(VOTE FOR\)", stripped):
+            if not stripped or re.match(r"(?i)\(VOTE FOR\s*\)", stripped):
                 if choices:
                     break
                 continue
@@ -113,6 +113,22 @@ def dotted(text: str) -> Iterator[dict[str, Any]]:
                 }
             )
         title = next((lines[back].strip() for back in range(index - 1, max(index - 4, -1), -1) if lines[back].strip()), "")
+        if joined:
+            above = []
+            for back in range(index - 1, max(index - 3, -1), -1):
+                candidate = lines[back].strip()
+                if (
+                    not candidate
+                    or candidate.startswith(("(WITH", "NO CANDIDATE", "INVALID", "VOTER TURNOUT", "REMOVED"))
+                    or re.search(r"(?i)\.html?\[|(\. ){2}", candidate)
+                    or ROW.match(lines[back])
+                ):
+                    break
+                above.insert(0, candidate)
+            title = " - ".join(above) or next(
+                (lines[back].strip() for back in range(index - 1, max(index - 6, -1), -1) if lines[back].strip() and not re.search(r"(?i)\.html?\[", lines[back])),
+                "",
+            )
         if choices and title:
             yield {"text": title, "vote_for": int(re.search(r"\d+", line)[0]), "choices": choices, "cast": None}
 
