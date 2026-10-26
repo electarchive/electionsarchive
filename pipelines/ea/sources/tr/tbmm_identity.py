@@ -8,6 +8,12 @@ from ea.store import DATA, connect
 
 SOURCE = "tr.tbmm_identity"
 VERSION = "1"
+SAME = {
+    frozenset({"Q106239096", "Q19611225"}): (
+        "Wikidata holds this member twice, as Q106239096 and Q19611225: both are members of the Grand National Assembly "
+        "born in 1961 in İzmir, and the TBMM lists her under one person ID in terms 22, 23, 25, and 26."
+    )
+}
 TERMS = (9, 10, 11, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26)
 
 
@@ -40,7 +46,8 @@ def emit() -> Path:
             people = sorted({person for _, _, person in terms}, key=str)
             if len(people) < 2:
                 continue
-            if len({value for person in people for value in wikidata[person]}) > 1:
+            items = frozenset(value for person in people for value in wikidata[person])
+            if len(items) > 1 and items not in SAME:
                 review.append((member, terms[0][1], "persons carry different Wikidata items"))
                 continue
             survivor = min(
@@ -52,6 +59,8 @@ def emit() -> Path:
                     str(person),
                 ),
             )
+            if items in SAME:
+                cs.add("note", entity_id=survivor, kind="context", body_md=SAME[items])
             for person in people:
                 if person != survivor:
                     cs.merge(person, survivor)
