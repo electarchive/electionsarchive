@@ -50,6 +50,7 @@ SKIP = re.compile(
     re.I,
 )
 LINE = re.compile(r"^\s+(.+?)\s{2,}\(?([\d,]+)\)?\s*$")
+HEADER = re.compile(r"^\s*([A-Za-z0-9][A-Za-z0-9 .&-]*?) - (\d\d/\d\d/\d{4})\s*$", re.M)
 ELECTION = re.compile(r"(General|Primary Runoff|Presidential Primary|Primary|Special|Runoff)[A-Za-z ]*Election(?: \d{4})? - (\d\d/\d\d/\d{4})", re.I)
 BLOCK = re.compile(
     rf"^\s*(?:(?P<ad>Assembly District|ASSEMBLY DISTRICT) (?P<adn>\d+)|(?P<cty>{COUNTIES}) County|(?P<tot>TOTAL FOR|Total for) (?P<what>.+))\s*$"
@@ -158,7 +159,13 @@ def read(path: Path) -> dict[str, object] | None:
     lines = pdf_text(path).splitlines()
     found = ELECTION.search("\n".join(lines[:25]))
     if found is None:
-        return None
+        found = HEADER.search("\n".join(lines[:25]))
+        if found is None:
+            return None
+        kind = "Primary Runoff" if "run" in found[1].lower() else "Primary" if "primary" in found[1].lower() else "General" if "general" in found[1].lower() else "Special"
+        found = (None, kind, found[2])
+    else:
+        found = (None, found[1].title(), found[2])
     scope = None
     for line in lines[:25]:
         matched = re.match(rf"^({COUNTIES}) County - (.+)$", line.strip()) or re.match(r"^(Crossover) - (.+)$", line.strip())
@@ -203,7 +210,7 @@ def read(path: Path) -> dict[str, object] | None:
             entries.append((office, block[0], block[1], name, party, num(counted[2])))
     return {
         "day": datetime.strptime(found[2], "%m/%d/%Y").date(),
-        "kind": found[1].title(),
+        "kind": found[1],
         "scope": scope,
         "entries": entries,
         "totals": totals,
@@ -317,7 +324,7 @@ def emit() -> Path:
     frames = []
     for office, county, found in keys:
         frames.append(
-            entries.filter((pl.col("office") == office) & (pl.col("county") == county) & (pl.col("kind").is_in(["General", "Primary", "Primary Runoff", "Presidential Primary"])))
+            entries.filter((pl.col("office") == office) & (pl.col("county") == county) & (pl.col("kind").is_in(["General", "Primary", "Primary Runoff", "Presidential Primary", "Special"])))
             .with_columns(
                 seat=pl.lit(found["seat"], pl.String),
                 number=pl.lit(found.get("number"), pl.Int64),
@@ -468,9 +475,15 @@ def emit() -> Path:
             rows = pl.concat(parts)
             era = "2002" if day_text < "2012-01-01" else "2012"
             if is_state:
-                state_kind = "general" if kind == "General" else "primary" if kind in ("Primary", "Presidential Primary") else "runoff"
+                state_kind = "general" if kind == "General" else "primary" if kind in ("Primary", "Presidential Primary") else "special" if kind == "Special" else "runoff"
                 election = None
-                for value in ([f"{day}:NY"] if state_kind == "general" else [f"{day}:NY:primary"]):
+                if state_kind == "special":
+                    election = conn.execute(
+                        "select e.id, s.path from election e left join slug s on s.entity_id = e.id "
+                        "where e.polity_id = %s and e.date_from = %s and e.kind = 'special' limit 1",
+                        [cs.polity("US-NY"), day],
+                    ).fetchone()
+                for value in ([] if state_kind == "special" else [f"{day}:NY"] if state_kind == "general" else [f"{day}:NY:primary"]):
                     election = conn.execute(
                         "select x.entity_id, s.path from external_id x left join slug s on s.entity_id = x.entity_id "
                         "where x.scheme = 'us.election' and x.value = %s limit 1",
@@ -510,12 +523,12 @@ def emit() -> Path:
                     continue
                 election = election[0]
             else:
-                election_kind = "primary" if kind in ("Primary", "Presidential Primary") else "runoff"
+                election_kind = "primary" if kind in ("Primary", "Presidential Primary") else "special" if kind == "Special" else "runoff"
                 election = conn.execute(
-                    "select id from election where polity_id = %s and date_from = %s and kind in ('primary', 'runoff')", [city, day]
+                    "select id from election where polity_id = %s and date_from = %s and kind in ('primary', 'runoff', 'special')", [city, day]
                 ).fetchone()
                 if election is None:
-                    election = cs.key("us.election", f"{day}:new-york-city:primary")
+                    election = cs.key("us.election", f"{day}:new-york-city:{election_kind}")
                     if election not in cs.minted:
                         pass
                     elif election not in added:
@@ -536,7 +549,7 @@ def emit() -> Path:
                     election = election[0]
             if not is_state:
                 election_path = conn.execute("select path from slug where entity_id = %s limit 1", [election]).fetchone()
-                election_path = election_path[0] if election_path else f"us/ny/new-york-city/{day}-{'primary' if kind == 'Primary' else 'runoff'}"
+                election_path = election_path[0] if election_path else f"us/ny/new-york-city/{day}-{'primary' if kind == 'Primary' else 'special' if kind == 'Special' else 'runoff'}"
             office = body_id = None
             area = None
             county_name = only_county
@@ -784,7 +797,7 @@ def emit() -> Path:
                         "outcome",
                         result_set_id=result_set,
                         option_id=roots[candidate],
-                        kind=("advanced" if kind != "General" else "elected") if rank < magnitude else "lost",
+                        kind=("advanced" if kind not in ("General", "Special") else "elected") if rank < magnitude else "lost",
                     )
             write_in = None
             if rows.filter(pl.col("party") == "WRITE-IN").height:
