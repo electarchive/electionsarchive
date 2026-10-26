@@ -100,21 +100,21 @@ const POOL = sql`
 const FACTS = {
   area: (set: SQL, area: SQL) =>
     sql`
-      select r.result_set_k, r.area_k, r.option_k, r.measure, r.count_round, r.value, r.complete
+      select r.result_set_k, r.area_k, r.option_k, r.measure, r.count_round, r.value, r.complete, r.channel
             from result_rollup r where r.result_set_k = ${set} and r.area_k = ${area} offset 0
     `,
   pool: (set: SQL, area: SQL) =>
     sql`
-      select v.result_set_k, ${area} as area_k, v.option_k, v.measure, v.count_round, sum(v.value) as value, true as complete
+      select v.result_set_k, ${area} as area_k, v.option_k, v.measure, v.count_round, sum(v.value) as value, true as complete, v.channel
       from (select * from result_value x where (-(${area}) - 1) / 16 = 0 and x.result_set_k = ${set} offset 0) v
       cross join lateral (select * from reporting_unit y where y.k = v.unit_k offset 0) u
       where ${POOLED} and ${POOL} = (${sql.param([...POOLS])}::text[])[(-(${area}) - 1) % 16 + 1]
         and not exists (
           select from reporting_unit c join result_value w on w.result_set_k = ${set} and w.unit_k = c.k where c.parent_id = u.id
         )
-      group by 1, 2, 3, 4, 5
+      group by 1, 2, 3, 4, 5, 8
       union all
-      select v.result_set_k, ${area} as area_k, v.option_k, v.measure, v.count_round, sum(v.value) as value, true as complete
+      select v.result_set_k, ${area} as area_k, v.option_k, v.measure, v.count_round, sum(v.value) as value, true as complete, v.channel
       from area pa
       join reporting_unit u on u.area_id = pa.id and ${PLACED}
       join result_value v on v.result_set_k = ${set} and v.unit_k = u.k
@@ -122,13 +122,13 @@ const FACTS = {
         and not exists (
           select from reporting_unit c join result_value w on w.result_set_k = ${set} and w.unit_k = c.k where c.parent_id = u.id
         )
-      group by 1, 2, 3, 4, 5
+      group by 1, 2, 3, 4, 5, 8
     `,
   unit: (set: SQL, unit: SQL) =>
     sql`
-      select v.result_set_k, v.unit_k as area_k, v.option_k, v.measure, v.count_round, sum(v.value) as value, true as complete
+      select v.result_set_k, v.unit_k as area_k, v.option_k, v.measure, v.count_round, sum(v.value) as value, true as complete, v.channel
             from result_value v where v.result_set_k = ${set} and v.unit_k = ${unit}
-            group by 1, 2, 3, 4, 5
+            group by 1, 2, 3, 4, 5, 8
     `,
 };
 const CYCLE = sql`
@@ -1066,10 +1066,11 @@ async function load(
     value: number;
     complete: boolean;
     rank: number;
+    channel: number;
   }>(sql`
     with fetched as materialized (
       select r.result_set_k as set, r.area_k as area, r.option_k as option, r.measure, r.count_round,
-        r.value::float8 as value, r.complete,
+        r.value::float8 as value, r.complete, r.channel,
         coalesce(${step}::int, case when p.single and ${!isFirst}
           then max(r.count_round) over (partition by r.result_set_k, r.area_k, r.measure)
           else min(r.count_round) over (partition by r.result_set_k, r.area_k, r.measure) end) as first,
@@ -1111,7 +1112,7 @@ async function load(
       ) x
       order by x.option_k, array_position(${COUNTED}, x.measure), x.count_round
     )
-    select r.set, r.area, r.option, x.role, r.main, r.value, r.complete, 0::float8 as rank
+    select r.set, r.area, r.option, x.role, r.main, r.value, r.complete, 0::float8 as rank, r.channel
     from flagged r
     cross join lateral (
       select case
@@ -1123,7 +1124,7 @@ async function load(
     where r.kept and r.count_round = r.first and x.role is not null and not (r.late and x.role = 'valid')
       and not exists (select from gone g where g.set = r.set and g.option = r.option)
     union all
-    select distinct on (r.option) r.set, r.area, r.option, 'rank', r.main, 0, true, coalesce(w.total, r.rank)::float8
+    select distinct on (r.option) r.set, r.area, r.option, 'rank', r.main, 0, true, coalesce(w.total, r.rank)::float8, 0
     from flagged r left join whole w on w.option = r.option where r.rank is not null or w.total is not null
   `);
   const counts = rollup.rows
@@ -1166,7 +1167,7 @@ async function load(
     };
     areas.set(row.area, area);
     area.complete &&= row.complete;
-    const sum = `${row.role}:${row.set}`;
+    const sum = `${row.role}:${row.set}:${row.channel}`;
     area.sums.set(sum, (area.sums.get(sum) ?? 0) + row.value);
     if (row.role === "votes") {
       area.votes.set(row.option, (area.votes.get(row.option) ?? 0) + row.value);
@@ -1428,11 +1429,29 @@ async function load(
     let total = 0;
     let appointed = 0;
     for (const set of sets) {
+      let [valid, votes, missing] = [0, 0, 0];
+      for (const [key, value] of area.sums) {
+        const [role, k, channel] = key.split(":");
+        if (k !== String(set.k)) {
+          continue;
+        }
+        if (role === "appointed") {
+          appointed += value;
+        } else if (role === "valid") {
+          valid += value;
+        } else if (role === "votes") {
+          votes += value;
+          if (!area.sums.has(`valid:${set.k}:${channel}`)) {
+            missing += value;
+          }
+        }
+      }
       total +=
-        (isAnswers ? null : area.sums.get(`valid:${set.k}`)) ??
-        area.sums.get(`votes:${set.k}`) ??
-        0;
-      appointed += area.sums.get(`appointed:${set.k}`) ?? 0;
+        isAnswers || valid === 0
+          ? votes
+          : valid >= votes
+            ? valid
+            : valid + missing;
     }
     loaded.set(k, {
       side: {
