@@ -245,13 +245,7 @@
       "schemes": [
         "de.landtag_wahlkreis"
       ],
-      "gaps": [
-        {
-          "from": 1946,
-          "to": 1950,
-          "note": "Before Baden-Württemberg was formed in 1952, Württemberg-Baden, Baden, and Württemberg-Hohenzollern held their own elections. They aren't counted yet."
-        }
-      ],
+      "gaps": [],
       "elections": [
         {
           "date": "1946-10-13",
@@ -261,6 +255,16 @@
           },
           "source": "bwl-ltw",
           "quote": "Table 1, 13.10.1946: HH 1."
+        },
+        {
+          "date": "1946-11-24",
+          "contests": 1,
+          "regions": {
+            "BW": 1
+          },
+          "source": "bwl-ltw",
+          "quote": "Table 3.1: Wahl im ehemaligen Land Württemberg-Baden am 24.11.1946",
+          "note": "An election in a former Land that became part of Baden-Württemberg in 1952."
         },
         {
           "date": "1946-12-01",
@@ -284,12 +288,13 @@
         },
         {
           "date": "1947-05-18",
-          "contests": 1,
+          "contests": 3,
           "regions": {
-            "RP": 1
+            "RP": 1,
+            "BW": 2
           },
           "source": "bwl-ltw",
-          "quote": "Table 1, 18.05.1947: RP 1."
+          "quote": "Table 1, 18.05.1947: RP 1.; Table 3.1: Wahl im ehemaligen Land Baden am 18.05.1947; Wahl im ehemaligen Land Württemberg-Hohenzollern am 18.05.1947"
         },
         {
           "date": "1947-10-05",
@@ -339,12 +344,13 @@
         },
         {
           "date": "1950-11-19",
-          "contests": 1,
+          "contests": 2,
           "regions": {
-            "HE": 1
+            "HE": 1,
+            "BW": 1
           },
           "source": "bwl-ltw",
-          "quote": "Table 1, 19.11.1950: HE 2."
+          "quote": "Table 1, 19.11.1950: HE 2.; Table 3.1: Wahl im ehemaligen Land Württemberg-Baden am 19.11.1950"
         },
         {
           "date": "1950-11-26",
