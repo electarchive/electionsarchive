@@ -96,6 +96,53 @@ NOTE_STATE = (
 )
 
 
+CHARTER_2005 = "https://www.nyc.gov/assets/charter/downloads/pdf/crc_ballot_questions.pdf"
+CHARTER_2010 = "https://www.nyc.gov/assets/charter/downloads/pdf/final_ballot_questions_combined.pdf"
+QUESTIONS = (
+    (
+        "2005-11-08",
+        "Q3. ETHICS CODE",
+        "ethics-code-for-city-administrative-judges",
+        "Question 3: Ethics Code for City Administrative Judges",
+        CHARTER_2005,
+        "2005 Ballot Questions, New York City Charter Revision Commission, August 2, 2005",
+        "Question 3: Ethics Code for City Administrative Judges. These changes to the City Charter, as proposed by the New York City Charter Revision Commission, would require the Mayor and the Chief Administrative Law Judge of the Office of Administrative Trials and Hearings to jointly issue rules establishing a code or codes of professional conduct for the administrative law judges and hearing officers in the City's administrative tribunals. Shall the proposed changes be adopted?",
+    ),
+    (
+        "2005-11-08",
+        "Q4 BALANCED BUDGET",
+        "balanced-budget-and-other-city-fiscal-requirements",
+        "Question 4: Balanced Budget and Other City Fiscal Requirements",
+        CHARTER_2005,
+        "2005 Ballot Questions, New York City Charter Revision Commission, August 2, 2005",
+        "Question 4: Balanced Budget and Other City Fiscal Requirements. These changes to the City Charter, as proposed by the New York City Charter Revision Commission, would establish as Charter requirements the following fiscal mandates that, in general, now apply to the City through a State law enacted in response to the City's 1975 fiscal crisis. The changes would add these mandates to the City Charter so that they would continue to apply after the State law expires. The changes would: Require that the City annually prepare a budget balanced in accordance with generally accepted accounting principles (GAAP), and end each year not showing a deficit in accordance with those principles; Require that the Mayor annually prepare a four-year City financial plan, to be based on reasonable assumptions and modified on at least a quarterly basis, and that the plan provide for payment of the City's debts and a general reserve of at least $100 million to cover shortfalls; Impose additional conditions on the Charter's current restrictions on short-term debt (which may be issued by the City to fund a projected deficit or in anticipation of the receipt of funds from taxes, revenues, and bonds). These conditions generally limit the duration and amount of the short-term debt; and Impose additional conditions on the annual audit of the City's accounts that is currently required by the Charter. These conditions relate to application of generally accepted auditing standards and access by auditors to records so that the audit may be issued within four months after the close of the City fiscal year. Shall the proposed changes be adopted?",
+    ),
+    (
+        "2010-11-02",
+        "TERM LIMITS",
+        "term-limits",
+        "City Question 1: Term Limits",
+        CHARTER_2010,
+        "2010 Ballot Questions, New York City Charter Revision Commission, August 23, 2010",
+        "City Question 1. Term Limits: The proposal would amend the City Charter to: Reduce from three to two the maximum number of consecutive full terms that can be served by elected city officials; and Make this change in term limits applicable only to those city officials who were first elected at or after the 2010 general election; and Prohibit the City Council from altering the term limits of elected city officials then serving in office. Shall this proposal be adopted?",
+    ),
+    (
+        "2010-11-02",
+        "ELECTIONS AND GOVERNMENT ADMINISTRATION",
+        "elections-and-government-administration",
+        "City Question 2: Elections and Government Administration",
+        CHARTER_2010,
+        "2010 Ballot Questions, New York City Charter Revision Commission, August 23, 2010",
+        "City Question 2. Elections and Government Administration: The proposal would amend the City Charter to: Disclosure of Independent Campaign Spending: Require public disclosure of expenditures made by entities and individuals independent from candidates to influence the outcome of a city election or referendum; Ballot Access: Generally reduce the number of petition signatures needed by candidates for city elective office to appear on a ballot; Voter Assistance and Campaign Finance Board: Merge voter assistance functions, including a reconstituted Voter Assistance Advisory Committee, into the Campaign Finance Board, and change when Campaign Finance Board member terms begin; Conflicts of Interest Law: Require all public servants to receive conflicts of interest training, raise the maximum fine for a public servant who violates the City's conflicts of interest law, and allow the City to recover any benefits obtained from such violations; City Administrative Tribunals: Authorize the Mayor to direct the merger of administrative tribunals and adjudications into the Office of Administrative Trials and Hearings and permit the Department of Consumer Affairs to adjudicate all violations issued by that department; City Reporting Requirements and Advisory Bodies: Create a commission to review requirements for reports and advisory bodies and waive the requirements, subject to City Council review, where the commission finds they are not of continuing value; and Map for Facility Siting: Include in the City's facilities siting map those transportation and waste management facilities operated by or for governmental entities, or by private entities that provide comparable services. Shall this proposal be adopted?",
+    ),
+)
+NOTE_QUESTION = (
+    "Assembly district returns of a city charter question from the Board of Elections' certified Statement and Return "
+    "reports. Ballots cast are the reports' total ballots. The borough reports' assembly district lines sum to each "
+    "report's county total."
+)
+
+
 def num(text: str) -> int:
     return int(text.replace(",", ""))
 
@@ -633,7 +680,7 @@ def emit() -> Path:
                 status="active",
                 source_id=source,
                 is_default=whole,
-                completeness=completeness,
+                completeness=None if is_state and not whole else completeness,
             )
             cs.add("note", entity_id=result_set, kind="methodology", body_md=NOTE + (NOTE_STATE if not whole else ""))
             real = rows.filter(pl.col("party").is_null() | (pl.col("party") != "WRITE-IN")).with_columns(
@@ -749,6 +796,99 @@ def emit() -> Path:
                 if magnitude == 1:
                     got = rows.filter((pl.col("county") == county) & (pl.col("bid") == bid))["votes"].sum()
                     values.append((str(result_set), str(unit), None, 4, int(got)))
+            taken += 1
+        for day_text, marker, qslug, qtitle, wording_url, wording_title, wording in QUESTIONS:
+            day = date.fromisoformat(day_text)
+            era = "2002" if day_text < "2012-01-01" else "2012"
+            qrows = entries.filter(
+                (pl.col("day") == day_text) & pl.col("office").str.to_uppercase().str.contains(marker, literal=True) & (pl.col("county") != "Crossover")
+            )
+            urls = {}
+            for county, url in qrows.select("county", "url").unique().sort("url").iter_rows():
+                urls.setdefault(county, url)
+            qrows = qrows.filter(pl.col("url").is_in(list(urls.values())))
+            if len(urls) < 5:
+                skipped.append(f"{day} question {qslug}: only {sorted(urls)}")
+                continue
+            parts = []
+            for county, url in urls.items():
+                part = qrows.filter(pl.col("url") == url)
+                mine = part.filter(pl.col("bkind") == "ad")
+                declared = totals.filter((pl.col("url") == url) & (pl.col("bkind") == "total") & pl.col("office").is_in(part["office"].unique().to_list()))["votes"]
+                if mine.is_empty() or declared.is_empty() or int(mine["votes"].sum()) != int(declared[-1]):
+                    skipped.append(f"{day} question {qslug}: {county} lines do not sum to the total")
+                    parts = None
+                    break
+                parts.append(mine)
+            if parts is None:
+                continue
+            qrows = pl.concat(parts)
+            election = conn.execute(
+                "select id from election where polity_id = %s and date_from = %s and kind in ('local', 'general') order by kind = 'local' desc",
+                [city, day],
+            ).fetchone() or conn.execute(
+                "select entity_id from external_id where scheme = 'us.election' and value = %s", [f"{day}:NY"]
+            ).fetchone()
+            election_path = conn.execute("select path from slug where entity_id = %s limit 1", [election[0]]).fetchone()[0]
+            contest_key = f"{day}:new-york-city:proposal-{qslug}"
+            contest = cs.key("us.contest", contest_key)
+            cs.add(
+                "contest",
+                id=contest,
+                election_id=election[0],
+                kind="ballot_question",
+                district_area_id=place,
+                magnitude=1,
+                round_number=1,
+                electoral_system_id=cs.key("us.electoral_system", "referendum"),
+                default_result_kind="counted",
+            )
+            cs.add("ballot_question", contest_id=contest, type="mandatory_referendum")
+            name(contest, f"{day.year} New York City ballot question: {qtitle}")
+            cs.add("slug", path=f"{election_path}/proposal-{qslug}", entity_id=contest)
+            source_title = f"{TITLE}, {day}"
+            source = cs.source(PUBLISHER, source_title)
+            if source in cs.minted and source not in added:
+                added.add(source)
+                cs.add("source", id=source, kind="official_body", publisher=PUBLISHER, title=source_title, url=next(iter(urls.values())), license="Public record")
+            for url in urls.values():
+                cs.artifact(raw.cached(SOURCE, url), source)
+            text_source = cs.source("New York City Charter Revision Commission", wording_title)
+            if text_source in cs.minted and text_source not in added:
+                added.add(text_source)
+                cs.add("source", id=text_source, kind="official_body", publisher="New York City Charter Revision Commission", title=wording_title, url=wording_url, license="Public record")
+            cs.add("ballot_question_text", contest_id=contest, kind="text", lang="en", body=wording, url=wording_url, source_id=text_source)
+            result_set = cs.key(f"{SOURCE}.result_set", contest_key)
+            cs.add(
+                "result_set",
+                id=result_set,
+                election_id=election[0],
+                contest_id=contest,
+                stage="certified",
+                kind="counted",
+                status="active",
+                source_id=source,
+                is_default=True,
+                completeness=1,
+            )
+            cs.add("note", entity_id=result_set, kind="methodology", body_md=NOTE_QUESTION)
+            answers = {}
+            for position, answer in enumerate(("YES", "NO"), start=1):
+                answers[answer] = cs.key("us.option", f"{contest_key}:{answer.lower()}")
+                cs.add("contest_option", id=answers[answer], contest_id=contest, kind="answer", ballot_position=position, ballot_label=answer.title())
+            summed = {}
+            for county, bid, answer, votes in qrows.select("county", "bid", "name", "votes").iter_rows():
+                if answer.upper() not in answers:
+                    continue
+                unit = unit_for(era, bid, county)
+                summed[(unit, answers[answer.upper()])] = summed.get((unit, answers[answer.upper()]), 0) + votes
+            values.extend((str(result_set), str(unit), str(option), 1, votes) for (unit, option), votes in summed.items())
+            for county, bid in qrows.select("county", "bid").unique().iter_rows():
+                unit = unit_for(era, bid, county)
+                cast = ballots.filter((pl.col("url") == urls[county]) & (pl.col("bkind") == "ad") & (pl.col("bid") == bid) & pl.col("office").is_in(qrows["office"].unique().to_list()))["votes"]
+                if not cast.is_empty():
+                    values.append((str(result_set), str(unit), None, 3, int(cast[0])))
+                values.append((str(result_set), str(unit), None, 4, int(qrows.filter((pl.col("county") == county) & (pl.col("bid") == bid))["votes"].sum())))
             taken += 1
         cs.frame(
             "result_value",
