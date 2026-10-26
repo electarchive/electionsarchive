@@ -7939,7 +7939,24 @@ async function races(
             })(),
         db.execute<{ from: string; to: string }>(sisters(roots, day)),
       ]);
-      const here = totals.get(place.k);
+      const here =
+        totals.get(place.k) ??
+        (single == null && districts.length > 0
+          ? (
+              await load(
+                districts.map((row) => row.id),
+                districts.map((row) => row.k ?? 0),
+                day,
+                counted.length > 0 ? counted : roots,
+                districts.map((row) => row.id),
+                null,
+                "area",
+                new Map<number, Array<[number, number]>>(
+                  districts.map((row) => [row.k ?? 0, [[place.k, 1]]]),
+                ),
+              )
+            ).get(place.k)
+          : undefined);
       const rows = reckon(here?.side, lineage, grouping, single == null);
       const folded = Map.groupBy(rows, (row) =>
         single == null && row.cell.party != null
