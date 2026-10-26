@@ -167,6 +167,36 @@
       "title": "Yüksek Seçim Kurulu Kararı 2018/263 (21 Nisan 2018)",
       "publisher": "Yüksek Seçim Kurulu (YSK)",
       "url": "https://www.ysk.gov.tr/doc/karar/dosya/77539/2018-263.pdf"
+    },
+    "ysk-2019-4379": {
+      "title": "Yüksek Seçim Kurulu Karar No: 2019/4379 (İstanbul Büyükşehir Belediye Başkanlığı yenileme seçimi)",
+      "publisher": "Yüksek Seçim Kurulu",
+      "url": "https://www.ysk.gov.tr/doc/karar/dosya/78043/2019-4379.pdf"
+    },
+    "tesav-ara": {
+      "title": "Çok Partili Dönemde Yapılan Milletvekili Ara Seçimi Sonuçları (Osmanlı'dan Günümüze Seçimler 1877–2002)",
+      "publisher": "TESAV, reproducing DİE (State Institute of Statistics) publications",
+      "url": "https://www.tesav.org.tr/wp-content/uploads/2018/02/8.-milletvekiliarasecimsonuclari.pdf"
+    },
+    "rg-12318": {
+      "title": "Resmî Gazete, 9 Haziran 1966, sayı 12318: Yüksek Seçim Kurulu bildirisi (milletvekili ara seçimi)",
+      "publisher": "Resmî Gazete (T.C. Cumhurbaşkanlığı)",
+      "url": "https://www.resmigazete.gov.tr/arsiv/12318.pdf"
+    },
+    "rg-12922": {
+      "title": "Resmî Gazete, 12 Haziran 1968, sayı 12922: Yüksek Seçim Kurulu bildirisi (milletvekili ara seçimi)",
+      "publisher": "Resmî Gazete (T.C. Cumhurbaşkanlığı)",
+      "url": "https://www.resmigazete.gov.tr/arsiv/12922.pdf"
+    },
+    "rg-16803": {
+      "title": "Resmî Gazete, 8 Kasım 1979, sayı 16803: Yüksek Seçim Kurulu bildirisi (milletvekili ara seçimi)",
+      "publisher": "Resmî Gazete (T.C. Cumhurbaşkanlığı)",
+      "url": "https://www.resmigazete.gov.tr/arsiv/16803.pdf"
+    },
+    "rg-19247": {
+      "title": "Resmî Gazete, 10 Ekim 1986, sayı 19247: Yüksek Seçim Kurulu bildirisi (milletvekili ara seçimi)",
+      "publisher": "Resmî Gazete (T.C. Cumhurbaşkanlığı)",
+      "url": "https://www.resmigazete.gov.tr/arsiv/19247.pdf"
     }
   },
   "levels": [
@@ -523,14 +553,55 @@
           "iso": "TR"
         }
       ],
-      "gaps": [
+      "gaps": [],
+      "elections": [
         {
-          "from": 1950,
-          "to": 2026,
-          "note": "No official count is compiled yet."
+          "date": "1951-09-16",
+          "contests": 17,
+          "source": "tesav-ara",
+          "quote": "16 Eylül 1951 Milletvekili Ara Seçimi Sonuçları ... Seçim Yapılan İl Sayısı 17 İl",
+          "note": "These counts come from a TESAV compilation that reproduces the State Institute of Statistics' published results."
+        },
+        {
+          "date": "1966-06-05",
+          "contests": 1,
+          "source": "rg-12318",
+          "quote": "Hatay İlinde boşalmış bir milletvekilliği için bu seçim çevresinde 5/6/1966 Pazar gününde yapılan ara seçimi"
+        },
+        {
+          "date": "1968-06-02",
+          "contests": 5,
+          "source": "rg-12922",
+          "quote": "2/6/1968 Pazar günü 5 ilde yapılan Milletvekili ara seçimi kesin sonuçları"
+        },
+        {
+          "date": "1975-10-12",
+          "contests": 6,
+          "source": "tesav-ara",
+          "quote": "12 Ekim 1975 Milletvekili Ara Seçimi Sonuçları ... Seçim Yapılan İl Sayısı 6 İl ... (YSK Bildirisi : 25 Ekim 1975 tarih ve 15394 sayılı Resmi Gazete)",
+          "note": "These counts come from a TESAV compilation that reproduces the State Institute of Statistics' published results."
+        },
+        {
+          "date": "1979-10-14",
+          "contests": 5,
+          "source": "rg-16803",
+          "quote": "14 Ekim 1979 Pazar günü 26 İlde yapılmış olan Cumhuriyet Senatosu üyeliği (C) Grubu İlleri Seçimi ile Cumhuriyet Senatosu ve 5 İldeki Milletvekili Ara seçimleri sonuçları"
+        },
+        {
+          "date": "1986-09-28",
+          "contests": 11,
+          "source": "rg-19247",
+          "quote": "28 Eylül 1986 Pazar günü onbir seçim çevresinde yapılan Türkiye Büyük Millet Meclisi XVII. Dönem Milletvekili Ara Seçiminde"
+        },
+        {
+          "date": "2003-03-09",
+          "contests": 1,
+          "source": "tesav-ara",
+          "quote": "9 Mart 2003 Siirt İli Yenileme Seçimi Sonuçları ... Kaynak: Yüksek Seçim Kurulu'nun, 11 Mart 2003 günlü ve 212 sayılı Kararı.",
+          "note": "Siirt's 2002 general election was annulled on appeal, and the province voted again on March 9, 2003."
         }
       ],
-      "elections": []
+      "note": "Each by-election counts one race per province, or per numbered district where a province was split into several (from 1983 on)."
     },
     {
       "key": "local",
@@ -603,6 +674,13 @@
           "contests": 1384,
           "source": "ysk-2019-bb",
           "quote": "SEÇİMİ YAPILAN BAŞKANLIK SAYISI 1.355 (Liste 3), plus SEÇİMİ YAPILAN BAŞKANLIK SAYISI 29 (Liste 2, metropolitan mayors; Istanbul annulled and not included)."
+        },
+        {
+          "date": "2019-06-23",
+          "contests": 1,
+          "source": "ysk-2019-4379",
+          "quote": "Yüksek Seçim Kurulunun 06/05/2019 tarih ve 2019/4219 sayılı kararı ile İstanbul Büyükşehir Belediye Başkanlığı seçiminin iptaline ve 23/06/2019 tarihinde yenilenmesine karar verilmiştir.",
+          "note": "The mayoral election of the Istanbul metropolitan municipality on March 31, 2019 was annulled, and the rerun on June 23 counts as its own race."
         },
         {
           "date": "2024-03-31",

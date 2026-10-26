@@ -474,7 +474,10 @@
           "source": "lop-hfer",
           "quote": "263 distinct ridings (Province and Riding) with Election Type Gen in Parliament 26",
           "note": "Seats from Elections Canada (Parliaments table, 26th: 128/265); ridings from the Library of Parliament. Some ridings returned two members until 1966, so ridings and seats differ.",
-          "regions": null
+          "regions": null,
+          "deferred": [
+            "1963-08-14"
+          ]
         },
         {
           "date": "1965-11-08",
@@ -505,7 +508,10 @@
           "contests": 264,
           "seats": 264,
           "source": "heo",
-          "quote": "Parliaments table, 30th: 141/264"
+          "quote": "Parliaments table, 30th: 141/264",
+          "deferred": [
+            "1974-10-08"
+          ]
         },
         {
           "date": "1979-05-22",

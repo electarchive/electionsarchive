@@ -291,13 +291,17 @@ def tally(cc: str, data: dict) -> tuple[dict, list[dict], list[dict]]:
         groups: dict[str, list[tuple]] = defaultdict(list)
         slots: dict[str, dict] = {}
         over: list[str] = []
+        deferred: dict[str, str] = {}
         for e in expected:
             slot = str(e["year"]) if by_year else e["date"]
             slots[slot] = e
+            deferred |= dict.fromkeys(e.get("deferred", []), slot)
         dates = sorted((date.fromisoformat(s), s) for s in slots) if not by_year else []
         for row in held:
             day = row[2]
-            if by_year:
+            if day.isoformat() in deferred:
+                slot = deferred[day.isoformat()]
+            elif by_year:
                 slot = str(day.year)
                 if level.get("cycle"):
                     slot = next((y for y in sorted(slots) if int(y) >= day.year), slot)

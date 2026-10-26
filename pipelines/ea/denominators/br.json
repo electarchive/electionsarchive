@@ -14,7 +14,7 @@
       "note": "One file per election, https://cdn.tse.jus.br/estatistica/sead/odsele/consulta_vagas/consulta_vagas_{year}.zip; counted by distinct SG_UF per DS_CARGO, deduplicating the national file."
     },
     "tse-cand": {
-      "title": "Consulta candidatos (candidates and their result by round), 1994–2022",
+      "title": "Consulta candidatos (candidates and their result by round), 1994–2026",
       "publisher": "Tribunal Superior Eleitoral, Portal de Dados Abertos",
       "url": "https://dadosabertos.tse.jus.br/dataset/?q=candidatos",
       "note": "consulta_cand_{year}.zip, BRASIL file, DS_CARGO Presidente: NR_TURNO and DS_SIT_TOT_TURNO."
@@ -136,6 +136,12 @@
           "contests": 2,
           "source": "tse-cand",
           "quote": "consulta_cand_2022, DS_CARGO Presidente: two candidates '2º TURNO' in round 1, and NR_TURNO 2 rows with 'ELEITO' and 'NÃO ELEITO'"
+        },
+        {
+          "year": 2026,
+          "contests": 2,
+          "source": "tse-cand",
+          "quote": "consulta_cand_2026, DS_CARGO Presidente: two candidates '2º TURNO' in round 1, and two NR_TURNO 2 rows"
         }
       ]
     },
