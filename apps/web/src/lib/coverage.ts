@@ -66,6 +66,7 @@ export const COUNTRY_COLUMNS = [
 export type Column =
   | (typeof US_COLUMNS)[number]
   | (typeof COUNTRY_COLUMNS)[number]
+  | "before_district"
   | "before"
   | "since";
 
@@ -84,6 +85,7 @@ export const TIER_LABELS: Record<Tier, () => string> = {
 export const COLUMN_LABELS: Record<Column, () => string> = {
   before_any: m.coverage_column_any,
   before_county: m.coverage_column_county,
+  before_district: m.coverage_column_district,
   before_shapes: m.coverage_column_shapes,
   since_any: m.coverage_column_any,
   since_county: m.coverage_column_county,
@@ -134,6 +136,97 @@ export function headline(polity: string, tier: string) {
     title: m.coverage_headline_us,
     progress: m.coverage_progress,
   } as const;
+}
+
+export function measures(
+  polity: string,
+  tier: string,
+): Array<{
+  era: "before" | "since" | null;
+  items: Array<{ column: Column; goal: Goal; title: () => string }>;
+}> {
+  if (polity !== "us") {
+    const lead = headline(polity, tier);
+    return [
+      {
+        era: null,
+        items: [
+          { column: "constituency", goal: tier as Goal, title: lead.title },
+          { column: "fine", goal: "fine", title: m.coverage_column_fine },
+          { column: "shapes", goal: "shapes", title: m.coverage_column_shapes },
+        ],
+      },
+    ];
+  }
+  if (tier === "local") {
+    return [
+      {
+        era: "since",
+        items: [
+          { column: "since_any", goal: "local", title: m.coverage_column_any },
+        ],
+      },
+    ];
+  }
+  if (tier === "turnout") {
+    return [
+      {
+        era: "before",
+        items: [
+          { column: "before", goal: "turnout", title: m.coverage_gap_turnout },
+        ],
+      },
+      {
+        era: "since",
+        items: [
+          { column: "since", goal: "turnout", title: m.coverage_gap_turnout },
+        ],
+      },
+    ];
+  }
+  return [
+    {
+      era: "before",
+      items: [
+        tier === "legislative"
+          ? {
+              column: "before_district",
+              goal: "history",
+              title: m.coverage_column_district,
+            }
+          : {
+              column: "before_county",
+              goal: "history",
+              title: m.coverage_column_county,
+            },
+        {
+          column: "before_shapes",
+          goal: "shapes_history",
+          title: m.coverage_column_shapes,
+        },
+      ],
+    },
+    {
+      era: "since",
+      items: [
+        {
+          column: "since_county",
+          goal: "county",
+          title: m.coverage_column_county,
+        },
+        {
+          column: "since_precinct",
+          goal: "precinct",
+          title: m.coverage_column_precinct,
+        },
+        {
+          column: "since_shapes",
+          goal: "shapes",
+          title: m.coverage_column_shapes,
+        },
+      ],
+    },
+  ];
 }
 
 export function grains(polity: string, tier: string): Array<Goal> {

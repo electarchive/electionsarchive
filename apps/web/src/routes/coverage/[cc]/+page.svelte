@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { enhance } from "$app/forms";
   import { goto, invalidateAll } from "$app/navigation";
   import { resolve } from "$app/paths";
   import { page } from "$app/state";
@@ -19,6 +20,7 @@
     headline,
     label,
     levelLabel,
+    measures,
     REASONS,
     spans,
     TIER_LABELS,
@@ -105,6 +107,38 @@
     summary.notes.filter(
       (note) => note.level === level && note.goal !== "fine",
     );
+
+  const range = $derived.by(() => {
+    const years = [
+      summary.first ?? Number(year),
+      summary.last ?? Number(year),
+      ...data.tiers.flatMap((tier) =>
+        tier.levels.flatMap((level) => level.years),
+      ),
+      ...summary.notes.flatMap((note) =>
+        [note.from, note.to].filter((value) => value != null),
+      ),
+    ];
+    const from = Math.min(...years);
+    return { from, to: Math.max(...years, from + 1) };
+  });
+  const marks = $derived.by(() => {
+    const step = range.to - range.from > 120 ? 50 : 25;
+    const found: Array<number> = [];
+    for (
+      let at = Math.ceil((range.from + 1) / step) * step;
+      at < range.to;
+      at += step
+    ) {
+      const share = (at - range.from) / (range.to - range.from + 1);
+      if (share > 0.15 && share < 0.8) {
+        found.push(at);
+      }
+    }
+    return found;
+  });
+  const at = (value: number) =>
+    ((value - range.from) / (range.to - range.from + 1)) * 100;
 
   let picked = $state<string | null>(null);
   const tab = $derived(picked ?? data.tiers[0]?.key ?? "");
@@ -206,6 +240,63 @@
   {/if}
 {/snippet}
 
+{#snippet strip(
+  name: string,
+  years: Array<number>,
+  gaps: Array<{ from?: number | null; to?: number | null }>,
+  counted: string,
+)}
+  {const uncounted = $derived(
+    gaps
+      .map((note) =>
+        note.from === note.to ? String(note.from) : `${note.from}–${note.to}`,
+      )
+      .join(", "),
+  )}
+  <span
+    role="img"
+    aria-label={uncounted === ""
+      ? m.coverage_ledger_strip_counted({ label: name, counted })
+      : m.coverage_ledger_strip({
+          label: name,
+          counted: counted === "" ? m.coverage_ledger_nothing() : counted,
+          uncounted,
+        })}
+    class="relative block overflow-hidden border-be border-border block-4 min-inline-56"
+  >
+    {#each gaps as note, index (index)}
+      <span
+        class="absolute inset-be-0 border border-be-0 border-muted-foreground/60 bg-[repeating-linear-gradient(135deg,var(--muted-foreground)_0_1px,transparent_1px_4px)] block-2.5"
+        style:inset-inline-start="{at(note.from ?? range.from)}%"
+        style:inline-size="{at((note.to ?? range.to) + 1) -
+          at(note.from ?? range.from)}%"
+      ></span>
+    {/each}
+    {#each years as value (value)}
+      <span
+        class="absolute inset-be-0 bg-foreground block-full inline-0.5"
+        style:inset-inline-start="{at(value)}%"
+      ></span>
+    {/each}
+  </span>
+{/snippet}
+
+{#snippet axis()}
+  <span
+    aria-hidden="true"
+    class="relative block font-normal text-muted-foreground tabular-nums block-4 min-inline-56"
+  >
+    <span class="absolute inset-s-0">{range.from}</span>
+    {#each marks as mark (mark)}
+      <span
+        class="absolute -translate-x-1/2"
+        style:inset-inline-start="{at(mark)}%">{mark}</span
+      >
+    {/each}
+    <span class="absolute inset-e-0">{range.to}</span>
+  </span>
+{/snippet}
+
 {#snippet head(isKinds: boolean, used: ReadonlyArray<Column>)}
   {const before = $derived(
     used.filter((column) => column.startsWith("before")).length,
@@ -253,7 +344,9 @@
         >
         {#if isKinds}
           <th scope="col" class="px-3 py-1.5 text-start align-bottom"
-            >{m.coverage_column_years()}</th
+            ><span class="grid gap-1"
+              >{m.coverage_column_years()}{@render axis()}</span
+            ></th
           >
         {/if}
         {#each used as column (column)}
@@ -284,13 +377,71 @@
   </dl>
 {/snippet}
 
-{#snippet progress(counts: Counts, lead: ReturnType<typeof headline>)}
-  {const goal = $derived(lead.goal)}
+{#snippet legend(
+  counts: Counts,
+  shown: Counts,
+  goal: Goal,
+  isWeighted: boolean,
+)}
+  <ul class="grid gap-y-2 text-sm">
+    {#each REASONS[goal].filter((reason) => reason === "complete" || shown[reason] > 0) as reason (reason)}
+      {const definition = $derived(
+        (reason === "complete"
+          ? (isUs ? COMPLETE : COUNTRY_COMPLETE)[goal]
+          : !isUs
+            ? COUNTRY_REASONS[reason]
+            : reason === "absent" && goal === "local"
+              ? m.coverage_reason_absent_local_def
+              : goal === "turnout"
+                ? TURNOUT_REASONS[reason]
+                : US_REASONS[reason])?.() ?? "",
+      )}
+      <li class="grid grid-cols-[0.75rem_minmax(0,1fr)] gap-x-2">
+        <Tone {reason} class="mbs-1 rounded-xs block-3 inline-3" />
+        <span>
+          <span class="font-semibold">{label(goal, reason, data.polity)}</span>
+          <span class="tabular-nums"
+            >{isWeighted
+              ? m.coverage_population_share({
+                  percent: percent(shown[reason] / shown.total, 1),
+                })
+              : count(counts[reason])}</span
+          >
+          <span class="block text-xs text-muted-foreground">{definition}</span>
+          {#if reason === "complete" && counts.icpsr > 0}
+            <span class="mbs-2 grid grid-cols-[0.75rem_minmax(0,1fr)] gap-x-2">
+              <Tone reason="icpsr" class="mbs-1 rounded-xs block-3 inline-3" />
+              <span>
+                <span class="font-semibold">{m.coverage_icpsr()}</span>
+                <span class="tabular-nums">{count(counts.icpsr)}</span>
+                <span class="block text-xs text-muted-foreground"
+                  >{m.coverage_icpsr_def()}</span
+                >
+              </span>
+            </span>
+          {/if}
+        </span>
+      </li>
+    {/each}
+  </ul>
+{/snippet}
+
+{#snippet measure(
+  counts: Counts,
+  goal: Goal,
+  title: string,
+  progress: (inputs: { complete: string; total: string }) => string,
+  tierKey: string,
+)}
   {const isWeighted = $derived(goal === "local" && counts.populationTotal > 0)}
   {const shown = $derived(isWeighted ? weighted(counts) : counts)}
-  <div class="grid gap-3">
+  {const held = $derived(counts.total - counts.absent)}
+  <div class="grid content-start gap-2 min-inline-0">
+    <p class="text-xs font-bold tracking-wide text-muted-foreground uppercase">
+      {title}
+    </p>
     {#if isWeighted}
-      <p class="text-xl font-bold tracking-[-0.01em] tabular-nums">
+      <p class="text-lg font-bold tracking-[-0.01em] tabular-nums">
         {m.coverage_progress_local_population({
           percent: percent(
             counts.populationComplete / counts.populationTotal,
@@ -299,9 +450,11 @@
         })}
       </p>
     {/if}
-    <p class="flex flex-wrap items-baseline gap-x-3 gap-y-1 tabular-nums">
-      <span class={cn({ "text-xl font-bold tracking-[-0.01em]": !isWeighted })}>
-        {(isWeighted ? m.coverage_progress_local_count : lead.progress)({
+    <p
+      class="flex flex-wrap items-baseline gap-x-3 gap-y-0.5 text-sm tabular-nums"
+    >
+      <span class={cn({ "text-lg font-bold tracking-[-0.01em]": !isWeighted })}>
+        {(isWeighted ? m.coverage_progress_local_count : progress)({
           complete: count(counts.complete),
           total: count(counts.total),
         })}
@@ -327,58 +480,48 @@
       population={isWeighted}
       class="block-3"
     />
-    <ul class="grid gap-x-6 gap-y-2 text-sm sm:grid-cols-2">
-      {#each REASONS[goal].filter((reason) => reason === "complete" || shown[reason] > 0) as reason (reason)}
-        {const definition = $derived(
-          (reason === "complete"
-            ? (isUs ? COMPLETE : COUNTRY_COMPLETE)[goal]
-            : !isUs
-              ? COUNTRY_REASONS[reason]
-              : reason === "absent" && goal === "local"
-                ? m.coverage_reason_absent_local_def
-                : goal === "turnout"
-                  ? TURNOUT_REASONS[reason]
-                  : US_REASONS[reason])?.() ?? "",
-        )}
-        <li class="grid grid-cols-[0.75rem_minmax(0,1fr)] gap-x-2">
-          <Tone {reason} class="mbs-1 rounded-xs block-3 inline-3" />
-          <span>
-            <span class="font-semibold">{label(goal, reason, data.polity)}</span
-            >
-            <span class="tabular-nums"
-              >{isWeighted
-                ? m.coverage_population_share({
-                    percent: percent(shown[reason] / shown.total, 1),
-                  })
-                : count(counts[reason])}</span
-            >
-            <span class="block text-muted-foreground">{definition}</span>
-            {#if reason === "complete" && counts.icpsr > 0}
-              <span
-                class="mbs-2 grid grid-cols-[0.75rem_minmax(0,1fr)] gap-x-2"
-              >
-                <Tone
-                  reason="icpsr"
-                  class="mbs-1 rounded-xs block-3 inline-3"
-                />
-                <span>
-                  <span class="font-semibold">{m.coverage_icpsr()}</span>
-                  <span class="tabular-nums">{count(counts.icpsr)}</span>
-                  <span class="block text-muted-foreground"
-                    >{m.coverage_icpsr_def()}</span
-                  >
-                </span>
-              </span>
-            {/if}
-          </span>
-        </li>
-      {/each}
-    </ul>
-    {#if isWeighted}
-      <p class="text-sm text-muted-foreground max-inline-[72ch]">
-        {m.coverage_local_two_measures()}
+    <div class="hidden pbs-1 md:block">
+      {@render legend(counts, shown, goal, isWeighted)}
+    </div>
+    <details class="group md:hidden">
+      <summary
+        class="flex cursor-pointer list-none items-center gap-1 text-sm text-muted-foreground focus-visible:outline-2 focus-visible:outline-ring [&::-webkit-details-marker]:hidden"
+      >
+        <ChevronRightIcon
+          class="transition-transform block-4 inline-4 group-open:rotate-90"
+        />
+        {m.coverage_legend()}
+      </summary>
+      <div class="pbs-2">
+        {@render legend(counts, shown, goal, isWeighted)}
+      </div>
+    </details>
+    {#if isUs && goal === "history" && tierKey !== "legislative"}
+      <p class="text-xs text-muted-foreground">
+        {m.coverage_note_history_1824()}
       </p>
-      <p class="text-sm text-muted-foreground max-inline-[72ch]">
+    {:else if goal === "county" && held > 0}
+      <p class="text-xs text-muted-foreground">
+        {m.coverage_turnout({
+          count: count(counts.turnout),
+          held: count(held),
+        })}
+      </p>
+    {:else if goal === "precinct" && counts.precincts > 0}
+      <p class="text-xs text-muted-foreground">
+        {m.coverage_shapes({
+          shaped: count(counts.shaped),
+          precincts: count(counts.precincts),
+        })}
+      </p>
+    {:else if isUs && (goal === "shapes" || goal === "shapes_history")}
+      <p class="text-xs text-muted-foreground">
+        {m.coverage_note_shapes()}
+      </p>
+    {/if}
+    {#if isWeighted}
+      <p class="text-xs text-muted-foreground max-inline-[72ch]">
+        {m.coverage_local_two_measures()}
         {m.coverage_local_weights()}
         {m.coverage_local_estimated({
           percent: percent(
@@ -431,7 +574,24 @@
           {m.coverage_current_hint({ year })}
         </p>
       </div>
-      <p class="text-xs text-muted-foreground">{built}</p>
+      <div
+        class="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted-foreground"
+      >
+        {built}
+        {#if data.dev}
+          <form method="POST" action="?/refresh" use:enhance>
+            <button
+              type="submit"
+              disabled={data.building}
+              class="rounded-sm border border-border px-2 whitespace-nowrap text-foreground block-6 hover:bg-muted focus-visible:outline-2 focus-visible:outline-ring disabled:opacity-50 disabled:hover:bg-transparent"
+              >{m.coverage_refresh()}</button
+            >
+          </form>
+          {#if data.building}
+            <span>{m.coverage_refresh_requested()}</span>
+          {/if}
+        {/if}
+      </div>
     </header>
 
     <section aria-labelledby="coverage-glance" class="grid gap-3 bg-card pbs-4">
@@ -493,7 +653,17 @@
       {const used = $derived(
         columns.filter((column) => slot(column, row.key) in row.cells),
       )}
-      {const counts = $derived(row.cells[lead.column])}
+      {const blocks = $derived(
+        measures(data.polity, row.key).flatMap((block) => {
+          const items = block.items.flatMap((item) => {
+            const found = row.cells[item.column];
+            return found == null || found.total === 0
+              ? []
+              : [{ ...item, counts: found }];
+          });
+          return items.length === 0 ? [] : [{ era: block.era, items }];
+        }),
+      )}
       <section
         id="tier-{row.key}"
         aria-labelledby="tier-{row.key}-title"
@@ -518,14 +688,36 @@
             </p>
           {/if}
         </hgroup>
-        {#if counts != null && counts.total > 0}
-          <div class="grid gap-2">
-            <p
-              class="text-xs font-bold tracking-wide text-muted-foreground uppercase"
-            >
-              {lead.title()}
-            </p>
-            {@render progress(counts, lead)}
+        {#if blocks.length > 0}
+          <div class="grid gap-5">
+            {#each blocks as block (block.era)}
+              <div class="grid gap-3">
+                {#if block.era != null}
+                  <h3 class="text-sm font-bold">
+                    {(block.era === "before"
+                      ? m.coverage_era_before
+                      : m.coverage_era_since)()}
+                  </h3>
+                {/if}
+                <div class="grid gap-x-8 gap-y-5 lg:grid-cols-2 xl:grid-cols-3">
+                  {#each block.items as item (item.column)}
+                    {@render measure(
+                      item.counts,
+                      item.goal,
+                      item.title(),
+                      isUs
+                        ? item.goal === "local"
+                          ? m.coverage_progress_local
+                          : item.goal === "turnout"
+                            ? m.coverage_progress_turnout
+                            : m.coverage_progress
+                        : lead.progress,
+                      row.key,
+                    )}
+                  {/each}
+                </div>
+              </div>
+            {/each}
           </div>
         {:else}
           <p class="text-sm text-muted-foreground">
@@ -533,9 +725,29 @@
           </p>
         {/if}
         <div class="grid gap-2">
-          <h3 class="hidden text-sm font-bold md:block">
-            {m.coverage_ledger()}
-          </h3>
+          <div
+            class="hidden flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground md:flex"
+          >
+            <h3 class="text-sm font-bold text-foreground">
+              {m.coverage_ledger()}
+            </h3>
+            {#if !isUs}
+              <span class="flex items-center gap-1.5">
+                <span
+                  aria-hidden="true"
+                  class="bg-foreground block-3 inline-0.5"
+                ></span>
+                {m.coverage_ledger_counted()}
+              </span>
+              <span class="flex items-center gap-1.5">
+                <span
+                  aria-hidden="true"
+                  class="border border-muted-foreground/60 bg-[repeating-linear-gradient(135deg,var(--muted-foreground)_0_1px,transparent_1px_4px)] block-2.5 inline-4"
+                ></span>
+                {m.coverage_ledger_uncounted()}
+              </span>
+            {/if}
+          </div>
           <table class="hidden text-sm md:table">
             {@render head(!isUs, used)}
             <tbody>
@@ -551,9 +763,11 @@
                     (note) => note.listed === false && note.from != null,
                   ),
                 )}
+                {const remark = $derived(
+                  summary.levels.find((found) => found.key === level.key)?.note,
+                )}
                 {const general = $derived([
-                  ...(summary.levels.find((found) => found.key === level.key)
-                    ?.note ?? []),
+                  ...(remark == null ? [] : [remark]),
                   ...notes.flatMap((note) =>
                     note.from == null ? [note.note] : [],
                   ),
@@ -575,9 +789,18 @@
                   </th>
                   {#if !isUs}
                     <td class="px-3 py-2.5 tabular-nums"
-                      >{counted === ""
-                        ? m.coverage_ledger_nothing()
-                        : counted}</td
+                      ><span class="grid gap-1.5"
+                        >{@render strip(
+                          levelLabel(data.polity, level.key),
+                          level.years,
+                          gaps,
+                          counted,
+                        )}<span
+                          >{counted === ""
+                            ? m.coverage_ledger_nothing()
+                            : counted}</span
+                        ></span
+                      ></td
                     >
                   {/if}
                   {#each used as column, index (column)}
@@ -674,6 +897,14 @@
                     >{levelLabel(data.polity, level.key)}</span
                   >
                   {#if !isUs}
+                    {@render strip(
+                      levelLabel(data.polity, level.key),
+                      level.years,
+                      notes.filter(
+                        (note) => note.from != null && note.listed !== false,
+                      ),
+                      counted,
+                    )}
                     <span class="text-sm tabular-nums"
                       ><span class="text-muted-foreground"
                         >{m.coverage_column_years()}:</span

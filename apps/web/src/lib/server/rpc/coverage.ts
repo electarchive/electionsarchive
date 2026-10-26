@@ -183,6 +183,9 @@ function tiers(polity: string, rows: Array<Row>, levels: Polity["levels"]) {
       return {
         before_any: { goal: "history", any: true },
         before_county: tier === "legislative" ? null : { goal: "history" },
+        ...(tier === "legislative"
+          ? { before_district: { goal: "history" } }
+          : {}),
         before_shapes: { goal: "shapes_history" },
         since_any: { goal: "county", any: true },
         since_county: { goal: "county" },
