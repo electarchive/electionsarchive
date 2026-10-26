@@ -6,6 +6,7 @@ import { call, ORPCError } from "@orpc/server";
 import { sql } from "drizzle-orm";
 import { createHash } from "node:crypto";
 import { existsSync } from "node:fs";
+import { mkdir, readdir, readFile, rename, rm, stat, writeFile } from "node:fs/promises";
 import path from "node:path";
 import * as v from "valibot";
 import { m } from "#lib/paraglide/messages.js";
@@ -3126,6 +3127,7 @@ async function atlas(input: {
   level?: string;
   vs?: string;
   group: Grouping;
+  isLean?: boolean;
 }) {
   const contest = await find(input.id);
   const chain = await descend(contest, input.unit);
@@ -3319,16 +3321,18 @@ async function atlas(input: {
         contest.id,
         area.id,
         contest.place?.id ?? area.id,
-        ...shown.map((row) => row.id),
+        ...(input.isLean === true ? [] : shown.map((row) => row.id)),
       ],
       contest.date,
     ),
     paths([contest.id]),
-    framing(
-      area.id,
-      day,
-      shown.map((row) => row.k),
-    ),
+    input.isLean === true
+      ? []
+      : framing(
+          area.id,
+          day,
+          shown.map((row) => row.k),
+        ),
     db.execute<{ id: string; date: string }>(sql`
       select c.id, e.date_from::text as date
       from contest c
@@ -3422,10 +3426,12 @@ async function atlas(input: {
       "party",
       input.group,
     ),
-    anchors(
-      shown.map((row) => row.k),
-      day,
-    ),
+    input.isLean === true
+      ? new Map<number, [number, number]>()
+      : anchors(
+          shown.map((row) => row.k),
+          day,
+        ),
     redrawn(
       shown.filter(() => spread.size === 0).map((row) => row.id),
       contest,
@@ -3521,6 +3527,239 @@ async function atlas(input: {
       redrawn: rows.map((row) => moved.get(row.k) ?? null),
     },
   };
+}
+
+async function mosaic(input: { id: string; vs?: string; group: Grouping }) {
+  const load = (
+    unit: string | undefined,
+    level: string | undefined,
+    isLean = true,
+  ) =>
+    atlas({
+      id: input.id,
+      unit,
+      level,
+      vs: input.vs,
+      group: input.group,
+      isLean,
+    });
+  const rastered = (tiles: string | null) =>
+    tiles != null &&
+    existsSync(path.resolve("../../data/tiles", `${tiles}.ids.pmtiles`));
+  const base = await load(undefined, undefined);
+  const middle = base.levels.findLast(
+    (level) => level.code !== base.level && rastered(level.tiles),
+  );
+  const units =
+    base.parts.length > 0 ? base.parts.map((part) => part.unit) : [""];
+  const sets: Array<Awaited<ReturnType<typeof atlas>>> = [];
+  if (middle != null) {
+    sets.push(await load(undefined, middle.code, false));
+  }
+  const queue = [...units.entries()];
+  const finer: Array<Awaited<ReturnType<typeof atlas>> | undefined> = [];
+  await Promise.all(
+    Array.from({ length: 4 }, async () => {
+      for (let next = queue.shift(); next != null; next = queue.shift()) {
+        const [at, unit] = next;
+        const first = unit === "" ? base : await load(unit, undefined);
+        const finest = first.levels.findLast(
+          (level) => level.code !== middle?.code && rastered(level.tiles),
+        );
+        if (finest != null) {
+          finer[at] =
+            finest.code === first.level
+              ? first
+              : await load(unit === "" ? undefined : unit, finest.code);
+        }
+      }
+    }),
+  );
+  for (const set of finer) {
+    if (set != null) {
+      sets.push(set);
+    }
+  }
+  const legend = [...base.legend];
+  const layers: Array<{ code: string; tiles: string }> = [];
+  const rows: Array<{
+    k: number;
+    name: string;
+    valid: number;
+    leader: number | null;
+    prior: number | null;
+    shares: Array<number | null>;
+    before: Array<number | null>;
+  }> = [];
+  const seen = new Set<number>();
+  for (const set of sets) {
+    const level = set.levels.find((entry) => entry.code === set.level);
+    if (
+      level?.tiles != null &&
+      !layers.some((layer) => layer.tiles === `${level.tiles}.ids`)
+    ) {
+      layers.push({ code: level.code, tiles: `${level.tiles}.ids` });
+    }
+    const at = set.legend.map((item) => {
+      const index = legend.findIndex((entry) => entry.key === item.key);
+      if (index >= 0) {
+        return index;
+      }
+      legend.push(item);
+      return legend.length - 1;
+    });
+    for (const [i, k] of set.places.k.entries()) {
+      if (seen.has(k)) {
+        continue;
+      }
+      seen.add(k);
+      const shares = legend.map(() => null as number | null);
+      const before = legend.map(() => null as number | null);
+      for (const [index, column] of set.places.shares.entries()) {
+        const value = column[i];
+        shares[at[index] ?? 0] =
+          value == null ? null : Math.round(value / 10);
+      }
+      for (const [index, column] of set.places.before.entries()) {
+        const value = column[i];
+        before[at[index] ?? 0] =
+          value == null ? null : Math.round(value / 10);
+      }
+      const leader = set.places.leader[i];
+      const prior = set.places.prior[i];
+      rows.push({
+        k,
+        name:
+          middle != null && set === sets[0]
+            ? (set.places.name[i] ?? "")
+            : "",
+        valid: set.places.valid[i] ?? 0,
+        leader: leader == null ? null : (at[leader] ?? null),
+        prior: prior == null ? null : (at[prior] ?? null),
+        shares,
+        before,
+      });
+    }
+  }
+  rows.sort((a, b) => a.k - b.k);
+  const isCompared = rows.some((row) =>
+    row.before.some((value) => value != null),
+  );
+  const placed = new Map<number, number>();
+  for (const row of rows) {
+    for (const [index] of row.shares
+      .entries()
+      .toArray()
+      .toSorted(([, a], [, b]) => (b ?? -1) - (a ?? -1))
+      .slice(0, 2)) {
+      placed.set(index, (placed.get(index) ?? 0) + 1);
+    }
+  }
+  const kept = new Set(
+    placed
+      .entries()
+      .filter(([, total]) => total >= rows.length / 500)
+      .map(([index]) => index),
+  );
+  const order = [
+    ...legend.keys().filter((index) => kept.has(index)),
+    ...legend.keys().filter((index) => !kept.has(index)),
+  ];
+  const moved = new Map(order.map((index, at) => [index, at]));
+  return {
+    legend: order.flatMap((index) => {
+      const item = legend[index];
+      return item == null ? [] : [item];
+    }),
+    layers,
+    places: {
+      k: rows.map((row, i) => row.k - (rows[i - 1]?.k ?? 0)),
+      name: rows.map((row) => row.name),
+      valid: rows.map((row) => row.valid),
+      leader: rows.map((row) =>
+        row.leader == null ? null : (moved.get(row.leader) ?? null),
+      ),
+      prior: isCompared
+        ? rows.map((row) =>
+            row.prior == null ? null : (moved.get(row.prior) ?? null),
+          )
+        : [],
+      shares: order
+        .filter((index) => kept.has(index))
+        .map((index) => rows.map((row) => row.shares[index] ?? null)),
+      before: isCompared
+        ? order
+            .filter((index) => kept.has(index))
+            .map((index) => rows.map((row) => row.before[index] ?? null))
+        : [],
+    },
+  };
+}
+
+export async function rebuildMosaics(only?: Array<string>) {
+  const started = Date.now();
+  const folder = path.resolve("../../data/mosaics");
+  await mkdir(folder, { recursive: true });
+  const listed =
+    only ??
+    (await db.execute<{ id: string }>(sql`
+      select c.id from contest c
+      where c.allocation_parent_id is null
+        and exists (select from contest k where k.allocation_parent_id = c.id offset 2)
+    `)).rows.map((row) => row.id);
+  const ids = new Set(listed);
+  if (only == null) {
+    for (const name of await readdir(folder)) {
+      if (name.endsWith(".json")) {
+        ids.add(name.slice(0, -5));
+      }
+    }
+  }
+  const rasters: Array<string> = [];
+  for (const name of await readdir(path.resolve("../../data/tiles"), {
+    recursive: true,
+  })) {
+    if (name.endsWith(".ids.pmtiles")) {
+      const info = await stat(path.resolve("../../data/tiles", name));
+      rasters.push(`${name}@${info.mtimeMs}`);
+    }
+  }
+  const counts = { built: 0, kept: 0, dropped: 0 };
+  for (const id of ids) {
+    const file = path.join(folder, `${id}.json`);
+    const found = await db.execute<{ stamp: string }>(sql`
+      with recursive grp(id) as (
+        select ${id}::uuid
+        union all
+        select c.id from contest c join grp on c.allocation_parent_id = grp.id
+      )
+      select md5(concat_ws('|', string_agg(concat_ws(':', rs.k, rs.changeset_id, rs.status, rs.is_default), ',' order by rs.k),
+        ${rasters.toSorted().join(",")}::text)) as stamp
+      from grp join result_set rs on rs.contest_id = grp.id
+    `);
+    const mark = found.rows[0]?.stamp ?? "";
+    const held = existsSync(file)
+      ? (JSON.parse(await readFile(file, "utf8")) as { stamp: string })
+      : null;
+    const age = held == null ? 0 : Date.now() - (await stat(file)).mtimeMs;
+    if (held?.stamp === mark && age < 86_400_000) {
+      counts.kept += 1;
+      continue;
+    }
+    try {
+      const sheet = await mosaic({ id, group: "option" });
+      await writeFile(`${file}.part`, JSON.stringify({ stamp: mark, sheet }));
+      await rename(`${file}.part`, file);
+      counts.built += 1;
+    } catch (error) {
+      if (!(error instanceof ORPCError) || error.code !== "NOT_FOUND") {
+        throw error;
+      }
+      await rm(file, { force: true });
+      counts.dropped += 1;
+    }
+  }
+  return `mosaics: ${counts.built} built, ${counts.kept} unchanged, ${counts.dropped} dropped in ${Math.round((Date.now() - started) / 1000)} s`;
 }
 
 export const contests = {
@@ -6259,163 +6498,21 @@ export const contests = {
       }),
     )
     .handler(async ({ input }) => {
-      const load = (unit: string | undefined, level: string | undefined) =>
-        remember(
-          `atlas:${JSON.stringify([input.id, unit, level, input.vs, input.group])}`,
-          () =>
-            atlas({
-              id: input.id,
-              unit,
-              level,
-              vs: input.vs,
-              group: input.group,
-            }),
-        );
-      const rastered = (tiles: string | null) =>
-        tiles != null &&
-        existsSync(path.resolve("../../data/tiles", `${tiles}.ids.pmtiles`));
-      const base = await load(undefined, undefined);
-      const middle = base.levels.findLast(
-        (level) => level.code !== base.level && rastered(level.tiles),
-      );
-      const units =
-        base.parts.length > 0 ? base.parts.map((part) => part.unit) : [""];
-      const sets: Array<Awaited<ReturnType<typeof atlas>>> = [];
-      if (middle != null) {
-        sets.push(await load(undefined, middle.code));
+      if ((input.vs ?? "none") !== "none" || input.group !== "option") {
+        return mosaic(input);
       }
-      const queue = [...units];
-      await Promise.all(
-        Array.from({ length: 4 }, async () => {
-          for (let unit = queue.shift(); unit != null; unit = queue.shift()) {
-            const first = await load(unit === "" ? undefined : unit, undefined);
-            const finest = first.levels.findLast(
-              (level) => level.code !== middle?.code && rastered(level.tiles),
-            );
-            if (finest != null) {
-              sets.push(
-                finest.code === first.level
-                  ? first
-                  : await load(unit === "" ? undefined : unit, finest.code),
-              );
-            }
-          }
-        }),
+      const file = path.resolve(
+        "../../data/mosaics",
+        `${input.id.toLowerCase()}.json`,
       );
-      const legend = [...base.legend];
-      const layers: Array<{ code: string; tiles: string }> = [];
-      const rows: Array<{
-        k: number;
-        name: string;
-        valid: number;
-        leader: number | null;
-        prior: number | null;
-        shares: Array<number | null>;
-        before: Array<number | null>;
-      }> = [];
-      const seen = new Set<number>();
-      for (const set of sets) {
-        const level = set.levels.find((entry) => entry.code === set.level);
-        if (
-          level?.tiles != null &&
-          !layers.some((layer) => layer.tiles === `${level.tiles}.ids`)
-        ) {
-          layers.push({ code: level.code, tiles: `${level.tiles}.ids` });
-        }
-        const at = set.legend.map((item) => {
-          const index = legend.findIndex((entry) => entry.key === item.key);
-          if (index >= 0) {
-            return index;
-          }
-          legend.push(item);
-          return legend.length - 1;
-        });
-        for (const [i, k] of set.places.k.entries()) {
-          if (seen.has(k)) {
-            continue;
-          }
-          seen.add(k);
-          const shares = legend.map(() => null as number | null);
-          const before = legend.map(() => null as number | null);
-          for (const [index, column] of set.places.shares.entries()) {
-            const value = column[i];
-            shares[at[index] ?? 0] =
-              value == null ? null : Math.round(value / 10);
-          }
-          for (const [index, column] of set.places.before.entries()) {
-            const value = column[i];
-            before[at[index] ?? 0] =
-              value == null ? null : Math.round(value / 10);
-          }
-          const leader = set.places.leader[i];
-          const prior = set.places.prior[i];
-          rows.push({
-            k,
-            name:
-              middle != null && set === sets[0]
-                ? (set.places.name[i] ?? "")
-                : "",
-            valid: set.places.valid[i] ?? 0,
-            leader: leader == null ? null : (at[leader] ?? null),
-            prior: prior == null ? null : (at[prior] ?? null),
-            shares,
-            before,
-          });
-        }
+      if (!existsSync(file)) {
+        await rebuildMosaics([input.id.toLowerCase()]);
       }
-      rows.sort((a, b) => a.k - b.k);
-      const isCompared = rows.some((row) =>
-        row.before.some((value) => value != null),
-      );
-      const placed = new Map<number, number>();
-      for (const row of rows) {
-        for (const [index] of row.shares
-          .entries()
-          .toArray()
-          .toSorted(([, a], [, b]) => (b ?? -1) - (a ?? -1))
-          .slice(0, 2)) {
-          placed.set(index, (placed.get(index) ?? 0) + 1);
+      return (
+        JSON.parse(await readFile(file, "utf8")) as {
+          sheet: Awaited<ReturnType<typeof mosaic>>;
         }
-      }
-      const kept = new Set(
-        placed
-          .entries()
-          .filter(([, total]) => total >= rows.length / 500)
-          .map(([index]) => index),
-      );
-      const order = [
-        ...legend.keys().filter((index) => kept.has(index)),
-        ...legend.keys().filter((index) => !kept.has(index)),
-      ];
-      const moved = new Map(order.map((index, at) => [index, at]));
-      return {
-        legend: order.flatMap((index) => {
-          const item = legend[index];
-          return item == null ? [] : [item];
-        }),
-        layers,
-        places: {
-          k: rows.map((row, i) => row.k - (rows[i - 1]?.k ?? 0)),
-          name: rows.map((row) => row.name),
-          valid: rows.map((row) => row.valid),
-          leader: rows.map((row) =>
-            row.leader == null ? null : (moved.get(row.leader) ?? null),
-          ),
-          prior: isCompared
-            ? rows.map((row) =>
-                row.prior == null ? null : (moved.get(row.prior) ?? null),
-              )
-            : [],
-          shares: order
-            .filter((index) => kept.has(index))
-            .map((index) => rows.map((row) => row.shares[index] ?? null)),
-          before: isCompared
-            ? order
-                .filter((index) => kept.has(index))
-                .map((index) => rows.map((row) => row.before[index] ?? null))
-            : [],
-        },
-      };
+      ).sheet;
     }),
   rounds: os
     .meta(
