@@ -239,6 +239,7 @@ def measure(conn, cc: str) -> dict:
         for scheme in spec.get("region_schemes", []):
             for code, text in conn.execute(AREA_LABELS_SQL, [scheme]):
                 labels.setdefault(code.zfill(2) if scheme in ("fr.departement", "tr.il") else code, text)
+    labels |= spec.get("region_labels", {})
     labels = {k: v for k, v in labels.items() if k in set(spec.get("regions") or labels)}
     return {
         "spec": spec,
@@ -409,33 +410,30 @@ def tally(cc: str, data: dict) -> tuple[dict, list[dict], list[dict]]:
                     target[i] += v
             total = max(count_total, held_n)
             complete = sum(1 for s in status.values() if s == "complete")
-            if goal == "national":
-                if fine:
-                    for reg, cell in by_region.items():
-                        if cell[0] == 0:
-                            continue
-                        f = goals[("fine", reg, key, year)]
-                        done = sum(
-                            1
-                            for k, s in status.items()
-                            if place.get(k, "") == reg and s == "complete" and fine_ok.get(k)
-                        )
-                        f[0] += cell[0]
-                        f[1] += done
-                        f[2] += cell[2]
-                        f[3] += cell[3]
-                        f[4] += cell[4]
-                        f[6] += cell[1] - done
-                if unit == "district":
-                    for reg, cell in by_region.items():
-                        if cell[0] == 0:
-                            continue
-                        s = goals[("shapes", reg, key, year)]
-                        mine = [k for k in status if place.get(k, "") == reg]
-                        s[0] += cell[0]
-                        s[1] += sum(1 for k in mine if shape.get(k) == "complete")
-                        s[10] += sum(1 for k in mine if shape.get(k) == "unshaped")
-                        s[12] += cell[0] - sum(1 for k in mine if shape.get(k) in ("complete", "unshaped"))
+            if fine:
+                for reg, cell in by_region.items():
+                    if cell[0] == 0:
+                        continue
+                    f = goals[("fine", reg, key, year)]
+                    done = sum(
+                        1 for k, s in status.items() if place.get(k, "") == reg and s == "complete" and fine_ok.get(k)
+                    )
+                    f[0] += cell[0]
+                    f[1] += done
+                    f[2] += cell[2]
+                    f[3] += cell[3]
+                    f[4] += cell[4]
+                    f[6] += cell[1] - done
+            if unit == "district":
+                for reg, cell in by_region.items():
+                    if cell[0] == 0:
+                        continue
+                    s = goals[("shapes", reg, key, year)]
+                    mine = [k for k in status if place.get(k, "") == reg]
+                    s[0] += cell[0]
+                    s[1] += sum(1 for k in mine if shape.get(k) == "complete")
+                    s[10] += sum(1 for k in mine if shape.get(k) == "unshaped")
+                    s[12] += cell[0] - sum(1 for k in mine if shape.get(k) in ("complete", "unshaped"))
             elections_out.append(
                 {
                     "goal": goal,

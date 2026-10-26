@@ -566,5 +566,8 @@
         }
       ]
     }
-  ]
+  ],
+  "region_labels": {
+    "ZZ": "French residents overseas"
+  }
 }
