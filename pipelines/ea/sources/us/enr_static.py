@@ -49,11 +49,11 @@ def _read(registry: Mapping[str, Mapping[str, str]]) -> Iterator[dict[str, Any]]
     for tenant in registry:
         for link in sorted(key for key in index if key.startswith(tenant) and key.endswith(".html")):
             page = raw.cached(SOURCE, link).path.read_text(errors="replace")
-            heading = re.search(r'class="election-title"[^>]*>(.*?)</h1>', page, re.DOTALL)
-            if heading is None:
+            headings = re.findall(r'class="election-title"[^>]*>(.*?)</h1>', page, re.DOTALL)
+            if not headings:
                 print(f"{link}: no election title")
                 continue
-            title = _text(re.sub(r"<[^>]+>", " ", heading[1]))
+            title = _text(re.sub(r"<[^>]+>", " ", " ".join(headings)))
             stated = re.search(
                 r"([A-Z][a-z]+) (\d{1,2})(?:st|nd|rd|th)?, (\d{4})", title.replace("Janurary", "January")
             )
