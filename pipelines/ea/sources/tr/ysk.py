@@ -1224,6 +1224,13 @@ PARTIES = [
 ]
 INDEPENDENTS = "Bağımsızlar"
 INDEPENDENTS_DOMESTIC = 226831
+ALLIANCE_NAMES = {
+    "Cumhur İttifakı": "People's Alliance",
+    "Millet İttifakı": "Nation Alliance",
+    "Emek ve Özgürlük İttifakı": "Labour and Freedom Alliance",
+    "Sosyalist Güç Birliği İttifakı": "Union of Socialist Forces",
+    "ATA İttifakı": "Ancestral Alliance",
+}
 ALLIANCES = [
     ("Sosyalist Güç Birliği İttifakı", 53),
     ("Cumhur İttifakı", 5888),
@@ -6716,6 +6723,8 @@ def emit() -> Path:
             for label, alliance in alliances.items():
                 cs.add("alliance", id=alliance, kind="electoral_alliance", election_id=election)
                 name(alliance, label)
+                if label in ALLIANCE_NAMES:
+                    name(alliance, ALLIANCE_NAMES[label], "en")
             for full, _, alliance, *_ in standing:
                 if alliance is not None:
                     cs.add("alliance_member", alliance_id=alliances[alliance], party_id=parties[full])
