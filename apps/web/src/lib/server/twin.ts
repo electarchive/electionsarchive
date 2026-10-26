@@ -227,13 +227,16 @@ async function load(segments: Array<string>, search: URLSearchParams) {
   }
   const found = await archive(segments.join("/"), search);
   if (found.kind === "election") {
-    return {
-      ...found,
-      byes: await call(router.seats.byElections, {
-        id: found.id,
-        within: found.scope?.id,
-      }),
-    };
+    const parts = found.election.elections.filter((child) => !child.isStage);
+    const [byes, tiers] = await Promise.all([
+      call(router.seats.byElections, { id: found.id, within: found.scope?.id }),
+      found.scope == null &&
+      parts.length > 1 &&
+      parts.every((child) => /^us\/[a-z]{2}\/[^/]+$/.test(child.path ?? ""))
+        ? call(router.elections.tiers, { id: found.id })
+        : null,
+    ]);
+    return { ...found, byes, tiers };
   }
   if (found.kind !== "polity") {
     return found;
@@ -402,7 +405,14 @@ function markdown(data: Data, link: Link) {
       return polityMarkdown(data.polity, data.record, data.holders, link);
     }
     case "election": {
-      return electionMarkdown(data.election, data.sections, data.byes, link);
+      return electionMarkdown(
+        data.election,
+        data.sections,
+        data.byes,
+        data.cycle,
+        data.tiers,
+        link,
+      );
     }
     case "day": {
       const { local } = data;
@@ -1835,9 +1845,21 @@ function electionMarkdown(
     counties,
   }: Extract<Data, { kind: "election" }>["sections"],
   byes: Extract<Data, { kind: "election" }>["byes"],
+  cycle: Extract<Data, { kind: "election" }>["cycle"],
+  ballot: Extract<Data, { kind: "election" }>["tiers"],
   link: Link,
 ) {
   const signed = new Intl.NumberFormat("en", { signDisplay: "exceptZero" });
+  const ballotParties = new Map(
+    (ballot?.parties ?? []).map((party) => [
+      party.id,
+      party.short ?? party.label,
+    ]),
+  );
+  const named = (party: string | null) =>
+    party == null
+      ? m.record_none()
+      : (ballotParties.get(party) ?? m.record_none());
   const parties = new Map(byes?.parties.map((party) => [party.key, party]));
   const label = (key: string | null) =>
     key == null || key.startsWith("person:")
@@ -2716,6 +2738,104 @@ function electionMarkdown(
                 }),
               ]
             : []),
+        ]),
+    ...(cycle == null ||
+    (cycle.primaries.length === 0 && cycle.parts.length === 0)
+      ? []
+      : [
+          `## ${m.cycle_road()}`,
+          table(
+            [m.col_election(), m.col_date(), m.cycle_winner()],
+            [
+              ...cycle.primaries.map((primary) => [
+                link(
+                  primary.party == null
+                    ? primary.name
+                    : primary.until == null
+                      ? m.cycle_primary({ party: primary.party.label })
+                      : m.cycle_primaries({ party: primary.party.label }),
+                  primary.path,
+                ),
+                primary.date == null
+                  ? null
+                  : primary.until == null || primary.until === primary.date
+                    ? date(primary.date)
+                    : `${date(primary.date)} – ${date(primary.until)}`,
+                primary.winners.map((winner) => winner.label).join(", ") ||
+                  null,
+              ]),
+              ...(cycle.general == null
+                ? []
+                : [
+                    [
+                      link(m.cycle_general(), cycle.general.path),
+                      cycle.general.date == null
+                        ? null
+                        : date(cycle.general.date),
+                      null,
+                    ],
+                  ]),
+            ],
+          ),
+          ...(cycle.parts.length === 0
+            ? []
+            : [
+                `### ${m.cycle_parts()}`,
+                cycle.parts
+                  .map(
+                    (part) =>
+                      `- ${part.place}: ${part.races
+                        .map((race) =>
+                          link(
+                            [
+                              race.date == null ? null : date(race.date),
+                              race.party?.short ?? race.party?.label ?? null,
+                            ]
+                              .filter((entry) => entry != null)
+                              .join(", "),
+                            race.path,
+                          ),
+                        )
+                        .join("; ")}`,
+                  )
+                  .join("\n"),
+              ]),
+        ]),
+    ...(ballot == null || ballot.tiers.length === 0
+      ? []
+      : [
+          `## ${m.tiers_title()}`,
+          ...ballot.tiers.flatMap((tier) => {
+            const rows = new Map(tier.rows.map((row) => [row.part, row]));
+            return [
+              `### ${{ governor: m.tiers_governor, lower: m.tiers_lower, upper: m.tiers_upper, measure: m.tiers_measure }[tier.kind]()}`,
+              ballot.parts
+                .flatMap((part) => {
+                  const row = rows.get(part.id);
+                  if (row == null) {
+                    return [];
+                  }
+                  return [
+                    `- ${link(part.place, part.path)}: ${
+                      tier.kind === "measure"
+                        ? m.tiers_passed({
+                            passed: count(row.passed),
+                            count: count(row.races),
+                          })
+                        : tier.kind === "governor"
+                          ? named(row.parties[0]?.party ?? null)
+                          : row.parties
+                              .map(
+                                (entry) =>
+                                  `${named(entry.party)} ${count(entry.seats)}`,
+                              )
+                              .join(", ")
+                    }`,
+                  ];
+                })
+                .join("\n"),
+            ];
+          }),
         ]),
     ...(election.contests.length === 0
       ? []
