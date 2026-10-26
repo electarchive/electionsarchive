@@ -1,11 +1,15 @@
 import io
+import json
 import shutil
+import time
 import unicodedata
 import zipfile
-from datetime import date, timedelta
+from concurrent.futures import ThreadPoolExecutor
+from datetime import UTC, date, datetime, timedelta
 from pathlib import Path
 from uuid import UUID
 
+import httpx
 import polars as pl
 
 from ea import raw
@@ -40,6 +44,8 @@ DROPPED = {
 }
 SENATORS = {1994: 2, 1998: 1, 2002: 2, 2006: 1, 2010: 2, 2014: 1, 2018: 2, 2026: 2}
 SCHEDULED = {2026: date(2026, 10, 25)}
+FEED = "https://resultados.tse.jus.br/oficial/ele2026/"
+RUNOFFS = {"6258": "1", "6260": "3"}
 ASSEMBLIES = {
     "DF": ("Legislative Chamber of the Federal District", "Câmara Legislativa do Distrito Federal"),
 }
@@ -81,6 +87,43 @@ EXCESS = (
 def fetch() -> None:
     for url in FILES.values():
         raw.fetch(SOURCE, url, suffix=".zip")
+
+    def get(path: str) -> bytes:
+        for attempt in range(5):
+            try:
+                response = httpx.get(f"{FEED}{path}", headers={"User-Agent": raw.USER_AGENT}, timeout=60)
+                response.raise_for_status()
+                return response.content
+            except httpx.HTTPError:
+                if attempt == 4:
+                    raise
+                time.sleep(2**attempt)
+        raise AssertionError
+
+    for election, cargo in RUNOFFS.items():
+        url = f"{FEED}{election}/dados/"
+        try:
+            raw.cached(SOURCE, url)
+            continue
+        except LookupError:
+            pass
+        scope = {row["cdabr"] for row in json.loads(get(f"{election}/dados/br/br-e00{election}-ab.json"))["abr"]}
+        config = get(f"{election}/config/mun-e00{election}-cm.json")
+        towns = [
+            f"{election}/dados/{state['cd']}/{state['cd']}{town['cd']}-c{cargo.zfill(4)}-e00{election}-u.json"
+            for state in json.loads(config)["abr"]
+            if cargo == "1" or state["cd"] in scope
+            for town in state["mu"]
+        ]
+        retrieved_at = datetime.now(UTC)
+        buffer = io.BytesIO()
+        with ThreadPoolExecutor(8) as pool, zipfile.ZipFile(buffer, "w", zipfile.ZIP_DEFLATED) as archive:
+            archive.writestr(f"config/mun-e00{election}-cm.json", config)
+            for path, content in zip(towns, pool.map(get, towns), strict=True):
+                archive.writestr(path.split("/", 1)[1], content)
+        raw.store(
+            SOURCE, url, buffer.getvalue(), suffix=".zip", retrieved_at=retrieved_at, media_type="application/zip"
+        )
 
 
 def scan(year: int, kind: str) -> pl.LazyFrame:
@@ -230,7 +273,74 @@ def parse() -> None:
         for path in PARSED.glob("*.csv"):
             path.unlink()
 
+    if not frames["candidates"][-1].filter(pl.col("round") == "2").height:
+        rows: dict[str, list[dict[str, object]]] = {"votes": [], "detail": [], "places": []}
+        for election, cargo in RUNOFFS.items():
+            with zipfile.ZipFile(raw.cached(SOURCE, f"{FEED}{election}/dados/").path) as archive:
+                labels = {
+                    town["cd"]: town["nm"]
+                    for state in json.loads(archive.read(f"config/mun-e00{election}-cm.json"))["abr"]
+                    for town in state["mu"]
+                }
+                for member in archive.namelist():
+                    if not member.startswith("dados/"):
+                        continue
+                    town = json.loads(archive.read(member))
+                    uf = member.split("/")[1].upper()
+                    contest = f"2026:2:{cargo}:{'BR' if cargo == '1' else uf}"
+                    municipality = town["cdabr"]
+                    if town["tf"] != "s":
+                        raise ValueError(f"{member} is not fully counted")
+                    for group in town["carg"][0]["agr"]:
+                        for party in group["par"]:
+                            for candidate in party["cand"]:
+                                if candidate["dvt"] != "Válido":
+                                    raise ValueError(f"{member}: {candidate['nm']} is {candidate['dvt']}")
+                                rows["votes"].append(
+                                    {
+                                        "contest": contest,
+                                        "municipality": municipality,
+                                        "candidate": candidate["sqcand"],
+                                        "valid": int(candidate["vap"]),
+                                        "void": 0,
+                                    }
+                                )
+                    rows["detail"].append(
+                        {
+                            "contest": contest,
+                            "municipality": municipality,
+                            "registered": int(town["e"]["te"]),
+                            "voters": int(town["e"]["c"]),
+                            "blank": int(town["v"]["vb"]),
+                            "null": int(town["v"]["tvn"]),
+                            "nominal": int(town["v"]["vnom"]),
+                        }
+                    )
+                    rows["places"].append(
+                        {
+                            "year": 2026,
+                            "uf": uf,
+                            "municipality": municipality,
+                            "label": labels[municipality],
+                            "day": SCHEDULED[2026],
+                        }
+                    )
+        for kind, frame_rows in rows.items():
+            template = frames[kind][-1]
+            frames[kind].append(pl.DataFrame(frame_rows, schema=template.schema))
+
     candidates = pl.concat(frames["candidates"])
+    pending = candidates.filter(
+        (pl.col("round") == "1") & (pl.col("outcome") == "advanced") & pl.col("year").is_in(list(SCHEDULED))
+    )
+    candidates = pl.concat(
+        [
+            candidates,
+            pending.with_columns(
+                contest=pl.col("contest").str.replace(r"^(\d+):1:", "$1:2:"), round=pl.lit("2"), outcome=pl.lit(None)
+            ).join(candidates, on=["contest", "candidate"], how="anti"),
+        ]
+    )
     votes = pl.concat(frames["votes"])
     legends = pl.concat(frames["legends"])
     detail = pl.concat(frames["detail"])
@@ -315,17 +425,6 @@ def parse() -> None:
             f"candidate totals fall short of the valid nominal votes: {excess.filter(pl.col('excess') < 0)}"
         )
 
-    pending = candidates.filter(
-        (pl.col("round") == "1") & (pl.col("outcome") == "advanced") & pl.col("year").is_in(list(SCHEDULED))
-    )
-    candidates = pl.concat(
-        [
-            candidates,
-            pending.with_columns(
-                contest=pl.col("contest").str.replace(r"^(\d+):1:", "$1:2:"), round=pl.lit("2"), outcome=pl.lit(None)
-            ).join(candidates, on=["contest", "candidate"], how="anti"),
-        ]
-    )
     candidates.write_parquet(PARSED / "candidates.parquet")
     votes.write_parquet(PARSED / "votes.parquet")
     legends.write_parquet(PARSED / "legends.parquet")
@@ -382,6 +481,24 @@ def emit() -> Path:
                 )
                 for file in ("roster",) if kind == "candidates" else ("candidates", "parties", "detail"):
                     cs.artifact(raw.cached(SOURCE, FILES[(year, file)]), source)
+        feed = None
+        if votes.filter(pl.col("contest").str.starts_with("2026:2:")).height:
+            feed = cs.source("Tribunal Superior Eleitoral", "Resultados - 2026, 2º turno")
+            cs.add(
+                "source",
+                id=feed,
+                kind="official_body",
+                publisher="Tribunal Superior Eleitoral",
+                title="Resultados - 2026, 2º turno",
+                url="https://resultados.tse.jus.br/oficial/app/index.html",
+                notes=(
+                    "The electoral court's results service publishes each municipality's final totals for the second "
+                    "round, for president and for governor in the states that held a runoff. Its open-data files did "
+                    "not yet carry the second round when these were loaded."
+                ),
+            )
+            for election in RUNOFFS:
+                cs.artifact(raw.cached(SOURCE, f"{FEED}{election}/dados/"), feed)
 
         brazil = cs.polity("BR")
         states = {uf: cs.area("br.uf", uf) for uf in UFS}
@@ -437,6 +554,7 @@ def emit() -> Path:
                 cs.add("note", entity_id=systems[key], kind="methodology", body_md=methodology)
 
         days = places.group_by("year").agg(first=pl.col("day").min(), last=pl.col("day").max())
+        held = set(places["day"])
         rounds: dict[str, UUID] = {}
         cycles: dict[int, UUID] = {}
         dates: dict[str, date] = {}
@@ -467,7 +585,7 @@ def emit() -> Path:
                     kind=stage,
                     date_from=day,
                     date_to=day,
-                    status="scheduled" if round == "2" and year in SCHEDULED else "held",
+                    status="held" if day in held else "scheduled",
                 )
                 name(rounds[code], f"{year} Brazilian general election, {ordinal} round", "en")
                 cs.add("slug", path=f"br/{day}-{stage}", entity_id=rounds[code])
@@ -677,7 +795,7 @@ def emit() -> Path:
                     stage="official",
                     kind="counted",
                     status="active",
-                    source_id=results[int(year)],
+                    source_id=feed if feed is not None and code.startswith("2026:2:") else results[int(year)],
                     is_default=True,
                     completeness=1,
                 )
