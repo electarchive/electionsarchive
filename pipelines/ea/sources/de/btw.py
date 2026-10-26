@@ -800,6 +800,12 @@ def emit() -> Path:
             )
             name(election, f"{year} German federal election", "en")
             name(election, f"Bundestagswahl {year}", "de", "native")
+            union = cs.key("de.alliance", f"{day}:union")
+            cs.add("alliance", id=union, kind="joint_list", election_id=election)
+            name(union, "CDU/CSU", "en")
+            name(union, "CDU/CSU", "de", "native")
+            cs.add("alliance_member", alliance_id=union, party_id=party_ids["CDU"], role=None)
+            cs.add("alliance_member", alliance_id=union, party_id=party_ids["CSU"], role=None)
             path = f"de/{day}-general"
             cs.add("slug", path=path, entity_id=election)
             if year == 1949:
@@ -944,6 +950,7 @@ def emit() -> Path:
                         contest_id=contest,
                         kind="others" if others else "list",
                         party_id=None if others else party_ids[group],
+                        alliance_id=union if group in ("CDU", "CSU") else None,
                         ballot_label=displays[group],
                     )
                     if others:
@@ -956,6 +963,7 @@ def emit() -> Path:
                             contest_id=national,
                             kind="list",
                             party_id=party_ids[group],
+                            alliance_id=union if group in ("CDU", "CSU") else None,
                             ballot_label=displays[group],
                         )
                     if land_seats.get(group):
@@ -1025,6 +1033,7 @@ def emit() -> Path:
                         contest_id=contest,
                         kind="others" if kind == "others" else "candidate",
                         party_id=party_ids[group] if kind == "party" else None,
+                        alliance_id=union if kind == "party" and group in ("CDU", "CSU") else None,
                         ballot_label=displays[group],
                     )
                     for version in ("final", "original"):

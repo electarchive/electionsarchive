@@ -1044,6 +1044,12 @@ def emit() -> Path:
         )
         name(election, "2025 German federal election", "en")
         name(election, "Bundestagswahl 2025", "de", "native")
+        union = cs.key("de.alliance", f"{ELECTION}:union")
+        cs.add("alliance", id=union, kind="joint_list", election_id=election)
+        name(union, "CDU/CSU", "en")
+        name(union, "CDU/CSU", "de", "native")
+        cs.add("alliance_member", alliance_id=union, party_id=party_ids["CDU"], role=None)
+        cs.add("alliance_member", alliance_id=union, party_id=party_ids["CSU"], role=None)
         path = f"de/{ELECTION}-general"
         cs.add("slug", path=path, entity_id=election)
 
@@ -1118,6 +1124,7 @@ def emit() -> Path:
                         contest_id=national,
                         kind="list",
                         party_id=party_ids[group],
+                        alliance_id=union if group in ("CDU", "CSU") else None,
                         ballot_label=group,
                     )
                 option = cs.key("de.option", f"{contest_key}:{group}")
@@ -1128,6 +1135,7 @@ def emit() -> Path:
                     contest_id=contest,
                     kind="list",
                     party_id=party_ids[group],
+                    alliance_id=union if group in ("CDU", "CSU") else None,
                     ballot_label=group,
                 )
                 if seats is not None:
@@ -1171,6 +1179,7 @@ def emit() -> Path:
                     contest_id=contest,
                     kind="others" if group == "Übrige" else "candidate",
                     party_id=None if independent or group == "Übrige" else party_ids[group],
+                    alliance_id=None if independent or group not in ("CDU", "CSU") else union,
                     ballot_label=group.removeprefix("EB:").strip(),
                 )
                 if outcome is not None:
@@ -1285,6 +1294,12 @@ def emit() -> Path:
         )
         name(european_election, "2024 European Parliament election in Germany", "en")
         name(european_election, "Europawahl 2024", "de", "native")
+        european_union = cs.key("de.alliance", f"{EUROPEAN}:union")
+        cs.add("alliance", id=european_union, kind="joint_list", election_id=european_election)
+        name(european_union, "CDU/CSU", "en")
+        name(european_union, "CDU/CSU", "de", "native")
+        cs.add("alliance_member", alliance_id=european_union, party_id=european_party_ids["CDU"], role=None)
+        cs.add("alliance_member", alliance_id=european_union, party_id=european_party_ids["CSU"], role=None)
         european_path = f"de/{EUROPEAN}-european-parliament"
         cs.add("slug", path=european_path, entity_id=european_election)
         european_contest = cs.key("de.contest", f"{EUROPEAN}:european-parliament")
@@ -1324,6 +1339,7 @@ def emit() -> Path:
                 contest_id=european_contest,
                 kind="list",
                 party_id=european_party_ids[group],
+                alliance_id=european_union if group in ("CDU", "CSU") else None,
                 ballot_position=position,
                 ballot_label=group,
             )
@@ -1367,6 +1383,7 @@ def emit() -> Path:
                 contest_id=contest,
                 kind="list",
                 party_id=european_party_ids[group],
+                alliance_id=european_union if group in ("CDU", "CSU") else None,
                 ballot_label=group,
             )
             if seats is not None:
