@@ -803,6 +803,16 @@ def emit() -> Path:
                 report[scope, "painted"] += options
             elif options >= 50:
                 print(f"no color: {iso} {(full + short)[0]} ({options} options, item {linked.get(party) or inherited})")
+        for party, value in conn.execute(
+            "select entity_id, value from external_id where scheme = 'wikidata' and value = 'Q3550075'"
+        ).fetchall():
+            cs.add(
+                "external_id_drop",
+                entity_id=party,
+                scheme="wikidata",
+                value=value,
+                reason="Q3550075 is the Union de la gauche of the 1970s, not the Union de la gauche of 2022 to 2024",
+            )
         for scope in sorted({scope for scope, _ in report}):
             print(
                 f"{scope}: {report[scope, 'linked']} of {report[scope, 'parties']} parties linked, "
