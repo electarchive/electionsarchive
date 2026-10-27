@@ -409,7 +409,7 @@
         "grain": "commune",
         "effort": "election",
         "first": false,
-        "note": "French Polynesia's 48 communes are the gap to fill. The other 74 missing are the 68 communes with no candidates, whose cancelled elections are rerun later, and about 6 more to check against the France-wide files."
+        "note": "French Polynesia's 48 communes are the gap to fill. The other 68 missing are the communes with no candidates, whose cancelled elections are rerun later."
       }
     ],
     "departementales": [

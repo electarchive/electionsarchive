@@ -209,6 +209,11 @@
       "title": "Résultats des élections municipales à Saint-Pierre et Miquelon",
       "publisher": "Les services de l'État à Saint-Pierre et Miquelon (préfecture)",
       "url": "https://saint-pierre-et-miquelon.gouv.fr/Actions-de-l-Etat/Elections/Elections-municipales-2026/Resultats-des-elections-municipales-a-Saint-Pierre-et-Miquelon"
+    },
+    "mi-communes-tombees": {
+      "title": "Les communes tombées pour la France (La Meuse, 2017 dossiers)",
+      "publisher": "Ministère de l'Intérieur",
+      "url": "https://mobile.interieur.gouv.fr/Archives/Archives-des-dossiers/2017-Dossiers/La-Meuse/Les-communes-tombees-pour-la-France"
     }
   },
   "levels": [
@@ -1934,7 +1939,13 @@
           ],
           "except_codes": [
             "977",
-            "978"
+            "978",
+            "55039",
+            "55050",
+            "55139",
+            "55189",
+            "55239",
+            "55307"
           ]
         }
       ],
@@ -1983,12 +1994,12 @@
         },
         {
           "date": "2026-03-15",
-          "contests": 34958,
+          "contests": 34952,
           "source": "dgcl-bis-206",
-          "quote": "dgcl-bis-206: 'La loi ne permettant pas la création de communes nouvelles l'année précédant les élections municipales, le nombre de communes reste stable à 34 875.' (metropolitan France and the overseas departments); nc-municipales-2026: 'La Nouvelle-Calédonie compte 33 communes.'; spm-municipales-2026: results for its two communes, 'À SAINT-PIERRE' and 'À MIQUELON-LANGLADE'; pf-municipales-2026: 'l'un des 1 056 sièges de conseillers municipaux à pourvoir, dans les 48 communes polynésiennes'. 34,875 + 33 + 2 + 48 = 34,958."
+          "quote": "dgcl-bis-206: 'La loi ne permettant pas la création de communes nouvelles l'année précédant les élections municipales, le nombre de communes reste stable à 34 875.' (metropolitan France and the overseas departments); nc-municipales-2026: 'La Nouvelle-Calédonie compte 33 communes.'; spm-municipales-2026: results for its two communes, 'À SAINT-PIERRE' and 'À MIQUELON-LANGLADE'; pf-municipales-2026: 'l'un des 1 056 sièges de conseillers municipaux à pourvoir, dans les 48 communes polynésiennes'. mi-communes-tombees: 'Aujourd'hui encore, six de ces communes sont administrées selon ce dispositif' (a three-member commission named by the prefect of the Meuse, law of 18 October 1919: Beaumont-en-Verdunois, Bezonvaux, Cumières-le-Mort-Homme, Fleury-devant-Douaumont, Haumont-près-Samogneux, and Louvemont-Côte-du-Poivre). 34,875 − 6 + 33 + 2 + 48 = 34,952."
         }
       ],
-      "note": "Counted per municipality: each commune that renewed its council counts once, both rounds together. The counts for 2001 to 2020 are the Interior Ministry's, as published by Sciences Po's CEVIPOF, which counts the arrondissements of Paris, Lyon, and Marseille with the communes. 2026 counts communes alone: the Interior Ministry's 34,875 in metropolitan France and the overseas departments, plus the 33 of New Caledonia, the 2 of Saint-Pierre-and-Miquelon, and the 48 of French Polynesia, each from the State's services there; the sector councils of Paris, Lyon, and Marseille count with their commune. Saint-Barthélemy and Saint-Martin elect territorial councils, not municipal ones, so they are left out. 1989 is the Interior Ministry's count of mayors elected after that year's renewal, one per commune."
+      "note": "Counted per municipality: each commune that renewed its council counts once, both rounds together. The counts for 2001 to 2020 are the Interior Ministry's, as published by Sciences Po's CEVIPOF, which counts the arrondissements of Paris, Lyon, and Marseille with the communes. For 2026, the count covers communes alone: the Interior Ministry's 34,875 in metropolitan France and the overseas departments, less the six destroyed villages near Verdun that have no voters and are run by a commission the prefect appoints, plus the 33 of New Caledonia, the 2 of Saint-Pierre-and-Miquelon, and the 48 of French Polynesia, each from the State's services there. The sector councils of Paris, Lyon, and Marseille count with their commune. Saint-Barthélemy and Saint-Martin elect territorial councils, not municipal ones, so they are left out. 1989 is the Interior Ministry's count of mayors elected after that year's renewal, one per commune."
     },
     {
       "key": "referendums",
