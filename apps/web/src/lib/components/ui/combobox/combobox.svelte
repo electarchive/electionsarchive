@@ -90,9 +90,13 @@
     <Command.List
       class="in-data-[slot=drawer-content]:max-h-[60dvh]"
       {@attach (list) => {
-        list
-          .querySelector('[data-checked="true"]')
-          ?.scrollIntoView({ block: "nearest" });
+        const checked = list.querySelector('[data-checked="true"]');
+        if (checked != null) {
+          list.scrollTop +=
+            checked.getBoundingClientRect().top -
+            list.getBoundingClientRect().top -
+            (list.clientHeight - checked.clientHeight) / 2;
+        }
       }}
     >
       <Command.Empty>{empty}</Command.Empty>
