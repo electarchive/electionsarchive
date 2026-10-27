@@ -1353,11 +1353,13 @@ function personMarkdown(
               ? null
               : percent(entry.votes / entry.total),
             entry.majority == null ? null : count(entry.majority),
-            entry.isUnopposed === true && entry.outcome === "elected"
-              ? m.person_elected_unopposed()
-              : entry.note == null || isDerived(entry.note)
-                ? outcome(entry.outcome)
-                : `${outcome(entry.outcome)} (${entry.note})`,
+            `${
+              entry.isUnopposed === true && entry.outcome === "elected"
+                ? m.person_elected_unopposed()
+                : entry.note == null || isDerived(entry.note)
+                  ? outcome(entry.outcome)
+                  : `${outcome(entry.outcome)} (${entry.note})`
+            }${entry.isWriteIn === true ? ` (${m.results_write_in().toLowerCase()})` : ""}`,
           ]),
         ),
   ].filter((block) => block !== "");

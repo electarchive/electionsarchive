@@ -17201,6 +17201,7 @@ export const people = {
             total: v.nullable(v.number()),
             majority: v.optional(v.nullable(v.number())),
             isUnopposed: v.optional(v.boolean()),
+            isWriteIn: v.optional(v.boolean()),
             outcome: v.nullable(v.string()),
             note: v.optional(v.nullable(v.string())),
             electoral: v.nullable(
@@ -17247,6 +17248,7 @@ export const people = {
         total: number | null;
         majority: number | null;
         unopposed: boolean;
+        written: boolean | null;
         outcome: string | null;
         note: string | null;
         party: string | null;
@@ -17264,7 +17266,8 @@ export const people = {
         mine as materialized (
           select o.id as option, o.contest_id, cd.id as candidacy, cd.role,
             coalesce(pm.into_id, lp.party) as party, cd.is_independent as independent,
-            (select party_scope_id is not null from contest where id = o.contest_id) as scoped
+            (select party_scope_id is not null from contest where id = o.contest_id) as scoped,
+            o.kind = 'write_in' as written
           from candidacy cd join contest_option o on o.id = cd.option_id
           cross join lateral (
             select coalesce(cd.member_of_party_id, o.party_id, ${fused(sql`o.id`, sql`o.contest_id`)},
@@ -17272,7 +17275,16 @@ export const people = {
           ) lp
           left join entity_merge pm on pm.entity_id = lp.party
           where cd.person_id in (select id from ids) and cd.role in ('head', 'list_member')
-            and o.kind <> 'write_in' and not ${stray(sql`cd.id`, sql`o.id`, sql`o.contest_id`)}
+            and not ${stray(sql`cd.id`, sql`o.id`, sql`o.contest_id`)}
+            and (o.kind <> 'write_in' or exists (
+              select from outcome wx join result_set wr on wr.id = wx.result_set_id and ${latest("wr")}
+              where wx.option_id = o.id and wx.kind in ('elected', 'won', 'advanced', 'tied')
+            ) or exists (
+              select from result_set wr
+              join contest_option wo on wo.id = o.id or wo.parent_option_id = o.id
+              join result_rollup wv on wv.result_set_k = wr.k and wv.option_k = wo.k
+              where wr.contest_id = o.contest_id and wv.value > 0
+            ))
         ),
         lines as materialized (
           select o.k from contest_option o
@@ -17357,6 +17369,7 @@ export const people = {
             )
         )
         select p.root, p.date::text as date, p.year, p.kind, p.election, t.main::int as measure, t.votes,
+          (select bool_and(m.written) from mine m join grp g on g.id = m.contest_id and g.root = p.root) as written,
           g.majority, exists (
             select from result_set rs where rs.contest_id = p.root and ${latest("rs")} and rs.kind = 'tacit'
           ) as unopposed,
@@ -17599,6 +17612,7 @@ export const people = {
                   ? row.majority
                   : null,
               isUnopposed: row.unopposed,
+              isWriteIn: row.written === true,
               outcome: indirect == null ? row.outcome : indirect.outcome,
               note: indirect == null ? row.note : null,
               isIndependent: row.party == null && row.independent,

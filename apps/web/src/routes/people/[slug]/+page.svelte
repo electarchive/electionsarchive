@@ -449,6 +449,11 @@
                       )}>{OUTCOMES[entry.outcome]?.() ?? entry.outcome}</span
                     >
                   {/if}
+                  {#if entry.isWriteIn === true}
+                    <span class="ms-1 text-xs text-muted-foreground"
+                      >{m.results_write_in()}</span
+                    >
+                  {/if}
                 </span>
                 {#if entry.nominees != null}
                   <span
