@@ -247,6 +247,7 @@ export class Engine {
   #padding: (width: number, height: number) => Padding;
   #options: Options;
   #isFramed = true;
+  #limit: Box | null;
   #layers = new Map<
     string,
     { spec: Maplibre.LayerSpecification; group: string; rank: number }
@@ -272,6 +273,7 @@ export class Engine {
     this.#frame = frame;
     this.#padding = padding;
     this.#options = options;
+    this.#limit = options.limit ?? null;
   }
 
   mount = (host: HTMLElement) => {
@@ -498,7 +500,7 @@ export class Engine {
     const width = canvas.clientWidth;
     const height = canvas.clientHeight;
     const box = this.#frame;
-    const limit = this.#options.limit;
+    const limit = this.#limit;
     const padding = this.#padding(width, height);
     const framed = gl.cameraForBounds(
       [box.west, box.south, box.east, box.north],
@@ -566,6 +568,19 @@ export class Engine {
       padding: this.#padding(canvas.clientWidth, canvas.clientHeight),
       duration: calm() ? 0 : 900,
     });
+  }
+
+  widen(box: Box) {
+    const limit = this.#limit ?? this.#frame;
+    this.#limit = {
+      west: Math.min(limit.west, box.west),
+      south: Math.min(limit.south, box.south),
+      east: Math.max(limit.east, box.east),
+      north: Math.max(limit.north, box.north),
+    };
+    if (this.gl != null) {
+      this.#hold(this.gl);
+    }
   }
 
   reset() {

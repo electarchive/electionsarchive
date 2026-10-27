@@ -22,6 +22,7 @@
   import * as Select from "#lib/components/ui/select/index.js";
   import { count, percent, plural, points, precision } from "#lib/format.js";
   import { keep } from "#lib/linked.js";
+  import { orpc } from "#lib/rpc.js";
   import { m } from "#lib/paraglide/messages.js";
   import { getLocale } from "#lib/paraglide/runtime.js";
   import { swatch } from "#lib/party.js";
@@ -119,6 +120,15 @@
 
   const uid = $props.id();
   let opening = $state<number | null>(null);
+  let context = $state<Awaited<
+    ReturnType<typeof orpc.contests.context.call>
+  > | null>(null);
+  let sight = $state<{
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+  } | null>(null);
   let still = $state(
     untrack(() =>
       handoff != null &&
@@ -200,7 +210,11 @@
         "CooperativeGesturesHandler.MacHelpText": m.map_gesture_mac(),
         "CooperativeGesturesHandler.MobileHelpText": m.map_gesture_mobile(),
       },
-      onReady: () => untrack(setup),
+      onReady: () => {
+        untrack(setup);
+        track();
+      },
+      onMove: () => track(),
       onMoveEnd: () => {
         if (own != null) {
           seen = engine.rendered("veil");
@@ -275,6 +289,75 @@
     },
   );
   const source = engine.tiles(untrack(() => tiles));
+
+  untrack(() => {
+    if (own != null) {
+      void orpc.contests.context.call({ k: own.k }).then(
+        (found) => {
+          if (found != null) {
+            context = found;
+            engine.widen(found.frame);
+          }
+        },
+        () => {},
+      );
+    }
+  });
+
+  $effect(() => {
+    const area = context?.area;
+    if (engine.gl == null || area == null) {
+      return;
+    }
+    untrack(() => {
+      engine.add(
+        {
+          id: "context",
+          type: "line",
+          source: engine.tiles(area.tiles),
+          "source-layer": "areas",
+          filter: ["==", ["id"], area.k],
+          paint: { "line-color": "var(--muted-foreground)", "line-width": 1.5 },
+        },
+        "lines",
+      );
+    });
+  });
+
+  const overview = $derived.by(() => {
+    if (context == null || sight == null || isHexView) {
+      return null;
+    }
+    const { extent } = context;
+    if (sight.width * sight.height >= extent.width * extent.height * 0.35) {
+      return null;
+    }
+    return {
+      ...sight,
+      isDot:
+        sight.width < extent.width * 0.05 &&
+        sight.height < extent.height * 0.05,
+      cx: sight.x + sight.width / 2,
+      cy: sight.y + sight.height / 2,
+      r: Math.max(extent.width, extent.height) * 0.035,
+    };
+  });
+
+  function track() {
+    const bounds = engine.gl?.getBounds();
+    if (bounds == null) {
+      return;
+    }
+    const x = (lng: number) => (lng * Math.PI * 6378.137) / 180;
+    const y = (lat: number) =>
+      -Math.log(Math.tan(Math.PI / 4 + (lat * Math.PI) / 360)) * 6378.137;
+    sight = {
+      x: x(bounds.getWest()),
+      y: y(bounds.getNorth()),
+      width: x(bounds.getEast()) - x(bounds.getWest()),
+      height: y(bounds.getSouth()) - y(bounds.getNorth()),
+    };
+  }
   const outer = untrack(() => (own == null ? null : engine.tiles(own.tiles)));
   const inside = untrack(() =>
     nested == null ? null : engine.tiles(nested.tiles),
@@ -1680,6 +1763,60 @@
         <ScanIcon class="block-4 inline-4" />
       </button>
     </div>
+    {#if overview != null && context != null}
+      <button
+        type="button"
+        class="absolute inset-s-2 inset-be-2 grid justify-items-center gap-1 rounded-sm bg-card/95 p-1.5 shadow-menu ring-1 ring-border hover:bg-secondary"
+        aria-label={m.map_context({ place: context.name })}
+        title={m.map_context({ place: context.name })}
+        onclick={() => {
+          if (context != null) {
+            engine.fit(context.frame);
+          }
+        }}
+        transition:fade={{ duration: calm ? 0 : 120 }}
+        data-export-skip
+      >
+        <svg
+          class="inline-28 max-block-24 max-sm:inline-20 max-sm:max-block-16"
+          viewBox="{context.extent.x} {context.extent.y} {context.extent
+            .width} {context.extent.height}"
+          aria-hidden="true"
+        >
+          <path
+            d={context.outline}
+            class="fill-muted-foreground/25 stroke-muted-foreground"
+            stroke-width="1"
+            stroke-linejoin="round"
+            vector-effect="non-scaling-stroke"
+          />
+          {#if overview.isDot}
+            <circle
+              cx={overview.cx}
+              cy={overview.cy}
+              r={overview.r}
+              class="fill-foreground stroke-card"
+              stroke-width="1.5"
+              vector-effect="non-scaling-stroke"
+            />
+          {:else}
+            <rect
+              x={overview.x}
+              y={overview.y}
+              width={overview.width}
+              height={overview.height}
+              class="fill-foreground/15 stroke-foreground"
+              stroke-width="1.5"
+              vector-effect="non-scaling-stroke"
+            />
+          {/if}
+        </svg>
+        <span
+          class="truncate text-[0.6875rem] leading-none text-muted-foreground max-inline-28 max-sm:max-inline-20"
+          >{context.name}</span
+        >
+      </button>
+    {/if}
     {#if up != null}
       <a
         class="absolute inset-s-2 inset-bs-2 flex items-center gap-1.5 rounded-sm bg-card ps-2 pe-2.5 text-[0.8125rem] font-semibold shadow-menu ring-1 ring-border block-8 max-inline-[calc(100%-4.5rem)] hover:bg-secondary pointer-coarse:block-10"

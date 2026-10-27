@@ -6657,6 +6657,131 @@ export const contests = {
       `);
       return found.rows.map((row) => row.k);
     }),
+  context: os
+    .meta(
+      openapi({
+        method: "GET",
+        path: "/places/{k}/context",
+        summary:
+          "Find the larger place that locates a place on a map: its state, or its country when the place is a state, with a simplified outline in map coordinates and the frame that fits it",
+      }),
+    )
+    .input(
+      v.object({
+        k: v.pipe(
+          v.union([v.number(), v.string()]),
+          v.transform(Number),
+          v.integer(),
+        ),
+      }),
+    )
+    .output(
+      v.nullable(
+        v.object({
+          name: v.string(),
+          area: v.nullable(v.object({ tiles: v.string(), k: v.number() })),
+          outline: v.string(),
+          extent: v.object({
+            x: v.number(),
+            y: v.number(),
+            width: v.number(),
+            height: v.number(),
+          }),
+          frame: v.object({
+            west: v.number(),
+            south: v.number(),
+            east: v.number(),
+            north: v.number(),
+          }),
+        }),
+      ),
+    )
+    .handler(async ({ input }) => {
+      const found = await db.execute<{
+        id: string;
+        k: number;
+        day: string;
+        outline: string;
+        tiles: string | null;
+        west: number;
+        south: number;
+        east: number;
+        north: number;
+      }>(sql`
+        with recursive up(id, depth) as (
+          select a.id, 0 from area a where a.k = ${input.k}
+          union all
+          select p.parent_id, up.depth + 1 from up
+          cross join lateral (
+            select x.parent_id from area_parent x where x.area_id = up.id
+            order by upper(x.valid) desc nulls first limit 1
+          ) p
+          where up.depth < 6
+        ),
+        sized as (
+          select up.depth, a.id, a.scheme_code as scheme, g.geom, g.valid,
+            (ST_XMax(g.geom) - ST_XMin(g.geom)) * (ST_YMax(g.geom) - ST_YMin(g.geom)) as size
+          from up join area a on a.id = up.id
+          cross join lateral (
+            select geom, valid from area_geometry where area_id = a.id
+            order by upper(valid) desc nulls first limit 1
+          ) g
+        ),
+        chosen as (
+          select b.* from sized b join sized o on o.depth = 0
+          where b.depth > 0 and b.size >= o.size * 4
+            and b.depth >= (select max(depth) from sized) - 1
+          order by b.depth limit 1
+        ),
+        planed as (
+          select id, valid, ${plane("geom", "scheme")} as geom from chosen
+        ),
+        measured as (
+          select id, valid, geom,
+            (ST_XMax(geom) - ST_XMin(geom)) * (ST_YMax(geom) - ST_YMin(geom)) as size
+          from planed
+        ),
+        drawn as (
+          select id, coalesce(upper(valid) - 1, current_date) as day, ST_Scale((
+            select ST_Collect(d.geom) from ST_Dump(ST_SimplifyPreserveTopology(geom, sqrt(size) / 250)) d
+            where ST_Area(d.geom) >= size / 20000
+          ), 0.001, 0.001) as geom
+          from measured
+        )
+        select a.id, a.k, drawn.day::text, ST_AsSVG(drawn.geom, 1, 2) as outline,
+          ST_XMin(drawn.geom) as west, ST_YMin(drawn.geom) as south,
+          ST_XMax(drawn.geom) as east, ST_YMax(drawn.geom) as north,
+          (
+            select coalesce(bs.tiles_key, bs.scheme_code || '/' || bs.vintage) from boundary_set bs
+            where bs.scheme_code = a.scheme_code and bs.valid @> drawn.day
+            order by bs.valid_from desc nulls last limit 1
+          ) as tiles
+        from drawn join area a on a.id = drawn.id where drawn.geom is not null
+      `);
+      const row = found.rows[0];
+      if (row == null) {
+        return null;
+      }
+      const [frame, labels] = await Promise.all([
+        framing(row.id, row.day),
+        names([row.id], row.day),
+      ]);
+      const tiles = stored(row.tiles);
+      return frame == null
+        ? null
+        : {
+            name: labels.full.get(row.id) ?? "",
+            area: tiles == null ? null : { tiles, k: row.k },
+            outline: row.outline,
+            extent: {
+              x: row.west,
+              y: -row.north,
+              width: row.east - row.west,
+              height: row.north - row.south,
+            },
+            frame,
+          };
+    }),
   boundaries: os
     .meta(
       openapi({
