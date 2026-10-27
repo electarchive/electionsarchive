@@ -98,7 +98,11 @@ with x as (
     from upc join contest c on c.id = upc.id join election e on e.id = c.election_id
 ),
 o as (
-    select o.contest_id, o.id, o.kind::text as kind, cs.pipeline,
+    select o.contest_id, o.id, o.kind::text as kind,
+        cs.pipeline <> 'us.fec_2026' or exists (
+            select from candidacy y join citation ci on ci.entity_id = y.id join source s on s.id = ci.source_id
+            where y.option_id in (o.id, ch.id) and coalesce(s.url, '') !~ 'fec[.]gov'
+        ) as official,
         o.party_id is not null or o.alliance_id is not null or exists (
             select from candidacy y where y.option_id in (o.id, ch.id)
                 and (y.member_of_party_id is not null or y.is_independent
@@ -115,7 +119,7 @@ o as (
 k as (
     select x.id,
         count(o.id) filter (where o.kind in ('candidate', 'ticket')) as people,
-        count(o.id) filter (where o.kind in ('candidate', 'ticket') and o.pipeline <> 'us.fec_2026') as official,
+        count(o.id) filter (where o.kind in ('candidate', 'ticket') and o.official) as official,
         count(o.id) filter (where o.kind in ('candidate', 'ticket', 'list') and not o.labeled) as unlabeled,
         count(o.id) filter (where o.kind in ('candidate', 'ticket') and o.labeled) as labeled,
         count(o.id) filter (where o.kind = 'list') as lists,
@@ -313,8 +317,7 @@ def markdown(day: str) -> str:
             " dated that day, and has candidates with at least one candidate option (a measure with at least one answer)."
             " Ready is the same rule as the upcoming track everywhere on /coverage (`READY_SQL`): an office or body, a"
             " district, and an electoral system; more candidates than seats, or exactly as many when it is uncontested (a"
-            " tacit result kind, or candidates written by a pipeline other than `us.fec_2026`, an official state list rather"
-            " than the FEC's filers); and a party, nomination, or independent mark on every candidate unless the race is"
+            " tacit result kind, or candidates cited to an official state list rather than taken from the FEC's filers); and a party, nomination, or independent mark on every candidate unless the race is"
             " nonpartisan. A measure is ready with two answers and its official wording. Places outside a level's cited list (the territories' delegates, governors, and legislatures) are left out. Other statewide offices are expected from the due-office schedule in"
             " `statewide_table.py` (each office's term and last elections); the other counts cite the sources in the file."
         ),

@@ -128,6 +128,8 @@ OFFICIAL = {
             "https://sos-prod.tnsosgovfiles.com/s3fs-public/document/Governor_Nov2026.xlsx",
             "https://sos-prod.tnsosgovfiles.com/s3fs-public/document/USSenate_Nov2026.xlsx",
             "https://sos-prod.tnsosgovfiles.com/s3fs-public/document/USHouse_Nov2026.xlsx",
+            "https://sos-prod.tnsosgovfiles.com/s3fs-public/document/TNSenate_Nov2026.xlsx#MF-140",
+            "https://sos-prod.tnsosgovfiles.com/s3fs-public/document/TNHouse_Nov2026.xlsx#MF-140",
         ],
     ),
     "AL": (
@@ -136,12 +138,18 @@ OFFICIAL = {
         [
             "https://www.sos.alabama.gov/sites/default/files/election-2026/2026GeneralElectionStateCertificationofRepublicanCandidates.pdf",
             "https://www.sos.alabama.gov/sites/default/files/election-2026/2026GeneralElectionStateCertificationofDemocraticCandidates.pdf",
+            "https://www.sos.alabama.gov/sites/default/files/election-2026/Amended_2026_Republican_Certification.pdf",
+            "https://www.sos.alabama.gov/sites/default/files/election-2026/AmendedCertificationofDemocraticPartyCandidates.pdf",
+            "https://www.sos.alabama.gov/sites/default/files/election-2026/2026GeneralElection-StateCertificationofIndependentCandidate.pdf",
         ],
     ),
     "SC": (
         "South Carolina State Election Commission",
         "Candidate listing, statewide general election, November 3, 2026",
-        ["https://vrems.scvotes.sc.gov/Candidate/CandidateSearchDate?electionDate=11%2F03%2F2026#browser"],
+        [
+            "https://vrems.scvotes.sc.gov/Candidate/CandidateSearchDate?electionDate=11%2F03%2F2026#browser",
+            "https://vrems.scvotes.sc.gov/Candidate/CandidateSearchDate?electionDate=11%2F03%2F2026&SelectedElections=22596&statewide=1#browser",
+        ],
     ),
     "KY": (
         "Kentucky Secretary of State",
@@ -159,6 +167,9 @@ OFFICIAL = {
         [
             "https://www.elections.alaska.gov/election/2026/General/OEPbooks/2026%20Alaska%20General%20VP_Region%201_ENG_web.pdf",
             "https://www.elections.alaska.gov/election-candidates/#candidates",
+            "https://www.elections.alaska.gov/candidates/?election=26genr",
+            "https://www.elections.alaska.gov/candidates/?election=26genr&frm-page-407=2",
+            "https://www.elections.alaska.gov/candidates/?election=26genr&frm-page-407=3",
         ],
     ),
     "CT": (
@@ -385,6 +396,7 @@ OFFICE_ALIASES = {
     "labor-commissioner": "commissioner-of-labor",
     "commissioner-of-the-general-land-office": "land-commissioner",
     "comptroller-auditor": "auditor",
+    "lt-governor": "lieutenant-governor",
 }
 SUFFIX = re.compile(r"(?i)^(jr|sr|ii|iii|iv|v)\.?$")
 DAY = date(2026, 11, 3)
@@ -417,20 +429,129 @@ TRANSCRIBED = {
         ("house", 7, "Terri Sewell"),
         ("governor", None, "Doug Jones"),
     ],
+    "AmendedCertificationofDemocraticPartyCandidates.pdf": [
+        ("Lieutenant Governor", None, "Phillip Ensler"),
+        ("Attorney General", None, "Jeff McLaughlin"),
+        ("Secretary of State", None, "Wayne Rogers"),
+        ("Treasurer", None, "Rosilyn Houston"),
+        ("Auditor", None, "Violet Edwards"),
+        ("Commissioner of Agriculture and Industries", None, "Ron Sparks"),
+        ("State Senator, District 2", None, "Rudolph Valentino Drake"),
+        ("State Senator, District 3", None, "John Dickey"),
+        ("State Senator, District 6", None, "Bobby Martin"),
+        ("State Senator, District 7", None, "Jared Sluss"),
+        ("State Senator, District 8", None, "Katie Kramer"),
+        ("State Senator, District 11", None, "Donald J. Mottern"),
+        ("State Senator, District 13", None, "Jamie Forsyth"),
+        ("State Senator, District 14", None, "Mandie Ledkins"),
+        ("State Senator, District 16", None, "Spencer Stone"),
+        ("State Senator, District 18", None, "Rodger M. Smitherman"),
+        ("State Senator, District 19", None, "Merika Coleman"),
+        ("State Senator, District 20", None, "Linda Coleman-Madison"),
+        ("State Senator, District 22", None, "Ashley Sharpe"),
+        ("State Senator, District 23", None, "Robert Stewart"),
+        ("State Senator, District 24", None, "Bobby Singleton"),
+        ("State Senator, District 25", None, "Phadra Carson Foster"),
+        ("State Senator, District 26", None, "Kirk Hatcher"),
+        ("State Senator, District 28", None, "Billy Beasley"),
+        ("State Senator, District 32", None, "Janet Appleby"),
+        ("State Senator, District 33", None, "Vivian Davis Figures"),
+        ("State Representative, District 2", None, "Rick Pressnell"),
+        ("State Representative, District 4", None, "Hanu Karlapalem"),
+        ("State Representative, District 5", None, "Jessie Barcala"),
+        ("State Representative, District 8", None, "Janine Maria Jordan"),
+        ("State Representative, District 10", None, "Marilyn Lands"),
+        ("State Representative, District 15", None, "Nell Brown"),
+        ("State Representative, District 16", None, "Christian Martin"),
+        ("State Representative, District 19", None, "Laura Hall"),
+        ("State Representative, District 20", None, "James Linderholm"),
+        ("State Representative, District 21", None, "Forrest Satterfield"),
+        ("State Representative, District 25", None, "Allison T Montgomery"),
+        ("State Representative, District 28", None, "Robert Louis Hunter"),
+        ("State Representative, District 32", None, "Debra D Foster"),
+        ("State Representative, District 37", None, "Michelle French"),
+        ("State Representative, District 38", None, "Hazel Floyd"),
+        ("State Representative, District 40", None, "Pam Howard"),
+        ("State Representative, District 41", None, "David J.A. Morgan"),
+        ("State Representative, District 43", None, "Taylor Cook"),
+        ("State Representative, District 45", None, "Toni Kornegay Vaughn"),
+        ("State Representative, District 47", None, "Jim Toomey"),
+        ("State Representative, District 50", None, "Alan Thomas"),
+        ("State Representative, District 52", None, "GiGi Hayes"),
+        ("State Representative, District 53", None, "Anthony Daniels"),
+        ("State Representative, District 54", None, "Neil Rafferty"),
+        ("State Representative, District 55", None, "Travis Hendrix"),
+        ("State Representative, District 56", None, "Ontario J Tillman"),
+        ("State Representative, District 57", None, "Patrick Sellers"),
+        ("State Representative, District 58", None, "Rolanda Hollis"),
+        ("State Representative, District 59", None, "Mary Moore"),
+        ("State Representative, District 60", None, "Alicia Escott Lumpkin"),
+        ("State Representative, District 63", None, "Judith Taylor"),
+        ("State Representative, District 67", None, "Prince Chestnut"),
+        ("State Representative, District 68", None, 'Thomas E "Action" Jackson'),
+        ("State Representative, District 69", None, "Kelvin J Lawrence"),
+        ("State Representative, District 70", None, "Christopher John England"),
+        ("State Representative, District 71", None, 'Artis "A.J." McCampbell'),
+        ("State Representative, District 72", None, "Curtis L Travis"),
+        ("State Representative, District 74", None, "Jasmyne Crimiel"),
+        ("State Representative, District 75", None, "Tisha Dickson Nickson"),
+        ("State Representative, District 76", None, 'Patrice "Penni" McClammy'),
+        ("State Representative, District 77", None, "TaShina Morris"),
+        ("State Representative, District 78", None, "Kenyatté Hassell"),
+        ("State Representative, District 80", None, "Manfred Malone"),
+        ("State Representative, District 82", None, "Pebblin W. Warren"),
+        ("State Representative, District 83", None, "Jeremy A. Gray"),
+        ("State Representative, District 84", None, "Berry Forte"),
+        ("State Representative, District 85", None, "Aristotle Onassis Kirkland"),
+        ("State Representative, District 96", None, "Terri Osborne"),
+        ("State Representative, District 97", None, "Adline C. Clarke"),
+        ("State Representative, District 98", None, "Napoleon Bracy, Jr."),
+        ("State Representative, District 99", None, "Sam Jones"),
+        ("State Representative, District 101", None, "Joan Friedlander"),
+        ("State Representative, District 103", None, "Barbara Drummond"),
+    ],
+    "2026GeneralElection-StateCertificationofIndependentCandidate.pdf": [
+        ("State Senator, District 10", None, "Jesse Battles"),
+        ("State Senator, District 21", None, "Jodie Woodrow Minor, Jr."),
+        ("State Representative, District 7", None, "Trent Ford"),
+        ("State Representative, District 7", None, 'Angelo "Doc" Mancuso'),
+        ("State Representative, District 35", None, "Joseph Cleveland"),
+        ("State Representative, District 65", None, "Elaine Beech"),
+    ],
 }
 ORDINAL_WORDS = [
-    "first",
-    "second",
-    "third",
-    "fourth",
-    "fifth",
-    "sixth",
-    "seventh",
-    "eighth",
-    "ninth",
-    "tenth",
-    "eleventh",
-    "twelfth",
+    *[
+        "first",
+        "second",
+        "third",
+        "fourth",
+        "fifth",
+        "sixth",
+        "seventh",
+        "eighth",
+        "ninth",
+        "tenth",
+        "eleventh",
+        "twelfth",
+        "thirteenth",
+        "fourteenth",
+        "fifteenth",
+        "sixteenth",
+        "seventeenth",
+        "eighteenth",
+        "nineteenth",
+    ],
+    *(
+        f"{tens}{suffix}"
+        for tens in ("twent", "thirt")
+        for suffix in (
+            "ieth",
+            *(
+                f"y-{unit}"
+                for unit in ["first", "second", "third", "fourth", "fifth", "sixth", "seventh", "eighth", "ninth"]
+            ),
+        )
+    ),
 ]
 
 
@@ -521,6 +642,9 @@ def read(state: str, path: Path) -> list[tuple[str, int | None, str, str]]:
                     else row["Race"]
                 )
                 number = re.search(r"\d+", row["District"])
+                if row["District Type"].lower() == "legislative" and number:
+                    race, _, position = row["Race"].partition(" Pos. ")
+                    chamber = f"{race}, District {number[0]}" + (f", Position {position}" if position else "")
                 party = {
                     "REP": "Republican",
                     "DEM": "Democratic",
@@ -533,13 +657,13 @@ def read(state: str, path: Path) -> list[tuple[str, int | None, str, str]]:
                 )
     if state == "SD":
         table = json.loads(path.read_text())["rows"] if path.suffix == ".json" else cells(path.read_text())
-        for contest, text, party, _, _, _, withdrawn, *_ in (row for row in table if len(row) >= 7):
+        for contest, text, party, _, seat, _, withdrawn, *_ in (row for row in table if len(row) >= 7):
             if text and not withdrawn and contest != "Contest":
                 chamber = {
                     "United States Senator": "senate",
                     "United States Representative": "house",
                     "Governor and Lieutenant Governor": "governor",
-                }.get(contest, contest)
+                }.get(contest, f"{contest}, {seat}" if contest.startswith("State ") and seat else contest)
                 rows.append(
                     (
                         chamber,
@@ -580,6 +704,18 @@ def read(state: str, path: Path) -> list[tuple[str, int | None, str, str]]:
                 for office, text in zip(offices, re.split(r"\s{2,}", line.strip())):
                     text = text.rstrip("*").split("/")[0]
                     rows.append((office, None, text, labels[frozenset(re.sub(r"[“”\"]", " ", text).lower().split())]))
+        return rows
+    if state == "AK" and "<h2>2026 General Election</h2>" in path.read_text():
+        for section in path.read_text().split('<section class="candidates-table">')[1:]:
+            heading = re.search(r"<h4>(?:<a[^>]*></a>)?(HOUSE|SENATE) DISTRICT (\w+)</h4>", section)
+            for flag, text, party in re.findall(
+                r'<span style="color: #e50000; font-weight: bold;">([^<]*)</span>\s*<a id="[^"]*"></a><strong>([^<]+)</strong><br>\s*<small>\(([^)]*)\)\s*\(Certified\)</small>',
+                section,
+            ):
+                if heading and not flag:
+                    last, _, first = html.unescape(text).partition(", ")
+                    office = "State Representative" if heading[1] == "HOUSE" else "State Senator"
+                    rows.append((f"{office}, District {heading[2]}", None, f"{first} {last}", party))
         return rows
     if state == "AK":
         return []
@@ -658,7 +794,11 @@ def read(state: str, path: Path) -> list[tuple[str, int | None, str, str]]:
                         "United States Senator": "senate",
                     }.get(race, race)
                     found = [text for text in texts if text.startswith("District:")]
-                    district = int(found[0].split()[-1]) if office == "house" and found else None
+                    district = (
+                        int(found[0].split()[-1])
+                        if office not in ("senate", "governor") and found and found[0].split()[-1].isdigit()
+                        else None
+                    )
                     sections.append((office, district, []))
                 elif texts and float(left) < 220 and not texts[0].startswith("Certification"):
                     sections[-1][2].append((float(left), (float(top) + float(bottom)) / 2, " ".join(texts)))
@@ -717,6 +857,23 @@ def read(state: str, path: Path) -> list[tuple[str, int | None, str, str]]:
                         rows.append((office, None, f"{first} {last.title()}", party.title()))
         return rows
     if state == "AL":
+        text = subprocess.run(
+            ["pdftotext", "-layout", str(path), "-"], capture_output=True, text=True, check=True
+        ).stdout
+        for line in text.splitlines():
+            match = re.match(
+                r"^(Lt\. Governor|Attorney General|Secretary of State|State Treasurer|State Auditor|Commissioner of Agriculture and Industries|Alabama State Senate District \d+|Alabama House of Representatives District \d+)\s{2,}(\S.*)$",
+                line,
+            )
+            if match:
+                office = re.sub(
+                    r"^Alabama (State Senate|House of Representatives) District",
+                    lambda m: "State Senator, District" if m[1] == "State Senate" else "State Representative, District",
+                    match[1],
+                )
+                rows.append((office, None, match[2].strip(), "Republican"))
+        return rows
+    if state == "AL":
         return []
     if state == "LA":
         for race, entries in json.loads(path.read_text())["races"].items():
@@ -726,7 +883,9 @@ def read(state: str, path: Path) -> list[tuple[str, int | None, str, str]]:
                 )
         return rows
     if state == "SC":
-        for _, race, _, text, _, party, _, status in json.loads(path.read_text())["rows"][1:]:
+        for _, race, _, text, _, party, _, status in (
+            row for row in json.loads(path.read_text())["rows"][1:] if len(row) == 8
+        ):
             if status == "Active":
                 house = re.fullmatch(r"U\.S\. House of Representatives, District (\d+)", race)
                 office = (
@@ -1148,7 +1307,7 @@ def read(state: str, path: Path) -> list[tuple[str, int | None, str, str]]:
                         if house
                         else ({"GOVERNOR": "governor", "UNITED STATES SENATOR": "senate"}.get(race, race), None)
                     )
-                elif office and (match := re.match(r"^\d+\s+(?:\d{7}\s+)?(\S.*?)\s{2,}(\S.*)$", stripped)):
+                elif office and (match := re.match(r"^\d+\s+(?:\d{7,8}\s+)?(\S.*?)\s{2,}(\S.*)$", stripped)):
                     rows.append((office, district, match[1].split(" / ")[0], match[2]))
                 elif (
                     rows
@@ -1208,7 +1367,10 @@ def read(state: str, path: Path) -> list[tuple[str, int | None, str, str]]:
                         "Governor": "governor",
                         "United States Senator": "senate",
                         "Representative in Congress": "house",
-                    }.get(stripped, stripped)
+                    }.get(
+                        stripped,
+                        re.sub(r"^(\w+) County$", lambda match: f"State Representative, {match[1].title()}", stripped),
+                    )
                     district = None
                 elif office and len(fields) >= 4:
                     party = {
@@ -1217,7 +1379,7 @@ def read(state: str, path: Path) -> list[tuple[str, int | None, str, str]]:
                         "LIB": "Libertarian",
                         "CON": "Constitution",
                         "IND": "Independent",
-                    }.get(fields[-1], fields[-1])
+                    }.get(fields[-1].split()[-1].upper(), fields[-1])
                     rows.append((office, district, fields[0], party))
             if state == "NJ":
                 if line.startswith("Candidate Totals"):
@@ -1246,22 +1408,35 @@ def read(state: str, path: Path) -> list[tuple[str, int | None, str, str]]:
                         "For United States Senator": "senate",
                         "For Representative in Congress": "house",
                         "For Governor and Lt. Governor": "governor",
+                        "For Member of the Legislature": "State Senator",
                     }.get(race, race.removeprefix("For "))
                     number = int(fields[1].split()[-1]) if at == 2 else None
-                    rows.append((chamber, number, fields[at + 3].split(" and ")[0], fields[at + 2]))
-                elif rows and len(fields) == 1 and fields[0] and 50 <= len(line) - len(line.lstrip()) <= 75:
+                    if chamber == "State Senator":
+                        rows.append((chamber, number, fields[at + 2], ""))
+                    else:
+                        rows.append((chamber, number, fields[at + 3].split(" and ")[0], fields[at + 2]))
+                elif (
+                    rows
+                    and rows[-1][0] != "State Senator"
+                    and len(fields) == 1
+                    and fields[0]
+                    and 50 <= len(line) - len(line.lstrip()) <= 75
+                ):
                     rows[-1] = (*rows[-1][:3], rows[-1][3] + " " + fields[0])
             if state == "UT":
-                if match := re.match(r"^U\.S\. House of Representatives District (\d+)\.", line):
-                    office, district = "house", int(match[1])
-                elif (
-                    re.match(r"^[A-Z][A-Z ]+$", line.strip())
-                    and line.strip() not in ("STATE SENATOR",)
-                    and len(line.strip()) > 12
-                    or line.strip() == "STATE SENATOR"
+                if match := re.match(
+                    r"^\s*(U\.S\. House of Representatives|Utah Senate|Utah House of Representatives) Dist\S*ct (\d+)\.",
+                    line,
                 ):
+                    office = {
+                        "U.S. House of Representatives": "house",
+                        "Utah Senate": "State Senator",
+                        "Utah House of Representatives": "State Representative",
+                    }[match[1]]
+                    district = int(match[2])
+                elif re.match(r"^[A-Z][A-Z ]+$", line.strip()) and len(line.strip()) > 12:
                     office = None
-                elif office and (match := re.match(r"^([A-Z][A-Z.'\-\" ]+[A-Z.])\s{3,}(\S.*)$", line)):
+                elif office and (match := re.match(r"^\s*([A-Z\"][A-Z.'\-\" ]+[A-Z.])\s{3,}(\S.*)$", line)):
                     rows.append((office, district, match[1], match[2].strip()))
             if state == "TX":
                 indent = len(line) - len(line.lstrip())
@@ -1303,6 +1478,8 @@ def read(state: str, path: Path) -> list[tuple[str, int | None, str, str]]:
                     office = "house" if race == "U.S. Representative" else race
                 elif header and office and (match := re.match(r"^District (\d+), (.+)$", line.strip())):
                     rows.append((office, int(match[1]), match[2], header))
+                elif header and office == "State Auditor" and line.strip():
+                    rows.append((office, None, line.strip(), header))
             if state == "DC":
                 if (
                     match := re.match(
@@ -1316,13 +1493,17 @@ def read(state: str, path: Path) -> list[tuple[str, int | None, str, str]]:
                     office = "house" if line.strip() == "Delegate to the House of Representatives" else line.strip()
     if state == "TN":
         for row in fastexcel.read_excel(path).load_sheet(0).to_polars().iter_rows(named=True):
+            if row["Candidate"] == "No Candidate Qualified":
+                continue
             house = re.fullmatch(r"United States House of Representatives District (\d+)", row["Office"])
             office = (
                 "house"
                 if house
                 else {"United States Senate": "senate", "Governor": "governor"}.get(row["Office"], row["Office"])
             )
-            rows.append((office, int(house[1]) if house else None, row["Candidate"], row["Party Name"]))
+            rows.append(
+                (office, int(house[1]) if house else None, row["Candidate"], row.get("Party Name") or row["Party"] or "")
+            )
     if state == "KY":
         for row in fastexcel.read_excel(path).load_sheet(0, dtypes="string").to_polars().iter_rows(named=True):
             if row["Party"] != "Write-In" and not row["Withdrawn"] and not row["Disqualified"]:
@@ -1338,7 +1519,13 @@ def read(state: str, path: Path) -> list[tuple[str, int | None, str, str]]:
         frame = fastexcel.read_excel(path).load_sheet(0).to_polars()
         for row in frame.iter_rows(named=True):
             if state == "ME":
-                office = {"US": "senate", "CG": "house", "GOV": "governor"}.get(row["Office"], row["Office"])
+                office = {
+                    "US": "senate",
+                    "CG": "house",
+                    "GOV": "governor",
+                    "SS": "State Senator",
+                    "SR": "State Representative",
+                }.get(row["Office"], row["Office"])
                 text = " ".join(
                     part for part in (row["First Name"], row["Middle Name"], row["Last Name"], row["Suffix"]) if part
                 )
@@ -1350,6 +1537,29 @@ def read(state: str, path: Path) -> list[tuple[str, int | None, str, str]]:
                 office = {"REPRESENTATIVE TO CONGRESS": "house", "GOVERNOR": "governor"}.get(
                     row["Contest"], row["Contest"]
                 )
+                if row["Contest"] in ("STATE SENATOR", "STATE REPRESENTATIVE"):
+                    office += ", " + " ".join(
+                        {
+                            "ADD": "Addison",
+                            "BEN": "Bennington",
+                            "CAL": "Caledonia",
+                            "CHI": "Chittenden",
+                            "ESX": "Essex",
+                            "FRA": "Franklin",
+                            "GI": "Grand Isle",
+                            "LAM": "Lamoille",
+                            "ORA": "Orange",
+                            "ORL": "Orleans",
+                            "RUT": "Rutland",
+                            "WAS": "Washington",
+                            "WDH": "Windham",
+                            "WDR": "Windsor",
+                            "CT": "Central",
+                            "N": "North",
+                            "SE": "Southeast",
+                        }.get(part, part)
+                        for part in row["District Name"].split()
+                    )
                 text = row["Name On Ballot"]
                 party = "/".join(
                     {"DEM": "Democratic", "REP": "Republican", "PROG": "Progressive"}.get(
@@ -1374,7 +1584,9 @@ def fetch() -> None:
                     print(f"{url} is a browser scrape; store it with raw.store")
                     continue
                 if "#MF-" in url:
-                    delivered = next((DATA / "inbox" / "manual" / url.split("#")[1]).iterdir())
+                    folder = DATA / "inbox" / "manual" / url.split("#")[1]
+                    named = folder / url.split("#")[0].rsplit("/", 1)[-1]
+                    delivered = named if named.exists() else next(folder.iterdir())
                     raw.store(
                         SOURCE,
                         url,
@@ -1469,7 +1681,12 @@ def parse() -> None:
         for office, district, text, party in [
             *read(state, raw.cached(SOURCE, url).path),
             *(
-                (office, district, text, "Republican" if "Republican" in url else "Democratic")
+                (
+                    office,
+                    district,
+                    text,
+                    "Republican" if "Republican" in url else "Democratic" if "Democratic" in url else "Independent",
+                )
                 for office, district, text in TRANSCRIBED.get(url.rsplit("/", 1)[-1], [])
             ),
         ]
@@ -1663,6 +1880,10 @@ def emit() -> Path:
                 known = nominees.setdefault(general, {})
                 known[(ballot, person)] = known.get((ballot, person)) or party_id
 
+        numbered: dict[tuple[str, str, str], list[str]] = {}
+        for state, level, seat in seats:
+            if re.fullmatch(r"\d+-\w+", seat):
+                numbered.setdefault((state, level, seat.split("-")[0]), []).append(seat)
         listed: dict[str, list[dict[str, str | int | None]]] = {}
         for row in pl.read_parquet(PARSED / "candidates.parquet").iter_rows(named=True):
             office = re.sub(r"-(statewide|state-of-[a-z]+)$", "", slug(row["office"]))
@@ -1676,7 +1897,7 @@ def emit() -> Path:
                 continue
             text = str(row["office"]).lower()
             if re.search(
-                r"u\.s\.|united states|congress|county|city|town|school|court|board|ward|council|precinct|committee|meeting|vacancy|special|unexpired|pos\.",
+                r"u\.s\.|united states|congress|county|city|town|school|(?<!general )court|board|ward|council|precinct|committee|meeting|vacancy|special|unexpired",
                 text,
             ):
                 continue
@@ -1687,16 +1908,39 @@ def emit() -> Path:
                 if re.search(r"represent|assembly|house|delegates|legislat", text)
                 else None
             )
-            number = re.search(r"(\d+)(?:st|nd|rd|th)?\s*(?:,?\s*seat\s+)?([a-z])?\b", text)
+            number = re.search(r"(\d+)(?:st|nd|rd|th)?\s*(?:,?\s*(?:seat|position)\s+)?([a-z]|\d+)?\b", text)
             if level and not number and row["district"] is not None:
                 number = re.match(r"(\d+)()", str(row["district"]))
-            if level and number:
+            if not level:
+                continue
+            candidates = []
+            if number:
                 district = str(int(number[1])) + (f"-{number[2]}" if number[2] else "")
-                key = seats.get((row["state"], level, district)) or seats.get(
-                    (row["state"], level, str(int(number[1])))
+                prefixed = numbered.get((row["state"], level, str(int(number[1]))), [])
+                candidates = [
+                    district,
+                    re.sub(r"-([a-z])$", lambda match: f"-{ord(match[1]) - 96}", district),
+                    str(int(number[1])),
+                    *(prefixed if len(prefixed) == 1 else []),
+                ]
+            if "," in text:
+                words = re.findall(r"[a-z]+(?:-[a-z]+)?|\d+", text.split(",", 1)[1])
+                ordinal = next(
+                    (str(ORDINAL_WORDS.index(word) + 1) for word in words if word in ORDINAL_WORDS),
+                    next((word for word in words if word.isdigit()), str(row["district"] or "")),
                 )
-                if key:
-                    listed.setdefault(key, []).append(row)
+                joined = "".join(
+                    word.replace("-", "")
+                    for word in words
+                    if word not in ORDINAL_WORDS and not word.isdigit() and word not in ("district", "and", "the", "of")
+                )
+                if joined:
+                    candidates += [f"{joined}-{ordinal}" if ordinal else joined, joined]
+            key = next(
+                (seats[row["state"], level, seat] for seat in candidates if (row["state"], level, seat) in seats), None
+            )
+            if key:
+                listed.setdefault(key, []).append(row)
 
         def surname(text: str) -> str:
             words = [
@@ -1901,11 +2145,18 @@ def emit() -> Path:
                     person
                     for person, held_text in by_state.get(state, [])
                     if len(surname(held_text)) > 2
-                    and "".join(
-                        token
-                        for token in slug(re.sub(r"[\"“][^\"”]*[\"”]|\([^)]*\)", " ", text)).split("-")
-                        if not SUFFIX.match(token)
-                    ).endswith(surname(held_text).replace("-", ""))
+                    and surname(held_text).replace("-", "")
+                    in {
+                        "".join(bare[index:])
+                        for bare in [
+                            [
+                                token
+                                for token in slug(re.sub(r"[\"“][^\"”]*[\"”]|\([^)]*\)", " ", text)).split("-")
+                                if not SUFFIX.match(token)
+                            ]
+                        ]
+                        for index in range(1, len(bare))
+                    }
                     and len(slug(held_text).split("-")[0]) > 1
                     and slug(held_text).split("-")[0] in tokens
                     and (
