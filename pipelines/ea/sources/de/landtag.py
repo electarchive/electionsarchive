@@ -1,7 +1,9 @@
 import csv
 import html
 import io
+import itertools
 import re
+import subprocess
 from datetime import date
 from pathlib import Path
 from typing import Any
@@ -21,10 +23,19 @@ BW = "https://wahlen.statistik-bw.de/ltw26"
 MV = "https://www.laiv-mv.de/static/LAIV/Wahlen/2-Landtagswahlen/2026/Ergebnisse"
 BE = "https://wahlen-berlin.de/wahlen/BE2026/Afspraes/AGH"
 ST = "https://wahlergebnisse.sachsen-anhalt.de/wahlen/lt26/downloads"
+RP = "https://www.wahlen.rlp.de/fileadmin/wahlen.rlp.de/dokumente-wahlen/ltw"
+RP_PDF = f"{RP}/PDF/Bekanntmachung_Endergebnis_2026/LW2026_Bekanntmachung_Endergebnis"
 URLS = {
     "BW": [f"{BW}/ltw26-ergebnisse.csv", f"{BW}/ltw26-gewaehlte.csv", f"{BW}/ltw26-sitzverteilung.pdf"],
     "MV": [f"{MV}/l_wahlkreise.csv", f"{MV}/l_mandate.csv"],
     "ST": [f"{ST}/Ergebnisse_Land_RKR_WKR_LT_2026.csv", f"{ST}/Sitzverteilung_LT_2026.csv"],
+    "RP": [
+        f"{RP}/Ergebnisdateien/2026/Endgueltiges_Ergebnis_LW_2026_Wahlkreise.xlsx",
+        f"{RP_PDF}_UEbersicht_2.pdf",
+        f"{RP_PDF}_UEbersicht_3.pdf",
+        f"{RP_PDF}_UEbersicht_4.pdf",
+        f"{RP_PDF}.pdf",
+    ],
     "BE": [f"{BE}/DL/DL_BE_AGHBVV2026.xlsx", "https://www.wahlen-berlin.de/wahlen/BE2026/Afspraes/agh/gewaehlte.html"],
 }
 NOTE_BE = (
@@ -55,6 +66,14 @@ NOTE_ST = (
     "to candidates on the party's Land list. If a party wins more constituencies than its share, it keeps them and "
     "the total number of seats grows by twice that surplus before the seats are divided again."
 )
+NOTE_RP = (
+    "Voters have two votes. The second vote decides how many of the Landtag's 101 seats each party gets: the seats "
+    "are shared by the Sainte-Laguë method among parties with 5 percent or more of the second votes. Each party's "
+    "winners in the 52 constituencies take their seats first, and any remaining seats go to candidates on the "
+    "party's Land list. A party that wins more constituencies than its share keeps them, and extra seats are added "
+    "until every party's seats match its share of the second votes. The total came to 105 seats."
+)
+RP_LABELS = {"Bastian Ruhl": "Einzelbewerber Bastian Ruhl", "Yunus Emre": "Miteinander statt Gegeneinander"}
 WINNERS_NOTE = (
     "The source names only the winners of each constituency. Other candidates are counted only in their party's "
     "vote totals."
@@ -99,6 +118,19 @@ STATES = {
         "publisher": "Statistisches Amt Mecklenburg-Vorpommern",
         "title": "Landtagswahl am 20. September 2026 in Mecklenburg-Vorpommern, endgültiges Ergebnis",
         "url": "https://www.laiv-mv.de/Wahlen/Landtagswahlen/2026/Ergebnisse/",
+    },
+    "RP": {
+        "land": "07",
+        "name": "Rhineland-Palatinate",
+        "native": "Landtagswahl in Rheinland-Pfalz 2026",
+        "body": ("Landtag of Rhineland-Palatinate", "Landtag Rheinland-Pfalz"),
+        "day": date(2026, 3, 22),
+        "rules": {"formula": "sainte_lague", "threshold": {"percent": 5, "level": "party", "scope": "contest"}},
+        "note": NOTE_RP,
+        "winners": WINNERS_NOTE,
+        "publisher": "Landeswahlleiter Rheinland-Pfalz",
+        "title": "Wahl zum 19. Landtag Rheinland-Pfalz am 22. März 2026, endgültiges Ergebnis",
+        "url": "https://www.wahlen.rlp.de/landtagswahl/bekanntmachungen/bekanntmachung-endergebnis-lw-2026",
     },
     "ST": {
         "land": "15",
@@ -414,7 +446,97 @@ def parse() -> None:
             }
         )
 
+    sheet = pl.read_excel(raw.cached(SOURCE, URLS["RP"][0]).path, has_header=False, infer_schema_length=0).rows()
+    labels, codes = sheet[2], sheet[3]
+    column = {code: i for i, code in enumerate(codes) if code}
+    for row in sheet[4:]:
+        if row[0] is None or not re.fullmatch(r"\d \d{3}", row[0].strip()):
+            continue
+        wk = f"{int(row[0].strip()[2:]):02d}"
+        cons.append(
+            {
+                "state": "RP",
+                "wk": wk,
+                "name": re.sub(r", WK$", "", row[2].strip()),
+                "registered": number(row[column["A"]]),
+                "voters": number(row[column["B"]]),
+                "invalid1": number(row[column["C"]]),
+                "valid1": number(row[column["D"]]),
+                "invalid2": number(row[column["E"]]),
+                "valid2": number(row[column["F"]]),
+            }
+        )
+        for ballot, prefix in ((1, "D"), (2, "F")):
+            add_votes(
+                "RP",
+                wk,
+                ballot,
+                {
+                    RP_LABELS.get(labels[i], labels[i]): number(row[i])
+                    for code, i in column.items()
+                    if re.fullmatch(prefix + r"\d+", code)
+                },
+            )
+
+    def pdf_lines(url: str) -> list[str]:
+        return subprocess.run(
+            ["pdftotext", "-layout", str(raw.cached(SOURCE, url).path), "-"], check=True, capture_output=True, text=True
+        ).stdout.splitlines()
+
+    for line in pdf_lines(URLS["RP"][2]):
+        match = re.fullmatch(r"\s*(\d+)\s+(.+?), (.+?)\s{2,}(\S+)\s*", line)
+        if match:
+            title = re.fullmatch(r"((?:Prof\. )?Dr\.) (.+)", match[2])
+            members.append(
+                {
+                    "state": "RP",
+                    "kind": "direct",
+                    "wk": f"{int(match[1]):02d}",
+                    "party": match[4],
+                    "family": title[2] if title else match[2],
+                    "first": match[3].strip(),
+                    "title": title[1] if title else None,
+                    "position": None,
+                }
+            )
+    party = None
+    for line in pdf_lines(URLS["RP"][3]):
+        heading = re.fullmatch(r"\s+[^\d].*\((\S+)\)\s*", line)
+        if heading:
+            party = heading[1]
+            continue
+        match = re.fullmatch(r"\s*\d+\s+(.+?), (.+?)(?: \(.+\))?\s{2,}(\d+)\s*", line)
+        if match:
+            title = re.fullmatch(r"((?:Prof\. )?Dr\.) (.+)", match[1])
+            members.append(
+                {
+                    "state": "RP",
+                    "kind": "list",
+                    "wk": None,
+                    "party": party,
+                    "family": title[2] if title else match[1],
+                    "first": match[2].strip(),
+                    "title": title[1] if title else None,
+                    "position": int(match[3]),
+                }
+            )
+    party = None
+    rp_seats: dict[tuple[str | None, str], int] = {}
+    lines = [line for line in pdf_lines(URLS["RP"][1]) if line.strip()]
+    for previous, line in itertools.pairwise(lines):
+        if line.strip() == "Über die":
+            party = previous.strip()
+        match = re.fullmatch(r"Land\s+(\d+)\s+(\d+)\s+(\d+)\s*", line)
+        if match:
+            if int(match[1]) + int(match[2]) != int(match[3]):
+                raise ValueError(f"RP {party}: seats do not add up")
+            seats.append({"state": "RP", "party": party, "total": int(match[3]), "direct": int(match[1])})
+            rp_seats[party, "direct"], rp_seats[party, "list"] = int(match[1]), int(match[2])
+
     member_frame = pl.DataFrame(members, infer_schema_length=None)
+    for party, kind, count in member_frame.filter(pl.col("state") == "RP").group_by("party", "kind").len().iter_rows():
+        if count != rp_seats.get((party, kind)):
+            raise ValueError(f"RP {party} {kind}: {count} members against the declared seats")
     for state in ("BW", "BE"):
         counts = member_frame.filter(pl.col("state") == state).group_by("party", "kind").len()
         for party in counts["party"].unique():
@@ -429,7 +551,7 @@ def parse() -> None:
             )
     constituencies = pl.DataFrame(cons, infer_schema_length=None)
     vote_frame = pl.DataFrame(votes, infer_schema_length=None)
-    for state, expected in (("BW", 157), ("MV", 71), ("ST", 83), ("BE", 153)):
+    for state, expected in (("BW", 157), ("MV", 71), ("ST", 83), ("BE", 153), ("RP", 105)):
         total = sum(row["total"] for row in seats if row["state"] == state)
         if total != expected:
             raise ValueError(f"{state}: {total} seats, expected {expected}")
@@ -465,7 +587,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="German state elections of 2026 (Baden-Württemberg, Mecklenburg-Vorpommern, Saxony-Anhalt) by constituency",
+            summary="German state elections of 2026 (Baden-Württemberg, Berlin, Mecklenburg-Vorpommern, Rhineland-Palatinate, and Saxony-Anhalt) by constituency",
             polity="DE",
         )
 
