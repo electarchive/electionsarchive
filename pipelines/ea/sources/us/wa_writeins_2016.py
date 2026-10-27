@@ -40,10 +40,16 @@ PEND_OREILLE = (
     "application/pdf",
     INBOX / "MF-119" / "november_2016_general_election_results_by_precinct.pdf",
 )
+YAKIMA = (
+    "https://www.yakimacounty.us/DocumentCenter/View/30743",
+    ".pdf",
+    "application/pdf",
+    INBOX / "MF-114" / "2016 General Election Results.pdf",
+)
 
 
 def fetch() -> None:
-    for url, suffix, media_type, path in (WHATCOM, PEND_OREILLE):
+    for url, suffix, media_type, path in (WHATCOM, PEND_OREILLE, YAKIMA):
         try:
             raw.cached(SOURCE, url)
         except LookupError:
@@ -162,6 +168,24 @@ def emit() -> Path:
                 raise ValueError(f"Pend Oreille {block[:30]!r}: no match")
             pend[matches[0]] = numbers[7]
         writeins |= pend
+        yakima_lines = subprocess.run(
+            ["pdftotext", "-layout", str(raw.cached(SOURCE, YAKIMA[0]).path), "-"], capture_output=True, check=True, text=True
+        ).stdout.splitlines()
+        first = next(index for index, line in enumerate(yakima_lines) if index > 200 and line.strip() == "President / Vice President of the United States")
+        last = next(index for index in range(first, len(yakima_lines)) if yakima_lines[index].strip() == "U.S. Senator")
+        yakima_skipped = []
+        for line in yakima_lines[first:last]:
+            cells = line.split()
+            if len(cells) == 14 and re.fullmatch(r"\d{4}", cells[0]) and cells[4].endswith("%"):
+                numbers = [int(cell.replace(",", "")) for cell in cells[5:]]
+                if sum(numbers[:8]) != numbers[8]:
+                    raise ValueError(f"Yakima precinct {cells[0]}: columns do not sum to the printed total")
+                matches = by_county["53077"].get(tuple(numbers[:7]), [])
+                if len(matches) == 1:
+                    writeins[matches[0]] = numbers[7]
+                elif sum(numbers[:8]) > 0:
+                    yakima_skipped.append(cells[0])
+        print("Yakima precincts without a single match:", yakima_skipped)
         thurston = list(pl.read_excel(raw.cached(SOURCE, THURSTON[0]).path, has_header=False, sheet_id=0).values())[0].rows()
         start = next(index for index, row in enumerate(thurston) if any(cell is not None and "Hillary" in str(cell) for cell in row))
         for row in thurston[start + 1 :]:
@@ -186,7 +210,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Washington's 2016 presidential precinct results with the Pierce, Clark, Thurston, Clallam, Whatcom, and Pend Oreille county write-in lines added",
+            summary="Washington's 2016 presidential precinct results with the Pierce, Clark, Thurston, Clallam, Whatcom, Pend Oreille, and Yakima county write-in lines added",
             polity="US-WA",
         )
         source = cs.source(PUBLISHER, TITLE)
@@ -196,6 +220,7 @@ def emit() -> Path:
         cs.artifact(raw.cached(SOURCE, CLARK[0]), source)
         cs.artifact(raw.cached(SOURCE, WHATCOM[0]), source)
         cs.artifact(raw.cached(SOURCE, PEND_OREILLE[0]), source)
+        cs.artifact(raw.cached(SOURCE, YAKIMA[0]), source)
         result_set = cs.key(f"{SOURCE}.result_set", "2016-11-08:WA:president")
         official = conn.execute(
             """select sum(v.value) from result_set r join source s on s.id = r.source_id join result_value v on v.result_set_k = r.k
@@ -230,7 +255,7 @@ def emit() -> Path:
             "note",
             entity_id=result_set,
             kind="methodology",
-            body_md=f"OpenElections' precinct results, which include King County's write-ins, with the write-in line added for {len(writeins)} precincts from the precinct canvasses of Pierce, Clark, Thurston, Clallam, Whatcom, and Pend Oreille counties. The Secretary of State's precinct files omit write-ins. Pierce suppresses small cells in 13 precincts, so those carry no write-in value, and its published precinct write-ins sum to 11,531 of its 11,532 county total. Thurston combines and zeroes small precincts for privacy, so three of its precincts, with 33 write-ins, are not loaded.",
+            body_md=f"OpenElections' precinct results, which include King County's write-ins, with the write-in line added for {len(writeins)} precincts from the precinct canvasses of Pierce, Clark, Thurston, Clallam, Whatcom, Pend Oreille, and Yakima counties. The Secretary of State's precinct files omit write-ins. Pierce suppresses small cells in 13 precincts, so those carry no write-in value, and its published precinct write-ins sum to 11,531 of its 11,532 county total. Thurston combines and zeroes small precincts for privacy, so three of its precincts, with 33 write-ins, are not loaded.",
         )
         for code, tally in tallies.items():
             for option_id, value in tally.items():
