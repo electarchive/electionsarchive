@@ -4687,6 +4687,20 @@ export const contests = {
             }),
           ),
         ),
+        overall: v.optional(
+          v.nullable(
+            v.object({
+              place: v.string(),
+              winners: v.array(
+                v.object({
+                  person: v.nullable(v.string()),
+                  party: v.nullable(v.string()),
+                  answer: v.nullable(v.string()),
+                }),
+              ),
+            }),
+          ),
+        ),
       }),
     )
     .handler(async ({ input }) => {
@@ -4706,13 +4720,14 @@ export const contests = {
             area: string | null;
             scheme: string | null;
             noun: string | null;
+            kind: string;
           }>(sql`
             with recursive up(id, parent, depth) as (
               select id, allocation_parent_id, 0 from contest where id = ${contest.id}::uuid
               union all
               select c.id, c.allocation_parent_id, up.depth + 1 from contest c join up on c.id = up.parent
             )
-            select up.id, a.id as area, a.scheme_code as scheme, sc.noun
+            select up.id, a.id as area, a.scheme_code as scheme, sc.noun, c.kind::text as kind
             from up
             join contest c on c.id = up.id
             join election e on e.id = c.election_id
@@ -5661,6 +5676,54 @@ export const contests = {
           path: slugs.get(polity) ?? null,
         };
       })();
+      county.catch(() => null);
+      const overall = (async () => {
+        const parent = ancestors.rows.at(-2);
+        const above = isRoot
+          ? parent != null &&
+            ["office", "delegate_allocation"].includes(parent.kind)
+            ? parent
+            : null
+          : ancestors.rows.at(-1);
+        if (above == null || above.kind === "list_allocation") {
+          return null;
+        }
+        const found = await db.execute<{
+          person: string | null;
+          party: string | null;
+          answer: string | null;
+          seats: number | null;
+        }>(sql`
+          select coalesce(m.into_id, cy.person_id) as person, coalesce(pm.into_id, o.party_id) as party,
+            case when o.kind = 'answer' then lower(o.ballot_label) end as answer, max(x.seats)::int as seats
+          from outcome x
+          join result_set rs on rs.id = x.result_set_id and ${latest("rs")}
+          join contest_option o on o.id = x.option_id
+          left join entity_merge pm on pm.entity_id = o.party_id
+          left join candidacy cy on cy.option_id = o.id and cy.role = 'head'
+          left join entity_merge m on m.entity_id = cy.person_id
+          where rs.contest_id = ${above.id}::uuid and x.kind in ('won', 'elected') and x.candidacy_id is null
+          group by 1, 2, 3
+        `);
+        let total = 0;
+        for (const row of found.rows) {
+          total += row.seats ?? 0;
+        }
+        const winners = found.rows.some((row) => (row.seats ?? 0) > 1)
+          ? found.rows.filter((row) => (row.seats ?? 0) * 2 > total)
+          : found.rows;
+        return winners.length === 0
+          ? null
+          : {
+              place: labels.full.get(above.area ?? above.id) ?? "",
+              winners: winners.map(({ person, party, answer }) => ({
+                person,
+                party,
+                answer,
+              })),
+            };
+      })();
+      overall.catch(() => null);
       const origins = (async () => {
         if (
           !isRoot ||
@@ -5739,6 +5802,7 @@ export const contests = {
           year: row.year,
         }));
       })();
+      origins.catch(() => null);
       const counterpart = sameRace.find(
         (row) =>
           isRoot &&
@@ -6468,6 +6532,7 @@ export const contests = {
           sources: [],
         };
       })();
+      locator.catch(() => null);
       const deeper = (async () => {
         if (!isRoot || grid == null || grid.rows.length === 0) {
           return null;
@@ -6492,6 +6557,7 @@ export const contests = {
         `);
         return found.rows[0]?.noun ?? null;
       })();
+      deeper.catch(() => null);
       const current = now.get(area.k);
       if (
         current != null &&
@@ -6527,6 +6593,7 @@ export const contests = {
           county: await county,
           locator: await locator,
           deeper: await deeper,
+          overall: await overall,
         };
       }
       const earlier = before?.get(area.k);
@@ -6846,6 +6913,7 @@ export const contests = {
         county: await county,
         locator: await locator,
         deeper: await deeper,
+        overall: await overall,
       };
     }),
   places: os

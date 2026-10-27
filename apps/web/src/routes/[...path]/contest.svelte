@@ -1423,12 +1423,27 @@
             {/if}
             {#if row.note == null}
               <span
-                class="ms-1 highlighter px-1 text-xs font-semibold text-foreground"
-                >{OUTCOMES[row.outcome]?.() ?? row.outcome}</span
+                class={cn("ms-1 px-1 text-xs font-semibold", {
+                  "rounded-xs bg-(--party) knockout": [
+                    "won",
+                    "elected",
+                  ].includes(row.outcome),
+                  "highlighter text-foreground": !["won", "elected"].includes(
+                    row.outcome,
+                  ),
+                })}>{OUTCOMES[row.outcome]?.() ?? row.outcome}</span
               >
             {:else}
               <Term
-                class="ms-1 highlighter px-1 text-xs font-semibold text-foreground"
+                class={cn("ms-1 px-1 text-xs font-semibold", {
+                  "rounded-xs bg-(--party) knockout": [
+                    "won",
+                    "elected",
+                  ].includes(row.outcome),
+                  "highlighter text-foreground": !["won", "elected"].includes(
+                    row.outcome,
+                  ),
+                })}
                 label={OUTCOMES[row.outcome]?.() ?? row.outcome}
                 definition={explain(row.note)}
               />
@@ -2556,6 +2571,7 @@
       rows={contest.rows}
       trace={page.url.pathname.slice(1)}
       place={drilled ? contest.scope.home : null}
+      overall={contest.overall}
       {span}
       votes={counted ?? m.col_votes()}
       seats={seated ? (SEATS[contest.kind]?.() ?? m.col_seats()) : null}

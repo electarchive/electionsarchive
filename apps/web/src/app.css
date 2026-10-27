@@ -178,6 +178,10 @@
     );
 }
 
+@utility knockout {
+  color: oklch(from var(--party) clamp(0, (0.7 - l) * 1000, 1) 0 0);
+}
+
 @utility keycap {
   transition-property: background-color, color, border-color;
   transition-duration: 80ms;

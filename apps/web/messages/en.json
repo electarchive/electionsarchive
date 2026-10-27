@@ -153,6 +153,8 @@
   "outcome_quorum": "Turnout below quorum",
   "outcome_note": "{names}: {note}",
   "outcome_derived": "Outcome inferred from the certified totals: {rest}",
+  "outcome_overall": "Won overall",
+  "outcome_overall_definition": "Won the race across {place}.",
   "stat_valid": "Valid votes",
   "stat_final_round": "Final-round votes",
   "stat_round_votes": "Round {round} votes",

@@ -3948,8 +3948,26 @@ function resultsMarkdown(
             : null)),
     ]),
   );
+  const overall = new Set(
+    contest.rows
+      .filter((row) => {
+        const option = row.current ?? row.earlier;
+        return (
+          contest.overall?.winners.some((winner) =>
+            winner.answer != null
+              ? row.key === `answer:${winner.answer}`
+              : winner.person != null
+                ? option?.person === winner.person
+                : option?.person == null && option?.party === winner.party,
+          ) ?? false
+        );
+      })
+      .map((row) => row.key),
+  );
   const hasOutcome =
-    !hasElectors && contest.rows.some((row) => row.current?.outcome != null);
+    !hasElectors &&
+    (overall.size > 0 ||
+      contest.rows.some((row) => row.current?.outcome != null));
   const results = contest.rows
     .filter(
       (row) => row.current != null || (then != null && row.earlier != null),
@@ -3979,9 +3997,16 @@ function resultsMarkdown(
           ]),
       ...(hasOutcome
         ? [
-            current?.outcome === "lost"
-              ? m.outcome_lost()
-              : outcome(current?.outcome ?? null),
+            [
+              current?.outcome === "lost"
+                ? m.outcome_lost()
+                : outcome(current?.outcome ?? null),
+              overall.has(key)
+                ? `${m.outcome_overall()} (${definite(contest.overall?.place ?? "")})`
+                : null,
+            ]
+              .filter((part) => part != null)
+              .join(", ") || null,
           ]
         : []),
     ]);

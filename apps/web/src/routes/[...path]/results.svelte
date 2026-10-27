@@ -4,7 +4,14 @@
   import Name from "#lib/components/name.svelte";
   import Term from "#lib/components/term.svelte";
   import * as Tooltip from "#lib/components/ui/tooltip/index.js";
-  import { count, credit, percent, points, precision } from "#lib/format.js";
+  import {
+    count,
+    credit,
+    definite,
+    percent,
+    points,
+    precision,
+  } from "#lib/format.js";
   import { explain, LOST, OUTCOMES } from "#lib/outcomes.js";
   import { m } from "#lib/paraglide/messages.js";
   import { getLocale } from "#lib/paraglide/runtime.js";
@@ -20,6 +27,7 @@
     seats,
     trace = null,
     place = null,
+    overall = null,
   }: {
     rows: Extract<PageData, { kind: "contest" }>["contest"]["rows"];
     span: {
@@ -32,6 +40,14 @@
     seats: string | null;
     trace?: string | null;
     place?: string | null;
+    overall?: {
+      place: string;
+      winners: Array<{
+        person: string | null;
+        party: string | null;
+        answer: string | null;
+      }>;
+    } | null;
   } = $props();
 
   let expanded = $state(false);
@@ -39,6 +55,20 @@
     rows.some((row) => row.key.startsWith("answer:")),
   );
 
+  const crowned = $derived.by(() => {
+    let total = 0;
+    for (const row of rows) {
+      total += row.current?.seats ?? 0;
+    }
+    return seats == null
+      ? null
+      : (rows.find(
+          (row) =>
+            row.current?.person != null &&
+            ["won", "elected"].includes(row.current.outcome ?? "") &&
+            (row.current.seats ?? 0) * 2 > total,
+        )?.key ?? null);
+  });
   const here = $derived(span?.forward === true ? span.from : span?.to);
   const there = $derived(span?.forward === true ? span.to : span?.from);
   const lines = $derived(
@@ -49,10 +79,27 @@
         span == null && (row.current?.lines.length ?? 0) === 0
           ? row.nominated
           : [];
+      const option = row.current ?? row.earlier;
+      const outcome = row.current?.outcome ?? null;
       return {
         row,
         before,
         after,
+        mark:
+          (seats == null && ["won", "elected"].includes(outcome ?? "")) ||
+          row.key === crowned
+            ? ("won" as const)
+            : seats == null && outcome === "advanced"
+              ? ("advanced" as const)
+              : null,
+        isOverall:
+          overall?.winners.some((winner) =>
+            winner.answer != null
+              ? row.key === `answer:${winner.answer}`
+              : winner.person != null
+                ? option?.person === winner.person
+                : option?.person == null && option?.party === winner.party,
+          ) ?? false,
         isNominated: nominated.length > 0,
         backers: [
           { say: m.nominated_by, list: nominated },
@@ -394,16 +441,30 @@
         {const page = $derived(row.current)}
         {const other = $derived(row.earlier)}
         <tr
-          class={cn("border-border/60", {
-            "border-be": span != null || (page?.lines.length ?? 0) === 0,
-            "text-muted-foreground": page == null,
-            "animate-in fade-in motion-reduce:animate-none": folded.has(
-              row.key,
-            ),
-          })}
+          class={cn(
+            "border-border/60",
+            {
+              "border-be": span != null || (page?.lines.length ?? 0) === 0,
+              "text-muted-foreground": page == null,
+              "animate-in fade-in motion-reduce:animate-none": folded.has(
+                row.key,
+              ),
+            },
+            {
+              "bg-[color-mix(in_oklab,var(--party)_16%,var(--card))]":
+                line.mark === "won",
+              "bg-[color-mix(in_oklab,var(--party)_8%,var(--card))]":
+                line.mark === "advanced",
+            },
+          )}
           style:--party={swatch(row.color, row.key)}
         >
-          <th class="px-2 py-1.5 text-start font-normal" scope="row">
+          <th
+            class={cn("px-2 py-1.5 text-start font-normal", {
+              "shadow-[inset_3px_0_0_var(--party)]": line.mark != null,
+            })}
+            scope="row"
+          >
             <span
               class={cn("flex items-center gap-2.5", {
                 "min-block-9": isPictured,
@@ -463,24 +524,37 @@
                     >{m.results_incumbent()}</span
                   >
                 {/if}
-                {#if page?.outcome != null && seats == null}
+                {#if page?.outcome != null && (seats == null || line.mark != null)}
                   {#if page.note == null}
                     <span
                       class={cn("ms-1 px-1 text-xs font-semibold", {
-                        "highlighter text-foreground": !LOST.has(page.outcome),
+                        "rounded-xs bg-(--party) knockout": line.mark != null,
+                        "highlighter text-foreground":
+                          line.mark == null && !LOST.has(page.outcome),
                         "text-muted-foreground": LOST.has(page.outcome),
                       })}>{OUTCOMES[page.outcome]?.() ?? page.outcome}</span
                     >
                   {:else}
                     <Term
                       class={cn("ms-1 px-1 text-xs font-semibold", {
-                        "highlighter text-foreground": !LOST.has(page.outcome),
+                        "rounded-xs bg-(--party) knockout": line.mark != null,
+                        "highlighter text-foreground":
+                          line.mark == null && !LOST.has(page.outcome),
                         "text-muted-foreground": LOST.has(page.outcome),
                       })}
                       label={OUTCOMES[page.outcome]?.() ?? page.outcome}
                       definition={explain(page.note)}
                     />
                   {/if}
+                {/if}
+                {#if line.isOverall && overall != null}
+                  <Term
+                    class="ms-1 rounded-xs px-1 text-xs font-semibold text-foreground ring-1 ring-(--party) ring-inset"
+                    label={m.outcome_overall()}
+                    definition={m.outcome_overall_definition({
+                      place: definite(overall.place),
+                    })}
+                  />
                 {/if}
                 {#if row.short != null && !row.label.includes(row.short) && !isOneParty && !line.isNominated && (span != null || (page?.lines.length ?? 0) === 0)}
                   <span class="block text-[0.8125rem] text-pretty">
