@@ -74,6 +74,7 @@
       name: string;
       isHeld: boolean;
       isOutside: boolean;
+      isPending: boolean;
     }> | null;
     isApproximate: boolean;
     noun: string;
@@ -596,10 +597,16 @@
       .filter((entry) => entry.isHeld)
       .toArray(),
   );
+  const pending = $derived(
+    blanks
+      .values()
+      .filter((entry) => entry.isPending)
+      .toArray(),
+  );
   const idle = $derived(
     blanks
       .values()
-      .filter((entry) => !entry.isHeld)
+      .filter((entry) => !entry.isHeld && !entry.isPending)
       .toArray(),
   );
   const inland: Maplibre.FilterSpecification = $derived([
@@ -980,7 +987,7 @@
     const empty = read(
       "color-mix(in oklab, var(--muted-foreground) 6%, var(--card))",
     );
-    for (const entry of missing) {
+    for (const entry of [...missing, ...pending]) {
       result.push([entry.k, empty]);
     }
     for (const row of [...places.rows, ...(places.districts ?? [])]) {
@@ -1191,7 +1198,12 @@
           filter: [
             "in",
             ["id"],
-            ["literal", id === "blank" ? missing.map((entry) => entry.k) : []],
+            [
+              "literal",
+              id === "blank"
+                ? [...missing, ...pending].map((entry) => entry.k)
+                : [],
+            ],
           ],
           paint: { "fill-pattern": image },
         },
@@ -2053,7 +2065,9 @@
           <span class="text-xs text-muted-foreground"
             >{blanks.get(empty)?.isHeld === true
               ? m.map_no_results()
-              : m.map_no_race()}</span
+              : blanks.get(empty)?.isPending === true
+                ? m.map_pending()
+                : m.map_no_race()}</span
           >
         {:else if beside != null}
           <span class="font-semibold text-pretty">{beside.name}</span>
@@ -2301,6 +2315,13 @@
             missing.map((entry) => entry.name),
           )}
         {/if}
+        {#if pending.length > 0}
+          {@render gap(
+            "absent",
+            m.map_pending_key(),
+            pending.map((entry) => entry.name),
+          )}
+        {/if}
       </div>
     {:else}
       <div class="flex flex-wrap gap-1.5">
@@ -2365,6 +2386,13 @@
             "absent",
             m.map_blank_key(),
             missing.map((entry) => entry.name),
+          )}
+        {/if}
+        {#if pending.length > 0}
+          {@render gap(
+            "absent",
+            m.map_pending_key(),
+            pending.map((entry) => entry.name),
           )}
         {/if}
         {const splits = $derived(

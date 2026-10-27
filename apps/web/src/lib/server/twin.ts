@@ -4333,6 +4333,15 @@ function placesMarkdown(
       }),
     ),
     ...(reconciled == null ? [] : [reconciled]),
+    ...((places.pending?.length ?? 0) === 0
+      ? []
+      : [
+          m.places_pending({
+            names: new Intl.ListFormat(getLocale(), {
+              type: "conjunction",
+            }).format(places.pending ?? []),
+          }),
+        ]),
     ...(isCompared && places.estimated === true
       ? [m.atlas_estimated_note({ year: then })]
       : []),

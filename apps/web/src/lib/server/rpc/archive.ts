@@ -507,6 +507,7 @@ const Places = v.nullable(
       ),
     ),
     isOpening: v.optional(v.boolean()),
+    pending: v.optional(v.array(v.string())),
     sources: v.array(v.string()),
     unreconciled: v.optional(
       v.array(v.object({ ...Unreconciled.entries, publisher: v.string() })),
@@ -537,6 +538,7 @@ const Sketch = v.object({
         name: v.string(),
         isHeld: v.boolean(),
         isOutside: v.boolean(),
+        isPending: v.boolean(),
       }),
     ),
   ),
@@ -2734,6 +2736,27 @@ async function places(
           : share(prior.get(row.k), prior.get(row.k)?.voters ?? 0),
     };
   };
+  const scoped = await db.execute(sql`
+    select from contest where id = ${contest.id}::uuid and party_scope_id is not null
+  `);
+  const waiting =
+    scoped.rows.length === 0
+      ? []
+      : (
+          await universe(
+            contest.id,
+            level.code,
+            area.id,
+            contest.date ?? "infinity",
+          )
+        ).filter((row) => row.pending && !shown.some((kid) => kid.k === row.k));
+  const waited =
+    waiting.length === 0
+      ? null
+      : await names(
+          waiting.map((row) => row.id),
+          contest.date,
+        );
   return {
     levels: levels.map((entry) => ({
       code: entry.code,
@@ -2743,6 +2766,11 @@ async function places(
     level: level.code,
     ...tabulated,
     estimated: spread.size > 0,
+    ...(waited != null && {
+      pending: waiting
+        .map((row) => waited.full.get(row.id) ?? "")
+        .toSorted((a, b) => a.localeCompare(b)),
+    }),
     ...(called != null && {
       noted: unplaced.map((row) => ({
         k: row.k,
@@ -7408,6 +7436,7 @@ export const contests = {
               name: v.string(),
               isHeld: v.boolean(),
               isOutside: v.boolean(),
+              isPending: v.boolean(),
             }),
           ),
           frame: v.nullable(
@@ -7490,6 +7519,7 @@ export const contests = {
           name: blankLabels.full.get(row.id) ?? "",
           isHeld: row.held,
           isOutside: row.outside,
+          isPending: row.pending,
         }))
         .toSorted((a, b) => a.name.localeCompare(b.name));
       const drawn = await Promise.all(
@@ -9230,6 +9260,7 @@ async function universe(
     k: number;
     held: boolean;
     outside: boolean;
+    pending: boolean;
   }>(sql`
     with recursive base as (
       select c.office_id, c.body_id, c.party_scope_id, ec.date_from, ec.date_to
@@ -9277,14 +9308,16 @@ async function universe(
       join area a on a.id = p.area_id
       where inside.depth < 2 and inside.scheme <> ${level} and (inside.depth = 0 or a.scheme_code = ${level})
     )
-    select distinct candidate.id, candidate.k, candidate.held, false as outside from candidate
+    select distinct candidate.id, candidate.k, candidate.held, false as outside,
+      not candidate.held and (select b.party_scope_id is not null from base b) as pending
+    from candidate
     join up on up.start = candidate.id where up.id = ${area}::uuid
     union
-    select a.id, a.k, true, false from down
+    select a.id, a.k, true, false, false from down
     join area a on a.id = down.id and a.scheme_code = ${level}
     where down.depth > 0 and exists (select from area_geometry g where g.area_id = a.id and g.valid @> ${day}::date)
     union
-    select a.id, a.k, false, true from inside
+    select a.id, a.k, false, true, false from inside
     join area a on a.id = inside.id and a.scheme_code = ${level}
     where inside.depth > 0 and not exists (select from candidate c where c.id = a.id)
       and exists (select from area_geometry g where g.area_id = a.id and g.valid @> ${day}::date)
@@ -9434,6 +9467,7 @@ async function sketch(
             name: labels.full.get(row.id) ?? "",
             isHeld: row.held,
             isOutside: row.outside,
+            isPending: row.pending,
           }))
           .toSorted((a, b) => a.name.localeCompare(b.name)),
         isApproximate: tiled.synthetic,
