@@ -35,7 +35,7 @@ type Options = {
 const SLOTS: Array<Slot> = ["fills", "lines", "points", "focus"];
 const CSS = /^(var|color-mix)\(/u;
 const SIZE = 512;
-const FIT = 15;
+const FIT = 13;
 
 let library: Promise<{
   maplibre: typeof Maplibre;
