@@ -12,7 +12,7 @@ from ea.changeset import Changeset
 from ea.store import DATA, connect
 
 SOURCE = "world.natural_earth"
-VERSION = "5"
+VERSION = "6"
 PARSED = DATA / "parsed" / SOURCE
 URL = "https://raw.githubusercontent.com/nvkelso/natural-earth-vector/master/geojson/ne_10m_admin_0_countries.geojson"
 PLACES = "https://raw.githubusercontent.com/nvkelso/natural-earth-vector/master/geojson/ne_10m_populated_places.geojson"
@@ -303,6 +303,23 @@ def emit() -> Path:
                     body_md=body,
                     reason="the area's status note was rewritten",
                 )
+        for name, entity, text in conn.execute(
+            """select n.id, n.entity_id, n.text from name n
+               join area a on a.id = n.entity_id and a.scheme_code = 'world.country'
+               join changeset w on w.id = n.changeset_id and w.pipeline = %s
+               where not n.is_preferred and exists (
+                 select from name p where p.entity_id = n.entity_id and p.lang = n.lang and p.text = n.text
+                   and p.is_preferred
+               )""",
+            [SOURCE],
+        ).fetchall():
+            cs.add(
+                "name_drop",
+                name_id=name,
+                entity_id=entity,
+                text=text,
+                reason="the same name is the preferred one in this language",
+            )
         for code, (_, reason) in FOLDED.items():
             try:
                 folded = cs.area("world.country", code)
