@@ -31,7 +31,7 @@
     <div
       class="mx-auto mt-4 hidden h-1.5 w-[100px] shrink-0 rounded-full bg-border group-data-[vaul-drawer-direction=bottom]/drawer-content:block"
     ></div>
-    <div class="flex min-h-0 flex-col overflow-y-auto">
+    <div class="flex min-h-0 flex-col overflow-y-auto overscroll-contain">
       {@render children?.()}
     </div>
   </DrawerPrimitive.Content>
