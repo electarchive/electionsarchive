@@ -35,6 +35,7 @@ type Options = {
 const SLOTS: Array<Slot> = ["fills", "lines", "points", "focus"];
 const CSS = /^(var|color-mix)\(/u;
 const SIZE = 512;
+const FIT = 15;
 
 let library: Promise<{
   maplibre: typeof Maplibre;
@@ -328,6 +329,7 @@ export class Engine {
           this.#frame.east,
           this.#frame.north,
         ],
+        fitBoundsOptions: { maxZoom: FIT },
       });
       gl.touchZoomRotate.disableRotation();
       gl.keyboard.disable();
@@ -504,7 +506,7 @@ export class Engine {
     const padding = this.#padding(width, height);
     const framed = gl.cameraForBounds(
       [box.west, box.south, box.east, box.north],
-      { padding },
+      { padding, maxZoom: FIT },
     );
     const camera =
       limit == null
@@ -516,7 +518,7 @@ export class Engine {
               Math.max(limit.east, box.east),
               Math.max(limit.north, box.north),
             ],
-            { padding },
+            { padding, maxZoom: FIT },
           );
     if (
       framed == null ||
@@ -566,6 +568,7 @@ export class Engine {
     const canvas = gl.getCanvas();
     gl.fitBounds([box.west, box.south, box.east, box.north], {
       padding: this.#padding(canvas.clientWidth, canvas.clientHeight),
+      maxZoom: FIT,
       duration: calm() ? 0 : 900,
     });
   }
@@ -623,6 +626,7 @@ export class Engine {
     const canvas = gl.getCanvas();
     gl.fitBounds([box.west, box.south, box.east, box.north], {
       padding: this.#padding(canvas.clientWidth, canvas.clientHeight),
+      maxZoom: FIT,
       duration: calm() ? 0 : 750,
       essential: false,
     });
@@ -642,6 +646,7 @@ export class Engine {
     return (
       gl.cameraForBounds([box.west, box.south, box.east, box.north], {
         padding: this.#padding(canvas.clientWidth, canvas.clientHeight),
+        maxZoom: FIT,
       })?.zoom ?? gl.getZoom()
     );
   }

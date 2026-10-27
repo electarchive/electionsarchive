@@ -9165,7 +9165,7 @@ async function framing(area: string, day: string, ks: Array<number> = []) {
     north: number;
   }>(sql`
     with parts as (
-      select a.id, ST_Simplify(d.geom, 0.01, true) as geom, a.scheme_code as scheme
+      select a.id, ST_Simplify(d.geom, least(greatest(ST_XMax(d.geom) - ST_XMin(d.geom), ST_YMax(d.geom) - ST_YMin(d.geom)) / 500, 0.01), true) as geom, a.scheme_code as scheme
       from area a
       join area_geometry g on g.area_id = a.id and g.valid @> ${day}::date
       cross join lateral ST_Dump(g.geom) d
