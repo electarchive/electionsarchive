@@ -4,9 +4,11 @@ import io
 import re
 import subprocess
 import unicodedata
+import zipfile
 from datetime import date, timedelta
 from pathlib import Path
 from uuid import UUID
+from xml.etree import ElementTree
 
 import polars as pl
 from psycopg import Connection
@@ -64,6 +66,13 @@ DOCUMENTS = {
         ks_sos_generals.PUBLISHER,
         ks_sos_generals.TITLE,
         ks_sos_generals.LANDING,
+    ),
+    "SC2010": (
+        SOURCE,
+        "https://www.enr-scvotes.org/SC/19077/40477/reports/detailxml.zip",
+        "South Carolina State Election Commission",
+        "Election night reporting results",
+        "https://www.enr-scvotes.org/SC/19077/40477/en/summary.html",
     ),
     "ME2014": (
         SOURCE,
@@ -298,6 +307,27 @@ def kansas(_: Connection) -> list[tuple[date, str, str, str, int]]:
     )
 
 
+def clarity(
+    conn: Connection, document: str, fips: str, day: date, chamber: str, contest: str
+) -> list[tuple[date, str, str, str, int]]:
+    codes = counties(conn, fips)
+    source, url, *_ = DOCUMENTS[document]
+    with zipfile.ZipFile(raw.cached(source, url).path) as archive:
+        root = ElementTree.fromstring(archive.read("detail.xml"))
+    found = next(item for item in root.iter("Contest") if item.get("text") == contest)
+    rows = []
+    for choice in found.iter("Choice"):
+        name = "WRITE-INS" if choice.get("text") == "WRITE-IN" else str(choice.get("text")).upper()
+        counted = {}
+        for county in choice.iter("County"):
+            code = codes[re.sub(r"[^a-z]", "", str(county.get("name")).lower())]
+            counted[code] = counted.get(code, 0) + int(str(county.get("votes")))
+        if sum(counted.values()) != int(str(choice.get("totalVotes"))):
+            raise ValueError(f"{document} {name}: counties do not sum to the total")
+        rows += [(day, chamber, code, name, votes) for code, votes in counted.items()]
+    return rows
+
+
 def pdf(document: str) -> str:
     source, url, *_ = DOCUMENTS[document]
     return subprocess.run(
@@ -315,6 +345,7 @@ def parse() -> None:
                 ("ME2014", maine),
                 ("DE2006", delaware),
                 ("KS2002", kansas),
+                ("SC2010", lambda conn: clarity(conn, "SC2010", "45", date(2010, 11, 2), "senate", "U.S. Senate")),
                 ("NM2002", lambda conn: elstats(conn, "NM2002", "35", date(2002, 11, 5), "senate")),
                 ("IN2000U", lambda conn: indiana(conn, "IN2000U")),
                 ("IN2000G", lambda conn: indiana(conn, "IN2000G")),
