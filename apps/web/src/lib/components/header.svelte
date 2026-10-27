@@ -14,9 +14,9 @@
   import { setMode, userPrefersMode } from "mode-watcher";
   import Monogram from "#lib/components/monogram.svelte";
   import Search from "#lib/components/search.svelte";
+  import Term from "#lib/components/term.svelte";
   import { buttonVariants } from "#lib/components/ui/button/index.js";
   import * as DropdownMenu from "#lib/components/ui/dropdown-menu/index.js";
-  import * as Tooltip from "#lib/components/ui/tooltip/index.js";
   import { palette } from "#lib/palette.svelte.js";
   import { m } from "#lib/paraglide/messages.js";
   import { cn } from "#lib/utils.js";
@@ -43,19 +43,13 @@
           >{m.wordmark()}</span
         >
       </a>
-      <Tooltip.Root delayDuration={150}>
-        <Tooltip.Trigger
-          class="absolute -inset-e-3 inset-bs-[calc(100%-0.375rem)] -rotate-3 cursor-help rounded-[2px] bg-marker px-1 text-[0.625rem]/[0.9rem] font-[780] tracking-[0.02em] text-[#15171a] transition-transform hover:rotate-0 focus-visible:outline-2 focus-visible:outline-ring motion-reduce:transition-none max-sm:-inset-e-0.5"
-          >{m.beta_label()}</Tooltip.Trigger
-        >
-        <Tooltip.Content
-          side="bottom"
-          align="start"
-          collisionPadding={8}
-          class="leading-snug max-inline-60"
-          >{m.beta_definition()}</Tooltip.Content
-        >
-      </Tooltip.Root>
+      <Term
+        class="absolute -inset-e-3 inset-bs-[calc(100%-0.375rem)] -rotate-3 rounded-[2px] bg-marker px-1 text-[0.625rem]/[0.9rem] font-[780] tracking-[0.02em] text-[#15171a] no-underline transition-transform hover:rotate-0 focus-visible:outline-2 focus-visible:outline-ring motion-reduce:transition-none max-sm:-inset-e-0.5"
+        label={m.beta_label()}
+        definition={m.beta_definition()}
+        side="bottom"
+        align="start"
+      />
     </div>
     <div class="flex items-center gap-2 max-sm:gap-0">
       <Search />

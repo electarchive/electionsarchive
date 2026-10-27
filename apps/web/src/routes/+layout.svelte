@@ -12,6 +12,7 @@
   import { setContext } from "svelte";
   import { on } from "svelte/events";
   import ConfirmationDialog from "#lib/components/confirmation-dialog.svelte";
+  import Explain from "#lib/components/explain.svelte";
   import Header from "#lib/components/header.svelte";
   import Provenance from "#lib/components/provenance.svelte";
   import Shahmaran from "#lib/components/shahmaran.svelte";
@@ -216,4 +217,5 @@
   <ProgressBar class="text-marker" displayThresholdMs={300} />
   <ConfirmationDialog />
   <Provenance />
+  <Explain />
 </QueryClientProvider>

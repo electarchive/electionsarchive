@@ -4,6 +4,7 @@
   import PartyCard from "#lib/components/party-card.svelte";
   import PersonCard from "#lib/components/person-card.svelte";
   import * as HoverCard from "#lib/components/ui/hover-card/index.js";
+  import { isTouch, show } from "#lib/explain.svelte.js";
   import { WITHIN } from "#lib/party.js";
   import { cn } from "#lib/utils.js";
 
@@ -26,8 +27,6 @@
   } = $props();
 
   const scope = getContext<(() => string | null) | undefined>(WITHIN);
-
-  let open = $state(false);
 </script>
 
 {#snippet face()}
@@ -43,7 +42,7 @@
 {#if person == null && party == null}
   <span class={className}>{@render face()}</span>
 {:else}
-  <HoverCard.Root bind:open openDelay={280} closeDelay={120}>
+  <HoverCard.Root openDelay={280} closeDelay={120}>
     <HoverCard.Trigger>
       {#snippet child({ props })}
         <a
@@ -55,12 +54,18 @@
             className,
           )}
           onclick={(event) => {
-            if (
-              event instanceof PointerEvent &&
-              (event.pointerType === "touch" || event.pointerType === "pen")
-            ) {
-              event.preventDefault();
-              open = !open;
+            if (isTouch(event)) {
+              show(
+                event,
+                person == null
+                  ? {
+                      kind: "party",
+                      id: party ?? "",
+                      color,
+                      within: scope?.() ?? null,
+                    }
+                  : { kind: "person", id: person },
+              );
             }
           }}
           role={undefined}

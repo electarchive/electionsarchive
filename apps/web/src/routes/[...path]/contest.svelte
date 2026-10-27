@@ -1814,23 +1814,15 @@
         </Tooltip.Root>
       {/if}
       {#if contest.target != null}
-        <Tooltip.Root disableCloseOnTriggerClick>
-          <Tooltip.Trigger
-            class="shrink-0 rounded-xs highlighter px-1 text-[0.8125rem] font-semibold"
-          >
-            {contest.comparison.label === "exact"
-              ? m.quality_exact()
-              : m.quality_estimated()}
-          </Tooltip.Trigger>
-          <Tooltip.Content
-            collisionPadding={8}
-            class="leading-snug max-inline-64"
-          >
-            {contest.comparison.label === "exact"
-              ? m.quality_exact_detail()
-              : m.quality_estimated_detail()}
-          </Tooltip.Content>
-        </Tooltip.Root>
+        <Term
+          class="shrink-0 rounded-xs highlighter px-1 text-[0.8125rem] font-semibold no-underline"
+          label={contest.comparison.label === "exact"
+            ? m.quality_exact()
+            : m.quality_estimated()}
+          definition={contest.comparison.label === "exact"
+            ? m.quality_exact_detail()
+            : m.quality_estimated_detail()}
+        />
       {/if}
     </div>
     {#if !question}

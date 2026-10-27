@@ -1,4 +1,6 @@
 <script lang="ts" module>
+  import { isTouch } from "#lib/explain.svelte.js";
+
   let pressed: DOMRect | null = null;
   let isWatching = false;
 
@@ -12,7 +14,7 @@
       "pointerdown",
       (event) => {
         const trigger =
-          event.target instanceof Element
+          event.target instanceof Element && !isTouch(event)
             ? event.target.closest("[data-tooltip-trigger]")
             : null;
         pressed = trigger?.getBoundingClientRect() ?? null;
@@ -48,8 +50,11 @@
   import { Tooltip as TooltipPrimitive } from "bits-ui";
   import { onMount } from "svelte";
 
-  let { open = $bindable(false), ...restProps }: TooltipPrimitive.RootProps<T> =
-    $props();
+  let {
+    open = $bindable(false),
+    ignoreNonKeyboardFocus = true,
+    ...restProps
+  }: TooltipPrimitive.RootProps<T> = $props();
 
   onMount(watch);
 </script>
@@ -63,5 +68,6 @@
       }
     }
   }
+  {ignoreNonKeyboardFocus}
   {...restProps}
 />
