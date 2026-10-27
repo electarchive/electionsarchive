@@ -374,6 +374,12 @@ def emit(
             value: entity
             for value, entity in conn.execute("select value, entity_id from external_id where scheme = 'us.party'").fetchall()
         }
+        for duplicate, survivor in (
+            ("NY:democratic", "democratic-party"),
+            ("NY:republican", "republican-party"),
+            ("NY:independence", "NY:independence-party"),
+        ):
+            cs.merge(cs.key("us.party", duplicate), cs.key("us.party", survivor))
         crossing = {
             (era, bid)
             for era, bid, count in (

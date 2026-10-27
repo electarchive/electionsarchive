@@ -5057,6 +5057,9 @@ def emit() -> Path:
             normalized = label.replace(" Of ", " of ").replace(" And ", " and ")
             canonical = PARTIES.get(normalized, normalized)
             titles[(state, label)] = canonical
+            if (state, canonical) == ("NY", "Reform Party"):
+                parties[(state, label)] = cs.key("us.party", "NY:reform-party")
+                continue
             national = canonical in NATIONAL
             if state == "NJ" and not national:
                 parties[(state, label)] = None
