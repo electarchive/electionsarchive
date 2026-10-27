@@ -129,7 +129,12 @@
     width: number;
     height: number;
   } | null>(null);
-  let nook = $state({ isTop: false, isEnd: false, isCompact: false });
+  let nook = $state({
+    isTop: false,
+    isEnd: false,
+    isCompact: false,
+    isPlaced: false,
+  });
   let inset: HTMLElement | null = null;
   let footprint = { width: 0, height: 0 };
   let upHeight = $state(0);
@@ -335,7 +340,13 @@
       return null;
     }
     const { extent } = context;
-    if (sight.width * sight.height >= extent.width * extent.height * 0.35) {
+    const latitude =
+      2 * Math.atan(Math.exp(-(sight.y + sight.height / 2) / 6378.137)) -
+      Math.PI / 2;
+    if (
+      Math.sqrt(sight.width * sight.height) * Math.cos(latitude) >= 40 ||
+      sight.width * sight.height >= extent.width * extent.height * 0.35
+    ) {
       return null;
     }
     return {
@@ -365,7 +376,13 @@
     };
   }
   function nestle() {
-    if (overview == null || inset == null) {
+    if (
+      overview == null ||
+      inset == null ||
+      engine.gl?.getLayer("fill") == null ||
+      !engine.gl.isSourceLoaded(source) ||
+      !engine.gl.areTilesLoaded()
+    ) {
       return;
     }
     if (!nook.isCompact) {
@@ -377,40 +394,51 @@
       { isTop: true, isEnd: false },
       { isTop: isNarrow, isEnd: true },
     ].map((spot) => {
-      const x = spot.isEnd ? boxWidth - 8 - footprint.width : 8;
-      const y = spot.isTop
-        ? 8 + (spot.isEnd || up == null ? 0 : upHeight + 8)
-        : boxHeight - 8 - footprint.height;
-      let hits = 0;
-      for (let column = 0; column < 5; column += 1) {
-        for (let row = 0; row < 4; row += 1) {
-          const point = {
-            x: x + (footprint.width * (column + 0.5)) / 5,
-            y: y + (footprint.height * (row + 0.5)) / 4,
-          };
-          if (
-            engine.pick(point, ["fill", "nested-fill"]) != null &&
-            engine.pick(point, ["veil"]) == null
-          ) {
-            hits += 1;
+      const share = (scale: number) => {
+        const width = footprint.width * scale + 12;
+        const height = footprint.height * scale + 12;
+        const x = spot.isEnd ? boxWidth - 8 - width : 8;
+        const y = spot.isTop
+          ? 8 + (spot.isEnd || up == null ? 0 : upHeight + 8)
+          : boxHeight - 8 - height;
+        let hits = 0;
+        for (let column = 0; column <= 6; column += 1) {
+          for (let row = 0; row <= 5; row += 1) {
+            const point = {
+              x: x + (width * column) / 6,
+              y: y + (height * row) / 5,
+            };
+            if (
+              engine.pick(point, ["fill", "nested-fill"]) != null &&
+              engine.pick(point, ["veil"]) == null
+            ) {
+              hits += 1;
+            }
           }
         }
-      }
-      return { ...spot, share: hits / 20 };
+        return hits / 42;
+      };
+      const full = share(1);
+      const compact = full === 0 ? 0 : share(0.5);
+      return { ...spot, rank: full === 0 ? 0 : 1 + compact };
     });
-    const best = scored.toSorted((a, b) => a.share - b.share)[0];
+    const best = scored.toSorted((a, b) => a.rank - b.rank)[0];
     if (best == null) {
       return;
     }
     const held =
-      scored.find(
-        (spot) => spot.isTop === nook.isTop && spot.isEnd === nook.isEnd,
-      ) ?? best;
-    const chosen = best.share < held.share - 0.1 ? best : held;
+      (nook.isPlaced
+        ? scored.find(
+            (spot) => spot.isTop === nook.isTop && spot.isEnd === nook.isEnd,
+          )
+        : null) ?? best;
+    const chosen =
+      held.rank - best.rank > (best.rank > 1 ? 0.1 : 0) ? best : held;
     nook = {
       isTop: chosen.isTop,
       isEnd: chosen.isEnd,
-      isCompact: chosen.share > (nook.isCompact ? 0.15 : 0.3),
+      isCompact: chosen.rank > 0,
+      isPlaced: true,
     };
   }
   const outer = untrack(() => (own == null ? null : engine.tiles(own.tiles)));
@@ -1822,7 +1850,10 @@
       {#key `${nook.isTop}:${nook.isEnd}`}
         <button
           type="button"
-          class="group absolute grid justify-items-center gap-1 rounded-sm bg-card/95 p-1.5 shadow-menu ring-1 ring-border hover:bg-secondary"
+          class={cn(
+            "group absolute grid justify-items-center gap-1 rounded-sm bg-card/95 p-1.5 shadow-menu ring-1 ring-border transition-opacity duration-150 hover:bg-secondary motion-reduce:transition-none",
+            { "pointer-events-none opacity-0": !nook.isPlaced },
+          )}
           style:inset-inline-start={nook.isEnd ? null : "8px"}
           style:inset-inline-end={nook.isEnd ? "8px" : null}
           style:inset-block-start={nook.isTop
@@ -1838,7 +1869,10 @@
           }}
           {@attach (node) => {
             inset = node;
-            untrack(nestle);
+            untrack(() => {
+              nestle();
+              engine.gl?.once("idle", nestle);
+            });
           }}
           transition:fade|global={{ duration: calm ? 0 : 160 }}
           data-export-skip
