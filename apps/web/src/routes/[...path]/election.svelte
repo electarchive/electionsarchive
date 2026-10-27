@@ -905,7 +905,7 @@
             ? (MEASURES[race.measure]?.() ?? m.col_votes())
             : m.col_votes_first(),
         isSlate: race.kind === "elector_slate",
-        isTally: election.isIndirect || race.measure === "electoral_votes",
+        isTally: election.isIndirect || race.isTally,
         seated: (seated.length === 0 &&
         race.kind === "body_seats" &&
         race.body != null &&

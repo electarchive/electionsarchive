@@ -21,7 +21,7 @@ import {
   type Tier,
 } from "#lib/coverage.js";
 import { count, date, definite, percent, plural, points } from "#lib/format.js";
-import { isDerived, VACANCIES } from "#lib/outcomes.js";
+import { isDerived, MEASURES, VACANCIES } from "#lib/outcomes.js";
 import { m } from "#lib/paraglide/messages.js";
 import { getLocale } from "#lib/paraglide/runtime.js";
 import { AFFILIATIONS, RELATIONS } from "#lib/relations.js";
@@ -2278,7 +2278,7 @@ function electionMarkdown(
         filled += row.seats ?? 0;
       }
       const hasSeats = filled > 1;
-      const isTally = election.isIndirect || race.measure === "electoral_votes";
+      const isTally = election.isIndirect || race.isTally;
       const hasParty = race.results.some(
         (row) =>
           row.person != null &&
@@ -4091,7 +4091,7 @@ function resultsMarkdown(
       ...(said == null ? [] : [said, ""]),
       ...contest.declared.rows.map(
         (row) =>
-          `- ${row.label}${row.short == null || row.short === row.label ? "" : ` (${row.short})`}: ${outcome(row.outcome)}`,
+          `- ${row.label}${row.short == null || row.short === row.label ? "" : ` (${row.short})`}: ${outcome(row.outcome)}${row.seats == null ? "" : ` (${(contest.kind === "delegate_allocation" ? m.col_delegates : m.col_seats)().toLocaleLowerCase()}: ${count(row.seats)})`}`,
       ),
     ].join("\n");
   }
@@ -4125,7 +4125,9 @@ function resultsMarkdown(
           (contest.count?.stv != null && contest.count.round === 1) ||
           (contest.isStv && contest.count == null)
             ? m.stv_first()
-            : m.col_votes(),
+            : ((isTally
+                ? MEASURES[contest.current?.measure ?? ""]?.()
+                : undefined) ?? m.col_votes()),
           ...(isTally ? [] : [m.col_share()]),
           ...(hasSeats ? [m.col_seats()] : []),
           ...(hasElectors
@@ -4144,7 +4146,7 @@ function resultsMarkdown(
           ...(hasOutcome ? [m.col_result()] : []),
         ],
         results,
-      )}\n\n${contest.ballot != null ? m.stat_votes_cast() : contest.count != null && contest.count.stv == null && contest.count.round > 1 ? m.stat_final_round() : m.stat_valid()}: ${count(contest.current.valid)}${contest.ballot == null ? "" : `. ${m.term_votes_cast({ count: String(contest.ballot) })}`}${
+      )}\n\n${contest.ballot != null ? m.stat_votes_cast() : contest.count != null && contest.count.stv == null && contest.count.round > 1 ? m.stat_final_round() : contest.current.isTally ? m.regions_total() : m.stat_valid()}: ${count(contest.current.valid)}${contest.ballot == null ? "" : `. ${m.term_votes_cast({ count: String(contest.ballot) })}`}${
         contest.turnout == null || contest.turnout.registered === 0
           ? ""
           : `\n\n${m.stat_turnout()}: ${percent(contest.turnout.voters / contest.turnout.registered)} (${m.stat_turnout_count({ voters: count(contest.turnout.voters), registered: count(contest.turnout.registered) })})${contest.turnout.basis === "rejected" ? ` ${m.turnout_basis_rejected()}` : contest.turnout.basis === "valid" ? ` ${m.turnout_basis_valid()}` : ""}`
@@ -4317,7 +4319,9 @@ function placesMarkdown(
           row.leader == null ? null : (row.earlier?.[row.leader] ?? null);
         return [
           link(row.name, row.path),
-          ...(isTally && row.leader != null && row.valid > 0
+          ...((isTally || row.isTally === true) &&
+          row.leader != null &&
+          row.valid > 0
             ? [
                 places.legend[row.leader]?.label ?? null,
                 count(Math.round((row.shares[row.leader] ?? 0) * row.valid)),
@@ -4329,7 +4333,7 @@ function placesMarkdown(
                   ? null
                   : places.legend.length === 1
                     ? m.map_unopposed()
-                    : isTally
+                    : isTally || row.isTally === true
                       ? `+${count(Math.round(row.margin * row.valid))}`
                       : points(row.margin),
               ]
@@ -4347,6 +4351,19 @@ function placesMarkdown(
       }),
     ),
     ...(reconciled == null ? [] : [reconciled]),
+    ...(isTally || places.rows.every((row) => row.isTally !== true)
+      ? []
+      : [
+          m.places_tallied({
+            names: new Intl.ListFormat(getLocale(), {
+              type: "conjunction",
+            }).format(
+              places.rows
+                .filter((row) => row.isTally === true)
+                .map((row) => row.name),
+            ),
+          }),
+        ]),
     ...((places.pending?.length ?? 0) === 0
       ? []
       : [

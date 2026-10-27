@@ -2675,6 +2675,7 @@
 
 {#snippet readout(isSheet = false)}
   {#if current != null}
+    {const tallied = $derived(isTally || current.isTally === true)}
     <span class="flex items-baseline justify-between gap-3">
       <span class="font-semibold text-pretty">{current.name}</span>
       {#if moved?.from != null && moved.to != null && moved.from !== moved.to}
@@ -2692,7 +2693,7 @@
         {const lead = $derived(Math.round(current.margin * current.valid))}
         <span
           class="shrink-0 font-figures text-xs text-muted-foreground tabular-nums"
-          >{isTally
+          >{tallied
             ? `${lead > 0 ? "+" : ""}${count(lead)}`
             : points(current.margin)}</span
         >
@@ -2713,7 +2714,7 @@
           <span
             class="flex items-baseline gap-2 font-figures text-xs tabular-nums"
           >
-            {#if moved != null && !isTally}
+            {#if moved != null && !tallied}
               <span class="text-muted-foreground"
                 >{points(
                   (moved.after[entry.index] ?? 0) -
@@ -2721,7 +2722,7 @@
                 )}</span
               >
             {/if}
-            {isTally
+            {tallied
               ? count(Math.round(entry.share * current.valid))
               : percent(entry.share, precision(current.margin))}</span
           >

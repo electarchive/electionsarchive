@@ -49,6 +49,7 @@ const MEASURES = new Map([
   [8, "list_votes"],
   [11, "electoral_votes"],
   [12, "state_delegate_equivalents"],
+  [27, "caucus_delegates"],
 ]);
 const KINDS = ["shared", "each", "combined"] as const;
 const COUNTED = sql`${sql.param(MEASURES.keys().toArray())}::int2[]`;
@@ -474,6 +475,7 @@ const PlaceRow = v.object({
   within: v.optional(v.number()),
   seats: v.optional(v.nullable(v.number())),
   isCounted: v.optional(v.boolean()),
+  isTally: v.optional(v.boolean()),
   declared: v.optional(
     v.nullable(
       v.object({
@@ -1087,6 +1089,7 @@ async function load(
     {
       side: Side;
       measure: string;
+      isTally: boolean;
       appointed: number | null;
       complete: boolean;
       ks: Array<number>;
@@ -1268,6 +1271,21 @@ async function load(
       area.votes.set(row.option, (area.votes.get(row.option) ?? 0) + row.value);
     }
   }
+  const delegated = new Set(
+    counts
+      .filter((row) => row.main === 12 || row.main === 27)
+      .map((row) => row.set),
+  );
+  const aligned = new Set(
+    delegated.size === 0
+      ? []
+      : (
+          await db.execute<{ set: number }>(sql`
+            select s.k as set from unnest(${sql.param([...delegated])}::int[]) as s(k)
+            where exists (select from result_value v where v.result_set_k = s.k and v.measure in (17, 18))
+          `)
+        ).rows.map((row) => row.set),
+  );
   const optionKs = new Set(tallies.keys());
 
   const options = await db.execute<{
@@ -1657,6 +1675,10 @@ async function load(
         backing: backers,
       },
       measure: MEASURES.get(area.main) ?? "votes",
+      isTally:
+        area.main === 11 ||
+        ((area.main === 12 || area.main === 27) &&
+          !sets.some((set) => aligned.has(set.k))),
       appointed: appointed > 0 ? appointed : null,
       complete: area.complete,
       ks: sets.map((set) => set.k),
@@ -3062,6 +3084,7 @@ async function tabulate(
       before,
       split: elects[index]?.split ?? null,
       valid: current?.side.valid ?? 0,
+      isTally: current?.isTally === true,
     };
   });
   const silent = rows.flatMap((row, index) =>
@@ -3097,7 +3120,7 @@ async function tabulate(
       left join candidacy cy on cy.option_id = o.id and cy.role = 'head'
       left join entity_merge m on m.entity_id = cy.person_id
       where x.result_set_id = rs.id and x.kind in ('elected', 'won')
-      order by o.k limit 1
+      order by x.seats desc nulls last, o.k limit 1
     ) w on true
     where c.id = any(${sql.param(silent)}::uuid[])
   `);
@@ -3191,7 +3214,7 @@ async function tabulate(
       party: item.party,
     })),
     rows: compared.map(
-      ({ row, result, leader, also, before, split, valid }) => {
+      ({ row, result, leader, also, before, split, valid, isTally }) => {
         const runner = result.find(
           (entry) =>
             entry.current != null &&
@@ -3213,6 +3236,7 @@ async function tabulate(
           contest: row.isContest,
           isRemainder: row.isRemainder ?? false,
           isCounted: row.isCounted,
+          ...(isTally && { isTally }),
           valid,
           shares: kept.map(
             (item) =>
@@ -4585,6 +4609,7 @@ export const contests = {
                 outcome: v.string(),
                 note: v.nullable(v.string()),
                 isDeclined: v.boolean(),
+                seats: v.nullable(v.number()),
               }),
             ),
           }),
@@ -5081,8 +5106,9 @@ export const contests = {
             outcome: string;
             note: string | null;
             declined: boolean;
+            seats: number | null;
           }>(sql`
-             select distinct on (o.k) o.id as key, rs.kind::text, coalesce(pm.into_id, o.party_id) as party, o.ballot_label as label,
+             select distinct on (o.k) o.id as key, x.seats, rs.kind::text, coalesce(pm.into_id, o.party_id) as party, o.ballot_label as label,
                (select coalesce(m.into_id, cy.person_id) from candidacy cy left join entity_merge m on m.entity_id = cy.person_id
                 where cy.option_id in (o.id, o.parent_option_id) and cy.role = 'head'
             and not exists (select from candidacy cz where cz.option_id = cy.option_id and cz.role = 'head' and cz.id <> cy.id)
@@ -5460,6 +5486,7 @@ export const contests = {
                   outcome: row.outcome,
                   note: row.note,
                   isDeclined: row.declined,
+                  seats: row.seats,
                 })),
               },
         turnout: roll.turnout,
@@ -7101,7 +7128,7 @@ export const contests = {
           isAllied: current.side.options.some(
             (option) => option.alliance != null && option.votes > 0,
           ),
-          isTally: contest.indirect || current.measure === "electoral_votes",
+          isTally: contest.indirect || current.isTally,
         },
         electors:
           electors.length === 0
@@ -10868,6 +10895,7 @@ async function races(
           .toArray(),
         spread: spread.rows,
         measure: here?.measure ?? "votes",
+        isTally: here?.isTally ?? false,
         valid: here?.side.valid ?? 0,
         results: isPrimaries ? [] : results,
         isPrimaries,
@@ -11306,6 +11334,7 @@ export const elections = {
               }),
             ),
             measure: v.string(),
+            isTally: v.boolean(),
             valid: v.number(),
             results: v.array(
               v.object({

@@ -108,6 +108,7 @@
     list_votes: m.term_list_votes,
     electoral_votes: m.term_electoral_votes,
     state_delegate_equivalents: m.term_state_delegate_equivalents,
+    caucus_delegates: m.term_caucus_delegates,
     live: m.term_stage_live,
     preliminary: m.term_stage_preliminary,
     official: m.term_stage_official,
@@ -1474,6 +1475,13 @@
                 hasSwatch={false}
                 party={row.party}
               />
+            {/if}
+            {#if row.seats != null}
+              <span
+                class="ms-1 font-figures text-[0.8125rem] text-muted-foreground tabular-nums"
+                >{SEATS[contest.kind]?.() ?? m.col_seats()}
+                {count(row.seats)}</span
+              >
             {/if}
             {#if row.note == null || row.isDeclined}
               <span

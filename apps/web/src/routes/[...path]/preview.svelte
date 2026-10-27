@@ -156,7 +156,7 @@
                 {/if}
               </span>
               <span class="font-figures text-xs tabular-nums"
-                >{contest.current?.measure === "electoral_votes"
+                >{contest.current?.isTally === true
                   ? count(row.current?.votes ?? 0)
                   : percent(row.current?.share ?? 0)}</span
               >

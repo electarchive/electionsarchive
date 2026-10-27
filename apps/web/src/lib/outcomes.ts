@@ -26,6 +26,7 @@ export const MEASURES: Record<string, () => string> = {
   list_votes: m.measure_list_votes,
   electoral_votes: m.measure_electoral_votes,
   state_delegate_equivalents: m.measure_state_delegate_equivalents,
+  caucus_delegates: m.measure_caucus_delegates,
 };
 export const isDerived = (note: string) => note.startsWith("Derived: ");
 export const explain = (note: string) =>

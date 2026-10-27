@@ -371,6 +371,7 @@
 
 {#snippet breakdown(row: (typeof visible)[number] | undefined)}
   {#if row != null}
+    {const tallied = $derived(isTally || row.isTally === true)}
     {const ranked = $derived(
       row.shares
         .map((share, index) => ({ share, index }))
@@ -386,8 +387,8 @@
       <span class="font-semibold">{row.name}</span>
       <span
         class={cn("grid items-baseline gap-x-3 gap-y-0.5 text-xs", {
-          "grid-cols-[minmax(0,1fr)_auto]": isTally,
-          "grid-cols-[minmax(0,1fr)_auto_auto]": !isTally,
+          "grid-cols-[minmax(0,1fr)_auto]": tallied,
+          "grid-cols-[minmax(0,1fr)_auto_auto]": !tallied,
         })}
       >
         {#each ranked.slice(0, 8) as entry (entry.index)}
@@ -404,13 +405,13 @@
           </span>
           <span
             class={cn("text-end font-figures tabular-nums", {
-              "opacity-70": !isTally,
+              "opacity-70": !tallied,
             })}
             >{row.valid > 0
               ? count(Math.round(entry.share * row.valid))
               : ""}</span
           >
-          {#if !isTally}
+          {#if !tallied}
             <span class="text-end font-figures tabular-nums"
               >{percent(entry.share)}</span
             >
@@ -428,7 +429,7 @@
         <span class="text-xs opacity-80"
           >{m.col_margin()}
           <span class="font-figures tabular-nums"
-            >{isTally
+            >{tallied
               ? `+${count(Math.round(row.margin * row.valid))}`
               : points(row.margin)}</span
           ></span
@@ -922,7 +923,7 @@
                       class="font-figures text-[0.8125rem] text-muted-foreground tabular-nums"
                       >{#if row.valid === 0}{@render status(
                           row,
-                        )}{:else if isTally}{count(
+                        )}{:else if isTally || row.isTally === true}{count(
                           Math.round((row.shares[row.leader] ?? 0) * row.valid),
                         )}{:else}{@render cite(
                           percent(row.shares[row.leader] ?? 0),
@@ -969,7 +970,7 @@
                   <span class="font-sans text-muted-foreground"
                     >{m.map_unopposed()}</span
                   >
-                {:else if row.margin != null && isTally}
+                {:else if row.margin != null && (isTally || row.isTally === true)}
                   {`+${count(Math.round(row.margin * row.valid))}`}
                 {:else if row.margin != null}
                   {@render cite(
