@@ -173,6 +173,13 @@ OFFICIAL = {
         "November 2026 list of elections",
         ["https://hosting.okelections.gov/electionlist.html"],
     ),
+    "NY": (
+        "New York State Board of Elections",
+        "Certification for the November 3, 2026 general election",
+        [
+            "https://elections.ny.gov/system/files/documents/2026/10/accessible-2026-general-ballot-certification-10.7.2026.pdf#MF-126"
+        ],
+    ),
     "AS": (
         "American Samoa Election Office",
         "Candidates for the 2026 midterm election",
@@ -449,6 +456,42 @@ def read(state: str, path: Path) -> list[tuple[str, int | None, str, str]]:
                 )
                 district = int(house[1]) if house else None
         return rows
+    if state == "NY":
+        layout = subprocess.run(
+            ["pdftotext", "-bbox-layout", str(path), "-"], capture_output=True, text=True, check=True
+        ).stdout
+        office: str | None = None
+        district: int | None = None
+        lines: dict[tuple[str, int | None, str], list[str]] = {}
+        for page in re.findall(r"<page[^>]*>(.*?)</page>", layout, re.DOTALL):
+            sections: list[tuple[str | None, int | None, list[tuple[float, float, str]]]] = [(office, district, [])]
+            for left, top, bottom, block in re.findall(
+                r'<block xMin="([\d.]+)" yMin="([\d.]+)" xMax="[\d.]+" yMax="([\d.]+)">(.*?)</block>', page, re.DOTALL
+            ):
+                texts = [
+                    html.unescape(" ".join(re.findall(r">([^<]+)</word>", line)))
+                    for line in re.findall(r"<line[^>]*>(.*?)</line>", block, re.DOTALL)
+                ]
+                texts = [text for text in texts if text not in ("Governor", "Lt. Governor", "Candidate Name", "Party")]
+                if texts and texts[0] == "Office:":
+                    race = texts[1]
+                    office = {
+                        "Governor and Lt. Governor": "governor",
+                        "Representative in Congress": "house",
+                        "United States Senator": "senate",
+                    }.get(race)
+                    found = [text for text in texts if text.startswith("District:")]
+                    district = int(found[0].split()[-1]) if office == "house" and found else None
+                    sections.append((office, district, []))
+                elif texts and float(left) < 220 and not texts[0].startswith("Certification"):
+                    sections[-1][2].append((float(left), (float(top) + float(bottom)) / 2, " ".join(texts)))
+            for section_office, section_district, blocks in sections:
+                parties = [(middle, text) for left, middle, text in blocks if left < 100]
+                for left, middle, text in blocks:
+                    if section_office and left >= 100 and parties:
+                        party = min(parties, key=lambda entry: abs(entry[0] - middle))[1]
+                        lines.setdefault((section_office, section_district, text), []).append(party)
+        return [(office, district, text, "/".join(parties)) for (office, district, text), parties in lines.items()]
     if state in ("AS", "MP"):
         flat = html.unescape(re.sub(r"\s*\|[\s|]*", " | ", re.sub(r"<[^>]+>", "|", path.read_text())))
         if state == "AS":
@@ -677,6 +720,17 @@ def fetch() -> None:
             except LookupError:
                 if url.endswith("#browser"):
                     print(f"{url} is a browser scrape; store it with raw.store")
+                    continue
+                if "#MF-" in url:
+                    delivered = next((DATA / "inbox" / "manual" / url.split("#")[1]).iterdir())
+                    raw.store(
+                        SOURCE,
+                        url,
+                        delivered.read_bytes(),
+                        suffix=delivered.suffix,
+                        retrieved_at=datetime.fromtimestamp(delivered.stat().st_mtime, UTC),
+                        media_type="",
+                    )
                     continue
             if url == FL_URL:
                 response = httpx.post(
