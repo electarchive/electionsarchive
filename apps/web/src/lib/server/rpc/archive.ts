@@ -941,6 +941,7 @@ function separate(
   colors: Map<string, string>,
   votes: Array<readonly [string | null, number]>,
   branch: Map<string, string> = new Map(),
+  isHued = false,
 ) {
   const weight = new Map<string, number>();
   for (const [party, count] of votes) {
@@ -976,48 +977,62 @@ function separate(
     const green = 1.9779984951 * l - 2.428592205 * m + 0.4505937099 * s;
     const blue = 0.0259040371 * l + 0.7827717662 * m - 0.808675766 * s;
     const hue = Math.atan2(blue, green);
-    const candidates = VARIANTS.filter(
-      ([step]) => shown + step >= 0.52 && shown + step <= 0.86,
-    ).map(([step, turn]) => {
-      const lightness = shown + step;
-      let chroma = Math.hypot(green, blue);
-      let fitted = { at: [lightness, green, blue], rgb: [0, 0, 0] };
-      for (let attempt = 0; attempt < 24; attempt++) {
-        const at = [
-          lightness,
-          chroma * Math.cos(hue + turn),
-          chroma * Math.sin(hue + turn),
-        ];
-        const [cl = 0, cm = 0, cs = 0] = [
-          0.3963377774 * (at[1] ?? 0) + 0.2158037573 * (at[2] ?? 0),
-          -0.1055613458 * (at[1] ?? 0) - 0.0638541728 * (at[2] ?? 0),
-          -0.0894841775 * (at[1] ?? 0) - 1.291485548 * (at[2] ?? 0),
-        ].map((value) => (lightness + value) ** 3);
-        fitted = {
-          at,
-          rgb: [
-            4.0767416621 * cl - 3.3077115913 * cm + 0.2309699292 * cs,
-            -1.2684380046 * cl + 2.6097574011 * cm - 0.3413193965 * cs,
-            -0.0041960863 * cl - 0.7034186147 * cm + 1.707614701 * cs,
-          ],
-        };
-        if (fitted.rgb.every((value) => value >= -0.0005 && value <= 1.0005)) {
-          break;
+    const candidates = (
+      isHued
+        ? VARIANTS.toSorted(
+            (a, c) =>
+              Number(a[1] === 0 && a[0] !== 0) -
+              Number(c[1] === 0 && c[0] !== 0),
+          )
+        : VARIANTS
+    )
+      .filter(([step]) => shown + step >= 0.52 && shown + step <= 0.86)
+      .map(([step, turn]) => {
+        const lightness = shown + step;
+        let chroma = Math.hypot(green, blue);
+        let fitted = { at: [lightness, green, blue], rgb: [0, 0, 0] };
+        for (let attempt = 0; attempt < 24; attempt++) {
+          const at = [
+            lightness,
+            chroma * Math.cos(hue + turn),
+            chroma * Math.sin(hue + turn),
+          ];
+          const [cl = 0, cm = 0, cs = 0] = [
+            0.3963377774 * (at[1] ?? 0) + 0.2158037573 * (at[2] ?? 0),
+            -0.1055613458 * (at[1] ?? 0) - 0.0638541728 * (at[2] ?? 0),
+            -0.0894841775 * (at[1] ?? 0) - 1.291485548 * (at[2] ?? 0),
+          ].map((value) => (lightness + value) ** 3);
+          fitted = {
+            at,
+            rgb: [
+              4.0767416621 * cl - 3.3077115913 * cm + 0.2309699292 * cs,
+              -1.2684380046 * cl + 2.6097574011 * cm - 0.3413193965 * cs,
+              -0.0041960863 * cl - 0.7034186147 * cm + 1.707614701 * cs,
+            ],
+          };
+          if (
+            fitted.rgb.every((value) => value >= -0.0005 && value <= 1.0005)
+          ) {
+            break;
+          }
+          chroma *= 0.9;
         }
-        chroma *= 0.9;
-      }
-      return {
-        ...fitted,
-        kept: step === 0 && turn === 0,
-        distance: Math.min(
-          ...placed.map((other) =>
-            Math.hypot(
-              ...fitted.at.map((value, index) => value - (other[index] ?? 0)),
+        return {
+          ...fitted,
+          kept: step === 0 && turn === 0,
+          distance: Math.min(
+            ...placed.map((other) =>
+              Math.hypot(
+                ...fitted.at.map(
+                  (value, index) =>
+                    (value - (other[index] ?? 0)) *
+                    (isHued && index === 0 ? 0.5 : 1),
+                ),
+              ),
             ),
           ),
-        ),
-      };
-    });
+        };
+      });
     const best =
       candidates.find((candidate) => candidate.distance >= 0.1) ??
       candidates.toSorted((a, c) => c.distance - a.distance).at(0);
@@ -3133,6 +3148,17 @@ async function tabulate(
     .toSorted((a, b) => b.votes - a.votes);
   const kept = ranked.filter((item, index) => index < 8 || item.lead);
   const position = new Map(kept.map((item, index) => [item.key, index]));
+  const relit = new Map(
+    kept.flatMap((item) =>
+      item.color == null ? [] : [[item.key, item.color] as const],
+    ),
+  );
+  separate(
+    relit,
+    kept.map((item) => [item.key, item.votes] as const),
+    new Map(),
+    true,
+  );
   return {
     isAllied: now.some((loaded) =>
       loaded
@@ -3147,7 +3173,7 @@ async function tabulate(
       key: item.key,
       label: item.label,
       short: item.key.startsWith("person:") ? null : item.short,
-      color: item.color,
+      color: relit.get(item.key) ?? item.color,
       person:
         item.key.startsWith("person:") ||
         (item.people.size === 1 && rows.every((row) => !row.isContest))
