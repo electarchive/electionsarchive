@@ -3349,7 +3349,7 @@ function contestMarkdown(
             ];
           }),
         ]),
-    resultsMarkdown(contest, then),
+    resultsMarkdown(contest, then, link),
     ...(additional != null || !lists?.isOpen
       ? []
       : [
@@ -3919,6 +3919,7 @@ function countMarkdown(contest: Extract<Data, { kind: "contest" }>["contest"]) {
 function resultsMarkdown(
   contest: Extract<Data, { kind: "contest" }>["contest"],
   then: string | null,
+  link: Link,
 ) {
   let won = 0;
   for (const row of contest.rows) {
@@ -3936,6 +3937,9 @@ function resultsMarkdown(
   const hasParty = contest.rows.some(
     (row) => row.current?.person != null && row.short != null,
   );
+  const named = contest.rows.filter((row) => row.current?.person != null);
+  const isWrittenIn =
+    named.length > 0 && named.every((row) => row.current?.isWriteIn === true);
   const joined = new Intl.ListFormat(getLocale(), { type: "conjunction" });
   const parties = new Map(
     contest.rows.map((row) => [
@@ -3972,10 +3976,22 @@ function resultsMarkdown(
     .filter(
       (row) => row.current != null || (then != null && row.earlier != null),
     )
-    .map(({ key, label, current, earlier, delta }) => [
-      current?.isIncumbent === true && current.person != null
-        ? m.results_incumbent_twin({ name: label })
-        : label,
+    .map(({ key, label, current, earlier, delta, ballot }) => [
+      [
+        current?.isIncumbent === true && current.person != null
+          ? m.results_incumbent_twin({ name: label })
+          : label,
+        ...(!isWrittenIn &&
+        current?.isWriteIn === true &&
+        current.person != null
+          ? [`(${m.results_write_in().toLowerCase()})`]
+          : []),
+        ...(ballot == null
+          ? []
+          : [
+              `(${m.results_ballot_elsewhere({ contest: link(ballot.name, ballot.path) }).replace(/^./u, (first) => first.toLowerCase())})`,
+            ]),
+      ].join(" "),
       ...(hasParty
         ? [
             (current ?? earlier)?.person == null
@@ -4048,7 +4064,7 @@ function resultsMarkdown(
   }
   return contest.current == null || results.length === 0
     ? m.no_results()
-    : `${table(
+    : `${isWrittenIn ? `${m.results_all_write_ins()}\n\n` : ""}${table(
         [
           contest.rows.some((row) => row.key.startsWith("answer:"))
             ? m.col_answer()

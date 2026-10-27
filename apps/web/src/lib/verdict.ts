@@ -269,6 +269,18 @@ export function verdict(contest: Page["contest"]) {
     return null;
   }
   const isWon = ["won", "elected"].includes(top.current.outcome ?? "");
+  const written = contest.rows.filter((row) => row.current?.person != null);
+  if (
+    isWon &&
+    written.length > 0 &&
+    written.every((row) => row.current?.isWriteIn === true)
+  ) {
+    return m.race_lede_write_ins({
+      name: named(top),
+      votes: count(top.current.votes),
+      total: count(contest.current.valid),
+    });
+  }
   const withdrew = contest.rows.find(
     (row) => row.current?.outcome === "withdrew",
   );

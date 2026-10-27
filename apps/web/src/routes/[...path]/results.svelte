@@ -19,6 +19,7 @@
   import { provenance } from "#lib/provenance.svelte.js";
   import { cn } from "#lib/utils.js";
   import type { PageData } from "./$types";
+  import Preview from "./preview.svelte";
 
   const {
     rows,
@@ -55,6 +56,12 @@
     rows.some((row) => row.key.startsWith("answer:")),
   );
 
+  const isWrittenIn = $derived.by(() => {
+    const named = rows.filter((row) => row.current?.person != null);
+    return (
+      named.length > 0 && named.every((row) => row.current?.isWriteIn === true)
+    );
+  });
   const crowned = $derived.by(() => {
     let total = 0;
     for (const row of rows) {
@@ -311,6 +318,11 @@
     {m.compare_unpaired()}
   </p>
 {/if}
+{#if isWrittenIn}
+  <p class="px-2 pbs-1 text-[0.8125rem] text-muted-foreground">
+    {m.results_all_write_ins()}
+  </p>
+{/if}
 <Download
   class="-mbe-2 justify-end"
   name="results"
@@ -524,6 +536,11 @@
                     >{m.results_incumbent()}</span
                   >
                 {/if}
+                {#if page?.isWriteIn === true && page.person != null && !isWrittenIn}
+                  <span class="ms-1 text-xs text-muted-foreground"
+                    >{m.results_write_in()}</span
+                  >
+                {/if}
                 {#if page?.outcome != null && (seats == null || line.mark != null)}
                   {#if page.note == null}
                     <span
@@ -605,6 +622,21 @@
                         />{/if}{/each}{backer.tail}</span
                   >
                 {/each}
+                {#if row.ballot != null}
+                  {const parts = $derived(
+                    m
+                      .results_ballot_elsewhere({ contest: "\u0001" })
+                      .split("\u0001"),
+                  )}
+                  <span
+                    class="block text-[0.8125rem] text-pretty text-muted-foreground"
+                    >{parts[0]}{#if row.ballot.path == null}{row.ballot
+                        .name}{:else}<Preview
+                        class="text-foreground underline decoration-border underline-offset-4 hover:decoration-foreground"
+                        path={row.ballot.path}>{row.ballot.name}</Preview
+                      >{/if}{parts[1]}</span
+                  >
+                {/if}
                 {#if row.backed != null}
                   <span class="block text-[0.8125rem] text-muted-foreground"
                     >{m.backed({ name: row.backed })}</span

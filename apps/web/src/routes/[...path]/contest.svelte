@@ -2453,11 +2453,25 @@
           </dd>
         </div>
         <div class="flex items-baseline gap-2">
+          {const listed = $derived(
+            contest.rows.filter(
+              (row) => row.current != null && row.current.isWriteIn !== true,
+            ).length,
+          )}
           <dt class="text-[0.8125rem] text-muted-foreground">
-            <Term label={m.stat_options()} definition={m.term_options()} />
+            {#if listed === 0}
+              <Term
+                label={m.stat_written_in()}
+                definition={m.term_written_in()}
+              />
+            {:else}
+              <Term label={m.stat_options()} definition={m.term_options()} />
+            {/if}
           </dt>
           <dd class="font-figures text-xl font-[760] tracking-[-0.015em]">
-            {contest.rows.filter((row) => row.current != null).length}
+            {listed === 0
+              ? contest.rows.filter((row) => row.current?.person != null).length
+              : listed}
           </dd>
         </div>
       {/if}

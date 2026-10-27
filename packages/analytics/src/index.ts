@@ -44,6 +44,7 @@ export type Cell = {
   note: string | null;
   isIndependent: boolean;
   isIncumbent?: boolean;
+  isWriteIn: boolean;
   seats: number | null;
   lines: Array<{ label: string; votes: number }>;
 };
@@ -118,6 +119,7 @@ function tally(side: Side, identify: (option: Option) => string) {
           note: option.note ?? null,
           isIndependent: option.isIndependent ?? false,
           isIncumbent: false,
+          isWriteIn: option.kind === "write_in",
           seats: option.seats,
           lines: [],
         },
@@ -130,6 +132,7 @@ function tally(side: Side, identify: (option: Option) => string) {
     group.cell.outcome ??= option.outcome;
     group.cell.note ??= option.note ?? null;
     group.cell.isIndependent &&= option.isIndependent ?? false;
+    group.cell.isWriteIn &&= option.kind === "write_in";
     if (option.seats != null) {
       group.cell.seats = (group.cell.seats ?? 0) + option.seats;
     }

@@ -432,6 +432,7 @@ const Cell = v.nullable(
     note: v.optional(v.nullable(v.string())),
     isIndependent: v.optional(v.boolean()),
     isIncumbent: v.optional(v.boolean()),
+    isWriteIn: v.optional(v.boolean()),
     seats: v.nullable(v.number()),
     lines: v.array(v.object({ label: v.string(), votes: v.number() })),
   }),
@@ -1298,6 +1299,15 @@ async function load(
       case when o.contest_id in (select id from covered) then exists (
           select from candidacy cy left join entity_merge m on m.entity_id = cy.person_id
           where cy.option_id = o.id and cy.role = 'head' and ${tenured(sql`coalesce(m.into_id, cy.person_id)`, sql`o.contest_id`)}
+            and (o.kind <> 'write_in' or exists (
+              select from tenure wt
+              join contest wk on wk.id = o.contest_id
+              join election we on we.id = wk.election_id
+              left join seat ws on ws.id = wt.seat_id
+              left join contest wc on wc.id = wt.contest_id
+              where wt.person_id in (cy.person_id, m.into_id) and ${holding("wt", sql`we.date_from`)}
+                and coalesce(ws.district_area_id, wc.district_area_id) = wk.district_area_id
+            ))
         )
         else exists (select from candidacy cy where cy.option_id = o.id and cy.role = 'head' and cy.is_incumbent)
       end as incumbent,
@@ -4656,6 +4666,11 @@ export const contests = {
             supported: v.array(
               v.object({ party: v.string(), label: v.string() }),
             ),
+            ballot: v.optional(
+              v.nullable(
+                v.object({ name: v.string(), path: v.nullable(v.string()) }),
+              ),
+            ),
           }),
         ),
         targets: v.array(
@@ -6767,7 +6782,7 @@ export const contests = {
       const electoral = new Map(
         ballots == null ? [] : electors.map((row) => [row.person, row.votes]),
       );
-      const [faces, attended, backers] = await Promise.all([
+      const [faces, attended, backers, elsewhere] = await Promise.all([
         portraits(
           rows.flatMap(
             (row) => row.current?.person ?? row.earlier?.person ?? [],
@@ -6796,6 +6811,73 @@ export const contests = {
           left join entity_merge pm on pm.entity_id = n.party_id
           where o.contest_id = ${contest.id}::uuid
         `),
+        (async () => {
+          const written = rows.flatMap((row) =>
+            row.current?.isWriteIn === true && row.current.person != null
+              ? [row.current.person]
+              : [],
+          );
+          if (written.length === 0) {
+            return new Map<string, { name: string; path: string | null }>();
+          }
+          const found = await db.execute<{
+            person: string;
+            contest: string;
+            party: string | null;
+            place: string | null;
+          }>(sql`
+            select distinct on (w.person) w.person, k.id as contest, k.party_scope_id as party, k.district_area_id as place
+            from unnest(${sql.param(written)}::uuid[]) w(person)
+            join candidacy cy on cy.role = 'head' and (
+              cy.person_id = w.person or cy.person_id in (select entity_id from entity_merge where into_id = w.person)
+            )
+            join contest_option o on o.id = cy.option_id and o.kind in ('candidate', 'ticket')
+            join contest k on k.id = o.contest_id and k.election_id = ${contest.election}::uuid and k.id <> ${contest.id}::uuid
+            order by w.person, k.district_area_id is not distinct from ${contest.place?.id ?? null}::uuid desc, (
+                select max(x.value) from result_set rs
+                cross join lateral (select x.value from result_rollup x where x.result_set_k = rs.k and x.option_k = o.k offset 0) x
+                where rs.contest_id = k.id and ${latest("rs")}
+              ) desc nulls last, k.id
+          `);
+          const ids = found.rows.map((row) => row.contest);
+          const [called, linked] = await Promise.all([
+            names(
+              [
+                ...ids,
+                ...found.rows.flatMap((row) =>
+                  [row.party, row.place].filter((id) => id != null),
+                ),
+              ],
+              contest.date,
+            ),
+            paths(ids),
+          ]);
+          return new Map(
+            found.rows.map((row) => {
+              const party =
+                called.short.get(row.party ?? "") ??
+                called.full.get(row.party ?? "");
+              return [
+                row.person,
+                {
+                  name:
+                    party == null
+                      ? (called.full.get(row.contest) ?? "").replace(
+                          /^\d{4} /u,
+                          "",
+                        )
+                      : row.place != null && row.place === contest.place?.id
+                        ? m.ballot_primary_here({ party })
+                        : m.ballot_primary({
+                            party,
+                            place: called.full.get(row.place ?? "") ?? "",
+                          }),
+                  path: linked.get(row.contest) ?? null,
+                },
+              ];
+            }),
+          );
+        })(),
       ]);
       const backed = await names(
         [...new Set(backers.rows.map((row) => row.party))],
@@ -6893,6 +6975,10 @@ export const contests = {
             photo:
               faces.get(row.current?.person ?? row.earlier?.person ?? "") ??
               null,
+            ballot:
+              row.current?.isWriteIn === true
+                ? (elsewhere.get(row.current.person ?? "") ?? null)
+                : null,
             nominated:
               nominated.length > 1 || nominated[0]?.isOwn === false
                 ? nominated.map(({ party, label }) => ({ party, label }))
