@@ -44,7 +44,7 @@
   import Places from "./places.svelte";
   import Preview from "./preview.svelte";
   import Results from "./results.svelte";
-  import Rounds from "./rounds.svelte";
+  import Road from "./road.svelte";
   import Seats from "./seats.svelte";
   import Series from "./series.svelte";
   import Shift from "./shift.svelte";
@@ -1401,7 +1401,47 @@
   {/if}
 </header>
 
-<Rounds {rounds} {cycle} />
+<Road {rounds} {cycle}>
+  {#snippet more()}
+    {#if cycle.others.length > 0}
+      <details class="text-[0.8125rem]">
+        <summary
+          class="cursor-pointer text-muted-foreground marker:text-border hover:text-foreground"
+        >
+          {m.cycle_parts()}
+          <span class="font-figures tabular-nums"
+            >{count(cycle.others.length)}</span
+          >
+        </summary>
+        <ul class="mbs-1.5 grid gap-x-6 gap-y-1 xl:grid-cols-2">
+          {#each cycle.others as other (other.party.id)}
+            <li class="grid gap-x-3 sm:grid-cols-[9.5rem_minmax(0,1fr)]">
+              <Name
+                class="truncate font-medium"
+                label={other.party.label}
+                color={other.party.color}
+              />
+              <span class="flex flex-wrap gap-x-2.5">
+                {#each other.races as race, index (index)}
+                  {#if race.path == null || race.isCurrent}
+                    <span class={cn({ "font-semibold": race.isCurrent })}
+                      >{race.place}</span
+                    >
+                  {:else}
+                    <Preview
+                      class="underline decoration-border underline-offset-4 hover:decoration-foreground"
+                      path={race.path}>{race.place}</Preview
+                    >
+                  {/if}
+                {/each}
+              </span>
+            </li>
+          {/each}
+        </ul>
+      </details>
+    {/if}
+  {/snippet}
+</Road>
 
 {#if contest.current == null && contest.declared != null}
   <section class="col-span-12 grid gap-2.5 bg-card px-3.5 py-4">
@@ -2049,10 +2089,6 @@
 {/if}
 
 <Cycle
-  primaries={[]}
-  general={null}
-  others={[]}
-  othersTitle={m.cycle_others()}
   day={{
     ...cycle.day,
     groups: cycle.day.groups.flatMap((group, index) =>

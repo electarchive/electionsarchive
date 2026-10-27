@@ -27,7 +27,6 @@
   import Alongside from "./alongside.svelte";
   import Balance from "./balance.svelte";
   import ByElections from "./byelections.svelte";
-  import Cycle from "./cycle.svelte";
   import Electors from "./electors.svelte";
   import Gains from "./gains.svelte";
   import Councils from "./councils.svelte";
@@ -40,6 +39,7 @@
   import Preview from "./preview.svelte";
   import Regions from "./regions.svelte";
   import Results from "./results.svelte";
+  import Road from "./road.svelte";
   import Seated from "./seated.svelte";
   import Tiers from "./tiers.svelte";
   import Winners from "./winners.svelte";
@@ -1723,41 +1723,76 @@
     </section>
   {/if}
 
-  <Cycle
-    primaries={cycle.primaries.map((primary) => ({
-      ...primary,
-      key: primary.id,
-      label:
-        primary.party == null
-          ? primary.name
-          : primary.until == null
-            ? m.cycle_primary({ party: primary.party.label })
-            : m.cycle_primaries({ party: primary.party.label }),
-      color: primary.party?.color ?? null,
-      runoff: null,
-      local: null,
-    }))}
-    general={cycle.general == null
-      ? null
-      : { ...cycle.general, winners: [], local: null }}
-    others={cycle.parts.map((part) => ({
-      key: part.place,
-      label: part.place,
-      color: null,
-      races: part.races.map((race) => ({
-        ...race,
-        label: [
-          race.date == null
-            ? null
-            : monthDay.format(new Date(`${race.date}T00:00:00Z`)),
-          race.party?.short ?? race.party?.label ?? null,
-        ]
-          .filter((part) => part != null)
-          .join(", "),
+  <Road
+    rounds={[]}
+    cycle={{
+      primaries: cycle.primaries.map((primary) => ({
+        ...primary,
+        isMinor: false,
+        runoff: null,
+        local: null,
       })),
-    }))}
-    othersTitle={m.cycle_parts()}
-  />
+      general:
+        cycle.general == null
+          ? null
+          : {
+              ...cycle.general,
+              id: cycle.general.path ?? "",
+              until: null,
+              party: null,
+              isMinor: false,
+              winners: [],
+              runoff: null,
+              local: null,
+            },
+    }}
+  >
+    {#snippet more()}
+      {#if cycle.parts.length > 0}
+        <details class="text-[0.8125rem]">
+          <summary
+            class="cursor-pointer text-muted-foreground marker:text-border hover:text-foreground"
+          >
+            {m.cycle_parts()}
+            <span class="font-figures tabular-nums"
+              >{count(cycle.parts.length)}</span
+            >
+          </summary>
+          <ul class="mbs-1.5 grid gap-x-6 gap-y-1 xl:grid-cols-2">
+            {#each cycle.parts as part (part.place)}
+              <li class="grid gap-x-3 sm:grid-cols-[9.5rem_minmax(0,1fr)]">
+                <span class="truncate font-medium">{part.place}</span>
+                <span class="flex flex-wrap gap-x-2.5">
+                  {#each part.races as race, index (index)}
+                    {const label = $derived(
+                      [
+                        race.date == null
+                          ? null
+                          : monthDay.format(new Date(`${race.date}T00:00:00Z`)),
+                        race.party?.short ?? race.party?.label ?? null,
+                      ]
+                        .filter((piece) => piece != null)
+                        .join(", "),
+                    )}
+                    {#if race.path == null || race.isCurrent}
+                      <span class={cn({ "font-semibold": race.isCurrent })}
+                        >{label}</span
+                      >
+                    {:else}
+                      <Preview
+                        class="underline decoration-border underline-offset-4 hover:decoration-foreground"
+                        path={race.path}>{label}</Preview
+                      >
+                    {/if}
+                  {/each}
+                </span>
+              </li>
+            {/each}
+          </ul>
+        </details>
+      {/if}
+    {/snippet}
+  </Road>
 {/snippet}
 
 {#snippet board()}

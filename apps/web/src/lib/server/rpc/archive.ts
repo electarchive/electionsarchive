@@ -361,6 +361,7 @@ const Step = v.object({
   until: v.nullable(v.string()),
   party: v.nullable(PartyRef),
   isCurrent: v.boolean(),
+  isMinor: v.boolean(),
   winners: v.array(Winner),
   runoff: v.nullable(
     v.object({
@@ -8442,7 +8443,17 @@ export const contests = {
         share: number | null;
       }>(sql`
         select x.contest, cy.person_id as person,
-          coalesce(o.party_id, (
+          coalesce((
+            select coalesce(go.party_id, (
+              select l.party_id from contest_option l
+              where l.parent_option_id = go.id and l.party_id is not null
+              order by l.ballot_position nulls last, l.k limit 1
+            ))
+            from candidacy gc join contest_option go on go.id = gc.option_id
+            where gc.person_id = cy.person_id and gc.role = 'head' and go.parent_option_id is null
+              and go.contest_id = ${general?.id ?? null}::uuid
+            limit 1
+          ), o.party_id, (
             select l.party_id from contest_option l
             where l.parent_option_id = o.id and l.party_id is not null
             order by l.ballot_position nulls last, l.k limit 1
@@ -8450,7 +8461,9 @@ export const contests = {
           coalesce(cy.ballot_name, o.ballot_label) as label,
           oc.seats is null or oc.seats = max(oc.seats) over (partition by x.contest) as "isTop",
           (
-            select (sum(r.value) filter (where r.option_k = o.k))::float8 / nullif(sum(r.value), 0)::float8
+            select (sum(r.value) filter (where r.option_k = any(array(
+                select l.k from contest_option l where l.id = o.id or l.parent_option_id = o.id
+              ))))::float8 / nullif(sum(r.value), 0)::float8
             from result_rollup r
             where r.result_set_k = rs.k and r.area_k = spot.k and r.option_k <> 0
               and r.measure = (
@@ -8483,6 +8496,78 @@ export const contests = {
         ) cy on true
         order by x.contest, o.ballot_position nulls last, o.k
       `);
+      const tallied = await db.execute<{
+        contest: string;
+        party: string | null;
+        votes: number | null;
+      }>(sql`
+        select x.contest, coalesce(o.party_id, (
+            select l.party_id from contest_option l
+            where l.parent_option_id = o.id and l.party_id is not null
+            order by l.ballot_position nulls last, l.k limit 1
+          )) as party, (
+            select sum(r.value) from result_rollup r
+            where r.result_set_k = rs.k and r.area_k = spot.k
+              and r.option_k = any(array(
+                select l.k from contest_option l where l.id = o.id or l.parent_option_id = o.id
+              ))
+              and r.measure = (
+                select y.measure from result_rollup y
+                where y.result_set_k = rs.k and y.area_k = spot.k and y.measure = any(${COUNTED})
+                order by array_position(${COUNTED}, y.measure) limit 1
+              )
+              and r.count_round = (
+                select max(y.count_round) from result_rollup y where y.result_set_k = rs.k and y.area_k = spot.k
+              )
+          )::float8 as votes
+        from unnest(${sql.param(steps.map((row) => row.id))}::uuid[]) as x(contest)
+        cross join lateral (
+          select rs.k from result_set rs where rs.contest_id = x.contest
+          order by rs.is_default desc, array_position(${STAGES}, rs.stage)
+          limit 1
+        ) rs
+        cross join lateral (
+          select a.k from contest c join election e on e.id = c.election_id
+          left join polity_territory pt on pt.polity_id = e.polity_id and pt.valid @> e.date_from
+          join area a on a.id = coalesce(c.district_area_id, pt.area_id)
+          where c.id = x.contest limit 1
+        ) spot
+        join contest_option o on o.contest_id = x.contest and o.parent_option_id is null
+      `);
+      const finalists = tallied.rows
+        .filter((row) => row.contest === general?.id)
+        .toSorted((a, b) => (b.votes ?? 0) - (a.votes ?? 0));
+      let cast = 0;
+      for (const row of finalists) {
+        cast += row.votes ?? 0;
+      }
+      const major = new Set(
+        finalists
+          .filter(
+            (row, index) =>
+              row.votes != null && (index < 2 || row.votes >= cast * 0.1),
+          )
+          .flatMap((row) => row.party ?? []),
+      );
+      const turnout = featured
+        .map((row) => {
+          let votes = 0;
+          for (const entry of tallied.rows) {
+            if (entry.contest === row.id) {
+              votes += entry.votes ?? 0;
+            }
+          }
+          return { id: row.id, votes };
+        })
+        .filter((row) => row.votes > 0)
+        .toSorted((a, b) => b.votes - a.votes);
+      const kept = new Set(
+        major.size > 0
+          ? featured
+              .filter((row) => major.has(row.party ?? ""))
+              .map((row) => row.id)
+          : turnout.slice(0, 2).map((row) => row.id),
+      );
       const locals = located.values().toArray();
       const lone = day.rows.filter(
         (row) =>
@@ -8587,6 +8672,7 @@ export const contests = {
           until: row.until === row.date ? null : row.until,
           party: row.party == null ? null : (colors.get(row.party) ?? null),
           isCurrent: row.id === contest.id,
+          isMinor: kept.size > 0 && row.party != null && !kept.has(row.id),
           winners: winners(row.id),
           runoff:
             row.runoff == null
