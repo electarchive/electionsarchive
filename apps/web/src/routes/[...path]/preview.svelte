@@ -120,7 +120,11 @@
       )}
       <div class="grid gap-0.5 px-3 pbs-2.5 pbe-2">
         <p class="text-[1.0625rem]/tight font-[720] text-balance">
-          {contest.scope.noun == null ? contest.name : contest.scope.name}
+          {contest.scope.noun == null
+            ? contest.name
+            : contest.scope.abroad == null
+              ? contest.scope.name
+              : m.scope_abroad_title({ place: contest.scope.name })}
         </p>
         <p class="text-[0.8125rem] text-muted-foreground">
           {contest.scope.noun == null

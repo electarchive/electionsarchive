@@ -3154,11 +3154,22 @@ function contestMarkdown(
               ]),
         ];
   return [
-    `# ${contest.name}`,
+    `# ${
+      contest.scope.noun == null
+        ? contest.name
+        : `${contest.scope.abroad == null ? contest.scope.name : m.scope_abroad_title({ place: contest.scope.name })}, ${contest.name}`
+    }`,
     byline(contest.breadcrumbs, link, contest.election.date),
     contest.scope.trail.length > 1
       ? contest.scope.trail
-          .map((step) => link(step.name, step.path))
+          .map((step) =>
+            link(
+              step.name,
+              step.query == null || step.path == null
+                ? step.path
+                : `${step.path}?${step.query}`,
+            ),
+          )
           .join(" / ")
       : "",
     ...contest.wording.map((row) => {
@@ -3196,17 +3207,28 @@ function contestMarkdown(
             }),
             ...(standing.siblings.count > 1
               ? [
-                  `- ${m.lean_rank({
-                    rank: standing.siblings.rank,
-                    name:
-                      standing.axis[standing.place.margin >= 0 ? 0 : 1]
-                        ?.label ?? "",
-                    count: count(standing.siblings.count),
-                    nouns: plural(standing.siblings.noun),
-                    place: definite(
-                      standing.parent?.name ?? standing.whole.name,
-                    ),
-                  })}`,
+                  `- ${
+                    contest.scope.abroad == null
+                      ? m.lean_rank({
+                          rank: standing.siblings.rank,
+                          name:
+                            standing.axis[standing.place.margin >= 0 ? 0 : 1]
+                              ?.label ?? "",
+                          count: count(standing.siblings.count),
+                          nouns: plural(standing.siblings.noun),
+                          place: definite(
+                            standing.parent?.name ?? standing.whole.name,
+                          ),
+                        })
+                      : m.lean_rank_abroad({
+                          rank: standing.siblings.rank,
+                          name:
+                            standing.axis[standing.place.margin >= 0 ? 0 : 1]
+                              ?.label ?? "",
+                          count: count(standing.siblings.count),
+                          nouns: plural(standing.siblings.noun),
+                        })
+                  }`,
                 ]
               : []),
             ...(standing.place.before == null || standing.previous?.date == null

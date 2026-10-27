@@ -626,6 +626,11 @@
     ),
   );
   const drilled = $derived(contest.scope.noun != null);
+  const heading = $derived(
+    drilled && contest.scope.abroad != null
+      ? m.scope_abroad_title({ place: contest.scope.name })
+      : contest.scope.name,
+  );
   const isLater = $derived(
     contest.count != null &&
       contest.count.stv == null &&
@@ -1165,17 +1170,24 @@
       >
     {/if}
     <h1 class="title" data-scope-title>
-      {drilled ? contest.scope.name : contest.name}
+      {drilled ? heading : contest.name}
     </h1>
     <p
       class="flex flex-wrap items-baseline gap-x-3 gap-y-1 text-[0.9375rem] text-muted-foreground"
     >
       {#if drilled}
         <span class="first-letter:uppercase"
-          >{m.scope_in({
-            noun: contest.scope.noun ?? "",
-            parent: contest.scope.parent ?? "",
-          })}</span
+          >{contest.scope.abroad == null
+            ? m.scope_in({
+                noun: contest.scope.noun ?? "",
+                parent: contest.scope.parent ?? "",
+              })
+            : contest.scope.abroad.electorate == null
+              ? m.scope_abroad_plain({ noun: contest.scope.noun ?? "" })
+              : m.scope_abroad({
+                  noun: contest.scope.noun ?? "",
+                  electorate: contest.scope.abroad.electorate,
+                })}</span
         >
       {:else if contest.election.path == null}
         <span>{contest.election.name}</span>
@@ -1317,10 +1329,19 @@
                 >/</span
               >
             {/if}
-            {#if index < contest.scope.trail.length - 1 && crumb.path != null}
+            {#if crumb.query != null && crumb.path != null}
+              <a
+                class="hover:highlighter"
+                href="{resolve('/[...path]', {
+                  path: crumb.path,
+                })}?{crumb.query}">{crumb.name}</a
+              >
+            {:else if index < contest.scope.trail.length - 1 && crumb.path != null}
               <Preview class="hover:highlighter" path={crumb.path}
                 >{crumb.name}</Preview
               >
+            {:else if index < contest.scope.trail.length - 1}
+              <span class="text-muted-foreground">{crumb.name}</span>
             {:else}
               <span class="font-semibold" aria-current="page">{crumb.name}</span
               >
@@ -2336,6 +2357,7 @@
           rank={found.siblings.rank}
           noun={found.siblings.noun}
           place={found.parent?.name ?? found.whole.name}
+          isAbroad={contest.scope.abroad != null}
           year={found.previous?.date == null
             ? null
             : Number(found.previous.date.slice(0, 4))}

@@ -366,6 +366,30 @@
   "election_annulled": "Annulled",
   "children_title": "Contests that make up this result",
   "scope_in": "{noun} in {parent}",
+  "scope_abroad_title": "Votes cast in {place}",
+  "scope_abroad": "{noun} in the vote abroad ({electorate})",
+  "scope_abroad_plain": "{noun} in the vote abroad",
+  "abroad_crumb": "Abroad",
+  "lean_rank_abroad": [
+    {
+      "declarations": [
+        "input rank",
+        "input name",
+        "input count",
+        "input nouns",
+        "local rankOrdinal = rank: plural type=ordinal"
+      ],
+      "selectors": [
+        "rankOrdinal"
+      ],
+      "match": {
+        "rankOrdinal=one": "{rank}st best for {name} of {count} {nouns} abroad",
+        "rankOrdinal=two": "{rank}nd best for {name} of {count} {nouns} abroad",
+        "rankOrdinal=few": "{rank}rd best for {name} of {count} {nouns} abroad",
+        "rankOrdinal=*": "{rank}th best for {name} of {count} {nouns} abroad"
+      }
+    }
+  ],
   "scope_path": "Geographic path of results",
   "scope_below": "Go one level down, by {noun}",
   "series_label": "This race in other years",

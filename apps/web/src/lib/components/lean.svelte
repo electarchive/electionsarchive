@@ -12,6 +12,7 @@
     rank,
     noun,
     place,
+    isAbroad = false,
     year = null,
     class: className = "",
   }: {
@@ -23,6 +24,7 @@
     rank: number;
     noun: string;
     place: string;
+    isAbroad?: boolean;
     year?: number | null;
     class?: string;
   } = $props();
@@ -146,13 +148,20 @@
           class="shrink-0 bg-[repeating-linear-gradient(90deg,var(--muted-foreground)_0_1px,transparent_1px_3px)] opacity-50 block-3 inline-2.5"
         ></span>
         <span class="text-pretty text-muted-foreground"
-          >{m.lean_rank({
-            rank,
-            name: side.label,
-            count: count(siblings.length),
-            nouns: plural(noun),
-            place: definite(place),
-          })}</span
+          >{isAbroad
+            ? m.lean_rank_abroad({
+                rank,
+                name: side.label,
+                count: count(siblings.length),
+                nouns: plural(noun),
+              })
+            : m.lean_rank({
+                rank,
+                name: side.label,
+                count: count(siblings.length),
+                nouns: plural(noun),
+                place: definite(place),
+              })}</span
         >
       </li>
     {/if}

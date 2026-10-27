@@ -855,6 +855,13 @@ async function descend(contest: Found, unit: string | undefined) {
   return chain;
 }
 
+const ABROAD: Record<string, string> = {
+  br: "Exterior",
+  fr: "Français établis hors de France",
+  it: "Estero",
+  tr: "Yurt dışı",
+};
+
 const UNAFFILIATED = [
   "#0e8f7e",
   "#8250c4",
@@ -4268,10 +4275,12 @@ export const contests = {
           isFine: v.boolean(),
           parent: v.nullable(v.string()),
           home: v.nullable(v.string()),
+          abroad: v.nullable(v.object({ electorate: v.nullable(v.string()) })),
           trail: v.array(
             v.object({
               name: v.string(),
               path: v.nullable(v.string()),
+              query: v.optional(v.string()),
               siblings: v.nullable(
                 v.object({
                   contest: v.string(),
@@ -4945,7 +4954,39 @@ export const contests = {
       const today = new Date().toISOString().slice(0, 10);
       const path = slugs.get(contest.id) ?? null;
       const scopePath = path == null ? null : [path, ...unit].join("/");
-      const trail = [
+      const stops = [
+        ...ancestors.rows.map((row) => row.area),
+        ...chain.map((entry) => entry.id),
+      ];
+      const away = new Set(
+        (
+          await db.execute<{ id: string }>(sql`
+            select a.id from area a
+            where a.id = any(${sql.param(stops.filter((id) => id != null))}::uuid[])
+              and (
+                a.scheme_code = 'world.country'
+                or (
+                  exists (select from reporting_unit_area m where m.area_id = a.id)
+                  and not exists (
+                    select from reporting_unit_area m join reporting_unit r on r.id = m.unit_id
+                    where m.area_id = a.id and r.kind <> 'abroad_mission'
+                  )
+                )
+              )
+          `)
+        ).rows.map((row) => row.id),
+      );
+      const trail: Array<{
+        name: string;
+        path: string | null;
+        query?: string;
+        siblings: {
+          contest: string;
+          unit: string | null;
+          level: string;
+          noun: string;
+        } | null;
+      }> = [
         ...ancestors.rows.map((row, index) => {
           const parent = ancestors.rows[index - 1];
           return {
@@ -4976,6 +5017,22 @@ export const contests = {
           },
         })),
       ];
+      const entered = stops.findIndex((id) => id != null && away.has(id));
+      if (entered !== -1) {
+        const before = trail[entered - 1];
+        trail.splice(entered, 0, {
+          name: m.abroad_crumb(),
+          path: before?.path ?? null,
+          ...(before?.path != null &&
+            chain[entered - ancestors.rows.length] != null && {
+              query: `by=${chain[entered - ancestors.rows.length]?.scheme}`,
+            }),
+          siblings: null,
+        });
+      }
+      const abroad = away.has(stops.at(-1) ?? "")
+        ? { electorate: ABROAD[crumbs[0]?.path?.split("/")[0] ?? ""] ?? null }
+        : null;
       const page = {
         name: labels.full.get(contest.id) ?? "",
         kind: contest.kind,
@@ -4995,6 +5052,7 @@ export const contests = {
           isFine: scoped?.kind === "precinct" || scoped?.kind === "synthetic",
           parent: isRoot ? null : (trail.at(-2)?.name ?? null),
           home: home.rows[0]?.path ?? null,
+          abroad,
           trail,
         },
         series: [],
