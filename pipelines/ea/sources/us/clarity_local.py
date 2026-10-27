@@ -587,7 +587,7 @@ def parse() -> None:
                     if re.match(r"(?i)\s*no (?:nomination|candidate)", label):
                         continue
                     if re.match(
-                        r"(?i)\s*(?:unresolved |unassigned |qualified )?write|scattering|personal choice", label
+                        r"(?i)\s*(?:unresolved |unassigned |qualified )?write|scattering|personal choice|w/?i$", label
                     ):
                         label = "Write-ins"
                     was = label
@@ -790,6 +790,15 @@ def emit() -> Path:
         known_people: dict[str, UUID] = dict(
             conn.execute("select value, entity_id from external_id where scheme = %s", [f"{SOURCE}.person"]).fetchall()
         )
+        polluted = {
+            entity
+            for entity, text in conn.execute(
+                """select n.entity_id, n.text from name n join external_id x on x.entity_id = n.entity_id
+                   where x.scheme = %s and n.is_preferred""",
+                [f"{SOURCE}.person"],
+            ).fetchall()
+            if _label(text)[0] != text
+        }
         for dropped, entity, text in conn.execute(
             """select n.id, n.entity_id, n.text from name n join changeset c on c.id = n.changeset_id
                where c.pipeline = %s and not n.is_preferred
@@ -1177,7 +1186,7 @@ def emit() -> Path:
                         persons[person_key] = cs.key(f"{SOURCE}.person", f"{st}:{code}:{slug(ballot)}")
                         if persons[person_key] in cs.minted:
                             cs.add("person", id=persons[person_key])
-                        if persons[person_key] in cs.minted or old != slug(ballot):
+                        if persons[person_key] in cs.minted or persons[person_key] in polluted:
                             name(persons[person_key], ballot)
                     if (duplicate := known_people.get(f"{st}:{code}:{old}")) is not None and duplicate != persons[
                         person_key
@@ -1288,4 +1297,32 @@ def emit() -> Path:
                 flags=pl.lit(0, pl.Int16),
             ),
         )
+        for candidacy, option, contest, ballot_name in conn.execute(
+            """select y.id, y.option_id, o.contest_id, y.ballot_name from candidacy y
+               join contest_option o on o.id = y.option_id join changeset c on c.id = y.changeset_id
+               where c.pipeline = %s and y.ballot_name ~* '^w/?i$'
+                 and not exists (select from outcome where option_id = o.id)
+                 and not exists (select from result_set r join result_value v on v.result_set_k = r.k
+                                 where r.contest_id = o.contest_id and v.option_k = o.k)""",
+            [SOURCE],
+        ).fetchall():
+            reason = f"{ballot_name} is the write-in total, not a candidate"
+            cs.add("entity_retirement", entity_id=candidacy, reason=reason)
+        for option, contest, label in conn.execute(
+            """select o.id, o.contest_id, o.ballot_label from contest_option o join changeset c on c.id = o.changeset_id
+               where c.pipeline = %s and o.kind = 'candidate' and o.ballot_label ~* '^w/?i$'
+                 and not exists (select from candidacy where option_id = o.id)
+                 and not exists (select from outcome where option_id = o.id)
+                 and not exists (select from result_set r join result_value v on v.result_set_k = r.k
+                                 where r.contest_id = o.contest_id and v.option_k = o.k)""",
+            [SOURCE],
+        ).fetchall():
+            cs.add("option_drop", option_id=option, contest_id=contest, reason=f"{label} has no candidacy left")
+        for person, text in conn.execute(
+            """select n.entity_id, n.text from name n join external_id x on x.entity_id = n.entity_id
+               where x.scheme = %s and n.is_preferred and n.text ~* '^w/?i$'
+                 and not exists (select from candidacy where person_id = n.entity_id)""",
+            [f"{SOURCE}.person"],
+        ).fetchall():
+            cs.add("entity_retirement", entity_id=person, reason=f"{text} is the write-in total, not a candidate")
         return cs.write()

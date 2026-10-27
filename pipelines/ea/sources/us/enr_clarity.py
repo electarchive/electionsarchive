@@ -429,7 +429,9 @@ def _label(label: str) -> tuple[str, str | None]:
     if doubled := re.fullmatch(r"(?i)(dem/rep|rep/dem|dar|nof|noa|ina|dem|rep|lib|grn|ind)\s+(.+?)\s+\(\1\)", label):
         lines.append(doubled[1])
         label = doubled[2]
-    if prefix := re.match(r"(?i:dem/rep|rep/dem)\s+|(DEM|REP|LIB|GRN|IND|CON)\s+(?=\S)", label):
+    if prefix := re.match(
+        r"(?i:dem/rep|rep/dem)\s+|(DEM|REP|LIB|GRN|IND|CON)\s+(?=\S)|(?i:dar|dem|rep)\s+(?=\S+\s+\S)", label
+    ):
         lines.append(prefix[0])
         label = label[prefix.end() :]
     if suffix := re.search(
@@ -1352,6 +1354,7 @@ def emit(
             had.setdefault(candidacy, set()).add(person)
         chosen: set[UUID] = set()
         assigned: dict[UUID, UUID] = {}
+        seated: dict[tuple[UUID, str], UUID] = {}
         systems = {key: cs.key("us.electoral_system", key) for key in ("fptp", "block", "referendum")}
         parties = {key: cs.key("us.party", f"{key}-party") for key in ("republican", "democratic")}
         if cs.minted & {*systems.values(), *parties.values()}:
@@ -2059,6 +2062,7 @@ def emit(
                     cs.renamed.pop(key, None)
                     chosen.add(person)
                     assigned[candidacy] = person
+                    seated[(contest, slug(ballot))] = person
                     if person not in persons:
                         persons.add(person)
                         if person in cs.minted:
@@ -2211,6 +2215,39 @@ def emit(
         for candidacy, person in assigned.items():
             for prior in had.get(candidacy, set()) - chosen:
                 cs.merge(prior, person)
+        for candidacy, option, contest, ballot_name, person in conn.execute(
+            """select y.id, y.option_id, o.contest_id, y.ballot_name, y.person_id from candidacy y
+               join contest_option o on o.id = y.option_id join changeset c on c.id = y.changeset_id
+               where c.pipeline = %s and y.ballot_name is not null and not (y.id = any(%s::uuid[]))
+                 and not exists (select from outcome where option_id = o.id)
+                 and not exists (select from result_set r join result_value v on v.result_set_k = r.k
+                                 where r.contest_id = o.contest_id and v.option_k = o.k)""",
+            [source, list(assigned)],
+        ).fetchall():
+            if WRITE_IN.match(ballot_name):
+                reason = f"{ballot_name} is the write-in total, not a candidate"
+                cs.add("entity_retirement", entity_id=candidacy, reason=reason)
+                people.pop(candidacy, None)
+                continue
+            clean = _label(ballot_name)[0]
+            if clean != ballot_name and (survivor := seated.get((contest, slug(_title(clean))))) is not None:
+                reason = f"{ballot_name} is a stale label for {clean}"
+                cs.add("entity_retirement", entity_id=candidacy, reason=reason)
+                people.pop(candidacy, None)
+                if person != survivor:
+                    cs.merge(person, survivor)
+        staged_options = {str(row["id"]) for row in cs.rows.get("contest_option", [])}
+        for option, contest, label in conn.execute(
+            """select o.id, o.contest_id, o.ballot_label from contest_option o join changeset c on c.id = o.changeset_id
+               where c.pipeline = %s and o.kind = 'candidate'
+                 and not exists (select from candidacy where option_id = o.id)
+                 and not exists (select from outcome where option_id = o.id)
+                 and not exists (select from result_set r join result_value v on v.result_set_k = r.k
+                                 where r.contest_id = o.contest_id and v.option_k = o.k)""",
+            [source],
+        ).fetchall():
+            if str(option) not in staged_options and (WRITE_IN.match(label) or _label(label)[0] != label):
+                cs.add("option_drop", option_id=option, contest_id=contest, reason=f"{label} has no candidacy left")
         kept = set(assigned.values()) | {person for candidacy, person in people.items() if candidacy not in assigned}
         linked = {
             person
