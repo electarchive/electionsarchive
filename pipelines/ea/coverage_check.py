@@ -57,7 +57,7 @@ def database(conn) -> list[str]:
     with (ROOT / ".agents" / "spec" / "finest-reported.csv").open() as f:
         for row in csv.DictReader(f):
             county = row.get("county") or ""
-            if row["finest"] not in ("none", "county", "town", "precinct") or (
+            if row["finest"] not in ("none", "county", "town", "district", "precinct") or (
                 row["finest"] == "precinct" and not (row["source"].strip() and row["url"].strip())
             ):
                 problems.append(f"finest-reported {row['state']} {row['year']} {row['level']}: finest {row['finest']}")
