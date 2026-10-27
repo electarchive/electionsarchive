@@ -1576,8 +1576,17 @@ function polityMarkdown(
             .join(", "),
           ...latest.races.flatMap((race) => {
             const isSeated = race.results.some((row) => row.seats != null);
+            const rounds = [
+              race.first == null ? null : link(m.round_first(), race.first),
+              race.pending == null
+                ? null
+                : (race.pending.isGeneral
+                    ? m.race_next_general
+                    : m.race_next_runoff)({ date: date(race.pending.date) }),
+            ].filter((part) => part != null);
             return [
               `### ${link(race.name, race.path)}`,
+              ...(rounds.length === 0 ? [] : [rounds.join(". ")]),
               race.isPartyless
                 ? m.record_seats_filled({ count: race.contested })
                 : table(
@@ -2186,11 +2195,21 @@ function electionMarkdown(
           ),
         ]),
     ...[...rest.slice(0, at), ...lists, ...rest.slice(at)].flatMap((entry) => {
+      if (entry.isFolded) {
+        return [];
+      }
+      const isOpening =
+        entry.round === 1 &&
+        election.races.some(
+          (other) => other.isFolded && other.name === entry.name,
+        );
       const isRound =
         entry.round != null &&
+        entry.count > 1 &&
         election.races.some(
           (other) =>
             other !== entry &&
+            !other.isFolded &&
             other.name === entry.name &&
             other.round !== entry.round,
         );
@@ -2283,7 +2302,7 @@ function electionMarkdown(
           : ((race.unopposed?.seats ?? 0) * 10 >= filled ||
               (race.multiple ?? 0) > 0
               ? m.race_lede_seats_only
-              : isRound && race.round === 1
+              : (isRound || isOpening) && race.round === 1
                 ? m.race_lede_seats_first
                 : m.race_lede_seats)({
               party: definite(
@@ -2380,9 +2399,33 @@ function electionMarkdown(
           ),
         ];
       }
+      const rounds = [
+        race.first?.path == null
+          ? null
+          : link(m.round_first(), race.first.path),
+        race.pending == null
+          ? null
+          : (race.pending.isGeneral ? m.race_next_general : m.race_next_runoff)(
+              { date: date(race.pending.date) },
+            ),
+      ].filter((part) => part != null);
       return [
         `## ${link(race.name, race.path)}`,
+        ...(rounds.length === 0 ? [] : [rounds.join(". ")]),
         ...(lede == null ? [] : [lede]),
+        ...(race.runoff?.runner == null
+          ? []
+          : [
+              `${(race.runoff.isWon
+                ? m.race_lede_runoff_won
+                : m.race_lede_runoff_led)({
+                party: race.runoff.label,
+                date: date(race.runoff.date),
+                share: percent(race.runoff.share),
+                margin: points(race.runoff.margin).replace(/^\+/u, ""),
+                runner: race.runoff.runner,
+              })} ${link(m.round_runoff(), race.runoff.path)}`,
+            ]),
         ...(race.results.length === 0
           ? []
           : [

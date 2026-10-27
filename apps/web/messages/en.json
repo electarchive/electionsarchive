@@ -692,6 +692,8 @@
   "wards_led": "Led with {share}",
   "wards_round_runoff": "{date} runoff",
   "wards_round_general": "{date} general election",
+  "race_next_runoff": "Runoff on {date}",
+  "race_next_general": "General election on {date}",
   "local_tier_county": "County offices",
   "local_tier_municipal": "Cities and towns",
   "local_top": "Top races",

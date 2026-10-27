@@ -8950,6 +8950,87 @@ async function sketch(
       };
 }
 
+export async function decide(ids: Array<string>) {
+  if (ids.length === 0) {
+    return new Map<
+      string,
+      {
+        first: string;
+        final: string;
+        isPrimary: boolean;
+        next: { id: string; date: string; isGeneral: boolean } | null;
+      }
+    >();
+  }
+  const found = await db.execute<{
+    id: string;
+    first: string;
+    final: string;
+    isPrimary: boolean;
+    next: string | null;
+    date: string | null;
+    isGeneral: boolean | null;
+  }>(sql`
+    with recursive ids(id) as (
+      select distinct x.id from unnest(${sql.param(ids)}::uuid[]) as x(id)
+    ),
+    back(root, id, depth) as (
+      select id, id, 0 from ids
+      union all
+      select back.root, c.previous_round_id, back.depth + 1 from back join contest c on c.id = back.id
+      where c.previous_round_id is not null and back.depth < 8
+    ),
+    ahead(root, id, depth, held, date, kind) as (
+      select id, id, 0, true, null::date, null::text from ids
+      union all
+      select ahead.root, n.id, ahead.depth + 1, n.held, n.date, n.kind from ahead
+      cross join lateral (
+        select n.id, ne.status = 'held' and exists (
+            select from result_set rs where rs.contest_id = n.id and ${latest("rs")}
+          ) as held,
+          ne.date_from as date, ne.kind::text as kind
+        from contest n join election ne on ne.id = n.election_id
+        where n.previous_round_id = ahead.id and ne.status::text not in ('canceled', 'annulled')
+        order by ne.date_from, n.round_number desc, n.id limit 1
+      ) n
+      where ahead.held and ahead.depth < 8
+    ),
+    ends as (
+      select i.id,
+        (select b.id from back b where b.root = i.id order by b.depth desc limit 1) as first,
+        (select a.id from ahead a where a.root = i.id and a.held order by a.depth desc limit 1) as final,
+        (select a.id from ahead a where a.root = i.id and not a.held limit 1) as next,
+        (select a.date::text from ahead a where a.root = i.id and not a.held limit 1) as date,
+        (select a.kind in ('general', 'local') from ahead a where a.root = i.id and not a.held limit 1) as "isGeneral"
+      from ids i
+    )
+    select ends.*, coalesce((
+      select fe.kind = 'primary' and le.kind in ('general', 'local')
+      from contest f join election fe on fe.id = f.election_id, contest l join election le on le.id = l.election_id
+      where f.id = ends.first and l.id = ends.final
+    ), false) as "isPrimary"
+    from ends
+  `);
+  return new Map(
+    found.rows.map((row) => [
+      row.id,
+      {
+        first: row.first,
+        final: row.final,
+        isPrimary: row.isPrimary,
+        next:
+          row.next == null
+            ? null
+            : {
+                id: row.next,
+                date: row.date ?? "",
+                isGeneral: row.isGeneral === true,
+              },
+      },
+    ]),
+  );
+}
+
 async function sequel(
   group: Array<{ isRunoff: boolean; runoffs: Array<string> }>,
   isBrief: boolean,
@@ -9234,7 +9315,7 @@ async function races(
   const owned = found.rows.some((row) => row.isOwn)
     ? found.rows.filter((row) => row.isOwn)
     : found.rows;
-  const groups = Map.groupBy(owned, (row) => row.series)
+  const split = Map.groupBy(owned, (row) => row.series)
     .values()
     .flatMap((group) =>
       group.length > 1 &&
@@ -9244,6 +9325,24 @@ async function races(
         : [group],
     )
     .toArray();
+  const chains = await decide(owned.map((row) => row.id));
+  const lone = new Map(
+    split.flatMap((group) =>
+      group.length === 1 && group[0] != null ? [[group[0].id, group[0]]] : [],
+    ),
+  );
+  const groups = split.filter((group) => {
+    const final = chains.get(group[0]?.id ?? "")?.final;
+    return (
+      group.length > 1 ||
+      final == null ||
+      final === group[0]?.id ||
+      !lone.has(final)
+    );
+  });
+  const homes = new Map(
+    groups.flatMap((group, spot) => group.map((row) => [row.id, spot])),
+  );
   if (nation == null || groups.length === 0) {
     return [];
   }
@@ -9257,7 +9356,10 @@ async function races(
       ]),
       date,
     ),
-    paths(owned.map((row) => row.id)),
+    paths([
+      ...owned.map((row) => row.id),
+      ...chains.values().map((chain) => chain.first),
+    ]),
     branches(day),
   ]);
   const parentOf = new Map(lineage.map((row) => [row.from, row.to]));
@@ -9886,9 +9988,28 @@ async function races(
           ? null
           : carried(previous?.rows ?? null, filled, parentOf);
       const { titled, named } = naming(head, single, groups);
+      const chain = group.length === 1 ? chains.get(head?.id ?? "") : undefined;
+      const sources = new Set(
+        group.map((row) => {
+          const link = chains.get(row.id);
+          return link == null || link.first === row.id
+            ? -1
+            : (homes.get(link.first) ?? -1);
+        }),
+      );
       return {
         map,
         before,
+        first:
+          chain == null || chain.first === head?.id || chain.isPrimary
+            ? null
+            : { path: slugs.get(chain.first) ?? null },
+        pending: chain?.next ?? null,
+        isFolded:
+          group.length > 1 &&
+          sources.size === 1 &&
+          !sources.has(-1) &&
+          (groups[sources.values().next().value ?? -1]?.length ?? 0) > 1,
         isNotional:
           before != null && (previous?.rows ?? []).some((row) => row.notional),
         resized:
@@ -9919,7 +10040,7 @@ async function races(
         round: head?.round ?? null,
         office: head?.office ?? null,
         election: head?.election ?? "",
-        day: head?.day ?? null,
+        day: lone.get(chain?.first ?? "")?.day ?? head?.day ?? null,
         chamber:
           labels.short.get(titled ?? "") ??
           labels.full.get(titled ?? "") ??
@@ -10168,7 +10289,13 @@ async function races(
           isNational && race.count === 1 && (race.body != null || race.isOffice)
             ? chambers.indexOf(chamber) === chambers.lastIndexOf(chamber)
               ? (chamber ?? race.name)
-              : [chamber ?? "", ...race.name.split(", ").slice(1)].join(", ")
+              : race.isRemainder
+                ? m.race_special({ name: chamber ?? race.name })
+                : [
+                    chamber ?? "",
+                    ...race.name.split(", ").slice(1),
+                    ...(race.name.match(/ \(([^)]+)\)$/u)?.slice(1) ?? []),
+                  ].join(", ")
             : race.name;
         return {
           ...race,
@@ -10449,6 +10576,15 @@ export const elections = {
             overall: v.nullable(
               v.array(v.object({ key: v.string(), seats: v.number() })),
             ),
+            first: v.nullable(v.object({ path: v.nullable(v.string()) })),
+            pending: v.nullable(
+              v.object({
+                id: v.string(),
+                date: v.string(),
+                isGeneral: v.boolean(),
+              }),
+            ),
+            isFolded: v.boolean(),
             runoff: v.nullable(
               v.object({
                 path: v.nullable(v.string()),
@@ -11780,6 +11916,14 @@ export const elections = {
       }),
     )
     .handler(async ({ input }) => {
+      const offices = await db.execute<{ id: string }>(sql`
+        select c.id from election k join contest c on c.election_id = k.id and c.kind = 'office'
+        where k.parent_id = ${input.id}::uuid
+      `);
+      const decided = (await decide(offices.rows.map((row) => row.id)))
+        .entries()
+        .filter(([id, chain]) => chain.final !== id)
+        .toArray();
       const found = await db.execute<{
         path: string;
         group: string | null;
@@ -11804,7 +11948,11 @@ export const elections = {
              where cy.option_id = o.id and cy.role = 'head' order by cy.id limit 1) as person,
             ${paint(sql`coalesce(pm.into_id, o.party_id)`, sql`select ${input.id}::uuid`, sql`k.date_from`)} as color
           from contest c
-          join result_set rs on rs.contest_id = c.id and ${latest("rs")}
+          left join unnest(
+            ${sql.param(decided.map(([id]) => id))}::uuid[],
+            ${sql.param(decided.map(([, chain]) => chain.final))}::uuid[]
+          ) as d(id, final) on d.id = c.id
+          join result_set rs on rs.contest_id = coalesce(d.final, c.id) and ${latest("rs")}
           join outcome x on x.result_set_id = rs.id and x.kind in ('elected', 'won') and x.candidacy_id is null
           join contest_option o on o.id = x.option_id
           left join entity_merge pm on pm.entity_id = o.party_id
@@ -14022,6 +14170,10 @@ export const polities = {
             races: v.array(
               v.object({
                 contest: v.nullable(v.string()),
+                first: v.nullable(v.string()),
+                pending: v.nullable(
+                  v.object({ date: v.string(), isGeneral: v.boolean() }),
+                ),
                 name: v.string(),
                 path: v.nullable(v.string()),
                 count: v.number(),
@@ -14362,7 +14514,7 @@ export const polities = {
       ) {
         shown.add(general.date);
       }
-      const [labels, slugs, raced, built] = await Promise.all([
+      const [labels, slugs, summed, built] = await Promise.all([
         names(ids),
         paths(ids),
         recent == null
@@ -14456,6 +14608,7 @@ export const polities = {
             }),
         ),
       ]);
+      const raced = summed.filter((race) => !race.isFolded);
       const tiers =
         Map.groupBy(
           raced.filter(
@@ -14653,23 +14806,26 @@ export const polities = {
                     const namesakes = all.filter(
                       (other) => other !== race && other.name === race.name,
                     );
-                    const isOpening = all.some(
-                      (other) =>
-                        race.kind === "office" &&
-                        other.kind === race.kind &&
-                        other.anchor === race.anchor &&
-                        (other.round ?? 1) > (race.round ?? 1),
-                    );
+                    const isOffice = race.kind === "office";
                     let contested = 0;
                     for (const row of race.results) {
-                      contested += isOpening ? 0 : (row.seats ?? 0);
+                      contested += isOffice ? 0 : (row.seats ?? 0);
                     }
                     return {
                       contest: race.contest,
+                      first: race.first?.path ?? null,
+                      pending:
+                        race.pending == null
+                          ? null
+                          : {
+                              date: race.pending.date,
+                              isGeneral: race.pending.isGeneral,
+                            },
                       name:
                         namesakes.length === 0
                           ? race.name
-                          : namesakes.some(
+                          : race.count > 1 &&
+                              namesakes.some(
                                 (other) =>
                                   (other.round ?? 1) !== (race.round ?? 1),
                               )
@@ -14697,7 +14853,7 @@ export const polities = {
                               !row.isIndependent),
                         ),
                       measure: race.measure,
-                      results: (isOpening
+                      results: (isOffice
                         ? race.results
                             .map((row) => ({ ...row, seats: null }))
                             .toSorted((a, b) => b.votes - a.votes)

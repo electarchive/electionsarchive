@@ -90,18 +90,7 @@
   };
 
   const ordered = $derived.by(() => {
-    const decisive = election.races.findIndex(
-      (race) =>
-        race.path != null && race.path === election.races[0]?.runoff?.path,
-    );
-    const led =
-      decisive < 1
-        ? election.races
-        : [
-            election.races[decisive],
-            ...election.races.filter((_, spot) => spot !== decisive),
-          ].filter((race) => race != null);
-    const grouped = Map.groupBy(led, (race) => race.scope)
+    const grouped = Map.groupBy(election.races, (race) => race.scope)
       .values()
       .flatMap((group) => [
         ...group.filter((race) => race.results.length !== 1),
@@ -575,6 +564,7 @@
       const top = whole?.parts.toSorted((a, b) => b.value - a.value) ?? [];
       const isRound =
         race.round != null &&
+        race.count > 1 &&
         ordered.some(
           (other) =>
             other !== race &&
@@ -1858,6 +1848,19 @@
       <Preview
         class="font-semibold text-foreground underline decoration-border underline-offset-4 hover:decoration-foreground"
         path={race.path}>{m.race_open()}</Preview
+      >
+    {/if}
+    {#if race.first?.path != null}
+      <Preview
+        class="underline decoration-border underline-offset-4 hover:decoration-foreground"
+        path={race.first.path}>{m.round_first()}</Preview
+      >
+    {/if}
+    {#if race.pending != null}
+      <span
+        >{(race.pending.isGeneral ? m.race_next_general : m.race_next_runoff)({
+          date: date(race.pending.date),
+        })}</span
       >
     {/if}
   </p>

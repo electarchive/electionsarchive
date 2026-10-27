@@ -622,6 +622,27 @@
               {/each}
             </ul>
           {/if}
+          {#if race.first != null || race.pending != null}
+            <p
+              class="flex flex-wrap gap-x-3 text-[0.8125rem] text-muted-foreground"
+            >
+              {#if race.first != null}
+                <Preview
+                  class="underline decoration-border underline-offset-4 hover:decoration-foreground"
+                  path={race.first}>{m.round_first()}</Preview
+                >
+              {/if}
+              {#if race.pending != null}
+                <span
+                  >{(race.pending.isGeneral
+                    ? m.race_next_general
+                    : m.race_next_runoff)({
+                    date: date(race.pending.date),
+                  })}</span
+                >
+              {/if}
+            </p>
+          {/if}
         </li>
       {/each}
     </ul>
