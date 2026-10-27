@@ -6370,6 +6370,7 @@ export const contests = {
               color: string | null;
               valid: number;
               margin: number | null;
+              decided: boolean;
               independent: boolean;
               next: {
                 party: string | null;
@@ -6411,6 +6412,7 @@ export const contests = {
                 ${paint(sql`w.party`, sql`${contest.election}::uuid`, sql`p.day`)} as color,
                 coalesce(w.valid, 0)::float8 as valid,
                 case when w.valid > 0 and not p.stv then ((w.first - w.second) / w.valid)::float8 end as margin,
+                coalesce(w.decided, false) as decided,
                 coalesce(w.independent, false) as independent,
                 (
                   select json_build_object(
@@ -6432,7 +6434,7 @@ export const contests = {
                     left join entity_merge m on m.entity_id = ca.person_id
                     where ca.option_id = o.id and ca.role = 'head' limit 1) as person,
                   exists (select from candidacy cy where cy.option_id = o.id and cy.role = 'head' and cy.is_independent) as independent,
-                  t.first, t.second, t.valid, t.next
+                  t.first, t.second, t.valid, t.next, t.decided
                 from (
                   select rs.k, rs.id from result_set rs where rs.contest_id = p.id and ${latest("rs")} limit 1
                 ) rs
@@ -6442,6 +6444,7 @@ export const contests = {
                     case when count(*) filter (where r.elected) > 1 then coalesce(max(r.value) filter (where not r.elected), 0)
                       else coalesce((array_agg(r.value order by r.value desc))[2], 0) end as second,
                     sum(r.value) as valid,
+                    bool_or(r.elected) as decided,
                     (array_agg(r.option_k order by r.seats desc, case when r.filled > 1 then r.total else r.value end desc, r.value desc)
                       filter (where r.elected and r.grp <> r.lead))[1] as next
                   from (
@@ -6516,26 +6519,31 @@ export const contests = {
         if (first == null) {
           return null;
         }
-        const isPersonal =
+        if (
           new Set(found.rows.map((row) => row.party)).size <= 1 &&
-          found.rows.some((row) => row.person != null);
+          found.rows.some((row) => row.person != null)
+        ) {
+          return null;
+        }
         const keyed = (row: {
           party: string | null;
           person: string | null;
           option: number | null;
           independent: boolean;
         }) =>
-          !isPersonal && row.party == null && row.independent
-            ? "independent"
-            : (isPersonal || row.party == null) && row.person != null
-              ? `person:${row.person}`
-              : row.party == null
+          row.party != null
+            ? `party:${row.party}`
+            : row.independent
+              ? "independent"
+              : row.person == null
                 ? `option:${row.option ?? ""}`
-                : `party:${row.party}`;
+                : `person:${row.person}`;
         const own = found.rows.find((row) => row.id === contest.root);
         const legend = Map.groupBy(
           [
-            ...found.rows.filter((row) => row.option != null),
+            ...found.rows.filter(
+              (row) => row.option != null && (row.margin !== 0 || row.decided),
+            ),
             ...found.rows.flatMap((row) =>
               row.next == null ? [] : [row.next],
             ),
@@ -6599,7 +6607,10 @@ export const contests = {
             isRemainder: false,
             valid: row.valid,
             shares: [],
-            leader: row.option == null ? null : (index.get(keyed(row)) ?? null),
+            leader:
+              row.option == null || (row.margin === 0 && !row.decided)
+                ? null
+                : (index.get(keyed(row)) ?? null),
             also:
               row.next == null ? null : (index.get(keyed(row.next)) ?? null),
             margin: row.margin,
