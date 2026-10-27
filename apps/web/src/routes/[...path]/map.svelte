@@ -129,6 +129,10 @@
     width: number;
     height: number;
   } | null>(null);
+  let nook = $state({ isTop: false, isEnd: false, isCompact: false });
+  let inset: HTMLElement | null = null;
+  let footprint = { width: 0, height: 0 };
+  let upHeight = $state(0);
   let still = $state(
     untrack(() =>
       handoff != null &&
@@ -213,9 +217,11 @@
       onReady: () => {
         untrack(setup);
         track();
+        engine.gl?.once("idle", nestle);
       },
       onMove: () => track(),
       onMoveEnd: () => {
+        engine.gl?.once("idle", nestle);
         if (own != null) {
           seen = engine.rendered("veil");
         }
@@ -356,6 +362,55 @@
       y: y(bounds.getNorth()),
       width: x(bounds.getEast()) - x(bounds.getWest()),
       height: y(bounds.getSouth()) - y(bounds.getNorth()),
+    };
+  }
+  function nestle() {
+    if (overview == null || inset == null) {
+      return;
+    }
+    if (!nook.isCompact) {
+      footprint = { width: inset.offsetWidth, height: inset.offsetHeight };
+    }
+    const isNarrow = matchMedia("(width < 40rem)").matches;
+    const scored = [
+      { isTop: false, isEnd: false },
+      { isTop: true, isEnd: false },
+      { isTop: isNarrow, isEnd: true },
+    ].map((spot) => {
+      const x = spot.isEnd ? boxWidth - 8 - footprint.width : 8;
+      const y = spot.isTop
+        ? 8 + (spot.isEnd || up == null ? 0 : upHeight + 8)
+        : boxHeight - 8 - footprint.height;
+      let hits = 0;
+      for (let column = 0; column < 5; column += 1) {
+        for (let row = 0; row < 4; row += 1) {
+          const point = {
+            x: x + (footprint.width * (column + 0.5)) / 5,
+            y: y + (footprint.height * (row + 0.5)) / 4,
+          };
+          if (
+            engine.pick(point, ["fill", "nested-fill"]) != null &&
+            engine.pick(point, ["veil"]) == null
+          ) {
+            hits += 1;
+          }
+        }
+      }
+      return { ...spot, share: hits / 20 };
+    });
+    const best = scored.toSorted((a, b) => a.share - b.share)[0];
+    if (best == null) {
+      return;
+    }
+    const held =
+      scored.find(
+        (spot) => spot.isTop === nook.isTop && spot.isEnd === nook.isEnd,
+      ) ?? best;
+    const chosen = best.share < held.share - 0.1 ? best : held;
+    nook = {
+      isTop: chosen.isTop,
+      isEnd: chosen.isEnd,
+      isCompact: chosen.share > (nook.isCompact ? 0.15 : 0.3),
     };
   }
   const outer = untrack(() => (own == null ? null : engine.tiles(own.tiles)));
@@ -1764,63 +1819,91 @@
       </button>
     </div>
     {#if overview != null && context != null}
-      <button
-        type="button"
-        class="absolute inset-s-2 inset-be-2 grid justify-items-center gap-1 rounded-sm bg-card/95 p-1.5 shadow-menu ring-1 ring-border hover:bg-secondary"
-        aria-label={m.map_context({ place: context.name })}
-        title={m.map_context({ place: context.name })}
-        onclick={() => {
-          if (context != null) {
-            engine.fit(context.frame);
-          }
-        }}
-        transition:fade={{ duration: calm ? 0 : 120 }}
-        data-export-skip
-      >
-        <svg
-          class="inline-28 max-block-24 max-sm:inline-20 max-sm:max-block-16"
-          viewBox="{context.extent.x} {context.extent.y} {context.extent
-            .width} {context.extent.height}"
-          aria-hidden="true"
+      {#key `${nook.isTop}:${nook.isEnd}`}
+        <button
+          type="button"
+          class="group absolute grid justify-items-center gap-1 rounded-sm bg-card/95 p-1.5 shadow-menu ring-1 ring-border hover:bg-secondary"
+          style:inset-inline-start={nook.isEnd ? null : "8px"}
+          style:inset-inline-end={nook.isEnd ? "8px" : null}
+          style:inset-block-start={nook.isTop
+            ? `${8 + (nook.isEnd || up == null ? 0 : upHeight + 8)}px`
+            : null}
+          style:inset-block-end={nook.isTop ? null : "8px"}
+          aria-label={m.map_context({ place: context.name })}
+          title={m.map_context({ place: context.name })}
+          onclick={() => {
+            if (context != null) {
+              engine.fit(context.frame);
+            }
+          }}
+          {@attach (node) => {
+            inset = node;
+            untrack(nestle);
+          }}
+          transition:fade|global={{ duration: calm ? 0 : 160 }}
+          data-export-skip
         >
-          <path
-            d={context.outline}
-            class="fill-muted-foreground/25 stroke-muted-foreground"
-            stroke-width="1"
-            stroke-linejoin="round"
-            vector-effect="non-scaling-stroke"
-          />
-          {#if overview.isDot}
-            <circle
-              cx={overview.cx}
-              cy={overview.cy}
-              r={overview.r}
-              class="fill-foreground stroke-card"
-              stroke-width="1.5"
+          <svg
+            class={cn(
+              "transition-[inline-size,max-block-size] duration-200 ease-out motion-reduce:transition-none",
+              {
+                "inline-28 max-block-24 max-sm:inline-20 max-sm:max-block-16":
+                  !nook.isCompact,
+              },
+              {
+                "inline-12 max-block-10 group-hover:inline-28 group-hover:max-block-24 group-focus-visible:inline-28 group-focus-visible:max-block-24":
+                  nook.isCompact,
+              },
+            )}
+            viewBox="{context.extent.x} {context.extent.y} {context.extent
+              .width} {context.extent.height}"
+            aria-hidden="true"
+          >
+            <path
+              d={context.outline}
+              class="fill-muted-foreground/25 stroke-muted-foreground"
+              stroke-width="1"
+              stroke-linejoin="round"
               vector-effect="non-scaling-stroke"
             />
-          {:else}
-            <rect
-              x={overview.x}
-              y={overview.y}
-              width={overview.width}
-              height={overview.height}
-              class="fill-foreground/15 stroke-foreground"
-              stroke-width="1.5"
-              vector-effect="non-scaling-stroke"
-            />
-          {/if}
-        </svg>
-        <span
-          class="truncate text-[0.6875rem] leading-none text-muted-foreground max-inline-28 max-sm:max-inline-20"
-          >{context.name}</span
-        >
-      </button>
+            {#if overview.isDot}
+              <circle
+                cx={overview.cx}
+                cy={overview.cy}
+                r={overview.r}
+                class="fill-foreground stroke-card"
+                stroke-width="1.5"
+                vector-effect="non-scaling-stroke"
+              />
+            {:else}
+              <rect
+                x={overview.x}
+                y={overview.y}
+                width={overview.width}
+                height={overview.height}
+                class="fill-foreground/15 stroke-foreground"
+                stroke-width="1.5"
+                vector-effect="non-scaling-stroke"
+              />
+            {/if}
+          </svg>
+          <span
+            class={cn(
+              "truncate text-[0.6875rem] leading-none text-muted-foreground max-inline-28 max-sm:max-inline-20",
+              {
+                "hidden group-hover:block group-focus-visible:block":
+                  nook.isCompact,
+              },
+            )}>{context.name}</span
+          >
+        </button>
+      {/key}
     {/if}
     {#if up != null}
       <a
         class="absolute inset-s-2 inset-bs-2 flex items-center gap-1.5 rounded-sm bg-card ps-2 pe-2.5 text-[0.8125rem] font-semibold shadow-menu ring-1 ring-border block-8 max-inline-[calc(100%-4.5rem)] hover:bg-secondary pointer-coarse:block-10"
         href={resolve("/[...path]", { path: up.path })}
+        bind:clientHeight={upHeight}
         data-export-skip
         ><ArrowUpLeftIcon
           class="shrink-0 block-4 inline-4"
