@@ -704,6 +704,7 @@ def attach(
     authoritative: str | None = None,
     declared: dict[str, tuple[str, str]] | None = None,
     empty: bool = False,
+    restage: bool = False,
 ) -> None:
     declared = declared or {}
     tag = str(cs.manifest["pipeline"])
@@ -962,8 +963,14 @@ def attach(
                     kind="caveat",
                     body_md=f"The certified county totals add up to {counted_votes:,} votes. The earlier default set counts {int(official):,}. {authoritative}",
                 )
+        held = (
+            conn.execute("select is_default from result_set where id = %s", [result_set]).fetchone()
+            if restage and result_set not in cs.minted
+            else None
+        )
         if (
             result_set not in cs.minted
+            and not restage
             and not conn.execute(
                 """select 1 from result_set r where r.id = %s
                    and not exists (select from result_value v where v.result_set_k = r.k and v.value <> 0)""",
@@ -995,7 +1002,7 @@ def attach(
             kind="counted",
             status="active",
             source_id=sources[lines["source"][0]],
-            is_default=key in declared or inherited,
+            is_default=key in declared or inherited or (held is not None and held[0]),
             completeness=1
             if authoritative is not None
             else round(

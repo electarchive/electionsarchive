@@ -1,4 +1,5 @@
 import io
+import os
 import re
 import struct
 import zipfile
@@ -8,13 +9,13 @@ from pathlib import Path
 import polars as pl
 import shapefile
 
-from ea import raw
+from ea import precinct_code, raw
 from ea.changeset import Changeset
 from ea.sources.us import medsl, oe_federal
 from ea.store import DATA, connect
 
 SOURCE = "us.swdb_sov"
-VERSION = "1"
+VERSION = "2"
 PARSED = DATA / "parsed" / SOURCE
 SWDB = "https://statewidedatabase.org/pub/data/"
 ELECTIONS = {
@@ -180,9 +181,24 @@ def parse() -> None:
 
 
 def emit() -> Path:
+    years = [int(year) for year in os.environ.get("SWDB_YEARS", "").split(",") if year]
+    counties = [county for county in os.environ.get("SWDB_COUNTIES", "").split(",") if county]
     returns = (
         pl.read_parquet(PARSED / "returns.parquet")
-        .with_columns(measure=pl.lit(1, pl.Int16), writein=pl.lit(False), kind=pl.lit("precinct"), source=pl.lit("CA"))
+        .filter(pl.col("year").is_in(years) if years else pl.lit(True))
+        .with_columns(
+            code=pl.when(pl.col("fips").is_in(counties) if counties else pl.lit(True))
+            .then(
+                precinct_code.expr(
+                    pl.col("year"), pl.col("state"), pl.col("fips"), pl.col("code").str.split(":SOV:").list.last()
+                )
+            )
+            .otherwise("code"),
+            measure=pl.lit(1, pl.Int16),
+            writein=pl.lit(False),
+            kind=pl.lit("precinct"),
+            source=pl.lit("CA"),
+        )
         .group_by(
             "year",
             "chamber",
@@ -235,8 +251,12 @@ def emit() -> Path:
             if day.year in set(returns["year"]):
                 for address in (sov(election), *(codes(election, county) for county in COUNTIES)):
                     cs.artifact(raw.cached(SOURCE, address), source)
-        medsl.attach(cs, conn, returns, {"CA": source}, grain="precinct")
+        medsl.attach(cs, conn, returns, {"CA": source}, grain="precinct", restage=True)
         used = set(pl.concat(cs.frames["result_value"])["unit_id"].unique()) if cs.frames.get("result_value") else set()
+        canonical = returns.filter(~pl.col("code").str.contains(":SOV:"))["code"].unique()
+        precinct_code.units(
+            cs, conn, canonical.filter(canonical.map_elements(lambda code: str(cs.unit("us.precinct", code)) in used))
+        )
         counties = {
             code: (unit, area)
             for code, unit, area in conn.execute(
@@ -244,7 +264,8 @@ def emit() -> Path:
             ).fetchall()
         }
         minted = (
-            returns.group_by("code")
+            returns.filter(pl.col("code").str.contains(":SOV:"))
+            .group_by("code")
             .agg(pl.col("fips").first(), pl.col("day").min())
             .with_columns(
                 id=pl.col("code").map_elements(lambda code: str(cs.unit("us.precinct", code)), return_dtype=pl.String)
