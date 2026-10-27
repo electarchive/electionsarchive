@@ -52,8 +52,8 @@ def picks(states: set[str] = STATES) -> list[tuple[str, int, str]]:
         found: dict[str, dict[bool, list[str]]] = defaultdict(lambda: defaultdict(list))
         for entry in tree["tree"]:
             matched = re.fullmatch(
-                rf"(\d{{4}})/(?:counties/)?((\d{{4}})\d{{4}})__{state.lower()}__(?:general{'|primary' if state in TOP_TWO else ''})"
-                rf"(__[a-z_]+)?__(?:precinct|ward)\.csv",
+                rf"(\d{{4}})/(?:counties/|General/)?((\d{{4}})\d{{4}})__{state.lower()}__(?:general{'|primary' if state in TOP_TWO else ''})"
+                rf"(__?[a-z_]+?)?__(?:precinct|ward)\.csv",
                 entry["path"],
             )
             if entry["type"] == "blob" and matched and int(matched[3]) in YEARS and matched[1] == matched[3]:
@@ -236,6 +236,7 @@ def emit() -> Path:
             returns,
             sources,
             grain="precinct",
+            extend=os.environ.get("OE_EXTEND") == "1",
             redone=frozenset(os.environ.get("OE_REDONE", "").split(",")) - {""},
         )
         used = set(pl.concat(cs.frames["result_value"])["unit_id"].unique()) if cs.frames.get("result_value") else set()
