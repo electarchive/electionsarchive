@@ -20,6 +20,7 @@ type Raster = { ids: Uint32Array; index: Uint8Array | Uint16Array };
 type Options = {
   cooperative?: boolean;
   maxZoom?: number;
+  limit?: Box | null;
   gestures?: Record<string, string>;
   onReady?: () => void;
   onPointer?: (event: {
@@ -497,11 +498,30 @@ export class Engine {
     const width = canvas.clientWidth;
     const height = canvas.clientHeight;
     const box = this.#frame;
-    const camera = gl.cameraForBounds(
+    const limit = this.#options.limit;
+    const padding = this.#padding(width, height);
+    const framed = gl.cameraForBounds(
       [box.west, box.south, box.east, box.north],
-      { padding: this.#padding(width, height) },
+      { padding },
     );
-    if (camera?.zoom == null || camera.center == null || width === 0) {
+    const camera =
+      limit == null
+        ? framed
+        : gl.cameraForBounds(
+            [
+              Math.min(limit.west, box.west),
+              Math.min(limit.south, box.south),
+              Math.max(limit.east, box.east),
+              Math.max(limit.north, box.north),
+            ],
+            { padding },
+          );
+    if (
+      framed == null ||
+      camera?.zoom == null ||
+      camera.center == null ||
+      width === 0
+    ) {
       return;
     }
     const { maplibre } = kit ?? {};
@@ -515,7 +535,7 @@ export class Engine {
     const corner = (x: number, y: number) =>
       new maplibre.MercatorCoordinate(x, y).toLngLat();
     gl.setMaxBounds(null);
-    gl.setMinZoom(Math.max(0, camera.zoom - 0.001));
+    gl.setMinZoom(Math.max(-2, camera.zoom - 0.001));
     gl.setMaxBounds(
       new maplibre.LngLatBounds(
         corner(middle.x - across, middle.y + down),
@@ -523,7 +543,7 @@ export class Engine {
       ),
     );
     if (this.#isFramed) {
-      gl.jumpTo(camera);
+      gl.jumpTo(framed);
     }
   }
 
@@ -539,7 +559,7 @@ export class Engine {
       return;
     }
     gl.setMaxBounds(null);
-    gl.setMinZoom(0);
+    gl.setMinZoom(-2);
     gl.once("moveend", () => this.#hold(gl));
     const canvas = gl.getCanvas();
     gl.fitBounds([box.west, box.south, box.east, box.north], {

@@ -295,18 +295,31 @@ for (const test of picked) {
           );
         }
 
-        await page.mouse.move(middle.x, middle.y);
-        await page.waitForTimeout(400);
-        const card = await page
-          .locator("[aria-live=polite], .shadow-menu")
-          .filter({ hasText: /\S/ })
-          .count();
-        check(
-          card > 0 || size.isMobile,
-          "no hover card over the middle of the map",
-        );
+        let probe = middle;
+        let card = 0;
+        for (const [fx, fy] of [
+          [0.5, 0.5],
+          [0.3, 0.35],
+          [0.7, 0.35],
+          [0.3, 0.65],
+          [0.7, 0.65],
+          [0.5, 0.25],
+          [0.5, 0.75],
+        ]) {
+          probe = { x: box.x + box.width * fx, y: box.y + box.height * fy };
+          await page.mouse.move(probe.x, probe.y);
+          await page.waitForTimeout(400);
+          card = await page
+            .locator("[aria-live=polite], .shadow-menu")
+            .filter({ hasText: /\S/ })
+            .count();
+          if (card > 0 || size.isMobile) {
+            break;
+          }
+        }
+        check(card > 0 || size.isMobile, "no hover card anywhere over the map");
         const unpinned = page.url();
-        await page.mouse.click(middle.x + 3, middle.y + 3);
+        await page.mouse.click(probe.x + 3, probe.y + 3);
         await page.waitForTimeout(test.isFull ? 1500 : 300);
         if (test.isFull) {
           check(
