@@ -74,6 +74,31 @@
       };
     }),
   );
+  const groups = $derived.by(() => {
+    const shown = isOpen ? entries : entries.slice(0, 12);
+    const strays = Map.groupBy(person.scattered, (row) => row.year);
+    const cut = shown.at(-1)?.year ?? Infinity;
+    const all = new Set([
+      ...shown.map((entry) => entry.year),
+      ...strays.keys().filter((year) => isOpen || year >= cut),
+    ]);
+    return [...all]
+      .toSorted((a, b) => b - a)
+      .map((year) => ({
+        year,
+        entries: shown.filter((entry) => entry.year === year),
+        strays: (strays.get(year) ?? []).map((row) => ({
+          ...row,
+          name: row.name.startsWith(`${row.year} `)
+            ? `${row.name.charAt(String(row.year).length + 1).toLocaleUpperCase()}${row.name.slice(String(row.year).length + 2)}`
+            : row.name,
+          share:
+            row.votes == null || row.total == null || row.total === 0
+              ? null
+              : row.votes / row.total,
+        })),
+      }));
+  });
   const races = $derived(entries.map((entry) => entry.outcome));
   const won = $derived(
     races.filter((outcome) => outcome === "elected" || outcome === "won")
@@ -399,125 +424,167 @@
 
     <section class="col-span-12 grid gap-2 bg-card px-3.5 pbs-3 pbe-3.5">
       <h2 class="text-[0.8125rem] font-bold">{m.person_record()}</h2>
-      {#if entries.length === 0}
+      {#if entries.length === 0 && person.scattered.length === 0}
         <p class="text-sm text-muted-foreground">{m.person_empty()}</p>
       {:else}
         <ol class="grid text-sm">
-          {#each isOpen ? entries : entries.slice(0, 12) as entry, index (index)}
-            <li
-              class="grid grid-cols-[3rem_minmax(0,1fr)_7.5rem] items-baseline gap-x-3 border-be border-border/60 py-2 last:border-be-0 max-sm:grid-cols-[2.75rem_minmax(0,1fr)_4rem]"
-            >
-              <span
-                class="font-figures text-[0.8125rem] text-muted-foreground tabular-nums"
-                >{index === 0 || entries[index - 1]?.year !== entry.year
-                  ? entry.year
-                  : ""}</span
+          {#each groups as group (group.year)}
+            {#each group.entries as entry, index (index)}
+              <li
+                class="grid grid-cols-[3rem_minmax(0,1fr)_7.5rem] items-baseline gap-x-3 border-be border-border/60 py-2 last:border-be-0 max-sm:grid-cols-[2.75rem_minmax(0,1fr)_4rem]"
               >
-              <span class="grid gap-0.5 min-inline-0">
-                <span>
-                  {#if entry.path == null}
-                    <span class="font-semibold">{entry.name}</span>
-                  {:else}
-                    <a
-                      class="font-semibold hover:highlighter"
-                      href={resolve("/[...path]", { path: entry.path })}
-                      >{entry.name}</a
-                    >
-                  {/if}
-                  {#if entry.outcome != null && entry.note != null}
-                    <Term
-                      class={cn(
-                        "ms-1 px-1 text-xs font-semibold whitespace-nowrap",
-                        {
-                          highlighter: !entry.isMuted,
-                          "rounded-xs bg-secondary text-muted-foreground":
-                            entry.isMuted,
-                        },
-                      )}
-                      label={OUTCOMES[entry.outcome]?.() ?? entry.outcome}
-                      definition={explain(entry.note)}
-                    />
-                  {:else if entry.outcome != null}
+                <span
+                  class="font-figures text-[0.8125rem] text-muted-foreground tabular-nums"
+                  >{index === 0 ? entry.year : ""}</span
+                >
+                <span class="grid gap-0.5 min-inline-0">
+                  <span>
+                    {#if entry.path == null}
+                      <span class="font-semibold">{entry.name}</span>
+                    {:else}
+                      <a
+                        class="font-semibold hover:highlighter"
+                        href={resolve("/[...path]", { path: entry.path })}
+                        >{entry.name}</a
+                      >
+                    {/if}
+                    {#if entry.outcome != null && entry.note != null}
+                      <Term
+                        class={cn(
+                          "ms-1 px-1 text-xs font-semibold whitespace-nowrap",
+                          {
+                            highlighter: !entry.isMuted,
+                            "rounded-xs bg-secondary text-muted-foreground":
+                              entry.isMuted,
+                          },
+                        )}
+                        label={OUTCOMES[entry.outcome]?.() ?? entry.outcome}
+                        definition={explain(entry.note)}
+                      />
+                    {:else if entry.outcome != null}
+                      <span
+                        class={cn(
+                          "ms-1 px-1 text-xs font-semibold whitespace-nowrap",
+                          {
+                            highlighter: !entry.isMuted,
+                            "rounded-xs bg-secondary text-muted-foreground":
+                              entry.isMuted,
+                          },
+                        )}>{OUTCOMES[entry.outcome]?.() ?? entry.outcome}</span
+                      >
+                    {/if}
+                    {#if entry.isWriteIn === true}
+                      <span class="ms-1 text-xs text-muted-foreground"
+                        >{m.results_write_in()}</span
+                      >
+                    {/if}
+                  </span>
+                  {#if entry.nominees != null}
                     <span
-                      class={cn(
-                        "ms-1 px-1 text-xs font-semibold whitespace-nowrap",
-                        {
-                          highlighter: !entry.isMuted,
-                          "rounded-xs bg-secondary text-muted-foreground":
-                            entry.isMuted,
-                        },
-                      )}>{OUTCOMES[entry.outcome]?.() ?? entry.outcome}</span
+                      class="justify-self-start text-[0.8125rem] text-muted-foreground"
+                      >{entry.nominees
+                        .head}{#each entry.nominees.parts as part, at (at)}{#if part.party == null}{part.text}{:else}<Name
+                            label={part.text}
+                            party={part.party}
+                          />{/if}{/each}{entry.nominees.tail}</span
                     >
-                  {/if}
-                  {#if entry.isWriteIn === true}
-                    <span class="ms-1 text-xs text-muted-foreground"
-                      >{m.results_write_in()}</span
+                  {:else if entry.party != null && entry.party.id !== person.party?.id}
+                    <Name
+                      class="justify-self-start text-[0.8125rem] text-muted-foreground"
+                      label={entry.party.label}
+                      color={swatch(
+                        entry.party.color,
+                        `party:${entry.party.id}`,
+                      )}
+                      party={entry.party.id}
+                    />
+                  {:else if entry.party == null && entry.isIndependent === true && !person.isIndependent}
+                    <span
+                      class="justify-self-start text-[0.8125rem] text-muted-foreground"
+                      >{m.person_parties_none()}</span
                     >
                   {/if}
                 </span>
-                {#if entry.nominees != null}
-                  <span
-                    class="justify-self-start text-[0.8125rem] text-muted-foreground"
-                    >{entry.nominees
-                      .head}{#each entry.nominees.parts as part, at (at)}{#if part.party == null}{part.text}{:else}<Name
-                          label={part.text}
-                          party={part.party}
-                        />{/if}{/each}{entry.nominees.tail}</span
+                <span class="grid justify-items-end gap-1">
+                  <span class="font-figures text-[0.8125rem] tabular-nums"
+                    >{entry.share == null
+                      ? entry.isUnopposed === true
+                        ? m.person_unopposed()
+                        : "–"
+                      : percent(entry.share)}</span
                   >
-                {:else if entry.party != null && entry.party.id !== person.party?.id}
-                  <Name
-                    class="justify-self-start text-[0.8125rem] text-muted-foreground"
-                    label={entry.party.label}
-                    color={swatch(entry.party.color, `party:${entry.party.id}`)}
-                    party={entry.party.id}
-                  />
-                {:else if entry.party == null && entry.isIndependent === true && !person.isIndependent}
-                  <span
-                    class="justify-self-start text-[0.8125rem] text-muted-foreground"
-                    >{m.person_parties_none()}</span
-                  >
-                {/if}
-              </span>
-              <span class="grid justify-items-end gap-1">
-                <span class="font-figures text-[0.8125rem] tabular-nums"
-                  >{entry.share == null
-                    ? entry.isUnopposed === true
-                      ? m.person_unopposed()
-                      : "–"
-                    : percent(entry.share)}</span
-                >
-                {#if entry.share != null}
-                  <span
-                    class="flex overflow-hidden rounded-xs bg-muted block-1.5 inline-full"
-                    aria-hidden="true"
-                  >
+                  {#if entry.share != null}
                     <span
-                      class="block-full"
-                      style:inline-size="{entry.share * 100}%"
-                      style:background-color={swatch(
-                        entry.party?.color ?? null,
-                        entry.party == null ? "" : `party:${entry.party.id}`,
-                      )}
-                    ></span>
-                  </span>
-                {/if}
-                {#if entry.majority != null}
-                  <span
-                    class="font-figures text-[0.6875rem] text-muted-foreground tabular-nums"
-                    >{m.person_majority({ count: count(entry.majority) })}</span
+                      class="flex overflow-hidden rounded-xs bg-muted block-1.5 inline-full"
+                      aria-hidden="true"
+                    >
+                      <span
+                        class="block-full"
+                        style:inline-size="{entry.share * 100}%"
+                        style:background-color={swatch(
+                          entry.party?.color ?? null,
+                          entry.party == null ? "" : `party:${entry.party.id}`,
+                        )}
+                      ></span>
+                    </span>
+                  {/if}
+                  {#if entry.majority != null}
+                    <span
+                      class="font-figures text-[0.6875rem] text-muted-foreground tabular-nums"
+                      >{m.person_majority({
+                        count: count(entry.majority),
+                      })}</span
+                    >
+                  {/if}
+                  {#if entry.electoral != null}
+                    <span
+                      class="font-figures text-[0.6875rem] text-muted-foreground tabular-nums"
+                      >{m.series_electoral({
+                        votes: count(entry.electoral.votes),
+                        total: count(entry.electoral.total),
+                      })}</span
+                    >
+                  {/if}
+                </span>
+              </li>
+            {/each}
+            {#if group.strays.length > 0}
+              <li
+                class="grid grid-cols-[3rem_minmax(0,1fr)] items-baseline gap-x-3 border-be border-border/60 py-2 last:border-be-0 max-sm:grid-cols-[2.75rem_minmax(0,1fr)]"
+              >
+                <span
+                  class="font-figures text-[0.8125rem] text-muted-foreground tabular-nums"
+                  >{group.entries.length === 0 ? group.year : ""}</span
+                >
+                <details class="group text-[0.8125rem]">
+                  <summary
+                    class="cursor-pointer text-muted-foreground marker:text-border hover:text-foreground"
+                    >{m.person_scattered({
+                      count: group.strays.length,
+                    })}</summary
                   >
-                {/if}
-                {#if entry.electoral != null}
-                  <span
-                    class="font-figures text-[0.6875rem] text-muted-foreground tabular-nums"
-                    >{m.series_electoral({
-                      votes: count(entry.electoral.votes),
-                      total: count(entry.electoral.total),
-                    })}</span
-                  >
-                {/if}
-              </span>
-            </li>
+                  <ul class="grid gap-1 pbs-1.5">
+                    {#each group.strays as row, at (at)}
+                      <li class="flex items-baseline justify-between gap-3">
+                        {#if row.path == null}
+                          <span>{row.name}</span>
+                        {:else}
+                          <a
+                            class="hover:highlighter"
+                            href={resolve("/[...path]", { path: row.path })}
+                            >{row.name}</a
+                          >
+                        {/if}
+                        <span
+                          class="shrink-0 font-figures text-muted-foreground tabular-nums"
+                          >{row.share == null ? "–" : percent(row.share)}</span
+                        >
+                      </li>
+                    {/each}
+                  </ul>
+                </details>
+              </li>
+            {/if}
           {/each}
         </ol>
         {#if entries.length > 12}

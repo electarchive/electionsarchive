@@ -1518,6 +1518,16 @@
   "person_lede_advanced": "Ran in {count} races between {first} and {last}, winning {won} and advancing to the next round in {advanced}.",
   "person_lede_year": "Won {won} of {count} races in {year}.",
   "person_majority": "Majority {count}",
+  "person_scattered": [
+    {
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "Also received write-in votes in {count} contest",
+        "countPlural=*": "Also received write-in votes in {count} contests"
+      }
+    }
+  ],
   "person_unopposed": "Unopposed",
   "person_elected_unopposed": "Elected unopposed",
   "person_lede_advanced_year": "Ran in {count} races in {year}, winning {won} and advancing to the next round in {advanced}.",

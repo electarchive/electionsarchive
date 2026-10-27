@@ -1362,6 +1362,23 @@ function personMarkdown(
             }${entry.isWriteIn === true ? ` (${m.results_write_in().toLowerCase()})` : ""}`,
           ]),
         ),
+    Map.groupBy(person.scattered, (row) => row.year)
+      .entries()
+      .map(
+        ([year, rows]) =>
+          `- ${year}: ${m.person_scattered({ count: rows.length })}: ${rows
+            .map(
+              (row) =>
+                `${link(row.name, row.path)}${
+                  row.votes == null || row.total == null || row.total === 0
+                    ? ""
+                    : ` (${percent(row.votes / row.total)})`
+                }`,
+            )
+            .join(", ")}`,
+      )
+      .toArray()
+      .join("\n"),
   ].filter((block) => block !== "");
 }
 
