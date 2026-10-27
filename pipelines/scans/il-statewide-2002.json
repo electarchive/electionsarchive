@@ -1,0 +1,335 @@
+{
+  "polity": "US-IL",
+  "publisher": "Illinois State Board of Elections",
+  "license": "Public record",
+  "raw_source": "us.il_sbe",
+  "title": "State of Illinois official vote cast at the general election, November 5, 2002",
+  "file": {
+    "url": "https://archive.org/download/officialvoteof2002illi/officialvoteof2002illi.pdf"
+  },
+  "contests": {
+    "senate": {
+      "year": 2002,
+      "chamber": "senate",
+      "day": "2002-11-05",
+      "special": false,
+      "state": "IL",
+      "district": null
+    },
+    "governor": {
+      "year": 2002,
+      "chamber": "governor",
+      "day": "2002-11-05",
+      "special": false,
+      "state": "IL",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 7,
+      "id": "s7",
+      "crop": [
+        0.0,
+        0.31,
+        1.0,
+        0.93
+      ],
+      "orientation": "counties_down",
+      "columns": [
+        {
+          "label": "Plurality",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Dem Durbin",
+          "contest": "senate",
+          "candidate": "Richard J. Durbin"
+        },
+        {
+          "label": "Rep Durkin",
+          "contest": "senate",
+          "candidate": "Jim Durkin"
+        },
+        {
+          "label": "Lib Burgauer",
+          "contest": "senate",
+          "candidate": "Steven Burgauer"
+        }
+      ]
+    },
+    {
+      "page": 8,
+      "id": "s8",
+      "crop": [
+        0.0,
+        0.13,
+        1.0,
+        0.93
+      ],
+      "orientation": "counties_down",
+      "columns": [
+        {
+          "label": "Plurality",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Dem Durbin",
+          "contest": "senate",
+          "candidate": "Richard J. Durbin"
+        },
+        {
+          "label": "Rep Durkin",
+          "contest": "senate",
+          "candidate": "Jim Durkin"
+        },
+        {
+          "label": "Lib Burgauer",
+          "contest": "senate",
+          "candidate": "Steven Burgauer"
+        }
+      ]
+    },
+    {
+      "page": 9,
+      "id": "s9",
+      "crop": [
+        0.0,
+        0.13,
+        1.0,
+        0.93
+      ],
+      "orientation": "counties_down",
+      "columns": [
+        {
+          "label": "Plurality",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Dem Durbin",
+          "contest": "senate",
+          "candidate": "Richard J. Durbin"
+        },
+        {
+          "label": "Rep Durkin",
+          "contest": "senate",
+          "candidate": "Jim Durkin"
+        },
+        {
+          "label": "Lib Burgauer",
+          "contest": "senate",
+          "candidate": "Steven Burgauer"
+        }
+      ]
+    },
+    {
+      "page": 10,
+      "id": "s10",
+      "crop": [
+        0.0,
+        0.13,
+        1.0,
+        0.93
+      ],
+      "orientation": "counties_down",
+      "columns": [
+        {
+          "label": "Plurality",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Dem Durbin",
+          "contest": "senate",
+          "candidate": "Richard J. Durbin"
+        },
+        {
+          "label": "Rep Durkin",
+          "contest": "senate",
+          "candidate": "Jim Durkin"
+        },
+        {
+          "label": "Lib Burgauer",
+          "contest": "senate",
+          "candidate": "Steven Burgauer"
+        }
+      ]
+    },
+    {
+      "page": 11,
+      "id": "g11",
+      "crop": [
+        0.0,
+        0.355,
+        1.0,
+        0.93
+      ],
+      "orientation": "counties_down",
+      "columns": [
+        {
+          "label": "Plurality",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Dem Blagojevich Quinn",
+          "contest": "governor",
+          "candidate": "Rod R. Blagojevich"
+        },
+        {
+          "label": "Rep Ryan Hawkinson",
+          "contest": "governor",
+          "candidate": "Jim Ryan"
+        },
+        {
+          "label": "Lib Skinner Tobin",
+          "contest": "governor",
+          "candidate": "Cal Skinner"
+        },
+        {
+          "label": "Ind Brown Candidate",
+          "contest": "governor",
+          "candidate": "Marisellis Brown"
+        },
+        {
+          "label": "Kausz",
+          "contest": "governor",
+          "candidate": "Peter Dale Kausz"
+        }
+      ]
+    },
+    {
+      "page": 12,
+      "id": "g12",
+      "crop": [
+        0.0,
+        0.13,
+        1.0,
+        0.93
+      ],
+      "orientation": "counties_down",
+      "columns": [
+        {
+          "label": "Plurality",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Dem Blagojevich Quinn",
+          "contest": "governor",
+          "candidate": "Rod R. Blagojevich"
+        },
+        {
+          "label": "Rep Ryan Hawkinson",
+          "contest": "governor",
+          "candidate": "Jim Ryan"
+        },
+        {
+          "label": "Lib Skinner Tobin",
+          "contest": "governor",
+          "candidate": "Cal Skinner"
+        },
+        {
+          "label": "Ind Brown Candidate",
+          "contest": "governor",
+          "candidate": "Marisellis Brown"
+        },
+        {
+          "label": "Kausz",
+          "contest": "governor",
+          "candidate": "Peter Dale Kausz"
+        }
+      ]
+    },
+    {
+      "page": 13,
+      "id": "g13",
+      "crop": [
+        0.0,
+        0.13,
+        1.0,
+        0.93
+      ],
+      "orientation": "counties_down",
+      "columns": [
+        {
+          "label": "Plurality",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Dem Blagojevich Quinn",
+          "contest": "governor",
+          "candidate": "Rod R. Blagojevich"
+        },
+        {
+          "label": "Rep Ryan Hawkinson",
+          "contest": "governor",
+          "candidate": "Jim Ryan"
+        },
+        {
+          "label": "Lib Skinner Tobin",
+          "contest": "governor",
+          "candidate": "Cal Skinner"
+        },
+        {
+          "label": "Ind Brown Candidate",
+          "contest": "governor",
+          "candidate": "Marisellis Brown"
+        },
+        {
+          "label": "Kausz",
+          "contest": "governor",
+          "candidate": "Peter Dale Kausz"
+        }
+      ]
+    },
+    {
+      "page": 14,
+      "id": "g14",
+      "crop": [
+        0.0,
+        0.13,
+        1.0,
+        0.93
+      ],
+      "orientation": "counties_down",
+      "columns": [
+        {
+          "label": "Plurality",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Dem Blagojevich Quinn",
+          "contest": "governor",
+          "candidate": "Rod R. Blagojevich"
+        },
+        {
+          "label": "Rep Ryan Hawkinson",
+          "contest": "governor",
+          "candidate": "Jim Ryan"
+        },
+        {
+          "label": "Lib Skinner Tobin",
+          "contest": "governor",
+          "candidate": "Cal Skinner"
+        },
+        {
+          "label": "Ind Brown Candidate",
+          "contest": "governor",
+          "candidate": "Marisellis Brown"
+        },
+        {
+          "label": "Kausz",
+          "contest": "governor",
+          "candidate": "Peter Dale Kausz"
+        }
+      ]
+    }
+  ],
+  "extend": true
+}

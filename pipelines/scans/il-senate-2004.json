@@ -1,0 +1,561 @@
+{
+  "polity": "US-IL",
+  "publisher": "Illinois State Board of Elections",
+  "license": "Public record",
+  "raw_source": "us.il_sbe",
+  "title": "State of Illinois official vote cast at the general election, November 2, 2004",
+  "file": {
+    "url": "https://archive.org/download/stateofillinoiso2004illi/stateofillinoiso2004illi.pdf"
+  },
+  "contests": {
+    "senate": {
+      "year": 2004,
+      "chamber": "senate",
+      "day": "2004-11-02",
+      "special": false,
+      "state": "IL",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 23,
+      "id": "m23",
+      "crop": [
+        0.0,
+        0.695,
+        1.0,
+        0.95
+      ],
+      "orientation": "counties_down",
+      "columns": [
+        {
+          "label": "Plurality",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Dem Obama",
+          "contest": "senate",
+          "candidate": "Barack Obama"
+        },
+        {
+          "label": "Rep Keyes",
+          "contest": "senate",
+          "candidate": "Alan Keyes"
+        },
+        {
+          "label": "Ind Franzen",
+          "contest": "senate",
+          "candidate": "Albert J. Franzen"
+        },
+        {
+          "label": "Lib Kohn",
+          "contest": "senate",
+          "candidate": "Jerry Kohn"
+        },
+        {
+          "label": "Kuhnke",
+          "contest": "senate",
+          "candidate": "Bill Kuhnke"
+        }
+      ]
+    },
+    {
+      "page": 24,
+      "id": "m24",
+      "crop": [
+        0.0,
+        0.135,
+        1.0,
+        0.95
+      ],
+      "orientation": "counties_down",
+      "columns": [
+        {
+          "label": "Plurality",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Dem Obama",
+          "contest": "senate",
+          "candidate": "Barack Obama"
+        },
+        {
+          "label": "Rep Keyes",
+          "contest": "senate",
+          "candidate": "Alan Keyes"
+        },
+        {
+          "label": "Ind Franzen",
+          "contest": "senate",
+          "candidate": "Albert J. Franzen"
+        },
+        {
+          "label": "Lib Kohn",
+          "contest": "senate",
+          "candidate": "Jerry Kohn"
+        },
+        {
+          "label": "Kuhnke",
+          "contest": "senate",
+          "candidate": "Bill Kuhnke"
+        }
+      ]
+    },
+    {
+      "page": 25,
+      "id": "m25",
+      "crop": [
+        0.0,
+        0.135,
+        1.0,
+        0.95
+      ],
+      "orientation": "counties_down",
+      "columns": [
+        {
+          "label": "Plurality",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Dem Obama",
+          "contest": "senate",
+          "candidate": "Barack Obama"
+        },
+        {
+          "label": "Rep Keyes",
+          "contest": "senate",
+          "candidate": "Alan Keyes"
+        },
+        {
+          "label": "Ind Franzen",
+          "contest": "senate",
+          "candidate": "Albert J. Franzen"
+        },
+        {
+          "label": "Lib Kohn",
+          "contest": "senate",
+          "candidate": "Jerry Kohn"
+        },
+        {
+          "label": "Kuhnke",
+          "contest": "senate",
+          "candidate": "Bill Kuhnke"
+        }
+      ]
+    },
+    {
+      "page": 26,
+      "id": "m26",
+      "crop": [
+        0.0,
+        0.135,
+        1.0,
+        0.95
+      ],
+      "orientation": "counties_down",
+      "columns": [
+        {
+          "label": "Plurality",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Dem Obama",
+          "contest": "senate",
+          "candidate": "Barack Obama"
+        },
+        {
+          "label": "Rep Keyes",
+          "contest": "senate",
+          "candidate": "Alan Keyes"
+        },
+        {
+          "label": "Ind Franzen",
+          "contest": "senate",
+          "candidate": "Albert J. Franzen"
+        },
+        {
+          "label": "Lib Kohn",
+          "contest": "senate",
+          "candidate": "Jerry Kohn"
+        },
+        {
+          "label": "Kuhnke",
+          "contest": "senate",
+          "candidate": "Bill Kuhnke"
+        }
+      ]
+    },
+    {
+      "page": 27,
+      "id": "m27",
+      "crop": [
+        0.0,
+        0.135,
+        1.0,
+        0.37
+      ],
+      "orientation": "counties_down",
+      "columns": [
+        {
+          "label": "Plurality",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Dem Obama",
+          "contest": "senate",
+          "candidate": "Barack Obama"
+        },
+        {
+          "label": "Rep Keyes",
+          "contest": "senate",
+          "candidate": "Alan Keyes"
+        },
+        {
+          "label": "Ind Franzen",
+          "contest": "senate",
+          "candidate": "Albert J. Franzen"
+        },
+        {
+          "label": "Lib Kohn",
+          "contest": "senate",
+          "candidate": "Jerry Kohn"
+        },
+        {
+          "label": "Kuhnke",
+          "contest": "senate",
+          "candidate": "Bill Kuhnke"
+        }
+      ]
+    },
+    {
+      "page": 27,
+      "id": "a27",
+      "crop": [
+        0.0,
+        0.37,
+        1.0,
+        0.95
+      ],
+      "orientation": "counties_down",
+      "columns": [
+        {
+          "label": "Plurality",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Doody",
+          "contest": "senate",
+          "candidate": "Scott Doody"
+        },
+        {
+          "label": "McArthur-Self",
+          "contest": "senate",
+          "candidate": "Donald McArthur-Self"
+        },
+        {
+          "label": "Campbell",
+          "contest": "senate",
+          "candidate": "Kathy Campbell"
+        },
+        {
+          "label": "Bill",
+          "contest": "senate",
+          "candidate": "Shaun L. Bill"
+        },
+        {
+          "label": "Hester",
+          "contest": "senate",
+          "candidate": "Marcus Hester"
+        }
+      ]
+    },
+    {
+      "page": 28,
+      "id": "a28",
+      "crop": [
+        0.0,
+        0.125,
+        1.0,
+        0.95
+      ],
+      "orientation": "counties_down",
+      "columns": [
+        {
+          "label": "Plurality",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Doody",
+          "contest": "senate",
+          "candidate": "Scott Doody"
+        },
+        {
+          "label": "McArthur-Self",
+          "contest": "senate",
+          "candidate": "Donald McArthur-Self"
+        },
+        {
+          "label": "Campbell",
+          "contest": "senate",
+          "candidate": "Kathy Campbell"
+        },
+        {
+          "label": "Bill",
+          "contest": "senate",
+          "candidate": "Shaun L. Bill"
+        },
+        {
+          "label": "Hester",
+          "contest": "senate",
+          "candidate": "Marcus Hester"
+        }
+      ]
+    },
+    {
+      "page": 29,
+      "id": "a29",
+      "crop": [
+        0.0,
+        0.125,
+        1.0,
+        0.95
+      ],
+      "orientation": "counties_down",
+      "columns": [
+        {
+          "label": "Plurality",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Doody",
+          "contest": "senate",
+          "candidate": "Scott Doody"
+        },
+        {
+          "label": "McArthur-Self",
+          "contest": "senate",
+          "candidate": "Donald McArthur-Self"
+        },
+        {
+          "label": "Campbell",
+          "contest": "senate",
+          "candidate": "Kathy Campbell"
+        },
+        {
+          "label": "Bill",
+          "contest": "senate",
+          "candidate": "Shaun L. Bill"
+        },
+        {
+          "label": "Hester",
+          "contest": "senate",
+          "candidate": "Marcus Hester"
+        }
+      ]
+    },
+    {
+      "page": 30,
+      "id": "a30",
+      "crop": [
+        0.0,
+        0.125,
+        1.0,
+        0.95
+      ],
+      "orientation": "counties_down",
+      "columns": [
+        {
+          "label": "Plurality",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Doody",
+          "contest": "senate",
+          "candidate": "Scott Doody"
+        },
+        {
+          "label": "McArthur-Self",
+          "contest": "senate",
+          "candidate": "Donald McArthur-Self"
+        },
+        {
+          "label": "Campbell",
+          "contest": "senate",
+          "candidate": "Kathy Campbell"
+        },
+        {
+          "label": "Bill",
+          "contest": "senate",
+          "candidate": "Shaun L. Bill"
+        },
+        {
+          "label": "Hester",
+          "contest": "senate",
+          "candidate": "Marcus Hester"
+        }
+      ]
+    },
+    {
+      "page": 31,
+      "id": "b31",
+      "crop": [
+        0.0,
+        0.125,
+        1.0,
+        0.95
+      ],
+      "orientation": "counties_down",
+      "columns": [
+        {
+          "label": "Plurality",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Carlson",
+          "contest": "senate",
+          "candidate": "Tom Carlson"
+        },
+        {
+          "label": "McDowell",
+          "contest": "senate",
+          "candidate": "Orlando McDowell"
+        },
+        {
+          "label": "Brumfield",
+          "contest": "senate",
+          "candidate": "Arthur C. Brumfield"
+        },
+        {
+          "label": "Seida",
+          "contest": "senate",
+          "candidate": "Lowell Seida"
+        }
+      ]
+    },
+    {
+      "page": 32,
+      "id": "b32",
+      "crop": [
+        0.0,
+        0.125,
+        1.0,
+        0.95
+      ],
+      "orientation": "counties_down",
+      "columns": [
+        {
+          "label": "Plurality",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Carlson",
+          "contest": "senate",
+          "candidate": "Tom Carlson"
+        },
+        {
+          "label": "McDowell",
+          "contest": "senate",
+          "candidate": "Orlando McDowell"
+        },
+        {
+          "label": "Brumfield",
+          "contest": "senate",
+          "candidate": "Arthur C. Brumfield"
+        },
+        {
+          "label": "Seida",
+          "contest": "senate",
+          "candidate": "Lowell Seida"
+        }
+      ]
+    },
+    {
+      "page": 33,
+      "id": "b33",
+      "crop": [
+        0.0,
+        0.125,
+        1.0,
+        0.95
+      ],
+      "orientation": "counties_down",
+      "columns": [
+        {
+          "label": "Plurality",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Carlson",
+          "contest": "senate",
+          "candidate": "Tom Carlson"
+        },
+        {
+          "label": "McDowell",
+          "contest": "senate",
+          "candidate": "Orlando McDowell"
+        },
+        {
+          "label": "Brumfield",
+          "contest": "senate",
+          "candidate": "Arthur C. Brumfield"
+        },
+        {
+          "label": "Seida",
+          "contest": "senate",
+          "candidate": "Lowell Seida"
+        }
+      ]
+    },
+    {
+      "page": 34,
+      "id": "b34",
+      "crop": [
+        0.0,
+        0.125,
+        1.0,
+        0.95
+      ],
+      "orientation": "counties_down",
+      "columns": [
+        {
+          "label": "Plurality",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Carlson",
+          "contest": "senate",
+          "candidate": "Tom Carlson"
+        },
+        {
+          "label": "McDowell",
+          "contest": "senate",
+          "candidate": "Orlando McDowell"
+        },
+        {
+          "label": "Brumfield",
+          "contest": "senate",
+          "candidate": "Arthur C. Brumfield"
+        },
+        {
+          "label": "Seida",
+          "contest": "senate",
+          "candidate": "Lowell Seida"
+        }
+      ]
+    }
+  ]
+}
