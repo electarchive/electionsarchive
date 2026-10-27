@@ -760,7 +760,7 @@
           : race.turnout.voters / race.turnout.registered;
       const isShort =
         race.kind === "ballot_question" &&
-        race.results[0]?.isLost === true &&
+        race.results[0]?.outcome === "lost" &&
         race.quorum != null &&
         turned != null &&
         turned <= race.quorum;
@@ -932,8 +932,10 @@
             party: row.party,
             votes: row.votes,
             share: row.share,
-            outcome: null,
-            isWriteIn: row.isWriteIn && row.isWon !== true,
+            outcome: row.outcome,
+            isDeclined: row.isDeclined,
+            isWriteIn:
+              row.isWriteIn && !["won", "elected"].includes(row.outcome ?? ""),
             ballots: row.ballots,
             seats: row.seats,
             lines: [],
@@ -1033,7 +1035,7 @@
                                   share: percent(leader.share),
                                 })
                               : race.kind === "ballot_question" &&
-                                  race.results[0]?.isLost === true
+                                  race.results[0]?.outcome === "lost"
                                 ? m.race_lede_lost({
                                     answer: named(leader),
                                     share: percent(leader.share),
@@ -1041,7 +1043,9 @@
                                 : runner == null
                                   ? null
                                   : (seated.length > 0 ||
-                                      race.results[0]?.isWon === true
+                                      ["won", "elected"].includes(
+                                        race.results[0]?.outcome ?? "",
+                                      )
                                       ? m.race_lede_won
                                       : m.race_lede_votes)({
                                       party: definite(named(leader), true),

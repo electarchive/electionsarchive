@@ -2272,7 +2272,11 @@ function electionMarkdown(
       );
       const hasResult =
         !hasSeats &&
-        race.results.some((row) => row.isWon === true && row.person != null);
+        race.results.some(
+          (row) =>
+            ["won", "elected"].includes(row.outcome ?? "") &&
+            row.person != null,
+        );
       const before = new Map(
         (race.before ?? []).map((entry) => [entry.key, entry.seats]),
       );
@@ -2506,8 +2510,9 @@ function electionMarkdown(
                     : []),
                   ...(hasResult
                     ? [
-                        row.isWon === true && row.person != null
-                          ? m.outcome_elected()
+                        ["won", "elected"].includes(row.outcome ?? "") &&
+                        row.person != null
+                          ? outcome(row.outcome)
                           : null,
                       ]
                     : []),
