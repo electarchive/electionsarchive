@@ -59,7 +59,7 @@ def picks(states: set[str] = STATES) -> list[tuple[str, int, str]]:
             if entry["type"] == "blob" and matched and int(matched[3]) in YEARS and matched[1] == matched[3]:
                 found[matched[2]][matched[4] is None].append(entry["path"])
         for _, files in sorted(found.items()):
-            chosen.extend((state, int(path[:4]), path) for path in sorted(files[True] or files[False]))
+            chosen.extend((state, int(path[:4]), path) for path in sorted(files[True] + files[False]))
     return chosen
 
 
@@ -97,9 +97,10 @@ def parse() -> None:
         .when(office.str.contains(r"^governor\b"))
         .then(pl.lit("governor")),
         day=pl.col("path").str.extract(r"(\d{8})__").str.to_date("%Y%m%d"),
-    ).filter(pl.col("chamber").is_not_null()).write_parquet(
-        PARSED / f"lines_{'_'.join(sorted(STATES)).lower()}.parquet"
-    )
+        statewide=pl.col("path").str.contains(r"^\d{4}/(General/)?\d{8}__[a-z]{2}__[a-z]+__(precinct|ward)\.csv$"),
+    ).filter(pl.col("chamber").is_not_null()).filter(
+        pl.col("statewide") | ~pl.col("statewide").any().over("state", "day", "fips", "chamber")
+    ).drop("statewide").write_parquet(PARSED / f"lines_{'_'.join(sorted(STATES)).lower()}.parquet")
 
 
 def emit() -> Path:

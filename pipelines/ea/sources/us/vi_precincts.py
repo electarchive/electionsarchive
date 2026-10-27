@@ -11,16 +11,35 @@ SOURCE = "us.vi_precincts"
 VERSION = "1"
 PUBLISHER = "Elections System of the Virgin Islands"
 BASE = "https://www.vivote.gov/sites/default/files/officialresults/"
+UNOFFICIAL = "https://www.vivote.gov/sites/default/files/unofficialresults/"
 REPORTS = {
-    date(2018, 11, 6): BASE + "Official%20Precinct%20Report20181117.HTM",
-    date(2020, 11, 3): BASE + "Official%20Precinct%20Report.pdf",
-    date(2022, 11, 8): BASE + "Precinct%20Report%20%281%29.pdf",
+    date(2016, 11, 8): [
+        UNOFFICIAL + "STX%20Precinct%20Report.HTM",
+        UNOFFICIAL + "STT-STJ%20Precinct%20Report.HTM",
+        BASE + "Election%20Summary%20w-detail.HTM",
+    ],
+    date(2018, 11, 6): [BASE + "Official%20Precinct%20Report20181117.HTM"],
+    date(2020, 11, 3): [BASE + "Official%20Precinct%20Report.pdf"],
+    date(2022, 11, 8): [BASE + "Precinct%20Report%20%281%29.pdf"],
+}
+CHANNELS = [
+    "stx early voting",
+    "stt/stj early voting",
+    "stx walk-in",
+    "stt/stj walk-in",
+    "stx mail",
+    "stt/stj mail",
+    "stx provisional",
+    "stt/stj provisional",
+]
+NOTES = {
+    2016: "Election-day votes by precinct from the Elections System of the Virgin Islands' election-night precinct reports for St. Croix and for St. Thomas and St. John, whose sums equal the election-day columns of the official results summary; early, walk-in, mail, and provisional votes by district from that official summary."
 }
 SECTIONS = {"governor": "governor", "delegate to the house": "house:0"}
 
 
 def fetch() -> None:
-    for url in REPORTS.values():
+    for url in [url for urls in REPORTS.values() for url in urls]:
         try:
             raw.cached(SOURCE, url)
         except LookupError:
@@ -38,13 +57,32 @@ def fetch() -> None:
 def emit() -> Path:
     results: dict[tuple[date, str], dict[str, dict[str, int]]] = {}
     artifacts = {}
-    for day, url in REPORTS.items():
+    for day, url in [(day, url) for day, urls in REPORTS.items() for url in urls]:
         artifact = raw.cached(SOURCE, url)
-        artifacts[day] = [artifact]
+        artifacts.setdefault(day, []).append(artifact)
+        if "Summary" in url:
+            section = None
+            for line in artifact.path.read_text(encoding="latin-1").splitlines():
+                stripped = line.strip()
+                lowered = stripped.lower()
+                found = re.match(r"^(.*?)[\s.]*\s(\d[\d,]*)\s+[\d.]+((?:\s+[\d,]+){10})\s*$", stripped)
+                if found and section is not None:
+                    name = re.sub(r"\s*\((dem|rep|ind)\)\s*$", "", found[1].strip(" ."), flags=re.IGNORECASE)
+                    counts = [int(count.replace(",", "")) for count in found[3].split()][2:]
+                    for channel, count in zip(CHANNELS, counts, strict=True):
+                        results.setdefault((day, section), {}).setdefault(f"{day.year}:VI:{channel}", {})[name] = count
+                elif stripped:
+                    section = next(
+                        (key for prefix, key in SECTIONS.items() if lowered.startswith(prefix)),
+                        None if not lowered.startswith("(vote") else section,
+                    )
+            continue
         if url.endswith("HTM"):
             text = artifact.path.read_text(encoding="latin-1")
         else:
-            text = subprocess.run(["pdftotext", "-layout", str(artifact.path), "-"], capture_output=True, check=True, text=True).stdout
+            text = subprocess.run(
+                ["pdftotext", "-layout", str(artifact.path), "-"], capture_output=True, check=True, text=True
+            ).stdout
         precinct = None
         section = None
         previous = ""
@@ -60,9 +98,15 @@ def emit() -> Path:
                 precinct = previous.lower()
                 section = None
             found = re.match(r"^(?:(?:DEM|REP|IND)\s+)?(.*?)[\s.]*\s(\d[\d,]*)(?:\s+[\d,.]+)*\s*$", stripped)
-            if found and section is not None and not re.match(r"(?i)(total votes|vote for|\(vote|precinct summary|report generated)", found[1]):
-                name = re.sub(r"\s*\((dem|rep|ind)\)\s*$", "", found[1].strip(" ."), flags=re.I)
-                results.setdefault((day, section), {}).setdefault(f"{day.year}:VI:{precinct}", {})[name] = int(found[2].replace(",", ""))
+            if (
+                found
+                and section is not None
+                and not re.match(r"(?i)(total\b|vote for|\(vote|precinct summary|report generated)", found[1])
+            ):
+                name = re.sub(r"\s*\((dem|rep|ind)\)\s*$", "", found[1].strip(" ."), flags=re.IGNORECASE)
+                results.setdefault((day, section), {}).setdefault(f"{day.year}:VI:{precinct}", {})[name] = int(
+                    found[2].replace(",", "")
+                )
             elif stripped:
                 lowered = stripped.lower()
                 for prefix, key in SECTIONS.items():
@@ -78,7 +122,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="The Virgin Islands' governor and delegate elections 2018, 2020, and 2022 by precinct from the Elections System of the Virgin Islands",
+            summary="The Virgin Islands' delegate elections 2016, 2018, 2020, and 2022 and governor elections 2018 and 2022 by precinct from the Elections System of the Virgin Islands",
             polity="US-VI",
         )
         (state,) = conn.execute("select id from polity where iso_code = 'US-VI'").fetchone()
@@ -91,7 +135,9 @@ def emit() -> Path:
                 "select c.id, c.election_id from contest c join external_id x on x.entity_id = c.id and x.scheme = 'us.contest' and x.value = %s",
                 [key],
             ).fetchone()
-            labels = conn.execute("select id, lower(ballot_label), kind from contest_option where contest_id = %s", [contest]).fetchall()
+            labels = conn.execute(
+                "select id, lower(ballot_label), kind from contest_option where contest_id = %s", [contest]
+            ).fetchall()
             picked = {}
             for name in {name for votes in precincts.values() for name in votes}:
                 lowered = name.lower()
@@ -107,13 +153,33 @@ def emit() -> Path:
             source_title = f"{day.year} General Election official results by precinct"
             source = cs.source(PUBLISHER, source_title)
             if source in cs.minted and not any(r["id"] == source for r in cs.rows.get("source", [])):
-                cs.add("source", id=source, kind="official_body", publisher=PUBLISHER, title=source_title, url="https://vivote.gov/", license="Public record")
+                cs.add(
+                    "source",
+                    id=source,
+                    kind="official_body",
+                    publisher=PUBLISHER,
+                    title=source_title,
+                    url="https://vivote.gov/",
+                    license="Public record",
+                )
             for artifact in artifacts[day]:
                 cs.artifact(artifact, source)
             result_set = cs.key(f"{SOURCE}.result_set", f"{key}:precinct")
-            columns = ("id", "election_id", "contest_id", "stage", "kind", "status", "source_id", "as_of", "completeness", "supersedes_id")
+            columns = (
+                "id",
+                "election_id",
+                "contest_id",
+                "stage",
+                "kind",
+                "status",
+                "source_id",
+                "as_of",
+                "completeness",
+                "supersedes_id",
+            )
             for prior in conn.execute(
-                f"select {', '.join(columns)} from result_set where contest_id = %s and is_default and id <> %s", [contest, result_set]
+                f"select {', '.join(columns)} from result_set where contest_id = %s and is_default and id <> %s",
+                [contest, result_set],
             ).fetchall():
                 cs.add("result_set", **dict(zip(columns, prior, strict=True)), is_default=False)
             for option, outcome_kind, seats in conn.execute(
@@ -126,7 +192,9 @@ def emit() -> Path:
                 "select sum(v.value) from result_set r join result_value v on v.result_set_k = r.k where r.contest_id = %s and r.is_default and v.measure = 1",
                 [contest],
             ).fetchone()[0]
-            counted = sum(votes for precinct in precincts.values() for name, votes in precinct.items() if name in picked)
+            counted = sum(
+                votes for precinct in precincts.values() for name, votes in precinct.items() if name in picked
+            )
             cs.add(
                 "result_set",
                 id=result_set,
@@ -139,7 +207,15 @@ def emit() -> Path:
                 is_default=True,
                 completeness=round(float(counted) / float(official), 4),
             )
-            cs.add("note", entity_id=result_set, kind="methodology", body_md="Votes by precinct from the Elections System of the Virgin Islands' official precinct reports.")
+            cs.add(
+                "note",
+                entity_id=result_set,
+                kind="methodology",
+                body_md=NOTES.get(
+                    day.year,
+                    "Votes by precinct from the Elections System of the Virgin Islands' official precinct reports.",
+                ),
+            )
             for code, votes in precincts.items():
                 unit = cs.unit("us.precinct", code)
                 if unit in cs.minted and not any(r["id"] == unit for r in cs.rows.get("reporting_unit", [])):
