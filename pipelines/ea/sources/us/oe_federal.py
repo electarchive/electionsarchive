@@ -198,7 +198,11 @@ def emit() -> Path:
                 candidate=pl.struct("candidate", "year", "state", "chamber").map_elements(head, return_dtype=pl.String)
             )
             .with_columns(candidate=pl.col("candidate").str.to_uppercase())
-            .filter(~pl.col("candidate").str.contains(openelections.NOT_COUNTED), pl.col("candidate") != "")
+            .filter(
+                ~pl.col("candidate").str.contains(openelections.NOT_COUNTED),
+                ~pl.col("candidate").str.contains(r"^NONE OF THE"),
+                pl.col("candidate") != "",
+            )
             .with_columns(
                 measure=pl.col("candidate").replace_strict(medsl.PSEUDO, default=1, return_dtype=pl.Int16),
                 writein=pl.col("candidate").is_in(list(medsl.POOLED)) | pl.col("candidate").str.contains("WRITE"),
