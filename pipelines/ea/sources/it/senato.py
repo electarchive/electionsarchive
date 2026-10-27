@@ -1,9 +1,10 @@
 import difflib
+import html
 import io
 import re
 import unicodedata
 import zipfile
-from datetime import date, timedelta
+from datetime import date, datetime, timedelta
 from pathlib import Path
 from urllib.parse import urlencode
 from uuid import UUID
@@ -12,6 +13,7 @@ import polars as pl
 
 from ea import raw
 from ea.changeset import Changeset, slug
+from ea.sources.it.interno import key as interno_key
 from ea.sources.it.interno import proper
 from ea.sources.it.storico import EXISTING, NEW, NEW_OVERRIDES, NORTH, OVERRIDES, SOUTH, SYMBOLS
 from ea.store import DATA, connect
@@ -49,9 +51,31 @@ DAYS = [
     date(1994, 3, 27),
     date(1996, 4, 21),
     date(2001, 5, 13),
+    date(2006, 4, 9),
+    date(2008, 4, 13),
+    date(2013, 2, 24),
 ]
 MATTARELLA = date(1994, 3, 27)
 CALDEROLI = date(2006, 4, 9)
+ROSATO = date(2018, 3, 4)
+BASE = "https://elezionistorico.interno.gov.it/"
+ABROAD = {
+    "EUROPA": ("europe", "Europe"),
+    "AMERICA MERIDIONALE": ("south-america", "South America"),
+    "AMERICA SETTENTRIONALE E CENTRALE": ("north-and-central-america", "North and Central America"),
+    "AFRICA ASIA OCEANIA ANTARTIDE": ("africa-asia-oceania-antarctica", "Africa, Asia, Oceania, and Antarctica"),
+    "ASIA AFRICA OCEANIA ANTARTIDE": ("africa-asia-oceania-antarctica", "Africa, Asia, Oceania, and Antarctica"),
+}
+CENTER_LEFT = ("Center-left coalition", "Coalizione di centrosinistra")
+CENTER_RIGHT = ("Center-right coalition", "Coalizione di centrodestra")
+LEADERS = {
+    (2006, "PRODI ROMANO"): ("The Union", "L'Unione"),
+    (2006, "BERLUSCONI SILVIO"): ("House of Freedoms", "Casa delle Libertà"),
+    (2008, "SILVIO BERLUSCONI"): CENTER_RIGHT,
+    (2008, "WALTER VELTRONI"): CENTER_LEFT,
+    (2013, "PIER LUIGI BERSANI"): ("Italy. Common Good", "Italia. Bene Comune"),
+    (2013, "SILVIO BERLUSCONI"): CENTER_RIGHT,
+}
 SIZES = [
     (237, date(1948, 5, 8)),
     (246, date(1958, 6, 12)),
@@ -115,6 +139,46 @@ SYSTEMS = {
         ),
     ),
     "senato-valle-d-aosta": ({"formula": "fptp"}, "Senate, Valle d'Aosta single-member seat", None),
+    "senato-proportional-2005": (
+        {"formula": "hare", "pooling": "coalition", "lists": {"order": "closed", "vacancy": "next_on_list"}},
+        "Senate, regional lists with majority bonus, 2005–2017",
+        (
+            "Under law 270 of 2005, senators were elected region by region from closed lists. Coalitions needed 20% of "
+            "the region's valid votes and their lists 3%; lists running alone, or in a coalition below 20%, needed 8%. "
+            "Seats were shared among coalitions and lone lists by the largest remainder of a Hare quota, counting all "
+            "the votes of a coalition's lists, and then among each coalition's qualifying lists in the same way. If the "
+            "coalition or list with the most votes in the region won less than 55% of its seats, it received 55%, "
+            "rounded up, and the others shared the rest. Molise, with two seats, had no bonus. Valle d'Aosta elected "
+            "one senator by plurality, and Trentino-Alto Adige kept the single-member collegi of 1993. The schema "
+            "stores the Hare step; the thresholds and the bonus are described here only."
+        ),
+    ),
+    "senato-trentino-2005": (
+        {"formula": "fptp"},
+        "Senate, Trentino-Alto Adige single-member collegi, 2005–2017",
+        None,
+    ),
+    "senato-trentino-recovery-2005": (
+        {"formula": "dhondt", "lists": {"order": "open", "constituencies": "skip", "vacancy": "next_by_votes"}},
+        "Senate, Trentino-Alto Adige proportional seat, 2005–2017",
+        (
+            "Under law 270 of 2005, Trentino-Alto Adige kept the rules of law 276 of 1993: six senators were elected by "
+            "plurality in single-member collegi and one was shared out by the D'Hondt method among groups of candidates "
+            "who ran under the same symbol, counting the votes of their candidates who had not won their collegio. "
+            "The seat went to the group's candidate with the highest share of the vote in their own collegio. The "
+            "schema stores the D'Hondt step; the scorporo and the ranking by share are described here only."
+        ),
+    ),
+    "senato-estero": (
+        {"formula": "hare", "lists": {"order": "open", "vacancy": "next_by_votes"}},
+        "Senate, constituency abroad",
+        (
+            "Since 2006, Italians resident abroad elect their own senators in four ripartizioni: Europe; South "
+            "America; North and Central America; and Africa, Asia, Oceania, and Antarctica. Until 2018 they elected "
+            "six (two each in Europe and South America), and since 2022 four, one in each. Seats in each ripartizione "
+            "go to lists by the largest remainder of a Hare quota, and to candidates by preference votes."
+        ),
+    ),
 }
 LICENSE = (
     "No license stated. Data that Italian public bodies publish without a license are open by default (art. 52 of "
@@ -142,6 +206,15 @@ UNNAMED_NOTE = (
     "The archive gives this party's votes in the collegio, summed from its municipal returns, but not its "
     "candidate's name."
 )
+OPTED_NOTE = (
+    "Eligendo's results also mark {names} as elected here. Each took a seat for another region or the Chamber of "
+    "Deputies, and the next candidates on the list took their places, so the elected senators shown are the ones "
+    "the Senate's record lists at the legislature's first sitting."
+)
+REPLACED_SAME_DAY = (
+    "The Senate's record also lists {names}, who replaced an elected senator on the legislature's first day; the "
+    "outcome counts the senator who was proclaimed."
+)
 ROMAN = re.compile(r"\b(I|Ii|Iii|Iv|V|Vi|Vii|Viii|Ix|X|Xi|Xii)\b")
 
 
@@ -166,10 +239,53 @@ def mandates(legislature: int) -> str:
 def fetch() -> None:
     for legislature, day in enumerate(DAYS, 1):
         raw.fetch(SOURCE, ARCHIVE.format(day=day), suffix=".zip")
+        raw.fetch(SOURCE, mandates(legislature), suffix=".csv")
+        if day >= CALDEROLI:
+            if not pages(day):
+                raise LookupError(f"store Eligendo's {day} pages in the playwright MCP first")
+            continue
         raw.fetch(SOURCE, NATIONAL.format(day=day), suffix=".html")
         for n in range(1, 21):
             raw.fetch(SOURCE, ELIGENDO.format(day=day, n=n), suffix=".html")
-        raw.fetch(SOURCE, mandates(legislature), suffix=".csv")
+
+
+def pages(day: date) -> list[str]:
+    _, index = raw._index(SOURCE)
+    stamp = f"dtel={day:%d/%m/%Y}&"
+    return sorted(url for url in index if url.startswith(BASE) and stamp in url)
+
+
+def params(url: str) -> dict[str, str]:
+    return dict(part.split("=", 1) for part in url.split("?", 1)[1].split("&"))
+
+
+def table(url: str) -> list[tuple[bool, list[str]]]:
+    page = re.sub(r"<script.*?</script>", "", raw.cached(SOURCE, url).path.read_text(encoding="utf-8"), flags=re.DOTALL)
+    found = []
+    for attributes, row in re.findall(r"<tr([^>]*)>(.*?)</tr>", page[max(page.find("<tbody"), 0) :], flags=re.DOTALL):
+        cells = [
+            html.unescape(re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", cell.replace("<br", " | <br")))).strip()
+            for cell in re.findall(r"<t[hd][^>]*>(.*?)</t[hd]>", row, flags=re.DOTALL)
+        ]
+        found.append(("leader" in attributes, cells))
+    return found
+
+
+def heading(url: str) -> tuple[str, tuple[int, int, int] | None]:
+    page = raw.cached(SOURCE, url).path.read_text(encoding="utf-8")
+    text = html.unescape(
+        re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", re.sub(r"<script.*?</script>", "", page, flags=re.DOTALL)))
+    )
+    title = re.search(r"Senato \d\d/\d\d/\d{4} (Area .+?) (?:Affluenza|Liste/Gruppi|Candidati)", text)
+    counts = re.search(r"Elettori ([\d.]+) Votanti ([\d.]+) [\d,]+ % Schede Bianche ([\d.]+)", text)
+    return (
+        title[1] if title else "",
+        None if counts is None else tuple(int(value.replace(".", "")) for value in counts.groups()),
+    )
+
+
+def number(text: str) -> int:
+    return int(text.replace(".", "") or 0)
 
 
 def eligendo(day: date) -> pl.DataFrame:
@@ -241,7 +357,178 @@ def parse() -> None:
         [],
         [],
     )
+    party_lists, party_accounts, party_candidates, abroad_votes, singles, recovered = [], [], [], [], [], []
     for legislature, day in enumerate(DAYS, 1):
+        if day >= CALDEROLI:
+            roll = senators(legislature)
+            all_senators.append(roll)
+            members = (
+                roll.filter(pl.col("start") <= roll["start"].min() + timedelta(days=7)).unique("senator").to_dicts()
+            )
+            for row in members:
+                folded = fold(row["region_name"])
+                row["seat"] = ABROAD[folded][0] if folded in ABROAD else region_of(row["region_name"])
+            with zipfile.ZipFile(raw.cached(SOURCE, ARCHIVE.format(day=day)).path) as archive:
+                member = next(name for name in archive.namelist() if "candlista" in name.lower())
+                cand = pl.read_csv(
+                    io.BytesIO(archive.read(member)), separator=";", infer_schema=False, encoding="latin1"
+                )
+            filed = {
+                (
+                    region_of(row["REGIONE"]),
+                    fold(html.unescape(row["descrlista"])),
+                    fold(f"{row['cognome']} {row['nome']}"),
+                ): row
+                for row in cand.with_columns(pl.col(c).str.strip_chars() for c in cand.columns).to_dicts()
+            }
+            coalesced: set[tuple[str, str | None]] = set()
+            day_lists = []
+            for url in pages(day):
+                if url.startswith(BASE + "candidati.php"):
+                    continue
+                query = params(url)
+                title, counts = heading(url)
+                division = None
+                if query["tpa"] == "I" and query["tpe"] == "R" and " Regione " in title:
+                    division = region_of(title.split(" Regione ", 1)[1])
+                    party_accounts.append((day, division, None, *counts))
+                    leader = None
+                    for is_leader, cells in table(url):
+                        if is_leader:
+                            leader = cells[0]
+                        elif cells[1:2] == ["Totale coalizione"]:
+                            coalesced.add((division, leader))
+                        elif len(cells) >= 6 and cells[1]:
+                            day_lists.append((division, cells[1], leader, number(cells[-3]), number(cells[-1])))
+                elif query["tpa"] == "E" and query["tpe"] in ("T", "N"):
+                    division = ABROAD[fold(title.split(" Ripartizione ", 1)[1].split(" Nazione ")[0])][0]
+                    country = title.split(" Nazione ", 1)[1] if query["tpe"] == "N" else None
+                    party_accounts.append((day, division, country, *counts))
+                    for _, cells in table(url):
+                        if len(cells) < 3 or not cells[1]:
+                            continue
+                        if country is None:
+                            day_lists.append((division, cells[1], None, number(cells[2]), number(cells[4])))
+                        else:
+                            abroad_votes.append((day, division, country, cells[1], number(cells[2])))
+                    if country is not None:
+                        continue
+                elif query["tpa"] == "G" and query["tpe"] == "L":
+                    region = region_of(title.split(" Regione ", 1)[1].split(" Collegio ")[0])
+                    collegio = title.split(" Collegio ", 1)[1]
+                    party_accounts.append((day, region, collegio, *counts))
+                    pool = [row for row in members if row["seat"] == region]
+                    for _, cells in table(url):
+                        if len(cells) < 3 or " | " not in cells[1]:
+                            continue
+                        label, person = cells[1].split(" | ", 1)
+                        elected = "(ELETTO)" in person
+                        person = person.replace("(ELETTO)", "").strip()
+                        named = [row for row in pool if (fold(person) + " ").startswith(fold(row["surname"]) + " ")]
+                        senator = (named[0] if len(named) == 1 else match(pool, person, "")) if elected else None
+                        singles.append(
+                            (
+                                day,
+                                region,
+                                collegio,
+                                label,
+                                person,
+                                number(cells[2]),
+                                elected,
+                                senator and senator["senator"],
+                            )
+                        )
+                if division is None:
+                    continue
+                listed = []
+                for link, label in dict(
+                    re.findall(
+                        r"carica_candidati\('" + re.escape(BASE) + r"(candidati\.php\?[^']+)'[^>]*?title=\"([^\"]+)\"",
+                        raw.cached(SOURCE, url).path.read_text(encoding="utf-8"),
+                    )
+                ).items():
+                    label = html.unescape(label).strip()
+                    rows = [cells for _, cells in table(BASE + html.unescape(link)) if cells[0] != "Candidati"]
+                    for position, cells in enumerate(rows, 1):
+                        found = filed.get((division, fold(label), fold(cells[0])))
+                        listed.append(
+                            {
+                                "day": day,
+                                "region": division,
+                                "label": label,
+                                "position": position if query["tpa"] == "I" else None,
+                                "name": cells[0],
+                                "surname": found["cognome"] if found else None,
+                                "forename": found["nome"] if found else None,
+                                "birth": datetime.strptime(cells[1], "%d/%m/%Y").date()
+                                if re.fullmatch(r"\d\d/\d\d/\d{4}", cells[1])
+                                else None,
+                                "sex": found and found["sesso"],
+                                "proclaimed": "Eletto" in cells[3:],
+                                "elected": False,
+                                "replacement": False,
+                                "senator": None,
+                                "preferences": number(cells[3]) if query["tpa"] == "E" else None,
+                            }
+                        )
+                pool = [row | {"surname": row["name"], "forename": "", "i": i} for i, row in enumerate(listed)]
+                for senator in members:
+                    if senator["seat"] != division:
+                        continue
+                    surname, forename = fold(senator["surname"]), (fold(senator["forename"]).split() or [""])[0]
+                    exact = [
+                        row
+                        for row in pool
+                        if (fold(row["name"]) + " ").startswith(surname + " ")
+                        and forename in fold(row["name"]).removeprefix(surname).split()
+                        and not listed[row["i"]]["elected"]
+                    ]
+                    exact.sort(key=lambda row: not row["proclaimed"])
+                    named = [
+                        row
+                        for row in pool
+                        if (fold(row["name"]) + " ").startswith(surname + " ")
+                        and row["proclaimed"]
+                        and not listed[row["i"]]["elected"]
+                    ]
+                    found = (
+                        exact[0]
+                        if exact
+                        else named[0]
+                        if len(named) == 1
+                        else match(pool, senator["surname"], senator["forename"])
+                    )
+                    if found is None:
+                        all_unplaced.append({"day": day, "region": division, "senator": senator["senator"]})
+                        continue
+                    row = listed[found["i"]]
+                    row |= {"elected": True, "senator": senator["senator"]}
+                    if row["surname"] is None:
+                        row |= {"surname": senator["surname"].upper(), "forename": senator["forename"].upper()}
+                seats_of = {label: seats for region, label, _, _, seats in day_lists if region == division}
+                for label in {row["label"] for row in listed}:
+                    seated = [row for row in listed if row["label"] == label and row["elected"]]
+                    for row in sorted(seated, key=lambda row: (row["proclaimed"], -(row["position"] or 0)))[
+                        : max(len(seated) - seats_of.get(label, 0), 0)
+                    ]:
+                        row |= {"elected": False, "replacement": True}
+                party_candidates.extend(listed)
+            for region, label, leader, votes, seats in day_lists:
+                party_lists.append(
+                    {
+                        "day": day,
+                        "region": region,
+                        "label": label,
+                        "coalition": leader if (region, leader) in coalesced else None,
+                        "votes": votes,
+                        "seats": seats,
+                    }
+                )
+            day_singles = [row for row in singles if row[0] == day]
+            for row in day_singles:
+                if row[6] and row[5] < max(other[5] for other in day_singles if other[2] == row[2]):
+                    recovered.append((day, row[1], row[3], row[7]))
+            continue
         with zipfile.ZipFile(raw.cached(SOURCE, ARCHIVE.format(day=day)).path) as archive:
             names = archive.namelist()
             candlista = next(name for name in names if "candlista" in name.lower())
@@ -371,6 +658,20 @@ def parse() -> None:
     pl.DataFrame(all_unplaced, schema={"day": pl.Date, "region": pl.String, "senator": pl.String}).write_parquet(
         PARSED / "unplaced.parquet"
     )
+    pl.DataFrame(party_lists).write_parquet(PARSED / "party_lists.parquet")
+    pl.DataFrame(party_candidates, infer_schema_length=None).write_parquet(PARSED / "party_candidates.parquet")
+    pl.DataFrame(
+        party_accounts, schema=["day", "region", "place", "registered", "voters", "blank"], orient="row"
+    ).write_parquet(PARSED / "party_accounts.parquet")
+    pl.DataFrame(abroad_votes, schema=["day", "region", "country", "label", "votes"], orient="row").write_parquet(
+        PARSED / "abroad_votes.parquet"
+    )
+    pl.DataFrame(
+        singles, schema=["day", "region", "collegio", "label", "name", "votes", "elected", "senator"], orient="row"
+    ).write_parquet(PARSED / "singles.parquet")
+    pl.DataFrame(recovered, schema=["day", "region", "label", "senator"], orient="row").write_parquet(
+        PARSED / "recovered.parquet"
+    )
 
 
 def emit() -> Path:
@@ -381,13 +682,19 @@ def emit() -> Path:
     declared = pl.read_parquet(PARSED / "declared.parquet")
     roll = pl.read_parquet(PARSED / "senators.parquet").sort("start").unique("senator", keep="first")
     unplaced = pl.read_parquet(PARSED / "unplaced.parquet")
+    party_lists = pl.read_parquet(PARSED / "party_lists.parquet")
+    party_candidates = pl.read_parquet(PARSED / "party_candidates.parquet")
+    party_accounts = pl.read_parquet(PARSED / "party_accounts.parquet")
+    abroad_votes = pl.read_parquet(PARSED / "abroad_votes.parquet")
+    single_seats = pl.read_parquet(PARSED / "singles.parquet")
+    recovery = pl.read_parquet(PARSED / "recovered.parquet")
     record = {row["senator"]: row for row in roll.to_dicts()}
     with connect() as conn:
         cs = Changeset(
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Italian Senate elections 1948–2001: candidates and votes by collegio, regional group seats, and the elected senators",
+            summary="Italian Senate elections 1948–2013: candidates and votes by collegio, region, and country abroad, list and group seats, and the elected senators",
             polity="IT",
         )
 
@@ -416,10 +723,14 @@ def emit() -> Path:
             )
         for legislature, day in enumerate(DAYS, 1):
             cs.artifact(raw.cached(SOURCE, ARCHIVE.format(day=day)), interno)
+            cs.artifact(raw.cached(SOURCE, mandates(legislature)), senate_record)
+            if day >= CALDEROLI:
+                for url in pages(day):
+                    cs.artifact(raw.cached(SOURCE, url), interno)
+                continue
             cs.artifact(raw.cached(SOURCE, NATIONAL.format(day=day)), interno)
             for n in range(1, 21):
                 cs.artifact(raw.cached(SOURCE, ELIGENDO.format(day=day, n=n)), interno)
-            cs.artifact(raw.cached(SOURCE, mandates(legislature)), senate_record)
 
         italy = cs.polity("IT")
         nation = cs.area("it.nation", "IT")
@@ -438,6 +749,7 @@ def emit() -> Path:
             ("it.regione_senato", 1, "Senate region"),
             ("it.collegio_senato", 3, "Senate college"),
             ("it.collegio_senato_1993", 3, "Senate college"),
+            ("it.collegio_senato_2005", 3, "Senate college"),
         ):
             if code not in schemes:
                 cs.add("scheme", code=code, polity_id=italy, kind="electoral_district", rank=rank, noun=noun)
@@ -598,6 +910,8 @@ def emit() -> Path:
                 ("it.collegio_senato", DAYS[0], MATTARELLA)
                 if day < MATTARELLA
                 else ("it.collegio_senato_1993", MATTARELLA, CALDEROLI)
+                if day < CALDEROLI
+                else ("it.collegio_senato_2005", CALDEROLI, ROSATO)
             )
             code = f"{region}-{slug(key)}"
             if (scheme, code) in colleges:
@@ -792,9 +1106,316 @@ def emit() -> Path:
                 )
             return members
 
+        chamber_parties: dict[tuple[date, str], UUID] = {}
+        for held, label, party in conn.execute(
+            """select e.date_from, o.ballot_label, o.party_id from contest_option o
+               join contest c on c.id = o.contest_id join election e on e.id = c.election_id
+               where e.polity_id = %s and e.date_from >= %s and c.body_id <> %s and o.kind = 'list'
+               and o.party_id is not null""",
+            [italy, CALDEROLI, senate],
+        ).fetchall():
+            chamber_parties.setdefault((held, label), party)
+        divisions = {code: cs.area("it.ripartizione", code) for code, _ in ABROAD.values()}
+        coalition_ids: dict[tuple[date, str], UUID] = {}
+        coalition_members: set[tuple[UUID, UUID]] = set()
+        minted_countries: set[str] = set()
+
+        def list_party(label: str, day: date) -> UUID | None:
+            return chamber_parties.get((day, label)) or party_of(label, day.year)
+
+        def coalition_of(leader: str | None, day: date, election: UUID) -> UUID | None:
+            if leader is None:
+                return None
+            english, italian = LEADERS.get((day.year, leader)) or (
+                f"{proper(leader)} coalition",
+                f"Coalizione {proper(leader)}",
+            )
+            if (day, english) not in coalition_ids:
+                coalition_ids[day, english] = cs.key("it.alliance", f"{day}:{slug(english)}")
+                if coalition_ids[day, english] in cs.minted:
+                    cs.add("alliance", id=coalition_ids[day, english], kind="electoral_alliance", election_id=election)
+                    name(coalition_ids[day, english], english)
+                    name(coalition_ids[day, english], italian, "it", "native")
+            return coalition_ids[day, english]
+
         for day in DAYS:
             election = existing("it.election", f"{day}:general")
             path = f"it/{day}-general"
+            if day >= CALDEROLI:
+                day_accounts = party_accounts.filter(pl.col("day") == day)
+                day_candidates = party_candidates.filter(pl.col("day") == day)
+                day_lists = party_lists.filter(pl.col("day") == day)
+                for region in sorted(day_lists["region"].unique()):
+                    rows = day_lists.filter(pl.col("region") == region).sort("votes", descending=True).to_dicts()
+                    abroad = not region[0].isdigit()
+                    english = next(english for code, english in ABROAD.values() if code == region) if abroad else None
+                    contest_key = f"{day}:senate:{region}"
+                    contest = cs.key("it.contest", contest_key)
+                    cs.add(
+                        "contest",
+                        id=contest,
+                        election_id=election,
+                        kind="body_seats" if abroad else "list_allocation",
+                        body_id=senate,
+                        district_area_id=divisions[region] if abroad else region_areas[region],
+                        magnitude=sum(row["seats"] for row in rows),
+                        electoral_system_id=systems["senato-estero" if abroad else "senato-proportional-2005"],
+                        default_result_kind="counted",
+                    )
+                    name(contest, f"Senate, abroad: {english}" if abroad else f"Senate, {region_names[region]}")
+                    cs.add(
+                        "slug",
+                        path=f"{path}/senate/abroad-{region}"
+                        if abroad
+                        else f"{path}/senate/{slug(region_names[region])}",
+                        entity_id=contest,
+                    )
+                    counted = result_set(contest_key, election, contest)
+                    listed = day_candidates.filter(pl.col("region") == region)
+                    opted = listed.filter(pl.col("proclaimed") & ~pl.col("elected"))
+                    if opted.height:
+                        names = sorted(
+                            f"{proper(row['forename'] or '')} {proper(row['surname'] or row['name'])}".strip()
+                            for row in opted.to_dicts()
+                        )
+                        cs.add(
+                            "note", entity_id=counted, kind="caveat", body_md=OPTED_NOTE.format(names=", ".join(names))
+                        )
+                    later = listed.filter(pl.col("replacement"))
+                    if later.height:
+                        names = sorted(
+                            f"{proper(row['forename'] or '')} {proper(row['surname'] or row['name'])}".strip()
+                            for row in later.to_dicts()
+                        )
+                        cs.add(
+                            "note",
+                            entity_id=counted,
+                            kind="caveat",
+                            body_md=REPLACED_SAME_DAY.format(names=", ".join(names)),
+                        )
+                    units: dict[str | None, UUID] = {}
+                    for place, registered, voters, blank in (
+                        day_accounts.filter((pl.col("region") == region) & (pl.col("place").is_null() != abroad))
+                        .select("place", "registered", "voters", "blank")
+                        .sort("place")
+                        .iter_rows()
+                    ):
+                        if abroad:
+                            code = interno_key(place)
+                            units[place] = cs.unit("it.estero", code)
+                            if units[place] in cs.minted and code not in minted_countries:
+                                minted_countries.add(code)
+                                cs.add(
+                                    "reporting_unit",
+                                    id=units[place],
+                                    polity_id=italy,
+                                    scheme_code="it.estero",
+                                    code=code,
+                                    area_relation="unlocated",
+                                    kind="abroad_mission",
+                                )
+                                name(units[place], place.title().replace(" E ", " e ").replace(" Di ", " di "), "it")
+                        else:
+                            units[place] = cs.unit("it.regione", region)
+                        if registered >= voters:
+                            value_row(counted, units[place], None, REGISTERED, registered)
+                        value_row(counted, units[place], None, VOTERS, voters)
+                        value_row(counted, units[place], None, BLANK, blank)
+                    for row in rows:
+                        option = cs.key("it.option", f"{contest_key}:{slug(row['label'])}")
+                        alliance = coalition_of(row["coalition"], day, election)
+                        party = list_party(row["label"], day)
+                        if alliance is not None and party is not None and (alliance, party) not in coalition_members:
+                            coalition_members.add((alliance, party))
+                            if alliance in cs.minted:
+                                cs.add("alliance_member", alliance_id=alliance, party_id=party)
+                        cs.add(
+                            "contest_option",
+                            id=option,
+                            contest_id=contest,
+                            kind="list",
+                            party_id=party,
+                            alliance_id=alliance,
+                            ballot_label=row["label"],
+                        )
+                        if abroad:
+                            for country, votes in (
+                                abroad_votes.filter(
+                                    (pl.col("day") == day)
+                                    & (pl.col("region") == region)
+                                    & (pl.col("label") == row["label"])
+                                )
+                                .select("country", "votes")
+                                .sort("country")
+                                .iter_rows()
+                            ):
+                                value_row(counted, units[country], option, VOTES, votes)
+                        else:
+                            value_row(counted, units[None], option, VOTES, row["votes"])
+                        if row["seats"]:
+                            cs.add("outcome", result_set_id=counted, option_id=option, kind="won", seats=row["seats"])
+                        for member in listed.filter(pl.col("label") == row["label"]).to_dicts():
+                            member |= {
+                                "surname": member["surname"] or member["name"],
+                                "forename": member["forename"] or "",
+                                "key": slug(row["label"]),
+                            }
+                            person = person_of(member, day, region)
+                            candidacy = cs.key("it.candidacy", f"{contest_key}:{slug(row['label'])}:{person}")
+                            cs.add(
+                                "candidacy",
+                                id=candidacy,
+                                person_id=person,
+                                option_id=option,
+                                role="list_member",
+                                list_position=member["position"],
+                                ballot_name=member["name"],
+                            )
+                            if member["elected"]:
+                                cs.add(
+                                    "outcome",
+                                    result_set_id=counted,
+                                    option_id=option,
+                                    candidacy_id=candidacy,
+                                    kind="elected",
+                                )
+                day_singles = single_seats.filter(pl.col("day") == day)
+                for region, collegio in (
+                    day_singles.select("region", "collegio").unique().sort("region", "collegio").iter_rows()
+                ):
+                    key = fold(collegio)
+                    rows = (
+                        day_singles.filter((pl.col("region") == region) & (pl.col("collegio") == collegio))
+                        .sort("votes", descending=True)
+                        .to_dicts()
+                    )
+                    label = label_of(collegio)
+                    area, unit = college(region, key, label, day)
+                    contest_key = f"{day}:senate:{region}:{slug(key)}"
+                    contest = cs.key("it.contest", contest_key)
+                    cs.add(
+                        "contest",
+                        id=contest,
+                        election_id=election,
+                        kind="body_seats",
+                        body_id=senate,
+                        district_area_id=area,
+                        magnitude=1,
+                        electoral_system_id=systems[
+                            "senato-valle-d-aosta" if region == "02" else "senato-trentino-2005"
+                        ],
+                        default_result_kind="counted",
+                    )
+                    name(contest, f"Senate, {label}")
+                    cs.add("slug", path=f"{path}/senate/{slug(region_names[region])}/{slug(key)}", entity_id=contest)
+                    counted = result_set(contest_key, election, contest)
+                    for registered, voters, blank in (
+                        day_accounts.filter((pl.col("region") == region) & (pl.col("place") == collegio))
+                        .select("registered", "voters", "blank")
+                        .iter_rows()
+                    ):
+                        if registered >= voters:
+                            value_row(counted, unit, None, REGISTERED, registered)
+                        value_row(counted, unit, None, VOTERS, voters)
+                        value_row(counted, unit, None, BLANK, blank)
+                    for position, row in enumerate(rows):
+                        option = cs.key("it.option", f"{contest_key}:{slug(row['name'])}")
+                        party = list_party(row["label"], day)
+                        cs.add(
+                            "contest_option",
+                            id=option,
+                            contest_id=contest,
+                            kind="candidate",
+                            party_id=party,
+                            ballot_label=row["label"],
+                        )
+                        person = person_of(
+                            {
+                                "senator": row["senator"],
+                                "surname": row["name"],
+                                "forename": "",
+                                "birth": None,
+                                "sex": None,
+                                "key": key,
+                            },
+                            day,
+                            region,
+                        )
+                        candidacy = cs.key("it.candidacy", f"{contest_key}:{slug(row['name'])}")
+                        cs.add(
+                            "candidacy",
+                            id=candidacy,
+                            person_id=person,
+                            option_id=option,
+                            role="head",
+                            ballot_name=row["name"],
+                        )
+                        if party is not None:
+                            cs.add("candidacy_nomination", candidacy_id=candidacy, party_id=party, kind="nominated")
+                        value_row(counted, unit, option, VOTES, row["votes"])
+                        if position == 0 and row["elected"]:
+                            cs.add("outcome", result_set_id=counted, option_id=option, kind="elected")
+                for region, label, senator in (
+                    recovery.filter(pl.col("day") == day).select("region", "label", "senator").iter_rows()
+                ):
+                    contest_key = f"{day}:senate:{region}"
+                    contest = cs.key("it.contest", contest_key)
+                    cs.add(
+                        "contest",
+                        id=contest,
+                        election_id=election,
+                        kind="list_allocation",
+                        body_id=senate,
+                        district_area_id=region_areas[region],
+                        magnitude=1,
+                        electoral_system_id=systems["senato-trentino-recovery-2005"],
+                        default_result_kind="counted",
+                    )
+                    name(contest, f"Senate, {region_names[region]} proportional seat")
+                    cs.add("slug", path=f"{path}/senate/{slug(region_names[region])}", entity_id=contest)
+                    counted = result_set(contest_key, election, contest, 0)
+                    groups = day_singles.filter(pl.col("region") == region)
+                    for group in sorted(groups["label"].unique()):
+                        option = cs.key("it.option", f"{contest_key}:{slug(group)}")
+                        cs.add(
+                            "contest_option",
+                            id=option,
+                            contest_id=contest,
+                            kind="list",
+                            party_id=list_party(group, day),
+                            ballot_label=group,
+                        )
+                        if group != label:
+                            continue
+                        cs.add("outcome", result_set_id=counted, option_id=option, kind="won", seats=1)
+                        row = groups.filter(
+                            (pl.col("label") == group) & pl.col("elected") & (pl.col("senator") == senator)
+                        ).to_dicts()[0]
+                        person = person_of(
+                            {
+                                "senator": senator,
+                                "surname": row["name"],
+                                "forename": "",
+                                "birth": None,
+                                "sex": None,
+                                "key": fold(row["collegio"]),
+                            },
+                            day,
+                            region,
+                        )
+                        candidacy = cs.key("it.candidacy", f"{contest_key}:{slug(group)}:{person}")
+                        cs.add(
+                            "candidacy",
+                            id=candidacy,
+                            person_id=person,
+                            option_id=option,
+                            role="list_member",
+                            ballot_name=row["name"],
+                        )
+                        cs.add(
+                            "outcome", result_set_id=counted, option_id=option, candidacy_id=candidacy, kind="elected"
+                        )
+                continue
             day_seats = seats.filter(pl.col("day") == day)
             day_declared = {
                 r: (n, c)
