@@ -1327,6 +1327,11 @@ def build() -> str:
                     cell[19] += published
                 else:
                     cell[13] += c.get("icpsr_only", 0)
+            if c["precincts"]:
+                cell = goals[("precinct_shapes", st, level, year)]
+                cell[0] += c["precincts"]
+                cell[1] += c["shaped_precincts"]
+                cell[10] += c["precincts"] - c["shaped_precincts"]
         elif coverage.target(st, level, year) == "county" or level in ("state_upper", "state_lower"):
             cell = goals[("history", st, level, year)]
             for i, value in enumerate([base, county, base - count, bare, totals, partial, 0, c.get("with_turnout", 0)]):

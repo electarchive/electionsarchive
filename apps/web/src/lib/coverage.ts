@@ -5,6 +5,7 @@ export const GOALS = [
   "history",
   "turnout",
   "precinct",
+  "precinct_shapes",
   "shapes",
   "shapes_history",
   "local",
@@ -55,8 +56,11 @@ export const US_COLUMNS = [
   "before_shapes",
   "since_any",
   "since_county",
-  "since_precinct",
   "since_shapes",
+  "precinct_2000",
+  "precinct_2016",
+  "precinct_shapes_2000",
+  "precinct_shapes_2016",
 ] as const;
 export const COUNTRY_COLUMNS = [
   "any",
@@ -90,8 +94,11 @@ export const COLUMN_LABELS: Record<Column, () => string> = {
   before_shapes: m.coverage_column_shapes,
   since_any: m.coverage_column_any,
   since_county: m.coverage_column_county,
-  since_precinct: m.coverage_column_precinct,
   since_shapes: m.coverage_column_shapes,
+  precinct_2000: m.coverage_era_mid,
+  precinct_2016: m.coverage_era_late,
+  precinct_shapes_2000: m.coverage_column_bonus,
+  precinct_shapes_2016: m.coverage_era_late,
   any: m.coverage_column_any,
   constituency: m.coverage_column_constituency,
   fine: m.coverage_column_fine,
@@ -99,6 +106,22 @@ export const COLUMN_LABELS: Record<Column, () => string> = {
   before: m.coverage_column_any,
   since: m.coverage_column_any,
 };
+
+export const ERA_LABELS = {
+  before: m.coverage_era_before,
+  since: m.coverage_era_since,
+  mid: m.coverage_era_mid,
+  late: m.coverage_era_late,
+};
+
+export const columnGroup = (column: Column) =>
+  column.startsWith("before")
+    ? m.coverage_era_before
+    : column.startsWith("since")
+      ? m.coverage_era_since
+      : column.startsWith("precinct_shapes")
+        ? m.coverage_column_precinct_shapes
+        : m.coverage_column_precinct;
 
 export function headline(polity: string, tier: string) {
   if (polity !== "us") {
@@ -143,7 +166,7 @@ export function measures(
   polity: string,
   tier: string,
 ): Array<{
-  era: "before" | "since" | null;
+  era: "before" | "since" | "mid" | "late" | null;
   items: Array<{ column: Column; goal: Goal; title: () => string }>;
 }> {
   if (polity !== "us") {
@@ -216,14 +239,39 @@ export function measures(
           title: m.coverage_column_county,
         },
         {
-          column: "since_precinct",
+          column: "since_shapes",
+          goal: "shapes",
+          title: m.coverage_column_shapes,
+        },
+      ],
+    },
+    {
+      era: "mid",
+      items: [
+        {
+          column: "precinct_2000",
           goal: "precinct",
           title: m.coverage_column_precinct,
         },
         {
-          column: "since_shapes",
-          goal: "shapes",
-          title: m.coverage_column_shapes,
+          column: "precinct_shapes_2000",
+          goal: "precinct_shapes",
+          title: m.coverage_column_precinct_shapes,
+        },
+      ],
+    },
+    {
+      era: "late",
+      items: [
+        {
+          column: "precinct_2016",
+          goal: "precinct",
+          title: m.coverage_column_precinct,
+        },
+        {
+          column: "precinct_shapes_2016",
+          goal: "precinct_shapes",
+          title: m.coverage_column_precinct_shapes,
         },
       ],
     },
@@ -237,7 +285,14 @@ export function grains(polity: string, tier: string): Array<Goal> {
   if (tier === "local" || tier === "turnout") {
     return [tier];
   }
-  return ["county", "precinct", "shapes", "history", "shapes_history"];
+  return [
+    "county",
+    "precinct",
+    "precinct_shapes",
+    "shapes",
+    "history",
+    "shapes_history",
+  ];
 }
 
 export type Reason =
@@ -296,6 +351,7 @@ export const REASONS: Record<Goal, Array<Reason>> = {
     "bare",
     "absent",
   ],
+  precinct_shapes: ["complete", "unshaped"],
   shapes: ["complete", "units", "unshaped", "undrawn"],
   shapes_history: ["complete", "units", "unshaped", "undrawn"],
   local: ["complete", "pending", "partial", "totals", "bare", "lost", "absent"],
@@ -361,6 +417,11 @@ const TURNOUT_LABELS: Partial<Record<Reason, () => string>> = {
   absent: m.coverage_reason_turnout_absent,
 };
 
+const PRECINCT_SHAPE_LABELS: Partial<Record<Reason, () => string>> = {
+  complete: m.coverage_reason_precinct_shaped,
+  unshaped: m.coverage_reason_precinct_unshaped,
+};
+
 const COUNTRY_LABELS: Partial<Record<Reason, () => string>> = {
   coarse: m.coverage_country_reason_coarse,
   partial: m.coverage_country_reason_partial,
@@ -371,6 +432,7 @@ const COUNTRY_LABELS: Partial<Record<Reason, () => string>> = {
 export function label(goal: Goal, reason: Reason, polity = "us") {
   return (
     (goal === "turnout" ? TURNOUT_LABELS[reason] : null) ??
+    (goal === "precinct_shapes" ? PRECINCT_SHAPE_LABELS[reason] : null) ??
     (polity === "us" ? null : COUNTRY_LABELS[reason]) ??
     LABELS[reason]
   )();

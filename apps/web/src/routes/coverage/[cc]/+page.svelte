@@ -24,6 +24,8 @@
     spans,
     TIER_LABELS,
     US_COLUMNS,
+    ERA_LABELS,
+    columnGroup,
     weighted,
   } from "#lib/coverage.js";
   import Tone from "#routes/coverage/tone.svelte";
@@ -50,6 +52,7 @@
     history: m.coverage_reason_complete_history_def,
     turnout: m.coverage_reason_complete_turnout_def,
     precinct: m.coverage_reason_complete_precinct_def,
+    precinct_shapes: m.coverage_reason_precinct_shaped_def,
     shapes: m.coverage_reason_complete_shapes_def,
     shapes_history: m.coverage_reason_complete_shapes_def,
     local: m.coverage_reason_complete_local_def,
@@ -125,6 +128,7 @@
   const GAP_LABELS: Partial<Record<Goal, () => string>> = {
     county: m.coverage_gap_county,
     precinct: m.coverage_gap_precinct,
+    precinct_shapes: m.coverage_gap_precinct_shapes,
     history: m.coverage_gap_history,
     shapes_history: m.coverage_gap_shapes_history,
     turnout: m.coverage_gap_turnout,
@@ -141,6 +145,15 @@
           data.tiers.some((row) => row.cells[column] != null),
         ),
   );
+  const opens = (used: ReadonlyArray<Column>, index: number) => {
+    const previous = used[index - 1];
+    const column = used[index];
+    return (
+      previous == null ||
+      column == null ||
+      columnGroup(column) !== columnGroup(previous)
+    );
+  };
   const slot = (column: Column, tier: string): Column =>
     tier === "turnout" && column === "before_any"
       ? "before"
@@ -346,8 +359,17 @@
 {/snippet}
 
 {#snippet head(isKinds: boolean, used: ReadonlyArray<Column>)}
-  {const before = $derived(
-    used.filter((column) => column.startsWith("before")).length,
+  {const runs = $derived(
+    used.flatMap((column, index) => {
+      if (!opens(used, index)) {
+        return [];
+      }
+      let span = 1;
+      while (index + span < used.length && !opens(used, index + span)) {
+        span += 1;
+      }
+      return [{ column, span }];
+    }),
   )}
   <thead class="text-xs/tight">
     {#if isUs}
@@ -358,29 +380,21 @@
           class="px-3.5 py-1.5 text-start align-bottom"
           >{m.coverage_column_kind()}</th
         >
-        {#if before > 0}
+        {#each runs as run (run.column)}
           <th
             scope="colgroup"
-            colspan={before}
+            colspan={run.span}
             class="border-s px-3 pbs-1.5 text-start text-muted-foreground"
-            >{m.coverage_era_before()}</th
+            >{columnGroup(run.column)()}</th
           >
-        {/if}
-        {#if used.length > before}
-          <th
-            scope="colgroup"
-            colspan={used.length - before}
-            class="border-s px-3 pbs-1.5 text-start text-muted-foreground"
-            >{m.coverage_era_since()}</th
-          >
-        {/if}
+        {/each}
       </tr>
       <tr>
         {#each used as column, index (column)}
           <th
             scope="col"
             class={cn("px-3 pbe-1.5 text-start align-bottom", {
-              "border-s": index === 0 || index === before,
+              "border-s": opens(used, index),
             })}>{COLUMN_LABELS[column]()}</th
           >
         {/each}
@@ -415,7 +429,7 @@
         <div class="grid content-start gap-0.5">
           <dt class="text-xs text-muted-foreground">
             {isUs
-              ? `${column.startsWith("before") ? m.coverage_era_before() : m.coverage_era_since()}, ${COLUMN_LABELS[column]().toLowerCase()}`
+              ? `${columnGroup(column)()}, ${COLUMN_LABELS[column]().toLowerCase()}`
               : COLUMN_LABELS[column]()}
           </dt>
           <dd>{@render cell(value, tierKey === "local" && isUs)}</dd>
@@ -445,7 +459,16 @@
               ? m.coverage_reason_absent_local_def
               : goal === "turnout"
                 ? TURNOUT_REASONS[reason]
-                : US_REASONS[reason])?.() ?? "",
+                : goal === "precinct_shapes" && reason === "unshaped"
+                  ? m.coverage_reason_precinct_unshaped_def
+                  : US_REASONS[reason])?.() ?? "",
+      )}
+      {const span = $derived(
+        isUs && reason === "unshaped"
+          ? data.unshaped.find(
+              (found) => found.tier === tierKey && found.goal === goal,
+            )
+          : undefined,
       )}
       <li class="grid grid-cols-[0.75rem_minmax(0,1fr)] gap-x-2">
         <Tone {reason} class="mbs-1 rounded-xs block-3 inline-3" />
@@ -458,7 +481,17 @@
                 })
               : count(counts[reason])}</span
           >
-          <span class="block text-xs text-muted-foreground">{definition}</span>
+          <span class="block text-xs text-muted-foreground"
+            >{definition}{#if span != null}{" "}{(span.from >= 2000 &&
+                span.to <= 2002
+                ? m.coverage_unshaped_span_redraw
+                : m.coverage_unshaped_span)({
+                years:
+                  span.from === span.to
+                    ? String(span.from)
+                    : `${span.from}–${span.to}`,
+              })}{/if}</span
+          >
           {#if reason === "complete" && counts.upcoming > 0}
             <span class="mbs-2 grid grid-cols-[0.75rem_minmax(0,1fr)] gap-x-2">
               <Tone
@@ -573,9 +606,16 @@
   title: string,
   progress: (inputs: { complete: string; total: string }) => string,
   tierKey: string,
+  isBonus: boolean,
 )}
   {const isWeighted = $derived(goal === "local" && counts.populationTotal > 0)}
-  {const shown = $derived(isWeighted ? weighted(counts) : counts)}
+  {const shown = $derived(
+    isWeighted
+      ? weighted(counts)
+      : isBonus
+        ? { ...counts, unshaped: 0 }
+        : counts,
+  )}
   {const held = $derived(counts.total - counts.absent)}
   <div class="grid content-start gap-2 min-inline-0">
     <p class="text-xs font-bold tracking-wide text-muted-foreground uppercase">
@@ -625,11 +665,13 @@
           {m.coverage_lost_of({ count: count(counts.lost) })}
         </span>
       {/if}
-      <span class="text-muted-foreground">
-        {m.coverage_short({
-          count: count(counts.total - counts.complete - counts.lost),
-        })}
-      </span>
+      {#if !isBonus}
+        <span class="text-muted-foreground">
+          {m.coverage_short({
+            count: count(counts.total - counts.complete - counts.lost),
+          })}
+        </span>
+      {/if}
     </p>
     <Bar
       counts={shown}
@@ -665,12 +707,11 @@
           held: count(held),
         })}
       </p>
-    {:else if goal === "precinct" && counts.precincts > 0}
-      <p class="text-xs text-muted-foreground">
-        {m.coverage_shapes({
-          shaped: count(counts.shaped),
-          precincts: count(counts.precincts),
-        })}
+    {:else if goal === "precinct_shapes"}
+      <p class="text-xs text-muted-foreground max-inline-[72ch]">
+        {(isBonus
+          ? m.coverage_note_precinct_shapes_bonus
+          : m.coverage_note_precinct_shapes)()}
       </p>
     {:else if isUs && (goal === "shapes" || goal === "shapes_history")}
       <p class="text-xs text-muted-foreground">
@@ -895,7 +936,7 @@
               {#each columns as column, index (column)}
                 <td
                   class={cn("px-3 py-2.5", {
-                    "border-s": isUs && (index === 0 || index === 3),
+                    "border-s": isUs && opens(columns, index),
                   })}
                 >
                   {@render cell(
@@ -967,9 +1008,7 @@
               <div class="grid gap-3">
                 {#if block.era != null}
                   <h3 class="text-sm font-bold">
-                    {(block.era === "before"
-                      ? m.coverage_era_before
-                      : m.coverage_era_since)()}
+                    {ERA_LABELS[block.era]()}
                   </h3>
                 {/if}
                 <div class="grid gap-x-8 gap-y-5 lg:grid-cols-2 xl:grid-cols-3">
@@ -983,9 +1022,12 @@
                           ? m.coverage_progress_local
                           : item.goal === "turnout"
                             ? m.coverage_progress_turnout
-                            : m.coverage_progress
+                            : item.goal === "precinct_shapes"
+                              ? m.coverage_progress_precincts
+                              : m.coverage_progress
                         : lead.progress,
                       row.key,
+                      item.column === "precinct_shapes_2000",
                     )}
                   {/each}
                 </div>
@@ -1093,13 +1135,7 @@
                   {#each used as column, index (column)}
                     <td
                       class={cn("px-3 py-2.5", {
-                        "border-s":
-                          isUs &&
-                          (index === 0 ||
-                            index ===
-                              used.findIndex((found) =>
-                                found.startsWith("since"),
-                              )),
+                        "border-s": isUs && opens(used, index),
                       })}
                     >
                       {@render cell(

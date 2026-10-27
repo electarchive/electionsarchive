@@ -22,8 +22,11 @@ US_GOALS = {
     "before_district": ("history", None),
     "before_shapes": ("shapes_history", None),
     "since_county": ("county", None),
-    "since_precinct": ("precinct", None),
     "since_shapes": ("shapes", None),
+    "precinct_2000": ("precinct", "mid"),
+    "precinct_2016": ("precinct", "late"),
+    "precinct_shapes_2000": ("precinct_shapes", "mid"),
+    "precinct_shapes_2016": ("precinct_shapes", "late"),
     "before": ("turnout", "before"),
     "since": ("turnout", "since"),
 }
@@ -195,7 +198,12 @@ def pages(conn) -> list[str]:
                             None,
                         )
                     )
-                    low, high = {"before": (0, 1999), "since": (2000, 9999)}.get(era, (0, 9999))
+                    low, high = {
+                        "before": (0, 1999),
+                        "since": (2000, 9999),
+                        "mid": (2000, 2015),
+                        "late": (2016, 9999),
+                    }.get(era, (0, 9999))
                     total, complete, icpsr, published, lost, upcoming, pending = conn.execute(
                         "select coalesce(sum(total), 0), coalesce(sum(complete + upcoming), 0), coalesce(sum(icpsr), 0),"
                         " coalesce(sum(published), 0), coalesce(sum(lost), 0), coalesce(sum(upcoming), 0),"

@@ -14,6 +14,8 @@ import {
   TIER_LABELS,
   US_COLUMNS,
   weighted,
+  columnGroup,
+  ERA_LABELS,
   type Column,
   type Counts,
   type Tier,
@@ -556,7 +558,7 @@ function coverageMarkdown(
         : column;
   const heading = (column: Column) =>
     isUs
-      ? `${(column.startsWith("before") ? m.coverage_era_before : m.coverage_era_since)()}, ${COLUMN_LABELS[column]().toLowerCase()}`
+      ? `${columnGroup(column)()}, ${COLUMN_LABELS[column]().toLowerCase()}`
       : COLUMN_LABELS[column]();
   const cell = (counts: Counts | null | undefined) =>
     counts == null
@@ -667,6 +669,7 @@ function coverageMarkdown(
             return [];
           }
           const isWeighted = item.goal === "local" && row.populationTotal > 0;
+          const isBonus = item.column === "precinct_shapes_2000";
           const held = row.total - row.absent;
           const progress = isWeighted
             ? m.coverage_progress_local_count
@@ -676,7 +679,9 @@ function coverageMarkdown(
                 ? m.coverage_progress_local
                 : item.goal === "turnout"
                   ? m.coverage_progress_turnout
-                  : m.coverage_progress;
+                  : item.goal === "precinct_shapes"
+                    ? m.coverage_progress_precincts
+                    : m.coverage_progress;
           const note =
             isUs && item.goal === "history" && tier.key !== "legislative"
               ? m.coverage_note_history_1824()
@@ -685,11 +690,10 @@ function coverageMarkdown(
                     count: count(row.turnout),
                     held: count(held),
                   })
-                : item.goal === "precinct" && row.precincts > 0
-                  ? m.coverage_shapes({
-                      shaped: count(row.shaped),
-                      precincts: count(row.precincts),
-                    })
+                : item.goal === "precinct_shapes"
+                  ? (isBonus
+                      ? m.coverage_note_precinct_shapes_bonus
+                      : m.coverage_note_precinct_shapes)()
                   : isUs &&
                       (item.goal === "shapes" || item.goal === "shapes_history")
                     ? m.coverage_note_shapes()
@@ -720,12 +724,20 @@ function coverageMarkdown(
                 ...(row.lost > 0
                   ? [m.coverage_lost_of({ count: count(row.lost) })]
                   : []),
-                m.coverage_short({
-                  count: count(row.total - row.complete - row.lost),
-                }),
+                ...(isBonus
+                  ? []
+                  : [
+                      m.coverage_short({
+                        count: count(row.total - row.complete - row.lost),
+                      }),
+                    ]),
               ].join(", ")}`,
               REASONS[item.goal]
-                .filter((reason) => reason === "complete" || row[reason] > 0)
+                .filter(
+                  (reason) =>
+                    reason === "complete" ||
+                    (row[reason] > 0 && !(isBonus && reason === "unshaped")),
+                )
                 .flatMap((reason) => [
                   `- ${reasonLabel(item.goal, reason, data.polity)}: ${count(row[reason])}${isWeighted ? ` (${m.coverage_population_share({ percent: percent(weighted(row)[reason] / Math.max(1, row.populationTotal), 1) })})` : ""}`,
                   ...(reason === "complete" && row.upcoming > 0
@@ -792,11 +804,7 @@ function coverageMarkdown(
         return lines.length === 0
           ? []
           : [
-              ...(block.era == null
-                ? []
-                : [
-                    `### ${(block.era === "before" ? m.coverage_era_before : m.coverage_era_since)()}`,
-                  ]),
+              ...(block.era == null ? [] : [`### ${ERA_LABELS[block.era]()}`]),
               ...lines,
             ];
       });

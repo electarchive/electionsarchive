@@ -16,6 +16,7 @@ const GOALS = [
   "history",
   "turnout",
   "precinct",
+  "precinct_shapes",
   "shapes",
   "shapes_history",
   "local",
@@ -124,10 +125,14 @@ const ZERO = Object.fromEntries(
 type Row = {
   goal: Goal;
   level: string;
-  before: boolean;
+  era: "before" | "mid" | "late";
   years: Array<number>;
 } & Counts;
-type Spec = { goal: Goal; era?: "before" | "since"; any?: boolean } | null;
+type Spec = {
+  goal: Goal;
+  era?: "before" | "since" | "mid" | "late";
+  any?: boolean;
+} | null;
 
 function sum(rows: Array<Row>, spec: Spec, levels: ReadonlyArray<string>) {
   if (spec == null) {
@@ -138,7 +143,8 @@ function sum(rows: Array<Row>, spec: Spec, levels: ReadonlyArray<string>) {
     if (
       row.goal === spec.goal &&
       levels.includes(row.level) &&
-      (spec.era == null || row.before === (spec.era === "before"))
+      (spec.era == null ||
+        (spec.era === "since" ? row.era !== "before" : row.era === spec.era))
     ) {
       for (const key of Object.keys(counts) as Array<keyof Counts>) {
         total[key] += row[key];
@@ -203,8 +209,11 @@ function tiers(polity: string, rows: Array<Row>, levels: Polity["levels"]) {
         before_shapes: { goal: "shapes_history" },
         since_any: { goal: "county", any: true },
         since_county: { goal: "county" },
-        since_precinct: { goal: "precinct" },
         since_shapes: { goal: "shapes" },
+        precinct_2000: { goal: "precinct", era: "mid" },
+        precinct_2016: { goal: "precinct", era: "late" },
+        precinct_shapes_2000: { goal: "precinct_shapes", era: "mid" },
+        precinct_shapes_2016: { goal: "precinct_shapes", era: "late" },
       };
     };
     const cells = (
@@ -326,7 +335,7 @@ export const coverage = {
         `),
       ]);
       const found = await db.execute<{ polity: string } & Row>(sql`
-        select g.polity, g.goal, g.level, g.year < 2000 as before, array_agg(distinct g.year order by g.year) as years,
+        select g.polity, g.goal, g.level, case when g.year < 2000 then 'before' when g.year < 2016 then 'mid' else 'late' end as era, array_agg(distinct g.year order by g.year) as years,
           ${SUMS}
         from coverage_goal g
         where g.goal in ('history', 'county', 'local', 'subnational', 'national', 'referendums', 'ep')
@@ -394,7 +403,7 @@ export const coverage = {
         method: "GET",
         path: "/coverage/{polity}",
         summary:
-          "One country's coverage by tier (polity is a lowercase ISO code, or eu): national, regional, and local elections, referendums, and the European Parliament (for the US: federal, statewide, state legislative, local, and turnout), each with counts at every grain (any results, by constituency or county, finer, and map shapes; for the US split before 2000 and from 2000) for the tier and for each kind of election in it, plus the cited sources of the denominators and what is left uncounted; complete includes upcoming, the races still to vote that the archive holds with their candidates or options in full, and pending counts those still short of them",
+          "One country's coverage by tier (polity is a lowercase ISO code, or eu): national, regional, and local elections, referendums, and the European Parliament (for the US: federal, statewide, state legislative, local, and turnout), each with counts at every grain (any results, by constituency or county, finer, and map shapes; for the US split before 2000 and from 2000, with precinct results and precinct shapes split into 2000–2015 and 2016 on; precinct shapes count precincts, and the target starts in 2016) for the tier and for each kind of election in it, plus the cited sources of the denominators and what is left uncounted; complete includes upcoming, the races still to vote that the archive holds with their candidates or options in full, and pending counts those still short of them",
       }),
     )
     .input(v.object({ polity: Code }))
@@ -426,6 +435,14 @@ export const coverage = {
             states: v.array(v.object({ state: v.string(), ...Ready })),
           }),
         ),
+        unshaped: v.array(
+          v.object({
+            tier: v.string(),
+            goal: v.string(),
+            from: v.number(),
+            to: v.number(),
+          }),
+        ),
       }),
     )
     .handler(async ({ input }) => {
@@ -437,7 +454,7 @@ export const coverage = {
         throw new ORPCError("NOT_FOUND");
       }
       const found = await db.execute<Row>(sql`
-        select g.goal, g.level, g.year < 2000 as before, array_agg(distinct g.year order by g.year) as years, ${SUMS}
+        select g.goal, g.level, case when g.year < 2000 then 'before' when g.year < 2016 then 'mid' else 'late' end as era, array_agg(distinct g.year order by g.year) as years, ${SUMS}
         from coverage_goal g
         where g.polity = ${input.polity}
         group by 1, 2, 3
@@ -479,11 +496,55 @@ export const coverage = {
         }
         group.states.push(row);
       }
+      const years = await db.execute<{
+        goal: string;
+        level: string;
+        year: number;
+        unshaped: number;
+      }>(sql`
+        select g.goal, g.level, g.year, sum(g.unshaped)::int as unshaped
+        from coverage_goal g
+        where g.polity = ${input.polity} and g.goal in ('shapes', 'shapes_history') and g.unshaped > 0
+        group by 1, 2, 3
+      `);
+      const unshaped = Object.entries(US_TIERS).flatMap(([tier, levels]) =>
+        ["shapes", "shapes_history"].flatMap((goal) => {
+          const byYear = new Map<number, number>();
+          for (const row of years.rows) {
+            if (
+              row.goal === goal &&
+              (levels as ReadonlyArray<string>).includes(row.level)
+            ) {
+              byYear.set(row.year, (byYear.get(row.year) ?? 0) + row.unshaped);
+            }
+          }
+          const sorted = [...byYear.entries()].toSorted((a, b) => a[0] - b[0]);
+          let total = 0;
+          for (const [, count] of sorted) {
+            total += count;
+          }
+          let best: { from: number; to: number } | null = null;
+          for (const [start, [from]] of sorted.entries()) {
+            let sum = 0;
+            for (const [to, count] of sorted.slice(start)) {
+              sum += count;
+              if (sum * 2 > total) {
+                if (best == null || to - from < best.to - best.from) {
+                  best = { from, to };
+                }
+                break;
+              }
+            }
+          }
+          return best == null ? [] : [{ tier, goal, ...best }];
+        }),
+      );
       return {
         ...status,
         summary,
         tiers: tiers(input.polity, found.rows, summary.levels),
         readiness,
+        unshaped,
       };
     }),
   gaps: os
@@ -542,6 +603,7 @@ export const coverage = {
           where g.polity = ${input.polity} and g.goal = ${input.goal}
             and (${state}::text is null or g.state = ${state})
             and (${level}::text is null or g.level = ${level})
+            and (${input.goal} <> 'precinct_shapes' or g.year >= 2016)
             and (${tier}::text is null or g.level = any(coalesce(string_to_array(${usLevels}::text, ','),
               (select array_agg(l ->> 'key') from coverage_polity c cross join jsonb_array_elements(c.levels) l
                 where c.polity = ${input.polity} and l ->> 'goal' = ${tier}))))
