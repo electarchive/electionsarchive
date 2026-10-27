@@ -188,7 +188,7 @@ METHODOLOGY = (
 )
 ELECTION_NOTE = (
     "Vote counts are the Interior Ministry's provisional count. Outcomes come from the proclamation as recorded in "
-    "the Chamber's mandates. The Senate election held the same day is not yet in the archive."
+    "the Chamber's mandates."
 )
 LEGEND_NOTE = (
     "Votes marked only on a single-member candidate are stored on a Candidate only option for each coalition in "
@@ -1082,18 +1082,6 @@ def emit() -> Path:
         name(general, "Elezioni politiche del 2022", "it", "native")
         path = f"it/{GENERAL}-general"
         cs.add("slug", path=path, entity_id=general)
-        earlier = conn.execute(
-            """select n.id from note n join changeset c on c.id = n.changeset_id
-               where c.pipeline = %s and n.entity_id = %s and n.kind = 'context' order by n.id limit 1""",
-            [SOURCE, general],
-        ).fetchone()
-        cs.add(
-            "note",
-            **({"id": earlier[0]} if earlier else {}),
-            entity_id=general,
-            kind="context",
-            body_md=ELECTION_NOTE,
-        )
         groups: dict[str, list[str]] = {}
         for label, group in lists.items():
             groups.setdefault(group, []).append(label)
@@ -1160,6 +1148,19 @@ def emit() -> Path:
             return f"{value:%B} {value.day}, {value.year}"
 
         national = cs.key("it.contest", f"{GENERAL}:camera")
+        earlier = conn.execute(
+            """select n.id from note n join changeset c on c.id = n.changeset_id
+               where c.pipeline = %s and n.entity_id = any(%s) and n.kind = 'context'
+                 and n.body_md like 'Vote counts are%%' order by n.id limit 1""",
+            [SOURCE, [general, national]],
+        ).fetchone()
+        cs.add(
+            "note",
+            **({"id": earlier[0]} if earlier else {}),
+            entity_id=national,
+            kind="context",
+            body_md=ELECTION_NOTE,
+        )
         cs.add(
             "contest",
             id=national,

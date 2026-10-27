@@ -989,6 +989,13 @@ def emit() -> Path:
                 [SOURCE],
             ).fetchall()
         )
+        chamber_notes = dict(
+            conn.execute(
+                """select n.entity_id, n.id from note n join changeset c on c.id = n.changeset_id
+                   where c.pipeline = %s and n.kind = 'context' and n.body_md like 'List votes are the Interior%%'""",
+                [SOURCE],
+            ).fetchall()
+        )
         italy = cs.polity("IT")
         nation = cs.area("it.nation", "IT")
         region_areas = {code: cs.area("it.regione", code) for code in REGIONS}
@@ -1332,14 +1339,6 @@ def emit() -> Path:
                 name(election, f"{year} Italian general election")
                 name(election, f"Elezioni politiche del {year}", "it", "native")
                 cs.add("slug", path=path, entity_id=election)
-                cs.add(
-                    "note",
-                    entity_id=election,
-                    kind="context",
-                    body_md=ELECTION_NOTE
-                    if day < MATTARELLA or day >= CALDEROLI
-                    else f"{ELECTION_NOTE} {DERIVED_WINNERS}",
-                )
             if day < MATTARELLA:
                 system, magnitude = "camera-proportional-1948", {1948: 574, 1953: 590, 1958: 596}.get(year, 630)
             elif day < CALDEROLI:
@@ -1363,6 +1362,17 @@ def emit() -> Path:
             )
             name(contest, "Chamber of Deputies, national seat allocation")
             cs.add("slug", path=f"{path}/chamber", entity_id=contest)
+            cs.add(
+                "note",
+                **(
+                    {"id": chamber_notes.get(election) or chamber_notes[contest]}
+                    if election in chamber_notes or contest in chamber_notes
+                    else {}
+                ),
+                entity_id=contest,
+                kind="context",
+                body_md=ELECTION_NOTE,
+            )
             counted = result_set(contest_key, election, contest)
             fresh = counted in cs.minted
             day_seats = seats.filter(pl.col("day") == day)
@@ -1466,6 +1476,8 @@ def emit() -> Path:
                 )
                 name(single, f"Chamber of Deputies, {label}")
                 cs.add("slug", path=f"{path}/chamber/{slug(code)}", entity_id=single)
+                if MATTARELLA <= day < CALDEROLI:
+                    cs.add("note", entity_id=single, kind="context", body_md=DERIVED_WINNERS)
                 counted_votes = day_singles.filter(pl.col("college") == code)["votes"].sum()
                 share = 1 if code not in turnout else min(1, counted_votes / turnout[code][3])
                 declared = result_set(single_key, election, single, round(share, 4))
