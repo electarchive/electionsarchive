@@ -5,6 +5,7 @@ import json
 import re
 import subprocess
 import zipfile
+from collections import Counter
 from datetime import UTC, date, datetime
 from pathlib import Path
 from uuid import UUID, uuid5
@@ -270,6 +271,66 @@ OFFICIAL = {
         "Candidate list, 2026 general election",
         ["https://www.sos.ks.gov/elections/elections_upcoming_candidate.aspx#browser"],
     ),
+    "AR": (
+        "Arkansas Secretary of State",
+        "2026 candidate search export",
+        ["https://candidates.arkansas.gov/#MF-134"],
+    ),
+    "PA": (
+        "Pennsylvania Department of State",
+        "Official candidate listing (post primary), 2026 general election",
+        ["https://www.pavoterservices.pa.gov/electioninfo/FooterLinkReport.aspx?ID=1420#MF-135"],
+    ),
+    "NV": (
+        "Nevada Secretary of State",
+        "2026 candidate filing list",
+        ["https://www.nvsos.gov/SOSCandidateServices/AnonymousAccess/CEFDSearchUU/CertCandList.aspx#MF-136"],
+    ),
+    "MN": (
+        "Minnesota Secretary of State",
+        "Candidate filings, November 3, 2026 state general elections",
+        ["https://candidates.sos.mn.gov/CandidateFilingResults.aspx#MF-137"],
+    ),
+    "WV": (
+        "West Virginia Secretary of State",
+        "2026 general candidate listing",
+        ["https://candidates.wvsos.gov/regular#MF-138"],
+    ),
+    "MS": (
+        "Mississippi Secretary of State",
+        "Candidate qualifying list",
+        ["https://sos.ms.gov/content/CandidateQualifying/default.aspx"],
+    ),
+    "HI": (
+        "Hawaii Office of Elections",
+        "2026 general election ballot proofs",
+        ["https://elections.hawaii.gov/wp-content/uploads/2026-General-Ballot-Proofs.pdf"],
+    ),
+    "OR": (
+        "Oregon Secretary of State",
+        "Voters' pamphlet, November 3, 2026 general election: list of candidates and measures",
+        [
+            "https://sos.oregon.gov/elections/Voters-Pamphlet/Documents/VP_G26-Book1_web.pdf",
+            "https://sos.oregon.gov/elections/Voters-Pamphlet/Documents/VP_G26-Book2_web.pdf",
+            "https://sos.oregon.gov/elections/Voters-Pamphlet/Documents/VP_G26-Book3_web.pdf",
+            "https://sos.oregon.gov/elections/Voters-Pamphlet/Documents/VP_G26-Book4_web.pdf",
+            "https://sos.oregon.gov/elections/Voters-Pamphlet/Documents/VP_G26-Book5_web.pdf",
+            "https://sos.oregon.gov/elections/Voters-Pamphlet/Documents/VP_G26-Book6_web.pdf",
+            "https://sos.oregon.gov/elections/Voters-Pamphlet/Documents/VP_G26-Book7_web.pdf",
+            "https://sos.oregon.gov/elections/Voters-Pamphlet/Documents/VP_G26-Book8_web.pdf",
+            "https://sos.oregon.gov/elections/Voters-Pamphlet/Documents/VP_G26-Book9_web.pdf",
+            "https://sos.oregon.gov/elections/Voters-Pamphlet/Documents/VP_G26-Book10_web.pdf",
+            "https://sos.oregon.gov/elections/Voters-Pamphlet/Documents/VP_G26-Book11_web.pdf",
+            "https://sos.oregon.gov/elections/Voters-Pamphlet/Documents/VP_G26-Book12_web.pdf",
+            "https://sos.oregon.gov/elections/Voters-Pamphlet/Documents/VP_G26-Book13_web.pdf",
+            "https://sos.oregon.gov/elections/Voters-Pamphlet/Documents/VP_G26-Book14_web.pdf",
+            "https://sos.oregon.gov/elections/Voters-Pamphlet/Documents/VP_G26-Book15_web.pdf",
+            "https://sos.oregon.gov/elections/Voters-Pamphlet/Documents/VP_G26-Book16_web.pdf",
+            "https://sos.oregon.gov/elections/Voters-Pamphlet/Documents/VP_G26-Book17_web.pdf",
+            "https://sos.oregon.gov/elections/Voters-Pamphlet/Documents/VP_G26-Book18_web.pdf",
+            "https://sos.oregon.gov/elections/Voters-Pamphlet/Documents/VP_G26-Book19_web.pdf",
+        ],
+    ),
     "AS": (
         "American Samoa Election Office",
         "Candidates for the 2026 midterm election",
@@ -309,6 +370,7 @@ MAJOR = [
     (re.compile(r"(?i)\bdemocrat"), "democratic-party"),
     (re.compile(r"(?i)\brepublican"), "republican-party"),
     (re.compile(r"(?i)\blibertarian"), "libertarian-party"),
+    (re.compile(r"(?i)^pacific green"), "OR:pacific-green-party"),
     (re.compile(r"(?i)\bgreen\b"), "green-party"),
     (re.compile(r"(?i)\bconstitution\b"), "constitution-party"),
 ]
@@ -317,7 +379,7 @@ DAY = date(2026, 11, 3)
 REDISTRICTED = {"AL", "CA", "FL", "LA", "NC", "OH", "TN", "TX", "UT"}
 CLASS_THREE_SPECIALS = ("OH", "FL")
 NO_GENERAL = ("PR",)
-SUPPLEMENTED = {"RI"}
+SUPPLEMENTED = {"RI", "AR", "NV", "MN"}
 SYSTEM_OVERRIDES = {"AK": "top_four", "LA": "fptp", "LA:house": "two_round"}
 ORDINALS = {1: "st", 2: "nd", 3: "rd"}
 TRANSCRIBED = {
@@ -368,6 +430,11 @@ def cells(text: str) -> list[list[str]]:
         ]
         for row in re.findall(r"<tr[^>]*>(.*?)</tr>", text, re.DOTALL)
     ]
+
+
+def single_filers(rows: list[tuple[str, int | None, str, str]]) -> list[tuple[str, int | None, str, str]]:
+    counts = Counter((office, district, party) for office, district, _, party in rows)
+    return [row for row in rows if counts[row[0], row[1], row[3]] == 1 or INDEPENDENT.match(row[3])]
 
 
 def read(state: str, path: Path) -> list[tuple[str, int | None, str, str]]:
@@ -837,6 +904,170 @@ def read(state: str, path: Path) -> list[tuple[str, int | None, str, str]]:
                 row["Party"], row["Party"]
             )
             rows.append((office, int(house[1]) if house else None, row["Name on Ballot"].strip(), party))
+        return rows
+    if state == "AR":
+        for row in csv.DictReader(io.StringIO(path.read_text(encoding="utf-8-sig"))):
+            race = row["Position/Office"]
+            house = re.fullmatch(r"U\.S\. Congress District (\d+)", race)
+            office = "house" if house else {"U.S. Senate": "senate", "Governor": "governor"}.get(race, race)
+            text = re.sub(
+                r"^(State Representative|State Senator|State Treasurer|Representative|Rep\.|Senator|Congress(?:man|woman)"
+                r"|Lieutenant Governor|Governor|Attorney General|Auditor of State|Secretary of State"
+                r"|Justice of the Peace|Justice|Mayor|Sheriff) ",
+                "",
+                row["Candidate Name"],
+            ).replace(", ", " ")
+            party = "Nonpartisan" if row["Party Affiliation"] == "Non Partisan Judicial" else row["Party Affiliation"]
+            rows.append((office, int(house[1]) if house else None, text, party))
+        return single_filers(rows)
+    if state == "PA":
+        for row in cells(path.read_text(errors="replace")):
+            if len(row) != 6 or row[0] != "-":
+                continue
+            _, text, race, district, party, _ = row
+            house = re.fullmatch(r"(\d+)\w\w Congressional District", district)
+            office = (
+                "house"
+                if race == "REPRESENTATIVE IN CONGRESS"
+                else "governor"
+                if race == "GOVERNOR"
+                else f"{race}, {district}"
+            )
+            party = {
+                "DEM": "Democratic",
+                "REP": "Republican",
+                "LIB": "Libertarian",
+                "GRN": "Green",
+                "IND": "Independent",
+                "D/R": "Democratic/Republican",
+            }.get(party, party)
+            rows.append((office, int(house[1]) if house and office == "house" else None, text, party))
+        return rows
+    if state == "NV":
+        for row in csv.DictReader(io.StringIO(path.read_text(encoding="utf-8-sig"))):
+            if row["Filed Status"] != "Filed":
+                continue
+            race = row["Office Sought"]
+            house = re.fullmatch(r"Representative In Congress, District (\d+)", race)
+            office = "house" if house else "governor" if race == "Governor" else race
+            last, _, given = row["Name to Appear on Ballot"].partition(", ")
+            suffix = ""
+            if re.fullmatch(r"(?i)(jr|sr|ii|iii|iv)\.?", given.split(", ")[0]):
+                suffix, _, given = given.partition(", ")
+            text = " ".join(part for part in (given.replace(", ", " "), last, suffix) if part) if given else last
+            party = re.sub(r"(?<!Political) Party( of Nevada)?$", "", row["Party or Nonpartisan Office"])
+            rows.append((office, int(house[1]) if house else None, text, party))
+        return single_filers(rows)
+    if state == "MN":
+        race = ""
+        for row in cells(path.read_text(errors="replace")):
+            if len(row) == 2 and row[1]:
+                race = row[1]
+            elif len(row) == 5 and row[1] and race:
+                house = re.fullmatch(r"U\.S\. Representative District (\d+)", race)
+                office = (
+                    "house"
+                    if house
+                    else {"U.S. Senator": "senate", "Governor & Lt Governor": "governor"}.get(race, race)
+                )
+                rows.append((office, int(house[1]) if house else None, row[1].split(" and ")[0], row[2]))
+        return single_filers(rows)
+    if state == "MS":
+        for card in path.read_text(errors="replace").split("<div class='card officeCard'>")[1:]:
+            race = re.sub(r"<[^>]+>", "", card.split("</div>")[0]).removeprefix("Candidates for ").strip()
+            table = cells(card)
+            if not table:
+                continue
+            header, *body = table
+            for row in body:
+                fields = dict(zip(header, row))
+                office = {"United States Senate": "senate", "United States House of Representatives": "house"}.get(
+                    race,
+                    ", ".join(
+                        [race, *(f"{key} {value}" for key, value in fields.items() if key not in ("Name", "Party"))]
+                    ),
+                )
+                district = int(fields["District"]) if office == "house" else None
+                rows.append((office, district, fields["Name"], fields.get("Party", "")))
+        return rows
+    if state == "HI":
+        lines = subprocess.run(
+            ["pdftotext", "-raw", str(path), "-"], capture_output=True, text=True, check=True
+        ).stdout.splitlines()
+        race = ""
+        seen: set[tuple[str, str]] = set()
+        for index, line in enumerate(lines):
+            if line.startswith("Vote For Not More Than"):
+                race = lines[index - 1]
+                if race.endswith(")") and "(" not in race:
+                    race = f"{lines[index - 2]} {race}"
+                continue
+            candidate = re.fullmatch(r"(?:\(([DGLNR])\) )?([A-Z][A-Z'’ .-]+, .+)", line)
+            if not race or not candidate or lines[index + 1 : index + 2] == ["For LIEUTENANT GOVERNOR"]:
+                if not candidate and line not in ("For GOVERNOR", "For LIEUTENANT GOVERNOR"):
+                    race = ""
+                continue
+            if (race, line) in seen:
+                continue
+            seen.add((race, line))
+            house = re.fullmatch(r"U\.S\. Representative, Dist (I+)", race)
+            office = "house" if house else "governor" if race == "Governor" else race
+            last, _, given = candidate[2].partition(", ")
+            suffix = re.fullmatch(r"(.+), (Jr\.|Sr\.|II|III|IV)", given)
+            text = " ".join([suffix[1], last.title(), suffix[2]] if suffix else [given, last.title()])
+            party = {"D": "Democratic", "R": "Republican", "G": "Green", "L": "Libertarian", "N": "Nonpartisan"}.get(
+                candidate[1] or "", ""
+            )
+            rows.append((office, len(house[1]) if house else None, text, party))
+        return rows
+    if state == "OR":
+        lines = subprocess.run(
+            ["pdftotext", "-raw", str(path), "-"], capture_output=True, text=True, check=True
+        ).stdout.splitlines()
+        spaced = re.sub(
+            r"\s+",
+            " ",
+            subprocess.run(["pdftotext", "-layout", str(path), "-"], capture_output=True, text=True, check=True).stdout,
+        )
+        start = next(index for index, line in enumerate(lines) if line.endswith("List of Candidates & Measures"))
+        race, seat, name, footnote = "", "", None, False
+        for line in lines[start + 1 :]:
+            if line.startswith("*Candidate"):
+                footnote = True
+            elif footnote:
+                footnote = not line.startswith("pamphlet.")
+            elif line.startswith("NonpartisanCandidates") or "Index of Candidates" in line:
+                break
+            elif line == "PartisanCandidates" or "List of Candidates & Measures" in line or line.isdigit():
+                continue
+            elif line in ("US Senator", "US Representative", "Governor", "State Senator", "State Representative") or (
+                line.startswith("County ")
+            ):
+                race, seat = line, ""
+            elif match := re.fullmatch(r"(\d+)(st|nd|rd|th) ?District|(\w+)County,Position(\d+)", line):
+                seat = f"{match[1]}{match[2]} District" if match[1] else f"{match[3]} County, Position {match[4]}"
+            elif name is None:
+                name = line.rstrip("*")
+                for split in re.finditer(r"(?<=[a-z]{2})(?=[A-Z])", name):
+                    candidate = f"{name[: split.start()]} {name[split.start() :]}"
+                    if candidate in spaced and name not in spaced:
+                        name = candidate
+                        break
+            else:
+                office = {"US Senator": "senate", "US Representative": "house", "Governor": "governor"}.get(
+                    race, f"{race}, {seat}" if seat else race
+                )
+                district = int(re.sub(r"\D", "", seat)) if office == "house" else None
+                rows.append((office, district, name, line.replace(", ", "/")))
+                name = None
+        return rows
+    if state == "WV":
+        for row in csv.DictReader(io.StringIO(path.read_text(encoding="utf-8-sig"))):
+            race = row["Race"]
+            house = re.fullmatch(r"U\.S\. HOUSE OF REPRESENTATIVES - DISTRICT (\d+)", race)
+            office = "house" if house else "senate" if race == "U.S. SENATE" else race
+            party = {"DEMOCRAT": "Democratic", "NON-PARTISAN": "Nonpartisan"}.get(row["Party"], row["Party"])
+            rows.append((office, int(house[1]) if house else None, row["Name"], party))
         return rows
     if state == "RI":
         frame = fastexcel.read_excel(path).load_sheet(0, dtypes="string").to_polars()
