@@ -931,6 +931,8 @@
             votes: row.votes,
             share: row.share,
             outcome: null,
+            isWriteIn: row.isWriteIn && row.isWon !== true,
+            ballots: row.ballots,
             seats: row.seats,
             lines: [],
           },
@@ -1598,6 +1600,7 @@
           trace={race.count === 1 ? race.path : null}
           span={null}
           votes={race.votes}
+          nouns={plural(race.places?.levels[0]?.noun ?? "contest")}
           seats={race.isLone || (race.isOffice && race.electors == null)
             ? null
             : race.electors == null && !race.isSlate

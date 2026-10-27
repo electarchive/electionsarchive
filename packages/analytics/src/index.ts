@@ -47,6 +47,7 @@ export type Cell = {
   isIndependent: boolean;
   isIncumbent?: boolean;
   isWriteIn: boolean;
+  ballots: number;
   seats: number | null;
   lines: Array<{ label: string; votes: number }>;
 };
@@ -123,6 +124,7 @@ function tally(side: Side, identify: (option: Option) => string) {
           isIndependent: option.isIndependent ?? false,
           isIncumbent: false,
           isWriteIn: option.kind === "write_in",
+          ballots: 0,
           seats: option.seats,
           lines: [],
         },
@@ -149,6 +151,11 @@ function tally(side: Side, identify: (option: Option) => string) {
   }
   for (const group of groups.values()) {
     group.cell.share = side.valid > 0 ? group.cell.votes / side.valid : 0;
+    group.cell.ballots = new Set(
+      group.members
+        .filter((member) => member.kind !== "write_in")
+        .map((member) => member.contest),
+    ).size;
     group.cell.isIncumbent = group.members.some(
       (member) =>
         member.isIncumbent === true && member.person === group.cell.person,

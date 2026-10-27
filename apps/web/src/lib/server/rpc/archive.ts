@@ -434,6 +434,7 @@ const Cell = v.nullable(
     isIndependent: v.optional(v.boolean()),
     isIncumbent: v.optional(v.boolean()),
     isWriteIn: v.optional(v.boolean()),
+    ballots: v.optional(v.number()),
     seats: v.nullable(v.number()),
     lines: v.array(v.object({ label: v.string(), votes: v.number() })),
   }),
@@ -9876,10 +9877,11 @@ async function races(
             members.find((row) => row.key === key) ??
             members.find((row) => row.cell.party === party) ??
             members[0];
-          let [votes, share, seats] = [0, 0, null as number | null];
+          let [votes, share, seats, ballots] = [0, 0, null as number | null, 0];
           for (const row of members) {
             votes += row.cell.votes;
             share += row.cell.share;
+            ballots += row.cell.ballots;
             seats =
               row.cell.seats == null ? seats : (seats ?? 0) + row.cell.seats;
           }
@@ -9908,6 +9910,8 @@ async function races(
             isWon: ["elected", "won"].includes(String(lead?.cell.outcome)),
             isLost: lead?.cell.outcome === "lost",
             isIndependent: members.every((row) => row.cell.isIndependent),
+            isWriteIn: members.every((row) => row.cell.isWriteIn),
+            ballots,
           };
         })
         .filter((row) => !row.key.startsWith("kind:") || row.votes > 0)
@@ -10883,6 +10887,8 @@ export const elections = {
                 isWon: v.optional(v.boolean()),
                 isLost: v.optional(v.boolean()),
                 isIndependent: v.optional(v.boolean()),
+                isWriteIn: v.boolean(),
+                ballots: v.number(),
                 photo: Photo,
                 nominated: v.array(
                   v.object({ party: v.string(), label: v.string() }),

@@ -29,6 +29,7 @@
     trace = null,
     place = null,
     overall = null,
+    nouns = null,
   }: {
     rows: Extract<PageData, { kind: "contest" }>["contest"]["rows"];
     span: {
@@ -41,6 +42,7 @@
     seats: string | null;
     trace?: string | null;
     place?: string | null;
+    nouns?: string | null;
     overall?: {
       place: string;
       winners: Array<{
@@ -52,6 +54,7 @@
   } = $props();
 
   let expanded = $state(false);
+  let isWriteOpen = $state(false);
   const isQuestion = $derived(
     rows.some((row) => row.key.startsWith("answer:")),
   );
@@ -184,19 +187,47 @@
       maximumFractionDigits: 0,
     }),
   );
+  const written = $derived.by(() => {
+    const keys = rows
+      .filter(
+        (row) =>
+          row.current?.isWriteIn === true &&
+          row.current.person != null &&
+          row.current.outcome == null,
+      )
+      .map((row) => row.key);
+    return new Set(!isWrittenIn && keys.length > 1 ? keys : []);
+  });
+  const isReach = $derived(
+    nouns != null &&
+      span == null &&
+      rows.some(
+        (row) => row.current?.person != null && (row.current.ballots ?? 0) > 1,
+      ),
+  );
   const folded = $derived.by(() => {
-    const tail = rows.filter(
-      (row, index) =>
-        index >= 5 &&
-        (row.current?.share ?? 0) < 0.01 &&
-        (row.earlier?.share ?? 0) < 0.01 &&
-        row.current?.outcome == null &&
-        row.current?.seats == null,
-    );
+    const tail = rows
+      .filter((row) => !written.has(row.key))
+      .filter(
+        (row, index) =>
+          index >= 5 &&
+          (row.current?.share ?? 0) < 0.01 &&
+          (row.earlier?.share ?? 0) < 0.01 &&
+          row.current?.outcome == null &&
+          row.current?.seats == null,
+      );
     return new Set(tail.length > 2 ? tail.map((row) => row.key) : []);
   });
+  const main = $derived(
+    lines.filter(
+      (line) =>
+        !written.has(line.row.key) && (expanded || !folded.has(line.row.key)),
+    ),
+  );
   const shown = $derived(
-    expanded ? lines : lines.filter((line) => !folded.has(line.row.key)),
+    isWriteOpen
+      ? [...main, ...lines.filter((line) => written.has(line.row.key))]
+      : main,
   );
   const credits = $derived(
     shown.flatMap(({ row }) =>
@@ -217,12 +248,12 @@
       parties.every((party) => party === parties[0])
     );
   });
-  const tail = $derived.by(() => {
+  const sum = (keys: Set<string>) => {
     let total = 0;
     let current = 0;
     let earlier = 0;
     for (const row of rows) {
-      if (folded.has(row.key)) {
+      if (keys.has(row.key)) {
         total += row.current?.votes ?? 0;
         current += row.current?.share ?? 0;
         earlier += row.earlier?.share ?? 0;
@@ -234,7 +265,9 @@
       after: span?.forward === true ? earlier : current,
       current,
     };
-  });
+  };
+  const tail = $derived(sum(folded));
+  const writeIns = $derived(sum(written));
 </script>
 
 {#snippet trend(
@@ -368,6 +401,415 @@
       ]),
     ])}
 />
+{#snippet more(
+  isOpen: boolean,
+  label: string,
+  sum: { votes: number; current: number; before: number; after: number },
+  toggle: () => void,
+)}
+  <tr>
+    <th class="px-2 py-1.5 text-start font-normal" scope="row">
+      <button
+        type="button"
+        class="flex items-center rounded-sm border border-input bg-card px-2 text-[0.8125rem] font-semibold whitespace-nowrap keycap block-7 hover:bg-secondary"
+        aria-expanded={isOpen}
+        onclick={toggle}>{label}</button
+      >
+    </th>
+    {#if isReach}
+      <td class="@max-[24rem]:hidden"></td>
+    {/if}
+    {#if !isOpen}
+      <td
+        class={cn(
+          "px-2 py-1.5 text-end font-figures text-[0.8125rem] whitespace-nowrap text-muted-foreground tabular-nums",
+          { "max-sm:hidden": span != null },
+        )}>{count(sum.votes)}</td
+      >
+      {#if span == null}
+        <td
+          class="px-2 py-1.5 text-end font-figures text-[0.8125rem] whitespace-nowrap text-muted-foreground tabular-nums"
+          >{percent(sum.current)}</td
+        >
+      {:else}
+        {#each [sum.before, sum.after] as share, index (index)}
+          <td
+            class="px-2 py-1.5 text-end font-figures text-[0.8125rem] whitespace-nowrap text-muted-foreground tabular-nums"
+            >{percent(share)}</td
+          >
+        {/each}
+      {/if}
+    {/if}
+  </tr>
+{/snippet}
+
+{#snippet entry(line: (typeof lines)[number])}
+  {const row = $derived(line.row)}
+  {const page = $derived(row.current)}
+  {const other = $derived(row.earlier)}
+  <tr
+    class={cn(
+      "border-border/60",
+      {
+        "border-be": span != null || (page?.lines.length ?? 0) === 0,
+        "text-muted-foreground": page == null,
+        "animate-in fade-in motion-reduce:animate-none":
+          folded.has(row.key) || written.has(row.key),
+      },
+      {
+        "bg-[color-mix(in_oklab,var(--party)_16%,var(--card))]":
+          line.mark === "won",
+        "bg-[color-mix(in_oklab,var(--party)_8%,var(--card))]":
+          line.mark === "advanced",
+      },
+    )}
+    style:--party={swatch(row.color, row.key)}
+  >
+    <th
+      class={cn("px-2 py-1.5 text-start font-normal", {
+        "shadow-[inset_3px_0_0_var(--party)]": line.mark != null,
+      })}
+      scope="row"
+    >
+      <span
+        class={cn("flex items-center gap-2.5", { "min-block-9": isPictured })}
+      >
+        {#if row.photo != null}
+          <img
+            class="shrink-0 rounded-full bg-muted object-cover object-top ring-2 ring-(--party) ring-offset-1 ring-offset-card block-7 inline-7"
+            src={row.photo.src}
+            alt=""
+            loading="lazy"
+            width="28"
+            height="28"
+          />
+        {:else if isPictured && (page ?? other)?.person == null}
+          <span
+            class="grid shrink-0 place-items-center block-7 inline-7"
+            aria-hidden="true"
+          >
+            {#if (page ?? other)?.party != null}
+              <span class="rounded-xs bg-(--party) chip block-2.5 inline-2.5"
+              ></span>
+            {/if}
+          </span>
+        {:else if isPictured}
+          <span
+            class="grid shrink-0 place-items-center rounded-full bg-secondary text-[0.625rem] font-semibold text-muted-foreground ring-2 ring-(--party) ring-offset-1 ring-offset-card select-none block-7 inline-7"
+            aria-hidden="true"
+            >{row.label
+              .split(/\s+/u)
+              .filter((word) => !/^(?:jr|sr|ii|iii|iv)\.?,?$/iu.test(word))
+              .filter((word, index, words) =>
+                [0, words.length - 1].includes(index),
+              )
+              .map((word) => word.slice(0, 1))
+              .join("")}</span
+          >
+        {:else}
+          <span
+            class="shrink-0 rounded-xs bg-(--party) chip block-2.5 inline-2.5"
+          ></span>
+        {/if}
+        <span class="flex-1 min-inline-0">
+          <Name
+            class="font-semibold text-foreground"
+            label={row.label}
+            color={swatch(row.color, row.key)}
+            hasSwatch={false}
+            person={(page ?? other)?.person}
+            party={(page ?? other)?.party}
+          />
+          {#if page?.isIncumbent === true && page.person != null}
+            <span class="ms-1 text-xs text-muted-foreground"
+              >{m.results_incumbent()}</span
+            >
+          {/if}
+          {#if page?.isWriteIn === true && page.person != null && !isWrittenIn}
+            <span class="ms-1 text-xs text-muted-foreground"
+              >{m.results_write_in()}</span
+            >
+          {/if}
+          {#if page?.outcome != null && (seats == null || line.mark != null || page.isDeclined)}
+            {#if page.note == null || page.isDeclined}
+              <span
+                class={cn("ms-1 px-1 text-xs font-semibold", {
+                  "rounded-xs bg-(--party) knockout": line.mark != null,
+                  "rounded-xs text-foreground ring-1 ring-(--party) ring-inset":
+                    page.isDeclined,
+                  "highlighter text-foreground":
+                    line.mark == null &&
+                    !page.isDeclined &&
+                    !LOST.has(page.outcome),
+                  "text-muted-foreground": LOST.has(page.outcome),
+                })}>{OUTCOMES[page.outcome]?.() ?? page.outcome}</span
+              >
+            {:else}
+              <Term
+                class={cn("ms-1 px-1 text-xs font-semibold", {
+                  "rounded-xs bg-(--party) knockout": line.mark != null,
+                  "highlighter text-foreground":
+                    line.mark == null && !LOST.has(page.outcome),
+                  "text-muted-foreground": LOST.has(page.outcome),
+                })}
+                label={OUTCOMES[page.outcome]?.() ?? page.outcome}
+                definition={explain(page.note)}
+              />
+            {/if}
+          {/if}
+          {#if page?.isDeclined === true}
+            <Term
+              class="ms-1 text-xs text-muted-foreground"
+              label={m.outcome_declined()}
+              definition={page.note == null
+                ? m.outcome_declined_definition()
+                : explain(page.note)}
+            />
+          {/if}
+          {#if line.isOverall && overall != null}
+            <Term
+              class="ms-1 rounded-xs px-1 text-xs font-semibold text-foreground ring-1 ring-(--party) ring-inset"
+              label={m.outcome_overall()}
+              definition={m.outcome_overall_definition({
+                place: definite(overall.place),
+              })}
+            />
+          {/if}
+          {#if row.short != null && !row.label.includes(row.short) && !isOneParty && !line.isNominated && (span != null || (page?.lines.length ?? 0) === 0)}
+            <span class="block text-[0.8125rem] text-pretty">
+              <Name
+                class="text-muted-foreground"
+                label={row.short}
+                color={swatch(row.color, row.key)}
+                hasSwatch={false}
+                party={(page ?? other)?.party}
+              />
+            </span>
+          {:else if row.short == null && page?.person != null && page.isIndependent === true && !isOneParty}
+            <span
+              class="block text-[0.8125rem] text-pretty text-muted-foreground"
+              >{m.seats_independents()}</span
+            >
+          {/if}
+          {#if span != null && there != null}
+            {#if page == null}
+              <span class="block text-[0.8125rem] text-muted-foreground"
+                >{m.compare_absent({ year: here ?? "" })}</span
+              >
+            {:else if other == null}
+              <span class="block text-[0.8125rem] text-muted-foreground"
+                >{m.compare_absent({ year: there })}</span
+              >
+            {:else if other.label !== page.label}
+              {const parts = $derived(
+                m.compare_in({ year: there, name: "\u0001" }).split("\u0001"),
+              )}
+              <span class="block text-[0.8125rem] text-muted-foreground"
+                >{parts[0]}<Name
+                  label={other.label}
+                  person={other.person}
+                  party={other.party}
+                />{parts[1]}</span
+              >
+            {/if}
+          {/if}
+          {#each line.backers as backer, index (index)}
+            <span
+              class="block text-[0.8125rem] text-pretty text-muted-foreground"
+              >{backer.head}{#each backer.parts as part, at (at)}{#if part.party == null}{part.text}{:else}<Name
+                    label={part.text}
+                    party={part.party}
+                  />{/if}{/each}{backer.tail}</span
+            >
+          {/each}
+          {#if row.ballot != null}
+            {const parts = $derived(
+              m.results_ballot_elsewhere({ contest: "\u0001" }).split("\u0001"),
+            )}
+            <span
+              class="block text-[0.8125rem] text-pretty text-muted-foreground"
+              >{parts[0]}{#if row.ballot.path == null}{row.ballot
+                  .name}{:else}<Preview
+                  class="text-foreground underline decoration-border underline-offset-4 hover:decoration-foreground"
+                  path={row.ballot.path}>{row.ballot.name}</Preview
+                >{/if}{parts[1]}</span
+            >
+          {/if}
+          {#if row.backed != null}
+            <span class="block text-[0.8125rem] text-muted-foreground"
+              >{m.backed({ name: row.backed })}</span
+            >
+          {/if}
+          {#if row.origin != null}
+            <span class="block text-[0.8125rem] text-muted-foreground"
+              >{m.split_from({ name: row.origin })}</span
+            >
+          {/if}
+        </span>
+      </span>
+    </th>
+    {#if isReach}
+      <td
+        class="px-2 py-1.5 text-end font-figures text-[0.8125rem] whitespace-nowrap tabular-nums @max-[24rem]:hidden"
+      >
+        {#if page?.person != null}
+          {count(page.ballots ?? 0)}
+        {/if}
+      </td>
+    {/if}
+    <td
+      class={cn(
+        "px-2 py-1.5 text-end font-figures text-[0.8125rem] whitespace-nowrap tabular-nums",
+        { "max-sm:hidden": span != null },
+      )}
+    >
+      {#if page != null && !(page.votes === 0 && (page.seats ?? 0) > 0)}
+        {@render cite(count(page.votes), "votes", row)}
+      {/if}
+    </td>
+    {#if span == null}
+      <td
+        class="px-2 py-1.5 text-end font-figures text-[0.8125rem] whitespace-nowrap tabular-nums"
+      >
+        {#if page != null && !(page.votes === 0 && (page.seats ?? 0) > 0)}
+          <span class="relative inline-block min-inline-12">
+            {@render cite(percent(page.share, digits), "share", row)}
+            <span
+              class="absolute inset-x-0 inset-bs-[calc(100%+0.25rem)] flex justify-end overflow-hidden rounded-full bg-secondary block-1"
+              aria-hidden="true"
+            >
+              <span
+                class="rounded-full bg-(--party)"
+                style:inline-size="{(page.share / topShare) * 100}%"
+              ></span>
+            </span>
+          </span>
+        {/if}
+      </td>
+    {:else}
+      {#each [line.before, line.after] as cell, index (index)}
+        <td
+          class={cn(
+            "px-2 py-1.5 text-end font-figures text-[0.8125rem] whitespace-nowrap tabular-nums",
+            {
+              "font-semibold text-foreground": cell != null && cell === page,
+              "text-muted-foreground": cell == null || cell !== page,
+            },
+          )}
+        >
+          {cell == null ? "–" : percent(cell.share, digits)}
+        </td>
+      {/each}
+    {/if}
+    {#if seats != null}
+      <td
+        class={cn(
+          "px-2 py-1.5 text-end font-figures text-[0.8125rem] whitespace-nowrap tabular-nums",
+          { "max-sm:hidden": span != null },
+        )}
+      >
+        <span class="font-semibold"
+          >{#if page?.seats != null}{@render cite(
+              count(page.seats),
+              "seats",
+              row,
+            )}{/if}</span
+        >
+        {#if line.gained != null && line.gained !== 0}
+          <span class="ms-1 text-[0.75rem] text-muted-foreground"
+            >{new Intl.NumberFormat(getLocale(), {
+              signDisplay: "exceptZero",
+            }).format(line.gained)}</span
+          >
+        {/if}
+      </td>
+    {/if}
+    {#if span != null && paired}
+      <td class="px-2 py-1 max-md:hidden">
+        {#if line.before != null || line.after != null}
+          <Tooltip.Root disableCloseOnTriggerClick>
+            <Tooltip.Trigger
+              class="block cursor-default inline-full"
+              aria-label={m.trend_label({ from: span.from, to: span.to })}
+            >
+              {@render trend(line.before, line.after)}
+            </Tooltip.Trigger>
+            <Tooltip.Content
+              collisionPadding={8}
+              class="grid grid-cols-[auto_auto_minmax(0,1fr)_auto] items-baseline gap-x-2 gap-y-1 py-1.5 max-inline-80"
+              style="--party: {swatch(row.color, row.key)}"
+            >
+              {#each [{ year: span.from, cell: line.before, bar: false }, { year: span.to, cell: line.after, bar: true }] as side, index (index)}
+                <span
+                  class={cn("self-center bg-(--party)", {
+                    "rounded-xs block-2 inline-3": side.bar,
+                    "bg-background block-3 inline-0.5": !side.bar,
+                  })}
+                ></span>
+                <span class="font-figures tabular-nums opacity-70"
+                  >{side.year}</span
+                >
+                {#if side.cell == null}
+                  <span class="col-span-2 opacity-70"
+                    >{m.compare_absent({ year: side.year })}</span
+                  >
+                {:else}
+                  <span class="truncate">{side.cell.label}</span>
+                  <span class="text-end font-figures tabular-nums"
+                    >{percent(side.cell.share)}</span
+                  >
+                {/if}
+              {/each}
+              {#if line.change != null}
+                <span
+                  class="col-span-4 border-bs border-background/20 pbs-1 text-end font-figures font-semibold tabular-nums"
+                  >{m.trend_change({ points: points(line.change) })}</span
+                >
+              {/if}
+            </Tooltip.Content>
+          </Tooltip.Root>
+        {/if}
+      </td>
+      <td
+        class="px-2 py-1.5 text-end font-figures text-[0.8125rem] font-semibold whitespace-nowrap tabular-nums"
+      >
+        {line.change == null ? "" : points(line.change)}
+      </td>
+    {/if}
+  </tr>
+  {#if span == null && page != null}
+    {#each page.lines as fused, index (index)}
+      <tr
+        class={cn("text-[0.8125rem] text-muted-foreground", {
+          "border-be border-border/60": index === page.lines.length - 1,
+        })}
+      >
+        <th class="ps-6.5 pe-2 pbe-1 text-start font-normal" scope="row">
+          {m.fusion_line({ name: fused.label })}
+        </th>
+        {#if isReach}
+          <td class="@max-[24rem]:hidden"></td>
+        {/if}
+        <td
+          class="px-2 pbe-1 text-end font-figures whitespace-nowrap tabular-nums"
+        >
+          {count(fused.votes)}
+        </td>
+        <td
+          class="px-2 pbe-1 text-end font-figures whitespace-nowrap tabular-nums"
+        >
+          {page.votes === 0
+            ? ""
+            : percent((fused.votes / page.votes) * page.share)}
+        </td>
+        {#if seats != null}
+          <td></td>
+        {/if}
+      </tr>
+    {/each}
+  {/if}
+{/snippet}
+
 <div class="overflow-x-auto">
   <table class="border-collapse text-sm/tight inline-full">
     <thead>
@@ -375,6 +817,16 @@
         <th class="px-2 py-1.5 text-start font-medium" scope="col"
           >{isQuestion ? m.col_answer() : m.col_option()}</th
         >
+        {#if isReach}
+          <th
+            class="px-2 py-1.5 text-end font-medium whitespace-nowrap @max-[24rem]:hidden"
+            scope="col"
+            ><Term
+              label={m.col_ballots()}
+              definition={m.col_ballots_definition({ nouns: nouns ?? "" })}
+            /></th
+          >
+        {/if}
         <th
           class={cn("px-2 py-1.5 text-end font-medium", {
             "max-sm:hidden": span != null,
@@ -450,406 +902,31 @@
       </tr>
     </thead>
     <tbody>
-      {#each shown as line (line.row.key)}
-        {const row = $derived(line.row)}
-        {const page = $derived(row.current)}
-        {const other = $derived(row.earlier)}
-        <tr
-          class={cn(
-            "border-border/60",
-            {
-              "border-be": span != null || (page?.lines.length ?? 0) === 0,
-              "text-muted-foreground": page == null,
-              "animate-in fade-in motion-reduce:animate-none": folded.has(
-                row.key,
-              ),
-            },
-            {
-              "bg-[color-mix(in_oklab,var(--party)_16%,var(--card))]":
-                line.mark === "won",
-              "bg-[color-mix(in_oklab,var(--party)_8%,var(--card))]":
-                line.mark === "advanced",
-            },
-          )}
-          style:--party={swatch(row.color, row.key)}
-        >
-          <th
-            class={cn("px-2 py-1.5 text-start font-normal", {
-              "shadow-[inset_3px_0_0_var(--party)]": line.mark != null,
-            })}
-            scope="row"
-          >
-            <span
-              class={cn("flex items-center gap-2.5", {
-                "min-block-9": isPictured,
-              })}
-            >
-              {#if row.photo != null}
-                <img
-                  class="shrink-0 rounded-full bg-muted object-cover object-top ring-2 ring-(--party) ring-offset-1 ring-offset-card block-7 inline-7"
-                  src={row.photo.src}
-                  alt=""
-                  loading="lazy"
-                  width="28"
-                  height="28"
-                />
-              {:else if isPictured && (page ?? other)?.person == null}
-                <span
-                  class="grid shrink-0 place-items-center block-7 inline-7"
-                  aria-hidden="true"
-                >
-                  {#if (page ?? other)?.party != null}
-                    <span
-                      class="rounded-xs bg-(--party) chip block-2.5 inline-2.5"
-                    ></span>
-                  {/if}
-                </span>
-              {:else if isPictured}
-                <span
-                  class="grid shrink-0 place-items-center rounded-full bg-secondary text-[0.625rem] font-semibold text-muted-foreground ring-2 ring-(--party) ring-offset-1 ring-offset-card select-none block-7 inline-7"
-                  aria-hidden="true"
-                  >{row.label
-                    .split(/\s+/u)
-                    .filter(
-                      (word) => !/^(?:jr|sr|ii|iii|iv)\.?,?$/iu.test(word),
-                    )
-                    .filter((word, index, words) =>
-                      [0, words.length - 1].includes(index),
-                    )
-                    .map((word) => word.slice(0, 1))
-                    .join("")}</span
-                >
-              {:else}
-                <span
-                  class="shrink-0 rounded-xs bg-(--party) chip block-2.5 inline-2.5"
-                ></span>
-              {/if}
-              <span class="flex-1 min-inline-0">
-                <Name
-                  class="font-semibold text-foreground"
-                  label={row.label}
-                  color={swatch(row.color, row.key)}
-                  hasSwatch={false}
-                  person={(page ?? other)?.person}
-                  party={(page ?? other)?.party}
-                />
-                {#if page?.isIncumbent === true && page.person != null}
-                  <span class="ms-1 text-xs text-muted-foreground"
-                    >{m.results_incumbent()}</span
-                  >
-                {/if}
-                {#if page?.isWriteIn === true && page.person != null && !isWrittenIn}
-                  <span class="ms-1 text-xs text-muted-foreground"
-                    >{m.results_write_in()}</span
-                  >
-                {/if}
-                {#if page?.outcome != null && (seats == null || line.mark != null || page.isDeclined)}
-                  {#if page.note == null || page.isDeclined}
-                    <span
-                      class={cn("ms-1 px-1 text-xs font-semibold", {
-                        "rounded-xs bg-(--party) knockout": line.mark != null,
-                        "rounded-xs text-foreground ring-1 ring-(--party) ring-inset":
-                          page.isDeclined,
-                        "highlighter text-foreground":
-                          line.mark == null &&
-                          !page.isDeclined &&
-                          !LOST.has(page.outcome),
-                        "text-muted-foreground": LOST.has(page.outcome),
-                      })}>{OUTCOMES[page.outcome]?.() ?? page.outcome}</span
-                    >
-                  {:else}
-                    <Term
-                      class={cn("ms-1 px-1 text-xs font-semibold", {
-                        "rounded-xs bg-(--party) knockout": line.mark != null,
-                        "highlighter text-foreground":
-                          line.mark == null && !LOST.has(page.outcome),
-                        "text-muted-foreground": LOST.has(page.outcome),
-                      })}
-                      label={OUTCOMES[page.outcome]?.() ?? page.outcome}
-                      definition={explain(page.note)}
-                    />
-                  {/if}
-                {/if}
-                {#if page?.isDeclined === true}
-                  <Term
-                    class="ms-1 text-xs text-muted-foreground"
-                    label={m.outcome_declined()}
-                    definition={page.note == null
-                      ? m.outcome_declined_definition()
-                      : explain(page.note)}
-                  />
-                {/if}
-                {#if line.isOverall && overall != null}
-                  <Term
-                    class="ms-1 rounded-xs px-1 text-xs font-semibold text-foreground ring-1 ring-(--party) ring-inset"
-                    label={m.outcome_overall()}
-                    definition={m.outcome_overall_definition({
-                      place: definite(overall.place),
-                    })}
-                  />
-                {/if}
-                {#if row.short != null && !row.label.includes(row.short) && !isOneParty && !line.isNominated && (span != null || (page?.lines.length ?? 0) === 0)}
-                  <span class="block text-[0.8125rem] text-pretty">
-                    <Name
-                      class="text-muted-foreground"
-                      label={row.short}
-                      color={swatch(row.color, row.key)}
-                      hasSwatch={false}
-                      party={(page ?? other)?.party}
-                    />
-                  </span>
-                {:else if row.short == null && page?.person != null && page.isIndependent === true && !isOneParty}
-                  <span
-                    class="block text-[0.8125rem] text-pretty text-muted-foreground"
-                    >{m.seats_independents()}</span
-                  >
-                {/if}
-                {#if span != null && there != null}
-                  {#if page == null}
-                    <span class="block text-[0.8125rem] text-muted-foreground"
-                      >{m.compare_absent({ year: here ?? "" })}</span
-                    >
-                  {:else if other == null}
-                    <span class="block text-[0.8125rem] text-muted-foreground"
-                      >{m.compare_absent({ year: there })}</span
-                    >
-                  {:else if other.label !== page.label}
-                    {const parts = $derived(
-                      m
-                        .compare_in({ year: there, name: "\u0001" })
-                        .split("\u0001"),
-                    )}
-                    <span class="block text-[0.8125rem] text-muted-foreground"
-                      >{parts[0]}<Name
-                        label={other.label}
-                        person={other.person}
-                        party={other.party}
-                      />{parts[1]}</span
-                    >
-                  {/if}
-                {/if}
-                {#each line.backers as backer, index (index)}
-                  <span
-                    class="block text-[0.8125rem] text-pretty text-muted-foreground"
-                    >{backer.head}{#each backer.parts as part, at (at)}{#if part.party == null}{part.text}{:else}<Name
-                          label={part.text}
-                          party={part.party}
-                        />{/if}{/each}{backer.tail}</span
-                  >
-                {/each}
-                {#if row.ballot != null}
-                  {const parts = $derived(
-                    m
-                      .results_ballot_elsewhere({ contest: "\u0001" })
-                      .split("\u0001"),
-                  )}
-                  <span
-                    class="block text-[0.8125rem] text-pretty text-muted-foreground"
-                    >{parts[0]}{#if row.ballot.path == null}{row.ballot
-                        .name}{:else}<Preview
-                        class="text-foreground underline decoration-border underline-offset-4 hover:decoration-foreground"
-                        path={row.ballot.path}>{row.ballot.name}</Preview
-                      >{/if}{parts[1]}</span
-                  >
-                {/if}
-                {#if row.backed != null}
-                  <span class="block text-[0.8125rem] text-muted-foreground"
-                    >{m.backed({ name: row.backed })}</span
-                  >
-                {/if}
-                {#if row.origin != null}
-                  <span class="block text-[0.8125rem] text-muted-foreground"
-                    >{m.split_from({ name: row.origin })}</span
-                  >
-                {/if}
-              </span>
-            </span>
-          </th>
-          <td
-            class={cn(
-              "px-2 py-1.5 text-end font-figures text-[0.8125rem] whitespace-nowrap tabular-nums",
-              { "max-sm:hidden": span != null },
-            )}
-          >
-            {#if page != null && !(page.votes === 0 && (page.seats ?? 0) > 0)}
-              {@render cite(count(page.votes), "votes", row)}
-            {/if}
-          </td>
-          {#if span == null}
-            <td
-              class="px-2 py-1.5 text-end font-figures text-[0.8125rem] whitespace-nowrap tabular-nums"
-            >
-              {#if page != null && !(page.votes === 0 && (page.seats ?? 0) > 0)}
-                <span class="relative inline-block min-inline-12">
-                  {@render cite(percent(page.share, digits), "share", row)}
-                  <span
-                    class="absolute inset-x-0 inset-bs-[calc(100%+0.25rem)] flex justify-end overflow-hidden rounded-full bg-secondary block-1"
-                    aria-hidden="true"
-                  >
-                    <span
-                      class="rounded-full bg-(--party)"
-                      style:inline-size="{(page.share / topShare) * 100}%"
-                    ></span>
-                  </span>
-                </span>
-              {/if}
-            </td>
-          {:else}
-            {#each [line.before, line.after] as cell, index (index)}
-              <td
-                class={cn(
-                  "px-2 py-1.5 text-end font-figures text-[0.8125rem] whitespace-nowrap tabular-nums",
-                  {
-                    "font-semibold text-foreground":
-                      cell != null && cell === page,
-                    "text-muted-foreground": cell == null || cell !== page,
-                  },
-                )}
-              >
-                {cell == null ? "–" : percent(cell.share, digits)}
-              </td>
-            {/each}
-          {/if}
-          {#if seats != null}
-            <td
-              class={cn(
-                "px-2 py-1.5 text-end font-figures text-[0.8125rem] whitespace-nowrap tabular-nums",
-                { "max-sm:hidden": span != null },
-              )}
-            >
-              <span class="font-semibold"
-                >{#if page?.seats != null}{@render cite(
-                    count(page.seats),
-                    "seats",
-                    row,
-                  )}{/if}</span
-              >
-              {#if line.gained != null && line.gained !== 0}
-                <span class="ms-1 text-[0.75rem] text-muted-foreground"
-                  >{new Intl.NumberFormat(getLocale(), {
-                    signDisplay: "exceptZero",
-                  }).format(line.gained)}</span
-                >
-              {/if}
-            </td>
-          {/if}
-          {#if span != null && paired}
-            <td class="px-2 py-1 max-md:hidden">
-              {#if line.before != null || line.after != null}
-                <Tooltip.Root disableCloseOnTriggerClick>
-                  <Tooltip.Trigger
-                    class="block cursor-default inline-full"
-                    aria-label={m.trend_label({ from: span.from, to: span.to })}
-                  >
-                    {@render trend(line.before, line.after)}
-                  </Tooltip.Trigger>
-                  <Tooltip.Content
-                    collisionPadding={8}
-                    class="grid grid-cols-[auto_auto_minmax(0,1fr)_auto] items-baseline gap-x-2 gap-y-1 py-1.5 max-inline-80"
-                    style="--party: {swatch(row.color, row.key)}"
-                  >
-                    {#each [{ year: span.from, cell: line.before, bar: false }, { year: span.to, cell: line.after, bar: true }] as side, index (index)}
-                      <span
-                        class={cn("self-center bg-(--party)", {
-                          "rounded-xs block-2 inline-3": side.bar,
-                          "bg-background block-3 inline-0.5": !side.bar,
-                        })}
-                      ></span>
-                      <span class="font-figures tabular-nums opacity-70"
-                        >{side.year}</span
-                      >
-                      {#if side.cell == null}
-                        <span class="col-span-2 opacity-70"
-                          >{m.compare_absent({ year: side.year })}</span
-                        >
-                      {:else}
-                        <span class="truncate">{side.cell.label}</span>
-                        <span class="text-end font-figures tabular-nums"
-                          >{percent(side.cell.share)}</span
-                        >
-                      {/if}
-                    {/each}
-                    {#if line.change != null}
-                      <span
-                        class="col-span-4 border-bs border-background/20 pbs-1 text-end font-figures font-semibold tabular-nums"
-                        >{m.trend_change({ points: points(line.change) })}</span
-                      >
-                    {/if}
-                  </Tooltip.Content>
-                </Tooltip.Root>
-              {/if}
-            </td>
-            <td
-              class="px-2 py-1.5 text-end font-figures text-[0.8125rem] font-semibold whitespace-nowrap tabular-nums"
-            >
-              {line.change == null ? "" : points(line.change)}
-            </td>
-          {/if}
-        </tr>
-        {#if span == null && page != null}
-          {#each page.lines as fused, index (index)}
-            <tr
-              class={cn("text-[0.8125rem] text-muted-foreground", {
-                "border-be border-border/60": index === page.lines.length - 1,
-              })}
-            >
-              <th class="ps-6.5 pe-2 pbe-1 text-start font-normal" scope="row">
-                {m.fusion_line({ name: fused.label })}
-              </th>
-              <td
-                class="px-2 pbe-1 text-end font-figures whitespace-nowrap tabular-nums"
-              >
-                {count(fused.votes)}
-              </td>
-              <td
-                class="px-2 pbe-1 text-end font-figures whitespace-nowrap tabular-nums"
-              >
-                {page.votes === 0
-                  ? ""
-                  : percent((fused.votes / page.votes) * page.share)}
-              </td>
-              {#if seats != null}
-                <td></td>
-              {/if}
-            </tr>
-          {/each}
-        {/if}
+      {#each main as line (line.row.key)}
+        {@render entry(line)}
       {/each}
       {#if folded.size > 0}
-        <tr>
-          <th class="px-2 py-1.5 text-start font-normal" scope="row">
-            <button
-              type="button"
-              class="flex items-center rounded-sm border border-input bg-card px-2 text-[0.8125rem] font-semibold whitespace-nowrap keycap block-7 hover:bg-secondary"
-              aria-expanded={expanded}
-              onclick={() => (expanded = !expanded)}
-              >{expanded
-                ? m.results_fewer()
-                : m.results_more({ count: folded.size })}</button
-            >
-          </th>
-          {#if !expanded}
-            <td
-              class={cn(
-                "px-2 py-1.5 text-end font-figures text-[0.8125rem] whitespace-nowrap text-muted-foreground tabular-nums",
-                { "max-sm:hidden": span != null },
-              )}>{count(tail.votes)}</td
-            >
-            {#if span == null}
-              <td
-                class="px-2 py-1.5 text-end font-figures text-[0.8125rem] whitespace-nowrap text-muted-foreground tabular-nums"
-                >{percent(tail.current)}</td
-              >
-            {:else}
-              {#each [tail.before, tail.after] as share, index (index)}
-                <td
-                  class="px-2 py-1.5 text-end font-figures text-[0.8125rem] whitespace-nowrap text-muted-foreground tabular-nums"
-                  >{percent(share)}</td
-                >
-              {/each}
-            {/if}
-          {/if}
-        </tr>
+        {@render more(
+          expanded,
+          expanded ? m.results_fewer() : m.results_more({ count: folded.size }),
+          tail,
+          () => (expanded = !expanded),
+        )}
+      {/if}
+      {#if written.size > 0}
+        {@render more(
+          isWriteOpen,
+          isWriteOpen
+            ? m.results_write_ins_hide()
+            : m.results_write_ins({ count: written.size }),
+          writeIns,
+          () => (isWriteOpen = !isWriteOpen),
+        )}
+        {#if isWriteOpen}
+          {#each shown.slice(main.length) as line (line.row.key)}
+            {@render entry(line)}
+          {/each}
+        {/if}
       {/if}
     </tbody>
   </table>
