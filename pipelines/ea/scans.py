@@ -84,6 +84,7 @@ class Manifest(TypedDict):
     unit_codes: NotRequired[dict[str, str]]
     unit_scheme: NotRequired[Literal["town", "split"]]
     authoritative: NotRequired[str]
+    extend: NotRequired[bool]
     autorotate: NotRequired[bool]
 
 
@@ -1477,6 +1478,7 @@ def emit(name: str) -> Path:
             {f"SC{name}": source},
             strict=not manifest.get("authoritative_loose"),
             authoritative=manifest.get("authoritative"),
+            extend=bool(manifest.get("extend")),
         )
         targets = {row["id"]: row["contest_id"] for row in cs.rows.get("result_set", [])}
         for held, contest in conn.execute(
