@@ -248,6 +248,7 @@ export type Reason =
   | "totals"
   | "bare"
   | "lost"
+  | "pending"
   | "absent"
   | "units"
   | "unshaped"
@@ -260,6 +261,7 @@ export type Counts = Record<
   | "shaped"
   | "icpsr"
   | "published"
+  | "upcoming"
   | "populationTotal"
   | "populationComplete"
   | "populationAbsent"
@@ -277,13 +279,16 @@ export const weighted = (row: Counts): Counts => ({
   icpsr: 0,
   published: 0,
   lost: 0,
+  upcoming: 0,
+  pending: 0,
 });
 
 export const REASONS: Record<Goal, Array<Reason>> = {
-  county: ["complete", "partial", "totals", "bare", "absent"],
+  county: ["complete", "pending", "partial", "totals", "bare", "absent"],
   history: ["complete", "partial", "totals", "bare", "absent"],
   precinct: [
     "complete",
+    "pending",
     "major",
     "coarse",
     "partial",
@@ -293,12 +298,45 @@ export const REASONS: Record<Goal, Array<Reason>> = {
   ],
   shapes: ["complete", "units", "unshaped", "undrawn"],
   shapes_history: ["complete", "units", "unshaped", "undrawn"],
-  local: ["complete", "partial", "totals", "bare", "lost", "absent"],
-  national: ["complete", "partial", "totals", "bare", "lost", "absent"],
-  fine: ["complete", "coarse", "partial", "totals", "bare", "lost", "absent"],
-  subnational: ["complete", "partial", "totals", "bare", "lost", "absent"],
-  referendums: ["complete", "partial", "totals", "bare", "lost", "absent"],
-  ep: ["complete", "partial", "totals", "bare", "lost", "absent"],
+  local: ["complete", "pending", "partial", "totals", "bare", "lost", "absent"],
+  national: [
+    "complete",
+    "pending",
+    "partial",
+    "totals",
+    "bare",
+    "lost",
+    "absent",
+  ],
+  fine: [
+    "complete",
+    "pending",
+    "coarse",
+    "partial",
+    "totals",
+    "bare",
+    "lost",
+    "absent",
+  ],
+  subnational: [
+    "complete",
+    "pending",
+    "partial",
+    "totals",
+    "bare",
+    "lost",
+    "absent",
+  ],
+  referendums: [
+    "complete",
+    "pending",
+    "partial",
+    "totals",
+    "bare",
+    "lost",
+    "absent",
+  ],
+  ep: ["complete", "pending", "partial", "totals", "bare", "lost", "absent"],
   turnout: ["complete", "partial", "coarse", "absent"],
 };
 
@@ -310,6 +348,7 @@ export const LABELS: Record<Reason, () => string> = {
   totals: m.coverage_reason_totals,
   bare: m.coverage_reason_bare,
   lost: m.coverage_country_reason_lost,
+  pending: m.coverage_reason_pending,
   absent: m.coverage_reason_absent,
   units: m.coverage_reason_units,
   unshaped: m.coverage_reason_unshaped,

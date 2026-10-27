@@ -210,11 +210,11 @@ async function load(segments: Array<string>, search: URLSearchParams) {
     return chamber(rest.join("/"));
   }
   if (head === "coverage" && rest.length === 1) {
-    return coverage(rest[0] ?? "", search);
+    return coverage(rest[0] ?? "");
   }
   switch (rest.length === 0 ? head : "") {
     case "coverage": {
-      return coverageOverview(search);
+      return coverageOverview();
     }
     case "compare": {
       return comparison(
@@ -541,7 +541,6 @@ function coverageMarkdown(
   data: Extract<Data, { kind: "coverage" }>,
   link: Link,
 ) {
-  const year = String(new Date().getFullYear());
   const { summary } = data;
   const isUs = data.polity === "us";
   const columns: ReadonlyArray<Column> = isUs
@@ -604,9 +603,7 @@ function coverageMarkdown(
               : [m.coverage_country_finest({ noun: summary.finestNoun })]),
           ].join(" "),
         ]),
-    (data.current ? m.twin_coverage_current_on : m.twin_coverage_current)({
-      year,
-    }),
+    m.coverage_upcoming_note(),
     ...(data.stale ? [`> ${m.coverage_stale()}`] : []),
     ...(data.readiness.length === 0
       ? []
@@ -711,6 +708,9 @@ function coverageMarkdown(
                     ]
                   : []),
                 `${progress({ complete: count(row.complete), total: count(row.total) })}, ${share(row)}`,
+                ...(row.upcoming > 0
+                  ? [m.coverage_upcoming_of({ count: count(row.upcoming) })]
+                  : []),
                 ...(row.icpsr > 0
                   ? [m.coverage_icpsr_of({ count: count(row.icpsr) })]
                   : []),
@@ -728,6 +728,11 @@ function coverageMarkdown(
                 .filter((reason) => reason === "complete" || row[reason] > 0)
                 .flatMap((reason) => [
                   `- ${reasonLabel(item.goal, reason, data.polity)}: ${count(row[reason])}${isWeighted ? ` (${m.coverage_population_share({ percent: percent(weighted(row)[reason] / Math.max(1, row.populationTotal), 1) })})` : ""}`,
+                  ...(reason === "complete" && row.upcoming > 0
+                    ? [
+                        `  - ${m.coverage_upcoming()}: ${count(row.upcoming)}. ${m.coverage_upcoming_def()}`,
+                      ]
+                    : []),
                   ...(reason === "complete" && row.icpsr > 0
                     ? [`  - ${m.coverage_icpsr()}: ${count(row.icpsr)}`]
                     : []),
@@ -936,7 +941,6 @@ function overviewMarkdown(
   data: Extract<Data, { kind: "coverage_overview" }>,
   link: Link,
 ) {
-  const year = String(new Date().getFullYear());
   return [
     `# ${m.coverage_overview_title()}`,
     m.coverage_overview_lede(),
@@ -950,9 +954,7 @@ function overviewMarkdown(
             last: String(data.totals.last),
           }),
         ]),
-    (data.current ? m.twin_coverage_current_on : m.twin_coverage_current)({
-      year,
-    }),
+    m.coverage_upcoming_note(),
     ...(data.stale ? [`> ${m.coverage_stale()}`] : []),
     table(
       [

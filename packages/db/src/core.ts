@@ -468,6 +468,8 @@ export const coverageGoal = pgTable("coverage_goal", {
 	major: integer().default(0).notNull(),
 	published: integer().default(0).notNull(),
 	lost: integer().default(0).notNull(),
+	upcoming: integer().default(0).notNull(),
+	pending: integer().default(0).notNull(),
 	populationTotal: bigint("population_total", { mode: "number" }).default(0).notNull(),
 	populationComplete: bigint("population_complete", { mode: "number" }).default(0).notNull(),
 	populationAbsent: bigint("population_absent", { mode: "number" }).default(0).notNull(),

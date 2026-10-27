@@ -43,19 +43,14 @@ const counts = {
   major: v.number(),
   published: v.number(),
   lost: v.number(),
+  upcoming: v.number(),
+  pending: v.number(),
   populationTotal: v.number(),
   populationComplete: v.number(),
   populationAbsent: v.number(),
   populationEstimated: v.number(),
 };
 type Counts = Record<keyof typeof counts, number>;
-const Current = v.optional(
-  v.pipe(
-    v.union([v.boolean(), v.string()]),
-    v.transform((value) => [true, "1", "true"].includes(value)),
-  ),
-  false,
-);
 const Code = v.pipe(v.string(), v.regex(/^[a-z]{2}$/));
 const SUMS = sql.raw(
   Object.keys(counts)
@@ -64,7 +59,7 @@ const SUMS = sql.raw(
         /[A-Z]/g,
         (letter) => `_${letter.toLowerCase()}`,
       );
-      return `sum(g.${column})::${column.startsWith("population_") ? "float8" : "int"} as "${key}"`;
+      return `sum(g.${column}${key === "complete" ? " + g.upcoming" : ""})::${column.startsWith("population_") ? "float8" : "int"} as "${key}"`;
     })
     .join(", "),
 );
@@ -154,10 +149,13 @@ function sum(rows: Array<Row>, spec: Spec, levels: ReadonlyArray<string>) {
     ? {
         ...ZERO,
         total: total.total,
-        complete: total.total - total.absent - total.bare - total.lost,
+        complete:
+          total.total - total.absent - total.bare - total.lost - total.pending,
         absent: total.absent,
         bare: total.bare,
         lost: total.lost,
+        upcoming: total.upcoming,
+        pending: total.pending,
       }
     : total;
 }
@@ -284,10 +282,9 @@ export const coverage = {
         method: "GET",
         path: "/coverage",
         summary:
-          "Coverage of every country the archive holds: its span, elections, contests, finest reporting unit, and how far each tier (national, regional, and local elections, referendums, and the European Parliament; for the US federal, statewide, state legislative, and local contests since 2000) is counted, as the share of races with results at each race's own constituency or district (US local governments: election years with any results); the current year, still under way, counts only with current=1",
+          "Coverage of every country the archive holds: its span, elections, contests, finest reporting unit, and how far each tier (national, regional, and local elections, referendums, and the European Parliament; for the US federal, statewide, state legislative, and local contests since 2000) is counted, as the share of races with results at each race's own constituency or district (US local governments: election years with any results); a race still to vote counts once it is in the archive with its candidates or options in full (upcoming), and once its date passes it needs results",
       }),
     )
-    .input(v.optional(v.object({ current: Current }), {}))
     .output(
       v.object({
         builtAt: v.nullable(v.string()),
@@ -333,7 +330,6 @@ export const coverage = {
           ${SUMS}
         from coverage_goal g
         where g.goal in ('history', 'county', 'local', 'subnational', 'national', 'referendums', 'ep')
-          and (${input.current} or g.year <> extract(year from current_date))
         group by 1, 2, 3, 4
       `);
       return {
@@ -398,10 +394,10 @@ export const coverage = {
         method: "GET",
         path: "/coverage/{polity}",
         summary:
-          "One country's coverage by tier (polity is a lowercase ISO code, or eu): national, regional, and local elections, referendums, and the European Parliament (for the US: federal, statewide, state legislative, local, and turnout), each with counts at every grain (any results, by constituency or county, finer, and map shapes; for the US split before 2000 and from 2000) for the tier and for each kind of election in it, plus the cited sources of the denominators and what is left uncounted; the current year counts only with current=1",
+          "One country's coverage by tier (polity is a lowercase ISO code, or eu): national, regional, and local elections, referendums, and the European Parliament (for the US: federal, statewide, state legislative, local, and turnout), each with counts at every grain (any results, by constituency or county, finer, and map shapes; for the US split before 2000 and from 2000) for the tier and for each kind of election in it, plus the cited sources of the denominators and what is left uncounted; complete includes upcoming, the races still to vote that the archive holds with their candidates or options in full, and pending counts those still short of them",
       }),
     )
-    .input(v.object({ polity: Code, current: Current }))
+    .input(v.object({ polity: Code }))
     .output(
       v.object({
         builtAt: v.nullable(v.string()),
@@ -443,7 +439,7 @@ export const coverage = {
       const found = await db.execute<Row>(sql`
         select g.goal, g.level, g.year < 2000 as before, array_agg(distinct g.year order by g.year) as years, ${SUMS}
         from coverage_goal g
-        where g.polity = ${input.polity} and (${input.current} or g.year <> extract(year from current_date))
+        where g.polity = ${input.polity}
         group by 1, 2, 3
       `);
       const ready = await db.execute<
@@ -496,7 +492,7 @@ export const coverage = {
         method: "GET",
         path: "/coverage/{polity}/gaps",
         summary:
-          "Where one country's coverage goal falls short, optionally within one tier: by state or region, then by level within it, then by year within a level, largest gap first; the current year counts only with current=1",
+          "Where one country's coverage goal falls short, optionally within one tier: by state or region, then by level within it, then by year within a level, largest gap first",
       }),
     )
     .input(
@@ -508,7 +504,6 @@ export const coverage = {
         ),
         state: v.optional(v.pipe(v.string(), v.maxLength(8))),
         level: v.optional(v.pipe(v.string(), v.maxLength(40))),
-        current: Current,
       }),
     )
     .output(
@@ -550,8 +545,7 @@ export const coverage = {
             and (${tier}::text is null or g.level = any(coalesce(string_to_array(${usLevels}::text, ','),
               (select array_agg(l ->> 'key') from coverage_polity c cross join jsonb_array_elements(c.levels) l
                 where c.polity = ${input.polity} and l ->> 'goal' = ${tier}))))
-            and (${input.current} or g.year <> extract(year from current_date))
-          group by 1
+            group by 1
         ) r
         order by case when ${input.goal} = 'local' then r."populationTotal" - r."populationComplete"
           else r.total - r.complete end desc, r.key desc

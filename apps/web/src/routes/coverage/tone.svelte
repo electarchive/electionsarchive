@@ -7,7 +7,7 @@
     class: className,
     style,
   }: {
-    reason: Reason | "icpsr" | "published";
+    reason: Reason | "icpsr" | "published" | "upcoming";
     class?: string;
     style?: string;
   } = $props();
@@ -30,6 +30,12 @@
     {
       "border border-dashed border-muted-foreground/70 bg-muted":
         reason === "lost",
+    },
+    {
+      "border border-dotted border-(--yes) bg-(--yes)/40":
+        reason === "upcoming",
+      "border border-dotted border-muted-foreground bg-card":
+        reason === "pending",
     },
     {
       "border border-muted-foreground/70 bg-muted bg-[repeating-linear-gradient(135deg,var(--muted-foreground)_0_1.5px,transparent_1.5px_5px)]":

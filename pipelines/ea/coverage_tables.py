@@ -782,8 +782,9 @@ create temp table lc as
 select coalesce(o.polity_id, b.polity_id, e.polity_id) as polity_id, cc.id, cc.year,
     extract(month from e.date_from)::int as month,
     cc.level <> 'local_measure' and cc.stage in ('general', 'primary', 'runoff') as regular, cc.stage,
-    coalesce(cg.precinct, false) or cc.tacit as precinct
+    coalesce(cg.precinct, false) or cc.tacit as precinct, cc.upcoming, coalesce(rdy.ok, false) as ready
 from cc
+left join rdy on rdy.id = cc.id
 join contest c on c.id = cc.id
 join election e on e.id = c.election_id
 left join office o on o.id = c.office_id
@@ -793,9 +794,11 @@ where cc.level in ('county', 'municipal', 'school', 'special_district', 'local_m
 """
 
 HELD_SQL = """
-select lc.polity_id, lc.year, count(*), count(*) filter (where lc.precinct), count(*) filter (where lc.regular),
+select lc.polity_id, lc.year, count(*) filter (where not lc.upcoming),
+    count(*) filter (where lc.precinct and not lc.upcoming), count(*) filter (where lc.regular),
     mode() within group (order by lc.month) filter (where lc.regular),
-    count(*) filter (where lc.regular and lc.stage = 'general')
+    count(*) filter (where lc.regular and lc.stage = 'general'),
+    count(*) filter (where lc.upcoming), count(*) filter (where lc.upcoming and lc.ready)
 from lc group by 1, 2
 """
 
@@ -983,8 +986,8 @@ def build() -> str:
         states = {fips: (st, name) for st, fips, name in conn.execute(coverage.STATES_SQL)}
         conn.execute(LOCAL_SQL)
         held: dict[str, dict[int, list]] = defaultdict(dict)
-        for polity, year, n, precinct, regular, month, generals in conn.execute(HELD_SQL):
-            held[str(polity)][year] = [n, precinct, regular, month, 0, 0, generals]
+        for polity, year, n, precinct, regular, month, generals, up, ready in conn.execute(HELD_SQL):
+            held[str(polity)][year] = [n, precinct, regular, month, 0, 0, generals, up, ready]
         for polity, year, n, shaped in conn.execute(LOCAL_SHAPES_SQL):
             held[str(polity)][year][4:6] = [n, shaped]
         polities = {str(pid): (kind, code, name, st) for pid, kind, code, name, st in conn.execute(POLITIES_SQL)}
@@ -994,15 +997,14 @@ def build() -> str:
         turnout = list(conn.execute(TURNOUT_SQL))
 
         by_key = {(c["state"], c["year"], c["level"], c["stage"]): c for c in cells}
-        season = {
-            "primary": date(today.year, 9, 20),
-            "general": date(today.year, 11, 2 + -date(today.year, 11, 1).weekday() % 7),
-        }
-        for stage, day in season.items():
-            if today <= day:
-                continue
+        for stage in ("primary", "general"):
             for (st, year, level, cell_stage), cell in list(by_key.items()):
-                if cell_stage != stage or level not in STATE_LEVELS or year != today.year - OFFSETS.get(level, 4):
+                if (
+                    cell_stage != stage
+                    or level not in STATE_LEVELS
+                    or level == "statewide_measure"
+                    or year != today.year - OFFSETS.get(level, 4)
+                ):
                     continue
                 key = (st, today.year, level, stage)
                 current = by_key.setdefault(
@@ -1018,6 +1020,8 @@ def build() -> str:
                         "precinct": 0,
                         "precincts": 0,
                         "shaped_precincts": 0,
+                        "upcoming": 0,
+                        "pending": 0,
                         "target": coverage.target(st, level, today.year),
                     },
                 )
@@ -1026,8 +1030,6 @@ def build() -> str:
         known = dict(KNOWN)
         for st, period in JUDICIAL.items():
             for year in range(2000 + (st == "PA"), today.year + 1, period):
-                if year == today.year and today <= (date(year, 4, 15) if st == "WI" else season["general"]):
-                    continue
                 retained = any(
                     "us.retention" in c.get("pipelines", "")
                     for (s, y, level, _), c in by_key.items()
@@ -1223,6 +1225,7 @@ def build() -> str:
             months[(g["state"], g["kind"])][g["month"]] += 1
 
     years_out: list[tuple] = []
+    ahead: dict[tuple[str, int], bool] = {}
     for g in governments:
         group = (g["state"], g["kind"])
         if g["period"] is None:
@@ -1260,8 +1263,10 @@ def build() -> str:
                 and (year - due[1]) % due[0] == 0
                 and (year < today.year or (g["month"] is not None and g["month"] < today.month))
             )
-            n, precinct, _, _, precincts, shaped, generals = years.get(year, [0, 0, 0, None, 0, 0, 0])
-            earlier = years.get(year - 4, [0] * 7)[6] if year < today.year else 0
+            n, precinct, _, _, precincts, shaped, generals, up, ready = years.get(year, [0, 0, 0, None, 0, 0, 0, 0, 0])
+            earlier = years.get(year - 4, [0] * 9)[6] if year < today.year else 0
+            if n == 0 and up and 2000 <= year <= today.year:
+                ahead[(g["id"], year)] = ready > 0
             if expected or n:
                 years_out.append(
                     (
@@ -1276,7 +1281,7 @@ def build() -> str:
                     )
                 )
     names = dict(states.values())
-    goals: dict[tuple[str, str, str, int], list[int]] = defaultdict(lambda: [0] * 20)
+    goals: dict[tuple[str, str, str, int], list[int]] = defaultdict(lambda: [0] * 22)
     for st, year, level, total, complete, unshaped, units, undrawn in shapes:
         if level not in STATE_LEVELS or st not in names:
             continue
@@ -1294,12 +1299,14 @@ def build() -> str:
         county = c["county_or_finer"]
         partial = c.get("county_partial", 0)
         bare = c.get("no_results", 0)
-        totals = max(0, count - county - partial - bare)
+        upcoming = c.get("upcoming", 0)
+        pending = c.get("pending", 0)
+        totals = max(0, count - county - partial - bare - upcoming - pending)
         precinct = c["precinct"]
         major = c.get("major_only", 0)
         published = c.get("published", 0)
         if coverage.target(st, level, year) == "total":
-            county = precinct = count - bare
+            county = precinct = count - bare - upcoming - pending
             partial = totals = major = published = 0
         if year >= 2000:
             for goal, complete, coarse in (
@@ -1311,6 +1318,8 @@ def build() -> str:
                     [base, complete, base - count, bare, totals, partial, coarse, c.get("with_turnout", 0)]
                 ):
                     cell[i] += value
+                cell[20] += upcoming
+                cell[21] += pending
                 if goal == "precinct":
                     cell[8] += c["precincts"]
                     cell[9] += c["shaped_precincts"]
@@ -1333,6 +1342,13 @@ def build() -> str:
         cell[5] += partial
         cell[6] += coarse
     kinds = {g["id"]: (g["state"], g["kind"], g["population"] or 0, g["population_basis"]) for g in governments}
+    for gid, year in ahead.keys() - {(row[0], row[1]) for row in years_out}:
+        st, kind, population, _ = kinds[gid]
+        if st in names:
+            cell = goals[("local", st, kind, year)]
+            cell[0] += 1
+            cell[20 if ahead[(gid, year)] else 21] += 1
+            cell[14] += population
     for gid, year, expected, n, _, _, precincts, shaped in years_out:
         st, kind, population, population_basis = kinds[gid]
         if st not in names or not 2000 <= year <= today.year or not (expected or n):
@@ -1340,6 +1356,10 @@ def build() -> str:
         cell = goals[("local", st, kind, year)]
         cell[0] += 1
         cell[1] += n > 0
+        if n == 0 and (gid, year) in ahead:
+            cell[20 if ahead[(gid, year)] else 21] += 1
+            cell[14] += population
+            continue
         cell[2] += n == 0
         cell[8] += precincts
         cell[9] += shaped
@@ -1387,7 +1407,7 @@ def build() -> str:
         with conn.cursor().copy(
             "copy coverage_goal (goal, state, level, year, total, complete, absent, bare, totals, partial, coarse,"
             " turnout, precincts, shaped, unshaped, units, undrawn, icpsr, population_total, population_complete,"
-            " population_absent, population_estimated, major, published) from stdin"
+            " population_absent, population_estimated, major, published, upcoming, pending) from stdin"
         ) as copy:
             for key, values in goals.items():
                 copy.write_row([*key, *values])

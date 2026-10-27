@@ -6,8 +6,8 @@ import type { Actions, PageServerLoad } from "./$types";
 
 const isDev = import.meta.env.DEV;
 
-export const load: PageServerLoad = async ({ params, url }) => ({
-  ...(await coverage(params.cc, url.searchParams)),
+export const load: PageServerLoad = async ({ params }) => ({
+  ...(await coverage(params.cc)),
   dev: isDev,
 });
 

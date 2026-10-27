@@ -23,13 +23,11 @@
     place = null,
     level = null,
     start = 0,
-    current,
   }: {
     polity: string;
     goal: Goal;
     tier?: string | null;
     order: "gap" | "name";
-    current: boolean;
     rows?: Array<
       Counts & { key: string; label: string | null; path: string | null }
     > | null;
@@ -46,13 +44,11 @@
         tier: tier ?? undefined,
         state: place ?? undefined,
         level: level ?? undefined,
-        current,
       },
     }),
     enabled: rows == null,
   }));
   const depth = $derived(place == null ? 0 : level == null ? 1 : 2);
-  const year = new Date().getFullYear();
   const all = $derived.by(() => {
     const named = (rows ?? fetched.data ?? []).map((row) => ({
       row,
@@ -61,8 +57,11 @@
           ? (row.label ?? (row.key === "" ? m.coverage_region_none() : row.key))
           : depth === 1
             ? levelLabel(polity, row.key)
-            : Number(row.key) === year
-              ? m.coverage_in_progress({ year: row.key })
+            : row.upcoming + row.pending > 0
+              ? m.coverage_year_upcoming({
+                  year: row.key,
+                  count: count(row.upcoming + row.pending),
+                })
               : row.key,
     }));
     return order === "name"
@@ -166,7 +165,6 @@
       place={depth === 0 ? row.key : place}
       level={depth === 1 ? row.key : null}
       {start}
-      {current}
     />
   {/if}
 {/each}

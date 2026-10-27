@@ -47,7 +47,7 @@ left join body b on b.id = c.body_id
 left join office o on o.id = c.office_id
 left join polity op on op.id = coalesce(b.polity_id, o.polity_id, e.polity_id)
 left join area a on a.id = c.district_area_id
-where e.date_from is not null and e.date_from <= current_date and e.status <> 'scheduled' and not c.notional
+where e.date_from is not null and not c.notional
     and case when %(iso)s = 'EU' then op.iso_code = 'EU' else e.polity_id in (select id from t) end
 """
 
@@ -240,6 +240,9 @@ def measure(conn, cc: str) -> dict:
                 picked[level["key"]].append(row)
                 break
     ids = [r[0] for rs in picked.values() for r in rs]
+    ahead = readiness.ready(
+        conn, [r[0] for rs in picked.values() for r in rs if r[2] >= readiness.local_today(r[6] or iso)]
+    )
     units: dict[str, dict[str, tuple[int, int]]] = defaultdict(dict)
     for cid, scheme, n, shaped in conn.execute(UNITS_SQL, [ids]):
         units[cid][scheme] = (n, shaped)
@@ -279,6 +282,7 @@ def measure(conn, cc: str) -> dict:
         "places": places,
         "geometry": geometry,
         "labels": labels,
+        "ahead": ahead,
     }
 
 
@@ -299,7 +303,7 @@ def shaped_on(spans: list[tuple], day: date) -> str:
 
 def tally(cc: str, data: dict) -> tuple[dict, list[dict], list[dict]]:
     spec = data["spec"]
-    goals: dict[tuple[str, str, str, int], list[int]] = defaultdict(lambda: [0] * 15)
+    goals: dict[tuple[str, str, str, int], list[int]] = defaultdict(lambda: [0] * 17)
     elections_out: list[dict] = []
     notes: list[dict] = []
     for level in spec["levels"]:
@@ -375,6 +379,7 @@ def tally(cc: str, data: dict) -> tuple[dict, list[dict], list[dict]]:
             own = [r for r in rows if r[9] in schemes] if unit == "district" else []
             for r in rows:
                 cid, tacit, district, scheme = r[0], r[7], r[8], r[9]
+                fresh = data["ahead"].get(cid)
                 got = data["units"].get(cid, {})
                 voted = data["sets"].get(cid, {}).values()
                 results = bool(got)
@@ -398,8 +403,16 @@ def tally(cc: str, data: dict) -> tuple[dict, list[dict], list[dict]]:
                 if unit == "district":
                     if scheme in schemes:
                         k = cid if level.get("by_contest") else district
-                        current = "complete" if tacit or good else "partial" if voted else "bare"
-                        rank = {"complete": 0, "partial": 1, "bare": 2}
+                        current = (
+                            ("upcoming" if fresh else "pending")
+                            if fresh is not None
+                            else "complete"
+                            if tacit or good
+                            else "partial"
+                            if voted
+                            else "bare"
+                        )
+                        rank = {"complete": 0, "upcoming": 1, "pending": 2, "partial": 3, "bare": 4}
                         if k not in status or rank[current] < rank[status[k]]:
                             status[k] = current
                         fine_ok[k] = fine_ok.get(k, False) or finer
@@ -420,8 +433,18 @@ def tally(cc: str, data: dict) -> tuple[dict, list[dict], list[dict]]:
                     k = r[10] if unit == "polity" else cid
                     at_grain = any(grain & by_scheme.keys() or fine & by_scheme.keys() for by_scheme in good)
                     ok = tacit or (at_grain if grain else bool(good))
-                    current = "complete" if ok else "totals" if good else "partial" if voted else "bare"
-                    rank = {"complete": 0, "partial": 1, "totals": 2, "bare": 3}
+                    current = (
+                        ("upcoming" if fresh else "pending")
+                        if fresh is not None
+                        else "complete"
+                        if ok
+                        else "totals"
+                        if good
+                        else "partial"
+                        if voted
+                        else "bare"
+                    )
+                    rank = {"complete": 0, "upcoming": 1, "pending": 2, "partial": 3, "totals": 4, "bare": 5}
                     if k not in status or rank[current] < rank[status[k]]:
                         status[k] = current
                     fine_ok[k] = fine_ok.get(k, False) or finer
@@ -434,7 +457,7 @@ def tally(cc: str, data: dict) -> tuple[dict, list[dict], list[dict]]:
                 status = {k: "lost" if st == "bare" else st for k, st in status.items()}
             regions_expected = (e or {}).get("regions") or {}
             count_total = n or 0
-            by_region: dict[str, list[int]] = defaultdict(lambda: [0] * 15)
+            by_region: dict[str, list[int]] = defaultdict(lambda: [0] * 17)
             for k, st in status.items():
                 cell = by_region[place.get(k, "")]
                 cell[1] += st == "complete"
@@ -442,24 +465,26 @@ def tally(cc: str, data: dict) -> tuple[dict, list[dict], list[dict]]:
                 cell[4] += st == "totals"
                 cell[5] += st == "partial"
                 cell[14] += st == "lost"
+                cell[15] += st == "upcoming"
+                cell[16] += st == "pending"
             held_n = len(status)
             if regions_expected:
                 for reg, want in regions_expected.items():
                     cell = by_region[reg]
-                    have = cell[1] + cell[3] + cell[4] + cell[5] + cell[14]
+                    have = sum(cell[i] for i in (1, 3, 4, 5, 14, 15, 16))
                     gap = max(0, want - have)
                     cell[4 if coarse_only else 2] += gap
                     cell[0] = max(want, have)
                 for reg, cell in by_region.items():
                     if reg not in regions_expected:
-                        cell[0] = cell[1] + cell[3] + cell[4] + cell[5] + cell[14]
+                        cell[0] = sum(cell[i] for i in (1, 3, 4, 5, 14, 15, 16))
                 rest = count_total - sum(max(w, 0) for w in regions_expected.values())
                 if rest > 0:
                     by_region[""][0] += rest
                     by_region[""][4 if coarse_only else 2] += rest
             else:
                 for cell in by_region.values():
-                    cell[0] = cell[1] + cell[3] + cell[4] + cell[5] + cell[14]
+                    cell[0] = sum(cell[i] for i in (1, 3, 4, 5, 14, 15, 16))
                 gap = max(0, count_total - held_n)
                 if gap:
                     cell = by_region[""]
@@ -491,6 +516,8 @@ def tally(cc: str, data: dict) -> tuple[dict, list[dict], list[dict]]:
                     f[4] += cell[4]
                     f[5] += cell[5]
                     f[14] += cell[14]
+                    f[15] += cell[15]
+                    f[16] += cell[16]
                     f[6] += cell[1] - done
             if unit == "district":
                 for reg, cell in by_region.items():
@@ -512,6 +539,8 @@ def tally(cc: str, data: dict) -> tuple[dict, list[dict], list[dict]]:
                     "complete": complete,
                     "bare": sum(1 for s in status.values() if s == "bare"),
                     "lost": sum(1 for s in status.values() if s == "lost"),
+                    "upcoming": sum(1 for s in status.values() if s == "upcoming"),
+                    "pending": sum(1 for s in status.values() if s == "pending"),
                     "partial": sum(1 for s in status.values() if s == "partial"),
                     "totals": sum(1 for s in status.values() if s == "totals")
                     + (max(0, count_total - held_n) if coarse_only else 0),
@@ -611,7 +640,7 @@ def write(conn, goal_rows: list[tuple], polity_rows: list[tuple]) -> None:
     conn.execute("delete from coverage_polity")
     with conn.cursor().copy(
         "copy coverage_goal (polity, goal, state, level, year, total, complete, absent, bare, totals, partial, coarse,"
-        " turnout, precincts, shaped, unshaped, units, undrawn, icpsr, lost) from stdin"
+        " turnout, precincts, shaped, unshaped, units, undrawn, icpsr, lost, upcoming, pending) from stdin"
     ) as copy:
         for row in goal_rows:
             copy.write_row(row)
@@ -642,7 +671,7 @@ def report(cc: str) -> str:
 
 def markdown(cc: str, data: dict, goals: dict, elections: list[dict], notes: list[dict]) -> str:
     spec = data["spec"]
-    sums: dict[str, list[int]] = defaultdict(lambda: [0] * 15)
+    sums: dict[str, list[int]] = defaultdict(lambda: [0] * 17)
     for (goal, _, _, _), values in goals.items():
         for i, v in enumerate(values):
             sums[goal][i] += v
@@ -658,13 +687,26 @@ def markdown(cc: str, data: dict, goals: dict, elections: list[dict], notes: lis
         "## Goals",
         "",
         coverage.table(
-            ["Goal", "Expected", "Meets it", "Share", "Totals only", "No vote counts", "No votes survive", "Not held"],
+            [
+                "Goal",
+                "Expected",
+                "Meets it",
+                "Upcoming, ready",
+                "Share",
+                "Upcoming, short",
+                "Totals only",
+                "No vote counts",
+                "No votes survive",
+                "Not held",
+            ],
             [
                 [
                     g,
                     f"{v[0]:,}",
                     f"{v[1]:,}",
-                    coverage.pct(v[1], v[0]),
+                    f"{v[15]:,}",
+                    coverage.pct(v[1] + v[15], v[0]),
+                    f"{v[16]:,}",
                     f"{v[4]:,}",
                     f"{v[3]:,}",
                     f"{v[14]:,}",
@@ -689,6 +731,8 @@ def markdown(cc: str, data: dict, goals: dict, elections: list[dict], notes: lis
                     "Expected",
                     "Held",
                     "Meets it",
+                    "Upcoming, ready",
+                    "Upcoming, short",
                     "Totals only",
                     "No vote counts",
                     "No votes survive",
@@ -702,6 +746,8 @@ def markdown(cc: str, data: dict, goals: dict, elections: list[dict], notes: lis
                         e["expected"],
                         e["held"],
                         e["complete"],
+                        e["upcoming"],
+                        e["pending"],
                         e["totals"],
                         e["bare"],
                         e["lost"],
@@ -727,10 +773,11 @@ def markdown(cc: str, data: dict, goals: dict, elections: list[dict], notes: lis
 
 
 WORLD_SQL = """
-select polity, level, year, sum(total)::int, sum(complete)::int, sum(absent)::int, sum(bare)::int, sum(lost)::int
+select polity, level, year, sum(total)::int, sum(complete + upcoming)::int, sum(absent)::int, sum(bare)::int,
+    sum(lost)::int
 from coverage_goal
-where polity <> 'us' and goal in ('national', 'subnational', 'local', 'referendums', 'ep') and year < %s
-group by 1, 2, 3 having sum(total) > sum(complete) + sum(lost)
+where polity <> 'us' and goal in ('national', 'subnational', 'local', 'referendums', 'ep')
+group by 1, 2, 3 having sum(total) > sum(complete + upcoming) + sum(lost)
 order by 1, 2, 3
 """
 
@@ -741,22 +788,19 @@ EFFORT = {
 }
 
 
-def inputs(ref: str | None = None) -> dict[str, str]:
-    folder = str(DENOMINATORS.relative_to(ROOT))
-    if ref is not None:
-        listed = subprocess.run(
-            ["git", "ls-tree", "-r", ref, "--", *INPUTS, folder], cwd=ROOT, capture_output=True, text=True, check=True
-        ).stdout
-        return {
-            path: line.split()[2]
-            for line in listed.splitlines()
-            if (path := line.split("\t")[1]) in INPUTS or path.endswith(".json")
-        }
-    paths = [*INPUTS, *(str(f.relative_to(ROOT)) for f in sorted(DENOMINATORS.glob("*.json")))]
-    hashed = subprocess.run(
-        ["git", "hash-object", "--", *paths], cwd=ROOT, capture_output=True, text=True, check=True
-    ).stdout.split()
-    return dict(zip(paths, hashed, strict=True))
+def inputs(ref: str = "HEAD") -> dict[str, str]:
+    listed = subprocess.run(
+        ["git", "ls-tree", "-r", ref, "--", *INPUTS, str(DENOMINATORS.relative_to(ROOT))],
+        cwd=ROOT,
+        capture_output=True,
+        text=True,
+        check=True,
+    ).stdout
+    return {
+        path: line.split()[2]
+        for line in listed.splitlines()
+        if (path := line.split("\t")[1]) in INPUTS or path.endswith(".json")
+    }
 
 
 def record(conn) -> list[str]:
@@ -771,7 +815,7 @@ def world() -> str:
     leads = json.loads((Path(__file__).parent / "world_leads.json").read_text())
     with connect() as conn:
         record(conn)
-        rows = list(conn.execute(WORLD_SQL, [date.today().year]))
+        rows = list(conn.execute(WORLD_SQL))
     specs = {cc: load(cc) for cc in countries()}
     spans: dict[tuple, dict] = {}
     for cc, level, year, total, complete, absent, bare, lost in rows:
@@ -838,9 +882,9 @@ def world() -> str:
         "",
         (
             "- A gap is a country, level, and year outside the US whose cited denominator (`pipelines/ea/denominators/`)"
-            " counts more contests than the archive holds with results at the level's grain; the current year is left out."
-            " Missing is total less complete, split into contests the archive lacks entirely and contests it holds with no"
-            " results."
+            " counts more contests than the archive holds with results at the level's grain, or, for a contest still to"
+            " vote, with its candidates or options in full. Missing is total less complete, split into contests the"
+            " archive lacks entirely and contests it holds with no results."
         ),
         (
             "- Each year goes to the first lead in `world_leads.json` whose years cover it, and consecutive years under one"

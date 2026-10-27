@@ -1,9 +1,10 @@
 import re
 from collections import Counter, defaultdict
+from datetime import date
 
 from ea.store import Connection
 
-LAST = 2025
+LAST = date.today().year
 MODERN = 1990
 JOINT = 1970
 APPOINTED_LG = {"TN", "WV", "ME", "NH", "OR", "WY", "AZ"}

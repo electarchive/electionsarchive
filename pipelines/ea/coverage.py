@@ -27,7 +27,7 @@ LEVELS = (
 STAGES = ("general", "primary", "runoff", "special")
 LOCAL = {"county", "municipal", "school", "special_district", "local_measure"}
 ERAS = ((1789, 1823), (1824, 1899), (1900, 1966), (1967, 1999), (2000, 2015), (2016, 2025))
-LAST = 2025
+LAST = date.today().year
 ALL_LEVELS = ("us_house", "us_senate", "governor", "statewide_exec", "state_upper", "state_lower")
 CONGRESS = ("us_house", "us_senate")
 STATEWIDE = ("governor", "statewide_exec", "state_upper", "state_lower")
@@ -87,6 +87,8 @@ select c.id, extract(year from e.date_from)::int as year, coalesce(ps.st, 'US') 
         else 'general'
     end as stage,
     c.default_result_kind = 'tacit' as tacit,
+    e.date_from >= coalesce((select d.day from local_day d where d.st = coalesce(ps.st, 'US')),
+        (now() at time zone 'America/New_York')::date) as upcoming,
     cs.pipeline
 from contest c
 join election e on e.id = c.election_id
@@ -320,15 +322,19 @@ with c as (
         or exists (select from pubc where pubc.id = cc.id) as published
     from cc left join cg on cg.contest_id = cc.id
 )
-select st, year, level, stage, count(*), count(*) filter (where results),
-    count(*) filter (where county or precinct or major or cancelled or single), count(*) filter (where precinct or cancelled or published),
-    count(*) filter (where major and not coalesce(precinct, false) and not coalesce(cancelled, false) and not published),
-    count(*) filter (where county and not county_free and not coalesce(precinct, false) and not single_free),
-    count(*) filter (where turnout), count(*) filter (where not tacit and (multi or stage <> 'primary')),
-    count(*) filter (where any_county and not (coalesce(county, false) or coalesce(precinct, false) or coalesce(major, false)
-        or coalesce(cancelled, false) or single)),
-    count(*) filter (where not results and not coalesce(cancelled, false)),
-    count(*) filter (where published and not coalesce(precinct, false) and not coalesce(cancelled, false))
+select st, year, level, stage, count(*), count(*) filter (where not upcoming and results),
+    count(*) filter (where not upcoming and (county or precinct or major or cancelled or single)),
+    count(*) filter (where not upcoming and (precinct or cancelled or published)),
+    count(*) filter (where not upcoming and major and not coalesce(precinct, false) and not coalesce(cancelled, false)
+        and not published),
+    count(*) filter (where not upcoming and county and not county_free and not coalesce(precinct, false) and not single_free),
+    count(*) filter (where not upcoming and turnout), count(*) filter (where not tacit and (multi or stage <> 'primary')),
+    count(*) filter (where not upcoming and any_county and not (coalesce(county, false) or coalesce(precinct, false)
+        or coalesce(major, false) or coalesce(cancelled, false) or single)),
+    count(*) filter (where not upcoming and not results and not coalesce(cancelled, false)),
+    count(*) filter (where not upcoming and published and not coalesce(precinct, false) and not coalesce(cancelled, false)),
+    count(*) filter (where upcoming and exists (select from rdy where rdy.id = c.id and rdy.ok)),
+    count(*) filter (where upcoming and not exists (select from rdy where rdy.id = c.id and rdy.ok))
 from c group by 1, 2, 3, 4
 """
 
@@ -566,8 +572,10 @@ def governor_years(st: str) -> set[int]:
 
 def matrix(conn: Connection, last: int = LAST) -> list[dict]:
     conn.execute("set statement_timeout = 0")
+    readiness.local_days(conn)
     for statement in CONTESTS_SQL.split(";\n\n"):
         conn.execute(statement)
+    readiness.flag(conn, "cc")
     conn.execute("create temp table published (st text, year integer, level text, county text, finest text)")
     published = ROOT / ".agents" / "spec" / "finest-reported.csv"
     if published.exists():
@@ -592,6 +600,8 @@ def matrix(conn: Connection, last: int = LAST) -> list[dict]:
             "partial": partial,
             "bare": bare,
             "published": published_count,
+            "upcoming": upcoming,
+            "pending": pending,
         }
         for (
             st,
@@ -609,6 +619,8 @@ def matrix(conn: Connection, last: int = LAST) -> list[dict]:
             partial,
             bare,
             published_count,
+            upcoming,
+            pending,
         ) in conn.execute(COUNT_SQL)
     }
     conn.execute(
@@ -745,6 +757,12 @@ def matrix(conn: Connection, last: int = LAST) -> list[dict]:
         key = (st, year, "statewide_exec", "general")
         expected[key] = max(expected[key], due)
 
+    undecided = {
+        (st, int(readiness.DAY[:4]), "statewide_measure", "general"): n
+        for level in readiness.spec(readiness.DAY)["levels"]
+        if level["key"] == "statewide_measure"
+        for st, n in level["states"].items()
+    }
     with (ROOT / "pipelines/ea/sources/us/ncsl_measures.csv").open() as f:
         for row in csv.DictReader(line for line in f if not line.startswith("#")):
             st, year = row["state"], int(row["year"])
@@ -754,7 +772,13 @@ def matrix(conn: Connection, last: int = LAST) -> list[dict]:
                 if stage != "general"
             )
             key = (st, year, "statewide_measure", "general")
-            expected[key] = max(expected[key], int(row["measures"]) - elsewhere, held.get(key, {}).get("held", 0))
+            expected[key] = max(
+                expected[key],
+                int(row["measures"]) - elsewhere + undecided.pop(key, 0),
+                held.get(key, {}).get("held", 0),
+            )
+    for key, n in undecided.items():
+        expected[key] = max(expected[key], n, held.get(key, {}).get("held", 0))
 
     for (st, year, level, stage), cell in list(held.items()):
         if level == "us_senate" and stage == "primary" and year in (2016, 2018):
@@ -905,6 +929,8 @@ def matrix(conn: Connection, last: int = LAST) -> list[dict]:
                 "partial": 0,
                 "bare": 0,
                 "published": 0,
+                "upcoming": 0,
+                "pending": 0,
             },
         )
         exp = expected.get(key)
@@ -925,6 +951,8 @@ def matrix(conn: Connection, last: int = LAST) -> list[dict]:
                 "county_or_finer": cell["county"],
                 "county_partial": cell["partial"],
                 "no_results": cell["bare"],
+                "upcoming": cell["upcoming"],
+                "pending": cell["pending"],
                 "precinct": cell["precinct"],
                 "major_only": cell["major"],
                 "with_turnout": cell["turnout"],
@@ -940,7 +968,7 @@ def matrix(conn: Connection, last: int = LAST) -> list[dict]:
                 "shaped_precincts": shaped,
                 "shape_share": round(shaped / precincts, 3) if precincts else "",
                 "target": goal,
-                "gap": base - attained,
+                "gap": base - attained - cell["upcoming"],
                 "icpsr_only": cell["icpsr_only"],
                 "published": cell["published"],
                 "owner": owner(level, pipelines.get(key, set())),
@@ -1120,11 +1148,18 @@ def report(rows: list[dict]) -> str:
         members = [r for r in rows if r["year"] == year and r["level"] not in LOCAL]
         held = sum(r["held"] for r in members)
         precincts = sum(r["precincts"] for r in members)
-        cells = [year, f"{held:,}"]
+        ahead = sum(r["upcoming"] + r["pending"] for r in members)
+        cells = [year, f"{held - ahead:,}"]
         for level in ("president", "us_senate", "us_house", "governor", "statewide_exec", "state_upper", "state_lower"):
             subset = [r for r in members if r["level"] == level and r["stage"] == "general"]
-            cells.append(pct(sum(r["precinct"] for r in subset), sum(r["held"] for r in subset)))
+            cells.append(
+                pct(
+                    sum(r["precinct"] for r in subset),
+                    sum(r["held"] - r["upcoming"] - r["pending"] for r in subset),
+                )
+            )
         cells.append(pct(sum(r["shaped_precincts"] for r in members), precincts))
+        cells.append(f"{sum(r['upcoming'] for r in members):,} of {ahead:,}" if ahead else "–")
         precinct_years.append(cells)
 
     missing_rows = []
@@ -1184,6 +1219,7 @@ Generated by `ea coverage us` on {today} from the database, measured against the
 
 ## How it is measured
 
+- Two tracks. A contest is held once its date has passed in its state's local time, and is measured on its results. Until then it is upcoming, and counts as covered (upcoming, ready) when it has an office or body, a district, an electoral system, and its candidates with parties (a measure's answers and official wording), or as short (upcoming, short) when it lacks any of them; the rule is `READY_SQL` in `readiness.py`. Years run through the current one.
 - Level comes from the contest's office or body and its polity: the president (state slates, national contests, Electoral College votes, and primary delegate allocations), the US Senate and House, governors, other statewide offices (`judicial` when the office names a justice, judge, or court), state upper and lower chambers (Nebraska's unicameral counts as upper), county, municipal, and school district offices and bodies (county and city offices naming a school or education board count as school), and statewide and local ballot questions. No special district polities exist yet, so that level is empty.
 - Stage: `runoff` for runoff elections (general and primary), `primary` for party-scoped contests and primary, top-two, and caucus elections, `special` for special elections and remainder terms on a regular day, and `general` otherwise.
 - Grain: a contest is `precinct` when any of its result sets has a precinct unit (`us.precinct`, `us.nyc_ed`, Iowa caucus precincts), `county` when any has a county, town, county part, Alaska house district, or place unit, `total` when it has any result set, and `none` otherwise. A U.S. House or state legislative contest (multi-member districts included) with results whose district shape on the election date lies at least 98% inside one county shape of that date, or at least half inside one with no other county shape taking more than 2% (the rest is water the county shapes leave out), counts as `county`, since its district total is that county's return (a district with no shape dated for the election does not qualify); an Alaska State House contest counts the same way, since its district is the Alaska house district unit that stands in for counties (`district_county` caches the overlay: the county under the district's point on surface, by shape vintage, with `rest` the largest share another county takes). A precinct has a shape when its unit equals an area with geometry. `icpsr_only` counts contests whose only county-level results come from ICPSR or from Algara and Amlani's returns, which are compiled from ICPSR and CQ (`us.icpsr`, `us.algara`, `us.algara_federal`; the ICPSR replacement lane's work). A result set is matched by its source's publisher, not by the changeset that last wrote it, since another pipeline that makes a set non-default restages it.
@@ -1212,9 +1248,9 @@ Each row groups the matrix by level, stage, era, target, and owner. Gap is conte
 
 ## Precinct results, 2000 on
 
-Contests held at state and federal levels per year, the share of general-election contests with precinct results per level, and the share of those years' precincts with shapes.
+Contests held at state and federal levels per year, the share of general-election contests with precinct results per level, and the share of those years' precincts with shapes. Upcoming counts the contests still to vote that the archive holds with candidates or options in full, of all it holds still to vote; they are left out of the other columns until their date passes.
 
-{table(["Year", "Contests", "President", "Senate", "House", "Governor", "Statewide", "Upper", "Lower", "Shaped"], precinct_years)}
+{table(["Year", "Contests", "President", "Senate", "House", "Governor", "Statewide", "Upper", "Lower", "Shaped", "Upcoming"], precinct_years)}
 
 ## For other lanes
 

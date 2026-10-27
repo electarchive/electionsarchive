@@ -78,6 +78,13 @@ def database(conn) -> list[str]:
         " or lost > 0 and (polity = 'us' or goal not in ('national', 'subnational', 'local', 'referendums', 'ep', 'fine'))"
     ):
         problems.append(f"{polity} {goal} {level} {state} {year}: lost {lost} outside a country vote goal")
+    for polity, goal, level, state, year, upcoming, pending in conn.execute(
+        "select polity, goal, level, state, year, upcoming, pending from coverage_goal where upcoming < 0 or pending < 0"
+        " or (upcoming > 0 or pending > 0) and year < %s"
+        " or complete + upcoming + absent + bare + totals + partial + lost + pending > total and goal <> 'readiness'",
+        [date.today().year],
+    ):
+        problems.append(f"{polity} {goal} {level} {state} {year}: upcoming {upcoming} pending {pending} out of bounds")
     ready = readiness.spec(readiness.DAY)
     for level in ready["levels"]:
         for part in (level, level.get("specials") or {}):
@@ -115,7 +122,6 @@ def database(conn) -> list[str]:
 
 def pages(conn) -> list[str]:
     problems = []
-    current = date.today().year
     listing = json.loads(fetch("/api/v1/coverage"))
     overview = {row["polity"]: row for row in listing["polities"]}
     stale = conn.execute("select latest is not null and inputs is distinct from latest from coverage_build").fetchone()[
@@ -190,11 +196,12 @@ def pages(conn) -> list[str]:
                         )
                     )
                     low, high = {"before": (0, 1999), "since": (2000, 9999)}.get(era, (0, 9999))
-                    total, complete, icpsr, published, lost = conn.execute(
-                        "select coalesce(sum(total), 0), coalesce(sum(complete), 0), coalesce(sum(icpsr), 0),"
-                        " coalesce(sum(published), 0), coalesce(sum(lost), 0) from coverage_goal where polity = %s"
-                        " and goal = %s and level = any(%s) and year <> %s and year between %s and %s",
-                        [cc, goal, keys, current, low, high],
+                    total, complete, icpsr, published, lost, upcoming, pending = conn.execute(
+                        "select coalesce(sum(total), 0), coalesce(sum(complete + upcoming), 0), coalesce(sum(icpsr), 0),"
+                        " coalesce(sum(published), 0), coalesce(sum(lost), 0), coalesce(sum(upcoming), 0),"
+                        " coalesce(sum(pending), 0) from coverage_goal where polity = %s"
+                        " and goal = %s and level = any(%s) and year between %s and %s",
+                        [cc, goal, keys, low, high],
                     ).fetchone()
                     if (total, complete) != (cell["total"], cell["complete"]) and not (cc == "us" and total == 0):
                         problems.append(
@@ -207,7 +214,13 @@ def pages(conn) -> list[str]:
                         )
                     if lost != cell["lost"]:
                         problems.append(f"{cc} {key} {level} {column}: page lost {cell['lost']} db {lost}")
+                    if (upcoming, pending) != (cell["upcoming"], cell["pending"]):
+                        problems.append(
+                            f"{cc} {key} {level} {column}: page upcoming {cell['upcoming']} pending {cell['pending']}"
+                            f" db {upcoming} {pending}"
+                        )
                     for count, phrase in (
+                        (cell["upcoming"], "upcoming and ready"),
                         (cell["lost"], "with no surviving votes"),
                         (cell["icpsr"], "rely on ICPSR alone"),
                         (cell["published"], "at the finest unit published"),

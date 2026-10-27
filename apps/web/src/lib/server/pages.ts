@@ -191,14 +191,11 @@ export async function home() {
   };
 }
 
-export async function coverage(polity: string, search: URLSearchParams) {
-  const isCurrent = search.get("current") === "1";
+export async function coverage(polity: string) {
   if (!/^[a-z]{2}$/.test(polity)) {
     error(404);
   }
-  const goals = await found(
-    call(router.coverage.goals, { polity, current: isCurrent }),
-  );
+  const goals = await found(call(router.coverage.goals, { polity }));
   const isFlat =
     polity !== "us" && Object.keys(goals.summary.regions).length === 0;
   const gaps = Object.fromEntries(
@@ -212,28 +209,18 @@ export async function coverage(polity: string, search: URLSearchParams) {
               goal: headline(polity, tier.key).goal,
               tier: tier.key,
               state: isFlat ? "" : undefined,
-              current: isCurrent,
             }),
           ] as const,
       ),
     ),
   );
-  return {
-    kind: "coverage" as const,
-    polity,
-    current: isCurrent,
-    isFlat,
-    ...goals,
-    gaps,
-  };
+  return { kind: "coverage" as const, polity, isFlat, ...goals, gaps };
 }
 
-export async function coverageOverview(search: URLSearchParams) {
-  const isCurrent = search.get("current") === "1";
+export async function coverageOverview() {
   return {
     kind: "coverage_overview" as const,
-    current: isCurrent,
-    ...(await call(router.coverage.overview, { current: isCurrent })),
+    ...(await call(router.coverage.overview)),
   };
 }
 

@@ -1,11 +1,10 @@
 <script lang="ts">
-  import { goto, invalidateAll } from "$app/navigation";
+  import { invalidateAll } from "$app/navigation";
   import { resolve } from "$app/paths";
   import { page } from "$app/state";
   import { count, percent } from "#lib/format.js";
   import { cn } from "#lib/utils.js";
   import { m } from "#lib/paraglide/messages.js";
-  import { Switch } from "#lib/components/ui/switch/index.js";
   import { getLocale } from "#lib/paraglide/runtime.js";
   import type { PageData } from "./$types";
   import type { CountryTier, Tier } from "#lib/coverage.js";
@@ -14,7 +13,6 @@
 
   const { data }: { data: PageData } = $props();
 
-  const year = String(new Date().getFullYear());
   const columns: Partial<Record<Tier, CountryTier>> = {
     federal: "national",
     statewide: "subnational",
@@ -64,24 +62,9 @@
           })}
         </p>
       {/if}
-      <div class="grid gap-1 pbs-1">
-        <label class="flex items-center gap-2 text-[0.8125rem] font-semibold">
-          <Switch
-            checked={!data.current}
-            onCheckedChange={(value: boolean) =>
-              void goto(
-                value
-                  ? resolve("/coverage")
-                  : `${resolve("/coverage")}?current=1`,
-                { replace: true, reset: false },
-              )}
-          />
-          {m.coverage_current({ year })}
-        </label>
-        <p class="text-xs text-muted-foreground">
-          {m.coverage_current_hint({ year })}
-        </p>
-      </div>
+      <p class="text-xs text-muted-foreground max-inline-[72ch]">
+        {m.coverage_upcoming_note()}
+      </p>
       <p class="text-xs text-muted-foreground">{built}</p>
       {#if data.stale}
         <p role="status" class="text-sm font-semibold text-(--no)">

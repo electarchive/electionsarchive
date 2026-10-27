@@ -1,12 +1,11 @@
 <script lang="ts">
   import { enhance } from "$app/forms";
-  import { goto, invalidateAll } from "$app/navigation";
+  import { invalidateAll } from "$app/navigation";
   import { resolve } from "$app/paths";
   import { page } from "$app/state";
   import ChevronRightIcon from "@lucide/svelte/icons/chevron-right";
   import { count, percent } from "#lib/format.js";
   import { m } from "#lib/paraglide/messages.js";
-  import { Switch } from "#lib/components/ui/switch/index.js";
   import { getLocale } from "#lib/paraglide/runtime.js";
   import { cn } from "#lib/utils.js";
   import type { PageData } from "./$types";
@@ -65,6 +64,7 @@
     ep: m.coverage_country_def_ep,
   };
   const US_REASONS: Partial<Record<Reason, () => string>> = {
+    pending: m.coverage_reason_pending_def,
     major: m.coverage_reason_major_def,
     coarse: m.coverage_reason_coarse_def,
     partial: m.coverage_reason_partial_def,
@@ -112,6 +112,7 @@
     },
   ] as const;
   const COUNTRY_REASONS: Partial<Record<Reason, () => string>> = {
+    pending: m.coverage_reason_pending_def,
     coarse: m.coverage_country_reason_coarse_def,
     partial: m.coverage_country_reason_partial_def,
     totals: m.coverage_country_reason_totals_def,
@@ -229,7 +230,6 @@
           }).format(new Date(data.builtAt)),
         }),
   );
-  const path = $derived(resolve("/coverage/[cc]", { cc: data.polity }));
   const title = $derived(
     isUs
       ? m.coverage_title()
@@ -459,6 +459,21 @@
               : count(counts[reason])}</span
           >
           <span class="block text-xs text-muted-foreground">{definition}</span>
+          {#if reason === "complete" && counts.upcoming > 0}
+            <span class="mbs-2 grid grid-cols-[0.75rem_minmax(0,1fr)] gap-x-2">
+              <Tone
+                reason="upcoming"
+                class="mbs-1 rounded-xs block-3 inline-3"
+              />
+              <span>
+                <span class="font-semibold">{m.coverage_upcoming()}</span>
+                <span class="tabular-nums">{count(counts.upcoming)}</span>
+                <span class="block text-xs text-muted-foreground"
+                  >{m.coverage_upcoming_def()}</span
+                >
+              </span>
+            </span>
+          {/if}
           {#if reason === "complete" && counts.icpsr > 0}
             <span class="mbs-2 grid grid-cols-[0.75rem_minmax(0,1fr)] gap-x-2">
               <Tone reason="icpsr" class="mbs-1 rounded-xs block-3 inline-3" />
@@ -590,6 +605,11 @@
           percent: percent(counts.complete / Math.max(1, counts.total), 1),
         })}
       </span>
+      {#if counts.upcoming > 0}
+        <span class="text-muted-foreground">
+          {m.coverage_upcoming_of({ count: count(counts.upcoming) })}
+        </span>
+      {/if}
       {#if counts.icpsr > 0}
         <span class="text-muted-foreground">
           {m.coverage_icpsr_of({ count: count(counts.icpsr) })}
@@ -696,22 +716,9 @@
           {/if}
         </p>
       {/if}
-      <div class="grid gap-1 pbs-1">
-        <label class="flex items-center gap-2 text-[0.8125rem] font-semibold">
-          <Switch
-            checked={!data.current}
-            onCheckedChange={(value: boolean) =>
-              void goto(value ? path : `${path}?current=1`, {
-                replace: true,
-                reset: false,
-              })}
-          />
-          {m.coverage_current({ year })}
-        </label>
-        <p class="text-xs text-muted-foreground">
-          {m.coverage_current_hint({ year })}
-        </p>
-      </div>
+      <p class="text-xs text-muted-foreground max-inline-[72ch]">
+        {m.coverage_upcoming_note()}
+      </p>
       <div
         class="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted-foreground"
       >
@@ -1365,13 +1372,12 @@
             >
             <span role="columnheader">{m.coverage_column_done()}</span>
           </div>
-          {#key `${tab}:${goal}:${data.current}`}
+          {#key `${tab}:${goal}`}
             <Gaps
               polity={data.polity}
               {goal}
               tier={tab}
               {order}
-              current={data.current}
               place={data.isFlat ? "" : null}
               start={data.isFlat ? 1 : 0}
               rows={goal === headline(data.polity, tab).goal
