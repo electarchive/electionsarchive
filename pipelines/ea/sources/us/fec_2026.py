@@ -152,6 +152,50 @@ OFFICIAL = {
         "Candidate inquiry, November 3, 2026 election",
         ["https://voterportal.sos.la.gov/CandidateInquiry?electionDate=20261103#browser"],
     ),
+    "AK": (
+        "Alaska Division of Elections",
+        "Official election pamphlet, November 3, 2026 general election",
+        [
+            "https://www.elections.alaska.gov/election/2026/General/OEPbooks/2026%20Alaska%20General%20VP_Region%201_ENG_web.pdf",
+            "https://www.elections.alaska.gov/election-candidates/#candidates",
+        ],
+    ),
+    "CT": (
+        "Connecticut Secretary of the State",
+        "Election Management System, November 2026 State Election",
+        [
+            "https://ctemspublic.tgstg.net/ng-app/data/election/108/49421/Lookupdata.json",
+            "https://ctemspublic.tgstg.net/ng-app/data/election/108/49421/stateVotes_Electiondata.json",
+        ],
+    ),
+    "OK": (
+        "Oklahoma State Election Board",
+        "November 2026 list of elections",
+        ["https://hosting.okelections.gov/electionlist.html"],
+    ),
+    "AS": (
+        "American Samoa Election Office",
+        "Candidates for the 2026 midterm election",
+        ["https://www.aselectionoffice.gov/candidates-information/candidates-for-the-2026-midterm-election"],
+    ),
+    "MP": (
+        "Commonwealth Election Commission",
+        "2026 certified candidates listing",
+        ["https://www.votecnmi.gov.mp/candidate/2026-certified-candidates-listing"],
+    ),
+    "GU": (
+        "Guam Election Commission",
+        "Sample general election ballot, November 3, 2026",
+        ["https://drive.google.com/uc?export=download&id=1RKr3bLuivj8n0n29XKbQVHEgdUYwILMN"],
+    ),
+    "VI": (
+        "Elections System of the Virgin Islands",
+        "2026 general election official listing of candidates",
+        [
+            "https://vivote.gov/wp-content/uploads/2026/08/2026-Election-Public-Offices-Aspirant-Listing-STX-OFFICIAL-August-2026.pdf",
+            "https://vivote.gov/wp-content/uploads/2026/09/2026-General-Election-Listing-of-Candidates-St.Thomas-St.-John-District-Official-.pdf",
+        ],
+    ),
     "VA": (
         "Virginia Department of Elections",
         "November 3, 2026 general election candidate list: federal offices",
@@ -328,6 +372,130 @@ def read(state: str, path: Path) -> list[tuple[str, int | None, str, str]]:
                         ),
                     )
                 )
+    if state == "AK" and path.suffix == ".pdf":
+        flat = html.unescape(
+            re.sub(
+                r"\s*\|[\s|]*",
+                " | ",
+                re.sub(r"<[^>]+>", "|", raw.cached(SOURCE, OFFICIAL["AK"][2][1]).path.read_text()),
+            )
+        )
+        labels = {
+            frozenset(re.sub(r"[,“”\"]", " ", text.split(" / ")[0]).lower().split()): party.split(" / ")[0]
+            for text, party in re.findall(
+                r"\| (?:UNITED STATES SENATOR|UNITED STATES REPRESENTATIVE|GOVERNOR / LIEUTENANT GOVERNOR) \| All \| ([^|]+?) \| ([^|]+?) \| (?=Certified|Withdrawn)",
+                flat,
+            )
+        }
+        page = subprocess.run(
+            ["pdftotext", "-layout", "-f", "17", "-l", "17", str(path), "-"], capture_output=True, text=True, check=True
+        ).stdout.splitlines()
+        offices: list[str] = []
+        for line in page:
+            if line.startswith("United States Senate"):
+                offices = ["senate", "house"]
+            elif line.startswith("Governor and Lieutenant Governor"):
+                offices = ["governor"]
+            elif line.startswith("Alaska State"):
+                break
+            elif offices and line.strip():
+                for office, text in zip(offices, re.split(r"\s{2,}", line.strip())):
+                    text = text.rstrip("*").split("/")[0]
+                    rows.append((office, None, text, labels[frozenset(re.sub(r"[“”\"]", " ", text).lower().split())]))
+        return rows
+    if state == "AK":
+        return []
+    if state == "CT":
+        votes = json.loads(path.read_text())
+        if "candidateIds" in votes:
+            return []
+        lookup = json.loads(raw.cached(SOURCE, OFFICIAL["CT"][2][0]).path.read_text())
+        offices = {key: value for entry in lookup["officeList"] for key, value in entry.items()}
+        lines: dict[tuple[str, int | None, str], list[str]] = {}
+        for office_id, entries in votes.items():
+            office = offices[office_id]["NM"]
+            chamber = (
+                "house"
+                if office.startswith("Representative in Congress")
+                else {"Governor and Lieutenant Governor": "governor", "United States Senator": "senate"}.get(office)
+            )
+            for entry in entries if chamber else []:
+                for candidate_id in entry:
+                    candidate = lookup["candidateIds"][candidate_id]
+                    party = re.sub(r"(?<!Independent) Party$", "", lookup["partyIds"][candidate["P"]]["NM"])
+                    if party != "Write In":
+                        key = (
+                            chamber,
+                            int(offices[office_id]["D"]) if chamber == "house" else None,
+                            candidate["NM"].split(" and ")[0],
+                        )
+                        lines.setdefault(key, []).append(party)
+        return [(chamber, district, text, "/".join(parties)) for (chamber, district, text), parties in lines.items()]
+    if state == "OK":
+        office: str | None = None
+        district: int | None = None
+        seen: set[tuple[str, int | None, str, str]] = set()
+        for token in html.unescape(re.sub(r"\s*\|[\s|]*", " | ", re.sub(r"<[^>]+>", "|", path.read_text()))).split(
+            " | "
+        ):
+            if match := re.fullmatch(r"(.+), (REPUBLICAN|DEMOCRAT|LIBERTARIAN|INDEPENDENT)", token.strip()):
+                if office and (office, district, match[1], match[2]) not in seen:
+                    seen.add((office, district, match[1], match[2]))
+                    rows.append((office, district, match[1], match[2]))
+            else:
+                house = re.fullmatch(r"UNITED STATES REPRESENTATIVE - DISTRICT (\d+)", token.strip())
+                office = (
+                    "house" if house else {"UNITED STATES SENATOR": "senate", "GOVERNOR": "governor"}.get(token.strip())
+                )
+                district = int(house[1]) if house else None
+        return rows
+    if state in ("AS", "MP"):
+        flat = html.unescape(re.sub(r"\s*\|[\s|]*", " | ", re.sub(r"<[^>]+>", "|", path.read_text())))
+        if state == "AS":
+            section = flat.split("DELEGATE TO THE UNITED STATES CONGRESS", 1)[1].split("HOUSE OF REPRESENTATIVES", 1)[0]
+            return [("house", None, text, "") for text in section.strip(" |").split(" | ")]
+        tickets, delegate = flat.split("Governor & Lieutenant Governor", 1)[1].split(
+            "Delegate to the U.S. House of Representatives", 1
+        )
+        labels = {"IND": "Independent", "REP": "Republican", "DEM": "Democratic"}
+        return [
+            ("governor", None, text, labels[party])
+            for text, party in re.findall(
+                r"\| Governor \| ([^|]+?) \| Lieutenant Governor \| [^|]+? \| (\w+)(?= \|)", tickets
+            )
+        ] + [
+            ("house", None, text, labels[party])
+            for text, party in re.findall(
+                r"([^|]+?) \| (IND|REP|DEM) \|", delegate.split(" · ", 1)[0].split("candidates |", 1)[1]
+            )
+        ]
+    if state in ("GU", "VI"):
+        lines = subprocess.run(
+            ["pdftotext", "-layout", str(path), "-"], capture_output=True, text=True, check=True
+        ).stdout.splitlines()
+        for index, line in enumerate(lines):
+            if state == "VI" and (
+                match := re.match(
+                    r"^\s*\d+\s+(.+?)\s+(?:P\.O\.|\d{3,}\s).*?\s(Democrat|Independent|Republican|ICM)\s+(Delegate to Congress|Governor/Lt\. Governor)",
+                    line,
+                )
+            ):
+                rows.append(
+                    ("house" if match[3].startswith("Delegate") else "governor", None, match[1].split("/")[0], match[2])
+                )
+            office = {
+                "Governor & Lieutenant Governor of Guam": "governor",
+                "Non-Voting Delegate to the U.S. House of Representatives": "house",
+            }.get(line.strip())
+            if state == "GU" and office:
+                position = next(i for i in range(index + 1, len(lines)) if "REPUBLICAN" in lines[i])
+                for party, text in zip(
+                    re.split(r"\s{2,}", lines[position].strip()), re.split(r"\s{2,}", lines[position + 1].strip())
+                ):
+                    if party != "WRITE-IN":
+                        last, first = text.split(", ", 1)
+                        rows.append((office, None, f"{first} {last.title()}", party.title()))
+        return rows
     if state == "AL":
         return []
     if state == "LA":
@@ -559,7 +727,9 @@ def fetch() -> None:
                 SOURCE,
                 url,
                 response.content,
-                suffix=".txt"
+                suffix=".pdf"
+                if response.content.startswith(b"%PDF")
+                else ".txt"
                 if url == FL_URL
                 else ".csv"
                 if url.endswith("#csv")
@@ -656,7 +826,7 @@ def emit() -> Path:
                where x.value ~ '^2024-11-05:[A-Z]{2}:house:[0-9]+$'
                   or x.value ~ '^2020-11-03:[A-Z]{2}:senate$'
                   or x.value ~ '^2022-11-08:(OH|FL):senate$'
-                  or x.value ~ '^2022-11-08:(?!GU|VI)[A-Z]{2}:governor$'"""
+                  or x.value ~ '^2022-11-08:[A-Z]{2}:governor$'"""
         ).fetchall()
         latest_plan = conn.execute(
             "select id from boundary_set where scheme_code = 'us.cd' order by valid_from desc limit 1"
@@ -697,7 +867,9 @@ def emit() -> Path:
             listed.setdefault(key, []).append(row)
 
         def surname(text: str) -> str:
-            words = [word for word in re.sub(r"\"[^\"]*\"|\([^)]*\)|,", " ", text).split() if not SUFFIX.match(word)]
+            words = [
+                word for word in re.sub(r"[\"“][^\"”]*[\"”]|\([^)]*\)|,", " ", text).split() if not SUFFIX.match(word)
+            ]
             return slug(words[-1]) if words else ""
 
         filers: dict[tuple[str, str, int | None], list[tuple[str, str, str]]] = {}
@@ -716,6 +888,7 @@ def emit() -> Path:
         fec_held = {entity for entity in fec_persons.values()}
         known: dict[str, list[tuple[UUID, str]]] = {}
         earlier: dict[str, list[tuple[UUID, str]]] = {}
+        by_state: dict[str, list[tuple[UUID, str]]] = {}
         latest: dict[UUID, str] = {}
         for value, person, text in conn.execute(
             """select x.value, cy.person_id, n.text
@@ -727,6 +900,7 @@ def emit() -> Path:
         ).fetchall():
             day, state, chamber, *rest = value.split(":")
             latest[person] = max(latest.get(person, ""), day)
+            by_state.setdefault(state, []).append((person, text))
             (known if day.startswith("2026") else earlier).setdefault(
                 f"{DAY}:{state}:{chamber}" + (f":{rest[0]}" if chamber == "house" else ""), []
             ).append((person, text))
@@ -743,6 +917,17 @@ def emit() -> Path:
             [sorted(surnames)],
         ).fetchall():
             statewide.setdefault((state, slug(re.sub(r'"[^"]*"|\([^)]*\)', " ", text))), set()).add(person)
+        for state, person, text in conn.execute(
+            """select distinct substring(x.value from '20[0-9]{2}-[0-9-]+:([A-Z]{2}):'), cy.person_id, n.text
+               from name n
+               join candidacy cy on cy.person_id = n.entity_id
+               join contest_option op on op.id = cy.option_id
+               join external_id x on x.entity_id = op.contest_id and x.scheme = 'us.contest'
+               where n.is_preferred and x.value ~ '^([a-z_.]+:)?20[0-2][0-9]-[0-9-]+:[A-Z]{2}:'
+                 and lower(regexp_replace(n.text, '^.* ', '')) = any(%s)""",
+            [sorted(surnames)],
+        ).fetchall():
+            by_state.setdefault(state, []).append((person, text))
         held: dict[str, dict[UUID, tuple[UUID, str]]] = {}
         for value, option, candidacy, person in conn.execute(
             """select x.value, op.id, cy.id, cy.person_id
@@ -794,12 +979,15 @@ def emit() -> Path:
 
         def person_of(state: str, key: str, chamber: str, district: int | None, text: str) -> UUID:
             last, first = surname(text), slug(re.sub(r"^\W+", "", text))[:1]
+            given = slug(re.sub(r"^\W+", "", text)).split("-")[0]
             pool = {person for person, held_text in known.get(key, []) if surname(held_text) == last}
             if len(pool) > 1 or not pool:
                 pool = {
                     person
                     for person, held_text in [*known.get(key, []), *earlier.get(key, [])]
-                    if surname(held_text) == last and slug(held_text)[:1] == first
+                    if surname(held_text) == last
+                    and slug(held_text)[:1] == first
+                    and (min(len(given), len(slug(held_text).split("-")[0])) < 2 or slug(held_text)[:2] == given[:2])
                 }
             filed = [fec for fec, filer_last, _ in filers.get((state, chamber, district), []) if filer_last == last]
             if len({fec_persons.get(fec, fec) for fec in filed}) > 1:
@@ -813,6 +1001,16 @@ def emit() -> Path:
                 pool = matched
             if not pool:
                 pool = statewide.get((state, slug(re.sub(r'"[^"]*"|\([^)]*\)', " ", text))), set())
+            if not pool:
+                tokens = slug(text).split("-")
+                pool = {
+                    person
+                    for person, held_text in by_state.get(state, [])
+                    if len(surname(held_text)) > 2
+                    and surname(held_text).replace("-", "") in "".join(tokens)
+                    and len(slug(held_text).split("-")[0]) > 1
+                    and slug(held_text).split("-")[0] in tokens
+                }
             for preferred in ({*held.get(key, {})}, {person for _, person in nominees.get(key, {})}, matched, fec_held):
                 if len(pool) > 1 and pool & preferred:
                     pool &= preferred
@@ -988,7 +1186,7 @@ def emit() -> Path:
                     person_id=person,
                     option_id=option,
                     role="head",
-                    is_independent=party_id is None,
+                    is_independent=party_id is None and state != "AS",
                 )
                 if state in sources and key in listed:
                     cs.add("citation", entity_id=candidacy, source_id=sources[state], locator=None)
