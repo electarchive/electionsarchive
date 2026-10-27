@@ -163,8 +163,8 @@ def emit() -> Path:
             ).fetchall():
                 cs.add("outcome", result_set_id=result_set, option_id=option, kind=outcome_kind, seats=seats)
             official = conn.execute(
-                "select sum(v.value) from result_set r join result_value v on v.result_set_k = r.k where r.contest_id = %s and r.is_default and v.measure = 1",
-                [contest],
+                "select sum(v.value) from result_set r join source s on s.id = r.source_id join result_value v on v.result_set_k = r.k where r.contest_id = %s and r.id <> %s and v.measure = 1 group by r.id, s.publisher order by (s.publisher = 'Federal Election Commission') desc, 1 desc limit 1",
+                [contest, result_set],
             ).fetchone()[0]
             counted = sum(votes for precinct in precincts.values() for name, votes in precinct.items() if name in picked)
             cs.add(
