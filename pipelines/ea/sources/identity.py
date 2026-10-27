@@ -12,10 +12,11 @@ from ea import names, raw
 from ea.changeset import Changeset
 from ea.sources.gb import members as commons
 from ea.sources.gb import mnis, wikidata_links
+from ea.sources.us.wikidata_links import NICKNAMES
 from ea.store import connect
 
 SOURCE = "identity"
-VERSION = "1"
+VERSION = "2"
 NEAR = 12 * 366
 LONG_GAP = 24 * 365
 LONG_SPAN = 50 * 365
@@ -1059,7 +1060,8 @@ def emit() -> Path:
             version=VERSION,
             summary=(
                 "People recorded once per source or per race joined into one person where the same printed name "
-                "(ignoring case, accents, and middle initials) ran for the same office or body in the same "
+                "(ignoring case, accents, middle initials, and a common nickname such as Bill for William, or a first "
+                "name printed as its initial when one person on the race line fits it) ran for the same office or body in the same "
                 "district within 12 years, and nothing tells them apart, and party labels of one state or country "
                 "that sources spelled apart joined by hand"
             ),
@@ -1071,6 +1073,12 @@ def emit() -> Path:
         pipelines: dict[UUID, set[str]] = defaultdict(set)
         lines: dict[tuple[object, ...], dict[UUID, list[date]]] = defaultdict(lambda: defaultdict(list))
         initials: dict[tuple[tuple[object, ...], UUID], set[frozenset[str]]] = defaultdict(set)
+        canon = {"rudy": "rudolph", "rudi": "rudolph"} | {
+            form: first
+            for first, forms in NICKNAMES.items()
+            for form in forms.split()
+            if form not in {"kathleen", "jon", "bert"}
+        }
         for person, text, area, office, body, day, pipeline in rows:
             dates[person].append(day)
             pipelines[person].add(pipeline)
@@ -1079,10 +1087,25 @@ def emit() -> Path:
             named = words(text)
             if named is None:
                 continue
-            line = (area, office, body, named[0])
+            first, rest = named[0].split(" ", 1)
+            line = (area, office, body, f"{canon.get(first, first)} {rest}")
             lines[line][person].append(day)
             if named[1]:
                 initials[line, person].add(named[1])
+        spelled: dict[tuple[object, ...], list[tuple[object, ...]]] = defaultdict(list)
+        for line in lines:
+            first, rest = line[3].split(" ", 1)
+            if len(first) > 1:
+                spelled[*line[:3], rest, first[0]].append(line)
+        for line in [line for line in lines if len(line[3].split(" ", 1)[0]) == 1]:
+            first, rest = line[3].split(" ", 1)
+            fits = spelled.get((*line[:3], rest, first), [])
+            if len(fits) != 1 or len(lines[fits[0]]) != 1:
+                continue
+            for person, days in lines.pop(line).items():
+                lines[fits[0]][person].extend(days)
+                if (line, person) in initials:
+                    initials[fits[0], person] |= initials.pop((line, person))
 
         def suspect(person: UUID) -> bool:
             days = sorted(dates[person])
@@ -1556,8 +1579,8 @@ def emit() -> Path:
                 member = conn.execute(
                     """select coalesce(m.into_id, x.entity_id) from external_id x
                        left join entity_merge m on m.entity_id = x.entity_id
-                       where x.scheme = 'bioguide' and x.value = %s limit 1""",
-                    [twin["bioguide"]],
+                       where x.scheme in ('bioguide', 'wikidata') and x.value = %s limit 1""",
+                    [twin["strong"]],
                 ).fetchone()
                 person = UUID(twin["person"])
                 target = None if member is None else cs.survivors.get(member[0], member[0])
@@ -1567,7 +1590,7 @@ def emit() -> Path:
                     or person in cs.survivors
                     or conn.execute("select from entity_merge where entity_id = %s", [person]).fetchone() is not None
                 ):
-                    print(f"{twin['name']} ({twin['bioguide']}): already merged or missing")
+                    print(f"{twin['name']} ({twin['strong']}): already merged or missing")
                     continue
                 for row in cs.rows.get("entity_merge", []):
                     absorbed = row["entity_id"]
