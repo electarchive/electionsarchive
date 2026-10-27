@@ -79,7 +79,8 @@ ZONES = {
 OPTIONS_SQL = """
 select rc.id, rc.st, rc.level, coalesce(c.magnitude, 1),
     count(o.k) filter (where o.kind in ('candidate', 'ticket', 'list')),
-    count(o.k) filter (where o.kind = 'answer')
+    count(o.k) filter (where o.kind = 'answer'),
+    exists (select from label l where l.entity_id = rc.id and l.kind = 'ballot' and l.value = 'no_candidate_qualified')
 from rc
 join contest c on c.id = rc.id
 left join contest_option o on o.contest_id = rc.id and o.parent_option_id is null
@@ -94,7 +95,8 @@ with x as (
         c.electoral_system_id is not null and (c.office_id is not null or c.body_id is not null or c.kind = 'ballot_question')
             and (c.district_area_id is not null or c.office_id is not null or c.kind = 'ballot_question') as framed,
         c.previous_round_id, e.kind::text = 'runoff' or coalesce(c.round_number, 1) > 1 as later,
-        e.date_from, c.office_id, c.body_id, c.district_area_id
+        e.date_from, c.office_id, c.body_id, c.district_area_id,
+        exists (select from label l where l.entity_id = c.id and l.kind = 'ballot' and l.value = 'no_candidate_qualified') as unqualified
     from upc join contest c on c.id = upc.id join election e on e.id = c.election_id
 ),
 o as (
@@ -145,6 +147,7 @@ h as (
 select x.id, x.framed and (x.previous_round_id is not null or not x.later) and case
     when x.kind = 'ballot_question' then k.answers >= 2 and exists (select from ballot_question_text t where t.contest_id = x.id)
     when x.later and x.previous_round_id in (select id from upc) then true
+    when x.unqualified then k.people = 0
     when k.lists > 0 then k.empty = 0 and k.unlabeled = 0
     else (k.people > x.seats or k.people >= x.seats and (x.tacit or k.official >= x.seats))
         and (k.unlabeled = 0 or k.labeled = 0 and not coalesce(h.partisan, false))
@@ -224,13 +227,15 @@ def measure(conn, day: str) -> dict:
                 listed[level["key"]].add(st)
     units = {level["key"]: level["unit"] for level in data["levels"]}
     cells: dict[tuple[str, str], dict] = defaultdict(lambda: dict.fromkeys(("exist", "candidates", "ready"), 0))
-    for cid, st, level, magnitude, candidates, answers in conn.execute(OPTIONS_SQL):
+    for cid, st, level, magnitude, candidates, answers, unqualified in conn.execute(OPTIONS_SQL):
         if level not in units or level != "statewide_exec" and st not in listed[level]:
             continue
         weight = magnitude if units[level] == "seats" else 1
         cell = cells[(level, st)]
         cell["exist"] += weight
-        cell["candidates"] += weight if (answers if level == "statewide_measure" else candidates) >= 1 else 0
+        cell["candidates"] += (
+            weight if unqualified or (answers if level == "statewide_measure" else candidates) >= 1 else 0
+        )
         cell["ready"] += weight if ok.get(str(cid)) else 0
     rows = []
     for level, st in sorted(set(expected) | set(cells)):
@@ -318,7 +323,9 @@ def markdown(day: str) -> str:
             " Ready is the same rule as the upcoming track everywhere on /coverage (`READY_SQL`): an office or body, a"
             " district, and an electoral system; more candidates than seats, or exactly as many when it is uncontested (a"
             " tacit result kind, or candidates cited to an official state list rather than taken from the FEC's filers); and a party, nomination, or independent mark on every candidate unless the race is"
-            " nonpartisan. A measure is ready with two answers and its official wording. Places outside a level's cited list (the territories' delegates, governors, and legislatures) are left out. Other statewide offices are expected from the due-office schedule in"
+            " nonpartisan. A race the certifying body's list reports with no candidate qualified (write-in only, a `ballot` label of"
+            " `no_candidate_qualified` citing that list) is ready, and counts as having candidates, when it has no candidate options."
+            " A measure is ready with two answers and its official wording. Places outside a level's cited list (the territories' delegates, governors, and legislatures) are left out. Other statewide offices are expected from the due-office schedule in"
             " `statewide_table.py` (each office's term and last elections); the other counts cite the sources in the file."
         ),
         "",

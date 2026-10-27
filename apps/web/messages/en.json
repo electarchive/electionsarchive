@@ -264,6 +264,7 @@
   "slate_title": "On the ballot",
   "slate_scheduled": "Voting is on {date}. Results will appear here once they're counted.",
   "slate_counting": "Voting closed on {date}. Ballots are still being counted, and no results are published yet.",
+  "slate_unqualified": "No candidate qualified (write-in only)",
   "slate_unreported": "Voting took place on {date}. No results are published for this contest yet.",
   "slate_incumbent": "Incumbent",
   "incumbency_defeated": "Incumbent defeated",

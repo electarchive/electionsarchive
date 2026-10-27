@@ -88,6 +88,42 @@ def database(conn) -> list[str]:
         [date.today().year],
     ):
         problems.append(f"{polity} {goal} {level} {state} {year}: upcoming {upcoming} pending {pending} out of bounds")
+    for path, options, kind, publisher, siblings, results in conn.execute("""
+        with m as (
+            select l.entity_id as id, l.source_id from label l
+            where l.kind = 'ballot' and l.value = 'no_candidate_qualified'
+        ),
+        same as (
+            select m.id, p.id as peer, p.election_id = c.election_id as now from m join contest c on c.id = m.id
+            join contest p on p.id <> c.id and (p.body_id = c.body_id or c.body_id is null and p.office_id = c.office_id)
+        )
+        select coalesce((select s.path from slug s where s.entity_id = m.id and s.is_current), m.id::text),
+            (select count(*) from contest_option o where o.contest_id = m.id and o.kind in ('candidate', 'ticket', 'list')),
+            s.kind::text, s.publisher,
+            array(
+                select distinct cs.publisher from same
+                join contest_option o on o.contest_id = same.peer
+                join candidacy y on y.option_id = o.id
+                join citation ci on ci.entity_id = y.id
+                join source cs on cs.id = ci.source_id and cs.kind = 'official_body'
+                where same.id = m.id and same.now
+            ),
+            array(
+                select distinct rs.publisher from same
+                join result_set r on r.contest_id = same.peer
+                join source rs on rs.id = r.source_id and rs.kind = 'official_body'
+                where same.id = m.id
+            )
+        from m left join source s on s.id = m.source_id
+    """):
+        if options:
+            problems.append(f"{path}: no candidate qualified, but {options} candidate options")
+        certifiers = siblings or results
+        if kind != "official_body" or publisher not in certifiers:
+            problems.append(
+                f"{path}: no-candidate label cites {publisher or 'nothing'} ({kind}), not the ballot's certifier"
+                f" ({', '.join(certifiers) or 'none on record'})"
+            )
     ready = readiness.spec(readiness.DAY)
     for level in ready["levels"]:
         for part in (level, level.get("specials") or {}):

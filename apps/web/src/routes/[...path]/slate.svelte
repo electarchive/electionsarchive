@@ -35,33 +35,38 @@
       {STATES[slate.state]({ date: date(held) })}
     </p>
   </div>
-  <ul
-    class="grid divide-y divide-border border-y border-border max-inline-[40rem]"
-  >
-    {#each slate.options as option (option.key)}
-      <li class="flex flex-wrap items-baseline gap-x-3 gap-y-0.5 py-2">
-        <Name
-          class="font-semibold min-inline-0"
-          label={option.label}
-          color={option.party == null
-            ? null
-            : swatch(option.party.color, option.party.id)}
-          person={option.person}
-          party={option.party?.id ?? null}
-        />
-        {#if option.isIncumbent}
-          <span class="highlighter px-1 text-xs font-semibold"
-            >{m.slate_incumbent()}</span
-          >
-        {/if}
-        <span class="ms-auto text-sm text-muted-foreground">
-          {#if option.party != null}
-            {option.party.short ?? option.party.name}
-          {:else if option.isIndependent}
-            {m.slate_independent()}
+  {#if slate.isUnqualified}
+    <p class="text-[0.9375rem] font-semibold">{m.slate_unqualified()}</p>
+  {/if}
+  {#if slate.options.length > 0}
+    <ul
+      class="grid divide-y divide-border border-y border-border max-inline-[40rem]"
+    >
+      {#each slate.options as option (option.key)}
+        <li class="flex flex-wrap items-baseline gap-x-3 gap-y-0.5 py-2">
+          <Name
+            class="font-semibold min-inline-0"
+            label={option.label}
+            color={option.party == null
+              ? null
+              : swatch(option.party.color, option.party.id)}
+            person={option.person}
+            party={option.party?.id ?? null}
+          />
+          {#if option.isIncumbent}
+            <span class="highlighter px-1 text-xs font-semibold"
+              >{m.slate_incumbent()}</span
+            >
           {/if}
-        </span>
-      </li>
-    {/each}
-  </ul>
+          <span class="ms-auto text-sm text-muted-foreground">
+            {#if option.party != null}
+              {option.party.short ?? option.party.name}
+            {:else if option.isIndependent}
+              {m.slate_independent()}
+            {/if}
+          </span>
+        </li>
+      {/each}
+    </ul>
+  {/if}
 </section>

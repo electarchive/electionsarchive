@@ -4001,6 +4001,7 @@ function resultsMarkdown(
         unreported: m.slate_unreported,
       }[contest.slate.state]({ date: date(contest.election.date) }),
       "",
+      ...(contest.slate.isUnqualified ? [m.slate_unqualified(), ""] : []),
       ...contest.slate.options.map((option) => {
         const tags = [
           option.party?.name ??

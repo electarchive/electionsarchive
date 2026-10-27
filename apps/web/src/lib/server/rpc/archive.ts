@@ -4421,6 +4421,7 @@ export const contests = {
         slate: v.nullable(
           v.object({
             state: v.picklist(["scheduled", "counting", "unreported"]),
+            isUnqualified: v.boolean(),
             options: v.array(
               v.object({
                 key: v.string(),
@@ -4692,10 +4693,15 @@ export const contests = {
             url: string | null;
           }>(sql`
             select distinct s.publisher, s.title, s.url
-            from citation ct join source s on s.id = ct.source_id
-            where ct.entity_id = ${contest.id}::uuid or ct.entity_id in (
-              select cy.id from candidacy cy join contest_option o on o.id = cy.option_id
-              where o.contest_id = ${contest.id}::uuid
+            from source s
+            where s.id in (
+              select ct.source_id from citation ct
+              where ct.entity_id = ${contest.id}::uuid or ct.entity_id in (
+                select cy.id from candidacy cy join contest_option o on o.id = cy.option_id
+                where o.contest_id = ${contest.id}::uuid
+              )
+            ) or s.id in (
+              select l.source_id from label l where l.entity_id = ${contest.id}::uuid and l.kind = 'ballot'
             )
             order by s.publisher, s.title
           `),
@@ -5044,6 +5050,16 @@ export const contests = {
         end as status
         from k
       `);
+      const unqualified =
+        isRoot && sets.rows.every((row) => row.status !== "active")
+          ? (
+              await db.execute<{ found: boolean }>(sql`
+                select exists (
+                  select from label where entity_id = ${contest.id}::uuid and kind = 'ballot' and value = 'no_candidate_qualified'
+                ) as found
+              `)
+            ).rows[0]?.found === true
+          : false;
       const listedNames = await names(
         listed.rows.flatMap((row) =>
           [row.person, row.party].filter((id) => id != null),
@@ -5191,7 +5207,7 @@ export const contests = {
         checks: [],
         incumbency: standing.rows[0]?.status ?? null,
         slate:
-          listed.rows.length === 0
+          listed.rows.length === 0 && !unqualified
             ? null
             : {
                 state:
@@ -5202,6 +5218,7 @@ export const contests = {
                           90 * 86_400_000
                       ? ("counting" as const)
                       : ("unreported" as const),
+                isUnqualified: unqualified,
                 options: listed.rows.map((row) => ({
                   key: String(row.k),
                   kind: row.kind,
