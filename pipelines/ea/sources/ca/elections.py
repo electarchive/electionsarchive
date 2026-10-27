@@ -772,7 +772,6 @@ def emit() -> Path:
                     election_id=election,
                     contest_id=contest,
                     stage="certified",
-                    kind="counted",
                     source_id=results[day],
                     status="active",
                     is_default=True,

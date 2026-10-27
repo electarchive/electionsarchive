@@ -420,6 +420,11 @@ class Changeset:
             )
         if "result_set" in tables and "result_value" in tables:
             sets, values = tables["result_set"], tables["result_value"]
+            sets = sets.with_columns(
+                pl.lit(self.defaults["result_set"].get(column)).alias(column)
+                for column in ("kind", "completeness")
+                if column not in sets.columns
+            )
             counted = sets.filter(pl.col("kind") == "counted")["id"].cast(pl.String)
             zeroed = (
                 values.lazy()
