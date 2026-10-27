@@ -109,6 +109,13 @@ DOCUMENTS = {
         "2002 General Election canvass summary: Governor/Lieutenant Governor",
         "https://sos.iowa.gov/elections/results/",
     ),
+    "VI2018R": (
+        SOURCE,
+        "https://usvi.elstats.civera.com/api/download_contest/54_table.csv?split_party=false",
+        "Election System of the Virgin Islands",
+        "Election archive",
+        "https://electionarchive.vivote.gov/contest/54",
+    ),
     "ME2014": (
         SOURCE,
         "https://lldc.mainelegislature.org/Open/Elections/Returns/2014/20141104/elec_20141104aj.xlsx",
@@ -480,6 +487,24 @@ def iowa(conn: Connection) -> list[tuple[date, str, str, str, int]]:
     return rows
 
 
+def virgin_islands_runoff(_: Connection) -> list[tuple[date, str, str, str, int]]:
+    source, url, *_ = DOCUMENTS["VI2018R"]
+    lines = list(csv.reader(io.StringIO(raw.cached(source, url).path.read_text())))
+    names = ["BRYAN", "MAPP", "Write-ins"]
+    codes = {"St. Croix": "78010", "St. Thomas/St. John": "2018:VI:st. thomas and st. john district"}
+    rows = [
+        (date(2018, 11, 20), "governor", codes[line[1]], name, int(value))
+        for line in lines
+        if line[0] == "District"
+        for name, value in zip(names, line[2:5], strict=True)
+    ]
+    territory = next(line for line in lines if line[0] == "Territory")
+    for index, name in enumerate(names):
+        if sum(row[4] for row in rows if row[3] == name) != int(territory[2 + index]):
+            raise ValueError(f"VI 2018 runoff {name}: districts do not sum to the territory")
+    return rows
+
+
 def pdf(document: str) -> str:
     source, url, *_ = DOCUMENTS[document]
     return subprocess.run(
@@ -500,6 +525,7 @@ def parse() -> None:
                 ("KS2002", kansas),
                 ("VI2024", lambda conn: virgin_islands(conn, "VI2024")),
                 ("VI2024S", lambda conn: virgin_islands(conn, "VI2024S")),
+                ("VI2018R", virgin_islands_runoff),
                 ("GA2000", georgia),
                 ("OH2010", ohio),
                 ("SC2010", lambda conn: clarity(conn, "SC2010", "45", date(2010, 11, 2), "senate", "U.S. Senate")),
@@ -589,19 +615,34 @@ def emit() -> Path:
             .then(pl.lit("precinct"))
             .otherwise(pl.lit("county"))
         )
+        authoritative = {
+            "IA2002": "Algara and Amlani's set pools Hart, Campagna, and the write-ins into one line that the "
+            "certified canvass reports separately."
+        }
         for grain in ("county", "town", "precinct"):
             documents = grains.filter(pl.col("grain") == grain)["state"]
             if len(documents):
                 medsl.attach(
                     cs,
                     conn,
-                    frame.filter(pl.col("state").is_in(documents)),
+                    frame.filter(pl.col("state").is_in(documents) & ~pl.col("source").is_in(list(authoritative))),
                     sources,
                     grain=grain,
                     strict=True,
                     extend=True,
                 )
-        used = set(pl.concat(cs.frames["result_value"])["unit_id"].unique())
+        for document, reason in authoritative.items():
+            medsl.attach(
+                cs,
+                conn,
+                frame.filter(pl.col("source") == document),
+                sources,
+                redone=frozenset({"2002-11-05:IA:governor"}),
+                strict=True,
+                extend=True,
+                authoritative=reason,
+            )
+        used = set(pl.concat(cs.frames["result_value"])["unit_id"].unique()) if "result_value" in cs.frames else set()
         minted = {str(unit) for unit in cs.minted}
         units = (
             frame.filter(pl.col("kind") == "precinct")
