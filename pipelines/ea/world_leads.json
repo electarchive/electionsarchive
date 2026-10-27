@@ -398,6 +398,18 @@
         "effort": "election",
         "first": false,
         "note": "The archive lists both elections; file formats were not opened."
+      },
+      {
+        "from": 2026,
+        "to": 2026,
+        "title": "Elections municipales 2026 - Résultats du premier tour (files for French Polynesia), and the second-round dataset",
+        "publisher": "Ministère de l'Intérieur, via data.gouv.fr",
+        "url": "https://www.data.gouv.fr/datasets/elections-municipales-2026-resultats-du-premier-tour",
+        "format": "CSV: the ministry publishes French Polynesia in its own three files (elected, results by commune, results by polling station), apart from the France-wide files fr.municipales loaded; results also at https://www.resultats-elections.interieur.gouv.fr/municipalesPolynesieFrancaise2026/",
+        "grain": "commune",
+        "effort": "election",
+        "first": false,
+        "note": "French Polynesia's 48 communes are the gap to fill. The other 74 missing are the 68 communes with no candidates, whose cancelled elections are rerun later, and about 6 more to check against the France-wide files."
       }
     ],
     "departementales": [

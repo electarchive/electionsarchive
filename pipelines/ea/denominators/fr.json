@@ -189,6 +189,26 @@
       "title": "Les Élections législatives. Métropole, départements d'Outre-Mer : 23 et 30 novembre 1958. Algérie : 30 novembre 1958. Départements des Oasis et de la Saoura : 30 novembre 1958",
       "publisher": "Ministère de l'Intérieur",
       "url": "https://bibliotheques-specialisees.paris.fr/ark:/73873/pf0000750657"
+    },
+    "dgcl-bis-206": {
+      "title": "BIS n° 206, « Les structures territoriales au 1er janvier 2026 »",
+      "publisher": "Ministère de l'Intérieur, Direction générale des collectivités locales",
+      "url": "https://www.collectivites-locales.gouv.fr/actualites/bis-206-les-structures-territoriales-au-1er-janvier"
+    },
+    "nc-municipales-2026": {
+      "title": "Élections municipales 2026, Informations générales",
+      "publisher": "Les services de l'État en Nouvelle-Calédonie (haut-commissariat de la République)",
+      "url": "https://www.nouvelle-caledonie.gouv.fr/Actions-de-l-Etat/Elections/Elections-2026/Elections-municipales-2026/Informations-generales"
+    },
+    "pf-municipales-2026": {
+      "title": "Élections municipales : dépôt des candidatures, du lundi 9 février au jeudi 26 février 2026, inclus",
+      "publisher": "Haut-commissariat de la République en Polynésie française",
+      "url": "https://www.polynesie-francaise.pref.gouv.fr/Actualites/Communiques-de-presse/2026/Elections-municipales-depot-des-candidatures"
+    },
+    "spm-municipales-2026": {
+      "title": "Résultats des élections municipales à Saint-Pierre et Miquelon",
+      "publisher": "Les services de l'État à Saint-Pierre et Miquelon (préfecture)",
+      "url": "https://saint-pierre-et-miquelon.gouv.fr/Actions-de-l-Etat/Elections/Elections-municipales-2026/Resultats-des-elections-municipales-a-Saint-Pierre-et-Miquelon"
     }
   },
   "levels": [
@@ -1898,6 +1918,24 @@
             "mayor"
           ],
           "iso": "*"
+        },
+        {
+          "kinds": [
+            "local",
+            "runoff"
+          ],
+          "bodies": [
+            "unicameral"
+          ],
+          "iso": "*",
+          "schemes": [
+            "fr.commune",
+            "fr.secteur"
+          ],
+          "except_codes": [
+            "977",
+            "978"
+          ]
         }
       ],
       "gaps": [
@@ -1945,12 +1983,12 @@
         },
         {
           "date": "2026-03-15",
-          "contests": 34986,
-          "source": "cevipof-municipales-2026",
-          "quote": "Tableau 1, row 'Nombre de municipalités(1)', column 2026: 34 986; footnote (1): 'Communes et arrondissements.' Sources : ministère de l'Intérieur."
+          "contests": 34958,
+          "source": "dgcl-bis-206",
+          "quote": "dgcl-bis-206: 'La loi ne permettant pas la création de communes nouvelles l'année précédant les élections municipales, le nombre de communes reste stable à 34 875.' (metropolitan France and the overseas departments); nc-municipales-2026: 'La Nouvelle-Calédonie compte 33 communes.'; spm-municipales-2026: results for its two communes, 'À SAINT-PIERRE' and 'À MIQUELON-LANGLADE'; pf-municipales-2026: 'l'un des 1 056 sièges de conseillers municipaux à pourvoir, dans les 48 communes polynésiennes'. 34,875 + 33 + 2 + 48 = 34,958."
         }
       ],
-      "note": "Counted per municipality: each commune that renewed its council counts once, both rounds together. The counts for 2001 to 2026 are the Interior Ministry's, as published by Sciences Po's CEVIPOF, which counts the arrondissements of Paris, Lyon, and Marseille with the communes. 1989 is the Interior Ministry's count of mayors elected after that year's renewal, one per commune."
+      "note": "Counted per municipality: each commune that renewed its council counts once, both rounds together. The counts for 2001 to 2020 are the Interior Ministry's, as published by Sciences Po's CEVIPOF, which counts the arrondissements of Paris, Lyon, and Marseille with the communes. 2026 counts communes alone: the Interior Ministry's 34,875 in metropolitan France and the overseas departments, plus the 33 of New Caledonia, the 2 of Saint-Pierre-and-Miquelon, and the 48 of French Polynesia, each from the State's services there; the sector councils of Paris, Lyon, and Marseille count with their commune. Saint-Barthélemy and Saint-Martin elect territorial councils, not municipal ones, so they are left out. 1989 is the Interior Ministry's count of mayors elected after that year's renewal, one per commune."
     },
     {
       "key": "referendums",

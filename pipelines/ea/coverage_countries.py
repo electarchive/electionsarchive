@@ -39,7 +39,9 @@ with recursive t(id) as (
 )
 select c.id::text, e.id::text, e.date_from, e.kind::text, coalesce(b.kind::text, o.kind::text, c.kind::text),
     op.iso_code, ep.iso_code, c.default_result_kind in ('tacit', 'show_of_hands'), c.district_area_id::text, a.scheme_code,
-    coalesce(b.polity_id, o.polity_id, e.polity_id)::text
+    coalesce(b.polity_id, o.polity_id, e.polity_id)::text,
+    (select ac.code from area_code ac where ac.area_id = c.district_area_id
+        order by ac.valid_from desc nulls last limit 1)
 from contest c
 join election e on e.id = c.election_id
 join polity ep on ep.id = e.polity_id
@@ -215,10 +217,12 @@ def countries() -> list[str]:
 
 
 def matches(rule: dict, row: tuple) -> bool:
-    _, _, day, ekind, body, body_iso, _, _, _, _, _ = row
+    _, _, day, ekind, body, body_iso, _, _, _, scheme, _, code = row
     return (
         ekind in rule["kinds"]
         and body in rule["bodies"]
+        and scheme in rule.get("schemes", [scheme])
+        and not any((code or "").startswith(prefix) for prefix in rule.get("except_codes", []))
         and (
             (body_iso or "") == rule["iso"]
             or rule["iso"].endswith("*")
