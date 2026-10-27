@@ -17,22 +17,11 @@ PARSED = DATA / "parsed" / SOURCE
 URL = "https://raw.githubusercontent.com/nvkelso/natural-earth-vector/master/geojson/ne_10m_admin_0_countries.geojson"
 PLACES = "https://raw.githubusercontent.com/nvkelso/natural-earth-vector/master/geojson/ne_10m_populated_places.geojson"
 DISPUTED = "https://raw.githubusercontent.com/nvkelso/natural-earth-vector/master/geojson/ne_10m_admin_0_disputed_areas.geojson"
-LINES = "https://raw.githubusercontent.com/nvkelso/natural-earth-vector/master/geojson/ne_10m_admin_0_boundary_lines_land.geojson"
 PAGE = "https://www.naturalearthdata.com/downloads/10m-cultural-vectors/10m-admin-0-countries/"
 MOVED = {"B89": "UKR", "B16": "SYR", "B19": "ESH", "B98": "PSE"}
 FOLDED = {
     "SOL": ("SOM", "Somaliland is drawn within Somalia, per UN recognition"),
     "KAS": ("IND", "Siachen is drawn within India, its administrator"),
-}
-DASHED = {
-    1746708757: "loc",
-    1746709127: "loc",
-    1746709133: "loc",
-    1746709141: "loc",
-    1746708449: "lac",
-    1746708457: "lac",
-    1746708463: "lac",
-    1746708469: "lac",
 }
 DISPLAY = {"CYN": "Northern Cyprus"}
 STATUS = {
@@ -52,12 +41,9 @@ STATUS = {
     "the UN regards them as part of Georgia.",
     "MDA": "Includes Transnistria, which has governed itself since 1990. Moldova claims it, and the UN regards it as "
     "part of Moldova.",
-    "IND": "India administers Jammu and Kashmir, including the Siachen Glacier, which Pakistan claims, and Arunachal "
-    "Pradesh, which China claims. The dashed lines are the Line of Control with Pakistan and the Line of Actual "
-    "Control with China. The final status of Jammu and Kashmir has not been agreed.",
-    "PAK": "Pakistan administers Azad Kashmir and Gilgit-Baltistan, which India claims. The dashed line is the Line of "
-    "Control. The final status of Jammu and Kashmir has not been agreed.",
-    "CHN": "China administers Aksai Chin, which India claims. The dashed line is the Line of Actual Control.",
+    "IND": "India administers Jammu and Kashmir and Ladakh, including the Siachen Glacier, which Pakistan claims, and Arunachal Pradesh, which China claims. The final status of Jammu and Kashmir has not been agreed.",
+    "PAK": "Pakistan administers Azad Kashmir and Gilgit-Baltistan, which India claims. The final status of Jammu and Kashmir has not been agreed.",
+    "CHN": "China administers Aksai Chin and the Shaksgam Valley, which India claims. The final status of Jammu and Kashmir has not been agreed.",
     "TWN": "Disputed status. Taiwan governs itself and holds its own elections; the People's Republic of China claims "
     "it. The UN seats the People's Republic of China (General Assembly Resolution 2758).",
     "KOS": "Disputed status. Kosovo declared independence from Serbia in 2008 and holds its own elections; Serbia "
@@ -97,7 +83,6 @@ def fetch() -> None:
     raw.fetch(SOURCE, URL, suffix=".geojson")
     raw.fetch(SOURCE, PLACES, suffix=".geojson")
     raw.fetch(SOURCE, DISPUTED, suffix=".geojson")
-    raw.fetch(SOURCE, LINES, suffix=".geojson")
 
 
 def parse() -> None:
@@ -124,13 +109,6 @@ def parse() -> None:
     ]
     if len(moved) != len(MOVED):
         raise ValueError("a disputed area to move is missing from Natural Earth's layer")
-    dashed = [
-        (DASHED[feature["properties"]["ne_id"]], json.dumps(feature["geometry"]))
-        for feature in json.loads(raw.cached(SOURCE, LINES).path.read_bytes())["features"]
-        if feature["properties"]["ne_id"] in DASHED
-    ]
-    if len(dashed) != len(DASHED):
-        raise ValueError("a dashed boundary is missing from Natural Earth's land boundaries")
     with connect() as conn:
         conn.execute("create temp table feature (code text, geojson text) on commit drop")
         conn.execute("create temp table moved (code text, geojson text) on commit drop")
@@ -172,11 +150,6 @@ def parse() -> None:
                                         order by st_area(d.geom::geography) desc limit 1)), 'hex')
                from shapes"""
         ).fetchall()
-        lines = conn.execute(
-            """select kind, encode(st_asewkb(st_force2d(st_setsrid(st_geomfromgeojson(geojson), 4326))), 'hex')
-               from unnest(%s::text[], %s::text[]) as l(kind, geojson)""",
-            [[kind for kind, _ in dashed], [geojson for _, geojson in dashed]],
-        ).fetchall()
     PARSED.mkdir(parents=True, exist_ok=True)
     places: dict[str, tuple[str, int]] = {}
     for feature in json.loads(raw.cached(SOURCE, PLACES).path.read_bytes())["features"]:
@@ -189,7 +162,6 @@ def parse() -> None:
     pl.DataFrame(
         [(key, country) for key, (country, _) in places.items()], schema=["city", "country"], orient="row"
     ).write_parquet(PARSED / "places.parquet")
-    pl.DataFrame(lines, schema=["kind", "geom"], orient="row").write_parquet(PARSED / "lines.parquet")
     frame.drop("geojson").filter(~pl.col("code").is_in(list(FOLDED))).join(
         pl.DataFrame(shapes, schema=["code", "geom", "label_point"], orient="row"), on="code", how="left"
     ).write_parquet(PARSED / "countries.parquet")
@@ -234,7 +206,6 @@ def emit() -> Path:
         cs.artifact(raw.cached(SOURCE, URL), source)
         cs.artifact(raw.cached(SOURCE, PLACES), source)
         cs.artifact(raw.cached(SOURCE, DISPUTED), disputed)
-        cs.artifact(raw.cached(SOURCE, LINES), disputed)
         cs.add("scheme", code="world.country", polity_id=None, kind="administrative", rank=0, noun="country")
         for row in frame.iter_rows(named=True):
             area = cs.area("world.country", row["code"])
@@ -264,8 +235,28 @@ def emit() -> Path:
                 source_id=source,
             )
         cs.add("boundary_set", scheme_code="world.country", vintage="5.1", valid_from=None, as_of=date(2026, 10, 26))
+        for note, entity, body, code in conn.execute(
+            """select n.id, n.entity_id, n.body_md, c.code from note n
+               join area a on a.id = n.entity_id and a.scheme_code = 'world.country'
+               join area_code c on c.area_id = a.id
+               join changeset w on w.id = n.changeset_id and w.pipeline = %s
+               where n.kind = 'context'""",
+            [SOURCE],
+        ).fetchall():
+            if STATUS.get(code) != body:
+                cs.add(
+                    "note_drop",
+                    note_id=note,
+                    entity_id=entity,
+                    body_md=body,
+                    reason="the area's status note was rewritten",
+                )
         for code, (_, reason) in FOLDED.items():
-            cs.add("entity_retirement", entity_id=cs.area("world.country", code), reason=reason)
+            try:
+                folded = cs.area("world.country", code)
+            except ValueError:
+                continue
+            cs.add("entity_retirement", entity_id=folded, reason=reason)
         areas = {row["code"]: cs.area("world.country", row["code"]) for row in frame.iter_rows(named=True)}
         shapes = {areas[code]: geom for code, geom in frame.select("code", "geom").iter_rows()}
         aliases = {"SDS": "SSD", "PSX": "PSE", "SAH": "ESH"}
