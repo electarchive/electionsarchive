@@ -36,7 +36,9 @@ const CASES = [
     path: "/map/de/2025-02-23-general/bundestag",
     isFull: true,
   },
-  { name: "fr-contest", path: "/fr/2022-04-10-presidential/president" },
+  { name: "fr-contest", path: "/fr/2022-04-10-general/president" },
+  { name: "gb-hub", path: "/gb/2024-07-04-general", toggle: "Map" },
+  { name: "us-house", path: "/us/ga/2024-11-05-general/house-5" },
   {
     name: "tr-full",
     path: "/map/tr/2023-05-14-general/president",
@@ -156,6 +158,12 @@ for (const test of picked) {
           waitUntil: "domcontentloaded",
           timeout: 120_000,
         });
+        if (test.toggle != null) {
+          await page
+            .getByRole("button", { name: test.toggle, exact: true })
+            .first()
+            .click({ timeout: 120_000 });
+        }
         await page.waitForSelector("[data-view]", { timeout: 120_000 });
         const host = page.locator("[data-view]").first();
         await host.scrollIntoViewIfNeeded();
@@ -354,6 +362,12 @@ for (const test of picked) {
           await page.goto(`${base}${test.path}`, {
             waitUntil: "domcontentloaded",
           });
+          if (test.toggle != null) {
+            await page
+              .getByRole("button", { name: test.toggle, exact: true })
+              .first()
+              .click({ timeout: 120_000 });
+          }
           await page.waitForSelector("[data-view]", { timeout: 120_000 });
           await settle(page);
         }
@@ -361,6 +375,12 @@ for (const test of picked) {
           await page.goto(`${base}${test.path}`, {
             waitUntil: "domcontentloaded",
           });
+          if (test.toggle != null) {
+            await page
+              .getByRole("button", { name: test.toggle, exact: true })
+              .first()
+              .click({ timeout: 120_000 });
+          }
           await page.waitForSelector("[data-view]", { timeout: 120_000 });
           await settle(page);
         }

@@ -588,25 +588,35 @@
           {/if}
         {/if}
         {#if race?.map != null && places != null}
-          {#key `${race.map.tiles}:${race.map.own?.tiles ?? ""}`}
-            <PlaceMap
-              {places}
-              colors={places.legend.map((item) => swatch(item.color, item.key))}
-              tiles={race.map.tiles}
-              own={race.map.own}
-              nested={race.map.nested}
-              frame={race.map.frame}
-              isApproximate={race.map.isApproximate}
-              sources={race.map.credits}
-              noun={places.levels[0]?.noun ?? ""}
-              votes={m.col_votes()}
-              names={places.legend.map((item) =>
-                item.person == null ? (item.short ?? item.label) : item.label,
-              )}
-              levels={[]}
-              span={null}
-            />
-          {/key}
+          {#if race.map.tiles != null}
+            {#key `${race.map.tiles}:${race.map.own?.tiles ?? ""}`}
+              <PlaceMap
+                {places}
+                colors={places.legend.map((item) =>
+                  swatch(item.color, item.key),
+                )}
+                tiles={race.map.tiles}
+                own={race.map.own}
+                nested={race.map.nested}
+                frame={race.map.frame}
+                isApproximate={race.map.isApproximate}
+                sources={race.map.credits}
+                noun={places.levels[0]?.noun ?? ""}
+                votes={m.col_votes()}
+                names={places.legend.map((item) =>
+                  item.person == null ? (item.short ?? item.label) : item.label,
+                )}
+                levels={[]}
+                span={null}
+              />
+            {/key}
+          {:else}
+            <p
+              class="grid place-items-center border border-dashed border-border px-4 text-center text-sm text-pretty text-muted-foreground block-[min(24rem,50svh)]"
+            >
+              {m.map_rebuilding()}
+            </p>
+          {/if}
         {:else if hub.isPending || isStale}
           <div
             class="animate-pulse rounded-sm bg-muted block-[min(32rem,60svh)] motion-reduce:animate-none"

@@ -1341,22 +1341,30 @@
       {#if (race.wards ?? []).length > 0 && (!isFolding || index === 0 || opened[index] === true)}
         {#if race.outcomes != null && race.map != null && (race.map.shaped ?? 0) * 2 >= race.outcomes.places.rows.length}
           <div class="grid gap-2 pbs-1">
-            <PlaceMap
-              places={race.outcomes.places}
-              colors={race.outcomes.tones}
-              tiles={race.map.tiles}
-              own={race.map.own}
-              nested={race.map.nested}
-              frame={race.map.frame}
-              blank={race.map.blank ?? null}
-              isApproximate={race.map.isApproximate}
-              sources={race.map.credits}
-              noun={race.places?.levels[0]?.noun ?? ""}
-              votes={race.votes}
-              names={race.outcomes.titles}
-              levels={[]}
-              span={null}
-            />
+            {#if race.map.tiles != null}
+              <PlaceMap
+                places={race.outcomes.places}
+                colors={race.outcomes.tones}
+                tiles={race.map.tiles}
+                own={race.map.own}
+                nested={race.map.nested}
+                frame={race.map.frame}
+                blank={race.map.blank ?? null}
+                isApproximate={race.map.isApproximate}
+                sources={race.map.credits}
+                noun={race.places?.levels[0]?.noun ?? ""}
+                votes={race.votes}
+                names={race.outcomes.titles}
+                levels={[]}
+                span={null}
+              />
+            {:else}
+              <p
+                class="grid place-items-center border border-dashed border-border px-4 text-center text-sm text-pretty text-muted-foreground block-[min(24rem,50svh)]"
+              >
+                {m.map_rebuilding()}
+              </p>
+            {/if}
           </div>
         {/if}
         {@render wards(race.wards ?? [], race.anchor, race.lede)}
@@ -1424,70 +1432,79 @@
               {/each}
             </div>
           {/if}
-          {#key places.level}
-            <PlaceMap
-              {places}
-              colors={swing == null && region == null
-                ? (final?.tones ?? race.tones)
-                : places.legend.map((item) => swatch(item.color, item.key))}
-              tiles={shape.tiles}
-              hexes={hexes.data ?? null}
-              own={shape.own}
-              nested={shape.nested}
-              frame={shape.frame}
-              blank={shape.blank ?? null}
-              isApproximate={shape.isApproximate}
-              sources={shape.credits}
-              noun={places.levels[0]?.noun ?? ""}
-              tallies={race.electors == null ||
-              region != null ||
-              places.level !== race.places.level
-                ? null
-                : places.legend.map(
-                    (item) =>
-                      race.electors?.rows.find((row) => row.key === item.key)
-                        ?.votes ?? null,
-                  )}
-              votes={final == null ? race.votes : m.col_votes()}
-              names={swing == null && region == null
-                ? (final?.titles ?? race.titles)
-                : places.legend.map((item) =>
-                    item.person == null
-                      ? (item.short ?? item.label)
-                      : item.label,
-                  )}
-              levels={option?.map == null
-                ? []
-                : [race.places, option.places].map((entry) => {
-                    const noun = entry.levels[0]?.noun ?? "";
-                    return {
-                      code: entry.level,
-                      label: noun.charAt(0).toUpperCase() + noun.slice(1),
-                      count: entry.rows.length,
-                      path: "",
-                      query: "",
-                      isCurrent: entry.level === places.level,
-                    };
-                  })}
-              pick={(code) => (regional[index] = code === option?.places.level)}
-              span={swing?.span ??
-                (region?.since != null
-                  ? {
-                      from: region.since,
-                      to: election.date?.slice(0, 4) ?? "",
-                      forward: false,
-                    }
-                  : race.count > 1 &&
-                      race.since != null &&
-                      race.places.rows.some((row) => row.prior != null)
+          {#if shape.tiles != null}
+            {#key places.level}
+              <PlaceMap
+                {places}
+                colors={swing == null && region == null
+                  ? (final?.tones ?? race.tones)
+                  : places.legend.map((item) => swatch(item.color, item.key))}
+                tiles={shape.tiles}
+                hexes={hexes.data ?? null}
+                own={shape.own}
+                nested={shape.nested}
+                frame={shape.frame}
+                blank={shape.blank ?? null}
+                isApproximate={shape.isApproximate}
+                sources={shape.credits}
+                noun={places.levels[0]?.noun ?? ""}
+                tallies={race.electors == null ||
+                region != null ||
+                places.level !== race.places.level
+                  ? null
+                  : places.legend.map(
+                      (item) =>
+                        race.electors?.rows.find((row) => row.key === item.key)
+                          ?.votes ?? null,
+                    )}
+                votes={final == null ? race.votes : m.col_votes()}
+                names={swing == null && region == null
+                  ? (final?.titles ?? race.titles)
+                  : places.legend.map((item) =>
+                      item.person == null
+                        ? (item.short ?? item.label)
+                        : item.label,
+                    )}
+                levels={option?.map == null
+                  ? []
+                  : [race.places, option.places].map((entry) => {
+                      const noun = entry.levels[0]?.noun ?? "";
+                      return {
+                        code: entry.level,
+                        label: noun.charAt(0).toUpperCase() + noun.slice(1),
+                        count: entry.rows.length,
+                        path: "",
+                        query: "",
+                        isCurrent: entry.level === places.level,
+                      };
+                    })}
+                pick={(code) =>
+                  (regional[index] = code === option?.places.level)}
+                span={swing?.span ??
+                  (region?.since != null
                     ? {
-                        from: race.since,
+                        from: region.since,
                         to: election.date?.slice(0, 4) ?? "",
                         forward: false,
                       }
-                    : null)}
-            />
-          {/key}
+                    : race.count > 1 &&
+                        race.since != null &&
+                        race.places.rows.some((row) => row.prior != null)
+                      ? {
+                          from: race.since,
+                          to: election.date?.slice(0, 4) ?? "",
+                          forward: false,
+                        }
+                      : null)}
+              />
+            {/key}
+          {:else}
+            <p
+              class="grid place-items-center border border-dashed border-border px-4 text-center text-sm text-pretty text-muted-foreground block-[min(24rem,50svh)]"
+            >
+              {m.map_rebuilding()}
+            </p>
+          {/if}
           {const districts = $derived(
             new Set(places.rows.map((row) => row.k)).size,
           )}

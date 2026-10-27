@@ -130,35 +130,43 @@
       />
     </div>
     {#if shape != null}
-      {#key shape.places.level}
-        <PlaceMap
-          places={shape.places}
-          colors={shape.places.legend.map((item) =>
-            swatch(item.color, item.key),
-          )}
-          tiles={shape.map.tiles}
-          own={shape.map.own}
-          frame={shape.map.frame}
-          isApproximate={shape.map.isApproximate}
-          sources={shape.map.credits}
-          noun={shape.places.levels[0]?.noun ?? ""}
-          votes=""
-          names={shape.places.legend.map((item) => item.short ?? item.label)}
-          levels={maps.map((entry) => {
-            const name = entry.places.levels[0]?.noun ?? "";
-            return {
-              code: entry.places.level,
-              label: name.charAt(0).toUpperCase() + name.slice(1),
-              count: entry.places.rows.length,
-              path: "",
-              query: "",
-              isCurrent: entry === shape,
-            };
-          })}
-          pick={(code) => (level = code)}
-          span={null}
-        />
-      {/key}
+      {#if shape.map.tiles != null}
+        {#key shape.places.level}
+          <PlaceMap
+            places={shape.places}
+            colors={shape.places.legend.map((item) =>
+              swatch(item.color, item.key),
+            )}
+            tiles={shape.map.tiles}
+            own={shape.map.own}
+            frame={shape.map.frame}
+            isApproximate={shape.map.isApproximate}
+            sources={shape.map.credits}
+            noun={shape.places.levels[0]?.noun ?? ""}
+            votes=""
+            names={shape.places.legend.map((item) => item.short ?? item.label)}
+            levels={maps.map((entry) => {
+              const name = entry.places.levels[0]?.noun ?? "";
+              return {
+                code: entry.places.level,
+                label: name.charAt(0).toUpperCase() + name.slice(1),
+                count: entry.places.rows.length,
+                path: "",
+                query: "",
+                isCurrent: entry === shape,
+              };
+            })}
+            pick={(code) => (level = code)}
+            span={null}
+          />
+        {/key}
+      {:else}
+        <p
+          class="grid place-items-center border border-dashed border-border px-4 text-center text-sm text-pretty text-muted-foreground block-[min(24rem,50svh)]"
+        >
+          {m.map_rebuilding()}
+        </p>
+      {/if}
     {/if}
     {#if shown.length === 0}
       <p class="py-3 text-sm text-muted-foreground">

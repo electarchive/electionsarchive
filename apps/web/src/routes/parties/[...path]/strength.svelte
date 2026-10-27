@@ -106,26 +106,34 @@
       {/if}
     </div>
     {#if found != null}
-      {#key chosen.id}
-        <PlaceMap
-          places={found.places}
-          colors={found.places.legend.map((item) =>
-            swatch(item.color, item.key),
-          )}
-          tiles={found.map.tiles}
-          own={found.map.own}
-          frame={found.map.frame}
-          isApproximate={found.map.isApproximate}
-          {noun}
-          votes={m.col_votes()}
-          names={found.places.legend.map((item) =>
-            item.person == null ? (item.short ?? item.label) : item.label,
-          )}
-          levels={[]}
-          span={null}
-          shade={found.shade}
-        />
-      {/key}
+      {#if found.map.tiles != null}
+        {#key chosen.id}
+          <PlaceMap
+            places={found.places}
+            colors={found.places.legend.map((item) =>
+              swatch(item.color, item.key),
+            )}
+            tiles={found.map.tiles}
+            own={found.map.own}
+            frame={found.map.frame}
+            isApproximate={found.map.isApproximate}
+            {noun}
+            votes={m.col_votes()}
+            names={found.places.legend.map((item) =>
+              item.person == null ? (item.short ?? item.label) : item.label,
+            )}
+            levels={[]}
+            span={null}
+            shade={found.shade}
+          />
+        {/key}
+      {:else}
+        <p
+          class="grid place-items-center border border-dashed border-border px-4 text-center text-sm text-pretty text-muted-foreground block-[min(24rem,50svh)]"
+        >
+          {m.map_rebuilding()}
+        </p>
+      {/if}
     {:else if hub.isPending}
       <div
         class="animate-pulse rounded-sm bg-muted/40 block-[min(32rem,60svh)] motion-reduce:animate-none"

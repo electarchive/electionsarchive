@@ -174,22 +174,30 @@
     <h2 id="{uid}-map" class="text-[0.8125rem] font-bold">
       {m.council_map_title({ election: regular[0]?.name ?? "" })}
     </h2>
-    <PlaceMap
-      places={mapped.places}
-      colors={kinds.map((kind) => swatch(kind.color, kind.key))}
-      tiles={mapped.map.tiles}
-      own={mapped.map.own}
-      nested={mapped.map.nested}
-      frame={mapped.map.frame}
-      blank={mapped.map.blank ?? null}
-      isApproximate={mapped.map.isApproximate}
-      sources={mapped.map.credits}
-      noun={mapped.noun}
-      votes={m.col_votes()}
-      names={kinds.map((kind) => kind.label)}
-      levels={[]}
-      span={null}
-    />
+    {#if mapped.map.tiles != null}
+      <PlaceMap
+        places={mapped.places}
+        colors={kinds.map((kind) => swatch(kind.color, kind.key))}
+        tiles={mapped.map.tiles}
+        own={mapped.map.own}
+        nested={mapped.map.nested}
+        frame={mapped.map.frame}
+        blank={mapped.map.blank ?? null}
+        isApproximate={mapped.map.isApproximate}
+        sources={mapped.map.credits}
+        noun={mapped.noun}
+        votes={m.col_votes()}
+        names={kinds.map((kind) => kind.label)}
+        levels={[]}
+        span={null}
+      />
+    {:else}
+      <p
+        class="grid place-items-center border border-dashed border-border px-4 text-center text-sm text-pretty text-muted-foreground block-[min(24rem,50svh)]"
+      >
+        {m.map_rebuilding()}
+      </p>
+    {/if}
   </section>
 {/if}
 

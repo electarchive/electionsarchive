@@ -409,6 +409,10 @@
       .toSorted((a, b) => b.won - a.won),
   );
   const focus = $derived(pinned ?? hovered);
+  const isRebuilding = $derived(
+    sheet.isPending &&
+      sheet.levels.find((level) => level.code === sheet.level)?.tiles == null,
+  );
   const entry = $derived.by(() => {
     void seen;
     const hit = focus == null ? null : lookup[focus];
@@ -979,7 +983,10 @@
     const marks = new Map<number, Record<string, string | number | boolean>>();
     for (const [i, k] of set.places.k.entries()) {
       const reading = read(set, i);
-      const color = tone(set, i);
+      const color =
+        pinned == null || pinned === k
+          ? tone(set, i)
+          : `color-mix(in oklab, ${tone(set, i)} 30%, var(--card))`;
       fills.set(k, {
         color: isDotted
           ? "color-mix(in oklab, var(--muted-foreground) 15%, var(--card))"
@@ -1324,6 +1331,7 @@
 
   $effect(() => {
     const mark = JSON.stringify([
+      pinned,
       shown,
       whom?.key,
       range,
@@ -1354,11 +1362,15 @@
       const colors = new Map<number, string>();
       for (const [i, k] of held.set.places.k.entries()) {
         if (held.set.places.leader[i] != null) {
-          colors.set(
-            k,
+          const color =
             shown === "votes"
               ? "color-mix(in oklab, var(--muted-foreground) 15%, var(--card))"
-              : tone(held.set, i),
+              : tone(held.set, i);
+          colors.set(
+            k,
+            pinned == null || pinned === k
+              ? color
+              : `color-mix(in oklab, ${color} 30%, var(--card))`,
           );
         }
       }
@@ -1798,7 +1810,7 @@
       class="pointer-events-none absolute inset-0 overflow-hidden"
       aria-hidden="true"
     >
-      {#each labels as label (label.k)}
+      {#each isRebuilding ? [] : labels as label (label.k)}
         <span
           class="absolute inset-s-0 inset-bs-0 text-[0.75rem] font-semibold whitespace-nowrap text-foreground [-webkit-text-stroke:3px_var(--card)] [paint-order:stroke_fill]"
           style:transform="translate({label.x}px, {label.y}px) translate(-50%,
@@ -2111,6 +2123,12 @@
       >
         {@render ledger(entry)}
       </aside>
+    {:else if isRebuilding}
+      <p
+        class="pointer-events-none absolute inset-0 z-10 grid place-items-center px-6 text-center text-sm text-pretty text-muted-foreground"
+      >
+        {m.map_rebuilding()}
+      </p>
     {:else}
       <p
         class="pointer-events-none absolute inset-e-3 inset-bs-3 z-10 rounded-sm bg-card/90 px-3 text-[13px]/8 text-muted-foreground ring-1 ring-border block-8 max-sm:hidden"

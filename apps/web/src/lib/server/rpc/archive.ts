@@ -471,7 +471,7 @@ const Places = v.nullable(
 );
 
 const Sketch = v.object({
-  tiles: v.string(),
+  tiles: v.nullable(v.string()),
   own: v.nullable(v.object({ tiles: v.string(), k: v.number() })),
   nested: v.optional(
     v.nullable(v.object({ tiles: v.string(), ks: v.array(v.number()) })),
@@ -3507,6 +3507,9 @@ async function atlas(input: {
     })),
     target: wanted?.id ?? null,
     estimated: spread.size > 0,
+    isPending: levels.some(
+      (entry) => entry.tiles == null && known.get(entry.code)?.tiles != null,
+    ),
     isAllied: tabulated.isAllied,
     legend: tabulated.legend.map((item) => ({
       key: item.key,
@@ -3730,6 +3733,7 @@ async function mosaic(input: { id: string; vs?: string; group: Grouping }) {
   ];
   const moved = new Map(order.map((index, at) => [index, at]));
   return {
+    target: base.target,
     legend: order.flatMap((index) => {
       const item = legend[index];
       return item == null ? [] : [item];
@@ -3868,7 +3872,7 @@ export async function rebuildMosaics(only?: Array<string>) {
   const ids = new Set(listed);
   if (only == null) {
     for (const name of await readdir(folder)) {
-      if (name.endsWith(".json")) {
+      if (name.endsWith(".json") && !name.endsWith(".vs.json")) {
         ids.add(name.slice(0, -5));
       }
     }
@@ -3885,13 +3889,14 @@ export async function rebuildMosaics(only?: Array<string>) {
   const counts = { built: 0, kept: 0, dropped: 0 };
   for (const id of ids) {
     const file = path.join(folder, `${id}.json`);
+    const twin = path.join(folder, `${id}.vs.json`);
     const found = await db.execute<{ stamp: string }>(sql`
       with recursive grp(id) as (
         select ${id}::uuid
         union all
         select c.id from contest c join grp on c.allocation_parent_id = grp.id
       )
-      select md5(concat_ws('|', 'parts', string_agg(concat_ws(':', rs.k, rs.changeset_id, rs.status, rs.is_default), ',' order by rs.k),
+      select md5(concat_ws('|', 'parts-vs', string_agg(concat_ws(':', rs.k, rs.changeset_id, rs.status, rs.is_default), ',' order by rs.k),
         ${rasters.toSorted().join(",")}::text)) as stamp
       from grp join result_set rs on rs.contest_id = grp.id
     `);
@@ -3908,12 +3913,30 @@ export async function rebuildMosaics(only?: Array<string>) {
       const sheet = await mosaic({ id, group: "option" });
       await writeFile(`${file}.part`, JSON.stringify({ stamp: mark, sheet }));
       await rename(`${file}.part`, file);
+      const compared = await mosaic({ id, vs: "previous", group: "option" });
+      if (compared.target == null) {
+        await rm(twin, { force: true });
+      } else {
+        const slug = await db.execute<{ path: string }>(sql`
+          select path from slug where entity_id = ${compared.target}::uuid and is_current limit 1
+        `);
+        await writeFile(
+          `${twin}.part`,
+          JSON.stringify({
+            stamp: mark,
+            path: slug.rows[0]?.path ?? null,
+            sheet: compared,
+          }),
+        );
+        await rename(`${twin}.part`, twin);
+      }
       counts.built += 1;
     } catch (error) {
       if (!(error instanceof ORPCError) || error.code !== "NOT_FOUND") {
         throw error;
       }
       await rm(file, { force: true });
+      await rm(twin, { force: true });
       counts.dropped += 1;
     }
   }
@@ -6463,6 +6486,7 @@ export const contests = {
           vintage: v.nullable(v.string()),
           asOf: v.nullable(v.string()),
           tiles: v.nullable(v.string()),
+          isPending: v.boolean(),
           isApproximate: v.boolean(),
           sources: v.array(
             v.object({
@@ -6611,6 +6635,7 @@ export const contests = {
               vintage: row.vintage,
               asOf: row.asOf,
               tiles: stored(row.tiles),
+              isPending: row.tiles != null && stored(row.tiles) == null,
               isApproximate: row.qualities.includes("synthetic"),
               sources: row.sources ?? [],
               count: group.ids.length,
@@ -6681,6 +6706,7 @@ export const contests = {
         ),
         target: v.nullable(v.string()),
         estimated: v.boolean(),
+        isPending: v.boolean(),
         isAllied: v.boolean(),
         legend: v.array(
           v.object({
@@ -6723,6 +6749,7 @@ export const contests = {
     )
     .output(
       v.object({
+        target: v.nullable(v.string()),
         legend: v.array(
           v.object({
             key: v.string(),
@@ -6746,7 +6773,28 @@ export const contests = {
       }),
     )
     .handler(async ({ input }) => {
-      if ((input.vs ?? "none") !== "none" || input.group !== "option") {
+      const vs = (input.vs ?? "none").toLowerCase();
+      if (input.group !== "option") {
+        return mosaic(input);
+      }
+      if (vs !== "none") {
+        const twin = path.resolve(
+          "../../data/mosaics",
+          `${input.id.toLowerCase()}.vs.json`,
+        );
+        if (existsSync(twin)) {
+          const held = JSON.parse(await readFile(twin, "utf8")) as {
+            path: string | null;
+            sheet: Awaited<ReturnType<typeof mosaic>>;
+          };
+          if (
+            ["previous", held.sheet.target, held.path].some(
+              (value) => value?.toLowerCase() === vs,
+            )
+          ) {
+            return held.sheet;
+          }
+        }
         return mosaic(input);
       }
       const file = path.resolve(
@@ -6762,7 +6810,7 @@ export const contests = {
             ).sheet
           : null;
       const held = await open();
-      if (held?.places?.part != null) {
+      if (held?.places?.part != null && held.target !== undefined) {
         return held as Awaited<ReturnType<typeof mosaic>>;
       }
       await rebuildMosaics([input.id.toLowerCase()]);
@@ -8376,16 +8424,14 @@ async function sketch(
     ),
   ]);
   const inside = stored(nested.rows[0]?.tiles);
-  const tiled = found.rows.find(
-    (row) => row.scheme === level && stored(row.tiles) != null,
-  );
+  const tiled = found.rows.find((row) => row.scheme === level);
   const own = found.rows.find(
     (row) => row.scheme !== level && stored(row.tiles) != null,
   );
   return tiled == null || frame == null
     ? null
     : {
-        tiles: tiled.tiles,
+        tiles: stored(tiled.tiles),
         own: own == null ? null : { tiles: own.tiles, k: area.k },
         nested: inside == null ? null : { tiles: inside, ks: inner },
         frame,

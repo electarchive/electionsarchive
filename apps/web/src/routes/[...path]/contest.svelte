@@ -1421,6 +1421,11 @@
   {#if drawn != null}
     {@render caveat()}
   {/if}
+  {#if drawn == null && boundaries.some((entry) => entry.isPending)}
+    <p class="col-span-12 bg-card px-3.5 py-3 text-sm text-muted-foreground">
+      {m.map_rebuilding()}
+    </p>
+  {/if}
   {#if drawn != null && placed != null}
     <div
       class={cn("col-span-12 bg-card px-3.5 pbs-3 pbe-3.5 min-inline-0", {
