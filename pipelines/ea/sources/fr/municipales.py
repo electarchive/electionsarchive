@@ -12,7 +12,7 @@ from ea.sources.fr.names import person_name
 from ea.store import DATA, connect
 
 SOURCE = "fr.municipales"
-VERSION = "1"
+VERSION = "2"
 PARSED = DATA / "parsed" / SOURCE
 ROUNDS = {1: date(2026, 3, 15), 2: date(2026, 3, 22)}
 STATIC = "https://static.data.gouv.fr/resources"
@@ -69,6 +69,15 @@ SEATS_CAVEAT = (
     "The ministry's results file gives this list {seats} seats, but its file of elected councilors names {named} of "
     "the list's candidates as elected."
 )
+OVER_CAVEAT = (
+    "The ministry's files give {lists} {total} seats and name {named} candidates as elected, more than the "
+    "council's {size} seats."
+)
+OVER_SINGLE = (
+    " As the only list, it holds every seat, so the archive records {size} seats and the first {size} candidates on "
+    "the list as elected."
+)
+OVER_SEVERAL = " The archive records no seats or elected councilors for this round until a corrected return is found."
 TURNOUT_CAVEAT = (
     "The ministry's results file reports more voters ({voters}) than registered voters ({registered}) in this commune."
 )
@@ -439,7 +448,23 @@ def emit() -> Path:
             for member in member_rows.get((round_, unit_code), []):
                 if member["elected"]:
                     named[member["panel"]] = named.get(member["panel"], 0) + 1
-            for entry in list_rows.get((round_, unit_code), []):
+            entries = list_rows.get((round_, unit_code), [])
+            total = sum(int(str(entry["seats"] or 0)) for entry in entries)
+            over = total > size
+            if over:
+                cs.add(
+                    "note",
+                    entity_id=result_set,
+                    kind="caveat",
+                    body_md=OVER_CAVEAT.format(
+                        lists="this list" if len(entries) == 1 else "these lists",
+                        total=total,
+                        named=sum(named.values()),
+                        size=size,
+                    )
+                    + (OVER_SINGLE.format(size=size) if len(entries) == 1 else OVER_SEVERAL),
+                )
+            for entry in entries:
                 panel = int(str(entry["panel"]))
                 options[panel] = cs.key(f"{SOURCE}.option", f"{key}:{panel}")
                 cs.add(
@@ -460,6 +485,10 @@ def emit() -> Path:
                         "value": entry["votes"],
                     }
                 )
+                if over:
+                    if len(entries) == 1:
+                        cs.add("outcome", result_set_id=result_set, option_id=options[panel], kind="won", seats=size)
+                    continue
                 if entry["seats"]:
                     cs.add(
                         "outcome", result_set_id=result_set, option_id=options[panel], kind="won", seats=entry["seats"]
@@ -483,7 +512,7 @@ def emit() -> Path:
                     list_position=position,
                     ballot_name=f"{member['surname']} {member['forename']}",
                 )
-                if member["elected"]:
+                if member["elected"] and (not over or len(entries) == 1 and position <= size):
                     cs.add(
                         "outcome",
                         result_set_id=result_set,
