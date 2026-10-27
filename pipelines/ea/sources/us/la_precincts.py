@@ -16,6 +16,19 @@ SOURCE = "us.la_precincts"
 VERSION = "1"
 PARSED = DATA / "parsed" / SOURCE
 DAYS = [
+    date(2002, 11, 5),
+    date(2002, 12, 7),
+    date(2004, 11, 2),
+    date(2004, 12, 4),
+    date(2006, 11, 7),
+    date(2006, 12, 9),
+    date(2008, 11, 4),
+    date(2008, 12, 6),
+    date(2010, 11, 2),
+    date(2012, 11, 6),
+    date(2012, 12, 8),
+    date(2014, 11, 4),
+    date(2014, 12, 6),
     date(2016, 11, 8),
     date(2016, 12, 10),
     date(2018, 11, 6),
@@ -170,7 +183,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Louisiana's president, U.S. Senate, U.S. House, and governor elections 2016–2024 by precinct from "
+            summary="Louisiana's president, U.S. Senate, U.S. House, and governor elections 2002–2024 by precinct from "
             "the Secretary of State's official results, for contests no other source holds by precinct",
             polity="US-LA",
         )
