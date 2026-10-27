@@ -1225,9 +1225,14 @@
       {/if}
       {#if contest.incumbency != null}
         <span class="highlighter px-1 font-semibold text-foreground"
-          >{contest.incumbency === "defeated"
-            ? m.incumbency_defeated()
-            : m.incumbency_open()}</span
+          ><Term
+            label={contest.incumbency === "defeated"
+              ? m.incumbency_defeated()
+              : m.incumbency_open()}
+            definition={contest.incumbency === "defeated"
+              ? m.term_incumbency_defeated()
+              : m.term_incumbency_open()}
+          /></span
         >
       {/if}
       {#if contest.election.status === "annulled"}

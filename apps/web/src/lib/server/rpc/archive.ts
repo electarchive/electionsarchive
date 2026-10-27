@@ -531,7 +531,14 @@ const Sketch = v.object({
     north: v.number(),
   }),
   blank: v.optional(
-    v.array(v.object({ k: v.number(), name: v.string(), isHeld: v.boolean() })),
+    v.array(
+      v.object({
+        k: v.number(),
+        name: v.string(),
+        isHeld: v.boolean(),
+        isOutside: v.boolean(),
+      }),
+    ),
   ),
   isApproximate: v.boolean(),
   shaped: v.optional(v.nullable(v.number())),
@@ -7396,7 +7403,12 @@ export const contests = {
           missing: v.array(v.string()),
           k: v.nullable(v.number()),
           blank: v.array(
-            v.object({ k: v.number(), name: v.string(), isHeld: v.boolean() }),
+            v.object({
+              k: v.number(),
+              name: v.string(),
+              isHeld: v.boolean(),
+              isOutside: v.boolean(),
+            }),
           ),
           frame: v.nullable(
             v.object({
@@ -7465,7 +7477,7 @@ export const contests = {
       const [frame, blankLabels] = await Promise.all([
         framing(area.id, own.rows[0]?.shaped ?? day, [
           ...present,
-          ...whole.map((row) => row.k),
+          ...whole.filter((row) => !row.outside).map((row) => row.k),
         ]),
         names(
           absent.map((row) => row.id),
@@ -7477,6 +7489,7 @@ export const contests = {
           k: row.k,
           name: blankLabels.full.get(row.id) ?? "",
           isHeld: row.held,
+          isOutside: row.outside,
         }))
         .toSorted((a, b) => a.name.localeCompare(b.name));
       const drawn = await Promise.all(
@@ -9212,7 +9225,12 @@ async function universe(
   area: string,
   day: string,
 ) {
-  const found = await db.execute<{ id: string; k: number; held: boolean }>(sql`
+  const found = await db.execute<{
+    id: string;
+    k: number;
+    held: boolean;
+    outside: boolean;
+  }>(sql`
     with recursive base as (
       select c.office_id, c.body_id, c.party_scope_id, ec.date_from, ec.date_to
       from contest c join election ec on ec.id = c.election_id
@@ -9250,13 +9268,26 @@ async function universe(
       union all
       select p.area_id, down.depth + 1 from area_parent p join down on p.parent_id = down.id
       where p.valid @> ${day}::date and down.depth < 4 and not exists (select from candidate)
+    ),
+    inside(id, scheme, depth) as (
+      select ${area}::uuid, ''::text, 0 where exists (select from candidate)
+      union all
+      select a.id, a.scheme_code, inside.depth + 1 from inside
+      join area_parent p on p.parent_id = inside.id and p.valid @> ${day}::date
+      join area a on a.id = p.area_id
+      where inside.depth < 2 and inside.scheme <> ${level} and (inside.depth = 0 or a.scheme_code = ${level})
     )
-    select distinct candidate.id, candidate.k, candidate.held from candidate
+    select distinct candidate.id, candidate.k, candidate.held, false as outside from candidate
     join up on up.start = candidate.id where up.id = ${area}::uuid
     union
-    select a.id, a.k, true from down
+    select a.id, a.k, true, false from down
     join area a on a.id = down.id and a.scheme_code = ${level}
     where down.depth > 0 and exists (select from area_geometry g where g.area_id = a.id and g.valid @> ${day}::date)
+    union
+    select a.id, a.k, false, true from inside
+    join area a on a.id = inside.id and a.scheme_code = ${level}
+    where inside.depth > 0 and not exists (select from candidate c where c.id = a.id)
+      and exists (select from area_geometry g where g.area_id = a.id and g.valid @> ${day}::date)
   `);
   return found.rows;
 }
@@ -9337,7 +9368,10 @@ async function sketch(
   const counted = new Set(ks);
   const absent = whole.filter((row) => !counted.has(row.k));
   const [frame, found, nested, labels] = await Promise.all([
-    framing(area.id, day, [...ks, ...whole.map((row) => row.k)]),
+    framing(area.id, day, [
+      ...ks,
+      ...whole.filter((row) => !row.outside).map((row) => row.k),
+    ]),
     db.execute<{
       scheme: string;
       tiles: string;
@@ -9399,6 +9433,7 @@ async function sketch(
             k: row.k,
             name: labels.full.get(row.id) ?? "",
             isHeld: row.held,
+            isOutside: row.outside,
           }))
           .toSorted((a, b) => a.name.localeCompare(b.name)),
         isApproximate: tiled.synthetic,

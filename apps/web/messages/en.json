@@ -274,6 +274,8 @@
   "slate_incumbent": "Incumbent",
   "incumbency_defeated": "Incumbent defeated",
   "incumbency_open": "Open seat",
+  "term_incumbency_open": "Whoever held this seat on election day was not on the ballot.",
+  "term_incumbency_defeated": "Whoever held this seat on election day ran and did not win.",
   "slate_independent": "Independent",
   "wards_none": "No results yet",
   "count_title": "Ranked-choice count",

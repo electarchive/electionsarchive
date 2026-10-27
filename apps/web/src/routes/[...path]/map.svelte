@@ -69,7 +69,12 @@
     nested?: { tiles: string; ks: Array<number> } | null;
     frame: Box;
     limit?: Box | null;
-    blank?: Array<{ k: number; name: string; isHeld: boolean }> | null;
+    blank?: Array<{
+      k: number;
+      name: string;
+      isHeld: boolean;
+      isOutside: boolean;
+    }> | null;
     isApproximate: boolean;
     noun: string;
     votes: string;
@@ -576,13 +581,40 @@
   };
   const inner = $derived(new Set(nested?.ks ?? []));
   const blanks = $derived(
-    new Map((blank ?? []).map((entry) => [entry.k, entry])),
+    new Map(
+      (blank ?? [])
+        .filter((entry) => !entry.isOutside)
+        .map((entry) => [entry.k, entry]),
+    ),
   );
   const notes = $derived(
     new Map((places.noted ?? []).map((entry) => [entry.k, entry])),
   );
-  const missing = $derived((blank ?? []).filter((entry) => entry.isHeld));
-  const idle = $derived((blank ?? []).filter((entry) => !entry.isHeld));
+  const missing = $derived(
+    blanks
+      .values()
+      .filter((entry) => entry.isHeld)
+      .toArray(),
+  );
+  const idle = $derived(
+    blanks
+      .values()
+      .filter((entry) => !entry.isHeld)
+      .toArray(),
+  );
+  const inland: Maplibre.FilterSpecification = $derived([
+    "!",
+    [
+      "in",
+      ["id"],
+      [
+        "literal",
+        (blank ?? [])
+          .filter((entry) => entry.isOutside)
+          .map((entry) => entry.k),
+      ],
+    ],
+  ]);
   const skipped = $derived.by(() => {
     if (typeof view !== "number") {
       return [];
@@ -1133,6 +1165,7 @@
         id: "fill",
         type: "fill",
         ...areas,
+        filter: inland,
         paint: {
           "fill-color": [
             "coalesce",
@@ -1171,6 +1204,7 @@
           id: "hatch",
           type: "fill",
           ...areas,
+          filter: inland,
           paint: { "fill-pattern": "hatch" },
         },
         "fills",
@@ -1185,6 +1219,7 @@
         id: "seam",
         type: "line",
         ...areas,
+        filter: inland,
         paint: {
           "line-color": "var(--card)",
           "line-width":
