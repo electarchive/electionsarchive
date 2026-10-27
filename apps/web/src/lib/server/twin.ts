@@ -238,6 +238,15 @@ async function load(segments: Array<string>, search: URLSearchParams) {
     ]);
     return { ...found, byes, tiers };
   }
+  if (found.kind === "contest") {
+    return {
+      ...found,
+      standing:
+        found.lean == null
+          ? null
+          : await call(router.contests.lean, found.lean).catch(() => null),
+    };
+  }
   if (found.kind !== "polity") {
     return found;
   }
@@ -516,6 +525,7 @@ function markdown(data: Data, link: Link) {
         data.statutes,
         data.lists,
         data.rounds,
+        data.standing,
         link,
       );
     }
@@ -2920,6 +2930,7 @@ function contestMarkdown(
   statutes: Extract<Data, { kind: "contest" }>["statutes"],
   lists: Extract<Data, { kind: "contest" }>["lists"],
   rounds: Extract<Data, { kind: "contest" }>["rounds"],
+  standing: Extract<Data, { kind: "contest" }>["standing"],
   link: Link,
 ) {
   const groups: Record<string, (place: string) => string> = {
@@ -3083,6 +3094,59 @@ function contestMarkdown(
       .join(" "),
     ...contest.notes.map((note) => `> ${note.body}`),
     ...compared,
+    ...(standing == null
+      ? []
+      : [
+          `## ${m.lean_title({ place: standing.place.name })}`,
+          [
+            ...[standing.parent, standing.whole].flatMap((mark) => {
+              const [ahead, behind] = standing.axis;
+              if (mark == null || ahead == null || behind == null) {
+                return [];
+              }
+              const gap = standing.place.margin - mark.margin;
+              return [
+                `- ${m.lean_versus({ place: definite(mark.name) })}: ${
+                  Math.abs(gap) < 0.0005
+                    ? m.atlas_even()
+                    : m.atlas_lead({
+                        name: (gap >= 0 ? ahead : behind).label,
+                        points: Math.abs(gap * 100).toFixed(1),
+                      })
+                }`,
+              ];
+            }),
+            ...(standing.siblings.count > 1
+              ? [
+                  `- ${m.lean_rank({
+                    rank: standing.siblings.rank,
+                    name:
+                      standing.axis[standing.place.margin >= 0 ? 0 : 1]
+                        ?.label ?? "",
+                    count: count(standing.siblings.count),
+                    nouns: plural(standing.siblings.noun),
+                    place: definite(
+                      standing.parent?.name ?? standing.whole.name,
+                    ),
+                  })}`,
+                ]
+              : []),
+            ...(standing.place.before == null || standing.previous?.date == null
+              ? []
+              : [
+                  `- ${m.atlas_shift({
+                    name:
+                      standing.axis[
+                        standing.place.margin >= standing.place.before ? 0 : 1
+                      ]?.label ?? "",
+                    points: Math.abs(
+                      (standing.place.margin - standing.place.before) * 100,
+                    ).toFixed(1),
+                    year: Number(standing.previous.date.slice(0, 4)),
+                  })}`,
+                ]),
+          ].join("\n"),
+        ]),
     ...held,
     ...(handover?.vacated == null ||
     contest.notes.some((note) => note.body.startsWith("By-election held"))

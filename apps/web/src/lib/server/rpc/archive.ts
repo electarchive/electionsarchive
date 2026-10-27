@@ -3578,12 +3578,17 @@ async function mosaic(input: { id: string; vs?: string; group: Grouping }) {
   );
   const units =
     base.parts.length > 0 ? base.parts.map((part) => part.unit) : [""];
-  const sets: Array<Awaited<ReturnType<typeof atlas>>> = [];
+  const sets: Array<{
+    set: Awaited<ReturnType<typeof atlas>>;
+    part: number | null;
+  }> = [];
   if (middle != null) {
-    sets.push(await load(undefined, middle.code, false));
+    sets.push({ set: await load(undefined, middle.code, false), part: null });
   }
   const queue = [...units.entries()];
-  const finer: Array<Awaited<ReturnType<typeof atlas>> | undefined> = [];
+  const finer: Array<
+    { set: Awaited<ReturnType<typeof atlas>>; part: number | null } | undefined
+  > = [];
   await Promise.all(
     Array.from({ length: 4 }, async () => {
       for (let next = queue.shift(); next != null; next = queue.shift()) {
@@ -3593,10 +3598,13 @@ async function mosaic(input: { id: string; vs?: string; group: Grouping }) {
           (level) => level.code !== middle?.code && rastered(level.tiles),
         );
         if (finest != null) {
-          finer[at] =
-            finest.code === first.level
-              ? first
-              : await load(unit === "" ? undefined : unit, finest.code);
+          finer[at] = {
+            set:
+              finest.code === first.level
+                ? first
+                : await load(unit === "" ? undefined : unit, finest.code),
+            part: unit === "" ? null : at,
+          };
         }
       }
     }),
@@ -3606,19 +3614,44 @@ async function mosaic(input: { id: string; vs?: string; group: Grouping }) {
       sets.push(set);
     }
   }
+  const homes = new Map<number, number>();
+  if (middle != null && base.parts.length > 0) {
+    const found = await db.execute<{ k: number; part: number }>(sql`
+      with recursive up(k, id, depth) as (
+        select a.k, a.id, 0 from area a
+        where a.k = any(${sql.param(sets[0]?.set.places.k ?? [])}::int[])
+        union all
+        select up.k, p.parent_id, up.depth + 1 from up
+        join area_parent p on p.area_id = up.id and p.valid @> ${base.date ?? "infinity"}::date
+        where up.depth < 6
+      )
+      select distinct on (up.k) up.k, a.k as part from up join area a on a.id = up.id
+      where a.k = any(${sql.param(base.parts.map((part) => part.k))}::int[])
+      order by up.k, up.depth
+    `);
+    const at = new Map(base.parts.map((part, index) => [part.k, index]));
+    for (const row of found.rows) {
+      const index = at.get(row.part);
+      if (index != null) {
+        homes.set(row.k, index);
+      }
+    }
+  }
   const legend = [...base.legend];
   const layers: Array<{ code: string; tiles: string }> = [];
   const rows: Array<{
     k: number;
     name: string;
     valid: number;
+    part: number | null;
+    layer: number;
     leader: number | null;
     prior: number | null;
     shares: Array<number | null>;
     before: Array<number | null>;
   }> = [];
   const seen = new Set<number>();
-  for (const set of sets) {
+  for (const { set, part } of sets) {
     const level = set.levels.find((entry) => entry.code === set.level);
     if (
       level?.tiles != null &&
@@ -3626,6 +3659,10 @@ async function mosaic(input: { id: string; vs?: string; group: Grouping }) {
     ) {
       layers.push({ code: level.code, tiles: `${level.tiles}.ids` });
     }
+    const layer = Math.max(
+      0,
+      layers.findIndex((entry) => entry.code === set.level),
+    );
     const at = set.legend.map((item) => {
       const index = legend.findIndex((entry) => entry.key === item.key);
       if (index >= 0) {
@@ -3654,8 +3691,12 @@ async function mosaic(input: { id: string; vs?: string; group: Grouping }) {
       rows.push({
         k,
         name:
-          middle != null && set === sets[0] ? (set.places.name[i] ?? "") : "",
+          middle != null && set === sets[0]?.set
+            ? (set.places.name[i] ?? "")
+            : "",
         valid: set.places.valid[i] ?? 0,
+        part: part ?? homes.get(k) ?? null,
+        layer,
         leader: leader == null ? null : (at[leader] ?? null),
         prior: prior == null ? null : (at[prior] ?? null),
         shares,
@@ -3698,6 +3739,8 @@ async function mosaic(input: { id: string; vs?: string; group: Grouping }) {
       k: rows.map((row, i) => row.k - (rows[i - 1]?.k ?? 0)),
       name: rows.map((row) => row.name),
       valid: rows.map((row) => row.valid),
+      part: rows.map((row) => row.part),
+      layer: rows.map((row) => row.layer),
       leader: rows.map((row) =>
         row.leader == null ? null : (moved.get(row.leader) ?? null),
       ),
@@ -3715,6 +3758,97 @@ async function mosaic(input: { id: string; vs?: string; group: Grouping }) {
             .map((index) => rows.map((row) => row.before[index] ?? null))
         : [],
     },
+  };
+}
+
+async function lean(input: { id: string; unit: string }) {
+  const contest = await find(input.id);
+  const chain = await descend(contest, input.unit);
+  const place = chain.at(-1);
+  if (place == null) {
+    throw new ORPCError("NOT_FOUND");
+  }
+  const above = chain
+    .slice(0, -1)
+    .map((entry) => entry.segment)
+    .join("/");
+  const near = await atlas({
+    id: input.id,
+    unit: above === "" ? undefined : above,
+    level: place.scheme,
+    vs: "previous",
+    group: "option",
+    isLean: true,
+  });
+  const whole =
+    chain.length === 1
+      ? near
+      : await atlas({ id: input.id, group: "option", isLean: true });
+  const axis = whole.legend.slice(0, 2);
+  if (axis.length < 2) {
+    throw new ORPCError("NOT_FOUND");
+  }
+  const round = (value: number) => Math.round(value * 10_000) / 10_000;
+  const spread = (set: typeof near, column: "shares" | "before", i: number) => {
+    const [a, b] = axis.map((item) => {
+      const index = set.legend.findIndex((entry) => entry.key === item.key);
+      return index < 0 ? 0 : set.places[column][index]?.[i];
+    });
+    return a == null || b == null ? null : (a - b) / 10_000;
+  };
+  const overall = (set: typeof near) => {
+    let [weighted, total] = [0, 0];
+    for (const [i, valid] of set.places.valid.entries()) {
+      const margin = spread(set, "shares", i);
+      if (margin != null && set.places.leader[i] != null) {
+        weighted += margin * valid;
+        total += valid;
+      }
+    }
+    return total === 0 ? 0 : round(weighted / total);
+  };
+  const at = near.places.k.indexOf(place.k);
+  const margin = at < 0 ? null : spread(near, "shares", at);
+  if (margin == null) {
+    throw new ORPCError("NOT_FOUND");
+  }
+  const margins: Array<number> = [];
+  for (const i of near.places.k.keys()) {
+    const value = spread(near, "shares", i);
+    if (value != null && near.places.leader[i] != null) {
+      margins.push(round(value));
+    }
+  }
+  const before = spread(near, "before", at);
+  const previous = near.targets.find((target) => target.id === near.target);
+  return {
+    axis: axis.map((item) => ({
+      key: item.key,
+      label: item.label,
+      color: item.color,
+    })),
+    place: {
+      name: place.name,
+      margin: round(margin),
+      before: before == null ? null : round(before),
+    },
+    parent:
+      chain.length === 1
+        ? null
+        : { name: chain.at(-2)?.name ?? "", margin: overall(near) },
+    whole: { name: whole.trail[0]?.name ?? "", margin: overall(whole) },
+    siblings: {
+      noun: place.noun,
+      count: margins.length,
+      rank:
+        1 +
+        margins.filter((value) =>
+          margin >= 0 ? value > round(margin) : value < round(margin),
+        ).length,
+      margins: margins.toSorted((a, b) => a - b),
+    },
+    previous:
+      previous == null ? null : { label: previous.label, date: previous.date },
   };
 }
 
@@ -3757,7 +3891,7 @@ export async function rebuildMosaics(only?: Array<string>) {
         union all
         select c.id from contest c join grp on c.allocation_parent_id = grp.id
       )
-      select md5(concat_ws('|', string_agg(concat_ws(':', rs.k, rs.changeset_id, rs.status, rs.is_default), ',' order by rs.k),
+      select md5(concat_ws('|', 'parts', string_agg(concat_ws(':', rs.k, rs.changeset_id, rs.status, rs.is_default), ',' order by rs.k),
         ${rasters.toSorted().join(",")}::text)) as stamp
       from grp join result_set rs on rs.contest_id = grp.id
     `);
@@ -6602,6 +6736,8 @@ export const contests = {
           k: v.array(v.number()),
           name: v.array(v.string()),
           valid: v.array(v.number()),
+          part: v.array(v.nullable(v.number())),
+          layer: v.array(v.number()),
           leader: v.array(v.nullable(v.number())),
           prior: v.array(v.nullable(v.number())),
           shares: v.array(v.array(v.nullable(v.number()))),
@@ -6617,15 +6753,68 @@ export const contests = {
         "../../data/mosaics",
         `${input.id.toLowerCase()}.json`,
       );
-      if (!existsSync(file)) {
-        await rebuildMosaics([input.id.toLowerCase()]);
+      const open = async () =>
+        existsSync(file)
+          ? (
+              JSON.parse(await readFile(file, "utf8")) as {
+                sheet: Partial<Awaited<ReturnType<typeof mosaic>>>;
+              }
+            ).sheet
+          : null;
+      const held = await open();
+      if (held?.places?.part != null) {
+        return held as Awaited<ReturnType<typeof mosaic>>;
       }
-      return (
-        JSON.parse(await readFile(file, "utf8")) as {
-          sheet: Awaited<ReturnType<typeof mosaic>>;
-        }
-      ).sheet;
+      await rebuildMosaics([input.id.toLowerCase()]);
+      const built = await open();
+      if (built == null) {
+        throw new ORPCError("NOT_FOUND");
+      }
+      return built as Awaited<ReturnType<typeof mosaic>>;
     }),
+  lean: os
+    .meta(
+      openapi({
+        method: "GET",
+        path: "/contests/{id}/lean",
+        summary:
+          "How a place within a contest leans against its parent and the contest's whole area: margins between the contest's two leading options (first minus second), the previous comparable election's margin, and its rank among same-level siblings",
+      }),
+    )
+    .input(
+      v.object({
+        id: v.pipe(v.string(), v.uuid()),
+        unit: v.pipe(v.string(), v.minLength(1)),
+      }),
+    )
+    .output(
+      v.object({
+        axis: v.array(
+          v.object({
+            key: v.string(),
+            label: v.string(),
+            color: v.nullable(v.string()),
+          }),
+        ),
+        place: v.object({
+          name: v.string(),
+          margin: v.number(),
+          before: v.nullable(v.number()),
+        }),
+        parent: v.nullable(v.object({ name: v.string(), margin: v.number() })),
+        whole: v.object({ name: v.string(), margin: v.number() }),
+        siblings: v.object({
+          noun: v.string(),
+          count: v.number(),
+          rank: v.number(),
+          margins: v.array(v.number()),
+        }),
+        previous: v.nullable(
+          v.object({ label: v.string(), date: v.nullable(v.string()) }),
+        ),
+      }),
+    )
+    .handler(async ({ input }) => lean(input)),
   rounds: os
     .meta(
       openapi({

@@ -18,6 +18,7 @@
   import { on } from "svelte/events";
   import { SvelteURLSearchParams } from "svelte/reactivity";
   import { fade } from "svelte/transition";
+  import Lean from "#lib/components/lean.svelte";
   import Monogram from "#lib/components/monogram.svelte";
   import * as Command from "#lib/components/ui/command/index.js";
   import * as Select from "#lib/components/ui/select/index.js";
@@ -112,6 +113,8 @@
     key: string;
     set: Sheet;
     layers: Array<{ code: string; tiles: string }>;
+    part: Array<number | null>;
+    layer: Array<number>;
   } | null>(null);
   let tinted = "";
   const named = new Set<string>();
@@ -432,6 +435,85 @@
       gap,
       side: gap >= 0 ? first : second,
       against: far.set.places.name[far.i] ?? "",
+    };
+  });
+  const groups = $derived.by(() => {
+    const held = mosaic;
+    return held == null
+      ? null
+      : Map.groupBy(
+          held.set.places.k.keys(),
+          (j) => `${held.part[j]}:${held.layer[j]}`,
+        );
+  });
+  const standing = $derived.by(() => {
+    void seen;
+    const hit = entry;
+    if (
+      hit == null ||
+      first == null ||
+      second == null ||
+      hit.set.places.leader[hit.i] == null
+    ) {
+      return null;
+    }
+    const national = sheet.scope.unit === "";
+    const overall = (set: Sheet) => {
+      let [weighted, total] = [0, 0];
+      for (const [j, valid] of set.places.valid.entries()) {
+        if (set.places.leader[j] != null) {
+          weighted += read(set, j).margin * valid;
+          total += valid;
+        }
+      }
+      return total === 0 ? 0 : weighted / total;
+    };
+    const held = mosaic;
+    const isTiled = held != null && hit.set === held.set;
+    const part = isTiled ? (held.part[hit.i] ?? null) : null;
+    const layer = isTiled ? (held.layer[hit.i] ?? 0) : 0;
+    const home = part == null ? undefined : sheet.parts[part];
+    const at = home == null ? -1 : sheet.places.k.indexOf(home.k);
+    const parent = isTiled
+      ? home == null || at < 0
+        ? null
+        : { name: home.name, margin: read(sheet, at).margin }
+      : hit.set.scope.unit === ""
+        ? null
+        : { name: hit.set.scope.name, margin: overall(hit.set) };
+    const whole = national
+      ? { name: sheet.trail[0]?.name ?? "", margin: overall(sheet) }
+      : null;
+    const margins: Array<number> = [];
+    for (const j of isTiled
+      ? (groups?.get(`${part}:${layer}`) ?? [])
+      : hit.set.places.k.keys()) {
+      if (hit.set.places.leader[j] != null) {
+        margins.push(read(hit.set, j).margin);
+      }
+    }
+    const reading = read(hit.set, hit.i);
+    const margin = reading.margin;
+    return {
+      sides: [
+        { label: first.label, tone: hue(sheet, 0) },
+        { label: second.label, tone: hue(sheet, 1) },
+      ] as [{ label: string; tone: string }, { label: string; tone: string }],
+      margin,
+      before: reading.swing == null ? null : margin - reading.swing,
+      marks: [parent, whole].filter((mark) => mark != null),
+      siblings: margins,
+      rank:
+        1 +
+        margins.filter((value) =>
+          margin >= 0 ? value > margin : value < margin,
+        ).length,
+      noun:
+        sheet.levels.find(
+          (level) =>
+            level.code === (isTiled ? held.layers[layer]?.code : hit.set.level),
+        )?.noun ?? "",
+      place: parent?.name ?? whole?.name ?? hit.set.scope.name,
     };
   });
   const found = $derived.by(() => {
@@ -1170,6 +1252,8 @@
         mosaic = {
           key,
           layers: found.layers,
+          part: found.places.part,
+          layer: found.places.layer,
           set: {
             ...start,
             scope: { ...start.scope, name: "" },
@@ -1606,6 +1690,19 @@
         {/if}
         <span class="block">{m.atlas_ticks({ year })}</span>
       </p>
+    {/if}
+    {#if standing != null}
+      <Lean
+        class="border-bs pbs-3"
+        sides={standing.sides}
+        margin={standing.margin}
+        before={standing.before}
+        marks={standing.marks}
+        siblings={standing.siblings}
+        rank={standing.rank}
+        noun={standing.noun}
+        place={standing.place}
+      />
     {/if}
     {#if part != null}
       <div class="flex flex-wrap gap-2">

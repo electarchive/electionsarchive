@@ -2,7 +2,9 @@
   import { goto } from "$app/navigation";
   import { resolve } from "$app/paths";
   import { page } from "$app/state";
+  import { createQuery } from "@tanstack/svelte-query";
   import { Tooltip as TooltipPrimitive } from "bits-ui";
+  import Lean from "#lib/components/lean.svelte";
   import Name from "#lib/components/name.svelte";
   import Term from "#lib/components/term.svelte";
   import { Combobox } from "#lib/components/ui/combobox/index.js";
@@ -63,6 +65,7 @@
     boundaries,
     surround,
     match,
+    lean,
   }: {
     contest: Extract<PageData, { kind: "contest" }>["contest"];
     lists: Extract<PageData, { kind: "contest" }>["lists"];
@@ -76,7 +79,17 @@
     boundaries: Extract<PageData, { kind: "contest" }>["boundaries"];
     surround: Extract<PageData, { kind: "contest" }>["surround"];
     match: string;
+    lean: { id: string; unit: string } | null;
   } = $props();
+
+  const leaning = createQuery(() => ({
+    ...orpc.contests.lean.queryOptions({
+      input: { id: lean?.id ?? "", unit: lean?.unit ?? "" },
+    }),
+    enabled: lean != null,
+    staleTime: Infinity,
+    meta: { quiet: true },
+  }));
 
   const DAY: Record<string, (place: string) => string> = {
     owner: () => "",
@@ -1464,9 +1477,16 @@
     </div>
     {#if chamber == null}
       <div
-        class="col-span-12 grid grid-rows-[auto_1fr] gap-px bg-border min-inline-0 lg:col-span-5 xl:col-span-4"
+        class={cn(
+          "col-span-12 grid gap-px bg-border min-inline-0 lg:col-span-5 xl:col-span-4",
+          {
+            "grid-rows-[auto_1fr]": leaning.data == null,
+            "grid-rows-[auto_auto_1fr]": leaning.data != null,
+          },
+        )}
       >
         {@render stats(true)}
+        {@render standing(true)}
         <div
           class="@container grid content-start gap-1 bg-card px-1.5 pbs-2 pbe-2.5"
         >
@@ -1567,9 +1587,16 @@
     </div>
     {#if chamber == null}
       <div
-        class="col-span-12 grid grid-rows-[auto_1fr] gap-px bg-border min-inline-0 lg:col-span-5 xl:col-span-4"
+        class={cn(
+          "col-span-12 grid gap-px bg-border min-inline-0 lg:col-span-5 xl:col-span-4",
+          {
+            "grid-rows-[auto_1fr]": leaning.data == null,
+            "grid-rows-[auto_auto_1fr]": leaning.data != null,
+          },
+        )}
       >
         {@render stats(true)}
+        {@render standing(true)}
         <div
           class="@container grid content-start gap-1 bg-card px-1.5 pbs-2 pbe-2.5"
         >
@@ -1588,6 +1615,7 @@
         {change}
       />
       {@render stats(false)}
+      {@render standing(false)}
       <div
         class="@container col-span-12 grid content-start gap-1 bg-card px-1.5 pbs-2 pbe-2.5"
       >
@@ -1596,6 +1624,7 @@
     {/if}
   {:else}
     {@render stats(false)}
+    {@render standing(false)}
   {/if}
   {#if additional != null}
     <Additional {additional} />
@@ -1855,6 +1884,7 @@
   {#if locating == null && (drawn == null || chamber != null)}
     {#if drawn != null}
       {@render stats(false)}
+      {@render standing(false)}
     {/if}
     <div
       class={cn(
@@ -2260,6 +2290,43 @@
     {/if}
   </section>
 {/if}
+
+{#snippet standing(compact: boolean)}
+  {#if leaning.data != null}
+    {const found = $derived(leaning.data)}
+    {const ahead = $derived(found.axis[0])}
+    {const behind = $derived(found.axis[1])}
+    {#if ahead != null && behind != null}
+      <section
+        class={cn("grid gap-2.5 bg-card px-3.5 py-3", {
+          "col-span-12": !compact,
+        })}
+        aria-labelledby="lean-title"
+      >
+        <h2 id="lean-title" class="text-sm font-semibold">
+          {m.lean_title({ place: found.place.name })}
+        </h2>
+        <Lean
+          class={cn({ "max-inline-xl": !compact })}
+          sides={[
+            { label: ahead.label, tone: swatch(ahead.color, ahead.key) },
+            { label: behind.label, tone: swatch(behind.color, behind.key) },
+          ]}
+          margin={found.place.margin}
+          before={found.place.before}
+          marks={[found.parent, found.whole].filter((mark) => mark != null)}
+          siblings={found.siblings.margins}
+          rank={found.siblings.rank}
+          noun={found.siblings.noun}
+          place={found.parent?.name ?? found.whole.name}
+          year={found.previous?.date == null
+            ? null
+            : Number(found.previous.date.slice(0, 4))}
+        />
+      </section>
+    {/if}
+  {/if}
+{/snippet}
 
 {#snippet stats(compact: boolean)}
   {#if contest.current != null || contest.turnout != null}

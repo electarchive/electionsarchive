@@ -716,6 +716,7 @@ export async function archive(path: string, search: URLSearchParams) {
       surround,
       match,
       within,
+      lean: unit === "" ? null : { id: slug.entity_id, unit },
     };
   }
   if (slug.type === "election") {
