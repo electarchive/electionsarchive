@@ -36,6 +36,7 @@
         ? []
         : [
             {
+              k: row.k,
               name: row.name,
               x: earlier,
               y: share,
@@ -183,7 +184,7 @@
         class="stroke-foreground"
         stroke-dasharray="4 4"
       />
-      {#each dots as dot (dot.name)}
+      {#each dots as dot (dot.k)}
         {const isPicked = $derived(picked.has(dot.name))}
         <circle
           cx={sx(dot.x)}

@@ -155,7 +155,7 @@
         </tr>
       </thead>
       <tbody>
-        {#each isAll ? councils : councils.slice(0, 20) as council (council.name)}
+        {#each isAll ? councils : councils.slice(0, 20) as council, index (index)}
           <tr class="border-be border-border/60">
             <th class="py-1.5 pe-3 text-start font-normal" scope="row">
               {#if council.path == null}

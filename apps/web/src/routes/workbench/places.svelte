@@ -110,7 +110,7 @@
         </tr>
       </thead>
       <tbody>
-        {#each visible as row (row.name)}
+        {#each visible as row (row.k)}
           <tr
             class={cn("cursor-pointer border-be last:border-be-0", {
               "bg-secondary": hovered === row.name,

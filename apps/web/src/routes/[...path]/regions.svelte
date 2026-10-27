@@ -256,7 +256,7 @@
           </tr>
         </thead>
         <tbody>
-          {#each isAll || ordered.length <= 16 ? ordered : ordered.slice(0, 15) as row (row.name)}
+          {#each isAll || ordered.length <= 16 ? ordered : ordered.slice(0, 15) as row, index (index)}
             <tr class="border-be border-border/60">
               <th
                 scope="row"

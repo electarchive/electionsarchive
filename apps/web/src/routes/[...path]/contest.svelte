@@ -1634,7 +1634,7 @@
         aria-labelledby="key-places"
       >
         <h2 id="key-places" class="text-sm font-semibold">{m.key_places()}</h2>
-        {#each keyed as group (group.label)}
+        {#each keyed as group, index (index)}
           <div class="flex flex-wrap items-center gap-1.5">
             <span class="text-[0.8125rem] text-muted-foreground"
               >{group.label}</span

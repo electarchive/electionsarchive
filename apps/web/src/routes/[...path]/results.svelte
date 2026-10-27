@@ -787,7 +787,7 @@
           {/if}
         </tr>
         {#if span == null && page != null}
-          {#each page.lines as fused, index (fused.label)}
+          {#each page.lines as fused, index (index)}
             <tr
               class={cn("text-[0.8125rem] text-muted-foreground", {
                 "border-be border-border/60": index === page.lines.length - 1,

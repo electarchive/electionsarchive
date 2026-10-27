@@ -183,7 +183,7 @@
   </p>
 {/if}
 
-{#each races as race, index (race.name)}
+{#each races as race, index (index)}
   {const focus = $derived(
     hovered?.series === index ? (race.rows[hovered.point] ?? null) : null,
   )}

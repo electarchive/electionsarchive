@@ -1629,7 +1629,7 @@
             })}
           </p>
         {/if}
-        {#each race.repeats ?? [] as repeat (repeat.label)}
+        {#each race.repeats ?? [] as repeat, index (index)}
           <p class="px-1.5 text-[0.8125rem] text-muted-foreground">
             {repeat.people.length === 1
               ? m.race_repeat_one({
@@ -1851,7 +1851,7 @@
     <ol
       class="grid grid-cols-[repeat(auto-fill,minmax(min(100%,19rem),1fr))] gap-x-6 text-sm"
     >
-      {#each unfolded.has(anchor) || rows.length <= 20 ? rows : rows.slice(0, 18) as row (row.label)}
+      {#each unfolded.has(anchor) || rows.length <= 20 ? rows : rows.slice(0, 18) as row, index (index)}
         {const final = $derived(row.runoff?.isWon === true ? row.runoff : null)}
         <li
           class="grid grid-cols-[minmax(4.5rem,auto)_minmax(0,1fr)] items-baseline gap-x-3 border-be border-border/60 py-1.5 pointer-coarse:py-2"

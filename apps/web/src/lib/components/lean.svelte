@@ -75,7 +75,7 @@
           vector-effect="non-scaling-stroke"
         />
       </svg>
-      {#each marks as mark, index (mark.name)}
+      {#each marks as mark, index (index)}
         <span
           class={cn("absolute inset-y-0 -translate-x-1/2 inline-0.5", {
             "bg-foreground": index === 0,
@@ -120,7 +120,7 @@
     </div>
   </div>
   <ul class="grid grid-cols-[minmax(0,1fr)] gap-1 text-[0.8125rem]">
-    {#each marks as mark, index (mark.name)}
+    {#each marks as mark, index (index)}
       {const gap = $derived(margin - mark.margin)}
       <li class="flex items-center gap-2">
         <span

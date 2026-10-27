@@ -212,7 +212,7 @@
       <div class="grid content-start gap-1.5">
         <h3 class="text-sm font-semibold">{m.ams_constituency_members()}</h3>
         <ul class="grid gap-1 text-sm">
-          {#each additional.constituencies as seat (seat.name)}
+          {#each additional.constituencies as seat, index (index)}
             {const party = $derived(labels.get(seat.key))}
             <li class="flex flex-wrap gap-x-1.5">
               {#if seat.path == null}
@@ -254,7 +254,7 @@
                 party={party?.isParty ? key : null}
               />
               <span class="ps-4 text-pretty">
-                {#each elected as member, index (member.name)}
+                {#each elected as member, index (index)}
                   {#if index > 0},
                   {/if}
                   {#if member.path == null}
