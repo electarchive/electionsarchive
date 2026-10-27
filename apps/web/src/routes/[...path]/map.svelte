@@ -700,8 +700,8 @@
     return Math.min(2, Math.max(0.8, (wide / Math.max(tall, 0.0001)) * 1.04));
   });
   let isKeyed = $state(false);
-  const leads = $derived(
-    Map.groupBy(
+  const leads = $derived.by(() => {
+    const counted = Map.groupBy(
       places.rows.filter((row) => row.leader != null),
       (row) => row.leader ?? 0,
     )
@@ -711,8 +711,19 @@
           [index, won.filter((row) => row.isCounted !== false).length] as const,
       )
       .toArray()
-      .toSorted((a, b) => b[1] - a[1]),
-  );
+      .toSorted((a, b) => b[1] - a[1]);
+    const listed = new Set(counted.map(([index]) => index));
+    return [
+      ...counted,
+      ...new Set(
+        places.rows.flatMap((row) =>
+          row.also == null || listed.has(row.also) ? [] : [row.also],
+        ),
+      )
+        .values()
+        .map((index) => [index, 0] as const),
+    ];
+  });
   const options = $derived(
     places.legend
       .map((item, index) => ({ index, name: names[index] ?? item.label }))
@@ -975,14 +986,15 @@
         }
         continue;
       }
-      const dimmed =
-        only != null && typeof only === "number" && only !== row.leader;
+      const shown =
+        typeof only === "number" && only === row.also ? only : row.leader;
+      const dimmed = only != null && typeof only === "number" && only !== shown;
       let strength = dimmed
         ? 10
         : isDeclared || row.valid === 0 || !isShaded
           ? 100
           : (LEANS[bin(row.margin)] ?? 100);
-      let tone = colors[row.leader] ?? "var(--muted-foreground)";
+      let tone = colors[shown] ?? "var(--muted-foreground)";
       const [red = 0, green = 0, blue = 0] = (
         /\d+, \d+, \d+/u.exec(read(tone))?.[0] ?? ""
       )

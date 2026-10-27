@@ -46,11 +46,24 @@ const SAFE = [
 
 export const WITHIN = Symbol("within");
 
+export function independent(rank: number) {
+  return (
+    [NEUTRALS[1], NEUTRALS[0], NEUTRALS[2]][rank % NEUTRALS.length] ??
+    "var(--muted-foreground)"
+  );
+}
+
 export function swatch(color: string | null | undefined, key: string) {
   const chosen =
     (key.startsWith("party:") ? palette.overrides[key.slice(6)] : undefined) ??
     color ??
     SIDES.get(key);
+  if (key === "independent" && chosen == null) {
+    return independent(0);
+  }
+  if (chosen != null && NEUTRALS.includes(chosen)) {
+    return chosen;
+  }
   if (chosen != null) {
     let base = chosen;
     const shade =

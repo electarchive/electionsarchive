@@ -62,7 +62,10 @@ const h = (
 ): Node => ({ type, props: { style, children } });
 
 const tint = (bar: Bar, index: number) =>
-  bar.color ?? ANSWERS[bar.key] ?? NEUTRALS[index % NEUTRALS.length] ?? MUTED;
+  (bar.color?.startsWith("#") === true ? bar.color : null) ??
+  ANSWERS[bar.key] ??
+  NEUTRALS[index % NEUTRALS.length] ??
+  MUTED;
 
 async function card(segments: Array<string>, search: URLSearchParams) {
   const [head = "", ...rest] = segments;

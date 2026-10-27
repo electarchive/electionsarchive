@@ -21,6 +21,7 @@ import { m } from "#lib/paraglide/messages.js";
 import { os, remember } from "#lib/server/cache.js";
 import { db } from "#lib/server/db/index.js";
 import { plane, spot } from "#lib/server/plane.js";
+import { independent } from "#lib/party.js";
 
 const stored = (tiles: string | null | undefined) =>
   tiles != null &&
@@ -1421,10 +1422,35 @@ async function load(
   );
   const lean = new Map(positions.rows.map((row) => [row.party_id, row.lean]));
   const top = Math.max(0, ...tallies.values());
+  const rootOf = new Map(picked.rows.map((row) => [row.contest, row.root]));
+  const partisan = new Set(
+    options.rows.flatMap((row) =>
+      stand(row) == null ? [] : [rootOf.get(row.contest) ?? row.contest],
+    ),
+  );
+  for (const group of Map.groupBy(
+    options.rows.filter(
+      (row) =>
+        row.independent &&
+        row.person != null &&
+        stand(row) == null &&
+        partisan.has(rootOf.get(row.contest) ?? row.contest),
+    ),
+    (row) => rootOf.get(row.contest) ?? row.contest,
+  ).values()) {
+    const order = new Set(
+      group
+        .toSorted((a, b) => (tallies.get(b.k) ?? 0) - (tallies.get(a.k) ?? 0))
+        .map((row) => row.person ?? ""),
+    );
+    for (const [rank, person] of [...order].entries()) {
+      color.set(person, independent(rank));
+    }
+  }
   const independents = options.rows
     .filter(
       (row) =>
-        !color.has(stand(row) ?? "") &&
+        !color.has(stand(row) ?? row.person ?? "") &&
         row.person != null &&
         (tallies.get(row.k) ?? 0) >= top * 0.05,
     )
@@ -1442,7 +1468,6 @@ async function load(
       return [row.k, id == null ? row.person : (branch.get(id) ?? id)] as const;
     }),
   );
-  const rootOf = new Map(picked.rows.map((row) => [row.contest, row.root]));
   const tinted = new Map<
     number,
     { party: string; rank: number; own: string | null }
@@ -1621,6 +1646,7 @@ type Holder = {
   k: number;
   kind: string;
   party: string | null;
+  isIndependent: boolean;
   seats: number;
   people: Array<{
     person: string;
@@ -1766,6 +1792,7 @@ function assign(
     const key = [
       option.party == null ? null : `party:${root(option.party)}`,
       option.people.length === 1 ? `person:${option.people[0]?.person}` : null,
+      option.party == null && option.isIndependent ? "independent" : null,
       option.party == null && loose.length === 1 ? loose[0] : null,
     ].find((entry) => entry != null && keys.has(entry));
     if (key != null) {
@@ -1832,6 +1859,7 @@ async function holders(
     k: number;
     kind: string;
     party: string | null;
+    isIndependent: boolean;
     seats: number;
     person: string | null;
     position: number | null;
@@ -1840,6 +1868,9 @@ async function holders(
   }>(sql`
     select c.id as contest, c.district_area_id as area, s.path, o.k, o.kind::text as kind,
       coalesce(pm.into_id, lp.party) as party, coalesce(x.seats, 1) as seats,
+      exists (
+        select from candidacy cy where cy.option_id = o.id and cy.role = 'head' and cy.is_independent
+      ) as "isIndependent",
       coalesce(m.into_id, y.person_id) as person, y.list_position as position,
       coalesce(y.seated, false) as "isSeated", coalesce(y.elected, false) as "isElected"
     from contest c
@@ -6199,6 +6230,14 @@ export const contests = {
               valid: number;
               margin: number | null;
               independent: boolean;
+              next: {
+                party: string | null;
+                option: number;
+                person: string | null;
+                label: string | null;
+                color: string | null;
+                independent: boolean;
+              } | null;
             }>(sql`
               with me as (
                 select c.*, a.scheme_code as scheme, e.date_from as day,
@@ -6231,7 +6270,19 @@ export const contests = {
                 ${paint(sql`w.party`, sql`${contest.election}::uuid`, sql`p.day`)} as color,
                 coalesce(w.valid, 0)::float8 as valid,
                 case when w.valid > 0 and not p.stv then ((w.first - w.second) / w.valid)::float8 end as margin,
-                coalesce(w.independent, false) as independent
+                coalesce(w.independent, false) as independent,
+                (
+                  select json_build_object(
+                    'party', coalesce(nm.into_id, n.party_id), 'option', n.k, 'label', n.ballot_label,
+                    'person', (select coalesce(m.into_id, ca.person_id) from candidacy ca
+                      left join entity_merge m on m.entity_id = ca.person_id
+                      where ca.option_id = n.id and ca.role = 'head' limit 1),
+                    'color', ${paint(sql`coalesce(nm.into_id, n.party_id)`, sql`${contest.election}::uuid`, sql`p.day`)},
+                    'independent', exists (select from candidacy cy where cy.option_id = n.id and cy.role = 'head' and cy.is_independent)
+                  )
+                  from contest_option n left join entity_merge nm on nm.entity_id = n.party_id
+                  where n.k = w.next
+                ) as next
               from peers p
               join scheme sc on sc.code = p.scheme
               left join lateral (
@@ -6240,7 +6291,7 @@ export const contests = {
                     left join entity_merge m on m.entity_id = ca.person_id
                     where ca.option_id = o.id and ca.role = 'head' limit 1) as person,
                   exists (select from candidacy cy where cy.option_id = o.id and cy.role = 'head' and cy.is_independent) as independent,
-                  t.first, t.second, t.valid
+                  t.first, t.second, t.valid, t.next
                 from (
                   select rs.k, rs.id from result_set rs where rs.contest_id = p.id and ${latest("rs")} limit 1
                 ) rs
@@ -6249,9 +6300,15 @@ export const contests = {
                     case when count(*) filter (where r.elected) > 1 then min(r.value) filter (where r.elected) else max(r.value) end as first,
                     case when count(*) filter (where r.elected) > 1 then coalesce(max(r.value) filter (where not r.elected), 0)
                       else coalesce((array_agg(r.value order by r.value desc))[2], 0) end as second,
-                    sum(r.value) as valid
+                    sum(r.value) as valid,
+                    (array_agg(r.option_k order by r.seats desc, case when r.filled > 1 then r.total else r.value end desc, r.value desc)
+                      filter (where r.elected and r.grp <> r.lead))[1] as next
                   from (
-                    select r.option_k, r.value, r.elected, count(*) filter (where r.elected) over (partition by r.grp) as seats,
+                    select r.*, first_value(r.grp) over (
+                      order by r.seats desc, case when r.filled > 1 then r.total else r.value end desc, r.value desc
+                    ) as lead
+                  from (
+                    select r.option_k, r.value, r.elected, r.grp, count(*) filter (where r.elected) over (partition by r.grp) as seats,
                       count(*) filter (where r.elected) over () as filled, sum(r.value) over (partition by r.grp) as total
                     from (
                       select r.option_k, r.value,
@@ -6278,6 +6335,7 @@ export const contests = {
                         ) end
                     ) r
                   ) r
+                  ) r
                 ) t
                 join contest_option o on o.k = t.top
                 left join entity_merge pm on pm.entity_id = o.party_id
@@ -6288,11 +6346,15 @@ export const contests = {
             }
             const [labels, slugs] = await Promise.all([
               names(
-                found.rows.flatMap((row) => [
-                  row.area,
-                  ...(row.party == null ? [] : [row.party]),
-                  ...(row.person == null ? [] : [row.person]),
-                ]),
+                found.rows.flatMap((row) =>
+                  [
+                    row.area,
+                    row.party,
+                    row.person,
+                    row.next?.party,
+                    row.next?.person,
+                  ].filter((id) => id != null),
+                ),
                 contest.date,
               ),
               paths([
@@ -6316,7 +6378,12 @@ export const contests = {
         const isPersonal =
           new Set(found.rows.map((row) => row.party)).size <= 1 &&
           found.rows.some((row) => row.person != null);
-        const keyed = (row: (typeof found.rows)[number]) =>
+        const keyed = (row: {
+          party: string | null;
+          person: string | null;
+          option: number | null;
+          independent: boolean;
+        }) =>
           !isPersonal && row.party == null && row.independent
             ? "independent"
             : (isPersonal || row.party == null) && row.person != null
@@ -6326,7 +6393,12 @@ export const contests = {
                 : `party:${row.party}`;
         const own = found.rows.find((row) => row.id === contest.root);
         const legend = Map.groupBy(
-          found.rows.filter((row) => row.option != null),
+          [
+            ...found.rows.filter((row) => row.option != null),
+            ...found.rows.flatMap((row) =>
+              row.next == null ? [] : [row.next],
+            ),
+          ],
           keyed,
         )
           .entries()
@@ -6387,6 +6459,8 @@ export const contests = {
             valid: row.valid,
             shares: [],
             leader: row.option == null ? null : (index.get(keyed(row)) ?? null),
+            also:
+              row.next == null ? null : (index.get(keyed(row.next)) ?? null),
             margin: row.margin,
             earlier: null,
             prior: null,
