@@ -4,12 +4,18 @@ from ea.changeset import Changeset
 from ea.store import connect
 
 SOURCE = "stray_names"
-VERSION = "2"
+VERSION = "3"
 FUSION = "a fusion ballot line, kept on the option's ballot label; merging the label into the party carried it over"
 DROPS = [
     ("us", "Republican Party", "Republican/Democratic", FUSION),
     ("us", "Republican Party", "Democratic and Republican", FUSION),
     ("us", "Republican Party", "Republican (Write-In)", FUSION),
+]
+PERSON_NAMES = [
+    ("5454d003-f584-5e5c-8fcb-a356a9b69faa", "Cellucci", "a short name derived from the wrong surname before the person's names were repaired"),
+    ("3e625f6e-1b10-517f-a021-9386a01635fa", "Marshall J.P./.", "a stray slash and period from the source's name field, kept beside the repaired name"),
+    ("ae09ec56-1de6-5c5b-8bb6-4c87a5ebd43b", "Margaret Sandra (<i>no surname</i>)", "the source's markup note kept as part of the name, beside the repaired name"),
+    ("c121ae31-3594-5b7b-8e3d-00c50773f615", "W/I", "the write-in ballot label derived as a short name"),
 ]
 PEOPLE = [
     (
@@ -43,6 +49,12 @@ def emit() -> Path:
             for name, entity in found:
                 cs.add("name_drop", name_id=name, entity_id=entity, text=text, reason=reason)
                 print(f"{root} {preferred}: {text}")
+        for entity, text, reason in PERSON_NAMES:
+            for (name,) in conn.execute(
+                "select id from name where entity_id = %s and text = %s and not is_preferred", [entity, text]
+            ).fetchall():
+                cs.add("name_drop", name_id=name, entity_id=entity, text=text, reason=reason)
+                print(f"person {entity}: {text}")
         for scheme, pattern, reason in PEOPLE:
             for name, entity, text in conn.execute(
                 """select distinct d.id, d.entity_id, d.text from name d
