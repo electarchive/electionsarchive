@@ -2264,6 +2264,7 @@ function electionMarkdown(
         filled += row.seats ?? 0;
       }
       const hasSeats = filled > 1;
+      const isTally = election.isIndirect || race.measure === "electoral_votes";
       const hasParty = race.results.some(
         (row) =>
           row.person != null &&
@@ -2456,7 +2457,7 @@ function electionMarkdown(
                     : m.col_option(),
                   ...(hasParty ? [m.col_party()] : []),
                   m.col_votes(),
-                  m.col_share(),
+                  ...(isTally ? [] : [m.col_share()]),
                   ...(hasSeats ? [seats] : []),
                   ...(isChanged ? [m.col_change()] : []),
                   ...(hasResult ? [m.col_result()] : []),
@@ -2482,9 +2483,13 @@ function electionMarkdown(
                   row.votes === 0 && (row.seats ?? 0) > 0
                     ? null
                     : count(row.votes),
-                  row.votes === 0 && (row.seats ?? 0) > 0
-                    ? null
-                    : percent(row.share),
+                  ...(isTally
+                    ? []
+                    : [
+                        row.votes === 0 && (row.seats ?? 0) > 0
+                          ? null
+                          : percent(row.share),
+                      ]),
                   ...(hasSeats
                     ? [row.seats == null ? null : count(row.seats)]
                     : []),
@@ -3644,6 +3649,7 @@ function contestMarkdown(
       ["votes", "list_votes"].includes(contest.current?.measure ?? "")
         ? (contest.current?.valid ?? null)
         : null,
+      contest.current?.isTally === true,
     ),
     ...(contest.children.length === 0
       ? []
@@ -3982,6 +3988,7 @@ function resultsMarkdown(
       })
       .map((row) => row.key),
   );
+  const isTally = contest.current?.isTally === true;
   const hasOutcome =
     !hasElectors &&
     (overall.size > 0 ||
@@ -4014,17 +4021,28 @@ function resultsMarkdown(
           ]
         : []),
       ...(current == null || (current.votes === 0 && (current.seats ?? 0) > 0)
-        ? [null, null]
-        : [count(current.votes), percent(current.share)]),
+        ? isTally
+          ? [null]
+          : [null, null]
+        : isTally
+          ? [count(current.votes)]
+          : [count(current.votes), percent(current.share)]),
       ...(hasSeats || hasElectors
         ? [current?.seats == null ? null : count(current.seats)]
         : []),
       ...(then == null
         ? []
-        : [
-            earlier && percent(earlier.share),
-            delta == null ? null : points(delta),
-          ]),
+        : isTally
+          ? [
+              earlier && count(earlier.votes),
+              current == null || earlier == null
+                ? null
+                : `${current.votes > earlier.votes ? "+" : current.votes < earlier.votes ? "−" : "±"}${count(Math.abs(current.votes - earlier.votes))}`,
+            ]
+          : [
+              earlier && percent(earlier.share),
+              delta == null ? null : points(delta),
+            ]),
       ...(hasOutcome
         ? [
             [
@@ -4089,7 +4107,7 @@ function resultsMarkdown(
           (contest.isStv && contest.count == null)
             ? m.stv_first()
             : m.col_votes(),
-          m.col_share(),
+          ...(isTally ? [] : [m.col_share()]),
           ...(hasSeats ? [m.col_seats()] : []),
           ...(hasElectors
             ? [
@@ -4100,7 +4118,10 @@ function resultsMarkdown(
             : []),
           ...(then == null
             ? []
-            : [m.col_share_in({ year: then }), m.col_change()]),
+            : [
+                isTally ? then : m.col_share_in({ year: then }),
+                m.col_change(),
+              ]),
           ...(hasOutcome ? [m.col_result()] : []),
         ],
         results,
@@ -4194,6 +4215,7 @@ function placesMarkdown(
   link: Link,
   then: string | null,
   total: number | null,
+  isTally: boolean,
 ) {
   if (
     places == null ||
@@ -4203,7 +4225,7 @@ function placesMarkdown(
     return [];
   }
   const isCompared =
-    then != null && places.rows.some((row) => row.earlier != null);
+    !isTally && then != null && places.rows.some((row) => row.earlier != null);
   const noun =
     places.levels.find((level) => level.code === places.level)?.noun ??
     places.level;
@@ -4266,7 +4288,7 @@ function placesMarkdown(
       [
         m.col_name(),
         m.col_leader(),
-        m.col_share(),
+        isTally ? m.col_votes() : m.col_share(),
         ...(hasMargin ? [m.col_margin()] : []),
         ...(isCompared ? [m.col_share_in({ year: then }), m.col_change()] : []),
         m.stat_valid(),
@@ -4276,14 +4298,21 @@ function placesMarkdown(
           row.leader == null ? null : (row.earlier?.[row.leader] ?? null);
         return [
           link(row.name, row.path),
-          ...leading(row, places.legend),
+          ...(isTally && row.leader != null && row.valid > 0
+            ? [
+                places.legend[row.leader]?.label ?? null,
+                count(Math.round((row.shares[row.leader] ?? 0) * row.valid)),
+              ]
+            : leading(row, places.legend)),
           ...(hasMargin
             ? [
                 row.margin == null
                   ? null
                   : places.legend.length === 1
                     ? m.map_unopposed()
-                    : points(row.margin),
+                    : isTally
+                      ? `+${count(Math.round(row.margin * row.valid))}`
+                      : points(row.margin),
               ]
             : []),
           ...(isCompared

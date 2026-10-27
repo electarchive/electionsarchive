@@ -35,6 +35,7 @@
 
   let {
     places,
+    isTally = false,
     colors,
     tiles,
     own,
@@ -61,6 +62,7 @@
     hexes = null,
   }: {
     places: Places;
+    isTally?: boolean;
     colors: Array<string>;
     tiles: string;
     own: { tiles: string; k: number } | null;
@@ -649,7 +651,11 @@
   const view = $derived(
     (!isCompared && typeof shading === "string" && COMPARED.has(shading)) ||
       (shading === "turnout" && turnouts.size === 0) ||
-      (shading === "turnout_change" && surges.size === 0)
+      (shading === "turnout_change" && surges.size === 0) ||
+      (isTally &&
+        (typeof shading === "number" ||
+          shading === "swing" ||
+          shading === "arrows"))
       ? "winner"
       : shading,
   );
@@ -725,7 +731,7 @@
     ];
   });
   const options = $derived(
-    places.legend
+    (isTally ? [] : places.legend)
       .map((item, index) => ({ index, name: names[index] ?? item.label }))
       .slice(0, Math.min(3, places.legend.length))
       .filter((option) =>
@@ -1581,7 +1587,7 @@
           </Select.Content>
         </Select.Root>
         <div class="-my-1 flex flex-wrap gap-2 py-1 min-inline-0 max-sm:hidden">
-          {#each [[{ value: "winner" as const, label: m.map_mode_winner() }, ...options.map( (option) => ({ value: option.index, label: option.name }) ), { value: "bubbles" as const, label: m.map_mode_bubbles() }, ...(turnouts.size > 0 ? [{ value: "turnout" as const, label: m.map_mode_turnout() }] : [])], isCompared ? [{ value: "swing" as const, label: m.map_mode_swing() }, { value: "arrows" as const, label: m.map_mode_arrows() }, { value: "flips" as const, label: m.map_mode_flips() }, ...(surges.size > 0 ? [{ value: "turnout_change" as const, label: m.map_mode_turnout_change() }] : [])] : []] as group, at (at)}
+          {#each [[{ value: "winner" as const, label: m.map_mode_winner() }, ...options.map( (option) => ({ value: option.index, label: option.name }) ), { value: "bubbles" as const, label: m.map_mode_bubbles() }, ...(turnouts.size > 0 ? [{ value: "turnout" as const, label: m.map_mode_turnout() }] : [])], isCompared ? [...(isTally ? [] : [{ value: "swing" as const, label: m.map_mode_swing() }, { value: "arrows" as const, label: m.map_mode_arrows() }]), { value: "flips" as const, label: m.map_mode_flips() }, ...(surges.size > 0 ? [{ value: "turnout_change" as const, label: m.map_mode_turnout_change() }] : [])] : []] as group, at (at)}
             {#if group.length > 0}
               <div class="flex shrink-0">
                 {#each group as choice (choice.value)}
@@ -2349,7 +2355,7 @@
         <span class="text-muted-foreground"
           >{m.map_bubbles_key({ votes: votes.toLowerCase() })}</span
         >
-      {:else if places.rows.some((row) => row.margin != null)}
+      {:else if !isTally && places.rows.some((row) => row.margin != null)}
         <div class="flex items-center gap-2.5">
           <span
             class={cn(
@@ -2620,9 +2626,12 @@
           >{m.map_unopposed()}</span
         >
       {:else if current.margin != null}
+        {const lead = $derived(Math.round(current.margin * current.valid))}
         <span
           class="shrink-0 font-figures text-xs text-muted-foreground tabular-nums"
-          >{points(current.margin)}</span
+          >{isTally
+            ? `${lead > 0 ? "+" : ""}${count(lead)}`
+            : points(current.margin)}</span
         >
       {/if}
     </span>
@@ -2641,7 +2650,7 @@
           <span
             class="flex items-baseline gap-2 font-figures text-xs tabular-nums"
           >
-            {#if moved != null}
+            {#if moved != null && !isTally}
               <span class="text-muted-foreground"
                 >{points(
                   (moved.after[entry.index] ?? 0) -
@@ -2649,7 +2658,9 @@
                 )}</span
               >
             {/if}
-            {percent(entry.share, precision(current.margin))}</span
+            {isTally
+              ? count(Math.round(entry.share * current.valid))
+              : percent(entry.share, precision(current.margin))}</span
           >
           <span class="col-span-2 rounded-xs bg-muted block-1.5">
             <span

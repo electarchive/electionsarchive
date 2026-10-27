@@ -30,6 +30,7 @@
     place = null,
     overall = null,
     nouns = null,
+    isTally = false,
   }: {
     rows: Extract<PageData, { kind: "contest" }>["contest"]["rows"];
     span: {
@@ -43,6 +44,7 @@
     trace?: string | null;
     place?: string | null;
     nouns?: string | null;
+    isTally?: boolean;
     overall?: {
       place: string;
       winners: Array<{
@@ -426,16 +428,16 @@
           { "max-sm:hidden": span != null },
         )}>{count(sum.votes)}</td
       >
-      {#if span == null}
+      {#if span == null && !isTally}
         <td
           class="px-2 py-1.5 text-end font-figures text-[0.8125rem] whitespace-nowrap text-muted-foreground tabular-nums"
           >{percent(sum.current)}</td
         >
-      {:else}
+      {:else if span != null}
         {#each [sum.before, sum.after] as share, index (index)}
           <td
             class="px-2 py-1.5 text-end font-figures text-[0.8125rem] whitespace-nowrap text-muted-foreground tabular-nums"
-            >{percent(share)}</td
+            >{isTally ? "" : percent(share)}</td
           >
         {/each}
       {/if}
@@ -664,10 +666,25 @@
       )}
     >
       {#if page != null && !(page.votes === 0 && (page.seats ?? 0) > 0)}
-        {@render cite(count(page.votes), "votes", row)}
+        {#if isTally && span == null}
+          <span class="relative inline-block min-inline-12">
+            {@render cite(count(page.votes), "votes", row)}
+            <span
+              class="absolute inset-x-0 inset-bs-[calc(100%+0.25rem)] flex justify-end overflow-hidden rounded-full bg-secondary block-1"
+              aria-hidden="true"
+            >
+              <span
+                class="rounded-full bg-(--party)"
+                style:inline-size="{(page.share / topShare) * 100}%"
+              ></span>
+            </span>
+          </span>
+        {:else}
+          {@render cite(count(page.votes), "votes", row)}
+        {/if}
       {/if}
     </td>
-    {#if span == null}
+    {#if span == null && isTally}{:else if span == null}
       <td
         class="px-2 py-1.5 text-end font-figures text-[0.8125rem] whitespace-nowrap tabular-nums"
       >
@@ -697,7 +714,11 @@
             },
           )}
         >
-          {cell == null ? "–" : percent(cell.share, digits)}
+          {cell == null
+            ? "–"
+            : isTally
+              ? count(cell.votes)
+              : percent(cell.share, digits)}
         </td>
       {/each}
     {/if}
@@ -724,7 +745,7 @@
         {/if}
       </td>
     {/if}
-    {#if span != null && paired}
+    {#if span != null && paired && !isTally}
       <td class="px-2 py-1 max-md:hidden">
         {#if line.before != null || line.after != null}
           <Tooltip.Root disableCloseOnTriggerClick>
@@ -795,13 +816,15 @@
         >
           {count(fused.votes)}
         </td>
-        <td
-          class="px-2 pbe-1 text-end font-figures whitespace-nowrap tabular-nums"
-        >
-          {page.votes === 0
-            ? ""
-            : percent((fused.votes / page.votes) * page.share)}
-        </td>
+        {#if !isTally}
+          <td
+            class="px-2 pbe-1 text-end font-figures whitespace-nowrap tabular-nums"
+          >
+            {page.votes === 0
+              ? ""
+              : percent((fused.votes / page.votes) * page.share)}
+          </td>
+        {/if}
         {#if seats != null}
           <td></td>
         {/if}
@@ -833,7 +856,7 @@
           })}
           scope="col">{votes}</th
         >
-        {#if span == null}
+        {#if span == null && isTally}{:else if span == null}
           <th class="px-2 py-1.5 text-end font-medium" scope="col"
             >{m.col_share()}</th
           >
@@ -847,9 +870,10 @@
                 class={cn("px-0.5", {
                   "highlighter font-semibold text-foreground": label === here,
                 })}
-                ><span class="max-sm:sr-only"
-                  >{m.col_share_in({ year: label })}</span
-                ><span class="sm:hidden" aria-hidden="true">{label}</span></span
+                >{#if isTally}{label}{:else}<span class="max-sm:sr-only"
+                    >{m.col_share_in({ year: label })}</span
+                  ><span class="sm:hidden" aria-hidden="true">{label}</span
+                  >{/if}</span
               >
             </th>
           {/each}
@@ -864,7 +888,7 @@
             {seats}
           </th>
         {/if}
-        {#if span != null && paired}
+        {#if span != null && paired && !isTally}
           <th
             class="px-2 pbs-1.5 pbe-1 text-start align-bottom font-medium inline-[26%] max-md:hidden"
             scope="col"

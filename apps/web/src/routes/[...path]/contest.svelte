@@ -562,6 +562,7 @@
       };
     }) ?? [],
   );
+  const isTally = $derived(contest.current?.isTally === true);
   const keyed = $derived.by(() => {
     const named = (placed?.rows ?? []).filter(
       (row) => row.leader != null && row.valid > 0,
@@ -593,7 +594,14 @@
         rows: sizable
           .toSorted((a, b) => (a.margin ?? 0) - (b.margin ?? 0))
           .slice(0, 3),
-        value: (row: (typeof rows)[number]) => points(row.margin ?? 0),
+        value: (row: (typeof rows)[number]) =>
+          isTally
+            ? row.shares
+                .toSorted((x, y) => y - x)
+                .slice(0, 2)
+                .map((share) => count(Math.round(share * row.valid)))
+                .join("–")
+            : points(row.margin ?? 0),
       },
       largest,
       ...[0, 1]
@@ -601,10 +609,17 @@
         .map((index) => ({
           label: m.key_strongest({ name: titles[index] ?? "" }),
           rows: sizable
-            .toSorted((a, b) => (b.shares[index] ?? 0) - (a.shares[index] ?? 0))
+            .toSorted((a, b) =>
+              isTally
+                ? (b.shares[index] ?? 0) * b.valid -
+                  (a.shares[index] ?? 0) * a.valid
+                : (b.shares[index] ?? 0) - (a.shares[index] ?? 0),
+            )
             .slice(0, 1),
           value: (row: (typeof rows)[number]) =>
-            percent(row.shares[index] ?? 0),
+            isTally
+              ? count(Math.round((row.shares[index] ?? 0) * row.valid))
+              : percent(row.shares[index] ?? 0),
         })),
     ];
   });
@@ -1519,6 +1534,7 @@
           names={titles}
           {levels}
           {span}
+          {isTally}
           isLinked
           bind:only={
             () => only,
@@ -1871,6 +1887,7 @@
         ?.value ?? null}
       places={placed}
       picked={only}
+      {isTally}
       onpick={(value: string | null) => {
         filter = { at: page.url.href, value };
         if (value != null) {
@@ -1990,6 +2007,7 @@
       {publishers}
       isMapped={drawn != null}
       deeper={contest.deeper ?? null}
+      {isTally}
       total={["votes", "list_votes"].includes(contest.current?.measure ?? "")
         ? (contest.current?.valid ?? null)
         : null}
@@ -2315,14 +2333,16 @@
           <dt class="text-[0.8125rem] text-muted-foreground">
             <Term
               label={m.col_margin()}
-              definition={members == null
-                ? m.term_margin()
-                : m.term_margin_last()}
+              definition={isTally
+                ? m.term_margin_tally()
+                : members == null
+                  ? m.term_margin()
+                  : m.term_margin_last()}
             />
           </dt>
           <dd class="flex items-baseline gap-2 min-inline-0">
             <span class="font-figures text-xl font-[760] tracking-[-0.015em]"
-              >{points(lead.margin)}</span
+              >{isTally ? `+${count(lead.votes)}` : points(lead.margin)}</span
             >
             <Name
               class="truncate text-sm font-semibold min-inline-0"
@@ -2331,7 +2351,7 @@
               person={lead.row.current?.person}
               party={lead.row.current?.party}
             />
-            {#if lead.votes > 0}
+            {#if lead.votes > 0 && !isTally}
               <span
                 class="shrink-0 font-figures text-[0.8125rem] text-muted-foreground tabular-nums"
                 >{m.atlas_votes({ votes: count(lead.votes) })}</span
@@ -2494,6 +2514,7 @@
       overall={contest.overall}
       {span}
       votes={counted ?? m.col_votes()}
+      {isTally}
       seats={seated ? (SEATS[contest.kind]?.() ?? m.col_seats()) : null}
     />
     {#if captions.length > 0}

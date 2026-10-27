@@ -28,6 +28,7 @@
     limit = 10,
     trace = null,
     total = null,
+    isTally = false,
     only = $bindable(null),
     focus = $bindable(null),
   }: {
@@ -47,6 +48,7 @@
     limit?: number;
     trace?: string | null;
     total?: number | null;
+    isTally?: boolean;
     only?: number | string | null;
     focus?: number | null;
   } = $props();
@@ -294,7 +296,7 @@
                   key: "margin" as const,
                   label: m.col_margin(),
                   numeric: true,
-                  definition: m.term_margin(),
+                  definition: isTally ? m.term_margin_tally() : m.term_margin(),
                 },
               ]),
         ]),
@@ -383,7 +385,10 @@
     >
       <span class="font-semibold">{row.name}</span>
       <span
-        class="grid grid-cols-[minmax(0,1fr)_auto_auto] items-baseline gap-x-3 gap-y-0.5 text-xs"
+        class={cn("grid items-baseline gap-x-3 gap-y-0.5 text-xs", {
+          "grid-cols-[minmax(0,1fr)_auto]": isTally,
+          "grid-cols-[minmax(0,1fr)_auto_auto]": !isTally,
+        })}
       >
         {#each ranked.slice(0, 8) as entry (entry.index)}
           <span class="flex items-baseline gap-1.5 min-inline-0">
@@ -397,14 +402,19 @@
               })}>{titles[entry.index]}</span
             >
           </span>
-          <span class="text-end font-figures tabular-nums opacity-70"
+          <span
+            class={cn("text-end font-figures tabular-nums", {
+              "opacity-70": !isTally,
+            })}
             >{row.valid > 0
               ? count(Math.round(entry.share * row.valid))
               : ""}</span
           >
-          <span class="text-end font-figures tabular-nums"
-            >{percent(entry.share)}</span
-          >
+          {#if !isTally}
+            <span class="text-end font-figures tabular-nums"
+              >{percent(entry.share)}</span
+            >
+          {/if}
         {/each}
       </span>
       {#if ranked.length > 8}
@@ -417,7 +427,10 @@
       {:else if row.margin != null}
         <span class="text-xs opacity-80"
           >{m.col_margin()}
-          <span class="font-figures tabular-nums">{points(row.margin)}</span
+          <span class="font-figures tabular-nums"
+            >{isTally
+              ? `+${count(Math.round(row.margin * row.valid))}`
+              : points(row.margin)}</span
           ></span
         >
       {/if}
@@ -909,6 +922,8 @@
                       class="font-figures text-[0.8125rem] text-muted-foreground tabular-nums"
                       >{#if row.valid === 0}{@render status(
                           row,
+                        )}{:else if isTally}{count(
+                          Math.round((row.shares[row.leader] ?? 0) * row.valid),
                         )}{:else}{@render cite(
                           percent(row.shares[row.leader] ?? 0),
                           "share",
@@ -954,6 +969,8 @@
                   <span class="font-sans text-muted-foreground"
                     >{m.map_unopposed()}</span
                   >
+                {:else if row.margin != null && isTally}
+                  {`+${count(Math.round(row.margin * row.valid))}`}
                 {:else if row.margin != null}
                   {@render cite(
                     points(row.margin),

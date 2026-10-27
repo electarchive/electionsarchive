@@ -115,10 +115,7 @@ export function verdict(contest: Page["contest"]) {
         total += row.votes;
       }
     }
-    const popular = contest.rows.find(
-      (row) =>
-        row.current?.person != null && row.current.person === elector.person,
-    );
+    const popular = elector.popular;
     return second?.votes === elector.votes
       ? m.race_lede_electors_tied({
           party: definite(elector.label, true),
@@ -126,7 +123,7 @@ export function verdict(contest: Page["contest"]) {
           seats: count(elector.votes),
           total: count(total),
         })
-      : popular?.current == null
+      : popular == null
         ? m.race_lede_electors_only({
             party: definite(elector.label, true),
             seats: count(elector.votes),
@@ -137,15 +134,13 @@ export function verdict(contest: Page["contest"]) {
             seats: count(elector.votes),
             total: count(total),
             share: percent(
-              popular.current.share,
+              popular,
               precision(
-                popular.current.share -
+                popular -
                   Math.max(
                     0,
-                    ...contest.rows.flatMap((row) =>
-                      row === popular || row.key.startsWith("kind:")
-                        ? []
-                        : [row.current?.share ?? 0],
+                    ...(contest.electors?.rows ?? []).flatMap((row) =>
+                      row === elector ? [] : [row.popular ?? 0],
                     ),
                   ),
               ),

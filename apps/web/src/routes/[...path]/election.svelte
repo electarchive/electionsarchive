@@ -905,6 +905,7 @@
             ? (MEASURES[race.measure]?.() ?? m.col_votes())
             : m.col_votes_first(),
         isSlate: race.kind === "elector_slate",
+        isTally: election.isIndirect || race.measure === "electoral_votes",
         seated: (seated.length === 0 &&
         race.kind === "body_seats" &&
         race.body != null &&
@@ -1468,6 +1469,7 @@
               isApproximate={shape.isApproximate}
               sources={shape.credits}
               noun={places.levels[0]?.noun ?? ""}
+              isTally={race.isTally}
               tallies={race.electors == null ||
               region != null ||
               places.level !== race.places.level
@@ -1546,6 +1548,7 @@
           trace={race.count === 1 ? race.path : null}
           span={null}
           votes={race.votes}
+          isTally={race.isTally}
           nouns={plural(race.places?.levels[0]?.noun ?? "contest")}
           seats={race.isLone || (race.isOffice && race.electors == null)
             ? null
@@ -1673,6 +1676,7 @@
         trace={race.count === 1 ? race.path : null}
         publishers={[]}
         votes={shown === race.decided?.places ? m.col_votes() : race.votes}
+        isTally={race.isTally}
         {isMapped}
         limit={isBallot ? 5 : 10}
       />

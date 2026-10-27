@@ -3940,8 +3940,15 @@ async function mosaic(input: { id: string; vs?: string; group: Grouping }) {
   };
 }
 
-async function lean(input: { id: string; unit: string }) {
+async function lean(input: {
+  id: string;
+  unit: string;
+  group?: "option" | "alliance";
+}) {
   const contest = await find(input.id);
+  if (contest.indirect) {
+    throw new ORPCError("NOT_FOUND");
+  }
   const chain = await descend(contest, input.unit);
   const place = chain.at(-1);
   if (place == null) {
@@ -4612,6 +4619,7 @@ export const contests = {
             complete: v.boolean(),
             sets: v.array(ResultSet),
             isAllied: v.boolean(),
+            isTally: v.boolean(),
           }),
         ),
         electors: v.nullable(
@@ -4626,6 +4634,7 @@ export const contests = {
                 party: v.nullable(v.string()),
                 lean: v.nullable(v.number()),
                 votes: v.number(),
+                popular: v.nullable(v.number()),
               }),
             ),
             appointed: v.nullable(v.number()),
@@ -6307,14 +6316,14 @@ export const contests = {
               ? { ...found, isOpening: true }
               : found,
           ),
-          counterpart?.indirect === true
-            ? load(
+          counterpart == null
+            ? null
+            : load(
                 [counterpart.id],
                 [area.k],
                 counterpart.date ?? "infinity",
                 [],
-              )
-            : null,
+              ),
           chamber(contest, area, loading, lineage, isRoot),
           db.execute<{ from: string; to: string }>(
             sisters([contest.root], contest.date ?? "infinity"),
@@ -6796,6 +6805,18 @@ export const contests = {
         current.side.options.toSorted((a, b) => b.votes - a.votes),
         (option) => option.person ?? "",
       );
+      const popular = new Map<string, number>();
+      const voted = [current, cast?.get(area.k)].find(
+        (entry) => entry?.measure === "votes" && entry.side.valid > 0,
+      );
+      for (const option of voted?.side.options ?? []) {
+        if (voted != null && option.person != null) {
+          popular.set(
+            option.person,
+            (popular.get(option.person) ?? 0) + option.votes / voted.side.valid,
+          );
+        }
+      }
       const electors = (
         ballots == null
           ? rows.map((row) => ({
@@ -6830,6 +6851,7 @@ export const contests = {
           party: row.party,
           lean: row.lean,
           votes: row.votes,
+          popular: popular.get(row.current?.person ?? "") ?? null,
         }))
         .toSorted((a, b) => b.votes - a.votes);
       const electoral = new Map(
@@ -6966,6 +6988,7 @@ export const contests = {
           isAllied: current.side.options.some(
             (option) => option.alliance != null && option.votes > 0,
           ),
+          isTally: contest.indirect || current.measure === "electoral_votes",
         },
         electors:
           electors.length === 0
@@ -10821,6 +10844,7 @@ export const elections = {
         name: v.string(),
         date: v.nullable(v.string()),
         status: v.string(),
+        isIndirect: v.boolean(),
         breadcrumbs: v.array(Link),
         parent: v.nullable(Link),
         notes: v.array(v.object({ kind: v.string(), body: v.string() })),
@@ -11102,8 +11126,10 @@ export const elections = {
         parent: string | null;
         date: string | null;
         status: string;
+        isIndirect: boolean;
       }>(sql`
-        select polity_id as polity, parent_id as parent, date_from::text as date, status::text as status
+        select polity_id as polity, parent_id as parent, date_from::text as date, status::text as status,
+          kind = 'indirect' as "isIndirect"
         from election where id = ${input.id}::uuid
       `);
       const election = found.rows[0];
@@ -11669,6 +11695,7 @@ export const elections = {
               }),
         date: election.date,
         status: election.status,
+        isIndirect: election.isIndirect,
         breadcrumbs: crumbs,
         parent:
           within != null

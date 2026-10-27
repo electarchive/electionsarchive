@@ -18,6 +18,7 @@
     places,
     picked,
     onpick,
+    isTally = false,
   }: {
     rows: Extract<PageData, { kind: "contest" }>["contest"]["rows"];
     span: { from: string; to: string; forward: boolean; race: string | null };
@@ -27,6 +28,7 @@
     places: Extract<PageData, { kind: "contest" }>["contest"]["places"];
     picked: number | string | null;
     onpick: (value: string | null) => void;
+    isTally?: boolean;
   } = $props();
 
   const cells = $derived(
@@ -62,6 +64,7 @@
               party: top[side]?.party ?? top.party,
             },
             margin: (top[side]?.share ?? 0) - (next?.[side]?.share ?? 0),
+            votes: (top[side]?.votes ?? 0) - (next?.[side]?.votes ?? 0),
           };
     }),
   );
@@ -73,21 +76,29 @@
     const margins = {
       from: span.from,
       to: span.to,
-      first: points(first.margin).replace("+", ""),
-      second: points(second.margin).replace("+", ""),
+      first: isTally
+        ? count(first.votes)
+        : points(first.margin).replace("+", ""),
+      second: isTally
+        ? count(second.votes)
+        : points(second.margin).replace("+", ""),
     };
     const same = first.name === second.name;
+    const changed = {
+      from: span.from,
+      to: span.to,
+      first: "\u00010\u0001",
+      second: "\u00011\u0001",
+      firstMargin: margins.first,
+      secondMargin: margins.second,
+    };
     const text =
       first.key === second.key
-        ? m.lede_same({ ...margins, name: "\u00010\u0001" })
-        : m.lede_changed({
-            from: span.from,
-            to: span.to,
-            first: "\u00010\u0001",
-            second: "\u00011\u0001",
-            firstMargin: margins.first,
-            secondMargin: margins.second,
-          });
+        ? (isTally ? m.lede_same_tally : m.lede_same)({
+            ...margins,
+            name: "\u00010\u0001",
+          })
+        : (isTally ? m.lede_changed_tally : m.lede_changed)(changed);
     const names =
       first.key === second.key
         ? [
@@ -142,10 +153,11 @@
         votes: Math.abs((a[side]?.votes ?? 0) - (b[side]?.votes ?? 0)),
       };
     });
+    const measure = isTally ? "votes" : "share";
     const shift =
-      (a.after?.share ?? 0) -
-      (b.after?.share ?? 0) -
-      ((a.before?.share ?? 0) - (b.before?.share ?? 0));
+      (a.after?.[measure] ?? 0) -
+      (b.after?.[measure] ?? 0) -
+      ((a.before?.[measure] ?? 0) - (b.before?.[measure] ?? 0));
     return { sides, shift: Math.abs(shift), toward: shift >= 0 ? a : b };
   });
   const movers = $derived(
@@ -155,8 +167,14 @@
         change: (cell.after?.share ?? 0) - (cell.before?.share ?? 0),
         votes: (cell.after?.votes ?? 0) - (cell.before?.votes ?? 0),
       }))
-      .filter((cell) => Math.abs(cell.change) >= 0.0005)
-      .toSorted((a, b) => Math.abs(b.change) - Math.abs(a.change))
+      .filter((cell) =>
+        isTally ? cell.votes !== 0 : Math.abs(cell.change) >= 0.0005,
+      )
+      .toSorted((a, b) =>
+        isTally
+          ? Math.abs(b.votes) - Math.abs(a.votes)
+          : Math.abs(b.change) - Math.abs(a.change),
+      )
       .slice(0, 3),
   );
   const flips = $derived.by(() => {
@@ -289,7 +307,10 @@
         )}
       >
         <dt class="text-[0.8125rem] text-muted-foreground">
-          <Term label={m.fact_margin()} definition={m.term_margin()} />
+          <Term
+            label={m.fact_margin()}
+            definition={isTally ? m.term_margin_tally() : m.term_margin()}
+          />
         </dt>
         <dd
           class="grid grid-cols-[auto_minmax(0,1fr)_auto_auto] items-center gap-x-2.5 gap-y-1 text-sm/tight"
@@ -298,19 +319,23 @@
             {@render line(
               index === 0 ? span.from : span.to,
               side.lead,
-              points(side.gap),
-              side.votes,
+              isTally ? count(side.votes) : points(side.gap),
+              isTally ? 0 : side.votes,
             )}
           {/each}
         </dd>
         <dd class="text-[0.8125rem] text-muted-foreground">
           {const parts = $derived(
-            m
-              .fact_shift({
-                points: points(margin.shift).replace("+", ""),
-                name: "\u0001",
-              })
-              .split("\u0001"),
+            (isTally
+              ? m.fact_shift_tally({
+                  votes: count(margin.shift),
+                  name: "\u0001",
+                })
+              : m.fact_shift({
+                  points: points(margin.shift).replace("+", ""),
+                  name: "\u0001",
+                })
+            ).split("\u0001"),
           )}
           {parts[0]}<Name
             class="text-foreground"
@@ -356,18 +381,31 @@
                   ></span>
                   <span
                     class="absolute inset-y-0 rounded-xs bg-(--party)"
-                    style:inset-inline-start={mover.change >= 0 ? "50%" : null}
-                    style:inset-inline-end={mover.change < 0 ? "50%" : null}
-                    style:inline-size="{(Math.abs(mover.change) /
-                      Math.max(0.0001, Math.abs(movers[0]?.change ?? 0))) *
+                    style:inset-inline-start={(isTally
+                      ? mover.votes
+                      : mover.change) >= 0
+                      ? "50%"
+                      : null}
+                    style:inset-inline-end={(isTally
+                      ? mover.votes
+                      : mover.change) < 0
+                      ? "50%"
+                      : null}
+                    style:inline-size="{(isTally
+                      ? Math.abs(mover.votes) /
+                        Math.max(1, Math.abs(movers[0]?.votes ?? 0))
+                      : Math.abs(mover.change) /
+                        Math.max(0.0001, Math.abs(movers[0]?.change ?? 0))) *
                       50}%"
                   ></span>
                 </span>
                 <span
                   class="text-end font-figures text-[0.8125rem] tabular-nums inline-11"
-                  >{points(mover.change)}</span
+                  >{isTally
+                    ? `${mover.votes > 0 ? "+" : "−"}${count(Math.abs(mover.votes))}`
+                    : points(mover.change)}</span
                 >
-                {#if mover.before?.votes != null && mover.after?.votes != null && (mover.before.votes > 0 || mover.after.votes > 0)}
+                {#if !isTally && mover.before?.votes != null && mover.after?.votes != null && (mover.before.votes > 0 || mover.after.votes > 0)}
                   <span
                     class="text-end font-figures text-xs text-muted-foreground tabular-nums inline-16"
                     >{mover.votes === 0
