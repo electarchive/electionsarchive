@@ -97,7 +97,7 @@ def parse() -> None:
         .when(office.str.contains(r"^governor\b"))
         .then(pl.lit("governor")),
         day=pl.col("path").str.extract(r"(\d{8})__").str.to_date("%Y%m%d"),
-        statewide=pl.col("path").str.contains(r"^\d{4}/(General/)?\d{8}__[a-z]{2}__[a-z]+__(precinct|ward)\.csv$"),
+        statewide=pl.col("fips").n_unique().over("path") > 1,
     ).filter(pl.col("chamber").is_not_null()).filter(
         pl.col("statewide") | ~pl.col("statewide").any().over("state", "day", "fips", "chamber")
     ).drop("statewide").write_parquet(PARSED / f"lines_{'_'.join(sorted(STATES)).lower()}.parquet")
