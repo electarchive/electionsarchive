@@ -602,7 +602,7 @@ def _publish_table(conn: Connection, stage: Stage, table: str) -> None:
                         current=sql.SQL(", ").join(sql.SQL("p.{}").format(column) for column in filled),
                     )
                 )
-            if kind in ("contest_option", "candidacy", "contest"):
+            if kind in ("contest_option", "candidacy", "contest", "reporting_unit"):
                 conn.execute(
                     sql.SQL("delete from public.{} where id in (select entity_id from {})").format(
                         sql.Identifier(kind), staged
