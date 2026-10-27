@@ -14,7 +14,7 @@ import fastexcel
 import httpx
 import polars as pl
 
-from ea import raw, statewide_table
+from ea import raw, readiness, statewide_table
 from ea.changeset import NAMESPACE, Changeset, slug
 from ea.names import initials
 from ea.store import DATA, connect
@@ -330,6 +330,11 @@ OFFICIAL = {
             "https://sos.oregon.gov/elections/Voters-Pamphlet/Documents/VP_G26-Book18_web.pdf",
             "https://sos.oregon.gov/elections/Voters-Pamphlet/Documents/VP_G26-Book19_web.pdf",
         ],
+    ),
+    "ID": (
+        "Idaho Secretary of State",
+        "Final candidates list, November 3, 2026 general election",
+        ["https://run.voteidaho.gov/search#MF-139"],
     ),
     "AS": (
         "American Samoa Election Office",
@@ -777,6 +782,8 @@ def read(state: str, path: Path) -> list[tuple[str, int | None, str, str]]:
             if not status.startswith("Active") or write_in or "Affil Comm:" in text:
                 continue
             last, _, given = text.split("\n")[0].partition(", ")
+            if match := re.match(r"(Jr|Sr|II|III|IV)\.?, (.+)", given):
+                last, given = f"{last} {match[1]}", match[2]
             suffix = re.search(r" (Jr|Sr|II|III|IV)\.?$", last)
             if suffix:
                 last = last[: suffix.start()]
@@ -1073,6 +1080,24 @@ def read(state: str, path: Path) -> list[tuple[str, int | None, str, str]]:
                 district = int(re.sub(r"\D", "", seat)) if office == "house" else None
                 rows.append((office, district, name, line.replace(", ", "/")))
                 name = None
+        return rows
+    if state == "ID":
+        for row in fastexcel.read_excel(path).load_sheet(0, dtypes="string").to_polars().iter_rows(named=True):
+            if row["Withdrawal Date"] or row["Write-In"]:
+                continue
+            race, district, seat = row["Office"].strip(), row["District"] or "", row["Seat/Zone"] or ""
+            office = {
+                "United States Senator": "senate",
+                "United States Representative": "house",
+                "Governor": "governor",
+            }.get(
+                race,
+                ", ".join(
+                    part for part in (race, district and f"District {district}", seat and f"Seat {seat}") if part
+                ),
+            )
+            party = "Nonpartisan" if row["Party Affiliation"] == "Non-Partisan" else row["Party Affiliation"] or ""
+            rows.append((office, int(district) if office == "house" else None, row["Ballot Name"], party))
         return rows
     if state == "WV":
         for row in csv.DictReader(io.StringIO(path.read_text(encoding="utf-8-sig"))):
@@ -1428,9 +1453,13 @@ def parse() -> None:
             "office": office,
             "district": 0 if office == "house" and district is None else district,
             "name": initials(
-                re.sub(r"\bMc([a-z])", lambda match: "Mc" + match[1].upper(), re.sub(r"\s+", " ", text).strip().title())
+                re.sub(
+                    r"\bMc([a-z])",
+                    lambda match: "Mc" + match[1].upper(),
+                    re.sub(r"\s+", " ", text).strip().rstrip("*").title(),
+                )
                 if text.isupper()
-                else re.sub(r"\s+", " ", text).strip()
+                else re.sub(r"\s+", " ", text).strip().rstrip("*")
             ),
             "party": party.strip().title() if party.isupper() and len(party) > 4 else party.strip(),
             "url": url,
@@ -1532,6 +1561,59 @@ def emit() -> Path:
             if f"{state}:{chamber}" not in offices:
                 offices[f"{state}:{chamber}"] = label
                 templates.append(tuple(template))
+        chambered: dict[tuple[str, str, str], dict[str, tuple[tuple, str, str]]] = {}
+        for *template, label, path in conn.execute(
+            """select x.value, co.kind, co.office_id, co.body_id, co.district_area_id, co.seat_id,
+                      co.boundary_set_id, co.magnitude, co.term, co.electoral_system_id,
+                      co.default_result_kind, e.polity_id, n.text, s.path
+               from contest co
+               join election e on e.id = co.election_id
+               join external_id x on x.entity_id = co.id and x.scheme = 'us.contest'
+               join name n on n.entity_id = co.id and n.is_preferred
+               join slug s on s.entity_id = co.id
+               where e.date_from in ('2022-11-08', '2024-11-05') and co.party_scope_id is null
+                 and x.value ~ '^[0-9-]+:[A-Z]{2}:(house|senate|assembly|house-of-delegates|legislature):.+:g$'"""
+        ).fetchall():
+            day, state, seat = template[0].split(":", 2)
+            level = "upper" if seat.startswith(("senate:", "legislature:")) else "lower"
+            chambered.setdefault((state, level, day[:4]), {})[seat] = (tuple(template), label, path)
+        legislative: dict[str, tuple[str, str, str]] = {}
+        seats: dict[tuple[str, str, str], str] = {}
+        for part in readiness.spec(str(DAY))["levels"]:
+            if part["key"] not in ("state_upper", "state_lower"):
+                continue
+            level = part["key"].removeprefix("state_")
+            for state, want in part["states"].items():
+                recent = chambered.get((state, level, "2024"), {})
+                full = {**chambered.get((state, level, "2022"), {}), **recent}
+                picked = full
+                if sum(entry[0][7] or 1 for entry in full.values()) != want:
+                    picked = {seat: entry for seat, entry in full.items() if seat not in recent}
+                    parities = {int(re.sub(r"\D", "", seat.split(":")[1]) or 0) % 2 for seat in recent}
+                    if sum(entry[0][7] or 1 for entry in picked.values()) > want and len(parities) == 1:
+                        picked = {
+                            seat: entry
+                            for seat, entry in full.items()
+                            if int(re.sub(r"\D", "", seat.split(":")[1]) or 0) % 2 not in parities
+                        }
+                if sum(entry[0][7] or 1 for entry in picked.values()) != want:
+                    print(
+                        "legislative seats differ:",
+                        state,
+                        level,
+                        sum(entry[0][7] or 1 for entry in picked.values()),
+                        want,
+                    )
+                for seat, (template, label, path) in picked.items():
+                    key = f"{DAY}:{state}:{seat}"
+                    legislative[template[0]] = (
+                        key,
+                        re.sub(r"^\d{4}", "2026", label),
+                        re.sub(r"\d{4}-\d\d-\d\d-general", f"{DAY}-general", path),
+                    )
+                    district = re.sub(r"^[a-z-]+:|:g$", "", seat).lower().replace(":", "-")
+                    seats[(state, level, district)] = key
+                    templates.append(template)
         latest_plan = conn.execute(
             "select id from boundary_set where scheme_code = 'us.cd' order by valid_from desc limit 1"
         ).fetchone()[0]
@@ -1563,6 +1645,24 @@ def emit() -> Path:
             known = nominees.setdefault(general, {})
             known[(ballot, person)] = known.get((ballot, person)) or party_id
 
+        for value, ballot, person, party_id in conn.execute(
+            """select x.value, op.ballot_label, cy.person_id, op.party_id
+               from external_id x
+               join contest co on co.id = x.entity_id and co.body_id is not null
+               join name b on b.entity_id = co.body_id and b.is_preferred and b.text !~ 'United States'
+               join result_set rs on rs.contest_id = x.entity_id and rs.status = 'active'
+               join outcome o on o.result_set_id = rs.id and o.kind = 'won'
+               join contest_option op on op.id = o.option_id
+               join candidacy cy on cy.option_id = op.id and cy.role = 'head'
+               where x.scheme = 'us.contest'
+                 and x.value ~ '^2026-[0-9-]+:[A-Z]{2}:(house|senate|assembly|house-of-delegates|legislature):.+:(democratic|republican|minnesota-democratic-farmer-labor)$'"""
+        ):
+            _, state, seat = value.rsplit(":", 1)[0].split(":", 2)
+            general = f"{DAY}:{state}:{seat}:g"
+            if general in {entry[0] for entry in legislative.values()}:
+                known = nominees.setdefault(general, {})
+                known[(ballot, person)] = known.get((ballot, person)) or party_id
+
         listed: dict[str, list[dict[str, str | int | None]]] = {}
         for row in pl.read_parquet(PARSED / "candidates.parquet").iter_rows(named=True):
             office = re.sub(r"-(statewide|state-of-[a-z]+)$", "", slug(row["office"]))
@@ -1573,6 +1673,30 @@ def emit() -> Path:
             if row["office"] in ("house", "senate", "governor") or f"{row['state']}:{office}" in offices:
                 key = f"{DAY}:{row['state']}:{row['office'] if row['office'] in ('house', 'senate', 'governor') else office}"
                 listed.setdefault(key + (f":{row['district']}" if row["office"] == "house" else ""), []).append(row)
+                continue
+            text = str(row["office"]).lower()
+            if re.search(
+                r"u\.s\.|united states|congress|county|city|town|school|court|board|ward|council|precinct|committee|meeting|vacancy|special|unexpired|pos\.",
+                text,
+            ):
+                continue
+            level = (
+                "upper"
+                if "senat" in text
+                else "lower"
+                if re.search(r"represent|assembly|house|delegates|legislat", text)
+                else None
+            )
+            number = re.search(r"(\d+)(?:st|nd|rd|th)?\s*(?:,?\s*seat\s+)?([a-z])?\b", text)
+            if level and not number and row["district"] is not None:
+                number = re.match(r"(\d+)()", str(row["district"]))
+            if level and number:
+                district = str(int(number[1])) + (f"-{number[2]}" if number[2] else "")
+                key = seats.get((row["state"], level, district)) or seats.get(
+                    (row["state"], level, str(int(number[1])))
+                )
+                if key:
+                    listed.setdefault(key, []).append(row)
 
         def surname(text: str) -> str:
             words = [
@@ -1635,7 +1759,8 @@ def emit() -> Path:
                join contest_option op on op.contest_id = x.entity_id
                join candidacy cy on cy.option_id = op.id
                join name n on n.entity_id = cy.person_id and n.is_preferred
-               where x.scheme = 'us.contest' and x.value ~ ('^20(1[8-9]|2[0-6])-[0-9-]+:[A-Z]{2}:(' || %s || ')(:|$)')""",
+               where x.scheme = 'us.contest' and x.value ~ ('^20(1[8-9]|2[0-6])-[0-9-]+:[A-Z]{2}:(' || %s || ')(:|$)')
+                 and x.value !~ ':g(:|$)'""",
             [chambers],
         ).fetchall():
             day, state, chamber, *rest = value.split(":")
@@ -1644,6 +1769,19 @@ def emit() -> Path:
             (known if day.startswith("2026") else earlier).setdefault(
                 f"{DAY}:{state}:{chamber}" + (f":{rest[0]}" if chamber == "house" else ""), []
             ).append((person, text))
+        for value, person, text in conn.execute(
+            """select x.value, cy.person_id, n.text
+               from external_id x
+               join contest_option op on op.contest_id = x.entity_id
+               join candidacy cy on cy.option_id = op.id
+               join name n on n.entity_id = cy.person_id and n.is_preferred
+               where x.scheme = 'us.contest' and x.value = any(%s)""",
+            [[*legislative]],
+        ).fetchall():
+            general = legislative[value][0]
+            latest[person] = max(latest.get(person, ""), value[:10])
+            by_state.setdefault(general.split(":")[1], []).append((person, text))
+            earlier.setdefault(general, []).append((person, text))
         for value, person, text in conn.execute(
             """select x.value, t.person_id, n.text
                from tenure t
@@ -1770,6 +1908,10 @@ def emit() -> Path:
                     ).endswith(surname(held_text).replace("-", ""))
                     and len(slug(held_text).split("-")[0]) > 1
                     and slug(held_text).split("-")[0] in tokens
+                    and (
+                        slug(held_text).split("-")[0] == tokens[0]
+                        or person in {earlier_person for earlier_person, _ in earlier.get(key, [])}
+                    )
                     and set(re.findall(r"\b(?:II|III|IV)\b", text)) <= set(re.findall(r"\b(?:II|III|IV)\b", held_text))
                 }
             for preferred in ({*held.get(key, {})}, {person for _, person in nominees.get(key, {})}, matched, fec_held):
@@ -1796,7 +1938,16 @@ def emit() -> Path:
             return person
 
         staged_contests: set[str] = set()
-        counts = {"house": 0, "senate": 0, "governor": 0, "statewide": 0, "candidates": 0, "listed": 0, "dropped": 0}
+        counts = {
+            "house": 0,
+            "senate": 0,
+            "governor": 0,
+            "statewide": 0,
+            "legislative": 0,
+            "candidates": 0,
+            "listed": 0,
+            "dropped": 0,
+        }
         for (
             value,
             kind,
@@ -1812,6 +1963,8 @@ def emit() -> Path:
             polity,
         ) in sorted(templates):
             _, state, chamber, *rest = value.split(":")
+            if value in legislative:
+                chamber = "legislative"
             if state in NO_GENERAL:
                 continue
             state_name = state_names[state]
@@ -1829,7 +1982,11 @@ def emit() -> Path:
                 )
                 name(elections[state], f"2026 {state_name} general election")
                 cs.add("slug", path=f"us/{state.lower()}/{DAY}-general", entity_id=elections[state])
-            key = f"{DAY}:{state}:{chamber}" + (f":{rest[0]}" if chamber == "house" else "")
+            key = (
+                legislative[value][0]
+                if chamber == "legislative"
+                else f"{DAY}:{state}:{chamber}" + (f":{rest[0]}" if chamber == "house" else "")
+            )
             if key in staged_contests:
                 continue
             staged_contests.add(key)
@@ -1844,7 +2001,11 @@ def emit() -> Path:
                 body_id=body,
                 district_area_id=area,
                 seat_id=seat,
-                boundary_set_id=latest_plan if chamber == "house" and state not in REDISTRICTED else None,
+                boundary_set_id=plan
+                if chamber == "legislative"
+                else latest_plan
+                if chamber == "house" and state not in REDISTRICTED
+                else None,
                 magnitude=magnitude,
                 term="remainder" if special else term,
                 round_number=1,
@@ -1873,6 +2034,8 @@ def emit() -> Path:
             elif chamber == "senate":
                 title = f"2026 U.S. Senate {'special ' if special else ''}election in {state_name}"
                 path = f"us/{state.lower()}/{DAY}-general/senate"
+            elif chamber == "legislative":
+                _, title, path = legislative[value]
             elif chamber == "governor":
                 title = f"2026 {state_name} gubernatorial election"
                 path = f"us/{state.lower()}/{DAY}-general/governor"
@@ -2014,7 +2177,8 @@ def emit() -> Path:
             f"{DAY}:{value.split(':')[1]}:{value.split(':')[2]}"
             + (f":{value.split(':')[3]}" if value.split(":")[2] == "house" else "")
             for value, *_ in templates
-        }
+            if value not in legislative
+        } | {entry[0] for entry in legislative.values()}
         print("listed but not scheduled:", sorted({*listed} - scheduled))
         for entity, retired in conn.execute(
             """select x.entity_id, e.retired_by from external_id x join entity e on e.id = x.entity_id
