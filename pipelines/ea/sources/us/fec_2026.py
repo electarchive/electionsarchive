@@ -412,6 +412,7 @@ VACANCY_2026 = {
     ("CO", "senate:29:g"),
     ("CO", "senate:31:g"),
     ("WY", "senate:6:g"),
+    ("NM", "senate:33:g"),
 }
 SPLIT = {
     "HI:trustee-of-the-office-of-hawaiian-affairs": {
@@ -1648,8 +1649,6 @@ def read(state: str, path: Path) -> list[tuple[str, int | None, str, str]]:
                     office = "house" if line.strip() == "Delegate to the House of Representatives" else line.strip()
     if state == "TN":
         for row in fastexcel.read_excel(path).load_sheet(0).to_polars().iter_rows(named=True):
-            if row["Candidate"] == "No Candidate Qualified":
-                continue
             house = re.fullmatch(r"United States House of Representatives District (\d+)", row["Office"])
             office = (
                 "house"
@@ -1998,14 +1997,9 @@ def emit() -> Path:
                         sum(entry[0][7] or 1 for entry in picked.values()),
                         want,
                     )
-                for seat, (template, label, path) in recent.items():
-                    if (state, seat) in VACANCY_2026:
-                        picked[seat] = (
-                            (*template[:8], "remainder", *template[9:]),
-                            label.replace(" election", " special election"),
-                            f"{path}-special-election",
-                        )
                 for seat, (template, label, path) in picked.items():
+                    if (state, seat) in VACANCY_2026:
+                        continue
                     key = f"{DAY}:{state}:{seat}"
                     legislative[template[0]] = (
                         key,
@@ -2015,6 +2009,17 @@ def emit() -> Path:
                     district = re.sub(r"^[a-z-]+:|:g$", "", seat).lower().replace(":", "-")
                     seats[(state, level, district)] = key
                     templates.append(template)
+        for state, seat in sorted(VACANCY_2026):
+            level = "upper" if seat.startswith(("senate:", "legislature:")) else "lower"
+            template, label, path = chambered[(state, level, "2024")][seat]
+            key = f"{DAY}:{state}:{seat}"
+            legislative[template[0]] = (
+                key,
+                re.sub(r"^\d{4}", "2026", label.replace(" election", " special election")),
+                re.sub(r"\d{4}-\d\d-\d\d-general", f"{DAY}-general", path) + "-special-election",
+            )
+            seats[(state, level, re.sub(r"^[a-z-]+:|:g$", "", seat).lower().replace(":", "-"))] = key
+            templates.append((*template[:8], "remainder", *template[9:]))
         latest_plan = conn.execute(
             "select id from boundary_set where scheme_code = 'us.cd' order by valid_from desc limit 1"
         ).fetchone()[0]
@@ -2526,8 +2531,19 @@ def emit() -> Path:
                         )
                     for url in urls:
                         cs.artifact(raw.cached(SOURCE, url), sources[state])
+                if all(row["name"] == "No Candidate Qualified" for row in listed[key]):
+                    cs.add(
+                        "label",
+                        entity_id=contest,
+                        kind="ballot",
+                        value="no_candidate_qualified",
+                        source_id=sources[state],
+                        valid_from=DAY,
+                    )
                 for row in sorted(listed[key], key=lambda row: str(row["name"])):
                     text, label = str(row["name"]), str(row["party"])
+                    if text == "No Candidate Qualified":
+                        continue
                     person = person_of(state, key, chamber, int(rest[0]) if chamber == "house" else None, text)
                     if " " not in text:
                         text = next((held for held_person, held in known.get(key, []) if held_person == person), text)
