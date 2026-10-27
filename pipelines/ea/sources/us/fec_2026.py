@@ -405,6 +405,7 @@ CLASS_THREE_SPECIALS = ("OH", "FL")
 NO_GENERAL = ("PR",)
 SUPPLEMENTED = {"RI", "AR", "NV", "MN"}
 UNEXPIRED_2024 = {("OH", "senate:33:g")}
+OHA = {"At-Large Trustee": ("", 3), "Maui Resident Trustee": ("maui", 1), "Oahu Resident Trustee": ("oahu", 1)}
 TACIT_SOURCES = {
     "HI": (
         "Hawaii Office of Elections",
@@ -419,7 +420,7 @@ TACIT_SOURCES = {
             "https://oklahoma.gov/elections/candidates/2026-candidate-filing-information.html",
             "https://oklahoma.gov/elections/candidates/2026-candidate-filing-information/2026-candidate-withdrawals.html",
         ],
-        "Oklahoma leaves a seat off the ballot when only one candidate remains after the April 1–3, 2026 filing period and withdrawals, and declares that candidate elected, so no votes are cast for it.",
+        "Oklahoma leaves a race off the ballot when only one candidate remains after the April 1–3, 2026 filing period and withdrawals, and declares that candidate elected, so no votes are cast for it.",
     ),
     "OK-primary": (
         "Oklahoma State Election Board",
@@ -436,93 +437,94 @@ TACIT_SOURCES = {
 }
 TACIT = {
     "HI": {
-        "house:1": ("Matthias Kusch", "democratic-party", "HI"),
-        "house:6": ("Kirstin Kahaloa", "democratic-party", "HI"),
-        "house:7": ("Nicole Lowen", "democratic-party", "HI"),
-        "house:9": ("Justin H. Woodson", "democratic-party", "HI"),
-        "house:15": ("Nadine K. Nakamura", "democratic-party", "HI"),
-        "house:19": ("Mark Jun Hashem", "democratic-party", "HI"),
-        "house:21": ("Derek Turbin", "democratic-party", "HI"),
-        "house:22": ("Andrew Takuya Garrett", "democratic-party", "HI"),
-        "house:24": ("Adrian Tam", "democratic-party", "HI"),
-        "house:25": ("Kim Coco Iwamoto", "democratic-party", "HI"),
-        "house:27": ("Jenna W.Y.C. Takenouchi", "democratic-party", "HI"),
-        "house:28": ("Michael (Cov) Ratcliffe", "democratic-party", "HI"),
-        "house:33": ("Sam Satoru Kong", "democratic-party", "HI"),
-        "house:35": ("Cory M. Chun", "democratic-party", "HI"),
-        "house:36": ("Daisy Balais Hartsfield", "democratic-party", "HI"),
-        "house:37": ("Trish La Chica", "democratic-party", "HI"),
-        "house:38": ("Lauren Cheape Matsumoto", "republican-party", "HI"),
-        "house:41": ("David A. Alcos III", "republican-party", "HI"),
-        "house:48": ("Lisa C. Kitagawa", "democratic-party", "HI"),
-        "house:51": ("Lisa Marten", "democratic-party", "HI"),
-        "senate:5": ("Troy N. Hashimoto", "democratic-party", "HI"),
-        "senate:8": ("Ronald D. Kouchi", "democratic-party", "HI"),
-        "senate:10": ("Jackson D. Sayama", "democratic-party", "HI"),
-        "senate:11": ("Carol Fukunaga", "democratic-party", "HI"),
-        "senate:14": ("Donna Mercado Kim", "democratic-party", "HI"),
-        "senate:15": ("Glenn Wakai", "democratic-party", "HI"),
-        "senate:17": ("Donovan Dela Cruz", "democratic-party", "HI"),
-        "senate:21": ("Mike Gabbard", "democratic-party", "HI"),
-        "senate:25": ("Chris Lee", "democratic-party", "HI"),
+        "house:1:g": ("Matthias Kusch", "democratic-party", "HI"),
+        "house:6:g": ("Kirstin Kahaloa", "democratic-party", "HI"),
+        "house:7:g": ("Nicole Lowen", "democratic-party", "HI"),
+        "house:9:g": ("Justin H. Woodson", "democratic-party", "HI"),
+        "house:15:g": ("Nadine K. Nakamura", "democratic-party", "HI"),
+        "house:19:g": ("Mark Jun Hashem", "democratic-party", "HI"),
+        "house:21:g": ("Derek Turbin", "democratic-party", "HI"),
+        "house:22:g": ("Andrew Takuya Garrett", "democratic-party", "HI"),
+        "house:24:g": ("Adrian Tam", "democratic-party", "HI"),
+        "house:25:g": ("Kim Coco Iwamoto", "democratic-party", "HI"),
+        "house:27:g": ("Jenna W.Y.C. Takenouchi", "democratic-party", "HI"),
+        "house:28:g": ("Michael (Cov) Ratcliffe", "democratic-party", "HI"),
+        "house:33:g": ("Sam Satoru Kong", "democratic-party", "HI"),
+        "house:35:g": ("Cory M. Chun", "democratic-party", "HI"),
+        "house:36:g": ("Daisy Balais Hartsfield", "democratic-party", "HI"),
+        "house:37:g": ("Trish La Chica", "democratic-party", "HI"),
+        "house:38:g": ("Lauren Cheape Matsumoto", "republican-party", "HI"),
+        "house:41:g": ("David A. Alcos III", "republican-party", "HI"),
+        "house:48:g": ("Lisa C. Kitagawa", "democratic-party", "HI"),
+        "house:51:g": ("Lisa Marten", "democratic-party", "HI"),
+        "senate:5:g": ("Troy N. Hashimoto", "democratic-party", "HI"),
+        "senate:8:g": ("Ronald D. Kouchi", "democratic-party", "HI"),
+        "senate:10:g": ("Jackson D. Sayama", "democratic-party", "HI"),
+        "senate:11:g": ("Carol Fukunaga", "democratic-party", "HI"),
+        "senate:14:g": ("Donna Mercado Kim", "democratic-party", "HI"),
+        "senate:15:g": ("Glenn Wakai", "democratic-party", "HI"),
+        "senate:17:g": ("Donovan Dela Cruz", "democratic-party", "HI"),
+        "senate:21:g": ("Mike Gabbard", "democratic-party", "HI"),
+        "senate:25:g": ("Chris Lee", "democratic-party", "HI"),
     },
     "OK": {
-        "house:1": ("Chris White", "republican-party", "OK-runoff"),
-        "house:2": ("Jim Olsen", "republican-party", "OK-filing"),
-        "house:5": ("Josh West", "republican-party", "OK-filing"),
-        "house:6": ("Rusty Cornwell", "republican-party", "OK-primary"),
-        "house:7": ("Steve Bashore", "republican-party", "OK-filing"),
-        "house:8": ("Tom Gann", "republican-party", "OK-primary"),
-        "house:11": ("John B. Kane", "republican-party", "OK-primary"),
-        "house:13": ("Neil Hays", "republican-party", "OK-filing"),
-        "house:15": ("Tim Turner", "republican-party", "OK-filing"),
-        "house:17": ("Jim Grego", "republican-party", "OK-filing"),
-        "house:18": ("David Smith", "republican-party", "OK-runoff"),
-        "house:19": ("Michael A. Brittingham", "republican-party", "OK-runoff"),
-        "house:21": ("Cody Maynard", "republican-party", "OK-filing"),
-        "house:22": ("Ryan Eaves", "republican-party", "OK-filing"),
-        "house:25": ("Ronny Johns", "republican-party", "OK-filing"),
-        "house:29": ("Kyle Hilbert", "republican-party", "OK-primary"),
-        "house:31": ("Collin Duel", "republican-party", "OK-primary"),
-        "house:35": ("Dillon Travis", "republican-party", "OK-primary"),
-        "house:37": ("Spencer Grace", "republican-party", "OK-primary"),
-        "house:39": ("Erick Harris", "republican-party", "OK-primary"),
-        "house:40": ("Kinsley Jordan", "republican-party", "OK-primary"),
-        "house:42": ("Cindy Roe", "republican-party", "OK-primary"),
-        "house:43": ("Jay Steagall", "republican-party", "OK-filing"),
-        "house:44": ("Jared Deck", "democratic-party", "OK-filing"),
-        "house:46": ("Jacob Rosecrants", "democratic-party", "OK-filing"),
-        "house:48": ("Tammy Townley", "republican-party", "OK-filing"),
-        "house:50": ("Stacy Jo Adams", "republican-party", "OK-filing"),
-        "house:51": ("Cole Stevens", "republican-party", "OK-primary"),
-        "house:52": ("Gerrid Kendrix", "republican-party", "OK-filing"),
-        "house:55": ("Nick Archer", "republican-party", "OK-filing"),
-        "house:57": ("Anthony S. Moore", "republican-party", "OK-filing"),
-        "house:59": ("Mike Dobrinski", "republican-party", "OK-filing"),
-        "house:61": ("Kenton Patzkowsky", "republican-party", "OK-filing"),
-        "house:65": ("Sam Mitchell", "republican-party", "OK-primary"),
-        "house:67": ("Rob Hall", "republican-party", "OK-filing"),
-        "house:70": ("Suzanne E. Schreiber", "democratic-party", "OK-filing"),
-        "house:71": ("Amanda Clinton", "democratic-party", "OK-filing"),
-        "house:73": ("Ron Stewart", "democratic-party", "OK-primary"),
-        "house:77": ("Kristina Gabriel", "democratic-party", "OK-primary"),
-        "house:88": ("Ellen Pogemiller", "democratic-party", "OK-filing"),
-        "house:89": ("Arturo Alonso", "democratic-party", "OK-filing"),
-        "house:92": ("Sam Wargin Grimaldo", "democratic-party", "OK-primary"),
-        "house:93": ("Mickey Dollens", "democratic-party", "OK-filing"),
-        "house:94": ("Andy Fugate", "democratic-party", "OK-filing"),
-        "house:97": ("Aletia Haynes Timmons", "democratic-party", "OK-primary"),
-        "house:101": ("Robert Manger", "republican-party", "OK-filing"),
-        "senate:14": ("Jerry Alvord", "republican-party", "OK-filing"),
-        "senate:16": ("Mary B. Boren", "democratic-party", "OK-filing"),
-        "senate:20": ("Chuck Hall", "republican-party", "OK-primary"),
-        "senate:26": ("Jessica Winegeart", "republican-party", "OK-runoff"),
-        "senate:30": ("Julia Kirt", "democratic-party", "OK-filing"),
-        "senate:38": ("Rick Vernon", "republican-party", "OK-primary"),
-        "senate:40": ("Carri Hicks", "democratic-party", "OK-filing"),
-        "senate:44": ("Michael Brooks", "democratic-party", "OK-filing"),
-        "senate:46": ("Mark Mann", "democratic-party", "OK-filing"),
-        "senate:48": ("Nikki Nice", "democratic-party", "OK-filing"),
+        "auditor-and-inspector": ("Melissa Capps", "republican-party", "OK-filing"),
+        "house:1:g": ("Chris White", "republican-party", "OK-runoff"),
+        "house:2:g": ("Jim Olsen", "republican-party", "OK-filing"),
+        "house:5:g": ("Josh West", "republican-party", "OK-filing"),
+        "house:6:g": ("Rusty Cornwell", "republican-party", "OK-primary"),
+        "house:7:g": ("Steve Bashore", "republican-party", "OK-filing"),
+        "house:8:g": ("Tom Gann", "republican-party", "OK-primary"),
+        "house:11:g": ("John B. Kane", "republican-party", "OK-primary"),
+        "house:13:g": ("Neil Hays", "republican-party", "OK-filing"),
+        "house:15:g": ("Tim Turner", "republican-party", "OK-filing"),
+        "house:17:g": ("Jim Grego", "republican-party", "OK-filing"),
+        "house:18:g": ("David Smith", "republican-party", "OK-runoff"),
+        "house:19:g": ("Michael A. Brittingham", "republican-party", "OK-runoff"),
+        "house:21:g": ("Cody Maynard", "republican-party", "OK-filing"),
+        "house:22:g": ("Ryan Eaves", "republican-party", "OK-filing"),
+        "house:25:g": ("Ronny Johns", "republican-party", "OK-filing"),
+        "house:29:g": ("Kyle Hilbert", "republican-party", "OK-primary"),
+        "house:31:g": ("Collin Duel", "republican-party", "OK-primary"),
+        "house:35:g": ("Dillon Travis", "republican-party", "OK-primary"),
+        "house:37:g": ("Spencer Grace", "republican-party", "OK-primary"),
+        "house:39:g": ("Erick Harris", "republican-party", "OK-primary"),
+        "house:40:g": ("Kinsley Jordan", "republican-party", "OK-primary"),
+        "house:42:g": ("Cindy Roe", "republican-party", "OK-primary"),
+        "house:43:g": ("Jay Steagall", "republican-party", "OK-filing"),
+        "house:44:g": ("Jared Deck", "democratic-party", "OK-filing"),
+        "house:46:g": ("Jacob Rosecrants", "democratic-party", "OK-filing"),
+        "house:48:g": ("Tammy Townley", "republican-party", "OK-filing"),
+        "house:50:g": ("Stacy Jo Adams", "republican-party", "OK-filing"),
+        "house:51:g": ("Cole Stevens", "republican-party", "OK-primary"),
+        "house:52:g": ("Gerrid Kendrix", "republican-party", "OK-filing"),
+        "house:55:g": ("Nick Archer", "republican-party", "OK-filing"),
+        "house:57:g": ("Anthony S. Moore", "republican-party", "OK-filing"),
+        "house:59:g": ("Mike Dobrinski", "republican-party", "OK-filing"),
+        "house:61:g": ("Kenton Patzkowsky", "republican-party", "OK-filing"),
+        "house:65:g": ("Sam Mitchell", "republican-party", "OK-primary"),
+        "house:67:g": ("Rob Hall", "republican-party", "OK-filing"),
+        "house:70:g": ("Suzanne E. Schreiber", "democratic-party", "OK-filing"),
+        "house:71:g": ("Amanda Clinton", "democratic-party", "OK-filing"),
+        "house:73:g": ("Ron Stewart", "democratic-party", "OK-primary"),
+        "house:77:g": ("Kristina Gabriel", "democratic-party", "OK-primary"),
+        "house:88:g": ("Ellen Pogemiller", "democratic-party", "OK-filing"),
+        "house:89:g": ("Arturo Alonso", "democratic-party", "OK-filing"),
+        "house:92:g": ("Sam Wargin Grimaldo", "democratic-party", "OK-primary"),
+        "house:93:g": ("Mickey Dollens", "democratic-party", "OK-filing"),
+        "house:94:g": ("Andy Fugate", "democratic-party", "OK-filing"),
+        "house:97:g": ("Aletia Haynes Timmons", "democratic-party", "OK-primary"),
+        "house:101:g": ("Robert Manger", "republican-party", "OK-filing"),
+        "senate:14:g": ("Jerry Alvord", "republican-party", "OK-filing"),
+        "senate:16:g": ("Mary B. Boren", "democratic-party", "OK-filing"),
+        "senate:20:g": ("Chuck Hall", "republican-party", "OK-primary"),
+        "senate:26:g": ("Jessica Winegeart", "republican-party", "OK-runoff"),
+        "senate:30:g": ("Julia Kirt", "democratic-party", "OK-filing"),
+        "senate:38:g": ("Rick Vernon", "republican-party", "OK-primary"),
+        "senate:40:g": ("Carri Hicks", "democratic-party", "OK-filing"),
+        "senate:44:g": ("Michael Brooks", "democratic-party", "OK-filing"),
+        "senate:46:g": ("Mark Mann", "democratic-party", "OK-filing"),
+        "senate:48:g": ("Nikki Nice", "democratic-party", "OK-filing"),
     },
 }
 SYSTEM_OVERRIDES = {"AK": "top_four", "LA": "fptp", "LA:house": "two_round"}
@@ -897,6 +899,7 @@ def read(state: str, path: Path) -> list[tuple[str, int | None, str, str]]:
         office: str | None = None
         district: int | None = None
         lines: dict[tuple[str, int | None, str], list[str]] = {}
+        split = False
         for page in re.findall(r"<page[^>]*>(.*?)</page>", layout, re.DOTALL):
             sections: list[tuple[str | None, int | None, list[tuple[float, float, str]]]] = [(office, district, [])]
             for left, top, bottom, block in re.findall(
@@ -907,6 +910,14 @@ def read(state: str, path: Path) -> list[tuple[str, int | None, str, str]]:
                     for line in re.findall(r"<line[^>]*>(.*?)</line>", block, re.DOTALL)
                 ]
                 texts = [text for text in texts if text not in ("Governor", "Lt. Governor", "Candidate Name", "Party")]
+                if texts == ["Office:", "District:", "Counties:", "Vote For:"]:
+                    split = True
+                    continue
+                if split:
+                    split = False
+                    texts = ["Office:", texts[0], f"District: {texts[1]}"]
+                if texts and re.fullmatch(r"\w*Office: .+", texts[0]):
+                    texts = ["Office:", texts[0].split(": ", 1)[1], *texts[1:]]
                 if texts and texts[0] == "Office:":
                     race = texts[1]
                     office = {
@@ -1623,7 +1634,12 @@ def read(state: str, path: Path) -> list[tuple[str, int | None, str, str]]:
                 else {"United States Senate": "senate", "Governor": "governor"}.get(row["Office"], row["Office"])
             )
             rows.append(
-                (office, int(house[1]) if house else None, row["Candidate"], row.get("Party Name") or row["Party"] or "")
+                (
+                    office,
+                    int(house[1]) if house else None,
+                    row["Candidate"],
+                    row.get("Party Name") or row["Party"] or "",
+                )
             )
     if state == "KY":
         for row in fastexcel.read_excel(path).load_sheet(0, dtypes="string").to_polars().iter_rows(named=True):
@@ -1898,7 +1914,13 @@ def emit() -> Path:
             _, state, chamber = template[0].split(":")
             if f"{state}:{chamber}" not in offices:
                 offices[f"{state}:{chamber}"] = label
-                templates.append(tuple(template))
+                if template[0].endswith(":HI:trustee-of-the-office-of-hawaiian-affairs"):
+                    templates.extend(
+                        (":".join(filter(None, (template[0], seat))), *template[1:7], magnitude, *template[8:])
+                        for seat, magnitude in OHA.values()
+                    )
+                else:
+                    templates.append(tuple(template))
         chambered: dict[tuple[str, str, str], dict[str, tuple[tuple, str, str]]] = {}
         for *template, label, path in conn.execute(
             """select x.value, co.kind, co.office_id, co.body_id, co.district_area_id, co.seat_id,
@@ -2009,6 +2031,12 @@ def emit() -> Path:
                 numbered.setdefault((state, level, seat.split("-")[0]), []).append(seat)
         listed: dict[str, list[dict[str, str | int | None]]] = {}
         for row in pl.read_parquet(PARSED / "candidates.parquet").iter_rows(named=True):
+            if row["state"] == "HI" and row["office"] in OHA:
+                key = ":".join(
+                    filter(None, (f"{DAY}:HI:trustee-of-the-office-of-hawaiian-affairs", OHA[row["office"]][0]))
+                )
+                listed.setdefault(key, []).append(row)
+                continue
             office = re.sub(r"-(statewide|state-of-[a-z]+)$", "", slug(row["office"]))
             office = re.sub(r"^(state|general)-", "", office)
             if office.startswith(("auditor", "treasurer", "comptroller")):
@@ -2356,11 +2384,7 @@ def emit() -> Path:
                 )
                 name(elections[state], f"2026 {state_name} general election")
                 cs.add("slug", path=f"us/{state.lower()}/{DAY}-general", entity_id=elections[state])
-            key = (
-                legislative[value][0]
-                if chamber == "legislative"
-                else f"{DAY}:{state}:{chamber}" + (f":{rest[0]}" if chamber == "house" else "")
-            )
+            key = legislative[value][0] if chamber == "legislative" else ":".join([str(DAY), state, chamber, *rest])
             if key in staged_contests:
                 continue
             staged_contests.add(key)
@@ -2385,10 +2409,10 @@ def emit() -> Path:
                 round_number=1,
                 electoral_system_id=systems[SYSTEM_OVERRIDES.get(f"{state}:{chamber}", SYSTEM_OVERRIDES[state])]
                 if state in SYSTEM_OVERRIDES and chamber in ("house", "senate")
+                else cs.key("us.electoral_system", "block")
+                if chamber != "legislative" and (magnitude or 1) > 1
                 else system,
-                default_result_kind="tacit"
-                if chamber == "legislative" and ":".join(key.split(":")[2:4]) in TACIT.get(state, {})
-                else result_kind,
+                default_result_kind="tacit" if key.split(":", 2)[2] in TACIT.get(state, {}) else result_kind,
             )
             counts[chamber if chamber in counts else "statewide"] += 1
             if chamber == "house":
@@ -2418,6 +2442,11 @@ def emit() -> Path:
             else:
                 title = re.sub(rf"^\d{{4}} {re.escape(state_name)} ", "2026 ", offices[f"{state}:{chamber}"])
                 path = f"us/{state.lower()}/{DAY}-general/{chamber}"
+                if (state, chamber) == ("HI", "trustee-of-the-office-of-hawaiian-affairs"):
+                    title = title.replace(
+                        " election", f" election ({rest[0].title()} resident)" if rest else " election (at-large)"
+                    )
+                    path = "-".join([path, *rest])
             name(contest, title)
             cs.add("slug", path=path, entity_id=contest)
             if chamber == "house" and state == "LA":
@@ -2470,12 +2499,9 @@ def emit() -> Path:
                         )
                     )
                 counts["listed"] += 1
-            seat_key = ":".join(key.split(":")[2:4])
-            tacit = TACIT.get(state, {}).get(seat_key) if chamber == "legislative" else None
+            tacit = TACIT.get(state, {}).get(key.split(":", 2)[2])
             if tacit is not None:
-                entries.append(
-                    (tacit[0], person_of(state, key, chamber, None, tacit[0]), cs.key("us.party", tacit[1]))
-                )
+                entries.append((tacit[0], person_of(state, key, chamber, None, tacit[0]), cs.key("us.party", tacit[1])))
             elif state in SUPPLEMENTED or key not in listed:
                 entries += [
                     (ballot, person, party_id)
