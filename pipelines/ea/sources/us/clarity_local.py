@@ -781,6 +781,17 @@ def emit() -> Path:
         zeroed = cs.zeroed() | cs.remainders(
             "A scattered-votes line in Clarity's results read as a candidate", r"^scattered$"
         )
+        zeroed |= {
+            result_set
+            for result_set, label in conn.execute(
+                """select r.id, o.ballot_label from result_set r join changeset g on g.id = r.changeset_id
+                   join contest_option o on o.contest_id = r.contest_id and o.kind = 'candidate'
+                   where g.pipeline = %s and r.status = 'active'
+                     and exists (select from result_value v where v.result_set_k = r.k and v.option_k = o.k)""",
+                [SOURCE],
+            ).fetchall()
+            if re.fullmatch(r"(?i)w/?i", label) or _label(label)[0] != label
+        }
 
         cs.renamed.update(RENAMED)
 

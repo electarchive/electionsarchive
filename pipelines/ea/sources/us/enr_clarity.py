@@ -36,7 +36,16 @@ OWN_MEMBERSHIPS = {
     "us.ny_saratoga",
 }
 STALE_MEMBERSHIP = "The pipeline's earlier emit placed the precinct in an area it does not vote in"
-DAY_FIXES = {("https://results.enr.clarityelections.com/IL/McHenry/", "109015"): date(2021, 4, 6)}
+DAY_FIXES = {("https://results.enr.clarityelections.com/IL/McHenry/", "109015"): date(2021, 4, 6)} | {
+    (f"https://results.enr.clarityelections.com/{site}/Winnebago/", election): day
+    for site in ("IL", "WRC")
+    for election, day in (
+        ("8819", date(2008, 11, 4)),
+        ("10284", date(2009, 2, 24)),
+        ("10445", date(2009, 4, 7)),
+        ("12442", date(2010, 2, 2)),
+    )
+}
 STATE_NAMES = {
     "AL": "Alabama",
     "AK": "Alaska",
@@ -624,11 +633,19 @@ def parse(
     contests: list[dict[str, object]] = []
     lines: list[dict[str, object]] = []
     skipped: Counter[str] = Counter()
+    mirrored: set[tuple[str, str]] = set()
     for record in read(registry):
         tenant, election, day = record["tenant"], record["election"], record["day"]
         day = DAY_FIXES.get((tenant, election), day)
         row = registry[tenant]
         county, st = row["county_fips"], row["state"]
+        if day.year == 1:
+            skipped["undated election"] += 1
+            continue
+        if (county, election) in mirrored:
+            skipped["the same election under another tenant"] += 1
+            continue
+        mirrored.add((county, election))
         county_name = _plain(row["county"])
         title = re.sub(r"\s+", " ", record["title"]).strip()
         heading = _plain(title)
@@ -1478,18 +1495,18 @@ def emit(
                     valid_from=None,
                 )
         for scheme, code in used:
-            held = polities.get(f"{scheme}:{code}")
+            found = polities.get(f"{scheme}:{code}")
             if (
                 code[:2] in ("17", "26", "34", "36", "39", "42")
-                and held is not None
-                and held[0] not in cs.minted
+                and found is not None
+                and found[0] not in cs.minted
                 and cs.area(scheme, code) not in cs.minted
                 and cs.unit(scheme, code) in cs.minted
             ):
                 cs.add(
                     "reporting_unit",
                     id=cs.unit(scheme, code),
-                    polity_id=held[0],
+                    polity_id=found[0],
                     scheme_code=scheme,
                     code=code,
                     area_relation="equals",
@@ -2159,7 +2176,7 @@ def emit(
         )
         columns = ("id", "election_id", "contest_id", "stage", "kind", "source_id", "is_default", "completeness")
         for row in conn.execute(
-            f"""select {", ".join(f"r.{column}" for column in columns)} from result_set r
+            f"""select distinct {", ".join(f"r.{column}" for column in columns)} from result_set r
                 join changeset g on g.id = r.changeset_id
                 join external_id x on x.entity_id = r.contest_id and x.scheme = 'us.contest'
                 where g.pipeline = %s and r.status = 'active' and r.contest_id <> all(%s)
