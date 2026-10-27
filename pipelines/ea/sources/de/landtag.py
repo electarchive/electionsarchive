@@ -1,4 +1,5 @@
 import csv
+import html
 import io
 import re
 from datetime import date
@@ -18,12 +19,22 @@ VERSION = "1"
 PARSED = DATA / "parsed" / SOURCE
 BW = "https://wahlen.statistik-bw.de/ltw26"
 MV = "https://www.laiv-mv.de/static/LAIV/Wahlen/2-Landtagswahlen/2026/Ergebnisse"
+BE = "https://wahlen-berlin.de/wahlen/BE2026/Afspraes/AGH"
 ST = "https://wahlergebnisse.sachsen-anhalt.de/wahlen/lt26/downloads"
 URLS = {
     "BW": [f"{BW}/ltw26-ergebnisse.csv", f"{BW}/ltw26-gewaehlte.csv", f"{BW}/ltw26-sitzverteilung.pdf"],
     "MV": [f"{MV}/l_wahlkreise.csv", f"{MV}/l_mandate.csv"],
     "ST": [f"{ST}/Ergebnisse_Land_RKR_WKR_LT_2026.csv", f"{ST}/Sitzverteilung_LT_2026.csv"],
+    "BE": [f"{BE}/DL/DL_BE_AGHBVV2026.xlsx", "https://www.wahlen-berlin.de/wahlen/BE2026/Afspraes/agh/gewaehlte.html"],
 }
+NOTE_BE = (
+    "Voters have two votes. The second vote decides how many of the Abgeordnetenhaus's seats each party gets: at "
+    "least 130 seats are shared by the Hare–Niemeyer largest remainder method among parties with 5 percent or more "
+    "of the second votes. Each party's winners in the 78 constituencies take their seats first, and any remaining "
+    "seats go to candidates on the party's Land list. Extra seats are added to balance out the overhang seats. The "
+    "total came to 153."
+)
+BE_PARTIES = {"MIETERPARTEI", "MERA25", "DL", "DIE FRAUEN"}
 NOTE_BW = (
     "Voters have two votes for the first time in 2026. The second vote decides how many of the Landtag's seats each "
     "party gets: at least 120 seats are shared by the Sainte-Laguë method among parties with 5 percent or more of the "
@@ -50,6 +61,19 @@ WINNERS_NOTE = (
 )
 WINNERS_NOTE_MV = "The source gives the party that won each constituency but not the winner's name."
 STATES = {
+    "BE": {
+        "land": "11",
+        "name": "Berlin",
+        "native": "Wahl zum 20. Abgeordnetenhaus von Berlin 2026",
+        "body": ("Abgeordnetenhaus of Berlin", "Abgeordnetenhaus von Berlin"),
+        "day": date(2026, 9, 20),
+        "rules": {"formula": "hare", "threshold": {"percent": 5, "level": "party", "scope": "contest"}},
+        "note": NOTE_BE,
+        "winners": WINNERS_NOTE,
+        "publisher": "Amt für Statistik Berlin-Brandenburg",
+        "title": "Wahl zum 20. Abgeordnetenhaus von Berlin am 20. September 2026, endgültiges Ergebnis",
+        "url": f"{BE}/downloads.html",
+    },
     "BW": {
         "land": "08",
         "name": "Baden-Württemberg",
@@ -320,8 +344,78 @@ def parse() -> None:
         if party != "Insgesamt":
             seats.append({"state": "ST", "party": party, "total": int(total), "direct": int(direct_seats)})
 
+    sheets = {
+        ballot: pl.read_excel(raw.cached(SOURCE, URLS["BE"][0]).path, sheet_name=sheet, infer_schema_length=0).rename(
+            lambda column: column.replace("\n", "")
+        )
+        for ballot, sheet in ((1, "AGH_W1"), (2, "AGH_W2"))
+    }
+    be_parties = set(sheets[2].columns[18:]) | BE_PARTIES
+    be_rows: dict[str, pl.DataFrame] = {}
+    for ballot, frame in sheets.items():
+        frame = frame.with_columns(
+            wk=pl.col("Bezirksnummer") + pl.col("Abgeordneten-hauswahlkreis").str.zfill(2),
+            district=pl.col("Bezirksname"),
+        )
+        be_rows[ballot] = frame
+        for column in frame.columns[10:-2]:
+            frame = frame.with_columns(pl.col(column).cast(pl.Int64))
+        be_rows[ballot] = frame
+        grouped = frame.group_by("wk").agg(pl.col("district").first(), *(pl.col(c).sum() for c in frame.columns[10:-2]))
+        for row in grouped.iter_rows(named=True):
+            counts = {
+                (column if column in be_parties else f"Einzelbewerber {column}"): row[column]
+                for column in frame.columns[18:-2]
+                if row[column]
+            }
+            add_votes("BE", row["wk"], ballot, counts)
+            if ballot == 1:
+                cons.append(
+                    {
+                        "state": "BE",
+                        "wk": row["wk"],
+                        "name": f"{row['district']} {int(row['wk'][2:])}",
+                        "registered": row["Wahlberechtigte insgesamt"],
+                        "voters": row["Wählende"],
+                        "invalid1": row["Ungültige Stimmen"],
+                        "valid1": row["Gültige Stimmen"],
+                        "invalid2": None,
+                        "valid2": None,
+                    }
+                )
+            else:
+                for entry in cons:
+                    if entry["state"] == "BE" and entry["wk"] == row["wk"]:
+                        entry["invalid2"] = row["Ungültige Stimmen"]
+                        entry["valid2"] = row["Gültige Stimmen"]
+    page = raw.cached(SOURCE, URLS["BE"][1]).path.read_text(encoding="utf-8")
+    for row in re.findall(r"<tr[^>]*>(.*?)</tr>", page, re.DOTALL):
+        cells = [
+            text
+            for cell in re.findall(r"<t[dh][^>]*>(.*?)</t[dh]>", row, re.DOTALL)
+            if (text := html.unescape(re.sub(r"<[^>]+>|\s+", " ", cell)).strip())
+        ]
+        if len(cells) != 3 or "," not in cells[1]:
+            continue
+        area, who, party = cells
+        family, _, first = who.partition(",")
+        title = re.match(r"((?:Dr\.|Prof\.)(?: (?:Dr\.|Prof\.))*) (.+)", family.strip())
+        direct_area = re.fullmatch(r"(\d{4}) - .+", area)
+        members.append(
+            {
+                "state": "BE",
+                "kind": "direct" if direct_area else "list",
+                "wk": direct_area[1] if direct_area else None,
+                "party": party,
+                "family": title[2] if title else family.strip(),
+                "first": first.strip(),
+                "title": title[1] if title else None,
+                "position": None,
+            }
+        )
+
     member_frame = pl.DataFrame(members, infer_schema_length=None)
-    for state in ("BW",):
+    for state in ("BW", "BE"):
         counts = member_frame.filter(pl.col("state") == state).group_by("party", "kind").len()
         for party in counts["party"].unique():
             sub = counts.filter(pl.col("party") == party)
@@ -335,7 +429,7 @@ def parse() -> None:
             )
     constituencies = pl.DataFrame(cons, infer_schema_length=None)
     vote_frame = pl.DataFrame(votes, infer_schema_length=None)
-    for state, expected in (("BW", 157), ("MV", 71), ("ST", 83)):
+    for state, expected in (("BW", 157), ("MV", 71), ("ST", 83), ("BE", 153)):
         total = sum(row["total"] for row in seats if row["state"] == state)
         if total != expected:
             raise ValueError(f"{state}: {total} seats, expected {expected}")
@@ -384,7 +478,7 @@ def emit() -> Path:
             raise ValueError("run de.btw first: the constituency system must exist")
         party_ids: dict[str, UUID] = {}
         for party in sorted(set(votes["party"]) | set(seats["party"]) | set(members["party"].drop_nulls())):
-            if party in OTHERS:
+            if party in OTHERS or party.startswith("Einzelbewerber "):
                 continue
             party_ids[party] = cs.key("de.party", party.upper())
             if party_ids[party] in cs.minted:
@@ -584,7 +678,7 @@ def emit() -> Path:
                         id=options[party],
                         contest_id=contest,
                         kind="others" if party in OTHERS else "candidate",
-                        party_id=None if party in OTHERS else party_ids[party],
+                        party_id=party_ids.get(party),
                         ballot_label=party,
                     )
                     value_rows.append(values(contest_set, wk, options[party], 1, count))
@@ -614,7 +708,8 @@ def emit() -> Path:
                 named=True
             ):
                 candidacy = cs.key(
-                    f"{SOURCE}.candidacy", f"{abbreviation}:{day}:list:{member['party']}:{member['position']}"
+                    f"{SOURCE}.candidacy",
+                    f"{abbreviation}:{day}:list:{member['party']}:{member['position']}:{member['family']}:{member['first']}",
                 )
                 cs.add(
                     "candidacy",
