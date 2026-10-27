@@ -5,7 +5,7 @@ import re
 import subprocess
 import unicodedata
 import zipfile
-from datetime import date, timedelta
+from datetime import UTC, date, datetime, timedelta
 from pathlib import Path
 from uuid import UUID
 from xml.etree import ElementTree
@@ -102,6 +102,13 @@ DOCUMENTS = {
         "Territorial election summary results report, official results, November 5, 2024",
         "https://vivote.gov/",
     ),
+    "IA2002": (
+        SOURCE,
+        "https://sos.iowa.gov/elections/pdf/2002/results/GovernorCanvass.pdf",
+        "Iowa Secretary of State",
+        "2002 General Election canvass summary: Governor/Lieutenant Governor",
+        "https://sos.iowa.gov/elections/results/",
+    ),
     "ME2014": (
         SOURCE,
         "https://lldc.mainelegislature.org/Open/Elections/Returns/2014/20141104/elec_20141104aj.xlsx",
@@ -113,8 +120,19 @@ DOCUMENTS = {
 
 
 def fetch() -> None:
-    for cached, url, *_ in DOCUMENTS.values():
-        if cached == SOURCE:
+    try:
+        raw.cached(SOURCE, DOCUMENTS["IA2002"][1])
+    except LookupError:
+        raw.store(
+            SOURCE,
+            DOCUMENTS["IA2002"][1],
+            (DATA / "inbox" / "manual" / "MF-142" / "GovernorCanvass.pdf").read_bytes(),
+            suffix=".pdf",
+            retrieved_at=datetime(2026, 10, 27, tzinfo=UTC),
+            media_type="application/pdf",
+        )
+    for document, (cached, url, *_) in DOCUMENTS.items():
+        if cached == SOURCE and document != "IA2002":
             raw.fetch(SOURCE, url, suffix=Path(url.split("?")[0]).suffix)
 
 
@@ -439,6 +457,29 @@ def virgin_islands(conn: Connection, document: str) -> list[tuple[date, str, str
     return rows
 
 
+def iowa(conn: Connection) -> list[tuple[date, str, str, str, int]]:
+    codes = counties(conn, "19")
+    names = ["VILSACK", "GROSS", "HART", "CAMPAGNA", "WRITE-INS"]
+    rows = []
+    totals = None
+    for line in pdf("IA2002").splitlines():
+        if match := re.fullmatch(r"\s*([A-Z][A-Za-z' ]+?)\s+((?:[\d,]+\s+){5}[\d,]+)\s*", line):
+            values = [int(value.replace(",", "")) for value in match[2].split()]
+            if sum(values[:5]) != values[5]:
+                raise ValueError(f"IA governor {match[1]}: columns do not sum to the total")
+            if match[1] == "Totals":
+                totals = values
+                continue
+            code = codes[re.sub(r"[^a-z]", "", match[1].lower())]
+            rows += [(date(2002, 11, 5), "governor", code, name, votes) for name, votes in zip(names, values, strict=False)]
+    if len({row[2] for row in rows}) != 99 or totals is None:
+        raise ValueError("IA governor: not 99 counties and a totals row")
+    for index, name in enumerate(names):
+        if sum(row[4] for row in rows if row[3] == name) != totals[index]:
+            raise ValueError(f"IA governor {name}: counties do not sum to the statewide total")
+    return rows
+
+
 def pdf(document: str) -> str:
     source, url, *_ = DOCUMENTS[document]
     return subprocess.run(
@@ -454,6 +495,7 @@ def parse() -> None:
                 ("AR", arkansas),
                 ("CA2000", california),
                 ("ME2014", maine),
+                ("IA2002", iowa),
                 ("DE2006", delaware),
                 ("KS2002", kansas),
                 ("VI2024", lambda conn: virgin_islands(conn, "VI2024")),
