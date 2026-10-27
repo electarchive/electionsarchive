@@ -629,11 +629,11 @@ def _publish_table(conn: Connection, stage: Stage, table: str) -> None:
                 conn.execute("delete from public.contest_option where contest_id = any(%s::uuid[])", [ids])
             if kind == "person":
                 conn.execute("delete from public.person_image where person_id = any(%s::uuid[])", [ids])
+            conn.execute("delete from public.citation where entity_id = any(%s::uuid[])", [ids])
             if kind == "tenure":
                 for owned, column in (
                     ("tenure_affiliation", "tenure_id"),
                     ("tenure_event", "tenure_id"),
-                    ("citation", "entity_id"),
                 ):
                     conn.execute(
                         sql.SQL("delete from public.{} where {} = any(%s::uuid[])").format(
