@@ -462,7 +462,8 @@
       places,
       tiles: own.tiles,
       own: { tiles: own.tiles, k: own.k },
-      frame: parent?.frame ?? {
+      frame: own.frame,
+      limit: parent?.frame ?? {
         west: own.frame.west - (own.frame.east - own.frame.west) * 1.5,
         south: own.frame.south - (own.frame.north - own.frame.south) * 1.5,
         east: own.frame.east + (own.frame.east - own.frame.west) * 1.5,
@@ -1558,23 +1559,26 @@
         "lg:col-span-8": chamber != null,
       })}
     >
-      <PlaceMap
-        places={locating.places}
-        colors={locating.colors}
-        tiles={locating.tiles}
-        own={locating.own}
-        frame={locating.frame}
-        isApproximate={locating.isApproximate}
-        noun={locating.noun}
-        sources={locating.sources}
-        explore={upward?.path ?? null}
-        up={upward}
-        votes={m.col_votes()}
-        names={locating.names}
-        levels={[]}
-        span={null}
-        isLinked
-      />
+      {#key here}
+        <PlaceMap
+          places={locating.places}
+          colors={locating.colors}
+          tiles={locating.tiles}
+          own={locating.own}
+          frame={locating.frame}
+          limit={locating.limit}
+          isApproximate={locating.isApproximate}
+          noun={locating.noun}
+          sources={locating.sources}
+          explore={upward?.path ?? null}
+          up={upward}
+          votes={m.col_votes()}
+          names={locating.names}
+          levels={[]}
+          span={null}
+          isLinked
+        />
+      {/key}
       {#if locating.places.context != null}
         {const context = $derived(locating.places.context)}
         <p class="pbs-2 text-xs text-muted-foreground">

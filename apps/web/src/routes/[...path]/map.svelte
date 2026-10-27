@@ -39,6 +39,7 @@
     own,
     nested = null,
     frame,
+    limit = null,
     blank = null,
     isApproximate,
     noun,
@@ -64,6 +65,7 @@
     own: { tiles: string; k: number } | null;
     nested?: { tiles: string; ks: Array<number> } | null;
     frame: Box;
+    limit?: Box | null;
     blank?: Array<{ k: number; name: string; isHeld: boolean }> | null;
     isApproximate: boolean;
     noun: string;
@@ -192,6 +194,7 @@
     },
     {
       cooperative: true,
+      limit: untrack(() => limit),
       gestures: {
         "CooperativeGesturesHandler.WindowsHelpText": m.map_gesture_windows(),
         "CooperativeGesturesHandler.MacHelpText": m.map_gesture_mac(),
@@ -258,7 +261,7 @@
             near = next.k;
             nearPinned = true;
           } else {
-            void goto(resolve("/[...path]", { path: next.path }));
+            open(next.k, next.path, own?.tiles);
           }
         } else if (isTouch && pinned !== k) {
           nearPinned = false;
@@ -661,24 +664,26 @@
     return index;
   }
 
-  function open(k: number) {
-    const path = rows.get(k)?.path;
+  function open(k: number, path = rows.get(k)?.path, layer = tiles) {
     if (path == null) {
       return;
     }
     const href = resolve("/[...path]", { path });
-    const box = engine.shape(engine.tiles(tiles), k);
+    const box = engine.shape(engine.tiles(layer), k);
     if (box == null || calm) {
       void goto(href);
       return;
     }
-    const loading = preloadData(href);
     opening = k;
-    pinned = k;
-    focus = k;
+    if (rows.has(k)) {
+      pinned = k;
+      focus = k;
+    }
+    let isMoving = true;
     let isGone = false;
+    let exact: Box | null | undefined;
     const leave = () => {
-      if (!isGone) {
+      if (!isGone && opening === k) {
         isGone = true;
         const image = engine.snapshot();
         handoff = image == null ? null : { path: href, image };
@@ -687,20 +692,43 @@
         });
       }
     };
-    void loading.then(
+    const settle = () => {
+      const target = exact;
+      if (isMoving || target === undefined) {
+        return;
+      }
+      const span = Math.max(box.east - box.west, box.north - box.south);
+      if (
+        target == null ||
+        (["west", "south", "east", "north"] as const).every(
+          (side) => Math.abs(target[side] - box[side]) < span * 0.02,
+        )
+      ) {
+        leave();
+        return;
+      }
+      setTimeout(leave, 1200);
+      engine.fit(target, leave);
+    };
+    const moved = () => {
+      if (isMoving) {
+        isMoving = false;
+        settle();
+      }
+    };
+    setTimeout(moved, 1200);
+    engine.fit(box, moved);
+    void preloadData(href).then(
       (result) => {
-        const data: unknown = result.type === "loaded" ? result.data : null;
-        if (
-          typeof data === "object" &&
-          data != null &&
-          "surround" in data &&
-          data.surround != null
-        ) {
-          leave();
-          return;
-        }
-        setTimeout(leave, 1200);
-        engine.fit(box, leave);
+        const data: Partial<Extract<PageData, { kind: "contest" }>> =
+          result.type === "loaded" ? result.data : {};
+        exact =
+          data.kind === "contest"
+            ? (data.boundaries?.find(
+                (entry) => entry.k != null && entry.frame != null,
+              )?.frame ?? null)
+            : null;
+        settle();
       },
       () => {
         opening = null;
@@ -1612,7 +1640,9 @@
           class="animate-spin rounded-full border-2 border-border border-bs-foreground block-3.5 inline-3.5 motion-reduce:animate-none"
           aria-hidden="true"
         ></span>
-        {m.map_opening({ place: rows.get(opening)?.name ?? "" })}
+        {m.map_opening({
+          place: rows.get(opening)?.name ?? besides.get(opening)?.name ?? "",
+        })}
       </p>
     {/if}
     <div
