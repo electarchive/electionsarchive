@@ -222,6 +222,41 @@ const paint = (party: SQL, elections: SQL, date: SQL) => sql`
   )
 `;
 
+const holding = (tenure: string, day: SQL) => {
+  const t = sql.raw(tenure);
+  return sql`(${t}.from_date is null or ${t}.from_date < ${day})
+    and (${t}.to_date is null or ${t}.to_date >= ${day}
+      or (${t}.ended_via in ('term_end', 'dissolved') and ${t}.to_date >= ${day} - 120))`;
+};
+
+const covered = (contests: SQL) => sql`
+  with tk as (
+    select c.id, c.office_id, c.body_id, e.date_from as d
+    from contest c join election e on e.id = c.election_id
+    where c.id in (${contests})
+  ),
+  tp as (select distinct office_id, body_id, d from tk),
+  th as (
+    select p.office_id, p.body_id, p.d from tp p
+    join tenure t on t.office_id = p.office_id and ${holding("t", sql`p.d`)}
+    union
+    select p.office_id, p.body_id, p.d from tp p
+    join tenure t on t.body_id = p.body_id and p.office_id is null and ${holding("t", sql`p.d`)}
+  )
+  select tk.id from tk join th on th.office_id is not distinct from tk.office_id
+    and th.body_id is not distinct from tk.body_id and th.d = tk.d
+`;
+
+const tenured = (person: SQL, contest: SQL) => sql`exists (
+  select from contest hc join election he on he.id = hc.election_id
+  join tenure ht on ht.person_id in (
+    select ${person} union all select hm.entity_id from entity_merge hm where hm.into_id = ${person}
+  )
+  where hc.id = ${contest}
+    and ${holding("ht", sql`he.date_from`)}
+    and (ht.office_id = hc.office_id or (hc.office_id is null and ht.body_id = hc.body_id))
+)`;
+
 const abbreviate = (party: SQL, date: SQL) => sql`
   (select a.text from name a
     left join lateral (
@@ -1212,6 +1247,10 @@ async function load(
     independent: boolean;
     incumbent: boolean;
   }>(sql`
+    with covered as (${covered(sql`
+      select contest_id from contest_option
+      where k = any(${sql.param([...optionKs])}::int[]) or contest_id = any(${sql.param(outcomes)}::uuid[])
+    `)})
     select o.k, o.contest_id as contest, o.kind::text, coalesce(pm.into_id, o.party_id, (
         select coalesce(mm.into_id, cy.member_of_party_id, ta.party_id, nm.party_id, nb.party)
         from candidacy cy
@@ -1252,7 +1291,12 @@ async function load(
       )) as party, o.ballot_label as label,
       o.alliance_id as alliance, o.parent_option_id is not null as is_line,
       exists (select from candidacy cy where cy.option_id = o.id and cy.role = 'head' and cy.is_independent) as independent,
-      exists (select from candidacy cy where cy.option_id = o.id and cy.role = 'head' and cy.is_incumbent) as incumbent,
+      case when o.contest_id in (select id from covered) then exists (
+          select from candidacy cy left join entity_merge m on m.entity_id = cy.person_id
+          where cy.option_id = o.id and cy.role = 'head' and ${tenured(sql`coalesce(m.into_id, cy.person_id)`, sql`o.contest_id`)}
+        )
+        else exists (select from candidacy cy where cy.option_id = o.id and cy.role = 'head' and cy.is_incumbent)
+      end as incumbent,
       (select coalesce(m.into_id, cy.person_id) from candidacy cy left join entity_merge m on m.entity_id = cy.person_id
        where cy.option_id in (o.id, o.parent_option_id) and cy.role = 'head'
          and not exists (select from candidacy cz where cz.option_id = cy.option_id and cz.role = 'head' and cz.id <> cy.id)
@@ -4372,6 +4416,7 @@ export const contests = {
             ),
           }),
         ),
+        incumbency: v.nullable(v.picklist(["defeated", "open"])),
         slate: v.nullable(
           v.object({
             state: v.picklist(["scheduled", "counting", "unreported"]),
@@ -4920,12 +4965,22 @@ export const contests = {
                 left join entity_merge m on m.entity_id = cy.person_id
                 join outcome x on x.option_id = o.id and x.kind in ('elected', 'won') and x.candidacy_id is null
                 join result_set xs on xs.id = x.result_set_id and ${latest("xs")}
+              ),
+              covered as (${covered(sql`select ${contest.id}::uuid`)}),
+              flagged as (
+                select from contest_option fo join candidacy fc on fc.option_id = fo.id and fc.role = 'head'
+                where fo.contest_id = ${contest.id}::uuid and fc.is_incumbent is not null
               )
               select o.k, o.kind::text as kind, coalesce(cy.ballot_name, o.ballot_label) as label,
                 coalesce(m.into_id, cy.person_id) as person, p.party,
                 ${paint(sql`p.party`, sql`${contest.election}::uuid`, sql`${contest.date ?? "infinity"}::date`)} as color,
                 coalesce(cy.is_independent, false) as "isIndependent",
-                coalesce(cy.is_incumbent, coalesce(m.into_id, cy.person_id) in (select person from won), false) as "isIncumbent"
+                case when exists (select from covered)
+                  then cy.person_id is not null and ${tenured(sql`coalesce(m.into_id, cy.person_id)`, sql`${contest.id}::uuid`)}
+                  when exists (select from flagged) then coalesce(cy.is_incumbent, false)
+                  else ${(contest.date ?? "") > new Date().toISOString().slice(0, 10)}::boolean
+                    and coalesce(m.into_id, cy.person_id) in (select person from won)
+                end as "isIncumbent"
               from contest_option o
               left join candidacy cy on cy.option_id = o.id and cy.role = 'head'
                 and not exists (select from candidacy cz where cz.option_id = o.id and cz.role = 'head' and cz.id <> cy.id)
@@ -4945,6 +5000,47 @@ export const contests = {
               order by o.ballot_position nulls last, coalesce(cy.ballot_name, o.ballot_label), o.k
             `)
           : { rows: [] };
+      const standing = await db.execute<{
+        status: "defeated" | "open" | null;
+      }>(sql`
+        with k as (
+          select c.id, c.office_id, c.seat_id, c.body_id, c.district_area_id, c.previous_round_id, e.date_from as d
+          from contest c join election e on e.id = c.election_id
+          where c.id = ${contest.id}::uuid and c.party_scope_id is null and not c.notional
+            and (c.office_id is not null or c.body_id is not null)
+        ),
+        covered as (${covered(sql`select id from k`)}),
+        ran as (
+          select o.id as option,
+            case when exists (select from covered)
+              then ${tenured(sql`coalesce(m.into_id, cy.person_id)`, sql`${contest.id}::uuid`)}
+              else coalesce(cy.is_incumbent, false)
+            end as "isIncumbent"
+          from k join contest_option o on o.contest_id = k.id and o.parent_option_id is null
+          join candidacy cy on cy.option_id = o.id and cy.role = 'head'
+          left join entity_merge m on m.entity_id = cy.person_id
+        ),
+        decided as (
+          select x.option_id, x.kind from outcome x
+          join result_set rs on rs.id = x.result_set_id and ${latest("rs")}
+          where rs.contest_id = ${contest.id}::uuid and x.candidacy_id is null
+            and x.kind in ('elected', 'won', 'advanced')
+        )
+        select case
+          when exists (select from decided where kind in ('elected', 'won'))
+            and exists (select from ran where "isIncumbent" and option not in (select option_id from decided))
+            then 'defeated'
+          when not exists (select from ran where "isIncumbent") and k.previous_round_id is null and exists (
+            select from tenure t
+            left join seat se on se.id = t.seat_id
+            where ${holding("t", sql`k.d`)}
+              and case when k.office_id is not null then t.office_id = k.office_id
+              when k.seat_id is not null then t.seat_id = k.seat_id
+              else t.body_id = k.body_id and se.district_area_id = k.district_area_id end
+          ) then 'open'
+        end as status
+        from k
+      `);
       const listedNames = await names(
         listed.rows.flatMap((row) =>
           [row.person, row.party].filter((id) => id != null),
@@ -5090,6 +5186,7 @@ export const contests = {
         })),
         citations: cited.rows,
         checks: [],
+        incumbency: standing.rows[0]?.status ?? null,
         slate:
           listed.rows.length === 0
             ? null

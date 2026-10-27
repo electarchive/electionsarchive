@@ -3178,7 +3178,13 @@ function contestMarkdown(
         ? `[${m.wording_link()}](${row.url ?? ""})`
         : `${row.kind === "text" ? m.wording_text() : m.wording_summary()}: ${row.body ?? ""} (${row.url == null ? source : `[${source}](${row.url})`})`;
     }),
-    [verdict(contest), comeback(contest, rounds)]
+    [
+      verdict(contest),
+      comeback(contest, rounds),
+      contest.incumbency == null
+        ? null
+        : `${contest.incumbency === "defeated" ? m.incumbency_defeated() : m.incumbency_open()}.`,
+    ]
       .filter((part) => part != null)
       .join(" "),
     ...contest.notes.map((note) => `> ${note.body}`),

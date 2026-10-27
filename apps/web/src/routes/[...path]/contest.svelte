@@ -1206,6 +1206,13 @@
           >{m.scope_home({ place: contest.scope.name })}</Preview
         >
       {/if}
+      {#if contest.incumbency != null}
+        <span class="highlighter px-1 font-semibold text-foreground"
+          >{contest.incumbency === "defeated"
+            ? m.incumbency_defeated()
+            : m.incumbency_open()}</span
+        >
+      {/if}
       {#if contest.election.status === "annulled"}
         <span class="highlighter px-1 font-semibold text-foreground"
           >{m.election_annulled()}</span

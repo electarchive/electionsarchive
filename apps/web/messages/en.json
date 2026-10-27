@@ -266,6 +266,8 @@
   "slate_counting": "Voting closed on {date}. Ballots are still being counted, and no results are published yet.",
   "slate_unreported": "Voting took place on {date}. No results are published for this contest yet.",
   "slate_incumbent": "Incumbent",
+  "incumbency_defeated": "Incumbent defeated",
+  "incumbency_open": "Open seat",
   "slate_independent": "Independent",
   "wards_none": "No results yet",
   "count_title": "Ranked-choice count",
