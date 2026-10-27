@@ -5,6 +5,17 @@ from typing import LiteralString
 from ea.store import ROOT, connect
 
 FIXTURES = ROOT / "packages" / "engine" / "src" / "fixtures"
+BONUSES = (
+    ("italy-camera-2006", "it/2006-04-09-general/chamber"),
+    ("italy-camera-2008", "it/2008-04-13-general/chamber"),
+    ("italy-camera-2013", "it/2013-02-24-general/chamber"),
+    ("italy-senate-2006-lombardia", "it/2006-04-09-general/senate/lombardia"),
+    ("france-2026-chenove", "fr/chenove/2026-03-15-local/conseil-municipal"),
+    ("france-2026-saulxures-les-nancy", "fr/saulxures-les-nancy/2026-03-15-local/conseil-municipal"),
+    ("france-2026-surgeres", "fr/surgeres/2026-03-22-runoff/conseil-municipal"),
+    ("france-2026-paris", "fr/paris/2026-03-22-runoff/conseil-municipal"),
+    ("france-2026-paris-18", "fr/paris/2026-03-22-runoff/secteur-18"),
+)
 
 
 def number(value: object) -> int:
@@ -487,4 +498,56 @@ def export() -> list[str]:
                     }
                 )
             write(fixture, labeled({"valid": valid, "lists": slates}))
+    bonuses()
     return sorted(path.name for path in FIXTURES.iterdir())
+
+
+def bonuses() -> None:
+    with connect() as conn:
+        for fixture, path in BONUSES:
+            row = conn.execute(
+                """select c.magnitude, coalesce(c.round_number, 1), es.rules || coalesce(c.rules_override, '{}'),
+                          (select sum(v.value) from result_value v where v.result_set_k = rs.k and v.option_k = 0
+                             and v.measure = 4 and v.count_round = 0 and v.channel = 0),
+                          (select jsonb_agg(jsonb_build_object(
+                             'id', o.id, 'label', o.ballot_label, 'party', o.party_id,
+                             'group', (select n.text from name n where n.entity_id = o.alliance_id and n.lang = 'en'
+                                       limit 1),
+                             'votes', (select sum(v.value) from result_value v where v.result_set_k = rs.k
+                                         and v.option_k = o.k and v.measure = 1 and v.count_round = 0
+                                         and v.channel = 0),
+                             'seats', (select sum(x.seats) from outcome x where x.result_set_id = rs.id
+                                         and x.option_id = o.id and x.candidacy_id is null))
+                             order by o.ballot_position, o.ballot_label)
+                           from contest_option o where o.contest_id = c.id)
+                   from slug s join contest c on c.id = s.entity_id
+                   join electoral_system es on es.id = c.electoral_system_id
+                   join result_set rs on rs.contest_id = c.id and rs.is_default where s.path = %s""",
+                [path],
+            ).fetchone()
+            if row is None:
+                raise LookupError(f"no contest with a default result set at {path}")
+            seats, round_number, rules, valid, options = row
+            labels = {str(option["party"]): option["label"].strip() for option in options}
+            bars = rules.get("threshold")
+            for bar in bars if isinstance(bars, list) else [bars] if bars else []:
+                if "exempt" in bar:
+                    bar["exempt"] = [labels.get(party, party) for party in bar["exempt"]]
+            write(
+                fixture,
+                {
+                    "seats": seats,
+                    "round": round_number,
+                    "valid": number(valid) if valid is not None else None,
+                    "rules": rules,
+                    "entries": [
+                        {
+                            "id": option["label"].strip(),
+                            "votes": number(option["votes"] or 0),
+                            **({"group": option["group"]} if option["group"] else {}),
+                        }
+                        for option in options
+                    ],
+                    "declared": {option["label"].strip(): option["seats"] or 0 for option in options},
+                },
+            )

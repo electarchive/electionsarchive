@@ -1,0 +1,35 @@
+{
+  "seats": 29,
+  "round": 2,
+  "valid": 3101,
+  "rules": {
+    "bonus": {
+      "size": {
+        "kind": "fraction",
+        "below": { "seats": 4, "rounding": "down" },
+        "fraction": 0.5,
+        "rounding": "up"
+      },
+      "level": "list",
+      "share": { "rounds": [1], "strict": true, "percent": 50 }
+    },
+    "lists": {
+      "order": "closed",
+      "vacancy": "next_on_list",
+      "exhausted": "vacant"
+    },
+    "formula": "dhondt",
+    "tieBreak": "votes",
+    "threshold": { "level": "list", "scope": "contest", "percent": 5 }
+  },
+  "entries": [
+    { "id": "SURGÈRES EN COMMUN", "votes": 1530 },
+    { "id": "Surgères avec vous", "votes": 1208 },
+    { "id": "Surgères à Gauche", "votes": 363 }
+  ],
+  "declared": {
+    "SURGÈRES EN COMMUN": 22,
+    "Surgères avec vous": 6,
+    "Surgères à Gauche": 1
+  }
+}

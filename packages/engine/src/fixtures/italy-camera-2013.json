@@ -1,0 +1,196 @@
+{
+  "seats": 617,
+  "round": 1,
+  "valid": 34002523,
+  "rules": {
+    "bonus": {
+      "size": { "kind": "target", "seats": 340 },
+      "level": "coalition",
+      "remainder": "others"
+    },
+    "lists": { "order": "closed", "vacancy": "next_on_list" },
+    "formula": "hare",
+    "threshold": [
+      {
+        "level": "coalition",
+        "scope": "national",
+        "exempt": ["SVP"],
+        "percent": 10,
+        "requires": { "percent": 2 }
+      },
+      {
+        "level": "list",
+        "scope": "national",
+        "exempt": ["SVP"],
+        "members": "coalition",
+        "percent": 2,
+        "bestLoser": true
+      },
+      {
+        "level": "list",
+        "scope": "national",
+        "exempt": ["SVP"],
+        "members": "standalone",
+        "percent": 4
+      }
+    ]
+  },
+  "entries": [
+    { "id": "CASAPOUND ITALIA", "votes": 47689 },
+    {
+      "id": "CENTRO DEMOCRATICO",
+      "votes": 167071,
+      "group": "Pier Luigi Bersani's coalition"
+    },
+    { "id": "DEMOCRAZIA ATEA", "votes": 556 },
+    { "id": "DIE FREIHEITLICHEN", "votes": 48317 },
+    { "id": "FARE PER FERMARE IL DECLINO", "votes": 380488 },
+    { "id": "FIAMMA TRICOLORE", "votes": 44744 },
+    { "id": "FORZA NUOVA", "votes": 89802 },
+    {
+      "id": "FRATELLI D'ITALIA",
+      "votes": 665835,
+      "group": "Silvio Berlusconi's coalition"
+    },
+    {
+      "id": "FUTURO E LIBERTA'",
+      "votes": 159415,
+      "group": "Mario Monti's coalition"
+    },
+    {
+      "id": "GRANDE SUD - MPA",
+      "votes": 148549,
+      "group": "Silvio Berlusconi's coalition"
+    },
+    { "id": "I PIRATI", "votes": 4557 },
+    {
+      "id": "IL POPOLO DELLA LIBERTA'",
+      "votes": 7332829,
+      "group": "Silvio Berlusconi's coalition"
+    },
+    { "id": "INDIPENDENZA PER LA SARDEGNA", "votes": 7598 },
+    { "id": "INDIPENDENZA VENETA", "votes": 33274 },
+    {
+      "id": "INTESA POPOLARE",
+      "votes": 25632,
+      "group": "Silvio Berlusconi's coalition"
+    },
+    { "id": "IO AMO L'ITALIA", "votes": 42527 },
+    {
+      "id": "LA DESTRA",
+      "votes": 219671,
+      "group": "Silvio Berlusconi's coalition"
+    },
+    {
+      "id": "LEGA NORD",
+      "votes": 1390153,
+      "group": "Silvio Berlusconi's coalition"
+    },
+    { "id": "LG.VENETA REPUBBLICA", "votes": 15838 },
+    { "id": "LIBERALI PER L'ITALIA - PLI", "votes": 28025 },
+    {
+      "id": "LIBERI PER UNA ITALIA EQUA",
+      "votes": 3243,
+      "group": "Silvio Berlusconi's coalition"
+    },
+    { "id": "LISTA AMNISTIA GIUSTIZIA LIBERTA'", "votes": 64713 },
+    { "id": "MERIS", "votes": 5901 },
+    {
+      "id": "MIR - MODERATI IN RIVOLUZIONE",
+      "votes": 81978,
+      "group": "Silvio Berlusconi's coalition"
+    },
+    { "id": "MOVIMENTO 5 STELLE BEPPEGRILLO.IT", "votes": 8689584 },
+    { "id": "MOVIMENTO P.P.A.", "votes": 1526 },
+    { "id": "MOVIMENTO PROGETTO ITALIA - MID", "votes": 3967 },
+    { "id": "PARTITO COMUNISTA DEI LAVORATORI", "votes": 89991 },
+    {
+      "id": "PARTITO DEMOCRATICO",
+      "votes": 8644542,
+      "group": "Pier Luigi Bersani's coalition"
+    },
+    { "id": "PARTITO DI ALTERNATIVA COMUNISTA", "votes": 5159 },
+    {
+      "id": "PARTITO PENSIONATI",
+      "votes": 54857,
+      "group": "Silvio Berlusconi's coalition"
+    },
+    { "id": "POPOLARI UNITI", "votes": 2992 },
+    { "id": "PRI", "votes": 7143 },
+    { "id": "PROGETTO NAZIONALE", "votes": 2865 },
+    { "id": "PS D'AZ.", "votes": 18585 },
+    { "id": "RIFONDAZIONE MISSINA ITALIANA", "votes": 3180 },
+    { "id": "RIFORMISTI ITALIANI", "votes": 8223 },
+    { "id": "RIVOLUZIONE CIVILE", "votes": 765194 },
+    {
+      "id": "SCELTA CIVICA CON MONTI PER L'ITALIA",
+      "votes": 2824064,
+      "group": "Mario Monti's coalition"
+    },
+    {
+      "id": "SINISTRA ECOLOGIA LIBERTA'",
+      "votes": 1089562,
+      "group": "Pier Luigi Bersani's coalition"
+    },
+    { "id": "STAMINALI D'ITALIA", "votes": 585 },
+    { "id": "SVP", "votes": 146804, "group": "Pier Luigi Bersani's coalition" },
+    { "id": "TUTTI INSIEME PER L'ITALIA", "votes": 1452 },
+    {
+      "id": "UNIONE DI CENTRO",
+      "votes": 608205,
+      "group": "Mario Monti's coalition"
+    },
+    { "id": "UNIONE POP.", "votes": 1515 },
+    { "id": "VENETO STATO", "votes": 11378 },
+    { "id": "VOTO DI PROTESTA", "votes": 12745 }
+  ],
+  "declared": {
+    "CASAPOUND ITALIA": 0,
+    "CENTRO DEMOCRATICO": 6,
+    "DEMOCRAZIA ATEA": 0,
+    "DIE FREIHEITLICHEN": 0,
+    "FARE PER FERMARE IL DECLINO": 0,
+    "FIAMMA TRICOLORE": 0,
+    "FORZA NUOVA": 0,
+    "FRATELLI D'ITALIA": 9,
+    "FUTURO E LIBERTA'": 0,
+    "GRANDE SUD - MPA": 0,
+    "I PIRATI": 0,
+    "IL POPOLO DELLA LIBERTA'": 97,
+    "INDIPENDENZA PER LA SARDEGNA": 0,
+    "INDIPENDENZA VENETA": 0,
+    "INTESA POPOLARE": 0,
+    "IO AMO L'ITALIA": 0,
+    "LA DESTRA": 0,
+    "LEGA NORD": 18,
+    "LG.VENETA REPUBBLICA": 0,
+    "LIBERALI PER L'ITALIA - PLI": 0,
+    "LIBERI PER UNA ITALIA EQUA": 0,
+    "LISTA AMNISTIA GIUSTIZIA LIBERTA'": 0,
+    "MERIS": 0,
+    "MIR - MODERATI IN RIVOLUZIONE": 0,
+    "MOVIMENTO 5 STELLE BEPPEGRILLO.IT": 108,
+    "MOVIMENTO P.P.A.": 0,
+    "MOVIMENTO PROGETTO ITALIA - MID": 0,
+    "PARTITO COMUNISTA DEI LAVORATORI": 0,
+    "PARTITO DEMOCRATICO": 292,
+    "PARTITO DI ALTERNATIVA COMUNISTA": 0,
+    "PARTITO PENSIONATI": 0,
+    "POPOLARI UNITI": 0,
+    "PRI": 0,
+    "PROGETTO NAZIONALE": 0,
+    "PS D'AZ.": 0,
+    "RIFONDAZIONE MISSINA ITALIANA": 0,
+    "RIFORMISTI ITALIANI": 0,
+    "RIVOLUZIONE CIVILE": 0,
+    "SCELTA CIVICA CON MONTI PER L'ITALIA": 37,
+    "SINISTRA ECOLOGIA LIBERTA'": 37,
+    "STAMINALI D'ITALIA": 0,
+    "SVP": 5,
+    "TUTTI INSIEME PER L'ITALIA": 0,
+    "UNIONE DI CENTRO": 8,
+    "UNIONE POP.": 0,
+    "VENETO STATO": 0,
+    "VOTO DI PROTESTA": 0
+  }
+}

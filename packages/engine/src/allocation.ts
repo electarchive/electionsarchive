@@ -215,3 +215,198 @@ export function qualify(
   }
   return passed;
 }
+
+function rounded(value: number, rounding: "up" | "down" | "nearest") {
+  const epsilon = 1e-9;
+  if (rounding === "up") return Math.ceil(value - epsilon);
+  if (rounding === "down") return Math.floor(value + epsilon);
+  return Math.round(value);
+}
+
+type Proportional = Exclude<
+  Allocating,
+  {
+    formula:
+      | "fptp"
+      | "winner_take_all"
+      | "block"
+      | "sntv"
+      | "limited"
+      | "cumulative"
+      | "approval";
+  }
+>;
+
+export type Apportionment = Allocation & {
+  qualified: Array<string>;
+  leader?: string | undefined;
+  bonus: number;
+};
+
+export function apportion(
+  rules: Proportional,
+  seats: number,
+  entries: Array<Entry & { group?: string }>,
+  { valid, round = 1 }: { valid?: number; round?: number } = {},
+): Apportionment {
+  let total = 0;
+  for (const { votes } of entries) total += votes;
+  const base = valid ?? total;
+  const reaches = (votes: number, percent: number) =>
+    votes * 100 >= percent * base;
+  const thresholds =
+    rules.threshold == null
+      ? []
+      : Array.isArray(rules.threshold)
+        ? rules.threshold
+        : [rules.threshold];
+  const isExempt = (threshold: Threshold, id: string, group?: string) =>
+    threshold.exempt?.includes(id) === true ||
+    (group != null && threshold.exempt?.includes(group) === true);
+  const coalitions = new Map<string, Array<Entry>>();
+  for (const { id, votes, group } of entries)
+    if (group != null)
+      coalitions.set(group, [...(coalitions.get(group) ?? []), { id, votes }]);
+  const pooled = new Map<string, number>();
+  for (const [group, members] of coalitions) {
+    let votes = 0;
+    for (const member of members) votes += member.votes;
+    pooled.set(group, votes);
+  }
+  const standing = new Set<string>();
+  for (const [group, members] of coalitions) {
+    const isStanding = thresholds
+      .filter(({ level }) => level === "coalition" || level === "alliance")
+      .every(
+        (threshold) =>
+          isExempt(threshold, group) ||
+          (reaches(pooled.get(group) ?? 0, threshold.percent) &&
+            (threshold.requires == null ||
+              members.some(({ votes }) =>
+                reaches(votes, threshold.requires?.percent ?? 0),
+              ))),
+      );
+    if (isStanding) standing.add(group);
+  }
+  const qualified = new Set<string>();
+  const listThresholds = thresholds.filter(
+    ({ level }) => level === "list" || level === "party",
+  );
+  for (const { id, votes, group } of entries) {
+    const inCoalition = group != null && standing.has(group);
+    const passes = listThresholds
+      .filter(
+        ({ members }) =>
+          members === "any" || (members === "coalition") === inCoalition,
+      )
+      .every(
+        (threshold) =>
+          isExempt(threshold, id, group) || reaches(votes, threshold.percent),
+      );
+    if (passes) qualified.add(id);
+  }
+  for (const threshold of listThresholds) {
+    if (!threshold.bestLoser) continue;
+    for (const group of standing) {
+      const losers = (coalitions.get(group) ?? [])
+        .filter(({ id }) => !qualified.has(id))
+        .toSorted((a, b) => b.votes - a.votes);
+      const best = losers[0];
+      if (best != null && best.votes !== losers[1]?.votes)
+        qualified.add(best.id);
+    }
+  }
+  const contenders: Array<Entry> = [];
+  const members = new Map<string, Array<Entry>>();
+  for (const [group, list] of coalitions) {
+    if (!standing.has(group)) continue;
+    const admitted = list.filter(({ id }) => qualified.has(id));
+    if (admitted.length === 0) continue;
+    members.set(group, admitted);
+    contenders.push({ id: group, votes: pooled.get(group) ?? 0 });
+  }
+  for (const { id, votes, group } of entries)
+    if (qualified.has(id) && (group == null || !standing.has(group)))
+      contenders.push({ id, votes });
+  const plain = {
+    ...rules,
+    pooling: undefined,
+    threshold: undefined,
+    bonus: undefined,
+  };
+  let allocation = allocate(plain, seats, contenders);
+  let leader: string | undefined;
+  let extra = 0;
+  const { bonus } = rules;
+  const ranked = contenders.toSorted((a, b) => b.votes - a.votes);
+  const top = ranked[0];
+  const isTriggered =
+    bonus != null &&
+    top != null &&
+    top.votes !== ranked[1]?.votes &&
+    (bonus.share == null ||
+      (bonus.share.rounds != null && !bonus.share.rounds.includes(round)) ||
+      (bonus.share.strict
+        ? top.votes * 100 > bonus.share.percent * base
+        : reaches(top.votes, bonus.share.percent)));
+  if (isTriggered && top != null) {
+    leader = top.id;
+    const { size } = bonus;
+    const others = contenders.filter(({ id }) => id !== top.id);
+    if (size.kind === "target") {
+      if (size.seats == null && size.fraction == null)
+        throw new Error("A target bonus needs seats or a fraction");
+      const target =
+        size.seats ??
+        rounded(seats * (size.fraction ?? 0), size.rounding ?? "up");
+      const won = allocation.seats[top.id] ?? 0;
+      if (won < target) {
+        extra = target - won;
+        const rest = allocate(plain, seats - target, others);
+        allocation = {
+          seats: { ...rest.seats, [top.id]: target },
+          tie: rest.tie,
+        };
+      }
+    } else {
+      extra =
+        size.kind === "seats"
+          ? size.seats
+          : rounded(
+              seats * size.fraction,
+              size.below != null && seats < size.below.seats
+                ? size.below.rounding
+                : size.rounding,
+            );
+      const rest = allocate(
+        plain,
+        seats - extra,
+        bonus.remainder === "others" ? others : contenders,
+      );
+      allocation = {
+        seats: { ...rest.seats, [top.id]: (rest.seats[top.id] ?? 0) + extra },
+        tie: rest.tie,
+      };
+    }
+  }
+  const result: Record<string, number> = {};
+  let tie = allocation.tie;
+  for (const { id } of entries) result[id] = 0;
+  for (const [id, won] of Object.entries(allocation.seats)) {
+    const list = members.get(id);
+    if (list == null) {
+      result[id] = won;
+      continue;
+    }
+    const inner = allocate(plain, won, list);
+    Object.assign(result, inner.seats);
+    tie ??= inner.tie;
+  }
+  return {
+    seats: result,
+    tie,
+    qualified: [...qualified],
+    leader,
+    bonus: extra,
+  };
+}

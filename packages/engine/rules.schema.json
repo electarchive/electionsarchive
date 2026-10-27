@@ -14,22 +14,156 @@
           "type": "string"
         },
         "threshold": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "percent": { "type": "number", "minimum": 0, "maximum": 100 },
+                "level": {
+                  "enum": ["list", "party", "alliance", "coalition"],
+                  "type": "string"
+                },
+                "scope": {
+                  "enum": ["contest", "national"],
+                  "type": "string",
+                  "default": "contest"
+                },
+                "constituencies": { "type": "integer", "minimum": 1 },
+                "exempt": { "type": "array", "items": { "type": "string" } },
+                "members": {
+                  "enum": ["any", "coalition", "standalone"],
+                  "type": "string"
+                },
+                "bestLoser": { "type": "boolean" },
+                "requires": {
+                  "type": "object",
+                  "properties": {
+                    "percent": {
+                      "type": "number",
+                      "minimum": 0,
+                      "maximum": 100
+                    }
+                  },
+                  "required": ["percent"]
+                }
+              },
+              "required": ["percent", "level"]
+            },
+            {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "percent": { "type": "number", "minimum": 0, "maximum": 100 },
+                  "level": {
+                    "enum": ["list", "party", "alliance", "coalition"],
+                    "type": "string"
+                  },
+                  "scope": {
+                    "enum": ["contest", "national"],
+                    "type": "string",
+                    "default": "contest"
+                  },
+                  "constituencies": { "type": "integer", "minimum": 1 },
+                  "exempt": { "type": "array", "items": { "type": "string" } },
+                  "members": {
+                    "enum": ["any", "coalition", "standalone"],
+                    "type": "string"
+                  },
+                  "bestLoser": { "type": "boolean" },
+                  "requires": {
+                    "type": "object",
+                    "properties": {
+                      "percent": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 100
+                      }
+                    },
+                    "required": ["percent"]
+                  }
+                },
+                "required": ["percent", "level"]
+              },
+              "minItems": 1
+            }
+          ]
+        },
+        "bonus": {
           "type": "object",
           "properties": {
-            "percent": { "type": "number", "minimum": 0, "maximum": 100 },
-            "level": {
-              "enum": ["list", "party", "alliance", "coalition"],
-              "type": "string"
+            "level": { "enum": ["list", "coalition"], "type": "string" },
+            "share": {
+              "type": "object",
+              "properties": {
+                "percent": { "type": "number", "minimum": 0, "maximum": 100 },
+                "strict": { "type": "boolean" },
+                "rounds": {
+                  "type": "array",
+                  "items": { "type": "integer", "minimum": 1 }
+                }
+              },
+              "required": ["percent"]
             },
-            "scope": {
-              "enum": ["contest", "national"],
-              "type": "string",
-              "default": "contest"
+            "size": {
+              "oneOf": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "kind": { "const": "fraction" },
+                    "fraction": {
+                      "type": "number",
+                      "exclusiveMinimum": 0,
+                      "maximum": 1
+                    },
+                    "rounding": {
+                      "enum": ["up", "down", "nearest"],
+                      "type": "string"
+                    },
+                    "below": {
+                      "type": "object",
+                      "properties": {
+                        "seats": { "type": "integer", "minimum": 1 },
+                        "rounding": {
+                          "enum": ["up", "down", "nearest"],
+                          "type": "string"
+                        }
+                      },
+                      "required": ["seats", "rounding"]
+                    }
+                  },
+                  "required": ["kind", "fraction", "rounding"]
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "kind": { "const": "seats" },
+                    "seats": { "type": "integer", "minimum": 1 }
+                  },
+                  "required": ["kind", "seats"]
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "kind": { "const": "target" },
+                    "seats": { "type": "integer", "minimum": 1 },
+                    "fraction": {
+                      "type": "number",
+                      "exclusiveMinimum": 0,
+                      "maximum": 1
+                    },
+                    "rounding": {
+                      "enum": ["up", "down", "nearest"],
+                      "type": "string"
+                    }
+                  },
+                  "required": ["kind"]
+                }
+              ]
             },
-            "constituencies": { "type": "integer", "minimum": 1 },
-            "exempt": { "type": "array", "items": { "type": "string" } }
+            "remainder": { "enum": ["all", "others"], "type": "string" }
           },
-          "required": ["percent", "level"]
+          "required": ["size"]
         },
         "pooling": { "enum": ["alliance", "coalition"], "type": "string" },
         "lists": {
@@ -73,22 +207,156 @@
         "formula": { "const": "modified_sainte_lague" },
         "firstDivisor": { "type": "number", "minimum": 1, "default": 1.4 },
         "threshold": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "percent": { "type": "number", "minimum": 0, "maximum": 100 },
+                "level": {
+                  "enum": ["list", "party", "alliance", "coalition"],
+                  "type": "string"
+                },
+                "scope": {
+                  "enum": ["contest", "national"],
+                  "type": "string",
+                  "default": "contest"
+                },
+                "constituencies": { "type": "integer", "minimum": 1 },
+                "exempt": { "type": "array", "items": { "type": "string" } },
+                "members": {
+                  "enum": ["any", "coalition", "standalone"],
+                  "type": "string"
+                },
+                "bestLoser": { "type": "boolean" },
+                "requires": {
+                  "type": "object",
+                  "properties": {
+                    "percent": {
+                      "type": "number",
+                      "minimum": 0,
+                      "maximum": 100
+                    }
+                  },
+                  "required": ["percent"]
+                }
+              },
+              "required": ["percent", "level"]
+            },
+            {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "percent": { "type": "number", "minimum": 0, "maximum": 100 },
+                  "level": {
+                    "enum": ["list", "party", "alliance", "coalition"],
+                    "type": "string"
+                  },
+                  "scope": {
+                    "enum": ["contest", "national"],
+                    "type": "string",
+                    "default": "contest"
+                  },
+                  "constituencies": { "type": "integer", "minimum": 1 },
+                  "exempt": { "type": "array", "items": { "type": "string" } },
+                  "members": {
+                    "enum": ["any", "coalition", "standalone"],
+                    "type": "string"
+                  },
+                  "bestLoser": { "type": "boolean" },
+                  "requires": {
+                    "type": "object",
+                    "properties": {
+                      "percent": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 100
+                      }
+                    },
+                    "required": ["percent"]
+                  }
+                },
+                "required": ["percent", "level"]
+              },
+              "minItems": 1
+            }
+          ]
+        },
+        "bonus": {
           "type": "object",
           "properties": {
-            "percent": { "type": "number", "minimum": 0, "maximum": 100 },
-            "level": {
-              "enum": ["list", "party", "alliance", "coalition"],
-              "type": "string"
+            "level": { "enum": ["list", "coalition"], "type": "string" },
+            "share": {
+              "type": "object",
+              "properties": {
+                "percent": { "type": "number", "minimum": 0, "maximum": 100 },
+                "strict": { "type": "boolean" },
+                "rounds": {
+                  "type": "array",
+                  "items": { "type": "integer", "minimum": 1 }
+                }
+              },
+              "required": ["percent"]
             },
-            "scope": {
-              "enum": ["contest", "national"],
-              "type": "string",
-              "default": "contest"
+            "size": {
+              "oneOf": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "kind": { "const": "fraction" },
+                    "fraction": {
+                      "type": "number",
+                      "exclusiveMinimum": 0,
+                      "maximum": 1
+                    },
+                    "rounding": {
+                      "enum": ["up", "down", "nearest"],
+                      "type": "string"
+                    },
+                    "below": {
+                      "type": "object",
+                      "properties": {
+                        "seats": { "type": "integer", "minimum": 1 },
+                        "rounding": {
+                          "enum": ["up", "down", "nearest"],
+                          "type": "string"
+                        }
+                      },
+                      "required": ["seats", "rounding"]
+                    }
+                  },
+                  "required": ["kind", "fraction", "rounding"]
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "kind": { "const": "seats" },
+                    "seats": { "type": "integer", "minimum": 1 }
+                  },
+                  "required": ["kind", "seats"]
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "kind": { "const": "target" },
+                    "seats": { "type": "integer", "minimum": 1 },
+                    "fraction": {
+                      "type": "number",
+                      "exclusiveMinimum": 0,
+                      "maximum": 1
+                    },
+                    "rounding": {
+                      "enum": ["up", "down", "nearest"],
+                      "type": "string"
+                    }
+                  },
+                  "required": ["kind"]
+                }
+              ]
             },
-            "constituencies": { "type": "integer", "minimum": 1 },
-            "exempt": { "type": "array", "items": { "type": "string" } }
+            "remainder": { "enum": ["all", "others"], "type": "string" }
           },
-          "required": ["percent", "level"]
+          "required": ["size"]
         },
         "pooling": { "enum": ["alliance", "coalition"], "type": "string" },
         "lists": {
@@ -134,22 +402,156 @@
           "type": "string"
         },
         "threshold": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "percent": { "type": "number", "minimum": 0, "maximum": 100 },
+                "level": {
+                  "enum": ["list", "party", "alliance", "coalition"],
+                  "type": "string"
+                },
+                "scope": {
+                  "enum": ["contest", "national"],
+                  "type": "string",
+                  "default": "contest"
+                },
+                "constituencies": { "type": "integer", "minimum": 1 },
+                "exempt": { "type": "array", "items": { "type": "string" } },
+                "members": {
+                  "enum": ["any", "coalition", "standalone"],
+                  "type": "string"
+                },
+                "bestLoser": { "type": "boolean" },
+                "requires": {
+                  "type": "object",
+                  "properties": {
+                    "percent": {
+                      "type": "number",
+                      "minimum": 0,
+                      "maximum": 100
+                    }
+                  },
+                  "required": ["percent"]
+                }
+              },
+              "required": ["percent", "level"]
+            },
+            {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "percent": { "type": "number", "minimum": 0, "maximum": 100 },
+                  "level": {
+                    "enum": ["list", "party", "alliance", "coalition"],
+                    "type": "string"
+                  },
+                  "scope": {
+                    "enum": ["contest", "national"],
+                    "type": "string",
+                    "default": "contest"
+                  },
+                  "constituencies": { "type": "integer", "minimum": 1 },
+                  "exempt": { "type": "array", "items": { "type": "string" } },
+                  "members": {
+                    "enum": ["any", "coalition", "standalone"],
+                    "type": "string"
+                  },
+                  "bestLoser": { "type": "boolean" },
+                  "requires": {
+                    "type": "object",
+                    "properties": {
+                      "percent": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 100
+                      }
+                    },
+                    "required": ["percent"]
+                  }
+                },
+                "required": ["percent", "level"]
+              },
+              "minItems": 1
+            }
+          ]
+        },
+        "bonus": {
           "type": "object",
           "properties": {
-            "percent": { "type": "number", "minimum": 0, "maximum": 100 },
-            "level": {
-              "enum": ["list", "party", "alliance", "coalition"],
-              "type": "string"
+            "level": { "enum": ["list", "coalition"], "type": "string" },
+            "share": {
+              "type": "object",
+              "properties": {
+                "percent": { "type": "number", "minimum": 0, "maximum": 100 },
+                "strict": { "type": "boolean" },
+                "rounds": {
+                  "type": "array",
+                  "items": { "type": "integer", "minimum": 1 }
+                }
+              },
+              "required": ["percent"]
             },
-            "scope": {
-              "enum": ["contest", "national"],
-              "type": "string",
-              "default": "contest"
+            "size": {
+              "oneOf": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "kind": { "const": "fraction" },
+                    "fraction": {
+                      "type": "number",
+                      "exclusiveMinimum": 0,
+                      "maximum": 1
+                    },
+                    "rounding": {
+                      "enum": ["up", "down", "nearest"],
+                      "type": "string"
+                    },
+                    "below": {
+                      "type": "object",
+                      "properties": {
+                        "seats": { "type": "integer", "minimum": 1 },
+                        "rounding": {
+                          "enum": ["up", "down", "nearest"],
+                          "type": "string"
+                        }
+                      },
+                      "required": ["seats", "rounding"]
+                    }
+                  },
+                  "required": ["kind", "fraction", "rounding"]
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "kind": { "const": "seats" },
+                    "seats": { "type": "integer", "minimum": 1 }
+                  },
+                  "required": ["kind", "seats"]
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "kind": { "const": "target" },
+                    "seats": { "type": "integer", "minimum": 1 },
+                    "fraction": {
+                      "type": "number",
+                      "exclusiveMinimum": 0,
+                      "maximum": 1
+                    },
+                    "rounding": {
+                      "enum": ["up", "down", "nearest"],
+                      "type": "string"
+                    }
+                  },
+                  "required": ["kind"]
+                }
+              ]
             },
-            "constituencies": { "type": "integer", "minimum": 1 },
-            "exempt": { "type": "array", "items": { "type": "string" } }
+            "remainder": { "enum": ["all", "others"], "type": "string" }
           },
-          "required": ["percent", "level"]
+          "required": ["size"]
         },
         "pooling": { "enum": ["alliance", "coalition"], "type": "string" },
         "lists": {

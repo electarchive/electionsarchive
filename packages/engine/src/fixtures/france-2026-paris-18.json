@@ -1,0 +1,43 @@
+{
+  "seats": 44,
+  "round": 2,
+  "valid": 66173,
+  "rules": {
+    "bonus": {
+      "size": {
+        "kind": "fraction",
+        "below": { "seats": 4, "rounding": "down" },
+        "fraction": 0.5,
+        "rounding": "up"
+      },
+      "level": "list",
+      "share": { "rounds": [1], "strict": true, "percent": 50 }
+    },
+    "lists": {
+      "order": "closed",
+      "vacancy": "next_on_list",
+      "exhausted": "vacant"
+    },
+    "formula": "dhondt",
+    "tieBreak": "votes",
+    "threshold": { "level": "list", "scope": "contest", "percent": 5 }
+  },
+  "entries": [
+    {
+      "id": "Changer Paris 18 avecThierry Guerrier et Rachida Dati",
+      "votes": 14810
+    },
+    {
+      "id": "Le 18e est à vous ! Avec Eric Lejoindre et Emmanuel Grégoire. L'union de la gauche et des écologistes",
+      "votes": 28996
+    },
+    { "id": "LE NOUVEAU PARIS POPULAIRE ET CITOYEN 18e", "votes": 16351 },
+    { "id": "Paris 18ème apaisé avec Samir BELAÏD", "votes": 6016 }
+  ],
+  "declared": {
+    "Changer Paris 18 avecThierry Guerrier et Rachida Dati": 5,
+    "Le 18e est à vous ! Avec Eric Lejoindre et Emmanuel Grégoire. L'union de la gauche et des écologistes": 32,
+    "LE NOUVEAU PARIS POPULAIRE ET CITOYEN 18e": 5,
+    "Paris 18ème apaisé avec Samir BELAÏD": 2
+  }
+}

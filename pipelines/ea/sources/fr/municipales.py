@@ -74,9 +74,13 @@ TURNOUT_CAVEAT = (
 )
 RULES = {
     "formula": "dhondt",
+    "tieBreak": "votes",
     "threshold": {"percent": 5, "level": "list", "scope": "contest"},
     "lists": {"order": "closed", "exhausted": "vacant", "vacancy": "next_on_list"},
 }
+BONUS = {"level": "list", "share": {"percent": 50, "strict": True, "rounds": [1]}}
+HALF = {"kind": "fraction", "fraction": 0.5, "rounding": "up", "below": {"seats": 4, "rounding": "down"}}
+QUARTER = {"kind": "fraction", "fraction": 0.25, "rounding": "up"}
 
 
 def fetch() -> None:
@@ -315,12 +319,13 @@ def emit() -> Path:
             name(nuances[code], label or code)
             name(nuances[code], code, "fr", "abbreviation")
         systems = {}
-        for key, english, note in (
-            ("list-2025", "French municipal list system", NOTE),
-            ("cities-2025", "Paris, Lyon, and Marseille council list system", NOTE_CITIES),
+        for key, english, note, size in (
+            ("list-2025", "French municipal list system", NOTE, HALF),
+            ("cities-2025", "Paris, Lyon, and Marseille council list system", NOTE_CITIES, QUARTER),
         ):
             systems[key] = cs.key(f"{SOURCE}.electoral_system", key)
-            cs.add("electoral_system", id=systems[key], polity_id=france, rules=RULES, rules_version=1)
+            rules = {**RULES, "bonus": {**BONUS, "size": size}}
+            cs.add("electoral_system", id=systems[key], polity_id=france, rules=rules, rules_version=1)
             name(systems[key], english, "en")
             cs.add("note", entity_id=systems[key], kind="methodology", body_md=note)
         umbrella = cs.key(f"{SOURCE}.election", "2026")

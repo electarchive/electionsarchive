@@ -21,13 +21,53 @@ const lists = v.optional(
   }),
 );
 
+const percent = v.pipe(v.number(), v.minValue(0), v.maxValue(100));
+const rounding = v.picklist(["up", "down", "nearest"]);
+const seatCount = v.pipe(v.number(), v.integer(), v.minValue(1));
+
 const threshold = v.object({
-  percent: v.pipe(v.number(), v.minValue(0), v.maxValue(100)),
+  percent,
   level: v.picklist(["list", "party", "alliance", "coalition"]),
   scope: v.optional(v.picklist(["contest", "national"]), "contest"),
-  constituencies: v.optional(v.pipe(v.number(), v.integer(), v.minValue(1))),
+  constituencies: v.optional(seatCount),
   exempt: v.optional(v.array(v.string())),
+  members: v.optional(v.picklist(["any", "coalition", "standalone"])),
+  bestLoser: v.optional(v.boolean()),
+  requires: v.optional(v.object({ percent })),
 });
+
+const thresholds = v.optional(
+  v.union([threshold, v.pipe(v.array(threshold), v.minLength(1))]),
+);
+
+const bonus = v.optional(
+  v.object({
+    level: v.optional(v.picklist(["list", "coalition"])),
+    share: v.optional(
+      v.object({
+        percent,
+        strict: v.optional(v.boolean()),
+        rounds: v.optional(v.array(seatCount)),
+      }),
+    ),
+    size: v.variant("kind", [
+      v.object({
+        kind: v.literal("fraction"),
+        fraction: v.pipe(v.number(), v.gtValue(0), v.maxValue(1)),
+        rounding,
+        below: v.optional(v.object({ seats: seatCount, rounding })),
+      }),
+      v.object({ kind: v.literal("seats"), seats: seatCount }),
+      v.object({
+        kind: v.literal("target"),
+        seats: v.optional(seatCount),
+        fraction: v.optional(v.pipe(v.number(), v.gtValue(0), v.maxValue(1))),
+        rounding: v.optional(rounding),
+      }),
+    ]),
+    remainder: v.optional(v.picklist(["all", "others"])),
+  }),
+);
 
 export const rules = v.variant("formula", [
   v.object({
@@ -38,7 +78,8 @@ export const rules = v.variant("formula", [
       "sainte_lague_schepers",
       "imperiali",
     ]),
-    threshold: v.optional(threshold),
+    threshold: thresholds,
+    bonus,
     pooling,
     lists,
     tieBreak,
@@ -46,14 +87,16 @@ export const rules = v.variant("formula", [
   v.object({
     formula: v.literal("modified_sainte_lague"),
     firstDivisor: v.optional(v.pipe(v.number(), v.minValue(1)), 1.4),
-    threshold: v.optional(threshold),
+    threshold: thresholds,
+    bonus,
     pooling,
     lists,
     tieBreak,
   }),
   v.object({
     formula: v.picklist(["hare", "droop", "imperiali_quota"]),
-    threshold: v.optional(threshold),
+    threshold: thresholds,
+    bonus,
     pooling,
     lists,
     tieBreak,
@@ -162,6 +205,7 @@ export const rules = v.variant("formula", [
 
 export type Rules = v.InferOutput<typeof rules>;
 export type Threshold = v.InferOutput<typeof threshold>;
+export type Bonus = NonNullable<v.InferOutput<typeof bonus>>;
 export type Lists = NonNullable<v.InferOutput<typeof lists>>;
 
 export const rulesJsonSchema = toJsonSchema(rules);

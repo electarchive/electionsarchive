@@ -120,6 +120,11 @@ REGIONS = {
 }
 INDEPENDENT = {"IND", "INDIPENDENTE"}
 REGISTERED, VOTERS, BLANK, VOTES = 2, 14, 6, 1
+SENATE_2005 = [
+    {"percent": 20, "level": "coalition", "requires": {"percent": 3}},
+    {"percent": 3, "level": "list", "members": "coalition"},
+    {"percent": 8, "level": "list", "members": "standalone"},
+]
 SYSTEMS = {
     "senato-1948": (
         {"formula": "dhondt", "lists": {"order": "open", "constituencies": "skip", "vacancy": "next_by_votes"}},
@@ -152,7 +157,17 @@ SYSTEMS = {
     ),
     "senato-valle-d-aosta": ({"formula": "fptp"}, "Senate, Valle d'Aosta single-member seat", None),
     "senato-proportional-2005": (
-        {"formula": "hare", "pooling": "coalition", "lists": {"order": "closed", "vacancy": "next_on_list"}},
+        {
+            "formula": "hare",
+            "pooling": "coalition",
+            "lists": {"order": "closed", "vacancy": "next_on_list"},
+            "threshold": SENATE_2005,
+            "bonus": {
+                "level": "coalition",
+                "size": {"kind": "target", "fraction": 0.55, "rounding": "up"},
+                "remainder": "others",
+            },
+        },
         "Senate, regional lists with majority bonus, 2005–2017",
         (
             "Under law 270 of 2005, senators were elected region by region from closed lists. Coalitions needed 20% of "
@@ -164,6 +179,16 @@ SYSTEMS = {
             "one senator by plurality, and Trentino-Alto Adige kept the single-member collegi of 1993. The schema "
             "stores the Hare step; the thresholds and the bonus are described here only."
         ),
+    ),
+    "senato-molise-2005": (
+        {
+            "formula": "hare",
+            "pooling": "coalition",
+            "lists": {"order": "closed", "vacancy": "next_on_list"},
+            "threshold": SENATE_2005,
+        },
+        "Senate, Molise regional lists, 2005–2017",
+        None,
     ),
     "senato-trentino-2005": (
         {"formula": "fptp"},
@@ -1376,6 +1401,8 @@ def emit() -> Path:
         systems: dict[str, UUID] = {}
         for code, (rules, label, methodology) in SYSTEMS.items():
             systems[code] = cs.key("it.electoral_system", code)
+            if code in ("senato-proportional-2005", "senato-molise-2005") and systems[code] not in cs.minted:
+                cs.add("electoral_system", id=systems[code], polity_id=italy, rules=rules, rules_version=1)
             if systems[code] in cs.minted:
                 cs.add("electoral_system", id=systems[code], polity_id=italy, rules=rules, rules_version=1)
                 name(systems[code], label)
@@ -1764,7 +1791,13 @@ def emit() -> Path:
                         body_id=senate,
                         district_area_id=divisions[region] if abroad else region_areas[region],
                         magnitude=sum(row["seats"] for row in rows),
-                        electoral_system_id=systems["senato-estero" if abroad else "senato-proportional-2005"],
+                        electoral_system_id=systems[
+                            "senato-estero"
+                            if abroad
+                            else "senato-molise-2005"
+                            if region == "14"
+                            else "senato-proportional-2005"
+                        ],
                         default_result_kind="counted",
                     )
                     name(contest, f"Senate, abroad: {english}" if abroad else f"Senate, {region_names[region]}")

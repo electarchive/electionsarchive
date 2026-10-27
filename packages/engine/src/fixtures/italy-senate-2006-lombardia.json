@@ -1,0 +1,96 @@
+{
+  "seats": 47,
+  "round": 1,
+  "valid": null,
+  "rules": {
+    "bonus": {
+      "size": { "kind": "target", "fraction": 0.55, "rounding": "up" },
+      "level": "coalition",
+      "remainder": "others"
+    },
+    "lists": { "order": "closed", "vacancy": "next_on_list" },
+    "formula": "hare",
+    "pooling": "coalition",
+    "threshold": [
+      { "level": "coalition", "percent": 20, "requires": { "percent": 3 } },
+      { "level": "list", "members": "coalition", "percent": 3 },
+      { "level": "list", "members": "standalone", "percent": 8 }
+    ]
+  },
+  "entries": [
+    {
+      "id": "ALLEANZA LOMBARDA AUTONOMIA",
+      "votes": 90855,
+      "group": "The Union"
+    },
+    {
+      "id": "ALLEANZA NAZIONALE",
+      "votes": 572242,
+      "group": "House of Freedoms"
+    },
+    {
+      "id": "ALTERNATIVA SOCIALE MUSSOLINI",
+      "votes": 32336,
+      "group": "House of Freedoms"
+    },
+    { "id": "AMBIENTA-LISTA", "votes": 15171, "group": "House of Freedoms" },
+    {
+      "id": "DEM.CRIST.-NUOVO PSI",
+      "votes": 28300,
+      "group": "House of Freedoms"
+    },
+    { "id": "DEMOCRATICI SINISTRA", "votes": 726105, "group": "The Union" },
+    {
+      "id": "DI PIETRO ITALIA DEI VALORI",
+      "votes": 150116,
+      "group": "The Union"
+    },
+    { "id": "DL.LA MARGHERITA", "votes": 588856, "group": "The Union" },
+    { "id": "FIAMMA TRICOLORE", "votes": 31307, "group": "House of Freedoms" },
+    { "id": "FORZA ITALIA", "votes": 1623745, "group": "House of Freedoms" },
+    { "id": "INSIEME CON L'UNIONE", "votes": 279552, "group": "The Union" },
+    { "id": "LA ROSA NEL PUGNO", "votes": 128849, "group": "The Union" },
+    { "id": "LEGA NORD", "votes": 652047, "group": "House of Freedoms" },
+    { "id": "NO EURO", "votes": 13580, "group": "House of Freedoms" },
+    {
+      "id": "P.LIBERALE ITALIANO",
+      "votes": 6390,
+      "group": "House of Freedoms"
+    },
+    { "id": "PARTITO PENSIONATI", "votes": 95026, "group": "The Union" },
+    { "id": "PENSIONATI UNITI", "votes": 24081, "group": "House of Freedoms" },
+    { "id": "PENSIONI E LAVORO", "votes": 19759 },
+    { "id": "PER IL SUD", "votes": 5434 },
+    { "id": "PSDI", "votes": 9324, "group": "The Union" },
+    { "id": "REPUBBLICANI EUROPEI", "votes": 5003, "group": "The Union" },
+    { "id": "RIFONDAZIONE COMUNISTA", "votes": 407939, "group": "The Union" },
+    { "id": "U.D.EUR POPOLARI", "votes": 19842, "group": "The Union" },
+    { "id": "UNIONE DI CENTRO", "votes": 343269, "group": "House of Freedoms" }
+  ],
+  "declared": {
+    "ALLEANZA LOMBARDA AUTONOMIA": 0,
+    "ALLEANZA NAZIONALE": 5,
+    "ALTERNATIVA SOCIALE MUSSOLINI": 0,
+    "AMBIENTA-LISTA": 0,
+    "DEM.CRIST.-NUOVO PSI": 0,
+    "DEMOCRATICI SINISTRA": 7,
+    "DI PIETRO ITALIA DEI VALORI": 0,
+    "DL.LA MARGHERITA": 6,
+    "FIAMMA TRICOLORE": 0,
+    "FORZA ITALIA": 14,
+    "INSIEME CON L'UNIONE": 3,
+    "LA ROSA NEL PUGNO": 0,
+    "LEGA NORD": 5,
+    "NO EURO": 0,
+    "P.LIBERALE ITALIANO": 0,
+    "PARTITO PENSIONATI": 0,
+    "PENSIONATI UNITI": 0,
+    "PENSIONI E LAVORO": 0,
+    "PER IL SUD": 0,
+    "PSDI": 0,
+    "REPUBBLICANI EUROPEI": 0,
+    "RIFONDAZIONE COMUNISTA": 4,
+    "U.D.EUR POPOLARI": 0,
+    "UNIONE DI CENTRO": 3
+  }
+}

@@ -1,0 +1,35 @@
+{
+  "seats": 27,
+  "round": 1,
+  "valid": 1922,
+  "rules": {
+    "bonus": {
+      "size": {
+        "kind": "fraction",
+        "below": { "seats": 4, "rounding": "down" },
+        "fraction": 0.5,
+        "rounding": "up"
+      },
+      "level": "list",
+      "share": { "rounds": [1], "strict": true, "percent": 50 }
+    },
+    "lists": {
+      "order": "closed",
+      "vacancy": "next_on_list",
+      "exhausted": "vacant"
+    },
+    "formula": "dhondt",
+    "tieBreak": "votes",
+    "threshold": { "level": "list", "scope": "contest", "percent": 5 }
+  },
+  "entries": [
+    { "id": "AU COEUR DE SAULXURES LES NANCY", "votes": 246 },
+    { "id": "BIEN VIVRE A SAULXURES-LES-NANCY", "votes": 957 },
+    { "id": "AGIR POUR SAULXURES", "votes": 719 }
+  ],
+  "declared": {
+    "AU COEUR DE SAULXURES LES NANCY": 0,
+    "BIEN VIVRE A SAULXURES-LES-NANCY": 0,
+    "AGIR POUR SAULXURES": 0
+  }
+}

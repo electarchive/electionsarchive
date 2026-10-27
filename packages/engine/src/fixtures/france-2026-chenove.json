@@ -1,0 +1,37 @@
+{
+  "seats": 33,
+  "round": 1,
+  "valid": 3604,
+  "rules": {
+    "bonus": {
+      "size": {
+        "kind": "fraction",
+        "below": { "seats": 4, "rounding": "down" },
+        "fraction": 0.5,
+        "rounding": "up"
+      },
+      "level": "list",
+      "share": { "rounds": [1], "strict": true, "percent": 50 }
+    },
+    "lists": {
+      "order": "closed",
+      "vacancy": "next_on_list",
+      "exhausted": "vacant"
+    },
+    "formula": "dhondt",
+    "tieBreak": "votes",
+    "threshold": { "level": "list", "scope": "contest", "percent": 5 }
+  },
+  "entries": [
+    { "id": "Union Populaire - LFI Chenôve", "votes": 468 },
+    { "id": "Lutte Ouvrière - Le camp des travailleurs", "votes": 122 },
+    { "id": "LE BON SENS - 100% CHENÔVE", "votes": 1074 },
+    { "id": "Chenôve pour tous", "votes": 1940 }
+  ],
+  "declared": {
+    "Union Populaire - LFI Chenôve": 2,
+    "Lutte Ouvrière - Le camp des travailleurs": 0,
+    "LE BON SENS - 100% CHENÔVE": 5,
+    "Chenôve pour tous": 26
+  }
+}

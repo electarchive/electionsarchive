@@ -344,6 +344,58 @@ MEMBERS = {
     ("House of Freedoms", 2001): {"FORZA ITALIA", "ALLEANZA NAZIONALE", "CCD-CDU", "LEGA NORD", "NUOVO PSI"},
     ("The Olive Tree", 2001): {"DEMOCRATICI SINISTRA", "LA MARGHERITA", "IL GIRASOLE", "COMUNISTI ITALIANI"},
 }
+COALITIONS = {
+    CALDEROLI: {
+        "Romano Prodi": (
+            "L'ULIVO",
+            "RIFONDAZIONE COMUNISTA",
+            "LA ROSA NEL PUGNO",
+            "COMUNISTI ITALIANI",
+            "DI PIETRO ITALIA DEI VALORI",
+            "FEDERAZIONE DEI VERDI",
+            "U.D.EUR POPOLARI",
+            "PARTITO PENSIONATI",
+            "SVP",
+            "I SOCIALISTI",
+            "LISTA CONSUMATORI",
+            "ALLEANZA LOMBARDA AUTONOMIA",
+            "LIGA FRONTE VENETO",
+        ),
+        "Silvio Berlusconi": (
+            "FORZA ITALIA",
+            "ALLEANZA NAZIONALE",
+            "UNIONE DI CENTRO",
+            "LEGA NORD",
+            "DEM.CRIST.-NUOVO PSI",
+            "ALTERNATIVA SOCIALE MUSSOLINI",
+            "FIAMMA TRICOLORE",
+            "NO EURO",
+            "PENSIONATI UNITI",
+            "AMBIENTA-LISTA",
+            "P.LIBERALE ITALIANO",
+            "S.O.S. ITALIA",
+        ),
+    },
+    date(2008, 4, 13): {
+        "Walter Veltroni": ("PARTITO DEMOCRATICO", "DI PIETRO ITALIA DEI VALORI"),
+        "Silvio Berlusconi": ("IL POPOLO DELLA LIBERTA'", "LEGA NORD", "MOVIMENTO PER L'AUTONOMIA ALL.PER IL SUD"),
+    },
+    date(2013, 2, 24): {
+        "Pier Luigi Bersani": ("PARTITO DEMOCRATICO", "SINISTRA ECOLOGIA LIBERTA'", "CENTRO DEMOCRATICO", "SVP"),
+        "Silvio Berlusconi": (
+            "IL POPOLO DELLA LIBERTA'",
+            "LEGA NORD",
+            "FRATELLI D'ITALIA",
+            "LA DESTRA",
+            "GRANDE SUD - MPA",
+            "MIR - MODERATI IN RIVOLUZIONE",
+            "PARTITO PENSIONATI",
+            "INTESA POPOLARE",
+            "LIBERI PER UNA ITALIA EQUA",
+        ),
+        "Mario Monti": ("SCELTA CIVICA CON MONTI PER L'ITALIA", "UNIONE DI CENTRO", "FUTURO E LIBERTA'"),
+    },
+}
 SYSTEMS = {
     "camera-proportional-1948": (
         {"formula": "imperiali_quota", "lists": {"order": "open", "vacancy": "next_by_votes"}},
@@ -374,7 +426,16 @@ SYSTEMS = {
         ),
     ),
     "camera-proportional-2005": (
-        {"formula": "hare", "lists": {"order": "closed", "vacancy": "next_on_list"}},
+        {
+            "formula": "hare",
+            "lists": {"order": "closed", "vacancy": "next_on_list"},
+            "threshold": [
+                {"percent": 10, "level": "coalition", "scope": "national", "requires": {"percent": 2}},
+                {"percent": 2, "level": "list", "scope": "national", "members": "coalition", "bestLoser": True},
+                {"percent": 4, "level": "list", "scope": "national", "members": "standalone"},
+            ],
+            "bonus": {"level": "coalition", "size": {"kind": "target", "seats": 340}, "remainder": "others"},
+        },
         "Chamber of Deputies proportional representation with majority bonus, 2005–2015",
         (
             "Under the 2005 electoral law, 617 deputies were elected in Italy by closed-list proportional representation. "
@@ -1045,6 +1106,8 @@ def emit() -> Path:
         systems: dict[str, UUID] = {}
         for code, (rules, label, methodology) in SYSTEMS.items():
             systems[code] = cs.key("it.electoral_system", code)
+            if code == "camera-proportional-2005":
+                cs.add("electoral_system", id=systems[code], polity_id=italy, rules=rules, rules_version=1)
             if systems[code] in cs.minted:
                 cs.add("electoral_system", id=systems[code], polity_id=italy, rules=rules, rules_version=1)
                 name(systems[code], label)
@@ -1358,6 +1421,15 @@ def emit() -> Path:
                 district_area_id=nation,
                 magnitude=magnitude,
                 electoral_system_id=systems[system],
+                rules_override=(
+                    {
+                        "threshold": [
+                            {**bar, "exempt": [str(party_of("SVP", year))]} for bar in SYSTEMS[system][0]["threshold"]
+                        ]
+                    }
+                    if day in COALITIONS
+                    else None
+                ),
                 default_result_kind="counted",
             )
             name(contest, "Chamber of Deputies, national seat allocation")
@@ -1407,6 +1479,17 @@ def emit() -> Path:
                     value_row(counted, region_units[region], None, BLANK, blank)
                     value_row(counted, region_units[region], None, VALID, valid)
             day_lists = lists.filter(pl.col("day") == day)
+            coalition_of: dict[str, UUID] = {}
+            for leader, members_of in COALITIONS.get(day, {}).items():
+                coalition = cs.key("it.alliance", f"{day}:camera:{slug(leader)}")
+                cs.add("alliance", id=coalition, kind="electoral_alliance", election_id=election)
+                name(coalition, f"{leader}'s coalition")
+                name(coalition, f"Coalizione di {leader}", "it", "native")
+                for label in members_of:
+                    coalition_of[slug(label)] = coalition
+                    cs.add("alliance_member", alliance_id=coalition, party_id=party_of(label, year))
+            if day in COALITIONS:
+                cs.artifact(raw.cached(SOURCE, ELIGENDO.format(day=day)), interno)
             for (label,) in (
                 day_lists.group_by("label")
                 .agg(pl.col("votes").sum())
@@ -1422,6 +1505,7 @@ def emit() -> Path:
                     contest_id=contest,
                     kind="list",
                     party_id=party_of(label, year),
+                    alliance_id=coalition_of.get(slug(label)),
                     ballot_label=label,
                 )
                 if label in won:

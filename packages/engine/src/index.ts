@@ -1,4 +1,10 @@
-export { allocate, type Allocation, qualify } from "./allocation.ts";
+export {
+  allocate,
+  type Allocation,
+  apportion,
+  type Apportionment,
+  qualify,
+} from "./allocation.ts";
 export {
   type Candidate,
   cover,
@@ -9,6 +15,7 @@ export {
 } from "./lists.ts";
 export { decide } from "./referendum.ts";
 export {
+  type Bonus,
   type Lists,
   type Rules,
   rules,

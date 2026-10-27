@@ -1,0 +1,208 @@
+{
+  "seats": 617,
+  "round": 1,
+  "valid": 38152446,
+  "rules": {
+    "bonus": {
+      "size": { "kind": "target", "seats": 340 },
+      "level": "coalition",
+      "remainder": "others"
+    },
+    "lists": { "order": "closed", "vacancy": "next_on_list" },
+    "formula": "hare",
+    "threshold": [
+      {
+        "level": "coalition",
+        "scope": "national",
+        "exempt": ["SVP"],
+        "percent": 10,
+        "requires": { "percent": 2 }
+      },
+      {
+        "level": "list",
+        "scope": "national",
+        "exempt": ["SVP"],
+        "members": "coalition",
+        "percent": 2,
+        "bestLoser": true
+      },
+      {
+        "level": "list",
+        "scope": "national",
+        "exempt": ["SVP"],
+        "members": "standalone",
+        "percent": 4
+      }
+    ]
+  },
+  "entries": [
+    {
+      "id": "ALLEANZA LOMBARDA AUTONOMIA",
+      "votes": 44580,
+      "group": "Romano Prodi's coalition"
+    },
+    {
+      "id": "ALLEANZA NAZIONALE",
+      "votes": 4707060,
+      "group": "Silvio Berlusconi's coalition"
+    },
+    {
+      "id": "ALTERNATIVA SOCIALE MUSSOLINI",
+      "votes": 255438,
+      "group": "Silvio Berlusconi's coalition"
+    },
+    {
+      "id": "AMBIENTA-LISTA",
+      "votes": 17372,
+      "group": "Silvio Berlusconi's coalition"
+    },
+    {
+      "id": "COMUNISTI ITALIANI",
+      "votes": 884677,
+      "group": "Romano Prodi's coalition"
+    },
+    {
+      "id": "DEM.CRIST.-NUOVO PSI",
+      "votes": 285493,
+      "group": "Silvio Berlusconi's coalition"
+    },
+    { "id": "DESTRA NAZIONALE", "votes": 1088 },
+    {
+      "id": "DI PIETRO ITALIA DEI VALORI",
+      "votes": 877092,
+      "group": "Romano Prodi's coalition"
+    },
+    { "id": "DIE FREIHEITLICHEN", "votes": 17167 },
+    { "id": "DIMENSIONE CHRISTIANA", "votes": 2447 },
+    {
+      "id": "FEDERAZIONE DEI VERDI",
+      "votes": 783931,
+      "group": "Romano Prodi's coalition"
+    },
+    {
+      "id": "FIAMMA TRICOLORE",
+      "votes": 231182,
+      "group": "Silvio Berlusconi's coalition"
+    },
+    {
+      "id": "FORZA ITALIA",
+      "votes": 9046869,
+      "group": "Silvio Berlusconi's coalition"
+    },
+    {
+      "id": "I SOCIALISTI",
+      "votes": 115090,
+      "group": "Romano Prodi's coalition"
+    },
+    { "id": "IRS", "votes": 11649 },
+    { "id": "L'ULIVO", "votes": 11929536, "group": "Romano Prodi's coalition" },
+    {
+      "id": "LA ROSA NEL PUGNO",
+      "votes": 990443,
+      "group": "Romano Prodi's coalition"
+    },
+    {
+      "id": "LEGA NORD",
+      "votes": 1748034,
+      "group": "Silvio Berlusconi's coalition"
+    },
+    { "id": "LEGA SUD", "votes": 847 },
+    {
+      "id": "LIGA FRONTE VENETO",
+      "votes": 22010,
+      "group": "Romano Prodi's coalition"
+    },
+    {
+      "id": "LISTA CONSUMATORI",
+      "votes": 73687,
+      "group": "Romano Prodi's coalition"
+    },
+    { "id": "MOV.DEM.SIC-NOI SIC.", "votes": 5176 },
+    { "id": "MOVIMENTO TRIVENETO", "votes": 4518 },
+    {
+      "id": "NO EURO",
+      "votes": 58720,
+      "group": "Silvio Berlusconi's coalition"
+    },
+    {
+      "id": "P.LIBERALE ITALIANO",
+      "votes": 12308,
+      "group": "Silvio Berlusconi's coalition"
+    },
+    {
+      "id": "PARTITO PENSIONATI",
+      "votes": 333801,
+      "group": "Romano Prodi's coalition"
+    },
+    {
+      "id": "PENSIONATI UNITI",
+      "votes": 27818,
+      "group": "Silvio Berlusconi's coalition"
+    },
+    { "id": "PER IL SUD", "votes": 5130 },
+    { "id": "PROGETTO NORDEST", "votes": 92079 },
+    {
+      "id": "RIFONDAZIONE COMUNISTA",
+      "votes": 2229858,
+      "group": "Romano Prodi's coalition"
+    },
+    {
+      "id": "S.O.S. ITALIA",
+      "votes": 6956,
+      "group": "Silvio Berlusconi's coalition"
+    },
+    { "id": "SARDIGNA NATZIONE", "votes": 11000 },
+    { "id": "SOLIDARIETA'", "votes": 5878 },
+    { "id": "SVP", "votes": 182703, "group": "Romano Prodi's coalition" },
+    { "id": "TERZO POLO", "votes": 16234 },
+    {
+      "id": "U.D.EUR POPOLARI",
+      "votes": 534440,
+      "group": "Romano Prodi's coalition"
+    },
+    {
+      "id": "UNIONE DI CENTRO",
+      "votes": 2580135,
+      "group": "Silvio Berlusconi's coalition"
+    }
+  ],
+  "declared": {
+    "ALLEANZA LOMBARDA AUTONOMIA": 0,
+    "ALLEANZA NAZIONALE": 71,
+    "ALTERNATIVA SOCIALE MUSSOLINI": 0,
+    "AMBIENTA-LISTA": 0,
+    "COMUNISTI ITALIANI": 16,
+    "DEM.CRIST.-NUOVO PSI": 4,
+    "DESTRA NAZIONALE": 0,
+    "DI PIETRO ITALIA DEI VALORI": 16,
+    "DIE FREIHEITLICHEN": 0,
+    "DIMENSIONE CHRISTIANA": 0,
+    "FEDERAZIONE DEI VERDI": 15,
+    "FIAMMA TRICOLORE": 0,
+    "FORZA ITALIA": 137,
+    "I SOCIALISTI": 0,
+    "IRS": 0,
+    "L'ULIVO": 220,
+    "LA ROSA NEL PUGNO": 18,
+    "LEGA NORD": 26,
+    "LEGA SUD": 0,
+    "LIGA FRONTE VENETO": 0,
+    "LISTA CONSUMATORI": 0,
+    "MOV.DEM.SIC-NOI SIC.": 0,
+    "MOVIMENTO TRIVENETO": 0,
+    "NO EURO": 0,
+    "P.LIBERALE ITALIANO": 0,
+    "PARTITO PENSIONATI": 0,
+    "PENSIONATI UNITI": 0,
+    "PER IL SUD": 0,
+    "PROGETTO NORDEST": 0,
+    "RIFONDAZIONE COMUNISTA": 41,
+    "S.O.S. ITALIA": 0,
+    "SARDIGNA NATZIONE": 0,
+    "SOLIDARIETA'": 0,
+    "SVP": 4,
+    "TERZO POLO": 0,
+    "U.D.EUR POPOLARI": 10,
+    "UNIONE DI CENTRO": 39
+  }
+}

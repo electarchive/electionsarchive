@@ -1,0 +1,33 @@
+{
+  "seats": 163,
+  "round": 2,
+  "valid": 847432,
+  "rules": {
+    "bonus": {
+      "size": { "kind": "fraction", "fraction": 0.25, "rounding": "up" },
+      "level": "list",
+      "share": { "rounds": [1], "strict": true, "percent": 50 }
+    },
+    "lists": {
+      "order": "closed",
+      "vacancy": "next_on_list",
+      "exhausted": "vacant"
+    },
+    "formula": "dhondt",
+    "tieBreak": "votes",
+    "threshold": { "level": "list", "scope": "contest", "percent": 5 }
+  },
+  "entries": [
+    {
+      "id": "Paris est à vous! avec Emmanuel Grégoire L'union de la gauche et des écologistes",
+      "votes": 428143
+    },
+    { "id": "CHANGER PARIS AVEC RACHIDA DATI", "votes": 351825 },
+    { "id": "LE NOUVEAU PARIS POPULAIRE", "votes": 67464 }
+  ],
+  "declared": {
+    "Paris est à vous! avec Emmanuel Grégoire L'union de la gauche et des écologistes": 103,
+    "CHANGER PARIS AVEC RACHIDA DATI": 51,
+    "LE NOUVEAU PARIS POPULAIRE": 9
+  }
+}

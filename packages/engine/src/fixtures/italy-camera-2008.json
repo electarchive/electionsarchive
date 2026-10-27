@@ -1,0 +1,122 @@
+{
+  "seats": 617,
+  "round": 1,
+  "valid": 36452305,
+  "rules": {
+    "bonus": {
+      "size": { "kind": "target", "seats": 340 },
+      "level": "coalition",
+      "remainder": "others"
+    },
+    "lists": { "order": "closed", "vacancy": "next_on_list" },
+    "formula": "hare",
+    "threshold": [
+      {
+        "level": "coalition",
+        "scope": "national",
+        "exempt": ["SVP"],
+        "percent": 10,
+        "requires": { "percent": 2 }
+      },
+      {
+        "level": "list",
+        "scope": "national",
+        "exempt": ["SVP"],
+        "members": "coalition",
+        "percent": 2,
+        "bestLoser": true
+      },
+      {
+        "level": "list",
+        "scope": "national",
+        "exempt": ["SVP"],
+        "members": "standalone",
+        "percent": 4
+      }
+    ]
+  },
+  "entries": [
+    { "id": "ASS.DIFESA DELLA VITA ABORTO?NO,GRAZIE", "votes": 135578 },
+    {
+      "id": "DI PIETRO ITALIA DEI VALORI",
+      "votes": 1593675,
+      "group": "Walter Veltroni's coalition"
+    },
+    { "id": "DIE FREIHEITLICHEN", "votes": 28347 },
+    { "id": "FORZA NUOVA", "votes": 108837 },
+    { "id": "IL LOTO", "votes": 1799 },
+    {
+      "id": "IL POPOLO DELLA LIBERTA'",
+      "votes": 13628865,
+      "group": "Silvio Berlusconi's coalition"
+    },
+    { "id": "L'INTESA VENETA", "votes": 2388 },
+    { "id": "LA DESTRA - FIAMMA TRICOLORE", "votes": 885229 },
+    { "id": "LA SINISTRA L'ARCOBALENO", "votes": 1124418 },
+    {
+      "id": "LEGA NORD",
+      "votes": 3024522,
+      "group": "Silvio Berlusconi's coalition"
+    },
+    { "id": "LEGA PER L'AUTONOMIA ALL.LOMB. LEGA PENS", "votes": 14003 },
+    { "id": "LEGA SUD", "votes": 4346 },
+    { "id": "LG.VENETA REPUBBLICA", "votes": 31353 },
+    { "id": "LISTA DEI GRILLI PARLANTI", "votes": 66844 },
+    { "id": "M.E.D.A.", "votes": 16449 },
+    { "id": "MOVIMENTO P.P.A.", "votes": 945 },
+    {
+      "id": "MOVIMENTO PER L'AUTONOMIA ALL.PER IL SUD",
+      "votes": 410487,
+      "group": "Silvio Berlusconi's coalition"
+    },
+    { "id": "P.LIBERALE ITALIANO", "votes": 103760 },
+    { "id": "PARTITO COMUNISTA DEI LAVORATORI", "votes": 208394 },
+    {
+      "id": "PARTITO DEMOCRATICO",
+      "votes": 12092998,
+      "group": "Walter Veltroni's coalition"
+    },
+    { "id": "PARTITO DI ALTERNATIVA COMUNISTA", "votes": 2049 },
+    { "id": "PARTITO SOCIALISTA", "votes": 355581 },
+    { "id": "PER IL BENE COMUNE", "votes": 119420 },
+    { "id": "PS D'AZ.", "votes": 14856 },
+    { "id": "SARDIGNA NATZIONE", "votes": 7182 },
+    { "id": "SINISTRA CRITICA", "votes": 167673 },
+    { "id": "SVP", "votes": 147666 },
+    { "id": "UNION FUR SUD TIROL", "votes": 12836 },
+    { "id": "UNIONE DEMOCRATICA PER I CONSUMATORI", "votes": 91486 },
+    { "id": "UNIONE DI CENTRO", "votes": 2050319 }
+  ],
+  "declared": {
+    "ASS.DIFESA DELLA VITA ABORTO?NO,GRAZIE": 0,
+    "DI PIETRO ITALIA DEI VALORI": 28,
+    "DIE FREIHEITLICHEN": 0,
+    "FORZA NUOVA": 0,
+    "IL LOTO": 0,
+    "IL POPOLO DELLA LIBERTA'": 272,
+    "L'INTESA VENETA": 0,
+    "LA DESTRA - FIAMMA TRICOLORE": 0,
+    "LA SINISTRA L'ARCOBALENO": 0,
+    "LEGA NORD": 60,
+    "LEGA PER L'AUTONOMIA ALL.LOMB. LEGA PENS": 0,
+    "LEGA SUD": 0,
+    "LG.VENETA REPUBBLICA": 0,
+    "LISTA DEI GRILLI PARLANTI": 0,
+    "M.E.D.A.": 0,
+    "MOVIMENTO P.P.A.": 0,
+    "MOVIMENTO PER L'AUTONOMIA ALL.PER IL SUD": 8,
+    "P.LIBERALE ITALIANO": 0,
+    "PARTITO COMUNISTA DEI LAVORATORI": 0,
+    "PARTITO DEMOCRATICO": 211,
+    "PARTITO DI ALTERNATIVA COMUNISTA": 0,
+    "PARTITO SOCIALISTA": 0,
+    "PER IL BENE COMUNE": 0,
+    "PS D'AZ.": 0,
+    "SARDIGNA NATZIONE": 0,
+    "SINISTRA CRITICA": 0,
+    "SVP": 2,
+    "UNION FUR SUD TIROL": 0,
+    "UNIONE DEMOCRATICA PER I CONSUMATORI": 0,
+    "UNIONE DI CENTRO": 36
+  }
+}
