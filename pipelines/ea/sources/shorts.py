@@ -62,7 +62,7 @@ PARTIES: dict[str, dict[str, str | tuple[tuple[str, str | None, str | None], ...
     },
     "fr": {
         "Ensemble": "Ensemble",
-        "Union de la gauche": "NFP",
+        "Nouveau Front populaire": "NFP",
         "Nouvelle Union populaire écologique et sociale": "NUPES",
         "La République en marche": "LREM",
         "Parti socialiste": "PS",
