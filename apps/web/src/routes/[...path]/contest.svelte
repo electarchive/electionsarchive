@@ -4,7 +4,6 @@
   import { page } from "$app/state";
   import { createQuery } from "@tanstack/svelte-query";
   import { Tooltip as TooltipPrimitive } from "bits-ui";
-  import Lean from "#lib/components/lean.svelte";
   import Name from "#lib/components/name.svelte";
   import Term from "#lib/components/term.svelte";
   import { Combobox } from "#lib/components/ui/combobox/index.js";
@@ -50,6 +49,7 @@
   import Series from "./series.svelte";
   import Shift from "./shift.svelte";
   import Slate from "./slate.svelte";
+  import Standing from "./standing.svelte";
   import Stv from "./stv.svelte";
   import Tally from "./tally.svelte";
   import Wording from "./wording.svelte";
@@ -747,7 +747,11 @@
       const row = members.find((member) => member.current?.share === last);
       return contest.isStv || row == null || loser?.current == null
         ? null
-        : { row, margin: (last ?? 0) - loser.current.share };
+        : {
+            row,
+            margin: (last ?? 0) - loser.current.share,
+            votes: (row.current?.votes ?? 0) - loser.current.votes,
+          };
     }
     const [top, next] = contest.rows
       .filter((row) => row.current != null && !row.key.startsWith("kind:"))
@@ -757,6 +761,7 @@
       : {
           row: top,
           margin: (top.current?.share ?? 0) - (next.current?.share ?? 0),
+          votes: (top.current?.votes ?? 0) - (next.current?.votes ?? 0),
         };
   });
   const footnotes = $derived(
@@ -1494,7 +1499,6 @@
   )}
   {#snippet summary()}
     {@render stats(isMapped)}
-    {@render standing(isMapped)}
     <div
       class="@container grid content-start gap-1 bg-card px-1.5 pbs-2 pbe-2.5"
     >
@@ -1896,6 +1900,27 @@
       />
     {/if}
   {/if}
+  {#if leaning.data != null}
+    {const found = $derived(leaning.data)}
+    {const ahead = $derived(found.axis[0])}
+    {const behind = $derived(found.axis[1])}
+    {#if ahead != null && behind != null}
+      <Standing
+        sides={[
+          { label: ahead.label, tone: swatch(ahead.color, ahead.key) },
+          { label: behind.label, tone: swatch(behind.color, behind.key) },
+        ]}
+        place={found.place}
+        parent={found.parent}
+        whole={found.whole}
+        siblings={found.siblings}
+        year={found.previous?.date == null
+          ? null
+          : Number(found.previous.date.slice(0, 4))}
+        isAbroad={contest.scope.abroad != null}
+      />
+    {/if}
+  {/if}
 {/if}
 
 {#if lists != null && additional == null && !drilled}
@@ -2284,44 +2309,6 @@
   </section>
 {/if}
 
-{#snippet standing(compact: boolean)}
-  {#if leaning.data != null}
-    {const found = $derived(leaning.data)}
-    {const ahead = $derived(found.axis[0])}
-    {const behind = $derived(found.axis[1])}
-    {#if ahead != null && behind != null}
-      <section
-        class={cn("grid gap-2.5 bg-card px-3.5 py-3", {
-          "col-span-12": !compact,
-        })}
-        aria-labelledby="lean-title"
-      >
-        <h2 id="lean-title" class="text-sm font-semibold">
-          {m.lean_title({ place: found.place.name })}
-        </h2>
-        <Lean
-          class={cn({ "max-inline-xl": !compact })}
-          sides={[
-            { label: ahead.label, tone: swatch(ahead.color, ahead.key) },
-            { label: behind.label, tone: swatch(behind.color, behind.key) },
-          ]}
-          margin={found.place.margin}
-          before={found.place.before}
-          marks={[found.parent, found.whole].filter((mark) => mark != null)}
-          siblings={found.siblings.margins}
-          rank={found.siblings.rank}
-          noun={found.siblings.noun}
-          place={found.parent?.name ?? found.whole.name}
-          isAbroad={contest.scope.abroad != null}
-          year={found.previous?.date == null
-            ? null
-            : Number(found.previous.date.slice(0, 4))}
-        />
-      </section>
-    {/if}
-  {/if}
-{/snippet}
-
 {#snippet stats(compact: boolean)}
   {#if contest.current != null || contest.turnout != null}
     <dl
@@ -2354,6 +2341,12 @@
               person={lead.row.current?.person}
               party={lead.row.current?.party}
             />
+            {#if lead.votes > 0}
+              <span
+                class="shrink-0 font-figures text-[0.8125rem] text-muted-foreground tabular-nums"
+                >{m.atlas_votes({ votes: count(lead.votes) })}</span
+              >
+            {/if}
           </dd>
         </div>
       {/if}

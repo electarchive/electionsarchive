@@ -136,7 +136,11 @@
     }
     const sides = (["before", "after"] as const).map((side) => {
       const gap = (a[side]?.share ?? 0) - (b[side]?.share ?? 0);
-      return { lead: gap >= 0 ? a : b, gap: Math.abs(gap) };
+      return {
+        lead: gap >= 0 ? a : b,
+        gap: Math.abs(gap),
+        votes: Math.abs((a[side]?.votes ?? 0) - (b[side]?.votes ?? 0)),
+      };
     });
     const shift =
       (a.after?.share ?? 0) -
@@ -149,6 +153,7 @@
       .map((cell) => ({
         ...cell,
         change: (cell.after?.share ?? 0) - (cell.before?.share ?? 0),
+        votes: (cell.after?.votes ?? 0) - (cell.before?.votes ?? 0),
       }))
       .filter((cell) => Math.abs(cell.change) >= 0.0005)
       .toSorted((a, b) => Math.abs(b.change) - Math.abs(a.change))
@@ -200,6 +205,7 @@
     party: string | null;
   },
   value: string,
+  votes: number,
 )}
   <span class="font-figures text-[0.8125rem] text-muted-foreground tabular-nums"
     >{year}</span
@@ -213,6 +219,9 @@
   />
   <span class="text-end font-figures text-[0.8125rem] tabular-nums"
     >{value}</span
+  >
+  <span class="text-end font-figures text-xs text-muted-foreground tabular-nums"
+    >{votes > 0 ? m.atlas_votes({ votes: count(votes) }) : ""}</span
   >
 {/snippet}
 
@@ -283,13 +292,14 @@
           <Term label={m.fact_margin()} definition={m.term_margin()} />
         </dt>
         <dd
-          class="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-x-2.5 gap-y-1 text-sm/tight"
+          class="grid grid-cols-[auto_minmax(0,1fr)_auto_auto] items-center gap-x-2.5 gap-y-1 text-sm/tight"
         >
           {#each margin.sides as side, index (index)}
             {@render line(
               index === 0 ? span.from : span.to,
               side.lead,
               points(side.gap),
+              side.votes,
             )}
           {/each}
         </dd>
@@ -357,6 +367,14 @@
                   class="text-end font-figures text-[0.8125rem] tabular-nums inline-11"
                   >{points(mover.change)}</span
                 >
+                {#if mover.before?.votes != null && mover.after?.votes != null && (mover.before.votes > 0 || mover.after.votes > 0)}
+                  <span
+                    class="text-end font-figures text-xs text-muted-foreground tabular-nums inline-16"
+                    >{mover.votes === 0
+                      ? "±0"
+                      : `${mover.votes > 0 ? "+" : "−"}${count(Math.abs(mover.votes))}`}</span
+                  >
+                {/if}
               </li>
             {/each}
           </ul>

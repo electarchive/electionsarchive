@@ -3991,11 +3991,25 @@ async function lean(input: { id: string; unit: string }) {
   if (margin == null) {
     throw new ORPCError("NOT_FOUND");
   }
-  const margins: Array<number> = [];
-  for (const i of near.places.k.keys()) {
+  const areas = await db.execute<{ id: string; k: number }>(sql`
+    select id, k from area where k = any(${sql.param(near.places.k)}::int[])
+  `);
+  const labels = await names(
+    areas.rows.map((row) => row.id),
+    contest.date,
+  );
+  const named = new Map(
+    areas.rows.map((row) => [row.k, labels.full.get(row.id) ?? ""]),
+  );
+  const places: Array<{ name: string; margin: number; isOwn: boolean }> = [];
+  for (const [i, k] of near.places.k.entries()) {
     const value = spread(near, "shares", i);
     if (value != null && near.places.leader[i] != null) {
-      margins.push(round(value));
+      places.push({
+        name: named.get(k) ?? "",
+        margin: round(value),
+        isOwn: i === at,
+      });
     }
   }
   const before = spread(near, "before", at);
@@ -4018,13 +4032,15 @@ async function lean(input: { id: string; unit: string }) {
     whole: { name: whole.trail[0]?.name ?? "", margin: overall(whole) },
     siblings: {
       noun: place.noun,
-      count: margins.length,
+      count: places.length,
       rank:
         1 +
-        margins.filter((value) =>
-          margin >= 0 ? value > round(margin) : value < round(margin),
+        places.filter((entry) =>
+          margin >= 0
+            ? entry.margin > round(margin)
+            : entry.margin < round(margin),
         ).length,
-      margins: margins.toSorted((a, b) => a - b),
+      places: places.toSorted((a, b) => a.margin - b.margin),
     },
     previous:
       previous == null ? null : { label: previous.label, date: previous.date },
@@ -7670,7 +7686,13 @@ export const contests = {
           noun: v.string(),
           count: v.number(),
           rank: v.number(),
-          margins: v.array(v.number()),
+          places: v.array(
+            v.object({
+              name: v.string(),
+              margin: v.number(),
+              isOwn: v.boolean(),
+            }),
+          ),
         }),
         previous: v.nullable(
           v.object({ label: v.string(), date: v.nullable(v.string()) }),

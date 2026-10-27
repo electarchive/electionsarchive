@@ -1299,6 +1299,12 @@
     }
   ],
   "lean_title": "How {place} compares",
+  "standing_lede": "{place} leaned {points} points further toward {name} than {other}.",
+  "standing_lede_even": "{place} voted in step with {other}.",
+  "standing_shift": "Since {year}, it has moved {points} points toward {name}.",
+  "standing_key": "Each dot is one {noun}. Hover a dot to see which.",
+  "standing_all": "Show all {count}",
+  "standing_fewer": "Show fewer",
   "atlas_zoom_to": "Zoom to",
   "atlas_alone": "Map {place} alone",
   "atlas_versus": "{name} +{points} vs. {place}",
