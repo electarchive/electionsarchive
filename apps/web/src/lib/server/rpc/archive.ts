@@ -6992,6 +6992,9 @@ export const contests = {
           current.side.valid,
           chosen?.id ?? null,
           earlier?.side.valid ?? null,
+          area.id === contest.place?.id ? null : (contest.place?.id ?? null),
+          area.id,
+          contest.date,
         ),
         db.execute<{
           person: string;
@@ -9498,13 +9501,39 @@ async function attendance(
   valid: number,
   before: string | null,
   prior: number | null,
+  district: string | null,
+  area: string,
+  date: string | null,
 ) {
-  const [pooled, earlier, polled] = await Promise.all([
+  const [pooled, earlier, polled, inside] = await Promise.all([
     known == null ? turnout(contest, [k]) : null,
     turnout(prior == null ? null : before, [k]),
     prior == null ? null : poll(before, k),
+    known != null || district == null
+      ? null
+      : db.execute<{ whole: boolean | null }>(sql`
+          with recursive up(id, depth) as (
+            select ${area}::uuid, 0
+            union all
+            select p.parent_id, up.depth + 1 from area_parent p join up on p.area_id = up.id where up.depth < 8
+          )
+          select case when exists (select from up where up.id = ${district}::uuid) then true else (
+            select ST_Area(ST_Intersection(a.geom, d.geom)) >= 0.98 * ST_Area(a.geom)
+            from (
+              select geom from area_geometry where area_id = ${area}::uuid
+              order by valid @> ${date ?? "infinity"}::date desc, upper(valid) desc nulls first limit 1
+            ) a
+            cross join (
+              select geom from area_geometry where area_id = ${district}::uuid
+              order by valid @> ${date ?? "infinity"}::date desc, upper(valid) desc nulls first limit 1
+            ) d
+          ) end as whole
+        `),
   ]);
-  const turned = sane(known ?? pooled?.get(k), valid);
+  const turned =
+    inside?.rows[0]?.whole === false
+      ? null
+      : sane(known ?? pooled?.get(k), valid);
   return turned == null
     ? null
     : {
