@@ -15,6 +15,8 @@ PIPELINES = (
     "us.la_precincts",
     "us.il_cook_dupage_2022",
     "us.mn_sos_precincts",
+    "us.ny_house_canvass",
+    "us.tx_house_canvass",
 )
 COUNTY = ("us.mo_gov_2004", "us.ri_gov_senate", "us.de_senate_2010")
 PLACEHOLDERS = ("us.algara", "us.algara_federal", "us.icpsr")
