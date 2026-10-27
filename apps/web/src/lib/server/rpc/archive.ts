@@ -3156,7 +3156,9 @@ async function tabulate(
   const position = new Map(kept.map((item, index) => [item.key, index]));
   const relit = new Map(
     kept.flatMap((item) =>
-      item.color == null ? [] : [[item.key, item.color] as const],
+      item.color == null || rows.every((row) => !row.isContest)
+        ? []
+        : [[item.key, item.color] as const],
     ),
   );
   separate(
@@ -7074,6 +7076,20 @@ export const contests = {
               },
         ),
         places: grid,
+        declared:
+          page.declared == null
+            ? null
+            : {
+                ...page.declared,
+                rows: page.declared.rows.map((row) => ({
+                  ...row,
+                  color:
+                    grid?.legend.find(
+                      (item) =>
+                        row.party != null && item.key === `party:${row.party}`,
+                    )?.color ?? row.color,
+                })),
+              },
         checks,
         count: steps,
         current: {
