@@ -11,7 +11,7 @@ from ea import raw
 from ea.sources.us import enr_clarity, kceb, wyco_ks
 
 SOURCE = "us.stlco_old"
-VERSION = "1"
+VERSION = "2"
 PLATFORM = "mo_stlco_old"
 ROOT = "https://extcontent.stlouisco.com/BOE/eResults/"
 STATE = re.compile(
@@ -23,7 +23,9 @@ STATE = re.compile(
 
 def _codes() -> list[str]:
     page = raw.cached(SOURCE, ROOT).path.read_text(errors="replace")
-    return sorted(code for code in set(re.findall(r"eResults/(el\d{6})/", page)) if code[2:4] > "20" or code[2:4] < "20")
+    return sorted(
+        code for code in set(re.findall(r"eResults/(el\d{6})/", page)) if code[2:4] > "20" or code[2:4] < "20"
+    )
 
 
 def _url(code: str) -> str:
@@ -48,14 +50,23 @@ def _read(registry: Mapping[str, Mapping[str, str]]) -> Iterator[dict[str, Any]]
             path = raw.cached(SOURCE, _url(code)).path
         except Exception:
             continue
-        text = subprocess.run(["pdftotext", "-layout", str(path), "-"], capture_output=True).stdout.decode(errors="replace")
+        text = subprocess.run(["pdftotext", "-layout", str(path), "-"], capture_output=True).stdout.decode(
+            errors="replace"
+        )
         head = text[:1500]
         found = kceb.DATE.search(head)
         if not found or "SUMMARY REPORT" not in head.upper():
             print(f"{code}: no text layer or unknown layout; skipped")
             continue
         day = datetime.strptime(f"{found[1].title()} {found[2]} {found[3]}", "%B %d %Y").date()
-        title = re.sub(r"\s+", " ", re.sub(r"(?i)summary report|official final results|official results", " ", head.splitlines()[0])).strip() or "Election"
+        title = (
+            re.sub(
+                r"\s+",
+                " ",
+                re.sub(r"(?i)summary report|official final results|official results", " ", head.splitlines()[0]),
+            ).strip()
+            or "Election"
+        )
         nodes = []
         seen: set[str] = set()
         parts = re.split(r"\*{5,}\s*\((\w+)\)\s*\*{5,}", text)
@@ -72,7 +83,28 @@ def _read(registry: Mapping[str, Mapping[str, str]]) -> Iterator[dict[str, Any]]
                 if label in seen:
                     continue
                 seen.add(label)
-                nodes.append({**node, "text": label, "key": str(len(nodes))})
+                choices = []
+                for choice in node["choices"]:
+                    text = choice["text"]
+                    if re.match(r"(?i)invalid write", text):
+                        choices.append({**choice, "text": "Write-ins"})
+                        continue
+                    rest = re.sub(r"(?i)(?:\s*\b(?:w/i|write-?in|votes?|of|0f|each)\b)+\s*$", "", text)
+                    pairs = re.findall(r"([A-Za-z][A-Za-z.' ,&()-]*?)\s*(?:\(\s*|-|\s)(\d[\d,]*)\)?(?=[\s,&]|$)", rest)
+                    if not pairs or rest == text and not re.fullmatch(r"(?:[A-Za-z' -]+-\d+,?\s*)+", text):
+                        choices.append(choice)
+                        continue
+                    named = []
+                    for names, count in pairs:
+                        people = [part.strip(" ,.") for part in re.split(r"\s*&\s*", names.strip(" ,&"))]
+                        named += [(person, int(count.replace(",", ""))) for person in people if person]
+                    rest_votes = int(choice["total"]) - sum(count for _, count in named)
+                    choices += [
+                        {**choice, "text": person, "party": None, "total": str(count)} for person, count in named
+                    ]
+                    if rest_votes > 0:
+                        choices.append({**choice, "text": "Write-ins", "party": None, "total": str(rest_votes)})
+                nodes.append({**node, "choices": choices, "text": label, "key": str(len(nodes))})
         yield {
             "tenant": tenant,
             "election": code,

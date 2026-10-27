@@ -1,3 +1,4 @@
+import html
 import io
 import json
 import re
@@ -15,7 +16,7 @@ from ea.sources.us.medsl_state import NATIONAL
 from ea.store import DATA, connect
 
 SOURCE = "us.wa_local"
-VERSION = "3"
+VERSION = "4"
 PARSED = DATA / "parsed" / SOURCE
 PUBLISHER = "Washington Secretary of State"
 TITLE = "Election results"
@@ -53,6 +54,7 @@ FILES = {day: f"https://results.vote.wa.gov/results/{day:%Y%m%d}/export/{day:%Y%
 PLACES = "https://www2.census.gov/geo/tiger/GENZ2020/shp/cb_2020_53_place_500k.zip"
 SCHOOLS = "https://www2.census.gov/geo/tiger/GENZ2020/shp/cb_2020_53_unsd_500k.zip"
 LOCAL = {"City/Town", "School", "County", "Commissioner", "Other"}
+ENTITY = r"&#?[a-zA-Z0-9]+;"
 NUMBER = re.compile(r"(?:SCHOOL DIST(?:RICT)?|SCH DIST|\bSD)\s*(?:NO\.?\s*|#\s*|-\s*)?(\d+)")
 SCHOOL = re.compile(r"\bSCHOOLS?\b|\bSCH\b|\bS\.?D\b")
 COMPASS = {"n": "north", "s": "south", "e": "east", "w": "west"}
@@ -983,6 +985,7 @@ def emit() -> Path:
                     option = cs.key("us.option", f"{contest_key}:write-ins")
                     cs.add("contest_option", id=option, contest_id=contest, kind="write_in", ballot_label="Write-ins")
                 else:
+                    ballot = html.unescape(ballot)
                     if ballot.isupper():
                         ballot = re.sub(r"\bMc([a-z])", lambda match: "Mc" + match[1].upper(), ballot.title())
                     person = cs.key(f"{SOURCE}.person", f"{contest_key}:{token}")
@@ -1030,6 +1033,45 @@ def emit() -> Path:
                     option_id=option,
                     kind="advanced" if stage == "primary" else "elected",
                     seats=None,
+                )
+        staged = {row["id"] for row in cs.rows.get("contest_option", [])} | {
+            row["id"] for row in cs.rows.get("candidacy", [])
+        }
+        for found, entity, text, preferred in conn.execute(
+            """select n.id, n.entity_id, n.text, n.is_preferred from name n join changeset c on c.id = n.changeset_id
+               join person p on p.id = n.entity_id where c.pipeline = %s and n.text ~ %s""",
+            [SOURCE, ENTITY],
+        ).fetchall():
+            cs.add(
+                "name_drop",
+                name_id=found,
+                entity_id=entity,
+                text=text,
+                reason="an HTML character reference read as text",
+            )
+            if preferred:
+                name(entity, html.unescape(text))
+        for option, contest, kind, label in conn.execute(
+            """select o.id, o.contest_id, o.kind::text, o.ballot_label from contest_option o
+               join changeset c on c.id = o.changeset_id where c.pipeline = %s and o.ballot_label ~ %s""",
+            [SOURCE, ENTITY],
+        ).fetchall():
+            if option not in staged:
+                cs.add("contest_option", id=option, contest_id=contest, kind=kind, ballot_label=html.unescape(label))
+        for candidacy, person, option, role, ballot, independent in conn.execute(
+            """select y.id, y.person_id, y.option_id, y.role::text, y.ballot_name, y.is_independent from candidacy y
+               join changeset c on c.id = y.changeset_id where c.pipeline = %s and y.ballot_name ~ %s""",
+            [SOURCE, ENTITY],
+        ).fetchall():
+            if candidacy not in staged:
+                cs.add(
+                    "candidacy",
+                    id=candidacy,
+                    person_id=person,
+                    option_id=option,
+                    role=role,
+                    ballot_name=html.unescape(ballot),
+                    is_independent=independent,
                 )
         for place, day in minted.items():
             cs.add(
