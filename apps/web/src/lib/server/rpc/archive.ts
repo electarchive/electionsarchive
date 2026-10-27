@@ -8540,42 +8540,73 @@ export const contests = {
               (row) =>
                 row.kind !== "owner" || row.owner != null || row.count === 1,
             )
-            .toSorted(
-              (a, b) =>
-                GROUPS.indexOf(
-                  a.kind === "owner" && a.isPart ? "local" : a.kind,
-                ) -
-                  GROUPS.indexOf(
-                    b.kind === "owner" && b.isPart ? "local" : b.kind,
-                  ) ||
-                Number(b.kind === "owner" && b.isPart) -
-                  Number(a.kind === "owner" && a.isPart) ||
-                Number(b.isHead) - Number(a.isHead) ||
-                b.count - a.count,
-            )
             .map((row) => {
               const isSingle = row.count === 1;
               const label =
                 labels.full.get((isSingle ? row.sample : row.owner) ?? "") ??
                 null;
-              return {
-                kind: row.kind,
-                label: isSingle
-                  ? label
-                  : (labels.short.get(row.owner ?? "") ?? label),
-                count: row.count,
-                path: isSingle
-                  ? (slugs.get(row.sample) ?? null)
-                  : row.kind === "owner" && row.isPart && election != null
-                    ? (slugs.get(election) ?? hub)
-                    : hub,
-                anchor: isSingle
-                  ? null
-                  : label != null && row.kind === "owner"
-                    ? `race-${segment(label)}`
-                    : "down-the-ballot",
-              };
-            }),
+              const year = contest.date?.slice(0, 4);
+              const plain =
+                isSingle && label != null && year != null
+                  ? label.replace(
+                      new RegExp(`^${year} (.+) election$`, "u"),
+                      "$1",
+                    )
+                  : label;
+              const court = isSingle
+                ? (/\b([A-Z][a-z]+ Court (?:Judge|Justice)|Surrogate)\b/u.exec(
+                    plain ?? "",
+                  )?.[1] ?? null)
+                : null;
+              const county =
+                court == null
+                  ? ""
+                  : (/(?:^|, )((?:New York|[A-Z][a-z]+) County)/u.exec(
+                      plain ?? "",
+                    )?.[1] ?? "");
+              return { row, isSingle, label, plain, court, county };
+            })
+            .toSorted(
+              (a, b) =>
+                GROUPS.indexOf(
+                  a.row.kind === "owner" && a.row.isPart ? "local" : a.row.kind,
+                ) -
+                  GROUPS.indexOf(
+                    b.row.kind === "owner" && b.row.isPart
+                      ? "local"
+                      : b.row.kind,
+                  ) ||
+                Number(b.row.kind === "owner" && b.row.isPart) -
+                  Number(a.row.kind === "owner" && a.row.isPart) ||
+                Number(b.row.isHead) - Number(a.row.isHead) ||
+                (a.court != null ? 2 : a.isSingle ? 0 : 1) -
+                  (b.court != null ? 2 : b.isSingle ? 0 : 1) ||
+                (a.court ?? "").localeCompare(b.court ?? "") ||
+                a.county.localeCompare(b.county) ||
+                Number((b.plain ?? "").startsWith(b.county)) -
+                  Number((a.plain ?? "").startsWith(a.county)) ||
+                b.row.count - a.row.count ||
+                (a.plain ?? "").localeCompare(b.plain ?? "", undefined, {
+                  numeric: true,
+                }),
+            )
+            .map(({ row, isSingle, label, plain }) => ({
+              kind: row.kind,
+              label: isSingle
+                ? plain
+                : (labels.short.get(row.owner ?? "") ?? label),
+              count: row.count,
+              path: isSingle
+                ? (slugs.get(row.sample) ?? null)
+                : row.kind === "owner" && row.isPart && election != null
+                  ? (slugs.get(election) ?? hub)
+                  : hub,
+              anchor: isSingle
+                ? null
+                : label != null && row.kind === "owner"
+                  ? `race-${segment(label)}`
+                  : "down-the-ballot",
+            })),
         },
       };
     }),
