@@ -12,14 +12,16 @@ from ea.store import DATA, connect
 SOURCE = "us.mn_sos_precincts"
 VERSION = "2"
 PARSED = DATA / "parsed" / SOURCE
+FILES = {2000: "1545/2000_general_results.xls", **mn_sos.FILES}
 PLACES = {
+    2000: ["MCD NAME", "WD", "PRECINCT NAME"],
     2002: ["MCD NAME", "WD", "PRECINCT NAME"],
     2004: ["McdName", "WD", "PrecinctName"],
     2006: ["MCDName", "WD", "Precinct Name"],
     2008: ["MCDName", "Precinct Name"],
     2010: ["Precinct Name"],
 }
-COUNTY = {2002: "CC", 2004: "CC", 2006: "County_ID", 2008: "CountyID", 2010: "CountyID"}
+COUNTY = {2000: "CC", 2002: "CC", 2004: "CC", 2006: "County_ID", 2008: "CountyID", 2010: "CountyID"}
 OFFICES = {
     "house": ("Cong", "USCong", "CONG"),
     "senate": ("USSen", "USSEN"),
@@ -53,14 +55,15 @@ PARTIES = {
     "CF": "christian freedom",
     "BL": "better life",
     "IND": "independent",
+    "GRP": "grassroots",
 }
 PUBLISHER = "Minnesota Secretary of State"
 TITLE = "Precinct results spreadsheets"
 
 
 def fetch() -> None:
-    for path in mn_sos.FILES.values():
-        cached = raw.cached(mn_sos.SOURCE, mn_sos.MEDIA + path)
+    for year, path in FILES.items():
+        cached = raw.cached("us.mn_leg_precincts" if year == 2000 else mn_sos.SOURCE, mn_sos.MEDIA + path)
         raw.store(
             SOURCE,
             mn_sos.MEDIA + path,
@@ -74,17 +77,29 @@ def fetch() -> None:
 def parse() -> None:
     rows = []
     residuals: dict[tuple[int, str, int | None], int] = {}
-    for year, path in mn_sos.FILES.items():
+    for year, path in FILES.items():
         day = date(year, 11, 2 + (-date(year, 11, 1).weekday()) % 7)
         cells = pl.read_excel(
             raw.cached(SOURCE, mn_sos.MEDIA + path).path,
-            sheet_name="Results",
+            sheet_name="full_00results" if year == 2000 else "Results",
             engine="calamine",
             has_header=False,
             infer_schema_length=0,
         ).rows()
         start = 2 if year == 2002 else 0
         header = [re.sub(r"\s+", " ", str(cell)).strip() for cell in cells[start]]
+        if year == 2000:
+            header = [
+                re.sub(
+                    r"^(.+)_(PREZ|USSEN|CONG)$",
+                    lambda m: (
+                        {"PREZ": "USPres", "USSEN": "USSen", "CONG": "Cong"}[m[2]]
+                        + {"OTHER": "WI", "ALL_OTHER": "WI", "IND": "IP"}.get(m[1], m[1])
+                    ),
+                    name,
+                )
+                for name in header
+            ]
         column = {name: index for index, name in enumerate(header)}
         fields = {
             chamber: [
@@ -95,7 +110,7 @@ def parse() -> None:
             ]
             + ([("Wellstone", column["Wellstone"])] if chamber == "senate" and year == 2002 else [])
             for chamber, prefixes in OFFICES.items()
-            if chamber != "governor" or year == 2002
+            if (chamber != "governor" or year == 2002) and (chamber != "president" or year != 2000)
         }
         for row in cells[start + 1 :]:
             if row[0] is None or row[0] == cells[start][0] or re.match(r"(?i)(statewide )?totals?\b", str(row[0])):
@@ -164,8 +179,8 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Minnesota's U.S. House generals 2002–2010, its U.S. Senate and presidential generals of those "
-            "years, and its 2002 governor, by precinct from the Secretary of State's precinct results spreadsheets",
+            summary="Minnesota's U.S. House generals 2000–2010, its U.S. Senate generals of those years, its "
+            "presidential generals 2004 and 2008, and its 2002 governor, by precinct from the Secretary of State's precinct results spreadsheets",
             polity="US",
         )
         source = cs.source(PUBLISHER, TITLE)
@@ -179,7 +194,7 @@ def emit() -> Path:
                 url="https://www.sos.state.mn.us/elections-voting/election-results/",
                 license="Public record",
             )
-        for path in mn_sos.FILES.values():
+        for path in FILES.values():
             cs.artifact(raw.cached(SOURCE, mn_sos.MEDIA + path), source)
         frame = frame.with_columns(
             key=pl.when(pl.col("chamber") == "house")
@@ -233,9 +248,7 @@ def emit() -> Path:
             .with_columns(special=pl.lit(False), state=pl.lit("MN"), measure=pl.lit(1, pl.Int16))
             .with_columns(source=pl.col("state"))
         )
-        wellstone = (
-            (pl.col("year") == 2002) & (pl.col("chamber") == "senate") & (pl.col("kind") == "precinct")
-        )
+        wellstone = (pl.col("year") == 2002) & (pl.col("chamber") == "senate") & (pl.col("kind") == "precinct")
         for governor, loose in ((False, False), (True, False), (False, True)):
             medsl.attach(
                 cs,
