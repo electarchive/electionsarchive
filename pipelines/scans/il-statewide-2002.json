@@ -331,5 +331,6 @@
       ]
     }
   ],
-  "extend": true
+  "extend": true,
+  "authoritative": "Source: the State Board of Elections' official vote cast, whose county rows add up to each candidate's printed state total; Algara and Amlani pool the minor candidates into one line."
 }
