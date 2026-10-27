@@ -45,11 +45,31 @@
       .slice(0, 2)
       .toSorted((a, b) => parts.indexOf(a) - parts.indexOf(b)),
   );
-  const order = $derived([
-    ...shown.slice(0, 1),
-    ...present.filter((part) => !shown.includes(part)),
-    ...shown.slice(1),
-  ]);
+  const order = $derived.by(() => {
+    const between = present.filter((part) => !shown.includes(part));
+    const tiny = between.filter(
+      (part) => part.value / Math.max(total, Number.EPSILON) < 0.004,
+    );
+    if (tiny.length < 2) {
+      return [...shown.slice(0, 1), ...between, ...shown.slice(1)];
+    }
+    let value = 0;
+    for (const part of tiny) {
+      value += part.value;
+    }
+    return [
+      ...shown.slice(0, 1),
+      ...between.filter((part) => !tiny.includes(part)),
+      {
+        key: "balance:others",
+        label: m.regions_others(),
+        color: "var(--muted-foreground)",
+        value,
+        members: tiny.length,
+      },
+      ...shown.slice(1),
+    ];
+  });
   const rest = $derived.by(() => {
     let sum = 0;
     for (const part of present) {
@@ -146,14 +166,7 @@
                 height="56"
               />
             {/if}
-            <span
-              class={cn("grid min-inline-0", {
-                "content-between gap-2.5": part.photo != null,
-                "gap-2": part.photo == null,
-                "min-block-12 sm:min-block-14": part.photo != null && isLead,
-                "min-block-11": part.photo != null && !isLead,
-              })}
-            >
+            <span class="grid gap-2 min-inline-0">
               <span
                 class={cn(
                   "font-figures leading-none font-[780] tracking-[-0.02em] text-foreground [text-box:trim-both_cap_alphabetic]",
@@ -225,7 +238,7 @@
   </div>
   <Tooltip.Root {tether} delayDuration={120}>
     {#snippet children({ payload })}
-      {const part = $derived(present.find((entry) => entry.key === payload))}
+      {const part = $derived(order.find((entry) => entry.key === payload))}
       {#if part != null}
         <Tooltip.Content
           collisionPadding={8}
@@ -238,7 +251,11 @@
             ></span>
             <span class="font-semibold">{part.label}</span>
           </span>
-          {#if part.detail != null}
+          {#if "members" in part}
+            <span class="text-xs opacity-80"
+              >{m.balance_others_count({ count: count(part.members) })}</span
+            >
+          {:else if part.detail != null}
             <span class="text-xs opacity-80">{part.detail}</span>
           {/if}
           <span

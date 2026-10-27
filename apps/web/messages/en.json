@@ -530,6 +530,7 @@
   "seats_official": "Officially {count} seats, {majority} for a majority",
   "electors_title": "Electoral votes",
   "electors_majority": "{count} to win",
+  "balance_others_count": "{count} candidates or parties, each too small to show",
   "electors_cast": "Cast by electors on {date}",
   "electors_popular": "Popular vote on {date}",
   "siblings_open": "Go to another {noun}",
