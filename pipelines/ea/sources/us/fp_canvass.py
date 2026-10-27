@@ -74,6 +74,13 @@ DOCUMENTS = {
         "Election night reporting results",
         "https://www.enr-scvotes.org/SC/19077/40477/en/summary.html",
     ),
+    "OH2010": (
+        SOURCE,
+        "https://web.archive.org/web/20191120093740id_/https://www.ohiosos.gov/elections/election-results-and-data/2010-elections-results/u.s.-senator-november-2-2010/",
+        "Ohio Secretary of State",
+        "Election results and data",
+        "https://www.ohiosos.gov/elections/election-results-and-data/",
+    ),
     "ME2014": (
         SOURCE,
         "https://lldc.mainelegislature.org/Open/Elections/Returns/2014/20141104/elec_20141104aj.xlsx",
@@ -328,6 +335,34 @@ def clarity(
     return rows
 
 
+def ohio(conn: Connection) -> list[tuple[date, str, str, str, int]]:
+    codes = counties(conn, "39")
+    source, url, *_ = DOCUMENTS["OH2010"]
+    table = [
+        [
+            html.unescape(re.sub(r"<[^>]+>", "", cell)).strip()
+            for cell in re.findall(r"<t[dh][^>]*>(.*?)</t[dh]>", line, re.DOTALL | re.IGNORECASE)
+        ]
+        for line in re.findall(
+            r"<tr[^>]*>(.*?)</tr>", raw.cached(source, url).path.read_text(), re.DOTALL | re.IGNORECASE
+        )
+    ]
+    names = [name.upper() for name in table[0][1:]]
+    rows = [
+        (date(2010, 11, 2), "senate", codes[re.sub(r"[^a-z]", "", line[0].lower())], name, int(value.replace(",", "")))
+        for line in table[2:]
+        if line and line[0] not in ("Total", "Percentage of Votes")
+        for name, value in zip(names, line[1:], strict=True)
+    ]
+    total = next(line for line in table if line and line[0] == "Total")
+    if len({row[2] for row in rows}) != 88:
+        raise ValueError("OH Senate: not 88 counties")
+    for name, printed in zip(names, total[1:], strict=True):
+        if (summed := sum(r[4] for r in rows if r[3] == name)) != int(printed.replace(",", "")):
+            raise ValueError(f"OH Senate {name}: counties sum to {summed}, statewide {printed}")
+    return rows
+
+
 def pdf(document: str) -> str:
     source, url, *_ = DOCUMENTS[document]
     return subprocess.run(
@@ -345,6 +380,7 @@ def parse() -> None:
                 ("ME2014", maine),
                 ("DE2006", delaware),
                 ("KS2002", kansas),
+                ("OH2010", ohio),
                 ("SC2010", lambda conn: clarity(conn, "SC2010", "45", date(2010, 11, 2), "senate", "U.S. Senate")),
                 ("NM2002", lambda conn: elstats(conn, "NM2002", "35", date(2002, 11, 5), "senate")),
                 ("IN2000U", lambda conn: indiana(conn, "IN2000U")),
