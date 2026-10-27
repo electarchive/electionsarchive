@@ -12,18 +12,22 @@ from ea.changeset import Changeset
 from ea.store import DATA, connect
 
 SOURCE = "world.natural_earth"
-VERSION = "3"
+VERSION = "5"
 PARSED = DATA / "parsed" / SOURCE
 URL = "https://raw.githubusercontent.com/nvkelso/natural-earth-vector/master/geojson/ne_10m_admin_0_countries.geojson"
 PLACES = "https://raw.githubusercontent.com/nvkelso/natural-earth-vector/master/geojson/ne_10m_populated_places.geojson"
 DISPUTED = "https://raw.githubusercontent.com/nvkelso/natural-earth-vector/master/geojson/ne_10m_admin_0_disputed_areas.geojson"
 PAGE = "https://www.naturalearthdata.com/downloads/10m-cultural-vectors/10m-admin-0-countries/"
+CLDR = "https://raw.githubusercontent.com/unicode-org/cldr-json/49.0.0/cldr-json/cldr-localenames-full/main/{}/territories.json"
+CLDR_PAGE = "https://cldr.unicode.org/"
 MOVED = {"B89": "UKR", "B16": "SYR", "B19": "ESH", "B98": "PSE"}
 FOLDED = {
     "SOL": ("SOM", "Somaliland is drawn within Somalia, per UN recognition"),
     "KAS": ("IND", "Siachen is drawn within India, its administrator"),
 }
-DISPLAY = {"CYN": "Northern Cyprus"}
+DISPLAY = {"CYN": "Northern Cyprus", "KOS": "Kosovo", "TWN": "Taiwan"}
+SHORT = {"HK", "MO", "MM", "PS"}
+LONG = {"CD", "CG"}
 STATUS = {
     "UKR": "Includes Crimea, which Russia has administered since 2014, and the parts of Donetsk, Luhansk, Zaporizhzhia, "
     "and Kherson oblasts that Russia has occupied since 2022. The UN regards all of them as part of Ukraine (General "
@@ -83,6 +87,8 @@ def fetch() -> None:
     raw.fetch(SOURCE, URL, suffix=".geojson")
     raw.fetch(SOURCE, PLACES, suffix=".geojson")
     raw.fetch(SOURCE, DISPUTED, suffix=".geojson")
+    for lang in LANGS.values():
+        raw.fetch(SOURCE, CLDR.format(lang), suffix=".json")
 
 
 def parse() -> None:
@@ -94,6 +100,9 @@ def parse() -> None:
         rows.append(
             {
                 "code": code,
+                "iso2": properties["ISO_A2_EH"]
+                if properties["ISO_A2_EH"] != "-99" and properties["ISO_A3_EH"] in ("-99", code)
+                else None,
                 "continent": properties["CONTINENT"],
                 "geojson": json.dumps(feature["geometry"]),
                 **{lang: properties[field] or None for field, lang in LANGS.items()},
@@ -102,6 +111,8 @@ def parse() -> None:
     frame = pl.DataFrame(rows)
     if frame["code"].n_unique() != frame.height:
         raise ValueError("country codes are not unique")
+    if frame["iso2"].drop_nulls().n_unique() != frame["iso2"].drop_nulls().len():
+        raise ValueError("ISO 3166 codes are not unique")
     moved = [
         (MOVED[feature["properties"]["BRK_A3"]], json.dumps(feature["geometry"]))
         for feature in json.loads(raw.cached(SOURCE, DISPUTED).path.read_bytes())["features"]
@@ -181,6 +192,7 @@ def emit() -> Path:
         )
         source = cs.source("Natural Earth", "Admin 0 – Countries, 1:10m")
         disputed = cs.source("Natural Earth", "Admin 0 – Breakaway, disputed areas, 1:10m")
+        cldr = cs.source("Unicode CLDR", "Territory display names, CLDR 49")
         cs.add(
             "source",
             id=source,
@@ -203,6 +215,22 @@ def emit() -> Path:
             license_url="https://www.naturalearthdata.com/about/terms-of-use/",
             attribution="Made with Natural Earth",
         )
+        cs.add(
+            "source",
+            id=cldr,
+            kind="community",
+            publisher="Unicode CLDR",
+            title="Territory display names, CLDR 49",
+            url=CLDR_PAGE,
+            license="Unicode License v3",
+            license_url="https://www.unicode.org/license.txt",
+            attribution="Unicode Common Locale Data Repository",
+        )
+        territories = {}
+        for lang in LANGS.values():
+            cached = raw.cached(SOURCE, CLDR.format(lang))
+            cs.artifact(cached, cldr)
+            territories[lang] = json.loads(cached.path.read_bytes())["main"][lang]["localeDisplayNames"]["territories"]
         cs.artifact(raw.cached(SOURCE, URL), source)
         cs.artifact(raw.cached(SOURCE, PLACES), source)
         cs.artifact(raw.cached(SOURCE, DISPUTED), disputed)
@@ -211,18 +239,42 @@ def emit() -> Path:
             area = cs.area("world.country", row["code"])
             cs.add("area", id=area, scheme_code="world.country")
             cs.add("area_code", area_id=area, code=row["code"], valid_from=None)
+            if row["iso2"] is not None:
+                cs.add("external_id", entity_id=area, scheme="iso3166", value=row["iso2"])
             for lang in LANGS.values():
-                if row[lang] is not None:
+                own = territories[lang]
+                chosen = (
+                    DISPLAY[row["code"]]
+                    if lang == "en" and row["code"] in DISPLAY
+                    else row[lang]
+                    if row["iso2"] in LONG
+                    else own.get(f"{row['iso2']}-alt-short" if row["iso2"] in SHORT else row["iso2"] or "")
+                ) or row[lang]
+                if chosen is not None and lang == "en":
+                    chosen = chosen.replace(" & ", " and ")
+                if chosen is None:
+                    continue
+                cs.add(
+                    "name",
+                    entity_id=area,
+                    text=chosen,
+                    lang=lang,
+                    kind="english" if lang == "en" and chosen != row[lang] else "official",
+                    is_preferred=True,
+                )
+                alternates = {row[lang], own.get(f"{row['iso2']}-alt-variant"), own.get(row["iso2"] or "")} - {
+                    None,
+                    chosen,
+                }
+                for text in sorted(alternates):
                     cs.add(
                         "name",
                         entity_id=area,
-                        text=row[lang],
+                        text=text,
                         lang=lang,
                         kind="official",
-                        is_preferred=lang == "en" and row["code"] not in DISPLAY,
+                        is_preferred=False,
                     )
-            if row["code"] in DISPLAY:
-                cs.add("name", entity_id=area, text=DISPLAY[row["code"]], lang="en", kind="english", is_preferred=True)
             if row["code"] in STATUS:
                 cs.add("note", entity_id=area, kind="context", body_md=STATUS[row["code"]])
             cs.add(

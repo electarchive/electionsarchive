@@ -389,6 +389,59 @@ def _geometry(stage: Stage) -> list[tuple[str, sql.Composed]]:
     ]
 
 
+def _country_names(stage: Stage) -> list[tuple[str, sql.Composed]]:
+    columns = stage.tables.get("name", [])
+    if not {"entity_id", "text", "lang", "is_preferred"} <= set(columns):
+        return []
+    return [
+        (
+            "name.country_mismatch",
+            sql.SQL(
+                """with staged as (
+                     select distinct on (entity_id, lang) entity_id, lang, text from {name}
+                     where is_preferred{timeless}
+                     order by entity_id, lang, {english} desc, text
+                   ),
+                   current as (
+                     select entity_id, lang, text from staged
+                     union all
+                     (select distinct on (n.entity_id, n.lang) n.entity_id, n.lang, n.text from public.name n
+                      where n.is_preferred and n.valid_from is null and n.valid_to is null
+                        and not exists (select from staged s where s.entity_id = n.entity_id and s.lang = n.lang)
+                      order by n.entity_id, n.lang, n.kind = 'english' desc, n.text)
+                   ),
+                   coded as (
+                     select entity_id, value from public.external_id where scheme = 'iso3166'{coded}
+                   ),
+                   link as (
+                     select p.id as polity, c.entity_id as country from public.polity p
+                     join coded c on c.value = p.iso_code
+                   )
+                   select l.polity, null::uuid,
+                          jsonb_build_object(
+                            'country', l.country, 'lang', a.lang, 'polity_name', a.text, 'country_name', b.text
+                          )
+                   from link l
+                   join current a on a.entity_id = l.polity
+                   join current b on b.entity_id = l.country and b.lang = a.lang
+                   where a.text <> b.text
+                     and (l.polity in (select entity_id from staged) or l.country in (select entity_id from staged))"""
+            ).format(
+                name=stage.staged("name"),
+                timeless=sql.SQL(
+                    "".join(f" and {column} is null" for column in ("valid_from", "valid_to") if column in columns)
+                ),
+                english=sql.SQL("kind = 'english'" if "kind" in columns else "false"),
+                coded=sql.SQL(" union select entity_id, value from {} where scheme = 'iso3166'").format(
+                    stage.staged("external_id")
+                )
+                if "external_id" in stage.tables
+                else sql.SQL(""),
+            ),
+        )
+    ]
+
+
 def _seated(stage: Stage) -> list[tuple[str, sql.Composed]]:
     columns = stage.tables.get("tenure", [])
     if not {"body_id", "seat_id", "from_date"} <= set(columns):
@@ -582,6 +635,7 @@ def run(conn: Connection, stage: Stage) -> list[Finding]:
         *_accounting(stage),
         *_outcomes(stage),
         *_geometry(stage),
+        *_country_names(stage),
         *_seated(stage),
         *_memberships(stage),
         *_scope(stage),
