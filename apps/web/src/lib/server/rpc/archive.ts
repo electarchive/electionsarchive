@@ -1382,53 +1382,66 @@ async function load(
         "",
     );
   }
+  const side = new Map(
+    options.rows.map((row) => {
+      const id = stand(row);
+      return [row.k, id == null ? row.person : (branch.get(id) ?? id)] as const;
+    }),
+  );
+  const rootOf = new Map(picked.rows.map((row) => [row.contest, row.root]));
+  const tinted = new Map<
+    number,
+    { party: string; rank: number; own: string | null }
+  >();
+  for (const [root, rows] of Map.groupBy(
+    options.rows.filter((row) => row.person != null && stand(row) != null),
+    (row) => rootOf.get(row.contest) ?? row.contest,
+  )) {
+    const parties = Map.groupBy(rows, (row) => side.get(row.k) ?? "");
+    for (const [party, group] of parties) {
+      const base = color.get(party);
+      const weight = new Map<string, number>();
+      for (const row of group) {
+        weight.set(
+          row.person ?? "",
+          (weight.get(row.person ?? "") ?? 0) + (tallies.get(row.k) ?? 0),
+        );
+      }
+      const order = weight
+        .keys()
+        .toArray()
+        .toSorted((a, b) => (weight.get(b) ?? 0) - (weight.get(a) ?? 0));
+      for (const row of group) {
+        const rank = order.indexOf(row.person ?? "");
+        if (base == null || rank < 1) {
+          continue;
+        }
+        const own =
+          parties.size === 1 ? null : `${root}:${party}:${row.person ?? ""}`;
+        if (own != null) {
+          color.set(own, base);
+          side.set(row.k, own);
+        }
+        tinted.set(row.k, { party, rank, own });
+      }
+    }
+  }
   separate(
     color,
     options.rows.map(
-      (row) =>
-        [
-          branch.get(stand(row) ?? "") ?? stand(row) ?? row.person,
-          tallies.get(row.k) ?? 0,
-        ] as const,
+      (row) => [side.get(row.k) ?? null, tallies.get(row.k) ?? 0] as const,
     ),
     branch,
   );
-  const rootOf = new Map(picked.rows.map((row) => [row.contest, row.root]));
-  const sharing = Map.groupBy(
-    options.rows.filter((row) => row.person != null && row.party != null),
-    (row) => `${rootOf.get(row.contest) ?? row.contest}:${row.party ?? ""}`,
-  );
-  const shared = new Set(sharing.values().map((rows) => rows[0]?.party ?? ""))
-    .size;
   const tints = new Map(
-    sharing.values().flatMap((rows) => {
-      const base = color.get(rows[0]?.party ?? "");
-      const order = [
-        ...new Set(
-          rows
-            .toSorted(
-              (a, b) => (tallies.get(b.k) ?? 0) - (tallies.get(a.k) ?? 0),
-            )
-            .map((row) => row.person),
-        ),
-      ];
-      return rows.flatMap((row) => {
-        const rank = order.indexOf(row.person);
-        const step =
-          (rank % 2 === 1 ? 1 : -1) * (0.06 + 0.08 * Math.ceil(rank / 2));
-        if (base == null || rank < 1) {
-          return [];
-        }
-        return [
-          [
-            row.k,
-            shared === 1
-              ? `oklch(from ${base} l max(c, 0.1) calc(h + ${rank * 137.5}))`
-              : `oklch(from ${base} calc(l + ${step}) c h)`,
-          ] as const,
-        ];
-      });
-    }),
+    tinted
+      .entries()
+      .map(([k, { party, rank, own }]) => [
+        k,
+        own == null
+          ? `oklch(from ${color.get(party) ?? ""} l max(c, 0.1) calc(h + ${rank * 137.5}))`
+          : (color.get(own) ?? ""),
+      ]),
   );
   const backers = backing.rows.map((row) => ({
     party: row.party,
