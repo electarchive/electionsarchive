@@ -76,7 +76,7 @@ OFFICIAL = {
     "SD": (
         "South Dakota Secretary of State",
         "2026 general election candidate list",
-        ["https://vip.sdsos.gov/candidatelist.aspx?eid=774"],
+        ["https://vip.sdsos.gov/candidatelist.aspx?eid=774#browser"],
     ),
     "NJ": (
         "New Jersey Division of Elections",
@@ -221,6 +221,55 @@ OFFICIAL = {
         "Declared candidates report, 2026",
         ["https://vote.sos.ri.gov/Forms/elections/Reports/Candidates.xlsx#MF-133"],
     ),
+    "CO": (
+        "Colorado Secretary of State",
+        "2026 general election official candidate list",
+        ["https://www.coloradosos.gov/pubs/elections/vote/files/2026/2026GeneralCandidateListOfficial.xlsx"],
+    ),
+    "WI": (
+        "Wisconsin Elections Commission",
+        "Candidates on ballot by election, 2026 general election",
+        [
+            "https://elections.wi.gov/sites/default/files/documents/Candidates%20on%20Ballot%20By%20Election_November%203%202026%20General%20Election.pdf"
+        ],
+    ),
+    "MI": (
+        "Michigan Department of State",
+        "Official candidate listing, November 3, 2026 general election",
+        [
+            "https://mi-boe.entellitrak.com/etk-mi-boe-prod/page.request.do?electionType=GEN&electionYear=2026&page=page.miboePublicReport"
+        ],
+    ),
+    "NM": (
+        "New Mexico Secretary of State",
+        "2026 general election contest and candidate list",
+        ["https://candidateportal.servis.sos.state.nm.us/CandidateList.aspx"],
+    ),
+    "ND": (
+        "North Dakota Secretary of State",
+        "2026 general election contest and candidate list",
+        ["https://vip.sos.nd.gov/candidatelist.aspx?eid=348#browser"],
+    ),
+    "MD": (
+        "Maryland State Board of Elections",
+        "2026 gubernatorial general election state candidates list",
+        ["https://elections.maryland.gov/elections/2026/General_candidates/2026_GG_statewide_candidatelist.csv"],
+    ),
+    "IN": (
+        "Indiana Election Division",
+        "Candidate list, abbreviated, 2026 general election (as of 2026-09-22)",
+        ["https://www.in.gov/sos/elections/files/Candidate_List_Abbreviated_20260922_011251PM.xlsx"],
+    ),
+    "IL": (
+        "Illinois State Board of Elections",
+        "Candidate list, general election 11/3/2026",
+        ["https://www.elections.il.gov/ElectionOperations/CandidateList.aspx?ElectionID=71#browser"],
+    ),
+    "KS": (
+        "Kansas Secretary of State",
+        "Candidate list, 2026 general election",
+        ["https://www.sos.ks.gov/elections/elections_upcoming_candidate.aspx#browser"],
+    ),
     "AS": (
         "American Samoa Election Office",
         "Candidates for the 2026 midterm election",
@@ -253,7 +302,7 @@ OFFICIAL = {
     ),
 }
 INDEPENDENT = re.compile(
-    r"(?i)^(independent|unaffiliated|unenrolled|undeclared|no party.*|npa|non|none|nonpartisan|non-partisan|petition|by petition|)$"
+    r"(?i)^(independent|independent nomination|unaffiliated|unenrolled|undeclared|no party.*|npa|non|none|nonpartisan|non-partisan|petition|by petition|)$"
 )
 MAJOR = [
     (re.compile(r"(?i)farmer.?labor"), "MN:minnesota-democratic-farmer-labor-party"),
@@ -404,18 +453,19 @@ def read(state: str, path: Path) -> list[tuple[str, int | None, str, str]]:
                     (chamber, int(number[0]) if number and chamber == "house" else None, row["Name"].lstrip("*"), party)
                 )
     if state == "SD":
-        for contest, text, party, _, _, _, withdrawn, *_ in (row for row in cells(path.read_text()) if len(row) >= 7):
+        table = json.loads(path.read_text())["rows"] if path.suffix == ".json" else cells(path.read_text())
+        for contest, text, party, _, _, _, withdrawn, *_ in (row for row in table if len(row) >= 7):
             if text and not withdrawn and contest != "Contest":
                 chamber = {
                     "United States Senator": "senate",
                     "United States Representative": "house",
-                    "Governor": "governor",
+                    "Governor and Lieutenant Governor": "governor",
                 }.get(contest, contest)
                 rows.append(
                     (
                         chamber,
                         None,
-                        text,
+                        text.split(" & ")[0],
                         {"REP": "Republican", "DEM": "Democratic", "LIB": "Libertarian", "IND": "Independent"}.get(
                             party, party
                         ),
@@ -601,6 +651,121 @@ def read(state: str, path: Path) -> list[tuple[str, int | None, str, str]]:
                 )
                 rows.append((office, int(house[1]) if house else None, text, party))
         return rows
+    if state == "CO":
+        for row in fastexcel.read_excel(path).load_sheet(0, dtypes="string").to_polars().iter_rows(named=True):
+            if row["Write In?"] != "N" or not row["Office"]:
+                continue
+            office = {"US Senate": "senate", "US House of Representatives": "house", "Governor": "governor"}.get(
+                row["Office"], f"{row['Office']}, {row['District']}" if row["District"] != "State" else row["Office"]
+            )
+            district = int(row["District"]) if office == "house" else None
+            rows.append((office, district, row["Candidate Name"], row["Party"] or ""))
+        return rows
+    if state == "IN":
+        for text, party, title, filed, *_ in (
+            fastexcel.read_excel(path).load_sheet(0, dtypes="string").to_polars().rows()
+        ):
+            if not text or not filed or text == "BALLOT NAME" or not party or party.startswith("Write-In"):
+                continue
+            house = re.fullmatch(r"United States Representative, (\w+) District", title or "")
+            office = "house" if house else title
+            rows.append((office, ORDINAL_WORDS.index(house[1].lower()) + 1 if house else None, text, party))
+        return rows
+    if state == "MD":
+        for row in csv.DictReader(io.StringIO(path.read_text(encoding="utf-8-sig"))):
+            if row["Candidate Status"] != "Active" or row["Filing Type and Date"].startswith("Write-In"):
+                continue
+            house = re.fullmatch(r"Congressional District (\d+)", row["Contest Run By District Name and Number"])
+            office = (
+                "house"
+                if row["Office Name"] == "Representative in Congress"
+                else "governor"
+                if row["Office Name"] == "Governor / Lt. Governor"
+                else f"{row['Office Name']}, {row['Contest Run By District Name and Number']}"
+            )
+            last = row["Candidate Ballot Last Name and Suffix"]
+            suffix = ""
+            if ", " in last:
+                last, suffix = last.split(", ", 1)
+            text = " ".join(part for part in (row["Candidate First Name and Middle Name"], last, suffix) if part)
+            rows.append((office, int(house[1]) if house else None, text, row["Office Political Party"]))
+        return rows
+    if state == "IL":
+        for text, write_in, _, race, party, _, status, *_ in (
+            row for row in json.loads(path.read_text())["rows"][1:] if len(row) == 7
+        ):
+            if not status.startswith("Active") or write_in or "Affil Comm:" in text:
+                continue
+            last, _, given = text.split("\n")[0].partition(", ")
+            suffix = re.search(r" (Jr|Sr|II|III|IV)\.?$", last)
+            if suffix:
+                last = last[: suffix.start()]
+            house = re.fullmatch(r"(\d+)\w\w CONGRESS", race)
+            office = (
+                "house"
+                if house
+                else {"UNITED STATES SENATOR": "senate", "GOVERNOR AND LIEUTENANT GOVERNOR": "governor"}.get(race, race)
+            )
+            text = " ".join(part for part in (given, last, suffix[0].strip() if suffix else "") if part)
+            rows.append((office, int(house[1]) if house else None, text, party))
+        return rows
+    if state == "KS":
+        for text, race, district, _, _, party, *_ in json.loads(path.read_text())["rows"][1:]:
+            office = {
+                "United States Senate": "senate",
+                "United States House of Representatives": "house",
+                "Governor / Lt. Governor": "governor",
+            }.get(race, f"{race}, {district}" if district != "0" else race)
+            rows.append((office, int(district) if office == "house" else None, re.split(r" / | and ", text)[0], party))
+        return rows
+    if state == "ND":
+        for race, _, _, district, _, text, *rest in json.loads(path.read_text())["rows"][1:]:
+            office = "house" if race == "Representative in Congress" else f"{race}, {district}" if district else race
+            rows.append((office, None, text, rest[3]))
+        return rows
+    if state == "NM":
+        for row in cells(path.read_text(errors="replace")):
+            if len(row) >= 23 and row[21] == "Qualified":
+                house = re.fullmatch(r"DISTRICT (\d+)", row[2]) if row[1] == "United States Representative" else None
+                office = (
+                    "house"
+                    if house
+                    else {"United States Senator": "senate", "Governor and Lieutenant Governor": "governor"}.get(
+                        row[1], f"{row[1]}, {row[2]}" if row[2] else row[1]
+                    )
+                )
+                party = {
+                    "DEM": "Democratic",
+                    "REP": "Republican",
+                    "LIB": "Libertarian",
+                    "FWD": "Forward",
+                    "DTS": "Independent",
+                }.get(row[8], row[8])
+                rows.append((office, int(house[1]) if house else None, row[4].split(" AND ")[0], party))
+        return rows
+    if state == "MI":
+        race = ""
+        for row in cells(path.read_text(errors="replace")):
+            filled = [cell for cell in row if cell]
+            if len(filled) == 1 and re.search(r"\(\d+\) Positions?$", filled[0]):
+                race = re.sub(r"\s+\d+ Year Term.*$|\s+\(\d+\) Positions?$", "", filled[0])
+            elif race and len(filled) >= 4 and re.fullmatch(r"\d\d/\d\d/\d{4}", filled[-2]):
+                if len(filled) == 5:
+                    continue
+                party, text = filled[0], filled[1].split(" / ")[0]
+                last, _, given = text.partition(", ")
+                house = re.fullmatch(r"(\d+)\w\w District Representative in Congress", race)
+                office = (
+                    "house"
+                    if house
+                    else {"U.S. Senate": "senate", "Governor / Lt. Governor": "governor"}.get(race, race)
+                )
+                suffix = re.search(r" (Jr\.|Sr\.|II|III|IV)$", last)
+                if suffix:
+                    last = last[: suffix.start()]
+                text = " ".join(part for part in (given, last, suffix[1] if suffix else "") if part)
+                rows.append((office, int(house[1]) if house else None, text, party))
+        return rows
     if state == "MA":
         race = district_name = ""
         for tag, body in re.findall(
@@ -704,6 +869,28 @@ def read(state: str, path: Path) -> list[tuple[str, int | None, str, str]]:
         district: int | None = None
         header = ""
         for line in lines:
+            if state == "WI":
+                stripped = line.strip()
+                if match := re.match(r"^Office :\s+(.+?)(?:\s{2,}Incumbent:.*)?$", stripped):
+                    race = match[1].strip()
+                    house = re.fullmatch(r"REPRESENTATIVE IN CONGRESS DISTRICT (\d+)", race)
+                    office, district = (
+                        ("house", int(house[1]))
+                        if house
+                        else ({"GOVERNOR": "governor", "UNITED STATES SENATOR": "senate"}.get(race, race), None)
+                    )
+                elif office and (match := re.match(r"^\d+\s+(?:\d{7}\s+)?(\S.*?)\s{2,}(\S.*)$", stripped)):
+                    rows.append((office, district, match[1].split(" / ")[0], match[2]))
+                elif (
+                    rows
+                    and office
+                    and len(line) - len(line.lstrip()) > 40
+                    and len(re.split(r"\s{2,}", stripped)) == 1
+                    and not stripped.startswith(("Total", "Printed", "Wisconsin", "Candidates", "2026", "Order", "ID"))
+                ):
+                    rows[-1] = (*rows[-1][:3], f"{rows[-1][3]} {stripped}")
+                elif stripped.startswith("Total Number"):
+                    office = None
             if state == "OH":
                 stripped = line.strip()
                 if re.match(r"^VI\.\s+CANDIDATES CERTIFIED", stripped):
@@ -1151,7 +1338,9 @@ def emit() -> Path:
                 for word in re.findall(r"\w+", re.sub(r"\s\S+$", "", text.strip()))
                 for initial in (
                     slug(word)[:1],
-                    {"bill": "w", "bob": "r", "dick": "r", "ted": "e", "peggy": "m"}.get(word.lower(), ""),
+                    {"bill": "w", "bob": "r", "dick": "r", "ted": "e", "peggy": "m", "tony": "a", "sandy": "a"}.get(
+                        word.lower(), ""
+                    ),
                 )
             }.isdisjoint(given_initials[fec]):
                 print("fec id dropped:", fec, text)
@@ -1295,6 +1484,7 @@ def emit() -> Path:
                     and surname(held_text).replace("-", "") in "".join(tokens)
                     and len(slug(held_text).split("-")[0]) > 1
                     and slug(held_text).split("-")[0] in tokens
+                    and set(re.findall(r"\b(?:II|III|IV)\b", text)) <= set(re.findall(r"\b(?:II|III|IV)\b", held_text))
                 }
             for preferred in ({*held.get(key, {})}, {person for _, person in nominees.get(key, {})}, matched, fec_held):
                 if len(pool) > 1 and pool & preferred:
