@@ -59,7 +59,7 @@ def database(conn) -> list[str]:
             if (
                 county
                 and not conn.execute(
-                    "select from reporting_unit u join polity p on p.id = u.polity_id"
+                    "select 1 from reporting_unit u join polity p on p.id = u.polity_id"
                     " where u.scheme_code = 'us.county' and u.code = %s and p.iso_code = %s",
                     [county, f"US-{row['state']}"],
                 ).fetchone()
@@ -172,8 +172,14 @@ def pages(conn) -> list[str]:
                         )
         for tier in summary["tiers"]:
             found = next((t for t in rest["tiers"] if t["key"] == tier["key"]), None)
-            column = "constituency" if cc != "us" else ("since_any" if tier["key"] == "local" else "since_county")
-            if found is None or found["cells"].get(column) != tier["cell"]:
+            if found is None:
+                expected = None
+            elif cc != "us" or tier["key"] == "local":
+                expected = found["cells"].get("constituency" if cc != "us" else "since_any")
+            else:
+                parts = [found["cells"][c] for c in ("before_any", "since_any") if found["cells"].get(c) is not None]
+                expected = {k: sum(p[k] for p in parts) for k in parts[0]} if parts else None
+            if found is None or expected != tier["cell"]:
                 problems.append(f"{cc} overview {tier['key']} differs from the country page")
     return problems
 

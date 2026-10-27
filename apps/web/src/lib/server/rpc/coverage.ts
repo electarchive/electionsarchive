@@ -270,7 +270,7 @@ export const coverage = {
         method: "GET",
         path: "/coverage",
         summary:
-          "Coverage of every country the archive holds: its span, elections, contests, finest reporting unit, and how far each tier (national, regional, and local elections, referendums, and the European Parliament; for the US federal, statewide, state legislative, and local contests since 2000) is counted by constituency or county; the current year, still under way, counts only with current=1",
+          "Coverage of every country the archive holds: its span, elections, contests, finest reporting unit, and how far each tier (national, regional, and local elections, referendums, and the European Parliament; for the US federal, statewide, state legislative, and local contests since 2000) is counted, as the share of races with results at each race's own constituency or district (US local governments: election years with any results); the current year, still under way, counts only with current=1",
       }),
     )
     .input(v.optional(v.object({ current: Current }), {}))
@@ -318,7 +318,7 @@ export const coverage = {
         select g.polity, g.goal, g.level, g.year < 2000 as before, array_agg(distinct g.year order by g.year) as years,
           ${SUMS}
         from coverage_goal g
-        where g.goal in ('county', 'local', 'subnational', 'national', 'referendums', 'ep')
+        where g.goal in ('history', 'county', 'local', 'subnational', 'national', 'referendums', 'ep')
           and (${input.current} or g.year <> extract(year from current_date))
         group by 1, 2, 3, 4
       `);
@@ -344,23 +344,32 @@ export const coverage = {
             polity.polity,
             found.rows.filter((row) => row.polity === polity.polity),
             polity.levels,
-          ).flatMap((tier) =>
-            tier.key === "turnout"
-              ? []
-              : [
-                  {
-                    key: tier.key,
-                    cell:
-                      tier.cells[
-                        polity.polity !== "us"
-                          ? "constituency"
-                          : tier.key === "local"
-                            ? "since_any"
-                            : "since_county"
-                      ] ?? null,
-                  },
-                ],
-          ),
+          ).flatMap((tier) => {
+            if (tier.key === "turnout") {
+              return [];
+            }
+            if (polity.polity !== "us" || tier.key === "local") {
+              return [
+                {
+                  key: tier.key,
+                  cell:
+                    tier.cells[
+                      polity.polity !== "us" ? "constituency" : "since_any"
+                    ] ?? null,
+                },
+              ];
+            }
+            const parts = [tier.cells.before_any, tier.cells.since_any].filter(
+              (part) => part != null,
+            );
+            const cell = { ...ZERO };
+            for (const part of parts) {
+              for (const key of Object.keys(counts) as Array<keyof Counts>) {
+                cell[key] += part[key];
+              }
+            }
+            return [{ key: tier.key, cell: parts.length === 0 ? null : cell }];
+          }),
         })),
       };
     }),

@@ -860,6 +860,7 @@ function overviewMarkdown(
           : `${polity.first}–${polity.last}`,
       ]),
     ),
+    m.coverage_overview_note(),
     `## ${m.coverage_overview_done()}`,
     m.coverage_overview_done_body(),
     m.coverage_overview_explain_count(),

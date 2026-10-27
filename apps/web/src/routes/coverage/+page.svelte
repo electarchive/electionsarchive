@@ -195,6 +195,9 @@
           </li>
         {/each}
       </ul>
+      <p class="px-3.5 py-2 text-xs text-muted-foreground">
+        {m.coverage_overview_note()}
+      </p>
     </section>
     <section
       aria-labelledby="coverage-explain"
