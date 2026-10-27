@@ -120,9 +120,9 @@
 
   const uid = $props.id();
   let opening = $state<number | null>(null);
-  let context = $state<Awaited<
-    ReturnType<typeof orpc.contests.context.call>
-  > | null>(null);
+  let ladder = $state<Awaited<ReturnType<typeof orpc.contests.context.call>>>(
+    [],
+  );
   let sight = $state<{
     x: number;
     y: number;
@@ -305,9 +305,10 @@
     if (own != null) {
       void orpc.contests.context.call({ k: own.k }).then(
         (found) => {
-          if (found != null) {
-            context = found;
-            engine.widen(found.frame);
+          ladder = found;
+          const top = found.at(-1);
+          if (top != null) {
+            engine.widen(top.frame);
           }
         },
         () => {},
@@ -315,23 +316,45 @@
     }
   });
 
+  const context = $derived.by(() => {
+    if (sight == null) {
+      return ladder.at(-1) ?? null;
+    }
+    const seen = Math.sqrt(sight.width * sight.height);
+    return (
+      ladder.find(
+        (rung) => Math.sqrt(rung.extent.width * rung.extent.height) >= seen * 2,
+      ) ??
+      ladder.at(-1) ??
+      null
+    );
+  });
+
   $effect(() => {
-    const area = context?.area;
-    if (engine.gl == null || area == null) {
+    const k = context?.k;
+    const tiles = context?.tiles;
+    if (engine.gl == null) {
       return;
     }
     untrack(() => {
-      engine.add(
-        {
-          id: "context",
-          type: "line",
-          source: engine.tiles(area.tiles),
-          "source-layer": "areas",
-          filter: ["==", ["id"], area.k],
-          paint: { "line-color": "var(--muted-foreground)", "line-width": 1.5 },
-        },
-        "lines",
-      );
+      engine.drop("context");
+      if (k != null && tiles != null) {
+        engine.add(
+          {
+            id: "context",
+            type: "line",
+            source: engine.tiles(tiles, "context"),
+            "source-layer": "areas",
+            filter: ["==", ["id"], k],
+            paint: {
+              "line-color": "var(--muted-foreground)",
+              "line-width": 1.5,
+            },
+          },
+          "lines",
+          { group: "context" },
+        );
+      }
     });
   });
 
@@ -1847,7 +1870,7 @@
       </button>
     </div>
     {#if overview != null && context != null}
-      {#key `${nook.isTop}:${nook.isEnd}`}
+      {#key `${nook.isTop}:${nook.isEnd}:${context.k}`}
         <button
           type="button"
           class={cn(
