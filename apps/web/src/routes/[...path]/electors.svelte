@@ -3,10 +3,11 @@
   import { Tooltip as TooltipPrimitive } from "bits-ui";
   import Name from "#lib/components/name.svelte";
   import * as Tooltip from "#lib/components/ui/tooltip/index.js";
-  import { count, date, percent, points } from "#lib/format.js";
+  import { count, date, points } from "#lib/format.js";
   import { m } from "#lib/paraglide/messages.js";
   import { swatch } from "#lib/party.js";
   import { cn } from "#lib/utils.js";
+  import Balance from "./balance.svelte";
   import Preview from "./preview.svelte";
 
   let {
@@ -47,189 +48,99 @@
     }
     return sum;
   });
-  const majority = $derived(Math.floor((electors.appointed ?? total) / 2) + 1);
-  const pair = $derived(
+  const parts = $derived(
     electors.rows
-      .slice(0, 2)
-      .toSorted((a, b) => (a.lean ?? 1e9) - (b.lean ?? 1e9)),
+      .toSorted(
+        (a, b) => (a.lean ?? 1e9) - (b.lean ?? 1e9) || b.votes - a.votes,
+      )
+      .map((row) => ({
+        key: row.key,
+        label: row.label,
+        color: swatch(row.color, row.key),
+        value: row.votes,
+        person: row.person,
+        party: row.party,
+        detail:
+          row.short == null || row.label.includes(row.short) ? null : row.short,
+      })),
   );
-  const first = $derived(pair[0]);
-  const second = $derived(pair[1]);
-  const others = $derived(electors.rows.slice(2));
-  const order = $derived([
-    ...(first == null ? [] : [first]),
-    ...others,
-    ...(second == null ? [] : [second]),
-  ]);
-  const tether = TooltipPrimitive.createTether<number>();
+  const others = $derived(
+    electors.rows.toSorted((a, b) => b.votes - a.votes).slice(2),
+  );
   const rungs = TooltipPrimitive.createTether<number>();
   const uid = $props.id();
 </script>
 
-{#snippet about(row: (typeof electors.rows)[number] | undefined)}
-  {#if row != null}
-    <Tooltip.Content
-      collisionPadding={8}
-      class="grid gap-0.5 leading-snug inline-[min(16rem,calc(100vw-2rem))]"
+{#snippet rungsBar()}
+  {#each ladder ?? [] as rung, index (rung.k)}
+    <Tooltip.Trigger
+      tether={rungs}
+      payload={index}
+      tabindex={-1}
+      onpointerenter={() => (focus = rung.k)}
+      onpointerleave={() => (focus = null)}
     >
-      <span class="flex items-baseline gap-1.5">
-        <span
-          class="shrink-0 self-center rounded-xs block-2 inline-2"
-          style:background-color={swatch(row.color, row.key)}
-        ></span>
-        <span class="font-semibold">{row.label}</span>
-      </span>
-      {#if row.short != null && !row.label.includes(row.short)}
-        <span class="text-xs opacity-80">{row.short}</span>
-      {/if}
-      <span
-        class="flex items-baseline justify-between gap-3 font-figures text-xs tabular-nums"
-        >{m.series_electoral({
-          votes: count(row.votes),
-          total: count(electors.appointed ?? total),
-        })}<span class="opacity-70"
-          >{percent(row.votes / (electors.appointed ?? total))}</span
-        ></span
-      >
-    </Tooltip.Content>
-  {/if}
-{/snippet}
-
-{#snippet side(row: (typeof electors.rows)[number] | undefined)}
-  {#if row != null}
-    <div
-      class="grid gap-0.5 min-inline-0 last:text-end"
-      style:--party={swatch(row.color, row.key)}
-    >
-      <span
-        class="font-figures text-4xl/none font-[780] tracking-[-0.02em] max-sm:text-3xl/none"
-        >{count(row.votes)}</span
-      >
-      <span class="truncate text-sm">
-        <Name
-          class="font-semibold"
-          label={row.label}
-          color={swatch(row.color, row.key)}
-          person={row.person}
-          party={row.party}
+      {#snippet child({ props })}
+        <svelte:element
+          this={rung.path == null ? "span" : "a"}
+          {...props}
+          type={undefined}
+          href={rung.path == null
+            ? undefined
+            : resolve("/[...path]", { path: rung.path })}
+          class={cn("block shrink-0 basis-0 transition-opacity", {
+            "opacity-45": focus != null && focus !== rung.k,
+          })}
+          style:background-color={rung.color}
+          style:flex-grow={rung.seats}
         />
-        {#if row.short != null && !row.label.includes(row.short)}
-          <Name
-            class="text-muted-foreground max-sm:hidden"
-            label={row.short}
-            color={swatch(row.color, row.key)}
-            hasSwatch={false}
-            party={row.party}
-          />
-        {/if}
-      </span>
-    </div>
-  {/if}
+      {/snippet}
+    </Tooltip.Trigger>
+  {/each}
 {/snippet}
 
 <section
   class="col-span-12 grid gap-2 bg-card px-3.5 pbs-3 pbe-3.5"
   aria-labelledby="{uid}-title"
 >
-  <div class="flex items-end justify-between gap-4">
-    {@render side(first)}
-    <h2
-      id="{uid}-title"
-      class="pbe-0.5 text-[0.8125rem] text-muted-foreground max-sm:sr-only"
-    >
-      {m.electors_title()}
-    </h2>
-    {@render side(second)}
-  </div>
-  <div class="relative pbs-1.5 pbe-5">
-    <div
-      class="flex animate-sweep gap-px overflow-hidden rounded-xs bg-card block-6 motion-reduce:animate-none"
-      role="img"
-      aria-label={electors.rows
-        .map((row) => `${row.label} ${count(row.votes)}`)
-        .join(", ")}
-    >
-      {#if ladder == null}
-        {#each order as row, index (row.key)}
-          <Tooltip.Trigger {tether} payload={index} tabindex={-1}>
-            {#snippet child({ props })}
-              <span
-                {...props}
-                class="block shrink-0"
-                style:background-color={swatch(row.color, row.key)}
-                style:width="{(row.votes / total) * 100}%"
-              ></span>
-            {/snippet}
-          </Tooltip.Trigger>
-        {/each}
-      {:else}
-        {#each ladder as rung, index (rung.k)}
-          <Tooltip.Trigger
-            tether={rungs}
-            payload={index}
-            tabindex={-1}
-            onpointerenter={() => (focus = rung.k)}
-            onpointerleave={() => (focus = null)}
+  <Balance
+    {parts}
+    total={electors.appointed ?? total}
+    isCount
+    isLead
+    isWhole
+    isLabeled
+    segments={ladder == null ? undefined : rungsBar}
+  >
+    {#snippet middle()}
+      <h2
+        id="{uid}-title"
+        class="pbe-0.5 text-[0.8125rem] text-muted-foreground max-sm:sr-only"
+      >
+        {m.electors_title()}
+      </h2>
+    {/snippet}
+  </Balance>
+  <Tooltip.Root tether={rungs} delayDuration={0}>
+    {#snippet children({ payload })}
+      {const rung = $derived(
+        payload == null ? undefined : ladder?.at(Number(payload)),
+      )}
+      {#if rung != null}
+        <Tooltip.Content collisionPadding={8} class="grid gap-0.5 leading-snug">
+          <span class="font-semibold">{rung.name}</span>
+          <span class="font-figures text-xs tabular-nums"
+            >{m.record_electors({ count: count(rung.seats) })}</span
           >
-            {#snippet child({ props })}
-              <svelte:element
-                this={rung.path == null ? "span" : "a"}
-                {...props}
-                type={undefined}
-                href={rung.path == null
-                  ? undefined
-                  : resolve("/[...path]", { path: rung.path })}
-                class={cn("block shrink-0 transition-opacity", {
-                  "opacity-45": focus != null && focus !== rung.k,
-                })}
-                style:background-color={rung.color}
-                style:width="calc({(rung.seats / total) * 100}% - 1px)"
-              />
-            {/snippet}
-          </Tooltip.Trigger>
-        {/each}
+          <span class="text-xs opacity-80"
+            >{rung.leader}
+            <span class="font-figures tabular-nums">{points(rung.margin)}</span
+            ></span
+          >
+        </Tooltip.Content>
       {/if}
-    </div>
-    <Tooltip.Root {tether} delayDuration={150}>
-      {#snippet children({ payload })}
-        {@render about(payload == null ? undefined : order.at(Number(payload)))}
-      {/snippet}
-    </Tooltip.Root>
-    <Tooltip.Root tether={rungs} delayDuration={0}>
-      {#snippet children({ payload })}
-        {const rung = $derived(
-          payload == null ? undefined : ladder?.at(Number(payload)),
-        )}
-        {#if rung != null}
-          <Tooltip.Content
-            collisionPadding={8}
-            class="grid gap-0.5 leading-snug"
-          >
-            <span class="font-semibold">{rung.name}</span>
-            <span class="font-figures text-xs tabular-nums"
-              >{m.record_electors({ count: count(rung.seats) })}</span
-            >
-            <span class="text-xs opacity-80"
-              >{rung.leader}
-              <span class="font-figures tabular-nums"
-                >{points(rung.margin)}</span
-              ></span
-            >
-          </Tooltip.Content>
-        {/if}
-      {/snippet}
-    </Tooltip.Root>
-    <span
-      class="absolute inset-bs-0 -translate-x-1/2 bg-foreground block-[calc(100%-1.125rem)] inline-0.5"
-      style:inset-inline-start="{Math.min(1, majority / total) * 100}%"
-      aria-hidden="true"
-    ></span>
-    <span
-      class="absolute inset-be-0 -translate-x-1/2 text-[0.8125rem] whitespace-nowrap text-muted-foreground"
-      style:inset-inline-start="{Math.min(1, majority / total) * 100}%"
-      >{m.electors_majority({ count: count(majority) })}</span
-    >
-  </div>
+    {/snippet}
+  </Tooltip.Root>
   {#if others.length > 0 || electors.link.path != null}
     <div
       class="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1.5 text-[0.8125rem]"

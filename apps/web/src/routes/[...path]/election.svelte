@@ -25,6 +25,7 @@
   import { cn } from "#lib/utils.js";
   import type { PageData } from "./$types";
   import Alongside from "./alongside.svelte";
+  import Balance from "./balance.svelte";
   import ByElections from "./byelections.svelte";
   import Cycle from "./cycle.svelte";
   import Electors from "./electors.svelte";
@@ -802,6 +803,8 @@
                       row.person == null ? (row.short ?? row.label) : row.label,
                     color: swatch(row.color, row.key),
                     value: row.votes,
+                    person: row.person,
+                    party: row.party,
                     photo:
                       race.results.find((entry) => entry.key === row.key)
                         ?.photo ?? null,
@@ -837,6 +840,8 @@
                             ? row.label
                             : (row.short ?? row.label),
                         color: swatch(row.color, row.key),
+                        person: row.keys.length > 1 ? null : row.person,
+                        party: row.keys.length > 1 ? null : row.party,
                         value: isTallied
                           ? districts.filter((place) =>
                               row.keys.includes(
@@ -857,8 +862,10 @@
               : {
                   total: 1,
                   parts: race.results
-                    .slice(0, 2)
-                    .toSorted((a, b) => (a.lean ?? 1e9) - (b.lean ?? 1e9))
+                    .toSorted(
+                      (a, b) =>
+                        (a.lean ?? 1e9) - (b.lean ?? 1e9) || b.share - a.share,
+                    )
                     .map((row) => ({
                       key: row.key,
                       label:
@@ -867,6 +874,8 @@
                           : row.label,
                       color: swatch(row.color, row.key),
                       value: row.share,
+                      person: row.person,
+                      party: row.party,
                       photo: row.photo,
                     })),
                   isCount: false,
@@ -1962,13 +1971,13 @@
 {#snippet tally(race: (typeof races)[number], isLead: boolean)}
   <div class="grid content-end gap-3">
     {#if race.whole == null}
-      {@render balance(race.balance, isLead)}
+      <Balance {...race.balance} {isLead} />
     {:else}
       <div class="grid gap-1">
         <p class="text-[0.8125rem] text-muted-foreground">
           {m.board_won()}
         </p>
-        {@render balance(race.balance, isLead)}
+        <Balance {...race.balance} {isLead} />
       </div>
       <div class="grid gap-1">
         <p class="text-[0.8125rem] text-muted-foreground">
@@ -1979,7 +1988,15 @@
                 seats: count(race.whole.total),
               })}
         </p>
-        {@render balance({ ...race.whole, isCount: true }, false)}
+        <Balance
+          parts={race.whole.parts.map((part) => ({
+            ...part,
+            party: part.key === "none" ? null : part.key,
+          }))}
+          total={race.whole.total}
+          isWhole={race.whole.isWhole}
+          isCount
+        />
       </div>
     {/if}
   </div>
@@ -2073,149 +2090,3 @@
     </ul>
   </section>
 {/if}
-
-{#snippet balance(
-  bar: {
-    total: number;
-    parts: Array<{
-      key: string;
-      label: string;
-      color: string;
-      value: number;
-      delta?: number | null;
-      photo?: {
-        src: string;
-        license: string;
-        artist: string | null;
-        source: string;
-      } | null;
-    }>;
-    isCount: boolean;
-    isWhole: boolean;
-  },
-  isLead: boolean,
-)}
-  {const shown = $derived(
-    bar.parts
-      .filter((part) => part.value > 0)
-      .toSorted((a, b) => b.value - a.value)
-      .slice(0, 2)
-      .toSorted((a, b) => bar.parts.indexOf(a) - bar.parts.indexOf(b)),
-  )}
-  {const isCrowded = $derived(
-    bar.isCount && bar.parts.filter((part) => part.value > 0).length > 2,
-  )}
-  {#if !bar.isCount && shown.length === 1}
-    <p class="flex items-baseline gap-1.5 text-[0.9375rem] font-semibold">
-      <span
-        class="shrink-0 self-center rounded-xs block-2.5 inline-2.5"
-        style:background-color={shown[0]?.color}
-      ></span>
-      <span class="truncate">{shown[0]?.label}</span>
-      <span class="shrink-0 text-[0.8125rem] font-normal text-muted-foreground"
-        >{m.map_unopposed()}</span
-      >
-    </p>
-  {:else}
-    <div class="grid gap-1.5">
-      <div class="flex items-end justify-between gap-4">
-        {#each shown as part, at (part.key)}
-          <p
-            class={cn("grid min-inline-0", {
-              "justify-items-end text-end": at === 1,
-              "gap-x-3": part.photo != null,
-              "grid-cols-[auto_minmax(0,1fr)]": part.photo != null && at === 0,
-              "grid-cols-[minmax(0,1fr)_auto]": part.photo != null && at === 1,
-            })}
-          >
-            {#if part.photo != null}
-              <img
-                class={cn(
-                  "row-span-2 self-center rounded-full bg-muted object-cover object-top ring-2 ring-offset-2 ring-offset-card",
-                  {
-                    "block-11 inline-11 sm:block-14 sm:inline-14": isLead,
-                    "block-11 inline-11": !isLead,
-                  },
-                  { "col-start-2 row-start-1": at === 1 },
-                )}
-                style:--tw-ring-color={part.color}
-                src={part.photo.src}
-                alt=""
-                width="56"
-                height="56"
-              />
-            {/if}
-            <span
-              class={cn(
-                "font-figures leading-none font-[780] tracking-[-0.02em]",
-                {
-                  "text-[2rem] sm:text-[2.5rem]": isLead,
-                  "text-[1.75rem]": !isLead,
-                },
-              )}>{bar.isCount ? count(part.value) : percent(part.value)}</span
-            >
-            <span
-              class="flex items-baseline gap-1.5 text-[0.9375rem] font-semibold min-inline-0"
-            >
-              {#if isCrowded}
-                <span
-                  class="shrink-0 self-center rounded-xs block-2.5 inline-2.5"
-                  style:background-color={part.color}
-                ></span>
-              {/if}
-              <span
-                class={cn({
-                  truncate: !isLead || part.photo == null,
-                  "line-clamp-2 leading-tight text-balance":
-                    isLead && part.photo != null,
-                })}>{part.label}</span
-              >
-              {#if part.delta !== undefined}
-                <span
-                  class={cn(
-                    "shrink-0 font-figures text-[0.8125rem] font-normal",
-                    {
-                      "text-muted-foreground":
-                        part.delta == null || part.delta === 0,
-                    },
-                  )}
-                  >{part.delta == null
-                    ? m.seats_change_new()
-                    : part.delta === 0
-                      ? "±0"
-                      : `${part.delta > 0 ? "+" : "−"}${count(Math.abs(part.delta))}`}</span
-                >
-              {/if}
-            </span>
-          </p>
-        {/each}
-      </div>
-      <div
-        class={cn(
-          "relative flex animate-sweep overflow-hidden bg-muted motion-reduce:animate-none",
-          { "block-4": isLead, "block-3": !isLead },
-        )}
-        aria-hidden="true"
-      >
-        {#each bar.isCount ? [shown[0], ...bar.parts.filter((part) => !shown.includes(part)), shown[1]].filter((part) => part != null) : shown as part, at (part.key)}
-          <span
-            class={cn("block block-full", {
-              "ms-auto": !bar.isCount && at === 1,
-            })}
-            style:inline-size="{(part.value / Math.max(bar.total, 0.0001)) *
-              100}%"
-            style:background-color={part.color}
-          ></span>
-        {/each}
-        {#if bar.isWhole && bar.total > 1}
-          <span
-            class="absolute -inset-y-px bg-foreground inline-0.5"
-            style:inset-inline-start="{((Math.floor(bar.total / 2) + 1) /
-              bar.total) *
-              100}%"
-          ></span>
-        {/if}
-      </div>
-    </div>
-  {/if}
-{/snippet}

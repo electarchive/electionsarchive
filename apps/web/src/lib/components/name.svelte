@@ -1,4 +1,5 @@
 <script lang="ts">
+  import type { Snippet } from "svelte";
   import { resolve } from "$app/paths";
   import { getContext } from "svelte";
   import PartyCard from "#lib/components/party-card.svelte";
@@ -16,6 +17,7 @@
     party = null,
     tabindex,
     class: className,
+    children,
   }: {
     label: string;
     color?: string | null;
@@ -24,6 +26,7 @@
     party?: string | null;
     tabindex?: number;
     class?: string;
+    children?: Snippet;
   } = $props();
 
   const scope = getContext<(() => string | null) | undefined>(WITHIN);
@@ -40,7 +43,7 @@
 {/snippet}
 
 {#if person == null && party == null}
-  <span class={className}>{@render face()}</span>
+  <span class={className}>{@render (children ?? face)()}</span>
 {:else}
   <HoverCard.Root openDelay={280} closeDelay={120}>
     <HoverCard.Trigger>
@@ -70,7 +73,7 @@
           }}
           role={undefined}
           aria-haspopup={undefined}
-          aria-expanded={undefined}>{@render face()}</a
+          aria-expanded={undefined}>{@render (children ?? face)()}</a
         >
       {/snippet}
     </HoverCard.Trigger><HoverCard.Content
