@@ -194,6 +194,12 @@ function tiers(polity: string, rows: Array<Row>, levels: Polity["levels"]) {
       if (tier === "local") {
         return { since_any: { goal: "local" } };
       }
+      if (tier === "precinct_shapes") {
+        return {
+          precinct_2000: { goal: "precinct_shapes", era: "mid" },
+          precinct_2016: { goal: "precinct_shapes", era: "late" },
+        };
+      }
       if (tier === "turnout") {
         return {
           before: { goal: "turnout", era: "before" },
@@ -212,8 +218,6 @@ function tiers(polity: string, rows: Array<Row>, levels: Polity["levels"]) {
         since_shapes: { goal: "shapes" },
         precinct_2000: { goal: "precinct", era: "mid" },
         precinct_2016: { goal: "precinct", era: "late" },
-        precinct_shapes_2000: { goal: "precinct_shapes", era: "mid" },
-        precinct_shapes_2016: { goal: "precinct_shapes", era: "late" },
       };
     };
     const cells = (
@@ -227,7 +231,9 @@ function tiers(polity: string, rows: Array<Row>, levels: Polity["levels"]) {
         }),
       );
     const main = new Set<Goal>(
-      isUs ? ["history", "county", "local", "turnout"] : [tier as Goal],
+      isUs
+        ? ["history", "county", "local", "turnout", "precinct_shapes"]
+        : [tier as Goal],
     );
     return {
       key: tier,
@@ -369,7 +375,7 @@ export const coverage = {
             found.rows.filter((row) => row.polity === polity.polity),
             polity.levels,
           ).flatMap((tier) => {
-            if (tier.key === "turnout") {
+            if (tier.key === "turnout" || tier.key === "precinct_shapes") {
               return [];
             }
             if (polity.polity !== "us" || tier.key === "local") {
@@ -403,7 +409,7 @@ export const coverage = {
         method: "GET",
         path: "/coverage/{polity}",
         summary:
-          "One country's coverage by tier (polity is a lowercase ISO code, or eu): national, regional, and local elections, referendums, and the European Parliament (for the US: federal, statewide, state legislative, local, and turnout), each with counts at every grain (any results, by constituency or county, finer, and map shapes; for the US split before 2000 and from 2000, with precinct results and precinct shapes split into 2000–2015 and 2016 on; precinct shapes count precincts, and the target starts in 2016) for the tier and for each kind of election in it, plus the cited sources of the denominators and what is left uncounted; complete includes upcoming, the races still to vote that the archive holds with their candidates or options in full, and pending counts those still short of them",
+          "One country's coverage by tier (polity is a lowercase ISO code, or eu): national, regional, and local elections, referendums, and the European Parliament (for the US: federal, statewide, state legislative, local, and turnout), each with counts at every grain (any results, by constituency or county, finer, and map shapes; for the US split before 2000 and from 2000, with precinct results split into 2000–2015 and 2016 on; precinct shapes are their own tier, counting each precinct once per state and year, deduplicated across sources, with the target from 2016) for the tier and for each kind of election in it, plus the cited sources of the denominators and what is left uncounted; complete includes upcoming, the races still to vote that the archive holds with their candidates or options in full, and pending counts those still short of them",
       }),
     )
     .input(v.object({ polity: Code }))

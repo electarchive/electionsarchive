@@ -37,6 +37,7 @@ export const US_TIERS = {
     "other",
   ],
   referendums: ["statewide_measure"],
+  precinct_shapes: ["precinct"],
   turnout: ["general", "primary", "runoff", "referendum"],
 } as const;
 export const COUNTRY_TIERS = [
@@ -59,8 +60,6 @@ export const US_COLUMNS = [
   "since_shapes",
   "precinct_2000",
   "precinct_2016",
-  "precinct_shapes_2000",
-  "precinct_shapes_2016",
 ] as const;
 export const COUNTRY_COLUMNS = [
   "any",
@@ -81,6 +80,7 @@ export const TIER_LABELS: Record<Tier, () => string> = {
   legislative: m.coverage_tier_legislative,
   local: m.coverage_tier_local,
   turnout: m.coverage_tier_turnout,
+  precinct_shapes: m.coverage_column_precinct_shapes,
   national: m.coverage_tier_national,
   subnational: m.coverage_tier_subnational,
   referendums: m.coverage_tier_referendums,
@@ -97,8 +97,6 @@ export const COLUMN_LABELS: Record<Column, () => string> = {
   since_shapes: m.coverage_column_shapes,
   precinct_2000: m.coverage_era_mid,
   precinct_2016: m.coverage_era_late,
-  precinct_shapes_2000: m.coverage_column_bonus,
-  precinct_shapes_2016: m.coverage_era_late,
   any: m.coverage_column_any,
   constituency: m.coverage_column_constituency,
   fine: m.coverage_column_fine,
@@ -119,9 +117,7 @@ export const columnGroup = (column: Column) =>
     ? m.coverage_era_before
     : column.startsWith("since")
       ? m.coverage_era_since
-      : column.startsWith("precinct_shapes")
-        ? m.coverage_column_precinct_shapes
-        : m.coverage_column_precinct;
+      : m.coverage_column_precinct;
 
 export function headline(polity: string, tier: string) {
   if (polity !== "us") {
@@ -144,6 +140,14 @@ export function headline(polity: string, tier: string) {
       goal: "local",
       title: m.coverage_headline_local,
       progress: m.coverage_progress_local,
+    } as const;
+  }
+  if (tier === "precinct_shapes") {
+    return {
+      column: "precinct_2016",
+      goal: "precinct_shapes",
+      title: m.coverage_column_precinct_shapes,
+      progress: m.coverage_progress_precincts,
     } as const;
   }
   if (tier === "turnout") {
@@ -188,6 +192,30 @@ export function measures(
         era: "since",
         items: [
           { column: "since_any", goal: "local", title: m.coverage_column_any },
+        ],
+      },
+    ];
+  }
+  if (tier === "precinct_shapes") {
+    return [
+      {
+        era: "mid",
+        items: [
+          {
+            column: "precinct_2000",
+            goal: "precinct_shapes",
+            title: m.coverage_column_precinct_shapes,
+          },
+        ],
+      },
+      {
+        era: "late",
+        items: [
+          {
+            column: "precinct_2016",
+            goal: "precinct_shapes",
+            title: m.coverage_column_precinct_shapes,
+          },
         ],
       },
     ];
@@ -253,11 +281,6 @@ export function measures(
           goal: "precinct",
           title: m.coverage_column_precinct,
         },
-        {
-          column: "precinct_shapes_2000",
-          goal: "precinct_shapes",
-          title: m.coverage_column_precinct_shapes,
-        },
       ],
     },
     {
@@ -268,11 +291,6 @@ export function measures(
           goal: "precinct",
           title: m.coverage_column_precinct,
         },
-        {
-          column: "precinct_shapes_2016",
-          goal: "precinct_shapes",
-          title: m.coverage_column_precinct_shapes,
-        },
       ],
     },
   ];
@@ -282,17 +300,10 @@ export function grains(polity: string, tier: string): Array<Goal> {
   if (polity !== "us") {
     return [tier as Goal, "fine", "shapes"];
   }
-  if (tier === "local" || tier === "turnout") {
+  if (tier === "local" || tier === "turnout" || tier === "precinct_shapes") {
     return [tier];
   }
-  return [
-    "county",
-    "precinct",
-    "precinct_shapes",
-    "shapes",
-    "history",
-    "shapes_history",
-  ];
+  return ["county", "precinct", "shapes", "history", "shapes_history"];
 }
 
 export type Reason =
@@ -448,6 +459,7 @@ export const LEVELS: Record<string, () => string> = {
   state_upper: m.coverage_level_state_upper,
   state_lower: m.coverage_level_state_lower,
   statewide_measure: m.coverage_level_statewide_measure,
+  precinct: m.coverage_level_precinct,
   general: m.coverage_level_general,
   primary: m.coverage_level_primary,
   runoff: m.coverage_level_runoff,

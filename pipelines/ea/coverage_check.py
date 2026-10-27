@@ -1,6 +1,9 @@
 import csv
+import html
 import json
 import os
+import re
+import urllib.parse
 import urllib.request
 from collections import defaultdict
 from datetime import date
@@ -15,6 +18,7 @@ US = {
     "legislative": ["state_upper", "state_lower"],
     "local": ["county", "municipality", "township", "school", "college", "special", "other"],
     "referendums": ["statewide_measure"],
+    "precinct_shapes": ["precinct"],
     "turnout": ["general", "primary", "runoff", "referendum"],
 }
 US_GOALS = {
@@ -25,17 +29,43 @@ US_GOALS = {
     "since_shapes": ("shapes", None),
     "precinct_2000": ("precinct", "mid"),
     "precinct_2016": ("precinct", "late"),
-    "precinct_shapes_2000": ("precinct_shapes", "mid"),
-    "precinct_shapes_2016": ("precinct_shapes", "late"),
     "before": ("turnout", "before"),
     "since": ("turnout", "since"),
 }
+GAP_GOALS = (
+    "county",
+    "history",
+    "turnout",
+    "precinct",
+    "precinct_shapes",
+    "shapes",
+    "shapes_history",
+    "local",
+    "national",
+    "fine",
+    "subnational",
+    "referendums",
+    "ep",
+)
 OVER = "In some years the archive holds more races than the official count lists"
 
 
 def fetch(path: str) -> bytes:
     with urllib.request.urlopen(BASE + path, timeout=180) as response:
         return response.read()
+
+
+def visible(path: str) -> str:
+    page = re.sub(r"(?s)<(script|style)\b.*?</\1>", " ", fetch(path).decode())
+    return html.unescape(re.sub(r"<[^>]+>", " ", page))
+
+
+def shares(path: str, text: str) -> list[str]:
+    return [
+        f"{path}: shows {found}%"
+        for found in re.findall(r"(?<![\w%.,/])(\d[\d,]*(?:\.\d+)?)%", re.sub(r"https?://\S+", " ", text))
+        if float(found.replace(",", "")) > 100
+    ]
 
 
 def database(conn) -> list[str]:
@@ -170,7 +200,15 @@ def pages(conn) -> list[str]:
         problems.append(
             f"overview: stale is {listing['stale']} in REST, {stale} in the database, or the twin disagrees"
         )
+    landing = visible("/coverage")
+    problems += shares("/coverage", landing) + shares("/coverage.md", fetch("/coverage.md").decode())
     for cc, summary in overview.items():
+        for tier in summary["tiers"]:
+            cell = tier["cell"]
+            if cell is not None and cell["total"] > 0 and f"{cell['complete']:,} of {cell['total']:,}" not in landing:
+                problems.append(f"/coverage {cc} {tier['key']}: {cell['complete']:,} of {cell['total']:,} not shown")
+    for cc, summary in overview.items():
+        page = visible(f"/coverage/{cc}")
         rest = json.loads(fetch(f"/api/v1/coverage/{cc}"))
         twin = json.loads(fetch(f"/coverage/{cc}.json"))
         if rest["stale"] != stale:
@@ -178,6 +216,27 @@ def pages(conn) -> list[str]:
         if rest["tiers"] != twin["tiers"]:
             problems.append(f"{cc}: REST and JSON twin tiers differ")
         markdown = fetch(f"/coverage/{cc}.md").decode()
+        problems += shares(f"/coverage/{cc}", page) + shares(f"/coverage/{cc}.md", markdown)
+        for goal, total, complete in conn.execute(
+            "select goal, sum(total), sum(complete + upcoming) from coverage_goal where polity = %s"
+            " and goal = any(%s) and (goal <> 'precinct_shapes' or year >= 2016) group by 1",
+            [cc, list(GAP_GOALS)],
+        ):
+            query = urllib.parse.urlencode({"goal": goal})
+            rows = json.loads(fetch(f"/api/v1/coverage/{cc}/gaps?{query}"))
+            found = (sum(r["total"] for r in rows), sum(r["complete"] for r in rows))
+            if found != (total, complete):
+                problems.append(f"{cc} gaps {goal}: list sums {found[1]}/{found[0]}, db {complete}/{total}")
+        for span in rest.get("unshaped", []):
+            total, inside = conn.execute(
+                "select coalesce(sum(unshaped), 0), coalesce(sum(unshaped) filter (where year between %s and %s), 0)"
+                " from coverage_goal where polity = %s and goal = %s and level = any(%s)",
+                [span["from"], span["to"], cc, span["goal"], US.get(span["tier"], [])],
+            ).fetchone()
+            if inside * 2 <= total:
+                problems.append(
+                    f"{cc} {span['tier']} {span['goal']}: {span['from']}–{span['to']} holds {inside} of {total}"
+                )
         if ("Rebuilt before the latest" in markdown) != stale:
             problems.append(f"{cc}: the twin's stale line does not match the database")
         levels = {lv["key"]: lv for lv in rest["summary"]["levels"]}
@@ -227,7 +286,9 @@ def pages(conn) -> list[str]:
                     if column in ("any", "before_any", "since_any"):
                         continue
                     goal, era = (
-                        US_GOALS.get(column, ("local", None))
+                        ("precinct_shapes", US_GOALS[column][1])
+                        if key == "precinct_shapes"
+                        else US_GOALS.get(column, ("local", None))
                         if cc == "us"
                         else (
                             key if column == "constituency" else column,
@@ -271,6 +332,10 @@ def pages(conn) -> list[str]:
                     ):
                         if level is None and count > 0 and f"{count:,} {phrase}" not in markdown:
                             problems.append(f"{cc} {key} {column}: {count:,} {phrase} not in the twin")
+                    if level is None and cell["total"] > 0 and f"{cell['complete']:,} of {cell['total']:,}" not in page:
+                        problems.append(
+                            f"/coverage/{cc} {key} {column}: {cell['complete']:,} of {cell['total']:,} not shown"
+                        )
                     if (
                         level is None
                         and cell["total"] > 0

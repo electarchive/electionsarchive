@@ -983,6 +983,7 @@ def build() -> str:
     with connect() as conn:
         statewide_table.rebuild(conn)
         cells = coverage.matrix(conn, last=today.year)
+        units = list(conn.execute(coverage.UNITS_SQL))
         states = {fips: (st, name) for st, fips, name in conn.execute(coverage.STATES_SQL)}
         conn.execute(LOCAL_SQL)
         held: dict[str, dict[int, list]] = defaultdict(dict)
@@ -1327,16 +1328,17 @@ def build() -> str:
                     cell[19] += published
                 else:
                     cell[13] += c.get("icpsr_only", 0)
-            if c["precincts"]:
-                cell = goals[("precinct_shapes", st, level, year)]
-                cell[0] += c["precincts"]
-                cell[1] += c["shaped_precincts"]
-                cell[10] += c["precincts"] - c["shaped_precincts"]
         elif coverage.target(st, level, year) == "county" or level in ("state_upper", "state_lower"):
             cell = goals[("history", st, level, year)]
             for i, value in enumerate([base, county, base - count, bare, totals, partial, 0, c.get("with_turnout", 0)]):
                 cell[i] += value
             cell[13] += c.get("icpsr_only", 0)
+    for st, year, n, shaped in units:
+        if st in names:
+            cell = goals[("precinct_shapes", st, "precinct", year)]
+            cell[0] += n
+            cell[1] += shaped
+            cell[10] += n - shaped
     for st, year, kind, complete, partial, coarse, absent in turnout:
         if st not in names:
             continue

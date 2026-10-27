@@ -44,6 +44,7 @@
     ep: m.coverage_tier_def_ep,
   };
   const US_DEFINITIONS: Record<string, () => string> = {
+    precinct_shapes: m.coverage_tier_def_precinct_shapes,
     local: m.coverage_tier_def_local_us,
     referendums: m.coverage_tier_def_referendums_us,
   };
@@ -256,7 +257,11 @@
   <meta name="robots" content="noindex" />
 </svelte:head>
 
-{#snippet cell(counts: Counts | null | undefined, isLocal: boolean)}
+{#snippet cell(
+  counts: Counts | null | undefined,
+  tierKey: string,
+  column: Column,
+)}
   {#if counts == null}
     <span class="text-muted-foreground" title={m.coverage_cell_na()}
       ><span aria-hidden="true">–</span><span class="sr-only"
@@ -287,7 +292,10 @@
           total: count(counts.total),
         })}</span
       >
-      {#if isLocal && counts.populationTotal > 0}
+      {#if tierKey === "precinct_shapes" && column === "precinct_2000"}
+        <span class="text-xs text-muted-foreground">{m.coverage_bonus()}</span>
+      {/if}
+      {#if isUs && tierKey === "local" && counts.populationTotal > 0}
         <span class="text-xs text-muted-foreground"
           >{m.coverage_population_share({
             percent: percent(
@@ -432,7 +440,7 @@
               ? `${columnGroup(column)()}, ${COLUMN_LABELS[column]().toLowerCase()}`
               : COLUMN_LABELS[column]()}
           </dt>
-          <dd>{@render cell(value, tierKey === "local" && isUs)}</dd>
+          <dd>{@render cell(value, tierKey, column)}</dd>
         </div>
       {/if}
     {/each}
@@ -941,7 +949,8 @@
                 >
                   {@render cell(
                     row.cells[slot(column, row.key)],
-                    isUs && row.key === "local",
+                    row.key,
+                    column,
                   )}
                 </td>
               {/each}
@@ -1027,7 +1036,8 @@
                               : m.coverage_progress
                         : lead.progress,
                       row.key,
-                      item.column === "precinct_shapes_2000",
+                      item.goal === "precinct_shapes" &&
+                        item.column === "precinct_2000",
                     )}
                   {/each}
                 </div>
@@ -1140,7 +1150,8 @@
                     >
                       {@render cell(
                         level.cells[slot(column, row.key)],
-                        isUs && row.key === "local",
+                        row.key,
+                        column,
                       )}
                     </td>
                   {/each}

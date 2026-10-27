@@ -587,6 +587,7 @@ function coverageMarkdown(
       ? m.coverage_tier_def_referendums_us
       : m.coverage_tier_def_referendums,
     ep: m.coverage_tier_def_ep,
+    precinct_shapes: m.coverage_tier_def_precinct_shapes,
   };
   return [
     `# ${isUs ? m.coverage_title() : m.coverage_country_title({ name: summary.name })}`,
@@ -657,7 +658,14 @@ function coverageMarkdown(
       [m.coverage_column_kind(), ...columns.map(heading)],
       data.tiers.map((tier) => [
         TIER_LABELS[tier.key as Tier](),
-        ...columns.map((column) => cell(tier.cells[slot(column, tier.key)])),
+        ...columns.map((column) => {
+          const value = tier.cells[slot(column, tier.key)];
+          return tier.key === "precinct_shapes" &&
+            column === "precinct_2000" &&
+            value != null
+            ? `${cell(value)}, ${m.coverage_bonus().toLowerCase()}`
+            : cell(value);
+        }),
       ]),
     ),
     ...data.tiers.flatMap((tier) => {
@@ -669,7 +677,8 @@ function coverageMarkdown(
             return [];
           }
           const isWeighted = item.goal === "local" && row.populationTotal > 0;
-          const isBonus = item.column === "precinct_shapes_2000";
+          const isBonus =
+            item.goal === "precinct_shapes" && item.column === "precinct_2000";
           const held = row.total - row.absent;
           const progress = isWeighted
             ? m.coverage_progress_local_count
