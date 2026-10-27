@@ -38,16 +38,27 @@
   const parties = $derived(
     new Map((record.data?.parties ?? []).map((party) => [party.id, party])),
   );
-  const current = $derived(
-    series.find((entry) => entry.id === chosen) ??
+  const current = $derived.by(() => {
+    const partied = new Map(
+      series.map((entry) => [
+        entry.id,
+        entry.points.filter((point) =>
+          point.parties.some((party) => party.party != null),
+        ).length,
+      ]),
+    );
+    return (
+      series.find((entry) => entry.id === chosen) ??
       series.toSorted(
         (a, b) =>
-          Number(b.isOwn && !b.isOffice && b.points.length > 2) -
-            Number(a.isOwn && !a.isOffice && a.points.length > 2) ||
+          Number(b.isOwn && !b.isOffice && (partied.get(b.id) ?? 0) > 2) -
+            Number(a.isOwn && !a.isOffice && (partied.get(a.id) ?? 0) > 2) ||
+          (partied.get(b.id) ?? 0) - (partied.get(a.id) ?? 0) ||
           b.points.length - a.points.length,
       )[0] ??
-      null,
-  );
+      null
+    );
+  });
   const isSingle = $derived(
     current?.isOffice === true &&
       current.points.every((point) => point.filled === 1),
