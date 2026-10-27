@@ -125,6 +125,18 @@ def pages(conn) -> list[str]:
         if ("Rebuilt before the latest" in markdown) != stale:
             problems.append(f"{cc}: the twin's stale line does not match the database")
         levels = {lv["key"]: lv for lv in rest["summary"]["levels"]}
+        for key in levels if cc != "us" else []:
+            missing = ", ".join(
+                str(n["from"]) if n["from"] == n["to"] else f"{n['from']}–{n['to']}"
+                for n in rest["summary"]["notes"]
+                if n["level"] == key
+                and n["goal"] != "fine"
+                and n.get("lost") is None
+                and n["from"] is not None
+                and n.get("listed") is not False
+            )
+            if missing and f"No official count for {missing}" not in markdown:
+                problems.append(f"{cc} {key}: uncounted years {missing} not in the twin")
         for tier in rest["tiers"]:
             scopes = [(tier["key"], None, tier["cells"])] + [
                 (tier["key"], lv["key"], lv["cells"]) for lv in tier["levels"]

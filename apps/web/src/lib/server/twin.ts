@@ -740,17 +740,27 @@ function coverageMarkdown(
               .map(heading),
           ],
           tier.levels.map((level) => {
+            const gaps = notesFor(level.key).filter(
+              (note) => note.from != null && note.listed !== false,
+            );
             const counted = spans(
               level.years,
-              notesFor(level.key).flatMap((note) =>
-                note.from == null || note.listed === false ? [] : [note.from],
-              ),
+              gaps.flatMap((note) => (note.from == null ? [] : [note.from])),
             );
+            const missing = gaps
+              .map((note) =>
+                note.from === note.to
+                  ? String(note.from)
+                  : `${note.from}–${note.to}`,
+              )
+              .join(", ");
             return [
               levelLabel(data.polity, level.key),
               ...(isUs
                 ? []
-                : [counted === "" ? m.coverage_ledger_nothing() : counted]),
+                : [
+                    `${counted === "" ? m.coverage_ledger_nothing() : counted}${missing === "" ? "" : `. ${m.coverage_years_uncounted({ years: missing })}`}`,
+                  ]),
               ...columns
                 .filter((column) => slot(column, tier.key) in tier.cells)
                 .map((column) => cell(level.cells[slot(column, tier.key)])),

@@ -1779,6 +1779,7 @@
   "coverage_glance_hint_us": "Each cell shows the share of contests that meet that level of detail, primaries and runoffs included. A dash means that detail isn't measured for these contests.",
   "coverage_glance_none_hint": "No count yet means no official count of these elections has been found to measure against, so there is no figure.",
   "coverage_column_kind": "Elections",
+  "coverage_years_uncounted": "No official count for {years}",
   "coverage_column_years": "Years with an official count",
   "coverage_column_any": "Any results",
   "coverage_column_constituency": "By constituency",

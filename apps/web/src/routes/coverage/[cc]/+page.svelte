@@ -836,6 +836,15 @@
                     (note) => note.listed === false && note.from != null,
                   ),
                 )}
+                {const missing = $derived(
+                  gaps
+                    .map((note) =>
+                      note.from === note.to
+                        ? String(note.from)
+                        : `${note.from}–${note.to}`,
+                    )
+                    .join(", "),
+                )}
                 {const remark = $derived(
                   summary.levels.find((found) => found.key === level.key)?.note,
                 )}
@@ -872,7 +881,12 @@
                           >{counted === ""
                             ? m.coverage_ledger_nothing()
                             : counted}</span
-                        ></span
+                        >{#if missing !== ""}<span
+                            class="text-xs text-muted-foreground"
+                            >{m.coverage_years_uncounted({
+                              years: missing,
+                            })}</span
+                          >{/if}</span
                       ></td
                     >
                   {/if}
@@ -955,13 +969,16 @@
             <ul class="grid">
               {#each row.levels as level (level.key)}
                 {const notes = $derived(notesFor(level.key))}
+                {const gaps = $derived(
+                  notes.filter(
+                    (note) => note.from != null && note.listed !== false,
+                  ),
+                )}
                 {const counted = $derived(
                   spans(
                     level.years,
-                    notes.flatMap((note) =>
-                      note.from == null || note.listed === false
-                        ? []
-                        : [note.from],
+                    gaps.flatMap((note) =>
+                      note.from == null ? [] : [note.from],
                     ),
                   ),
                 )}
@@ -973,9 +990,7 @@
                     {@render strip(
                       levelLabel(data.polity, level.key),
                       level.years,
-                      notes.filter(
-                        (note) => note.from != null && note.listed !== false,
-                      ),
+                      gaps,
                       counted,
                     )}
                     <span class="text-sm tabular-nums"
@@ -986,6 +1001,19 @@
                         ? m.coverage_ledger_nothing()
                         : counted}</span
                     >
+                    {#if gaps.length > 0}
+                      <span class="text-xs text-muted-foreground tabular-nums"
+                        >{m.coverage_years_uncounted({
+                          years: gaps
+                            .map((note) =>
+                              note.from === note.to
+                                ? String(note.from)
+                                : `${note.from}–${note.to}`,
+                            )
+                            .join(", "),
+                        })}</span
+                      >
+                    {/if}
                   {/if}
                   {@render cards(level.cells, row.key)}
                   {const remark = $derived(
