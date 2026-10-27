@@ -8,8 +8,9 @@ export const OUTCOMES: Record<string, () => string> = {
   lost: m.outcome_lost,
   withdrew: m.outcome_withdrew,
   disqualified: m.outcome_disqualified,
+  declined: m.outcome_declined,
 };
-export const LOST = new Set(["lost", "withdrew", "disqualified"]);
+export const LOST = new Set(["lost", "withdrew", "disqualified", "declined"]);
 export const VACANCIES: Record<string, (input: { name: string }) => string> = {
   died: m.byes_reason_died,
   resigned: m.byes_reason_resigned,

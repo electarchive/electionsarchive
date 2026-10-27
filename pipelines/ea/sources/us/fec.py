@@ -26,7 +26,7 @@ from ea.changeset import Changeset, slug
 from ea.store import DATA, connect
 
 SOURCE = "us.fec"
-VERSION = "4"
+VERSION = "5"
 PARSED = DATA / "parsed" / SOURCE
 DOCUMENTS = "https://www.fec.gov/documents/"
 FILES = {
@@ -1167,6 +1167,7 @@ PARTY_RUN = [
     {"year": 2020, "state": "KS", "code": "D"},
 ]
 WITHDREW = {(2002, "H8OK04037"), (2020, "H0TX02080"), (2022, "H2AK01174"), (2022, "H8TX03123")}
+DECLINED = re.compile(r"declined the nomination|nomination was null and void")
 MISTOTALED = {(2006, "WA", "senate", None)}
 STRAYED = {(2020, "WI", "02", "W(R)", "131"): "01"}
 RUNOFFS = {
@@ -5900,13 +5901,22 @@ def emit() -> Path:
                     continue
                 if tacit and len(ranked) != 1:
                     raise ValueError(f"{contest_key}: {len(ranked)} unopposed candidates")
+                declined = re.search(DECLINED, footnotes.get(winner) or "") is not None
                 cs.add(
                     "outcome",
                     result_set_id=result_set,
                     option_id=roots[winner],
                     kind="won",
-                    notes=footnotes.get(winner),
+                    notes=None if declined else footnotes.get(winner),
                 )
+                if declined:
+                    cs.add(
+                        "outcome",
+                        result_set_id=result_set,
+                        option_id=roots[winner],
+                        kind="declined",
+                        notes=footnotes[winner],
+                    )
         if unmatched:
             raise ValueError(f"primary outcomes disagree with the FEC's flags or general lists: {unmatched}")
 
@@ -6327,15 +6337,19 @@ def emit() -> Path:
                         party_id=(nominated[0] if nominated else None) if len(lines_of) == 1 else None,
                         ballot_label=f"{ballot} ({slogan})" if slogan else ballot,
                     )
-                    head = cs.key("us.candidacy", f"{option_key}:head")
                     if ballot == "Scattered":
-                        if head not in cs.minted:
+                        stale = cs.conn.execute(
+                            "select entity_id from external_id where scheme = 'us.candidacy' and value = %s",
+                            [f"{option_key}:head"],
+                        ).fetchone()
+                        if stale is not None:
                             cs.add(
                                 "entity_retirement",
-                                entity_id=head,
+                                entity_id=stale[0],
                                 reason="A scattered write-in line the FEC filed under a candidate's ID",
                             )
                     else:
+                        head = cs.key("us.candidacy", f"{option_key}:head")
                         cs.add(
                             "candidacy",
                             id=head,

@@ -430,6 +430,7 @@ const Cell = v.nullable(
     share: v.number(),
     outcome: v.nullable(v.string()),
     note: v.optional(v.nullable(v.string())),
+    isDeclined: v.optional(v.boolean()),
     isIndependent: v.optional(v.boolean()),
     isIncumbent: v.optional(v.boolean()),
     isWriteIn: v.optional(v.boolean()),
@@ -1246,6 +1247,7 @@ async function load(
     label: string | null;
     outcome: string | null;
     note: string | null;
+    declined: boolean;
     seats: number | null;
     alliance: string | null;
     is_line: boolean;
@@ -1315,7 +1317,7 @@ async function load(
        where cy.option_id in (o.id, o.parent_option_id) and cy.role = 'head'
          and not exists (select from candidacy cz where cz.option_id = cy.option_id and cz.role = 'head' and cz.id <> cy.id)
        order by cy.option_id = o.id desc, cy.id limit 1) as person,
-      oc.kind::text as outcome, oc.note,
+      oc.kind::text as outcome, oc.note, coalesce(oc.declined, false) as declined,
       case when o.kind = 'list' and ${pooled(sql`o.id`)} then null
         when o.parent_option_id is null or ${pooled(sql`o.parent_option_id`)} or not exists (
           select from outcome y join result_set ry on ry.id = y.result_set_id and ${latest("ry")}
@@ -1324,12 +1326,13 @@ async function load(
     from contest_option o
     left join entity_merge pm on pm.entity_id = o.party_id
     left join lateral (
-      select (array_agg(x.kind order by array_position(array['elected', 'advanced', 'won', 'tied', 'withdrew', 'disqualified']::outcome_kind[], x.kind)))[1] as kind,
-        (array_agg(x.notes order by array_position(array['elected', 'advanced', 'won', 'tied', 'withdrew', 'disqualified']::outcome_kind[], x.kind)))[1] as note,
+      select (array_agg(x.kind order by array_position(array['elected', 'advanced', 'won', 'tied', 'withdrew', 'disqualified']::outcome_kind[], x.kind)) filter (where x.kind <> 'declined'))[1] as kind,
+        (array_agg(x.notes order by array_position(array['elected', 'advanced', 'won', 'tied', 'withdrew', 'disqualified', 'declined']::outcome_kind[], x.kind)) filter (where x.notes is not null))[1] as note,
+        bool_or(x.kind = 'declined') as declined,
         coalesce(max(x.seats), nullif(count(*) filter (where x.kind = 'elected'), 0))::int as seats
       from outcome x join result_set rs on rs.id = x.result_set_id
       where x.option_id = o.id and o.contest_id = any(${sql.param(outcomes)}::uuid[]) and ${latest("rs")}
-        and (x.kind in ('elected', 'won', 'advanced', 'tied', 'withdrew', 'disqualified') or x.kind = 'lost' and o.kind = 'answer') and x.candidacy_id is null
+        and (x.kind in ('elected', 'won', 'advanced', 'tied', 'withdrew', 'disqualified', 'declined') or x.kind = 'lost' and o.kind = 'answer') and x.candidacy_id is null
         and not (x.kind in ('withdrew', 'disqualified') and exists (
           select from contest_option lp where lp.id = o.parent_option_id and lp.kind = 'list'
         ))
@@ -1601,6 +1604,7 @@ async function load(
             votes: area.votes.get(row.k) ?? 0,
             outcome: row.outcome,
             note: row.note,
+            isDeclined: row.declined,
             isIndependent: row.independent,
             isIncumbent: row.incumbent,
             seats: row.seats,
@@ -4457,6 +4461,7 @@ export const contests = {
                 party: v.nullable(v.string()),
                 outcome: v.string(),
                 note: v.nullable(v.string()),
+                isDeclined: v.boolean(),
               }),
             ),
           }),
@@ -4950,20 +4955,22 @@ export const contests = {
             label: string | null;
             outcome: string;
             note: string | null;
+            declined: boolean;
           }>(sql`
-             select o.id as key, rs.kind::text, coalesce(pm.into_id, o.party_id) as party, o.ballot_label as label,
+             select distinct on (o.k) o.id as key, rs.kind::text, coalesce(pm.into_id, o.party_id) as party, o.ballot_label as label,
                (select coalesce(m.into_id, cy.person_id) from candidacy cy left join entity_merge m on m.entity_id = cy.person_id
                 where cy.option_id in (o.id, o.parent_option_id) and cy.role = 'head'
             and not exists (select from candidacy cz where cz.option_id = cy.option_id and cz.role = 'head' and cz.id <> cy.id)
                 order by cy.option_id = o.id desc, cy.id limit 1) as person,
-               x.kind::text as outcome, x.notes as note
+               x.kind::text as outcome, coalesce(x.notes, d.notes) as note, d.kind is not null as declined
              from result_set rs
-             join outcome x on x.result_set_id = rs.id and x.candidacy_id is null
+             join outcome x on x.result_set_id = rs.id and x.candidacy_id is null and x.kind <> 'declined'
              join contest_option o on o.id = x.option_id
+             left join outcome d on d.result_set_id = rs.id and d.option_id = o.id and d.candidacy_id is null and d.kind = 'declined'
              left join entity_merge pm on pm.entity_id = o.party_id
              where ${isRoot}::boolean and rs.contest_id = ${contest.id}::uuid and ${latest("rs")}
                and (rs.kind <> 'counted' or not exists (select from result_rollup r where r.result_set_k = rs.k offset 0))
-             order by o.k
+             order by o.k, array_position(array['elected', 'won', 'advanced', 'tied', 'withdrew', 'disqualified']::outcome_kind[], x.kind)
           `),
           db.execute<{
             kind: "text" | "summary" | "link";
@@ -5327,6 +5334,7 @@ export const contests = {
                   party: row.party,
                   outcome: row.outcome,
                   note: row.note,
+                  isDeclined: row.declined,
                 })),
               },
         turnout: roll.turnout,
@@ -8210,6 +8218,7 @@ export const contests = {
           limit 1
         ) rs
         join outcome oc on oc.result_set_id = rs.id and oc.candidacy_id is null and oc.kind in ('won', 'elected')
+          and not exists (select from outcome d where d.result_set_id = rs.id and d.option_id = oc.option_id and d.kind = 'declined')
         join contest_option o on o.id = oc.option_id
         left join lateral (
           select c.person_id, c.ballot_name from candidacy c
@@ -11887,6 +11896,7 @@ export const elections = {
           limit 1
         ) rs
         join outcome oc on oc.result_set_id = rs.id and oc.candidacy_id is null and oc.kind in ('won', 'elected')
+          and not exists (select from outcome d where d.result_set_id = rs.id and d.option_id = oc.option_id and d.kind = 'declined')
         join contest_option o on o.id = oc.option_id
         left join lateral (
           select c.person_id, c.ballot_name from candidacy c
@@ -17346,7 +17356,7 @@ export const people = {
           ) as unopposed,
           case when t.main = 11 then coalesce(t.appointed, t.total) else t.total end as total,
           coalesce(
-            (select (array_agg(x.kind::text order by array_position(array['elected', 'advanced', 'won', 'tied']::outcome_kind[], x.kind)))[1]
+            (select (array_agg(x.kind::text order by array_position(array['declined', 'elected', 'advanced', 'won', 'tied']::outcome_kind[], x.kind)))[1]
               from mine m join outcome x on x.option_id = m.option
                 and (x.candidacy_id = m.candidacy or (x.candidacy_id is null and m.role = 'head'))
               join result_set rs on rs.id = x.result_set_id and ${latest("rs")}
@@ -17363,7 +17373,7 @@ export const people = {
               join result_set rs on rs.id = x.result_set_id and ${latest("rs")}
               where o.contest_id = p.root limit 1)
           ) as outcome,
-          (select (array_agg(x.notes order by array_position(array['elected', 'advanced', 'won', 'tied']::outcome_kind[], x.kind)))[1]
+          (select (array_agg(x.notes order by array_position(array['declined', 'elected', 'advanced', 'won', 'tied']::outcome_kind[], x.kind)) filter (where x.notes is not null))[1]
             from mine m join outcome x on x.option_id = m.option
               and (x.candidacy_id = m.candidacy or (x.candidacy_id is null and m.role = 'head'))
             join result_set rs on rs.id = x.result_set_id and ${latest("rs")}

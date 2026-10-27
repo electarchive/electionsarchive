@@ -1421,18 +1421,27 @@
                 party={row.party}
               />
             {/if}
-            {#if row.note == null}
+            {#if row.note == null || row.isDeclined}
               <span
                 class={cn("ms-1 px-1 text-xs font-semibold", {
-                  "rounded-xs bg-(--party) knockout": [
-                    "won",
-                    "elected",
-                  ].includes(row.outcome),
-                  "highlighter text-foreground": !["won", "elected"].includes(
-                    row.outcome,
-                  ),
+                  "rounded-xs bg-(--party) knockout":
+                    !row.isDeclined && ["won", "elected"].includes(row.outcome),
+                  "rounded-xs text-foreground ring-1 ring-(--party) ring-inset":
+                    row.isDeclined,
+                  "highlighter text-foreground":
+                    !row.isDeclined &&
+                    !["won", "elected"].includes(row.outcome),
                 })}>{OUTCOMES[row.outcome]?.() ?? row.outcome}</span
               >
+              {#if row.isDeclined}
+                <Term
+                  class="ms-1 text-xs text-muted-foreground"
+                  label={m.outcome_declined()}
+                  definition={row.note == null
+                    ? m.outcome_declined_definition()
+                    : explain(row.note)}
+                />
+              {/if}
             {:else}
               <Term
                 class={cn("ms-1 px-1 text-xs font-semibold", {

@@ -20,6 +20,7 @@
     elsewhere: m.person_elected_elsewhere,
     withdrew: m.outcome_withdrew,
     disqualified: m.outcome_disqualified,
+    declined: m.outcome_declined,
   };
 
   let width = $state(0);

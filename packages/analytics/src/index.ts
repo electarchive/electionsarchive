@@ -14,6 +14,7 @@ export type Option = {
   votes: number;
   outcome: string | null;
   note?: string | null;
+  isDeclined?: boolean;
   isIndependent?: boolean;
   isIncumbent?: boolean;
   seats: number | null;
@@ -42,6 +43,7 @@ export type Cell = {
   share: number;
   outcome: string | null;
   note: string | null;
+  isDeclined: boolean;
   isIndependent: boolean;
   isIncumbent?: boolean;
   isWriteIn: boolean;
@@ -117,6 +119,7 @@ function tally(side: Side, identify: (option: Option) => string) {
           share: 0,
           outcome: option.outcome,
           note: option.note ?? null,
+          isDeclined: option.isDeclined ?? false,
           isIndependent: option.isIndependent ?? false,
           isIncumbent: false,
           isWriteIn: option.kind === "write_in",
@@ -131,6 +134,7 @@ function tally(side: Side, identify: (option: Option) => string) {
     group.cell.votes += option.votes;
     group.cell.outcome ??= option.outcome;
     group.cell.note ??= option.note ?? null;
+    group.cell.isDeclined ||= option.isDeclined ?? false;
     group.cell.isIndependent &&= option.isIndependent ?? false;
     group.cell.isWriteIn &&= option.kind === "write_in";
     if (option.seats != null) {

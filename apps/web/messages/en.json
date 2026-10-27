@@ -149,6 +149,8 @@
   "outcome_tied": "Tied",
   "outcome_withdrew": "Withdrew",
   "outcome_disqualified": "Disqualified",
+  "outcome_declined": "Did not accept",
+  "outcome_declined_definition": "Won, but did not take up the nomination or seat.",
   "outcome_lost": "Not passed",
   "outcome_quorum": "Turnout below quorum",
   "outcome_note": "{names}: {note}",

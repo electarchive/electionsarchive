@@ -83,6 +83,7 @@ const OUTCOMES: Record<string, () => string> = {
   elsewhere: m.person_elected_elsewhere,
   withdrew: m.outcome_withdrew,
   disqualified: m.outcome_disqualified,
+  declined: m.outcome_declined,
 };
 
 const outcome = (value: string | null) =>
@@ -4017,6 +4018,7 @@ function resultsMarkdown(
               current?.outcome === "lost"
                 ? m.outcome_lost()
                 : outcome(current?.outcome ?? null),
+              current?.isDeclined === true ? m.outcome_declined() : null,
               overall.has(key)
                 ? `${m.outcome_overall()} (${definite(contest.overall?.place ?? "")})`
                 : null,

@@ -93,12 +93,14 @@
         before,
         after,
         mark:
-          (seats == null && ["won", "elected"].includes(outcome ?? "")) ||
-          row.key === crowned
-            ? ("won" as const)
-            : seats == null && outcome === "advanced"
-              ? ("advanced" as const)
-              : null,
+          row.current?.isDeclined === true
+            ? null
+            : (seats == null && ["won", "elected"].includes(outcome ?? "")) ||
+                row.key === crowned
+              ? ("won" as const)
+              : seats == null && outcome === "advanced"
+                ? ("advanced" as const)
+                : null,
         isOverall:
           overall?.winners.some((winner) =>
             winner.answer != null
@@ -541,13 +543,17 @@
                     >{m.results_write_in()}</span
                   >
                 {/if}
-                {#if page?.outcome != null && (seats == null || line.mark != null)}
-                  {#if page.note == null}
+                {#if page?.outcome != null && (seats == null || line.mark != null || page.isDeclined)}
+                  {#if page.note == null || page.isDeclined}
                     <span
                       class={cn("ms-1 px-1 text-xs font-semibold", {
                         "rounded-xs bg-(--party) knockout": line.mark != null,
+                        "rounded-xs text-foreground ring-1 ring-(--party) ring-inset":
+                          page.isDeclined,
                         "highlighter text-foreground":
-                          line.mark == null && !LOST.has(page.outcome),
+                          line.mark == null &&
+                          !page.isDeclined &&
+                          !LOST.has(page.outcome),
                         "text-muted-foreground": LOST.has(page.outcome),
                       })}>{OUTCOMES[page.outcome]?.() ?? page.outcome}</span
                     >
@@ -563,6 +569,15 @@
                       definition={explain(page.note)}
                     />
                   {/if}
+                {/if}
+                {#if page?.isDeclined === true}
+                  <Term
+                    class="ms-1 text-xs text-muted-foreground"
+                    label={m.outcome_declined()}
+                    definition={page.note == null
+                      ? m.outcome_declined_definition()
+                      : explain(page.note)}
+                  />
                 {/if}
                 {#if line.isOverall && overall != null}
                   <Term

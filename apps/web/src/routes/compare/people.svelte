@@ -21,6 +21,7 @@
     lost: m.person_lost_mark,
     withdrew: m.outcome_withdrew,
     disqualified: m.outcome_disqualified,
+    declined: m.outcome_declined,
   };
 
   let width = $state(0);
