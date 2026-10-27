@@ -27,9 +27,27 @@ THURSTON = (
 )
 NAMES = ("Hillary Clinton", "Donald J. Trump", "Alyson Kennedy", "Gloria Estela La Riva", "Jill Stein", "Darrell L. Castle", "Gary Johnson")
 CLALLAM = ("https://www.clallamcountywa.gov/DocumentCenter/View/4212/Precinct-2016-General-PDF", ".pdf", "application/pdf")
+INBOX = Path(__file__).parents[4] / "data/inbox/manual"
+WHATCOM = (
+    "https://www.whatcomcounty.us/DocumentCenter/View/24061",
+    ".xls",
+    "application/vnd.ms-excel",
+    INBOX / "MF-110" / "Precinct Canvass_3.xls",
+)
+PEND_OREILLE = (
+    "https://www.pendoreille.gov/media/1886",
+    ".pdf",
+    "application/pdf",
+    INBOX / "MF-119" / "november_2016_general_election_results_by_precinct.pdf",
+)
 
 
 def fetch() -> None:
+    for url, suffix, media_type, path in (WHATCOM, PEND_OREILLE):
+        try:
+            raw.cached(SOURCE, url)
+        except LookupError:
+            raw.store(SOURCE, url, path.read_bytes(), suffix=suffix, retrieved_at=datetime.now(UTC), media_type=media_type)
     for url, suffix, media_type in (PIERCE, CLALLAM, CLARK, THURSTON):
         try:
             raw.cached(SOURCE, url)
@@ -110,6 +128,40 @@ def emit() -> Path:
             if code.startswith("2016:WA:53067:"):
                 by_tuple.setdefault(tuple(int(next(v for o, v in tally.items() if labels[o].startswith(name))) for name in NAMES), []).append(code)
         writeins = dict(pierce)
+        by_county: dict[str, dict[tuple[int, ...], list[str]]] = {}
+        for code, tally in tallies.items():
+            by_county.setdefault(code[8:13], {}).setdefault(
+                tuple(int(next(v for o, v in tally.items() if labels[o].startswith(name))) for name in NAMES), []
+            ).append(code)
+        for sheet in pl.read_excel(raw.cached(SOURCE, WHATCOM[0]).path, has_header=False, sheet_id=0, infer_schema_length=0).values():
+            rows = sheet.rows()
+            start = next((index for index, row in enumerate(rows) if any(cell is not None and "Hillary" in str(cell) for cell in row)), None)
+            if start is None:
+                continue
+            for row in rows[start + 1 :]:
+                if row[0] == "Contest Total":
+                    break
+                votes = tuple(int(row[index] or 0) for index in (7, 8, 10, 11, 12, 13, 14))
+                matches = by_county["53073"].get(votes, [])
+                named = [code for code in matches if code.endswith(f":{row[0]}")]
+                if len(matches) == 1 or len(named) == 1:
+                    writeins[(named or matches)[0]] = int(row[15] or 0)
+                else:
+                    raise ValueError(f"Whatcom precinct {row[0]}: {len(matches)} matches")
+        po_text = raw.cached(SOURCE, PEND_OREILLE[0]).path.read_text(errors="replace")
+        pend = {}
+        for block in re.split(r"\n\s+(?=\d{4} [A-Z])", po_text)[1:]:
+            section = re.search(r"Pres\. & VP of US\nVote for 1\n(.*?)Over Votes", block, flags=re.S)
+            if section is None:
+                continue
+            numbers = [int(n.replace(",", "")) for n in re.findall(r"\.\s+([\d,]+)(?:\s+[\d.]+)?\s*\n", section[1])]
+            if len(numbers) != 8:
+                raise ValueError(f"Pend Oreille {block[:30]!r}: {len(numbers)} lines")
+            matches = by_county["53051"].get(tuple(numbers[:7]), [])
+            if not matches:
+                raise ValueError(f"Pend Oreille {block[:30]!r}: no match")
+            pend[matches[0]] = numbers[7]
+        writeins |= pend
         thurston = list(pl.read_excel(raw.cached(SOURCE, THURSTON[0]).path, has_header=False, sheet_id=0).values())[0].rows()
         start = next(index for index, row in enumerate(thurston) if any(cell is not None and "Hillary" in str(cell) for cell in row))
         for row in thurston[start + 1 :]:
@@ -134,7 +186,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Washington's 2016 presidential precinct results with the Pierce, Clark, Thurston, and Clallam county write-in lines added",
+            summary="Washington's 2016 presidential precinct results with the Pierce, Clark, Thurston, Clallam, Whatcom, and Pend Oreille county write-in lines added",
             polity="US-WA",
         )
         source = cs.source(PUBLISHER, TITLE)
@@ -142,6 +194,8 @@ def emit() -> Path:
         cs.artifact(raw.cached(SOURCE, PIERCE[0]), source)
         cs.artifact(raw.cached(SOURCE, CLALLAM[0]), source)
         cs.artifact(raw.cached(SOURCE, CLARK[0]), source)
+        cs.artifact(raw.cached(SOURCE, WHATCOM[0]), source)
+        cs.artifact(raw.cached(SOURCE, PEND_OREILLE[0]), source)
         result_set = cs.key(f"{SOURCE}.result_set", "2016-11-08:WA:president")
         official = conn.execute(
             """select sum(v.value) from result_set r join source s on s.id = r.source_id join result_value v on v.result_set_k = r.k
@@ -176,7 +230,7 @@ def emit() -> Path:
             "note",
             entity_id=result_set,
             kind="methodology",
-            body_md=f"OpenElections' precinct results, which include King County's write-ins, with the write-in line added for {len(writeins)} precincts from the precinct canvasses of Pierce, Clark, Thurston, and Clallam counties. The Secretary of State's precinct files omit write-ins. Pierce suppresses small cells in 13 precincts, so those carry no write-in value, and its published precinct write-ins sum to 11,531 of its 11,532 county total. Thurston combines and zeroes small precincts for privacy, so three of its precincts, with 33 write-ins, are not loaded.",
+            body_md=f"OpenElections' precinct results, which include King County's write-ins, with the write-in line added for {len(writeins)} precincts from the precinct canvasses of Pierce, Clark, Thurston, Clallam, Whatcom, and Pend Oreille counties. The Secretary of State's precinct files omit write-ins. Pierce suppresses small cells in 13 precincts, so those carry no write-in value, and its published precinct write-ins sum to 11,531 of its 11,532 county total. Thurston combines and zeroes small precincts for privacy, so three of its precincts, with 33 write-ins, are not loaded.",
         )
         for code, tally in tallies.items():
             for option_id, value in tally.items():
