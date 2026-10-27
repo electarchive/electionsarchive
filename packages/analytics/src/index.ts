@@ -156,13 +156,24 @@ function tally(side: Side, identify: (option: Option) => string) {
     const isFused = group.members.every(
       (member) => member.person != null && member.person === group.lead.person,
     );
-    const lines = group.members.flatMap((member) =>
-      !isFused || member.line == null || member.votes === 0
-        ? []
-        : [{ label: member.line, votes: member.votes }],
+    const lines = Map.groupBy(
+      group.members.filter(
+        (member) => isFused && member.line != null && member.votes !== 0,
+      ),
+      (member) => member.line ?? "",
     );
     group.cell.lines =
-      lines.length < 2 ? [] : lines.toSorted((a, b) => b.votes - a.votes);
+      lines.size < 2
+        ? []
+        : [...lines]
+            .map(([label, members]) => {
+              let votes = 0;
+              for (const member of members) {
+                votes += member.votes;
+              }
+              return { label, votes };
+            })
+            .toSorted((a, b) => b.votes - a.votes);
   }
   return groups;
 }
