@@ -568,7 +568,11 @@ function coverageMarkdown(
   const notesFor = (level: string) =>
     summary.notes.filter(
       (note) =>
-        note.level === level && note.goal !== "fine" && note.lost == null,
+        note.level === level &&
+        note.goal !== "fine" &&
+        note.lost == null &&
+        note.canvass == null &&
+        note.readiness == null,
     );
   const definitions: Record<string, () => string> = {
     federal: m.coverage_tier_def_federal,
@@ -604,6 +608,50 @@ function coverageMarkdown(
       year,
     }),
     ...(data.stale ? [`> ${m.coverage_stale()}`] : []),
+    ...(data.readiness.length === 0
+      ? []
+      : [
+          `## ${m.coverage_ready_title()}`,
+          m.coverage_ready_lede(),
+          table(
+            [
+              m.coverage_column_kind(),
+              m.coverage_ready_complete(),
+              m.coverage_ready_partial(),
+              m.coverage_ready_bare(),
+              m.coverage_ready_absent(),
+              m.coverage_ready_states(),
+            ],
+            data.readiness.map((row) => [
+              levelLabel(data.polity, row.level),
+              `${percent(row.complete / Math.max(1, row.total), 1)} (${m.coverage_ready_of({ complete: count(row.complete), total: count(row.total) })})`,
+              count(row.partial),
+              count(row.bare),
+              count(row.absent),
+              row.states
+                .filter((state) => state.complete < state.total)
+                .map(
+                  (state) =>
+                    `${state.state} ${count(state.complete)}/${count(state.total)}`,
+                )
+                .join(", "),
+            ]),
+          ),
+          [
+            `- ${m.coverage_ready_complete()}: ${m.coverage_ready_complete_def()}`,
+            `- ${m.coverage_ready_partial()}: ${m.coverage_ready_partial_def()}`,
+            `- ${m.coverage_ready_bare()}: ${m.coverage_ready_bare_def()}`,
+            `- ${m.coverage_ready_absent()}: ${m.coverage_ready_absent_def()}`,
+          ].join("\n"),
+          m.coverage_ready_schedule(),
+          `${m.coverage_ready_sources()}:\n${summary.notes
+            .filter((note) => note.readiness != null)
+            .map((note) => {
+              const source = summary.sources[note.readiness ?? ""];
+              return `- ${levelLabel(data.polity, note.level)}: ${source == null ? (note.readiness ?? "") : `[${source.publisher ?? ""}, ${source.title}](${source.url})`}. ${note.note}`;
+            })
+            .join("\n")}`,
+        ]),
     `## ${m.coverage_glance()}`,
     `${(isUs ? m.coverage_glance_hint_us : m.coverage_glance_hint_country)()} ${m.coverage_glance_none_hint()}`,
     table(
@@ -685,6 +733,24 @@ function coverageMarkdown(
                     : []),
                   ...(reason === "complete" && row.published > 0
                     ? [`  - ${m.coverage_published()}: ${count(row.published)}`]
+                    : []),
+                  ...(reason === "complete" && item.goal === "precinct"
+                    ? summary.notes
+                        .filter(
+                          (note) =>
+                            note.canvass != null &&
+                            tier.levels.some(
+                              (level) => level.key === note.level,
+                            ),
+                        )
+                        .flatMap((note, index) => [
+                          ...(index === 0
+                            ? [
+                                `  - ${m.coverage_canvass()}: ${m.coverage_canvass_def()}`,
+                              ]
+                            : []),
+                          `    - [${m.coverage_canvass_row({ state: note.canvass ?? "", year: String(note.from), office: levelLabel(data.polity, note.level) })}](${note.url ?? ""}). ${note.note}`,
+                        ])
                     : []),
                   ...(reason === "lost"
                     ? summary.notes

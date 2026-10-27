@@ -321,7 +321,13 @@
         }
       ],
       "schemes": [
-        "it.collegio_senato"
+        "it.collegio_senato",
+        "it.collegio_senato_1993",
+        "it.collegio_senato_2005",
+        "it.collegio_senato_2017",
+        "it.plurinominale_senato_2017",
+        "it.collegio_senato_2020",
+        "it.plurinominale_senato_2020"
       ],
       "elections": [
         {

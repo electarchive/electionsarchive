@@ -6,7 +6,7 @@ from collections import defaultdict
 from datetime import date, timedelta
 from pathlib import Path
 
-from ea import coverage
+from ea import coverage, readiness
 from ea.store import ROOT, connect
 
 DENOMINATORS = Path(__file__).parent / "denominators"
@@ -15,6 +15,8 @@ INPUTS = (
     "pipelines/ea/coverage_tables.py",
     "pipelines/ea/coverage_countries.py",
     "pipelines/ea/statewide_table.py",
+    "pipelines/ea/readiness.py",
+    "pipelines/ea/readiness/2026-11-03.json",
     "pipelines/ea/sources/us/ncsl_measures.csv",
     ".agents/spec/finest-reported.csv",
 )
@@ -547,7 +549,32 @@ def place_of(cc: str, data: dict, area: str | None, election_iso: str | None) ->
 
 def build(conn) -> tuple[list[tuple], list[tuple]]:
     goal_rows: list[tuple] = []
-    polity_rows: list[tuple] = [("us", *summary(conn, "us"), "{}", "[]", "[]", "{}")]
+    with (ROOT / ".agents" / "spec" / "finest-reported.csv").open() as f:
+        canvass = [
+            {
+                "goal": "precinct",
+                "level": row["level"],
+                "from": int(row["year"]),
+                "to": int(row["year"]),
+                "note": row["source"],
+                "canvass": row["state"],
+                "county": row.get("county") or None,
+                "url": row["url"],
+            }
+            for row in csv.DictReader(f)
+            if row["finest"] == "precinct"
+        ]
+    ready, cited = readiness.notes(readiness.DAY)
+    polity_rows: list[tuple] = [
+        (
+            "us",
+            *summary(conn, "us"),
+            "{}",
+            "[]",
+            json.dumps(canvass + ready, ensure_ascii=False),
+            json.dumps(cited, ensure_ascii=False),
+        )
+    ]
     for cc in countries():
         data = measure(conn, cc)
         goals, _, notes = tally(cc, data)

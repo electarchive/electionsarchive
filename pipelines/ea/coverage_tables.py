@@ -8,7 +8,7 @@ from datetime import date
 
 import polars as pl
 
-from ea import coverage, coverage_countries, raw, statewide_table
+from ea import coverage, coverage_countries, raw, readiness, statewide_table
 from ea.store import ROOT, connect
 
 LOCK = 7_302_019
@@ -1383,6 +1383,7 @@ def build() -> str:
         ) as copy:
             for row in years_out:
                 copy.write_row(row)
+        goals |= readiness.goals(conn, readiness.DAY)
         with conn.cursor().copy(
             "copy coverage_goal (goal, state, level, year, total, complete, absent, bare, totals, partial, coarse,"
             " turnout, precincts, shaped, unshaped, units, undrawn, icpsr, population_total, population_complete,"

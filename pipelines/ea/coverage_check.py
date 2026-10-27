@@ -5,7 +5,7 @@ import urllib.request
 from collections import defaultdict
 from datetime import date
 
-from ea import coverage_countries
+from ea import coverage_countries, readiness
 from ea.store import ROOT, connect
 
 BASE = os.environ.get("EA_BASE", "http://localhost:5173")
@@ -54,7 +54,9 @@ def database(conn) -> list[str]:
     with (ROOT / ".agents" / "spec" / "finest-reported.csv").open() as f:
         for row in csv.DictReader(f):
             county = row.get("county") or ""
-            if row["finest"] not in ("none", "county", "town"):
+            if row["finest"] not in ("none", "county", "town", "precinct") or (
+                row["finest"] == "precinct" and not (row["source"].strip() and row["url"].strip())
+            ):
                 problems.append(f"finest-reported {row['state']} {row['year']} {row['level']}: finest {row['finest']}")
             if (
                 county
@@ -76,6 +78,15 @@ def database(conn) -> list[str]:
         " or lost > 0 and (polity = 'us' or goal not in ('national', 'subnational', 'local', 'referendums', 'ep', 'fine'))"
     ):
         problems.append(f"{polity} {goal} {level} {state} {year}: lost {lost} outside a country vote goal")
+    ready = readiness.spec(readiness.DAY)
+    for level in ready["levels"]:
+        for part in (level, level.get("specials") or {}):
+            if (
+                part
+                and not level.get("schedule")
+                and not (part.get("quote") and part.get("source") in ready["sources"])
+            ):
+                problems.append(f"readiness {level['key']}: needs a source and a quote")
     sums: dict[tuple[str, str, int], int] = defaultdict(int)
     for polity, level, goal, year, total in conn.execute(
         "select polity, level, goal, year, sum(total) from coverage_goal where polity <> 'us' group by 1, 2, 3, 4"
@@ -125,6 +136,21 @@ def pages(conn) -> list[str]:
         if ("Rebuilt before the latest" in markdown) != stale:
             problems.append(f"{cc}: the twin's stale line does not match the database")
         levels = {lv["key"]: lv for lv in rest["summary"]["levels"]}
+        for row in rest.get("readiness", []):
+            total, complete = conn.execute(
+                "select coalesce(sum(total), 0), coalesce(sum(complete), 0) from coverage_goal"
+                " where polity = %s and goal = 'readiness' and level = %s",
+                [cc, row["level"]],
+            ).fetchone()
+            if (total, complete) != (row["total"], row["complete"]) or row["complete"] > row["total"]:
+                problems.append(
+                    f"{cc} readiness {row['level']}: page {row['complete']}/{row['total']} db {complete}/{total}"
+                )
+            if f"{row['complete']:,} of {row['total']:,} ready" not in markdown:
+                problems.append(f"{cc} readiness {row['level']}: not in the twin")
+        for note in rest["summary"]["notes"]:
+            if note.get("canvass") is not None and note["note"] not in markdown:
+                problems.append(f"{cc} {note['canvass']} {note['from']} {note['level']}: canvass note not in the twin")
         for key in levels if cc != "us" else []:
             missing = ", ".join(
                 str(n["from"]) if n["from"] == n["to"] else f"{n['from']}–{n['to']}"

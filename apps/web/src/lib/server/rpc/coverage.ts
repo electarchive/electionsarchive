@@ -68,6 +68,13 @@ const SUMS = sql.raw(
     })
     .join(", "),
 );
+const Ready = {
+  total: v.number(),
+  complete: v.number(),
+  absent: v.number(),
+  bare: v.number(),
+  partial: v.number(),
+};
 const Note = v.object({
   goal: v.string(),
   level: v.string(),
@@ -77,6 +84,10 @@ const Note = v.object({
   held: v.optional(v.number()),
   listed: v.optional(v.boolean()),
   lost: v.optional(v.string()),
+  canvass: v.optional(v.string()),
+  readiness: v.optional(v.string()),
+  county: v.optional(v.nullable(v.string())),
+  url: v.optional(v.string()),
 });
 const Summary = v.object({
   polity: v.string(),
@@ -342,7 +353,12 @@ export const coverage = {
           contests: polity.contests,
           finest: polity.finest,
           finestNoun: polity.finestNoun,
-          uncounted: polity.notes.filter((note) => note.lost == null).length,
+          uncounted: polity.notes.filter(
+            (note) =>
+              note.lost == null &&
+              note.canvass == null &&
+              note.readiness == null,
+          ).length,
           tiers: tiers(
             polity.polity,
             found.rows.filter((row) => row.polity === polity.polity),
@@ -406,6 +422,14 @@ export const coverage = {
             ),
           }),
         ),
+        readiness: v.array(
+          v.object({
+            level: v.string(),
+            year: v.number(),
+            ...Ready,
+            states: v.array(v.object({ state: v.string(), ...Ready })),
+          }),
+        ),
       }),
     )
     .handler(async ({ input }) => {
@@ -422,10 +446,48 @@ export const coverage = {
         where g.polity = ${input.polity} and (${input.current} or g.year <> extract(year from current_date))
         group by 1, 2, 3
       `);
+      const ready = await db.execute<
+        { level: string; year: number; state: string } & Record<
+          keyof typeof Ready,
+          number
+        >
+      >(sql`
+        select g.level, g.year, g.state, g.total, g.complete, g.absent, g.bare, g.partial
+        from coverage_goal g
+        where g.polity = ${input.polity} and g.goal = 'readiness'
+        order by g.level, g.state
+      `);
+      const readiness: Array<
+        { level: string; year: number; states: typeof ready.rows } & Record<
+          keyof typeof Ready,
+          number
+        >
+      > = [];
+      for (const row of ready.rows) {
+        let group = readiness.find((found) => found.level === row.level);
+        if (group == null) {
+          group = {
+            level: row.level,
+            year: row.year,
+            total: 0,
+            complete: 0,
+            absent: 0,
+            bare: 0,
+            partial: 0,
+            states: [],
+          };
+          readiness.push(group);
+        }
+        for (const key of Object.keys(Ready) as Array<keyof typeof Ready>) {
+          group[key] += row[key];
+        }
+        group.states.push(row);
+      }
       return {
         ...status,
         summary,
         tiers: tiers(input.polity, found.rows, summary.levels),
+        readiness,
       };
     }),
   gaps: os

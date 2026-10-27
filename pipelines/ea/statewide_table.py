@@ -38,7 +38,7 @@ group by 1, 2, 3
 """
 
 
-def rebuild(conn: Connection) -> int:
+def schedule(conn: Connection, last: int = LAST) -> list[tuple]:
     observed: dict[tuple, set[int]] = defaultdict(set)
     governors: dict[str, set[int]] = defaultdict(set)
     for office, key, st, governor, year, general in conn.execute(OFFICES_SQL):
@@ -68,7 +68,7 @@ def rebuild(conn: Connection) -> int:
             if together
             else {year for year in range(start, MODERN) if year % period == phase}
         )
-        years = {year for year in range(max(start, MODERN), LAST + 1) if year % period == phase} | old | modern
+        years = {year for year in range(max(start, MODERN), last + 1) if year % period == phase} | old | modern
         if max(recent) < 2016:
             years = {year for year in years if year <= max(recent)}
         if st == "CO" and key in ("member-of-the-state-board-of-education", "regent-of-the-university-of-colorado"):
@@ -86,7 +86,7 @@ def rebuild(conn: Connection) -> int:
             years = years - {2022, 2024} | {2025}
         kind = next((name for pattern, name in CLASSES if re.search(pattern, key)), "other")
         for year in sorted(years):
-            if year > LAST:
+            if year > last:
                 continue
             rows.append((st, office, kind, year, False, "observed" if year in recent else "cycle"))
     for (office, key, st), begun in tenures.items():
@@ -95,6 +95,11 @@ def rebuild(conn: Connection) -> int:
         for year in sorted(governors[st]):
             if year >= max(begun - 1, JOINT):
                 rows.append((st, office, "lieutenant_governor", year, True, "joint"))
+    return rows
+
+
+def rebuild(conn: Connection) -> int:
+    rows = schedule(conn)
     conn.execute("delete from statewide_office_year")
     with conn.cursor().copy(
         "copy statewide_office_year (state, office_id, class, year, joint_ticket, basis) from stdin"

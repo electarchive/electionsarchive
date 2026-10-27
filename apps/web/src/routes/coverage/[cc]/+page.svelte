@@ -80,6 +80,37 @@
     coarse: m.coverage_reason_turnout_coarse_def,
     absent: m.coverage_reason_turnout_absent_def,
   };
+  const READY_LEVELS = [
+    "us_house",
+    "us_senate",
+    "governor",
+    "statewide_exec",
+    "state_upper",
+    "state_lower",
+    "statewide_measure",
+  ];
+  const READY = [
+    {
+      reason: "complete",
+      label: m.coverage_ready_complete,
+      definition: m.coverage_ready_complete_def,
+    },
+    {
+      reason: "partial",
+      label: m.coverage_ready_partial,
+      definition: m.coverage_ready_partial_def,
+    },
+    {
+      reason: "bare",
+      label: m.coverage_ready_bare,
+      definition: m.coverage_ready_bare_def,
+    },
+    {
+      reason: "absent",
+      label: m.coverage_ready_absent,
+      definition: m.coverage_ready_absent_def,
+    },
+  ] as const;
   const COUNTRY_REASONS: Partial<Record<Reason, () => string>> = {
     coarse: m.coverage_country_reason_coarse_def,
     partial: m.coverage_country_reason_partial_def,
@@ -118,7 +149,11 @@
   const notesFor = (level: string) =>
     summary.notes.filter(
       (note) =>
-        note.level === level && note.goal !== "fine" && note.lost == null,
+        note.level === level &&
+        note.goal !== "fine" &&
+        note.lost == null &&
+        note.canvass == null &&
+        note.readiness == null,
     );
 
   const range = $derived.by(() => {
@@ -451,6 +486,40 @@
               </span>
             </span>
           {/if}
+          {#if reason === "complete" && goal === "precinct"}
+            {const levels = $derived(
+              data.tiers
+                .find((tier) => tier.key === tierKey)
+                ?.levels.map((level) => level.key) ?? [],
+            )}
+            {const fixes = $derived(
+              summary.notes.filter(
+                (note) => note.canvass != null && levels.includes(note.level),
+              ),
+            )}
+            {#if fixes.length > 0}
+              <span class="mbs-2 grid gap-1">
+                <span class="font-semibold">{m.coverage_canvass()}</span>
+                <span class="text-xs text-muted-foreground"
+                  >{m.coverage_canvass_def()}</span
+                >
+                {#each fixes as note, index (index)}
+                  <span class="text-xs">
+                    <a
+                      href={note.url}
+                      class="underline underline-offset-2 focus-visible:outline-2 focus-visible:outline-ring"
+                      >{m.coverage_canvass_row({
+                        state: note.canvass ?? "",
+                        year: String(note.from),
+                        office: levelLabel(data.polity, note.level),
+                      })}</a
+                    >
+                    <span class="block text-muted-foreground">{note.note}</span>
+                  </span>
+                {/each}
+              </span>
+            {/if}
+          {/if}
           {#if reason === "lost"}
             {const levels = $derived(
               data.tiers
@@ -667,6 +736,130 @@
         </p>
       {/if}
     </header>
+
+    {#if data.readiness.length > 0}
+      <section
+        aria-labelledby="coverage-ready"
+        class="grid gap-4 bg-card px-3.5 pbs-4 pbe-4"
+      >
+        <hgroup class="grid gap-1">
+          <h2 id="coverage-ready" class="text-lg font-bold">
+            {m.coverage_ready_title()}
+          </h2>
+          <p class="text-sm text-muted-foreground max-inline-[80ch]">
+            {m.coverage_ready_lede()}
+          </p>
+        </hgroup>
+        <ul class="grid gap-x-6 gap-y-5 sm:grid-cols-2 lg:grid-cols-4">
+          {#each READY_LEVELS.flatMap( (level) => data.readiness.filter((row) => row.level === level) ) as row (row.level)}
+            {const short = $derived(
+              row.states.filter((state) => state.complete < state.total),
+            )}
+            <li class="grid content-start gap-1">
+              <span class="text-sm font-semibold"
+                >{levelLabel(data.polity, row.level)}</span
+              >
+              <span class="text-lg font-bold tracking-[-0.01em] tabular-nums"
+                >{percent(row.complete / Math.max(1, row.total), 1)}</span
+              >
+              <span
+                role="img"
+                aria-label={READY.filter((part) => row[part.reason] > 0)
+                  .map((part) =>
+                    m.coverage_count({
+                      label: part.label(),
+                      count: count(row[part.reason]),
+                    }),
+                  )
+                  .join(", ")}
+                class="flex overflow-hidden rounded-xs bg-muted block-2.5 max-inline-56"
+              >
+                {#each READY.filter((part) => row[part.reason] > 0) as part (part.reason)}
+                  <span
+                    class="block-full"
+                    style:inline-size="{(row[part.reason] /
+                      Math.max(1, row.total)) *
+                      100}%"
+                  >
+                    <Tone
+                      reason={part.reason}
+                      class="block block-full inline-full"
+                    />
+                  </span>
+                {/each}
+              </span>
+              <span class="text-xs text-muted-foreground tabular-nums"
+                >{m.coverage_ready_of({
+                  complete: count(row.complete),
+                  total: count(row.total),
+                })}</span
+              >
+              {#if short.length > 0}
+                <details class="group text-xs">
+                  <summary
+                    class="flex cursor-pointer list-none items-center gap-1 focus-visible:outline-2 focus-visible:outline-ring [&::-webkit-details-marker]:hidden"
+                  >
+                    <ChevronRightIcon
+                      class="text-muted-foreground transition-transform block-3.5 inline-3.5 group-open:rotate-90"
+                    />
+                    {m.coverage_ready_states()} ({count(short.length)})
+                  </summary>
+                  <ul
+                    class="grid grid-cols-[repeat(auto-fill,minmax(5.5rem,1fr))] gap-x-3 gap-y-0.5 pbs-1.5 tabular-nums"
+                  >
+                    {#each short as state (state.state)}
+                      <li>
+                        <span class="font-semibold">{state.state}</span>
+                        {count(state.complete)}/{count(state.total)}
+                      </li>
+                    {/each}
+                  </ul>
+                </details>
+              {/if}
+            </li>
+          {/each}
+        </ul>
+        <ul class="grid gap-x-6 gap-y-2 text-sm sm:grid-cols-2">
+          {#each READY as part (part.reason)}
+            <li class="grid grid-cols-[0.75rem_minmax(0,1fr)] gap-x-2">
+              <Tone
+                reason={part.reason}
+                class="mbs-1 rounded-xs block-3 inline-3"
+              />
+              <span>
+                <span class="font-semibold">{part.label()}</span>
+                <span class="block text-xs text-muted-foreground"
+                  >{part.definition()}</span
+                >
+              </span>
+            </li>
+          {/each}
+        </ul>
+        <div class="grid gap-1 text-xs text-muted-foreground">
+          <p>{m.coverage_ready_schedule()}</p>
+          <p class="font-semibold text-foreground">
+            {m.coverage_ready_sources()}
+          </p>
+          <ul class="grid gap-0.5">
+            {#each summary.notes.filter((note) => note.readiness != null) as note, index (index)}
+              {const source = $derived(summary.sources[note.readiness ?? ""])}
+              <li>
+                <span class="text-foreground"
+                  >{levelLabel(data.polity, note.level)}:</span
+                >
+                <a
+                  href={source?.url}
+                  class="underline underline-offset-2 focus-visible:outline-2 focus-visible:outline-ring"
+                  >{source == null
+                    ? note.readiness
+                    : `${source.publisher ?? ""}, ${source.title}`}</a
+                >
+              </li>
+            {/each}
+          </ul>
+        </div>
+      </section>
+    {/if}
 
     <section aria-labelledby="coverage-glance" class="grid gap-3 bg-card pbs-4">
       <hgroup class="grid gap-1 px-3.5">
