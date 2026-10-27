@@ -572,9 +572,15 @@
     }) ?? [],
   );
   const keyed = $derived.by(() => {
-    const rows = (placed?.rows ?? []).filter(
+    const named = (placed?.rows ?? []).filter(
       (row) => row.leader != null && row.valid > 0,
     );
+    const head = `${named[0]?.name.split(", ")[0] ?? ""}, `;
+    const isShared =
+      named.length > 1 && named.every((row) => row.name.startsWith(head));
+    const rows = isShared
+      ? named.map((row) => ({ ...row, name: row.name.slice(head.length) }))
+      : named;
     if (rows.length < 6) {
       return [];
     }
