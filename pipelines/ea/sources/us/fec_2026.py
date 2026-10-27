@@ -405,7 +405,17 @@ CLASS_THREE_SPECIALS = ("OH", "FL")
 NO_GENERAL = ("PR",)
 SUPPLEMENTED = {"RI", "AR", "NV", "MN"}
 UNEXPIRED_2024 = {("OH", "senate:33:g")}
-OHA = {"At-Large Trustee": ("", 3), "Maui Resident Trustee": ("maui", 1), "Oahu Resident Trustee": ("oahu", 1)}
+SPLIT = {
+    "HI:trustee-of-the-office-of-hawaiian-affairs": {
+        "At-Large Trustee": ("", 3, "at-large"),
+        "Maui Resident Trustee": ("maui", 1, "Maui resident"),
+        "Oahu Resident Trustee": ("oahu", 1, "Oahu resident"),
+    },
+    "GA:public-service-commissioner": {
+        "Public Service Commissioner, District 3": ("district-3", 1, "District 3"),
+        "Public Service Commissioner, District 5": ("district-5", 1, "District 5"),
+    },
+}
 TACIT_SOURCES = {
     "HI": (
         "Hawaii Office of Elections",
@@ -1914,10 +1924,10 @@ def emit() -> Path:
             _, state, chamber = template[0].split(":")
             if f"{state}:{chamber}" not in offices:
                 offices[f"{state}:{chamber}"] = label
-                if template[0].endswith(":HI:trustee-of-the-office-of-hawaiian-affairs"):
+                if f"{state}:{chamber}" in SPLIT:
                     templates.extend(
                         (":".join(filter(None, (template[0], seat))), *template[1:7], magnitude, *template[8:])
-                        for seat, magnitude in OHA.values()
+                        for seat, magnitude, _ in SPLIT[f"{state}:{chamber}"].values()
                     )
                 else:
                     templates.append(tuple(template))
@@ -2031,11 +2041,16 @@ def emit() -> Path:
                 numbered.setdefault((state, level, seat.split("-")[0]), []).append(seat)
         listed: dict[str, list[dict[str, str | int | None]]] = {}
         for row in pl.read_parquet(PARSED / "candidates.parquet").iter_rows(named=True):
-            if row["state"] == "HI" and row["office"] in OHA:
-                key = ":".join(
-                    filter(None, (f"{DAY}:HI:trustee-of-the-office-of-hawaiian-affairs", OHA[row["office"]][0]))
-                )
-                listed.setdefault(key, []).append(row)
+            split = next(
+                (
+                    f"{DAY}:{key}" + (f":{seats[row['office']][0]}" if seats[row["office"]][0] else "")
+                    for key, seats in SPLIT.items()
+                    if key.startswith(f"{row['state']}:") and row["office"] in seats
+                ),
+                None,
+            )
+            if split is not None:
+                listed.setdefault(split, []).append(row)
                 continue
             office = re.sub(r"-(statewide|state-of-[a-z]+)$", "", slug(row["office"]))
             office = re.sub(r"^(state|general)-", "", office)
@@ -2442,10 +2457,11 @@ def emit() -> Path:
             else:
                 title = re.sub(rf"^\d{{4}} {re.escape(state_name)} ", "2026 ", offices[f"{state}:{chamber}"])
                 path = f"us/{state.lower()}/{DAY}-general/{chamber}"
-                if (state, chamber) == ("HI", "trustee-of-the-office-of-hawaiian-affairs"):
-                    title = title.replace(
-                        " election", f" election ({rest[0].title()} resident)" if rest else " election (at-large)"
+                if f"{state}:{chamber}" in SPLIT:
+                    label = next(
+                        text for seat, _, text in SPLIT[f"{state}:{chamber}"].values() if seat == ":".join(rest)
                     )
+                    title = title.replace(" election", f" election ({label})")
                     path = "-".join([path, *rest])
             name(contest, title)
             cs.add("slug", path=path, entity_id=contest)
