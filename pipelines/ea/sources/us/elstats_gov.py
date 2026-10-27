@@ -111,8 +111,21 @@ LEGISLATURE = (
     "the governor."
 )
 
+TICKET = r"\s*/\s*| and "
 
-WINDOWS = {"ID": [(1700, 1989), (1990, 1994), (1995, 1999), (2000, 2004), (2005, 2009), (2010, 2014), (2015, 2019), (2020, 2026)]}
+
+WINDOWS = {
+    "ID": [
+        (1700, 1989),
+        (1990, 1994),
+        (1995, 1999),
+        (2000, 2004),
+        (2005, 2009),
+        (2010, 2014),
+        (2015, 2019),
+        (2020, 2026),
+    ]
+}
 
 
 def url(state: str, years: tuple[int, int] = (1700, 2026)) -> str:
@@ -307,6 +320,18 @@ def emit() -> Path:
         )
         known = {value for (value,) in conn.execute("select value from external_id where scheme = 'us.election'")}
         labels = {value for (value,) in conn.execute("select value from external_id where scheme = 'us.party'")}
+        held = {
+            value
+            for (value,) in conn.execute(
+                "select value from external_id where scheme = %s", [f"{SOURCE}.person"]
+            ).fetchall()
+        }
+        for name_id, entity, text in conn.execute(
+            """select n.id, n.entity_id, n.text from name n join changeset c on c.id = n.changeset_id
+               join person p on p.id = n.entity_id where c.pipeline = %s and n.text ~ '/' and not n.is_preferred""",
+            [SOURCE],
+        ).fetchall():
+            cs.add("name_drop", name_id=name_id, entity_id=entity, text=text, reason="Ticket stamped as a person name")
         existing: dict[str, list[tuple[UUID, str]]] = {}
         for key, option, label in conn.execute(
             """select e.value, o.id, o.ballot_label from external_id e
@@ -326,16 +351,21 @@ def emit() -> Path:
                 [f"{SOURCE}.result_set", SOURCE],
             ).fetchall()
         }
+        defaults: dict[UUID, bool] = dict(
+            conn.execute(
+                """select r.id, r.is_default from result_set r join changeset c on c.id = r.changeset_id
+                   where c.pipeline = %s""",
+                [SOURCE],
+            ).fetchall()
+        )
         fptp, two_round = cs.key("us.electoral_system", "fptp"), cs.key("us.electoral_system", "two_round")
         if cs.minted & {fptp, two_round}:
             raise ValueError("the fptp and two-round systems must exist")
         firsts: dict[tuple[str, str], UUID] = {}
         published: dict[UUID, UUID | None] = dict(
             conn.execute(
-                """select o.id, coalesce(h.party_id, o.party_id) from contest_option o
+                """select o.id, o.party_id from contest_option o
                    join changeset c on c.id = o.changeset_id
-                   left join lateral (select party_id from contest_option_history h where h.id = o.id
-                                      order by h.recorded_from limit 1) h on true
                    where c.pipeline = %s""",
                 [SOURCE],
             ).fetchall()
@@ -504,7 +534,10 @@ def emit() -> Path:
                 else {
                     named[index]: named[survivor]
                     for index, survivor in names.fold(
-                        [candidate.partition(" and ")[0] if primary is None else candidate for candidate in named]
+                        [
+                            re.split(TICKET, candidate, maxsplit=1)[0] if primary is None else candidate
+                            for candidate in named
+                        ]
                     ).items()
                 }
             )
@@ -541,7 +574,7 @@ def emit() -> Path:
                 kind="counted",
                 status="active",
                 source_id=sources[state],
-                is_default=regioned or (not reused and (previous or result_set) not in demoted),
+                is_default=regioned or defaults.get(result_set, not reused and (previous or result_set) not in demoted),
                 supersedes_id=previous,
                 completeness=1,
             )
@@ -564,7 +597,7 @@ def emit() -> Path:
                         ballot_label="Other votes",
                     )
                     continue
-                head, _, mate = candidate.partition(" and ") if primary is None else (candidate, "", "")
+                head, mate = (*re.split(TICKET, candidate, maxsplit=1), "")[:2] if primary is None else (candidate, "")
                 surname = [
                     word for word in slug(head).split("-") if len(word) > 1 and word not in ("jr", "sr", "ii", "iii")
                 ]
@@ -579,6 +612,8 @@ def emit() -> Path:
                 if matched is not None:
                     options[candidate] = matched
                     continue
+                if mate and f"{state}:{slug(candidate)}" in held:
+                    cs.merge(cs.key(f"{SOURCE}.person", f"{state}:{slug(candidate)}"), person(state, head))
                 key = cs.key("us.option", f"{contest_key}:{person(state, head)}")
                 if key in options.values():
                     options[candidate] = key
@@ -589,7 +624,7 @@ def emit() -> Path:
                     "contest_option",
                     id=options[candidate],
                     contest_id=contest,
-                    kind="candidate",
+                    kind="ticket" if mate else "candidate",
                     party_id=published.get(options[candidate], party_id) if day.year >= 1854 else party_id,
                     ballot_label=candidate,
                 )
@@ -606,7 +641,7 @@ def emit() -> Path:
                         )
             targets: dict[str, UUID] = {}
             for survivor in dict.fromkeys(folded.values()):
-                kept = person(state, survivor.partition(" and ")[0] if primary is None else survivor)
+                kept = person(state, re.split(TICKET, survivor, maxsplit=1)[0] if primary is None else survivor)
                 for printed in [survivor, *(candidate for candidate, into in folded.items() if into == survivor)]:
                     party_id = party_of(state, day.year, lines.filter(pl.col("candidate") == printed)["party"][0])
                     targets[printed] = cs.key("us.option", f"{contest_key}:{kept}:{slug(printed)}")
@@ -627,7 +662,7 @@ def emit() -> Path:
                     options[printed] = options[survivor]
                     gone = cs.key(
                         f"{SOURCE}.person",
-                        f"{state}:{slug(printed.partition(' and ')[0] if primary is None else printed)}",
+                        f"{state}:{slug(re.split(TICKET, printed, maxsplit=1)[0] if primary is None else printed)}",
                     )
                     old = cs.key("us.option", f"{contest_key}:{gone}")
                     if previous is None or old in cs.minted or old == targets[printed] or gone == kept:

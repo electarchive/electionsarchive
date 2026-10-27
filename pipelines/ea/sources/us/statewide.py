@@ -115,7 +115,7 @@ INDEPENDENT = {
     "No Party",
 }
 NO_PARTY = {"Nonpartisan", "Write In", "Write-In", "Past labels not allowed in current law", "None"}
-TICKET = r" and | & "
+TICKET = r"\s*/\s*| and | & "
 LEGISLATURE = {"Governor", "Lieutenant Governor", "Treasurer"}
 RETIRED_OFFICE = (
     'This statewide "County Treasurer" office came from a county race that the Idaho archive filed as a statewide '
@@ -485,10 +485,8 @@ def emit() -> Path:
         current = dict(conn.execute("select entity_id, path from slug where is_current").fetchall())
         published: dict[UUID, UUID | None] = dict(
             conn.execute(
-                """select o.id, coalesce(h.party_id, o.party_id) from contest_option o
+                """select o.id, o.party_id from contest_option o
                    join changeset c on c.id = o.changeset_id
-                   left join lateral (select party_id from contest_option_history h where h.id = o.id
-                                      order by h.recorded_from limit 1) h on true
                    where c.pipeline = %s""",
                 [SOURCE],
             ).fetchall()
@@ -596,11 +594,24 @@ def emit() -> Path:
                     days.setdefault((parts[1], int(parts[0][:4]), kind), parts[0])
 
         elections: dict[str, UUID] = {}
+        months = {
+            value
+            for (value,) in conn.execute(
+                """select e.value from external_id e join election l on l.id = e.entity_id
+                   join changeset s on s.id = l.changeset_id
+                   where e.scheme = 'us.election' and s.pipeline = %s and e.value ~ '^[0-9]{4}-09:'""",
+                [SOURCE],
+            ).fetchall()
+        }
 
         def election(state: str, year: int, day: date | None, kind: str) -> tuple[UUID, str, str]:
             kind = "primary" if kind == "nonpartisan" else kind
             if day is None:
-                datekey = days.get((state, year, kind)) or (
+                datekey = (
+                    f"{year}-09"
+                    if kind == "primary" and f"{year}-09:{state}:primary" in months
+                    else days.get((state, year, kind))
+                ) or (
                     str(date(year, 11, 2) + timedelta(days=(1 - date(year, 11, 2).weekday()) % 7))
                     if kind == "general"
                     else f"{year}-09"
@@ -666,7 +677,39 @@ def emit() -> Path:
                 if persons[person] in cs.minted:
                     name(persons[person], initials(candidate))
             named[(state, candidate)] = person
-            surnames[(state, year, office, slug(candidate).split("-")[-1])] = person
+            surnames[(state, year, office, re.sub(r"-(jr|sr|ii|iii)$", "", slug(candidate)).split("-")[-1])] = person
+        held_persons = {
+            value
+            for (value,) in conn.execute(
+                "select value from external_id where scheme = %s", [f"{SOURCE}.person"]
+            ).fetchall()
+        }
+        tickets: dict[str, str] = {}
+        for person, state, year, candidate in (
+            lines.filter(pl.col("person").is_in(held_persons) & pl.col("candidate").str.contains(TICKET))
+            .select("person", "state", "year", "candidate")
+            .unique()
+            .sort("year")
+            .iter_rows()
+        ):
+            head = re.split(TICKET, candidate, maxsplit=1)[0]
+            clean = named.get((state, head)) or surnames.get(
+                (state, year, "Governor", re.sub(r"-(jr|sr|ii|iii)$", "", slug(head)).split("-")[-1])
+            )
+            if clean is None:
+                tickets[person] = person
+                persons[person] = cs.key(f"{SOURCE}.person", person)
+                cs.add("person", id=persons[person])
+                name(persons[person], initials(head))
+            else:
+                tickets[person] = clean
+                cs.merge(cs.key(f"{SOURCE}.person", person), persons[clean])
+        for name_id, entity, text in conn.execute(
+            """select n.id, n.entity_id, n.text from name n join changeset c on c.id = n.changeset_id
+               join person p on p.id = n.entity_id where c.pipeline = %s and n.text ~ '/' and not n.is_preferred""",
+            [SOURCE],
+        ).fetchall():
+            cs.add("name_drop", name_id=name_id, entity_id=entity, text=text, reason="Ticket stamped as a person name")
 
         taken: set[str] = set()
         values: list[tuple[str, str, str, int, int]] = []
@@ -842,7 +885,7 @@ def emit() -> Path:
                 if reused:
                     words = [
                         word
-                        for word in slug(re.split(f"/|{TICKET}", ballot)[0]).split("-")
+                        for word in slug(re.split(TICKET, ballot)[0]).split("-")
                         if len(word) > 1 and word not in ("jr", "sr", "ii", "iii")
                     ]
                     matched = next(
@@ -868,7 +911,7 @@ def emit() -> Path:
                             (kept_head,) = (id for id, option in heads if option == matched)
                             cs.merge(gone, kept_head)
                 root = matched or cs.key("us.option", option_key)
-                if matched is None:
+                if matched is None or matched in published:
                     cs.add(
                         "contest_option",
                         id=root,
@@ -886,8 +929,12 @@ def emit() -> Path:
                         who = (
                             person
                             if len(members) == 1
+                            else tickets[person]
+                            if role == "head" and person in tickets
                             else named.get((state, member))
-                            or surnames.get((state, year, held, slug(member).split("-")[-1]))
+                            or surnames.get(
+                                (state, year, held, re.sub(r"-(jr|sr|ii|iii)$", "", slug(member)).split("-")[-1])
+                            )
                             or f"{state}:{slug(member)}"
                         )
                         if who not in persons:
@@ -895,6 +942,14 @@ def emit() -> Path:
                             cs.add("person", id=persons[who])
                             if persons[who] in cs.minted:
                                 name(persons[who], initials(member))
+                        if (
+                            len(members) > 1
+                            and who not in (person, f"{state}:{slug(member)}")
+                            and f"{state}:{slug(member)}" in held_persons
+                        ):
+                            folds.setdefault(cs.key(f"{SOURCE}.person", f"{state}:{slug(member)}"), []).append(
+                                persons[who]
+                            )
                         cs.add(
                             "candidacy",
                             id=cs.key("us.candidacy", f"{option_key}:{role}"),

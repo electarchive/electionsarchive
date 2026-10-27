@@ -5927,19 +5927,26 @@ def emit() -> Path:
         for key, text in frame.filter(pl.col("key").is_not_null()).select("key", "name").unique().iter_rows():
             if key in persons:
                 known.setdefault(slug(text), set()).add(persons[key])
-        for key, text in (
+        cycles: dict[tuple[int, str], UUID] = {}
+        for key, text, year in (
             nominations.filter(pl.col("key").is_not_null())
             .group_by("key", "name")
-            .agg(pl.col("votes").fill_null(0).sum())
+            .agg(pl.col("votes").fill_null(0).sum(), pl.col("year").max())
             .with_columns(anonymous=pl.col("key").str.starts_with("us:"))
             .sort("anonymous", "votes", "name", descending=[False, True, False])
             .unique("key", keep="first", maintain_order=True)
-            .select("key", "name")
+            .select("key", "name", "year")
             .iter_rows()
         ):
             if key in persons:
                 continue
-            if key in NAMESAKES:
+            if key.startswith("P") and (twin := cycles.get((year, slug(text)))) is not None:
+                persons[key] = twin
+                if key not in fec_persons:
+                    cs.add("external_id", entity_id=twin, scheme="fec.candidate", value=key)
+                elif fec_persons[key] != twin:
+                    cs.merge(fec_persons[key], twin)
+            elif key in NAMESAKES:
                 persons[key] = cs.key(f"{SOURCE}.person", key)
                 if key in fec_persons and fec_persons[key] != persons[key]:
                     cs.renamed[str(persons[key])] = str(fec_persons[key])
@@ -5958,6 +5965,8 @@ def emit() -> Path:
                 cs.add("person", id=persons[key])
                 name(persons[key], text)
             known.setdefault(slug(text), set()).add(persons[key])
+            if key.startswith("P"):
+                cycles.setdefault((year, slug(text)), persons[key])
         nominations = nominations.with_columns(
             person=pl.col("key").replace_strict(
                 {key: str(person) for key, person in persons.items()}, default=None, return_dtype=pl.String

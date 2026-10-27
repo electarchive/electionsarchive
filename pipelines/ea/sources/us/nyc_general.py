@@ -406,6 +406,13 @@ def emit() -> Path:
         def name(entity: UUID, text: str) -> None:
             cs.add("name", entity_id=entity, text=text, lang="en", kind="official", is_preferred=True)
 
+        for name_id, entity, text in conn.execute(
+            """select n.id, n.entity_id, n.text from name n join changeset c on c.id = n.changeset_id
+               join person p on p.id = n.entity_id where c.pipeline = %s and n.text ~ ' / ' and not n.is_preferred""",
+            [SOURCE],
+        ).fetchall():
+            cs.add("name_drop", name_id=name_id, entity_id=entity, text=text, reason="Ticket stamped as a person name")
+
         city = cs.key("us.polity", "new-york-city")
         place = cs.area("us.place", "3651000")
         council = cs.key("us.body", "NY:3651000:council")
@@ -1252,7 +1259,8 @@ def emit() -> Path:
                                 person = cs.key(f"{SOURCE}.person", f"{contest_key}:{slug(candidate)}")
                                 if person in cs.minted:
                                     cs.add("person", id=person)
-                                    name(person, candidate)
+                                if person in cs.minted or " / " in candidate:
+                                    name(person, candidate.split(" / ")[0])
                             head = cs.key("us.candidacy", f"{root_key}:head")
                             cs.add(
                                 "candidacy",
@@ -1260,7 +1268,7 @@ def emit() -> Path:
                                 person_id=person,
                                 option_id=option_ids[candidate],
                                 role="head",
-                                ballot_name=candidate,
+                                ballot_name=candidate.split(" / ")[0],
                                 is_independent=False,
                             )
                             if " / " in candidate:
