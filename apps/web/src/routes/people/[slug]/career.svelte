@@ -28,7 +28,9 @@
 
   const marks = $derived(
     record
-      .filter((entry) => entry.outcome !== "elsewhere")
+      .filter(
+        (entry) => entry.outcome !== "elsewhere" && entry.kind !== "indirect",
+      )
       .map((entry) => ({
         ...entry,
         at:

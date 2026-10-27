@@ -80,13 +80,16 @@
     const cut = shown.at(-1)?.year ?? Infinity;
     const all = new Set([
       ...shown.map((entry) => entry.year),
-      ...strays.keys().filter((year) => isOpen || year >= cut),
+      ...[...strays.keys(), ...person.faithless.map((row) => row.year)].filter(
+        (year) => isOpen || year >= cut,
+      ),
     ]);
     return [...all]
       .toSorted((a, b) => b - a)
       .map((year) => ({
         year,
         entries: shown.filter((entry) => entry.year === year),
+        faithless: person.faithless.filter((row) => row.year === year),
         strays: (strays.get(year) ?? []).map((row) => ({
           ...row,
           name: row.name.startsWith(`${row.year} `)
@@ -424,7 +427,7 @@
 
     <section class="col-span-12 grid gap-2 bg-card px-3.5 pbs-3 pbe-3.5">
       <h2 class="text-[0.8125rem] font-bold">{m.person_record()}</h2>
-      {#if entries.length === 0 && person.scattered.length === 0}
+      {#if entries.length === 0 && person.scattered.length === 0 && person.faithless.length === 0}
         <p class="text-sm text-muted-foreground">{m.person_empty()}</p>
       {:else}
         <ol class="grid text-sm">
@@ -548,13 +551,43 @@
                 </span>
               </li>
             {/each}
+            {#each group.faithless as row, at (at)}
+              {const line = $derived(
+                (row.isFaithless ? m.person_faithless : m.person_electors)({
+                  count: row.votes,
+                  states: new Intl.ListFormat(getLocale(), {
+                    type: "conjunction",
+                  }).format(row.states),
+                }),
+              )}
+              <li
+                class="grid grid-cols-[3rem_minmax(0,1fr)] items-baseline gap-x-3 border-be border-border/60 py-2 text-[0.8125rem] last:border-be-0 max-sm:grid-cols-[2.75rem_minmax(0,1fr)]"
+              >
+                <span
+                  class="font-figures text-muted-foreground tabular-nums"
+                  >{group.entries.length === 0 && at === 0
+                    ? group.year
+                    : ""}</span
+                >
+                {#if row.path == null}
+                  <span class="text-muted-foreground">{line}</span>
+                {:else}
+                  <a
+                    class="justify-self-start text-muted-foreground hover:text-foreground hover:highlighter"
+                    href={resolve("/[...path]", { path: row.path })}>{line}</a
+                  >
+                {/if}
+              </li>
+            {/each}
             {#if group.strays.length > 0}
               <li
                 class="grid grid-cols-[3rem_minmax(0,1fr)] items-baseline gap-x-3 border-be border-border/60 py-2 last:border-be-0 max-sm:grid-cols-[2.75rem_minmax(0,1fr)]"
               >
                 <span
                   class="font-figures text-[0.8125rem] text-muted-foreground tabular-nums"
-                  >{group.entries.length === 0 ? group.year : ""}</span
+                  >{group.entries.length === 0 && group.faithless.length === 0
+                    ? group.year
+                    : ""}</span
                 >
                 <details class="group text-[0.8125rem]">
                   <summary

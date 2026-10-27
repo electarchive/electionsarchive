@@ -1353,6 +1353,20 @@ function personMarkdown(
             }${entry.isWriteIn === true ? ` (${m.results_write_in().toLowerCase()})` : ""}`,
           ]),
         ),
+    person.faithless
+      .map(
+        (row) =>
+          `- ${row.year}: ${link(
+            (row.isFaithless ? m.person_faithless : m.person_electors)({
+              count: row.votes,
+              states: new Intl.ListFormat(getLocale(), {
+                type: "conjunction",
+              }).format(row.states),
+            }),
+            row.path,
+          )}`,
+      )
+      .join("\n"),
     Map.groupBy(person.scattered, (row) => row.year)
       .entries()
       .map(

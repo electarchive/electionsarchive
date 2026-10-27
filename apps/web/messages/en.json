@@ -1542,6 +1542,26 @@
       }
     }
   ],
+  "person_faithless": [
+    {
+      "declarations": ["input count", "input states", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "Received {count} electoral vote from a faithless elector in {states}",
+        "countPlural=*": "Received {count} electoral votes from faithless electors in {states}"
+      }
+    }
+  ],
+  "person_electors": [
+    {
+      "declarations": ["input count", "input states", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "Received {count} electoral vote in {states}",
+        "countPlural=*": "Received {count} electoral votes in {states}"
+      }
+    }
+  ],
   "person_unopposed": "Unopposed",
   "person_elected_unopposed": "Elected unopposed",
   "person_lede_advanced_year": "Ran in {count} races in {year}, winning {won} and advancing to the next round in {advanced}.",

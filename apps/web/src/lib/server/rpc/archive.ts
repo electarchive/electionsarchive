@@ -17627,6 +17627,17 @@ export const people = {
             to: v.nullable(v.string()),
           }),
         ),
+        faithless: v.array(
+          v.object({
+            name: v.string(),
+            path: v.nullable(v.string()),
+            date: v.string(),
+            year: v.number(),
+            votes: v.number(),
+            isFaithless: v.boolean(),
+            states: v.array(v.string()),
+          }),
+        ),
         scattered: v.array(
           v.object({
             name: v.string(),
@@ -17875,6 +17886,69 @@ export const people = {
           row.total === 0 ||
           row.votes / row.total < 0.05);
       const kept = rows.rows.filter((row) => !isStray(row));
+      const lone = kept.filter(
+        (row) =>
+          row.kind === "indirect" &&
+          row.measure === 11 &&
+          kept.every((other) => peer(other) !== row),
+      );
+      const faithless =
+        lone.length === 0
+          ? []
+          : (
+              await db.execute<{
+                root: string;
+                state: string;
+                votes: number;
+                isFaithless: boolean;
+              }>(sql`
+                with recursive ids(id) as (
+                  select ${person.id}::uuid
+                  union
+                  select em.entity_id from entity_merge em join ids on em.into_id = ids.id
+                )
+                select c.id as root, a.id as state, r.value::float8 as votes,
+                  coalesce(w.person not in (select id from ids) and not w.died, false) as "isFaithless"
+                from contest c
+                join election e on e.id = c.election_id
+                join contest_option o on o.contest_id = c.id
+                join result_set rs on rs.contest_id = c.id and ${latest("rs")}
+                cross join lateral (
+                  select x.area_k, x.value from result_rollup x
+                  where x.result_set_k = rs.k and x.option_k = o.k and x.measure = 11 and x.value > 0 offset 0
+                ) r
+                join area a on a.k = r.area_k and a.scheme_code <> 'us.nation'
+                left join lateral (
+                  select coalesce(em.into_id, hc.person_id) as person,
+                    coalesce((select p.death_date < e.date_from from person p where p.id = hc.person_id), false) as died
+                  from contest g
+                  join election ge on ge.id = g.election_id
+                  join contest gk on gk.id = g.id or gk.allocation_parent_id = g.id
+                  join result_set gs on gs.contest_id = gk.id and gs.is_default
+                  cross join lateral (
+                    select y.option_k, y.value from result_rollup y
+                    where y.result_set_k = gs.k and y.area_k = r.area_k and y.measure = 1 and y.option_k <> 0 offset 0
+                  ) gv
+                  join contest_option go on go.k = gv.option_k
+                  left join candidacy hc on hc.option_id = coalesce(go.parent_option_id, go.id) and hc.role = 'head'
+                  left join entity_merge em on em.entity_id = hc.person_id
+                  where g.office_id = c.office_id and g.party_scope_id is null and g.allocation_parent_id is null
+                    and ge.kind = 'general' and extract(year from ge.date_from) = extract(year from e.date_from)
+                  order by gv.value desc limit 1
+                ) w on true
+                where c.id = any(${sql.param(lone.map((row) => row.root))}::uuid[])
+                  and exists (
+                    select from candidacy cd where cd.option_id = o.id and cd.role = 'head' and cd.person_id in (select id from ids)
+                  )
+                  and exists (
+                    select from contest g join election ge on ge.id = g.election_id
+                    where g.office_id = c.office_id and g.party_scope_id is null and ge.kind = 'general'
+                      and extract(year from ge.date_from) = extract(year from e.date_from)
+                  )
+                order by r.value desc, a.k
+              `)
+            ).rows;
+      const unfaithful = Map.groupBy(faithless, (row) => row.root);
       const tenures = await db.execute<{
         owner: string;
         isBody: boolean;
@@ -18010,6 +18084,7 @@ export const people = {
         names(
           [
             person.id,
+            ...faithless.map((row) => row.state),
             ...joint.rows.map((row) => row.party),
             ...roots,
             ...new Set([...spells, ...terms].map((spell) => spell.owner)),
@@ -18029,8 +18104,9 @@ export const people = {
         ...kept
           .filter(
             (row) =>
-              row.kind !== "indirect" ||
-              kept.every((other) => peer(other) !== row),
+              !unfaithful.has(row.root) &&
+              (row.kind !== "indirect" ||
+                kept.every((other) => peer(other) !== row)),
           )
           .map((row) => {
             const found = (nominations.get(row.root) ?? [])
@@ -18298,6 +18374,29 @@ export const people = {
           }))
           .toSorted((a, b) => b.from.localeCompare(a.from)),
         record,
+        faithless: lone.flatMap((row) =>
+          Map.groupBy(unfaithful.get(row.root) ?? [], (entry) => entry.isFaithless)
+            .entries()
+            .map(([isFaithless, entries]) => {
+              let votes = 0;
+              for (const entry of entries) {
+                votes += entry.votes;
+              }
+              return {
+                name: labels.full.get(row.root) ?? "",
+                path: slugs.get(row.root) ?? null,
+                date: row.date,
+                year: row.year,
+                votes,
+                isFaithless,
+                states: entries.map(
+                  (entry) => labels.full.get(entry.state) ?? "",
+                ),
+              };
+            })
+            .toArray()
+            .toSorted((a, b) => Number(b.isFaithless) - Number(a.isFaithless)),
+        ),
         scattered: rows.rows
           .filter((row) => isStray(row) && (row.votes ?? 0) > 0)
           .map((row) => ({
