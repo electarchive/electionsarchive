@@ -438,6 +438,7 @@
   "note_channels_target": "The earlier election reports some votes separately by how they were cast ({methods}) and this one doesn't, so the two may not cover the same votes.",
   "places_pool_special": "Special voting rules",
   "map_pools": "Not on the map:",
+  "map_abroad_only": "This map shows only votes cast abroad, {percent} of the total. Switch to a domestic level to see the rest.",
   "places_pool_abroad": "Votes cast abroad",
   "places_pool_customs": "Votes cast at customs gates",
   "places_pool_abroad_customs": "Votes cast abroad and at customs gates",

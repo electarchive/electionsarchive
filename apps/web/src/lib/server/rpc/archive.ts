@@ -2524,6 +2524,7 @@ async function places(
     group by 1, 2
   `);
   const pools = pooled.rows
+    .filter(() => level.code !== "world.country")
     .map((row) => ({ ...row, index: POOLS.indexOf(row.pool) }))
     .toSorted(
       (a, b) => Number(a.isPlaced) - Number(b.isPlaced) || a.index - b.index,
@@ -4846,7 +4847,9 @@ export const contests = {
               union all
               select cy.id from candidacy cy join contest_option o on o.id = cy.option_id
               where o.contest_id = ${contest.id}::uuid
-            )
+            ) or (n.kind = 'methodology' and n.entity_id = (
+              select c.district_area_id from contest c where c.id = ${contest.id}::uuid
+            ))
             order by array_position(array['caveat','context','methodology','editorial']::note_kind[], n.kind)
           `),
           db.execute<{
@@ -6818,7 +6821,7 @@ export const contests = {
         method: "GET",
         path: "/places/{k}/context",
         summary:
-          "Find the larger place that locates a place on a map: its state, or its country when the place is a state, with a simplified outline in map coordinates and the frame that fits it",
+          "List the larger places that locate a place on a map, smallest first: the counties, cities, and towns that contain it, up to its state (its country when the place is a state), each with a simplified outline in map coordinates and the frame that fits it",
       }),
     )
     .input(
@@ -6831,10 +6834,11 @@ export const contests = {
       }),
     )
     .output(
-      v.nullable(
+      v.array(
         v.object({
+          k: v.number(),
           name: v.string(),
-          area: v.nullable(v.object({ tiles: v.string(), k: v.number() })),
+          tiles: v.nullable(v.string()),
           outline: v.string(),
           extent: v.object({
             x: v.number(),
@@ -6856,6 +6860,7 @@ export const contests = {
         id: string;
         k: number;
         day: string;
+        size: number;
         outline: string;
         tiles: string | null;
         west: number;
@@ -6882,28 +6887,69 @@ export const contests = {
             order by upper(valid) desc nulls first limit 1
           ) g
         ),
-        chosen as (
-          select b.* from sized b join sized o on o.depth = 0
+        own as (select * from sized where depth = 0),
+        cap as (
+          select b.* from sized b cross join own o
           where b.depth > 0 and b.size >= o.size * 4
             and b.depth >= (select max(depth) from sized) - 1
           order by b.depth limit 1
         ),
+        around as (
+          select a.id, a.scheme_code as scheme, g.geom, g.valid,
+            (ST_XMax(g.geom) - ST_XMin(g.geom)) * (ST_YMax(g.geom) - ST_YMin(g.geom)) as size
+          from (
+            select distinct f.area_id from own o
+            join area_geometry f on f.geom ~ o.geom and f.area_id <> o.id
+          ) f
+          join area a on a.id = f.area_id
+          join scheme s on s.code = a.scheme_code
+          cross join own o
+          cross join cap
+          cross join lateral (
+            select geom, valid from area_geometry where area_id = a.id
+            order by valid @> coalesce(upper(o.valid) - 1, current_date) desc,
+              upper(valid) desc nulls first
+            limit 1
+          ) g
+          where s.kind = 'administrative' and s.polity_id is not null
+            and a.scheme_code not in ('us.school_district', 'us.special_district')
+            and a.id not in (select id from sized)
+            and g.geom ~ o.geom
+            and (ST_XMax(g.geom) - ST_XMin(g.geom)) * (ST_YMax(g.geom) - ST_YMin(g.geom))
+              between o.size * 3 and cap.size
+            and ST_Area(ST_Intersection(g.geom, o.geom)) >= ST_Area(o.geom) * 0.9
+        ),
+        chosen as (
+          select distinct on (c.id) c.* from (
+            select id, scheme, geom, valid, size from sized where depth > 0
+            union all
+            select id, scheme, geom, valid, size from around
+          ) c
+          cross join own o cross join cap
+          where c.size >= o.size * 3 and c.size <= cap.size
+          order by c.id
+        ),
         planed as (
-          select id, valid, ${plane("geom", "scheme")} as geom from chosen
+          select id, valid, size, ${plane("geom", "scheme")} as geom
+          from (
+            select id, valid, size, scheme,
+              ST_Simplify(geom, least(sqrt(size) / 500, 0.01), true) as geom
+            from chosen
+          ) c
         ),
         measured as (
-          select id, valid, geom,
-            (ST_XMax(geom) - ST_XMin(geom)) * (ST_YMax(geom) - ST_YMin(geom)) as size
+          select id, valid, size, geom,
+            (ST_XMax(geom) - ST_XMin(geom)) * (ST_YMax(geom) - ST_YMin(geom)) as extent
           from planed
         ),
         drawn as (
-          select id, coalesce(upper(valid) - 1, current_date) as day, ST_Scale((
-            select ST_Collect(d.geom) from ST_Dump(ST_SimplifyPreserveTopology(geom, sqrt(size) / 250)) d
-            where ST_Area(d.geom) >= size / 20000
+          select id, size, coalesce(upper(valid) - 1, current_date) as day, ST_Scale((
+            select ST_Collect(d.geom) from ST_Dump(ST_SimplifyPreserveTopology(geom, sqrt(extent) / 250)) d
+            where ST_Area(d.geom) >= extent / 20000
           ), 0.001, 0.001) as geom
           from measured
         )
-        select a.id, a.k, drawn.day::text, ST_AsSVG(drawn.geom, 1, 2) as outline,
+        select a.id, a.k, drawn.day::text, drawn.size, ST_AsSVG(drawn.geom, 1, 2) as outline,
           ST_XMin(drawn.geom) as west, ST_YMin(drawn.geom) as south,
           ST_XMax(drawn.geom) as east, ST_YMax(drawn.geom) as north,
           (
@@ -6913,29 +6959,42 @@ export const contests = {
           ) as tiles
         from drawn join area a on a.id = drawn.id where drawn.geom is not null
       `);
-      const row = found.rows[0];
-      if (row == null) {
-        return null;
+      const rungs: typeof found.rows = [];
+      for (const row of found.rows.toSorted((a, b) => b.size - a.size)) {
+        const last = rungs.at(-1);
+        if (last == null || row.size * 3 <= last.size) {
+          rungs.push(row);
+        }
       }
-      const [frame, labels] = await Promise.all([
-        framing(row.id, row.day),
-        names([row.id], row.day),
+      const [frames, labels] = await Promise.all([
+        Promise.all(rungs.map((row) => framing(row.id, row.day))),
+        names(
+          rungs.map((row) => row.id),
+          rungs[0]?.day ?? null,
+        ),
       ]);
-      const tiles = stored(row.tiles);
-      return frame == null
-        ? null
-        : {
-            name: labels.full.get(row.id) ?? "",
-            area: tiles == null ? null : { tiles, k: row.k },
-            outline: row.outline,
-            extent: {
-              x: row.west,
-              y: -row.north,
-              width: row.east - row.west,
-              height: row.north - row.south,
-            },
-            frame,
-          };
+      return rungs
+        .flatMap((row, index) => {
+          const frame = frames[index];
+          return frame == null
+            ? []
+            : [
+                {
+                  k: row.k,
+                  name: labels.full.get(row.id) ?? "",
+                  tiles: stored(row.tiles),
+                  outline: row.outline,
+                  extent: {
+                    x: row.west,
+                    y: -row.north,
+                    width: row.east - row.west,
+                    height: row.north - row.south,
+                  },
+                  frame,
+                },
+              ];
+        })
+        .toReversed();
     }),
   boundaries: os
     .meta(

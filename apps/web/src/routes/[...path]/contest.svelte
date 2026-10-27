@@ -1501,7 +1501,11 @@
           {m.places_others_note({ name: grouped.label })}
         </p>
       {/if}
-      {#if unmapped >= 0.01}
+      {#if placed.level === "world.country" && unmapped >= 0.01}
+        <p class="px-1 pbs-1 text-xs text-pretty text-muted-foreground">
+          {m.map_abroad_only({ percent: percent(1 - unmapped) })}
+        </p>
+      {:else if unmapped >= 0.01}
         <p class="px-1 pbs-1 text-xs text-pretty text-muted-foreground">
           {m.map_unmapped({ percent: percent(unmapped) })}
         </p>
