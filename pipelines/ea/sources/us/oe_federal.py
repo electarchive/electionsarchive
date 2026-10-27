@@ -87,7 +87,20 @@ def parse() -> None:
     )
     office = pl.col("office").str.to_lowercase()
     PARSED.mkdir(parents=True, exist_ok=True)
+    swapped = (
+        (pl.col("state") == "MS") & (pl.col("year") == 2016) & (pl.col("county") == "Perry") & (office == "u.s. house")
+    )
     frame.with_columns(
+        candidate=pl.when(swapped)
+        .then(
+            pl.col("candidate").replace(
+                {"Shawn O'Hara": "Richard Blake McCluskey", "Richard Blake McCluskey": "Shawn O'Hara"}
+            )
+        )
+        .otherwise("candidate"),
+        party=pl.when(swapped)
+        .then(pl.col("party").replace({"Reform": "Libertarian", "Libertarian": "Reform"}))
+        .otherwise("party"),
         chamber=pl.when(office.str.contains(r"^(u\.?s\.? )?president|^presidential electors|^electors for president"))
         .then(pl.lit("president"))
         .when(office.str.contains(openelections.SENATE.pattern) & ~office.str.contains(r"\bstate\b"))
