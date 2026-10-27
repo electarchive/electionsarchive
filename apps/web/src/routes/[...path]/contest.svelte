@@ -1401,9 +1401,7 @@
   {/if}
 </header>
 
-{#if rounds.length > 1}
-  <Rounds {rounds} />
-{/if}
+<Rounds {rounds} {cycle} />
 
 {#if contest.current == null && contest.declared != null}
   <section class="col-span-12 grid gap-2.5 bg-card px-3.5 py-4">
@@ -2051,27 +2049,9 @@
 {/if}
 
 <Cycle
-  primaries={cycle.primaries.map((step) => ({
-    ...step,
-    key: step.id,
-    label:
-      step.party == null
-        ? ""
-        : step.until == null
-          ? m.cycle_primary({ party: step.party.label })
-          : m.cycle_primaries({ party: step.party.label }),
-    color: step.party?.color ?? null,
-  }))}
-  general={cycle.primaries.length === 0 &&
-  rounds.some((round) => round.path === cycle.general?.path)
-    ? null
-    : cycle.general}
-  others={cycle.others.map((entry) => ({
-    key: entry.party.id,
-    label: entry.party.label,
-    color: entry.party.color,
-    races: entry.races.map((race) => ({ ...race, label: race.place })),
-  }))}
+  primaries={[]}
+  general={null}
+  others={[]}
   othersTitle={m.cycle_others()}
   day={{
     ...cycle.day,

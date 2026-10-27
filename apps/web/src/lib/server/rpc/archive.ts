@@ -39,6 +39,11 @@ export const latest = (set: string) =>
     `(${set}.is_default and ${set}.stage <> 'notional' and not exists (select from result_set later where later.contest_id = ${set}.contest_id and later.is_default and array_position(${ORDER}, later.stage) < array_position(${ORDER}, ${set}.stage)))`,
   );
 
+const serial = (contest: string, election: string) =>
+  sql.raw(
+    `case when ${contest}.kind = 'ballot_question' then ${contest}.id::text else concat_ws(':', ${contest}.office_id, ${contest}.body_id, ${contest}.kind, ${election}.kind, case when ${contest}.previous_round_id is null then 1 else 1 + (with recursive back(id, depth) as (select ${contest}.previous_round_id, 1 union all select p.previous_round_id, back.depth + 1 from back join contest p on p.id = back.id where back.depth < 8) select count(*) from back join contest bc on bc.id = back.id join election be on be.id = bc.election_id where be.kind = ${election}.kind) end, ${contest}.party_scope_id) end`,
+  );
+
 const MEASURES = new Map([
   [1, "votes"],
   [8, "list_votes"],
@@ -346,6 +351,7 @@ const Winner = v.object({
   person: v.nullable(v.string()),
   party: v.nullable(v.string()),
   color: v.nullable(v.string()),
+  share: v.nullable(v.number()),
 });
 
 const Step = v.object({
@@ -358,6 +364,7 @@ const Step = v.object({
   winners: v.array(Winner),
   runoff: v.nullable(
     v.object({
+      id: v.string(),
       path: v.nullable(v.string()),
       date: v.nullable(v.string()),
       isCurrent: v.boolean(),
@@ -686,8 +693,7 @@ async function find(id: string) {
       union all
       select c.id, c.allocation_parent_id from contest c join up on c.id = up.parent
     )
-    select c.id, c.kind::text as kind, case when r.kind = 'ballot_question' then r.id::text
-      else concat_ws(':', r.office_id, r.body_id, r.kind, r.round_number, r.party_scope_id) end as series,
+    select c.id, c.kind::text as kind, ${serial("r", "e")} as series,
       r.id as root, e.id as election, e.kind = 'indirect' as indirect,
       exists (select from body b where b.id = r.body_id and b.kind = 'electoral_college') as "isElectoral",
       e.polity_id as polity, e.date_from::text as date,
@@ -3581,12 +3587,13 @@ async function atlas(input: {
       select c.id, e.date_from::text as date
       from contest c
       join election e on e.id = c.election_id
+      join contest me on me.id = ${contest.root}::uuid
+        and c.office_id is not distinct from me.office_id and c.body_id is not distinct from me.body_id and c.kind = me.kind
       where c.allocation_parent_id is null and c.id <> ${contest.root}::uuid
         and e.polity_id = (select polity_id from election where id = ${contest.election}::uuid)
         and e.date_from < ${day}::date and e.status not in ('annulled', 'canceled')
         and (e.kind = 'indirect') = ${contest.indirect}
-        and case when c.kind = 'ballot_question' then c.id::text
-          else concat_ws(':', c.office_id, c.body_id, c.kind, c.round_number, c.party_scope_id) end = ${contest.series}
+        and ${serial("c", "e")} = ${contest.series}
       order by e.date_from desc
       limit 16
     `),
@@ -5683,8 +5690,7 @@ export const contests = {
           ) x
         ),
         roots as (
-          select c.id, case when c.kind = 'ballot_question' then c.id::text
-            else concat_ws(':', c.office_id, c.body_id, c.kind, c.round_number, c.party_scope_id) end as series,
+          select c.id, ${serial("c", "e")} as series,
             e.id as election, e.kind = 'indirect' as indirect, e.date_from, ${CYCLE} as year, e.status,
             c.term is not distinct from 'remainder' as "isRemainder", c.notional,
             c.district_area_id is not distinct from ${contest.place?.id ?? null}::uuid as own,
@@ -7048,7 +7054,25 @@ export const contests = {
           )
           .map(({ kind, body }) => ({ kind, body })),
         turnout: attended,
-        series,
+        series: series.map((entry) =>
+          entry.winner == null
+            ? entry
+            : {
+                ...entry,
+                winner: {
+                  ...entry.winner,
+                  color:
+                    grid?.legend.find((item) => item.key === entry.winner?.key)
+                      ?.color ?? entry.winner.color,
+                  seats: entry.winner.seats?.map((seat) => ({
+                    ...seat,
+                    color:
+                      grid?.legend.find((item) => item.key === seat.key)
+                        ?.color ?? seat.color,
+                  })),
+                },
+              },
+        ),
         places: grid,
         checks,
         count: steps,
@@ -7074,7 +7098,18 @@ export const contests = {
                   popular: counterpart?.indirect === false,
                 },
               },
-        chamber: seats,
+        chamber:
+          seats == null
+            ? null
+            : {
+                ...seats,
+                parties: seats.parties.map((party) => ({
+                  ...party,
+                  color:
+                    grid?.legend.find((item) => item.key === party.key)
+                      ?.color ?? party.color,
+                })),
+              },
         partners: pairs.rows.map((row) => [row.from, row.to]),
         target,
         comparison: {
@@ -7111,6 +7146,9 @@ export const contests = {
           const nominated = own.filter((entry) => entry.kind === "nominated");
           return {
             ...row,
+            color:
+              grid?.legend.find((item) => item.key === row.key)?.color ??
+              row.color,
             current:
               row.current?.seats == null ||
               row.current.person == null ||
@@ -7949,8 +7987,11 @@ export const contests = {
                           },
                         ],
                   )
-                  .toSorted((a, b) => b.votes - a.votes)
-                  .slice(0, 3);
+                  .filter((entry) => entry.share > 0)
+                  .toSorted((a, b) => b.votes - a.votes);
+          const moved = leaders.filter((entry) =>
+            ["advanced", "won", "elected"].includes(entry.outcome ?? ""),
+          );
           return {
             id: row.id,
             path:
@@ -7964,7 +8005,7 @@ export const contests = {
             kind: row.kind,
             date: row.date,
             isCurrent: row.id === input.id,
-            leaders,
+            leaders: moved.length > 3 ? moved : leaders.slice(0, 3),
           };
         }),
       );
@@ -8382,15 +8423,41 @@ export const contests = {
         party: string | null;
         label: string | null;
         isTop: boolean;
+        share: number | null;
       }>(sql`
-        select x.contest, cy.person_id as person, o.party_id as party, coalesce(cy.ballot_name, o.ballot_label) as label,
-          oc.seats is null or oc.seats = max(oc.seats) over (partition by x.contest) as "isTop"
+        select x.contest, cy.person_id as person,
+          coalesce(o.party_id, (
+            select l.party_id from contest_option l
+            where l.parent_option_id = o.id and l.party_id is not null
+            order by l.ballot_position nulls last, l.k limit 1
+          )) as party,
+          coalesce(cy.ballot_name, o.ballot_label) as label,
+          oc.seats is null or oc.seats = max(oc.seats) over (partition by x.contest) as "isTop",
+          (
+            select (sum(r.value) filter (where r.option_k = o.k))::float8 / nullif(sum(r.value), 0)::float8
+            from result_rollup r
+            where r.result_set_k = rs.k and r.area_k = spot.k and r.option_k <> 0
+              and r.measure = (
+                select y.measure from result_rollup y
+                where y.result_set_k = rs.k and y.area_k = spot.k and y.measure = any(${COUNTED})
+                order by array_position(${COUNTED}, y.measure) limit 1
+              )
+              and r.count_round = (
+                select max(y.count_round) from result_rollup y where y.result_set_k = rs.k and y.area_k = spot.k
+              )
+          ) as share
         from unnest(${sql.param(decided)}::uuid[]) as x(contest)
         cross join lateral (
-          select rs.id from result_set rs where rs.contest_id = x.contest
+          select rs.id, rs.k from result_set rs where rs.contest_id = x.contest
           order by rs.is_default desc, array_position(${STAGES}, rs.stage)
           limit 1
         ) rs
+        cross join lateral (
+          select a.k from contest c join election e on e.id = c.election_id
+          left join polity_territory pt on pt.polity_id = e.polity_id and pt.valid @> e.date_from
+          join area a on a.id = coalesce(c.district_area_id, pt.area_id)
+          where c.id = x.contest limit 1
+        ) spot
         join outcome oc on oc.result_set_id = rs.id and oc.candidacy_id is null and oc.kind in ('won', 'elected')
           and not exists (select from outcome d where d.result_set_id = rs.id and d.option_id = oc.option_id and d.kind = 'declined')
         join contest_option o on o.id = oc.option_id
@@ -8493,6 +8560,7 @@ export const contests = {
             person: row.person,
             party: row.party,
             color: colors.get(row.party ?? "")?.color ?? null,
+            share: row.share,
           }));
       const step = (row: (typeof stepped.rows)[number]) => {
         const local = located.get(row.id);
@@ -8508,6 +8576,7 @@ export const contests = {
             row.runoff == null
               ? null
               : {
+                  id: row.runoff,
                   path: slugs.get(row.runoff) ?? null,
                   date: row.runoffDate,
                   isCurrent: row.runoff === contest.id,
@@ -12227,6 +12296,7 @@ export const elections = {
                 person: entry.person,
                 party: entry.party,
                 color: party(entry.party)?.color ?? null,
+                share: null,
               })),
           }))
           .toSorted(
