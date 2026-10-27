@@ -1,6 +1,7 @@
 import json
 import re
 import subprocess
+from difflib import SequenceMatcher
 from datetime import date, datetime, timedelta
 from pathlib import Path
 from urllib.parse import quote, unquote
@@ -312,10 +313,18 @@ def classify(office_text: str, county: str | None) -> dict[str, str | int | None
     return None
 
 
-def emit() -> Path:
-    entries = pl.read_parquet(PARSED / "entries.parquet")
-    totals = pl.read_parquet(PARSED / "totals.parquet")
-    ballots = pl.read_parquet(PARSED / "ballots.parquet")
+def emit(
+    pipeline: str = SOURCE,
+    parsed: Path = PARSED,
+    version: str = VERSION,
+    summary: str = "New York City's 2005-2013 city and county offices by assembly district from the Board of Elections' certified recaps",
+    note: str = NOTE,
+    strict: bool = False,
+    questions: bool = True,
+) -> Path:
+    entries = pl.read_parquet(parsed / "entries.parquet")
+    totals = pl.read_parquet(parsed / "totals.parquet")
+    ballots = pl.read_parquet(parsed / "ballots.parquet")
     keys = []
     for office, county in entries.select("office", "county").unique().iter_rows():
         found = classify(office, county)
@@ -344,9 +353,9 @@ def emit() -> Path:
     with connect() as conn:
         cs = Changeset(
             conn,
-            pipeline=SOURCE,
-            version=VERSION,
-            summary="New York City's 2005-2013 city and county offices by assembly district from the Board of Elections' certified recaps",
+            pipeline=pipeline,
+            version=version,
+            summary=summary,
             polity="US-NY",
         )
 
@@ -621,7 +630,7 @@ def emit() -> Path:
                    where c.election_id = %s and c.office_id is not distinct from %s and c.body_id is not distinct from %s
                    and c.district_area_id is not distinct from %s and c.party_scope_id is not distinct from %s
                    and c.changeset_id not in (select id from changeset where pipeline = %s)""",
-                [election, office, body_id, area, party, SOURCE],
+                [election, office, body_id, area, party, pipeline],
             ).fetchall()
             if len(found) > 1:
                 skipped.append(f"{label}: several contests match")
@@ -702,14 +711,59 @@ def emit() -> Path:
                 )
                 name(contest, f"{day.year} {scope.title() + ' primary for ' if scope else ''}{title}{'' if scope else ' election'}")
                 cs.add("slug", path=f"{election_path}/{seat_path}", entity_id=contest)
+            real = rows.filter(pl.col("party").is_null() | (pl.col("party") != "WRITE-IN")).with_columns(
+                pl.col("name").str.replace_all(r"\s+", " ").alias("name")
+            )
+            ranked = real.group_by("name").agg(pl.col("votes").sum()).sort("votes", "name", descending=[True, False])
+            margin = magnitude > 0 and ranked.height > magnitude and ranked["votes"][magnitude - 1] == ranked["votes"][magnitude]
+            roots: dict[str, UUID] = {}
+            tickets: dict[tuple[str, str | None], UUID] = {}
+            known: dict[tuple[str, str], UUID] = {}
+            clash: set[tuple[str, str]] = set()
+            if attach:
+                for option_id, ballot_name in conn.execute(
+                    """select o.id, ca.ballot_name from contest_option o join candidacy ca on ca.option_id = o.id and ca.role = 'head'
+                       where o.contest_id = %s and o.parent_option_id is null and o.kind in ('candidate', 'ticket')""",
+                    [contest],
+                ).fetchall():
+                    words = [w for w in re.sub(r"[^a-z ]", " ", ballot_name.lower().split("/")[0]).split() if w not in ("jr", "sr", "ii", "iii")]
+                    for token in {(words[0], words[-1]), (words[0][0], words[-1])}:
+                        if token in known:
+                            clash.add(token)
+                        known[token] = option_id
+
+            def lookup(candidate: str) -> UUID | None:
+                words = [w for w in re.sub(r"[^a-z ]", " ", candidate.lower().split("/")[0]).split() if w not in ("jr", "sr", "ii", "iii")]
+                if len(words) < 2:
+                    return None
+                rest = "".join(words[1:])
+                for token in ((words[0], words[-1]), (words[0][0], words[-1]), (words[0], rest), (words[0][0], rest)):
+                    if token in known and token not in clash:
+                        return known[token]
+                found = {option for (first, last), option in known.items() if words[-1] in (first, last) or rest == last}
+                if len(found) == 1:
+                    return found.pop()
+                close = [
+                    (SequenceMatcher(None, f"{words[0]} {rest}", f"{first} {last}").ratio(), option)
+                    for (first, last), option in known.items()
+                    if len(first) > 1 and first[0] == words[0][0]
+                ]
+                close = sorted(close, key=lambda t: -t[0])
+                if close and close[0][0] >= 0.88 and (len(close) == 1 or close[1][0] < 0.8):
+                    return close[0][1]
+                return None
+
+            if attach and strict and (unmatched := [c for c in ranked["name"] if lookup(c.title()) is None]):
+                skipped.append(f"{label}: {unmatched} do not match the contest's options {sorted(known)}")
+                continue
             source_title = f"{TITLE}, {kind} {day}"
             source = cs.source(PUBLISHER, source_title)
             if source in cs.minted and source not in added:
                 added.add(source)
-                cs.add("source", id=source, kind="official_body", publisher=PUBLISHER, title=source_title, url=next(iter(urls.values())), license="Public record")
+                cs.add("source", id=source, kind="official_body", publisher=PUBLISHER, title=source_title, url=next(iter(urls.values())).partition("#")[0], license="Public record")
             for url in urls.values():
-                cs.artifact(raw.cached(SOURCE, url), source)
-            result_set = cs.key(f"{SOURCE}.result_set", contest_key)
+                cs.artifact(raw.cached(pipeline, url.partition("#")[0]), source)
+            result_set = cs.key(f"{pipeline}.result_set", contest_key)
             declared = {}
             if attach and whole:
                 columns = ("id", "election_id", "contest_id", "stage", "kind", "status", "source_id", "as_of", "completeness", "supersedes_id")
@@ -736,33 +790,13 @@ def emit() -> Path:
                 is_default=whole,
                 completeness=None if is_state and not whole else completeness,
             )
-            cs.add("note", entity_id=result_set, kind="methodology", body_md=NOTE + (NOTE_STATE if not whole else ""))
-            real = rows.filter(pl.col("party").is_null() | (pl.col("party") != "WRITE-IN")).with_columns(
-                pl.col("name").str.replace_all(r"\s+", " ").alias("name")
-            )
-            ranked = real.group_by("name").agg(pl.col("votes").sum()).sort("votes", "name", descending=[True, False])
-            margin = magnitude > 0 and ranked.height > magnitude and ranked["votes"][magnitude - 1] == ranked["votes"][magnitude]
-            roots: dict[str, UUID] = {}
-            tickets: dict[tuple[str, str | None], UUID] = {}
-            known: dict[tuple[str, str], UUID] = {}
-            clash: set[tuple[str, str]] = set()
-            if attach:
-                for option_id, ballot_name in conn.execute(
-                    """select o.id, ca.ballot_name from contest_option o join candidacy ca on ca.option_id = o.id and ca.role = 'head'
-                       where o.contest_id = %s and o.parent_option_id is null and o.kind in ('candidate', 'ticket')""",
-                    [contest],
-                ).fetchall():
-                    words = [w for w in re.sub(r"[^a-z ]", " ", ballot_name.lower().split("/")[0]).split() if w not in ("jr", "sr", "ii", "iii")]
-                    token = (words[0], words[-1])
-                    if token in known:
-                        clash.add(token)
-                    known[token] = option_id
+            cs.add("note", entity_id=result_set, kind="methodology", body_md=note + (NOTE_STATE if not whole else ""))
             for rank, candidate in enumerate(ranked["name"]):
                 label_text = candidate.title()
                 root_key = f"{contest_key}:{slug(candidate)}"
                 words = [w for w in re.sub(r"[^a-z ]", " ", label_text.lower().split("/")[0]).split() if w not in ("jr", "sr", "ii", "iii")]
-                if attach and len(words) >= 2 and (words[0], words[-1]) in known and (words[0], words[-1]) not in clash:
-                    roots[candidate] = known[(words[0], words[-1])]
+                if attach and (existing := lookup(label_text)) is not None:
+                    roots[candidate] = existing
                     if whole:
                         cs.add("outcome", result_set_id=result_set, option_id=roots[candidate], kind=declared.get(roots[candidate], "lost"))
                     continue
@@ -776,7 +810,7 @@ def emit() -> Path:
                 if matched is not None and len(matched) == 1:
                     person = matched[0]
                 else:
-                    person = cs.key(f"{SOURCE}.person", f"NY:{slug(label_text)}")
+                    person = cs.key(f"{pipeline}.person", f"NY:{slug(label_text)}")
                     if person in cs.minted and person not in made:
                         made.add(person)
                         cs.add("person", id=person)
@@ -856,7 +890,7 @@ def emit() -> Path:
                     got = rows.filter((pl.col("county") == county) & (pl.col("bid") == bid))["votes"].sum()
                     values.append((str(result_set), str(unit), None, 4, int(got)))
             taken += 1
-        for day_text, marker, qslug, qtitle, wording_url, wording_title, wording in QUESTIONS:
+        for day_text, marker, qslug, qtitle, wording_url, wording_title, wording in QUESTIONS if questions else ():
             day = date.fromisoformat(day_text)
             era = "2002" if day_text < "2012-01-01" else "2012"
             qrows = entries.filter(
@@ -909,15 +943,15 @@ def emit() -> Path:
             source = cs.source(PUBLISHER, source_title)
             if source in cs.minted and source not in added:
                 added.add(source)
-                cs.add("source", id=source, kind="official_body", publisher=PUBLISHER, title=source_title, url=next(iter(urls.values())), license="Public record")
+                cs.add("source", id=source, kind="official_body", publisher=PUBLISHER, title=source_title, url=next(iter(urls.values())).partition("#")[0], license="Public record")
             for url in urls.values():
-                cs.artifact(raw.cached(SOURCE, url), source)
+                cs.artifact(raw.cached(pipeline, url.partition("#")[0]), source)
             text_source = cs.source("New York City Charter Revision Commission", wording_title)
             if text_source in cs.minted and text_source not in added:
                 added.add(text_source)
                 cs.add("source", id=text_source, kind="official_body", publisher="New York City Charter Revision Commission", title=wording_title, url=wording_url, license="Public record")
             cs.add("ballot_question_text", contest_id=contest, kind="text", lang="en", body=wording, url=wording_url, source_id=text_source)
-            result_set = cs.key(f"{SOURCE}.result_set", contest_key)
+            result_set = cs.key(f"{pipeline}.result_set", contest_key)
             cs.add(
                 "result_set",
                 id=result_set,
