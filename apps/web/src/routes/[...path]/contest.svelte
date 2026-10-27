@@ -37,6 +37,7 @@
   import Cycle from "./cycle.svelte";
   import ElectionRow from "./election-row.svelte";
   import Electors from "./electors.svelte";
+  import Lead from "./lead.svelte";
   import Lists from "./lists.svelte";
   import PlaceMap from "./map.svelte";
   import Members from "./members.svelte";
@@ -1488,145 +1489,124 @@
       {m.map_rebuilding()}
     </p>
   {/if}
-  <div class="col-span-12 grid grid-cols-12 gap-px bg-border min-inline-0">
-    {#if (drawn != null && placed != null) || locating != null}
-      <div
-        class={cn("col-span-12 grid gap-px bg-border min-inline-0", {
-          "lg:col-span-4": chamber != null,
-          "lg:col-span-5 xl:col-span-4": chamber == null,
-          "grid-rows-[auto_1fr]": leaning.data == null,
-          "grid-rows-[auto_auto_1fr]": leaning.data != null,
-        })}
-      >
-        {@render stats(true)}
-        {@render standing(true)}
-        <div
-          class="@container grid content-start gap-1 bg-card px-1.5 pbs-2 pbe-2.5"
-        >
-          {@render results()}
-        </div>
-      </div>
-      <div
-        class={cn("col-span-12 bg-card px-3.5 pbs-3 pbe-3.5 min-inline-0", {
-          "lg:col-span-8 lg:row-span-2": chamber != null,
-          "lg:col-span-7 xl:col-span-8": chamber == null,
-        })}
-      >
-        <div class="lg:sticky lg:inset-bs-3">
-          {#if drawn != null && placed != null}
-            {#key `${here}:${drawn.tiles}`}
-              <PlaceMap
-                places={placed}
-                colors={tones}
-                shade={titles.length === 1 ? "bubbles" : "winner"}
-                tiles={drawn.tiles}
-                own={drawn.own}
-                nested={drawn.nested}
-                frame={drawn.frame}
-                blank={drawn.blank}
-                isApproximate={drawn.isApproximate}
-                noun={drawn.noun}
-                sources={drawn.sources}
-                explore={here}
-                neighbors={around}
-                up={upward}
-                votes={placed.isOpening === true
-                  ? m.stv_first()
-                  : (counted ?? m.col_votes())}
-                names={titles}
-                {levels}
-                {span}
-                isLinked
-                bind:only={
-                  () => only,
-                  (value: number | string | null) =>
-                    (filter = { at: page.url.href, value })
-                }
-                bind:focus
-              />
-            {/key}
-            {#if grouped != null && placed.rows.some( (row) => placed.legend[row.leader ?? -1]?.key.startsWith("kind:others") )}
-              <p class="px-1 pbs-1 text-xs text-pretty text-muted-foreground">
-                {m.places_others_note({ name: grouped.label })}
-              </p>
-            {/if}
-            {#if placed.level === "world.country" && unmapped >= 0.01}
-              <p class="px-1 pbs-1 text-xs text-pretty text-muted-foreground">
-                {m.map_abroad_only({ percent: percent(1 - unmapped) })}
-              </p>
-            {:else if unmapped >= 0.01}
-              <p class="px-1 pbs-1 text-xs text-pretty text-muted-foreground">
-                {m.map_unmapped({ percent: percent(unmapped) })}
-              </p>
-            {/if}
-            {#if placed.isOpening === true}
-              <p class="px-1 pbs-1 text-xs text-pretty text-muted-foreground">
-                {m.places_opening()}
-              </p>
-            {/if}
-          {:else if locating != null}
-            {#key here}
-              <PlaceMap
-                places={locating.places}
-                colors={locating.colors}
-                tiles={locating.tiles}
-                own={locating.own}
-                frame={locating.frame}
-                limit={locating.limit}
-                isApproximate={locating.isApproximate}
-                noun={locating.noun}
-                sources={locating.sources}
-                explore={upward?.path ?? null}
-                up={upward}
-                votes={m.col_votes()}
-                names={locating.names}
-                levels={[]}
-                span={null}
-                isLinked
-              />
-            {/key}
-            {#if locating.places.context != null}
-              {const context = $derived(locating.places.context)}
-              <p class="pbs-2 text-xs text-muted-foreground">
-                {#if context.path == null}
-                  {m.locator_context({ date: date(context.date) })}
-                {:else}
-                  <a
-                    href={resolve("/[...path]", { path: context.path })}
-                    class="underline decoration-border underline-offset-4 hover:decoration-foreground"
-                    >{m.locator_context({ date: date(context.date) })}</a
-                  >
-                {/if}
-              </p>
-            {/if}
+  {const isMapped = $derived(
+    (drawn != null && placed != null) || locating != null,
+  )}
+  {#snippet summary()}
+    {@render stats(isMapped)}
+    {@render standing(isMapped)}
+    <div
+      class="@container grid content-start gap-1 bg-card px-1.5 pbs-2 pbe-2.5"
+    >
+      {@render results()}
+    </div>
+  {/snippet}
+  {#snippet mapped()}
+    {#if drawn != null && placed != null}
+      {#key `${here}:${drawn.tiles}`}
+        <PlaceMap
+          places={placed}
+          colors={tones}
+          shade={titles.length === 1 ? "bubbles" : "winner"}
+          tiles={drawn.tiles}
+          own={drawn.own}
+          nested={drawn.nested}
+          frame={drawn.frame}
+          blank={drawn.blank}
+          isApproximate={drawn.isApproximate}
+          noun={drawn.noun}
+          sources={drawn.sources}
+          explore={here}
+          neighbors={around}
+          up={upward}
+          votes={placed.isOpening === true
+            ? m.stv_first()
+            : (counted ?? m.col_votes())}
+          names={titles}
+          {levels}
+          {span}
+          isLinked
+          bind:only={
+            () => only,
+            (value: number | string | null) =>
+              (filter = { at: page.url.href, value })
+          }
+          bind:focus
+        />
+      {/key}
+      {#if grouped != null && placed.rows.some( (row) => placed.legend[row.leader ?? -1]?.key.startsWith("kind:others") )}
+        <p class="px-1 pbs-1 text-xs text-pretty text-muted-foreground">
+          {m.places_others_note({ name: grouped.label })}
+        </p>
+      {/if}
+      {#if placed.level === "world.country" && unmapped >= 0.01}
+        <p class="px-1 pbs-1 text-xs text-pretty text-muted-foreground">
+          {m.map_abroad_only({ percent: percent(1 - unmapped) })}
+        </p>
+      {:else if unmapped >= 0.01}
+        <p class="px-1 pbs-1 text-xs text-pretty text-muted-foreground">
+          {m.map_unmapped({ percent: percent(unmapped) })}
+        </p>
+      {/if}
+      {#if placed.isOpening === true}
+        <p class="px-1 pbs-1 text-xs text-pretty text-muted-foreground">
+          {m.places_opening()}
+        </p>
+      {/if}
+    {:else if locating != null}
+      {#key here}
+        <PlaceMap
+          places={locating.places}
+          colors={locating.colors}
+          tiles={locating.tiles}
+          own={locating.own}
+          frame={locating.frame}
+          limit={locating.limit}
+          isApproximate={locating.isApproximate}
+          noun={locating.noun}
+          sources={locating.sources}
+          explore={upward?.path ?? null}
+          up={upward}
+          votes={m.col_votes()}
+          names={locating.names}
+          levels={[]}
+          span={null}
+          isLinked
+        />
+      {/key}
+      {#if locating.places.context != null}
+        {const context = $derived(locating.places.context)}
+        <p class="pbs-2 text-xs text-muted-foreground">
+          {#if context.path == null}
+            {m.locator_context({ date: date(context.date) })}
+          {:else}
+            <a
+              href={resolve("/[...path]", { path: context.path })}
+              class="underline decoration-border underline-offset-4 hover:decoration-foreground"
+              >{m.locator_context({ date: date(context.date) })}</a
+            >
           {/if}
-        </div>
-      </div>
-    {:else}
-      {@render stats(false)}
-      {@render standing(false)}
-      <div
-        class={cn(
-          "@container col-span-12 grid content-start gap-1 bg-card px-1.5 pbs-2 pbe-2.5",
-          { "lg:col-span-8": chamber != null },
-        )}
-      >
-        {@render results()}
-      </div>
+        </p>
+      {/if}
     {/if}
-    {#if chamber != null}
-      <Seats
-        isLinked
-        parties={chamber.parties}
-        places={chamber.places}
-        here={chamber.here}
-        place={seatsPlace}
-        link={chamber.link}
-        size={chamber.size}
-        {change}
-      />
-    {/if}
-  </div>
+  {/snippet}
+  {#snippet hemicycle()}
+    <Seats
+      isLinked
+      parties={chamber?.parties ?? []}
+      places={chamber?.places ?? []}
+      here={chamber?.here ?? null}
+      place={seatsPlace}
+      link={chamber?.link ?? null}
+      size={chamber?.size ?? null}
+      {change}
+    />
+  {/snippet}
+  <Lead
+    results={summary}
+    map={isMapped ? mapped : null}
+    aside={chamber == null ? null : hemicycle}
+  />
   {#if drawn != null && placed != null}
     {#if keyed.length > 0}
       <section

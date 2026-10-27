@@ -1152,17 +1152,15 @@
                   {m.workbench_coalition_none()}
                 </p>
               {:else}
-                <div class="grid grid-cols-[minmax(0,1fr)] *:col-span-full!">
-                  <Seats
-                    parties={current.chamber.parties}
-                    places={current.chamber.places}
-                    here={current.chamber.here}
-                    place={current.scope.name}
-                    link={current.chamber.link}
-                    size={current.chamber.size}
-                    {change}
-                  />
-                </div>
+                <Seats
+                  parties={current.chamber.parties}
+                  places={current.chamber.places}
+                  here={current.chamber.here}
+                  place={current.scope.name}
+                  link={current.chamber.link}
+                  size={current.chamber.size}
+                  {change}
+                />
               {/if}
             {:else if panel.kind === "scatter"}
               <Scatter

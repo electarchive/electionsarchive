@@ -516,7 +516,7 @@
 </script>
 
 <section
-  class="relative col-span-12 grid grid-cols-[minmax(0,1fr)] content-start gap-3 bg-card p-3.5 lg:col-span-4"
+  class="relative grid grid-cols-[minmax(0,1fr)] content-start gap-3 bg-card p-3.5 min-inline-0"
   aria-labelledby="{uid}-title"
   data-export
 >

@@ -33,6 +33,7 @@
   import Councils from "./councils.svelte";
   import Counties from "./counties.svelte";
   import Governments from "./governments.svelte";
+  import Lead from "./lead.svelte";
   import Local from "./local.svelte";
   import PlaceMap from "./map.svelte";
   import Places from "./places.svelte";
@@ -1300,11 +1301,11 @@
     {@render board()}
   {/if}
   {#if index === 0 && !isBallot && race.results.length > 0 && (race.wards ?? []).length === 0 && (others.length > 0 || race.balance.parts.some((part) => part.value > 0))}
-    <section
-      id="race-{race.anchor}"
-      class="col-span-12 grid scroll-mbs-4 gap-x-10 gap-y-3 bg-card px-3.5 pbs-4 pbe-3 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)]"
-    >
-      <div class="grid content-start gap-1.5">
+    {#snippet headline()}
+      <div
+        id="race-{race.anchor}"
+        class="grid scroll-mbs-4 content-start gap-1.5 bg-card px-3.5 pbs-4 pbe-3"
+      >
         <h2
           class="text-[clamp(1.5rem,2.4vw,2rem)]/tight font-[760] tracking-[-0.015em] text-balance"
         >
@@ -1315,8 +1316,11 @@
         {/if}
         {@render meta(race)}
       </div>
+    {/snippet}
+    {#snippet totals()}
       {@render tally(race, true)}
-    </section>
+    {/snippet}
+    <Lead results={headline} map={totals} />
   {:else if index === 0 || race.results.length !== 1}
     <section
       id="race-{race.anchor}"
@@ -1413,16 +1417,8 @@
         race.places != null &&
         (index < 4 || race.body != null),
     )}
-    {#if isMapped && race.map != null && race.places != null}
-      <div
-        class={cn(
-          "col-span-12 self-stretch bg-card px-3.5 pbs-3 pbe-3.5 min-inline-0",
-          {
-            "lg:col-span-8": isSeated,
-            "lg:col-span-7 xl:col-span-8": !isSeated,
-          },
-        )}
-      >
+    {#snippet mapped()}
+      {#if race.map != null && race.places != null}
         {const option = $derived(regionals[index]?.data ?? null)}
         {const region = $derived(regional[index] === true ? option : null)}
         {const swing = $derived(swings[index]?.data ?? null)}
@@ -1433,167 +1429,117 @@
           region?.places ?? swing?.places ?? final?.places ?? race.places,
         )}
         {const shape = $derived(region?.map ?? race.map)}
-        <div class="grid gap-2 lg:sticky lg:inset-bs-3">
-          {#if race.decided != null && region == null}
-            <div
-              class="flex self-start"
-              role="group"
-              aria-label={m.map_round_label()}
-            >
-              {#each [false, true] as isFirst (isFirst)}
-                <button
-                  type="button"
-                  class={cn(
-                    "-ms-px flex items-center border border-input bg-card px-2.5 text-[0.8125rem] font-semibold whitespace-nowrap keycap block-7 first:ms-0 first:rounded-s-sm last:rounded-e-sm hover:bg-secondary pointer-coarse:block-10",
-                    {
-                      "relative z-10 bg-primary text-primary-foreground hover:bg-primary":
-                        (firstRound[index] === true) === isFirst,
-                    },
+        {#if race.decided != null && region == null}
+          <div
+            class="flex self-start"
+            role="group"
+            aria-label={m.map_round_label()}
+          >
+            {#each [false, true] as isFirst (isFirst)}
+              <button
+                type="button"
+                class={cn(
+                  "-ms-px flex items-center border border-input bg-card px-2.5 text-[0.8125rem] font-semibold whitespace-nowrap keycap block-7 first:ms-0 first:rounded-s-sm last:rounded-e-sm hover:bg-secondary pointer-coarse:block-10",
+                  {
+                    "relative z-10 bg-primary text-primary-foreground hover:bg-primary":
+                      (firstRound[index] === true) === isFirst,
+                  },
+                )}
+                aria-pressed={(firstRound[index] === true) === isFirst}
+                onclick={() => (firstRound[index] = isFirst)}
+                >{isFirst ? m.round_first() : m.map_round_seats()}</button
+              >
+            {/each}
+          </div>
+        {/if}
+        {#if shape.tiles != null}
+          {#key places.level}
+            <PlaceMap
+              {places}
+              colors={swing == null && region == null
+                ? (final?.tones ?? race.tones)
+                : places.legend.map((item) => swatch(item.color, item.key))}
+              tiles={shape.tiles}
+              hexes={hexes.data ?? null}
+              own={shape.own}
+              nested={shape.nested}
+              frame={shape.frame}
+              blank={shape.blank ?? null}
+              isApproximate={shape.isApproximate}
+              sources={shape.credits}
+              noun={places.levels[0]?.noun ?? ""}
+              tallies={race.electors == null ||
+              region != null ||
+              places.level !== race.places.level
+                ? null
+                : places.legend.map(
+                    (item) =>
+                      race.electors?.rows.find((row) => row.key === item.key)
+                        ?.votes ?? null,
                   )}
-                  aria-pressed={(firstRound[index] === true) === isFirst}
-                  onclick={() => (firstRound[index] = isFirst)}
-                  >{isFirst ? m.round_first() : m.map_round_seats()}</button
-                >
-              {/each}
-            </div>
-          {/if}
-          {#if shape.tiles != null}
-            {#key places.level}
-              <PlaceMap
-                {places}
-                colors={swing == null && region == null
-                  ? (final?.tones ?? race.tones)
-                  : places.legend.map((item) => swatch(item.color, item.key))}
-                tiles={shape.tiles}
-                hexes={hexes.data ?? null}
-                own={shape.own}
-                nested={shape.nested}
-                frame={shape.frame}
-                blank={shape.blank ?? null}
-                isApproximate={shape.isApproximate}
-                sources={shape.credits}
-                noun={places.levels[0]?.noun ?? ""}
-                tallies={race.electors == null ||
-                region != null ||
-                places.level !== race.places.level
-                  ? null
-                  : places.legend.map(
-                      (item) =>
-                        race.electors?.rows.find((row) => row.key === item.key)
-                          ?.votes ?? null,
-                    )}
-                votes={final == null ? race.votes : m.col_votes()}
-                names={swing == null && region == null
-                  ? (final?.titles ?? race.titles)
-                  : places.legend.map((item) =>
-                      item.person == null
-                        ? (item.short ?? item.label)
-                        : item.label,
-                    )}
-                levels={option?.map == null
-                  ? []
-                  : [race.places, option.places].map((entry) => {
-                      const noun = entry.levels[0]?.noun ?? "";
-                      return {
-                        code: entry.level,
-                        label: noun.charAt(0).toUpperCase() + noun.slice(1),
-                        count: entry.rows.length,
-                        path: "",
-                        query: "",
-                        isCurrent: entry.level === places.level,
-                      };
-                    })}
-                pick={(code) =>
-                  (regional[index] = code === option?.places.level)}
-                span={swing?.span ??
-                  (region?.since != null
+              votes={final == null ? race.votes : m.col_votes()}
+              names={swing == null && region == null
+                ? (final?.titles ?? race.titles)
+                : places.legend.map((item) =>
+                    item.person == null
+                      ? (item.short ?? item.label)
+                      : item.label,
+                  )}
+              levels={option?.map == null
+                ? []
+                : [race.places, option.places].map((entry) => {
+                    const noun = entry.levels[0]?.noun ?? "";
+                    return {
+                      code: entry.level,
+                      label: noun.charAt(0).toUpperCase() + noun.slice(1),
+                      count: entry.rows.length,
+                      path: "",
+                      query: "",
+                      isCurrent: entry.level === places.level,
+                    };
+                  })}
+              pick={(code) => (regional[index] = code === option?.places.level)}
+              span={swing?.span ??
+                (region?.since != null
+                  ? {
+                      from: region.since,
+                      to: election.date?.slice(0, 4) ?? "",
+                      forward: false,
+                    }
+                  : race.count > 1 &&
+                      race.since != null &&
+                      race.places.rows.some((row) => row.prior != null)
                     ? {
-                        from: region.since,
+                        from: race.since,
                         to: election.date?.slice(0, 4) ?? "",
                         forward: false,
                       }
-                    : race.count > 1 &&
-                        race.since != null &&
-                        race.places.rows.some((row) => row.prior != null)
-                      ? {
-                          from: race.since,
-                          to: election.date?.slice(0, 4) ?? "",
-                          forward: false,
-                        }
-                      : null)}
-              />
-            {/key}
-          {:else}
-            <p
-              class="grid place-items-center border border-dashed border-border px-4 text-center text-sm text-pretty text-muted-foreground block-[min(24rem,50svh)]"
-            >
-              {m.map_rebuilding()}
-            </p>
-          {/if}
-          {const districts = $derived(
-            new Set(places.rows.map((row) => row.k)).size,
-          )}
-          {#if shape.shaped != null && shape.shaped < districts}
-            <p class="px-1 pbs-1 text-xs text-pretty text-muted-foreground">
-              {m.map_shaped({
-                shaped: count(shape.shaped),
-                count: count(districts),
-              })}
-            </p>
-          {/if}
-        </div>
-      </div>
-    {/if}
-    {#if isSeated}
-      <Seated
-        parties={race.seated}
-        places={race.holders}
-        body={race.body}
-        size={race.isTier || scope != null ? null : race.size}
-        date={election.date}
-        place={race.name}
-        region={election.parent == null
-          ? null
-          : (election.breadcrumbs
-              .filter((crumb) => crumb.path !== election.parent?.path)
-              .at(-1)?.name ?? null)}
-        change={race.change}
-        isComplete={scope == null &&
-          !race.isTier &&
-          (race.size != null || race.count === 1)}
-        partners={race.isTier ? [] : race.partners}
-        governing={race.size === chamber?.size ? governing : []}
-        isStaggered={race.isStaggered}
-      />
-    {/if}
-    {#if race.isNotional === true && race.change != null && race.since != null}
-      <p class="col-span-12 bg-card px-3.5 py-2 text-xs text-muted-foreground">
-        {m.seats_change_notional({ year: race.since })}
-      </p>
-    {/if}
-    {#if race.resized != null && race.change != null && race.since != null && race.size != null}
-      <p class="col-span-12 bg-card px-3.5 py-2 text-xs text-muted-foreground">
-        {m.seats_change_resized({
-          year: race.since,
-          before: count(race.resized),
-          now: count(race.size),
-        })}
-      </p>
-    {/if}
-    {#if (race.straddled ?? 0) > 0}
-      <p class="col-span-12 bg-card px-3.5 py-2 text-xs text-muted-foreground">
-        {m.seats_change_straddled()}
-      </p>
-    {/if}
-    {#if !race.isPrimaries}
-      <div
-        class={cn(
-          "@container col-span-12 grid content-start gap-1 bg-card px-1.5 pbs-2 pbe-2.5",
-          {
-            "lg:col-span-5 xl:col-span-4": isMapped && !isSeated,
-            "lg:col-span-8": isSeated && !isMapped,
-          },
+                    : null)}
+            />
+          {/key}
+        {:else}
+          <p
+            class="grid place-items-center border border-dashed border-border px-4 text-center text-sm text-pretty text-muted-foreground block-[min(24rem,50svh)]"
+          >
+            {m.map_rebuilding()}
+          </p>
+        {/if}
+        {const districts = $derived(
+          new Set(places.rows.map((row) => row.k)).size,
         )}
+        {#if shape.shaped != null && shape.shaped < districts}
+          <p class="px-1 pbs-1 text-xs text-pretty text-muted-foreground">
+            {m.map_shaped({
+              shaped: count(shape.shaped),
+              count: count(districts),
+            })}
+          </p>
+        {/if}
+      {/if}
+    {/snippet}
+    {#snippet summary()}
+      <div
+        class="@container grid content-start gap-1 bg-card px-1.5 pbs-2 pbe-2.5"
       >
         <Results
           rows={race.rows}
@@ -1663,6 +1609,52 @@
           </p>
         {/each}
       </div>
+    {/snippet}
+    {#snippet hemicycle()}
+      <Seated
+        parties={race.seated}
+        places={race.holders}
+        body={race.body}
+        size={race.isTier || scope != null ? null : race.size}
+        date={election.date}
+        place={race.name}
+        region={election.parent == null
+          ? null
+          : (election.breadcrumbs
+              .filter((crumb) => crumb.path !== election.parent?.path)
+              .at(-1)?.name ?? null)}
+        change={race.change}
+        isComplete={scope == null &&
+          !race.isTier &&
+          (race.size != null || race.count === 1)}
+        partners={race.isTier ? [] : race.partners}
+        governing={race.size === chamber?.size ? governing : []}
+        isStaggered={race.isStaggered}
+      />
+    {/snippet}
+    <Lead
+      results={race.isPrimaries ? null : summary}
+      map={isMapped && race.map != null && race.places != null ? mapped : null}
+      aside={isSeated ? hemicycle : null}
+    />
+    {#if race.isNotional === true && race.change != null && race.since != null}
+      <p class="col-span-12 bg-card px-3.5 py-2 text-xs text-muted-foreground">
+        {m.seats_change_notional({ year: race.since })}
+      </p>
+    {/if}
+    {#if race.resized != null && race.change != null && race.since != null && race.size != null}
+      <p class="col-span-12 bg-card px-3.5 py-2 text-xs text-muted-foreground">
+        {m.seats_change_resized({
+          year: race.since,
+          before: count(race.resized),
+          now: count(race.size),
+        })}
+      </p>
+    {/if}
+    {#if (race.straddled ?? 0) > 0}
+      <p class="col-span-12 bg-card px-3.5 py-2 text-xs text-muted-foreground">
+        {m.seats_change_straddled()}
+      </p>
     {/if}
     {#if race.places != null && !race.isTotal}
       {const shown = $derived(

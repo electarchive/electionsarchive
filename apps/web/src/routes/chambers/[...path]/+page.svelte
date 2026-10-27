@@ -530,30 +530,32 @@
         </div>
       {/if}
 
-      {#key term.start}
-        <Seats
-          isLinked
-          parties={hemicycle}
-          {places}
-          here={null}
-          place={body.name}
-          link={null}
-          size={open.length > 0
-            ? apportioned
-            : term.size != null && held <= term.size
-              ? term.size
-              : null}
-          vacant={open.length > 0
-            ? Math.max(0, apportioned - held - seceded)
-            : term.size == null || !term.isSeated
-              ? 0
-              : Math.max(0, term.size - held)}
-          {seceded}
-          official={seceded > 0 && term.size != null ? term.size : null}
-          {change}
-          partners={body.partners}
-        />
-      {/key}
+      <div class="col-span-12 grid lg:col-span-4">
+        {#key term.start}
+          <Seats
+            isLinked
+            parties={hemicycle}
+            {places}
+            here={null}
+            place={body.name}
+            link={null}
+            size={open.length > 0
+              ? apportioned
+              : term.size != null && held <= term.size
+                ? term.size
+                : null}
+            vacant={open.length > 0
+              ? Math.max(0, apportioned - held - seceded)
+              : term.size == null || !term.isSeated
+                ? 0
+                : Math.max(0, term.size - held)}
+            {seceded}
+            official={seceded > 0 && term.size != null ? term.size : null}
+            {change}
+            partners={body.partners}
+          />
+        {/key}
+      </div>
 
       <section
         class="col-span-12 grid content-start gap-4 bg-card p-3.5 lg:col-span-8"
