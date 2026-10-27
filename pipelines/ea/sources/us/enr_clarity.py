@@ -120,7 +120,7 @@ SKIPPED = re.compile(
     r"STATE CONVENTION|REFERENDA|REFERENDUM ITEM|BALLOTS CAST|REGISTERED VOTERS|TURNOUT|STATEWIDE|\bTEST\b"
 )
 QUESTION = re.compile(r"(?i)\s*(?:yes|no|for|against|si|bonds? yes|bonds? no)\b")
-WRITE_IN = re.compile(r"(?i)\s*(?:unresolved |unassigned |qualified |uncertified )?write|scatter|personal choice")
+WRITE_IN = re.compile(r"(?i)\s*(?:unresolved |unassigned |qualified |uncertified )?write|scatter|personal choice|w/?i$")
 VACANT = re.compile(r"(?i)\s*(?:no (?:nomination|candidate)|over ?votes|under ?votes|blank|unopposed)")
 REMAINDER = re.compile(r"\bUNEX\w*|\bUNXP\w*|SHORT TERM|VACANCY|REMAINDER|PARTIAL TERM|TO FILL\b|\bFILL\b")
 TERM = re.compile(r"\b(\d+|ONE|TWO|THREE|FOUR|FIVE|SIX)[ -]?(?:YR|YEAR)S?\b(?: TERM)?")
@@ -439,6 +439,9 @@ def _label(label: str) -> tuple[str, str | None]:
     ):
         lines.append(suffix[1])
         label = label[: suffix.start()]
+    if letter := re.search(r"(?<=[a-z.])\s+([DR])$", label):
+        lines.append(letter[1])
+        label = label[: letter.start()]
     found = {party for line in lines if (party := _party(line))} | (
         {"democratic", "republican"} if any(re.search(r"(?i)/|dar", line) for line in lines) else set()
     )
