@@ -371,6 +371,22 @@ def _publish_table(conn: Connection, stage: Stage, table: str) -> None:
                     target, others, others, staged, _present(conn, table, compared)
                 )
             )
+        if table == "name" and "is_preferred" in columns:
+            conn.execute(
+                sql.SQL(
+                    """update public.name n set is_preferred = false
+                       from (select p.id, row_number() over (
+                                 partition by p.entity_id, p.lang, p.script
+                                 order by exists (select from {0} s where s.entity_id = p.entity_id and s.text = p.text
+                                                  and s.lang = p.lang and s.is_preferred) desc,
+                                          p.recorded_from desc, p.id) as rank
+                             from public.name p join changeset c on c.id = p.changeset_id and c.pipeline = %s
+                             where p.is_preferred and p.valid_from is null and p.valid_to is null
+                               and p.entity_id in (select entity_id from {0})) ranked
+                       where n.id = ranked.id and ranked.rank > 1"""
+                ).format(staged),
+                [stage.pipeline],
+            )
         return
     if table == "external_id":
         conn.execute(
