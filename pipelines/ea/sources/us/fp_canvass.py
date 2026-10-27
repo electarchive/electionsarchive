@@ -81,6 +81,13 @@ DOCUMENTS = {
         "Election results and data",
         "https://www.ohiosos.gov/elections/election-results-and-data/",
     ),
+    "GA2000": (
+        SOURCE,
+        "https://web.archive.org/web/2008id_/http://sos.georgia.gov/elections/election_results/2000_1107/0000200.htm",
+        "Georgia Secretary of State",
+        "Georgia Election Results: official results of the general election",
+        "https://sos.ga.gov/page/historical-elections-results",
+    ),
     "ME2014": (
         SOURCE,
         "https://lldc.mainelegislature.org/Open/Elections/Returns/2014/20141104/elec_20141104aj.xlsx",
@@ -363,6 +370,28 @@ def ohio(conn: Connection) -> list[tuple[date, str, str, str, int]]:
     return rows
 
 
+def georgia(conn: Connection) -> list[tuple[date, str, str, str, int]]:
+    codes = counties(conn, "13")
+    source, url, *_ = DOCUMENTS["GA2000"]
+    text = raw.cached(source, url).path.read_text(errors="replace")
+    body = html.unescape(re.sub(r"<[^>]+>", "", re.search(r"<pre>(.*?)</pre>", text, re.DOTALL)[1])).splitlines()
+    start = next(index for index, line in enumerate(body) if line.startswith("County"))
+    names = body[start - 4].split()
+    printed = [int(cell.replace(",", "")) for cell in body[start - 2].split()]
+    rows = []
+    for line in body[start + 1 :]:
+        if found := re.fullmatch(r"(\D+?)\s+\d+\s+\d+\s+([\d,\s]+)", line.strip()):
+            votes = [int(cell.replace(",", "")) for cell in found[2].split()]
+            code = codes[re.sub(r"[^a-z]", "", found[1].lower())]
+            rows += [(date(2000, 11, 7), "senate", code, name, value) for name, value in zip(names, votes, strict=True)]
+    if len({row[2] for row in rows}) != 159:
+        raise ValueError("GA Senate: not 159 counties")
+    for name, total in zip(names, printed, strict=True):
+        if (summed := sum(r[4] for r in rows if r[3] == name)) != total:
+            raise ValueError(f"GA Senate {name}: counties sum to {summed}, statewide {total}")
+    return rows
+
+
 def pdf(document: str) -> str:
     source, url, *_ = DOCUMENTS[document]
     return subprocess.run(
@@ -380,6 +409,7 @@ def parse() -> None:
                 ("ME2014", maine),
                 ("DE2006", delaware),
                 ("KS2002", kansas),
+                ("GA2000", georgia),
                 ("OH2010", ohio),
                 ("SC2010", lambda conn: clarity(conn, "SC2010", "45", date(2010, 11, 2), "senate", "U.S. Senate")),
                 ("NM2002", lambda conn: elstats(conn, "NM2002", "35", date(2002, 11, 5), "senate")),
@@ -396,7 +426,7 @@ def parse() -> None:
         .with_columns(
             year=pl.col("day").dt.year().cast(pl.Int32),
             district=pl.lit(None, pl.Int16),
-            special=pl.lit(False),
+            special=pl.col("source") == "GA2000",
             writein=pl.col("candidate") == "WRITE-INS",
             measure=pl.lit(1, pl.Int16),
             kind=pl.when(pl.col("code").str.contains(r"^\d{5}$"))
