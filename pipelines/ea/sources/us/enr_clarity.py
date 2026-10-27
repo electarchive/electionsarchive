@@ -2290,13 +2290,21 @@ def emit(
                 cs.add("entity_retirement", entity_id=person, reason=f"{key} has no candidacy left")
             elif len(holders[person]) == 1 and person not in holders[person]:
                 cs.merge(person, next(iter(holders[person])))
-        for dropped, entity, text in conn.execute(
-            """select n.id, n.entity_id, n.text from name n join changeset c on c.id = n.changeset_id
-               where c.pipeline = %s and not n.is_preferred
-                 and n.entity_id in (select entity_id from external_id where scheme = %s)""",
+        for dropped, entity, text, preferred, rank in conn.execute(
+            """select id, entity_id, text, is_preferred, rank from (
+                 select n.id, n.entity_id, n.text, n.is_preferred, row_number() over (
+                          partition by n.entity_id, n.lang, n.script, n.text, n.valid_from, n.valid_to
+                          order by n.is_preferred desc, n.recorded_from, n.id) as rank
+                 from name n join changeset c on c.id = n.changeset_id
+                 where c.pipeline = %s and n.entity_id in (select entity_id from external_id where scheme = %s)) ranked
+               where rank > 1 or not is_preferred""",
             [source, f"{source}.person"],
         ).fetchall():
-            if _label(text)[0] != text and entity not in retired and entity not in cs.survivors:
+            if rank > 1 and entity not in retired and entity not in cs.survivors:
+                cs.add(
+                    "name_drop", name_id=dropped, entity_id=entity, text=text, reason="a second copy of the same name"
+                )
+            elif not preferred and _label(text)[0] != text and entity not in retired and entity not in cs.survivors:
                 cs.add(
                     "name_drop",
                     name_id=dropped,

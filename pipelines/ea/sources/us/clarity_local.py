@@ -787,7 +787,8 @@ def emit() -> Path:
                 """select r.id, o.ballot_label from result_set r join changeset g on g.id = r.changeset_id
                    join contest_option o on o.contest_id = r.contest_id and o.kind = 'candidate'
                    where g.pipeline = %s and r.status = 'active'
-                     and exists (select from result_value v where v.result_set_k = r.k and v.option_k = o.k)""",
+                     and (exists (select from result_value v where v.result_set_k = r.k and v.option_k = o.k)
+                          or exists (select from outcome u where u.result_set_id = r.id and u.option_id = o.id))""",
                 [SOURCE],
             ).fetchall()
             if re.fullmatch(r"(?i)w/?i", label) or _label(label)[0] != label
@@ -810,13 +811,21 @@ def emit() -> Path:
             ).fetchall()
             if _label(text)[0] != text
         }
-        for dropped, entity, text in conn.execute(
-            """select n.id, n.entity_id, n.text from name n join changeset c on c.id = n.changeset_id
-               where c.pipeline = %s and not n.is_preferred
-                 and n.entity_id in (select entity_id from external_id where scheme = %s)""",
+        for dropped, entity, text, preferred, rank in conn.execute(
+            """select id, entity_id, text, is_preferred, rank from (
+                 select n.id, n.entity_id, n.text, n.is_preferred, row_number() over (
+                          partition by n.entity_id, n.lang, n.script, n.text, n.valid_from, n.valid_to
+                          order by n.is_preferred desc, n.recorded_from, n.id) as rank
+                 from name n join changeset c on c.id = n.changeset_id
+                 where c.pipeline = %s and n.entity_id in (select entity_id from external_id where scheme = %s)) ranked
+               where rank > 1 or not is_preferred""",
             [SOURCE, f"{SOURCE}.person"],
         ).fetchall():
-            if _label(text)[0] != text:
+            if rank > 1:
+                cs.add(
+                    "name_drop", name_id=dropped, entity_id=entity, text=text, reason="a second copy of the same name"
+                )
+            elif not preferred and _label(text)[0] != text:
                 cs.add(
                     "name_drop",
                     name_id=dropped,
