@@ -405,6 +405,14 @@ CLASS_THREE_SPECIALS = ("OH", "FL")
 NO_GENERAL = ("PR",)
 SUPPLEMENTED = {"RI", "AR", "NV", "MN"}
 UNEXPIRED_2024 = {("OH", "senate:33:g")}
+REMEDIAL_2024 = {("ND", "house:9:gs"): ("house:9-a:g", "house:9-b:g")}
+VACANCY_2026 = {
+    ("CO", "senate:17:g"),
+    ("CO", "senate:21:g"),
+    ("CO", "senate:29:g"),
+    ("CO", "senate:31:g"),
+    ("WY", "senate:6:g"),
+}
 SPLIT = {
     "HI:trustee-of-the-office-of-hawaiian-affairs": {
         "At-Large Trustee": ("", 3, "at-large"),
@@ -1359,7 +1367,12 @@ def read(state: str, path: Path) -> list[tuple[str, int | None, str, str]]:
                 footnote = not line.startswith("pamphlet.")
             elif line.startswith("NonpartisanCandidates") or "Index of Candidates" in line:
                 break
-            elif line == "PartisanCandidates" or "List of Candidates & Measures" in line or line.isdigit():
+            elif (
+                not line.strip()
+                or line == "PartisanCandidates"
+                or "List of Candidates & Measures" in line
+                or line.isdigit()
+            ):
                 continue
             elif line in ("US Senator", "US Representative", "Governor", "State Senator", "State Representative") or (
                 line.startswith("County ")
@@ -1567,13 +1580,13 @@ def read(state: str, path: Path) -> list[tuple[str, int | None, str, str]]:
                     rows[-1] = (*rows[-1][:3], rows[-1][3] + " " + fields[0])
             if state == "UT":
                 if match := re.match(
-                    r"^\s*(U\.S\. House of Representatives|Utah Senate|Utah House of Representatives) Dist\S*ct (\d+)\.",
+                    r"^\s*(U\.S\. House|Utah Senate|Utah House)(?:\s*of\s*Rep\S*)?\s+Dis\S*\s+(\d+)\.",
                     line,
                 ):
                     office = {
-                        "U.S. House of Representatives": "house",
+                        "U.S. House": "house",
                         "Utah Senate": "State Senator",
-                        "Utah House of Representatives": "State Representative",
+                        "Utah House": "State Representative",
                     }[match[1]]
                     district = int(match[2])
                 elif re.match(r"^[A-Z][A-Z ]+$", line.strip()) and len(line.strip()) > 12:
@@ -1942,13 +1955,22 @@ def emit() -> Path:
                join name n on n.entity_id = co.id and n.is_preferred
                join slug s on s.entity_id = co.id
                where e.date_from in ('2022-11-08', '2024-11-05') and co.party_scope_id is null
-                 and x.value ~ '^[0-9-]+:[A-Z]{2}:(house|senate|assembly|house-of-delegates|legislature):.+:g$'"""
+                 and x.value ~ '^[0-9-]+:[A-Z]{2}:(house|senate|assembly|house-of-delegates|legislature):.+:gs?$'"""
         ).fetchall():
             day, state, seat = template[0].split(":", 2)
             if day.startswith("2024") and (state, seat) in UNEXPIRED_2024:
                 continue
             level = "upper" if seat.startswith(("senate:", "legislature:")) else "lower"
+            if seat.endswith(":gs"):
+                if (state, seat) not in REMEDIAL_2024:
+                    continue
+                template[8] = "full"
+                seat, day = seat.removesuffix("s"), "2022"
+                label, path = label.replace(" special election", " election"), path.removesuffix("-special-election")
             chambered.setdefault((state, level, day[:4]), {})[seat] = (tuple(template), label, path)
+        for (state, _), replaced in REMEDIAL_2024.items():
+            for seat in replaced:
+                chambered[(state, "lower", "2022")].pop(seat)
         legislative: dict[str, tuple[str, str, str]] = {}
         seats: dict[tuple[str, str, str], str] = {}
         for part in readiness.spec(str(DAY))["levels"]:
@@ -1976,6 +1998,13 @@ def emit() -> Path:
                         sum(entry[0][7] or 1 for entry in picked.values()),
                         want,
                     )
+                for seat, (template, label, path) in recent.items():
+                    if (state, seat) in VACANCY_2026:
+                        picked[seat] = (
+                            (*template[:8], "remainder", *template[9:]),
+                            label.replace(" election", " special election"),
+                            f"{path}-special-election",
+                        )
                 for seat, (template, label, path) in picked.items():
                     key = f"{DAY}:{state}:{seat}"
                     legislative[template[0]] = (
@@ -2646,6 +2675,21 @@ def emit() -> Path:
                     "entity_retirement",
                     entity_id=entity,
                     reason="Puerto Rico's Resident Commissioner serves a four-year term, elected in 2024; Puerto Rico holds no general election on 2026-11-03",
+                )
+        written = {str(row["id"]) for row in cs.rows.get("contest", [])}
+        for entity, value in conn.execute(
+            """select co.id, x.value from contest co join changeset c on c.id = co.changeset_id
+               join entity e on e.id = co.id and e.retired_by is null
+               join external_id x on x.entity_id = co.id and x.scheme = 'us.contest'
+               where c.pipeline = %s""",
+            [SOURCE],
+        ).fetchall():
+            if str(entity) not in written:
+                print("retiring", value)
+                cs.add(
+                    "entity_retirement",
+                    entity_id=entity,
+                    reason="The contest is no longer on the ballot as scheduled; its seats are now held as other contests",
                 )
         print(counts)
         return cs.write()
