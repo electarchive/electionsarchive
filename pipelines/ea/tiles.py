@@ -4,6 +4,8 @@ import tempfile
 import time
 from pathlib import Path
 
+import polars as pl
+
 from ea import plane
 from ea.store import DATA, ROOT, connect
 
@@ -17,7 +19,17 @@ from (
 where p is not null
 """
 
+LINES_SQL = """
+select '{{"type":"Feature","properties":{{"kind":"' || kind || '"}},"geometry":' || ST_AsGeoJSON(p, 1, 0) || '}}'
+from (
+    select l.kind, {plane} as p
+    from unnest(%s::text[], %s::text[]) as l(kind, geom)
+) x
+where p is not null
+"""
+
 DENSE = {"us.nyc_ed": 14}
+LINES = {"world.country": DATA / "parsed" / "world.natural_earth" / "lines.parquet"}
 
 
 def build(prefix: str | None) -> str:
@@ -42,8 +54,17 @@ def build(prefix: str | None) -> str:
                 continue
             areas_path = Path(scratch) / "areas.geojsonl"
             labels_path = Path(scratch) / "labels.geojsonl"
+            lines_path = Path(scratch) / "lines.geojsonl"
             output = Path(scratch) / "out.pmtiles"
             with connect() as conn, areas_path.open("w") as areas_file, labels_path.open("w") as labels_file:
+                if scheme_code in LINES:
+                    lines = pl.read_parquet(LINES[scheme_code])
+                    with lines_path.open("w") as lines_file:
+                        for (line,) in conn.execute(
+                            LINES_SQL.format(plane=plane.sql("ST_GeomFromEWKB(decode(l.geom, 'hex'))", scheme_code)),
+                            [lines["kind"].to_list(), lines["geom"].to_list()],
+                        ):
+                            lines_file.write(f"{line}\n")
                 for column, handle in (
                     ("g.geom", areas_file),
                     ("coalesce(g.label_point, ST_PointOnSurface(g.geom))", labels_file),
@@ -66,7 +87,7 @@ def build(prefix: str | None) -> str:
                     f"--maximum-zoom={DENSE.get(scheme_code, 12 if features >= 5_000 else 10)}",
                     "--simplification=4",
                     "--detect-shared-borders",
-                    "--exclude-all",
+                    *(["--include=kind"] if scheme_code in LINES else ["--exclude-all"]),
                     *(
                         ["--no-feature-limit", "--no-tile-size-limit", "--no-tiny-polygon-reduction", "--drop-rate=1"]
                         if scheme_code in DENSE
@@ -79,6 +100,7 @@ def build(prefix: str | None) -> str:
                     ),
                     f"--named-layer=areas:{areas_path}",
                     f"--named-layer=labels:{labels_path}",
+                    *([f"--named-layer=lines:{lines_path}"] if scheme_code in LINES else []),
                 ],
                 check=True,
             )
