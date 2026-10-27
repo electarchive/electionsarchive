@@ -2257,8 +2257,8 @@
       >
     </div>
     {#if engine.credits.length > 0}
-      <p
-        class="pointer-events-none absolute inset-e-14 inset-be-1 z-0 truncate text-[0.625rem] text-muted-foreground max-inline-[40%] max-sm:hidden"
+      <div
+        class="pointer-events-none absolute inset-e-14 inset-be-1 z-0 grid text-[0.625rem] text-muted-foreground max-inline-[40%] max-sm:hidden"
       >
         {const vintage = $derived(
           !sheet.estimated
@@ -2268,13 +2268,16 @@
                   ?.tiles ?? "",
               )?.[1],
         )}
-        {vintage == null
-          ? m.map_boundaries({ publishers: engine.credits.join("; ") })
-          : m.map_boundaries_dated({
-              publishers: engine.credits.join("; "),
-              date: date(vintage),
-            })}
-      </p>
+        <p class="truncate">
+          {vintage == null
+            ? m.map_boundaries({ publishers: engine.credits.join("; ") })
+            : m.map_boundaries_dated({
+                publishers: engine.credits.join("; "),
+                date: date(vintage),
+              })}
+        </p>
+        <p class="truncate">{m.map_water_credit()}</p>
+      </div>
     {/if}
   </main>
 </div>

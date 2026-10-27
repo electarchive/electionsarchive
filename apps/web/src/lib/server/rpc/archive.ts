@@ -7242,9 +7242,26 @@ export const contests = {
         planed as (
           select id, valid, size, ${plane("geom", "scheme")} as geom
           from (
-            select id, valid, size, scheme,
-              ST_Simplify(geom, least(sqrt(size) / 500, 0.01)) as geom
-            from chosen
+            select c.id, c.valid, c.size, c.scheme, coalesce(
+              (select ST_Simplify(coalesce(x.geom, c.geom), c.t) from display.clipped x
+                join display.meta dm on dm.mask_version = x.mask_version
+                where x.area_id = c.id and x.valid = c.valid and x.geom_hash = md5(ST_AsBinary(c.geom))),
+              case when c.size <= 4 then (
+                select case when ST_IsEmpty(w.d) then null else w.d end from (
+                  select case
+                    when not exists (select from display.lake l where l.geom && v.g and ST_Intersects(l.geom, v.g))
+                      and exists (select from display.land k where k.geom && v.g and ST_Covers(k.geom, v.g)) then v.g
+                    else ST_Multi(ST_CollectionExtract(ST_Difference(
+                      coalesce((select ST_UnaryUnion(ST_Collect(ST_Intersection(ST_MakeValid(ST_Simplify(ST_ClipByBox2D(k.geom, v.g), c.t, true)), v.g)))
+                        from display.land k where k.geom && v.g), ST_GeomFromText('GEOMETRYCOLLECTION EMPTY', 4326)),
+                      coalesce((select ST_UnaryUnion(ST_Collect(ST_MakeValid(ST_Simplify(ST_ClipByBox2D(l.geom, v.g), c.t, true))))
+                        from display.lake l where l.geom && v.g), ST_GeomFromText('GEOMETRYCOLLECTION EMPTY', 4326))), 3))
+                  end as d
+                  from (select ST_MakeValid(ST_Simplify(c.geom, c.t, true)) as g) v
+                ) w
+              ) end,
+              ST_Simplify(c.geom, c.t)) as geom
+            from (select *, least(sqrt(size) / 500, 0.01) as t from chosen) c
           ) c
         ),
         measured as (
@@ -9217,12 +9234,42 @@ async function framing(area: string, day: string, ks: Array<number> = []) {
     east: number;
     north: number;
   }>(sql`
-    with parts as (
-      select a.id, ST_Simplify(d.geom, least(greatest(ST_XMax(d.geom) - ST_XMin(d.geom), ST_YMax(d.geom) - ST_YMin(d.geom)) / 500, 0.01), true) as geom, a.scheme_code as scheme
+    with shapes as (
+      select a.id, a.scheme_code as scheme, g.valid, g.geom
       from area a
       join area_geometry g on g.area_id = a.id and g.valid @> ${day}::date
-      cross join lateral ST_Dump(g.geom) d
       where ${ks.length === 0 ? sql`a.id = ${area}::uuid` : sql`a.k = any(${sql.param(ks)}::int[])`}
+    ),
+    bounds as (
+      select box, least(greatest(ST_XMax(box) - ST_XMin(box), ST_YMax(box) - ST_YMin(box)) / 500, 0.01) as t
+      from (select ST_SetSRID(ST_Extent(geom)::geometry, 4326) as box from shapes) e
+      where (ST_XMax(box) - ST_XMin(box)) * (ST_YMax(box) - ST_YMin(box)) <= 4
+    ),
+    water as (
+      select ST_Subdivide(ST_Difference(b.box, ST_Difference(
+        coalesce((select ST_UnaryUnion(ST_Collect(ST_MakeValid(ST_Simplify(ST_ClipByBox2D(c.geom, b.box), b.t, true))))
+          from display.land c where c.geom && b.box), ST_GeomFromText('GEOMETRYCOLLECTION EMPTY', 4326)),
+        coalesce((select ST_UnaryUnion(ST_Collect(ST_MakeValid(ST_Simplify(ST_ClipByBox2D(l.geom, b.box), b.t, true))))
+          from display.lake l where l.geom && b.box), ST_GeomFromText('GEOMETRYCOLLECTION EMPTY', 4326)))), 64) as geom
+      from bounds b
+    ),
+    dry as (
+      select s.id, s.scheme, coalesce(
+        (select coalesce(c.geom, s.geom) from display.clipped c join display.meta dm on dm.mask_version = c.mask_version
+          where c.area_id = s.id and c.valid = s.valid and c.geom_hash = md5(ST_AsBinary(s.geom))),
+        (select case when ST_IsEmpty(w.d) then null else w.d end from (
+          select ST_Multi(ST_CollectionExtract(ST_Difference(ST_MakeValid(ST_Simplify(s.geom, b.t, true)),
+            (select ST_UnaryUnion(ST_Collect(x.geom)) from water x where x.geom && s.geom)), 3)) as d
+          from bounds b
+          where exists (select from water x where x.geom && s.geom and ST_Intersects(x.geom, s.geom))
+        ) w),
+        s.geom) as geom
+      from shapes s
+    ),
+    parts as (
+      select w.id, ST_Simplify(d.geom, least(greatest(ST_XMax(d.geom) - ST_XMin(d.geom), ST_YMax(d.geom) - ST_YMin(d.geom)) / 500, 0.01), true) as geom, w.scheme
+      from dry w
+      cross join lateral ST_Dump(w.geom) d
     ),
     ranked as (
       select parts.*, row_number() over (partition by id order by ST_Area(geom) desc) = 1 as anchor

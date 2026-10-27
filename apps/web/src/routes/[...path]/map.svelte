@@ -2459,6 +2459,7 @@
       {#each notices as notice (notice)}
         <p>{notice}</p>
       {/each}
+      <p>{m.map_water_credit()}</p>
     </div>
   {/if}
 
