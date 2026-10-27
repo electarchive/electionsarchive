@@ -10157,7 +10157,10 @@ async function races(
               (single == null ? parties.short.get(party ?? "") : null) ??
               lead?.short ??
               null,
-            color: lead?.color ?? null,
+            color:
+              (table ?? grid)?.legend.find((item) => item.key === key)?.color ??
+              lead?.color ??
+              null,
             lean: lead?.lean ?? null,
             person:
               members.length === 1 && (single != null || party == null)
