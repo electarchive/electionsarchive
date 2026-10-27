@@ -5053,12 +5053,14 @@ export const contests = {
             from note n
             left join result_set rs on rs.id = n.entity_id
             left join source s on s.id = rs.source_id
-            where n.entity_id in (
-              select ${contest.id}::uuid
+            where exists (select from (
+              select ${contest.id}::uuid as id, null::note_kind as kind
               union all
-              select ${contest.election}::uuid
+              select ${contest.election}::uuid, null
               union all
-              select rs.id from result_set rs
+              select c.district_area_id, 'methodology' from contest c where c.id = ${contest.id}::uuid
+              union all
+              select rs.id, null from result_set rs
                 where rs.contest_id = ${contest.id}::uuid and (${latest("rs")} or exists (
                   select from result_rollup r
                   where r.result_set_k = rs.k and r.measure = any(${COUNTED}) and not exists (
@@ -5070,11 +5072,9 @@ export const contests = {
                   offset 0
                 ))
               union all
-              select cy.id from candidacy cy join contest_option o on o.id = cy.option_id
+              select cy.id, null from candidacy cy join contest_option o on o.id = cy.option_id
               where o.contest_id = ${contest.id}::uuid
-            ) or (n.kind = 'methodology' and n.entity_id = (
-              select c.district_area_id from contest c where c.id = ${contest.id}::uuid
-            ))
+            ) w where w.id = n.entity_id and (w.kind is null or w.kind = n.kind))
             order by array_position(array['caveat','context','methodology','editorial']::note_kind[], n.kind)
           `),
           db.execute<{
@@ -6030,9 +6030,23 @@ export const contests = {
              union all
              select grp.root, c.id from contest c join grp on c.allocation_parent_id = grp.id
            ),
+           area_k(k) as (
+             select ${area.k}::int
+             union
+             select a.k from contest c join area a on a.id = c.district_area_id
+             where c.id = any(${sql.param(sameRace.filter((row) => row.lineage).map((row) => row.id))}::uuid[])
+           ),
+           here as materialized (
+             select distinct x.result_set_k as k from area_k cross join lateral (
+               select r.result_set_k from result_rollup_sum r where r.area_k = area_k.k
+               union all
+               select r.result_set_k from result_rollup_unit r where r.area_k = area_k.k
+             ) x
+           ),
            sets as materialized (
              select grp.root, rs.k, rs.contest_id, rs.is_default, rs.stage, rs.completeness
              from grp cross join lateral (select * from result_set x where x.contest_id = grp.id offset 0) rs
+             where rs.k in (select k from here)
            ),
            picked as (
              select distinct on (rs.contest_id) rs.root, rs.k, hit.area
@@ -18404,7 +18418,10 @@ export const people = {
           .toSorted((a, b) => b.from.localeCompare(a.from)),
         record,
         faithless: lone.flatMap((row) =>
-          Map.groupBy(unfaithful.get(row.root) ?? [], (entry) => entry.isFaithless)
+          Map.groupBy(
+            unfaithful.get(row.root) ?? [],
+            (entry) => entry.isFaithless,
+          )
             .entries()
             .map(([isFaithless, entries]) => {
               let votes = 0;
