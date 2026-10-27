@@ -233,19 +233,34 @@ def emit() -> Path:
             .with_columns(special=pl.lit(False), state=pl.lit("MN"), measure=pl.lit(1, pl.Int16))
             .with_columns(source=pl.col("state"))
         )
-        for governor in (False, True):
+        wellstone = (
+            (pl.col("year") == 2002) & (pl.col("chamber") == "senate") & (pl.col("kind") == "precinct")
+        )
+        for governor, loose in ((False, False), (True, False), (False, True)):
             medsl.attach(
                 cs,
                 conn,
-                precincts.filter((pl.col("chamber") == "governor") == governor).select(
+                precincts.filter(
+                    ((pl.col("chamber") == "governor") == governor) & (wellstone == loose if not governor else True)
+                ).select(
                     "year", "chamber", "day", "special", "state", "district", "code", "candidate", "measure", "writein",
                     "votes", "kind", "source",
                 ),
                 {"MN": source},
                 grain="precinct",
-                strict=True,
+                strict=not loose,
                 extend=governor,
+                authoritative="The Secretary of State's precinct spreadsheet" if loose else None,
             )  # fmt: skip
+            if loose:
+                for row in cs.rows.get("result_set", []):
+                    if row["id"] == cs.key(f"{SOURCE}.result_set", "2002-11-05:MN:senate:precinct"):
+                        cs.add(
+                            "note",
+                            entity_id=row["id"],
+                            kind="caveat",
+                            body_md="The Secretary of State's 2002 precinct spreadsheet sums to 1,117,139 for Norm Coleman, 1,068,148 for Walter Mondale, and 10,953 for Paul Wellstone, against the canvass's 1,116,697, 1,067,246, and 11,381; the other columns differ by a few dozen votes. The spreadsheet's precinct rows are published as the State's own, and the difference is unresolved.",
+                        )
         used = set(pl.concat(cs.frames["result_value"])["unit_id"].unique()) if cs.frames.get("result_value") else set()
         parents = {
             code: (unit, area)
