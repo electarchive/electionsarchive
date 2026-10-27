@@ -11,6 +11,7 @@ from uuid import UUID
 from xml.etree import ElementTree
 
 import polars as pl
+import shapefile
 from psycopg import Connection
 
 from ea import raw
@@ -115,6 +116,13 @@ DOCUMENTS = {
         "Election System of the Virgin Islands",
         "Election archive",
         "https://electionarchive.vivote.gov/contest/54",
+    ),
+    "IN2022": (
+        SOURCE,
+        "https://election.lab.ufl.edu/data-downloads/resultsdata/2022/precinct/in_2022.zip",
+        "Voting and Election Science Team",
+        "2022 Precinct-Level Election Results: Indiana",
+        "https://election.lab.ufl.edu/dataset/in-2022-precinct-level-election-results/",
     ),
     "ME2014": (
         SOURCE,
@@ -505,6 +513,32 @@ def virgin_islands_runoff(_: Connection) -> list[tuple[date, str, str, str, int]
     return rows
 
 
+def indiana_vest(_: Connection) -> list[tuple[date, str, str, str, int]]:
+    source, url, *_ = DOCUMENTS["IN2022"]
+    with zipfile.ZipFile(raw.cached(source, url).path) as archive:
+        reader = shapefile.Reader(dbf=io.BytesIO(archive.read("in_2022.dbf")))
+    fields = [field[0] for field in reader.fields[1:]]
+    columns = {
+        "G22USSRYOU": ("senate", "Todd Young"),
+        "G22USSDMCD": ("senate", "Thomas M. McDermott Jr."),
+        "G22USSLSCE": ("senate", "James M. Sceniak"),
+        "G22SOSRMOR": ("secretary-of-state", "Diego Morales"),
+        "G22SOSDWEL": ("secretary-of-state", "Destiny Wells"),
+        "G22SOSLMAU": ("secretary-of-state", "Jeffrey Maurer"),
+        "G22AUDRKLU": ("auditor", "Tera K. Klutz"),
+        "G22AUDDBRO": ("auditor", "ZeNai Brooks"),
+        "G22AUDLSCH": ("auditor", "John Andrew Schick"),
+        "G22TRERELL": ("treasurer", "Daniel Elliott"),
+        "G22TREDMCC": ("treasurer", "Jessica McClellan"),
+    }
+    return [
+        (date(2022, 11, 8), chamber, f"2022:IN:18{row['COUNTY']}::{row['P22']}", name, int(row[column]))
+        for record in reader.iterRecords()
+        for row in [dict(zip(fields, list(record), strict=True))]
+        for column, (chamber, name) in columns.items()
+    ]
+
+
 def pdf(document: str) -> str:
     source, url, *_ = DOCUMENTS[document]
     return subprocess.run(
@@ -521,6 +555,7 @@ def parse() -> None:
                 ("CA2000", california),
                 ("ME2014", maine),
                 ("IA2002", iowa),
+                ("IN2022", indiana_vest),
                 ("DE2006", delaware),
                 ("KS2002", kansas),
                 ("VI2024", lambda conn: virgin_islands(conn, "VI2024")),
@@ -579,11 +614,12 @@ def emit() -> Path:
                 cs.add(
                     "source",
                     id=source,
-                    kind="official_body",
+                    kind="academic" if document == "IN2022" else "official_body",
                     publisher=publisher,
                     title=title,
                     url=home,
-                    license="Public record",
+                    license="CC BY-NC-ND 4.0" if document == "IN2022" else "Public record",
+                    license_url="https://creativecommons.org/licenses/by-nc-nd/4.0/" if document == "IN2022" else None,
                 )
             sources[document] = source
             cs.artifact(raw.cached(cached, url), source)
@@ -608,7 +644,8 @@ def emit() -> Path:
                 valid_from=None,
                 valid_to=None,
             )
-        grains = frame.group_by("state").agg(
+        alone = {"IA2002", "IN2022"}
+        grains = frame.filter(~pl.col("source").is_in(list(alone))).group_by("state").agg(
             grain=pl.when((pl.col("kind") == "town").any())
             .then(pl.lit("town"))
             .when((pl.col("kind") == "precinct").any())
@@ -625,12 +662,15 @@ def emit() -> Path:
                 medsl.attach(
                     cs,
                     conn,
-                    frame.filter(pl.col("state").is_in(documents) & ~pl.col("source").is_in(list(authoritative))),
+                    frame.filter(pl.col("state").is_in(documents) & ~pl.col("source").is_in(list(alone))),
                     sources,
                     grain=grain,
                     strict=True,
                     extend=True,
                 )
+        medsl.attach(
+            cs, conn, frame.filter(pl.col("source") == "IN2022"), sources, grain="precinct", strict=True, extend=True
+        )
         for document, reason in authoritative.items():
             medsl.attach(
                 cs,
