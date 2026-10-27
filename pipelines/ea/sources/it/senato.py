@@ -1,6 +1,7 @@
 import difflib
 import html
 import io
+import json
 import re
 import unicodedata
 import zipfile
@@ -54,10 +55,17 @@ DAYS = [
     date(2006, 4, 9),
     date(2008, 4, 13),
     date(2013, 2, 24),
+    date(2018, 3, 4),
+    date(2022, 9, 25),
 ]
 MATTARELLA = date(1994, 3, 27)
 CALDEROLI = date(2006, 4, 9)
 ROSATO = date(2018, 3, 4)
+REDUCED = date(2022, 9, 25)
+TRASPARENZA = (
+    "https://dait.interno.gov.it/documenti/trasparenza/POLITICHE_20220925/SENATO_ITALIA_20220925/"
+    "SENATO_ITALIA_20220925_pluri.json"
+)
 BASE = "https://elezionistorico.interno.gov.it/"
 ABROAD = {
     "EUROPA": ("europe", "Europe"),
@@ -75,6 +83,10 @@ LEADERS = {
     (2008, "WALTER VELTRONI"): CENTER_LEFT,
     (2013, "PIER LUIGI BERSANI"): ("Italy. Common Good", "Italia. Bene Comune"),
     (2013, "SILVIO BERLUSCONI"): CENTER_RIGHT,
+    (2018, CENTER_RIGHT[0]): CENTER_RIGHT,
+    (2018, CENTER_LEFT[0]): CENTER_LEFT,
+    (2022, CENTER_RIGHT[0]): CENTER_RIGHT,
+    (2022, CENTER_LEFT[0]): CENTER_LEFT,
 }
 SIZES = [
     (237, date(1948, 5, 8)),
@@ -169,6 +181,33 @@ SYSTEMS = {
             "schema stores the D'Hondt step; the scorporo and the ranking by share are described here only."
         ),
     ),
+    "senato-single-member-2017": (
+        {"formula": "fptp"},
+        "Senate, single-member collegi, since 2017",
+        None,
+    ),
+    "senato-proportional-2017": (
+        {
+            "formula": "hare",
+            "pooling": "coalition",
+            "lists": {"order": "closed", "constituencies": "skip", "vacancy": "next_on_list"},
+        },
+        "Senate, regional lists, since 2017",
+        (
+            "Under law 165 of 2017, about three eighths of the senators are elected by plurality in single-member "
+            "collegi and the rest from short closed lists in multi-member collegi. Each voter casts one vote: a vote "
+            "for a list also counts for the single-member candidate it supports, and a vote for the candidate alone "
+            "is shared among the candidate's lists in proportion to their votes in the collegio, so the list votes "
+            "shown include those shares. Lists need 3% of the national valid vote, or 20% in their region, and "
+            "coalitions need 10% nationally. A coalition list between 1% and 3% adds its votes to the coalition but "
+            "wins no seats. Seats are shared region by region among qualifying coalitions and lists by the largest "
+            "remainder of a Hare quota, then among each coalition's qualifying lists in the same way, and then among "
+            "the region's multi-member collegi. Valle d'Aosta elects one senator by plurality, and Trentino-Alto "
+            "Adige elects six in single-member collegi (and in 2018 one more from lists). The Senate had 315 elected "
+            "seats until 2022, and 200 since. The schema stores the Hare step; the thresholds and the split among "
+            "collegi are described here only."
+        ),
+    ),
     "senato-estero": (
         {"formula": "hare", "lists": {"order": "open", "vacancy": "next_by_votes"}},
         "Senate, constituency abroad",
@@ -215,6 +254,60 @@ REPLACED_SAME_DAY = (
     "The Senate's record also lists {names}, who replaced an elected senator on the legislature's first day; the "
     "outcome counts the senator who was proclaimed."
 )
+ABROAD_GAP = (
+    "The votes shown by country add up to {counted} valid votes, but Eligendo gives the ripartizione {total}, and its "
+    "seats were allocated on that total."
+)
+SENATE_NOTE = (
+    "Votes are the Interior Ministry's totals, from its open-data archive and Eligendo's historical results. "
+    "Elected senators are linked to the Senate's own record of its members."
+)
+UNORDERED_NOTE = (
+    "The Interior Ministry's archive lists each list's candidates but not in ballot order, and Eligendo has no "
+    "candidate pages for this election, so list positions are not given."
+)
+SHARES_NOTE = (
+    "List votes include each list's share of the votes cast for its single-member candidates alone, as the "
+    "Interior Ministry counts them."
+)
+VACANT = {
+    (date(2018, 3, 4), "19"): (
+        1,
+        (
+            "Sicily had 16 list seats, but only 15 were filled at the proclamation. Movimento 5 Stelle won one more "
+            "seat than it had candidates left, because all the others on its Sicilian lists had won single-member "
+            "collegi. On July 31, 2019, the Senate gave the seat to Emma Pavanelli, the first candidate not elected on "
+            "the party's list in Umbria."
+        ),
+    ),
+}
+CAVEATS = {
+    (date(2022, 9, 25), "14"): (
+        "Molise had one list seat. Seats are allocated first among coalitions. The center-right coalition had the "
+        "most votes, so the seat went to it. Within that coalition, the seat went to Fratelli d'Italia, although "
+        "Movimento 5 Stelle had the most votes of any single list."
+    ),
+    (date(2018, 3, 4), "18"): (
+        "On July 31, 2019, the Senate annulled Matteo Salvini's election in Calabria and gave the seat to Fulvia "
+        "Michela Caligiuri of Forza Italia. Salvini sat for Lazio instead."
+    ),
+    (date(2018, 3, 4), "12"): (
+        "On July 31, 2019, the Senate declared Matteo Salvini elected in Lazio, after annulling his election in "
+        "Calabria, in place of Kristalia Rachele Papaevangeliu."
+    ),
+    (date(2018, 3, 4), "16"): (
+        "On December 2, 2021, the Senate annulled Anna Carmela Minuto's election and moved Forza Italia's seat to "
+        "another collegio in the region, where Michele Boccardi took it."
+    ),
+    (date(2018, 3, 4), "08:emilia-romagna-u05"): (
+        "On July 31, 2019, the Senate annulled Edoardo Patriarca's election and declared Stefano Corti of the Lega "
+        "elected for this collegio."
+    ),
+    (date(2018, 3, 4), "south-america"): (
+        "On December 2, 2021, the Senate declined to validate Adriano Cario's election, and on January 12, 2022, "
+        "Fabio Porta of the Partito Democratico took the seat."
+    ),
+}
 ROMAN = re.compile(r"\b(I|Ii|Iii|Iv|V|Vi|Vii|Viii|Ix|X|Xi|Xii)\b")
 
 
@@ -232,6 +325,10 @@ def region_of(text: str) -> str:
     return REGIONS.get(folded) or REGIONS[next(name for name in REGIONS if folded.startswith(name))]
 
 
+def count(column: str) -> pl.Expr:
+    return pl.col(column).str.replace(",", ".").cast(pl.Float64).cast(pl.Int64)
+
+
 def mandates(legislature: int) -> str:
     return "https://dati.senato.it/sparql?" + urlencode({"query": QUERY % legislature, "format": "text/csv"})
 
@@ -240,6 +337,8 @@ def fetch() -> None:
     for legislature, day in enumerate(DAYS, 1):
         raw.fetch(SOURCE, ARCHIVE.format(day=day), suffix=".zip")
         raw.fetch(SOURCE, mandates(legislature), suffix=".csv")
+        if day == REDUCED:
+            raw.fetch(SOURCE, TRASPARENZA, suffix=".json")
         if day >= CALDEROLI:
             if not pages(day):
                 raise LookupError(f"store Eligendo's {day} pages in the playwright MCP first")
@@ -252,7 +351,18 @@ def fetch() -> None:
 def pages(day: date) -> list[str]:
     _, index = raw._index(SOURCE)
     stamp = f"dtel={day:%d/%m/%Y}&"
-    return sorted(url for url in index if url.startswith(BASE) and stamp in url)
+    return sorted(
+        url
+        for url in index
+        if url.startswith(BASE)
+        and stamp in url
+        and not (
+            day >= ROSATO
+            and (
+                ("candidati.php" in url and "tpa=I" in url) or ("tpa=G" in url and "&ne2=" in url) or "lev2=lev" in url
+            )
+        )
+    )
 
 
 def params(url: str) -> dict[str, str]:
@@ -358,6 +468,7 @@ def parse() -> None:
         [],
     )
     party_lists, party_accounts, party_candidates, abroad_votes, singles, recovered = [], [], [], [], [], []
+    r_lists, r_members, r_singles, r_accounts = [], [], [], []
     for legislature, day in enumerate(DAYS, 1):
         if day >= CALDEROLI:
             roll = senators(legislature)
@@ -371,8 +482,11 @@ def parse() -> None:
             with zipfile.ZipFile(raw.cached(SOURCE, ARCHIVE.format(day=day)).path) as archive:
                 member = next(name for name in archive.namelist() if "candlista" in name.lower())
                 cand = pl.read_csv(
-                    io.BytesIO(archive.read(member)), separator=";", infer_schema=False, encoding="latin1"
-                )
+                    io.BytesIO(archive.read(member)),
+                    separator=";",
+                    infer_schema=False,
+                    encoding="utf8" if day >= ROSATO else "latin1",
+                ).rename({"Regione": "REGIONE", "CollPlurinom": "COLLEGIOPLURINOM"}, strict=False)
             filed = {
                 (
                     region_of(row["REGIONE"]),
@@ -389,7 +503,7 @@ def parse() -> None:
                 query = params(url)
                 title, counts = heading(url)
                 division = None
-                if query["tpa"] == "I" and query["tpe"] == "R" and " Regione " in title:
+                if query["tpa"] == "I" and query["tpe"] == "R" and " Regione " in title and day < ROSATO:
                     division = region_of(title.split(" Regione ", 1)[1])
                     party_accounts.append((day, division, None, *counts))
                     leader = None
@@ -403,6 +517,10 @@ def parse() -> None:
                 elif query["tpa"] == "E" and query["tpe"] in ("T", "N"):
                     division = ABROAD[fold(title.split(" Ripartizione ", 1)[1].split(" Nazione ")[0])][0]
                     country = title.split(" Nazione ", 1)[1] if query["tpe"] == "N" else None
+                    if counts is None and country is not None:
+                        if any(len(cells) >= 3 and cells[1] and number(cells[2]) for _, cells in table(url)):
+                            raise ValueError(f"{day} {country}: votes without turnout")
+                        continue
                     party_accounts.append((day, division, country, *counts))
                     for _, cells in table(url):
                         if len(cells) < 3 or not cells[1]:
@@ -413,7 +531,7 @@ def parse() -> None:
                             abroad_votes.append((day, division, country, cells[1], number(cells[2])))
                     if country is not None:
                         continue
-                elif query["tpa"] == "G" and query["tpe"] == "L":
+                elif query["tpa"] == "G" and query["tpe"] == "L" and day < ROSATO:
                     region = region_of(title.split(" Regione ", 1)[1].split(" Collegio ")[0])
                     collegio = title.split(" Collegio ", 1)[1]
                     party_accounts.append((day, region, collegio, *counts))
@@ -528,6 +646,464 @@ def parse() -> None:
             for row in day_singles:
                 if row[6] and row[5] < max(other[5] for other in day_singles if other[2] == row[2]):
                     recovered.append((day, row[1], row[3], row[7]))
+            if day >= ROSATO:
+                with zipfile.ZipFile(raw.cached(SOURCE, ARCHIVE.format(day=day)).path) as archive:
+
+                    def sheet(pattern: str) -> pl.DataFrame:
+                        member = next(name for name in archive.namelist() if re.search(pattern, name))
+                        frame = pl.read_csv(io.BytesIO(archive.read(member)), separator=";", infer_schema=False)
+                        return frame.with_columns(pl.col(c).str.strip_chars() for c in frame.columns)
+
+                    region = pl.col("REGIONE").map_elements(region_of, return_dtype=pl.String)
+                    born = pl.col("birth").str.split(" ").list.first().str.to_date("%d/%m/%Y", strict=False)
+                    if day < REDUCED:
+                        plural = pl.concat_str(
+                            pl.col("plural").str.extract(r"^(.+) - \d+$"),
+                            pl.lit(" - P"),
+                            pl.col("plural").str.extract(r" - (\d+)$"),
+                        )
+                        single = pl.concat_str(
+                            pl.col("REGIONE"),
+                            pl.lit(" - U"),
+                            pl.col("single").str.extract(r"^(\d+) - "),
+                            pl.lit(" ("),
+                            pl.col("single").str.extract(r"^\d+ - (.+)$"),
+                            pl.lit(")"),
+                        )
+                        day_lists = pl.concat(
+                            [
+                                sheet("Liste_Italia_Liv_Reg").select(
+                                    region=region,
+                                    college=pl.lit(None, pl.String),
+                                    label="LISTA",
+                                    votes=count("VOTILISTA"),
+                                    seats=count("SEGGILISTA"),
+                                ),
+                                sheet("Liste_Italia_CollPlurinom")
+                                .rename({"COLLPLURINOM": "plural"})
+                                .select(
+                                    region=region,
+                                    college=plural,
+                                    label="LISTA",
+                                    votes=count("TOTVOTI"),
+                                    seats=count("SEGGILISTA"),
+                                ),
+                            ]
+                        )
+                        day_members = (
+                            sheet("CandidDiListaCollPlurinom")
+                            .rename({"COLLEGIOPLURINOM": "plural", "datanascita": "birth"})
+                            .select(
+                                region=region,
+                                college=plural,
+                                label="LISTA",
+                                position=pl.lit(None, pl.Int64),
+                                surname="cognome",
+                                forename="nome",
+                                birth=born,
+                                sex="sesso",
+                                elected=pl.col("CODTIPOELETTO") == "E",
+                            )
+                        )
+                        uninominal = sheet("Liste&CandidCollUninom").rename(
+                            {"COLLEGIOPLURINOM": "plural", "COLLEGIOUNINOM": "single", "DATANASCITA": "birth"}
+                        )
+                        aosta = sheet("VAosta_CandidCollUninom")
+                        day_singles = pl.concat(
+                            [
+                                uninominal.group_by(
+                                    "REGIONE",
+                                    "plural",
+                                    "single",
+                                    "COGNOME",
+                                    "NOME",
+                                    "birth",
+                                    "SESSO",
+                                    "CODTIPOELETTO",
+                                    "VOTICAND",
+                                )
+                                .agg(pl.col("LISTA").drop_nulls().unique().sort().alias("lists"))
+                                .select(
+                                    region=region,
+                                    college=single,
+                                    parent=plural,
+                                    surname="COGNOME",
+                                    forename="NOME",
+                                    birth=born,
+                                    sex="SESSO",
+                                    votes=count("VOTICAND"),
+                                    lists="lists",
+                                    flagged=pl.col("CODTIPOELETTO") == "E",
+                                ),
+                                aosta.select(
+                                    region=pl.lit("02"),
+                                    college=pl.col("COLLEGIOUNINOM").str.replace(r" - (\d+)$", " - U$1"),
+                                    parent=pl.lit(None, pl.String),
+                                    surname="COGNOME",
+                                    forename="NOME",
+                                    birth=pl.col("DATANASCITA")
+                                    .str.split(" ")
+                                    .list.first()
+                                    .str.to_date("%d/%m/%Y", strict=False),
+                                    sex="SESSO",
+                                    votes=count("TOTVOTI"),
+                                    lists=pl.concat_list(pl.col("LISTA")),
+                                    flagged=pl.col("CODTIPOELETTO") == "E",
+                                ),
+                            ]
+                        )
+                        accounting = [
+                            (sheet("Scrutini_Italia_Liv_Reg"), "REGIONE", pl.lit(None, pl.String)),
+                            (
+                                sheet("Scrutini_Italia_CollPlurinom").rename({"COLLPLURINOM": "plural"}),
+                                "REGIONE",
+                                plural,
+                            ),
+                            (
+                                sheet("Scrutini_Italia_CollUninom").rename(
+                                    {"COLLEGIOUNINOM": "single", "ELETTORITOTALI": "NUMELETTORITOTALI"}
+                                ),
+                                "REGIONE",
+                                single,
+                            ),
+                            (
+                                sheet("Scrutini_VAosta_LivCollUninom").with_columns(
+                                    pl.lit("VALLE D'AOSTA").alias("REGIONE")
+                                ),
+                                "REGIONE",
+                                pl.col("COLLEGIO").str.replace(r" - (\d+)$", " - U$1"),
+                            ),
+                        ]
+                        day_accounts = pl.concat(
+                            [
+                                frame.rename({"ELETTORITOTALI": "NUMELETTORITOTALI"}, strict=False).select(
+                                    region=region,
+                                    college=college,
+                                    registered=count("NUMELETTORITOTALI"),
+                                    voters=count("NUMVOTANTITOTALI"),
+                                    blank=count("SKBIANCHE"),
+                                )
+                                for frame, _, college in accounting
+                            ]
+                        )
+                    else:
+                        communes = sheet("Senato_Italia_LivComune").rename(
+                            {"CIRC-REG": "REGIONE", "COLLPLURI": "college", "COLLUNINOM": "single"}
+                        )
+                        towns = communes.unique(["single", "COMUNE"])
+                        small = sheet(r"VAosta&Trentino_LivComune\.csv").with_columns(
+                            pl.concat_str(
+                                pl.col("REGIONE").str.split("/").list.first(), pl.lit(" - "), "COLLEGIO"
+                            ).alias("single")
+                        )
+                        small_towns = sheet("VAosta&Trentino_livComune_Scrutini").with_columns(
+                            pl.concat_str(
+                                pl.col("REGIONE").str.split("/").list.first(), pl.lit(" - "), "COLLEGIO"
+                            ).alias("single")
+                        )
+                        list_votes = communes.unique(["single", "COMUNE", "DESCRLISTA"]).with_columns(
+                            count("VOTILISTA").alias("votes")
+                        )
+                        positions = {
+                            (
+                                fold(row["desc_ente"]),
+                                fold(row["desc_lista"]),
+                                fold(row["cogn_c"]),
+                                fold(row["nome_c"]),
+                            ): row["num_c"]
+                            for row in json.loads(raw.cached(SOURCE, TRASPARENZA).path.read_text(encoding="utf-8-sig"))[
+                                "candidati"
+                            ]
+                        }
+                        day_members = cand.rename({"datanascita": "birth"}).select(
+                            region=region,
+                            college="COLLEGIOPLURINOM",
+                            label="descrlista",
+                            position=pl.struct("COLLEGIOPLURINOM", "descrlista", "cognome", "nome").map_elements(
+                                lambda row, positions=positions: positions[
+                                    fold(row["COLLEGIOPLURINOM"]),
+                                    fold(row["descrlista"]),
+                                    fold(row["cognome"]),
+                                    fold(row["nome"]),
+                                ],
+                                return_dtype=pl.Int64,
+                            ),
+                            surname="cognome",
+                            forename="nome",
+                            birth=born,
+                            sex="sesso",
+                            elected=pl.col("CODTIPOELETTO") == "E",
+                        )
+                        won = day_members.filter("elected").group_by("region", "college", "label").len("seats")
+                        plural_lists = (
+                            list_votes.group_by("REGIONE", "college", "DESCRLISTA")
+                            .agg(pl.col("votes").sum())
+                            .select(region=region, college="college", label="DESCRLISTA", votes="votes")
+                        )
+                        plural_lists = plural_lists.join(won, on=["region", "college", "label"], how="left")
+                        day_lists = pl.concat(
+                            [
+                                plural_lists.group_by("region", "label")
+                                .agg(pl.col("votes").sum(), pl.col("seats").sum())
+                                .select("region", pl.lit(None, pl.String).alias("college"), "label", "votes", "seats"),
+                                plural_lists.select("region", "college", "label", "votes", "seats"),
+                            ]
+                        ).with_columns(pl.col("seats").fill_null(0).cast(pl.Int64))
+                        day_singles = pl.concat(
+                            [
+                                communes.unique(["single", "COMUNE", "COGNOME", "NOME", "DATANASCITA"])
+                                .group_by("REGIONE", "college", "single", "COGNOME", "NOME", "DATANASCITA", "SESSO")
+                                .agg(count("VOTICANDIDATO").sum().alias("votes"))
+                                .join(
+                                    communes.group_by("single", "COGNOME", "NOME", "DATANASCITA").agg(
+                                        pl.col("DESCRLISTA").drop_nulls().unique().sort().alias("lists")
+                                    ),
+                                    on=["single", "COGNOME", "NOME", "DATANASCITA"],
+                                )
+                                .select(
+                                    region=region,
+                                    college="single",
+                                    parent="college",
+                                    surname="COGNOME",
+                                    forename="NOME",
+                                    birth=pl.col("DATANASCITA").str.to_date("%d/%m/%Y", strict=False),
+                                    sex="SESSO",
+                                    votes="votes",
+                                    lists="lists",
+                                ),
+                                small.group_by("REGIONE", "single", "COGNOME", "NOME", "DATANASCITA", "SESSO")
+                                .agg(
+                                    count("TOTVOTI").sum().alias("votes"),
+                                    pl.col("CONTRASSEGNO").unique().sort().alias("lists"),
+                                )
+                                .select(
+                                    region=region,
+                                    college="single",
+                                    parent=pl.lit(None, pl.String),
+                                    surname="COGNOME",
+                                    forename="NOME",
+                                    birth=pl.col("DATANASCITA")
+                                    .str.split(" ")
+                                    .list.first()
+                                    .str.to_date("%d/%m/%Y", strict=False),
+                                    sex="SESSO",
+                                    votes="votes",
+                                    lists="lists",
+                                ),
+                            ]
+                        ).with_columns(flagged=pl.col("votes") == pl.col("votes").max().over("region", "college"))
+                        fields = [
+                            count("ELETTORITOT").sum().alias("registered"),
+                            count("VOTANTITOT").sum().alias("voters"),
+                            count("SKBIANCHE").sum().alias("blank"),
+                        ]
+                        small_fields = [
+                            count("NUMELETTORI").sum().alias("registered"),
+                            count("VOTANTITOT").sum().alias("voters"),
+                            count("SKBIANCHE").sum().alias("blank"),
+                        ]
+                        day_accounts = pl.concat(
+                            [
+                                towns.group_by("REGIONE")
+                                .agg(fields)
+                                .select(
+                                    region=region,
+                                    college=pl.lit(None, pl.String),
+                                    registered="registered",
+                                    voters="voters",
+                                    blank="blank",
+                                ),
+                                towns.group_by("REGIONE", "college")
+                                .agg(fields)
+                                .select(
+                                    region=region,
+                                    college="college",
+                                    registered="registered",
+                                    voters="voters",
+                                    blank="blank",
+                                ),
+                                towns.group_by("REGIONE", "single")
+                                .agg(fields)
+                                .select(
+                                    region=region,
+                                    college="single",
+                                    registered="registered",
+                                    voters="voters",
+                                    blank="blank",
+                                ),
+                                small_towns.group_by("REGIONE", "single")
+                                .agg(small_fields)
+                                .select(
+                                    region=region,
+                                    college="single",
+                                    registered="registered",
+                                    voters="voters",
+                                    blank="blank",
+                                ),
+                            ]
+                        )
+                declared, official, final, turnout = {}, {}, {}, {}
+                colleges = dict(day_singles.select("college", "region").unique("college").iter_rows())
+                for url in pages(day):
+                    query = params(url)
+                    title, counts = heading(url)
+                    if "index.php" in url and (query["tpe"] == "U" or (query["tpa"] == "G" and query["tpe"] == "L")):
+                        place = (
+                            title.rsplit(" Collegio ", 1)[1]
+                            if query["tpe"] == "U"
+                            else next(
+                                name
+                                for name, region in colleges.items()
+                                if region == f"{query['ne1'][0]:0>2}" and f" - U{query['ne1'][1:]} " in name + " "
+                            )
+                        )
+                        turnout[colleges[place], place] = counts
+                        for is_leader, cells in table(url):
+                            if is_leader:
+                                final[place, fold(re.sub(r" DETT[AO] .+$", "", cells[0]))] = (
+                                    next(number(cell) for cell in cells[2:] if re.fullmatch(r"[\d.]+", cell)),
+                                    cells[1] == "Eletto",
+                                )
+                        continue
+                    if query["tpa"] != "I" or query["tpe"] not in ("R", "P") or " Regione " not in title:
+                        continue
+                    place = title.split(" Regione ", 1)[1].split(" Collegio Plurinominale ")
+                    where = (
+                        region_of(place[0]),
+                        re.sub(
+                            r" - (\d+)$",
+                            r" - P\1",
+                            unicodedata.normalize("NFKD", place[1]).encode("ascii", "ignore").decode(),
+                        )
+                        if query["tpe"] == "P"
+                        else None,
+                    )
+                    for is_leader, cells in table(url):
+                        if not is_leader and len(cells) >= 6 and not cells[0] and cells[1]:
+                            official[*where, cells[1]] = number(cells[-3])
+                            if query["tpe"] == "R" and number(cells[-1]):
+                                declared[where[0], cells[1]] = number(cells[-1])
+                    turnout[where] = counts
+                if day >= REDUCED:
+                    keys = set(day_accounts.select("region", "college").rows())
+                    if keys != set(turnout):
+                        raise ValueError(
+                            f"{day}: turnout keys differ: {sorted(keys - set(turnout), key=str)[:3]} "
+                            f"{sorted(set(turnout) - keys, key=str)[:3]}"
+                        )
+                    day_accounts = pl.DataFrame(
+                        [(*key, *value) for key, value in turnout.items()],
+                        schema=["region", "college", "registered", "voters", "blank"],
+                        orient="row",
+                    )
+                    picks = [
+                        final.get((row["college"], fold(f"{row['surname']} {row['forename']}")))
+                        for row in day_singles.iter_rows(named=True)
+                    ]
+                    if None in picks or len(picks) != len(final):
+                        raise ValueError(f"{day}: single-member candidates differ from Eligendo's collegio pages")
+                    day_singles = day_singles.with_columns(
+                        pl.Series("votes", [votes for votes, _ in picks]),
+                        pl.Series("flagged", [won for _, won in picks]),
+                    )
+                    day_lists = day_lists.with_columns(
+                        pl.struct("region", "college", "label")
+                        .map_elements(
+                            lambda row, official=official: official.get((row["region"], row["college"], row["label"])),
+                            return_dtype=pl.Int64,
+                        )
+                        .alias("votes")
+                    )
+                differ = set(official.items()) ^ {
+                    ((region, place, label), votes)
+                    for region, place, label, votes in day_lists.select(
+                        "region", "college", "label", "votes"
+                    ).iter_rows()
+                }
+                if differ:
+                    raise ValueError(f"{day}: list votes differ from Eligendo's pages: {sorted(differ, key=str)[:8]}")
+                counted = {
+                    (region, label): seats
+                    for region, label, seats in day_lists.filter(pl.col("college").is_null() & (pl.col("seats") > 0))
+                    .select("region", "label", "seats")
+                    .iter_rows()
+                }
+                if counted != declared:
+                    raise ValueError(f"{day}: list seats differ from Eligendo's regional pages")
+                if day_members.filter("elected").height != day_lists.filter(pl.col("college").is_null())["seats"].sum():
+                    raise ValueError(f"{day}: elected list candidates differ from list seats")
+                coalition: dict[str, str] = {}
+                for lists in day_singles["lists"].to_list():
+                    if len(lists) < 2:
+                        continue
+                    english = (
+                        CENTER_RIGHT[0]
+                        if "FORZA ITALIA" in lists
+                        else CENTER_LEFT[0]
+                        if any(label.startswith("PARTITO DEMOCRATICO") for label in lists)
+                        else None
+                    )
+                    if english is None:
+                        raise ValueError(f"{day}: unnamed coalition {lists}")
+                    coalition |= dict.fromkeys(lists, english)
+                seated = {row["senator"] for row in members}
+                picked: set[str] = set()
+
+                def senator_of(
+                    region: str, kind: str, surname: str, forename: str, day=day, members=members, picked=picked
+                ) -> str | None:
+                    pool = [
+                        row
+                        for row in members
+                        if row["seat"] == region and kind in (row["kind"] or "") and row["senator"] not in picked
+                    ]
+                    found = match(pool, surname, forename)
+                    if found is None:
+                        print(f"{day} {region}: no seated senator for {surname} {forename}")
+                        return None
+                    picked.add(found["senator"])
+                    return found["senator"]
+
+                day_members = day_members.with_columns(
+                    pl.struct("region", "surname", "forename", "elected")
+                    .map_elements(
+                        lambda row: (
+                            senator_of(row["region"], "proporzionale", row["surname"], row["forename"])
+                            if row["elected"]
+                            else None
+                        ),
+                        return_dtype=pl.String,
+                    )
+                    .alias("senator")
+                )
+                day_singles = day_singles.with_columns(
+                    pl.struct("region", "surname", "forename", "flagged")
+                    .map_elements(
+                        lambda row: (
+                            senator_of(row["region"], "uninominale", row["surname"], row["forename"])
+                            if row["flagged"]
+                            else None
+                        ),
+                        return_dtype=pl.String,
+                    )
+                    .alias("senator")
+                ).with_columns(elected=pl.col("flagged"))
+                unseated = sorted(seated - picked - {row["senator"] for row in members if not row["seat"][0].isdigit()})
+                if unseated:
+                    print(f"{day}: seated senators matched to no candidate: {unseated}")
+                if day_singles.group_by("college").agg(pl.col("elected").sum()).filter(pl.col("elected") != 1).height:
+                    raise ValueError(f"{day}: a single-member collegio without exactly one winner")
+                r_lists.append(
+                    day_lists.with_columns(
+                        pl.lit(day).alias("day"),
+                        pl.col("label")
+                        .replace_strict(coalition, default=None, return_dtype=pl.String)
+                        .alias("coalition"),
+                    )
+                )
+                r_members.append(day_members.with_columns(pl.lit(day).alias("day")))
+                r_singles.append(day_singles.with_columns(pl.lit(day).alias("day")))
+                r_accounts.append(day_accounts.with_columns(pl.lit(day).alias("day")))
             continue
         with zipfile.ZipFile(raw.cached(SOURCE, ARCHIVE.format(day=day)).path) as archive:
             names = archive.namelist()
@@ -672,6 +1248,10 @@ def parse() -> None:
     pl.DataFrame(recovered, schema=["day", "region", "label", "senator"], orient="row").write_parquet(
         PARSED / "recovered.parquet"
     )
+    pl.concat(r_lists, how="diagonal_relaxed").write_parquet(PARSED / "rosato_lists.parquet")
+    pl.concat(r_members, how="diagonal_relaxed").write_parquet(PARSED / "rosato_members.parquet")
+    pl.concat(r_singles, how="diagonal_relaxed").write_parquet(PARSED / "rosato_singles.parquet")
+    pl.concat(r_accounts, how="diagonal_relaxed").write_parquet(PARSED / "rosato_accounts.parquet")
 
 
 def emit() -> Path:
@@ -688,13 +1268,17 @@ def emit() -> Path:
     abroad_votes = pl.read_parquet(PARSED / "abroad_votes.parquet")
     single_seats = pl.read_parquet(PARSED / "singles.parquet")
     recovery = pl.read_parquet(PARSED / "recovered.parquet")
+    rosato_lists = pl.read_parquet(PARSED / "rosato_lists.parquet")
+    rosato_members = pl.read_parquet(PARSED / "rosato_members.parquet")
+    rosato_singles = pl.read_parquet(PARSED / "rosato_singles.parquet")
+    rosato_accounts = pl.read_parquet(PARSED / "rosato_accounts.parquet")
     record = {row["senator"]: row for row in roll.to_dicts()}
     with connect() as conn:
         cs = Changeset(
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Italian Senate elections 1948–2013: candidates and votes by collegio, region, and country abroad, list and group seats, and the elected senators",
+            summary="Italian Senate elections 1948–2022: candidates and votes by collegio, region, and country abroad, list and group seats, and the elected senators",
             polity="IT",
         )
 
@@ -724,6 +1308,8 @@ def emit() -> Path:
         for legislature, day in enumerate(DAYS, 1):
             cs.artifact(raw.cached(SOURCE, ARCHIVE.format(day=day)), interno)
             cs.artifact(raw.cached(SOURCE, mandates(legislature)), senate_record)
+            if day == REDUCED:
+                cs.artifact(raw.cached(SOURCE, TRASPARENZA), interno)
             if day >= CALDEROLI:
                 for url in pages(day):
                     cs.artifact(raw.cached(SOURCE, url), interno)
@@ -750,6 +1336,10 @@ def emit() -> Path:
             ("it.collegio_senato", 3, "Senate college"),
             ("it.collegio_senato_1993", 3, "Senate college"),
             ("it.collegio_senato_2005", 3, "Senate college"),
+            ("it.plurinominale_senato_2017", 2, "Senate multi-member college"),
+            ("it.collegio_senato_2017", 3, "Senate single-member college"),
+            ("it.plurinominale_senato_2020", 2, "Senate multi-member college"),
+            ("it.collegio_senato_2020", 3, "Senate single-member college"),
         ):
             if code not in schemes:
                 cs.add("scheme", code=code, polity_id=italy, kind="electoral_district", rank=rank, noun=noun)
@@ -905,13 +1495,20 @@ def emit() -> Path:
 
         colleges: dict[tuple[str, str], tuple[UUID, UUID]] = {}
 
-        def college(region: str, key: str, label: str, day: date) -> tuple[UUID, UUID]:
+        def college(
+            region: str, key: str, label: str, day: date, plural: bool = False, parent: UUID | None = None
+        ) -> tuple[UUID, UUID]:
+            kind = "plurinominale" if plural else "collegio"
             scheme, start, end = (
                 ("it.collegio_senato", DAYS[0], MATTARELLA)
                 if day < MATTARELLA
                 else ("it.collegio_senato_1993", MATTARELLA, CALDEROLI)
                 if day < CALDEROLI
                 else ("it.collegio_senato_2005", CALDEROLI, ROSATO)
+                if day < ROSATO
+                else (f"it.{kind}_senato_2017", ROSATO, REDUCED)
+                if day < REDUCED
+                else (f"it.{kind}_senato_2020", REDUCED, None)
             )
             code = f"{region}-{slug(key)}"
             if (scheme, code) in colleges:
@@ -921,7 +1518,13 @@ def emit() -> Path:
             if area in cs.minted:
                 cs.add("area", id=area, scheme_code=scheme)
                 cs.add("area_code", area_id=area, code=code, valid_from=start, valid_to=end)
-                cs.add("area_parent", area_id=area, parent_id=region_areas[region], valid_from=start, valid_to=end)
+                cs.add(
+                    "area_parent",
+                    area_id=area,
+                    parent_id=parent or region_areas[region],
+                    valid_from=start,
+                    valid_to=end,
+                )
                 name(area, label, "it")
             if unit in cs.minted:
                 cs.add(
@@ -1117,7 +1720,9 @@ def emit() -> Path:
             chamber_parties.setdefault((held, label), party)
         divisions = {code: cs.area("it.ripartizione", code) for code, _ in ABROAD.values()}
         coalition_ids: dict[tuple[date, str], UUID] = {}
-        coalition_members: set[tuple[UUID, UUID]] = set()
+        coalition_members: set[tuple[UUID, UUID]] = set(
+            conn.execute("select alliance_id, party_id from alliance_member").fetchall()
+        )
         minted_countries: set[str] = set()
 
         def list_party(label: str, day: date) -> UUID | None:
@@ -1171,6 +1776,20 @@ def emit() -> Path:
                         entity_id=contest,
                     )
                     counted = result_set(contest_key, election, contest)
+                    if (day, region) in CAVEATS:
+                        cs.add("note", entity_id=counted, kind="caveat", body_md=CAVEATS[day, region])
+                    if abroad:
+                        spread = abroad_votes.filter((pl.col("day") == day) & (pl.col("region") == region))[
+                            "votes"
+                        ].sum()
+                        total = sum(row["votes"] for row in rows)
+                        if spread != total:
+                            cs.add(
+                                "note",
+                                entity_id=counted,
+                                kind="caveat",
+                                body_md=ABROAD_GAP.format(counted=f"{spread:,}", total=f"{total:,}"),
+                            )
                     listed = day_candidates.filter(pl.col("region") == region)
                     opted = listed.filter(pl.col("proclaimed") & ~pl.col("elected"))
                     if opted.height:
@@ -1227,8 +1846,7 @@ def emit() -> Path:
                         party = list_party(row["label"], day)
                         if alliance is not None and party is not None and (alliance, party) not in coalition_members:
                             coalition_members.add((alliance, party))
-                            if alliance in cs.minted:
-                                cs.add("alliance_member", alliance_id=alliance, party_id=party)
+                            cs.add("alliance_member", alliance_id=alliance, party_id=party)
                         cs.add(
                             "contest_option",
                             id=option,
@@ -1415,6 +2033,207 @@ def emit() -> Path:
                         cs.add(
                             "outcome", result_set_id=counted, option_id=option, candidacy_id=candidacy, kind="elected"
                         )
+                if day < ROSATO:
+                    continue
+                day_r_lists = rosato_lists.filter(pl.col("day") == day)
+                day_r_members = rosato_members.filter(pl.col("day") == day)
+                day_r_singles = rosato_singles.filter(pl.col("day") == day)
+                day_r_accounts = rosato_accounts.filter(pl.col("day") == day)
+                coalition_by_label = dict(day_r_lists.select("label", "coalition").unique("label").iter_rows())
+
+                def accounted(result: UUID, unit: UUID, region: str, place: str | None, day_r_accounts=day_r_accounts):
+                    for registered, voters, blank in (
+                        day_r_accounts.filter(
+                            (pl.col("region") == region)
+                            & (pl.col("college").is_null() if place is None else pl.col("college") == place)
+                        )
+                        .select("registered", "voters", "blank")
+                        .iter_rows()
+                    ):
+                        if registered >= voters:
+                            value_row(result, unit, None, REGISTERED, registered)
+                        value_row(result, unit, None, VOTERS, voters)
+                        value_row(result, unit, None, BLANK, blank)
+
+                def list_option(
+                    contest_key: str,
+                    contest: UUID,
+                    label: str,
+                    day=day,
+                    election=election,
+                    coalition_by_label=coalition_by_label,
+                ) -> UUID:
+                    option = cs.key("it.option", f"{contest_key}:{slug(label)}")
+                    alliance = coalition_of(coalition_by_label.get(label), day, election)
+                    party = list_party(label, day)
+                    if alliance is not None and party is not None and (alliance, party) not in coalition_members:
+                        coalition_members.add((alliance, party))
+                        cs.add("alliance_member", alliance_id=alliance, party_id=party)
+                    cs.add(
+                        "contest_option",
+                        id=option,
+                        contest_id=contest,
+                        kind="list",
+                        party_id=party,
+                        alliance_id=alliance,
+                        ballot_label=label,
+                    )
+                    return option
+
+                plurals: dict[str, UUID] = {}
+                for region in sorted(day_r_lists["region"].unique()):
+                    region_lists = day_r_lists.filter(pl.col("region") == region)
+                    rows = region_lists.filter(pl.col("college").is_null()).sort("votes", descending=True).to_dicts()
+                    contest_key = f"{day}:senate:{region}"
+                    root = cs.key("it.contest", contest_key)
+                    extra, vacancy = VACANT.get((day, region), (0, None))
+                    cs.add(
+                        "contest",
+                        id=root,
+                        election_id=election,
+                        kind="list_allocation",
+                        body_id=senate,
+                        district_area_id=region_areas[region],
+                        magnitude=sum(row["seats"] for row in rows) + extra,
+                        electoral_system_id=systems["senato-proportional-2017"],
+                        default_result_kind="counted",
+                    )
+                    name(root, f"Senate, {region_names[region]}")
+                    region_path = f"{path}/senate/{slug(region_names[region])}"
+                    cs.add("slug", path=region_path, entity_id=root)
+                    counted = result_set(contest_key, election, root)
+                    for body in (SHARES_NOTE, vacancy, CAVEATS.get((day, region))):
+                        if body is not None:
+                            cs.add("note", entity_id=counted, kind="caveat", body_md=body)
+                    region_unit = cs.unit("it.regione", region)
+                    accounted(counted, region_unit, region, None)
+                    for row in rows:
+                        option = list_option(contest_key, root, row["label"])
+                        value_row(counted, region_unit, option, VOTES, row["votes"])
+                        if row["seats"]:
+                            cs.add("outcome", result_set_id=counted, option_id=option, kind="won", seats=row["seats"])
+                    for place in sorted(region_lists.filter(pl.col("college").is_not_null())["college"].unique()):
+                        label = label_of(place)
+                        area, unit = college(region, place, label, day, plural=True)
+                        plurals[place] = area
+                        child_key = f"{contest_key}:{slug(place)}"
+                        child = cs.key("it.contest", child_key)
+                        cs.add(
+                            "contest",
+                            id=child,
+                            election_id=election,
+                            kind="list_allocation",
+                            body_id=senate,
+                            district_area_id=area,
+                            allocation_parent_id=root,
+                            electoral_system_id=systems["senato-proportional-2017"],
+                            default_result_kind="counted",
+                        )
+                        name(child, f"Senate, {label}")
+                        cs.add("slug", path=f"{region_path}/{place.rsplit(' - ', 1)[1].lower()}", entity_id=child)
+                        plural_set = result_set(child_key, election, child)
+                        for body in (SHARES_NOTE, UNORDERED_NOTE if day < REDUCED else None):
+                            if body is not None:
+                                cs.add("note", entity_id=plural_set, kind="caveat", body_md=body)
+                        accounted(plural_set, unit, region, place)
+                        for row in (
+                            region_lists.filter(pl.col("college") == place).sort("votes", descending=True).to_dicts()
+                        ):
+                            option = list_option(child_key, child, row["label"])
+                            value_row(plural_set, unit, option, VOTES, row["votes"])
+                            if row["seats"]:
+                                cs.add(
+                                    "outcome",
+                                    result_set_id=plural_set,
+                                    option_id=option,
+                                    kind="won",
+                                    seats=row["seats"],
+                                )
+                            for member in (
+                                day_r_members.filter((pl.col("college") == place) & (pl.col("label") == row["label"]))
+                                .sort("position", "surname", "forename", nulls_last=True)
+                                .to_dicts()
+                            ):
+                                person = person_of(member | {"key": slug(row["label"])}, day, region)
+                                candidacy = cs.key("it.candidacy", f"{child_key}:{slug(row['label'])}:{person}")
+                                cs.add(
+                                    "candidacy",
+                                    id=candidacy,
+                                    person_id=person,
+                                    option_id=option,
+                                    role="list_member",
+                                    list_position=member["position"],
+                                    ballot_name=f"{member['surname']} {member['forename']}",
+                                )
+                                if member["elected"]:
+                                    cs.add(
+                                        "outcome",
+                                        result_set_id=plural_set,
+                                        option_id=option,
+                                        candidacy_id=candidacy,
+                                        kind="elected",
+                                    )
+                for place in sorted(day_r_singles["college"].unique()):
+                    rows = day_r_singles.filter(pl.col("college") == place).sort("votes", descending=True).to_dicts()
+                    region, code = rows[0]["region"], place.split(" (")[0]
+                    label = label_of(place)
+                    area, unit = college(region, code, label, day, parent=plurals.get(rows[0]["parent"] or ""))
+                    contest_key = f"{day}:senate:{region}:{slug(code)}"
+                    contest = cs.key("it.contest", contest_key)
+                    cs.add(
+                        "contest",
+                        id=contest,
+                        election_id=election,
+                        kind="body_seats",
+                        body_id=senate,
+                        district_area_id=area,
+                        magnitude=1,
+                        electoral_system_id=systems[
+                            "senato-valle-d-aosta" if region == "02" else "senato-single-member-2017"
+                        ],
+                        default_result_kind="counted",
+                    )
+                    name(contest, f"Senate, {label}")
+                    cs.add(
+                        "slug",
+                        path=f"{path}/senate/{slug(region_names[region])}/{code.rsplit(' - ', 1)[1].lower()}",
+                        entity_id=contest,
+                    )
+                    counted = result_set(contest_key, election, contest)
+                    if (day, f"{region}:{slug(code)}") in CAVEATS:
+                        cs.add("note", entity_id=counted, kind="caveat", body_md=CAVEATS[day, f"{region}:{slug(code)}"])
+                    accounted(counted, unit, region, place)
+                    for row in rows:
+                        ballot = f"{row['surname']} {row['forename']}"
+                        lists = row["lists"]
+                        option = cs.key("it.option", f"{contest_key}:{slug(ballot)}")
+                        cs.add(
+                            "contest_option",
+                            id=option,
+                            contest_id=contest,
+                            kind="candidate",
+                            party_id=list_party(lists[0], day) if len(lists) == 1 else None,
+                            alliance_id=coalition_of(coalition_by_label.get(lists[0]), day, election)
+                            if len(lists) > 1
+                            else None,
+                            ballot_label=ballot,
+                        )
+                        person = person_of(row | {"key": slug(code)}, day, region)
+                        candidacy = cs.key("it.candidacy", f"{contest_key}:{slug(ballot)}")
+                        cs.add(
+                            "candidacy",
+                            id=candidacy,
+                            person_id=person,
+                            option_id=option,
+                            role="head",
+                            ballot_name=ballot,
+                        )
+                        for party in dict.fromkeys(list_party(label, day) for label in lists):
+                            if party is not None:
+                                cs.add("candidacy_nomination", candidacy_id=candidacy, party_id=party, kind="nominated")
+                        value_row(counted, unit, option, VOTES, row["votes"])
+                        if row["elected"]:
+                            cs.add("outcome", result_set_id=counted, option_id=option, kind="elected")
                 continue
             day_seats = seats.filter(pl.col("day") == day)
             day_declared = {
@@ -1540,4 +2359,6 @@ def emit() -> Path:
                     counts,
                     note,
                 )
+        for row in cs.rows["contest"]:
+            cs.add("note", entity_id=row["id"], kind="context", body_md=SENATE_NOTE)
         return cs.write()
