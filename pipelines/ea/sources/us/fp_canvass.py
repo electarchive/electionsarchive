@@ -88,6 +88,20 @@ DOCUMENTS = {
         "Georgia Election Results: official results of the general election",
         "https://sos.ga.gov/page/historical-elections-results",
     ),
+    "VI2024": (
+        SOURCE,
+        "https://usvi.elstats.civera.com/api/download_contest/39_table.csv?split_party=false",
+        "Election System of the Virgin Islands",
+        "Election archive",
+        "https://electionarchive.vivote.gov/contest/39",
+    ),
+    "VI2024S": (
+        SOURCE,
+        "https://vivote.gov/wp-content/uploads/2024/11/Official-Territorial-Election-Summary-11.15.2024.pdf",
+        "Election System of the Virgin Islands",
+        "Territorial election summary results report, official results, November 5, 2024",
+        "https://vivote.gov/",
+    ),
     "ME2014": (
         SOURCE,
         "https://lldc.mainelegislature.org/Open/Elections/Returns/2014/20141104/elec_20141104aj.xlsx",
@@ -392,6 +406,39 @@ def georgia(conn: Connection) -> list[tuple[date, str, str, str, int]]:
     return rows
 
 
+def virgin_islands(conn: Connection, document: str) -> list[tuple[date, str, str, str, int]]:
+    day = date(2024, 11, 5)
+    source, url, *_ = DOCUMENTS["VI2024"]
+    lines = list(csv.reader(io.StringIO(raw.cached(source, url).path.read_text())))
+    names = ["PLASKETT", "SMITH", "PICKARD", "WRITE-INS"]
+    summary = re.search(r"DELEGATE TO THE HOUSE.*?Total Votes Cast", pdf("VI2024S"), re.DOTALL)[0]
+    official = [
+        [int(value.replace(",", "")) for value in found]
+        for found in re.findall(
+            r"(?m)^(?:DEM|IND|REP)?\s*[A-Za-z. -]+?\s+([\d,]+)\s+([\d,]+)\s+([\d,]+)\s+([\d,]+)\s+([\d,]+)$", summary
+        )
+    ]
+    rows = []
+    if document == "VI2024":
+        district = None
+        for line in lines[2:]:
+            if line[0] == "District":
+                district = "78010" if line[1] == "St. Croix" else "78030"
+            elif line[0] == "Precinct":
+                county = "78020" if line[1] in ("Coral Bay", "Cruz Bay") else district
+                code = f"2024:VI:{county}::{line[1].lower()}"
+                rows += [(day, "house", code, name, int(value)) for name, value in zip(names, line[2:6], strict=True)]
+        for index, name in enumerate(names):
+            if sum(r[4] for r in rows if r[3] == name) != official[index][1] + official[index][2]:
+                raise ValueError(f"VI delegate {name}: precincts do not equal election-day plus early votes")
+    else:
+        rows = [
+            (day, "house", "2024:VI:absentee and provisional", name, official[index][3] + official[index][4])
+            for index, name in enumerate(names)
+        ]
+    return rows
+
+
 def pdf(document: str) -> str:
     source, url, *_ = DOCUMENTS[document]
     return subprocess.run(
@@ -409,6 +456,8 @@ def parse() -> None:
                 ("ME2014", maine),
                 ("DE2006", delaware),
                 ("KS2002", kansas),
+                ("VI2024", lambda conn: virgin_islands(conn, "VI2024")),
+                ("VI2024S", lambda conn: virgin_islands(conn, "VI2024S")),
                 ("GA2000", georgia),
                 ("OH2010", ohio),
                 ("SC2010", lambda conn: clarity(conn, "SC2010", "45", date(2010, 11, 2), "senate", "U.S. Senate")),
@@ -491,7 +540,7 @@ def emit() -> Path:
                 valid_from=None,
                 valid_to=None,
             )
-        grains = frame.group_by("source").agg(
+        grains = frame.group_by("state").agg(
             grain=pl.when((pl.col("kind") == "town").any())
             .then(pl.lit("town"))
             .when((pl.col("kind") == "precinct").any())
@@ -499,12 +548,12 @@ def emit() -> Path:
             .otherwise(pl.lit("county"))
         )
         for grain in ("county", "town", "precinct"):
-            documents = grains.filter(pl.col("grain") == grain)["source"]
+            documents = grains.filter(pl.col("grain") == grain)["state"]
             if len(documents):
                 medsl.attach(
                     cs,
                     conn,
-                    frame.filter(pl.col("source").is_in(documents)),
+                    frame.filter(pl.col("state").is_in(documents)),
                     sources,
                     grain=grain,
                     strict=True,

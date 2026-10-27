@@ -1,0 +1,72 @@
+{
+  "polity": "US-NE",
+  "publisher": "Nebraska Secretary of State",
+  "license": "Public record",
+  "raw_source": "us.fp_canvass",
+  "title": "Official Report of the Board of State Canvassers, General Election, November 7, 2000",
+  "file": {
+    "url": "https://sos.nebraska.gov/sites/default/files/doc/elections/2000/2000%20General.pdf"
+  },
+  "contests": {
+    "senate": {
+      "year": 2000,
+      "chamber": "senate",
+      "day": "2000-11-07",
+      "special": false,
+      "state": "NE",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 13,
+      "id": "m13",
+      "orientation": "counties_down",
+      "dpi": 300,
+      "hint": "The first row on page 13 is the statewide TOTAL; skip it.",
+      "columns": [
+        {
+          "label": "Don Stenberg Republican",
+          "contest": "senate",
+          "candidate": "Don Stenberg"
+        },
+        {
+          "label": "Ben Nelson Democrat",
+          "contest": "senate",
+          "candidate": "Ben Nelson"
+        },
+        {
+          "label": "Write In",
+          "contest": "senate",
+          "candidate": "WRITE-INS",
+          "writein": true
+        }
+      ]
+    },
+    {
+      "page": 14,
+      "id": "m14",
+      "orientation": "counties_down",
+      "dpi": 300,
+      "hint": "The first row on page 13 is the statewide TOTAL; skip it.",
+      "columns": [
+        {
+          "label": "Don Stenberg Republican",
+          "contest": "senate",
+          "candidate": "Don Stenberg"
+        },
+        {
+          "label": "Ben Nelson Democrat",
+          "contest": "senate",
+          "candidate": "Ben Nelson"
+        },
+        {
+          "label": "Write In",
+          "contest": "senate",
+          "candidate": "WRITE-INS",
+          "writein": true
+        }
+      ]
+    }
+  ]
+}
