@@ -1,7 +1,9 @@
+import difflib
 import html
 import json
 import re
 import subprocess
+import tempfile
 from collections import Counter
 from datetime import UTC, date, datetime
 from pathlib import Path
@@ -56,6 +58,7 @@ def fetch() -> None:
 def parse() -> None:
     PARSED.mkdir(parents=True, exist_ok=True)
     documents: dict[str, list[str]] = {}
+    scanned: set[str] = set()
     rows = []
     for row in measures():
         url = str(row["url"])
@@ -65,19 +68,53 @@ def parse() -> None:
             print("no source document:", row["state"], row["label"], url)
             continue
         if url not in documents:
-            documents[url] = (
+            extracted = (
                 [
-                    plain(
-                        subprocess.run(
-                            ["pdftotext", *mode, str(path), "-"], capture_output=True, text=True, check=True
-                        ).stdout
-                    )
+                    subprocess.run(
+                        ["pdftotext", *mode, str(path), "-"], capture_output=True, text=True, check=True
+                    ).stdout
                     for mode in ([], ["-raw"], ["-layout"])
                 ]
                 if path.suffix == ".pdf"
-                else [plain(re.sub(r"<[^>]+>", " ", path.read_text(errors="replace")))]
+                else [re.sub(r"<[^>]+>", " ", path.read_text(errors="replace"))]
             )
-        found = any(plain(str(row["text"])) in document for document in documents[url])
+            if path.suffix == ".pdf" and len(plain(extracted[0])) < 200:
+                with tempfile.TemporaryDirectory() as scratch:
+                    subprocess.run(["pdftoppm", "-r", "300", "-gray", "-png", str(path), f"{scratch}/p"], check=True)
+                    extracted = [
+                        " ".join(
+                            subprocess.run(
+                                ["tesseract", str(page), "-"], capture_output=True, text=True, check=True
+                            ).stdout
+                            for page in sorted(Path(scratch).glob("p-*.png"))
+                        )
+                    ]
+                scanned.add(url)
+            documents[url] = [plain(text) for text in extracted] + [
+                plain(re.sub(r"(?m)^\s*\d{1,2}(\s+|$)", "", text)) for text in extracted
+            ]
+        segments = [
+            plain(part) for part in re.split(r"(?<=[.?!:;—])\s+|\n", str(row["text"])) if len(plain(part)) > 3
+        ]
+        found = row["text"] is not None and any(
+            all(segment in document for segment in segments)
+            or all(re.sub("f[il]", "", segment) in re.sub("f[il]", "", document) for segment in segments)
+            for document in documents[url]
+        )
+        if not found and row["text"] is not None and url in scanned:
+            document = documents[url][0]
+            found = all(
+                difflib.SequenceMatcher(
+                    None, segment, document[max(match.b - match.a, 0) : max(match.b - match.a, 0) + len(segment)]
+                ).ratio()
+                >= 0.95
+                for segment in segments
+                for match in [
+                    difflib.SequenceMatcher(None, segment, document, autojunk=False).find_longest_match(
+                        0, len(segment), 0, len(document)
+                    )
+                ]
+            )
         if not found:
             print("text not found in source:", row["state"], row["label"], url)
         rows.append({**{key: None if value is None else str(value) for key, value in row.items()}, "verified": found})
@@ -127,7 +164,7 @@ def emit() -> Path:
                 cs.add(
                     "source",
                     id=source,
-                    kind="official",
+                    kind="official_body",
                     publisher=row["publisher"],
                     title=row["source_title"],
                     url=row["url"],
