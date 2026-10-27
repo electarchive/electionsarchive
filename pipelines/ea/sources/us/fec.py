@@ -1168,6 +1168,7 @@ PARTY_RUN = [
 ]
 WITHDREW = {(2002, "H8OK04037"), (2020, "H0TX02080"), (2022, "H2AK01174"), (2022, "H8TX03123")}
 DECLINED = re.compile(r"declined the nomination|nomination was null and void")
+SUBSTITUTED = re.compile(r"declined the nomination|null and void|substituted|replaced .+ (?:line|candidate)")
 MISTOTALED = {(2006, "WA", "senate", None)}
 STRAYED = {(2020, "WI", "02", "W(R)", "131"): "01"}
 RUNOFFS = {
@@ -6549,7 +6550,7 @@ def emit() -> Path:
                     option_id=roots[winner],
                     kind="elected",
                     seats=1,
-                    notes=footnotes.get(winner),
+                    notes=None if re.search(SUBSTITUTED, footnotes.get(winner) or "") else footnotes.get(winner),
                 )
                 if contest_key in canvasses:
                     canvass, page, read = canvasses[contest_key]
