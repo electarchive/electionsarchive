@@ -264,6 +264,21 @@ export function verdict(contest: Page["contest"]) {
     return null;
   }
   const isWon = ["won", "elected"].includes(top.current.outcome ?? "");
+  const noun = (
+    {
+      state_delegate_equivalents: m.noun_state_delegate_equivalents,
+      caucus_delegates: m.noun_caucus_delegates,
+    } as Record<string, () => string>
+  )[contest.current.measure];
+  if (noun != null) {
+    return (isWon ? m.race_lede_tally_won : m.race_lede_tally_led)({
+      party: definite(named(top), true),
+      votes: count(top.current.votes),
+      noun: noun(),
+      runner: definite(named(next)),
+      other: count(next.current.votes),
+    });
+  }
   const written = contest.rows.filter((row) => row.current?.person != null);
   if (
     isWon &&

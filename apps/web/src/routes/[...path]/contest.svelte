@@ -2380,7 +2380,7 @@
               person={lead.row.current?.person}
               party={lead.row.current?.party}
             />
-            {#if lead.votes > 0 && !isTally}
+            {#if lead.votes > 0 && !isTally && contest.current?.measure !== "state_delegate_equivalents"}
               <span
                 class="shrink-0 font-figures text-[0.8125rem] text-muted-foreground tabular-nums"
                 >{m.atlas_votes({ votes: count(lead.votes) })}</span
