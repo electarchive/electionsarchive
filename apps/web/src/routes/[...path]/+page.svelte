@@ -206,7 +206,7 @@
         boundaries={data.boundaries}
         surround={data.surround}
         match={data.match}
-        lean={data.lean}
+        standing={data.standing}
       />
     {:else if data.kind === "election"}
       {#key `${data.id}${query}`}

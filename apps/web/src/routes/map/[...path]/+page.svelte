@@ -18,8 +18,8 @@
   import { on } from "svelte/events";
   import { SvelteURLSearchParams } from "svelte/reactivity";
   import { fade } from "svelte/transition";
-  import Lean from "#lib/components/lean.svelte";
   import Monogram from "#lib/components/monogram.svelte";
+  import Standing from "#lib/components/standing.svelte";
   import * as Command from "#lib/components/ui/command/index.js";
   import * as Select from "#lib/components/ui/select/index.js";
   import { Switch } from "#lib/components/ui/switch/index.js";
@@ -252,6 +252,7 @@
       leader,
       lead: top - next,
       margin,
+      isMeasured: at(first?.key) != null && at(second?.key) != null,
       swing,
       value,
       isFlip: prior != null && leader != null && prior !== leader,
@@ -457,7 +458,8 @@
       hit == null ||
       first == null ||
       second == null ||
-      hit.set.places.leader[hit.i] == null
+      hit.set.places.leader[hit.i] == null ||
+      !read(hit.set, hit.i).isMeasured
     ) {
       return null;
     }
@@ -465,8 +467,9 @@
     const overall = (set: Sheet) => {
       let [weighted, total] = [0, 0];
       for (const [j, valid] of set.places.valid.entries()) {
-        if (set.places.leader[j] != null) {
-          weighted += read(set, j).margin * valid;
+        const reading = read(set, j);
+        if (set.places.leader[j] != null && reading.isMeasured) {
+          weighted += reading.margin * valid;
           total += valid;
         }
       }
@@ -488,17 +491,25 @@
     const whole = national
       ? { name: sheet.trail[0]?.name ?? "", margin: overall(sheet) }
       : null;
-    const margins: Array<number> = [];
+    const places: Array<{ name: string; margin: number; isOwn: boolean }> = [];
+    let total = 0;
     for (const j of isTiled
       ? (groups?.get(`${part}:${layer}`) ?? [])
       : hit.set.places.k.keys()) {
-      if (hit.set.places.leader[j] != null) {
-        margins.push(read(hit.set, j).margin);
+      const each = read(hit.set, j);
+      total += Number(hit.set.places.leader[j] != null);
+      if (hit.set.places.leader[j] != null && each.isMeasured) {
+        places.push({
+          name: hit.set.places.name[j] ?? "",
+          margin: each.margin,
+          isOwn: j === hit.i,
+        });
       }
     }
     const reading = read(hit.set, hit.i);
     const margin = reading.margin;
     return {
+      name: hit.set.places.name[hit.i] ?? "",
       sides: [
         { label: first.label, tone: hue(sheet, 0) },
         { label: second.label, tone: hue(sheet, 1) },
@@ -506,11 +517,12 @@
       margin,
       before: reading.swing == null ? null : margin - reading.swing,
       marks: [parent, whole].filter((mark) => mark != null),
-      siblings: margins,
+      places: places.toSorted((a, b) => a.margin - b.margin),
+      total,
       rank:
         1 +
-        margins.filter((value) =>
-          margin >= 0 ? value > margin : value < margin,
+        places.filter((entry) =>
+          margin >= 0 ? entry.margin > margin : entry.margin < margin,
         ).length,
       noun:
         (isTiled
@@ -1737,16 +1749,25 @@
       </p>
     {/if}
     {#if standing != null}
-      <Lean
+      <Standing
         class="border-bs pbs-3"
         sides={standing.sides}
-        margin={standing.margin}
-        before={standing.before}
+        place={{
+          name: standing.name,
+          margin: standing.margin,
+          before: standing.before,
+        }}
         marks={standing.marks}
-        siblings={standing.siblings}
-        rank={standing.rank}
-        noun={standing.noun}
-        place={standing.place}
+        within={standing.place}
+        siblings={{
+          noun: standing.noun,
+          count: standing.places.length,
+          total: standing.total,
+          rank: standing.rank,
+          places: standing.places,
+        }}
+        year={null}
+        isCompact
       />
     {/if}
     {#if part != null}

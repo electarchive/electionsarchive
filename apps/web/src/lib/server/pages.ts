@@ -629,6 +629,7 @@ export async function archive(path: string, search: URLSearchParams) {
       additional,
       successors,
       statutes,
+      standing,
     ] = await found(
       Promise.all([
         call(router.contests.get, {
@@ -648,6 +649,21 @@ export async function archive(path: string, search: URLSearchParams) {
         call(router.seats.additional, { id: slug.entity_id }),
         call(router.seats.successors, { id: slug.entity_id }),
         call(router.seats.statutes, { id: slug.entity_id }),
+        (async () => {
+          if (unit === "") {
+            return null;
+          }
+          try {
+            return await call(router.contests.lean, {
+              id: slug.entity_id,
+              unit,
+              group:
+                search.get("group") === "alliance" ? "alliance" : undefined,
+            });
+          } catch {
+            return null;
+          }
+        })(),
       ]),
     );
     const boundaries = await call(router.contests.boundaries, {
@@ -703,7 +719,7 @@ export async function archive(path: string, search: URLSearchParams) {
       surround,
       match,
       within,
-      lean: unit === "" ? null : { id: slug.entity_id, unit },
+      standing,
     };
   }
   if (slug.type === "election") {

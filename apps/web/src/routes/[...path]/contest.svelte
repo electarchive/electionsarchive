@@ -2,9 +2,9 @@
   import { goto } from "$app/navigation";
   import { resolve } from "$app/paths";
   import { page } from "$app/state";
-  import { createQuery } from "@tanstack/svelte-query";
   import { Tooltip as TooltipPrimitive } from "bits-ui";
   import Name from "#lib/components/name.svelte";
+  import Standing from "#lib/components/standing.svelte";
   import Term from "#lib/components/term.svelte";
   import { Combobox } from "#lib/components/ui/combobox/index.js";
   import * as Tooltip from "#lib/components/ui/tooltip/index.js";
@@ -49,7 +49,6 @@
   import Series from "./series.svelte";
   import Shift from "./shift.svelte";
   import Slate from "./slate.svelte";
-  import Standing from "./standing.svelte";
   import Stv from "./stv.svelte";
   import Tally from "./tally.svelte";
   import Wording from "./wording.svelte";
@@ -67,7 +66,7 @@
     boundaries,
     surround,
     match,
-    lean,
+    standing,
   }: {
     contest: Extract<PageData, { kind: "contest" }>["contest"];
     lists: Extract<PageData, { kind: "contest" }>["lists"];
@@ -81,17 +80,8 @@
     boundaries: Extract<PageData, { kind: "contest" }>["boundaries"];
     surround: Extract<PageData, { kind: "contest" }>["surround"];
     match: string;
-    lean: { id: string; unit: string } | null;
+    standing: Extract<PageData, { kind: "contest" }>["standing"];
   } = $props();
-
-  const leaning = createQuery(() => ({
-    ...orpc.contests.lean.queryOptions({
-      input: { id: lean?.id ?? "", unit: lean?.unit ?? "" },
-    }),
-    enabled: lean != null,
-    staleTime: Infinity,
-    meta: { quiet: true },
-  }));
 
   const DAY: Record<string, (place: string) => string> = {
     owner: () => "",
@@ -1900,23 +1890,23 @@
       />
     {/if}
   {/if}
-  {#if leaning.data != null}
-    {const found = $derived(leaning.data)}
-    {const ahead = $derived(found.axis[0])}
-    {const behind = $derived(found.axis[1])}
+  {#if standing != null}
+    {const ahead = $derived(standing.axis[0])}
+    {const behind = $derived(standing.axis[1])}
     {#if ahead != null && behind != null}
       <Standing
         sides={[
           { label: ahead.label, tone: swatch(ahead.color, ahead.key) },
           { label: behind.label, tone: swatch(behind.color, behind.key) },
         ]}
-        place={found.place}
-        parent={found.parent}
-        whole={found.whole}
-        siblings={found.siblings}
-        year={found.previous?.date == null
+        place={standing.place}
+        marks={[standing.parent, standing.whole].filter((mark) => mark != null)}
+        within={standing.parent?.name ?? standing.whole.name}
+        siblings={standing.siblings}
+        year={standing.previous?.date == null
           ? null
-          : Number(found.previous.date.slice(0, 4))}
+          : Number(standing.previous.date.slice(0, 4))}
+        isAllied={standing.group === "alliance" && grouping === "option"}
         isAbroad={contest.scope.abroad != null}
       />
     {/if}

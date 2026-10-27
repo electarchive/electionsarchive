@@ -3951,48 +3951,80 @@ async function lean(input: { id: string; unit: string }) {
     .slice(0, -1)
     .map((entry) => entry.segment)
     .join("/");
-  const near = await atlas({
-    id: input.id,
-    unit: above === "" ? undefined : above,
-    level: place.scheme,
-    vs: "previous",
-    group: "option",
-    isLean: true,
-  });
-  const whole =
-    chain.length === 1
-      ? near
-      : await atlas({ id: input.id, group: "option", isLean: true });
-  const axis = whole.legend.slice(0, 2);
-  if (axis.length < 2) {
+  const measure = async (group: "option" | "alliance") => {
+    const near = await atlas({
+      id: input.id,
+      unit: above === "" ? undefined : above,
+      level: place.scheme,
+      vs: "previous",
+      group,
+      isLean: true,
+    });
+    const whole =
+      chain.length === 1
+        ? near
+        : await atlas({ id: input.id, group, isLean: true });
+    const axis = whole.legend.slice(0, 2);
+    const spread = (
+      set: typeof near,
+      column: "shares" | "before",
+      i: number,
+    ) => {
+      const [a, b] = axis.map((item) => {
+        const index = set.legend.findIndex((entry) => entry.key === item.key);
+        return index < 0 ? null : set.places[column][index]?.[i];
+      });
+      return a == null || b == null ? null : (a - b) / 10_000;
+    };
+    const held = near.places.k
+      .keys()
+      .filter((i) => near.places.leader[i] != null)
+      .toArray();
+    const counted = held.filter((i) => spread(near, "shares", i) != null);
+    const at = near.places.k.indexOf(place.k);
+    return {
+      group,
+      near,
+      whole,
+      axis,
+      spread,
+      at,
+      held,
+      counted,
+      margin: axis.length < 2 || at < 0 ? null : spread(near, "shares", at),
+    };
+  };
+  const asked = await measure(input.group ?? "option");
+  const chosen =
+    asked.group === "option" &&
+    (asked.near.isAllied || asked.whole.isAllied) &&
+    (asked.margin == null || asked.counted.length < asked.held.length)
+      ? await measure("alliance").then((allied) =>
+          allied.margin != null &&
+          (asked.margin == null || allied.counted.length > asked.counted.length)
+            ? allied
+            : asked,
+        )
+      : asked;
+  const { group, near, whole, axis, spread, at, held, counted, margin } =
+    chosen;
+  if (margin == null) {
     throw new ORPCError("NOT_FOUND");
   }
   const round = (value: number) => Math.round(value * 10_000) / 10_000;
-  const spread = (set: typeof near, column: "shares" | "before", i: number) => {
-    const [a, b] = axis.map((item) => {
-      const index = set.legend.findIndex((entry) => entry.key === item.key);
-      return index < 0 ? 0 : set.places[column][index]?.[i];
-    });
-    return a == null || b == null ? null : (a - b) / 10_000;
-  };
   const overall = (set: typeof near) => {
     let [weighted, total] = [0, 0];
     for (const [i, valid] of set.places.valid.entries()) {
-      const margin = spread(set, "shares", i);
-      if (margin != null && set.places.leader[i] != null) {
-        weighted += margin * valid;
+      const value = spread(set, "shares", i);
+      if (value != null && set.places.leader[i] != null) {
+        weighted += value * valid;
         total += valid;
       }
     }
     return total === 0 ? 0 : round(weighted / total);
   };
-  const at = near.places.k.indexOf(place.k);
-  const margin = at < 0 ? null : spread(near, "shares", at);
-  if (margin == null) {
-    throw new ORPCError("NOT_FOUND");
-  }
   const areas = await db.execute<{ id: string; k: number }>(sql`
-    select id, k from area where k = any(${sql.param(near.places.k)}::int[])
+    select id, k from area where k = any(${sql.param(counted.map((i) => near.places.k[i] ?? -1))}::int[])
   `);
   const labels = await names(
     areas.rows.map((row) => row.id),
@@ -4001,20 +4033,15 @@ async function lean(input: { id: string; unit: string }) {
   const named = new Map(
     areas.rows.map((row) => [row.k, labels.full.get(row.id) ?? ""]),
   );
-  const places: Array<{ name: string; margin: number; isOwn: boolean }> = [];
-  for (const [i, k] of near.places.k.entries()) {
-    const value = spread(near, "shares", i);
-    if (value != null && near.places.leader[i] != null) {
-      places.push({
-        name: named.get(k) ?? "",
-        margin: round(value),
-        isOwn: i === at,
-      });
-    }
-  }
+  const places = counted.map((i) => ({
+    name: named.get(near.places.k[i] ?? -1) ?? "",
+    margin: round(spread(near, "shares", i) ?? 0),
+    isOwn: i === at,
+  }));
   const before = spread(near, "before", at);
   const previous = near.targets.find((target) => target.id === near.target);
   return {
+    group,
     axis: axis.map((item) => ({
       key: item.key,
       label: item.label,
@@ -4033,6 +4060,7 @@ async function lean(input: { id: string; unit: string }) {
     siblings: {
       noun: place.noun,
       count: places.length,
+      total: held.length,
       rank:
         1 +
         places.filter((entry) =>
@@ -7657,17 +7685,19 @@ export const contests = {
         method: "GET",
         path: "/contests/{id}/lean",
         summary:
-          "How a place within a contest leans against its parent and the contest's whole area: margins between the contest's two leading options (first minus second), the previous comparable election's margin, and its rank among same-level siblings",
+          "How a place within a contest leans against its parent and the contest's whole area: margins between the contest's two leading options (first minus second) wherever both stood, the previous comparable election's margin, and its rank among same-level siblings. Where an alliance's parties took turns standing so that options leave gaps, it compares alliances instead and says so in group",
       }),
     )
     .input(
       v.object({
         id: v.pipe(v.string(), v.uuid()),
         unit: v.pipe(v.string(), v.minLength(1)),
+        group: v.optional(v.picklist(["option", "alliance"])),
       }),
     )
     .output(
       v.object({
+        group: v.picklist(["option", "alliance"]),
         axis: v.array(
           v.object({
             key: v.string(),
@@ -7685,6 +7715,7 @@ export const contests = {
         siblings: v.object({
           noun: v.string(),
           count: v.number(),
+          total: v.number(),
           rank: v.number(),
           places: v.array(
             v.object({

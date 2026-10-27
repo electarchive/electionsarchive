@@ -1305,6 +1305,8 @@
   "standing_key": "Each dot is one {noun}. Hover a dot to see which.",
   "standing_all": "Show all {count}",
   "standing_fewer": "Show fewer",
+  "standing_partial": "Only {count} of {total} {nouns} had both {first} and {second} on the ballot, so the rest are left out.",
+  "standing_allied": "Compared by alliance: the parties in each alliance took turns fielding candidates, so party against party would leave out {nouns} where one of them wasn't on the ballot.",
   "atlas_zoom_to": "Zoom to",
   "atlas_alone": "Map {place} alone",
   "atlas_versus": "{name} +{points} vs. {place}",

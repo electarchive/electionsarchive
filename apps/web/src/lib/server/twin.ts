@@ -241,15 +241,6 @@ async function load(segments: Array<string>, search: URLSearchParams) {
     ]);
     return { ...found, byes, tiers };
   }
-  if (found.kind === "contest") {
-    return {
-      ...found,
-      standing:
-        found.lean == null
-          ? null
-          : await call(router.contests.lean, found.lean).catch(() => null),
-    };
-  }
   if (found.kind !== "polity") {
     return found;
   }
@@ -3265,6 +3256,9 @@ function contestMarkdown(
       ? []
       : [
           `## ${m.lean_title({ place: standing.place.name })}`,
+          ...(standing.group === "alliance"
+            ? [m.standing_allied({ nouns: plural(standing.siblings.noun) })]
+            : []),
           [
             ...[standing.parent, standing.whole].flatMap((mark) => {
               const [ahead, behind] = standing.axis;
