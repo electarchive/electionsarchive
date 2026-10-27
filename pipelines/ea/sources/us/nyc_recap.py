@@ -378,6 +378,7 @@ def emit(
             ("NY:democratic", "democratic-party"),
             ("NY:republican", "republican-party"),
             ("NY:independence", "NY:independence-party"),
+            ("NY:reform", "NY:reform-party"),
         ):
             cs.merge(cs.key("us.party", duplicate), cs.key("us.party", survivor))
         crossing = {
