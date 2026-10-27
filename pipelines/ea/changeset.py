@@ -17,7 +17,7 @@ from ea.store import DATA, Connection
 
 NAMESPACE = uuid5(NAMESPACE_URL, "https://electionsarchive.com/")
 CHUNK = 200_000
-LATE = ("name", "slug", "external_id", "note", "citation", "entity_merge", "entity_retirement")
+LATE = ("name", "slug", "external_id", "note", "label", "citation", "entity_merge", "entity_retirement")
 UUID_TEXT = re.compile(r"[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}")
 TRANSLITERATION = str.maketrans(
     {
