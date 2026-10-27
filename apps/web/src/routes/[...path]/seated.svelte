@@ -71,7 +71,7 @@
       .toISOString()
       .slice(0, 10);
     const term = data.makeup
-      .filter((entry) => entry.start <= until)
+      .filter((entry) => entry.start >= date && entry.start <= until)
       .toSorted((a, b) => a.start.localeCompare(b.start))
       .at(-1);
     if (term == null) {

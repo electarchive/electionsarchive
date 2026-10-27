@@ -555,7 +555,26 @@
           : after.get(race.body);
       const isTier =
         !race.isTotal &&
-        ordered.some((other) => other.isTotal && other.body === race.body);
+        ordered.some((other) => {
+          if (other.body !== race.body) {
+            return false;
+          }
+          if (other.isTotal) {
+            return true;
+          }
+          if (
+            other.kind === race.kind ||
+            (other.round ?? 1) !== 1 ||
+            other.size == null
+          ) {
+            return false;
+          }
+          let seats = 0;
+          for (const row of other.results) {
+            seats += row.seats ?? 0;
+          }
+          return seats >= other.size * 0.95 && seats <= other.size * 1.02;
+        });
       const isPartial =
         !isTier &&
         whole != null &&
@@ -1526,7 +1545,7 @@
         isComplete={scope == null &&
           !race.isTier &&
           (race.size != null || race.count === 1)}
-        partners={race.partners}
+        partners={race.isTier ? [] : race.partners}
         governing={race.size === chamber?.size ? governing : []}
         isStaggered={race.isStaggered}
       />
