@@ -1,18 +1,20 @@
 import csv
 import html
 import io
+import json
 import re
+import subprocess
 import zipfile
 from datetime import UTC, date, datetime
 from pathlib import Path
-from uuid import UUID
+from uuid import UUID, uuid5
 
 import fastexcel
 import httpx
 import polars as pl
 
 from ea import raw
-from ea.changeset import Changeset, slug
+from ea.changeset import NAMESPACE, Changeset, slug
 from ea.names import initials
 from ea.store import DATA, connect
 
@@ -21,7 +23,9 @@ VERSION = "2"
 PARSED = DATA / "parsed" / SOURCE
 CN26 = "https://www.fec.gov/files/bulk-downloads/2026/cn26.zip"
 BROWSER = {
-    "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36"
+    "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36",
+    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+    "Accept-Language": "en-US,en;q=0.9",
 }
 FL_URL = "https://dos.elections.myflorida.com/candidates/extractCanList.asp?elecID=20261103-GEN"
 OFFICIAL = {
@@ -74,6 +78,80 @@ OFFICIAL = {
         "2026 general election candidate list",
         ["https://vip.sdsos.gov/candidatelist.aspx?eid=774"],
     ),
+    "NJ": (
+        "New Jersey Division of Elections",
+        "Official list of candidates for the 2026 general election",
+        [
+            "https://www.nj.gov/state/elections/assets/pdf/election-results/2026/2026-official-general-candidates-us-house-0904.pdf",
+            "https://www.nj.gov/state/elections/assets/pdf/election-results/2026/2026-official-general-candidates-us-senate.pdf",
+        ],
+    ),
+    "NE": (
+        "Nebraska Secretary of State",
+        "Final statewide general candidate list, November 3, 2026 general election",
+        [
+            "https://sos.nebraska.gov/sites/default/files/doc/elections/2026/Final_Statewide_General_Candidate_Filing_List_9.11.26.pdf"
+        ],
+    ),
+    "UT": (
+        "Utah Lieutenant Governor",
+        "Certification of candidates for the 2026 general election (amended)",
+        ["https://www.utah.gov/pmn/files/1492833.pdf"],
+    ),
+    "DC": (
+        "District of Columbia Board of Elections",
+        "2026 general election candidates",
+        [
+            "https://dcboe.org/getContentAsset/1029b813-fb27-4055-9218-fbe40360aacb/5ebbd046-860b-4ee1-81c8-43d0e3bc446e/2026-General-CANDIDATES-07152026.pdf?language=en"
+        ],
+    ),
+    "TX": (
+        "Texas Secretary of State",
+        "Ballot certification report, 2026 November general election",
+        ["https://www.sos.texas.gov/elections/forms/2026-ballot-cert.pdf"],
+    ),
+    "CA": (
+        "California Secretary of State",
+        "Official certified list of candidates, general election, November 3, 2026",
+        ["https://elections.cdn.sos.ca.gov/statewide-elections/2026-general/cert-list-candidates.pdf"],
+    ),
+    "MO": (
+        "Missouri Secretary of State",
+        "Certification of candidates and party emblems, general election, November 3, 2026",
+        ["https://www.sos.mo.gov/CMSImages/ElectionCandidates/2026GeneralElectionCertifiedCandidates.pdf"],
+    ),
+    "TN": (
+        "Tennessee Secretary of State",
+        "2026 candidate lists: November 3, 2026 state and federal general election",
+        [
+            "https://sos-prod.tnsosgovfiles.com/s3fs-public/document/Governor_Nov2026.xlsx",
+            "https://sos-prod.tnsosgovfiles.com/s3fs-public/document/USSenate_Nov2026.xlsx",
+            "https://sos-prod.tnsosgovfiles.com/s3fs-public/document/USHouse_Nov2026.xlsx",
+        ],
+    ),
+    "AL": (
+        "Alabama Secretary of State",
+        "State certification of Republican and Democratic candidates, 2026 general election",
+        [
+            "https://www.sos.alabama.gov/sites/default/files/election-2026/2026GeneralElectionStateCertificationofRepublicanCandidates.pdf",
+            "https://www.sos.alabama.gov/sites/default/files/election-2026/2026GeneralElectionStateCertificationofDemocraticCandidates.pdf",
+        ],
+    ),
+    "SC": (
+        "South Carolina State Election Commission",
+        "Candidate listing, statewide general election, November 3, 2026",
+        ["https://vrems.scvotes.sc.gov/Candidate/CandidateSearchDate?electionDate=11%2F03%2F2026#browser"],
+    ),
+    "KY": (
+        "Kentucky Secretary of State",
+        "Candidate filings, 2026 general election",
+        ["https://web.sos.ky.gov/candidatefilings/Default.aspx?id=3#excel"],
+    ),
+    "LA": (
+        "Louisiana Secretary of State",
+        "Candidate inquiry, November 3, 2026 election",
+        ["https://voterportal.sos.la.gov/CandidateInquiry?electionDate=20261103#browser"],
+    ),
     "VA": (
         "Virginia Department of Elections",
         "November 3, 2026 general election candidate list: federal offices",
@@ -82,7 +160,9 @@ OFFICIAL = {
         ],
     ),
 }
-INDEPENDENT = re.compile(r"(?i)^(independent|unaffiliated|unenrolled|undeclared|no party.*|npa|non|none|nonpartisan|non-partisan|petition|)$")
+INDEPENDENT = re.compile(
+    r"(?i)^(independent|unaffiliated|unenrolled|undeclared|no party.*|npa|non|none|nonpartisan|non-partisan|petition|by petition|)$"
+)
 MAJOR = [
     (re.compile(r"(?i)farmer.?labor"), "MN:minnesota-democratic-farmer-labor-party"),
     (re.compile(r"(?i)\bdemocrat"), "democratic-party"),
@@ -96,8 +176,46 @@ DAY = date(2026, 11, 3)
 REDISTRICTED = {"AL", "CA", "FL", "LA", "NC", "OH", "TN", "TX", "UT"}
 CLASS_THREE_SPECIALS = ("OH", "FL")
 NO_GENERAL = ("PR",)
-SYSTEM_OVERRIDES = {"AK": "top_four", "LA": "fptp"}
+SYSTEM_OVERRIDES = {"AK": "top_four", "LA": "fptp", "LA:house": "two_round"}
 ORDINALS = {1: "st", 2: "nd", 3: "rd"}
+TRANSCRIBED = {
+    "2026GeneralElectionStateCertificationofRepublicanCandidates.pdf": [
+        ("senate", None, "Barry Moore"),
+        ("house", 1, "Jerry Carl"),
+        ("house", 2, "Rhett Marques"),
+        ("house", 3, "Mike Rogers"),
+        ("house", 4, "Robert B. Aderholt"),
+        ("house", 5, "Dale W. Strong"),
+        ("house", 6, "Gary Palmer"),
+        ("house", 7, "Ammie Akin"),
+        ("governor", None, "Tommy Tuberville"),
+    ],
+    "2026GeneralElectionStateCertificationofDemocraticCandidates.pdf": [
+        ("senate", None, "Everett Wess"),
+        ("house", 1, "Clyde Jones"),
+        ("house", 2, "Shomari C. Figures"),
+        ("house", 3, "Lee McInnis"),
+        ("house", 4, "Amanda N. Pusczek"),
+        ("house", 5, "Andrew Sneed"),
+        ("house", 6, "Maurice Mercer"),
+        ("house", 7, "Terri Sewell"),
+        ("governor", None, "Doug Jones"),
+    ],
+}
+ORDINAL_WORDS = [
+    "first",
+    "second",
+    "third",
+    "fourth",
+    "fifth",
+    "sixth",
+    "seventh",
+    "eighth",
+    "ninth",
+    "tenth",
+    "eleventh",
+    "twelfth",
+]
 
 
 def cells(text: str) -> list[list[str]]:
@@ -189,7 +307,9 @@ def read(state: str, path: Path) -> list[tuple[str, int | None, str, str]]:
                     "GRN": "Green",
                     "IND": "Independent",
                 }.get(row["Party Preference"], row["Party Preference"])
-                rows.append((chamber, int(number[0]) if number and chamber == "house" else None, row["Name"].lstrip("*"), party))
+                rows.append(
+                    (chamber, int(number[0]) if number and chamber == "house" else None, row["Name"].lstrip("*"), party)
+                )
     if state == "SD":
         for contest, text, party, _, _, _, withdrawn, *_ in (row for row in cells(path.read_text()) if len(row) >= 7):
             if text and not withdrawn and contest != "Contest":
@@ -208,6 +328,149 @@ def read(state: str, path: Path) -> list[tuple[str, int | None, str, str]]:
                         ),
                     )
                 )
+    if state == "AL":
+        return []
+    if state == "LA":
+        for race, entries in json.loads(path.read_text())["races"].items():
+            for text, party in entries:
+                rows.append(
+                    ("senate" if race == "senate" else "house", None if race == "senate" else int(race), text, party)
+                )
+        return rows
+    if state == "SC":
+        for _, race, _, text, _, party, _, status in json.loads(path.read_text())["rows"][1:]:
+            if status == "Active":
+                house = re.fullmatch(r"U\.S\. House of Representatives, District (\d+)", race)
+                office = (
+                    "house"
+                    if house
+                    else {"U.S. Senate": "senate", "Governor and Lieutenant Governor": "governor"}.get(race, race)
+                )
+                rows.append((office, int(house[1]) if house else None, text, party))
+        return rows
+    if path.suffix == ".pdf":
+        lines = subprocess.run(
+            ["pdftotext", "-layout", str(path), "-"], capture_output=True, text=True, check=True
+        ).stdout.splitlines()
+        office: str | None = None
+        district: int | None = None
+        header = ""
+        for line in lines:
+            if state == "NJ":
+                if line.startswith("Candidate Totals"):
+                    header = ""
+                elif match := re.match(r"^(\w+) Congressional District", line):
+                    office, district = "house", ORDINAL_WORDS.index(match[1].lower()) + 1
+                elif "Candidates for US Senate" in line:
+                    office, district = "senate", None
+                elif line.startswith("Name ") and "Party" in line:
+                    header = line
+                elif header and re.match(r"^[A-Z][A-Z.'\- ]+[A-Z.](?: \*)?\s{2,}", line):
+                    fields = re.split(r"\s{2,}", line.strip())
+                    label = re.sub(r"^.*\bApt-(?:Unit)?\s*\S*\s+", "", fields[-1]) if len(fields) == 2 else fields[-1]
+                    party = (
+                        label.title()
+                        if re.search(r"(?i)\b(democratic|republican|green|libertarian|party)\b", label)
+                        else "Independent"
+                    )
+                    rows.append((office or "senate", district, fields[0].removesuffix(" *"), party))
+            if state == "NE":
+                fields = re.split(r"\s{2,}", line.strip())
+                if line.startswith("For ") and len(fields) >= 6:
+                    at = 2 if fields[1].startswith("District") else 1
+                    race = fields[0]
+                    chamber = {
+                        "For United States Senator": "senate",
+                        "For Representative in Congress": "house",
+                        "For Governor and Lt. Governor": "governor",
+                    }.get(race, race.removeprefix("For "))
+                    number = int(fields[1].split()[-1]) if at == 2 else None
+                    rows.append((chamber, number, fields[at + 3].split(" and ")[0], fields[at + 2]))
+                elif rows and len(fields) == 1 and fields[0] and 50 <= len(line) - len(line.lstrip()) <= 75:
+                    rows[-1] = (*rows[-1][:3], rows[-1][3] + " " + fields[0])
+            if state == "UT":
+                if match := re.match(r"^U\.S\. House of Representatives District (\d+)\.", line):
+                    office, district = "house", int(match[1])
+                elif (
+                    re.match(r"^[A-Z][A-Z ]+$", line.strip())
+                    and line.strip() not in ("STATE SENATOR",)
+                    and len(line.strip()) > 12
+                    or line.strip() == "STATE SENATOR"
+                ):
+                    office = None
+                elif office and (match := re.match(r"^([A-Z][A-Z.'\-\" ]+[A-Z.])\s{3,}(\S.*)$", line)):
+                    rows.append((office, district, match[1], match[2].strip()))
+            if state == "TX":
+                indent = len(line) - len(line.lstrip())
+                if indent == 5 and line.strip():
+                    race = line.strip()
+                    house = re.fullmatch(r"U\. S\. REPRESENTATIVE DISTRICT (\d+)", race)
+                    office, district = (
+                        ("house", int(house[1]))
+                        if house
+                        else ({"U. S. SENATOR": "senate", "GOVERNOR": "governor"}.get(race, race), None)
+                    )
+                elif indent == 10 and office and len(fields := re.split(r"\s{2,}", line.strip())) == 2:
+                    party = {
+                        "REP": "Republican",
+                        "DEM": "Democratic",
+                        "LIB": "Libertarian",
+                        "GRE": "Green",
+                        "IND": "Independent",
+                    }.get(fields[1], fields[1])
+                    if (office, district, fields[0], party) not in rows:
+                        rows.append((office, district, fields[0], party))
+            if state == "CA":
+                indent = len(line) - len(line.lstrip())
+                if indent >= 25 and line.strip() and not re.match(r"^\d", line.strip()):
+                    race = line.strip()
+                    house = re.fullmatch(r"United States Representative District (\d+)", race)
+                    office, district = (
+                        ("house", int(house[1]))
+                        if house
+                        else ({"United States Senator": "senate", "Governor": "governor"}.get(race, race), None)
+                    )
+                elif indent == 8 and office and len(fields := re.split(r"\s{2,}", line.strip())) == 2:
+                    rows.append((office, district, fields[0], fields[1]))
+            if state == "MO":
+                if match := re.match(r"^\s*(\w+) PARTY EMBLEM", line):
+                    header = match[1].title()
+                elif line.startswith("For "):
+                    race = line.removeprefix("For ").strip()
+                    office = "house" if race == "U.S. Representative" else race
+                elif header and office and (match := re.match(r"^District (\d+), (.+)$", line.strip())):
+                    rows.append((office, int(match[1]), match[2], header))
+            if state == "DC":
+                if (
+                    match := re.match(
+                        r"^(\S.*?) - (Republican|Democrat|Statehood Green|Independent|Libertarian|Nonpartisan)\b", line
+                    )
+                ) and office:
+                    rows.append((office, 0 if office == "house" else None, match[1], match[2]))
+                elif (
+                    line.strip() and not line.startswith(" ") and " - " not in line and not line.startswith("Write-In")
+                ):
+                    office = "house" if line.strip() == "Delegate to the House of Representatives" else line.strip()
+    if state == "TN":
+        for row in fastexcel.read_excel(path).load_sheet(0).to_polars().iter_rows(named=True):
+            house = re.fullmatch(r"United States House of Representatives District (\d+)", row["Office"])
+            office = (
+                "house"
+                if house
+                else {"United States Senate": "senate", "Governor": "governor"}.get(row["Office"], row["Office"])
+            )
+            rows.append((office, int(house[1]) if house else None, row["Candidate"], row["Party Name"]))
+    if state == "KY":
+        for row in fastexcel.read_excel(path).load_sheet(0, dtypes="string").to_polars().iter_rows(named=True):
+            if row["Party"] != "Write-In" and not row["Withdrawn"] and not row["Disqualified"]:
+                office = {"US Senator": "senate", "US Representative": "house", "Governor": "governor"}.get(
+                    row["Office"], row["Office"]
+                )
+                text = " ".join(
+                    part for part in (row["First Name"], row["Middle Name"], row["Last Name"], row["Suffix"]) if part
+                )
+                district = int(row["District"]) if str(row["District"] or "").isdigit() else None
+                rows.append((office, district, text, row["Party"]))
     if state in ("ME", "VT"):
         frame = fastexcel.read_excel(path).load_sheet(0).to_polars()
         for row in frame.iter_rows(named=True):
@@ -244,7 +507,9 @@ def fetch() -> None:
                 raw.cached(SOURCE, url)
                 continue
             except LookupError:
-                pass
+                if url.endswith("#browser"):
+                    print(f"{url} is a browser scrape; store it with raw.store")
+                    continue
             if url == FL_URL:
                 response = httpx.post(
                     url.split("?")[0],
@@ -269,6 +534,24 @@ def fetch() -> None:
                     }
                     button = re.findall(r'name="([^"]*ExportToCsvButton[^"]*)"', page)[0]
                     response = client.post(url.removesuffix("#csv"), data={**fields, button: " "})
+            elif url.endswith("#excel"):
+                with httpx.Client(headers=BROWSER, follow_redirects=True, timeout=300) as client:
+                    page = client.get(url.removesuffix("#excel")).text
+                    fields = {
+                        field: html.unescape(value)
+                        for field, value in re.findall(
+                            r'<input[^>]*type="hidden"[^>]*name="([^"]+)"[^>]*value="([^"]*)"', page
+                        )
+                    }
+                    response = client.post(
+                        url.removesuffix("#excel"),
+                        data={
+                            **fields,
+                            "ctl00$MainContent$ddlElection": "87",
+                            "ctl00$MainContent$ddlParty": "",
+                            "ctl00$MainContent$bExcel": "Excel",
+                        },
+                    )
             else:
                 response = httpx.get(url, headers=BROWSER, follow_redirects=True, timeout=300, verify=False)
             response.raise_for_status()
@@ -303,7 +586,13 @@ def parse() -> None:
         }
         for state, (_, _, urls) in OFFICIAL.items()
         for url in urls
-        for office, district, text, party in read(state, raw.cached(SOURCE, url).path)
+        for office, district, text, party in [
+            *read(state, raw.cached(SOURCE, url).path),
+            *(
+                (office, district, text, "Republican" if "Republican" in url else "Democratic")
+                for office, district, text in TRANSCRIBED.get(url.rsplit("/", 1)[-1], [])
+            ),
+        ]
     ]
     frame = pl.DataFrame(
         rows,
@@ -427,6 +716,7 @@ def emit() -> Path:
         fec_held = {entity for entity in fec_persons.values()}
         known: dict[str, list[tuple[UUID, str]]] = {}
         earlier: dict[str, list[tuple[UUID, str]]] = {}
+        latest: dict[UUID, str] = {}
         for value, person, text in conn.execute(
             """select x.value, cy.person_id, n.text
                from external_id x
@@ -436,6 +726,7 @@ def emit() -> Path:
                where x.scheme = 'us.contest' and x.value ~ '^20(1[8-9]|2[0-6])-[0-9-]+:[A-Z]{2}:(governor|senate|house:[0-9]+)'"""
         ).fetchall():
             day, state, chamber, *rest = value.split(":")
+            latest[person] = max(latest.get(person, ""), day)
             (known if day.startswith("2026") else earlier).setdefault(
                 f"{DAY}:{state}:{chamber}" + (f":{rest[0]}" if chamber == "house" else ""), []
             ).append((person, text))
@@ -522,6 +813,11 @@ def emit() -> Path:
                 pool = matched
             if not pool:
                 pool = statewide.get((state, slug(re.sub(r'"[^"]*"|\([^)]*\)', " ", text))), set())
+            for preferred in ({*held.get(key, {})}, {person for _, person in nominees.get(key, {})}, matched, fec_held):
+                if len(pool) > 1 and pool & preferred:
+                    pool &= preferred
+            if len(pool) > 1:
+                pool = {max(pool, key=lambda person: (latest.get(person, ""), str(person)))}
             if len(pool) == 1:
                 person = next(iter(pool))
                 free = [fec for fec in filed if fec not in fec_persons]
@@ -589,7 +885,7 @@ def emit() -> Path:
                 magnitude=magnitude,
                 term="remainder" if special else term,
                 round_number=1,
-                electoral_system_id=systems[SYSTEM_OVERRIDES[state]]
+                electoral_system_id=systems[SYSTEM_OVERRIDES.get(f"{state}:{chamber}", SYSTEM_OVERRIDES[state])]
                 if state in SYSTEM_OVERRIDES and chamber != "governor"
                 else system,
                 default_result_kind=result_kind,
@@ -619,6 +915,13 @@ def emit() -> Path:
                 path = f"us/{state.lower()}/{DAY}-general/governor"
             name(contest, title)
             cs.add("slug", path=path, entity_id=contest)
+            if chamber == "house" and state == "LA":
+                cs.add(
+                    "note",
+                    entity_id=contest,
+                    kind="methodology",
+                    body_md="Louisiana Act 7 of 2026 cancelled the closed party primaries for the U.S. House and moved the races to the open primary on 2026-11-03: every candidate runs on one ballot, a majority wins outright, and otherwise the top two meet in a general election on 2026-12-12.",
+                )
             if chamber == "house" and state in REDISTRICTED:
                 cs.add(
                     "note",
@@ -666,7 +969,10 @@ def emit() -> Path:
                     continue
                 staged.add(person)
                 previous = held.get(key, {}).get(person)
-                option = cs.key("us.option", option_keys[previous[0]] if previous else f"{key}:{slug(ballot)}")
+                fresh = f"{key}:{slug(ballot)}"
+                if not previous and uuid5(NAMESPACE, f"external_id:us.option\x1f{fresh}") in cs.retired:
+                    fresh += ":2026-10-27"
+                option = cs.key("us.option", option_keys[previous[0]] if previous else fresh)
                 cs.add(
                     "contest_option",
                     id=option,
@@ -675,9 +981,7 @@ def emit() -> Path:
                     party_id=party_id,
                     ballot_label=ballot,
                 )
-                candidacy = cs.key(
-                    "us.candidacy", candidacy_keys[previous[1]] if previous and previous[1] else f"{key}:{slug(ballot)}"
-                )
+                candidacy = cs.key("us.candidacy", candidacy_keys[previous[1]] if previous and previous[1] else fresh)
                 cs.add(
                     "candidacy",
                     id=candidacy,
@@ -716,7 +1020,9 @@ def emit() -> Path:
                 if (
                     entity == contest
                     and text != body
-                    and not text.endswith("the new plan's boundaries are not loaded yet.")
+                    and not text.endswith(
+                        ("the new plan's boundaries are not loaded yet.", "meet in a general election on 2026-12-12.")
+                    )
                 ):
                     cs.add(
                         "note_drop",
