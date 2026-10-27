@@ -4363,6 +4363,29 @@ export const contests = {
             ),
           }),
         ),
+        slate: v.nullable(
+          v.object({
+            state: v.picklist(["scheduled", "counting", "unreported"]),
+            options: v.array(
+              v.object({
+                key: v.string(),
+                kind: v.string(),
+                label: v.string(),
+                party: v.nullable(
+                  v.object({
+                    id: v.string(),
+                    name: v.string(),
+                    short: v.nullable(v.string()),
+                    color: v.nullable(v.string()),
+                  }),
+                ),
+                person: v.nullable(v.string()),
+                isIncumbent: v.boolean(),
+                isIndependent: v.boolean(),
+              }),
+            ),
+          }),
+        ),
         quorum: v.nullable(v.number()),
         ballot: v.optional(v.nullable(v.number())),
         isStv: v.optional(v.boolean()),
@@ -4853,6 +4876,73 @@ export const contests = {
       const declaredColor = new Map(
         declaredColors.rows.map((row) => [row.party_id, row.color]),
       );
+      const listed =
+        isRoot && sets.rows.every((row) => row.status !== "active")
+          ? await db.execute<{
+              k: number;
+              kind: string;
+              label: string | null;
+              person: string | null;
+              party: string | null;
+              color: string | null;
+              isIndependent: boolean;
+              isIncumbent: boolean;
+            }>(sql`
+              with prior as (
+                select pc.id from contest cc
+                join election ce on ce.id = cc.election_id
+                join contest pc on pc.id <> cc.id and pc.party_scope_id is null
+                  and pc.body_id is not distinct from cc.body_id and pc.office_id is not distinct from cc.office_id
+                  and pc.district_area_id is not distinct from cc.district_area_id
+                join election pe on pe.id = pc.election_id and pe.status = 'held' and pe.date_from < ce.date_from
+                where cc.id = ${contest.id}::uuid and (cc.body_id is not null or cc.office_id is not null)
+                  and exists (
+                    select from outcome x join result_set xs on xs.id = x.result_set_id and ${latest("xs")}
+                    where xs.contest_id = pc.id and x.kind in ('elected', 'won')
+                  )
+                order by pe.date_from desc
+                limit 1
+              ),
+              won as (
+                select distinct coalesce(m.into_id, cy.person_id) as person
+                from prior
+                join contest_option o on o.contest_id = prior.id
+                join candidacy cy on cy.option_id = o.id and cy.role = 'head'
+                left join entity_merge m on m.entity_id = cy.person_id
+                join outcome x on x.option_id = o.id and x.kind in ('elected', 'won') and x.candidacy_id is null
+                join result_set xs on xs.id = x.result_set_id and ${latest("xs")}
+              )
+              select o.k, o.kind::text as kind, coalesce(cy.ballot_name, o.ballot_label) as label,
+                coalesce(m.into_id, cy.person_id) as person, p.party,
+                ${paint(sql`p.party`, sql`${contest.election}::uuid`, sql`${contest.date ?? "infinity"}::date`)} as color,
+                coalesce(cy.is_independent, false) as "isIndependent",
+                coalesce(cy.is_incumbent, coalesce(m.into_id, cy.person_id) in (select person from won), false) as "isIncumbent"
+              from contest_option o
+              left join candidacy cy on cy.option_id = o.id and cy.role = 'head'
+                and not exists (select from candidacy cz where cz.option_id = o.id and cz.role = 'head' and cz.id <> cy.id)
+              left join entity_merge m on m.entity_id = cy.person_id
+              left join lateral (
+                select n.party_id from candidacy_nomination n
+                where n.candidacy_id = cy.id and n.kind = 'nominated'
+                order by n.party_id
+                limit 1
+              ) n on true
+              left join entity_merge pm on pm.entity_id = coalesce(o.party_id, cy.member_of_party_id, n.party_id)
+              cross join lateral (
+                select coalesce(pm.into_id, o.party_id, cy.member_of_party_id, n.party_id) as party
+              ) p
+              where o.contest_id = ${contest.id}::uuid and o.parent_option_id is null
+                and o.kind in ('candidate', 'ticket', 'list', 'answer', 'none_of_the_above')
+              order by o.ballot_position nulls last, coalesce(cy.ballot_name, o.ballot_label), o.k
+            `)
+          : { rows: [] };
+      const listedNames = await names(
+        listed.rows.flatMap((row) =>
+          [row.person, row.party].filter((id) => id != null),
+        ),
+        contest.date,
+      );
+      const today = new Date().toISOString().slice(0, 10);
       const path = slugs.get(contest.id) ?? null;
       const scopePath = path == null ? null : [path, ...unit].join("/");
       const trail = [
@@ -4942,6 +5032,37 @@ export const contests = {
         })),
         citations: cited.rows,
         checks: [],
+        slate:
+          listed.rows.length === 0
+            ? null
+            : {
+                state:
+                  contest.date != null && contest.date > today
+                    ? ("scheduled" as const)
+                    : contest.date != null &&
+                        Date.parse(today) - Date.parse(contest.date) <
+                          90 * 86_400_000
+                      ? ("counting" as const)
+                      : ("unreported" as const),
+                options: listed.rows.map((row) => ({
+                  key: String(row.k),
+                  kind: row.kind,
+                  label:
+                    listedNames.full.get(row.person ?? "") ?? row.label ?? "",
+                  party:
+                    row.party == null
+                      ? null
+                      : {
+                          id: row.party,
+                          name: listedNames.full.get(row.party) ?? "",
+                          short: listedNames.short.get(row.party) ?? null,
+                          color: row.color,
+                        },
+                  person: row.person,
+                  isIncumbent: row.isIncumbent,
+                  isIndependent: row.isIndependent,
+                })),
+              },
         declared:
           declared.rows[0] == null
             ? null
@@ -9456,7 +9577,7 @@ async function races(
                     ),
                   person: row.person,
                   name: people.full.get(row.person ?? "") ?? null,
-                  share: row.share ?? 0,
+                  share: row.share,
                   isWon: row.isWon === true,
                   runoff:
                     row.runoff == null
@@ -10068,7 +10189,7 @@ export const elections = {
                   label: v.string(),
                   person: v.nullable(v.string()),
                   name: v.nullable(v.string()),
-                  share: v.number(),
+                  share: v.nullable(v.number()),
                   isWon: v.boolean(),
                   runoff: v.nullable(
                     v.object({

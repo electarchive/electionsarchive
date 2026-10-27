@@ -1784,13 +1784,17 @@
             >
           {/if}
           <span class="grid gap-0.5 min-inline-0">
-            <Name
-              class="justify-self-start font-semibold"
-              label={(final ?? row).name ?? ""}
-              person={(final ?? row).person}
-            />
+            {#if row.share != null}
+              <Name
+                class="justify-self-start font-semibold"
+                label={(final ?? row).name ?? ""}
+                person={(final ?? row).person}
+              />
+            {/if}
             <span class="text-xs text-muted-foreground">
-              {#if row.runoff == null}
+              {#if row.share == null}
+                {m.wards_none()}
+              {:else if row.runoff == null}
                 {(row.isWon ? m.wards_won : m.wards_led)({
                   share: percent(row.share, 1),
                 })}

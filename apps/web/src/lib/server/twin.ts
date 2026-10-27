@@ -2330,27 +2330,29 @@ function electionMarkdown(
               return [
                 link(row.label, row.path),
                 (final ?? row).name,
-                row.runoff == null
-                  ? (row.isWon ? m.wards_won : m.wards_led)({
-                      share: percent(row.share),
-                    })
-                  : final == null
-                    ? m.wards_pending({
+                row.share == null
+                  ? m.wards_none()
+                  : row.runoff == null
+                    ? (row.isWon ? m.wards_won : m.wards_led)({
                         share: percent(row.share),
-                        round: round(row.runoff),
                       })
-                    : final.person != null && final.person === row.person
-                      ? m.wards_kept({
+                    : final == null
+                      ? m.wards_pending({
                           share: percent(row.share),
                           round: round(row.runoff),
-                          final: percent(final.share),
                         })
-                      : m.wards_took({
-                          round: round(row.runoff),
-                          final: percent(final.share),
-                          name: row.name ?? "",
-                          share: percent(row.share),
-                        }),
+                      : final.person != null && final.person === row.person
+                        ? m.wards_kept({
+                            share: percent(row.share),
+                            round: round(row.runoff),
+                            final: percent(final.share),
+                          })
+                        : m.wards_took({
+                            round: round(row.runoff),
+                            final: percent(final.share),
+                            name: row.name ?? "",
+                            share: percent(row.share),
+                          }),
               ];
             }),
           ),
@@ -3910,6 +3912,24 @@ function resultsMarkdown(
         (row) =>
           `- ${row.label}${row.short == null || row.short === row.label ? "" : ` (${row.short})`}: ${outcome(row.outcome)}`,
       ),
+    ].join("\n");
+  }
+  if (contest.current == null && contest.slate != null) {
+    return [
+      {
+        scheduled: m.slate_scheduled,
+        counting: m.slate_counting,
+        unreported: m.slate_unreported,
+      }[contest.slate.state]({ date: date(contest.election.date) }),
+      "",
+      ...contest.slate.options.map((option) => {
+        const tags = [
+          option.party?.name ??
+            (option.isIndependent ? m.slate_independent() : null),
+          option.isIncumbent ? m.slate_incumbent() : null,
+        ].filter((tag) => tag != null);
+        return `- ${option.label}${tags.length === 0 ? "" : ` (${tags.join(", ")})`}`;
+      }),
     ].join("\n");
   }
   return contest.current == null || results.length === 0
