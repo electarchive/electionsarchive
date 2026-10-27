@@ -1118,7 +1118,7 @@
       type="button"
       class="flex items-center justify-center rounded-sm border border-input bg-card text-[0.8125rem] font-semibold keycap block-8 hover:bg-secondary"
       onclick={() => (all = true)}
-      >{m.places_show_all({ count: count(filtered.length) })}</button
+      >{m.places_show_more({ count: count(filtered.length - limit) })}</button
     >
   {/if}
   {#if reconciled != null}

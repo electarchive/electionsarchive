@@ -484,6 +484,7 @@
   "places_top_votes": "Showing the {count} {nouns} with the most votes",
   "places_flipped": "Changed hands",
   "places_show_all": "Show all {count}",
+  "places_show_more": "Show {count} more",
   "places_sources": "These results come from {publisher}.",
   "places_unreconciled_lead": "{publisher}'s returns do not match the official result.",
   "places_unreconciled_drifted": "They show {counted} votes for the {party} candidate; the official count is {official}.",

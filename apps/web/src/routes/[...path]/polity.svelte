@@ -1024,7 +1024,7 @@
           type="button"
           class="justify-self-start rounded-sm border border-input bg-card px-2.5 text-[0.8125rem] font-semibold keycap block-7 hover:bg-secondary"
           onclick={() => (isAllPlaces = true)}
-          >{m.places_show_all({ count: count(children.length) })}</button
+          >{m.places_show_more({ count: count(children.length - 20) })}</button
         >
       {/if}
     {/if}
