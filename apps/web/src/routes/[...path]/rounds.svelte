@@ -47,17 +47,20 @@
           ? m.round_primary()
           : round.kind === "runoff"
             ? m.round_runoff()
-            : round.kind === "indirect"
+            : round.kind === "indirect" &&
+                !rounds.some((other) => other.kind === "runoff")
               ? rounds.length === 2
                 ? index === 0
                   ? m.round_electoral()
                   : m.round_indirect()
                 : m.round_ballot({ round: index + 1 })
-              : round.kind === "general"
-                ? index === 0
-                  ? m.round_first()
-                  : m.round_general()
-                : m.round_number({ round: index + 1 }),
+              : round.kind === "indirect"
+                ? m.round_first()
+                : round.kind === "general"
+                  ? index === 0
+                    ? m.round_first()
+                    : m.round_general()
+                  : m.round_number({ round: index + 1 }),
       )}
       <li
         class={cn("grid content-start gap-1.5 border-bs-2 pbs-2", {
