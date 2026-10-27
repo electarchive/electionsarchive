@@ -4,7 +4,7 @@ import io
 import re
 import subprocess
 import unicodedata
-from datetime import date
+from datetime import date, timedelta
 from pathlib import Path
 from uuid import UUID
 
@@ -13,7 +13,7 @@ from psycopg import Connection
 
 from ea import raw
 from ea.changeset import Changeset
-from ea.sources.us import ar_abstract_2002, medsl
+from ea.sources.us import ar_abstract_2002, ks_sos_generals, medsl
 from ea.store import DATA, connect
 
 SOURCE = "us.fp_canvass"
@@ -57,6 +57,13 @@ DOCUMENTS = {
         "New Mexico Secretary of State",
         "ElectionStats",
         "https://electionstats.sos.nm.gov/contest/1169",
+    ),
+    "KS2002": (
+        ks_sos_generals.SOURCE,
+        ks_sos_generals.url((date(2002, 11, 5), "governor")),
+        ks_sos_generals.PUBLISHER,
+        ks_sos_generals.TITLE,
+        ks_sos_generals.LANDING,
     ),
     "ME2014": (
         SOURCE,
@@ -282,6 +289,15 @@ def elstats(
     return rows
 
 
+def kansas(_: Connection) -> list[tuple[date, str, str, str, int]]:
+    return (
+        pl.read_parquet(raw.parsed(ks_sos_generals.SOURCE) / "precincts.parquet")
+        .filter(pl.col("chamber") == "governor", pl.col("year") == 2002)
+        .select("day", "chamber", "code", "candidate", "votes")
+        .rows()
+    )
+
+
 def pdf(document: str) -> str:
     source, url, *_ = DOCUMENTS[document]
     return subprocess.run(
@@ -298,6 +314,7 @@ def parse() -> None:
                 ("CA2000", california),
                 ("ME2014", maine),
                 ("DE2006", delaware),
+                ("KS2002", kansas),
                 ("NM2002", lambda conn: elstats(conn, "NM2002", "35", date(2002, 11, 5), "senate")),
                 ("IN2000U", lambda conn: indiana(conn, "IN2000U")),
                 ("IN2000G", lambda conn: indiana(conn, "IN2000G")),
@@ -396,4 +413,39 @@ def emit() -> Path:
                     strict=True,
                     extend=True,
                 )
+        used = set(pl.concat(cs.frames["result_value"])["unit_id"].unique())
+        minted = {str(unit) for unit in cs.minted}
+        units = (
+            frame.filter(pl.col("kind") == "precinct")
+            .group_by("code")
+            .agg(pl.col("state").first(), pl.col("day").min())
+            .with_columns(
+                id=pl.col("code").map_elements(lambda code: str(cs.unit("us.precinct", code)), return_dtype=pl.String),
+                county=pl.col("code").str.split(":").list.get(2),
+            )
+            .filter(pl.col("id").is_in(list(used)) & pl.col("id").is_in(list(minted)))
+        )
+        if units.height:
+            cs.frame(
+                "reporting_unit",
+                units.select(
+                    "id",
+                    polity_id=pl.col("state").map_elements(
+                        lambda state: str(cs.polity(f"US-{state}")), return_dtype=pl.String
+                    ),
+                    scheme_code=pl.lit("us.precinct"),
+                    code="code",
+                    parent_id=pl.col("county").map_elements(
+                        lambda code: str(cs.unit("us.county", code)), return_dtype=pl.String
+                    ),
+                    area_relation=pl.lit("within"),
+                    area_id=pl.col("county").map_elements(
+                        lambda code: str(cs.area("us.county", code)), return_dtype=pl.String
+                    ),
+                    kind=pl.lit("standard"),
+                    valid_from="day",
+                    valid_to=pl.col("day") + timedelta(days=1),
+                ),
+            )
+        print(f"{units.height} new precinct units")
         return cs.write()
