@@ -2219,11 +2219,23 @@ def emit(
                 [list(person_keys), person_scheme],
             ).fetchall()
         }
+        holders: dict[UUID, set[UUID]] = {}
+        for person, holder in conn.execute(
+            """select h.person_id, y.person_id from candidacy_history h join candidacy y on y.id = h.id
+               where h.person_id = any(%s)
+               union select person_id, person_id from candidacy where person_id = any(%s)""",
+            [list(person_keys), list(person_keys)],
+        ).fetchall():
+            holders.setdefault(person, set()).add(holder)
         retired = set()
         for person, key in person_keys.items():
-            if person not in kept and person not in cs.survivors and person not in chosen and person not in linked:
+            if person in kept or person in cs.survivors or person in chosen or person in linked:
+                continue
+            if person not in holders:
                 retired.add(person)
                 cs.add("entity_retirement", entity_id=person, reason=f"{key} has no candidacy left")
+            elif len(holders[person]) == 1 and person not in holders[person]:
+                cs.merge(person, next(iter(holders[person])))
         for dropped, entity, text in conn.execute(
             """select n.id, n.entity_id, n.text from name n join changeset c on c.id = n.changeset_id
                where c.pipeline = %s and not n.is_preferred

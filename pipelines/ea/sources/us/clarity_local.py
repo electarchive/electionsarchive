@@ -13,7 +13,7 @@ import shapefile
 
 from ea import raw
 from ea.changeset import Changeset, slug
-from ea.sources.us.enr_clarity import _title
+from ea.sources.us.enr_clarity import _label, _title
 from ea.store import DATA, connect
 
 SOURCE = "us.clarity_local"
@@ -590,6 +590,9 @@ def parse() -> None:
                         r"(?i)\s*(?:unresolved |unassigned |qualified )?write|scattering|personal choice", label
                     ):
                         label = "Write-ins"
+                    was = label
+                    label, line = _label(label)
+                    party = choice.get("party") or (line if line and "," not in line else None)
                     for kind_node in choice.iter("VoteType"):
                         for place in kind_node.iter("Precinct"):
                             votes = place.get("votes") or "0"
@@ -599,7 +602,8 @@ def parse() -> None:
                                     "election": election,
                                     "contest": node.get("key"),
                                     "choice": label,
-                                    "party": choice.get("party"),
+                                    "was": was,
+                                    "party": party,
                                     "place": re.sub(r"\s+", " ", (place.get("name") or "").upper()).strip(),
                                     "votes": int(votes) if votes.isdigit() else 0,
                                 }
@@ -610,7 +614,8 @@ def parse() -> None:
                             "election": election,
                             "contest": node.get("key"),
                             "choice": label,
-                            "party": choice.get("party"),
+                            "was": was,
+                            "party": party,
                             "place": None,
                             "votes": int(choice.get("totalVotes") or 0),
                         }
@@ -663,7 +668,9 @@ def parse() -> None:
         pl.DataFrame(lines, schema_overrides={"votes": pl.Int64, "place": pl.String, "party": pl.String})
         .with_columns(same=pl.col("choice").str.to_lowercase().str.replace_all(r"[^a-z0-9]+", ""))
         .group_by("county", "election", "contest", "same", "place", maintain_order=True)
-        .agg(pl.col("choice").first(), pl.col("party").drop_nulls().first(), pl.col("votes").sum())
+        .agg(
+            pl.col("choice").first(), pl.col("was").first(), pl.col("party").drop_nulls().first(), pl.col("votes").sum()
+        )
         .drop("same")
     )
     contests_frame = pl.DataFrame(contests, infer_schema_length=None)
@@ -779,6 +786,24 @@ def emit() -> Path:
 
         def name(entity: UUID, text: str) -> None:
             cs.add("name", entity_id=entity, text=text, lang="en", kind="official", is_preferred=True)
+
+        known_people: dict[str, UUID] = dict(
+            conn.execute("select value, entity_id from external_id where scheme = %s", [f"{SOURCE}.person"]).fetchall()
+        )
+        for dropped, entity, text in conn.execute(
+            """select n.id, n.entity_id, n.text from name n join changeset c on c.id = n.changeset_id
+               where c.pipeline = %s and not n.is_preferred
+                 and n.entity_id in (select entity_id from external_id where scheme = %s)""",
+            [SOURCE, f"{SOURCE}.person"],
+        ).fetchall():
+            if _label(text)[0] != text:
+                cs.add(
+                    "name_drop",
+                    name_id=dropped,
+                    entity_id=entity,
+                    text=text,
+                    reason="a party or write-in label in the name",
+                )
 
         def title(text: str) -> str:
             if text != text.upper():
@@ -1112,12 +1137,17 @@ def emit() -> Path:
             totals = (
                 counted.filter(pl.col("place").is_null())
                 .group_by("same", maintain_order=True)
-                .agg(pl.col("choice").first(), pl.col("party").drop_nulls().first(), pl.col("votes").sum())
+                .agg(
+                    pl.col("choice").first(),
+                    pl.col("was").first(),
+                    pl.col("party").drop_nulls().first(),
+                    pl.col("votes").sum(),
+                )
                 .sort("votes", "choice", descending=[True, False])
             )
             options: dict[str, UUID] = {}
             ranked: list[tuple[int, UUID]] = []
-            for same, choice, party, votes in totals.select("same", "choice", "party", "votes").iter_rows():
+            for same, choice, was, party, votes in totals.select("same", "choice", "was", "party", "votes").iter_rows():
                 if question:
                     answer = "yes" if re.match(r"(?i)\s*(?:yes|for)\b", choice) else "no"
                     option = options[same] = cs.key("us.option", f"{contest_key}:{answer}")
@@ -1139,12 +1169,20 @@ def emit() -> Path:
                     continue
                 else:
                     ballot = _title(re.sub(r"\s*\((?:DEM|REP|IND|NON|NP|NPA|LIB|GRN)\)$", "", choice))
+                    old = slug(_title(re.sub(r"\s*\((?:DEM|REP|IND|NON|NP|NPA|LIB|GRN)\)$", "", was)))
+                    if old != slug(ballot):
+                        cs.renamed[f":{slug(ballot)}"] = f":{old}"
                     person_key = (code, slug(ballot))
                     if person_key not in persons:
                         persons[person_key] = cs.key(f"{SOURCE}.person", f"{st}:{code}:{slug(ballot)}")
                         if persons[person_key] in cs.minted:
                             cs.add("person", id=persons[person_key])
+                        if persons[person_key] in cs.minted or old != slug(ballot):
                             name(persons[person_key], ballot)
+                    if (duplicate := known_people.get(f"{st}:{code}:{old}")) is not None and duplicate != persons[
+                        person_key
+                    ]:
+                        cs.merge(duplicate, persons[person_key])
                     option = options[same] = cs.key("us.option", f"{contest_key}:{slug(ballot)}")
                     party_key = PARTIES.get((party or "").upper()[:3])
                     cs.add(
@@ -1155,9 +1193,11 @@ def emit() -> Path:
                         party_id=cs.key("us.party", party_key) if party_key else None,
                         ballot_label=ballot,
                     )
+                    candidacy = cs.key("us.candidacy", f"{contest_key}:{slug(ballot)}:head")
+                    cs.renamed.pop(f":{slug(ballot)}", None)
                     cs.add(
                         "candidacy",
-                        id=cs.key("us.candidacy", f"{contest_key}:{slug(ballot)}:head"),
+                        id=candidacy,
                         person_id=persons[person_key],
                         option_id=option,
                         role="head",
