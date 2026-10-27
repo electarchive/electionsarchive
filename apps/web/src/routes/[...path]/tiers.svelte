@@ -320,7 +320,7 @@
     </div>
     <div
       class={cn("grid grid-cols-[minmax(0,1fr)] gap-x-8 gap-y-6", {
-        "lg:grid-cols-[minmax(0,1.35fr)_minmax(0,1fr)]": isTopped,
+        "lg:grid-cols-[minmax(0,34rem)_minmax(0,1fr)]": isTopped,
         "sm:grid-cols-2 lg:grid-cols-3": !isTopped,
       })}
     >
@@ -369,7 +369,7 @@
                 >
               </figcaption>
               {#if panel.kind !== "measure" && panel.total > 0}
-                <div class="grid gap-1">
+                <div class="grid grid-cols-[minmax(0,1fr)] gap-1">
                   <div class="flex overflow-hidden rounded-xs block-2">
                     {#each panel.bar as part (part.party)}
                       <span
