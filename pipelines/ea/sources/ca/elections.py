@@ -3,6 +3,7 @@ import csv
 import io
 import json
 import zipfile
+from collections.abc import Mapping
 from datetime import date, timedelta
 from pathlib import Path
 from uuid import UUID
@@ -15,10 +16,17 @@ from ea.changeset import Changeset, slug
 from ea.store import DATA, connect
 
 SOURCE = "ca.elections"
-VERSION = "7"
+VERSION = "8"
 PARSED = DATA / "parsed" / SOURCE
 MAPS = "https://ftp.maps.canada.ca/pub/elections_elections/Electoral-districts_Circonscription-electorale"
 RESULTS = "https://www.elections.ca/res/rep/off"
+STATCAN = "https://web.archive.org/web/{}id_/http://www12.statcan.gc.ca/census-recensement/2011/geo/bound-limit/files-fichiers/{}.zip"
+LAND = STATCAN.format("20170720055008", "2016/lpr_000b16a_e")
+CARTOGRAPHIC = {
+    "2003": (STATCAN.format("20170719173952", "gfed000b11a_e"), 4269, "2011"),
+    "2013": (STATCAN.format("20170720063046", "2016/lfed000b16a_e"), 3347, "2016"),
+}
+TOLERANCE = 25
 ORDER = date(2025, 3, 23)
 ORDERS = {
     "2003": (
@@ -197,7 +205,7 @@ def decoded(data: bytes) -> str:
 
 
 def fetch() -> None:
-    for _, _, _, url, _ in ORDERS.values():
+    for url in [*(url for _, _, _, url, _ in ORDERS.values()), LAND, *(url for url, _, _ in CARTOGRAPHIC.values())]:
         raw.fetch(SOURCE, url, suffix=".zip")
     for _, _, folder, polls, document in ELECTIONS.values():
         raw.fetch(SOURCE, f"{folder}/{polls}", suffix=".zip")
@@ -351,63 +359,101 @@ def parse() -> None:
         )
         polls.write_parquet(PARSED / f"polls-{day}.parquet")
 
-    for vintage, (_, _, _, url, _) in ORDERS.items():
+    def shapes(url: str) -> list[tuple[Mapping[str, object], str]]:
         with zipfile.ZipFile(raw.cached(SOURCE, url).path) as z:
             parts = {
                 name.rsplit(".", 1)[1].lower(): io.BytesIO(z.read(name))
                 for name in z.namelist()
-                if "_EN" in name.upper() and name.rsplit(".", 1)[1].lower() in ("shp", "shx", "dbf")
+                if ("_EN" in name.upper() or "_E." in name.upper())
+                and name.rsplit(".", 1)[1].lower() in ("shp", "shx", "dbf")
             }
             encoding = "utf-8" if any(name.lower().endswith(".cpg") for name in z.namelist()) else "cp1252"
         reader = shapefile.Reader(shp=parts["shp"], shx=parts["shx"], dbf=parts["dbf"], encoding=encoding)
-        records = [
-            (record.as_dict(), shape)
+        return [
+            (record.as_dict(), json.dumps(shape.__geo_interface__))
             for record, shape in zip(reader.records(), reader.shapes(), strict=True)
             if record is not None and shape is not None
         ]
-        with connect() as conn:
+
+    simplified = """select code, encode(st_asewkb(geom), 'hex') as geom,
+                           encode(st_asewkb(st_pointonsurface(geom)), 'hex') as label_point
+                    from (select code, st_multi(st_collectionextract(st_makevalid(st_transform(
+                                   st_setsrid(st_coveragesimplify(geom, %s) over (), 3347), 4326)), 3)) as geom
+                          from (select code, st_setsrid(st_coverageclean(geom) over (), 3347) as geom from {}) clean) simple"""
+    land = shapes(LAND)
+    with connect() as conn:
+        conn.execute(
+            """create temp table province as
+               select code, st_multi(st_collectionextract(st_makevalid(st_setsrid(st_geomfromgeojson(geojson), 3347)), 3))
+                        as geom
+               from unnest(%s::text[], %s::text[]) as f(code, geojson)""",
+            [[record["PRUID"] for record, _ in land], [geojson for _, geojson in land]],
+        )
+        conn.execute("create temp table land as select st_subdivide(geom, 256) as geom from province")
+        conn.execute("create index on land using gist (geom)")
+        conn.execute(f"create temp table simple_province as {simplified.format('province')}", [TOLERANCE])
+        pl.DataFrame(
             conn.execute(
-                """create temp table fed on commit drop as
+                """select code, geom from simple_province
+                   union all select 'CA', encode(st_asewkb(st_multi(st_union(st_geomfromewkb(decode(geom, 'hex'))))), 'hex')
+                   from simple_province"""
+            ).fetchall(),
+            schema=["code", "geom"],
+            orient="row",
+        ).write_parquet(PARSED / "province.parquet")
+        for vintage, (_, _, _, url, _) in ORDERS.items():
+            records = shapes(url)
+            conn.execute("drop table if exists fed, shape")
+            conn.execute(
+                """create temp table fed as
                    select code, name_en, name_fr,
-                          st_multi(st_collectionextract(st_makevalid(st_transform(
-                            st_setsrid(st_geomfromgeojson(geojson), 3347), 4326)), 3)) as geom
+                          st_multi(st_collectionextract(st_makevalid(st_setsrid(st_geomfromgeojson(geojson), 3347)), 3))
+                            as geom
                    from unnest(%s::text[], %s::text[], %s::text[], %s::text[]) as f(code, name_en, name_fr, geojson)""",
                 [
                     [str(record.get("FED_NUM") or record["FEDNUM"]) for record, _ in records],
                     [record.get("ED_NAMEE") or record["ENNAME"] for record, _ in records],
                     [record.get("ED_NAMEF") or record["FRNAME"] for record, _ in records],
-                    [json.dumps(shape.__geo_interface__) for _, shape in records],
+                    [geojson for _, geojson in records],
                 ],
             )
+            if vintage in CARTOGRAPHIC:
+                cartographic_url, srid, _ = CARTOGRAPHIC[vintage]
+                cartographic = shapes(cartographic_url)
+                conn.execute(
+                    """create temp table shape as
+                       select code, st_multi(st_collectionextract(st_makevalid(st_union(st_transform(
+                                st_setsrid(st_geomfromgeojson(geojson), %s), 3347))), 3)) as geom
+                       from unnest(%s::text[], %s::text[]) as f(code, geojson) group by code""",
+                    [srid, [record["FEDUID"] for record, _ in cartographic], [geojson for _, geojson in cartographic]],
+                )
+            else:
+                conn.execute(
+                    """create temp table shape as
+                       select f.code, st_multi(st_collectionextract(st_makevalid(st_union(st_intersection(f.geom, l.geom))), 3))
+                                as geom
+                       from fed f join land l on st_intersects(f.geom, l.geom) group by f.code"""
+                )
+            if unmatched := conn.execute(
+                "(select code from fed except select code from shape) union (select code from shape except select code from fed)"
+            ).fetchall():
+                raise ValueError(f"{vintage}: districts without a matching land shape: {unmatched}")
             pl.DataFrame(
                 conn.execute(
-                    """select code, name_en, name_fr, encode(st_asewkb(geom), 'hex'),
-                              encode(st_asewkb(st_pointonsurface(geom)), 'hex')
-                       from (select code, min(name_en) as name_en, min(name_fr) as name_fr,
-                                    case when count(*) > 1 then st_multi(st_union(geom)) else (array_agg(geom))[1] end
-                                      as geom
-                             from fed group by code) as f
-                       order by code"""
+                    f"""select f.code, f.name_en, f.name_fr, s.geom, s.label_point
+                        from (select code, min(name_en) as name_en, min(name_fr) as name_fr from fed group by code) f
+                        join ({simplified.format("shape")}) s using (code)
+                        order by f.code""",
+                    [TOLERANCE],
                 ).fetchall(),
                 schema=["code", "name_en", "name_fr", "geom", "label_point"],
                 orient="row",
             ).write_parquet(PARSED / f"fed-{vintage}.parquet")
-            conn.execute(
-                "create temp table province on commit drop as"
-                " select left(code, 2) as code, st_multi(st_union(geom)) as geom from fed group by 1"
-            )
-            pl.DataFrame(
-                conn.execute(
-                    """select code, encode(st_asewkb(geom), 'hex') from province
-                       union all select 'CA', encode(st_asewkb(st_multi(st_union(geom))), 'hex') from province"""
-                ).fetchall(),
-                schema=["code", "geom"],
-                orient="row",
-            ).write_parquet(PARSED / f"province-{vintage}.parquet")
+            print(vintage, "shapes")
 
 
 def emit() -> Path:
-    provinces = dict(pl.read_parquet(PARSED / "province-2023.parquet").iter_rows())
+    provinces = dict(pl.read_parquet(PARSED / "province.parquet").iter_rows())
 
     with connect() as conn:
         cs = Changeset(
@@ -454,6 +500,29 @@ def emit() -> Path:
                 license="Open Government Licence – Canada",
             )
             cs.artifact(raw.cached(SOURCE, url), boundaries[vintage])
+        statcan: dict[str, UUID] = {}
+        for key, title, url in (
+            ("land", "Provinces and territories, cartographic boundary file, 2016 Census", LAND),
+            *(
+                (
+                    vintage,
+                    f"Federal electoral districts, {vintage} Representation Order, cartographic boundary file, {census} Census",
+                    url,
+                )
+                for vintage, (url, _, census) in CARTOGRAPHIC.items()
+            ),
+        ):
+            statcan[key] = cs.source("Statistics Canada", title)
+            cs.add(
+                "source",
+                id=statcan[key],
+                kind="official_body",
+                publisher="Statistics Canada",
+                title=title,
+                url=url.split("id_/", 1)[1],
+                license="Statistics Canada Open Licence",
+            )
+            cs.artifact(raw.cached(SOURCE, url), statcan[key])
         results: dict[date, UUID] = {}
         for day, (ordinal, _, folder, archive, document) in ELECTIONS.items():
             title = f"{ordinal} General Election, poll-by-poll results"
@@ -514,7 +583,7 @@ def emit() -> Path:
             geom=provinces["CA"],
             label_point=None,
             quality="official",
-            source_id=boundaries["2023"],
+            source_id=statcan["land"],
         )
         for code, (abbreviation, label) in PROVINCES.items():
             province = cs.polity(f"CA-{abbreviation}")
@@ -533,7 +602,7 @@ def emit() -> Path:
                 geom=provinces[code],
                 label_point=None,
                 quality="official",
-                source_id=boundaries["2023"],
+                source_id=statcan["land"],
             )
         cs.add(
             "boundary_set",
@@ -566,7 +635,7 @@ def emit() -> Path:
                     geom=fed["geom"],
                     label_point=fed["label_point"],
                     quality="official",
-                    source_id=boundaries[vintage],
+                    source_id=statcan.get(vintage, boundaries[vintage]),
                 )
             cs.add(
                 "boundary_set",
@@ -703,6 +772,7 @@ def emit() -> Path:
                     election_id=election,
                     contest_id=contest,
                     stage="certified",
+                    kind="counted",
                     source_id=results[day],
                     status="active",
                     is_default=True,
