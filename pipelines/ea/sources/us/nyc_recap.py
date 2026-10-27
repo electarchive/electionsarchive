@@ -620,7 +620,7 @@ def emit(
                     added.add(office)
                     cs.add("office", id=office, polity_id=city, kind="other")
                     name(office, title)
-            party = party_id(scope.title())[0] if scope is not None else None
+            party = party_id(scope)[0] if scope is not None else None
             seat_path = f"{path}-{slug(scope)}" if scope else path
             if (office is not None and office in cs.minted and office not in added) or (area is not None and area in cs.minted) or (body_id is not None and body_id in cs.minted):
                 skipped.append(f"{label}: its office or district is not in the archive")
