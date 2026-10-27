@@ -386,6 +386,13 @@ select cc.st, cc.year, cc.level, cc.stage, concat_ws(':', count(*), sum(rs.k), s
 from cc join rs on rs.contest_id = cc.id group by 1, 2, 3, 4
 """
 
+UNITS_SQL = """
+select cc.st, cc.year, count(distinct ug.k)::int, (count(distinct ug.k) filter (where ug.shaped))::int
+from cc join rs on rs.contest_id = cc.id join rsu on rsu.result_set_k = rs.k join ug on ug.k = rsu.unit_k
+where ug.grain = 'precinct' and cc.year >= 2000 and not cc.upcoming
+group by grouping sets ((cc.st, cc.year), (cc.year))
+"""
+
 SHAPES_SQL = """
 select cc.st, cc.year, cc.level, cc.stage, count(distinct ug.k), count(distinct ug.k) filter (where ug.shaped)
 from cc join dirty d on d.key = concat_ws('|', cc.st, cc.year, cc.level, cc.stage)
@@ -1021,12 +1028,13 @@ def us() -> str:
     started = time.monotonic()
     with connect() as conn:
         rows = matrix(conn)
+        units = {(st, year): (n, shaped) for st, year, n, shaped in conn.execute(UNITS_SQL)}
     spec = ROOT / ".agents" / "spec"
     with (spec / "us-coverage.csv").open("w", newline="") as handle:
         writer = csv.DictWriter(handle, fieldnames=list(rows[0]))
         writer.writeheader()
         writer.writerows(rows)
-    text = report(rows)
+    text = report(rows, units)
     ready = readiness.markdown(readiness.DAY)
     (spec / "us-coverage.md").write_text(
         text.replace("\n## How it is measured", f"\n{ready}\n## How it is measured", 1)
@@ -1099,7 +1107,7 @@ def top_states(rows: list[dict], field: str, n: int = 6) -> str:
     return ", ".join(f"{s} {v:,}" for v, s in ranked)
 
 
-def report(rows: list[dict]) -> str:
+def report(rows: list[dict], units: dict[tuple, tuple[int, int]]) -> str:
     groups: dict[tuple, list[dict]] = defaultdict(list)
     for row in rows:
         groups[(row["level"], row["stage"], era(row["year"]), row["target"], row["owner"])].append(row)
@@ -1147,7 +1155,6 @@ def report(rows: list[dict]) -> str:
     for year in range(2000, LAST + 1):
         members = [r for r in rows if r["year"] == year and r["level"] not in LOCAL]
         held = sum(r["held"] for r in members)
-        precincts = sum(r["precincts"] for r in members)
         ahead = sum(r["upcoming"] + r["pending"] for r in members)
         cells = [year, f"{held - ahead:,}"]
         for level in ("president", "us_senate", "us_house", "governor", "statewide_exec", "state_upper", "state_lower"):
@@ -1158,7 +1165,8 @@ def report(rows: list[dict]) -> str:
                     sum(r["held"] - r["upcoming"] - r["pending"] for r in subset),
                 )
             )
-        cells.append(pct(sum(r["shaped_precincts"] for r in members), precincts))
+        n, shaped = units.get((None, year), (0, 0))
+        cells.append(pct(shaped, n))
         cells.append(f"{sum(r['upcoming'] for r in members):,} of {ahead:,}" if ahead else "–")
         precinct_years.append(cells)
 
@@ -1183,30 +1191,15 @@ def report(rows: list[dict]) -> str:
                         ]
                     )
 
-    shape_rows = []
-    for year in range(2000, LAST + 1):
-        members = [r for r in rows if r["year"] == year and r["precincts"]]
-        precincts = sum(r["precincts"] for r in members)
-        if precincts:
-            shaped = sum(r["shaped_precincts"] for r in members)
-            shape_rows.append(
-                [
-                    year,
-                    "target" if year >= 2016 else "bonus",
-                    f"{precincts:,}",
-                    pct(shaped, precincts),
-                    f"{precincts - shaped:,}",
-                ]
-            )
-    shape_cells = defaultdict(lambda: [0, 0])
-    for r in rows:
-        if r["year"] >= 2016 and r["precincts"]:
-            shape_cells[(r["state"], r["year"])][0] += r["precincts"]
-            shape_cells[(r["state"], r["year"])][1] += r["shaped_precincts"]
+    shape_rows = [
+        [year, "target" if year >= 2016 else "bonus", f"{n:,}", pct(shaped, n), f"{n - shaped:,}"]
+        for (st, year), (n, shaped) in sorted(units.items(), key=lambda item: item[0][1])
+        if st is None and n
+    ]
     shape_gaps = [
         [st, year, f"{n:,}", pct(shaped, n), f"{n - shaped:,}", "frontend lane"]
-        for (st, year), (n, shaped) in sorted(shape_cells.items(), key=lambda item: item[1][1] - item[1][0])
-        if n > shaped
+        for (st, year), (n, shaped) in sorted(units.items(), key=lambda item: item[1][1] - item[1][0])
+        if st is not None and year >= 2016 and n > shaped
     ][:40]
 
     icpsr = defaultdict(int)
@@ -1260,7 +1253,7 @@ Each row groups the matrix by level, stage, era, target, and owner. Gap is conte
 
 ## Precinct results, 2000 on
 
-Contests held at state and federal levels per year, the share of general-election contests with precinct results per level, and the share of those years' precincts with shapes (a bonus before 2016, the target from 2016). Upcoming counts the contests still to vote that the archive holds with candidates or options in full, of all it holds still to vote; they are left out of the other columns until their date passes.
+Contests held at state and federal levels per year, the share of general-election contests with precinct results per level, and the share of those years' distinct precincts with shapes (a bonus before 2016, the target from 2016). Upcoming counts the contests still to vote that the archive holds with candidates or options in full, of all it holds still to vote; they are left out of the other columns until their date passes.
 
 ### 2000–2015
 
@@ -1272,11 +1265,11 @@ Contests held at state and federal levels per year, the share of general-electio
 
 ## For other lanes
 
-Precinct shapes: precincts with results and the share with shapes, by year. The target starts in 2016; shapes for 2000–2015 are a bonus, and precincts without one then are not a gap. A precinct counts once per level and stage it reported.
+Precinct shapes: distinct precincts with results and the share with shapes, by year (one precinct counts once, however many contests it reported, since one shape serves them all). The target starts in 2016; shapes for 2000–2015 are a bonus, and precincts without one then are not a gap.
 
 {table(["Year", "Counts as", "Precincts", "Shaped", "Unshaped"], shape_rows)}
 
-Largest precinct shape gaps from 2016 (the frontend lane, which owns `us.precinct` shapes): states and years ranked by precincts with results but no shape, top 40.
+Largest precinct shape gaps from 2016 (the frontend lane, which owns `us.precinct` shapes): states and years ranked by distinct precincts with results but no shape, top 40.
 
 {table(["State", "Year", "Precincts", "Shaped", "Unshaped", "Owner"], shape_gaps)}
 
