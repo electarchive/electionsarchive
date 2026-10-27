@@ -1,6 +1,4 @@
 <script lang="ts">
-  import { enhance } from "$app/forms";
-  import { invalidateAll } from "$app/navigation";
   import { resolve } from "$app/paths";
   import { page } from "$app/state";
   import ChevronRightIcon from "@lucide/svelte/icons/chevron-right";
@@ -225,14 +223,6 @@
       : (options[0] ?? headline(data.polity, tab).goal),
   );
   let order = $state<"gap" | "name">("gap");
-
-  $effect(() => {
-    if (!data.building) {
-      return;
-    }
-    const timer = setInterval(() => void invalidateAll(), 5000);
-    return () => clearInterval(timer);
-  });
 
   const built = $derived(
     data.builtAt == null
@@ -772,18 +762,8 @@
         class="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted-foreground"
       >
         {built}
-        {#if data.dev}
-          <form method="POST" action="?/refresh" use:enhance>
-            <button
-              type="submit"
-              disabled={data.building}
-              class="rounded-sm border border-border px-2 whitespace-nowrap text-foreground block-6 hover:bg-muted focus-visible:outline-2 focus-visible:outline-ring disabled:opacity-50 disabled:hover:bg-transparent"
-              >{m.coverage_refresh()}</button
-            >
-          </form>
-          {#if data.building}
-            <span>{m.coverage_refresh_requested()}</span>
-          {/if}
+        {#if data.building}
+          <span>{m.coverage_rebuilding()}</span>
         {/if}
       </div>
       {#if data.stale}
