@@ -48,6 +48,11 @@ const CASES = [
     path: "/map/tr/2023-05-14-general/president",
     isFull: true,
   },
+  {
+    name: "br-world",
+    path: "/br/2022-10-02-general/president?by=world.country",
+  },
+  { name: "it-abroad", path: "/it/2022-09-25-general/chamber/abroad-europe" },
 ];
 const WIDTHS = [
   { name: "1440", width: 1440, height: 900, isMobile: false },
@@ -313,6 +318,35 @@ for (const test of picked) {
               .catch(() => false),
             "clicking a place did not open its card",
           );
+          const docked = size.isMobile
+            ? await page
+                .locator("aside[aria-live=polite]")
+                .first()
+                .evaluate((node) => node.getBoundingClientRect().top)
+                .catch(() => null)
+            : null;
+          const held = await view(page);
+          const sheet = await page
+            .locator("[data-view] canvas")
+            .first()
+            .boundingBox();
+          if (
+            docked != null &&
+            held != null &&
+            sheet != null &&
+            Math.abs(held.zoom - home.min) < 0.05
+          ) {
+            const y = (lat) =>
+              Math.log(Math.tan(Math.PI / 4 + (lat * Math.PI) / 360));
+            const floor =
+              y(held.north) -
+              ((docked - sheet.y) / sheet.height) *
+                (y(held.north) - y(held.south));
+            check(
+              y(held.frame.south) >= floor - 1e-6,
+              "the docked card covers the polity at the fitted view",
+            );
+          }
           const alone = page
             .getByRole("button", { name: /^Map .+ alone$/u })
             .first();

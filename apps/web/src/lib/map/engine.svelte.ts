@@ -552,6 +552,16 @@ export class Engine {
     this.frame(this.#frame, true);
   }
 
+  hold() {
+    if (this.gl == null) {
+      return;
+    }
+    if (this.gl.getZoom() - this.gl.getMinZoom() < 0.01) {
+      this.#isFramed = true;
+    }
+    this.#hold(this.gl);
+  }
+
   get isFramed() {
     return this.#isFramed;
   }

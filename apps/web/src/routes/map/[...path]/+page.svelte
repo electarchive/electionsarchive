@@ -112,7 +112,7 @@
   let mosaic = $state.raw<{
     key: string;
     set: Sheet;
-    layers: Array<{ code: string; tiles: string }>;
+    layers: Array<{ code: string; noun: string; tiles: string }>;
     part: Array<number | null>;
     layer: Array<number>;
   } | null>(null);
@@ -513,10 +513,10 @@
           margin >= 0 ? value > margin : value < margin,
         ).length,
       noun:
-        sheet.levels.find(
-          (level) =>
-            level.code === (isTiled ? held.layers[layer]?.code : hit.set.level),
-        )?.noun ?? "",
+        (isTiled
+          ? held.layers[layer]?.noun
+          : sheet.levels.find((level) => level.code === hit.set.level)?.noun) ??
+        "",
       place: parent?.name ?? whole?.name ?? hit.set.scope.name,
     };
   });
@@ -665,11 +665,19 @@
     });
   });
 
+  let docked = $state(0);
+  const reserved = $derived(entry == null ? 0 : docked);
+  let tapped: { x: number; y: number } | null = null;
   const padding = (width: number) => {
     const side = Math.round(Math.min(320, width * 0.16));
     return width >= 768
       ? { top: 64, right: side, bottom: 24, left: side }
-      : { top: 64, right: 16, bottom: 120, left: 16 };
+      : {
+          top: 64,
+          right: 16,
+          bottom: width < 640 && reserved > 0 ? reserved + 24 : 120,
+          left: 16,
+        };
   };
 
   const engine = new Engine(
@@ -708,6 +716,7 @@
         }
         pinned = k;
         hovered = k;
+        tapped = point;
         if (
           isParts &&
           lookup[k]?.set === sheet &&
@@ -718,6 +727,24 @@
       },
     },
   );
+
+  $effect(() => {
+    const height = reserved;
+    untrack(() => {
+      const gl = engine.gl;
+      if (gl == null || gl.getCanvas().clientWidth >= 640) {
+        return;
+      }
+      engine.hold();
+      if (height === 0 || tapped == null || engine.isFramed) {
+        return;
+      }
+      const top = gl.getCanvas().clientHeight - height - 24;
+      if (tapped.y > top) {
+        gl.panBy([0, tapped.y - (64 + top) / 2], { duration: calm ? 0 : 300 });
+      }
+    });
+  });
 
   let painted: Record<string, string> = {};
   const base = $derived.by(() => {
@@ -781,47 +808,49 @@
         options,
       );
     }
-    engine.add(
-      {
-        id: `seam:${id}`,
-        type: "line",
-        ...layer,
-        paint: {
-          "line-color": "var(--card)",
-          "line-width": [
-            "interpolate",
-            ["linear"],
-            ["zoom"],
-            3,
-            isDense ? 0.08 : 0.6,
-            6,
-            isDense ? 0.2 : 0.9,
-            9,
-            isDense ? 0.55 : 1.2,
-            13,
-            1.2,
-          ],
-          "line-opacity": on,
+    if (rank < 2) {
+      engine.add(
+        {
+          id: `seam:${id}`,
+          type: "line",
+          ...layer,
+          paint: {
+            "line-color": "var(--card)",
+            "line-width": [
+              "interpolate",
+              ["linear"],
+              ["zoom"],
+              3,
+              isDense ? 0.08 : 0.6,
+              6,
+              isDense ? 0.2 : 0.9,
+              9,
+              isDense ? 0.55 : 1.2,
+              13,
+              1.2,
+            ],
+            "line-opacity": on,
+          },
         },
-      },
-      "fills",
-      options,
-    );
-    engine.add(
-      {
-        id: `edge:${id}`,
-        type: "line",
-        ...layer,
-        minzoom: rank === 0 ? MID : FINE,
-        paint: {
-          "line-color": "var(--card)",
-          "line-width": rank === 0 ? 2 : 1.25,
-          "line-opacity": on,
+        "fills",
+        options,
+      );
+      engine.add(
+        {
+          id: `edge:${id}`,
+          type: "line",
+          ...layer,
+          minzoom: rank === 0 ? MID : FINE,
+          paint: {
+            "line-color": "var(--card)",
+            "line-width": rank === 0 ? 2 : 1.25,
+            "line-opacity": on,
+          },
         },
-      },
-      "lines",
-      options,
-    );
+        "lines",
+        options,
+      );
+    }
     engine.add(
       {
         id: `focus:${id}`,
@@ -1304,9 +1333,7 @@
       return;
     }
     const timer = setTimeout(() => {
-      const id =
-        pointer == null || base == null ? null : engine.pick(pointer, [base]);
-      const part = sheet.parts.find((entry) => entry.k === id);
+      const part = sheet.parts[held.part[hit.i] ?? -1];
       if (part == null || named.has(`${held.key}|${part.unit}`)) {
         return;
       }
@@ -1314,7 +1341,7 @@
       const [, , vs = ""] = asked.split("|");
       void request(
         part.unit,
-        held.layers.at(-1)?.code ?? null,
+        held.layers[held.layer[hit.i] ?? 0]?.code ?? null,
         vs === "" ? null : vs,
       ).then((set) => {
         for (const [j, place] of set.places.k.entries()) {
@@ -1590,6 +1617,7 @@
   {const lead = $derived(
     reading.leader == null ? null : hit.set.legend[reading.leader],
   )}
+  {const status = $derived(hit.set.places.status?.[hit.i] ?? null)}
   <div class="grid grid-cols-[minmax(0,1fr)] gap-3">
     <div class="grid gap-0.5">
       <div class="flex items-start justify-between gap-3">
@@ -1620,6 +1648,11 @@
           .filter((part) => part != null && part !== "")
           .join(", ")}
       </p>
+      {#if status != null}
+        <p class="text-[0.8125rem] text-pretty text-muted-foreground">
+          {status}
+        </p>
+      {/if}
     </div>
     {#if lead != null}
       <p
@@ -1836,7 +1869,7 @@
 
     <section
       class={cn(
-        "absolute inset-s-3 inset-be-3 z-10 grid gap-3 overflow-y-auto rounded-sm bg-card/96 p-3.5 shadow-menu ring-1 ring-border inline-[min(19.5rem,calc(100%-1.5rem))] max-block-[calc(100%-1.5rem)] max-sm:max-block-[60%]",
+        "absolute inset-s-3 inset-be-3 z-10 grid grid-cols-[minmax(0,1fr)] gap-3 overflow-y-auto rounded-sm bg-card/96 p-3.5 shadow-menu ring-1 ring-border inline-[min(19.5rem,calc(100%-1.5rem))] max-block-[calc(100%-1.5rem)] max-sm:max-block-[60%]",
         { "max-sm:hidden [@media(max-height:30rem)]:hidden": !isKeyOpen },
       )}
       aria-labelledby="{uid}-key"
@@ -1844,14 +1877,14 @@
       <h2 id="{uid}-key" class="sr-only">{m.atlas_key()}</h2>
       {@render finder(false)}
       {@render comparer(false)}
-      <div class="grid gap-1.5">
+      <div class="grid grid-cols-[minmax(0,1fr)] gap-1.5">
         <span class="text-xs font-semibold text-muted-foreground"
           >{m.map_color_by()}</span
         >
         <div class="flex flex-wrap gap-1.5">
           {#each [{ value: "winner" as const, label: m.map_mode_winner(), key: null }, { value: "votes" as const, label: m.map_mode_bubbles(), key: null }, ...sheet.legend
               .slice(0, 3)
-              .map( (item) => ({ value: "share" as const, label: item.label, key: item.key }) ), ...(isCompared ? [{ value: "swing" as const, label: m.map_mode_swing(), key: null }, { value: "flips" as const, label: m.map_mode_flips(), key: null }] : [])] as choice (`${choice.value}:${choice.key ?? ""}`)}
+              .map( (item) => ({ value: "share" as const, label: item.short ?? item.label, key: item.key }) ), ...(isCompared ? [{ value: "swing" as const, label: m.map_mode_swing(), key: null }, { value: "flips" as const, label: m.map_mode_flips(), key: null }] : [])] as choice (`${choice.value}:${choice.key ?? ""}`)}
             {const isOn = $derived(
               shown === choice.value &&
                 (choice.key == null || whom?.key === choice.key),
@@ -1859,7 +1892,7 @@
             <button
               type="button"
               class={cn(
-                "flex items-center gap-1.5 rounded-sm px-2 text-[0.8125rem] font-semibold whitespace-nowrap ring-1 ring-input block-7 hover:bg-secondary",
+                "flex items-center gap-1.5 rounded-sm px-2 text-[0.8125rem] font-semibold whitespace-nowrap ring-1 ring-input block-7 max-inline-full min-inline-0 hover:bg-secondary",
                 {
                   "bg-primary text-primary-foreground ring-primary hover:bg-primary":
                     isOn,
@@ -1874,11 +1907,11 @@
             >
               {#if choice.key != null}
                 <span
-                  class="rounded-xs block-2 inline-2"
+                  class="shrink-0 rounded-xs block-2 inline-2"
                   style:background-color={tones[choice.key]}
                 ></span>
               {/if}
-              {choice.label}
+              <span class="truncate">{choice.label}</span>
             </button>
           {/each}
         </div>
@@ -1980,11 +2013,14 @@
               title={m.atlas_only({ name: item.label })}
               onclick={() => (only = only === item.key ? null : item.key)}
             >
-              <span class="rounded-xs bg-(--party) chip block-2.5 inline-2.5"
-              ></span>
-              <span class="truncate font-semibold">{item.label}</span>
               <span
-                class="font-figures text-xs text-muted-foreground tabular-nums"
+                class="shrink-0 rounded-xs bg-(--party) chip block-2.5 inline-2.5"
+              ></span>
+              <span class="truncate font-semibold"
+                >{item.short ?? item.label}</span
+              >
+              <span
+                class="shrink-0 font-figures text-xs text-muted-foreground tabular-nums"
                 >{count(lead.won)}</span
               >
             </button>
@@ -2120,6 +2156,7 @@
           },
         )}
         aria-live="polite"
+        bind:offsetHeight={docked}
       >
         {@render ledger(entry)}
       </aside>

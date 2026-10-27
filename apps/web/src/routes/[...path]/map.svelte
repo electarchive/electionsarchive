@@ -225,7 +225,10 @@
         if (kind === "move") {
           pointer = point;
           const path = k == null ? null : rows.get(k)?.path;
-          empty = k == null && id != null && blanks.has(id) ? id : null;
+          empty =
+            k == null && id != null && (blanks.has(id) || notes.has(id))
+              ? id
+              : null;
           if (!nearPinned) {
             near = next?.k ?? null;
           }
@@ -380,6 +383,9 @@
   const inner = $derived(new Set(nested?.ks ?? []));
   const blanks = $derived(
     new Map((blank ?? []).map((entry) => [entry.k, entry])),
+  );
+  const notes = $derived(
+    new Map((places.noted ?? []).map((entry) => [entry.k, entry])),
   );
   const missing = $derived((blank ?? []).filter((entry) => entry.isHeld));
   const idle = $derived((blank ?? []).filter((entry) => !entry.isHeld));
@@ -1673,6 +1679,13 @@
       >
         {#if current != null}
           {@render readout()}
+        {:else if empty != null && notes.has(empty)}
+          <span class="font-semibold text-pretty">{notes.get(empty)?.name}</span
+          >
+          <span
+            class="text-xs text-pretty text-muted-foreground max-inline-[17rem]"
+            >{notes.get(empty)?.status}</span
+          >
         {:else if empty != null}
           <span class="font-semibold text-pretty"
             >{blanks.get(empty)?.name}</span
@@ -2387,6 +2400,11 @@
             })}{/if}</span
         >
       </span>
+    {/if}
+    {#if current.status != null}
+      <span class="text-xs text-pretty text-muted-foreground"
+        >{current.status}</span
+      >
     {/if}
     <span class="flex items-baseline justify-between gap-3 text-xs">
       <span class="text-muted-foreground"

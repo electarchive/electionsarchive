@@ -802,7 +802,7 @@
         </tr>
       </thead>
       <tbody>
-        {#each visible as row, index (row.path ?? row.name)}
+        {#each visible as row, index (row.path ?? `${row.k}:${row.name}`)}
           <tr
             class={cn(
               "group relative border-be border-border/60 last:border-be-0 hover:bg-secondary/70",

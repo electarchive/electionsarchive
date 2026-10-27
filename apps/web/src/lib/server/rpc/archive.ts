@@ -438,6 +438,7 @@ const PlaceRow = v.object({
   ),
   isRecorded: v.optional(v.boolean()),
   isPool: v.optional(v.boolean()),
+  status: v.optional(v.string()),
 });
 
 const Places = v.nullable(
@@ -458,6 +459,11 @@ const Places = v.nullable(
     ),
     rows: v.array(PlaceRow),
     districts: v.optional(v.array(PlaceRow)),
+    noted: v.optional(
+      v.array(
+        v.object({ k: v.number(), name: v.string(), status: v.string() }),
+      ),
+    ),
     isOpening: v.optional(v.boolean()),
     sources: v.array(v.string()),
     unreconciled: v.optional(
@@ -754,8 +760,17 @@ async function children(
         )
     `)
     : { rows: [] };
-  const members = new Set(joined.rows.map((row) => row.id));
-  found.rows.push(...joined.rows);
+  const abroad =
+    isRoot && !found.rows.some((row) => row.scheme === "world.country")
+      ? await db.execute<{ id: string; k: number; scheme: string }>(sql`
+          select a.id, a.k, a.scheme_code as scheme from area a
+          where a.scheme_code = 'world.country' and ${counted}
+        `)
+      : { rows: [] };
+  const members = new Set(
+    [...joined.rows, ...abroad.rows].map((row) => row.id),
+  );
+  found.rows.push(...joined.rows, ...abroad.rows);
   if (found.rows.length === 0) {
     return [];
   }
@@ -2266,10 +2281,11 @@ async function places(
       .map((row) => {
         const isPool =
           isMixed && !["standard", "mobile", "prison"].includes(row.kind);
+        const segments = row.code.split(":");
         const code =
-          row.scheme === "us.precinct"
-            ? row.code.split(":").slice(4).join(":")
-            : (row.code.split(":").at(-1) ?? row.code);
+          row.scheme === "us.precinct" && segments.length > 4
+            ? segments.slice(4).join(":")
+            : (segments.at(-1) ?? row.code);
         const cased = /\p{Ll}/u.test(code)
           ? code
           : code.replaceAll(/\p{Lu}+/gu, (word) =>
@@ -2564,6 +2580,25 @@ async function places(
     ),
   ]);
   const seats = new Map(allocated.rows.map((row) => [row.k, row.seats]));
+  const contexts =
+    level.code === "world.country"
+      ? (
+          await db.execute<{ id: string; k: number; body: string }>(sql`
+            select a.id, a.k, n.body_md as body from area a join note n on n.entity_id = a.id and n.kind = 'context'
+            where a.scheme_code = 'world.country'
+          `)
+        ).rows
+      : [];
+  const statuses = new Map(contexts.map((row) => [row.k, row.body]));
+  const placed = new Set(shown.map((kid) => kid.k));
+  const unplaced = contexts.filter((row) => !placed.has(row.k));
+  const called =
+    unplaced.length === 0
+      ? null
+      : await names(
+          unplaced.map((row) => row.id),
+          contest.date,
+        );
   const turnouts = (row: (typeof tabulated.rows)[number]) => {
     const entry = turned.get(row.k);
     const now = share(entry, row.valid);
@@ -2587,6 +2622,13 @@ async function places(
     level: level.code,
     ...tabulated,
     estimated: spread.size > 0,
+    ...(called != null && {
+      noted: unplaced.map((row) => ({
+        k: row.k,
+        name: called.full.get(row.id) ?? "",
+        status: row.body,
+      })),
+    }),
     rows: tabulated.rows
       .slice(0, rows.length + pools.length)
       .map((row) => ({
@@ -2595,6 +2637,7 @@ async function places(
         at: at.get(row.k) ?? null,
         seats: seats.get(row.k) ?? null,
         ...(row.k < 0 && { isPool: true }),
+        ...(statuses.has(row.k) && { status: statuses.get(row.k) }),
       })),
     districts: tabulated.rows
       .slice(rows.length + pools.length)
@@ -3479,6 +3522,17 @@ async function atlas(input: {
     rows.length > 1 &&
     rows.every((row) => row.name.endsWith(tail));
   const path = slugs.get(contest.id) ?? null;
+  const statuses =
+    level?.code === "world.country"
+      ? new Map(
+          (
+            await db.execute<{ k: number; body: string }>(sql`
+              select a.k, n.body_md as body from area a join note n on n.entity_id = a.id and n.kind = 'context'
+              where a.k = any(${sql.param(rows.map((row) => row.k))}::int[])
+            `)
+          ).rows.map((row) => [row.k, row.body]),
+        )
+      : null;
   return {
     title: labels.full.get(contest.id) ?? "",
     scope: {
@@ -3554,6 +3608,9 @@ async function atlas(input: {
         ),
       ),
       redrawn: rows.map((row) => moved.get(row.k) ?? null),
+      ...(statuses != null && {
+        status: rows.map((row) => statuses.get(row.k) ?? null),
+      }),
     },
   };
 }
@@ -3641,7 +3698,7 @@ async function mosaic(input: { id: string; vs?: string; group: Grouping }) {
     }
   }
   const legend = [...base.legend];
-  const layers: Array<{ code: string; tiles: string }> = [];
+  const layers: Array<{ code: string; noun: string; tiles: string }> = [];
   const rows: Array<{
     k: number;
     name: string;
@@ -3660,7 +3717,11 @@ async function mosaic(input: { id: string; vs?: string; group: Grouping }) {
       level?.tiles != null &&
       !layers.some((layer) => layer.tiles === `${level.tiles}.ids`)
     ) {
-      layers.push({ code: level.code, tiles: `${level.tiles}.ids` });
+      layers.push({
+        code: level.code,
+        noun: level.noun,
+        tiles: `${level.tiles}.ids`,
+      });
     }
     const layer = Math.max(
       0,
@@ -3896,7 +3957,7 @@ export async function rebuildMosaics(only?: Array<string>) {
         union all
         select c.id from contest c join grp on c.allocation_parent_id = grp.id
       )
-      select md5(concat_ws('|', 'parts-vs', string_agg(concat_ws(':', rs.k, rs.changeset_id, rs.status, rs.is_default), ',' order by rs.k),
+      select md5(concat_ws('|', 'parts-noun', string_agg(concat_ws(':', rs.k, rs.changeset_id, rs.status, rs.is_default), ',' order by rs.k),
         ${rasters.toSorted().join(",")}::text)) as stamp
       from grp join result_set rs on rs.contest_id = grp.id
     `);
@@ -6488,6 +6549,7 @@ export const contests = {
           tiles: v.nullable(v.string()),
           isPending: v.boolean(),
           isApproximate: v.boolean(),
+          note: v.nullable(v.string()),
           sources: v.array(
             v.object({
               publisher: v.string(),
@@ -6598,6 +6660,7 @@ export const contests = {
               url: string | null;
               attribution: string | null;
             }> | null;
+            note: string | null;
           }>(sql`
             with chosen as (
               select bs.vintage, bs.as_of, coalesce(bs.tiles_key, bs.scheme_code || '/' || bs.vintage) as tiles
@@ -6617,7 +6680,11 @@ export const contests = {
               array(select distinct area_id::text from shapes) as shaped,
               array(select distinct quality from shapes) as qualities,
               (select json_agg(json_build_object('publisher', s.publisher, 'title', s.title, 'url', s.url, 'attribution', nullif(s.attribution, '')) order by s.publisher)
-               from source s where s.id in (select source_id from shapes)) as sources
+               from source s where s.id in (select source_id from shapes)) as sources,
+              (select n.body_md from note n
+               where n.kind = 'methodology' and n.entity_id = ${area.id}::uuid
+                 and ${area.id}::uuid = any(${sql.param(group.ids)}::uuid[])
+               limit 1) as note
             from scheme sc left join chosen on true
             where sc.code = ${group.scheme}
           `);
@@ -6637,6 +6704,7 @@ export const contests = {
               tiles: stored(row.tiles),
               isPending: row.tiles != null && stored(row.tiles) == null,
               isApproximate: row.qualities.includes("synthetic"),
+              note: row.note,
               sources: row.sources ?? [],
               count: group.ids.length,
               missing: absent
@@ -6727,6 +6795,7 @@ export const contests = {
           shares: v.array(v.array(v.nullable(v.number()))),
           before: v.array(v.array(v.nullable(v.number()))),
           redrawn: v.array(v.nullable(v.number())),
+          status: v.optional(v.array(v.nullable(v.string()))),
         }),
       }),
     )
@@ -6758,7 +6827,9 @@ export const contests = {
             color: v.nullable(v.string()),
           }),
         ),
-        layers: v.array(v.object({ code: v.string(), tiles: v.string() })),
+        layers: v.array(
+          v.object({ code: v.string(), noun: v.string(), tiles: v.string() }),
+        ),
         places: v.object({
           k: v.array(v.number()),
           name: v.array(v.string()),
@@ -6788,6 +6859,7 @@ export const contests = {
             sheet: Awaited<ReturnType<typeof mosaic>>;
           };
           if (
+            held.sheet.layers.every((layer) => layer.noun != null) &&
             ["previous", held.sheet.target, held.path].some(
               (value) => value?.toLowerCase() === vs,
             )
@@ -6810,7 +6882,11 @@ export const contests = {
             ).sheet
           : null;
       const held = await open();
-      if (held?.places?.part != null && held.target !== undefined) {
+      if (
+        held?.places?.part != null &&
+        held.target !== undefined &&
+        held.layers?.every((layer) => layer.noun != null) === true
+      ) {
         return held as Awaited<ReturnType<typeof mosaic>>;
       }
       await rebuildMosaics([input.id.toLowerCase()]);
@@ -8349,15 +8425,24 @@ async function framing(area: string, day: string, ks: Array<number> = []) {
     north: number;
   }>(sql`
     with parts as (
-      select ST_Simplify(d.geom, 0.01, true) as geom, a.scheme_code as scheme
+      select a.id, ST_Simplify(d.geom, 0.01, true) as geom, a.scheme_code as scheme
       from area a
       join area_geometry g on g.area_id = a.id and g.valid @> ${day}::date
       cross join lateral ST_Dump(g.geom) d
       where ${ks.length === 0 ? sql`a.id = ${area}::uuid` : sql`a.k = any(${sql.param(ks)}::int[])`}
     ),
+    ranked as (
+      select parts.*, row_number() over (partition by id order by ST_Area(geom) desc) = 1 as anchor
+      from parts
+    ),
+    kept as (
+      select p.geom, p.scheme from ranked p
+      join ranked x on x.id = p.id and x.anchor
+      where ST_DWithin(p.geom, x.geom, 2)
+    ),
     framed as (
       select ST_Transform(ST_SetSRID(ST_Extent(${plane("geom", "scheme")})::geometry, 3857), 4326) as box
-      from parts
+      from kept
     )
     select ST_XMin(box) as west, ST_YMin(box) as south, ST_XMax(box) as east, ST_YMax(box) as north
     from framed where box is not null

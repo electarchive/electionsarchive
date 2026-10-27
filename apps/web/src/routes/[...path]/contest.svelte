@@ -2252,6 +2252,11 @@
                   >
                 {/if}
               {/each}
+              {#if entry.note != null}
+                <span class="text-[0.8125rem] text-pretty text-muted-foreground"
+                  >{entry.note}</span
+                >
+              {/if}
               {#if entry.missing.length > 0}
                 <span class="text-[0.8125rem] text-muted-foreground"
                   >{entry.missing.length > 3
