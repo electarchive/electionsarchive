@@ -1073,6 +1073,11 @@
       };
     }),
   );
+  const regionsAt = $derived(
+    scope == null
+      ? races.findIndex((race) => race.body != null && race.count > 1)
+      : -1,
+  );
   const isBallot = $derived(
     races.length > 2 && races.every((race) => race.kind === "ballot_question"),
   );
@@ -1669,10 +1674,79 @@
       />
     {/if}
   {/if}
+  {#if index === 0}
+    {@render ticket()}
+  {/if}
+  {#if index === regionsAt}
+    <Regions {id} />
+  {/if}
   {#if index === 0 && others.length > 0 && !isBallot}
     {@render board()}
   {/if}
 {/each}
+
+{#snippet ticket()}
+  {#if stages.length > 0}
+    <section class="col-span-12 bg-card px-3.5 py-3">
+      <h2 class="mbe-1.5 text-[0.8125rem] font-bold">{m.election_stages()}</h2>
+      <ul class="grid text-sm">
+        {#each stages as child, index (index)}
+          <li
+            class="flex items-baseline justify-between gap-4 border-be border-border/60 py-1.5 last:border-be-0"
+          >
+            {#if child.path == null}
+              <span>{child.name}</span>
+            {:else}
+              <Preview class="hover:highlighter" path={child.path}
+                >{child.name}</Preview
+              >
+            {/if}
+            <time
+              class="shrink-0 font-figures text-xs text-muted-foreground"
+              datetime={child.date}>{date(child.date)}</time
+            >
+          </li>
+        {/each}
+      </ul>
+    </section>
+  {/if}
+
+  <Cycle
+    primaries={cycle.primaries.map((primary) => ({
+      ...primary,
+      key: primary.id,
+      label:
+        primary.party == null
+          ? primary.name
+          : primary.until == null
+            ? m.cycle_primary({ party: primary.party.label })
+            : m.cycle_primaries({ party: primary.party.label }),
+      color: primary.party?.color ?? null,
+      runoff: null,
+      local: null,
+    }))}
+    general={cycle.general == null
+      ? null
+      : { ...cycle.general, winners: [], local: null }}
+    others={cycle.parts.map((part) => ({
+      key: part.place,
+      label: part.place,
+      color: null,
+      races: part.races.map((race) => ({
+        ...race,
+        label: [
+          race.date == null
+            ? null
+            : monthDay.format(new Date(`${race.date}T00:00:00Z`)),
+          race.party?.short ?? race.party?.label ?? null,
+        ]
+          .filter((part) => part != null)
+          .join(", "),
+      })),
+    }))}
+    othersTitle={m.cycle_parts()}
+  />
+{/snippet}
 
 {#snippet board()}
   <section class="col-span-12 bg-card px-3.5" aria-labelledby="board-title">
@@ -1929,66 +2003,9 @@
   </section>
 {/if}
 
-{#if stages.length > 0}
-  <section class="col-span-12 bg-card px-3.5 py-3">
-    <h2 class="mbe-1.5 text-[0.8125rem] font-bold">{m.election_stages()}</h2>
-    <ul class="grid text-sm">
-      {#each stages as child, index (index)}
-        <li
-          class="flex items-baseline justify-between gap-4 border-be border-border/60 py-1.5 last:border-be-0"
-        >
-          {#if child.path == null}
-            <span>{child.name}</span>
-          {:else}
-            <Preview class="hover:highlighter" path={child.path}
-              >{child.name}</Preview
-            >
-          {/if}
-          <time
-            class="shrink-0 font-figures text-xs text-muted-foreground"
-            datetime={child.date}>{date(child.date)}</time
-          >
-        </li>
-      {/each}
-    </ul>
-  </section>
+{#if races.length === 0}
+  {@render ticket()}
 {/if}
-
-<Cycle
-  primaries={cycle.primaries.map((primary) => ({
-    ...primary,
-    key: primary.id,
-    label:
-      primary.party == null
-        ? primary.name
-        : primary.until == null
-          ? m.cycle_primary({ party: primary.party.label })
-          : m.cycle_primaries({ party: primary.party.label }),
-    color: primary.party?.color ?? null,
-    runoff: null,
-    local: null,
-  }))}
-  general={cycle.general == null
-    ? null
-    : { ...cycle.general, winners: [], local: null }}
-  others={cycle.parts.map((part) => ({
-    key: part.place,
-    label: part.place,
-    color: null,
-    races: part.races.map((race) => ({
-      ...race,
-      label: [
-        race.date == null
-          ? null
-          : monthDay.format(new Date(`${race.date}T00:00:00Z`)),
-        race.party?.short ?? race.party?.label ?? null,
-      ]
-        .filter((part) => part != null)
-        .join(", "),
-    })),
-  }))}
-  othersTitle={m.cycle_parts()}
-/>
 
 {#if sections.local != null}
   <Local local={sections.local} isOwn={true} />
@@ -1999,7 +2016,9 @@
 {#if scope == null}
   <Alongside {id} />
   <Governments {id} {chamber} />
-  <Regions {id} />
+  {#if regionsAt === -1}
+    <Regions {id} />
+  {/if}
 {/if}
 <Gains {id} within={scope?.id} />
 <ByElections {id} within={scope?.id} />
