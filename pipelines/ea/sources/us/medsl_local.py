@@ -1,3 +1,4 @@
+import html
 import io
 import json
 import re
@@ -44,7 +45,8 @@ SYNONYMS = {
     "state-s-attorney": "states-attorney",
     "states-attorney": "states-attorney",
 }
-VERSION = "9"
+VERSION = "10"
+ANSWER = r"(?i)^(?:yes|no)\b"
 PARSED = DATA / "parsed" / SOURCE
 ABBREVIATED = {
     "DAD": {"MIA": "MIAMI"},
@@ -1136,11 +1138,32 @@ def parse() -> None:
         )
         precinct = ["office", "district", "special", "county_fips", "jurisdiction_fips", "precinct"]
         frame = (
-            frame.with_columns(total=(pl.col("mode") == "TOTAL").any().over(*precinct, "candidate", "party_detailed"))
+            frame.with_columns(
+                candidate=pl.col("candidate")
+                .map_elements(
+                    lambda text: html.unescape(re.sub(r"&([A-Za-z]+);", lambda entity: f"&{entity[1].lower()};", text)),
+                    return_dtype=pl.String,
+                )
+                .str.replace(r"(?i)^write[- ]?in:\s*", "")
+                .str.replace(r"(?i)\s*\((?:w/i|write[- ]?in)\)$", "")
+                .str.replace(r"(?i)\s+write[- ]?in$", "")
+                .str.replace(r'(?i)\s*"declared write[- ]?in"', "")
+                .str.replace(r"(?i)\s+-\s+[\d,]+\s+valid votes$", "")
+            )
+            .with_columns(
+                candidate=pl.when(
+                    pl.col("candidate").str.to_lowercase().str.starts_with(pl.col("office").str.to_lowercase() + " ")
+                )
+                .then(pl.col("candidate").str.slice(pl.col("office").str.len_chars() + 1))
+                .otherwise("candidate")
+            )
+            .filter(~pl.col("candidate").str.contains(r"(?i)^(?:no name|no one|no petition filed|no vote)$"))
+            .with_columns(total=(pl.col("mode") == "TOTAL").any().over(*precinct, "candidate", "party_detailed"))
             .filter(pl.col("total") == (pl.col("mode") == "TOTAL"))
             .with_columns(
                 pooled=pl.col("candidate").str.to_uppercase().is_in([*POOLED, "SCATTERING"])
                 | (pl.col("writein") == "TRUE")
+                | pl.col("candidate").str.contains(r"(?i)\bwrite[- ]?ins?\b")
             )
         )
         labels = []
@@ -1735,7 +1758,7 @@ def emit() -> Path:
                 kind="standard",
                 valid_from=None,
             )
-        systems = {key: cs.key("us.electoral_system", key) for key in ("fptp", "block", "two_round")}
+        systems = {key: cs.key("us.electoral_system", key) for key in ("fptp", "block", "two_round", "referendum")}
         firsts: list[tuple[UUID, UUID, UUID, date, str]] = []
         if cs.minted & set(systems.values()):
             raise ValueError("the fptp, block, and two_round systems must already exist")
@@ -1978,27 +2001,33 @@ def emit() -> Path:
                     )
             contest = cs.key("us.contest", contest_key)
             slugs[contest_path] = contest
-            magnitude = row["magnitude"]
+            named = grouped[(day, code, key, seat, row["remainder"])].filter(~pl.col("pooled"))["candidate"]
+            measure = named.len() > 0 and bool(named.str.contains(ANSWER).all())
+            magnitude = None if measure else row["magnitude"]
             cs.add(
                 "contest",
                 id=contest,
                 election_id=election,
-                kind="body_seats" if body else "office",
-                office_id=None if body else owners[(code, key)],
-                body_id=owners[(code, key)] if body else None,
+                kind="ballot_question" if measure else "body_seats" if body else "office",
+                office_id=None if body or measure else owners[(code, key)],
+                body_id=owners[(code, key)] if body and not measure else None,
                 district_area_id=area,
                 magnitude=magnitude,
                 round_number=1,
                 electoral_system_id=systems[
-                    "two_round"
+                    "referendum"
+                    if measure
+                    else "two_round"
                     if magnitude == 1 and (majority or code in MAJORITY)
                     else "fptp"
                     if magnitude == 1
                     else "block"
                 ],
                 default_result_kind="counted",
-                term="remainder" if row["remainder"] else "full",
+                term=None if measure else "remainder" if row["remainder"] else "full",
             )
+            if measure:
+                cs.add("ballot_question", contest_id=contest, type="mandatory_referendum")
             term = re.fullmatch(TERM, seat or "", re.IGNORECASE)
             start = None if term is None else date(int(term[3]), int(term[1]), int(term[2]))
             begins = None if start is None else f"{start:%B} {start.day}, {start.year}"
@@ -2035,7 +2064,11 @@ def emit() -> Path:
                 if origin.startswith("electionsfl")
                 else contributed[state]
             )
-            counted = grouped[(day, code, key, seat, row["remainder"])].with_columns(
+            counted = (
+                grouped[(day, code, key, seat, row["remainder"])].filter(
+                    pl.lit(measure) | pl.col("pooled") | ~pl.col("candidate").str.contains(ANSWER)
+                )
+            ).with_columns(
                 token=pl.col("candidate").map_elements(slug, return_dtype=pl.String),
                 line=pl.col("party_detailed")
                 .map_elements(lambda label, state=state: str(party(state, label)[0] or ""), return_dtype=pl.String)
@@ -2112,6 +2145,18 @@ def emit() -> Path:
                 if pooled:
                     option = cs.key("us.option", f"{contest_key}:write-ins")
                     cs.add("contest_option", id=option, contest_id=contest, kind="write_in", ballot_label="Write-ins")
+                elif measure:
+                    answer = "Yes" if re.match(r"(?i)yes", candidate) else "No"
+                    option = cs.key("us.option", f"{contest_key}:{slug(candidate)}")
+                    cs.add(
+                        "contest_option",
+                        id=option,
+                        contest_id=contest,
+                        kind="answer",
+                        ballot_position=1 if answer == "Yes" else 2,
+                        ballot_label=answer,
+                    )
+                    totals.append((votes or 0, option))
                 else:
                     full, known_person = resolved.get(
                         (day, code, key, seat, row["remainder"], candidate), (candidate, None)
@@ -2336,5 +2381,10 @@ def emit() -> Path:
                     reason="A surname-only name in MEDSL's files, resolved to the full name",
                 )
         cs.pool("A scattering line in MEDSL's files read as a candidate")
+        cs.remainders(
+            "A write-in mark, vote tally, placeholder, office title, or ballot answer in MEDSL's files read as a candidate",
+            r"^(?:yes|no)\y|\((?:w/i|write[- ]?in)\)$|^write[- ]?in\y|\swrite[- ]?in$|declared write|valid votes"
+            r"|^(?:no name|no one|no petition filed|no vote)$|&[a-z]+;|^circuit clerk ",
+        )
         cs.clear()
         return cs.write()

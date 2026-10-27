@@ -16,7 +16,7 @@ from ea.sources.us.ncsbe import SOURCE as NCSBE
 from ea.store import DATA, connect
 
 SOURCE = "us.nc_local"
-VERSION = "6"
+VERSION = "7"
 PARSED = DATA / "parsed" / SOURCE
 DAYS = [
     date(int(text[:4]), int(text[4:6]), int(text[6:]))
@@ -247,7 +247,10 @@ def parse() -> None:
             "county",
             "precinct",
             pl.col("contest").str.to_uppercase().str.replace_all(r"\s+", " ").str.strip_chars(),
-            pl.col("choice").str.replace_all(r"\s+", " ").str.strip_chars(),
+            pl.col("choice")
+            .str.replace_all(r"\s+", " ")
+            .str.replace(r"(?i)\s*-\s*disqualified$", "")
+            .str.strip_chars(),
             pl.col("party").fill_null("").str.strip_chars(),
             pl.col("votes").str.replace_all(",", "").cast(pl.Int64),
             pl.col("vote_for").cast(pl.Int16),

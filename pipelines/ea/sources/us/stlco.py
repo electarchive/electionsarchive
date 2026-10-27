@@ -11,7 +11,7 @@ from ea import raw
 from ea.sources.us import enr_clarity
 
 SOURCE = "us.stlco"
-VERSION = "1"
+VERSION = "2"
 PLATFORM = "mo_stlco"
 ROOT = "https://extcontent.stlouisco.com/BOE/eResults/"
 PARTIES = {"REP": "Republican", "DEM": "Democratic", "LIB": "Libertarian", "CON": "Constitution", "GRN": "Green"}
@@ -19,7 +19,7 @@ PARTIES = {"REP": "Republican", "DEM": "Democratic", "LIB": "Libertarian", "CON"
 
 def _files() -> dict[str, str]:
     found = {}
-    for code in re.findall(r'eResults/(el\d{6})/', raw.cached(SOURCE, ROOT).path.read_text(errors="replace")):
+    for code in re.findall(r"eResults/(el\d{6})/", raw.cached(SOURCE, ROOT).path.read_text(errors="replace")):
         listing = raw.fetch(SOURCE, f"{ROOT}{code}/", suffix=".html").path.read_text(errors="replace")
         if csv_file := re.search(r'HREF="(/BOE/eResults/' + code + r'/[^"]*\.csv)"', listing, re.I):
             found[code] = f"https://extcontent.stlouisco.com{csv_file[1]}"
@@ -43,13 +43,19 @@ def _read(registry: Mapping[str, Mapping[str, str]]) -> Iterator[dict[str, Any]]
         orders: dict[str, list[str]] = defaultdict(list)
         text = raw.cached(SOURCE, link).path.read_bytes().decode("latin-1")
         for row in csv.DictReader(io.StringIO(text)):
-            title, choice = row["Contest Title"].strip(), row["Choice Name"].strip()
+            title = row["Contest Title"].strip()
+            choice = re.sub(r"(?i)\s*\(disqualified[^)]*\)", "", row["Choice Name"]).strip()
             votes = row["Total Votes"].strip()
             if not votes.lstrip("-").isdigit():
                 continue
             entry = contests[title].setdefault(
                 choice,
-                {"text": choice, "party": PARTIES.get(row.get("Choice Party") or row.get("Contest Party") or ""), "votes": 0, "places": []},
+                {
+                    "text": choice,
+                    "party": PARTIES.get(row.get("Choice Party") or row.get("Contest Party") or ""),
+                    "votes": 0,
+                    "places": [],
+                },
             )
             entry["votes"] += int(votes)
             entry["places"].append((row["#Precinct"].strip(), votes))
