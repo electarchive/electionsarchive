@@ -1227,6 +1227,27 @@
   "atlas_flipped": "Flipped since {year}",
   "atlas_shift": "Shifted {name} +{points} since {year}",
   "atlas_ticks": "Ticks mark {year}",
+  "lean_versus": "vs {place}",
+  "lean_rank": [
+    {
+      "declarations": [
+        "input rank",
+        "input name",
+        "input count",
+        "input nouns",
+        "input place",
+        "local rankOrdinal = rank: plural type=ordinal"
+      ],
+      "selectors": ["rankOrdinal"],
+      "match": {
+        "rankOrdinal=one": "{rank}st best for {name} of {count} {nouns} in {place}",
+        "rankOrdinal=two": "{rank}nd best for {name} of {count} {nouns} in {place}",
+        "rankOrdinal=few": "{rank}rd best for {name} of {count} {nouns} in {place}",
+        "rankOrdinal=*": "{rank}th best for {name} of {count} {nouns} in {place}"
+      }
+    }
+  ],
+  "lean_title": "How {place} compares",
   "atlas_zoom_to": "Zoom to",
   "atlas_alone": "Map {place} alone",
   "atlas_versus": "{name} +{points} vs. {place}",
@@ -1701,6 +1722,10 @@
   "coverage_country_def_referendums": "The archive has the referendum's results by region or finer, and they add up to at least 98% of the declared total. Where no declared total is stored, every region must be present.",
   "coverage_country_def_ep": "The archive has the constituency's votes, and they add up to at least 98% of the declared total. Where no declared total is stored, every unit must be present.",
   "coverage_country_reason_coarse": "Constituency results only",
+  "coverage_country_reason_lost": "No votes survive",
+  "coverage_country_reason_lost_def": "The archive holds who won the race, but no record of its votes is known to survive. The source for each span says so.",
+  "coverage_lost_of": "{count} with no surviving votes",
+  "coverage_lost_span": "{years}: {source}",
   "coverage_country_reason_partial": "Short of the official total",
   "coverage_country_reason_partial_def": "The archive has votes for the race, but they add up to less than 98% of the declared total, or some of the race's units are missing.",
   "coverage_country_reason_coarse_def": "The archive has the constituency's votes, but nothing finer yet.",

@@ -65,6 +65,17 @@ def database(conn) -> list[str]:
                 ).fetchone()
             ):
                 problems.append(f"finest-reported {row['state']} {row['year']} {row['level']}: no county {county}")
+    for cc in coverage_countries.countries():
+        spec = coverage_countries.load(cc)
+        for level in spec["levels"]:
+            for span in level.get("lost", []):
+                if not (span.get("quote") and span.get("note") and span.get("source") in spec["sources"]):
+                    problems.append(f"{cc} {level['key']} lost {span.get('from')}: needs a source, a quote, and a note")
+    for polity, goal, level, state, year, lost, bare in conn.execute(
+        "select polity, goal, level, state, year, lost, bare from coverage_goal where lost < 0"
+        " or lost > 0 and (polity = 'us' or goal not in ('national', 'subnational', 'local', 'referendums', 'ep', 'fine'))"
+    ):
+        problems.append(f"{polity} {goal} {level} {state} {year}: lost {lost} outside a country vote goal")
     sums: dict[tuple[str, str, int], int] = defaultdict(int)
     for polity, level, goal, year, total in conn.execute(
         "select polity, level, goal, year, sum(total) from coverage_goal where polity <> 'us' group by 1, 2, 3, 4"
@@ -141,9 +152,9 @@ def pages(conn) -> list[str]:
                         )
                     )
                     low, high = {"before": (0, 1999), "since": (2000, 9999)}.get(era, (0, 9999))
-                    total, complete, icpsr, published = conn.execute(
+                    total, complete, icpsr, published, lost = conn.execute(
                         "select coalesce(sum(total), 0), coalesce(sum(complete), 0), coalesce(sum(icpsr), 0),"
-                        " coalesce(sum(published), 0) from coverage_goal where polity = %s"
+                        " coalesce(sum(published), 0), coalesce(sum(lost), 0) from coverage_goal where polity = %s"
                         " and goal = %s and level = any(%s) and year <> %s and year between %s and %s",
                         [cc, goal, keys, current, low, high],
                     ).fetchone()
@@ -156,7 +167,10 @@ def pages(conn) -> list[str]:
                             f"{cc} {key} {level} {column}: page icpsr {cell['icpsr']} published {cell['published']}"
                             f" db {icpsr} {published}"
                         )
+                    if lost != cell["lost"]:
+                        problems.append(f"{cc} {key} {level} {column}: page lost {cell['lost']} db {lost}")
                     for count, phrase in (
+                        (cell["lost"], "with no surviving votes"),
                         (cell["icpsr"], "rely on ICPSR alone"),
                         (cell["published"], "at the finest unit published"),
                     ):

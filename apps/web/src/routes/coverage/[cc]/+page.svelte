@@ -85,6 +85,7 @@
     partial: m.coverage_country_reason_partial_def,
     totals: m.coverage_country_reason_totals_def,
     bare: m.coverage_country_reason_bare_def,
+    lost: m.coverage_country_reason_lost_def,
     absent: m.coverage_country_reason_absent_def,
     unshaped: m.coverage_country_reason_unshaped_def,
     undrawn: m.coverage_country_reason_undrawn_def,
@@ -116,7 +117,8 @@
         : column;
   const notesFor = (level: string) =>
     summary.notes.filter(
-      (note) => note.level === level && note.goal !== "fine",
+      (note) =>
+        note.level === level && note.goal !== "fine" && note.lost == null,
     );
 
   const range = $derived.by(() => {
@@ -449,6 +451,32 @@
               </span>
             </span>
           {/if}
+          {#if reason === "lost"}
+            {const levels = $derived(
+              data.tiers
+                .find((tier) => tier.key === tierKey)
+                ?.levels.map((level) => level.key) ?? [],
+            )}
+            <span class="mbs-1 grid gap-1 text-xs">
+              {#each summary.notes.filter((note) => note.lost != null && levels.includes(note.level)) as note, index (index)}
+                {const source = $derived(summary.sources[note.lost ?? ""])}
+                <span>
+                  <a
+                    href={source?.url}
+                    class="underline underline-offset-2 focus-visible:outline-2 focus-visible:outline-ring"
+                    >{m.coverage_lost_span({
+                      years:
+                        note.from === note.to
+                          ? String(note.from)
+                          : `${note.from}–${note.to}`,
+                      source: source?.title ?? note.lost ?? "",
+                    })}</a
+                  >
+                  <span class="block text-muted-foreground">{note.note}</span>
+                </span>
+              {/each}
+            </span>
+          {/if}
         </span>
       </li>
     {/each}
@@ -503,8 +531,15 @@
           {m.coverage_published_of({ count: count(counts.published) })}
         </span>
       {/if}
+      {#if counts.lost > 0}
+        <span class="text-muted-foreground">
+          {m.coverage_lost_of({ count: count(counts.lost) })}
+        </span>
+      {/if}
       <span class="text-muted-foreground">
-        {m.coverage_short({ count: count(counts.total - counts.complete) })}
+        {m.coverage_short({
+          count: count(counts.total - counts.complete - counts.lost),
+        })}
       </span>
     </p>
     <Bar

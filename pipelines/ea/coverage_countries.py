@@ -297,7 +297,7 @@ def shaped_on(spans: list[tuple], day: date) -> str:
 
 def tally(cc: str, data: dict) -> tuple[dict, list[dict], list[dict]]:
     spec = data["spec"]
-    goals: dict[tuple[str, str, str, int], list[int]] = defaultdict(lambda: [0] * 14)
+    goals: dict[tuple[str, str, str, int], list[int]] = defaultdict(lambda: [0] * 15)
     elections_out: list[dict] = []
     notes: list[dict] = []
     for level in spec["levels"]:
@@ -314,6 +314,11 @@ def tally(cc: str, data: dict) -> tuple[dict, list[dict], list[dict]]:
             for g in level.get("gaps", [])
         ]
         notes += gaps
+        lost = level.get("lost", [])
+        notes += [
+            {"goal": goal, "level": key, "from": g["from"], "to": g["to"], "note": g["note"], "lost": g["source"]}
+            for g in lost
+        ]
         if level.get("fine_note"):
             notes.append({"goal": "fine", "level": key, "from": None, "to": None, "note": level["fine_note"]})
         groups: dict[str, list[tuple]] = defaultdict(list)
@@ -423,33 +428,36 @@ def tally(cc: str, data: dict) -> tuple[dict, list[dict], list[dict]]:
                         if district is not None
                         else region(cc, None, None, None, r[6])
                     )
+            if any(g["from"] <= year <= g["to"] for g in lost):
+                status = {k: "lost" if st == "bare" else st for k, st in status.items()}
             regions_expected = (e or {}).get("regions") or {}
             count_total = n or 0
-            by_region: dict[str, list[int]] = defaultdict(lambda: [0] * 14)
+            by_region: dict[str, list[int]] = defaultdict(lambda: [0] * 15)
             for k, st in status.items():
                 cell = by_region[place.get(k, "")]
                 cell[1] += st == "complete"
                 cell[3] += st == "bare"
                 cell[4] += st == "totals"
                 cell[5] += st == "partial"
+                cell[14] += st == "lost"
             held_n = len(status)
             if regions_expected:
                 for reg, want in regions_expected.items():
                     cell = by_region[reg]
-                    have = cell[1] + cell[3] + cell[4] + cell[5]
+                    have = cell[1] + cell[3] + cell[4] + cell[5] + cell[14]
                     gap = max(0, want - have)
                     cell[4 if coarse_only else 2] += gap
                     cell[0] = max(want, have)
                 for reg, cell in by_region.items():
                     if reg not in regions_expected:
-                        cell[0] = cell[1] + cell[3] + cell[4] + cell[5]
+                        cell[0] = cell[1] + cell[3] + cell[4] + cell[5] + cell[14]
                 rest = count_total - sum(max(w, 0) for w in regions_expected.values())
                 if rest > 0:
                     by_region[""][0] += rest
                     by_region[""][4 if coarse_only else 2] += rest
             else:
                 for cell in by_region.values():
-                    cell[0] = cell[1] + cell[3] + cell[4] + cell[5]
+                    cell[0] = cell[1] + cell[3] + cell[4] + cell[5] + cell[14]
                 gap = max(0, count_total - held_n)
                 if gap:
                     cell = by_region[""]
@@ -480,6 +488,7 @@ def tally(cc: str, data: dict) -> tuple[dict, list[dict], list[dict]]:
                     f[3] += cell[3]
                     f[4] += cell[4]
                     f[5] += cell[5]
+                    f[14] += cell[14]
                     f[6] += cell[1] - done
             if unit == "district":
                 for reg, cell in by_region.items():
@@ -500,6 +509,7 @@ def tally(cc: str, data: dict) -> tuple[dict, list[dict], list[dict]]:
                     "held": held_n,
                     "complete": complete,
                     "bare": sum(1 for s in status.values() if s == "bare"),
+                    "lost": sum(1 for s in status.values() if s == "lost"),
                     "partial": sum(1 for s in status.values() if s == "partial"),
                     "totals": sum(1 for s in status.values() if s == "totals")
                     + (max(0, count_total - held_n) if coarse_only else 0),
@@ -574,7 +584,7 @@ def write(conn, goal_rows: list[tuple], polity_rows: list[tuple]) -> None:
     conn.execute("delete from coverage_polity")
     with conn.cursor().copy(
         "copy coverage_goal (polity, goal, state, level, year, total, complete, absent, bare, totals, partial, coarse,"
-        " turnout, precincts, shaped, unshaped, units, undrawn, icpsr) from stdin"
+        " turnout, precincts, shaped, unshaped, units, undrawn, icpsr, lost) from stdin"
     ) as copy:
         for row in goal_rows:
             copy.write_row(row)
@@ -605,7 +615,7 @@ def report(cc: str) -> str:
 
 def markdown(cc: str, data: dict, goals: dict, elections: list[dict], notes: list[dict]) -> str:
     spec = data["spec"]
-    sums: dict[str, list[int]] = defaultdict(lambda: [0] * 14)
+    sums: dict[str, list[int]] = defaultdict(lambda: [0] * 15)
     for (goal, _, _, _), values in goals.items():
         for i, v in enumerate(values):
             sums[goal][i] += v
@@ -621,9 +631,18 @@ def markdown(cc: str, data: dict, goals: dict, elections: list[dict], notes: lis
         "## Goals",
         "",
         coverage.table(
-            ["Goal", "Expected", "Meets it", "Share", "Totals only", "No vote counts", "Not held"],
+            ["Goal", "Expected", "Meets it", "Share", "Totals only", "No vote counts", "No votes survive", "Not held"],
             [
-                [g, f"{v[0]:,}", f"{v[1]:,}", coverage.pct(v[1], v[0]), f"{v[4]:,}", f"{v[3]:,}", f"{v[2]:,}"]
+                [
+                    g,
+                    f"{v[0]:,}",
+                    f"{v[1]:,}",
+                    coverage.pct(v[1], v[0]),
+                    f"{v[4]:,}",
+                    f"{v[3]:,}",
+                    f"{v[14]:,}",
+                    f"{v[2]:,}",
+                ]
                 for g in GOALS
                 if (v := sums.get(g)) is not None
             ],
@@ -645,6 +664,7 @@ def markdown(cc: str, data: dict, goals: dict, elections: list[dict], notes: lis
                     "Meets it",
                     "Totals only",
                     "No vote counts",
+                    "No votes survive",
                     "Not held",
                     "Finer",
                     "Shaped",
@@ -657,6 +677,7 @@ def markdown(cc: str, data: dict, goals: dict, elections: list[dict], notes: lis
                         e["complete"],
                         e["totals"],
                         e["bare"],
+                        e["lost"],
                         e["absent"],
                         e["fine"],
                         e["shaped"],
@@ -670,7 +691,8 @@ def markdown(cc: str, data: dict, goals: dict, elections: list[dict], notes: lis
         for n in notes:
             span = "" if n["from"] is None else f"{n['from']}" if n["from"] == n["to"] else f"{n['from']}–{n['to']}"
             held = f" (archive holds {n['held']})" if n.get("held") else ""
-            lines.append(f"- {n['level']} {span}{held}: {n['note']}".replace("  ", " "))
+            lost = f" (no votes survive, {n['lost']})" if n.get("lost") else ""
+            lines.append(f"- {n['level']} {span}{lost}{held}: {n['note']}".replace("  ", " "))
     lines += ["", "## Sources", ""]
     for key, s in spec["sources"].items():
         lines.append(f"- `{key}`: {s.get('publisher', '')}, {s['title']}, <{s['url']}>")
@@ -678,10 +700,10 @@ def markdown(cc: str, data: dict, goals: dict, elections: list[dict], notes: lis
 
 
 WORLD_SQL = """
-select polity, level, year, sum(total)::int, sum(complete)::int, sum(absent)::int, sum(bare)::int
+select polity, level, year, sum(total)::int, sum(complete)::int, sum(absent)::int, sum(bare)::int, sum(lost)::int
 from coverage_goal
 where polity <> 'us' and goal in ('national', 'subnational', 'local', 'referendums', 'ep') and year < %s
-group by 1, 2, 3 having sum(total) > sum(complete)
+group by 1, 2, 3 having sum(total) > sum(complete) + sum(lost)
 order by 1, 2, 3
 """
 
@@ -725,7 +747,7 @@ def world() -> str:
         rows = list(conn.execute(WORLD_SQL, [date.today().year]))
     specs = {cc: load(cc) for cc in countries()}
     spans: dict[tuple, dict] = {}
-    for cc, level, year, total, complete, absent, bare in rows:
+    for cc, level, year, total, complete, absent, bare, lost in rows:
         found = next(
             (
                 (i, lead)
@@ -740,7 +762,7 @@ def world() -> str:
             {"cc": cc, "level": level, "lead": lead, "years": [], "missing": 0, "absent": 0, "bare": 0},
         )
         span["years"].append(year)
-        span["missing"] += total - complete
+        span["missing"] += total - complete - lost
         span["absent"] += absent
         span["bare"] += bare
     labels = {(cc, lv["key"]): lv.get("label", lv["key"]) for cc, spec in specs.items() for lv in spec["levels"]}

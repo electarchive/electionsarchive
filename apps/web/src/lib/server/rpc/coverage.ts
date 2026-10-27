@@ -42,6 +42,7 @@ const counts = {
   icpsr: v.number(),
   major: v.number(),
   published: v.number(),
+  lost: v.number(),
   populationTotal: v.number(),
   populationComplete: v.number(),
   populationAbsent: v.number(),
@@ -75,6 +76,7 @@ const Note = v.object({
   note: v.string(),
   held: v.optional(v.number()),
   listed: v.optional(v.boolean()),
+  lost: v.optional(v.string()),
 });
 const Summary = v.object({
   polity: v.string(),
@@ -141,9 +143,10 @@ function sum(rows: Array<Row>, spec: Spec, levels: ReadonlyArray<string>) {
     ? {
         ...ZERO,
         total: total.total,
-        complete: total.total - total.absent - total.bare,
+        complete: total.total - total.absent - total.bare - total.lost,
         absent: total.absent,
         bare: total.bare,
+        lost: total.lost,
       }
     : total;
 }
@@ -339,7 +342,7 @@ export const coverage = {
           contests: polity.contests,
           finest: polity.finest,
           finestNoun: polity.finestNoun,
-          uncounted: polity.notes.length,
+          uncounted: polity.notes.filter((note) => note.lost == null).length,
           tiers: tiers(
             polity.polity,
             found.rows.filter((row) => row.polity === polity.polity),
