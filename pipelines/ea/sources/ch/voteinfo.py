@@ -1,12 +1,14 @@
+import html
 import json
+import re
 from datetime import date
 from pathlib import Path
-from uuid import UUID
+from uuid import UUID, uuid5
 
 import polars as pl
 
 from ea import raw
-from ea.changeset import Changeset, slug
+from ea.changeset import NAMESPACE, Changeset, slug
 from ea.sources.ch.swissvotes import CANTONS, FIELDS, MONTHS, MOOT, TYPES
 from ea.store import DATA, connect
 
@@ -30,6 +32,26 @@ DAYS = [
     date(2026, 9, 27),
 ]
 LANGUAGES = ("de", "fr", "it", "rm", "en")
+FEDLEX = "https://www.fedlex.admin.ch/eli/fga/2026/{number}/{lang}"
+CIRCULAR = (
+    "https://www.fedlex.admin.ch/filestore/fedlex.data.admin.ch/eli/fga/2026/2406/{lang}/html/"
+    "fedlex-data-admin-ch-eli-fga-2026-2406-{lang}-html.html"
+)
+QUESTIONS = (
+    (
+        "AHV",
+        1757,
+        "Decreto federale sul finanziamento supplementare dell’AVS mediante un aumento dell’imposta sul valore aggiunto",
+    ),
+    ("Feuerwerk", 1760, "Iniziativa popolare «Per una limitazione dei fuochi d’artificio»"),
+    (
+        "Ehepaare",
+        1758,
+        "Iniziativa popolare «Sì a imposte federali eque anche per i coniugi – Basta con la discriminazione del matrimonio!»",
+    ),
+    ("Kriegsmaterial", 22, "Modifica della legge federale sul materiale bellico (LMB)"),
+)
+ASKED = ("de", "fr", "it")
 UNALLOCATED = 32
 VALID_NOTE = (
     "The Federal Chancellery counts valid ballots across the initiative and its counter-proposal together, so they "
@@ -52,6 +74,8 @@ def fetch() -> None:
     for day in DAYS:
         raw.fetch(SOURCE, url(day), suffix=".json")
     raw.fetch(SOURCE, SWISSVOTES, suffix=".csv")
+    for lang in ASKED:
+        raw.fetch(SOURCE, CIRCULAR.format(lang=lang), suffix=".html")
 
 
 def parse() -> None:
@@ -114,8 +138,21 @@ def parse() -> None:
     upcoming = pl.read_csv(
         raw.cached(SOURCE, SWISSVOTES).path, separator=";", encoding="utf8-lossy", infer_schema_length=0
     ).filter(pl.col("datum").str.to_date("%d.%m.%Y") == UPCOMING)
+    asked = {}
+    for lang in ASKED:
+        text = re.sub(
+            r"\s+",
+            " ",
+            html.unescape(
+                re.sub(r"<[^>]+>", "", raw.cached(SOURCE, CIRCULAR.format(lang=lang)).path.read_text(encoding="utf-8"))
+            ),
+        )
+        asked[lang] = re.findall(r"(?:Wollen Sie|Acceptez-vous|Volete accettare)[^?]+\?", text)
+        if len(asked[lang]) != len(QUESTIONS):
+            raise ValueError(f"{lang}: {len(asked[lang])} ballot questions in the circular")
     for row in upcoming.iter_rows(named=True):
         vote = round(float(row["anr"]) * 10)
+        order = next(i for i, (keyword, _, _) in enumerate(QUESTIONS) if keyword in row["titel_off_d"])
         contests.append(
             {
                 "date": UPCOMING,
@@ -130,10 +167,12 @@ def parse() -> None:
                 "cantons_no": 0.0,
                 "title_de": row["titel_off_d"],
                 "title_fr": row["titel_off_f"],
-                "title_it": None,
+                "title_it": QUESTIONS[order][2],
                 "title_rm": None,
                 "title_en": row["titel_kurz_e"],
                 "scheduled": True,
+                "gazette": QUESTIONS[order][1],
+                **{f"question_{lang}": asked[lang][order] for lang in ASKED},
             }
         )
     frame = pl.DataFrame(results, infer_schema_length=None)
@@ -161,7 +200,7 @@ def parse() -> None:
     ):
         raise ValueError("a national total differs from the sum of its cantons")
     PARSED.mkdir(parents=True, exist_ok=True)
-    pl.DataFrame(contests).write_parquet(PARSED / "contests.parquet")
+    pl.DataFrame(contests, infer_schema_length=None).write_parquet(PARSED / "contests.parquet")
     frame.write_parquet(PARSED / "results.parquet")
     print(f"{len(contests)} votes, {len(results)} result rows")
 
@@ -202,6 +241,19 @@ def emit() -> Path:
         )
         for day in DAYS:
             cs.artifact(raw.cached(SOURCE, url(day)), source)
+        gazette = cs.source(PUBLISHER, "Bundesblatt")
+        cs.add(
+            "source",
+            id=gazette,
+            kind="official_body",
+            publisher=PUBLISHER,
+            title="Bundesblatt",
+            url="https://www.fedlex.admin.ch/de/fga",
+            license="Official acts, not protected by copyright (Art. 5 URG)",
+            license_url="https://www.fedlex.admin.ch/eli/cc/1993/1798_1798_1798/de",
+        )
+        for lang in ASKED:
+            cs.artifact(raw.cached(SOURCE, CIRCULAR.format(lang=lang)), gazette)
 
         switzerland = cs.polity("CH")
         system = cs.key("ch.electoral_system", "federal-referendum")
@@ -287,6 +339,25 @@ def emit() -> Path:
                     ballot_label=label,
                 )
             if row["scheduled"]:
+                for lang in ASKED:
+                    circular = FEDLEX.format(number=2406, lang=lang)
+                    official = FEDLEX.format(number=row["gazette"], lang=lang)
+                    for text_kind, body, address in (
+                        ("text", row[f"question_{lang}"], circular),
+                        ("link", None, official),
+                    ):
+                        cs.add(
+                            "ballot_question_text",
+                            id=uuid5(
+                                NAMESPACE, f"ballot_question_text\x1f{contest}\x1f{text_kind}\x1f{lang}\x1f{gazette}"
+                            ),
+                            contest_id=contest,
+                            kind=text_kind,
+                            lang=lang,
+                            body=body,
+                            url=address,
+                            source_id=gazette,
+                        )
                 continue
             result_set = cs.key(f"{SOURCE}.result_set", contest_key)
             cs.add(
