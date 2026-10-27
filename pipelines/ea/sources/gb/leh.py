@@ -528,6 +528,7 @@ def emit() -> Path:
     candidates = pl.read_parquet(PARSED / "candidates.parquet")
     wards = pl.read_parquet(PARSED / "wards.parquet")
     names: dict[str, str] = {}
+    people: set[UUID] = set()
     for year in LOOKUPS:
         for row in lookup(year).sort("ward").iter_rows(named=True):
             names[row["ward"]] = row["ward_name"]
@@ -936,15 +937,17 @@ def emit() -> Path:
                         surname_first = f"{surname}, {line['given']}"
                         full = f"{line['given']} {surname}"
                     else:
-                        surname_first = line["name"]
+                        surname_first = re.sub(r"(?<=\.)/\.$", "", line["name"])
                         parts = surname_first.split()
                         initials = []
                         while len(parts) > 1 and re.fullmatch(r"(?:[A-Z]\.?)+", parts[-1]):
                             initials.insert(0, parts.pop())
                         full = " ".join([*initials, *parts])
                     person = cs.key("gb.leh.person", option_key)
-                    cs.add("person", id=person, gender=GENDERS.get(line["gender"]))
-                    name(person, full)
+                    if person not in people:
+                        people.add(person)
+                        cs.add("person", id=person, gender=GENDERS.get(line["gender"]))
+                        name(person, full)
                     owner = party_of(
                         year,
                         line["party"],

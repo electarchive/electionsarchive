@@ -692,7 +692,14 @@ def emit() -> Path:
                     if line["name"] is not None:
                         person = cs.key("gb.leap.person", option_key)
                         cs.add("person", id=person)
-                        name(person, line["name"])
+                        name(
+                            person,
+                            re.sub(
+                                r"(?<=\bO)[?']{1,2}(?=[A-Z])",
+                                "'",
+                                re.sub(r"\s*(?:\*+|\?{3,})$|\s*\(<i>.*?</i>\)$", "", line["name"]),
+                            ),
+                        )
                         cs.add(
                             "candidacy",
                             id=cs.key("gb.leap.candidacy", option_key),
