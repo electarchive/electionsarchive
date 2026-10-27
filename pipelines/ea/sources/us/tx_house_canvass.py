@@ -137,18 +137,27 @@ def emit() -> Path:
             completeness=round(counted / official, 4),
         )
         cs.add("external_id", entity_id=result_set, scheme="ea.authoritative", value=str(result_set))
-        cs.add(
-            "note",
-            entity_id=result_set,
-            kind="methodology",
-            body_md="Votes by precinct in Brazoria, Jefferson, and Orange counties from OpenElections' Texas precinct file, as in the OpenElections set for this contest, whose county sums equal the Secretary of State's, and in Galveston County from the Galveston County Clerk's official canvass report (run November 21, 2022, as mirrored by the University of Florida Election Lab), its ballot-style rows summed to each precinct. Chambers County cast no votes in this district.",
-        )
-        cs.add(
-            "note",
-            entity_id=result_set,
-            kind="caveat",
-            body_md=f"Galveston County's canvass gives Mikal Williams 38,998 votes in the county, in its precinct rows, its totals row, and its cumulative report; the Secretary of State's county return and the FEC's district total carry 33,998 there, so this set counts {counted:,} votes against the earlier default's {int(official):,}.",
-        )
+        for entity, kind, body in (
+            (
+                result_set,
+                "methodology",
+                "Votes by precinct in Brazoria, Jefferson, and Orange counties from OpenElections' Texas precinct file, as in the OpenElections set for this contest, whose county sums equal the Secretary of State's, and in Galveston County from the Galveston County Clerk's official canvass report (run November 21, 2022, as mirrored by the University of Florida Election Lab), its ballot-style rows summed to each precinct. Chambers County cast no votes in this district.",
+            ),
+            (
+                result_set,
+                "caveat",
+                f"Galveston County's canvass gives Mikal Williams 38,998 votes in the county, in its precinct rows, its totals row, and its cumulative report; the Secretary of State's county return and the FEC's district total carry 33,998 there, so this set counts {counted:,} votes against the earlier default's {int(official):,}.",
+            ),
+            (
+                contest_id,
+                "caveat",
+                "Galveston County's official canvass gives Mikal Williams 38,998 votes in the county. The Secretary of State's county return and the FEC's district total carry 33,998 there, a 5,000-vote transcription error, so the official district total understates Williams by 5,000 votes (68,606, not 63,606). The precinct set from the county's canvass counts the corrected figure.",
+            ),
+        ):
+            if not conn.execute(
+                "select 1 from note where entity_id = %s and body_md = %s", [entity, body]
+            ).fetchone():
+                cs.add("note", entity_id=entity, kind=kind, body_md=body)
         for unit, option, value in values:
             cs.add(
                 "result_value",
