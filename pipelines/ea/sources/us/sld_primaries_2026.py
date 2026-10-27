@@ -99,6 +99,7 @@ OPENELECTIONS = {
     "PA": ("Pennsylvania", "pa", date(2026, 5, 19), "20260519__pa__primary__county.csv"),
     "MO": ("Missouri", "mo", date(2026, 8, 4), "20260804__mo__primary__county.csv"),
     "TN": ("Tennessee", "tn", date(2026, 8, 6), "20260801__tn__primary__county.csv"),
+    "NM": ("New Mexico", "nm", date(2026, 6, 2), "20260602__nm__primary__county.csv"),
 }
 ROUNDS += [
     (
@@ -238,7 +239,11 @@ def fetch() -> None:
         try:
             raw.cached(SOURCE, address)
         except LookupError:
-            held = raw.cached("us.oe_primaries_2026", address)
+            try:
+                held = raw.cached("us.oe_primaries_2026", address)
+            except LookupError:
+                raw.fetch(SOURCE, address, suffix=".csv")
+                continue
             raw.store(
                 SOURCE,
                 address,
@@ -300,6 +305,7 @@ def parse() -> None:
                     chamber is None
                     or party not in PARTIES
                     or candidate is None
+                    or not (votes or "0").isdigit()
                     or re.search(r"(?i)write-?ins?$|^(over|under) votes$|withdrawn", candidate)
                 ):
                     continue
@@ -308,7 +314,9 @@ def parse() -> None:
                         chamber,
                         re.sub(r"^(\d+)([AB])$", lambda match: f"{match[1]}-{match[2].lower()}", district),
                         party,
-                        candidate,
+                        re.sub(r"\bMc(\w)", lambda match: f"Mc{match[1].upper()}", candidate.title())
+                        if candidate.isupper()
+                        else candidate,
                         county,
                         int(votes or 0),
                     )
@@ -595,7 +603,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="2026 state legislative primaries and primary runoffs by county: Alabama, Georgia, Idaho, Indiana, Iowa, Michigan, Minnesota, Nevada (with its statewide offices), North Carolina, Rhode Island, South Carolina, Utah, West Virginia, and Wisconsin from the states' official results; Arizona, Colorado, Kentucky, Missouri, North Dakota, Oregon, Pennsylvania, South Dakota, Tennessee, Texas, and Wyoming from OpenElections",
+            summary="2026 state legislative primaries and primary runoffs by county: Alabama, Georgia, Idaho, Indiana, Iowa, Michigan, Minnesota, Nevada (with its statewide offices), North Carolina, Rhode Island, South Carolina, Utah, West Virginia, and Wisconsin from the states' official results; Arizona, Colorado, Kentucky, Missouri, New Mexico, North Dakota, Oregon, Pennsylvania, South Dakota, Tennessee, Texas, and Wyoming from OpenElections",
             polity="US",
         )
 
@@ -644,6 +652,8 @@ def emit() -> Path:
                 [f"{FIPS[state]}___"],
             ).fetchall():
                 counties[code] = counties[re.sub(r"[^a-z]", "", text.lower().replace("saint ", "st "))] = unit
+            if state == "NM":
+                counties["donaana"] = counties["35013"]
             if state == "MO":
                 counties["kansascity"] = conn.execute(
                     "select id from reporting_unit where scheme_code = 'us.place' and code = '2938000'"
