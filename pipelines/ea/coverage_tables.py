@@ -1283,14 +1283,14 @@ def build() -> str:
                 )
     names = dict(states.values())
     goals: dict[tuple[str, str, str, int], list[int]] = defaultdict(lambda: [0] * 22)
-    for st, year, level, total, complete, unshaped, units, undrawn in shapes:
+    for st, year, level, total, complete, unshaped, unit_shapes, undrawn in shapes:
         if level not in STATE_LEVELS or st not in names:
             continue
         cell = goals[("shapes" if year >= 2000 else "shapes_history", st, level, year)]
         cell[0] += total
         cell[1] += complete
         cell[10] += unshaped
-        cell[11] += units
+        cell[11] += unit_shapes
         cell[12] += undrawn
     for (st, year, level, _), c in by_key.items():
         if level not in STATE_LEVELS or st not in names:
