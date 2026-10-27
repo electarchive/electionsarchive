@@ -1,5 +1,6 @@
 <script lang="ts">
   import { Slider } from "#lib/components/ui/slider/index.js";
+  import { cn } from "#lib/utils.js";
 
   let {
     bars,
@@ -114,7 +115,10 @@
   <div class="relative text-[0.6875rem] text-muted-foreground block-4">
     {#each ticks as tick, index (index)}
       <span
-        class="absolute font-figures whitespace-nowrap tabular-nums"
+        class={cn("absolute font-figures whitespace-nowrap tabular-nums", {
+          "truncate max-inline-[40%]":
+            index === 0 || index === ticks.length - 1,
+        })}
         style:inset-inline-start="{place(tick.at) * 100}%"
         style:translate={index === 0
           ? "0"

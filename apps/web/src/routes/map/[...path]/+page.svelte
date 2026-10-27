@@ -1590,7 +1590,7 @@
   {const lead = $derived(
     reading.leader == null ? null : hit.set.legend[reading.leader],
   )}
-  <div class="grid gap-3">
+  <div class="grid grid-cols-[minmax(0,1fr)] gap-3">
     <div class="grid gap-0.5">
       <div class="flex items-start justify-between gap-3">
         <h2 class="text-lg/6 font-[720] text-balance">
@@ -1644,9 +1644,9 @@
         {/if}
       </p>
     {/if}
-    <ul class="grid gap-2">
+    <ul class="grid grid-cols-[minmax(0,1fr)] gap-2">
       {#each rows as row (row.item.key)}
-        <li class="grid gap-1">
+        <li class="grid grid-cols-[minmax(0,1fr)] gap-1">
           <div class="flex items-baseline gap-2 text-[0.8125rem]">
             <span
               class="shrink-0 self-center rounded-xs block-2.5 inline-2.5"
@@ -1971,7 +1971,7 @@
             <button
               type="button"
               class={cn(
-                "flex items-center gap-1.5 rounded-xs px-1.5 text-[0.8125rem] block-7 hover:bg-secondary",
+                "flex items-center gap-1.5 rounded-xs px-1.5 text-[0.8125rem] block-7 max-inline-full min-inline-0 hover:bg-secondary",
                 { "marked bg-secondary": only === item.key },
                 { "opacity-45": only != null && only !== item.key },
               )}
@@ -1982,7 +1982,7 @@
             >
               <span class="rounded-xs bg-(--party) chip block-2.5 inline-2.5"
               ></span>
-              <span class="font-semibold">{item.label}</span>
+              <span class="truncate font-semibold">{item.label}</span>
               <span
                 class="font-figures text-xs text-muted-foreground tabular-nums"
                 >{count(lead.won)}</span

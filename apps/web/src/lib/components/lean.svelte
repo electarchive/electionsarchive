@@ -48,8 +48,8 @@
   }
 </script>
 
-<div class={cn("grid gap-2", className)}>
-  <div class="grid gap-1" aria-hidden="true">
+<div class={cn("grid grid-cols-[minmax(0,1fr)] gap-2", className)}>
+  <div class="grid grid-cols-[minmax(0,1fr)] gap-1" aria-hidden="true">
     <div class="relative block-7">
       <svg
         class="absolute inset-0 size-full overflow-visible"
@@ -117,7 +117,7 @@
       >
     </div>
   </div>
-  <ul class="grid gap-1 text-[0.8125rem]">
+  <ul class="grid grid-cols-[minmax(0,1fr)] gap-1 text-[0.8125rem]">
     {#each marks as mark, index (mark.name)}
       {const gap = $derived(margin - mark.margin)}
       <li class="flex items-center gap-2">
@@ -130,7 +130,7 @@
         <span class="flex-1 truncate text-muted-foreground"
           >{m.lean_versus({ place: definite(mark.name) })}</span
         >
-        <span class="font-figures font-semibold tabular-nums"
+        <span class="truncate font-figures font-semibold tabular-nums"
           >{Math.abs(gap) < 0.0005
             ? m.atlas_even()
             : m.atlas_lead({

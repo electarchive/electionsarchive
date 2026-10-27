@@ -11,16 +11,19 @@ const CASES = [
     name: "us-full",
     path: "/map/us/2024-11-05-general/president",
     isFull: true,
+    drill: { unit: "georgia", up: "United States" },
   },
   {
     name: "us-full-georgia",
     path: "/map/us/2024-11-05-general/president/georgia",
     isFull: true,
+    drill: { unit: "georgia", up: "United States" },
   },
   {
     name: "us-full-swing",
     path: "/map/us/2024-11-05-general/president?vs=us/2020-11-03-general/president&color=swing",
     isFull: true,
+    drill: { unit: "georgia", up: "United States" },
   },
   { name: "us-contest", path: "/us/2024-11-05-general/president" },
   {
@@ -35,6 +38,7 @@ const CASES = [
     name: "de-full",
     path: "/map/de/2025-02-23-general/bundestag",
     isFull: true,
+    drill: { unit: "bayern", up: "Germany" },
   },
   { name: "fr-contest", path: "/fr/2022-04-10-general/president" },
   { name: "gb-hub", path: "/gb/2024-07-04-general", toggle: "Map" },
@@ -302,7 +306,7 @@ for (const test of picked) {
         if (test.isFull) {
           check(
             await page
-              .getByText(/^[\d,]+ votes$/u)
+              .getByText(/(?:^|, )[\d,]+ votes$/u)
               .first()
               .waitFor({ timeout: 5000 })
               .then(() => true)
@@ -312,64 +316,73 @@ for (const test of picked) {
           const alone = page
             .getByRole("button", { name: /^Map .+ alone$/u })
             .first();
+          const canDrill = test.drill != null || (await alone.isVisible());
           let [from, to] = [unpinned, null];
-          if (await alone.isVisible()) {
-            await alone.click();
-          } else {
-            const [bare, query = ""] = test.path.split("?");
-            const deep = `${bare}/georgia${query === "" ? "" : `?${query}`}`;
-            if (!bare.endsWith("/georgia")) {
-              await page.goto(`${base}${deep}`, {
-                waitUntil: "domcontentloaded",
-              });
-              await page.waitForSelector("[data-view]", { timeout: 120_000 });
-              await settle(page);
+          if (canDrill) {
+            if (await alone.isVisible()) {
+              await alone.click();
+            } else {
+              const [bare, query = ""] = test.path.split("?");
+              const deep = `${bare}/${test.drill.unit}${query === "" ? "" : `?${query}`}`;
+              if (!bare.endsWith(`/${test.drill.unit}`)) {
+                await page.goto(`${base}${deep}`, {
+                  waitUntil: "domcontentloaded",
+                });
+                await page.waitForSelector("[data-view]", { timeout: 120_000 });
+                await settle(page);
+              }
+              from = page.url();
+              await page
+                .getByRole("link", { name: test.drill.up, exact: true })
+                .first()
+                .click();
             }
-            from = page.url();
-            await page
-              .getByRole("link", { name: /^United States$/u })
-              .first()
-              .click();
+            await page.waitForTimeout(2500);
+            await settle(page);
+            to = page.url();
+            check(to !== from, "drilling did not change the URL");
+            const inner = await view(page);
+            check(
+              inner != null && inside(inner, inner.limit),
+              "after drilling the view left the frame",
+            );
+            check(
+              inner != null && Math.abs(inner.zoom - inner.min) < 0.05,
+              "after drilling the map is not at the fit zoom",
+            );
+            await page.screenshot({ path: `${out}/${label}-drilled.png` });
+            await page.goBack();
+            await page.waitForTimeout(2500);
+            await settle(page);
+            check(
+              page.url() === from,
+              "back did not return to the previous map",
+            );
+            const outer = await view(page);
+            check(
+              outer != null && Math.abs(outer.zoom - outer.min) < 0.05,
+              "after going back the map is not at the fit zoom",
+            );
+            await page.goForward();
+            await page.waitForTimeout(2500);
+            await settle(page);
+            check(
+              page.url() === to,
+              "forward did not return to the drilled map",
+            );
+            check((await inks(page)) > 3, "map blank after back and forward");
+            await page.goto(`${base}${test.path}`, {
+              waitUntil: "domcontentloaded",
+            });
+            if (test.toggle != null) {
+              await page
+                .getByRole("button", { name: test.toggle, exact: true })
+                .first()
+                .click({ timeout: 120_000 });
+            }
+            await page.waitForSelector("[data-view]", { timeout: 120_000 });
+            await settle(page);
           }
-          await page.waitForTimeout(2500);
-          await settle(page);
-          to = page.url();
-          check(to !== from, "drilling did not change the URL");
-          const inner = await view(page);
-          check(
-            inner != null && inside(inner, inner.limit),
-            "after drilling the view left the frame",
-          );
-          check(
-            inner != null && Math.abs(inner.zoom - inner.min) < 0.05,
-            "after drilling the map is not at the fit zoom",
-          );
-          await page.screenshot({ path: `${out}/${label}-drilled.png` });
-          await page.goBack();
-          await page.waitForTimeout(2500);
-          await settle(page);
-          check(page.url() === from, "back did not return to the previous map");
-          const outer = await view(page);
-          check(
-            outer != null && Math.abs(outer.zoom - outer.min) < 0.05,
-            "after going back the map is not at the fit zoom",
-          );
-          await page.goForward();
-          await page.waitForTimeout(2500);
-          await settle(page);
-          check(page.url() === to, "forward did not return to the drilled map");
-          check((await inks(page)) > 3, "map blank after back and forward");
-          await page.goto(`${base}${test.path}`, {
-            waitUntil: "domcontentloaded",
-          });
-          if (test.toggle != null) {
-            await page
-              .getByRole("button", { name: test.toggle, exact: true })
-              .first()
-              .click({ timeout: 120_000 });
-          }
-          await page.waitForSelector("[data-view]", { timeout: 120_000 });
-          await settle(page);
         }
         if (!test.isFull) {
           await page.goto(`${base}${test.path}`, {
@@ -421,7 +434,9 @@ for (const test of picked) {
 
         await page.screenshot({ path: `${out}/${label}-end.png` });
       } catch (error) {
-        failures.push(`crash: ${String(error).slice(0, 300)}`);
+        failures.push(
+          `crash: ${String(error).slice(0, 300)} ${/map-qa\.js:\d+/u.exec(String(error?.stack))?.[0] ?? ""}`,
+        );
       }
       results.push({ label, failures });
       console.log(
