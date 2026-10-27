@@ -368,6 +368,7 @@ def emit() -> Path:
             .iter_rows()
         )
         values: list[dict[str, object]] = []
+        cleared: list[UUID] = []
 
         def person_for(commune: str, row: dict[str, object]) -> UUID:
             key = f"2026:{commune}:{row['surname']}:{row['forename']}"
@@ -451,6 +452,8 @@ def emit() -> Path:
             entries = list_rows.get((round_, unit_code), [])
             total = sum(int(str(entry["seats"] or 0)) for entry in entries)
             over = total > size
+            if over and len(entries) != 1:
+                cleared.append(result_set)
             if over:
                 cs.add(
                     "note",
@@ -679,4 +682,9 @@ def emit() -> Path:
                 flags=pl.lit(0, pl.Int16),
             ),
         )
+        scope_manifest = cs.manifest.get("scope")
+        cs.manifest["scope"] = {
+            **(scope_manifest if isinstance(scope_manifest, dict) else {}),
+            "clears": [str(id) for id in cleared],
+        }
         return cs.write()
