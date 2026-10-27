@@ -1525,7 +1525,7 @@
     </ul>
   </section>
 {:else if contest.current == null && contest.turnout != null}
-  {@render stats(false)}
+  {@render stats()}
   <p class="col-span-12 bg-card px-3.5 py-6 text-muted-foreground">
     {m.no_counts()}
   </p>
@@ -1554,7 +1554,6 @@
     (drawn != null && placed != null) || locating != null,
   )}
   {#snippet summary()}
-    {@render stats(isMapped)}
     <div
       class="@container grid content-start gap-1 bg-card px-1.5 pbs-2 pbe-2.5"
     >
@@ -2346,192 +2345,104 @@
   </section>
 {/if}
 
-{#snippet stats(compact: boolean)}
-  {#if contest.current != null || contest.turnout != null}
+{#snippet stats()}
+  {#if contest.turnout != null}
     <dl
-      class={cn(
-        "flex flex-wrap items-baseline gap-x-7 gap-y-1.5 bg-card px-3.5 py-3",
-        { "col-span-12": !compact },
-      )}
+      class="col-span-12 flex flex-wrap items-baseline gap-x-8 gap-y-1 bg-card px-3.5 py-2.5 text-[0.8125rem]"
     >
-      {#if lead != null}
-        <div
-          class="flex items-baseline gap-2 min-inline-0"
-          style:--party={swatch(lead.row.color, lead.row.key)}
-        >
-          <dt class="text-[0.8125rem] text-muted-foreground">
-            <Term
-              label={m.col_margin()}
-              definition={isTally
-                ? m.term_margin_tally()
-                : members == null
-                  ? m.term_margin()
-                  : m.term_margin_last()}
-            />
-          </dt>
-          <dd class="flex items-baseline gap-2 min-inline-0">
-            <span class="font-figures text-xl font-[760] tracking-[-0.015em]"
-              >{isTally ? `+${count(lead.votes)}` : points(lead.margin)}</span
-            >
-            <Name
-              class="truncate text-sm font-semibold min-inline-0"
-              label={lead.row.label}
-              color={swatch(lead.row.color, lead.row.key)}
-              person={lead.row.current?.person}
-              party={lead.row.current?.party}
-            />
-            {#if lead.votes > 0 && !isTally && contest.current?.measure !== "state_delegate_equivalents"}
-              <span
-                class="shrink-0 font-figures text-[0.8125rem] text-muted-foreground tabular-nums"
-                >{m.atlas_votes({ votes: count(lead.votes) })}</span
-              >
-            {/if}
-          </dd>
-        </div>
-      {/if}
-      {#if contest.current != null}
-        <div class="flex items-baseline gap-2">
-          <dt class="text-[0.8125rem] text-muted-foreground">
-            <Term
-              label={contest.ballot == null
-                ? (counted ?? m.stat_valid())
-                : m.stat_votes_cast()}
-              definition={contest.ballot == null
-                ? isLater
-                  ? m.term_final_round()
-                  : (DEFINITIONS[contest.current.measure]?.() ?? m.term_valid())
-                : m.term_votes_cast({ count: String(contest.ballot) })}
-            />
-          </dt>
-          <dd class="font-figures text-xl font-[760] tracking-[-0.015em]">
-            {count(contest.current.valid)}
-          </dd>
-        </div>
-        <div class="flex items-baseline gap-2">
-          {const listed = $derived(
-            contest.rows.filter(
-              (row) => row.current != null && row.current.isWriteIn !== true,
-            ).length,
-          )}
-          <dt class="text-[0.8125rem] text-muted-foreground">
-            {#if listed === 0}
-              <Term
-                label={m.stat_written_in()}
-                definition={m.term_written_in()}
-              />
-            {:else}
-              <Term label={m.stat_options()} definition={m.term_options()} />
-            {/if}
-          </dt>
-          <dd class="font-figures text-xl font-[760] tracking-[-0.015em]">
-            {listed === 0
-              ? contest.rows.filter((row) => row.current?.person != null).length
-              : listed}
-          </dd>
-        </div>
-      {/if}
-      {#if single != null}
-        <div class="flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
-          <dt class="sr-only">
-            {m.stat_seat()}
-          </dt>
-          <dd class="font-figures text-xl font-[760] tracking-[-0.015em]">
-            1 <span class="text-sm font-normal text-muted-foreground"
-              >{m.seats_of_total({ count: count(single.total) })}</span
-            >
-          </dd>
-          <dd class="text-[0.8125rem] text-muted-foreground">
-            {const pieces = $derived(
-              m
-                .seats_single_national({
-                  count: single.winner.seats,
-                  party: "\u0001party\u0001",
-                  where: "\u0001where\u0001",
-                })
-                .split("\u0001"),
-            )}
-            {#each pieces as piece, index (index)}{#if index % 2 === 1 && piece === "party"}<Name
-                  class="text-foreground"
-                  label={single.winner.short ?? single.winner.label}
-                  color={swatch(single.winner.color, single.winner.key)}
-                  party={single.party}
-                />{:else if index % 2 === 1 && piece === "where"}{#if single.link.path != null}<Preview
-                    class="text-foreground underline decoration-border underline-offset-4 hover:decoration-foreground"
-                    path={single.link.path}>{single.link.name}</Preview
-                  >{:else}{single.link.name}{/if}{:else}{piece}{/if}{/each}
-          </dd>
-        </div>
-      {/if}
-      {#if contest.turnout != null}
-        {#if contest.current == null}
-          <div class="flex items-baseline gap-2">
-            <dt class="text-[0.8125rem] text-muted-foreground">
-              {m.stat_registered()}
-            </dt>
-            <dd class="font-figures text-xl font-[760] tracking-[-0.015em]">
-              {count(contest.turnout.registered)}
-            </dd>
-          </div>
-          <div class="flex items-baseline gap-2">
-            <dt class="text-[0.8125rem] text-muted-foreground">
-              {m.stat_voters()}
-            </dt>
-            <dd class="font-figures text-xl font-[760] tracking-[-0.015em]">
-              {count(contest.turnout.voters)}
-            </dd>
-          </div>
-        {/if}
-        <div class="flex items-baseline gap-2">
-          <dt class="text-[0.8125rem] text-muted-foreground">
-            <Term
-              label={m.stat_turnout()}
-              definition={contest.turnout.basis === "rejected"
-                ? m.term_turnout_rejected()
-                : contest.turnout.basis === "valid"
-                  ? m.term_turnout_valid()
-                  : m.term_turnout()}
-            />
-          </dt>
-          <dd class="flex flex-wrap items-baseline gap-x-2">
-            <span class="font-figures text-xl font-[760] tracking-[-0.015em]"
-              >{percent(
-                contest.turnout.voters / contest.turnout.registered,
-              )}</span
-            >
-            {#if contest.current != null}
-              <span
-                class="font-figures text-xs text-muted-foreground tabular-nums"
-                >{m.stat_turnout_count({
-                  voters: count(contest.turnout.voters),
-                  registered: count(contest.turnout.registered),
-                })}</span
-              >
-            {/if}
-            {#if contest.turnout.earlier != null && contest.target?.year != null}
-              <span class="font-figures text-xs font-semibold tabular-nums"
-                >{m.turnout_since({
-                  points: points(
-                    contest.turnout.voters / contest.turnout.registered -
-                      contest.turnout.earlier.voters /
-                        contest.turnout.earlier.registered,
-                  ),
-                  year: String(contest.target.year),
-                })}</span
-              >
-            {/if}
-            {#if contest.turnout.reporting != null && contest.turnout.of != null && contest.turnout.reporting < contest.turnout.of}
-              <span class="text-xs text-muted-foreground"
-                >{m.turnout_partial({
-                  reporting: String(contest.turnout.reporting),
-                  of: String(contest.turnout.of),
-                })}</span
-              >
-            {/if}
-          </dd>
-        </div>
-      {/if}
+      <div class="flex items-baseline gap-2">
+        <dt class="text-muted-foreground">{m.stat_registered()}</dt>
+        <dd class="font-figures font-semibold tabular-nums">
+          {count(contest.turnout.registered)}
+        </dd>
+      </div>
+      <div class="flex items-baseline gap-2">
+        <dt class="text-muted-foreground">{m.stat_voters()}</dt>
+        <dd class="font-figures font-semibold tabular-nums">
+          {count(contest.turnout.voters)}
+        </dd>
+      </div>
+      <div class="flex items-baseline gap-2">
+        <dt class="text-muted-foreground">{@render turnout()}</dt>
+        <dd class="font-figures font-semibold tabular-nums">
+          {percent(contest.turnout.voters / contest.turnout.registered)}
+        </dd>
+      </div>
     </dl>
   {/if}
+{/snippet}
+
+{#snippet turnout()}
+  {#if contest.turnout != null}
+    {const share = $derived(
+      contest.turnout.voters / contest.turnout.registered,
+    )}
+    <Term
+      label={m.stat_turnout()}
+      definition={[
+        contest.turnout.basis === "rejected"
+          ? m.term_turnout_rejected()
+          : contest.turnout.basis === "valid"
+            ? m.term_turnout_valid()
+            : m.term_turnout(),
+        contest.turnout.earlier != null && contest.target?.year != null
+          ? m.turnout_change({
+              points: points(
+                share -
+                  contest.turnout.earlier.voters /
+                    contest.turnout.earlier.registered,
+              ),
+              year: String(contest.target.year),
+            })
+          : "",
+        contest.turnout.reporting != null &&
+        contest.turnout.of != null &&
+        contest.turnout.reporting < contest.turnout.of
+          ? m.turnout_partial({
+              reporting: String(contest.turnout.reporting),
+              of: String(contest.turnout.of),
+            })
+          : "",
+      ]
+        .filter((part) => part !== "")
+        .join(" ")}
+    />
+  {/if}
+{/snippet}
+
+{#snippet total()}
+  <Term
+    label={contest.ballot == null
+      ? (counted ?? m.stat_valid())
+      : m.stat_votes_cast()}
+    definition={contest.ballot == null
+      ? isLater
+        ? m.term_final_round()
+        : (DEFINITIONS[contest.current?.measure ?? ""]?.() ?? m.term_valid())
+      : m.term_votes_cast({ count: String(contest.ballot) })}
+  />
+{/snippet}
+
+{#snippet margin()}
+  <span class="flex items-baseline gap-2.5 min-inline-0">
+    <Term
+      label={m.col_margin()}
+      definition={isTally
+        ? m.term_margin_tally()
+        : members == null
+          ? m.term_margin()
+          : m.term_margin_last()}
+    />
+    {#if lead != null}
+      <Name
+        class="truncate text-foreground min-inline-0"
+        label={lead.row.label}
+        color={swatch(lead.row.color, lead.row.key)}
+        person={lead.row.current?.person}
+        party={lead.row.current?.party}
+      />
+    {/if}
+  </span>
 {/snippet}
 
 {#snippet results()}
@@ -2545,7 +2456,75 @@
       votes={counted ?? m.col_votes()}
       {isTally}
       seats={seated ? (SEATS[contest.kind]?.() ?? m.col_seats()) : null}
+      facts={[
+        {
+          key: "total",
+          label: total,
+          figure: count(contest.current.valid),
+          detail: null,
+        },
+        ...(lead == null
+          ? []
+          : [
+              {
+                key: "margin",
+                label: margin,
+                figure: isTally ? `+${count(lead.votes)}` : points(lead.margin),
+                detail:
+                  !isTally &&
+                  lead.votes > 0 &&
+                  contest.current.measure !== "state_delegate_equivalents"
+                    ? m.atlas_votes({ votes: count(lead.votes) })
+                    : null,
+              },
+            ]),
+        ...(contest.turnout == null
+          ? []
+          : [
+              {
+                key: "turnout",
+                label: turnout,
+                figure: percent(
+                  contest.turnout.voters / contest.turnout.registered,
+                ),
+                detail: m.stat_turnout_count({
+                  voters: count(contest.turnout.voters),
+                  registered: count(contest.turnout.registered),
+                }),
+              },
+            ]),
+      ]}
     />
+    {#if single != null}
+      {const pieces = $derived(
+        m
+          .seats_single_national({
+            count: single.winner.seats,
+            party: "\u0001party\u0001",
+            where: "\u0001where\u0001",
+          })
+          .split("\u0001"),
+      )}
+      <p
+        class="flex flex-wrap items-baseline gap-x-3 px-2 text-[0.8125rem] text-muted-foreground"
+      >
+        <span class="font-figures tabular-nums"
+          ><span class="font-semibold text-foreground">1</span>
+          {m.seats_of_total({ count: count(single.total) })}</span
+        >
+        <span
+          >{#each pieces as piece, index (index)}{#if index % 2 === 1 && piece === "party"}<Name
+                class="text-foreground"
+                label={single.winner.short ?? single.winner.label}
+                color={swatch(single.winner.color, single.winner.key)}
+                party={single.party}
+              />{:else if index % 2 === 1 && piece === "where"}{#if single.link.path != null}<Preview
+                  class="text-foreground underline decoration-border underline-offset-4 hover:decoration-foreground"
+                  path={single.link.path}>{single.link.name}</Preview
+                >{:else}{single.link.name}{/if}{:else}{piece}{/if}{/each}</span
+        >
+      </p>
+    {/if}
     {#if captions.length > 0}
       <p class="px-2 text-[0.8125rem] text-muted-foreground">
         <a

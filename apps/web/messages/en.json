@@ -262,8 +262,6 @@
   "measure_caucus_delegates": "Convention delegates",
   "noun_state_delegate_equivalents": "state delegate equivalents",
   "noun_caucus_delegates": "convention delegates",
-  "stat_options": "On the ballot",
-  "stat_written_in": "Written in",
   "stat_turnout": "Turnout",
   "stat_registered": "Registered voters",
   "stat_voters": "Voters",
@@ -511,7 +509,6 @@
   "seats_focus": "{place} provided {count} of the {total} seats.",
   "seats_of": "of {count}",
   "seats_of_total": "of {count} seats",
-  "stat_seat": "Seat",
   "seats_single_national": [
     {
       "declarations": [
@@ -841,8 +838,6 @@
   "term_electoral_votes": "Votes cast by presidential electors. A candidate wins by receiving a majority of appointed electors.",
   "term_state_delegate_equivalents": "The weighted delegate count a caucus reports instead of votes.",
   "term_caucus_delegates": "Delegates the caucus elected to its next convention (county, district, or state). The caucus reported these instead of votes.",
-  "term_options": "Candidates, parties, or answers with results in this contest.",
-  "term_written_in": "Names that voters wrote in. No one was on the printed ballot.",
   "term_turnout": "The share of registered voters who turned out.",
   "term_turnout_rejected": "Valid and rejected ballots as a share of the electorate. The source gives no total of ballots cast.",
   "term_turnout_valid": "Valid votes as a share of the electorate. The source gives no total of ballots cast or of rejected ballots.",
@@ -2057,6 +2052,7 @@
   "col_councils_controlled": "Councils controlled",
   "control_none_short": "No overall control",
   "turnout_partial": "Based on {reporting} of {of} jurisdictions reporting both registered voters and ballots cast.",
+  "turnout_change": "Turnout changed by {points} points since {year}.",
   "map_mode_turnout_change": "Turnout change",
   "map_turnout_change_key": "Turnout change since the compared election",
   "map_turnout_fell": "Decrease",

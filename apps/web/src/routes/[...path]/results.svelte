@@ -1,4 +1,5 @@
 <script lang="ts">
+  import type { Snippet } from "svelte";
   import ChevronRightIcon from "@lucide/svelte/icons/chevron-right";
   import Download from "#lib/components/download.svelte";
   import Name from "#lib/components/name.svelte";
@@ -31,6 +32,7 @@
     overall = null,
     nouns = null,
     isTally = false,
+    facts = null,
   }: {
     rows: Extract<PageData, { kind: "contest" }>["contest"]["rows"];
     span: {
@@ -45,6 +47,12 @@
     place?: string | null;
     nouns?: string | null;
     isTally?: boolean;
+    facts?: Array<{
+      key: string;
+      label: Snippet;
+      figure: string;
+      detail: string | null;
+    }> | null;
     overall?: {
       place: string;
       winners: Array<{
@@ -955,6 +963,31 @@
     </tbody>
   </table>
 </div>
+{#if facts != null && facts.length > 0}
+  <dl class="grid gap-1 px-2 pbs-2.5 text-[0.8125rem]">
+    {#each facts as fact (fact.key)}
+      <div class="flex items-baseline gap-2">
+        <dt
+          class="flex items-baseline gap-2.5 text-muted-foreground min-inline-0"
+        >
+          {@render fact.label()}
+        </dt>
+        <span
+          class="mbe-1 flex-1 self-end border-be border-dotted border-muted-foreground/40 min-inline-4"
+          aria-hidden="true"
+        ></span>
+        <dd
+          class="flex shrink-0 items-baseline gap-2 font-figures tabular-nums"
+        >
+          {#if fact.detail != null}
+            <span class="text-muted-foreground">{fact.detail}</span>
+          {/if}
+          <span class="font-semibold">{fact.figure}</span>
+        </dd>
+      </div>
+    {/each}
+  </dl>
+{/if}
 {#if credits.length > 0}
   <details class="group px-2 pbs-2 text-xs/relaxed text-muted-foreground">
     <summary
