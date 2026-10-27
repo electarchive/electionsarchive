@@ -12,7 +12,7 @@ from ea.sources.us import medsl
 from ea.store import DATA, connect
 
 SOURCE = "us.mo_gov_2004"
-VERSION = "1"
+VERSION = "2"
 PARSED = DATA / "parsed" / SOURCE
 PUBLISHER = "Missouri Secretary of State"
 TITLE = "County reporting, official election returns, November 2, 2004"
@@ -26,9 +26,13 @@ def fetch() -> None:
     try:
         raw.cached(SOURCE, PART2)
     except LookupError:
-        response = httpx.get(PART2, headers={"User-Agent": "Mozilla/5.0 (X11; Linux x86_64) Chrome/130.0 Safari/537.36"})
+        response = httpx.get(
+            PART2, headers={"User-Agent": "Mozilla/5.0 (X11; Linux x86_64) Chrome/130.0 Safari/537.36"}
+        )
         response.raise_for_status()
-        raw.store(SOURCE, PART2, response.content, suffix=".pdf", retrieved_at=datetime.now(UTC), media_type="application/pdf")
+        raw.store(
+            SOURCE, PART2, response.content, suffix=".pdf", retrieved_at=datetime.now(UTC), media_type="application/pdf"
+        )
 
 
 def parse() -> None:
@@ -119,5 +123,13 @@ def emit() -> Path:
             )
         for address in (URL, PART2):
             cs.artifact(raw.cached(SOURCE, address), source)
-        medsl.attach(cs, conn, pl.read_parquet(PARSED / "counties.parquet"), {"MO": source}, strict=True, extend=True)
+        medsl.attach(
+            cs,
+            conn,
+            pl.read_parquet(PARSED / "counties.parquet"),
+            {"MO": source},
+            strict=True,
+            extend=True,
+            authoritative="Algara and Amlani's statewide totals for Blunt and McCaskill do not match the certified returns.",
+        )
         return cs.write()

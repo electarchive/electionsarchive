@@ -90,8 +90,33 @@ def parse() -> None:
     swapped = (
         (pl.col("state") == "MS") & (pl.col("year") == 2016) & (pl.col("county") == "Perry") & (office == "u.s. house")
     )
+    unnamed = (pl.col("state") == "MO") & (pl.col("year") == 2000) & office.str.contains(r"^governor\b")
     frame.with_columns(
-        candidate=pl.when(swapped)
+        office=pl.when(
+            (pl.col("state") == "OK")
+            & (pl.col("year") == 2014)
+            & (office == "u.s. senate")
+            & pl.col("candidate").is_in(["James Lankford", "Connie Johnson", "Mark Beard"])
+        )
+        .then(pl.lit("U.S. Senate Unexpired Term"))
+        .otherwise("office")
+    ).with_columns(
+        candidate=pl.when(unnamed & (pl.col("candidate").fill_null("") == ""))
+        .then(
+            pl.col("party").replace_strict(
+                {
+                    "DEM": "Bob Holden",
+                    "REP": "Jim Talent",
+                    "LIB": "John M. Swenson",
+                    "CST": "Richard L. Smith",
+                    "REF": "Richard Allen Kline",
+                    "GRE": "Lavoy Reed",
+                    "IND": "Larry Rice",
+                },
+                default=pl.col("candidate"),
+            )
+        )
+        .when(swapped)
         .then(
             pl.col("candidate").replace(
                 {"Shawn O'Hara": "Richard Blake McCluskey", "Richard Blake McCluskey": "Shawn O'Hara"}

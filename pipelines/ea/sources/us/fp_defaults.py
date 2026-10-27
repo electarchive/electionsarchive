@@ -14,8 +14,22 @@ PIPELINES = (
     "us.al_precincts",
     "us.la_precincts",
     "us.il_cook_dupage_2022",
+    "us.mn_sos_precincts",
 )
-COLUMNS = ("id", "election_id", "contest_id", "stage", "kind", "status", "source_id", "as_of", "completeness", "supersedes_id")
+COUNTY = ("us.mo_gov_2004", "us.ri_gov_senate", "us.de_senate_2010")
+PLACEHOLDERS = ("us.algara", "us.algara_federal", "us.icpsr")
+COLUMNS = (
+    "id",
+    "election_id",
+    "contest_id",
+    "stage",
+    "kind",
+    "status",
+    "source_id",
+    "as_of",
+    "completeness",
+    "supersedes_id",
+)
 
 
 def emit() -> Path:
@@ -24,7 +38,8 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Precinct result sets that cover at least 98 percent of the official total become the default, and the earlier default stays active and non-default",
+            summary="Precinct result sets that cover at least 98 percent of the official total, and official county sets "
+            "in place of an Algara or ICPSR default, become the default, and the earlier default stays active and non-default",
             polity="US",
         )
         targets = conn.execute(
@@ -34,15 +49,19 @@ def emit() -> Path:
                 where rs.status = 'active' and not rs.is_default and rs.kind = 'counted'
                   and rs.completeness between 0.98 and 1.05
                   and x.value ~ ':(president|governor|senate|house:[0-9]+)(:special)?$'
-                  and c.pipeline = any(%s)
-                  and exists (select from result_value v join reporting_unit u on u.k = v.unit_k
-                              where v.result_set_k = rs.k and u.scheme_code in ('us.precinct', 'us.nyc_ed'))
+                  and (c.pipeline = any(%s)
+                       and exists (select from result_value v join reporting_unit u on u.k = v.unit_k
+                                   where v.result_set_k = rs.k and u.scheme_code in ('us.precinct', 'us.nyc_ed'))
+                       or c.pipeline = any(%s)
+                       and exists (select from result_set d join changeset g on g.id = d.changeset_id
+                                   where d.contest_id = rs.contest_id and d.stage = rs.stage and d.is_default
+                                     and d.status = 'active' and g.pipeline = any(%s)))
                   and not exists (select from result_set d join result_value v on v.result_set_k = d.k
                                   join reporting_unit u on u.k = v.unit_k
                                   where d.contest_id = rs.contest_id and d.stage = rs.stage and d.is_default and d.status = 'active'
                                     and u.scheme_code in ('us.precinct', 'us.nyc_ed', 'us.county_part'))
-                order by rs.completeness desc""",
-            [list(PIPELINES)],
+                order by c.pipeline = any(%s), rs.completeness desc""",
+            [list(PIPELINES), list(COUNTY), list(PLACEHOLDERS), list(COUNTY)],
         ).fetchall()
         chosen: set[tuple[object, object]] = set()
         for row in targets:

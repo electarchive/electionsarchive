@@ -10,7 +10,7 @@ from ea.sources.us import medsl, mn_sos
 from ea.store import DATA, connect
 
 SOURCE = "us.mn_sos_precincts"
-VERSION = "1"
+VERSION = "2"
 PARSED = DATA / "parsed" / SOURCE
 PLACES = {
     2002: ["MCD NAME", "WD", "PRECINCT NAME"],
@@ -24,6 +24,16 @@ OFFICES = {
     "house": ("Cong", "USCong", "CONG"),
     "senate": ("USSen", "USSEN"),
     "president": ("USPres", "USPRES"),
+    "governor": ("Gov",),
+}
+GOVERNOR = {
+    "GP": "Ken Pentel",
+    "IP": "Tim Penny",
+    "R": "Tim Pawlenty",
+    "DFL": "Roger D. Moe",
+    "CP": "Lawrence Aeshliman",
+    "I": "Booker Hodges IV",
+    "SW": "Kari Sachs",
 }
 PARTIES = {
     "GP": "green",
@@ -85,6 +95,7 @@ def parse() -> None:
             ]
             + ([("Wellstone", column["Wellstone"])] if chamber == "senate" and year == 2002 else [])
             for chamber, prefixes in OFFICES.items()
+            if chamber != "governor" or year == 2002
         }
         for row in cells[start + 1 :]:
             if row[0] is None or row[0] == cells[start][0] or re.match(r"(?i)(statewide )?totals?\b", str(row[0])):
@@ -103,7 +114,7 @@ def parse() -> None:
                 counted = 0
                 for name, index in found:
                     votes = int(float(row[index] or 0))
-                    party = re.sub(r"^(Cong|USCong|CONG|USSen|USSEN|USPres|USPRES)", "", name).upper()
+                    party = re.sub(r"^(Cong|USCong|CONG|USSen|USSEN|USPres|USPRES|Gov)", "", name).upper()
                     if party == "TOT":
                         total = votes
                         continue
@@ -153,8 +164,8 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Minnesota's U.S. House generals 2002–2010, and its U.S. Senate and presidential generals of those "
-            "years, by precinct from the Secretary of State's precinct results spreadsheets",
+            summary="Minnesota's U.S. House generals 2002–2010, its U.S. Senate and presidential generals of those "
+            "years, and its 2002 governor, by precinct from the Secretary of State's precinct results spreadsheets",
             polity="US",
         )
         source = cs.source(PUBLISHER, TITLE)
@@ -191,6 +202,8 @@ def emit() -> Path:
         frame = frame.with_columns(
             candidate=pl.when("writein")
             .then(pl.lit("WRITE-INS"))
+            .when(pl.col("chamber") == "governor")
+            .then(pl.col("party").replace_strict(GOVERNOR))
             .otherwise(
                 pl.struct("key", "party").map_elements(
                     lambda row: labels.get((row["key"], row["party"])) or row["party"], return_dtype=pl.String
@@ -207,6 +220,7 @@ def emit() -> Path:
             for (key,) in conn.execute(
                 """select distinct x.value from external_id x
                    join result_set r on r.contest_id = x.entity_id and r.status = 'active'
+                    and coalesce(r.completeness, 1) >= 0.98
                    join changeset g on g.id = r.changeset_id and g.pipeline <> %s
                    join result_value v on v.result_set_k = r.k
                    join reporting_unit u on u.k = v.unit_k and u.scheme_code = 'us.precinct'
@@ -219,17 +233,19 @@ def emit() -> Path:
             .with_columns(special=pl.lit(False), state=pl.lit("MN"), measure=pl.lit(1, pl.Int16))
             .with_columns(source=pl.col("state"))
         )
-        medsl.attach(
-            cs,
-            conn,
-            precincts.select(
-                "year", "chamber", "day", "special", "state", "district", "code", "candidate", "measure", "writein",
-                "votes", "kind", "source",
-            ),
-            {"MN": source},
-            grain="precinct",
-            strict=True,
-        )  # fmt: skip
+        for governor in (False, True):
+            medsl.attach(
+                cs,
+                conn,
+                precincts.filter((pl.col("chamber") == "governor") == governor).select(
+                    "year", "chamber", "day", "special", "state", "district", "code", "candidate", "measure", "writein",
+                    "votes", "kind", "source",
+                ),
+                {"MN": source},
+                grain="precinct",
+                strict=True,
+                extend=governor,
+            )  # fmt: skip
         used = set(pl.concat(cs.frames["result_value"])["unit_id"].unique()) if cs.frames.get("result_value") else set()
         parents = {
             code: (unit, area)
