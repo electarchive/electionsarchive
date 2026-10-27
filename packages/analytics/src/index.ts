@@ -117,7 +117,7 @@ function tally(side: Side, identify: (option: Option) => string) {
           outcome: option.outcome,
           note: option.note ?? null,
           isIndependent: option.isIndependent ?? false,
-          isIncumbent: option.isIncumbent === true,
+          isIncumbent: false,
           seats: option.seats,
           lines: [],
         },
@@ -130,7 +130,6 @@ function tally(side: Side, identify: (option: Option) => string) {
     group.cell.outcome ??= option.outcome;
     group.cell.note ??= option.note ?? null;
     group.cell.isIndependent &&= option.isIndependent ?? false;
-    group.cell.isIncumbent &&= option.isIncumbent === true;
     if (option.seats != null) {
       group.cell.seats = (group.cell.seats ?? 0) + option.seats;
     }
@@ -143,6 +142,10 @@ function tally(side: Side, identify: (option: Option) => string) {
   }
   for (const group of groups.values()) {
     group.cell.share = side.valid > 0 ? group.cell.votes / side.valid : 0;
+    group.cell.isIncumbent = group.members.some(
+      (member) =>
+        member.isIncumbent === true && member.person === group.cell.person,
+    );
     const isFused = group.members.every(
       (member) => member.person != null && member.person === group.lead.person,
     );

@@ -231,8 +231,9 @@ const holding = (tenure: string, day: SQL) => {
 
 const covered = (contests: SQL) => sql`
   with tk as (
-    select c.id, c.office_id, c.body_id, e.date_from as d
+    select c.id, coalesce(c.office_id, pc.office_id) as office_id, c.body_id, e.date_from as d
     from contest c join election e on e.id = c.election_id
+    left join contest pc on pc.id = c.allocation_parent_id
     where c.id in (${contests})
   ),
   tp as (select distinct office_id, body_id, d from tk),
@@ -249,12 +250,14 @@ const covered = (contests: SQL) => sql`
 
 const tenured = (person: SQL, contest: SQL) => sql`exists (
   select from contest hc join election he on he.id = hc.election_id
+  left join contest hp on hp.id = hc.allocation_parent_id
   join tenure ht on ht.person_id in (
     select ${person} union all select hm.entity_id from entity_merge hm where hm.into_id = ${person}
   )
   where hc.id = ${contest}
     and ${holding("ht", sql`he.date_from`)}
-    and (ht.office_id = hc.office_id or (hc.office_id is null and ht.body_id = hc.body_id))
+    and (ht.office_id = coalesce(hc.office_id, hp.office_id)
+      or (coalesce(hc.office_id, hp.office_id) is null and ht.body_id = hc.body_id))
 )`;
 
 const abbreviate = (party: SQL, date: SQL) => sql`
@@ -5034,6 +5037,10 @@ export const contests = {
           join result_set rs on rs.id = x.result_set_id and ${latest("rs")}
           where rs.contest_id = ${contest.id}::uuid and x.candidacy_id is null
             and x.kind in ('elected', 'won', 'advanced')
+            and (x.kind <> 'won' or x.seats is null or x.seats = (
+              select max(y.seats) from outcome y
+              where y.result_set_id = x.result_set_id and y.kind = 'won' and y.candidacy_id is null
+            ))
         )
         select case
           when exists (select from decided where kind in ('elected', 'won'))
