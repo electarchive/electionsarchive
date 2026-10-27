@@ -3,7 +3,7 @@ import re
 import time
 import zipfile
 from collections import defaultdict
-from datetime import date
+from datetime import UTC, date, datetime
 from pathlib import Path
 from xml.etree import ElementTree
 
@@ -12,11 +12,15 @@ import polars as pl
 
 from ea import raw
 from ea.changeset import Changeset, slug
+from ea.sources.us.enr_clarity import STATE_NAMES
 from ea.sources.us.oe_primaries_2026 import (
     BASE,
+    BROWSER,
+    CT_COUNTIES,
     EV,
     FIPS,
     IN_URL,
+    OK_BASE,
     RUNOFF_SYSTEMS,
     THRESHOLDS,
     elstats,
@@ -189,6 +193,69 @@ ROUNDS += [
         for state, (state_name, code, day, file) in OPENELECTIONS.items()
     ),
 ]
+ROUNDS += [
+    (
+        "FL",
+        date(2026, 8, 18),
+        "Florida Division of Elections",
+        "August 18, 2026 primary election official results by county",
+        "https://results.elections.myflorida.com",
+        url("fl", "extract"),
+    ),
+    (
+        "DE",
+        date(2026, 9, 15),
+        "Delaware Department of Elections",
+        "September 15, 2026 primary election results",
+        "https://elections.delaware.gov/results/",
+        url("de", "PR2026.html"),
+    ),
+    *(
+        (
+            "AR",
+            day,
+            "Arkansas Secretary of State",
+            f"{title} results by county",
+            "https://arkansas.tally-enr.com/",
+            f"https://results.tally-enr.com/results/arkansas/{election}/FullDataFile.json",
+        )
+        for day, title, election in (
+            (date(2026, 3, 3), "March 3, 2026 preferential primary", "7f77a178-af02-40ec-92db-c5cc50882c68"),
+            (date(2026, 3, 31), "March 31, 2026 primary runoff", "b412bdef-f97a-45bc-b3ec-6761d28caf9e"),
+        )
+    ),
+    (
+        "CT",
+        date(2026, 8, 11),
+        "Connecticut Secretary of the State",
+        "August 11, 2026 primary results by town",
+        "https://ctemspublic.pcctg.net/",
+        url("ct", "111/27708/townVotes_Electiondata"),
+    ),
+    *(
+        (
+            "OK",
+            day,
+            "Oklahoma State Election Board",
+            f"{title} results by county",
+            "https://results.okelections.gov/OKER/",
+            url("ok", f"getelec/{day:%Y%m%d}"),
+        )
+        for day, title in (
+            (date(2026, 6, 16), "June 16, 2026 primary election"),
+            (date(2026, 8, 25), "August 25, 2026 primary runoff election"),
+        )
+    ),
+]
+SYSTEMS = {**RUNOFF_SYSTEMS, "AR": "two_round"}
+MAJORITY = {**THRESHOLDS, "AR": 50}
+AR_CONTESTS = "https://enr-results-api.totalresults.com/Contest/GetContestSearchList?cid=arkansas&electionID={}"
+SIDECARS = {
+    "CT": [
+        url("ct", file) for file in ("111/27708/Lookupdata", "112/28256/Lookupdata", "112/28256/townVotes_Electiondata")
+    ],
+}
+OK_RACE = re.compile(r"FOR STATE (SENATOR|REPRESENTATIVE) DISTRICT (\d+)")
 LEGISLATIVE = re.compile(
     r"(?P<party>REP|DEM) (?:State (?P<chamber>Senate|House)|(?P<body>Senator|Representative) in General Assembly) District (?P<district>\d+)"
 )
@@ -214,8 +281,37 @@ PARTIES = {
 }
 
 
+def cased(text: str) -> str:
+    if not text.isupper():
+        return text
+    return re.sub(
+        r'"(\w{1,3})"',
+        lambda match: f'"{match[1].upper()}"',
+        re.sub(r"\bMc(\w)", lambda match: f"Mc{match[1].upper()}", text.title()),
+    )
+
+
+def shared(address: str) -> None:
+    try:
+        raw.cached(SOURCE, address)
+    except LookupError:
+        try:
+            held = raw.cached("us.oe_primaries_2026", address)
+        except LookupError:
+            raw.fetch(SOURCE, address, suffix=".json" if "okelections" in address else ".csv")
+            return
+        raw.store(
+            SOURCE,
+            address,
+            held.path.read_bytes(),
+            suffix=held.path.suffix,
+            retrieved_at=held.retrieved_at,
+            media_type=held.media_type,
+        )
+
+
 def fetch() -> None:
-    for state, *_, address in ROUNDS:
+    for state, day, *_, address in ROUNDS:
         if state == "IN":
             for file in ("OffCatC_1018_B.json", "OffCatC_1040_B.json"):
                 raw.fetch(SOURCE, IN_URL.format(file), suffix=".json")
@@ -236,22 +332,49 @@ def fetch() -> None:
                         else:
                             print("no detail for", state, item["name"][0]["text"])
             continue
-        try:
-            raw.cached(SOURCE, address)
-        except LookupError:
-            try:
-                held = raw.cached("us.oe_primaries_2026", address)
-            except LookupError:
-                raw.fetch(SOURCE, address, suffix=".csv")
-                continue
-            raw.store(
-                SOURCE,
-                address,
-                held.path.read_bytes(),
-                suffix=held.path.suffix,
-                retrieved_at=held.retrieved_at,
-                media_type=held.media_type,
-            )
+        if state == "AR":
+            election = address.split("/")[-2]
+            for link in (address, AR_CONTESTS.format(election)):
+                try:
+                    raw.cached(SOURCE, link)
+                except LookupError:
+                    raw.store(
+                        SOURCE,
+                        link,
+                        httpx.get(link, headers={**BROWSER, "Origin": "https://arkansas.tally-enr.com"}, timeout=600)
+                        .raise_for_status()
+                        .content,
+                        suffix=".json",
+                        retrieved_at=datetime.now(UTC),
+                        media_type="application/json",
+                    )
+            continue
+        shared(address)
+        for other in SIDECARS.get(state, []):
+            shared(other)
+        if state == "OK":
+            token = httpx.put(
+                OK_BASE + "enrapi/login/",
+                json={"Username": "appuser", "Password": "X098de!22k098Mgfd"},
+                headers=BROWSER,
+                timeout=60,
+            ).json()[1:]
+            for race in json.loads(raw.cached(SOURCE, address).path.read_bytes())["races"]:
+                race_url = url("ok", f"{day:%Y%m%d}/{race['raceID']}")
+                if OK_RACE.fullmatch(race["raceTitle"]):
+                    try:
+                        raw.cached(SOURCE, race_url)
+                    except LookupError:
+                        raw.store(
+                            SOURCE,
+                            race_url,
+                            httpx.get(race_url, headers={**BROWSER, "Authorization": f"Bearer {token}"}, timeout=300)
+                            .raise_for_status()
+                            .content,
+                            suffix=".json",
+                            retrieved_at=datetime.now(UTC),
+                            media_type="application/json",
+                        )
 
 
 def parse() -> None:
@@ -321,6 +444,133 @@ def parse() -> None:
                         int(votes or 0),
                     )
                 )
+        if state == "FL":
+            seen = set()
+            for row in pl.read_csv(path, separator="\t", infer_schema=False, quote_char=None).iter_rows(named=True):
+                key = tuple(
+                    row[column]
+                    for column in (
+                        "RaceCode",
+                        "PartyCode",
+                        "Juris1num",
+                        "CountyCode",
+                        "CanNameLast",
+                        "CanNameFirst",
+                        "CanNameMiddle",
+                    )
+                )
+                if row["RaceCode"] not in ("STS", "STR") or row["PartyCode"] not in ("REP", "DEM") or key in seen:
+                    continue
+                seen.add(key)
+                rows.append(
+                    (
+                        "senate" if row["RaceCode"] == "STS" else "house",
+                        row["Juris1num"].lstrip("0"),
+                        "republican" if row["PartyCode"] == "REP" else "democratic",
+                        " ".join(
+                            part for part in (row["CanNameFirst"], row["CanNameMiddle"], row["CanNameLast"]) if part
+                        ),
+                        row["CountyName"],
+                        int(row["CanVotes"]),
+                    )
+                )
+        if state == "DE":
+            for chamber, district, party, body in re.findall(
+                r"<caption>State (Senator|Representative) District (\d+)<br>(Democratic|Republican) Party</caption>(.*?)</table>",
+                path.read_text(encoding="utf-8", errors="replace"),
+                flags=re.DOTALL,
+            ):
+                rows.extend(
+                    (
+                        "senate" if chamber == "Senator" else "house",
+                        district,
+                        party.lower(),
+                        cased(candidate.strip()),
+                        "",
+                        int(votes.replace(",", "")),
+                    )
+                    for candidate, votes in re.findall(
+                        r'data-label="Candidate Name">([^<]+)</td>.*?data-label="Total Votes">([\d,]+)</td>',
+                        body,
+                        flags=re.DOTALL,
+                    )
+                )
+        if state == "AR":
+            names = json.loads(raw.cached(SOURCE, AR_CONTESTS.format(address.split("/")[-2])).path.read_text())[
+                "response"
+            ]["contests"]
+            for contest in json.loads(path.read_text())["ContestData"]:
+                found = re.fullmatch(
+                    r"(REP|DEM) STATE (REPRESENTATIVE|SENATE) +(?:DIST\.|DISTRICT) (\d+)",
+                    names.get(contest["ContestID"], {}).get("contestName", "").upper(),
+                )
+                if found is None:
+                    continue
+                rows.extend(
+                    (
+                        "senate" if found[2] == "SENATE" else "house",
+                        str(int(found[3])),
+                        "republican" if found[1] == "REP" else "democratic",
+                        cased(
+                            names[contest["ContestID"]]["choices"][choice["ChoiceID"]]["name"].removeprefix(
+                                "State Representative "
+                            )
+                        ),
+                        fips,
+                        choice["TotalVotes"],
+                    )
+                    for fips, location in contest["Locations"].items()
+                    for choice in location["Choices"]
+                )
+        if state == "CT":
+            totals = defaultdict(int)
+            for election in ("111/27708", "112/28256"):
+                lookup = json.loads(raw.cached(SOURCE, url("ct", f"{election}/Lookupdata")).path.read_text())
+                counties_of = {
+                    entry["TownID"]: "09" + CT_COUNTIES[lookup["counties"][entry["CountyID"]]]
+                    for entry in lookup["countyTowns"]
+                }
+                offices = {key: value for entry in lookup["officeList"] for key, value in entry.items()}
+                votes = json.loads(raw.cached(SOURCE, url("ct", f"{election}/townVotes_Electiondata")).path.read_text())
+                for town, contests in votes.items():
+                    for office_id, results in contests.items():
+                        found = re.fullmatch(r"State (Senator|Representative) (\d+)", offices[office_id]["NM"])
+                        if found is None:
+                            continue
+                        for result in results:
+                            for candidate_id, tally in result.items():
+                                candidate = lookup["candidateIds"][candidate_id]
+                                party = lookup["partyIds"][candidate["P"]]["NM"]
+                                if party in ("Democratic Party", "Republican Party"):
+                                    totals[
+                                        (
+                                            "senate" if found[1] == "Senator" else "house",
+                                            found[2],
+                                            party.removesuffix(" Party").lower(),
+                                            cased(candidate["NM"]),
+                                            counties_of[town],
+                                        )
+                                    ] += int(tally["V"])
+            rows = [(*key, votes) for key, votes in totals.items()]
+        if state == "OK":
+            for race in json.loads(path.read_text())["races"]:
+                found = OK_RACE.fullmatch(race["raceTitle"])
+                if found is None:
+                    continue
+                for county in json.loads(
+                    raw.cached(SOURCE, url("ok", f"{day:%Y%m%d}/{race['raceID']}")).path.read_text()
+                )["summaryCandResults"]:
+                    rows.extend(
+                        (
+                            "senate" if found[1] == "SENATOR" else "house",
+                            found[2],
+                            "democratic" if race["raceTitle2"] == "Democrat" else race["raceTitle2"].lower(),
+                            cased(candidate["candName"]),
+                            f"40{2 * int(county['countyID']) - 1:03}",
+                            result["totalVotes"],
+                        )
+                        for candidate, result in zip(race["raceCandidates"], county["candResults"], strict=True)
+                    )
         if state == "MN":
             totals: dict[tuple[str, str, str, str, str], int] = defaultdict(int)
             for line in path.read_text(encoding="latin-1").splitlines():
@@ -603,7 +853,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="2026 state legislative primaries and primary runoffs by county: Alabama, Georgia, Idaho, Indiana, Iowa, Michigan, Minnesota, Nevada (with its statewide offices), North Carolina, Rhode Island, South Carolina, Utah, West Virginia, and Wisconsin from the states' official results; Arizona, Colorado, Kentucky, Missouri, New Mexico, North Dakota, Oregon, Pennsylvania, South Dakota, Tennessee, Texas, and Wyoming from OpenElections",
+            summary="2026 state legislative primaries and primary runoffs by county: Alabama, Arkansas, Connecticut, Delaware (district totals), Florida, Georgia, Idaho, Indiana, Iowa, Michigan, Minnesota, Nevada (with its statewide offices), North Carolina, Oklahoma, Rhode Island, South Carolina, Utah, West Virginia, and Wisconsin from the states' official results; Arizona, Colorado, Kentucky, Missouri, New Mexico, North Dakota, Oregon, Pennsylvania, South Dakota, Tennessee, Texas, and Wyoming from OpenElections",
             polity="US",
         )
 
@@ -612,10 +862,17 @@ def emit() -> Path:
                 cs.add("name", entity_id=entity, text=text, lang="en", kind="official", is_preferred=True)
 
         counts = {"contests": 0, "candidates": 0, "matched": 0, "skipped": 0}
+        finalists: dict[str, dict[str, object]] = defaultdict(dict)
+        kept = dict(
+            conn.execute(
+                "select cy.id, cy.person_id from candidacy cy join changeset ch on ch.id = cy.changeset_id where ch.pipeline = %s",
+                [SOURCE],
+            ).fetchall()
+        )
         for state, day, publisher, title, page, address in ROUNDS:
             first = min(when for other, when, *_ in ROUNDS if other == state)
             runoff = day != first
-            system = cs.key("us.electoral_system", "fptp" if state == "SD" else RUNOFF_SYSTEMS.get(state, "fptp"))
+            system = cs.key("us.electoral_system", "fptp" if state == "SD" else SYSTEMS.get(state, "fptp"))
             source = cs.source(publisher, title)
             if source in cs.minted:
                 cs.add(
@@ -630,9 +887,30 @@ def emit() -> Path:
             cs.artifact(raw.cached(SOURCE, address), source)
             if state == "IN":
                 cs.artifact(raw.cached(SOURCE, IN_URL.format("OffCatC_1018_B.json")), source)
+            for other in SIDECARS.get(state, []) + (
+                [AR_CONTESTS.format(address.split("/")[-2])] if state == "AR" else []
+            ):
+                cs.artifact(raw.cached(SOURCE, other), source)
+            if state == "OK":
+                for race in json.loads(raw.cached(SOURCE, address).path.read_bytes())["races"]:
+                    if OK_RACE.fullmatch(race["raceTitle"]):
+                        cs.artifact(raw.cached(SOURCE, url("ok", f"{day:%Y%m%d}/{race['raceID']}")), source)
             election = cs.key("us.election", f"{day}:{state}:{'runoff' if runoff else 'primary'}")
             if election in cs.minted:
-                raise ValueError(f"the {day} {state} primary election must exist")
+                if not runoff:
+                    raise ValueError(f"the {day} {state} primary election must exist")
+                cs.add(
+                    "election",
+                    id=election,
+                    polity_id=cs.polity(f"US-{state}"),
+                    parent_id=None,
+                    kind="runoff",
+                    date_from=day,
+                    date_to=day,
+                    status="held",
+                )
+                name(election, f"2026 {STATE_NAMES[state]} primary runoff election")
+                cs.add("slug", path=f"us/{state.lower()}/{day}-primary-runoff", entity_id=election)
             templates = {
                 value: row
                 for value, *row in conn.execute(
@@ -748,7 +1026,10 @@ def emit() -> Path:
                     body_md=(
                         f"Results by county from OpenElections' 2026 primary file for {OPENELECTIONS[state][0]}, a community compilation of the state's county results."
                         if state in OPENELECTIONS
-                        else f"Results by county from the {publisher}'s official results."
+                        else f"District totals from the {publisher}'s official results."
+                        if state == "DE"
+                        else f"Results by county from the {publisher}'s official results"
+                        + (", town results summed to counties." if state == "CT" else ".")
                     )
                     + (
                         " Declared write-in candidates are listed by name; the candidate with the most votes is shown as the nominee."
@@ -758,17 +1039,21 @@ def emit() -> Path:
                 )
                 totals = []
                 if "" in contest_rows["county"].explode().to_list():
-                    (counties[""],) = {
-                        unit
-                        for (unit,) in conn.execute(
-                            """select distinct u.id from external_id x
-                               join result_set rs on rs.contest_id = x.entity_id and rs.status = 'active'
-                               join result_value v on v.result_set_k = rs.k
-                               join reporting_unit u on u.k = v.unit_k and u.scheme_code = 'us.county'
-                               where x.scheme = 'us.contest' and x.value ~ %s""",
-                            [f"^20(22|24)-11-[0-9]+:{state}:{chamber}:{district}:g$"],
-                        ).fetchall()
-                    }
+                    held = defaultdict(set)
+                    for scheme, unit in conn.execute(
+                        """select distinct u.scheme_code, u.id from external_id x
+                           join result_set rs on rs.contest_id = x.entity_id and rs.status = 'active'
+                           join result_value v on v.result_set_k = rs.k
+                           join reporting_unit u on u.k = v.unit_k and u.scheme_code in ('us.county', 'us.sldl', 'us.sldu')
+                           where x.scheme = 'us.contest' and x.value ~ %s""",
+                        [f"^20(22|24)-11-[0-9]+:{state}:{chamber}:{district}:g$"],
+                    ).fetchall():
+                        held[scheme].add(unit)
+                    (counties[""],) = (
+                        held["us.county"]
+                        if len(held["us.county"]) == 1
+                        else held["us.sldu" if chamber == "senate" else "us.sldl"]
+                    )
                 for candidate, write_in, by_county, votes in contest_rows.select(
                     "candidate", "write_in", "county", "votes"
                 ).iter_rows():
@@ -778,7 +1063,11 @@ def emit() -> Path:
                         for w in re.sub(r"[^a-z ]", "", candidate.lower()).split()
                         if w not in ("jr", "sr", "ii", "iii", "iv")
                     ]
-                    found = pool.get((words[0], words[-1]), set())
+                    candidacy = cs.key("us.candidacy", f"{contest_key}:{slug(candidate)}")
+                    earlier = kept.get(candidacy) or (
+                        finalists[contest_key.split(":", 1)[1]].get(words[-1]) if runoff else None
+                    )
+                    found = {earlier} if earlier is not None else pool.get((words[0], words[-1]), set())
                     if len(found) == 1:
                         person = next(iter(found))
                         counts["matched"] += 1
@@ -788,6 +1077,8 @@ def emit() -> Path:
                             cs.add("person", id=person)
                             name(person, candidate)
                             pool[(words[0], words[-1])].add(person)
+                    if not runoff:
+                        finalists[contest_key.split(":", 1)[1]][words[-1]] = person
                     cs.add(
                         "contest_option",
                         id=option,
@@ -798,7 +1089,7 @@ def emit() -> Path:
                     )
                     cs.add(
                         "candidacy",
-                        id=cs.key("us.candidacy", f"{contest_key}:{slug(candidate)}"),
+                        id=candidacy,
                         person_id=person,
                         option_id=option,
                         role="head",
@@ -824,10 +1115,10 @@ def emit() -> Path:
                 everyone = sum(votes for votes, _ in totals)
                 if (
                     not runoff
-                    and state in THRESHOLDS
+                    and state in MAJORITY
                     and state != "SD"
                     and len(totals) > 1
-                    and totals[0][0] * 100 <= THRESHOLDS[state] * everyone
+                    and totals[0][0] * 100 <= MAJORITY[state] * everyone
                 ):
                     if len(totals) == 2 or totals[1][0] > totals[2][0]:
                         for _, option in totals[:2]:
