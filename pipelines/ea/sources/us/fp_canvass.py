@@ -1,6 +1,9 @@
+import csv
 import html
+import io
 import re
 import subprocess
+import unicodedata
 from datetime import date
 from pathlib import Path
 from uuid import UUID
@@ -41,6 +44,20 @@ DOCUMENTS = {
         )
         for office, stamp in (("US+Senator", "20020905180654"), ("Governor", "20021013053937"))
     },
+    "DE2006": (
+        "us.de_doe",
+        "https://elections.delaware.gov/elections/resultsarchive/elect06/elect06_general/elect06_general.edrd.txt",
+        "Delaware Department of Elections",
+        "Election results archive",
+        "https://elections.delaware.gov/elections/resultsarchive/",
+    ),
+    "NM2002": (
+        SOURCE,
+        "https://nm.elstats.civera.com/api/download_contest/1169_table.csv?split_party=false",
+        "New Mexico Secretary of State",
+        "ElectionStats",
+        "https://electionstats.sos.nm.gov/contest/1169",
+    ),
     "ME2014": (
         SOURCE,
         "https://lldc.mainelegislature.org/Open/Elections/Returns/2014/20141104/elec_20141104aj.xlsx",
@@ -54,12 +71,12 @@ DOCUMENTS = {
 def fetch() -> None:
     for cached, url, *_ in DOCUMENTS.values():
         if cached == SOURCE:
-            raw.fetch(SOURCE, url, suffix=Path(url).suffix)
+            raw.fetch(SOURCE, url, suffix=Path(url.split("?")[0]).suffix)
 
 
 def counties(conn: Connection, fips: str) -> dict[str, str]:
     return {
-        re.sub(r"[^a-z]", "", text.lower()): code
+        re.sub(r"[^a-z]", "", unicodedata.normalize("NFKD", text).lower()): code
         for text, code in conn.execute(
             """select n.text, u.code from reporting_unit u join name n on n.entity_id = u.area_id and n.kind = 'short'
                where u.scheme_code = 'us.county' and u.code like %s""",
@@ -208,6 +225,63 @@ def indiana(conn: Connection, document: str) -> list[tuple[date, str, str, str, 
     return rows
 
 
+def delaware(conn: Connection) -> list[tuple[date, str, str, str, int]]:
+    units = {
+        code.rsplit("::", 1)[1]: code
+        for (code,) in conn.execute(
+            "select code from reporting_unit where scheme_code = 'us.precinct' and code like '2006:DE:%%'"
+        ).fetchall()
+    }
+    source, url, *_ = DOCUMENTS["DE2006"]
+    rows: list[tuple[date, str, str, str, int]] = []
+    names: list[str] = []
+    reading = False
+    for line in raw.cached(source, url).path.read_text("latin-1").splitlines():
+        if line.strip():
+            reading = (
+                line.strip() == "UNITED STATES SENATOR"
+                or (reading and not line[0].isalpha())
+                or (reading and line.startswith(("District", "RD Tot")))
+            )
+        if not reading:
+            continue
+        if line.startswith("District"):
+            names = re.findall(r"([A-Z]+) [A-Z](?: [A-Z])?\b", line.removeprefix("District").replace("Total", ""))
+            continue
+        if found := re.fullmatch(r"(\d\d-\d\d)\s+([\d\s]+)", line.strip()):
+            votes = [int(value) for value in found[2].split()]
+            totals = votes[3::3]
+            if len(totals) != len(names) or sum(totals) != votes[0]:
+                raise ValueError(f"DE Senate {found[1]}: {votes}")
+            rows += [
+                (date(2006, 11, 7), "senate", units[found[1]], name, value)
+                for name, value in zip(names, totals, strict=True)
+            ]
+    if len(rows) != 436 * 3:
+        raise ValueError(f"DE Senate: {len(rows)} rows")
+    return rows
+
+
+def elstats(
+    conn: Connection, document: str, fips: str, day: date, chamber: str
+) -> list[tuple[date, str, str, str, int]]:
+    codes = counties(conn, fips)
+    source, url, *_ = DOCUMENTS[document]
+    lines = list(csv.reader(io.StringIO(raw.cached(source, url).path.read_text())))
+    names = [name.upper() for name in lines[0][2:] if name and not name.startswith("Total")]
+    rows = [
+        (day, chamber, codes[re.sub(r"[^a-z]", "", line[1].lower())], name, int(value))
+        for line in lines[2:]
+        if line[0] == "County"
+        for name, value in zip(names, line[2:], strict=False)
+    ]
+    state = next(line for line in lines if line[0] == "State")
+    for name, total in zip(names, state[2:], strict=False):
+        if (summed := sum(r[4] for r in rows if r[3] == name)) != int(total):
+            raise ValueError(f"{document} {name}: counties sum to {summed}, statewide {total}")
+    return rows
+
+
 def pdf(document: str) -> str:
     source, url, *_ = DOCUMENTS[document]
     return subprocess.run(
@@ -223,6 +297,8 @@ def parse() -> None:
                 ("AR", arkansas),
                 ("CA2000", california),
                 ("ME2014", maine),
+                ("DE2006", delaware),
+                ("NM2002", lambda conn: elstats(conn, "NM2002", "35", date(2002, 11, 5), "senate")),
                 ("IN2000U", lambda conn: indiana(conn, "IN2000U")),
                 ("IN2000G", lambda conn: indiana(conn, "IN2000G")),
             )
@@ -243,6 +319,8 @@ def parse() -> None:
             .then(pl.lit("county"))
             .when(pl.col("code").str.contains(r"^\d{10}$"))
             .then(pl.lit("town"))
+            .when(pl.col("code").str.contains("::"))
+            .then(pl.lit("precinct"))
             .otherwise(pl.lit("aggregate")),
         )
     )
@@ -299,11 +377,15 @@ def emit() -> Path:
                 valid_from=None,
                 valid_to=None,
             )
-        towns = frame.group_by("source").agg((pl.col("kind") != "county").any().alias("towns"))
-        for grain, documents in (
-            ("county", towns.filter(~pl.col("towns"))["source"]),
-            ("town", towns.filter(pl.col("towns"))["source"]),
-        ):
+        grains = frame.group_by("source").agg(
+            grain=pl.when((pl.col("kind") == "town").any())
+            .then(pl.lit("town"))
+            .when((pl.col("kind") == "precinct").any())
+            .then(pl.lit("precinct"))
+            .otherwise(pl.lit("county"))
+        )
+        for grain in ("county", "town", "precinct"):
+            documents = grains.filter(pl.col("grain") == grain)["source"]
             if len(documents):
                 medsl.attach(
                     cs,
