@@ -1,4 +1,4 @@
-key	contest	unexpired	name	party
+key	contest	unexpired	name	party	county	seats
 FL-12081	Manatee County Commissioner District 1	0	Elizabeth “Liz” Arnold	Republican
 FL-12081	Manatee County Commissioner District 1	0	Sari Lindroos-Valimaki	Democratic
 FL-12081	Manatee County Commissioner District 2	0	Amanda Ballard	Republican
@@ -9,3 +9,37 @@ FL-12081	Manatee County School Board Member District 2	0	Sharon Jefferson	Nonpar
 FL-12081	Manatee County School Board Member District 2	0	Cindy Spray	Nonpartisan
 FL-12081	Manatee County School Board Member District 5	0	Camden “Cam” Bedinghaus	Nonpartisan
 FL-12081	Manatee County School Board Member District 5	0	Jonathan Mullis	Nonpartisan
+FL-12057	Temple Terrace City Council	0	Alison McGillivray Fernandez	Nonpartisan	Hillsborough	3
+FL-12057	Temple Terrace City Council	0	Ryan Gessman	Nonpartisan	Hillsborough	3
+FL-12057	Temple Terrace City Council	0	Karen Michalski	Nonpartisan	Hillsborough	3
+FL-12057	Temple Terrace City Council	0	Eugene Papantoniou	Nonpartisan	Hillsborough	3
+FL-12057	Temple Terrace City Council	0	Amber Treat	Nonpartisan	Hillsborough	3
+FL-12031	Atlantic Beach Mayor-Commissioner Seat 1	0	Curtis R. Ford	Nonpartisan	Duval	1
+FL-12031	Atlantic Beach Mayor-Commissioner Seat 1	0	Nancy Staats	Nonpartisan	Duval	1
+FL-12031	Atlantic Beach City Commission Seat 4	0	Lisa Herrold	Nonpartisan	Duval	1
+FL-12031	Atlantic Beach City Commission Seat 4	0	Jennifer Lagner	Nonpartisan	Duval	1
+FL-12071	Bonita Springs City Council District 3	0	Ruth Condit	Nonpartisan	Lee	1
+FL-12071	Bonita Springs City Council District 3	0	Ray Sandelli	Nonpartisan	Lee	1
+FL-12071	Bonita Springs City Council District 3	0	Tim Voit	Nonpartisan	Lee	1
+FL-12071	Bonita Springs City Council District 5	0	James Anderst	Nonpartisan	Lee	1
+FL-12071	Bonita Springs City Council District 5	0	Nigel Patrick Fullick	Nonpartisan	Lee	1
+FL-12071	Fort Myers Mayor	0	Kevin B. Anderson	Nonpartisan	Lee	1
+FL-12071	Fort Myers Mayor	0	Amber Ware	Nonpartisan	Lee	1
+FL-12071	Fort Myers City Council Ward 3	0	Chantel "Telly" Rhodes	Nonpartisan	Lee	1
+FL-12071	Fort Myers City Council Ward 3	0	Terolyn P. Watson	Nonpartisan	Lee	1
+FL-12071	Fort Myers Beach Town Council	0	Tom Brady	Nonpartisan	Lee	3
+FL-12071	Fort Myers Beach Town Council	0	Anita Cereceda	Nonpartisan	Lee	3
+FL-12071	Fort Myers Beach Town Council	0	Rebecca Link	Nonpartisan	Lee	3
+FL-12071	Fort Myers Beach Town Council	0	Edward J. Schoonover	Nonpartisan	Lee	3
+FL-12073	Leon County Commissioner At-Large Group 2	0	Nick Maddox	Nonpartisan	Leon	1
+FL-12073	Leon County Commissioner District 3	0	C.B. Lorch	Nonpartisan	Leon	1
+FL-12073	Leon County Commissioner District 3	0	Rick Minor	Nonpartisan	Leon	1
+FL-12073	Leon County Commissioner District 5	0	David T. Hawkins	Nonpartisan	Leon	1
+FL-12073	Leon County Commissioner District 5	0	David T. O'Keefe	Nonpartisan	Leon	1
+FL-12073	Leon County School Board Member District 1	0	Alva "Striplin" Smith	Nonpartisan	Leon	1
+FL-12073	Tallahassee Mayor	0	Loranne Ausley	Nonpartisan	Leon	1
+FL-12073	Tallahassee Mayor	0	Jeremy Matlow	Nonpartisan	Leon	1
+FL-12073	Tallahassee City Commission Seat 3	0	Tom Derzypolski	Nonpartisan	Leon	1
+FL-12073	Tallahassee City Commission Seat 3	0	P.J. Perez	Nonpartisan	Leon	1
+FL-12073	Tallahassee City Commission Seat 5	0	Dot Inman-Johnson	Nonpartisan	Leon	1
+FL-12073	Tallahassee City Commission Seat 5	0	Dianne Williams-Cox	Nonpartisan	Leon	1

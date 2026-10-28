@@ -5,7 +5,7 @@ import json
 import re
 import subprocess
 import zipfile
-from collections import defaultdict
+from collections import Counter, defaultdict
 from datetime import UTC, date, datetime
 from itertools import pairwise
 from pathlib import Path
@@ -62,6 +62,11 @@ FEEDS = {
         "https://content.lavote.gov/docs/rrcc/documents/final-list-of-qualified-candidates-to-appear-on-the-ballot9fcf3b64-1a33-4882-9e17-8cbc3b3c8d76.pdf",
         "Los Angeles County Registrar-Recorder/County Clerk",
         "General Election, November 3, 2026: Final List of Qualified Candidates to Appear on the Ballot",
+    ),
+    "KY": (
+        "https://web.sos.ky.gov/CandidateFilings/countyfilings.aspx",
+        "Kentucky Secretary of State",
+        "Candidate Filings with the County Clerk: Excel Spreadsheet of All County Candidates, 2026 General Election",
     ),
     "SC": (
         "https://vrems.scvotes.sc.gov/Candidate/CandidateSearch?electionId=22596#ExportSearchResults",
@@ -253,6 +258,41 @@ FEEDS = {
         "Manatee County Supervisor of Elections",
         "Manatee County Sample Ballot, General Election, November 3, 2026 (all voters)",
     ),
+    "FL-12057": (
+        "https://www.votehillsborough.gov/DocumentCenter/View/2615/2026-General-Election-All-Races-Sample-Ballot-PDF",
+        "Hillsborough County Supervisor of Elections",
+        "Official General Election Ballot, November 3, 2026: All Races Sample Ballot",
+    ),
+    "FL-12031": (
+        "https://www.duvalelections.gov/DocumentCenter/View/1644/2026-General-All-Races",
+        "Duval County Supervisor of Elections",
+        "General Election, November 3, 2026: All-Races Sample Ballot",
+    ),
+    "FL-12071": (
+        "https://www.lee.vote/243/Sample-Ballots",
+        "Lee County Supervisor of Elections",
+        "All-Inclusive Sample Ballot, November 3, 2026 General Election",
+    ),
+    "FL-12073": (
+        "https://www.leonvotes.gov/Records/Sample-Ballots",
+        "Leon County Supervisor of Elections",
+        "2026 General Election Guide: Sample Ballot, November 3, 2026",
+    ),
+    "CA-06001": (
+        "https://alamedacountyca.gov/rov_app/candidatelist",
+        "Alameda County Registrar of Voters",
+        "Candidate List: General Election, November 3, 2026 (Official)",
+    ),
+    "CA-06097": (
+        "https://sonomacounty.gov/administrative-support-and-fiscal-services/registrar-of-voters/elections/november-3-2026-general-election-candidates-on-the-ballot",
+        "Sonoma County Registrar of Voters",
+        "November 3, 2026 General Election: Candidates on the Ballot",
+    ),
+    "CA-06075": (
+        "https://www.sf.gov/candidates-november-3-2026-general-election",
+        "San Francisco Department of Elections",
+        "Candidates, November 3, 2026, General Election",
+    ),
     "CA-06099": (
         "https://www.stanvote.gov/pdf/candidate-list.pdf",
         "Stanislaus County Registrar of Voters",
@@ -354,6 +394,97 @@ FEEDS = {
         "Election results files, November 3, 2026: school district races",
     ),
 }
+VOTERFOCUS = {
+    "alachua_54": ("Alachua", "", "2026 Gubernatorial and City of Gainesville"),
+    "baker_33": ("Baker", "", "General Election"),
+    "bay_35": ("Bay", "", "2026 Primary/General Election"),
+    "bradford_23": ("Bradford", "", "2026 General"),
+    "brevard_30": ("Brevard", "", "2026 General Election"),
+    "calhoun_22": ("Calhoun", "", "2026 Primary/General Election"),
+    "charlotte_27": ("Charlotte", "", "2026 Election Cycle"),
+    "citrus_21": ("Citrus", "", "2026 General Election"),
+    "clay_94": ("Clay", "", "2026 Election Cycle"),
+    "collier_15": ("Collier", "", "2026 General Election"),
+    "columbia_29": ("Columbia", "", "2026 GENERAL ELECTION"),
+    "desoto_6": ("DeSoto", "", "2026 General Election"),
+    "dixie_13": ("Dixie", "", "2026 Primary/General Election"),
+    "duval_40": ("Duval", "", "2026 General Election"),
+    "duval_44": ("Duval", "", "2026 Special Unitary Election Cycle"),
+    "escambia_26": ("Escambia", "Pensacola", "2026 General Election"),
+    "flagler_41": ("Flagler", "", "2026 Candidates"),
+    "franklin_26": ("Franklin", "", "2026 Election Cycle"),
+    "gadsden_37": ("Gadsden", "", "2026 General Election"),
+    "gilchrist_24": ("Gilchrist", "", "2026 Primary/General Election"),
+    "glades_6": ("Glades", "", "2026 Election Cycle"),
+    "gulf_61": ("Gulf", "", "2026 Candidate Reporting"),
+    "hamilton_14": ("Hamilton", "", "2026 General Election"),
+    "hardee_16": ("Hardee", "", "2026 Election Cycle"),
+    "hendry_17": ("Hendry", "", "2026 Election"),
+    "hernando_32": ("Hernando", "", "2026 CANDIDATE ELECTION CYCLE"),
+    "highlands_10": ("Highlands", "", "General 2026"),
+    "hillsborough_27": ("Hillsborough", "", "2026 Candidate Election Cycle"),
+    "holmes_11": ("Holmes", "", "2026 General Election"),
+    "indianriver_18": ("Indian River", "", "2026 General Election"),
+    "jackson_19": ("Jackson", "", "2026 General Election"),
+    "jefferson_8": ("Jefferson", "", "2026 Election Cycle"),
+    "lafayette_8": ("Lafayette", "", "2026 Election Cycle"),
+    "lake_17": ("Lake", "", "2026 General Election"),
+    "lee_34": ("Lee", "", "2026 CANDIDATES"),
+    "lee_35": ("Lee", "", "2026 MUNICIPAL"),
+    "levy_23": ("Levy", "", "2026 Election"),
+    "liberty_25": ("Liberty", "", "2026 Election"),
+    "madison_8": ("Madison", "", "2026 Primary/General Election"),
+    "manatee_219": ("Manatee", "", "2026 Municipal Elections"),
+    "marion_49": ("Marion", "Belleview", "City of Belleview"),
+    "marion_50": ("Marion", "Dunnellon", "City of Dunnellon"),
+    "marion_47": ("Marion", "", "General Election"),
+    "martin_16": ("Martin", "", "2026 Election Cycle"),
+    "monroe_49": ("Monroe", "", "2026, County, State, Federal Elections"),
+    "nassau_46": ("Nassau", "", "2026 General Election Cycle"),
+    "nassau_48": ("Nassau", "", "2026 Municipal Election Cycle"),
+    "okaloosa_220": ("Okaloosa", "", "2026 Election Cycle"),
+    "okaloosa_223": ("Okaloosa", "", "Special Election- School Board District 1"),
+    "okeechobee_32": ("Okeechobee", "", "2026 Candidate"),
+    "orange_105": ("Orange", "", "Election- 11/3/2026"),
+    "osceola_17": ("Osceola", "", "General Election 2026"),
+    "palmbeach_12": ("Palm Beach", "", "2026 Election Cycle"),
+    "pinellas_35": ("Pinellas", "", "2026 Candidate Election Cycle"),
+    "polk_22": ("Polk", "", "2026 General Election"),
+    "putnam_34": ("Putnam", "Palatka", "2026 Election Cycle"),
+    "santarosa_11": ("Santa Rosa", "", "2026 General Election"),
+    "sarasota_134": ("Sarasota", "", "2026 Primary & General Elections"),
+    "sarasota_153": ("Sarasota", "North Port", "City of North Port General Election"),
+    "sarasota_149": ("Sarasota", "Sarasota", "City of Sarasota General Election"),
+    "sarasota_147": ("Sarasota", "Venice", "City of Venice General Election"),
+    "seminole_126": ("Seminole", "Altamonte Springs", "2026 Altamonte Springs General"),
+    "seminole_124": ("Seminole", "Casselberry", "2026 CASSELBERRY GENERAL"),
+    "seminole_116": ("Seminole", "", "2026 GENERAL ELECTION"),
+    "seminole_129": ("Seminole", "Lake Mary", "2026 LAKE MARY GENERAL"),
+    "seminole_122": ("Seminole", "Longwood", "2026 LONGWOOD GENERAL"),
+    "seminole_128": ("Seminole", "Oviedo", "2026 OVIEDO GENERAL ELECTION"),
+    "seminole_127": ("Seminole", "Sanford", "2026 Sanford General"),
+    "seminole_125": ("Seminole", "Winter Springs", "2026 Winter Springs General"),
+    "stjohns_20": ("St. Johns", "", "2026 Election Cycle"),
+    "stlucie_26": ("St. Lucie", "", "General 2026"),
+    "sumter_26": ("Sumter", "", "2026 GENERAL ELECTION (Candidates)"),
+    "suwannee_29": ("Suwannee", "", "2026 GENERAL ELECTION"),
+    "taylor_16": ("Taylor", "Perry", "General Election - 2026"),
+    "union_11": ("Union", "", "2026 Elections"),
+    "volusia_36": ("Volusia", "", "General Election 11/3/26 (8/18/26)"),
+    "wakulla_15": ("Wakulla", "", "2026 Election Cycle"),
+    "walton_42": ("Walton", "", "2026 County Elections"),
+    "washington_10": ("Washington", "", "2026 General Election"),
+}
+FEEDS.update(
+    {
+        f"FL-vf-{group}": (
+            f"https://www.voterfocus.com/CampaignFinance/candidate_pr.php?el={group.split('_')[1]}&c={group.split('_')[0]}",
+            f"{county} County Supervisor of Elections",
+            f"Candidate Reports: {label}",
+        )
+        for group, (county, _, label) in VOTERFOCUS.items()
+    }
+)
 LOCAL_BODY = re.compile(
     r"(?i)school|\btown\b|\bcity\b|village|township|education|trustee|soil|water|hospital|fire|library|sanitary"
     r"|conservation|cemetery|\bparks?\b|airport|\bport\b|utility|levee|drainage|college|recreation"
@@ -420,6 +551,7 @@ DELIVERED = {
     / "2026 General Election Maricopa County Candidates On Ballot - Remediated.pdf",
     "17031c": DATA / "inbox" / "manual" / "MF-154" / "GetAllCandidates.json",
     "SC": DATA / "inbox" / "y26" / "sc_candidates_2026-11-03_all.csv",
+    "KY": DATA / "inbox" / "y26" / "ky" / "countycandidates_20261028.xls",
     "NM": DATA / "inbox" / "y26" / "nm_candidates_2026_all.csv",
     "NJ-34009": DATA / "inbox" / "y26" / "nj" / "cape_may.pdf",
     "NJ-34011": DATA / "inbox" / "y26" / "nj" / "cumberland.xlsx",
@@ -443,6 +575,13 @@ DELIVERED = {
     "FL-12011": DATA / "inbox" / "y26" / "fl" / "broward.pdf",
     "FL-12101": DATA / "inbox" / "y26" / "fl" / "pasco.pdf",
     "FL-12081": DATA / "inbox" / "y26" / "fl" / "manatee.pdf",
+    "CA-06001": DATA / "inbox" / "y26" / "ca" / "alameda.html",
+    "CA-06097": DATA / "inbox" / "y26" / "ca" / "sonoma.html",
+    "CA-06075": DATA / "inbox" / "y26" / "ca" / "sf.html",
+    "FL-12057": DATA / "inbox" / "manual" / "MF-177" / "2026 General Election_All Races Sample Ballot.pdf",
+    "FL-12031": DATA / "inbox" / "manual" / "MF-178" / "2026 General All Races_202609210829090089.pdf",
+    "FL-12071": DATA / "inbox" / "manual" / "MF-182" / "2026 General Election - All Inclusive Sample Ballot.pdf",
+    "FL-12073": DATA / "inbox" / "manual" / "MF-183" / "2026 GEN Election Guide.pdf",
     "OH-39017": DATA / "inbox" / "y26" / "oh" / "butler.pdf",
     "OH-39035": DATA / "inbox" / "y26" / "oh" / "cuyahoga.pdf",
     "OH-39049": DATA / "inbox" / "y26" / "oh" / "franklin.pdf",
@@ -654,10 +793,12 @@ def fetch() -> None:
                     media_type={
                         ".pdf": "application/pdf",
                         ".xlsx": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                        ".html": "text/html",
+                        ".xls": "application/vnd.ms-excel",
                     }.get(DELIVERED[state].suffix, "text/csv"),
                 )
             continue
-        raw.fetch(SOURCE, url, suffix=Path(url).suffix or ".pdf")
+        raw.fetch(SOURCE, url, suffix=".html" if "voterfocus" in url else Path(url).suffix or ".pdf")
         if state in PRIMARIES:
             raw.fetch(SOURCE, PRIMARIES[state], suffix=".zip")
     for fips, url in FILES.items():
@@ -858,6 +999,7 @@ def parse() -> None:
                 1,
                 candidate[2],
                 PARTIES.get(candidate[1]) if candidate[1] != candidate[2] else None,
+                candidate[1] == candidate[2],
             )
 
     for race in json.loads(raw.cached(SOURCE, FILES["17031c"]).path.read_bytes())["Candidates"]:
@@ -995,6 +1137,63 @@ def parse() -> None:
         )
 
     category = None
+    filings = pl.read_excel(raw.cached(SOURCE, FEEDS["KY"][0]).path, infer_schema_length=0).filter(
+        pl.col("Withdrawn").is_null()
+        & pl.col("Disqualified").is_null()
+        & pl.col("Deceased").is_null()
+        & (pl.col("Party") != "WRITE-IN")
+    )
+    titles = {
+        "COUNTY JUDGE / EXECUTIVE": "Judge/Executive",
+        "SHERIFF": "Sheriff",
+        "COUNTY CLERK": "Clerk",
+        "COUNTY ATTORNEY": "Attorney",
+        "JAILER": "Jailer",
+        "CORONER": "Coroner",
+        "PROPERTY VALUATION ADMINISTRATOR": "Property Valuation Administrator",
+        "SURVEYOR": "Surveyor",
+        "CIRCUIT COURT CLERK": "Circuit Court Clerk",
+        "MAGISTRATE / JUSTICE OF THE PEACE": "Magistrate",
+        "CONSTABLE": "Constable",
+        "COUNTY COMMISSIONER": "Commissioner",
+    }
+    for (county, post, district), group in filings.filter(pl.col("Office").is_in(list(titles))).group_by(
+        "County", "Office", "District"
+    ):
+        if group.filter(pl.col("Party").is_in(["REPUBLICAN PARTY", "DEMOCRATIC PARTY"]))[
+            "Party"
+        ].is_duplicated().any() or (district is None) == (
+            titles[str(post)] in ("Magistrate", "Constable", "Commissioner")
+        ):
+            continue
+        place = str(county).title().replace("Mccracken", "McCracken").replace("Mclean", "McLean")
+        for row in group.iter_rows(named=True):
+            suffix = str(row["Suffix"] or "").strip()
+            nickname = suffix if suffix.startswith('"') else ""
+            named, independent = party(row["Party"])
+            feeds["KY"].append(
+                {
+                    "county": place,
+                    "contest": f"{place} County {titles[str(post)]}" + (f" District {district}" if district else ""),
+                    "seats": 1,
+                    "name": " ".join(
+                        cased(part)
+                        for part in (
+                            row["First Name"],
+                            nickname or row["Middle Name"],
+                            row["Last Name"],
+                            suffix.rstrip(".").title() + "." * (suffix[:2] in ("JR", "SR"))
+                            if re.fullmatch(r"(JR|SR|II|III|IV)\.?", suffix)
+                            else "",
+                        )
+                        if part
+                    ),
+                    "party": named,
+                    "independent": independent,
+                    "unexpired": row["Unexpired"] is not None,
+                }
+            )
+
     for cells in pl.read_excel(raw.cached(SOURCE, FEEDS["IN"][0]).path, has_header=False).iter_rows():
         if cells[0] == "OFFICE CATEGORY:":
             category = cells[1]
@@ -2185,7 +2384,7 @@ def parse() -> None:
 
     for row in [
         row
-        for state in ("oh", "fl")
+        for state in ("oh", "fl", "ca")
         for row in csv.DictReader(
             Path(__file__).with_name(f"local_2026_{state}.tsv").read_text().splitlines(), delimiter="\t"
         )
@@ -2193,15 +2392,80 @@ def parse() -> None:
         named, independent = party(row["party"])
         feeds[row["key"]].append(
             {
-                "county": row["contest"].split(" County")[0],
+                "county": row.get("county") or row["contest"].split(" County")[0],
                 "contest": row["contest"],
-                "seats": 1,
-                "name": row["name"],
+                "seats": int(row.get("seats") or 1),
+                "name": cased(row["name"]),
                 "party": named,
                 "independent": independent,
                 "unexpired": row["unexpired"] == "1",
             }
         )
+
+    for group, (county, town, _) in VOTERFOCUS.items():
+        key = f"FL-vf-{group}"
+        page = raw.cached(SOURCE, FEEDS[key][0]).path.read_bytes().decode("utf-8", errors="replace")
+        offices: dict[str, list[tuple[str, str, str]]] = defaultdict(list)
+        post = None
+        for block in re.split(r'(?=<div class="col-xs-12 officename">)|(?=<div class="col-xs-12 detailrow)', page):
+            if heading := re.match(r'<div class="col-xs-12 officename">\s*Office:\s*(.*?)\s*<', block):
+                post = " ".join(html.unescape(heading[1]).split())
+            elif (status := re.search(r"\(Active-<span[^>]*>(.*?)</span>\s*\)", block)) and (
+                cell := re.search(r'role="gridcell">\s*(.*?)\s*</div>', block, re.DOTALL)
+            ):
+                name = " ".join(html.unescape(re.sub(r"<[^>]+>", " ", cell[1])).replace("(N/P)", "").split())
+                found = re.match(r"(.*?)\s*\(([A-Z]{2,4})\)$", name)
+                offices[str(post)].append((found[1] if found else name, found[2] if found else "", status[1].strip()))
+        for post, people in offices.items():
+            on = [person for person in people if person[2] in ("Qualified", "Advanced", "Runoff")]
+            parties = Counter(person[1] for person in on if person[1] in ("REP", "DEM"))
+            title = re.sub(r"(?i)\bsch\b", "School", re.sub(r"(?i)^co\b", "County", post))
+            title = re.sub(r"(?i)\b(?:dist|dst|pct)\b\.?", "District", title)
+            title = re.sub(r"(?i)\s*-\s*(?:single m|at large)$|^member,\s*", "", title)
+            title = re.sub(r"(?i)\s*-\s*(\d+)$", r" District \1", title)
+            title = " ".join(re.sub(r"\s*[-,]\s*", " ", title).split())
+            countywide = re.search(
+                r"(?i)^(county|board of county|school board|supervisor of elections|clerk|sheriff|property appraiser"
+                r"|tax collector)",
+                title,
+            )
+            if (
+                not on
+                or "Elected" in {person[2] for person in people}
+                or any(count > 1 for count in parties.values())
+                or re.search(
+                    r"(?i)\bCDD\b|develop|\bdst\b|stewardship|mosq|ecua|\bfd\b|foundation|trustee|supervisors?\b|soil"
+                    r"|water|judge|court|hospital|fire|district \d+ (?:board|seat)|improvement|port|authority|library",
+                    post,
+                )
+                or len(on) > 2
+                and (
+                    countywide
+                    and not {person[2] for person in on} & {"Advanced", "Runoff"}
+                    or not countywide
+                    and not re.search(r"(?i)\b(seat|district|ward|zone|group|mayor)\b", title)
+                )
+            ):
+                continue
+            if countywide:
+                title = f"{county} County {re.sub(r'(?i)^county ', '', title)}"
+            elif town and not title.lower().startswith(town.lower()):
+                title = f"{town} {title}"
+            for name, label, _ in on:
+                named, independent = party(
+                    {"REP": "Republican", "DEM": "Democratic", "LPF": "Libertarian", "GRE": "Green"}.get(label)
+                )
+                feeds[key].append(
+                    {
+                        "county": county,
+                        "contest": title,
+                        "seats": 1,
+                        "name": cased(name),
+                        "party": named,
+                        "independent": independent or label in ("NPA", "IND"),
+                        "unexpired": False,
+                    }
+                )
 
     for line in text("FL-12011", "-layout").splitlines():
         found = re.match(r"(\S.*?)\s{2,}(\S.*?)\s{2,}(\S.*?)\s*$", line)
@@ -2508,7 +2772,7 @@ def parse() -> None:
                         (f"Ward {ward[1] or ward[2] or ward[3]}" if ward[4] is None else f"{ward[4].title()} Ward")
                         if ward and role in ("council", "commission")
                         else f"{other[1].title()} {other[2]}"
-                        if (other := re.search(r"\b(seat|district|group|place) (\d+)\b", post))
+                        if (other := re.search(r"\b(seat|district|group|place|zone) (\d+)\b", post))
                         and role in ("council", "commission")
                         else "At-Large"
                         if role in ("council", "commission") and re.search(r"\bat large\b", post)
@@ -2557,7 +2821,7 @@ def parse() -> None:
                         " ".join(
                             word
                             if word.isupper() and len(word) <= 3 and word != "AND" and not title.isupper()
-                            else word.capitalize()
+                            else "/".join(part.capitalize() for part in word.split("/"))
                             for word in re.sub(r"(?i)\bby commissioner district district\b", "District", title).split()
                         ),
                     )
