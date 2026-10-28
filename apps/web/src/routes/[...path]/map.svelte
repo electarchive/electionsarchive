@@ -2887,21 +2887,8 @@
         >
       </span>
     {/if}
-    {#if approximate.length > 0}
-      <span class="flex items-center gap-1.5 text-muted-foreground">
-        <span
-          class="border-t border-dashed border-foreground/45 inline-4"
-          aria-hidden="true"
-        ></span>
-        <Term
-          class="text-foreground"
-          label={m.map_approximate_key()}
-          definition={m.term_boundaries_approximate()}
-        />
-      </span>
-    {/if}
   </div>
-  {#if credited.length > 0}
+  {#if credited.length > 0 || approximate.length > 0}
     {const notices = $derived(
       credited.filter((credit) => /©|: |\.$|^Contains /u.test(credit)),
     )}
@@ -2913,6 +2900,18 @@
       ),
     )}
     <div class="grid gap-0.5 px-1 text-xs text-muted-foreground">
+      {#if approximate.length > 0}
+        <p class="flex items-center gap-1.5">
+          <span
+            class="border-t border-dashed border-foreground/45 inline-4"
+            aria-hidden="true"
+          ></span>
+          <Term
+            label={m.map_approximate_key()}
+            definition={m.term_boundaries_approximate()}
+          />
+        </p>
+      {/if}
       {#if publishers.length > 0}
         {const listed = $derived(
           new Intl.ListFormat(getLocale(), { type: "conjunction" }).format(
@@ -2924,7 +2923,9 @@
       {#each notices as notice (notice)}
         <p>{notice}</p>
       {/each}
-      <p>{m.map_water_credit()}</p>
+      {#if credited.length > 0}
+        <p>{m.map_water_credit()}</p>
+      {/if}
     </div>
   {/if}
 
