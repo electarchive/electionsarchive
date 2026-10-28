@@ -1,7 +1,8 @@
 import html
+import json
 import re
 import subprocess
-from datetime import date
+from datetime import UTC, date, datetime
 from itertools import pairwise
 from pathlib import Path
 
@@ -28,6 +29,16 @@ FILES = {
     "48113": "https://assets01.aws.connect.clarityelections.com/Assets/Connect/RootPublish/dallas-tx.connect.clarityelections.com/SampleBallots/2026/261103GeneralJoint/1.pdf",
     "12086": "https://www.miamidade.gov/elections/library/2026-11-03-general-election-master-ballot.pdf",
     "3651000": "https://www.vote.nyc/sites/default/files/pdf/candidates/2026/9_11_2026%2010_26_11%20AM_General%20Contest%20List%20Web%20Version.pdf",
+    "04013": "https://elections.maricopa.gov/asset/jcr:1673a1e7-bbed-4d76-94fe-ae0ccc1ce9d5/2026%20General%20Election%20Maricopa%20County%20Candidates%20On%20Ballot%20-%20Remediated.pdf",
+    "17031c": "https://www.cookcountyclerkil.gov/elections/current-elections/view-all-candidates#GetAllCandidates.json",
+}
+DELIVERED = {
+    "04013": DATA
+    / "inbox"
+    / "manual"
+    / "MF-153"
+    / "2026 General Election Maricopa County Candidates On Ballot - Remediated.pdf",
+    "17031c": DATA / "inbox" / "manual" / "MF-154" / "GetAllCandidates.json",
 }
 PUBLISHERS = {
     "0644000": (
@@ -53,6 +64,12 @@ PUBLISHERS = {
         "NY",
         "Board of Elections in the City of New York",
         "The Contest List, General Election 2026 (tentative, printed 9/11/2026)",
+    ),
+    "04013": ("AZ", "Maricopa County Elections Department", "Official County Candidates, 2026 General Election"),
+    "17031c": (
+        "IL",
+        "Cook County Clerk",
+        "View All Candidates, November 3, 2026 Gubernatorial General Election",
     ),
 }
 COUNTIES = {"06073": "San Diego County", "06059": "Orange County"}
@@ -102,6 +119,14 @@ OFFICES = {
     "06059": [
         (r"Nonpartisan COUNTY OF ORANGE County Supervisor (\d+)\w\w District", "CA:06059:board-of-supervisors:{}")
     ],
+    "17031c": [
+        (r"(6|14|15|17)\w\w County Board District Commissioner", "IL:17031:board-of-commissioners:district-{}"),
+    ],
+    "04013": [
+        (r"CLERK OF THE SUPERIOR COURT COUNTY", "AZ:04013:superior-court-clerk"),
+        (r"JUSTICE OF THE PEACE ([A-Z -]+)", "AZ:04013:justice-of-the-peace:{}"),
+        (r"CONSTABLE ([A-Z -]+)", "AZ:04013:constable:{}"),
+    ],
     "3651000": [
         (
             r"Member of the City Council - (\d+)\w\w Council District, # to be elected: 1",
@@ -118,13 +143,27 @@ PARTIES = {
     "Lib": "libertarian-party",
     "Green": "green-party",
     "Grn": "green-party",
+    "LBT": "libertarian-party",
 }
 NUMBERS = {"One": 1, "Two": 2, "Three": 3, "Four": 4, "Five": 5}
 WATERMARK = re.compile(r"^(?:[A-Z]{1,2} )+(?=\S\S)|(?: (?!JR|SR|II|IV)[A-Z]{1,2})+$")
 
 
 def fetch() -> None:
-    for url in FILES.values():
+    for fips, url in FILES.items():
+        if fips in DELIVERED:
+            try:
+                raw.cached(SOURCE, url)
+            except LookupError:
+                raw.store(
+                    SOURCE,
+                    url,
+                    DELIVERED[fips].read_bytes(),
+                    suffix=DELIVERED[fips].suffix,
+                    retrieved_at=datetime.fromtimestamp(DELIVERED[fips].stat().st_mtime, UTC),
+                    media_type="application/json" if fips == "17031c" else "application/pdf",
+                )
+            continue
         try:
             raw.fetch(SOURCE, url, suffix=".pdf")
         except httpx.HTTPError as error:
@@ -138,7 +177,7 @@ def parse() -> None:
         for pattern, tail in OFFICES[fips]:
             found = re.fullmatch(pattern, heading.strip())
             if found is not None:
-                return tail.format(*found.groups())
+                return tail.format(*(slug(group) for group in found.groups()))
         return None
 
     def add(fips: str, tail: str, heading: str, seats: int, name: str, party: str | None) -> None:
@@ -298,6 +337,37 @@ def parse() -> None:
                 1,
                 candidate[2],
                 PARTIES.get(candidate[1]) if candidate[1] != candidate[2] else None,
+            )
+
+    for race in json.loads(raw.cached(SOURCE, FILES["17031c"]).path.read_bytes())["Candidates"]:
+        heading = f"{race['Name']} {race['Office']} {race['Vacancy']}"
+        if (tail := office("17031c", heading)) is None:
+            continue
+        for item in race["item"]:
+            add(
+                "17031c",
+                tail,
+                heading,
+                race["Vote"],
+                item["Name"].strip("'").replace("''", '"'),
+                PARTIES.get(item["Pty"].title()),
+            )
+
+    for line in text("04013", "-layout").splitlines():
+        row = re.fullmatch(r"(.+?) / .+?\s{2,}(.+?)\s{2,}(.+?), (.+?)\s{2,}(DEM|REP|LBT|GRN|IND)\s*", line)
+        if row is not None and (tail := office("04013", f"{row[1]} {row[2].split(' / ')[0]}")) is not None:
+            last = re.sub(r" (JR|SR|II|III|IV)$", r", \1", row[3])
+            add(
+                "04013",
+                tail,
+                row[1],
+                1,
+                re.sub(
+                    r'"([A-Z]+)"',
+                    lambda match: f'"{match[1].title()}"',
+                    cased(f"{row[4]} {last.split(', ')[0]}" + "".join(f" {part}" for part in last.split(", ")[1:])),
+                ),
+                PARTIES.get(row[5].title(), PARTIES.get(row[5])),
             )
 
     PARSED.mkdir(parents=True, exist_ok=True)
@@ -495,7 +565,11 @@ def emit() -> Path:
             text = re.sub(r"^\d{4} ", "2026 ", title)
             if group["unexpired"][0] and term == "full":
                 text = text.replace(" election", " special election", 1)
-            name(contest, text.replace(" election", " runoff election", 1) if chained else text)
+            if chained:
+                text = text.replace(
+                    " election", " general municipal election" if fips == "0644000" else " runoff election", 1
+                )
+            cs.add("name", entity_id=contest, text=text, lang="en", kind="official", is_preferred=True)
             cs.add("slug", path=re.sub(r"/[0-9-]+-\w+/", f"/{DAY}-general/", path), entity_id=contest)
             counts["contests"] += 1
             if tail in created:
