@@ -20,6 +20,9 @@ SOURCE = "tr.tuik_secim"
 VERSION = "1"
 APP = "https://biruni.tuik.gov.tr/secimdagitimapp/secim.zul"
 TABLE = "Seçim çevresi ve ilçelere göre milletvekili genel seçimi sonuçları"
+REFERENDUMS = "https://biruni.tuik.gov.tr/secimdagitimapp/halkoylama.zul"
+REFERENDUM_TABLE = "İl ve ilçelere göre yurt içi halk oylaması sonuçları"
+REFERENDUM_YEARS = ("1961", "1982", "1987", "1988", "2007", "2010", "2017")
 YEARS = ("1961", "1965", "1969", "1973", "1977", "1983", "1987", "1991", "1995", "1999", "2002", "2007")
 PARSED = DATA / "parsed" / SOURCE
 MEASURES = (("Sandık", "boxes"), ("Kayıtlı", "registered"), ("Oy kullanan", "voters"), ("Geçerli", "valid"))
@@ -76,6 +79,7 @@ PARTS = {
     "Belde/Köy": "rural",
     "Bucak ve köyler toplamı": "rural",
 }
+REFERENDUM_PARTS = {"İl/İlçe merkezi toplamı": "urban", "Belde/Köy toplamı": "rural"}
 ITEM = r'<tr id="([^"]+)" z\.type="Lit"[^>]*>\s*<td[^>]*>([^<]+)'
 
 
@@ -84,13 +88,14 @@ def key(year: str, district: str) -> str:
 
 
 class App:
-    def __init__(self) -> None:
+    def __init__(self, app: str = APP, table: str = TABLE) -> None:
         self.client = httpx.Client(timeout=120, follow_redirects=True, headers={"User-Agent": raw.USER_AGENT})
-        page = self.client.get(APP).text
+        page = self.client.get(app).text
+        self.page = page
         self.action = "https://biruni.tuik.gov.tr" + re.search(r'zk_action="([^"]+)"', page).group(1)
         self.dtid = re.search(r'z\.dtid="([^"]+)"', page).group(1)
         self.button = re.search(r'<button type="button" id="([^"]+)"[^>]*>\s*Raporu Oluştur', page).group(1)
-        at = page.index(TABLE)
+        at = page.index(table)
         item = re.findall(r'<tr id="([^"]+)" z\.type="Lit"', page[:at])[-1]
         box = re.findall(r'<div id="([^"]+)" z\.type="zul\.sel\.Libox"', page[:at])[-1]
         self.years = self.select(box, item)
@@ -147,9 +152,45 @@ def year(label: str) -> None:
     raise RuntimeError(f"{label}: gave up")
 
 
+def referendum(label: str) -> None:
+    for attempt in range(6):
+        try:
+            app = App(REFERENDUMS, REFERENDUM_TABLE)
+            radios = {
+                html.unescape(text).strip(): uuid
+                for uuid, text in re.findall(
+                    r'<span id="([^"]+)" z\.type="zul\.widget\.Radio"[^>]*>\s*<input[^>]*>\s*<label[^>]*>([^<]+)</label>',
+                    app.page,
+                )
+            }
+            text = app.post([("cmd.0", "onCheck"), ("uuid.0", radios[f"{label} Halk oylaması"]), ("data.0", "true")])
+            box = re.search(r'<div id="([^"]+)" z\.type="zul\.sel\.Libox"', text).group(1)
+            provinces = {html.unescape(name).strip(): uuid for uuid, name in re.findall(ITEM, text)}
+            for province, item in provinces.items():
+                url = f"{REFERENDUMS}?tablo=ilce&oylama={label}&il={province}"
+                try:
+                    raw.cached(SOURCE, url)
+                    continue
+                except LookupError:
+                    pass
+                app.select(box, item)
+                link = app.report().replace("http://", "https://")
+                content = app.client.get(link).content
+                if b"<tr" not in content:
+                    raise ValueError(f"{label} {province}: empty report")
+                raw.store(SOURCE, url, content, suffix=".html", retrieved_at=datetime.now(UTC), media_type="text/html")
+                print(label, province, len(content), flush=True)
+            return
+        except (httpx.HTTPError, AttributeError, ValueError, KeyError) as error:
+            print(label, "retry", attempt, repr(error), flush=True)
+            time.sleep(10 * (attempt + 1))
+    raise RuntimeError(f"{label}: gave up")
+
+
 def fetch() -> None:
     with ThreadPoolExecutor(3) as pool:
         list(pool.map(year, YEARS))
+        list(pool.map(referendum, REFERENDUM_YEARS))
 
 
 def cells(row: str) -> list[str]:
@@ -163,7 +204,45 @@ def parse() -> None:
     _, index = raw._index(SOURCE)
     rows: list[dict[str, object]] = []
     notes: list[dict[str, str]] = []
-    for url in sorted(index):
+    votes: list[dict[str, object]] = []
+    for url in sorted(key for key in index if key.startswith(REFERENDUMS)):
+        label, province = re.search(r"oylama=(\d{4})&il=(.+)$", url).groups()
+        text = raw.cached(SOURCE, url).path.read_bytes().decode("cp1254")
+        pending = None
+        for row in re.findall(
+            r"<tr.*?</tr>", re.sub(r"<script.*?</script>", "", text, flags=re.DOTALL), flags=re.DOTALL | re.IGNORECASE
+        ):
+            filled = [cell for cell in cells(row) if cell]
+            numeric = [cell for cell in filled if re.fullmatch(r"[\d,.-]+", cell)]
+            if len(numeric) != 12:
+                if len(filled) == 1 and not numeric and province in filled[0]:
+                    pending = filled[0]
+                continue
+            if len(filled) == 12:
+                level, name = "province", pending
+            else:
+                name = filled[0]
+                level = REFERENDUM_PARTS.get(name, "ilce")
+            if name is None:
+                raise ValueError(f"{url}: {filled}")
+            for column, cell in zip(
+                ("boxes", "registered", "voters", "invalid", "valid", "yes", "no"),
+                [numeric[i] for i in (0, 1, 2, 4, 6, 8, 10)],
+                strict=True,
+            ):
+                votes.append(
+                    {
+                        "year": label,
+                        "province": province,
+                        "level": level,
+                        "name": name,
+                        "column": column,
+                        "value": int(cell.replace(".", "")) if cell != "-" else 0,
+                    }
+                )
+    PARSED.mkdir(parents=True, exist_ok=True)
+    pl.DataFrame(votes).write_parquet(PARSED / "referendum.parquet")
+    for url in sorted(key for key in index if not key.startswith(REFERENDUMS)):
         year, district = re.search(r"yil=(\d{4})&cevre=(.+)$", url).groups()
         text = re.sub(
             r"<script.*?</script>", "", raw.cached(SOURCE, url).path.read_bytes().decode("cp1254"), flags=re.DOTALL
