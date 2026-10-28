@@ -1758,7 +1758,8 @@
         <h2 id="key-places" class="text-sm font-semibold">{m.key_places()}</h2>
         {#each keyed as group, index (index)}
           <div class="flex flex-wrap items-center gap-1.5">
-            <span class="text-[0.8125rem] text-muted-foreground"
+            <span
+              class="text-[0.8125rem] text-muted-foreground max-sm:basis-full"
               >{group.label}</span
             >
             {#each group.rows as row (row.k)}
@@ -2521,7 +2522,9 @@
     {#if lead != null}
       <Name
         class="truncate text-foreground min-inline-0"
-        label={lead.row.label}
+        label={lead.row.current?.person == null
+          ? (lead.row.short ?? lead.row.label)
+          : lead.row.label}
         color={swatch(lead.row.color, lead.row.key)}
         person={lead.row.current?.person}
         party={lead.row.current?.party}

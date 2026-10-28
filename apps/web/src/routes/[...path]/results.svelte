@@ -973,7 +973,7 @@
 {#if facts != null && facts.length > 0}
   <dl class="grid gap-1 px-2 pbs-2.5 text-[0.8125rem]">
     {#each facts as fact (fact.key)}
-      <div class="flex items-baseline gap-2">
+      <div class="flex flex-wrap items-baseline gap-x-2">
         <dt
           class="flex items-baseline gap-2.5 text-muted-foreground min-inline-0"
         >
@@ -984,7 +984,7 @@
           aria-hidden="true"
         ></span>
         <dd
-          class="flex shrink-0 items-baseline gap-2 font-figures tabular-nums"
+          class="ms-auto flex shrink-0 items-baseline gap-2 font-figures tabular-nums"
         >
           {#if fact.detail != null}
             <span class="text-muted-foreground">{fact.detail}</span>
