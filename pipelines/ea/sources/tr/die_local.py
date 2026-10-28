@@ -1,15 +1,24 @@
 import difflib
 import html
+import io
+import itertools
+import json
+import math
 import re
 import struct
 import subprocess
+import unicodedata
+from collections import Counter
+from concurrent.futures import ThreadPoolExecutor
 from datetime import UTC, date, datetime
 from pathlib import Path
 from statistics import median
 from uuid import UUID
 
 import httpx
+import numpy as np
 import polars as pl
+from PIL import Image
 
 from ea import raw, scan
 from ea.changeset import Changeset, slug
@@ -415,6 +424,290 @@ def tidy(text: str) -> tuple[str, str | None, bool]:
     return " ".join(words), alias, bucak
 
 
+TABLES_1963 = {"mayor": "belediye_baskani", "meclis": "belediye_meclisi", "genel": "il_genel"}
+LEFT_1963 = ("name", "population", "boxes", "registered", "voters")
+PARTIES_1963 = ("AP", "CHP", "CKMP", "MP", "TİP", "YTP", "Bağımsızlar")
+RIGHT_1963 = ("valid", *PARTIES_1963)
+COUNTS_1963 = ("registered", "voters", "valid")
+ERRATA_1963 = {
+    (1174, "registered", 17475): 174715,
+    (1174, "registered", 31487): 61487,
+    (1174, "registered", 20795): 10795,
+    (1174, "registered", 18264): 18624,
+}
+NOT_ILCE = {("01", "Mustafabeyli"), ("42", "Akçaşehir"), ("44", "Erkenek")}
+NAMES_1963 = {(796, 3): "Çukurca Şehir", (602, 1): "Elazığ Şehir", (604, 1): "Elazığ Şehir"}
+
+
+def runs(mask: np.ndarray, gap: int = 3) -> list[tuple[int, int]]:
+    out: list[list[int]] = []
+    for i in np.flatnonzero(mask):
+        if out and i - out[-1][1] <= gap:
+            out[-1][1] = int(i)
+        else:
+            out.append([int(i), int(i)])
+    return [(a, b) for a, b in out]
+
+
+def png(image: Image.Image) -> bytes:
+    buffer = io.BytesIO()
+    image.save(buffer, "PNG")
+    return buffer.getvalue()
+
+
+def image_1963(number: int) -> Image.Image:
+    image = PARSED / "img63" / f"{number}.png"
+    if not image.exists():
+        image.parent.mkdir(parents=True, exist_ok=True)
+        subprocess.run(
+            [
+                "pdftoppm",
+                "-r",
+                "100",
+                "-gray",
+                "-png",
+                "-f",
+                str(number),
+                "-l",
+                str(number),
+                "-singlefile",
+                str(raw.cached(SOURCE, url(1963)).path),
+                str(image.with_suffix("")),
+            ],
+            check=True,
+        )
+    return Image.open(image).convert("L")
+
+
+def digits(crop: Image.Image, passes: tuple[tuple[bool, str, int], ...]) -> list[int | None]:
+    out: list[int | None] = []
+    for binary, psm, scale in passes:
+        image = crop.point(lambda v: 0 if v < 165 else 255) if binary else crop
+        image = image.resize((image.width * scale, image.height * scale), Image.Resampling.LANCZOS)
+        padded = Image.new("L", (image.width + 40, image.height + 40), 255)
+        padded.paste(image, (20, 20))
+        text = subprocess.run(
+            ["tesseract", "stdin", "stdout", "--psm", psm, "-l", "eng", "-c", "tessedit_char_whitelist=0123456789"],
+            input=png(padded),
+            capture_output=True,
+            check=True,
+        ).stdout.decode()
+        found = re.sub(r"\D", "", text)
+        out.append(int(found) if found else None)
+    return out
+
+
+def sheet_1963(number: int, columns: tuple[str, ...], fixed: dict | None = None) -> dict:
+    gray = image_1963(number)
+    if fixed is None:
+        small = gray.resize((gray.width // 4, gray.height // 4))
+        best, angle = -1.0, 0.0
+        for step in range(-40, 41):
+            ink = np.asarray(small.rotate(step / 20, fillcolor=255, resample=Image.Resampling.BILINEAR)) < 140
+            score = float((ink.sum(axis=1).astype(np.float64) ** 2).sum())
+            if score > best:
+                best, angle = score, step / 20
+    else:
+        angle = fixed["angle"]
+    gray = gray.rotate(angle, fillcolor=255, resample=Image.Resampling.BICUBIC)
+    ink = np.asarray(gray) < 140
+    if fixed is None:
+        height, width = ink.shape
+        lines = ink[:, int(width * 0.1) : int(width * 0.9)].mean(axis=1)
+        rules = [r for r in runs(lines > 0.4) if r[0] < height * 0.35]
+        if len(rules) < 2:
+            raise ValueError(f"page {number}: rules {rules}")
+        top, head = rules[0], rules[-1]
+        floor = [r for r in runs(lines > 0.4) if r[0] > height * 0.8]
+        body0, body1 = head[1] + 4, (floor[0][0] - 5 if floor else int(height * 0.97))
+        edge = ink.mean(axis=0) > 0.5
+        x0, x1 = max(runs(ink[head[0] - 2 : head[1] + 3].any(axis=0) & ~edge, 60), key=lambda r: r[1] - r[0])
+        scores = []
+        for block, scale in (
+            (ink[top[1] + 3 : head[0] - 2, x0 + 25 : x1 - 25], max(head[0] - top[1], 1) / 2.5),
+            (ink[body0:body1, x0 + 25 : x1 - 25], 400),
+        ):
+            block = block | np.roll(block, 1, axis=1) | np.roll(block, -1, axis=1) | np.roll(block, 2, axis=1)
+            longest = np.zeros(block.shape[1], dtype=np.int32)
+            current = np.zeros(block.shape[1], dtype=np.int32)
+            for row in block:
+                current = np.where(row, current + 1, 0)
+                longest = np.maximum(longest, current)
+            scores.append(longest / scale)
+        score = np.maximum(*scores)
+        peaks = [(float(score[a : b + 1].max()), (a + b) // 2 + x0 + 25) for a, b in runs(score > 0.15, 6)]
+        shares = (
+            (0.177, 0.290, 0.403, 0.516, 0.629, 0.742, 0.855) if columns == RIGHT_1963 else (0.338, 0.522, 0.636, 0.820)
+        )
+        edges = [x0]
+        for x in (x0 + (x1 - x0) * share for share in shares):
+            near = [(abs(p - x) - v * 10, p) for v, p in peaks if abs(p - x) <= 40]
+            edges.append(int(min(near)[1]) if near else round(x))
+        edges.append(x1)
+        start = 1 if columns == LEFT_1963 else 0
+        marks = []
+        for index, (a, b) in enumerate(itertools.pairwise(edges[start:])):
+            column = ink[body0:body1, a + 12 : b - 12].sum(axis=1)
+            for s, e in runs(column >= 3, 2):
+                if 24 <= e - s <= 62 and column[s : e + 1].sum() >= 60:
+                    marks.append(((s + e) / 2 + body0, s + body0, e + body0, index))
+        clusters: list[list[tuple]] = []
+        for mark in sorted(marks):
+            if clusters and mark[0] - np.mean([m[0] for m in clusters[-1]]) <= 14:
+                clusters[-1].append(mark)
+            else:
+                clusters.append([mark])
+        spans = [
+            (int(np.median([m[1] for m in cluster])), int(np.median([m[2] for m in cluster])))
+            for cluster in clusters
+            if len(cluster) >= 2 and any(m[3] == 0 for m in cluster)
+        ]
+    else:
+        edges, spans, body0, body1 = fixed["edges"], fixed["spans"], 0, 0
+    rows = []
+    for a, b in spans:
+        cells = {}
+        for i, label in enumerate(columns):
+            if label == "name":
+                continue
+            x0, y0, x1, y1 = edges[i] + 9, a - 6, edges[i + 1] - 9, b + 6
+            part = ink[y0:y1, x0:x1]
+            if part.sum() < 25:
+                cells[label] = ("blank", None)
+                continue
+            ys, xs = np.nonzero(part)
+            if ys.max() - ys.min() <= 9 and xs.max() - xs.min() >= 14:
+                cells[label] = ("dash", None)
+                continue
+            cells[label] = (
+                "ink",
+                gray.crop(
+                    (x0 + int(xs.min()) - 6, y0 + int(ys.min()) - 6, x0 + int(xs.max()) + 7, y0 + int(ys.max()) + 7)
+                ),
+            )
+        rows.append({"y": [a, b], "cells": cells})
+    return {"angle": angle, "edges": edges, "body": [body0, body1], "rows": rows, "gray": gray}
+
+
+def spread_1963(left: int, table: str) -> dict:
+    sides = [sheet_1963(left, LEFT_1963), sheet_1963(left + 1, RIGHT_1963)]
+    page, edges = sides[0], sides[0]["edges"]
+    tsv = subprocess.run(
+        ["tesseract", "stdin", "stdout", "--psm", "6", "-l", "tur", "tsv"],
+        input=png(page["gray"].crop((max(edges[0] - 70, 0), page["body"][0], edges[1] - 6, page["body"][1]))),
+        capture_output=True,
+        check=True,
+    ).stdout.decode()
+    words: dict[tuple, list] = {}
+    for line in tsv.splitlines()[1:]:
+        f = line.split("\t")
+        if len(f) >= 12 and f[0] == "5" and f[11].strip():
+            words.setdefault((f[2], f[3], f[4]), []).append(
+                (int(f[7]) + page["body"][0] + int(f[9]) / 2, int(f[6]), f[11])
+            )
+    centers = [(r["y"][0] + r["y"][1]) / 2 for r in page["rows"]]
+    for record in page["rows"]:
+        record["name"] = ""
+    for found in sorted(words.values(), key=lambda ws: sum(w[0] for w in ws) / len(ws)):
+        text = " ".join(w[2] for w in sorted(found, key=lambda w: w[1]))
+        if centers and re.search(r"[A-Za-zÇĞİÖŞÜçğıöşü]{2}", text):
+            y = sum(w[0] for w in found) / len(found)
+            record = page["rows"][min(range(len(centers)), key=lambda i: abs(centers[i] - y))]
+            record["name"] = (record["name"] + " " + text).strip()
+    jobs = [
+        (record, label, crop)
+        for side in sides
+        for record in side["rows"]
+        for label, (kind, crop) in record["cells"].items()
+    ]
+    passes = ((False, "7", 1), (False, "7", 2), (False, "8", 1))
+    with ThreadPoolExecutor(12) as pool:
+        reads = list(pool.map(lambda job: digits(job[2], passes) if job[2] is not None else [], jobs))
+    for (record, label, crop), found in zip(jobs, reads, strict=True):
+        kind = record["cells"][label][0]
+        if kind == "ink" and all(r is None for r in found) and crop.width > 2.2 * crop.height:
+            found = [0, "wide"]
+        record["cells"][label] = [None] if kind == "blank" else [0] if kind == "dash" else found
+    lrows, rrows = sides[0]["rows"], sides[1]["rows"]
+    lc = [(r["y"][0] + r["y"][1]) / 2 for r in lrows]
+    rc = [(r["y"][0] + r["y"][1]) / 2 for r in rrows]
+    best, scale, shift = -1.0, 1.0, 0.0
+    for k in range(-12, 13):
+        for d in range(-450, 451, 3):
+            hits = (
+                (sum(min(abs(a * (1 + k / 400) + d - b) for b in rc) < 10 for a in lc) if rc else 0)
+                - abs(d) / 2000
+                - abs(k) / 200
+            )
+            if hits > best:
+                best, scale, shift = hits, 1 + k / 400, d
+    lc = [a * scale + shift for a in lc]
+    n, m = len(lc), len(rc)
+    score = [[0] * (m + 1) for _ in range(n + 1)]
+    for i in range(n - 1, -1, -1):
+        for j in range(m - 1, -1, -1):
+            score[i][j] = max(
+                score[i + 1][j], score[i][j + 1], score[i + 1][j + 1] + 1 if abs(lc[i] - rc[j]) < 25 else 0
+            )
+    rows = []
+    i = j = 0
+    while i < n and j < m:
+        if abs(lc[i] - rc[j]) < 25 and score[i][j] == score[i + 1][j + 1] + 1:
+            rows.append(
+                {
+                    "name": lrows[i]["name"],
+                    "ly": lrows[i]["y"],
+                    "ry": rrows[j]["y"],
+                    **lrows[i]["cells"],
+                    **rrows[j]["cells"],
+                }
+            )
+            i, j = i + 1, j + 1
+        elif score[i][j] == score[i + 1][j]:
+            print(f"1963 page {left}: left row at {lrows[i]['y']} unmatched")
+            i += 1
+        else:
+            print(f"1963 page {left + 1}: right row at {rrows[j]['y']} unmatched")
+            j += 1
+    return {
+        "left": left,
+        "table": table,
+        "angles": [sides[0]["angle"], sides[1]["angle"]],
+        "edges": [sides[0]["edges"], sides[1]["edges"]],
+        "rows": rows,
+        "counts": [n, m],
+    }
+
+
+def choose_1963(row: dict) -> dict:
+    tallies = {
+        label: Counter(r for r in row.get(label, [None]) if isinstance(r, int)) for label in LEFT_1963[1:] + RIGHT_1963
+    }
+    agreed = {
+        label: bool(found) and (found.most_common(1)[0][1] >= 2 or row.get(label) in ([0], [0, "wide"]))
+        for label, found in tallies.items()
+    }
+    pick = {label: [v for v, _ in found.most_common()] for label, found in tallies.items()}
+    choice = {label: (found[0] if found else None) for label, found in pick.items()}
+    status = "unsure"
+    if None not in (choice[label] for label in RIGHT_1963) and choice["valid"] == sum(choice[p] for p in PARTIES_1963):
+        status = "sum"
+    else:
+        spread = [pick[label] or [None] for label in RIGHT_1963]
+        hits = []
+        if spread[0][0] is not None and sum(len(s) > 1 for s in spread) <= 6:
+            hits = [c for c in itertools.product(*spread) if None not in c and c[0] == sum(c[1:])]
+        if len(hits) == 1:
+            choice.update(zip(RIGHT_1963, hits[0], strict=True))
+            status = "sum"
+        elif all(agreed[label] for label in RIGHT_1963):
+            status = "agreed"
+    unsure = [label for label, ok in agreed.items() if not ok]
+    if status == "sum":
+        unsure = [label for label in unsure if label in LEFT_1963]
+    return {"values": choice, "status": status, "unsure": unsure}
+
+
 def parse() -> None:
     pdf = str(raw.cached(SOURCE, url(1973)).path)
     rows, values, mayors = [], [], []
@@ -537,6 +830,222 @@ def parse() -> None:
                 row["district"] = None
             else:
                 row["district"] = district
+    seq = 0
+    book = raw.cached(SOURCE, url(1963)).path
+    layer = subprocess.run(["pdftotext", "-layout", str(book), "-"], capture_output=True, check=True).stdout.decode()
+    candidates = [
+        number
+        for number, text in enumerate(layer.split("\f")[:-1], 1)
+        if number >= 9
+        and not re.search(
+            r"MUHTAR|M U H T A R|HEYET|IHTIYAR|İHTİYAR|ÎHTÎYAR",
+            " ".join(" ".join(text.split("\n")[:8]).split())[:140].upper(),
+        )
+    ]
+    cached = PARSED / "titles63.json"
+    titles = json.loads(cached.read_text()) if cached.exists() else {}
+
+    def strip(number: int) -> tuple[int, str]:
+        image = image_1963(number)
+        found = subprocess.run(
+            ["tesseract", "stdin", "stdout", "--psm", "6", "-l", "tur"],
+            input=png(image.crop((0, 0, image.width, int(image.height * 0.13)))),
+            capture_output=True,
+            check=True,
+        ).stdout.decode()
+        return number, " ".join(found.split())
+
+    with ThreadPoolExecutor(8) as pool:
+        for number, text in pool.map(strip, [n for n in candidates if str(n) not in titles]):
+            titles[str(number)] = text
+    PARSED.mkdir(parents=True, exist_ok=True)
+    cached.write_text(json.dumps(titles, ensure_ascii=False))
+    heads = {int(number): text.upper().replace("Î", "İ") for number, text in titles.items()}
+
+    def left_role(text: str) -> str | None:
+        if re.search(r"MUHTAR|HEYET|İHTİYAR|IHTIYAR", text):
+            return "muhtar"
+        if "GENEL" in text:
+            return "genel"
+        if re.search(r"BELED.YE\s*M.CL", text):
+            return "meclis"
+        return "mayor" if re.search(r"BELED.YE", text) else None
+
+    def right_role(text: str) -> str | None:
+        if re.search(r"BAŞKAN|BASKAN", text):
+            return "mayor"
+        if re.search(r"ÜYELER|UYELER", text):
+            return "meclis"
+        return "R" if re.search(r"MECL.S|SEÇİMİ|SONUÇ|ALINAN", text) else None
+
+    starts: list[tuple[int, str | None, str | None]] = []
+    number = min(heads)
+    while number <= max(heads):
+        lt, rt = left_role(heads.get(number, "")), right_role(heads.get(number + 1, ""))
+        if lt in TABLES_1963 or (rt is not None and starts and starts[-1][0] == number - 2):
+            starts.append((number, lt, rt))
+            number += 2
+        else:
+            number += 1
+    spreads_1963: list[tuple[int, int, str]] = []
+    plate, previous = 0, None
+    for index, (number, lt, rt) in enumerate(starts):
+        if index == 0 or starts[index - 1][0] != number - 2:
+            plate += 1
+            previous = None
+        table = lt if lt in TABLES_1963 else rt if rt in ("mayor", "meclis") else previous
+        if lt in TABLES_1963 and rt in ("mayor", "meclis") and rt != lt:
+            print(f"1963 spread {number}: left page {lt}, right page {rt}, left out")
+        else:
+            spreads_1963.append((plate, number, table))
+        previous = table
+    folder = PARSED / "cells63"
+    folder.mkdir(parents=True, exist_ok=True)
+    rereads = ((True, "7", 3), (False, "6", 2), (True, "8", 2))
+    grouped_1963: dict[tuple[int, str], list[dict]] = {}
+    for plate, number, table in spreads_1963:
+        target = folder / f"{number}.json"
+        if not target.exists():
+            try:
+                found = spread_1963(number, table)
+            except ValueError as error:
+                print(f"1963 spread {number} ({table}) not read: {error}")
+                continue
+            target.write_text(json.dumps(found, ensure_ascii=False))
+        data = json.loads(target.read_text())
+        if 0 in data["counts"]:
+            print(f"1963 spread {number} ({table}): rows found {data['counts']}, left out")
+            continue
+        if not data.get("reread"):
+            wanted = [row for row in data["rows"] if choose_1963(row)["status"] != "sum"]
+            jobs = []
+            for side, columns, key in ((0, LEFT_1963, "ly"), (1, RIGHT_1963, "ry")):
+                sheet = sheet_1963(
+                    number + side,
+                    columns,
+                    {"angle": data["angles"][side], "edges": data["edges"][side], "spans": [r[key] for r in wanted]},
+                )
+                for row, record in zip(wanted, sheet["rows"], strict=True):
+                    jobs += [
+                        (row, label, crop)
+                        for label, (kind, crop) in record["cells"].items()
+                        if kind == "ink" and "wide" not in row[label]
+                    ]
+            with ThreadPoolExecutor(12) as pool:
+                found = list(pool.map(lambda job: digits(job[2], rereads), jobs))
+            for (row, label, _), reads in zip(jobs, found, strict=True):
+                row[label] = row[label] + reads
+            data["reread"] = True
+            target.write_text(json.dumps(data, ensure_ascii=False))
+        grouped_1963.setdefault((plate, table), []).append(data)
+    sizes: dict[int, tuple[int, int]] = {}
+    for (plate, table), parts in grouped_1963.items():
+        district, first = None, True
+        for data in parts:
+            for position, row in enumerate(data["rows"]):
+                printed = unicodedata.normalize("NFC", NAMES_1963.get((data["left"], position), row["name"]))
+                text = re.sub(r"[^A-Za-zÇĞİÖŞÜçğıöşüâîûÂÎÛ,.()\- ]", " ", printed)
+                if "itiraz" in text.lower():
+                    continue
+                picked = choose_1963(row)
+                values_1963 = picked["values"]
+                for (page, label, old), new in ERRATA_1963.items():
+                    if page == data["left"] and values_1963[label] == old:
+                        values_1963[label] = new
+                name, alias, bucak = tidy(re.sub(r"\(\s*B\s*\.\s*L\s*\.?\s*\)", "(B.M.)", text))
+                words = name.split()
+                level = "district"
+                town = next(
+                    (
+                        index
+                        for index, word in enumerate(words)
+                        if (index and re.fullmatch(r"[ŞS][EeHh][EeHhIiİırR]{0,4}[.,]?", word)) or "Şehir" in word
+                    ),
+                    None,
+                )
+                if ("TOPLAM" in text.upper() and town is None and "BUCAK" not in text.upper()) or (first and not words):
+                    level, name = "province", ""
+                elif words[:1] == ["Bucak"] and table == "genel" and "İlcesi" not in words:
+                    name = ""
+                elif town is not None:
+                    name = " ".join([*words[:town], re.split(r"[ŞS][EeHh]", words[town])[0]]).strip()
+                else:
+                    for index, word in enumerate(words):
+                        stem = word.strip(",.").lower().replace("i̇", "i")
+                        if stem in ("ilcesi", "ilçesi", "ilcegi", "ilçegi"):
+                            name = " ".join(words[:index])
+                            break
+                        if stem in ("bucağı", "bucagı", "köyü", "kasabası", "koyu", "nahiyesi"):
+                            name, bucak = " ".join(words[:index]), True
+                            break
+                if level != "province":
+                    if bucak:
+                        level = "belde"
+                    if norm(name) == norm(PROVINCES[plate - 1]):
+                        name = "Merkez"
+                    if level == "district":
+                        district = name
+                first = False
+                unsure = picked["unsure"]
+                counts = [values_1963[label] for label in COUNTS_1963]
+                accounting = (
+                    None not in counts
+                    and not any(label in unsure for label in COUNTS_1963)
+                    and counts[0] >= counts[1] >= counts[2]
+                )
+                seq += 1
+                rows.append(
+                    {
+                        "year": 1963,
+                        "table": TABLES_1963[table],
+                        "seq": seq,
+                        "plate": plate,
+                        "level": level,
+                        "district": district if level == "belde" else None,
+                        "name": name,
+                        "alias": alias,
+                        "bucak": bucak,
+                        "unresolved": [label for label in PARTIES_1963 if label in unsure],
+                        "accounting": accounting,
+                        "printed": printed,
+                        "page": data["left"],
+                    }
+                )
+                for label in [*COUNTS_1963, *PARTIES_1963]:
+                    if values_1963[label] is None or label in unsure or (label in COUNTS_1963 and not accounting):
+                        continue
+                    side = 0 if label in LEFT_1963 else 1
+                    columns = LEFT_1963 if side == 0 else RIGHT_1963
+                    edges = data["edges"][side]
+                    column = columns.index(label)
+                    top, bottom = row["ly" if side == 0 else "ry"]
+                    page = data["left"] + side
+                    if page not in sizes:
+                        sizes[page] = image_1963(page).size
+                    width, height = sizes[page]
+                    angle = math.radians(data["angles"][side])
+                    corners = [
+                        (
+                            width / 2 + (x - width / 2) * math.cos(angle) - (y - height / 2) * math.sin(angle),
+                            height / 2 + (x - width / 2) * math.sin(angle) + (y - height / 2) * math.cos(angle),
+                        )
+                        for x in (edges[column] + 9, edges[column + 1] - 9)
+                        for y in (top - 6, bottom + 6)
+                    ]
+                    values.append(
+                        {
+                            "year": 1963,
+                            "table": TABLES_1963[table],
+                            "seq": seq,
+                            "column": label,
+                            "value": values_1963[label],
+                            "page": page,
+                            "x0": round(max(min(c[0] for c in corners) / width, 0), 6),
+                            "y0": round(max(min(c[1] for c in corners) / height, 0), 6),
+                            "x1": round(min(max(c[0] for c in corners) / width, 1), 6),
+                            "y1": round(min(max(c[1] for c in corners) / height, 1), 6),
+                        }
+                    )
     PARSED.mkdir(parents=True, exist_ok=True)
     pl.DataFrame(rows, infer_schema_length=None).write_parquet(PARSED / "rows.parquet")
     pl.DataFrame(values, infer_schema_length=None).write_parquet(PARSED / "values.parquet")
@@ -546,18 +1055,38 @@ def parse() -> None:
 DAY_1973 = date(1973, 12, 9)
 PUBLISHER = "Devlet İstatistik Enstitüsü"
 TITLE_1973 = "9 Aralık 1973 Mahalli Seçimler Sonuçları (DİE yayın no. 716)"
+DAY_1963 = date(1963, 11, 17)
+TITLE_1963 = "17 Kasım 1963 Mahalli Seçimler Sonuçları (DİE yayın no. 474)"
 LICENSE = (
     "Official statistics published by the State Institute of Statistics under Laws 286, 306, and 307; served by "
     "TÜİK's library, which states no license, retrieved through the Wayback Machine."
 )
-SPELLINGS_1973 = {"Cay": "Çay", "Yemce": "Yenice", "Sanz": "Sarız", "Derinkaya": "Derinkuyu"}
-KEYS_1973 = {
+SPELLINGS_1973 = {
+    "Cay": "Çay",
+    "Cav": "Çay",
+    "Yemce": "Yenice",
+    "Sanz": "Sarız",
+    "Derinkaya": "Derinkuyu",
+    "Gençilcesi": "Genç",
+    "Ilıç": "İliç",
+    "Gercuş": "Gercüş",
+    "Beytüşşebab": "Beytüşşebap",
+    "A. Karahisar": "Merkez",
+    "A. KARAHİSAR": "Merkez",
+    "Maraş": "Merkez",
+    "Içel": "Merkez",
+    "İçel": "Merkez",
+}
+KEYS = {
     "AP": "adalet-partisi-1961",
     "CHP": "cumhuriyet-halk-partisi",
     "CGP": "cumhuriyetci-guven-partisi",
     "DP": "demokratik-parti",
     "MP": "millet-partisi-1962",
     "MHP": "cumhuriyetci-koylu-millet-partisi",
+    "CKMP": "cumhuriyetci-koylu-millet-partisi",
+    "TİP": "turkiye-isci-partisi-1961",
+    "YTP": "yeni-turkiye-partisi-1961",
     "MSP": "milli-selamet-partisi",
     "TBP": "turkiye-birlik-partisi",
     "Bağımsızlar": None,
@@ -573,6 +1102,21 @@ METHOD_1973 = (
     "consolidation reports of the provincial and ilçe election boards unchanged, so party votes do not always add "
     "up to the valid votes. The book's text layer and a second optical reading were checked cell by cell against "
     "each party's printed share of the valid votes; a count that could not be confirmed that way is left out."
+)
+METHOD_1963 = (
+    "From the State Institute of Statistics' book of the 17 November 1963 local elections, which prints the "
+    "provincial and ilçe election boards' counts without shares, so party votes do not always add up to the valid "
+    "votes. Every count was read from the page image by optical recognition, three to six times, and a row was "
+    "taken as read where the readings agree or where exactly one combination of them makes the party votes add up "
+    "to the valid votes; a count whose readings disagree is left out. The book's errata are applied."
+)
+UNREAD_1963 = (
+    "Some party counts in this row of the book could not be read with confidence, so they are left out and the "
+    "stored party votes do not add up to the valid votes. Counts left out: {labels}."
+)
+GAP_1963 = (
+    "The party votes in this row of the book do not add up to the valid votes it prints, so both are stored as "
+    "printed. Party votes {votes:,}, valid votes {valid:,}."
 )
 UNREAD_1973 = (
     "Some counts in this row of the book could not be read with confidence ({labels}), so they are left out and "
@@ -604,17 +1148,17 @@ SUSPECT_1973 = (
 
 
 def emit() -> Path:
-    rows = pl.read_parquet(PARSED / "rows.parquet")
-    values = pl.read_parquet(PARSED / "values.parquet")
-    mayors = {row["seq"]: row for row in pl.read_parquet(PARSED / "mayors.parquet").iter_rows(named=True)}
+    parsed_rows = pl.read_parquet(PARSED / "rows.parquet")
+    parsed_values = pl.read_parquet(PARSED / "values.parquet")
+    parsed_mayors = pl.read_parquet(PARSED / "mayors.parquet")
     measures = {"registered": REGISTERED, "voters": VOTERS, "valid": VALID}
     with connect() as conn:
         cs = Changeset(
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Turkey's 9 December 1973 local elections by province, ilçe, and municipality, with mayors' names, "
-            "from the State Institute of Statistics",
+            summary="Turkey's 17 November 1963 and 9 December 1973 local elections by province, ilçe, and "
+            "municipality, with the 1973 mayors' names, from the State Institute of Statistics",
             polity="TR",
         )
         turkey = cs.polity("TR")
@@ -622,169 +1166,16 @@ def emit() -> Path:
         def name(entity: UUID, text: str, lang: str = "tr", kind: str = "official") -> None:
             cs.add("name", entity_id=entity, text=text, lang=lang, kind=kind, is_preferred=kind == "official")
 
-        book = raw.cached(SOURCE, url(1973))
-        source = cs.source(PUBLISHER, TITLE_1973)
-        cs.add(
-            "source",
-            id=source,
-            kind="official_body",
-            publisher=PUBLISHER,
-            title=TITLE_1973,
-            url=url(1973),
-            license=LICENSE,
-        )
-        artifact = cs.artifact(book, source)
-        page_ids = {}
-        for number in sorted({*values["page"].unique().to_list(), *(row["page"] for row in mayors.values())}):
-            image = PAGES / f"{book.sha256}-{number}.png"
-            if not image.exists():
-                PAGES.mkdir(parents=True, exist_ok=True)
-                subprocess.run(
-                    [
-                        "pdftoppm",
-                        "-r",
-                        "100",
-                        "-png",
-                        "-f",
-                        str(number),
-                        "-l",
-                        str(number),
-                        "-singlefile",
-                        str(book.path),
-                        str(image.with_suffix("")),
-                    ],
-                    check=True,
-                )
-            width, height = struct.unpack(">II", image.read_bytes()[16:24])
-            page_ids[number] = cs.page(artifact, number)
-            cs.add(
-                "source_page",
-                id=page_ids[number],
-                artifact_id=artifact,
-                page_number=number,
-                image_key=f"pages/{SOURCE}/{image.name}",
-                width=width,
-                height=height,
-            )
-
         equals = dict(
             conn.execute(
                 "select area_id, id from reporting_unit where scheme_code = 'tr.ilce' and area_relation = 'equals'"
             ).fetchall()
         )
-        named_areas: dict[str, dict[str, set[UUID]]] = {}
-        current_names: dict[str, dict[str, set[UUID]]] = {}
-        for area, text, start, end, plate_code in conn.execute(
-            """select a.id, n.text, n.valid_from, n.valid_to, pc.code from area a
-               join name n on n.entity_id = a.id and n.lang = 'tr'
-               join area_parent ap on ap.area_id = a.id
-               join area p on p.id = ap.parent_id and p.scheme_code = 'tr.il'
-               join area_code pc on pc.area_id = p.id
-               where a.scheme_code = 'tr.ilce'"""
-        ).fetchall():
-            named_areas.setdefault(plate_code, {}).setdefault(norm(text), set()).add(area)
-            if (start is None or start <= DAY_1973) and (end is None or end > DAY_1973):
-                current_names.setdefault(plate_code, {}).setdefault(norm(text), set()).add(area)
         matched: list[str] = []
         minted_ilce: list[str] = []
-        resolved: dict[tuple[str, str], tuple[UUID, str]] = {}
-
-        def trims(label: str) -> list[str]:
-            words = label.split()
-            out = []
-            for start in range(len(words)):
-                for end in range(len(words), start, -1):
-                    out.append(" ".join(words[start:end]))
-            return out
-
-        def variants(text: str) -> list[str]:
-            out = [SPELLINGS_1973.get(text, text)]
-            for old, replacement in (("ı", "r"), (" ", ""), ("Ş. ", "Şerefli"), ("M. ", "Mustafa")):
-                out += [v.replace(old, replacement) for v in out if old in v]
-            out += [v[0].replace("I", "İ") + v[1:] for v in out if v.startswith("I")]
-            out += [v[0].replace("İ", "I") + v[1:] for v in out if v.startswith("İ")]
-            out += [v.replace("Ş. Karahisar", "Şebinkarahisar") for v in out if "Ş. Karahisar" in v]
-            return list(dict.fromkeys(out))
-
-        def lookup(plate: str, label: str, alias: str | None, strict: bool = False) -> tuple[UUID, str] | None:
-            later = [f"{n:02}" for n in range(68, 82)]
-            tables = (current_names,) if strict else (current_names, named_areas)
-            texts = [*trims(label), *([alias] if alias else [])]
-            for allowed in ([plate], later):
-                for text in texts:
-                    for variant in variants(text):
-                        form = norm(variant)
-                        if form == "MERKEZ":
-                            form = norm(f"{PROVINCES[int(plate) - 1]} Merkez")
-                        form = ILCE_ALIASES.get((plate, form), form)
-                        for table_ in tables:
-                            for candidate in (form, f"{form} MERKEZ"):
-                                found = {a for code in allowed for a in table_.get(code, {}).get(candidate, set())}
-                                if len(found) == 1:
-                                    return next(iter(found)), text
-            for table_ in tables:
-                for text in trims(label):
-                    best: dict[tuple[str, str], float] = {}
-                    for variant in variants(text):
-                        for code in [plate, *later]:
-                            for other in table_.get(code, {}):
-                                ratio = difflib.SequenceMatcher(None, norm(variant), other).ratio()
-                                best[(other, code)] = max(ratio, best.get((other, code), 0))
-                    scored = sorted((ratio, other, code) for (other, code), ratio in best.items())
-                    if (
-                        scored
-                        and scored[-1][0] >= (0.85 if strict else 0.8)
-                        and (len(scored) < 2 or scored[-2][0] < scored[-1][0])
-                    ):
-                        found = table_[scored[-1][2]][scored[-1][1]]
-                        if len(found) == 1:
-                            matched.append(f"{plate} {label} -> {scored[-1][1]}")
-                            return next(iter(found)), text
-            return None
-
-        def ilce(plate: str, label: str, alias: str | None) -> UUID:
-            if (plate, label) not in resolved:
-                hit = lookup(plate, label, alias)
-                if hit is None:
-                    code = f"{plate}:{title(label)}"
-                    unit = cs.unit("tr.ilce", code)
-                    if unit in cs.minted and code not in minted_ilce:
-                        minted_ilce.append(code)
-                        cs.add(
-                            "reporting_unit",
-                            id=unit,
-                            polity_id=turkey,
-                            scheme_code="tr.ilce",
-                            code=code,
-                            parent_id=None,
-                            area_relation="within",
-                            area_id=cs.area("tr.il", plate),
-                            kind="aggregate",
-                        )
-                        name(unit, title(label))
-                    resolved[(plate, label)] = (unit, label)
-                else:
-                    area, text = hit
-                    if area not in equals:
-                        code = f"{plate}:{title(text)}"
-                        equals[area] = cs.unit("tr.ilce", code)
-                        cs.add(
-                            "reporting_unit",
-                            id=equals[area],
-                            polity_id=turkey,
-                            scheme_code="tr.ilce",
-                            code=code,
-                            parent_id=None,
-                            area_relation="equals",
-                            area_id=area,
-                            kind="aggregate",
-                        )
-                        name(equals[area], title(text))
-                    resolved[(plate, label)] = (equals[area], text)
-            return resolved[(plate, label)][0]
-
         areas = {unit: area for area, unit in equals.items()}
         polities = {value for (value,) in conn.execute("select value from external_id where scheme = 'tr.polity'")}
+        offices: set[UUID] = set()
         known_units = {
             (scheme, code)
             for scheme, code in conn.execute(
@@ -792,12 +1183,9 @@ def emit() -> Path:
             ).fetchall()
         }
         mayoral = cs.key("tr.electoral_system", "mayor")
-        local = cs.key("tr.election", f"{DAY_1973}:local")
-        if {mayoral, local} & cs.minted:
-            raise ValueError("publish tr.ysk_local before tr.die_local")
         parties: dict[str, UUID] = {}
         party_names: dict[str, str] = {}
-        for label, key in KEYS_1973.items():
+        for label, key in KEYS.items():
             if key is not None:
                 parties[label] = cs.key("tr.party", key)
                 if parties[label] in cs.minted:
@@ -807,374 +1195,558 @@ def emit() -> Path:
                        where x.scheme = 'tr.party' and x.value = %s order by n.valid_from desc nulls last limit 1""",
                     [key],
                 ).fetchone()[0]
-
         cells: list[dict] = []
         located: list[dict] = []
+        seen: set[tuple[int, str, str]] = set()
 
-        def put(result_set: UUID, unit: UUID, option: UUID | None, measure: int, row: dict) -> None:
-            fact = {
-                "result_set_id": str(result_set),
-                "unit_id": str(unit),
-                "option_id": None if option is None else str(option),
-                "channel": 0,
-                "measure": measure,
-                "count_round": 0,
-            }
-            cells.append({**fact, "flags": DIGITIZED, "value": row["value"]})
-            located.append(
-                {
-                    **fact,
-                    "page_id": str(page_ids[row["page"]]),
-                    "x0": row["x0"],
-                    "y0": row["y0"],
-                    "x1": row["x1"],
-                    "y1": row["y1"],
-                }
-            )
-
-        def option_of(contest_key: str, label: str) -> UUID:
-            key = KEYS_1973[label]
-            option = cs.key("tr.option", f"{contest_key}:{key or 'independents'}")
-            if option in cs.minted:
-                raise ValueError(f"{contest_key}: no {label} option")
-            return option
-
-        def shortfall(stored: dict) -> tuple[int, int] | None:
-            valid = next((cell["value"] for column, cell in stored.items() if measures.get(column) == VALID), None)
-            votes = sum(cell["value"] for column, cell in stored.items() if column not in measures)
-            return None if valid is None or votes == valid else (int(votes), int(valid))
-
-        grouped = {(table, seq): frame for (table, seq), frame in values.group_by("table", "seq")}
-        seen: set[tuple[str, str]] = set()
-
-        def mayor_contest(row: dict, stored: dict, parts: list[str], english: str, plate: str, unit: UUID) -> None:
-            key = "-".join(parts)
-            path = "tr/" + "/".join(parts)
-            polity = cs.key("tr.polity", key)
-            office = cs.key("tr.office", f"{key}-mayor")
-            if key not in polities:
-                polities.add(key)
-                cs.add("polity", id=polity, kind="municipality", iso_code=None)
-                name(polity, f"{english} Municipality", "en")
-                name(polity, f"{english} Belediyesi", kind="native")
-                cs.add("polity_parent", polity_id=polity, parent_id=turkey)
-                cs.add("slug", path=path, entity_id=polity)
-            if office in cs.minted:
-                cs.add("office", id=office, polity_id=polity, kind="mayor")
-                name(office, f"Mayor of {english}", "en")
-                name(office, f"{english} Belediye Başkanı", kind="native")
-            election = cs.key("tr.election", f"{DAY_1973}:{key}-mayor")
+        def load(year: int, day: date, title_text: str, method: str) -> None:
+            rows = parsed_rows.filter(pl.col("year") == year)
+            values = parsed_values.filter(pl.col("year") == year)
+            mayors = {row["seq"]: row for row in parsed_mayors.filter(pl.col("year") == year).iter_rows(named=True)}
+            book = raw.cached(SOURCE, url(year))
+            source = cs.source(PUBLISHER, title_text)
             cs.add(
-                "election",
-                id=election,
-                polity_id=polity,
-                parent_id=local,
-                kind="local",
-                date_from=DAY_1973,
-                date_to=DAY_1973,
-                status="held",
+                "source",
+                id=source,
+                kind="official_body",
+                publisher=PUBLISHER,
+                title=title_text,
+                url=url(year),
+                license=LICENSE,
             )
-            name(election, f"1973 {english} mayoral election", "en")
-            name(election, f"1973 {english} Belediye Başkanlığı Seçimi", kind="native")
-            cs.add("slug", path=f"{path}/{DAY_1973}-local", entity_id=election)
-            contest_key = f"{DAY_1973}:{key}-mayor"
-            contest = cs.key("tr.contest", contest_key)
-            district = current.get(plate, "Merkez")
-            cs.add(
-                "contest",
-                id=contest,
-                election_id=election,
-                kind="office",
-                office_id=office,
-                district_area_id=areas.get(ilce(plate, district, None)) or cs.area("tr.il", plate),
-                magnitude=1,
-                round_number=1,
-                electoral_system_id=mayoral,
-                default_result_kind="counted",
-            )
-            name(contest, f"Mayor of {english}", "en")
-            cs.add("slug", path=f"{path}/{DAY_1973}-local/mayor", entity_id=contest)
-            declared = cs.key(f"{SOURCE}.result_set", contest_key)
-            cs.add(
-                "result_set",
-                id=declared,
-                election_id=election,
-                contest_id=contest,
-                stage="official",
-                kind="counted",
-                status="active",
-                source_id=source,
-                is_default=True,
-                completeness=1,
-            )
-            cs.add("note", entity_id=declared, kind="methodology", body_md=METHOD_1973)
-            if row["unresolved"]:
-                cs.add(
-                    "note",
-                    entity_id=declared,
-                    kind="caveat",
-                    body_md=UNREAD_1973.format(labels=", ".join(row["unresolved"])),
-                )
-            if not row["accounting"]:
-                cs.add("note", entity_id=declared, kind="caveat", body_md=NO_ACCOUNTING_1973)
-            elif not row["unresolved"] and (gap := shortfall(stored)) is not None:
-                cs.add("note", entity_id=declared, kind="caveat", body_md=GAP_1973.format(votes=gap[0], valid=gap[1]))
-            options: dict[str, UUID] = {}
-
-            def option(label: str) -> UUID:
-                owner = KEYS_1973[label]
-                tag = "independents" if owner is None else owner
-                if tag not in options:
-                    options[tag] = cs.key("tr.option", f"{contest_key}:{tag}")
-                    cs.add(
-                        "contest_option",
-                        id=options[tag],
-                        contest_id=contest,
-                        kind="others" if owner is None else "candidate",
-                        party_id=None if owner is None else parties[label],
-                        ballot_label="Bağımsızlar" if owner is None else party_names[label],
+            artifact = cs.artifact(book, source)
+            page_ids = {}
+            for number in sorted({*values["page"].unique().to_list(), *(row["page"] for row in mayors.values())}):
+                image = PAGES / f"{book.sha256}-{number}.png"
+                if not image.exists():
+                    PAGES.mkdir(parents=True, exist_ok=True)
+                    subprocess.run(
+                        [
+                            "pdftoppm",
+                            "-r",
+                            "100",
+                            "-png",
+                            "-f",
+                            str(number),
+                            "-l",
+                            str(number),
+                            "-singlefile",
+                            str(book.path),
+                            str(image.with_suffix("")),
+                        ],
+                        check=True,
                     )
-                return options[tag]
+                width, height = struct.unpack(">II", image.read_bytes()[16:24])
+                page_ids[number] = cs.page(artifact, number)
+                cs.add(
+                    "source_page",
+                    id=page_ids[number],
+                    artifact_id=artifact,
+                    page_number=number,
+                    image_key=f"pages/{SOURCE}/{image.name}",
+                    width=width,
+                    height=height,
+                )
 
-            for column, cell in stored.items():
-                if column in measures:
-                    put(declared, unit, None, measures[column], cell)
-                else:
-                    put(declared, unit, option(column), VOTES, cell)
-            winner = mayors.get(row["seq"])
-            if winner is None:
-                return
-            label = winner["party"]
-            person_name, _, _ = tidy(winner["mayor"])
-            if label is None:
-                cs.add("note", entity_id=declared, kind="caveat", body_md=WINNER_PARTY_1973.format(mayor=person_name))
-                return
-            if label not in KEYS_1973:
-                raise ValueError(f"{contest_key}: unknown party {label}")
-            votes = {column: cell["value"] for column, cell in stored.items() if column not in measures}
-            listed = sorted((value for column, value in votes.items() if KEYS_1973[column] is not None), reverse=True)
-            independent = KEYS_1973[label] is None
-            unread = not independent and (
-                label not in votes or any(column in KEYS_1973 for column in row["unresolved"])
-            )
-            suspect = (
-                not independent
-                and not unread
-                and (votes[label] != listed[0] or (len(listed) > 1 and listed[0] == listed[1]))
-            )
-            if independent:
-                cs.add("note", entity_id=declared, kind="caveat", body_md=INDEPENDENTS_1973.format(mayor=person_name))
-            elif unread:
-                cs.add(
-                    "note",
-                    entity_id=declared,
-                    kind="caveat",
-                    body_md=UNREAD_WINNER_1973.format(mayor=person_name, party=party_names[label]),
-                )
-            elif suspect:
-                cs.add(
-                    "note",
-                    entity_id=declared,
-                    kind="caveat",
-                    body_md=SUSPECT_1973.format(mayor=person_name, party=party_names[label]),
-                )
-            person = cs.key(f"{SOURCE}.person", f"1973:{key}")
-            if person in cs.minted:
-                cs.add("person", id=person)
-                name(person, person_name)
-            candidacy = cs.key("tr.candidacy", f"{contest_key}:1")
-            cs.add(
-                "candidacy",
-                id=candidacy,
-                person_id=person,
-                option_id=option(label),
-                role="head",
-                list_position=None,
-                ballot_name=None,
-                member_of_party_id=None,
-                is_independent=independent,
-            )
-            if not independent:
-                cs.add("candidacy_nomination", candidacy_id=candidacy, party_id=parties[label], kind="nominated")
-            if not independent and not unread and not suspect:
-                cs.add(
-                    "outcome",
-                    result_set_id=declared,
-                    option_id=option(label),
-                    candidacy_id=candidacy,
-                    kind="elected",
-                    seats=None,
-                )
-            cs.add(
-                "citation",
-                entity_id=candidacy,
-                source_id=source,
-                locator={
-                    "page_id": str(page_ids[winner["page"]]),
-                    "bbox": [winner["x0"], winner["y0"], winner["x1"], winner["y1"]],
-                },
-            )
+            named_areas: dict[str, dict[str, set[UUID]]] = {}
+            current_names: dict[str, dict[str, set[UUID]]] = {}
+            for area, text, start, end, plate_code in conn.execute(
+                """select a.id, n.text, n.valid_from, n.valid_to, pc.code from area a
+                   join name n on n.entity_id = a.id and n.lang = 'tr'
+                   join area_parent ap on ap.area_id = a.id
+                   join area p on p.id = ap.parent_id and p.scheme_code = 'tr.il'
+                   join area_code pc on pc.area_id = p.id
+                   where a.scheme_code = 'tr.ilce'"""
+            ).fetchall():
+                named_areas.setdefault(plate_code, {}).setdefault(norm(text), set()).add(area)
+                if (start is None or start <= day) and (end is None or end > day):
+                    current_names.setdefault(plate_code, {}).setdefault(norm(text), set()).add(area)
+            resolved: dict[tuple[str, str], tuple[UUID, str]] = {}
 
-        for table, contest_code in CONTESTS_1973.items():
-            contest_key = f"{DAY_1973}:{contest_code}"
-            contest = cs.key("tr.contest", contest_key)
-            if contest in cs.minted:
-                raise ValueError(f"{contest_key} is not in the archive")
-            sets = {}
-            for level in ("province", "district" if table == "il_genel" else "municipality"):
-                sets[level] = cs.key(f"{SOURCE}.result_set", f"{contest_key}:by-{level}")
+            def trims(label: str) -> list[str]:
+                words = label.split()
+                out = []
+                for start in range(len(words)):
+                    for end in range(len(words), start, -1):
+                        out.append(" ".join(words[start:end]))
+                return out
+
+            def variants(text: str) -> list[str]:
+                out = [SPELLINGS_1973.get(text, text)]
+                for old, replacement in (("ı", "r"), (" ", ""), ("Ş. ", "Şerefli"), ("M. ", "Mustafa")):
+                    out += [v.replace(old, replacement) for v in out if old in v]
+                out += [v[0].replace("I", "İ") + v[1:] for v in out if v.startswith("I")]
+                out += [v[0].replace("İ", "I") + v[1:] for v in out if v.startswith("İ")]
+                out += [v.replace("Ş. Karahisar", "Şebinkarahisar") for v in out if "Ş. Karahisar" in v]
+                return list(dict.fromkeys(out))
+
+            def lookup(plate: str, label: str, alias: str | None, strict: bool = False) -> tuple[UUID, str] | None:
+                later = [f"{n:02}" for n in range(68, 82)]
+                tables = (current_names,) if strict else (current_names, named_areas)
+                texts = [*trims(label), *([alias] if alias else [])]
+                for allowed in ([plate], later):
+                    for text in texts:
+                        for variant in variants(text):
+                            form = norm(variant)
+                            if form == "MERKEZ":
+                                form = norm(f"{PROVINCES[int(plate) - 1]} Merkez")
+                            form = ILCE_ALIASES.get((plate, form), form)
+                            for table_ in tables:
+                                for candidate in (form, f"{form} MERKEZ"):
+                                    found = {a for code in allowed for a in table_.get(code, {}).get(candidate, set())}
+                                    if len(found) == 1:
+                                        return next(iter(found)), text
+                for table_ in tables:
+                    for text in trims(label):
+                        if year == 1963 and any(
+                            norm(variant).startswith(norm(name))
+                            for variant in variants(text)
+                            for code, name in NOT_ILCE
+                            if code == plate
+                        ):
+                            continue
+                        best: dict[tuple[str, str], float] = {}
+                        for variant in variants(text):
+                            for code in [plate, *later]:
+                                for other in table_.get(code, {}):
+                                    ratio = difflib.SequenceMatcher(None, norm(variant), other).ratio()
+                                    best[(other, code)] = max(ratio, best.get((other, code), 0))
+                        scored = sorted((ratio, other, code) for (other, code), ratio in best.items())
+                        if (
+                            scored
+                            and scored[-1][0] >= (0.85 if strict else 0.8)
+                            and (len(scored) < 2 or scored[-2][0] < scored[-1][0])
+                        ):
+                            found = table_[scored[-1][2]][scored[-1][1]]
+                            if len(found) == 1:
+                                matched.append(f"{plate} {label} -> {scored[-1][1]}")
+                                return next(iter(found)), text
+                return None
+
+            def ilce(plate: str, label: str, alias: str | None) -> UUID:
+                if (plate, label) not in resolved:
+                    hit = lookup(plate, label, alias)
+                    if hit is None:
+                        code = f"{plate}:{title(label)}"
+                        unit = cs.unit("tr.ilce", code)
+                        if unit in cs.minted and code not in minted_ilce:
+                            minted_ilce.append(code)
+                            cs.add(
+                                "reporting_unit",
+                                id=unit,
+                                polity_id=turkey,
+                                scheme_code="tr.ilce",
+                                code=code,
+                                parent_id=None,
+                                area_relation="within",
+                                area_id=cs.area("tr.il", plate),
+                                kind="aggregate",
+                            )
+                            name(unit, title(label))
+                        resolved[(plate, label)] = (unit, label)
+                    else:
+                        area, text = hit
+                        if area not in equals:
+                            code = f"{plate}:{title(text)}"
+                            equals[area] = cs.unit("tr.ilce", code)
+                            cs.add(
+                                "reporting_unit",
+                                id=equals[area],
+                                polity_id=turkey,
+                                scheme_code="tr.ilce",
+                                code=code,
+                                parent_id=None,
+                                area_relation="equals",
+                                area_id=area,
+                                kind="aggregate",
+                            )
+                            name(equals[area], title(text))
+                        resolved[(plate, label)] = (equals[area], text)
+                return resolved[(plate, label)][0]
+
+            local = cs.key("tr.election", f"{day}:local")
+            if {mayoral, local} & cs.minted:
+                raise ValueError("publish tr.ysk_local before tr.die_local")
+
+            def put(result_set: UUID, unit: UUID, option: UUID | None, measure: int, row: dict) -> None:
+                fact = {
+                    "result_set_id": str(result_set),
+                    "unit_id": str(unit),
+                    "option_id": None if option is None else str(option),
+                    "channel": 0,
+                    "measure": measure,
+                    "count_round": 0,
+                }
+                cells.append({**fact, "flags": DIGITIZED, "value": row["value"]})
+                located.append(
+                    {
+                        **fact,
+                        "page_id": str(page_ids[row["page"]]),
+                        "x0": row["x0"],
+                        "y0": row["y0"],
+                        "x1": row["x1"],
+                        "y1": row["y1"],
+                    }
+                )
+
+            def option_of(contest_key: str, label: str) -> UUID:
+                key = KEYS[label]
+                option = cs.key("tr.option", f"{contest_key}:{key or 'independents'}")
+                if option in cs.minted:
+                    raise ValueError(f"{contest_key}: no {label} option")
+                return option
+
+            def shortfall(stored: dict) -> tuple[int, int] | None:
+                valid = next((cell["value"] for column, cell in stored.items() if measures.get(column) == VALID), None)
+                votes = sum(cell["value"] for column, cell in stored.items() if column not in measures)
+                return None if valid is None or votes == valid else (int(votes), int(valid))
+
+            grouped = {(table, seq): frame for (table, seq), frame in values.group_by("table", "seq")}
+
+            def mayor_contest(row: dict, stored: dict, parts: list[str], english: str, plate: str, unit: UUID) -> None:
+                key = "-".join(parts)
+                path = "tr/" + "/".join(parts)
+                polity = cs.key("tr.polity", key)
+                office = cs.key("tr.office", f"{key}-mayor")
+                if key not in polities:
+                    polities.add(key)
+                    cs.add("polity", id=polity, kind="municipality", iso_code=None)
+                    name(polity, f"{english} Municipality", "en")
+                    name(polity, f"{english} Belediyesi", kind="native")
+                    cs.add("polity_parent", polity_id=polity, parent_id=turkey)
+                    cs.add("slug", path=path, entity_id=polity)
+                if office in cs.minted and office not in offices:
+                    offices.add(office)
+                    cs.add("office", id=office, polity_id=polity, kind="mayor")
+                    name(office, f"Mayor of {english}", "en")
+                    name(office, f"{english} Belediye Başkanı", kind="native")
+                election = cs.key("tr.election", f"{day}:{key}-mayor")
+                cs.add(
+                    "election",
+                    id=election,
+                    polity_id=polity,
+                    parent_id=local,
+                    kind="local",
+                    date_from=day,
+                    date_to=day,
+                    status="held",
+                )
+                name(election, f"{year} {english} mayoral election", "en")
+                name(election, f"{year} {english} Belediye Başkanlığı Seçimi", kind="native")
+                cs.add("slug", path=f"{path}/{day}-local", entity_id=election)
+                contest_key = f"{day}:{key}-mayor"
+                contest = cs.key("tr.contest", contest_key)
+                district = current.get(plate, "Merkez")
+                cs.add(
+                    "contest",
+                    id=contest,
+                    election_id=election,
+                    kind="office",
+                    office_id=office,
+                    district_area_id=areas.get(ilce(plate, district, None)) or cs.area("tr.il", plate),
+                    magnitude=1,
+                    round_number=1,
+                    electoral_system_id=mayoral,
+                    default_result_kind="counted",
+                )
+                name(contest, f"Mayor of {english}", "en")
+                cs.add("slug", path=f"{path}/{day}-local/mayor", entity_id=contest)
+                declared = cs.key(f"{SOURCE}.result_set", contest_key)
                 cs.add(
                     "result_set",
-                    id=sets[level],
-                    election_id=local,
+                    id=declared,
+                    election_id=election,
                     contest_id=contest,
-                    stage="alternative",
+                    stage="official",
                     kind="counted",
                     status="active",
                     source_id=source,
-                    is_default=False,
+                    is_default=True,
                     completeness=1,
                 )
-                cs.add("note", entity_id=sets[level], kind="methodology", body_md=METHOD_1973)
-            unread = {"province": [], "district": [], "municipality": []}
-            districts: dict[str, set[str]] = {}
-            for plate_number, district_name in (
-                rows.filter(pl.col("table") == table, pl.col("level") == "district").select("plate", "name").iter_rows()
-            ):
-                districts.setdefault(f"{plate_number:02}", set()).add(district_name)
-            current: dict[str, str] = {}
-            listed = rows.filter(pl.col("table") == table).sort("seq")
-            if table != "il_genel":
-                order: dict[tuple[int, str], list[str]] = {}
-                for plate_number, text, level in (
-                    rows.filter(pl.col("table") == "belediye_baskani")
-                    .sort("seq")
-                    .select("plate", "name", "level")
-                    .iter_rows()
-                ):
-                    order.setdefault((plate_number, text), []).append(level)
-                seen_names: dict[tuple[int, str], int] = {}
-                levels = []
-                for plate_number, text, level, bucak in listed.select("plate", "name", "level", "bucak").iter_rows():
-                    index = seen_names.get((plate_number, text), 0)
-                    seen_names[(plate_number, text)] = index + 1
-                    if level in ("province", "national"):
-                        levels.append(level)
-                    elif len(order.get((plate_number, text), [])) > 1:
-                        levels.append(order[(plate_number, text)][min(index, len(order[(plate_number, text)]) - 1)])
-                    elif bucak or lookup(f"{plate_number:02}", text, None, strict=True) is None:
-                        levels.append("belde")
-                    else:
-                        levels.append("district")
-                listed = listed.with_columns(level=pl.Series(levels))
-            for row in listed.iter_rows(named=True):
-                if row["level"] == "national":
-                    continue
-                if all(len(word) == 1 for word in row["name"].split()):
-                    row = {**row, "name": "".join(row["name"].split())}
-                if (
-                    sum(len(word) == 1 for word in row["name"].split()) >= 2
-                    or re.search(r"Dağılım|Listesindeki|lçelere", row["name"])
-                    or (
-                        row["level"] != "province"
-                        and row["name"] != "Of"
-                        and not any(len(word) >= 3 for word in row["name"].split())
-                    )
-                ):
-                    print(f"skipped {table} {row['plate']} {row['printed']}")
-                    continue
-                plate = f"{row['plate']:02}"
-                province = PROVINCES[row["plate"] - 1]
-                province_slug = slug(province)
-                frame = grouped.get((table, row["seq"]))
-                if frame is None:
-                    continue
-                if row["level"] == "province":
-                    level, unit = "province", cs.unit("tr.il", plate)
-                    place = province
-                elif table == "il_genel":
-                    level, unit, place = "district", ilce(plate, row["name"], row["alias"]), row["name"]
-                else:
-                    level = "municipality"
-                    if row["level"] == "district":
-                        ilce(plate, row["name"], row["alias"])
-                        label = resolved[(plate, row["name"])][1]
-                        current[plate] = label
-                        central = label == "Merkez"
-                        parts = [province_slug] if central else [province_slug, slug(label)]
-                        english = province if central else label
-                        scheme = "tr.ilce"
-                    else:
-                        district = current.get(plate, "Merkez")
-                        words = row["name"].split()
-                        while len(words) > 1 and (len(words[-1]) <= 2 or any(c.isdigit() for c in words[-1])):
-                            words.pop()
-                        while len(words) > 1 and (len(words[0]) <= 2 or any(c.isdigit() for c in words[0])):
-                            words.pop(0)
-                        row = {**row, "name": " ".join(words)}
-                        options = [
-                            [province_slug, "merkez" if district == "Merkez" else slug(district), slug(row["name"])]
-                        ]
-                        if row["name"] not in districts.get(plate, set()):
-                            options.append([province_slug, slug(row["name"])])
-                        if row["alias"]:
-                            options.append(
-                                [
-                                    province_slug,
-                                    "merkez" if district == "Merkez" else slug(district),
-                                    slug(row["alias"]),
-                                ]
-                            )
-                        parts = next((o for o in options if "-".join(o) in polities), options[0])
-                        english = row["name"]
-                        scheme = "tr.belde" if len(parts) == 3 else "tr.ilce"
-                    key = "-".join(parts)
-                    if (table, key) in seen:
-                        raise ValueError(f"two 1973 municipalities share {key}")
-                    seen.add((table, key))
-                    unit = cs.unit(scheme, key)
-                    if (scheme, key) not in known_units:
-                        known_units.add((scheme, key))
-                        district = current.get(plate, "Merkez")
-                        area = areas.get(ilce(plate, district, None)) or cs.area("tr.il", plate)
-                        cs.add(
-                            "reporting_unit",
-                            id=unit,
-                            polity_id=turkey,
-                            scheme_code=scheme,
-                            code=key,
-                            area_relation="within",
-                            area_id=area,
-                            kind="aggregate",
-                        )
-                        name(unit, english)
-                    place = english
-                stored = {r["column"]: r for r in frame.iter_rows(named=True)}
+                cs.add("note", entity_id=declared, kind="methodology", body_md=method)
                 if row["unresolved"]:
-                    unread[level].append(f"{place} ({', '.join(row['unresolved'])})")
-                if not row["accounting"]:
-                    unread[level].append(f"{place} (registered, voters, valid)")
-                elif not row["unresolved"] and (gap := shortfall(stored)) is not None:
-                    unread[level].append(f"{place} (party votes {gap[0]:,} against {gap[1]:,} valid)")
-                for column, cell in stored.items():
-                    if column in measures:
-                        put(sets[level], unit, None, measures[column], cell)
-                    else:
-                        put(sets[level], unit, option_of(contest_key, column), VOTES, cell)
-                if table == "belediye_baskani" and level == "municipality":
-                    mayor_contest(row, stored, parts, english, plate, unit)
-            for level, missing in unread.items():
-                if missing and level in sets:
                     cs.add(
                         "note",
-                        entity_id=sets[level],
+                        entity_id=declared,
                         kind="caveat",
-                        body_md="Some counts in the book could not be read with confidence and are left out, or the "
-                        + "party votes do not add up to the valid votes: "
-                        + "; ".join(missing)
-                        + ".",
+                        body_md=(UNREAD_1963 if year == 1963 else UNREAD_1973).format(
+                            labels=", ".join(row["unresolved"])
+                        ),
                     )
+                if not row["accounting"]:
+                    cs.add("note", entity_id=declared, kind="caveat", body_md=NO_ACCOUNTING_1973)
+                elif not row["unresolved"] and (gap := shortfall(stored)) is not None:
+                    cs.add(
+                        "note",
+                        entity_id=declared,
+                        kind="caveat",
+                        body_md=(GAP_1963 if year == 1963 else GAP_1973).format(votes=gap[0], valid=gap[1]),
+                    )
+                options: dict[str, UUID] = {}
 
+                def option(label: str) -> UUID:
+                    owner = KEYS[label]
+                    tag = "independents" if owner is None else owner
+                    if tag not in options:
+                        options[tag] = cs.key("tr.option", f"{contest_key}:{tag}")
+                        cs.add(
+                            "contest_option",
+                            id=options[tag],
+                            contest_id=contest,
+                            kind="independents" if owner is None else "candidate",
+                            party_id=None if owner is None else parties[label],
+                            ballot_label="Bağımsızlar" if owner is None else party_names[label],
+                        )
+                    return options[tag]
+
+                for column, cell in stored.items():
+                    if column in measures:
+                        put(declared, unit, None, measures[column], cell)
+                    else:
+                        put(declared, unit, option(column), VOTES, cell)
+                winner = mayors.get(row["seq"])
+                if winner is None:
+                    return
+                label = winner["party"]
+                person_name, _, _ = tidy(winner["mayor"])
+                if label is None:
+                    cs.add(
+                        "note", entity_id=declared, kind="caveat", body_md=WINNER_PARTY_1973.format(mayor=person_name)
+                    )
+                    return
+                if label not in KEYS:
+                    raise ValueError(f"{contest_key}: unknown party {label}")
+                votes = {column: cell["value"] for column, cell in stored.items() if column not in measures}
+                listed = sorted((value for column, value in votes.items() if KEYS[column] is not None), reverse=True)
+                independent = KEYS[label] is None
+                unread = not independent and (label not in votes or any(column in KEYS for column in row["unresolved"]))
+                suspect = (
+                    not independent
+                    and not unread
+                    and (votes[label] != listed[0] or (len(listed) > 1 and listed[0] == listed[1]))
+                )
+                if independent:
+                    cs.add(
+                        "note", entity_id=declared, kind="caveat", body_md=INDEPENDENTS_1973.format(mayor=person_name)
+                    )
+                elif unread:
+                    cs.add(
+                        "note",
+                        entity_id=declared,
+                        kind="caveat",
+                        body_md=UNREAD_WINNER_1973.format(mayor=person_name, party=party_names[label]),
+                    )
+                elif suspect:
+                    cs.add(
+                        "note",
+                        entity_id=declared,
+                        kind="caveat",
+                        body_md=SUSPECT_1973.format(mayor=person_name, party=party_names[label]),
+                    )
+                person = cs.key(f"{SOURCE}.person", f"{year}:{key}")
+                if person in cs.minted:
+                    cs.add("person", id=person)
+                    name(person, person_name)
+                candidacy = cs.key("tr.candidacy", f"{contest_key}:1")
+                cs.add(
+                    "candidacy",
+                    id=candidacy,
+                    person_id=person,
+                    option_id=option(label),
+                    role="head",
+                    list_position=None,
+                    ballot_name=None,
+                    member_of_party_id=None,
+                    is_independent=independent,
+                )
+                if not independent:
+                    cs.add("candidacy_nomination", candidacy_id=candidacy, party_id=parties[label], kind="nominated")
+                if not independent and not unread and not suspect:
+                    cs.add(
+                        "outcome",
+                        result_set_id=declared,
+                        option_id=option(label),
+                        candidacy_id=candidacy,
+                        kind="elected",
+                        seats=None,
+                    )
+                cs.add(
+                    "citation",
+                    entity_id=candidacy,
+                    source_id=source,
+                    locator={
+                        "page_id": str(page_ids[winner["page"]]),
+                        "bbox": [winner["x0"], winner["y0"], winner["x1"], winner["y1"]],
+                    },
+                )
+
+            for table, contest_code in CONTESTS_1973.items():
+                contest_key = f"{day}:{contest_code}"
+                contest = cs.key("tr.contest", contest_key)
+                if contest in cs.minted:
+                    raise ValueError(f"{contest_key} is not in the archive")
+                sets = {}
+                for level in ("province", "district" if table == "il_genel" else "municipality"):
+                    sets[level] = cs.key(f"{SOURCE}.result_set", f"{contest_key}:by-{level}")
+                    cs.add(
+                        "result_set",
+                        id=sets[level],
+                        election_id=local,
+                        contest_id=contest,
+                        stage="alternative",
+                        kind="counted",
+                        status="active",
+                        source_id=source,
+                        is_default=False,
+                        completeness=1,
+                    )
+                    cs.add("note", entity_id=sets[level], kind="methodology", body_md=method)
+                unread = {"province": [], "district": [], "municipality": []}
+                districts: dict[str, set[str]] = {}
+                for plate_number, district_name in (
+                    rows.filter(pl.col("table") == table, pl.col("level") == "district")
+                    .select("plate", "name")
+                    .iter_rows()
+                ):
+                    districts.setdefault(f"{plate_number:02}", set()).add(district_name)
+                current: dict[str, str] = {}
+                listed = rows.filter(pl.col("table") == table).sort("seq")
+                if table != "il_genel":
+                    order: dict[tuple[int, str], list[str]] = {}
+                    for plate_number, text, level in (
+                        rows.filter(pl.col("table") == "belediye_baskani")
+                        .sort("seq")
+                        .select("plate", "name", "level")
+                        .iter_rows()
+                    ):
+                        order.setdefault((plate_number, text), []).append(level)
+                    seen_names: dict[tuple[int, str], int] = {}
+                    levels = []
+                    for plate_number, text, level, bucak in listed.select(
+                        "plate", "name", "level", "bucak"
+                    ).iter_rows():
+                        index = seen_names.get((plate_number, text), 0)
+                        seen_names[(plate_number, text)] = index + 1
+                        if level in ("province", "national"):
+                            levels.append(level)
+                        elif len(order.get((plate_number, text), [])) > 1:
+                            levels.append(order[(plate_number, text)][min(index, len(order[(plate_number, text)]) - 1)])
+                        elif bucak or lookup(f"{plate_number:02}", text, None, strict=True) is None:
+                            levels.append("belde")
+                        else:
+                            levels.append("district")
+                    listed = listed.with_columns(level=pl.Series(levels))
+                for row in listed.iter_rows(named=True):
+                    if row["level"] == "national":
+                        continue
+                    if all(len(word) == 1 for word in row["name"].split()):
+                        row = {**row, "name": "".join(row["name"].split())}
+                    if (
+                        sum(len(word) == 1 for word in row["name"].split()) >= 2
+                        or re.search(r"Dağılım|Listesindeki|lçelere", row["name"])
+                        or (
+                            row["level"] != "province"
+                            and row["name"] != "Of"
+                            and not any(len(word) >= 3 for word in row["name"].split())
+                        )
+                    ):
+                        print(f"skipped {table} {row['plate']} {row['printed']}")
+                        continue
+                    plate = f"{row['plate']:02}"
+                    province = PROVINCES[row["plate"] - 1]
+                    province_slug = slug(province)
+                    frame = grouped.get((table, row["seq"]))
+                    if frame is None:
+                        continue
+                    if row["level"] == "province":
+                        level, unit = "province", cs.unit("tr.il", plate)
+                        place = province
+                    elif table == "il_genel":
+                        level, unit, place = "district", ilce(plate, row["name"], row["alias"]), row["name"]
+                    else:
+                        level = "municipality"
+                        if row["level"] == "district":
+                            ilce(plate, row["name"], row["alias"])
+                            label = resolved[(plate, row["name"])][1]
+                            current[plate] = label
+                            central = label == "Merkez"
+                            parts = [province_slug] if central else [province_slug, slug(label)]
+                            english = province if central else label
+                            scheme = "tr.ilce"
+                        else:
+                            district = current.get(plate, "Merkez")
+                            words = row["name"].split()
+                            while len(words) > 1 and (len(words[-1]) <= 2 or any(c.isdigit() for c in words[-1])):
+                                words.pop()
+                            while len(words) > 1 and (len(words[0]) <= 2 or any(c.isdigit() for c in words[0])):
+                                words.pop(0)
+                            row = {**row, "name": " ".join(words)}
+                            options = [
+                                [province_slug, "merkez" if district == "Merkez" else slug(district), slug(row["name"])]
+                            ]
+                            if row["name"] not in districts.get(plate, set()):
+                                options.append([province_slug, slug(row["name"])])
+                            if row["alias"]:
+                                options.append(
+                                    [
+                                        province_slug,
+                                        "merkez" if district == "Merkez" else slug(district),
+                                        slug(row["alias"]),
+                                    ]
+                                )
+                            parts = next((o for o in options if "-".join(o) in polities), options[0])
+                            english = row["name"]
+                            scheme = "tr.belde" if len(parts) == 3 else "tr.ilce"
+                        key = "-".join(parts)
+                        if (year, table, key) in seen:
+                            raise ValueError(f"two {year} municipalities share {key}")
+                        seen.add((year, table, key))
+                        unit = cs.unit(scheme, key)
+                        if (scheme, key) not in known_units:
+                            known_units.add((scheme, key))
+                            district = current.get(plate, "Merkez")
+                            area = areas.get(ilce(plate, district, None)) or cs.area("tr.il", plate)
+                            cs.add(
+                                "reporting_unit",
+                                id=unit,
+                                polity_id=turkey,
+                                scheme_code=scheme,
+                                code=key,
+                                area_relation="within",
+                                area_id=area,
+                                kind="aggregate",
+                            )
+                            name(unit, english)
+                        place = english
+                    stored = {r["column"]: r for r in frame.iter_rows(named=True)}
+                    if row["unresolved"]:
+                        unread[level].append(f"{place} ({', '.join(row['unresolved'])})")
+                    if not row["accounting"]:
+                        unread[level].append(f"{place} (registered, voters, valid)")
+                    elif not row["unresolved"] and (gap := shortfall(stored)) is not None:
+                        unread[level].append(f"{place} (party votes {gap[0]:,} against {gap[1]:,} valid)")
+                    for column, cell in stored.items():
+                        if column in measures:
+                            put(sets[level], unit, None, measures[column], cell)
+                        else:
+                            put(sets[level], unit, option_of(contest_key, column), VOTES, cell)
+                    if table == "belediye_baskani" and level == "municipality":
+                        mayor_contest(row, stored, parts, english, plate, unit)
+                for level, missing in unread.items():
+                    if missing and level in sets:
+                        cs.add(
+                            "note",
+                            entity_id=sets[level],
+                            kind="caveat",
+                            body_md="Some counts in the book could not be read with confidence and are left out, or the "
+                            + "party votes do not add up to the valid votes: "
+                            + "; ".join(missing)
+                            + ".",
+                        )
+
+        load(1963, DAY_1963, TITLE_1963, METHOD_1963)
+        load(1973, DAY_1973, TITLE_1973, METHOD_1973)
         print("fuzzy:", *matched, sep="\n  ")
         print("new ilçe units:", *minted_ilce, sep="\n  ")
         keys = ["result_set_id", "unit_id", "option_id", "channel", "measure", "count_round"]
