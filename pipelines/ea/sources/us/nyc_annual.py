@@ -1,14 +1,14 @@
 import re
 from collections import defaultdict
-from itertools import combinations
 from datetime import UTC, date, datetime, timedelta
+from itertools import combinations
 from pathlib import Path
 from uuid import UUID
 
 import polars as pl
 
 from ea import raw
-from ea.changeset import Changeset
+from ea.changeset import Changeset, slug
 from ea.store import DATA, connect
 
 SOURCE = "us.nyc_annual"
@@ -39,6 +39,39 @@ NOTE = (
 )
 ORDINAL = re.compile(r"^(\d{1,2})(st|d|nd|rd|th)$")
 NUMBER = re.compile(r"^\d{1,3}(,\d{3})*$")
+TITLES = {"MAYOR", "COMPTROLLER", "ALDERMEN"}
+CITY = {
+    "COMPTROLLER": (
+        "new-york-city:comptroller",
+        "comptroller",
+        "Comptroller",
+        {
+            "Lockwood": ("Charles C. Lockwood", "republican-party"),
+            "Craig": ("Charles L. Craig", "democratic-party"),
+            "Blatch": ("Harriot Stanton Blatch", "NY:socialist"),
+            "Howe": ("Ben Howe", "NY:farmer-labor"),
+            "McKee": ("John McKee", "prohibition-party"),
+            "Archer": ("A. E. Archer", "NY:socialist-labor"),
+            "Lindgren": ("Edward Lindgren", "NY:workers"),
+            "Macey": ("George R. Macey", "NY:single-tax"),
+        },
+    ),
+    "ALDERMEN": (
+        "new-york-city:president-board-of-aldermen",
+        "president-board-of-aldermen",
+        "President of the Board of Aldermen",
+        {
+            "Gilroy": ("Vincent Gilroy", "republican-party"),
+            "Hulbert": ("Murray Hulbert", "democratic-party"),
+            "Oneal": ("James Oneal", "NY:socialist"),
+            "Lefkowitz": ("Abraham Lefkowitz", "NY:farmer-labor"),
+            "Quail": ("John W. Quail", "prohibition-party"),
+            "Phalor": ("May Phalor", "NY:socialist-labor"),
+            "Veen": ("Morris Van Veen", "NY:single-tax"),
+        },
+    ),
+}
+BALLOTS = {427257: "36061", 428275: "36047", 178963: "36005", 129624: "36081", 32823: "36085"}
 HEADING = re.compile(r"(NEW YORK|BRONX|KINGS|QUEENS|RICHMOND) COUNTY")
 
 
@@ -94,19 +127,41 @@ def parse() -> None:
                         county = above[-1]
                 if final and sums and (labels or carry) and county is not None:
                     block = f"{file}:{number}:{int(total_y)}"
+                    title_y, title = max(
+                        (
+                            ((y0 + y1) / 2, w)
+                            for x0, y0, x1, y1, w in words
+                            if w in TITLES and (y0 + y1) / 2 < (labels[0][0] if labels else 0)
+                        ),
+                        default=(0, ""),
+                    )
+                    heads = {}
+                    for x1, _ in sums:
+                        tokens = sorted(
+                            (
+                                w
+                                for w in words
+                                if w[1] > title_y
+                                and w[1] < (labels[0][0] if labels else 0) - 20
+                                and abs((w[0] + w[2]) / 2 - (x1 - 35)) < 60
+                                and re.match(r"^[A-Za-z']", w[4])
+                            ),
+                            key=lambda w: (w[1] // 30, w[0]),
+                        )
+                        heads[x1] = " ".join(w[4] for w in tokens)
                     for ad, x1, value in [*carry, *here]:
                         column = min(sums, key=lambda t: abs(t[0] - x1))
                         if abs(column[0] - x1) <= 45:
-                            rows.append((file, block, COUNTIES[county], number, ad, column[0], value))
+                            rows.append((file, block, COUNTIES[county], number, ad, column[0], value, title, ""))
                     for x1, v in sums:
-                        rows.append((file, block, COUNTIES[county], number, 0, x1, v))
+                        rows.append((file, block, COUNTIES[county], number, 0, x1, v, title, heads[x1]))
                     carry = []
                 elif not final:
                     carry = here if labels else []
                 start = total_y + 30
-    pl.DataFrame(rows, schema=["file", "block", "county", "page", "ad", "column", "value"], orient="row").write_parquet(
-        PARSED / "lines.parquet"
-    )
+    pl.DataFrame(
+        rows, schema=["file", "block", "county", "page", "ad", "column", "value", "title", "header"], orient="row"
+    ).write_parquet(PARSED / "lines.parquet")
 
 
 def emit() -> Path:
@@ -274,4 +329,157 @@ def emit() -> Path:
                                 value=value,
                             )
                 print(f"{day} {extern}: {tied} of {everyone} county votes tie in {len(counties)} counties")
+            if "1921" not in file:
+                continue
+            day = date(1921, 11, 8)
+            polity_path = conn.execute(
+                "select path from slug where entity_id = %s and is_current", [city_polity]
+            ).fetchone()[0]
+            election = cs.key("us.election", f"{day}:NY:3651000")
+            system = cs.key("us.electoral_system", "fptp")
+            seen: set[UUID] = set()
+            for title, (office_key, office_slug, office_label, names) in CITY.items():
+                found: dict[str, dict[str, tuple[dict[int, int], int, int]]] = defaultdict(dict)
+                for (block,), group in report.filter(pl.col("title").is_in(list(CITY))).group_by(["block"]):
+                    totals = group.filter(pl.col("ad") == 0)
+                    county = next(
+                        (
+                            BALLOTS[v]
+                            for v, h in zip(totals["value"], totals["header"])
+                            if v in BALLOTS and "Ballots" in h
+                        ),
+                        None,
+                    )
+                    if county is None:
+                        everything = sum(totals["value"])
+                        county = next((c for v, c in BALLOTS.items() if abs(everything - v) < v * 0.005), None)
+                    if county is None:
+                        continue
+                    for column, value, header in totals.select("column", "value", "header").iter_rows():
+                        tokens = header.split()
+                        if len(tokens) > 7 or any(t.isupper() and len(t) > 3 for t in tokens):
+                            continue
+                        rows = group.filter((pl.col("column") == column) & (pl.col("ad") > 0))
+                        if rows["value"].sum() != value:
+                            continue
+                        for surname in names:
+                            if surname in tokens:
+                                ads = dict(rows.group_by("ad").agg(pl.col("value").sum()).iter_rows())
+                                if surname not in found[county] or len(tokens) < found[county][surname][2]:
+                                    found[county][surname] = (ads, value, len(tokens))
+                if not found:
+                    continue
+                office = cs.key("us.office", office_key)
+                if office in cs.minted:
+                    cs.add("office", id=office, polity_id=city_polity, kind="other")
+                    cs.add("name", entity_id=office, text=office_label, lang="en", kind="official", is_preferred=True)
+                contest_key = f"{SOURCE}:{day}:NY:3651000:{office_slug}"
+                contest = cs.key("us.contest", contest_key)
+                cs.add(
+                    "contest",
+                    id=contest,
+                    election_id=election,
+                    kind="office",
+                    office_id=office,
+                    district_area_id=cs.area("us.place", "3651000"),
+                    magnitude=1,
+                    round_number=1,
+                    previous_round_id=None,
+                    electoral_system_id=system,
+                    default_result_kind="counted",
+                    term="full",
+                )
+                cs.add(
+                    "name",
+                    entity_id=contest,
+                    text=f"1921 New York City {office_label} election",
+                    lang="en",
+                    kind="official",
+                    is_preferred=True,
+                )
+                cs.add("slug", path=f"{polity_path}/{day}-local/{office_slug}", entity_id=contest)
+                result_set = cs.key(f"{SOURCE}.result_set", f"{contest_key}:ad")
+                cs.add(
+                    "result_set",
+                    id=result_set,
+                    election_id=election,
+                    contest_id=contest,
+                    stage="certified",
+                    kind="counted",
+                    status="active",
+                    source_id=source,
+                    is_default=True,
+                    completeness=None,
+                )
+                cs.add(
+                    "note",
+                    entity_id=result_set,
+                    kind="methodology",
+                    body_md=NOTE + " Candidate names and party lines are read from the report's column headings.",
+                )
+                citywide = defaultdict(int)
+                for county, candidates in found.items():
+                    for surname, (_, total, _) in candidates.items():
+                        citywide[surname] += total
+                top = max(citywide, key=citywide.get)
+                for surname, total in citywide.items():
+                    label, party_key = names[surname]
+                    party = cs.key("us.party", party_key)
+                    person = cs.key(f"{SOURCE}.person", slug(label))
+                    if person in cs.minted and person not in seen:
+                        seen.add(person)
+                        cs.add("person", id=person)
+                        cs.add("name", entity_id=person, text=label, lang="en", kind="official", is_preferred=True)
+                    option = cs.key("us.option", f"{contest_key}:{slug(label)}")
+                    cs.add(
+                        "contest_option",
+                        id=option,
+                        contest_id=contest,
+                        kind="candidate",
+                        party_id=party,
+                        ballot_label=label,
+                    )
+                    cs.add(
+                        "candidacy",
+                        id=cs.key("us.candidacy", f"{contest_key}:{slug(label)}:head"),
+                        person_id=person,
+                        option_id=option,
+                        role="head",
+                        ballot_name=label,
+                        is_independent=False,
+                    )
+                    if surname == top:
+                        cs.add("outcome", result_set_id=result_set, option_id=option, kind="elected", seats=None)
+                    for county, candidates in found.items():
+                        if surname not in candidates:
+                            continue
+                        for ad, value in candidates[surname][0].items():
+                            code = f"{county}:{ad:02d}"
+                            if (day, code) not in units:
+                                units[(day, code)] = cs.unit("us.nyc_ad", code, day)
+                                cs.add(
+                                    "reporting_unit",
+                                    id=units[(day, code)],
+                                    polity_id=city_polity,
+                                    scheme_code="us.nyc_ad",
+                                    code=code,
+                                    parent_id=cs.unit("us.county", county),
+                                    area_relation="unlocated",
+                                    area_id=None,
+                                    kind="standard",
+                                    valid_from=day,
+                                    valid_to=day + timedelta(days=1),
+                                )
+                            cs.add(
+                                "result_value",
+                                result_set_id=result_set,
+                                unit_id=units[(day, code)],
+                                option_id=option,
+                                channel=0,
+                                measure=1,
+                                count_round=0,
+                                flags=0,
+                                value=value,
+                            )
+                print(f"{office_slug}: {dict(citywide)} in {sorted(found)}")
         return cs.write()
