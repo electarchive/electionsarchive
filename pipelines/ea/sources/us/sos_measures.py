@@ -428,6 +428,11 @@ NE_HEADING = re.compile(
     r"Measure Number|No\.)\s*(\d+[A-C]?)\b",
     re.IGNORECASE,
 )
+AR = "https://www.sos.arkansas.gov/uploads/elections/"
+AR_BOOKS = {
+    date(2000, 11, 7): "2000_Certified_General_Election_Results.pdf",
+    date(2002, 11, 5): "2002_General.pdf",
+}
 MISPRINTS = {("CA", date(2000, 11, 7), "38", "NO"): 3000}
 MISREPORTED = {("ME", date(2005, 11, 8), "6"), ("LA", date(2010, 10, 2), "2")}
 STATES = {
@@ -507,6 +512,11 @@ PUBLISHERS = {
         "Nevada Secretary of State",
         "Official election results",
         "https://www.nvsos.gov/sos/elections/election-information/election-results",
+    ),
+    "AR": (
+        "Arkansas Secretary of State",
+        "Certified general election results",
+        "https://www.sos.arkansas.gov/elections/research/election-results",
     ),
     "NE": (
         "Nebraska Secretary of State",
@@ -605,6 +615,8 @@ def fetch() -> None:
         raw.fetch(SOURCE, NV.format(stamp, folder), suffix=".html")
     for name in NE_BOOKS.values():
         raw.fetch(SOURCE, NE + name, suffix=".pdf")
+    for name in AR_BOOKS.values():
+        raw.fetch(SOURCE, AR + name, suffix=".pdf")
     try:
         raw.cached(SOURCE, NCSL_PAGE)
     except LookupError:
@@ -1495,6 +1507,64 @@ def nevada() -> list[dict[str, object]]:
     return rows
 
 
+def arkansas() -> list[dict[str, object]]:
+    rows: list[dict[str, object]] = []
+    for day, name in AR_BOOKS.items():
+        text = subprocess.run(
+            ["pdftotext", "-layout", str(raw.cached(SOURCE, AR + name).path), "-"],
+            capture_output=True,
+            text=True,
+            check=True,
+        ).stdout.replace("\f", "\n")
+        totals: dict[tuple[str, str], tuple[int, int]] = {}
+        counties: dict[tuple[str, str], dict[str, tuple[int, int]]] = {}
+        if day.year == 2000:
+            for kind, number, yes, no, body in re.findall(
+                r"(?m)^(Amendment|Initiated Act) (\d+)\s+Yes \[(\d+) total votes[^\n]*\s+No \[(\d+) total votes[^\n]*\n"
+                r"((?:.*\n)*?)(?=^(?:Amendment|Initiated Act) \d+\s*$)",
+                text,
+            ):
+                if (kind, number) in totals:
+                    break
+                totals[(kind, number)] = (int(yes), int(no))
+                table = counties.setdefault((kind, number), {})
+                for county, a, b in re.findall(r"(?m)^\s*(.+?) County\s+(\d+)\s+(\d+)\s*$", body):
+                    table.setdefault(county, (int(a), int(b)))
+        else:
+            for kind, number, county, yes, no in re.findall(
+                r"(?m)^Proposed (Constitutional Amendment|Initiated Act) No\. (\d+)(?: \((.+?) County\))?\s*\n"
+                r"(?:.*\n){0,6}?For\s+([\d,]+)[^\n]*\n\s*Against\s+([\d,]+)",
+                text,
+            ):
+                votes = (int(yes.replace(",", "")), int(no.replace(",", "")))
+                if not county:
+                    totals.setdefault((kind, number), votes)
+                else:
+                    counties.setdefault((kind, number), {})[county] = votes
+        for (kind, number), total in totals.items():
+            if total == (0, 0):
+                continue
+            found = counties.get((kind, number), {})
+            summed = tuple(sum(votes[side] for votes in found.values()) for side in (0, 1))
+            if len(found) != 75 or summed != total:
+                raise ValueError(f"{name} {kind} {number}: {len(found)} counties add up to {summed}, not {total}")
+            rows.extend(
+                {
+                    "state": "AR",
+                    "day": day,
+                    "number": number,
+                    "label": "Initiated Act" if kind == "Initiated Act" else "Amendment",
+                    "url": AR + name,
+                    "county": county,
+                    "answer": answer,
+                    "votes": votes[side],
+                }
+                for county, votes in found.items()
+                for side, answer in enumerate(("YES", "NO"))
+            )
+    return rows
+
+
 def nebraska() -> list[dict[str, object]]:
     rows: list[dict[str, object]] = []
     for day, name in NE_BOOKS.items():
@@ -1737,6 +1807,7 @@ def parse() -> None:
             *rhode_island(),
             *nevada(),
             *nebraska(),
+            *arkansas(),
         ]
     )
     words = re.compile(r"[a-z]{4,}")
@@ -1761,8 +1832,12 @@ def parse() -> None:
         if found.height != 1 or found["number"][0] is None and label:
             found = (
                 found.with_columns(
-                    overlap=pl.col("title").map_elements(
-                        lambda title, mine=mine: len(mine & set(words.findall(title.lower()))), return_dtype=pl.Int64
+                    overlap=pl.struct("title", "measure").map_elements(
+                        lambda row, mine=mine: (
+                            100 * len(mine & set(words.findall(row["title"].lower())))
+                            + len(mine & set(words.findall((row["measure"] or "").lower())))
+                        ),
+                        return_dtype=pl.Int64,
                     )
                 )
                 .filter(pl.col("overlap") > 0)
@@ -1776,6 +1851,7 @@ def parse() -> None:
                 "state": state,
                 "day": day,
                 "number": number,
+                "label": label,
                 "measure": f"Question {number}"
                 if state in ("ME", "NV", "RI")
                 else entry["measure"]
@@ -1923,7 +1999,12 @@ def emit() -> Path:
         )
         for entry in measures.iter_rows(named=True):
             state, day = entry["state"], entry["day"]
-            rows = frame.filter(pl.col("state") == state, pl.col("day") == day, pl.col("number") == entry["number"])
+            rows = frame.filter(
+                pl.col("state") == state,
+                pl.col("day") == day,
+                pl.col("number") == entry["number"],
+                pl.col("label") == entry["label"],
+            )
             election_key = next(
                 (
                     key
