@@ -6,7 +6,7 @@ from ea.changeset import Changeset
 from ea.store import connect
 
 SOURCE = "shorts"
-VERSION = "3"
+VERSION = "4"
 PARTIES: dict[str, dict[str, str | tuple[tuple[str, str | None, str | None], ...]]] = {
     "us": {
         "Democratic Party": "Democratic",
@@ -69,7 +69,6 @@ PARTIES: dict[str, dict[str, str | tuple[tuple[str, str | None, str | None], ...
         "Socialist Party": "PS",
         "Rassemblement national": (("FN", None, "2018-06-01"), ("RN", "2018-06-01", None)),
         "Parti communiste français": "PCF",
-        "Parti communiste": "PCF",
         "Divers gauche": "Misc. left",
         "Divers droite": "Misc. right",
         "Divers centre": "Misc. center",
@@ -77,12 +76,15 @@ PARTIES: dict[str, dict[str, str | tuple[tuple[str, str | None, str | None], ...
         "Régionalistes": "Regionalists",
         "Mouvement démocrate": "MoDem",
         "La France insoumise": "LFI",
-        "Rally for the Republic": "RPR",
+        "Rassemblement Pour la République": "RPR",
+        "Union pour un mouvement populaire": "UMP",
+        "Union for the French democracy": "UDF",
+        "Union for French Democracy (UDF) + Rally for the Republic (RPR)": "UDF–RPR",
         "Extrême droite": "Far right",
     },
     "it": {
         "Democratic Party": "PD",
-        "Partito Democratico – Italia Democratica e Progressista": "PD",
+        "Partito Democratico – Italia Democratica e Progressista": "PD–IDP",
         "The People of Freedom": "PdL",
         "The Olive Tree": "Olive Tree",
         "Forza Italia": "FI",
@@ -110,6 +112,44 @@ PARTIES: dict[str, dict[str, str | tuple[tuple[str, str | None, str | None], ...
     },
     "ch": {
         "GRÜNE Schweiz": "Greens",
+    },
+    "at": {
+        "Austrian People's Party": "ÖVP",
+        "Social Democratic Party": "SPÖ",
+        "Freedom Party of Austria": "FPÖ",
+    },
+    "bg": {
+        "GERB-SDS": "GERB",
+        "Bulgarian Socialist Party": "BSP",
+        "Movement for Rights and Freedom": "DPS",
+        "National Movement Simeon II": "NDSV",
+        "Attack": "Ataka",
+    },
+    "es": {
+        "Spanish Socialist Workers' Party": "PSOE",
+        "People's Party": "PP",
+        "People's Alliance": "AP",
+        "Democratic and Social Centre": "CDS",
+    },
+    "fi": {
+        "Social Democratic Party": "SDP",
+        "Centre Party": "Keskusta",
+    },
+    "gr": {
+        "Panhellenic Socialist Movement": "PASOK",
+        "New Democracy": "ND",
+        "Communist Party": "KKE",
+        "Communist party - Interior": "KKE Interior",
+        "Progressive Party": "KP",
+    },
+    "pl": {
+        "PiS-Law and Justice": "PiS",
+        "PO Civic Platform": "PO",
+        "Koalicja Obywatelska": "KO",
+    },
+    "pt": {
+        "PSD-Social Democratic Party": "PSD",
+        "PS-Socialist Party": "PS",
     },
 }
 OFFICES = {

@@ -20,7 +20,7 @@ from ea.sources.it.storico import EXISTING, NEW, NEW_OVERRIDES, NORTH, OVERRIDES
 from ea.store import DATA, connect
 
 SOURCE = "it.senato"
-VERSION = "2"
+VERSION = "3"
 PARSED = DATA / "parsed" / SOURCE
 ARCHIVE = "https://dait.interno.gov.it/documenti/opendata/senato/senato-{day:%Y%m%d}.zip"
 ELIGENDO = (
@@ -37,6 +37,21 @@ SELECT DISTINCT ?s ?m ?cognome ?nome ?nascita ?genere ?leg ?regione ?collegio ?t
  OPTIONAL { ?m osr:tipoElezione ?tipo } OPTIONAL { ?m osr:fine ?fine } OPTIONAL { ?m osr:tipoFineMandato ?fineTipo }
  OPTIONAL { ?s osr:dataNascita ?nascita } OPTIONAL { ?s foaf:gender ?genere }
 }"""
+GROUPS = """PREFIX osr: <http://dati.senato.it/osr/>
+PREFIX ocd: <http://dati.camera.it/ocd/>
+SELECT DISTINCT ?s ?inizio ?titolo WHERE {
+ ?s a osr:Senatore ; ocd:aderisce ?a . ?a osr:legislatura %d ; osr:gruppo ?g ; osr:inizio ?inizio .
+ ?g osr:denominazione ?d . ?d osr:titolo ?titolo . OPTIONAL { ?d osr:inizio ?di } OPTIONAL { ?d osr:fine ?df }
+ FILTER(!BOUND(?di) || ?di <= ?inizio) FILTER(!BOUND(?df) || ?df > ?inizio)
+} ORDER BY ?s ?inizio"""
+SENATE_GROUPS = (
+    ("Fratelli d'Italia", "FRATELLI D'ITALIA"),
+    ("Lega", "LEGA"),
+    ("Forza Italia", "FORZA ITALIA"),
+    ("Partito Democratico", "PARTITO DEMOCRATICO"),
+    ("Civici d'Italia", "NOI MODERATI"),
+    ("Per le Autonomie", "SVP"),
+)
 DAYS = [
     date(1948, 4, 18),
     date(1953, 6, 7),
@@ -383,10 +398,16 @@ def mandates(legislature: int) -> str:
     return "https://dati.senato.it/sparql?" + urlencode({"query": QUERY % legislature, "format": "text/csv"})
 
 
+def adhesions(legislature: int) -> str:
+    return "https://dati.senato.it/sparql?" + urlencode({"query": GROUPS % legislature, "format": "text/csv"})
+
+
 def fetch() -> None:
     for legislature, day in enumerate(DAYS, 1):
         raw.fetch(SOURCE, ARCHIVE.format(day=day), suffix=".zip")
         raw.fetch(SOURCE, mandates(legislature), suffix=".csv")
+        if day >= ROSATO:
+            raw.fetch(SOURCE, adhesions(legislature), suffix=".csv")
         if day == REDUCED:
             raw.fetch(SOURCE, TRASPARENZA, suffix=".json")
         if day >= CALDEROLI:
@@ -1323,6 +1344,16 @@ def emit() -> Path:
     rosato_singles = pl.read_parquet(PARSED / "rosato_singles.parquet")
     rosato_accounts = pl.read_parquet(PARSED / "rosato_accounts.parquet")
     record = {row["senator"]: row for row in roll.to_dicts()}
+    joined = {}
+    for legislature, day in enumerate(DAYS, 1):
+        if day >= ROSATO:
+            first = (
+                pl.read_csv(raw.cached(SOURCE, adhesions(legislature)).path, infer_schema=False)
+                .sort("inizio")
+                .unique("s", keep="first", maintain_order=True)
+            )
+            for uri, title in first.select("s", "titolo").iter_rows():
+                joined[day, uri.rsplit("/", 1)[1]] = title
     with connect() as conn:
         cs = Changeset(
             conn,
@@ -2306,12 +2337,24 @@ def emit() -> Path:
                         )
                         person = person_of(row | {"key": slug(code)}, day, region)
                         candidacy = cs.key("it.candidacy", f"{contest_key}:{slug(ballot)}")
+                        title = joined.get((day, row["senator"] or ""), "") if row["elected"] and len(lists) > 1 else ""
+                        member = next(
+                            (
+                                label
+                                for prefix, start in SENATE_GROUPS
+                                if title.startswith(prefix)
+                                for label in lists
+                                if label.startswith(start)
+                            ),
+                            None,
+                        )
                         cs.add(
                             "candidacy",
                             id=candidacy,
                             person_id=person,
                             option_id=option,
                             role="head",
+                            member_of_party_id=None if member is None else list_party(member, day),
                             ballot_name=ballot,
                         )
                         for party in dict.fromkeys(list_party(label, day) for label in lists):

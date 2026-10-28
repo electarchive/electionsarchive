@@ -11,7 +11,7 @@ from ea.sources.ie.dail import BALLOTS, EXHAUSTED, INVALID, PARTY_CODES, QUOTA, 
 from ea.store import DATA, connect
 
 SOURCE = "ie.byelections"
-VERSION = "1"
+VERSION = "2"
 PARSED = DATA / "parsed" / SOURCE
 DAIL = date(2026, 5, 22)
 SEANAD = date(2026, 11, 6)
@@ -43,6 +43,7 @@ CAUSES = {
     "Dublin Central": "The by-election filled the seat Paschal Donohoe vacated when he resigned from the Dáil.",
     "Galway West": "The by-election filled the seat Catherine Connolly vacated when she was elected President.",
 }
+VACATED = {"Dublin Central": "Paschal Donohoe", "Galway West": "Catherine Connolly"}
 
 
 def fetch() -> None:
@@ -125,6 +126,23 @@ def emit() -> Path:
             name(contest, f"2026 {label} by-election")
             cs.add("slug", path=f"ie/{DAIL}-by-election/{slug(label)}", entity_id=contest)
             cs.add("note", entity_id=contest, kind="context", body_md=CAUSES[label])
+            general = conn.execute(
+                "select entity_id from slug where path = %s and is_current",
+                [f"ie/2024-11-29-general/{slug(label)}"],
+            ).fetchone()
+            if general is None:
+                raise ValueError(f"no 2024 contest for {label}")
+            cs.add(
+                "tenure",
+                id=cs.key(f"{SOURCE}.tenure", f"{DAIL}:{slug(label)}"),
+                person_id=cs.key("ie.dail.person", roster[label, fold(VACATED[label])]),
+                body_id=dail_body,
+                from_date=date(2024, 11, 29),
+                to_date=date(2025, 1, 1),
+                to_precision="year",
+                acquired_via="elected",
+                contest_id=general[0],
+            )
             result_set = cs.key(f"{SOURCE}.result_set", f"{DAIL}:{slug(label)}")
             cs.add(
                 "result_set",
