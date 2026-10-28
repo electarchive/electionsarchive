@@ -113,6 +113,11 @@ FEEDS = {
         "County of San Luis Obispo Elections Division",
         "Certified Candidate List for the November 3, 2026 General Election",
     ),
+    "NJ-34029": (
+        "https://www.co.ocean.nj.us/WebContentFiles/a6ad1195-1bbf-442f-bbd0-b4398929f0ef.pdf",
+        "Ocean County Clerk",
+        "2026 General Election Official Candidate Certification Sheet",
+    ),
     "MN": (
         "https://electionresultsfiles.sos.mn.gov/20261103/local.txt",
         "Minnesota Secretary of State",
@@ -339,7 +344,7 @@ def resolve(conn, state: str, wanted: set[tuple[str, str]]) -> dict[tuple[str, s
            left join office f on f.id = c.office_id
            left join body b on b.id = c.body_id
            join polity op on op.id = coalesce(f.polity_id, b.polity_id, e.polity_id)
-           where (x.value ~ %s or x.value ~ %s) and e.date_from between '2016-01-01' and %s and not c.notional
+           where (x.value ~ %s or x.value ~ %s) and e.date_from >= '2016-01-01' and e.date_from < %s and not c.notional
                and c.party_scope_id is null and c.kind <> 'ballot_question'
                and op.kind in ('county', 'municipality', 'school_district', 'special_district')
            order by c.office_id, c.body_id, c.district_area_id, c.seat_id, e.date_from desc""",
@@ -677,7 +682,7 @@ def parse() -> None:
         ):
             if word.startswith(prefix):
                 return key, False
-        return None, word in ("independent", "unaffiliated", "no party", "non-partisan independent")
+        return None, word in ("independent", "unaffiliated", "no party", "non-partisan independent", "petition")
 
     for row in csv.DictReader(io.StringIO(raw.cached(SOURCE, FEEDS["MD"][0]).path.read_text(encoding="utf-8-sig"))):
         if row["Candidate Status"] != "Active":
@@ -769,21 +774,21 @@ def parse() -> None:
     for cells in csv.reader(io.StringIO(raw.cached(SOURCE, FEEDS["NM"][0]).path.read_text(encoding="utf-8-sig"))):
         if (
             len(cells) < 18
-            or "Qualified" not in cells[16:19]
+            or "Qualified" not in cells[-4:]
             or not re.match(r"(County|Probate|Magistrate|Metropolitan)", cells[0])
         ):
             continue
-        named, independent = party(
-            {"DEM": "Democratic", "REP": "Republican", "LIB": "Libertarian"}.get(cells[6], cells[6])
-        )
+        head, code = cells[: len(cells) - 13], cells[len(cells) - 13].strip()
+        suffix = head.pop().strip() if head[-1].strip() in ("JR", "SR", "II", "III", "IV") else ""
+        named, independent = party({"DEM": "Democratic", "REP": "Republican", "LIB": "Libertarian"}.get(code, code))
         feeds["NM"].append(
             {
-                "county": cells[2],
-                "contest": f"{cells[2]} County {cells[0]} {cells[1]}",
+                "county": head[-4],
+                "contest": f"{head[-4]} County {head[0]} {' '.join(part.strip() for part in head[1:-4])}",
                 "seats": 0,
-                "name": cased(" ".join(part for part in cells[3:6] if part)),
+                "name": cased(" ".join(part for part in [*head[-3:], suffix] if part)),
                 "party": named,
-                "independent": independent or cells[6] in ("DTS", "IND"),
+                "independent": independent or code in ("DTS", "IND"),
                 "unexpired": False,
             }
         )
@@ -1122,6 +1127,26 @@ def parse() -> None:
                     "unexpired": bool(re.search(r"(?i)short term|unexpired", contest)),
                 }
             )
+
+    for line in text("NJ-34029", "-layout").splitlines():
+        found = re.match(
+            r"(\S.*?)\s{2,}([A-Z][A-Z ,'-]+?)\s{2,}(?:(UNEXP\.)\s+)?(\d+)\s+(\d+)\s+(\S.*?)\s{2,}(\S.*?)\s{2,}([A-Z][a-z]+(?: [A-Za-z]+)*)\b",
+            line,
+        )
+        if found is None or "NO NOMINATION" in line:
+            continue
+        named, independent = party(found[8])
+        feeds["NJ-34029"].append(
+            {
+                "county": "Ocean",
+                "contest": f"{found[1]} {found[2]}",
+                "seats": int(found[5]),
+                "name": cased(f"{found[6]} {found[7]}"),
+                "party": named,
+                "independent": independent,
+                "unexpired": found[3] is not None,
+            }
+        )
 
     county = ""
     heading = ""

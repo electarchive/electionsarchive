@@ -226,7 +226,8 @@ select x.id, x.framed and (x.previous_round_id is not null or not x.later) and c
     when x.later and x.previous_round_id in (select id from upc) then true
     when x.unqualified then k.people = 0
     when k.lists > 0 then k.empty = 0 and k.unlabeled = 0
-    else (k.people > x.seats or k.people >= x.seats and (x.tacit or k.official >= x.seats))
+    else (k.people > x.seats or k.people >= x.seats and (x.tacit or k.official >= x.seats)
+            or k.people > 0 and k.official = k.people)
         and (k.unlabeled = 0 or k.labeled = 0 and not coalesce(h.partisan, false))
 end
 from x join k on k.id = x.id left join h on h.id = x.id
@@ -478,7 +479,9 @@ def markdown(day: str) -> str:
             " dated that day, and has candidates with at least one candidate option (a measure with at least one answer)."
             " Ready is the same rule as the upcoming track everywhere on /coverage (`READY_SQL`): an office or body, a"
             " district, and an electoral system; more candidates than seats, or exactly as many when it is uncontested (a"
-            " tacit result kind, or candidates cited to an official state list rather than taken from the FEC's filers); and a party, nomination, or independent mark on every candidate unless the race is"
+            " tacit result, or candidates taken from an official state list rather than from the FEC's filers), or any number"
+            " when every candidate comes from an official list, since an official list with fewer candidates than seats is"
+            " still complete; and a party, nomination, or independent mark on every candidate unless the race is"
             " nonpartisan. A race the certifying body's list reports with no candidate qualified (write-in only, a `ballot` label of"
             " `no_candidate_qualified` citing that list) is ready, and counts as having candidates, when it has no candidate options."
             " A measure is ready with two answers and its official wording. Places outside a level's cited list (the territories' delegates, governors, and legislatures) are left out. Other statewide offices are expected from the due-office schedule in"
