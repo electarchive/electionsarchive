@@ -339,6 +339,32 @@ MILLET = {
     "cumhuriyet-halk-partisi": ("iyi-parti", {"01", "06", "07", "09", "16", "26", "31", "35", "44", "46", "48", "59"}),
     "iyi-parti": ("cumhuriyet-halk-partisi", {"10", "20", "27", "38", "41", "42", "45", "54", "55", "61"}),
 }
+BLOCS = {
+    2019: {
+        ("Cumhur İttifakı", "People's Alliance"): [
+            "adalet-ve-kalkinma-partisi",
+            "milliyetci-hareket-partisi",
+            "buyuk-birlik-partisi",
+        ],
+        ("Millet İttifakı", "Nation Alliance"): ["cumhuriyet-halk-partisi", "iyi-parti"],
+    },
+    2024: {("Cumhur İttifakı", "People's Alliance"): ["adalet-ve-kalkinma-partisi", "milliyetci-hareket-partisi"]},
+}
+BLOC_NOTES = {
+    2019: (
+        "Local alliances have no standing in law. AK Parti and MHP announced cooperation in 51 provinces, 30 of them "
+        "metropolitan, and CHP and İYİ Parti in 51, 23 of them metropolitan (Anadolu Ajansı, 19 February 2019, "
+        "carried by Euronews and BBC News Türkçe). The same report says BBP fielded no metropolitan candidates and "
+        "backed the Cumhur İttifakı. Partners stood in different places, so the alliance applies to a contest only "
+        "where at most one of its parties fielded a candidate or list."
+    ),
+    2024: (
+        "Local alliances have no standing in law. MHP and AK Parti again divided candidacies in 2024: MHP's own "
+        "announcement of 10 January 2024 lists the 55 mayoral candidates it fielded where AK Parti stood aside. "
+        "CHP and İYİ Parti did not renew their alliance. The alliance applies to a contest only where at most one "
+        "of its parties fielded a candidate or list."
+    ),
+}
 BALLOT_MHP = {2019: {"01", "33", "45"}, 2024: {"33", "45"}}
 
 
@@ -1403,12 +1429,22 @@ def emit() -> Path:
                 )
             )
 
+        bloc_of: dict[tuple[date, UUID], UUID] = {}
         for year, day in DAYS.items():
             election = cs.key("tr.election", f"{day}:local")
             cs.add("election", id=election, polity_id=turkey, kind="local", date_from=day, date_to=day, status="held")
             name(election, f"{year} Turkish local elections", "en")
             name(election, f"{year} Mahalli İdareler Genel Seçimleri", kind="native")
             cs.add("slug", path=f"tr/{day}-local", entity_id=election)
+            for (native_name, english_name), members in BLOCS.get(year, {}).items():
+                bloc = cs.key("tr.alliance", f"{day}:local:{native_name}")
+                cs.add("alliance", id=bloc, kind="electoral_alliance", election_id=election)
+                name(bloc, native_name)
+                name(bloc, english_name, "en")
+                cs.add("note", entity_id=bloc, kind="context", body_md=BLOC_NOTES[year])
+                for member in members:
+                    cs.add("alliance_member", alliance_id=bloc, party_id=parties[member])
+                    bloc_of[(day, parties[member])] = bloc
             held = values.filter(pl.col("year") == year)
             for office, (code, english, native) in OFFICES.items():
                 rows = held.filter(pl.col("office").is_in([office, f"{office}:seats"]))
@@ -2018,6 +2054,20 @@ def emit() -> Path:
             "measure": pl.col("measure").cast(pl.Int16),
             "count_round": pl.lit(0, pl.Int16),
         }
+        election_day = {row["id"]: row["date_from"] for row in cs.rows["election"]}
+        contest_day = {row["id"]: election_day[row["election_id"]] for row in cs.rows["contest"]}
+        office_contests = {row["id"] for row in cs.rows["contest"] if row["kind"] == "office"}
+        standing: dict[tuple[object, UUID], int] = {}
+        for row in cs.rows["contest_option"]:
+            bloc = bloc_of.get((contest_day[row["contest_id"]], row["party_id"]))
+            if bloc is not None:
+                standing[(row["contest_id"], bloc)] = standing.get((row["contest_id"], bloc), 0) + 1
+        for row in cs.rows["contest_option"]:
+            bloc = bloc_of.get((contest_day[row["contest_id"]], row["party_id"]))
+            if bloc is not None and (
+                row["contest_id"] not in office_contests or standing[(row["contest_id"], bloc)] == 1
+            ):
+                row["alliance_id"] = bloc
         cs.frame("result_value", located.select(**keys, flags="flags", value="value"))
         cs.frame(
             "value_locator",
