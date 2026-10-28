@@ -10437,6 +10437,32 @@ async function races(
         ],
         date,
       );
+      const won =
+        single == null && head?.isOffice === true && roots.length > 1
+          ? new Map(
+              (
+                await db.execute<{ party: string | null; seats: number }>(sql`
+                  select coalesce(bm.into_id, br.parent_party_id, pm.into_id, o.party_id) as party, count(distinct x.option_id)::int as seats
+                  from contest c
+                  join election e on e.id = c.election_id
+                  join result_set rs on rs.contest_id = c.id and ${latest("rs")}
+                  join outcome x on x.result_set_id = rs.id and x.kind in ('elected', 'won') and x.candidacy_id is null
+                  join contest_option o on o.id = x.option_id
+                  left join entity_merge pm on pm.entity_id = o.party_id
+                  left join party_affiliation br on br.party_id = coalesce(pm.into_id, o.party_id)
+                    and br.kind = 'regional_branch' and br.valid @> e.date_from
+                  left join entity_merge bm on bm.entity_id = br.parent_party_id
+                  where c.id = any(${sql.param(roots)}::uuid[])
+                  group by 1
+                `)
+              ).rows.map((row) => [
+                row.party == null
+                  ? null
+                  : `party:${parentOf.get(row.party) ?? row.party}`,
+                row.seats,
+              ]),
+            )
+          : null;
       const results = folded
         .entries()
         .map(([key, members]) => {
@@ -10477,7 +10503,7 @@ async function races(
             party: party ?? lead?.cell.party ?? null,
             votes,
             share,
-            seats,
+            seats: won == null ? seats : (won.get(key) ?? null),
             outcome: lead?.cell.outcome ?? null,
             isDeclined: lead?.cell.isDeclined === true,
             isIndependent: members.every((row) => row.cell.isIndependent),
@@ -15849,7 +15875,7 @@ export const polities = {
                     const namesakes = all.filter(
                       (other) => other !== race && other.name === race.name,
                     );
-                    const isOffice = race.kind === "office";
+                    const isOffice = race.kind === "office" && race.count <= 1;
                     let contested = 0;
                     for (const row of race.results) {
                       contested += isOffice ? 0 : (row.seats ?? 0);
