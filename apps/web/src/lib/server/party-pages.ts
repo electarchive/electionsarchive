@@ -127,7 +127,7 @@ export async function rebuild() {
       }
     }),
   );
-  const removed = await db.execute(sql`
+  const removed = await db.execute<Record<string, never>>(sql`
     delete from party_page
     where not (party_id = any(${sql.param(listed.rows.map((row) => row.id))}::uuid[]))
   `);

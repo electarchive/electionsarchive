@@ -2906,7 +2906,7 @@ async function places(
           : share(prior.get(row.k), prior.get(row.k)?.voters ?? 0),
     };
   };
-  const scoped = await db.execute(sql`
+  const scoped = await db.execute<Record<string, never>>(sql`
     select from contest where id = ${contest.id}::uuid and party_scope_id is not null
   `);
   const waiting =

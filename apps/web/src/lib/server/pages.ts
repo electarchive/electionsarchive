@@ -257,7 +257,7 @@ export async function party(path: string, place: string | null = null) {
   if (
     within != null &&
     (
-      await db.execute(
+      await db.execute<Record<string, never>>(
         sql`select from party where id = ${id}::uuid and polity_id = ${within}::uuid`,
       )
     ).rows.length > 0
