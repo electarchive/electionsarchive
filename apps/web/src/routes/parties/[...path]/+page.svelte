@@ -385,9 +385,9 @@
                       : null,
                   )}
                   <li
-                    class="grid grid-cols-[minmax(0,1fr)_auto] items-baseline gap-x-3"
+                    class="flex flex-wrap items-baseline justify-between gap-x-3"
                   >
-                    <span>
+                    <span class="min-w-0">
                       {#if election.path == null}
                         {name}
                       {:else}
