@@ -818,6 +818,7 @@ def emit() -> Path:
                 id=contest,
                 election_id=election,
                 kind="ballot_question",
+                district_area_id=countries[NATIONAL[key][0]] if day == "1979-03-01" else None,
                 electoral_system_id=system,
                 round_number=1,
                 default_result_kind="counted",
