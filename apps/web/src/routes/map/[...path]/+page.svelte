@@ -1887,6 +1887,16 @@
         {m.atlas_loading()}
       </p>
     {/if}
+    {#if !isLoading && pending === 0 && sheet.places.k.length === 0 && sheet.date != null && sheet.date >= new Date()
+          .toISOString()
+          .slice(0, 10)}
+      <p
+        class="pointer-events-none absolute inset-x-0 inset-bs-3 z-10 mx-auto rounded-sm bg-card/95 px-3 py-2 text-center text-[0.8125rem] font-semibold text-pretty shadow-menu ring-1 ring-border inline-fit max-inline-[min(26rem,calc(100%-1.5rem))]"
+        role="status"
+      >
+        {m.slate_scheduled({ date: date(sheet.date) })}
+      </p>
+    {/if}
 
     <section
       class={cn(
