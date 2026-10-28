@@ -1490,6 +1490,45 @@ def revert(conn: Connection, changeset_id: str, reason: str) -> None:
                 [f"Rejected: {reason}", changeset_id],
             )
         return
+    folder = next(
+        (
+            root / changeset_id
+            for root in (DATA / "changesets", DATA / "retired" / "changesets")
+            if (root / changeset_id / "manifest.json").exists()
+        ),
+        None,
+    )
+    staged = (
+        None
+        if folder is None
+        else sorted(
+            {
+                str(id)
+                for table in FACTS
+                if (folder / f"{table}.parquet").exists()
+                for id in pl.read_parquet(folder / f"{table}.parquet", columns=["result_set_id"])["result_set_id"]
+            }
+        )
+    )
+    restaged = [
+        result_set
+        for (result_set,) in conn.execute(
+            """select rs.id::text from result_set rs
+               where (rs.changeset_id <> %(id)s
+                      or exists (select from result_set_history h where h.id = rs.id and h.superseded_by = %(id)s))
+                 and (rs.id = any(%(staged)s::uuid[])
+                      or %(staged)s::uuid[] is null and rs.changeset_id = %(id)s
+                         and exists (select from result_value v where v.result_set_k = rs.k))
+               order by 1""",
+            {"id": changeset_id, "staged": staged},
+        ).fetchall()
+    ]
+    if restaged:
+        raise ValueError(
+            f"{changeset_id} replaced the facts of {len(restaged)} result sets it did not create, which a revert cannot "
+            f"restore (it would leave them on the units and options it deletes); fix forward with a re-emit: "
+            + ", ".join(restaged[:10])
+        )
     for _ in range(240):
         taken = conn.execute(
             "select pg_try_advisory_xact_lock(hashtext('ea.search')) and pg_try_advisory_xact_lock(%s)", [MERGE_LOCK]
