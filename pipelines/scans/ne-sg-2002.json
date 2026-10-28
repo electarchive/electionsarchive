@@ -2,6 +2,9 @@
  "polity": "US-NE",
  "publisher": "Nebraska Secretary of State",
  "title": "2002 General Election Canvass",
+ "authoritative": "Source: the Secretary of State's general election canvass, whose county rows add up to each candidate's printed state total; Algara and Amlani pool the minor candidates into one line.",
+ "extend": true,
+ "restage": true,
  "license": "Public record",
  "file": {
   "url": "https://sos.nebraska.gov/sites/default/files/doc/2002%20General.pdf"
@@ -44,14 +47,14 @@
    "page": 4,
    "id": "gova",
    "orientation": "counties_down",
-   "hint": "Read only the Governor table; columns are the Governor and Lieutenant Governor tickets, use the Governor's name.",
+   "hint": "Read only the Governor table, every ticket column (Johanns, Dean, and Rosberg); use the Governor's name for each column.",
    "discover": "gov"
   },
   {
    "page": 5,
    "id": "govb",
    "orientation": "counties_down",
-   "hint": "Read only the Governor table; columns are the Governor and Lieutenant Governor tickets, use the Governor's name.",
+   "hint": "Read only the Governor table, every ticket column (Johanns, Dean, and Rosberg); use the Governor's name for each column.",
    "discover": "gov"
   }
  ]

@@ -1,0 +1,103 @@
+{
+ "polity": "US-MS",
+ "publisher": "Mississippi Secretary of State",
+ "title": "Election summary for the 2000 general election, United States Senator, certified results by county",
+ "authoritative": "Source: the Secretary of State's certified results by county, whose county rows add up to each candidate's printed state total; they replace Algara and Amlani's county rows.",
+ "license": "Public record",
+ "file": {
+  "url": "https://web.archive.org/web/20010605065153id_/http://www.sos.state.ms.us:80/elections/2000ReCap/CertResultsScans/USSenator.pdf"
+ },
+ "raw_source": "us.ms_pri_scans",
+ "unit_codes": {
+  "Jeff Davis": "28065", "Coplah": "28029"
+ },
+ "contests": {
+  "sen": {
+   "year": 2000,
+   "chamber": "senate",
+   "day": "2000-11-07",
+   "special": false,
+   "state": "MS",
+   "district": null
+  }
+ },
+ "pages": [
+  {
+   "page": 1,
+   "id": "sen1",
+   "orientation": "counties_down",
+   "hint": "Each county is a block: the county name, then one line per candidate (Troy Brown, Jim Giles, Trent Lott, Lewis Napper, Shawn Ohara) with votes and a percentage, then 'Total for County'. Read one row per county with a column per candidate's votes; ignore the percentages.",
+   "discover": "sen"
+  },
+  {
+   "page": 2,
+   "id": "sen2",
+   "orientation": "counties_down",
+   "hint": "Each county is a block: the county name, then one line per candidate (Troy Brown, Jim Giles, Trent Lott, Lewis Napper, Shawn Ohara) with votes and a percentage, then 'Total for County'. Read one row per county with a column per candidate's votes; ignore the percentages.",
+   "discover": "sen"
+  },
+  {
+   "page": 3,
+   "id": "sen3",
+   "orientation": "counties_down",
+   "hint": "Each county is a block: the county name, then one line per candidate (Troy Brown, Jim Giles, Trent Lott, Lewis Napper, Shawn Ohara) with votes and a percentage, then 'Total for County'. Read one row per county with a column per candidate's votes; ignore the percentages.",
+   "discover": "sen"
+  },
+  {
+   "page": 4,
+   "id": "sen4",
+   "orientation": "counties_down",
+   "hint": "Each county is a block: the county name, then one line per candidate (Troy Brown, Jim Giles, Trent Lott, Lewis Napper, Shawn Ohara) with votes and a percentage, then 'Total for County'. Read one row per county with a column per candidate's votes; ignore the percentages.",
+   "discover": "sen"
+  },
+  {
+   "page": 5,
+   "id": "sen5",
+   "orientation": "counties_down",
+   "hint": "Each county is a block: the county name, then one line per candidate (Troy Brown, Jim Giles, Trent Lott, Lewis Napper, Shawn Ohara) with votes and a percentage, then 'Total for County'. Read one row per county with a column per candidate's votes; ignore the percentages.",
+   "discover": "sen"
+  },
+  {
+   "page": 6,
+   "id": "sen6",
+   "orientation": "counties_down",
+   "hint": "Each county is a block: the county name, then one line per candidate (Troy Brown, Jim Giles, Trent Lott, Lewis Napper, Shawn Ohara) with votes and a percentage, then 'Total for County'. Read one row per county with a column per candidate's votes; ignore the percentages.",
+   "discover": "sen"
+  },
+  {
+   "page": 7,
+   "id": "sen7",
+   "orientation": "counties_down",
+   "hint": "Each county is a block: the county name, then one line per candidate (Troy Brown, Jim Giles, Trent Lott, Lewis Napper, Shawn Ohara) with votes and a percentage, then 'Total for County'. Read one row per county with a column per candidate's votes; ignore the percentages.",
+   "discover": "sen"
+  },
+  {
+   "page": 8,
+   "id": "sen8",
+   "orientation": "counties_down",
+   "hint": "Each county is a block: the county name, then one line per candidate (Troy Brown, Jim Giles, Trent Lott, Lewis Napper, Shawn Ohara) with votes and a percentage, then 'Total for County'. Read one row per county with a column per candidate's votes; ignore the percentages.",
+   "discover": "sen"
+  },
+  {
+   "page": 9,
+   "id": "sen9",
+   "orientation": "counties_down",
+   "hint": "Each county is a block: the county name, then one line per candidate (Troy Brown, Jim Giles, Trent Lott, Lewis Napper, Shawn Ohara) with votes and a percentage, then 'Total for County'. Read one row per county with a column per candidate's votes; ignore the percentages.",
+   "discover": "sen"
+  },
+  {
+   "page": 10,
+   "id": "sen10",
+   "orientation": "counties_down",
+   "hint": "Each county is a block: the county name, then one line per candidate (Troy Brown, Jim Giles, Trent Lott, Lewis Napper, Shawn Ohara) with votes and a percentage, then 'Total for County'. Read one row per county with a column per candidate's votes; ignore the percentages.",
+   "discover": "sen"
+  },
+  {
+   "page": 11,
+   "id": "sen11",
+   "orientation": "counties_down",
+   "hint": "Each county is a block: the county name, then one line per candidate (Troy Brown, Jim Giles, Trent Lott, Lewis Napper, Shawn Ohara) with votes and a percentage, then 'Total for County'. Read one row per county (Yalobusha and Yazoo) with a column per candidate's votes; ignore the percentages and the State Totals block.",
+   "discover": "sen"
+  }
+ ]
+}

@@ -85,6 +85,7 @@ class Manifest(TypedDict):
     unit_scheme: NotRequired[Literal["town", "split"]]
     authoritative: NotRequired[str]
     extend: NotRequired[bool]
+    restage: NotRequired[bool]
     autorotate: NotRequired[bool]
 
 
@@ -1158,12 +1159,12 @@ def finalize(
                 chosen, how = two or one, "review"
         cellmap = {key: (value, box) for key, (value, box) in chosen.cells.items()}
         fixes = [item for item in overrides.get("cells", []) if item["series"] == name]
+        for item in fixes:
+            key = (str(item.get("section", item.get("page"))), str(item["county"]))
+            seen = cellmap.get(key) or one.cells.get(key) or (two.cells.get(key) if two is not None else None)
+            if seen is not None:
+                cellmap[key] = (int(item["value"]) if "value" in item else seen[0] + int(item["delta"]), seen[1])
         if how == "review" and fixes:
-            for item in fixes:
-                key = (str(item.get("section", item.get("page"))), str(item["county"]))
-                seen = cellmap.get(key) or one.cells.get(key) or (two.cells.get(key) if two is not None else None)
-                if seen is not None:
-                    cellmap[key] = (int(item["value"]) if "value" in item else seen[0] + int(item["delta"]), seen[1])
             target = chosen.printed if chosen.printed is not None else held.get(name)
             slack = 0 if chosen.printed is not None else max(50, (target or 0) * 0.01)
             if target is not None and abs(sum(value for value, _ in cellmap.values()) - target) <= slack:
@@ -1492,6 +1493,7 @@ def emit(name: str) -> Path:
             strict=not manifest.get("authoritative_loose"),
             authoritative=manifest.get("authoritative"),
             extend=bool(manifest.get("extend")),
+            restage=bool(manifest.get("restage")),
         )
         targets = {row["id"]: row["contest_id"] for row in cs.rows.get("result_set", [])}
         for held, contest in conn.execute(
