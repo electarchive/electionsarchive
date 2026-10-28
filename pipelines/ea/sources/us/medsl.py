@@ -970,6 +970,17 @@ def attach(
         if (
             authoritative is None
             and counted.filter(pl.col("candidate").is_in(list(picked)))["votes"].sum() > official * 1.1
+            and not (
+                any(fec for *_, fec in known)
+                and all(
+                    counted.filter(
+                        pl.col("candidate").is_in([name for name, chosen in picked.items() if chosen == str(option)])
+                    )["votes"].sum()
+                    == fec
+                    for option, _, _, _, fec in known
+                    if fec
+                )
+            )
         ):
             print(f"{key}: the county sum exceeds the official total by over 10 percent, skipped")
             continue
