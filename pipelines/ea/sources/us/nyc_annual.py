@@ -14,19 +14,28 @@ from ea.store import DATA, connect
 SOURCE = "us.nyc_annual"
 VERSION = "2"
 PARSED = DATA / "parsed" / SOURCE
-INBOX = DATA / "inbox" / "manual" / "MF-210"
+INBOX = DATA / "inbox" / "manual"
 REPORTS = (
     (
-        "nyc-boe-annual-report-1921-uc1.b4565447.html",
+        "MF-210/nyc-boe-annual-report-1921-uc1.b4565447.html",
         "https://babel.hathitrust.org/cgi/pt?id=uc1.b4565447",
         "Annual Report of the Board of Elections of the City of New York for the Year 1921",
         (date(1921, 1, 1), date(1921, 12, 31)),
     ),
     (
-        "nyc-boe-annual-reports-1918-23-nyp.33433075933410.html",
+        "MF-210/nyc-boe-annual-reports-1918-23-nyp.33433075933410.html",
         "https://babel.hathitrust.org/cgi/pt?id=nyp.33433075933410",
         "Annual Reports of the Board of Elections of the City of New York for the Years 1918 to 1923",
         (date(1918, 1, 1), date(1923, 12, 31)),
+    ),
+    *(
+        (
+            f"MF-218/{year}-uc1.b{item}.html",
+            f"https://babel.hathitrust.org/cgi/pt?id=uc1.b{item}",
+            f"Annual Report of the Board of Elections of the City of New York for the Year {year}",
+            (date(year, 1, 1), date(year, 12, 31)),
+        )
+        for year, item in ((1918, 4565444), (1919, 4565445), (1920, 4565446), (1922, 4565448))
     ),
 )
 COUNTIES = {"NEW YORK": "36061", "BRONX": "36005", "KINGS": "36047", "QUEENS": "36081", "RICHMOND": "36085"}
@@ -78,7 +87,7 @@ NOTE_1917 = (
 )
 REPORTS_1917 = (
     (
-        "nyc-boe-annual-report-1917-uc1.b4565443.html",
+        "MF-210/nyc-boe-annual-report-1917-uc1.b4565443.html",
         "https://babel.hathitrust.org/cgi/pt?id=uc1.b4565443",
         "Annual Report of the Board of Elections of the City of New York for the Year 1917",
         date(1917, 11, 6),

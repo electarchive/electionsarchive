@@ -102,7 +102,7 @@ def fetch() -> None:
     stamp = datetime.now(UTC).strftime("%Y%m%dT%H%M%SZ")
     pages: dict[str, str] = {}
     seen: set[str] = set()
-    level = [urljoin(BASE, "index.html")]
+    level = [BASE]
     client = httpx.Client(follow_redirects=True, timeout=60, headers={"User-Agent": "electionsarchive.com"})
 
     def get(url: str) -> tuple[str, bytes | None]:
@@ -228,7 +228,9 @@ def target(title: str) -> tuple[str, str] | None:
 
 
 def emit():
-    frame = pl.read_parquet(PARSED / "results.parquet")
+    frame = pl.read_parquet(PARSED / "results.parquet").filter(
+        pl.col("as_of").dt.date().is_between(DAY, DAY + timedelta(days=2))
+    )
     pages = json.loads((PARSED / "pages.json").read_text())
     with connect() as conn:
         cs = Changeset(
