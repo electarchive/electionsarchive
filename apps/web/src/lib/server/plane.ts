@@ -57,7 +57,7 @@ export const plane = (column: string, scheme: string) =>
 export const spot = (column: string, scheme: string) =>
   sql`ST_Transform(ST_GeometryN(${plane(column, scheme)}, 1), 4326)`;
 
-const projectionOf = (scheme: string) =>
+export const projectionOf = (scheme: string) =>
   projections[schemes[scheme.split(".", 1)[0] ?? ""] ?? fallback];
 
 const insetsOf = (scheme: string) => projectionOf(scheme)?.insets ?? [];

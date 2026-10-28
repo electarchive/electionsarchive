@@ -20,7 +20,13 @@ import * as v from "valibot";
 import { m } from "#lib/paraglide/messages.js";
 import { os, remember } from "#lib/server/cache.js";
 import { db } from "#lib/server/db/index.js";
-import { outside, parted, plane, spot } from "#lib/server/plane.js";
+import {
+  outside,
+  parted,
+  plane,
+  projectionOf,
+  spot,
+} from "#lib/server/plane.js";
 import { independent } from "#lib/party.js";
 
 const stored = (tiles: string | null | undefined) =>
@@ -8009,7 +8015,11 @@ export const contests = {
               noun: row.noun,
               vintage: row.vintage,
               asOf: row.asOf,
-              tiles: stored(row.tiles),
+              tiles:
+                input.level != null &&
+                projectionOf(input.level) !== projectionOf(group.scheme)
+                  ? null
+                  : stored(row.tiles),
               isPending: row.tiles != null && stored(row.tiles) == null,
               isApproximate: row.qualities.includes("synthetic"),
               note: row.note,
@@ -14906,11 +14916,6 @@ export async function record(input: { id: string; body?: string }) {
           select from contest pc join election pe on pe.id = pc.election_id
           where pc.id = c.previous_round_id and pe.kind in ('general', 'local')
         )
-        and not (c.term = 'remainder' and exists (
-          select from contest f where f.election_id = c.election_id and f.term = 'full'
-            and f.body_id is not distinct from c.body_id and f.office_id is not distinct from c.office_id
-            and f.seat_id is not distinct from c.seat_id and f.district_area_id is not distinct from c.district_area_id
-        ))
         and (coalesce(
           (select polity_id from body where id = c.body_id),
           (select polity_id from office where id = c.office_id)
@@ -14988,16 +14993,8 @@ export async function record(input: { id: string; body?: string }) {
     ),
     won as materialized (
       select w.root, w.contest, w.id, w.seats,
-        coalesce(bm.into_id, br.parent_party_id, pm.into_id, w.party_id, ld.party_id,
-          (select min(cn.party_id::text)::uuid from candidacy cy
-            join candidacy_nomination cn on cn.candidacy_id = cy.id and cn.kind = 'nominated'
-            where cy.option_id = w.id having count(distinct cn.party_id) = 1),
-          (select coalesce(min(cy.member_of_party_id::text)::uuid, o.alliance_id) from contest_option o
-            left join candidacy cy on cy.option_id = o.id
-            where o.id = w.id and o.alliance_id is not null group by o.alliance_id)) as party,
-        exists (select from candidacy cy where cy.option_id = w.id and cy.is_independent)
-          or exists (select from contest_option o where o.id = w.id and o.party_id is null and o.alliance_id is null
-            and o.ballot_label ~* '^(independent|bağımsız|indépendant|unabhängig|indipendent)') as independent,
+        coalesce(bm.into_id, br.parent_party_id, pm.into_id, w.party_id, ld.party_id) as party,
+        exists (select from candidacy cy where cy.option_id = w.id and cy.is_independent) as independent,
         case when r."isOffice" then (select coalesce(m.into_id, cy.person_id) from candidacy cy
           left join entity_merge m on m.entity_id = cy.person_id
           where cy.option_id = w.id and cy.person_id is not null order by cy.id limit 1) end as person
@@ -15187,22 +15184,8 @@ export async function record(input: { id: string; body?: string }) {
     );
     for (const ids of texts.values()) {
       if (ids.length > 1) {
-        const last = new Map(
-          ids.map((id) => [
-            id,
-            Math.max(
-              ...found.rows
-                .filter((row) => row.party === id)
-                .map((row) => row.year),
-            ),
-          ]),
-        );
-        const newest = Math.max(...last.values());
-        const current = ids.filter((id) => last.get(id) === newest);
         for (const id of ids) {
-          if (current.length > 1 || !current.includes(id)) {
-            clashes.add(id);
-          }
+          clashes.add(id);
         }
       }
     }

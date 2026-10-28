@@ -145,6 +145,7 @@
   const uid = $props.id();
   let opening = $state<number | null>(null);
   let listing = $state<string | null>(null);
+  let stripHeight = $state(0);
   let ladder = $state<Awaited<ReturnType<typeof orpc.contests.context.call>>>(
     [],
   );
@@ -232,7 +233,7 @@
       return {
         top: edge + (up == null ? 0 : 20),
         right: edge + 36,
-        bottom: edge,
+        bottom: Math.max(edge, stripHeight + 16),
         left: edge,
       };
     },
@@ -2081,6 +2082,7 @@
     {#if segments.length > 0}
       <div
         class="pointer-events-none absolute inset-e-2 inset-be-2 flex flex-wrap-reverse justify-end gap-1.5 max-sm:inset-s-2 max-sm:inset-e-14"
+        bind:clientHeight={stripHeight}
       >
         {#each segments as segment (segment.group)}
           {const heading = $derived(
@@ -2179,30 +2181,14 @@
               {/each}
             </div>
           {:else}
-            {const lines = $derived(
-              segment.entries.map((entry, index) => {
+            {const groups = $derived(
+              Map.groupBy(segment.entries, (entry) => {
                 const cut = entry.name.lastIndexOf(", ");
-                const prefix = cut > 0 ? entry.name.slice(0, cut) : "";
-                const rest = entry.name.slice(cut + 2);
-                const isShared =
-                  prefix !== "" &&
-                  segment.entries.filter((other) =>
-                    other.name.startsWith(`${prefix}, `),
-                  ).length > 1;
-                const before = segment.entries[index - 1]?.name ?? "";
-                return {
-                  entry,
-                  header:
-                    isShared && !before.startsWith(`${prefix}, `)
-                      ? prefix
-                      : null,
-                  label: isShared
-                    ? rest
-                    : prefix === rest
-                      ? prefix
-                      : entry.name,
-                };
-              }),
+                return cut > 0 ? entry.name.slice(0, cut) : entry.name;
+              })
+                .entries()
+                .map(([name, entries]) => ({ name, entries }))
+                .toArray(),
             )}
             <Popover.Root
               bind:open={
@@ -2239,36 +2225,61 @@
               <Popover.Content
                 side="top"
                 align="end"
-                class="gap-0 overflow-y-auto p-1 inline-80 max-block-[min(24rem,60dvh)]"
+                class="gap-0 overflow-y-auto px-3 py-1 inline-[min(34rem,calc(100vw-1rem))] max-block-[min(36rem,75dvh)]"
               >
-                {#each lines as line (line.entry.k)}
-                  {const row = $derived(rows.get(line.entry.k))}
-                  {#if line.header != null}
-                    <p
-                      class="px-2 pbs-2 pbe-0.5 text-xs text-muted-foreground not-first:mbs-1 not-first:border-bs not-first:border-border"
-                    >
-                      {line.header}
-                    </p>
-                  {/if}
-                  {#if row?.path == null}
+                <div class="grid grid-cols-[minmax(0,8rem)_1fr] gap-x-3">
+                  {#each groups as group (group.name)}
                     <div
-                      class="flex items-center gap-2.5 rounded-xs px-2 py-1.5"
+                      class="col-span-2 grid grid-cols-subgrid items-baseline border-bs border-border py-1.5 first:border-bs-0"
                     >
-                      {@render outlier(line.entry, row, line.label)}
+                      <span
+                        class="pbs-0.5 text-[0.8125rem] font-semibold text-pretty"
+                        >{group.name}</span
+                      >
+                      <span
+                        class="grid grid-cols-[repeat(auto-fill,minmax(5.25rem,1fr))] gap-x-1"
+                      >
+                        {#each group.entries as entry (entry.k)}
+                          {const row = $derived(rows.get(entry.k))}
+                          {const rest = $derived(
+                            entry.name.slice(group.name.length + 2),
+                          )}
+                          {const number = $derived(
+                            group.entries.length > 1
+                              ? (/\d+/u.exec(rest)?.[0] ?? rest)
+                              : null,
+                          )}
+                          {const detail = $derived(
+                            entry.leader == null || row == null
+                              ? m.map_blank_key()
+                              : `${names[entry.leader] ?? ""} ${percent(row.shares[entry.leader] ?? 0)}`,
+                          )}
+                          {#if row?.path == null}
+                            <span
+                              class="flex items-center gap-1.5 rounded-xs px-1.5 text-xs block-7"
+                              title={`${entry.name}: ${detail}`}
+                            >
+                              {@render tile(entry, row, number)}
+                            </span>
+                          {:else}
+                            <button
+                              type="button"
+                              class="flex items-center gap-1.5 rounded-xs px-1.5 text-xs block-7 hover:bg-secondary focus-visible:bg-secondary pointer-coarse:block-9"
+                              title={`${entry.name}: ${detail}`}
+                              aria-label={`${entry.name}: ${detail}`}
+                              onclick={() => {
+                                listing = null;
+                                open(entry.k);
+                              }}
+                            >
+                              {@render tile(entry, row, number)}
+                            </button>
+                          {/if}
+                        {/each}
+                      </span>
                     </div>
-                  {:else}
-                    <button
-                      type="button"
-                      class="flex items-center gap-2.5 rounded-xs px-2 py-1.5 text-start inline-full hover:bg-secondary focus-visible:bg-secondary"
-                      onclick={() => {
-                        listing = null;
-                        open(line.entry.k);
-                      }}
-                    >
-                      {@render outlier(line.entry, row, line.label)}
-                    </button>
-                  {/if}
-                {/each}
+                  {/each}
+                </div>
               </Popover.Content>
             </Popover.Root>
           {/if}
@@ -3037,35 +3048,26 @@
   </span>
 {/snippet}
 
-{#snippet outlier(
+{#snippet tile(
   entry: (typeof remote)[number],
   row: ReturnType<typeof rows.get>,
-  label: string,
+  number: string | null,
 )}
   <span
-    class={cn(
-      "mbs-1 shrink-0 self-start rounded-xs bg-(--party) block-2.5 inline-2.5",
-      { "ring-1 ring-border": entry.isBlank },
-    )}
+    class={cn("shrink-0 rounded-xs bg-(--party) block-2.5 inline-2.5", {
+      "ring-1 ring-border": entry.isBlank,
+    })}
     style:--party={entry.fill}
     aria-hidden="true"
   ></span>
-  <span class="grid flex-1 gap-0.5 min-inline-0">
-    <span
-      class={cn(
-        "text-[0.8125rem] font-semibold text-pretty first-letter:uppercase",
-        { "font-normal text-muted-foreground": entry.isBlank },
-      )}>{label}</span
-    >
-    <span class="truncate text-xs text-muted-foreground"
-      >{entry.leader == null ? m.map_blank_key() : names[entry.leader]}</span
-    >
-  </span>
-  {#if entry.leader != null && row != null}
-    <span class="shrink-0 self-start font-figures text-[0.8125rem] tabular-nums"
-      >{percent(row.shares[entry.leader] ?? 0)}</span
-    >
+  {#if number != null}
+    <span class="font-semibold">{number}</span>
   {/if}
+  <span class="font-figures text-muted-foreground tabular-nums"
+    >{entry.leader == null || row == null
+      ? "–"
+      : percent(row.shares[entry.leader] ?? 0)}</span
+  >
 {/snippet}
 
 {#snippet readout(isSheet = false)}
