@@ -1,0 +1,807 @@
+{
+  "polity": "US-RI",
+  "publisher": "Rhode Island Board of Elections",
+  "title": "Official Count of the Ballots Cast, General Election, November 7, 2000",
+  "license": "Public record",
+  "raw_source": "us.ri_countbook",
+  "file": {
+    "url": "https://elections.ri.gov/sites/g/files/xkgbur756/files/publications/Election_Publications/Countbooks/2000-Count-Book.pdf"
+  },
+  "unit_scheme": "town",
+  "contests": {
+    "senate-14": {
+      "year": 2000,
+      "chamber": "state-senate",
+      "day": "2000-11-07",
+      "special": false,
+      "state": "RI",
+      "district": 14
+    },
+    "senate-17": {
+      "year": 2000,
+      "chamber": "state-senate",
+      "day": "2000-11-07",
+      "special": false,
+      "state": "RI",
+      "district": 17
+    },
+    "senate-21": {
+      "year": 2000,
+      "chamber": "state-senate",
+      "day": "2000-11-07",
+      "special": false,
+      "state": "RI",
+      "district": 21
+    },
+    "senate-22": {
+      "year": 2000,
+      "chamber": "state-senate",
+      "day": "2000-11-07",
+      "special": false,
+      "state": "RI",
+      "district": 22
+    },
+    "senate-41": {
+      "year": 2000,
+      "chamber": "state-senate",
+      "day": "2000-11-07",
+      "special": false,
+      "state": "RI",
+      "district": 41
+    },
+    "senate-44": {
+      "year": 2000,
+      "chamber": "state-senate",
+      "day": "2000-11-07",
+      "special": false,
+      "state": "RI",
+      "district": 44
+    },
+    "senate-46": {
+      "year": 2000,
+      "chamber": "state-senate",
+      "day": "2000-11-07",
+      "special": false,
+      "state": "RI",
+      "district": 46
+    },
+    "senate-47": {
+      "year": 2000,
+      "chamber": "state-senate",
+      "day": "2000-11-07",
+      "special": false,
+      "state": "RI",
+      "district": 47
+    },
+    "house-24": {
+      "year": 2000,
+      "chamber": "state-house",
+      "day": "2000-11-07",
+      "special": false,
+      "state": "RI",
+      "district": 24
+    },
+    "house-25": {
+      "year": 2000,
+      "chamber": "state-house",
+      "day": "2000-11-07",
+      "special": false,
+      "state": "RI",
+      "district": 25
+    },
+    "house-28": {
+      "year": 2000,
+      "chamber": "state-house",
+      "day": "2000-11-07",
+      "special": false,
+      "state": "RI",
+      "district": 28
+    },
+    "house-31": {
+      "year": 2000,
+      "chamber": "state-house",
+      "day": "2000-11-07",
+      "special": false,
+      "state": "RI",
+      "district": 31
+    },
+    "house-47": {
+      "year": 2000,
+      "chamber": "state-house",
+      "day": "2000-11-07",
+      "special": false,
+      "state": "RI",
+      "district": 47
+    },
+    "house-52": {
+      "year": 2000,
+      "chamber": "state-house",
+      "day": "2000-11-07",
+      "special": false,
+      "state": "RI",
+      "district": 52
+    },
+    "house-53": {
+      "year": 2000,
+      "chamber": "state-house",
+      "day": "2000-11-07",
+      "special": false,
+      "state": "RI",
+      "district": 53
+    },
+    "house-87": {
+      "year": 2000,
+      "chamber": "state-house",
+      "day": "2000-11-07",
+      "special": false,
+      "state": "RI",
+      "district": 87
+    },
+    "house-90": {
+      "year": 2000,
+      "chamber": "state-house",
+      "day": "2000-11-07",
+      "special": false,
+      "state": "RI",
+      "district": 90
+    },
+    "house-93": {
+      "year": 2000,
+      "chamber": "state-house",
+      "day": "2000-11-07",
+      "special": false,
+      "state": "RI",
+      "district": 93
+    },
+    "house-98": {
+      "year": 2000,
+      "chamber": "state-house",
+      "day": "2000-11-07",
+      "special": false,
+      "state": "RI",
+      "district": 98
+    }
+  },
+  "pages": [
+    {
+      "page": 241,
+      "id": "241-0",
+      "columns": [
+        {
+          "label": "Total Votes",
+          "contest": "senate-14",
+          "candidate": "Kimberly J. Manchester"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.03,
+        0.08,
+        0.99,
+        0.51
+      ],
+      "hint": "Read only the table titled 'SENATE DISTRICT 14' for the candidate Kimberly J. MANCHESTER; ignore any other table visible in the image. Return one row per community: label it with the community's full name (write 'S. KINGSTOWN' as 'South Kingstown' and 'N. KINGSTOWN' as 'North Kingstown') and give the 'Total Votes' column figure from that community's 'Total Votes' subtotal row; when a community has a single precinct and no subtotal row, give that precinct row's 'Total Votes' figure. Do not return precinct rows. Return the 'Grand Total' row's 'Total Votes' figure as the total.",
+      "bands": 1
+    },
+    {
+      "page": 241,
+      "id": "241-1",
+      "columns": [
+        {
+          "label": "Total Votes",
+          "contest": "senate-14",
+          "candidate": "Aram G. Garabedian"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.03,
+        0.47,
+        0.99,
+        0.89
+      ],
+      "hint": "Read only the table titled 'SENATE DISTRICT 14' for the candidate Aram G. GARABEDIAN; ignore any other table visible in the image. Return one row per community: label it with the community's full name (write 'S. KINGSTOWN' as 'South Kingstown' and 'N. KINGSTOWN' as 'North Kingstown') and give the 'Total Votes' column figure from that community's 'Total Votes' subtotal row; when a community has a single precinct and no subtotal row, give that precinct row's 'Total Votes' figure. Do not return precinct rows. Return the 'Grand Total' row's 'Total Votes' figure as the total.",
+      "bands": 1
+    },
+    {
+      "page": 244,
+      "id": "244-0",
+      "columns": [
+        {
+          "label": "Total Votes",
+          "contest": "senate-17",
+          "candidate": "William A. Walaska"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.03,
+        0.1,
+        0.99,
+        0.46
+      ],
+      "hint": "Read only the table titled 'SENATE DISTRICT 17' for the candidate William A. WALASKA; ignore any other table visible in the image. Return one row per community: label it with the community's full name (write 'S. KINGSTOWN' as 'South Kingstown' and 'N. KINGSTOWN' as 'North Kingstown') and give the 'Total Votes' column figure from that community's 'Total Votes' subtotal row; when a community has a single precinct and no subtotal row, give that precinct row's 'Total Votes' figure. Do not return precinct rows. Return the 'Grand Total' row's 'Total Votes' figure as the total.",
+      "bands": 1
+    },
+    {
+      "page": 246,
+      "id": "246-0",
+      "columns": [
+        {
+          "label": "Total Votes",
+          "contest": "senate-21",
+          "candidate": "Leo R. Blais"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.03,
+        0.46,
+        0.99,
+        0.88
+      ],
+      "hint": "Read only the table titled 'SENATE DISTRICT 21' for the candidate Leo R. BLAIS; ignore any other table visible in the image. Return one row per community: label it with the community's full name (write 'S. KINGSTOWN' as 'South Kingstown' and 'N. KINGSTOWN' as 'North Kingstown') and give the 'Total Votes' column figure from that community's 'Total Votes' subtotal row; when a community has a single precinct and no subtotal row, give that precinct row's 'Total Votes' figure. Do not return precinct rows. Return the 'Grand Total' row's 'Total Votes' figure as the total.",
+      "bands": 1
+    },
+    {
+      "page": 247,
+      "id": "247-0",
+      "columns": [
+        {
+          "label": "Total Votes",
+          "contest": "senate-21",
+          "candidate": "Michael G. Reeves"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.03,
+        0.11,
+        0.99,
+        0.53
+      ],
+      "hint": "Read only the table titled 'SENATE DISTRICT 21' for the candidate Michael G. REEVES; ignore any other table visible in the image. Return one row per community: label it with the community's full name (write 'S. KINGSTOWN' as 'South Kingstown' and 'N. KINGSTOWN' as 'North Kingstown') and give the 'Total Votes' column figure from that community's 'Total Votes' subtotal row; when a community has a single precinct and no subtotal row, give that precinct row's 'Total Votes' figure. Do not return precinct rows. Return the 'Grand Total' row's 'Total Votes' figure as the total.",
+      "bands": 1
+    },
+    {
+      "page": 247,
+      "id": "247-1",
+      "columns": [
+        {
+          "label": "Total Votes",
+          "contest": "senate-21",
+          "candidate": "Victor G. Moffitt"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.03,
+        0.47,
+        0.99,
+        0.9
+      ],
+      "hint": "Read only the table titled 'SENATE DISTRICT 21' for the candidate Victor G. MOFFITT; ignore any other table visible in the image. Return one row per community: label it with the community's full name (write 'S. KINGSTOWN' as 'South Kingstown' and 'N. KINGSTOWN' as 'North Kingstown') and give the 'Total Votes' column figure from that community's 'Total Votes' subtotal row; when a community has a single precinct and no subtotal row, give that precinct row's 'Total Votes' figure. Do not return precinct rows. Return the 'Grand Total' row's 'Total Votes' figure as the total.",
+      "bands": 1
+    },
+    {
+      "page": 248,
+      "id": "248-0",
+      "columns": [
+        {
+          "label": "Total Votes",
+          "contest": "senate-22",
+          "candidate": "S. G. Payne"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.03,
+        0.07,
+        0.99,
+        0.52
+      ],
+      "hint": "Read only the table titled 'SENATE DISTRICT 22' for the candidate S.G. PAYNE; ignore any other table visible in the image. Return one row per community: label it with the community's full name (write 'S. KINGSTOWN' as 'South Kingstown' and 'N. KINGSTOWN' as 'North Kingstown') and give the 'Total Votes' column figure from that community's 'Total Votes' subtotal row; when a community has a single precinct and no subtotal row, give that precinct row's 'Total Votes' figure. Do not return precinct rows. Return the 'Grand Total' row's 'Total Votes' figure as the total.",
+      "bands": 1
+    },
+    {
+      "page": 248,
+      "id": "248-1",
+      "columns": [
+        {
+          "label": "Total Votes",
+          "contest": "senate-22",
+          "candidate": "J. Michael Lenihan"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.03,
+        0.45,
+        0.99,
+        0.93
+      ],
+      "hint": "Read only the table titled 'SENATE DISTRICT 22' for the candidate J. Michael LENIHAN; ignore any other table visible in the image. Return one row per community: label it with the community's full name (write 'S. KINGSTOWN' as 'South Kingstown' and 'N. KINGSTOWN' as 'North Kingstown') and give the 'Total Votes' column figure from that community's 'Total Votes' subtotal row; when a community has a single precinct and no subtotal row, give that precinct row's 'Total Votes' figure. Do not return precinct rows. Return the 'Grand Total' row's 'Total Votes' figure as the total.",
+      "bands": 1
+    },
+    {
+      "page": 262,
+      "id": "262-0",
+      "columns": [
+        {
+          "label": "Total Votes",
+          "contest": "senate-41",
+          "candidate": "Kevin A. Breene"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.03,
+        0.11,
+        0.99,
+        0.5
+      ],
+      "hint": "Read only the table titled 'SENATE DISTRICT 41' for the candidate Kevin A. BREENE; ignore any other table visible in the image. Return one row per community: label it with the community's full name (write 'S. KINGSTOWN' as 'South Kingstown' and 'N. KINGSTOWN' as 'North Kingstown') and give the 'Total Votes' column figure from that community's 'Total Votes' subtotal row; when a community has a single precinct and no subtotal row, give that precinct row's 'Total Votes' figure. Do not return precinct rows. Return the 'Grand Total' row's 'Total Votes' figure as the total.",
+      "bands": 1
+    },
+    {
+      "page": 263,
+      "id": "263-0",
+      "columns": [
+        {
+          "label": "Total Votes",
+          "contest": "senate-44",
+          "candidate": "David E. Bates"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.03,
+        0.38,
+        0.99,
+        0.69
+      ],
+      "hint": "Read only the table titled 'SENATE DISTRICT 44' for the candidate David E. BATES; ignore any other table visible in the image. Return one row per community: label it with the community's full name (write 'S. KINGSTOWN' as 'South Kingstown' and 'N. KINGSTOWN' as 'North Kingstown') and give the 'Total Votes' column figure from that community's 'Total Votes' subtotal row; when a community has a single precinct and no subtotal row, give that precinct row's 'Total Votes' figure. Do not return precinct rows. Return the 'Grand Total' row's 'Total Votes' figure as the total.",
+      "bands": 1
+    },
+    {
+      "page": 265,
+      "id": "265-0",
+      "columns": [
+        {
+          "label": "Total Votes",
+          "contest": "senate-46",
+          "candidate": "Walter S. Felag, Jr."
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.03,
+        0.09,
+        0.99,
+        0.49
+      ],
+      "hint": "Read only the table titled 'SENATE DISTRICT 46' for the candidate Walter S. FELAG, JR.; ignore any other table visible in the image. Return one row per community: label it with the community's full name (write 'S. KINGSTOWN' as 'South Kingstown' and 'N. KINGSTOWN' as 'North Kingstown') and give the 'Total Votes' column figure from that community's 'Total Votes' subtotal row; when a community has a single precinct and no subtotal row, give that precinct row's 'Total Votes' figure. Do not return precinct rows. Return the 'Grand Total' row's 'Total Votes' figure as the total.",
+      "bands": 1
+    },
+    {
+      "page": 266,
+      "id": "266-0",
+      "columns": [
+        {
+          "label": "Total Votes",
+          "contest": "senate-47",
+          "candidate": "Karen F. Carroll"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.03,
+        0.09,
+        0.99,
+        0.41
+      ],
+      "hint": "Read only the table titled 'SENATE DISTRICT 47' for the candidate Karen F. CARROLL; ignore any other table visible in the image. Return one row per community: label it with the community's full name (write 'S. KINGSTOWN' as 'South Kingstown' and 'N. KINGSTOWN' as 'North Kingstown') and give the 'Total Votes' column figure from that community's 'Total Votes' subtotal row; when a community has a single precinct and no subtotal row, give that precinct row's 'Total Votes' figure. Do not return precinct rows. Return the 'Grand Total' row's 'Total Votes' figure as the total.",
+      "bands": 1
+    },
+    {
+      "page": 266,
+      "id": "266-1",
+      "columns": [
+        {
+          "label": "Total Votes",
+          "contest": "senate-47",
+          "candidate": "William Enos"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.03,
+        0.36,
+        0.99,
+        0.7
+      ],
+      "hint": "Read only the table titled 'SENATE DISTRICT 47' for the candidate William ENOS; ignore any other table visible in the image. Return one row per community: label it with the community's full name (write 'S. KINGSTOWN' as 'South Kingstown' and 'N. KINGSTOWN' as 'North Kingstown') and give the 'Total Votes' column figure from that community's 'Total Votes' subtotal row; when a community has a single precinct and no subtotal row, give that precinct row's 'Total Votes' figure. Do not return precinct rows. Return the 'Grand Total' row's 'Total Votes' figure as the total.",
+      "bands": 1
+    },
+    {
+      "page": 284,
+      "id": "284-0",
+      "columns": [
+        {
+          "label": "Total Votes",
+          "contest": "house-24",
+          "candidate": "Frank A. Montanaro"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.03,
+        0.31,
+        0.99,
+        0.57
+      ],
+      "hint": "Read only the table titled 'REPRESENTATIVE DISTRICT 24' for the candidate Frank A. MONTANARO; ignore any other table visible in the image. Return one row per community: label it with the community's full name (write 'S. KINGSTOWN' as 'South Kingstown' and 'N. KINGSTOWN' as 'North Kingstown') and give the 'Total Votes' column figure from that community's 'Total Votes' subtotal row; when a community has a single precinct and no subtotal row, give that precinct row's 'Total Votes' figure. Do not return precinct rows. Return the 'Grand Total' row's 'Total Votes' figure as the total.",
+      "bands": 1
+    },
+    {
+      "page": 284,
+      "id": "284-1",
+      "columns": [
+        {
+          "label": "Total Votes",
+          "contest": "house-25",
+          "candidate": "Peter G. Palumbo"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.03,
+        0.54,
+        0.99,
+        0.82
+      ],
+      "hint": "Read only the table titled 'REPRESENTATIVE DISTRICT 25' for the candidate Peter G. PALUMBO; ignore any other table visible in the image. Return one row per community: label it with the community's full name (write 'S. KINGSTOWN' as 'South Kingstown' and 'N. KINGSTOWN' as 'North Kingstown') and give the 'Total Votes' column figure from that community's 'Total Votes' subtotal row; when a community has a single precinct and no subtotal row, give that precinct row's 'Total Votes' figure. Do not return precinct rows. Return the 'Grand Total' row's 'Total Votes' figure as the total.",
+      "bands": 1
+    },
+    {
+      "page": 285,
+      "id": "285-0",
+      "columns": [
+        {
+          "label": "Total Votes",
+          "contest": "house-28",
+          "candidate": "Nancy Hetherington"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.03,
+        0.54,
+        0.99,
+        0.8
+      ],
+      "hint": "Read only the table titled 'REPRESENTATIVE DISTRICT 28' for the candidate Nancy HETHERINGTON; ignore any other table visible in the image. Return one row per community: label it with the community's full name (write 'S. KINGSTOWN' as 'South Kingstown' and 'N. KINGSTOWN' as 'North Kingstown') and give the 'Total Votes' column figure from that community's 'Total Votes' subtotal row; when a community has a single precinct and no subtotal row, give that precinct row's 'Total Votes' figure. Do not return precinct rows. Return the 'Grand Total' row's 'Total Votes' figure as the total.",
+      "bands": 1
+    },
+    {
+      "page": 287,
+      "id": "287-0",
+      "columns": [
+        {
+          "label": "Total Votes",
+          "contest": "house-31",
+          "candidate": "Myrna George"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.03,
+        0.11,
+        0.99,
+        0.42
+      ],
+      "hint": "Read only the table titled 'REPRESENTATIVE DISTRICT 31' for the candidate Myrna GEORGE; ignore any other table visible in the image. Return one row per community: label it with the community's full name (write 'S. KINGSTOWN' as 'South Kingstown' and 'N. KINGSTOWN' as 'North Kingstown') and give the 'Total Votes' column figure from that community's 'Total Votes' subtotal row; when a community has a single precinct and no subtotal row, give that precinct row's 'Total Votes' figure. Do not return precinct rows. Return the 'Grand Total' row's 'Total Votes' figure as the total.",
+      "bands": 1
+    },
+    {
+      "page": 295,
+      "id": "295-0",
+      "columns": [
+        {
+          "label": "Total Votes",
+          "contest": "house-47",
+          "candidate": "David A. Caprio"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.03,
+        0.53,
+        0.99,
+        0.77
+      ],
+      "hint": "Read only the table titled 'REPRESENTATIVE DISTRICT 47' for the candidate David A. CAPRIO; ignore any other table visible in the image. Return one row per community: label it with the community's full name (write 'S. KINGSTOWN' as 'South Kingstown' and 'N. KINGSTOWN' as 'North Kingstown') and give the 'Total Votes' column figure from that community's 'Total Votes' subtotal row; when a community has a single precinct and no subtotal row, give that precinct row's 'Total Votes' figure. Do not return precinct rows. Return the 'Grand Total' row's 'Total Votes' figure as the total.",
+      "bands": 1
+    },
+    {
+      "page": 299,
+      "id": "299-0",
+      "columns": [
+        {
+          "label": "Total Votes",
+          "contest": "house-52",
+          "candidate": "Joseph H. Scott"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.03,
+        0.12,
+        0.99,
+        0.41
+      ],
+      "hint": "Read only the table titled 'REPRESENTATIVE DISTRICT 52' for the candidate Joseph H. SCOTT; ignore any other table visible in the image. Return one row per community: label it with the community's full name (write 'S. KINGSTOWN' as 'South Kingstown' and 'N. KINGSTOWN' as 'North Kingstown') and give the 'Total Votes' column figure from that community's 'Total Votes' subtotal row; when a community has a single precinct and no subtotal row, give that precinct row's 'Total Votes' figure. Do not return precinct rows. Return the 'Grand Total' row's 'Total Votes' figure as the total.",
+      "bands": 1
+    },
+    {
+      "page": 299,
+      "id": "299-1",
+      "columns": [
+        {
+          "label": "Total Votes",
+          "contest": "house-52",
+          "candidate": "Kenneth L. Fernstrom"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.03,
+        0.37,
+        0.99,
+        0.66
+      ],
+      "hint": "Read only the table titled 'REPRESENTATIVE DISTRICT 52' for the candidate Kenneth L. FERNSTROM; ignore any other table visible in the image. Return one row per community: label it with the community's full name (write 'S. KINGSTOWN' as 'South Kingstown' and 'N. KINGSTOWN' as 'North Kingstown') and give the 'Total Votes' column figure from that community's 'Total Votes' subtotal row; when a community has a single precinct and no subtotal row, give that precinct row's 'Total Votes' figure. Do not return precinct rows. Return the 'Grand Total' row's 'Total Votes' figure as the total.",
+      "bands": 1
+    },
+    {
+      "page": 299,
+      "id": "299-2",
+      "columns": [
+        {
+          "label": "Total Votes",
+          "contest": "house-52",
+          "candidate": "John M. Carlevale"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.03,
+        0.62,
+        0.99,
+        0.91
+      ],
+      "hint": "Read only the table titled 'REPRESENTATIVE DISTRICT 52' for the candidate John M. CARLEVALE; ignore any other table visible in the image. Return one row per community: label it with the community's full name (write 'S. KINGSTOWN' as 'South Kingstown' and 'N. KINGSTOWN' as 'North Kingstown') and give the 'Total Votes' column figure from that community's 'Total Votes' subtotal row; when a community has a single precinct and no subtotal row, give that precinct row's 'Total Votes' figure. Do not return precinct rows. Return the 'Grand Total' row's 'Total Votes' figure as the total.",
+      "bands": 1
+    },
+    {
+      "page": 300,
+      "id": "300-0",
+      "columns": [
+        {
+          "label": "Total Votes",
+          "contest": "house-53",
+          "candidate": "Nicholas Gorham"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.03,
+        0.08,
+        0.99,
+        0.32
+      ],
+      "hint": "Read only the table titled 'REPRESENTATIVE DISTRICT 53' for the candidate Nicholas GORHAM; ignore any other table visible in the image. Return one row per community: label it with the community's full name (write 'S. KINGSTOWN' as 'South Kingstown' and 'N. KINGSTOWN' as 'North Kingstown') and give the 'Total Votes' column figure from that community's 'Total Votes' subtotal row; when a community has a single precinct and no subtotal row, give that precinct row's 'Total Votes' figure. Do not return precinct rows. Return the 'Grand Total' row's 'Total Votes' figure as the total.",
+      "bands": 1
+    },
+    {
+      "page": 300,
+      "id": "300-1",
+      "columns": [
+        {
+          "label": "Total Votes",
+          "contest": "house-53",
+          "candidate": "Earl Bagley"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.03,
+        0.3,
+        0.99,
+        0.59
+      ],
+      "hint": "Read only the table titled 'REPRESENTATIVE DISTRICT 53' for the candidate Earl BAGLEY, III; ignore any other table visible in the image. Return one row per community: label it with the community's full name (write 'S. KINGSTOWN' as 'South Kingstown' and 'N. KINGSTOWN' as 'North Kingstown') and give the 'Total Votes' column figure from that community's 'Total Votes' subtotal row; when a community has a single precinct and no subtotal row, give that precinct row's 'Total Votes' figure. Do not return precinct rows. Return the 'Grand Total' row's 'Total Votes' figure as the total.",
+      "bands": 1
+    },
+    {
+      "page": 314,
+      "id": "314-0",
+      "columns": [
+        {
+          "label": "Total Votes",
+          "contest": "house-87",
+          "candidate": "John A. Savage"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.03,
+        0.44,
+        0.99,
+        0.69
+      ],
+      "hint": "Read only the table titled 'REPRESENTATIVE DISTRICT 87' for the candidate John A. SAVAGE; ignore any other table visible in the image. Return one row per community: label it with the community's full name (write 'S. KINGSTOWN' as 'South Kingstown' and 'N. KINGSTOWN' as 'North Kingstown') and give the 'Total Votes' column figure from that community's 'Total Votes' subtotal row; when a community has a single precinct and no subtotal row, give that precinct row's 'Total Votes' figure. Do not return precinct rows. Return the 'Grand Total' row's 'Total Votes' figure as the total.",
+      "bands": 1
+    },
+    {
+      "page": 314,
+      "id": "314-1",
+      "columns": [
+        {
+          "label": "Total Votes",
+          "contest": "house-87",
+          "candidate": "Mary A. Gasbarro"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.03,
+        0.66,
+        0.99,
+        0.91
+      ],
+      "hint": "Read only the table titled 'REPRESENTATIVE DISTRICT 87' for the candidate Mary A. GASBARRO; ignore any other table visible in the image. Return one row per community: label it with the community's full name (write 'S. KINGSTOWN' as 'South Kingstown' and 'N. KINGSTOWN' as 'North Kingstown') and give the 'Total Votes' column figure from that community's 'Total Votes' subtotal row; when a community has a single precinct and no subtotal row, give that precinct row's 'Total Votes' figure. Do not return precinct rows. Return the 'Grand Total' row's 'Total Votes' figure as the total.",
+      "bands": 1
+    },
+    {
+      "page": 316,
+      "id": "316-0",
+      "columns": [
+        {
+          "label": "Total Votes",
+          "contest": "house-90",
+          "candidate": "Jeffrey Luiz"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.03,
+        0.12,
+        0.99,
+        0.45
+      ],
+      "hint": "Read only the table titled 'REPRESENTATIVE DISTRICT 90' for the candidate Jeffrey LUIZ; ignore any other table visible in the image. Return one row per community: label it with the community's full name (write 'S. KINGSTOWN' as 'South Kingstown' and 'N. KINGSTOWN' as 'North Kingstown') and give the 'Total Votes' column figure from that community's 'Total Votes' subtotal row; when a community has a single precinct and no subtotal row, give that precinct row's 'Total Votes' figure. Do not return precinct rows. Return the 'Grand Total' row's 'Total Votes' figure as the total.",
+      "bands": 1
+    },
+    {
+      "page": 316,
+      "id": "316-1",
+      "columns": [
+        {
+          "label": "Total Votes",
+          "contest": "house-90",
+          "candidate": "Fausto C. Anguilla"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.03,
+        0.35,
+        0.99,
+        0.62
+      ],
+      "hint": "Read only the table titled 'REPRESENTATIVE DISTRICT 90' for the candidate Fausto C. ANGUILLA; ignore any other table visible in the image. Return one row per community: label it with the community's full name (write 'S. KINGSTOWN' as 'South Kingstown' and 'N. KINGSTOWN' as 'North Kingstown') and give the 'Total Votes' column figure from that community's 'Total Votes' subtotal row; when a community has a single precinct and no subtotal row, give that precinct row's 'Total Votes' figure. Do not return precinct rows. Return the 'Grand Total' row's 'Total Votes' figure as the total.",
+      "bands": 1
+    },
+    {
+      "page": 318,
+      "id": "318-0",
+      "columns": [
+        {
+          "label": "Total Votes",
+          "contest": "house-93",
+          "candidate": "William L. Douglas"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.03,
+        0.08,
+        0.99,
+        0.33
+      ],
+      "hint": "Read only the table titled 'REPRESENTATIVE DISTRICT 93' for the candidate William L. DOUGLAS, JR.; ignore any other table visible in the image. Return one row per community: label it with the community's full name (write 'S. KINGSTOWN' as 'South Kingstown' and 'N. KINGSTOWN' as 'North Kingstown') and give the 'Total Votes' column figure from that community's 'Total Votes' subtotal row; when a community has a single precinct and no subtotal row, give that precinct row's 'Total Votes' figure. Do not return precinct rows. Return the 'Grand Total' row's 'Total Votes' figure as the total.",
+      "bands": 1
+    },
+    {
+      "page": 318,
+      "id": "318-1",
+      "columns": [
+        {
+          "label": "Total Votes",
+          "contest": "house-93",
+          "candidate": "Charles J. Levesque"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.03,
+        0.31,
+        0.99,
+        0.57
+      ],
+      "hint": "Read only the table titled 'REPRESENTATIVE DISTRICT 93' for the candidate Charles J. LEVESQUE; ignore any other table visible in the image. Return one row per community: label it with the community's full name (write 'S. KINGSTOWN' as 'South Kingstown' and 'N. KINGSTOWN' as 'North Kingstown') and give the 'Total Votes' column figure from that community's 'Total Votes' subtotal row; when a community has a single precinct and no subtotal row, give that precinct row's 'Total Votes' figure. Do not return precinct rows. Return the 'Grand Total' row's 'Total Votes' figure as the total.",
+      "bands": 1
+    },
+    {
+      "page": 318,
+      "id": "318-2",
+      "columns": [
+        {
+          "label": "Total Votes",
+          "contest": "house-93",
+          "candidate": "James E. Leary, Jr."
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.03,
+        0.54,
+        0.99,
+        0.8
+      ],
+      "hint": "Read only the table titled 'REPRESENTATIVE DISTRICT 93' for the candidate James E. LEARY, JR.; ignore any other table visible in the image. Return one row per community: label it with the community's full name (write 'S. KINGSTOWN' as 'South Kingstown' and 'N. KINGSTOWN' as 'North Kingstown') and give the 'Total Votes' column figure from that community's 'Total Votes' subtotal row; when a community has a single precinct and no subtotal row, give that precinct row's 'Total Votes' figure. Do not return precinct rows. Return the 'Grand Total' row's 'Total Votes' figure as the total.",
+      "bands": 1
+    },
+    {
+      "page": 320,
+      "id": "320-0",
+      "columns": [
+        {
+          "label": "Total Votes",
+          "contest": "house-98",
+          "candidate": "William J. Murphy"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.03,
+        0.47,
+        0.99,
+        0.74
+      ],
+      "hint": "Read only the table titled 'REPRESENTATIVE DISTRICT 98' for the candidate William H. MURPHY; ignore any other table visible in the image. Return one row per community: label it with the community's full name (write 'S. KINGSTOWN' as 'South Kingstown' and 'N. KINGSTOWN' as 'North Kingstown') and give the 'Total Votes' column figure from that community's 'Total Votes' subtotal row; when a community has a single precinct and no subtotal row, give that precinct row's 'Total Votes' figure. Do not return precinct rows. Return the 'Grand Total' row's 'Total Votes' figure as the total.",
+      "bands": 1
+    },
+    {
+      "page": 320,
+      "id": "320-1",
+      "columns": [
+        {
+          "label": "Total Votes",
+          "contest": "house-98",
+          "candidate": "George R. Levesque"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.03,
+        0.69,
+        0.99,
+        0.92
+      ],
+      "hint": "Read only the table titled 'REPRESENTATIVE DISTRICT 98' for the candidate George R. LEVESQUE; ignore any other table visible in the image. Return one row per community: label it with the community's full name (write 'S. KINGSTOWN' as 'South Kingstown' and 'N. KINGSTOWN' as 'North Kingstown') and give the 'Total Votes' column figure from that community's 'Total Votes' subtotal row; when a community has a single precinct and no subtotal row, give that precinct row's 'Total Votes' figure. Do not return precinct rows. Return the 'Grand Total' row's 'Total Votes' figure as the total.",
+      "bands": 1
+    }
+  ]
+}
