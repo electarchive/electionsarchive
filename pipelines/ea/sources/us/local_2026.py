@@ -607,6 +607,11 @@ FEEDS = {
         "Butte County Clerk-Recorder/Registrar of Voters",
         "Final Qualified Candidate List: General Election, November 3, 2026",
     ),
+    "CA-06111": (
+        "https://clerkrecorder.venturacounty.gov/wp-content/uploads/2026/06/cfmcfmr001_contcanddataproof_08-12-2026.pdf",
+        "Ventura County Clerk and Recorder/Registrar of Voters",
+        "Contest/Candidate Proof List, November 3, 2026 General Election (printed 8/12/2026; candidates qualified, pending certification of the ballot)",
+    ),
     "CA-06083": (
         "https://content.civicplus.com/api/assets/7c6fb4a3-0c1e-4cbe-b382-b906599d7977",
         "County of Santa Barbara Elections Division",
@@ -1728,6 +1733,7 @@ def parse() -> None:
                     elect,
                 )
     magnitudes: dict[tuple[str, str], int] = {}
+    spellings: dict[tuple[str, frozenset[str]], str] = {}
     contests = []
     for county, post, district, description in filings.select(
         "County", "Office", "District", "Office Description"
@@ -1740,6 +1746,11 @@ def parse() -> None:
                 str(description or "").upper(),
             ).split()
         ).title()
+        if city:
+            city = spellings.setdefault(
+                (str(county), coverage_tables.tokens(re.sub(r"\s+City$", "", city))),
+                re.sub(r"\bMt\b", "Mount", re.sub(r"\bSt\b", "Saint", re.sub(r"\s+City$", "", city))),
+            )
         found = kentucky.get(coverage_tables.tokens(f"{place} County School District"))
         if post in titles and (district is None) != (titles[str(post)] in ("Magistrate", "Constable", "Commissioner")):
             contests.append(f"{place} County {titles[str(post)]}" + (f" District {district}" if district else ""))
@@ -2146,7 +2157,9 @@ def parse() -> None:
         if found := re.match(r"(\d{4,5})-(.+?)\s{2,}Vote for (?:no more than )?(\d+)", line):
             more = (
                 lines[index + 1]
-                if re.match(r"[A-Za-z]", lines[index + 1]) and not lines[index + 1].startswith("CONTEST")
+                if re.match(r"[A-Za-z0-9]", lines[index + 1])
+                and not lines[index + 1].startswith("CONTEST")
+                and not re.match(r"\d{4,5}-", lines[index + 1])
                 else ""
             )
             heading = f"{found[2]} {more}".strip()
@@ -3860,7 +3873,7 @@ def parse() -> None:
                     minted[tail] = (title, district, owner, owned.get(owner) or f"us/ky/{slug(district)}")
                 place = places.get(str(row["fips"]), "").rsplit(",", 1)[0]
                 tokens = [
-                    "mount" if token == "mt" else token
+                    "mount" if token == "mt" else "st" if token == "saint" else token
                     for token in re.findall(
                         r"[a-z0-9]+",
                         re.sub(
@@ -3891,7 +3904,7 @@ def parse() -> None:
                         if sort != "school"
                         else ([],)
                     ):
-                        lead = start + stem
+                        lead = start + ["st" if word == "saint" else word for word in stem]
                         if stem and tokens[: len(lead)] == lead:
                             rest = tokens[len(lead) :]
                             said = (
@@ -3923,7 +3936,6 @@ def parse() -> None:
                         and str(row["contest"]).startswith("City of ")
                         or state == "CA"
                         and bool(fits)
-                        and fits[0][4].startswith("school:")
                     )
                     and len({fit[4] for fit in fits}) == 1
                     and (
