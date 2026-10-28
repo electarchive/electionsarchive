@@ -58,13 +58,13 @@ def emit() -> Path:
         cs.artifact(raw.cached(SOURCE, URL), source)
         contest_key = f"{DAY}:constitution"
         contest = cs.key("tr.contest", contest_key)
+        result_set = cs.key(f"{SOURCE}.result_set", contest_key)
         old = conn.execute(
-            "select id, source_id, completeness, election_id from result_set"
-            " where contest_id = %s and is_default and status = 'active'",
-            [contest],
+            "select id, source_id, completeness, election_id from result_set where contest_id = %s and id <> %s",
+            [contest, result_set],
         ).fetchone()
         if old is None:
-            raise ValueError("no default set")
+            raise ValueError("no predecessor set")
         options = [cs.key("tr.option", f"{contest_key}:{slug(answer)}") for answer in ANSWERS_2017]
         cs.add(
             "result_set",
@@ -78,7 +78,6 @@ def emit() -> Path:
             is_default=False,
             completeness=old[2],
         )
-        result_set = cs.key(f"{SOURCE}.result_set", contest_key)
         cs.add(
             "result_set",
             id=result_set,
@@ -93,6 +92,7 @@ def emit() -> Path:
             supersedes_id=old[0],
         )
         cs.add("note", entity_id=result_set, kind="methodology", body_md=NOTES)
+        cs.add("outcome", result_set_id=result_set, option_id=options[0], kind="won")
         for plate, (_, registered, voters, valid, invalid, yes, no) in rows.items():
             for option, measure, value in (
                 (None, REGISTERED, registered),
