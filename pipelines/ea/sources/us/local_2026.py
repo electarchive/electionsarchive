@@ -828,6 +828,37 @@ FILLER = {
     "seat",
 }
 NO_FILING = "No Candidate Filed"
+ROLES = frozenset(
+    [
+        "commissioner",
+        "commission",
+        "constable",
+        "magistrate",
+        "sheriff",
+        "clerk",
+        "treasurer",
+        "assessor",
+        "coroner",
+        "attorney",
+        "judge",
+        "justice",
+        "mayor",
+        "council",
+        "supervisor",
+        "recorder",
+        "auditor",
+        "surveyor",
+        "collector",
+        "executive",
+        "administrator",
+        "jailer",
+        "prosecutor",
+        "solicitor",
+        "alderman",
+        "legislator",
+    ]
+)
+ROLE = {"commission": "commissioner"}
 GA_STATE = (
     r"US |Governor|Lieutenant|Secretary of State|Attorney General|State School|Commissioner of|PSC|State Senate"
     r"|State House|State Representative|Party Question|Justice|Judge|Lt\.|District Attorney"
@@ -1095,24 +1126,29 @@ def resolve(conn, state: str, wanted: set[tuple[str, str]]) -> dict[tuple[str, s
            where (x.value ~ %s or x.value ~ %s) and e.date_from >= '2016-01-01' and e.date_from < %s and not c.notional
                and c.party_scope_id is null and c.kind <> 'ballot_question'
                and op.kind in ('county', 'municipality', 'school_district', 'special_district')
-           order by c.office_id, c.body_id, c.district_area_id, c.seat_id, e.date_from desc""",
+           order by c.office_id, c.body_id, c.district_area_id, c.seat_id, e.date_from desc, x.value ~ 'at-large', x.value""",
         [f"(^|:){state}:", "^ceda:" if state == "CA" else "^$", DAY],
     ):
         county = re.match(rf"{state}:(\d{{5}})(?:\d{{5}})?(?::|$)", tail)
         pool[county[1] if county else ""].append((tail, *words(f"{text} {tail.split(':', 2)[-1].replace('-', ' ')}")))
     found = {}
+    scores: dict[tuple[str, str], float] = {}
     for county, contest in wanted:
         mine, marks = words(contest)
+        roles = {ROLE.get(word, word) for word in mine & ROLES}
         scored = sorted(
             (
                 (len(mine & theirs) / len(mine | theirs), tail)
                 for tail, theirs, their_marks in pool[county] + pool[""]
                 if their_marks == marks
+                and bool({"education", "school"} & mine) == bool({"education", "school"} & theirs)
+                and not (roles and theirs & ROLES and not roles & {ROLE.get(word, word) for word in theirs})
             ),
             reverse=True,
         )
         if scored and scored[0][0] >= 0.6 and (len(scored) == 1 or scored[1][0] < scored[0][0]):
             found[(county, contest)] = (scored[0][1], scored[0][1])
+            scores[(county, contest)] = scored[0][0]
             continue
         if len(marks) != 1 or not (mark := next(iter(marks))).isalnum() or mark == "atlarge":
             continue
@@ -1120,14 +1156,25 @@ def resolve(conn, state: str, wanted: set[tuple[str, str]]) -> dict[tuple[str, s
             (
                 (len(mine & theirs) / len(mine | theirs), tail)
                 for tail, theirs, their_marks in pool[county]
-                if len(their_marks) == 1 and re.search(rf"-{next(iter(their_marks))}$", tail)
+                if len(their_marks) == 1
+                and re.search(rf"-{next(iter(their_marks))}$", tail)
+                and bool({"education", "school"} & mine) == bool({"education", "school"} & theirs)
+                and not (roles and theirs & ROLES and not roles & {ROLE.get(word, word) for word in theirs})
             ),
             reverse=True,
         )
         best = [tail for score, tail in siblings if score == siblings[0][0]] if siblings else []
         if best and siblings[0][0] >= 0.6 and len({tail.rsplit("-", 1)[0] for tail in best}) == 1:
             found[(county, contest)] = (best[0], f"{best[0].rsplit('-', 1)[0]}-{mark}")
-    return found
+            scores[(county, contest)] = siblings[0][0]
+    top: dict[str, tuple[float, str]] = {}
+    for wanted_key, (_, tail) in found.items():
+        top[tail] = max(top.get(tail, (0.0, "")), (scores[wanted_key], wanted_key[1]))
+    return {
+        wanted_key: value
+        for wanted_key, value in found.items()
+        if scores[wanted_key] == top[value[1]][0] or words(top[value[1]][1])[0] <= words(wanted_key[1])[0]
+    }
 
 
 def fetch() -> None:
@@ -3428,7 +3475,7 @@ def parse() -> None:
                        join external_id x on x.entity_id = g.polity_id and x.scheme = 'us.polity'
                            and x.value ~ '^(place|town|school):'
                        join slug s on s.entity_id = g.polity_id
-                       where g.state = %s and (g.kind in ('municipality', 'township') or g.kind = 'school' and g.state = 'MI')
+                       where g.state = %s and (g.kind in ('municipality', 'township') or g.kind = 'school' and g.state in ('MI', 'CA'))
                        order by g.id, x.value desc, s.path""",
                     [state],
                 ):
@@ -3493,7 +3540,7 @@ def parse() -> None:
                             if (
                                 said
                                 and (sort and said != sort or not sort and said == "township")
-                                or (sort == "school" or state == "MI")
+                                or (sort == "school" or state in ("MI", "CA"))
                                 and (sort == "school")
                                 != bool(re.search(r"\b(school|schools|sch|education)\b", " ".join(rest)))
                             ):
@@ -3506,7 +3553,9 @@ def parse() -> None:
                     fits = [fit for fit in fits if fit[1]] if len({fit[4] for fit in fits if fit[1]}) == 1 else fits
                 if (
                     template is None
-                    and state in ("NJ", "MI", "FL")
+                    and (
+                        state in ("NJ", "MI", "FL") or state == "CA" and bool(fits) and fits[0][4].startswith("school:")
+                    )
                     and len({fit[4] for fit in fits}) == 1
                     and (
                         fits[0][4].startswith("school:")
@@ -3559,6 +3608,9 @@ def parse() -> None:
                         and role in ("council", "commission")
                         else "At-Large"
                         if role in ("council", "commission") and re.search(r"\bat large\b", post)
+                        else f"{area[1].replace('area', 'trustee area').title()} {area[2].upper()}"
+                        if state == "CA"
+                        and (area := re.search(r"\b(area|district|seat)(?: no)? 0*(\d+|[a-g](?= |$))", post))
                         else ""
                     )
                     if role is not None:
@@ -4115,7 +4167,10 @@ def emit() -> Path:
                         cs.add("person", id=person)
                         name(person, row["name"])
                 party = cs.key("us.party", row["party"]) if row["party"] else None
-                option = cs.key("us.option", f"{key}:{slug(row['name'])}")
+                try:
+                    option = cs.key("us.option", f"{key}:{slug(row['name'])}")
+                except ValueError:
+                    option = cs.key("us.option", f"{key}:{slug(row['name'])}:reissued")
                 cs.add(
                     "contest_option",
                     id=option,
@@ -4124,7 +4179,10 @@ def emit() -> Path:
                     party_id=party,
                     ballot_label=row["name"],
                 )
-                candidacy = cs.key("us.candidacy", f"{key}:{slug(row['name'])}")
+                try:
+                    candidacy = cs.key("us.candidacy", f"{key}:{slug(row['name'])}")
+                except ValueError:
+                    candidacy = cs.key("us.candidacy", f"{key}:{slug(row['name'])}:reissued")
                 cs.add(
                     "candidacy",
                     id=candidacy,
