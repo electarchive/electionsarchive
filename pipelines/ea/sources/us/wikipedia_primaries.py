@@ -712,7 +712,13 @@ def emit() -> Path:
             )
             path = (
                 f"us/{state.lower()}/{day}-{kind}/"
-                + ("house-at-large" if district == 0 else f"house-{district}" if office == "house" else office.replace(":", "-"))
+                + (
+                    "house-at-large"
+                    if district == 0
+                    else f"house-{district}"
+                    if office == "house"
+                    else office.replace(":", "-")
+                )
                 + (f"-{party}" if party else "")
             )
             if slugs.setdefault(path, contest) != contest:
@@ -870,6 +876,9 @@ def emit() -> Path:
             ).fetchall()
         ]
         people: dict[str, UUID] = {}
+        minted = dict(
+            conn.execute("select value, entity_id from external_id where scheme = %s", [f"{SOURCE}.person"]).fetchall()
+        )
         for candidate in presidential.filter(pl.col("named"))["candidate"].unique().sort():
             first, surname = split(candidate)
             words = {word for word in slug(candidate).split("-") if word not in {"jr", "sr", "ii", "iii", "iv"}}
@@ -900,6 +909,14 @@ def emit() -> Path:
                 ),
                 None,
             )
+            own = minted.get(f"US:{slug(candidate)}")
+            others = {
+                person
+                for given, family, person, held in pool
+                if family == surname and held and alike(first, given, True) and person != own
+            }
+            if own is not None and found in (None, {own}) and len(others) == 1:
+                found = others
             if found is not None:
                 people[candidate] = found.pop()
             elif hit is not None:
@@ -922,6 +939,12 @@ def emit() -> Path:
             people[candidate] = cs.key(f"{SOURCE}.person", f"US:{slug(candidate)}")
             cs.add("person", id=people[candidate])
             name(people[candidate], candidate)
+        absorbed = {entity for entities in cs.merged.values() for entity in entities}
+        for candidate, person in people.items():
+            earlier = minted.get(f"US:{slug(candidate)}")
+            if earlier is not None and earlier != person and str(earlier) not in absorbed:
+                print("merging", candidate, earlier, "into", person)
+                cs.merge(earlier, person)
         totals = {template: total for template, total in presidential.select("template", "total").unique().iter_rows()}
         nations: dict[str, UUID] = {}
         parents: dict[str, UUID] = {}
