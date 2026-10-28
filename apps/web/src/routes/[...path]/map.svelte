@@ -770,6 +770,43 @@
         .map((index) => [index, 0] as const),
     ];
   });
+  const ramps = $derived(
+    (isKeyed ? leads : leads.slice(0, 6)).flatMap(([index, won]) => {
+      if (won === 0) {
+        return [];
+      }
+      const tone = colors[index] ?? "var(--muted-foreground)";
+      const [red = 0, green = 0, blue = 0] = (
+        /\d+, \d+, \d+/u.exec(engine.read(tone))?.[0] ?? ""
+      )
+        .split(", ")
+        .map(Number);
+      const isFlat =
+        Math.max(red, green, blue) - Math.min(red, green, blue) < 24;
+      const counts = LEANS.map(() => 0);
+      for (const row of places.rows) {
+        if (
+          row.leader === index &&
+          row.isCounted !== false &&
+          row.valid > 0 &&
+          row.margin != null
+        ) {
+          const at = bin(row.margin);
+          counts[at] = (counts[at] ?? 0) + 1;
+        }
+      }
+      return [
+        {
+          index,
+          name: names[index] ?? "",
+          cells: LEANS.map((strength, at) => ({
+            tone: `color-mix(in oklab, ${tone} ${isFlat ? 100 : strength}%, var(--map-low))`,
+            count: counts[at] ?? 0,
+          })),
+        },
+      ];
+    }),
+  );
   const options = $derived(
     (isTally ? [] : places.legend)
       .map((item, index) => ({ index, name: names[index] ?? item.label }))
@@ -2421,36 +2458,93 @@
           >{m.map_bubbles_key({ votes: votes.toLowerCase() })}</span
         >
       {:else if !isTally && places.rows.some((row) => row.margin != null)}
-        <div class="flex items-center gap-2.5">
-          <span
-            class={cn(
-              "flex items-center gap-1.5 font-figures text-xs tabular-nums",
-              { hidden: !isShaded },
-            )}
-            aria-hidden="true"
-          >
-            <span>{m.map_margin_under({ points: "5" })}</span>
-            <span class="flex">
-              {#each LEANS as strength (strength)}
-                <span
-                  class="block-3 inline-5 first:rounded-s-xs last:rounded-e-xs"
-                  style:background-color="color-mix(in oklab, #3d434b {strength}%,
-                  var(--map-low))"
-                ></span>
-              {/each}
-            </span>
-            <span>{m.map_margin_over({ points: "45" })}</span>
-          </span>
-          <button
-            type="button"
-            class={cn(
-              "flex items-center gap-1.5 rounded-xs px-1.5 py-0.5 font-semibold ring-1 ring-border hover:bg-secondary",
-              { "bg-foreground text-background hover:bg-foreground": isShaded },
-            )}
-            aria-pressed={isShaded}
-            onclick={() => (isShaded = !isShaded)}>{m.map_margin()}</button
-          >
-        </div>
+        <button
+          type="button"
+          class={cn(
+            "flex items-center gap-1.5 self-start rounded-xs px-1.5 py-0.5 font-semibold ring-1 ring-border hover:bg-secondary",
+            { "bg-foreground text-background hover:bg-foreground": isShaded },
+          )}
+          aria-pressed={isShaded}
+          onclick={() => (isShaded = !isShaded)}>{m.map_margin()}</button
+        >
+        {#if isShaded && ramps.length > 0}
+          <div class="basis-full overflow-x-auto">
+            <table
+              class="border-separate border-spacing-x-0.5 border-spacing-y-1"
+            >
+              <thead>
+                <tr
+                  class="font-figures text-[0.6875rem] text-muted-foreground tabular-nums"
+                >
+                  <th
+                    class="pe-2 text-start font-normal max-inline-32"
+                    scope="col"
+                  >
+                    {m.map_margin_lead()}
+                  </th>
+                  {#each LEANS as strength, at (strength)}
+                    <th
+                      class="px-0.5 text-center font-normal whitespace-nowrap"
+                      scope="col"
+                    >
+                      {at === 0
+                        ? m.map_margin_under({
+                            points: String(Math.round((BINS[0] ?? 0) * 100)),
+                          })
+                        : at === LEANS.length - 1
+                          ? m.map_margin_over({
+                              points: String(
+                                Math.round((BINS.at(-1) ?? 0) * 100),
+                              ),
+                            })
+                          : m.map_margin_range({
+                              from: String(
+                                Math.round((BINS[at - 1] ?? 0) * 100),
+                              ),
+                              to: String(Math.round((BINS[at] ?? 0) * 100)),
+                            })}
+                    </th>
+                  {/each}
+                </tr>
+              </thead>
+              <tbody>
+                {#each ramps as ramp (ramp.index)}
+                  <tr>
+                    <th
+                      class="truncate pe-2 text-start font-semibold max-inline-32"
+                      scope="row"
+                    >
+                      {ramp.name}
+                    </th>
+                    {#each ramp.cells as cell, at (at)}
+                      <td
+                        class="p-0"
+                        title={m.map_margin_cell({
+                          name: ramp.name,
+                          count: count(cell.count),
+                          noun: cell.count === 1 ? noun : plural(noun),
+                        })}
+                      >
+                        <span
+                          class={cn(
+                            "grid place-items-center rounded-xs font-figures text-[0.6875rem] tabular-nums block-5 min-inline-9",
+                            { "opacity-35": cell.count === 0 },
+                          )}
+                          style:background-color={cell.tone}
+                        >
+                          <span
+                            class="rounded-xs bg-card/85 px-1 leading-4 text-foreground"
+                            >{count(cell.count)}</span
+                          >
+                        </span>
+                      </td>
+                    {/each}
+                  </tr>
+                {/each}
+              </tbody>
+            </table>
+          </div>
+        {/if}
       {/if}
     {/if}
     {#if isUnmatched && span != null}
