@@ -662,6 +662,14 @@ def emit() -> Path:
                 [SOURCE],
             ).fetchall()
         }
+        shared: set[UUID] = {
+            person
+            for (person,) in conn.execute(
+                """select distinct cd.person_id from candidacy cd join changeset c on c.id = cd.changeset_id
+                   where c.pipeline <> %s and cd.person_id = any(%s)""",
+                [SOURCE, list(surnamed)],
+            ).fetchall()
+        }
         harris = [pool for pools in finer({date(2024, 11, 5)}).values() for pool in pools]
         held: dict[UUID, UUID] = dict(
             conn.execute(
@@ -1085,7 +1093,7 @@ def emit() -> Path:
                 flags=pl.lit(0, pl.Int16),
             ),
         )
-        for person in surnamed - set(persons.values()):
+        for person in surnamed - set(persons.values()) - shared:
             cs.add(
                 "entity_retirement",
                 entity_id=person,
