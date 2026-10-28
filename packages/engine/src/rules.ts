@@ -3,6 +3,7 @@ import * as v from "valibot";
 
 const tieBreak = v.optional(v.picklist(["votes", "lot"]));
 const pooling = v.optional(v.picklist(["alliance", "coalition"]));
+const compensation = v.optional(v.literal("constituency_seats"));
 
 const lists = v.optional(
   v.object({
@@ -81,6 +82,7 @@ export const rules = v.variant("formula", [
     threshold: thresholds,
     bonus,
     pooling,
+    compensation,
     lists,
     tieBreak,
   }),
@@ -90,6 +92,7 @@ export const rules = v.variant("formula", [
     threshold: thresholds,
     bonus,
     pooling,
+    compensation,
     lists,
     tieBreak,
   }),
@@ -98,6 +101,7 @@ export const rules = v.variant("formula", [
     threshold: thresholds,
     bonus,
     pooling,
+    remainders: v.optional(v.picklist(["contest", "national"])),
     lists,
     tieBreak,
   }),

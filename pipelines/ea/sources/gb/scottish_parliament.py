@@ -189,8 +189,7 @@ AMS = (
     "two votes: one for a constituency candidate and one for a party list or an individual candidate in the "
     "region. Each region's seven list seats go to parties by the D'Hondt method, dividing a party's regional list "
     "votes by one more than the number of constituency seats it won in that region, so the list compensates for "
-    "disproportion in the constituency results. The rules schema cannot yet express that adjusted divisor, so the "
-    "declared seats are stored as published."
+    "disproportion in the constituency results. The declared seats are stored as published."
 )
 HISTORY_LISTS = (
     "The regional list votes are the Scottish Parliament's election analysis workbook, sheet Region Vote, summed "
@@ -774,10 +773,16 @@ def emit() -> Path:
         if fptp in cs.minted:
             raise ValueError("publish gb.parliament first: first past the post must exist")
         ams = cs.key("gb.electoral_system", "scottish-ams-list")
+        cs.add(
+            "electoral_system",
+            id=ams,
+            polity_id=scotland,
+            rules={"formula": "dhondt", "compensation": "constituency_seats"},
+            rules_version=1,
+        )
+        cs.add("note", entity_id=ams, kind="methodology", body_md=AMS)
         if ams in cs.minted:
-            cs.add("electoral_system", id=ams, polity_id=scotland, rules={"formula": "dhondt"}, rules_version=1)
             name(ams, "Additional member system, regional lists (Scottish Parliament)")
-            cs.add("note", entity_id=ams, kind="methodology", body_md=AMS)
         body = cs.key("gb.body", "scottish-parliament")
         if body in cs.minted:
             cs.add("body", id=body, polity_id=scotland, kind="unicameral")

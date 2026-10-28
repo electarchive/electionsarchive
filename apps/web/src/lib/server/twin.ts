@@ -3642,6 +3642,45 @@ function contestMarkdown(
     ]
       .filter((part) => part != null)
       .join(" "),
+    ...contest.explanations.map((row) => {
+      const who =
+        row.person == null
+          ? row.label
+          : m.explain_who_independent({ person: row.person, list: row.label });
+      const sentence =
+        row.kind === "note"
+          ? (row.note ?? "")
+          : row.kind === "remainder"
+            ? m.explain_remainder({ who })
+            : row.kind === "compensation"
+              ? m.explain_compensation({ who })
+              : row.kind === "threshold"
+                ? m.explain_threshold({
+                    beaten: new Intl.ListFormat(getLocale(), {
+                      type: "conjunction",
+                    }).format(row.beaten),
+                    percent: String(row.percent ?? ""),
+                  })
+                : row.kind === "pooling"
+                  ? m.explain_pooling({ who })
+                  : row.kind === "bonus"
+                    ? m.explain_bonus({ who })
+                    : row.joined == null
+                      ? m.explain_independent({
+                          person: row.person ?? "",
+                          list: row.label,
+                        })
+                      : m.explain_independent_joined({
+                          person: row.person ?? "",
+                          list: row.label,
+                          date: date(row.joined),
+                        });
+      return row.kind === "note" ||
+        row.kind === "independent" ||
+        row.system == null
+        ? sentence
+        : `${sentence} (${row.system})`;
+    }),
     ...contest.notes.map((note) => `> ${note.body}`),
     ...(() => {
       const units = ledger?.places;

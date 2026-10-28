@@ -5287,6 +5287,28 @@ export const contests = {
         quorum: v.nullable(v.number()),
         ballot: v.optional(v.nullable(v.number())),
         isStv: v.optional(v.boolean()),
+        explanations: v.array(
+          v.object({
+            key: v.string(),
+            kind: v.picklist([
+              "note",
+              "remainder",
+              "compensation",
+              "threshold",
+              "pooling",
+              "bonus",
+              "independent",
+            ]),
+            label: v.string(),
+            note: v.nullable(v.string()),
+            percent: v.nullable(v.number()),
+            beaten: v.array(v.string()),
+            person: v.nullable(v.string()),
+            joined: v.nullable(v.string()),
+            system: v.nullable(v.string()),
+            rule: v.nullable(v.string()),
+          }),
+        ),
         channels: v.optional(
           v.array(
             v.object({
@@ -5525,18 +5547,27 @@ export const contests = {
       const isRoot = scoped == null;
       const area = scoped ?? contest.place;
       const unit = chain.map((entry) => entry.segment);
-      const [parts, ancestors, cited, home, roll, reach, counted, split] =
-        await Promise.all([
-          db.execute<{ id: string }>(sql`
+      const [
+        parts,
+        ancestors,
+        cited,
+        home,
+        roll,
+        reach,
+        counted,
+        split,
+        explanations,
+      ] = await Promise.all([
+        db.execute<{ id: string }>(sql`
             select id from contest where allocation_parent_id = ${contest.id}::uuid
           `),
-          db.execute<{
-            id: string;
-            area: string | null;
-            scheme: string | null;
-            noun: string | null;
-            kind: string;
-          }>(sql`
+        db.execute<{
+          id: string;
+          area: string | null;
+          scheme: string | null;
+          noun: string | null;
+          kind: string;
+        }>(sql`
             with recursive up(id, parent, depth) as (
               select id, allocation_parent_id, 0 from contest where id = ${contest.id}::uuid
               union all
@@ -5551,11 +5582,11 @@ export const contests = {
             left join scheme sc on sc.code = a.scheme_code
             order by up.depth desc
           `),
-          db.execute<{
-            publisher: string;
-            title: string;
-            url: string | null;
-          }>(sql`
+        db.execute<{
+          publisher: string;
+          title: string;
+          url: string | null;
+        }>(sql`
             select distinct s.publisher, s.title, s.url
             from source s
             where s.id in (
@@ -5569,13 +5600,13 @@ export const contests = {
             )
             order by s.publisher, s.title
           `),
-          db.execute<{ path: string }>(sql`
+        db.execute<{ path: string }>(sql`
             select s.path from polity_territory t join slug s on s.entity_id = t.polity_id and s.is_current
             where t.area_id = ${area?.id}::uuid and t.polity_id <> ${contest.polity}::uuid
             order by upper(t.valid) desc nulls first limit 1
           `),
-          poll(contest.id, area?.k ?? null),
-          db.execute<{ held: number; of: number }>(sql`
+        poll(contest.id, area?.k ?? null),
+        db.execute<{ held: number; of: number }>(sql`
             select count(*) filter (
                 where exists (select from result_rollup x where x.result_set_k = rs.k and x.area_k = a.k)
               )::int as held, count(*)::int as of
@@ -5591,13 +5622,13 @@ export const contests = {
                 select from result_rollup_sum x where x.result_set_k = rs.k and x.area_k = ${area?.k ?? null}::int and not x.complete
               )
           `),
-          db.execute<{
-            last: number;
-            round: number | null;
-            derived: boolean;
-            seats: number | null;
-            isShallow: boolean;
-          }>(sql`
+        db.execute<{
+          last: number;
+          round: number | null;
+          derived: boolean;
+          seats: number | null;
+          isShallow: boolean;
+        }>(sql`
             select coalesce(t.last, 1) as last,
               t.last > 1 and (
                 select 2 * count(distinct x.area_k) filter (where x.count_round = t.last) < count(distinct x.area_k) filter (where x.count_round = 1)
@@ -5634,13 +5665,13 @@ export const contests = {
                 and coalesce(c.rules_override ->> 'formula', es.rules ->> 'formula') = 'stv'
             ) stv on true
           `),
-          db.execute<{
-            channel: number;
-            option: number;
-            person: string | null;
-            party: string | null;
-            value: number;
-          }>(sql`
+        db.execute<{
+          channel: number;
+          option: number;
+          person: string | null;
+          party: string | null;
+          value: number;
+        }>(sql`
             with facts as (
               select r.channel, r.option_k, r.measure, r.count_round, r.value
               from result_set rs cross join lateral (
@@ -5661,7 +5692,8 @@ export const contests = {
             group by 1, 2, 3, 4
             having (select count(distinct channel) from facts) > 1
           `),
-        ]);
+        isRoot ? explain(contest, contest.place?.k ?? null) : [],
+      ]);
       const [
         { last, round, derived, seats: elects, isShallow } = {
           last: 1,
@@ -6136,6 +6168,7 @@ export const contests = {
               },
         turnout: roll.turnout,
         quorum: roll.quorum,
+        explanations,
         ballot: roll.ballot,
         isStv: roll.isStv,
         channels: Map.groupBy(split.rows, (row) => row.channel)
@@ -10641,6 +10674,205 @@ async function poll(contest: string | null, k: number | null, isAsked = true) {
     ballot: row?.ballot != null && row.ballot > 1 ? row.ballot : null,
     isStv: row?.isStv ?? false,
   };
+}
+
+async function explain(
+  contest: { id: string; date: string | null },
+  k: number | null,
+) {
+  if (k == null) {
+    return [];
+  }
+  const found = await db.execute<{
+    key: string;
+    party: string | null;
+    label: string | null;
+    votes: number;
+    seats: number;
+    note: string | null;
+    person: string | null;
+    joined: string | null;
+    rules: Record<string, unknown>;
+    system: string | null;
+    rule: string | null;
+  }>(sql`
+    with own as (
+      select c.id, c.election_id, c.electoral_system_id as system,
+        coalesce(es.rules, '{}') || coalesce(c.rules_override, '{}') as rules
+      from contest c left join electoral_system es on es.id = c.electoral_system_id
+      where c.id = ${contest.id}::uuid
+    ),
+    chosen as (
+      select rs.id, rs.k from result_set rs
+      where rs.contest_id = ${contest.id}::uuid and ${latest("rs")}
+      order by exists (select from outcome x where x.result_set_id = rs.id) desc, array_position(${STAGES}, rs.stage)
+      limit 1
+    ),
+    tallied as (
+      select r.option_k, sum(r.value)::float8 as votes
+      from chosen cross join lateral (
+        select x.option_k, x.value, x.count_round from result_rollup x
+        where x.result_set_k = chosen.k and x.area_k = ${k}::int and x.measure = 1 and x.option_k is not null offset 0
+      ) r
+      where r.count_round = (
+        select min(y.count_round) from result_rollup y
+        where y.result_set_k = chosen.k and y.area_k = ${k}::int and y.measure = 1
+      )
+      group by r.option_k
+    )
+    select o.id as key, coalesce(pm.into_id, o.party_id) as party, o.ballot_label as label, t.votes,
+      coalesce((
+        select greatest(coalesce(sum(x.seats) filter (where x.candidacy_id is null), 0),
+          count(*) filter (where x.candidacy_id is not null and x.kind = 'elected'),
+          case when bool_or(x.kind = 'won' and x.candidacy_id is null) then 1 else 0 end)
+        from outcome x join chosen on chosen.id = x.result_set_id
+        where x.option_id = o.id and x.kind in ('won', 'elected')
+      ), 0)::int as seats,
+      (select x.notes from outcome x join chosen on chosen.id = x.result_set_id
+       where x.option_id = o.id and x.kind in ('won', 'elected') and x.notes is not null and x.notes not like 'Derived:%'
+       limit 1) as note,
+      i.person, i.joined, own.rules,
+      (select n.text from name n where n.entity_id = own.system order by n.is_preferred desc limit 1) as system,
+      (select n.body_md from note n where n.entity_id = own.system and n.kind = 'methodology' limit 1) as rule
+    from own
+    join contest_option o on o.contest_id = own.id
+    join tallied t on t.option_k = o.k
+    left join entity_merge pm on pm.entity_id = o.party_id
+    left join lateral (
+      select coalesce(m.into_id, cy.person_id) as person, (
+          select lower(pp.valid)::text from person_party_membership pp
+          where pp.person_id = coalesce(m.into_id, cy.person_id) and pp.party_id = coalesce(pm.into_id, o.party_id)
+            and lower(pp.valid) > ${contest.date ?? null}::date and lower(pp.valid) < ${contest.date ?? null}::date + 366
+          order by lower(pp.valid) limit 1
+        ) as joined
+      from candidacy cy
+      join chosen on true
+      join outcome x on x.result_set_id = chosen.id and x.candidacy_id = cy.id and x.kind = 'elected'
+      left join entity_merge m on m.entity_id = cy.person_id
+      where cy.option_id = o.id and cy.is_independent
+      limit 1
+    ) i on true
+  `);
+  const rows = found.rows;
+  const rules = rows[0]?.rules ?? {};
+  const thresholds = [rules.threshold ?? []]
+    .flat()
+    .filter(
+      (entry): entry is { percent: number; scope?: string; level?: string } =>
+        typeof entry === "object" &&
+        entry != null &&
+        "percent" in entry &&
+        "scope" in entry &&
+        entry.scope === "national" &&
+        (!("level" in entry) ||
+          entry.level === "party" ||
+          entry.level === "list"),
+    );
+  const shares = new Map<string, number>();
+  if (thresholds.length > 0) {
+    const national = await db.execute<{ party: string; share: number }>(sql`
+      with siblings as (
+        select c.id, a.k from contest c
+        join contest own on own.id = ${contest.id}::uuid
+        join area a on a.id = c.district_area_id
+        where c.election_id = own.election_id and c.electoral_system_id is not distinct from own.electoral_system_id
+      ),
+      votes as (
+        select coalesce(pm.into_id, o.party_id) as party, r.value
+        from siblings s
+        join result_set rs on rs.contest_id = s.id and ${latest("rs")}
+        cross join lateral (
+          select x.option_k, x.value from result_rollup x
+          where x.result_set_k = rs.k and x.area_k = s.k and x.measure = 1 and x.count_round = 0 and x.option_k is not null offset 0
+        ) r
+        join contest_option o on o.k = r.option_k
+        left join entity_merge pm on pm.entity_id = o.party_id
+      )
+      select party, (sum(value) / nullif((select sum(value) from votes), 0))::float8 as share
+      from votes where party is not null group by party
+    `);
+    for (const row of national.rows) {
+      shares.set(row.party, row.share);
+    }
+  }
+  const people = rows.flatMap((row) =>
+    row.person == null ? [] : [row.person],
+  );
+  const parties = rows.flatMap((row) => (row.party == null ? [] : [row.party]));
+  const labels = await names([...people, ...parties], contest.date);
+  const label = (row: (typeof rows)[number]) =>
+    labels.short.get(row.party ?? "") ??
+    labels.full.get(row.party ?? "") ??
+    row.label ??
+    "";
+  const explained = [];
+  for (const row of rows) {
+    const beaten = rows.filter(
+      (other) => other.votes > row.votes && other.seats < row.seats,
+    );
+    if (row.seats === 0 || beaten.length === 0) {
+      continue;
+    }
+    const threshold = thresholds.find((entry) =>
+      beaten.every(
+        (other) =>
+          other.party != null &&
+          shares.has(other.party) &&
+          (shares.get(other.party) ?? 0) * 100 < entry.percent,
+      ),
+    );
+    const kind:
+      | "note"
+      | "remainder"
+      | "compensation"
+      | "threshold"
+      | "pooling"
+      | "bonus"
+      | "independent"
+      | null =
+      row.note != null
+        ? "note"
+        : rules.remainders === "national"
+          ? "remainder"
+          : rules.compensation === "constituency_seats"
+            ? "compensation"
+            : threshold != null
+              ? "threshold"
+              : rules.pooling != null
+                ? "pooling"
+                : rules.bonus != null
+                  ? "bonus"
+                  : row.person != null
+                    ? "independent"
+                    : null;
+    if (kind == null) {
+      continue;
+    }
+    const merged = explained.find(
+      (entry) => kind === "threshold" && entry.kind === kind,
+    );
+    if (merged != null) {
+      for (const other of beaten.map(label)) {
+        if (!merged.beaten.includes(other)) {
+          merged.beaten.push(other);
+        }
+      }
+      continue;
+    }
+    explained.push({
+      key: row.key,
+      kind,
+      label: label(row),
+      note: kind === "note" ? row.note : null,
+      percent: kind === "threshold" ? (threshold?.percent ?? null) : null,
+      beaten: kind === "threshold" ? beaten.map(label) : [],
+      person: row.person == null ? null : (labels.full.get(row.person) ?? null),
+      joined: row.joined,
+      system: row.system,
+      rule: row.rule,
+    });
+  }
+  return explained;
 }
 
 async function attendance(

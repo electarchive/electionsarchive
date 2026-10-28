@@ -2218,5 +2218,13 @@
         "countPlural=*": "{countText} wins"
       }
     }
-  ]
+  ],
+  "explain_remainder": "{who} won this seat from the national remainder, a pool that fills the seats that districts leave after whole quotas by each party's leftover votes nationwide, so a list can win one here with few votes.",
+  "explain_compensation": "{who} won list seats here with fewer votes than parties that took constituency seats, because list seats make up for the constituency results: each party's list votes are divided by one more than the seats it already holds in the region.",
+  "explain_threshold": "{beaten} won more votes here but fewer seats, because only parties with at least {percent}% of the vote nationwide take seats.",
+  "explain_pooling": "{who} won a seat with fewer votes than some lists outside its alliance, because seats are shared out among alliances first and then within each one.",
+  "explain_bonus": "{who} won a seat with fewer votes than some other lists, because the winning list or coalition receives bonus seats on top of its share.",
+  "explain_independent": "{person} won {list}'s seat as an independent on its list.",
+  "explain_independent_joined": "{person} won {list}'s seat as an independent on its list and joined the party on {date}.",
+  "explain_who_independent": "{person}, an independent on {list}'s list,"
 }

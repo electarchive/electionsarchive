@@ -2638,6 +2638,43 @@
         >
       </p>
     {/if}
+    {#each contest.explanations as row (row.key)}
+      {const who = $derived(
+        row.person == null
+          ? row.label
+          : m.explain_who_independent({ person: row.person, list: row.label }),
+      )}
+      <p class="px-2 text-[0.8125rem] text-muted-foreground">
+        {#if row.kind === "note"}{row.note}{:else if row.kind === "remainder"}{m.explain_remainder(
+            { who },
+          )}{:else if row.kind === "compensation"}{m.explain_compensation({
+            who,
+          })}{:else if row.kind === "threshold"}{m.explain_threshold({
+            beaten: new Intl.ListFormat(getLocale(), {
+              type: "conjunction",
+            }).format(row.beaten),
+            percent: String(row.percent ?? ""),
+          })}{:else if row.kind === "pooling"}{m.explain_pooling({
+            who,
+          })}{:else if row.kind === "bonus"}{m.explain_bonus({
+            who,
+          })}{:else if row.joined == null}{m.explain_independent({
+            person: row.person ?? "",
+            list: row.label,
+          })}{:else}{m.explain_independent_joined({
+            person: row.person ?? "",
+            list: row.label,
+            date: date(row.joined),
+          })}{/if}
+        {#if row.kind !== "note" && row.kind !== "independent" && row.system != null}
+          <Term
+            class="text-foreground"
+            label={row.system}
+            definition={row.rule ?? row.system}
+          />
+        {/if}
+      </p>
+    {/each}
     {#if captions.length > 0}
       <p class="px-2 text-[0.8125rem] text-muted-foreground">
         <a

@@ -253,8 +253,7 @@ AMS = (
     "candidate and one for a party list or an individual candidate in the region. Each region's four list seats go "
     "to parties by the D'Hondt method, dividing a party's regional list votes by one more than the number of "
     "constituency seats it won in that region (plus the list seats it has already won), so the list compensates for "
-    "disproportion in the constituency results. The rules schema cannot yet express that adjusted divisor, so the "
-    "declared seats are stored as published; the loader checked that the declared list seats reproduce by this "
+    "disproportion in the constituency results. The declared seats are stored as published; the loader checked that the declared list seats reproduce by this "
     "method in every region."
 )
 PARTY_LEVEL = (
@@ -754,10 +753,16 @@ def emit() -> Path:
         if fptp in cs.minted:
             raise ValueError("publish gb.parliament first: first past the post must exist")
         ams = cs.key("gb.electoral_system", "welsh-ams-list")
+        cs.add(
+            "electoral_system",
+            id=ams,
+            polity_id=wales,
+            rules={"formula": "dhondt", "compensation": "constituency_seats"},
+            rules_version=1,
+        )
+        cs.add("note", entity_id=ams, kind="methodology", body_md=AMS)
         if ams in cs.minted:
-            cs.add("electoral_system", id=ams, polity_id=wales, rules={"formula": "dhondt"}, rules_version=1)
             name(ams, "Additional member system, regional lists (Senedd Cymru)")
-            cs.add("note", entity_id=ams, kind="methodology", body_md=AMS)
         body = cs.key("gb.body", "senedd")
         if body in cs.minted:
             cs.add("body", id=body, polity_id=wales, kind="unicameral")

@@ -426,7 +426,7 @@ AMS_NOTE = (
     "of the London-wide vote are excluded. The 11 London-wide seats are allocated to the remaining parties using the "
     "D'Hondt method. This divides each party's London-wide votes by one more than the number of seats it already "
     "holds, including constituency seats, so the list seats offset disproportion in the constituency results. The "
-    "rules schema cannot yet express this adjusted divisor, so the declared seats are stored as published."
+    "declared seats are stored as published."
 )
 LIST_2000 = {
     "LAB": "Labour Party",
@@ -1143,20 +1143,21 @@ def emit() -> Path:
             name(body, "London Assembly")
         cs.add("body_size", body_id=body, seats=ASSEMBLY_SEATS, valid_from=first_day)
         ams = cs.key("gb.electoral_system", "london-ams-list")
+        cs.add(
+            "electoral_system",
+            id=ams,
+            polity_id=london,
+            rules={
+                "formula": "dhondt",
+                "threshold": {"percent": 5, "level": "party"},
+                "lists": {"order": "closed", "vacancy": "next_on_list"},
+                "compensation": "constituency_seats",
+            },
+            rules_version=1,
+        )
+        cs.add("note", entity_id=ams, kind="methodology", body_md=AMS_NOTE)
         if ams in cs.minted:
-            cs.add(
-                "electoral_system",
-                id=ams,
-                polity_id=london,
-                rules={
-                    "formula": "dhondt",
-                    "threshold": {"percent": 5, "level": "party"},
-                    "lists": {"order": "closed", "vacancy": "next_on_list"},
-                },
-                rules_version=1,
-            )
             name(ams, "Additional member system, London-wide list (London Assembly)")
-            cs.add("note", entity_id=ams, kind="methodology", body_md=AMS_NOTE)
 
         def party_of(label: str) -> UUID:
             label = RESOLVED.get(label, label)
