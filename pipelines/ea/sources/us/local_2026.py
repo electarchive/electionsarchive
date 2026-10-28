@@ -88,6 +88,26 @@ FEEDS = {
         "Davis County Clerk",
         "Certification of Candidates and Ballot Propositions for the Regular General Election, November 3, 2026",
     ),
+    "AZ-04021": (
+        "https://www.pinal.gov/DocumentCenter/View/32952",
+        "Pinal County Elections",
+        "2026 General Election County and Local Candidate List",
+    ),
+    "MO-29095": (
+        "https://www.jcebmo.org/election-information/on-the-ballot/",
+        "Jackson County Board of Election Commissioners",
+        "Notice of General Election and Sample Ballot, November 3, 2026",
+    ),
+    "MO-29095-k": (
+        "https://www.kceb.org/elections/ballot/",
+        "Kansas City Board of Election Commissioners",
+        "Sample Ballot, General Election, November 3, 2026",
+    ),
+    "IL-17097": (
+        "https://www.lakecountyil.gov/DocumentCenter/View/13059",
+        "Lake County Clerk",
+        "Candidate List, General Election 11/3/2026",
+    ),
     "IL-17197": (
         "https://assets01.aws.connect.clarityelections.com/Assets/Connect/RootPublish/will-il.connect.clarityelections.com/Elections/2026GeneralElection/Candidates/Countywide.pdf",
         "Will County Clerk",
@@ -204,9 +224,9 @@ FEEDS = {
         "Official Candidate Listing, November 3, 2026 General Election",
     ),
     "MI-26163": (
-        "https://www.waynecountymi.gov/files/assets/mainsite/v/1/clerk/documents/elections/unofficial_candidate_list_11032026828.pdf",
+        "https://www.waynecountymi.gov/Government/Elected-Officials/Clerk/Elections/Election-Results-Candidates/November-3rd-2026-General-Election",
         "Wayne County Clerk",
-        "November 3, 2026 General Election: Unofficial Candidate List",
+        "November 3, 2026 General Election: Official Candidate List",
     ),
     "MI-26099": (
         "https://macombgovdocs.org/clerk/pdfs/elect-2026-11-03-Official-Candidate-List-printable.pdf",
@@ -227,6 +247,11 @@ FEEDS = {
         "https://www.dropbox.com/scl/fi/5b4627tqe8txa3n6x8jxs/Ingham-November-Candidate-List-2026.pdf",
         "Ingham County Clerk",
         "Ingham County Candidate List, November 3, 2026 General Election",
+    ),
+    "MI-26081": (
+        "https://www.kentcountymi.gov/DocumentCenter/View/8870",
+        "Kent County Clerk",
+        "Official Candidates and Proposals List, November 3, 2026 General Election",
     ),
     "MI-26093": (
         "https://milivcounty.gov/wp-content/uploads/Candidate-Filings-November-2026.pdf",
@@ -738,12 +763,13 @@ DELIVERED = {
     "MI-26017": DATA / "inbox" / "y26" / "mi" / "bay.pdf",
     "MI-26049": DATA / "inbox" / "y26" / "mi" / "genesee.pdf",
     "MI-26091": DATA / "inbox" / "y26" / "mi" / "lenawee.pdf",
-    "MI-26163": DATA / "inbox" / "y26" / "mi" / "wayne.pdf",
+    "MI-26163": DATA / "inbox" / "manual" / "MF-199" / "official-candidate-list_november-3-2026.pdf",
     "MI-26099": DATA / "inbox" / "y26" / "mi" / "macomb.pdf",
     "MI-26147": DATA / "inbox" / "y26" / "mi" / "stclair.pdf",
     "MI-26055": DATA / "inbox" / "y26" / "mi" / "grandtraverse.pdf",
     "MI-26065": DATA / "inbox" / "y26" / "mi" / "ingham.pdf",
     "MI-26093": DATA / "inbox" / "y26" / "mi" / "livingston.pdf",
+    "MI-26081": DATA / "inbox" / "manual" / "MF-200" / "11032026 Candidates and Proposals_202610261659007429.pdf",
     "MI-26161": DATA / "inbox" / "y26" / "mi" / "washtenaw.pdf",
     "MI-26139": DATA / "inbox" / "y26" / "mi" / "ottawa.pdf",
     "MI-26005": DATA / "inbox" / "y26" / "mi" / "allegan.pdf",
@@ -777,6 +803,10 @@ DELIVERED = {
     "UT-49049": DATA / "inbox" / "y26" / "ut" / "utah_county.pdf",
     "UT-49011": DATA / "inbox" / "y26" / "ut" / "davis.pdf",
     "IL-17197": DATA / "inbox" / "y26" / "il" / "will.pdf",
+    "AZ-04021": DATA / "inbox" / "manual" / "MF-203" / "2026 General Election County Local Candidate List (PDF).pdf",
+    "MO-29095": DATA / "inbox" / "manual" / "MF-202" / "11.03.26-Notice-of-Election-Sample-Ballot-Poster.pdf",
+    "MO-29095-k": DATA / "inbox" / "manual" / "MF-202" / "Sample Ballot 11-26 FINAL WEB REV 9-14-2026.pdf",
+    "IL-17097": DATA / "inbox" / "manual" / "MF-201" / "candidatelist9.9.26_202609090842449785.pdf",
     "CO-08005": DATA / "inbox" / "y26" / "co" / "arapahoe.pdf",
     "AZ-04013-s": DATA / "inbox" / "y26" / "az" / "maricopa_schools.json",
     "GA-13121": DATA / "inbox" / "y26" / "ga" / "fulton.pdf",
@@ -1478,10 +1508,14 @@ def parse() -> None:
     for county, listing in json.loads(raw.cached(SOURCE, FEEDS["WA"][0]).path.read_text()).items():
         for row in csv.DictReader(io.StringIO(listing)):
             kind, race = row["District Type"].lower(), " ".join(row["Race"].split())
-            if (
-                kind not in ("countywide", "county", "council", "commissioner", "city council", "city/town")
-                or re.search(r"(?i)court|judge|director of community", race)
-            ):
+            if kind not in (
+                "countywide",
+                "county",
+                "council",
+                "commissioner",
+                "city council",
+                "city/town",
+            ) or re.search(r"(?i)court|judge|director of community", race):
                 continue
             race = re.sub(rf"(?i)^(?:metropolitan )?(?:{county} )?county |^{county} ", "", race)
             race = re.sub(r"(?i)\bcouncilor\b", "Council", re.sub(r"(?i)\s*[;,]\s*|\s+-\s+|\bresidency\b", " ", race))
@@ -1803,6 +1837,47 @@ def parse() -> None:
                     "name": cased(re.sub(r"\s*\(Incumbent\)", "", found[2])),
                     "party": named,
                     "independent": independent or found[1] == "Npa",
+                    "unexpired": unexpired,
+                }
+            )
+
+    section, jurisdiction, contest, seats, unexpired = "", "", "", 0, False
+    for line in text("MI-26081", "-layout").splitlines():
+        if found := re.fullmatch(r"\s{5}([A-Z][A-Z ]+?)\s*|\s{40,}([A-Z][A-Z ]+?)\s*", line):
+            section, jurisdiction, contest = (found[1] or found[2]), "", ""
+        elif section not in {"TOWNSHIP", "CITY", "VILLAGE", "COMMUNITY COLLEGE", "LOCAL SCHOOL DISTRICTS"}:
+            continue
+        elif found := re.fullmatch(r"\s{5}((?:City|Village) of [A-Za-z .'-]+|[A-Z][A-Za-z.' -]+ Tow\w+)\s*", line):
+            jurisdiction, contest = re.sub(r"Tow\w+$", "Township", found[1]), ""
+        elif found := re.match(
+            r"\s{5}(\S.*?)(?:\s+-)?\s{2,}(\d+ Year Term|Partial Term \w+ \S+)\s*$", line
+        ) or re.match(r"\s{5}(\S.*?) - (Partial Term \w+ \S+)\s*$", line):
+            contest = (
+                found[1] if section in {"COMMUNITY COLLEGE", "LOCAL SCHOOL DISTRICTS"} else f"{jurisdiction} {found[1]}"
+            )
+            unexpired = found[2].startswith("Partial")
+        elif found := re.match(r"\s+Vote for not more than (\d+)", line):
+            seats = int(found[1])
+        elif (
+            contest
+            and not re.search(r"Qualified Write-In|Withdrew", line)
+            and (
+                found := re.match(
+                    r"\s{5}(DEM|REP|LIB|UST|GRN|NLP|WCP|\s{3})\s{6,14}([A-Z][^\d]+?)(?:\s{2,}|\s*$)", line
+                )
+            )
+        ):
+            named, independent = party(
+                {"DEM": "Democratic", "REP": "Republican", "LIB": "Libertarian"}.get(found[1].strip(), "")
+            )
+            feeds["MI-26081"].append(
+                {
+                    "county": "Kent",
+                    "contest": re.sub(r"^Board Member (.+)$", r"\1 Board Member", contest),
+                    "seats": seats,
+                    "name": cased(found[2]),
+                    "party": named,
+                    "independent": independent,
                     "unexpired": unexpired,
                 }
             )
@@ -2438,7 +2513,7 @@ def parse() -> None:
                 seats, unexpired = int(found[4]), "PARTIAL" in found[3]
             elif re.match(r"\s{20,}[A-Z][A-Z0-9 .,'&/()-]+$", line):
                 post = ""
-            elif post and (found := re.match(r"(\S(?:.*?\S)?)\s{2,}(\S.*?)(?:\s{2,}|$)", line)):
+            elif post and (found := re.match(r"\s{0,4}(\S(?:.*?\S)?)\s{2,}(\S.*?)(?:\s{2,}|$)", line)):
                 if nobody.search(found[2]) or re.search(
                     r"(?i)no candidate filed|withdr|disqualif|page \d+ of|^november", line
                 ):
