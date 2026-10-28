@@ -357,7 +357,55 @@ ROUNDS += [
         elstats.ma_primary_search(8, 2026),
     ),
 ]
-SYSTEMS = {**RUNOFF_SYSTEMS, "AR": "two_round"}
+DELIVERED = {
+    "ME": (DATA / "inbox" / "manual" / "MF-148", "https://www.maine.gov/sos/elections-voting/election-results-data"),
+    "MT": (DATA / "inbox" / "manual" / "MF-149", "https://electionresults.mt.gov/ResultsExport.aspx?eid=450002928"),
+    "NH": (DATA / "inbox" / "manual" / "MF-150", "https://www.sos.nh.gov/2026-state-primary-election-results"),
+}
+DELIVERED_FILES = {
+    "ME": [
+        *(
+            f"{office} {party} - FINAL.xlsx"
+            for office in ("State Senate", "Rep to the Legislature")
+            for party in ("DEM", "REP")
+        ),
+        "Senate District 4 - Republican.xlsx",
+        "House District 58 - Republican.xlsx",
+    ],
+    "MT": ["Legislative Results.xlsx"],
+    "NH": sorted(path.name for path in DELIVERED["NH"][0].glob("2026-sp-*.xlsx")),
+}
+ROUNDS += [
+    (
+        state,
+        day,
+        publisher,
+        title,
+        DELIVERED[state][1],
+        f"{DELIVERED[state][1]}#{DELIVERED_FILES[state][0]}",
+    )
+    for state, day, publisher, title in (
+        (
+            "ME",
+            date(2026, 6, 9),
+            "Maine Secretary of State",
+            "June 9, 2026 primary election official results by municipality",
+        ),
+        (
+            "MT",
+            date(2026, 6, 2),
+            "Montana Secretary of State",
+            "June 2, 2026 primary election legislative results by county",
+        ),
+        (
+            "NH",
+            date(2026, 9, 8),
+            "New Hampshire Secretary of State",
+            "September 8, 2026 state primary election results by town",
+        ),
+    )
+]
+SYSTEMS = {**RUNOFF_SYSTEMS, "AR": "two_round", "ME": "irv"}
 MAJORITY = {**THRESHOLDS, "AR": 50}
 AR_CONTESTS = "https://enr-results-api.totalresults.com/Contest/GetContestSearchList?cid=arkansas&electionID={}"
 SIDECARS = {
@@ -366,7 +414,26 @@ SIDECARS = {
     ],
     "HI": [url("hi", county) for county in ("coh", "cok", "com")],
     "MA": [elstats.ma_primary_search(9, 2026)],
+    **{state: [f"{DELIVERED[state][1]}#{name}" for name in names[1:]] for state, names in DELIVERED_FILES.items()},
 }
+ME_COUNTIES = [
+    "AND",
+    "ARO",
+    "CUM",
+    "FRA",
+    "HAN",
+    "KEN",
+    "KNO",
+    "LIN",
+    "OXF",
+    "PEN",
+    "PIS",
+    "SAG",
+    "SOM",
+    "WAL",
+    "WAS",
+    "YOR",
+]
 OK_RACE = re.compile(r"FOR STATE (SENATOR|REPRESENTATIVE) DISTRICT (\d+)")
 LEGISLATIVE = re.compile(
     r"(?P<party>REP|DEM) (?:State (?P<chamber>Senate|House)|(?P<body>Senator|Representative) in General Assembly) District (?P<district>\d+)"
@@ -459,6 +526,20 @@ def fetch() -> None:
                         suffix=".json",
                         retrieved_at=datetime.now(UTC),
                         media_type="application/json",
+                    )
+            continue
+        if state in DELIVERED:
+            for name in DELIVERED_FILES[state]:
+                try:
+                    raw.cached(SOURCE, f"{DELIVERED[state][1]}#{name}")
+                except LookupError:
+                    raw.store(
+                        SOURCE,
+                        f"{DELIVERED[state][1]}#{name}",
+                        (DELIVERED[state][0] / name).read_bytes(),
+                        suffix=".xlsx",
+                        retrieved_at=datetime(2026, 10, 28, tzinfo=UTC),
+                        media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                     )
             continue
         if state == "MD":
@@ -779,6 +860,153 @@ def parse() -> None:
                             )
                         elif segment and not segment.startswith(("Blank", "Over", "Number")):
                             found = None
+        if state == "ME":
+            for name in DELIVERED_FILES[state]:
+                ranked = re.fullmatch(r"(Senate|House) District (\d+) - Republican\.xlsx", name)
+                if ranked is not None:
+                    grid = pl.read_excel(
+                        raw.cached(SOURCE, f"{DELIVERED[state][1]}#{name}").path,
+                        has_header=False,
+                        infer_schema_length=0,
+                    ).rows()
+                    where = grid[3].index("CTY")
+                    rows.extend(
+                        (
+                            ranked[1].lower(),
+                            ranked[2],
+                            "republican",
+                            re.sub(
+                                r"\b(Ii|Iii|Iv)$",
+                                lambda match: match[1].upper(),
+                                cased(
+                                    re.sub(
+                                        r"^(.+?), (.+?),?( JR\.?| SR\.?| II| III| IV)?$",
+                                        lambda match: f"{match[2]} {match[1]}{match[3] or ''}",
+                                        grid[0][column].strip(),
+                                    )
+                                ),
+                            ),
+                            f"23{2 * ME_COUNTIES.index(line[where].upper()) + 1:03}",
+                            int(line[column] or 0),
+                        )
+                        for line in grid[4:]
+                        if line[where]
+                        for column in range(where + 3, len(line))
+                        if grid[0][column] and grid[0][column] != "BLANK"
+                    )
+                    continue
+                names: list[str] = []
+                for line in pl.read_excel(
+                    raw.cached(SOURCE, f"{DELIVERED[state][1]}#{name}").path, has_header=False, infer_schema_length=0
+                ).rows():
+                    if (line[0] or "").strip().upper() == "DIS":
+                        names = [cell for cell in line[3:] if cell and cell not in ("BLANK", "TBC")]
+                        continue
+                    if not (line[0] or "").isdigit() or not line[1]:
+                        continue
+                    for column, candidate in enumerate(names, 3):
+                        rows.append(
+                            (
+                                "senate" if name.startswith("State Senate") else "house",
+                                line[0],
+                                "democratic" if " DEM " in name else "republican",
+                                re.sub(
+                                    r"\b(Ii|Iii|Iv)$",
+                                    lambda match: match[1].upper(),
+                                    cased(
+                                        re.sub(
+                                            r"^(.+?), (.+?),?( JR\.?| SR\.?| II| III| IV)?$",
+                                            lambda match: f"{match[2]} {match[1]}{match[3] or ''}",
+                                            candidate.strip(),
+                                        )
+                                    ),
+                                ),
+                                f"23{2 * ME_COUNTIES.index(line[1].upper()) + 1:03}",
+                                int(line[column] or 0),
+                            )
+                        )
+        if state == "MT":
+            for sheet, grid in pl.read_excel(path, sheet_id=0, has_header=False, infer_schema_length=0).items():
+                lines = grid.rows()
+                found = re.search(r"(SENATOR|REPRESENTATIVE) DISTRICT (\d+)", lines[4][0] or "")
+                if found is None or sheet[:3] not in ("REP", "DEM"):
+                    continue
+                for line in lines[5:]:
+                    if not line[1] or line[1].strip().upper() == "TOTALS":
+                        continue
+                    rows.extend(
+                        (
+                            "senate" if found[1] == "SENATOR" else "house",
+                            str(int(found[2])),
+                            "republican" if sheet.startswith("REP") else "democratic",
+                            cased(lines[4][column].split("\n")[0].strip()),
+                            line[1],
+                            int(line[column] or 0),
+                        )
+                        for column in range(2, len(line))
+                        if lines[4][column]
+                    )
+        if state == "NH":
+            found_rows = []
+            for name in DELIVERED_FILES[state]:
+                party = "d" if name.endswith(("democratic.xlsx", "democratic_0.xlsx")) else "r"
+                county = re.match(r"2026-sp-house-([a-z]+)-", name)
+                district = names = None
+                for line in pl.read_excel(
+                    raw.cached(SOURCE, f"{DELIVERED[state][1]}#{name}").path,
+                    has_header=False,
+                    infer_schema_length=0,
+                ).rows():
+                    first = (line[0] or "").strip()
+                    heading = re.match(r"State Senate District (\d+)|District No\. (\d+) \(", first)
+                    if heading is not None:
+                        district = heading[1] or f"{county[1]}-{heading[2]}"
+                        names = [cell.strip() if cell else None for cell in line[1:]] if county is not None else None
+                        continue
+                    if first.upper().startswith("SEPTEMBER") and county is None:
+                        names = [cell.strip() if cell else None for cell in line[1:]]
+                        continue
+                    if not first or names is None or first.upper().startswith(("TOTALS", "STATE OF")):
+                        continue
+                    town = re.sub(r"\s+ward\s+\d+$", "", first.lower())
+                    votes = [int((cell or "").strip() or 0) for cell in line[1 : len(names) + 1]]
+                    place = next(
+                        (
+                            key
+                            for key in (plain(town), plain(re.sub(elstats.SUFFIXES, "", town)))
+                            if key in town_counties("NH")
+                        ),
+                        None,
+                    )
+                    if county is None and place is None:
+                        if any(votes):
+                            raise ValueError(f"unknown New Hampshire town {first}")
+                        continue
+                    for column, (candidate, value) in enumerate(zip(names, votes)):
+                        if not candidate or candidate in ("Recount", "Write-Ins"):
+                            continue
+                        if column + 1 < len(names) and names[column + 1] == "Recount":
+                            value = votes[column + 1]
+                        ballot, comma, letter = re.sub(r"\s{2,}WRITE-IN$", "", candidate).rpartition(", ")
+                        found_rows.append(
+                            (
+                                "senate" if county is None else "house",
+                                district,
+                                "democratic" if party == "d" else "republican",
+                                (ballot if comma else letter).replace(", ", " ")
+                                + (
+                                    ""
+                                    if comma and letter.strip().lower() == party and "WRITE-IN" not in candidate
+                                    else " (write-in)"
+                                ),
+                                county[1].title() if county is not None else town_counties("NH")[place],
+                                value,
+                            )
+                        )
+            cast = defaultdict(int)
+            for chamber, district, party, candidate, _, votes in found_rows:
+                cast[chamber, district, party, candidate] += votes
+            rows.extend(row for row in found_rows if cast[row[:4]] or not row[3].endswith("(write-in)"))
         if state == "MD":
             for page in MD_PAGES:
                 for link in re.findall(r'href="(gen_detail_results_[^"]+)"', raw.cached(SOURCE, page).path.read_text()):
@@ -1183,7 +1411,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="2026 state legislative primaries and primary runoffs by county: Alabama, Arkansas, Connecticut, Delaware (district totals), Florida, Georgia, Hawaii, Idaho, Illinois, Indiana, Iowa, Kansas, Maryland, Massachusetts, Michigan, Minnesota, Nevada (with its statewide offices), New York, North Carolina, Oklahoma, Rhode Island, South Carolina, Utah, Vermont, West Virginia, and Wisconsin from the states' official results; Arizona, Colorado, Kentucky, Missouri, New Mexico, North Dakota, Oregon, Pennsylvania, South Dakota, Tennessee, Texas, and Wyoming from OpenElections",
+            summary="2026 state legislative primaries and primary runoffs by county: Alabama, Arkansas, Connecticut, Delaware (district totals), Florida, Georgia, Hawaii, Idaho, Illinois, Indiana, Iowa, Kansas, Maine (ranked-choice first choices), Maryland, Massachusetts, Michigan, Minnesota, Montana, Nevada (with its statewide offices), New Hampshire, New York, North Carolina, Oklahoma, Rhode Island, South Carolina, Utah, Vermont, West Virginia, and Wisconsin from the states' official results; Arizona, Colorado, Kentucky, Missouri, New Mexico, North Dakota, Oregon, Pennsylvania, South Dakota, Tennessee, Texas, and Wyoming from OpenElections",
             polity="US",
         )
 
@@ -1397,6 +1625,14 @@ def emit() -> Path:
                         if state in CIVERA
                         else f"Results by county from the {publisher}'s official results"
                         + (", town results summed to counties." if state in ("CT", "MA") else ".")
+                        + (
+                            " Maine's primaries are ranked-choice: these are first choices, municipal results summed to"
+                            " counties, without the military and overseas ballots that Maine reports only by district. In Senate District 4"
+                            " and House District 58 (Republican), the ranked-choice tabulation elected the first-round"
+                            " leader."
+                            if state == "ME"
+                            else ""
+                        )
                     )
                     + (
                         " Declared write-in candidates are listed by name; the candidate with the most votes is shown as the nominee."
