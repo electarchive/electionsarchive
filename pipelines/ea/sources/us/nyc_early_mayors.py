@@ -26,7 +26,27 @@ PRIMARIES = {
     1977: date(1977, 9, 8),
     1985: date(1985, 9, 10),
 }
-YEARS = sorted([*range(1897, 1986, 4), *SPECIALS])
+EARLY = {
+    1834: (date(1834, 4, 8), date(1834, 4, 10)),
+    1844: (date(1844, 4, 9),) * 2,
+    1850: (date(1850, 11, 5),) * 2,
+    1854: (date(1854, 11, 7),) * 2,
+    1856: (date(1856, 11, 4),) * 2,
+    1857: (date(1857, 12, 1),) * 2,
+    1859: (date(1859, 12, 6),) * 2,
+    1861: (date(1861, 12, 3),) * 2,
+    1863: (date(1863, 12, 1),) * 2,
+    1865: (date(1865, 12, 5),) * 2,
+    1867: (date(1867, 12, 3),) * 2,
+    1870: (date(1870, 11, 8),) * 2,
+    1874: (date(1874, 11, 3),) * 2,
+    1886: (date(1886, 11, 2),) * 2,
+    1888: (date(1888, 11, 6),) * 2,
+    1890: (date(1890, 11, 4),) * 2,
+    1892: (date(1892, 11, 8),) * 2,
+    1894: (date(1894, 11, 6),) * 2,
+}
+YEARS = sorted([*EARLY, *range(1897, 1986, 4), *SPECIALS])
 CITYWIDE = {
     "comptroller": ("Comptroller", "new-york-city:comptroller", (1993, 1997)),
     "public-advocate": ("Public Advocate", "new-york-city:public-advocate", (1993, 1997)),
@@ -69,6 +89,8 @@ NAMES = {
     "Eric Haas": "Eric Hass",
     "Vito Battista": "Vito P. Battista",
     "Robert F. Wagner Jr.": "Robert F. Wagner Jr.",
+    "Cornelius Lawrence": "Cornelius Van Wyck Lawrence",
+    "Alesxander Jonas": "Alexander Jonas",
 }
 
 
@@ -160,7 +182,7 @@ def parse() -> None:
             (stage, party, kind, body)
             for box, stage, party in boxes
             for kind, body in re.findall(
-                r"\{\{Election box (winning candidate|candidate)[^|{]*?\s*\n?\s*\|(.*?)\}\}\s*(?=\n|$)",
+                r"\{\{\s*Election box (winning candidate|candidate)[^|{]*?\s*\n?\s*\|(.*?)\}\}\s*(?=\n|$)",
                 box,
                 re.DOTALL | re.IGNORECASE,
             )
@@ -201,7 +223,7 @@ def parse() -> None:
             )
             if box is not None:
                 for kind, body in re.findall(
-                    r"\{\{Election box (winning candidate|candidate)[^|{]*?\s*\n?\s*\|(.*?)\}\}\s*(?=\n|$)",
+                    r"\{\{\s*Election box (winning candidate|candidate)[^|{]*?\s*\n?\s*\|(.*?)\}\}\s*(?=\n|$)",
                     box,
                     re.DOTALL | re.IGNORECASE,
                 ):
@@ -314,9 +336,12 @@ def emit() -> Path:
             day = (
                 PRIMARIES[year]
                 if primary
+                else EARLY[year][0]
+                if year in EARLY
                 else SPECIALS.get(year, first + timedelta(days=(0 - first.weekday()) % 7 + 1))
             )
-            kind = "primary" if primary else "general" if year % 2 == 0 else "local"
+            end = EARLY[year][1] if year in EARLY and not primary else day
+            kind = "primary" if primary else "general" if year % 2 == 0 and year not in EARLY else "local"
             if primary:
                 election = cs.key("us.election", f"{day}:new-york-city:primary")
                 if election in cs.minted and election not in seen:
@@ -327,7 +352,7 @@ def emit() -> Path:
                         polity_id=polity,
                         kind="primary",
                         date_from=day,
-                        date_to=day,
+                        date_to=end,
                         date_precision="day",
                         status="held",
                     )
@@ -340,7 +365,7 @@ def emit() -> Path:
                     polity_id=cs.polity("US-NY"),
                     kind=kind,
                     date_from=day,
-                    date_to=day,
+                    date_to=end,
                     date_precision="day",
                     status="held",
                 )
@@ -356,7 +381,7 @@ def emit() -> Path:
                     parent_id=parent,
                     kind=kind,
                     date_from=day,
-                    date_to=day,
+                    date_to=end,
                     date_precision="day",
                     status="held",
                 )
