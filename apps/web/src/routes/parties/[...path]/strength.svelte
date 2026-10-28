@@ -116,6 +116,9 @@
             tiles={found.map.tiles}
             own={found.map.own}
             frame={found.map.frame}
+            blank={found.map.blank ?? null}
+            outlying={found.map.outlying ?? null}
+            parted={found.map.parted ?? null}
             approximate={found.map.approximate}
             {noun}
             votes={m.col_votes()}

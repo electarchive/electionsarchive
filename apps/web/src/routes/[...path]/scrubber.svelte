@@ -587,6 +587,9 @@
                 own={race.map.own}
                 nested={race.map.nested}
                 frame={race.map.frame}
+                blank={race.map.blank ?? null}
+                outlying={race.map.outlying ?? null}
+                parted={race.map.parted ?? null}
                 approximate={race.map.approximate}
                 sources={race.map.credits}
                 noun={places.levels[0]?.noun ?? ""}

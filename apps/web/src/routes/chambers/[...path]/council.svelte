@@ -183,6 +183,8 @@
         nested={mapped.map.nested}
         frame={mapped.map.frame}
         blank={mapped.map.blank ?? null}
+        outlying={mapped.map.outlying ?? null}
+        parted={mapped.map.parted ?? null}
         approximate={mapped.map.approximate}
         sources={mapped.map.credits}
         noun={mapped.noun}

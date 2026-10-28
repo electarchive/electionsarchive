@@ -369,6 +369,9 @@
                   own.frame.north + (own.frame.north - own.frame.south) * 1.5,
               }
             : own.frame,
+          blank: level.blank,
+          outlying: level.outlying ?? null,
+          parted: level.parted ?? null,
           approximate: level.approximate,
           noun:
             places.levels.find((entry) => entry.code === places.level)?.noun ??
@@ -472,6 +475,9 @@
         own={drawn.own}
         nested={drawn.nested}
         frame={drawn.frame}
+        blank={drawn.blank}
+        outlying={drawn.outlying}
+        parted={drawn.parted}
         approximate={drawn.approximate}
         noun={drawn.noun}
         votes={m.col_votes()}
