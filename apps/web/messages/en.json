@@ -992,6 +992,7 @@
   "term_withdrew_fallback": "Left the race after the lists were final. Their name stayed on the list and the seat went to the next member.",
   "boundaries_title": "Boundaries",
   "boundaries_set": "{noun} shapes from the {vintage} boundary set",
+  "boundaries_set_dated": "{noun} shapes as of {date}",
   "boundaries_scheme": "{noun} shapes",
   "map_shaped": "Only {shaped} of the {count} districts have boundary shapes. The table below lists results for all districts.",
   "map_unmapped": "{percent} of the vote was reported for units not shown on the map (such as absentee, early, or questioned ballots). These counts are included in the totals but do not appear in any specific location.",

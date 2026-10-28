@@ -54,7 +54,7 @@
           >
             <span
               class="text-end font-figures text-[0.9375rem] font-semibold tabular-nums"
-              >{group.count > 1 ? count(group.count) : ""}</span
+              >{count(group.count)}</span
             >
             <span
               class="underline decoration-border underline-offset-4 group-hover:decoration-foreground"

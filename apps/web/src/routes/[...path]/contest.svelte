@@ -2293,10 +2293,15 @@
                 <span class="font-semibold first-letter:uppercase"
                   >{entry.vintage == null
                     ? m.boundaries_scheme({ noun: entry.noun })
-                    : m.boundaries_set({
-                        noun: entry.noun,
-                        vintage: entry.vintage,
-                      })}</span
+                    : /^\d{4}-\d{2}-\d{2}$/u.test(entry.vintage)
+                      ? m.boundaries_set_dated({
+                          noun: entry.noun,
+                          date: date(entry.vintage),
+                        })
+                      : m.boundaries_set({
+                          noun: entry.noun,
+                          vintage: entry.vintage,
+                        })}</span
                 >
                 {#if entry.isApproximate}
                   <Term
