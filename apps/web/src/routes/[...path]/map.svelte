@@ -46,6 +46,7 @@
     limit = null,
     blank = null,
     outlying = null,
+    parted = null,
     isApproximate,
     noun,
     votes,
@@ -68,7 +69,11 @@
     isTally?: boolean;
     colors: Array<string>;
     tiles: string;
-    own: { tiles: string; k: number } | null;
+    own: {
+      tiles: string;
+      k: number;
+      parted?: { isOnly: boolean; ks: Array<number> } | null;
+    } | null;
     nested?: { tiles: string; ks: Array<number> } | null;
     frame: Box;
     limit?: Box | null;
@@ -80,6 +85,7 @@
       isPending: boolean;
     }> | null;
     outlying?: Array<{ k: number; code: string }> | null;
+    parted?: { isOnly: boolean; ks: Array<number> } | null;
     isApproximate: boolean;
     noun: string;
     votes: string;
@@ -638,21 +644,40 @@
       }))
       .toSorted((a, b) => a.code.localeCompare(b.code));
   });
+  const away = $derived(
+    new Set([
+      ...(outlying ?? []).map((entry) => entry.k),
+      ...places.rows
+        .filter(
+          (row) =>
+            parted != null && parted.ks.includes(row.k) !== parted.isOnly,
+        )
+        .map((row) => row.k),
+    ]),
+  );
   const inland: Maplibre.ExpressionSpecification = $derived([
-    "!",
+    "all",
     [
-      "in",
-      ["id"],
+      "!",
       [
-        "literal",
+        "in",
+        ["id"],
         [
-          ...(blank ?? [])
-            .filter((entry) => entry.isOutside)
-            .map((entry) => entry.k),
-          ...(outlying ?? []).map((entry) => entry.k),
+          "literal",
+          [
+            ...(blank ?? [])
+              .filter((entry) => entry.isOutside)
+              .map((entry) => entry.k),
+            ...(outlying ?? []).map((entry) => entry.k),
+          ],
         ],
       ],
     ],
+    parted == null
+      ? true
+      : parted.isOnly
+        ? ["in", ["id"], ["literal", parted.ks]]
+        : ["!", ["in", ["id"], ["literal", parted.ks]]],
   ]);
   const skipped = $derived.by(() => {
     if (typeof view !== "number") {
@@ -983,9 +1008,7 @@
       return;
     }
     const href = unit(path);
-    const box = remote.some((entry) => entry.k === k)
-      ? null
-      : engine.shape(engine.tiles(layer), k);
+    const box = away.has(k) ? null : engine.shape(engine.tiles(layer), k);
     if (box == null || calm) {
       opening = k;
       void goto(href).finally(() => {
@@ -1331,12 +1354,21 @@
     );
     if (own != null && outer != null) {
       const ownAreas = { source: outer, "source-layer": "areas" } as const;
+      const beyond: Maplibre.ExpressionSpecification = [
+        "all",
+        ["!=", ["id"], own.k],
+        own.parted == null
+          ? true
+          : own.parted.isOnly
+            ? ["in", ["id"], ["literal", own.parted.ks]]
+            : ["!", ["in", ["id"], ["literal", own.parted.ks]]],
+      ];
       engine.add(
         {
           id: "veil",
           type: "fill",
           ...ownAreas,
-          filter: ["!=", ["id"], own.k],
+          filter: beyond,
           paint: {
             "fill-color": "var(--card)",
             "fill-opacity": [
@@ -1364,7 +1396,7 @@
           id: "near",
           type: "line",
           ...ownAreas,
-          filter: ["!=", ["id"], own.k],
+          filter: beyond,
           paint: {
             "line-color": "var(--foreground)",
             "line-width": 1.5,
@@ -1571,9 +1603,7 @@
       engine.points(
         "dots",
         places.rows.flatMap((row) =>
-          row.at == null || remote.some((entry) => entry.k === row.k)
-            ? []
-            : [{ k: row.k, at: row.at }],
+          row.at == null || away.has(row.k) ? [] : [{ k: row.k, at: row.at }],
         ),
       );
       engine.points(
@@ -1583,7 +1613,7 @@
               const change = changes.get(row.k)?.swing;
               if (
                 row.at == null ||
-                remote.some((entry) => entry.k === row.k) ||
+                away.has(row.k) ||
                 change == null ||
                 Math.abs(change) < 0.001
               ) {

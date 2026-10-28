@@ -388,7 +388,7 @@
           own:
             own.tiles == null || own.k == null
               ? null
-              : { tiles: own.tiles, k: own.k },
+              : { tiles: own.tiles, k: own.k, parted: own.parted ?? null },
           nested:
             inner?.tiles == null || districts.length === 0
               ? null
@@ -396,6 +396,7 @@
           frame: own.frame,
           blank: level.blank,
           outlying: level.outlying ?? null,
+          parted: level.parted ?? null,
           isApproximate: level.isApproximate,
           noun: noun ?? level.noun,
           sources: [
@@ -458,7 +459,8 @@
     return {
       places,
       tiles: own.tiles,
-      own: { tiles: own.tiles, k: own.k },
+      own: { tiles: own.tiles, k: own.k, parted: own.parted ?? null },
+      parted: own.parted ?? null,
       frame: own.frame,
       limit: parent?.frame ?? {
         west: own.frame.west - (own.frame.east - own.frame.west) * 1.5,
@@ -1490,6 +1492,7 @@
       colors={shown.colors}
       tiles={shown.tiles}
       own={shown.own}
+      parted={shown.parted}
       frame={shown.frame}
       limit={shown.limit}
       isApproximate={shown.isApproximate}
@@ -1668,6 +1671,7 @@
           frame={drawn.frame}
           blank={drawn.blank}
           outlying={drawn.outlying}
+          parted={drawn.parted}
           isApproximate={drawn.isApproximate}
           noun={drawn.noun}
           sources={drawn.sources}

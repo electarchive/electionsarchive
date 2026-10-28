@@ -20,7 +20,7 @@ import * as v from "valibot";
 import { m } from "#lib/paraglide/messages.js";
 import { os, remember } from "#lib/server/cache.js";
 import { db } from "#lib/server/db/index.js";
-import { plane, spot } from "#lib/server/plane.js";
+import { parted, plane, spot } from "#lib/server/plane.js";
 import { independent } from "#lib/party.js";
 
 const stored = (tiles: string | null | undefined) =>
@@ -150,13 +150,7 @@ const fused = (option: SQL, contest: SQL) => sql`
   (
     select ch.party_id from contest_option ch
     join result_set rs on rs.contest_id = ch.contest_id and ${latest("rs")}
-    join contest dc on dc.id = ch.contest_id
-    left join area da on da.id = dc.district_area_id
-    cross join lateral (
-      (select x.value from result_rollup x where x.result_set_k = rs.k and x.area_k = da.k and x.option_k = ch.k offset 0)
-      union all
-      (select x.value from result_rollup x where da.k is null and x.result_set_k = rs.k and x.option_k = ch.k offset 0)
-    ) x
+    cross join lateral (select x.value from result_rollup x where x.result_set_k = rs.k and x.option_k = ch.k offset 0) x
     where ch.contest_id = ${contest} and ch.parent_option_id = ${option} and ch.party_id is not null
     group by ch.id, ch.party_id
     order by exists (
@@ -538,7 +532,18 @@ const Places = v.nullable(
 
 const Sketch = v.object({
   tiles: v.nullable(v.string()),
-  own: v.nullable(v.object({ tiles: v.string(), k: v.number() })),
+  own: v.nullable(
+    v.object({
+      tiles: v.string(),
+      k: v.number(),
+      parted: v.optional(
+        v.object({ isOnly: v.boolean(), ks: v.array(v.number()) }),
+      ),
+    }),
+  ),
+  parted: v.optional(
+    v.object({ isOnly: v.boolean(), ks: v.array(v.number()) }),
+  ),
   nested: v.optional(
     v.nullable(v.object({ tiles: v.string(), ks: v.array(v.number()) })),
   ),
@@ -7798,6 +7803,9 @@ export const contests = {
           outlying: v.optional(
             v.array(v.object({ k: v.number(), code: v.string() })),
           ),
+          parted: v.optional(
+            v.object({ isOnly: v.boolean(), ks: v.array(v.number()) }),
+          ),
           frame: v.nullable(
             v.object({
               west: v.number(),
@@ -7931,7 +7939,7 @@ export const contests = {
           const shaped = new Set(row.shaped);
           const absent = group.ids.filter((id) => !shaped.has(id));
           const isLevel = group.scheme === input.level;
-          const [labels, outlying] = await Promise.all([
+          const [labels, outlying, split] = await Promise.all([
             names(absent, contest.date),
             isLevel && group.scheme === "us.state"
               ? db.execute<{ k: number; code: string }>(sql`
@@ -7940,6 +7948,7 @@ export const contests = {
                   and c.code in ('60', '66', '69', '72', '78')
               `)
               : null,
+            parted(group.scheme, area.id, row.asOf ?? day),
           ]);
           return [
             {
@@ -7960,6 +7969,7 @@ export const contests = {
               frame: group.ids.includes(area.id) ? frame : null,
               blank: isLevel ? blank : [],
               ...(outlying != null && { outlying: outlying.rows }),
+              parted: split,
             },
           ];
         }),
@@ -10029,11 +10039,19 @@ async function sketch(
   const own = found.rows.find(
     (row) => row.scheme !== level && stored(row.tiles) != null,
   );
+  const [split, ownSplit] = await Promise.all([
+    parted(level, area.id, day),
+    own == null ? undefined : parted(own.scheme, area.id, day),
+  ]);
   return tiled == null || frame == null
     ? null
     : {
         tiles: stored(tiled.tiles),
-        own: own == null ? null : { tiles: own.tiles, k: area.k },
+        own:
+          own == null
+            ? null
+            : { tiles: own.tiles, k: area.k, parted: ownSplit },
+        parted: split,
         nested: inside == null ? null : { tiles: inside, ks: inner },
         frame,
         blank: absent

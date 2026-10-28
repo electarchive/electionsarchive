@@ -1408,6 +1408,7 @@
                 frame={race.map.frame}
                 blank={race.map.blank ?? null}
                 outlying={race.map.outlying ?? null}
+                parted={race.map.parted ?? null}
                 isApproximate={race.map.isApproximate}
                 sources={race.map.credits}
                 noun={race.places?.levels[0]?.noun ?? ""}
@@ -1495,6 +1496,7 @@
               frame={shape.frame}
               blank={shape.blank ?? null}
               outlying={shape.outlying ?? null}
+              parted={shape.parted ?? null}
               isApproximate={shape.isApproximate}
               sources={shape.credits}
               noun={places.levels[0]?.noun ?? ""}
