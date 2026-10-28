@@ -5,6 +5,7 @@
   import { count, date, percent } from "#lib/format.js";
   import { m } from "#lib/paraglide/messages.js";
   import { swatch } from "#lib/party.js";
+  import { cn } from "#lib/utils.js";
 
   const {
     terms,
@@ -342,7 +343,14 @@
   reserve={"clamp(230px, (100vw - 640px) * 100, 320px)"}
 >
   <svg
-    class="block cursor-pointer touch-pan-y overflow-visible rounded-sm outline-none block-auto max-inline-full focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring"
+    class={cn(
+      "block touch-pan-y overflow-visible rounded-sm outline-none block-auto max-inline-full focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring",
+      {
+        "cursor-pointer":
+          (selected != null && onselect != null) ||
+          (hovered != null && link?.(hovered) != null),
+      },
+    )}
     viewBox="0 0 {width} {height}"
     {width}
     {height}
@@ -508,7 +516,9 @@
             ? 0.5
             : 1
           : 0.3}
+        class="cursor-default"
         role="presentation"
+        onclick={(event) => event.stopPropagation()}
         onpointerenter={(event) => {
           if (event.pointerType === "mouse") {
             seated = cabinet.from;

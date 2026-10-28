@@ -20,3 +20,48 @@ export const AFFILIATIONS: Record<string, (input: { name: string }) => string> =
     regional_branch: m.aff_regional_branch,
     coalition: m.aff_coalition,
   };
+
+export function named(entry: { from: string | null; to: string | null }) {
+  const from = entry.from?.slice(0, 4) ?? null;
+  const to = entry.to?.slice(0, 4) ?? null;
+  return from == null
+    ? to == null
+      ? ""
+      : m.party_name_until({ year: to })
+    : to == null
+      ? m.party_name_from({ year: from })
+      : from === to
+        ? from
+        : `${from}–${to}`;
+}
+
+export function formerly(
+  names: Array<{
+    name: string;
+    short: string | null;
+    from: string | null;
+    to: string | null;
+  }>,
+  locale: string,
+) {
+  const former = names.filter((entry) => entry.to != null);
+  const [only] = former;
+  if (only == null) {
+    return null;
+  }
+  if (former.length === 1) {
+    return m.party_formerly_one({
+      name: only.short == null ? only.name : `${only.name} (${only.short})`,
+      years: named(only),
+    });
+  }
+  return m.party_formerly({
+    names: new Intl.ListFormat(locale, { type: "conjunction" }).format(
+      former.map((entry) =>
+        former.length > 2
+          ? `${entry.short ?? entry.name} (${named(entry)})`
+          : `${entry.name} (${[entry.short, named(entry)].filter((part) => part != null).join(", ")})`,
+      ),
+    ),
+  });
+}

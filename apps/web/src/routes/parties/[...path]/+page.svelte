@@ -8,7 +8,7 @@
   import { m } from "#lib/paraglide/messages.js";
   import { getLocale } from "#lib/paraglide/runtime.js";
   import { swatch } from "#lib/party.js";
-  import { AFFILIATIONS } from "#lib/relations.js";
+  import { AFFILIATIONS, formerly } from "#lib/relations.js";
   import type { PageData } from "./$types";
   import History from "./history.svelte";
   import Lineage from "./lineage.svelte";
@@ -34,6 +34,7 @@
       !party.scope.polity.path.startsWith(`${party.polity.path}/`),
   );
   const color = $derived(swatch(party.color, `party:${data.id}`));
+  const former = $derived(formerly(party.names ?? [], getLocale()));
   const links = $derived(
     party.parents.flatMap((parent) => {
       const phrase = AFFILIATIONS[parent.kind];
@@ -148,6 +149,11 @@
           />{m.versus_action()}</a
         >
       </div>
+      {#if former != null}
+        <p class="text-[0.9375rem] text-pretty text-muted-foreground">
+          {former}
+        </p>
+      {/if}
       {#if party.scope != null}
         {const scope = $derived(party.scope)}
         <p

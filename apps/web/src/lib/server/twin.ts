@@ -27,7 +27,7 @@ import { count, date, definite, percent, plural, points } from "#lib/format.js";
 import { isDerived, MEASURES, VACANCIES } from "#lib/outcomes.js";
 import { m } from "#lib/paraglide/messages.js";
 import { getLocale } from "#lib/paraglide/runtime.js";
-import { AFFILIATIONS, RELATIONS } from "#lib/relations.js";
+import { AFFILIATIONS, formerly, RELATIONS } from "#lib/relations.js";
 import {
   archive,
   atlasPage,
@@ -1557,11 +1557,19 @@ function partyMarkdown(
       (parent) =>
         `- ${AFFILIATIONS[parent.kind]?.({ name: link(parent.party.label, `id/${parent.party.id}`) }) ?? link(parent.party.label, `id/${parent.party.id}`)}`,
     ),
+    ...(party.events ?? []).flatMap((event) =>
+      event.kind === "closed_by_court"
+        ? [
+            `- ${m.rel_closed_by_court()}${event.date == null ? "" : ` (${event.date.slice(0, 4)})`}`,
+          ]
+        : [],
+    ),
   ];
   return [
     party.scope == null
       ? `# ${party.name}${party.short != null && !party.name.includes(party.short) ? ` (${party.short})` : ""}`
       : `# ${(party.scope.polity.path != null && party.polity?.path != null && !party.scope.polity.path.startsWith(`${party.polity.path}/`) ? m.party_abroad_title : m.party_scope_title)({ party: party.name, place: party.scope.polity.name })}`,
+    ...[formerly(party.names ?? [], getLocale())].flatMap((line) => line ?? []),
     ...(party.polity == null
       ? []
       : [
@@ -4765,9 +4773,7 @@ function placesMarkdown(
               }),
             )
             .join("; ") +
-            (splits === 0
-              ? ""
-              : `; ${m.map_split_key()} ${count(splits)}`) +
+            (splits === 0 ? "" : `; ${m.map_split_key()} ${count(splits)}`) +
             ".",
         ]),
     table(

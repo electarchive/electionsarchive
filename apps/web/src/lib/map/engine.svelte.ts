@@ -269,6 +269,37 @@ function arrow() {
   };
 }
 
+export function proportional(
+  held: Iterable<Array<[number, number]> | null | undefined>,
+) {
+  let won = 0;
+  let split = 0;
+  for (const entry of held) {
+    won += 1;
+    if (entry != null) {
+      split += 1;
+    }
+  }
+  return won > 0 && split / won >= 0.8;
+}
+
+export function largest(
+  held: Array<[number, number]>,
+  votes: (index: number) => number,
+) {
+  let best = held[0];
+  for (const entry of held) {
+    if (
+      best == null ||
+      entry[1] > best[1] ||
+      (entry[1] === best[1] && votes(entry[0]) > votes(best[0]))
+    ) {
+      best = entry;
+    }
+  }
+  return best?.[0] ?? null;
+}
+
 export class Engine {
   isLoaded = $state(false);
   credits = $state<Array<string>>([]);

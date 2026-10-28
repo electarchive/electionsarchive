@@ -4,7 +4,7 @@
   import Measured from "#lib/components/measured.svelte";
   import { m } from "#lib/paraglide/messages.js";
   import { swatch } from "#lib/party.js";
-  import { RELATIONS } from "#lib/relations.js";
+  import { named as years, RELATIONS } from "#lib/relations.js";
   import { cn } from "#lib/utils.js";
   import type { PageData } from "./$types";
 
@@ -27,9 +27,32 @@
   ]);
   const LINE = 14;
   const GAP = 10;
+  const KEYS: Array<[string, () => string]> = [
+    ["merged_into", m.lineage_key_merger],
+    ["absorbed_by", m.lineage_key_absorption],
+    ["split_from", m.lineage_key_split],
+    ["successor_of", m.lineage_key_succession],
+    ["list_vehicle_for", m.lineage_key_list],
+    ["closed_by_court", m.rel_closed_by_court],
+    ["renamed", m.lineage_key_rename],
+  ];
+  const DASHES: Record<string, string> = {
+    successor_of: "4 8",
+    refounded_as: "4 8",
+    list_vehicle_for: "0.1 6",
+  };
 
+  const uid = $props.id();
   let width = $state(0);
   let lit = $state<string | null>(null);
+  let tip = $state<{
+    key: string;
+    x: number;
+    y: number;
+    title: string;
+    short: string | null;
+    detail: string;
+  } | null>(null);
   let chart = $state<SVGSVGElement | null>(null);
 
   const year = (value: string) =>
@@ -48,17 +71,17 @@
   });
 
   const title = $derived(party.short ?? party.name);
+  const names = $derived(party.names ?? []);
+  const isRenamed = $derived(names.length > 1);
+  const hasChart = $derived(
+    isRenamed || (party.events ?? []).length > 0 || party.relations.length > 0,
+  );
   const self = $derived({
     from: party.span == null ? null : year(party.span.from),
     to: party.span == null ? null : year(party.span.to),
   });
   const others = $derived(
-    Map.groupBy(
-      party.relations.filter(
-        (relation) => relation.kind !== "list_vehicle_for",
-      ),
-      (relation) => relation.party.id,
-    )
+    Map.groupBy(party.relations, (relation) => relation.party.id)
       .values()
       .toArray()
       .flatMap((group) => {
@@ -66,11 +89,25 @@
         if (first == null) {
           return [];
         }
-        const events = group.map((relation) => ({
+        const notes = group.map((relation) => {
+          const text =
+            RELATIONS[relation.kind]?.[relation.outgoing ? 1 : 0]?.({
+              name: title,
+            }) ?? "";
+          const at = relation.date?.slice(0, 4) ?? null;
+          return {
+            text,
+            at,
+            label: [text, at].filter((part) => part != null).join(" "),
+          };
+        });
+        const events = group.map((relation, index) => ({
+          kind: relation.kind,
           at: relation.date == null ? null : year(relation.date),
           isInto: INTO.has(
             `${relation.kind}:${relation.outgoing ? "out" : "in"}`,
           ),
+          label: notes[index]?.label ?? "",
         }));
         return [
           {
@@ -78,18 +115,7 @@
             span: first.span,
             events,
             isAbove: events.every((event) => event.isInto),
-            notes: group.map((relation) => {
-              const text =
-                RELATIONS[relation.kind]?.[relation.outgoing ? 1 : 0]?.({
-                  name: title,
-                }) ?? "";
-              const at = relation.date?.slice(0, 4) ?? null;
-              return {
-                text,
-                at,
-                label: [text, at].filter((part) => part != null).join(" "),
-              };
-            }),
+            notes,
           },
         ];
       }),
@@ -102,6 +128,22 @@
         if (event.at != null) {
           from = Math.min(from, event.at);
           to = Math.max(to, event.at);
+        }
+      }
+    }
+    for (const event of party.events ?? []) {
+      if (event.date != null) {
+        from = Math.min(from, year(event.date));
+        to = Math.max(to, year(event.date));
+      }
+    }
+    if (isRenamed) {
+      for (const entry of names) {
+        for (const at of [entry.from, entry.to]) {
+          if (at != null) {
+            from = Math.min(from, year(at));
+            to = Math.max(to, year(at));
+          }
         }
       }
     }
@@ -144,7 +186,7 @@
       cursor -= tall + GAP;
     }
     const top = cursor + GAP;
-    cursor = GAP + 8;
+    cursor = GAP + 8 + (isRenamed ? 14 : 0);
     for (const entry of below) {
       rows.push({ ...entry, offset: cursor + 9 });
       cursor += 18 + LINE * entry.notes.length + GAP;
@@ -229,6 +271,83 @@
   const bend = $derived(Math.min(56, Math.max(20, (end - start) * 0.05)));
   const sx = (value: number) =>
     start + ((value - extent.low) / (extent.high - extent.low)) * (end - start);
+  const segments = $derived(
+    isRenamed && Number.isFinite(main.from)
+      ? names.map((entry, index) => {
+          const from = sx(
+            entry.from == null
+              ? main.from
+              : Math.max(main.from, year(entry.from)),
+          );
+          const to = sx(
+            entry.to == null ? main.to : Math.min(main.to, year(entry.to)),
+          );
+          const room = to - from - 6;
+          return {
+            entry,
+            from,
+            to,
+            isFormer: index < names.length - 1,
+            label:
+              measure(entry.name, 11, 500) <= room
+                ? entry.name
+                : entry.short != null && measure(entry.short, 11, 500) <= room
+                  ? entry.short
+                  : null,
+          };
+        })
+      : [],
+  );
+  const closures = $derived(
+    (party.events ?? []).flatMap((event) =>
+      event.date == null || !Number.isFinite(main.from)
+        ? []
+        : [{ ...event, x: sx(year(event.date)) }],
+    ),
+  );
+  const kinds = $derived(
+    new Set([
+      ...lanes.flatMap((lane) =>
+        lane.events.flatMap((event) =>
+          event.at == null
+            ? []
+            : [event.kind === "refounded_as" ? "successor_of" : event.kind],
+        ),
+      ),
+      ...closures.map((event) => event.kind),
+      ...(segments.length > 0 ? ["renamed"] : []),
+    ]),
+  );
+  const hint = (next: NonNullable<typeof tip>) => ({
+    role: "button",
+    tabindex: 0,
+    "aria-label": `${next.title}${next.short == null ? "" : ` (${next.short})`}, ${next.detail}`,
+    onpointerenter: (event: PointerEvent) => {
+      if (event.pointerType === "mouse") {
+        tip = next;
+      }
+    },
+    onpointerleave: (event: PointerEvent) => {
+      if (event.pointerType === "mouse" && tip?.key === next.key) {
+        tip = null;
+      }
+    },
+    onfocus: () => (tip = next),
+    onblur: () => {
+      if (tip?.key === next.key) {
+        tip = null;
+      }
+    },
+    onclick: () => (tip = next),
+    onkeydown: (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        tip = null;
+      } else if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        tip = next;
+      }
+    },
+  });
   const ticks = $derived.by(() => {
     const span = extent.high - extent.low;
     const room = Math.max(1, Math.floor((end - start) / 56));
@@ -247,13 +366,13 @@
   });
 </script>
 
-{#if lanes.length > 0 || links.length > 0}
+{#if hasChart || links.length > 0}
   <section
     class="relative col-span-12 grid grid-cols-[minmax(0,1fr)] gap-3 bg-card px-3.5 pbs-3.5 pbe-3"
     aria-labelledby="lineage-title"
     data-export
   >
-    {#if lanes.length > 0}
+    {#if hasChart}
       <Export name="lineage" class="absolute inset-e-2 inset-bs-2" />
     {/if}
     <div class="grid gap-0.5 pe-8">
@@ -262,21 +381,26 @@
           ? m.party_relations()
           : m.party_lineage_title()}
       </h2>
-      {#if lanes.length > 0}
-        <p class="text-[0.8125rem] text-muted-foreground max-inline-[64ch]">
-          {m.party_lineage_lede()}
+      {#if hasChart}
+        <p
+          class="text-[0.8125rem] text-pretty text-muted-foreground max-inline-[64ch]"
+        >
+          {#if lanes.length > 0}
+            {m.party_lineage_lede()}
+          {/if}
+          {m.party_lineage_hint()}
         </p>
       {/if}
     </div>
-    {#if lanes.length > 0}
-      <Measured bind:width class="pbs-1 min-inline-0">
+    {#if hasChart}
+      <Measured bind:width class="relative pbs-1 min-inline-0">
         <svg
           bind:this={chart}
           class="block overflow-visible block-auto max-inline-full"
           viewBox="0 0 {width} {height}"
           {width}
           {height}
-          role="img"
+          role="group"
           aria-labelledby="lineage-title"
           aria-describedby="lineage-list"
         >
@@ -333,18 +457,17 @@
               }
               return { from, to };
             })}
-            {const path = $derived(
-              [
-                ...marks.map(({ x, isInto }) =>
-                  isInto
-                    ? `M${x - turn},${y} C${x - turn / 2},${y} ${x - turn / 2},${axis} ${x},${axis}`
-                    : `M${x},${axis} C${x + turn / 2},${axis} ${x + turn / 2},${y} ${x + turn},${y}`,
-                ),
-                span.to - span.from > 0.5
-                  ? `M${span.from},${y} H${span.to}`
-                  : "",
-              ].join(" "),
-            )}
+            {const paths = $derived([
+              ...marks.map(({ x, isInto, kind }) => ({
+                d: isInto
+                  ? `M${x - turn},${y} C${x - turn / 2},${y} ${x - turn / 2},${axis} ${x},${axis}`
+                  : `M${x},${axis} C${x + turn / 2},${axis} ${x + turn / 2},${y} ${x + turn},${y}`,
+                dash: DASHES[kind],
+              })),
+              ...(span.to - span.from > 0.5
+                ? [{ d: `M${span.from},${y} H${span.to}`, dash: undefined }]
+                : []),
+            ])}
             {const reach = $derived(measure(lane.name, 13, 500) + 8)}
             {const left = $derived(
               Math.min(
@@ -371,20 +494,25 @@
                   stroke-linecap="round"
                 />
               {/if}
-              <path
-                d={path}
-                fill="none"
-                class="stroke-card"
-                stroke-width="9"
-                stroke-linecap="round"
-              />
-              <path
-                d={path}
-                fill="none"
-                stroke={tint}
-                stroke-width="4"
-                stroke-linecap="round"
-              />
+              {#each paths as line, index (index)}
+                <path
+                  d={line.d}
+                  fill="none"
+                  class="stroke-card"
+                  stroke-width="9"
+                  stroke-linecap="round"
+                />
+              {/each}
+              {#each paths as line, index (index)}
+                <path
+                  d={line.d}
+                  fill="none"
+                  stroke={tint}
+                  stroke-width="4"
+                  stroke-linecap="round"
+                  stroke-dasharray={line.dash}
+                />
+              {/each}
               {#if isCutStart && span.to - span.from > 0.5}
                 <path
                   d="M{span.from + 5},{y - 5} L{span.from},{y} L{span.from +
@@ -473,14 +601,70 @@
                   stroke-linecap="round"
                 />
               {/if}
-              <rect
-                x={sx(main.from)}
-                y={axis - 5}
-                width={Math.max(10, sx(main.to) - sx(main.from))}
-                height="10"
-                rx="5"
-                fill={color}
-              />
+              {#if segments.length > 0}
+                <clipPath id="{uid}-bar">
+                  <rect
+                    x={sx(main.from)}
+                    y={axis - 5}
+                    width={Math.max(10, sx(main.to) - sx(main.from))}
+                    height="10"
+                    rx="5"
+                  />
+                </clipPath>
+                <g clip-path="url(#{uid}-bar)">
+                  {#each segments as segment, index (index)}
+                    <rect
+                      x={segment.from}
+                      y={axis - 5}
+                      width={Math.max(0, segment.to - segment.from)}
+                      height="10"
+                      fill={color}
+                      fill-opacity={segment.isFormer ? 0.5 : 1}
+                    />
+                  {/each}
+                </g>
+                {#each segments.slice(1) as segment, index (index)}
+                  <line
+                    x1={segment.from}
+                    x2={segment.from}
+                    y1={axis - 6}
+                    y2={axis + 6}
+                    class="stroke-card"
+                    stroke-width="2.5"
+                  />
+                  <line
+                    x1={segment.from}
+                    x2={segment.from}
+                    y1={axis - 9}
+                    y2={axis + 9}
+                    class="stroke-foreground"
+                    stroke-width="1"
+                    stroke-dasharray="3 12"
+                  />
+                {/each}
+                {#each segments as segment, index (index)}
+                  {#if segment.label != null}
+                    <text
+                      x={segment.from + 3}
+                      y={axis + 19}
+                      class={cn(
+                        "fill-muted-foreground stroke-card text-[0.6875rem] font-medium [paint-order:stroke]",
+                        { "fill-foreground": tip?.key === `name:${index}` },
+                      )}
+                      stroke-width="3">{segment.label}</text
+                    >
+                  {/if}
+                {/each}
+              {:else}
+                <rect
+                  x={sx(main.from)}
+                  y={axis - 5}
+                  width={Math.max(10, sx(main.to) - sx(main.from))}
+                  height="10"
+                  rx="5"
+                  fill={color}
+                />
+              {/if}
               <text
                 x="0"
                 y={axis + 4.5}
@@ -490,23 +674,180 @@
             </g>
           {/if}
           {#each lanes as lane (lane.party.id)}
+            {const tint = $derived(
+              swatch(lane.party.color, `party:${lane.party.id}`),
+            )}
             {#each lane.events as event, index (index)}
               {#if event.at != null}
-                <circle
-                  cx={sx(event.at)}
-                  cy={axis}
-                  r="4.5"
-                  fill={swatch(lane.party.color, `party:${lane.party.id}`)}
-                  class={cn("stroke-card transition-opacity duration-200", {
-                    "opacity-20": lit != null && lit !== lane.party.id,
+                {const x = $derived(sx(event.at))}
+                <g
+                  class={cn(
+                    "group cursor-default transition-opacity duration-200 outline-none",
+                    { "opacity-20": lit != null && lit !== lane.party.id },
+                  )}
+                  {...hint({
+                    key: `rel:${lane.party.id}:${index}`,
+                    x,
+                    y: axis + 14,
+                    title: lane.party.label,
+                    short: null,
+                    detail: event.label,
                   })}
-                  stroke-width="2"
-                />
+                >
+                  <circle
+                    cx={x}
+                    cy={axis}
+                    r="10"
+                    fill="transparent"
+                    class="stroke-transparent group-focus-visible:stroke-ring"
+                    stroke-width="2"
+                  />
+                  {#if event.kind === "absorbed_by"}
+                    <rect
+                      x={x - 4.25}
+                      y={axis - 4.25}
+                      width="8.5"
+                      height="8.5"
+                      rx="1"
+                      fill={tint}
+                      class="stroke-card"
+                      stroke-width="2"
+                    />
+                  {:else if event.kind === "split_from"}
+                    <path
+                      d="M{x},{axis - 6} L{x + 6},{axis} L{x},{axis + 6} L{x -
+                        6},{axis} Z"
+                      fill={tint}
+                      class="stroke-card"
+                      stroke-width="2"
+                      stroke-linejoin="round"
+                    />
+                  {:else if event.kind === "successor_of" || event.kind === "refounded_as"}
+                    <circle
+                      cx={x}
+                      cy={axis}
+                      r="4.5"
+                      class="fill-card"
+                      stroke={tint}
+                      stroke-width="2.5"
+                    />
+                  {:else if event.kind === "list_vehicle_for"}
+                    <rect
+                      x={x - 4}
+                      y={axis - 4}
+                      width="8"
+                      height="8"
+                      rx="1"
+                      class="fill-card"
+                      stroke={tint}
+                      stroke-width="2"
+                    />
+                  {:else}
+                    <circle
+                      cx={x}
+                      cy={axis}
+                      r="4.5"
+                      fill={tint}
+                      class="stroke-card"
+                      stroke-width="2"
+                    />
+                  {/if}
+                </g>
               {/if}
             {/each}
           {/each}
+          {#each closures as event, index (index)}
+            <g
+              class="group cursor-default outline-none"
+              {...hint({
+                key: `closed:${index}`,
+                x: event.x,
+                y: axis + 14,
+                title: m.rel_closed_by_court(),
+                short: null,
+                detail: event.date?.slice(0, 4) ?? "",
+              })}
+            >
+              {const top = $derived(axis - 15)}
+              <circle
+                cx={event.x}
+                cy={top}
+                r="9"
+                fill="transparent"
+                class="stroke-transparent group-focus-visible:stroke-ring"
+                stroke-width="2"
+              />
+              <line
+                x1={event.x}
+                x2={event.x}
+                y1={top + 5}
+                y2={axis - 5}
+                class="stroke-foreground"
+                stroke-width="1"
+              />
+              <path
+                d="M{event.x - 4},{top - 4} L{event.x + 4},{top + 4} M{event.x +
+                  4},{top - 4} L{event.x - 4},{top + 4}"
+                class="stroke-card"
+                stroke-width="5"
+                stroke-linecap="round"
+              />
+              <path
+                d="M{event.x - 4},{top - 4} L{event.x + 4},{top + 4} M{event.x +
+                  4},{top - 4} L{event.x - 4},{top + 4}"
+                class="stroke-foreground"
+                stroke-width="1.75"
+                stroke-linecap="round"
+              />
+            </g>
+          {/each}
+          {#each segments as segment, index (index)}
+            <rect
+              x={segment.from}
+              y={axis - 9}
+              width={Math.max(8, segment.to - segment.from)}
+              height="32"
+              fill="transparent"
+              class="cursor-default outline-none focus-visible:stroke-ring"
+              stroke-width="2"
+              {...hint({
+                key: `name:${index}`,
+                x: (segment.from + segment.to) / 2,
+                y: axis + 28,
+                title: segment.entry.name,
+                short: segment.entry.short,
+                detail: years(segment.entry),
+              })}
+            />
+          {/each}
         </svg>
+        {#if tip != null}
+          <div
+            class="pointer-events-none absolute grid gap-0.5 rounded-sm bg-card/95 px-2.5 py-1.5 text-xs shadow-menu ring-1 ring-border max-inline-60"
+            style:inset-inline-start="{Math.max(
+              0,
+              Math.min(width - 240, tip.x - 60),
+            )}px"
+            style:inset-block-start="{tip.y}px"
+          >
+            <span class="text-[0.8125rem] font-semibold"
+              >{tip.title}{#if tip.short != null}
+                <span class="ms-1.5 font-normal text-muted-foreground"
+                  >{tip.short}</span
+                >{/if}</span
+            >
+            <span class="font-figures text-muted-foreground tabular-nums"
+              >{tip.detail.charAt(0).toUpperCase()}{tip.detail.slice(1)}</span
+            >
+          </div>
+        {/if}
         <ul id="lineage-list" class="sr-only">
+          {#each segments as segment, index (index)}
+            <li>{segment.entry.name}: {years(segment.entry)}</li>
+          {/each}
+          {#each closures as event, index (index)}
+            <li>{m.rel_closed_by_court()}: {event.date?.slice(0, 4) ?? ""}</li>
+          {/each}
           {#each lanes as lane (lane.party.id)}
             <li>
               {lane.party.label}: {lane.notes
@@ -516,6 +857,87 @@
           {/each}
         </ul>
       </Measured>
+      {#if kinds.size > 0}
+        <ul
+          class="flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground"
+        >
+          {#each KEYS.filter( ([kind]) => kinds.has(kind) ) as [kind, label] (kind)}
+            <li class="flex items-center gap-1.5">
+              <svg
+                viewBox="-8 -8 16 16"
+                class="shrink-0 overflow-visible block-3.5 inline-3.5"
+                aria-hidden="true"
+              >
+                {#if kind === "absorbed_by"}
+                  <rect
+                    x="-4.25"
+                    y="-4.25"
+                    width="8.5"
+                    height="8.5"
+                    rx="1"
+                    class="fill-muted-foreground"
+                  />
+                {:else if kind === "split_from"}
+                  <path
+                    d="M0,-6 L6,0 L0,6 L-6,0 Z"
+                    class="fill-muted-foreground"
+                  />
+                {:else if kind === "successor_of"}
+                  <circle
+                    r="4.5"
+                    class="fill-card stroke-muted-foreground"
+                    stroke-width="2.5"
+                  />
+                {:else if kind === "list_vehicle_for"}
+                  <rect
+                    x="-4"
+                    y="-4"
+                    width="8"
+                    height="8"
+                    rx="1"
+                    class="fill-card stroke-muted-foreground"
+                    stroke-width="2"
+                  />
+                {:else if kind === "closed_by_court"}
+                  <path
+                    d="M-4,-4 L4,4 M4,-4 L-4,4"
+                    class="stroke-foreground"
+                    stroke-width="1.75"
+                    stroke-linecap="round"
+                  />
+                {:else if kind === "renamed"}
+                  <rect
+                    x="-8"
+                    y="-3"
+                    width="16"
+                    height="6"
+                    class="fill-muted-foreground"
+                  />
+                  <line
+                    x1="0"
+                    x2="0"
+                    y1="-4"
+                    y2="4"
+                    class="stroke-card"
+                    stroke-width="2.5"
+                  />
+                  <line
+                    x1="0"
+                    x2="0"
+                    y1="-7"
+                    y2="7"
+                    class="stroke-foreground"
+                    stroke-dasharray="3 8"
+                  />
+                {:else}
+                  <circle r="4.5" class="fill-muted-foreground" />
+                {/if}
+              </svg>
+              {label()}
+            </li>
+          {/each}
+        </ul>
+      {/if}
     {/if}
     {#if links.length > 0}
       <ul class="grid gap-x-6 gap-y-1 text-sm md:grid-cols-2">

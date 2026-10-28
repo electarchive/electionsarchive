@@ -3324,7 +3324,9 @@ async function tabulate(
       chosenOnes.has(`${option.contest}:${option.person}`),
     );
     const held = new Map<string, number>();
-    for (const entry of row.isContest ? (seatsWon.get(row.owner ?? "") ?? []) : []) {
+    for (const entry of row.isContest
+      ? (seatsWon.get(row.owner ?? "") ?? [])
+      : []) {
       const key =
         entry.party != null
           ? `party:${entry.party}`
@@ -8269,7 +8271,8 @@ export const contests = {
         })
         .toArray()
         .toSorted(
-          (a, b) => Number(a.k == null) - Number(b.k == null) || b.valid - a.valid,
+          (a, b) =>
+            Number(a.k == null) - Number(b.k == null) || b.valid - a.valid,
         );
       const shown = grouped.filter(
         (entry) => entry.k == null || entry.entries.length > 1,
@@ -20479,6 +20482,85 @@ export const people = {
     }),
 };
 
+async function renames(id: string) {
+  const [rows, founded] = await Promise.all([
+    db.execute<{
+      text: string;
+      kind: string;
+      lang: string;
+      from: string | null;
+      to: string | null;
+      isPreferred: boolean;
+    }>(sql`
+      select text, kind::text, lang, lower(valid)::text as from, upper(valid)::text as to, is_preferred as "isPreferred"
+      from name where entity_id = ${id}::uuid and kind in ('official', 'abbreviation')
+    `),
+    db.execute<{ date: string | null }>(sql`
+      select min(date)::text as date from party_relation
+      where (to_party_id = ${id}::uuid and kind in ('merged_into', 'refounded_as'))
+        or (from_party_id = ${id}::uuid and kind in ('split_from', 'successor_of'))
+    `),
+  ]);
+  const official = rows.rows.filter((row) => row.kind === "official");
+  const current = official
+    .filter((row) => row.to == null)
+    .toSorted(
+      (a, b) =>
+        (b.from ?? "").localeCompare(a.from ?? "") ||
+        Number(b.isPreferred) - Number(a.isPreferred),
+    )[0];
+  if (current == null) {
+    return [];
+  }
+  const shorts = rows.rows.filter((row) => row.kind === "abbreviation");
+  const names = Map.groupBy(
+    official.filter((row) => row.lang === current.lang),
+    (row) => row.text,
+  )
+    .entries()
+    .flatMap(([text, group]) => {
+      const froms = group.flatMap((row) => row.from ?? []).toSorted();
+      const tos = group.flatMap((row) => row.to ?? []).toSorted();
+      const isCurrent = text === current.text;
+      return isCurrent || tos.length > 0
+        ? [
+            {
+              name: text,
+              from: froms[0] ?? null,
+              to: isCurrent ? null : (tos.at(-1) ?? null),
+            },
+          ]
+        : [];
+    })
+    .toArray()
+    .toSorted(
+      (a, b) =>
+        (a.to ?? "9999").localeCompare(b.to ?? "9999") ||
+        (a.from ?? "").localeCompare(b.from ?? ""),
+    );
+  return names.map((entry, index) => {
+    const from =
+      entry.from ??
+      (index === 0
+        ? founded.rows[0]?.date != null &&
+          (entry.to == null || founded.rows[0].date < entry.to)
+          ? founded.rows[0].date
+          : null
+        : (names[index - 1]?.to ?? null));
+    const matches = shorts.filter(
+      (row) =>
+        (row.from != null || row.to != null) &&
+        row.to === entry.to &&
+        row.text !== entry.name,
+    );
+    const short =
+      matches.find((row) => row.from === from && row.lang === current.lang) ??
+      matches.find((row) => row.lang === current.lang) ??
+      matches[0];
+    return { ...entry, from, short: short?.text ?? null };
+  });
+}
+
 export const parties = {
   elections: os
     .meta(
@@ -21100,6 +21182,19 @@ export const parties = {
           }),
         ),
         parents: v.array(v.object({ kind: v.string(), party: PartyRef })),
+        events: v.optional(
+          v.array(v.object({ kind: v.string(), date: v.nullable(v.string()) })),
+        ),
+        names: v.optional(
+          v.array(
+            v.object({
+              name: v.string(),
+              short: v.nullable(v.string()),
+              from: v.nullable(v.string()),
+              to: v.nullable(v.string()),
+            }),
+          ),
+        ),
         namesakes: v.optional(
           v.array(
             v.object({
@@ -21162,13 +21257,14 @@ export const parties = {
           kind: string;
           outgoing: boolean;
           date: string | null;
-          other: string;
+          other: string | null;
         }>(sql`
-          select r.kind::text, r.from_party_id = ${party.id}::uuid as outgoing, r.date::text,
+          select r.kind::text, r.from_party_id = ${party.id}::uuid as outgoing,
+            coalesce(r.date, e.date_from)::text as date,
             case when r.from_party_id = ${party.id}::uuid then r.to_party_id else r.from_party_id end as other
-          from party_relation r
-          where (r.from_party_id = ${party.id}::uuid or r.to_party_id = ${party.id}::uuid) and r.to_party_id is not null
-          order by r.date nulls last
+          from party_relation r left join election e on e.id = r.election_id
+          where r.from_party_id = ${party.id}::uuid or r.to_party_id = ${party.id}::uuid
+          order by 3 nulls last
         `),
         db.execute<{ kind: string; parent: string }>(sql`
           select distinct on (parent_party_id) kind::text, parent_party_id as parent
@@ -21219,8 +21315,11 @@ export const parties = {
         party.polity,
       );
       const peers = sakes.filter((id) => id !== party.id);
-      const others = [...relations.rows.map((row) => row.other), ...peers];
-      const [entities, slugs, spans] = await Promise.all([
+      const others = [
+        ...relations.rows.flatMap((row) => row.other ?? []),
+        ...peers,
+      ];
+      const [entities, slugs, spans, named] = await Promise.all([
         refs([
           party.id,
           ...polity,
@@ -21237,6 +21336,7 @@ export const parties = {
           where coalesce(m.into_id, o.party_id) = any(${sql.param(others)}::uuid[])
           group by 1
         `),
+        renames(party.id),
       ]);
       const self = entities.get(party.id);
       const ranges = new Map(spans.rows.map((row) => [row.party, row]));
@@ -21258,6 +21358,9 @@ export const parties = {
             ? null
             : { from: party.from, to: party.to, contests: party.contests },
         relations: relations.rows.flatMap((row) => {
+          if (row.other == null) {
+            return [];
+          }
           const other = entities.get(row.other);
           const range = ranges.get(row.other);
           return other == null
@@ -21277,6 +21380,10 @@ export const parties = {
           const other = entities.get(row.parent);
           return other == null ? [] : [{ kind: row.kind, party: other }];
         }),
+        names: named,
+        events: relations.rows.flatMap((row) =>
+          row.other == null ? [{ kind: row.kind, date: row.date }] : [],
+        ),
         namesakes: peers.flatMap((id) => {
           const other = entities.get(id);
           const range = ranges.get(id);

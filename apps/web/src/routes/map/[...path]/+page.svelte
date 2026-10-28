@@ -11,6 +11,7 @@
   import { page } from "$app/state";
   import MinusIcon from "@lucide/svelte/icons/minus";
   import PlusIcon from "@lucide/svelte/icons/plus";
+  import ChevronDownIcon from "@lucide/svelte/icons/chevron-down";
   import ScanIcon from "@lucide/svelte/icons/scan";
   import SlidersHorizontalIcon from "@lucide/svelte/icons/sliders-horizontal";
   import XIcon from "@lucide/svelte/icons/x";
@@ -21,6 +22,7 @@
   import Monogram from "#lib/components/monogram.svelte";
   import Standing from "#lib/components/standing.svelte";
   import * as Command from "#lib/components/ui/command/index.js";
+  import * as DropdownMenu from "#lib/components/ui/dropdown-menu/index.js";
   import * as Select from "#lib/components/ui/select/index.js";
   import { Switch } from "#lib/components/ui/switch/index.js";
   import { count, date, percent, plural, points } from "#lib/format.js";
@@ -30,7 +32,7 @@
   import { swatch } from "#lib/party.js";
   import { orpc } from "#lib/rpc.js";
   import { cn } from "#lib/utils.js";
-  import { Engine } from "#lib/map/engine.svelte.js";
+  import { Engine, largest, proportional } from "#lib/map/engine.svelte.js";
   import Histogram from "./histogram.svelte";
 
   type Sheet = PageData["atlas"];
@@ -46,7 +48,14 @@
   const STEPS = [14, 30, 48, 66, 84, 100];
   const SWINGS = [0.02, 0.05, 0.1];
   const DIM = "color-mix(in oklab, var(--muted-foreground) 11%, var(--card))";
-  const VIEWS = ["winner", "share", "votes", "swing", "flips"] as const;
+  const VIEWS = [
+    "winner",
+    "split",
+    "share",
+    "votes",
+    "swing",
+    "flips",
+  ] as const;
 
   const uid = $props.id();
   const calm =
@@ -78,6 +87,7 @@
     VIEWS.find((choice) => choice === query.get("color")) ?? "winner",
   );
   let who = $state<string | null>(query.get("who"));
+  const opener = query.get("color") === "share" ? query.get("who") : null;
   let range = $state<[number, number] | null>(
     untrack(() => {
       const [low, high] = (query.get("range") ?? "")
@@ -128,8 +138,21 @@
           column.some((value) => value != null),
         )),
   );
+  const isProportional = $derived(
+    proportional(
+      sheet.places.leader.flatMap((leader, i) =>
+        leader == null ? [] : [sheet.places.held?.[i] ?? null],
+      ),
+    ),
+  );
   const shown = $derived(
-    !isCompared && (view === "swing" || view === "flips") ? "winner" : view,
+    (!isCompared && (view === "swing" || view === "flips")) ||
+      (view === "split" && !isProportional)
+      ? "winner"
+      : view,
+  );
+  const isBanded = $derived(
+    shown === "split" || (shown === "winner" && !isProportional),
   );
   const needsBefore = $derived(shown === "swing" || shown === "flips");
   const isEstimated = $derived(
@@ -138,11 +161,24 @@
         Object.values(detail).some((held) => held.set.estimated)),
   );
   const first = $derived(sheet.legend[0] ?? null);
+  const picks = $derived([
+    ...sheet.legend.filter((item) => item.key === opener),
+    ...sheet.legend.slice(0, 3).filter((item) => item.key !== opener),
+  ]);
+  const extras = $derived(sheet.legend.filter((item) => !picks.includes(item)));
+  const more = $derived(
+    extras.every((item) => item.key.startsWith("person:"))
+      ? m.map_more_candidates()
+      : m.map_more_parties(),
+  );
   const second = $derived(sheet.legend[1] ?? null);
   const whom = $derived(
     shown === "share"
       ? (sheet.legend.find((item) => item.key === who) ?? first)
       : null,
+  );
+  const extra = $derived(
+    extras.find((item) => whom != null && item.key === whom.key) ?? null,
   );
   const drawn = $derived(isDeep ? (detail.mid?.set ?? sheet) : sheet);
   const isParts = $derived(
@@ -251,9 +287,14 @@
           : leader == null
             ? null
             : margin;
+    const held = set.places.held?.[i] ?? null;
     return {
       leader,
-      held: set.places.held?.[i] ?? null,
+      held,
+      owner:
+        held != null && !isBanded
+          ? (largest(held, (index) => columns[index]?.[i] ?? 0) ?? leader)
+          : leader,
       lead: top - next,
       margin,
       isMeasured: at(first?.key) != null && at(second?.key) != null,
@@ -319,8 +360,8 @@
       return mix(hue(set, reading.leader), reading.isFlip ? 100 : 16);
     }
     return mix(
-      hue(set, reading.leader),
-      set.places.valid[i] === 0
+      hue(set, reading.owner),
+      set.places.valid[i] === 0 || (reading.held != null && !isBanded)
         ? 100
         : (LEANS[step(reading.lead, BINS)] ?? 100),
     );
@@ -406,15 +447,25 @@
     ];
   });
   const splits = $derived(
-    shown === "winner"
+    isBanded
       ? (drawn.places.held?.filter((held) => held != null).length ?? 0)
       : 0,
   );
   const leads = $derived(
     Map.groupBy(
-      drawn.places.leader.flatMap((leader, i) =>
-        leader == null || drawn.places.held?.[i] != null ? [] : [leader],
-      ),
+      drawn.places.leader.flatMap((leader, i) => {
+        const held = drawn.places.held?.[i];
+        return leader == null || (isBanded && held != null)
+          ? []
+          : [
+              held == null
+                ? leader
+                : (largest(
+                    held,
+                    (index) => drawn.places.shares[index]?.[i] ?? 0,
+                  ) ?? leader),
+            ];
+      }),
       (leader) => leader,
     )
       .entries()
@@ -1075,7 +1126,7 @@
     }
     engine.paint(id, fills, true);
     const splits =
-      shown === "winner" && !isDotted
+      isBanded && !isDotted
         ? set.places.k.flatMap((k, i) => {
             const held = set.places.held?.[i];
             return held == null ||
@@ -2028,37 +2079,86 @@
           >{m.map_color_by()}</span
         >
         <div class="flex flex-wrap gap-1.5">
-          {#each [{ value: "winner" as const, label: m.map_mode_winner(), key: null }, { value: "votes" as const, label: m.map_mode_bubbles(), key: null }, ...sheet.legend
-              .slice(0, 3)
-              .map( (item) => ({ value: "share" as const, label: item.short ?? item.label, key: item.key }) ), ...(isCompared ? [{ value: "swing" as const, label: m.map_mode_swing(), key: null }, { value: "flips" as const, label: m.map_mode_flips(), key: null }] : [])] as choice (`${choice.value}:${choice.key ?? ""}`)}
+          {#each [{ value: "winner" as const, label: m.map_mode_winner(), key: null }, ...(isProportional ? [{ value: "split" as const, label: m.map_mode_split(), key: null }] : []), { value: "votes" as const, label: m.map_mode_bubbles(), key: null }, ...picks.map( (item) => ({ value: "share" as const, label: item.short ?? item.label, key: item.key }) ), ...(extras.length > 0 ? [{ value: "more" as const, label: extra == null ? more : (extra.short ?? extra.label), key: null }] : []), ...(isCompared ? [{ value: "swing" as const, label: m.map_mode_swing(), key: null }, { value: "flips" as const, label: m.map_mode_flips(), key: null }] : [])] as choice (`${choice.value}:${choice.key ?? ""}`)}
             {const isOn = $derived(
-              shown === choice.value &&
-                (choice.key == null || whom?.key === choice.key),
+              choice.value === "more"
+                ? extra != null
+                : shown === choice.value &&
+                    (choice.key == null || whom?.key === choice.key),
             )}
-            <button
-              type="button"
-              class={cn(
-                "flex items-center gap-1.5 rounded-sm px-2 text-[0.8125rem] font-semibold whitespace-nowrap ring-1 ring-input block-7 max-inline-full min-inline-0 hover:bg-secondary",
-                {
-                  "bg-primary text-primary-foreground ring-primary hover:bg-primary":
-                    isOn,
-                },
-              )}
-              aria-pressed={isOn}
-              onclick={() => {
-                view = choice.value;
-                who = choice.key;
-                range = null;
-              }}
-            >
-              {#if choice.key != null}
-                <span
-                  class="shrink-0 rounded-xs block-2 inline-2"
-                  style:background-color={tones[choice.key]}
-                ></span>
-              {/if}
-              <span class="truncate">{choice.label}</span>
-            </button>
+            {#if choice.value === "more"}
+              <DropdownMenu.Root>
+                <DropdownMenu.Trigger
+                  class={cn(
+                    "flex items-center gap-1.5 rounded-sm ps-2 pe-1.5 text-[0.8125rem] font-semibold whitespace-nowrap ring-1 ring-input block-7 max-inline-full min-inline-0 hover:bg-secondary",
+                    {
+                      "bg-primary text-primary-foreground ring-primary hover:bg-primary":
+                        isOn,
+                    },
+                  )}
+                  aria-pressed={isOn}
+                >
+                  {#if extra != null}
+                    <span
+                      class="shrink-0 rounded-xs block-2 inline-2"
+                      style:background-color={tones[extra.key]}
+                    ></span>
+                  {/if}
+                  <span class="truncate">{choice.label}</span>
+                  <ChevronDownIcon class="shrink-0 block-3.5 inline-3.5" />
+                </DropdownMenu.Trigger>
+                <DropdownMenu.Content
+                  align="start"
+                  class="max-block-80 min-inline-48"
+                >
+                  <DropdownMenu.RadioGroup
+                    value={extra?.key ?? ""}
+                    onValueChange={(value) => {
+                      view = "share";
+                      who = value;
+                      range = null;
+                    }}
+                  >
+                    {#each extras as item (item.key)}
+                      <DropdownMenu.RadioItem
+                        class="gap-2"
+                        value={item.key}
+                        closeOnSelect
+                        ><span
+                          class="shrink-0 rounded-xs block-2.5 inline-2.5"
+                          style:background-color={tones[item.key]}
+                        ></span>{item.label}</DropdownMenu.RadioItem
+                      >
+                    {/each}
+                  </DropdownMenu.RadioGroup>
+                </DropdownMenu.Content>
+              </DropdownMenu.Root>
+            {:else}
+              <button
+                type="button"
+                class={cn(
+                  "flex items-center gap-1.5 rounded-sm px-2 text-[0.8125rem] font-semibold whitespace-nowrap ring-1 ring-input block-7 max-inline-full min-inline-0 hover:bg-secondary",
+                  {
+                    "bg-primary text-primary-foreground ring-primary hover:bg-primary":
+                      isOn,
+                  },
+                )}
+                aria-pressed={isOn}
+                onclick={() => {
+                  view = choice.value;
+                  who = choice.key;
+                  range = null;
+                }}
+              >
+                {#if choice.key != null}
+                  <span
+                    class="shrink-0 rounded-xs block-2 inline-2"
+                    style:background-color={tones[choice.key]}
+                  ></span>
+                {/if}
+                <span class="truncate">{choice.label}</span>
+              </button>
+            {/if}
           {/each}
         </div>
       </div>
@@ -2172,6 +2272,12 @@
             </button>
           {/if}
         {/each}
+        {#if shown === "winner" && isProportional}
+          <span
+            class="flex items-center px-1.5 text-[0.8125rem] text-muted-foreground block-7"
+            >{m.map_largest_key({ noun: current?.noun ?? "" })}</span
+          >
+        {/if}
         {#if splits > 0}
           <span
             class="flex items-center gap-1.5 px-1.5 text-[0.8125rem] text-muted-foreground block-7"

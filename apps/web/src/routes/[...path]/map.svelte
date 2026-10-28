@@ -5,12 +5,12 @@
 
 <script lang="ts">
   import type * as Maplibre from "maplibre-gl";
-  import type { Box } from "#lib/map/engine.svelte.js";
   import { goto, preloadData } from "$app/navigation";
   import { resolve } from "$app/paths";
   import { page } from "$app/state";
   import ArrowLeftIcon from "@lucide/svelte/icons/arrow-left";
   import ArrowUpLeftIcon from "@lucide/svelte/icons/arrow-up-left";
+  import ChevronDownIcon from "@lucide/svelte/icons/chevron-down";
   import ChevronUpIcon from "@lucide/svelte/icons/chevron-up";
   import GlobeIcon from "@lucide/svelte/icons/globe";
   import MinusIcon from "@lucide/svelte/icons/minus";
@@ -20,20 +20,22 @@
   import { untrack } from "svelte";
   import { on } from "svelte/events";
   import { fade, fly } from "svelte/transition";
+  import type { Box } from "#lib/map/engine.svelte.js";
   import Export from "#lib/components/export.svelte";
   import Term from "#lib/components/term.svelte";
   import * as Drawer from "#lib/components/ui/drawer/index.js";
+  import * as DropdownMenu from "#lib/components/ui/dropdown-menu/index.js";
   import * as Popover from "#lib/components/ui/popover/index.js";
-  import { Engine } from "#lib/map/engine.svelte.js";
-  import { isNarrowLayout } from "#lib/narrow-layout.svelte.js";
   import * as Select from "#lib/components/ui/select/index.js";
   import { isHover, isTouch } from "#lib/explain.svelte.js";
   import { count, percent, plural, points, precision } from "#lib/format.js";
   import { keep } from "#lib/linked.js";
-  import { orpc } from "#lib/rpc.js";
+  import { Engine, largest, proportional } from "#lib/map/engine.svelte.js";
+  import { isNarrowLayout } from "#lib/narrow-layout.svelte.js";
   import { m } from "#lib/paraglide/messages.js";
   import { getLocale } from "#lib/paraglide/runtime.js";
   import { swatch } from "#lib/party.js";
+  import { orpc } from "#lib/rpc.js";
   import { cn } from "#lib/utils.js";
   import type { PageData } from "./$types";
   import { unit } from "./unit.js";
@@ -141,6 +143,7 @@
   const COMPARED = new Set(["swing", "arrows", "flips", "turnout_change"]);
   const MODES = [
     "winner",
+    "split",
     "bubbles",
     "turnout",
     "turnout_change",
@@ -784,8 +787,14 @@
       ),
     ),
   );
+  const isProportional = $derived(
+    proportional(
+      places.rows.flatMap((row) => (row.leader == null ? [] : [row.held])),
+    ),
+  );
   const view = $derived(
     (!isCompared && typeof shading === "string" && COMPARED.has(shading)) ||
+      (shading === "split" && !isProportional) ||
       (shading === "turnout" && turnouts.size === 0) ||
       (shading === "turnout_change" && surges.size === 0) ||
       (isTally &&
@@ -795,6 +804,13 @@
       ? "winner"
       : shading,
   );
+  const isBanded = $derived(
+    view === "split" || (view === "winner" && !isProportional),
+  );
+  const leading = (row: (typeof places.rows)[number]) =>
+    view === "winner" && isProportional && row.held != null
+      ? largest(row.held, (index) => row.shares[index] ?? 0)
+      : row.leader;
   const isUnmatched = $derived(
     unmatched.size > 0 && typeof view === "string" && COMPARED.has(view),
   );
@@ -844,8 +860,10 @@
   let isKeyed = $state(false);
   const leads = $derived.by(() => {
     const counted = Map.groupBy(
-      places.rows.filter((row) => row.leader != null && row.held == null),
-      (row) => row.leader ?? 0,
+      places.rows.filter(
+        (row) => row.leader != null && !(isBanded && row.held != null),
+      ),
+      (row) => leading(row) ?? 0,
     )
       .entries()
       .map(
@@ -884,13 +902,13 @@
       const counts = LEANS.map(() => 0);
       for (const row of places.rows) {
         if (
-          row.leader === index &&
-          row.held == null &&
+          leading(row) === index &&
+          !(isBanded && row.held != null) &&
           row.isCounted !== false &&
           row.valid > 0 &&
           row.margin != null
         ) {
-          const at = bin(row.margin);
+          const at = row.held == null ? bin(row.margin) : LEANS.length - 1;
           counts[at] = (counts[at] ?? 0) + 1;
         }
       }
@@ -906,13 +924,30 @@
       ];
     }),
   );
-  const options = $derived(
+  const anchor = untrack(() => (typeof shading === "number" ? shading : null));
+  const parties = $derived(
     (isTally ? [] : places.legend)
       .map((item, index) => ({ index, name: names[index] ?? item.label }))
-      .slice(0, Math.min(3, places.legend.length))
-      .filter((option) =>
-        places.rows.some((row) => (row.shares[option.index] ?? 0) > 0),
+      .filter(
+        (option) =>
+          option.index === anchor ||
+          places.rows.some((row) => (row.shares[option.index] ?? 0) > 0),
       ),
+  );
+  const options = $derived([
+    ...parties.filter((option) => option.index === anchor),
+    ...parties.filter((option) => option.index !== anchor && option.index < 3),
+  ]);
+  const extras = $derived(
+    parties.filter((option) => !options.includes(option)),
+  );
+  const extra = $derived(extras.find((option) => option.index === view));
+  const more = $derived(
+    extras.every((option) =>
+      places.legend[option.index]?.key.startsWith("person:"),
+    )
+      ? m.map_more_candidates()
+      : m.map_more_parties(),
   );
   const edges = $derived.by(() => {
     if (typeof view !== "number") {
@@ -1162,7 +1197,11 @@
         continue;
       }
       if (row.leader == null) {
-        if (view === "winner" && only == null && row.declared != null) {
+        if (
+          (view === "winner" || view === "split") &&
+          only == null &&
+          row.declared != null
+        ) {
           result.push([
             row.k,
             read(
@@ -1176,11 +1215,14 @@
         typeof only === "number" &&
         (row.held?.some(([index]) => index === only) ?? false)
           ? only
-          : row.leader;
+          : (leading(row) ?? row.leader);
       const dimmed = only != null && typeof only === "number" && only !== shown;
       let strength = dimmed
         ? 10
-        : isDeclared || row.valid === 0 || !isShaded
+        : isDeclared ||
+            row.valid === 0 ||
+            !isShaded ||
+            (view === "winner" && isProportional && row.held != null)
           ? 100
           : (LEANS[bin(row.margin)] ?? 100);
       let tone = colors[shown] ?? "var(--muted-foreground)";
@@ -1604,7 +1646,7 @@
         : []),
     ];
     const splits =
-      view === "winner" && only == null
+      isBanded && only == null
         ? places.rows.flatMap((row) =>
             row.held == null || row.leader == null || inner.has(row.k)
               ? []
@@ -1774,9 +1816,10 @@
           >
             <span class="truncate"
               >{typeof view === "number"
-                ? (options.find((option) => option.index === view)?.name ?? "")
+                ? (parties.find((option) => option.index === view)?.name ?? "")
                 : {
                     winner: m.map_mode_winner,
+                    split: m.map_mode_split,
                     bubbles: m.map_mode_bubbles,
                     turnout: m.map_mode_turnout,
                     turnout_change: m.map_mode_turnout_change,
@@ -1788,9 +1831,23 @@
           </Select.Trigger>
           <Select.Content align="start">
             <Select.Item value="winner" label={m.map_mode_winner()} />
+            {#if isProportional}
+              <Select.Item value="split" label={m.map_mode_split()} />
+            {/if}
             {#each options as option (option.index)}
               <Select.Item value={String(option.index)} label={option.name} />
             {/each}
+            {#if extras.length > 0}
+              <Select.Group>
+                <Select.GroupHeading>{more}</Select.GroupHeading>
+                {#each extras as option (option.index)}
+                  <Select.Item
+                    value={String(option.index)}
+                    label={option.name}
+                  />
+                {/each}
+              </Select.Group>
+            {/if}
             <Select.Item value="bubbles" label={m.map_mode_bubbles()} />
             {#if turnouts.size > 0}
               <Select.Item value="turnout" label={m.map_mode_turnout()} />
@@ -1809,30 +1866,71 @@
           </Select.Content>
         </Select.Root>
         <div class="-my-1 flex flex-wrap gap-2 py-1 min-inline-0 max-sm:hidden">
-          {#each [[{ value: "winner" as const, label: m.map_mode_winner() }, ...options.map( (option) => ({ value: option.index, label: option.name }) ), { value: "bubbles" as const, label: m.map_mode_bubbles() }, ...(turnouts.size > 0 ? [{ value: "turnout" as const, label: m.map_mode_turnout() }] : [])], isCompared ? [...(isTally ? [] : [{ value: "swing" as const, label: m.map_mode_swing() }, { value: "arrows" as const, label: m.map_mode_arrows() }]), { value: "flips" as const, label: m.map_mode_flips() }, ...(surges.size > 0 ? [{ value: "turnout_change" as const, label: m.map_mode_turnout_change() }] : [])] : []] as group, at (at)}
+          {#each [[{ value: "winner" as const, label: m.map_mode_winner() }, ...(isProportional ? [{ value: "split" as const, label: m.map_mode_split() }] : []), ...options.map( (option) => ({ value: option.index, label: option.name }) ), ...(extras.length > 0 ? [{ value: "more" as const, label: extra?.name ?? more }] : []), { value: "bubbles" as const, label: m.map_mode_bubbles() }, ...(turnouts.size > 0 ? [{ value: "turnout" as const, label: m.map_mode_turnout() }] : [])], isCompared ? [...(isTally ? [] : [{ value: "swing" as const, label: m.map_mode_swing() }, { value: "arrows" as const, label: m.map_mode_arrows() }]), { value: "flips" as const, label: m.map_mode_flips() }, ...(surges.size > 0 ? [{ value: "turnout_change" as const, label: m.map_mode_turnout_change() }] : [])] : []] as group, at (at)}
             {#if group.length > 0}
               <div class="flex shrink-0">
                 {#each group as choice (choice.value)}
-                  <button
-                    type="button"
-                    class={cn(
-                      "-ms-px flex items-center border border-input bg-card px-2.5 text-[0.8125rem] font-semibold whitespace-nowrap keycap block-7 first:ms-0 first:rounded-s-sm last:rounded-e-sm hover:bg-secondary",
-                      {
-                        "relative z-10 bg-primary text-primary-foreground hover:bg-primary":
-                          view === choice.value,
-                      },
-                      {
-                        "max-inline-44 xl:max-inline-none":
-                          typeof choice.value === "number",
-                      },
-                    )}
-                    title={typeof choice.value === "number"
-                      ? choice.label
-                      : undefined}
-                    aria-pressed={view === choice.value}
-                    onclick={() => (shading = choice.value)}
-                    ><span class="truncate">{choice.label}</span></button
-                  >
+                  {#if choice.value === "more"}
+                    <DropdownMenu.Root>
+                      <DropdownMenu.Trigger
+                        class={cn(
+                          "-ms-px flex items-center gap-1 border border-input bg-card ps-2.5 pe-2 text-[0.8125rem] font-semibold whitespace-nowrap keycap block-7 max-inline-44 first:ms-0 first:rounded-s-sm last:rounded-e-sm hover:bg-secondary xl:max-inline-none",
+                          {
+                            "relative z-10 bg-primary text-primary-foreground hover:bg-primary":
+                              extra != null,
+                          },
+                        )}
+                        aria-pressed={extra != null}
+                        title={extra?.name}
+                        ><span class="truncate">{choice.label}</span
+                        ><ChevronDownIcon
+                          class="shrink-0 block-3.5 inline-3.5"
+                        /></DropdownMenu.Trigger
+                      >
+                      <DropdownMenu.Content
+                        align="start"
+                        class="max-block-80 min-inline-48"
+                      >
+                        <DropdownMenu.RadioGroup
+                          value={extra == null ? "" : String(extra.index)}
+                          onValueChange={(value) => (shading = Number(value))}
+                        >
+                          {#each extras as option (option.index)}
+                            <DropdownMenu.RadioItem
+                              class="gap-2"
+                              value={String(option.index)}
+                              closeOnSelect
+                              ><span
+                                class="shrink-0 rounded-xs block-2.5 inline-2.5"
+                                style:background-color={colors[option.index]}
+                              ></span>{option.name}</DropdownMenu.RadioItem
+                            >
+                          {/each}
+                        </DropdownMenu.RadioGroup>
+                      </DropdownMenu.Content>
+                    </DropdownMenu.Root>
+                  {:else}
+                    <button
+                      type="button"
+                      class={cn(
+                        "-ms-px flex items-center border border-input bg-card px-2.5 text-[0.8125rem] font-semibold whitespace-nowrap keycap block-7 first:ms-0 first:rounded-s-sm last:rounded-e-sm hover:bg-secondary",
+                        {
+                          "relative z-10 bg-primary text-primary-foreground hover:bg-primary":
+                            view === choice.value,
+                        },
+                        {
+                          "max-inline-44 xl:max-inline-none":
+                            typeof choice.value === "number",
+                        },
+                      )}
+                      title={typeof choice.value === "number"
+                        ? choice.label
+                        : undefined}
+                      aria-pressed={view === choice.value}
+                      onclick={() => (shading = choice.value)}
+                      ><span class="truncate">{choice.label}</span></button
+                    >
+                  {/if}
                 {/each}
               </div>
             {/if}
@@ -2739,7 +2837,7 @@
           )}
         {/if}
         {const splits = $derived(
-          view === "winner" && only == null
+          isBanded && only == null
             ? places.rows.filter(
                 (row) => row.held != null && row.leader != null,
               ).length
@@ -2755,6 +2853,12 @@
             <span>{m.map_split_key()}</span>
             <span class="font-figures text-xs tabular-nums">{splits}</span>
           </span>
+        {/if}
+        {#if view === "winner" && isProportional && only == null}
+          <span
+            class="flex items-center px-1.5 text-[0.8125rem] text-muted-foreground block-7"
+            >{m.map_largest_key({ noun })}</span
+          >
         {/if}
       </div>
       {#if isDeclared}{:else if view === "bubbles"}

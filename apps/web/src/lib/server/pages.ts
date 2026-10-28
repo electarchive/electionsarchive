@@ -272,7 +272,9 @@ export async function party(path: string, place: string | null = null) {
         }>(sql`select page from party_page where party_id = ${id}::uuid`);
         const found = stored.rows[0]?.page;
         if (found != null) {
-          return found;
+          return found.party.events == null
+            ? { ...found, party: await call(router.parties.get, { id }) }
+            : found;
         }
       }
       return contents(id, within);
