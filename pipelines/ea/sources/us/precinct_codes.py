@@ -32,7 +32,7 @@ def emit() -> Path:
                 """select u.id, u.code from reporting_unit u join changeset c on c.id = u.changeset_id
                    join entity e on e.id = u.id
                    where u.scheme_code = 'us.precinct' and c.pipeline = any(%s) and e.retired_by is null
-                     and u.code !~ '^[0-9]{{4}}:[A-Z]{{2}}:[0-9]{{5}}::'
+                     and u.code !~ '^[0-9]{{4}}:[A-Z]{{2}}:[0-9]{{5}}::[A-Z0-9]+( [A-Z0-9]+)*$'
                      and not exists (select from reporting_unit_area m where m.unit_id = u.id)
                      and not exists (select from reporting_unit x where x.parent_id = u.id or x.counted_with_id = u.id){}"""
             ).format(facts),

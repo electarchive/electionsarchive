@@ -1,6 +1,7 @@
 import re
 import unicodedata
 from datetime import date
+from uuid import UUID
 
 import polars as pl
 from psycopg import Connection
@@ -36,14 +37,23 @@ def expr(year: pl.Expr, state: pl.Expr, county: pl.Expr, precinct: pl.Expr) -> p
 def units(cs: Changeset, conn: Connection, codes: pl.Series) -> None:
     wanted = sorted(set(codes))
     held: dict[str, tuple[str | None, str, str | None]] = {}
-    for unit, area, relation, parent in conn.execute(
-        """select code, area_id::text, area_relation::text, parent_id::text from reporting_unit
+    others: list[tuple[UUID, str, tuple[str | None, str, str | None]]] = []
+    for id, unit, area, relation, parent in conn.execute(
+        """select id, code, area_id::text, area_relation::text, parent_id::text from reporting_unit
            where scheme_code = 'us.precinct' and code = any(%s)""",
         [wanted],
     ).fetchall():
-        if unit in held:
-            raise ValueError(f"us.precinct {unit} has more than one row; merge them before staging it for the year")
-        held[unit] = (area, relation, parent)
+        if id == cs.unit("us.precinct", unit):
+            held[unit] = (area, relation, parent)
+        else:
+            others.append((id, unit, (area, relation, parent)))
+    for id, unit, place in others:
+        if place != held[unit]:
+            raise ValueError(f"us.precinct {unit} has rows with different areas; never merge across a boundary change")
+        cs.merge(id, cs.unit("us.precinct", unit))
+    merged = {unit for _, unit, _ in others}
+    if merged:
+        print(f"{len(merged)} us.precinct codes merged into one unit each; emit again to stage them for the year")
     counties = {
         county: (str(unit), str(area))
         for county, unit, area in conn.execute(
@@ -52,6 +62,8 @@ def units(cs: Changeset, conn: Connection, codes: pl.Series) -> None:
     }
     rows = []
     for unit in wanted:
+        if unit in merged:
+            continue
         year, state, county = unit.split(":")[:3]
         area, relation, parent = held.get(unit, (counties[county][1], "within", counties[county][0]))
         rows.append(

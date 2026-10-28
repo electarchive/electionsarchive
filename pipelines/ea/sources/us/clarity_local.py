@@ -400,6 +400,10 @@ UNDECIDED = (
     "No winner is recorded: no candidate passed a majority of the votes cast, and this source does not say whether "
     "the city elects by plurality or holds a runoff."
 )
+UNNAMED = (
+    "No winner is recorded: the county reported only a write-in total for this office and named no write-in "
+    "candidate, so these returns do not show who won."
+)
 TOTALS = (
     "Votes are the {publisher}'s election night reporting results, counted as one total for the whole jurisdiction "
     "because the county's precincts do not add up to its total or are already in the archive under other names."
@@ -1317,6 +1321,23 @@ def emit() -> Path:
                 flags=pl.lit(0, pl.Int16),
             ),
         )
+        unnamed = [
+            str(result_set)
+            for (result_set,) in conn.execute(
+                """select distinct u.result_set_id from outcome u join contest_option o on o.id = u.option_id
+                   join changeset c on c.id = u.changeset_id
+                   where c.pipeline = %s and (o.kind = 'write_in' or o.kind = 'candidate' and o.ballot_label ~* '^w/?i$')""",
+                [SOURCE],
+            ).fetchall()
+        ]
+        for result_set in unnamed:
+            cs.add("note", entity_id=UUID(result_set), kind="caveat", body_md=UNNAMED)
+        scope = cs.manifest["scope"]
+        cs.manifest["scope"] = {
+            **(scope if isinstance(scope, dict) else {}),
+            "clears": [*(scope.get("clears", []) if isinstance(scope, dict) else []), *unnamed],
+        }
+        print(f"{len(unnamed)} sets lose an outcome inferred onto a write-in total")
         for candidacy, option, contest, ballot_name in conn.execute(
             """select y.id, y.option_id, o.contest_id, y.ballot_name from candidacy y
                join contest_option o on o.id = y.option_id join changeset c on c.id = y.changeset_id

@@ -1,11 +1,12 @@
 import html
 import io
 import json
+import os
 import re
 import subprocess
 import zipfile
 from concurrent.futures import ThreadPoolExecutor
-from datetime import UTC, date, datetime, timedelta
+from datetime import UTC, date, datetime
 from pathlib import Path
 from uuid import UUID
 
@@ -14,7 +15,7 @@ import httpx
 import polars as pl
 from PIL import Image
 
-from ea import raw
+from ea import precinct_code, raw
 from ea.changeset import Changeset
 from ea.sources.us import (
     county_measures,
@@ -34,7 +35,7 @@ from ea.sources.us import (
 from ea.store import DATA, connect
 
 SOURCE = "us.measure_precincts"
-VERSION = "1"
+VERSION = "2"
 PARSED = DATA / "parsed" / SOURCE
 FIRST = 2000
 LAST = 2025
@@ -1243,9 +1244,119 @@ def emit() -> Path:
         landed: dict[str, int] = {}
         kept: set[UUID | None] = set()
         skipped = 0
-        minted: dict[tuple[str, date], tuple[str, str]] = {}
+        scope = [state for state in os.environ.get("MEASURE_STATES", "").split(",") if state]
         values = []
+        parts = pl.col("code").str.splitn(":", 5)
+        held = (
+            pl.DataFrame(
+                conn.execute(
+                    """select rs.id::text, u.id::text, u.code from result_set rs join changeset g on g.id = rs.changeset_id
+                       join result_value v on v.result_set_k = rs.k join reporting_unit u on u.k = v.unit_k
+                       join changeset w on w.id = u.changeset_id
+                       where g.pipeline = %s and w.pipeline = %s and u.scheme_code = 'us.precinct' group by 1, 2, 3""",
+                    [SOURCE, SOURCE],
+                ).fetchall(),
+                schema=["result_set_id", "unit_id", "code"],
+                orient="row",
+            )
+            .with_columns(
+                year=parts.struct.field("field_0"),
+                state=parts.struct.field("field_1"),
+                fips=parts.struct.field("field_2"),
+                jurisdiction=parts.struct.field("field_3"),
+                precinct=parts.struct.field("field_4"),
+            )
+            .filter(pl.col("state").is_in(scope) if scope else pl.lit(True))
+            .filter(
+                pl.col("fips").is_in(os.environ["MEASURE_COUNTIES"].split(","))
+                if os.environ.get("MEASURE_COUNTIES")
+                else pl.lit(True)
+            )
+            .with_columns(
+                canonical=precinct_code.expr(
+                    pl.col("year"),
+                    pl.col("state"),
+                    pl.col("fips"),
+                    pl.when(
+                        (
+                            pl.col("jurisdiction")
+                            .filter(pl.col("jurisdiction") != "")
+                            .n_unique()
+                            .over("result_set_id", "fips")
+                            > 1
+                        )
+                        & ~pl.col("precinct")
+                        .str.to_uppercase()
+                        .str.starts_with(pl.col("jurisdiction").str.to_uppercase())
+                    )
+                    .then(pl.concat_str("jurisdiction", "precinct", separator=" "))
+                    .otherwise("precinct"),
+                )
+            )
+        )
+        used = set(held["canonical"])
+        stale = held.filter(pl.col("code") != pl.col("canonical"))["result_set_id"].unique().to_list()
+        moving = held.filter(pl.col("result_set_id").is_in(stale)).select(
+            "result_set_id",
+            "unit_id",
+            canonical=pl.col("canonical").map_elements(
+                lambda code: str(cs.unit("us.precinct", code)), return_dtype=pl.String
+            ),
+        )
+        grain = ["result_set_id", "unit_id", "option_id", "channel", "measure", "count_round"]
+        for table, columns, schema, merged in (
+            (
+                "result_value",
+                "v.flags, v.value",
+                {"flags": pl.Int16, "value": pl.Int64},
+                [pl.col("flags").max(), pl.col("value").sum()],
+            ),
+            (
+                "value_locator",
+                "v.page_id::text, v.source_id::text, v.x0, v.y0, v.x1, v.y1",
+                {
+                    "page_id": pl.String,
+                    "source_id": pl.String,
+                    "x0": pl.Float64,
+                    "y0": pl.Float64,
+                    "x1": pl.Float64,
+                    "y1": pl.Float64,
+                },
+                [pl.all().first()],
+            ),
+        ):
+            facts = (
+                pl.DataFrame(
+                    conn.execute(
+                        f"""select rs.id::text, u.id::text, o.id::text, v.channel, v.measure, v.count_round, {columns}
+                            from {table} v join result_set rs on rs.k = v.result_set_k
+                            join reporting_unit u on u.k = v.unit_k join contest_option o on o.k = v.option_k
+                            where rs.id = any(%s::uuid[])""",
+                        [stale],
+                    ).fetchall(),
+                    schema={
+                        "result_set_id": pl.String,
+                        "unit_id": pl.String,
+                        "option_id": pl.String,
+                        "channel": pl.Int16,
+                        "measure": pl.Int16,
+                        "count_round": pl.Int16,
+                        **schema,
+                    },
+                    orient="row",
+                )
+                .join(moving, on=["result_set_id", "unit_id"], how="left")
+                .with_columns(unit_id=pl.coalesce("canonical", "unit_id"))
+                .drop("canonical")
+                .group_by(grain, maintain_order=True)
+                .agg(*merged)
+            )
+            if facts.height:
+                (values if table == "result_value" else locators).append(facts)
+        print(f"{len(stale)} sets moved onto canonical precinct codes")
         for key, state, source, method, rows in candidates:
+            if scope and state not in scope:
+                continue
             official = defaults.filter(pl.col("key") == key)
             if official.height == 0:
                 continue
@@ -1304,9 +1415,22 @@ def emit() -> Path:
             )
             day = first["day"]
             rows = rows.with_columns(
-                code=pl.concat_str(pl.lit(f"{day.year}:{state}"), "fips", "jurisdiction", "precinct", separator=":")
+                code=precinct_code.expr(
+                    pl.lit(day.year),
+                    pl.lit(state),
+                    pl.col("fips"),
+                    pl.when(
+                        (pl.col("jurisdiction").filter(pl.col("jurisdiction") != "").n_unique().over("fips") > 1)
+                        & ~pl.col("precinct")
+                        .str.to_uppercase()
+                        .str.starts_with(pl.col("jurisdiction").fill_null("").str.to_uppercase())
+                    )
+                    .then(pl.concat_str("jurisdiction", "precinct", separator=" "))
+                    .otherwise("precinct"),
+                )
             )
             codes = {}
+            precincts = set()
             for code, fips, precinct in rows.select("code", "fips", "precinct").unique().iter_rows():
                 if precinct == "county":
                     codes[code] = str(counties[fips][0])
@@ -1327,9 +1451,8 @@ def emit() -> Path:
                 if fips in aggregates and not fips.isdigit():
                     codes[code] = str(aggregates[fips])
                     continue
-                codes[code] = str(cs.unit("us.precinct", code, on=day))
-                if UUID(codes[code]) in cs.minted:
-                    minted.setdefault((code, day), (state, fips))
+                codes[code] = str(cs.unit("us.precinct", code))
+                precincts.add(code)
             complete = (
                 rows.group_by("code", "answer")
                 .agg(
@@ -1486,6 +1609,7 @@ def emit() -> Path:
                     },
                 )
             values.append(complete.select(pl.lit(str(staged)).alias("result_set_id"), pl.all()))
+            used |= precincts
             landed[state] = landed.get(state, 0) + 1
         columns = ("id", "election_id", "contest_id", "stage", "kind", "source_id", "is_default", "completeness")
         active = pl.DataFrame(
@@ -1534,25 +1658,10 @@ def emit() -> Path:
                 status="withdrawn",
             )
             cs.add("note", entity_id=UUID(row["id"]), kind="caveat", body_md=WITHDRAWN)
-        for (code, day), (state, fips) in minted.items():
-            cs.add(
-                "reporting_unit",
-                id=cs.unit("us.precinct", code, on=day),
-                polity_id=states[state],
-                scheme_code="us.precinct",
-                code=code,
-                parent_id=counties[fips][0],
-                area_relation="within",
-                area_id=counties[fips][1],
-                kind="standard",
-                valid_from=day,
-                valid_to=day + timedelta(days=1),
-            )
+        precinct_code.units(cs, conn, pl.Series(sorted(used), dtype=pl.String))
         if values:
             cs.frame("result_value", pl.concat(values))
         if locators:
-            cs.frame("value_locator", pl.concat(locators))
-        print(
-            f"{sum(landed.values())} precinct sets {sorted(landed.items())}, {skipped} skipped, {len(minted)} new units"
-        )
+            cs.frame("value_locator", pl.concat(locators, how="vertical_relaxed"))
+        print(f"{sum(landed.values())} precinct sets {sorted(landed.items())}, {skipped} skipped, {len(used)} units")
         return cs.write()
