@@ -84,7 +84,7 @@
 {#snippet label(part: (typeof parts)[number], isFull: boolean)}
   <span
     class={cn(
-      "mbe-[-0.3em] block pbe-[0.3em] text-[0.9375rem]/tight font-semibold [text-box:trim-both_cap_alphabetic]",
+      "mbs-[-0.3em] mbe-[-0.3em] block pbs-[0.3em] pbe-[0.3em] text-[0.9375rem]/tight font-semibold [text-box:trim-both_cap_alphabetic]",
       { "line-clamp-2 text-balance": isFull, truncate: !isFull },
     )}
   >
