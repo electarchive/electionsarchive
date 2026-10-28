@@ -2269,7 +2269,7 @@ def emit() -> Path:
                         "contest_option",
                         id=others,
                         contest_id=contest,
-                        kind="others",
+                        kind="independents",
                         party_id=None,
                         ballot_label=INDEPENDENTS,
                     )

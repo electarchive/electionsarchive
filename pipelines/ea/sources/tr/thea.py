@@ -514,7 +514,7 @@ def emit() -> Path:
                 "contest_option",
                 id=id,
                 contest_id=contest,
-                kind="list" if party in PARTIES else "others",
+                kind="list" if party in PARTIES else "independents" if party is None else "others",
                 party_id=parties.get(party or ""),
                 ballot_label=label,
             )

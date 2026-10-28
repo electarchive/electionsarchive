@@ -615,7 +615,7 @@ def emit() -> Path:
         for contest_key, option in votes.select("contest", "option").unique().sort("contest", "option").iter_rows():
             id = cs.key("tr.option", f"{contest_key}:{changeset.slug(option)}")
             options[f"{contest_key}\x1f{option}"] = str(id)
-            if id not in cs.minted:
+            if id not in cs.minted and (contest_key, option) != (f"{MARCH}:istanbul-mayor", "others"):
                 continue
             contest = cs.key("tr.contest", contest_key)
             if contest in cs.minted:
@@ -638,7 +638,7 @@ def emit() -> Path:
                 )
             elif contest_key == f"{MARCH}:istanbul-mayor":
                 cs.add(
-                    "contest_option", id=id, contest_id=contest, kind="others", party_id=None, ballot_label=INDEPENDENTS
+                    "contest_option", id=id, contest_id=contest, kind="independents", party_id=None, ballot_label=INDEPENDENTS
                 )
             elif (alliance := alliances.get(f"{contest_key[:10]}:{option}")) is not None and alliance not in cs.minted:
                 cs.add(

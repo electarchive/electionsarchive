@@ -382,7 +382,7 @@ def emit() -> Path:
                     "contest_option",
                     id=options[label],
                     contest_id=contest,
-                    kind="others" if owner is None else "candidate",
+                    kind="independents" if owner is None else "candidate",
                     party_id=parties[label],
                     ballot_label=INDEPENDENTS if owner is None else party_names[owner],
                 )
@@ -485,7 +485,7 @@ def emit() -> Path:
                             "contest_option",
                             id=options[label],
                             contest_id=contest,
-                            kind="others" if owner is None else "list",
+                            kind="independents" if owner is None else "list",
                             party_id=parties[label],
                             ballot_label=INDEPENDENTS if owner is None else party_names[owner],
                         )

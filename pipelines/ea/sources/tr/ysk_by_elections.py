@@ -312,7 +312,7 @@ def emit() -> Path:
                         "contest_option",
                         id=option,
                         contest_id=contest,
-                        kind="others" if independent else "list",
+                        kind="independents" if independent else "list",
                         party_id=None if independent else party_ids[short],
                         ballot_label=INDEPENDENTS if independent else PARTIES[short][1],
                     )
@@ -490,7 +490,7 @@ def emit() -> Path:
             "contest_option",
             id=options[-1],
             contest_id=contest,
-            kind="others",
+            kind="independents",
             party_id=None,
             ballot_label=INDEPENDENTS,
         )

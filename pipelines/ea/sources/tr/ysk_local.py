@@ -1531,7 +1531,7 @@ def emit() -> Path:
                             "contest_option",
                             id=option,
                             contest_id=contest,
-                            kind="others" if key is None else "list",
+                            kind="independents" if key is None else "list",
                             party_id=None if key is None else parties[key],
                             ballot_label=label(key, day),
                         )
@@ -1761,7 +1761,7 @@ def emit() -> Path:
                         "contest_option",
                         id=option,
                         contest_id=contest,
-                        kind="others" if key is None else "candidate",
+                        kind="independents" if key is None else "candidate",
                         party_id=None if key is None else parties[key],
                         ballot_label=label(key, day),
                     )
