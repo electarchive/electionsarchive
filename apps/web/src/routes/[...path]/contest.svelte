@@ -1189,7 +1189,7 @@
       >
     {/if}
     <h1 class="title" data-scope-title>
-      {drilled ? heading : contest.name}
+      {(drilled ? heading : contest.name).replaceAll("—", "\u2060—")}
     </h1>
     <p
       class="flex flex-wrap items-baseline gap-x-3 gap-y-1 text-[0.9375rem] text-muted-foreground"
