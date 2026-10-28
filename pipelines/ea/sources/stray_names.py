@@ -4,7 +4,7 @@ from ea.changeset import Changeset
 from ea.store import connect
 
 SOURCE = "stray_names"
-VERSION = "5"
+VERSION = "6"
 FUSION = "a fusion ballot line, kept on the option's ballot label; merging the label into the party carried it over"
 DROPS = [
     ("us", "Republican Party", "Republican/Democratic", FUSION),
@@ -94,4 +94,19 @@ def emit() -> Path:
             ).fetchall():
                 cs.add("name_drop", name_id=name, entity_id=entity, text=text, reason=reason)
                 print(f"{scheme}: {text}")
+        for name, entity, text in conn.execute(
+            r"""select distinct a.id, a.entity_id, a.text from name a
+               join name b on b.entity_id = a.entity_id and b.kind = 'official' and b.lang = a.lang
+                 and b.text ~ '[^\x01-\x7f]'
+               join person p on p.id = a.entity_id
+               where a.kind = 'official' and not a.is_preferred and a.text !~ '[^\x01-\x7f]'
+                 and a.text = unaccent(b.text)"""
+        ).fetchall():
+            cs.add(
+                "name_drop",
+                name_id=name,
+                entity_id=entity,
+                text=text,
+                reason="the same name with its accents stripped, beside the accented name",
+            )
         return cs.write()

@@ -20,7 +20,7 @@ from ea.sources.it.storico import EXISTING, NEW, NEW_OVERRIDES, NORTH, OVERRIDES
 from ea.store import DATA, connect
 
 SOURCE = "it.senato"
-VERSION = "1"
+VERSION = "2"
 PARSED = DATA / "parsed" / SOURCE
 ARCHIVE = "https://dait.interno.gov.it/documenti/opendata/senato/senato-{day:%Y%m%d}.zip"
 ELIGENDO = (
@@ -87,6 +87,31 @@ LEADERS = {
     (2018, CENTER_LEFT[0]): CENTER_LEFT,
     (2022, CENTER_RIGHT[0]): CENTER_RIGHT,
     (2022, CENTER_LEFT[0]): CENTER_LEFT,
+    (2022, "Campobase"): ("Campobase", "Campobase"),
+}
+JOINT = {
+    "LEGA PER SALVINI PREM.-FORZA IT.-NOI MODERATI-FRAT. D'ITALIA": (
+        CENTER_RIGHT[0],
+        [
+            "LEGA PER SALVINI PREMIER",
+            "FORZA ITALIA",
+            "NOI MODERATI/LUPI - TOTI - BRUGNARO - UDC",
+            "FRATELLI D'ITALIA CON GIORGIA MELONI",
+        ],
+    ),
+    "PARTITO DEMOCRATICO - +EUROPA - ALLEANZA VERDI E SINISTRA": (
+        CENTER_LEFT[0],
+        ["PARTITO DEMOCRATICO - ITALIA DEMOCRATICA E PROGRESSISTA", "+EUROPA", "ALLEANZA VERDI E SINISTRA"],
+    ),
+    "CAMPOBASE +EUROPA-ALL.VERDI E SIN.? PD-AZIONE-ITALIA VIVA": (
+        "Campobase",
+        [
+            "PARTITO DEMOCRATICO - ITALIA DEMOCRATICA E PROGRESSISTA",
+            "+EUROPA",
+            "ALLEANZA VERDI E SINISTRA",
+            "AZIONE - ITALIA VIVA - CALENDA",
+        ],
+    ),
 }
 SIZES = [
     (237, date(1948, 5, 8)),
@@ -2238,7 +2263,21 @@ def emit() -> Path:
                     accounted(counted, unit, region, place)
                     for row in rows:
                         ballot = f"{row['surname']} {row['forename']}"
-                        lists = row["lists"]
+                        joint = JOINT.get(row["lists"][0]) if len(row["lists"]) == 1 else None
+                        lists = row["lists"] if joint is None else joint[1]
+                        alliance = (
+                            coalition_of(
+                                joint[0] if joint is not None else coalition_by_label.get(lists[0]), day, election
+                            )
+                            if len(lists) > 1
+                            else None
+                        )
+                        if joint is not None and alliance is not None:
+                            for label in lists:
+                                party = list_party(label, day)
+                                if party is not None and (alliance, party) not in coalition_members:
+                                    coalition_members.add((alliance, party))
+                                    cs.add("alliance_member", alliance_id=alliance, party_id=party)
                         option = cs.key("it.option", f"{contest_key}:{slug(ballot)}")
                         cs.add(
                             "contest_option",
@@ -2246,9 +2285,7 @@ def emit() -> Path:
                             contest_id=contest,
                             kind="candidate",
                             party_id=list_party(lists[0], day) if len(lists) == 1 else None,
-                            alliance_id=coalition_of(coalition_by_label.get(lists[0]), day, election)
-                            if len(lists) > 1
-                            else None,
+                            alliance_id=alliance,
                             ballot_label=ballot,
                         )
                         person = person_of(row | {"key": slug(code)}, day, region)
