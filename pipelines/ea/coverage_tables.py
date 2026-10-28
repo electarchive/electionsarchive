@@ -77,6 +77,8 @@ JUDICIAL = {
     "WI": 1,
 }
 KNOWN = {("GA", 2025, "statewide_exec", "general"): 2}
+SWITCHED = {("MI", "county"): (2024, (4, 0))}
+HELD_IN = {("FL", "school"): 8, ("TN", "school"): 8}
 CALENDAR: dict[tuple[str, str], tuple[int, int, str | None] | tuple[int, int, str | None, int]] = {
     ("AK", "county"): (1, 0, "Alaska Stat. § 29.26.040, https://ak.elaws.us/as/29.26.040"),
     ("AK", "municipality"): (1, 0, "Alaska Stat. § 29.26.040, https://ak.elaws.us/as/29.26.040"),
@@ -174,7 +176,12 @@ CALENDAR: dict[tuple[str, str], tuple[int, int, str | None] | tuple[int, int, st
     ),
     ("GA", "county"): (2, 0, None),
     ("GA", "municipality"): (2, 1, "Ga. Code Ann. § 21-2-9(c), (d), https://georgiacommons.org/code/21-2-9"),
-    ("GA", "school"): (2, 0, None),
+    ("GA", "school"): (
+        2,
+        0,
+        "Ga. Code Ann. § 21-2-139 (nonpartisan school board elections at the May general primary unless local law says otherwise), https://law.justia.com/codes/georgia/title-21/chapter-2/article-4/section-21-2-139/",
+        5,
+    ),
     ("HI", "county"): (
         2,
         0,
@@ -1270,6 +1277,11 @@ def build() -> str:
             g["month"] = calendar[3]
         elif g["month"] is None and months[group]:
             g["month"] = months[group].most_common(1)[0][0]
+        if group in SWITCHED and (g["period"], g["phase"]) != SWITCHED[group][1]:
+            g["era"] = (SWITCHED[group][0] - 1, SWITCHED[group][0], (g["period"], g["phase"]))
+            g["period"], g["phase"] = SWITCHED[group][1]
+            g["basis"] = "state calendar, changed"
+        g["month"] = HELD_IN.get(group, g["month"])
         years = held.get(g["polity_id"] or "", {})
         for year in sorted(set(years) | set(range(2000, today.year + 1))):
             era = g["era"]
