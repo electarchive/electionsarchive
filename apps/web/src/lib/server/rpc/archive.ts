@@ -12273,6 +12273,14 @@ export const elections = {
             ),
             size: v.nullable(v.number()),
             isStaggered: v.optional(v.boolean()),
+            unelected: v.optional(
+              v.array(
+                v.object({
+                  category: v.picklist(["appointed", "ex_officio"]),
+                  seats: v.number(),
+                }),
+              ),
+            ),
             covered: v.optional(v.nullable(v.number())),
             straddled: v.optional(v.number()),
             unopposed: v.optional(
@@ -13099,6 +13107,38 @@ export const elections = {
           hasBefore: sides?.has(false) === true,
         };
       });
+      const unelected = Map.groupBy(
+        (
+          await db.execute<{
+            body: string;
+            category: "appointed" | "ex_officio";
+            seats: number;
+          }>(sql`
+            with recursive chain as materialized (
+              select t.id, t.body_id, t.from_date, t.to_date, t.acquired_via::text as via,
+                coalesce(t.succeeds_tenure_id, case when t.seat_id is not null then
+                  lag(t.id) over (partition by t.seat_id order by t.from_date nulls first) end) as before
+              from tenure t
+              where t.body_id = any(${sql.param([...new Set(raced.flatMap((race) => race.body ?? []))])}::uuid[])
+            ),
+            kinds(id, category) as (
+              select c.id, case when c.via in ('ex_officio', 'appointed') then c.via else 'elected' end
+              from chain c
+              where c.before is null or c.via not in ('appointed', 'acting', 'succession', 'list_replacement', 'co_opted', 'trustee')
+              union all
+              select c.id, k.category from kinds k join chain c on c.before = k.id
+              where c.via in ('appointed', 'acting', 'succession', 'list_replacement', 'co_opted', 'trustee')
+            )
+            select c.body_id::text as body, k.category, count(*)::int as seats
+            from chain c join kinds k on k.id = c.id
+            where k.category in ('appointed', 'ex_officio')
+              and c.from_date <= ${election.date ?? "infinity"}::date + 45
+              and coalesce(c.to_date, 'infinity'::date) > ${election.date ?? "infinity"}::date + 45
+            group by 1, 2 order by 2
+          `)
+        ).rows,
+        (row) => row.body,
+      );
       const isUmbrella =
         within == null &&
         raced.length >= 5 &&
@@ -13260,6 +13300,10 @@ export const elections = {
           return {
             ...race,
             isStaggered: council?.isStaggered === true,
+            unelected: (unelected.get(race.body ?? "") ?? []).map((row) => ({
+              category: row.category,
+              seats: row.seats,
+            })),
             covered:
               council == null ||
               council.isWhole ||
@@ -18228,6 +18272,7 @@ export const bodies = {
               v.object({
                 party: v.nullable(v.string()),
                 caucus: v.nullable(v.string()),
+                category: v.picklist(["elected", "appointed", "ex_officio"]),
                 seats: v.number(),
                 isIndependent: v.boolean(),
               }),
@@ -18286,10 +18331,25 @@ export const bodies = {
             start: string;
             party: string | null;
             caucus: string | null;
+            category: "elected" | "appointed" | "ex_officio";
             seats: number;
             isIndependent: boolean;
           }>(sql`
-          with t as materialized (
+          with recursive chain as materialized (
+            select t.id, t.acquired_via::text as via,
+              coalesce(t.succeeds_tenure_id, case when t.seat_id is not null then
+                lag(t.id) over (partition by t.seat_id order by t.from_date nulls first) end) as before
+            from tenure t where t.body_id = ${input.id}::uuid
+          ),
+          kinds(id, category) as (
+            select c.id, case when c.via in ('ex_officio', 'indirect', 'appointed') then c.via else 'elected' end
+            from chain c
+            where c.before is null or c.via not in ('appointed', 'acting', 'succession', 'list_replacement', 'co_opted', 'trustee')
+            union all
+            select c.id, k.category from kinds k join chain c on c.before = k.id
+            where c.via in ('appointed', 'acting', 'succession', 'list_replacement', 'co_opted', 'trustee')
+          ),
+          t as materialized (
             select t.id, t.seat_id, t.from_date, coalesce(t.to_date, 'infinity'::date) as to_date, t.contest_id, t.person_id,
               (select e.date_from from contest c join election e on e.id = c.election_id where c.id = t.contest_id) as won
             from tenure t left join seat st on st.id = t.seat_id
@@ -18330,17 +18390,18 @@ export const bodies = {
             order by t.id
           )
           select x.start::text as start, coalesce(bm.into_id, br.parent_party_id, x.party) as party,
-            nullif(x.caucus, coalesce(bm.into_id, br.parent_party_id, x.party)) as caucus, count(*)::int as seats,
+            nullif(x.caucus, coalesce(bm.into_id, br.parent_party_id, x.party)) as caucus, x.category, count(*)::int as seats,
             bool_and(x.party is null and coalesce(x.independent, false)) as "isIndependent"
           from (
-            select s.start,
-              case when a.found then a.party_id is null else f.independent end as independent,
-              case when a.found then a.party else f.party end as party,
+            select s.start, case when k.category in ('appointed', 'ex_officio') then k.category else 'elected' end as category,
+              case when k.category in ('appointed', 'ex_officio') then false when a.found then a.party_id is null else f.independent end as independent,
+              case when k.category in ('appointed', 'ex_officio') then null when a.found then a.party else f.party end as party,
               (select coalesce(pm.into_id, g.party_id) from tenure_affiliation g
                 left join entity_merge pm on pm.entity_id = g.party_id
                 where g.tenure_id = s.id and g.kind = 'parliamentary_group' and g.party_id is not null
-                  and g.valid @> s.start limit 1) as caucus
+                  and g.valid @> s.start and k.category is distinct from 'appointed' and k.category is distinct from 'ex_officio' limit 1) as caucus
             from sat s left join fallback f on f.id = s.id
+            left join kinds k on k.id = s.id
             left join lateral (
               select a.party_id, coalesce(pm.into_id, a.party_id) as party, true as found from tenure_affiliation a
               left join entity_merge pm on pm.entity_id = a.party_id
@@ -18351,7 +18412,7 @@ export const bodies = {
           left join party_affiliation br on br.party_id = x.party
             and br.kind = 'regional_branch' and br.valid @> x.start
           left join entity_merge bm on bm.entity_id = br.parent_party_id
-          group by 1, 2, 3 order by 1, 4 desc
+          group by 1, 2, 3, 4 order by 1, x.category = 'elected' desc, 5 desc
         `),
           db.execute<{ id: string; date: string; seats: number }>(sql`
           select e.id, e.date_from::text as date, sum(coalesce(c.magnitude, 1))::int as seats
@@ -18451,6 +18512,7 @@ export const bodies = {
             parties: rows.map((row) => ({
               party: row.party,
               caucus: row.caucus,
+              category: row.category,
               seats: row.seats,
               isIndependent: row.isIndependent,
             })),

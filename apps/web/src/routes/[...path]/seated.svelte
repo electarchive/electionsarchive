@@ -1,6 +1,7 @@
 <script lang="ts">
   import { createQuery } from "@tanstack/svelte-query";
   import { m } from "#lib/paraglide/messages.js";
+  import { independent } from "#lib/party.js";
   import { orpc } from "#lib/rpc.js";
   import Seats from "./seats.svelte";
 
@@ -17,6 +18,7 @@
     partners,
     governing,
     isStaggered = false,
+    unelected = [],
   }: {
     parties: Array<{
       key: string;
@@ -46,6 +48,7 @@
     partners: Array<Array<string>>;
     governing: Array<string>;
     isStaggered?: boolean;
+    unelected?: Array<{ category: "appointed" | "ex_officio"; seats: number }>;
   } = $props();
 
   const filled = $derived.by(() => {
@@ -55,7 +58,9 @@
     }
     return total;
   });
-  const isPart = $derived(body != null && size != null && filled < size);
+  const isPart = $derived(
+    body != null && size != null && (filled < size || unelected.length > 0),
+  );
 
   const chamber = createQuery(() => ({
     ...orpc.bodies.get.queryOptions({ input: { id: body ?? "" } }),
@@ -70,13 +75,33 @@
     const until = new Date(Date.parse(date) + 120 * 86_400_000)
       .toISOString()
       .slice(0, 10);
-    const term = data.makeup
+    const found = data.makeup
       .filter((entry) => entry.start >= date && entry.start <= until)
       .toSorted((a, b) => a.start.localeCompare(b.start))
       .at(-1);
-    if (term == null) {
+    if (found == null && unelected.length === 0) {
       return null;
     }
+    const own = parties.map((party) => ({
+      id: /^party:(.+)$/.exec(party.key)?.[1] ?? null,
+      party,
+    }));
+    const term = found ?? {
+      parties: [
+        ...own.map(({ id, party }) => ({
+          party: id,
+          category: "elected" as const,
+          seats: party.seats,
+          isIndependent: id == null,
+        })),
+        ...unelected.map((entry) => ({
+          party: null,
+          category: entry.category,
+          seats: entry.seats,
+          isIndependent: false,
+        })),
+      ],
+    };
     let total = 0;
     for (const entry of term.parties) {
       total += entry.seats;
@@ -84,7 +109,20 @@
     if (total <= filled) {
       return null;
     }
-    const info = new Map(data.parties.map((party) => [party.id, party]));
+    const info = new Map<
+      string,
+      {
+        label: string;
+        short: string | null;
+        color: string | null;
+        lean: number | null;
+      }
+    >([
+      ...data.parties.map((party) => [party.id, party] as const),
+      ...own.flatMap(({ id, party }) =>
+        id == null ? [] : [[id, party] as const],
+      ),
+    ]);
     const local = new Map<string, number>();
     const held = new Map<string, (typeof parties)[number]["members"]>();
     for (const party of parties) {
@@ -97,6 +135,19 @@
       held.set(key, [...(held.get(key) ?? []), ...party.members]);
     }
     return term.parties.map((entry) => {
+      if (entry.category !== "elected") {
+        const isAppointed = entry.category === "appointed";
+        return {
+          key: `category:${entry.category}`,
+          label: isAppointed ? m.seats_appointed() : m.seats_ex_officio(),
+          short: null,
+          color: independent(isAppointed ? 1 : 2),
+          lean: Number.MAX_SAFE_INTEGER,
+          seats: entry.seats,
+          here: 0,
+          members: [],
+        };
+      }
       const key = entry.party ?? "none";
       const party = entry.party == null ? null : info.get(entry.party);
       return {

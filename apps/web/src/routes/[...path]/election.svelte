@@ -21,7 +21,7 @@
   import { MEASURES } from "#lib/outcomes.js";
   import { m } from "#lib/paraglide/messages.js";
   import { getLocale } from "#lib/paraglide/runtime.js";
-  import { swatch } from "#lib/party.js";
+  import { independent, swatch } from "#lib/party.js";
   import { orpc } from "#lib/rpc.js";
   import { cn } from "#lib/utils.js";
   import type { PageData } from "./$types";
@@ -461,13 +461,28 @@
               parts: term.parties
                 .map((entry) => {
                   const party = info.get(entry.party ?? "");
+                  const isAppointed = entry.category === "appointed";
+                  const group =
+                    entry.category === "elected"
+                      ? null
+                      : isAppointed
+                        ? m.seats_appointed()
+                        : m.seats_ex_officio();
                   return {
-                    key: entry.party ?? "none",
-                    name: party?.label ?? m.board_after_other(),
+                    key:
+                      group == null
+                        ? (entry.party ?? "none")
+                        : `category:${entry.category}`,
+                    name: group ?? party?.label ?? m.board_after_other(),
                     label:
-                      party?.short ?? party?.label ?? m.board_after_other(),
+                      group ??
+                      party?.short ??
+                      party?.label ??
+                      m.board_after_other(),
                     color: swatch(
-                      party?.color ?? null,
+                      group == null
+                        ? (party?.color ?? null)
+                        : independent(isAppointed ? 1 : 2),
                       `party:${entry.party ?? ""}`,
                     ),
                     value: entry.seats,
@@ -1801,6 +1816,7 @@
         partners={race.isTier ? [] : race.partners}
         governing={race.size === chamber?.size ? governing : []}
         isStaggered={race.isStaggered}
+        unelected={race.unelected ?? []}
       />
     {/snippet}
     <Lead

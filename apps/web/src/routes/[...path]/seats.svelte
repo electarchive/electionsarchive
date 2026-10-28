@@ -522,7 +522,9 @@
 >
   <Export name="seats" class="absolute inset-e-2 inset-bs-2" />
   <h2 id="{uid}-title" class="pe-8 heading">
-    {m.seats_title()}<span class="sr-only">, {place}</span>
+    {isUp ? m.seats_after_title() : m.seats_title()}<span class="sr-only"
+      >, {place}</span
+    >
   </h2>
   <figure class="grid justify-items-center gap-2">
     <div

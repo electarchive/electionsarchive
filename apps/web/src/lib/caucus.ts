@@ -1,4 +1,5 @@
 import { m } from "#lib/paraglide/messages.js";
+import { independent } from "#lib/party.js";
 
 type Party = {
   id: string;
@@ -12,8 +13,12 @@ type Party = {
 export function effective(entry: {
   party: string | null;
   caucus?: string | null;
+  category?: "elected" | "appointed" | "ex_officio";
   isIndependent?: boolean;
 }) {
+  if (entry.category != null && entry.category !== "elected") {
+    return `category:${entry.category}`;
+  }
   if (entry.caucus != null) {
     return `${entry.party ?? "independent"}>${entry.caucus}`;
   }
@@ -40,6 +45,21 @@ export function stand(
   > = [];
   const unique = new Set(keys);
   for (const key of unique) {
+    if (key === "category:appointed" || key === "category:ex_officio") {
+      const isAppointed = key === "category:appointed";
+      const label = isAppointed ? m.seats_appointed() : m.seats_ex_officio();
+      added.push({
+        id: key,
+        label,
+        short: label,
+        color: independent(isAppointed ? 1 : 2),
+        lean: Number.MAX_SAFE_INTEGER,
+        caucus: null,
+        isStriped: false,
+        isMade: true,
+      });
+      continue;
+    }
     if (
       key == null ||
       info.has(key) ||
