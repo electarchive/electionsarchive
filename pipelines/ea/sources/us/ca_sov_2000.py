@@ -206,6 +206,7 @@ def emit() -> Path:
         pdf = raw.cached(SOURCE, SITE + FILE)
         artifact = cs.artifact(pdf, source)
         pages: dict[int, UUID] = {}
+        sizes: dict[int, tuple[int, int]] = {}
         for number in sorted({*frame["page"].to_list(), *voters["page"].to_list()}):
             image = PAGES / f"{pdf.sha256}-{number}.png"
             if not image.exists():
@@ -217,6 +218,7 @@ def emit() -> Path:
                 )
             width, height = struct.unpack(">II", image.read_bytes()[16:24])
             pages[number] = cs.page(artifact, number)
+            sizes[number] = (width * 3, height * 3)
             cs.add(
                 "source_page",
                 id=pages[number],
@@ -298,10 +300,10 @@ def emit() -> Path:
                     **fact,
                     page_id=pages[number],
                     source_id=None,
-                    x0=box[0],
-                    y0=box[1],
-                    x1=box[2],
-                    y1=box[3],
+                    x0=box[0] / sizes[number][0],
+                    y0=box[1] / sizes[number][1],
+                    x1=box[2] / sizes[number][0],
+                    y1=box[3] / sizes[number][1],
                 )
             for option, kind, seats in outcomes:
                 if option in totals:
@@ -344,9 +346,9 @@ def emit() -> Path:
                         **fact,
                         page_id=pages[number],
                         source_id=None,
-                        x0=box[0],
-                        y0=box[1],
-                        x1=box[2],
-                        y1=box[3],
+                        x0=box[0] / sizes[number][0],
+                        y0=box[1] / sizes[number][1],
+                        x1=box[2] / sizes[number][0],
+                        y1=box[3] / sizes[number][1],
                     )
         return cs.write()

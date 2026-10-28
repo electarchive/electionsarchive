@@ -265,6 +265,7 @@ def emit() -> Path:
             license="Public record",
         )
         pages: dict[tuple[int, int], str] = {}
+        sizes: dict[tuple[int, int], tuple[int, int]] = {}
         for file, (name, (_, url, _)) in enumerate(FILES.items()):
             pdf = raw.cached(SOURCE, url)
             artifact = cs.artifact(pdf, source)
@@ -280,6 +281,7 @@ def emit() -> Path:
                 width, height = struct.unpack(">II", image.read_bytes()[16:24])
                 page = cs.page(artifact, number)
                 pages[(file, number)] = str(page)
+                sizes[(file, number)] = (width, height)
                 cs.add(
                     "source_page",
                     id=page,
@@ -292,7 +294,14 @@ def emit() -> Path:
         frame = frame.with_columns(
             page_id=pl.struct("file", "page").map_elements(
                 lambda r: pages[(r["file"], r["page"])], return_dtype=pl.String
-            )
+            ),
+            **{
+                edge: pl.struct("file", "page", edge).map_elements(
+                    lambda r, edge=edge, axis=axis: r[edge] / sizes[(r["file"], r["page"])][axis],
+                    return_dtype=pl.Float64,
+                )
+                for edge, axis in (("x0", 0), ("y0", 1), ("x1", 0), ("y1", 1))
+            },
         )
-        medsl.attach(cs, conn, frame, {"AZ": source}, strict=True)
+        medsl.attach(cs, conn, frame, {"AZ": source}, strict=True, restage=True)
         return cs.write()

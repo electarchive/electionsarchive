@@ -341,6 +341,7 @@ def emit() -> Path:
         )
         sources: dict[str, object] = {}
         pages: dict[str, str] = {}
+        sizes: dict[str, tuple[int, int]] = {}
         for book, (item, day, title) in BOOKS.items():
             source = cs.source(PUBLISHER, title)
             sources[f"WI{day.year}"] = source
@@ -377,6 +378,7 @@ def emit() -> Path:
                 width, height = struct.unpack(">II", image.read_bytes()[16:24])
                 number = cs.page(artifact, page)
                 pages[f"{book}:{page}"] = str(number)
+                sizes[f"{book}:{page}"] = (width, height)
                 cs.add(
                     "source_page",
                     id=number,
@@ -386,8 +388,12 @@ def emit() -> Path:
                     width=width,
                     height=height,
                 )
-        frame = frame.with_columns(page_id=pl.col("page").replace_strict(pages, return_dtype=pl.String)).with_columns(
-            page=pl.lit(1)
-        )
-        medsl.attach(cs, conn, frame, sources, strict=True)
+        frame = frame.with_columns(
+            page_id=pl.col("page").replace_strict(pages, return_dtype=pl.String),
+            **{
+                edge: pl.col(edge) / pl.col("page").replace_strict({k: v[axis] for k, v in sizes.items()})
+                for edge, axis in (("x0", 0), ("y0", 1), ("x1", 0), ("y1", 1))
+            },
+        ).with_columns(page=pl.lit(1))
+        medsl.attach(cs, conn, frame, sources, strict=True, restage=True)
         return cs.write()

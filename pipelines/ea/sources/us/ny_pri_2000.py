@@ -307,6 +307,7 @@ def emit() -> Path:
         pdf = raw.cached(SOURCE, URL)
         artifact = cs.artifact(pdf, source)
         pages: dict[int, str] = {}
+        sizes: dict[int, tuple[int, int]] = {}
         for number in sorted(frame["page"].unique().to_list()):
             image = PAGES / f"{pdf.sha256}-{number}.png"
             if not image.exists():
@@ -319,6 +320,7 @@ def emit() -> Path:
             width, height = struct.unpack(">II", image.read_bytes()[16:24])
             page = cs.page(artifact, number)
             pages[number] = str(page)
+            sizes[number] = (width, height)
             cs.add(
                 "source_page",
                 id=page,
@@ -328,6 +330,12 @@ def emit() -> Path:
                 width=width,
                 height=height,
             )
-        frame = frame.with_columns(page_id=pl.col("page").replace_strict(pages, return_dtype=pl.String))
-        medsl.attach(cs, conn, frame, {"NY": source}, strict=True)
+        frame = frame.with_columns(
+            page_id=pl.col("page").replace_strict(pages, return_dtype=pl.String),
+            **{
+                edge: pl.col(edge) / pl.col("page").replace_strict({k: v[axis] for k, v in sizes.items()})
+                for edge, axis in (("x0", 0), ("y0", 1), ("x1", 0), ("y1", 1))
+            },
+        )
+        medsl.attach(cs, conn, frame, {"NY": source}, strict=True, restage=True)
         return cs.write()

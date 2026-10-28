@@ -436,8 +436,8 @@ def emit() -> Path:
                         source_id=None,
                         x0=0,
                         y0=0,
-                        x1=sizes[row["page"]][0],
-                        y1=sizes[row["page"]][1],
+                        x1=1,
+                        y1=1,
                     )
                     if row["votes"] == top:
                         cs.add(
