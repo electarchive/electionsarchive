@@ -186,7 +186,7 @@ def parse() -> None:
     frame.write_parquet(PARSED / "mayors_2004.parquet")
 
 
-VERSION = "3"
+VERSION = "4"
 DAY_2004 = date(2004, 3, 28)
 PAGE_2004 = "https://www.ysk.gov.tr/doc/sayfa/28-mart-2004-mahalli-idareler-genel-secimleri/2818.html"
 METHOD_2004 = (
@@ -278,6 +278,7 @@ def emit() -> Path:
         seen: set[str] = set()
         moved: dict[str, str] = {}
         used: set[UUID] = set()
+        declared_sets: list[str] = []
         district = legacy = ""
         for row in frame.iter_rows(named=True):
             level = row["level"]
@@ -393,6 +394,7 @@ def emit() -> Path:
             )
             name(unit, english)
             declared = cs.key(f"{SOURCE}.result_set", contest_key)
+            declared_sets.append(str(declared))
             cs.add(
                 "result_set",
                 id=declared,
@@ -459,6 +461,10 @@ def emit() -> Path:
                 body_md=text,
                 reason="YSK does not declare the 2004 mayors, so the archive no longer stores the vote leader as winner.",
             )
+        cs.frame(
+            "outcome", pl.DataFrame(schema={"result_set_id": pl.String, "option_id": pl.String, "kind": pl.String})
+        )
+        cs.manifest["scope"] = {**cs.manifest["scope"], "clears": declared_sets}
         for before, after in moved.items():
             if before in existing:
                 cs.merge(cs.key("tr.polity", before), cs.key("tr.polity", after))
