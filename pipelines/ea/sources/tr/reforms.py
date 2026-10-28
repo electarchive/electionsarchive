@@ -933,13 +933,14 @@ def emit() -> Path:
         for key, (plate, _, town) in towns.items():
             by_town.setdefault((plate, slug(town)), []).append(key)
 
-        def town_key(plate: str, parent: str, town: str) -> str:
+        def town_key(plate: str, parent: str, town: str, register: bool = True) -> str:
             province = PROVINCES[int(plate) - 1]
             central = upper(parent) in ("MERKEZ", upper(province)) or upper(parent).endswith(" MERKEZ")
             key = "-".join([slug(province), "merkez" if central else slug(parent), slug(town)])
             if key not in towns and len(by_town.get((plate, slug(town)), [])) == 1:
                 key = by_town[(plate, slug(town))][0]
-            towns.setdefault(key, (plate, "Merkez" if central else title(parent), title(town)))
+            if register:
+                towns.setdefault(key, (plate, "Merkez" if central else title(parent), title(town)))
             return key
 
         closures: dict[str, tuple[str, str, list[str], str, str]] = {}
@@ -957,7 +958,8 @@ def emit() -> Path:
         }
 
         def center(plate: str, text: str) -> UUID | None:
-            if text != "Merkez":
+            province = upper(PROVINCES[int(plate) - 1])
+            if upper(text) not in ("MERKEZ", province, f"{province} MERKEZ"):
                 return None
             if plate in renamed_centers:
                 return find(plate, renamed_centers[plate])
@@ -999,7 +1001,7 @@ def emit() -> Path:
                         or (center(plate, target) if plate in renamed_centers else None)
                         or (
                             cs.key("tr.belde", town_key(plate, parent, target))
-                            if town_key(plate, parent, target) in towns
+                            if town_key(plate, parent, target, register=False) in towns
                             else None
                         )
                     )
