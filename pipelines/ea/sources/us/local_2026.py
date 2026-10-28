@@ -25,6 +25,7 @@ SOURCE = "us.local_2026"
 VERSION = "1"
 DAY = date(2026, 11, 3)
 GAZETTEER = "https://www2.census.gov/geo/docs/maps-data/data/gazetteer/2020_Gazetteer/2020_Gaz_place_national.zip"
+BALLOTS = "https://web.sos.ky.gov/ballots/{}%202026G.pdf"
 PARSED = DATA / "parsed" / SOURCE
 FILES = {
     "06037": "https://content.lavote.gov/docs/rrcc/documents/final-list-of-qualified-candidates-to-appear-on-the-ballot9fcf3b64-1a33-4882-9e17-8cbc3b3c8d76.pdf",
@@ -590,6 +591,31 @@ FEEDS = {
         "https://www.slocounty.ca.gov/departments/clerk-recorder/forms-documents/elections-and-voting/current-elections/2026-11-03/unofficial-candidates-list",
         "County of San Luis Obispo Elections Division",
         "Certified Candidate List for the November 3, 2026 General Election",
+    ),
+    "CA-06077": (
+        "https://www.sjgov.org/docs/default-source/registrar-of-voters-documents/elections/gubernatorial-general-election-2026/candidate-services/candidate-roster-(35).pdf",
+        "San Joaquin County Registrar of Voters",
+        "Candidate List: November 3, 2026 General Election (Qualified Candidates Only)",
+    ),
+    "CA-06089": (
+        "https://elections.shastacounty.gov/wp-content/uploads/2026/08/Final-Qualifed-Candidate-List-8-25-26.pdf",
+        "Shasta County Clerk/Registrar of Voters",
+        "Final Qualified Candidate List: November 3, 2026 General Election",
+    ),
+    "CA-06007": (
+        "https://buttevotes.ca.gov/DocumentCenter/View/4207/cfmcfmr029_candidatecertification",
+        "Butte County Clerk-Recorder/Registrar of Voters",
+        "Final Qualified Candidate List: General Election, November 3, 2026",
+    ),
+    "CA-06083": (
+        "https://content.civicplus.com/api/assets/7c6fb4a3-0c1e-4cbe-b382-b906599d7977",
+        "County of Santa Barbara Elections Division",
+        "Qualified On Ballot Contest/Candidate List for Cities, November 3, 2026 General Election",
+    ),
+    "CA-06083-s": (
+        "https://content.civicplus.com/api/assets/1c1115e9-7446-48b3-9cea-5ad1eb88b2e6",
+        "County of Santa Barbara Elections Division",
+        "Qualified Contest/Candidate List for Schools and Special Districts, November 3, 2026 General Election",
     ),
     "NJ-34029": (
         "https://www.co.ocean.nj.us/WebContentFiles/a6ad1195-1bbf-442f-bbd0-b4398929f0ef.pdf",
@@ -1301,6 +1327,11 @@ def fetch() -> None:
             raw.fetch(SOURCE, url, suffix=".pdf")
         except httpx.HTTPError as error:
             print(f"{url}: {error}")
+    for county in pl.read_excel(raw.cached(SOURCE, FEEDS["KY"][0]).path, infer_schema_length=0)["County"].unique():
+        try:
+            raw.fetch(SOURCE, BALLOTS.format(str(county).replace(" ", "%20")), suffix=".pdf")
+        except httpx.HTTPError as error:
+            print(f"{county}: {error}")
 
 
 def parse() -> None:
@@ -1650,6 +1681,53 @@ def parse() -> None:
         if st == "21"
     }
     schools: dict[str, tuple[str, str, str]] = {}
+    spelled = {
+        w: n
+        for n, w in enumerate(
+            ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten", "eleven", "twelve"]
+        )
+    }
+    councils: dict[tuple[str, frozenset[str]], tuple[str, int]] = {}
+    warded: set[tuple[str, frozenset[str]]] = set()
+    for county in filings["County"].unique():
+        try:
+            ballot_pdf = raw.cached(SOURCE, BALLOTS.format(str(county).replace(" ", "%20"))).path
+        except LookupError:
+            continue
+        printed = (
+            subprocess.run(["pdftotext", "-raw", str(ballot_pdf), "-"], capture_output=True, check=False)
+            .stdout.decode()
+            .splitlines()
+        )
+        for i, line in enumerate(printed):
+            asks = re.search(r"(?i)\(?Vote ?for (?:up to )?(\w+)(?: candidates?)?\)?$", line.strip())
+            if asks is None:
+                continue
+            ahead = line.strip()[: asks.start()].strip()
+            above = ahead or " ".join(printed[max(0, i - 3) : i])
+            if not re.search(r"(?i)council|commissioner", above) or re.search(
+                r"(?i)county commission|fiscal|judge|urban county", above
+            ):
+                continue
+            for earlier in [ahead] if ahead else printed[max(0, i - 8) : i][::-1]:
+                city_key = re.search(
+                    r"(?i)City of\s+([A-Za-z'. -]+?)(?:,|\s+CITY\b|$|\s+(?:COUNCIL|COMMISSION))", earlier
+                ) or re.search(
+                    r"^(?:NONPARTISAN CITY BALLOT, )?([A-Z][A-Z'. -]+?) (?:CITY )?(?:COUNCIL|COMMISSIONERS?)\b", earlier
+                )
+                if city_key and city_key[1].strip().upper() not in ("CITY", "NONPARTISAN CITY BALLOT"):
+                    break
+            else:
+                continue
+            elect = spelled.get(asks[1].lower()) or (int(asks[1]) if asks[1].isdigit() else 0)
+            if re.search(r"(?i)\bward\s+\w+", above) and elect == 1:
+                warded.add((str(county), coverage_tables.tokens(city_key[1])))
+            elif elect:
+                councils[(str(county), coverage_tables.tokens(city_key[1]))] = (
+                    "City Commission" if re.search(r"(?i)commission", above) else "City Council",
+                    elect,
+                )
+    magnitudes: dict[tuple[str, str], int] = {}
     contests = []
     for county, post, district, description in filings.select(
         "County", "Office", "District", "Office Description"
@@ -1657,7 +1735,7 @@ def parse() -> None:
         place = str(county).title().replace("Mccracken", "McCracken").replace("Mclean", "McLean")
         city = " ".join(
             re.sub(
-                r"\bCITY (?=COUNCIL|COMMISSION|LEGISLATIVE|MAYOR|OF)|^CITY\b|\b(COUNCIL|COUNCILMEMBERS?|MEMBERS?|COMMISSION|COMMISSIONERS?|MAYOR|OF|LEGISLATIVE|BODY)\b|[^A-Z ]",
+                r"\bCITY (?=COUN|COM|LEGISLATIVE|MAYOR|OF)|^CITY\b|\bCITY$|-\s*\w+ CO$|\b(COUN\w*|MEMBERS?|COM\w*|MAYOR|OF|LEGISLATIVE|BODY)\b|[^A-Z ]",
                 " ",
                 str(description or "").upper(),
             ).split()
@@ -1674,17 +1752,21 @@ def parse() -> None:
             contest = f"{place} County Board of Education, Educational District {district}"
             schools[contest] = (f"Board of Education, Educational District {district}", found[1], f"school:{found[0]}")
             contests.append(contest)
-        elif post in ("MAYOR", "CITY LEGISLATIVE BODY") and city:
-            contests.append(
-                f"City of {city} "
-                + (
-                    "Mayor"
-                    if post == "MAYOR"
-                    else "City Commission"
-                    if "COMMISSION" in str(description).upper()
-                    else "City Council"
-                )
+        elif post == "MAYOR" and city:
+            contests.append(f"City of {city} Mayor")
+        elif post == "CITY LEGISLATIVE BODY" and city:
+            city_key = (str(county), coverage_tables.tokens(city))
+            chamber, elect = councils.get(
+                city_key,
+                ("City Commission", 4) if re.search(r"\bCOM", str(description).upper()) else ("City Council", 0),
             )
+            contest = (
+                f"City of {city} City Council, Ward {district}"
+                if district and city_key in warded
+                else f"City of {city} {chamber}"
+            )
+            magnitudes[(str(county), contest)] = 1 if city_key in warded else elect
+            contests.append(contest)
         else:
             contests.append(None)
     for (county, contest), group in (
@@ -1703,11 +1785,7 @@ def parse() -> None:
                 {
                     "county": place,
                     "contest": contest,
-                    "seats": 0
-                    if str(contest).endswith("City Council")
-                    else 4
-                    if str(contest).endswith("City Commission")
-                    else 1,
+                    "seats": magnitudes.get((str(county), str(contest)), 1),
                     "name": " ".join(
                         cased(part)
                         for part in (
