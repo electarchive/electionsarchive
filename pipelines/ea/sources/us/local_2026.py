@@ -607,6 +607,41 @@ FEEDS = {
         "Butte County Clerk-Recorder/Registrar of Voters",
         "Final Qualified Candidate List: General Election, November 3, 2026",
     ),
+    "CA-06067": (
+        "https://elections.saccounty.gov/content/vre/us/en/campaign-services/candidate-report.html",
+        "Sacramento County Voter Registration and Elections",
+        "Roster of Candidates: November 3, 2026 General Election (contests on ballot, qualified candidates)",
+    ),
+    "CA-06039": (
+        "https://votemadera.com/wp-content/uploads/2026/09/Contests-on-Ballot-with-Qualified-Candidates.pdf",
+        "Madera County Elections Division",
+        "Contest/Candidate Proof List: Contests on Ballot with Qualified Candidates, November 3, 2026 Consolidated General Election",
+    ),
+    "CA-06023": (
+        "https://humboldtgov.org/DocumentCenter/View/156936/Qualified-Candidate-List---City-Contests",
+        "Humboldt County Elections Office",
+        "Qualified Candidate List: City Contests, November 3, 2026 General Election",
+    ),
+    "CA-06023-s": (
+        "https://humboldtgov.org/DocumentCenter/View/156758/List-of-Qualified-Candidates---Statewide-General-Election-2026",
+        "Humboldt County Elections Office",
+        "List of Qualified Candidates: Contests Going to Election, November 3, 2026 General Election",
+    ),
+    "CA-06025": (
+        "https://elections.imperialcounty.org/wp-content/uploads/2026/08/CandidateStatus_Website-1-14.pdf",
+        "Imperial County Registrar of Voters",
+        "Imperial County Candidate Status, November 3, 2026 General Election (updated as of 08/14/2026)",
+    ),
+    "CA-06113": (
+        "https://elections.yolocounty.gov/423/Municipal-City",
+        "Yolo County Assessor/Clerk-Recorder/Elections",
+        "Candidate Filings: Municipal / City, November 3, 2026 General Election",
+    ),
+    "CA-06113-s": (
+        "https://elections.yolocounty.gov/397/School-Districts",
+        "Yolo County Assessor/Clerk-Recorder/Elections",
+        "Candidate Filings: School Districts, November 3, 2026 General Election",
+    ),
     "CA-06111": (
         "https://clerkrecorder.venturacounty.gov/wp-content/uploads/2026/06/cfmcfmr001_contcanddataproof_08-12-2026.pdf",
         "Ventura County Clerk and Recorder/Registrar of Voters",
@@ -1250,6 +1285,14 @@ def resolve(conn, state: str, wanted: set[tuple[str, str]]) -> dict[tuple[str, s
                 (len(mine & theirs) / len(mine | theirs), tail)
                 for tail, theirs, their_marks in pool[county] + pool[""]
                 if their_marks == marks
+                and not (
+                    (
+                        named := re.match(
+                            r"[A-Z]{2}:\d{2}-([a-z-]+?)-(?:community|unified|joint|union|elementary|high|school)", tail
+                        )
+                    )
+                    and set(named[1].split("-")) - set(re.findall(r"[a-z]+", contest.lower()))
+                )
                 and bool({"education", "school"} & mine) == bool({"education", "school"} & theirs)
                 and not (roles and theirs & ROLES and not roles & {ROLE.get(word, word) for word in theirs})
             ),
@@ -1310,7 +1353,9 @@ def fetch() -> None:
         raw.fetch(
             SOURCE,
             url,
-            suffix=".html" if "voterfocus" in url or url.endswith("current-election") else Path(url).suffix or ".pdf",
+            suffix=".html"
+            if "voterfocus" in url or "yolocounty" in url or url.endswith("current-election")
+            else Path(url).suffix or ".pdf",
         )
         if state in PRIMARIES:
             raw.fetch(SOURCE, PRIMARIES[state], suffix=".zip")
@@ -3994,7 +4039,11 @@ def parse() -> None:
                         if role in ("council", "commission") and re.search(r"\bat large\b", post)
                         else f"{area[1].replace('area', 'trustee area').title()} {area[2].upper()}"
                         if state == "CA"
-                        and (area := re.search(r"\b(area|district|seat)(?: no)? 0*(\d+|[a-g](?= |$))", post))
+                        and (
+                            area := re.search(
+                                r"\b(area|district|seat)(?: no)? 0*(\d+|(?<=area )[a-z](?= |$)|[a-g](?= |$))", post
+                            )
+                        )
                         else ""
                     )
                     if role is not None:
