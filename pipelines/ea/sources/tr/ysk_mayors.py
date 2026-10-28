@@ -186,14 +186,13 @@ def parse() -> None:
     frame.write_parquet(PARSED / "mayors_2004.parquet")
 
 
-VERSION = "2"
+VERSION = "3"
 DAY_2004 = date(2004, 3, 28)
 PAGE_2004 = "https://www.ysk.gov.tr/doc/sayfa/28-mart-2004-mahalli-idareler-genel-secimleri/2818.html"
 METHOD_2004 = (
-    "YSK publishes the 2004 mayoral results by municipality as votes by party, without the winners' names. The "
-    "party named as winner here is the one with the most votes in YSK's table."
+    "YSK publishes the 2004 mayoral results by municipality as votes by party, without the mayors elected, so no "
+    "winner is stored here."
 )
-TIE_2004 = "YSK's table gives no single party the most votes here, or the most votes go to independents together."
 SPELLINGS = {"AFYON": "AFYONKARAHİSAR", "KAZAN": "KAHRAMANKAZAN", "EYÜP": "EYÜPSULTAN"}
 AREAS = {
     ("07", "Kale"): "Demre",
@@ -420,11 +419,6 @@ def emit() -> Path:
                     party_id=None if owner is None else party_ids[label],
                     ballot_label=INDEPENDENTS if owner is None else party_names[owner],
                 )
-            ranked = sorted(votes, key=lambda label: votes[label], reverse=True)
-            if len(ranked) > 1 and votes[ranked[0]] == votes[ranked[1]] or owners[ranked[0]] is None:
-                cs.add("note", entity_id=declared, kind="caveat", body_md=TIE_2004)
-            else:
-                cs.add("outcome", result_set_id=declared, option_id=options[ranked[0]], kind="elected")
             for measure, value in zip(
                 (REGISTERED, VOTERS, VALID, INVALID),
                 (row["registered"], row["voters"], row["valid"], row["voters"] - row["valid"]),
@@ -453,6 +447,18 @@ def emit() -> Path:
                     flags=0,
                     value=count,
                 )
+        for note, entity, text in conn.execute(
+            """select n.id, n.entity_id, n.body_md from note n join changeset c on c.id = n.changeset_id
+               where c.pipeline = %s and n.kind in ('methodology', 'caveat') and n.body_md <> %s""",
+            [SOURCE, METHOD_2004],
+        ).fetchall():
+            cs.add(
+                "note_drop",
+                note_id=note,
+                entity_id=entity,
+                body_md=text,
+                reason="YSK does not declare the 2004 mayors, so the archive no longer stores the vote leader as winner.",
+            )
         for before, after in moved.items():
             if before in existing:
                 cs.merge(cs.key("tr.polity", before), cs.key("tr.polity", after))
