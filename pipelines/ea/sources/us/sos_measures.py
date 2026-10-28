@@ -17,7 +17,7 @@ import polars as pl
 
 from ea import raw
 from ea.changeset import Changeset, slug
-from ea.sources.us import fl_sos
+from ea.sources.us import fl_sos, gov_counties
 from ea.store import DATA, connect
 
 SOURCE = "us.sos_measures"
@@ -457,6 +457,7 @@ PUBLISHERS = {
         "https://oklahoma.gov/elections/elections-results.html",
     ),
     "FL": (fl_sos.PUBLISHER, fl_sos.TITLE, "https://results.elections.myflorida.com/"),
+    "OH": gov_counties.OFFICIAL["OH"][:3],
     "LA": ("Louisiana Secretary of State", "Official election results", "https://voterportal.sos.la.gov/"),
     "OR": (
         "Oregon Secretary of State",
@@ -1365,6 +1366,31 @@ def florida() -> list[dict[str, object]]:
     return rows
 
 
+def ohio() -> list[dict[str, object]]:
+    issues = [f"STATE_ISSUE_{number}_{answer}" for number in "2345" for answer in ("YES", "NO")]
+    counties = (
+        pl.read_csv(raw.cached(gov_counties.SOURCE, gov_counties.OH_2006).path, infer_schema_length=0)
+        .group_by("COUNTY_NAME")
+        .agg(pl.col(column).cast(pl.Int64).sum() for column in issues)
+    )
+    if counties.height != 88:
+        raise ValueError(f"{gov_counties.OH_2006}: {counties.height} counties")
+    return [
+        {
+            "state": "OH",
+            "day": date(2006, 11, 7),
+            "number": column.split("_")[2],
+            "label": "",
+            "url": gov_counties.OH_2006,
+            "county": row["COUNTY_NAME"],
+            "answer": column.split("_")[3],
+            "votes": row[column],
+        }
+        for row in counties.iter_rows(named=True)
+        for column in issues
+    ]
+
+
 def oregon() -> list[dict[str, object]]:
     listed = ncsl().filter(pl.col("state") == "OR")
     words = re.compile(r"[a-z]{4,}")
@@ -1472,6 +1498,7 @@ def parse() -> None:
             *oregon(),
             *florida(),
             *oklahoma(),
+            *ohio(),
         ]
     )
     words = re.compile(r"[a-z]{4,}")
@@ -1575,7 +1602,9 @@ def emit() -> Path:
                     license="Public record",
                 )
         for state, url in frame.select("state", "url").unique(maintain_order=True).iter_rows():
-            cs.artifact(raw.cached(fl_sos.SOURCE if state == "FL" else SOURCE, url), sources[state])
+            cs.artifact(
+                raw.cached({"FL": fl_sos.SOURCE, "OH": gov_counties.SOURCE}.get(state, SOURCE), url), sources[state]
+            )
         system = cs.key("us.electoral_system", "referendum")
         states: dict[str, tuple[UUID, str]] = {}
         fips: dict[str, str] = {}
