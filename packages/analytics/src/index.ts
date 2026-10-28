@@ -18,7 +18,12 @@ export type Option = {
   isIndependent?: boolean;
   isIncumbent?: boolean;
   seats: number | null;
-  alliance: { id: string; label: string; anchor: string | null } | null;
+  alliance: {
+    id: string;
+    label: string;
+    anchor: string | null;
+    color?: string | null;
+  } | null;
   line: string | null;
 };
 
@@ -489,7 +494,7 @@ export function compare(
       label: named?.label ?? lead.label,
       short:
         named == null ? lead.short : named.roster === "" ? null : named.roster,
-      color: anchor?.color ?? lead.color,
+      color: alliance?.color ?? anchor?.color ?? lead.color,
       lean: anchor?.lean ?? lead.lean,
       current: flatten(present),
       earlier: flatten(past),

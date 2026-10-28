@@ -1797,6 +1797,7 @@ async function load(
                     id: row.alliance,
                     label: labels.full.get(row.alliance) ?? "",
                     anchor: leading.get(row.alliance) ?? null,
+                    color: color.get(leading.get(row.alliance) ?? "") ?? null,
                   },
             line: row.is_line
               ? (labels.full.get(row.party ?? "") ??
