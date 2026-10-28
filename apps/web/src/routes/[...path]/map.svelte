@@ -20,6 +20,7 @@
   import Export from "#lib/components/export.svelte";
   import { Engine } from "#lib/map/engine.svelte.js";
   import * as Select from "#lib/components/ui/select/index.js";
+  import { isTouch } from "#lib/explain.svelte.js";
   import { count, percent, plural, points, precision } from "#lib/format.js";
   import { keep } from "#lib/linked.js";
   import { orpc } from "#lib/rpc.js";
@@ -1842,11 +1843,7 @@
               }
             }}
             onclick={(event) => {
-              if (
-                event instanceof PointerEvent &&
-                event.pointerType === "touch" &&
-                pinned !== cell.k
-              ) {
+              if (isTouch(event) && pinned !== cell.k) {
                 pinned = cell.k;
                 focus = cell.k;
               } else {

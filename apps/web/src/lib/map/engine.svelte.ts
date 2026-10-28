@@ -265,6 +265,7 @@ export class Engine {
   #probe: HTMLElement | null = null;
   #cache = new Map<string, string>();
   #canvas: CanvasRenderingContext2D | null = null;
+  #isTouch = false;
 
   constructor(
     frame: Box,
@@ -284,6 +285,18 @@ export class Engine {
     this.#probe = document.createElement("span");
     this.#probe.hidden = true;
     host.append(this.#probe);
+    for (const kind of ["pointerdown", "pointermove"] as const) {
+      offs.push(
+        on(
+          host,
+          kind,
+          (event) => {
+            this.#isTouch = event.pointerType === "touch";
+          },
+          { capture: true },
+        ),
+      );
+    }
     this.#canvas = document
       .createElement("canvas")
       .getContext("2d", { willReadFrequently: true });
@@ -369,15 +382,20 @@ export class Engine {
       gl.on("resize", () => this.#hold(gl));
       for (const kind of ["mousemove", "click"] as const) {
         gl.on(kind, (event) => {
+          if (kind === "mousemove" && this.#isTouch) {
+            return;
+          }
           this.#options.onPointer?.({
             kind: kind === "click" ? "click" : "move",
             point: { x: event.point.x, y: event.point.y },
-            isTouch:
-              (event.originalEvent as PointerEvent).pointerType === "touch",
+            isTouch: this.#isTouch,
           });
         });
       }
       gl.on("mouseout", () => {
+        if (this.#isTouch) {
+          return;
+        }
         this.#options.onPointer?.({
           kind: "leave",
           point: { x: -1, y: -1 },

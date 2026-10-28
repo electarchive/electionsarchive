@@ -1,3 +1,5 @@
+import { on } from "svelte/events";
+
 export const explain = $state<{
   isOpen: boolean;
   anchor: HTMLElement | null;
@@ -8,9 +10,28 @@ export const explain = $state<{
     | null;
 }>({ isOpen: false, anchor: null, value: null });
 
-export const isTouch = (event: Event) =>
-  event instanceof PointerEvent &&
-  (event.pointerType === "touch" || event.pointerType === "pen");
+const pressed = { kind: "" };
+
+if (typeof document !== "undefined") {
+  on(
+    document,
+    "pointerdown",
+    (event) => {
+      pressed.kind = event.pointerType;
+    },
+    { capture: true, passive: true },
+  );
+}
+
+export const isTouch = (event: Event) => {
+  const kind =
+    event instanceof PointerEvent && event.pointerType !== ""
+      ? event.pointerType
+      : event instanceof MouseEvent && event.detail > 0
+        ? pressed.kind
+        : "";
+  return kind === "touch" || kind === "pen";
+};
 
 export function show(event: Event, value: NonNullable<typeof explain.value>) {
   event.preventDefault();
