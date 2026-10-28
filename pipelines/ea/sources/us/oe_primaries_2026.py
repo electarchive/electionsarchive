@@ -18,6 +18,7 @@ import polars as pl
 from ea import raw
 from ea.changeset import Changeset, slug
 from ea.sources.us import elstats
+from ea.sources.us.county_changes import ct_regions
 from ea.store import DATA, connect
 
 SOURCE = "us.oe_primaries_2026"
@@ -190,7 +191,7 @@ OFFICIAL = {
     "OK": ("Oklahoma State Election Board", "https://results.okelections.gov/OKER/", "county results from the board's results application"),
     "AR": ("Arkansas Secretary of State", "https://arkansas.tally-enr.com/", "county results from the state's election night reporting site"),
     "AL": ("Alabama Secretary of State", "https://www.sos.alabama.gov/alabama-votes/voter/election-data", "county files of precinct results summed to counties"),
-    "CT": ("Connecticut Secretary of the State", "https://ctemspublic.pcctg.net/", "town results from the Election Center summed to counties"),
+    "CT": ("Connecticut Secretary of the State", "https://ctemspublic.pcctg.net/", "town results from the Election Center summed to planning regions"),
     "RI": ("Rhode Island Board of Elections", "https://elections.ri.gov/elections/previous-election-results", "town results summed to counties"),
     "LA": ("Louisiana Secretary of State", "https://voterportal.sos.la.gov/graphical", "parish files from the live election results site"),
     "NE": ("Nebraska Secretary of State", "https://sos.nebraska.gov/elections", "county tables in the primary canvass book"),
@@ -272,7 +273,6 @@ EV = {
 }
 FL_URL = "https://results.elections.myflorida.com/ResultsExtract.Asp?ElectionDate=8/18/2026&OfficialResults=Y"
 AR_ELECTION = "7f77a178-af02-40ec-92db-c5cc50882c68"
-CT_COUNTIES = {"Fairfield": "001", "Hartford": "003", "Litchfield": "005", "Middlesex": "007", "New Haven": "009", "New London": "011", "Tolland": "013", "Windham": "015"}
 OK_BASE = "https://results.okelections.gov/OKERS/"
 BROWSER = {"User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36"}
 MA_BASE = elstats.MASSACHUSETTS
@@ -960,7 +960,8 @@ def rows(code: str, path: Path, file: str = ""):
         if file.endswith("Lookupdata"):
             return
         lookup = json.loads(raw.cached(SOURCE, url(code, file.replace("townVotes_Electiondata", "Lookupdata"))).path.read_text())
-        counties_of = {entry["TownID"]: "09" + CT_COUNTIES[lookup["counties"][entry["CountyID"]]] for entry in lookup["countyTowns"]}
+        regions = ct_regions()
+        counties_of = {entry["TownID"]: regions[re.sub(r"[^a-z]", "", entry["TownName"].lower())] for entry in lookup["countyTowns"]}
         offices = {key: value for entry in lookup["officeList"] for key, value in entry.items()}
         totals = {}
         for town, contests in json.loads(path.read_text()).items():
@@ -1441,7 +1442,10 @@ def emit() -> Path:
                     kind="counted",
                     status="active",
                     source_id=sources[round_slot],
-                    is_default=True,
+                    is_default=conn.execute(
+                        "select 1 from result_set where id = %s and not is_default", [result_set]
+                    ).fetchone()
+                    is None,
                     completeness=1,
                 )
                 named: list[tuple[int, UUID]] = []

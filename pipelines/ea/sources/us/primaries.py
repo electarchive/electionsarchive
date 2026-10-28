@@ -3448,9 +3448,17 @@ def emit() -> Path:
                 if revised is None
                 else f"{key}:r{int(found[1]) + 1 if (found := re.search(r':r(\d+)$', revised[0])) else 2}",
             )
-            for row in conn.execute(
-                f"select {', '.join(columns)} from result_set where contest_id = %s and is_default", [contest]
-            ).fetchall():
+            ceded = (
+                conn.execute("select 1 from result_set where id = %s and not is_default", [result_set]).fetchone()
+                is not None
+            )
+            for row in (
+                []
+                if ceded
+                else conn.execute(
+                    f"select {', '.join(columns)} from result_set where contest_id = %s and is_default", [contest]
+                ).fetchall()
+            ):
                 cs.add(
                     "result_set",
                     **{
@@ -3471,7 +3479,7 @@ def emit() -> Path:
                 kind="counted",
                 status="active",
                 source_id=sources[lines["url"][0]],
-                is_default=True,
+                is_default=not ceded,
                 supersedes_id=None if revised is None else revised[1],
             )
             for option, kind, seats in outcomes:
