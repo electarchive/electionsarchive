@@ -13,7 +13,7 @@ from ea.sources.us import fec_totals, medsl, openelections
 from ea.store import DATA, connect
 
 SOURCE = "us.mo_primaries"
-VERSION = "4"
+VERSION = "5"
 PARSED = DATA / "parsed" / SOURCE
 SITE = "https://web.archive.org/web/2025id_/https://www.sos.mo.gov/CMSImages/ElectionResultsStatistics/"
 LIVE = "https://www.sos.mo.gov/CMSImages/ElectionResultsStatistics/"
@@ -27,6 +27,8 @@ FILES = {
     date(2012, 2, 7): [SITE + "CountyPresidential2012.pdf", SITE + "CountyPresidential2012Part2.pdf"],
 }
 PARTIAL = {date(2000, 8, 8): 5}
+BOOK = "https://s1.sos.mo.gov/cmsimages/bluebook/2001-2002/"
+BOOK_FILES = ["0670-0673.pdf", "0692-0695.pdf"]
 STATS = "https://www.sos.mo.gov/CMSImages/ElectionResultsStatistics/"
 MATRICES = {
     date(2016, 3, 15): "ActualResults-April122016.pdf",
@@ -55,9 +57,22 @@ PARTIES = {
 PUBLISHER = "Missouri Secretary of State"
 TITLE = "County reporting: official primary election returns"
 OE_TITLE = "Missouri primary results by county, 2012 and 2014"
+BOOK_TITLE = "Official Manual of the State of Missouri, 2001–2002: 2000 primary election results"
 
 
 def fetch() -> None:
+    for name in BOOK_FILES:
+        try:
+            raw.cached(SOURCE, BOOK + name)
+        except LookupError:
+            raw.store(
+                SOURCE,
+                BOOK + name,
+                (DATA / "inbox" / "manual" / "MF-208" / name).read_bytes(),
+                suffix=".pdf",
+                retrieved_at=datetime(2026, 10, 28, tzinfo=UTC),
+                media_type="application/pdf",
+            )
     for urls in FILES.values():
         for url in urls:
             if url.startswith(LIVE):
@@ -66,9 +81,18 @@ def fetch() -> None:
                     continue
                 except LookupError:
                     pass
-                response = httpx.get(url, headers={"User-Agent": "Mozilla/5.0 (X11; Linux x86_64) Chrome/130.0 Safari/537.36"})
+                response = httpx.get(
+                    url, headers={"User-Agent": "Mozilla/5.0 (X11; Linux x86_64) Chrome/130.0 Safari/537.36"}
+                )
                 response.raise_for_status()
-                raw.store(SOURCE, url, response.content, suffix=".pdf", retrieved_at=datetime.now(UTC), media_type="application/pdf")
+                raw.store(
+                    SOURCE,
+                    url,
+                    response.content,
+                    suffix=".pdf",
+                    retrieved_at=datetime.now(UTC),
+                    media_type="application/pdf",
+                )
             else:
                 raw.fetch(SOURCE, url, suffix=".pdf")
     for name in MATRICES.values():
@@ -110,7 +134,9 @@ def parse() -> None:
                     county, office = codes[re.sub(r"[^a-z]", "", heading[1].lower())], None
                 elif re.fullmatch(r" {0,5}U\.S\. Senator(?:\s{2,}Precincts.*)?", line):
                     office, lines = ("senate", None), []
-                elif found := re.fullmatch(r" {0,5}U\.S\. Representative \W+ District (\d+)(?:\s{2,}Precincts.*)?", line):
+                elif found := re.fullmatch(
+                    r" {0,5}U\.S\. Representative \W+ District (\d+)(?:\s{2,}Precincts.*)?", line
+                ):
                     office, lines = ("house", int(found[1])), []
                 elif re.fullmatch(r" {0,5}U\.S\. President And Vice President(?:\s{2,}Precincts.*)?", line):
                     office, lines = ("president", None), []
@@ -140,6 +166,59 @@ def parse() -> None:
     party_label = re.compile(r"Republican|Democrat(?:ic)?|Libertarian|Green|Constitution")
     entry = re.compile(r"(\S.*?)\s{2,}(\d[\d,]*(?:\s+\d[\d,]*)*)\s*")
     known = connect()
+    for name in BOOK_FILES:
+        text = subprocess.run(
+            ["pdftotext", "-layout", str(raw.cached(SOURCE, BOOK + name).path), "-"],
+            capture_output=True,
+            text=True,
+            check=True,
+        ).stdout
+        race: tuple[str, int | None] | None = None
+        head: list[str] = []
+        books: dict[tuple[tuple[str, int | None], tuple[str, ...]], dict[str, list[int]]] = {}
+        for line in text.splitlines():
+            if title := re.match(r"(?:U\.S\. Senator\S*Primary election.*|District (\d+)(?: \(cont\.\))?)", line):
+                race, head = ("senate", None) if title[1] is None else ("house", int(title[1])), []
+                line = line[title.end() :]
+            if race is None or re.search(r"OFFICIAL MANUAL|PRIMARY ELECTION RESULTS", line):
+                continue
+            if found := re.fullmatch(r"([A-Z][A-Z .']*?)\s{2,}(\d[\d,]*(?:\s+\d[\d,]*)*)\s*", line):
+                books.setdefault((race, tuple(head)), {})[found[1]] = [
+                    int(v.replace(",", "")) for v in found[2].split()
+                ]
+            elif line.strip():
+                head.append(re.sub(r"\s+", " ", line.strip()))
+        for ((kind, district), header), body in books.items():
+            if district == PARTIAL[date(2000, 8, 8)]:
+                continue
+            labels = re.findall(r"Democratic|Republican|Libertarian|Reform|Green|Natural Law", header[0])
+            total_row = body.pop("TOTAL")
+            for at, label in enumerate(labels):
+                if any(len(values) != len(labels) for values in body.values()):
+                    raise ValueError(f"{name} {kind} {district}: rows do not match {labels}")
+                votes = {county: values[at] for county, values in body.items()}
+                party = PARTIES[label.upper()[:3]]
+                key = "2000-08-08:MO:" + (f"house:{district}" if district is not None else kind) + f":{party}"
+                if sum(votes.values()) != total_row[at]:
+                    print(f"{key}: column {at} adds up to {sum(votes.values())}, not {total_row[at]}, skipped")
+                    continue
+                names = fec_totals.labels(known, key).get(total_row[at], [])
+                if len(names) != 1:
+                    print(f"{key}: {len(names)} candidates with {total_row[at]}, skipped")
+                    continue
+                rows.extend(
+                    {
+                        "day": date(2000, 8, 8),
+                        "chamber": f"{kind}:{party}",
+                        "district": district,
+                        "code": codes[re.sub(r"[^a-z]", "", county.lower())],
+                        "candidate": names[0].upper(),
+                        "writein": False,
+                        "votes": value,
+                        "source": "BOOK",
+                    }
+                    for county, value in votes.items()
+                )
     for day, name in MATRICES.items():
         text = subprocess.run(
             ["pdftotext", "-layout", str(raw.cached(SOURCE, STATS + name).path), "-"],
@@ -270,7 +349,11 @@ def emit() -> Path:
             summary="Missouri's 1998, 2000, 2004, 2012, 2014, and 2016–2022 House, Senate, and presidential primaries by county",
             polity="US-MO",
         )
-        sources = {"MO": cs.source(PUBLISHER, TITLE), "OE": cs.source("OpenElections", OE_TITLE)}
+        sources = {
+            "MO": cs.source(PUBLISHER, TITLE),
+            "OE": cs.source("OpenElections", OE_TITLE),
+            "BOOK": cs.source(PUBLISHER, BOOK_TITLE),
+        }
         cs.add(
             "source",
             id=sources["MO"],
@@ -292,6 +375,17 @@ def emit() -> Path:
         for urls in FILES.values():
             for url in urls:
                 cs.artifact(raw.cached(SOURCE, url), sources["MO"])
+        cs.add(
+            "source",
+            id=sources["BOOK"],
+            kind="official_body",
+            publisher=PUBLISHER,
+            title=BOOK_TITLE,
+            url="https://www.sos.mo.gov/bluebook",
+            license="Public record",
+        )
+        for name in BOOK_FILES:
+            cs.artifact(raw.cached(SOURCE, BOOK + name), sources["BOOK"])
         for path in SHEETS.values():
             url = openelections.REPOSITORY.format(state="mo", commit=openelections.COMMITS["MO"], path=path)
             cs.artifact(raw.cached(SOURCE, url), sources["OE"])
@@ -311,7 +405,8 @@ def emit() -> Path:
             conn,
             frame.filter(
                 pl.all_horizontal(
-                    (pl.col("day") != day) | (pl.col("district") == district) for day, district in PARTIAL.items()
+                    (pl.col("source") != "MO") | (pl.col("day") != day) | (pl.col("district") == district)
+                    for day, district in PARTIAL.items()
                 ),
                 ~pl.concat_str(
                     pl.col("day").cast(pl.String),
@@ -321,7 +416,7 @@ def emit() -> Path:
                     .otherwise(pl.lit("senate")),
                     pl.col("chamber").str.split(":").list.last(),
                     separator=":",
-                ).is_in(list(held))
+                ).is_in(list(held)),
             ),
             sources,
             strict=True,
