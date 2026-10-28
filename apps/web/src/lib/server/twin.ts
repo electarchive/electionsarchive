@@ -3357,11 +3357,14 @@ function contestMarkdown(
       : [
           `## ${m.rounds_title()}`,
           ...rounds.flatMap((round, index) => {
+            const american = contest.path?.split("/")[0] === "us";
             const label =
               round.kind === "primary"
                 ? m.round_primary()
                 : round.kind === "runoff"
-                  ? m.round_runoff()
+                  ? american
+                    ? m.round_runoff()
+                    : m.round_second()
                   : round.kind === "indirect" &&
                       !rounds.some((other) => other.kind === "runoff")
                     ? rounds.length === 2
@@ -3372,7 +3375,7 @@ function contestMarkdown(
                     : round.kind === "indirect"
                       ? m.round_first()
                       : round.kind === "general"
-                        ? index === 0
+                        ? index === 0 && !american
                           ? m.round_first()
                           : m.round_general()
                         : m.round_number({ round: index + 1 });

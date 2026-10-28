@@ -86,6 +86,8 @@
     });
     const known = new Set(party.map((stage) => stage.id));
     const generals = rounds.filter((round) => round.kind === "general");
+    const american = rounds.some((round) => round.path?.split("/")[0] === "us");
+    const runoff = rounds.some((round) => round.kind === "runoff");
     const chained = rounds
       .filter((round) => !known.has(round.id))
       .map((round) => {
@@ -102,9 +104,10 @@
             round.kind === "primary"
               ? m.round_primary()
               : round.kind === "runoff"
-                ? m.round_runoff()
-                : round.kind === "indirect" &&
-                    !rounds.some((other) => other.kind === "runoff")
+                ? american
+                  ? m.round_runoff()
+                  : m.round_second()
+                : round.kind === "indirect" && !runoff
                   ? rounds.length === 2
                     ? index === 0
                       ? m.round_electoral()
@@ -114,7 +117,9 @@
                     ? m.round_first()
                     : round.kind === "general"
                       ? generals.length < 2
-                        ? m.round_general()
+                        ? american || !runoff
+                          ? m.round_general()
+                          : m.round_first()
                         : generals.indexOf(round) === 0
                           ? m.round_first()
                           : generals.indexOf(round) === 1
