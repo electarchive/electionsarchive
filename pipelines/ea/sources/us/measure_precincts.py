@@ -1248,29 +1248,13 @@ def emit() -> Path:
         values = []
         parts = pl.col("code").str.splitn(":", 5)
         held = (
-            pl.DataFrame(
-                conn.execute(
-                    """select rs.id::text, u.id::text, u.code from result_set rs join changeset g on g.id = rs.changeset_id
-                       join result_value v on v.result_set_k = rs.k join reporting_unit u on u.k = v.unit_k
-                       join changeset w on w.id = u.changeset_id
-                       where g.pipeline = %s and w.pipeline = %s and u.scheme_code = 'us.precinct' group by 1, 2, 3""",
-                    [SOURCE, SOURCE],
-                ).fetchall(),
-                schema=["result_set_id", "unit_id", "code"],
-                orient="row",
-            )
+            precinct_code.held(conn, SOURCE, scope)
             .with_columns(
                 year=parts.struct.field("field_0"),
                 state=parts.struct.field("field_1"),
                 fips=parts.struct.field("field_2"),
                 jurisdiction=parts.struct.field("field_3"),
                 precinct=parts.struct.field("field_4"),
-            )
-            .filter(pl.col("state").is_in(scope) if scope else pl.lit(True))
-            .filter(
-                pl.col("fips").is_in(os.environ["MEASURE_COUNTIES"].split(","))
-                if os.environ.get("MEASURE_COUNTIES")
-                else pl.lit(True)
             )
             .with_columns(
                 canonical=precinct_code.expr(
@@ -1295,65 +1279,9 @@ def emit() -> Path:
             )
         )
         used = set(held["canonical"])
-        stale = held.filter(pl.col("code") != pl.col("canonical"))["result_set_id"].unique().to_list()
-        moving = held.filter(pl.col("result_set_id").is_in(stale)).select(
-            "result_set_id",
-            "unit_id",
-            canonical=pl.col("canonical").map_elements(
-                lambda code: str(cs.unit("us.precinct", code)), return_dtype=pl.String
-            ),
-        )
-        grain = ["result_set_id", "unit_id", "option_id", "channel", "measure", "count_round"]
-        for table, columns, schema, merged in (
-            (
-                "result_value",
-                "v.flags, v.value",
-                {"flags": pl.Int16, "value": pl.Int64},
-                [pl.col("flags").max(), pl.col("value").sum()],
-            ),
-            (
-                "value_locator",
-                "v.page_id::text, v.source_id::text, v.x0, v.y0, v.x1, v.y1",
-                {
-                    "page_id": pl.String,
-                    "source_id": pl.String,
-                    "x0": pl.Float64,
-                    "y0": pl.Float64,
-                    "x1": pl.Float64,
-                    "y1": pl.Float64,
-                },
-                [pl.all().first()],
-            ),
-        ):
-            facts = (
-                pl.DataFrame(
-                    conn.execute(
-                        f"""select rs.id::text, u.id::text, o.id::text, v.channel, v.measure, v.count_round, {columns}
-                            from {table} v join result_set rs on rs.k = v.result_set_k
-                            join reporting_unit u on u.k = v.unit_k join contest_option o on o.k = v.option_k
-                            where rs.id = any(%s::uuid[])""",
-                        [stale],
-                    ).fetchall(),
-                    schema={
-                        "result_set_id": pl.String,
-                        "unit_id": pl.String,
-                        "option_id": pl.String,
-                        "channel": pl.Int16,
-                        "measure": pl.Int16,
-                        "count_round": pl.Int16,
-                        **schema,
-                    },
-                    orient="row",
-                )
-                .join(moving, on=["result_set_id", "unit_id"], how="left")
-                .with_columns(unit_id=pl.coalesce("canonical", "unit_id"))
-                .drop("canonical")
-                .group_by(grain, maintain_order=True)
-                .agg(*merged)
-            )
-            if facts.height:
-                (values if table == "result_value" else locators).append(facts)
-        print(f"{len(stale)} sets moved onto canonical precinct codes")
+        moved, moved_locators = precinct_code.remap(cs, conn, held)
+        values.extend(moved)
+        locators.extend(moved_locators)
         for key, state, source, method, rows in candidates:
             if scope and state not in scope:
                 continue
@@ -1658,7 +1586,7 @@ def emit() -> Path:
                 status="withdrawn",
             )
             cs.add("note", entity_id=UUID(row["id"]), kind="caveat", body_md=WITHDRAWN)
-        precinct_code.units(cs, conn, pl.Series(sorted(used), dtype=pl.String))
+        precinct_code.units(cs, conn, pl.Series(sorted(used), dtype=pl.String), held)
         if values:
             cs.frame("result_value", pl.concat(values))
         if locators:
