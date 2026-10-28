@@ -423,7 +423,7 @@
 
   const paths = $derived.by(() => {
     const holders = Map.groupBy(
-      ordered,
+      ordered.filter((party) => !party.key.startsWith("category:")),
       (party) =>
         partners.find((pair) => pair.includes(party.key))?.[0] ?? party.key,
     )
