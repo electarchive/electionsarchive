@@ -733,6 +733,34 @@ FORMER = {
     "Genç Parti": ("Yeniden Doğuş Partisi", "YDP", date(2002, 8, 23)),
     "Emek Partisi": ("Emeğin Partisi", "EMEP", date(2005, 11, 27)),
 }
+FOUNDED_AS = {"Milliyetçi Hareket Partisi": ("Muhafazakâr Parti", "MP", date(1983, 7, 7), date(1985, 11, 30))}
+FOUNDING_SOURCES = (
+    (
+        "official_body",
+        "Anayasa Mahkemesi",
+        "Anayasa Mahkemesi kararı E.1983/4, K.1983/4 (Muhafazakâr Parti), 3 Kasım 1983",
+        "https://www.resmigazete.gov.tr/arsiv/18552.pdf",
+        LICENSE,
+        (
+            "The Constitutional Court's decision in the closure case against the Muhafazakâr Parti, published in the "
+            "Resmî Gazete of 21 October 1984 (no. 18552). The prosecutor's indictment it quotes says the party "
+            "gained legal personality by filing its founding statement with the Ministry of the Interior on "
+            "7 July 1983."
+        ),
+    ),
+    (
+        "academic",
+        "Akdeniz Üniversitesi",
+        "Latife Toker, Milliyetçi Çalışma Partisi (1985-1993), yüksek lisans tezi",
+        "https://avesis.akdeniz.edu.tr/yonetilen-tez/8e37134a-4642-4b49-b215-27073203d764/milliyetci-calisma-partisi-1985-1993",
+        None,
+        (
+            "A master's thesis at Akdeniz University on the Milliyetçi Çalışma Partisi. Its abstract says the "
+            "Muhafazakâr Parti (1983–1985) changed its name and emblem to Milliyetçi Çalışma Partisi at its first "
+            "ordinary congress on 30 November 1985."
+        ),
+    ),
+)
 MISPRINTED = {"Sabahat Akkiray": "Sabahat Akkiraz"}
 PRESIDENT_CAVEAT = (
     "Customs-gate ballot boxes serve voters registered abroad, so the gazette prints the abroad register again for "
@@ -6058,8 +6086,26 @@ def emit() -> Path:
             cs.add("party", id=parties[full], kind="party", polity_id=turkey)
             if full in FORMER:
                 former, abbreviation, start = FORMER[full]
-                name(parties[full], former, end=start)
-                name(parties[full], abbreviation, kind="abbreviation", end=start)
+                renamed = None
+                if full in FOUNDED_AS:
+                    first, first_abbreviation, founded, renamed = FOUNDED_AS[full]
+                    name(parties[full], first, start=founded, end=renamed)
+                    name(parties[full], first_abbreviation, kind="abbreviation", start=founded, end=renamed)
+                    for cited_kind, publisher, heading, address, terms, notes in FOUNDING_SOURCES:
+                        cited = cs.source(publisher, heading)
+                        cs.add(
+                            "source",
+                            id=cited,
+                            kind=cited_kind,
+                            publisher=publisher,
+                            title=heading,
+                            url=address,
+                            license=terms,
+                            notes=notes,
+                        )
+                        cs.add("citation", entity_id=parties[full], source_id=cited, locator={"name": first})
+                name(parties[full], former, start=renamed, end=start)
+                name(parties[full], abbreviation, kind="abbreviation", start=renamed, end=start)
             name(parties[full], full, start=start)
             name(parties[full], short, kind="abbreviation", start=start)
         persons: dict[str, UUID] = {}
@@ -6769,7 +6815,7 @@ def emit() -> Path:
                     "contest_option",
                     id=option,
                     contest_id=national,
-                    kind="others" if full == INDEPENDENTS else "list",
+                    kind="independents" if full == INDEPENDENTS else "list",
                     party_id=None if full == INDEPENDENTS else parties[full],
                     alliance_id=None if alliance is None else alliances[alliance],
                     ballot_label=full,
@@ -6860,7 +6906,7 @@ def emit() -> Path:
                         "contest_option",
                         id=option,
                         contest_id=contest,
-                        kind="others" if full == INDEPENDENTS else "list",
+                        kind="independents" if full == INDEPENDENTS else "list",
                         party_id=None if full == INDEPENDENTS else parties[full],
                         alliance_id=None if alliance is None else alliances[alliance],
                         ballot_label=full,
@@ -7326,7 +7372,7 @@ def emit() -> Path:
                         "contest_option",
                         id=option,
                         contest_id=contest,
-                        kind="others" if key == INDEPENDENTS else "list",
+                        kind="independents" if key == INDEPENDENTS else "list",
                         party_id=None if key == INDEPENDENTS else cs.key("tr.party", key),
                         ballot_label=full,
                     )
@@ -7687,7 +7733,7 @@ def emit() -> Path:
                     "contest_option",
                     id=option,
                     contest_id=contest,
-                    kind="others" if party == "others" else "candidate",
+                    kind="independents" if party == "others" else "candidate",
                     party_id=None if party == "others" else parties[party],
                     ballot_label=INDEPENDENTS if party == "others" else party,
                 )
