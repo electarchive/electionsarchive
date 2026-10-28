@@ -1,4 +1,5 @@
 import re
+import subprocess
 from datetime import date
 from pathlib import Path
 from uuid import UUID
@@ -16,6 +17,7 @@ PARSED = DATA / "parsed" / SOURCE
 ORIGIN = "www.elections.ny.gov/NYSBOE/elections/"
 WAYBACK = "https://web.archive.org/web/{}id_/https://" + ORIGIN + "{}"
 DAYS = {
+    2002: date(2002, 11, 5),
     2006: date(2006, 11, 7),
     2010: date(2010, 11, 2),
     2014: date(2014, 11, 4),
@@ -47,6 +49,9 @@ LINES = {
     "SAM": ("NY:serve-america-movement-party", "Serve America Movement"),
     "GRN": ("green-party", "Green"),
     "GRE": ("green-party", "Green"),
+    "LIB": ("NY:liberal", "Liberal"),
+    "RTL": ("NY:right-to-life", "Right to Life"),
+    "MRP": ("NY:marijuana-reform-party", "Marijuana Reform"),
     "LBT": ("libertarian-party", "Libertarian"),
     "FDM": ("NY:freedom-party", "Freedom"),
     "SWP": ("socialist-workers-party", "Socialist Workers"),
@@ -59,11 +64,22 @@ LINES = {
 TITLES = {"governor": "Governor", "attorney-general": "Attorney General", "comptroller": "Comptroller"}
 PUBLISHER = "New York State Board of Elections"
 TITLE = "Certified statewide election returns by county"
-NYC = (
-    "The Board's 2006 file combines blank, void, and scattered votes in one column, so this set has no write-in option."
-)
+NYC = "The Board's {year} file combines blank, void, and scattered votes in one column, so this set has no write-in option."
+COLUMNS_2002 = [
+    ("Pataki", "REP"),
+    ("McCall", "DEM"),
+    ("Tom Golisano", "IND"),
+    ("Pataki", "CON"),
+    ("Andrew Cuomo", "LIB"),
+    ("Gerard Cronin", "RTL"),
+    ("Stanley Aronowitz", "GRN"),
+    ("McCall", "WOR"),
+    ("Thomas K. Leighton", "MRP"),
+    ("Scott Jeffrey", "LBT"),
+]
 COUNTERS = {"Blank", "Void", "BVS Subtotal", "Total", "Total Votes by County", "Blk.,Void"}
 FILES = {
+    (2002, "governor"): ("20120823003957", "2002/general/2002_gov.pdf"),
     (2006, "governor"): ("20120822221216", "2006/general/2006_gov.xls"),
     (2006, "attorney-general"): ("20120822221201", "2006/general/2006_ag.xls"),
     (2006, "comptroller"): ("20120822221057", "2006/general/2006_comp.xls"),
@@ -94,6 +110,52 @@ def fetch() -> None:
 def parse() -> None:
     rows: list[dict[str, object]] = []
     for (year, office), (stamp, path) in FILES.items():
+        if path.endswith(".pdf"):
+            text = subprocess.run(
+                ["pdftotext", "-layout", str(raw.cached(SOURCE, WAYBACK.format(stamp, path)).path), "-"],
+                check=True,
+                capture_output=True,
+                text=True,
+            ).stdout
+            counted, printed_2002 = 0, None
+            for line in text.splitlines():
+                found = re.fullmatch(r"([A-Za-z][A-Za-z. ]*?)\s{2,}([\d,]+(?:\s+[\d,]+){11})\s*", line)
+                if found is None or found[1].startswith(("RECAP", "Total")):
+                    continue
+                numbers = [int(number.replace(",", "")) for number in found[2].split()]
+                if sum(numbers[:-1]) != numbers[-1]:
+                    raise ValueError(
+                        f"{year} {office} {found[1]}: columns sum to {sum(numbers[:-1])}, printed {numbers[-1]}"
+                    )
+                if found[1] == "STATEWIDE TOTAL":
+                    printed_2002 = numbers
+                    continue
+                counted += 1
+                rows.extend(
+                    {
+                        "year": year,
+                        "office": office,
+                        "head": head,
+                        "mate": None,
+                        "party": party,
+                        "county": found[1],
+                        "votes": votes,
+                    }
+                    for (head, party), votes in zip(COLUMNS_2002, numbers, strict=False)
+                )
+            if counted != 62 or printed_2002 is None:
+                raise ValueError(f"{year} {office}: {counted} counties")
+            for index, (head, party) in enumerate(COLUMNS_2002):
+                total = sum(
+                    row["votes"]
+                    for row in rows
+                    if row["year"] == year and row["head"] == head and row["party"] == party
+                )
+                if total != printed_2002[index]:
+                    raise ValueError(
+                        f"{year} {office} {head} ({party}): counties sum to {total}, printed {printed_2002[index]}"
+                    )
+            continue
         sheet = fastexcel.read_excel(raw.cached(SOURCE, WAYBACK.format(stamp, path)).path).load_sheet(
             0, header_row=None
         )
@@ -152,7 +214,9 @@ def parse() -> None:
                 )
         if counted != 62:
             raise ValueError(f"{year} {office}: {counted} counties")
-        frame = pl.DataFrame([row for row in rows if row["year"] == year and row["office"] == office])
+        frame = pl.DataFrame(
+            [row for row in rows if row["year"] == year and row["office"] == office], infer_schema_length=None
+        )
         for column, (head, _, party) in columns.items():
             total = int(frame.filter(pl.col("head") == head, pl.col("party") == party)["votes"].sum())
             if column in printed and printed[column] != total:
@@ -162,7 +226,7 @@ def parse() -> None:
         if not printed:
             raise ValueError(f"{year} {office}: no statewide total")
     PARSED.mkdir(parents=True, exist_ok=True)
-    frame = pl.DataFrame(rows)
+    frame = pl.DataFrame(rows, infer_schema_length=None)
     frame.write_parquet(PARSED / "lines.parquet")
     print(
         frame.group_by("year", "office", "head", "party")
@@ -178,7 +242,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="New York's governor, attorney general, and comptroller elections 2006–2022 by county and "
+            summary="New York's governor, attorney general, and comptroller elections 2002–2022 by county and "
             "ballot line, from the State Board of Elections",
             polity="US",
         )
@@ -307,8 +371,8 @@ def emit() -> Path:
                 is_default=True,
                 completeness=1,
             )
-            if year == 2006:
-                cs.add("note", entity_id=result_set, kind="caveat", body_md=NYC)
+            if year in (2002, 2006):
+                cs.add("note", entity_id=result_set, kind="caveat", body_md=NYC.format(year=year))
             totals: dict[UUID, int] = {}
             targets: dict[tuple[str, str], str] = {}
             for (head,), cells in lines.group_by("head", maintain_order=True):
@@ -324,7 +388,9 @@ def emit() -> Path:
                         )
                     targets[(head, "")] = str(write_in)
                     continue
-                found = [option for option, _, last in roots if last == surname(head)]
+                found = [option for option, _, last in roots if last == surname(head)] or [
+                    option for option, text, _ in roots if slug(text).split("-")[0] == surname(head)
+                ]
                 if len(found) > 1:
                     raise ValueError(f"{key}: {len(found)} options for {head}")
                 codes = cells["party"].unique(maintain_order=True).to_list()
