@@ -172,7 +172,7 @@ def emit() -> Path:
             """select l.unit_id, min(a.id::text)::uuid
                from located l
                join area_geometry g on g.geom && l.point and ST_Covers(g.geom, l.point)
-               join area a on a.id = g.area_id and a.scheme_code = 'br.bairro'
+               join area a on a.id = g.area_id and a.scheme_code in ('br.bairro', 'br.setor')
                group by l.unit_id"""
         ).fetchall()
         cs.frame(

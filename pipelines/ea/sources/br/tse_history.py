@@ -22,7 +22,7 @@ SOURCE = "br.tse_history"
 VERSION = "1"
 PARSED = DATA / "parsed" / SOURCE
 TSE = "https://cdn.tse.jus.br/estatistica/sead/odsele/"
-YEARS = (1994, 1998, 2002, 2006, 2010, 2014, 2018, 2026)
+YEARS = (1994, 1998, 2002, 2006, 2010, 2014, 2018, 2022, 2026)
 FILES = {
     (year, kind): f"{TSE}{folder}/{folder}_{year}.zip"
     for year in YEARS
@@ -114,7 +114,7 @@ DROPPED = {
         "November 2020. Her votes are missing here."
     )
 }
-SENATORS = {1994: 2, 1998: 1, 2002: 2, 2006: 1, 2010: 2, 2014: 1, 2018: 2, 2026: 2}
+SENATORS = {1994: 2, 1998: 1, 2002: 2, 2006: 1, 2010: 2, 2014: 1, 2018: 2, 2022: 1, 2026: 2}
 SCHEDULED = {2026: date(2026, 10, 25)}
 FEED = "https://resultados.tse.jus.br/oficial/ele2026/"
 RUNOFFS = {"6258": "1", "6260": "3"}
@@ -222,7 +222,9 @@ def parse() -> None:
             separator=":",
         )
         municipality = pl.col("CD_MUNICIPIO").str.zfill(5)
-        ordinary = (pl.col("CD_TIPO_ELEICAO") == "2") & pl.col("CD_CARGO").is_in(list(OFFICES))
+        ordinary = (pl.col("CD_TIPO_ELEICAO") == "2") & pl.col("CD_CARGO").is_in(
+            [cargo for cargo in OFFICES if year != 2022 or cargo not in ("1", "6")]
+        )
 
         candidates = scan(year, "candidates").filter(ordinary)
         columns = candidates.collect_schema().names()
@@ -476,6 +478,8 @@ def parse() -> None:
         if expected is not None and frame.height != expected - (str(code) in DROPPED):
             failures.append(f"{code}: {frame.height} elected, expected {expected}")
     for year in YEARS:
+        if year == 2022:
+            continue
         chamber = elected.filter((pl.col("year") == year) & (pl.col("office") == "chamber")).height
         if chamber != sum(SEATS.values()):
             failures.append(f"{year}: {chamber} deputies elected")
@@ -532,7 +536,7 @@ def emit() -> Path:
             pipeline=SOURCE,
             version=VERSION,
             summary=(
-                "Brazil's general elections from 1994 to 2018 and in 2026 by municipality: president, governors, "
+                "Brazil's general elections from 1994 to 2022 and in 2026 by municipality: president, governors, "
                 "senators, federal deputies, and state deputies"
             ),
             polity="BR",
@@ -884,7 +888,7 @@ def emit() -> Path:
             override = None
             if office in ("chamber", "assembly") and int(year) in SCHEDULED:
                 override = {"threshold": {"percent": 80 / magnitude, "level": "list"}}
-            elif office in ("chamber", "assembly") and year != "2018":
+            elif office in ("chamber", "assembly") and year not in ("2018", "2022"):
                 counted, blank = totals[code]
                 share = (counted + blank) / counted if year == "1994" else 1
                 override = {"threshold": {"percent": float(f"{100 * share / magnitude:.6f}"), "level": "list"}}
@@ -917,7 +921,7 @@ def emit() -> Path:
                     else "chamber-open-list"
                     if int(year) in SCHEDULED
                     else "open-list-2018"
-                    if year == "2018"
+                    if year in ("2018", "2022")
                     else "open-list-quotient"
                 ],
                 rules_override=override,
