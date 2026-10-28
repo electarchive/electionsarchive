@@ -833,7 +833,6 @@ FEEDS.update(
                     "gaston",
                     "hillsboro",
                     "king-city",
-                    "lake-oswego",
                     "north-plains",
                     "rivergrove",
                     "sherwood",
@@ -3576,9 +3575,15 @@ def parse() -> None:
         for st, district, label in saipe.select("State FIPS Code", "District ID", "Name").iter_rows():
             index[(st, coverage_tables.tokens(label))].append((f"{st}{district}", label))
         unowned: dict[str, list[tuple[str, str, str, str, str]]] = defaultdict(list)
+        owned = dict(
+            conn.execute(
+                """select distinct on (x.value) x.value, s.path from external_id x join slug s on s.entity_id = x.entity_id
+                   where x.scheme = 'us.polity' and x.value ~ '^(place|school):' order by x.value, length(s.path)"""
+            ).fetchall()
+        )
         for st, county_code, label in conn.execute(
             """select g.state, g.county, g.name from coverage_government g
-               where g.kind = 'school' and g.polity_id is null and g.county is not null and g.state in ('MI')"""
+               where g.kind = 'school' and g.polity_id is null and g.county is not null and g.state in ('MI', 'CA', 'NJ')"""
         ).fetchall():
             mine = coverage_tables.tokens(label)
             hits = [
@@ -3591,29 +3596,43 @@ def parse() -> None:
             if len(alike or hits) == 1:
                 code, district = (alike or hits)[0]
                 unowned[st].append(
-                    (county_code, district, f"school:{code}", f"us/{st.lower()}/{slug(district)}", "school")
+                    (
+                        county_code,
+                        district,
+                        f"school:{code}",
+                        owned.get(f"school:{code}") or f"us/{st.lower()}/{slug(district)}",
+                        "school",
+                    )
                 )
         with zipfile.ZipFile(raw.fetch(SOURCE, GAZETTEER, suffix=".zip").path) as archive:
             gazetteer = pl.read_csv(archive.read(archive.namelist()[0]), separator="\t", infer_schema=False).rename(
                 lambda column: column.strip()
             )
-        cities: dict[tuple[str, frozenset[str]], list[tuple[str, str]]] = defaultdict(list)
-        for st, geoid, label in (
-            gazetteer.filter(pl.col("USPS").is_in(["OR"]) & (pl.col("FUNCSTAT") == "A"))
+        cities: dict[tuple[str, frozenset[str]], list[tuple[str, str, str]]] = defaultdict(list)
+        for st, geoid, full in (
+            gazetteer.filter(pl.col("USPS").is_in(["OR", "FL", "MI"]) & (pl.col("FUNCSTAT") == "A"))
             .select("USPS", "GEOID", "NAME")
             .iter_rows()
         ):
-            label = re.sub(r" (city|town|village)$", "", label)
-            cities[(st, coverage_tables.tokens(label))].append((geoid, label))
+            label = re.sub(r" (city|town|village)$", "", full)
+            cities[(st, coverage_tables.tokens(label))].append((geoid, label, full))
+        claimed = {path for (path,) in conn.execute("select path from slug where path ~ '^us/(or|fl|mi)/[^/]+$'")}
         for st, county_code, label in conn.execute(
             """select g.state, g.county, g.name from coverage_government g
-               where g.kind = 'municipality' and g.polity_id is null and g.county is not null and g.state in ('OR')"""
+               where g.kind = 'municipality' and g.polity_id is null and g.county is not null and g.state in ('OR', 'FL', 'MI')"""
         ).fetchall():
             hits = cities.get((st, coverage_tables.tokens(label)), [])
             if len(hits) == 1:
-                geoid, district = hits[0]
+                geoid, district, full = hits[0]
+                path = f"us/{st.lower()}/{slug(district)}"
                 unowned[st].append(
-                    (county_code, district, f"place:{geoid}", f"us/{st.lower()}/{slug(district)}", "municipality")
+                    (
+                        county_code,
+                        district,
+                        f"place:{geoid}",
+                        owned.get(f"place:{geoid}") or (f"us/{st.lower()}/{slug(full)}" if path in claimed else path),
+                        "municipality",
+                    )
                 )
         for key, found in feeds.items():
             state = key.split("-")[0]
@@ -3655,7 +3674,7 @@ def parse() -> None:
                        join external_id x on x.entity_id = g.polity_id and x.scheme = 'us.polity'
                            and x.value ~ '^(place|town|school):'
                        join slug s on s.entity_id = g.polity_id
-                       where g.state = %s and (g.kind in ('municipality', 'township') or g.kind = 'school' and g.state in ('MI', 'CA'))
+                       where g.state = %s and (g.kind in ('municipality', 'township') or g.kind = 'school' and g.state in ('MI', 'CA', 'NJ'))
                        order by g.id, x.value desc, s.path""",
                         [state],
                     ),
@@ -3735,7 +3754,11 @@ def parse() -> None:
                 if tokens[:3] == ["governing", "board", "member"]:
                     tokens = tokens[3:]
                 fits = []
-                for stem, sort, label, owner, path in towns.get(str(row["fips"]), []):
+                for stem, sort, label, owner, path in (
+                    [town for pool in towns.values() for town in pool]
+                    if state == "OR"
+                    else towns.get(str(row["fips"]), [])
+                ):
                     for start in (
                         ([], *([word, "of"] for word in ("city", "village", "town", "township", "borough")))
                         if sort != "school"
@@ -3754,7 +3777,7 @@ def parse() -> None:
                             if (
                                 said
                                 and (sort and said != sort or not sort and said == "township")
-                                or (sort == "school" or state in ("MI", "CA"))
+                                or (sort == "school" or state in ("MI", "CA", "NJ"))
                                 and (sort == "school")
                                 != bool(re.search(r"\b(school|schools|sch|education)\b", " ".join(rest)))
                             ):
@@ -3857,7 +3880,10 @@ def parse() -> None:
                 if (
                     template is None
                     and place
-                    and int(str(row["seats"]) or 0) <= 1
+                    and (
+                        int(str(row["seats"]) or 0) <= 1
+                        or re.search(r"(?i)\bcounty (council|commission)\b", str(row["contest"])) is not None
+                    )
                     and not LOCAL_BODY.search(str(row["contest"]))
                     and (
                         "-" not in key
@@ -4017,48 +4043,55 @@ def emit() -> Path:
         created: set[str] = set()
         made: set[object] = set()
         homes: dict[str, str] = {}
-        homeless: set[object] = set()
+        homeless: set[str] = set()
         for (fips, tail, template), group in frame.group_by(["fips", "tail", "template"], maintain_order=True):
             if template == "" and group["owner"][0]:
                 title, place, owner, home = (str(group[column][0]) for column in ("title", "place", "owner", "home"))
                 st, code, role = tail.split(":")[:3]
+                if owner.startswith(("school:", "place:")) and (
+                    owner in homeless
+                    or conn.execute(
+                        "select 1 from external_id where scheme = 'us.polity' and value = %s", [owner]
+                    ).fetchone()
+                    is None
+                    and conn.execute("select 1 from slug where path = %s", [home]).fetchone() is not None
+                ):
+                    homeless.add(owner)
+                    counts["no template"] += 1
+                    print(f"slug taken: {tail} {home}")
+                    continue
                 polity = cs.key("us.polity", owner)
                 body = role not in ("mayor", "supervisor", "clerk", "treasurer", "president")
-                holder = cs.key("us.body" if body else "us.office", f"{st}:{code}:{role}")
                 if polity in cs.minted and polity not in made and owner.startswith(("school:", "place:")):
                     made.add(polity)
-                    if conn.execute("select 1 from slug where path = %s", [home]).fetchone() is not None:
-                        homeless.add(polity)
-                        print(f"slug taken: {home}")
-                    else:
-                        geoid = owner.split(":")[1]
-                        scheme, polity_kind = (
-                            ("us.school_district", "school_district")
-                            if owner.startswith("school:")
-                            else ("us.place", "municipality")
-                        )
-                        cs.add("polity", id=polity, kind=polity_kind, iso_code=None)
-                        name(polity, place)
-                        cs.add("polity_parent", polity_id=polity, parent_id=cs.polity(f"US-{st}"))
-                        cs.add("slug", path=home, entity_id=polity)
-                        district_area = cs.area(scheme, geoid)
-                        if district_area in cs.minted:
-                            cs.add("area", id=district_area, scheme_code=scheme)
-                            cs.add("area_code", area_id=district_area, code=geoid, valid_from=None)
-                            cs.add("area_parent", area_id=district_area, parent_id=cs.area("us.state", geoid[:2]))
-                            name(district_area, f"{place}, {st}")
-                        cs.add("polity_territory", polity_id=polity, area_id=district_area)
-                        cs.add(
-                            "reporting_unit",
-                            id=cs.unit(scheme, geoid),
-                            polity_id=polity,
-                            scheme_code=scheme,
-                            code=geoid,
-                            area_relation="equals",
-                            area_id=district_area,
-                            kind="standard",
-                            valid_from=None,
-                        )
+                    geoid = owner.split(":")[1]
+                    scheme, polity_kind = (
+                        ("us.school_district", "school_district")
+                        if owner.startswith("school:")
+                        else ("us.place", "municipality")
+                    )
+                    cs.add("polity", id=polity, kind=polity_kind, iso_code=None)
+                    name(polity, place)
+                    cs.add("polity_parent", polity_id=polity, parent_id=cs.polity(f"US-{st}"))
+                    cs.add("slug", path=home, entity_id=polity)
+                    district_area = cs.area(scheme, geoid)
+                    if district_area in cs.minted:
+                        cs.add("area", id=district_area, scheme_code=scheme)
+                        cs.add("area_code", area_id=district_area, code=geoid, valid_from=None)
+                        cs.add("area_parent", area_id=district_area, parent_id=cs.area("us.state", geoid[:2]))
+                        name(district_area, f"{place}, {st}")
+                    cs.add("polity_territory", polity_id=polity, area_id=district_area)
+                    cs.add(
+                        "reporting_unit",
+                        id=cs.unit(scheme, geoid),
+                        polity_id=polity,
+                        scheme_code=scheme,
+                        code=geoid,
+                        area_relation="equals",
+                        area_id=district_area,
+                        kind="standard",
+                        valid_from=None,
+                    )
                 whole = (
                     (cs.area("us.school_district" if owner.startswith("school:") else "us.place", owner.split(":")[1]),)
                     if polity in cs.minted
@@ -4069,10 +4102,11 @@ def emit() -> Path:
                         [owner],
                     ).fetchone()
                 )
-                if whole is None or polity in homeless:
+                if whole is None:
                     counts["no template"] += 1
                     print(f"no territory: {tail} {owner}")
                     continue
+                holder = cs.key("us.body" if body else "us.office", f"{st}:{code}:{role}")
                 if holder in cs.minted and holder not in made:
                     made.add(holder)
                     if body:
@@ -4126,20 +4160,24 @@ def emit() -> Path:
                 title, place = str(group["title"][0]), str(group["place"][0])
                 st, county = tail.split(":")[:2]
                 polity = cs.key("us.polity", f"county:{county}")
-                office = cs.key("us.office", tail)
+                seats = int(group["seats"][0] or 1)
+                office = cs.key("us.office" if seats == 1 else "us.body", tail)
                 if office in cs.minted:
-                    cs.add("office", id=office, polity_id=polity, kind="other")
+                    if seats == 1:
+                        cs.add("office", id=office, polity_id=polity, kind="other")
+                    else:
+                        cs.add("body", id=office, polity_id=polity, kind="council")
                     name(office, f"{place} {title.removeprefix('County ')}")
                 templates[tail] = (
                     tail,
                     None,
-                    "office",
-                    office,
+                    "office" if seats == 1 else "body_seats",
+                    office if seats == 1 else None,
+                    None if seats == 1 else office,
+                    None if seats == 1 else cs.area("us.county", county),
                     None,
                     None,
-                    None,
-                    None,
-                    1,
+                    seats,
                     "full",
                     cs.key("us.electoral_system", "fptp"),
                     "counted",
