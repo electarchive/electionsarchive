@@ -622,4 +622,16 @@ def emit() -> Path:
                     values.extend((cs.unit("us.county", county), name, value) for county, value in cells.items())
                 city_contest(day, office_key, office_slug, office_label, source, candidates, values, "county")
                 print(f"{day} {office_slug}: {candidates}")
+        for contest, in conn.execute(
+            """select c.id from contest c join changeset h on h.id = c.changeset_id
+               join external_id x on x.entity_id = c.id and x.scheme = 'us.contest'
+               join entity e on e.id = c.id and e.retired_by is null
+               where h.pipeline = %s and x.value like '%%1921-11-08%%borough-president%%'""",
+            [SOURCE],
+        ).fetchall():
+            cs.add(
+                "entity_retirement",
+                entity_id=contest,
+                reason="The report's column headings name only three of the candidates, so shares would omit the minor lines",
+            )
         return cs.write()
