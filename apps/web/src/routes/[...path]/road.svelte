@@ -16,7 +16,6 @@
     rounds,
     cycle,
     after = [],
-    paint = new Map(),
     more,
   }: {
     rounds: Extract<PageData, { kind: "contest" }>["rounds"];
@@ -27,7 +26,6 @@
       date: string | null;
       path: string | null;
     }>;
-    paint?: Map<string, string>;
     more?: Snippet;
   } = $props();
 
@@ -281,9 +279,7 @@
           <span class="inline-flex items-baseline gap-x-1.5">
             <Name
               label={leader.label}
-              color={(entry.isCurrent
-                ? paint.get(leader.person ?? "")
-                : undefined) ?? swatch(leader.color, leader.key)}
+              color={swatch(leader.color, leader.key)}
               person={leader.person}
               party={leader.party}
             />
