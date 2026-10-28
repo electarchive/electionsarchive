@@ -17,6 +17,7 @@ import polars as pl
 from ea import raw, readiness, statewide_table
 from ea.changeset import NAMESPACE, Changeset, slug
 from ea.names import initials
+from ea.sources.us.oe_primaries_2026 import FIPS
 from ea.store import DATA, connect
 
 SOURCE = "us.fec_2026"
@@ -1928,7 +1929,7 @@ def emit() -> Path:
         ).fetchall()
         due = {
             office: st
-            for st, office, _, when, joint, _ in statewide_table.schedule(conn, DAY.year)
+            for st, office, _, when, joint, _, _ in statewide_table.schedule(conn, DAY.year)
             if when == DAY.year and not joint
         }
         offices: dict[str, str] = {}
@@ -2046,6 +2047,23 @@ def emit() -> Path:
         latest_plan = conn.execute(
             "select id from boundary_set where scheme_code = 'us.cd' order by valid_from desc limit 1"
         ).fetchone()[0]
+        sitting: dict[str, set[UUID]] = {"house": set(), "senate": set()}
+        members: dict[tuple[str, str], list[list[str]]] = {}
+        states = {fips: state for state, fips in FIPS.items()}
+        for chamber, person, held_name, fips in conn.execute(
+            """select case when n.text = 'United States Senate' then 'senate' else 'house' end, t.person_id, pn.text,
+                      (select left(ac.code, 2) from area_code ac where ac.area_id = s.apportioned_area_id limit 1)
+               from tenure t join name n on n.entity_id = t.body_id and n.is_preferred
+               join seat s on s.id = t.seat_id
+               join name pn on pn.entity_id = t.person_id and pn.is_preferred and pn.lang = 'en'
+               where n.text in ('United States House of Representatives', 'United States Senate')
+                 and t.from_date <= %(day)s and (t.to_date is null or t.to_date >= %(day)s)""",
+            {"day": DAY},
+        ):
+            sitting[chamber].add(person)
+            members.setdefault((chamber, states.get(fips, "")), []).append(
+                [token for token in slug(re.sub(r'"[^"]*"', " ", held_name)).split("-") if not SUFFIX.fullmatch(token)]
+            )
         state_names = dict(
             conn.execute(
                 """select right(p.iso_code, 2), n.text from polity p
@@ -2638,6 +2656,22 @@ def emit() -> Path:
                     option_id=option,
                     role="head",
                     is_independent=party_id is None and state != "AS",
+                    is_incumbent=(
+                        person in sitting[key.split(":")[2]]
+                        or any(
+                            member[-1] == tokens[-1] and member[0][:3] == tokens[0][:3]
+                            for member in members.get((key.split(":")[2], state), [])
+                            if (
+                                tokens := [
+                                    token
+                                    for token in slug(re.sub(r'"[^"]*"', " ", ballot)).split("-")
+                                    if not SUFFIX.fullmatch(token)
+                                ]
+                            )
+                        )
+                    )
+                    if re.fullmatch(r"[\d-]+:[A-Z]{2}:(house:\d+|senate(:special)?)", key)
+                    else None,
                 )
                 if state in sources and key in listed:
                     cs.add("citation", entity_id=candidacy, source_id=sources[state], locator=None)
