@@ -45,6 +45,9 @@ ROW = re.compile(
 )
 
 ELEVATED = {
+    "64": ["Kütahya"],
+    "02": ["Malatya"],
+    "54": ["Kocaeli"],
     "71": ["Ankara"],
     "68": ["Niğde"],
     "69": ["Gümüşhane"],
