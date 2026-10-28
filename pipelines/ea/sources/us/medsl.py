@@ -191,6 +191,28 @@ def parse() -> None:
         .group_by("year", "state_po", "code", "kind", "candidate", "measure", maintain_order=True)
         .agg(pl.col("votes").sum(), pl.col("totalvotes").max())
     )
+    named = counted.filter((pl.col("state_po") == "CT") & (pl.col("year") == 2024))["candidate"].drop_nulls()
+    regions = (
+        precincts({("president", 2024): raw.cached(SOURCE, DATAVERSE + "13730901").path})
+        .filter((pl.col("state") == "CT") & (pl.col("measure") == 1))
+        .group_by(
+            year=pl.lit(2024, pl.Int64),
+            state_po=pl.col("state"),
+            code=pl.col("jurisdiction")
+            .str.to_lowercase()
+            .str.replace_all(r"[^a-z]", "")
+            .replace_strict(ct_regions(), return_dtype=pl.String),
+            kind=pl.lit("county"),
+            candidate=pl.when(pl.col("candidate").is_in(named.to_list())).then("candidate").otherwise(pl.lit("OTHER")),
+            measure=pl.col("measure").cast(pl.Int16),
+            maintain_order=True,
+        )
+        .agg(pl.col("votes").sum())
+        .with_columns(totalvotes=pl.col("votes").sum().over("code"))
+    )
+    counted = pl.concat(
+        [counted.filter((pl.col("state_po") != "CT") | (pl.col("year") < 2022)), regions.select(counted.columns)]
+    )
     uneven = (
         counted.filter(pl.col("measure") == 1)
         .group_by("year", "state_po", "code")
@@ -566,7 +588,7 @@ def emit() -> Path:
                        where id = (select entity_id from external_id where scheme = %s and value = %s)""",
                     [f"{SOURCE}.result_set", f"{key}:county"],
                 ).fetchone()
-                if state == "AK"
+                if state == "AK" or state == "CT" and year >= 2022
                 else None
             )
             if previous is not None:
@@ -593,7 +615,8 @@ def emit() -> Path:
                     status="superseded",
                 )
             result_sets[(year, state)] = cs.key(
-                f"{SOURCE}.result_set", f"{key}:county" + (":districts" if state == "AK" else "")
+                f"{SOURCE}.result_set",
+                f"{key}:county" + (":districts" if state == "AK" else ":regions" if previous is not None else ""),
             )
             cs.add(
                 "result_set",
@@ -779,6 +802,7 @@ def attach(
         if election is None or first is None or not official or first > 1:
             print(f"{key}: no official total or first round, skipped")
             continue
+        again = restage
         if district is not None and (chamber == "president" or at_large not in contests):
             zeros = {
                 code: counties[code][1]
@@ -804,6 +828,7 @@ def attach(
             if dropped:
                 lines = lines.filter(~pl.col("code").is_in(dropped))
                 skipped_outside.append((key, len(dropped)))
+                again = True
         known = []
         for option, kind, label, name, fec in conn.execute(
             """select o.id, o.kind, o.ballot_label, n.text,
@@ -990,14 +1015,24 @@ def attach(
                     kind="caveat",
                     body_md=f"The certified county totals add up to {counted_votes:,} votes. The earlier default set counts {int(official):,}. {authoritative}",
                 )
+        if not again and district is not None and result_set not in cs.minted:
+            again = (
+                conn.execute(
+                    """select 1 from result_set r join result_value v on v.result_set_k = r.k
+                       join reporting_unit u on u.k = v.unit_k and u.scheme_code = 'us.county_part'
+                       where r.id = %s group by u.k having sum(abs(v.value)) = 0 limit 1""",
+                    [result_set],
+                ).fetchone()
+                is not None
+            )
         held = (
             conn.execute("select is_default from result_set where id = %s", [result_set]).fetchone()
-            if restage and result_set not in cs.minted
+            if again and result_set not in cs.minted
             else None
         )
         if (
             result_set not in cs.minted
-            and not restage
+            and not again
             and not conn.execute(
                 """select 1 from result_set r where r.id = %s
                    and not exists (select from result_value v where v.result_set_k = r.k and v.value <> 0)""",

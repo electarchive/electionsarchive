@@ -83,6 +83,15 @@ SWAPPED = {
     ("AZ", "YAVAPAI", "RUBY SMITH"): "JAY RUBY",
     ("NY", "ESSEX", "BILLY D JONES"): "D BILLY JONES",
 }
+UNLABELED = {
+    "AZ:KEVIN VOLK": "DEMOCRAT",
+    "IA:CHRISTIAN HERMANSON": "REPUBLICAN",
+    "NH:MARK PROULXR": "REPUBLICAN",
+    "OR:SHANNON JONES ISADORE": "DEMOCRAT",
+    "OR:APRIL DOBSON": "DEMOCRAT",
+    "OR:WILLY CHOTZEN": "DEMOCRAT",
+    "OR:KHANH PHAM": "DEMOCRAT",
+}
 POOLED = {"WRITE-IN", "SCATTER", "MISC", "OTHERS", "WRITE-INS", "WRITE IN"}
 DROPPED = {
     "UNDERVOTES",
@@ -116,7 +125,6 @@ NATIONAL = {
 }
 INDEPENDENT = {
     "INDEPENDENT",
-    "NONPARTISAN",
     "UNDECLARED",
     "NO PARTY AFFILIATION",
     "UNAFFILIATED",
@@ -264,6 +272,12 @@ def parse() -> None:
         candidate=pl.struct("state_po", "county_name", "candidate").map_elements(
             lambda row: SWAPPED.get((row["state_po"], row["county_name"], row["candidate"]), row["candidate"]),
             return_dtype=pl.String,
+        )
+    )
+    frame = frame.with_columns(
+        party_detailed=pl.coalesce(
+            "party_detailed",
+            pl.concat_str("state_po", "candidate", separator=":").replace_strict(UNLABELED, default=None),
         )
     )
     recounted = frame.filter(pl.col("stage") == "GEN RECOUNT").select("state_po", "office", "district").unique()
@@ -656,6 +670,28 @@ def emit() -> Path:
                 [SOURCE],
             ).fetchall()
         )
+        taken: set[UUID] = {
+            id
+            for (id,) in conn.execute(
+                """with mine as (select distinct r.contest_id from result_set r join changeset h on h.id = r.changeset_id
+                                 where h.pipeline = %(source)s)
+                   select o.id from contest_option o join mine m on m.contest_id = o.contest_id
+                   join changeset c on c.id = o.changeset_id where c.pipeline <> %(source)s
+                   union all
+                   select cd.id from candidacy cd join contest_option o on o.id = cd.option_id
+                   join mine m on m.contest_id = o.contest_id
+                   join changeset c on c.id = cd.changeset_id where c.pipeline <> %(source)s""",
+                {"source": SOURCE},
+            ).fetchall()
+        }
+        ceded: set[UUID] = {
+            id
+            for (id,) in conn.execute(
+                """select r.id from result_set r join election e on e.id = r.election_id
+                   where not r.is_default and e.date_from = %s""",
+                [DAY],
+            ).fetchall()
+        }
         last_party: dict[UUID, UUID] = dict(
             conn.execute(
                 """select distinct on (cd.person_id) cd.person_id, o.party_id
@@ -792,6 +828,8 @@ def emit() -> Path:
             if "/" in label:
                 found = [party(state, part.strip()) for part in CROSS_FILED.get((state, label), label).split("/")]
                 return next((id for id, _ in found if id is not None), None), all(alone for _, alone in found)
+            if label == "NONPARTISAN":
+                return None, False
             if label in INDEPENDENT:
                 return None, True
             if label in NATIONAL:
@@ -911,7 +949,7 @@ def emit() -> Path:
                 kind="counted",
                 status="active",
                 source_id=sources[group["origin"][0]],
-                is_default=contest_key not in RANKED_ROUNDS,
+                is_default=contest_key not in RANKED_ROUNDS and result_set not in ceded,
                 completeness=None if group["masked"].any() else 1,
             )
             if group["masked"].any():
@@ -940,9 +978,9 @@ def emit() -> Path:
                     single = re.fullmatch(r"[A-Z'-]+", str(candidate)) is not None
                     for key in (f"{first} {surname}", surname) if single else (f"{first} {surname}",):
                         by_code = past.get((body_key, key), {})
-                        found = by_code.get(full, set()) or (
-                            set().union(*by_code.values()) if key != surname else set()
-                        )
+                        found = (
+                            by_code.get(full, set()) or (set().union(*by_code.values()) if key != surname else set())
+                        ) - surnamed
                         if len(found) == 1:
                             break
                     head = cs.key("us.candidacy", f"{option_key}:head")
@@ -971,42 +1009,51 @@ def emit() -> Path:
                             if single and " " not in ballot:
                                 problems.append(f"surname only: {state} {office} {district} {candidate}")
                     persons[person_key] = person
-                    cs.add(
-                        "candidacy",
-                        id=head,
-                        person_id=person,
-                        option_id=root,
-                        role="head",
-                        ballot_name=ballot,
-                        is_independent=all(independent for _, independent in resolved),
-                    )
-                    for label in labels:
-                        for part in (label or "").split("/") if "/" in (label or "") else ():
-                            if (nominee := party(state, part.strip())[0]) is not None:
-                                cs.add("candidacy_nomination", candidacy_id=head, party_id=nominee, kind="nominated")
-                    if principal is None and not all(independent for _, independent in resolved):
+                    if head not in taken:
+                        cs.add(
+                            "candidacy",
+                            id=head,
+                            person_id=person,
+                            option_id=root,
+                            role="head",
+                            ballot_name=ballot,
+                            is_independent=all(independent for _, independent in resolved),
+                        )
+                        for label in labels:
+                            for part in (label or "").split("/") if "/" in (label or "") else ():
+                                if (nominee := party(state, part.strip())[0]) is not None:
+                                    cs.add(
+                                        "candidacy_nomination", candidacy_id=head, party_id=nominee, kind="nominated"
+                                    )
+                    if (
+                        principal is None
+                        and "NONPARTISAN" not in labels
+                        and not all(independent for _, independent in resolved)
+                    ):
                         principal = last_party.get(person)
-                cs.add(
-                    "contest_option",
-                    id=root,
-                    contest_id=contest,
-                    kind="write_in" if pooled else "candidate",
-                    party_id=principal,
-                    ballot_label=ballot,
-                )
+                if root not in taken:
+                    cs.add(
+                        "contest_option",
+                        id=root,
+                        contest_id=contest,
+                        kind="write_in" if pooled else "candidate",
+                        party_id=principal,
+                        ballot_label=ballot,
+                    )
                 for label, (party_id, _), votes in zip(labels, resolved, rows["votes"], strict=True):
                     target = root
                     if len(rows) > 1:
                         target = cs.key("us.option", f"{option_key}:{slug(label or 'no party')}")
-                        cs.add(
-                            "contest_option",
-                            id=target,
-                            contest_id=contest,
-                            parent_option_id=root,
-                            kind="candidate",
-                            party_id=party_id,
-                            ballot_label=f"{ballot} ({title(label or 'no party')})",
-                        )
+                        if target not in taken:
+                            cs.add(
+                                "contest_option",
+                                id=target,
+                                contest_id=contest,
+                                parent_option_id=root,
+                                kind="candidate",
+                                party_id=party_id,
+                                ballot_label=f"{ballot} ({title(label or 'no party')})",
+                            )
                     if votes is not None and result_set in cs.minted:
                         values.append((str(result_set), str(unit), str(target), votes))
                 if not pooled:
