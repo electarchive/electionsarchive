@@ -75,6 +75,20 @@ class Stage:
                and p.valid_from >= {start}::date"""
         ).format(pipeline=sql.Literal(self.pipeline), areas=sql.Literal(drop["areas"]), start=sql.Literal(drop["from"]))
 
+    def unstaged(self, table: str) -> sql.Composable:
+        return sql.SQL(
+            """c.id = p.changeset_id and c.pipeline = any({writers})
+               and p.tenure_id in (select tenure_id from {staged})
+               and not exists (select 1 from {staged} x where {same})"""
+        ).format(
+            writers=self.writers(table),
+            staged=self.staged(table),
+            same=sql.SQL(" and ").join(
+                sql.SQL("x.{0} is not distinct from p.{0}").format(sql.Identifier(column))
+                for column in self.tables[table]
+            ),
+        )
+
     def staged(self, table: str) -> sql.Composable:
         return sql.SQL("{}.{}").format(sql.Identifier(self.schema), sql.Identifier(table))
 

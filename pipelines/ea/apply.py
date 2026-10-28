@@ -178,6 +178,14 @@ def _diff(conn: Connection, stage: Stage) -> dict[str, dict[str, int]]:
             ).fetchone()
             assert dropped is not None
             diff[table]["delete"] = dropped[0]
+        if table == "tenure_affiliation":
+            unstaged = conn.execute(
+                sql.SQL("select count(*) from public.{} p, changeset c where {}").format(
+                    sql.Identifier(table), stage.unstaged(table)
+                )
+            ).fetchone()
+            assert unstaged is not None
+            diff[table]["delete"] = unstaged[0]
         if table in stage.parents:
             deleted = conn.execute(
                 sql.SQL("select count(*) from public.{} p, changeset c where {}").format(
@@ -934,6 +942,10 @@ def _publish_table(conn: Connection, stage: Stage, table: str) -> None:
                 """delete from public.{target} p using {staged} s, changeset c
                    where c.id = p.changeset_id and c.pipeline = any({writers}) and {overlaps}"""
             ).format(target=target, staged=staged, writers=stage.writers(table), overlaps=stage.overlaps(table))
+        )
+    if table == "tenure_affiliation":
+        conn.execute(
+            sql.SQL("delete from public.{} p using changeset c where {}").format(target, stage.unstaged(table))
         )
     if table in stage.parents:
         if stage.parents[table] == "result_set_id" and stage.clears:
