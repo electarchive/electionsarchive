@@ -109,7 +109,7 @@ export async function rebuild() {
   let built = 0;
   let failed = 0;
   await Promise.all(
-    Array.from({ length: 2 }, async () => {
+    Array.from({ length: Number(process.env.PARTY_PAGE_WORKERS ?? 2) }, async () => {
       for (let id = queue.pop(); id != null; id = queue.pop()) {
         try {
           const read = new Date().toISOString();
