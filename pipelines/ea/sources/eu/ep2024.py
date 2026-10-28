@@ -10,6 +10,7 @@ from collections import defaultdict
 from datetime import date
 from html.parser import HTMLParser
 from pathlib import Path
+from uuid import UUID
 
 import polars as pl
 from PIL import Image
@@ -1153,6 +1154,38 @@ COUNTRIES = {
     "EE": "Estonia",
     "RO": "Romania",
 }
+NAMES = {
+    ("BE", "LES ENGAGÉS"): "Les Engagés",
+    ("ES", "SUMAR"): "Sumar",
+    ("ES", "PODEMOS"): "Podemos",
+    ("ES", "COALICIÓN POR UNA EUROPA SOLIDARIA"): "Coalición por una Europa Solidaria",
+    ("HR", "MOŽEMO! - POLITIČKA PLATFORMA"): "Možemo! – politička platforma",
+    ("HR", "DOMOVINSKI POKRET - DP"): "Domovinski pokret",
+    ("HU", "TISZA"): "Tisztelet és Szabadság Párt",
+    ("LU", "DP – DEMOKRATESCH PARTEI"): "Demokratesch Partei",
+    ("LV", "LATVIJA PIRMAJĀ VIETĀ"): "Latvija pirmajā vietā",
+    ("PL", "KOALICYJNY KOMITET WYBORCZY KOALICJA OBYWATELSKA"): "Koalicja Obywatelska",
+    ("PL", "KOALICYJNY KOMITET WYBORCZY LEWICA"): "Lewica",
+    (
+        "PL",
+        "KOALICYJNY KOMITET WYBORCZY TRZECIA DROGA POLSKA 2050 SZYMONA HOŁOWNI - POLSKIE STRONNICTWO LUDOWE",
+    ): "Trzecia Droga",
+    ("PL", "KOMITET WYBORCZY KONFEDERACJA WOLNOŚĆ I NIEPODLEGŁOŚĆ"): "Konfederacja Wolność i Niepodległość",
+    ("PT", "AD — ALIANÇA DEMOCRÁTICA"): "Aliança Democrática",
+    ("PT", "CHEGA"): "Chega",
+    ("RO", "PARTIDUL S.O.S. ROMÂNIA"): "S.O.S. România",
+    ("RO", "ALIANȚA AUR"): "Alianța AUR",
+    ("RO", "ALIANȚA ELECTORALĂ PSD PNL"): "Alianța Electorală PSD PNL",
+    ("RO", "ȘTEFĂNUȚĂ NICOLAE-BOGDĂNEL"): "Nicolae Ștefănuță",
+    ("RO", "UNIUNEA DEMOCRATĂ MAGHIARĂ DIN ROMÂNIA"): "Uniunea Democrată Maghiară din România",
+    ("RO", "ALIANȚA DREAPTA UNITĂ USR - PMP - FORȚA DREPTEI"): "Alianța Dreapta Unită",
+    ("SI", "NOVA SLOVENIJA - KRŠČANSKI DEMOKRATI"): "Nova Slovenija – Krščanski demokrati",
+    ("SI", "SOCIALNI DEMOKRATI - SD"): "Socialni demokrati",
+    ("SI", "VESNA - ZELENA STRANKA"): "Vesna – zelena stranka",
+    ("SI", "SLOVENSKA DEMOKRATSKA STRANKA - SDS"): "Slovenska demokratska stranka",
+    ("SI", "GIBANJE SVOBODA"): "Gibanje Svoboda",
+    ("SK", "REPUBLIKA"): "Republika",
+}
 PARTIES = {
     ("ES", "Partido Popular"): "da48502c-6236-5a46-a8dc-8fc85e82630d",
     ("ES", "Partido Socialista Obrero Español"): "2fb658c3-582f-5475-88fa-826e073a3b30",
@@ -1178,6 +1211,28 @@ PARTIES = {
     ("CZ", "Česká pirátská strana"): "f97e97c0-5ec8-50e9-9849-5d3eb6609036",
     ("FR", "LA FRANCE REVIENT ! AVEC JORDAN BARDELLA ET MARINE LE PEN"): "6e3a553f-9b1f-5a04-86fe-c52913e4dd6f",
     ("FR", "BESOIN D'EUROPE"): "30193ee0-3050-5f91-aa5b-da1b19748c14",
+    ("FR", "RÉVEILLER L'EUROPE"): "9fab4680-3011-5c3a-bd33-bdc6e96693aa",
+    ("FR", "LA DROITE POUR FAIRE ENTENDRE LA VOIX DE LA FRANCE EN EUROPE"): "a9e91bb9-8c0e-5ad8-bc9f-2b7d6dcbee12",
+    (
+        "FR",
+        "LA FRANCE FIERE, MENEE PAR MARION MARECHAL ET SOUTENUE PAR ÉRIC ZEMMOUR",
+    ): "0c388226-b799-55a3-94a3-7196b0e8f7c4",
+    ("HU", "FIDESZ-KDNP"): "bd1f0f84-9ecd-5b5b-8eb1-7a0c56c5a859",
+    ("GR", "ΝΕΑ ΔΗΜΟΚΡΑΤΙΑ"): "902fab40-b8be-5a48-8b3e-7ee9d481bc46",
+    ("GR", "ΠΑΣΟΚ - Κίνημα Αλλαγής"): "a27f2266-4eae-5537-8c6c-0e89b09c1b16",
+    ("CY", "ΔΗΜΟΚΡΑΤΙΚΟΣ ΣΥΝΑΓΕΡΜΟΣ"): "19a45f23-1ddb-5f8b-83dc-ebfef7c062e6",
+    ("CY", "ΑΚΕΛ (Α.Κ.Ε.Λ.) ΑΡΙΣΤΕΡΑ - ΚΟΙΝΩΝΙΚΗ ΣΥΜΜΑΧΙΑ"): "e7532986-78e5-5c6b-bc1c-467d2334db0e",
+    ("CY", "ΔΗΜΟΚΡΑΤΙΚΟ ΚΟΜΜΑ"): "3afa9fd8-546d-522d-b2d5-710c8d6f7d1d",
+    ("BG", "ГЕРБ-СДС"): "0c4b54b3-f9af-5e5d-8c1d-8f46cc136389",
+    ("BG", "Движение за права и свободи – ДПС"): "b0632691-314e-5e0b-8262-87d09ab2fa13",
+    ("BG", "БСП за БЪЛГАРИЯ"): "e7daa94d-7424-5897-aba1-66797a4f26f3",
+    ("EE", "Eesti Reformierakond"): "d3ec8416-9e8b-5bbd-85e5-cc695105d91c",
+    ("EE", "ISAMAA Erakond"): "5930d099-46c8-5066-acf8-40c4c75e2c53",
+    ("EE", "Sotsiaaldemokraatlik Erakond"): "50a616f2-a170-5522-b7ab-9ae19c56e669",
+    ("LT", "Tėvynės sąjunga-Lietuvos krikščionys demokratai"): "39abea74-147a-5c10-b1ca-73bcac88b9ca",
+    ("LT", "Lietuvos socialdemokratų partija"): "da5f33c2-ada3-57eb-a9d5-1c6366db2102",
+    ("IT", "ALLEANZA VERDI E SINISTRA"): "01a13bf7-300c-7784-acd9-f60f3ecf846c",
+    ("LV", '"PROGRESĪVIE"'): "1a055a9d-089b-53a5-87bd-faa37cacf5fa",
     ("FR", "LA FRANCE INSOUMISE - UNION POPULAIRE"): "9669c097-0cc7-5768-8612-04d04e503458",
     ("FR", "EUROPE ÉCOLOGIE"): "c51441df-526d-5109-b48b-d69af65f7dd7",
     ("HR", "HRVATSKA DEMOKRATSKA ZAJEDNICA - HDZ"): "3f363d1b-38dd-5ecd-88f0-44d553996fd3",
@@ -1236,6 +1291,12 @@ def emit() -> Path:
         if missing := set(PARTIES.values()) - known:
             raise ValueError(f"unknown parties {missing}")
         merged = dict(conn.execute("select entity_id::text, into_id::text from entity_merge").fetchall())
+        published = dict(
+            conn.execute(
+                """select x.value, x.entity_id::text from external_id x where x.scheme = 'eu.ep2024.party'
+                   and not exists (select from entity_merge m where m.entity_id = x.entity_id)"""
+            ).fetchall()
+        )
 
         def name(entity, text: str, lang: str = "en", kind: str = "official", preferred: bool = True) -> None:
             cs.add(
@@ -1367,9 +1428,13 @@ def emit() -> Path:
                         if mapped is None
                         else merged.get(mapped, mapped)
                     )
+                    proper = NAMES.get((iso, row["label"]))
                     if mapped is None and party in cs.minted:
                         cs.add("party", id=party, polity_id=polity)
-                        name(party, row["label"], "und", "official", True)
+                    if mapped is None and (party in cs.minted or proper is not None):
+                        name(party, proper or row["label"], "und", "official", True)
+                    if mapped is not None and (old := published.get(f"{iso}:{row['label']}")) is not None:
+                        cs.merge(UUID(old), UUID(str(party)))
                     option = cs.key(
                         "eu.ep2024.option",
                         f"{iso}:2024:{college + ':' if college else ''}{row['position']}:{fold(row['label'])}",

@@ -838,11 +838,20 @@ def emit() -> Path:
                 """
                 select p.id, n.text, p.birth_date from person p
                 join external_id x on x.entity_id = p.id and x.scheme = 'br.tse.person'
-                join name n on n.entity_id = p.id and n.is_preferred
-                where p.birth_date is not null
+                join name n on n.entity_id = p.id and n.kind = 'official'
+                where p.birth_date is not null and not exists (select from entity_merge m where m.entity_id = p.id)
                 """
             ).fetchall()
         }
+        for value, entity in conn.execute(
+            """
+            select x.value, x.entity_id from external_id x
+            where x.scheme = 'br.tse_history.person'
+              and not exists (select from entity_merge m where m.entity_id = x.entity_id)
+            """
+        ).fetchall():
+            if value in persons and persons[value] != entity:
+                cs.merge(entity, persons[value])
         options: dict[str, str] = {}
         result_sets: dict[str, str] = {}
         contests: dict[str, UUID] = {}
