@@ -13,7 +13,7 @@ from ea.sources.us.in_federal import CODES, NAMES, PUBLISHER
 from ea.store import DATA, connect
 
 SOURCE = "us.in_enr_legislature"
-VERSION = "1"
+VERSION = "2"
 PARSED = DATA / "parsed" / SOURCE
 DAYS = {
     2002: date(2002, 11, 5),
@@ -21,6 +21,12 @@ DAYS = {
     2006: date(2006, 11, 7),
     2008: date(2008, 11, 4),
     2010: date(2010, 11, 2),
+    2012: date(2012, 11, 6),
+    2014: date(2014, 11, 4),
+    2016: date(2016, 11, 8),
+    2018: date(2018, 11, 6),
+    2020: date(2020, 11, 3),
+    2022: date(2022, 11, 8),
     2024: date(2024, 11, 5),
 }
 OFFICES = {"State Representative": "house", "State Senator": "senate"}
@@ -97,7 +103,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Indiana's state legislative generals by county, 2002-2010, and its 2024 governor by county (Election Division)",
+            summary="Indiana's state legislative generals by county, 2002–2024, and its 2024 governor by county (Election Division)",
             polity="US-IN",
         )
         source = cs.source(PUBLISHER, TITLE)
