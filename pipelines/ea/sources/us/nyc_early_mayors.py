@@ -14,7 +14,8 @@ SOURCE = "us.nyc_early_mayors"
 VERSION = "1"
 PARSED = DATA / "parsed" / SOURCE
 API = "https://en.wikipedia.org/w/api.php?"
-YEARS = [*range(1897, 1986, 4)]
+SPECIALS = {1932: date(1932, 11, 8), 1950: date(1950, 11, 7)}
+YEARS = sorted([*range(1897, 1986, 4), *SPECIALS])
 TITLE = "New York City mayoral election articles, results boxes"
 NOTE = (
     "Citywide votes as tabulated in the results boxes of the English Wikipedia's articles on each New York City mayoral "
@@ -58,7 +59,7 @@ def page(year: int) -> str:
             "prop": "revisions",
             "rvprop": "content|ids",
             "rvslots": "main",
-            "titles": f"{year} New York City mayoral election",
+            "titles": f"{year} New York City {'special ' if year in SPECIALS else ''}mayoral election",
             "redirects": 1,
             "format": "json",
             "formatversion": 2,
@@ -108,7 +109,7 @@ def parse() -> None:
                 for key, value in [part.split("=", 1)]
             }
             votes = re.sub(r"\D", "", text(fields.get("votes", "")))
-            name = re.sub(r"\s*\((?:incumbent|inc\.|deceased|inc\., write-in)\)", "", text(fields["candidate"])).strip()
+            name = re.sub(r"\s*\([^)]*\)", "", text(fields["candidate"])).strip()
             rows.append(
                 {
                     "year": year,
@@ -168,7 +169,7 @@ def emit() -> Path:
         seen: set[object] = set()
         for (year,), rows in frame.group_by(["year"], maintain_order=True):
             first = date(year, 11, 1)
-            day = first + timedelta(days=(0 - first.weekday()) % 7 + 1)
+            day = SPECIALS.get(year, first + timedelta(days=(0 - first.weekday()) % 7 + 1))
             kind = "general" if year % 2 == 0 else "local"
             parent_key = f"{day}:NY"
             parent = cs.key("us.election", parent_key)
@@ -203,7 +204,7 @@ def emit() -> Path:
             contest_key = f"nyc_early_mayors:{day}:NY:3651000:mayor"
             contest = cs.key("us.contest", contest_key)
             path = f"{polity_path}/{day}-{kind}/mayor"
-            if path in taken:
+            if path in taken and contest in cs.minted:
                 raise ValueError(f"{path} is already taken")
             cs.add(
                 "contest",
@@ -218,9 +219,9 @@ def emit() -> Path:
                 previous_round_id=None,
                 electoral_system_id=system,
                 default_result_kind="counted",
-                term="full",
+                term="remainder" if year in SPECIALS else "full",
             )
-            name(contest, f"{year} New York City mayoral election")
+            name(contest, f"{year} New York City {'special ' if year in SPECIALS else ''}mayoral election")
             cs.add("slug", path=path, entity_id=contest)
             result_set = cs.key(f"{SOURCE}.result_set", contest_key)
             cs.add(
