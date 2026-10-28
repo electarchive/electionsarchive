@@ -244,6 +244,7 @@
           total: {
             ...base,
             anchor: `${tiers[0]?.anchor ?? base.anchor}-total`,
+            drawn: base.anchor,
             path: null,
             kind: "body_seats",
             count: 1,
@@ -1538,16 +1539,24 @@
         race.places != null &&
         (index < 4 || race.body != null),
     )}
+    {const target = $derived(
+      "drawn" in race
+        ? (races.find(
+            (other) => !other.isTotal && other.anchor === race.drawn,
+          ) ?? race)
+        : race,
+    )}
     {const explore = $derived(
       scope == null &&
-        race.path == null &&
-        race.count >= 3 &&
+        target.path == null &&
+        target.count >= 3 &&
         races.every(
           (other) =>
             other.anchor.replace(/-\d+$/u, "") !==
-              race.anchor.replace(/-\d+$/u, "") || other.count <= race.count,
+              target.anchor.replace(/-\d+$/u, "") ||
+            other.count <= target.count,
         )
-        ? `${page.url.pathname.slice(1)}/${race.anchor}`
+        ? `${page.url.pathname.slice(1)}/${target.anchor}`
         : null,
     )}
     {#snippet mapped()}
@@ -1840,7 +1849,13 @@
         publishers={[]}
         votes={shown === race.decided?.places ? m.col_votes() : race.votes}
         isTally={race.isTally}
-        {isMapped}
+        isMapped={isMapped ||
+          races.some(
+            (other) =>
+              "drawn" in other &&
+              other.drawn === race.anchor &&
+              other.map != null,
+          )}
         limit={isBallot ? 5 : 10}
       />
     {/if}
