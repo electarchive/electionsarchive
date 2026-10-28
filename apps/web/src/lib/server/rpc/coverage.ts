@@ -1,8 +1,9 @@
 import { openapi } from "@orpc/openapi";
-import { ORPCError } from "@orpc/server";
+import { ORPCError, os as base } from "@orpc/server";
+import { dev } from "$app/env";
 import { sql } from "drizzle-orm";
 import * as v from "valibot";
-import { os } from "#lib/server/cache.js";
+import { os as cached } from "#lib/server/cache.js";
 import { db } from "#lib/server/db/index.js";
 import {
   COUNTRY_TIERS,
@@ -10,6 +11,8 @@ import {
   type Column,
   type Goal,
 } from "#lib/coverage.js";
+
+const os = dev ? base : cached;
 
 const GOALS = [
   "county",
