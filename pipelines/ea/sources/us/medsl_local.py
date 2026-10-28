@@ -45,7 +45,7 @@ SYNONYMS = {
     "state-s-attorney": "states-attorney",
     "states-attorney": "states-attorney",
 }
-VERSION = "10"
+VERSION = "11"
 ANSWER = r"(?i)^(?:yes|no)\b"
 PARSED = DATA / "parsed" / SOURCE
 ABBREVIATED = {
@@ -134,6 +134,7 @@ RETIRED = (
     "Maricopa County's 2024 constable races, filed under one countywide title in MEDSL's file; the archive holds "
     "each justice precinct's race separately."
 )
+COMBINED = ("NY:conservative-common-sense-party", "NY:conservative-rule-of-law-party")
 OFFICES = [
     ("sheriff", "Sheriff", False, r"(?:HIGH )?SHERIFF"),
     ("coroner", "Coroner", False, r"CORONER"),
@@ -1559,6 +1560,8 @@ def emit() -> Path:
             label = EXPANDED.get(label, label)
             if label in INDEPENDENT or label in UNAFFILIATED or "PETITION" in label:
                 return None, True
+            if "/" in label and not all(party(state, part)[1] for part in label.split("/")):
+                return next((id for part in label.split("/") if (id := party(state, part)[0]) is not None), None), False
             if label in NATIONAL:
                 return cs.key("us.party", NATIONAL[label]), False
             text = (title(label.removesuffix(" PARTY")) + " Party").replace("'S ", "'s ")
@@ -1571,6 +1574,15 @@ def emit() -> Path:
                 name(found, text)
             return found, False
 
+        for (value,) in conn.execute(
+            "select value from external_id where scheme = 'us.party' and value = any(%s)", [list(COMBINED)]
+        ).fetchall():
+            cs.add(
+                "entity_retirement",
+                entity_id=cs.key("us.party", value),
+                reason="Two parties' fusion line in MEDSL's file, minted as one party. The line keeps its votes and "
+                "names the first party; the candidate is nominated by each.",
+            )
         sources = {}
         for day, (text, url) in DATASETS.items():
             source = sources[day] = cs.source(PUBLISHER, text)
@@ -1882,6 +1894,14 @@ def emit() -> Path:
         for (day, code, _), pool in held_by_contest.items():
             same_day[(day, code)].append(pool)
         surnames: set[str] = set()
+        outside: dict[UUID, UUID] = dict(
+            conn.execute(
+                """select k.id, k.person_id from candidacy k join changeset g on g.id = k.changeset_id
+                   join person p on p.id = k.person_id join changeset h on h.id = p.changeset_id
+                   where k.role = 'head' and g.pipeline = %s and h.pipeline <> %s""",
+                [SOURCE, SOURCE],
+            ).fetchall()
+        )
         survivors: dict[tuple[str, str], tuple[UUID, str, str]] = {}
         absorbed: dict[str, UUID] = {}
         for value, body, pipeline, text in conn.execute(
@@ -2225,8 +2245,13 @@ def emit() -> Path:
                     ballot = title(full) if full.isupper() else full
                     party_id, independent = (None, False) if token in fused else party(state, label)
                     person_key = (code, slug(full))
+                    head = cs.key("us.candidacy", f"{contest_key}:{slug(candidate)}:head")
                     if person_key not in persons:
-                        persons[person_key] = known_person or cs.key(f"{SOURCE}.person", f"{state}:{code}:{slug(full)}")
+                        persons[person_key] = (
+                            known_person
+                            or outside.get(head)
+                            or cs.key(f"{SOURCE}.person", f"{state}:{code}:{slug(full)}")
+                        )
                         if known_person is None:
                             cs.add("person", id=persons[person_key])
                             if persons[person_key] in cs.minted:
@@ -2242,7 +2267,7 @@ def emit() -> Path:
                     )
                     cs.add(
                         "candidacy",
-                        id=cs.key("us.candidacy", f"{contest_key}:{slug(candidate)}:head"),
+                        id=head,
                         person_id=persons[person_key],
                         option_id=option,
                         role="head",
@@ -2250,8 +2275,12 @@ def emit() -> Path:
                         is_independent=independent,
                     )
                     totals.append((votes or 0, option))
+                    nominees: list[UUID | None] = (
+                        [party(state, part)[0] for part in label.split("/")]
+                        if token not in fused and "/" in (label or "")
+                        else []
+                    )
                     if token in fused:
-                        head = cs.key("us.candidacy", f"{contest_key}:{slug(candidate)}:head")
                         for line, labels in (
                             counted.filter(pl.col("token") == token)
                             .group_by("line")
@@ -2272,9 +2301,12 @@ def emit() -> Path:
                                 party_id=line_party,
                                 ballot_label=f"{ballot} ({title(label) if label else 'Other lines'})",
                             )
-                            if line_party is not None:
-                                cs.add("candidacy_nomination", candidacy_id=head, party_id=line_party, kind="nominated")
+                            if line:
+                                nominees.extend(party(state, part)[0] for part in (label or "").split("/"))
                             options[(token, pooled, line)] = child
+                    for nominee in dict.fromkeys(nominees):
+                        if nominee is not None:
+                            cs.add("candidacy_nomination", candidacy_id=head, party_id=nominee, kind="nominated")
                 options[(token, pooled, "")] = option
             if result_set in cs.minted or result_set in zeroed:
                 for token, pooled, line, place, votes in (
@@ -2473,6 +2505,42 @@ def emit() -> Path:
             [sorted(SPLIT)],
         ).fetchall():
             cs.add("entity_retirement", entity_id=contest, reason=RETIRED)
+        listed = {row["id"] for row in cs.rows.get("contest_option", [])}
+        for option, contest, parent, kind, ballot, combined, value, text, head in conn.execute(
+            """select o.id, o.contest_id, o.parent_option_id, o.kind::text, o.ballot_label, o.party_id, x.value, n.text,
+                      k.id
+               from contest_option o join changeset g on g.id = o.changeset_id
+               join external_id x on x.entity_id = o.party_id and x.scheme = 'us.party' and x.value = any(%s)
+               join name n on n.entity_id = o.party_id and n.is_preferred
+               left join candidacy k on k.option_id = coalesce(o.parent_option_id, o.id) and k.role = 'head'
+               where g.pipeline = %s""",
+            [list(COMBINED), SOURCE],
+        ).fetchall():
+            if option in listed:
+                continue
+            state, label = value.split(":")[0], text.upper().removesuffix(" PARTY")
+            cs.add(
+                "contest_option",
+                id=option,
+                contest_id=contest,
+                parent_option_id=parent,
+                kind=kind,
+                party_id=party(state, label)[0],
+                ballot_label=ballot,
+            )
+            nominees = [
+                *(
+                    nominee
+                    for (nominee,) in conn.execute(
+                        "select party_id from candidacy_nomination where candidacy_id = %s and party_id <> %s",
+                        [head, combined],
+                    ).fetchall()
+                ),
+                *(party(state, part)[0] for part in label.split("/")),
+            ]
+            for nominee in dict.fromkeys(nominees):
+                if head is not None and nominee is not None:
+                    cs.add("candidacy_nomination", candidacy_id=head, party_id=nominee, kind="nominated")
         cs.pool("A scattering line in MEDSL's files read as a candidate")
         cs.remainders(
             "A write-in mark, vote tally, placeholder, office title, or ballot answer in MEDSL's files read as a candidate",
