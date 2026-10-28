@@ -953,6 +953,124 @@ WITHDREW = {
     ),
 }
 
+NY_WRITEIN = (
+    "Derived: the leading write-in candidate in the State Board of Elections' certified primary results, which name "
+    "each write-in; the city Board's report by election district gives write-ins as one line."
+)
+NY_UNATTRIBUTED = (
+    "No winner is shown: the leading write-in line in the State Board of Elections' certified primary results is "
+    '"Unattributable Write-In", not a candidate.'
+)
+VT_CHITTENDEN = (
+    "Baruth, Vyhovsky, and Gulick were the top three in the Secretary of State's certified totals; the recount at "
+    "Chittenden County Superior Court on August 19, 2022 kept Gulick ahead of Erhard Mahnke, 3,948 to 3,944, and all "
+    "three were Democratic nominees in November."
+)
+VT_WINDHAM = "Coester and Kenyon were the top two in the Secretary of State's certified totals."
+DECLARED: dict[str, list[tuple[str, str, str]]] = {
+    "2006-08-08:CO:senate:22:rp": [
+        (
+            "Mike Kopp",
+            "won",
+            "Kopp led the Secretary of State's certified totals by 80 votes and was the Republican nominee in November.",
+        )
+    ],
+    "2006-09-12:VT:house:orange-2:rp": [
+        (
+            "Tom Barkley",
+            "won",
+            "Barkley finished first in the Secretary of State's certified totals, 74 votes ahead of third place.",
+        )
+    ],
+    "2016-03-15:NC:house:92:rp": [
+        (
+            "Charles Jeter",
+            "won",
+            (
+                "Jeter led the State Board of Elections' certified totals by 35 votes, and Mecklenburg County's recount on "
+                "March 24, 2016 confirmed the margin (WFAE, March 24, 2016)."
+            ),
+        ),
+        (
+            "Charles Jeter",
+            "declined",
+            (
+                "Withdrew from the November race on July 25, 2016, when he resigned his seat; the Mecklenburg County "
+                "Republican Party named Beth Danae Caulfield to the ballot (WFAE, July 25 and August 22, 2016)."
+            ),
+        ),
+    ],
+    "2017-06-13:VA:house-of-delegates:2:dp": [
+        (
+            "Jennifer Denise Carroll Foy",
+            "won",
+            (
+                "Carroll Foy led the Department of Elections' certified totals by 12 votes; the recount in Prince William "
+                "and Stafford counties on July 20, 2017 kept her ahead by 14 votes, and she was the Democratic nominee in "
+                "November."
+            ),
+        )
+    ],
+    "2018-08-14:CT:house:38:dp": [
+        (
+            "Baird Welch-Collins",
+            "won",
+            (
+                "Welch-Collins led the Secretary of the State's certified totals by 8 votes and was the Democratic nominee "
+                "in November."
+            ),
+        )
+    ],
+    "2018-08-14:CT:senate:16:dp": [
+        (
+            "Vickie Orsini Nardello",
+            "won",
+            (
+                "Orsini Nardello led the Secretary of the State's certified totals by 37 votes and was the Democratic "
+                "nominee in November."
+            ),
+        )
+    ],
+    "2022-08-09:VT:senate:chittendencentral:dp": [
+        ("Phil Baruth", "won", VT_CHITTENDEN),
+        ("Tanya Vyhovsky", "won", VT_CHITTENDEN),
+        ("Martine Larocque Gulick", "won", VT_CHITTENDEN),
+    ],
+    "2022-08-09:VT:senate:windham:rp": [
+        ("Mark Coester", "won", VT_WINDHAM),
+        ("Richard Kenyon", "won", VT_WINDHAM),
+        (
+            "Mark Coester",
+            "declined",
+            (
+                "Ran in November as an independent; the Windham County Republican Committee named Richard Morton to the "
+                "second Republican line (VTDigger, August 17, 2022)."
+            ),
+        ),
+    ],
+}
+UNDECLARED = {
+    "2006-09-12:VT:house:orange-2:rp": (
+        "Only Tom Barkley is shown as a winner: David Atkinson led Bob Wolffe by one vote for the second seat in the "
+        "Secretary of State's certified totals, and no recount or declaration has been found."
+    ),
+    "2012-08-14:CT:house:5:dp": (
+        "No winner is shown. The Secretary of the State's recanvass, whose totals this set holds, gave Leo Canty 774 "
+        "votes and Brandon McGee 773, but a court-ordered recount found a 774 to 774 tie, and the court ordered a new "
+        "primary on October 2, 2012, which McGee won."
+    ),
+    "2020-09-01:MA:house:bristol-12:dp": (
+        "No winner is shown: David A. French III leads the named write-ins in the Secretary of the Commonwealth's "
+        "certified totals, but no Democrat appeared on the November ballot."
+    ),
+    "2018-09-13:NY:assembly:30:womensequalityp": NY_UNATTRIBUTED,
+    "2018-09-13:NY:senate:12:reformp": NY_UNATTRIBUTED,
+    "2018-09-13:NY:assembly:43:indepp": (
+        "No winner is shown: the leading write-in in the State Board of Elections' certified primary results is Mario "
+        "Cuomo, who died in 2015."
+    ),
+}
+
 WITHHELD = (
     'The archive withholds some of this primary\'s county counts by voting method for voter privacy, shown as "*", '
     "covering at most {ballots} ballots by its own ballot totals, so each candidate's total may be short by up to that "
@@ -3574,6 +3692,16 @@ def emit() -> Path:
             [f"{SOURCE}.result_set"],
         ).fetchall():
             earlier.setdefault(result_set, []).append((option, kind, seats, notes))
+        named: dict[UUID, list[tuple[UUID, UUID | None, str | None]]] = {}
+        for contest, option, party, label in conn.execute(
+            """select o.contest_id, o.id, o.party_id, o.ballot_label from contest_option o
+               join external_id x on x.entity_id = o.id and x.scheme = 'us.option'
+               join changeset g on g.id = o.changeset_id
+               where x.value ~ '^20[0-9-]+:NY:' and g.pipeline = %s and exists (
+                 select 1 from candidacy d where d.option_id = o.id)""",
+            [SOURCE],
+        ).fetchall():
+            named.setdefault(contest, []).append((option, party, label))
         methods: dict[UUID, str] = dict(
             conn.execute(
                 """select n.entity_id, n.body_md from note n
@@ -3985,6 +4113,18 @@ def emit() -> Path:
                         is_independent=False,
                     )
                 options[(state, day, office, code, party, choice)] = option
+            if state == "NY" and not parted:
+                built = {options[(state, day, office, code, party, choice)] for choice in rows["choice"]}
+                for option, party_id, label in named.get(contest, []):
+                    if option not in built:
+                        cs.add(
+                            "contest_option",
+                            id=option,
+                            contest_id=contest,
+                            kind="write_in",
+                            party_id=party_id,
+                            ballot_label=label,
+                        )
             if empty:
                 continue
             tallies = ranked["votes"].to_list()
@@ -4056,9 +4196,20 @@ def emit() -> Path:
                     wins = [(names[0], "won", WON_NOMINEE)]
             if base in WITHDREW:
                 wins += [(choice, "withdrew", WITHDREW[base][1]) for choice in names if choice in WITHDREW[base][0]]
+            if base in DECLARED:
+                wins = DECLARED[base]
             wanted = {
                 (options[(state, day, office, code, party, choice)], kind, None, notes) for choice, kind, notes in wins
             }
+            if state == "NY" and not parted and ranked.is_empty() and base not in UNDECLARED:
+                revision = 1
+                while f"{base}:parts:{revision + 1}" in published:
+                    revision += 1
+                prior = published.get(f"{base}:parts" + (f":{revision}" if revision > 1 else ""))
+                wanted = {
+                    (option, kind, None, NY_WRITEIN)
+                    for option, kind, _, _ in (earlier.get(prior[0], []) if prior is not None else [])
+                }
             grain = "parts" if parted else "precinct"
             revision = 1
             while f"{base}:{grain}:{revision + 1}" in published:
@@ -4190,6 +4341,8 @@ def emit() -> Path:
                     kind="caveat",
                     body_md=WITHHELD.format(ballots=rows["withheld"].max()),
                 )
+            if base in UNDECLARED:
+                cs.add("note", entity_id=result_set, kind="caveat", body_md=UNDECLARED[base])
             for option, kind, _, notes in sorted(wanted):
                 cs.add("outcome", result_set_id=result_set, option_id=option, kind=kind, notes=notes)
         congress = pl.read_parquet(PARSED / "congress.parquet")
