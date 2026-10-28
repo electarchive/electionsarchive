@@ -35,6 +35,7 @@ DAYS = [
     date(2020, 6, 23),
     date(2022, 5, 17),
     date(2022, 7, 26),
+    date(2024, 3, 5),
 ]
 PUBLISHER = "North Carolina State Board of Elections"
 TITLE = "Election results by precinct: primaries"
@@ -180,7 +181,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="North Carolina's House, Senate, and presidential primaries and second primaries by county, 2002–2022",
+            summary="North Carolina's House, Senate, and presidential primaries and second primaries by county, 2002–2024",
             polity="US-NC",
         )
         source = cs.source(PUBLISHER, TITLE)
