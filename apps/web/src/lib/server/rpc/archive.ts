@@ -4582,6 +4582,7 @@ export const contests = {
             current: v.boolean(),
             annulled: v.boolean(),
             isRemainder: v.boolean(),
+            notional: v.boolean(),
             gap: v.boolean(),
             winner: v.nullable(
               v.object({

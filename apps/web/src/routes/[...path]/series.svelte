@@ -54,14 +54,17 @@
               to: year,
             })
           : null,
-        label:
-          (seen[year]?.length ?? 0) > 1 && entry.isRemainder
+        label: entry.notional
+          ? m.series_notional({ year })
+          : (seen[year]?.length ?? 0) > 1 && entry.isRemainder
             ? m.series_remainder({ year })
-            : (days[entry.date ?? ""] ?? []).filter((peer) => !peer.isRemainder)
-                  .length > 1
+            : (days[entry.date ?? ""] ?? []).filter(
+                  (peer) => !peer.isRemainder && !peer.notional,
+                ).length > 1
               ? `${year} ${entry.name.split(", ").at(-1) ?? ""}`
-              : (seen[year] ?? []).filter((peer) => !peer.isRemainder).length >
-                    1 && entry.date != null
+              : (seen[year] ?? []).filter(
+                    (peer) => !peer.isRemainder && !peer.notional,
+                  ).length > 1 && entry.date != null
                 ? month.format(new Date(`${entry.date}T00:00:00Z`))
                 : year,
         color:

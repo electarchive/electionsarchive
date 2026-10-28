@@ -1019,6 +1019,7 @@
   "round_electoral": "Electoral College vote",
   "places_remainder": "Unexpired term",
   "series_remainder": "{year} special",
+  "series_notional": "{year} notional",
   "polity_lede": "{elections} from {first} to {last}",
   "polity_within": "and {count} more in subdivisions",
   "polity_no_local": "We don't have any local elections for {place} yet. The races below are statewide and federal, with the votes cast in {place}.",

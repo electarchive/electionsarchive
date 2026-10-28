@@ -1266,7 +1266,7 @@
             class="underline decoration-border underline-offset-4 hover:decoration-foreground"
             href={resolve("/[...path]", { path: handover.prior.path })}
             >{handover.prior.name}</a
-          >{:else}{handover.prior.name}{/if}.
+          >.{:else}{handover.prior.name}.{/if}
       </p>
     {/if}
     {#each footnotes as line (line)}
