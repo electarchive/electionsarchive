@@ -116,7 +116,7 @@
             tiles={found.map.tiles}
             own={found.map.own}
             frame={found.map.frame}
-            isApproximate={found.map.isApproximate}
+            approximate={found.map.approximate}
             {noun}
             votes={m.col_votes()}
             names={found.places.legend.map((item) =>

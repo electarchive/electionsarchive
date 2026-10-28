@@ -1500,7 +1500,7 @@
                 blank={race.map.blank ?? null}
                 outlying={race.map.outlying ?? null}
                 parted={race.map.parted ?? null}
-                isApproximate={race.map.isApproximate}
+                approximate={race.map.approximate}
                 sources={race.map.credits}
                 noun={race.places?.levels[0]?.noun ?? ""}
                 votes={race.votes}
@@ -1615,7 +1615,7 @@
               blank={shape.blank ?? null}
               outlying={shape.outlying ?? null}
               parted={shape.parted ?? null}
-              isApproximate={shape.isApproximate}
+              approximate={shape.approximate}
               sources={shape.credits}
               noun={places.levels[0]?.noun ?? ""}
               isTally={race.isTally}

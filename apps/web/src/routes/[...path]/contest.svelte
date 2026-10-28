@@ -397,7 +397,7 @@
           blank: level.blank,
           outlying: level.outlying ?? null,
           parted: level.parted ?? null,
-          isApproximate: level.isApproximate,
+          approximate: level.approximate,
           noun: noun ?? level.noun,
           sources: [
             ...new Set(
@@ -468,7 +468,7 @@
         east: own.frame.east + (own.frame.east - own.frame.west) * 1.5,
         north: own.frame.north + (own.frame.north - own.frame.south) * 1.5,
       },
-      isApproximate: own.isApproximate,
+      approximate: own.approximate,
       noun: own.noun,
       sources: [
         ...new Set(
@@ -1495,7 +1495,7 @@
       parted={shown.parted}
       frame={shown.frame}
       limit={shown.limit}
-      isApproximate={shown.isApproximate}
+      approximate={shown.approximate}
       noun={shown.noun}
       sources={shown.sources}
       explore={upward?.path ?? null}
@@ -1672,7 +1672,7 @@
           blank={drawn.blank}
           outlying={drawn.outlying}
           parted={drawn.parted}
-          isApproximate={drawn.isApproximate}
+          approximate={drawn.approximate}
           noun={drawn.noun}
           sources={drawn.sources}
           explore={here}

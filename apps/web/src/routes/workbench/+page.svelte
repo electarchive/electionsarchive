@@ -183,7 +183,7 @@
               ? null
               : { tiles: own.tiles, k: own.k },
           frame: own.frame,
-          isApproximate: level.isApproximate,
+          approximate: level.approximate,
           noun:
             places.levels.find((entry) => entry.code === places.level)?.noun ??
             level.noun,
@@ -1133,7 +1133,7 @@
                     tiles={drawn.tiles}
                     own={drawn.own}
                     frame={drawn.frame}
-                    isApproximate={drawn.isApproximate}
+                    approximate={drawn.approximate}
                     noun={drawn.noun}
                     votes={m.col_votes()}
                     names={legend.map((item) =>

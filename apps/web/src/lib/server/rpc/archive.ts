@@ -576,7 +576,7 @@ const Sketch = v.object({
       }),
     ),
   ),
-  isApproximate: v.boolean(),
+  approximate: v.array(v.number()),
   shaped: v.optional(v.nullable(v.number())),
   credits: v.optional(v.nullable(v.array(v.string()))),
   outlying: v.optional(
@@ -8178,6 +8178,7 @@ export const contests = {
           tiles: v.nullable(v.string()),
           isPending: v.boolean(),
           isApproximate: v.boolean(),
+          approximate: v.array(v.number()),
           note: v.nullable(v.string()),
           sources: v.array(
             v.object({
@@ -8324,6 +8325,7 @@ export const contests = {
             tiles: string | null;
             shaped: Array<string>;
             qualities: Array<string>;
+            approximate: Array<number>;
             sources: Array<{
               publisher: string;
               title: string;
@@ -8349,6 +8351,14 @@ export const contests = {
             select sc.noun, chosen.vintage, chosen.as_of::text as "asOf", chosen.tiles,
               array(select distinct area_id::text from shapes) as shaped,
               array(select distinct quality from shapes) as qualities,
+              array(
+                select a.k from (select area_id, valid from area_geometry where quality = 'synthetic' offset 0) g
+                join area a on a.id = g.area_id
+                left join chosen on true
+                where (g.area_id = any(${sql.param(group.ids)}::uuid[])
+                  or a.k = any(${sql.param(group.scheme === input.level ? blank.map((entry) => entry.k) : [])}::int[]))
+                  and g.valid @> coalesce(chosen.as_of, ${day}::date)
+              ) as approximate,
               (select json_agg(json_build_object('publisher', s.publisher, 'title', s.title, 'url', s.url, 'attribution', nullif(s.attribution, '')) order by s.publisher)
                from source s where s.id in (select source_id from shapes)) as sources,
               (select n.body_md from note n
@@ -8396,6 +8406,7 @@ export const contests = {
                   : stored(row.tiles),
               isPending: row.tiles != null && stored(row.tiles) == null,
               isApproximate: row.qualities.includes("synthetic"),
+              approximate: row.approximate,
               note: row.note,
               sources: row.sources ?? [],
               count: group.ids.length,
@@ -10439,7 +10450,7 @@ async function sketch(
     db.execute<{
       scheme: string;
       tiles: string;
-      synthetic: boolean;
+      approximate: Array<number>;
       shaped: number;
       credits: Array<string>;
     }>(sql`
@@ -10456,12 +10467,12 @@ async function sketch(
           cross join lateral (values (s.publisher), (nullif(s.attribution, ''))) c(credit)
           where x.scheme_code = bs.scheme_code and x.k = any(${sql.param([...ks, area.k])}::int[]) and c.credit is not null
         ) as credits,
-        exists (
-          select from (select area_id, valid from area_geometry where quality = 'synthetic' offset 0) g
+        array(
+          select distinct x.k from (select area_id, valid from area_geometry where quality = 'synthetic' offset 0) g
           join area x on x.id = g.area_id
           where x.scheme_code = bs.scheme_code and g.valid @> coalesce(bs.as_of, ${day}::date)
-          limit 1
-        ) as synthetic
+            and x.k = any(${sql.param([...ks, ...absent.map((row) => row.k)])}::int[])
+        ) as approximate
       from boundary_set bs
       where bs.scheme_code in (${level}, (select scheme_code from area where id = ${area.id}::uuid))
         and bs.valid @> ${day}::date
@@ -10526,7 +10537,7 @@ async function sketch(
             isPending: row.pending,
           }))
           .toSorted((a, b) => a.name.localeCompare(b.name)),
-        isApproximate: tiled.synthetic,
+        approximate: tiled.approximate,
         ...(strip.length > 0 && { outlying: strip }),
         shaped: ks.length === 0 ? null : tiled.shaped,
         credits:

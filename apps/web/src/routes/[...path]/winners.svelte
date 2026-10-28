@@ -140,7 +140,7 @@
             tiles={shape.map.tiles}
             own={shape.map.own}
             frame={shape.map.frame}
-            isApproximate={shape.map.isApproximate}
+            approximate={shape.map.approximate}
             sources={shape.map.credits}
             noun={shape.places.levels[0]?.noun ?? ""}
             votes=""

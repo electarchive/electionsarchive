@@ -183,7 +183,7 @@
         nested={mapped.map.nested}
         frame={mapped.map.frame}
         blank={mapped.map.blank ?? null}
-        isApproximate={mapped.map.isApproximate}
+        approximate={mapped.map.approximate}
         sources={mapped.map.credits}
         noun={mapped.noun}
         votes={m.col_votes()}

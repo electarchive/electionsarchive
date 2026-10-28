@@ -599,7 +599,7 @@
                 own={race.map.own}
                 nested={race.map.nested}
                 frame={race.map.frame}
-                isApproximate={race.map.isApproximate}
+                approximate={race.map.approximate}
                 sources={race.map.credits}
                 noun={places.levels[0]?.noun ?? ""}
                 votes={m.col_votes()}

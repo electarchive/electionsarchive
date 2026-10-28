@@ -368,7 +368,7 @@
                   own.frame.north + (own.frame.north - own.frame.south) * 1.5,
               }
             : own.frame,
-          isApproximate: level.isApproximate,
+          approximate: level.approximate,
           noun:
             places.levels.find((entry) => entry.code === places.level)?.noun ??
             level.noun,
@@ -471,7 +471,7 @@
         own={drawn.own}
         nested={drawn.nested}
         frame={drawn.frame}
-        isApproximate={drawn.isApproximate}
+        approximate={drawn.approximate}
         noun={drawn.noun}
         votes={m.col_votes()}
         names={drawn.names}

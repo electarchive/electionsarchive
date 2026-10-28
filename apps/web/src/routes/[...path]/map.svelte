@@ -21,6 +21,7 @@
   import { on } from "svelte/events";
   import { fade, fly } from "svelte/transition";
   import Export from "#lib/components/export.svelte";
+  import Term from "#lib/components/term.svelte";
   import * as Drawer from "#lib/components/ui/drawer/index.js";
   import * as Popover from "#lib/components/ui/popover/index.js";
   import { Engine } from "#lib/map/engine.svelte.js";
@@ -53,7 +54,7 @@
     blank = null,
     outlying = null,
     parted = null,
-    isApproximate,
+    approximate,
     noun,
     votes,
     names,
@@ -97,7 +98,7 @@
       group: "territory" | "overseas" | "abroad";
     }> | null;
     parted?: { isOnly: boolean; ks: Array<number> } | null;
-    isApproximate: boolean;
+    approximate: Array<number>;
     noun: string;
     votes: string;
     names: Array<string>;
@@ -1351,18 +1352,6 @@
         "fills",
       );
     }
-    if (isApproximate) {
-      engine.add(
-        {
-          id: "hatch",
-          type: "fill",
-          ...areas,
-          filter: inland,
-          paint: { "fill-pattern": "hatch" },
-        },
-        "fills",
-      );
-    }
     const side = Math.sqrt(
       (boxWidth * boxHeight) / Math.max(1, places.rows.length),
     );
@@ -1387,6 +1376,21 @@
                   1.6,
                 ]
               : ["interpolate", ["linear"], ["zoom"], 2, 0.6, 6, 1, 10, 1.6],
+        },
+      },
+      "fills",
+    );
+    engine.add(
+      {
+        id: "rough",
+        type: "line",
+        ...areas,
+        filter: ["all", inland, ["in", ["id"], ["literal", approximate]]],
+        paint: {
+          "line-color":
+            "color-mix(in oklab, var(--foreground) 45%, transparent)",
+          "line-width": ["interpolate", ["linear"], ["zoom"], 2, 0.75, 8, 1.1],
+          "line-dasharray": [3, 2.5],
         },
       },
       "fills",
@@ -1611,7 +1615,13 @@
     const tips = [0, 1].map((index) =>
       read(colors[index] ?? "var(--muted-foreground)"),
     );
+    const rough: Maplibre.FilterSpecification = [
+      "all",
+      inland,
+      ["in", ["id"], ["literal", approximate]],
+    ];
     untrack(() => {
+      engine.filter("rough", rough);
       engine.filter("unmatched", [
         "all",
         inland,
@@ -2877,12 +2887,17 @@
         >
       </span>
     {/if}
-    {#if isApproximate}
+    {#if approximate.length > 0}
       <span class="flex items-center gap-1.5 text-muted-foreground">
         <span
-          class="rounded-xs bg-[repeating-linear-gradient(135deg,var(--muted-foreground)_0_1px,transparent_1px_4px)] ring-1 ring-border block-3 inline-4"
+          class="border-t border-dashed border-foreground/45 inline-4"
+          aria-hidden="true"
         ></span>
-        {m.boundaries_approximate()}
+        <Term
+          class="text-foreground"
+          label={m.map_approximate_key()}
+          definition={m.term_boundaries_approximate()}
+        />
       </span>
     {/if}
   </div>
