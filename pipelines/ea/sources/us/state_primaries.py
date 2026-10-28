@@ -4017,8 +4017,12 @@ def emit() -> Path:
                     magnitude
                 ] > (rows["withheld"].max() or 0):
                     wins = [(choice, "won", WON_LEAD) for choice in names[:magnitude]]
-                elif magnitude == 1 and tallies[0] > tallies[1] and nominated.get(names[0]):
-                    wins = [(names[0], "won", WON_NOMINEE)]
+                elif (
+                    tallies[magnitude - 1] > tallies[magnitude]
+                    and all(nominated.get(choice) for choice in names[:magnitude])
+                    and (magnitude == 1 or not any(nominated.get(choice) for choice in names[magnitude:]))
+                ):
+                    wins = [(choice, "won", WON_NOMINEE) for choice in names[:magnitude]]
             elif tallies:
                 runoff = state in rounds and (
                     any(
