@@ -1189,13 +1189,14 @@ def defaults(
                     and (r.stage = d.stage or (r.stage > d.stage and r.stage <> 'alternative' and not exists (
                       select from result_set x where x.election_id = r.election_id and x.contest_id = r.contest_id
                         and x.stage = r.stage and x.is_default)))
-                  join source rs on rs.id = r.source_id and rs.kind = 'official_body'
+                  join source rs on rs.id = r.source_id and (rs.kind = 'official_body' or rs.kind = 'community'
+                    and ds.publisher in ('Algara and Amlani', 'Inter-university Consortium for Political and Social Research'))
                   where d.is_default and d.status = 'active' and d.kind = 'counted' and d.contest_id is not null
                     and (ds.kind <> 'official_body' or exists (
                       select from external_id x where x.scheme = 'ea.authoritative' and x.value = r.id::text))
                     and (%(contests)s::uuid[] is null or d.contest_id = any(%(contests)s::uuid[]))
                     and not exists (select from flag f where f.result_set_id = r.id and f.check_code = 'reconcile.official')
-                  order by d.id, r.stage desc, r.completeness desc nulls last, r.k
+                  order by d.id, rs.kind = 'official_body' desc, r.stage desc, r.completeness desc nulls last, r.k
                 )
                 select p.old::text, p.new::text, p.same, p.contest_id::text, ({tally.format("old_k")}),
                        ({tally.format("new_k")}),
@@ -1211,7 +1212,8 @@ def defaults(
     flipped: list[tuple[str, str, bool]] = []
     skipped: list[dict[str, object]] = []
     for old, new, same, contest, before, after, winners, authoritative, unranked in picks:
-        total, counted = sum(before.values()), sum(after.get(option, 0) for option in before)
+        total = sum(votes for option, votes in before.items() if option not in unranked)
+        counted = sum(after.get(option, 0) for option in before if option not in unranked)
         losing = [votes for option, votes in after.items() if option not in winners and option not in unranked]
         reason = (
             "no votes"
