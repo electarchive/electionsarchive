@@ -101,7 +101,9 @@ left join polity op on op.id = coalesce(o.polity_id, b.polity_id, e.polity_id)
 left join external_id oe on oe.entity_id = c.office_id and oe.scheme = 'us.office'
 left join external_id be on be.entity_id = c.body_id and be.scheme = 'us.body'
 join changeset cs on cs.id = c.changeset_id
-where e.date_from is not null and not c.notional;
+where e.date_from is not null and not c.notional
+    and not exists (select from name n where n.entity_id = c.office_id and n.is_preferred
+        and n.text ~ ' Party ((Male |Female )?(County Committee|State Committee|District Leader)|(Alternate )?Delegate to )');
 
 analyze cc;
 
