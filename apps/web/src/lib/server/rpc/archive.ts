@@ -14824,6 +14824,7 @@ export const elections = {
                   v.object({
                     party: v.nullable(v.string()),
                     isIndependent: v.boolean(),
+                    isNonpartisan: v.boolean(),
                     seats: v.number(),
                   }),
                 ),
@@ -14849,6 +14850,7 @@ export const elections = {
         tier: string | null;
         party: string | null;
         independent: boolean;
+        nonpartisan: boolean;
         seats: number;
         races: number;
         passed: number;
@@ -14919,7 +14921,8 @@ export const elections = {
           group by r.part
         )
         select w.part, p.polity_id as polity, w.tier, n.party,
-          n.party is null and exists (select from candidacy cy where cy.option_id = w.id and cy.is_independent) as independent,
+          n.party is null and n.partisan and exists (select from candidacy cy where cy.option_id = w.id and cy.is_independent) as independent,
+          n.party is null and not n.partisan as nonpartisan,
           sum(w.seats)::int as seats, count(distinct w.contest)::int as races, 0 as passed,
           coalesce(sum(w.seats) filter (where w.tacit), 0)::int as tacit
         from winners w
@@ -14933,14 +14936,20 @@ export const elections = {
           select coalesce(bm.into_id, br.parent_party_id, pm.into_id, w.party_id, ld.party_id,
             (select min(cn.party_id::text)::uuid from candidacy cy
               join candidacy_nomination cn on cn.candidacy_id = cy.id and cn.kind = 'nominated'
-              where cy.option_id = w.id having count(distinct cn.party_id) = 1)) as party
+              where cy.option_id = w.id having count(distinct cn.party_id) = 1)) as party,
+            exists (select from contest c0
+              join contest c2 on c2.election_id = c0.election_id and c2.body_id is not distinct from c0.body_id
+                and c2.office_id is not distinct from c0.office_id
+              join contest_option k on k.contest_id = c2.id left join candidacy cy on cy.option_id = k.id
+              where c0.id = w.contest and (k.party_id is not null or k.alliance_id is not null or cy.member_of_party_id is not null
+                or exists (select from candidacy_nomination cn where cn.candidacy_id = cy.id))) as partisan
         ) n
-        group by w.part, p.polity_id, w.tier, n.party, 5
+        group by w.part, p.polity_id, w.tier, n.party, 5, 6
         union all
-        select m.part, p.polity_id, 'measure', null, false, 0, m.races, m.passed, 0
+        select m.part, p.polity_id, 'measure', null, false, false, 0, m.races, m.passed, 0
         from measures m join parts p on p.id = m.part
         union all
-        select p.id, p.polity_id, null, null, false, 0, 0, 0, 0 from parts p
+        select p.id, p.polity_id, null, null, false, false, 0, 0, 0, 0 from parts p
       `);
       const parts = [...new Set(found.rows.map((row) => row.part))];
       const polities = [...new Set(found.rows.map((row) => row.polity))];
@@ -15004,6 +15013,7 @@ export const elections = {
                     .map((row) => ({
                       party: row.party,
                       isIndependent: row.independent,
+                      isNonpartisan: row.nonpartisan,
                       seats: row.seats,
                     }))
                     .toSorted((a, b) => b.seats - a.seats),
@@ -15197,6 +15207,12 @@ export async function record(input: { id: string; body?: string }) {
             left join candidacy cy on cy.option_id = o.id
             where o.id = w.id and o.alliance_id is not null group by o.alliance_id)) as party,
         exists (select from candidacy cy where cy.option_id = w.id and cy.is_independent)
+          and exists (select from contest c0
+            join contest c2 on c2.election_id = c0.election_id and c2.body_id is not distinct from c0.body_id
+              and c2.office_id is not distinct from c0.office_id
+            join contest_option k on k.contest_id = c2.id left join candidacy cy on cy.option_id = k.id
+            where c0.id = w.contest and (k.party_id is not null or k.alliance_id is not null or cy.member_of_party_id is not null
+              or exists (select from candidacy_nomination cn where cn.candidacy_id = cy.id)))
           or exists (select from contest_option o where o.id = w.id and o.party_id is null and o.alliance_id is null
             and o.ballot_label ~* '^(independent|bağımsız|indépendant|unabhängig|indipendent)') as independent,
         case when r."isOffice" then (select coalesce(m.into_id, cy.person_id) from candidacy cy
