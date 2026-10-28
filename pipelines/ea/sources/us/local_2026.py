@@ -78,6 +78,86 @@ FEEDS = {
         "New Mexico Secretary of State",
         "Candidate List: 2026 General Election",
     ),
+    "UT-49049": (
+        "https://www.utahcounty.gov/cms/uploads/Utah_County_2026_General_Election_Candidate_Certification_4e705c1719.pdf",
+        "Utah County Clerk",
+        "2026 General Election Candidate Certification",
+    ),
+    "UT-49011": (
+        "https://www.daviscountyutah.gov/Sitefinity/WebsiteTemplates/ClerkAuditor/2026%20General%20Notice.pdf",
+        "Davis County Clerk",
+        "Certification of Candidates and Ballot Propositions for the Regular General Election, November 3, 2026",
+    ),
+    "IL-17197": (
+        "https://assets01.aws.connect.clarityelections.com/Assets/Connect/RootPublish/will-il.connect.clarityelections.com/Elections/2026GeneralElection/Candidates/Countywide.pdf",
+        "Will County Clerk",
+        "General Election, November 3, 2026: Candidate List, Countywide Offices",
+    ),
+    "CO-08005": (
+        "https://files.arapahoeco.gov/Clerk%20and%20Recorder/ArapahoeVotes/Documents-Articles/2026%20Sample%20Ballots/2026%20Arapahoe%20County%20General%20Election%20Sample%20Ballot%20-%20English.pdf",
+        "Arapahoe County Clerk and Recorder",
+        "Sample General Election Ballot, Tuesday, November 3, 2026",
+    ),
+    "GA-13121": (
+        "https://www.fultoncountyga.gov/-/media/2026-Election/November-3-Election/Sample-Ballot--Consolidated--Nov-32026-General--Special-Election--1082026.pdf",
+        "Fulton County Department of Registration and Elections",
+        "November 3, 2026 General Special Election: Consolidated Sample Ballot",
+    ),
+    "GA-13135": (
+        "https://www.gwinnettcounty.com/documents/d/gwinnett-county/nov-3-general-election-special-election-consolidated-sample-ballot-english-asian-lang",
+        "Gwinnett County Voter Registrations and Elections",
+        "November 3 General Election and Special Election: Consolidated Sample Ballot",
+    ),
+    "GA-13067": (
+        "https://assets.cobbcounty.gov/files/2026-09/SAMPLE%20BALLOT%20DRAFT%20v4%20WEB.pdf",
+        "Cobb County Elections and Registration",
+        "November 3, 2026 General and Special Election: Sample Ballot (draft v4)",
+    ),
+    "GA-13089": (
+        "https://dekalbcountyga.gov/sites/default/files/2026-10/NOV_2026%20_GENERAL.SPECIAL%20Sample-booklet-am.pdf",
+        "DeKalb County Voter Registration and Elections",
+        "Sample Ballot, General / Special Election, November 3, 2026",
+    ),
+    "GA-13063": (
+        "https://www.claytoncountyga.gov/wp-content/uploads/2026/09/11.3.26-Composite-Sample-Ballot-Final.pdf",
+        "Clayton County Elections and Registration",
+        "November 3, 2026 Composite Sample Ballot",
+    ),
+    "GA-13223": (
+        "https://www.paulding.gov/DocumentCenter/View/19236/Paulding-County-Composite-Sample-Ballot-November-3-2026-General-Election",
+        "Paulding County Elections and Registration",
+        "Composite Sample Ballot, November 3, 2026 General Election",
+    ),
+    "GA-13153": (
+        "https://www.houstoncountyga.gov/skins/userfiles/files/November%202026%20Sample%20Ballot.pdf",
+        "Houston County Board of Elections",
+        "November 2026 Sample Ballot",
+    ),
+    "GA-13073": (
+        "https://www.columbiacountyga.gov/DocumentCenter/View/10721/OFFICIAL-COLUMBIA-COUNTY-COMPOSITE--SAMPLE-BALLOT--NOVEMBER-3-2026-GENERAL--SPECIAL-ELECTION",
+        "Columbia County Board of Elections",
+        "Official Composite Sample Ballot, November 3, 2026 General and Special Election",
+    ),
+    "GA-13245": (
+        "https://www.augustaga.gov/DocumentCenter/View/21864/Composite-Sample-Ballot-Nov-2026",
+        "Augusta-Richmond County Board of Elections",
+        "Composite Sample Ballot, November 2026",
+    ),
+    "AZ-04013-s": (
+        "https://mcss.knack.com/school-districts#2026-filed-candidates/",
+        "Maricopa County School Superintendent",
+        "Elections and Districts Data Dashboard: 2026 Filed Candidates and 2026 Offices To Be Elected",
+    ),
+    "AL": (
+        "https://www.sos.alabama.gov/alabama-votes/2026-general-election-sample-ballots",
+        "Alabama Secretary of State",
+        "2026 General Election Sample Ballots, November 3, 2026 (61 county ballots)",
+    ),
+    "WA": (
+        "https://voter.votewa.gov/CandidateList.aspx?e=899#export-by-county",
+        "Washington Secretary of State",
+        "Candidate List: General 2026 (11/03/2026), CSV export for each county",
+    ),
     "IN": (
         "https://www.in.gov/sos/elections/files/Candidate_List_Abbreviated_20260922_011251PM.xlsx",
         "Indiana Election Division",
@@ -357,6 +437,11 @@ FEEDS = {
         "https://www.essexclerk.com/_Content/pdf/Essex-2026-Sample-Ballots.pdf",
         "Essex County Clerk",
         "Official General Election Sample Ballot, November 3, 2026",
+    ),
+    "NJ-34021": (
+        "https://www.mercercounty.org/government/county-clerk/elections/election-sample-ballots",
+        "Mercer County Clerk",
+        "2026 Official General Election Sample Ballots, November 3, 2026 (twelve municipal ballots)",
     ),
     "NJ-34003": (
         "https://docs.google.com/spreadsheets/d/1uS4o-ogeeIrZMyfxYs0Eg5WDcSYPuIrkMskOTXKJDP4/edit?usp=sharing",
@@ -686,6 +771,23 @@ DELIVERED = {
     "CA-06013": DATA / "inbox" / "manual" / "MF-189" / "contra-costa-2026-general-candidates-and-measures.html",
     "NJ-34013": DATA / "inbox" / "y26" / "nj" / "essex.pdf",
     "NJ-34003": DATA / "inbox" / "y26" / "nj" / "bergen.xlsx",
+    "NJ-34021": DATA / "inbox" / "y26" / "nj" / "mercer.pdf",
+    "WA": DATA / "inbox" / "y26" / "wa" / "votewa_general_2026_by_county.json",
+    "AL": DATA / "inbox" / "y26" / "al" / "sample_ballots.pdf",
+    "UT-49049": DATA / "inbox" / "y26" / "ut" / "utah_county.pdf",
+    "UT-49011": DATA / "inbox" / "y26" / "ut" / "davis.pdf",
+    "IL-17197": DATA / "inbox" / "y26" / "il" / "will.pdf",
+    "CO-08005": DATA / "inbox" / "y26" / "co" / "arapahoe.pdf",
+    "AZ-04013-s": DATA / "inbox" / "y26" / "az" / "maricopa_schools.json",
+    "GA-13121": DATA / "inbox" / "y26" / "ga" / "fulton.pdf",
+    "GA-13135": DATA / "inbox" / "y26" / "ga" / "gwinnett.pdf",
+    "GA-13067": DATA / "inbox" / "y26" / "ga" / "cobb.pdf",
+    "GA-13089": DATA / "inbox" / "y26" / "ga" / "dekalb.pdf",
+    "GA-13063": DATA / "inbox" / "y26" / "ga" / "clayton.pdf",
+    "GA-13223": DATA / "inbox" / "y26" / "ga" / "paulding.pdf",
+    "GA-13153": DATA / "inbox" / "y26" / "ga" / "houston.pdf",
+    "GA-13073": DATA / "inbox" / "y26" / "ga" / "columbia.pdf",
+    "GA-13245": DATA / "inbox" / "y26" / "ga" / "augusta.pdf",
     "IL-17043": DATA / "inbox" / "y26" / "il" / "dupage.pdf",
     "AZ-04019": DATA / "inbox" / "y26" / "az" / "pima.pdf",
     "NV-32003": DATA / "inbox" / "y26" / "nv" / "clark.pdf",
@@ -907,6 +1009,7 @@ def fetch() -> None:
                         ".xlsx": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                         ".html": "text/html",
                         ".xls": "application/vnd.ms-excel",
+                        ".json": "application/json",
                     }.get(DELIVERED[state].suffix, "text/csv"),
                 )
             continue
@@ -1371,6 +1474,47 @@ def parse() -> None:
                 "unexpired": False,
             }
         )
+
+    for county, listing in json.loads(raw.cached(SOURCE, FEEDS["WA"][0]).path.read_text()).items():
+        for row in csv.DictReader(io.StringIO(listing)):
+            kind, race = row["District Type"].lower(), " ".join(row["Race"].split())
+            if (
+                kind not in ("countywide", "county", "council", "commissioner", "city council", "city/town")
+                or re.search(r"(?i)court|judge|director of community", race)
+            ):
+                continue
+            race = re.sub(rf"(?i)^(?:metropolitan )?(?:{county} )?county |^{county} ", "", race)
+            race = re.sub(r"(?i)\bcouncilor\b", "Council", re.sub(r"(?i)\s*[;,]\s*|\s+-\s+|\bresidency\b", " ", race))
+            race = race.title() if race.isupper() else race
+            number = r"(?:\s*no\.)?\s*#?\s*0*(\d+)$"
+            race = (
+                re.sub(rf"(?i)\s+(?:pos\.|position){number}", r" Position \1", race)
+                if re.search(rf"(?i)\s(?:pos\.|position){number}", race)
+                else re.sub(rf"(?i)(?:^|\s+)(?:(?:dist\.?|district)\s*)?{number}", r" District \1", race)
+            )
+            race = " ".join(race.split())
+            if re.fullmatch(r"(?i)district \d+", race):
+                race = f"Commissioner {race}"
+            town = re.match(r"(?i)(?:city of )?(.+?)(?: city council district \d+)?$", row["District"])
+            contest = (
+                f"{str(town[1]).title()} City {'Council ' if not race.startswith('Council') else ''}{race}"
+                if kind.startswith("city")
+                else f"{county} County {race}"
+            )
+            preference = row["Party Preference"].strip().upper()
+            named, independent = party({"GOP": "Republican", "DEMOCRAT": "Democratic"}.get(preference, preference))
+            feeds["WA"].append(
+                {
+                    "county": county,
+                    "contest": contest,
+                    "seats": 1,
+                    "name": row["Name"],
+                    "party": named,
+                    "independent": independent
+                    or preference in ("INDEPENDENT", "INDEPENDANT", "IND", "STATES NO PARTY PREFERENCE"),
+                    "unexpired": row["Term Type"] == "Unexpired",
+                }
+            )
 
     with connect() as conn:
         exact = {
@@ -2696,7 +2840,7 @@ def parse() -> None:
             Path(__file__).with_name(f"local_2026_{state}.tsv").read_text().splitlines(), delimiter="\t"
         )
     ]:
-        named, independent = party(row["party"])
+        named, independent = (row["party"], False) if ":" in row["party"] else party(row["party"])
         feeds[row["key"]].append(
             {
                 "county": row.get("county") or row["contest"].split(" County")[0],
@@ -3244,7 +3388,7 @@ def emit() -> Path:
                where x.scheme = 'us.contest' and x.value like %s and c.pipeline = %s""",
             [f"{DAY}:%:remainder", SOURCE],
         ).fetchall():
-            if tail.removesuffix(":remainder") not in set(frame["tail"]):
+            if tail.removesuffix(":remainder") not in set(frame["tail"]) or tail in set(frame["tail"]):
                 continue
             reason = "This full-term race was filed under the office's last unexpired-term contest; it moves to the full-term seat."
             for (candidacy,) in conn.execute(
@@ -3544,7 +3688,11 @@ def emit() -> Path:
                 )
             chained = previous is not None and held_on.year == DAY.year
             key = f"{DAY}:{tail}"
-            contest = cs.key("us.contest", key)
+            try:
+                contest = cs.key("us.contest", key)
+            except ValueError:
+                key = f"{key}:reissued"
+                contest = cs.key("us.contest", key)
             cs.add(
                 "contest",
                 id=contest,
