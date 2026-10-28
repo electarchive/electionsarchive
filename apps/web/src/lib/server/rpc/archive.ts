@@ -15176,6 +15176,14 @@ export const polities = {
         ),
         mapped: v.nullable(v.string()),
         local: v.nullable(v.string()),
+        next: v.nullable(
+          v.object({
+            name: v.string(),
+            path: v.nullable(v.string()),
+            date: v.string(),
+            races: v.number(),
+          }),
+        ),
         latest: v.nullable(
           v.object({
             name: v.string(),
@@ -15503,6 +15511,10 @@ export const polities = {
           ? null
           : { id: fallback.election, date: fallback.date });
       const isBorrowed = held.length === 0 && polity.isTerritorial;
+      const upcoming = electionRows.rows.findLast(
+        (row) =>
+          row.date != null && row.date >= today && row.status === "scheduled",
+      );
       const parents = new Set(here.rows.map((row) => row.parent));
       const kept = here.rows.filter((row) => !parents.has(row.id));
       const sizes = Map.groupBy(kept, (row) => row.date)
@@ -15530,7 +15542,13 @@ export const polities = {
       ) {
         shown.add(general.date);
       }
-      const [labels, slugs, summed, built] = await Promise.all([
+      const [counted, labels, slugs, summed, built] = await Promise.all([
+        upcoming == null
+          ? null
+          : db.execute<{ count: number }>(sql`
+            select count(*)::int as count from contest c
+            where c.election_id = ${upcoming.id}::uuid and c.allocation_parent_id is null and c.party_scope_id is null and not c.notional
+          `),
         names(ids),
         paths(ids),
         recent == null
@@ -15770,6 +15788,15 @@ export const polities = {
           .map(({ rank: _rank, ...entry }) => entry),
         mapped: ranked?.rows[0]?.id ?? null,
         local,
+        next:
+          upcoming?.date == null
+            ? null
+            : {
+                name: labels.full.get(upcoming.id) ?? "",
+                path: slugs.get(upcoming.id) ?? null,
+                date: upcoming.date,
+                races: counted?.rows[0]?.count ?? 0,
+              },
         latest:
           recent == null
             ? null

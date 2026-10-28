@@ -1030,6 +1030,21 @@
   "polity_no_local": "We don't have any local elections for {place} yet. The races below are statewide and federal, with the votes cast in {place}.",
   "polity_latest": "Latest election",
   "polity_latest_local": "Latest local election",
+  "polity_next": "Up next",
+  "polity_next_races": [
+    {
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural",
+        "local countText = count: number"
+      ],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "{countText} race on the ballot",
+        "countPlural=*": "{countText} races on the ballot"
+      }
+    }
+  ],
   "polity_filter_label": "Show",
   "polity_filter_all": "All",
   "polity_filter_general": "General",

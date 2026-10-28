@@ -499,6 +499,30 @@
     )}
     aria-labelledby="{uid}-latest"
   >
+    {#if polity.next != null}
+      <div
+        class={cn(
+          "flex flex-wrap items-baseline gap-x-3 gap-y-0.5 border-be border-border pbe-3",
+          { "lg:flex-col lg:items-start": isMapped },
+        )}
+      >
+        <h2 class="text-[0.8125rem] font-bold">{m.polity_next()}</h2>
+        {#if polity.next.path == null}
+          <span class="heading">{polity.next.name}</span>
+        {:else}
+          <Preview
+            class="heading underline decoration-border underline-offset-4 hover:decoration-foreground"
+            path={polity.next.path}>{polity.next.name}</Preview
+          >
+        {/if}
+        <span class="text-[0.8125rem] text-muted-foreground">
+          <time datetime={polity.next.date}>{date(polity.next.date)}</time>
+          {#if polity.next.races > 0}
+            · {m.polity_next_races({ count: polity.next.races })}
+          {/if}
+        </span>
+      </div>
+    {/if}
     <div
       class={cn("flex flex-wrap items-baseline gap-x-3 gap-y-0.5", {
         "lg:flex-col lg:items-start": isMapped,

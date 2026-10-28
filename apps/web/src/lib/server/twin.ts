@@ -1593,6 +1593,18 @@ function polityMarkdown(
     )
       ? [m.polity_no_local({ place: polity.name })]
       : []),
+    ...(polity.next == null
+      ? []
+      : [
+          `## ${m.polity_next()}`,
+          [
+            link(polity.next.name, polity.next.path),
+            date(polity.next.date),
+            ...(polity.next.races > 0
+              ? [m.polity_next_races({ count: polity.next.races })]
+              : []),
+          ].join(", "),
+        ]),
     ...(latest == null || latest.races.length === 0
       ? []
       : [
