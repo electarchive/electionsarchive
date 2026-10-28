@@ -20,7 +20,7 @@
   import Export from "#lib/components/export.svelte";
   import { Engine } from "#lib/map/engine.svelte.js";
   import * as Select from "#lib/components/ui/select/index.js";
-  import { isTouch } from "#lib/explain.svelte.js";
+  import { isHover, isTouch } from "#lib/explain.svelte.js";
   import { count, percent, plural, points, precision } from "#lib/format.js";
   import { keep } from "#lib/linked.js";
   import { orpc } from "#lib/rpc.js";
@@ -1818,7 +1818,7 @@
                   })}
             data-k={cell.k}
             onpointermove={(event) => {
-              if (event.pointerType !== "mouse") {
+              if (!isHover(event)) {
                 return;
               }
               const bounds =
