@@ -150,7 +150,13 @@ const fused = (option: SQL, contest: SQL) => sql`
   (
     select ch.party_id from contest_option ch
     join result_set rs on rs.contest_id = ch.contest_id and ${latest("rs")}
-    cross join lateral (select x.value from result_rollup x where x.result_set_k = rs.k and x.option_k = ch.k offset 0) x
+    join contest dc on dc.id = ch.contest_id
+    left join area da on da.id = dc.district_area_id
+    cross join lateral (
+      (select x.value from result_rollup x where x.result_set_k = rs.k and x.area_k = da.k and x.option_k = ch.k offset 0)
+      union all
+      (select x.value from result_rollup x where da.k is null and x.result_set_k = rs.k and x.option_k = ch.k offset 0)
+    ) x
     where ch.contest_id = ${contest} and ch.parent_option_id = ${option} and ch.party_id is not null
     group by ch.id, ch.party_id
     order by exists (
