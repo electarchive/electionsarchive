@@ -6,7 +6,7 @@ from ea.changeset import Changeset
 from ea.store import connect
 
 SOURCE = "tr.artvin_1964"
-VERSION = "1"
+VERSION = "2"
 PUBLISHER = "Cumhuriyet Senatosu"
 CONTEST = UUID("e5e4bfba-9131-5383-9cdd-2caab902189a")
 RESULT_SET = UUID("841a2f91-adc3-56d7-8a1f-d26612465cba")
@@ -72,7 +72,9 @@ def emit() -> Path:
             status="held",
             rerun_of_id=june,
         )
-        cs.add("name", entity_id=election, text="1964 Artvin Senate rerun", lang="en", kind="official", is_preferred=True)
+        cs.add(
+            "name", entity_id=election, text="1964 Artvin Senate rerun", lang="en", kind="official", is_preferred=True
+        )
         cs.add(
             "name",
             entity_id=election,
@@ -96,7 +98,14 @@ def emit() -> Path:
             electoral_system_id=system,
             default_result_kind="counted",
         )
-        cs.add("name", entity_id=contest, text="Senate of the Republic, Artvin", lang="en", kind="official", is_preferred=True)
+        cs.add(
+            "name",
+            entity_id=contest,
+            text="Senate of the Republic, Artvin",
+            lang="en",
+            kind="official",
+            is_preferred=True,
+        )
         cs.add("slug", path="tr/1964-09-20-rerun/artvin", entity_id=contest)
         declared = cs.key(f"{SOURCE}.result_set", "1964-09-20:senate:artvin")
         cs.add(
@@ -137,6 +146,15 @@ def emit() -> Path:
             is_independent=False,
         )
         cs.add("candidacy_nomination", candidacy_id=candidacy, party_id=CHP, kind="nominated")
-        cs.add("outcome", result_set_id=declared, option_id=option, candidacy_id=candidacy, kind="elected", seats=None, notes=None)
+        cs.add("outcome", result_set_id=declared, option_id=option, candidacy_id=None, kind="won", seats=1, notes=None)
+        cs.add(
+            "outcome",
+            result_set_id=declared,
+            option_id=option,
+            candidacy_id=candidacy,
+            kind="elected",
+            seats=None,
+            notes=None,
+        )
         cs.add("citation", entity_id=candidacy, source_id=sources[CERTIFICATE], locator=None)
         return cs.write()

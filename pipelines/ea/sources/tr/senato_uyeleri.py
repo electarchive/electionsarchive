@@ -11,7 +11,7 @@ from ea.changeset import Changeset
 from ea.store import connect
 
 SOURCE = "tr.senato_uyeleri"
-VERSION = "1"
+VERSION = "2"
 SENATE = UUID("fa08c487-e2d8-5d2e-9fc0-7f3bce579c1f")
 MEMBERS = Path(__file__).with_name("senato_uyeleri.tsv")
 PUBLISHER = "Türkiye Büyük Millet Meclisi Vakfı"
@@ -28,6 +28,7 @@ RENEWALS = (
     (date(1966, 6, 5), date(1975, 10, 12)),
     (date(1968, 6, 2), date(1977, 6, 5)),
 )
+JOINED = {(date(1966, 6, 5), "ismen"): (date(1966, 6, 14), date(1971, 7, 20))}
 NOTES = (
     "Every member of the Senate of the Republic, 1961–1980, from the two volumes of Fahri Çöker's biographies of its "
     "members, whose front-matter indexes list each member by category (natural members, members elected by "
@@ -82,7 +83,7 @@ def emit() -> Path:
             """select x.value, c.id, e.date_from,
                  (select ac.code from area_code ac where ac.area_id = c.district_area_id limit 1),
                  coalesce((select m.into_id from entity_merge m where m.entity_id = cy.person_id), cy.person_id),
-                 n.text, case when cy.is_independent then null else coalesce(o.party_id, cn.party_id) end
+                 n.text, case when cy.is_independent then null else coalesce(o.party_id, cn.party_id) end, o.party_id
                from external_id x
                join contest c on c.id = x.entity_id
                join election e on e.id = c.election_id
@@ -133,8 +134,8 @@ def emit() -> Path:
             if later != earlier:
                 survivors[later] = earlier
 
-        elected: list[tuple[str, UUID, date, str, UUID, str, UUID | None, date, str, str]] = []
-        for key, contest, day, plate, person, text, party in winners:
+        elected: list[tuple[str, UUID, date, str, UUID, str, list[tuple[date, date, UUID | None]], date, str, str]] = []
+        for key, contest, day, plate, person, text, party, line in winners:
             override = overrides.get((day, surname(text)))
             if override is not None:
                 if (day, surname(text)) in seen_overrides:
@@ -144,6 +145,12 @@ def emit() -> Path:
             else:
                 end = next((renewal for renewal in groups[plate] if renewal > day), CLOSED)
                 ended = "dissolved" if end == CLOSED else "term_end"
+            joined, left = JOINED.get((day, surname(text)), (end, end))
+            spans = [
+                (start, stop, owner)
+                for start, stop, owner in ((day, joined, party), (joined, left, line), (left, end, party))
+                if stop > start
+            ]
             elected.append(
                 (
                     key,
@@ -152,7 +159,7 @@ def emit() -> Path:
                     plate,
                     person,
                     text,
-                    party,
+                    spans,
                     end,
                     ended,
                     "" if override is None else override["note"],
@@ -252,7 +259,7 @@ def emit() -> Path:
             else:
                 sizes.append((start, end))
 
-        for key, contest, day, plate, person, text, party, end, ended, note in elected:
+        for key, contest, day, plate, person, text, spans, end, ended, note in elected:
             tenure = cs.key(f"{SOURCE}.tenure", f"elected:{key}:{fold(text)}")
             cs.add(
                 "tenure",
@@ -274,15 +281,15 @@ def emit() -> Path:
             if note:
                 cs.add("note", entity_id=tenure, kind="context", body_md=note)
                 cs.add("citation", entity_id=tenure, source_id=source, locator={"member": text})
-            if end > day:
+            for start, stop, party in spans:
                 cs.add(
                     "tenure_affiliation",
                     tenure_id=tenure,
                     kind="party",
                     party_id=party,
-                    valid_from=day,
+                    valid_from=start,
                     valid_from_precision="day",
-                    valid_to=end,
+                    valid_to=stop,
                     valid_to_precision="day",
                 )
 

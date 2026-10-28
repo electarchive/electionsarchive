@@ -30,7 +30,7 @@ from ea.sources.tr.ysk import (
 from ea.store import DATA, connect
 
 SOURCE = "tr.gazette"
-VERSION = "2"
+VERSION = "3"
 PARSED = DATA / "parsed" / SOURCE
 PAGES = DATA / "pages" / SOURCE
 OCR = PARSED / "ocr"
@@ -1500,6 +1500,13 @@ UNEVEN_CAVEAT = (
     "{valid:,}."
 )
 SWAPPED = {(date(1961, 10, 15), "25"), (date(1961, 10, 15), "26")}
+REMAINDER_1966 = (
+    "The 1966 renewal used the national remainder adopted in 1965. Each province first gave a list one seat for every "
+    "full provincial quota, the province's valid votes divided by its seats. The votes left over and the seats left "
+    "unfilled were pooled across Turkey, shared among the parties by their leftover votes, and assigned back to "
+    "provinces, so a list could win a seat here with far fewer votes than a provincial quota."
+)
+LISTED_INDEPENDENT = "{name} stood as an independent on the {party} list; YSK's notice marks the name with an asterisk."
 SWAPPED_CAVEAT = (
     "The decision's list of senators prints Erzurum's three winners as Justice Party (AP) members and "
     "Eskişehir's two as New Turkey Party (YTP) members. Its vote table has the New Turkey Party far ahead in "
@@ -2222,6 +2229,8 @@ def emit() -> Path:
                     cs.add("note", entity_id=declared, kind="caveat", body_md=SENATE_CAVEATS[day])
                 if (day, unit) in BY_CAVEATS:
                     cs.add("note", entity_id=declared, kind="caveat", body_md=BY_CAVEATS[(day, unit)])
+                if day == date(1966, 6, 5):
+                    cs.add("note", entity_id=declared, kind="context", body_md=REMAINDER_1966)
                 if (day, unit) in SWAPPED:
                     cs.add("note", entity_id=declared, kind="caveat", body_md=SWAPPED_CAVEAT)
                 fresh = declared in cs.minted
@@ -2317,6 +2326,13 @@ def emit() -> Path:
                     if party is not None and not independent:
                         cs.add(
                             "candidacy_nomination", candidacy_id=candidacy, party_id=party_ids[party], kind="nominated"
+                        )
+                    if party is not None and independent:
+                        cs.add(
+                            "note",
+                            entity_id=candidacy,
+                            kind="context",
+                            body_md=LISTED_INDEPENDENT.format(name=person_name, party=labels[party]),
                         )
                     if won:
                         cs.add(
