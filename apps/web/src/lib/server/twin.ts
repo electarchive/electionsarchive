@@ -29,6 +29,7 @@ import { getLocale } from "#lib/paraglide/runtime.js";
 import { AFFILIATIONS, RELATIONS } from "#lib/relations.js";
 import {
   archive,
+  atlasPage,
   chamber,
   comparison,
   coverage,
@@ -216,6 +217,9 @@ async function load(segments: Array<string>, search: URLSearchParams) {
   }
   if (head === "coverage" && rest.length === 1) {
     return coverage(rest[0] ?? "");
+  }
+  if (head === "map" && rest.length > 0) {
+    return atlasPage(rest.join("/"), search);
   }
   switch (rest.length === 0 ? head : "") {
     case "coverage": {
@@ -420,6 +424,9 @@ function markdown(data: Data, link: Link) {
     }
     case "polity": {
       return polityMarkdown(data.polity, data.record, data.holders, link);
+    }
+    case "map": {
+      return mapMarkdown(data, link);
     }
     case "election": {
       return electionMarkdown(
@@ -3234,6 +3241,106 @@ function electionMarkdown(
             .join("\n"),
         ]),
   ].filter((block) => block !== "");
+}
+
+function mapMarkdown(data: Extract<Data, { kind: "map" }>, link: Link) {
+  const { atlas } = data;
+  const level = atlas.levels.find((entry) => entry.code === atlas.level);
+  const target = atlas.targets.find((entry) => entry.id === atlas.target);
+  const year = target?.date.slice(0, 4) ?? "";
+  const name = (index: number | null) => {
+    const item = index == null ? null : atlas.legend[index];
+    return item == null ? "" : (item.short ?? item.label);
+  };
+  const won = new Map<number, number>();
+  for (const leader of atlas.places.leader) {
+    if (leader != null) {
+      won.set(leader, (won.get(leader) ?? 0) + 1);
+    }
+  }
+  const rows = atlas.places.k.map((_, i) => {
+    const shares = atlas.places.shares
+      .map((column) => column[i] ?? 0)
+      .toSorted((a, b) => b - a);
+    const [top = 0, next = 0] = shares;
+    const leader = atlas.places.leader[i] ?? null;
+    const prior = atlas.places.prior[i] ?? null;
+    return [
+      atlas.places.name[i] ?? "",
+      name(leader),
+      leader == null ? null : percent(top / 10_000),
+      leader == null ? null : points((top - next) / 10_000),
+      count(atlas.places.valid[i] ?? 0),
+      ...(target == null
+        ? []
+        : [
+            prior === leader || prior == null
+              ? name(prior)
+              : `${name(prior)} (${m.map_flipped()})`,
+          ]),
+    ];
+  });
+  const others = atlas.levels.filter((entry) => entry.code !== atlas.level);
+  const heading = plural(level?.noun ?? "").replace(/^./u, (first) =>
+    first.toUpperCase(),
+  );
+  return [
+    `# ${atlas.scope.unit === "" ? m.atlas_page_title_plain({ title: atlas.title }) : m.atlas_page_title({ title: atlas.title, place: atlas.scope.name })}`,
+    byline(
+      [
+        ...(atlas.scope.path == null
+          ? []
+          : [{ name: atlas.title, path: atlas.scope.path }]),
+      ],
+      link,
+      atlas.date,
+    ),
+    m.twin_map_summary({
+      count: count(atlas.places.k.length),
+      nouns: plural(level?.noun ?? ""),
+    }),
+    ...(target == null
+      ? []
+      : [
+          m.twin_map_compared({ name: target.label }),
+          ...(atlas.estimated ? [m.atlas_estimated_note({ year })] : []),
+        ]),
+    ...(others.length === 0
+      ? []
+      : [
+          m.twin_map_levels({
+            levels: others
+              .map((entry) =>
+                link(
+                  plural(entry.noun),
+                  `map/${data.path}${atlas.scope.unit === "" ? "" : `/${atlas.scope.unit}`}?level=${entry.code}`,
+                ),
+              )
+              .join(", "),
+          }),
+        ]),
+    `## ${m.atlas_won()}`,
+    table(
+      [m.col_party(), heading],
+      won
+        .entries()
+        .toArray()
+        .toSorted((a, b) => b[1] - a[1])
+        .map(([index, total]) => [name(index), count(total)]),
+    ),
+    `## ${heading}`,
+    table(
+      [
+        m.col_place(),
+        m.col_leader(),
+        m.col_share(),
+        m.col_margin(),
+        m.col_votes(),
+        ...(target == null ? [] : [m.twin_map_then({ year })]),
+      ],
+      rows,
+    ),
+  ];
 }
 
 function contestMarkdown(

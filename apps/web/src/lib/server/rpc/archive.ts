@@ -3094,6 +3094,7 @@ async function tabulate(
     isRemainder?: boolean;
     isCounted?: boolean;
     owner: string | null;
+    isApart?: boolean;
   }>,
   date: string | null,
   chosen: {
@@ -3240,12 +3241,13 @@ async function tabulate(
         .filter((entry) => entry.key.startsWith("person:"))
         .map(
           (entry) =>
-            `${rows[index]?.owner ?? ""}:${(entry.current ?? entry.earlier)?.party}`,
+            `${rows[index]?.isApart === true ? index : (rows[index]?.owner ?? "")}:${(entry.current ?? entry.earlier)?.party}`,
         ),
     ),
   );
   const compared = rows.map((row, index) => {
     const current = now[tier[index] ?? 0]?.get(row.k);
+    const owner = row.isApart === true ? index : (row.owner ?? "");
     const sets = current?.sets ?? [];
     for (const set of sets) {
       sources.add(set.source.publisher);
@@ -3259,7 +3261,7 @@ async function tabulate(
     const result = (results[index] ?? []).map((entry) =>
       entry.key.startsWith("party:") &&
       entry.current?.person != null &&
-      personal.has(`${row.owner ?? ""}:${entry.current.party}`)
+      personal.has(`${owner}:${entry.current.party}`)
         ? { ...entry, key: `person:${entry.current.person}` }
         : entry,
     );
@@ -4076,6 +4078,7 @@ async function atlas(input: {
         path: null,
         isContest: false,
         owner: null,
+        isApart: group != null,
       })),
       contest.date,
       then == null
@@ -4106,8 +4109,77 @@ async function atlas(input: {
     targets.rows.map((row) => row.named),
     null,
   );
+  const strays = tabulated.legend.flatMap((item) =>
+    group != null && item.key.startsWith("person:") && item.party != null
+      ? [item.party]
+      : [],
+  );
+  const parties =
+    strays.length === 0 ? null : await names(strays, contest.date);
+  const merged: typeof tabulated.legend = [];
+  const joined = tabulated.legend.map((item) => {
+    const party =
+      parties == null || !item.key.startsWith("person:") ? null : item.party;
+    const key =
+      party == null
+        ? item.key
+        : (tabulated.legend.find(
+            (other) =>
+              !other.key.startsWith("person:") && other.party === party,
+          )?.key ?? `party:${party}`);
+    const at = merged.findIndex((other) => other.key === key);
+    if (at >= 0) {
+      return at;
+    }
+    merged.push(
+      party == null
+        ? item
+        : {
+            ...item,
+            key,
+            label: parties?.full.get(party) ?? item.label,
+            short: parties?.short.get(party) ?? null,
+            person: null,
+          },
+    );
+    return merged.length - 1;
+  });
+  const weight = merged.map(() => 0);
+  for (const row of tabulated.rows) {
+    for (const [index, share] of row.shares.entries()) {
+      const at = joined[index] ?? index;
+      weight[at] = (weight[at] ?? 0) + share * row.valid;
+    }
+  }
+  const order = merged
+    .keys()
+    .toArray()
+    .toSorted((a, b) =>
+      parties == null ? a - b : (weight[b] ?? 0) - (weight[a] ?? 0),
+    );
+  const legend = order.flatMap((index) => merged[index] ?? []);
+  const fold = joined.map((index) => order.indexOf(index));
+  const merge = (values: Array<number>) => {
+    const summed = legend.map(() => 0);
+    for (const [index, value] of values.entries()) {
+      const at = fold[index] ?? index;
+      summed[at] = (summed[at] ?? 0) + value;
+    }
+    return summed;
+  };
   const rows = tabulated.rows.map((row) => ({
     ...row,
+    shares: merge(row.shares),
+    earlier: row.earlier == null ? null : merge(row.earlier),
+    absent: row.absent?.flatMap((index) =>
+      fold.every(
+        (at, other) => at !== fold[index] || row.absent?.includes(other),
+      )
+        ? [fold[index] ?? index]
+        : [],
+    ),
+    leader: row.leader == null ? null : (fold[row.leader] ?? row.leader),
+    prior: row.prior == null ? null : (fold[row.prior] ?? row.prior),
     ...(moved.has(row.k) && { earlier: null, prior: null }),
   }));
   const tail = /, [^,]+$/u.exec(rows[0]?.name ?? "")?.[0];
@@ -4163,13 +4235,11 @@ async function atlas(input: {
       (entry) => entry.tiles == null && known.get(entry.code)?.tiles != null,
     ),
     isAllied: tabulated.isAllied,
-    legend: tabulated.legend.map((item) => ({
+    legend: legend.map((item) => ({
       key: item.key,
       label:
         item.short != null &&
-        tabulated.legend.some(
-          (other) => other !== item && other.label === item.label,
-        )
+        legend.some((other) => other !== item && other.label === item.label)
           ? `${item.label} (${item.short})`
           : item.label,
       short: item.short,
@@ -4191,14 +4261,14 @@ async function atlas(input: {
       }),
       leader: rows.map((row) => row.leader),
       prior: rows.map((row) => row.prior),
-      shares: tabulated.legend.map((_, index) =>
+      shares: legend.map((_, index) =>
         rows.map((row) =>
           row.absent?.includes(index) === true
             ? null
             : Math.round((row.shares[index] ?? 0) * 10_000),
         ),
       ),
-      before: tabulated.legend.map((_, index) =>
+      before: legend.map((_, index) =>
         rows.map((row) =>
           row.earlier == null
             ? null
