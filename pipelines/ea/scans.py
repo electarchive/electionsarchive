@@ -1062,7 +1062,20 @@ def run(name: str, mode: str = "auto") -> str:
             redo = {
                 page
                 for name, entry in outcome["first"].items()
-                if entry.status != "tied" and (reader == "second" or outcome["second"][name].status != "tied")
+                if entry.status != "tied"
+                and (
+                    reader == "second"
+                    or not (
+                        outcome["second"][name].status == "tied"
+                        or (
+                            entry.status == "unchecked"
+                            and not entry.errors
+                            and not outcome["second"][name].errors
+                            and {k: v[0] for k, v in entry.cells.items()}
+                            == {k: v[0] for k, v in outcome["second"][name].cells.items()}
+                        )
+                    )
+                )
                 for page in entry.pages
             }
             if not redo:

@@ -1,0 +1,93 @@
+{
+  "polity": "RO",
+  "publisher": "Biroul Electoral Central",
+  "title": "Proces-verbal privind centralizarea voturilor și atribuirea mandatelor la alegerile pentru membrii din România în Parlamentul European din data de 09 iunie 2024",
+  "license": "Public record",
+  "file": {
+    "url": "https://europarlamentare2024.bec.ro/wp-content/uploads/2024/06/PVCVAM_1.pdf"
+  },
+  "raw_source": "eu.ep2024",
+  "unit_codes": {
+    "a": "a",
+    "a1": "a1",
+    "a2": "a2",
+    "b": "b",
+    "b1": "b1",
+    "b2": "b2",
+    "b3": "b3",
+    "c": "c",
+    "d": "d",
+    "e": "e",
+    "f": "f",
+    "1": "1",
+    "2": "2",
+    "3": "3",
+    "4": "4",
+    "5": "5",
+    "6": "6",
+    "7": "7",
+    "8": "8",
+    "9": "9",
+    "10": "10",
+    "11": "11",
+    "12": "12",
+    "13": "13",
+    "14": "14",
+    "15": "15",
+    "16": "16"
+  },
+  "contests": {
+    "accounting": {
+      "year": 2024,
+      "chamber": "accounting",
+      "day": "2024-06-09",
+      "special": false,
+      "state": "RO",
+      "district": null
+    },
+    "lists": {
+      "year": 2024,
+      "chamber": "lists",
+      "day": "2024-06-09",
+      "special": false,
+      "state": "RO",
+      "district": null
+    },
+    "seats": {
+      "year": 2024,
+      "chamber": "seats",
+      "day": "2024-06-09",
+      "special": false,
+      "state": "RO",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 1,
+      "id": "accounting",
+      "crop": [0.1, 0.42, 0.92, 0.8],
+      "orientation": "counties_down",
+      "hint": "This is not a county table. The rows are the lines a, a1, a2, b, b1, b2, b3, c, d, e, and f of a Romanian election return. Use only the line's letter code (for example a1 or b3) as each row's label, and read the figure in the right-hand column; there is no total row.",
+      "columns": [{ "label": "Numărul", "contest": "accounting", "candidate": "count" }]
+    },
+    {
+      "page": 2,
+      "id": "lists",
+      "crop": [0.1, 0.08, 0.92, 0.45],
+      "orientation": "counties_down",
+      "hint": "This is not a county table. The rows are the 16 lists and independent candidates, numbered 1 to 16 in the Nr. crt. column. Use only that number as each row's label, and read the figure in the right-hand column (Numărul voturilor valabil exprimate obținute); there is no total row.",
+      "columns": [
+        { "label": "Numărul voturilor valabil exprimate obținute", "contest": "lists", "candidate": "votes", "official": 8942629 }
+      ]
+    },
+    {
+      "page": 12,
+      "id": "seats",
+      "crop": [0.1, 0.57, 0.92, 0.81],
+      "orientation": "counties_down",
+      "hint": "This is not a county table. The rows are the lists and independent candidates numbered 1 to 6 in the Nr. crt. column, then a Total row. Use only that number as each row's label (and Total for the last row), and read the figure in the right-hand column (Număr mandate atribuite).",
+      "columns": [{ "label": "Număr mandate atribuite", "contest": "seats", "candidate": "seats" }]
+    }
+  ]
+}

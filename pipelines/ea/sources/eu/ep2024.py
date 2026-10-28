@@ -12,8 +12,9 @@ from html.parser import HTMLParser
 from pathlib import Path
 
 import polars as pl
+from PIL import Image
 
-from ea import raw
+from ea import raw, scans
 from ea.changeset import Changeset
 from ea.store import DATA, connect
 
@@ -42,6 +43,10 @@ FILES = {
     "FI": "https://tulospalvelu.vaalit.fi/EPV-2024/epv-2024_puo_maa.xml.zip",
     "SI": "https://web.archive.org/web/20250407151347id_/https://volitve.dvk-rs.si/ep2024/data/rezultati.json",
     "CY": "https://results.elections.moi.gov.cy/api/greek/Results?electionId=163&districtId=&areaId=&pollingstationId=&ballotboxId=",
+    "LT": "https://www.vrk.lt/lt/2024-m-birzelio-9-d-rinkimai-i-europos-parlamenta/rinkimu-rezultatai#DG_1546_1_2146.csv",
+    "MT": "https://electoral.gov.mt/ElectionResults/MEP",
+    "EE": "https://ep2024.valimised.ee/et/election-result/index.html",
+    "RO": "https://europarlamentare2024.bec.ro/wp-content/uploads/2024/06/PVCVAM_1.pdf",
 }
 SUFFIXES = {
     "FR": ".csv",
@@ -63,6 +68,10 @@ SUFFIXES = {
     "FI": ".zip",
     "SI": ".json",
     "CY": ".json",
+    "LT": ".csv",
+    "MT": ".html",
+    "EE": ".html",
+    "RO": ".pdf",
 }
 CHECKS = [
     "parties",
@@ -696,6 +705,132 @@ def cyprus() -> tuple[list[dict], dict]:
     }
 
 
+def lithuania() -> tuple[list[dict], dict]:
+    seats = {14: 3, 2: 2, 1: 1, 5: 1, 6: 1, 8: 1, 9: 1, 13: 1}
+    votes: dict[tuple[int, str], int] = defaultdict(int)
+    with raw.cached(SOURCE, FILES["LT"]).path.open(encoding="utf-8-sig") as handle:
+        for row in csv.DictReader(handle, delimiter="\t"):
+            votes[(int(row["SARASO_NUMERIS"]), row["SARASO_PAVADINIMAS"])] += int(row["BALSU_VISO"] or 0)
+    lists = [
+        {"label": label, "votes": total, "seats": seats.get(position, 0), "position": position}
+        for (position, label), total in sorted(votes.items())
+    ]
+    return lists, {"valid": sum(votes.values())}
+
+
+def malta() -> tuple[list[dict], dict]:
+    seats = {"Partit Laburista": 3, "Partit Nazzjonalista": 3}
+    page = raw.cached(SOURCE, FILES["MT"]).path.read_text(encoding="utf-8")
+    reader = Rows()
+    reader.feed(page)
+    found = [row for row in reader.rows if row]
+    start = max(index for index, row in enumerate(found) if row[:2] == ["", "Count 1"])
+    lists: list[dict] = []
+    party = None
+    for row in found[start + 1 :]:
+        if row[0] == "Non-Transferrable Votes":
+            break
+        if len(row) == 1:
+            party = row[0]
+            continue
+        if party == "Kandidat Indipendenti" or not lists or lists[-1]["label"] != party:
+            label = row[0] if party == "Kandidat Indipendenti" else party
+            lists.append({"label": label, "votes": 0, "seats": seats.get(label, 0), "position": len(lists) + 1})
+        lists[-1]["votes"] += number(row[1])
+    text = re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", page))
+    value = lambda label: number(re.search(label + r"(?: [\d.]+%)? ([\d,]+)", text)[1])
+    return lists, {
+        "registered": value("Registered Voters"),
+        "cast": value("Votes Cast"),
+        "valid": value("Valid Votes"),
+        "invalid": value("Invalid Votes"),
+    }
+
+
+def estonia() -> tuple[list[dict], dict]:
+    found = rows("EE")
+    start = found.index(["Erakond või üksikkandidaat", "Hääli", "Protsent häältest", "Mandaate"])
+    lists = [
+        {"label": row[0], "votes": number(row[1]), "seats": int(row[3].split()[0]), "position": position}
+        for position, row in enumerate((row for row in found[start + 1 :] if len(row) == 4), start=1)
+    ]
+    text = raw.cached(SOURCE, FILES["EE"]).path.read_text(encoding="utf-8")
+    return lists, {"valid": number(re.search(r"Hääli kokku:\s*([\d\s]+?|[\d&nbsp;]+?)\s*<", text)[1])}
+
+
+ROMANIA = {
+    1: "UNIUNEA DEMOCRATĂ MAGHIARĂ DIN ROMÂNIA",
+    2: "ALIANȚA ELECTORALĂ PSD PNL",
+    3: "PARTIDUL REÎNNOIM PROIECTUL EUROPEAN AL ROMÂNIEI",
+    4: "ALIANȚA AUR",
+    5: "PARTIDUL UMANIST SOCIAL LIBERAL",
+    6: "ALIANȚA DREAPTA UNITĂ USR - PMP - FORȚA DREPTEI",
+    7: "ROMÂNIA SOCIALISTĂ",
+    8: "PARTIDUL ROMÂNIA MARE",
+    9: "PARTIDUL PATRIOȚILOR",
+    10: "PARTIDUL ALTERNATIVA DREAPTĂ",
+    11: "PARTIDUL S.O.S. ROMÂNIA",
+    12: "PARTIDUL DIASPORA UNITĂ",
+    13: "PÎRVĂNESCU PAULA-MARINELA",
+    14: "GHEORGHE VLAD-DAN",
+    15: "ȘTEFĂNUȚĂ NICOLAE-BOGDĂNEL",
+    16: "ȘOȘOACĂ DUMITRU-SILVESTRU",
+}
+SCANS = DATA / "parsed" / "us.scans" / "ro-ep-2024" / "tables.parquet"
+
+
+def romania() -> tuple[list[dict], dict]:
+    read = pl.read_parquet(SCANS)
+    cells = {(row["contest"], row["code"]): row for row in read.iter_rows(named=True)}
+    seated = {2: "1", 4: "2", 6: "3", 11: "4", 1: "5", 15: "6"}
+    value = lambda contest, code: cells[(contest, code)]["votes"]
+    accounting = {code: value("accounting", code) for code in ("a", "a1", "a2", "b", "b1", "b2", "b3", "e", "f")}
+    lists = [
+        {
+            "label": label,
+            "votes": value("lists", str(position)),
+            "seats": value("seats", seated[position]) if position in seated else 0,
+            "position": position,
+        }
+        for position, label in ROMANIA.items()
+    ]
+    wrong = [
+        check
+        for check, holds in (
+            ("a = a1 + a2", accounting["a"] == accounting["a1"] + accounting["a2"]),
+            ("b = b1 + b2 + b3", accounting["b"] == accounting["b1"] + accounting["b2"] + accounting["b3"]),
+            ("e = the lists' sum", accounting["e"] == sum(entry["votes"] for entry in lists)),
+            ("33 seats", sum(entry["seats"] for entry in lists) == 33),
+        )
+        if not holds
+    ]
+    if wrong:
+        raise ValueError(f"RO procès-verbal fails {wrong}")
+    measures = {"a": 2, "b": 3, "e": 4, "f": 5}
+    pl.DataFrame(
+        [
+            {
+                "iso": "RO",
+                "position": None if contest == "accounting" else position,
+                "measure": measures[code] if contest == "accounting" else 1 if contest == "lists" else 16,
+                **{key: cells[(contest, code)][key] for key in ("page", "x0", "y0", "x1", "y1")},
+            }
+            for contest, code, position in (
+                *(("accounting", code, None) for code in measures),
+                *(("lists", str(position), position) for position in ROMANIA),
+                *(("seats", code, position) for position, code in seated.items()),
+            )
+        ],
+        schema_overrides={"position": pl.Int64},
+    ).write_parquet(PARSED / "locators.parquet")
+    return lists, {
+        "registered": accounting["a"],
+        "cast": accounting["b"],
+        "valid": accounting["e"],
+        "invalid": accounting["f"],
+    }
+
+
 PARSERS = {
     "FR": france,
     "IT": italy,
@@ -718,6 +853,10 @@ PARSERS = {
     "FI": finland,
     "SI": slovenia,
     "CY": cyprus,
+    "LT": lithuania,
+    "MT": malta,
+    "EE": estonia,
+    "RO": romania,
 }
 
 
@@ -948,6 +1087,44 @@ AUTHORITIES = {
         date(2024, 6, 9),
         date(2024, 6, 9),
     ),
+    "LT": (
+        "Vyriausioji rinkimų komisija",
+        "2024 m. birželio 9 d. rinkimai į Europos Parlamentą: rinkimų rezultatai pagal apylinkes",
+        "https://www.vrk.lt/lt/2024-m-birzelio-9-d-rinkimai-i-europos-parlamenta/rinkimu-rezultatai",
+        None,
+        date(2024, 6, 9),
+        date(2024, 6, 9),
+    ),
+    "MT": (
+        "Electoral Commission of Malta",
+        "MEP Election 2024: count results, national",
+        FILES["MT"],
+        None,
+        date(2024, 6, 8),
+        date(2024, 6, 8),
+    ),
+    "EE": (
+        "Vabariigi Valimiskomisjon",
+        "Euroopa Parlament 2024: hääletamis- ja valimistulemus, Eesti Vabariik; otsus nr 16, 25.06.2024 (RT III, 27.06.2024, 3)",
+        FILES["EE"],
+        None,
+        date(2024, 6, 9),
+        date(2024, 6, 9),
+    ),
+    "RO": (
+        "Biroul Electoral Central",
+        "Proces-verbal privind centralizarea voturilor și atribuirea mandatelor la alegerile pentru membrii din România în Parlamentul European din data de 09 iunie 2024",
+        FILES["RO"],
+        None,
+        date(2024, 6, 9),
+        date(2024, 6, 9),
+    ),
+}
+NOTES = {
+    "LT": "Votes are the Central Electoral Commission's polling-station file summed by list; their total, 678,319, is the commission's count of valid votes. Seats are as the commission declared them.",
+    "MT": "Malta elects its six members by single transferable vote. Each party's votes are its candidates' first preferences, summed from the Electoral Commission's count sheet, and each independent candidate is shown on their own. Seats are the candidates each party had elected, as the European Parliament's results datasheet gives them.",
+    "EE": "Votes are from the electoral service's results page as of 11 June 2024, with all 378 polling stations, electronic votes, and paper votes from abroad counted. Seats are the members the National Electoral Committee registered on 25 June 2024.",
+    "RO": "The figures were read from a scan of the Central Electoral Bureau's signed procès-verbal and checked against its own arithmetic: the lists' votes add up to the printed total of valid votes, and the seats add up to 33. The boxes that locate each figure on the page are approximate.",
 }
 COUNTRIES = {
     "FR": "France",
@@ -971,6 +1148,10 @@ COUNTRIES = {
     "FI": "Finland",
     "SI": "Slovenia",
     "CY": "Cyprus",
+    "LT": "Lithuania",
+    "MT": "Malta",
+    "EE": "Estonia",
+    "RO": "Romania",
 }
 PARTIES = {
     ("ES", "Partido Popular"): "da48502c-6236-5a46-a8dc-8fc85e82630d",
@@ -1072,6 +1253,7 @@ def emit() -> Path:
             )
 
         frames = []
+        located: list[pl.DataFrame] = []
         for iso, (publisher, title, url, license, start, end) in AUTHORITIES.items():
             if iso not in COUNTRIES or lists.filter(pl.col("iso") == iso).height == 0:
                 continue
@@ -1079,9 +1261,35 @@ def emit() -> Path:
             cs.add(
                 "source", id=source, kind="official_body", publisher=publisher, title=title, url=url, license=license
             )
-            for artifact_url in [FILES.get(iso), PAGES.get(iso), ELECTED.get(iso), DECLARED.get(iso, (None,))[0]]:
-                if artifact_url is not None:
-                    cs.artifact(raw.cached(SOURCE, artifact_url), source)
+            artifacts = {
+                artifact_url: cs.artifact(raw.cached(SOURCE, artifact_url), source)
+                for artifact_url in [FILES.get(iso), PAGES.get(iso), ELECTED.get(iso), DECLARED.get(iso, (None,))[0]]
+                if artifact_url is not None
+            }
+            if iso == "MT":
+                artifacts[f"{EP}/seats-breakdown-parties/mt.csv"] = cs.artifact(
+                    raw.cached(SOURCE, f"{EP}/seats-breakdown-parties/mt.csv"), source
+                )
+            pages: dict[int, str] = {}
+            if iso == "RO":
+                manifest = scans.load("ro-ep-2024")
+                for spec in manifest["pages"]:
+                    image = scans.PAGES / f"{raw.cached(SOURCE, FILES['RO']).sha256}-{spec['page']}.png"
+                    if not image.exists():
+                        image.parent.mkdir(parents=True, exist_ok=True)
+                        scans.render(manifest, spec, 100).save(image)
+                    width, height = Image.open(image).size
+                    page = cs.page(artifacts[FILES["RO"]], spec["page"])
+                    pages[spec["page"]] = str(page)
+                    cs.add(
+                        "source_page",
+                        id=page,
+                        artifact_id=artifacts[FILES["RO"]],
+                        page_number=spec["page"],
+                        image_key=f"pages/{scans.SOURCE}/{image.name}",
+                        width=width,
+                        height=height,
+                    )
             polity = cs.polity(iso)
             election = cs.key("eu.election", f"{iso}:2024:european-parliament")
             path = f"{iso.lower()}/{start}-european-parliament"
@@ -1148,7 +1356,10 @@ def emit() -> Path:
                     is_default=True,
                     completeness=1,
                 )
+                if iso in NOTES:
+                    cs.add("note", entity_id=result_set, kind="methodology", body_md=NOTES[iso])
                 values = []
+                options: dict[int, str] = {}
                 for row in rows.iter_rows(named=True):
                     mapped = PARTIES.get((iso, row["label"]))
                     party = (
@@ -1174,6 +1385,7 @@ def emit() -> Path:
                     )
                     if row["seats"]:
                         cs.add("outcome", result_set_id=result_set, option_id=option, kind="won", seats=row["seats"])
+                    options[row["position"]] = str(option)
                     values += [(str(option), 1, row["votes"]), (str(option), 16, row["seats"])]
                 for accounting in totals.filter((pl.col("iso") == iso) & (pl.col("college") == college)).iter_rows(
                     named=True
@@ -1205,5 +1417,24 @@ def emit() -> Path:
                         },
                     )
                 )
+                if pages:
+                    located.append(
+                        pl.read_parquet(PARSED / "locators.parquet").select(
+                            result_set_id=pl.lit(str(result_set)),
+                            unit_id=pl.lit(str(unit)),
+                            option_id=pl.col("position").replace_strict(options, default=None, return_dtype=pl.String),
+                            channel=pl.lit(0, pl.Int16),
+                            measure=pl.col("measure").cast(pl.Int16),
+                            count_round=pl.lit(0, pl.Int16),
+                            page_id=pl.col("page").replace_strict(pages, return_dtype=pl.String),
+                            source_id=pl.lit(None, pl.String),
+                            x0="x0",
+                            y0="y0",
+                            x1="x1",
+                            y1="y1",
+                        )
+                    )
         cs.frame("result_value", pl.concat(frames))
+        if located:
+            cs.frame("value_locator", pl.concat(located))
         return cs.write()
