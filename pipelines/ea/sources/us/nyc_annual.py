@@ -357,6 +357,16 @@ def emit() -> Path:
                 [first, last],
             ).fetchall():
                 known[(fips, int(value))].add((contest, day, extern, option, city))
+
+            def near(fips: str, total: int) -> list[tuple[UUID, date, str, UUID, bool]]:
+                slack = total * 0.005 if total >= 1000 else 0
+                return [
+                    hit
+                    for (county, value), hits in known.items()
+                    if county == fips and abs(value - total) <= slack
+                    for hit in hits
+                ]
+
             matched: dict[tuple[UUID, str], dict[UUID, tuple[date, str, bool, dict[str, int], int]]] = defaultdict(dict)
             for (block,), group in report.group_by(["block"]):
                 columns = []
@@ -368,7 +378,7 @@ def emit() -> Path:
                 votes = defaultdict(int)
                 for total, _ in columns:
                     for fips in COUNTIES.values():
-                        for contest, *_ in known.get((fips, total), ()):
+                        for contest, *_ in near(fips, total):
                             votes[(fips, contest)] += 1
                 if not votes:
                     continue
@@ -377,12 +387,14 @@ def emit() -> Path:
                     continue
                 leftover = []
                 for total, ads in columns:
-                    found = [hit for hit in known.get((county, total), ()) if hit[0] == contest]
+                    found = [hit for hit in near(county, total) if hit[0] == contest]
                     if len(found) == 1:
                         _, day, extern, option, city = found[0]
                         matched[(contest, county)][option] = (day, extern, city, ads, total)
                     else:
                         leftover.append((total, ads))
+                if not matched[(contest, county)]:
+                    continue
                 day, extern, city = next(iter(matched[(contest, county)].values()))[:3]
                 missing = {
                     option: value
@@ -395,7 +407,14 @@ def emit() -> Path:
                 }
                 for option, value in missing.items():
                     for size in range(1, min(len(leftover), 6) + 1):
-                        pick = next((c for c in combinations(leftover, size) if sum(t for t, _ in c) == value), None)
+                        pick = next(
+                            (
+                                c
+                                for c in combinations(leftover, size)
+                                if abs(sum(t for t, _ in c) - value) <= (value * 0.005 if value >= 1000 else 0)
+                            ),
+                            None,
+                        )
                         if pick is not None:
                             ads = defaultdict(int)
                             for _, column_ads in pick:
@@ -416,7 +435,8 @@ def emit() -> Path:
                 )
             by_contest = defaultdict(dict)
             for (contest, county), options in matched.items():
-                by_contest[contest][county] = options
+                if options:
+                    by_contest[contest][county] = options
             for contest, counties in by_contest.items():
                 if contest in done:
                     continue
