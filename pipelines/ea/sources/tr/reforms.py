@@ -950,6 +950,19 @@ def emit() -> Path:
                 kept += 1
             elif key not in closures:
                 closures[key] = (row["date"], row["kind"], row["targets"], row["law"], row["note"])
+        renamed_centers = {
+            plate: new
+            for day, _, _, kind, plate, new, sources, _, _ in ILCE_CHANGES
+            if kind == "renamed" and sources == ["Merkez"] and day == "2014-03-30"
+        }
+
+        def center(plate: str, text: str) -> UUID | None:
+            if text != "Merkez":
+                return None
+            if plate in renamed_centers:
+                return find(plate, renamed_centers[plate])
+            return historical.get((plate, f"{PROVINCES[int(plate) - 1]} Merkez"))
+
         for key, (plate, parent, town) in sorted(towns.items()):
             area = cs.key("tr.belde", key)
             if area in cs.minted:
@@ -959,7 +972,7 @@ def emit() -> Path:
             cs.add(
                 "area_parent",
                 area_id=area,
-                parent_id=find(plate, parent) or provinces[plate],
+                parent_id=find(plate, parent) or center(plate, parent) or provinces[plate],
                 valid_from=None,
                 valid_from_precision="day",
                 valid_to=end,
@@ -979,7 +992,18 @@ def emit() -> Path:
             if key in closures:
                 day, kind, targets, law, note = closures[key]
                 into = [
-                    find(plate, target) or cs.key("tr.belde", town_key(plate, parent, target)) for target in targets
+                    found
+                    for target in targets
+                    if (
+                        found := find(plate, target)
+                        or (center(plate, target) if plate in renamed_centers else None)
+                        or (
+                            cs.key("tr.belde", town_key(plate, parent, target))
+                            if town_key(plate, parent, target) in towns
+                            else None
+                        )
+                    )
+                    is not None
                 ]
                 event(kind, day, laws[law], note, [(area, "from"), *((t, "to") for t in into)])
                 counts[f"tr.belde {kind}"] = counts.get(f"tr.belde {kind}", 0) + 1
