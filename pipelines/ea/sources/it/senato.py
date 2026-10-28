@@ -1506,6 +1506,16 @@ def emit() -> Path:
             scheme: {value for (value,) in conn.execute("select value from external_id where scheme = %s", [scheme])}
             for scheme in ("it.senato.senatore", "it.interno.person")
         }
+        held_people: set[UUID] = {
+            id
+            for (id,) in conn.execute(
+                """select cy.person_id from candidacy cy join changeset c on c.id = cy.changeset_id
+                   where c.pipeline = %(source)s
+                   union select m.entity_id from entity_merge m join person p on p.id = m.into_id
+                   union select x.entity_id from external_id x where x.scheme like 'it.%%'""",
+                {"source": SOURCE},
+            ).fetchall()
+        }
         bound: dict[tuple[str, str], UUID] = {}
 
         def person_of(row: dict, day: date, region: str) -> UUID:
@@ -1524,6 +1534,7 @@ def emit() -> Path:
             if entity is None:
                 fresh = keys[0]
                 entity = cs.key(*fresh)
+            if fresh is not None and entity not in held_people:
                 birth = senator["birth"] if senator is not None and senator["birth"] is not None else row.get("birth")
                 sex = row.get("sex") or (senator and {"male": "M", "female": "F"}.get(senator["gender"] or ""))
                 cs.add(
@@ -1540,7 +1551,12 @@ def emit() -> Path:
                 )
                 name(entity, display, "it")
             for key in keys:
-                if key not in bound and key != fresh and key[1] not in known_people.get(key[0], ()):
+                if (
+                    key not in bound
+                    and key != fresh
+                    and key[1] not in known_people.get(key[0], ())
+                    and entity not in held_people
+                ):
                     cs.add("external_id", entity_id=entity, scheme=key[0], value=key[1])
                 bound[key] = entity
             return entity
