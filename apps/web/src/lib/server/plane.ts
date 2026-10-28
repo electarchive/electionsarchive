@@ -17,6 +17,7 @@ const {
         clip?: Array<number>;
         srid: number;
         affine: Array<number>;
+        detached?: boolean;
       }>;
     }
   >;
@@ -56,8 +57,10 @@ export const plane = (column: string, scheme: string) =>
 export const spot = (column: string, scheme: string) =>
   sql`ST_Transform(ST_GeometryN(${plane(column, scheme)}, 1), 4326)`;
 
-const insetsOf = (scheme: string) =>
-  projections[schemes[scheme.split(".", 1)[0] ?? ""] ?? fallback]?.insets ?? [];
+const projectionOf = (scheme: string) =>
+  projections[schemes[scheme.split(".", 1)[0] ?? ""] ?? fallback];
+
+const insetsOf = (scheme: string) => projectionOf(scheme)?.insets ?? [];
 
 const part = (scheme: string, column: string) =>
   sql.raw(
@@ -68,7 +71,7 @@ const part = (scheme: string, column: string) =>
       )} else -1 end from ST_Dump(${column}) d cross join lateral (select (ST_XMin(d.geom) + ST_XMax(d.geom)) / 2 as x, (ST_YMin(d.geom) + ST_YMax(d.geom)) / 2 as y) q order by ST_Area(d.geom) desc limit 1)`,
   );
 
-export const abroad = async (
+export const outside = async (
   scheme: string,
   area: string,
   ks: Array<number>,
@@ -77,25 +80,46 @@ export const abroad = async (
   if (ks.length === 0 || ks.length > 5000) {
     return [];
   }
-  const found = await db.execute<{ k: number }>(sql`
+  const insets = insetsOf(scheme);
+  const found = await db.execute<{
+    k: number;
+    part: number;
+    isAbroad: boolean;
+  }>(sql`
     with me as materialized (
       select geom from area_geometry
       where area_id = ${area}::uuid
         and not exists (select from area_parent p where p.area_id = ${area}::uuid and p.valid @> ${day}::date)
       order by valid @> ${day}::date desc, upper(valid) desc nulls first limit 1
     )
-    select a.k from area a
+    select a.k, ${insets.length === 0 ? sql`-1` : part(scheme, "g.geom")} as part,
+      not ST_Covers(me.geom, ST_PointOnSurface(g.geom))
+        and ST_Area(ST_Intersection(me.geom, g.geom)) < 0.5 * ST_Area(g.geom) as "isAbroad"
+    from area a
     cross join me
     cross join lateral (
       select g.geom from area_geometry g where g.area_id = a.id
       order by g.valid @> ${day}::date desc, upper(g.valid) desc nulls first limit 1
     ) g
     where a.k = any(${sql.param(ks)}::int[])
-      and not ST_Covers(me.geom, ST_PointOnSurface(g.geom))
-      and ST_Area(ST_Intersection(me.geom, g.geom)) < 0.5 * ST_Area(g.geom)
-      and ${insetsOf(scheme).length === 0 ? sql`true` : sql`${part(scheme, "g.geom")} = -1`}
+      and not (${sql.raw(
+        (projectionOf(scheme)?.within ?? [])
+          .map(
+            ([west, south, east, north]) =>
+              `g.geom @ ST_MakeEnvelope(${west}, ${south}, ${east}, ${north}, 4326)`,
+          )
+          .join(" or ") || "false",
+      )})
   `);
-  return found.rows.map((row) => row.k);
+  return found.rows.flatMap((row) => {
+    const group: "overseas" | "abroad" | null =
+      insets[row.part]?.detached === true
+        ? "overseas"
+        : row.part === -1 && row.isAbroad
+          ? "abroad"
+          : null;
+    return group == null ? [] : [{ k: row.k, group }];
+  });
 };
 
 export const parted = async (scheme: string, area: string, day: string) => {

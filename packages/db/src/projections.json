@@ -214,7 +214,8 @@
             2.64528,
             -2218159,
             2268475
-          ]
+          ],
+          "detached": true
         },
         {
           "name": "Martinique",
@@ -231,7 +232,8 @@
             3.70637,
             -2828904,
             1000281
-          ]
+          ],
+          "detached": true
         },
         {
           "name": "Guyane",
@@ -248,7 +250,8 @@
             0.4968,
             -576780,
             6553906
-          ]
+          ],
+          "detached": true
         },
         {
           "name": "La Réunion",
@@ -265,7 +268,8 @@
             3.50049,
             -1399500,
             -20053160
-          ]
+          ],
+          "detached": true
         },
         {
           "name": "Mayotte",
@@ -282,7 +286,8 @@
             4.9031,
             -2981255,
             -35541644
-          ]
+          ],
+          "detached": true
         },
         {
           "name": "Saint-Pierre-et-Miquelon",
@@ -299,7 +304,8 @@
             4.56761,
             -2725835,
             -17209313
-          ]
+          ],
+          "detached": true
         },
         {
           "name": "Saint-Martin et Saint-Barthélemy",
@@ -316,7 +322,8 @@
             5.96294,
             -3444715,
             -5556068
-          ]
+          ],
+          "detached": true
         },
         {
           "name": "Wallis-et-Futuna",
@@ -333,7 +340,8 @@
             1.05388,
             -692588,
             -2622034
-          ]
+          ],
+          "detached": true
         },
         {
           "name": "Polynésie française",
@@ -350,7 +358,8 @@
             0.09023,
             -511173,
             5356618
-          ]
+          ],
+          "detached": true
         },
         {
           "name": "Nouvelle-Calédonie",
@@ -367,7 +376,8 @@
             0.48291,
             -369954,
             5919821
-          ]
+          ],
+          "detached": true
         }
       ]
     },

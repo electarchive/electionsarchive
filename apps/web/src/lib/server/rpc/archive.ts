@@ -20,7 +20,7 @@ import * as v from "valibot";
 import { m } from "#lib/paraglide/messages.js";
 import { os, remember } from "#lib/server/cache.js";
 import { db } from "#lib/server/db/index.js";
-import { abroad, parted, plane, spot } from "#lib/server/plane.js";
+import { outside, parted, plane, spot } from "#lib/server/plane.js";
 import { independent } from "#lib/party.js";
 
 const stored = (tiles: string | null | undefined) =>
@@ -568,7 +568,13 @@ const Sketch = v.object({
   shaped: v.optional(v.nullable(v.number())),
   credits: v.optional(v.nullable(v.array(v.string()))),
   outlying: v.optional(
-    v.array(v.object({ k: v.number(), code: v.optional(v.string()) })),
+    v.array(
+      v.object({
+        k: v.number(),
+        code: v.optional(v.string()),
+        group: v.picklist(["territory", "overseas", "abroad"]),
+      }),
+    ),
   ),
 });
 
@@ -7821,7 +7827,13 @@ export const contests = {
             }),
           ),
           outlying: v.optional(
-            v.array(v.object({ k: v.number(), code: v.optional(v.string()) })),
+            v.array(
+              v.object({
+                k: v.number(),
+                code: v.optional(v.string()),
+                group: v.picklist(["territory", "overseas", "abroad"]),
+              }),
+            ),
           ),
           parted: v.optional(
             v.object({ isOnly: v.boolean(), ks: v.array(v.number()) }),
@@ -7890,11 +7902,25 @@ export const contests = {
         kids.filter((kid) => kid.scheme === input.level).map((kid) => kid.k),
       );
       const absent = whole.filter((row) => !present.has(row.k));
+      const offside =
+        input.level == null
+          ? []
+          : await outside(
+              input.level,
+              area.id,
+              [...present, ...whole.map((row) => row.k)],
+              day,
+            );
+      const off = new Set(offside.map((entry) => entry.k));
       const [frame, blankLabels] = await Promise.all([
-        framing(area.id, own.rows[0]?.shaped ?? day, [
-          ...present,
-          ...whole.filter((row) => !row.outside).map((row) => row.k),
-        ]),
+        framing(
+          area.id,
+          own.rows[0]?.shaped ?? day,
+          [
+            ...present,
+            ...whole.filter((row) => !row.outside).map((row) => row.k),
+          ].filter((k) => !off.has(k)),
+        ),
         names(
           absent.map((row) => row.id),
           contest.date,
@@ -7959,7 +7985,7 @@ export const contests = {
           const shaped = new Set(row.shaped);
           const absent = group.ids.filter((id) => !shaped.has(id));
           const isLevel = group.scheme === input.level;
-          const [labels, outlying, split, away] = await Promise.all([
+          const [labels, outlying, split] = await Promise.all([
             names(absent, contest.date),
             isLevel && group.scheme === "us.state"
               ? db.execute<{ k: number; code: string }>(sql`
@@ -7969,11 +7995,14 @@ export const contests = {
               `)
               : null,
             parted(group.scheme, area.id, row.asOf ?? day),
-            isLevel
-              ? abroad(group.scheme, area.id, [...present], row.asOf ?? day)
-              : [],
           ]);
-          const off = [...(outlying?.rows ?? []), ...away.map((k) => ({ k }))];
+          const strip = [
+            ...(outlying?.rows ?? []).map((entry) => ({
+              ...entry,
+              group: "territory" as const,
+            })),
+            ...(isLevel ? offside : []),
+          ];
           return [
             {
               scheme: group.scheme,
@@ -7992,7 +8021,7 @@ export const contests = {
               k: group.ids.includes(area.id) ? area.k : null,
               frame: group.ids.includes(area.id) ? frame : null,
               blank: isLevel ? blank : [],
-              ...(off.length > 0 && { outlying: off }),
+              ...(strip.length > 0 && { outlying: strip }),
               parted: split,
             },
           ];
@@ -10002,11 +10031,22 @@ async function sketch(
     contest == null ? [] : await universe(contest, level, area.id, day);
   const counted = new Set(ks);
   const absent = whole.filter((row) => !counted.has(row.k));
+  const offside = await outside(
+    level,
+    area.id,
+    [...ks, ...whole.map((row) => row.k)],
+    day,
+  );
+  const off = new Set(offside.map((entry) => entry.k));
   const [frame, found, nested, labels, outlying] = await Promise.all([
-    framing(area.id, day, [
-      ...ks,
-      ...whole.filter((row) => !row.outside).map((row) => row.k),
-    ]),
+    framing(
+      area.id,
+      day,
+      [
+        ...ks,
+        ...whole.filter((row) => !row.outside).map((row) => row.k),
+      ].filter((k) => !off.has(k)),
+    ),
     db.execute<{
       scheme: string;
       tiles: string;
@@ -10063,12 +10103,17 @@ async function sketch(
   const own = found.rows.find(
     (row) => row.scheme !== level && stored(row.tiles) != null,
   );
-  const [split, ownSplit, away] = await Promise.all([
+  const [split, ownSplit] = await Promise.all([
     parted(level, area.id, day),
     own == null ? undefined : parted(own.scheme, area.id, day),
-    abroad(level, area.id, ks, day),
   ]);
-  const off = [...(outlying?.rows ?? []), ...away.map((k) => ({ k }))];
+  const strip = [
+    ...(outlying?.rows ?? []).map((entry) => ({
+      ...entry,
+      group: "territory" as const,
+    })),
+    ...offside,
+  ];
   return tiled == null || frame == null
     ? null
     : {
@@ -10090,7 +10135,7 @@ async function sketch(
           }))
           .toSorted((a, b) => a.name.localeCompare(b.name)),
         isApproximate: tiled.synthetic,
-        ...(off.length > 0 && { outlying: off }),
+        ...(strip.length > 0 && { outlying: strip }),
         shaped: ks.length === 0 ? null : tiled.shaped,
         credits:
           ks.length === 0
