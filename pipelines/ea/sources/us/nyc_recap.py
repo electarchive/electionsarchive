@@ -321,6 +321,7 @@ def emit(
     note: str = NOTE,
     strict: bool = False,
     questions: bool = True,
+    fuller: bool = False,
 ) -> Path:
     entries = pl.read_parquet(parsed / "entries.parquet")
     totals = pl.read_parquet(parsed / "totals.parquet")
@@ -685,7 +686,7 @@ def emit(
                     skipped.append(f"{label}: no single default set to compare with")
                     continue
                 completeness = round(min(mine / float(prior[0][1]), 1), 4)
-                if (completeness < 0.995 and not is_state) or mine > float(prior[0][1]) * 1.005:
+                if (completeness < 0.995 and not is_state) or (mine > float(prior[0][1]) * 1.005 and not fuller):
                     skipped.append(f"{label}: totals disagree ({mine} against {prior[0][1]})")
                     continue
                 whole = completeness >= 0.999 and (inside or not is_state)

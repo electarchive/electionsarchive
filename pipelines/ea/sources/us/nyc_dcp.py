@@ -21,7 +21,9 @@ PAGE = "https://www.nyc.gov/content/planning/pages/resources/datasets/election-d
 LICENSE = "Public record; free download with DCP's disclaimer of warranty"
 OLD = "https://www.nyc.gov/assets/planning/download/zip/data-maps/open-data"
 NEW = "https://s-media.nyc.gov/agencies/dcp/assets/files/zip/data-tools/bytes/election-districts"
+WAYBACK = "https://web.archive.org/web/20201018231725id_/https://www1.nyc.gov/assets/planning/download/zip/data-maps/open-data/nyed_12c.zip"
 RELEASED = {
+    "12c": date(2012, 11, 1),
     "13a": date(2013, 2, 28),
     "13b": date(2013, 5, 29),
     "13c": date(2013, 9, 24),
@@ -75,13 +77,13 @@ EFFECTIVE = {**RELEASED, "22b": date(2022, 6, 28), "23d": date(2023, 11, 8)}
 ORDER = list(RELEASED)
 EDITIONS = {
     edition: (
-        f"{OLD if edition <= '22b' else NEW}/nyed_{edition}.zip",
+        WAYBACK if edition == "12c" else f"{OLD if edition <= '22b' else NEW}/nyed_{edition}.zip",
         EFFECTIVE[edition],
         EFFECTIVE[ORDER[index + 1]] if index + 1 < len(ORDER) else None,
     )
     for index, edition in enumerate(ORDER)
 }
-ERAS = {"21b": ("13a", "22a"), "22b": ("22b", "22c"), "23a": ("23a", "23c"), "25b": ("23d", "25d")}
+ERAS = {"21b": ("12c", "22a"), "22b": ("22b", "22c"), "23a": ("23a", "23c"), "25b": ("23d", "25d")}
 COUNTIES = ("36005", "36047", "36061", "36081", "36085")
 BOROUGHS = {
     "21b": {"50105": "36047", "65094": "36061", "65095": "36061", "77073": "36005"},
@@ -178,7 +180,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="New York City's election districts from the Department of City Planning, every edition from 2013 on",
+            summary="New York City's election districts from the Department of City Planning, every edition from November 2012 on",
             polity="US",
         )
         source = cs.source(PUBLISHER, TITLE)

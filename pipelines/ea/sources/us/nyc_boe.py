@@ -1,5 +1,7 @@
+import csv
 import html
 import re
+import subprocess
 from datetime import date
 from pathlib import Path
 from uuid import UUID
@@ -11,7 +13,7 @@ from ea.changeset import Changeset, slug
 from ea.store import DATA, connect
 
 SOURCE = "us.nyc_boe"
-VERSION = "3"
+VERSION = "4"
 PARSED = DATA / "parsed" / SOURCE
 PUBLISHER = "Board of Elections in the City of New York"
 RESULTS = "https://www.vote.nyc/sites/default/files/pdf/election_results"
@@ -125,6 +127,29 @@ PAGES = {
         "027131",
     ],
 }
+SPECIALS = {
+    (date(2021, 2, 2), "24"): (
+        None,
+        "2021/2-02-2021_Special_Election_24th_Council/00400500024Queens%20Member%20of%20the%20City%20Council%2024th%20Council%20District%20EDLevel.csv",
+    ),
+    (date(2021, 2, 23), "31"): (
+        "2021/2-23-2021_Special_Election_31st_Council/Queens_Member_of_the_City_Council_31st_Council_District_022321_RCV_ResultSummary_031921.csv",
+        "2021/2-23-2021_Special_Election_31st_Council/00400500031Queens%20Member%20of%20the%20City%20Council%2031st%20Council%20District%20EDLevel.csv",
+    ),
+    (date(2021, 3, 23), "11"): (
+        "2021/3-23-2021_Special_Election_11th_Council/BX%20032321%20ENResult%2011CD%20by%20Rounds%20Final%20dtd041421.xls",
+        None,
+    ),
+    (date(2021, 3, 23), "15"): (
+        "2021/3-23-2021_Special_Election_15th_Council/BX%20032321%20ENResult%2015CD%20by%20Rounds%20Final%20dtd041421.xls",
+        None,
+    ),
+    (date(2025, 3, 25), "44"): (
+        "https://web.archive.org/web/20250601230853id_/https://vote.nyc/sites/default/files/pdf/election_results/2025/20250325Special%20Election/Council_Member_44th_Council_District.pdf",
+        None,
+    ),
+    (date(2025, 4, 29), "51"): ("2025/20250429Special%20Election/Council_Member_51st_Council_District_1.pdf", None),
+}
 COUNTIES = ("36005", "36047", "36061", "36081", "36085")
 PARTIES = {
     "DEM": ("democratic-party", "Democratic"),
@@ -147,7 +172,7 @@ BOROUGHS = {
     "Richmond": ("36085", "Staten Island"),
 }
 WRITE_INS = "Write-ins"
-WRITTEN = ("Write-ins", "WriteIn")
+WRITTEN = ("Write-ins", "WriteIn", "Undeclared Write-ins")
 INACTIVE = "Inactive ballots"
 PERSONS = {
     "Andrew Yang": ("fec.candidate", "P00006486"),
@@ -172,6 +197,10 @@ def fetch() -> None:
     for day, pages in PAGES.items():
         for page in pages:
             raw.fetch(SOURCE, url(day, page), suffix=".html")
+    for paths in SPECIALS.values():
+        for path in paths:
+            if path is not None:
+                raw.fetch(SOURCE, path if "://" in path else f"{RESULTS}/{path}", suffix=Path(path).suffix)
 
 
 def parse() -> None:
@@ -238,6 +267,100 @@ def parse() -> None:
             )
     PARSED.mkdir(parents=True, exist_ok=True)
     pl.concat(frames).write_parquet(PARSED / "rounds.parquet")
+    specials = []
+    eds = []
+    for (day, district), (rounds_path, ed_path) in SPECIALS.items():
+        key = f"{day}:new-york-city:council-district-{district}"
+        firsts: dict[str, int] = {}
+        if ed_path is not None:
+            link = f"{RESULTS}/{ed_path}"
+            table = pl.read_csv(
+                raw.cached(SOURCE, link).path, has_header=False, infer_schema=False, truncate_ragged_lines=True
+            )
+            table = table.select(pl.nth(range(table.width - 11, table.width)))
+            for ad, ed, *_, unit, tally in table.iter_rows():
+                if ad == "AD":
+                    continue
+                if unit.endswith("Write-In)") or unit == "Scattered":
+                    label = WRITE_INS
+                elif found := re.fullmatch(r"(.+?) \(.*\)", unit):
+                    label = found[1]
+                else:
+                    continue
+                votes = int(tally.strip().replace(",", ""))
+                firsts[label] = firsts.get(label, 0) + votes
+                eds.append((day, district, key, link, ad + ed, label, votes))
+        if rounds_path is None:
+            link = f"{RESULTS}/{ed_path}"
+            counts = [(label, 1, votes) for label, votes in firsts.items()]
+            winner = max(firsts, key=lambda label: firsts[label])
+            if firsts[winner] * 2 <= sum(firsts.values()):
+                raise ValueError(f"{key}: no first-round majority and no rounds file")
+        else:
+            link = rounds_path if "://" in rounds_path else f"{RESULTS}/{rounds_path}"
+            cached = raw.cached(SOURCE, link).path
+            if rounds_path.endswith(".pdf"):
+                text = subprocess.run(
+                    ["pdftotext", "-layout", str(cached), "-"], capture_output=True, text=True, check=True
+                ).stdout
+                decided = re.search(r"(.+?) won the .+? with ([\d,]+) of the votes in the first round", text)
+                if decided is None:
+                    raise ValueError(f"{key}: only first-round decisions are read from PDFs")
+                winner = decided[1].strip()
+                block = text.split("Votes in this round", 1)[1].split("Inactive ballots", 1)[0]
+                counts = [
+                    (WRITE_INS if found[1] in WRITTEN else found[1], 1, int(found[2].replace(",", "")))
+                    for found in re.finditer(r"^\s*(\S.*?)\s{2,}([\d,]+)\s+[\d.]+%", block, re.MULTILINE)
+                ]
+                frame = pl.DataFrame(counts, schema=["label", "round", "votes"], orient="row")
+                specials.append(
+                    frame.with_columns(date=pl.lit(day), url=pl.lit(link), district=pl.lit(district), key=pl.lit(key))
+                )
+                continue
+            rows = [
+                ["" if cell is None else str(cell).strip() for cell in row]
+                for row in (
+                    pl.read_excel(cached, has_header=False).rows()
+                    if rounds_path.endswith(".xls")
+                    else list(csv.reader(cached.read_text(encoding="latin-1").splitlines()))
+                )
+            ]
+            header = next(index for index, row in enumerate(rows) if row and row[0] == "Rounds")
+            rounds = sum(1 for cell in rows[header][1:] if cell.startswith("Round"))
+            winner = next(row[1] for row in rows if row and row[0] == "Winner(s)")
+            counts = []
+            for label, *cells in rows[header + 1 :]:
+                if label in ("Eliminated", "Elected", ""):
+                    continue
+                for number in range(rounds):
+                    cell = cells[number].replace(",", "") if number < len(cells) else ""
+                    if cell and (votes := int(float(cell))) > 0:
+                        counts.append((WRITE_INS if label in WRITTEN else label, number + 1, votes))
+                if label == INACTIVE:
+                    break
+        frame = pl.DataFrame(counts, schema=["label", "round", "votes"], orient="row")
+        totals = frame.group_by("round").agg(pl.col("votes").sum())["votes"].unique()
+        last = frame["round"].max()
+        top = frame.filter((pl.col("round") == last) & (pl.col("label") != INACTIVE)).sort("votes", descending=True)
+        if totals.len() != 1 or top["label"][0] != winner:
+            raise ValueError(f"{key}: rounds do not conserve ballots or the winner differs")
+        specials.append(
+            frame.with_columns(date=pl.lit(day), url=pl.lit(link), district=pl.lit(district), key=pl.lit(key))
+        )
+    pl.concat(specials).write_parquet(PARSED / "specials.parquet")
+    pl.DataFrame(
+        eds,
+        schema={
+            "date": pl.Date,
+            "district": pl.String,
+            "key": pl.String,
+            "url": pl.String,
+            "code": pl.String,
+            "label": pl.String,
+            "votes": pl.Int64,
+        },
+        orient="row",
+    ).write_parquet(PARSED / "special_eds.parquet")
 
 
 def emit() -> Path:
@@ -488,6 +611,174 @@ def emit() -> Path:
                         count_round=1,
                         flags=0,
                         value=rounds_frame.filter(pl.col("round") == 1)["votes"].sum(),
+                    )
+        specials = pl.read_parquet(PARSED / "specials.parquet")
+        eds = pl.read_parquet(PARSED / "special_eds.parquet")
+        for (day,) in specials.select("date").unique().sort("date").iter_rows():
+            election = cs.key("us.election", f"{day}:NY:3651000")
+            if election in cs.minted:
+                cs.add(
+                    "election", id=election, polity_id=city, kind="special", date_from=day, date_to=day, status="held"
+                )
+                name(election, f"{day.year} New York City special election")
+                cs.add("slug", path=f"us/ny/new-york-city/{day}-special", entity_id=election)
+            for (district,) in (
+                specials.filter(pl.col("date") == day).select("district").unique().sort("district").iter_rows()
+            ):
+                rounds_frame = specials.filter((pl.col("date") == day) & (pl.col("district") == district))
+                contest_key, link = rounds_frame.select("key", "url").row(0)
+                district_area = cs.area("us.local_district", f"36:3651000:council:district-{district}")
+                if district_area in cs.minted:
+                    raise ValueError(f"council district {district} must already exist")
+                contest = cs.key("us.contest", contest_key)
+                cs.add(
+                    "contest",
+                    id=contest,
+                    election_id=election,
+                    kind="body_seats",
+                    office_id=None,
+                    body_id=council,
+                    party_scope_id=None,
+                    district_area_id=district_area,
+                    magnitude=1,
+                    round_number=1,
+                    electoral_system_id=irv,
+                    default_result_kind="counted",
+                )
+                name(contest, f"{day.year} New York City Council, District {district} election")
+                cs.add("slug", path=f"us/ny/new-york-city/{day}-special/council-district-{district}", entity_id=contest)
+                sources: dict[str, UUID] = {}
+                for wanted in {link, *eds.filter(pl.col("key") == contest_key)["url"].unique()}:
+                    title = (
+                        f"{day.year} Special Election: Official Ranked Choice Rounds, Council District {district}"
+                        if not wanted.endswith("EDLevel.csv")
+                        else f"{day.year} Special Election: Results by Election District, Council District {district}"
+                    )
+                    sources[wanted] = cs.source(PUBLISHER, title)
+                    cs.add(
+                        "source",
+                        id=sources[wanted],
+                        kind="official_body",
+                        publisher=PUBLISHER,
+                        title=title,
+                        url=wanted,
+                        license="Public record",
+                    )
+                    cs.artifact(raw.cached(SOURCE, wanted), sources[wanted])
+                result_set = cs.key(f"{SOURCE}.result_set", contest_key)
+                cs.add(
+                    "result_set",
+                    id=result_set,
+                    election_id=election,
+                    contest_id=contest,
+                    stage="certified",
+                    kind="counted",
+                    status="active",
+                    source_id=sources[link],
+                    is_default=True,
+                    completeness=1,
+                )
+                rounds = rounds_frame["round"].max()
+                options: dict[str, UUID] = {}
+                lasts = dict(rounds_frame.group_by("label").agg(pl.col("round").max()).iter_rows())
+                for label in rounds_frame.filter(pl.col("round") == 1).sort("votes", descending=True)["label"]:
+                    if label == INACTIVE:
+                        continue
+                    option_key = f"{contest_key}:{slug(label)}"
+                    options[label] = cs.key("us.option", option_key)
+                    cs.add(
+                        "contest_option",
+                        id=options[label],
+                        contest_id=contest,
+                        kind="write_in" if label in WRITTEN else "candidate",
+                        party_id=None,
+                        ballot_label=label,
+                    )
+                    if label in WRITTEN:
+                        continue
+                    person = persons.get(label) or cs.key(f"{SOURCE}.person", slug(label))
+                    if person in cs.minted:
+                        cs.add("person", id=person)
+                        name(person, label)
+                    cs.add(
+                        "candidacy",
+                        id=cs.key("us.candidacy", f"{option_key}:head"),
+                        person_id=person,
+                        option_id=options[label],
+                        role="head",
+                        ballot_name=label,
+                        is_independent=True,
+                    )
+                winner = rounds_frame.filter((pl.col("round") == rounds) & (pl.col("label") != INACTIVE)).sort(
+                    "votes", descending=True
+                )["label"][0]
+                for label, option in options.items():
+                    if label not in WRITTEN:
+                        cs.add(
+                            "outcome",
+                            result_set_id=result_set,
+                            option_id=option,
+                            kind="elected" if label == winner else "lost" if lasts[label] == rounds else "eliminated",
+                        )
+                for label, count_round, votes in rounds_frame.select("label", "round", "votes").iter_rows():
+                    cs.add(
+                        "result_value",
+                        result_set_id=result_set,
+                        unit_id=unit,
+                        option_id=None if label == INACTIVE else options[label],
+                        channel=0,
+                        measure=21 if label == INACTIVE else 1,
+                        count_round=count_round,
+                        flags=0,
+                        value=votes,
+                    )
+                cs.add(
+                    "result_value",
+                    result_set_id=result_set,
+                    unit_id=unit,
+                    option_id=None,
+                    channel=0,
+                    measure=4,
+                    count_round=1,
+                    flags=0,
+                    value=rounds_frame.filter(pl.col("round") == 1)["votes"].sum(),
+                )
+                by_ed = eds.filter(pl.col("key") == contest_key)
+                if by_ed.is_empty():
+                    continue
+                ed_set = cs.key(f"{SOURCE}.result_set", f"{contest_key}:ed")
+                cs.add(
+                    "result_set",
+                    id=ed_set,
+                    election_id=election,
+                    contest_id=contest,
+                    stage="certified",
+                    kind="counted",
+                    status="active",
+                    source_id=sources[by_ed["url"][0]],
+                    is_default=False,
+                    completeness=1,
+                )
+                cs.add(
+                    "note",
+                    entity_id=ed_set,
+                    kind="methodology",
+                    body_md="First choices by election district, from the Board's election district file. "
+                    "The Board published the later rounds for the whole district only.",
+                )
+                for code, label, votes in (
+                    by_ed.group_by("code", "label").agg(pl.col("votes").sum()).sort("code", "label").iter_rows()
+                ):
+                    cs.add(
+                        "result_value",
+                        result_set_id=ed_set,
+                        unit_id=cs.unit("us.nyc_ed", code, day),
+                        option_id=options[label],
+                        channel=0,
+                        measure=1,
+                        count_round=1,
+                        flags=0,
+                        value=votes,
                     )
         cs.pool("The Board of Elections' write-in line read as a candidate")
         return cs.write()
