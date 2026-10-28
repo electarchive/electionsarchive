@@ -724,15 +724,19 @@ export class Engine {
         .then((meta) => {
           const text = String(
             (meta as { attribution?: unknown } | null)?.attribution ?? "",
+          )
+            .replace(/Coastlines © OpenStreetMap[^\n]*/u, "")
+            .trim();
+          const credits = new Set([
+            ...this.credits,
+            ...text
+              .split(text.includes("\n") ? "\n" : "; ")
+              .map((part) => part.trim())
+              .filter((part) => part !== ""),
+          ]);
+          this.credits = [...credits].filter(
+            (credit) => !credits.has(`© ${credit}`),
           );
-          this.credits = [
-            ...new Set([
-              ...this.credits,
-              ...text
-                .split(text.includes("\n") ? "\n" : "; ")
-                .filter((part) => part.trim() !== ""),
-            ]),
-          ];
         });
     }
     return id;
