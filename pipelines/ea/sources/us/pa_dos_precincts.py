@@ -5,14 +5,14 @@ from pathlib import Path
 
 import polars as pl
 
-from ea import raw
+from ea import precinct_code, raw
 from ea.changeset import Changeset
 from ea.sources.us.pa_dos_returns import LANDING, PUBLISHER
 from ea.sources.us.pa_dos_returns import SOURCE as RAW_SOURCE
 from ea.store import DATA, connect
 
 SOURCE = "us.pa_dos_precincts"
-VERSION = "2"
+VERSION = "3"
 PARSED = DATA / "parsed" / SOURCE
 BASE = "https://www.pa.gov/content/dam/copapwp-pagov/en/dos/resources/voting-and-elections/bulk-data/"
 GENERALS = {
@@ -150,14 +150,42 @@ def parse() -> None:
         )
 
 
+def precincts(year: int, primary: bool) -> pl.DataFrame:
+    breaks = ["break1_code", "break1_name", "break2_code", "break2_name"]
+    return (
+        pl.read_parquet(PARSED / f"{year}{'p' if primary else ''}.parquet")
+        .with_columns(
+            municipality=pl.col("municipality").str.strip_suffix(
+                pl.concat_str(
+                    [pl.lit(""), *[pl.col(column).replace("", None) for column in breaks]],
+                    separator=" ",
+                    ignore_nulls=True,
+                )
+            )
+        )
+        .with_columns(
+            unit=precinct_code.expr(
+                pl.lit(year),
+                pl.lit("PA"),
+                (pl.col("county") * 2 + 41999).cast(pl.String),
+                pl.concat_str(
+                    [pl.col("precinct").cast(pl.String), "municipality", "break1_name", "break2_name"], separator=" "
+                ),
+            ),
+            name=pl.concat_str(["municipality", *breaks], separator=" ").str.replace_all(r"\s+", " ").str.strip_chars(),
+        )
+        .with_columns(pl.col("unit", "name").min().over("county", "precinct"))
+    )
+
+
 def emit() -> Path:
     year = int(os.environ["PA_YEAR"])
-    offices = os.environ["PA_OFFICES"].split(",")
+    offices = [office for office in os.environ.get("PA_OFFICES", "").split(",") if office]
     primary = "PA_PRIMARY" in os.environ
     day = (PRIMARIES if primary else GENERALS)[year][1]
     title = f"Precinct Election Returns {year}" + (" Primary" if "PA_PRIMARY" in os.environ else "")
     frame = (
-        pl.read_parquet(PARSED / f"{year}{'p' if primary else ''}.parquet")
+        precincts(year, primary)
         .filter(pl.col("office").is_in(offices))
         .filter(pl.col("party").is_in(list(PARTIES)) if primary else pl.lit(True))
         .with_columns(
@@ -168,9 +196,6 @@ def emit() -> Path:
             )
             .str.replace_all(r"\s+", " ")
             .str.strip_chars(),
-            unit=pl.format(
-                "{}:PA:{}:{}", pl.lit(str(day)), pl.col("county").cast(pl.String).str.zfill(2), pl.col("precinct")
-            ),
         )
     )
     with connect() as conn:
@@ -193,12 +218,6 @@ def emit() -> Path:
                 license="Public record",
             )
         cs.artifact(raw.cached(RAW_SOURCE, url(year, primary)), source)
-        counties = {
-            (int(code) - 42000 + 1) // 2: (str(unit), str(area))
-            for code, unit, area in conn.execute(
-                "select code, id, area_id from reporting_unit where scheme_code = 'us.county' and code like '42%%'"
-            ).fetchall()
-        }
         contests = dict(
             conn.execute(
                 "select value, entity_id from external_id where scheme = 'us.contest' and value like %s",
@@ -211,6 +230,50 @@ def emit() -> Path:
                 [f"{SOURCE}.result_set", f"{day}:PA:%"],
             )
         )
+        known = pl.concat(
+            precincts(year, held_primary)
+            .select(
+                pl.format(
+                    "{}:PA:{}:{}",
+                    pl.lit(str(held_day)),
+                    pl.col("county").cast(pl.String).str.zfill(2),
+                    pl.col("precinct"),
+                ).alias("code"),
+                canonical="unit",
+                name="name",
+                day=pl.lit(held_day),
+            )
+            .unique("code")
+            for held_primary, held_day in ((False, GENERALS[year][1]), (True, PRIMARIES.get(year, (None, None))[1]))
+            if held_day is not None
+        )
+        before = (
+            precinct_code.held(conn, SOURCE, ["PA"])
+            .filter(pl.col("code").str.starts_with(f"{year}-"))
+            .join(known, on="code", how="left")
+        )
+        if before["canonical"].null_count():
+            raise ValueError(f"{before['canonical'].null_count()} held units are missing from the {year} files")
+        moved, locators = precinct_code.remap(cs, conn, before)
+        old = before.select("unit_id", "canonical").unique()
+        moving = pl.DataFrame(
+            conn.execute(
+                """select unit_id::text, area_id::text, valid_from, valid_to, approximate, partial, method::text
+                       from reporting_unit_area where unit_id = any(%s::uuid[])""",
+                [old["unit_id"].to_list()],
+            ).fetchall(),
+            schema={
+                "unit_id": pl.String,
+                "area_id": pl.String,
+                "valid_from": pl.Date,
+                "valid_to": pl.Date,
+                "approximate": pl.Boolean,
+                "partial": pl.Boolean,
+                "method": pl.String,
+            },
+            orient="row",
+        ).join(old, on="unit_id")
+        named = before.sort("day").unique("canonical", keep="first").select("canonical", "name")
         values = []
         memberships: set[tuple[str, str]] = set()
         loaded: set[str] = set()
@@ -306,7 +369,8 @@ def emit() -> Path:
                     p
                     for p in people
                     if p[1] == letters
-                    or p[1][:1] == letters[:1] and (p[1].endswith(letters[-7:]) or letters.endswith(p[1][-7:]))
+                    or p[1][:1] == letters[:1]
+                    and (p[1].endswith(letters[-7:]) or letters.endswith(p[1][-7:]))
                     or ("PA_ADD" in os.environ and p[1][-5:] == letters[-5:])
                 ]
                 found = [p for p in found if p[0] not in targets.values()]
@@ -424,43 +488,21 @@ def emit() -> Path:
                 if office in ("STH", "STS", "USC") and district_area is not None:
                     memberships.add((unit, str(district_area)))
             loaded.update(rows["unit"].unique())
-        if not values:
+        used = sorted(set(before["canonical"]) | set(frame.filter(pl.col("unit").is_in(list(loaded)))["unit"]))
+        if not used:
             print("nothing to load")
             return cs.write()
-        units = (
-            frame.filter(pl.col("unit").is_in(list(loaded)))
-            .group_by("unit")
-            .agg(pl.all().exclude("unit").first())
-            .with_columns(
-                id=pl.col("unit").map_elements(
-                    lambda code: str(cs.unit("us.precinct", code, day)), return_dtype=pl.String
-                ),
-                name=pl.concat_str(
-                    ["municipality", "break1_code", "break1_name", "break2_code", "break2_name"], separator=" "
-                )
-                .str.replace_all(r"\s+", " ")
-                .str.strip_chars(),
-            )
-        )
-        cs.frame(
-            "reporting_unit",
-            units.select(
-                "id",
-                polity_id=pl.lit(str(cs.polity("US-PA"))),
-                scheme_code=pl.lit("us.precinct"),
-                code="unit",
-                parent_id=pl.col("county").replace_strict({n: unit for n, (unit, _) in counties.items()}),
-                area_relation=pl.lit("within"),
-                area_id=pl.col("county").replace_strict({n: area for n, (_, area) in counties.items()}),
-                kind=pl.lit("standard"),
-                valid_from=pl.lit(day),
-                valid_to=pl.lit(day + timedelta(days=1)),
-            ),
-        )
+        fresh = {code for code in used if cs.unit("us.precinct", code) in cs.minted}
+        precinct_code.units(cs, conn, pl.Series(used, dtype=pl.String))
         cs.frame(
             "name",
-            units.select(
-                entity_id="id",
+            pl.concat([named, frame.select(canonical="unit", name="name")])
+            .unique("canonical", keep="first", maintain_order=True)
+            .filter(pl.col("canonical").is_in(list(fresh)))
+            .select(
+                entity_id=pl.col("canonical").map_elements(
+                    lambda code: str(cs.unit("us.precinct", code)), return_dtype=pl.String
+                ),
                 text="name",
                 lang=pl.lit("en"),
                 kind=pl.lit("official"),
@@ -468,29 +510,60 @@ def emit() -> Path:
             ),
         )
         cs.frame(
-            "external_id",
-            units.select(
-                entity_id="id",
-                scheme=pl.lit(f"{SOURCE}.unit"),
-                value=pl.format("{}:{}:{}:{}:{}", pl.lit(str(day)), "fips", "mcd", "vtd", "unit"),
-            ),
-        )
-        unit_ids = dict(zip(units["unit"], units["id"], strict=True))
-        cs.frame(
             "reporting_unit_area",
-            pl.DataFrame(
-                [(unit_ids[unit], area) for unit, area in memberships],
-                schema=["unit_id", "area_id"],
-                orient="row",
-            ).with_columns(valid_from=pl.lit(day), valid_to=pl.lit(day + timedelta(days=1))),
+            pl.concat(
+                [
+                    moving.select(
+                        unit_id=pl.col("canonical").map_elements(
+                            lambda code: str(cs.unit("us.precinct", code)), return_dtype=pl.String
+                        ),
+                        area_id="area_id",
+                        valid_from="valid_from",
+                        valid_to="valid_to",
+                        approximate="approximate",
+                        partial="partial",
+                        method="method",
+                    ),
+                    pl.DataFrame(
+                        [(str(cs.unit("us.precinct", unit)), area) for unit, area in memberships],
+                        schema=["unit_id", "area_id"],
+                        orient="row",
+                    ).with_columns(
+                        valid_from=pl.lit(day),
+                        valid_to=pl.lit(day + timedelta(days=1)),
+                        approximate=pl.lit(False),
+                        partial=pl.lit(False),
+                        method=pl.lit(None, dtype=pl.String),
+                    ),
+                ],
+                how="vertical_relaxed",
+            ).unique(),
         )
+        if moving.height:
+            cs.frame(
+                "unit_area_drop",
+                moving.select(
+                    "unit_id", "area_id", reason=pl.format("{} is replaced by its canonical precinct code", "canonical")
+                ).unique(["unit_id", "area_id"]),
+            )
         cs.frame(
             "result_value",
-            pl.DataFrame(
-                [(rs, unit_ids[unit], option, votes) for rs, unit, option, votes in values],
-                schema=["result_set_id", "unit_id", "option_id", "value"],
-                orient="row",
-            ).with_columns(channel=pl.lit(0), measure=pl.lit(1), count_round=pl.lit(0), flags=pl.lit(0)),
+            pl.concat(
+                [
+                    *moved,
+                    pl.DataFrame(
+                        [(rs, str(cs.unit("us.precinct", unit)), option, votes) for rs, unit, option, votes in values],
+                        schema=["result_set_id", "unit_id", "option_id", "value"],
+                        orient="row",
+                    ).with_columns(channel=pl.lit(0), measure=pl.lit(1), count_round=pl.lit(0), flags=pl.lit(0)),
+                ],
+                how="diagonal_relaxed",
+            ),
         )
-        print(f"{len(loaded)} precincts, {len(values)} values, {len(cs.rows.get('result_set', []))} result set rows")
+        if locators:
+            cs.frame("value_locator", pl.concat(locators, how="vertical_relaxed"))
+        print(
+            f"{before['result_set_id'].n_unique()} sets moved, {len(loaded)} precincts, {len(values)} values, "
+            f"{len(cs.rows.get('result_set', []))} result set rows, {len(used)} units"
+        )
         return cs.write()
