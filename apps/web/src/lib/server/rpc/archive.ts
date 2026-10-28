@@ -2308,7 +2308,9 @@ async function chamber(
   const [parties, holding] = await Promise.all([
     names(
       rows.flatMap((row) =>
-        row.key.startsWith("party:") ? [row.key.slice("party:".length)] : [],
+        row.key.startsWith("party:")
+          ? [row.current?.party ?? row.key.slice("party:".length)]
+          : [],
       ),
       contest.date,
     ),
@@ -2359,8 +2361,14 @@ async function chamber(
     here: at === -1 ? null : at,
     parties: rows.map((row) => ({
       key: row.key,
-      label: parties.full.get(row.key.slice("party:".length)) ?? row.label,
-      short: parties.short.get(row.key.slice("party:".length)) ?? row.short,
+      label:
+        parties.full.get(
+          row.current?.party ?? row.key.slice("party:".length),
+        ) ?? row.label,
+      short:
+        parties.short.get(
+          row.current?.party ?? row.key.slice("party:".length),
+        ) ?? row.short,
       color: here.get(row.key)?.color ?? row.color,
       lean: row.lean,
       seats: row.current?.seats ?? 0,
