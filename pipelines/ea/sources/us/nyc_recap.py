@@ -782,7 +782,8 @@ def emit(
                 declared = dict(
                     conn.execute(
                         """select o.option_id, o.kind from outcome o join result_set r on r.id = o.result_set_id
-                           where r.contest_id = %s and r.is_default and r.id <> %s""",
+                           where r.contest_id = %s and r.id <> %s and o.kind <> 'lost'
+                           order by r.is_default, r.as_of nulls first""",
                         [contest, result_set],
                     ).fetchall()
                 )
@@ -805,7 +806,7 @@ def emit(
                 words = [w for w in re.sub(r"[^a-z ]", " ", label_text.lower().split("/")[0]).split() if w not in ("jr", "sr", "ii", "iii")]
                 if attach and (existing := lookup(label_text)) is not None:
                     roots[candidate] = existing
-                    if whole:
+                    if whole and declared:
                         cs.add("outcome", result_set_id=result_set, option_id=roots[candidate], kind=declared.get(roots[candidate], "lost"))
                     continue
                 roots[candidate] = cs.key("us.option", root_key)
@@ -832,9 +833,9 @@ def emit(
                     for line in real.filter(pl.col("name") == candidate)["party"].drop_nulls().unique().sort():
                         for entity in party_id(line):
                             cs.add("candidacy_nomination", candidacy_id=head, party_id=entity, kind="nominated")
-                if whole and attach:
+                if whole and attach and declared:
                     cs.add("outcome", result_set_id=result_set, option_id=roots[candidate], kind="lost")
-                elif not margin and whole:
+                elif not margin and whole and not attach:
                     cs.add(
                         "outcome",
                         result_set_id=result_set,

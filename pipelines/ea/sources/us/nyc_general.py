@@ -1207,7 +1207,8 @@ def emit() -> Path:
                     dict(
                         conn.execute(
                             """select o.option_id, o.kind from outcome o join result_set r on r.id = o.result_set_id
-                               where r.contest_id = %s and r.is_default and r.id <> %s""",
+                               where r.contest_id = %s and r.id <> %s and o.kind <> 'lost'
+                               order by r.is_default, r.as_of nulls first""",
                             [contest, result_set],
                         ).fetchall()
                     )
