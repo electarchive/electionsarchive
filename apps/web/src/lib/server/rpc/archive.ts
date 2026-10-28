@@ -17217,6 +17217,15 @@ export const bodies = {
             lean: v.nullable(v.number()),
           }),
         ),
+        next: v.nullable(
+          v.object({
+            date: v.string(),
+            name: v.string(),
+            path: v.nullable(v.string()),
+            anchor: v.string(),
+            seats: v.number(),
+          }),
+        ),
       }),
     )
     .handler(async ({ input }) => {
@@ -17233,25 +17242,26 @@ export const bodies = {
       if (body == null) {
         throw new ORPCError("NOT_FOUND");
       }
-      const [labels, slugs, crumbs, peers, sizes, makeup] = await Promise.all([
-        names([input.id, body.polity]),
-        paths([body.polity]),
-        breadcrumbs(body.polity),
-        chambers(body.polity),
-        db.execute<{ seats: number; from: string | null; to: string | null }>(
-          sql`
+      const [labels, slugs, crumbs, peers, sizes, makeup, upcoming] =
+        await Promise.all([
+          names([input.id, body.polity]),
+          paths([body.polity]),
+          breadcrumbs(body.polity),
+          chambers(body.polity),
+          db.execute<{ seats: number; from: string | null; to: string | null }>(
+            sql`
             select seats, lower(valid)::text as from, upper(valid)::text as to
             from body_size where body_id = ${input.id}::uuid
             order by lower(valid) nulls first
           `,
-        ),
-        db.execute<{
-          start: string;
-          party: string | null;
-          caucus: string | null;
-          seats: number;
-          isIndependent: boolean;
-        }>(sql`
+          ),
+          db.execute<{
+            start: string;
+            party: string | null;
+            caucus: string | null;
+            seats: number;
+            isIndependent: boolean;
+          }>(sql`
           with t as materialized (
             select t.id, t.seat_id, t.from_date, coalesce(t.to_date, 'infinity'::date) as to_date, t.contest_id, t.person_id,
               (select e.date_from from contest c join election e on e.id = c.election_id where c.id = t.contest_id) as won
@@ -17316,7 +17326,16 @@ export const bodies = {
           left join entity_merge bm on bm.entity_id = br.parent_party_id
           group by 1, 2, 3 order by 1, 4 desc
         `),
-      ]);
+          db.execute<{ id: string; date: string; seats: number }>(sql`
+          select e.id, e.date_from::text as date, sum(coalesce(c.magnitude, 1))::int as seats
+          from contest c join election e on e.id = c.election_id
+          where c.body_id = ${input.id}::uuid and c.allocation_parent_id is null
+            and c.party_scope_id is null and not c.notional and e.date_from >= current_date
+          group by e.id, e.date_from
+          order by e.date_from, seats desc
+          limit 1
+        `),
+        ]);
       const home = slugs.get(body.polity) ?? null;
       const held = [
         ...new Set(
@@ -17343,6 +17362,11 @@ export const bodies = {
         join body_apportionment a on a.body_id = ${input.id}::uuid and a.valid @> s.start
         group by s.start
       `);
+      const next = upcoming.rows[0];
+      const [nextNames, nextPaths] =
+        next == null
+          ? [null, null]
+          : await Promise.all([names([next.id]), paths([next.id])]);
       const entitled = new Map(apportioned.rows.map((row) => [row.start, row]));
       const last = await db.execute<{ id: string; date: string }>(sql`
         select c.id, e.date_from::text as date from contest c join election e on e.id = c.election_id
@@ -17411,6 +17435,16 @@ export const bodies = {
         })),
         partners:
           pairs?.rows.map((row) => [row.from.slice(6), row.to.slice(6)]) ?? [],
+        next:
+          next == null
+            ? null
+            : {
+                date: next.date,
+                name: nextNames?.full.get(next.id) ?? "",
+                path: nextPaths?.get(next.id) ?? null,
+                anchor: `race-${segment(labels.full.get(input.id) ?? "")}`,
+                seats: next.seats,
+              },
       };
     }),
   members: os

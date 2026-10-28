@@ -1474,6 +1474,22 @@
   "chamber_seats": "Seats",
   "chamber_terms": "Terms on record",
   "chamber_largest": "Largest party",
+  "chamber_next": "Next election",
+  "chamber_next_seats": [
+    {
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural",
+        "local countText = count: number"
+      ],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "{countText} seat up",
+        "countPlural=*": "{countText} seats up"
+      }
+    }
+  ],
+  "chamber_next_line": "Next election: {date}, {seats}.",
   "chamber_members_count": "Members on record",
   "chamber_makeup_title": "Makeup over time",
   "chamber_makeup_seated": "Seats each party held at the start of every term, based on those who actually sat. The dashed line marks a majority. Select a term to view details below.",

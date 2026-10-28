@@ -4662,6 +4662,17 @@ function chamberMarkdown(
       kind: (KINDS[body.kind] ?? m.chamber_kind_other)(),
       polity: link(body.polity.name, body.polity.path),
     }),
+    ...(body.next == null
+      ? []
+      : [
+          m.chamber_next_line({
+            date:
+              body.next.path == null
+                ? date(body.next.date)
+                : link(date(body.next.date), body.next.path),
+            seats: m.chamber_next_seats({ count: body.next.seats }),
+          }),
+        ]),
     ...(isParty
       ? [
           `## ${m.chamber_makeup_title()}`,

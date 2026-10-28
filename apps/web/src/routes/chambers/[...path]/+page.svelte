@@ -412,6 +412,29 @@
             >
           </dd>
         </div>
+        {#if body.next != null}
+          <div class="flex items-baseline gap-2">
+            <dt class="text-[0.8125rem] text-muted-foreground">
+              {m.chamber_next()}
+            </dt>
+            <dd class="flex items-baseline gap-2">
+              {#if body.next.path == null}
+                <span class="text-xl font-[760] tracking-[-0.015em]"
+                  >{date(body.next.date)}</span
+                >
+              {:else}
+                <a
+                  class="text-xl font-[760] tracking-[-0.015em] underline decoration-border underline-offset-4 hover:decoration-foreground"
+                  href="{resolve('/[...path]', { path: body.next.path })}#{body
+                    .next.anchor}">{date(body.next.date)}</a
+                >
+              {/if}
+              <span class="text-base text-muted-foreground"
+                >{m.chamber_next_seats({ count: body.next.seats })}</span
+              >
+            </dd>
+          </div>
+        {/if}
         {#if body.tenures > 0}
           <div class="flex items-baseline gap-2">
             <dt class="text-[0.8125rem] text-muted-foreground">
