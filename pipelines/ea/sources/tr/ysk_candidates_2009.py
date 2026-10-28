@@ -15,10 +15,10 @@ from ea.sources.tr.ysk_mayors import SOURCE as MAYORS
 from ea.store import DATA, connect
 
 SOURCE = "tr.ysk_candidates_2009"
-VERSION = "1"
+VERSION = "2"
 DAY = date(2009, 3, 29)
 PAGE = "https://www.ysk.gov.tr/doc/sayfa/29-mart-2009-mahalli-idareler-genel-secimleri/2819.html"
-SPELLINGS = {"KAZAN": "KAHRAMANKAZAN", "EYÜP": "EYÜPSULTAN"}
+SPELLINGS = {"KAZAN": "KAHRAMANKAZAN", "EYÜP": "EYÜPSULTAN", "BAHŞİLİ": "BAHŞILI", "ONDOKUZMAYIS": "19-May"}
 PARSED = DATA / "parsed" / SOURCE
 CAVEAT = (
     "YSK has published the candidates for this race but, for 2009, no vote counts by municipality; its results "
@@ -107,11 +107,12 @@ def emit() -> Path:
             (plate, upper(text)): id
             for plate, text, id in conn.execute(
                 """select pc.code, n.text, a.id from area a
-                   join area_parent ap on ap.area_id = a.id
+                   join area_parent ap on ap.area_id = a.id and ap.valid @> %s::date
                    join area p on p.id = ap.parent_id and p.scheme_code = 'tr.il'
                    join area_code pc on pc.area_id = p.id
                    join name n on n.entity_id = a.id
-                   where a.scheme_code = 'tr.ilce'"""
+                   where a.scheme_code = 'tr.ilce'""",
+                [DAY],
             ).fetchall()
         }
         existing = {
@@ -161,6 +162,8 @@ def emit() -> Path:
             seen.add(key)
             lookup = SPELLINGS.get(str(district), str(district))
             area = districts.get((plate, upper(lookup)))
+            if area is None:
+                raise ValueError(f"no 2009 ilçe area for {key} ({lookup})")
             polity = cs.key("tr.polity", key)
             office = cs.key("tr.office", f"{key}-mayor")
             if key not in existing:

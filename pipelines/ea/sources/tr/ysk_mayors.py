@@ -186,7 +186,7 @@ def parse() -> None:
     frame.write_parquet(PARSED / "mayors_2004.parquet")
 
 
-VERSION = "1"
+VERSION = "2"
 DAY_2004 = date(2004, 3, 28)
 PAGE_2004 = "https://www.ysk.gov.tr/doc/sayfa/28-mart-2004-mahalli-idareler-genel-secimleri/2818.html"
 METHOD_2004 = (
@@ -195,6 +195,16 @@ METHOD_2004 = (
 )
 TIE_2004 = "YSK's table gives no single party the most votes here, or the most votes go to independents together."
 SPELLINGS = {"AFYON": "AFYONKARAHİSAR", "KAZAN": "KAHRAMANKAZAN", "EYÜP": "EYÜPSULTAN"}
+AREAS = {
+    ("07", "Kale"): "Demre",
+    ("22", "Süleoğlu"): "Süloğlu",
+    ("42", "Hadım"): "Hadim",
+    ("26", "Mihalıçcık"): "Mihalıççık",
+    ("44", "Arapkir"): "Arapgir",
+    ("44", "Pötürge"): "Pütürge",
+    ("55", "19 Mayıs"): "19-May",
+    ("56", "Aydınlar"): "Tillo",
+}
 
 
 def emit() -> Path:
@@ -226,21 +236,22 @@ def emit() -> Path:
             )
 
         turkey = cs.polity("TR")
-        provinces = {plate: cs.area("tr.il", plate) for plate in plates.values()}
         districts = {
             (plate, upper(text)): id
             for plate, text, id in conn.execute(
                 """select pc.code, n.text, a.id from area a
-                   join area_parent ap on ap.area_id = a.id
+                   join area_parent ap on ap.area_id = a.id and ap.valid @> %s::date
                    join area p on p.id = ap.parent_id and p.scheme_code = 'tr.il'
                    join area_code pc on pc.area_id = p.id
                    join name n on n.entity_id = a.id
-                   where a.scheme_code = 'tr.ilce'"""
+                   where a.scheme_code = 'tr.ilce'""",
+                [DAY_2004],
             ).fetchall()
         }
         existing = {
             value for (value,) in conn.execute("select value from external_id where scheme = 'tr.polity'").fetchall()
         }
+        territorial = {polity for (polity,) in conn.execute("select polity_id from polity_territory").fetchall()}
         mayoral = cs.key("tr.electoral_system", "mayor")
         parent = cs.key("tr.election", f"{DAY_2004}:local")
         if cs.minted:
@@ -266,33 +277,56 @@ def emit() -> Path:
             )
         cs.artifact(raw.cached(SOURCE, RESULTS_2004), source)
         seen: set[str] = set()
-        district = ""
+        moved: dict[str, str] = {}
+        used: set[UUID] = set()
+        district = legacy = ""
         for row in frame.iter_rows(named=True):
             level = row["level"]
             text = SPELLINGS.get(upper(row["province"]), upper(row["province"]))
             plate = plates[text]
-            province_slug = slug(PROVINCES[int(plate) - 1])
+            province = PROVINCES[int(plate) - 1]
+            province_slug = slug(province)
             if level == "province":
+                district = ""
                 continue
             label_text = re.sub(r"\s*\(\d\)$", "", str(row["name"])).strip()
             if level == "district":
-                district = label_text
-                central = district.startswith("Merkez")
+                district = legacy = label_text
+            central = district.startswith("Merkez")
+            if level == "district":
                 parts = [province_slug] if central else [province_slug, slug(district)]
-                english = PROVINCES[int(plate) - 1] if central else district
-                district_text = district
-            else:
-                central = district.startswith("Merkez")
+                english = province if central else district
+            elif district:
                 parts = [province_slug, "merkez" if central else slug(district), slug(label_text)]
                 english = label_text
-                district_text = district
+            elif label_text == "Merkez":
+                parts = [province_slug, "merkez"]
+                english = f"{province} Merkez"
+            else:
+                direct = f"{province_slug}-{slug(label_text)}"
+                parts = (
+                    [province_slug, slug(label_text)]
+                    if direct in existing
+                    else [province_slug, "merkez", slug(label_text)]
+                )
+                english = label_text
             key = "-".join(parts)
             path = "tr/" + "/".join(parts)
             if key in seen:
                 raise ValueError(f"two 2004 municipalities share {key}")
             seen.add(key)
-            lookup = re.sub(r"\s*\(.*\)$", "", district_text)
+            if level == "town" and not district:
+                before = "-".join(
+                    [province_slug, "merkez" if legacy.startswith("Merkez") else slug(legacy), slug(label_text)]
+                )
+                if before != key:
+                    moved[before] = key
+                    cs.renamed[f"{DAY_2004}:{key}-mayor"] = f"{DAY_2004}:{before}-mayor"
+            lookup = f"{province} Merkez" if central or not district else re.sub(r"\s*\(.*\)$", "", district)
+            lookup = AREAS.get((plate, lookup), lookup)
             area = districts.get((plate, upper(SPELLINGS.get(upper(lookup), lookup))))
+            if area is None:
+                raise ValueError(f"no 2004 ilçe area for {key} ({lookup})")
             polity = cs.key("tr.polity", key)
             office = cs.key("tr.office", f"{key}-mayor")
             if key not in existing:
@@ -304,6 +338,17 @@ def emit() -> Path:
                 cs.add("office", id=office, polity_id=polity, kind="mayor")
                 name(office, f"Mayor of {english}", "en")
                 name(office, f"{english} Belediye Başkanı", kind="native")
+            if level == "district" and polity not in territorial:
+                territorial.add(polity)
+                cs.add(
+                    "polity_territory",
+                    polity_id=polity,
+                    area_id=area,
+                    valid_from=None,
+                    valid_from_precision="day",
+                    valid_to=None,
+                    valid_to_precision="day",
+                )
             election = cs.key("tr.election", f"{DAY_2004}:{key}-mayor")
             cs.add(
                 "election",
@@ -336,6 +381,7 @@ def emit() -> Path:
             cs.add("slug", path=f"{path}/{DAY_2004}-local/mayor", entity_id=contest)
             scheme = "tr.ilce" if level == "district" else "tr.belde"
             unit = cs.unit(scheme, key)
+            used.add(unit)
             cs.add(
                 "reporting_unit",
                 id=unit,
@@ -343,7 +389,7 @@ def emit() -> Path:
                 scheme_code=scheme,
                 code=key,
                 area_relation="within",
-                area_id=area or provinces[plate],
+                area_id=area,
                 kind="aggregate",
             )
             name(unit, english)
@@ -406,5 +452,20 @@ def emit() -> Path:
                     count_round=0,
                     flags=0,
                     value=count,
+                )
+        for before, after in moved.items():
+            if before in existing:
+                cs.merge(cs.key("tr.polity", before), cs.key("tr.polity", after))
+                cs.merge(cs.key("tr.office", f"{before}-mayor"), cs.key("tr.office", f"{after}-mayor"))
+        for (unit,) in conn.execute(
+            """select ru.id from reporting_unit ru join changeset ch on ch.id = ru.changeset_id
+               where ch.pipeline = %s""",
+            [SOURCE],
+        ).fetchall():
+            if unit not in used:
+                cs.add(
+                    "entity_retirement",
+                    entity_id=unit,
+                    reason="A 2004 reporting unit filed under the wrong ilçe, replaced by the town's unit in its own ilçe.",
                 )
         return cs.write()
