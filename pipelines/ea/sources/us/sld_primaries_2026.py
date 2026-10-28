@@ -16,6 +16,7 @@ import polars as pl
 
 from ea import raw
 from ea.changeset import Changeset, slug
+from ea.sources.us.county_changes import ct_regions
 from ea.sources.us.enr_clarity import STATE_NAMES
 from ea.sources.us.oe_primaries_2026 import (
     BASE,
@@ -467,18 +468,6 @@ PARTIES = {
     "republican": ("rp", "republican-party", "Republican"),
 }
 
-CT_COUNTIES = {
-    "Fairfield": "001",
-    "Hartford": "003",
-    "Litchfield": "005",
-    "Middlesex": "007",
-    "New Haven": "009",
-    "New London": "011",
-    "Tolland": "013",
-    "Windham": "015",
-}
-
-
 def cased(text: str) -> str:
     if not text.isupper():
         return text
@@ -836,10 +825,11 @@ def parse() -> None:
                 )
         if state == "CT":
             totals = defaultdict(int)
+            regions = ct_regions()
             for election in ("111/27708", "112/28256"):
                 lookup = json.loads(raw.cached(SOURCE, url("ct", f"{election}/Lookupdata")).path.read_text())
                 counties_of = {
-                    entry["TownID"]: "09" + CT_COUNTIES[lookup["counties"][entry["CountyID"]]]
+                    entry["TownID"]: regions[re.sub(r"[^a-z]", "", entry["TownName"].lower())]
                     for entry in lookup["countyTowns"]
                 }
                 offices = {key: value for entry in lookup["officeList"] for key, value in entry.items()}
@@ -1705,7 +1695,10 @@ def emit() -> Path:
                     kind="counted",
                     status="active",
                     source_id=source,
-                    is_default=True,
+                    is_default=conn.execute(
+                        "select 1 from result_set where id = %s and not is_default", [result_set]
+                    ).fetchone()
+                    is None,
                     completeness=1,
                 )
                 cs.add(
