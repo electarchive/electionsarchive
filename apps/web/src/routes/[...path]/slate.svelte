@@ -1,17 +1,20 @@
 <script lang="ts">
   import Name from "#lib/components/name.svelte";
-  import { date } from "#lib/format.js";
+  import { resolve } from "$app/paths";
+  import { date, percent } from "#lib/format.js";
   import { m } from "#lib/paraglide/messages.js";
   import { swatch } from "#lib/party.js";
   import type { PageData } from "./$types";
 
   const {
     slate,
+    last,
     held,
   }: {
     slate: NonNullable<
       Extract<PageData, { kind: "contest" }>["contest"]["slate"]
     >;
+    last: Extract<PageData, { kind: "contest" }>["contest"]["last"];
     held: string | null;
   } = $props();
 
@@ -38,35 +41,89 @@
   {#if slate.isUnqualified}
     <p class="text-[0.9375rem] font-semibold">{m.slate_unqualified()}</p>
   {/if}
-  {#if slate.options.length > 0}
-    <ul
-      class="grid divide-y divide-border border-y border-border max-inline-[40rem]"
-    >
-      {#each slate.options as option (option.key)}
-        <li class="flex flex-wrap items-baseline gap-x-3 gap-y-0.5 py-2">
-          <Name
-            class="font-semibold min-inline-0"
-            label={option.label}
-            color={option.party == null
-              ? null
-              : swatch(option.party.color, option.party.id)}
-            person={option.person}
-            party={option.party?.id ?? null}
-          />
-          {#if option.isIncumbent}
-            <span class="highlighter px-1 text-xs font-semibold"
-              >{m.slate_incumbent()}</span
+  <div
+    class="grid items-start gap-x-10 gap-y-5 lg:grid-cols-[minmax(0,40rem)_minmax(0,22rem)]"
+  >
+    {#if slate.options.length > 0}
+      <ul
+        class="grid divide-y divide-border border-y border-border max-inline-[40rem]"
+      >
+        {#each slate.options as option (option.key)}
+          <li class="flex flex-wrap items-baseline gap-x-3 gap-y-0.5 py-2">
+            <Name
+              class="font-semibold min-inline-0"
+              label={option.label}
+              color={option.party == null
+                ? null
+                : swatch(option.party.color, option.party.id)}
+              person={option.person}
+              party={option.party?.id ?? null}
+            />
+            {#if option.isIncumbent}
+              <span class="highlighter px-1 text-xs font-semibold"
+                >{m.slate_incumbent()}</span
+              >
+            {/if}
+            <span class="ms-auto text-sm text-muted-foreground">
+              {#if option.party != null}
+                {option.party.short ?? option.party.name}
+              {:else if option.isIndependent}
+                {m.slate_independent()}
+              {/if}
+            </span>
+          </li>
+        {/each}
+      </ul>
+    {/if}
+    {#if last != null}
+      <aside class="grid gap-2" aria-labelledby="{uid}-last">
+        <div class="grid gap-0.5">
+          <h3 id="{uid}-last" class="text-[0.8125rem] font-bold">
+            {m.slate_last()}
+          </h3>
+          {#if last.path == null}
+            <span class="text-[0.8125rem] text-muted-foreground"
+              >{m.slate_last_link({ date: date(last.date) })}</span
+            >
+          {:else}
+            <a
+              class="text-[0.8125rem] text-muted-foreground underline decoration-border underline-offset-4 hover:text-foreground hover:decoration-foreground"
+              href={resolve("/[...path]", { path: last.path })}
+              >{m.slate_last_link({ date: date(last.date) })}</a
             >
           {/if}
-          <span class="ms-auto text-sm text-muted-foreground">
-            {#if option.party != null}
-              {option.party.short ?? option.party.name}
-            {:else if option.isIndependent}
-              {m.slate_independent()}
-            {/if}
-          </span>
-        </li>
-      {/each}
-    </ul>
-  {/if}
+        </div>
+        <div
+          class="flex overflow-hidden rounded-xs bg-muted block-2"
+          aria-hidden="true"
+        >
+          {#each last.rows as row (row.key)}
+            <span
+              class="block-full"
+              style:inline-size="{row.share * 100}%"
+              style:background-color={swatch(row.color, row.key)}
+            ></span>
+          {/each}
+        </div>
+        <ul class="grid gap-0.5 text-sm">
+          {#each last.rows as row (row.key)}
+            <li
+              class="grid grid-cols-[minmax(0,1fr)_auto] items-baseline gap-x-3"
+            >
+              <Name
+                class="truncate min-inline-0"
+                label={row.label}
+                color={swatch(row.color, row.key)}
+                person={row.person}
+                party={row.party}
+              />
+              <span class="font-figures text-[0.8125rem] tabular-nums"
+                >{percent(row.share)}</span
+              >
+            </li>
+          {/each}
+        </ul>
+      </aside>
+    {/if}
+  </div>
 </section>

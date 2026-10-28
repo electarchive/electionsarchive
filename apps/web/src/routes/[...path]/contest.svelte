@@ -1550,7 +1550,11 @@
     {m.no_counts()}
   </p>
 {:else if contest.current == null && contest.slate != null}
-  <Slate slate={contest.slate} held={contest.election.date} />
+  <Slate
+    slate={contest.slate}
+    last={contest.last ?? null}
+    held={contest.election.date}
+  />
 {:else if contest.current == null}
   <p class="col-span-12 bg-card px-3.5 py-6 text-muted-foreground">
     {m.no_results()}

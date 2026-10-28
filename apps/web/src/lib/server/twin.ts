@@ -4168,6 +4168,21 @@ function resultsMarkdown(
         ].filter((tag) => tag != null);
         return `- ${option.label}${tags.length === 0 ? "" : ` (${tags.join(", ")})`}`;
       }),
+      ...(contest.last == null
+        ? []
+        : [
+            "",
+            `## ${m.slate_last()}`,
+            "",
+            link(
+              m.slate_last_link({ date: date(contest.last.date) }),
+              contest.last.path,
+            ),
+            "",
+            ...contest.last.rows.map(
+              (row) => `- ${row.label}: ${percent(row.share)}`,
+            ),
+          ]),
     ].join("\n");
   }
   return contest.current == null || results.length === 0

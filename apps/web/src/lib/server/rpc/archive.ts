@@ -4657,6 +4657,24 @@ export const contests = {
           }),
         ),
         incumbency: v.nullable(v.picklist(["defeated", "open"])),
+        last: v.optional(
+          v.nullable(
+            v.object({
+              date: v.nullable(v.string()),
+              path: v.nullable(v.string()),
+              rows: v.array(
+                v.object({
+                  key: v.string(),
+                  label: v.string(),
+                  person: v.nullable(v.string()),
+                  party: v.nullable(v.string()),
+                  color: v.nullable(v.string()),
+                  share: v.number(),
+                }),
+              ),
+            }),
+          ),
+        ),
         slate: v.nullable(
           v.object({
             state: v.picklist(["scheduled", "counting", "unreported"]),
@@ -6825,8 +6843,68 @@ export const contests = {
         }
       }
       if (current == null) {
+        const prior =
+          page.slate?.state === "scheduled" &&
+          previous != null &&
+          previous.series === contest.series
+            ? previous
+            : null;
+        const [held, priorSlugs] =
+          prior == null
+            ? [null, null]
+            : await Promise.all([
+                prior.id === chosen?.id
+                  ? before
+                  : load(
+                      [prior.id],
+                      [area.k],
+                      prior.date ?? "infinity",
+                      [prior.id].filter(() => isRoot),
+                      [],
+                      null,
+                      "area",
+                      null,
+                      true,
+                    ),
+                paths([prior.id]),
+              ]);
+        const side = held?.get(area.k)?.side;
+        const leaders =
+          side == null
+            ? []
+            : compare(side, null, lineage, "party")
+                .flatMap((row) =>
+                  row.current == null || row.current.votes <= 0
+                    ? []
+                    : [{ ...row, cell: row.current }],
+                )
+                .toSorted((a, b) => b.cell.votes - a.cell.votes)
+                .slice(0, 2);
+        const leaderNames = await names(
+          leaders.flatMap((row) =>
+            row.cell.person == null ? [] : [row.cell.person],
+          ),
+          prior?.date ?? null,
+        );
         return {
           ...page,
+          last:
+            prior == null || leaders.length === 0
+              ? null
+              : {
+                  date: prior.date,
+                  path: priorSlugs?.get(prior.id) ?? null,
+                  rows: leaders.map((row) => ({
+                    key: row.key,
+                    label:
+                      leaderNames.full.get(row.cell.person ?? "") ??
+                      row.cell.label,
+                    person: row.cell.person,
+                    party: row.cell.party,
+                    color: row.color,
+                    share: row.cell.share,
+                  })),
+                },
           series,
           places: grid,
           targets,
