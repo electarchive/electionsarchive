@@ -1174,39 +1174,54 @@ function personMarkdown(
       .filter((part) => part != null)
       .join(". "),
     ...(() => {
-      if (person.record.length === 0) {
-        return [];
-      }
-      const won = person.record.filter(
+      const today = new Date().toISOString().slice(0, 10);
+      const held = person.record.filter(
+        (entry) => entry.outcome != null || entry.date < today,
+      );
+      const next = person.record
+        .filter((entry) => entry.outcome == null && entry.date >= today)
+        .map((entry) => entry.date)
+        .toSorted((a, b) => a.localeCompare(b))
+        .at(0);
+      const won = held.filter(
         (entry) => entry.outcome === "elected" || entry.outcome === "won",
       ).length;
-      const advanced = person.record.filter(
+      const advanced = held.filter(
         (entry) => entry.outcome === "advanced",
       ).length;
-      const first = Math.min(...person.record.map((entry) => entry.year));
-      const last = Math.max(...person.record.map((entry) => entry.year));
-      return [
-        person.record.length === 1
-          ? (won > 0 ? m.person_lede_single_won : m.person_lede_single)({
-              year: String(first),
-            })
-          : first === last
-            ? (advanced > 0 ? m.person_lede_advanced_year : m.person_lede_year)(
-                {
+      const first = Math.min(...held.map((entry) => entry.year));
+      const last = Math.max(...held.map((entry) => entry.year));
+      const lede =
+        held.length === 0
+          ? null
+          : held.length === 1
+            ? (won > 0 ? m.person_lede_single_won : m.person_lede_single)({
+                year: String(first),
+              })
+            : first === last
+              ? (advanced > 0
+                  ? m.person_lede_advanced_year
+                  : m.person_lede_year)({
                   won: count(won),
                   advanced: count(advanced),
-                  count: count(person.record.length),
+                  count: count(held.length),
                   year: String(first),
-                },
-              )
-            : (advanced > 0 ? m.person_lede_advanced : m.person_lede)({
-                won: count(won),
-                advanced: count(advanced),
-                count: count(person.record.length),
-                first: String(first),
-                last: String(last),
-              }),
-      ];
+                })
+              : (advanced > 0 ? m.person_lede_advanced : m.person_lede)({
+                  won: count(won),
+                  advanced: count(advanced),
+                  count: count(held.length),
+                  first: String(first),
+                  last: String(last),
+                });
+      return [
+        [
+          lede,
+          next == null ? null : m.person_lede_upcoming({ date: date(next) }),
+        ]
+          .filter((part) => part != null)
+          .join(" "),
+      ].filter((part) => part !== "");
     })(),
     ...[
       { title: m.person_served(), spells: person.served },
@@ -1359,9 +1374,13 @@ function personMarkdown(
             `${
               entry.isUnopposed === true && entry.outcome === "elected"
                 ? m.person_elected_unopposed()
-                : entry.note == null || isDerived(entry.note)
-                  ? outcome(entry.outcome)
-                  : `${outcome(entry.outcome)} (${entry.note})`
+                : entry.outcome == null
+                  ? entry.date >= new Date().toISOString().slice(0, 10)
+                    ? m.person_record_upcoming({ date: date(entry.date) })
+                    : ""
+                  : entry.note == null || isDerived(entry.note)
+                    ? outcome(entry.outcome)
+                    : `${outcome(entry.outcome)} (${entry.note})`
             }${entry.isWriteIn === true ? ` (${m.results_write_in().toLowerCase()})` : ""}`,
           ]),
         ),

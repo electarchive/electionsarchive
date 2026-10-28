@@ -102,7 +102,18 @@
         })),
       }));
   });
-  const races = $derived(entries.map((entry) => entry.outcome));
+  const today = new Date().toISOString().slice(0, 10);
+  const held = $derived(
+    entries.filter((entry) => entry.outcome != null || entry.date < today),
+  );
+  const next = $derived(
+    entries
+      .filter((entry) => entry.outcome == null && entry.date >= today)
+      .map((entry) => entry.date)
+      .toSorted((a, b) => a.localeCompare(b))
+      .at(0) ?? null,
+  );
+  const races = $derived(held.map((entry) => entry.outcome));
   const won = $derived(
     races.filter((outcome) => outcome === "elected" || outcome === "won")
       .length,
@@ -110,10 +121,9 @@
   const advanced = $derived(
     races.filter((outcome) => outcome === "advanced").length,
   );
-  const years = $derived(entries.map((entry) => entry.year));
+  const years = $derived(held.map((entry) => entry.year));
   const first = $derived(Math.min(...years));
   const last = $derived(Math.max(...years));
-  const today = new Date().toISOString().slice(0, 10);
   const endings: Record<string, () => string> = {
     died: m.person_ended_died,
     resigned: m.person_ended_resigned,
@@ -386,26 +396,31 @@
           <p
             class="font-serif text-[clamp(1.0625rem,1.6vw,1.25rem)]/snug text-pretty max-inline-[60ch]"
           >
-            {races.length === 1
-              ? (won > 0 ? m.person_lede_single_won : m.person_lede_single)({
-                  year: String(first),
-                })
-              : first === last
-                ? (advanced > 0
-                    ? m.person_lede_advanced_year
-                    : m.person_lede_year)({
-                    won: count(won),
-                    advanced: count(advanced),
-                    count: count(races.length),
+            {#if races.length > 0}
+              {races.length === 1
+                ? (won > 0 ? m.person_lede_single_won : m.person_lede_single)({
                     year: String(first),
                   })
-                : (advanced > 0 ? m.person_lede_advanced : m.person_lede)({
-                    won: count(won),
-                    advanced: count(advanced),
-                    count: count(races.length),
-                    first: String(first),
-                    last: String(last),
-                  })}
+                : first === last
+                  ? (advanced > 0
+                      ? m.person_lede_advanced_year
+                      : m.person_lede_year)({
+                      won: count(won),
+                      advanced: count(advanced),
+                      count: count(races.length),
+                      year: String(first),
+                    })
+                  : (advanced > 0 ? m.person_lede_advanced : m.person_lede)({
+                      won: count(won),
+                      advanced: count(advanced),
+                      count: count(races.length),
+                      first: String(first),
+                      last: String(last),
+                    })}
+            {/if}
+            {#if next != null}
+              {m.person_lede_upcoming({ date: date(next) })}
+            {/if}
           </p>
         {/if}
         {#if person.served.length > 0}
@@ -474,6 +489,13 @@
                               entry.isMuted,
                           },
                         )}>{OUTCOMES[entry.outcome]?.() ?? entry.outcome}</span
+                      >
+                    {:else if entry.date >= today}
+                      <span
+                        class="ms-1 rounded-xs bg-secondary px-1 text-xs font-semibold whitespace-nowrap text-muted-foreground"
+                        >{m.person_record_upcoming({
+                          date: date(entry.date),
+                        })}</span
                       >
                     {/if}
                     {#if entry.isWriteIn === true}
@@ -563,8 +585,7 @@
               <li
                 class="grid grid-cols-[3rem_minmax(0,1fr)] items-baseline gap-x-3 border-be border-border/60 py-2 text-[0.8125rem] last:border-be-0 max-sm:grid-cols-[2.75rem_minmax(0,1fr)]"
               >
-                <span
-                  class="font-figures text-muted-foreground tabular-nums"
+                <span class="font-figures text-muted-foreground tabular-nums"
                   >{group.entries.length === 0 && at === 0
                     ? group.year
                     : ""}</span
@@ -573,7 +594,7 @@
                   <span class="text-muted-foreground">{line}</span>
                 {:else}
                   <a
-                    class="justify-self-start text-muted-foreground hover:text-foreground hover:highlighter"
+                    class="justify-self-start text-muted-foreground hover:highlighter hover:text-foreground"
                     href={resolve("/[...path]", { path: row.path })}>{line}</a
                   >
                 {/if}
