@@ -20,7 +20,7 @@ from ea.sources.us.wikidata_links import NICKNAMES
 from ea.store import DATA, connect
 
 SOURCE = "us.medsl_state"
-VERSION = "2"
+VERSION = "3"
 PARSED = DATA / "parsed" / SOURCE
 ACCESS = "https://dataverse.harvard.edu/api/access/datafile"
 RETURNS = f"{ACCESS}/13730906"
@@ -134,6 +134,19 @@ INDEPENDENT = {
     "WRITEIN",
 }
 CROSS_FILED = {("VT", "DEMOCRAT/REPUBLICAN"): "REPUBLICAN/DEMOCRAT"}
+COMBINED = (
+    "NH:independent-democrat-party",
+    "NY:republican-ibf-party",
+    "OR:democrat-independent-party",
+    "OR:democrat-independent-working-families-party",
+    "OR:democrat-working-families-party",
+    "OR:republican-democrat-party",
+    "PA:democratic-republican-party",
+    "VT:democrat-progressive-party",
+    "VT:democrat-republican-party",
+    "VT:progressive-democrat-party",
+    "VT:republican-libertarian-party",
+)
 EXPANDED = {"PFP": "PEACE AND FREEDOM", "CSS": "COMMON SENSE", "LOC607": "LOCAL 607"}
 
 
@@ -852,6 +865,15 @@ def emit() -> Path:
                 name(found, text)
             return found, False
 
+        for (value,) in conn.execute(
+            "select value from external_id where scheme = 'us.party' and value = any(%s)", [list(COMBINED)]
+        ).fetchall():
+            cs.add(
+                "entity_retirement",
+                entity_id=cs.key("us.party", value),
+                reason="A cross-filed candidate's party labels in MEDSL's file, minted as one party; the candidate "
+                "is nominated by each.",
+            )
         bodies: dict[tuple[str, str], tuple[UUID, str, str, str]] = {}
         persons: dict[tuple[str, str], UUID] = {}
         values: list[tuple[str, str, str, int]] = []
@@ -1017,6 +1039,8 @@ def emit() -> Path:
                             if single and " " not in ballot:
                                 problems.append(f"surname only: {state} {office} {district} {candidate}")
                     persons[person_key] = person
+                    if single and person in known_names:
+                        ballot = initials(known_names[person])
                     if head not in taken:
                         cs.add(
                             "candidacy",
