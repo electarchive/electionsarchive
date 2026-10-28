@@ -21,6 +21,7 @@ from uuid import UUID
 
 import anthropic
 import httpx
+import numpy as np
 import polars as pl
 from anthropic.types import ImageBlockParam, TextBlockParam
 from anthropic.types.message_create_params import MessageCreateParamsNonStreaming
@@ -126,6 +127,7 @@ class Read:
     span: tuple[float, float]
     digest: str
     pixels: int
+    image: bytes
     key: str
     params: MessageCreateParamsNonStreaming
 
@@ -349,11 +351,11 @@ def framing(spec: Page, reader: str) -> tuple[list[float], int, int]:
 @cache
 def bands(
     name: str, reader: str
-) -> list[tuple[str, str, tuple[float, float], list[ImageBlockParam | TextBlockParam], str, int]]:
+) -> list[tuple[str, str, tuple[float, float], list[ImageBlockParam | TextBlockParam], str, int, bytes]]:
     manifest = load(name)
     folder = WORK / name / "crops"
     folder.mkdir(parents=True, exist_ok=True)
-    out: list[tuple[str, str, tuple[float, float], list[ImageBlockParam | TextBlockParam], str, int]] = []
+    out: list[tuple[str, str, tuple[float, float], list[ImageBlockParam | TextBlockParam], str, int, bytes]] = []
     for spec in manifest["pages"]:
         (x0, y0, x1, y1), count, dpi = framing(spec, reader)
         image = render(manifest, spec, dpi)
@@ -437,6 +439,7 @@ def bands(
                     blocks,
                     digest.hexdigest(),
                     pixels,
+                    data,
                 )
             )
     return out
@@ -445,7 +448,7 @@ def bands(
 def requests(name: str, reader: str) -> dict[str, Read]:
     starts = {str(spec.get("id", spec["page"])): spec.get("start") for spec in load(name)["pages"]}
     out: dict[str, Read] = {}
-    for custom, page, span, blocks, digest, pixels in bands(name, reader):
+    for custom, page, span, blocks, digest, pixels, image in bands(name, reader):
         model, effort, _, _ = READERS["second" if reader == "first" and starts[page] == "second" else reader]
         out[custom] = Read(
             custom=custom,
@@ -453,6 +456,7 @@ def requests(name: str, reader: str) -> dict[str, Read]:
             span=span,
             digest=digest,
             pixels=pixels,
+            image=image,
             key=f"anthropic-batch:{model}/{PROMPT}/{effort}/{digest}",
             params=MessageCreateParamsNonStreaming(
                 model=model,
@@ -524,13 +528,89 @@ def counties(manifest: Manifest) -> dict[str, str]:
     }
 
 
+def calibrate(name: str, plan: dict[str, Read]) -> dict[str, list[float]]:
+    path = WORK / name / "calibration.json"
+    known: dict[str, list[float]] = json.loads(path.read_text()) if path.exists() else {}
+
+    def fit(request: Read) -> list[float] | None:
+        table = parse(cached(request.key))
+        if isinstance(table, str):
+            return None
+        ink = np.asarray(Image.open(io.BytesIO(request.image)).convert("L")) < 140
+        height, width = ink.shape
+        ink[ink.mean(axis=1) > 0.5, :] = False
+        ink[:, ink.mean(axis=0) > 0.5] = False
+        buffer = io.BytesIO()
+        Image.fromarray(np.where(ink, 0, 255).astype(np.uint8)).save(buffer, "PNG")
+        found: dict[str, list[tuple[float, float]]] = {}
+        for word in (
+            subprocess.run(
+                ["tesseract", "stdin", "-", "--psm", "11", "tsv"],
+                input=buffer.getvalue(),
+                capture_output=True,
+                check=True,
+                env={**os.environ, "OMP_THREAD_LIMIT": "1"},
+            )
+            .stdout.decode()
+            .splitlines()[1:]
+        ):
+            parts = word.split("\t")
+            digits = re.sub(r"\D", "", parts[-1]) if len(parts) == 12 and re.fullmatch(r"[\d,.]+", parts[-1]) else ""
+            if len(digits) > 1:
+                found.setdefault(digits, []).append(
+                    ((int(parts[6]) + int(parts[8]) / 2) / width, (int(parts[7]) + int(parts[9]) / 2) / height)
+                )
+        read: dict[str, list[tuple[float, float]]] = {}
+        for row in table["rows"]:
+            if len(row["values"]) != len(table["header"]):
+                continue
+            for entry, text in zip(table["header"], row["values"], strict=True):
+                digits = re.sub(r"\D", "", text)
+                if len(digits) > 1:
+                    read.setdefault(digits, []).append(((entry["x0"] + entry["x1"]) / 2, (row["y0"] + row["y1"]) / 2))
+        pairs = [(read[d][0], found[d][0]) for d in read if len(read[d]) == 1 and len(found.get(d, [])) == 1]
+        out: list[float] = []
+        for axis, size in ((0, width), (1, height)):
+            points = [(model[axis], page[axis]) for model, page in pairs]
+            line: tuple[float, float] | None = None
+            for _ in range(3):
+                if len(points) < 4 or max(p[0] for p in points) - min(p[0] for p in points) < 20:
+                    line = None
+                    break
+                mean = sum(p[0] for p in points) / len(points), sum(p[1] for p in points) / len(points)
+                slope = sum((p[0] - mean[0]) * (p[1] - mean[1]) for p in points) / sum(
+                    (p[0] - mean[0]) ** 2 for p in points
+                )
+                line = (slope, mean[1] - slope * mean[0])
+                misses = sorted(abs(line[0] * p[0] + line[1] - p[1]) for p in points)
+                limit = max(0.01, 3 * misses[len(misses) // 2])
+                points = [p for p in points if abs(line[0] * p[0] + line[1] - p[1]) <= limit]
+            if line is None or line[0] <= 0:
+                reported = [e["x1"] for e in table["header"]] if axis == 0 else [e["y1"] for e in table["rows"]]
+                scale = min(1.0, 2576 / max(width, height))
+                line = (1 / (size * scale) if max(reported, default=0) > 1000 else 1 / 1000, 0.0)
+                points = []
+            out += [line[0], line[1], len(points)]
+        return out
+
+    todo = [request for request in plan.values() if request.key not in known and cached(request.key) is not None]
+    with ThreadPoolExecutor(max_workers=8) as pool:
+        for request, line in zip(todo, pool.map(fit, todo), strict=True):
+            if line is not None:
+                known[request.key] = line
+    if todo:
+        path.write_text(json.dumps(known))
+    return known
+
+
 def cells(
     manifest: Manifest, plan: dict[str, Read], names: dict[str, str], reader: str
 ) -> tuple[dict[tuple[str, str, int], tuple[int, list[float]]], dict[tuple[str, int], int], dict[str, str]]:
     values: dict[tuple[str, str, int], tuple[int, list[float]]] = {}
-    margin: dict[tuple[str, str, int], int] = {}
+    margin: dict[tuple[str, str, int], float] = {}
     printed: dict[tuple[str, int], int] = {}
     errors: dict[str, str] = {}
+    lines = calibrate(manifest["name"], plan)
     extra = {slug(label).replace(" ", ""): code for label, code in manifest.get("unit_codes", {}).items()}
     towns = manifest.get("unit_scheme") == "town"
     folded = towns or manifest.get("unit_scheme") == "split"
@@ -569,6 +649,7 @@ def cells(
                 errors[number] = f"{custom}: row bands are not ascending"
                 continue
             start, stop = request.span
+            ax, bx, _, ay, by, _ = lines.get(request.key, [0.001, 0.0, 0, 0.001, 0.0, 0])
             heading = ""
             for r, row in enumerate(rows):
                 if towns and not any(row["values"]):
@@ -625,13 +706,22 @@ def cells(
                         break
                     unit = slug(label).replace(" ", "") if folded else code
                     home[unit] = code
+                    left, right, top, bottom = (
+                        min(1.0, max(0.0, a * v + b))
+                        for a, b, v in (
+                            (ax, bx, header[c]["x0"]),
+                            (ax, bx, header[c]["x1"]),
+                            (ay, by, row["y0"]),
+                            (ay, by, row["y1"]),
+                        )
+                    )
                     box = [
-                        x0 + (x1 - x0) * header[c]["x0"] / 1000,
-                        y0 + (y1 - y0) * (start + (stop - start) * row["y0"] / 1000),
-                        x0 + (x1 - x0) * header[c]["x1"] / 1000,
-                        y0 + (y1 - y0) * (start + (stop - start) * row["y1"] / 1000),
+                        x0 + (x1 - x0) * left,
+                        y0 + (y1 - y0) * (start + (stop - start) * top),
+                        x0 + (x1 - x0) * right,
+                        y0 + (y1 - y0) * (start + (stop - start) * bottom),
                     ]
-                    edge = min(row["y0"], 1000 - row["y1"])
+                    edge = min(top, 1 - bottom)
                     if (number, unit, series) not in values or edge > margin[(number, unit, series)]:
                         values[(number, unit, series)] = (value, box)
                         margin[(number, unit, series)] = edge
@@ -1509,7 +1599,7 @@ def emit(name: str) -> Path:
                 (
                     "Read from the scan's text layer, every column checked against the printed state total. Each cell's box is its column's band by its row's band, so it is approximate."
                     if manifest.get("text_layer")
-                    else "Read from the scan by a vision model. Each cell's box is its column's band by its row's band as the model reported them, so it is approximate."
+                    else "Read from the scan by a vision model. Each cell's box is its column's band by its row's band; its position comes from matching the model's figures to an OCR pass over the same image, so it is approximate."
                 )
                 + (
                     " Each county's votes are the sum of its towns' returns, towns placed in counties by the 2020 Census Gazetteer, and the box is the first town's."
