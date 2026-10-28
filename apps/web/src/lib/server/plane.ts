@@ -85,6 +85,7 @@ export const outside = async (
     k: number;
     part: number;
     isAbroad: boolean;
+    code: string | null;
   }>(sql`
     with me as materialized (
       select geom from area_geometry
@@ -94,7 +95,11 @@ export const outside = async (
     )
     select a.k, ${insets.length === 0 ? sql`-1` : part(scheme, "g.geom")} as part,
       not ST_Covers(me.geom, ST_PointOnSurface(g.geom))
-        and ST_Area(ST_Intersection(me.geom, g.geom)) < 0.5 * ST_Area(g.geom) as "isAbroad"
+        and ST_Area(ST_Intersection(me.geom, g.geom)) < 0.5 * ST_Area(g.geom) as "isAbroad",
+      case when a.scheme_code = 'fr.departement' then (
+        select c.code from area_code c where c.area_id = a.id
+        order by c.valid @> ${day}::date desc limit 1
+      ) end as code
     from area a
     cross join me
     cross join lateral (
@@ -118,7 +123,9 @@ export const outside = async (
         : row.part === -1 && row.isAbroad
           ? "abroad"
           : null;
-    return group == null ? [] : [{ k: row.k, group }];
+    return group == null
+      ? []
+      : [{ k: row.k, group, ...(row.code != null && { code: row.code }) }];
   });
 };
 

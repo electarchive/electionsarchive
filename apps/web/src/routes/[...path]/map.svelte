@@ -19,8 +19,10 @@
   import { on } from "svelte/events";
   import { fade, fly } from "svelte/transition";
   import Export from "#lib/components/export.svelte";
+  import * as Drawer from "#lib/components/ui/drawer/index.js";
   import * as Popover from "#lib/components/ui/popover/index.js";
   import { Engine } from "#lib/map/engine.svelte.js";
+  import { isNarrowLayout } from "#lib/narrow-layout.svelte.js";
   import * as Select from "#lib/components/ui/select/index.js";
   import { isHover, isTouch } from "#lib/explain.svelte.js";
   import { count, percent, plural, points, precision } from "#lib/format.js";
@@ -145,6 +147,7 @@
   const uid = $props.id();
   let opening = $state<number | null>(null);
   let listing = $state<string | null>(null);
+  const narrow = $derived(isNarrowLayout());
   let stripHeight = $state(0);
   let ladder = $state<Awaited<ReturnType<typeof orpc.contests.context.call>>>(
     [],
@@ -2093,7 +2096,7 @@
               pool: m.map_offmap(),
             }[segment.group],
           )}
-          {#if segment.entries.length === 1 || (segment.entries.every((entry) => entry.code != null) && segment.entries.length <= 6)}
+          {#if segment.entries.length === 1 || (segment.entries.every((entry) => entry.code != null) && segment.entries.length <= (narrow ? 6 : 12))}
             <div
               class="pointer-events-auto flex overflow-hidden rounded-sm bg-card/95 shadow-menu ring-1 ring-border"
               role="group"
@@ -2181,107 +2184,88 @@
               {/each}
             </div>
           {:else}
-            {const groups = $derived(
+            {const blocks = $derived(
               Map.groupBy(segment.entries, (entry) => {
                 const cut = entry.name.lastIndexOf(", ");
-                return cut > 0 ? entry.name.slice(0, cut) : entry.name;
+                const prefix = cut > 0 ? entry.name.slice(0, cut) : "";
+                return prefix !== "" &&
+                  segment.entries.filter((other) =>
+                    other.name.startsWith(`${prefix}, `),
+                  ).length > 1
+                  ? prefix
+                  : "";
               })
                 .entries()
-                .map(([name, entries]) => ({ name, entries }))
+                .map(([header, entries]) => ({
+                  header,
+                  lines: entries.map((entry) => {
+                    const cut = entry.name.lastIndexOf(", ");
+                    const rest = entry.name.slice(cut + 2);
+                    return {
+                      entry,
+                      label:
+                        header === ""
+                          ? cut > 0 && entry.name.slice(0, cut) === rest
+                            ? rest
+                            : entry.name
+                          : rest,
+                    };
+                  }),
+                }))
                 .toArray(),
             )}
-            <Popover.Root
-              bind:open={
-                () => listing === segment.group,
-                (value: boolean) => {
-                  listing = value ? segment.group : null;
+            {#if narrow}
+              <Drawer.Root
+                bind:open={
+                  () => listing === segment.group,
+                  (value: boolean) => {
+                    listing = value ? segment.group : null;
+                  }
                 }
-              }
-            >
-              <Popover.Trigger
-                class="pointer-events-auto flex items-center gap-2 rounded-sm bg-card/95 ps-2.5 pe-2 text-xs font-semibold shadow-menu ring-1 ring-border block-7 hover:bg-secondary data-[state=open]:bg-secondary pointer-coarse:block-10"
               >
-                {heading}
-                <span class="flex gap-0.5" aria-hidden="true">
-                  {#each segment.entries.slice(0, 12) as entry (entry.k)}
-                    <span
-                      class={cn(
-                        "rounded-[1px] bg-(--party) block-2.5 inline-1.5",
-                        { "ring-1 ring-border": entry.isBlank },
-                      )}
-                      style:--party={entry.fill}
-                    ></span>
-                  {/each}
-                </span>
-                <span
-                  class="font-figures font-normal text-muted-foreground tabular-nums"
-                  >{count(segment.entries.length)}</span
+                <Drawer.Trigger
+                  class="pointer-events-auto flex items-center gap-2 rounded-sm bg-card/95 ps-2.5 pe-2 text-xs font-semibold shadow-menu ring-1 ring-border block-7 hover:bg-secondary data-[state=open]:bg-secondary pointer-coarse:block-10"
                 >
-                <ChevronUpIcon
-                  class="text-muted-foreground block-3.5 inline-3.5"
-                  aria-hidden="true"
-                />
-              </Popover.Trigger>
-              <Popover.Content
-                side="top"
-                align="end"
-                class="gap-0 overflow-y-auto px-3 py-1 inline-[min(34rem,calc(100vw-1rem))] max-block-[min(36rem,75dvh)]"
-              >
-                <div class="grid grid-cols-[minmax(0,8rem)_1fr] gap-x-3">
-                  {#each groups as group (group.name)}
-                    <div
-                      class="col-span-2 grid grid-cols-subgrid items-baseline border-bs border-border py-1.5 first:border-bs-0"
+                  {@render summary(segment.entries, heading)}
+                </Drawer.Trigger>
+                <Drawer.Content>
+                  <Drawer.Header
+                    class="flex-row items-baseline justify-between px-4 pbs-3 pbe-1"
+                  >
+                    <Drawer.Title class="text-base">{heading}</Drawer.Title>
+                    <span
+                      class="font-figures text-sm text-muted-foreground tabular-nums"
+                      >{count(segment.entries.length)}</span
                     >
-                      <span
-                        class="pbs-0.5 text-[0.8125rem] font-semibold text-pretty"
-                        >{group.name}</span
-                      >
-                      <span
-                        class="grid grid-cols-[repeat(auto-fill,minmax(5.25rem,1fr))] gap-x-1"
-                      >
-                        {#each group.entries as entry (entry.k)}
-                          {const row = $derived(rows.get(entry.k))}
-                          {const rest = $derived(
-                            entry.name.slice(group.name.length + 2),
-                          )}
-                          {const number = $derived(
-                            group.entries.length > 1
-                              ? (/\d+/u.exec(rest)?.[0] ?? rest)
-                              : null,
-                          )}
-                          {const detail = $derived(
-                            entry.leader == null || row == null
-                              ? m.map_blank_key()
-                              : `${names[entry.leader] ?? ""} ${percent(row.shares[entry.leader] ?? 0)}`,
-                          )}
-                          {#if row?.path == null}
-                            <span
-                              class="flex items-center gap-1.5 rounded-xs px-1.5 text-xs block-7"
-                              title={`${entry.name}: ${detail}`}
-                            >
-                              {@render tile(entry, row, number)}
-                            </span>
-                          {:else}
-                            <button
-                              type="button"
-                              class="flex items-center gap-1.5 rounded-xs px-1.5 text-xs block-7 hover:bg-secondary focus-visible:bg-secondary pointer-coarse:block-9"
-                              title={`${entry.name}: ${detail}`}
-                              aria-label={`${entry.name}: ${detail}`}
-                              onclick={() => {
-                                listing = null;
-                                open(entry.k);
-                              }}
-                            >
-                              {@render tile(entry, row, number)}
-                            </button>
-                          {/if}
-                        {/each}
-                      </span>
-                    </div>
-                  {/each}
-                </div>
-              </Popover.Content>
-            </Popover.Root>
+                  </Drawer.Header>
+                  <div class="px-2 pbe-[max(1rem,env(safe-area-inset-bottom))]">
+                    {@render roster(blocks, true)}
+                  </div>
+                </Drawer.Content>
+              </Drawer.Root>
+            {:else}
+              <Popover.Root
+                bind:open={
+                  () => listing === segment.group,
+                  (value: boolean) => {
+                    listing = value ? segment.group : null;
+                  }
+                }
+              >
+                <Popover.Trigger
+                  class="pointer-events-auto flex items-center gap-2 rounded-sm bg-card/95 ps-2.5 pe-2 text-xs font-semibold shadow-menu ring-1 ring-border block-7 hover:bg-secondary data-[state=open]:bg-secondary pointer-coarse:block-10"
+                >
+                  {@render summary(segment.entries, heading)}
+                </Popover.Trigger>
+                <Popover.Content
+                  side="top"
+                  align="end"
+                  class="gap-0 overflow-y-auto p-1 inline-80 max-block-[min(24rem,60dvh)]"
+                >
+                  {@render roster(blocks, false)}
+                </Popover.Content>
+              </Popover.Root>
+            {/if}
           {/if}
         {/each}
       </div>
@@ -3048,26 +3032,109 @@
   </span>
 {/snippet}
 
-{#snippet tile(
+{#snippet summary(entries: typeof remote, heading: string)}
+  {heading}
+  <span class="flex gap-0.5" aria-hidden="true">
+    {#each entries.slice(0, 12) as entry (entry.k)}
+      <span
+        class={cn("rounded-[1px] bg-(--party) block-2.5 inline-1.5", {
+          "ring-1 ring-border": entry.isBlank,
+        })}
+        style:--party={entry.fill}
+      ></span>
+    {/each}
+  </span>
+  <span class="font-figures font-normal text-muted-foreground tabular-nums"
+    >{count(entries.length)}</span
+  >
+  <ChevronUpIcon
+    class="text-muted-foreground block-3.5 inline-3.5"
+    aria-hidden="true"
+  />
+{/snippet}
+
+{#snippet roster(
+  blocks: Array<{
+    header: string;
+    lines: Array<{ entry: (typeof remote)[number]; label: string }>;
+  }>,
+  isSheet: boolean,
+)}
+  {#each blocks as block (block.header)}
+    <div
+      class={cn({
+        "not-first:mbs-1 not-first:border-bs not-first:border-border":
+          block.header !== "",
+      })}
+    >
+      {#if block.header !== ""}
+        <p
+          class={cn("px-2 pbs-2 pbe-0.5 text-xs text-muted-foreground", {
+            "text-[0.8125rem]": isSheet,
+          })}
+        >
+          {block.header}
+        </p>
+      {/if}
+      {#each block.lines as line (line.entry.k)}
+        {const row = $derived(rows.get(line.entry.k))}
+        {#if row?.path == null}
+          <div
+            class={cn("flex items-center gap-2.5 rounded-xs px-2 py-1.5", {
+              "py-2.5": isSheet,
+            })}
+          >
+            {@render outlier(line.entry, row, line.label)}
+          </div>
+        {:else}
+          <button
+            type="button"
+            class={cn(
+              "flex items-center gap-2.5 rounded-xs px-2 py-1.5 text-start inline-full hover:bg-secondary focus-visible:bg-secondary",
+              { "py-2.5": isSheet },
+            )}
+            onclick={() => {
+              listing = null;
+              open(line.entry.k);
+            }}
+          >
+            {@render outlier(line.entry, row, line.label)}
+          </button>
+        {/if}
+      {/each}
+    </div>
+  {/each}
+{/snippet}
+
+{#snippet outlier(
   entry: (typeof remote)[number],
   row: ReturnType<typeof rows.get>,
-  number: string | null,
+  label: string,
 )}
   <span
-    class={cn("shrink-0 rounded-xs bg-(--party) block-2.5 inline-2.5", {
-      "ring-1 ring-border": entry.isBlank,
-    })}
+    class={cn(
+      "mbs-1 shrink-0 self-start rounded-xs bg-(--party) block-2.5 inline-2.5",
+      { "ring-1 ring-border": entry.isBlank },
+    )}
     style:--party={entry.fill}
     aria-hidden="true"
   ></span>
-  {#if number != null}
-    <span class="font-semibold">{number}</span>
+  <span class="grid flex-1 gap-0.5 min-inline-0">
+    <span
+      class={cn(
+        "text-[0.8125rem] font-semibold text-pretty first-letter:uppercase",
+        { "font-normal text-muted-foreground": entry.isBlank },
+      )}>{label}</span
+    >
+    <span class="truncate text-xs text-muted-foreground"
+      >{entry.leader == null ? m.map_blank_key() : names[entry.leader]}</span
+    >
+  </span>
+  {#if entry.leader != null && row != null}
+    <span class="shrink-0 self-start font-figures text-[0.8125rem] tabular-nums"
+      >{percent(row.shares[entry.leader] ?? 0)}</span
+    >
   {/if}
-  <span class="font-figures text-muted-foreground tabular-nums"
-    >{entry.leader == null || row == null
-      ? "–"
-      : percent(row.shares[entry.leader] ?? 0)}</span
-  >
 {/snippet}
 
 {#snippet readout(isSheet = false)}

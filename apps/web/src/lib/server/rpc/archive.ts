@@ -14216,7 +14216,7 @@ export const elections = {
           found.rows.find((row) => row.grouping === "alliance")?.grouping ??
             "party",
         ),
-        sketch(nation, level.scheme, date),
+        sketch(nation, level.scheme, date, level.ks),
       ]);
       const parties = await names(
         table.legend.flatMap((item) =>
