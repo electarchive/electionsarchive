@@ -14937,12 +14937,11 @@ export const elections = {
             (select min(cn.party_id::text)::uuid from candidacy cy
               join candidacy_nomination cn on cn.candidacy_id = cy.id and cn.kind = 'nominated'
               where cy.option_id = w.id having count(distinct cn.party_id) = 1)) as party,
-            exists (select from contest c0
-              join contest c2 on c2.election_id = c0.election_id and c2.body_id is not distinct from c0.body_id
-                and c2.office_id is not distinct from c0.office_id
-              join contest_option k on k.contest_id = c2.id left join candidacy cy on cy.option_id = k.id
-              where c0.id = w.contest and (k.party_id is not null or k.alliance_id is not null or cy.member_of_party_id is not null
-                or exists (select from candidacy_nomination cn where cn.candidacy_id = cy.id))) as partisan
+            exists (select from contest_option k left join candidacy cy on cy.option_id = k.id
+              where k.contest_id in (select w.contest union all select c2.id from contest c0
+                join contest c2 on c2.body_id = c0.body_id and c2.election_id = c0.election_id where c0.id = w.contest)
+                and (k.party_id is not null or k.alliance_id is not null or cy.member_of_party_id is not null
+                  or exists (select from candidacy_nomination cn where cn.candidacy_id = cy.id))) as partisan
         ) n
         group by w.part, p.polity_id, w.tier, n.party, 5, 6
         union all
@@ -15207,12 +15206,11 @@ export async function record(input: { id: string; body?: string }) {
             left join candidacy cy on cy.option_id = o.id
             where o.id = w.id and o.alliance_id is not null group by o.alliance_id)) as party,
         exists (select from candidacy cy where cy.option_id = w.id and cy.is_independent)
-          and exists (select from contest c0
-            join contest c2 on c2.election_id = c0.election_id and c2.body_id is not distinct from c0.body_id
-              and c2.office_id is not distinct from c0.office_id
-            join contest_option k on k.contest_id = c2.id left join candidacy cy on cy.option_id = k.id
-            where c0.id = w.contest and (k.party_id is not null or k.alliance_id is not null or cy.member_of_party_id is not null
-              or exists (select from candidacy_nomination cn where cn.candidacy_id = cy.id)))
+          and exists (select from contest_option k left join candidacy cy on cy.option_id = k.id
+            where k.contest_id in (select w.contest union all select c2.id from contest c0
+              join contest c2 on c2.body_id = c0.body_id and c2.election_id = c0.election_id where c0.id = w.contest)
+              and (k.party_id is not null or k.alliance_id is not null or cy.member_of_party_id is not null
+                or exists (select from candidacy_nomination cn where cn.candidacy_id = cy.id)))
           or exists (select from contest_option o where o.id = w.id and o.party_id is null and o.alliance_id is null
             and o.ballot_label ~* '^(independent|bağımsız|indépendant|unabhängig|indipendent)') as independent,
         case when r."isOffice" then (select coalesce(m.into_id, cy.person_id) from candidacy cy
