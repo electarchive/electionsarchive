@@ -34,6 +34,7 @@ export const labelKind = pgEnum("label_kind", ["recognition", "integrity", "data
 export const nameKind = pgEnum("name_kind", ["official", "native", "english", "historical", "transliteration", "abbreviation", "ballot", "short"])
 export const nominationKind = pgEnum("nomination_kind", ["nominated", "endorsed", "supported"])
 export const noteKind = pgEnum("note_kind", ["context", "caveat", "methodology", "editorial", "retired"])
+export const translationOrigin = pgEnum("translation_origin", ["official", "human", "machine"])
 export const officeKind = pgEnum("office_kind", ["head_of_state", "head_of_government", "governor", "mayor", "deputy_mayor", "muhtar", "speaker", "other"])
 export const optionKind = pgEnum("option_kind", ["candidate", "ticket", "list", "legend", "answer", "write_in", "others", "none_of_the_above", "uncommitted"])
 export const outcomeKind = pgEnum("outcome_kind", ["elected", "won", "advanced", "eliminated", "lost", "tied", "withdrew", "disqualified", "declined"])
@@ -832,8 +833,22 @@ export const note = pgTable("note", {
 	valid: daterange().generatedAlwaysAs(sql`daterange(valid_from, valid_to, '[)'::text)`),
 	changesetId: uuid("changeset_id").notNull().references(() => changeset.id),
 	recordedFrom: timestamp("recorded_from", { withTimezone: true }).default(sql`now()`).notNull(),
+	lang: text().default("en").notNull(),
 }, (table) => [
 	index("note_entity_idx").using("btree", table.entityId.asc().nullsLast()),
+]);
+
+export const translation = pgTable("translation", {
+	sourceMd5: text("source_md5").notNull(),
+	lang: text().notNull(),
+	body: text().notNull(),
+	origin: translationOrigin().notNull(),
+	changesetId: uuid("changeset_id").notNull().references(() => changeset.id),
+	recordedFrom: timestamp("recorded_from", { withTimezone: true }).default(sql`now()`).notNull(),
+}, (table) => [
+	primaryKey({ columns: [table.sourceMd5, table.lang], name: "translation_pkey"}),
+	check("translation_source_md5_check", sql`(source_md5 ~ '^[0-9a-f]{32}$'::text)`),
+	check("translation_lang_check", sql`(lang <> 'en'::text)`),
 ]);
 
 export const noteDrop = pgTable("note_drop", {
