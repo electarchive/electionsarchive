@@ -76,7 +76,12 @@
       .toISOString()
       .slice(0, 10);
     const found = data.makeup
-      .filter((entry) => entry.start >= date && entry.start <= until)
+      .filter(
+        (entry) =>
+          entry.start >= date &&
+          entry.start <= until &&
+          entry.parties.some((party) => party.category === "elected"),
+      )
       .toSorted((a, b) => a.start.localeCompare(b.start))
       .at(-1);
     if (found == null && unelected.length === 0) {
