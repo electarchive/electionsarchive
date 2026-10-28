@@ -626,21 +626,34 @@
                   }).format(new Date(`${first.date}T00:00:00Z`)),
                 }),
               });
-      const kinds = [
-        {
-          key: "ward:outright",
-          label: m.map_ward_outright(),
-          color: "#0e7c86",
-        },
-        {
-          key: "ward:runoff",
-          label:
-            first?.isGeneral === true
-              ? m.map_ward_general()
-              : m.map_ward_runoff(),
-          color: "#d08a00",
-        },
-      ].map((kind) => ({ ...kind, short: null, person: null, party: null }));
+      const isPending = wards.every(
+        (row) => row.share == null && !row.isWon && row.runoff == null,
+      );
+      const kinds = (
+        isPending
+          ? [
+              {
+                key: "ward:scheduled",
+                label: m.map_ward_scheduled(),
+                color: "#5f6b7a",
+              },
+            ]
+          : [
+              {
+                key: "ward:outright",
+                label: m.map_ward_outright(),
+                color: "#0e7c86",
+              },
+              {
+                key: "ward:runoff",
+                label:
+                  first?.isGeneral === true
+                    ? m.map_ward_general()
+                    : m.map_ward_runoff(),
+                color: "#d08a00",
+              },
+            ]
+      ).map((kind) => ({ ...kind, short: null, person: null, party: null }));
       const outcomes =
         wards.length === 0 || race.places == null
           ? null
@@ -1695,7 +1708,7 @@
   {#if index === regionsAt}
     <Regions {id} />
   {/if}
-  {#if index === 0 && others.length > 0 && !isBallot}
+  {#if index === 0 && others.some((other) => other.results.length > 0 || other.lede != null || other.isPrimaries) && !isBallot}
     {@render board()}
   {/if}
 {/each}

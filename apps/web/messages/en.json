@@ -1331,6 +1331,7 @@
   "map_gesture_mobile": "Use two fingers to move the map",
   "map_color_by": "Color by",
   "map_ward_outright": "Won outright",
+  "map_ward_scheduled": "Up for election",
   "map_ward_runoff": "Went to runoff",
   "map_ward_general": "Went to the general",
   "map_mode_winner": "Winner",
