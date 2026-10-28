@@ -803,5 +803,6 @@
       "hint": "Read only the table titled 'REPRESENTATIVE DISTRICT 98' for the candidate George R. LEVESQUE; ignore any other table visible in the image. Return one row per community: label it with the community's full name (write 'S. KINGSTOWN' as 'South Kingstown' and 'N. KINGSTOWN' as 'North Kingstown') and give the 'Total Votes' column figure from that community's 'Total Votes' subtotal row; when a community has a single precinct and no subtotal row, give that precinct row's 'Total Votes' figure. Do not return precinct rows. Return the 'Grand Total' row's 'Total Votes' figure as the total.",
       "bands": 1
     }
-  ]
+  ],
+  "authoritative": "The count book's totals include mail ballots, which the earlier default set leaves out."
 }
