@@ -8,7 +8,7 @@ from ea.store import connect
 
 SOURCE = "us.precinct_codes"
 VERSION = "1"
-MIGRATED = ("us.swdb_sov",)
+MIGRATED = ("us.swdb_sov", "us.measure_precincts", "us.pa_dos_precincts")
 
 
 def emit() -> Path:
