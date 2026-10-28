@@ -15072,9 +15072,11 @@ export async function record(input: { id: string; body?: string }) {
       order by party_id, valid_from desc nulls last
     `),
       db.execute<{ id: string; region: string | null }>(sql`
-      select p.id, split_part(po.iso_code, '-', 2) as region from party p
+      select p.id, case when po.iso_code like '%-%' then split_part(po.iso_code, '-', 2) else po.iso_code end as region
+      from party p
       join polity po on po.id = p.polity_id
-      where p.id = any(${sql.param(parties)}::uuid[]) and po.iso_code like '%-%'
+      where p.id = any(${sql.param(parties)}::uuid[])
+        and (po.iso_code like '%-%' or po.id <> ${input.id}::uuid)
     `),
       db.execute<{ path: string }>(sql`
       select s.path from slug s join polity p on p.id = s.entity_id
