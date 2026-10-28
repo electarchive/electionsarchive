@@ -778,7 +778,7 @@
                       at === spot ? (ward?.share ?? 0) : 0,
                     ),
                     leader: spot,
-                    also: null,
+                    held: null,
                     margin: null,
                     earlier: null,
                     prior: null,

@@ -844,7 +844,7 @@
   let isKeyed = $state(false);
   const leads = $derived.by(() => {
     const counted = Map.groupBy(
-      places.rows.filter((row) => row.leader != null),
+      places.rows.filter((row) => row.leader != null && row.held == null),
       (row) => row.leader ?? 0,
     )
       .entries()
@@ -859,7 +859,9 @@
       ...counted,
       ...new Set(
         places.rows.flatMap((row) =>
-          row.also == null || listed.has(row.also) ? [] : [row.also],
+          (row.held ?? []).flatMap(([index]) =>
+            listed.has(index) ? [] : [index],
+          ),
         ),
       )
         .values()
@@ -883,6 +885,7 @@
       for (const row of places.rows) {
         if (
           row.leader === index &&
+          row.held == null &&
           row.isCounted !== false &&
           row.valid > 0 &&
           row.margin != null
@@ -1170,7 +1173,10 @@
         continue;
       }
       const shown =
-        typeof only === "number" && only === row.also ? only : row.leader;
+        typeof only === "number" &&
+        (row.held?.some(([index]) => index === only) ?? false)
+          ? only
+          : row.leader;
       const dimmed = only != null && typeof only === "number" && only !== shown;
       let strength = dimmed
         ? 10
@@ -1600,13 +1606,16 @@
     const splits =
       view === "winner" && only == null
         ? places.rows.flatMap((row) =>
-            row.also == null || row.leader == null || inner.has(row.k)
+            row.held == null || row.leader == null || inner.has(row.k)
               ? []
               : [
                   {
                     k: row.k,
-                    image: engine.stripe(
-                      colors[row.also] ?? "var(--muted-foreground)",
+                    image: engine.bands(
+                      row.held.map(([index, seats]) => [
+                        colors[index] ?? "var(--muted-foreground)",
+                        seats,
+                      ]),
                     ),
                   },
                 ],
@@ -2732,7 +2741,7 @@
         {const splits = $derived(
           view === "winner" && only == null
             ? places.rows.filter(
-                (row) => row.also != null && row.leader != null,
+                (row) => row.held != null && row.leader != null,
               ).length
             : 0,
         )}
@@ -2741,7 +2750,7 @@
             class="flex items-center gap-1.5 px-1.5 text-[0.8125rem] text-muted-foreground block-7"
           >
             <span
-              class="rounded-xs bg-[repeating-linear-gradient(135deg,var(--muted-foreground)_0_1.5px,transparent_1.5px_3.5px)] ring-1 ring-border block-2.5 inline-2.5"
+              class="rounded-xs bg-[repeating-linear-gradient(135deg,var(--muted-foreground)_0_2.5px,color-mix(in_oklab,var(--muted-foreground)_35%,var(--card))_2.5px_5px)] block-2.5 inline-2.5"
             ></span>
             <span>{m.map_split_key()}</span>
             <span class="font-figures text-xs tabular-nums">{splits}</span>

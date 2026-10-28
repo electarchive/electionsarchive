@@ -4733,9 +4733,14 @@ function placesMarkdown(
               total: count(total),
             })
           : null;
+  const splits = places.rows.filter((row) => row.held != null).length;
   const led = Map.groupBy(
     places.rows.filter(
-      (row) => row.leader != null && row.valid > 0 && row.isCounted !== false,
+      (row) =>
+        row.leader != null &&
+        row.held == null &&
+        row.valid > 0 &&
+        row.isCounted !== false,
     ),
     (row) => row.leader ?? -1,
   )
@@ -4759,7 +4764,11 @@ function placesMarkdown(
                 }),
               }),
             )
-            .join("; ") + ".",
+            .join("; ") +
+            (splits === 0
+              ? ""
+              : `; ${m.map_split_key()} ${count(splits)}`) +
+            ".",
         ]),
     table(
       [
@@ -4782,7 +4791,17 @@ function placesMarkdown(
                 places.legend[row.leader]?.label ?? null,
                 count(Math.round((row.shares[row.leader] ?? 0) * row.valid)),
               ]
-            : leading(row, places.legend)),
+            : row.held == null
+              ? leading(row, places.legend)
+              : [
+                  `${m.map_split_key()} (${row.held
+                    .map(
+                      ([index, seats]) =>
+                        `${places.legend[index]?.short ?? places.legend[index]?.label ?? ""} ${count(seats)}`,
+                    )
+                    .join(", ")})`,
+                  leading(row, places.legend)[1] ?? null,
+                ]),
           ...(hasMargin
             ? [
                 row.margin == null

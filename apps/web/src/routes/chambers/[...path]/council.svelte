@@ -87,7 +87,7 @@
             ...row,
             shares: kinds.map((_, at) => (at === spot ? share : 0)),
             leader: spot,
-            also: null,
+            held: null,
             margin: null,
             earlier: null,
             prior: null,

@@ -186,12 +186,6 @@ function pattern(shape: string, color: string) {
         pen.lineTo(to, at);
       }
       pen.stroke();
-    } else {
-      for (const shift of [-8, 0, 8]) {
-        pen.moveTo(shift, 8);
-        pen.lineTo(shift + 8, 0);
-      }
-      pen.stroke();
     }
   }
   return {
@@ -199,6 +193,45 @@ function pattern(shape: string, color: string) {
     height: 8,
     data: new Uint8Array(
       pen?.getImageData(0, 0, 8, 8).data.buffer ?? new ArrayBuffer(256),
+    ),
+  };
+}
+
+function banded(entries: Array<[string, number]>) {
+  let total = 0;
+  for (const [, weight] of entries) {
+    total += weight;
+  }
+  const side = 2 * Math.max(24, Math.ceil(total * 4 * Math.SQRT2));
+  const canvas = document.createElement("canvas");
+  canvas.width = side;
+  canvas.height = side;
+  const pen = canvas.getContext("2d", { willReadFrequently: true });
+  if (pen != null && total > 0) {
+    pen.fillStyle = entries[0]?.[0] ?? "transparent";
+    pen.fillRect(0, 0, side, side);
+    let from = 0;
+    for (const [color, weight] of entries) {
+      const to = from + (weight / total) * side;
+      pen.fillStyle = color;
+      for (const shift of [-side, 0, side, side * 2]) {
+        pen.beginPath();
+        pen.moveTo(from + shift, 0);
+        pen.lineTo(to + shift, 0);
+        pen.lineTo(to + shift - side, side);
+        pen.lineTo(from + shift - side, side);
+        pen.closePath();
+        pen.fill();
+      }
+      from = to;
+    }
+  }
+  return {
+    width: side,
+    height: side,
+    data: new Uint8Array(
+      pen?.getImageData(0, 0, side, side).data.buffer ??
+        new ArrayBuffer(side * side * 4),
     ),
   };
 }
@@ -258,7 +291,7 @@ export class Engine {
   #painted = new Map<string, Map<number, State>>();
   #marks = new Map<string, { source: string; k: number }>();
   #tinted = new Map<number, string>();
-  #images = new Set<string>();
+  #bands = new Map<string, Array<[string, number]>>();
   #slots = new Map<string, Slot>();
   #rasterKeys: Array<string> = [];
   #version = 0;
@@ -492,8 +525,11 @@ export class Engine {
         );
       }
     }
-    for (const name of this.#images) {
-      gl.updateImage(name, pattern("stripe", this.read(name.slice(7))));
+    for (const [name, entries] of this.#bands) {
+      gl.updateImage(
+        name,
+        banded(entries.map(([css, weight]) => [this.read(css), weight])),
+      );
     }
     for (const [source, states] of this.#painted) {
       this.paint(source, states, true);
@@ -879,12 +915,16 @@ export class Engine {
     );
   }
 
-  stripe(css: string) {
-    const name = `stripe:${css}`;
+  bands(entries: Array<[string, number]>) {
+    const name = `bands:${JSON.stringify(entries)}`;
     const gl = this.gl;
     if (gl != null && !gl.hasImage(name)) {
-      gl.addImage(name, pattern("stripe", this.read(css)));
-      this.#images.add(name);
+      gl.addImage(
+        name,
+        banded(entries.map(([css, weight]) => [this.read(css), weight])),
+        { pixelRatio: 2 },
+      );
+      this.#bands.set(name, entries);
     }
     return name;
   }

@@ -253,6 +253,7 @@
             : margin;
     return {
       leader,
+      held: set.places.held?.[i] ?? null,
       lead: top - next,
       margin,
       isMeasured: at(first?.key) != null && at(second?.key) != null,
@@ -277,7 +278,9 @@
       (range == null ||
         (clamped != null && clamped >= low - 1e-9 && clamped <= high + 1e-9)) &&
       (only == null ||
-        (reading.leader != null && set.legend[reading.leader]?.key === only)) &&
+        (reading.leader != null && set.legend[reading.leader]?.key === only) ||
+        (reading.held?.some(([index]) => set.legend[index]?.key === only) ??
+          false)) &&
       (!isFlippedOnly || !isCompared || reading.isFlip)
     );
   }
@@ -402,9 +405,16 @@
       },
     ];
   });
+  const splits = $derived(
+    shown === "winner"
+      ? (drawn.places.held?.filter((held) => held != null).length ?? 0)
+      : 0,
+  );
   const leads = $derived(
     Map.groupBy(
-      drawn.places.leader.filter((leader) => leader != null),
+      drawn.places.leader.flatMap((leader, i) =>
+        leader == null || drawn.places.held?.[i] != null ? [] : [leader],
+      ),
       (leader) => leader,
     )
       .entries()
@@ -808,6 +818,17 @@
       "fills",
       options,
     );
+    engine.add(
+      {
+        id: `split:${id}`,
+        type: "fill",
+        ...layer,
+        filter: ["in", ["id"], ["literal", []]],
+        paint: { "fill-pattern": "hatch" },
+      },
+      "fills",
+      options,
+    );
     for (const [shape, flag] of [
       ["hatch", "hatched"],
       ["norun", "absent"],
@@ -1053,6 +1074,41 @@
       });
     }
     engine.paint(id, fills, true);
+    const splits =
+      shown === "winner" && !isDotted
+        ? set.places.k.flatMap((k, i) => {
+            const held = set.places.held?.[i];
+            return held == null ||
+              (pinned != null && pinned !== k) ||
+              !admits(set, read(set, i))
+              ? []
+              : [
+                  {
+                    k,
+                    image: engine.bands(
+                      held.map(([index, seats]) => [hue(set, index), seats]),
+                    ),
+                  },
+                ];
+          })
+        : [];
+    engine.filter(`split:${id}`, [
+      "in",
+      ["id"],
+      ["literal", splits.map((entry) => entry.k)],
+    ]);
+    engine.style(
+      `split:${id}`,
+      "fill-pattern",
+      splits[0] == null
+        ? "hatch"
+        : [
+            "match",
+            ["id"],
+            ...splits.flatMap((entry) => [entry.k, entry.image]),
+            splits[0].image,
+          ],
+    );
     if (engine.has(dots)) {
       engine.paint(dots, marks);
     }
@@ -2116,6 +2172,19 @@
             </button>
           {/if}
         {/each}
+        {#if splits > 0}
+          <span
+            class="flex items-center gap-1.5 px-1.5 text-[0.8125rem] text-muted-foreground block-7"
+          >
+            <span
+              class="shrink-0 rounded-xs bg-[repeating-linear-gradient(135deg,var(--muted-foreground)_0_2.5px,color-mix(in_oklab,var(--muted-foreground)_35%,var(--card))_2.5px_5px)] block-2.5 inline-2.5"
+            ></span>
+            <span>{m.map_split_key()}</span>
+            <span class="font-figures text-xs tabular-nums"
+              >{count(splits)}</span
+            >
+          </span>
+        {/if}
       </div>
       <div
         class="flex flex-wrap items-center justify-between gap-x-3 gap-y-2 border-bs pbs-2.5"
