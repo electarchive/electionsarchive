@@ -402,8 +402,6 @@ class Changeset:
         print(f"clears {len(listed)} result sets that still carry ballot remainders")
 
     def write(self) -> Path:
-        folder = DATA / "changesets" / str(self.id)
-        folder.mkdir(parents=True)
         tables: dict[str, pl.DataFrame] = {}
         for table, rows in self.rows.items():
             if rows:
@@ -478,6 +476,27 @@ class Changeset:
                 )
                 if tacit:
                     tables["result_value"] = values.filter(~pl.col("result_set_id").cast(pl.String).is_in(tacit))
+        if "party" in tables and "name" in tables and "external_id" in tables:
+            keyed = tables["external_id"].filter(pl.col("scheme") == "us.party")["entity_id"].cast(pl.String)
+            minted = keyed.filter(keyed.is_in([str(id) for id in self.minted]))
+            names = tables["name"].filter(pl.col("entity_id").cast(pl.String).is_in(minted.implode()))["text"]
+            if names.str.contains("/").any():
+
+                def fold(text: str) -> str:
+                    return re.sub(r"ic$", "", re.sub(r"party|\W", "", text.casefold()))
+
+                known = {fold(text) for text in names} | {
+                    fold(text)
+                    for (text,) in self.conn.execute(
+                        """select n.text from name n join party p on p.id = n.entity_id
+                           where exists (select from external_id x where x.entity_id = p.id and x.scheme = 'us.party')"""
+                    ).fetchall()
+                } - {"independent", "no", "none", "unenrolled", "nonpartisan", "unaffiliated", "writein"}
+                for text in names.filter(names.str.contains("/")):
+                    if all(fold(part) in known for part in text.split("/")):
+                        raise ValueError(f"party {text!r} joins known parties; record each party's line or nomination")
+        folder = DATA / "changesets" / str(self.id)
+        folder.mkdir(parents=True)
         for table, frame in tables.items():
             frame.write_parquet(folder / f"{table}.parquet")
         edges = self.conn.execute(
