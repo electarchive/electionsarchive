@@ -4410,7 +4410,7 @@ function sourcesMarkdown(
         (other) =>
           other.stage === set.stage &&
           other.status === set.status &&
-          other.isDefault === set.isDefault &&
+          (contest.current != null || other.isDefault === set.isDefault) &&
           other.source.publisher === set.source.publisher &&
           other.source.title === set.source.title,
       ) === index,

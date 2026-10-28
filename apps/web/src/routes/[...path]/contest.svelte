@@ -633,7 +633,7 @@
           (other) =>
             other.stage === set.stage &&
             other.status === set.status &&
-            other.isDefault === set.isDefault &&
+            (contest.current != null || other.isDefault === set.isDefault) &&
             other.source.publisher === set.source.publisher &&
             other.source.title === set.source.title,
         ) === index,
@@ -2197,7 +2197,7 @@
                     definition={DEFINITIONS[tier(set)]?.() ?? ""}
                   />
                 {/if}
-                {#if contest.current == null ? set.isDefault : contest.current.sets.some((other) => other.stage === set.stage && other.source.publisher === set.source.publisher && other.source.title === set.source.title)}
+                {#if sets.length > 1 && (contest.current == null ? set.isDefault : contest.current.sets.some((other) => other.stage === set.stage && other.source.publisher === set.source.publisher && other.source.title === set.source.title))}
                   <Term
                     class="highlighter px-1 text-xs font-semibold"
                     label={m.source_shown()}
