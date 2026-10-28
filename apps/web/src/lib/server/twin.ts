@@ -2124,51 +2124,74 @@ function electionMarkdown(
     byeRows.length > 20
       ? byeRows.filter((row) => row.isGain || row.isHere || row.to == null)
       : byeRows;
-  const tiered =
-    Map.groupBy(
-      election.races.filter(
-        (race) =>
-          race.body != null &&
-          (race.round ?? 1) === 1 &&
-          (race.kind === "body_seats" || race.kind === "list_allocation"),
-      ),
-      (race) => race.body,
-    )
-      .values()
-      .find((group) => {
-        let seats = 0;
-        for (const race of group) {
-          for (const row of race.results) {
-            seats += row.seats ?? 0;
-          }
+  const groups = Map.groupBy(
+    election.races.filter(
+      (race) =>
+        race.body != null &&
+        (race.round ?? 1) === 1 &&
+        (race.kind === "body_seats" || race.kind === "list_allocation"),
+    ),
+    (race) => race.body,
+  )
+    .values()
+    .filter((group) => {
+      let seats = 0;
+      for (const race of group) {
+        for (const row of race.results) {
+          seats += row.seats ?? 0;
         }
-        return (
-          new Set(group.map((race) => race.kind)).size === 2 &&
-          (group[0]?.size == null || seats <= group[0].size * 1.02)
-        );
-      }) ?? [];
-  const tiers = new Map<
-    string,
-    { label: string; constituencies: number; lists: number }
-  >();
-  for (const race of tiered) {
-    for (const row of race.results) {
-      const entry = tiers.get(row.key) ?? {
-        label: row.label,
-        constituencies: 0,
-        lists: 0,
-      };
-      if (race.kind === "list_allocation") {
-        entry.lists += row.seats ?? 0;
-      } else {
-        entry.constituencies += row.seats ?? 0;
       }
-      tiers.set(row.key, entry);
+      return (
+        new Set(group.map((race) => race.kind)).size === 2 &&
+        (group[0]?.size == null || seats <= group[0].size * 1.02)
+      );
+    })
+    .toArray();
+  const tiered = groups.flat();
+  const totals = groups.map((group) => {
+    const tiers = new Map<
+      string,
+      { label: string; constituencies: number; lists: number }
+    >();
+    for (const race of group) {
+      for (const row of race.results) {
+        const entry = tiers.get(row.key) ?? {
+          label: row.label,
+          constituencies: 0,
+          lists: 0,
+        };
+        if (race.kind === "list_allocation") {
+          entry.lists += row.seats ?? 0;
+        } else {
+          let seats = row.seats ?? 0;
+          for (const credit of race.credits ?? []) {
+            if (
+              row.key.startsWith("alliance:") &&
+              credit.alliance === row.label
+            ) {
+              const member = tiers.get(credit.key) ?? {
+                label: credit.label,
+                constituencies: 0,
+                lists: 0,
+              };
+              member.constituencies += credit.seats;
+              tiers.set(credit.key, member);
+              seats -= credit.seats;
+            }
+          }
+          entry.constituencies += seats;
+        }
+        tiers.set(row.key, entry);
+      }
     }
-  }
-  const overall = new Map(
-    (tiered[0]?.overall ?? []).map((entry) => [entry.key, entry.seats]),
-  );
+    return {
+      name: group[0]?.name ?? "",
+      tiers,
+      overall: new Map(
+        (group[0]?.overall ?? []).map((entry) => [entry.key, entry.seats]),
+      ),
+    };
+  });
   const lists = tiered.filter((race) => race.kind === "list_allocation");
   const chamber = election.races.find(
     (race) =>
@@ -2177,7 +2200,13 @@ function electionMarkdown(
       race.results.some((row) => (row.seats ?? 0) > 0),
   );
   const rest = election.races.filter((race) => !lists.includes(race));
-  const at = rest.findLastIndex((race) => tiered.includes(race)) + 1;
+  const ordered = rest.flatMap((race) => {
+    const group = groups.find((entry) => entry.includes(race));
+    return group != null &&
+      rest.findLast((other) => group.includes(other)) === race
+      ? [race, ...group.filter((other) => other.kind === "list_allocation")]
+      : [race];
+  });
   return [
     `# ${election.name}`,
     byline(election.breadcrumbs, link, election.date),
@@ -2250,48 +2279,46 @@ function electionMarkdown(
           ),
         ]),
     ...councilsMarkdown(election.councils, link),
-    ...(tiered[0] == null
-      ? []
-      : [
-          `## ${m.race_tiers_title({ name: tiered[0].name })}`,
-          table(
-            [
-              m.col_party(),
-              m.col_constituency_seats(),
-              m.col_list_seats(),
-              m.col_total_seats(),
-              ...(overall.size > 0 ? [m.col_change()] : []),
-            ],
-            tiers
-              .entries()
-              .filter(([, entry]) => entry.constituencies + entry.lists > 0)
-              .toArray()
-              .toSorted(
-                ([, a], [, b]) =>
-                  b.constituencies + b.lists - (a.constituencies + a.lists),
-              )
-              .map(([key, entry]) => [
-                entry.label,
-                count(entry.constituencies),
-                count(entry.lists),
-                count(entry.constituencies + entry.lists),
-                ...(overall.size > 0
-                  ? [
-                      overall.has(key)
-                        ? signed
-                            .format(
-                              entry.constituencies +
-                                entry.lists -
-                                (overall.get(key) ?? 0),
-                            )
-                            .replace("-", "−")
-                        : null,
-                    ]
-                  : []),
-              ]),
-          ),
-        ]),
-    ...[...rest.slice(0, at), ...lists, ...rest.slice(at)].flatMap((entry) => {
+    ...totals.flatMap(({ name, tiers, overall }) => [
+      `## ${m.race_tiers_title({ name })}`,
+      table(
+        [
+          m.col_party(),
+          m.col_constituency_seats(),
+          m.col_list_seats(),
+          m.col_total_seats(),
+          ...(overall.size > 0 ? [m.col_change()] : []),
+        ],
+        tiers
+          .entries()
+          .filter(([, entry]) => entry.constituencies + entry.lists > 0)
+          .toArray()
+          .toSorted(
+            ([, a], [, b]) =>
+              b.constituencies + b.lists - (a.constituencies + a.lists),
+          )
+          .map(([key, entry]) => [
+            entry.label,
+            count(entry.constituencies),
+            count(entry.lists),
+            count(entry.constituencies + entry.lists),
+            ...(overall.size > 0
+              ? [
+                  overall.has(key)
+                    ? signed
+                        .format(
+                          entry.constituencies +
+                            entry.lists -
+                            (overall.get(key) ?? 0),
+                        )
+                        .replace("-", "−")
+                    : null,
+                ]
+              : []),
+          ]),
+      ),
+    ]),
+    ...ordered.flatMap((entry) => {
       if (entry.isFolded) {
         return [];
       }

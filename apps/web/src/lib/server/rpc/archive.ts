@@ -10644,7 +10644,10 @@ async function races(
         head != null && group.length === 1 ? await find(head.id) : null;
       const place = single?.place ?? nation;
       const districts = group.filter((row) => row.k != null);
-      const first = districts[0];
+      const first = Map.groupBy(districts, (row) => row.scheme)
+        .values()
+        .toArray()
+        .toSorted((a, b) => b.length - a.length)[0]?.[0];
       const isPrimaries =
         single == null && head?.party != null && districts.length > 1;
       const grouping =
@@ -10842,6 +10845,53 @@ async function races(
               ]),
             )
           : null;
+      const credited =
+        single == null && head?.isOffice !== true && grouping === "alliance"
+          ? (
+              await db.execute<{
+                from: string;
+                party: string;
+                seats: number;
+              }>(sql`
+                select r.from, r.party, count(*)::int as seats
+                from (
+                  select distinct on (o.id) coalesce(lm.into_id, o.alliance_id) as from,
+                    coalesce(bm.into_id, br.parent_party_id, pm.into_id, n.party_id) as party
+                  from contest c
+                  join election e on e.id = c.election_id
+                  join result_set rs on rs.contest_id = c.id and ${latest("rs")}
+                  join outcome x on x.result_set_id = rs.id and x.kind in ('elected', 'won') and x.candidacy_id is null
+                  join contest_option o on o.id = x.option_id and o.party_id is null and o.alliance_id is not null
+                  join candidacy cy on cy.option_id = o.id
+                  cross join lateral (
+                    select coalesce(
+                      (select min(cn.party_id::text)::uuid from candidacy_nomination cn
+                        where cn.candidacy_id = cy.id and cn.kind = 'nominated' having count(distinct cn.party_id) = 1),
+                      cy.member_of_party_id
+                    ) as party_id
+                  ) n
+                  left join entity_merge lm on lm.entity_id = o.alliance_id
+                  left join entity_merge pm on pm.entity_id = n.party_id
+                  left join party_affiliation br on br.party_id = coalesce(pm.into_id, n.party_id)
+                    and br.kind = 'regional_branch' and br.valid @> e.date_from
+                  left join entity_merge bm on bm.entity_id = br.parent_party_id
+                  where c.id = any(${sql.param(roots)}::uuid[]) and n.party_id is not null
+                  order by o.id, cy.id
+                ) r
+                group by 1, 2
+              `)
+            ).rows
+          : [];
+      const creditNames =
+        credited.length === 0
+          ? null
+          : await names(
+              credited.flatMap((row) => [
+                row.from,
+                parentOf.get(row.party) ?? row.party,
+              ]),
+              date,
+            );
       const results = folded
         .entries()
         .map(([key, members]) => {
@@ -11450,6 +11500,16 @@ async function races(
                   .toSorted((a, b) => b.seats - a.seats),
               },
         multiple: returned?.rows[0]?.multiple ?? 0,
+        credits: credited.map((row) => {
+          const party = parentOf.get(row.party) ?? row.party;
+          return {
+            alliance: creditNames?.full.get(row.from) ?? "",
+            key: `party:${party}`,
+            label: creditNames?.full.get(party) ?? "",
+            short: creditNames?.short.get(party) ?? null,
+            seats: row.seats,
+          };
+        }),
         repeats: Map.groupBy(repeated?.rows ?? [], (row) =>
           row.party == null
             ? "independent"
@@ -11881,6 +11941,17 @@ export const elections = {
               ),
             ),
             multiple: v.optional(v.number()),
+            credits: v.optional(
+              v.array(
+                v.object({
+                  alliance: v.string(),
+                  key: v.string(),
+                  label: v.string(),
+                  short: v.nullable(v.string()),
+                  seats: v.number(),
+                }),
+              ),
+            ),
             repeats: v.optional(
               v.array(
                 v.object({

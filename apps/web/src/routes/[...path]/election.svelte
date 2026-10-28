@@ -104,7 +104,7 @@
       lead == null
         ? grouped
         : [lead, ...grouped.filter((race) => race !== lead)];
-    const tiers = Map.groupBy(
+    const groups = Map.groupBy(
       sorted.filter(
         (race) =>
           race.body != null &&
@@ -115,7 +115,7 @@
       (race) => race.body,
     )
       .values()
-      .find((group) => {
+      .filter((group) => {
         const size = group[0]?.size ?? 0;
         let seats = 0;
         for (const race of group) {
@@ -134,86 +134,156 @@
           seats >= size * 0.95 &&
           seats <= size * 1.02
         );
-      });
-    const base =
-      tiers?.find((race) => race.map != null) ??
-      tiers?.find((race) => race.count === 1) ??
-      tiers?.[0];
-    if (
-      tiers == null ||
-      base == null ||
-      tiers.some((race) =>
-        race.results.some(
-          (row) =>
+      })
+      .toArray();
+    const totals = groups.flatMap((tiers) => {
+      const base =
+        tiers.find((race) => race.map != null) ??
+        tiers.find((race) => race.count === 1) ??
+        tiers[0];
+      if (base == null) {
+        return [];
+      }
+      const isCredited = tiers.some((race) => (race.credits ?? []).length > 0);
+      const counted = isCredited
+        ? (tiers.find((race) => race.kind === "list_allocation") ?? base)
+        : base;
+      const rows = tiers.flatMap((race) =>
+        race.results.flatMap((row) => {
+          const credits = row.key.startsWith("alliance:")
+            ? (race.credits ?? []).filter(
+                (credit) => credit.alliance === row.label,
+              )
+            : [];
+          let left = row.seats;
+          for (const credit of credits) {
+            left = (left ?? 0) - credit.seats;
+          }
+          return [
+            { row: { ...row, seats: left }, isBase: race === counted },
+            ...credits.map((credit) => ({
+              row: {
+                ...row,
+                key: credit.key,
+                label: credit.label,
+                short: credit.short,
+                color: null,
+                lean: null,
+                person: null,
+                party: credit.key.slice(6),
+                seats: credit.seats,
+              },
+              isBase: false,
+            })),
+          ];
+        }),
+      );
+      if (
+        rows.some(
+          ({ row }) =>
             row.key.startsWith("alliance:") &&
             (row.seats ?? 0) > 0 &&
             election.coalitions.every((entry) => entry.name !== row.label),
-        ),
-      )
-    ) {
-      return sorted.map((race) => ({ ...race, isTotal: false }));
-    }
-    const allied = new Map(
-      tiers.flatMap((race) =>
-        race.results.flatMap((row) => {
-          const coalition = row.key.startsWith("alliance:")
-            ? election.coalitions.find((entry) => entry.name === row.label)
-            : null;
+        )
+      ) {
+        return [];
+      }
+      const allied = new Map(
+        rows.flatMap(({ row }) => {
+          if (isCredited) {
+            return [];
+          }
+          const coalition =
+            row.key.startsWith("alliance:") && (row.seats ?? 0) > 0
+              ? election.coalitions.find((entry) => entry.name === row.label)
+              : null;
           return coalition == null
             ? []
             : coalition.parties.map((party) => [`party:${party}`, row.key]);
         }),
-      ),
-    );
-    const folded = Map.groupBy(
-      tiers.flatMap((race) =>
-        race.results.map((row) => ({ row, isBase: race === base })),
-      ),
-      (entry) => allied.get(entry.row.key) ?? entry.row.key,
-    )
-      .entries()
-      .map(([key, entries]) => {
-        const head =
-          entries.find((entry) => entry.row.key === key)?.row ??
-          entries[0]?.row;
-        let [votes, share, seats] = [0, 0, null as number | null];
-        for (const { row, isBase } of entries) {
-          if (isBase) {
-            votes += row.votes;
-            share += row.share;
+      );
+      const folded = Map.groupBy(
+        rows,
+        (entry) => allied.get(entry.row.key) ?? entry.row.key,
+      )
+        .entries()
+        .map(([key, entries]) => {
+          const head =
+            entries.find(
+              (entry) => entry.row.key === key && entry.row.color != null,
+            )?.row ??
+            entries.find((entry) => entry.row.key === key)?.row ??
+            entries[0]?.row;
+          let [votes, share, seats] = [0, 0, null as number | null];
+          for (const { row, isBase } of entries) {
+            if (isBase) {
+              votes += row.votes;
+              share += row.share;
+            }
+            seats = row.seats == null ? seats : (seats ?? 0) + row.seats;
           }
-          seats = row.seats == null ? seats : (seats ?? 0) + row.seats;
-        }
-        return head == null ? null : { ...head, key, votes, share, seats };
-      })
-      .filter((row) => row != null)
-      .toArray()
-      .toSorted((a, b) => (b.seats ?? 0) - (a.seats ?? 0) || b.votes - a.votes);
-    const lists = tiers.filter((race) => race.kind === "list_allocation");
+          return head == null ? null : { ...head, key, votes, share, seats };
+        })
+        .filter((row) => row != null)
+        .filter((row) => row.votes > 0 || (row.seats ?? 0) > 0)
+        .toArray()
+        .toSorted(
+          (a, b) => (b.seats ?? 0) - (a.seats ?? 0) || b.votes - a.votes,
+        );
+      return [
+        {
+          tiers,
+          base,
+          total: {
+            ...base,
+            anchor: `${tiers[0]?.anchor ?? base.anchor}-total`,
+            path: null,
+            kind: "body_seats",
+            count: 1,
+            sample: null,
+            since: null,
+            before: base.overall,
+            holders: null,
+            partners: [],
+            runoff: null,
+            results: folded,
+            isTotal: true,
+          },
+        },
+      ];
+    });
+    const lists = totals.flatMap(({ tiers }) =>
+      tiers.filter((race) => race.kind === "list_allocation"),
+    );
     const rest = sorted.filter((race) => !lists.includes(race));
-    const at = rest.findLastIndex((race) => tiers.includes(race)) + 1;
-    return [
-      {
-        ...base,
-        anchor: `${tiers[0]?.anchor ?? base.anchor}-total`,
-        path: null,
-        kind: "body_seats",
-        count: 1,
-        sample: null,
-        since: null,
-        before: base.overall,
-        holders: null,
-        partners: [],
-        runoff: null,
-        results: folded,
-        isTotal: true,
-      },
-      ...[...rest.slice(0, at), ...lists, ...rest.slice(at)].map((race) => ({
+    return rest.flatMap((race) => {
+      const entry = totals.find(({ tiers }) => tiers.includes(race));
+      const plain = {
         ...race,
-        ...(race === base ? { map: null } : {}),
+        ...(race === entry?.base ? { map: null } : {}),
         isTotal: false,
-      })),
-    ];
+      };
+      if (entry == null) {
+        return [plain];
+      }
+      const isFirst =
+        rest.find((other) => entry.tiers.includes(other)) === race;
+      const isLast =
+        rest.findLast((other) => entry.tiers.includes(other)) === race;
+      return [
+        ...(isFirst ? [entry.total] : []),
+        plain,
+        ...(isLast
+          ? entry.tiers
+              .filter((other) => other.kind === "list_allocation")
+              .map((other) => ({
+                ...other,
+                ...(other === entry.base ? { map: null } : {}),
+                isTotal: false,
+              }))
+          : []),
+      ];
+    });
   });
 
   const stages = $derived(
