@@ -1,3 +1,4 @@
+import csv
 import gzip
 import json
 import re
@@ -11,13 +12,15 @@ import polars as pl
 
 from ea import raw
 from ea.changeset import Changeset
+from ea.sources.licenses import UNLICENSED
 from ea.store import DATA, connect
 
 SOURCE = "tr.tkgm"
-VERSION = "1"
+VERSION = "2"
 PARSED = DATA / "parsed" / SOURCE
 COUNTIES = Path.home() / "Downloads" / "counties"
 URL = "https://parselsorgu.tkgm.gov.tr/"
+PARENTS = Path(__file__).with_name("tkgm_parents.tsv")
 RENAMED = {"19 Mayıs": "19-May"}
 TOLERANCE = 10
 GAP = 50
@@ -59,7 +62,14 @@ NOTES = (
     "Ardahan and Iğdır 1992-06-03 (Law 3806, RG 21247); Yalova, Karabük, and Kilis 1995-06-06 (KHK 550, RG "
     "22305); Osmaniye 1996-10-28 (Law 4200, RG 22801); Düzce 1999-12-09 (KHK 584, RG 23091). Each new province's "
     "ilçeler are assigned to the province named in its law, except those listed from another province; transfers "
-    "between existing provinces are not modeled."
+    "between existing provinces are not modeled. Each ilçe's outline before its first election with its own results "
+    "is drawn inside the ilçe it was carved from, so an ilçe's outline at an election is the union of today's "
+    "ilçeler that reported under it; ilçeler that existed in 1961 keep today's outline back to then, and villages "
+    "moved between existing ilçeler are not modeled. The parent of each of the 360 ilçeler that first reported "
+    "after 1961 is in tkgm_parents.tsv: 69 from the split laws (5747, 6360, and the metropolitan laws), 138 where "
+    "the ilçe's Turkish Wikipedia article names a single neighboring ilçe in the sentence on its creation, and 153 "
+    "from the neighboring ilçe in the same province whose registered voters fell by the new ilçe's at its first "
+    "election. Electoral districts at each election are the union of the ilçeler that reported in them."
 )
 
 
@@ -117,6 +127,31 @@ def parse() -> None:
         ).fetchall():
             names[area] = (plates[parent], name)
             districts[plates[parent], "merkez" if key(name) == f"{titles[parent]}merkez" else key(name)] = area
+        historical: dict[str, date] = {}
+        lookup = {(plate, name): area for area, (plate, name) in names.items()}
+        for area, name, plate, end in conn.execute(
+            """select a.id::text, n.text, c.code, p.valid_to from area a
+               join name n on n.entity_id = a.id and n.is_preferred
+               join area_parent p on p.area_id = a.id and p.valid_to is not null
+               join area_code c on c.area_id = p.parent_id
+               where a.scheme_code = 'tr.ilce'
+                 and not exists (select from area_parent q where q.area_id = a.id and q.valid_to is null)"""
+        ).fetchall():
+            historical[area] = end
+            lookup[plate, name] = area
+        starts: dict[str, date] = {}
+        parent_of: dict[str, str] = {}
+        with PARENTS.open() as handle:
+            for row in csv.DictReader(handle, delimiter="\t"):
+                child = lookup[row["plate"], row["ilce"]]
+                starts[child] = date.fromisoformat(row["first"])
+                parent_of[child] = lookup[row["parent_plate"], row["parent"]]
+
+        def owner(area: str, day: date) -> str | None:
+            while area in starts and day < starts[area]:
+                area = parent_of[area]
+            return None if area in historical and day >= historical[area] else area
+
         neighborhoods: dict[tuple[str, str], list[str]] = defaultdict(list)
         for area, name, parent in conn.execute(
             """select a.id::text, n.text, p.parent_id::text from area a
@@ -136,6 +171,13 @@ def parse() -> None:
                join area ia on ia.k = r.area_k and ia.scheme_code = 'tr.ilce'"""
         ).fetchall():
             compositions[code][held].add(area)
+        polls = sorted(
+            day
+            for (day,) in conn.execute(
+                """select distinct e.date_from from election e join polity p on p.id = e.polity_id
+                   where p.iso_code = 'TR' and e.date_from is not null"""
+            ).fetchall()
+        )
         constituencies = dict(
             conn.execute(
                 """select c.code, a.id::text from area a join area_code c on c.area_id = a.id
@@ -175,7 +217,7 @@ def parse() -> None:
             return plate
 
         periods = list(zip([None, *breaks], [*breaks, None], strict=True))
-        versions: list[tuple[str, date | None, date | None, frozenset[str]]] = []
+        versions: list[tuple[str, str, date | None, date | None, frozenset[str], bool]] = []
         for plate in provinces:
             history: list[tuple[date | None, date | None, frozenset[str]]] = []
             for start, end in periods:
@@ -188,28 +230,82 @@ def parse() -> None:
                     history[-1] = (history[-1][0], end, members)
                 elif members:
                     history.append((start, end, members))
-            versions += [(plate, start, end, members) for start, end, members in history]
+            versions += [("il", plate, start, end, members, end is None) for start, end, members in history]
+        changes = sorted(set(starts.values()) | set(historical.values()))
+        spans = list(zip([None, *changes], [*changes, None], strict=True))
+        held_by: dict[date | None, dict[str, frozenset[str]]] = {}
+        for start, _ in spans:
+            owned: dict[str, set[str]] = defaultdict(set)
+            for area in names:
+                if (holder := owner(area, start or date(1950, 1, 1))) is not None:
+                    owned[holder].add(area)
+            held_by[start] = {holder: frozenset(members) for holder, members in owned.items()}
+        for area in [*names, *historical]:
+            history = []
+            for start, end in spans:
+                members = held_by[start].get(area)
+                if members and history and history[-1][1] == start and history[-1][2] == members:
+                    history[-1] = (history[-1][0], end, members)
+                elif members:
+                    history.append((start, end, members))
+            versions += [("ilce", area, start, end, members, members == {area}) for start, end, members in history]
+        elections = sorted({day for held in compositions.values() for day in held})
         for code, held in compositions.items():
             history = []
             for day in sorted(held):
-                if history and history[-1][2] == frozenset(held[day]):
+                members = frozenset(area for area in names if owner(area, day) in held[day])
+                if history and history[-1][2] == members:
                     continue
                 if history:
                     history[-1] = (history[-1][0], day, history[-1][2])
-                history.append((day, None, frozenset(held[day])))
-            versions += [(code, start, end, members) for start, end, members in history]
+                history.append((day, None, members))
+            history[-1] = (history[-1][0], next((day for day in elections if day > max(held)), None), history[-1][2])
+            versions += [
+                ("secim_cevresi", code, start, end, members, all(owner(area, start) == area for area in members))
+                for start, end, members in history
+            ]
+
+        lineage = []
+        for area, (home, name) in names.items():
+            history = []
+            for start, end in periods:
+                plate = province(home, name, start or date(1950, 1, 1))
+                if plate is not None and history and history[-1][1] == start and history[-1][2] == plate:
+                    history[-1] = (history[-1][0], end, plate)
+                elif plate is not None:
+                    history.append((start, end, plate))
+            lineage += [(area, provinces[plate], start, end) for start, end, plate in history]
+        boundaries = []
+        for scheme, ranges in (
+            ("tr.il", periods),
+            ("tr.ilce", spans),
+            ("tr.secim_cevresi", list(zip(elections, [*elections[1:], None], strict=True))),
+        ):
+            for start, end in ranges:
+                inside = [day for day in polls if (start is None or day >= start) and (end is None or day < end)]
+                if not inside:
+                    continue
+                vintage = "2024" if end is None and scheme != "tr.secim_cevresi" else inside[0].isoformat()
+                as_of = ELECTION if end is None and scheme != "tr.secim_cevresi" else inside[0]
+                boundaries.append((scheme, vintage, start, end, as_of))
 
         conn.execute("create temp table feature (district text, neighborhood text, geojson text) on commit drop")
         with conn.cursor() as cursor, cursor.copy("copy feature (district, neighborhood, geojson) from stdin") as copy:
             for row in features:
                 copy.write_row(row)
-        conn.execute("create temp table version (id int, code text, valid_from date, valid_to date) on commit drop")
+        conn.execute(
+            "create temp table version (id int, layer text, code text, valid_from date, valid_to date, exact boolean) "
+            "on commit drop"
+        )
         conn.execute("create temp table member (id int, district text) on commit drop")
-        with conn.cursor() as cursor, cursor.copy("copy version (id, code, valid_from, valid_to) from stdin") as copy:
-            for index, (code, start, end, _) in enumerate(versions):
-                copy.write_row((index, code, start, end))
+        with (
+            conn.cursor() as cursor,
+            cursor.copy("copy version (id, layer, code, valid_from, valid_to, exact) from stdin") as copy,
+        ):
+            for index, (layer, code, start, end, _, exact) in enumerate(versions):
+                copy.write_row((index, layer, code, start, end, exact))
         with conn.cursor() as cursor, cursor.copy("copy member (id, district) from stdin") as copy:
-            for index, (*_, members) in enumerate(versions):
+            for index, (*_, members, _) in enumerate(versions):
                 for area in members:
                     copy.write_row((index, area))
         conn.execute(
@@ -230,19 +326,17 @@ def parse() -> None:
         rows = conn.execute(
             """with layers as (
                  select 'mahalle' as layer, district, neighborhood as code, null::date as valid_from,
-                        null::date as valid_to, geom
+                        null::date as valid_to, true as exact, geom
                  from unit
                  union all
-                 select 'ilce', district, district, null, null, geom from district
-                 union all
-                 select case when length(v.code) = 2 then 'il' else 'secim_cevresi' end, null, v.code,
-                        v.valid_from, v.valid_to, st_setsrid(st_coverageunion(d.geom), 3035)
+                 select v.layer, null, v.code, v.valid_from, v.valid_to, v.exact,
+                        st_setsrid(st_coverageunion(d.geom), 3035)
                  from version v join member m on m.id = v.id join district d on d.district = m.district
-                 group by v.id, v.code, v.valid_from, v.valid_to
+                 group by v.id, v.layer, v.code, v.valid_from, v.valid_to, v.exact
                  union all
-                 select 'nation', null, 'TR', null, null, st_setsrid(st_coverageunion(geom), 3035) from district
+                 select 'nation', null, 'TR', null, null, true, st_setsrid(st_coverageunion(geom), 3035) from district
                )
-               select layer, district, code, valid_from, valid_to,
+               select layer, district, code, valid_from, valid_to, exact,
                       encode(st_asewkb(st_multi(st_collectionextract(st_makevalid(st_transform(geom, 4326)), 3))), 'hex'),
                       case when layer <> 'nation'
                         then encode(st_asewkb(st_transform(st_pointonsurface(geom), 4326)), 'hex') end
@@ -256,6 +350,7 @@ def parse() -> None:
             "code": pl.String,
             "valid_from": pl.Date,
             "valid_to": pl.Date,
+            "exact": pl.Boolean,
             "geom": pl.String,
             "label_point": pl.String,
         },
@@ -279,7 +374,7 @@ def parse() -> None:
                 .alias("area")
             ),
             pl.DataFrame(
-                [("mahalle", None, None, None, None, geom, point, area) for area, geom, point in matched],
+                [("mahalle", None, None, None, None, True, geom, point, area) for area, geom, point in matched],
                 schema=frame.schema | {"area": pl.String},
                 orient="row",
             ),
@@ -297,13 +392,24 @@ def parse() -> None:
     counts = dict(frame.group_by("layer").len().iter_rows())
     print(counts, f"{len({area for area, *_ in matched})} of {sum(len(v) for v in neighborhoods.values())} mahalleler")
     if (
-        counts["ilce"] != len(names)
+        set(frame.filter(pl.col("layer") == "ilce")["area"]) < set(names)
         or frame["geom"].null_count()
         or frame.filter(pl.col("layer") != "nation")["area"].null_count()
     ):
         raise ValueError(f"unexpected layers {counts}")
     PARSED.mkdir(parents=True, exist_ok=True)
     frame.drop("district", "code").write_parquet(PARSED / "areas.parquet")
+    dates = {"valid_from": pl.Date, "valid_to": pl.Date}
+    pl.DataFrame(lineage, schema={"area": pl.String, "parent": pl.String} | dates, orient="row").with_columns(
+        pl.col("valid_from").replace_strict(precisions, default="day", return_dtype=pl.String).alias("from_precision"),
+        pl.col("valid_to").replace_strict(precisions, default="day", return_dtype=pl.String).alias("to_precision"),
+    ).write_parquet(PARSED / "parents.parquet")
+    pl.DataFrame(
+        boundaries, schema={"scheme": pl.String, "vintage": pl.String} | dates | {"as_of": pl.Date}, orient="row"
+    ).with_columns(
+        pl.col("valid_from").replace_strict(precisions, default="day", return_dtype=pl.String).alias("from_precision"),
+        pl.col("valid_to").replace_strict(precisions, default="day", return_dtype=pl.String).alias("to_precision"),
+    ).write_parquet(PARSED / "boundaries.parquet")
 
 
 def emit() -> Path:
@@ -315,8 +421,10 @@ def emit() -> Path:
             version=VERSION,
             summary=(
                 "Turkey's mahalleler from TKGM's 2024 administrative boundaries, with ilçeler, provinces, İstanbul's, "
-                "Ankara's, İzmir's, and Bursa's electoral districts, and the nation as their unions, and each "
-                "province's outline before the provinces created since 1953"
+                "Ankara's, İzmir's, and Bursa's electoral districts, and the nation as their unions, each "
+                "province's outline before the provinces created since 1953, each ilçe's outline before the ilçeler "
+                "carved from it since 1961, the electoral districts of every general election since 1983, the "
+                "province each ilçe belonged to on each date, and a boundary set for each era"
             ),
             polity="TR",
         )
@@ -329,15 +437,19 @@ def emit() -> Path:
             publisher="Tapu ve Kadastro Genel Müdürlüğü",
             title=title,
             url=URL,
-            license=None,
+            license=UNLICENSED,
             license_url=None,
             attribution="Tapu ve Kadastro Genel Müdürlüğü",
             notes=NOTES,
         )
         cs.artifact(raw.cached(SOURCE, URL), source)
         nation = cs.area("tr.nation", "TR")
-        for layer, area, valid_from, from_precision, valid_to, to_precision, geom, point in frame.select(
-            "layer", "area", "valid_from", "from_precision", "valid_to", "to_precision", "geom", "label_point"
+        cs.manifest["scope"] = {
+            "polity": "TR",
+            "replaces": {"area_geometry": ["tr.reforms"], "area_parent": ["tr.oveo"]},
+        }
+        for layer, area, valid_from, from_precision, valid_to, to_precision, exact, geom, point in frame.select(
+            "layer", "area", "valid_from", "from_precision", "valid_to", "to_precision", "exact", "geom", "label_point"
         ).rows():
             cs.add(
                 "area_geometry",
@@ -348,9 +460,49 @@ def emit() -> Path:
                 valid_to_precision=to_precision,
                 geom=geom,
                 label_point=point,
-                quality="synthetic" if layer == "il" and valid_to is not None else "official",
+                quality="official" if exact else "synthetic",
                 source_id=source,
             )
-        for scheme in ("tr.il", "tr.ilce", "tr.mahalle"):
-            cs.add("boundary_set", scheme_code=scheme, vintage="2024", valid_from=None, valid_to=None, as_of=ELECTION)
+        for area, parent, valid_from, valid_to, from_precision, to_precision in pl.read_parquet(
+            PARSED / "parents.parquet"
+        ).rows():
+            cs.add(
+                "area_parent",
+                area_id=UUID(area),
+                parent_id=UUID(parent),
+                valid_from=valid_from,
+                valid_from_precision=from_precision or "day",
+                valid_to=valid_to,
+                valid_to_precision=to_precision or "day",
+            )
+        existing = dict(
+            conn.execute(
+                "select scheme_code || ' ' || vintage, id from boundary_set where starts_with(scheme_code, 'tr.')"
+            ).fetchall()
+        )
+        cs.add(
+            "boundary_set",
+            id=existing.get("tr.mahalle 2024"),
+            scheme_code="tr.mahalle",
+            vintage="2024",
+            valid_from=None,
+            valid_from_precision="day",
+            valid_to=None,
+            valid_to_precision="day",
+            as_of=ELECTION,
+        )
+        for scheme, vintage, valid_from, valid_to, as_of, from_precision, to_precision in pl.read_parquet(
+            PARSED / "boundaries.parquet"
+        ).rows():
+            cs.add(
+                "boundary_set",
+                id=existing.get(f"{scheme} {vintage}"),
+                scheme_code=scheme,
+                vintage=vintage,
+                valid_from=valid_from,
+                valid_from_precision=from_precision or "day",
+                valid_to=valid_to,
+                valid_to_precision=to_precision or "day",
+                as_of=as_of,
+            )
         return cs.write()
