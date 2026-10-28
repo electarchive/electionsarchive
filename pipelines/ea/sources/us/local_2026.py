@@ -293,6 +293,71 @@ FEEDS = {
         "San Francisco Department of Elections",
         "Candidates, November 3, 2026, General Election",
     ),
+    "CA-06085": (
+        "https://vote.santaclaracounty.gov/november-3-2026-general-election-resources",
+        "Santa Clara County Registrar of Voters",
+        "Qualified List of Local Candidates: November 3, 2026 General Election",
+    ),
+    "CA-06081": (
+        "https://smcacre.gov/",
+        "San Mateo County Assessor-County Clerk-Recorder and Elections",
+        "Roster of Candidates: Statewide General Election, November 3, 2026",
+    ),
+    "CA-06061": (
+        "https://www.placer.ca.gov/",
+        "Placer County Elections",
+        "Qualified Candidate List: November 3, 2026 General Election",
+    ),
+    "CA-06029": (
+        "https://www.kernvote.com/elections/upcoming-elections/november-3-2026-general-election",
+        "Kern County Elections",
+        "Contest/Candidate Proof List: November 3, 2026 General Election",
+    ),
+    "CA-06019": (
+        "https://www.fresnocountyca.gov/",
+        "Fresno County Clerk/Registrar of Voters",
+        "Contest/Candidate Proof List: Consolidated Statewide General Election, November 3, 2026",
+    ),
+    "CA-06107": (
+        "https://tularecounty.ca.gov/elections/registrar-of-voters/current-election-information",
+        "Tulare County Registrar of Voters",
+        "Contest/Candidate Proof List: November 3, 2026 General Election",
+    ),
+    "NJ-34031": (
+        "https://www.passaiccountynj.org/residents/election-and-voting-information/county-clerk-elections-division",
+        "Passaic County Clerk",
+        "List of County and Local Candidates for the General Election, November 3, 2026",
+    ),
+    "NJ-34035": (
+        "https://www.somersetcountynj.gov/government/elected-officials/county-clerk/election-division",
+        "Somerset County Clerk",
+        "2026 General Election Candidates",
+    ),
+    "NJ-34041": (
+        "https://www.warrencountyvotes.com/elections/current-election-candidates",
+        "Warren County Clerk",
+        "2026 Warren County General Election Candidates: County and Municipal",
+    ),
+    "NJ-34023": (
+        "https://www.middlesexcountynj.gov/government/departments/department-of-community-services/office-of-county-clerk/election-services",
+        "Middlesex County Clerk",
+        "Official Candidate List, General Election 2026",
+    ),
+    "NJ-34017": (
+        "https://www.hudsoncountyclerk.org/wp-content/uploads/2026/08/2026-November-3-General-Elecction-Official-Master-List.pdf",
+        "Hudson County Clerk",
+        "November 3, 2026, General Election Official Master List",
+    ),
+    "CA-06013": (
+        "https://www.contracostavote.gov/election/november-3-2026-general-election/",
+        "Contra Costa County Clerk-Recorder-Elections",
+        "November 3, 2026, General Election: List of Candidates and Measures",
+    ),
+    "NJ-34013": (
+        "https://www.essexclerk.com/_Content/pdf/Essex-2026-Sample-Ballots.pdf",
+        "Essex County Clerk",
+        "Official General Election Sample Ballot, November 3, 2026",
+    ),
     "CA-06099": (
         "https://www.stanvote.gov/pdf/candidate-list.pdf",
         "Stanislaus County Registrar of Voters",
@@ -578,6 +643,23 @@ DELIVERED = {
     "CA-06001": DATA / "inbox" / "y26" / "ca" / "alameda.html",
     "CA-06097": DATA / "inbox" / "y26" / "ca" / "sonoma.html",
     "CA-06075": DATA / "inbox" / "y26" / "ca" / "sf.html",
+    "CA-06085": DATA / "inbox" / "manual" / "MF-188" / "qualified-list-of-local-candidates-9-28-26.pdf",
+    "CA-06081": DATA / "inbox" / "manual" / "MF-194" / "52_candidateroster0903.pdf",
+    "CA-06061": DATA / "inbox" / "manual" / "MF-195" / "can_watch27.pdf",
+    "CA-06029": DATA / "inbox" / "manual" / "MF-190" / "Candidate List.pdf",
+    "CA-06019": DATA / "inbox" / "manual" / "MF-191" / "officesupforelectioncandidatelist.pdf",
+    "CA-06107": DATA / "inbox" / "manual" / "MF-196" / "NOVGENUOCL.pdf",
+    "NJ-34031": DATA / "inbox" / "manual" / "MF-167" / "Updated List of county and Local Candidates Gen 2026.pdf",
+    "NJ-34035": DATA / "inbox" / "manual" / "MF-168" / "2026 General Election Candidates 9.2.26 (excel).xlsx",
+    "NJ-34041": DATA
+    / "inbox"
+    / "manual"
+    / "MF-169"
+    / "2026 general County  Municipal candidates list for distribution.pdf",
+    "NJ-34023": DATA / "inbox" / "manual" / "MF-197" / "Official Candidate List 2026 General Election.pdf",
+    "NJ-34017": DATA / "inbox" / "y26" / "nj" / "hudson.pdf",
+    "CA-06013": DATA / "inbox" / "manual" / "MF-189" / "contra-costa-2026-general-candidates-and-measures.html",
+    "NJ-34013": DATA / "inbox" / "y26" / "nj" / "essex.pdf",
     "FL-12057": DATA / "inbox" / "manual" / "MF-177" / "2026 General Election_All Races Sample Ballot.pdf",
     "FL-12031": DATA / "inbox" / "manual" / "MF-178" / "2026 General All Races_202609210829090089.pdf",
     "FL-12071": DATA / "inbox" / "manual" / "MF-182" / "2026 General Election - All Inclusive Sample Ballot.pdf",
@@ -1941,6 +2023,156 @@ def parse() -> None:
                 }
             )
 
+    unfilled = re.compile(
+        r"(?i)no nom|no petition|to be provided|no (local|municipal) offices|^n/a$|^name of candidate$"
+    )
+    tallies: dict[tuple[str, bool], dict[str, int]] = defaultdict(lambda: defaultdict(int))
+    for line in text("NJ-34031", "-layout").splitlines():
+        found = re.match(
+            r"(Countywide|[A-Z][A-Z .'-]*?(?:BOROUGH|TOWNSHIP|CITY|TOWN|VILLAGE))\s+(\S.*?)\s{2,}(\S.*?)\s{2,}(\S.*?)\s{2,}.*?\s\d{5}\s+(\S.*?)(?:\s{2,}|$)",
+            line,
+        )
+        if found is None or unfilled.search(line):
+            continue
+        unexpired = bool(re.search(r"(?i)unexp", found[2]))
+        contest = (
+            f"Passaic County {re.sub(r'(?i)^county |\s*unexp\w* term', '', found[2])}"
+            if found[1] == "Countywide"
+            else f"{found[1].title()} {found[2]}"
+        )
+        tallies[(contest, unexpired)][found[5]] += 1
+        named, independent = party(found[5])
+        feeds["NJ-34031"].append(
+            {
+                "county": "Passaic",
+                "contest": contest,
+                "seats": 0,
+                "name": cased(f"{found[3]} {found[4]}"),
+                "party": named,
+                "independent": independent or named is None,
+                "unexpired": unexpired,
+            }
+        )
+    for row in feeds["NJ-34031"]:
+        row["seats"] = max(tallies[(row["contest"], row["unexpired"])].values())
+
+    for sheet, frame in pl.read_excel(
+        raw.cached(SOURCE, FEEDS["NJ-34035"][0]).path, sheet_id=0, has_header=False
+    ).items():
+        if sheet in ("All", "Federal"):
+            continue
+        for cells in frame.iter_rows():
+            where, office, term, vote, label, name = (str(cell or "").strip() for cell in cells[:6])
+            if not vote.lower().startswith("vote for") or not name or unfilled.search(name) or federal.search(office):
+                continue
+            named, independent = party(label)
+            feeds["NJ-34035"].append(
+                {
+                    "county": "Somerset",
+                    "contest": f"Somerset County {office.removeprefix('County ')}"
+                    if sheet == "County"
+                    else f"{sheet} {office}{f' {where}' if re.match(r'(?i)(ward|district) ', where) else ''}",
+                    "seats": NUMBERS.get(vote.split()[-1].title(), 1),
+                    "name": cased(name),
+                    "party": named,
+                    "independent": independent or named is None,
+                    "unexpired": "nexpired" in term,
+                }
+            )
+
+    town = office = label = ""
+    seats, unexpired = 1, False
+    for line in text("NJ-34041", "-layout").splitlines():
+        if found := re.match(r"(\S.*?)\s{2,}Vote for (\d+)\s{2,}(\S.*?)\s{2,}(\S.*?)\s*$", line):
+            town, seats, office, unexpired = found[1], int(found[2]), found[3], "nexpired" in found[4]
+            town = {"Wash Boro": "Washington Borough", "Wash Twp": "Washington Township"}.get(town, town)
+            label = ""
+            continue
+        found = re.match(
+            r"\s+(?:(REPUBLICAN|DEMOCRAT|NOMINATED BY PETITION)\S*:)?\s+(\S.*?)(?:\s{2,}|\s+\S+@\S+|$)", line
+        )
+        if not town or found is None:
+            continue
+        label = found[1] or label
+        if unfilled.search(found[2]) or "@" in found[2]:
+            continue
+        named, independent = party(label)
+        feeds["NJ-34041"].append(
+            {
+                "county": "Warren",
+                "contest": f"Warren County {office}" if town == "County" else f"{town} {office}",
+                "seats": seats,
+                "name": cased(found[2]),
+                "party": named,
+                "independent": independent or named is None,
+                "unexpired": unexpired,
+            }
+        )
+
+    town = office = pending = ""
+    seats, unexpired = 1, False
+    for line in text("NJ-34023", "-layout").splitlines():
+        if found := re.match(r"(?:(\S.*?)\s+)?\d+ YEAR (UNEXPIRED )?TERM VOTE FOR (\d+)", line):
+            if found[1]:
+                office, town = found[1], pending.title() if pending else town
+            else:
+                office = pending
+            seats, unexpired, pending = int(found[3]), bool(found[2]), ""
+            continue
+        if re.match(r"[A-Z][A-Z .'-]+$", line) and not re.search("NOMINATION|OFFICES", line):
+            pending = line.strip()
+            continue
+        found = re.match(r"[A-Z]\s{3,}(\S.*?)\s{2,}(\S.*?)\s{2,}(Republican|Democratic|Democrat|Independent)\b", line)
+        if found is None or unfilled.search(found[1]) or federal.search(office) or "CONGRESSIONAL" in office:
+            continue
+        named, independent = party(found[3])
+        feeds["NJ-34023"].append(
+            {
+                "county": "Middlesex",
+                "contest": f"Middlesex County {office.title().removeprefix('County ')}"
+                if office.startswith("COUNTY")
+                else f"{town} {office.title()}",
+                "seats": seats,
+                "name": cased(f"{found[1]} {found[2]}"),
+                "party": named,
+                "independent": independent,
+                "unexpired": unexpired,
+            }
+        )
+
+    contest, label, expect, seats = "", "", "", 1
+    for line in text("NJ-34017", "-layout").splitlines():
+        if not line.strip() or "@" in line or re.search(r"Clerk’s Office|OFFICIAL Master List", line):
+            continue
+        if re.match(r"\s{10,}\S", line):
+            heading = re.sub(r"\s*\((\d+) [Ss]eats?\)", "", line)
+            seats = int(found[1]) if (found := re.search(r"\((\d+) [Ss]eats?\)", line)) else 1
+            heading = re.sub(r"\b(Democratic|Republican|Independent|Dem|Rep|Ind)\b|–", " ", heading)
+            contest = re.sub(r"\b(\d)(?:st|nd|rd|th) Ward\b", r"Council Ward \1", " ".join(heading.split()))
+            expect = ""
+        elif found := re.match(r"Slogan:\s*(.*)", line):
+            label, expect = found[1].strip(), "" if unfilled.search(found[1]) else "office"
+        elif line.startswith("Ballot Position"):
+            expect = "office"
+        elif expect == "office":
+            expect = "name"
+        elif expect == "name":
+            expect = ""
+            if re.search(r"(?i)senat|congress", contest):
+                continue
+            named, independent = party(label)
+            feeds["NJ-34017"].append(
+                {
+                    "county": "Hudson",
+                    "contest": contest,
+                    "seats": seats,
+                    "name": cased(line.strip()),
+                    "party": named,
+                    "independent": independent or named is None,
+                    "unexpired": bool(re.search(r"(?i)unexpired", contest)),
+                }
+            )
+
     for key, county in (("MI-26017", "Bay"), ("MI-26091", "Lenawee"), ("MI-26021", "Berrien")):
         post, seats, unexpired = "", 0, False
         for line in text(key, "-layout").splitlines():
@@ -2384,7 +2616,7 @@ def parse() -> None:
 
     for row in [
         row
-        for state in ("oh", "fl", "ca")
+        for state in ("oh", "fl", "ca", "nj")
         for row in csv.DictReader(
             Path(__file__).with_name(f"local_2026_{state}.tsv").read_text().splitlines(), delimiter="\t"
         )
@@ -2827,6 +3059,8 @@ def parse() -> None:
                     )
                     template, tail = "", f"{state}:{row['fips']}:{slug(title)}"
                     minted[tail] = (title, place, "", "")
+                if tail is not None and not row["unexpired"]:
+                    tail = tail.removesuffix(":remainder")
                 if (
                     tail is not None
                     and used.setdefault(tail, str(row["contest"])) != row["contest"]
@@ -2892,10 +3126,13 @@ def parse() -> None:
             )
         }
     kept = set(frame["tail"])
+    renamed = {
+        tail for tail in held.values() if tail.endswith(":remainder") and tail.removesuffix(":remainder") in kept
+    }
     lost = {
         (":".join(tail.split(":")[:2]), person)
         for persons, tail in held.items()
-        if tail not in kept
+        if tail not in kept and tail not in renamed
         for person in persons
     }
     moved = {
@@ -2925,6 +3162,22 @@ def emit() -> Path:
         def name(entity: object, text: str) -> None:
             if entity in cs.minted:
                 cs.add("name", entity_id=entity, text=text, lang="en", kind="official", is_preferred=True)
+
+        for tail, contest in conn.execute(
+            """select substr(x.value, 12), x.entity_id from external_id x join changeset c on c.id = x.changeset_id
+               join entity t on t.id = x.entity_id and t.retired_by is null
+               where x.scheme = 'us.contest' and x.value like %s and c.pipeline = %s""",
+            [f"{DAY}:%:remainder", SOURCE],
+        ).fetchall():
+            if tail.removesuffix(":remainder") not in set(frame["tail"]):
+                continue
+            reason = "This full-term race was filed under the office's last unexpired-term contest; it moves to the full-term seat."
+            for (candidacy,) in conn.execute(
+                "select ca.id from candidacy ca join contest_option o on o.id = ca.option_id where o.contest_id = %s",
+                [contest],
+            ).fetchall():
+                cs.add("entity_retirement", entity_id=candidacy, reason=reason)
+            cs.add("entity_retirement", entity_id=contest, reason=reason)
 
         templates: dict[str, tuple] = {}
         for row in conn.execute(
@@ -3063,6 +3316,11 @@ def emit() -> Path:
                 base = list(templates[template])
                 if tail.endswith(":unexpired"):
                     base[15] = f"{base[15]}-unexpired"
+                    known[tail] = known.get(template, [])
+                elif template == f"{tail}:remainder":
+                    base[1], base[9] = None, "full"
+                    base[14] = re.sub(r"(?i),? \(?unexpired term\)?| special(?= election)", "", base[14])
+                    base[15] = re.sub(r"-(unexpired|remainder)(-term)?(?=-|$)", "", base[15])
                     known[tail] = known.get(template, [])
                 else:
                     old, new = template.rsplit("-", 1)[1], tail.rsplit("-", 1)[1]
@@ -3273,7 +3531,10 @@ def emit() -> Path:
                     person = next(iter(pool))
                     counts["matched"] += 1
                 else:
-                    person = cs.key(f"{SOURCE}.person", f"{tail}:{slug(row['name'])}")
+                    person = cs.key(
+                        f"{SOURCE}.person",
+                        f"{template if template == f'{tail}:remainder' else tail}:{slug(row['name'])}",
+                    )
                     if person in cs.minted:
                         cs.add("person", id=person)
                         name(person, row["name"])
