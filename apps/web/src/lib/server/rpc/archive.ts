@@ -817,15 +817,33 @@ async function children(
         select ${area.id}::uuid
         union
         select p.parent_id from area_parent p join anc on p.area_id = anc.id
+      ),
+      me as materialized (
+        select geom from area_geometry where area_id = ${area.id}::uuid
+        order by valid @> ${date}::date desc, upper(valid) desc nulls first limit 1
       )
       select a.id, a.k, a.scheme_code as scheme
       from (
-        select distinct r.area_k from unnest(${sql.param(ks)}::int[]) as s(k) cross join lateral (
-          select x.area_k from result_rollup x where x.result_set_k = s.k and x.measure = any(${COUNTED}) offset 0
+        select r.area_k, coalesce(bool_or(r.value <> 0), false) as voted
+        from unnest(${sql.param(ks)}::int[]) as s(k) cross join lateral (
+          select x.area_k, x.value from result_rollup x where x.result_set_k = s.k and x.measure = any(${COUNTED}) offset 0
         ) r
+        group by r.area_k
       ) r
       join area a on a.k = r.area_k
       where a.id not in (select id from anc)
+        and (
+          r.voted
+          or not exists (select from me)
+          or not exists (select from area_geometry g where g.area_id = a.id)
+          or exists (
+            select from me cross join lateral (
+              select g.geom from area_geometry g where g.area_id = a.id
+              order by g.valid @> ${date}::date desc, upper(g.valid) desc nulls first limit 1
+            ) g
+            where ST_Area(ST_Intersection(g.geom, me.geom)) >= 0.01 * ST_Area(g.geom)
+          )
+        )
     `);
   }
   const settled = found.rows.some(
