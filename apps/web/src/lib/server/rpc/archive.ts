@@ -20,7 +20,7 @@ import * as v from "valibot";
 import { m } from "#lib/paraglide/messages.js";
 import { os, remember } from "#lib/server/cache.js";
 import { db } from "#lib/server/db/index.js";
-import { parted, plane, spot } from "#lib/server/plane.js";
+import { abroad, parted, plane, spot } from "#lib/server/plane.js";
 import { independent } from "#lib/party.js";
 
 const stored = (tiles: string | null | undefined) =>
@@ -567,7 +567,9 @@ const Sketch = v.object({
   isApproximate: v.boolean(),
   shaped: v.optional(v.nullable(v.number())),
   credits: v.optional(v.nullable(v.array(v.string()))),
-  outlying: v.optional(v.array(v.object({ k: v.number(), code: v.string() }))),
+  outlying: v.optional(
+    v.array(v.object({ k: v.number(), code: v.optional(v.string()) })),
+  ),
 });
 
 type Found = {
@@ -7801,7 +7803,7 @@ export const contests = {
             }),
           ),
           outlying: v.optional(
-            v.array(v.object({ k: v.number(), code: v.string() })),
+            v.array(v.object({ k: v.number(), code: v.optional(v.string()) })),
           ),
           parted: v.optional(
             v.object({ isOnly: v.boolean(), ks: v.array(v.number()) }),
@@ -7939,7 +7941,7 @@ export const contests = {
           const shaped = new Set(row.shaped);
           const absent = group.ids.filter((id) => !shaped.has(id));
           const isLevel = group.scheme === input.level;
-          const [labels, outlying, split] = await Promise.all([
+          const [labels, outlying, split, away] = await Promise.all([
             names(absent, contest.date),
             isLevel && group.scheme === "us.state"
               ? db.execute<{ k: number; code: string }>(sql`
@@ -7949,7 +7951,11 @@ export const contests = {
               `)
               : null,
             parted(group.scheme, area.id, row.asOf ?? day),
+            isLevel
+              ? abroad(group.scheme, area.id, [...present], row.asOf ?? day)
+              : [],
           ]);
+          const off = [...(outlying?.rows ?? []), ...away.map((k) => ({ k }))];
           return [
             {
               scheme: group.scheme,
@@ -7968,7 +7974,7 @@ export const contests = {
               k: group.ids.includes(area.id) ? area.k : null,
               frame: group.ids.includes(area.id) ? frame : null,
               blank: isLevel ? blank : [],
-              ...(outlying != null && { outlying: outlying.rows }),
+              ...(off.length > 0 && { outlying: off }),
               parted: split,
             },
           ];
@@ -10039,10 +10045,12 @@ async function sketch(
   const own = found.rows.find(
     (row) => row.scheme !== level && stored(row.tiles) != null,
   );
-  const [split, ownSplit] = await Promise.all([
+  const [split, ownSplit, away] = await Promise.all([
     parted(level, area.id, day),
     own == null ? undefined : parted(own.scheme, area.id, day),
+    abroad(level, area.id, ks, day),
   ]);
+  const off = [...(outlying?.rows ?? []), ...away.map((k) => ({ k }))];
   return tiled == null || frame == null
     ? null
     : {
@@ -10064,7 +10072,7 @@ async function sketch(
           }))
           .toSorted((a, b) => a.name.localeCompare(b.name)),
         isApproximate: tiled.synthetic,
-        ...(outlying != null && { outlying: outlying.rows }),
+        ...(off.length > 0 && { outlying: off }),
         shaped: ks.length === 0 ? null : tiled.shaped,
         credits:
           ks.length === 0

@@ -56,15 +56,52 @@ export const plane = (column: string, scheme: string) =>
 export const spot = (column: string, scheme: string) =>
   sql`ST_Transform(ST_GeometryN(${plane(column, scheme)}, 1), 4326)`;
 
+const insetsOf = (scheme: string) =>
+  projections[schemes[scheme.split(".", 1)[0] ?? ""] ?? fallback]?.insets ?? [];
+
+const part = (scheme: string, column: string) =>
+  sql.raw(
+    `(select case ${insetsOf(scheme)
+      .map((inset, index) => `when ${inside(inset.within)} then ${index}`)
+      .join(
+        " ",
+      )} else -1 end from ST_Dump(${column}) d cross join lateral (select (ST_XMin(d.geom) + ST_XMax(d.geom)) / 2 as x, (ST_YMin(d.geom) + ST_YMax(d.geom)) / 2 as y) q order by ST_Area(d.geom) desc limit 1)`,
+  );
+
+export const abroad = async (
+  scheme: string,
+  area: string,
+  ks: Array<number>,
+  day: string,
+) => {
+  if (ks.length === 0 || ks.length > 5000) {
+    return [];
+  }
+  const found = await db.execute<{ k: number }>(sql`
+    with me as materialized (
+      select geom from area_geometry
+      where area_id = ${area}::uuid
+        and not exists (select from area_parent p where p.area_id = ${area}::uuid and p.valid @> ${day}::date)
+      order by valid @> ${day}::date desc, upper(valid) desc nulls first limit 1
+    )
+    select a.k from area a
+    cross join me
+    cross join lateral (
+      select g.geom from area_geometry g where g.area_id = a.id
+      order by g.valid @> ${day}::date desc, upper(g.valid) desc nulls first limit 1
+    ) g
+    where a.k = any(${sql.param(ks)}::int[])
+      and not ST_Covers(me.geom, ST_PointOnSurface(g.geom))
+      and ${insetsOf(scheme).length === 0 ? sql`true` : sql`${part(scheme, "g.geom")} = -1`}
+  `);
+  return found.rows.map((row) => row.k);
+};
+
 export const parted = async (scheme: string, area: string, day: string) => {
-  const insets =
-    projections[schemes[scheme.split(".", 1)[0] ?? ""] ?? fallback]?.insets ??
-    [];
+  const insets = insetsOf(scheme);
   if (insets.length === 0) {
     return;
   }
-  const part = (column: string) =>
-    `(select case ${insets.map((inset, index) => `when ${inside(inset.within)} then ${index}`).join(" ")} else -1 end from ST_Dump(${column}) d cross join lateral (select (ST_XMin(d.geom) + ST_XMax(d.geom)) / 2 as x, (ST_YMin(d.geom) + ST_YMax(d.geom)) / 2 as y) q order by ST_Area(d.geom) desc limit 1)`;
   const found = await db.execute<{
     k: number;
     part: number;
@@ -75,8 +112,8 @@ export const parted = async (scheme: string, area: string, day: string) => {
       select geom from area_geometry where area_id = ${area}::uuid
       order by valid @> ${day}::date desc, upper(valid) desc nulls first limit 1
     ),
-    mine as materialized (select ${sql.raw(part("me.geom"))} as part from me)
-    select a.k, ${sql.raw(part("g.geom"))} as part, mine.part as mine, ST_Covers(me.geom, ST_PointOnSurface(g.geom)) as "isInside"
+    mine as materialized (select ${part(scheme, "me.geom")} as part from me)
+    select a.k, ${part(scheme, "g.geom")} as part, mine.part as mine, ST_Covers(me.geom, ST_PointOnSurface(g.geom)) as "isInside"
     from area_geometry g
     join area a on a.id = g.area_id
     cross join me

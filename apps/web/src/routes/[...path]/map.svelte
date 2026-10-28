@@ -10,6 +10,7 @@
   import { resolve } from "$app/paths";
   import { page } from "$app/state";
   import ArrowUpLeftIcon from "@lucide/svelte/icons/arrow-up-left";
+  import ChevronUpIcon from "@lucide/svelte/icons/chevron-up";
   import MinusIcon from "@lucide/svelte/icons/minus";
   import PlusIcon from "@lucide/svelte/icons/plus";
   import ScanIcon from "@lucide/svelte/icons/scan";
@@ -18,6 +19,7 @@
   import { on } from "svelte/events";
   import { fade, fly } from "svelte/transition";
   import Export from "#lib/components/export.svelte";
+  import * as Popover from "#lib/components/ui/popover/index.js";
   import { Engine } from "#lib/map/engine.svelte.js";
   import * as Select from "#lib/components/ui/select/index.js";
   import { isHover, isTouch } from "#lib/explain.svelte.js";
@@ -84,7 +86,7 @@
       isOutside: boolean;
       isPending: boolean;
     }> | null;
-    outlying?: Array<{ k: number; code: string }> | null;
+    outlying?: Array<{ k: number; code?: string }> | null;
     parted?: { isOnly: boolean; ks: Array<number> } | null;
     isApproximate: boolean;
     noun: string;
@@ -138,6 +140,7 @@
 
   const uid = $props.id();
   let opening = $state<number | null>(null);
+  let isListing = $state(false);
   let ladder = $state<Awaited<ReturnType<typeof orpc.contests.context.call>>>(
     [],
   );
@@ -487,9 +490,6 @@
     nested == null ? null : engine.tiles(nested.tiles),
   );
 
-  const pools = $derived(
-    places.rows.filter((row) => row.isPool === true && row.leader != null),
-  );
   const rows = $derived(
     new Map(
       [...places.rows, ...(places.districts ?? [])].map((row) => [row.k, row]),
@@ -625,24 +625,42 @@
     const codes = new Map(
       (outlying ?? []).map((entry) => [entry.k, entry.code]),
     );
-    if (codes.size === 0) {
-      return [];
-    }
     const painted = new Map(fills((css) => css));
     return [
       ...places.rows
-        .filter((row) => codes.has(row.k))
-        .map((row) => ({ k: row.k, name: row.name, isBlank: false })),
+        .filter(
+          (row) =>
+            codes.has(row.k) || (row.isPool === true && row.leader != null),
+        )
+        .map((row) => ({
+          k: row.k,
+          name: row.name,
+          leader: row.leader,
+          isBlank: false,
+          isPool: row.isPool === true,
+        })),
       ...[...missing, ...pending]
         .filter((entry) => codes.has(entry.k))
-        .map((entry) => ({ k: entry.k, name: entry.name, isBlank: true })),
+        .map((entry) => ({
+          k: entry.k,
+          name: entry.name,
+          leader: null,
+          isBlank: true,
+          isPool: false,
+        })),
     ]
       .map((entry) => ({
         ...entry,
-        code: codes.get(entry.k) ?? "",
-        fill: painted.get(entry.k),
+        code: codes.get(entry.k),
+        fill:
+          painted.get(entry.k) ??
+          (entry.leader == null ? undefined : colors[entry.leader]),
       }))
-      .toSorted((a, b) => a.code.localeCompare(b.code));
+      .toSorted((a, b) =>
+        (a.code ?? a.name).localeCompare(b.code ?? b.name, getLocale(), {
+          numeric: true,
+        }),
+      );
   });
   const away = $derived(
     new Set([
@@ -2054,91 +2072,171 @@
       </button>
     </div>
     {#if remote.length > 0}
-      <div
-        class="absolute inset-e-2 inset-be-2 flex overflow-hidden rounded-sm bg-card/95 shadow-menu ring-1 ring-border max-sm:inset-e-14"
-        role="group"
-        aria-label={m.map_outlying()}
-      >
-        {#each remote as entry (entry.k)}
-          {const reach = (node: HTMLElement) => {
-            const box =
-              node.offsetParent?.parentElement?.getBoundingClientRect();
-            const rect = node.getBoundingClientRect();
-            if (box != null) {
-              pointer = {
-                x: rect.left - box.left + rect.width / 2,
-                y: rect.top - box.top,
-              };
-            }
-          }}
-          <button
-            type="button"
-            class={cn(
-              "flex items-center gap-1.5 border-s border-border px-2 text-xs font-semibold block-7 first:border-s-0 hover:bg-secondary pointer-coarse:block-10",
-              { "bg-secondary": pinned === entry.k || focus === entry.k },
-              { "font-normal text-muted-foreground": entry.isBlank },
-            )}
-            aria-label={entry.name}
-            aria-pressed={entry.isBlank ? undefined : pinned === entry.k}
-            onpointermove={(event) => {
-              if (
-                !isHover(event) ||
-                (pointer != null && (entry.isBlank ? empty : focus) === entry.k)
-              ) {
-                return;
-              }
-              reach(event.currentTarget);
-              if (entry.isBlank) {
-                empty = entry.k;
-              } else if (pinned == null) {
-                focus = entry.k;
+      {const isCoded = $derived(remote.every((entry) => entry.code != null))}
+      {const heading = $derived(
+        isCoded
+          ? m.map_outlying()
+          : remote.every((entry) => !entry.isPool)
+            ? m.map_abroad()
+            : m.map_offmap(),
+      )}
+      {#if remote.length === 1 || (isCoded && remote.length <= 6)}
+        <div
+          class="absolute inset-e-2 inset-be-2 flex overflow-hidden rounded-sm bg-card/95 shadow-menu ring-1 ring-border max-sm:inset-e-14"
+          role="group"
+          aria-label={heading}
+        >
+          {#each remote as entry (entry.k)}
+            {const reach = (node: HTMLElement) => {
+              const box =
+                node.offsetParent?.parentElement?.getBoundingClientRect();
+              const rect = node.getBoundingClientRect();
+              if (box != null) {
+                pointer = {
+                  x: rect.left - box.left + rect.width / 2,
+                  y: rect.top - box.top,
+                };
               }
             }}
-            onpointerleave={() => {
-              pointer = null;
-              empty = null;
-              if (pinned == null && focus === entry.k) {
-                focus = null;
-              }
-            }}
-            onfocus={(event) => {
-              reach(event.currentTarget);
-              if (entry.isBlank) {
-                empty = entry.k;
-              } else if (pinned == null) {
-                focus = entry.k;
-              }
-            }}
-            onblur={() => {
-              pointer = null;
-              empty = null;
-              if (pinned == null && focus === entry.k) {
-                focus = null;
-              }
-            }}
-            onclick={(event) => {
-              if (entry.isBlank) {
-                return;
-              }
-              if (isTouch(event) && pinned !== entry.k) {
-                pinned = entry.k;
-                focus = entry.k;
-              } else {
-                open(entry.k);
-              }
-            }}
+            <button
+              type="button"
+              class={cn(
+                "flex items-center gap-1.5 border-s border-border px-2 text-xs font-semibold block-7 first:border-s-0 hover:bg-secondary pointer-coarse:block-10",
+                { "bg-secondary": pinned === entry.k || focus === entry.k },
+                { "font-normal text-muted-foreground": entry.isBlank },
+              )}
+              aria-label={entry.name}
+              aria-pressed={entry.isBlank ? undefined : pinned === entry.k}
+              onpointermove={(event) => {
+                if (
+                  !isHover(event) ||
+                  (pointer != null &&
+                    (entry.isBlank ? empty : focus) === entry.k)
+                ) {
+                  return;
+                }
+                reach(event.currentTarget);
+                if (entry.isBlank) {
+                  empty = entry.k;
+                } else if (pinned == null) {
+                  focus = entry.k;
+                }
+              }}
+              onpointerleave={() => {
+                pointer = null;
+                empty = null;
+                if (pinned == null && focus === entry.k) {
+                  focus = null;
+                }
+              }}
+              onfocus={(event) => {
+                reach(event.currentTarget);
+                if (entry.isBlank) {
+                  empty = entry.k;
+                } else if (pinned == null) {
+                  focus = entry.k;
+                }
+              }}
+              onblur={() => {
+                pointer = null;
+                empty = null;
+                if (pinned == null && focus === entry.k) {
+                  focus = null;
+                }
+              }}
+              onclick={(event) => {
+                if (entry.isBlank) {
+                  return;
+                }
+                if (isTouch(event) && pinned !== entry.k) {
+                  pinned = entry.k;
+                  focus = entry.k;
+                } else {
+                  open(entry.k);
+                }
+              }}
+            >
+              <span
+                class={cn("rounded-xs bg-(--party) block-2.5 inline-2.5", {
+                  "ring-1 ring-border": entry.isBlank,
+                })}
+                style:--party={entry.fill}
+                aria-hidden="true"
+              ></span>
+              {entry.code ?? entry.name}
+            </button>
+          {/each}
+        </div>
+      {:else}
+        <Popover.Root bind:open={isListing}>
+          <Popover.Trigger
+            class="absolute inset-e-2 inset-be-2 flex items-center gap-2 rounded-sm bg-card/95 ps-2.5 pe-2 text-xs font-semibold shadow-menu ring-1 ring-border block-7 hover:bg-secondary data-[state=open]:bg-secondary pointer-coarse:block-10 max-sm:inset-e-14"
           >
+            {heading}
+            <span class="flex gap-0.5" aria-hidden="true">
+              {#each remote.slice(0, 12) as entry (entry.k)}
+                <span
+                  class={cn("rounded-[1px] bg-(--party) block-2.5 inline-1.5", {
+                    "ring-1 ring-border": entry.isBlank,
+                  })}
+                  style:--party={entry.fill}
+                ></span>
+              {/each}
+            </span>
             <span
-              class={cn("rounded-xs bg-(--party) block-2.5 inline-2.5", {
-                "ring-1 ring-border": entry.isBlank,
-              })}
-              style:--party={entry.fill}
+              class="font-figures font-normal text-muted-foreground tabular-nums"
+              >{count(remote.length)}</span
+            >
+            <ChevronUpIcon
+              class="text-muted-foreground block-3.5 inline-3.5"
               aria-hidden="true"
-            ></span>
-            {entry.code}
-          </button>
-        {/each}
-      </div>
+            />
+          </Popover.Trigger>
+          <Popover.Content
+            side="top"
+            align="end"
+            class="gap-0 overflow-y-auto p-1 inline-80 max-block-[min(24rem,60dvh)]"
+          >
+            {const shared = $derived.by(() => {
+              const first = remote[0]?.name ?? "";
+              let cut = first.lastIndexOf(", ");
+              while (
+                cut > 0 &&
+                !remote.every((entry) =>
+                  entry.name.startsWith(first.slice(0, cut + 2)),
+                )
+              ) {
+                cut = first.lastIndexOf(", ", cut - 1);
+              }
+              return cut > 0 ? first.slice(0, cut + 2) : "";
+            })}
+            {#if shared !== ""}
+              <p class="px-2 pbs-1.5 pbe-1 text-xs text-muted-foreground">
+                {shared.slice(0, -2)}
+              </p>
+            {/if}
+            {#each remote as entry (entry.k)}
+              {const row = $derived(rows.get(entry.k))}
+              {#if row?.path == null}
+                <div class="flex items-center gap-2.5 rounded-xs px-2 py-1.5">
+                  {@render outlier(entry, row, entry.name.slice(shared.length))}
+                </div>
+              {:else}
+                <button
+                  type="button"
+                  class="flex items-center gap-2.5 rounded-xs px-2 py-1.5 text-start inline-full hover:bg-secondary focus-visible:bg-secondary"
+                  onclick={() => {
+                    isListing = false;
+                    open(entry.k);
+                  }}
+                >
+                  {@render outlier(entry, row, entry.name.slice(shared.length))}
+                </button>
+              {/if}
+            {/each}
+          </Popover.Content>
+        </Popover.Root>
+      {/if}
     {/if}
     {#if overview != null && context != null}
       {#key `${nook.isTop}:${nook.isEnd}:${context.k}`}
@@ -2724,49 +2822,6 @@
       </span>
     {/if}
   </div>
-  {#if pools.length > 0}
-    <div class="flex flex-wrap items-center gap-1.5 text-[0.8125rem]">
-      <span class="text-muted-foreground">{m.map_pools()}</span>
-      {#each pools as row (row.k)}
-        <button
-          type="button"
-          class={cn(
-            "flex items-center gap-1.5 rounded-xs px-1.5 block-7 hover:bg-secondary pointer-coarse:block-10",
-            { "marked bg-secondary": pinned === row.k },
-          )}
-          style:--party={row.leader == null
-            ? "var(--muted-foreground)"
-            : colors[row.leader]}
-          aria-pressed={pinned === row.k}
-          onpointerenter={() => {
-            if (pinned == null) {
-              focus = row.k;
-            }
-          }}
-          onpointerleave={() => {
-            if (pinned == null && focus === row.k) {
-              focus = null;
-            }
-          }}
-          onclick={() => {
-            pinned = pinned === row.k ? null : row.k;
-            focus = pinned;
-          }}
-        >
-          <span class="rounded-xs bg-(--party) chip block-2.5 inline-2.5"
-          ></span>
-          <span class="font-semibold">{row.name}</span>
-          {#if row.leader != null}
-            <span
-              class="font-figures text-xs text-muted-foreground tabular-nums"
-              >{names[row.leader]}
-              {percent(row.shares[row.leader] ?? 0)}</span
-            >
-          {/if}
-        </button>
-      {/each}
-    </div>
-  {/if}
   {#if credited.length > 0}
     {const notices = $derived(
       credited.filter((credit) => /©|: |\.$|^Contains /u.test(credit)),
@@ -2941,6 +2996,37 @@
       <span class="font-figures text-xs tabular-nums">{names.length}</span>
     {/if}
   </span>
+{/snippet}
+
+{#snippet outlier(
+  entry: (typeof remote)[number],
+  row: ReturnType<typeof rows.get>,
+  label: string,
+)}
+  <span
+    class={cn(
+      "mbs-1 shrink-0 self-start rounded-xs bg-(--party) block-2.5 inline-2.5",
+      { "ring-1 ring-border": entry.isBlank },
+    )}
+    style:--party={entry.fill}
+    aria-hidden="true"
+  ></span>
+  <span class="grid min-inline-0 flex-1 gap-0.5">
+    <span
+      class={cn(
+        "text-[0.8125rem] font-semibold text-pretty first-letter:uppercase",
+        { "font-normal text-muted-foreground": entry.isBlank },
+      )}>{label}</span
+    >
+    <span class="truncate text-xs text-muted-foreground"
+      >{entry.leader == null ? m.map_blank_key() : names[entry.leader]}</span
+    >
+  </span>
+  {#if entry.leader != null && row != null}
+    <span class="shrink-0 self-start font-figures text-[0.8125rem] tabular-nums"
+      >{percent(row.shares[entry.leader] ?? 0)}</span
+    >
+  {/if}
 {/snippet}
 
 {#snippet readout(isSheet = false)}
