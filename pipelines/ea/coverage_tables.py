@@ -922,6 +922,8 @@ def tokens(text: str) -> frozenset[str]:
 
 
 def request() -> None:
+    if (ROOT / "data" / "logs" / "coverage.paused").exists():
+        return
     with connect(autocommit=True) as conn:
         recent = conn.execute(
             "update coverage_build set requested_at = now() returning built_at > now() - interval '3 hours'"
