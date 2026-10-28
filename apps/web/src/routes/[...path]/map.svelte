@@ -2869,9 +2869,11 @@
       {/each}
     </nav>
   {/if}
-  <p class="px-1 text-[0.8125rem] text-muted-foreground sm:hidden">
-    {m.map_pick_touch()}
-  </p>
+  {#if places.rows.some((row) => row.valid > 0 || row.leader != null)}
+    <p class="px-1 text-[0.8125rem] text-muted-foreground sm:hidden">
+      {m.map_pick_touch()}
+    </p>
+  {/if}
   {#if nearPinned && beside != null && pinned == null}
     {const place = $derived(beside)}
     <div
@@ -3011,7 +3013,7 @@
     style:--party={entry.fill}
     aria-hidden="true"
   ></span>
-  <span class="grid min-inline-0 flex-1 gap-0.5">
+  <span class="grid flex-1 gap-0.5 min-inline-0">
     <span
       class={cn(
         "text-[0.8125rem] font-semibold text-pretty first-letter:uppercase",
