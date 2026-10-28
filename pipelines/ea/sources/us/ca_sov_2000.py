@@ -256,32 +256,62 @@ def emit() -> Path:
         elections: set[UUID] = set()
         for (key,), lines in frame.group_by("contest", maintain_order=True):
             result_set = cs.key(f"{SOURCE}.result_set", key)
-            if result_set not in cs.minted:
-                continue
+            fresh = result_set in cs.minted
             contest = contests[key]
             ((election,),) = conn.execute("select election_id from contest where id = %s", [contest]).fetchall()
             elections.add(election)
-            for row in conn.execute(
-                f"select {', '.join(columns)} from result_set where contest_id = %s and is_default", [contest]
-            ).fetchall():
-                cs.add("result_set", **dict(zip(columns, row, strict=True)), is_default=False)
-            outcomes = conn.execute(
-                """select o.option_id, o.kind, o.seats from outcome o
-                   join result_set rs on rs.id = o.result_set_id and rs.is_default where rs.contest_id = %s""",
-                [contest],
-            ).fetchall()
-            cs.add(
-                "result_set",
-                id=result_set,
-                election_id=election,
-                contest_id=contest,
-                stage="certified",
-                kind="counted",
-                status="active",
-                source_id=source,
-                is_default=True,
-                completeness=1,
-            )
+            outcomes = []
+            for unit, option, channel, measure, round_, flags, value, *locator in (
+                []
+                if fresh
+                else conn.execute(
+                    """select u.id, o.id, v.channel, v.measure, v.count_round, v.flags, v.value,
+                              l.page_id, l.source_id, l.x0, l.y0, l.x1, l.y1
+                       from result_value v join result_set r on r.k = v.result_set_k
+                       join reporting_unit u on u.k = v.unit_k left join contest_option o on o.k = v.option_k
+                       left join value_locator l on (l.result_set_k, l.unit_k, l.option_k, l.channel, l.measure, l.count_round)
+                         = (v.result_set_k, v.unit_k, v.option_k, v.channel, v.measure, v.count_round)
+                       where r.id = %s and v.measure <> 1""",
+                    [result_set],
+                ).fetchall()
+            ):
+                fact = {
+                    "result_set_id": result_set,
+                    "unit_id": unit,
+                    "option_id": option,
+                    "channel": channel,
+                    "measure": measure,
+                    "count_round": round_,
+                }
+                cs.add("result_value", **fact, flags=flags, value=value)
+                if locator[0] is not None or locator[1] is not None:
+                    cs.add(
+                        "value_locator",
+                        **fact,
+                        **dict(zip(("page_id", "source_id", "x0", "y0", "x1", "y1"), locator, strict=True)),
+                    )
+            if fresh:
+                for row in conn.execute(
+                    f"select {', '.join(columns)} from result_set where contest_id = %s and is_default", [contest]
+                ).fetchall():
+                    cs.add("result_set", **dict(zip(columns, row, strict=True)), is_default=False)
+                outcomes = conn.execute(
+                    """select o.option_id, o.kind, o.seats from outcome o
+                       join result_set rs on rs.id = o.result_set_id and rs.is_default where rs.contest_id = %s""",
+                    [contest],
+                ).fetchall()
+                cs.add(
+                    "result_set",
+                    id=result_set,
+                    election_id=election,
+                    contest_id=contest,
+                    stage="certified",
+                    kind="counted",
+                    status="active",
+                    source_id=source,
+                    is_default=True,
+                    completeness=1,
+                )
             totals = {
                 UUID(option): votes for option, votes in lines.group_by("option").agg(pl.col("votes").sum()).iter_rows()
             }
@@ -316,18 +346,19 @@ def emit() -> Path:
         }
         for election in sorted(elections):
             result_set = cs.key(f"{SOURCE}.turnout", str(election))
-            cs.add(
-                "result_set",
-                id=result_set,
-                election_id=election,
-                contest_id=None,
-                stage="certified",
-                kind="counted",
-                status="active",
-                source_id=source,
-                is_default=election not in held,
-                completeness=1,
-            )
+            if result_set in cs.minted:
+                cs.add(
+                    "result_set",
+                    id=result_set,
+                    election_id=election,
+                    contest_id=None,
+                    stage="certified",
+                    kind="counted",
+                    status="active",
+                    source_id=source,
+                    is_default=election not in held,
+                    completeness=1,
+                )
             for county, registered, ballots, number, box_registered, box_ballots in voters.filter(
                 pl.col("county") != "State Totals"
             ).select("county", "registered", "ballots", "page", "box_registered", "box_ballots").iter_rows():
