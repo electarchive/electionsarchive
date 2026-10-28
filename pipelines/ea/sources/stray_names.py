@@ -4,7 +4,7 @@ from ea.changeset import Changeset
 from ea.store import connect
 
 SOURCE = "stray_names"
-VERSION = "4"
+VERSION = "5"
 FUSION = "a fusion ballot line, kept on the option's ballot label; merging the label into the party carried it over"
 DROPS = [
     ("us", "Republican Party", "Republican/Democratic", FUSION),
@@ -12,6 +12,11 @@ DROPS = [
     ("us", "Republican Party", "Republican (Write-In)", FUSION),
 ]
 PERSON_NAMES = [
+    (
+        "01a13fb6-eb6e-74dc-99cc-2a94045ac96f",
+        "Parti Rhinocéros Party",
+        "the party's English and French names were joined; each is now its own name",
+    ),
     (
         "01a13c0c-c7c6-700f-98ec-39090d2d9638",
         "2023 Turkish presidential runoff",
@@ -73,7 +78,8 @@ def emit() -> Path:
                 print(f"{root} {preferred}: {text}")
         for entity, text, reason in PERSON_NAMES:
             for (name,) in conn.execute(
-                "select id from name where entity_id = %s and text = %s and not is_preferred", [entity, text]
+                "select id from name where entity_id = %s and text = %s and kind = 'official' and not is_preferred",
+                [entity, text],
             ).fetchall():
                 cs.add("name_drop", name_id=name, entity_id=entity, text=text, reason=reason)
                 print(f"person {entity}: {text}")

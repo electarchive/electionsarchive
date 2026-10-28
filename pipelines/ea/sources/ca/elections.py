@@ -156,7 +156,7 @@ PARTIES = {
     "COMMUNIST": ("Communist Party of Canada", None, "#ff6347"),
     "LIBERTARIAN": ("Libertarian Party of Canada", None, "#f2ba00"),
     "MARXIST-LENINIST": ("Marxist-Leninist Party of Canada", None, "#f5191a"),
-    "PARTI RHINOCÉROS PARTY": ("Parti Rhinocéros Party", None, "#d8bfd8"),
+    "PARTI RHINOCÉROS PARTY": ("Rhinoceros Party", None, "#d8bfd8"),
     "CHRISTIAN HERITAGE PARTY": ("Christian Heritage Party of Canada", None, None),
     "CENTRIST": ("Centrist Party of Canada", None, None),
     "ANIMAL PROTECTION PARTY": ("Animal Protection Party of Canada", None, None),
@@ -666,6 +666,8 @@ def emit() -> Path:
                         name(party, full, start=renamed)
                     else:
                         name(party, full)
+                    if key == "PARTI RHINOCÉROS PARTY":
+                        name(party, "Parti Rhinocéros", lang="fr")
                     if short is not None:
                         name(party, short, "abbreviation")
                     elif label != full:
