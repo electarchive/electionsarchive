@@ -115,6 +115,12 @@ CONTESTS = {
     "2026-12-22:MS:senate:34:s": ("2026-12-22:MS:special", "two_round", "MS-34", "MS-qualifying"),
 }
 STATES = {"MS": "Mississippi", "LA": "Louisiana", "AR": "Arkansas"}
+COURTS = {
+    "Candidates for Mississippi Court of Appeals": "coa",
+    "Candidates for Mississippi Chancery Court Judge": "chancery",
+    "Candidates for Mississippi Circuit Court Judge": "circuit",
+    "Candidates for District Attorney (Special Election)": "district-attorney",
+}
 PARTIES = {"Democrat": "democratic-party", "Republican": "republican-party"}
 
 
@@ -171,7 +177,26 @@ def parse() -> None:
                 rows.append(
                     {"contest": contest, "name": listed[index + 1], "party": listed[listed.index("Party", index) + 1]}
                 )
+    page = raw.cached(SOURCE, SOURCES["MS-qualifying"][0]).path.read_text()
+    judges = []
+    for header, court in COURTS.items():
+        section = page[page.index(f">{header}<") :]
+        section = section[: section.find("Candidates for", 20) % len(section)]
+        for cells in re.findall(r"<tr[^>]*>(.*?)</tr>", section, re.DOTALL):
+            values = [
+                html.unescape(re.sub(r"<[^>]+>", "", cell)).strip()
+                for cell in re.findall(r"<td[^>]*>(.*?)</td>", cells, re.DOTALL)
+            ]
+            if len(values) < 2:
+                continue
+            text, district, *place = values
+            judges.append({"court": court, "district": district, "place": (place or [""])[0] or None, "name": text})
     PARSED.mkdir(parents=True, exist_ok=True)
+    judicial = pl.DataFrame(
+        judges, schema={"court": pl.String, "district": pl.String, "place": pl.String, "name": pl.String}
+    )
+    judicial.write_parquet(PARSED / "judicial.parquet")
+    print(judicial.group_by("court").len())
     frame = pl.DataFrame(rows, schema={"contest": pl.String, "name": pl.String, "party": pl.String})
     frame.write_parquet(PARSED / "candidates.parquet")
     print(frame.group_by("contest").agg(pl.col("name")).sort("contest"))
@@ -184,7 +209,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="The 2026 elections after November 3 as scheduled: the Guam, Georgia, Mississippi, Arkansas, and Louisiana runoff dates, the Louisiana, Arkansas, and Mississippi legislative special elections through January 2027 with their candidates, and the November 3 Mississippi House 70 and 77 and Louisiana House 92 specials that can lead to December runoffs",
+            summary="The 2026 elections after November 3 as scheduled: the Guam, Georgia, Mississippi, Arkansas, and Louisiana runoff dates, the Louisiana, Arkansas, and Mississippi legislative special elections through January 2027 with their candidates, the November 3 Mississippi House 70 and 77 and Louisiana House 92 specials that can lead to December runoffs, and Mississippi's November 3 Court of Appeals, chancery, and circuit court elections and District Attorney District 7 special election with their qualified candidates",
             polity="US",
         )
 
@@ -326,6 +351,133 @@ def emit() -> Path:
                     is_independent=row["party"] == "No Party",
                 )
                 cs.add("citation", entity_id=candidacy, source_id=sources[listed], locator=None)
+                counts["candidates"] += 1
+        state_polity, state_area = conn.execute(
+            """select p.id, u.area_id from polity p
+               join reporting_unit u on u.polity_id = p.id and u.scheme_code = 'us.state'
+               where p.iso_code = 'US-MS'"""
+        ).fetchall()[0]
+        mississippians: dict[str, set[object]] = {}
+        for person, text in conn.execute(
+            """select distinct cy.person_id, n.text from candidacy cy
+               join name n on n.entity_id = cy.person_id and n.is_preferred and n.lang = 'en'
+               join contest_option o on o.id = cy.option_id
+               join external_id x on x.entity_id = o.contest_id and x.scheme = 'us.contest' and x.value ~ ':MS:'"""
+        ).fetchall():
+            mississippians.setdefault(slug(text), set()).add(person)
+        judicial = pl.read_parquet(PARSED / "judicial.parquet")
+        districts: set[str] = set()
+        offices: set[object] = set()
+        for (court, district, place), rows in judicial.group_by("court", "district", "place", maintain_order=True):
+            number = int(district.split("-")[0])
+            ordinal = (
+                f"{number}{'th' if 10 <= number % 100 <= 20 else {1: 'st', 2: 'nd', 3: 'rd'}.get(number % 10, 'th')}"
+            )
+            label = (
+                f"Court of Appeals District {number}"
+                if court == "coa"
+                else f"{ordinal} {'Chancery' if court == 'chancery' else 'Circuit'} Court District"
+            )
+            base = f"MS:{'circuit' if court == 'district-attorney' else court}-{number}"
+            polity = cs.key("us.polity", f"judicial:{base}")
+            area = cs.area("us.judicial_district", base)
+            if base not in districts:
+                districts.add(base)
+                if polity in cs.minted:
+                    cs.add("polity", id=polity, kind="judicial_district", iso_code=None)
+                    name(polity, f"Mississippi {label}")
+                    cs.add("polity_parent", polity_id=polity, parent_id=state_polity)
+                    cs.add("slug", path=f"us/ms/{slug(label)}", entity_id=polity)
+                if area in cs.minted:
+                    cs.add("area", id=area, scheme_code="us.judicial_district")
+                    cs.add("area_code", area_id=area, code=base, valid_from=None)
+                    cs.add("area_parent", area_id=area, parent_id=state_area)
+                    name(area, f"{label}, MS")
+                    cs.add("polity_territory", polity_id=polity, area_id=area)
+            if "-" in district:
+                label = f"{label}, Subdistrict {district}"
+                area = cs.area("us.judicial_district", f"MS:{court}-{district}")
+                if area in cs.minted:
+                    cs.add("area", id=area, scheme_code="us.judicial_district")
+                    cs.add("area_code", area_id=area, code=f"MS:{court}-{district}", valid_from=None)
+                    cs.add("area_parent", area_id=area, parent_id=cs.area("us.judicial_district", base))
+                    name(area, f"{label}, MS")
+            title = {
+                "coa": "Judge of the Court of Appeals",
+                "chancery": "Chancellor",
+                "circuit": "Circuit Judge",
+                "district-attorney": "District Attorney",
+            }[court]
+            office = cs.key("us.office", f"{slug(title)}:{base}")
+            if office not in offices:
+                offices.add(office)
+                cs.add("office", id=office, polity_id=polity, kind="other")
+                name(office, f"{title}, {label.split(', Subdistrict')[0]}")
+            special = court == "district-attorney"
+            key = (
+                f"2026-11-03:MS:{slug(title)}:{base.split(':')[1]}{district.removeprefix(str(number))}"
+                + (f":place-{place}" if place else "")
+                + (":s" if special else "")
+            )
+            contest = cs.key("us.contest", key)
+            cs.add(
+                "contest",
+                id=contest,
+                election_id=elections["2026-11-03:MS"],
+                kind="office",
+                office_id=office,
+                body_id=None,
+                district_area_id=area,
+                seat_id=None,
+                boundary_set_id=None,
+                magnitude=1,
+                term="remainder" if special else "full",
+                round_number=1,
+                previous_round_id=None,
+                electoral_system_id=cs.key("us.electoral_system", "two_round"),
+                default_result_kind="counted",
+            )
+            seat = f", Place {place}" if place else ""
+            name(contest, f"2026 Mississippi {title} {'special election' if special else 'election'}, {label}{seat}")
+            cs.add(
+                "slug",
+                path=f"us/ms/2026-11-03-general/{slug(f'{title} {label}{seat}')}"
+                + ("-special-election" if special else ""),
+                entity_id=contest,
+            )
+            cs.add("citation", entity_id=contest, source_id=sources["MS-qualifying"], locator=None)
+            counts["contests"] += 1
+            for text in rows["name"]:
+                pool = mississippians.get(slug(text), set())
+                if len(pool) == 1:
+                    person = next(iter(pool))
+                    counts["matched"] += 1
+                    print("matched", key, text)
+                else:
+                    person = cs.key(f"{SOURCE}.person", f"{key}:{slug(text)}")
+                    if person in cs.minted:
+                        cs.add("person", id=person)
+                        name(person, text)
+                option = cs.key("us.option", f"{key}:{slug(text)}")
+                cs.add(
+                    "contest_option",
+                    id=option,
+                    contest_id=contest,
+                    kind="candidate",
+                    party_id=None,
+                    ballot_label=text,
+                )
+                candidacy = cs.key("us.candidacy", f"{key}:{slug(text)}")
+                cs.add(
+                    "candidacy",
+                    id=candidacy,
+                    person_id=person,
+                    option_id=option,
+                    role="head",
+                    ballot_name=text,
+                    is_independent=False,
+                )
+                cs.add("citation", entity_id=candidacy, source_id=sources["MS-qualifying"], locator=None)
                 counts["candidates"] += 1
         print(counts)
         return cs.write()
