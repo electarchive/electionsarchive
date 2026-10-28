@@ -349,6 +349,14 @@ ROUNDS += [
         MD_PAGES[0],
     ),
     (
+        "OH",
+        date(2026, 5, 5),
+        "Ohio Secretary of State",
+        "May 5, 2026 primary election official canvass by county",
+        "https://www.ohiosos.gov/elections/election-results-and-data/2026-official-elections-results/",
+        url("oh", "summary-level-official-results-2026-primary---democratic.xlsx"),
+    ),
+    (
         "MA",
         date(2026, 9, 1),
         "Massachusetts Secretary of the Commonwealth",
@@ -366,6 +374,7 @@ SIDECARS = {
     ],
     "HI": [url("hi", county) for county in ("coh", "cok", "com")],
     "MA": [elstats.ma_primary_search(9, 2026)],
+    "OH": [url("oh", "summary-level-official-results-2026-primary---republican.xlsx")],
 }
 OK_RACE = re.compile(r"FOR STATE (SENATOR|REPRESENTATIVE) DISTRICT (\d+)")
 LEGISLATIVE = re.compile(
@@ -810,6 +819,40 @@ def parse() -> None:
                                 )
                                 for name, votes in zip(names, cells[1:], strict=True)
                             )
+        if state == "OH":
+            for workbook in (address, *SIDECARS[state]):
+                grid = pl.read_excel(
+                    raw.cached(SOURCE, workbook).path,
+                    sheet_name="General Assembly",
+                    has_header=False,
+                    infer_schema_length=0,
+                ).rows()
+                labels = []
+                for cell in grid[0]:
+                    labels.append(cell or (labels[-1] if labels else None))
+                found_rows = []
+                for line in grid[4:]:
+                    for column in range(6, len(line)):
+                        found = re.fullmatch(
+                            r"State (Senator|Representative) - District (\d+)\s*", labels[column] or ""
+                        )
+                        candidate = re.fullmatch(r"(.+?)\s*(\(WI\)\*)?\s*\((D|R)\)", grid[1][column] or "")
+                        if found is None or candidate is None or not line[0] or line[column] in (None, ""):
+                            continue
+                        found_rows.append(
+                            (
+                                "senate" if found[1] == "Senator" else "house",
+                                str(int(found[2])),
+                                "democratic" if candidate[3] == "D" else "republican",
+                                re.sub(r"\s+", " ", candidate[1]) + (" (write-in)" if candidate[2] else ""),
+                                line[0],
+                                int(float(line[column])),
+                            )
+                        )
+                cast = defaultdict(int)
+                for chamber, district, party, _, county, votes in found_rows:
+                    cast[chamber, district, party, county] += votes
+                rows.extend(row for row in found_rows if cast[*row[:3], row[4]])
         if state == "KS":
             rows = [
                 (
@@ -1183,7 +1226,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="2026 state legislative primaries and primary runoffs by county: Alabama, Arkansas, Connecticut, Delaware (district totals), Florida, Georgia, Hawaii, Idaho, Illinois, Indiana, Iowa, Kansas, Maryland, Massachusetts, Michigan, Minnesota, Nevada (with its statewide offices), New York, North Carolina, Oklahoma, Rhode Island, South Carolina, Utah, Vermont, West Virginia, and Wisconsin from the states' official results; Arizona, Colorado, Kentucky, Missouri, New Mexico, North Dakota, Oregon, Pennsylvania, South Dakota, Tennessee, Texas, and Wyoming from OpenElections",
+            summary="2026 state legislative primaries and primary runoffs by county: Alabama, Arkansas, Connecticut, Delaware (district totals), Florida, Georgia, Hawaii, Idaho, Illinois, Indiana, Iowa, Kansas, Maryland, Massachusetts, Michigan, Minnesota, Nevada (with its statewide offices), New York, North Carolina, Ohio, Oklahoma, Rhode Island, South Carolina, Utah, Vermont, West Virginia, and Wisconsin from the states' official results; Arizona, Colorado, Kentucky, Missouri, New Mexico, North Dakota, Oregon, Pennsylvania, South Dakota, Tennessee, Texas, and Wyoming from OpenElections",
             polity="US",
         )
 
