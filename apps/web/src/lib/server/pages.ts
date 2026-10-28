@@ -476,6 +476,28 @@ export async function chamber(path: string) {
     )
     .toSorted((a, b) => a - b);
   const typical = gaps[Math.floor(gaps.length / 2)] ?? null;
+  const partial: Array<boolean> = [];
+  for (const [index, term] of raw.entries()) {
+    const seats = total(term.parties);
+    const known = size(term.start);
+    const before = raw[index - 1];
+    const near = raw
+      .filter(
+        (other) =>
+          Math.abs(Date.parse(other.start) - Date.parse(term.start)) < 2.5e11,
+      )
+      .map((other) => total(other.parties));
+    partial.push(
+      !term.isSeated &&
+        (known == null
+          ? seats < 0.6 * Math.max(...near) ||
+            (before != null &&
+              partial[index - 1] === true &&
+              Math.abs(seats - total(before.parties)) <=
+                0.2 * total(before.parties))
+          : seats < 0.85 * known),
+    );
+  }
   const terms = raw.map((term, index) => {
     const next = raw[index + 1]?.start ?? null;
     const stranded =
@@ -510,9 +532,10 @@ export async function chamber(path: string) {
     return {
       ...term,
       parties: [...seats].map(([party, count]) => ({ party, seats: count })),
-      end: lapse ?? stranded ?? next,
+      end: lapse ?? stranded ?? next ?? body.closed,
       total: total(term.parties),
       size: size(term.start),
+      isPartial: partial[index] ?? false,
     };
   });
   const last = terms.at(-1);
@@ -531,7 +554,27 @@ export async function chamber(path: string) {
         ? ("mixed" as const)
         : ("seated" as const)
       : ("results" as const),
-    governments: record.governments,
+    seats:
+      last == null
+        ? null
+        : last.isPartial
+          ? (last.size ?? body.sizes.at(-1)?.seats ?? null)
+          : (last.size ?? last.total),
+    governments: record.governments.flatMap((cabinet) =>
+      body.closed == null
+        ? [cabinet]
+        : cabinet.from >= body.closed
+          ? []
+          : [
+              {
+                ...cabinet,
+                to:
+                  cabinet.to == null || cabinet.to > body.closed
+                    ? body.closed
+                    : cabinet.to,
+              },
+            ],
+    ),
     parties: stand(
       terms.flatMap((term) => term.parties.map((entry) => entry.party)),
       groups.flatMap((group) =>

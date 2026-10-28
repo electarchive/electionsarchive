@@ -372,14 +372,16 @@
       <dl
         class="col-span-12 flex flex-wrap items-baseline gap-x-7 gap-y-1.5 bg-card px-3.5 py-3"
       >
-        <div class="flex items-baseline gap-2">
-          <dt class="text-[0.8125rem] text-muted-foreground">
-            {m.chamber_seats()}
-          </dt>
-          <dd class="font-figures text-xl font-[760] tracking-[-0.015em]">
-            {count(latest.size ?? latest.total)}
-          </dd>
-        </div>
+        {#if data.seats != null}
+          <div class="flex items-baseline gap-2">
+            <dt class="text-[0.8125rem] text-muted-foreground">
+              {m.chamber_seats()}
+            </dt>
+            <dd class="font-figures text-xl font-[760] tracking-[-0.015em]">
+              {count(data.seats)}
+            </dd>
+          </div>
+        {/if}
         <div class="flex items-baseline gap-2">
           <dt class="text-[0.8125rem] text-muted-foreground">
             {m.chamber_terms()}
@@ -387,7 +389,7 @@
           <dd class="font-figures text-xl font-[760] tracking-[-0.015em]">
             {count(data.terms.length)}
             <span class="text-sm text-muted-foreground"
-              >{span(data.terms[0]?.start ?? latest.start, null)}</span
+              >{span(data.terms[0]?.start ?? latest.start, body.closed)}</span
             >
           </dd>
         </div>
@@ -574,6 +576,7 @@
                 : Math.max(0, term.size - held)}
             {seceded}
             official={seceded > 0 && term.size != null ? term.size : null}
+            isComplete={!term.isPartial}
             {change}
             partners={body.partners}
           />
@@ -587,7 +590,13 @@
           <p
             class="font-serif text-[1.375rem]/snug font-[560] tracking-[-0.005em] text-pretty max-inline-[44ch]"
           >
-            {#if leader.seats >= Math.floor(whole / 2) + 1}
+            {#if term.isPartial}
+              {m.chamber_renewal({
+                party: definite(leader.full ?? leader.name, true),
+                seats: count(leader.seats),
+                total: count(term.total),
+              })}
+            {:else if leader.seats >= Math.floor(whole / 2) + 1}
               {m.chamber_majority({
                 party: definite(leader.full ?? leader.name, true),
                 seats: count(leader.seats),

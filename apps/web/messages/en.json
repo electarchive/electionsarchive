@@ -1550,6 +1550,7 @@
   "chamber_term_next": "Next term",
   "chamber_majority": "{party} held a majority with {seats} of {total} seats.",
   "chamber_plurality": "No party held a majority. The largest, {party}, had {seats} of {total} seats.",
+  "chamber_renewal": "{party} won {seats} of the {total} seats up at this renewal.",
   "chamber_elected": "Elected at",
   "chamber_no_election": "No election record for this term.",
   "chamber_governments": "Governments during the term",

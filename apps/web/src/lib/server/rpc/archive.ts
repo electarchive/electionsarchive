@@ -18280,6 +18280,7 @@ export const bodies = {
           }),
         ),
         tenures: v.number(),
+        closed: v.nullable(v.string()),
         makeup: v.array(
           v.object({
             start: v.string(),
@@ -18322,10 +18323,28 @@ export const bodies = {
         kind: string;
         polity: string;
         tenures: number;
+        closed: string | null;
       }>(sql`
         select b.kind::text as kind, b.polity_id as polity,
-          (select count(*)::int from tenure t where t.body_id = b.id) as tenures
-        from body b where b.id = ${input.id}::uuid
+          (select count(*)::int from tenure t where t.body_id = b.id) as tenures,
+          coalesce(
+            (select max(upper(z.valid)) from body_size z where z.body_id = b.id having bool_and(not upper_inf(z.valid))),
+            (select min(p.valid_from) from polity_period p where p.polity_id = b.polity_id and p.valid_from > s.last),
+            (select min(e.date_from) from body y join contest c on c.body_id = y.id join election e on e.id = c.election_id
+              where b.kind in ('lower_house', 'upper_house') and y.polity_id = b.polity_id and y.id <> b.id
+                and y.kind in ('lower_house', 'upper_house', 'unicameral') and e.date_from > s.last
+                and s.last < current_date - interval '20 years'
+                and not exists (
+                  select from contest k join election w on w.id = k.election_id
+                  where k.body_id = y.id and w.date_from between s.first and s.last
+                ))
+          )::text as closed
+        from body b
+        cross join lateral (
+          select min(e.date_from) as first, max(e.date_from) as last from contest c join election e on e.id = c.election_id
+          where c.body_id = b.id and e.date_from <= current_date
+        ) s
+        where b.id = ${input.id}::uuid
       `);
       const body = found.rows[0];
       if (body == null) {
@@ -18520,6 +18539,7 @@ export const bodies = {
               })),
         sizes: sizes.rows,
         tenures: body.tenures,
+        closed: body.closed,
         makeup: Map.groupBy(makeup.rows, (row) => row.start)
           .entries()
           .map(([start, rows]) => ({

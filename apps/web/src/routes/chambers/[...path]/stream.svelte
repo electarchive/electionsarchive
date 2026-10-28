@@ -24,6 +24,7 @@
       apportioned: number | null;
       seceded: number;
       isSeated: boolean;
+      isPartial: boolean;
       parties: Array<{ party: string | null; seats: number }>;
       election: { name: string; path: string | null; date: string } | null;
     }>;
@@ -75,7 +76,10 @@
   const inner = $derived(height - PAD.top - PAD.axis - band);
   const low = $derived(Date.parse(terms[0]?.start ?? today));
   const high = $derived(
-    Math.max(Date.parse(today), Date.parse(terms.at(-1)?.start ?? today) + 1),
+    Math.max(
+      Date.parse(terms.at(-1)?.end ?? today),
+      Date.parse(terms.at(-1)?.start ?? today) + 1,
+    ),
   );
   const sx = (value: number) =>
     PAD.side +
@@ -216,8 +220,13 @@
   const majority = $derived.by(() => {
     let d = "";
     for (const [index, column] of columns.entries()) {
+      if (column.term.isPartial) {
+        continue;
+      }
       const isJoined =
-        index > 0 && column.x0 - (columns[index - 1]?.x1 ?? 0) < 1;
+        index > 0 &&
+        columns[index - 1]?.term.isPartial === false &&
+        column.x0 - (columns[index - 1]?.x1 ?? 0) < 1;
       d += `${isJoined ? "L" : "M"}${column.x0},${column.line}L${column.x1},${column.line}`;
     }
     return d;
