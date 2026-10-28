@@ -2011,6 +2011,26 @@
     {/if}
   </div>
 
+  {#if placed != null && !placed.level.startsWith("unit:")}
+    {#key `${here}?${placed.level}`}
+      <Ledger
+        {id}
+        unit={path === "" ? undefined : path}
+        level={placed.level}
+        noun={placed.levels.find((level) => level.code === placed.level)
+          ?.noun ?? ""}
+        parents={placed.rows}
+        {match}
+        group={page.url.searchParams.get("group") ?? undefined}
+        round={Math.max(
+          0,
+          Math.trunc(Number(page.url.searchParams.get("round"))) || 0,
+        )}
+        isMapped={drawn != null}
+        bind:focus
+      />
+    {/key}
+  {/if}
   {#if span != null && contest.target != null}
     <Changes
       rows={contest.rows}
@@ -2158,26 +2178,6 @@
       bind:focus
     />
   {/key}
-  {#if !placed.level.startsWith("unit:")}
-    {#key `${here}?${placed.level}`}
-      <Ledger
-        {id}
-        unit={path === "" ? undefined : path}
-        level={placed.level}
-        noun={placed.levels.find((level) => level.code === placed.level)
-          ?.noun ?? ""}
-        parents={placed.rows}
-        {match}
-        group={page.url.searchParams.get("group") ?? undefined}
-        round={Math.max(
-          0,
-          Math.trunc(Number(page.url.searchParams.get("round"))) || 0,
-        )}
-        isMapped={drawn != null}
-        bind:focus
-      />
-    {/key}
-  {/if}
 {:else if contest.children.length > 0 && !drilled}
   <section class="col-span-12 bg-card px-3.5 py-3">
     <h2 class="mbe-1.5 text-[0.8125rem] font-bold">{m.children_title()}</h2>

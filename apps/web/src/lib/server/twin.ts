@@ -3635,6 +3635,69 @@ function contestMarkdown(
       .filter((part) => part != null)
       .join(" "),
     ...contest.notes.map((note) => `> ${note.body}`),
+    ...(() => {
+      const units = ledger?.places;
+      if (ledger == null || units == null || contest.places == null) {
+        return [];
+      }
+      const group =
+        contest.places.levels.find(
+          (level) => level.code === contest.places?.level,
+        )?.noun ?? "";
+      const paths = new Map(contest.places.rows.map((row) => [row.k, row]));
+      const format = (nouns: Array<string>) =>
+        new Intl.ListFormat(getLocale(), {
+          style: "long",
+          type: "conjunction",
+        }).format(nouns);
+      const nouns = format(units.levels.map((level) => plural(level.noun)));
+      let at = 0;
+      return [
+        `## ${m.places_title({ noun: format(units.levels.map((level) => level.noun)) })}`,
+        [
+          ledger.groups.every((entry) => entry.k == null)
+            ? m.ledger_lede_flat({ nouns })
+            : m.ledger_lede({ nouns, group }),
+          ...(ledger.folded === 0
+            ? []
+            : [
+                m.ledger_single({
+                  count: count(ledger.folded),
+                  groups: ledger.folded === 1 ? group : plural(group),
+                }),
+              ]),
+        ].join(" "),
+        table(
+          [
+            group.charAt(0).toUpperCase() + group.slice(1),
+            m.col_name(),
+            m.col_leader(),
+            m.col_share(),
+            m.col_margin(),
+            m.stat_valid(),
+          ],
+          ledger.groups.flatMap((entry) => {
+            const rows = units.rows.slice(at, at + entry.size);
+            at += entry.size;
+            const parent = entry.k == null ? null : paths.get(entry.k);
+            return rows.map((row) => [
+              link(
+                parent?.name ??
+                  (entry.k == null &&
+                  ledger.groups.some((other) => other.k != null)
+                    ? m.ledger_unplaced({ place: entry.name, group })
+                    : entry.name),
+                parent?.path ?? null,
+              ),
+              row.name,
+              ...leading(row, units.legend),
+              row.margin == null ? null : points(row.margin),
+              count(row.valid),
+            ]);
+          }),
+        ),
+      ];
+    })(),
     ...compared,
     ...(standing == null
       ? []
@@ -4040,62 +4103,6 @@ function contestMarkdown(
         : null,
       contest.current?.isTally === true,
     ),
-    ...(() => {
-      const units = ledger?.places;
-      if (ledger == null || units == null || contest.places == null) {
-        return [];
-      }
-      const group =
-        contest.places.levels.find(
-          (level) => level.code === contest.places?.level,
-        )?.noun ?? "";
-      const paths = new Map(contest.places.rows.map((row) => [row.k, row]));
-      const format = (nouns: Array<string>) =>
-        new Intl.ListFormat(getLocale(), {
-          style: "long",
-          type: "conjunction",
-        }).format(nouns);
-      const nouns = format(units.levels.map((level) => plural(level.noun)));
-      let at = 0;
-      return [
-        `## ${m.places_title({ noun: format(units.levels.map((level) => level.noun)) })}`,
-        [
-          ledger.groups.every((entry) => entry.k == null)
-            ? m.ledger_lede_flat({ nouns })
-            : m.ledger_lede({ nouns, group }),
-          ...(ledger.folded === 0
-            ? []
-            : [
-                m.ledger_single({
-                  count: count(ledger.folded),
-                  groups: ledger.folded === 1 ? group : plural(group),
-                }),
-              ]),
-        ].join(" "),
-        table(
-          [
-            group.charAt(0).toUpperCase() + group.slice(1),
-            m.col_name(),
-            m.col_leader(),
-            m.col_share(),
-            m.col_margin(),
-            m.stat_valid(),
-          ],
-          ledger.groups.flatMap((entry) => {
-            const rows = units.rows.slice(at, at + entry.size);
-            at += entry.size;
-            const parent = entry.k == null ? null : paths.get(entry.k);
-            return rows.map((row) => [
-              link(parent?.name ?? entry.name, parent?.path ?? null),
-              row.name,
-              ...leading(row, units.legend),
-              row.margin == null ? null : points(row.margin),
-              count(row.valid),
-            ]);
-          }),
-        ),
-      ];
-    })(),
     ...(contest.children.length === 0
       ? []
       : [

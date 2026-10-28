@@ -83,14 +83,20 @@
     if (places == null) {
       return [];
     }
+    const groups = ledger.data?.groups ?? [];
+    const isMixed = groups.some((entry) => entry.k != null);
     let at = 0;
-    return (ledger.data?.groups ?? []).map((entry) => {
+    return groups.map((entry) => {
       const units = places.rows.slice(at, at + entry.size);
       at += entry.size;
       const parent = entry.k == null ? null : known.get(entry.k);
       return {
         k: entry.k,
-        name: parent?.name ?? entry.name,
+        name:
+          parent?.name ??
+          (isMixed && entry.k == null
+            ? m.ledger_unplaced({ place: entry.name, group: noun })
+            : entry.name),
         path: parent?.path ?? null,
         valid: entry.valid,
         units,

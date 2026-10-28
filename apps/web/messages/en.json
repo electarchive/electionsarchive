@@ -442,6 +442,7 @@
   "ledger_lede_flat": "We don't have boundaries for these {nouns}, so they're listed here instead of on the map.",
   "ledger_single": "{count} {groups} have no results beyond those already shown above, so they aren't listed here.",
   "ledger_open": "Open {name}",
+  "ledger_unplaced": "In {place}, {group} unknown",
   "places_leads": "{label} leads in {count}",
   "places_reconcile": "The {nouns} add up to {sum} of the {total} valid votes. The rows after them hold the rest, which no single place includes.",
   "places_reconcile_short": "These rows add up to {sum} of the {total} valid votes. The rest was reported without a place.",
