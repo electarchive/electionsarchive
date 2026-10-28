@@ -1492,8 +1492,9 @@
   });
 
   $effect(() => {
-    const at = pinned == null ? null : anchor;
     void seen;
+    const at =
+      pinned == null || lookup[pinned]?.source !== "ids" ? null : anchor;
     if (engine.gl == null) {
       return;
     }
@@ -1661,7 +1662,11 @@
         then: hit.set.places.before[index]?.[hit.i] ?? null,
       }))
       .filter((row) => row.share > 0 || (row.then ?? 0) > 0)
-      .toSorted((a, b) => b.share - a.share)
+      .toSorted(
+        (a, b) =>
+          Number(a.item.key.startsWith("kind:")) -
+            Number(b.item.key.startsWith("kind:")) || b.share - a.share,
+      )
       .slice(0, 5),
   )}
   {const part = $derived(
