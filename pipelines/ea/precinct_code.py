@@ -11,7 +11,7 @@ from ea.changeset import Changeset
 
 def normalize(precinct: str) -> str:
     plain = unicodedata.normalize("NFKD", precinct).encode("ascii", "ignore").decode()
-    return re.sub(r"[^A-Z0-9]+", " ", plain.upper()).strip()
+    return re.sub(r"[^A-Z0-9]+", " ", plain.upper()).strip() or "UNNAMED"
 
 
 def code(year: int, state: str, county: str, precinct: str) -> str:
@@ -30,7 +30,8 @@ def expr(year: pl.Expr, state: pl.Expr, county: pl.Expr, precinct: pl.Expr) -> p
         .str.replace_all(r"[^\x00-\x7F]", "")
         .str.to_uppercase()
         .str.replace_all(r"[^A-Z0-9]+", " ")
-        .str.strip_chars(),
+        .str.strip_chars()
+        .replace("", "UNNAMED"),
     )
 
 
