@@ -336,7 +336,8 @@ def emit() -> Path:
                 for candidate, _, votes, _ in candidates
                 for row in boroughs.filter(pl.col("year") == year).iter_rows(named=True)
                 if row["counts"][-1] == votes
-                and re.sub(r"[^a-z]", "", candidate.split()[-1].lower().replace("jr.", "")) in row["candidate"].lower()
+                and re.sub(r"[^a-z]", "", candidate.split()[-1].lower().replace("jr.", ""))
+                in re.sub(r"[^a-z]", "", row["candidate"].lower())
             }
             if matched:
                 by_borough = cs.key(f"{SOURCE}.result_set", f"{contest_key}:boroughs")
