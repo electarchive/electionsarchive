@@ -8,7 +8,20 @@ from ea.store import ROOT, connect
 
 DAY = "2026-11-03"
 FOLDER = ROOT / "pipelines" / "ea" / "readiness"
-LEVELS = ("us_house", "us_senate", "governor", "statewide_exec", "state_upper", "state_lower", "statewide_measure")
+LEVELS = (
+    "us_house",
+    "us_senate",
+    "governor",
+    "statewide_exec",
+    "judicial",
+    "state_upper",
+    "state_lower",
+    "statewide_measure",
+    "county_office",
+    "municipal",
+    "school_board",
+    "local_judicial",
+)
 LABELS = {
     "us_house": "U.S. House",
     "us_senate": "U.S. Senate",
@@ -17,7 +30,30 @@ LABELS = {
     "state_upper": "State senate",
     "state_lower": "State house",
     "statewide_measure": "Statewide ballot measures",
+    "judicial": "Statewide judicial (states)",
+    "county_office": "County offices (governments)",
+    "municipal": "Municipal and township offices (governments)",
+    "school_board": "School boards (governments)",
+    "local_judicial": "Local judicial (races held)",
 }
+GOVERNMENTS = {
+    "county": "county_office",
+    "municipality": "municipal",
+    "township": "municipal",
+    "school": "school_board",
+}
+GOVERNMENT_NOTES = {
+    "county_office": "Counted by government, not by seat, because no state calendar the archive cites gives a seat count for county offices. Expected is every county government in the 2022 Census of Governments that the coverage calendar has voting in November 2026, judged from its own past elections or else from its state's election law or pattern. A county is ready when the archive holds at least one of its November 3 contests and every one of them is ready.",
+    "municipal": "Counted by government, not by seat, because no state calendar the archive cites gives a seat count for city, town, village, and township offices. Expected is every municipal and township government in the 2022 Census of Governments that the coverage calendar has voting in November 2026, judged from its own past elections or else from its state's election law or pattern. A government is ready when the archive holds at least one of its November 3 contests and every one of them is ready.",
+    "school_board": "Counted by government, not by seat, because no state calendar the archive cites gives a seat count for school boards. Expected is every school district in the 2022 Census of Governments that the coverage calendar has voting in November 2026, judged from its own past elections or else from its state's election law or pattern. A district is ready when the archive holds at least one of its November 3 contests and every one of them is ready.",
+}
+COG = {
+    "title": "2022 Census of Governments, Government Units",
+    "publisher": "U.S. Census Bureau",
+    "url": "https://www2.census.gov/programs-surveys/gus/datasets/2022/govt_units_2022.ZIP",
+}
+JUDGES = """oe.value ~ '(justice|judge|court|chancellor|magistrate)' and oe.value !~ '(clerk|county-judge)'"""
+APPELLATE = "(op.kind in ('federal_unit', 'region') or oe.value ~ '(supreme|appeal)')"
 ZONES = {
     "US": "Pacific/Honolulu",
     "US-HI": "Pacific/Honolulu",
@@ -76,16 +112,45 @@ ZONES = {
     "IT": "Europe/Rome",
     "TR": "Europe/Istanbul",
 }
-OPTIONS_SQL = """
-select rc.id, rc.st, rc.level, coalesce(c.magnitude, 1),
+OPTIONS_SQL = f"""
+select rc.id, rc.st,
+    case when {JUDGES} then case when {APPELLATE} then 'judicial' else 'local_judicial' end else rc.level end,
+    coalesce(c.magnitude, 1),
     count(o.k) filter (where o.kind in ('candidate', 'ticket', 'list')),
     count(o.k) filter (where o.kind = 'answer'),
-    exists (select from label l where l.entity_id = rc.id and l.kind = 'ballot' and l.value = 'no_candidate_qualified')
+    exists (select from label l where l.entity_id = rc.id and l.kind = 'ballot' and l.value = 'no_candidate_qualified'),
+    op.id::text
 from rc
 join contest c on c.id = rc.id
+join election e on e.id = c.election_id
+left join office f on f.id = c.office_id
+left join body b on b.id = c.body_id
+left join polity op on op.id = coalesce(f.polity_id, b.polity_id, e.polity_id)
+left join lateral (select x.value from external_id x where x.entity_id = c.office_id and x.scheme = 'us.office' limit 1) oe
+    on true
 left join contest_option o on o.contest_id = rc.id and o.parent_option_id is null
 where rc.stage in ('general', 'special')
-group by 1, 2, 3, 4
+group by rc.id, rc.st, 3, 4, op.id
+"""
+
+GOVERNMENTS_SQL = """
+select g.state, g.kind, g.polity_id::text, g.name, coalesce(g.population, 0),
+    g.active and g.month = %(month)s and (%(year)s - g.phase) %% g.period = 0 and exists (
+        select from coverage_government_year y where y.government_id = g.id and y.year = %(year)s - g.period and y.expected)
+from coverage_government g
+where g.kind in ('county', 'municipality', 'township', 'school')
+"""
+
+JUDGED_SQL = f"""
+select distinct substr(p.iso_code, 4)
+from contest c
+join election e on e.id = c.election_id
+join polity p on p.id = e.polity_id and p.iso_code like 'US-%%'
+join office f on f.id = c.office_id
+join polity op on op.id = f.polity_id
+join external_id oe on oe.entity_id = c.office_id and oe.scheme = 'us.office'
+where extract(year from e.date_from) in (%(year)s - 2, %(year)s - 4) and extract(month from e.date_from) = %(month)s
+    and not c.notional and c.party_scope_id is null and e.kind in ('general', 'special') and {JUDGES} and {APPELLATE}
 """
 
 
@@ -210,6 +275,22 @@ def measure(conn, day: str) -> dict:
     ok = ready(conn, [str(cid) for (cid,) in conn.execute("select id from rc")])
     expected: dict[tuple[str, str], int] = defaultdict(int)
     listed: dict[str, set[str]] = defaultdict(set)
+    params = {"year": year, "month": int(day[5:7])}
+    places: list[tuple[str, str, str, int, bool]] = []
+    by_polity: dict[str, int] = {}
+    for st, kind, polity, name, population, due in conn.execute(GOVERNMENTS_SQL, params):
+        if polity is not None:
+            by_polity[polity] = len(places)
+        places.append((GOVERNMENTS[kind], st, name, population, due))
+    from ea.coverage_tables import JUDICIAL
+
+    judged = {st for (st,) in conn.execute(JUDGED_SQL, params)}
+    judges: dict[str, int] = {}
+    for st, period in JUDICIAL.items():
+        if st in judged and (year - (2001 if st == "PA" else 2000)) % period == 0:
+            judges[st] = len(places)
+            places.append(("judicial", st, st, 0, True))
+    held: dict[int, list[tuple[bool, bool]]] = defaultdict(list)
     for level in data["levels"]:
         if level.get("schedule"):
             due = {
@@ -225,32 +306,75 @@ def measure(conn, day: str) -> dict:
             for st, n in part.get("states", {}).items():
                 expected[(level["key"], st)] += n
                 listed[level["key"]].add(st)
-    units = {level["key"]: level["unit"] for level in data["levels"]}
-    cells: dict[tuple[str, str], dict] = defaultdict(lambda: dict.fromkeys(("exist", "candidates", "ready"), 0))
-    for cid, st, level, magnitude, candidates, answers, unqualified in conn.execute(OPTIONS_SQL):
-        if level not in units or level != "statewide_exec" and st not in listed[level]:
+    units = {level["key"]: level["unit"] for level in data["levels"]} | {"local_judicial": "races"}
+    cells: dict[tuple[str, str], dict] = defaultdict(
+        lambda: dict.fromkeys(
+            ("exist", "candidates", "ready", "places", "population_total", "population_ready", "population_absent"), 0
+        )
+    )
+    for cid, st, level, magnitude, candidates, answers, unqualified, polity in conn.execute(OPTIONS_SQL):
+        has = unqualified or (answers if level == "statewide_measure" else candidates) >= 1
+        if level == "judicial" and st not in judges:
+            judges[st] = len(places)
+            places.append(("judicial", st, st, 0, False))
+        place = (
+            judges[st]
+            if level == "judicial"
+            else by_polity.get(polity or "")
+            if level in ("county", "municipal", "school", "special_district")
+            else None
+        )
+        if place is not None:
+            held[place].append((has, ok.get(str(cid), False)))
+            continue
+        if level not in units or level not in ("statewide_exec", "local_judicial") and st not in listed[level]:
             continue
         weight = magnitude if units[level] == "seats" else 1
         cell = cells[(level, st)]
         cell["exist"] += weight
-        cell["candidates"] += (
-            weight if unqualified or (answers if level == "statewide_measure" else candidates) >= 1 else 0
-        )
+        cell["candidates"] += weight if has else 0
         cell["ready"] += weight if ok.get(str(cid)) else 0
+    short = []
+    for i, (level, st, name, population, due) in enumerate(places):
+        contests = held.get(i, [])
+        if not (due or contests):
+            continue
+        cell = cells[(level, st)]
+        expected[(level, st)] += due
+        candidates = bool(contests) and all(has for has, _ in contests)
+        done = bool(contests) and all(ok for _, ok in contests)
+        cell["places"] += 1
+        cell["exist"] += bool(contests)
+        cell["candidates"] += candidates
+        cell["ready"] += done
+        cell["population_total"] += population
+        cell["population_ready"] += population if done else 0
+        cell["population_absent"] += 0 if contests else population
+        if not done:
+            short.append(
+                {
+                    "level": level,
+                    "state": st,
+                    "name": name,
+                    "population": population,
+                    "status": "with candidates" if candidates else "in the archive" if contests else "missing",
+                }
+            )
     rows = []
     for level, st in sorted(set(expected) | set(cells)):
-        cell = cells[(level, st)]
+        cell = dict(cells[(level, st)])
         want = expected.get((level, st), 0)
         rows.append(
             {
                 "level": level,
                 "state": st,
                 "expected": want,
-                "total": max(want, cell["exist"]),
+                "total": cell.pop("places") or max(want, cell["exist"]),
                 **cell,
             }
         )
-    return {"spec": data, "rows": rows}
+    short.sort(key=lambda place: -int(place["population"]))
+    return {"spec": data, "rows": rows, "short": short}
 
 
 def goals(conn, day: str) -> dict[tuple[str, str, str, int], list[int]]:
@@ -263,6 +387,9 @@ def goals(conn, day: str) -> dict[tuple[str, str, str, int], list[int]]:
         values[2] = row["total"] - row["exist"]
         values[3] = row["exist"] - row["candidates"]
         values[5] = row["candidates"] - row["ready"]
+        values[14] = row["population_total"]
+        values[15] = row["population_ready"]
+        values[16] = row["population_absent"]
         out[("readiness", row["state"], row["level"], year)] = values
     return out
 
@@ -284,7 +411,11 @@ def notes(day: str) -> tuple[list[dict], dict]:
                         "readiness": part["source"],
                     }
                 )
-    return found, data["sources"]
+    found += [
+        {"goal": "readiness", "level": level, "from": year, "to": year, "note": note, "readiness": "cog-2022"}
+        for level, note in GOVERNMENT_NOTES.items()
+    ]
+    return found, {**data["sources"], "cog-2022": COG}
 
 
 def markdown(day: str) -> str:
@@ -327,6 +458,16 @@ def markdown(day: str) -> str:
             " `no_candidate_qualified` citing that list) is ready, and counts as having candidates, when it has no candidate options."
             " A measure is ready with two answers and its official wording. Places outside a level's cited list (the territories' delegates, governors, and legislatures) are left out. Other statewide offices are expected from the due-office schedule in"
             " `statewide_table.py` (each office's term and last elections); the other counts cite the sources in the file."
+            " Statewide judicial races (supreme and appellate courts, including those elected by district) count by state: a"
+            " state is expected when `coverage_tables.JUDICIAL` has it electing judges that year and the archive holds a"
+            " November statewide judicial race there two or four years earlier, and it is ready when the archive holds at"
+            " least one of its Nov 3 judicial races and every one is ready. Local judicial races (trial courts, justices of"
+            " the peace) have no cited count, so they are measured against the races the archive holds. County, municipal"
+            " and township, and school board offices count by government, not seat: expected is every 2022 Census of"
+            " Governments unit that the coverage build's calendar (`coverage_government`: its own cycle, else the state"
+            " calendar or pattern) has electing in November of that year, and a government is ready when the archive holds"
+            " at least one of its Nov 3 contests and every one is ready. Run `ea coverage us` first, since these read the"
+            " last build's `coverage_government`."
         ),
         "",
         "### Short by state",
@@ -336,7 +477,37 @@ def markdown(day: str) -> str:
             [
                 [LABELS[r["level"]], r["state"], r["expected"], r["exist"], r["candidates"], r["ready"]]
                 for r in rows
-                if r["ready"] < r["total"]
+                if r["ready"] < r["total"] and r["level"] not in GOVERNMENTS.values()
+            ],
+        ),
+        "",
+        "### Local governments short by state, largest population first",
+        "",
+        coverage.table(
+            ["Office", "State", "Expected", "In the archive", "With candidates", "Ready", "Population not ready"],
+            [
+                [
+                    LABELS[r["level"]],
+                    r["state"],
+                    r["expected"],
+                    r["exist"],
+                    r["candidates"],
+                    r["ready"],
+                    f"{r['population_total'] - r['population_ready']:,}",
+                ]
+                for r in sorted(rows, key=lambda r: r["population_ready"] - r["population_total"])
+                if r["ready"] < r["total"] and r["level"] in GOVERNMENTS.values()
+            ],
+        ),
+        "",
+        "### Counties and municipalities over 100,000 not ready",
+        "",
+        coverage.table(
+            ["Government", "State", "Office", "Population", "Stands at"],
+            [
+                [p["name"], p["state"], LABELS[p["level"]], f"{p['population']:,}", p["status"]]
+                for p in found["short"]
+                if p["population"] >= 100_000 and p["level"] in ("county_office", "municipal")
             ],
         ),
     ]
