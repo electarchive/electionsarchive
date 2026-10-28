@@ -195,19 +195,30 @@ k as (
     from x left join o on o.contest_id = x.id
     group by x.id
 ),
+p as (
+    select x.id, (
+        select pc.id from contest pc join election pe on pe.id = pc.election_id
+        where pc.office_id = x.office_id and pe.date_from < x.date_from and not pc.notional
+            and exists (select from contest_option po where po.contest_id = pc.id and po.kind in ('candidate', 'ticket'))
+        order by pe.date_from desc limit 1) as previous
+    from x where x.office_id is not null
+    union all
+    select x.id, (
+        select pc.id from contest pc join election pe on pe.id = pc.election_id
+        where pc.body_id = x.body_id and pc.district_area_id = x.district_area_id and pe.date_from < x.date_from
+            and not pc.notional
+            and exists (select from contest_option po where po.contest_id = pc.id and po.kind in ('candidate', 'ticket'))
+        order by pe.date_from desc limit 1)
+    from x where x.office_id is null and x.body_id is not null
+),
 h as (
-    select x.id, exists (
+    select p.id, exists (
         select from contest_option o
         left join candidacy y on y.option_id = o.id
-        where o.contest_id = (
-            select pc.id from contest pc join election pe on pe.id = pc.election_id
-            where pe.date_from < x.date_from and not pc.notional
-                and (pc.office_id = x.office_id or pc.body_id = x.body_id and pc.district_area_id = x.district_area_id)
-                and exists (select from contest_option po where po.contest_id = pc.id and po.kind in ('candidate', 'ticket'))
-            order by pe.date_from desc limit 1)
+        where o.contest_id = p.previous
             and o.kind in ('candidate', 'ticket') and (o.party_id is not null or y.member_of_party_id is not null)
     ) as partisan
-    from x where x.office_id is not null or x.body_id is not null
+    from p
 )
 select x.id, x.framed and (x.previous_round_id is not null or not x.later) and case
     when x.kind = 'ballot_question' then k.answers >= 2 and exists (select from ballot_question_text t where t.contest_id = x.id)
@@ -263,11 +274,14 @@ def measure(conn, day: str) -> dict:
     contests = contests.replace("create temp table uspol as", "create temp table if not exists uspol as", 1)
     contests = contests.replace("create temp table pstate as", "create temp table if not exists pstate as", 1)
     contests = contests.replace("create temp table cc as", "create temp table rc as", 1)
-    contests = contests.replace(
-        "where e.date_from is not null and not c.notional;",
-        f"where e.date_from = '{day}' and not c.notional;",
+    dated = contests.replace(
+        "where e.date_from is not null and not c.notional",
+        f"where e.date_from = '{day}' and not c.notional",
         1,
     )
+    if dated == contests:
+        raise RuntimeError("readiness: coverage.CONTESTS_SQL no longer has the date filter readiness narrows")
+    contests = dated
     local_days(conn)
     for statement in contests.split(";\n\n"):
         if statement.strip():
