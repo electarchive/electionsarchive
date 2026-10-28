@@ -7,13 +7,13 @@ from datetime import date, timedelta
 from difflib import SequenceMatcher
 from pathlib import Path
 from urllib.parse import quote, unquote
-from uuid import UUID
+from uuid import UUID, uuid5
 
 import httpx
 import polars as pl
 
 from ea import raw
-from ea.changeset import Changeset, slug
+from ea.changeset import NAMESPACE, Changeset, slug
 from ea.store import DATA, connect
 
 SOURCE = "us.nyc_general"
@@ -440,33 +440,47 @@ def emit() -> Path:
         ).fetchall():
             known_parties[re.sub(r"(?: of new york(?: state)?| party)$", "", slug(text).replace("-", " "))] = value
         joint: dict[str, list[UUID]] = {}
+        added_parties: set[UUID] = set()
         for line in {*lines, *(b for b in frame["body"].unique().to_list() if b)}:
-            parts = [
-                PARTIES.get(
+            ids: list[UUID] = []
+            for part in [line] if line in PARTIES else line.split("/"):
+                key = PARTIES.get(
                     part,
-                    known_parties.get(re.sub(r"(?: of new york(?: state)?| party)$", "", slug(part).replace("-", " "))),
+                    known_parties.get(re.sub(r"(?: of new york(?: state)?| party)$", "", slug(part).replace("-", " ")))
+                    or f"NY:{slug(part)}",
                 )
-                for part in line.split("/")
-            ]
-            if "/" in line and line not in PARTIES and all(parts):
-                joint[line] = [cs.key("us.party", part) for part in parts if part is not None]
-                parties[line] = joint[line][0]
-                continue
-            key = PARTIES.get(
-                line,
-                known_parties.get(re.sub(r"(?: of new york(?: state)?| party)$", "", slug(line).replace("-", " ")))
-                or f"NY:{slug(line)}",
-            )
-            if key is None:
-                parties[line] = None
-                continue
-            party = cs.key("us.party", key)
-            if party in cs.minted:
-                if line in PARTIES:
-                    raise ValueError(f"the {line} party must already exist")
-                cs.add("party", id=party, kind="party", polity_id=cs.polity("US-NY"))
-                name(party, line)
-            parties[line] = party
+                if key is None:
+                    continue
+                party = cs.key("us.party", key)
+                if party in cs.minted and party not in added_parties:
+                    if part in PARTIES:
+                        raise ValueError(f"the {part} party must already exist")
+                    added_parties.add(party)
+                    cs.add("party", id=party, kind="party", polity_id=cs.polity("US-NY"))
+                    name(party, part)
+                if party not in ids:
+                    ids.append(party)
+            parties[line] = ids[0] if ids else None
+            if len(ids) > 1:
+                joint[line] = ids
+        for candidacy, in conn.execute(
+            """select distinct y.id from candidacy y join changeset h on h.id = y.changeset_id
+               join candidacy_nomination n on n.candidacy_id = y.id
+               join name pn on pn.entity_id = n.party_id and pn.text like '%%/%%'
+               where h.pipeline = %s and y.role = 'head'""",
+            [SOURCE],
+        ).fetchall():
+            cs.add("entity_retirement", entity_id=candidacy, reason="Nominated by a fusion line stored as a party")
+        for stale, in conn.execute(
+            """select p.id from party p join changeset h on h.id = p.changeset_id
+               join entity e on e.id = p.id and e.retired_by is null
+               where h.pipeline = %s and exists (select 1 from name n where n.entity_id = p.id and n.text like '%%/%%')
+                 and not exists (select 1 from contest_option o where o.party_id = p.id)
+                 and not exists (select 1 from candidacy_nomination n where n.party_id = p.id)
+                 and not exists (select 1 from candidacy c where c.member_of_party_id = p.id)""",
+            [SOURCE],
+        ).fetchall():
+            cs.add("entity_retirement", entity_id=stale, reason="A fusion line stored as a party; its lines are separate parties")
 
         for day_text in sorted(frame["date"].unique()):
             day = date(int(day_text[:4]), int(day_text[4:6]), int(day_text[6:]))
@@ -1264,7 +1278,13 @@ def emit() -> Path:
                                     cs.add("person", id=person)
                                 if person in cs.minted or " / " in candidate:
                                     name(person, candidate.split(" / ")[0])
-                            head = cs.key("us.candidacy", f"{root_key}:head")
+                            head_key = f"{root_key}:head"
+                            if conn.execute(
+                                "select 1 from entity where id = %s and retired_by is not null",
+                                [uuid5(NAMESPACE, f"external_id:us.candidacy\x1f{head_key}")],
+                            ).fetchone():
+                                head_key += ":2"
+                            head = cs.key("us.candidacy", head_key)
                             cs.add(
                                 "candidacy",
                                 id=head,
@@ -1428,4 +1448,13 @@ def emit() -> Path:
                 )
         print(f"{len(taken)} county measures taken over: {taken}")
         print(f"{len(skipped)} state contests not loaded:", *skipped, sep="\n  ")
+        staged = {str(row["id"]) for row in cs.rows.get("contest_option", [])}
+        for option, contest in conn.execute(
+            """select o.id, o.contest_id from contest_option o join changeset h on h.id = o.changeset_id
+               join name n on n.entity_id = o.party_id and n.text like '%%/%%'
+               where h.pipeline = %s and not exists (select from candidacy where option_id = o.id)""",
+            [SOURCE],
+        ).fetchall():
+            if str(option) not in staged:
+                cs.add("option_drop", option_id=option, contest_id=contest, reason="A fusion line stored as a party; its lines are separate parties")
         return cs.write()
