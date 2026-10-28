@@ -108,7 +108,7 @@ def emit() -> Path:
             publisher="IBGE",
             title="Malha de Bairros (Censo Demográfico) 2022",
             url=PAGE,
-            attribution="Fonte: IBGE, Censo Demográfico 2022",
+            attribution="Source: IBGE, 2022 Census",
             notes="IBGE draws bairros by adjusting census tracts, so edges can differ from the municipal laws. "
             "Municipalities with no legally instituted bairros, and Tocantins and the Federal District, have none.",
         )

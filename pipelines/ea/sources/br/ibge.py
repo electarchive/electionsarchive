@@ -117,7 +117,7 @@ def emit() -> Path:
                 "https://www.ibge.gov.br/geociencias/organizacao-do-territorio/malhas-territoriais/15774-malhas.html",
                 None,
                 None,
-                "Fonte: IBGE",
+                "Source: IBGE",
             ),
             (
                 CODES,
@@ -164,7 +164,9 @@ def emit() -> Path:
             geometry(cs.area("br.uf", code), ("uf", code))
         municipalities = conn.execute(
             """select e.value, a.id from area a join external_id e on e.entity_id = a.id
-               where a.scheme_code = 'br.municipality' and e.scheme = 'br.tse.municipality'"""
+               join changeset c on c.id = a.changeset_id
+               where a.scheme_code = 'br.municipality' and e.scheme = 'br.tse.municipality'
+                 and c.pipeline <> 'br.tse_history'"""
         ).fetchall()
         missing = sorted(code for code, _ in municipalities if ("municipality", ibge.get(code, "")) not in shapes)
         if missing:
