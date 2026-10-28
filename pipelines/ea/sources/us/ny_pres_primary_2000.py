@@ -1,6 +1,7 @@
 import csv
 import re
-from datetime import UTC, date, datetime
+import subprocess
+from datetime import UTC, date, datetime, timedelta
 from pathlib import Path
 
 from ea import raw
@@ -13,6 +14,8 @@ DAY = date(2000, 3, 7)
 PAGE = "https://results.elections.ny.gov/contest/4994"
 FILE = DATA / "inbox" / "manual" / "MF-166" / "4994_table.csv"
 CITY = "https://web.archive.org/web/20050530142050id_/http://www.vote.nyc.ny.us/pdf/results/2000/presPrimary/AllGreenPP2000.pdf"
+CITY_DEM = "https://web.archive.org/web/20040101060122id_/http://www.vote.nyc.ny.us/pdf/results/2000/presPrimary/AllDemPP2000.pdf"
+BOROUGHS = {"Bronx": "36005", "Kings": "36047", "New York": "36061", "Queens": "36081", "Richmond": "36085"}
 GREEN = [("Ralph Nader", 117), ("Joel Kovel", 28), ("Stephen Gaskin", 7), ("Jello Biafra", 33)]
 COUNTIES = {
     "Albany": "36001",
@@ -134,11 +137,43 @@ def emit() -> Path:
             license="Public record",
         )
         cs.artifact(raw.cached("us.nyc_recap_wayback", CITY), city)
+        city_dem = cs.source(
+            "Board of Elections in the City of New York", "2000 presidential primary, Democratic Party"
+        )
+        cs.add(
+            "source",
+            id=city_dem,
+            kind="official_body",
+            publisher="Board of Elections in the City of New York",
+            title="2000 presidential primary, Democratic Party",
+            url=CITY_DEM,
+            license="Public record",
+        )
+        pdf = raw.cached("us.nyc_recap_wayback", CITY_DEM)
+        cs.artifact(pdf, city_dem)
+        parts = []
+        for line in subprocess.run(
+            ["pdftotext", "-layout", str(pdf.path), "-"], capture_output=True, text=True, check=True
+        ).stdout.splitlines():
+            found = re.match(
+                r"(Bronx|Kings|New York|Queens|Richmond)\s+(\d+)(?:ST|ND|RD|TH)\s+\*\s+\d+\s+\d+\s+\d+\s+\*\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s*$",
+                line,
+            )
+            if found:
+                votes = [int(found[i]) for i in range(3, 6)]
+                if sum(votes) != int(found[6]):
+                    raise ValueError(f"{line}: the candidates do not add up to the total")
+                parts.append((found[1], int(found[2]), votes))
+        for county in BOROUGHS:
+            if [sum(votes[i] for name, _, votes in parts if name == county) for i in range(3)] != [
+                counties[county][1],
+                counties[county][0],
+                counties[county][2],
+            ]:
+                raise ValueError(f"{county}: the congressional district rows do not match the county row")
         owner = cs.key("us.office", "president")
         system = cs.key("us.electoral_system", "fptp")
         election = cs.key("us.election", f"{DAY}:NY:primary")
-        if election not in cs.minted:
-            raise ValueError("the election already exists")
         cs.add(
             "election",
             id=election,
@@ -238,6 +273,59 @@ def emit() -> Path:
                         flags=0,
                         value=votes,
                     )
+            if party_name == "Democratic":
+                by_part = cs.key(f"{SOURCE}.result_set", f"{key}:city-board")
+                cs.add(
+                    "result_set",
+                    id=by_part,
+                    election_id=election,
+                    contest_id=contest,
+                    stage="certified",
+                    kind="counted",
+                    status="active",
+                    source_id=city_dem,
+                    is_default=False,
+                    completeness=1,
+                )
+                order = [
+                    next(label for label in names if surname in label.lower())
+                    for surname in ("bradley", "gore", "larouche")
+                ]
+                for borough, district, votes in parts:
+                    code = f"{DAY}:{BOROUGHS[borough]}:{district}"
+                    unit = cs.unit("us.county_part", code)
+                    cs.add(
+                        "reporting_unit",
+                        id=unit,
+                        polity_id=cs.polity("US-NY"),
+                        scheme_code="us.county_part",
+                        code=code,
+                        parent_id=cs.unit("us.county", BOROUGHS[borough]),
+                        area_relation="within",
+                        area_id=cs.area("us.county", BOROUGHS[borough]),
+                        kind="standard",
+                        valid_from=DAY,
+                        valid_to=DAY + timedelta(days=1),
+                    )
+                    cs.add(
+                        "reporting_unit_area",
+                        unit_id=unit,
+                        area_id=cs.area("us.cd", f"36{district:02d}"),
+                        valid_from=DAY,
+                        valid_to=DAY + timedelta(days=1),
+                    )
+                    for label, count in zip(order, votes, strict=True):
+                        cs.add(
+                            "result_value",
+                            result_set_id=by_part,
+                            unit_id=unit,
+                            option_id=cs.key("us.option", f"{key}:{slug(label)}"),
+                            channel=0,
+                            measure=1,
+                            count_round=0,
+                            flags=0,
+                            value=count,
+                        )
             cs.add(
                 "outcome",
                 result_set_id=result_set,
