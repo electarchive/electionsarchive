@@ -207,8 +207,7 @@
         .normalize("NFKD")
         .replaceAll(/\p{M}/gu, ""),
     );
-    const isNested = column === "name" && !descending;
-    return listed
+    const sorted = listed
       .map((row, index) => ({
         row,
         move: moves[index],
@@ -243,12 +242,28 @@
             : Number(a.row.valid === 0) - Number(b.row.valid === 0)) ||
           (descending ? -order : order)
         );
-      })
+      });
+    const parents = new Map(
+      sorted
+        .filter((entry) => entry.row.within == null)
+        .map((entry) => [entry.row.k, entry.row]),
+    );
+    return sorted
+      .filter(
+        (entry) => entry.row.within == null || !parents.has(entry.row.within),
+      )
+      .flatMap((entry) => [
+        entry,
+        ...sorted.filter((child) => child.row.within === entry.row.k),
+      ])
       .map((entry) => {
-        const parent = places.rows.find((row) => row.k === entry.row.within);
-        const isUnder = isNested && parent != null;
+        const parent =
+          entry.row.within == null ? null : parents.get(entry.row.within);
+        const isUnder = parent != null;
         const prefix = isUnder
-          ? `${parent.name}'s `
+          ? entry.row.name.startsWith(`${parent.name}'s `)
+            ? `${parent.name}'s `
+            : `${parent.name} `
           : (owner ?? (shared == null ? null : `${shared}, `));
         const short =
           prefix != null && entry.row.name.startsWith(prefix)
@@ -266,7 +281,14 @@
         };
       });
   });
-  const visible = $derived(all ? filtered : filtered.slice(0, limit));
+  const tops = $derived(filtered.filter((row) => !row.isNested).length);
+  const visible = $derived.by(() => {
+    if (all) {
+      return filtered;
+    }
+    let seen = 0;
+    return filtered.filter((row) => (row.isNested ? seen : ++seen) <= limit);
+  });
   const levels = $derived(
     places.levels.map((level) => ({
       ...level,
@@ -666,7 +688,7 @@
       {m.places_deeper({ noun, finer: deeper })}
     </p>
   {/if}
-  {#if !all && !isSolo && picked == null && column === "valid" && query === "" && filtered.length > limit}
+  {#if !all && !isSolo && picked == null && column === "valid" && query === "" && tops > limit}
     <p class="text-xs text-muted-foreground sm:hidden">
       {m.places_top_votes({ count: count(limit), nouns: plural(noun) })}
     </p>
@@ -1110,12 +1132,12 @@
     {/snippet}
   </Tooltip.Root>
 
-  {#if !all && filtered.length > limit}
+  {#if !all && tops > limit}
     <button
       type="button"
       class="flex items-center justify-center rounded-sm border border-input bg-card text-[0.8125rem] font-semibold keycap block-8 hover:bg-secondary"
       onclick={() => (all = true)}
-      >{m.places_show_more({ count: count(filtered.length - limit) })}</button
+      >{m.places_show_more({ count: count(tops - limit) })}</button
     >
   {/if}
   {#if reconciled != null}
