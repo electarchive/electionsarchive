@@ -118,7 +118,7 @@ def parse() -> None:
         if not found:
             print("text not found in source:", row["state"], row["label"], url)
         rows.append({**{key: None if value is None else str(value) for key, value in row.items()}, "verified": found})
-    pl.DataFrame(rows).write_parquet(PARSED / "measures.parquet")
+    pl.DataFrame(rows, infer_schema_length=None).write_parquet(PARSED / "measures.parquet")
 
 
 def emit() -> Path:
@@ -188,7 +188,7 @@ def emit() -> Path:
                 default_result_kind="counted",
             )
             cs.add("ballot_question", contest_id=contest, type=row["type"])
-            name = f"{row['label']}: {row['title']}" if row["title"] else row["label"]
+            name = f"{row['label']}: {row['name'] or row['title'].removesuffix('.')}" if row["title"] else row["label"]
             cs.add("name", entity_id=contest, text=name, lang="en", kind="official", is_preferred=True)
             if contest in cs.minted:
                 path = held.get(contest)
