@@ -10547,32 +10547,33 @@ async function races(
             (other[0].kind === "body_seats" ||
               other[0].kind === "list_allocation"),
         );
-      const [map, previous, runoff, seated, asked, wards] = await Promise.all([
-        level == null || isBrief || isPrimaries
-          ? null
-          : sketch(
-              place,
-              level,
-              day,
-              (table ?? grid)?.rows.map((row) => row.k) ?? [],
-              grid?.districts?.map((row) => row.k),
-              head?.id ?? null,
-            ),
-        isBrief ||
-        date == null ||
-        size == null ||
-        head?.owner == null ||
-        head.isOffice ||
-        (!isTier && filled < size * 0.9)
-          ? null
-          : db.execute<{
-              party: string | null;
-              seats: number;
-              doubt: number;
-              notional: boolean;
-              size: number | null;
-              day: string | null;
-            }>(sql`
+      const [map, previous, runoff, seated, asked, wards, field] =
+        await Promise.all([
+          level == null || isBrief || isPrimaries
+            ? null
+            : sketch(
+                place,
+                level,
+                day,
+                (table ?? grid)?.rows.map((row) => row.k) ?? [],
+                grid?.districts?.map((row) => row.k),
+                head?.id ?? null,
+              ),
+          isBrief ||
+          date == null ||
+          size == null ||
+          head?.owner == null ||
+          head.isOffice ||
+          (!isTier && filled < size * 0.9)
+            ? null
+            : db.execute<{
+                party: string | null;
+                seats: number;
+                doubt: number;
+                notional: boolean;
+                size: number | null;
+                day: string | null;
+              }>(sql`
               with recursive same as (
                 select case when x.kind = 'local' then 'local' else 'general' end::election_kind as kind
                 from election x where x.id = ${head.election}::uuid
@@ -10711,38 +10712,38 @@ async function races(
                 and br.kind = 'regional_branch' and br.valid @> (select day from last)
               left join entity_merge bm on bm.entity_id = br.parent_party_id
             `),
-        sequel(group, isBrief, place.k, lineage),
-        isBrief || filled === 0 || group.length < 2
-          ? null
-          : holders(
-              [...new Set([...roots, ...counted])],
-              day,
-              lineage,
-              new Set(results.map((row) => row.key)),
-              null,
-            ),
-        poll(single?.id ?? null, place.k, head?.kind === "ballot_question"),
-        isBrief ||
-        results.some((row) => row.key.startsWith("party:")) ||
-        group.length < 2 ||
-        head?.kind !== "body_seats"
-          ? null
-          : (async () => {
-              const found = await db.execute<{
-                id: string;
-                area: string | null;
-                seat: string | null;
-                person: string | null;
-                share: number | null;
-                isWon: boolean | null;
-                runoff: string | null;
-                date: string | null;
-                isGeneral: boolean | null;
-                winner: string | null;
-                won: number | null;
-                isDone: boolean | null;
-                field: Array<{ person: string; party: string | null }> | null;
-              }>(sql`
+          sequel(group, isBrief, place.k, lineage),
+          isBrief || filled === 0 || group.length < 2
+            ? null
+            : holders(
+                [...new Set([...roots, ...counted])],
+                day,
+                lineage,
+                new Set(results.map((row) => row.key)),
+                null,
+              ),
+          poll(single?.id ?? null, place.k, head?.kind === "ballot_question"),
+          isBrief ||
+          results.some((row) => row.key.startsWith("party:")) ||
+          group.length < 2 ||
+          head?.kind !== "body_seats"
+            ? null
+            : (async () => {
+                const found = await db.execute<{
+                  id: string;
+                  area: string | null;
+                  seat: string | null;
+                  person: string | null;
+                  share: number | null;
+                  isWon: boolean | null;
+                  runoff: string | null;
+                  date: string | null;
+                  isGeneral: boolean | null;
+                  winner: string | null;
+                  won: number | null;
+                  isDone: boolean | null;
+                  field: Array<{ person: string; party: string | null }> | null;
+                }>(sql`
                 select g.id, c.district_area_id as area, (select st.label from seat st where st.id = c.seat_id) as seat,
                   f.person, f.share, f.won as "isWon", g.runoff,
                   case when f.person is null and g.runoff is null then (
@@ -10816,68 +10817,101 @@ async function races(
                 order by t.value desc limit 1
                 ) r on true
               `);
-              const [people, links] = await Promise.all([
-                names(
+                const [people, links] = await Promise.all([
+                  names(
+                    found.rows.flatMap((row) =>
+                      [
+                        row.area,
+                        row.person,
+                        row.winner,
+                        ...(row.field ?? []).flatMap((entry) => [
+                          entry.person,
+                          entry.party,
+                        ]),
+                      ].filter((id) => id != null),
+                    ),
+                    date,
+                  ),
+                  paths(
+                    found.rows.flatMap((row) =>
+                      [row.id, row.runoff].filter((id) => id != null),
+                    ),
+                  ),
+                ]);
+                return found.rows
+                  .map((row) => ({
+                    path: links.get(row.id) ?? null,
+                    label:
+                      row.seat ??
+                      (people.full.get(row.area ?? "") ?? "").replace(
+                        /^.*, /u,
+                        "",
+                      ),
+                    person: row.person,
+                    name: people.full.get(row.person ?? "") ?? null,
+                    share: row.share,
+                    isWon: row.isWon === true,
+                    field: (row.field ?? []).map((entry) => ({
+                      person: entry.person,
+                      name: people.full.get(entry.person) ?? "",
+                      party:
+                        entry.party == null
+                          ? null
+                          : (people.short.get(entry.party) ??
+                            people.full.get(entry.party) ??
+                            null),
+                    })),
+                    runoff:
+                      row.runoff == null
+                        ? null
+                        : {
+                            path: links.get(row.runoff) ?? null,
+                            date: row.date ?? "",
+                            isGeneral: row.isGeneral === true,
+                            person: row.winner,
+                            name: people.full.get(row.winner ?? "") ?? null,
+                            share: row.won ?? 0,
+                            isWon: row.isDone === true || (row.won ?? 0) > 0.5,
+                          },
+                  }))
+                  .toSorted((a, b) =>
+                    a.label.localeCompare(b.label, undefined, {
+                      numeric: true,
+                    }),
+                  );
+              })(),
+          single == null || results.length > 0
+            ? []
+            : (async () => {
+                const found = await db.execute<{
+                  person: string;
+                  party: string | null;
+                }>(sql`
+                select coalesce(fm.into_id, fc.person_id) as person, coalesce(fo.party_id, fc.member_of_party_id) as party
+                from contest_option fo
+                join candidacy fc on fc.option_id = fo.id and fc.role = 'head'
+                left join entity_merge fm on fm.entity_id = fc.person_id
+                where fo.contest_id = ${single.id}::uuid and fo.kind = 'candidate'
+                order by fo.ballot_position nulls last, fo.k
+              `);
+                const people = await names(
                   found.rows.flatMap((row) =>
-                    [
-                      row.area,
-                      row.person,
-                      row.winner,
-                      ...(row.field ?? []).flatMap((entry) => [
-                        entry.person,
-                        entry.party,
-                      ]),
-                    ].filter((id) => id != null),
+                    [row.person, row.party].filter((id) => id != null),
                   ),
                   date,
-                ),
-                paths(
-                  found.rows.flatMap((row) =>
-                    [row.id, row.runoff].filter((id) => id != null),
-                  ),
-                ),
-              ]);
-              return found.rows
-                .map((row) => ({
-                  path: links.get(row.id) ?? null,
-                  label:
-                    row.seat ??
-                    (people.full.get(row.area ?? "") ?? "").replace(
-                      /^.*, /u,
-                      "",
-                    ),
-                  person: row.person,
-                  name: people.full.get(row.person ?? "") ?? null,
-                  share: row.share,
-                  isWon: row.isWon === true,
-                  field: (row.field ?? []).map((entry) => ({
-                    person: entry.person,
-                    name: people.full.get(entry.person) ?? "",
-                    party:
-                      entry.party == null
-                        ? null
-                        : (people.short.get(entry.party) ??
-                          people.full.get(entry.party) ??
-                          null),
-                  })),
-                  runoff:
-                    row.runoff == null
-                      ? null
-                      : {
-                          path: links.get(row.runoff) ?? null,
-                          date: row.date ?? "",
-                          isGeneral: row.isGeneral === true,
-                          person: row.winner,
-                          name: people.full.get(row.winner ?? "") ?? null,
-                          share: row.won ?? 0,
-                          isWon: row.isDone === true || (row.won ?? 0) > 0.5,
-                        },
-                }))
-                .toSorted((a, b) =>
-                  a.label.localeCompare(b.label, undefined, { numeric: true }),
                 );
-            })(),
-      ]);
+                return found.rows.map((row) => ({
+                  person: row.person,
+                  name: people.full.get(row.person) ?? "",
+                  party:
+                    row.party == null
+                      ? null
+                      : (people.short.get(row.party) ??
+                        people.full.get(row.party) ??
+                        null),
+                }));
+              })(),
+        ]);
       const straddled = Math.max(
         0,
         ...(previous?.rows ?? []).map((row) => row.doubt),
@@ -10921,6 +10955,7 @@ async function races(
         filled,
         runoff,
         wards: wards ?? undefined,
+        field,
         turnout: asked.turnout,
         quorum: asked.quorum,
         contest: single?.id ?? null,
@@ -11500,6 +11535,13 @@ export const elections = {
                 share: v.number(),
                 margin: v.number(),
                 isWon: v.boolean(),
+              }),
+            ),
+            field: v.array(
+              v.object({
+                person: v.string(),
+                name: v.string(),
+                party: v.nullable(v.string()),
               }),
             ),
             wards: v.optional(

@@ -674,8 +674,11 @@
     }
   ],
   "race_open": "View full results",
+  "race_open_scheduled": "View race",
   "race_show": "Show results",
   "race_hide": "Hide results",
+  "race_show_field": "Show candidates",
+  "race_hide_field": "Hide candidates",
   "election_parent": "Part of {name}",
   "election_within": "{name} in {place}",
   "seats_change_straddled": "Change in seats isn't shown, because some seats at the previous election lay across this border.",

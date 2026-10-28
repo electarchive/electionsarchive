@@ -2474,7 +2474,17 @@ function electionMarkdown(
               })} ${link(m.round_runoff(), race.runoff.path)}`,
             ]),
         ...(race.results.length === 0
-          ? []
+          ? race.field.length === 0
+            ? []
+            : [
+                race.field
+                  .map((entry) =>
+                    entry.party == null
+                      ? `- ${entry.name}`
+                      : `- ${entry.name} (${entry.party})`,
+                  )
+                  .join("\n"),
+              ]
           : [
               table(
                 [

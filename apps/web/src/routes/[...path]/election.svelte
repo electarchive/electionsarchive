@@ -1370,16 +1370,24 @@
         </p>
       {/if}
       {#if race.results.length === 0 && !race.isPrimaries && (race.wards ?? []).length === 0}
-        <p class="text-[0.9375rem] text-muted-foreground">{m.no_results()}</p>
+        {@render field(race)}
       {:else if isFolding && index > 0}
         <button
           type="button"
           class="mbs-1.5 mbe-2 flex items-center justify-center gap-1.5 rounded-sm border border-input bg-card text-[0.8125rem] font-semibold keycap block-10 hover:bg-secondary"
           aria-expanded={opened[index] === true}
           onclick={() => (opened[index] = opened[index] !== true)}
-          >{opened[index] === true
-            ? m.race_hide()
-            : m.race_show()}<ChevronDownIcon
+          >{race.results.length === 0 &&
+          (race.wards ?? []).length > 0 &&
+          (race.wards ?? []).every(
+            (row) => row.share == null && row.runoff == null,
+          )
+            ? opened[index] === true
+              ? m.race_hide_field()
+              : m.race_show_field()
+            : opened[index] === true
+              ? m.race_hide()
+              : m.race_show()}<ChevronDownIcon
             class={cn("transition-transform block-4 inline-4", {
               "rotate-180": opened[index] === true,
             })}
@@ -1869,9 +1877,7 @@
           {#if other.results.length > 0 && (other.wards ?? []).length === 0}
             {@render tally(other, false)}
           {:else if other.results.length === 0 && !other.isPrimaries}
-            <p class="text-[0.9375rem] text-muted-foreground">
-              {m.no_results()}
-            </p>
+            {@render field(other)}
           {/if}
         </li>
       {/each}
@@ -2026,6 +2032,29 @@
   </div>
 {/snippet}
 
+{#snippet field(race: (typeof races)[number])}
+  {#if race.field.length === 0}
+    <p class="text-[0.9375rem] text-muted-foreground">{m.no_results()}</p>
+  {:else}
+    <ul class="grid gap-1 pbe-2 text-[0.9375rem]">
+      {#each race.field as entry (entry.person)}
+        <li class="flex flex-wrap items-baseline gap-x-1.5">
+          <Name
+            class="font-semibold"
+            label={entry.name}
+            person={entry.person}
+          />
+          {#if entry.party != null}
+            <span class="text-[0.8125rem] text-muted-foreground"
+              >{entry.party}</span
+            >
+          {/if}
+        </li>
+      {/each}
+    </ul>
+  {/if}
+{/snippet}
+
 {#snippet meta(race: (typeof races)[number])}
   <p class="flex items-baseline gap-3 text-[0.8125rem] text-muted-foreground">
     {#if race.count > 1}
@@ -2041,7 +2070,10 @@
     {#if race.path != null}
       <Preview
         class="font-semibold text-foreground underline decoration-border underline-offset-4 hover:decoration-foreground"
-        path={race.path}>{m.race_open()}</Preview
+        path={race.path}
+        >{race.results.length === 0 && race.field.length > 0
+          ? m.race_open_scheduled()
+          : m.race_open()}</Preview
       >
     {/if}
     {#if race.first?.path != null}
