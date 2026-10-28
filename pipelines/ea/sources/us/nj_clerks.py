@@ -181,7 +181,8 @@ SKIPPED = re.compile(
 )
 NUMBERS = {"ONE": "1", "TWO": "2", "THREE": "3", "FOUR": "4", "FIVE": "5"}
 ORDINALS = {"FIRST": "1", "SECOND": "2", "THIRD": "3", "FOURTH": "4", "FIFTH": "5"}
-PARTIES = {"DEM": "democratic-party", "REP": "republican-party"}
+PARTIES = {"DEM": "democratic-party", "REP": "republican-party", "LIB": "libertarian-party"}
+PREFIX = re.compile(r"(?i)^(REP|DEM|LIB|IND|NON|NBP|NP)\s*-\s+")
 METHOD = (
     "Votes are the {publisher}'s election night reporting results by election district, summed across the "
     "election day, mail-in, provisional, and emergency ballots; mail-in and provisional ballots the county "
@@ -307,12 +308,14 @@ def parse() -> None:
                     if re.match(r"(?i)\s*no (?:nomination|candidate)", choice.get("text") or ""):
                         continue
                     label = re.sub(r"\s+", " ", choice.get("text") or "").strip()
+                    party = choice.get("party") or ((prefix := PREFIX.match(label)) and prefix[1].upper())
+                    party = None if party in {"NON", "NBP", "NP"} else party
                     for kind in choice.iter("VoteType"):
                         for place in kind.iter("Precinct"):
                             rows.append(
                                 (
                                     label,
-                                    choice.get("party"),
+                                    party,
                                     place.get("name") or "",
                                     int(votes) if (votes := place.get("votes") or "0").isdigit() else 0,
                                 )
@@ -324,7 +327,7 @@ def parse() -> None:
                             "election": election,
                             "contest": node.get("key"),
                             "choice": label,
-                            "party": choice.get("party"),
+                            "party": party,
                             "place": None,
                             "votes": contests_total,
                         }
@@ -515,6 +518,25 @@ def emit() -> Path:
                 r"\b([A-Z][A-Z'’-]+)\b", lambda match: match[1].title() if len(match[1]) > 1 else match[1], text
             )
             return re.sub(r"\bMc([a-z])", lambda match: "Mc" + match[1].upper(), text)
+
+        for key, (_, text, _) in polities.items():
+            if key.startswith("us.town:") and (found := re.fullmatch(r"(.+) \([A-Za-z ]+ County\)", text)):
+                cs.renamed[slug(text)] = slug(found[1])
+        for row_id, entity, text in conn.execute(
+            """select distinct n.id, n.entity_id, n.text from name n
+               join external_id x on x.entity_id = n.entity_id and x.scheme = %s
+               where n.text ~* '^(REP|DEM|LIB|IND|NON|NBP|NP)\\s*-\\s+'""",
+            [f"{SOURCE}.person"],
+        ).fetchall():
+            cs.add(
+                "name",
+                id=row_id,
+                entity_id=entity,
+                text=PREFIX.sub("", text),
+                lang="en",
+                kind="official",
+                is_preferred=True,
+            )
 
         systems = {key: cs.key("us.electoral_system", key) for key in ("fptp", "block", "two_round", "referendum")}
         if cs.minted & set(systems.values()):
@@ -739,7 +761,8 @@ def emit() -> Path:
                     default_result_kind="counted",
                 )
                 cs.add("ballot_question", contest_id=contest, type="mandatory_referendum")
-                name(contest, f"{day.year} {place}: {label}")
+                if contest in cs.minted:
+                    name(contest, f"{day.year} {place}: {label}")
                 if re.fullmatch(r"(?i)(?:board of education )?(?:public )?question(?: number| no\.?)? ?\d+", label):
                     cs.add("note", entity_id=contest, kind="caveat", body_md=UNTITLED)
             else:
@@ -808,21 +831,23 @@ def emit() -> Path:
                     default_result_kind="counted",
                     term="remainder" if row["remainder"] else "full",
                 )
-                name(
-                    contest,
-                    (
-                        f"{day.year} {display} mayoral election"
-                        if key == "mayor"
-                        else f"{day.year} {office_title} election"
+                if contest in cs.minted:
+                    name(
+                        contest,
+                        (
+                            f"{day.year} {display} mayoral election"
+                            if key == "mayor"
+                            else f"{day.year} {office_title} election"
+                        )
+                        + (f", {seat}" if seat else "")
+                        + (" (unexpired term)" if row["remainder"] else "")
+                        + (f" ({row['variant']})" if row["variant"] else "")
+                        + (" runoff" if previous else ""),
                     )
-                    + (f", {seat}" if seat else "")
-                    + (" (unexpired term)" if row["remainder"] else "")
-                    + (f" ({row['variant']})" if row["variant"] else "")
-                    + (" runoff" if previous else ""),
-                )
                 if not row["runoff"]:
                     firsts[(row["town"], key, seat)] = (day, contest_key)
-            cs.add("slug", path=contest_path, entity_id=contest)
+            if contest in cs.minted:
+                cs.add("slug", path=contest_path, entity_id=contest)
             counted = grouped[(row["county"], row["election"], row["contest"])]
             balanced = bool(row["balanced"])
             result_set = cs.key(f"{SOURCE}.result_set", contest_key)
@@ -862,14 +887,15 @@ def emit() -> Path:
                     cs.add("contest_option", id=option, contest_id=contest, kind="write_in", ballot_label="Write-ins")
                     continue
                 else:
-                    ballot = title(choice)
-                    person_key = (code, slug(ballot))
+                    raw_ballot = title(choice)
+                    ballot = PREFIX.sub("", raw_ballot)
+                    person_key = (code, slug(raw_ballot))
                     if person_key not in persons:
-                        persons[person_key] = cs.key(f"{SOURCE}.person", f"NJ:{code}:{slug(ballot)}")
+                        persons[person_key] = cs.key(f"{SOURCE}.person", f"NJ:{code}:{slug(raw_ballot)}")
                         if persons[person_key] in cs.minted:
                             cs.add("person", id=persons[person_key])
                             name(persons[person_key], ballot)
-                    option = options[choice] = cs.key("us.option", f"{contest_key}:{slug(ballot)}")
+                    option = options[choice] = cs.key("us.option", f"{contest_key}:{slug(raw_ballot)}")
                     party_key = PARTIES.get(party or "")
                     cs.add(
                         "contest_option",
@@ -881,7 +907,7 @@ def emit() -> Path:
                     )
                     cs.add(
                         "candidacy",
-                        id=cs.key("us.candidacy", f"{contest_key}:{slug(ballot)}:head"),
+                        id=cs.key("us.candidacy", f"{contest_key}:{slug(raw_ballot)}:head"),
                         person_id=persons[person_key],
                         option_id=option,
                         role="head",
