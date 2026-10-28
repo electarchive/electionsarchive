@@ -17,7 +17,7 @@ import polars as pl
 
 from ea import raw
 from ea.changeset import Changeset, slug
-from ea.sources.us import fl_sos, gov_counties
+from ea.sources.us import fl_sos, gov_counties, ri_countbook
 from ea.store import DATA, connect
 
 SOURCE = "us.sos_measures"
@@ -383,6 +383,40 @@ AL_COUNTIES = {
     "wilcox",
     "winston",
 }
+NV = "https://web.archive.org/web/{}id_/http://sos.state.nv.us/elections/results/{}/ElectionSummary.asp"
+NV_PAGES = {
+    date(2000, 11, 7): ("20080206205544", "2000General"),
+    date(2002, 11, 5): ("20080206210100", "2002General"),
+    date(2004, 11, 2): ("20080206205932", "2004General"),
+    date(2006, 11, 7): ("20080206205130", "2006StateWideGeneral"),
+    date(2008, 11, 4): ("20090116025519", "2008StateWideGeneral"),
+}
+NV_COUNTIES = (
+    "32510",
+    "32001",
+    "32003",
+    "32005",
+    "32007",
+    "32009",
+    "32011",
+    "32013",
+    "32015",
+    "32017",
+    "32019",
+    "32021",
+    "32023",
+    "32027",
+    "32029",
+    "32031",
+    "32033",
+)
+RI_BOOKS = {
+    date(2000, 11, 7): "2000-Count-Book.pdf",
+    date(2002, 11, 5): "2002-Count-Book.pdf",
+    date(2004, 11, 2): "2004-Count-Book.pdf",
+    date(2006, 11, 7): "2006-Count-Book.pdf",
+    date(2010, 11, 2): "2010-Countbook.pdf",
+}
 MISPRINTS = {("CA", date(2000, 11, 7), "38", "NO"): 3000}
 MISREPORTED = {("ME", date(2005, 11, 8), "6"), ("LA", date(2010, 10, 2), "2")}
 STATES = {
@@ -458,6 +492,12 @@ PUBLISHERS = {
     ),
     "FL": (fl_sos.PUBLISHER, fl_sos.TITLE, "https://results.elections.myflorida.com/"),
     "OH": gov_counties.OFFICIAL["OH"][:3],
+    "NV": (
+        "Nevada Secretary of State",
+        "Official election results",
+        "https://www.nvsos.gov/sos/elections/election-information/election-results",
+    ),
+    "RI": (ri_countbook.PUBLISHER, ri_countbook.TITLE, "https://elections.ri.gov/publications/election-publications"),
     "LA": ("Louisiana Secretary of State", "Official election results", "https://voterportal.sos.la.gov/"),
     "OR": (
         "Oregon Secretary of State",
@@ -485,6 +525,9 @@ METHODOLOGY = (
 MAINE = (
     " Maine's county totals are summed from its town and precinct returns or read from its referendum tabulations, "
     "as kept by the Maine State Law and Legislative Reference Library."
+)
+LIMITED = (
+    " Limited ballots, which Rhode Island counts by limited district rather than by town, are a unit of their own."
 )
 OVERSEAS = " Overseas and military (UOCAVA) ballots, which Maine tabulates statewide, are a unit of their own."
 
@@ -542,6 +585,8 @@ def tx_races(election: int) -> list[tuple[int, str]]:
 
 
 def fetch() -> None:
+    for stamp, folder in NV_PAGES.values():
+        raw.fetch(SOURCE, NV.format(stamp, folder), suffix=".html")
     try:
         raw.cached(SOURCE, NCSL_PAGE)
     except LookupError:
@@ -1391,6 +1436,123 @@ def ohio() -> list[dict[str, object]]:
     ]
 
 
+def nevada() -> list[dict[str, object]]:
+    rows: list[dict[str, object]] = []
+    for day, (stamp, folder) in NV_PAGES.items():
+        url = NV.format(stamp, folder)
+        page = raw.cached(SOURCE, url).path.read_bytes().decode("latin-1")
+        page = re.sub(r"(?is)<(script|style).*?</\1>", "", page)
+        tokens = [
+            text for cell in re.split(r"<[^>]+>", page) if (text := re.sub(r"\s+", " ", html.unescape(cell)).strip())
+        ]
+        number = None
+        found: dict[str, dict[str, list[int]]] = {}
+        for at, token in enumerate(tokens):
+            if heading := re.fullmatch(r"(?i)(?:state |ballot )?question(?: no\.)? ?(\d+)", token):
+                number = heading[1]
+            elif number is not None and token.upper() in ("YES", "NO") and token.upper() not in found.get(number, {}):
+                cells = [int(cell.replace(",", "")) for cell in tokens[at + 2 : at + 20]]
+                if sum(cells[1:]) != cells[0]:
+                    raise ValueError(
+                        f"{url} question {number} {token}: counties add up to {sum(cells[1:])}, not {cells[0]}"
+                    )
+                found.setdefault(number, {})[token.upper()] = cells[1:]
+        for number, answers in found.items():
+            if set(answers) != {"YES", "NO"}:
+                raise ValueError(f"{url} question {number}: {sorted(answers)}")
+            rows.extend(
+                {
+                    "state": "NV",
+                    "day": day,
+                    "number": number,
+                    "label": "",
+                    "url": url,
+                    "county": county,
+                    "answer": answer,
+                    "votes": votes,
+                }
+                for answer, values in answers.items()
+                for county, votes in zip(NV_COUNTIES, values, strict=True)
+            )
+    return rows
+
+
+def rhode_island() -> list[dict[str, object]]:
+    def town(text: str) -> str:
+        text = re.sub(
+            r"^([nsew])\.\s*", lambda m: {"n": "north ", "s": "south ", "e": "east ", "w": "west "}[m[1]], text.lower()
+        )
+        return re.sub(r"[^a-z]", "", text)
+
+    towns = {town(name): fips for fips, names in ri_countbook.COUNTIES.items() for name in names}
+    rows: list[dict[str, object]] = []
+    for day, name in RI_BOOKS.items():
+        url = ri_countbook.BASE + name
+        text = subprocess.run(
+            ["pdftotext", "-layout", str(raw.cached(ri_countbook.SOURCE, url).path), "-"],
+            capture_output=True,
+            text=True,
+            check=True,
+        ).stdout
+        for chunk in re.split(r"STATE REFERENDA RESULTS|STATE REFERENDUM QUESTIONS", text)[1:]:
+            lines = chunk.splitlines()
+            if span := re.match(r":?\s*Questions?\s*(\d+)\s*[-—–]\s*(\d+)\b(?!.*(?:…|\.{4}))", lines[0]):
+                numbers = [str(n) for n in range(int(span[1]), int(span[2]) + 1)]
+            elif lines[0].strip() or re.search(r"…|\.{4}", chunk[:200]):
+                continue
+            else:
+                numbers = re.findall(r"Question (\d+)", "\n".join(lines[:6]))
+            if not numbers:
+                continue
+            width = 2 * len(numbers)
+            counts: dict[str, list[int]] = {}
+            stacked: list[str] = []
+            buffer: list[int] = []
+            total = None
+            for line in lines[1:]:
+                cells = re.findall(r"\d[\d,]*", line)
+                label = town(
+                    re.sub(r"[\d,;.:'!|]+\s*$|\s[\d,;.]+.*$", "", re.sub(r"^(?:[I|!l:~.]\s+)+", "", line.strip()))
+                )
+                if label in ("statetotal", "total", "totals"):
+                    total = [int(cell.replace(",", "")) for cell in cells]
+                    break
+                if label == "limiteddistrict" and len(cells) == width + 1:
+                    previous = counts.get("limited", [0] * width)
+                    counts["limited"] = [a + int(b.replace(",", "")) for a, b in zip(previous, cells[1:], strict=True)]
+                elif label in towns and not cells:
+                    stacked.append(label)
+                elif label in towns and len(cells) == width:
+                    counts[label] = [int(cell.replace(",", "")) for cell in cells]
+                elif stacked and not label and len(cells) == 1:
+                    buffer.append(int(cells[0].replace(",", "")))
+                    if len(buffer) == width * len(stacked):
+                        for at, held in enumerate(stacked):
+                            counts[held] = buffer[at :: len(stacked)]
+                        stacked, buffer = [], []
+            sums = [sum(values[column] for values in counts.values()) for column in range(width)]
+            if len(counts.keys() - {"limited"}) != 39 or sums != total:
+                raise ValueError(f"{name} questions {numbers}: {len(counts)} towns, {sums} against {total}")
+            for at, number in enumerate(numbers):
+                for fips in [*ri_countbook.COUNTIES, *(["limited"] if "limited" in counts else [])]:
+                    for answer, column in (("YES", 2 * at), ("NO", 2 * at + 1)):
+                        rows.append(
+                            {
+                                "state": "RI",
+                                "day": day,
+                                "number": number,
+                                "label": "",
+                                "url": url,
+                                "county": fips,
+                                "answer": answer,
+                                "votes": sum(
+                                    values[column] for held, values in counts.items() if towns.get(held, held) == fips
+                                ),
+                            }
+                        )
+    return rows
+
+
 def oregon() -> list[dict[str, object]]:
     listed = ncsl().filter(pl.col("state") == "OR")
     words = re.compile(r"[a-z]{4,}")
@@ -1499,6 +1661,8 @@ def parse() -> None:
             *florida(),
             *oklahoma(),
             *ohio(),
+            *rhode_island(),
+            *nevada(),
         ]
     )
     words = re.compile(r"[a-z]{4,}")
@@ -1539,7 +1703,7 @@ def parse() -> None:
                 "day": day,
                 "number": number,
                 "measure": f"Question {number}"
-                if state == "ME"
+                if state in ("ME", "NV", "RI")
                 else entry["measure"]
                 if entry["number"]
                 else f"Amendment No. {number}"
@@ -1603,7 +1767,10 @@ def emit() -> Path:
                 )
         for state, url in frame.select("state", "url").unique(maintain_order=True).iter_rows():
             cs.artifact(
-                raw.cached({"FL": fl_sos.SOURCE, "OH": gov_counties.SOURCE}.get(state, SOURCE), url), sources[state]
+                raw.cached(
+                    {"FL": fl_sos.SOURCE, "OH": gov_counties.SOURCE, "RI": ri_countbook.SOURCE}.get(state, SOURCE), url
+                ),
+                sources[state],
             )
         system = cs.key("us.electoral_system", "referendum")
         states: dict[str, tuple[UUID, str]] = {}
@@ -1627,8 +1794,8 @@ def emit() -> Path:
         frame = frame.with_columns(
             code=pl.struct("state", "county").map_elements(
                 lambda row: (
-                    "ME:uocava"
-                    if row["county"] == "uocava"
+                    f"{row['state']}:{row['county']}"
+                    if row["county"] in ("uocava", "limited")
                     else row["county"]
                     if row["county"].isdigit()
                     else counties.get((fips[row["state"]], re.sub(r"[^a-z]", "", row["county"].lower())))
@@ -1639,6 +1806,27 @@ def emit() -> Path:
         missing = frame.filter(pl.col("code").is_null()).select("state", "county").unique()
         if missing.height:
             raise ValueError(f"unmatched counties: {missing.rows()}")
+        for code in frame.filter(pl.col("code").str.contains(":"))["code"].unique():
+            if conn.execute(
+                "select 1 from reporting_unit where scheme_code = 'us.aggregate' and code = %s", [code]
+            ).fetchone():
+                continue
+            polity, parent, area = conn.execute(
+                """select p.id, u.id, u.area_id from polity p join polity_territory t on t.polity_id = p.id
+                   join reporting_unit u on u.area_id = t.area_id and u.scheme_code = 'us.state' where p.iso_code = %s""",
+                [f"US-{code.split(':')[0]}"],
+            ).fetchone() or (None, None, None)
+            cs.add(
+                "reporting_unit",
+                id=cs.unit("us.aggregate", code),
+                polity_id=polity,
+                scheme_code="us.aggregate",
+                code=code,
+                parent_id=parent,
+                area_relation="within",
+                area_id=area,
+                kind="aggregate",
+            )
         elections = dict(
             conn.execute(
                 """select x.value, x.entity_id from external_id x join election e on e.id = x.entity_id
@@ -1744,7 +1932,8 @@ def emit() -> Path:
                 kind="methodology",
                 body_md=METHODOLOGY.format(publisher=PUBLISHERS[state][0])
                 + (MAINE if state == "ME" else "")
-                + (OVERSEAS if (rows["code"] == "ME:uocava").any() else ""),
+                + (OVERSEAS if (rows["code"] == "ME:uocava").any() else "")
+                + (LIMITED if (rows["code"] == "RI:limited").any() else ""),
             )
             yes = int(rows.filter(pl.col("answer") == "YES")["votes"].sum())
             no = int(rows.filter(pl.col("answer") == "NO")["votes"].sum())
