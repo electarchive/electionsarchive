@@ -1932,7 +1932,7 @@
       {#each unfolded.has(anchor) || rows.length <= 20 ? rows : rows.slice(0, 18) as row, index (index)}
         {const final = $derived(row.runoff?.isWon === true ? row.runoff : null)}
         <li
-          class="grid grid-cols-[minmax(4.5rem,auto)_minmax(0,1fr)] items-baseline gap-x-3 border-be border-border/60 py-1.5 pointer-coarse:py-2"
+          class="grid grid-cols-[fit-content(45%)_minmax(0,1fr)] items-baseline gap-x-3 border-be border-border/60 py-1.5 pointer-coarse:py-2"
         >
           {#if row.path == null}
             <span class="text-[0.8125rem] text-muted-foreground"
@@ -1948,7 +1948,9 @@
             {#if row.share == null && row.field.length > 0}
               <span class="grid gap-0.5">
                 {#each row.field.slice(0, 3) as entry (entry.person)}
-                  <span class="flex items-baseline gap-1 min-inline-0">
+                  <span
+                    class="flex flex-wrap items-baseline gap-x-1 min-inline-0"
+                  >
                     <Name
                       class="font-semibold"
                       label={entry.name}

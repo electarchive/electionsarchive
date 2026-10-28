@@ -3808,6 +3808,7 @@ function contestMarkdown(
       : [
           `## ${m.series_label()}`,
           contest.series
+            .toReversed()
             .map(
               (entry) =>
                 `- ${entry.current ? entry.name : link(entry.name, entry.path)}${entry.winner == null ? "" : entry.winner.seats != null && entry.winner.seats.length > 1 ? `: ${entry.winner.seats.map((seat) => seat.label).join(", ")}` : `: ${entry.winner.label}${entry.winner.total > 0 ? `, ${percent(entry.winner.share)}` : ""}`}`,
