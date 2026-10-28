@@ -7,6 +7,7 @@ from datetime import date
 from pathlib import Path
 
 import polars as pl
+from PIL import Image
 
 from ea import raw
 from ea.changeset import Changeset
@@ -17,6 +18,8 @@ from ea.store import DATA, connect
 SOURCE = "us.gov_counties"
 VERSION = "1"
 PARSED = DATA / "parsed" / SOURCE
+PAGES = DATA / "pages" / SOURCE
+READS = Path(__file__).with_suffix(".tsv")
 OPENELECTIONS = {("AZ", 2014), ("MT", 2008), ("OR", 2010)}
 FLORIDA = range(1982, 2011, 4)
 ME_2006 = "https://web.archive.org/web/20081127115711id_/http://www.maine.gov/sos/cec/elec/2006g/Gov.txt"
@@ -80,6 +83,51 @@ MN_2006 = (
     "?erselectionId=55&mediafileid=100"
 )
 AR_2006 = "https://www.sos.arkansas.gov/uploads/elections/Voices2006-WEB_sm.pdf"
+SCANS = {
+    ("KS", date(2014, 11, 4)): (
+        "https://www.sos.ks.gov/elections/14elec/2014%20General%20Election%20Results%20by%20county.pdf",
+        [9, 10, 11],
+        0,
+        "Kansas Secretary of State",
+        "2014 General Election official results by county",
+        "https://sos.ks.gov/elections/election-results.html",
+    ),
+    ("CT", date(2010, 11, 2)): (
+        "https://portal.ct.gov/-/media/SOTS/ElectionServices/StatementOfVote_PDFs/2010_SOV-pdf.pdf",
+        [8],
+        -90,
+        "Connecticut Secretary of the State",
+        "Statement of Vote, November 2, 2010",
+        "https://portal.ct.gov/sots/election-services/statement-of-vote-pdfs/statement-of-vote",
+    ),
+    ("KY", date(2011, 11, 8)): (
+        (
+            "https://web.archive.org/web/2020id_/https://elect.ky.gov/SiteCollectionDocuments/Election%20Results/"
+            "2010-2019/2011/off2011gen.pdf"
+        ),
+        [2, 3, 4, 5],
+        0,
+        "Kentucky State Board of Elections",
+        "2011 General Election official results",
+        "https://elect.ky.gov/results/2010-2019/Pages/2011.aspx",
+    ),
+    ("KY", date(2019, 11, 5)): (
+        "https://elect.ky.gov/results/2010-2019/Documents/2019%20General%20Certified%20Results.pdf",
+        [1, 2, 3, 4, 5, 6],
+        -90,
+        "Kentucky State Board of Elections",
+        "2019 General Election certified results",
+        "https://elect.ky.gov/results/2010-2019/Pages/2019.aspx",
+    ),
+    ("MS", date(2015, 11, 3)): (
+        "https://sos.ms.gov/elections/electionresults/2015General/certified%20results/Amended%20Statewide%20Certification.pdf",
+        [2, 3, 4, 5, 6, 7, 8, 9],
+        90,
+        "Mississippi Secretary of State",
+        "2015 General Election amended statewide certification",
+        "https://sos.ms.gov/elections-voting/election-results",
+    ),
+}
 OFFICIAL = {
     "AL": (
         "Alabama Secretary of State",
@@ -149,6 +197,8 @@ COLUMNS = [
 
 def fetch() -> None:
     openelections.fetch()
+    for url, *_ in SCANS.values():
+        raw.fetch(SOURCE, url, suffix=".pdf")
     for _, _, _, urls in OFFICIAL.values():
         for url in urls:
             raw.fetch(
@@ -159,6 +209,7 @@ def fetch() -> None:
 
 
 def parse() -> None:
+    PARSED.mkdir(parents=True, exist_ok=True)
     frame, _ = oe_statewide.load()
     opened = frame.filter(
         pl.col("office").str.contains(r"^(STATE )?GOVERNOR$"),
@@ -255,7 +306,7 @@ def parse() -> None:
         named: dict[str, dict[str, str]] = {}
         for code, text in conn.execute(
             """select u.code, n.text from reporting_unit u join name n on n.entity_id = u.area_id and n.kind = 'short'
-               where u.scheme_code = 'us.county' and left(u.code, 2) in ('01', '05', '17', '45')"""
+               where u.scheme_code = 'us.county' and left(u.code, 2) in ('01', '05', '09', '17', '20', '21', '28', '45')"""
         ).fetchall():
             named.setdefault(code[:2], {})[re.sub(r"[^a-z]", "", text.lower().replace("saint", "st"))] = code
 
@@ -343,6 +394,136 @@ def parse() -> None:
             code = county("05", found[1])
             for name, votes in zip(names, found[2].split()[:6], strict=True):
                 rows.append((date(2006, 11, 7), "AR", code, name, int(votes.replace(",", "")), "AR"))
+    reads = pl.read_csv(READS, separator="\t", try_parse_dates=True).with_columns(
+        candidate=pl.col("candidate").str.replace(r" \((D|WF)\)$", "")
+    )
+    located = []
+    PAGES.mkdir(parents=True, exist_ok=True)
+    for (state, day), (url, pages, turn, *_) in SCANS.items():
+        pdf = raw.cached(SOURCE, url)
+        fips = {"KS": "20", "CT": "09", "KY": "21", "MS": "28"}[state]
+        order = reads.filter(pl.col("state") == state, pl.col("day") == day)["county"].unique(maintain_order=True)
+        keys = [re.sub(r"[^a-z]", "", name.lower()) for name in order]
+        anchors: dict[int, tuple[int, float, float, float, int, int]] = {}
+        columns: dict[int, tuple[int, float, float, float, float]] = {}
+        heads = ["philbryant", "robertgray", "shawnohara"]
+        at = 0
+        for number in pages:
+            image = PAGES / f"{pdf.sha256}-{number}.png"
+            if not image.exists():
+                subprocess.run(
+                    ["pdftoppm", "-r", "300", "-gray", "-png", "-singlefile", "-f", str(number), "-l", str(number)]
+                    + [str(pdf.path), str(image.with_suffix(""))],
+                    check=True,
+                )
+                if turn:
+                    Image.open(image).rotate(turn, expand=True).save(image, dpi=(300, 300))
+            width, height = Image.open(image).size
+            words = subprocess.run(
+                ["tesseract", str(image), "-", "--psm", "4", "tsv"], capture_output=True, text=True, check=True
+            ).stdout.splitlines()[1:]
+            found: dict[tuple[str, str, str], list[list[str]]] = {}
+            for word in words:
+                cells = word.split("\t")
+                if len(cells) == 12 and cells[11].strip():
+                    found.setdefault((cells[2], cells[3], cells[4]), []).append(cells)
+            if state == "MS":
+                lines = {
+                    re.sub(r"[^a-z]", "", "".join(cell[11] for cell in line).lower()): line for line in found.values()
+                }
+                block = [next(line for text, line in lines.items() if text.startswith(head)) for head in heads]
+                rights = sorted(int(cell[6]) + int(cell[8]) for cell in block[1] if re.fullmatch(r"[\d,]+", cell[11]))[
+                    : len(order) - at
+                ]
+                top = min(int(cell[7]) for cell in block[0])
+                bottom = max(int(cell[7]) + int(cell[9]) for cell in block[-1])
+                for right in rights:
+                    columns[at] = (number, (right - 185) / width, top / height, (right + 8) / width, bottom / height)
+                    at += 1
+                continue
+            for line in found.values():
+                text = re.sub(r"[^a-z]", "", "".join(cell[11] for cell in line).lower())
+                for index in range(at, min(at + 4, len(keys))):
+                    if difflib.SequenceMatcher(None, text[: len(keys[index])], keys[index]).ratio() >= 0.8:
+                        top = min(int(cell[7]) for cell in line)
+                        bottom = max(int(cell[7]) + int(cell[9]) for cell in line)
+                        anchors[index] = (number, int(line[0][6]) / width, top / height, bottom / height, width, height)
+                        at = index + 1
+                        break
+        if columns and len(columns) != len(order):
+            raise ValueError(f"{state} {day}: {len(columns)} columns for {len(order)} counties")
+        for index, name in enumerate(order):
+            if index in columns:
+                page, left, top, right, bottom = columns[index]
+            elif index not in anchors:
+                before = max((i for i in anchors if i < index), default=None)
+                after = min((i for i in anchors if i > index), default=None)
+                steps = sorted(
+                    anchors[i + 1][2] - anchors[i][2]
+                    for i in anchors
+                    if i + 1 in anchors and anchors[i + 1][0] == anchors[i][0]
+                )
+                step = steps[len(steps) // 2]
+                if before is not None and after is not None and anchors[before][0] == anchors[after][0]:
+                    share = (index - before) / (after - before)
+                    first, last = anchors[before], anchors[after]
+                    anchors[index] = (
+                        first[0],
+                        min(first[1], last[1]),
+                        first[2] + share * (last[2] - first[2]),
+                        first[3] + share * (last[3] - first[3]),
+                        first[4],
+                        first[5],
+                    )
+                elif before is not None and anchors[before][3] + (index - before) * step < 0.97:
+                    near = anchors[before]
+                    shift = (index - before) * step
+                    anchors[index] = (near[0], near[1], near[2] + shift, near[3] + shift, near[4], near[5])
+                elif after is not None and anchors[after][2] - (after - index) * step > 0.03:
+                    near = anchors[after]
+                    shift = (after - index) * step
+                    anchors[index] = (near[0], near[1], near[2] - shift, near[3] - shift, near[4], near[5])
+                else:
+                    raise ValueError(f"{state} {day}: {name} could not be placed on a page")
+            if index not in columns:
+                page, left, top, bottom, _, _ = anchors[index]
+                right = 1.0
+            code = county(fips, name)
+            for candidate, votes in (
+                reads.filter(pl.col("state") == state, pl.col("day") == day, pl.col("county") == name)
+                .select("candidate", "votes")
+                .iter_rows()
+            ):
+                located.append(
+                    (
+                        day,
+                        state,
+                        code,
+                        candidate,
+                        votes,
+                        f"{state}:{day.year}",
+                        page,
+                        left,
+                        max(top - 0.004, 0),
+                        min(right, 1),
+                        min(bottom + 0.004, 1),
+                    )
+                )
+    pl.DataFrame(
+        located,
+        schema=["day", "state", "code", "candidate", "votes", "source", "page", "x0", "y0", "x1", "y1"],
+        orient="row",
+    ).with_columns(
+        chamber=pl.lit("governor"),
+        year=pl.col("day").dt.year().cast(pl.Int32),
+        district=pl.lit(None, pl.Int16),
+        special=pl.lit(False),
+        writein=pl.col("candidate") == "WRITE-INS",
+        measure=pl.lit(1, pl.Int16),
+        kind=pl.lit("county"),
+    ).group_by(*COLUMNS[:4], *COLUMNS[5:], "page", "x0", "y0", "x1", "y1").agg(pl.col("votes").sum()).write_parquet(
+        PARSED / "located.parquet"
+    )
     official = pl.DataFrame(
         rows, schema=["day", "state", "code", "candidate", "votes", "source"], orient="row"
     ).with_columns(
@@ -369,7 +550,6 @@ def parse() -> None:
             .agg(pl.col("votes").sum(), pl.col("code").n_unique())
             .sort("state", "votes", descending=[False, True])
         )
-    PARSED.mkdir(parents=True, exist_ok=True)
     picked.write_parquet(PARSED / "counties.parquet")
 
 
@@ -383,8 +563,9 @@ def emit() -> Path:
             summary="Governor generals by county, and New Mexico's 2012 U.S. Senate race, where the archive's only "
             "county breakdown came from ICPSR-derived returns: official canvasses for Alabama 2014, Arkansas 2006, "
             "Florida 1982–2010, Illinois 2006, Maine 2006 and 2014, Minnesota 2006, New Mexico 2006 and 2012, Rhode "
-            "Island 2006, and South Carolina 2010, and OpenElections' transcriptions for Arizona 2014, Montana 2008, "
-            "and Oregon 2010",
+            "Island 2006, and South Carolina 2010; scanned canvasses, transcribed by hand and located on their pages, "
+            "for Connecticut 2010, Kansas 2014, Kentucky 2011 and 2019, and Mississippi 2015; and OpenElections' "
+            "transcriptions for Arizona 2014, Montana 2008, and Oregon 2010",
             polity="US",
         )
         sources = {"FL": cs.source(fl_sos.PUBLISHER, fl_sos.TITLE)}
@@ -445,5 +626,47 @@ def emit() -> Path:
             sources,
             extend=True,
             partial="the Board's county table leaves out the write-in candidates other than Randy Stufflebeam",
+        )
+        scanned = pl.read_parquet(PARSED / "located.parquet")
+        pages = {}
+        for (state, day), (url, numbers, _, publisher, title, landing) in SCANS.items():
+            key = f"{state}:{day.year}"
+            sources[key] = cs.source(publisher, title)
+            if sources[key] in cs.minted:
+                cs.add(
+                    "source",
+                    id=sources[key],
+                    kind="official_body",
+                    publisher=publisher,
+                    title=title,
+                    url=landing,
+                    license="Public record",
+                )
+            pdf = raw.cached(SOURCE, url)
+            artifact = cs.artifact(pdf, sources[key])
+            for number in numbers:
+                image = PAGES / f"{pdf.sha256}-{number}.png"
+                width, height = Image.open(image).size
+                pages[(key, number)] = str(cs.page(artifact, number))
+                cs.add(
+                    "source_page",
+                    id=pages[(key, number)],
+                    artifact_id=artifact,
+                    page_number=number,
+                    image_key=f"pages/{SOURCE}/{image.name}",
+                    width=width,
+                    height=height,
+                )
+        medsl.attach(
+            cs,
+            conn,
+            scanned.with_columns(
+                page_id=pl.struct("source", "page").map_elements(
+                    lambda row: pages[(row["source"], row["page"])], return_dtype=pl.String
+                )
+            ).with_columns(page=pl.lit(1)),
+            sources,
+            strict=True,
+            extend=True,
         )
         return cs.write()
