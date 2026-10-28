@@ -492,8 +492,19 @@ class Changeset:
                            where exists (select from external_id x where x.entity_id = p.id and x.scheme = 'us.party')"""
                     ).fetchall()
                 } - {"independent", "no", "none", "unenrolled", "nonpartisan", "unaffiliated", "writein"}
-                for text in names.filter(names.str.contains("/")):
-                    if all(fold(part) in known for part in text.split("/")):
+                oregon = set(
+                    tables["external_id"].filter(pl.col("value").str.starts_with("OR:"))["entity_id"].cast(pl.String)
+                )
+                for entity, text in (
+                    tables["name"]
+                    .select(pl.col("entity_id").cast(pl.String), "text")
+                    .filter(pl.col("entity_id").is_in(minted.implode()), pl.col("text").str.contains("/"))
+                    .iter_rows()
+                ):
+                    if all(
+                        fold(part) in known or entity in oregon and fold(part) == "independent"
+                        for part in text.split("/")
+                    ):
                         raise ValueError(f"party {text!r} joins known parties; record each party's line or nomination")
         folder = DATA / "changesets" / str(self.id)
         folder.mkdir(parents=True)
