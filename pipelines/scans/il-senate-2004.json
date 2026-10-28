@@ -23,7 +23,7 @@
       "id": "m23",
       "crop": [
         0.0,
-        0.695,
+        0.615,
         1.0,
         0.95
       ],
@@ -197,7 +197,7 @@
         0.0,
         0.135,
         1.0,
-        0.37
+        0.425
       ],
       "orientation": "counties_down",
       "columns": [
@@ -238,7 +238,7 @@
       "id": "a27",
       "crop": [
         0.0,
-        0.37,
+        0.425,
         1.0,
         0.95
       ],
@@ -267,7 +267,8 @@
         {
           "label": "Bill",
           "contest": "senate",
-          "candidate": "Shaun L. Bill"
+          "candidate": "Shaun L. Bill",
+          "official": 37
         },
         {
           "label": "Hester",
@@ -310,7 +311,8 @@
         {
           "label": "Bill",
           "contest": "senate",
-          "candidate": "Shaun L. Bill"
+          "candidate": "Shaun L. Bill",
+          "official": 37
         },
         {
           "label": "Hester",
@@ -353,7 +355,8 @@
         {
           "label": "Bill",
           "contest": "senate",
-          "candidate": "Shaun L. Bill"
+          "candidate": "Shaun L. Bill",
+          "official": 37
         },
         {
           "label": "Hester",
@@ -396,7 +399,8 @@
         {
           "label": "Bill",
           "contest": "senate",
-          "candidate": "Shaun L. Bill"
+          "candidate": "Shaun L. Bill",
+          "official": 37
         },
         {
           "label": "Hester",
@@ -557,5 +561,6 @@
         }
       ]
     }
-  ]
+  ],
+  "authoritative": "Source: the State Board of Elections' official vote cast, whose county rows add up to each candidate's printed state total; Algara and Amlani pool the minor candidates into one line."
 }
