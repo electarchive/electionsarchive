@@ -13,7 +13,7 @@ from ea.sources.us.county_changes import ct_regions
 from ea.store import DATA, Connection, connect
 
 SOURCE = "us.medsl"
-VERSION = "2"
+VERSION = "3"
 PARSED = DATA / "parsed" / SOURCE
 DATAVERSE = "https://dataverse.harvard.edu/api/access/datafile/"
 FILES = {
@@ -687,6 +687,7 @@ def emit() -> Path:
             conn,
             congress.with_columns(source=pl.col("chamber") + ":" + pl.col("year").cast(pl.String)),
             {f"{chamber}:{year}": source for (chamber, year), source in sources.items()},
+            restage=True,
         )
         return cs.write()
 
@@ -725,6 +726,7 @@ def attach(
     cs.add("scheme", code="us.county_part", polity_id=cs.polity("US"), kind="synthetic", rank=3, noun="county part")
     unmatched: list[tuple[str, str, int, int]] = []
     drifted: list[tuple[str, str, int, int]] = []
+    skipped_outside: list[tuple[str, int]] = []
     taken: set[str] = set()
     parts: set[str] = set()
     values: list[pl.DataFrame] = []
@@ -777,6 +779,31 @@ def attach(
         if election is None or first is None or not official or first > 1:
             print(f"{key}: no official total or first round, skipped")
             continue
+        if district is not None and (chamber == "president" or at_large not in contests):
+            zeros = {
+                code: counties[code][1]
+                for code, votes in lines.filter(pl.col("kind").is_in(["county", "place"]))
+                .group_by("code")
+                .agg(pl.col("votes").abs().sum())
+                .iter_rows()
+                if not votes and code in counties
+            }
+            outside = {
+                str(area)
+                for (area,) in conn.execute(
+                    """select a from unnest(%s::uuid[]) a
+                       join lateral (select geom from area_geometry g where g.area_id = %s and g.valid @> %s::date
+                                     order by g.valid_from desc nulls last limit 1) d on true
+                       join lateral (select geom from area_geometry g where g.area_id = a and g.valid @> %s::date
+                                     order by g.valid_from desc nulls last limit 1) c on true
+                       where st_area(st_intersection(c.geom, d.geom)) <= 0.001 * st_area(c.geom)""",
+                    [list(zeros.values()), district_area, day, day],
+                ).fetchall()
+            }
+            dropped = [code for code, area in zeros.items() if str(area) in outside]
+            if dropped:
+                lines = lines.filter(~pl.col("code").is_in(dropped))
+                skipped_outside.append((key, len(dropped)))
         known = []
         for option, kind, label, name, fec in conn.execute(
             """select o.id, o.kind, o.ballot_label, n.text,
@@ -1149,6 +1176,10 @@ def attach(
                     else []
                 ),
             )
+        )
+    if skipped_outside:
+        print(
+            f"{sum(count for _, count in skipped_outside)} all-zero counties outside the district dropped from {len(skipped_outside)} contests"
         )
     for key, label, medsl, fec in drifted:
         print(f"{key}: {label} {medsl} by county against {fec} from the FEC")
