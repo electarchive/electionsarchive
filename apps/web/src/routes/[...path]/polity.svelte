@@ -13,6 +13,7 @@
   import { orpc } from "#lib/rpc.js";
   import { cn } from "#lib/utils.js";
   import type { PageData } from "./$types";
+  import Bar from "./bar.svelte";
   import PlaceMap from "./map.svelte";
   import Holders from "./holders.svelte";
   import Offices from "./offices.svelte";
@@ -1142,18 +1143,17 @@
                       >
                     {/if}
                   </div>
-                  <div
-                    class="flex overflow-hidden rounded-xs bg-muted block-2 max-sm:hidden"
-                    aria-hidden="true"
-                  >
-                    {#each race.leaders as row (row.key)}
-                      <span
-                        class="block-full"
-                        style:inline-size="{row.share * 100}%"
-                        style:background-color={swatch(row.color, row.key)}
-                      ></span>
-                    {/each}
-                  </div>
+                  <Bar
+                    class="max-sm:hidden"
+                    parts={race.leaders.map((row) => ({
+                      ...row,
+                      color: swatch(row.color, row.key),
+                      value: row.share,
+                    }))}
+                    total={1}
+                    isCount={false}
+                    isSlim
+                  />
                   <div
                     class="grid gap-0.5 text-[0.8125rem] pointer-coarse:gap-2"
                   >

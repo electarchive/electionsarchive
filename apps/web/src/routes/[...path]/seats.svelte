@@ -38,8 +38,10 @@
     partners: pairs = [],
     governing: governed = [],
     chamber = null,
+    title = null,
     isLinked = false,
     isUp = false,
+    isCompact = false,
   }: {
     parties: Array<{
       key: string;
@@ -65,8 +67,10 @@
     partners?: Array<Array<string>>;
     governing?: Array<string>;
     chamber?: string | null;
+    title?: string | null;
     isLinked?: boolean;
     isUp?: boolean;
+    isCompact?: boolean;
   } = $props();
 
   const uid = $props.id();
@@ -516,14 +520,25 @@
 </script>
 
 <section
-  class="relative grid grid-cols-[minmax(0,1fr)] content-start gap-3 bg-card p-3.5 min-inline-0"
+  class={cn(
+    "relative grid grid-cols-[minmax(0,1fr)] content-start gap-3 min-inline-0",
+    { "bg-card p-3.5": !isCompact },
+  )}
   aria-labelledby="{uid}-title"
-  data-export
+  data-export={isCompact ? undefined : ""}
 >
-  <Export name="seats" class="absolute inset-e-2 inset-bs-2" />
-  <h2 id="{uid}-title" class="pe-8 heading">
-    {isUp ? m.seats_after_title() : m.seats_title()}<span class="sr-only"
-      >, {place}</span
+  {#if !isCompact}
+    <Export name="seats" class="absolute inset-e-2 inset-bs-2" />
+  {/if}
+  <h2
+    id="{uid}-title"
+    class={cn({
+      "pe-8 heading": !isCompact,
+      "text-[0.8125rem] font-bold": isCompact,
+    })}
+  >
+    {title ?? (isUp ? m.seats_after_title() : m.seats_title())}<span
+      class="sr-only">, {place}</span
     >
   </h2>
   <figure class="grid justify-items-center gap-2">
@@ -541,10 +556,11 @@
         class={cn(
           "block touch-pan-y overflow-visible rounded-sm outline-none inline-full focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring",
           { "cursor-pointer": tip?.path != null },
+          { "pointer-events-none": isCompact },
         )}
         viewBox="{box.x} {box.y} {box.width} {box.height}"
         role="listbox"
-        tabindex="0"
+        tabindex={isCompact ? -1 : 0}
         aria-label={whole ? `${count(totals.all)} ${m.seats_title()}` : caption}
         aria-describedby="{uid}-keys"
         aria-activedescendant={active == null
@@ -760,7 +776,7 @@
     </figcaption>
   </figure>
   <p id="{uid}-keys" class="sr-only">{m.seats_keys()}</p>
-  {#if whole && folded.length > 1}
+  {#if whole && folded.length > 1 && !isCompact}
     <div class="grid gap-1.5" aria-live="polite">
       <div class="flex items-baseline justify-between gap-3 text-[0.8125rem]">
         <span class={cn({ "text-muted-foreground": picked.length === 0 })}>
@@ -825,10 +841,14 @@
           { "text-muted-foreground": isMuted },
           { "ring-1 ring-foreground ring-inset": picked.includes(party.key) },
         )}
-        onpointerenter={() => (hovered = party.key)}
+        onpointerenter={() => {
+          if (!isCompact) {
+            hovered = party.key;
+          }
+        }}
         onpointerleave={() => (hovered = null)}
       >
-        {#if whole && folded.length > 1}
+        {#if whole && folded.length > 1 && !isCompact}
           <button
             type="button"
             class="absolute inset-0 rounded-xs outline-none focus-visible:ring-2 focus-visible:ring-ring"
@@ -957,7 +977,7 @@
       </li>
     {/if}
   </ul>
-  {#if whole && paths.length > 1}
+  {#if whole && paths.length > 1 && !isCompact}
     <div class="grid gap-2 border-bs pbs-3">
       <div class="grid gap-0.5">
         <h3 class="text-[0.8125rem] font-bold">{m.seats_paths_title()}</h3>

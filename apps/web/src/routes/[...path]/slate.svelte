@@ -1,10 +1,11 @@
 <script lang="ts">
   import Name from "#lib/components/name.svelte";
   import { resolve } from "$app/paths";
-  import { date, percent } from "#lib/format.js";
+  import { date } from "#lib/format.js";
   import { m } from "#lib/paraglide/messages.js";
   import { swatch } from "#lib/party.js";
   import type { PageData } from "./$types";
+  import Balance from "./balance.svelte";
 
   const {
     slate,
@@ -76,7 +77,7 @@
       </ul>
     {/if}
     {#if last != null}
-      <aside class="grid gap-2" aria-labelledby="{uid}-last">
+      <aside class="grid gap-3" aria-labelledby="{uid}-last">
         <div class="grid gap-0.5">
           <h3 id="{uid}-last" class="text-[0.8125rem] font-bold">
             {m.slate_last()}
@@ -93,36 +94,15 @@
             >
           {/if}
         </div>
-        <div
-          class="flex overflow-hidden rounded-xs bg-muted block-2"
-          aria-hidden="true"
-        >
-          {#each last.rows as row (row.key)}
-            <span
-              class="block-full"
-              style:inline-size="{row.share * 100}%"
-              style:background-color={swatch(row.color, row.key)}
-            ></span>
-          {/each}
-        </div>
-        <ul class="grid gap-0.5 text-sm">
-          {#each last.rows as row (row.key)}
-            <li
-              class="grid grid-cols-[minmax(0,1fr)_auto] items-baseline gap-x-3"
-            >
-              <Name
-                class="truncate min-inline-0"
-                label={row.label}
-                color={swatch(row.color, row.key)}
-                person={row.person}
-                party={row.party}
-              />
-              <span class="font-figures text-[0.8125rem] tabular-nums"
-                >{percent(row.share)}</span
-              >
-            </li>
-          {/each}
-        </ul>
+        <Balance
+          parts={last.rows.map((row) => ({
+            ...row,
+            color: swatch(row.color, row.key),
+            value: row.share,
+          }))}
+          total={1}
+          isCount={false}
+        />
       </aside>
     {/if}
   </div>

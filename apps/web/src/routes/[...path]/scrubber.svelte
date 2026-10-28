@@ -12,13 +12,15 @@
   } from "@tanstack/svelte-query";
   import { untrack } from "svelte";
   import Export from "#lib/components/export.svelte";
-  import { count, date, percent } from "#lib/format.js";
+  import { count, date } from "#lib/format.js";
   import { keep } from "#lib/linked.js";
   import { m } from "#lib/paraglide/messages.js";
   import { swatch } from "#lib/party.js";
   import { orpc } from "#lib/rpc.js";
   import { cn } from "#lib/utils.js";
+  import Balance from "./balance.svelte";
   import PlaceMap from "./map.svelte";
+  import Seats from "./seats.svelte";
 
   const {
     id,
@@ -50,8 +52,6 @@
     party == null
       ? swatch(null, "")
       : swatch(parties.get(party)?.color ?? null, `party:${party}`);
-  const lean = (party: string | null) =>
-    (party == null ? null : parties.get(party)?.lean) ?? Infinity;
 
   const own = $derived(
     (record.data?.series ?? []).filter((series) => !series.isAbroad),
@@ -263,95 +263,83 @@
       located.isPlaceholderData ||
       settled !== (step?.path ?? null),
   );
-  const leaders = $derived(
-    race == null
-      ? []
-      : race.electors != null && race.electors.rows.length > 0
-        ? race.electors.rows
-            .slice(0, 2)
-            .map((row) => ({
-              key: row.key,
-              label: row.label,
-              color: swatch(row.color, row.key),
-              value: count(row.votes),
-            }))
-        : (race.results.some((row) => (row.seats ?? 0) > 1)
-            ? race.results.toSorted(
-                (a, b) => (b.seats ?? 0) - (a.seats ?? 0) || b.votes - a.votes,
-              )
-            : race.results
-          )
-            .slice(0, 2)
-            .map((row) => ({
-              key: row.key,
-              label: row.person == null ? (row.short ?? row.label) : row.label,
-              color: swatch(row.color, row.key),
-              value:
-                (row.seats ?? 0) > 1
-                  ? count(row.seats ?? 0)
-                  : percent(row.share),
-            })),
-  );
-
-  const sitting = $derived.by(() => {
-    const point =
+  const balance = $derived.by(() => {
+    if (race == null) {
+      return null;
+    }
+    const lean = (row: { lean: number | null }) => row.lean ?? 1e9;
+    if (race.electors != null && race.electors.rows.length > 0) {
+      let total = race.electors.appointed ?? 0;
+      if (race.electors.appointed == null) {
+        for (const row of race.electors.rows) {
+          total += row.votes;
+        }
+      }
+      return {
+        parts: race.electors.rows
+          .toSorted((a, b) => lean(a) - lean(b) || b.votes - a.votes)
+          .map((row) => ({
+            key: row.key,
+            label: row.person == null ? (row.short ?? row.label) : row.label,
+            color: swatch(row.color, row.key),
+            value: row.votes,
+            person: row.person,
+            party: row.party,
+          })),
+        total,
+        isCount: true,
+        isWhole: true,
+      };
+    }
+    const isSeated = race.results.some((row) => (row.seats ?? 0) > 1);
+    let seats = 0;
+    for (const row of race.results) {
+      seats += row.seats ?? 0;
+    }
+    return {
+      parts: race.results
+        .toSorted((a, b) => lean(a) - lean(b) || b.share - a.share)
+        .map((row) => ({
+          key: row.key,
+          label: row.person == null ? (row.short ?? row.label) : row.label,
+          color: swatch(row.color, row.key),
+          value: isSeated ? (row.seats ?? 0) : row.share,
+          person: row.person,
+          party: row.party,
+        })),
+      total: isSeated ? seats : 1,
+      isCount: isSeated,
+      isWhole: false,
+    };
+  });
+  const sitting = $derived(
+    (
       chamber?.points.findLast((entry) => entry.date <= (step?.date ?? "")) ??
-      null;
-    const rows = (point?.parties ?? [])
-      .filter((entry) => entry.seats > 0)
-      .toSorted((a, b) => lean(a.party) - lean(b.party) || b.seats - a.seats);
-    let total = 0;
-    for (const row of rows) {
-      total += row.seats;
-    }
-    return { point, rows, total };
-  });
-  const dots = $derived.by(() => {
-    const total = sitting.total;
-    if (total === 0) {
-      return [];
-    }
-    const rings = Math.max(1, Math.ceil(Math.sqrt(total / 2.2)));
-    const gap = 0.6 / rings;
-    const radii = Array.from(
-      { length: rings },
-      (_, ring) => 0.4 + gap * (ring + 0.5),
-    );
-    let sum = 0;
-    for (const radius of radii) {
-      sum += radius;
-    }
-    const counts = radii.map((radius) =>
-      Math.max(1, Math.round((total * radius) / sum)),
-    );
-    let placed = 0;
-    for (const value of counts) {
-      placed += value;
-    }
-    counts[rings - 1] = (counts[rings - 1] ?? 0) + total - placed;
-    const colors = sitting.rows.flatMap((row) =>
-      Array.from({ length: row.seats }, () => tint(row.party)),
-    );
-    return radii
-      .flatMap((radius, ring) => {
-        const n = counts[ring] ?? 0;
-        return Array.from({ length: n }, (_, spot) => {
-          const angle = Math.PI * (n === 1 ? 0.5 : spot / (n - 1));
-          return {
-            x: -Math.cos(angle) * radius,
-            y: -Math.sin(angle) * radius,
-            angle,
-            radius,
-          };
-        });
-      })
-      .toSorted((a, b) => a.angle - b.angle || b.radius - a.radius)
-      .map((spot, seat) => ({
-        ...spot,
-        size: gap * 0.38,
-        color: colors[seat] ?? "var(--muted)",
-      }));
-  });
+      null
+    )?.parties
+      .filter((row) => row.seats > 0)
+      .map((row) => {
+        const party = parties.get(row.party ?? "");
+        return {
+          key:
+            row.party == null
+              ? row.isIndependent
+                ? "independent"
+                : "none"
+              : `party:${row.party}`,
+          label:
+            party?.label ??
+            row.label ??
+            (row.isIndependent ? m.seats_independents() : m.record_none()),
+          short: party?.short ?? null,
+          color: party?.color ?? null,
+          lean: party?.lean ?? null,
+          seats: row.seats,
+          here: 0,
+          members: [],
+        };
+      }) ?? [],
+  );
   const government = $derived.by(() => {
     const from = step?.date ?? "";
     const next =
@@ -656,89 +644,25 @@
           {/if}
         </div>
 
-        {#if race != null && leaders.length > 0}
-          <div class="grid gap-1.5">
+        {#if race != null && balance?.parts.some((part) => part.value > 0) === true}
+          <div class="grid gap-2">
             <p class="text-[0.8125rem] font-bold">{race.name}</p>
-            <ul class="grid gap-1 text-sm">
-              {#each leaders as row (row.key)}
-                <li
-                  class="grid grid-cols-[auto_minmax(0,1fr)_auto] items-baseline gap-x-2"
-                >
-                  <span
-                    class="self-center rounded-xs block-2.5 inline-2.5"
-                    style:background-color={row.color}
-                  ></span>
-                  <span class="truncate font-semibold">{row.label}</span>
-                  <span class="font-figures text-[0.8125rem] tabular-nums"
-                    >{row.value}</span
-                  >
-                </li>
-              {/each}
-            </ul>
+            <Balance {...balance} />
           </div>
         {/if}
 
-        {#if chamber != null && dots.length > 0}
-          <figure class="grid gap-1.5">
-            <figcaption class="text-[0.8125rem] font-bold">
-              {m.scrubber_chamber({ chamber: chamber.name })}
-            </figcaption>
-            <svg
-              viewBox="-1.04 -1.04 2.08 1.1"
-              class="block inline-full"
-              role="img"
-              aria-label={sitting.rows
-                .map(
-                  (row) =>
-                    `${parties.get(row.party ?? "")?.short ?? parties.get(row.party ?? "")?.label ?? (row.isIndependent ? m.seats_independents() : m.record_none())} ${row.seats}`,
-                )
-                .join(", ")}
-            >
-              {#each dots as dot, seat (seat)}
-                <circle
-                  class="transition-[transform,fill,r] duration-500 ease-out motion-reduce:transition-none"
-                  style:transform="translate({dot.x}px, {dot.y}px)"
-                  style:r="{dot.size}px"
-                  style:fill={dot.color}
-                />
-              {/each}
-              <line
-                x1="0"
-                x2="0"
-                y1="-1.02"
-                y2="-0.34"
-                class="stroke-foreground"
-                stroke-width="0.008"
-              />
-            </svg>
-            <ul class="flex flex-wrap gap-x-3 gap-y-1 text-[0.8125rem]">
-              {#each sitting.rows
-                .toSorted((a, b) => b.seats - a.seats)
-                .slice(0, 5) as row (row.party ?? "none")}
-                <li class="flex items-baseline gap-1.5">
-                  <span
-                    class="self-center rounded-xs block-2.5 inline-2.5"
-                    style:background-color={tint(row.party)}
-                  ></span>
-                  <span class="font-semibold"
-                    >{parties.get(row.party ?? "")?.short ??
-                      parties.get(row.party ?? "")?.label ??
-                      (row.isIndependent
-                        ? m.seats_independents()
-                        : m.record_none())}</span
-                  >
-                  <span class="font-figures text-xs tabular-nums"
-                    >{row.seats}</span
-                  >
-                </li>
-              {/each}
-            </ul>
-            <p class="text-xs text-muted-foreground">
-              {m.scrubber_majority({
-                seats: count(Math.floor(sitting.total / 2) + 1),
-              })}
-            </p>
-          </figure>
+        {#if chamber != null && sitting.length > 0}
+          <Seats
+            parties={sitting}
+            places={[]}
+            here={null}
+            {place}
+            link={null}
+            size={null}
+            chamber={chamber.id}
+            title={m.scrubber_chamber({ chamber: chamber.name })}
+            isCompact
+          />
         {/if}
 
         {#if government != null}

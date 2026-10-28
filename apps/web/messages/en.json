@@ -1705,7 +1705,6 @@
   "scrubber_pause": "Pause",
   "scrubber_slider": "Election year",
   "scrubber_chamber": "{chamber} after the election",
-  "scrubber_majority": "{seats} for a majority",
   "scrubber_no_map": "No map available: the archive has no boundaries for {year}",
   "map_rebuilding": "This map is being rebuilt. Check back in a few minutes.",
   "scrubber_government": "Government that followed",
