@@ -421,6 +421,51 @@ VACANCY_2026 = {
     ("WY", "senate:6:g"),
     ("NM", "senate:33:g"),
 }
+SPECIAL_2026 = {
+    ("AR", "senate:1"): "senate:1",
+    ("AR", "house:8"): "house:8",
+    ("FL", "senate:21"): "senate:21",
+    ("HI", "senate:18"): "senate:18",
+    ("HI", "senate:19"): "senate:19",
+    ("KS", "senate:24"): "senate:24",
+    ("KS", "senate:25"): "senate:25",
+    ("NE", "legislature:41"): "legislature:41",
+    ("ND", "house:20"): "house:20",
+    ("ND", "house:26"): "house:26",
+    ("ND", "house:42"): "house:42",
+    ("OK", "senate:17"): "senate:17",
+    ("SC", "senate:15"): "senate:15",
+    ("TX", "senate:22"): "senate:22",
+    ("TX", "house:93"): "house:93",
+    ("VA", "house-of-delegates:20"): "house-of-delegates:20",
+    ("WV", "senate:3:1"): "senate:3",
+    ("WV", "senate:17:1"): "senate:17",
+}
+TX_SPECIAL = "https://goelect.txelections.civixapps.com/api-ivis-cbp/api/cbp/findQualifiedCandidates#{}"
+SPECIAL_LISTS = {
+    "FL": (
+        "Florida Department of State, Division of Elections",
+        "Candidate listing, 2026 special election, State Senate District 21",
+        [FL_URL.replace("-GEN", "-S01")],
+    ),
+    "SC": (
+        "South Carolina State Election Commission",
+        "Candidate listing, State Senate District 15 special election, November 3, 2026",
+        ["https://vrems.scvotes.sc.gov/Candidate/CandidateSearch?electionId=22758#browser"],
+    ),
+    "TX": (
+        "Texas Secretary of State",
+        "Qualified candidates, 2026 special elections for Senate District 22 and House District 93",
+        [TX_SPECIAL.format(66618), TX_SPECIAL.format(66734)],
+    ),
+    "VA": (
+        "Virginia Department of Elections",
+        "November 3, 2026 House of Delegates District 20 special election candidate list",
+        [
+            "https://www.elections.virginia.gov/media/castyourballot/candidatelist/2026/2026-November-HD20-Candidate-List.xlsx"
+        ],
+    ),
+}
 SPLIT = {
     "HI:trustee-of-the-office-of-hawaiian-affairs": {
         "At-Large Trustee": ("", 3, "at-large"),
@@ -750,6 +795,25 @@ def read(state: str, path: Path) -> list[tuple[str, int | None, str, str]]:
                 "UNA": "Unaffiliated",
             }.get(row["party_candidate"], row["party_candidate"])
             rows.append((office, int(house.group(1)) if house else None, row["name_on_ballot"], party))
+    if state == "VA" and path.suffix == ".xlsx":
+        for row in fastexcel.read_excel(path).load_sheet(0, dtypes="string").to_polars().iter_rows(named=True):
+            entry = (
+                f"{row['Office Title']} (special)",
+                int(re.sub(r"\D", "", row["District"])),
+                row["Candidate Name"],
+                row["Candidate Party"],
+            )
+            if entry not in rows:
+                rows.append(entry)
+        return rows
+    if state == "TX" and path.suffix == ".json":
+        for row in json.loads(path.read_text()):
+            if row["cdStatus"] == "A" and row["flActive"]:
+                party = {"R": "Republican", "D": "Democratic", "L": "Libertarian", "G": "Green"}.get(
+                    row["cdParty"], "Independent"
+                )
+                rows.append((row["txOfficeName"], None, row["txFullNameBallot"], party))
+        return rows
     if state == "VA":
         for office, district, party, text, *_ in cells(path.read_text())[1:]:
             number = re.match(r"(\d+)", district)
@@ -1048,7 +1112,9 @@ def read(state: str, path: Path) -> list[tuple[str, int | None, str, str]]:
         return rows
     if state == "SC":
         for _, race, _, text, _, party, _, status in (
-            row for row in json.loads(path.read_text())["rows"][1:] if len(row) == 8
+            row if len(row) == 8 else ["", *row]
+            for row in json.loads(path.read_text())["rows"][1:]
+            if len(row) in (7, 8)
         ):
             if status == "Active":
                 house = re.fullmatch(r"U\.S\. House of Representatives, District (\d+)", race)
@@ -1256,10 +1322,12 @@ def read(state: str, path: Path) -> list[tuple[str, int | None, str, str]]:
             text = re.sub(
                 r"^(State Representative|State Senator|State Treasurer|Representative|Rep\.|Senator|Congress(?:man|woman)"
                 r"|Lieutenant Governor|Governor|Attorney General|Auditor of State|Secretary of State"
-                r"|Justice of the Peace|Justice|Mayor|Sheriff) ",
+                r"|Justice of the Peace|Justice|Mayor|Sheriff|School Board Director) ",
                 "",
                 row["Candidate Name"],
             ).replace(", ", " ")
+            if race.startswith(("State Senate", "State Representative")) and row["Filing Date"] >= "2026-07-01":
+                office = f"{race} (special)"
             party = "Nonpartisan" if row["Party Affiliation"] == "Non Partisan Judicial" else row["Party Affiliation"]
             rows.append((office, int(house[1]) if house else None, text, party))
         return single_filers(rows)
@@ -1746,7 +1814,7 @@ def read(state: str, path: Path) -> list[tuple[str, int | None, str, str]]:
 
 def fetch() -> None:
     raw.fetch(SOURCE, CN26, suffix=".zip")
-    for _, _, urls in OFFICIAL.values():
+    for _, _, urls in [*OFFICIAL.values(), *SPECIAL_LISTS.values()]:
         for url in urls:
             try:
                 raw.cached(SOURCE, url)
@@ -1768,11 +1836,11 @@ def fetch() -> None:
                         media_type="",
                     )
                     continue
-            if url == FL_URL:
+            if url.startswith(FL_URL.split("?")[0]):
                 response = httpx.post(
                     url.split("?")[0],
                     data={
-                        "elecID": "20261103-GEN",
+                        "elecID": url.split("=")[-1],
                         "office": "All",
                         "status": "All",
                         "cantype": "STA",
@@ -1780,6 +1848,21 @@ def fetch() -> None:
                     },
                     headers=BROWSER,
                     timeout=300,
+                )
+            elif url.startswith(TX_SPECIAL.split("#")[0]):
+                response = httpx.post(
+                    url.split("#")[0],
+                    json={
+                        "electionYear": 2026,
+                        "electionId": int(url.split("#")[1]),
+                        "party": None,
+                        "officeId": None,
+                        "officeType": None,
+                        "status": None,
+                        "countyId": None,
+                    },
+                    headers={**BROWSER, "Accept": "application/json"},
+                    timeout=60,
                 )
             elif url.endswith("#csv"):
                 with httpx.Client(headers=BROWSER, follow_redirects=True, timeout=300) as client:
@@ -1820,7 +1903,9 @@ def fetch() -> None:
                 suffix=".pdf"
                 if response.content.startswith(b"%PDF")
                 else ".txt"
-                if url == FL_URL
+                if url.startswith(FL_URL.split("?")[0])
+                else ".json"
+                if url.startswith(TX_SPECIAL.split("#")[0])
                 else ".csv"
                 if url.endswith("#csv")
                 else Path(url.split("?")[0].rstrip("/")).suffix or ".html",
@@ -1834,7 +1919,9 @@ def parse() -> None:
     rows = [
         {
             "state": state,
-            "office": office,
+            "office": f"{office} (special)"
+            if special and not re.search(r"(?i)vacancy|special|unexpired", office)
+            else office,
             "district": 0 if office == "house" and district is None else district,
             "name": initials(
                 re.sub(
@@ -1848,7 +1935,10 @@ def parse() -> None:
             "party": party.strip().title() if party.isupper() and len(party) > 4 else party.strip(),
             "url": url,
         }
-        for state, (_, _, urls) in OFFICIAL.items()
+        for state, (_, _, urls), special in [
+            *((state, entry, False) for state, entry in OFFICIAL.items()),
+            *((state, entry, True) for state, entry in SPECIAL_LISTS.items()),
+        ]
         for url in urls
         for office, district, text, party in [
             *read(state, raw.cached(SOURCE, url).path),
@@ -1971,7 +2061,7 @@ def emit() -> Path:
                join external_id x on x.entity_id = co.id and x.scheme = 'us.contest'
                join name n on n.entity_id = co.id and n.is_preferred
                join slug s on s.entity_id = co.id
-               where e.date_from in ('2020-11-03', '2022-11-08', '2024-11-05') and co.party_scope_id is null
+               where e.date_from in ('2020-11-03', '2022-11-08', '2024-11-05', '2025-11-04') and co.party_scope_id is null
                  and x.value ~ '^[0-9-]+:[A-Z]{2}:(house|senate|assembly|house-of-delegates|legislature):.+:gs?$'"""
         ).fetchall():
             day, state, seat = template[0].split(":", 2)
@@ -2044,6 +2134,22 @@ def emit() -> Path:
             )
             seats[(state, level, re.sub(r"^[a-z-]+:|:g$", "", seat).lower().replace(":", "-"))] = key
             templates.append((*template[:8], "remainder", *template[9:]))
+        special_seats: dict[tuple[str, str, str], str] = {}
+        for (state, seat), held_seat in sorted(SPECIAL_2026.items()):
+            level = "upper" if seat.startswith(("senate:", "legislature:")) else "lower"
+            template, label, path = next(
+                chambered[(state, level, year)][f"{held_seat}:g"]
+                for year in ("2025", "2024", "2022", "2020")
+                if f"{held_seat}:g" in chambered.get((state, level, year), {})
+            )
+            key = f"{DAY}:{state}:{seat}:gs"
+            legislative[f"{template[0]}|special"] = (
+                key,
+                re.sub(r"^\d{4}", "2026", label.replace(" election", " special election")),
+                re.sub(r"\d{4}-\d\d-\d\d-general", f"{DAY}-general", path) + "-special-election",
+            )
+            special_seats[(state, level, seat.split(":", 1)[1].replace(":", "-"))] = key
+            templates.append((f"{template[0]}|special", *template[1:7], 1, "remainder", *template[9:]))
         latest_plan = conn.execute(
             "select id from boundary_set where scheme_code = 'us.cd' order by valid_from desc limit 1"
         ).fetchone()[0]
@@ -2118,9 +2224,11 @@ def emit() -> Path:
                     nominated[(general, person)] = certified
 
         numbered: dict[tuple[str, str, str], list[str]] = {}
-        for state, level, seat in seats:
-            if re.fullmatch(r"\d+-\w+", seat):
-                numbered.setdefault((state, level, seat.split("-")[0]), []).append(seat)
+        special_numbered: dict[tuple[str, str, str], list[str]] = {}
+        for pool, grouped in ((seats, numbered), (special_seats, special_numbered)):
+            for state, level, seat in pool:
+                if re.fullmatch(r"\d+-\w+", seat):
+                    grouped.setdefault((state, level, seat.split("-")[0]), []).append(seat)
         listed: dict[str, list[dict[str, str | int | None]]] = {}
         for row in pl.read_parquet(PARSED / "candidates.parquet").iter_rows(named=True):
             split = next(
@@ -2145,10 +2253,11 @@ def emit() -> Path:
                 continue
             text = str(row["office"]).lower()
             if re.search(
-                r"u\.s\.|united states|congress|county|city|town|school|(?<!general )court|board|ward|council|precinct|committee|meeting|vacancy|special|unexpired",
+                r"u\.s\.|united states|congress|county|city|town|school|(?<!general )court|board|ward|council|precinct|committee|meeting",
                 text,
             ):
                 continue
+            special = re.search(r"vacancy|special|unexpired", text) is not None
             level = (
                 "upper"
                 if "senat" in text
@@ -2156,7 +2265,9 @@ def emit() -> Path:
                 if re.search(r"represent|assembly|house|delegates|legislat", text)
                 else None
             )
-            number = re.search(r"(\d+)(?:st|nd|rd|th)?\s*(?:,?\s*(?:seat|position)\s+)?([a-z]|\d+)?\b", text)
+            number = re.search(
+                r"(\d+)(?:st|nd|rd|th)?\s*(?:,?\s*(?:seat|position)\s+)?([a-z]|\d+)?\b", re.sub(r"\d+-year", "", text)
+            )
             if level and not number and row["district"] is not None:
                 number = re.match(r"(\d+)()", str(row["district"]))
             if not level:
@@ -2164,7 +2275,9 @@ def emit() -> Path:
             candidates = []
             if number:
                 district = str(int(number[1])) + (f"-{number[2]}" if number[2] else "")
-                prefixed = numbered.get((row["state"], level, str(int(number[1]))), [])
+                prefixed = (special_numbered if special else numbered).get(
+                    (row["state"], level, str(int(number[1]))), []
+                )
                 candidates = [
                     district,
                     re.sub(r"-([a-z])$", lambda match: f"-{ord(match[1]) - 96}", district),
@@ -2185,7 +2298,13 @@ def emit() -> Path:
                 if joined:
                     candidates += [f"{joined}-{ordinal}" if ordinal else joined, joined]
             key = next(
-                (seats[row["state"], level, seat] for seat in candidates if (row["state"], level, seat) in seats), None
+                (
+                    pool[row["state"], level, seat]
+                    for pool in ((special_seats,) if special else (seats, special_seats))
+                    for seat in candidates
+                    if (row["state"], level, seat) in pool
+                ),
+                None,
             )
             if key:
                 listed.setdefault(key, []).append(row)
@@ -2268,12 +2387,13 @@ def emit() -> Path:
                join candidacy cy on cy.option_id = op.id
                join name n on n.entity_id = cy.person_id and n.is_preferred
                where x.scheme = 'us.contest' and x.value = any(%s)""",
-            [[*legislative]],
+            [[held.removesuffix("|special") for held in legislative]],
         ).fetchall():
-            general = legislative[value][0]
             latest[person] = max(latest.get(person, ""), value[:10])
-            by_state.setdefault(general.split(":")[1], []).append((person, text))
-            earlier.setdefault(general, []).append((person, text))
+            by_state.setdefault(value.split(":")[1], []).append((person, text))
+            for held in (value, f"{value}|special"):
+                if held in legislative:
+                    earlier.setdefault(legislative[held][0], []).append((person, text))
         for value, person, text in conn.execute(
             """select x.value, t.person_id, n.text
                from tenure t
@@ -2564,14 +2684,18 @@ def emit() -> Path:
                 )
             staged: set[UUID] = set()
             entries: list[tuple[str, UUID, UUID | None]] = []
+            listing = None
             if state in OFFICIAL and key in listed:
-                publisher, title, urls = OFFICIAL[state]
-                if state not in sources:
-                    sources[state] = cs.source(publisher, title)
-                    if sources[state] in cs.minted:
+                listing = (
+                    f"special:{state}" if listed[key][0]["url"] in SPECIAL_LISTS.get(state, ("", "", []))[2] else state
+                )
+                publisher, title, urls = SPECIAL_LISTS[state] if listing != state else OFFICIAL[state]
+                if listing not in sources:
+                    sources[listing] = cs.source(publisher, title)
+                    if sources[listing] in cs.minted:
                         cs.add(
                             "source",
-                            id=sources[state],
+                            id=sources[listing],
                             kind="official_body",
                             publisher=publisher,
                             title=title,
@@ -2579,14 +2703,14 @@ def emit() -> Path:
                             license=None,
                         )
                     for url in urls:
-                        cs.artifact(raw.cached(SOURCE, url), sources[state])
+                        cs.artifact(raw.cached(SOURCE, url), sources[listing])
                 if all(row["name"] == "No Candidate Qualified" for row in listed[key]):
                     cs.add(
                         "label",
                         entity_id=contest,
                         kind="ballot",
                         value="no_candidate_qualified",
-                        source_id=sources[state],
+                        source_id=sources[listing],
                         valid_from=DAY,
                     )
                 for row in sorted(listed[key], key=lambda row: str(row["name"])):
@@ -2673,8 +2797,8 @@ def emit() -> Path:
                     if re.fullmatch(r"[\d-]+:[A-Z]{2}:(house:\d+|senate(:special)?)", key)
                     else None,
                 )
-                if state in sources and key in listed:
-                    cs.add("citation", entity_id=candidacy, source_id=sources[state], locator=None)
+                if listing is not None:
+                    cs.add("citation", entity_id=candidacy, source_id=sources[listing], locator=None)
                 elif (key, person) in nominated:
                     cs.add("citation", entity_id=candidacy, source_id=nominated[(key, person)], locator=None)
                 counts["candidates"] += 1
@@ -2712,7 +2836,7 @@ def emit() -> Path:
                     cs.add("citation", entity_id=candidacy, source_id=sources[f"tacit:{tacit[2]}"], locator=None)
             reason = (
                 f"Not on the certified {state_name} 2026 general election candidate list"
-                if state in sources and key in listed
+                if listing is not None
                 else f"No longer a nominee in the archive's {state_name} 2026 primary result sets"
             )
             for person, (option, candidacy) in held.get(key, {}).items():
@@ -2725,10 +2849,10 @@ def emit() -> Path:
                         )
                     cs.add("entity_retirement", entity_id=option, reason=reason)
                     counts["dropped"] += 1
-            if state in SUPPLEMENTED and key in listed:
-                body = f"Candidates are the {state_name} nominees recorded in the archive's own 2026 primary result sets, the unopposed primary candidates, and the independent candidates qualified for the general election ballot on the {OFFICIAL[state][0]}'s {OFFICIAL[state][1]}. Declared write-in candidates are not listed."
-            elif state in sources and key in listed:
-                body = f"Candidates are those on the {OFFICIAL[state][0]}'s {OFFICIAL[state][1]}, as certified for the 2026-11-03 ballot. Declared write-in candidates are not listed."
+            if state in SUPPLEMENTED and listing is not None and not key.endswith(":gs"):
+                body = f"Candidates are the {state_name} nominees recorded in the archive's own 2026 primary result sets, the unopposed primary candidates, and the independent candidates qualified for the general election ballot on the {publisher}'s {title}. Declared write-in candidates are not listed."
+            elif listing is not None:
+                body = f"Candidates are those on the {publisher}'s {title}, as certified for the 2026-11-03 ballot. Declared write-in candidates are not listed."
             elif key in nominees:
                 body = f"Candidates are the {state_name} nominees recorded in the archive's own 2026 primary result sets ({'the two advancing candidates of the top-two primary' if state in ('CA', 'WA') else 'the major-party primary winners'}). Where a party's primary was uncontested or has not been loaded, that party's nominee is not yet listed. No ballot list from the state has been confirmed, so third-party and independent candidates are not yet listed."
             else:
