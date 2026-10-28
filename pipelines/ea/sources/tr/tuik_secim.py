@@ -13,7 +13,7 @@ import polars as pl
 
 from ea import raw
 from ea.changeset import Changeset
-from ea.sources.tr.ysk import PROVINCES, REGISTERED, VALID, VOTERS, VOTES, title, upper
+from ea.sources.tr.ysk import INVALID, PROVINCES, REGISTERED, VALID, VOTERS, VOTES, title, upper
 from ea.store import DATA, connect
 
 SOURCE = "tr.tuik_secim"
@@ -22,7 +22,15 @@ APP = "https://biruni.tuik.gov.tr/secimdagitimapp/secim.zul"
 TABLE = "Seçim çevresi ve ilçelere göre milletvekili genel seçimi sonuçları"
 REFERENDUMS = "https://biruni.tuik.gov.tr/secimdagitimapp/halkoylama.zul"
 REFERENDUM_TABLE = "İl ve ilçelere göre yurt içi halk oylaması sonuçları"
-REFERENDUM_YEARS = ("1961", "1982", "1987", "1988", "2007", "2010", "2017")
+REFERENDUM_DAYS = {
+    "1961": date(1961, 7, 9),
+    "1982": date(1982, 11, 7),
+    "1987": date(1987, 9, 6),
+    "1988": date(1988, 9, 25),
+    "2007": date(2007, 10, 21),
+    "2010": date(2010, 9, 12),
+    "2017": date(2017, 4, 16),
+}
 YEARS = ("1961", "1965", "1969", "1973", "1977", "1983", "1987", "1991", "1995", "1999", "2002", "2007")
 PARSED = DATA / "parsed" / SOURCE
 MEASURES = (("Sandık", "boxes"), ("Kayıtlı", "registered"), ("Oy kullanan", "voters"), ("Geçerli", "valid"))
@@ -50,7 +58,7 @@ PROVINCE_ALIASES = {
     "K.MARAŞ": "KAHRAMANMARAŞ",
     "İÇEL": "MERSİN",
 }
-LABEL_ALIASES: dict[str, str] = {}
+LABEL_ALIASES = {"BĞMZ": "Bağımsızlar", "TİP": "Türkiye İşçi Partisi", "TBP": "Türkiye Birlik Partisi"}
 ILCE_ALIASES = {
     ("03", "SİNCANLI"): "SİNANPAŞA",
     ("07", "KALE"): "DEMRE",
@@ -79,7 +87,12 @@ PARTS = {
     "Belde/Köy": "rural",
     "Bucak ve köyler toplamı": "rural",
 }
-REFERENDUM_PARTS = {"İl/İlçe merkezi toplamı": "urban", "Belde/Köy toplamı": "rural"}
+REFERENDUM_PARTS = {
+    "İl/İlçe merkezi toplamı": "urban",
+    "Belde/Köy toplamı": "rural",
+    "İl/İlçe merkezi": "urban",
+    "Belde/Köy": "rural",
+}
 ITEM = r'<tr id="([^"]+)" z\.type="Lit"[^>]*>\s*<td[^>]*>([^<]+)'
 
 
@@ -190,7 +203,7 @@ def referendum(label: str) -> None:
 def fetch() -> None:
     with ThreadPoolExecutor(3) as pool:
         list(pool.map(year, YEARS))
-        list(pool.map(referendum, REFERENDUM_YEARS))
+        list(pool.map(referendum, REFERENDUM_DAYS))
 
 
 def cells(row: str) -> list[str]:
@@ -209,6 +222,7 @@ def parse() -> None:
         label, province = re.search(r"oylama=(\d{4})&il=(.+)$", url).groups()
         text = raw.cached(SOURCE, url).path.read_bytes().decode("cp1254")
         pending = None
+        found = False
         for row in re.findall(
             r"<tr.*?</tr>", re.sub(r"<script.*?</script>", "", text, flags=re.DOTALL), flags=re.DOTALL | re.IGNORECASE
         ):
@@ -220,9 +234,15 @@ def parse() -> None:
                 continue
             if len(filled) == 12:
                 level, name = "province", pending
+            elif filled[0] == "Türkiye":
+                level, name = "nation", filled[0]
+            elif filled[0] in REFERENDUM_PARTS:
+                level, name = REFERENDUM_PARTS[filled[0]], filled[0]
+            elif not found:
+                level, name = "province", filled[0]
             else:
-                name = filled[0]
-                level = REFERENDUM_PARTS.get(name, "ilce")
+                level, name = "ilce", filled[0]
+            found = found or level == "province"
             if name is None:
                 raise ValueError(f"{url}: {filled}")
             for column, cell in zip(
@@ -309,7 +329,8 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Ilçe results of Turkey's general elections from 1961 to 2007, from TÜİK's election database",
+            summary="Ilçe results of Turkey's general elections from 1961 to 2007 and its referendums from 1961 to 2017, "
+            "from TÜİK's election database",
             polity="TR",
         )
         turkey = cs.polity("TR")
@@ -324,9 +345,20 @@ def emit() -> Path:
             license=LICENSE,
             notes=METHODOLOGY.format(title=TITLE),
         )
+        voting = cs.source(PUBLISHER, REFERENDUM_TABLE)
+        cs.add(
+            "source",
+            id=voting,
+            kind="official_body",
+            publisher=PUBLISHER,
+            title=REFERENDUM_TABLE,
+            url=REFERENDUMS,
+            license=LICENSE,
+            notes=METHODOLOGY.format(title=REFERENDUM_TABLE).replace("district", "province"),
+        )
         _, index = raw._index(SOURCE)
         for url in sorted(index):
-            cs.artifact(raw.cached(SOURCE, url), source)
+            cs.artifact(raw.cached(SOURCE, url), voting if url.startswith(REFERENDUMS) else source)
 
         areas: dict[UUID, list[tuple[str, date | None, date | None, str]]] = {}
         for area, text, start, end, plate in conn.execute(
@@ -424,22 +456,26 @@ def emit() -> Path:
         missing: list[str] = []
         lagged: list[str] = []
         units: dict[tuple[str, str, str], UUID] = {}
-        rows = (
-            frame.filter(pl.col("level") == "ilce")
-            .select("year", "district", "name")
+        referendums = pl.read_parquet(PARSED / "referendum.parquet")
+        wanted = [
+            (row, DAYS[row[0]], re.sub(r"\s*\(\d+\)$", "", row[1]))
+            for row in frame.filter(pl.col("level") == "ilce").select("year", "district", "name").unique().iter_rows()
+        ] + [
+            ((f"referendum {year}", province, label), REFERENDUM_DAYS[year], province)
+            for year, province, label in referendums.filter(pl.col("level") == "ilce")
+            .select("year", "province", "name")
             .unique()
-            .sort("year", "district", "name")
-        )
-        for year, district, label in rows.iter_rows():
-            province = norm(re.sub(r"\s*\(\d+\)$", "", district))
-            plate = plates[PROVINCE_ALIASES.get(province, province)]
-            area = match(DAYS[year], plate, label)
-            if area is None and (area := match(DAYS[year], plate, label, late=True)) is not None:
-                lagged.append(f"{year} {district} {label}")
+            .iter_rows()
+        ]
+        for row, day, province in sorted(wanted):
+            plate = plates[PROVINCE_ALIASES.get(norm(province), norm(province))]
+            area = match(day, plate, row[2])
+            if area is None and (area := match(day, plate, row[2], late=True)) is not None:
+                lagged.append(" ".join(row))
             if area is None:
-                missing.append(f"{year} {district} {label}")
+                missing.append(" ".join(row))
                 continue
-            units[(year, district, label)] = area
+            units[row] = area
         print("fuzzy:", *fuzzy, sep="\n  ")
         print("lagged:", *lagged, sep="\n  ")
         print("ambiguous:", *ambiguous, sep="\n  ")
@@ -489,9 +525,7 @@ def emit() -> Path:
             [[contest for contest, _ in contests.values()]],
         ).fetchall():
             labels = options.setdefault(contest, {})
-            if kind == "others":
-                labels["BĞMZ"] = option
-            for text in (ballot, party):
+            for text in (ballot, party, *(ballot.split(" ve ") if kind == "others" and ballot else ())):
                 if text is not None:
                     labels[norm(text)] = option
         frame = frame.filter(pl.col("level").is_in(["ilce", "district"])).with_columns(
@@ -556,6 +590,8 @@ def emit() -> Path:
                     cs.add("note", entity_id=result_set, kind="caveat", body_md=CUSTOMS)
                 labels = options.get(contest, {})
                 seen: set[tuple[UUID, str]] = set()
+                values: dict[tuple[UUID, str, UUID | None], int] = {}
+                unlisted = 0
                 for district, label, column, value in ilce.select("district", "name", "column", "value").iter_rows():
                     if column == "boxes":
                         continue
@@ -566,9 +602,21 @@ def emit() -> Path:
                     measure = {"registered": REGISTERED, "voters": VOTERS, "valid": VALID}.get(column, VOTES)
                     option = None if measure != VOTES else labels.get(norm(column))
                     if measure == VOTES and option is None:
-                        if value:
+                        if value and column == LABEL_ALIASES["BĞMZ"]:
+                            unlisted += value
+                        elif value:
                             unmatched.add(f"{contest_key} {column}")
                         continue
+                    values[(unit, measure, option)] = values.get((unit, measure, option), 0) + value
+                if unlisted:
+                    cs.add(
+                        "note",
+                        entity_id=result_set,
+                        kind="caveat",
+                        body_md=f"TÜİK's ilçe rows give independents {unlisted:,} votes, but the declared result "
+                        "lists no independent candidate, so those votes are not stored here.",
+                    )
+                for (unit, measure, option), value in values.items():
                     cs.add(
                         "result_value",
                         result_set_id=result_set,
@@ -582,6 +630,76 @@ def emit() -> Path:
                     )
         if unmatched:
             raise ValueError("no option for:\n  " + "\n  ".join(sorted(unmatched)))
+        questions = {
+            key: (contest, election)
+            for key, contest, election in conn.execute(
+                """select x.value, c.id, c.election_id from external_id x join contest c on c.id = x.entity_id
+                   where x.scheme = 'tr.contest' and x.value = any(%s)""",
+                [[f"{day}:constitution" for day in REFERENDUM_DAYS.values()]],
+            ).fetchall()
+        }
+        answers = {
+            (contest, label): option
+            for contest, option, label in conn.execute(
+                "select contest_id, id, ballot_label from contest_option where contest_id = any(%s)",
+                [[contest for contest, _ in questions.values()]],
+            ).fetchall()
+        }
+        for year, day in REFERENDUM_DAYS.items():
+            contest, election = questions[f"{day}:constitution"]
+            held = referendums.filter(pl.col("year") == year, pl.col("column") != "boxes")
+            totals = dict(
+                held.filter(pl.col("level") == "province").group_by("column").agg(pl.col("value").sum()).iter_rows()
+            )
+            ilce = held.filter(pl.col("level") == "ilce")
+            sums = dict(ilce.group_by("column").agg(pl.col("value").sum()).iter_rows())
+            result_set = cs.key(f"{SOURCE}.result_set", f"{day}:constitution")
+            cs.add(
+                "result_set",
+                id=result_set,
+                election_id=election,
+                contest_id=contest,
+                stage="alternative",
+                kind="counted",
+                status="active",
+                source_id=voting,
+                is_default=False,
+                completeness=round(min(1, sums["valid"] / totals["valid"]), 4),
+            )
+            result_sets += 1
+            off = [
+                f"{column} ({sums.get(column, 0):,} against {value:,})"
+                for column, value in sorted(totals.items())
+                if sums.get(column, 0) != value
+            ]
+            if off:
+                cs.add(
+                    "note",
+                    entity_id=result_set,
+                    kind="caveat",
+                    body_md="TÜİK's ilçe rows do not add up to its province totals for "
+                    + ", ".join(off)
+                    + ". The ilçe figures are stored as TÜİK prints them.",
+                )
+            seen = set()
+            for province, label, column, value in ilce.select("province", "name", "column", "value").iter_rows():
+                unit = unit_ids[units[(f"referendum {year}", province, label)]]
+                if (unit, column) in seen:
+                    raise ValueError(f"referendum {year}: {province} {label} twice")
+                seen.add((unit, column))
+                cs.add(
+                    "result_value",
+                    result_set_id=result_set,
+                    unit_id=unit,
+                    option_id={"yes": answers[(contest, "Evet")], "no": answers[(contest, "Hayır")]}.get(column),
+                    channel=0,
+                    measure={"registered": REGISTERED, "voters": VOTERS, "valid": VALID, "invalid": INVALID}.get(
+                        column, VOTES
+                    ),
+                    count_round=0,
+                    flags=0,
+                    value=value,
+                )
         print(
             f"{result_sets} result sets, {len(unit_ids)} ilçe units ({len(unit_ids) - len(existing.keys() & unit_ids.keys())} new)"
         )
