@@ -21,12 +21,12 @@ from ea.sources.wikidata_photos import _credit, _free, _text
 from ea.store import DATA, connect
 
 SOURCE = "party_logos"
-VERSION = "1"
+VERSION = "2"
 TITLE = "Party logos"
 LOGOS = DATA / "logos"
 ITEMS = DATA / "parsed" / SOURCE / "items.json"
 DATED = Path(__file__).with_suffix(".tsv")
-STATEMENTS = """SELECT ?item ?statement ?file ?start ?startPrecision ?end ?endPrecision ?began ?ended ?dissolved WHERE {{
+STATEMENTS = """SELECT ?item ?statement ?file ?rank ?start ?startPrecision ?end ?endPrecision ?began ?ended ?dissolved WHERE {{
   VALUES ?item {{ {items} }}
   ?item p:P154 ?statement . ?statement ps:P154 ?file ; wikibase:rank ?rank .
   FILTER(?rank != wikibase:DeprecatedRank)
@@ -43,6 +43,13 @@ HEIGHT = 96
 WIDEST = 480
 PRECISIONS = {11: "day", 10: "month", 9: "year"}
 UNDATED: tuple[date | None, str] = (None, "unknown")
+NOT_LOGOS = {
+    ("Q2453869", "Logo PSTU.png"),
+    ("Q108700", "A-Block-for-the-Wigs-Gillray.jpeg"),
+    ("Q6517143", "Newhome masthead.gif"),
+    ("Q42183", "1848whigbanner.jpg"),
+    ("Q2653287", "Bandeira-democracia-cristã.png"),
+}
 
 
 @dataclass
@@ -53,6 +60,10 @@ class Logo:
     start: tuple[date | None, str] = UNDATED
     end: tuple[date | None, str] = UNDATED
     dated_by: str | None = None
+    preferred: bool = False
+    open: bool = True
+    default: bool = False
+    dated_url: str | None = None
 
 
 def _items() -> list[str]:
@@ -136,18 +147,32 @@ def _statements(items: list[str]) -> dict[str, list[Logo]]:
         for row in json.loads(raw.cached(SOURCE, url).path.read_text(encoding="utf-8"))["results"]["bindings"]:
             item = row["item"]["value"].rsplit("/", 1)[1]
             statement = row["statement"]["value"].rsplit("/", 1)[1]
+            file = unquote(row["file"]["value"].rsplit("/", 1)[1]).replace("_", " ")
+            if (item, file) in NOT_LOGOS:
+                continue
             begun = _when(row.get("start", {}).get("value"), row.get("startPrecision", {}).get("value"))
             ended = _when(row.get("end", {}).get("value"), row.get("endPrecision", {}).get("value"))
             if any(row.get(key, {}).get("value", "").startswith("http") for key in ("began", "ended")):
                 begun = ended = UNDATED
             parties.setdefault(item, {})[statement] = Logo(
                 statement=statement,
-                file=unquote(row["file"]["value"].rsplit("/", 1)[1]).replace("_", " "),
+                file=file,
                 dissolved="dissolved" in row,
                 start=begun,
                 end=ended,
                 dated_by="wikidata" if begun[0] is not None or ended[0] is not None else None,
+                preferred=row["rank"]["value"].endswith("PreferredRank"),
+                open="ended" not in row,
             )
+    for statements in parties.values():
+        logos = list(statements.values())
+        preferred = [logo for logo in logos if logo.preferred]
+        unended = [logo for logo in logos if logo.open]
+        chosen = (
+            preferred if len(preferred) == 1 else unended if len(unended) == 1 else logos if len(logos) == 1 else []
+        )
+        for logo in chosen:
+            logo.default = True
     return {item: list(statements.values()) for item, statements in parties.items()}
 
 
@@ -195,7 +220,8 @@ def _logos(items: list[str]) -> dict[str, list[Logo]]:
             continue
         match.start = (date.fromisoformat(row["valid_from"]) if row["valid_from"] else None, row["from_precision"])
         match.end = (date.fromisoformat(row["valid_to"]) if row["valid_to"] else None, row["to_precision"])
-        match.dated_by = "file"
+        match.dated_by = "source" if row["url"] else "file"
+        match.dated_url = row["url"] or None
     for logos in parties.values():
         starts = sorted((logo.start for logo in logos if logo.start[0] is not None), key=lambda begun: str(begun[0]))
         for logo in logos:
@@ -273,8 +299,8 @@ def emit() -> Path:
             if item not in known:
                 continue
             for logo in logos:
-                if logo.dated_by is None and (len(logos) > 1 or logo.dissolved):
-                    skipped["undated and never shown"] += 1
+                if logo.dated_by is None and not logo.default:
+                    skipped["undated and not the default"] += 1
                     continue
                 info = infos.get(logo.file)
                 if info is None:
@@ -317,6 +343,7 @@ def emit() -> Path:
                     valid_to=logo.end[0],
                     valid_to_precision=logo.end[1],
                     dated_by=logo.dated_by,
+                    dated_url=logo.dated_url,
                     uploaded_at=datetime.fromisoformat(info["uploaded"]) if info["uploaded"] else None,
                 )
                 added += 1
