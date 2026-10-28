@@ -721,6 +721,7 @@ PRESIDENT_METHODOLOGY = (
     "most votes face each other in a second round two weeks later. The current constitutional rule is Article 101; "
     "before the 2017 amendments, it was Article 102."
 )
+DATED = {"Yeşiller ve Sol Gelecek Partisi": (date(2012, 11, 25), date(2023, 10, 15))}
 RENAMED = {
     "İşçi Partisi": ("Vatan Partisi", date(2015, 2, 15)),
     "Özgürlük ve Dayanışma Partisi": ("Sol Parti", date(2019, 12, 22)),
@@ -6106,8 +6107,9 @@ def emit() -> Path:
                         cs.add("citation", entity_id=parties[full], source_id=cited, locator={"name": first})
                 name(parties[full], former, start=renamed, end=start)
                 name(parties[full], abbreviation, kind="abbreviation", start=renamed, end=start)
-            name(parties[full], full, start=start)
-            name(parties[full], short, kind="abbreviation", start=start)
+            start, end = DATED.get(full, (start, None))
+            name(parties[full], full, start=start, end=end)
+            name(parties[full], short, kind="abbreviation", start=start, end=end)
         persons: dict[str, UUID] = {}
         for label in dict.fromkeys(
             [label for label, _ in CANDIDATES + CANDIDATES_2018 + CANDIDATES_2014]
