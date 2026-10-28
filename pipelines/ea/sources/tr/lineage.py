@@ -9,7 +9,7 @@ from ea.sources.tr import ysk
 from ea.store import connect
 
 SOURCE = "tr.lineage"
-VERSION = "5"
+VERSION = "6"
 COURT = "https://anayasa.gov.tr/media/3617/tulensiyasipartilerinkapatilmasi.pdf"
 COURT_PUBLISHER = "Anayasa Mahkemesi"
 COURT_TITLE = "Son Üç Kararı Çerçevesinde Anayasa Mahkemesinin Siyasi Partilerin Kapatılmasına İlişkin İçtihadı"
@@ -41,6 +41,7 @@ MINTED: dict[str, tuple[str, list[tuple[str, str | None, date | None, date | Non
         ],
     ),
     "yeni-parti-2026": ("Q140644267", [("Yeni Parti", "YENİ", date(2026, 7, 24), None)]),
+    "yeni-yol": ("Q131742127", [("Yeni Yol", "YENİ YOL", date(2025, 1, 10), None)]),
 }
 MERGED = {
     "ozgurluk-ve-dayanisma-partisi": "sol-parti",
@@ -357,7 +358,7 @@ def emit() -> Path:
             summary=(
                 "Turkish party lineage from 1946 to 2025: court closures, mergers, parties that joined another, "
                 "successors, and splits within a tradition, with the renames of ÖDP to Sol Parti and Yeniden Doğuş "
-                "Partisi to Genç Parti merged into one party each, YSP renamed HEDEP and then DEM Parti, YENİ Parti's split from CHP, and the joint "
+                "Partisi to Genç Parti merged into one party each, YSP renamed HEDEP and then DEM Parti, YENİ Parti's split from CHP, Yeni Yol, and the joint "
                 "lists of 1991, 2002, 2018, and 2023 that carried other parties' candidates"
             ),
             polity="TR",

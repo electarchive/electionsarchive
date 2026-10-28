@@ -1,33 +1,59 @@
 member	name	party	valid_from	valid_to	source
+2023-05-14:01:2	Ahmet Zenbilci	adalet-ve-kalkinma-partisi	2023-06-02	2024-09-30	wikipedia
+2023-05-14:01:9	Orhan Sümer	cumhuriyet-halk-partisi	2023-06-02	2026-07-24	evrensel
+2023-05-14:01:9	Orhan Sümer	yeni-parti-2026	2026-07-24		evrensel
 2023-05-14:01:11	Burhanettin Bulut	cumhuriyet-halk-partisi	2023-06-02	2026-07-24	evrensel
 2023-05-14:01:11	Burhanettin Bulut	yeni-parti-2026	2026-07-24		evrensel
+2023-05-14:01:12	Sadullah Kısacık	demokrasi-ve-atilim-partisi	2023-06-02	2025-01-10	wikipedia
+2023-05-14:01:12	Sadullah Kısacık	yeni-yol	2025-01-10		wikipedia
 2023-05-14:01:13	Ayhan Barut	cumhuriyet-halk-partisi	2023-06-02	2026-07-24	evrensel
 2023-05-14:01:13	Ayhan Barut	yeni-parti-2026	2026-07-24		evrensel
 2023-05-14:01:15	Bilal Bilici	iyi-parti	2023-06-02	2024-05-15	wikipedia
 2023-05-14:01:15	Bilal Bilici	cumhuriyet-halk-partisi	2024-08-20	2026-07-24	wikipedia
 2023-05-14:01:15	Bilal Bilici	yeni-parti-2026	2026-07-24		evrensel
-2023-05-14:01:9	Orhan Sümer	cumhuriyet-halk-partisi	2023-06-02	2026-07-24	evrensel
-2023-05-14:01:9	Orhan Sümer	yeni-parti-2026	2026-07-24		evrensel
 2023-05-14:05:3	Reşat Karagöz	cumhuriyet-halk-partisi	2023-06-02	2026-07-24	evrensel
 2023-05-14:05:3	Reşat Karagöz	yeni-parti-2026	2026-07-24		evrensel
-2023-05-14:06-1:11	Aliye Timisi Ersever	cumhuriyet-halk-partisi	2023-06-02	2026-07-24	evrensel
-2023-05-14:06-1:11	Aliye Timisi Ersever	yeni-parti-2026	2026-07-24		evrensel
 2023-05-14:06-1:6	Gamze Taşcıer	cumhuriyet-halk-partisi	2023-06-02	2026-07-24	evrensel
 2023-05-14:06-1:6	Gamze Taşcıer	yeni-parti-2026	2026-07-24		evrensel
 2023-05-14:06-1:8	Okan Konuralp	cumhuriyet-halk-partisi	2023-06-02	2026-07-24	evrensel
 2023-05-14:06-1:8	Okan Konuralp	yeni-parti-2026	2026-07-24		evrensel
+2023-05-14:06-1:9	Sadullah Ergin	demokrasi-ve-atilim-partisi	2023-06-02	2025-01-10	wikipedia
+2023-05-14:06-1:9	Sadullah Ergin	yeni-yol	2025-01-10		wikipedia
+2023-05-14:06-1:10	Mustafa Nedim Yamalı	gelecek-partisi	2023-06-02	2023-07-06	wikipedia
+2023-05-14:06-1:10	Mustafa Nedim Yamalı	saadet-partisi	2023-07-06	2024-12-24	wikipedia
+2023-05-14:06-1:10	Mustafa Nedim Yamalı	adalet-ve-kalkinma-partisi	2024-12-25		wikipedia
+2023-05-14:06-1:11	Aliye Timisi Ersever	cumhuriyet-halk-partisi	2023-06-02	2026-07-24	evrensel
+2023-05-14:06-1:11	Aliye Timisi Ersever	yeni-parti-2026	2026-07-24		evrensel
+2023-05-14:06-1:12	Koray Aydın	iyi-parti	2023-06-02	2024-06-27	wikipedia
+2023-05-14:06-1:13	Ahmet Eşref Fakıbaba	iyi-parti	2023-06-02	2026-10-21	wikipedia
 2023-05-14:06-2:8	Murat Emir	cumhuriyet-halk-partisi	2023-06-02	2026-07-24	evrensel
 2023-05-14:06-2:8	Murat Emir	yeni-parti-2026	2026-07-24		evrensel
-2023-05-14:06-3:10	Aylin Yaman	cumhuriyet-halk-partisi	2023-06-02	2026-07-24	evrensel
-2023-05-14:06-3:10	Aylin Yaman	yeni-parti-2026	2026-07-24		evrensel
+2023-05-14:06-2:9	İdris Şahin	demokrasi-ve-atilim-partisi	2023-06-02	2025-01-10	wikipedia
+2023-05-14:06-2:9	İdris Şahin	yeni-yol	2025-01-10		wikipedia
+2023-05-14:06-2:11	Adnan Beker	iyi-parti	2023-06-02	2023-11-16	wikipedia
+2023-05-14:06-2:11	Adnan Beker	cumhuriyet-halk-partisi	2025-03-04	2026-07-04	wikipedia
 2023-05-14:06-3:7	Tekin Bingöl	cumhuriyet-halk-partisi	2023-06-02	2026-07-24	evrensel
 2023-05-14:06-3:7	Tekin Bingöl	yeni-parti-2026	2026-07-24		evrensel
 2023-05-14:06-3:8	Umut Akdoğan	cumhuriyet-halk-partisi	2023-06-02	2026-07-24	evrensel
 2023-05-14:06-3:8	Umut Akdoğan	yeni-parti-2026	2026-07-24		evrensel
+2023-05-14:06-3:9	Mesut Doğan	saadet-partisi	2023-06-02	2025-01-10	wikipedia
+2023-05-14:06-3:9	Mesut Doğan	yeni-yol	2025-01-10		wikipedia
+2023-05-14:06-3:10	Aylin Yaman	cumhuriyet-halk-partisi	2023-06-02	2026-07-24	evrensel
+2023-05-14:06-3:10	Aylin Yaman	yeni-parti-2026	2026-07-24		evrensel
+2023-05-14:06-3:11	Yüksel Arslan	iyi-parti	2023-06-02	2023-12-21	wikipedia
+2023-05-14:06-3:11	Yüksel Arslan	iyi-parti	2025-04-09		wikipedia
+2023-05-14:06-3:12	Kürşad Zorlu	iyi-parti	2023-06-02	2025-01-02	wikipedia
+2023-05-14:06-3:12	Kürşad Zorlu	adalet-ve-kalkinma-partisi	2025-01-21		wikipedia
 2023-05-14:07:11	Cavit Arı	cumhuriyet-halk-partisi	2023-06-02	2026-07-24	evrensel
 2023-05-14:07:11	Cavit Arı	yeni-parti-2026	2026-07-24		evrensel
 2023-05-14:07:12	Aliye Coşar	cumhuriyet-halk-partisi	2023-06-02	2026-07-24	evrensel
 2023-05-14:07:12	Aliye Coşar	yeni-parti-2026	2026-07-24		evrensel
+2023-05-14:07:13	Serap Yazıcı Özbudun	gelecek-partisi	2023-06-02	2023-07-06	wikipedia
+2023-05-14:07:13	Serap Yazıcı Özbudun	saadet-partisi	2023-07-06	2025-01-10	wikipedia
+2023-05-14:07:13	Serap Yazıcı Özbudun	yeni-yol	2025-01-10	2025-02-22	wikipedia
+2023-05-14:07:13	Serap Yazıcı Özbudun	adalet-ve-kalkinma-partisi	2025-02-23		wikipedia
+2023-05-14:07:14	Şerafettin Kılıç	saadet-partisi	2023-06-02	2025-01-10	wikipedia
+2023-05-14:07:14	Şerafettin Kılıç	yeni-yol	2025-01-10		wikipedia
 2023-05-14:07:15	Mustafa Erdem	cumhuriyet-halk-partisi	2023-06-02	2026-07-24	evrensel
 2023-05-14:07:15	Mustafa Erdem	yeni-parti-2026	2026-07-24		evrensel
 2023-05-14:07:17	Aykut Kaya	iyi-parti	2023-06-02	2024-05-31	wikipedia
@@ -41,18 +67,29 @@ member	name	party	valid_from	valid_to	source
 2023-05-14:09:6	Süleyman Bülbül	yeni-parti-2026	2026-07-24		evrensel
 2023-05-14:09:7	Evrim Karakoz	cumhuriyet-halk-partisi	2023-06-02	2026-07-24	evrensel
 2023-05-14:09:7	Evrim Karakoz	yeni-parti-2026	2026-07-24		evrensel
+2023-05-14:09:8	Ömer Karakaş	iyi-parti	2023-06-02	2026-08-14	wikipedia
+2023-05-14:09:8	Ömer Karakaş	adalet-ve-kalkinma-partisi	2026-08-14		wikipedia
 2023-05-14:10:6	Ensar Aytekin	cumhuriyet-halk-partisi	2023-06-02	2026-07-24	evrensel
 2023-05-14:10:6	Ensar Aytekin	yeni-parti-2026	2026-07-24		evrensel
+2023-05-14:10:8	Burak Dalgın	demokrasi-ve-atilim-partisi	2023-06-02	2025-01-07	wikipedia
+2023-05-14:10:8	Burak Dalgın	iyi-parti	2026-01-18		wikipedia
 2023-05-14:11:2	Yaşar Tüzün	cumhuriyet-halk-partisi	2023-06-02	2026-07-24	evrensel
 2023-05-14:11:2	Yaşar Tüzün	yeni-parti-2026	2026-07-24		evrensel
+2023-05-14:14:2	İsmail Akgül	milliyetci-hareket-partisi	2023-06-02	2024-11-20	wikipedia
 2023-05-14:15:3	İzzet Akbulut	cumhuriyet-halk-partisi	2023-06-02	2026-07-24	evrensel
 2023-05-14:15:3	İzzet Akbulut	yeni-parti-2026	2026-07-24		evrensel
 2023-05-14:16-1:7	Kayıhan Pala	cumhuriyet-halk-partisi	2023-06-02	2026-07-24	evrensel
 2023-05-14:16-1:7	Kayıhan Pala	yeni-parti-2026	2026-07-24		evrensel
 2023-05-14:16-1:8	Nurhayat Altaca Kayışoğlu	cumhuriyet-halk-partisi	2023-06-02	2026-07-24	evrensel
 2023-05-14:16-1:8	Nurhayat Altaca Kayışoğlu	yeni-parti-2026	2026-07-24		evrensel
+2023-05-14:16-1:9	Mehmet Atmaca	saadet-partisi	2023-06-02	2025-01-10	wikipedia
+2023-05-14:16-1:9	Mehmet Atmaca	yeni-yol	2025-01-10		wikipedia
 2023-05-14:16-2:7	Hasan Öztürk	cumhuriyet-halk-partisi	2023-06-02	2026-07-24	evrensel
 2023-05-14:16-2:7	Hasan Öztürk	yeni-parti-2026	2026-07-24		evrensel
+2023-05-14:16-2:8	Cemalettin Kani Torun	gelecek-partisi	2023-06-02	2023-07-06	wikipedia
+2023-05-14:16-2:8	Cemalettin Kani Torun	saadet-partisi	2023-07-06	2025-01-10	wikipedia
+2023-05-14:16-2:8	Cemalettin Kani Torun	yeni-yol	2025-01-10	2026-08-31	wikipedia
+2023-05-14:16-2:8	Cemalettin Kani Torun	adalet-ve-kalkinma-partisi	2026-10-20		wikipedia
 2023-05-14:17:2	İsmet Güneşhan	cumhuriyet-halk-partisi	2023-06-02	2026-07-24	evrensel
 2023-05-14:17:2	İsmet Güneşhan	yeni-parti-2026	2026-07-24		evrensel
 2023-05-14:17:3	Özgür Ceylan	cumhuriyet-halk-partisi	2023-06-02	2026-07-24	evrensel
@@ -61,89 +98,178 @@ member	name	party	valid_from	valid_to	source
 2023-05-14:19:4	Mehmet Tahtasız	yeni-parti-2026	2026-07-24		evrensel
 2023-05-14:20:5	Şeref Arpacı	cumhuriyet-halk-partisi	2023-06-02	2026-07-24	evrensel
 2023-05-14:20:5	Şeref Arpacı	yeni-parti-2026	2026-07-24		evrensel
+2023-05-14:20:6	Sema Silkin Ün	gelecek-partisi	2023-06-02	2023-07-06	wikipedia
+2023-05-14:20:6	Sema Silkin Ün	saadet-partisi	2023-07-06	2025-01-10	wikipedia
+2023-05-14:20:6	Sema Silkin Ün	yeni-yol	2025-01-10		wikipedia
 2023-05-14:21:12	Mustafa Sezgin Tanrıkulu	cumhuriyet-halk-partisi	2023-06-02	2026-07-24	evrensel
 2023-05-14:21:12	Mustafa Sezgin Tanrıkulu	yeni-parti-2026	2026-07-24		evrensel
+2023-05-14:22:2	Ediz Ün	cumhuriyet-halk-partisi	2023-06-02	2024-09-28	wikipedia
+2023-05-14:22:2	Ediz Ün	cumhuriyet-halk-partisi	2026-07-30		wikipedia
 2023-05-14:24:2	Mustafa Sarıgül	cumhuriyet-halk-partisi	2023-06-02	2026-07-24	evrensel
 2023-05-14:24:2	Mustafa Sarıgül	yeni-parti-2026	2026-07-24		evrensel
 2023-05-14:26:3	Utku Çakırözer	cumhuriyet-halk-partisi	2023-06-02	2026-07-24	evrensel
 2023-05-14:26:3	Utku Çakırözer	yeni-parti-2026	2026-07-24		evrensel
 2023-05-14:26:5	İbrahim Arslan	cumhuriyet-halk-partisi	2023-06-02	2026-07-24	evrensel
 2023-05-14:26:5	İbrahim Arslan	yeni-parti-2026	2026-07-24		evrensel
+2023-05-14:26:6	İdris Nebi Hatipoğlu	iyi-parti	2023-06-02	2023-11-02	wikipedia
+2023-05-14:26:6	İdris Nebi Hatipoğlu	adalet-ve-kalkinma-partisi	2023-11-07		wikipedia
+2023-05-14:27:6	Şahzade Demir	hur-dava-partisi	2023-06-02		wikipedia
+2023-05-14:27:10	Sevda Karaca Demir	emek-partisi	2023-06-02		wikipedia
 2023-05-14:27:12	Melih Meriç	cumhuriyet-halk-partisi	2023-06-02	2026-07-24	evrensel
 2023-05-14:27:12	Melih Meriç	yeni-parti-2026	2026-07-24		evrensel
+2023-05-14:27:13	Ertuğrul Kaya	demokrasi-ve-atilim-partisi	2023-06-02	2024-12-27	wikipedia
+2023-05-14:27:13	Ertuğrul Kaya	saadet-partisi	2024-12-27	2025-01-10	wikipedia
+2023-05-14:27:13	Ertuğrul Kaya	yeni-yol	2025-01-10		wikipedia
+2023-05-14:27:14	Mehmet Mustafa Gürban	iyi-parti	2023-06-02	2026-08-13	wikipedia
+2023-05-14:27:14	Mehmet Mustafa Gürban	adalet-ve-kalkinma-partisi	2026-08-14		wikipedia
 2023-05-14:28:4	Elvan Işık Gezmiş	cumhuriyet-halk-partisi	2023-06-02	2026-07-24	evrensel
 2023-05-14:28:4	Elvan Işık Gezmiş	yeni-parti-2026	2026-07-24		evrensel
 2023-05-14:31:9	Servet Mullaoğlu	cumhuriyet-halk-partisi	2023-06-02	2026-07-24	evrensel
 2023-05-14:31:9	Servet Mullaoğlu	yeni-parti-2026	2026-07-24		evrensel
+2023-05-14:31:10	Necmettin Çalışkan	saadet-partisi	2023-06-02	2025-01-10	wikipedia
+2023-05-14:31:10	Necmettin Çalışkan	yeni-yol	2025-01-10		wikipedia
+2023-05-14:32:3	Hasan Basri Sönmez	milliyetci-hareket-partisi	2023-06-02	2024-11-20	wikipedia
 2023-05-14:32:4	Hikmet Yalım Halıcı	cumhuriyet-halk-partisi	2023-06-02	2026-07-24	evrensel
 2023-05-14:32:4	Hikmet Yalım Halıcı	yeni-parti-2026	2026-07-24		evrensel
-2023-05-14:33:11	Talat Dinçer	cumhuriyet-halk-partisi	2023-06-02	2026-07-24	evrensel
-2023-05-14:33:11	Talat Dinçer	yeni-parti-2026	2026-07-24		evrensel
+2023-05-14:33:4	Faruk Dinç	hur-dava-partisi	2023-06-02		wikipedia
 2023-05-14:33:8	Ali Mahir Başarır	cumhuriyet-halk-partisi	2023-06-02	2026-07-24	evrensel
 2023-05-14:33:8	Ali Mahir Başarır	yeni-parti-2026	2026-07-24		evrensel
+2023-05-14:33:10	Mehmet Emin Ekmen	demokrasi-ve-atilim-partisi	2023-06-02	2024-12-27	wikipedia
+2023-05-14:33:10	Mehmet Emin Ekmen	saadet-partisi	2024-12-27	2025-01-10	wikipedia
+2023-05-14:33:10	Mehmet Emin Ekmen	yeni-yol	2025-01-10		wikipedia
+2023-05-14:33:11	Talat Dinçer	cumhuriyet-halk-partisi	2023-06-02	2026-07-24	evrensel
+2023-05-14:33:11	Talat Dinçer	yeni-parti-2026	2026-07-24		evrensel
+2023-05-14:33:12	Hasan Ufuk Çakır	cumhuriyet-halk-partisi	2023-06-02	2025-12-09	wikipedia
+2023-05-14:33:12	Hasan Ufuk Çakır	adalet-ve-kalkinma-partisi	2026-01-07		wikipedia
+2023-05-14:34-1:15	Suat Pamukçu	yeniden-refah-partisi	2023-06-02	2024-02-20	wikipedia
+2023-05-14:34-1:15	Suat Pamukçu	adalet-ve-kalkinma-partisi	2024-03-24		wikipedia
 2023-05-14:34-1:23	Fethi Açıkel	cumhuriyet-halk-partisi	2023-06-02	2026-07-24	evrensel
 2023-05-14:34-1:23	Fethi Açıkel	yeni-parti-2026	2026-07-24		evrensel
 2023-05-14:34-1:24	Gökhan Günaydın	cumhuriyet-halk-partisi	2023-06-02	2026-07-24	evrensel
 2023-05-14:34-1:24	Gökhan Günaydın	yeni-parti-2026	2026-07-24		evrensel
-2023-05-14:34-1:29	Cemal Enginyurt	cumhuriyet-halk-partisi	2023-06-02	2026-07-24	evrensel
+2023-05-14:34-1:25	Birol Aydın	saadet-partisi	2023-06-02	2025-01-10	wikipedia
+2023-05-14:34-1:25	Birol Aydın	yeni-yol	2025-01-10		wikipedia
+2023-05-14:34-1:26	Ahmet Ersagun Yücel	iyi-parti	2023-06-02	2024-07-22	wikipedia
+2023-05-14:34-1:26	Ahmet Ersagun Yücel	adalet-ve-kalkinma-partisi	2024-08-14		wikipedia
+2023-05-14:34-1:27	Elif Esen	demokrasi-ve-atilim-partisi	2023-06-02	2025-01-10	wikipedia
+2023-05-14:34-1:27	Elif Esen	yeni-yol	2025-01-10		wikipedia
+2023-05-14:34-1:28	Hasan Karal	demokrasi-ve-atilim-partisi	2023-06-02	2025-01-10	wikipedia
+2023-05-14:34-1:28	Hasan Karal	yeni-yol	2025-01-10		wikipedia
+2023-05-14:34-1:29	Cemal Enginyurt	demokrat-parti	2023-06-02	2024-11-18	wikipedia
+2023-05-14:34-1:29	Cemal Enginyurt	cumhuriyet-halk-partisi	2025-02-04	2026-07-24	wikipedia
 2023-05-14:34-1:29	Cemal Enginyurt	yeni-parti-2026	2026-07-24		evrensel
+2023-05-14:34-1:30	Selim Temurci	gelecek-partisi	2023-06-02	2023-07-06	wikipedia
+2023-05-14:34-1:30	Selim Temurci	saadet-partisi	2023-07-06	2025-07-19	wikipedia
 2023-05-14:34-1:31	Ali Gökçek	cumhuriyet-halk-partisi	2023-06-02	2026-07-24	evrensel
 2023-05-14:34-1:31	Ali Gökçek	yeni-parti-2026	2026-07-24		evrensel
 2023-05-14:34-1:32	Suat Özçağdaş	cumhuriyet-halk-partisi	2023-06-02	2026-07-24	evrensel
 2023-05-14:34-1:32	Suat Özçağdaş	yeni-parti-2026	2026-07-24		evrensel
+2023-05-14:34-1:33	Nimet Özdemir	iyi-parti	2023-06-02	2024-07-24	wikipedia
+2023-05-14:34-1:33	Nimet Özdemir	cumhuriyet-halk-partisi	2024-10-08	2026-06-17	wikipedia
+2023-05-14:34-1:33	Nimet Özdemir	adalet-ve-kalkinma-partisi	2026-06-24		wikipedia
+2023-05-14:34-2:4	Mehmet Önder Aksakal	demokratik-sol-parti	2023-06-02		wikipedia
 2023-05-14:34-2:18	Namık Tan	cumhuriyet-halk-partisi	2023-06-02	2026-07-24	evrensel
 2023-05-14:34-2:18	Namık Tan	yeni-parti-2026	2026-07-24		evrensel
 2023-05-14:34-2:19	Yunus Emre	cumhuriyet-halk-partisi	2023-06-02	2026-07-24	evrensel
 2023-05-14:34-2:19	Yunus Emre	yeni-parti-2026	2026-07-24		evrensel
 2023-05-14:34-2:20	Gökan Zeybek	cumhuriyet-halk-partisi	2023-06-02	2026-07-24	evrensel
 2023-05-14:34-2:20	Gökan Zeybek	yeni-parti-2026	2026-07-24		evrensel
-2023-05-14:34-2:25	Evrim Rızvanoğlu	cumhuriyet-halk-partisi	2023-06-02	2026-07-24	evrensel
+2023-05-14:34-2:22	Mustafa Kaya	saadet-partisi	2023-06-02	2025-01-10	wikipedia
+2023-05-14:34-2:22	Mustafa Kaya	yeni-yol	2025-01-10		wikipedia
+2023-05-14:34-2:24	İsa Mesih Şahin	gelecek-partisi	2023-06-02	2023-07-06	wikipedia
+2023-05-14:34-2:24	İsa Mesih Şahin	saadet-partisi	2023-07-06	2025-07-19	wikipedia
+2023-05-14:34-2:24	İsa Mesih Şahin	adalet-ve-kalkinma-partisi	2026-01-07		wikipedia
+2023-05-14:34-2:25	Evrim Rızvanoğlu	demokrasi-ve-atilim-partisi	2023-06-02	2025-06-27	wikipedia
+2023-05-14:34-2:25	Evrim Rızvanoğlu	cumhuriyet-halk-partisi	2025-07-23	2026-07-24	wikipedia
 2023-05-14:34-2:25	Evrim Rızvanoğlu	yeni-parti-2026	2026-07-24		evrensel
+2023-05-14:34-2:27	Mehmet Selim Ensarioğlu	iyi-parti	2023-06-02	2023-12-15	wikipedia
+2023-05-14:34-2:27	Mehmet Selim Ensarioğlu	adalet-ve-kalkinma-partisi	2025-02-23		wikipedia
+2023-05-14:34-3:4	Zekeriya Yapıcıoğlu	hur-dava-partisi	2023-06-02		wikipedia
+2023-05-14:34-3:18	Çiğdem Kılıçgün Uçar	yesiller-ve-sol-gelecek-partisi	2023-06-02	2023-11-12	wikipedia
+2023-05-14:34-3:18	Çiğdem Kılıçgün Uçar	baris-ve-demokrasi-partisi	2023-11-12		wikipedia
+2023-05-14:34-3:19	İskender Bayhan	emek-partisi	2023-06-02		wikipedia
 2023-05-14:34-3:25	Türkan Elçi	cumhuriyet-halk-partisi	2023-06-02	2026-07-24	evrensel
 2023-05-14:34-3:25	Türkan Elçi	yeni-parti-2026	2026-07-24		evrensel
 2023-05-14:34-3:27	Zeynel Emre	cumhuriyet-halk-partisi	2023-06-02	2026-07-24	evrensel
 2023-05-14:34-3:27	Zeynel Emre	yeni-parti-2026	2026-07-24		evrensel
-2023-05-14:34-3:30	Doğan Demir	cumhuriyet-halk-partisi	2023-06-02	2026-07-24	evrensel
+2023-05-14:34-3:28	Mustafa Yeneroğlu	demokrasi-ve-atilim-partisi	2023-06-02	2024-12-26	wikipedia
+2023-05-14:34-3:29	Bülent Kaya	saadet-partisi	2023-06-02	2025-01-10	wikipedia
+2023-05-14:34-3:29	Bülent Kaya	yeni-yol	2025-01-10		wikipedia
+2023-05-14:34-3:30	Doğan Demir	gelecek-partisi	2023-06-02	2023-07-06	wikipedia
+2023-05-14:34-3:30	Doğan Demir	saadet-partisi	2023-07-06	2025-01-10	wikipedia
+2023-05-14:34-3:30	Doğan Demir	yeni-yol	2025-01-10	2025-07-21	wikipedia
+2023-05-14:34-3:30	Doğan Demir	cumhuriyet-halk-partisi	2025-11-18	2026-07-24	wikipedia
 2023-05-14:34-3:30	Doğan Demir	yeni-parti-2026	2026-07-24		evrensel
 2023-05-14:34-3:31	Özgür Karabat	cumhuriyet-halk-partisi	2023-06-02	2026-07-24	evrensel
 2023-05-14:34-3:31	Özgür Karabat	yeni-parti-2026	2026-07-24		evrensel
+2023-05-14:34-3:32	Medeni Yılmaz	demokrasi-ve-atilim-partisi	2023-06-02	2025-01-10	wikipedia
+2023-05-14:34-3:32	Medeni Yılmaz	yeni-yol	2025-01-10		wikipedia
 2023-05-14:34-3:33	Turan Taşkın Özer	cumhuriyet-halk-partisi	2023-06-02	2026-07-24	evrensel
 2023-05-14:34-3:33	Turan Taşkın Özer	yeni-parti-2026	2026-07-24		evrensel
+2023-05-14:34-3:34	Ersin Beyaz	iyi-parti	2023-06-02	2026-05-18	wikipedia
+2023-05-14:34-3:34	Ersin Beyaz	adalet-ve-kalkinma-partisi	2026-06-10		wikipedia
+2023-05-14:34-3:35	Seyithan İzsiz	iyi-parti	2023-06-02	2024-06-14	wikipedia
+2023-05-14:34-3:35	Seyithan İzsiz	adalet-ve-kalkinma-partisi	2024-08-14		wikipedia
 2023-05-14:34-3:36	Ayşe Sibel Yanıkömeroğlu	iyi-parti	2023-06-02	2023-12-06	wikipedia
 2023-05-14:34-3:36	Ayşe Sibel Yanıkömeroğlu	cumhuriyet-halk-partisi	2024-04-24	2026-07-24	wikipedia
 2023-05-14:34-3:36	Ayşe Sibel Yanıkömeroğlu	yeni-parti-2026	2026-07-24		evrensel
-2023-05-14:35-1:10	Ednan Arslan	cumhuriyet-halk-partisi	2023-06-02	2026-07-24	evrensel
-2023-05-14:35-1:10	Ednan Arslan	yeni-parti-2026	2026-07-24		evrensel
-2023-05-14:35-1:11	Seda Kâya Ösen	cumhuriyet-halk-partisi	2023-06-02	2026-07-24	evrensel
-2023-05-14:35-1:11	Seda Kâya Ösen	yeni-parti-2026	2026-07-24		evrensel
-2023-05-14:35-1:14	Ümit Özlale	iyi-parti	2023-06-02	2024-04-08	wikipedia
-2023-05-14:35-1:14	Ümit Özlale	iyi-parti	2024-04-27	2024-09-12	gazetemizmir
-2023-05-14:35-1:14	Ümit Özlale	cumhuriyet-halk-partisi	2024-12-03	2026-07-24	wikipedia
-2023-05-14:35-1:14	Ümit Özlale	yeni-parti-2026	2026-07-24		evrensel
 2023-05-14:35-1:6	Yüksel Taşkın	cumhuriyet-halk-partisi	2023-06-02	2026-07-24	evrensel
 2023-05-14:35-1:6	Yüksel Taşkın	yeni-parti-2026	2026-07-24		evrensel
 2023-05-14:35-1:7	Tuncay Özkan	cumhuriyet-halk-partisi	2023-06-02	2026-07-24	evrensel
 2023-05-14:35-1:7	Tuncay Özkan	yeni-parti-2026	2026-07-24		evrensel
 2023-05-14:35-1:9	Murat Bakan	cumhuriyet-halk-partisi	2023-06-02	2026-07-24	evrensel
 2023-05-14:35-1:9	Murat Bakan	yeni-parti-2026	2026-07-24		evrensel
-2023-05-14:35-2:11	Mehmet Salih Uzun	cumhuriyet-halk-partisi	2023-06-02	2026-07-24	evrensel
+2023-05-14:35-1:10	Ednan Arslan	cumhuriyet-halk-partisi	2023-06-02	2026-07-24	evrensel
+2023-05-14:35-1:10	Ednan Arslan	yeni-parti-2026	2026-07-24		evrensel
+2023-05-14:35-1:11	Seda Kâya Ösen	demokrasi-ve-atilim-partisi	2023-06-02	2025-04-22	wikipedia
+2023-05-14:35-1:11	Seda Kâya Ösen	cumhuriyet-halk-partisi	2025-05-19	2026-07-24	wikipedia
+2023-05-14:35-1:11	Seda Kâya Ösen	yeni-parti-2026	2026-07-24		evrensel
+2023-05-14:35-1:12	Haydar Altıntaş	demokrat-parti	2023-06-02		wikipedia
+2023-05-14:35-1:14	Ümit Özlale	iyi-parti	2023-06-02	2024-04-08	wikipedia
+2023-05-14:35-1:14	Ümit Özlale	iyi-parti	2024-04-27	2024-09-12	gazetemizmir
+2023-05-14:35-1:14	Ümit Özlale	cumhuriyet-halk-partisi	2024-12-03	2026-07-24	wikipedia
+2023-05-14:35-1:14	Ümit Özlale	yeni-parti-2026	2026-07-24		evrensel
+2023-05-14:35-2:7	Gökçe Gökçen	cumhuriyet-halk-partisi	2023-06-02	2026-07-24	evrensel
+2023-05-14:35-2:7	Gökçe Gökçen	yeni-parti-2026	2026-07-24		evrensel
+2023-05-14:35-2:11	Mehmet Salih Uzun	demokrat-parti	2023-06-02	2024-11-18	wikipedia
+2023-05-14:35-2:11	Mehmet Salih Uzun	cumhuriyet-halk-partisi	2025-02-04	2026-07-24	wikipedia
 2023-05-14:35-2:11	Mehmet Salih Uzun	yeni-parti-2026	2026-07-24		evrensel
 2023-05-14:35-2:12	Deniz Yücel	cumhuriyet-halk-partisi	2023-06-02	2026-07-24	evrensel
 2023-05-14:35-2:12	Deniz Yücel	yeni-parti-2026	2026-07-24		evrensel
-2023-05-14:35-2:7	Gökçe Gökçen	cumhuriyet-halk-partisi	2023-06-02	2026-07-24	evrensel
-2023-05-14:35-2:7	Gökçe Gökçen	yeni-parti-2026	2026-07-24		evrensel
+2023-05-14:35-2:13	Mustafa Bilici	gelecek-partisi	2023-06-02	2023-07-06	wikipedia
+2023-05-14:35-2:13	Mustafa Bilici	saadet-partisi	2023-07-06	2025-01-10	wikipedia
+2023-05-14:35-2:13	Mustafa Bilici	yeni-yol	2025-01-10	2026-08-14	wikipedia
+2023-05-14:35-2:13	Mustafa Bilici	adalet-ve-kalkinma-partisi	2026-08-14		wikipedia
 2023-05-14:38:8	Aşkın Genç	cumhuriyet-halk-partisi	2023-06-02	2026-07-24	evrensel
 2023-05-14:38:8	Aşkın Genç	yeni-parti-2026	2026-07-24		evrensel
+2023-05-14:38:9	Mahmut Arıkan	saadet-partisi	2023-06-02		wikipedia
+2023-05-14:38:10	Dursun Ataş	iyi-parti	2023-06-02	2024-09-06	wikipedia
+2023-05-14:38:10	Dursun Ataş	adalet-ve-kalkinma-partisi	2024-10-30		wikipedia
 2023-05-14:39:3	Fahri Özkan	cumhuriyet-halk-partisi	2023-06-02	2026-07-24	evrensel
 2023-05-14:39:3	Fahri Özkan	yeni-parti-2026	2026-07-24		evrensel
 2023-05-14:40:2	Metin İlhan	cumhuriyet-halk-partisi	2023-06-02	2026-07-24	evrensel
 2023-05-14:40:2	Metin İlhan	yeni-parti-2026	2026-07-24		evrensel
+2023-05-14:41:8	Saffet Sancaklı	milliyetci-hareket-partisi	2023-06-02	2023-12-10	wikipedia
+2023-05-14:41:8	Saffet Sancaklı	milliyetci-hareket-partisi	2024-04-15		wikipedia
 2023-05-14:41:10	Mühip Kanko	cumhuriyet-halk-partisi	2023-06-02	2026-07-24	evrensel
 2023-05-14:41:10	Mühip Kanko	yeni-parti-2026	2026-07-24		evrensel
 2023-05-14:41:11	Harun Özgür Yıldızlı	cumhuriyet-halk-partisi	2023-06-02	2026-07-24	evrensel
 2023-05-14:41:11	Harun Özgür Yıldızlı	yeni-parti-2026	2026-07-24		evrensel
+2023-05-14:41:12	Hasan Bitmez	saadet-partisi	2023-06-02		wikipedia
 2023-05-14:41:13	Nail Çiler	cumhuriyet-halk-partisi	2023-06-02	2026-07-24	evrensel
 2023-05-14:41:13	Nail Çiler	yeni-parti-2026	2026-07-24		evrensel
+2023-05-14:42:10	Ali Yüksel	yeniden-refah-partisi	2023-06-02	2026-08-31	wikipedia
+2023-05-14:42:10	Ali Yüksel	yeni-yol	2026-08-31		wikipedia
+2023-05-14:42:14	Hasan Ekici	gelecek-partisi	2023-06-02	2023-07-06	wikipedia
+2023-05-14:42:14	Hasan Ekici	saadet-partisi	2023-07-06	2025-01-10	wikipedia
+2023-05-14:42:14	Hasan Ekici	yeni-yol	2025-01-10	2025-05-14	wikipedia
+2023-05-14:42:14	Hasan Ekici	adalet-ve-kalkinma-partisi	2025-05-14		wikipedia
+2023-05-14:42:15	Ünal Karaman	iyi-parti	2023-06-02	2025-01-20	wikipedia
+2023-05-14:42:15	Ünal Karaman	adalet-ve-kalkinma-partisi	2025-02-23		wikipedia
+2023-05-14:43:5	Ali Fazıl Kasap	cumhuriyet-halk-partisi	2023-06-02	2023-12-16	wikipedia
+2023-05-14:43:5	Ali Fazıl Kasap	saadet-partisi	2023-12-16	2025-01-07	wikipedia
+2023-05-14:43:5	Ali Fazıl Kasap	cumhuriyet-halk-partisi	2025-01-07	2026-08-14	wikipedia
+2023-05-14:43:5	Ali Fazıl Kasap	yeni-yol	2026-08-14		wikipedia
 2023-05-14:44:6	Veli Ağbaba	cumhuriyet-halk-partisi	2023-06-02	2026-07-24	evrensel
 2023-05-14:44:6	Veli Ağbaba	yeni-parti-2026	2026-07-24		evrensel
 2023-05-14:45:6	Özgür Özel	cumhuriyet-halk-partisi	2023-06-02	2026-07-24	evrensel
@@ -152,36 +278,61 @@ member	name	party	valid_from	valid_to	source
 2023-05-14:45:7	Ahmet Vehbi Bakırlıoğlu	yeni-parti-2026	2026-07-24		evrensel
 2023-05-14:45:8	Bekir Başevirgen	cumhuriyet-halk-partisi	2023-06-02	2026-07-24	evrensel
 2023-05-14:45:8	Bekir Başevirgen	yeni-parti-2026	2026-07-24		evrensel
+2023-05-14:45:9	Selma Aliye Kavaf	demokrasi-ve-atilim-partisi	2023-06-02	2025-01-08	wikipedia
+2023-05-14:45:9	Selma Aliye Kavaf	cumhuriyet-halk-partisi	2025-01-28		wikipedia
+2023-05-14:46:8	İrfan Karatutlu	demokrasi-ve-atilim-partisi	2023-06-02	2025-01-10	wikipedia
+2023-05-14:46:8	İrfan Karatutlu	yeni-yol	2025-01-10	2026-01-05	wikipedia
+2023-05-14:46:8	İrfan Karatutlu	adalet-ve-kalkinma-partisi	2026-01-07		wikipedia
+2023-05-14:47:3	Salihe Aydeniz	baris-ve-demokrasi-partisi	2023-06-02	2023-11-12	wikipedia
+2023-05-14:47:3	Salihe Aydeniz	yesiller-ve-sol-gelecek-partisi	2023-11-12		wikipedia
 2023-05-14:48:3	Cumhur Uzun	cumhuriyet-halk-partisi	2023-06-02	2026-07-24	evrensel
 2023-05-14:48:3	Cumhur Uzun	yeni-parti-2026	2026-07-24		evrensel
 2023-05-14:48:4	Gizem Özcan	cumhuriyet-halk-partisi	2023-06-02	2026-07-24	evrensel
 2023-05-14:48:4	Gizem Özcan	yeni-parti-2026	2026-07-24		evrensel
 2023-05-14:48:5	Süreyya Öneş Derici	cumhuriyet-halk-partisi	2023-06-02	2026-07-24	evrensel
 2023-05-14:48:5	Süreyya Öneş Derici	yeni-parti-2026	2026-07-24		evrensel
+2023-05-14:48:6	Selçuk Özdağ	gelecek-partisi	2023-06-02	2023-07-06	wikipedia
+2023-05-14:48:6	Selçuk Özdağ	saadet-partisi	2023-07-06	2025-01-10	wikipedia
+2023-05-14:48:6	Selçuk Özdağ	yeni-yol	2025-01-10		wikipedia
 2023-05-14:52:5	Seyit Torun	cumhuriyet-halk-partisi	2023-06-02	2026-07-24	evrensel
 2023-05-14:52:5	Seyit Torun	yeni-parti-2026	2026-07-24		evrensel
 2023-05-14:53:3	Tahsin Ocaklı	cumhuriyet-halk-partisi	2023-06-02	2026-07-24	evrensel
 2023-05-14:53:3	Tahsin Ocaklı	yeni-parti-2026	2026-07-24		evrensel
 2023-05-14:54:7	Ayça Taşkent	cumhuriyet-halk-partisi	2023-06-02	2026-07-24	evrensel
 2023-05-14:54:7	Ayça Taşkent	yeni-parti-2026	2026-07-24		evrensel
+2023-05-14:54:8	Ümit Dikbayır	iyi-parti	2023-06-02	2023-12-05	wikipedia
+2023-05-14:54:8	Ümit Dikbayır	cumhuriyet-halk-partisi	2025-10-21	2026-06-23	wikipedia
 2023-05-14:55:7	Murat Çan	cumhuriyet-halk-partisi	2023-06-02	2026-07-24	evrensel
 2023-05-14:55:7	Murat Çan	yeni-parti-2026	2026-07-24		evrensel
+2023-05-14:55:8	Mehmet Karaman	saadet-partisi	2023-06-02	2025-01-10	wikipedia
+2023-05-14:55:8	Mehmet Karaman	yeni-yol	2025-01-10		wikipedia
 2023-05-14:57:2	Barış Karadeniz	cumhuriyet-halk-partisi	2023-06-02	2026-07-24	evrensel
 2023-05-14:57:2	Barış Karadeniz	yeni-parti-2026	2026-07-24		evrensel
 2023-05-14:58:5	Ulaş Karasu	cumhuriyet-halk-partisi	2023-06-02	2026-07-24	evrensel
 2023-05-14:58:5	Ulaş Karasu	yeni-parti-2026	2026-07-24		evrensel
+2023-05-14:59:6	Cem Avşar	demokrasi-ve-atilim-partisi	2023-06-02	2025-01-10	wikipedia
+2023-05-14:59:6	Cem Avşar	yeni-yol	2025-01-10	2025-06-27	wikipedia
+2023-05-14:59:6	Cem Avşar	cumhuriyet-halk-partisi	2025-07-23		wikipedia
 2023-05-14:61:5	Sibel Suiçmez	cumhuriyet-halk-partisi	2023-06-02	2026-07-24	evrensel
 2023-05-14:61:5	Sibel Suiçmez	yeni-parti-2026	2026-07-24		evrensel
+2023-05-14:63:10	Mithat Sancar	halklarin-demokratik-partisi	2023-06-02	2023-09-05	wikipedia
+2023-05-14:63:10	Mithat Sancar	yesiller-ve-sol-gelecek-partisi	2023-09-05		wikipedia
 2023-05-14:63:14	Mahmut Tanal	cumhuriyet-halk-partisi	2023-06-02	2026-07-24	evrensel
 2023-05-14:63:14	Mahmut Tanal	yeni-parti-2026	2026-07-24		evrensel
+2023-05-14:65:3	Pervin Buldan	halklarin-demokratik-partisi	2023-06-02	2023-09-05	wikipedia
+2023-05-14:65:3	Pervin Buldan	yesiller-ve-sol-gelecek-partisi	2023-09-05		wikipedia
 2023-05-14:67:4	Deniz Yavuzyılmaz	cumhuriyet-halk-partisi	2023-06-02	2026-07-24	evrensel
 2023-05-14:67:4	Deniz Yavuzyılmaz	yeni-parti-2026	2026-07-24		evrensel
 2023-05-14:67:5	Eylem Ertuğ Ertuğrul	cumhuriyet-halk-partisi	2023-06-02	2026-07-24	evrensel
 2023-05-14:67:5	Eylem Ertuğ Ertuğrul	yeni-parti-2026	2026-07-24		evrensel
+2023-05-14:68:3	Ramazan Kaşlı	milliyetci-hareket-partisi	2023-06-02	2026-03-12	wikipedia
 2023-05-14:70:3	İsmail Atakan Ünver	cumhuriyet-halk-partisi	2023-06-02	2026-07-24	evrensel
 2023-05-14:70:3	İsmail Atakan Ünver	yeni-parti-2026	2026-07-24		evrensel
+2023-05-14:72:2	Serkan Ramanlı	hur-dava-partisi	2023-06-02		wikipedia
+2023-05-14:72:3	Keskin Bayındır	baris-ve-demokrasi-partisi	2023-06-02		wikipedia
 2023-05-14:75:2	Özgür Erdem İncesu	cumhuriyet-halk-partisi	2023-06-02	2026-07-24	evrensel
 2023-05-14:75:2	Özgür Erdem İncesu	yeni-parti-2026	2026-07-24		evrensel
+2023-05-14:79:2	Mustafa Demir	milliyetci-hareket-partisi	2023-06-02	2024-11-20	wikipedia
 2023-05-14:80:4	Asu Kaya	cumhuriyet-halk-partisi	2023-06-02	2026-07-24	evrensel
 2023-05-14:80:4	Asu Kaya	yeni-parti-2026	2026-07-24		evrensel
 2023-05-14:81:3	Talih Özcan	cumhuriyet-halk-partisi	2023-06-02	2026-07-24	evrensel

@@ -27,7 +27,7 @@ from ea.changeset import Changeset, slug
 from ea.store import DATA, connect
 
 SOURCE = "tr.ysk"
-VERSION = "19"
+VERSION = "20"
 PARSED = DATA / "parsed" / SOURCE
 PAGES = DATA / "pages" / SOURCE
 SCANS = PARSED / "scans"
@@ -94,6 +94,15 @@ INAUGURATED_2018 = date(2018, 7, 9)
 MP_START = date(2023, 6, 2)
 MP_START_2018 = date(2018, 7, 7)
 ATALAY = ("ŞERAFETTİN CAN ATALAY", date(2024, 1, 30))
+ENDS_2023 = {
+    "2023-05-14:41:12": (date(2023, 12, 14), "died", None),
+    "2023-05-14:03:5": (date(2024, 4, 3), "disqualified", "mayor-2024"),
+    "2023-05-14:71:3": (date(2024, 4, 4), "disqualified", "mayor-2024"),
+    "2023-05-14:02:5": (date(2024, 4, 4), "disqualified", "mayor-2024"),
+    "2023-05-14:37:3": (date(2024, 4, 5), "disqualified", "mayor-2024"),
+    "2023-05-14:34-1:1": (date(2024, 7, 2), "disqualified", "Q51212178"),
+    "2023-05-14:34-1:18": (date(2025, 5, 3), "died", None),
+}
 RERUN = date(2019, 6, 23)
 MARCH = date(2019, 3, 31)
 MAYORALTY, LOCAL_ELECTIONS, RERUN_ELECTION, ARREST, IMAMOGLU = (
@@ -846,6 +855,23 @@ LEFT_2018 = {
         "be members of the Assembly."
     ),
     "Q106224801": "Left the Assembly after being elected mayor in the March 2019 local elections.",
+    "mayor-2024": "Left the Assembly after being elected mayor in the March 2024 local elections.",
+}
+SWITCH_NOTES = {
+    "2023-05-14:34-1:30": (
+        "Elected on the CHP list as a Gelecek Partisi member. Joined Saadet with nine other Gelecek members on July 6, "
+        "2023, so the two parties could form a group in the Assembly, and later returned to Gelecek on a date the "
+        "sources do not give, so the Saadet span runs to July 19, 2025, the day of leaving Gelecek."
+    ),
+    "2023-05-14:34-2:24": (
+        "Elected on the CHP list as a Gelecek Partisi member. Joined Saadet with nine other Gelecek members on July 6, "
+        "2023, so the two parties could form a group in the Assembly, and later returned to Gelecek on a date the "
+        "sources do not give, so the Saadet span runs to July 19, 2025, the day of leaving Gelecek."
+    ),
+    "2023-05-14:06-1:13": (
+        "Announced on October 21, 2026 a resignation from İYİ Parti and from the Assembly. The Assembly had not "
+        "yet listed the membership as ended, so the tenure stays open."
+    ),
 }
 CONVICTED = "Membership ended when a final court conviction was read out in the General Assembly."
 POOL_METHODOLOGY_2015 = (
@@ -1082,6 +1108,13 @@ SWITCH_SOURCES = {
         "Wikipedia",
         "TBMM 28. dönem milletvekilleri listesi",
         ".wiki",
+    ),
+    "tbmm": (
+        "https://www.tbmm.gov.tr/milletvekili/milletvekiligi-sona-erenler",
+        "official_body",
+        "Türkiye Büyük Millet Meclisi",
+        "Milletvekilliği Sona Erenler",
+        ".html",
     ),
     "gazetemizmir": (
         "https://www.gazetemizmir.com/umit-ozlale-iyi-parti-ye-geri-dondu/103275",
@@ -6692,7 +6725,7 @@ def emit() -> Path:
                 publisher=publisher,
                 title=heading,
                 url=url.replace("&action=raw", "").replace("w/index.php?title=", "wiki/"),
-                notes="Dates the party changes of members of the 28th Grand National Assembly.",
+                notes="Dates the party changes and ended memberships of members of the 28th Grand National Assembly.",
             )
             cs.artifact(raw.cached(SOURCE, url), switch_sources[code])
         switches: dict[str, list[tuple[str, date, date | None, str]]] = {}
@@ -7131,6 +7164,9 @@ def emit() -> Path:
                         terms = []
                     elif row["name"] == ATALAY[0]:
                         terms = [(MP_START, ATALAY[1], "removed", None, None)]
+                    elif member in ENDS_2023:
+                        end, ended_via, cause = ENDS_2023[member]
+                        terms = [(MP_START, end, ended_via, cause, None)]
                     else:
                         terms = [(MP_START, None, None, None, None)]
                     previous: UUID | None = None
@@ -7158,8 +7194,13 @@ def emit() -> Path:
                                 valid_from=valid_from,
                                 valid_to=valid_to,
                             )
-                        for cited in sorted({cited for *_, cited in spans}):
+                        for cited in sorted(
+                            {cited for *_, cited in spans}
+                            | ({"tbmm"} if day == ROUND_DAYS[1] and end is not None else set())
+                        ):
                             cs.add("citation", entity_id=tenure, source_id=switch_sources[cited], locator=None)
+                        if member in SWITCH_NOTES:
+                            cs.add("note", entity_id=tenure, kind="context", body_md=SWITCH_NOTES[member])
                         if statement is not None:
                             cs.add(
                                 "citation", entity_id=tenure, source_id=members_source, locator={"statement": statement}
@@ -7186,7 +7227,7 @@ def emit() -> Path:
                                 else ATALAY_REMOVED
                                 if day != DAY_2018
                                 else CONVICTED,
-                                source_id=members_source if day == DAY_2018 else None,
+                                source_id=members_source if day == DAY_2018 else switch_sources["tbmm"],
                             )
                         previous = tenure
 
