@@ -83,6 +83,10 @@ MN_2006 = (
     "?erselectionId=55&mediafileid=100"
 )
 AR_2006 = "https://www.sos.arkansas.gov/uploads/elections/Voices2006-WEB_sm.pdf"
+OH_2006 = (
+    "https://web.archive.org/web/20080522043004id_/http://www.sos.state.oh.us/sos/upload/elections/2006/gen/"
+    "Gen06Statewide.csv"
+)
 SCANS = {
     ("KS", date(2014, 11, 4)): (
         "https://www.sos.ks.gov/elections/14elec/2014%20General%20Election%20Results%20by%20county.pdf",
@@ -127,6 +131,17 @@ SCANS = {
         "2015 General Election amended statewide certification",
         "https://sos.ms.gov/elections-voting/election-results",
     ),
+    ("MS", date(2002, 11, 5)): (
+        (
+            "https://web.archive.org/web/20081128010129id_/http://www.sos.state.ms.us/elections/EleResults/"
+            "2002GeneralElection/OverallUSSenate.pdf"
+        ),
+        [1, 2, 3, 4, 5, 6, 7],
+        0,
+        "Mississippi Secretary of State",
+        "Total votes reported by county for the 2002 general election, U.S. Senator",
+        "http://www.sos.state.ms.us/elections/EleResults/2002GeneralElection/OverallUSSenate.pdf",
+    ),
 }
 OFFICIAL = {
     "AL": (
@@ -158,6 +173,12 @@ OFFICIAL = {
         "Voices: the 2006 elections",
         "https://www.sos.arkansas.gov/elections/research/election-results",
         [AR_2006],
+    ),
+    "OH": (
+        "Ohio Secretary of State",
+        "2006 General Election official results by precinct, statewide races",
+        "https://www.ohiosos.gov/elections/election-results-and-data/2006-elections-results/",
+        [OH_2006],
     ),
     "ME": (
         "Maine Secretary of State",
@@ -204,7 +225,9 @@ def fetch() -> None:
             raw.fetch(
                 SOURCE,
                 url,
-                suffix={SC_2010: ".csv", MN_2006: ".txt", ME_2006: ".txt", ME_2014: ".xlsx"}.get(url, ".pdf"),
+                suffix={SC_2010: ".csv", OH_2006: ".csv", MN_2006: ".txt", ME_2006: ".txt", ME_2014: ".xlsx"}.get(
+                    url, ".pdf"
+                ),
             )
 
 
@@ -394,6 +417,20 @@ def parse() -> None:
             code = county("05", found[1])
             for name, votes in zip(names, found[2].split()[:6], strict=True):
                 rows.append((date(2006, 11, 7), "AR", code, name, int(votes.replace(",", "")), "AR"))
+    ohio = {
+        "GOV_D_STRICKLAND": "TED STRICKLAND",
+        "GOV_R_BLACKWELL": "J. KENNETH BLACKWELL",
+        "GOV_PEIRCE": "WILLIAM S. (BILL) PEIRCE",
+        "GOV_FITRAKIS": "ROBERT (BOB) FITRAKIS",
+    }
+    for number, *votes in (
+        pl.read_csv(raw.cached(SOURCE, OH_2006).path, infer_schema_length=0)
+        .group_by("COUNTY_NUM")
+        .agg(pl.col(column).cast(pl.Int64).sum() for column in ohio)
+        .iter_rows()
+    ):
+        for name, count in zip(ohio.values(), votes, strict=True):
+            rows.append((date(2006, 11, 7), "OH", f"39{int(number) * 2 - 1:03}", name, count, "OH"))
     reads = pl.read_csv(READS, separator="\t", try_parse_dates=True).with_columns(
         candidate=pl.col("candidate").str.replace(r" \((D|WF)\)$", "")
     )
@@ -407,6 +444,7 @@ def parse() -> None:
         anchors: dict[int, tuple[int, float, float, float, int, int]] = {}
         columns: dict[int, tuple[int, float, float, float, float]] = {}
         heads = ["philbryant", "robertgray", "shawnohara"]
+        headed = set()
         at = 0
         for number in pages:
             image = PAGES / f"{pdf.sha256}-{number}.png"
@@ -427,7 +465,7 @@ def parse() -> None:
                 cells = word.split("\t")
                 if len(cells) == 12 and cells[11].strip():
                     found.setdefault((cells[2], cells[3], cells[4]), []).append(cells)
-            if state == "MS":
+            if state == "MS" and day.year == 2015:
                 lines = {
                     re.sub(r"[^a-z]", "", "".join(cell[11] for cell in line).lower()): line for line in found.values()
                 }
@@ -448,8 +486,20 @@ def parse() -> None:
                         top = min(int(cell[7]) for cell in line)
                         bottom = max(int(cell[7]) + int(cell[9]) for cell in line)
                         anchors[index] = (number, int(line[0][6]) / width, top / height, bottom / height, width, height)
+                        if not any(character.isdigit() for cell in line for character in cell[11]):
+                            headed.add(index)
                         at = index + 1
                         break
+        if len(headed) * 2 < len(anchors):
+            headed = set()
+        heights = sorted(
+            anchors[i + 1][2] - anchors[i][2] for i in headed if i + 1 in anchors and anchors[i + 1][0] == anchors[i][0]
+        )
+        for index in headed:
+            page, left, top, _, width, height = anchors[index]
+            after = anchors.get(index + 1)
+            bottom = after[2] - 0.01 if after is not None and after[0] == page else top + heights[len(heights) // 2]
+            anchors[index] = (page, left, top, bottom, width, height)
         if columns and len(columns) != len(order):
             raise ValueError(f"{state} {day}: {len(columns)} columns for {len(order)} counties")
         for index, name in enumerate(order):
@@ -514,7 +564,9 @@ def parse() -> None:
         schema=["day", "state", "code", "candidate", "votes", "source", "page", "x0", "y0", "x1", "y1"],
         orient="row",
     ).with_columns(
-        chamber=pl.lit("governor"),
+        chamber=pl.when((pl.col("state") == "MS") & (pl.col("day").dt.year() == 2002))
+        .then(pl.lit("senate"))
+        .otherwise(pl.lit("governor")),
         year=pl.col("day").dt.year().cast(pl.Int32),
         district=pl.lit(None, pl.Int16),
         special=pl.lit(False),
@@ -560,11 +612,11 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Governor generals by county, and New Mexico's 2012 U.S. Senate race, where the archive's only "
+            summary="Governor generals by county, and New Mexico's 2012 and Mississippi's 2002 U.S. Senate races, where the archive's only "
             "county breakdown came from ICPSR-derived returns: official canvasses for Alabama 2014, Arkansas 2006, "
-            "Florida 1982–2010, Illinois 2006, Maine 2006 and 2014, Minnesota 2006, New Mexico 2006 and 2012, Rhode "
+            "Florida 1982–2010, Illinois 2006, Maine 2006 and 2014, Minnesota 2006, New Mexico 2006 and 2012, Ohio 2006, Rhode "
             "Island 2006, and South Carolina 2010; scanned canvasses, transcribed by hand and located on their pages, "
-            "for Connecticut 2010, Kansas 2014, Kentucky 2011 and 2019, and Mississippi 2015; and OpenElections' "
+            "for Connecticut 2010, Kansas 2014, Kentucky 2011 and 2019, and Mississippi 2002 and 2015; and OpenElections' "
             "transcriptions for Arizona 2014, Montana 2008, and Oregon 2010",
             polity="US",
         )
