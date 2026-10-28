@@ -161,7 +161,9 @@ def emit() -> Path:
         held = {
             election_id
             for (election_id,) in conn.execute(
-                "select election_id from result_set where contest_id is null and is_default and status <> 'withdrawn'"
+                """select r.election_id from result_set r join changeset c on c.id = r.changeset_id
+                   where r.contest_id is null and r.is_default and r.status <> 'withdrawn' and c.pipeline <> %s""",
+                [SOURCE],
             )
         }
         cs = Changeset(
