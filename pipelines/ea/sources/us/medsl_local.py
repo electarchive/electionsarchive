@@ -2288,7 +2288,7 @@ def emit() -> Path:
                         target = precincts.get(place) or cs.unit("us.precinct", place)
                         if place not in precincts and place not in minted:
                             minted[place] = (county, day)
-                        if area != parents[county][1]:
+                        if area != parents[county][1] and votes > 0:
                             memberships.add((target, area, day))
                     cell = (
                         str(result_set),
@@ -2401,6 +2401,24 @@ def emit() -> Path:
                 orient="row",
             ),
         )
+        linked = {(target, area) for target, area, _ in memberships}
+        stale = [
+            pair
+            for pair in conn.execute(
+                """select ua.unit_id, ua.area_id from reporting_unit_area ua
+                   join changeset g on g.id = ua.changeset_id and g.pipeline = %s
+                   join reporting_unit u on u.id = ua.unit_id
+                   where not exists (
+                     select from contest c join result_set r on r.contest_id = c.id
+                     join result_value v on v.result_set_k = r.k
+                     where c.district_area_id = ua.area_id and v.unit_k = u.k and v.measure = 1 and v.value > 0)""",
+                [SOURCE],
+            ).fetchall()
+            if pair not in linked
+        ]
+        for unit, area in stale:
+            cs.add("unit_area_drop", unit_id=unit, area_id=area, reason="no votes in the district's contests")
+        print(f"{len(memberships)} memberships; {len(stale)} dropped")
         cs.frame(
             "reporting_unit_area",
             pl.DataFrame(
