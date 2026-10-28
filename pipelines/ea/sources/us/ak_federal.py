@@ -13,7 +13,7 @@ from ea.sources.us import medsl
 from ea.store import DATA, connect
 
 SOURCE = "us.ak_federal"
-VERSION = "2"
+VERSION = "3"
 PARSED = DATA / "parsed" / SOURCE
 BASE = "https://www.elections.alaska.gov/results/"
 FILES = {
@@ -22,6 +22,8 @@ FILES = {
     date(2018, 8, 21): "18PRIM/data/resultsbyprecinct.txt",
     date(2020, 8, 18): "20PRIM/data/sovc/resultsbyprecinct20.txt",
 }
+GENERAL = {date(2014, 11, 4): "14GENR/data/results-precinct.txt"}
+KINDS = {"Absentee": "absentee", "Question": "question", "Early Voting": "early"}
 SOVC = {
     date(2004, 8, 24): "04PRIM",
     date(2006, 8, 22): "06PRIM",
@@ -49,7 +51,7 @@ TITLE = "Primary election results by precinct"
 
 
 def fetch() -> None:
-    urls = [BASE + path for path in FILES.values()]
+    urls = [BASE + path for path in [*FILES.values(), *GENERAL.values()]]
     urls += [SOVC_URL.format(folder, number) for folder in SOVC.values() for number in range(1, 41)]
     for url in urls:
         try:
@@ -215,7 +217,69 @@ def parse() -> None:
                             votes,
                         )
                     )
+    precincts = []
+    for day, path in GENERAL.items():
+        for row in csv.reader(
+            raw.cached(SOURCE, BASE + path).path.read_text(encoding="latin-1").splitlines(), escapechar="\\"
+        ):
+            if len(row) < 6:
+                continue
+            place, race, name, _, column, votes = (cell.strip() for cell in row[:6])
+            office = {"UNITED STATES SENATOR": "senate", "US REPRESENTATIVE": "house"}.get(race)
+            if office is None or column != "Total" or name in STATS or not votes:
+                continue
+            writein = name.lower().startswith("write")
+            if precinct := re.match(r"(\d\d-\d\d\d) ", place):
+                code, kind = f"{day.year}:AK:{precinct[1]}", "precinct"
+            elif aggregate := re.fullmatch(r"District (\d+)\s*- (.*)", place):
+                code, kind = f"AK:{day.year}:{int(aggregate[1]):02}:{KINDS[aggregate[2]]}", "aggregate"
+            else:
+                raise ValueError(f"unknown place {place}")
+            precincts.append(
+                (
+                    day.year,
+                    office,
+                    day,
+                    0 if office == "house" else None,
+                    code,
+                    kind,
+                    "WRITE-INS" if writein else name.upper(),
+                    writein,
+                    int(votes),
+                )
+            )
     PARSED.mkdir(parents=True, exist_ok=True)
+    pl.DataFrame(
+        precincts,
+        schema={
+            "year": pl.Int32,
+            "chamber": pl.String,
+            "day": pl.Date,
+            "district": pl.Int16,
+            "code": pl.String,
+            "kind": pl.String,
+            "candidate": pl.String,
+            "writein": pl.Boolean,
+            "votes": pl.Int64,
+        },
+        orient="row",
+    ).group_by("year", "chamber", "day", "district", "code", "kind", "candidate", "writein").agg(
+        pl.col("votes").sum()
+    ).select(
+        "year",
+        "chamber",
+        "day",
+        special=pl.lit(False),
+        state=pl.lit("AK"),
+        district="district",
+        code="code",
+        kind="kind",
+        candidate="candidate",
+        measure=pl.lit(1, pl.Int16),
+        writein="writein",
+        votes="votes",
+        source=pl.lit("AK"),
+    ).write_parquet(PARSED / "precincts.parquet")
     pl.DataFrame(
         rows,
         schema={
@@ -246,7 +310,8 @@ def emit() -> Path:
             pipeline=SOURCE,
             version=VERSION,
             summary="Alaska's 2004, 2006, 2008, 2010, 2012, 2014, 2016, 2018, and 2020 U.S. Senate and House primaries and "
-            "2004–2012 U.S. Senate, House, governor, and presidential generals by House district",
+            "2004–2012 U.S. Senate, House, governor, and presidential generals by House district, and the 2014 U.S. Senate "
+            "and House generals by precinct",
             polity="US-AK",
         )
         source = cs.source(PUBLISHER, TITLE)
@@ -259,7 +324,7 @@ def emit() -> Path:
             url="https://www.elections.alaska.gov/election-results/",
             license="Public record",
         )
-        for url in [BASE + path for path in FILES.values()] + [
+        for url in [BASE + path for path in [*FILES.values(), *GENERAL.values()]] + [
             SOVC_URL.format(folder, number) for folder in SOVC.values() for number in range(1, 41)
         ]:
             cs.artifact(raw.cached(SOURCE, url), source)
@@ -282,4 +347,13 @@ def emit() -> Path:
                 valid_to=day + timedelta(days=1),
             )
         medsl.attach(cs, conn, frame, {"AK": source}, strict=True)
+        medsl.attach(
+            cs,
+            conn,
+            pl.read_parquet(PARSED / "precincts.parquet"),
+            {"AK": source},
+            grain="precinct",
+            strict=True,
+            authoritative="Source: the Division of Elections' official results by precinct.",
+        )
         return cs.write()

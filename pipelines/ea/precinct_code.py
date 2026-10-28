@@ -85,16 +85,16 @@ def links(conn: Connection, moved: pl.DataFrame, sets: list[str]) -> tuple[pl.Da
     )
     tombstoned = pl.DataFrame(
         conn.execute(
-            "select unit_id::text, area_id::text from unit_area_drop where unit_id = any(%s::uuid[])",
+            "select unit_id::text, area_id::text, reason from unit_area_drop where unit_id = any(%s::uuid[])",
             [moved["unit_id"].unique().to_list()],
         ).fetchall(),
-        schema={"unit_id": pl.String, "area_id": pl.String},
+        schema={"unit_id": pl.String, "area_id": pl.String, "reason": pl.String},
         orient="row",
     )
     dropped = (
         rows.filter(~pl.col("kept"))
-        .join(tombstoned, on=["unit_id", "area_id"], how="anti")
-        .select("unit_id", "area_id", reason=pl.lit("replaced by its canonical precinct code"))
+        .join(tombstoned, on=["unit_id", "area_id"], how="left")
+        .select("unit_id", "area_id", reason=pl.col("reason").fill_null("replaced by its canonical precinct code"))
         .unique(["unit_id", "area_id"])
     )
     print(f"{copied.height} memberships copied onto canonical units, {dropped.height} dropped from old units")

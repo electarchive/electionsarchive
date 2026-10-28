@@ -14,12 +14,12 @@ import httpx
 import polars as pl
 import shapefile
 
-from ea import raw
+from ea import precinct_code, raw
 from ea.changeset import NAMESPACE, Changeset, slug
 from ea.store import DATA, connect
 
 SOURCE = "us.la_local"
-VERSION = "1"
+VERSION = "2"
 PUBLISHER = "Louisiana Secretary of State"
 TITLE = "Official election results"
 DATA_URL = "https://voterportal.sos.la.gov/ElectionResults/ElectionResults/Data?blob="
@@ -590,19 +590,12 @@ def emit() -> Path:
                    join polity_territory t on t.area_id = a.id
                    join polity p on p.id = t.polity_id and p.kind = 'county'
                    join name n on n.entity_id = p.id and n.is_preferred and n.lang = 'en'
-                   join slug s on s.entity_id = p.id
+                   join slug s on s.entity_id = p.id and s.is_current
                    where a.scheme_code = 'us.county' and c.code like '22%%'"""
             ).fetchall()
         }
         if len(polities) != 64:
             raise ValueError("Louisiana needs 64 parishes")
-        names = dict(
-            conn.execute(
-                """select u.code, upper(n.text) from reporting_unit u
-                   join name n on n.entity_id = u.area_id and n.kind = 'short'
-                   where u.scheme_code = 'us.county' and u.code like '22%%'"""
-            ).fetchall()
-        )
         held = {
             code: (polity, text, path, kind)
             for code, polity, text, path, kind in conn.execute(
@@ -611,7 +604,7 @@ def emit() -> Path:
                    join polity_territory t on t.area_id = a.id
                    join polity p on p.id = t.polity_id and p.kind = 'municipality'
                    join name n on n.entity_id = p.id and n.is_preferred and n.lang = 'en'
-                   join slug s on s.entity_id = p.id
+                   join slug s on s.entity_id = p.id and s.is_current
                    where a.scheme_code = 'us.place' and c.code like '22%%'"""
             ).fetchall()
         }
@@ -687,14 +680,28 @@ def emit() -> Path:
             "scheme", code="us.special_district", polity_id=us, kind="administrative", rank=3, noun="special district"
         )
         special_names = dict(
-            contests.filter(pl.col("kind") == "special").select("code", "office").unique("code").iter_rows()
+            contests.filter(pl.col("kind") == "special")
+            .sort("day", "office")
+            .select("code", "office")
+            .unique("code", keep="first", maintain_order=True)
+            .iter_rows()
         )
+        published = {
+            str(polity): (text, path)
+            for polity, text, path in conn.execute(
+                """select p.id, n.text, s.path from polity p
+                   join name n on n.entity_id = p.id and n.is_preferred and n.lang = 'en'
+                   join slug s on s.entity_id = p.id and s.is_current
+                   where p.kind = 'special_district' and s.path like 'us/la/%%'"""
+            ).fetchall()
+        }
         for code, text in special_names.items():
             polity = cs.key("us.polity", f"special:{code}")
+            if polity not in cs.minted:
+                polities[code] = (polity, *published[str(polity)], "special")
+                continue
             path = f"{polities[code[:5]][2]}/{slug(text)}"
             polities[code] = (polity, text, path, "special")
-            if polity not in cs.minted:
-                continue
             if path in taken:
                 raise ValueError(f"{text} would take {path}")
             cs.add("polity", id=polity, kind="special_district", iso_code=None)
@@ -719,17 +726,6 @@ def emit() -> Path:
                 valid_from=None,
             )
 
-        precincts: dict[str, UUID] = dict(
-            conn.execute(
-                "select code, id from reporting_unit where scheme_code = 'us.precinct' and code like '____-__-__:LA:%%'"
-            ).fetchall()
-        )
-        parishes = {
-            code: (unit, area)
-            for code, unit, area in conn.execute(
-                "select code, id, area_id from reporting_unit where scheme_code = 'us.county' and code like '22%%'"
-            ).fetchall()
-        }
         grouped = {key: rows for key, rows in results.group_by("ckey")}
         choices = {key: rows for key, rows in options.group_by("ckey")}
         elections: dict[tuple[date, str], UUID] = {}
@@ -747,7 +743,8 @@ def emit() -> Path:
         }
         owners: dict[tuple[str, str], UUID] = {}
         persons: dict[UUID, str] = {}
-        minted: dict[str, tuple[date, str]] = {}
+        codes: set[str] = set()
+        sets: list[str] = []
         memberships: set[tuple[UUID, UUID, date]] = set()
         districts: set[str] = set()
         paths: set[str] = set()
@@ -901,6 +898,7 @@ def emit() -> Path:
                     body_md=DISTRICT.format(whole="parish" if owner_kind != "place" else "municipality"),
                 )
             result_set = cs.key(f"{SOURCE}.result_set", contest_key)
+            sets.append(str(result_set))
             cs.add(
                 "result_set",
                 id=result_set,
@@ -985,10 +983,9 @@ def emit() -> Path:
             ):
                 target = unit
                 if precinct is not None:
-                    place_code = f"{day}:LA:{fips}:{names[fips]}:{precinct}"
-                    target = precincts.get(place_code) or cs.unit("us.precinct", place_code)
-                    if place_code not in precincts:
-                        minted.setdefault(place_code, (day, fips))
+                    place_code = precinct_code.code(day.year, "LA", fips, precinct)
+                    target = cs.unit("us.precinct", place_code)
+                    codes.add(place_code)
                     if owner_kind != "parish" or district:
                         memberships.add((target, area, day))
                 cell = (target, made[canon[candidate]])
@@ -1005,20 +1002,19 @@ def emit() -> Path:
                     flags=0,
                     value=votes,
                 )
-        for place_code, (day, fips) in minted.items():
-            cs.add(
-                "reporting_unit",
-                id=cs.unit("us.precinct", place_code),
-                polity_id=state,
-                scheme_code="us.precinct",
-                code=place_code,
-                parent_id=parishes[fips][0],
-                area_relation="within",
-                area_id=parishes[fips][1],
-                kind="standard",
-                valid_from=day,
-                valid_to=day + timedelta(days=1),
-            )
+        precinct_code.units(cs, conn, pl.Series(sorted(codes)))
+        old = pl.DataFrame(
+            conn.execute(
+                """select u.id::text from reporting_unit u join changeset w on w.id = u.changeset_id
+                   where w.pipeline = %s and u.scheme_code = 'us.precinct' and u.code like '____-__-__:LA:%%'
+                   and extract(year from u.valid_from)::int / 10 * 10 = %s""",
+                [SOURCE, decade],
+            ).fetchall(),
+            schema={"unit_id": pl.String},
+            orient="row",
+        )
+        if old.height:
+            cs.frame("unit_area_drop", precinct_code.links(conn, old.with_columns(into=pl.col("unit_id")), sets)[1])
         for target, area, day in memberships:
             cs.add(
                 "reporting_unit_area",
