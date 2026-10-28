@@ -121,7 +121,7 @@ def main() -> None:
                 if args.action == "status"
                 else scans.reconcile()
                 if args.action == "ledger"
-                else f"{scans.reconcile()}\n{scans.bill()}"
+                else f"{scans.bill()}\n{scans.reconcile()}"
                 if args.action == "reconcile"
                 else layout.step(args.name, args.mode)
                 if args.action == "layout"
