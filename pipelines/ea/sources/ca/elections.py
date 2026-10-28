@@ -16,7 +16,7 @@ from ea.changeset import Changeset, slug
 from ea.store import DATA, connect
 
 SOURCE = "ca.elections"
-VERSION = "8"
+VERSION = "9"
 PARSED = DATA / "parsed" / SOURCE
 MAPS = "https://ftp.maps.canada.ca/pub/elections_elections/Electoral-districts_Circonscription-electorale"
 RESULTS = "https://www.elections.ca/res/rep/off"
@@ -816,7 +816,7 @@ def emit() -> Path:
                     role="head",
                     ballot_name=display,
                     member_of_party_id=party,
-                    is_independent=candidate["party"] == "Independent",
+                    is_independent=candidate["party"] in ("Independent", "No Affiliation"),
                     is_incumbent=candidate["incumbent"] == "Y",
                 )
                 if candidate["elected"] == "Y":

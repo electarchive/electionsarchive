@@ -18,7 +18,7 @@ from ea.sources.ca.elections import PROVINCES
 from ea.store import DATA, connect
 
 SOURCE = "ca.lop"
-VERSION = "2"
+VERSION = "3"
 PARSED = DATA / "parsed" / SOURCE
 DATASET = "https://open.canada.ca/data/en/dataset/ea8f2c37-90b6-4fee-857e-984d3060184e"
 HFER = "https://open.canada.ca/data/dataset/ea8f2c37-90b6-4fee-857e-984d3060184e/resource/5c8ab22c-4a5e-494b-879a-e0611bc10a95/download/hfer_e.csv"
@@ -621,7 +621,8 @@ def emit() -> Path:
                     member_of_party_id=None
                     if party is None or row["party"].startswith("Independent ") or row["party"] in NUANCES
                     else party,
-                    is_independent=row["party"].startswith("Independent"),
+                    is_independent=row["party"].startswith("Independent")
+                    or row["party"] == "No affiliation to a recognised party",
                 )
                 if row["party"] != row["printed_party"] and candidacy in cs.minted:
                     note(

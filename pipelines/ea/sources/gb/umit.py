@@ -13,7 +13,7 @@ from ea.changeset import Changeset, slug
 from ea.store import DATA, connect
 
 SOURCE = "gb.umit"
-VERSION = "2"
+VERSION = "3"
 PARSED = DATA / "parsed" / SOURCE
 DATAVERSE = "https://dataverse.harvard.edu/api/access/datafile"
 RESULTS = f"{DATAVERSE}/14037637?format=original"
@@ -553,34 +553,35 @@ NAMES = {
     "liberal-party-1989": "Liberal Party",
 }
 DERIVED_CAVEAT = (
-    "Umit's dataset marks no winners. The candidates shown as elected are those with the most votes, one for each seat."
+    "Our source for this result doesn't record who won, and we have no declared result for it. The candidates shown"
+    " as elected are the ones with the most votes, one for each seat."
 )
 STV_CAVEAT = (
-    "University seats elected their members by the single transferable vote from 1918 to 1945. Umit's dataset gives "
-    "first preferences only and marks no winners, so no candidate is shown as elected."
+    "University seats elected their members by the single transferable vote from 1918 to 1945. Our source gives "
+    "first preferences only and doesn't record who won, so no candidate is shown as elected."
 )
 MISSING_CAVEAT = (
-    "Umit's dataset lists no more candidates than seats in this contested race, so some candidates are missing and no "
+    "Our source lists no more candidates than seats in this contested race, so some candidates are missing and no "
     "candidate is shown as elected."
 )
 TIE_CAVEAT = (
-    "Two or more candidates tie for the last seat in Umit's dataset, so the tied candidates are not shown as elected."
+    "Two or more candidates tie for the last seat in our source, so the tied candidates are not shown as elected."
 )
 DECLARED_CAVEAT = (
-    "Umit's dataset marks no winners here. The candidates shown as elected are the members Wikidata records as "
-    "returned for this seat at this election."
+    "Our source for this result doesn't record who won. The candidates shown as elected are the members Wikidata "
+    "records as returned for this seat at this election."
 )
 HANSARD_CAVEAT = (
-    "Umit's dataset leaves at least one seat here without a winner. The candidates shown as elected are the members "
-    "Parliament's Historic Hansard records as sitting for this seat from this election."
+    "Our source for this result doesn't record who won at least one seat here. The candidates shown as elected are "
+    "the members Parliament's Historic Hansard records as sitting for this seat from this election."
 )
 COUNTED = {("1929-05-30", "eng-combined-english-universities")}
 COUNTED_CAVEAT = (
-    "Umit's dataset marks no winners here. The candidates shown as elected are those the House of Commons Library's "
-    "general election results (CBP-8647) give as elected at the second stage of the count."
+    "Our source for this result doesn't record who won. The candidates shown as elected are the ones the House of "
+    "Commons Library's general election results (CBP-8647) give as elected at the second stage of the count."
 )
 UNOPPOSED_CAVEAT = (
-    "Umit's dataset marks every candidate here as unopposed but lists more candidates than seats, so no candidate is "
+    "Our source marks every candidate here as unopposed but lists more candidates than seats, so no candidate is "
     "shown as elected."
 )
 STV = "Single transferable vote (university seats, 1918–1945)"
