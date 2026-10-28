@@ -1639,14 +1639,51 @@ def parse() -> None:
         "CONSTABLE": "Constable",
         "COUNTY COMMISSIONER": "Commissioner",
     }
-    for (county, post, district), group in filings.filter(pl.col("Office").is_in(list(titles))).group_by(
-        "County", "Office", "District"
-    ):
-        if group.filter(pl.col("Party").is_in(["REPUBLICAN PARTY", "DEMOCRATIC PARTY"]))[
-            "Party"
-        ].is_duplicated().any() or (district is None) == (
-            titles[str(post)] in ("Magistrate", "Constable", "Commissioner")
+    saipe = (
+        fastexcel.read_excel(raw.cached(cog.SOURCE, cog.SAIPE).path.read_bytes())
+        .load_sheet(0, header_row=2, dtypes="string")
+        .to_polars()
+    )
+    kentucky = {
+        coverage_tables.tokens(label): (f"{st}{code}", label)
+        for st, code, label in saipe.select("State FIPS Code", "District ID", "Name").iter_rows()
+        if st == "21"
+    }
+    schools: dict[str, tuple[str, str, str]] = {}
+    contests = []
+    for county, post, district, description in filings.select(
+        "County", "Office", "District", "Office Description"
+    ).iter_rows():
+        place = str(county).title().replace("Mccracken", "McCracken").replace("Mclean", "McLean")
+        city = " ".join(
+            re.sub(
+                r"\bCITY (?=COUNCIL|COMMISSION|LEGISLATIVE|MAYOR|OF)|^CITY\b|\b(COUNCIL|COUNCILMEMBERS?|MEMBERS?|COMMISSION|COMMISSIONERS?|MAYOR|OF|LEGISLATIVE|BODY)\b|[^A-Z ]",
+                " ",
+                str(description or "").upper(),
+            ).split()
+        ).title()
+        found = kentucky.get(coverage_tables.tokens(f"{place} County School District"))
+        if post in titles and (district is None) != (titles[str(post)] in ("Magistrate", "Constable", "Commissioner")):
+            contests.append(f"{place} County {titles[str(post)]}" + (f" District {district}" if district else ""))
+        elif (
+            post == "SCHOOL BOARD MEMBER"
+            and district is not None
+            and found is not None
+            and "INDEPENDENT" not in str(description or "").upper()
         ):
+            contest = f"{place} County Board of Education, Educational District {district}"
+            schools[contest] = (f"Board of Education, Educational District {district}", found[1], f"school:{found[0]}")
+            contests.append(contest)
+        elif post in ("MAYOR", "CITY LEGISLATIVE BODY") and city:
+            contests.append(f"City of {city} {'Mayor' if post == 'MAYOR' else 'City Council'}")
+        else:
+            contests.append(None)
+    for (county, contest), group in (
+        filings.with_columns(pl.Series("Contest", contests, dtype=pl.String))
+        .filter(pl.col("Contest").is_not_null())
+        .group_by("County", "Contest")
+    ):
+        if group.filter(pl.col("Party").is_in(["REPUBLICAN PARTY", "DEMOCRATIC PARTY"]))["Party"].is_duplicated().any():
             continue
         place = str(county).title().replace("Mccracken", "McCracken").replace("Mclean", "McLean")
         for row in group.iter_rows(named=True):
@@ -1656,8 +1693,8 @@ def parse() -> None:
             feeds["KY"].append(
                 {
                     "county": place,
-                    "contest": f"{place} County {titles[str(post)]}" + (f" District {district}" if district else ""),
-                    "seats": 1,
+                    "contest": contest,
+                    "seats": 0 if str(contest).endswith("City Council") else 1,
                     "name": " ".join(
                         cased(part)
                         for part in (
@@ -3566,11 +3603,6 @@ def parse() -> None:
                 [f"{DAY}:%", SOURCE],
             )
         } | {str(row["tail"]) for row in rows}
-        saipe = (
-            fastexcel.read_excel(raw.cached(cog.SOURCE, cog.SAIPE).path.read_bytes())
-            .load_sheet(0, header_row=2, dtypes="string")
-            .to_polars()
-        )
         index: dict[tuple[str, frozenset[str]], list[tuple[str, str]]] = defaultdict(list)
         for st, district, label in saipe.select("State FIPS Code", "District ID", "Name").iter_rows():
             index[(st, coverage_tables.tokens(label))].append((f"{st}{district}", label))
@@ -3610,16 +3642,16 @@ def parse() -> None:
             )
         cities: dict[tuple[str, frozenset[str]], list[tuple[str, str, str]]] = defaultdict(list)
         for st, geoid, full in (
-            gazetteer.filter(pl.col("USPS").is_in(["OR", "FL", "MI"]) & (pl.col("FUNCSTAT") == "A"))
+            gazetteer.filter(pl.col("USPS").is_in(["OR", "FL", "MI", "KY"]) & (pl.col("FUNCSTAT") == "A"))
             .select("USPS", "GEOID", "NAME")
             .iter_rows()
         ):
             label = re.sub(r" (city|town|village)$", "", full)
             cities[(st, coverage_tables.tokens(label))].append((geoid, label, full))
-        claimed = {path for (path,) in conn.execute("select path from slug where path ~ '^us/(or|fl|mi)/[^/]+$'")}
+        claimed = {path for (path,) in conn.execute("select path from slug where path ~ '^us/(or|fl|mi|ky)/[^/]+$'")}
         for st, county_code, label in conn.execute(
             """select g.state, g.county, g.name from coverage_government g
-               where g.kind = 'municipality' and g.polity_id is null and g.county is not null and g.state in ('OR', 'FL', 'MI')"""
+               where g.kind = 'municipality' and g.polity_id is null and g.county is not null and g.state in ('OR', 'FL', 'MI', 'KY')"""
         ).fetchall():
             hits = cities.get((st, coverage_tables.tokens(label)), [])
             if len(hits) == 1:
@@ -3667,7 +3699,7 @@ def parse() -> None:
             used: dict[str, str] = {}
             missed: set[str] = set()
             towns: dict[str, list[tuple[list[str], str, str, str, str]]] = defaultdict(list)
-            if "-" in key and key != "MN-county":
+            if "-" in key and key != "MN-county" or key == "KY":
                 for county_code, label, owner, path, kind in [
                     *conn.execute(
                         """select distinct on (g.id) g.county, g.name, x.value, s.path, g.kind from coverage_government g
@@ -3731,6 +3763,10 @@ def parse() -> None:
                 template, tail = tails.get((str(row["fips"]), str(row["contest"])), (None, None))
                 if row.get("tail") is not None:
                     template = tail = str(row["tail"]) if row["tail"] in exact else None
+                if key == "KY" and str(row["contest"]) in schools:
+                    title, district, owner = schools[str(row["contest"])]
+                    template, tail = "", f"KY:{owner.split(':')[1]}:board-of-education:{slug(title.split(', ')[1])}"
+                    minted[tail] = (title, district, owner, owned.get(owner) or f"us/ky/{slug(district)}")
                 place = places.get(str(row["fips"]), "").rsplit(",", 1)[0]
                 tokens = [
                     "mount" if token == "mt" else token
@@ -3792,6 +3828,8 @@ def parse() -> None:
                     template is None
                     and (
                         state in ("NJ", "MI", "FL", "OR")
+                        or state == "KY"
+                        and re.search(r"(?i)\bmayor$", str(row["contest"])) is not None
                         or state == "CA"
                         and bool(fits)
                         and fits[0][4].startswith("school:")
