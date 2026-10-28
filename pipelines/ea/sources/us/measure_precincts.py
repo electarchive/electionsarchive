@@ -1279,9 +1279,29 @@ def emit() -> Path:
             )
         )
         used = set(held["canonical"])
-        moved, moved_locators = precinct_code.remap(cs, conn, held)
+        moved, moved_locators, memberships, drops = precinct_code.remap(cs, conn, held)
         values.extend(moved)
         locators.extend(moved_locators)
+        strayed, unlinked = precinct_code.relink(
+            cs,
+            conn,
+            SOURCE,
+            scope,
+            [
+                precinct_code.expr(pl.col("year"), pl.col("state"), pl.col("fips"), pl.col("precinct")),
+                precinct_code.expr(
+                    pl.col("year"),
+                    pl.col("state"),
+                    pl.col("fips"),
+                    pl.when(
+                        (pl.col("jurisdiction") != "")
+                        & ~pl.col("precinct")
+                        .str.to_uppercase()
+                        .str.starts_with(pl.col("jurisdiction").str.to_uppercase())
+                    ).then(pl.concat_str("jurisdiction", "precinct", separator=" ")),
+                ),
+            ],
+        )
         for key, state, source, method, rows in candidates:
             if scope and state not in scope:
                 continue
@@ -1587,6 +1607,10 @@ def emit() -> Path:
             )
             cs.add("note", entity_id=UUID(row["id"]), kind="caveat", body_md=WITHDRAWN)
         precinct_code.units(cs, conn, pl.Series(sorted(used), dtype=pl.String), held)
+        if memberships.height or strayed.height:
+            cs.frame("reporting_unit_area", pl.concat([memberships, strayed]))
+        if drops.height or unlinked.height:
+            cs.frame("unit_area_drop", pl.concat([drops, unlinked]).unique(["unit_id", "area_id"]))
         if values:
             cs.frame("result_value", pl.concat(values))
         if locators:

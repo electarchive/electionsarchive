@@ -254,25 +254,7 @@ def emit() -> Path:
         )
         if before["canonical"].null_count():
             raise ValueError(f"{before['canonical'].null_count()} held units are missing from the {year} files")
-        moved, locators = precinct_code.remap(cs, conn, before)
-        old = before.select("unit_id", "canonical").unique()
-        moving = pl.DataFrame(
-            conn.execute(
-                """select unit_id::text, area_id::text, valid_from, valid_to, approximate, partial, method::text
-                       from reporting_unit_area where unit_id = any(%s::uuid[])""",
-                [old["unit_id"].to_list()],
-            ).fetchall(),
-            schema={
-                "unit_id": pl.String,
-                "area_id": pl.String,
-                "valid_from": pl.Date,
-                "valid_to": pl.Date,
-                "approximate": pl.Boolean,
-                "partial": pl.Boolean,
-                "method": pl.String,
-            },
-            orient="row",
-        ).join(old, on="unit_id")
+        moved, locators, moved_links, moved_drops = precinct_code.remap(cs, conn, before)
         named = before.sort("day").unique("canonical", keep="first").select("canonical", "name")
         values = []
         memberships: set[tuple[str, str]] = set()
@@ -513,17 +495,7 @@ def emit() -> Path:
             "reporting_unit_area",
             pl.concat(
                 [
-                    moving.select(
-                        unit_id=pl.col("canonical").map_elements(
-                            lambda code: str(cs.unit("us.precinct", code)), return_dtype=pl.String
-                        ),
-                        area_id="area_id",
-                        valid_from="valid_from",
-                        valid_to="valid_to",
-                        approximate="approximate",
-                        partial="partial",
-                        method="method",
-                    ),
+                    moved_links,
                     pl.DataFrame(
                         [(str(cs.unit("us.precinct", unit)), area) for unit, area in memberships],
                         schema=["unit_id", "area_id"],
@@ -536,16 +508,11 @@ def emit() -> Path:
                         method=pl.lit(None, dtype=pl.String),
                     ),
                 ],
-                how="vertical_relaxed",
-            ).unique(),
+                how="diagonal_relaxed",
+            ).unique(["unit_id", "area_id", "valid_from"]),
         )
-        if moving.height:
-            cs.frame(
-                "unit_area_drop",
-                moving.select(
-                    "unit_id", "area_id", reason=pl.format("{} is replaced by its canonical precinct code", "canonical")
-                ).unique(["unit_id", "area_id"]),
-            )
+        if moved_drops.height:
+            cs.frame("unit_area_drop", moved_drops)
         cs.frame(
             "result_value",
             pl.concat(

@@ -289,7 +289,14 @@ def emit() -> Path:
                 parts.struct.field("field_4"),
             )
         )
-        values, locators = precinct_code.remap(cs, conn, held)
+        values, locators, memberships, drops = precinct_code.remap(cs, conn, held)
+        strayed, unlinked = precinct_code.relink(
+            cs,
+            conn,
+            SOURCE,
+            scope,
+            [precinct_code.expr(pl.col("year"), pl.col("state"), pl.col("fips"), pl.col("precinct"))],
+        )
         minted: set[str] = set(held["canonical"])
         skipped: dict[str, list[str]] = {}
         missed: list[tuple[float, str, int, int]] = []
@@ -413,6 +420,10 @@ def emit() -> Path:
             print(f"{key}: {counted} by precinct against {official} ({ratio:.3f})")
         precinct_code.units(cs, conn, pl.Series(sorted(minted), dtype=pl.String), held)
         print(f"{held['result_set_id'].n_unique()} held sets, {len(values)} value frames, {len(minted)} units")
+        if memberships.height or strayed.height:
+            cs.frame("reporting_unit_area", pl.concat([memberships, strayed]))
+        if drops.height or unlinked.height:
+            cs.frame("unit_area_drop", pl.concat([drops, unlinked]).unique(["unit_id", "area_id"]))
         if values:
             cs.frame("result_value", pl.concat(values, how="vertical_relaxed"))
         if locators:

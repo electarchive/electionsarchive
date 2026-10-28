@@ -1,6 +1,5 @@
 import re
 from collections import Counter
-from datetime import date
 from pathlib import Path
 
 import polars as pl
@@ -62,7 +61,7 @@ def emit() -> Path:
             schema=["unit", "code", "valid_from", "valid_to", "county", "pipeline"],
             orient="row",
         ).with_columns(
-            vintage=pl.when(pl.col("valid_from") < date(2010, 4, 1)).then(2000).otherwise(2010),
+            vintage=pl.when(pl.col("valid_from").dt.year() < 2010).then(2000).otherwise(2010),
             year=pl.col("valid_from").dt.year(),
             state=pl.col("code").str.split(":").list.get(1),
         )
