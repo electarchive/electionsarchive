@@ -511,6 +511,7 @@ const Places = v.nullable(
     ),
     rows: v.array(PlaceRow),
     districts: v.optional(v.array(PlaceRow)),
+    total: v.optional(v.number()),
     noted: v.optional(
       v.array(
         v.object({ k: v.number(), name: v.string(), status: v.string() }),
@@ -1108,6 +1109,7 @@ async function load(
   facts: keyof typeof FACTS = "area",
   spread: Map<number, Array<[number, number]>> | null = null,
   isFirst = false,
+  only: Array<number> | null = null,
 ) {
   const loaded = new Map<
     number,
@@ -1150,6 +1152,7 @@ async function load(
     sets as materialized (
       select rs.k, rs.id, rs.contest_id, grp.root, rs.stage, rs.status, rs.completeness, rs.is_default, rs.source_id
       from grp cross join lateral (select * from result_set x where x.contest_id = grp.id and x.status <> 'withdrawn' offset 0) rs
+      ${only == null ? sql`` : sql`where rs.k = any(${sql.param(only)}::int[])`}
     ),
     picked as (
       select distinct on (rs.contest_id, a.k) a.k as area, rs.k, rs.id, rs.contest_id as contest, rs.root, rs.stage, rs.status,
@@ -2567,8 +2570,55 @@ async function places(
   const joined = new Set(
     kids.filter((kid) => kid.isMember).map((kid) => kid.scheme),
   );
+  const checked = kids.filter((kid) =>
+    eligible.some((level) => level.code === kid.scheme),
+  );
+  const straddled =
+    checked.length > 600
+      ? null
+      : await db.execute<{ k: number }>(sql`
+              with me as materialized (
+                select geom from area_geometry where area_id = ${area.id}::uuid
+                order by valid @> ${contest.date ?? "infinity"}::date desc, upper(valid) desc nulls first limit 1
+              ),
+              straddling as materialized (
+                select a.id, a.k from area a
+                cross join me
+                cross join lateral (
+                  select g.geom from area_geometry g where g.area_id = a.id
+                  order by g.valid @> ${contest.date ?? "infinity"}::date desc, upper(g.valid) desc nulls first limit 1
+                ) g
+                where a.k = any(${sql.param(checked.map((kid) => kid.k))}::int[])
+                  and not exists (
+                    select from area_parent p
+                    where p.area_id = a.id and p.parent_id = ${area.id}::uuid and p.valid @> ${contest.date ?? "infinity"}::date
+                  )
+                  and ST_Area(ST_Intersection(g.geom, me.geom)) < 0.95 * ST_Area(g.geom)
+              ),
+              siblings as materialized (
+                select rs.k from contest own
+                join contest c on c.election_id = own.election_id and c.id <> own.id
+                  and (c.office_id = own.office_id or c.body_id = own.body_id)
+                join result_set rs on rs.contest_id = c.id and rs.status = 'active'
+                where own.id = ${contest.id}::uuid
+              )
+              select s.k from straddling s
+              where not exists (
+                  select from reporting_unit ru
+                  join result_value v on v.unit_k = ru.k
+                  join result_set rs on rs.k = v.result_set_k and rs.contest_id = ${contest.id}::uuid
+                  where ru.area_id = s.id and ru.area_relation = 'equals'
+                )
+                or exists (select from siblings x join result_rollup_unit u on u.result_set_k = x.k and u.area_k = s.k)
+                or exists (select from siblings x join result_rollup_sum r on r.result_set_k = x.k and r.area_k = s.k)
+            `);
+  const split = new Set(straddled?.rows.map((row) => row.k) ?? []);
+  const partial = new Set(
+    checked.filter((kid) => split.has(kid.k)).map((kid) => kid.scheme),
+  );
   const levels = eligible.toSorted(
     (a, b) =>
+      Number(partial.has(a.code)) - Number(partial.has(b.code)) ||
       Number(joined.has(a.code)) - Number(joined.has(b.code)) ||
       a.rank - b.rank ||
       Number(
@@ -2599,9 +2649,10 @@ async function places(
     tail != null && shown.every((kid) => kid.name.endsWith(tail));
   const rows = shown.map((kid) => {
     const child = childPath.get(kid.id);
+    const name = isShared ? kid.name.slice(0, -tail.length) : kid.name;
     return {
       k: kid.k,
-      name: isShared ? kid.name.slice(0, -tail.length) : kid.name,
+      name: split.has(kid.k) ? m.map_part({ name }) : name,
       path: child ?? (base == null ? null : `${base}/${kid.segment}`),
       isContest: child != null,
       owner: null,
@@ -2761,7 +2812,7 @@ async function places(
         : { ...row, earlier: null, prior: null, redrawn: overlap };
     }),
   };
-  const [turned, prior] = await Promise.all([
+  const [turned, prior, whole] = await Promise.all([
     turnout(
       contest.root,
       listed.map((row) => row.k),
@@ -2769,6 +2820,18 @@ async function places(
     turnout(
       chosen?.id ?? null,
       listed.map((row) => row.k),
+    ),
+    load(
+      [contest.root],
+      [area.k],
+      contest.date ?? "infinity",
+      [],
+      [],
+      round,
+      "area",
+      null,
+      false,
+      counted.sets,
     ),
   ]);
   const seats = new Map(allocated.rows.map((row) => [row.k, row.seats]));
@@ -2834,6 +2897,7 @@ async function places(
     })),
     level: level.code,
     ...tabulated,
+    total: whole.get(area.k)?.side.valid,
     estimated: spread.size > 0,
     ...(waited != null && {
       pending: waiting
@@ -3310,6 +3374,16 @@ async function tabulate(
     ),
     sources: [...sources],
     unreconciled: unreconciled.values().toArray(),
+    sets: [
+      ...new Set(
+        now.flatMap((found) =>
+          found
+            .values()
+            .flatMap((entry) => entry.ks)
+            .toArray(),
+        ),
+      ),
+    ],
   };
 }
 
