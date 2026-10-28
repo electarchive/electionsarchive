@@ -4,24 +4,27 @@ import io
 import json
 import re
 import subprocess
+import unicodedata
 import zipfile
 from collections import Counter, defaultdict
 from datetime import UTC, date, datetime
 from itertools import pairwise
 from pathlib import Path
 
+import fastexcel
 import httpx
 import polars as pl
 
-from ea import coverage, raw
+from ea import coverage, coverage_tables, raw
 from ea.changeset import Changeset, slug
-from ea.sources.us import mn_local
+from ea.sources.us import cog, mn_local
 from ea.sources.us.sld_primaries_2026 import cased
 from ea.store import DATA, connect
 
 SOURCE = "us.local_2026"
 VERSION = "1"
 DAY = date(2026, 11, 3)
+GAZETTEER = "https://www2.census.gov/geo/docs/maps-data/data/gazetteer/2020_Gazetteer/2020_Gaz_place_national.zip"
 PARSED = DATA / "parsed" / SOURCE
 FILES = {
     "06037": "https://content.lavote.gov/docs/rrcc/documents/final-list-of-qualified-candidates-to-appear-on-the-ballot9fcf3b64-1a33-4882-9e17-8cbc3b3c8d76.pdf",
@@ -770,6 +773,78 @@ FEEDS.update(
         for group, (county, _, label) in VOTERFOCUS.items()
     }
 )
+OCVR = {
+    "OR-41053": (
+        "Polk",
+        "https://www.polkcountyor.gov/DocumentCenter/View/6955/Ballot-Content-for-November-3-2026-Election",
+        "Polk County Clerk Elections",
+    ),
+    "OR-41039": (
+        "Lane",
+        "https://www.lanecounty.org/UserFiles/Servers/Server_3585797/File/County%20Clerk/Elections/Dated%20Elections/November%203,%202026/GE26_E_019%20Web.pdf",
+        "Lane County Elections",
+    ),
+    "OR-41051": (
+        "Multnomah",
+        "https://multco.us/file/ballot_content_-_nov._2026/download",
+        "Multnomah County Elections",
+    ),
+}
+FEEDS.update(
+    {
+        key: (
+            url,
+            publisher,
+            "Ballot Content, November 3, 2026 General Election (Oregon Centralized Voter Registration report E-019)",
+        )
+        for key, (_, url, publisher) in OCVR.items()
+    }
+    | {
+        "OR-41051-rcv": (
+            "https://multco.us/file/ballot_content_rcv_-_nov._2026/download",
+            "Multnomah County Elections",
+            "Ballot Content RCV, November 3, 2026 General Election (Oregon Centralized Voter Registration report E-019)",
+        ),
+        "OR-41005": (
+            "https://dochub.clackamas.us/documents/drupal/03f4f9db-a1ab-4a1f-9ce1-16059d49a513",
+            "Clackamas County Elections",
+            "Voters' Pamphlet, November 3, 2026 General Election: Table of Contents (Candidates)",
+        ),
+        "OR-41067": (
+            "https://www.washingtoncountyor.gov/elections/current-election",
+            "Washington County Elections Division",
+            "November 3, 2026 General Election: Candidate Positions",
+        ),
+    }
+    | {
+        f"OR-41067-{city}": (
+            f"https://www.washingtoncountyor.gov/elections/documents/city-{document}/download?inline",
+            f"City of {city.replace('-', ' ').title()}",
+            "Certification of Candidates, November 3, 2026 General Election (filed with Washington County Elections)",
+        )
+        for city, document in (
+            *(
+                (city, f"{city}-certified-candidates-nov-2026")
+                for city in (
+                    "banks",
+                    "cornelius",
+                    "durham",
+                    "forest-grove",
+                    "gaston",
+                    "hillsboro",
+                    "king-city",
+                    "lake-oswego",
+                    "north-plains",
+                    "rivergrove",
+                    "sherwood",
+                    "tigard",
+                    "tualatin",
+                )
+            ),
+            ("wilsonville", "tualatin-certified-candidates-nov-2026-0"),
+        )
+    }
+)
 LOCAL_BODY = re.compile(
     r"(?i)school|\btown\b|\bcity\b|village|township|education|trustee|soil|water|hospital|fire|library|sanitary"
     r"|conservation|cemetery|\bparks?\b|airport|\bport\b|utility|levee|drainage|college|recreation"
@@ -1202,7 +1277,11 @@ def fetch() -> None:
                     }.get(DELIVERED[state].suffix, "text/csv"),
                 )
             continue
-        raw.fetch(SOURCE, url, suffix=".html" if "voterfocus" in url else Path(url).suffix or ".pdf")
+        raw.fetch(
+            SOURCE,
+            url,
+            suffix=".html" if "voterfocus" in url or url.endswith("current-election") else Path(url).suffix or ".pdf",
+        )
         if state in PRIMARIES:
             raw.fetch(SOURCE, PRIMARIES[state], suffix=".zip")
     for fips, url in FILES.items():
@@ -1619,6 +1698,54 @@ def parse() -> None:
                 "unexpired": False,
             }
         )
+
+    for key, (county, url, _) in OCVR.items():
+        report = subprocess.run(
+            ["pdftotext", "-layout", str(raw.cached(SOURCE, url).path), "-"], capture_output=True, text=True, check=True
+        ).stdout
+        section, contest, depth, seats, unexpired, open_ = "", "", 0, 1, False, False
+        for line in report.splitlines():
+            depth_here = len(line) - len(line.lstrip(" "))
+            body = line.strip()
+            if not body or re.match(
+                r"County: |Ballot Content|Report No|Election :|Oregon Centralized|Number Candidates Filed|Contest Total|:$",
+                body,
+            ):
+                continue
+            if depth_here == 1:
+                section, contest = body, ""
+                continue
+            if section not in ("City Offices", "County Offices", "District Offices") or depth_here <= 3:
+                continue
+            if found := re.match(r"(.*?)\s{2,}Vote for (\d+)", line.strip()):
+                contest, depth, seats, unexpired, open_ = found[1], depth_here, int(found[2]), "Unexpired" in line, True
+                continue
+            if not contest:
+                continue
+            if depth_here == depth and open_:
+                contest = f"{contest}{'' if contest.endswith('-') else ' '}{body}"
+                continue
+            if depth_here > 40:
+                continue
+            open_ = False
+            if section == "District Offices" and not re.search(r"(?i)school", contest):
+                continue
+            name, *rest = re.split(r"\s{2,}", body)
+            name = re.sub(r"\s+-\s+Incumbent$", "", name)
+            named, independent = party(rest[0] if rest else None)
+            feeds[key].append(
+                {
+                    "county": county,
+                    "contest": re.sub(r"^(\w[\w .]*? County),", r"\1", contest)
+                    if section != "County Offices" or contest.startswith(f"{county} County")
+                    else f"{county} County {contest}",
+                    "seats": seats,
+                    "name": name,
+                    "party": named,
+                    "independent": independent,
+                    "unexpired": unexpired,
+                }
+            )
 
     for row in csv.DictReader(io.StringIO(raw.cached(SOURCE, FEEDS["SC"][0]).path.read_text(encoding="utf-8-sig"))):
         title = row["Office"].strip()
@@ -3440,6 +3567,54 @@ def parse() -> None:
                 [f"{DAY}:%", SOURCE],
             )
         } | {str(row["tail"]) for row in rows}
+        saipe = (
+            fastexcel.read_excel(raw.cached(cog.SOURCE, cog.SAIPE).path.read_bytes())
+            .load_sheet(0, header_row=2, dtypes="string")
+            .to_polars()
+        )
+        index: dict[tuple[str, frozenset[str]], list[tuple[str, str]]] = defaultdict(list)
+        for st, district, label in saipe.select("State FIPS Code", "District ID", "Name").iter_rows():
+            index[(st, coverage_tables.tokens(label))].append((f"{st}{district}", label))
+        unowned: dict[str, list[tuple[str, str, str, str, str]]] = defaultdict(list)
+        for st, county_code, label in conn.execute(
+            """select g.state, g.county, g.name from coverage_government g
+               where g.kind = 'school' and g.polity_id is null and g.county is not null and g.state in ('MI')"""
+        ).fetchall():
+            mine = coverage_tables.tokens(label)
+            hits = [
+                hit
+                for (code_st, theirs), found in index.items()
+                if code_st == county_code[:2] and (theirs == mine or theirs < mine or mine < theirs)
+                for hit in found
+            ]
+            alike = [hit for hit in hits if coverage_tables.tokens(hit[1]) == mine]
+            if len(alike or hits) == 1:
+                code, district = (alike or hits)[0]
+                unowned[st].append(
+                    (county_code, district, f"school:{code}", f"us/{st.lower()}/{slug(district)}", "school")
+                )
+        with zipfile.ZipFile(raw.fetch(SOURCE, GAZETTEER, suffix=".zip").path) as archive:
+            gazetteer = pl.read_csv(archive.read(archive.namelist()[0]), separator="\t", infer_schema=False).rename(
+                lambda column: column.strip()
+            )
+        cities: dict[tuple[str, frozenset[str]], list[tuple[str, str]]] = defaultdict(list)
+        for st, geoid, label in (
+            gazetteer.filter(pl.col("USPS").is_in(["OR"]) & (pl.col("FUNCSTAT") == "A"))
+            .select("USPS", "GEOID", "NAME")
+            .iter_rows()
+        ):
+            label = re.sub(r" (city|town|village)$", "", label)
+            cities[(st, coverage_tables.tokens(label))].append((geoid, label))
+        for st, county_code, label in conn.execute(
+            """select g.state, g.county, g.name from coverage_government g
+               where g.kind = 'municipality' and g.polity_id is null and g.county is not null and g.state in ('OR')"""
+        ).fetchall():
+            hits = cities.get((st, coverage_tables.tokens(label)), [])
+            if len(hits) == 1:
+                geoid, district = hits[0]
+                unowned[st].append(
+                    (county_code, district, f"place:{geoid}", f"us/{st.lower()}/{slug(district)}", "municipality")
+                )
         for key, found in feeds.items():
             state = key.split("-")[0]
             prefix = next(fips for st, fips, _ in conn.execute(coverage.STATES_SQL) if st == state)
@@ -3474,16 +3649,29 @@ def parse() -> None:
             missed: set[str] = set()
             towns: dict[str, list[tuple[list[str], str, str, str, str]]] = defaultdict(list)
             if "-" in key and key != "MN-county":
-                for county_code, label, owner, path, kind in conn.execute(
-                    """select distinct on (g.id) g.county, g.name, x.value, s.path, g.kind from coverage_government g
+                for county_code, label, owner, path, kind in [
+                    *conn.execute(
+                        """select distinct on (g.id) g.county, g.name, x.value, s.path, g.kind from coverage_government g
                        join external_id x on x.entity_id = g.polity_id and x.scheme = 'us.polity'
                            and x.value ~ '^(place|town|school):'
                        join slug s on s.entity_id = g.polity_id
                        where g.state = %s and (g.kind in ('municipality', 'township') or g.kind = 'school' and g.state in ('MI', 'CA'))
                        order by g.id, x.value desc, s.path""",
-                    [state],
-                ):
-                    stem = re.findall(r"[a-z0-9]+", label.lower().replace("&", " and "))
+                        [state],
+                    ),
+                    *unowned.get(state, []),
+                ]:
+                    stem = [
+                        "mount" if word == "mt" else word
+                        for word in re.findall(
+                            r"[a-z0-9]+",
+                            unicodedata.normalize("NFKD", label)
+                            .encode("ascii", "ignore")
+                            .decode()
+                            .lower()
+                            .replace("&", " and "),
+                        )
+                    ]
                     towns[county_code].append(
                         (
                             [
@@ -3491,7 +3679,16 @@ def parse() -> None:
                                 for word in stem
                                 if word
                                 not in (
-                                    ("public", "schools", "school", "district", "community", "area", "consolidated")
+                                    (
+                                        "public",
+                                        "schools",
+                                        "school",
+                                        "district",
+                                        "community",
+                                        "area",
+                                        "consolidated",
+                                        "elementary",
+                                    )
                                     if kind == "school"
                                     else ("township", "borough", "city", "town", "village", "charter")
                                 )
@@ -3516,14 +3713,27 @@ def parse() -> None:
                 if row.get("tail") is not None:
                     template = tail = str(row["tail"]) if row["tail"] in exact else None
                 place = places.get(str(row["fips"]), "").rsplit(",", 1)[0]
-                tokens = re.findall(
-                    r"[a-z0-9]+",
-                    re.sub(
-                        r"\bcharter township\b",
-                        "township",
-                        re.sub(r"(?i)\btwp\b", "township", str(row["contest"]).lower().replace("&", " and ")),
-                    ),
-                )
+                tokens = [
+                    "mount" if token == "mt" else token
+                    for token in re.findall(
+                        r"[a-z0-9]+",
+                        re.sub(
+                            r"\bcharter township\b",
+                            "township",
+                            re.sub(
+                                r"(?i)\btwp\b",
+                                "township",
+                                unicodedata.normalize("NFKD", str(row["contest"]))
+                                .encode("ascii", "ignore")
+                                .decode()
+                                .lower()
+                                .replace("&", " and "),
+                            ),
+                        ),
+                    )
+                ]
+                if tokens[:3] == ["governing", "board", "member"]:
+                    tokens = tokens[3:]
                 fits = []
                 for stem, sort, label, owner, path in towns.get(str(row["fips"]), []):
                     for start in (
@@ -3558,7 +3768,10 @@ def parse() -> None:
                 if (
                     template is None
                     and (
-                        state in ("NJ", "MI", "FL") or state == "CA" and bool(fits) and fits[0][4].startswith("school:")
+                        state in ("NJ", "MI", "FL", "OR")
+                        or state == "CA"
+                        and bool(fits)
+                        and fits[0][4].startswith("school:")
                     )
                     and len({fit[4] for fit in fits}) == 1
                     and (
@@ -3585,7 +3798,10 @@ def parse() -> None:
                                     (r"(?<!president of )(?<!deputy )\bmayor\b", "mayor"),
                                     (r"\bboard of education\b|\bschool board\b|\bboe\b", "board-of-education"),
                                     (r"\bcommittee\b", "committee"),
-                                    (r"\bcouncil\b|\bcouncilm[ae]n\b|\bcouncilmember\b|\balderm[ae]n\b", "council"),
+                                    (
+                                        r"\bcouncil\b|\bcouncilors?\b|\bcouncilm[ae]n\b|\bcouncilmember\b|\balderm[ae]n\b",
+                                        "council",
+                                    ),
                                     (r"\bcommission(?:er|ers)?\b", "commission"),
                                     (r"\btrustees?\b", "board-of-trustees"),
                                 )
@@ -3608,7 +3824,7 @@ def parse() -> None:
                         (f"Ward {ward[1] or ward[2] or ward[3]}" if ward[4] is None else f"{ward[4].title()} Ward")
                         if ward and role in ("council", "commission")
                         else f"{other[1].title()} {other[2]}"
-                        if (other := re.search(r"\b(seat|district|group|place|zone) (\d+)\b", post))
+                        if (other := re.search(r"\b(seat|district|group|place|zone|position) (\d+)\b", post))
                         and role in ("council", "commission")
                         else "At-Large"
                         if role in ("council", "commission") and re.search(r"\bat large\b", post)
@@ -3801,6 +4017,7 @@ def emit() -> Path:
         created: set[str] = set()
         made: set[object] = set()
         homes: dict[str, str] = {}
+        homeless: set[object] = set()
         for (fips, tail, template), group in frame.group_by(["fips", "tail", "template"], maintain_order=True):
             if template == "" and group["owner"][0]:
                 title, place, owner, home = (str(group[column][0]) for column in ("title", "place", "owner", "home"))
@@ -3808,6 +4025,54 @@ def emit() -> Path:
                 polity = cs.key("us.polity", owner)
                 body = role not in ("mayor", "supervisor", "clerk", "treasurer", "president")
                 holder = cs.key("us.body" if body else "us.office", f"{st}:{code}:{role}")
+                if polity in cs.minted and polity not in made and owner.startswith(("school:", "place:")):
+                    made.add(polity)
+                    if conn.execute("select 1 from slug where path = %s", [home]).fetchone() is not None:
+                        homeless.add(polity)
+                        print(f"slug taken: {home}")
+                    else:
+                        geoid = owner.split(":")[1]
+                        scheme, polity_kind = (
+                            ("us.school_district", "school_district")
+                            if owner.startswith("school:")
+                            else ("us.place", "municipality")
+                        )
+                        cs.add("polity", id=polity, kind=polity_kind, iso_code=None)
+                        name(polity, place)
+                        cs.add("polity_parent", polity_id=polity, parent_id=cs.polity(f"US-{st}"))
+                        cs.add("slug", path=home, entity_id=polity)
+                        district_area = cs.area(scheme, geoid)
+                        if district_area in cs.minted:
+                            cs.add("area", id=district_area, scheme_code=scheme)
+                            cs.add("area_code", area_id=district_area, code=geoid, valid_from=None)
+                            cs.add("area_parent", area_id=district_area, parent_id=cs.area("us.state", geoid[:2]))
+                            name(district_area, f"{place}, {st}")
+                        cs.add("polity_territory", polity_id=polity, area_id=district_area)
+                        cs.add(
+                            "reporting_unit",
+                            id=cs.unit(scheme, geoid),
+                            polity_id=polity,
+                            scheme_code=scheme,
+                            code=geoid,
+                            area_relation="equals",
+                            area_id=district_area,
+                            kind="standard",
+                            valid_from=None,
+                        )
+                whole = (
+                    (cs.area("us.school_district" if owner.startswith("school:") else "us.place", owner.split(":")[1]),)
+                    if polity in cs.minted
+                    else conn.execute(
+                        "select t.area_id from polity_territory t join polity p on p.id = t.polity_id"
+                        " join external_id x on x.entity_id = p.id and x.scheme = 'us.polity' and x.value = %s"
+                        " order by t.valid_from desc nulls last limit 1",
+                        [owner],
+                    ).fetchone()
+                )
+                if whole is None or polity in homeless:
+                    counts["no template"] += 1
+                    print(f"no territory: {tail} {owner}")
+                    continue
                 if holder in cs.minted and holder not in made:
                     made.add(holder)
                     if body:
@@ -3816,16 +4081,6 @@ def emit() -> Path:
                     else:
                         cs.add("office", id=holder, polity_id=polity, kind="mayor" if role == "mayor" else "other")
                         name(holder, f"Mayor of {place}" if role == "mayor" else f"{place} {title}")
-                whole = conn.execute(
-                    "select t.area_id from polity_territory t join polity p on p.id = t.polity_id"
-                    " join external_id x on x.entity_id = p.id and x.scheme = 'us.polity' and x.value = %s"
-                    " order by t.valid_from desc nulls last limit 1",
-                    [owner],
-                ).fetchone()
-                if whole is None:
-                    counts["no template"] += 1
-                    print(f"no territory: {tail} {owner}")
-                    continue
                 area = whole[0]
                 if ", " in title:
                     seat = title.split(", ", 1)[1]
@@ -4001,6 +4256,17 @@ def emit() -> Path:
                 election_path,
                 scope,
             ) = templates[tail]
+            if area is None and office_id is None and body_id is not None:
+                area = next(
+                    iter(
+                        conn.execute(
+                            """select pt.area_id from body b join polity_territory pt on pt.polity_id = b.polity_id
+                               where b.id = %s and pt.valid @> %s::date limit 1""",
+                            [body_id, DAY],
+                        )
+                    ),
+                    (None,),
+                )[0]
             state = fips.split("-")[0] if fips in FEEDS else PUBLISHERS[fips][0]
             for feed in group["feed"].unique(maintain_order=True):
                 if feed not in sources:
@@ -4054,6 +4320,12 @@ def emit() -> Path:
                     "slug", path=re.sub(r"/[0-9-]+-\w+$", f"/{DAY}-general", election_path), entity_id=elections[scope]
                 )
             chained = previous is not None and held_on.year == DAY.year
+            if str(group["feed"][0]).endswith("-rcv"):
+                system = cs.key(
+                    "us.electoral_system",
+                    ("portland:" if tail.startswith(("OR:4159000:", "OR:portland:")) else "")
+                    + ("stv" if int(group["seats"][0] or 1) > 1 else "irv"),
+                )
             key = f"{DAY}:{tail}"
             try:
                 contest = cs.key("us.contest", key)
