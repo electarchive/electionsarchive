@@ -1207,14 +1207,15 @@ UNLISTED = {
     "2024-03-31:yozgat-sorgun-yeniyer-mayor:milliyetci-hareket-partisi",
 }
 RESIDUAL: dict[tuple[int, str], dict[str | None, int]] = {
-    (2019, "belediye_baskani"): {"milliyetci-hareket-partisi": 1, "saadet-partisi": -1},
+    (2019, "belediye_baskani"): {"milliyetci-hareket-partisi": 1, "saadet-partisi": -1, "iyi-parti": -1},
     (2024, "belediye_baskani"): {None: -8, "adalet-ve-kalkinma-partisi": -3, "buyuk-birlik-partisi": -6},
 }
 RESIDUAL_CAVEAT = {
     (2019, "belediye_baskani"): (
-        "The mayors named in each municipality add up to these mayoralties by party with one exception: YSK's table "
+        "The mayors named in each municipality add up to these mayoralties by party with two exceptions. YSK's table "
         "gives Saadet one more mayoralty and MHP one fewer than the ballot-box results do, and the archive has not "
-        "found the decision behind the difference."
+        "found the decision behind the difference. It also counts İYİ Parti's March win in Suvarlı, which YSK "
+        "annulled; the rerun on August 4, 2019 is stored as its own election."
     ),
     (2024, "belediye_baskani"): (
         "The mayors named in each municipality add up to these mayoralties by party except in 17 races: 16 where "
