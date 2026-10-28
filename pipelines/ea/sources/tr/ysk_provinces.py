@@ -22,7 +22,7 @@ from ea.sources.tr.ysk import (
 from ea.store import connect
 
 SOURCE = "tr.ysk_provinces"
-VERSION = "1"
+VERSION = "2"
 DOCS = "https://www.ysk.gov.tr/doc/dosyalar/docs"
 BOOK = f"{DOCS}/2009_2019_%C4%B0STAT%C4%B0ST%C4%B0K_K%C4%B0TABI.pdf"
 PROVINCES_2014 = f"{DOCS}/2014CB/CB-AdayOylari-ilBaz%C4%B1nda-2014.pdf"
@@ -138,6 +138,13 @@ def emit() -> Path:
                 "select id, k, source_id, completeness, election_id from result_set where contest_id = %s and is_default and status = 'active'",
                 [contest],
             ).fetchone()
+            result_set = cs.key(f"{SOURCE}.result_set", contest_key)
+            if old is not None and old[0] == result_set:
+                old = conn.execute(
+                    """select p.id, p.k, p.source_id, p.completeness, p.election_id
+                    from result_set p join result_set s on s.supersedes_id = p.id where s.id = %s""",
+                    [result_set],
+                ).fetchone()
             if old is None:
                 raise ValueError(f"{day}: no default set")
             option_ids = [cs.key("tr.option", f"{contest_key}:{slug(candidates[index][0])}") for index in columns]
@@ -158,7 +165,6 @@ def emit() -> Path:
                 if domestic.get(option) != total:
                     raise ValueError(f"{day}: column {column} sums to {total}, gazette domestic {domestic.get(option)}")
 
-            result_set = cs.key(f"{SOURCE}.result_set", contest_key)
             cs.add(
                 "result_set",
                 id=old[0],
@@ -185,6 +191,18 @@ def emit() -> Path:
                 supersedes_id=old[0],
             )
             cs.add("note", entity_id=result_set, kind="methodology", body_md=NOTES)
+            for option, kind, seats, notes, candidacy in conn.execute(
+                "select option_id, kind, seats, notes, candidacy_id from outcome where result_set_id = %s", [old[0]]
+            ).fetchall():
+                cs.add(
+                    "outcome",
+                    result_set_id=result_set,
+                    option_id=option,
+                    kind=kind,
+                    seats=seats,
+                    notes=notes,
+                    candidacy_id=candidacy,
+                )
             for plate, row in votes.items():
                 unit = cs.unit("tr.il", plate)
                 facts = [(option, VOTES, row[offset + column]) for column, option in enumerate(option_ids)]

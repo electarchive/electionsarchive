@@ -763,8 +763,10 @@ KAHRAMANMARAS_CAVEAT = (
     "The gazette prints Karaman's page twice and leaves out Kahramanmaraş. We therefore derive Kahramanmaraş's "
     "voters, valid votes, party votes, and seats by subtracting the other 86 districts from the national totals. Its "
     "share of the votes cast abroad is computed the same way as for every other district. We do not show its "
-    "registered voters: subtracting the other districts from the national total gives fewer registered voters than "
-    "voters, so the figure is unreliable. Its members come from Wikidata."
+    "registered voters, so the 86 other districts' registered voters (55,667,385) fall 655,247 short of YSK's "
+    "domestic figure (56,322,632). That difference is the most Kahramanmaraş could have, and it is 5,894 fewer than "
+    "the 661,141 voters derived for it, so the gazette's district figures and its domestic total disagree by at "
+    "least that much and the subtraction is unreliable. Its members come from Wikidata."
 )
 PARLIAMENT_2015_METHODOLOGY = (
     "Seats are allocated by D'Hondt in each of the 85 electoral districts, with each party's list counted on its own. "
@@ -6188,7 +6190,7 @@ def emit() -> Path:
                 "2023 Turkish general election",
                 "Cumhurbaşkanı Seçimi ve 28. Dönem Milletvekili Genel Seçimi",
             ),
-            (2, "runoff", "2023 Turkish presidential runoff", "Cumhurbaşkanı Seçimi ikinci oylama"),
+            (2, "runoff", "2023 Turkish presidential election, second round", "Cumhurbaşkanı Seçimi ikinci oylama"),
         ):
             elections[number] = cs.key("tr.election", str(ROUND_DAYS[number]))
             cs.add(
@@ -6226,6 +6228,7 @@ def emit() -> Path:
         result_sets: dict[str, str] = {}
         options: dict[str, str] = {}
         facts: list[dict[str, object]] = []
+        superseded = {id for (id,) in conn.execute("select id from result_set where status = 'superseded'").fetchall()}
 
         def result_set(contest_key: str, election: UUID, contest: UUID, url: str) -> UUID:
             id = cs.key(f"{SOURCE}.result_set", contest_key)
@@ -6236,9 +6239,9 @@ def emit() -> Path:
                 contest_id=contest,
                 stage="certified",
                 kind="counted",
-                status="active",
+                status="superseded" if id in superseded else "active",
                 source_id=sources[url],
-                is_default=True,
+                is_default=id not in superseded,
                 completeness=1,
             )
             if id in cs.minted:
@@ -6278,7 +6281,7 @@ def emit() -> Path:
             )
             name(
                 contests[number],
-                f"2023 Turkish presidential election, {'first round' if number == 1 else 'runoff'}",
+                f"2023 Turkish presidential election, {'first round' if number == 1 else 'second round'}",
                 "en",
             )
             cs.add("slug", path=f"{paths[number]}/president", entity_id=contests[number])
@@ -6835,6 +6838,17 @@ def emit() -> Path:
                 cs.add("slug", path=f"{path}/parliament/{slug(label)}", entity_id=contest)
                 if day == DAY_2018 and (plate, number) == KAHRAMANMARAS:
                     cs.add("note", entity_id=contest, kind="caveat", body_md=KAHRAMANMARAS_CAVEAT)
+                    for note, body in conn.execute(
+                        "select id, body_md from note where entity_id = %s and kind = 'caveat' and body_md like %s and body_md <> %s",
+                        [contest, "The gazette prints Karaman's page twice%", KAHRAMANMARAS_CAVEAT],
+                    ).fetchall():
+                        cs.add(
+                            "note_drop",
+                            note_id=note,
+                            entity_id=contest,
+                            body_md=body,
+                            reason="the caveat now gives the registered-voter shortfall",
+                        )
                 if day == DAY_2011 and code == "21":
                     cs.add("note", entity_id=contest, kind="caveat", body_md=DIYARBAKIR_2011_CAVEAT)
                 declared = result_set(contest_key, election, contest, url)
