@@ -334,12 +334,13 @@ def emit() -> Path:
             )
             name(contest, f"Mayor of {english}", "en")
             cs.add("slug", path=f"{path}/{DAY_2004}-local/mayor", entity_id=contest)
-            unit = cs.unit("tr.belediye", key)
+            scheme = "tr.ilce" if level == "district" else "tr.belde"
+            unit = cs.unit(scheme, key)
             cs.add(
                 "reporting_unit",
                 id=unit,
                 polity_id=turkey,
-                scheme_code="tr.belediye",
+                scheme_code=scheme,
                 code=key,
                 area_relation="within",
                 area_id=area or provinces[plate],
