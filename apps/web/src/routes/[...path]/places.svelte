@@ -693,7 +693,7 @@
       {m.places_top_votes({ count: count(limit), nouns: plural(noun) })}
     </p>
   {/if}
-  <div class="-mx-2 overflow-x-auto">
+  <div class="-mx-2 overflow-x-auto overflow-y-hidden overscroll-x-contain">
     <table
       class="border-collapse text-sm/tight inline-full"
       {@attach (table: HTMLTableElement) => {

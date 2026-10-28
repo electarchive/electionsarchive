@@ -98,7 +98,7 @@
     </p>
   </div>
   <div
-    class="overflow-x-auto"
+    class="overflow-x-auto overflow-y-hidden overscroll-x-contain"
     {@attach (node: HTMLElement) => {
       const cell = node.querySelector<HTMLElement>(
         `thead th:nth-child(${count.round + 1})`,

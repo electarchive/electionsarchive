@@ -378,7 +378,7 @@
         {/each}
       </svg>
     </Measured>
-    <div class="overflow-x-auto">
+    <div class="overflow-x-auto overflow-y-hidden overscroll-x-contain">
       <table class="border-collapse text-sm tabular-nums inline-full">
         <thead>
           <tr class="border-be text-xs text-muted-foreground">

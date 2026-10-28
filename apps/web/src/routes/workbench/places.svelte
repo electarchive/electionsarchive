@@ -79,7 +79,7 @@
 {#if contest.places == null || contest.places.rows.length === 0}
   <p class="p-3.5 text-sm text-muted-foreground">{m.workbench_no_places()}</p>
 {:else}
-  <div class="overflow-x-auto">
+  <div class="overflow-x-auto overflow-y-hidden overscroll-x-contain">
     <table class="text-sm inline-full">
       <thead>
         <tr class="border-be text-[0.8125rem] text-muted-foreground">
