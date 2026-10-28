@@ -876,6 +876,16 @@ FEEDS.update(
             "Clackamas County Elections",
             "Voters' Pamphlet, November 3, 2026 General Election: Table of Contents (Candidates)",
         ),
+        "OR-41047": (
+            "https://www.co.marion.or.us/CO/elections/Results/Documents/20261103/November%203%202026%20General%20Election%20VP_FINAL_ONLINEVER.pdf",
+            "Marion County Clerk, Elections Division",
+            "Voters' Pamphlet, November 3, 2026 General Election: Sample Ballot",
+        ),
+        "OR-41009": (
+            "https://www.columbiacountyor.gov/media/Election/2026-11-03/0-2026_Columbia-General_VP_v5-FINAL.pdf",
+            "Columbia County Elections",
+            "Voters' Pamphlet, November 3, 2026 General Election: Index of Candidates on Ballot",
+        ),
         "OR-41067": (
             "https://www.washingtoncountyor.gov/elections/current-election",
             "Washington County Elections Division",
