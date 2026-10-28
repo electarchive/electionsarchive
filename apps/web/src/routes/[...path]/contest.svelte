@@ -37,6 +37,7 @@
   import ElectionRow from "./election-row.svelte";
   import Electors from "./electors.svelte";
   import Lead from "./lead.svelte";
+  import Ledger from "./ledger.svelte";
   import Lists from "./lists.svelte";
   import PlaceMap from "./map.svelte";
   import Members from "./members.svelte";
@@ -55,6 +56,8 @@
   import Wording from "./wording.svelte";
 
   const {
+    id,
+    unit: path,
     contest,
     lists,
     rounds,
@@ -69,6 +72,8 @@
     match,
     standing,
   }: {
+    id: string;
+    unit: string;
     contest: Extract<PageData, { kind: "contest" }>["contest"];
     lists: Extract<PageData, { kind: "contest" }>["lists"];
     rounds: Extract<PageData, { kind: "contest" }>["rounds"];
@@ -2153,6 +2158,26 @@
       bind:focus
     />
   {/key}
+  {#if !placed.level.startsWith("unit:")}
+    {#key `${here}?${placed.level}`}
+      <Ledger
+        {id}
+        unit={path === "" ? undefined : path}
+        level={placed.level}
+        noun={placed.levels.find((level) => level.code === placed.level)
+          ?.noun ?? ""}
+        parents={placed.rows}
+        {match}
+        group={page.url.searchParams.get("group") ?? undefined}
+        round={Math.max(
+          0,
+          Math.trunc(Number(page.url.searchParams.get("round"))) || 0,
+        )}
+        isMapped={drawn != null}
+        bind:focus
+      />
+    {/key}
+  {/if}
 {:else if contest.children.length > 0 && !drilled}
   <section class="col-span-12 bg-card px-3.5 py-3">
     <h2 class="mbe-1.5 text-[0.8125rem] font-bold">{m.children_title()}</h2>

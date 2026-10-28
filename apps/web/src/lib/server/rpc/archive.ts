@@ -7936,6 +7936,280 @@ export const contests = {
         input.group,
       );
     }),
+  ledger: os
+    .meta(
+      openapi({
+        method: "GET",
+        path: "/contests/{id}/ledger",
+        summary:
+          "List the reporting units with no boundary shapes within a contest's place, each with the place at the given level that holds it",
+      }),
+    )
+    .input(v.object({ ...Input.entries, level: v.optional(v.string()) }))
+    .output(
+      v.nullable(
+        v.object({
+          count: v.number(),
+          isCapped: v.boolean(),
+          folded: v.number(),
+          places: Places,
+          groups: v.array(
+            v.object({
+              k: v.nullable(v.number()),
+              name: v.string(),
+              valid: v.number(),
+              size: v.number(),
+            }),
+          ),
+        }),
+      ),
+    )
+    .handler(async ({ input }) => {
+      const contest = await find(input.id);
+      const chain = await descend(contest, input.unit);
+      const area = chain.at(-1) ?? contest.place;
+      if (area == null) {
+        return null;
+      }
+      const day = contest.date ?? "infinity";
+      const CAP = 20_000;
+      const sets = await db.execute<{ k: number }>(sql`
+        with recursive grp(id) as (
+          select ${contest.id}::uuid
+          union all
+          select c.id from contest c join grp on c.allocation_parent_id = grp.id
+        )
+        select rs.k from grp cross join lateral (select x.k from result_set x where x.contest_id = grp.id and x.status = 'active' offset 0) rs
+      `);
+      const ks = sets.rows.map((row) => row.k);
+      const valued = await db.execute<{ set: number; k: number }>(sql`
+        select s.k as set, u.k from unnest(${sql.param(ks)}::int[]) s(k)
+        cross join lateral (
+          select distinct v.unit_k as k from result_value v where v.result_set_k = s.k limit ${CAP + 1}
+        ) u
+      `);
+      const finest = Map.groupBy(valued.rows, (row) => row.set)
+        .values()
+        .toArray()
+        .toSorted((a, b) => b.length - a.length)[0];
+      const candidates =
+        finest == null || finest.length <= CAP
+          ? (finest ?? []).map((row) => row.k)
+          : chain.length === 0
+            ? null
+            : (
+                await db.execute<{ k: number }>(sql`
+                  with recursive down(id, depth) as (
+                    select ${area.id}::uuid, 0
+                    union all
+                    select p.area_id, down.depth + 1 from area_parent p join down on p.parent_id = down.id
+                    where p.valid @> ${day}::date and down.depth < 3
+                  )
+                  select u.k from (select distinct id from down) d
+                  join reporting_unit u on u.area_id = d.id
+                  where u.area_relation = 'within' and u.kind in ('standard', 'aggregate')
+                    and exists (
+                      select from result_value v
+                      where v.result_set_k = any(${sql.param(ks)}::int[]) and v.unit_k = u.k
+                    )
+                  limit ${CAP + 1}
+                `)
+              ).rows.map((row) => row.k);
+      if (candidates == null || candidates.length > CAP) {
+        return {
+          count: CAP,
+          isCapped: true,
+          folded: 0,
+          places: null,
+          groups: [],
+        };
+      }
+      const found = await db.execute<{
+        k: number;
+        id: string;
+        code: string;
+        scheme: string;
+        noun: string;
+        kind: string;
+        group: string | null;
+        at: number | null;
+      }>(sql`
+        with recursive placed as materialized (
+          select u.k, u.id, u.code, u.scheme_code as scheme, u.kind::text as kind, u.area_id, u.parent_id
+          from unnest(${sql.param(candidates)}::int[]) c(k)
+          join reporting_unit u on u.k = c.k
+          where u.area_relation = 'within' and u.kind in ('standard', 'aggregate')
+            and u.area_id is not null
+        ),
+        up(unit, id, depth) as (
+          select p.k, p.area_id, 0 from placed p
+          union all
+          select p.k, m.area_id, 0 from placed p
+          join reporting_unit_area m on m.unit_id = p.id and not m.approximate and m.valid @> ${day}::date
+          union all
+          select up.unit, ap.parent_id, up.depth + 1 from up
+          join area_parent ap on ap.area_id = up.id and ap.valid @> ${day}::date
+          where up.depth < 6 and up.id <> ${area.id}::uuid
+        ),
+        chains as (
+          select up.unit, ${chain.length === 0} or bool_or(up.id = ${area.id}::uuid) as inside,
+            (array_agg(a.id order by up.depth) filter (where a.scheme_code = ${input.level ?? ""}))[1] as "group"
+          from up join area a on a.id = up.id
+          group by up.unit
+        )
+        select p.k, p.id, p.code, p.scheme, s.noun, p.kind,
+          coalesce(c."group", nullif(p.area_id, ${area.id}::uuid)) as "group", g.k as at
+        from placed p
+        join chains c on c.unit = p.k and c.inside
+        join scheme s on s.code = p.scheme
+        left join area g on g.id = coalesce(c."group", nullif(p.area_id, ${area.id}::uuid))
+        where not exists (select from placed x where x.parent_id = p.id)
+      `);
+      if (found.rows.length < 2) {
+        return null;
+      }
+      if (found.rows.length > 4000) {
+        return {
+          count: found.rows.length,
+          isCapped: true,
+          folded: 0,
+          places: null,
+          groups: [],
+        };
+      }
+      const labels = await names(
+        [
+          area.id,
+          ...found.rows.flatMap((row) =>
+            row.group == null ? [row.id] : [row.id, row.group],
+          ),
+        ],
+        contest.date,
+      );
+      const units = found.rows
+        .filter(
+          (row) =>
+            row.kind === "standard" ||
+            found.rows.every(
+              (other) =>
+                other.scheme !== row.scheme || other.kind !== "standard",
+            ),
+        )
+        .map((row) => {
+          const segments = row.code.split(":");
+          const code =
+            row.scheme === "us.precinct" && segments.length > 4
+              ? segments.slice(4).join(":")
+              : (segments.at(-1) ?? row.code);
+          const cased = /\p{Ll}/u.test(code)
+            ? code
+            : code.replaceAll(/\p{Lu}+/gu, (word) =>
+                word.length > 2
+                  ? word.charAt(0) + word.slice(1).toLowerCase()
+                  : word,
+              );
+          const noun = row.noun.charAt(0).toUpperCase() + row.noun.slice(1);
+          const group = labels.full.get(row.group ?? "") ?? null;
+          const name =
+            labels.full.get(row.id) ??
+            (/^\d/u.test(cased)
+              ? `${noun} ${cased.replace(/^0+(?=\d)/u, "")}`
+              : cased);
+          const plain = name.startsWith(`${group ?? ""}, `)
+            ? name.slice((group ?? "").length + 2)
+            : name;
+          return {
+            k: row.k,
+            at: row.at,
+            group,
+            noun: row.noun,
+            scheme: row.scheme,
+            name: (plain.charAt(0).toUpperCase() + plain.slice(1)).replace(
+              /(?<=\D)0+(?=\d)/u,
+              "",
+            ),
+            path: null,
+            isContest: false,
+            owner: null,
+          };
+        });
+      const tabulated = await tabulate(
+        [contest.root],
+        units,
+        contest.date,
+        null,
+        [],
+        input.match,
+        input.group,
+        input.round === 0 ? null : input.round,
+        "unit",
+      );
+      const kept = tabulated.rows.flatMap((row, index) => {
+        const own = units[index];
+        return own == null || (row.valid === 0 && row.declared == null)
+          ? []
+          : [{ row: { ...row, at: null }, own }];
+      });
+      if (kept.length < 2) {
+        return null;
+      }
+      const grouped = Map.groupBy(kept, (entry) => entry.own.at)
+        .entries()
+        .map(([k, entries]) => {
+          let valid = 0;
+          for (const { row } of entries) {
+            valid += row.valid;
+          }
+          return {
+            k,
+            name: entries[0]?.own.group ?? labels.full.get(area.id) ?? "",
+            valid,
+            entries: entries.toSorted((a, b) =>
+              entries.length > 10
+                ? b.row.valid - a.row.valid
+                : a.row.name.localeCompare(b.row.name, undefined, {
+                    numeric: true,
+                  }),
+            ),
+          };
+        })
+        .toArray()
+        .toSorted((a, b) => b.valid - a.valid);
+      const shown = grouped.filter(
+        (entry) => entry.k == null || entry.entries.length > 1,
+      );
+      if (shown.length === 0) {
+        return null;
+      }
+      const nouns = Map.groupBy(
+        shown.flatMap((entry) => entry.entries),
+        (entry) => entry.own.noun,
+      )
+        .entries()
+        .toArray()
+        .toSorted((a, b) => b[1].length - a[1].length);
+      return {
+        count: kept.length,
+        isCapped: false,
+        folded: grouped.length - shown.length,
+        places: {
+          levels: nouns.map(([noun, entries]) => ({
+            code: `unit:${entries[0]?.own.scheme ?? ""}`,
+            noun,
+            count: entries.length,
+          })),
+          level: `unit:${nouns[0]?.[1][0]?.own.scheme ?? ""}`,
+          ...tabulated,
+          rows: shown.flatMap((entry) => entry.entries.map(({ row }) => row)),
+        },
+        groups: shown.map((entry) => ({
+          k: entry.k,
+          name: entry.name,
+          valid: entry.valid,
+          size: entry.entries.length,
+        })),
+      };
+    }),
   adjacent: os
     .meta(
       openapi({
@@ -13897,11 +14171,18 @@ export const elections = {
     .output(
       v.object({
         noun: v.nullable(v.string()),
-        groups: v.array(v.object({ id: v.string(), name: v.string() })),
+        groups: v.array(
+          v.object({
+            id: v.string(),
+            k: v.nullable(v.number()),
+            name: v.string(),
+          }),
+        ),
         maps: v.array(v.object({ places: v.nonNullable(Places), map: Sketch })),
         rows: v.array(
           v.object({
             path: v.string(),
+            at: v.nullable(v.number()),
             group: v.nullable(v.string()),
             person: v.nullable(v.string()),
             party: v.nullable(v.string()),
@@ -13930,17 +14211,22 @@ export const elections = {
         party: string | null;
         label: string | null;
         color: string | null;
+        shaped: string | null;
       }>(sql`
         with top as (
           select pt.area_id as id from election e
           join polity_territory pt on pt.polity_id = e.polity_id and pt.valid @> e.date_from
           where e.id = ${input.id}::uuid limit 1
         )
-        select s.path, k.date_from::text as date, w.person, w.party, w.label, w.color, w.area, g.id as group
+        select s.path, k.date_from::text as date, w.person, w.party, w.label, w.color, w.area, g.id as group, z.id as shaped
         from election k
         join slug s on s.entity_id = k.id and s.is_current
         left join lateral (
-          select coalesce(pm.into_id, o.party_id) as party, o.ballot_label as label, c.district_area_id as area,
+          select coalesce(pm.into_id, o.party_id) as party, o.ballot_label as label,
+            coalesce(c.district_area_id, (
+              select pt.area_id from polity_territory pt where pt.polity_id = k.polity_id
+              order by pt.valid @> k.date_from desc limit 1
+            )) as area,
             (select coalesce(m.into_id, cy.person_id) from candidacy cy left join entity_merge m on m.entity_id = cy.person_id
              where cy.option_id = o.id and cy.role = 'head' order by cy.id limit 1) as person,
             ${paint(sql`coalesce(pm.into_id, o.party_id)`, sql`select ${input.id}::uuid`, sql`k.date_from`)} as color
@@ -13967,10 +14253,29 @@ export const elections = {
           where exists (select from area_parent p where p.area_id = up.id and p.parent_id = (select id from top))
           order by up.depth limit 1
         ) g on true
+        left join lateral (
+          with recursive up(id, depth) as (
+            select w.area, 0
+            union all
+            select p.parent_id, up.depth + 1 from area_parent p join up on p.area_id = up.id
+            where up.depth < 6 and p.valid @> k.date_from
+          )
+          select up.id from up
+          where exists (select from area_geometry ag where ag.area_id = up.id)
+          order by up.depth limit 1
+        ) z on true
         where k.parent_id = ${input.id}::uuid
       `);
       if (found.rows.length < 40) {
         return { noun: null, groups: [], maps: [], rows: [] };
+      }
+      const segments = new Map(
+        found.rows.flatMap((row) =>
+          row.group == null ? [] : [[row.path.split("/")[1], row.group]],
+        ),
+      );
+      for (const row of found.rows) {
+        row.group ??= segments.get(row.path.split("/")[1]) ?? null;
       }
       const groups = [...new Set(found.rows.flatMap((row) => row.group ?? []))];
       const date = found.rows[0]?.date ?? "infinity";
@@ -14005,7 +14310,7 @@ export const elections = {
             where g.area_id = a.id and g.valid @> ${date}::date limit 1
           ) g on true
           cross join lateral (select ${spot("coalesce(g.label_point, ST_PointOnSurface(g.geom))", "a.scheme_code")} as p) at
-          where a.id = any(${sql.param([...new Set([...groups, ...found.rows.flatMap((row) => row.area ?? [])])])}::uuid[])
+          where a.id = any(${sql.param([...new Set([...groups, ...found.rows.flatMap((row) => [row.area, row.shaped].filter((id) => id != null))])])}::uuid[])
         `),
         db.execute<{ id: string; k: number }>(sql`
           select a.id, a.k from election e
@@ -14026,7 +14331,10 @@ export const elections = {
         }),
         Map.groupBy(
           found.rows.filter(
-            (row) => row.area != null && area.get(row.area)?.scheme !== top,
+            (row) =>
+              row.area != null &&
+              area.get(row.area)?.scheme !== top &&
+              area.get(row.area)?.x != null,
           ),
           (row) => row.area ?? "",
         )
@@ -14122,10 +14430,15 @@ export const elections = {
         maps: maps.flat(),
 
         groups: groups
-          .map((id) => ({ id, name: labels.full.get(id) ?? "" }))
+          .map((id) => ({
+            id,
+            k: area.get(id)?.k ?? null,
+            name: labels.full.get(id) ?? "",
+          }))
           .toSorted((a, b) => a.name.localeCompare(b.name, "tr")),
         rows: found.rows.map((row) => ({
           path: row.path,
+          at: area.get(row.shaped ?? "")?.k ?? null,
           group: row.group,
           person: row.person,
           party: row.party,

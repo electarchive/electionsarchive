@@ -194,6 +194,8 @@
     {/if}
     {#if data.kind === "contest"}
       <Contest
+        id={data.id}
+        unit={data.unit}
         contest={data.contest}
         lists={data.lists}
         rounds={data.rounds}

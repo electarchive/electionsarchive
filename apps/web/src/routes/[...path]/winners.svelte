@@ -23,6 +23,7 @@
   let opened = $state<Array<string>>([]);
   let level = $state<string | null>(null);
   let isAll = $state(false);
+  let focus = $state<number | null>(null);
 
   const winners = createQuery(() => ({
     ...orpc.elections.winners.queryOptions({ input: { id } }),
@@ -33,46 +34,80 @@
   const places = $derived(
     new Map(parts.map((part) => [part.path, part.place ?? part.name])),
   );
-  const noun = $derived(winners.data?.noun ?? "");
   const maps = $derived(winners.data?.maps ?? []);
   const shape = $derived(
     maps.find((entry) => entry.places.level === level) ?? maps[0],
   );
+  const noun = $derived(
+    shape == null || shape === maps[0]
+      ? (winners.data?.noun ?? "")
+      : (shape.places.levels[0]?.noun ?? winners.data?.noun ?? ""),
+  );
+  const provinces = $derived(
+    new Map((winners.data?.groups ?? []).map((group) => [group.id, group])),
+  );
+  const finer = $derived(
+    shape == null || shape === maps[0]
+      ? null
+      : new Map(shape.places.rows.map((row) => [row.k, row.name])),
+  );
   const groups = $derived(
-    (winners.data?.groups ?? []).map((group) => {
-      const rows = (winners.data?.rows ?? [])
-        .filter((row) => row.group === group.id)
-        .map((row) => ({
-          ...row,
-          place: places.get(row.path) ?? row.path,
-          tone: swatch(
-            row.color,
-            row.party == null
-              ? `person:${row.person ?? ""}`
-              : `party:${row.party}`,
-          ),
-          isCenter: row.path.split("/").length === 3,
-        }))
-        .toSorted(
-          (a, b) =>
-            Number(b.isCenter) - Number(a.isCenter) ||
-            a.place.localeCompare(b.place, "tr"),
-        );
-      const tally = Map.groupBy(
-        rows.filter((row) => row.party != null),
-        (row) => row.party,
-      )
-        .values()
-        .map((members) => ({
-          key: members[0]?.party ?? "",
-          short: members[0]?.short ?? "",
-          tone: members[0]?.tone ?? "",
-          wins: members.length,
-        }))
-        .toArray()
-        .toSorted((a, b) => b.wins - a.wins);
-      return { ...group, rows, tally };
-    }),
+    Map.groupBy(
+      (winners.data?.rows ?? []).filter((row) => row.group != null),
+      (row) =>
+        finer != null && row.at != null && finer.has(row.at)
+          ? `k:${row.at}`
+          : (row.group ?? ""),
+    )
+      .entries()
+      .map(([key, members]) => {
+        const province = provinces.get(members[0]?.group ?? "");
+        const at = key.startsWith("k:") ? Number(key.slice(2)) : null;
+        const rows = members
+          .map((row) => ({
+            ...row,
+            place: places.get(row.path) ?? row.path,
+            tone: swatch(
+              row.color,
+              row.party == null
+                ? `person:${row.person ?? ""}`
+                : `party:${row.party}`,
+            ),
+            isCenter: row.path.split("/").length === 3,
+          }))
+          .toSorted(
+            (a, b) =>
+              Number(b.isCenter) - Number(a.isCenter) ||
+              a.place.localeCompare(b.place, "tr"),
+          );
+        const tally = Map.groupBy(
+          rows.filter((row) => row.party != null),
+          (row) => row.party,
+        )
+          .values()
+          .map((entries) => ({
+            key: entries[0]?.party ?? "",
+            short: entries[0]?.short ?? "",
+            tone: entries[0]?.tone ?? "",
+            wins: entries.length,
+          }))
+          .toArray()
+          .toSorted((a, b) => b.wins - a.wins);
+        return {
+          id: key,
+          k: at ?? province?.k ?? null,
+          name: at == null ? (province?.name ?? "") : (finer?.get(at) ?? ""),
+          region: at == null ? null : (province?.name ?? null),
+          rows,
+          tally,
+        };
+      })
+      .toArray()
+      .toSorted(
+        (a, b) =>
+          (a.region ?? a.name).localeCompare(b.region ?? b.name, "tr") ||
+          a.name.localeCompare(b.name, "tr"),
+      ),
   );
   const shown = $derived.by(() => {
     const needle = query.trim().toLocaleLowerCase("tr");
@@ -161,6 +196,7 @@
             })}
             pick={(code) => (level = code)}
             span={null}
+            bind:focus
           />
         {/key}
       {:else}
@@ -182,9 +218,20 @@
       {#each isAll || query !== "" ? shown : shown.slice(0, 12) as group (group.id)}
         {const isOpen = $derived(opened.includes(group.id) || query !== "")}
         {const total = $derived(group.rows.length)}
-        <li class="grid content-start gap-2 bg-card px-3 pbs-2.5 pbe-3">
+        <li
+          class={cn("grid content-start gap-2 bg-card px-3 pbs-2.5 pbe-3", {
+            "bg-secondary": focus != null && focus === group.k,
+          })}
+          onpointerenter={() => (focus = group.k)}
+          onpointerleave={() => (focus = null)}
+        >
           <div class="flex items-baseline justify-between gap-3">
-            <h3 class="font-semibold">{group.name}</h3>
+            <h3 class="font-semibold">
+              {group.name}{#if group.region != null}<span
+                  class="font-normal text-muted-foreground"
+                  >, {group.region}</span
+                >{/if}
+            </h3>
             <span
               class="font-figures text-xs text-muted-foreground tabular-nums"
               >{count(total)}</span

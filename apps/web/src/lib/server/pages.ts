@@ -749,6 +749,8 @@ export async function archive(path: string, search: URLSearchParams) {
     })();
     return {
       kind: "contest" as const,
+      id: slug.entity_id,
+      unit,
       contest,
       lists,
       rounds,

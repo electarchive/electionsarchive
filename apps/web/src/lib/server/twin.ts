@@ -1,4 +1,5 @@
 import type { RequestEvent } from "@sveltejs/kit";
+import type { InferRouterOutputs } from "@orpc/server";
 import { call } from "@orpc/server";
 import { error, isHttpError, isRedirect, redirect } from "@sveltejs/kit";
 import { effective, stand } from "#lib/caucus.js";
@@ -43,6 +44,8 @@ import { router } from "#lib/server/rpc/router.js";
 import { comeback, verdict } from "#lib/verdict.js";
 
 type Data = Awaited<ReturnType<typeof load>>;
+type Ledger = InferRouterOutputs<typeof router>["contests"]["ledger"];
+type Winners = InferRouterOutputs<typeof router>["elections"]["winners"];
 type Link = (name: string, path: string | null) => string;
 
 const TYPES = {
@@ -295,9 +298,40 @@ export async function twin({ request, url }: RequestEvent) {
     if (data.kind === "election" && data.scope != null) {
       headers.link = `<${url.origin}${pathname}?in=${data.scope.path}>; rel="canonical"`;
     }
+    const level = data.kind === "contest" ? data.contest.places?.level : null;
+    const ledger =
+      data.kind !== "contest" || level == null || level.startsWith("unit:")
+        ? null
+        : await call(router.contests.ledger, {
+            id: data.id,
+            unit: data.unit === "" ? undefined : data.unit,
+            level,
+            match:
+              data.match === "person" || data.match === "family"
+                ? data.match
+                : "party",
+            group: url.searchParams.get("group") ?? undefined,
+            round: Math.max(
+              0,
+              Math.trunc(Number(url.searchParams.get("round"))) || 0,
+            ),
+          }).catch(() => null);
+    const winners =
+      data.kind === "election" &&
+      data.election.elections.filter((child) => !child.isStage).length >= 40
+        ? await call(router.elections.winners, { id: data.id }).catch(
+            () => null,
+          )
+        : null;
     if (format === "json") {
       return Response.json(
-        data.kind === "home" ? { ...data, atlas: undefined } : data,
+        data.kind === "home"
+          ? { ...data, atlas: undefined }
+          : ledger?.places != null
+            ? { ...data, ledger }
+            : winners != null && winners.rows.length > 0
+              ? { ...data, winners: { ...winners, maps: undefined } }
+              : data,
         { headers },
       );
     }
@@ -310,10 +344,12 @@ export async function twin({ request, url }: RequestEvent) {
       return `[${name}](${url.origin}/${route}.md${query == null ? "" : `?${query}`})`;
     };
     return new Response(
-      `${markdown(data, link).join("\n\n")}\n\n${m.twin_alternates({
-        html: `${url.origin}${pathname}${url.search}`,
-        json: `${base}.json${url.search}`,
-      })}\n`,
+      `${markdown(data, link, ledger, winners).join("\n\n")}\n\n${m.twin_alternates(
+        {
+          html: `${url.origin}${pathname}${url.search}`,
+          json: `${base}.json${url.search}`,
+        },
+      )}\n`,
       { headers },
     );
   } catch (error_) {
@@ -348,7 +384,12 @@ function failure(
     : new Response(`# ${message}\n`, { status, headers });
 }
 
-function markdown(data: Data, link: Link) {
+function markdown(
+  data: Data,
+  link: Link,
+  ledger: Ledger = null,
+  winners: Winners | null = null,
+) {
   switch (data.kind) {
     case "search": {
       const groups = [
@@ -429,14 +470,57 @@ function markdown(data: Data, link: Link) {
       return mapMarkdown(data, link);
     }
     case "election": {
-      return electionMarkdown(
-        data.election,
-        data.sections,
-        data.byes,
-        data.cycle,
-        data.tiers,
-        link,
+      const named = new Map(
+        data.election.elections.map((child) => [
+          child.path,
+          child.place ?? child.name,
+        ]),
       );
+      const regions = new Map(
+        (winners?.groups ?? []).map((group) => [group.id, group.name]),
+      );
+      const noun = winners?.noun ?? "";
+      return [
+        ...electionMarkdown(
+          data.election,
+          data.sections,
+          data.byes,
+          data.cycle,
+          data.tiers,
+          link,
+        ),
+        ...(winners == null || winners.rows.length === 0
+          ? []
+          : [
+              `## ${m.winners_title({ noun })}`,
+              m.winners_lede({ count: count(winners.rows.length), noun }),
+              table(
+                [
+                  noun.charAt(0).toUpperCase() + noun.slice(1),
+                  m.col_name(),
+                  m.col_option(),
+                  m.col_party(),
+                ],
+                winners.rows
+                  .map((row) => ({
+                    ...row,
+                    region: regions.get(row.group ?? "") ?? "",
+                    place: named.get(row.path) ?? row.path,
+                  }))
+                  .toSorted(
+                    (a, b) =>
+                      a.region.localeCompare(b.region, getLocale()) ||
+                      a.place.localeCompare(b.place, getLocale()),
+                  )
+                  .map((row) => [
+                    row.region,
+                    link(row.place, row.path),
+                    row.label ?? m.winners_none(),
+                    row.short,
+                  ]),
+              ),
+            ]),
+      ];
     }
     case "day": {
       const { local } = data;
@@ -542,6 +626,7 @@ function markdown(data: Data, link: Link) {
         data.rounds,
         data.standing,
         link,
+        ledger,
       );
     }
   }
@@ -3354,6 +3439,7 @@ function contestMarkdown(
   rounds: Extract<Data, { kind: "contest" }>["rounds"],
   standing: Extract<Data, { kind: "contest" }>["standing"],
   link: Link,
+  ledger: Ledger,
 ) {
   const groups: Record<string, (place: string) => string> = {
     owner: () => "",
@@ -3939,6 +4025,62 @@ function contestMarkdown(
         : null,
       contest.current?.isTally === true,
     ),
+    ...(() => {
+      const units = ledger?.places;
+      if (ledger == null || units == null || contest.places == null) {
+        return [];
+      }
+      const group =
+        contest.places.levels.find(
+          (level) => level.code === contest.places?.level,
+        )?.noun ?? "";
+      const paths = new Map(contest.places.rows.map((row) => [row.k, row]));
+      const format = (nouns: Array<string>) =>
+        new Intl.ListFormat(getLocale(), {
+          style: "long",
+          type: "conjunction",
+        }).format(nouns);
+      const nouns = format(units.levels.map((level) => plural(level.noun)));
+      let at = 0;
+      return [
+        `## ${m.places_title({ noun: format(units.levels.map((level) => level.noun)) })}`,
+        [
+          ledger.groups.every((entry) => entry.k == null)
+            ? m.ledger_lede_flat({ nouns })
+            : m.ledger_lede({ nouns, group }),
+          ...(ledger.folded === 0
+            ? []
+            : [
+                m.ledger_single({
+                  count: count(ledger.folded),
+                  groups: ledger.folded === 1 ? group : plural(group),
+                }),
+              ]),
+        ].join(" "),
+        table(
+          [
+            group.charAt(0).toUpperCase() + group.slice(1),
+            m.col_name(),
+            m.col_leader(),
+            m.col_share(),
+            m.col_margin(),
+            m.stat_valid(),
+          ],
+          ledger.groups.flatMap((entry) => {
+            const rows = units.rows.slice(at, at + entry.size);
+            at += entry.size;
+            const parent = entry.k == null ? null : paths.get(entry.k);
+            return rows.map((row) => [
+              link(parent?.name ?? entry.name, parent?.path ?? null),
+              row.name,
+              ...leading(row, units.legend),
+              row.margin == null ? null : points(row.margin),
+              count(row.valid),
+            ]);
+          }),
+        ),
+      ];
+    })(),
     ...(contest.children.length === 0
       ? []
       : [
