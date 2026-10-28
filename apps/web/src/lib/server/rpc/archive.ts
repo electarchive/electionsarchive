@@ -556,6 +556,7 @@ const Sketch = v.object({
   isApproximate: v.boolean(),
   shaped: v.optional(v.nullable(v.number())),
   credits: v.optional(v.nullable(v.array(v.string()))),
+  outlying: v.optional(v.array(v.object({ k: v.number(), code: v.string() }))),
 });
 
 type Found = {
@@ -2577,41 +2578,41 @@ async function places(
     checked.length > 600
       ? null
       : await db.execute<{ k: number }>(sql`
-              with me as materialized (
-                select geom from area_geometry where area_id = ${area.id}::uuid
-                order by valid @> ${contest.date ?? "infinity"}::date desc, upper(valid) desc nulls first limit 1
-              ),
-              straddling as materialized (
-                select a.id, a.k from area a
-                cross join me
-                cross join lateral (
-                  select g.geom from area_geometry g where g.area_id = a.id
-                  order by g.valid @> ${contest.date ?? "infinity"}::date desc, upper(g.valid) desc nulls first limit 1
-                ) g
-                where a.k = any(${sql.param(checked.map((kid) => kid.k))}::int[])
-                  and not exists (
-                    select from area_parent p
-                    where p.area_id = a.id and p.parent_id = ${area.id}::uuid and p.valid @> ${contest.date ?? "infinity"}::date
-                  )
-                  and ST_Area(ST_Intersection(g.geom, me.geom)) < 0.95 * ST_Area(g.geom)
-              ),
-              siblings as materialized (
-                select rs.k from contest own
-                join contest c on c.election_id = own.election_id and c.id <> own.id
-                  and (c.office_id = own.office_id or c.body_id = own.body_id)
-                join result_set rs on rs.contest_id = c.id and rs.status = 'active'
-                where own.id = ${contest.id}::uuid
-              )
-              select s.k from straddling s
-              where not exists (
-                  select from reporting_unit ru
-                  join result_value v on v.unit_k = ru.k
-                  join result_set rs on rs.k = v.result_set_k and rs.contest_id = ${contest.id}::uuid
-                  where ru.area_id = s.id and ru.area_relation = 'equals'
-                )
-                or exists (select from siblings x join result_rollup_unit u on u.result_set_k = x.k and u.area_k = s.k)
-                or exists (select from siblings x join result_rollup_sum r on r.result_set_k = x.k and r.area_k = s.k)
-            `);
+        with me as materialized (
+          select geom from area_geometry where area_id = ${area.id}::uuid
+          order by valid @> ${contest.date ?? "infinity"}::date desc, upper(valid) desc nulls first limit 1
+        ),
+        straddling as materialized (
+          select a.id, a.k from area a
+          cross join me
+          cross join lateral (
+            select g.geom from area_geometry g where g.area_id = a.id
+            order by g.valid @> ${contest.date ?? "infinity"}::date desc, upper(g.valid) desc nulls first limit 1
+          ) g
+          where a.k = any(${sql.param(checked.map((kid) => kid.k))}::int[])
+            and not exists (
+              select from area_parent p
+              where p.area_id = a.id and p.parent_id = ${area.id}::uuid and p.valid @> ${contest.date ?? "infinity"}::date
+            )
+            and ST_Area(ST_Intersection(g.geom, me.geom)) < 0.95 * ST_Area(g.geom)
+        ),
+        siblings as materialized (
+          select rs.k from contest own
+          join contest c on c.election_id = own.election_id and c.id <> own.id
+            and (c.office_id = own.office_id or c.body_id = own.body_id)
+          join result_set rs on rs.contest_id = c.id and rs.status = 'active'
+          where own.id = ${contest.id}::uuid
+        )
+        select s.k from straddling s
+        where not exists (
+            select from reporting_unit ru
+            join result_value v on v.unit_k = ru.k
+            join result_set rs on rs.k = v.result_set_k and rs.contest_id = ${contest.id}::uuid
+            where ru.area_id = s.id and ru.area_relation = 'equals'
+          )
+          or exists (select from siblings x join result_rollup_unit u on u.result_set_k = x.k and u.area_k = s.k)
+          or exists (select from siblings x join result_rollup_sum r on r.result_set_k = x.k and r.area_k = s.k)
+      `);
   const split = new Set(straddled?.rows.map((row) => row.k) ?? []);
   const partial = new Set(
     checked.filter((kid) => split.has(kid.k)).map((kid) => kid.scheme),
@@ -7788,6 +7789,9 @@ export const contests = {
               isPending: v.boolean(),
             }),
           ),
+          outlying: v.optional(
+            v.array(v.object({ k: v.number(), code: v.string() })),
+          ),
           frame: v.nullable(
             v.object({
               west: v.number(),
@@ -7920,7 +7924,17 @@ export const contests = {
           }
           const shaped = new Set(row.shaped);
           const absent = group.ids.filter((id) => !shaped.has(id));
-          const labels = await names(absent, contest.date);
+          const isLevel = group.scheme === input.level;
+          const [labels, outlying] = await Promise.all([
+            names(absent, contest.date),
+            isLevel && group.scheme === "us.state"
+              ? db.execute<{ k: number; code: string }>(sql`
+                select a.k, (array['AS', 'GU', 'MP', 'PR', 'VI'])[array_position(array['60', '66', '69', '72', '78'], c.code)] as code from area a join area_code c on c.area_id = a.id
+                where (a.id = any(${sql.param(group.ids)}::uuid[]) or a.k = any(${sql.param(blank.map((entry) => entry.k))}::int[]))
+                  and c.code in ('60', '66', '69', '72', '78')
+              `)
+              : null,
+          ]);
           return [
             {
               scheme: group.scheme,
@@ -7938,7 +7952,8 @@ export const contests = {
                 .toSorted((a, b) => a.localeCompare(b)),
               k: group.ids.includes(area.id) ? area.k : null,
               frame: group.ids.includes(area.id) ? frame : null,
-              blank: group.scheme === input.level ? blank : [],
+              blank: isLevel ? blank : [],
+              ...(outlying != null && { outlying: outlying.rows }),
             },
           ];
         }),
@@ -9947,7 +9962,7 @@ async function sketch(
     contest == null ? [] : await universe(contest, level, area.id, day);
   const counted = new Set(ks);
   const absent = whole.filter((row) => !counted.has(row.k));
-  const [frame, found, nested, labels] = await Promise.all([
+  const [frame, found, nested, labels, outlying] = await Promise.all([
     framing(area.id, day, [
       ...ks,
       ...whole.filter((row) => !row.outside).map((row) => row.k),
@@ -9995,6 +10010,13 @@ async function sketch(
       absent.map((row) => row.id),
       day,
     ),
+    level === "us.state"
+      ? db.execute<{ k: number; code: string }>(sql`
+        select a.k, (array['AS', 'GU', 'MP', 'PR', 'VI'])[array_position(array['60', '66', '69', '72', '78'], c.code)] as code from area a join area_code c on c.area_id = a.id
+        where a.k = any(${sql.param([...ks, ...absent.map((row) => row.k)])}::int[])
+          and c.code in ('60', '66', '69', '72', '78')
+      `)
+      : null,
   ]);
   const inside = stored(nested.rows[0]?.tiles);
   const tiled = found.rows.find((row) => row.scheme === level);
@@ -10018,6 +10040,7 @@ async function sketch(
           }))
           .toSorted((a, b) => a.name.localeCompare(b.name)),
         isApproximate: tiled.synthetic,
+        ...(outlying != null && { outlying: outlying.rows }),
         shaped: ks.length === 0 ? null : tiled.shaped,
         credits:
           ks.length === 0

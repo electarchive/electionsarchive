@@ -395,6 +395,7 @@
               : { tiles: inner.tiles, ks: districts.map((row) => row.k) },
           frame: own.frame,
           blank: level.blank,
+          outlying: level.outlying ?? null,
           isApproximate: level.isApproximate,
           noun: noun ?? level.noun,
           sources: [
@@ -1666,6 +1667,7 @@
           nested={drawn.nested}
           frame={drawn.frame}
           blank={drawn.blank}
+          outlying={drawn.outlying}
           isApproximate={drawn.isApproximate}
           noun={drawn.noun}
           sources={drawn.sources}

@@ -1407,6 +1407,7 @@
                 nested={race.map.nested}
                 frame={race.map.frame}
                 blank={race.map.blank ?? null}
+                outlying={race.map.outlying ?? null}
                 isApproximate={race.map.isApproximate}
                 sources={race.map.credits}
                 noun={race.places?.levels[0]?.noun ?? ""}
@@ -1493,6 +1494,7 @@
               nested={shape.nested}
               frame={shape.frame}
               blank={shape.blank ?? null}
+              outlying={shape.outlying ?? null}
               isApproximate={shape.isApproximate}
               sources={shape.credits}
               noun={places.levels[0]?.noun ?? ""}

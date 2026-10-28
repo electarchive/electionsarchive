@@ -45,6 +45,7 @@
     frame,
     limit = null,
     blank = null,
+    outlying = null,
     isApproximate,
     noun,
     votes,
@@ -78,6 +79,7 @@
       isOutside: boolean;
       isPending: boolean;
     }> | null;
+    outlying?: Array<{ k: number; code: string }> | null;
     isApproximate: boolean;
     noun: string;
     votes: string;
@@ -613,16 +615,42 @@
       .filter((entry) => !entry.isHeld && !entry.isPending)
       .toArray(),
   );
-  const inland: Maplibre.FilterSpecification = $derived([
+  const remote = $derived.by(() => {
+    const codes = new Map(
+      (outlying ?? []).map((entry) => [entry.k, entry.code]),
+    );
+    if (codes.size === 0) {
+      return [];
+    }
+    const painted = new Map(fills((css) => css));
+    return [
+      ...places.rows
+        .filter((row) => codes.has(row.k))
+        .map((row) => ({ k: row.k, name: row.name, isBlank: false })),
+      ...[...missing, ...pending]
+        .filter((entry) => codes.has(entry.k))
+        .map((entry) => ({ k: entry.k, name: entry.name, isBlank: true })),
+    ]
+      .map((entry) => ({
+        ...entry,
+        code: codes.get(entry.k) ?? "",
+        fill: painted.get(entry.k),
+      }))
+      .toSorted((a, b) => a.code.localeCompare(b.code));
+  });
+  const inland: Maplibre.ExpressionSpecification = $derived([
     "!",
     [
       "in",
       ["id"],
       [
         "literal",
-        (blank ?? [])
-          .filter((entry) => entry.isOutside)
-          .map((entry) => entry.k),
+        [
+          ...(blank ?? [])
+            .filter((entry) => entry.isOutside)
+            .map((entry) => entry.k),
+          ...(outlying ?? []).map((entry) => entry.k),
+        ],
       ],
     ],
   ]);
@@ -1238,13 +1266,17 @@
           type: "fill",
           ...areas,
           filter: [
-            "in",
-            ["id"],
+            "all",
+            inland,
             [
-              "literal",
-              id === "blank"
-                ? [...missing, ...pending].map((entry) => entry.k)
-                : [],
+              "in",
+              ["id"],
+              [
+                "literal",
+                id === "blank"
+                  ? [...missing, ...pending].map((entry) => entry.k)
+                  : [],
+              ],
             ],
           ],
           paint: { "fill-pattern": image },
@@ -1450,6 +1482,7 @@
         id: "focus",
         type: "line",
         ...areas,
+        filter: inland,
         paint: {
           "line-color": "var(--foreground)",
           "line-width": 2.25,
@@ -1503,16 +1536,20 @@
       read(colors[index] ?? "var(--muted-foreground)"),
     );
     untrack(() => {
-      engine.filter("unmatched", ["in", ["id"], ["literal", hatched]]);
+      engine.filter("unmatched", [
+        "all",
+        inland,
+        ["in", ["id"], ["literal", hatched]],
+      ]);
       engine.filter("norun", [
-        "in",
-        ["id"],
-        ["literal", skipped.map((row) => row.k)],
+        "all",
+        inland,
+        ["in", ["id"], ["literal", skipped.map((row) => row.k)]],
       ]);
       engine.filter("split", [
-        "in",
-        ["id"],
-        ["literal", splits.map((entry) => entry.k)],
+        "all",
+        inland,
+        ["in", ["id"], ["literal", splits.map((entry) => entry.k)]],
       ]);
       engine.style(
         "split",
@@ -1529,7 +1566,9 @@
       engine.points(
         "dots",
         places.rows.flatMap((row) =>
-          row.at == null ? [] : [{ k: row.k, at: row.at }],
+          row.at == null || remote.some((entry) => entry.k === row.k)
+            ? []
+            : [{ k: row.k, at: row.at }],
         ),
       );
       engine.points(
@@ -1539,6 +1578,7 @@
               const change = changes.get(row.k)?.swing;
               if (
                 row.at == null ||
+                remote.some((entry) => entry.k === row.k) ||
                 change == null ||
                 Math.abs(change) < 0.001
               ) {
@@ -1972,6 +2012,93 @@
         <ScanIcon class="block-4 inline-4" />
       </button>
     </div>
+    {#if remote.length > 0}
+      <div
+        class="absolute inset-e-2 inset-be-2 flex overflow-hidden rounded-sm bg-card/95 shadow-menu ring-1 ring-border max-sm:inset-e-14"
+        role="group"
+        aria-label={m.map_outlying()}
+      >
+        {#each remote as entry (entry.k)}
+          {const reach = (node: HTMLElement) => {
+            const box =
+              node.offsetParent?.parentElement?.getBoundingClientRect();
+            const rect = node.getBoundingClientRect();
+            if (box != null) {
+              pointer = {
+                x: rect.left - box.left + rect.width / 2,
+                y: rect.top - box.top,
+              };
+            }
+          }}
+          <button
+            type="button"
+            class={cn(
+              "flex items-center gap-1.5 border-s border-border px-2 text-xs font-semibold block-7 first:border-s-0 hover:bg-secondary pointer-coarse:block-10",
+              { "bg-secondary": pinned === entry.k || focus === entry.k },
+              { "font-normal text-muted-foreground": entry.isBlank },
+            )}
+            aria-label={entry.name}
+            aria-pressed={entry.isBlank ? undefined : pinned === entry.k}
+            onpointermove={(event) => {
+              if (
+                !isHover(event) ||
+                (pointer != null && (entry.isBlank ? empty : focus) === entry.k)
+              ) {
+                return;
+              }
+              reach(event.currentTarget);
+              if (entry.isBlank) {
+                empty = entry.k;
+              } else if (pinned == null) {
+                focus = entry.k;
+              }
+            }}
+            onpointerleave={() => {
+              pointer = null;
+              empty = null;
+              if (pinned == null && focus === entry.k) {
+                focus = null;
+              }
+            }}
+            onfocus={(event) => {
+              reach(event.currentTarget);
+              if (entry.isBlank) {
+                empty = entry.k;
+              } else if (pinned == null) {
+                focus = entry.k;
+              }
+            }}
+            onblur={() => {
+              pointer = null;
+              empty = null;
+              if (pinned == null && focus === entry.k) {
+                focus = null;
+              }
+            }}
+            onclick={(event) => {
+              if (entry.isBlank) {
+                return;
+              }
+              if (isTouch(event) && pinned !== entry.k) {
+                pinned = entry.k;
+                focus = entry.k;
+              } else {
+                open(entry.k);
+              }
+            }}
+          >
+            <span
+              class={cn("rounded-xs bg-(--party) block-2.5 inline-2.5", {
+                "ring-1 ring-border": entry.isBlank,
+              })}
+              style:--party={entry.fill}
+              aria-hidden="true"
+            ></span>
+            {entry.code}
+          </button>
+        {/each}
+      </div>
+    {/if}
     {#if overview != null && context != null}
       {#key `${nook.isTop}:${nook.isEnd}:${context.k}`}
         <button
@@ -2743,9 +2870,10 @@
 </div>
 
 {#snippet gap(shape: "absent" | "norun", label: string, names: Array<string>)}
+  {const isListed = $derived(names.length <= 5)}
   <span
-    class="flex items-center gap-1.5 px-1.5 text-[0.8125rem] text-muted-foreground block-7"
-    title={names.join(", ")}
+    class="flex items-center gap-1.5 px-1.5 text-[0.8125rem] text-muted-foreground min-block-7"
+    title={isListed ? undefined : names.join(", ")}
   >
     <svg
       viewBox="0 0 10 10"
@@ -2761,8 +2889,16 @@
         stroke-linecap={shape === "absent" ? "round" : "butt"}
       />
     </svg>
-    <span>{label}</span>
-    <span class="font-figures text-xs tabular-nums">{names.length}</span>
+    <span class="shrink-0">{label}</span>
+    {#if isListed}
+      <span class="text-pretty text-foreground"
+        >{new Intl.ListFormat(getLocale(), { type: "conjunction" }).format(
+          names.toSorted((a, b) => a.localeCompare(b, getLocale())),
+        )}</span
+      >
+    {:else}
+      <span class="font-figures text-xs tabular-nums">{names.length}</span>
+    {/if}
   </span>
 {/snippet}
 
