@@ -14961,6 +14961,16 @@ export async function record(input: { id: string; body?: string }) {
       case when "isMixed" then listed else seats end as seats
     from flagged
     where not ("isMixed" and listed = 0)
+      and not exists (
+        select from election e
+        join polity ep on ep.id = e.polity_id and ep.kind = 'supranational'
+        where e.id = flagged.link and not exists (select from contest c where c.election_id = e.id)
+          and exists (
+            select from polity_parent pp
+            where pp.parent_id = e.polity_id and pp.valid @> e.date_from
+              and not exists (select from election k where k.parent_id = e.id and k.polity_id = pp.polity_id)
+          )
+      )
     order by day
   `);
   const cabinets = await db.execute<{

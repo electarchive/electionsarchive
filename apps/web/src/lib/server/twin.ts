@@ -2182,6 +2182,15 @@ function electionMarkdown(
     `# ${election.name}`,
     byline(election.breadcrumbs, link, election.date),
     ...election.notes.map((note) => `> ${note.body}`),
+    ...(election.coverage == null
+      ? []
+      : [
+          m.election_partial({
+            held: count(election.coverage.held),
+            of: count(election.coverage.of),
+            noun: election.coverage.noun,
+          }),
+        ]),
     ...(election.turnout == null
       ? []
       : [
