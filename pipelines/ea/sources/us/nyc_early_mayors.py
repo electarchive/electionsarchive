@@ -15,7 +15,17 @@ VERSION = "1"
 PARSED = DATA / "parsed" / SOURCE
 API = "https://en.wikipedia.org/w/api.php?"
 SPECIALS = {1932: date(1932, 11, 8), 1950: date(1950, 11, 7)}
-PRIMARIES = {1925: date(1925, 9, 15), 1937: date(1937, 9, 16), 1941: date(1941, 9, 16), 1977: date(1977, 9, 8)}
+PRIMARIES = {
+    1925: date(1925, 9, 15),
+    1929: date(1929, 9, 17),
+    1933: date(1933, 9, 19),
+    1937: date(1937, 9, 16),
+    1941: date(1941, 9, 16),
+    1961: date(1961, 9, 7),
+    1965: date(1965, 9, 14),
+    1977: date(1977, 9, 8),
+    1985: date(1985, 9, 10),
+}
 YEARS = sorted([*range(1897, 1986, 4), *SPECIALS])
 CITYWIDE = {
     "comptroller": ("Comptroller", "new-york-city:comptroller", (1993, 1997)),
@@ -141,7 +151,8 @@ def parse() -> None:
                 )
                 if (
                     heading := re.search(
-                        r"title\s*=\s*\d{4} (Democratic|Republican) mayoral primary(?! runoff)", box.group(0)
+                        r"title\s*=\s*\d{4} (?:New York City )?(Democratic|Republican) (?:mayoral )?primary(?! runoff)",
+                        box.group(0),
                     )
                 )
             ]
