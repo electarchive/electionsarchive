@@ -14,7 +14,7 @@ from ea.sources.us.secession import STATES
 from ea.store import connect
 
 SOURCE = "us.legislators"
-VERSION = "5"
+VERSION = "6"
 SERVICE = "https://query.wikidata.org/sparql?" + urlencode(
     {
         "query": """SELECT ?bioguide ?start ?startPrecision ?end ?endPrecision ?cause WHERE {
@@ -556,7 +556,11 @@ def emit() -> Path:
                     from_precision=began,
                     to_date=None if end > today else end,
                     to_precision=ended,
-                    acquired_via="appointed" if term.get("how") == "appointment" else "elected",
+                    acquired_via="appointed"
+                    if term.get("how") == "appointment"
+                    else "indirect"
+                    if chamber == "senate" and contest is None and start < date(1913, 5, 31)
+                    else "elected",
                     contest_id=contest,
                     ended_via=cause or ("term_end" if scheduled and end <= today else None),
                 )
