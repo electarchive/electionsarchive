@@ -14189,6 +14189,7 @@ export const elections = {
             label: v.nullable(v.string()),
             short: v.nullable(v.string()),
             color: v.nullable(v.string()),
+            isLed: v.boolean(),
           }),
         ),
       }),
@@ -14212,21 +14213,18 @@ export const elections = {
         label: string | null;
         color: string | null;
         shaped: string | null;
+        led: boolean | null;
       }>(sql`
         with top as (
           select pt.area_id as id from election e
           join polity_territory pt on pt.polity_id = e.polity_id and pt.valid @> e.date_from
           where e.id = ${input.id}::uuid limit 1
         )
-        select s.path, k.date_from::text as date, w.person, w.party, w.label, w.color, w.area, g.id as group, z.id as shaped
+        select s.path, k.date_from::text as date, w.person, w.party, w.label, w.color, w.area, w.led, g.id as group, z.id as shaped
         from election k
         join slug s on s.entity_id = k.id and s.is_current
         left join lateral (
-          select coalesce(pm.into_id, o.party_id) as party, o.ballot_label as label,
-            coalesce(c.district_area_id, (
-              select pt.area_id from polity_territory pt where pt.polity_id = k.polity_id
-              order by pt.valid @> k.date_from desc limit 1
-            )) as area,
+          select coalesce(pm.into_id, o.party_id) as party, o.ballot_label as label, ar.id as area, pick.led,
             (select coalesce(m.into_id, cy.person_id) from candidacy cy left join entity_merge m on m.entity_id = cy.person_id
              where cy.option_id = o.id and cy.role = 'head' order by cy.id limit 1) as person,
             ${paint(sql`coalesce(pm.into_id, o.party_id)`, sql`select ${input.id}::uuid`, sql`k.date_from`)} as color
@@ -14236,8 +14234,37 @@ export const elections = {
             ${sql.param(decided.map(([, chain]) => chain.final))}::uuid[]
           ) as d(id, final) on d.id = c.id
           join result_set rs on rs.contest_id = coalesce(d.final, c.id) and ${latest("rs")}
-          join outcome x on x.result_set_id = rs.id and x.kind in ('elected', 'won') and x.candidacy_id is null
-          join contest_option o on o.id = x.option_id
+          cross join lateral (
+            select coalesce(c.district_area_id, (
+              select pt.area_id from polity_territory pt where pt.polity_id = k.polity_id
+              order by pt.valid @> k.date_from desc limit 1
+            )) as id
+          ) ar
+          left join area da on da.id = ar.id
+          cross join lateral (
+            (
+              select x.option_id as id, false as led from outcome x
+              where x.result_set_id = rs.id and x.kind in ('elected', 'won') and x.candidacy_id is null
+              order by x.option_id limit 1
+            )
+            union all
+            (
+              select o.id, true from (
+                select y.option_k, sum(y.value) as value from result_rollup y
+                where y.result_set_k = rs.k and y.area_k = da.k and y.measure = 1 and y.option_k <> 0
+                  and y.count_round = (
+                    select max(z.count_round) from result_rollup z
+                    where z.result_set_k = rs.k and z.area_k = da.k and z.measure = 1 offset 0
+                  )
+                group by y.option_k
+                offset 0
+              ) t
+              join contest_option o on o.k = t.option_k
+              order by t.value desc limit 1
+            )
+            limit 1
+          ) pick
+          join contest_option o on o.id = pick.id
           left join entity_merge pm on pm.entity_id = o.party_id
           where c.election_id = k.id and c.kind = 'office'
           order by c.id limit 1
@@ -14451,6 +14478,7 @@ export const elections = {
             labels.full.get(row.party ?? "") ??
             null,
           color: row.color,
+          isLed: row.led === true,
         })),
       };
     }),

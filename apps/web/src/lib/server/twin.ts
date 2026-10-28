@@ -493,7 +493,18 @@ function markdown(
           ? []
           : [
               `## ${m.winners_title({ noun })}`,
-              m.winners_lede({ count: count(winners.rows.length), noun }),
+              [
+                m.winners_lede({ count: count(winners.rows.length), noun }),
+                ...(winners.rows.some((row) => row.isLed)
+                  ? [
+                      m.winners_led_note({
+                        count: count(
+                          winners.rows.filter((row) => row.isLed).length,
+                        ),
+                      }),
+                    ]
+                  : []),
+              ].join(" "),
               table(
                 [
                   noun.charAt(0).toUpperCase() + noun.slice(1),
@@ -515,7 +526,11 @@ function markdown(
                   .map((row) => [
                     row.region,
                     link(row.place, row.path),
-                    row.label ?? m.winners_none(),
+                    row.label == null
+                      ? m.winners_none()
+                      : row.isLed
+                        ? `${row.label} (${m.winners_led()})`
+                        : row.label,
                     row.short,
                   ]),
               ),

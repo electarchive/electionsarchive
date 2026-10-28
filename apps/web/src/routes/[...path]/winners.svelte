@@ -109,6 +109,9 @@
           a.name.localeCompare(b.name, "tr"),
       ),
   );
+  const led = $derived(
+    (winners.data?.rows ?? []).filter((row) => row.isLed).length,
+  );
   const shown = $derived.by(() => {
     const needle = query.trim().toLocaleLowerCase("tr");
     return needle === ""
@@ -140,6 +143,9 @@
             count: count(winners.data?.rows.length ?? 0),
             noun,
           })}
+          {#if led > 0}
+            {m.winners_led_note({ count: count(led) })}
+          {/if}
         </p>
       </div>
       <Input
@@ -295,6 +301,12 @@
                       >{/if}
                   {/if}
                 </span>
+                {#if row.label != null && row.isLed}
+                  <span
+                    class="shrink-0 rounded-xs border border-border px-1 text-xs text-muted-foreground"
+                    >{m.winners_led()}</span
+                  >
+                {/if}
               </li>
             {/each}
           </ul>

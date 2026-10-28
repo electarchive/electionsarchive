@@ -1789,6 +1789,8 @@
   "winners_more": "Show all {count}",
   "winners_fewer": "Show fewer",
   "winners_none": "Winner not recorded",
+  "winners_led": "Led",
+  "winners_led_note": "Our sources declare no winner in {count} of these races, so we show the candidate with the most votes, marked Led.",
   "fusion_line": "{name} line",
   "versus_opponents": "Compare with opponents",
   "versus_neighbors": "Compare with neighbors",
