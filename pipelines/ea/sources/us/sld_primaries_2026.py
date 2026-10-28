@@ -940,7 +940,7 @@ def parse() -> None:
                             str(int(found[2])),
                             "republican" if sheet.startswith("REP") else "democratic",
                             cased(lines[4][column].split("\n")[0].strip()),
-                            line[1],
+                            line[1].replace("&", "and"),
                             int(line[column] or 0),
                         )
                         for column in range(2, len(line))
