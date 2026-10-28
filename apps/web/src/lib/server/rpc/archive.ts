@@ -1757,6 +1757,21 @@ async function load(
             label:
               labels.full.get(row.person ?? "") ??
               labels.full.get(row.party ?? "") ??
+              (row.kind === "others"
+                ? (
+                    {
+                      Übrige: m.option_others,
+                      others: m.option_others,
+                      ".": m.option_others,
+                      Altri: m.option_others,
+                      "Voti dispersi": m.option_scattered,
+                      Einzelbewerber: m.option_individuals,
+                      Bağımsızlar: m.option_independents,
+                      "Diğer partiler ve bağımsızlar":
+                        m.option_others_independents,
+                    } as Record<string, (() => string) | undefined>
+                  )[row.label ?? ""]?.()
+                : undefined) ??
               row.label ??
               row.kind,
             short:
