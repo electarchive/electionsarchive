@@ -666,7 +666,7 @@ def emit(
                        from area_geometry g, area_geometry n where g.area_id = %s and g.valid @> %s::date and n.area_id = %s""",
                     [area, day, place],
                 ).fetchone()
-                inside = outside is not None and outside[0] <= 0.01
+                inside = outside is not None and outside[0] <= (0.1 if fuller else 0.01)
             if attach:
                 contest = found[0][0]
                 contest_key = conn.execute(
