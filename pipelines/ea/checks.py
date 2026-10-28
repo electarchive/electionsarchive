@@ -307,6 +307,53 @@ def _outcomes(stage: Stage) -> list[tuple[str, sql.Composed]]:
     ]
 
 
+def _dropped(stage: Stage) -> list[tuple[str, sql.Composed]]:
+    staged = stage.tables.get("result_set", [])
+    if not staged:
+        return []
+
+    def column(name: str, fallback: LiteralString) -> sql.Composable:
+        if name in staged:
+            return sql.SQL("s.{}").format(sql.Identifier(name))
+        return sql.SQL("coalesce(p.{}, {})").format(sql.Identifier(name), sql.SQL(fallback))
+
+    outcomes = stage.staged("outcome") if "outcome" in stage.tables else None
+    notes = stage.staged("note") if "note" in stage.tables else None
+    return [
+        (
+            "outcome.dropped",
+            sql.SQL(
+                """select null::uuid, s.id, jsonb_build_object('supersedes_id', {supersedes})
+                   from {result_sets} s left join public.result_set p on p.id = s.id
+                   where {status} = 'active' and {default} and {supersedes} is not null
+                     and (exists (select from public.outcome o where o.result_set_id = {supersedes}){prior})
+                     and not exists (select from public.note n where n.entity_id = s.id and n.kind = 'caveat'){noted}
+                     and (s.id = any({clears}::uuid[])
+                          or not exists (select from public.outcome o where o.result_set_id = s.id)){own}"""
+            ).format(
+                result_sets=stage.staged("result_set"),
+                supersedes=column("supersedes_id", "null"),
+                status=column("status", "'active'"),
+                default=column("is_default", "false"),
+                prior=sql.SQL(" or exists (select from {} o where o.result_set_id = {})").format(
+                    outcomes, column("supersedes_id", "null")
+                )
+                if outcomes is not None
+                else sql.SQL(""),
+                noted=sql.SQL(
+                    " and not exists (select from {} n where n.entity_id = s.id and n.kind = 'caveat')"
+                ).format(notes)
+                if notes is not None
+                else sql.SQL(""),
+                own=sql.SQL(" and not exists (select from {} o where o.result_set_id = s.id)").format(outcomes)
+                if outcomes is not None
+                else sql.SQL(""),
+                clears=sql.Literal(stage.clears),
+            ),
+        )
+    ]
+
+
 def _references(conn: Connection, stage: Stage) -> list[tuple[str, sql.Composed]]:
     queries: list[tuple[str, sql.Composed]] = []
     for table in FACTS:
@@ -634,6 +681,7 @@ def run(conn: Connection, stage: Stage) -> list[Finding]:
         *_references(conn, stage),
         *_accounting(stage),
         *_outcomes(stage),
+        *_dropped(stage),
         *_geometry(stage),
         *_country_names(stage),
         *_seated(stage),
