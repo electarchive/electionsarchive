@@ -20768,7 +20768,7 @@ export const parties = {
           from contest c join election e on e.id = c.election_id
           left join body b on b.id = c.body_id
           left join office f on f.id = c.office_id
-          where c.allocation_parent_id is null and c.party_scope_id is null and e.kind in ('general', 'local')
+          where c.allocation_parent_id is null and c.party_scope_id is null and e.kind in ('general', 'local') and e.rerun_of_id is null
             and coalesce(c.body_id, c.office_id) is not null and not c.notional
             and ((select polity from home) is null or coalesce(b.polity_id, f.polity_id) = (select polity from home))
         ),
