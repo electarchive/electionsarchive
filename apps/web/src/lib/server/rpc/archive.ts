@@ -612,13 +612,30 @@ export async function names(
     kind: string;
     text: string;
   }>(sql`
-    (select distinct on (entity_id) entity_id, kind::text, text
-    from name
-    where entity_id = any(${sql.param(ids)}::uuid[]) and kind in ('official', 'english')
-    order by entity_id, coalesce(valid @> coalesce(${on}::date, current_date), false) desc,
-      coalesce(valid @> coalesce(${on}::date, current_date) and not (lower_inf(valid) and upper_inf(valid)), false) desc,
-      coalesce(kind = 'english' and script = 'Latn' and entity_id = any(${sql.param(common)}::uuid[]), false) desc, is_preferred desc,
-      (lang = 'en') desc, (kind = 'official') desc, recorded_from desc, id)
+    (select n.entity_id, n.kind, coalesce(to_char(d.date, 'FMMonth FMDD, ') || n.text, n.text) as text
+    from (
+      select distinct on (entity_id) entity_id, kind::text, text
+      from name
+      where entity_id = any(${sql.param(ids)}::uuid[]) and kind in ('official', 'english')
+      order by entity_id, coalesce(valid @> coalesce(${on}::date, current_date), false) desc,
+        coalesce(valid @> coalesce(${on}::date, current_date) and not (lower_inf(valid) and upper_inf(valid)), false) desc,
+        coalesce(kind = 'english' and script = 'Latn' and entity_id = any(${sql.param(common)}::uuid[]), false) desc, is_preferred desc,
+        (lang = 'en') desc, (kind = 'official') desc, recorded_from desc, id
+    ) n
+    left join lateral (
+      select e.date_from as date from election e
+      where e.id = n.entity_id and e.date_precision = 'day'
+        and n.text like extract(year from e.date_from)::int || ' %'
+        and exists (
+          select from election o
+          join name m on m.entity_id = o.id and m.is_preferred and m.lang = 'en'
+          where o.polity_id = e.polity_id and o.id <> e.id and o.status::text <> 'annulled'
+            and o.date_from >= date_trunc('year', e.date_from)::date
+            and o.date_from < (date_trunc('year', e.date_from) + interval '1 year')::date
+            and o.date_from <> e.date_from
+            and regexp_replace(m.text, '^[A-Z][a-z]+ [0-9]{1,2}, ', '') = n.text
+        )
+    ) d on true)
     union all
     select i.id, 'abbreviation', short.text
     from (select distinct unnest(${sql.param(ids)}::uuid[]) as id) i

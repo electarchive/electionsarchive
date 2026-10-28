@@ -15,10 +15,17 @@
   const {
     rounds,
     cycle,
+    after = [],
     more,
   }: {
     rounds: Extract<PageData, { kind: "contest" }>["rounds"];
     cycle: Pick<Cycle, "primaries" | "general">;
+    after?: Array<{
+      id: string;
+      label: string;
+      date: string | null;
+      path: string | null;
+    }>;
     more?: Snippet;
   } = $props();
 
@@ -143,6 +150,14 @@
               local: general.local,
             },
           ]),
+      ...after.map((stage) => ({
+        ...stage,
+        until: null,
+        isCurrent: false,
+        isMinor: false,
+        leaders: [],
+        local: null,
+      })),
     ].toSorted((a, b) => (a.date ?? "").localeCompare(b.date ?? ""));
     const order = (a: (typeof early)[number], b: (typeof early)[number]) =>
       (a.date ?? "").localeCompare(b.date ?? "");

@@ -1210,6 +1210,8 @@
   {/if}
 </header>
 
+{@render ticket()}
+
 {#if election.composition != null}
   {const composition = $derived(election.composition)}
   <section class="col-span-12 grid gap-2 bg-card px-3.5 py-3">
@@ -1686,9 +1688,6 @@
       />
     {/if}
   {/if}
-  {#if index === 0}
-    {@render ticket()}
-  {/if}
   {#if index === regionsAt}
     <Regions {id} />
   {/if}
@@ -1698,7 +1697,8 @@
 {/each}
 
 {#snippet ticket()}
-  {#if stages.length > 0}
+  {const isRoad = $derived(cycle.primaries.length > 0)}
+  {#if stages.length > 0 && !isRoad}
     <section class="col-span-12 bg-card px-3.5 py-3">
       <h2 class="mbe-1.5 text-[0.8125rem] font-bold">{m.election_stages()}</h2>
       <ul class="grid text-sm">
@@ -1725,6 +1725,14 @@
 
   <Road
     rounds={[]}
+    after={isRoad
+      ? stages.map((child) => ({
+          id: child.path ?? child.name,
+          label: child.name.replace(/^\d{4} /u, ""),
+          date: child.date,
+          path: child.path,
+        }))
+      : []}
     cycle={{
       primaries: cycle.primaries.map((primary) => ({
         ...primary,
@@ -2056,10 +2064,6 @@
       {/each}
     </ul>
   </section>
-{/if}
-
-{#if races.length === 0}
-  {@render ticket()}
 {/if}
 
 {#if sections.local != null}
