@@ -137,28 +137,28 @@ plate	ilce	parent_plate	parent	first	method	also
 33	Toroslar	33	Mersin Merkez	2010-09-12	law	
 33	Yenişehir	33	Mersin Merkez	2010-09-12	law	
 33	Çamlıyayla	33	Tarsus	1991-10-20	wikipedia	
-34	Arnavutköy	34	Çatalca	2010-09-12	registered_voters	34:Eyüpsultan
-34	Ataşehir	34	Üsküdar	2010-09-12	wikipedia	
+34	Arnavutköy	34	Çatalca	2010-09-12	law	34:Gaziosmanpaşa;34:Küçükçekmece
+34	Ataşehir	34	Kadıköy	2010-09-12	law	34:Üsküdar;34:Ümraniye;34:Kartal
 34	Avcılar	34	Küçükçekmece	1995-12-24	registered_voters	
 34	Bahçelievler	34	Bakırköy	1995-12-24	wikipedia	
 34	Bayrampaşa	34	Eyüpsultan	1991-10-20	registered_voters	
 34	Bağcılar	34	Bakırköy	1995-12-24	wikipedia	
-34	Başakşehir	34	Büyükçekmece	2010-09-12	wikipedia	
-34	Beylikdüzü	34	Küçükçekmece	2010-09-12	registered_voters	
+34	Başakşehir	34	Küçükçekmece	2010-09-12	law	34:Esenler;34:Büyükçekmece
+34	Beylikdüzü	34	Büyükçekmece	2010-09-12	law	
 34	Büyükçekmece	34	Çatalca	1988-09-25	wikipedia	
 34	Esenler	34	Bakırköy	1995-12-24	registered_voters	
-34	Esenyurt	34	Büyükçekmece	2010-09-12	wikipedia	
+34	Esenyurt	34	Büyükçekmece	2010-09-12	law	34:Avcılar
 34	Gaziosmanpaşa	34	Eyüpsultan	1965-10-10	registered_voters	
 34	Güngören	34	Bakırköy	1995-12-24	wikipedia	
 34	Kağıthane	34	Şişli	1988-09-25	wikipedia	
 34	Küçükçekmece	34	Bakırköy	1991-10-20	wikipedia	
 34	Maltepe	34	Kartal	1995-12-24	wikipedia	
 34	Pendik	34	Kartal	1991-10-20	registered_voters	
-34	Sancaktepe	34	Kadıköy	2010-09-12	registered_voters	
+34	Sancaktepe	34	Ümraniye	2010-09-12	law	34:Kartal;34:Pendik
 34	Sultanbeyli	34	Kartal	1995-12-24	wikipedia	
-34	Sultangazi	34	Gaziosmanpaşa	2010-09-12	registered_voters	
+34	Sultangazi	34	Gaziosmanpaşa	2010-09-12	law	34:Eyüpsultan;34:Esenler
 34	Tuzla	34	Pendik	1995-12-24	wikipedia	
-34	Çekmeköy	34	Ümraniye	2010-09-12	registered_voters	
+34	Çekmeköy	34	Ümraniye	2010-09-12	law	34:Kartal
 34	Ümraniye	34	Üsküdar	1988-09-25	registered_voters	
 35	Aliağa	35	Menemen	1982-11-07	wikipedia	
 35	Balçova	35	Konak	1995-12-24	wikipedia	
@@ -169,7 +169,7 @@ plate	ilce	parent_plate	parent	first	method	also
 35	Güzelbahçe	35	Urla	1995-12-24	wikipedia	
 35	Karabağlar	35	Konak	2010-09-12	wikipedia	
 35	Konak	35	İzmir Merkez	1991-10-20	law	
-35	Menderes	35	Kemalpaşa	1991-10-20	registered_voters	
+35	Menderes	35	İzmir Merkez	1991-10-20	law	
 35	Narlıdere	35	Konak	1995-12-24	wikipedia	
 35	Çiğli	35	Karşıyaka	1995-12-24	wikipedia	
 36	Akyaka	36	Arpaçay	1991-10-20	registered_voters	
@@ -200,7 +200,7 @@ plate	ilce	parent_plate	parent	first	method	also
 41	İzmit	41	Kocaeli Merkez	2010-09-12	law	
 42	Ahırlı	42	Bozkır	1991-10-20	wikipedia	
 42	Akören	42	Meram	1991-10-20	registered_voters	
-42	Altınekin	42	Ilgın	1988-09-25	registered_voters	
+42	Altınekin	42	Cihanbeyli	1988-09-25	wikipedia	
 42	Derbent	42	Selçuklu	1991-10-20	wikipedia	
 42	Derebucak	42	Beyşehir	1988-09-25	wikipedia	
 42	Emirgazi	42	Ereğli	1991-10-20	registered_voters	
@@ -221,13 +221,13 @@ plate	ilce	parent_plate	parent	first	method	also
 43	Çavdarhisar	43	Emet	1991-10-20	registered_voters	
 43	Şaphane	43	Gediz	1991-10-20	wikipedia	
 44	Battalgazi	44	Malatya Merkez	1991-10-20	law	
-44	Doğanyol	44	Malatya Merkez	1991-10-20	registered_voters	44:Pütürge
+44	Doğanyol	44	Pütürge	1991-10-20	wikipedia	
 44	Kale	44	Pütürge	1991-10-20	registered_voters	
 44	Kuluncak	44	Darende	1991-10-20	wikipedia	
 44	Yazıhan	44	Malatya Merkez	1991-10-20	registered_voters	
 45	Ahmetli	45	Turgutlu	1991-10-20	registered_voters	
 45	Gölmarmara	45	Akhisar	1988-09-25	registered_voters	
-45	Köprübaşı	45	Manisa Merkez	1991-10-20	law	
+45	Köprübaşı	45	Gördes	1991-10-20	wikipedia	
 45	Yunusemre	45	Manisa Merkez	2014-03-30	law	
 45	Şehzadeler	45	Manisa Merkez	2014-03-30	law	
 46	Dulkadiroğlu	46	Kahramanmaraş Merkez	2014-03-30	law	
@@ -244,12 +244,12 @@ plate	ilce	parent_plate	parent	first	method	also
 49	Hasköy	49	Muş Merkez	1991-10-20	registered_voters	
 49	Korkut	49	Muş Merkez	1991-10-20	registered_voters	
 50	Acıgöl	50	Nevşehir Merkez	1988-09-25	registered_voters	
-51	Altunhisar	51	Niğde Merkez	1991-10-20	registered_voters	
+51	Altunhisar	51	Bor	1991-10-20	law	
 51	Çiftlik	51	Bor	1991-10-20	registered_voters	
 52	Gülyalı	52	Altınordu	1991-10-20	registered_voters	
 52	Gürgentepe	52	Gölköy	1991-10-20	registered_voters	
 52	Kabadüz	52	Altınordu	1991-10-20	registered_voters	
-52	Kabataş	52	Fatsa	1991-10-20	wikipedia	
+52	Kabataş	52	Aybastı	1991-10-20	wikipedia	
 52	Çamaş	52	Fatsa	1991-10-20	wikipedia	
 52	Çatalpınar	52	Aybastı	1991-10-20	registered_voters	
 52	Çaybaşı	52	Ünye	1991-10-20	wikipedia	
@@ -290,7 +290,7 @@ plate	ilce	parent_plate	parent	first	method	also
 59	Marmaraereğlisi	59	Çorlu	1991-10-20	wikipedia	
 60	Başçiftlik	60	Niksar	1991-10-20	wikipedia	
 60	Pazar	60	Turhal	1991-10-20	registered_voters	
-60	Sulusaray	60	Artova	1991-10-20	registered_voters	60:Tokat Merkez
+60	Sulusaray	60	Artova	1991-10-20	wikipedia	
 60	Yeşilyurt	60	Artova	1991-10-20	registered_voters	
 61	Beşikdüzü	61	Vakfıkebir	1988-09-25	registered_voters	
 61	Dernekpazarı	61	Çaykara	1991-10-20	registered_voters	
@@ -311,7 +311,7 @@ plate	ilce	parent_plate	parent	first	method	also
 65	Çaldıran	65	Muradiye	1991-10-20	registered_voters	
 65	İpekyolu	65	Van Merkez	2014-03-30	law	
 66	Aydıncık	66	Çekerek	1991-10-20	registered_voters	
-66	Kadışehri	66	Çekerek	1991-10-20	registered_voters	66:Sorgun
+66	Kadışehri	66	Çekerek	1991-10-20	wikipedia	
 66	Saraykent	66	Akdağmadeni	1991-10-20	registered_voters	
 66	Yenifakılı	66	Boğazlıyan	1991-10-20	wikipedia	
 66	Çandır	66	Çayıralan	1991-10-20	wikipedia	

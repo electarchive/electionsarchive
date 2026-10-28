@@ -16,7 +16,7 @@ from ea.sources.licenses import UNLICENSED
 from ea.store import DATA, connect
 
 SOURCE = "tr.tkgm"
-VERSION = "3"
+VERSION = "4"
 PARSED = DATA / "parsed" / SOURCE
 COUNTIES = Path.home() / "Downloads" / "counties"
 URL = "https://parselsorgu.tkgm.gov.tr/"
@@ -69,17 +69,21 @@ NOTES = (
     "is drawn inside the ilçe it was carved from, so an ilçe's outline at an election is the union of today's "
     "ilçeler that reported under it; ilçeler that existed in 1961 keep today's outline back to then, and villages "
     "moved between existing ilçeler are not modeled. The parent of each of the 360 ilçeler that first reported "
-    "after 1961 is in tkgm_parents.tsv: 69 from the split laws (5747, 6360, and the metropolitan laws), 138 where "
-    "the ilçe's Turkish Wikipedia article names a single neighboring ilçe in the sentence on its creation, and 153 "
-    "from the neighboring ilçe in the same province whose registered voters fell by the new ilçe's at its first "
-    "election. The central ilçeler of Bursa, Gaziantep, Konya, and İzmir, split by Laws 3391, 3398, 3399, and 3392 in "
+    "after 1961 is in tkgm_parents.tsv: 77 from the laws that formed them (3392, 3644, 5747, 6360, and the "
+    "metropolitan laws; for Law 5747's Istanbul ilçeler, the ilçe each merged belde belonged to), 140 where the "
+    "ilçe's Wikipedia article names a single ilçe it was carved from, and 143 from the neighboring ilçe in the same "
+    "province whose registered voters fell by the new ilçe's at its first election, kept only where the new ilçe "
+    "touches that neighbor's outline at the time. The central ilçeler of Bursa, Gaziantep, Konya, and İzmir, split by Laws 3391, 3398, 3399, and 3392 in "
     "1987, kept reporting until their successors first did, so each is drawn, and kept in its province, until then. "
     "Electoral districts at each election are the union of the ilçeler that reported in them, and in 1987 the union "
     "of the ilçeler listed in YSK's decisions. Each of these outlines is a union of whole official ilçe outlines, so "
-    "it is marked official, except where Wikipedia says a new ilçe was formed from two neighbors (Akyurt, Arnavutköy, "
-    "Ayrancı, Bayraklı, Belen, Doğanyol, Eğil, Elbeyli, Kadışehri, Pursaklar, Seydiler, Sulusaray, and Yenipazar): it "
-    "is drawn inside one of them until its first election, so the outlines of both neighbors before then are marked "
-    "synthetic."
+    "it is marked official, except where Wikipedia or the law says a new ilçe was formed from more than one ilçe (Akyurt, "
+    "Arnavutköy, Ataşehir, Ayrancı, Başakşehir, Bayraklı, Belen, Çekmeköy, Eğil, Elbeyli, Esenyurt, Pursaklar, "
+    "Sancaktepe, Seydiler, Sultangazi, and Yenipazar): it "
+    "is drawn inside one of them until its first election, so the outlines of all of them before then are marked "
+    "synthetic. Ankara Merkez before 1987 is drawn as today's Gölbaşı, Keçiören, Mamak, and Sincan and the ilçeler later "
+    "carved from them, in three pieces, "
+    "because the parts of its ring now in Altındağ, Çankaya, and Yenimahalle are not modeled."
 )
 
 
