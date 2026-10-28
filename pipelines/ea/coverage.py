@@ -350,6 +350,9 @@ with c as (
                 or stage in ('general', 'special') and level = 'statewide_exec' and st in ('FL', 'LA', 'OK')
                 or stage in ('general', 'special') and exists (select from published p
                     where p.st = cc.st and p.year = cc.year and p.level = cc.level and p.county = '' and p.finest = 'none'))
+        or cc.stage = 'primary' and exists (select from contest_option o where o.contest_id = cc.id and o.kind = 'write_in')
+            and not exists (select from contest_option o where o.contest_id = cc.id and o.parent_option_id is null
+                and (o.kind <> 'write_in' or exists (select from candidacy d where d.option_id = o.id)))
             as cancelled,
         coalesce(cg.county, false) and exists (select from published p where p.st = cc.st and p.year = cc.year
             and p.level = cc.level and p.county = '' and p.finest in ('county', 'town'))
