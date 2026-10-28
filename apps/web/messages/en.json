@@ -1148,7 +1148,7 @@
   "cycle_in_place": "In {place}",
   "cycle_others": "Other party primaries",
   "cycle_parts": "Primaries and caucuses by state",
-  "cycle_day": "Also on the ballot on {date}",
+  "cycle_day": "Also on the ballot in {place} on {date}",
   "cycle_governor": "Governors",
   "cycle_legislature": "State legislative seats",
   "cycle_regional_office": "Other statewide offices",

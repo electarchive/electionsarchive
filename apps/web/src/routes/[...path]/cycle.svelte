@@ -1,6 +1,6 @@
 <script lang="ts">
   import { resolve } from "$app/paths";
-  import { count, date } from "#lib/format.js";
+  import { count, date, definite } from "#lib/format.js";
   import { m } from "#lib/paraglide/messages.js";
   import Preview from "./preview.svelte";
 
@@ -9,6 +9,7 @@
   }: {
     day: {
       date: string | null;
+      place: string;
       part: { name: string; path: string | null } | null;
       groups: Array<{
         key: string;
@@ -29,7 +30,7 @@
     aria-labelledby="{uid}-day"
   >
     <h2 id="{uid}-day" class="text-[0.8125rem] font-bold">
-      {m.cycle_day({ date: date(day.date) })}
+      {m.cycle_day({ date: date(day.date), place: definite(day.place) })}
     </h2>
     <ul
       class="grid grid-cols-[repeat(auto-fill,minmax(min(100%,11.5rem),1fr))] gap-x-4 gap-y-1.5 border-bs-2 border-border pbs-2"

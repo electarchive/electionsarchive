@@ -8425,14 +8425,23 @@ export const contests = {
           top: string;
           topPolity: string;
           election: string;
+          isScoped: boolean;
         }>(sql`
-          with recursive up(id, parent) as (
-            select e.id, e.parent_id from contest c join election e on e.id = c.election_id where c.id = ${contest.id}::uuid
+          with recursive up(id, parent, depth) as (
+            select e.id, e.parent_id, 0 from contest c join election e on e.id = c.election_id where c.id = ${contest.id}::uuid
             union all
-            select e.id, e.parent_id from election e join up on e.id = up.parent
+            select e.id, e.parent_id, up.depth + 1 from election e join up on e.id = up.parent
+          ),
+          scope as (
+            select s.id, s.id <> (select id from up where parent is null) as scoped, e.polity_id
+            from (select coalesce((
+              select up.id from up join election e on e.id = up.id join polity y on y.id = e.polity_id
+              where y.kind in ('federal_unit', 'region') order by up.depth desc limit 1
+            ), (select id from up where parent is null)) as id) s
+            join election e on e.id = s.id
           ),
           tree(id) as (
-            select id from up where parent is null
+            select id from scope
             union all
             select k.id from election k join tree on k.parent_id = tree.id
           ),
@@ -8462,14 +8471,17 @@ export const contests = {
                 else 'local' end as kind,
               case when kind <> 'ballot_question' and (ykind in ('sovereign_state', 'supranational', 'historical_state') or own)
                 then coalesce(office_id, body_id)
-                when kind not in ('ballot_question', 'office') and ykind = 'region' then body_id end as owner
+                when okind = 'governor' and (select scoped from scope) then office_id
+                when kind not in ('ballot_question', 'office')
+                  and (ykind = 'region' or (ykind = 'federal_unit' and (select scoped from scope))) then body_id end as owner
             from roots
           )
           select kind, owner, count(*)::int as count, min(id::text) as sample,
             bool_or(id = ${contest.root}::uuid) as "isCurrent", bool_or(okind = 'head_of_state') as "isHead",
             bool_and(part) as "isPart",
-            (select id from up where parent is null) as top,
-            (select t.polity_id from election t where t.id = (select id from up where parent is null)) as "topPolity",
+            (select id from scope) as top,
+            (select polity_id from scope) as "topPolity",
+            (select scoped from scope) as "isScoped",
             (select election_id from contest where id = ${contest.id}::uuid) as election
           from classed group by kind, owner
         `),
@@ -8696,6 +8708,7 @@ export const contests = {
       const top = day.rows[0]?.top ?? null;
       const election = day.rows[0]?.election ?? null;
       const topPolity = day.rows[0]?.topPolity ?? null;
+      const isScoped = day.rows[0]?.isScoped ?? false;
       const parties = [
         ...steps.flatMap((row) => row.party ?? []),
         ...others.flatMap((row) => row.party ?? []),
@@ -8875,9 +8888,17 @@ export const contests = {
             )
             .map(({ row, isSingle, label, plain }) => ({
               kind: row.kind,
-              label: isSingle
-                ? plain
-                : (labels.short.get(row.owner ?? "") ?? label),
+              label:
+                isSingle &&
+                !(
+                  isScoped &&
+                  row.owner != null &&
+                  !(row.kind === "owner" && row.isPart)
+                )
+                  ? plain
+                  : (labels.short.get(row.owner ?? "") ??
+                    labels.full.get(row.owner ?? "") ??
+                    label),
               count: row.count,
               path: isSingle
                 ? (slugs.get(row.sample) ?? null)
@@ -8886,9 +8907,13 @@ export const contests = {
                   : hub,
               anchor: isSingle
                 ? null
-                : label != null && row.kind === "owner"
+                : label != null &&
+                    (row.kind === "owner" ||
+                      (isScoped && row.kind === "legislature"))
                   ? `race-${segment(label)}`
-                  : "down-the-ballot",
+                  : isScoped
+                    ? null
+                    : "down-the-ballot",
             })),
         },
       };

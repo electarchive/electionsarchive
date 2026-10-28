@@ -3830,7 +3830,7 @@ function contestMarkdown(
     ...(day.length === 0 || cycle.day.date == null
       ? []
       : [
-          `## ${m.cycle_day({ date: date(cycle.day.date) })}`,
+          `## ${m.cycle_day({ date: date(cycle.day.date), place: definite(cycle.day.place) })}`,
           day
             .map(
               (group) =>
