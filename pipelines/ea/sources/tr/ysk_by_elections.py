@@ -1,3 +1,5 @@
+import struct
+import subprocess
 from datetime import UTC, date, datetime
 from pathlib import Path
 
@@ -5,11 +7,12 @@ import httpx
 
 from ea import raw
 from ea.changeset import Changeset, slug
-from ea.sources.tr.ysk import INDEPENDENTS, REGISTERED, VALID, VOTERS, VOTES
-from ea.store import connect
+from ea.sources.tr import die_local
+from ea.sources.tr.ysk import DIGITIZED, INDEPENDENTS, REGISTERED, VALID, VOTERS, VOTES
+from ea.store import DATA, connect
 
 SOURCE = "tr.ysk_by_elections"
-VERSION = "1"
+VERSION = "2"
 PUBLISHER = "Yüksek Seçim Kurulu"
 ARCHIVE = "https://www.resmigazete.gov.tr/arsiv"
 WAYBACK = "https://web.archive.org/web/2023id_"
@@ -74,9 +77,81 @@ BY_ELECTIONS = {
         ),
     ),
 }
+HATAY_DAY = date(1966, 6, 5)
+HATAY_BOOK = f"{die_local.LIBRARY}/0015213.pdf"
+HATAY_PUBLISHER = "Devlet İstatistik Enstitüsü"
+HATAY_TITLE = (
+    "5 Haziran 1966 Cumhuriyet Senatosu Üyeleri Kısmi Seçim Sonuçları ve Hatay İlinde Boş Bulunan 1 Milletvekili "
+    "Ara Seçimi Sonucu (DİE yayın no. 525)"
+)
+HATAY_LICENSE = (
+    "Official statistics published by the State Institute of Statistics under Laws 306 and 307; served by TÜİK's "
+    "library, which states no license, retrieved through the Wayback Machine."
+)
+HATAY_PARTIES = (
+    ("AP", "adalet-partisi-1961", "Adalet Partisi"),
+    ("CHP", "cumhuriyet-halk-partisi", "Cumhuriyet Halk Partisi"),
+    ("CKMP", "cumhuriyetci-koylu-millet-partisi", "Cumhuriyetçi Köylü Millet Partisi"),
+    ("MP", "millet-partisi-1962", "Millet Partisi"),
+    ("TİP", "turkiye-isci-partisi-1961", "Türkiye İşçi Partisi"),
+    ("YTP", "yeni-turkiye-partisi-1961", "Yeni Türkiye Partisi"),
+)
+HATAY_DECLARED = (29, (199170, 105530, 100584, 44598, 36096, 1063, 1488, 4949, 0, 12390))
+HATAY_ILCE = {
+    "Merkez": "Hatay Merkez",
+    "Altınözü": "Altınözü",
+    "Dörtyol": "Dörtyol",
+    "Hassa": "Hassa",
+    "İskenderun": "İskenderun",
+    "Kırıkhan": "Kırıkhan",
+    "Reyhanlı": "Reyhanlı",
+    "Samandağı": "Samandağ",
+    "Yayladağı": "Yayladağı",
+}
+HATAY_TABLE = 38
+HATAY_METHOD = (
+    "The district figures are YSK's declared results as published in the Resmî Gazete of 9 and 11 June 1966, "
+    "reprinted in table 1 of the State Institute of Statistics' book. The ilçe figures come from table 2, the "
+    "ilçe election boards' consolidation reports as printed by the Institute."
+)
+HATAY_CAVEAT = (
+    "The ilçe rows add up to 105,540 voters and 100,586 valid votes, against the 105,530 and 100,584 that YSK "
+    "declared; party votes agree. In Merkez and Reyhanlı, party and independent votes add up to one fewer than "
+    "the valid votes (22,297 against 22,298, and 7,751 against 7,752). The archive keeps every figure as printed. The book does not name the member elected for the "
+    "Justice Party list."
+)
+PAGES = DATA / "pages" / SOURCE
+
+
+def located(words: list[tuple], value: int) -> list[float] | None:
+    target = f"{value:,}".replace(",", " ")
+    tokens = [w for w in words if die_local.numeric(w[4])]
+    for start in range(len(tokens)):
+        for end in range(start + 1, min(start + 4, len(tokens)) + 1):
+            if " ".join(t[4] for t in tokens[start:end]) == target:
+                return [
+                    min(t[0] for t in tokens[start:end]),
+                    min(t[1] for t in tokens[start:end]),
+                    max(t[2] for t in tokens[start:end]),
+                    max(t[3] for t in tokens[start:end]),
+                ]
+    return None
 
 
 def fetch() -> None:
+    try:
+        raw.cached(SOURCE, HATAY_BOOK)
+    except LookupError:
+        response = httpx.get(f"{WAYBACK}/{HATAY_BOOK}", follow_redirects=True, timeout=600)
+        response.raise_for_status()
+        raw.store(
+            SOURCE,
+            HATAY_BOOK,
+            response.content,
+            suffix=".pdf",
+            retrieved_at=datetime.now(UTC),
+            media_type="application/pdf",
+        )
     for issue, *_ in BY_ELECTIONS.values():
         url = f"{ARCHIVE}/{issue}.pdf"
         try:
@@ -100,7 +175,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Turkey's 1986 National Assembly by-elections by electoral district, from YSK's notice",
+            summary="Turkey's 1966 and 1986 National Assembly by-elections: 1966 Hatay by ilçe from DİE, 1986 by district",
             polity="TR",
         )
         turkey = cs.polity("TR")
@@ -159,8 +234,8 @@ def emit() -> Path:
             for short in parties[:-1]:
                 key, full = PARTIES[short]
                 party_ids[short] = cs.key("tr.party", key)
-                if (party_ids[short] in cs.minted) != (short in NEW_PARTIES):
-                    raise ValueError(f"tr.party {key}: expected {'new' if short in NEW_PARTIES else 'existing'}")
+                if party_ids[short] in cs.minted and short not in NEW_PARTIES:
+                    raise ValueError(f"tr.party {key} is not in the archive")
                 if short in NEW_PARTIES:
                     cs.add("party", id=party_ids[short], kind="party", polity_id=turkey)
                     name(party_ids[short], full)
@@ -273,4 +348,195 @@ def emit() -> Path:
                     cs.add("outcome", result_set_id=declared, option_id=option, kind="won", seats=1)
                     cs.add("outcome", result_set_id=declared, option_id=option, candidacy_id=candidacy, kind="elected")
                     cs.add("citation", entity_id=candidacy, source_id=source, locator=None)
+        book = raw.cached(SOURCE, HATAY_BOOK)
+        source = cs.source(HATAY_PUBLISHER, HATAY_TITLE)
+        cs.add(
+            "source",
+            id=source,
+            kind="official_body",
+            publisher=HATAY_PUBLISHER,
+            title=HATAY_TITLE,
+            url=HATAY_BOOK,
+            license=HATAY_LICENSE,
+        )
+        artifact = cs.artifact(book, source)
+        read = die_local.pages(str(book.path), HATAY_DECLARED[0], HATAY_TABLE)
+        page_ids = {}
+        for number in (HATAY_DECLARED[0], HATAY_TABLE):
+            image = PAGES / f"{book.sha256}-{number}.png"
+            if not image.exists():
+                PAGES.mkdir(parents=True, exist_ok=True)
+                subprocess.run(
+                    [
+                        "pdftoppm",
+                        "-r",
+                        "100",
+                        "-png",
+                        "-f",
+                        str(number),
+                        "-l",
+                        str(number),
+                        "-singlefile",
+                        str(book.path),
+                        str(image.with_suffix("")),
+                    ],
+                    check=True,
+                )
+            width, height = struct.unpack(">II", image.read_bytes()[16:24])
+            page_ids[number] = cs.page(artifact, number)
+            cs.add(
+                "source_page",
+                id=page_ids[number],
+                artifact_id=artifact,
+                page_number=number,
+                image_key=f"pages/{SOURCE}/{image.name}",
+                width=width,
+                height=height,
+            )
+        width, height, words = read[HATAY_TABLE]
+        rows = {}
+        for line in die_local.lines(words, 0):
+            label = line[0][4]
+            if label in HATAY_ILCE and len(line) > 10:
+                rows[HATAY_ILCE[label]] = line
+        expected = {
+            "Hatay Merkez": (50311, 23542, 22298, 9704, 5500, 215, 201, 1839, 0, 4838),
+            "Altınözü": (16454, 6786, 6474, 2635, 3064, 87, 110, 476, 0, 102),
+            "Dörtyol": (18171, 10655, 10196, 5438, 4239, 143, 194, 172, 0, 10),
+            "Hassa": (9301, 5779, 5571, 3798, 1426, 64, 215, 58, 0, 10),
+            "İskenderun": (44037, 24462, 23434, 10551, 9836, 195, 343, 487, 0, 2022),
+            "Kırıkhan": (18127, 11268, 10878, 4079, 5689, 106, 149, 819, 0, 36),
+            "Reyhanlı": (13468, 8207, 7752, 2899, 4071, 112, 119, 498, 0, 52),
+            "Samandağ": (20146, 10362, 9674, 2648, 1087, 83, 74, 470, 0, 5312),
+            "Yayladağı": (9155, 4479, 4309, 2846, 1184, 58, 83, 130, 0, 8),
+        }
+        if set(rows) != set(expected):
+            raise ValueError(f"1966 Hatay: the ilçe table has {sorted(rows)}")
+        sums = [sum(column) for column in zip(*expected.values(), strict=True)]
+        if sums[3:] != list(HATAY_DECLARED[1][3:]) or sums[:3] != [199170, 105540, 100586]:
+            raise ValueError("1966 Hatay: the ilçe rows do not add up to the book's totals")
+        system = cs.key("tr.electoral_system", "by_election_1966")
+        cs.add(
+            "electoral_system",
+            id=system,
+            polity_id=turkey,
+            rules={"lists": {"order": "closed", "vacancy": "by_election"}, "formula": "dhondt"},
+            rules_version=1,
+        )
+        name(system, "National Assembly by-election, 1966", "en")
+        cs.add(
+            "note",
+            entity_id=system,
+            kind="methodology",
+            body_md="The by-election filled one vacant seat of a province's list, so the list or independent with "
+            "the most votes took it.",
+        )
+        election = cs.key("tr.election", f"{HATAY_DAY}:by-election")
+        cs.add(
+            "election",
+            id=election,
+            polity_id=turkey,
+            kind="by_election",
+            date_from=HATAY_DAY,
+            date_to=HATAY_DAY,
+            status="held",
+        )
+        name(election, "1966 Turkish National Assembly by-election", "en")
+        name(election, "5 Haziran 1966 Milletvekili Ara Seçimi", kind="native", preferred=False)
+        cs.add("slug", path=f"tr/{HATAY_DAY}-by-election", entity_id=election)
+        contest_key = f"{HATAY_DAY}:by-election:31"
+        contest = cs.key("tr.contest", contest_key)
+        assembly = cs.key("tr.body", "millet-meclisi")
+        if assembly in cs.minted:
+            raise ValueError("publish tr.thea before tr.ysk_by_elections")
+        cs.add(
+            "contest",
+            id=contest,
+            election_id=election,
+            kind="list_allocation",
+            body_id=assembly,
+            district_area_id=cs.area("tr.il", "31"),
+            magnitude=1,
+            round_number=1,
+            electoral_system_id=system,
+            default_result_kind="counted",
+        )
+        name(contest, "National Assembly, Hatay", "en")
+        cs.add("slug", path=f"tr/{HATAY_DAY}-by-election/hatay", entity_id=contest)
+        declared = cs.key(f"{SOURCE}.result_set", contest_key)
+        cs.add(
+            "result_set",
+            id=declared,
+            election_id=election,
+            contest_id=contest,
+            stage="official",
+            kind="counted",
+            status="active",
+            source_id=source,
+            is_default=True,
+            completeness=1,
+        )
+        cs.add("note", entity_id=declared, kind="methodology", body_md=HATAY_METHOD)
+        cs.add("note", entity_id=declared, kind="caveat", body_md=HATAY_CAVEAT)
+        options = []
+        for short, key, full in HATAY_PARTIES:
+            party = cs.key("tr.party", key)
+            if party in cs.minted:
+                raise ValueError(f"tr.party {key} is not in the archive")
+            options.append(cs.key("tr.option", f"{contest_key}:{key}"))
+            cs.add("contest_option", id=options[-1], contest_id=contest, kind="list", party_id=party, ballot_label=full)
+        options.append(cs.key("tr.option", f"{contest_key}:{slug(INDEPENDENTS)}"))
+        cs.add(
+            "contest_option",
+            id=options[-1],
+            contest_id=contest,
+            kind="others",
+            party_id=None,
+            ballot_label=INDEPENDENTS,
+        )
+        cs.add("outcome", result_set_id=declared, option_id=options[0], kind="won", seats=1)
+        measures = [(REGISTERED, None), (VOTERS, None), (VALID, None), *((VOTES, option) for option in options)]
+        district = cs.unit("tr.secim_cevresi", "31")
+        placed = [
+            (
+                district,
+                HATAY_DECLARED[0],
+                HATAY_DECLARED[1],
+                [w for w in read[HATAY_DECLARED[0]][2] if 712 < w[1] < 726],
+            )
+        ]
+        for code, values in expected.items():
+            unit = cs.unit("tr.ilce", f"31:{code}")
+            if unit in cs.minted:
+                raise ValueError(f"tr.ilce 31:{code} is not in the archive")
+            placed.append((unit, HATAY_TABLE, values, rows[code]))
+        for unit, number, values, line in placed:
+            if unit in cs.minted:
+                raise ValueError("publish tr.thea before tr.ysk_by_elections")
+            width, height, _ = read[number]
+            for (measure, option), value in zip(measures, values, strict=True):
+                if option is not None and value == 0:
+                    continue
+                fact = {
+                    "result_set_id": declared,
+                    "unit_id": unit,
+                    "option_id": option,
+                    "channel": 0,
+                    "measure": measure,
+                    "count_round": 0,
+                }
+                cs.add("result_value", **fact, flags=DIGITIZED, value=value)
+                found = located(line, value)
+                if found is None:
+                    raise ValueError(f"1966 Hatay: {value:,} is not on page {number}")
+                cs.add(
+                    "value_locator",
+                    **fact,
+                    page_id=page_ids[number],
+                    source_id=None,
+                    x0=found[0] / width,
+                    y0=found[1] / height,
+                    x1=found[2] / width,
+                    y1=found[3] / height,
+                )
         return cs.write()
