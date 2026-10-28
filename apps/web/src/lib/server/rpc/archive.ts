@@ -767,6 +767,7 @@ async function children(
   isRoot: boolean,
   date: string,
   target?: number,
+  isDeep = false,
 ) {
   const sets = await db.execute<{ k: number }>(sql`
     with recursive grp(id) as (
@@ -922,43 +923,87 @@ async function children(
     `,
   );
   found.rows.push(...unlinked.rows);
+  const tops = found.rows.filter(
+    (row) => !members.has(row.id) && !deeper.has(row.id),
+  );
+  const below =
+    isDeep && isRoot && tops.length > 1 && tops.length <= 200
+      ? await db.execute<{
+          id: string;
+          k: number;
+          scheme: string;
+          parent: string;
+        }>(sql`
+          select a.id, a.k, a.scheme_code as scheme, p.parent_id as parent
+          from area_parent p join area a on a.id = p.area_id
+          where p.parent_id = any(${sql.param(tops.map((row) => row.id))}::uuid[])
+            and p.valid @> ${date}::date
+            and a.scheme_code in (
+              select s.code from scheme s
+              where s.kind = 'administrative' and s.rank = (
+                select max(x.rank) + 1 from scheme x
+                where x.code = any(${sql.param([...new Set(tops.map((row) => row.scheme))])}::text[])
+              )
+            )
+            and exists (select from boundary_set bs where bs.scheme_code = a.scheme_code and bs.valid @> ${date}::date)
+            and ${counted}
+        `)
+      : { rows: [] };
+  const deep = Map.groupBy(below.rows, (row) => row.scheme)
+    .values()
+    .filter((rows) => rows.length > tops.length && rows.length <= 10_000)
+    .toArray()
+    .flat();
   const [labels, schemes] = await Promise.all([
     names(
-      found.rows.map((row) => row.id),
+      [...found.rows, ...deep].map((row) => row.id),
       date,
     ),
     db.execute<{ code: string; noun: string; kind: string; rank: number }>(sql`
       select code, noun, kind::text, rank from scheme
-      where code = any(${sql.param([...new Set(found.rows.map((row) => row.scheme))])}::text[])
+      where code = any(${sql.param([...new Set([...found.rows, ...deep].map((row) => row.scheme))])}::text[])
     `),
   ]);
   const scheme = new Map(schemes.rows.map((row) => [row.code, row]));
   const taken = new Map<string, number>();
-  return found.rows
+  const shaped = (
+    row: { id: string; k: number; scheme: string },
+    prefix: string,
+  ) => {
+    const name = labels.full.get(row.id) ?? "";
+    const base = `${prefix}${segment(name)}`;
+    const seen = (taken.get(base) ?? 0) + 1;
+    taken.set(base, seen);
+    return {
+      id: row.id,
+      k: row.k,
+      scheme: row.scheme,
+      name,
+      segment: seen === 1 ? base : `${base}-${seen}`,
+      noun: scheme.get(row.scheme)?.noun ?? "",
+      kind: scheme.get(row.scheme)?.kind ?? "",
+      rank: scheme.get(row.scheme)?.rank ?? 0,
+      isMember: members.has(row.id),
+      isDeep: prefix !== "",
+    };
+  };
+  const listed = found.rows
     .toSorted(
       (a, b) =>
         Number(deeper.has(a.id)) - Number(deeper.has(b.id)) ||
         Number(members.has(a.id)) - Number(members.has(b.id)) ||
         a.k - b.k,
     )
-    .map((row) => {
-      const name = labels.full.get(row.id) ?? "";
-      const base = segment(name);
-      const seen = (taken.get(base) ?? 0) + 1;
-      taken.set(base, seen);
-      return {
-        ...row,
-        name,
-        segment: seen === 1 ? base : `${base}-${seen}`,
-        noun: scheme.get(row.scheme)?.noun ?? "",
-        kind: scheme.get(row.scheme)?.kind ?? "",
-        rank: scheme.get(row.scheme)?.rank ?? 0,
-        isMember: members.has(row.id),
-      };
-    })
-    .toSorted((a, b) =>
-      a.name.localeCompare(b.name, undefined, { numeric: true }),
-    );
+    .map((row) => shaped(row, ""));
+  const prefixes = new Map(listed.map((row) => [row.id, `${row.segment}/`]));
+  return [
+    ...listed,
+    ...deep
+      .toSorted((a, b) => a.k - b.k)
+      .map((row) => shaped(row, prefixes.get(row.parent) ?? "")),
+  ].toSorted((a, b) =>
+    a.name.localeCompare(b.name, undefined, { numeric: true }),
+  );
 }
 
 async function descend(contest: Found, unit: string | undefined) {
@@ -2425,10 +2470,19 @@ async function places(
     area,
     isRoot,
     contest.date ?? "infinity",
+    undefined,
+    true,
   );
   const counts = new Map<
     string,
-    { code: string; noun: string; kind: string; rank: number; count: number }
+    {
+      code: string;
+      noun: string;
+      kind: string;
+      rank: number;
+      count: number;
+      isDeep: boolean;
+    }
   >();
   for (const kid of kids) {
     const level = counts.get(kid.scheme) ?? {
@@ -2437,6 +2491,7 @@ async function places(
       kind: kid.kind,
       rank: kid.rank,
       count: 0,
+      isDeep: kid.isDeep,
     };
     level.count += 1;
     counts.set(kid.scheme, level);
@@ -2614,8 +2669,11 @@ async function places(
   const joined = new Set(
     kids.filter((kid) => kid.isMember).map((kid) => kid.scheme),
   );
-  const checked = kids.filter((kid) =>
-    eligible.some((level) => level.code === kid.scheme),
+  const checked = kids.filter(
+    (kid) =>
+      !kid.isDeep &&
+      kid.scheme !== "world.country" &&
+      eligible.some((level) => level.code === kid.scheme),
   );
   const straddled =
     checked.length > 600
@@ -2662,6 +2720,7 @@ async function places(
   );
   const levels = eligible.toSorted(
     (a, b) =>
+      Number(a.isDeep) - Number(b.isDeep) ||
       Number(partial.has(a.code)) - Number(partial.has(b.code)) ||
       Number(joined.has(a.code)) - Number(joined.has(b.code)) ||
       a.rank - b.rank ||
@@ -7873,7 +7932,14 @@ export const contests = {
         `),
         input.level == null
           ? []
-          : children(contest.id, area, chain.length === 0, day),
+          : children(
+              contest.id,
+              area,
+              chain.length === 0,
+              day,
+              undefined,
+              true,
+            ),
       ]);
       const scheme = own.rows[0]?.scheme ?? "";
       const listed = kids
@@ -10111,7 +10177,10 @@ async function sketch(
   const inside = stored(nested.rows[0]?.tiles);
   const tiled = found.rows.find((row) => row.scheme === level);
   const own = found.rows.find(
-    (row) => row.scheme !== level && stored(row.tiles) != null,
+    (row) =>
+      row.scheme !== level &&
+      stored(row.tiles) != null &&
+      projectionOf(row.scheme) === projectionOf(level),
   );
   const [split, ownSplit] = await Promise.all([
     parted(level, area.id, day),
@@ -14149,6 +14218,7 @@ export const elections = {
       v.object({
         id: v.pipe(v.string(), v.uuid()),
         contest: v.pipe(v.string(), v.uuid()),
+        level: v.optional(v.string()),
       }),
     )
     .output(
@@ -14157,6 +14227,7 @@ export const elections = {
           places: v.nonNullable(Places),
           since: v.nullable(v.string()),
           map: v.nullable(Sketch),
+          world: v.nullable(v.number()),
         }),
       ),
     )
@@ -14208,7 +14279,7 @@ export const elections = {
             cross join lateral (
               select distinct x.area_k from result_rollup x where x.result_set_k = rs.k
             ) r
-            where rs.contest_id = any(${sql.param(roots)}::uuid[]) and ${latest("rs")}
+            where rs.contest_id = any(${sql.param(roots)}::uuid[]) and rs.status = 'active'
           )
           select a.scheme_code as scheme, sc.noun, array_agg(a.k order by a.k) as ks
           from hits h join area a on a.k = h.area_k join scheme sc on sc.code = a.scheme_code
@@ -14216,8 +14287,9 @@ export const elections = {
             select d.scheme_code from contest c join area d on d.id = c.district_area_id
             where c.id = any(${sql.param(roots)}::uuid[])
           )
-          group by 1, 2 having count(*) between 2 and ${roots.length - 1}
-          order by count(*) limit 1
+          group by 1, 2 having count(*) >= 2
+            and (a.scheme_code = 'world.country' or count(*) < ${roots.length})
+          order by count(*)
         `),
         db.execute<{ id: string; k: number; polity: string }>(sql`
           select a.id, a.k, e.polity_id as polity
@@ -14256,7 +14328,9 @@ export const elections = {
         `),
         branches(date),
       ]);
-      const level = levels.rows[0];
+      const level =
+        levels.rows.find((row) => row.scheme === input.level) ??
+        levels.rows.find((row) => row.scheme !== "world.country");
       const nation = territory.rows[0];
       if (level == null || nation == null) {
         return null;
@@ -14336,6 +14410,9 @@ export const elections = {
       return {
         since: prior?.slice(0, 4) ?? null,
         map,
+        world:
+          levels.rows.find((row) => row.scheme === "world.country")?.ks
+            .length ?? null,
         places: {
           levels: [
             { code: level.scheme, noun: level.noun, count: areas.rows.length },

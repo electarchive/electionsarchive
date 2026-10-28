@@ -1002,6 +1002,8 @@
   "map_outlying": "U.S. territories",
   "map_abroad": "Abroad",
   "map_overseas": "Overseas",
+  "map_world": "World map",
+  "map_world_back": "Back to {place}",
   "map_offmap": "Not on the map",
   "map_pooled_writeins": "The map's source counts write-ins as one line, so the map shows where write-in votes were cast, not which write-in candidate got them.",
   "map_boundaries": "Boundaries from {publishers}",

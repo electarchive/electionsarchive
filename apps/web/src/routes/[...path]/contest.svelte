@@ -1683,6 +1683,7 @@
             : (counted ?? m.col_votes())}
           names={titles}
           {levels}
+          home={contest.scope.trail.at(-1)?.name ?? null}
           {span}
           {isTally}
           isLinked

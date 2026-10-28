@@ -9,8 +9,10 @@
   import { goto, preloadData } from "$app/navigation";
   import { resolve } from "$app/paths";
   import { page } from "$app/state";
+  import ArrowLeftIcon from "@lucide/svelte/icons/arrow-left";
   import ArrowUpLeftIcon from "@lucide/svelte/icons/arrow-up-left";
   import ChevronUpIcon from "@lucide/svelte/icons/chevron-up";
+  import GlobeIcon from "@lucide/svelte/icons/globe";
   import MinusIcon from "@lucide/svelte/icons/minus";
   import PlusIcon from "@lucide/svelte/icons/plus";
   import ScanIcon from "@lucide/svelte/icons/scan";
@@ -56,6 +58,7 @@
     votes,
     names,
     levels,
+    home = null,
     span,
     only = $bindable(null),
     focus = $bindable(null),
@@ -106,6 +109,7 @@
       query: string;
       isCurrent: boolean;
     }>;
+    home?: string | null;
     span: { from: string; to: string; forward: boolean } | null;
     only?: number | string | null;
     focus?: number | null;
@@ -147,6 +151,12 @@
   const uid = $props.id();
   let opening = $state<number | null>(null);
   let listing = $state<string | null>(null);
+  const globe = $derived(
+    levels.length > 1
+      ? levels.find((level) => level.code === "world.country")
+      : undefined,
+  );
+  const tiers = $derived(levels.filter((level) => level !== globe));
   const narrow = $derived(isNarrowLayout());
   let stripHeight = $state(0);
   let ladder = $state<Awaited<ReturnType<typeof orpc.contests.context.call>>>(
@@ -1830,9 +1840,9 @@
         {/each}
       </div>
     {/if}
-    {#if levels.length > 1}
+    {#if tiers.length > 1}
       <div class="flex" role="group" aria-label={m.map_level()}>
-        {#each levels as level (level.code)}
+        {#each tiers as level (level.code)}
           <svelte:element
             this={pick == null ? "a" : "button"}
             class={cn(
@@ -2082,7 +2092,7 @@
         <ScanIcon class="block-4 inline-4" />
       </button>
     </div>
-    {#if segments.length > 0}
+    {#if segments.length > 0 || globe != null}
       <div
         class="pointer-events-none absolute inset-e-2 inset-be-2 flex flex-wrap-reverse justify-end gap-1.5 max-sm:inset-s-2 max-sm:inset-e-14"
         bind:clientHeight={stripHeight}
@@ -2268,6 +2278,28 @@
             {/if}
           {/if}
         {/each}
+        {#if globe != null}
+          {const target = $derived(globe.isCurrent ? tiers[0] : globe)}
+          {#if target != null && pick == null}
+            <a
+              class="pointer-events-auto flex items-center gap-1.5 rounded-sm bg-card/95 ps-2 pe-2.5 text-xs font-semibold shadow-menu ring-1 ring-border block-7 hover:bg-secondary pointer-coarse:block-10"
+              href={resolve(`/[...path]?${target.query}`, {
+                path: target.path,
+              })}
+              data-sveltekit-reset="false"
+            >
+              {@render traveler(globe, target)}
+            </a>
+          {:else if target != null}
+            <button
+              type="button"
+              class="pointer-events-auto flex items-center gap-1.5 rounded-sm bg-card/95 ps-2 pe-2.5 text-xs font-semibold shadow-menu ring-1 ring-border block-7 hover:bg-secondary pointer-coarse:block-10"
+              onclick={() => pick?.(target.code)}
+            >
+              {@render traveler(globe, target)}
+            </button>
+          {/if}
+        {/if}
       </div>
     {/if}
     {#if overview != null && context != null}
@@ -3030,6 +3062,35 @@
       <span class="font-figures text-xs tabular-nums">{names.length}</span>
     {/if}
   </span>
+{/snippet}
+
+{#snippet traveler(
+  world: (typeof levels)[number],
+  target: (typeof levels)[number],
+)}
+  {#if world.isCurrent}
+    <ArrowLeftIcon
+      class="text-muted-foreground block-3.5 inline-3.5"
+      aria-hidden="true"
+    />
+  {:else}
+    <GlobeIcon
+      class="text-muted-foreground block-3.5 inline-3.5"
+      aria-hidden="true"
+    />
+  {/if}
+  <span
+    >{world.isCurrent
+      ? home == null
+        ? target.label
+        : m.map_world_back({ place: home })
+      : m.map_world()}</span
+  >
+  {#if !world.isCurrent}
+    <span class="font-figures font-normal text-muted-foreground tabular-nums"
+      >{count(world.count)}</span
+    >
+  {/if}
 {/snippet}
 
 {#snippet summary(entries: typeof remote, heading: string)}

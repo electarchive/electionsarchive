@@ -312,7 +312,7 @@
       };
     }),
   }));
-  const regional = $state<Record<number, boolean>>({});
+  const regional = $state<Record<number, string>>({});
   const opened = $state<Record<number, boolean>>({});
   const wide = new MediaQuery("min-width: 40rem");
   let isHydrated = $state(false);
@@ -328,6 +328,20 @@
         race.map != null &&
         race.places != null &&
         index < 4,
+      staleTime: Infinity,
+      meta: { quiet: true },
+    })),
+  }));
+  const worlds = createQueries(() => ({
+    queries: ordered.map((race, index) => ({
+      ...orpc.elections.regional.queryOptions({
+        input: {
+          id,
+          contest: race.sample ?? race.anchor,
+          level: "world.country",
+        },
+      }),
+      enabled: regional[index] === "world.country",
       staleTime: Infinity,
       meta: { quiet: true },
     })),
@@ -1450,7 +1464,13 @@
     {#snippet mapped()}
       {#if race.map != null && race.places != null}
         {const option = $derived(regionals[index]?.data ?? null)}
-        {const region = $derived(regional[index] === true ? option : null)}
+        {const region = $derived(
+          regional[index] === "world.country"
+            ? (worlds[index]?.data ?? null)
+            : regional[index] === option?.places.level
+              ? option
+              : null,
+        )}
         {const swing = $derived(swings[index]?.data ?? null)}
         {const final = $derived(
           region == null && firstRound[index] !== true ? race.decided : null,
@@ -1520,18 +1540,33 @@
                   )}
               levels={option?.map == null
                 ? []
-                : [race.places, option.places].map((entry) => {
-                    const noun = entry.levels[0]?.noun ?? "";
-                    return {
-                      code: entry.level,
-                      label: noun.charAt(0).toUpperCase() + noun.slice(1),
-                      count: entry.rows.length,
-                      path: "",
-                      query: "",
-                      isCurrent: entry.level === places.level,
-                    };
-                  })}
-              pick={(code) => (regional[index] = code === option?.places.level)}
+                : [
+                    ...[race.places, option.places].map((entry) => {
+                      const noun = entry.levels[0]?.noun ?? "";
+                      return {
+                        code: entry.level,
+                        label: noun.charAt(0).toUpperCase() + noun.slice(1),
+                        count: entry.rows.length,
+                        path: "",
+                        query: "",
+                        isCurrent: entry.level === places.level,
+                      };
+                    }),
+                    ...(option.world == null
+                      ? []
+                      : [
+                          {
+                            code: "world.country",
+                            label: "",
+                            count: option.world,
+                            path: "",
+                            query: "",
+                            isCurrent: places.level === "world.country",
+                          },
+                        ]),
+                  ]}
+              home={election.breadcrumbs[0]?.name ?? null}
+              pick={(code: string) => (regional[index] = code)}
               span={swing?.span ??
                 (region?.since != null
                   ? {
@@ -1696,11 +1731,14 @@
     {/if}
     {#if race.places != null && !race.isTotal}
       {const shown = $derived(
-        regional[index] === true
-          ? (regionals[index]?.data?.places ?? race.places)
-          : firstRound[index] === true
-            ? race.places
-            : (race.decided?.places ?? race.places),
+        regional[index] === "world.country"
+          ? (worlds[index]?.data?.places ?? race.places)
+          : regional[index] != null &&
+              regional[index] === regionals[index]?.data?.places.level
+            ? regionals[index].data.places
+            : firstRound[index] === true
+              ? race.places
+              : (race.decided?.places ?? race.places),
       )}
       <Places
         places={{
