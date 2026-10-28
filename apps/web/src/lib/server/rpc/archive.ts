@@ -116,14 +116,18 @@ const FACTS = {
       select r.result_set_k, r.area_k, r.option_k, r.measure, r.count_round, r.value, r.complete, r.channel
             from result_rollup r where r.result_set_k = ${set} and r.area_k = ${area} offset 0
     `,
-  pool: (set: SQL, area: SQL) =>
+  pool: (set: SQL, area: SQL, units: SQL) =>
     sql`
       select v.result_set_k, ${area} as area_k, v.option_k, v.measure, v.count_round, sum(v.value) as value, true as complete, v.channel
-      from (select * from result_value x where (-(${area}) - 1) / 16 = 0 and x.result_set_k = ${set} offset 0) v
-      cross join lateral (select * from reporting_unit y where y.k = v.unit_k offset 0) u
-      where ${POOLED} and ${POOL} = (${sql.param([...POOLS])}::text[])[(-(${area}) - 1) % 16 + 1]
+      from jsonb_array_elements_text(${units} -> (
+        select e.polity_id::text from result_set s join election e on e.id = s.election_id where s.k = ${set}
+      )) as uk(k)
+      cross join lateral (select * from reporting_unit y where y.k = uk.k::int offset 0) u
+      cross join lateral (select * from result_value x where x.result_set_k = ${set} and x.unit_k = u.k offset 0) v
+      where (-(${area}) - 1) / 16 = 0 and ${POOLED} and ${POOL} = (${sql.param([...POOLS])}::text[])[(-(${area}) - 1) % 16 + 1]
         and not exists (
           select from reporting_unit c join result_value w on w.result_set_k = ${set} and w.unit_k = c.k where c.parent_id = u.id
+          offset 0
         )
       group by 1, 2, 3, 4, 5, 8
       union all
@@ -134,6 +138,7 @@ const FACTS = {
       where pa.k = (-(${area}) - 1) / 16 and ${POOL} = (${sql.param([...POOLS])}::text[])[(-(${area}) - 1) % 16 + 1]
         and not exists (
           select from reporting_unit c join result_value w on w.result_set_k = ${set} and w.unit_k = c.k where c.parent_id = u.id
+          offset 0
         )
       group by 1, 2, 3, 4, 5, 8
     `,
@@ -174,6 +179,7 @@ const pooled = (list: SQL) => sql`
     join outcome y on y.option_id = ch.id and y.kind = 'elected' and y.candidacy_id is null
     join result_set ry on ry.id = y.result_set_id and ${latest("ry")}
     where pl.id = ${list} and pl.kind = 'list'
+    offset 0
   )
 `;
 const stray = (candidacy: SQL, option: SQL, contest: SQL) => sql`
@@ -1247,6 +1253,24 @@ async function load(
   if (areaKs.length === 0) {
     return loaded;
   }
+  const units = sql`${JSON.stringify(
+    facts === "pool"
+      ? await remember("unlocated", async () =>
+          Object.fromEntries(
+            (
+              await db.execute<{ polity: string; units: Array<number> }>(sql`
+                with recursive up(k, id) as (
+                  select u.k, u.polity_id from reporting_unit u where u.area_id is null
+                  union
+                  select up.k, p.parent_id from polity_parent p join up on p.polity_id = up.id
+                )
+                select id::text as polity, array_agg(k order by k) as units from up group by id
+              `)
+            ).rows.map((row) => [row.polity, row.units]),
+          ),
+        )
+      : {},
+  )}::jsonb`;
   const picked = await db.execute<{
     area: number;
     k: number;
@@ -1286,7 +1310,7 @@ async function load(
       }
       join lateral (
         select count(distinct f.option_k) filter (where f.option_k <> 0) as options
-        from (${FACTS[facts](sql`rs.k`, sql`a.k`)}) f where f.measure = any(${COUNTED}) and f.value > 0
+        from (${FACTS[facts](sql`rs.k`, sql`a.k`, units)}) f where f.measure = any(${COUNTED}) and f.value > 0
         having count(*) > 0
       ) hit on true
       order by rs.contest_id, a.k,
@@ -1326,7 +1350,7 @@ async function load(
           and max(r.count_round) filter (where r.measure = any(${COUNTED})) over (partition by r.result_set_k, r.area_k)
             > min(r.count_round) filter (where r.measure = any(${COUNTED})) over (partition by r.result_set_k, r.area_k) as late
       from unnest(${sql.param(picked.rows.map((row) => row.k))}::int[], ${sql.param(picked.rows.map((row) => row.area))}::int[], ${sql.param(picked.rows.map((row) => row.single))}::boolean[]) as p(set, area, single)
-      join lateral (${FACTS[facts](sql`p.set`, sql`p.area`)}) r on true
+      join lateral (${FACTS[facts](sql`p.set`, sql`p.area`, units)}) r on true
       where (r.measure = any(${COUNTED}) or r.option_k = 0 and (r.measure = 2 or r.measure = 4 and ${step}::int is null))
     ),
     mains as materialized (
@@ -1521,6 +1545,7 @@ async function load(
         when o.parent_option_id is null or ${pooled(sql`o.parent_option_id`)} or not exists (
           select from outcome y join result_set ry on ry.id = y.result_set_id and ${latest("ry")}
           where y.option_id = o.parent_option_id and y.kind in ('elected', 'won') and y.candidacy_id is null
+          offset 0
         ) then oc.seats end as seats
     from contest_option o
     left join entity_merge pm on pm.entity_id = o.party_id
@@ -2732,18 +2757,21 @@ async function places(
           order by valid @> ${contest.date ?? "infinity"}::date desc, upper(valid) desc nulls first limit 1
         ),
         straddling as materialized (
-          select a.id, a.k from area a
+          select a.id, a.k from (
+            select a.id, a.k from area a
+            where a.k = any(${sql.param(checked.map((kid) => kid.k))}::int[])
+              and not exists (
+                select from area_parent p
+                where p.area_id = a.id and p.parent_id = ${area.id}::uuid and p.valid @> ${contest.date ?? "infinity"}::date
+              )
+            offset 0
+          ) a
           cross join me
           cross join lateral (
             select g.geom from area_geometry g where g.area_id = a.id
             order by g.valid @> ${contest.date ?? "infinity"}::date desc, upper(g.valid) desc nulls first limit 1
           ) g
-          where a.k = any(${sql.param(checked.map((kid) => kid.k))}::int[])
-            and not exists (
-              select from area_parent p
-              where p.area_id = a.id and p.parent_id = ${area.id}::uuid and p.valid @> ${contest.date ?? "infinity"}::date
-            )
-            and ST_Area(ST_Intersection(g.geom, me.geom)) < 0.95 * ST_Area(g.geom)
+          where ST_Area(ST_Intersection(g.geom, me.geom)) < 0.95 * ST_Area(g.geom)
         ),
         siblings as materialized (
           select rs.k from contest own
@@ -2837,18 +2865,36 @@ async function places(
     )
     select u.pool, u."isPlaced", array_agg(distinct u.channel) as channels from (
       select ${POOL} as pool, false as "isPlaced", (
-        select v.channel from result_value v where v.result_set_k = any(select k from sets) and v.unit_k = u.k and v.measure = any(${COUNTED}) and v.option_k <> 0 limit 1
+        select v.channel from sets cross join lateral (select x.channel from result_value x where x.result_set_k = sets.k and x.unit_k = u.k and x.measure = any(${COUNTED}) and x.option_k <> 0 limit 1) v limit 1
       ) as channel
-      from reporting_unit u
-      where (select "isShort" from short) and u.area_id is null and ${POOLED}
-        and exists (select from result_value v where v.unit_k = u.k and v.result_set_k = any(select k from sets))
+      from jsonb_array_elements_text(${JSON.stringify(
+        await remember("unlocated", async () =>
+          Object.fromEntries(
+            (
+              await db.execute<{ polity: string; units: Array<number> }>(sql`
+                with recursive up(k, id) as (
+                  select u.k, u.polity_id from reporting_unit u where u.area_id is null
+                  union
+                  select up.k, p.parent_id from polity_parent p join up on p.polity_id = up.id
+                )
+                select id::text as polity, array_agg(k order by k) as units from up group by id
+              `)
+            ).rows.map((row) => [row.polity, row.units]),
+          ),
+        ),
+      )}::jsonb -> (
+        select e.polity_id::text from contest c join election e on e.id = c.election_id where c.id = ${contest.root}::uuid
+      )) as uk(k)
+      join reporting_unit u on u.k = uk.k::int
+      where (select "isShort" from short) and ${POOLED}
+        and exists (select from sets cross join lateral (select from result_value x where x.result_set_k = sets.k and x.unit_k = u.k limit 1) v)
       union all
       select ${POOL}, true, (
-        select v.channel from result_value v where v.result_set_k = any(select k from sets) and v.unit_k = u.k and v.measure = any(${COUNTED}) and v.option_k <> 0 limit 1
+        select v.channel from sets cross join lateral (select x.channel from result_value x where x.result_set_k = sets.k and x.unit_k = u.k and x.measure = any(${COUNTED}) and x.option_k <> 0 limit 1) v limit 1
       )
       from reporting_unit u
       where u.area_id = ${area.id}::uuid and ${PLACED}
-        and exists (select from result_value v where v.unit_k = u.k and v.result_set_k = any(select k from sets))
+        and exists (select from sets cross join lateral (select from result_value x where x.result_set_k = sets.k and x.unit_k = u.k limit 1) v)
     ) u
     group by 1, 2
   `);
@@ -8001,7 +8047,7 @@ export const contests = {
           where c.size >= o.size * 1.5 and c.size <= cap.size
           order by c.id
         ),
-        planed as (
+        planed as materialized (
           select id, valid, size, ${plane("geom", "scheme")} as geom
           from (
             select c.id, c.valid, c.size, c.scheme, coalesce(
@@ -10243,11 +10289,12 @@ async function universe(
       select up.start, p.parent_id, up.depth + 1 from area_parent p join up on p.area_id = up.id
       where p.valid @> ${day}::date and up.depth < 4
     ),
-    down(id, depth) as (
-      select ${area}::uuid, 0
+    down(id, scheme, depth) as (
+      select ${area}::uuid, ''::text, 0
       union all
-      select p.area_id, down.depth + 1 from area_parent p join down on p.parent_id = down.id
-      where p.valid @> ${day}::date and down.depth < 4 and not exists (select from candidate)
+      select a.id, a.scheme_code, down.depth + 1 from area_parent p join down on p.parent_id = down.id
+      join area a on a.id = p.area_id
+      where p.valid @> ${day}::date and down.depth < 4 and down.scheme <> ${level} and not exists (select from candidate)
     ),
     inside(id, scheme, depth) as (
       select ${area}::uuid, ''::text, 0 where exists (select from candidate)
