@@ -16,14 +16,18 @@ PARSED = DATA / "parsed" / SOURCE
 API = "https://en.wikipedia.org/w/api.php?"
 SPECIALS = {1932: date(1932, 11, 8), 1950: date(1950, 11, 7)}
 YEARS = sorted([*range(1897, 1986, 4), *SPECIALS])
+CITYWIDE = {
+    "comptroller": ("Comptroller", "new-york-city:comptroller", (1993, 1997)),
+    "public-advocate": ("Public Advocate", "new-york-city:public-advocate", (1993, 1997)),
+}
 TITLE = "New York City mayoral election articles, results boxes"
 NOTE = (
     "Citywide votes as tabulated in the results boxes of the English Wikipedia's articles on each New York City mayoral "
     "election, a stopgap until the Board of Elections' printed canvass is read."
 )
 METHOD = (
-    "Citywide votes from the results box of the English Wikipedia's article on the {year} New York City mayoral "
-    "election. A candidate on several ballot lines carries the total of the lines; the lines themselves are not "
+    "Citywide votes from the results box of the English Wikipedia's article on the {year} New York City {office}. "
+    " A candidate on several ballot lines carries the total of the lines; the lines themselves are not "
     "shown. The article's own total row is ignored."
 )
 BOROUGH_METHOD = (
@@ -57,14 +61,14 @@ NAMES = {
 }
 
 
-def page(year: int) -> str:
+def page(year: int, office: str = "mayor") -> str:
     return API + urlencode(
         {
             "action": "query",
             "prop": "revisions",
             "rvprop": "content|ids",
             "rvslots": "main",
-            "titles": f"{year} New York City {'special ' if year in SPECIALS else ''}mayoral election",
+            "titles": f"{year} New York City {CITYWIDE[office][0] + ' election' if office in CITYWIDE else ('special ' if year in SPECIALS else '') + 'mayoral election'}",
             "redirects": 1,
             "format": "json",
             "formatversion": 2,
@@ -81,6 +85,9 @@ def text(value: str) -> str:
 def fetch() -> None:
     for year in YEARS:
         raw.fetch(SOURCE, page(year), suffix=".json")
+    for office, (_, _, years) in CITYWIDE.items():
+        for year in years:
+            raw.fetch(SOURCE, page(year, office), suffix=".json")
 
 
 def parse() -> None:
@@ -148,8 +155,73 @@ def parse() -> None:
                     "won": kind.lower() == "winning candidate",
                 }
             )
+    for office, (label, _, years) in CITYWIDE.items():
+        for year in years:
+            wikitext = json.loads(raw.cached(SOURCE, page(year, office)).path.read_text())["query"]["pages"][0][
+                "revisions"
+            ][0]["slots"]["main"]["content"]
+            box = next(
+                (
+                    box.group(0)
+                    for box in re.finditer(
+                        r"\{\{Election box begin.*?\{\{Election box end\}\}", wikitext, re.DOTALL | re.IGNORECASE
+                    )
+                    if re.search(rf"title\s*=\s*{year} New York City {label} election", box.group(0))
+                ),
+                None,
+            )
+            if box is not None:
+                for kind, body in re.findall(
+                    r"\{\{Election box (winning candidate|candidate)[^|{]*?\s*\n?\s*\|(.*?)\}\}\s*(?=\n|$)",
+                    box,
+                    re.DOTALL | re.IGNORECASE,
+                ):
+                    fields = {
+                        key.strip(): value.strip()
+                        for part in re.split(r"\n?\s*\|\s*(?=\w+\s*=)", "|" + body)
+                        if "=" in part
+                        for key, value in [part.split("=", 1)]
+                    }
+                    votes = re.sub(r"\D", "", text(fields.get("votes", "")))
+                    rows.append(
+                        {
+                            "year": year,
+                            "office": office,
+                            "candidate": re.sub(r"\s*\([^)]*\)", "", text(fields["candidate"])).strip(),
+                            "line": re.sub(r"\s+", " ", text(fields["party"])),
+                            "votes": int(votes) if votes else None,
+                            "won": kind.lower() == "winning candidate",
+                        }
+                    )
+                continue
+            general = re.search(
+                r"==\s*General election\s*==.*?(\{\|.*?\n\|\}|\Z)|(\{\|[^\n]*\n(?:(?!\|\}).)*general election.*?\n\|\})",
+                wikitext,
+                re.DOTALL | re.IGNORECASE,
+            )
+            general = (general[1] or general[2]) if general else ""
+            for line in re.split(r"\n\|-[^\n]*", general)[2:]:
+                fields = [
+                    text(re.sub(r"^\s*(?:style|bgcolor|rowspan|colspan|align)[^|]*\|(?!\|)", "", field))
+                    for entry in line.strip().split("\n")
+                    if entry.startswith("|")
+                    for field in re.split(r"\|\|", entry[1:])
+                ]
+                if len(fields) >= 3 and fields[0] != "Total" and re.fullmatch(r"\d{1,3}(?:,\d{3})+|\d+", fields[2]):
+                    rows.append(
+                        {
+                            "year": year,
+                            "office": office,
+                            "candidate": re.sub(r"\s*\([^)]*\)", "", fields[0]).strip(),
+                            "line": fields[1],
+                            "votes": int(fields[2].replace(",", "")),
+                            "won": False,
+                        }
+                    )
+    for row in rows:
+        row.setdefault("office", "mayor")
     PARSED.mkdir(parents=True, exist_ok=True)
-    pl.DataFrame(rows).write_parquet(PARSED / "lines.parquet")
+    pl.DataFrame(rows, infer_schema_length=None).write_parquet(PARSED / "lines.parquet")
     pl.DataFrame(boroughs).write_parquet(PARSED / "boroughs.parquet")
 
 
@@ -161,7 +233,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="New York City mayoral elections 1897–1985, citywide, from the English Wikipedia's election articles",
+            summary="New York City mayoral elections 1897–1985, and comptroller and public advocate 1993 and 1997, citywide, from the English Wikipedia's election articles",
             polity="US",
         )
 
@@ -198,7 +270,12 @@ def emit() -> Path:
         taken = {path for (path,) in conn.execute("select path from slug where path like 'us/ny/%'").fetchall()}
         parties: dict[str, object | None] = {}
         seen: set[object] = set()
-        for (year,), rows in frame.group_by(["year"], maintain_order=True):
+        offices = {
+            "mayor": ("mayoral election", owner),
+            **{office: (f"{label} election", cs.key("us.office", key)) for office, (label, key, _) in CITYWIDE.items()},
+        }
+        for (year, office_slug), rows in frame.group_by(["year", "office"], maintain_order=True):
+            office_label, office_id = offices[office_slug]
             first = date(year, 11, 1)
             day = SPECIALS.get(year, first + timedelta(days=(0 - first.weekday()) % 7 + 1))
             kind = "general" if year % 2 == 0 else "local"
@@ -232,9 +309,9 @@ def emit() -> Path:
                 )
                 name(election, f"{year} New York City {kind} election")
                 cs.add("slug", path=f"{polity_path}/{day}-{kind}", entity_id=election)
-            contest_key = f"nyc_early_mayors:{day}:NY:3651000:mayor"
+            contest_key = f"nyc_early_mayors:{day}:NY:3651000:{office_slug}"
             contest = cs.key("us.contest", contest_key)
-            path = f"{polity_path}/{day}-{kind}/mayor"
+            path = f"{polity_path}/{day}-{kind}/{office_slug}"
             if path in taken and contest in cs.minted:
                 raise ValueError(f"{path} is already taken")
             cs.add(
@@ -242,7 +319,7 @@ def emit() -> Path:
                 id=contest,
                 election_id=election,
                 kind="office",
-                office_id=owner,
+                office_id=office_id,
                 party_scope_id=None,
                 district_area_id=cs.area("us.place", "3651000"),
                 magnitude=1,
@@ -252,7 +329,10 @@ def emit() -> Path:
                 default_result_kind="counted",
                 term="remainder" if year in SPECIALS else "full",
             )
-            name(contest, f"{year} New York City {'special ' if year in SPECIALS else ''}mayoral election")
+            name(
+                contest,
+                f"{year} New York City {'special ' if year in SPECIALS else ''}{office_label}",
+            )
             cs.add("slug", path=path, entity_id=contest)
             result_set = cs.key(f"{SOURCE}.result_set", contest_key)
             cs.add(
@@ -267,7 +347,9 @@ def emit() -> Path:
                 is_default=True,
                 completeness=1,
             )
-            cs.add("note", entity_id=result_set, kind="methodology", body_md=METHOD.format(year=year))
+            cs.add(
+                "note", entity_id=result_set, kind="methodology", body_md=METHOD.format(year=year, office=office_label)
+            )
             unit = cs.unit("us.place", "3651000")
             candidates: list[tuple[str, str, int, bool]] = []
             for (candidate,), lines in rows.group_by(["candidate"], maintain_order=True):
@@ -276,6 +358,9 @@ def emit() -> Path:
                 votes = int(total[0] if len(total) else counted["votes"].sum())
                 if votes:
                     candidates.append((candidate, counted["line"][0], votes, bool(lines["won"].any())))
+            if not any(won for *_, won in candidates):
+                top = max(candidates, key=lambda candidate: candidate[2])
+                candidates = [(*candidate[:3], candidate == top) for candidate in candidates]
             for candidate, line, votes, won in candidates:
                 label = re.sub(r"\s*\((?:US|United States)\)\s*$", "", line)
                 label = re.sub(r"\s+", " ", label).strip()
