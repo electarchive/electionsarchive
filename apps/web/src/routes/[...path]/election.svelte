@@ -1947,7 +1947,12 @@
           <span class="grid gap-0.5 min-inline-0">
             {#if row.share == null && row.field.length > 0}
               <span class="grid gap-0.5">
-                {#each row.field.slice(0, 3) as entry (entry.person)}
+                {const shown = $derived(
+                  row.field.filter(
+                    (entry, place) => place < 3 || entry.isIncumbent === true,
+                  ),
+                )}
+                {#each shown as entry (entry.person)}
                   <span
                     class="flex flex-wrap items-baseline gap-x-1 min-inline-0"
                   >
@@ -1961,12 +1966,23 @@
                         >{entry.party}</span
                       >
                     {/if}
+                    {#if entry.isIncumbent === true}
+                      <span class="highlighter px-1 text-xs font-semibold"
+                        >{m.slate_incumbent()}</span
+                      >
+                    {/if}
                   </span>
                 {/each}
-                {#if row.field.length > 3}
+                {#if row.field.every((entry) => entry.isIncumbent === false)}
+                  <span
+                    class="justify-self-start highlighter px-1 text-xs font-semibold"
+                    >{m.incumbency_open()}</span
+                  >
+                {/if}
+                {#if row.field.length > shown.length}
                   <span class="text-xs text-muted-foreground"
                     >{m.wards_field_more({
-                      count: count(row.field.length - 3),
+                      count: count(row.field.length - shown.length),
                     })}</span
                   >
                 {/if}
@@ -2051,8 +2067,20 @@
               >{entry.party}</span
             >
           {/if}
+          {#if entry.isIncumbent === true}
+            <span class="highlighter px-1 text-xs font-semibold"
+              >{m.slate_incumbent()}</span
+            >
+          {/if}
         </li>
       {/each}
+      {#if race.field.every((entry) => entry.isIncumbent === false)}
+        <li>
+          <span class="highlighter px-1 text-xs font-semibold"
+            >{m.incumbency_open()}</span
+          >
+        </li>
+      {/if}
     </ul>
   {/if}
 {/snippet}

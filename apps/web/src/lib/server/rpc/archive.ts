@@ -10767,12 +10767,16 @@ async function races(
                   winner: string | null;
                   won: number | null;
                   isDone: boolean | null;
-                  field: Array<{ person: string; party: string | null }> | null;
+                  field: Array<{
+                    person: string;
+                    party: string | null;
+                    isIncumbent: boolean | null;
+                  }> | null;
                 }>(sql`
                 select g.id, c.district_area_id as area, (select st.label from seat st where st.id = c.seat_id) as seat,
                   f.person, f.share, f.won as "isWon", g.runoff,
                   case when f.person is null and g.runoff is null then (
-                    select json_agg(json_build_object('person', coalesce(fm.into_id, fc.person_id), 'party', coalesce(fo.party_id, fc.member_of_party_id)) order by fo.ballot_position nulls last, fo.k)
+                    select json_agg(json_build_object('person', coalesce(fm.into_id, fc.person_id), 'party', coalesce(fo.party_id, fc.member_of_party_id), 'isIncumbent', fc.is_incumbent) order by fo.ballot_position nulls last, fo.k)
                     from contest_option fo
                     join candidacy fc on fc.option_id = fo.id and fc.role = 'head'
                     left join entity_merge fm on fm.entity_id = fc.person_id
@@ -10878,6 +10882,7 @@ async function races(
                     isWon: row.isWon === true,
                     field: (row.field ?? []).map((entry) => ({
                       person: entry.person,
+                      isIncumbent: entry.isIncumbent,
                       name: people.full.get(entry.person) ?? "",
                       party:
                         entry.party == null
@@ -10911,8 +10916,9 @@ async function races(
                 const found = await db.execute<{
                   person: string;
                   party: string | null;
+                  isIncumbent: boolean | null;
                 }>(sql`
-                select coalesce(fm.into_id, fc.person_id) as person, coalesce(fo.party_id, fc.member_of_party_id) as party
+                select coalesce(fm.into_id, fc.person_id) as person, coalesce(fo.party_id, fc.member_of_party_id) as party, fc.is_incumbent as "isIncumbent"
                 from contest_option fo
                 join candidacy fc on fc.option_id = fo.id and fc.role = 'head'
                 left join entity_merge fm on fm.entity_id = fc.person_id
@@ -10927,6 +10933,7 @@ async function races(
                 );
                 return found.rows.map((row) => ({
                   person: row.person,
+                  isIncumbent: row.isIncumbent,
                   name: people.full.get(row.person) ?? "",
                   party:
                     row.party == null
@@ -11565,6 +11572,7 @@ export const elections = {
             field: v.array(
               v.object({
                 person: v.string(),
+                isIncumbent: v.nullable(v.boolean()),
                 name: v.string(),
                 party: v.nullable(v.string()),
               }),
@@ -11581,6 +11589,7 @@ export const elections = {
                   field: v.array(
                     v.object({
                       person: v.string(),
+                      isIncumbent: v.nullable(v.boolean()),
                       name: v.string(),
                       party: v.nullable(v.string()),
                     }),
@@ -14296,6 +14305,7 @@ export const elections = {
                 part: v.string(),
                 races: v.number(),
                 passed: v.number(),
+                tacit: v.number(),
                 parties: v.array(
                   v.object({
                     party: v.nullable(v.string()),
@@ -14326,6 +14336,7 @@ export const elections = {
         seats: number;
         races: number;
         passed: number;
+        tacit: number;
       }>(sql`
         with parts as materialized (
           select e.id, e.polity_id, e.date_from from election e
@@ -14352,7 +14363,7 @@ export const elections = {
           )
         ),
         winners as materialized (
-          select r.id as contest, r.part, r.tier, o.id, o.party_id, max(coalesce(x.seats, 1)) as seats
+          select r.id as contest, r.part, r.tier, o.id, o.party_id, max(coalesce(x.seats, 1)) as seats, bool_and(rs.kind = 'tacit') as tacit
           from roots r
           join result_set rs on rs.contest_id = r.id and ${latest("rs")}
           join outcome x on x.result_set_id = rs.id and x.candidacy_id is null and x.kind in ('elected', 'won')
@@ -14392,7 +14403,8 @@ export const elections = {
           group by r.part
         )
         select w.part, p.polity_id as polity, w.tier, coalesce(bm.into_id, br.parent_party_id, pm.into_id, w.party_id, ld.party_id) as party,
-          sum(w.seats)::int as seats, count(distinct w.contest)::int as races, 0 as passed
+          sum(w.seats)::int as seats, count(distinct w.contest)::int as races, 0 as passed,
+          coalesce(sum(w.seats) filter (where w.tacit), 0)::int as tacit
         from winners w
         join parts p on p.id = w.part
         left join leads ld on ld.parent = w.id
@@ -14402,10 +14414,10 @@ export const elections = {
         left join entity_merge bm on bm.entity_id = br.parent_party_id
         group by w.part, p.polity_id, w.tier, coalesce(bm.into_id, br.parent_party_id, pm.into_id, w.party_id, ld.party_id)
         union all
-        select m.part, p.polity_id, 'measure', null, 0, m.races, m.passed
+        select m.part, p.polity_id, 'measure', null, 0, m.races, m.passed, 0
         from measures m join parts p on p.id = m.part
         union all
-        select p.id, p.polity_id, null, null, 0, 0, 0 from parts p
+        select p.id, p.polity_id, null, null, 0, 0, 0, 0 from parts p
       `);
       const parts = [...new Set(found.rows.map((row) => row.part))];
       const polities = [...new Set(found.rows.map((row) => row.polity))];
@@ -14453,14 +14465,17 @@ export const elections = {
               .map(([part, group]) => {
                 let races = 0;
                 let passed = 0;
+                let tacit = 0;
                 for (const row of group) {
                   races += row.races;
                   passed += row.passed;
+                  tacit += row.tacit;
                 }
                 return {
                   part,
                   races,
                   passed,
+                  tacit,
                   parties: group
                     .filter((row) => row.seats > 0)
                     .map((row) => ({ party: row.party, seats: row.seats }))

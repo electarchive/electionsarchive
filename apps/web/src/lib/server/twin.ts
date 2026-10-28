@@ -2393,15 +2393,23 @@ function electionMarkdown(
             [m.col_seat(), m.col_candidate(), m.col_result()],
             wards.map((row) => {
               const final = row.runoff?.isWon === true ? row.runoff : null;
+              const isOpen =
+                row.share == null &&
+                row.field.length > 0 &&
+                row.field.every((entry) => entry.isIncumbent === false);
               return [
-                link(row.label, row.path),
+                `${link(row.label, row.path)}${isOpen ? ` (${m.incumbency_open()})` : ""}`,
                 row.share == null && row.field.length > 0
                   ? row.field
-                      .map((entry) =>
-                        entry.party == null
-                          ? entry.name
-                          : `${entry.name} (${entry.party})`,
-                      )
+                      .map((entry) => {
+                        const tags = [
+                          entry.party,
+                          entry.isIncumbent === true
+                            ? m.slate_incumbent()
+                            : null,
+                        ].filter((tag) => tag != null);
+                        return `${entry.name}${tags.length === 0 ? "" : ` (${tags.join(", ")})`}`;
+                      })
                       .join(", ")
                   : (final ?? row).name,
                 row.share == null
@@ -2477,12 +2485,17 @@ function electionMarkdown(
           ? race.field.length === 0
             ? []
             : [
+                ...(race.field.every((entry) => entry.isIncumbent === false)
+                  ? [`${m.incumbency_open()}.`]
+                  : []),
                 race.field
-                  .map((entry) =>
-                    entry.party == null
-                      ? `- ${entry.name}`
-                      : `- ${entry.name} (${entry.party})`,
-                  )
+                  .map((entry) => {
+                    const tags = [
+                      entry.party,
+                      entry.isIncumbent === true ? m.slate_incumbent() : null,
+                    ].filter((tag) => tag != null);
+                    return `- ${entry.name}${tags.length === 0 ? "" : ` (${tags.join(", ")})`}`;
+                  })
                   .join("\n"),
               ]
           : [
@@ -3075,7 +3088,7 @@ function electionMarkdown(
                                   `${named(entry.party)} ${count(entry.seats)}`,
                               )
                               .join(", ")
-                    }`,
+                    }${tier.kind === "measure" || row.tacit === 0 ? "" : `. ${m.tiers_tacit({ count: row.tacit })}`}`,
                   ];
                 })
                 .join("\n"),

@@ -146,9 +146,11 @@
       const rows = new Map(tier.rows.map((row) => [row.part, row]));
       let races = 0;
       let passed = 0;
+      let tacit = 0;
       for (const row of tier.rows) {
         races += row.races;
         passed += row.passed;
+        tacit += row.tacit;
       }
       const bar = Map.groupBy(
         tier.rows.flatMap((row) =>
@@ -200,6 +202,10 @@
             : tier.kind === "governor"
               ? null
               : m.tiers_chamber_key(),
+        tacit:
+          tier.kind === "measure" || tacit === 0
+            ? null
+            : m.tiers_tacit({ count: tacit }),
         bar,
         lead: bar
           .toSorted((a, b) => b.value - a.value)
@@ -249,12 +255,20 @@
                     place: place.place,
                     party: label(first?.party ?? null),
                   })
-                : m.tiers_tile_seats({
-                    place: place.place,
-                    party: label(first?.party ?? null),
-                    seats: count(first?.seats ?? 0),
-                    total: count(filled),
-                  }),
+                : row.tacit > 0
+                  ? m.tiers_tile_tacit({
+                      place: place.place,
+                      party: label(first?.party ?? null),
+                      seats: count(first?.seats ?? 0),
+                      total: count(filled),
+                      tacit: count(row.tacit),
+                    })
+                  : m.tiers_tile_seats({
+                      place: place.place,
+                      party: label(first?.party ?? null),
+                      seats: count(first?.seats ?? 0),
+                      total: count(filled),
+                    }),
           };
         }),
       };
@@ -423,6 +437,9 @@
               {@render map(panel.tiles, "small")}
               {#if panel.key != null}
                 <p class="text-xs text-muted-foreground">{panel.key}</p>
+              {/if}
+              {#if panel.tacit != null}
+                <p class="text-xs text-muted-foreground">{panel.tacit}</p>
               {/if}
             </figure>
           {/each}

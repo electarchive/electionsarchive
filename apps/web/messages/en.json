@@ -1397,6 +1397,17 @@
   "tiers_tile_seats": "{place}: {party} won {seats} of {total} seats",
   "tiers_tile_measures": "{place}: {passed} of {count} passed",
   "tiers_tile_none": "{place}: no race",
+  "tiers_tile_tacit": "{place}: {party} won {seats} of {total} seats, {tacit} of them declared unopposed",
+  "tiers_tacit": [
+    {
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "{count} seat was declared unopposed, with no vote held.",
+        "countPlural=*": "{count} seats were declared unopposed, with no vote held."
+      }
+    }
+  ],
   "seats_paths_title": "Paths to a majority",
   "seats_paths_lede": "Smallest combinations of parties that reach {count} seats, ordered by proximity on the left-right spectrum. Select a combination to highlight its seats.",
   "seats_paths_more": "Show all {count}",
