@@ -9715,7 +9715,7 @@ async function framing(area: string, day: string, ks: Array<number> = []) {
     kept as (
       select p.geom, p.scheme from ranked p
       join ranked x on x.id = p.id and x.anchor
-      where ST_DWithin(p.geom, x.geom, 2)
+      where ST_DWithin(p.geom, x.geom, 2) or ST_Area(p.geom) >= ST_Area(x.geom) * 0.05
     ),
     framed as (
       select ST_Transform(ST_SetSRID(ST_Extent(${plane("geom", "scheme")})::geometry, 3857), 4326) as box
