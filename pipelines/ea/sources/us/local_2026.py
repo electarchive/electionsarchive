@@ -118,6 +118,76 @@ FEEDS = {
         "Ocean County Clerk",
         "2026 General Election Official Candidate Certification Sheet",
     ),
+    "NJ-34001": (
+        "https://www.atlanticcountyclerk.org/wp-content/uploads/2026/08/Candidates-List-2026-General-8-12-26-1.pdf",
+        "Atlantic County Clerk",
+        "2026 General Election: Official Candidates List",
+    ),
+    "NJ-34005": (
+        "https://www.burlingtoncountynj.gov/DocumentCenter/View/25709/General-Election-Candidate-List---Partisan-Offices-PDF",
+        "Burlington County Clerk",
+        "Burlington County 2026 General Election Candidates List (8/31/2026)",
+    ),
+    "NJ-34015": (
+        "https://www.gloucestercountynj.gov/DocumentCenter/View/19422/OFFICIAL-CANDIDATE-LIST-GENERAL-ELECTION-2026?bidId=",
+        "Gloucester County Clerk",
+        "2026 General Election Candidate List (revision 08.27.26)",
+    ),
+    "NJ-34009": (
+        "https://www.capemaycountyvotes.com/wp-content/uploads/2026/08/2026-General-Candidates-WEB.pdf",
+        "Cape May County Clerk",
+        "2026 Official General Election Candidates, November 3, 2026",
+    ),
+    "NJ-34011": (
+        "https://cumberlandcountyclerknj.gov/wp-content/uploads/2026/07/CANDIDATE-LIST-WEBSITE.xlsx",
+        "Cumberland County Clerk",
+        "Candidates for 2026 General Election",
+    ),
+    "NJ-34019": (
+        "https://www.co.hunterdon.nj.us/DocumentCenter/View/20397/2026-GENERAL-DEMS-PDF",
+        "Hunterdon County Clerk",
+        "2026 General: Democratic Candidates",
+    ),
+    "NJ-34019-r": (
+        "https://www.co.hunterdon.nj.us/DocumentCenter/View/20499",
+        "Hunterdon County Clerk",
+        "2026 General: Republican Candidates",
+    ),
+    "NJ-34019-i": (
+        "https://www.co.hunterdon.nj.us/DocumentCenter/View/20398/G26-Independents-PDF",
+        "Hunterdon County Clerk",
+        "2026 General: Independent Candidates",
+    ),
+    "NJ-34025": (
+        "https://www.monmouthcountyvotes.gov/wp-content/uploads/2026/09/2026-11-03-General-Election-Candidates-Municipal5.pdf",
+        "Monmouth County Clerk",
+        "General Election, November 3, 2026: Official List, Municipal Candidates (9/1/2026)",
+    ),
+    "NJ-34025-c": (
+        "https://www.monmouthcountyvotes.gov/wp-content/uploads/2026/09/2026-11-03-General-Election-Candidates-Top-of-Ticket3.pdf",
+        "Monmouth County Clerk",
+        "General Election, November 3, 2026: Official List, Federal and County Candidates (9/1/2026)",
+    ),
+    "NJ-34027": (
+        "https://www.morriscountyclerk.org/files/sharedassets/clerk/v/12/elections/past-results/2026-general-candidates.pdf",
+        "Morris County Clerk",
+        "General Election Candidates, November 3, 2026",
+    ),
+    "NJ-34033": (
+        "https://www.salemcountynj.gov/wp-content/uploads/2026/07/2026-Candidate-List-1.pdf",
+        "Salem County Clerk",
+        "2026 General Election Candidates",
+    ),
+    "NJ-34037": (
+        "https://www.sussexcountyclerk.org/DocumentCenter/View/4636/2026-Nov-3-GE---Official-Candidate-List---Sussex-WEB",
+        "Sussex County Clerk",
+        "Official Candidate List: Nov 3, 2026 General Election (updated 9/4/2026)",
+    ),
+    "NJ-34039": (
+        "https://unioncountyvotes.com/wp-content/uploads/2026/09/GENERAL-2026-CANDIDATE-LIST-9-3.pdf",
+        "Union County Clerk",
+        "Candidate List for the General Election, November 3, 2026 (9/3/2026)",
+    ),
     "MN": (
         "https://electionresultsfiles.sos.mn.gov/20261103/local.txt",
         "Minnesota Secretary of State",
@@ -201,6 +271,13 @@ DELIVERED = {
     "17031c": DATA / "inbox" / "manual" / "MF-154" / "GetAllCandidates.json",
     "SC": DATA / "inbox" / "y26" / "sc_candidates_2026-11-03_all.csv",
     "NM": DATA / "inbox" / "y26" / "nm_candidates_2026_all.csv",
+    "NJ-34009": DATA / "inbox" / "y26" / "nj" / "cape_may.pdf",
+    "NJ-34011": DATA / "inbox" / "y26" / "nj" / "cumberland.xlsx",
+    "NJ-34019-r": DATA / "inbox" / "y26" / "nj" / "hunterdon_rep.pdf",
+    "NJ-34019-i": DATA / "inbox" / "y26" / "nj" / "hunterdon_independent.pdf",
+    "NJ-34025": DATA / "inbox" / "y26" / "nj" / "monmouth_municipal.pdf",
+    "NJ-34025-c": DATA / "inbox" / "y26" / "nj" / "monmouth.pdf",
+    "NJ-34027": DATA / "inbox" / "y26" / "nj" / "morris.pdf",
 }
 PUBLISHERS = {
     "0644000": (
@@ -394,7 +471,10 @@ def fetch() -> None:
                     DELIVERED[state].read_bytes(),
                     suffix=DELIVERED[state].suffix,
                     retrieved_at=datetime.fromtimestamp(DELIVERED[state].stat().st_mtime, UTC),
-                    media_type="text/csv",
+                    media_type={
+                        ".pdf": "application/pdf",
+                        ".xlsx": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                    }.get(DELIVERED[state].suffix, "text/csv"),
                 )
             continue
         raw.fetch(SOURCE, url, suffix=Path(url).suffix or ".pdf")
@@ -431,11 +511,19 @@ def parse() -> None:
         return None
 
     def add(
-        fips: str, tail: str, heading: str, seats: int, name: str, party: str | None, independent: bool = False
+        fips: str,
+        tail: str,
+        heading: str,
+        seats: int,
+        name: str,
+        party: str | None,
+        independent: bool = False,
+        feed: str | None = None,
     ) -> None:
         rows.append(
             {
                 "fips": fips,
+                "feed": feed or fips,
                 "tail": tail,
                 "heading": heading.strip(),
                 "seats": seats,
@@ -625,7 +713,7 @@ def parse() -> None:
 
     feeds: dict[str, list[dict[str, object]]] = defaultdict(list)
     templated: dict[str, str] = {}
-    minted: dict[str, tuple[str, str]] = {}
+    minted: dict[str, tuple[str, str, str, str]] = {}
 
     with zipfile.ZipFile(raw.cached(SOURCE, PRIMARIES["NC"]).path) as archive:
         primary = archive.read(archive.namelist()[0]).decode("utf-8", "replace")
@@ -1148,6 +1236,343 @@ def parse() -> None:
             }
         )
 
+    nobody = re.compile(r"(?i)no nom\w* made|no petition filed|^none$|can be found with|^vacant")
+    federal = re.compile(
+        r"(?i)^(federal|state|cd \d+|united states|u\.s\.|house of rep|member of (the )?(house|united states))"
+    )
+    codes = {"dem": "Democratic", "rep": "Republican", "ind": "Independent", "np": "Nonpartisan"}
+
+    town = post = ""
+    seats = 0
+    for line in text("NJ-34001", "-layout").splitlines():
+        found = re.match(r"(\S.*?)?\s+V(\d)\s+(\S.*?)\s{2,}([A-Z]{3})\s+(\S.*?)(?:\s{2,}|$)", line)
+        more = re.match(r"\s{20,}([A-Z]{3})\s+(\S.*?)(?:\s{2,}|$)", line)
+        if found:
+            town, seats, post, code, name = (found[1] or town).strip(), int(found[2]), found[3], found[4], found[5]
+        elif more and post:
+            code, name = more[1], more[2]
+        else:
+            if re.match(r"\S", line) and not re.match(r"\s*Vote For", line):
+                post = ""
+            continue
+        if town == "Federal" or nobody.search(name):
+            continue
+        named, independent = party(codes.get(code.lower(), code))
+        post = re.sub(r"(?i)\s*-\s*\d+ yr unexpired term", " unexpired", post)
+        feeds["NJ-34001"].append(
+            {
+                "county": "Atlantic",
+                "contest": re.sub(r"^(?!Atlantic County)", "Atlantic County ", post.removesuffix(" unexpired"))
+                if town == "County"
+                else f"{town} {post.removesuffix(' unexpired')}",
+                "seats": seats,
+                "name": cased(name),
+                "party": named,
+                "independent": independent,
+                "unexpired": post.endswith(" unexpired"),
+            }
+        )
+
+    orders: dict[tuple[object, object], set[str]] = defaultdict(set)
+    for line in text("NJ-34015", "-layout").splitlines():
+        found = re.match(
+            r"(\d+)[A-Z]\s+(\S.*?)\s{2,}(\S.*?)\s{2,}(\S.*?)\s{2,}(\S.*?)(?:\s{2,}(\S+(?: \S+)*))?(?:\s{2,}|$)", line
+        )
+        if found is None or re.match(r"CD \d", found[4]) or found[4] == "COUNTYWIDE" and "COMMISSIONER" not in found[3]:
+            continue
+        contest = (
+            f"{'Gloucester County' if found[4] == 'COUNTYWIDE' else found[4]} {found[3].replace(' UNEXPIRED', '')}"
+        )
+        orders[(contest, "UNEXPIRED" in found[3])].add(found[1])
+        if nobody.search(found[5]):
+            continue
+        named, independent = party(found[2])
+        feeds["NJ-34015"].append(
+            {
+                "county": "Gloucester",
+                "contest": contest,
+                "seats": 0,
+                "name": cased(f"{found[5]} {found[6] or ''}"),
+                "party": named,
+                "independent": independent or named is None and "EDUCATION" not in found[3],
+                "unexpired": "UNEXPIRED" in found[3],
+            }
+        )
+    for row in feeds["NJ-34015"]:
+        row["seats"] = len(orders[(row["contest"], row["unexpired"])])
+
+    town = ""
+    for line in text("NJ-34037", "-layout").splitlines():
+        if found := re.match(r"([A-Z][A-Z .'-]+?)\s{2,}# Seats", line):
+            town = found[1].title()
+        elif town and (
+            found := re.match(r"(\S.*?)\s{2,}(\d+)\s+(?:\d+\s+)?(\S.*?)\s{2,}([A-Z]{2,3})\s+(?:NJ\s+)?", line)
+        ):
+            if nobody.search(found[3]) or town == "Sussex County" and federal.search(found[1]):
+                continue
+            named, independent = party(codes.get(found[4].lower(), found[4]))
+            feeds["NJ-34037"].append(
+                {
+                    "county": "Sussex",
+                    "contest": f"{town} {re.sub(r'(?i)\s*\([^)]*\)', '', found[1])}",
+                    "seats": int(found[2]),
+                    "name": cased(re.sub(r"\s*\(.*?\)", "", found[3])),
+                    "party": named,
+                    "independent": independent or found[4] == "IND",
+                    "unexpired": "nexpired" in found[1],
+                }
+            )
+
+    town = post = ""
+    seats, unexpired = 0, False
+    for line in text("NJ-34033", "-layout").splitlines():
+        if found := re.match(r"\s*(\S.*?) – (\d+) year (unexpired )?term – Vote for (\d+)", line):
+            if found[1] == "School Board":
+                post = f"{town} Board of Education"
+            else:
+                town = found[1]
+                suffix = {"Township": "Committee", "Borough": "Council", "City": "Council"}.get(town.split()[-1])
+                post = f"{town} {suffix}" if suffix else town.replace("County", "Salem County", 1)
+            seats, unexpired = int(found[4]), found[3] is not None
+        elif re.match(r"\S", line):
+            post = ""
+        elif post and (found := re.match(r"\s+(?:(\S.*?)\s{2,})?(\S.*?)\s*$", line)):
+            if nobody.search(found[2]) or federal.search(post):
+                continue
+            named, independent = party(found[1])
+            feeds["NJ-34033"].append(
+                {
+                    "county": "Salem",
+                    "contest": post,
+                    "seats": seats,
+                    "name": cased(found[2]),
+                    "party": named,
+                    "independent": independent,
+                    "unexpired": unexpired,
+                }
+            )
+
+    town = ""
+    for line in text("NJ-34039", "-layout").splitlines():
+        if found := re.match(r"\s{30,}((?:TOWNSHIP|CITY|BOROUGH|TOWN|VILLAGE) OF [A-Z .'-]+?)\s*$", line):
+            town = found[1].title()
+        elif found := re.match(
+            r"\s{30,}(SHERIFF|COUNTY CLERK|MEMBERS OF BOARD OF COUNTY COMMISSIONERS|SURROGATE)\s*$", line
+        ):
+            town = f"Union County {found[1].title().replace('Members Of ', '')}"
+        elif town and (
+            found := re.match(
+                r"\s*(?:\d+[A-Z]\s+)?(\S.*?)\s{2,}(?:\S.*?\s{2,})?(Dem|Rep|Ind|[A-Z][a-z]{2})\s{2,}(\S.*?)?(?:\s{2,}|$)",
+                line,
+            )
+        ):
+            if nobody.search(found[1]):
+                continue
+            named, independent = party(codes.get(found[2].lower(), found[2]))
+            post = re.sub(r"(?i)^members? of |(?<=\d)(st|nd|rd|th)\b|\s*-$", "", found[3] or "")
+            feeds["NJ-34039"].append(
+                {
+                    "county": "Union",
+                    "contest": town if town.startswith("Union County") else f"{town} {post}",
+                    "seats": 0,
+                    "name": cased(found[1]),
+                    "party": named,
+                    "independent": independent,
+                    "unexpired": False,
+                }
+            )
+
+    lines: dict[tuple[str, ...], list[tuple[float, float, str]]] = defaultdict(list)
+    for cell in csv.DictReader(io.StringIO(text("NJ-34005", "-tsv")), delimiter="\t", quoting=csv.QUOTE_NONE):
+        if cell["level"] == "5":
+            lines[(cell["page_num"], cell["par_num"], cell["block_num"], cell["line_num"])].append(
+                (float(cell["left"]), float(cell["top"]), cell["text"])
+            )
+    pages: dict[int, list[tuple[float, float, str]]] = defaultdict(list)
+    for (page, *_), words in lines.items():
+        pages[int(page)].append((words[0][0], words[0][1], " ".join(word[2] for word in words)))
+    heads: list[tuple[int, str]] = []
+    for page in sorted(pages):
+        cells = [c for c in pages[page] if not re.match(r"Burlington County 2026|\d+/\d+/\d{4}$|\d+:\d+ [AP]M$", c[2])]
+        top = next((y for x, y, t in cells if t == "JURISDICTION"), None)
+        if top is not None:
+            heads = sorted({round(x): t for x, y, t in cells if top - 1 <= y <= top + 5}.items())
+            cells = [c for c in cells if c[1] > top + 5 and c[2] not in ("VACANCIES", "POSITION")]
+        last = 0.0
+        for bottom in sorted(y for x, y, t in cells if x < heads[1][0] - 5):
+            record: dict[str, list[str]] = defaultdict(list)
+            for x, y, t in sorted(cells, key=lambda c: (c[1], c[0])):
+                if last < y <= bottom + 1:
+                    record[max((h for h in heads if h[0] <= x + 15), key=lambda h: h[0])[1]].append(t)
+            last = bottom + 1
+            cell = {key: " ".join(value) for key, value in record.items()}
+            name = re.sub(r"\s+", " ", " ".join(cell.get(k, "") for k in ("FIRST NAME", "MI", "LAST NAME", "SUFFIX")))
+            kind = cell.get("JURISDICTION", "")
+            if (
+                kind not in ("COUNTY", "MUNICIPAL", "MUNICIPAL NONPARTISAN", "SCHOOL")
+                or not name.strip()
+                or nobody.search(name.strip())
+            ):
+                continue
+            named, independent = party(cell.get("Party"))
+            feeds["NJ-34005"].append(
+                {
+                    "county": "Burlington",
+                    "contest": cell["ENTITY"],
+                    "seats": int(cell.get("VACANCIES") or 0),
+                    "name": cased(name),
+                    "party": named,
+                    "independent": independent or named is None and kind == "MUNICIPAL",
+                    "unexpired": cell.get("Term") == "Unexpired",
+                }
+            )
+
+    for line in text("NJ-34027", "-layout").splitlines():
+        found = re.match(
+            r"(\S.*?)\s{2,}(\S.*?)\s{2,}(\d+)\s+(\d+)\s+(?:(W\d+)\s{2,})?(\S.*?)(?:\s{2,}(\S.*?))?\s{2,}(Republican|Democratic|Independent)\b",
+            line,
+        )
+        if found is None or nobody.search(found[6]) or federal.search(found[2]):
+            continue
+        named, independent = party(found[8])
+        feeds["NJ-34027"].append(
+            {
+                "county": "Morris",
+                "contest": f"{found[1]} {re.sub(r'(?i)^member of the |\s*-?\s*unexpired.*$', '', found[2])}",
+                "seats": int(found[4]),
+                "name": cased(f"{found[6]} {found[7] or ''}"),
+                "party": named,
+                "independent": independent,
+                "unexpired": "UNEXPIRED" in found[2].upper(),
+            }
+        )
+
+    for key, county in (("NJ-34025", "Monmouth"), ("NJ-34025-c", "Monmouth")):
+        town = post = ""
+        seats, unexpired = 0, False
+        for line in text(key, "-layout").splitlines():
+            if found := re.match(
+                r"(?:FOR )?(\S.*?)\s*[-–]+\s*(.*?)\s*[-–]+\s*Vote [Ff]or (\w+)\s*$",
+                line.replace("AT-LARGE", "AT LARGE"),
+            ):
+                post = found[1] if not town else f"{town} {found[1]}"
+                seats, unexpired = NUMBERS.get(found[3].title(), 1), "nexpired" in found[2]
+                if key.endswith("-c"):
+                    post = f"Monmouth County {re.sub(r'(?i)^members? of the ', '', found[1])}"
+            elif not key.endswith("-c") and (found := re.match(r"([A-Z][A-Z .'-]+?)(?:\s+[–-].*)?\s*$", line)):
+                town, post = found[1].title(), ""
+            elif post and (found := re.match(r"(\S.*?)\s+\(([A-Z])\)\s*(.*)$", line)):
+                if nobody.search(found[1]) or federal.search(re.sub(r"^Monmouth County ", "", post)):
+                    continue
+                named, independent = party(
+                    {"D": "Democratic", "R": "Republican", "I": "Independent"}.get(found[2], found[3])
+                )
+                feeds["NJ-34025"].append(
+                    {
+                        "feed": key,
+                        "county": county,
+                        "contest": post,
+                        "seats": seats,
+                        "name": cased(found[1]),
+                        "party": named,
+                        "independent": independent,
+                        "unexpired": unexpired,
+                    }
+                )
+
+    pending: dict[str, str] | None = None
+    for line in text("NJ-34009", "-layout").splitlines():
+        if found := re.match(
+            r"\s+((?:Township|City|Borough|County|Town) of \S.*?|United States)\s{2,}(\S.*?)\s{2,}(\S.*?)(?:\s{2,}|$)",
+            line,
+        ):
+            pending = {"where": found[1], "post": found[2], "name": found[3]}
+        elif pending and (found := re.match(r"\s+(\S.*?)\s{2,}(?:(\d+) Year )?(Unexpired )?.*?Vote for (\w+)", line)):
+            where, post, name = pending["where"], pending["post"], re.sub(r"\s*\*+$", "", pending["name"])
+            pending = None
+            if where == "United States" or not name or nobody.search(name):
+                continue
+            named, independent = party(found[1])
+            feeds["NJ-34009"].append(
+                {
+                    "county": "Cape May",
+                    "contest": f"{'Cape May County' if where == 'County of Cape May' else where} {re.sub(r'(?i)^member of the ', '', post)}",
+                    "seats": NUMBERS.get(found[4].title(), 1),
+                    "name": cased(name),
+                    "party": named,
+                    "independent": independent,
+                    "unexpired": found[3] is not None,
+                }
+            )
+
+    for key, label in (("NJ-34019", "Democratic"), ("NJ-34019-r", "Republican"), ("NJ-34019-i", "Independent")):
+        town = post = ""
+        seats = 0
+        for line in text(key, "-layout").splitlines():
+            found = re.match(
+                r"(\S.*?)?\s{2,}(\S.*?)\s{2,}\d+ Year Term\s{2,}Vote for (\w+)\s{2,}(\S.*?)(?:\s{2,}|$)", line
+            )
+            more = re.match(r"\s{40,}([A-Z][A-Za-z .,'\"()-]+?)(?:\s{2,}|$)", line)
+            if found:
+                town = found[1].strip() if found[1] else town
+                post, seats, name = found[2], NUMBERS.get(found[3].title(), 1), found[4]
+            elif more and post:
+                name = more[1]
+            else:
+                if re.match(r"\S", line):
+                    post = ""
+                continue
+            if nobody.search(name) or re.search(r"\d|@", name):
+                continue
+            named, independent = party(label)
+            feeds["NJ-34019"].append(
+                {
+                    "feed": key,
+                    "county": "Hunterdon",
+                    "contest": f"{town} {post}" if town else f"Hunterdon County {post}",
+                    "seats": seats,
+                    "name": cased(name),
+                    "party": named,
+                    "independent": independent,
+                    "unexpired": False,
+                }
+            )
+
+    post, seats = "", 0
+    for cells in pl.read_excel(raw.cached(SOURCE, FEEDS["NJ-34011"][0]).path, has_header=False).iter_rows():
+        values = [str(cell).strip() for cell in cells if cell is not None and str(cell).strip()]
+        if len(values) == 1 and (found := re.search(r"- *(\d+) SEATS?$", values[0])):
+            post, seats = values[0], int(found[1])
+        elif post and len(cells) >= 8 and cells[4] is not None and cells[0] is not None:
+            where, title = str(cells[5]).strip(), str(cells[4]).strip()
+            if where == "COUNTYWIDE" and title.startswith("US "):
+                continue
+            named, independent = party(str(cells[6] or ""))
+            feeds["NJ-34011"].append(
+                {
+                    "county": "Cumberland",
+                    "contest": f"Cumberland County {title}" if where == "COUNTYWIDE" else f"{where} {title}",
+                    "seats": seats,
+                    "name": cased(" ".join(str(cell).strip() for cell in cells[:4] if cell is not None)),
+                    "party": named,
+                    "independent": independent,
+                    "unexpired": "UNEXPIRED" in post,
+                }
+            )
+
+    for key in [key for key in feeds if key.startswith("NJ-")]:
+        tally: dict[tuple[object, object], defaultdict[object, int]] = defaultdict(lambda: defaultdict(int))
+        for row in feeds[key]:
+            row["contest"] = re.sub(
+                r"(?i)^(\S.*? county) (?:member of the )?(?:board of )?(?:county )?commis+ioners?\b",
+                r"\1 Commission",
+                str(row["contest"]),
+            )
+            tally[(row["contest"], row["unexpired"])][row["party"] or row["independent"]] += 1
+        for row in feeds[key]:
+            if not row["seats"]:
+                row["seats"] = max(tally[(row["contest"], row["unexpired"])].values())
+
     county = ""
     heading = ""
     for line in text("TX", "-layout").splitlines():
@@ -1219,17 +1644,129 @@ def parse() -> None:
             )
             used: dict[str, str] = {}
             missed: set[str] = set()
+            towns: dict[str, list[tuple[list[str], str, str, str, str]]] = defaultdict(list)
+            if "-" in key and key != "MN-county":
+                for county_code, label, owner, path, kind in conn.execute(
+                    """select distinct on (g.id) g.county, g.name, x.value, s.path, g.kind from coverage_government g
+                       join external_id x on x.entity_id = g.polity_id and x.scheme = 'us.polity'
+                           and x.value ~ '^(place|town):'
+                       join slug s on s.entity_id = g.polity_id
+                       where g.state = %s and g.kind in ('municipality', 'township')
+                       order by g.id, x.value desc, s.path""",
+                    [state],
+                ):
+                    stem = re.findall(r"[a-z0-9]+", label.lower().replace("&", " and "))
+                    towns[county_code].append(
+                        (
+                            [
+                                word
+                                for word in stem
+                                if word not in ("township", "borough", "city", "town", "village", "charter")
+                            ],
+                            next(
+                                (
+                                    word
+                                    for word in reversed(stem)
+                                    if word in ("township", "borough", "city", "town", "village")
+                                ),
+                                "township" if kind == "township" else "",
+                            ),
+                            label,
+                            owner,
+                            path,
+                        )
+                    )
             for row in found:
                 template, tail = tails.get((str(row["fips"]), str(row["contest"])), (None, None))
                 if row.get("tail") is not None:
                     template = tail = str(row["tail"]) if row["tail"] in exact else None
                 place = places.get(str(row["fips"]), "").rsplit(",", 1)[0]
+                tokens = re.findall(
+                    r"[a-z0-9]+", re.sub(r"(?i)\btwp\b", "township", str(row["contest"]).lower().replace("&", " and "))
+                )
+                fits = []
+                for stem, sort, label, owner, path in towns.get(str(row["fips"]), []):
+                    for start in ([], [sort, "of"], ["charter", "township", "of"]):
+                        lead = start + stem
+                        if stem and tokens[: len(lead)] == lead:
+                            rest = tokens[len(lead) :]
+                            said = (
+                                rest[0]
+                                if not start and rest and rest[0] in ("township", "borough", "city", "town", "village")
+                                else start[0]
+                                if start
+                                else ""
+                            )
+                            if said and sort and said != sort:
+                                continue
+                            fits.append(
+                                (len(stem), bool(said), rest[1:] if said and not start else rest, label, owner, path)
+                            )
+                fits = [fit for fit in fits if fit[0] == max(f[0] for f in fits)]
+                if len(fits) > 1:
+                    fits = [fit for fit in fits if fit[1]] if len({fit[4] for fit in fits if fit[1]}) == 1 else fits
+                if (
+                    template is None
+                    and state in ("NJ", "MI")
+                    and len({fit[4] for fit in fits}) == 1
+                    and not re.search(
+                        r"\b(school|unified|college|district|area|primary|nominating|special)\b", " ".join(fits[0][2])
+                    )
+                ):
+                    _, _, rest, label, owner, path = fits[0]
+                    post = " ".join(rest)
+                    role = next(
+                        (
+                            role
+                            for pattern, role in (
+                                (r"(?<!president of )(?<!deputy )\bmayor\b", "mayor"),
+                                (r"\bboard of education\b|\bschool board\b|\bboe\b", "board-of-education"),
+                                (r"\bcommittee\b", "committee"),
+                                (r"\bcouncil\b|\bcouncilm[ae]n\b|\balderm[ae]n\b", "council"),
+                                (r"\btrustees?\b", "board-of-trustees"),
+                            )
+                            if re.search(pattern, post)
+                            and not re.search(r"president|clerk|tax|collector|fire|library", post)
+                        ),
+                        None,
+                    )
+                    ward = re.search(
+                        r"\bward (\d+)\b|\b(\d+)(?:st|nd|rd|th)? ward\b|\bw(\d+)\b|\b(north|south|east|west|central) ward\b",
+                        post,
+                    )
+                    seat = (
+                        (f"Ward {ward[1] or ward[2] or ward[3]}" if ward[4] is None else f"{ward[4].title()} Ward")
+                        if ward and role == "council"
+                        else "At-Large"
+                        if role == "council" and re.search(r"\bat large\b", post)
+                        else ""
+                    )
+                    if role is not None:
+                        code = owner.split(":", 1)[1]
+                        template, tail = "", f"{state}:{code}:{role}" + (f":{slug(seat)}" if seat else "")
+                        minted[tail] = (
+                            {
+                                "mayor": "mayoral",
+                                "board-of-education": "Board of Education",
+                                "committee": "Committee",
+                                "council": "Council",
+                                "board-of-trustees": "Board of Trustees",
+                            }[role]
+                            + (f", {seat}" if seat else ""),
+                            label,
+                            owner,
+                            path,
+                        )
                 if (
                     template is None
                     and place
                     and int(str(row["seats"]) or 0) <= 1
                     and not LOCAL_BODY.search(str(row["contest"]))
-                    and ("-" not in key or key == "MN-county")
+                    and (
+                        "-" not in key
+                        or key == "MN-county"
+                        or re.match(rf"(?i){re.escape(place)}\b", str(row["contest"])) is not None
+                    )
                 ):
                     title = re.sub(
                         rf"(?i)^\s*(?:{re.escape(place)}|{re.escape(place.removesuffix(' County'))}(?:\s+county)?)\s+",
@@ -1247,7 +1784,7 @@ def parse() -> None:
                         ),
                     )
                     template, tail = "", f"{state}:{row['fips']}:{slug(title)}"
-                    minted[tail] = (title, place)
+                    minted[tail] = (title, place, "", "")
                 if (
                     tail is not None
                     and used.setdefault(tail, str(row["contest"])) != row["contest"]
@@ -1271,6 +1808,7 @@ def parse() -> None:
                     str(row["name"]),
                     None if row["party"] is None else str(row["party"]),
                     bool(row["independent"]),
+                    str(row.get("feed") or key),
                 )
             taken |= set(used)
             print(f"{key}: {len(used)} contests matched, {len(missed)} not matched")
@@ -1284,10 +1822,33 @@ def parse() -> None:
         .unique(["tail", "person"], keep="first", maintain_order=True)
         .with_columns(
             template=pl.col("tail").replace(templated),
-            title=pl.col("tail").replace_strict({tail: title for tail, (title, _) in minted.items()}, default=None),
-            place=pl.col("tail").replace_strict({tail: place for tail, (_, place) in minted.items()}, default=None),
+            title=pl.col("tail").replace_strict({tail: value[0] for tail, value in minted.items()}, default=None),
+            place=pl.col("tail").replace_strict({tail: value[1] for tail, value in minted.items()}, default=None),
+            owner=pl.col("tail").replace_strict({tail: value[2] for tail, value in minted.items()}, default=None),
+            home=pl.col("tail").replace_strict({tail: value[3] for tail, value in minted.items()}, default=None),
         )
     )
+    with connect() as conn:
+        held = {
+            frozenset(slug(label) for label in labels if label): tail
+            for tail, labels in conn.execute(
+                """select substr(x.value, 12), array_agg(distinct o.ballot_label) from external_id x
+                   join contest c on c.id = x.entity_id join changeset cs on cs.id = c.changeset_id
+                   join entity t on t.id = c.id and t.retired_by is null
+                   join contest_option o on o.contest_id = c.id
+                   where x.scheme = 'us.contest' and x.value like %s and cs.pipeline = %s
+                   group by 1""",
+                [f"{DAY}:%", SOURCE],
+            )
+        }
+    kept = set(frame["tail"])
+    moved = {
+        tail
+        for (tail,), group in frame.group_by(["tail"])
+        if tail not in held.values() and (old := held.get(frozenset(group["person"]))) is not None and old not in kept
+    }
+    print(f"{len(moved)} contests left on the tail this pipeline already published")
+    frame = frame.filter(~pl.col("tail").is_in(moved))
     frame.write_parquet(PARSED / "candidates.parquet")
     print(frame.group_by("fips").agg(pl.col("tail").n_unique().alias("contests"), pl.len().alias("candidates")))
 
@@ -1342,8 +1903,75 @@ def emit() -> Path:
         elections = {}
         counts = {"contests": 0, "chained": 0, "created": 0, "candidates": 0, "matched": 0, "no template": 0}
         created: set[str] = set()
+        made: set[object] = set()
+        homes: dict[str, str] = {}
         for (fips, tail, template), group in frame.group_by(["fips", "tail", "template"], maintain_order=True):
-            if template == "":
+            if template == "" and group["owner"][0]:
+                title, place, owner, home = (str(group[column][0]) for column in ("title", "place", "owner", "home"))
+                st, code, role = tail.split(":")[:3]
+                polity = cs.key("us.polity", owner)
+                body = role != "mayor"
+                holder = cs.key("us.body" if body else "us.office", f"{st}:{code}:{role}")
+                if holder in cs.minted and holder not in made:
+                    made.add(holder)
+                    if body:
+                        cs.add("body", id=holder, polity_id=polity, kind="council")
+                        name(holder, f"{place} {title.split(',')[0]}")
+                    else:
+                        cs.add("office", id=holder, polity_id=polity, kind="mayor")
+                        name(holder, f"Mayor of {place}")
+                whole = conn.execute(
+                    "select t.area_id from polity_territory t join polity p on p.id = t.polity_id"
+                    " join external_id x on x.entity_id = p.id and x.scheme = 'us.polity' and x.value = %s"
+                    " order by t.valid_from desc nulls last limit 1",
+                    [owner],
+                ).fetchone()
+                if whole is None:
+                    counts["no template"] += 1
+                    print(f"no territory: {tail} {owner}")
+                    continue
+                area = whole[0]
+                if ", " in title:
+                    seat = title.split(", ", 1)[1]
+                    district = f"{st}:{code}:{role}:{slug(seat)}"
+                    area = cs.area("us.local_district", district)
+                    if area in cs.minted and area not in made:
+                        made.add(area)
+                        cs.add("area", id=area, scheme_code="us.local_district")
+                        cs.add("area_code", area_id=area, code=district, valid_from=None)
+                        cs.add("area_parent", area_id=area, parent_id=whole[0], valid_from=None)
+                        name(area, f"{place} {title.split(',')[0]}, {seat}")
+                templates[tail] = (
+                    tail,
+                    None,
+                    "body_seats" if body else "office",
+                    None if body else holder,
+                    holder if body else None,
+                    area,
+                    None,
+                    None,
+                    1,
+                    "full",
+                    cs.key("us.electoral_system", "fptp"),
+                    "counted",
+                    DAY,
+                    polity,
+                    f"2026 {place} {title} election",
+                    f"{home}/{DAY}-general/{role}" + (f"-{slug(title.split(', ', 1)[1])}" if ", " in title else ""),
+                    f"2026 {place} general election",
+                    f"{home}/{DAY}-general",
+                    f"{st}:{code}",
+                )
+                created.add(tail)
+                known[tail] = conn.execute(
+                    """select ca.person_id, coalesce(ca.ballot_name, o.ballot_label, pn.text)
+                       from contest co join contest_option o on o.contest_id = co.id
+                       join candidacy ca on ca.option_id = o.id join entity e on e.id = ca.id and e.retired_by is null
+                       left join name pn on pn.entity_id = ca.person_id and pn.is_preferred and pn.lang = 'en'
+                       where co.office_id = %s or co.body_id = %s""",
+                    [holder, holder],
+                ).fetchall()
+            elif template == "":
                 title, place = str(group["title"][0]), str(group["place"][0])
                 st, county = tail.split(":")[:2]
                 polity = cs.key("us.polity", f"county:{county}")
@@ -1472,25 +2100,40 @@ def emit() -> Path:
                 election_path,
                 scope,
             ) = templates[tail]
-            state, publisher, source_title = (
-                (fips.split("-")[0], *FEEDS[fips][1:]) if fips in FEEDS else PUBLISHERS[fips]
-            )
-            if fips not in sources:
-                source = cs.source(publisher, source_title)
-                if source not in sources.values():
-                    if source in cs.minted:
-                        cs.add(
-                            "source",
-                            id=source,
-                            kind="official_body",
-                            publisher=publisher,
-                            title=source_title,
-                            url=FEEDS[fips][0] if fips in FEEDS else FILES[fips],
-                            license="Public record",
-                        )
-                    cs.artifact(raw.cached(SOURCE, FEEDS[fips][0] if fips in FEEDS else FILES[fips]), source)
-                sources[fips] = source
+            state = fips.split("-")[0] if fips in FEEDS else PUBLISHERS[fips][0]
+            for feed in group["feed"].unique(maintain_order=True):
+                if feed not in sources:
+                    _, publisher, source_title = (
+                        (feed.split("-")[0], *FEEDS[feed][1:]) if feed in FEEDS else PUBLISHERS[feed]
+                    )
+                    source = cs.source(publisher, source_title)
+                    if source not in sources.values():
+                        if source in cs.minted:
+                            cs.add(
+                                "source",
+                                id=source,
+                                kind="official_body",
+                                publisher=publisher,
+                                title=source_title,
+                                url=FEEDS[feed][0] if feed in FEEDS else FILES[feed],
+                                license="Public record",
+                            )
+                        cs.artifact(raw.cached(SOURCE, FEEDS[feed][0] if feed in FEEDS else FILES[feed]), source)
+                    sources[feed] = source
+            home = re.sub(r"/[0-9-]+-\w+$", f"/{DAY}-general", election_path)
+            if scope not in elections and home in homes:
+                elections[scope] = elections[homes[home]]
             if scope not in elections:
+                held = conn.execute(
+                    "select x.value from slug s join external_id x on x.entity_id = s.entity_id and x.scheme = 'us.election'"
+                    " where s.path = %s",
+                    [home],
+                ).fetchone()
+                if held is not None and held[0] != f"{DAY}:{scope}":
+                    elections[scope] = elections.get(held[0][11:]) or cs.key("us.election", held[0])
+                    homes[home] = scope
+            if scope not in elections:
+                homes[home] = scope
                 elections[scope] = cs.key("us.election", f"{DAY}:{scope}")
                 cs.add(
                     "election",
@@ -1541,7 +2184,7 @@ def emit() -> Path:
             counts["contests"] += 1
             if tail in created:
                 counts["created"] += 1
-                cs.add("citation", entity_id=contest, source_id=sources[fips], locator=None)
+                cs.add("citation", entity_id=contest, source_id=sources[str(group["feed"][0])], locator=None)
             counts["chained"] += chained
             for row in group.iter_rows(named=True):
                 tokens = [
@@ -1597,7 +2240,7 @@ def emit() -> Path:
                     ballot_name=row["name"],
                     is_independent=bool(row["independent"]),
                 )
-                cs.add("citation", entity_id=candidacy, source_id=sources[fips], locator=None)
+                cs.add("citation", entity_id=candidacy, source_id=sources[row["feed"]], locator=None)
                 counts["candidates"] += 1
         print(counts)
         return cs.write()

@@ -20,7 +20,6 @@ from ea.sources.us.enr_clarity import STATE_NAMES
 from ea.sources.us.oe_primaries_2026 import (
     BASE,
     BROWSER,
-    CT_COUNTIES,
     EV,
     FIPS,
     IL_CITIES,
@@ -466,6 +465,17 @@ PARTIES = {
     "dfl": ("dp", "MN:minnesota-democratic-farmer-labor-party", "Democratic–Farmer–Labor"),
     "democratic": ("dp", "democratic-party", "Democratic"),
     "republican": ("rp", "republican-party", "Republican"),
+}
+
+CT_COUNTIES = {
+    "Fairfield": "001",
+    "Hartford": "003",
+    "Litchfield": "005",
+    "Middlesex": "007",
+    "New Haven": "009",
+    "New London": "011",
+    "Tolland": "013",
+    "Windham": "015",
 }
 
 
