@@ -857,7 +857,7 @@ def parse() -> None:
                                 )
                                 if re.search(r"[A-Z]{3}", re.sub(r'"[^"]*"', "", row["CandidateName"]))
                                 else row["CandidateName"].strip(),
-                                IL_CITIES.get(row["JurisName"].upper(), row["JurisName"]),
+                                IL_CITIES.get(row["JurisName"].upper(), row["JurisName"]).upper(),
                             )
                         ] += int(row["VoteCount"] or 0)
             rows = [(*key, votes) for key, votes in totals.items()]
