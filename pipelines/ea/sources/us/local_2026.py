@@ -118,6 +118,71 @@ FEEDS = {
         "Arapahoe County Clerk and Recorder",
         "Sample General Election Ballot, Tuesday, November 3, 2026",
     ),
+    "GA": (
+        "https://results.sos.ga.gov/results/public/api/elections/Georgia/GeneralPrimary51926/data#counties",
+        "Georgia Secretary of State",
+        "May 19, 2026 General Primary and June 16, 2026 General Primary Runoff: Official Results by County",
+    ),
+    "IL-17089": (
+        "https://applications.kanecountyil.gov/ElectionWebsite/en-US/Candidates/List/31/NP",
+        "Kane County Clerk",
+        "Candidates for the 2026 General Election",
+    ),
+    "IL-17201": (
+        "https://wincoil.gov/media/attachments/2026/09/25/november-2026-candidate-list.pdf",
+        "Winnebago County Clerk",
+        "2026 General Election: List of Candidates (9/25/2026)",
+    ),
+    "IL-17167": (
+        "https://sangamondepartments.blob.core.windows.net/dnnfiles/Clerk/Elections/Candidates/2026%20Election/11-3-26%20Co%20Wide%20and%20Co%20Board%20Candidate%20Listing.pdf",
+        "Sangamon County Clerk",
+        "Sangamon County Candidates for November 3, 2026 General Election",
+    ),
+    "MO-29183": (
+        "https://www.sccmo.org/DocumentCenter/View/28912/Candidates-SCCMO-only-for-Nov-2026---20260826",
+        "St. Charles County Election Authority",
+        "Filed Candidates for 2026 General Election, as of 08/26/2026",
+    ),
+    "MO-29099": (
+        "https://www.jeffcomo.gov/DocumentCenter/View/22933/November-3-2026-General-Election-County-Wide-Sample-Ballot-PDF",
+        "Jefferson County Clerk",
+        "Sample Ballot, General Election, Tuesday, November 3, 2026",
+    ),
+    "MO-29077": (
+        "https://vote.greenecountymo.gov/wp-content/uploads/2026/09/Candidates_and_Ballot_Issues_Composite_November_2026.pdf",
+        "Greene County Clerk",
+        "November 3, 2026 General Election: Candidates and Ballot Issues",
+    ),
+    "MO-29189": (
+        "https://extcontent.stlouisco.com/BOE/FIO/NovemberFIO.pdf",
+        "St. Louis County Board of Elections",
+        "November 3, 2026 General Election: Ballot Content Report (09/16/2026)",
+    ),
+    "MO-29510": (
+        "https://www.stlouis-mo.gov/government/departments/board-election-commissioners/documents/upload/Nov26-All-Races-Sample-Ballot.pdf",
+        "St. Louis City Board of Election Commissioners",
+        "November 3, 2026 General Election: All Races Sample Ballot",
+    ),
+    "OH-39153": (
+        "https://boe.ohio.gov/summit/c/upload/Election_CandidateList.pdf",
+        "Summit County Board of Elections",
+        "General Election, November 3, 2026: Candidate List (subject to withdrawal, 10/16/26)",
+    ),
+    "OH-39095": (
+        "https://boe.ohio.gov/lucas/#26NGCandidatesList.pdf",
+        "Lucas County Board of Elections",
+        "General Election, November 3, 2026: Candidates List (09/11/26)",
+    ),
+    "OH-39113": (
+        "https://montgomery.boe.ohio.gov/#10.16.2026-Candidate-Petition-Report.pdf",
+        "Montgomery County Board of Elections",
+        "2026 Montgomery County Candidate Report (October 16, 2026)",
+    ),
+    "IL-17111": (
+        "https://www.mchenrycountyil.gov/county-government/departments-j-z/county-clerk/elections#20260824-candidatelist.pdf",
+        "McHenry County Clerk",
+        "Certified Candidate List, General, 11/3/2026",
+    ),
     "GA-13121": (
         "https://www.fultoncountyga.gov/-/media/2026-Election/November-3-Election/Sample-Ballot--Consolidated--Nov-32026-General--Special-Election--1082026.pdf",
         "Fulton County Department of Registration and Elections",
@@ -172,6 +237,26 @@ FEEDS = {
         "https://www.sos.alabama.gov/alabama-votes/2026-general-election-sample-ballots",
         "Alabama Secretary of State",
         "2026 General Election Sample Ballots, November 3, 2026 (61 county ballots)",
+    ),
+    "CO": (
+        "https://results.enr.clarityelections.com/CO/126592/web.377440/#/summary#counties",
+        "Colorado Secretary of State",
+        "June 30, 2026 Primary Election: Official Results by County",
+    ),
+    "IA": (
+        "https://electionresults.iowa.gov/IA/126082/web.377216/#/summary#counties",
+        "Iowa Secretary of State",
+        "June 2, 2026 Primary Election: Official Results by County",
+    ),
+    "WI": (
+        "https://elections.wi.gov/2026#File All Contests and Candidates_November 3, 2026.xlsx",
+        "Wisconsin Elections Commission",
+        "All Contests and Candidates, November 3, 2026 General Election",
+    ),
+    "ID": (
+        "https://api-run.voteidaho.gov/api/FiledCandidates/SearchCandidates#1e38d17c-a176-47b8-91d1-368ba38ccdec",
+        "Idaho Secretary of State",
+        "Filed Candidates: 11/03/2026 General Election, Final List",
     ),
     "WA": (
         "https://voter.votewa.gov/CandidateList.aspx?e=899#export-by-county",
@@ -742,6 +827,12 @@ FILLER = {
     "member",
     "seat",
 }
+NO_FILING = "No Candidate Filed"
+GA_STATE = (
+    r"US |Governor|Lieutenant|Secretary of State|Attorney General|State School|Commissioner of|PSC|State Senate"
+    r"|State House|State Representative|Party Question|Justice|Judge|Lt\.|District Attorney"
+)
+GA_BALLOTS = {"Fulton", "Gwinnett", "Cobb", "DeKalb", "Clayton", "Paulding", "Houston", "Columbia", "Richmond"}
 ROMAN = ["i", "ii", "iii", "iv", "v", "vi", "vii", "viii", "ix", "x"]
 DELIVERED = {
     "04013": DATA
@@ -799,6 +890,10 @@ DELIVERED = {
     "NJ-34003": DATA / "inbox" / "y26" / "nj" / "bergen.xlsx",
     "NJ-34021": DATA / "inbox" / "y26" / "nj" / "mercer.pdf",
     "WA": DATA / "inbox" / "y26" / "wa" / "votewa_general_2026_by_county.json",
+    "ID": DATA / "inbox" / "y26" / "id" / "idaho_2026_general_filed_candidates.json",
+    "WI": DATA / "inbox" / "y26" / "wi" / "all_contests_2026-11-03.xlsx",
+    "IA": DATA / "inbox" / "y26" / "ia" / "clarity_2026_primary.json",
+    "CO": DATA / "inbox" / "y26" / "co" / "clarity_2026_primary.json",
     "AL": DATA / "inbox" / "y26" / "al" / "sample_ballots.pdf",
     "UT-49049": DATA / "inbox" / "y26" / "ut" / "utah_county.pdf",
     "UT-49011": DATA / "inbox" / "y26" / "ut" / "davis.pdf",
@@ -809,6 +904,19 @@ DELIVERED = {
     "IL-17097": DATA / "inbox" / "manual" / "MF-201" / "candidatelist9.9.26_202609090842449785.pdf",
     "CO-08005": DATA / "inbox" / "y26" / "co" / "arapahoe.pdf",
     "AZ-04013-s": DATA / "inbox" / "y26" / "az" / "maricopa_schools.json",
+    "GA": DATA / "inbox" / "y26" / "ga" / "ev_2026_primaries.json",
+    "IL-17089": DATA / "inbox" / "y26" / "il" / "kane.html",
+    "IL-17201": DATA / "inbox" / "y26" / "il" / "winnebago.pdf",
+    "IL-17167": DATA / "inbox" / "y26" / "il" / "sangamon.pdf",
+    "MO-29183": DATA / "inbox" / "y26" / "mo" / "stcharles.pdf",
+    "MO-29099": DATA / "inbox" / "y26" / "mo" / "jefferson.pdf",
+    "MO-29077": DATA / "inbox" / "y26" / "mo" / "greene.pdf",
+    "MO-29189": DATA / "inbox" / "y26" / "mo" / "stlouiscounty.pdf",
+    "MO-29510": DATA / "inbox" / "y26" / "mo" / "stlouiscity.pdf",
+    "OH-39153": DATA / "inbox" / "y26" / "oh" / "summit.pdf",
+    "OH-39095": DATA / "inbox" / "y26" / "oh" / "lucas.pdf",
+    "OH-39113": DATA / "inbox" / "y26" / "oh" / "montgomery.pdf",
+    "IL-17111": DATA / "inbox" / "y26" / "il" / "mchenry.pdf",
     "GA-13121": DATA / "inbox" / "y26" / "ga" / "fulton.pdf",
     "GA-13135": DATA / "inbox" / "y26" / "ga" / "gwinnett.pdf",
     "GA-13067": DATA / "inbox" / "y26" / "ga" / "cobb.pdf",
@@ -1501,6 +1609,97 @@ def parse() -> None:
                 "name": cased(" ".join(part for part in [*head[-3:], suffix] if part)),
                 "party": named,
                 "independent": independent or code in ("DTS", "IND"),
+                "unexpired": False,
+            }
+        )
+
+    for county, listing in json.loads(raw.cached(SOURCE, FEEDS["CO"][0]).path.read_text()).items():
+        if county == "Arapahoe":
+            continue
+        for contest in listing["contests"]:
+            found = re.fullmatch(rf"({re.escape(county)} County .+) - ([^-]+?) Party", contest["C"])
+            ranked = sorted(
+                (votes, name)
+                for name, votes in zip(contest["CH"], contest["V"], strict=True)
+                if not re.search(r"(?i)write.?in", name)
+            )
+            if found is None or not ranked or re.search(r"(?i)district attorney|regent", found[1]):
+                continue
+            named, independent = party(found[2])
+            feeds["CO"].append(
+                {
+                    "county": county,
+                    "contest": found[1].replace(" - ", " "),
+                    "seats": 1,
+                    "name": cased(ranked[-1][1]),
+                    "party": named,
+                    "independent": independent,
+                    "unexpired": re.search(r"(?i)vacancy|unexpired", found[1]) is not None,
+                }
+            )
+
+    for county, listing in json.loads(raw.cached(SOURCE, FEEDS["IA"][0]).path.read_text()).items():
+        for contest in listing["contests"]:
+            found = re.fullmatch(r"(County .+?) - (Rep|Dem)\.", contest["C"])
+            if found is None:
+                continue
+            seats = int(contest["VF"] or 1)
+            ranked = sorted(
+                (
+                    (votes, name)
+                    for name, label, votes in zip(contest["CH"], contest["P"], contest["V"], strict=True)
+                    if label
+                ),
+                reverse=True,
+            )
+            for votes, name in ranked[:seats]:
+                if votes * seats * 100 >= contest["T"] * 35:
+                    feeds["IA"].append(
+                        {
+                            "county": county,
+                            "contest": f"{county} {re.sub(r'(?i)\s*-?\s*(?:to fill (?:a )?vacancy|\d+ year term)$', '', found[1])}",
+                            "seats": seats,
+                            "name": cased(name),
+                            "party": "republican-party" if found[2] == "Rep" else "democratic-party",
+                            "independent": False,
+                            "unexpired": re.search(r"(?i)vacancy|unexpired", found[1]) is not None,
+                        }
+                    )
+
+    for row in pl.read_excel(raw.cached(SOURCE, FEEDS["WI"][0]).path, infer_schema_length=0).iter_rows(named=True):
+        if row["IsReferendum"] or not str(row["District"]).endswith(" County") or " County " not in row["Contest"]:
+            continue
+        named, independent = party(str(row["Political Party"] or "").removeprefix("Wisconsin "))
+        feeds["WI"].append(
+            {
+                "county": row["District"].removesuffix(" County"),
+                "contest": re.sub(r"Circuit Courts$", "Circuit Court", row["Contest"]),
+                "seats": 1,
+                "name": cased(row["Name On Ballot"]),
+                "party": named,
+                "independent": independent,
+                "unexpired": re.search(r"(?i)unexpired|vacancy", row["Contest"]) is not None,
+            }
+        )
+
+    for row in json.loads(raw.cached(SOURCE, FEEDS["ID"][0]).path.read_text())["candidates"]:
+        if (
+            row["districtType"] != "County"
+            or row["filingStatus"] != "Approved"
+            or row["isWriteIn"]
+            or row["officeName"].startswith("Magistrate")
+        ):
+            continue
+        post = row["officeName"].strip().removeprefix("County ")
+        named, independent = party(row["partyName"])
+        feeds["ID"].append(
+            {
+                "county": row["countyName"],
+                "contest": f"{row['countyName']} County {post}" + (f" District {row['seat']}" if row["seat"] else ""),
+                "seats": 1,
+                "name": cased(row["candidateName"]),
+                "party": named,
+                "independent": independent,
                 "unexpired": False,
             }
         )
@@ -2513,6 +2712,18 @@ def parse() -> None:
                 seats, unexpired = int(found[4]), "PARTIAL" in found[3]
             elif re.match(r"\s{20,}[A-Z][A-Z0-9 .,'&/()-]+$", line):
                 post = ""
+            elif post and re.fullmatch(r"(?i)\s*(?:\S+\s+)?no candidate filed\s*", line):
+                feeds[key].append(
+                    {
+                        "county": county,
+                        "contest": post,
+                        "seats": seats,
+                        "name": NO_FILING,
+                        "party": None,
+                        "independent": False,
+                        "unexpired": unexpired,
+                    }
+                )
             elif post and (found := re.match(r"\s{0,4}(\S(?:.*?\S)?)\s{2,}(\S.*?)(?:\s{2,}|$)", line)):
                 if nobody.search(found[2]) or re.search(
                     r"(?i)no candidate filed|withdr|disqualif|page \d+ of|^november", line
@@ -2908,6 +3119,50 @@ def parse() -> None:
                 }
             )
 
+    ev = json.loads(raw.cached(SOURCE, FEEDS["GA"][0]).path.read_text())
+    for short, county in ev["primary"].items():
+        place = county["county"].removesuffix(" County")
+        if place in GA_BALLOTS:
+            continue
+        for item in county["ballotItems"]:
+            found = re.fullmatch(r"(.+?) - (Rep|Dem)", item["name"])
+            if found is None or re.match(GA_STATE, found[1]) or "Elections Board" in found[1]:
+                continue
+            options = [option for option in item["options"] if not option["writeIn"]]
+            if len(options) > 1 and max(option["votes"] for option in options) * 2 <= sum(
+                option["votes"] for option in options
+            ):
+                options = next(
+                    (
+                        [option for option in runoff["options"] if not option["writeIn"]]
+                        for runoff in ev["runoff"].get(short, {}).get("ballotItems", [])
+                        if runoff["name"] == item["name"]
+                    ),
+                    [],
+                )
+            if not options:
+                continue
+            winner = max(options, key=lambda option: option["votes"])
+            title = re.sub(
+                r"(?i)\s*/\s*para .*|\s*\((?:unexpired|special)[^)]*\)|\s*-?\s*(?:unexpired term|special election)",
+                "",
+                found[1],
+            )
+            title = re.sub(r"\bBOE\b", "Board of Education", " ".join(title.replace(" - ", " ").split()))
+            if not title.startswith(("County ", place)):
+                title = f"County {title}"
+            feeds["GA"].append(
+                {
+                    "county": place,
+                    "contest": title if title.startswith(place) else f"{place} {title}",
+                    "seats": int(re.sub(r"\D", "", item["voteFor"]) or 1),
+                    "name": cased(re.sub(r"\s*\(I\)$", "", winner["name"])),
+                    "party": "republican-party" if found[2] == "Rep" else "democratic-party",
+                    "independent": False,
+                    "unexpired": re.search(r"(?i)unexpired|special", found[1]) is not None,
+                }
+            )
+
     for row in [
         row
         for state in ("oh", "fl", "ca", "nj", "counties")
@@ -3077,7 +3332,9 @@ def parse() -> None:
         feeds[key] = [
             row
             for row in feeds[key]
-            if not nobody.search(str(row["name"])) and not re.search(r"(?i)withdr", str(row["name"]))
+            if row["name"] == NO_FILING
+            or not nobody.search(str(row["name"]))
+            and not re.search(r"(?i)withdr", str(row["name"]))
         ]
 
     for key in [key for key in feeds if key.startswith("NJ-")]:
@@ -3505,7 +3762,16 @@ def emit() -> Path:
 
         sources = {}
         elections = {}
-        counts = {"contests": 0, "chained": 0, "created": 0, "candidates": 0, "matched": 0, "no template": 0}
+        counts = {
+            "contests": 0,
+            "chained": 0,
+            "created": 0,
+            "candidates": 0,
+            "matched": 0,
+            "no template": 0,
+            "no filing": 0,
+            "dropped": 0,
+        }
         created: set[str] = set()
         made: set[object] = set()
         homes: dict[str, str] = {}
@@ -3799,7 +4065,19 @@ def emit() -> Path:
                 counts["created"] += 1
                 cs.add("citation", entity_id=contest, source_id=sources[str(group["feed"][0])], locator=None)
             counts["chained"] += chained
+            if set(group["name"]) == {NO_FILING}:
+                cs.add(
+                    "label",
+                    entity_id=contest,
+                    kind="ballot",
+                    value="no_candidate_qualified",
+                    source_id=sources[str(group["feed"][0])],
+                    valid_from=DAY,
+                )
+                counts["no filing"] += 1
             for row in group.iter_rows(named=True):
+                if row["name"] == NO_FILING:
+                    continue
                 tokens = [
                     token
                     for token in slug(re.sub(r'"[^"]*"|\([^)]*\)', " ", row["name"])).split("-")
@@ -3858,5 +4136,21 @@ def emit() -> Path:
                 )
                 cs.add("citation", entity_id=candidacy, source_id=sources[row["feed"]], locator=None)
                 counts["candidates"] += 1
+        options = {str(row["id"]) for row in cs.rows.get("contest_option", [])}
+        for option, candidacy, value in conn.execute(
+            """select o.id, ca.id, x.value from contest_option o join changeset c on c.id = o.changeset_id
+               join entity e on e.id = o.id and e.retired_by is null
+               left join candidacy ca on ca.option_id = o.id
+               left join external_id x on x.entity_id = o.id and x.scheme = 'us.option'
+               where c.pipeline = %s and o.contest_id = any(%s::uuid[])""",
+            [SOURCE, [str(row["id"]) for row in cs.rows.get("contest", [])]],
+        ).fetchall():
+            if str(option) not in options:
+                print("dropping", value)
+                reason = "No longer on the newest official candidate list for this race"
+                if candidacy is not None:
+                    cs.add("entity_retirement", entity_id=candidacy, reason=reason)
+                cs.add("entity_retirement", entity_id=option, reason=reason)
+                counts["dropped"] += 1
         print(counts)
         return cs.write()
