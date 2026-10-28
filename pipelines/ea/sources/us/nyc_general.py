@@ -4,6 +4,7 @@ import os
 import re
 import time
 from datetime import date, timedelta
+from difflib import SequenceMatcher
 from pathlib import Path
 from urllib.parse import quote, unquote
 from uuid import UUID
@@ -1203,18 +1204,21 @@ def emit() -> Path:
                     is_default=whole or not partial,
                     completeness=completeness,
                 )
-                declared = (
-                    dict(
-                        conn.execute(
-                            """select o.option_id, o.kind from outcome o join result_set r on r.id = o.result_set_id
-                               where r.contest_id = %s and r.id <> %s and o.kind <> 'lost'
-                               order by r.is_default, r.as_of nulls first""",
-                            [contest, result_set],
-                        ).fetchall()
-                    )
-                    if whole
-                    else {}
-                )
+                declared = {}
+                by_name = []
+                if whole:
+                    for option_id, declared_kind, label in conn.execute(
+                        """select o.option_id, o.kind, co.ballot_label from outcome o
+                           join result_set r on r.id = o.result_set_id
+                           join contest_option co on co.id = o.option_id
+                           where r.contest_id = %s and r.id <> %s and o.kind <> 'lost'
+                           order by r.is_default, r.as_of nulls first""",
+                        [contest, result_set],
+                    ).fetchall():
+                        declared[option_id] = declared_kind
+                        words = re.sub(r"[^a-z ]", "", str(label).lower()).split()
+                        if len(words) >= 2:
+                            by_name.append((words[0][0], words[-1], declared_kind))
                 cs.add(
                     "note",
                     entity_id=result_set,
@@ -1313,7 +1317,21 @@ def emit() -> Path:
                             "outcome",
                             result_set_id=result_set,
                             option_id=option_ids[candidate],
-                            kind=declared.get(option_ids[candidate], "lost"),
+                            kind=declared.get(
+                                option_ids[candidate],
+                                next(
+                                    (
+                                        declared_kind
+                                        for initial, surname, declared_kind in reversed(by_name)
+                                        if initial == candidate.lower()[0]
+                                        and SequenceMatcher(
+                                            None, surname, re.sub(r"[^a-z ]", "", candidate.lower()).split()[-1]
+                                        ).ratio()
+                                        >= 0.85
+                                    ),
+                                    "lost",
+                                ),
+                            ),
                         )
                     elif not partial and not (tied and position is not None):
                         cs.add(
