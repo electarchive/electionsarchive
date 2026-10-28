@@ -1,5 +1,6 @@
 <script lang="ts">
   import { resolve } from "$app/paths";
+  import { page } from "$app/state";
   import ChevronDownIcon from "@lucide/svelte/icons/chevron-down";
   import {
     createQueries,
@@ -1537,6 +1538,18 @@
         race.places != null &&
         (index < 4 || race.body != null),
     )}
+    {const explore = $derived(
+      scope == null &&
+        race.path == null &&
+        race.count >= 3 &&
+        races.every(
+          (other) =>
+            other.anchor.replace(/-\d+$/u, "") !==
+              race.anchor.replace(/-\d+$/u, "") || other.count <= race.count,
+        )
+        ? `${page.url.pathname.slice(1)}/${race.anchor}`
+        : null,
+    )}
     {#snippet mapped()}
       {#if race.map != null && race.places != null}
         {const option = $derived(regionals[index]?.data ?? null)}
@@ -1582,6 +1595,7 @@
           {#key places.level}
             <PlaceMap
               {places}
+              {explore}
               colors={swing == null && region == null
                 ? (final?.tones ?? race.tones)
                 : places.legend.map((item) => swatch(item.color, item.key))}

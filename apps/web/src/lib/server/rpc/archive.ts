@@ -629,6 +629,34 @@ function segment(text: string) {
   );
 }
 
+export async function representative(election: string, anchor: string) {
+  const found = await db.execute<{ id: string; owner: string }>(sql`
+    with recursive down(id) as (
+      select ${election}::uuid
+      union all
+      select k.id from election k join down on k.parent_id = down.id
+    )
+    select (array_agg(c.id order by c.id))[1]::text as id, coalesce(c.body_id, c.office_id) as owner
+    from down join contest c on c.election_id = down.id
+    where not exists (select from contest pr join down d on d.id = pr.election_id where pr.id = c.previous_round_id)
+      and c.allocation_parent_id is null
+      and not c.notional and c.district_area_id is not null and coalesce(c.body_id, c.office_id) is not null
+    group by coalesce(c.body_id, c.office_id), c.kind, c.term
+    having count(*) >= 3
+    order by count(*) desc
+  `);
+  const labels = await names(found.rows.map((row) => row.owner));
+  const bare = anchor.replace(/-\d+$/u, "");
+  const named = found.rows.map((row) => ({
+    id: row.id,
+    anchor: segment(labels.full.get(row.owner) ?? ""),
+  }));
+  return (
+    named.find((row) => row.anchor === anchor) ??
+    named.find((row) => row.anchor === bare)
+  )?.id;
+}
+
 export async function names(
   ids: Array<string>,
   on: string | null = null,
@@ -762,7 +790,7 @@ async function find(id: string) {
 }
 
 async function children(
-  contest: string,
+  contest: string | Array<string>,
   area: { id: string; k: number },
   isRoot: boolean,
   date: string,
@@ -771,7 +799,7 @@ async function children(
 ) {
   const sets = await db.execute<{ k: number }>(sql`
     with recursive grp(id) as (
-      select ${contest}::uuid
+      select unnest(${sql.param([contest].flat())}::uuid[])
       union all
       select c.id from contest c join grp on c.allocation_parent_id = grp.id
     )
@@ -1006,7 +1034,11 @@ async function children(
   );
 }
 
-async function descend(contest: Found, unit: string | undefined) {
+async function descend(
+  contest: Found,
+  unit: string | undefined,
+  roots: Array<string> = [contest.id],
+) {
   const chain: Awaited<ReturnType<typeof children>> = [];
   const pieces = (unit ?? "").split("/").filter((piece) => piece !== "");
   if (pieces.length > 0 && contest.place == null) {
@@ -1015,7 +1047,7 @@ async function descend(contest: Found, unit: string | undefined) {
   let current = contest.place ?? { id: "", k: 0 };
   for (const piece of pieces) {
     const kids = await children(
-      contest.id,
+      roots,
       current,
       chain.length === 0,
       contest.date ?? "infinity",
@@ -3639,20 +3671,62 @@ async function atlas(input: {
   vs?: string;
   group: Grouping;
   isLean?: boolean;
+  whole?: string;
 }) {
-  const contest = await find(input.id);
-  const chain = await descend(contest, input.unit);
+  const picked = await find(input.id);
+  const group =
+    input.whole != null
+      ? ((
+          await db.execute<{
+            ids: Array<string>;
+            place: { id: string; k: number } | null;
+            owner: string;
+          }>(sql`
+            with recursive down(id) as (
+              select ${input.whole}::uuid
+              union all
+              select k.id from election k join down on k.parent_id = down.id
+            )
+            select array_agg(c.id order by c.id)::text[] as ids, (
+              select json_build_object('id', a.id, 'k', a.k) from election e
+              join polity_territory pt on pt.polity_id = e.polity_id and pt.valid @> e.date_from
+              join area a on a.id = pt.area_id
+              where e.id = ${input.whole}::uuid limit 1
+            ) as place, coalesce(me.body_id, me.office_id) as owner
+            from contest me
+            join down on true
+            join contest c on c.election_id = down.id
+              and coalesce(c.body_id, c.office_id) = coalesce(me.body_id, me.office_id) and c.kind = me.kind
+              and c.term is not distinct from me.term
+              and not exists (select from contest pr join down d on d.id = pr.election_id where pr.id = c.previous_round_id)
+              and c.allocation_parent_id is null and not c.notional and c.district_area_id is not null
+            where me.id = ${picked.id}::uuid
+            group by me.id
+          `)
+        ).rows[0] ?? null)
+      : null;
+  if (input.whole != null && (group == null || group.ids.length < 3)) {
+    throw new ORPCError("NOT_FOUND");
+  }
+  const contest =
+    group == null || input.whole == null
+      ? picked
+      : { ...picked, place: group.place, election: input.whole };
+  const chain = await descend(contest, input.unit, group?.ids);
   const area = chain.at(-1) ?? contest.place;
   if (area == null) {
     throw new ORPCError("NOT_FOUND");
   }
   const day = contest.date ?? "infinity";
-  const owners = await db.execute<{
-    id: string;
-    place: string;
-    depth: number;
-    parts: number;
-  }>(sql`
+  const owners =
+    group != null
+      ? { rows: [] }
+      : await db.execute<{
+          id: string;
+          place: string;
+          depth: number;
+          parts: number;
+        }>(sql`
     with recursive anc(id, depth) as (
       select ${area.id}::uuid, 0
       union all
@@ -3682,9 +3756,10 @@ async function atlas(input: {
   const owner = owners.rows[0] ?? {
     id: contest.root,
     place: area.id,
-    depth: 0,
+    depth: group == null ? 0 : chain.length,
     parts: 0,
   };
+  const roots = group?.ids ?? [owner.id];
   const isFederal = owner.depth === 0 && owner.parts >= 3;
   const base = chain.map((entry) => entry.segment);
   let found: Array<{ id: string; k: number; scheme: string }> = [];
@@ -3741,6 +3816,24 @@ async function atlas(input: {
         name: kid.name,
         unit: [...base, kid.segment].join("/"),
       }));
+  } else if (group != null) {
+    const listed = await db.execute<{
+      id: string;
+      k: number;
+      scheme: string;
+    }>(sql`
+      with recursive up(id, origin, depth) as (
+        select c.district_area_id, c.district_area_id, 0 from contest c where c.id = any(${sql.param(group.ids)}::uuid[])
+        union all
+        select p.parent_id, up.origin, up.depth + 1 from area_parent p join up on p.area_id = up.id
+        where p.valid @> ${day}::date and up.depth < 6 and up.id <> ${area.id}::uuid
+      )
+      select distinct a.id, a.k, a.scheme_code as scheme
+      from up join area a on a.id = up.id
+      where up.id <> ${area.id}::uuid
+        and up.origin in (select origin from up where id = ${area.id}::uuid)
+    `);
+    found = listed.rows;
   } else {
     const listed = await db.execute<{
       id: string;
@@ -3748,7 +3841,7 @@ async function atlas(input: {
       scheme: string;
     }>(sql`
       with recursive grp(id) as (
-        select ${owner.id}::uuid
+        select unnest(${sql.param(roots)}::uuid[])
         union all
         select c.id from contest c join grp on c.allocation_parent_id = grp.id
       ),
@@ -3832,11 +3925,12 @@ async function atlas(input: {
         contest.id,
         area.id,
         contest.place?.id ?? area.id,
+        ...(group == null ? [] : [contest.election, group.owner]),
         ...(input.isLean === true ? [] : shown.map((row) => row.id)),
       ],
       contest.date,
     ),
-    paths([contest.id]),
+    paths([group == null ? contest.id : contest.election]),
     input.isLean === true
       ? null
       : framing(
@@ -3844,8 +3938,32 @@ async function atlas(input: {
           day,
           shown.map((row) => row.k),
         ),
-    db.execute<{ id: string; date: string }>(sql`
-      select c.id, e.date_from::text as date
+    group != null
+      ? db.execute<{ id: string; date: string; named: string }>(sql`
+          with recursive tops(top, id, date) as (
+            select e.id, e.id, e.date_from from election e
+            where e.polity_id = (select polity_id from election where id = ${contest.election}::uuid)
+              and e.parent_id is not distinct from (select parent_id from election where id = ${contest.election}::uuid)
+              and e.date_from < ${day}::date and e.status not in ('annulled', 'canceled')
+            union all
+            select tops.top, k.id, tops.date from election k join tops on k.parent_id = tops.id
+          )
+          select (array_agg(c.id order by c.term is not null, c.id))[1]::text as id, tops.date::text as date, tops.top as named
+          from tops
+          join contest c on c.election_id = tops.id
+          join contest me on me.id = ${contest.id}::uuid
+          where coalesce(c.body_id, c.office_id) = coalesce(me.body_id, me.office_id) and c.kind = me.kind
+            and not exists (
+              select from contest pr join tops t on t.id = pr.election_id and t.top = tops.top where pr.id = c.previous_round_id
+            )
+            and c.allocation_parent_id is null and not c.notional and c.district_area_id is not null
+          group by tops.top, tops.date
+          having count(*) * 2 >= ${group.ids.length}
+          order by tops.date desc
+          limit 16
+        `)
+      : db.execute<{ id: string; date: string; named: string }>(sql`
+      select c.id, e.date_from::text as date, c.id as named
       from contest c
       join election e on e.id = c.election_id
       join contest me on me.id = ${contest.root}::uuid
@@ -3869,7 +3987,40 @@ async function atlas(input: {
   const counterpart =
     wanted == null
       ? null
-      : await db.execute<{ id: string; date: string }>(sql`
+      : group != null
+        ? await db.execute<{
+            id: string;
+            date: string;
+            ids: Array<string>;
+          }>(sql`
+            with recursive up(id, polity, parent) as (
+              select e.id, e.polity_id, e.parent_id from contest w join election e on e.id = w.election_id
+              where w.id = ${wanted.id}::uuid
+              union all
+              select e.id, e.polity_id, e.parent_id from election e join up on e.id = up.parent
+            ),
+            down(id) as (
+              (select up.id from up
+                where up.polity = (select polity_id from election where id = ${contest.election}::uuid)
+                order by up.parent is null limit 1)
+              union all
+              select k.id from election k join down on k.parent_id = down.id
+            )
+            select ${wanted.id}::text as id, ${wanted.date}::text as date, array_agg(c.id)::text[] as ids
+            from contest w
+            join down on true
+            join contest c on c.election_id = down.id
+              and coalesce(c.body_id, c.office_id) = coalesce(w.body_id, w.office_id) and c.kind = w.kind
+              and c.term is not distinct from w.term
+              and not exists (select from contest pr join down d on d.id = pr.election_id where pr.id = c.previous_round_id)
+              and c.allocation_parent_id is null and not c.notional and c.district_area_id is not null
+            where w.id = ${wanted.id}::uuid
+          `)
+        : await db.execute<{
+            id: string;
+            date: string;
+            ids?: Array<string>;
+          }>(sql`
         with recursive grp(id) as (
           select ${wanted.id}::uuid
           union all
@@ -3918,7 +4069,7 @@ async function atlas(input: {
   const then = counterpart?.rows[0] ?? null;
   const [tabulated, at, moved] = await Promise.all([
     tabulate(
-      [owner.id],
+      roots,
       shown.map((row) => ({
         k: row.k,
         name: labels.full.get(row.id) ?? "",
@@ -3930,7 +4081,7 @@ async function atlas(input: {
       then == null
         ? null
         : {
-            ids: [then.id],
+            ids: then.ids ?? [then.id],
             date: then.date,
             ...(spread.size > 0 && { spread }),
           },
@@ -3952,7 +4103,7 @@ async function atlas(input: {
     ),
   ]);
   const titles = await names(
-    targets.rows.map((row) => row.id),
+    targets.rows.map((row) => row.named),
     null,
   );
   const rows = tabulated.rows.map((row) => ({
@@ -3964,7 +4115,7 @@ async function atlas(input: {
     tail != null &&
     rows.length > 1 &&
     rows.every((row) => row.name.endsWith(tail));
-  const path = slugs.get(contest.id) ?? null;
+  const path = slugs.get(group == null ? contest.id : contest.election) ?? null;
   const statuses =
     level?.code === "world.country"
       ? new Map(
@@ -3977,12 +4128,16 @@ async function atlas(input: {
         )
       : null;
   return {
-    title: labels.full.get(contest.id) ?? "",
+    title:
+      group == null
+        ? (labels.full.get(contest.id) ?? "")
+        : `${labels.full.get(contest.election) ?? ""}, ${labels.full.get(group.owner) ?? ""}`,
     scope: {
       name: labels.full.get(area.id) ?? "",
       k: area.k,
       unit: base.join("/"),
-      path: path == null ? null : [path, ...base].join("/"),
+      path:
+        path == null ? null : group == null ? [path, ...base].join("/") : path,
     },
     trail: [
       { name: labels.full.get(contest.place?.id ?? area.id) ?? "", unit: "" },
@@ -3999,7 +4154,7 @@ async function atlas(input: {
     parts,
     targets: targets.rows.map((row) => ({
       id: row.id,
-      label: titles.full.get(row.id) ?? "",
+      label: titles.full.get(row.named) ?? "",
       date: row.date,
     })),
     target: wanted?.id ?? null,
@@ -8137,6 +8292,7 @@ export const contests = {
         level: v.optional(v.string()),
         vs: v.optional(v.string()),
         group: Input.entries.group,
+        whole: v.optional(v.pipe(v.string(), v.uuid())),
       }),
     )
     .output(

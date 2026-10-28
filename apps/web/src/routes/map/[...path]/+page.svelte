@@ -588,6 +588,7 @@
       level: level ?? undefined,
       vs: vs ?? undefined,
       group: group === "" ? undefined : group,
+      whole: data.whole ?? undefined,
     });
     cache[key] = fetched;
     fetched.catch(() => {
@@ -1289,7 +1290,11 @@
   $effect(() => {
     const [where = "", , vs = "", group = ""] = asked.split("|");
     const key = [data.contest, vs, group].join("|");
-    if (where !== "" || untrack(() => mosaic?.key) === key) {
+    if (
+      data.whole != null ||
+      where !== "" ||
+      untrack(() => mosaic?.key) === key
+    ) {
       return;
     }
     void orpc.contests.mosaic
