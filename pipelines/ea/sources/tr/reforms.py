@@ -260,6 +260,31 @@ ILCE_CHANGES = [
         ["Melikgazi", "Kocasinan"],
         "Law 3508 art. 1",
     ),
+    (
+        "1983-11-30",
+        "2963",
+        "30.11.1983-18237",
+        "split",
+        "06",
+        "Merkez",
+        [],
+        ["Gölbaşı", "Keçiören", "Mamak", "Sincan"],
+        "Law 2963 art. 1",
+    ),
+    ("1987-07-04", "3392", "04.07.1987-19507", "split", "35", "Merkez", [], ["Konak", "Buca"], "Law 3392 art. 1(55)"),
+    *(
+        ("2008-03-22", "5747", "22.03.2008-26824", "split", plate, "Merkez", [], targets, "Law 5747 art. 1")
+        for plate, targets in (
+            ("07", ["Muratpaşa", "Kepez", "Konyaaltı", "Aksu", "Döşemealtı"]),
+            ("21", ["Bağlar", "Kayapınar", "Sur", "Yenişehir"]),
+            ("25", ["Yakutiye", "Palandöken"]),
+            ("26", ["Odunpazarı", "Tepebaşı"]),
+            ("33", ["Akdeniz", "Mezitli", "Toroslar", "Yenişehir"]),
+            ("41", ["İzmit", "Başiskele", "Kartepe"]),
+            ("54", ["Adapazarı", "Serdivan", "Arifiye", "Erenler"]),
+            ("55", ["İlkadım", "Canik", "Atakum"]),
+        )
+    ),
     ("2008-03-22", "5747", "22.03.2008-26824", "absorbed", "34", "Fatih", ["Eminönü"], [], "Law 5747 art. 2(2)"),
     ("2008-03-22", "5747", "22.03.2008-26824", "renamed", "25", "Aziziye", ["Ilıca"], [], "Law 5747 art. 2(5)"),
     *(

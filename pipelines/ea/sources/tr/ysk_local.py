@@ -1178,7 +1178,13 @@ CITY_DISPUTED = (
 WINNER_CAVEAT = "YSK publishes the party that won this race, but not its votes."
 OTHERS = "Diğer partiler ve bağımsızlar"
 ANNULLED = {
-    2019: {"kirikkale-keskin", "artvin-yusufeli", "denizli-honaz", "adiyaman-besni-kesmetepe"},
+    2019: {
+        "kirikkale-keskin",
+        "artvin-yusufeli",
+        "denizli-honaz",
+        "adiyaman-besni-kesmetepe",
+        "adiyaman-besni-suvarli",
+    },
     2024: {
         "aksaray-guzelyurt",
         "kayseri-pinarbasi",
@@ -1223,10 +1229,9 @@ DERIVED_WINNER = (
     "The winner named here is the candidate with the most votes in YSK's ballot-box results, which the "
     "archive holds by neighborhood; those votes are on the neighborhood result set for this race."
 )
-ANNULLED_CAVEAT = {
-    2019: "YSK annulled this race and held it again on June 2, 2019. The archive does not hold the rerun yet.",
-    2024: "YSK annulled this race and held it again on June 2, 2024. The archive does not hold the rerun yet.",
-}
+ANNULLED_CAVEAT = "YSK annulled this race and held it again on {date}; the rerun is stored as its own election."
+RERUN_ON = {2019: "June 2, 2019", 2024: "June 2, 2024"}
+RERUN_ON_PLACE = {"adiyaman-besni-suvarli": "August 4, 2019"}
 TIED_CAVEAT = "The two leading candidates have the same number of votes in YSK's ballot-box results, so the archive does not name a winner."
 LUMPED_CAVEAT = (
     "The neighborhood results report several of this race's candidates as one total, and that total leads, so the "
@@ -1987,7 +1992,12 @@ def emit() -> Path:
                 )
             cs.add("note", entity_id=declared, kind="methodology", body_md=DERIVED_WINNER)
             if annulled:
-                cs.add("note", entity_id=declared, kind="caveat", body_md=ANNULLED_CAVEAT[year])
+                cs.add(
+                    "note",
+                    entity_id=declared,
+                    kind="caveat",
+                    body_md=ANNULLED_CAVEAT.format(date=RERUN_ON_PLACE.get(key, RERUN_ON[year])),
+                )
                 continue
             leader, second = ranked[0], ranked[1] if len(ranked) > 1 else None
             if second is not None and leader[2] == second[2] or leader[1] == "others":
