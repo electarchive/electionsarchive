@@ -60,6 +60,8 @@ PROVINCE_ALIASES = {
 }
 LABEL_ALIASES = {"BĞMZ": "Bağımsızlar", "TİP": "Türkiye İşçi Partisi", "TBP": "Türkiye Birlik Partisi"}
 ILCE_ALIASES = {
+    ("12", "KIĞI"): "KİĞI",
+    ("42", "HADIM"): "HADİM",
     ("03", "SİNCANLI"): "SİNANPAŞA",
     ("07", "KALE"): "DEMRE",
     ("06", "KAZAN"): "KAHRAMANKAZAN",
@@ -72,6 +74,14 @@ ILCE_ALIASES = {
     ("55", "ONDOKUZMAYIS"): "19-MAY",
     ("56", "AYDINLAR"): "TİLLO",
     ("71", "BAHŞİLİ"): "BAHŞILI",
+    ("09", "ÇINE"): "ÇİNE",
+    ("63", "SÜRÜÇ"): "SURUÇ",
+    ("59", "M.EREĞLİ"): "MARMARAEREĞLİSİ",
+    ("34", "PENDIK"): "PENDİK",
+}
+UNSPLIT = {("referendum 1987", "Adana", "Merkez")}
+MOVED = {
+    ("41", "KAYNARCA"): "54",
 }
 METHODOLOGY = (
     "District results by ilçe from TÜİK's election database (table: {title}). TÜİK notes that its district totals come "
@@ -384,6 +394,11 @@ def emit() -> Path:
                 [list(areas)],
             ).fetchall()
         )
+        for area, names in areas.items():
+            if area in created and any(
+                end is not None and timedelta(0) <= end - created[area] <= timedelta(days=500) for _, _, end, _ in names
+            ):
+                del created[area]
         ended = dict(
             conn.execute(
                 """select m.area_id, max(e.date) from area_event e join area_event_member m on m.event_id = e.id
@@ -404,18 +419,19 @@ def emit() -> Path:
         )
         plates = {norm(name): f"{number:02}" for number, name in enumerate(PROVINCES, 1)}
 
-        def match(day: date, plate: str, label: str, late: bool = False) -> UUID | None:
-            allowed = {plate} | {code for code, start in province_created.items() if start > day}
+        def match(day: date, plate: str, label: str, late: bool = False, early: bool = False) -> UUID | None:
             stem = label.split("/")[0]
             forms = {norm(re.sub(r"\s*\(.*?\)", "", stem))} | {norm(alt) for alt in re.findall(r"\((.*?)\)", stem)}
             forms = {ILCE_ALIASES.get((plate, form), form) for form in forms}
+            allowed = {plate, *(MOVED[(plate, form)] for form in forms if (plate, form) in MOVED)}
+            allowed |= {code for code, start in province_created.items() if start > day}
             if any(form == "MERKEZ" or form.endswith(" MERKEZ") for form in forms):
                 forms = {f"{norm(PROVINCES[int(plate) - 1])} MERKEZ"}
-            since = day - timedelta(days=400) if late else day
+            since = day - timedelta(days=800) if late else day
             live = {
                 area: names
                 for area, names in areas.items()
-                if (created.get(area) is None or created[area] <= day)
+                if (early or created.get(area) is None or created[area] <= day)
                 and (ended.get(area) is None or ended[area] > since)
             }
 
@@ -431,6 +447,8 @@ def emit() -> Path:
                 }
 
             found = named(lambda text: text in forms)
+            if not found:
+                found = named(lambda text: text in {f"{form} MERKEZ" for form in forms})
             if not found:
                 found = named(
                     lambda text: any(
@@ -455,6 +473,8 @@ def emit() -> Path:
                     fuzzy.append(f"{day.year} {plate} {label} -> {scored[-1][2]}")
                     found = {scored[-1][1]}
             if len(found) > 1:
+                found = {area for area in found if any(parent == plate for *_, parent in live[area])}
+            if len(found) > 1:
                 ambiguous.append(f"{day.year} {plate} {label}: {len(found)}")
                 return None
             return next(iter(found), None)
@@ -463,6 +483,7 @@ def emit() -> Path:
         ambiguous: list[str] = []
         missing: list[str] = []
         lagged: list[str] = []
+        early: list[str] = []
         units: dict[tuple[str, str, str], UUID] = {}
         referendums = pl.read_parquet(PARSED / "referendum.parquet")
         wanted = [
@@ -476,10 +497,14 @@ def emit() -> Path:
             .iter_rows()
         ]
         for row, day, province in sorted(wanted):
+            if row in UNSPLIT:
+                continue
             plate = plates[PROVINCE_ALIASES.get(norm(province), norm(province))]
             area = match(day, plate, row[2])
             if area is None and (area := match(day, plate, row[2], late=True)) is not None:
                 lagged.append(" ".join(row))
+            if area is None and (area := match(day, plate, row[2], early=True)) is not None:
+                early.append(" ".join(row))
             if area is None:
                 missing.append(" ".join(row))
                 continue
@@ -487,6 +512,7 @@ def emit() -> Path:
         print("fuzzy:", *fuzzy, sep="\n  ")
         print("lagged:", *lagged, sep="\n  ")
         print("ambiguous:", *ambiguous, sep="\n  ")
+        print("early:", *early, sep="\n  ")
         if missing:
             raise ValueError("unmatched ilçes:\n  " + "\n  ".join(missing))
 
@@ -597,16 +623,16 @@ def emit() -> Path:
                 if year == "2007":
                     cs.add("note", entity_id=result_set, kind="caveat", body_md=CUSTOMS)
                 labels = options.get(contest, {})
-                seen: set[tuple[UUID, str]] = set()
-                values: dict[tuple[UUID, str, UUID | None], int] = {}
+                seen: set[tuple[str, UUID, str]] = set()
+                values: dict[tuple[UUID, int, UUID | None], int] = {}
                 unlisted = 0
                 for district, label, column, value in ilce.select("district", "name", "column", "value").iter_rows():
                     if column == "boxes":
                         continue
                     unit = unit_ids[units[(year, district, label)]]
-                    if (unit, column) in seen:
+                    if (district, unit, column) in seen:
                         raise ValueError(f"{contest_key}: {district} {label} twice")
-                    seen.add((unit, column))
+                    seen.add((district, unit, column))
                     measure = {"registered": REGISTERED, "voters": VOTERS, "valid": VALID}.get(column, VOTES)
                     option = None if measure != VOTES else labels.get(norm(column))
                     if measure == VOTES and option is None:
@@ -689,12 +715,23 @@ def emit() -> Path:
                     + ", ".join(off)
                     + ". The ilçe figures are stored as TÜİK prints them.",
                 )
-            seen = set()
+            taken: set[tuple[UUID, str]] = set()
             for province, label, column, value in ilce.select("province", "name", "column", "value").iter_rows():
+                if (f"referendum {year}", province, label) in UNSPLIT:
+                    if column == "valid":
+                        cs.add(
+                            "note",
+                            entity_id=result_set,
+                            kind="caveat",
+                            body_md=f"TÜİK's table still prints {province}'s former central ilçe as one row "
+                            f"({value:,} valid votes), after it was split into new ilçes. The archive has no area "
+                            "for that row, so it is not stored here.",
+                        )
+                    continue
                 unit = unit_ids[units[(f"referendum {year}", province, label)]]
-                if (unit, column) in seen:
+                if (unit, column) in taken:
                     raise ValueError(f"referendum {year}: {province} {label} twice")
-                seen.add((unit, column))
+                taken.add((unit, column))
                 cs.add(
                     "result_value",
                     result_set_id=result_set,
