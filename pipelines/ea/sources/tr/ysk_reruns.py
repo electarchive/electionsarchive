@@ -10,12 +10,17 @@ from ea.sources.tr.ysk import INDEPENDENTS, INVALID, LICENSE, PUBLISHER, REGISTE
 from ea.store import connect
 
 SOURCE = "tr.ysk_reruns"
-VERSION = "1"
+VERSION = "2"
 FAALIYET = "https://www.ysk.gov.tr/doc/dosyalar/docs/Faaliyet_Raporlari/2024_Yili_idari_Faaliyet_Raporu.pdf"
 ANNEX_2019 = "https://www.ysk.gov.tr/doc/dosyalar/docs/2019MahalliIdareler/KesinSecimSonuclari/2019Mahalli-Ek-2.pdf"
-AA_2024 = "https://www.aa.com.tr/tr/gundem/ysk-2-haziranda-yapilan-yenileme-secimlerinin-kesin-sonuclarini-acikladi/3259545"
+AA_2024 = (
+    "https://www.aa.com.tr/tr/gundem/ysk-2-haziranda-yapilan-yenileme-secimlerinin-kesin-sonuclarini-acikladi/3259545"
+)
 AA_2019 = "https://www.aa.com.tr/tr/politika/3-ilce-ve-bir-beldede-yenileme-secimleri-yapildi/1495170"
+BOOK = "https://www.ysk.gov.tr/doc/dosyalar/docs/2009_2019_%C4%B0STAT%C4%B0ST%C4%B0K_K%C4%B0TABI.pdf"
+SABAH_2019 = "https://www.sabah.com.tr/gundem/2019/08/04/adiyamanin-ilk-kadin-belediye-baskani-secildi"
 RERUN_2019 = date(2019, 6, 2)
+SUVARLI = date(2019, 8, 4)
 RERUN_2024 = date(2024, 6, 2)
 MARCH_2019 = date(2019, 3, 31)
 MARCH_2024 = date(2024, 3, 31)
@@ -34,6 +39,12 @@ PARTIES = {
     "VATAN": "vatan-partisi",
     "YENİDEN REFAH": "yeniden-refah-partisi",
     "ZAFER PARTİSİ": "zafer-partisi",
+    "EMEP": "emek-partisi",
+    "HÜDA PAR": "hur-dava-partisi",
+    "MİLLİ YOL": "milli-yol-partisi",
+    "TİP": "turkiye-isci-partisi",
+    "TKP": "turkiye-komunist-partisi",
+    "VATAN PARTİSİ": "vatan-partisi",
     "BAĞIMSIZ": None,
 }
 RACES_2019 = {
@@ -71,6 +82,8 @@ PLACES_2024 = {
     ),
     "Aksaray Merkez İlçesi Sağlık": ("aksaray-merkez-saglik", "68", "Aksaray Merkez", "Sağlık"),
 }
+ANNULLED_COUNCILS = {"aksaray-guzelyurt", "kayseri-pinarbasi", "sanliurfa-hilvan", "sivas-yildizeli-guneykaya"}
+SHORT_2024 = {("kayseri-pinarbasi", "Meclis Üyeliği"): 37}
 OFFICIAL_2019 = (
     "YSK publishes the four June 2, 2019 races only as one combined table (Resmî Gazete 30828, decision 2019/5002, "
     "annex 2): 34,630 registered voters, 128 ballot boxes, 30,877 voters, and 30,140 valid votes, with AK Parti 13,297 "
@@ -82,44 +95,82 @@ OFFICIAL_2024 = (
     "YSK's 2024 annual report prints each of the seven June 2, 2024 races separately. The votes are the party totals "
     "it gives, and invalid votes are the voters minus the valid votes; it does not name the candidates, whose names for the winners come from Anadolu Ajansı."
 )
-PARTIAL_2019 = "Anadolu Ajansı's election-night count lists only the leading candidates, so other parties' votes are missing."
+SUVARLI_RACE = ("adiyaman-besni-suvarli", "02", "Besni", "Suvarlı", "AK PARTİ", "Gülfer Ağır")
+SUVARLI_MAYOR = ([1867, 1700, 1602, 98], {"AK PARTİ": 894, "BTP": 11, "VATAN": 697})
+SUVARLI_COUNCIL = ([1867, 1699, 1572, 127], {"AK PARTİ": 894, "VATAN": 678})
+OFFICIAL_SUVARLI = (
+    "YSK annulled Suvarlı's March 31, 2019 mayoral and council elections (decision 4711 of May 28, 2019) and held "
+    "both again on August 4, 2019. The votes are the totals in YSK's 2009–2019 statistics book (section 6.4), and "
+    "invalid votes are the voters minus the valid votes. The book does not name the candidates; the winner's name "
+    "comes from İhlas Haber Ajansı's report in Sabah."
+)
+COUNCIL_2024 = (
+    "YSK's 2024 annual report prints the four June 2, 2024 council reruns separately, with each party's votes but not "
+    "its seats. Invalid votes are the voters minus the valid votes."
+)
+PARTIAL_2019 = (
+    "Anadolu Ajansı's election-night count lists only the leading candidates, so other parties' votes are missing."
+)
 
 
 def fetch() -> None:
-    for url, suffix in ((FAALIYET, ".pdf"), (ANNEX_2019, ".pdf"), (AA_2024, ".html"), (AA_2019, ".html")):
+    for url, suffix in (
+        (FAALIYET, ".pdf"),
+        (ANNEX_2019, ".pdf"),
+        (AA_2024, ".html"),
+        (AA_2019, ".html"),
+        (BOOK, ".pdf"),
+        (SABAH_2019, ".html"),
+    ):
         raw.fetch(SOURCE, url, suffix=suffix)
 
 
 def emit() -> Path:
     text = subprocess.run(
-        ["pdftotext", "-layout", str(raw.cached(SOURCE, FAALIYET).path), "-"], capture_output=True, text=True, check=True
+        ["pdftotext", "-layout", str(raw.cached(SOURCE, FAALIYET).path), "-"],
+        capture_output=True,
+        text=True,
+        check=True,
     ).stdout
-    text = re.sub(r"^\s*(?:T \. C \..*|2 0 2 4 Y I L I.*)\|\s*\d+\s*$", "", text, flags=re.M)
+    text = re.sub(r"^\s*(?:T \. C \..*|2 0 2 4 Y I L I.*)\|\s*\d+\s*$", "", text, flags=re.MULTILINE)
     found: dict[str, tuple[list[int], dict[str, int]]] = {}
-    for place in PLACES_2024:
+    councils: dict[str, tuple[list[int], dict[str, int]]] = {}
+    for place, office in [(place, office) for place in PLACES_2024 for office in ("Başkanlığı", "Meclis Üyeliği")]:
         match = re.search(
-            re.escape(place) + r"[^\n]* Belediye Başkanlığı Seçim Sonuçları\s+2 Haziran 2024\s+"
+            re.escape(place) + r"[^\n]* Belediye " + office + r" Seçim Sonuçları\s+2 Haziran 2024\s+"
             r"Sandık Sayısı\s+[\d.]+\s+Kayıtlı Seçmen Sayısı\s+([\d.]+)\s+Oy Kullanan Seçmen Sayısı\s+([\d.]+)\s+"
             r"Katılım Oranı\s*\(%\)\s+[\d,]+\s+Geçerli Oy Sayısı\s+([\d.]+)\s+Geçerli Oyların Siyasi Partilere "
-            r"Dağılımı(.*?)(?=\n\S[^\n]*Seçim Sonuçları|\n2 HAZİRAN)",
+            r"Dağılımı(.*?)(?=\n\s*\S[^\n]*Seçim Sonuçları|\n2 HAZİRAN|\nBilgi Güvenliği)",
             text,
-            re.S,
+            re.DOTALL,
         )
         if match is None:
-            raise ValueError(f"no table for {place}")
+            if office != "Başkanlığı" and PLACES_2024[place][0] not in ANNULLED_COUNCILS:
+                continue
+            raise ValueError(f"no {office} table for {place}")
         registered, voters, valid = (int(match.group(i).replace(".", "")) for i in (1, 2, 3))
         votes: dict[str, int] = {}
-        for label, count in re.findall(r"^\s*([A-ZÇĞİÖŞÜ][A-ZÇĞİÖŞÜ .]+?)\s{2,}([\d.]+)\s+[\d,]+\s*$", match.group(4), re.M):
+        for label, count in re.findall(
+            r"^\s*([A-ZÇĞİÖŞÜ][A-ZÇĞİÖŞÜ .]+?)\s{2,}([\d.]+)\s+[\d,]+\s*$", match.group(4), re.MULTILINE
+        ):
             votes[label.strip()] = int(count.replace(".", ""))
-        if sum(votes.values()) != valid:
-            raise ValueError(f"{place}: parties sum to {sum(votes.values())}, not {valid}")
-        found[PLACES_2024[place][0]] = ([registered, voters, valid, voters - valid], votes)
+        if sum(votes.values()) != valid - SHORT_2024.get((PLACES_2024[place][0], office), 0):
+            raise ValueError(f"{place} {office}: parties sum to {sum(votes.values())}, not {valid}")
+        (found if office == "Başkanlığı" else councils)[PLACES_2024[place][0]] = (
+            [registered, voters, valid, voters - valid],
+            votes,
+        )
+    if set(councils) != ANNULLED_COUNCILS:
+        raise ValueError(f"council reruns found: {sorted(councils)}")
     with connect() as conn:
         cs = Changeset(
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Turkey's mayoral reruns of annulled local races on June 2, 2019 and June 2, 2024",
+            summary=(
+                "Turkey's reruns of annulled local races: mayors on June 2, 2019 and June 2, 2024, Suvarlı's mayor "
+                "and council on August 4, 2019, and four municipal councils on June 2, 2024"
+            ),
             polity="TR",
         )
         turkey = cs.polity("TR")
@@ -127,12 +178,28 @@ def emit() -> Path:
         official_2019 = cs.source(PUBLISHER, "2 Haziran 2019 Mahalli İdareler Yenileme Seçimi Sonuçları (Ek-2)")
         press = {
             RERUN_2019: cs.source("Anadolu Ajansı", "3 ilçe ve bir beldede yenileme seçimleri yapıldı"),
-            RERUN_2024: cs.source("Anadolu Ajansı", "YSK, 2 Haziran'da yapılan yenileme seçimlerinin kesin sonuçlarını açıkladı"),
+            RERUN_2024: cs.source(
+                "Anadolu Ajansı", "YSK, 2 Haziran'da yapılan yenileme seçimlerinin kesin sonuçlarını açıkladı"
+            ),
+            SUVARLI: cs.source("Sabah", "Adıyaman'ın ilk kadın belediye başkanı seçildi"),
         }
+        book = cs.source(PUBLISHER, "2009-2019 Seçim İstatistikleri Kitabı")
         for id, url, title_text, publisher, kind in (
             (official_2024, FAALIYET, "2024 Yılı Faaliyet Raporu", PUBLISHER, "official_body"),
-            (official_2019, ANNEX_2019, "2 Haziran 2019 Mahalli İdareler Yenileme Seçimi Sonuçları (Ek-2)", PUBLISHER, "official_body"),
-            (press[RERUN_2019], AA_2019, "3 ilçe ve bir beldede yenileme seçimleri yapıldı", "Anadolu Ajansı", "news_agency"),
+            (
+                official_2019,
+                ANNEX_2019,
+                "2 Haziran 2019 Mahalli İdareler Yenileme Seçimi Sonuçları (Ek-2)",
+                PUBLISHER,
+                "official_body",
+            ),
+            (
+                press[RERUN_2019],
+                AA_2019,
+                "3 ilçe ve bir beldede yenileme seçimleri yapıldı",
+                "Anadolu Ajansı",
+                "news_agency",
+            ),
             (
                 press[RERUN_2024],
                 AA_2024,
@@ -140,6 +207,8 @@ def emit() -> Path:
                 "Anadolu Ajansı",
                 "news_agency",
             ),
+            (book, BOOK, "2009-2019 Seçim İstatistikleri Kitabı", PUBLISHER, "official_body"),
+            (press[SUVARLI], SABAH_2019, "Adıyaman'ın ilk kadın belediye başkanı seçildi", "Sabah", "news_agency"),
         ):
             cs.add(
                 "source",
@@ -151,14 +220,12 @@ def emit() -> Path:
                 license=LICENSE if kind == "official_body" else None,
             )
             cs.artifact(raw.cached(SOURCE, url), id)
-        sources = {RERUN_2019: official_2019, RERUN_2024: official_2024}
+        sources = {RERUN_2019: official_2019, RERUN_2024: official_2024, SUVARLI: book}
 
         def name(entity: UUID, text: str, lang: str = "tr", kind: str = "official") -> None:
             cs.add("name", entity_id=entity, text=text, lang=lang, kind=kind, is_preferred=kind == "official")
 
-        parties = {
-            label: None if owner is None else cs.key("tr.party", owner) for label, owner in PARTIES.items()
-        }
+        parties = {label: None if owner is None else cs.key("tr.party", owner) for label, owner in PARTIES.items()}
         party_names = dict(
             conn.execute(
                 """select e.value, (select text from name n where n.entity_id = e.entity_id and n.kind = 'official'
@@ -184,18 +251,29 @@ def emit() -> Path:
         ).fetchone()
         assert mayoral is not None
         cycle = {}
-        for day, label in ((RERUN_2019, "2019"), (RERUN_2024, "2024")):
+        for day, label in (
+            (RERUN_2019, "2019 Turkish local election reruns"),
+            (RERUN_2024, "2024 Turkish local election reruns"),
+            (SUVARLI, "August 2019 Turkish local election rerun"),
+        ):
             cycle[day] = cs.key("tr.election", f"{day}:local-rerun")
             cs.add("election", id=cycle[day], polity_id=turkey, kind="local", date_from=day, date_to=day, status="held")
-            name(cycle[day], f"{label} Turkish local election reruns", "en")
-        everything: list[tuple[date, date, str, str, str | None, str | None, str | None, list[int | None], dict[str, int]]] = []
+            name(cycle[day], label, "en")
+            cs.add("slug", path=f"tr/{day}-local-rerun", entity_id=cycle[day])
+        everything: list[
+            tuple[date, date, str, str, str | None, str | None, str | None, list[int | None], dict[str, int]]
+        ] = []
         for key, (plate, district, belde, _, _, totals) in RACES_2019.items():
             everything.append(
                 (RERUN_2019, MARCH_2019, key, plate, district, belde, None, totals or [None] * 4, VOTES_2019[key])
             )
+        everything.append(
+            (SUVARLI, MARCH_2019, SUVARLI_RACE[0], *SUVARLI_RACE[1:4], None, SUVARLI_MAYOR[0], SUVARLI_MAYOR[1])
+        )
         for key, (totals, votes) in found.items():
             place = next(row for row in PLACES_2024.values() if row[0] == key)
             everything.append((RERUN_2024, MARCH_2024, key, place[1], place[2], place[3], None, totals, votes))
+        units: dict[tuple[date, str], UUID] = {}
         for day, march, key, plate, district, belde, _, totals, votes in everything:
             march_election = cs.key("tr.election", f"{march}:{key}-mayor")
             march_contest = cs.key("tr.contest", f"{march}:{key}-mayor")
@@ -269,6 +347,7 @@ def emit() -> Path:
                         kind="aggregate",
                     )
                     name(unit, belde)
+            units[(day, key)] = unit
             declared = cs.key(f"{SOURCE}.result_set", contest_key)
             partial = day == RERUN_2019 and key in ("kirikkale-keskin", "artvin-yusufeli")
             cs.add(
@@ -279,15 +358,22 @@ def emit() -> Path:
                 stage="official",
                 kind="counted",
                 status="active",
-                source_id=sources[day] if day == RERUN_2024 else press[day],
+                source_id=press[day] if day == RERUN_2019 else sources[day],
                 is_default=True,
                 completeness=0 if partial else 1,
             )
-            cs.add("note", entity_id=declared, kind="methodology", body_md=OFFICIAL_2024 if day == RERUN_2024 else OFFICIAL_2019)
+            cs.add(
+                "note",
+                entity_id=declared,
+                kind="methodology",
+                body_md={RERUN_2019: OFFICIAL_2019, RERUN_2024: OFFICIAL_2024, SUVARLI: OFFICIAL_SUVARLI}[day],
+            )
             if partial:
                 cs.add("note", entity_id=declared, kind="caveat", body_md=PARTIAL_2019)
             winner_label = max(votes, key=lambda label: votes[label])
-            winner_name = WINNERS_2024[key] if day == RERUN_2024 else RACES_2019[key][4]
+            winner_name = {RERUN_2024: WINNERS_2024, RERUN_2019: {k: v[4] for k, v in RACES_2019.items()}}.get(
+                day, {SUVARLI_RACE[0]: SUVARLI_RACE[5]}
+            )[key]
             options: dict[str, UUID] = {}
             for label in sorted(votes):
                 owner = PARTIES[label]
@@ -342,4 +428,88 @@ def emit() -> Path:
                     flags=0,
                     value=count,
                 )
+        nation = cs.area("tr.nation", "TR")
+        for day, races in (
+            (RERUN_2024, councils),
+            (SUVARLI, {SUVARLI_RACE[0]: SUVARLI_COUNCIL}),
+        ):
+            contest_key = f"{day}:municipal-councils"
+            contest = cs.key("tr.contest", contest_key)
+            cs.add(
+                "contest",
+                id=contest,
+                election_id=cycle[day],
+                kind="body_seats",
+                district_area_id=nation,
+                magnitude=None,
+                round_number=1,
+                default_result_kind="counted",
+            )
+            name(contest, "Municipal councils", "en")
+            name(contest, "Belediye Meclisi Üyeliği", kind="native")
+            cs.add("slug", path=f"tr/{day}-local-rerun/municipal-councils", entity_id=contest)
+            declared = cs.key(f"{SOURCE}.result_set", contest_key)
+            cs.add(
+                "result_set",
+                id=declared,
+                election_id=cycle[day],
+                contest_id=contest,
+                stage="official",
+                kind="counted",
+                status="active",
+                source_id=sources[day],
+                is_default=True,
+                completeness=1,
+            )
+            cs.add(
+                "note",
+                entity_id=declared,
+                kind="methodology",
+                body_md=COUNCIL_2024 if day == RERUN_2024 else OFFICIAL_SUVARLI,
+            )
+            if day == RERUN_2024:
+                cs.add(
+                    "note",
+                    entity_id=declared,
+                    kind="caveat",
+                    body_md=f"In Pınarbaşı, the report's party rows add up to {SHORT_2024[('kayseri-pinarbasi', 'Meclis Üyeliği')]} "
+                    "votes fewer than its valid votes; those votes are counted as valid but given to no party.",
+                )
+            options: dict[str, UUID] = {}
+            for key, (totals, votes) in sorted(races.items()):
+                for label in sorted(votes):
+                    owner = PARTIES[label]
+                    if label not in options:
+                        options[label] = cs.key("tr.option", f"{contest_key}:{owner or 'independents'}")
+                        cs.add(
+                            "contest_option",
+                            id=options[label],
+                            contest_id=contest,
+                            kind="others" if owner is None else "list",
+                            party_id=parties[label],
+                            ballot_label=INDEPENDENTS if owner is None else party_names[owner],
+                        )
+                    cs.add(
+                        "result_value",
+                        result_set_id=declared,
+                        unit_id=units[(day, key)],
+                        option_id=options[label],
+                        channel=0,
+                        measure=VOTES,
+                        count_round=0,
+                        flags=0,
+                        value=votes[label],
+                    )
+                for measure, value in zip((REGISTERED, VOTERS, VALID, INVALID), totals, strict=True):
+                    cs.add(
+                        "result_value",
+                        result_set_id=declared,
+                        unit_id=units[(day, key)],
+                        option_id=None,
+                        channel=0,
+                        measure=measure,
+                        count_round=0,
+                        flags=0,
+                        value=value,
+                    )
         return cs.write()
