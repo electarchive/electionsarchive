@@ -92,6 +92,7 @@ export const abroad = async (
     ) g
     where a.k = any(${sql.param(ks)}::int[])
       and not ST_Covers(me.geom, ST_PointOnSurface(g.geom))
+      and ST_Area(ST_Intersection(me.geom, g.geom)) < 0.5 * ST_Area(g.geom)
       and ${insetsOf(scheme).length === 0 ? sql`true` : sql`${part(scheme, "g.geom")} = -1`}
   `);
   return found.rows.map((row) => row.k);
