@@ -2,8 +2,10 @@ import html
 import re
 import subprocess
 from datetime import date
+from itertools import pairwise
 from pathlib import Path
 
+import httpx
 import polars as pl
 
 from ea import raw
@@ -28,7 +30,11 @@ FILES = {
     "3651000": "https://www.vote.nyc/sites/default/files/pdf/candidates/2026/9_11_2026%2010_26_11%20AM_General%20Contest%20List%20Web%20Version.pdf",
 }
 PUBLISHERS = {
-    "0644000": ("CA", "Los Angeles City Clerk", "2026 General Municipal Election, November 3, 2026: Certified List of Candidates"),
+    "0644000": (
+        "CA",
+        "Los Angeles City Clerk",
+        "2026 General Municipal Election, November 3, 2026: Certified List of Candidates",
+    ),
     "17031": (
         "IL",
         "Chicago Board of Election Commissioners",
@@ -37,48 +43,70 @@ PUBLISHERS = {
     "48201": ("TX", "Harris County Elections", "General and Special Elections, November 3, 2026: Sample Ballot"),
     "48113": ("TX", "Dallas County Elections", "General and Joint Election, November 3, 2026: Official Ballot"),
     "12086": ("FL", "Miami-Dade County Elections Department", "Official General Election Ballot, November 3, 2026"),
+    "06073": ("CA", "County of San Diego Registrar of Voters", "November 3, 2026 General Election: Candidate List"),
+    "06059": (
+        "CA",
+        "Orange County Registrar of Voters",
+        "General Election, November 3, 2026: Contest/Candidate Proof List",
+    ),
+    "3651000": (
+        "NY",
+        "Board of Elections in the City of New York",
+        "The Contest List, General Election 2026 (tentative, printed 9/11/2026)",
+    ),
 }
+COUNTIES = {"06073": "San Diego County", "06059": "Orange County"}
 OFFICES = {
     "0644000": [
-        (r"MAYOR", "mayor"),
-        (r"CITY ATTORNEY", "city-attorney"),
-        (r"CONTROLLER", "city-controller"),
-        (r"MEMBER OF THE CITY COUNCIL, DISTRICT NO\. (\d+)", "council:{}"),
+        (r"MAYOR", "CA:0644000:mayor"),
+        (r"CITY ATTORNEY", "CA:0644000:city-attorney"),
+        (r"CONTROLLER", "CA:0644000:city-controller"),
+        (r"MEMBER OF THE CITY COUNCIL, DISTRICT NO\. (\d+)", "CA:0644000:council:{}"),
     ],
     "17031": [
-        (r"County Clerk", "clerk"),
-        (r"County Sheriff", "sheriff"),
-        (r"County Treasurer", "treasurer"),
-        (r"County Assessor", "assessor"),
-        (r"County Commissioner, (\d+)\w\w District", "board-of-commissioners:district-{}"),
-        (r"Board of Review, (\d+)\w\w District", "board-of-review:district-{}"),
+        (r"County Clerk", "IL:17031:clerk"),
+        (r"County Sheriff", "IL:17031:sheriff"),
+        (r"County Treasurer", "IL:17031:treasurer"),
+        (r"County Assessor", "IL:17031:assessor"),
+        (r"County Commissioner, (\d+)\w\w District", "IL:17031:board-of-commissioners:district-{}"),
+        (r"Board of Review, (\d+)\w\w District", "IL:17031:board-of-review:district-{}"),
         (
             r"Metropolitan Water Reclamation District Commissioners Full 6-Year Term",
-            "reclamation:metropolitan-water-reclamation-district-of-greater-chicago:special",
+            "IL:17031:reclamation:metropolitan-water-reclamation-district-of-greater-chicago:special",
         ),
         (
             r"Metropolitan Water Reclamation District Commissioners Unexpired 2-Year Term",
-            "reclamation:metropolitan-water-reclamation-district-of-greater-chicago:special:2-year-term",
+            "IL:17031:reclamation:metropolitan-water-reclamation-district-of-greater-chicago:special:2-year-term",
         ),
     ],
     "48201": [
-        (r"County Judge", "county-judge"),
-        (r"County Clerk", "clerk"),
-        (r"District Clerk", "district-clerk"),
-        (r"County Treasurer", "treasurer"),
-        (r"County Attorney - Unexpired Term", "county-attorney"),
-        (r"County Commissioner, Precinct (\d+)", "commissioners-court:precinct-{}"),
+        (r"County Judge", "TX:48201:county-judge"),
+        (r"County Clerk", "TX:48201:clerk"),
+        (r"District Clerk", "TX:48201:district-clerk"),
+        (r"County Treasurer", "TX:48201:treasurer"),
+        (r"County Attorney - Unexpired Term", "TX:48201:county-attorney"),
+        (r"County Commissioner, Precinct (\d+)", "TX:48201:commissioners-court:precinct-{}"),
     ],
     "48113": [
-        (r"County Judge", "county-judge"),
-        (r"County Clerk", "clerk"),
-        (r"District Clerk", "district-clerk"),
-        (r"County Treasurer", "treasurer"),
-        (r"Criminal District Attorney", "district-attorney"),
+        (r"County Judge", "TX:48113:county-judge"),
+        (r"County Clerk", "TX:48113:clerk"),
+        (r"District Clerk", "TX:48113:district-clerk"),
+        (r"County Treasurer", "TX:48113:treasurer"),
+        (r"Criminal District Attorney", "TX:48113:district-attorney"),
     ],
     "12086": [
-        (r"County Commissioner, District (\d+)", "commission:district-{}"),
-        (r"School Board Member, District (\d+)", "board-of-education:district-{}"),
+        (r"County Commissioner, District (\d+)", "FL:12086:commission:district-{}"),
+        (r"School Board Member, District (\d+)", "FL:12086:board-of-education:district-{}"),
+    ],
+    "06073": [(r"BOARD OF SUPERVISORS - DISTRICT NO\. (\d+)", "CA:06073:board-of-supervisors:{}")],
+    "06059": [
+        (r"Nonpartisan COUNTY OF ORANGE County Supervisor (\d+)\w\w District", "CA:06059:board-of-supervisors:{}")
+    ],
+    "3651000": [
+        (
+            r"Member of the City Council - (\d+)\w\w Council District, # to be elected: 1",
+            "new-york-city:council-district-{}",
+        )
     ],
 }
 PARTIES = {
@@ -99,7 +127,7 @@ def fetch() -> None:
     for url in FILES.values():
         try:
             raw.fetch(SOURCE, url, suffix=".pdf")
-        except Exception as error:
+        except httpx.HTTPError as error:
             print(f"{url}: {error}")
 
 
@@ -110,7 +138,7 @@ def parse() -> None:
         for pattern, tail in OFFICES[fips]:
             found = re.fullmatch(pattern, heading.strip())
             if found is not None:
-                return f"{PUBLISHERS[fips][0]}:{fips}:{tail.format(*found.groups())}"
+                return tail.format(*found.groups())
         return None
 
     def add(fips: str, tail: str, heading: str, seats: int, name: str, party: str | None) -> None:
@@ -149,11 +177,20 @@ def parse() -> None:
                 if other.strip() and not re.match(r"^\s*(Write-in|Ballot No\.|Page \d)", other.strip()):
                     break
                 continue
-            add("17031", tail, lines[index - 1], NUMBERS[vote[1]], candidate[1], PARTIES.get(str(candidate[2]).split()[0]))
+            add(
+                "17031",
+                tail,
+                lines[index - 1],
+                NUMBERS[vote[1]],
+                candidate[1],
+                PARTIES.get(str(candidate[2]).split()[0]),
+            )
 
     for fips in ("48201", "48113"):
         words = subprocess.run(
-            ["pdftotext", "-bbox-layout", str(raw.cached(SOURCE, FILES[fips]).path), "-"], capture_output=True, check=True
+            ["pdftotext", "-bbox-layout", str(raw.cached(SOURCE, FILES[fips]).path), "-"],
+            capture_output=True,
+            check=True,
         ).stdout.decode()
         pages = [
             [
@@ -167,7 +204,7 @@ def parse() -> None:
             {
                 round(x)
                 for page in pages
-                for (x, y, word), (_, other_y, following) in zip(page, page[1:])
+                for (x, y, word), (_, other_y, following) in pairwise(page)
                 if word == "Vote" and abs(y - other_y) < 1 and following in ("for", "por")
             }
         ):
@@ -193,7 +230,11 @@ def parse() -> None:
             found = []
             started = False
             for other in lines[index + 1 :]:
-                if other.startswith(("Vote ", "Votar", "Bỏ phiếu")) or not started and not re.search(r"[A-Z]{2}", other):
+                if (
+                    other.startswith(("Vote ", "Votar", "Bỏ phiếu"))
+                    or not started
+                    and not re.search(r"[A-Z]{2}", other)
+                ):
                     started = started or other.startswith("Vote ")
                     continue
                 if not started:
@@ -226,6 +267,39 @@ def parse() -> None:
             elif other.strip() == "" and any(row["tail"] == tail for row in rows):
                 break
 
+    tail = None
+    for line in text("06073", "-layout").splitlines():
+        if re.fullmatch(r"[A-Z][^a-z]*", line.rstrip()) and "N/A" not in line:
+            tail = office("06073", line)
+            heading = line
+        elif tail is not None and (candidate := re.match(r"^([A-Z][A-Z .'\"-]+), ([A-Z][A-Z .'\"-]+?)\s{2,}N/A", line)):
+            add("06073", tail, heading, 1, f"{candidate[2]} {candidate[1]}", None)
+
+    tail = None
+    for line in text("06059", "-layout").splitlines():
+        if re.match(r"^(Nonpartisan|Voter Nominated|Partisan|Party Nominated) ", line):
+            tail = office("06059", line)
+            heading = line
+        elif tail is not None and (
+            candidate := re.fullmatch(r"\s{8,}(?:Candidate\(s\):)?\s+([A-Z][A-Z .'\"-]+)", line)
+        ):
+            add("06059", tail, heading, 1, candidate[1], None)
+
+    tail = None
+    for line in text("3651000", "-layout").splitlines():
+        if re.match(r"^ \S", line):
+            tail = office("3651000", line)
+            heading = line
+        elif tail is not None and (candidate := re.match(r"^  (\S.*?)\s{2,}(\S.*?)\s{2,}\S", line)):
+            add(
+                "3651000",
+                tail,
+                f"{heading} (unexpired term)",
+                1,
+                candidate[2],
+                PARTIES.get(candidate[1]) if candidate[1] != candidate[2] else None,
+            )
+
     PARSED.mkdir(parents=True, exist_ok=True)
     frame = pl.DataFrame(rows).unique(["tail", "name"], keep="first", maintain_order=True)
     frame.write_parquet(PARSED / "candidates.parquet")
@@ -241,7 +315,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Local contests on the 2026-11-03 ballot in the largest jurisdictions, with candidates from the official candidate lists and sample ballots: Los Angeles city runoffs, Cook County offices (from the Chicago board's list), Harris and Dallas county offices, and Miami-Dade runoffs",
+            summary="Local contests on the 2026-11-03 ballot in the largest jurisdictions, with candidates from the official candidate lists and sample ballots: Los Angeles city runoffs, Cook County offices (from the Chicago board's list), Harris and Dallas county offices, and Miami-Dade runoffs, the San Diego and Orange county supervisor races, and the New York City Council District 3 special",
             polity="US",
         )
 
@@ -281,14 +355,90 @@ def emit() -> Path:
 
         sources = {}
         elections = {}
-        counts = {"contests": 0, "chained": 0, "candidates": 0, "matched": 0, "no template": 0}
+        counts = {"contests": 0, "chained": 0, "created": 0, "candidates": 0, "matched": 0, "no template": 0}
+        created: set[str] = set()
         for (fips, tail), group in frame.group_by(["fips", "tail"], maintain_order=True):
             if tail not in templates:
-                counts["no template"] += 1
-                print(f"no template: {tail}")
-                continue
-            (_, previous, kind, office_id, body_id, area, seat, plan, magnitude, term, system, result_kind, held_on, polity,
-             title, path, election_title, election_path, scope) = templates[tail]
+                county = re.fullmatch(r"CA:(\d{5}):board-of-supervisors:(\d+)", tail)
+                if county is None:
+                    counts["no template"] += 1
+                    print(f"no template: {tail}")
+                    continue
+                label = COUNTIES[county[1]]
+                polity = cs.key("us.polity", f"county:{county[1]}")
+                body = cs.key("us.body", f"CA:{county[1]}:board-of-supervisors")
+                if body in cs.minted:
+                    cs.add("body", id=body, polity_id=polity, kind="council")
+                    name(body, f"{label} Board of Supervisors")
+                code = f"06:{county[1]}:board-of-supervisors:district-{county[2]}"
+                area = cs.area("us.local_district", code)
+                if area in cs.minted:
+                    cs.add("area", id=area, scheme_code="us.local_district")
+                    cs.add("area_code", area_id=area, code=code, valid_from=None)
+                    cs.add(
+                        "area_parent",
+                        area_id=area,
+                        parent_id=next(
+                            iter(
+                                conn.execute(
+                                    "select area_id from reporting_unit where scheme_code = 'us.county' and code = %s",
+                                    [county[1]],
+                                )
+                            )
+                        )[0],
+                    )
+                    name(area, f"{label} supervisorial district {county[2]}")
+                templates[tail] = (
+                    tail,
+                    None,
+                    "body_seats",
+                    None,
+                    body,
+                    area,
+                    None,
+                    None,
+                    1,
+                    "full",
+                    cs.key("us.electoral_system", "fptp"),
+                    "counted",
+                    DAY,
+                    polity,
+                    f"2026 {label} Board of Supervisors, supervisorial district {county[2]} election",
+                    f"us/ca/{slug(label)}/{DAY}-general/board-of-supervisors-{county[2]}",
+                    f"2026 {label} general election",
+                    f"us/ca/{slug(label)}/{DAY}-general",
+                    f"CA:{county[1]}",
+                )
+                created.add(tail)
+                known[tail] = conn.execute(
+                    """select ca.person_id, coalesce(ca.ballot_name, o.ballot_label, pn.text)
+                       from contest co join contest_option o on o.contest_id = co.id
+                       join candidacy ca on ca.option_id = o.id join entity e on e.id = ca.id and e.retired_by is null
+                       left join name pn on pn.entity_id = ca.person_id and pn.is_preferred and pn.lang = 'en'
+                       where co.district_area_id = %s""",
+                    [area],
+                ).fetchall()
+            (
+                _,
+                previous,
+                kind,
+                office_id,
+                body_id,
+                area,
+                seat,
+                plan,
+                magnitude,
+                term,
+                system,
+                result_kind,
+                held_on,
+                polity,
+                title,
+                path,
+                election_title,
+                election_path,
+                scope,
+            ) = templates[tail]
             state, publisher, source_title = PUBLISHERS[fips]
             if fips not in sources:
                 sources[fips] = cs.source(publisher, source_title)
@@ -315,9 +465,14 @@ def emit() -> Path:
                     date_to=DAY,
                     status="scheduled",
                 )
-                name(elections[scope], re.sub(r"^\d{4} (.+?) \w+ elections?$", r"2026 \1 general election", election_title))
-                cs.add("slug", path=re.sub(r"/[0-9-]+-\w+$", f"/{DAY}-general", election_path), entity_id=elections[scope])
-            chained = held_on.year == DAY.year
+                name(
+                    elections[scope],
+                    re.sub(r"^\d{4} (.+?) \w+ elections?$", r"2026 \1 general election", election_title),
+                )
+                cs.add(
+                    "slug", path=re.sub(r"/[0-9-]+-\w+$", f"/{DAY}-general", election_path), entity_id=elections[scope]
+                )
+            chained = previous is not None and held_on.year == DAY.year
             key = f"{DAY}:{tail}"
             contest = cs.key("us.contest", key)
             cs.add(
@@ -338,17 +493,32 @@ def emit() -> Path:
                 default_result_kind=result_kind,
             )
             text = re.sub(r"^\d{4} ", "2026 ", title)
+            if group["unexpired"][0] and term == "full":
+                text = text.replace(" election", " special election", 1)
             name(contest, text.replace(" election", " runoff election", 1) if chained else text)
             cs.add("slug", path=re.sub(r"/[0-9-]+-\w+/", f"/{DAY}-general/", path), entity_id=contest)
             counts["contests"] += 1
+            if tail in created:
+                counts["created"] += 1
+                cs.add("citation", entity_id=contest, source_id=sources[fips], locator=None)
             counts["chained"] += chained
             for row in group.iter_rows(named=True):
-                tokens = [token for token in slug(re.sub(r'"[^"]*"|\([^)]*\)', " ", row["name"])).split("-") if token not in ("jr", "sr", "ii", "iii", "iv")]
+                tokens = [
+                    token
+                    for token in slug(re.sub(r'"[^"]*"|\([^)]*\)', " ", row["name"])).split("-")
+                    if token not in ("jr", "sr", "ii", "iii", "iv")
+                ]
                 pool = {
                     person
                     for person, held_text in known.get(tail, [])
                     if held_text
-                    and (held := [token for token in slug(held_text).split("-") if token not in ("jr", "sr", "ii", "iii", "iv")])
+                    and (
+                        held := [
+                            token
+                            for token in slug(held_text).split("-")
+                            if token not in ("jr", "sr", "ii", "iii", "iv")
+                        ]
+                    )
                     and held[-1] == tokens[-1]
                     and held[0][:1] == tokens[0][:1]
                 }
@@ -362,7 +532,14 @@ def emit() -> Path:
                         name(person, row["name"])
                 party = cs.key("us.party", row["party"]) if row["party"] else None
                 option = cs.key("us.option", f"{key}:{slug(row['name'])}")
-                cs.add("contest_option", id=option, contest_id=contest, kind="candidate", party_id=party, ballot_label=row["name"])
+                cs.add(
+                    "contest_option",
+                    id=option,
+                    contest_id=contest,
+                    kind="candidate",
+                    party_id=party,
+                    ballot_label=row["name"],
+                )
                 candidacy = cs.key("us.candidacy", f"{key}:{slug(row['name'])}")
                 cs.add(
                     "candidacy",
