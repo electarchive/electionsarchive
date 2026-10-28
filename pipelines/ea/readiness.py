@@ -134,9 +134,10 @@ group by rc.id, rc.st, 3, 4, op.id
 """
 
 GOVERNMENTS_SQL = """
-select g.state, g.kind, g.polity_id::text, g.name, coalesce(g.population, 0),
-    g.active and g.month = %(month)s and (%(year)s - g.phase) %% g.period = 0 and exists (
-        select from coverage_government_year y where y.government_id = g.id and y.year = %(year)s - g.period and y.expected)
+select g.state, g.kind, g.polity_id::text, g.name, coalesce(g.population, 0), g.county,
+    coalesce(g.active and g.month = %(month)s and (%(year)s - g.phase) %% g.period = 0 and exists (
+        select from coverage_government_year y where y.government_id = g.id and y.year = %(year)s - g.period and y.expected),
+        false)
 from coverage_government g
 where g.kind in ('county', 'municipality', 'township', 'school')
 """
@@ -292,9 +293,15 @@ def measure(conn, day: str) -> dict:
     params = {"year": year, "month": int(day[5:7])}
     places: list[tuple[str, str, str, int, bool]] = []
     by_polity: dict[str, int] = {}
-    for st, kind, polity, name, population, due in conn.execute(GOVERNMENTS_SQL, params):
+    counties: dict[str, tuple[str, str]] = {}
+    schools: dict[str, list[tuple[int, str]]] = defaultdict(list)
+    for st, kind, polity, name, population, county, due in conn.execute(GOVERNMENTS_SQL, params):
         if polity is not None:
             by_polity[polity] = len(places)
+            if kind == "county" and county is not None:
+                counties[polity] = (county, name.removesuffix(" County").removesuffix(" Parish"))
+        if kind == "school" and county is not None:
+            schools[county].append((len(places), name))
         places.append((GOVERNMENTS[kind], st, name, population, due))
     from ea.coverage_tables import JUDICIAL
 
@@ -338,6 +345,10 @@ def measure(conn, day: str) -> dict:
             if level in ("county", "municipal", "school", "special_district")
             else None
         )
+        if level == "school" and (polity or "") in counties:
+            county, short = counties[polity or ""]
+            system = [i for i, name in schools[county] if short in name]
+            place = system[0] if len(system) == 1 else place
         if place is not None:
             held[place].append((has, ok.get(str(cid), False)))
             continue
