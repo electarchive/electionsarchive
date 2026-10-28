@@ -6843,12 +6843,42 @@ export const contests = {
         }
       }
       if (current == null) {
-        const prior =
+        const candidates =
           page.slate?.state === "scheduled" &&
           previous != null &&
           previous.series === contest.series
-            ? previous
-            : null;
+            ? comparable.filter(
+                (row) =>
+                  row.series === contest.series &&
+                  row.date != null &&
+                  contest.date != null &&
+                  row.date < contest.date &&
+                  (fence == null || row.date > fence) &&
+                  row.status !== "annulled" &&
+                  row.status !== "canceled",
+              )
+            : [];
+        const prior =
+          candidates.length === 0
+            ? null
+            : ((
+                await db.execute<{ id: string; date: string }>(sql`
+                  with recursive base as (
+                    select c.id from unnest(${sql.param(candidates.map((row) => row.id))}::uuid[]) with ordinality u(id, at)
+                    join contest c on c.id = u.id
+                    order by c.seat_id is not distinct from (select seat_id from contest where id = ${contest.id}::uuid) desc, u.at
+                    limit 1
+                  ),
+                  chain(id, depth) as (
+                    select id, 0 from base
+                    union all
+                    select c.id, chain.depth + 1 from contest c join chain on c.previous_round_id = chain.id
+                  )
+                  select chain.id, e.date_from::text as date from chain
+                  join contest c on c.id = chain.id join election e on e.id = c.election_id
+                  order by chain.depth desc limit 1
+                `)
+              ).rows[0] ?? null);
         const [held, priorSlugs] =
           prior == null
             ? [null, null]
