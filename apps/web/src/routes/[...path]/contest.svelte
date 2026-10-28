@@ -1464,6 +1464,43 @@
   {/snippet}
 </Road>
 
+{#snippet locator(shown: NonNullable<typeof locating>)}
+  {#key here}
+    <PlaceMap
+      places={shown.places}
+      colors={shown.colors}
+      tiles={shown.tiles}
+      own={shown.own}
+      frame={shown.frame}
+      limit={shown.limit}
+      isApproximate={shown.isApproximate}
+      noun={shown.noun}
+      sources={shown.sources}
+      explore={upward?.path ?? null}
+      up={upward}
+      votes={m.col_votes()}
+      names={shown.names}
+      levels={[]}
+      span={null}
+      isLinked
+    />
+  {/key}
+  {#if shown.places.context != null}
+    {const context = $derived(shown.places.context)}
+    <p class="pbs-2 text-xs text-muted-foreground">
+      {#if context.path == null}
+        {m.locator_context({ date: date(context.date) })}
+      {:else}
+        <a
+          href={resolve("/[...path]", { path: context.path })}
+          class="underline decoration-border underline-offset-4 hover:decoration-foreground"
+          >{m.locator_context({ date: date(context.date) })}</a
+        >
+      {/if}
+    </p>
+  {/if}
+{/snippet}
+
 {#if contest.current == null && contest.declared != null}
   <section class="col-span-12 grid gap-2.5 bg-card px-3.5 py-4">
     <p class="text-[0.9375rem] text-muted-foreground">
@@ -1555,6 +1592,19 @@
     last={contest.last ?? null}
     held={contest.election.date}
   />
+  {#if locating != null}
+    <section
+      class="col-span-12 grid gap-3 bg-card px-3.5 pbs-3 pbe-3.5"
+      aria-labelledby="locator-title"
+    >
+      <h2 id="locator-title" class="text-[0.8125rem] font-bold">
+        {m.map_view_map()}
+      </h2>
+      <div class="max-inline-[48rem]">
+        {@render locator(locating)}
+      </div>
+    </section>
+  {/if}
 {:else if contest.current == null}
   <p class="col-span-12 bg-card px-3.5 py-6 text-muted-foreground">
     {m.no_results()}
@@ -1649,40 +1699,7 @@
         </p>
       {/if}
     {:else if locating != null}
-      {#key here}
-        <PlaceMap
-          places={locating.places}
-          colors={locating.colors}
-          tiles={locating.tiles}
-          own={locating.own}
-          frame={locating.frame}
-          limit={locating.limit}
-          isApproximate={locating.isApproximate}
-          noun={locating.noun}
-          sources={locating.sources}
-          explore={upward?.path ?? null}
-          up={upward}
-          votes={m.col_votes()}
-          names={locating.names}
-          levels={[]}
-          span={null}
-          isLinked
-        />
-      {/key}
-      {#if locating.places.context != null}
-        {const context = $derived(locating.places.context)}
-        <p class="pbs-2 text-xs text-muted-foreground">
-          {#if context.path == null}
-            {m.locator_context({ date: date(context.date) })}
-          {:else}
-            <a
-              href={resolve("/[...path]", { path: context.path })}
-              class="underline decoration-border underline-offset-4 hover:decoration-foreground"
-              >{m.locator_context({ date: date(context.date) })}</a
-            >
-          {/if}
-        </p>
-      {/if}
+      {@render locator(locating)}
     {/if}
   {/snippet}
   {#snippet hemicycle()}
