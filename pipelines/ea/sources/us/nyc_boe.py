@@ -149,7 +149,23 @@ SPECIALS = {
         None,
     ),
     (date(2025, 4, 29), "51"): ("2025/20250429Special%20Election/Council_Member_51st_Council_District_1.pdf", None),
+    (date(2026, 4, 28), "3"): (
+        "2026/20260428Special%20Election/202611V1_Council_Member_3rd_Council_District.pdf",
+        None,
+    ),
 }
+PDF_PRIMARIES = {
+    date(2026, 6, 23): [
+        (
+            "2026/20260623Primary%20Election/DEM_Council_Member_3rd_Council_District.pdf",
+            "027477",
+            "DEM",
+            "council",
+            "3",
+        )
+    ]
+}
+SPECIAL_PAGES = {(date(2026, 4, 28), "3"): "027431"}
 COUNTIES = ("36005", "36047", "36061", "36081", "36085")
 PARTIES = {
     "DEM": ("democratic-party", "Democratic"),
@@ -189,6 +205,38 @@ PERSONS = {
 }
 
 
+def pdf_rounds(path: Path, key: str) -> tuple[str, list[tuple[str, int, int]]]:
+    text = subprocess.run(["pdftotext", "-layout", str(path), "-"], capture_output=True, text=True, check=True).stdout
+    decided = re.search(r"(.+?) won the .+? with ([\d,]+) of the votes in the (?:first|final) round", text)
+    if decided is None:
+        raise ValueError(f"{key}: no winner line in the rounds PDF")
+    block = text.split("Votes in this round", 1)[1].split("*The winning", 1)[0]
+    counts = []
+    for row in block.splitlines():
+        found = re.match(r"\s*([A-Za-z][^\d]*?)\s{2,}(\S.*)$", row)
+        if found is None:
+            continue
+        label = found[1].strip()
+        tokens = re.findall(r"-XXX|\d+\.\d+%|[\d,]+", found[2])
+        if not tokens or label.startswith("Eliminated") or label == "Elected":
+            continue
+        label = WRITE_INS if label in WRITTEN else label
+        number = 1
+        index = 0
+        if label != INACTIVE:
+            counts.append((label, 1, int(tokens[0].replace(",", ""))))
+            index = 2
+            number = 2
+        else:
+            index = 0
+            number = 2
+        while index < len(tokens) and tokens[index] != "-XXX":
+            counts.append((label, number, int(tokens[index + 1].replace(",", ""))))
+            index += 2 if label == INACTIVE else 3
+            number += 1
+    return decided[1].strip(), counts
+
+
 def url(day: date, page: str) -> str:
     return f"{PRIMARIES[day]}/{page}_1.html"
 
@@ -197,6 +245,9 @@ def fetch() -> None:
     for day, pages in PAGES.items():
         for page in pages:
             raw.fetch(SOURCE, url(day, page), suffix=".html")
+    for entries in PDF_PRIMARIES.values():
+        for path, *_ in entries:
+            raw.fetch(SOURCE, f"{RESULTS}/{path}", suffix=".pdf")
     for paths in SPECIALS.values():
         for path in paths:
             if path is not None:
@@ -265,6 +316,30 @@ def parse() -> None:
                     ),
                 )
             )
+    for day, entries in PDF_PRIMARIES.items():
+        for path, page, party_code, office, district in entries:
+            link = f"{RESULTS}/{path}"
+            key = f"{day}:new-york-city:{office}-{district}:{PARTIES[party_code][1].lower()}"
+            winner, counts = pdf_rounds(raw.cached(SOURCE, link).path, key)
+            frame = pl.DataFrame(counts, schema=["label", "round", "votes"], orient="row")
+            totals = frame.group_by("round").agg(pl.col("votes").sum())["votes"].unique()
+            top = frame.filter((pl.col("round") == frame["round"].max()) & (pl.col("label") != INACTIVE)).sort(
+                "votes", descending=True
+            )
+            if totals.len() != 1 or top["label"][0] != winner:
+                raise ValueError(f"{key}: rounds do not conserve ballots or the winner differs")
+            frames.append(
+                frame.with_columns(
+                    date=pl.lit(day),
+                    url=pl.lit(link),
+                    page=pl.lit(page),
+                    contest=pl.lit(f"{party_code} Council Member {district}rd Council District"),
+                    party=pl.lit(party_code),
+                    office=pl.lit(office),
+                    district=pl.lit(district),
+                    key=pl.lit(key),
+                )
+            )
     PARSED.mkdir(parents=True, exist_ok=True)
     pl.concat(frames).write_parquet(PARSED / "rounds.parquet")
     specials = []
@@ -300,21 +375,23 @@ def parse() -> None:
             link = rounds_path if "://" in rounds_path else f"{RESULTS}/{rounds_path}"
             cached = raw.cached(SOURCE, link).path
             if rounds_path.endswith(".pdf"):
-                text = subprocess.run(
-                    ["pdftotext", "-layout", str(cached), "-"], capture_output=True, text=True, check=True
-                ).stdout
-                decided = re.search(r"(.+?) won the .+? with ([\d,]+) of the votes in the first round", text)
-                if decided is None:
-                    raise ValueError(f"{key}: only first-round decisions are read from PDFs")
-                winner = decided[1].strip()
-                block = text.split("Votes in this round", 1)[1].split("Inactive ballots", 1)[0]
-                counts = [
-                    (WRITE_INS if found[1] in WRITTEN else found[1], 1, int(found[2].replace(",", "")))
-                    for found in re.finditer(r"^\s*(\S.*?)\s{2,}([\d,]+)\s+[\d.]+%", block, re.MULTILINE)
-                ]
+                winner, counts = pdf_rounds(cached, key)
                 frame = pl.DataFrame(counts, schema=["label", "round", "votes"], orient="row")
+                totals = frame.group_by("round").agg(pl.col("votes").sum())["votes"].unique()
+                last = frame["round"].max()
+                top = frame.filter((pl.col("round") == last) & (pl.col("label") != INACTIVE)).sort(
+                    "votes", descending=True
+                )
+                if totals.len() != 1 or top["label"][0] != winner:
+                    raise ValueError(f"{key}: rounds do not conserve ballots or the winner differs")
                 specials.append(
-                    frame.with_columns(date=pl.lit(day), url=pl.lit(link), district=pl.lit(district), key=pl.lit(key))
+                    frame.with_columns(
+                        date=pl.lit(day),
+                        url=pl.lit(link),
+                        district=pl.lit(district),
+                        key=pl.lit(key),
+                        page=pl.lit(SPECIAL_PAGES.get((day, district)), dtype=pl.String),
+                    )
                 )
                 continue
             rows = [
@@ -345,7 +422,13 @@ def parse() -> None:
         if totals.len() != 1 or top["label"][0] != winner:
             raise ValueError(f"{key}: rounds do not conserve ballots or the winner differs")
         specials.append(
-            frame.with_columns(date=pl.lit(day), url=pl.lit(link), district=pl.lit(district), key=pl.lit(key))
+            frame.with_columns(
+                date=pl.lit(day),
+                url=pl.lit(link),
+                district=pl.lit(district),
+                key=pl.lit(key),
+                page=pl.lit(SPECIAL_PAGES.get((day, district)), dtype=pl.String),
+            )
         )
     pl.concat(specials).write_parquet(PARSED / "specials.parquet")
     pl.DataFrame(

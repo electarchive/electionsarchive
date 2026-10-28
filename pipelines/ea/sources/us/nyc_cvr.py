@@ -1,3 +1,4 @@
+import os
 import re
 import zipfile
 from datetime import date, timedelta
@@ -17,7 +18,12 @@ RESULTS = "https://www.vote.nyc/sites/default/files/pdf/election_results"
 CVRS = {
     date(2021, 6, 22): f"{RESULTS}/2021/20210622Primary%20Election/cvr/PE2021_CVR_Final.zip",
     date(2025, 6, 24): f"{RESULTS}/2025/20250624Primary%20Election/rcv/2025_Primary_CVR_2025-07-17.zip",
+    date(2026, 4, 28): f"{RESULTS}/2026/20260428Special%20Election/Special_Election_2026_04_28_2026_CVR.zip",
+    date(2026, 6, 23): f"{RESULTS}/2026/20260623Primary%20Election/2026_Primary_CVR_2026-06-23.zip",
 }
+ONLY = os.environ.get("NYC_CVR_DAYS")
+if ONLY:
+    CVRS = {day: link for day, link in CVRS.items() if day.isoformat() in ONLY.split(",")}
 CHOICE = re.compile(r"^(\w+) (.+?) Choice (\d) of (\d) (.+) \((\d)(\d{5})\)$")
 PRECINCT = re.compile(r"^AD: (\d\d) ED: (\d\d\d)$")
 WRITE_IN = "Write-in"
@@ -50,6 +56,17 @@ METHOD = (
 EXACT = "Summed over the contest's election districts, every round reproduces the Board's official rounds exactly."
 
 
+def official_rounds() -> pl.DataFrame:
+    boe = raw.parsed("us.nyc_boe")
+    return pl.concat(
+        [
+            pl.read_parquet(boe / "rounds.parquet"),
+            pl.read_parquet(boe / "specials.parquet").filter(pl.col("page").is_not_null()),
+        ],
+        how="diagonal_relaxed",
+    )
+
+
 def fetch() -> None:
     for link in CVRS.values():
         raw.fetch(SOURCE, link, suffix=".zip")
@@ -71,7 +88,7 @@ def parse() -> None:
         }
         frames = []
         for name in names:
-            if not re.search(r"_(ABS|AFF|EAR|ELE|EMG|OTH)[^/]*\.xlsx$", name):
+            if not re.search(r"_(ABS|AFF|EAR|ED|ELE|EMG|EV|OTH)[^/]*\.xlsx$", name):
                 continue
             reader = fastexcel.read_excel(archive.read(name))
             columns = {
@@ -106,7 +123,7 @@ def parse() -> None:
             choice=pl.col("value").replace({**labels, WRITE_IN: WRITE_INS}),
         ).drop("precinct", "value").write_parquet(PARSED / f"ballots_{day}.parquet")
 
-    official = pl.read_parquet(raw.parsed("us.nyc_boe") / "rounds.parquet")
+    official = official_rounds().filter(pl.col("date").is_in(list(CVRS)))
     tallies = []
     for day in CVRS:
         ballots = pl.read_parquet(PARSED / f"ballots_{day}.parquet")
@@ -193,9 +210,7 @@ def parse() -> None:
 
 def emit() -> Path:
     tally = pl.read_parquet(PARSED / "rounds.parquet").join(
-        pl.read_parquet(raw.parsed("us.nyc_boe") / "rounds.parquet")
-        .select("date", "page", "key", "office", "district")
-        .unique(),
+        official_rounds().select("date", "page", "key", "office", "district").unique(),
         on=["date", "page"],
     )
     with connect() as conn:
@@ -211,7 +226,7 @@ def emit() -> Path:
             frame = tally.filter(pl.col("date") == day)
             if frame.is_empty():
                 continue
-            title = f"{day.year} Primary Election: Cast Vote Records"
+            title = f"{day.year} {'Special' if day == date(2026, 4, 28) else 'Primary'} Election: Cast Vote Records"
             source = cs.source(PUBLISHER, title)
             cs.add(
                 "source",
@@ -313,7 +328,10 @@ def emit() -> Path:
                 cs.add(
                     "result_set",
                     id=result_set,
-                    election_id=cs.key("us.election", f"{day}:new-york-city:primary"),
+                    election_id=cs.key(
+                        "us.election",
+                        f"{day}:NY:3651000" if day == date(2026, 4, 28) else f"{day}:new-york-city:primary",
+                    ),
                     contest_id=contest,
                     stage="certified",
                     kind="counted",
