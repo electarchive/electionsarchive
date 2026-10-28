@@ -17874,20 +17874,25 @@ export const people = {
             case when bool_or(o.elected) and bool_or(o.named and not o.elected)
               then min(o.value) filter (where o.elected) - max(o.value) filter (where o.named and not o.elected) end as majority
           from (
-            select f.root, f.option, sum(f.value) as value, co.kind in ('candidate', 'ticket') as named, exists (
+            select f.root, top.k as option, top.kind, coalesce(
+              sum(f.value) filter (where co.parent_option_id is null), sum(f.value)
+            ) as value, top.kind in ('candidate', 'ticket') as named, exists (
               select from outcome x join result_set rs on rs.id = x.result_set_id and ${latest("rs")}
-              where x.option_id = co.id and x.candidacy_id is null and x.kind in ('elected', 'won')
+              where x.option_id = top.id and x.candidacy_id is null and x.kind in ('elected', 'won')
             ) as elected, f.first <> f.last as "isCounted"
             from fetched f join mains m on m.root = f.root and m.main = f.measure
               join contest_option co on co.k = f.option
+              join contest_option top on top.id = coalesce(co.parent_option_id, co.id)
             where f.count_round = f.last and f.option <> 0 and (
               f.first = f.last or (select coalesce(c.magnitude, 1) <= 1 from contest c where c.id = f.root)
             )
-            group by f.root, f.option, co.id, co.kind, f.first, f.last
+            group by f.root, top.k, top.id, top.kind, f.first, f.last
           ) o
           where not exists (select from contest c where c.allocation_parent_id = o.root)
           group by o.root
-          having (bool_or(o."isCounted") or count(distinct o.option) = (select count(*) from contest_option co where co.contest_id = o.root))
+          having (bool_or(o."isCounted") or count(distinct o.option) filter (where o.kind <> 'write_in') = (
+            select count(*) from contest_option co where co.contest_id = o.root and co.parent_option_id is null and co.kind <> 'write_in'
+          ))
             and not exists (
               select from contest_option co where co.contest_id = o.root and co.kind not in ('candidate', 'ticket', 'write_in', 'others')
             )
