@@ -23,7 +23,7 @@
   import * as Command from "#lib/components/ui/command/index.js";
   import * as Select from "#lib/components/ui/select/index.js";
   import { Switch } from "#lib/components/ui/switch/index.js";
-  import { count, date, percent, points } from "#lib/format.js";
+  import { count, date, percent, plural, points } from "#lib/format.js";
   import { keep } from "#lib/linked.js";
   import { palette } from "#lib/palette.svelte.js";
   import { m } from "#lib/paraglide/messages.js";
@@ -110,6 +110,7 @@
     Array<{ k: number; name: string; x: number; y: number }>
   >([]);
   let isQueued = false;
+  let isDeep = $state(false);
   let mosaic = $state.raw<{
     key: string;
     set: Sheet;
@@ -143,6 +144,7 @@
       ? (sheet.legend.find((item) => item.key === who) ?? first)
       : null,
   );
+  const drawn = $derived(isDeep ? (detail.mid?.set ?? sheet) : sheet);
   const isParts = $derived(
     sheet.parts.length > 0 && sheet.places.k.includes(sheet.parts[0]?.k ?? -1),
   );
@@ -327,13 +329,13 @@
     const tally = Array.from<number>({ length: total }).fill(0);
     let admitted = 0;
     let measured = 0;
-    for (const [i] of sheet.places.k.entries()) {
-      const reading = read(sheet, i);
+    for (const [i] of drawn.places.k.entries()) {
+      const reading = read(drawn, i);
       if (reading.value == null) {
         continue;
       }
       measured += 1;
-      if (admits(sheet, reading)) {
+      if (admits(drawn, reading)) {
         admitted += 1;
       }
       const at = Math.min(
@@ -381,7 +383,7 @@
       ];
     }
     const name = (item: typeof first) =>
-      item?.label.replace(/ \([^)]*\)$/u, "") ?? "";
+      item?.short ?? item?.label.replace(/ \([^)]*\)$/u, "") ?? "";
     return [
       {
         at: low,
@@ -402,7 +404,7 @@
   });
   const leads = $derived(
     Map.groupBy(
-      sheet.places.leader.filter((leader) => leader != null),
+      drawn.places.leader.filter((leader) => leader != null),
       (leader) => leader,
     )
       .entries()
@@ -512,8 +514,8 @@
     return {
       name: hit.set.places.name[hit.i] ?? "",
       sides: [
-        { label: first.label, tone: hue(sheet, 0) },
-        { label: second.label, tone: hue(sheet, 1) },
+        { label: first.short ?? first.label, tone: hue(sheet, 0) },
+        { label: second.short ?? second.label, tone: hue(sheet, 1) },
       ] as [{ label: string; tone: string }, { label: string; tone: string }],
       margin,
       before: reading.swing == null ? null : margin - reading.swing,
@@ -1203,7 +1205,9 @@
       return;
     }
     const held = detail.mid;
-    const set = held != null && gl.getZoom() >= MID ? held.set : sheet;
+    const deep = gl.getZoom() >= MID;
+    isDeep = deep;
+    const set = held != null && deep ? held.set : sheet;
     const finest = sheet.levels.findLast((level) => level.tiles != null);
     if (set.level === finest?.code && set.places.k.length > 500) {
       labels = [];
@@ -1720,7 +1724,7 @@
       >
         <span class="font-semibold">
           {m.atlas_lead({
-            name: lead.label,
+            name: lead.short ?? lead.label,
             points: (reading.lead * 100).toFixed(1),
           })}
         </span>
@@ -1745,7 +1749,9 @@
               class="shrink-0 self-center rounded-xs block-2.5 inline-2.5"
               style:background-color={hue(hit.set, row.index)}
             ></span>
-            <span class="flex-1 truncate">{row.item.label}</span>
+            <span class="flex-1 truncate"
+              >{row.item.short ?? row.item.label}</span
+            >
             <span class="font-figures font-semibold tabular-nums"
               >{percent(row.share)}</span
             >
@@ -1784,7 +1790,7 @@
       {const side = $derived(reading.swing >= 0 ? first : second)}
       <p class="text-[0.8125rem] text-muted-foreground">
         {m.atlas_shift({
-          name: side?.label ?? "",
+          name: side?.short ?? side?.label ?? "",
           points: Math.abs(reading.swing * 100).toFixed(1),
           year,
         })}
@@ -2078,7 +2084,7 @@
       <div class="flex flex-wrap items-center gap-1">
         <span class="pe-1 text-xs text-muted-foreground">{m.atlas_won()}</span>
         {#each leads.slice(0, 6) as lead (lead.index)}
-          {const item = $derived(sheet.legend[lead.index])}
+          {const item = $derived(drawn.legend[lead.index])}
           {#if item != null}
             <button
               type="button"
@@ -2087,7 +2093,7 @@
                 { "marked bg-secondary": only === item.key },
                 { "opacity-45": only != null && only !== item.key },
               )}
-              style:--party={tones[item.key]}
+              style:--party={hue(drawn, lead.index)}
               aria-pressed={only === item.key}
               title={m.atlas_only({ name: item.label })}
               onclick={() => (only = only === item.key ? null : item.key)}
@@ -2168,8 +2174,10 @@
             {/each}
           </div>
         </div>
-      {:else if isParts && mosaic == null}
-        <p class="text-xs text-muted-foreground">{m.atlas_zoom_hint()}</p>
+      {:else if isParts && mosaic == null && mid != null && drawn === sheet}
+        <p class="text-xs text-muted-foreground">
+          {m.atlas_zoom_hint({ places: plural(mid.noun) })}
+        </p>
       {/if}
       {#if sheet.isAllied || grouped}
         <div class="grid gap-1.5">
@@ -2271,14 +2279,14 @@
               style:background-color={glance.tone}
             ></span>
             {m.atlas_lead({
-              name: glance.leader.label,
+              name: glance.leader.short ?? glance.leader.label,
               points: (glance.lead * 100).toFixed(1),
             })}
           </span>
         {/if}
         <span class="font-figures text-xs text-muted-foreground tabular-nums">
           {m.atlas_versus({
-            name: glance.side?.label ?? "",
+            name: glance.side?.short ?? glance.side?.label ?? "",
             points: Math.abs(glance.gap * 100).toFixed(1),
             place: glance.against,
           })}

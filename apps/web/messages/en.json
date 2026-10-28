@@ -1324,7 +1324,7 @@
   "atlas_shown": "{shown} of {total} shown",
   "atlas_flipped_only": "Flipped only",
   "atlas_clear": "Clear filters",
-  "atlas_zoom_hint": "Zoom in for counties and precincts.",
+  "atlas_zoom_hint": "Zoom in for {places}.",
   "atlas_pin_hint": "Click to pin a place",
   "atlas_unpin": "Unpin",
   "atlas_votes": "{votes} votes",
