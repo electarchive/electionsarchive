@@ -645,6 +645,8 @@ def _publish_table(conn: Connection, stage: Stage, table: str) -> None:
                 conn.execute("delete from public.contest_option where contest_id = any(%s::uuid[])", [ids])
             if kind == "person":
                 conn.execute("delete from public.person_image where person_id = any(%s::uuid[])", [ids])
+            if kind == "party":
+                conn.execute("delete from public.party_image where party_id = any(%s::uuid[])", [ids])
             if kind == "area":
                 for owned in ("area_code", "area_geometry"):
                     conn.execute(
@@ -739,6 +741,8 @@ def _publish_table(conn: Connection, stage: Stage, table: str) -> None:
                 raise ValueError(f"{entity} is a {kind}; {subtype} is not a stray subtype row to drop")
             if subtype == "person":
                 conn.execute("delete from public.person_image where person_id = %s", [entity])
+            if subtype == "party":
+                conn.execute("delete from public.party_image where party_id = %s", [entity])
             held = [
                 f"{relation}.{column} ({rows} rows)"
                 for relation, column in conn.execute(

@@ -949,6 +949,33 @@ export const partyColor = pgTable("party_color", {
 	primaryKey({ columns: [table.partyId, table.valid], name: "party_color_pkey"}),
 check("party_color_color_check", sql`(color ~ '^#[0-9a-f]{6}$'::text)`),]);
 
+export const partyImage = pgTable("party_image", {
+	id: uuid().default(sql`uuidv7()`).primaryKey(),
+	partyId: uuid("party_id").notNull().references(() => party.id),
+	path: text().notNull(),
+	width: integer().notNull(),
+	height: integer().notNull(),
+	license: text().notNull(),
+	artist: text(),
+	sourceUrl: text("source_url").notNull(),
+	sourceId: uuid("source_id").references(() => source.id),
+	validFrom: date("valid_from"),
+	validFromPrecision: datePrecision("valid_from_precision").default("unknown").notNull(),
+	validTo: date("valid_to"),
+	validToPrecision: datePrecision("valid_to_precision").default("unknown").notNull(),
+	valid: daterange().generatedAlwaysAs(sql`CASE WHEN ((valid_from IS NOT NULL) OR (valid_to IS NOT NULL)) THEN daterange(valid_from, valid_to, '[)'::text) ELSE NULL::daterange END`),
+	datedBy: text("dated_by"),
+	uploadedAt: timestamp("uploaded_at", { withTimezone: true }),
+	changesetId: uuid("changeset_id").notNull().references(() => changeset.id),
+	recordedFrom: timestamp("recorded_from", { withTimezone: true }).default(sql`now()`).notNull(),
+}, (table) => [
+	index("party_image_party_idx").using("btree", table.partyId.asc().nullsLast()),
+	check("party_image_width_check", sql`(width > 0)`),
+	check("party_image_height_check", sql`(height > 0)`),
+	check("party_image_dated_by_check", sql`(dated_by = ANY (ARRAY['wikidata'::text, 'file'::text, 'next_logo'::text]))`),
+	check("party_image_check", sql`((dated_by IS NULL) = ((valid_from IS NULL) AND (valid_to IS NULL)))`),
+]);
+
 export const partyPage = pgTable("party_page", {
 	partyId: uuid("party_id").primaryKey(),
 	page: jsonb().notNull(),
