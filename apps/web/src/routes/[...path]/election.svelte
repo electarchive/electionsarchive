@@ -2204,6 +2204,68 @@
 {:else if parts.length >= 40}
   <Winners {id} {parts} />
 {:else if parts.length > 0}
+  {#if election.seated != null}
+    {const seated = $derived(election.seated)}
+    <section class="col-span-12 grid gap-2 bg-card px-3.5 py-3">
+      <div class="flex flex-wrap items-baseline justify-between gap-x-4">
+        <h2 class="text-[0.8125rem] font-bold">{m.seats_title()}</h2>
+        <p class="text-[0.8125rem] text-muted-foreground">
+          {m.seats_filled({ count: count(seated.total) })}
+        </p>
+      </div>
+      <table class="border-collapse text-sm inline-full sm:inline-auto">
+        <thead>
+          <tr class="border-be text-[0.8125rem] text-muted-foreground">
+            <th class="pe-6 pbe-1.5 text-start font-normal" scope="col">
+              {m.col_party()}
+            </th>
+            <th class="ps-2 pbe-1.5 text-end font-normal" scope="col">
+              {m.col_seats()}
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          {#each seated.parties as row, index (index)}
+            <tr class="border-be border-border/60 last:border-be-0">
+              <th class="py-1.5 pe-6 text-start font-normal" scope="row">
+                <span class="inline-flex items-center gap-1.5">
+                  <span
+                    class="shrink-0 rounded-xs block-2.5 inline-2.5"
+                    style:background={swatch(row.color, `party:${row.label}`)}
+                  ></span>
+                  {row.isIndependent
+                    ? m.seats_independents()
+                    : (row.short ?? row.label)}
+                </span>
+              </th>
+              <td
+                class="py-1.5 ps-2 text-end font-figures font-semibold tabular-nums"
+              >
+                {count(row.seats)}
+              </td>
+            </tr>
+          {/each}
+          {#if seated.others != null}
+            <tr>
+              <th
+                class="py-1.5 pe-6 text-start font-normal text-muted-foreground"
+                scope="row"
+              >
+                {m.election_seated_others({
+                  count: count(seated.others.count),
+                })}
+              </th>
+              <td
+                class="py-1.5 ps-2 text-end font-figures text-muted-foreground tabular-nums"
+              >
+                {count(seated.others.seats)}
+              </td>
+            </tr>
+          {/if}
+        </tbody>
+      </table>
+    </section>
+  {/if}
   <section class="col-span-12 bg-card px-3.5 py-3">
     <h2 class="mbe-2 text-[0.8125rem] font-bold">
       {partNoun == null
@@ -2213,7 +2275,7 @@
     <ul class="grid grid-cols-2 gap-x-6 text-sm sm:grid-cols-3 lg:grid-cols-4">
       {#each parts as child, index (index)}
         <li
-          class="flex items-baseline justify-between gap-3 border-be border-border/60 py-1.5 min-inline-0"
+          class="flex flex-wrap items-baseline justify-between gap-x-3 border-be border-border/60 py-1.5 min-inline-0"
         >
           {#if child.path == null}
             <span class="truncate">{child.place ?? child.name}</span>
@@ -2227,6 +2289,17 @@
               class="shrink-0 font-figures text-xs text-muted-foreground"
               datetime={child.date}>{date(child.date)}</time
             >
+          {/if}
+          {#if child.lead != null && child.seats != null}
+            <span class="truncate text-xs text-muted-foreground inline-full">
+              {child.lead.label === ""
+                ? m.seats_independents()
+                : child.lead.label}
+              <span class="font-figures tabular-nums"
+                >{count(child.lead.seats)}
+                {m.seats_of({ count: count(child.seats) })}</span
+              >
+            </span>
           {/if}
         </li>
       {/each}

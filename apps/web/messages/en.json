@@ -591,6 +591,7 @@
   "locator_context": "Other seats show the results of the {date} general election.",
   "election_places": "Elections in each {noun}",
   "election_children": "Elections held within this one",
+  "election_seated_others": "{count} other parties",
   "race_round": "{name} round {round}",
   "race_split": "{name}, by {noun}",
   "race_list": "{name}, by party list",

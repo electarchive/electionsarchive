@@ -3166,6 +3166,33 @@ function electionMarkdown(
             .map((contest) => `- ${link(contest.name, contest.path)}`)
             .join("\n"),
         ]),
+    ...(election.seated == null
+      ? []
+      : [
+          `## ${m.seats_title()}`,
+          m.seats_filled({ count: count(election.seated.total) }),
+          table(
+            [m.col_party(), m.col_seats()],
+            [
+              ...election.seated.parties.map((row) => [
+                row.isIndependent
+                  ? m.seats_independents()
+                  : (row.short ?? row.label),
+                count(row.seats),
+              ]),
+              ...(election.seated.others == null
+                ? []
+                : [
+                    [
+                      m.election_seated_others({
+                        count: count(election.seated.others.count),
+                      }),
+                      count(election.seated.others.seats),
+                    ],
+                  ]),
+            ],
+          ),
+        ]),
     ...(election.elections.length === 0
       ? []
       : [
@@ -3173,7 +3200,7 @@ function electionMarkdown(
           election.elections
             .map(
               (child) =>
-                `- ${link(child.name, child.path)}${child.date == null ? "" : `, ${date(child.date)}`}`,
+                `- ${link(child.name, child.path)}${child.date == null ? "" : `, ${date(child.date)}`}${child.lead == null || child.seats == null ? "" : `: ${child.lead.label === "" ? m.seats_independents() : child.lead.label} ${count(child.lead.seats)} ${m.seats_of({ count: count(child.seats) })}`}`,
             )
             .join("\n"),
         ]),

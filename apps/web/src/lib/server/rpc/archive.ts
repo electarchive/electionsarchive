@@ -11984,6 +11984,27 @@ export const elections = {
             path: v.nullable(v.string()),
             date: v.nullable(v.string()),
             isStage: v.boolean(),
+            seats: v.nullable(v.number()),
+            lead: v.nullable(
+              v.object({ label: v.string(), seats: v.number() }),
+            ),
+          }),
+        ),
+        seated: v.nullable(
+          v.object({
+            total: v.number(),
+            parties: v.array(
+              v.object({
+                label: v.string(),
+                short: v.nullable(v.string()),
+                color: v.nullable(v.string()),
+                isIndependent: v.boolean(),
+                seats: v.number(),
+              }),
+            ),
+            others: v.nullable(
+              v.object({ count: v.number(), seats: v.number() }),
+            ),
           }),
         ),
       }),
@@ -12048,14 +12069,39 @@ export const elections = {
           kind: string;
           polity: string | null;
           noun: string | null;
+          parties: Array<{
+            party: string | null;
+            independent: boolean;
+            seats: number;
+          }> | null;
+          seats: number | null;
         }>(sql`
           select e.id, e.date_from::text as date, e.kind::text as kind,
-            nullif(e.polity_id, p.polity_id) as polity, sc.noun
+            nullif(e.polity_id, p.polity_id) as polity, sc.noun, s.parties, s.seats
           from election e
           join election p on p.id = e.parent_id
           left join polity_territory pt on pt.polity_id = e.polity_id and pt.valid @> e.date_from
           left join area a on a.id = pt.area_id
           left join scheme sc on sc.code = a.scheme_code
+          left join lateral (
+            select jsonb_agg(jsonb_build_object('party', w.party, 'independent', w.independent, 'seats', w.seats) order by w.seats desc) as parties,
+              sum(w.seats)::int as seats
+            from (
+              select v.party, bool_or(v.independent) as independent, sum(v.seats)::int as seats from (
+                select coalesce(m.into_id, o.party_id) as party, max(coalesce(x.seats, 1)) as seats,
+                  exists (select from candidacy cy where cy.option_id = o.id and cy.is_independent) as independent
+                from contest c
+                join body b on b.id = c.body_id and b.polity_id = p.polity_id
+                join result_set rs on rs.contest_id = c.id and ${latest("rs")}
+                join outcome x on x.result_set_id = rs.id and x.kind in ('elected', 'won') and x.candidacy_id is null
+                join contest_option o on o.id = x.option_id
+                left join entity_merge m on m.entity_id = o.party_id
+                where c.election_id = e.id and c.allocation_parent_id is null and c.party_scope_id is null and not c.notional
+                group by o.id, coalesce(m.into_id, o.party_id)
+              ) v group by v.party
+            ) w
+            where exists (select from polity sp where sp.id = p.polity_id and sp.kind = 'supranational')
+          ) s on true
           where e.parent_id = ${input.id}::uuid and ${within}::uuid is null
             and not exists (select from entity_merge m where m.entity_id = e.id)
         `),
@@ -12571,6 +12617,37 @@ export const elections = {
         new Set(raced.map((race) => race.body)).size === raced.length &&
         new Set(whole.rows.map((row) => row.election)).size === raced.length &&
         !whole.rows.some((row) => row.election === input.id);
+      const seatedRows = electionRows.rows.flatMap((row) => row.parties ?? []);
+      const seatedRefs = await refs(
+        seatedRows.flatMap((row) => row.party ?? []),
+      );
+      const seatedTotals = Map.groupBy(
+        seatedRows,
+        (row) => row.party ?? (row.independent ? "independent" : ""),
+      );
+      const seatedParties = [...seatedTotals.entries()].map(([key, rows]) => {
+        let seats = 0;
+        for (const row of rows) {
+          seats += row.seats;
+        }
+        const ref = seatedRefs.get(key);
+        return {
+          label: ref?.label ?? "",
+          short: ref?.short ?? null,
+          color: ref?.color ?? null,
+          isIndependent: key === "independent",
+          seats,
+        };
+      });
+      const seatedRanked = seatedParties.toSorted((a, b) => b.seats - a.seats);
+      let seatedTotal = 0;
+      let seatedRest = 0;
+      for (const [index, party] of seatedRanked.entries()) {
+        seatedTotal += party.seats;
+        if (index >= 15) {
+          seatedRest += party.seats;
+        }
+      }
       return {
         name:
           within == null
@@ -12784,10 +12861,34 @@ export const elections = {
             path: slugs.get(row.id) ?? null,
             date: row.date,
             isStage: row.kind === "runoff" || row.kind === "indirect",
+            seats: row.seats,
+            lead:
+              row.parties?.[0] == null
+                ? null
+                : {
+                    label:
+                      row.parties[0].party == null
+                        ? ""
+                        : (seatedRefs.get(row.parties[0].party)?.short ??
+                          seatedRefs.get(row.parties[0].party)?.label ??
+                          ""),
+                    seats: row.parties[0].seats,
+                  },
           }))
           .toSorted((a, b) =>
             a.name.localeCompare(b.name, undefined, { numeric: true }),
           ),
+        seated:
+          seatedTotal === 0
+            ? null
+            : {
+                total: seatedTotal,
+                parties: seatedRanked.slice(0, 15),
+                others:
+                  seatedRanked.length > 15
+                    ? { count: seatedRanked.length - 15, seats: seatedRest }
+                    : null,
+              },
       };
     }),
   cycle: os
