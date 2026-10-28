@@ -354,8 +354,11 @@ function markdown(data: Data, link: Link) {
         ["person", m.search_group_person()],
       ] as const;
       const line = (hit: (typeof data.hits)[number]) =>
-        `- ${(hit.office == null ? [link(hit.name, hit.path), hit.context, date(hit.date)] : [link(hit.name, hit.path), hit.office]).filter((part) => part != null && part !== "").join(", ")}`;
+        `- ${(hit.ballot != null ? [link(hit.name, hit.path), m.search_ballot({ date: date(hit.ballot.date), office: hit.ballot.label })] : hit.office == null ? [link(hit.name, hit.path), hit.context, date(hit.date)] : [link(hit.name, hit.path), hit.office]).filter((part) => part != null && part !== "").join(", ")}`;
       const best = data.hits.filter((hit) => hit.isBest);
+      const similar = data.hits.some((hit) => !hit.isSimilar)
+        ? data.hits.filter((hit) => hit.isSimilar)
+        : [];
       return [
         `# ${m.search_title()}`,
         ...(data.q === ""
@@ -371,7 +374,10 @@ function markdown(data: Data, link: Link) {
                     ]),
                 ...groups.flatMap(([type, heading]) => {
                   const hits = data.hits.filter(
-                    (hit) => hit.type === type && !hit.isBest,
+                    (hit) =>
+                      hit.type === type &&
+                      !hit.isBest &&
+                      !similar.includes(hit),
                   );
                   return hits.length === 0
                     ? []
@@ -380,6 +386,12 @@ function markdown(data: Data, link: Link) {
                         hits.map((hit) => line(hit)).join("\n"),
                       ];
                 }),
+                ...(similar.length === 0
+                  ? []
+                  : [
+                      `## ${m.search_similar()}`,
+                      similar.map((hit) => line(hit)).join("\n"),
+                    ]),
               ]),
       ];
     }

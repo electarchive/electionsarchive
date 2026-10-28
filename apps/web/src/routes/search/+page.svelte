@@ -25,6 +25,12 @@
 
   const best = $derived(data.hits.find((hit) => hit.isBest) ?? null);
 
+  const similar = $derived(
+    data.hits.some((hit) => !hit.isSimilar)
+      ? data.hits.filter((hit) => hit.isSimilar && hit.path != null)
+      : [],
+  );
+
   const groups = $derived(
     GROUPS.map((group) => ({
       ...group,
@@ -32,7 +38,11 @@
         (hit) => hit.type === group.type && !hit.isBest,
       ),
       hits: data.hits.filter(
-        (hit) => hit.type === group.type && hit.path != null && !hit.isBest,
+        (hit) =>
+          hit.type === group.type &&
+          hit.path != null &&
+          !hit.isBest &&
+          !similar.includes(hit),
       ),
     }))
       .filter((group) => group.hits.length > 0)
@@ -47,6 +57,69 @@
   <link rel="canonical" href="{page.url.origin}{page.url.pathname}" />
   <meta name="robots" content="noindex" />
 </svelte:head>
+
+{#snippet entry(
+  hit: PageData["hits"][number],
+  Icon: (typeof GROUPS)[number]["icon"],
+)}
+  <li class="border-be border-border/60">
+    <a
+      class="grid grid-cols-[auto_minmax(0,1fr)] items-baseline gap-x-2.5 py-2 hover:bg-secondary"
+      href={resolve("/[...path]", { path: hit.path ?? "" })}
+    >
+      {#if hit.type !== "person"}
+        <Icon
+          class="self-center text-muted-foreground block-4 inline-4"
+          aria-hidden="true"
+        />
+      {:else if hit.photo == null}
+        <span
+          class="row-span-2 grid place-items-center self-center rounded-full bg-muted text-muted-foreground block-9 inline-9"
+          aria-hidden="true"
+        >
+          <Icon class="block-4 inline-4" />
+        </span>
+      {:else}
+        <img
+          class="row-span-2 self-center rounded-full bg-muted object-cover object-top block-9 inline-9"
+          src={hit.photo}
+          alt=""
+          loading="lazy"
+          width="36"
+          height="36"
+        />
+      {/if}
+      <span class="line-clamp-2 font-semibold text-pretty">{hit.name}</span>
+      {#if hit.ballot != null}
+        <span
+          class="col-start-2 truncate text-[0.8125rem] text-muted-foreground"
+          >{m.search_ballot({
+            date: date(hit.ballot.date),
+            office: hit.ballot.label,
+          })}</span
+        >
+      {:else if hit.office != null}
+        <span
+          class="col-start-2 truncate text-[0.8125rem] text-muted-foreground"
+          >{hit.office}</span
+        >
+      {:else if hit.context != null || hit.date != null}
+        <span
+          class="col-start-2 truncate text-[0.8125rem] text-muted-foreground"
+        >
+          {[
+            hit.type === "person" && hit.context != null
+              ? m.search_person_latest({ contest: hit.context })
+              : hit.context,
+            hit.date == null ? null : date(hit.date),
+          ]
+            .filter((part) => part != null)
+            .join(", ")}
+        </span>
+      {/if}
+    </a>
+  </li>
+{/snippet}
 
 <main class="pbe-16">
   <article class="grid grid-cols-12 gap-px overflow-clip border-be bg-border">
@@ -114,10 +187,15 @@
           <span class="self-end text-xl font-bold text-pretty">{best.name}</span
           >
           <span class="self-start text-sm text-muted-foreground"
-            >{best.office ??
-              (best.context == null
-                ? ""
-                : m.search_person_latest({ contest: best.context }))}</span
+            >{best.ballot != null
+              ? m.search_ballot({
+                  date: date(best.ballot.date),
+                  office: best.ballot.label,
+                })
+              : (best.office ??
+                (best.context == null
+                  ? ""
+                  : m.search_person_latest({ contest: best.context })))}</span
           >
         </a>
       </section>
@@ -133,60 +211,32 @@
         </h2>
         <ul class="grid gap-x-6 md:grid-cols-2">
           {#each group.hits as hit (hit.id)}
-            <li class="border-be border-border/60">
-              <a
-                class="grid grid-cols-[auto_minmax(0,1fr)] items-baseline gap-x-2.5 py-2 hover:bg-secondary"
-                href={resolve("/[...path]", { path: hit.path ?? "" })}
-              >
-                {#if group.type !== "person"}
-                  <group.icon
-                    class="self-center text-muted-foreground block-4 inline-4"
-                    aria-hidden="true"
-                  />
-                {:else if hit.photo == null}
-                  <span
-                    class="row-span-2 grid place-items-center self-center rounded-full bg-muted text-muted-foreground block-9 inline-9"
-                    aria-hidden="true"
-                  >
-                    <group.icon class="block-4 inline-4" />
-                  </span>
-                {:else}
-                  <img
-                    class="row-span-2 self-center rounded-full bg-muted object-cover object-top block-9 inline-9"
-                    src={hit.photo}
-                    alt=""
-                    loading="lazy"
-                    width="36"
-                    height="36"
-                  />
-                {/if}
-                <span class="line-clamp-2 font-semibold text-pretty"
-                  >{hit.name}</span
-                >
-                {#if hit.office != null}
-                  <span
-                    class="col-start-2 truncate text-[0.8125rem] text-muted-foreground"
-                    >{hit.office}</span
-                  >
-                {:else if hit.context != null || hit.date != null}
-                  <span
-                    class="col-start-2 truncate text-[0.8125rem] text-muted-foreground"
-                  >
-                    {[
-                      hit.type === "person" && hit.context != null
-                        ? m.search_person_latest({ contest: hit.context })
-                        : hit.context,
-                      hit.date == null ? null : date(hit.date),
-                    ]
-                      .filter((part) => part != null)
-                      .join(", ")}
-                  </span>
-                {/if}
-              </a>
-            </li>
+            {@render entry(hit, group.icon)}
           {/each}
         </ul>
       </section>
     {/each}
+
+    {#if similar.length > 0}
+      <section
+        class="col-span-12 grid gap-2 bg-card px-3.5 pbs-3 pbe-3.5"
+        aria-labelledby="search-similar"
+      >
+        <h2
+          id="search-similar"
+          class="text-[0.8125rem] font-medium text-muted-foreground"
+        >
+          {m.search_similar()}
+        </h2>
+        <ul class="grid gap-x-6 md:grid-cols-2">
+          {#each similar as hit (hit.id)}
+            {@render entry(
+              hit,
+              GROUPS.find((group) => group.type === hit.type)?.icon ?? VoteIcon,
+            )}
+          {/each}
+        </ul>
+      </section>
+    {/if}
   </article>
 </main>

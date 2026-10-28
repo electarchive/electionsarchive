@@ -1073,6 +1073,8 @@
   "search_group_person": "People",
   "search_best": "Best match",
   "search_person_latest": "Latest: {contest}",
+  "search_similar": "Similar names",
+  "search_ballot": "On the ballot {date}: {office}",
   "card_open": "View full page",
   "explain_preview": "Preview",
   "person_ran": "Elections",

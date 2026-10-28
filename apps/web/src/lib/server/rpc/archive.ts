@@ -19911,7 +19911,9 @@ export const search = {
           date: v.nullable(v.string()),
           photo: v.nullable(v.string()),
           office: v.nullable(v.string()),
+          ballot: v.nullable(v.object({ date: v.string(), label: v.string() })),
           isBest: v.boolean(),
+          isSimilar: v.boolean(),
         }),
       ),
     )
@@ -20036,6 +20038,7 @@ export const search = {
         boost: number | null;
         office: string | null;
         isExecutive: boolean | null;
+        matched: boolean;
       }>(sql`
         with q as (select lower(unaccent(${q})) as t),
         terms as (
@@ -20107,7 +20110,7 @@ export const search = {
           order by score desc nulls last, el.date_from desc nulls last limit 200
         ),
         top as (
-          select t.entity_id, t.type, t.score
+          select t.entity_id, t.type, t.matched, t.score
             + (t.matched and q.t like '% %' and exists (
               select from name n where n.entity_id = t.entity_id and n.kind <> 'short' and lower(unaccent(n.text)) = q.t
             ))::int
@@ -20125,14 +20128,14 @@ export const search = {
               when t.polity_id is not null then coalesce((
                 select case when y.kind in ('sovereign_state', 'supranational') then 0.3 when y.kind = 'federal_unit' then 0.25 end
                 from polity y where y.id = t.polity_id), (
-                select least(0.3, greatest(0, 0.1 * (log(max(g.population)) - 4)))
+                select least(0.3, greatest(0, 0.1 * (log(greatest(max(g.population), 1)) - 4)))
                 from coverage_government g where g.polity_id = t.polity_id), 0)
               else 0
             end as score
           from tiered t cross join q
           order by score desc nulls last, t.date_from desc nulls last limit ${room * 2}
         )
-        select top.entity_id as id, top.type::text as type, x.target, x.context,
+        select top.entity_id as id, top.type::text as type, top.matched, x.target, x.context,
           coalesce(x.date, (select e.date_from from contest c join election e on e.id = c.election_id where c.id = x.target and top.type = 'person'))::text as date,
           case when top.type = 'person' then (select d.rank_boost from search_document d where d.entity_id = top.entity_id) end as boost,
           best.id as office, best.rank >= 2 as "isExecutive"
@@ -20200,6 +20203,7 @@ export const search = {
         boost: null,
         office: null,
         isExecutive: null,
+        matched: true,
         isClose: row.isClose,
       }));
       const rows = [
@@ -20207,10 +20211,27 @@ export const search = {
         ...found.rows.filter((row) => row.target != null),
         ...bodies.filter((row) => !row.isClose),
       ];
+      const upcoming = new Map(
+        (
+          await db.execute<{ person: string; date: string; seat: string }>(sql`
+            select distinct on (cy.person_id) cy.person_id as person, e.date_from::text as date, coalesce(c.office_id, c.body_id) as seat
+            from candidacy cy
+            join contest_option o on o.id = cy.option_id
+            join contest c on c.id = o.contest_id and c.party_scope_id is null and coalesce(c.office_id, c.body_id) is not null
+            join election e on e.id = c.election_id and e.kind <> 'primary' and e.status = 'scheduled' and e.date_from >= current_date
+            where cy.person_id = any(${sql.param(rows.flatMap((row) => (row.type === "person" ? [row.id] : [])))}::uuid[]) and cy.role = 'head'
+            order by cy.person_id, e.date_from
+          `)
+        ).rows.map((row) => [row.person, row]),
+      );
       const ids = rows.flatMap((row) =>
-        [row.id, row.target, row.context, row.office].filter(
-          (id) => id != null,
-        ),
+        [
+          row.id,
+          row.target,
+          row.context,
+          row.office,
+          upcoming.get(row.id)?.seat,
+        ].filter((id) => id != null),
       );
       const [labels, slugs, faces, peers] = await Promise.all([
         names(
@@ -20232,44 +20253,52 @@ export const search = {
         ),
       ]);
       const ranked = rows
-        .map((row) => ({
-          id: row.id,
-          type: row.type,
-          name: labels.full.get(row.id) ?? "",
-          path:
-            row.type === "body" &&
-            slugs.get(row.context ?? "") != null &&
-            peers.get(row.id) != null
-              ? `chambers/${slugs.get(row.context ?? "")}/${peers.get(row.id)}`
-              : ["person", "party", "body"].includes(row.type)
-                ? `id/${row.id}`
-                : (slugs.get(row.target ?? "") ?? null),
-          context:
-            [
-              labels.full.get(
-                (row.type === "person"
-                  ? row.isExecutive === true
-                    ? row.office
-                    : row.target
-                  : row.context) ?? "",
-              ),
-              row.type === "body"
-                ? units.find(
-                    (entry) =>
-                      entry.code ===
-                      /^us\/([a-z]{2})\/./u.exec(
-                        slugs.get(row.context ?? "") ?? "",
-                      )?.[1],
-                  )?.label
-                : undefined,
-            ]
-              .filter((part) => part != null)
-              .join(", ") || null,
-          date: row.isExecutive === true ? null : row.date,
-          photo: faces.get(row.id)?.src ?? null,
-          office: labels.full.get(row.office ?? "") ?? null,
-          boost: row.boost,
-        }))
+        .map((row) => {
+          const next = upcoming.get(row.id);
+          return {
+            id: row.id,
+            type: row.type,
+            name: labels.full.get(row.id) ?? "",
+            path:
+              row.type === "body" &&
+              slugs.get(row.context ?? "") != null &&
+              peers.get(row.id) != null
+                ? `chambers/${slugs.get(row.context ?? "")}/${peers.get(row.id)}`
+                : ["person", "party", "body"].includes(row.type)
+                  ? `id/${row.id}`
+                  : (slugs.get(row.target ?? "") ?? null),
+            context:
+              [
+                labels.full.get(
+                  (row.type === "person"
+                    ? row.isExecutive === true
+                      ? row.office
+                      : row.target
+                    : row.context) ?? "",
+                ),
+                row.type === "body"
+                  ? units.find(
+                      (entry) =>
+                        entry.code ===
+                        /^us\/([a-z]{2})\/./u.exec(
+                          slugs.get(row.context ?? "") ?? "",
+                        )?.[1],
+                    )?.label
+                  : undefined,
+              ]
+                .filter((part) => part != null)
+                .join(", ") || null,
+            date: row.isExecutive === true ? null : row.date,
+            photo: faces.get(row.id)?.src ?? null,
+            office: labels.full.get(row.office ?? "") ?? null,
+            ballot:
+              next == null
+                ? null
+                : { date: next.date, label: labels.full.get(next.seat) ?? "" },
+            boost: row.boost,
+            isSimilar: !row.matched,
+          };
+        })
         .filter((row) => row.path != null && row.name !== "")
         .toSorted(
           (a, b) =>
@@ -20337,7 +20366,9 @@ export const search = {
         date: row.date,
         photo: row.photo,
         office: row.office,
+        ballot: row.ballot,
         isBest: row === best,
+        isSimilar: row.isSimilar,
       }));
     }),
 };
