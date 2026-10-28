@@ -3262,7 +3262,7 @@ async function tabulate(
       const item = legend.get(entry.key) ?? {
         key: entry.key,
         label: entry.label,
-        short: entry.short,
+        short: entry.key.startsWith("alliance:") ? null : entry.short,
         color: entry.color,
         person: null,
         party: null,
