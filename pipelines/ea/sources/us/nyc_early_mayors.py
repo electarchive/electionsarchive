@@ -15,6 +15,7 @@ VERSION = "1"
 PARSED = DATA / "parsed" / SOURCE
 API = "https://en.wikipedia.org/w/api.php?"
 SPECIALS = {1932: date(1932, 11, 8), 1950: date(1950, 11, 7)}
+PRIMARIES = {1925: date(1925, 9, 15), 1937: date(1937, 9, 16), 1941: date(1941, 9, 16), 1977: date(1977, 9, 8)}
 YEARS = sorted([*range(1897, 1986, 4), *SPECIALS])
 CITYWIDE = {
     "comptroller": ("Comptroller", "new-york-city:comptroller", (1993, 1997)),
@@ -125,19 +126,34 @@ def parse() -> None:
                 {"year": year, "candidate": name, "line": line, "votes": votes, "won": name == "Jimmy Walker"}
                 for name, line, votes in TABLE_1925
             )
-            continue
-        general = next(
-            box
+        boxes = [
+            (box.group(0), "general", "")
             for box in re.finditer(
                 r"\{\{Election box begin.*?\{\{Election box end\}\}", wikitext, re.DOTALL | re.IGNORECASE
             )
-            if re.search(r"title\s*=[^\n]*mayoral election", box.group(0), re.IGNORECASE)
-        ).group(0)
-        for kind, body in re.findall(
-            r"\{\{Election box (winning candidate|candidate)[^|{]*?\s*\n?\s*\|(.*?)\}\}\s*(?=\n|$)",
-            general,
-            re.DOTALL | re.IGNORECASE,
-        ):
+            if year != 1925 and re.search(r"title\s*=[^\n]*mayoral election", box.group(0), re.IGNORECASE)
+        ][:1]
+        if year in PRIMARIES:
+            boxes += [
+                (box.group(0), "primary", heading[1])
+                for box in re.finditer(
+                    r"\{\{Election box begin.*?\{\{Election box end\}\}", wikitext, re.DOTALL | re.IGNORECASE
+                )
+                if (
+                    heading := re.search(
+                        r"title\s*=\s*\d{4} (Democratic|Republican) mayoral primary(?! runoff)", box.group(0)
+                    )
+                )
+            ]
+        for stage, party, kind, body in [
+            (stage, party, kind, body)
+            for box, stage, party in boxes
+            for kind, body in re.findall(
+                r"\{\{Election box (winning candidate|candidate)[^|{]*?\s*\n?\s*\|(.*?)\}\}\s*(?=\n|$)",
+                box,
+                re.DOTALL | re.IGNORECASE,
+            )
+        ]:
             fields = {
                 key.strip(): value.strip()
                 for part in re.split(r"\n?\s*\|\s*(?=\w+\s*=)", "|" + body)
@@ -150,9 +166,11 @@ def parse() -> None:
                 {
                     "year": year,
                     "candidate": NAMES.get(name, name),
-                    "line": re.sub(r"\s+", " ", text(fields["party"])),
+                    "line": f"{party} Party" if party else re.sub(r"\s+", " ", text(fields["party"])),
                     "votes": int(votes) if votes else None,
                     "won": kind.lower() == "winning candidate",
+                    "stage": stage,
+                    "party": party,
                 }
             )
     for office, (label, _, years) in CITYWIDE.items():
@@ -220,6 +238,8 @@ def parse() -> None:
                     )
     for row in rows:
         row.setdefault("office", "mayor")
+        row.setdefault("stage", "general")
+        row.setdefault("party", "")
     PARSED.mkdir(parents=True, exist_ok=True)
     pl.DataFrame(rows, infer_schema_length=None).write_parquet(PARSED / "lines.parquet")
     pl.DataFrame(boroughs).write_parquet(PARSED / "boroughs.parquet")
@@ -274,14 +294,35 @@ def emit() -> Path:
             "mayor": ("mayoral election", owner),
             **{office: (f"{label} election", cs.key("us.office", key)) for office, (label, key, _) in CITYWIDE.items()},
         }
-        for (year, office_slug), rows in frame.group_by(["year", "office"], maintain_order=True):
+        for (year, office_slug, stage, scope), rows in frame.group_by(
+            ["year", "office", "stage", "party"], maintain_order=True
+        ):
             office_label, office_id = offices[office_slug]
             first = date(year, 11, 1)
-            day = SPECIALS.get(year, first + timedelta(days=(0 - first.weekday()) % 7 + 1))
-            kind = "general" if year % 2 == 0 else "local"
-            parent_key = f"{day}:NY"
-            parent = cs.key("us.election", parent_key)
-            if parent in cs.minted:
+            primary = stage == "primary"
+            day = (
+                PRIMARIES[year]
+                if primary
+                else SPECIALS.get(year, first + timedelta(days=(0 - first.weekday()) % 7 + 1))
+            )
+            kind = "primary" if primary else "general" if year % 2 == 0 else "local"
+            if primary:
+                election = cs.key("us.election", f"{day}:new-york-city:primary")
+                if election in cs.minted and election not in seen:
+                    seen.add(election)
+                    cs.add(
+                        "election",
+                        id=election,
+                        polity_id=polity,
+                        kind="primary",
+                        date_from=day,
+                        date_to=day,
+                        date_precision="day",
+                        status="held",
+                    )
+                    name(election, f"{year} New York City primary election")
+                    cs.add("slug", path=f"{polity_path}/{day}-primary", entity_id=election)
+            elif (parent := cs.key("us.election", f"{day}:NY")) in cs.minted:
                 cs.add(
                     "election",
                     id=parent,
@@ -294,8 +335,9 @@ def emit() -> Path:
                 )
                 name(parent, f"{year} New York {kind} elections")
                 cs.add("slug", path=f"us/ny/{day}-{kind}", entity_id=parent)
-            election = cs.key("us.election", f"{day}:NY:3651000")
-            if election in cs.minted:
+            if not primary:
+                election = cs.key("us.election", f"{day}:NY:3651000")
+            if not primary and election in cs.minted:
                 cs.add(
                     "election",
                     id=election,
@@ -309,9 +351,10 @@ def emit() -> Path:
                 )
                 name(election, f"{year} New York City {kind} election")
                 cs.add("slug", path=f"{polity_path}/{day}-{kind}", entity_id=election)
-            contest_key = f"nyc_early_mayors:{day}:NY:3651000:{office_slug}"
+            suffix = f"-{scope.lower()}" if primary else ""
+            contest_key = f"nyc_early_mayors:{day}:{'primary:' if primary else ''}NY:3651000:{office_slug}{suffix}"
             contest = cs.key("us.contest", contest_key)
-            path = f"{polity_path}/{day}-{kind}/{office_slug}"
+            path = f"{polity_path}/{day}-{kind}/{office_slug}{suffix}"
             if path in taken and contest in cs.minted:
                 raise ValueError(f"{path} is already taken")
             cs.add(
@@ -320,7 +363,7 @@ def emit() -> Path:
                 election_id=election,
                 kind="office",
                 office_id=office_id,
-                party_scope_id=None,
+                party_scope_id=cs.key("us.party", PARTIES[scope]) if primary else None,
                 district_area_id=cs.area("us.place", "3651000"),
                 magnitude=1,
                 round_number=1,
@@ -331,7 +374,7 @@ def emit() -> Path:
             )
             name(
                 contest,
-                f"{year} New York City {'special ' if year in SPECIALS else ''}{office_label}",
+                f"{year} {scope + ' primary for ' if primary else ''}New York City {'special ' if year in SPECIALS else ''}{office_label}",
             )
             cs.add("slug", path=path, entity_id=contest)
             result_set = cs.key(f"{SOURCE}.result_set", contest_key)
@@ -358,7 +401,10 @@ def emit() -> Path:
                 votes = int(total[0] if len(total) else counted["votes"].sum())
                 if votes:
                     candidates.append((candidate, counted["line"][0], votes, bool(lines["won"].any())))
-            if not any(won for *_, won in candidates):
+            if primary:
+                everyone = sum(votes for _, _, votes, _ in candidates)
+                candidates = [(*candidate[:3], candidate[2] * 2 > everyone) for candidate in candidates]
+            elif not any(won for *_, won in candidates):
                 top = max(candidates, key=lambda candidate: candidate[2])
                 candidates = [(*candidate[:3], candidate == top) for candidate in candidates]
             for candidate, line, votes, won in candidates:
