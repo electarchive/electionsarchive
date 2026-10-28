@@ -451,6 +451,18 @@ AR_VOICES = {date(2008, 11, 4): "Voices%20of%20Ark%202008-WEB2.pdf"}
 SD = "https://sdsos.gov/elections-voting/assets/Archive/Prior%20to%202026/"
 SD_SHEETS = {date(2000, 11, 7): "00SWgenres.xls"}
 SD_PRECINCTS = {date(2010, 11, 2): "pastelections_general2010_bqpct.xls"}
+SD_OLD = "https://web.archive.org/web/{}id_/http://www.state.sd.us:80/sos/{}"
+SD_NEW = "https://web.archive.org/web/{}id_/http://www.sdsos.gov/electionsvoteregistration/{}"
+SD_PAGES = {
+    date(2001, 6, 5): (SD_NEW.format("20110612195100", "pastelections_electioninfo01_specialelecreturns.shtm"),),
+    date(2002, 11, 5): (
+        SD_OLD.format("20030831122516", "2002/02amendAB.htm"),
+        SD_OLD.format("20030831122357", "2002/02amendC.htm"),
+        SD_OLD.format("20030831123531", "2002/02init1.htm"),
+    ),
+    date(2004, 11, 2): (SD_NEW.format("20110416214306", "pastelections_electioninfo04_GEballotquestionreturns.shtm"),),
+    date(2006, 11, 7): (SD_NEW.format("20110416214157", "pastelections_electioninfo06_GEballotquestions.shtm"),),
+}
 SD_SCANS = {
     "sd-measures-2008": "https://sdsos.gov/elections-voting/assets/Archive/2002-2011Assets/2008OfficialGeneralElectionStateCanvass.pdf"
 }
@@ -652,6 +664,9 @@ def fetch() -> None:
         time.sleep(1)
     for url in SD_SCANS.values():
         raw.fetch(SOURCE, url, suffix=".pdf")
+    for url in (url for urls in SD_PAGES.values() for url in urls):
+        raw.fetch(SOURCE, url, suffix=".htm")
+        time.sleep(1)
     for name in AR_SHEETS.values():
         raw.fetch(SOURCE, AR + name, suffix=".xlsx")
     for name in AR_PUBLICATIONS.values():
@@ -1784,6 +1799,75 @@ def south_dakota() -> list[dict[str, object]]:
             }
             for label, county, answer, votes in sheet.iter_rows()
         )
+    for day, urls in SD_PAGES.items():
+        for url in urls:
+            page = raw.cached(SOURCE, url).path.read_bytes().decode("latin-1")
+            page = re.sub(r"(?is)<(script|style).*?</\1>", "", page)
+            tokens = [
+                text
+                for cell in re.split(r"<[^>]+>", page)
+                if (text := re.sub(r"\s+", " ", html.unescape(cell)).strip())
+            ]
+            labels: list[str] = []
+            kind = ""
+            at = 0
+            while at < len(tokens):
+                token = tokens[at]
+                if (whole := re.fullmatch(r"(?i)initiat\w* measure (\d{1,2})", token)) and token not in tokens[
+                    : at - 1
+                ]:
+                    labels.append(f"Initiated Measure {whole[1]}")
+                elif re.search(r"(?i)amend|initiat|ref+er", token):
+                    kind = token
+                elif re.fullmatch(r"[A-Z]|\d{1,2}", token) and (
+                    re.search(r"(?i)amend|initiat|ref+er", tokens[at - 1])
+                    or re.fullmatch(r"[A-Z]|\d{1,2}", tokens[at - 1])
+                ):
+                    labels.append(
+                        f"Constitutional Amendment {token}"
+                        if token.isalpha()
+                        else f"Referred Law {token}"
+                        if re.search(r"(?i)ref+er", kind)
+                        else f"Initiated Measure {token}"
+                    )
+                elif token in ("AURORA", "Aurora") and not tokens[at - 1].replace(",", "").isdigit():
+                    merged: dict[str, list[int]] = {}
+                    while tokens[at] != "PERCENTAGE" and tokens[at + 1].replace(",", "").isdigit():
+                        end = at + 1
+                        while end < len(tokens) and tokens[end].replace(",", "").isdigit():
+                            end += 1
+                        merged.setdefault(tokens[at], []).extend(
+                            int(cell.replace(",", "")) for cell in tokens[at + 1 : end]
+                        )
+                        at = end
+                    totals = merged.pop("TOTALS")
+                    counties = list(merged.items())
+                    width = len(totals)
+                    taken, labels = labels[: width // 2], labels[width // 2 :]
+                    if (
+                        len(taken) * 2 != width
+                        or len(counties) != 66
+                        or [sum(column) for column in zip(*(v for _, v in counties), strict=True)] != totals
+                    ):
+                        raise ValueError(f"{url}: {taken}, {len(counties)} counties, or columns off their totals")
+                    rows.extend(
+                        {
+                            "state": "SD",
+                            "day": day,
+                            "number": label.rsplit(" ", 1)[1],
+                            "label": label,
+                            "url": url,
+                            "county": county,
+                            "answer": answer,
+                            "votes": values[2 * position + offset],
+                        }
+                        for position, label in enumerate(taken)
+                        for offset, answer in enumerate(("YES", "NO"))
+                        for county, values in counties
+                    )
+                at += 1
+            if labels:
+                raise ValueError(f"{url}: {labels} left without a table")
     for name, url in SD_SCANS.items():
         contests = json.loads((SCANS / f"{name}.json").read_text())["contests"]
         if not (DATA / "parsed" / "us.scans" / name / "tables.parquet").exists():
@@ -2104,6 +2188,7 @@ def parse() -> None:
                 for rows in (
                     pool.filter(kind, pl.col("measure") == label),
                     pool.filter(kind, pl.col("number") == number),
+                    pool.filter(kind, pl.lit(state) == "SD", pl.col("measure").str.ends_with(f" {number}")),
                     pool.filter(kind, pl.col("number").is_null()),
                     pool.filter(pl.col("number") == number),
                     pool.filter(pl.col("number").is_null()),

@@ -71,10 +71,10 @@
    "id": "Ga",
    "orientation": "counties_down",
    "crop": [
-    0.12,
-    0.1,
+    0.03,
+    0.08,
     0.62,
-    0.87
+    0.94
    ],
    "hint": "Read only the county table in this image (Yes and No columns); ignore the Total column and the percentages in the Total row's Yes and No cells.",
    "columns": [
@@ -95,7 +95,7 @@
    "id": "Gb",
    "orientation": "counties_down",
    "crop": [
-    0.12,
+    0.03,
     0.1,
     0.62,
     0.33
@@ -119,10 +119,10 @@
    "id": "Ha",
    "orientation": "counties_down",
    "crop": [
-    0.12,
-    0.1,
+    0.03,
+    0.08,
     0.62,
-    0.87
+    0.94
    ],
    "hint": "Read only the county table in this image (Yes and No columns); ignore the Total column and the percentages in the Total row's Yes and No cells.",
    "columns": [
@@ -143,7 +143,7 @@
    "id": "Hb",
    "orientation": "counties_down",
    "crop": [
-    0.12,
+    0.03,
     0.1,
     0.62,
     0.33
@@ -167,10 +167,10 @@
    "id": "Ia",
    "orientation": "counties_down",
    "crop": [
-    0.12,
-    0.1,
+    0.03,
+    0.08,
     0.62,
-    0.87
+    0.94
    ],
    "hint": "Read only the county table in this image (Yes and No columns); ignore the Total column and the percentages in the Total row's Yes and No cells.",
    "columns": [
@@ -191,7 +191,7 @@
    "id": "Ib",
    "orientation": "counties_down",
    "crop": [
-    0.12,
+    0.03,
     0.1,
     0.62,
     0.33
@@ -215,10 +215,10 @@
    "id": "Ja",
    "orientation": "counties_down",
    "crop": [
-    0.12,
-    0.1,
+    0.03,
+    0.08,
     0.62,
-    0.87
+    0.94
    ],
    "hint": "Read only the county table in this image (Yes and No columns); ignore the Total column and the percentages in the Total row's Yes and No cells.",
    "columns": [
@@ -239,7 +239,7 @@
    "id": "Jb",
    "orientation": "counties_down",
    "crop": [
-    0.12,
+    0.03,
     0.1,
     0.62,
     0.33
@@ -263,10 +263,10 @@
    "id": "9a",
    "orientation": "counties_down",
    "crop": [
-    0.12,
-    0.1,
+    0.03,
+    0.08,
     0.62,
-    0.87
+    0.94
    ],
    "hint": "Read only the county table in this image (Yes and No columns); ignore the Total column and the percentages in the Total row's Yes and No cells.",
    "columns": [
@@ -287,7 +287,7 @@
    "id": "9b",
    "orientation": "counties_down",
    "crop": [
-    0.12,
+    0.03,
     0.1,
     0.62,
     0.33
@@ -311,10 +311,10 @@
    "id": "10a",
    "orientation": "counties_down",
    "crop": [
-    0.12,
-    0.1,
+    0.03,
+    0.08,
     0.62,
-    0.87
+    0.94
    ],
    "hint": "Read only the county table in this image (Yes and No columns); ignore the Total column and the percentages in the Total row's Yes and No cells.",
    "columns": [
@@ -335,7 +335,7 @@
    "id": "10b",
    "orientation": "counties_down",
    "crop": [
-    0.12,
+    0.03,
     0.1,
     0.62,
     0.33
@@ -359,10 +359,10 @@
    "id": "11a",
    "orientation": "counties_down",
    "crop": [
-    0.12,
-    0.1,
+    0.03,
+    0.08,
     0.62,
-    0.87
+    0.94
    ],
    "hint": "Read only the county table in this image (Yes and No columns); ignore the Total column and the percentages in the Total row's Yes and No cells.",
    "columns": [
@@ -383,7 +383,7 @@
    "id": "11b",
    "orientation": "counties_down",
    "crop": [
-    0.12,
+    0.03,
     0.1,
     0.62,
     0.33
