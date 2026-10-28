@@ -212,6 +212,7 @@ def emit() -> Path:
                 """select distinct cx.value from external_id cx join result_set rs on rs.contest_id = cx.entity_id
                    where cx.scheme = 'us.contest' and cx.value ~ '^(199[0-9]|20([01][0-9]|2[0-2]))-1[01]-\\d\\d:(NH|VT):'
                      and rs.changeset_id not in (select id from changeset where pipeline = %s)
+                     and rs.status = 'active' and rs.completeness >= 0.98
                      and exists (select 1 from result_value v join reporting_unit u on u.k = v.unit_k
                                  where v.result_set_k = rs.k and u.scheme_code = 'us.precinct')""",
                 [SOURCE],
