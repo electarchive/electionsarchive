@@ -10,7 +10,7 @@ from ea.sources.tr.ysk import INDEPENDENTS, INVALID, LICENSE, PUBLISHER, REGISTE
 from ea.store import connect
 
 SOURCE = "tr.ysk_reruns"
-VERSION = "2"
+VERSION = "3"
 FAALIYET = "https://www.ysk.gov.tr/doc/dosyalar/docs/Faaliyet_Raporlari/2024_Yili_idari_Faaliyet_Raporu.pdf"
 ANNEX_2019 = "https://www.ysk.gov.tr/doc/dosyalar/docs/2019MahalliIdareler/KesinSecimSonuclari/2019Mahalli-Ek-2.pdf"
 AA_2024 = (
@@ -105,8 +105,8 @@ OFFICIAL_SUVARLI = (
     "comes from İhlas Haber Ajansı's report in Sabah."
 )
 COUNCIL_2024 = (
-    "YSK's 2024 annual report prints the four June 2, 2024 council reruns separately, with each party's votes but not "
-    "its seats. Invalid votes are the voters minus the valid votes."
+    "YSK's 2024 annual report prints this June 2, 2024 council rerun with each party's votes but not its seats. "
+    "Invalid votes are the voters minus the valid votes."
 )
 PARTIAL_2019 = (
     "Anadolu Ajansı's election-night count lists only the leading candidates, so other parties' votes are missing."
@@ -274,6 +274,8 @@ def emit() -> Path:
             place = next(row for row in PLACES_2024.values() if row[0] == key)
             everything.append((RERUN_2024, MARCH_2024, key, place[1], place[2], place[3], None, totals, votes))
         units: dict[tuple[date, str], UUID] = {}
+        places: dict[tuple[date, str], tuple[str, str, UUID, UUID]] = {}
+        held = {(RERUN_2024, key) for key in councils} | {(SUVARLI, SUVARLI_RACE[0])}
         for day, march, key, plate, district, belde, _, totals, votes in everything:
             march_election = cs.key("tr.election", f"{march}:{key}-mayor")
             march_contest = cs.key("tr.contest", f"{march}:{key}-mayor")
@@ -301,7 +303,12 @@ def emit() -> Path:
                 status="held",
                 rerun_of_id=march_election,
             )
-            name(election, f"{day.year} {english} mayoral election rerun", "en")
+            name(
+                election,
+                f"{day.year} {english} {'local' if (day, key) in held else 'mayoral'} election rerun",
+                "en",
+            )
+            places[(day, key)] = (path, english, base[1], election)
             cs.add("slug", path=f"{path}/{day}-local", entity_id=election)
             contest_key = f"{day}:{key}-mayor"
             contest = cs.key("tr.contest", contest_key)
@@ -428,72 +435,80 @@ def emit() -> Path:
                     flags=0,
                     value=count,
                 )
-        nation = cs.area("tr.nation", "TR")
         for day, races in (
             (RERUN_2024, councils),
             (SUVARLI, {SUVARLI_RACE[0]: SUVARLI_COUNCIL}),
         ):
-            contest_key = f"{day}:municipal-councils"
-            contest = cs.key("tr.contest", contest_key)
-            cs.add(
-                "contest",
-                id=contest,
-                election_id=cycle[day],
-                kind="body_seats",
-                district_area_id=nation,
-                magnitude=None,
-                round_number=1,
-                default_result_kind="counted",
-            )
-            name(contest, "Municipal councils", "en")
-            name(contest, "Belediye Meclisi Üyeliği", kind="native")
-            cs.add("slug", path=f"tr/{day}-local-rerun/municipal-councils", entity_id=contest)
-            declared = cs.key(f"{SOURCE}.result_set", contest_key)
-            cs.add(
-                "result_set",
-                id=declared,
-                election_id=cycle[day],
-                contest_id=contest,
-                stage="official",
-                kind="counted",
-                status="active",
-                source_id=sources[day],
-                is_default=True,
-                completeness=1,
-            )
-            cs.add(
-                "note",
-                entity_id=declared,
-                kind="methodology",
-                body_md=COUNCIL_2024 if day == RERUN_2024 else OFFICIAL_SUVARLI,
-            )
-            if day == RERUN_2024:
+            pooled = conn.execute(
+                "select entity_id from external_id where scheme = 'tr.contest' and value = %s",
+                [f"{day}:municipal-councils"],
+            ).fetchone()
+            if pooled is not None:
+                cs.add(
+                    "entity_retirement",
+                    entity_id=pooled[0],
+                    reason="Each council rerun now sits in its own town's rerun election, beside the mayoral rerun.",
+                )
+            for key, (totals, votes) in sorted(races.items()):
+                path, english, district, election = places[(day, key)]
+                contest_key = f"{day}:{key}-council"
+                contest = cs.key("tr.contest", contest_key)
+                cs.add(
+                    "contest",
+                    id=contest,
+                    election_id=election,
+                    kind="body_seats",
+                    district_area_id=district,
+                    magnitude=None,
+                    round_number=1,
+                    default_result_kind="counted",
+                )
+                name(contest, f"{english} municipal council", "en")
+                name(contest, f"{english} Belediye Meclisi Üyeliği", kind="native")
+                cs.add("slug", path=f"{path}/{day}-local/municipal-council", entity_id=contest)
+                declared = cs.key(f"{SOURCE}.result_set", contest_key)
+                cs.add(
+                    "result_set",
+                    id=declared,
+                    election_id=election,
+                    contest_id=contest,
+                    stage="official",
+                    kind="counted",
+                    status="active",
+                    source_id=sources[day],
+                    is_default=True,
+                    completeness=1,
+                )
                 cs.add(
                     "note",
                     entity_id=declared,
-                    kind="caveat",
-                    body_md=f"In Pınarbaşı, the report's party rows add up to {SHORT_2024[('kayseri-pinarbasi', 'Meclis Üyeliği')]} "
-                    "votes fewer than its valid votes; those votes are counted as valid but given to no party.",
+                    kind="methodology",
+                    body_md=COUNCIL_2024 if day == RERUN_2024 else OFFICIAL_SUVARLI,
                 )
-            options: dict[str, UUID] = {}
-            for key, (totals, votes) in sorted(races.items()):
+                if (key, "Meclis Üyeliği") in SHORT_2024:
+                    cs.add(
+                        "note",
+                        entity_id=declared,
+                        kind="caveat",
+                        body_md=f"The report's party rows add up to {SHORT_2024[(key, 'Meclis Üyeliği')]} votes fewer "
+                        "than its valid votes; those votes are counted as valid but given to no party.",
+                    )
                 for label in sorted(votes):
                     owner = PARTIES[label]
-                    if label not in options:
-                        options[label] = cs.key("tr.option", f"{contest_key}:{owner or 'independents'}")
-                        cs.add(
-                            "contest_option",
-                            id=options[label],
-                            contest_id=contest,
-                            kind="independents" if owner is None else "list",
-                            party_id=parties[label],
-                            ballot_label=INDEPENDENTS if owner is None else party_names[owner],
-                        )
+                    option = cs.key("tr.option", f"{contest_key}:{owner or 'independents'}")
+                    cs.add(
+                        "contest_option",
+                        id=option,
+                        contest_id=contest,
+                        kind="independents" if owner is None else "list",
+                        party_id=parties[label],
+                        ballot_label=INDEPENDENTS if owner is None else party_names[owner],
+                    )
                     cs.add(
                         "result_value",
                         result_set_id=declared,
                         unit_id=units[(day, key)],
-                        option_id=options[label],
+                        option_id=option,
                         channel=0,
                         measure=VOTES,
                         count_round=0,
