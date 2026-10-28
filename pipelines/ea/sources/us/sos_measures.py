@@ -417,6 +417,17 @@ RI_BOOKS = {
     date(2006, 11, 7): "2006-Count-Book.pdf",
     date(2010, 11, 2): "2010-Countbook.pdf",
 }
+NE = "https://sos.nebraska.gov/sites/default/files/doc/"
+NE_BOOKS = {
+    date(2004, 11, 2): "2004%20General.pdf",
+    date(2008, 11, 4): "elections/2008/2008%20General%20Canvass%20Book.pdf",
+    date(2010, 11, 2): "elections/2010/2010%20Gen%20Canvass%20Book%2011-30-Final.pdf",
+}
+NE_HEADING = re.compile(
+    r"^\s*(?:Proposed (?:Constitutional )?Amendment|Amendment Number|Initiative Measure|Referendum Measure|"
+    r"Measure Number|No\.)\s*(\d+[A-C]?)\b",
+    re.IGNORECASE,
+)
 MISPRINTS = {("CA", date(2000, 11, 7), "38", "NO"): 3000}
 MISREPORTED = {("ME", date(2005, 11, 8), "6"), ("LA", date(2010, 10, 2), "2")}
 STATES = {
@@ -496,6 +507,11 @@ PUBLISHERS = {
         "Nevada Secretary of State",
         "Official election results",
         "https://www.nvsos.gov/sos/elections/election-information/election-results",
+    ),
+    "NE": (
+        "Nebraska Secretary of State",
+        "Official report of the Board of State Canvassers",
+        "https://sos.nebraska.gov/previous-elections",
     ),
     "RI": (ri_countbook.PUBLISHER, ri_countbook.TITLE, "https://elections.ri.gov/publications/election-publications"),
     "LA": ("Louisiana Secretary of State", "Official election results", "https://voterportal.sos.la.gov/"),
@@ -587,6 +603,8 @@ def tx_races(election: int) -> list[tuple[int, str]]:
 def fetch() -> None:
     for stamp, folder in NV_PAGES.values():
         raw.fetch(SOURCE, NV.format(stamp, folder), suffix=".html")
+    for name in NE_BOOKS.values():
+        raw.fetch(SOURCE, NE + name, suffix=".pdf")
     try:
         raw.cached(SOURCE, NCSL_PAGE)
     except LookupError:
@@ -1477,6 +1495,61 @@ def nevada() -> list[dict[str, object]]:
     return rows
 
 
+def nebraska() -> list[dict[str, object]]:
+    rows: list[dict[str, object]] = []
+    for day, name in NE_BOOKS.items():
+        text = subprocess.run(
+            ["pdftotext", "-layout", str(raw.cached(SOURCE, NE + name).path), "-"],
+            capture_output=True,
+            text=True,
+            check=True,
+        ).stdout
+        number = None
+        table = ""
+        tables: dict[str, dict[str, tuple[int, int]]] = {}
+        totals: dict[str, tuple[int, int]] = {}
+        reading = None
+        for line in text.splitlines():
+            if heading := NE_HEADING.match(line):
+                number, reading = heading[1], None
+            elif re.match(r"^\s*County\s+For\s+Against\b", line):
+                if number is None or number in tables:
+                    raise ValueError(f"{name}: a county table with no new measure heading ({number})")
+                table, reading = number, tables.setdefault(number, {})
+            elif reading is not None:
+                for county, yes, no in re.findall(
+                    r"([A-Z][A-Za-z.]*(?: [A-Z][A-Za-z.]*)*)\s+([\d,]+)\s+([\d,]+)", line
+                ):
+                    votes = (int(yes.replace(",", "")), int(no.replace(",", "")))
+                    if county.upper() == "TOTAL":
+                        totals[table] = votes
+                    else:
+                        reading[county] = votes
+                if len(reading) == 93 and table in totals:
+                    reading = None
+        for number, counties in tables.items():
+            summed = tuple(sum(votes[side] for votes in counties.values()) for side in (0, 1))
+            if len(counties) != 93 or summed != totals.get(number):
+                raise ValueError(
+                    f"{name} measure {number}: {len(counties)} counties add up to {summed}, not {totals.get(number)}"
+                )
+            rows.extend(
+                {
+                    "state": "NE",
+                    "day": day,
+                    "number": number,
+                    "label": "",
+                    "url": NE + name,
+                    "county": county,
+                    "answer": answer,
+                    "votes": votes[side],
+                }
+                for county, votes in counties.items()
+                for side, answer in enumerate(("YES", "NO"))
+            )
+    return rows
+
+
 def rhode_island() -> list[dict[str, object]]:
     def town(text: str) -> str:
         text = re.sub(
@@ -1663,6 +1736,7 @@ def parse() -> None:
             *ohio(),
             *rhode_island(),
             *nevada(),
+            *nebraska(),
         ]
     )
     words = re.compile(r"[a-z]{4,}")
