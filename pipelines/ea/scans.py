@@ -1583,7 +1583,7 @@ def emit(name: str) -> Path:
             strict=not manifest.get("authoritative_loose"),
             authoritative=manifest.get("authoritative"),
             extend=bool(manifest.get("extend")),
-            restage=bool(manifest.get("restage")),
+            restage=bool(manifest.get("restage")) or "EA_SCANS_RESTAGE" in os.environ,
         )
         targets = {row["id"]: row["contest_id"] for row in cs.rows.get("result_set", [])}
         for held, contest in conn.execute(

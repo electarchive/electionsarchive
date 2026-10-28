@@ -5,6 +5,7 @@ import itertools
 import json
 import re
 import subprocess
+import tempfile
 import time
 import zipfile
 from datetime import UTC, date, datetime
@@ -14,6 +15,7 @@ from uuid import UUID
 import fastexcel
 import httpx
 import polars as pl
+from PIL import Image
 
 from ea import raw
 from ea.changeset import Changeset, slug
@@ -422,17 +424,30 @@ NE_BOOKS = {
     date(2004, 11, 2): "2004%20General.pdf",
     date(2008, 11, 4): "elections/2008/2008%20General%20Canvass%20Book.pdf",
     date(2010, 11, 2): "elections/2010/2010%20Gen%20Canvass%20Book%2011-30-Final.pdf",
+    date(2008, 5, 13): "elections/2008/2008%20primary%20official%20results.pdf",
+    date(2010, 5, 11): "elections/2010/Canvas%20PR10%20After%20Recount%20Final.pdf",
 }
+NE_SCANS = {
+    "ne-measures-2000": "elections/2000/2000%20General.pdf",
+    "ne-measures-2006": "2006%20General.pdf",
+    "ne-measures-2006-primary": "2006%20Primary.pdf",
+}
+SCANS = Path(__file__).resolve().parents[3] / "scans"
+BALLOT_LABELS = {("NE", date(2006, 11, 7), "422"): ("Retain", "Repeal")}
 NE_HEADING = re.compile(
     r"^\s*(?:Proposed (?:Constitutional )?Amendment|Amendment Number|Initiative Measure|Referendum Measure|"
-    r"Measure Number|No\.)\s*(\d+[A-C]?)\b",
+    r"Measure Number|No\.)\s*(?:No\.\s*)?(\d+[A-C]?)\b",
     re.IGNORECASE,
 )
 AR = "https://www.sos.arkansas.gov/uploads/elections/"
 AR_BOOKS = {
     date(2000, 11, 7): "2000_Certified_General_Election_Results.pdf",
     date(2002, 11, 5): "2002_General.pdf",
+    date(2004, 11, 2): "2004_General_Election_and_Non-Partisan_Judicial_Runoff_Certification_Report.pdf",
 }
+AR_SHEETS = {date(2010, 11, 2): "2010_General_Election_Results_-_Fed%2C_State_-_by_Polling_Location.xlsx"}
+AR_PUBLICATIONS = {date(2006, 11, 7): "20070308_ARSOS_2006_Elections_Publication_Final__Revised.xls"}
+AR_VOICES = {date(2008, 11, 4): "Voices%20of%20Ark%202008-WEB2.pdf"}
 MISPRINTS = {("CA", date(2000, 11, 7), "38", "NO"): 3000}
 MISREPORTED = {("ME", date(2005, 11, 8), "6"), ("LA", date(2010, 10, 2), "2")}
 STATES = {
@@ -555,6 +570,10 @@ MAINE = (
 LIMITED = (
     " Limited ballots, which Rhode Island counts by limited district rather than by town, are a unit of their own."
 )
+SCANNED = (
+    " The county figures were read from the scanned canvass book by a vision model and checked against the book's "
+    "printed state totals; the box shown on each figure is approximate."
+)
 OVERSEAS = " Overseas and military (UOCAVA) ballots, which Maine tabulates statewide, are a unit of their own."
 
 
@@ -613,10 +632,14 @@ def tx_races(election: int) -> list[tuple[int, str]]:
 def fetch() -> None:
     for stamp, folder in NV_PAGES.values():
         raw.fetch(SOURCE, NV.format(stamp, folder), suffix=".html")
-    for name in NE_BOOKS.values():
+    for name in [*NE_BOOKS.values(), *NE_SCANS.values()]:
         raw.fetch(SOURCE, NE + name, suffix=".pdf")
-    for name in AR_BOOKS.values():
+    for name in [*AR_BOOKS.values(), *AR_VOICES.values()]:
         raw.fetch(SOURCE, AR + name, suffix=".pdf")
+    for name in AR_SHEETS.values():
+        raw.fetch(SOURCE, AR + name, suffix=".xlsx")
+    for name in AR_PUBLICATIONS.values():
+        raw.fetch(SOURCE, AR + name, suffix=".xls")
     try:
         raw.cached(SOURCE, NCSL_PAGE)
     except LookupError:
@@ -1531,16 +1554,26 @@ def arkansas() -> list[dict[str, object]]:
                 for county, a, b in re.findall(r"(?m)^\s*(.+?) County\s+(\d+)\s+(\d+)\s*$", body):
                     table.setdefault(county, (int(a), int(b)))
         else:
-            for kind, number, county, yes, no in re.findall(
-                r"(?m)^Proposed (Constitutional Amendment|Initiated Act) No\. (\d+)(?: \((.+?) County\))?\s*\n"
-                r"(?:.*\n){0,6}?For\s+([\d,]+)[^\n]*\n\s*Against\s+([\d,]+)",
-                text,
-            ):
-                votes = (int(yes.replace(",", "")), int(no.replace(",", "")))
-                if not county:
-                    totals.setdefault((kind, number), votes)
-                else:
-                    counties.setdefault((kind, number), {})[county] = votes
+            current: tuple[str, str, str | None] | None = None
+            seen: dict[str, int] = {}
+            for line in text.splitlines():
+                if heading := re.match(
+                    r"^(?:Proposed )?(Constitutional Amendment|Initiated Act|Referred Question) No\. (\d+)"
+                    r"(?: \((.+?) County\))?\s*$",
+                    line,
+                ):
+                    if not (heading[3] is None and current is not None and current[:2] == heading.groups()[:2]):
+                        current, seen = (heading[1], heading[2], heading[3]), {}
+                elif current is not None and (side := re.match(r"^\s*(For|Against)\s+([\d,]+)", line)):
+                    seen[side[1]] = int(side[2].replace(",", ""))
+                    if len(seen) == 2:
+                        kind, number, county = current
+                        votes = (seen["For"], seen["Against"])
+                        if county is None:
+                            totals.setdefault((kind, number), votes)
+                        else:
+                            counties.setdefault((kind, number), {})[county] = votes
+                        current = None
         for (kind, number), total in totals.items():
             if total == (0, 0):
                 continue
@@ -1553,7 +1586,7 @@ def arkansas() -> list[dict[str, object]]:
                     "state": "AR",
                     "day": day,
                     "number": number,
-                    "label": "Initiated Act" if kind == "Initiated Act" else "Amendment",
+                    "label": kind if kind in ("Initiated Act", "Referred Question") else "Amendment",
                     "url": AR + name,
                     "county": county,
                     "answer": answer,
@@ -1562,6 +1595,113 @@ def arkansas() -> list[dict[str, object]]:
                 for county, votes in found.items()
                 for side, answer in enumerate(("YES", "NO"))
             )
+    for day, name in AR_VOICES.items():
+        text = subprocess.run(
+            ["pdftotext", "-layout", str(raw.cached(SOURCE, AR + name).path), "-"],
+            capture_output=True,
+            text=True,
+            check=True,
+        ).stdout
+        for kind, number, body, total in re.findall(
+            r"(?m)^\s*(?:Proposed )?(Constitutional Amendment|Initiated Act|Referred Question) (\d+)\s*$"
+            r"((?:.*\n)*?)^\s*Totals\s+([\d,]+\s+[\d,]+)",
+            text,
+        ):
+            found: dict[str, tuple[int, int]] = {}
+            waiting: list[str] = []
+            figures: list[int] = []
+            for name_, figure in re.findall(r"([A-Z][A-Za-z.]*(?: [A-Z][A-Za-z.]*)*) County|(\d[\d,]*)", body):
+                if name_:
+                    if figures:
+                        raise ValueError(f"{name} {kind} {number}: {name_} County interrupts {waiting}")
+                    waiting.append(name_)
+                elif waiting:
+                    figures.append(int(figure.replace(",", "")))
+                    if len(figures) == 3 * len(waiting):
+                        for at, county in enumerate(waiting):
+                            yes, no, both = figures[at :: len(waiting)]
+                            if yes + no != both:
+                                raise ValueError(f"{name} {kind} {number} {county}: {yes} and {no} are not {both}")
+                            found[county] = (yes, no)
+                        waiting, figures = [], []
+            printed = tuple(int(part.replace(",", "")) for part in total.split())
+            summed = tuple(sum(votes[side] for votes in found.values()) for side in (0, 1))
+            if len(found) != 75 or summed != printed:
+                raise ValueError(f"{name} {kind} {number}: {len(found)} counties add up to {summed}, not {printed}")
+            rows.extend(
+                {
+                    "state": "AR",
+                    "day": day,
+                    "number": number,
+                    "label": {"Constitutional Amendment": "Amendment", "Initiated Act": "Initiative Act"}.get(
+                        kind, kind
+                    ),
+                    "url": AR + name,
+                    "county": county,
+                    "answer": answer,
+                    "votes": votes[side],
+                }
+                for county, votes in found.items()
+                for side, answer in enumerate(("YES", "NO"))
+            )
+    for day, name in AR_PUBLICATIONS.items():
+        with tempfile.TemporaryDirectory() as folder:
+            stored = raw.cached(SOURCE, AR + name).path
+            subprocess.run(
+                ["soffice", "--headless", "--convert-to", "xlsx", "--outdir", folder, str(stored)],
+                capture_output=True,
+                check=True,
+            )
+            book = fastexcel.read_excel(Path(folder) / f"{stored.stem}.xlsx")
+            for label in ("Proposed Amendment", "Referred Question"):
+                table = book.load_sheet_by_name(label, header_row=None).to_polars()
+                number = table.row(0)[1].rsplit(" ", 1)[1]
+                found = {
+                    county.removesuffix(" County"): (int(yes), int(no))
+                    for county, yes, no, *_ in table.rows()
+                    if county is not None and county.endswith(" County")
+                }
+                total = next((int(yes), int(no)) for county, yes, no, *_ in table.rows() if county == "Totals")
+                summed = tuple(sum(votes[side] for votes in found.values()) for side in (0, 1))
+                if len(found) != 75 or summed != total:
+                    raise ValueError(f"{name} {label}: {len(found)} counties add up to {summed}, not {total}")
+                rows.extend(
+                    {
+                        "state": "AR",
+                        "day": day,
+                        "number": number,
+                        "label": "Amendment" if label == "Proposed Amendment" else label,
+                        "url": AR + name,
+                        "county": county,
+                        "answer": answer,
+                        "votes": votes[side],
+                    }
+                    for county, votes in found.items()
+                    for side, answer in enumerate(("YES", "NO"))
+                )
+    for day, name in AR_SHEETS.items():
+        sheet = (
+            fastexcel.read_excel(raw.cached(SOURCE, AR + name).path)
+            .load_sheet_by_name("Ballot Measures", dtypes={"Votes": "int"})
+            .to_polars()
+            .group_by("Race", "County", "Candidate", maintain_order=True)
+            .agg(pl.col("Votes").sum())
+        )
+        if sheet["County"].n_unique() != 75 or set(sheet["Candidate"]) != {"For", "Against"}:
+            raise ValueError(f"{name}: unexpected counties or answers")
+        rows.extend(
+            {
+                "state": "AR",
+                "day": day,
+                "number": race.rsplit(" ", 1)[1],
+                "label": "Amendment",
+                "url": AR + name,
+                "county": county.removesuffix(" County"),
+                "answer": "YES" if answer == "For" else "NO",
+                "votes": votes,
+            }
+            for race, county, answer, votes in sheet.iter_rows()
+        )
     return rows
 
 
@@ -1582,11 +1722,12 @@ def nebraska() -> list[dict[str, object]]:
         for line in text.splitlines():
             if heading := NE_HEADING.match(line):
                 number, reading = heading[1], None
-            elif re.match(r"^\s*County\s+For\s+Against\b", line):
+            elif header := re.match(r"^\s*County\s+For\s+Against\b", line):
                 if number is None or number in tables:
                     raise ValueError(f"{name}: a county table with no new measure heading ({number})")
                 table, reading = number, tables.setdefault(number, {})
-            elif reading is not None:
+                line = line[header.end() :]
+            if reading is not None:
                 for county, yes, no in re.findall(
                     r"([A-Z][A-Za-z.]*(?: [A-Z][A-Za-z.]*)*)\s+([\d,]+)\s+([\d,]+)", line
                 ):
@@ -1616,6 +1757,32 @@ def nebraska() -> list[dict[str, object]]:
                 }
                 for county, votes in counties.items()
                 for side, answer in enumerate(("YES", "NO"))
+            )
+    for name, path in NE_SCANS.items():
+        contests = json.loads((SCANS / f"{name}.json").read_text())["contests"]
+        scanned = pl.read_parquet(DATA / "parsed" / "us.scans" / name / "tables.parquet")
+        for number, contest in contests.items():
+            table = scanned.filter(pl.col("contest") == number)
+            if sorted(table["candidate"].unique()) != ["NO", "YES"] or table.height != 186:
+                print(f"{name} measure {number}: {table.height} cells passed, skipped")
+                continue
+            rows.extend(
+                {
+                    "state": "NE",
+                    "day": date.fromisoformat(contest["day"]),
+                    "number": number,
+                    "label": "",
+                    "url": NE + path,
+                    "county": row["code"],
+                    "answer": row["candidate"],
+                    "votes": row["votes"],
+                    "page": row["page"],
+                    "x0": row["x0"],
+                    "y0": row["y0"],
+                    "x1": row["x1"],
+                    "y1": row["y1"],
+                }
+                for row in table.iter_rows(named=True)
             )
     return rows
 
@@ -1808,7 +1975,8 @@ def parse() -> None:
             *nevada(),
             *nebraska(),
             *arkansas(),
-        ]
+        ],
+        infer_schema_length=None,
     )
     words = re.compile(r"[a-z]{4,}")
     matched: list[dict[str, object]] = []
@@ -1915,12 +2083,35 @@ def emit() -> Path:
                     url=url,
                     license="Public record",
                 )
+        artifacts: dict[str, UUID] = {}
         for state, url in frame.select("state", "url").unique(maintain_order=True).iter_rows():
-            cs.artifact(
+            artifacts[url] = cs.artifact(
                 raw.cached(
                     {"FL": fl_sos.SOURCE, "OH": gov_counties.SOURCE, "RI": ri_countbook.SOURCE}.get(state, SOURCE), url
                 ),
                 sources[state],
+            )
+        pages: dict[tuple[str, int], UUID] = {}
+        for url, number in frame.filter(pl.col("page").is_not_null()).select("url", "page").unique().iter_rows():
+            stored = raw.cached(SOURCE, url)
+            image = DATA / "pages" / SOURCE / f"{stored.sha256}-{number}.png"
+            if not image.exists():
+                image.parent.mkdir(parents=True, exist_ok=True)
+                subprocess.run(
+                    ["pdftoppm", "-r", "100", "-gray", "-png", "-singlefile", "-f", str(number), "-l", str(number)]
+                    + [str(stored.path), str(image.with_suffix(""))],
+                    check=True,
+                )
+            width, height = Image.open(image).size
+            pages[(url, number)] = cs.page(artifacts[url], number)
+            cs.add(
+                "source_page",
+                id=pages[(url, number)],
+                artifact_id=artifacts[url],
+                page_number=number,
+                image_key=f"pages/{SOURCE}/{image.name}",
+                width=width,
+                height=height,
             )
         system = cs.key("us.electoral_system", "referendum")
         states: dict[str, tuple[UUID, str]] = {}
@@ -2066,7 +2257,7 @@ def emit() -> Path:
                     contest_id=contest,
                     kind="answer",
                     ballot_position=position + 1,
-                    ballot_label=answer.capitalize(),
+                    ballot_label=BALLOT_LABELS.get((state, day, entry["number"]), ("Yes", "No"))[position],
                 )
             result_set = cs.key(f"{SOURCE}.result_set", contest_key)
             cs.add(
@@ -2088,7 +2279,8 @@ def emit() -> Path:
                 body_md=METHODOLOGY.format(publisher=PUBLISHERS[state][0])
                 + (MAINE if state == "ME" else "")
                 + (OVERSEAS if (rows["code"] == "ME:uocava").any() else "")
-                + (LIMITED if (rows["code"] == "RI:limited").any() else ""),
+                + (LIMITED if (rows["code"] == "RI:limited").any() else "")
+                + (SCANNED if rows["page"].is_not_null().any() else ""),
             )
             yes = int(rows.filter(pl.col("answer") == "YES")["votes"].sum())
             no = int(rows.filter(pl.col("answer") == "NO")["votes"].sum())
@@ -2102,16 +2294,32 @@ def emit() -> Path:
                 kind="won",
             )
             if result_set in cs.minted:
-                for code, answer, votes in rows.select("code", "answer", "votes").iter_rows():
+                for row in rows.iter_rows(named=True):
+                    unit = cs.unit("us.aggregate" if ":" in row["code"] else "us.county", row["code"])
                     cs.add(
                         "result_value",
                         result_set_id=result_set,
-                        unit_id=cs.unit("us.aggregate" if ":" in code else "us.county", code),
-                        option_id=options[answer],
+                        unit_id=unit,
+                        option_id=options[row["answer"]],
                         channel=0,
                         measure=1,
                         count_round=0,
                         flags=0,
-                        value=votes,
+                        value=row["votes"],
                     )
+                    if row["page"] is not None:
+                        cs.add(
+                            "value_locator",
+                            result_set_id=result_set,
+                            unit_id=unit,
+                            option_id=options[row["answer"]],
+                            channel=0,
+                            measure=1,
+                            count_round=0,
+                            page_id=pages[(row["url"], row["page"])],
+                            x0=row["x0"],
+                            y0=row["y0"],
+                            x1=row["x1"],
+                            y1=row["y1"],
+                        )
         return cs.write()

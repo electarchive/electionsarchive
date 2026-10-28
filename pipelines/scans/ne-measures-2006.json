@@ -1,0 +1,518 @@
+{
+ "polity": "US-NE",
+ "publisher": "Nebraska Secretary of State",
+ "title": "2006 General Election Canvass",
+ "license": "Public record",
+ "file": {
+  "url": "https://sos.nebraska.gov/sites/default/files/doc/2006%20General.pdf"
+ },
+ "raw_source": "us.sos_measures",
+ "contests": {
+  "1": {
+   "year": 2006,
+   "chamber": "question-1",
+   "day": "2006-11-07",
+   "special": false,
+   "state": "NE",
+   "district": null
+  },
+  "2": {
+   "year": 2006,
+   "chamber": "question-2",
+   "day": "2006-11-07",
+   "special": false,
+   "state": "NE",
+   "district": null
+  },
+  "3": {
+   "year": 2006,
+   "chamber": "question-3",
+   "day": "2006-11-07",
+   "special": false,
+   "state": "NE",
+   "district": null
+  },
+  "4": {
+   "year": 2006,
+   "chamber": "question-4",
+   "day": "2006-11-07",
+   "special": false,
+   "state": "NE",
+   "district": null
+  },
+  "421": {
+   "year": 2006,
+   "chamber": "question-421",
+   "day": "2006-11-07",
+   "special": false,
+   "state": "NE",
+   "district": null
+  },
+  "422": {
+   "year": 2006,
+   "chamber": "question-422",
+   "day": "2006-11-07",
+   "special": false,
+   "state": "NE",
+   "district": null
+  },
+  "423": {
+   "year": 2006,
+   "chamber": "question-423",
+   "day": "2006-11-07",
+   "special": false,
+   "state": "NE",
+   "district": null
+  },
+  "5": {
+   "year": 2006,
+   "chamber": "question-5",
+   "day": "2006-11-07",
+   "special": false,
+   "state": "NE",
+   "district": null
+  },
+  "6": {
+   "year": 2006,
+   "chamber": "question-6",
+   "day": "2006-11-07",
+   "special": false,
+   "state": "NE",
+   "district": null
+  }
+ },
+ "pages": [
+  {
+   "page": 61,
+   "id": "1l",
+   "orientation": "counties_down",
+   "crop": [
+    0.07,
+    0.1,
+    0.49,
+    0.97
+   ],
+   "hint": "Read only the county table in this image (For and Against columns); ignore any heading text above it.",
+   "columns": [
+    {
+     "label": "For",
+     "contest": "1",
+     "candidate": "YES"
+    },
+    {
+     "label": "Against",
+     "contest": "1",
+     "candidate": "NO"
+    }
+   ]
+  },
+  {
+   "page": 61,
+   "id": "1r",
+   "orientation": "counties_down",
+   "crop": [
+    0.49,
+    0.1,
+    0.92,
+    0.97
+   ],
+   "hint": "Read only the county table in this image (For and Against columns); ignore any heading text above it.",
+   "columns": [
+    {
+     "label": "For",
+     "contest": "1",
+     "candidate": "YES"
+    },
+    {
+     "label": "Against",
+     "contest": "1",
+     "candidate": "NO"
+    }
+   ]
+  },
+  {
+   "page": 62,
+   "id": "2l",
+   "orientation": "counties_down",
+   "crop": [
+    0.07,
+    0.1,
+    0.49,
+    0.97
+   ],
+   "hint": "Read only the county table in this image (For and Against columns); ignore any heading text above it.",
+   "columns": [
+    {
+     "label": "For",
+     "contest": "2",
+     "candidate": "YES"
+    },
+    {
+     "label": "Against",
+     "contest": "2",
+     "candidate": "NO"
+    }
+   ]
+  },
+  {
+   "page": 62,
+   "id": "2r",
+   "orientation": "counties_down",
+   "crop": [
+    0.49,
+    0.1,
+    0.92,
+    0.97
+   ],
+   "hint": "Read only the county table in this image (For and Against columns); ignore any heading text above it.",
+   "columns": [
+    {
+     "label": "For",
+     "contest": "2",
+     "candidate": "YES"
+    },
+    {
+     "label": "Against",
+     "contest": "2",
+     "candidate": "NO"
+    }
+   ]
+  },
+  {
+   "page": 63,
+   "id": "3l",
+   "orientation": "counties_down",
+   "crop": [
+    0.07,
+    0.1,
+    0.49,
+    0.97
+   ],
+   "hint": "Read only the county table in this image (For and Against columns); ignore any heading text above it.",
+   "columns": [
+    {
+     "label": "For",
+     "contest": "3",
+     "candidate": "YES"
+    },
+    {
+     "label": "Against",
+     "contest": "3",
+     "candidate": "NO"
+    }
+   ]
+  },
+  {
+   "page": 63,
+   "id": "3r",
+   "orientation": "counties_down",
+   "crop": [
+    0.49,
+    0.1,
+    0.92,
+    0.97
+   ],
+   "hint": "Read only the county table in this image (For and Against columns); ignore any heading text above it.",
+   "columns": [
+    {
+     "label": "For",
+     "contest": "3",
+     "candidate": "YES"
+    },
+    {
+     "label": "Against",
+     "contest": "3",
+     "candidate": "NO"
+    }
+   ]
+  },
+  {
+   "page": 64,
+   "id": "4l",
+   "orientation": "counties_down",
+   "crop": [
+    0.07,
+    0.1,
+    0.49,
+    0.97
+   ],
+   "hint": "Read only the county table in this image (For and Against columns); ignore any heading text above it.",
+   "columns": [
+    {
+     "label": "For",
+     "contest": "4",
+     "candidate": "YES"
+    },
+    {
+     "label": "Against",
+     "contest": "4",
+     "candidate": "NO"
+    }
+   ]
+  },
+  {
+   "page": 64,
+   "id": "4r",
+   "orientation": "counties_down",
+   "crop": [
+    0.49,
+    0.1,
+    0.92,
+    0.97
+   ],
+   "hint": "Read only the county table in this image (For and Against columns); ignore any heading text above it.",
+   "columns": [
+    {
+     "label": "For",
+     "contest": "4",
+     "candidate": "YES"
+    },
+    {
+     "label": "Against",
+     "contest": "4",
+     "candidate": "NO"
+    }
+   ]
+  },
+  {
+   "page": 65,
+   "id": "5l",
+   "orientation": "counties_down",
+   "crop": [
+    0.07,
+    0.1,
+    0.49,
+    0.97
+   ],
+   "hint": "Read only the county table in this image (For and Against columns); ignore any heading text above it.",
+   "columns": [
+    {
+     "label": "For",
+     "contest": "5",
+     "candidate": "YES"
+    },
+    {
+     "label": "Against",
+     "contest": "5",
+     "candidate": "NO"
+    }
+   ]
+  },
+  {
+   "page": 65,
+   "id": "5r",
+   "orientation": "counties_down",
+   "crop": [
+    0.49,
+    0.1,
+    0.92,
+    0.97
+   ],
+   "hint": "Read only the county table in this image (For and Against columns); ignore any heading text above it.",
+   "columns": [
+    {
+     "label": "For",
+     "contest": "5",
+     "candidate": "YES"
+    },
+    {
+     "label": "Against",
+     "contest": "5",
+     "candidate": "NO"
+    }
+   ]
+  },
+  {
+   "page": 66,
+   "id": "6l",
+   "orientation": "counties_down",
+   "crop": [
+    0.07,
+    0.1,
+    0.49,
+    0.97
+   ],
+   "hint": "Read only the county table in this image (For and Against columns); ignore any heading text above it.",
+   "columns": [
+    {
+     "label": "For",
+     "contest": "6",
+     "candidate": "YES"
+    },
+    {
+     "label": "Against",
+     "contest": "6",
+     "candidate": "NO"
+    }
+   ]
+  },
+  {
+   "page": 66,
+   "id": "6r",
+   "orientation": "counties_down",
+   "crop": [
+    0.49,
+    0.1,
+    0.92,
+    0.97
+   ],
+   "hint": "Read only the county table in this image (For and Against columns); ignore any heading text above it.",
+   "columns": [
+    {
+     "label": "For",
+     "contest": "6",
+     "candidate": "YES"
+    },
+    {
+     "label": "Against",
+     "contest": "6",
+     "candidate": "NO"
+    }
+   ]
+  },
+  {
+   "page": 67,
+   "id": "421l",
+   "orientation": "counties_down",
+   "crop": [
+    0.07,
+    0.1,
+    0.49,
+    0.97
+   ],
+   "hint": "Read only the county table in this image (For and Against columns); ignore any heading text above it.",
+   "columns": [
+    {
+     "label": "For",
+     "contest": "421",
+     "candidate": "YES"
+    },
+    {
+     "label": "Against",
+     "contest": "421",
+     "candidate": "NO"
+    }
+   ]
+  },
+  {
+   "page": 67,
+   "id": "421r",
+   "orientation": "counties_down",
+   "crop": [
+    0.49,
+    0.1,
+    0.92,
+    0.97
+   ],
+   "hint": "Read only the county table in this image (For and Against columns); ignore any heading text above it.",
+   "columns": [
+    {
+     "label": "For",
+     "contest": "421",
+     "candidate": "YES"
+    },
+    {
+     "label": "Against",
+     "contest": "421",
+     "candidate": "NO"
+    }
+   ]
+  },
+  {
+   "page": 68,
+   "id": "422l",
+   "orientation": "counties_down",
+   "crop": [
+    0.07,
+    0.1,
+    0.49,
+    0.97
+   ],
+   "hint": "Read only the county table in this image (Retain and Repeal columns); ignore any heading text above it.",
+   "columns": [
+    {
+     "label": "Retain",
+     "contest": "422",
+     "candidate": "YES"
+    },
+    {
+     "label": "Repeal",
+     "contest": "422",
+     "candidate": "NO"
+    }
+   ]
+  },
+  {
+   "page": 68,
+   "id": "422r",
+   "orientation": "counties_down",
+   "crop": [
+    0.49,
+    0.1,
+    0.92,
+    0.97
+   ],
+   "hint": "Read only the county table in this image (Retain and Repeal columns); ignore any heading text above it.",
+   "columns": [
+    {
+     "label": "Retain",
+     "contest": "422",
+     "candidate": "YES"
+    },
+    {
+     "label": "Repeal",
+     "contest": "422",
+     "candidate": "NO"
+    }
+   ]
+  },
+  {
+   "page": 69,
+   "id": "423a",
+   "orientation": "counties_down",
+   "crop": [
+    0.2,
+    0.03,
+    0.82,
+    0.97
+   ],
+   "hint": "Read only the county table in this image (For and Against columns); ignore any heading text above it.",
+   "columns": [
+    {
+     "label": "For",
+     "contest": "423",
+     "candidate": "YES"
+    },
+    {
+     "label": "Against",
+     "contest": "423",
+     "candidate": "NO"
+    }
+   ]
+  },
+  {
+   "page": 70,
+   "id": "423b",
+   "orientation": "counties_down",
+   "crop": [
+    0.2,
+    0.03,
+    0.82,
+    0.97
+   ],
+   "hint": "Read only the county table in this image (For and Against columns); ignore any heading text above it.",
+   "columns": [
+    {
+     "label": "For",
+     "contest": "423",
+     "candidate": "YES"
+    },
+    {
+     "label": "Against",
+     "contest": "423",
+     "candidate": "NO"
+    }
+   ]
+  }
+ ]
+}
