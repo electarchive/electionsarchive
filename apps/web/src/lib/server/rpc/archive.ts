@@ -10871,14 +10871,14 @@ async function races(
               }>(sql`
                 select r.from, r.party, count(*)::int as seats
                 from (
-                  select distinct on (o.id) coalesce(lm.into_id, o.alliance_id) as from,
+                  select distinct on (o.id, x.candidacy_id) coalesce(lm.into_id, o.alliance_id) as from,
                     coalesce(bm.into_id, br.parent_party_id, pm.into_id, n.party_id) as party
                   from contest c
                   join election e on e.id = c.election_id
                   join result_set rs on rs.contest_id = c.id and ${latest("rs")}
-                  join outcome x on x.result_set_id = rs.id and x.kind in ('elected', 'won') and x.candidacy_id is null
-                  join contest_option o on o.id = x.option_id and o.party_id is null and o.alliance_id is not null
-                  join candidacy cy on cy.option_id = o.id
+                  join outcome x on x.result_set_id = rs.id and x.kind in ('elected', 'won')
+                  join contest_option o on o.id = x.option_id and o.alliance_id is not null
+                  join candidacy cy on cy.option_id = o.id and (x.candidacy_id is null or cy.id = x.candidacy_id)
                   cross join lateral (
                     select coalesce(
                       (select min(cn.party_id::text)::uuid from candidacy_nomination cn
@@ -10892,7 +10892,9 @@ async function races(
                     and br.kind = 'regional_branch' and br.valid @> e.date_from
                   left join entity_merge bm on bm.entity_id = br.parent_party_id
                   where c.id = any(${sql.param(roots)}::uuid[]) and n.party_id is not null
-                  order by o.id, cy.id
+                    and (o.party_id is null or (x.candidacy_id is not null and n.party_id <> o.party_id and exists (
+                      select from alliance_member am where am.alliance_id = o.alliance_id and am.party_id = n.party_id)))
+                  order by o.id, x.candidacy_id, cy.id
                 ) r
                 group by 1, 2
               `)

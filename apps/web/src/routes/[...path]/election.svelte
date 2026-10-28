@@ -210,6 +210,12 @@
         .map(([key, entries]) => {
           const head =
             entries.find(
+              (entry) =>
+                entry.isBase &&
+                entry.row.key === key &&
+                entry.row.color != null,
+            )?.row ??
+            entries.find(
               (entry) => entry.row.key === key && entry.row.color != null,
             )?.row ??
             entries.find((entry) => entry.row.key === key)?.row ??
