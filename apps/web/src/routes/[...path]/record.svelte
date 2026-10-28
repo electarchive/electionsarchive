@@ -5,12 +5,13 @@
   import Export from "#lib/components/export.svelte";
   import Measured from "#lib/components/measured.svelte";
   import * as Select from "#lib/components/ui/select/index.js";
-  import { count, date, percent } from "#lib/format.js";
+  import { date, percent } from "#lib/format.js";
   import { m } from "#lib/paraglide/messages.js";
   import { getLocale } from "#lib/paraglide/runtime.js";
   import { swatch } from "#lib/party.js";
   import { orpc } from "#lib/rpc.js";
   import { cn } from "#lib/utils.js";
+  import Makeup from "./makeup.svelte";
 
   const { id, isExpected = false }: { id: string; isExpected?: boolean } =
     $props();
@@ -64,6 +65,40 @@
       current.points.every((point) => point.filled === 1),
   );
   const cabinets = $derived(record.data?.governments ?? []);
+  const sessions = $derived.by(() => {
+    let last = 0;
+    return (current?.points ?? []).filter((point) => {
+      if (point.filled * 2 < last) {
+        return false;
+      }
+      last = point.filled;
+      return true;
+    });
+  });
+  const terms = $derived(
+    sessions.map((point, index, all) => ({
+      start: point.date,
+      end: all[index + 1]?.date ?? null,
+      total: point.filled,
+      size: null,
+      apportioned: null,
+      seceded: 0,
+      isSeated: false,
+      isPartial: false,
+      parties: point.parties.map((entry) => ({
+        party: entry.party,
+        seats: entry.seats,
+      })),
+      election: { name: point.name, path: point.path, date: point.date },
+    })),
+  );
+  const held = $derived(
+    (record.data?.parties ?? []).map((party) => ({
+      ...party,
+      isStriped: false,
+      isMade: false,
+    })),
+  );
   const band = $derived(cabinets.length > 0 ? 22 : 0);
   const height = $derived((isSingle ? 96 : 240) + band);
   const step = $derived(
@@ -413,6 +448,20 @@
           {/each}
         </svg>
       </Measured>
+    {:else if !isSingle}
+      <Makeup
+        {terms}
+        parties={held}
+        governments={cabinets}
+        link={(index: number) => {
+          const path = sessions[index]?.path;
+          return path == null || coarse.current
+            ? null
+            : record.data?.scope == null
+              ? path
+              : `${path}?in=${record.data.scope}`;
+        }}
+      />
     {:else}
       <Measured
         bind:width
@@ -464,17 +513,6 @@
               {/each}
             </a>
           {/each}
-          {#if !isSingle}
-            <line
-              x1={PAD.side}
-              x2={PAD.side + step * columns.length}
-              y1={PAD.top + inner / 2}
-              y2={PAD.top + inner / 2}
-              class="stroke-foreground"
-              stroke-dasharray="3 3"
-              stroke-opacity="0.55"
-            />
-          {/if}
           {#each spans as span (span.key)}
             <rect
               x={span.x}
@@ -529,62 +567,31 @@
             style:inset-block-start="{PAD.top}px"
           >
             <span class="text-[0.8125rem] font-semibold">{lit.name}</span>
-            {#if isSingle}
-              {const winner = $derived(lit.parties[0]?.party ?? null)}
-              {#if lit.winner != null}
-                <span>{lit.winner}</span>
-              {/if}
-              {#if lit.winner == null || winner != null || lit.parties[0]?.isIndependent === true}
-                <span class="flex items-center gap-1.5">
-                  <span
-                    class="rounded-xs block-2.5 inline-2.5"
-                    style:background={tint(winner)}
-                  ></span>
-                  {winner == null && lit.parties[0]?.isIndependent === true
-                    ? m.person_parties_none()
-                    : (lit.parties[0]?.label ?? label(winner))}
-                </span>
-              {/if}
-              {#if lit.share != null}
-                <span class="font-figures tabular-nums"
-                  >{m.record_share({ share: percent(lit.share) })}</span
-                >
-              {/if}
-            {:else if !current.isOffice && lit.parties.every((entry) => entry.party == null && entry.isIndependent !== true)}
-              <span class="font-figures text-muted-foreground tabular-nums"
-                >{m.record_filled({ count: lit.filled })}</span
-              >
-            {:else}
-              <ul class="grid gap-0.5">
-                {#each lit.parties.slice(0, 5) as entry (entry.party)}
-                  <li class="flex items-center justify-between gap-3">
-                    <span class="flex items-center gap-1.5 truncate">
-                      <span
-                        class="shrink-0 rounded-xs block-2.5 inline-2.5"
-                        style:background={tint(entry.party)}
-                      ></span>
-                      <span class="truncate"
-                        >{entry.label ?? label(entry.party)}</span
-                      >
-                    </span>
-                    <span class="font-figures font-semibold tabular-nums"
-                      >{count(entry.seats)}</span
-                    >
-                  </li>
-                {/each}
-              </ul>
-              <span class="text-muted-foreground"
-                >{current.isOffice
-                  ? m.record_electors({ count: count(lit.filled) })
-                  : m.record_seats({
-                      seats: count(lit.parties[0]?.seats ?? 0),
-                      total: count(lit.filled),
-                    })}</span
+            {const winner = $derived(lit.parties[0]?.party ?? null)}
+            {#if lit.winner != null}
+              <span>{lit.winner}</span>
+            {/if}
+            {#if lit.winner == null || winner != null || lit.parties[0]?.isIndependent === true}
+              <span class="flex items-center gap-1.5">
+                <span
+                  class="rounded-xs block-2.5 inline-2.5"
+                  style:background={tint(winner)}
+                ></span>
+                {winner == null && lit.parties[0]?.isIndependent === true
+                  ? m.person_parties_none()
+                  : (lit.parties[0]?.label ?? label(winner))}
+              </span>
+            {/if}
+            {#if lit.share != null}
+              <span class="font-figures tabular-nums"
+                >{m.record_share({ share: percent(lit.share) })}</span
               >
             {/if}
           </div>
         {/if}
       </Measured>
+    {/if}
+    {#if current != null}
       <ol
         class="hidden gap-1.5 pointer-coarse:grid"
         aria-label={m.record_list()}
@@ -644,7 +651,7 @@
         {/each}
       </ol>
     {/if}
-    {#if cabinets.length > 0}
+    {#if cabinets.length > 0 && (current == null || isSingle)}
       <p
         class="flex flex-wrap items-baseline gap-x-3 gap-y-0.5 text-[0.8125rem] min-block-5"
         aria-live="polite"
@@ -680,22 +687,25 @@
         {/if}
       </p>
     {/if}
-    <ul class="flex flex-wrap gap-x-4 gap-y-1.5 text-xs">
-      {#each legend as party (party)}
-        <li class="flex items-center gap-1.5">
-          <span
-            class="rounded-xs block-2.5 inline-2.5"
-            style:background={tint(party)}
-          ></span>
-          {#if party == null}
-            <span class="text-muted-foreground">{label(party)}</span>
-          {:else}
-            <a class="hover:underline" href={resolve("/id/[id]", { id: party })}
-              >{label(party)}</a
-            >
-          {/if}
-        </li>
-      {/each}
-    </ul>
+    {#if current == null || isSingle}
+      <ul class="flex flex-wrap gap-x-4 gap-y-1.5 text-xs">
+        {#each legend as party (party)}
+          <li class="flex items-center gap-1.5">
+            <span
+              class="rounded-xs block-2.5 inline-2.5"
+              style:background={tint(party)}
+            ></span>
+            {#if party == null}
+              <span class="text-muted-foreground">{label(party)}</span>
+            {:else}
+              <a
+                class="hover:underline"
+                href={resolve("/id/[id]", { id: party })}>{label(party)}</a
+              >
+            {/if}
+          </li>
+        {/each}
+      </ul>
+    {/if}
   </section>
 {/if}
