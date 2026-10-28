@@ -16,11 +16,14 @@ from ea.sources.licenses import UNLICENSED
 from ea.store import DATA, connect
 
 SOURCE = "tr.tkgm"
-VERSION = "2"
+VERSION = "3"
 PARSED = DATA / "parsed" / SOURCE
 COUNTIES = Path.home() / "Downloads" / "counties"
 URL = "https://parselsorgu.tkgm.gov.tr/"
 PARENTS = Path(__file__).with_name("tkgm_parents.tsv")
+COMPOSITIONS = Path(__file__).with_name("tkgm_districts.tsv")
+GAZETTE = "https://www.resmigazete.gov.tr/arsiv"
+DECISIONS = ("19510", "19519", "19525")
 RENAMED = {"19 Mayıs": "19-May"}
 TOLERANCE = 10
 GAP = 50
@@ -69,7 +72,14 @@ NOTES = (
     "after 1961 is in tkgm_parents.tsv: 69 from the split laws (5747, 6360, and the metropolitan laws), 138 where "
     "the ilçe's Turkish Wikipedia article names a single neighboring ilçe in the sentence on its creation, and 153 "
     "from the neighboring ilçe in the same province whose registered voters fell by the new ilçe's at its first "
-    "election. Electoral districts at each election are the union of the ilçeler that reported in them."
+    "election. The central ilçeler of Bursa, Gaziantep, Konya, and İzmir, split by Laws 3391, 3398, 3399, and 3392 in "
+    "1987, kept reporting until their successors first did, so each is drawn, and kept in its province, until then. "
+    "Electoral districts at each election are the union of the ilçeler that reported in them, and in 1987 the union "
+    "of the ilçeler listed in YSK's decisions. Each of these outlines is a union of whole official ilçe outlines, so "
+    "it is marked official, except where Wikipedia says a new ilçe was formed from two neighbors (Akyurt, Arnavutköy, "
+    "Ayrancı, Bayraklı, Belen, Doğanyol, Eğil, Elbeyli, Kadışehri, Pursaklar, Seydiler, Sulusaray, and Yenipazar): it "
+    "is drawn inside one of them until its first election, so the outlines of both neighbors before then are marked "
+    "synthetic."
 )
 
 
@@ -80,6 +90,8 @@ def key(text: str) -> str:
 
 
 def fetch() -> None:
+    for issue in DECISIONS:
+        raw.fetch(SOURCE, f"{GAZETTE}/{issue}.pdf", suffix=".pdf")
     try:
         raw.cached(SOURCE, URL)
         return
@@ -128,6 +140,7 @@ def parse() -> None:
             names[area] = (plates[parent], name)
             districts[plates[parent], "merkez" if key(name) == f"{titles[parent]}merkez" else key(name)] = area
         historical: dict[str, date] = {}
+        legal: dict[str, tuple[str, date]] = {}
         lookup = {(plate, name): area for area, (plate, name) in names.items()}
         for area, name, plate, end in conn.execute(
             """select a.id::text, n.text, c.code, p.valid_to from area a
@@ -138,19 +151,38 @@ def parse() -> None:
                  and not exists (select from area_parent q where q.area_id = a.id and q.valid_to is null)"""
         ).fetchall():
             historical[area] = end
+            legal[area] = (plate, end)
             lookup[plate, name] = area
         starts: dict[str, date] = {}
         parent_of: dict[str, str] = {}
+        also: dict[str, list[str]] = {}
         with PARENTS.open() as handle:
             for row in csv.DictReader(handle, delimiter="\t"):
                 child = lookup[row["plate"], row["ilce"]]
                 starts[child] = date.fromisoformat(row["first"])
                 parent_of[child] = lookup[row["parent_plate"], row["parent"]]
+                if row["also"]:
+                    also[child] = [lookup[tuple(other.split(":"))] for other in row["also"].split(";")]
+        for child, parent in parent_of.items():
+            if parent in historical:
+                historical[parent] = max(historical[parent], starts[child])
 
         def owner(area: str, day: date) -> str | None:
             while area in starts and day < starts[area]:
                 area = parent_of[area]
             return None if area in historical and day >= historical[area] else area
+
+        territories: dict[tuple[str, date], set[str]] = {}
+
+        def whole(start: date | None, members: frozenset[str]) -> bool:
+            day = start or date(1950, 1, 1)
+            for child, others in also.items():
+                for other in others if day < starts[child] else []:
+                    if (other, day) not in territories:
+                        territories[other, day] = {area for area in names if owner(area, day) == other}
+                    if territories[other, day] and (child in members) != bool(territories[other, day] & members):
+                        return False
+            return True
 
         neighborhoods: dict[tuple[str, str], list[str]] = defaultdict(list)
         for area, name, parent in conn.execute(
@@ -171,6 +203,28 @@ def parse() -> None:
                join area ia on ia.k = r.area_k and ia.scheme_code = 'tr.ilce'"""
         ).fetchall():
             compositions[code][held].add(area)
+        spellings = conn.execute(
+            """select a.id::text, n.text, n.valid_from, n.valid_to from area a
+               join name n on n.entity_id = a.id and n.lang = 'tr' where a.scheme_code = 'tr.ilce'"""
+        ).fetchall()
+        with COMPOSITIONS.open() as handle:
+            for row in csv.DictReader(handle, delimiter="\t"):
+                if row["split"]:
+                    continue
+                held = date.fromisoformat(row["day"])
+                area = lookup.get((row["district"][:2], row["ilce"]))
+                if area is None:
+                    candidates = {
+                        found
+                        for found, text, start, end in spellings
+                        if key(row["ilce"]) in (key(text), key(text.removesuffix(" Merkez")))
+                        and (start is None or start <= held)
+                        and (end is None or end > held)
+                    }
+                    if len(candidates) != 1:
+                        raise ValueError(f"no single ilçe for {row}")
+                    area = candidates.pop()
+                compositions[row["district"]][held].add(area)
         polls = sorted(
             day
             for (day,) in conn.execute(
@@ -217,20 +271,22 @@ def parse() -> None:
             return plate
 
         periods = list(zip([None, *breaks], [*breaks, None], strict=True))
+        marks = sorted({*breaks, *(starts[child] for child in also)})
         versions: list[tuple[str, str, date | None, date | None, frozenset[str], bool]] = []
         for plate in provinces:
-            history: list[tuple[date | None, date | None, frozenset[str]]] = []
-            for start, end in periods:
+            history: list[tuple[date | None, date | None, frozenset[str], bool]] = []
+            for start, end in zip([None, *marks], [*marks, None], strict=True):
                 members = frozenset(
                     area
                     for area, (home, name) in names.items()
                     if province(home, name, start or date(1950, 1, 1)) == plate
                 )
-                if members and history and history[-1][1] == start and history[-1][2] == members:
-                    history[-1] = (history[-1][0], end, members)
+                exact = whole(start, members)
+                if members and history and history[-1][1] == start and history[-1][2:] == (members, exact):
+                    history[-1] = (history[-1][0], end, members, exact)
                 elif members:
-                    history.append((start, end, members))
-            versions += [("il", plate, start, end, members, end is None) for start, end, members in history]
+                    history.append((start, end, members, exact))
+            versions += [("il", plate, *version) for version in history]
         changes = sorted(set(starts.values()) | set(historical.values()))
         spans = list(zip([None, *changes], [*changes, None], strict=True))
         held_by: dict[date | None, dict[str, frozenset[str]]] = {}
@@ -244,26 +300,25 @@ def parse() -> None:
             history = []
             for start, end in spans:
                 members = held_by[start].get(area)
-                if members and history and history[-1][1] == start and history[-1][2] == members:
-                    history[-1] = (history[-1][0], end, members)
+                exact = members is not None and whole(start, members)
+                if members and history and history[-1][1] == start and history[-1][2:] == (members, exact):
+                    history[-1] = (history[-1][0], end, members, exact)
                 elif members:
-                    history.append((start, end, members))
-            versions += [("ilce", area, start, end, members, members == {area}) for start, end, members in history]
+                    history.append((start, end, members, exact))
+            versions += [("ilce", area, *version) for version in history]
         elections = sorted({day for held in compositions.values() for day in held})
         for code, held in compositions.items():
             history = []
             for day in sorted(held):
                 members = frozenset(area for area in names if owner(area, day) in held[day])
-                if history and history[-1][2] == members:
+                exact = whole(day, members)
+                if history and history[-1][2:] == (members, exact):
                     continue
                 if history:
-                    history[-1] = (history[-1][0], day, history[-1][2])
-                history.append((day, None, members))
-            history[-1] = (history[-1][0], next((day for day in elections if day > max(held)), None), history[-1][2])
-            versions += [
-                ("secim_cevresi", code, start, end, members, all(owner(area, start) == area for area in members))
-                for start, end, members in history
-            ]
+                    history[-1] = (history[-1][0], day, *history[-1][2:])
+                history.append((day, None, members, exact))
+            history[-1] = (history[-1][0], next((day for day in elections if day > max(held)), None), *history[-1][2:])
+            versions += [("secim_cevresi", code, *version) for version in history]
 
         lineage = []
         for area, (home, name) in names.items():
@@ -275,6 +330,11 @@ def parse() -> None:
                 elif plate is not None:
                     history.append((start, end, plate))
             lineage += [(area, provinces[plate], start, end) for start, end, plate in history]
+        lineage += [
+            (area, provinces[plate], end, historical[area])
+            for area, (plate, end) in legal.items()
+            if historical[area] > end
+        ]
         boundaries = []
         for scheme, ranges in (
             ("tr.il", periods),
@@ -443,6 +503,27 @@ def emit() -> Path:
             notes=NOTES,
         )
         cs.artifact(raw.cached(SOURCE, URL), source)
+        title = "Yüksek Seçim Kurulu decisions 265, 299, and 303 on the 1987 electoral districts"
+        decisions = cs.source("Yüksek Seçim Kurulu", title)
+        cs.add(
+            "source",
+            id=decisions,
+            kind="official_body",
+            publisher="Yüksek Seçim Kurulu",
+            title=title,
+            url=f"{GAZETTE}/{DECISIONS[0]}.pdf",
+            license=UNLICENSED,
+            license_url=None,
+            attribution="Yüksek Seçim Kurulu, Resmî Gazete",
+            notes=(
+                "The ilçeler in each electoral district of the 1987-11-29 general election: decision 265 (Resmî "
+                "Gazete 19510, 1987-07-07, annex 2), with Ankara's districts from decision 299 (RG 19519) and "
+                "Ordu's from decision 303 (RG 19525), transcribed in tkgm_districts.tsv. İstanbul's Bakırköy and "
+                "İzmir's Merkez were divided between two districts by mahalle (annex 3) and are not drawn."
+            ),
+        )
+        for issue in DECISIONS:
+            cs.artifact(raw.cached(SOURCE, f"{GAZETTE}/{issue}.pdf"), decisions)
         nation = cs.area("tr.nation", "TR")
         cs.manifest["scope"] = {
             "polity": "TR",
