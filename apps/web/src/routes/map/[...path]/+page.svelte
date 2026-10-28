@@ -96,6 +96,7 @@
   let isFlippedOnly = $state(query.get("flipped") === "1");
   let hovered = $state<number | null>(null);
   let pinned = $state<number | null>(null);
+  let anchor = $state<[number, number] | null>(null);
   let pointer = $state<{ x: number; y: number } | null>(null);
   let term = $state("");
   let isKeyOpen = $state(false);
@@ -683,7 +684,12 @@
   const padding = (width: number) => {
     const side = Math.round(Math.min(320, width * 0.16));
     return width >= 768
-      ? { top: 64, right: side, bottom: 24, left: side }
+      ? {
+          top: 64,
+          right: side,
+          bottom: 24,
+          left: width >= 1024 ? Math.max(side, 336) : side,
+        }
       : {
           top: 64,
           right: 16,
@@ -726,6 +732,8 @@
           pinned = null;
           return;
         }
+        const at = engine.gl?.unproject([point.x, point.y]);
+        anchor = at == null ? null : [at.lng, at.lat];
         pinned = k;
         hovered = k;
         tapped = point;
@@ -1173,6 +1181,7 @@
           0.4,
       ),
     );
+    anchor = [x, y];
     pinned = k;
     engine.fly([x, y], zoom);
   }
@@ -1479,6 +1488,40 @@
           k,
         );
       }
+    });
+  });
+
+  $effect(() => {
+    const at = pinned == null ? null : anchor;
+    void seen;
+    if (engine.gl == null) {
+      return;
+    }
+    untrack(() => {
+      engine.points("pin", at == null ? [] : [{ at }]);
+      engine.add(
+        {
+          id: "pin",
+          type: "circle",
+          source: "pin",
+          paint: {
+            "circle-radius": 7,
+            "circle-color": "rgba(0, 0, 0, 0)",
+            "circle-stroke-color": "var(--foreground)",
+            "circle-stroke-width": 2,
+            "circle-stroke-opacity": [
+              "interpolate",
+              ["linear"],
+              ["zoom"],
+              8,
+              1,
+              10,
+              0,
+            ],
+          },
+        },
+        "focus",
+      );
     });
   });
 
@@ -2180,7 +2223,7 @@
     {#if entry != null}
       <aside
         class={cn(
-          "absolute inset-e-3 inset-bs-3 z-10 overflow-y-auto rounded-sm bg-card/96 p-3.5 shadow-menu ring-1 ring-border inline-[min(19.5rem,calc(100%-1.5rem))] max-block-[calc(100%-1.5rem)] max-sm:inset-bs-auto max-sm:inset-be-3 max-sm:max-block-[55%]",
+          "absolute inset-e-3 inset-bs-3 z-10 overflow-y-auto rounded-sm bg-card/96 p-3.5 shadow-menu ring-1 ring-border inline-[min(19.5rem,calc(100%-1.5rem))] max-block-[calc(100%-1.5rem)] max-sm:inset-s-3 max-sm:inset-bs-auto max-sm:inset-be-3 max-sm:inline-auto max-sm:max-block-[55%]",
           {
             "max-sm:hidden [@media(max-height:30rem)]:hidden":
               pinned == null || isKeyOpen,

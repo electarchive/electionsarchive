@@ -256,8 +256,9 @@
       {#each marks as mark, index (index)}
         {const at = $derived(x(mark.margin))}
         {const row = $derived(rows[index] ?? 0)}
+        {const half = $derived((mark.name.length + 5) * 3.2)}
         {const anchor = $derived(
-          at < width * 0.15 ? "start" : at > width * 0.85 ? "end" : "middle",
+          at < half ? "start" : at > width - half ? "end" : "middle",
         )}
         <line
           x1={at}
@@ -327,12 +328,9 @@
       {#each swarm as dot (dot.index)}
         {const entry = $derived(siblings.places[dot.index])}
         {#if entry?.isOwn === true}
+          {const half = $derived((place.name.length + 5) * 3.8)}
           {const anchor = $derived(
-            dot.cx < width * 0.15
-              ? "start"
-              : dot.cx > width * 0.85
-                ? "end"
-                : "middle",
+            dot.cx < half ? "start" : dot.cx > width - half ? "end" : "middle",
           )}
           <line
             x1={dot.cx}
