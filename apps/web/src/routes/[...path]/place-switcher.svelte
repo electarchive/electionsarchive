@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { resolve } from "$app/paths";
   import ChevronDownIcon from "@lucide/svelte/icons/chevron-down";
   import * as Command from "#lib/components/ui/command/index.js";
   import * as Drawer from "#lib/components/ui/drawer/index.js";
@@ -10,6 +9,7 @@
   import { swatch } from "#lib/party.js";
   import { orpc } from "#lib/rpc.js";
   import { cn } from "#lib/utils.js";
+  import { unit } from "./unit.js";
 
   const {
     source,
@@ -88,7 +88,7 @@
         {#each places.rows as row (row.path ?? row.name)}
           {#if row.path != null}
             <Command.LinkItem
-              href={resolve("/[...path]", { path: row.path })}
+              href={unit(row.path)}
               value={row.name}
               data-checked={row.name === current}
               onSelect={() => toggle(false)}

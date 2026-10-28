@@ -51,6 +51,7 @@
   import Slate from "./slate.svelte";
   import Stv from "./stv.svelte";
   import Tally from "./tally.svelte";
+  import { carried, unit } from "./unit.js";
   import Wording from "./wording.svelte";
 
   const {
@@ -1367,8 +1368,10 @@
                 })}?{crumb.query}">{crumb.name}</a
               >
             {:else if index < contest.scope.trail.length - 1 && crumb.path != null}
-              <Preview class="hover:highlighter" path={crumb.path}
-                >{crumb.name}</Preview
+              <Preview
+                class="hover:highlighter"
+                path={crumb.path}
+                search={carried()}>{crumb.name}</Preview
               >
             {:else if index < contest.scope.trail.length - 1}
               <span class="text-muted-foreground">{crumb.name}</span>
@@ -1536,9 +1539,6 @@
     {m.no_results()}
   </p>
 {:else}
-  {#if contest.count != null}
-    <Count count={contest.count} {here} isDerived={contest.isDerived} />
-  {/if}
   {#if contest.electors != null}
     <Electors electors={contest.electors} {ladder} bind:focus />
   {/if}
@@ -1557,6 +1557,14 @@
     <div
       class="@container grid content-start gap-1 bg-card px-1.5 pbs-2 pbe-2.5"
     >
+      {#if contest.count != null}
+        <Count
+          count={contest.count}
+          {here}
+          table="rounds"
+          isDerived={contest.isDerived && !isMapped}
+        />
+      {/if}
       {@render results()}
     </div>
   {/snippet}
@@ -1611,6 +1619,15 @@
       {#if placed.isOpening === true}
         <p class="px-1 pbs-1 text-xs text-pretty text-muted-foreground">
           {m.places_opening()}
+        </p>
+      {/if}
+      {#if contest.isDerived && contest.count != null}
+        <p class="px-1 pbs-1 text-xs text-pretty text-muted-foreground">
+          {m.count_derived()}
+          <a
+            class="text-foreground underline decoration-border underline-offset-4 hover:decoration-foreground"
+            href="#notes">{m.count_derived_link()}</a
+          >
         </p>
       {/if}
     {:else if locating != null}
@@ -1686,9 +1703,7 @@
                   "flex items-center gap-1.5 rounded-xs px-1.5 text-[0.8125rem] block-7 hover:bg-secondary",
                   { "bg-secondary": focus === row.k },
                 )}
-                href={row.path == null
-                  ? undefined
-                  : resolve("/[...path]", { path: row.path })}
+                href={row.path == null ? undefined : unit(row.path)}
                 style:--party={tones[row.leader ?? 0]}
                 role={row.path == null ? "presentation" : undefined}
                 onpointerenter={() => (focus = row.k)}

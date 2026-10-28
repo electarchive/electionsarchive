@@ -17,6 +17,7 @@
   import { cn } from "#lib/utils.js";
   import type { PageData } from "./$types";
   import Preview from "./preview.svelte";
+  import { unit } from "./unit.js";
 
   let {
     places,
@@ -830,7 +831,7 @@
                 {const target = $derived(row.path)}
                 <a
                   class="absolute inset-0"
-                  href={resolve("/[...path]", { path: target })}
+                  href={unit(target)}
                   tabindex={-1}
                   aria-hidden="true"
                 ></a>
@@ -882,9 +883,7 @@
                       {...props}
                       type={undefined}
                       class="relative z-1 flex overflow-hidden rounded-xs bg-muted block-3"
-                      href={row.path == null
-                        ? undefined
-                        : resolve("/[...path]", { path: row.path })}
+                      href={row.path == null ? undefined : unit(row.path)}
                       aria-hidden="true"
                     >
                       {#each row.shares as share, index (index)}
@@ -1010,9 +1009,7 @@
                         {...props}
                         type={undefined}
                         class="relative z-1 flex items-center justify-end gap-2"
-                        href={row.path == null
-                          ? undefined
-                          : resolve("/[...path]", { path: row.path })}
+                        href={row.path == null ? undefined : unit(row.path)}
                         style:--party={swatch(toward?.color, toward?.key ?? "")}
                       >
                         {#if flip != null}

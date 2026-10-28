@@ -288,6 +288,7 @@
   "count_next": "Next round",
   "count_of": "Round {round} of {last}",
   "count_continuing": "{count} candidates remaining",
+  "count_more": "{count} more",
   "count_eliminated": "Eliminated after this round: {names}",
   "count_table": "Round by round",
   "count_table_note": "Each share is of the ballots still counting in that round.",

@@ -1,9 +1,10 @@
 <script lang="ts">
+  import { goto } from "$app/navigation";
   import { resolve } from "$app/paths";
-  import { page } from "$app/state";
+  import { navigating, page } from "$app/state";
   import ChevronLeftIcon from "@lucide/svelte/icons/chevron-left";
   import ChevronRightIcon from "@lucide/svelte/icons/chevron-right";
-  import { percent } from "#lib/format.js";
+  import { count as figure, percent } from "#lib/format.js";
   import { m } from "#lib/paraglide/messages.js";
   import { getLocale } from "#lib/paraglide/runtime.js";
   import { swatch } from "#lib/party.js";
@@ -13,33 +14,21 @@
   const {
     count,
     here,
+    table,
     isDerived,
   }: {
     count: NonNullable<
       Extract<PageData, { kind: "contest" }>["contest"]["count"]
     >;
     here: string;
+    table: string;
     isDerived: boolean;
   } = $props();
 
   const uid = $props.id();
-  const index = $derived(count.round - 1);
-  const standing = $derived.by(() => {
-    const rows = count.rows.filter((row) => row.votes[index] != null);
-    let total = 0;
-    for (const row of rows) {
-      total += row.votes[index] ?? 0;
-    }
-    return rows.map((row) => ({
-      ...row,
-      share: total === 0 ? 0 : (row.votes[index] ?? 0) / total,
-    }));
-  });
-  const leaving = $derived(
-    count.round === count.last
-      ? []
-      : standing.filter((row) => row.votes[index + 1] == null),
-  );
+
+  let pending = $state<{ round: number; href: string } | null>(null);
+
   const href = (round: number) => {
     const kept = [...page.url.searchParams].filter(([key]) => key !== "round");
     const query = new URLSearchParams(
@@ -49,139 +38,254 @@
     const suffix = text === "" ? ("" as const) : (`?${text}` as const);
     return resolve(`/[...path]${suffix}`, { path: here });
   };
-  const rounds = $derived(
-    Array.from({ length: count.last }, (_, step) => step + 1),
+  const shown = $derived(
+    pending != null &&
+      navigating.to != null &&
+      `${navigating.to.url.pathname}${navigating.to.url.search}` ===
+        pending.href
+      ? pending.round
+      : count.round,
   );
-  const list = new Intl.ListFormat(getLocale(), {
-    style: "long",
-    type: "conjunction",
-  });
+  const rounds = $derived(
+    Array.from({ length: count.last }, (_, step) => {
+      let total = 0;
+      for (const row of count.rows) {
+        total += row.votes[step] ?? 0;
+      }
+      return {
+        round: step + 1,
+        rows: count.rows
+          .filter((row) => (row.votes[step] ?? 0) > 0)
+          .map((row) => ({
+            key: row.key,
+            label: row.label,
+            color: swatch(row.color, row.key),
+            share: total === 0 ? 0 : (row.votes[step] ?? 0) / total,
+          })),
+      };
+    }),
+  );
+  const standing = $derived(
+    count.rows.filter((row) => row.votes[shown - 1] != null),
+  );
+  const leaving = $derived(
+    shown === count.last
+      ? []
+      : standing.filter((row) => row.votes[shown] == null),
+  );
+  const list = $derived(
+    new Intl.ListFormat(getLocale(), { style: "long", type: "conjunction" }),
+  );
+  const named = (keys: Array<string>) =>
+    list.format(
+      keys.map((key) => count.rows.find((row) => row.key === key)?.label ?? ""),
+    );
   const action = $derived.by(() => {
-    const step = count.stv?.steps[index];
+    const step = count.stv?.steps[shown - 1];
     if (step == null) {
       return null;
     }
-    const label = (keys: Array<string>) =>
-      list.format(
-        keys.map(
-          (key) => count.rows.find((row) => row.key === key)?.label ?? "",
-        ),
-      );
     return {
       text:
         step.kind === "first"
           ? m.stv_first()
           : step.kind === "surplus"
-            ? m.stv_surplus({ names: label(step.from) })
+            ? m.stv_surplus({ names: named(step.from) })
             : step.kind === "exclusion"
-              ? m.stv_exclusion({ names: label(step.from) })
+              ? m.stv_exclusion({ names: named(step.from) })
               : m.stv_none(),
-      elected: step.elected.length === 0 ? null : label(step.elected),
+      elected: step.elected.length === 0 ? null : named(step.elected),
     };
   });
+  const out = $derived.by(() => {
+    const names = leaving.map((row) => row.label);
+    const more = m.count_more({ count: figure(names.length - 3) });
+    return list
+      .formatToParts(names.length > 4 ? [...names.slice(0, 3), more] : names)
+      .map((part) => ({
+        ...part,
+        isMore: names.length > 4 && part.value === more,
+      }));
+  });
+  const name = (round: number) =>
+    count.stv != null
+      ? m.stv_count({ count: round })
+      : round === count.last
+        ? m.count_final()
+        : m.count_round({ round });
+
+  const go = (round: number) => {
+    const target = href(round);
+    pending = { round, href: target };
+    return target;
+  };
 </script>
 
 {#snippet step(round: number, label: string, Icon: typeof ChevronLeftIcon)}
   {#if round < 1 || round > count.last}
     <span
-      class="flex shrink-0 items-center justify-center rounded-sm border border-input bg-card text-muted-foreground opacity-40 block-8 inline-8"
+      class="grid place-items-center rounded-sm text-muted-foreground/40 block-7 inline-7 pointer-coarse:block-9 pointer-coarse:inline-9"
       aria-hidden="true"><Icon class="block-4 inline-4" /></span
     >
   {:else}
     <a
-      class="flex shrink-0 items-center justify-center rounded-sm border border-input bg-card keycap block-8 inline-8 hover:bg-secondary"
+      class="grid place-items-center rounded-sm text-muted-foreground keycap block-7 inline-7 hover:bg-secondary hover:text-foreground pointer-coarse:block-9 pointer-coarse:inline-9"
       href={href(round)}
       aria-label={label}
-      data-sveltekit-reset="false"><Icon class="block-4 inline-4" /></a
+      data-sveltekit-reset="false"
+      onclick={() => go(round)}><Icon class="block-4 inline-4" /></a
     >
   {/if}
 {/snippet}
 
-<nav
-  class="col-span-12 grid gap-2.5 bg-card px-3.5 pbs-3 pbe-3.5"
+<section
+  class="mbe-1 grid gap-2 border-be px-2 pbs-1 pbe-3"
   aria-labelledby="{uid}-title"
 >
-  <div class="flex flex-wrap items-center justify-between gap-x-6 gap-y-2">
-    <div class="grid gap-0.5">
-      <h2 id="{uid}-title" class="text-sm font-semibold">
-        {count.stv != null
-          ? m.count_title_stv()
-          : count.isSupplementary
-            ? m.count_title_supplementary()
-            : m.count_title()}
-      </h2>
-      <p class="text-[0.8125rem] text-muted-foreground">
-        {#if action == null}
-          {count.round === count.last
-            ? m.count_final()
-            : m.count_of({ round: count.round, last: count.last })}.
-          {m.count_continuing({ count: standing.length })}
-        {:else}
-          {m.stv_step({
-            count: count.round,
-            last: count.last,
-            action: action.text,
-          })}
-          {#if action.elected != null}
-            {m.stv_step_elected({ names: action.elected })}
-          {/if}
-        {/if}
-      </p>
+  <div class="flex items-center justify-between gap-3">
+    <h2 id="{uid}-title" class="text-sm font-semibold">
+      {count.stv != null
+        ? m.count_title_stv()
+        : count.isSupplementary
+          ? m.count_title_supplementary()
+          : m.count_title()}
+    </h2>
+    <div class="-me-1.5 flex items-center">
+      {@render step(shown - 1, m.count_previous(), ChevronLeftIcon)}
+      {@render step(shown + 1, m.count_next(), ChevronRightIcon)}
     </div>
-    <div class="flex items-stretch gap-1.5">
-      {@render step(count.round - 1, m.count_previous(), ChevronLeftIcon)}
-      <ol class="flex">
-        {#each rounds as round (round)}
-          <li class="-ms-px first:ms-0">
-            <a
+  </div>
+  <ol
+    class="-mx-1 grid auto-cols-[minmax(1.75rem,1fr)] grid-flow-col overflow-x-auto"
+    {@attach (node: HTMLElement) => {
+      const cell = node.children[shown - 1];
+      if (cell instanceof HTMLElement) {
+        node.scrollLeft = Math.max(
+          0,
+          cell.offsetLeft + cell.offsetWidth - node.clientWidth,
+        );
+      }
+    }}
+  >
+    {#each rounds as entry (entry.round)}
+      {const isShown = $derived(entry.round === shown)}
+      <li class="flex">
+        <a
+          class={cn(
+            "group relative grid flex-1 content-end gap-1.5 rounded-xs px-1 pbs-2 pbe-1.5 keycap pointer-coarse:pbs-3",
+            {
+              "bg-secondary text-foreground": isShown,
+              "text-muted-foreground hover:bg-secondary/60 hover:text-foreground":
+                !isShown,
+            },
+          )}
+          href={href(entry.round)}
+          aria-current={isShown ? "step" : undefined}
+          aria-label={name(entry.round)}
+          tabindex={isShown ? 0 : -1}
+          data-sveltekit-reset="false"
+          onclick={() => go(entry.round)}
+          onkeydown={(event) => {
+            const next =
+              event.key === "ArrowLeft"
+                ? shown - 1
+                : event.key === "ArrowRight"
+                  ? shown + 1
+                  : event.key === "Home"
+                    ? 1
+                    : event.key === "End"
+                      ? count.last
+                      : null;
+            if (
+              next == null ||
+              next < 1 ||
+              next > count.last ||
+              next === shown
+            ) {
+              return;
+            }
+            event.preventDefault();
+            const links = event.currentTarget
+              .closest("ol")
+              ?.querySelectorAll("a");
+            links?.[next - 1]?.focus();
+            void goto(go(next), { reset: false }).catch(() => null);
+          }}
+        >
+          <span
+            class={cn("flex gap-px overflow-hidden rounded-[1px]", {
+              "block-2": isShown,
+              "opacity-70 block-1 group-hover:opacity-100": !isShown,
+            })}
+            aria-hidden="true"
+          >
+            {#each entry.rows as row (row.key)}
+              <span
+                class="bg-(--party) min-inline-px"
+                style:--party={row.color}
+                style:flex-grow={row.share}
+              ></span>
+            {/each}
+          </span>
+          <span
+            class={cn(
+              "truncate text-center font-figures text-xs leading-none tabular-nums",
+              { "font-semibold": isShown },
+            )}
+            aria-hidden="true"
+            >{count.last > 5 ? entry.round : name(entry.round)}</span
+          >
+          {#if isShown}
+            <span
               class={cn(
-                "relative flex items-center justify-center border border-input bg-card px-2 font-figures text-[0.8125rem] tabular-nums block-8 min-inline-8",
+                "absolute inset-x-1 -inset-be-px bg-foreground block-0.5",
                 {
-                  "z-10 border-foreground highlighter font-semibold":
-                    round === count.round,
-                  "text-muted-foreground hover:z-10 hover:border-foreground hover:text-foreground":
-                    round !== count.round,
+                  "animate-pulse motion-reduce:animate-none":
+                    shown !== count.round,
                 },
               )}
-              href={href(round)}
-              aria-current={round === count.round ? "step" : undefined}
-              aria-label={count.stv != null
-                ? m.stv_count({ count: round })
-                : round === count.last
-                  ? m.count_final()
-                  : m.count_round({ round })}
-              data-sveltekit-reset="false">{round}</a
-            >
-          </li>
-        {/each}
-      </ol>
-      {@render step(count.round + 1, m.count_next(), ChevronRightIcon)}
-    </div>
-  </div>
-  <div
-    class="flex gap-px overflow-hidden rounded-xs block-2"
-    aria-hidden="true"
-  >
-    {#each standing as row (row.key)}
-      <span
-        class="bg-(--party)"
-        style:--party={swatch(row.color, row.key)}
-        style:flex-grow={row.share}
-      ></span>
+              aria-hidden="true"
+            ></span>
+          {/if}
+        </a>
+      </li>
     {/each}
-  </div>
-  {#if leaving.length > 0 && action == null}
-    <p class="text-[0.8125rem]">
-      {m.count_eliminated({
-        names: new Intl.ListFormat(getLocale(), {
-          style: "long",
-          type: "conjunction",
-        }).format(leaving.map((row) => row.label)),
-      })}
-    </p>
-  {/if}
+  </ol>
+  <p
+    class="text-[0.8125rem] text-pretty text-muted-foreground"
+    aria-live="polite"
+  >
+    {#if action == null}
+      {#if count.last > 5}
+        <span class="font-semibold text-foreground"
+          >{shown === count.last
+            ? m.count_final()
+            : m.count_of({ round: shown, last: count.last })}.</span
+        >
+      {/if}
+      {m.count_continuing({ count: standing.length })}.
+      {#if leaving.length > 0}
+        {const frame = $derived(
+          m.count_eliminated({ names: "\u0000" }).split("\u0000"),
+        )}
+        <span class="text-foreground"
+          >{frame[0]}{#each out as part, index (index)}{#if part.isMore}<a
+                class="underline decoration-border underline-offset-4 hover:decoration-foreground"
+                href="#{table}">{part.value}</a
+              >{:else}{part.value}{/if}{/each}{frame[1]}.</span
+        >
+      {/if}
+    {:else}
+      {m.stv_step({ count: shown, last: count.last, action: action.text })}
+      {#if action.elected != null}
+        <span class="text-foreground"
+          >{m.stv_step_elected({ names: action.elected })}</span
+        >
+      {/if}
+    {/if}
+  </p>
   {#if isDerived}
-    <p class="text-[0.8125rem] text-muted-foreground">
+    <p class="text-xs text-pretty text-muted-foreground">
       {m.count_derived()}
       <a
         class="text-foreground underline decoration-border underline-offset-4 hover:decoration-foreground"
@@ -190,7 +294,8 @@
     </p>
   {/if}
   <p class="sr-only">
-    {#each standing as row (row.key)}{row.label} {percent(row.share)}.
+    {#each rounds[shown - 1]?.rows ?? [] as row (row.key)}{row.label}
+      {percent(row.share)}.
     {/each}
   </p>
-</nav>
+</section>

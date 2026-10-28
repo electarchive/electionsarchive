@@ -28,6 +28,7 @@
   import { swatch } from "#lib/party.js";
   import { cn } from "#lib/utils.js";
   import type { PageData } from "./$types";
+  import { unit } from "./unit.js";
 
   type Places = NonNullable<
     Extract<PageData, { kind: "contest" }>["contest"]["places"]
@@ -274,7 +275,7 @@
             clearTimeout(dwell);
             if (path != null) {
               dwell = setTimeout(() => {
-                const href = resolve("/[...path]", { path });
+                const href = unit(path);
                 if (focus === k && warmed[href] !== true) {
                   warmed[href] = true;
                   void preloadData(href);
@@ -913,7 +914,7 @@
     if (path == null) {
       return;
     }
-    const href = resolve("/[...path]", { path });
+    const href = unit(path);
     const box = engine.shape(engine.tiles(layer), k);
     if (box == null || calm) {
       void goto(href);
@@ -931,7 +932,8 @@
       if (!isGone && opening === k) {
         isGone = true;
         const image = engine.snapshot();
-        handoff = image == null ? null : { path: href, image };
+        handoff =
+          image == null ? null : { path: href.split("?")[0] ?? href, image };
         void goto(href).finally(() => {
           opening = null;
         });
@@ -2024,7 +2026,7 @@
     {#if up != null}
       <a
         class="absolute inset-s-2 inset-bs-2 flex items-center gap-1.5 rounded-sm bg-card ps-2 pe-2.5 text-[0.8125rem] font-semibold shadow-menu ring-1 ring-border block-8 max-inline-[calc(100%-4.5rem)] hover:bg-secondary pointer-coarse:block-10"
-        href={resolve("/[...path]", { path: up.path })}
+        href={unit(up.path)}
         bind:clientHeight={upHeight}
         data-export-skip
         ><ArrowUpLeftIcon
@@ -2541,7 +2543,7 @@
       {#each adjoining as entry (entry.k)}
         <a
           class="font-semibold underline decoration-border underline-offset-4 hover:decoration-foreground"
-          href={resolve("/[...path]", { path: entry.path })}
+          href={unit(entry.path)}
           onpointerenter={() => (near = entry.k)}
           onpointerleave={() => {
             if (!nearPinned) {
@@ -2580,8 +2582,7 @@
       </div>
       <a
         class="flex items-center justify-center rounded-sm border border-foreground bg-marker text-sm font-semibold text-[#15171a] block-11"
-        href={resolve("/[...path]", { path: place.path })}
-        >{m.map_open({ place: place.name })}</a
+        href={unit(place.path)}>{m.map_open({ place: place.name })}</a
       >
     </div>
   {/if}

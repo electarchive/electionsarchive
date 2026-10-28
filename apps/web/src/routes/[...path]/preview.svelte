@@ -12,11 +12,13 @@
 
   const {
     path,
+    search = "",
     class: className,
     onclick,
     children,
   }: {
     path: string;
+    search?: `?${string}` | "";
     class?: string;
     onclick?: (
       event: MouseEvent & { currentTarget: HTMLAnchorElement },
@@ -24,7 +26,7 @@
     children: Snippet;
   } = $props();
 
-  const href = $derived(resolve("/[...path]", { path }));
+  const href = $derived(resolve(`/[...path]${search}`, { path }));
 
   let open = $state(false);
   let loaded = $state<{
