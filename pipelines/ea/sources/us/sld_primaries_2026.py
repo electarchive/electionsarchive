@@ -1,4 +1,5 @@
 import csv
+import html
 import json
 import re
 import subprocess
@@ -361,6 +362,7 @@ DELIVERED = {
     "ME": (DATA / "inbox" / "manual" / "MF-148", "https://www.maine.gov/sos/elections-voting/election-results-data"),
     "MT": (DATA / "inbox" / "manual" / "MF-149", "https://electionresults.mt.gov/ResultsExport.aspx?eid=450002928"),
     "NH": (DATA / "inbox" / "manual" / "MF-150", "https://www.sos.nh.gov/2026-state-primary-election-results"),
+    "TX": (DATA / "inbox" / "manual" / "MF-152", "https://goelect.txelections.civixapps.com/ivis-enr-ui"),
 }
 DELIVERED_FILES = {
     "ME": [
@@ -374,6 +376,7 @@ DELIVERED_FILES = {
     ],
     "MT": ["Legislative Results.xlsx"],
     "NH": sorted(path.name for path in DELIVERED["NH"][0].glob("2026-sp-*.xlsx")),
+    "TX": ["CountyByCountyCanvassReport.pdf", "CountyByCountyCanvassReport (1).pdf"],
 }
 ROUNDS += [
     (
@@ -396,6 +399,12 @@ ROUNDS += [
             date(2026, 6, 2),
             "Montana Secretary of State",
             "June 2, 2026 primary election legislative results by county",
+        ),
+        (
+            "TX",
+            date(2026, 5, 26),
+            "Texas Secretary of State",
+            "May 26, 2026 primary runoff elections: county by county canvass reports",
         ),
         (
             "NH",
@@ -528,7 +537,7 @@ def fetch() -> None:
                         media_type="application/json",
                     )
             continue
-        if state in DELIVERED:
+        if state in DELIVERED and address.startswith(DELIVERED[state][1]):
             for name in DELIVERED_FILES[state]:
                 try:
                     raw.cached(SOURCE, f"{DELIVERED[state][1]}#{name}")
@@ -537,9 +546,11 @@ def fetch() -> None:
                         SOURCE,
                         f"{DELIVERED[state][1]}#{name}",
                         (DELIVERED[state][0] / name).read_bytes(),
-                        suffix=".xlsx",
+                        suffix=Path(name).suffix,
                         retrieved_at=datetime(2026, 10, 28, tzinfo=UTC),
-                        media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                        media_type="application/pdf"
+                        if name.endswith(".pdf")
+                        else "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                     )
             continue
         if state == "MD":
@@ -565,7 +576,7 @@ def fetch() -> None:
                     raw.fetch(SOURCE, f"{elstats.MASSACHUSETTS}download/{election}/precincts_include:0/", suffix=".csv")
             continue
         shared(address)
-        for other in SIDECARS.get(state, []):
+        for other in SIDECARS.get(state, []) if state not in DELIVERED else []:
             shared(other)
         if state == "OK":
             token = httpx.put(
@@ -629,7 +640,83 @@ def parse() -> None:
             )
             continue
         rows = []
-        if state in OPENELECTIONS:
+        if state == "TX" and day == date(2026, 5, 26):
+            finalists = defaultdict(list)
+            for frame in frames:
+                for row in frame.filter((pl.col("state") == "TX") & (pl.col("day") == date(2026, 3, 3))).iter_rows(
+                    named=True
+                ):
+                    if row["candidate"] not in finalists[(row["chamber"], row["district"], row["party"])]:
+                        finalists[(row["chamber"], row["district"], row["party"])].append(row["candidate"])
+            for name in DELIVERED_FILES[state]:
+                document = subprocess.run(
+                    ["pdftotext", "-bbox-layout", str(raw.cached(SOURCE, f"{DELIVERED[state][1]}#{name}").path), "-"],
+                    capture_output=True,
+                    check=True,
+                ).stdout.decode()
+                party = "democratic" if "DEMOCRATIC" in re.findall(r">([^<]*)</word>", document)[:40] else "republican"
+                for page in document.split("<page ")[1:]:
+                    lines: dict[float, list[tuple[float, float, str]]] = {}
+                    for left, top, right, word in re.findall(
+                        r'<word xMin="([\d.]+)" yMin="([\d.]+)" xMax="([\d.]+)"[^>]*>([^<]*)</word>', page
+                    ):
+                        key = next((row for row in lines if abs(row - float(top)) < 2), float(top))
+                        lines.setdefault(key, []).append((float(left), float(right), html.unescape(word)))
+                    contest = None
+                    header: list[tuple[float, float, float, str]] = []
+                    names: list[str] = []
+                    for row in sorted(lines):
+                        words = sorted(lines[row])
+                        line = " ".join(word for *_, word in words)
+                        title = re.fullmatch(r"STATE (SENATOR, DISTRICT|REPRESENTATIVE DISTRICT) (\d+)", line)
+                        if title is not None:
+                            contest = ("senate" if "SENATOR" in title[1] else "house", title[2])
+                            header, names = [], []
+                            continue
+                        if contest is None or re.search(r"\bPage \d+ of \d+", line):
+                            continue
+                        numbers = [(left + right) / 2 for left, right, word in words if re.fullmatch(r"[\d,]+", word)]
+                        if not numbers or re.fullmatch(r"[\d,]+", words[0][2]):
+                            header += [(row, *word) for word in words]
+                            continue
+                        if line.startswith("TOTAL VOTES"):
+                            contest = None
+                            continue
+                        if not names:
+                            columns = [""] * (len(numbers) - 1)
+                            for _, left, right, word in sorted(header):
+                                if re.fullmatch(r"County|Total|Votes|\[[DR]\]|\(I\)", word):
+                                    continue
+                                column = min(
+                                    range(len(numbers)), key=lambda index: abs(numbers[index] - (left + right) / 2)
+                                )
+                                if column < len(columns):
+                                    columns[column] += re.sub(r"[^A-Z]", "", word.upper())
+                            for letters in columns:
+                                names.append(
+                                    next(
+                                        (
+                                            candidate
+                                            for candidate in finalists[(*contest, party)]
+                                            if re.sub(
+                                                r"[^A-Z]",
+                                                "",
+                                                re.sub(r"(?i),?\s+(jr|sr|ii|iii|iv)\.?$", "", candidate)
+                                                .split()[-1]
+                                                .upper(),
+                                            )
+                                            in letters
+                                        ),
+                                        letters.title(),
+                                    )
+                                )
+                        votes = [word for *_, word in words if re.fullmatch(r"[\d,]+", word)]
+                        county = " ".join(word for *_, word in words if not re.fullmatch(r"[\d,]+", word))
+                        rows.extend(
+                            (contest[0], contest[1], party, candidate, county, int(count.replace(",", "")))
+                            for candidate, count in zip(names, votes, strict=False)
+                        )
+        if state in OPENELECTIONS and day == OPENELECTIONS[state][2]:
             for county, office, district, party, candidate, votes, *_ in pl.read_csv(
                 path, infer_schema=False
             ).iter_rows():
@@ -1617,7 +1704,7 @@ def emit() -> Path:
                     kind="methodology",
                     body_md=(
                         f"Results by county from OpenElections' 2026 primary file for {OPENELECTIONS[state][0]}, a community compilation of the state's county results."
-                        if state in OPENELECTIONS
+                        if state in OPENELECTIONS and day == OPENELECTIONS[state][2]
                         else f"District totals from the {publisher}'s official results."
                         if state == "DE"
                         else f"Results by county from the {publisher}'s election results archive"
