@@ -358,6 +358,31 @@ FEEDS = {
         "Essex County Clerk",
         "Official General Election Sample Ballot, November 3, 2026",
     ),
+    "NJ-34003": (
+        "https://docs.google.com/spreadsheets/d/1uS4o-ogeeIrZMyfxYs0Eg5WDcSYPuIrkMskOTXKJDP4/edit?usp=sharing",
+        "Bergen County Clerk",
+        "2026 General Election Candidate List (Unofficial)",
+    ),
+    "IL-17043": (
+        "https://www.dupagecounty.gov/elections/",
+        "DuPage County Clerk Election Division",
+        "2026 General Official Candidate Listing",
+    ),
+    "AZ-04019": (
+        "https://www.pima.gov/2026-general-election-official-candidate-list",
+        "Pima County Elections Department",
+        "2026 General Election Official Candidate List",
+    ),
+    "NV-32003": (
+        "https://www.clarkcountynv.gov/government/departments/elections/",
+        "Clark County Election Department",
+        "Offices Up for Election and Candidates, 2026 General Election",
+    ),
+    "UT-49035": (
+        "https://www.saltlakecounty.gov/clerk/elections/",
+        "Salt Lake County Clerk",
+        "Certification of Candidates, 2026 General Election",
+    ),
     "CA-06099": (
         "https://www.stanvote.gov/pdf/candidate-list.pdf",
         "Stanislaus County Registrar of Voters",
@@ -660,6 +685,11 @@ DELIVERED = {
     "NJ-34017": DATA / "inbox" / "y26" / "nj" / "hudson.pdf",
     "CA-06013": DATA / "inbox" / "manual" / "MF-189" / "contra-costa-2026-general-candidates-and-measures.html",
     "NJ-34013": DATA / "inbox" / "y26" / "nj" / "essex.pdf",
+    "NJ-34003": DATA / "inbox" / "y26" / "nj" / "bergen.xlsx",
+    "IL-17043": DATA / "inbox" / "y26" / "il" / "dupage.pdf",
+    "AZ-04019": DATA / "inbox" / "y26" / "az" / "pima.pdf",
+    "NV-32003": DATA / "inbox" / "y26" / "nv" / "clark.pdf",
+    "UT-49035": DATA / "inbox" / "y26" / "ut" / "salt_lake.pdf",
     "FL-12057": DATA / "inbox" / "manual" / "MF-177" / "2026 General Election_All Races Sample Ballot.pdf",
     "FL-12031": DATA / "inbox" / "manual" / "MF-178" / "2026 General All Races_202609210829090089.pdf",
     "FL-12071": DATA / "inbox" / "manual" / "MF-182" / "2026 General Election - All Inclusive Sample Ballot.pdf",
@@ -2173,6 +2203,51 @@ def parse() -> None:
                 }
             )
 
+    sheets = pl.read_excel(
+        raw.cached(SOURCE, FEEDS["NJ-34003"][0]).path, sheet_id=0, has_header=False, infer_schema_length=0
+    )
+    office = ""
+    for cells in sheets["Countywide"].iter_rows():
+        label, post, vote, _, first, last, name = (str(cell or "").strip() for cell in cells[:7])
+        office = post or office
+        if not vote or vote == "VOTE FOR" or not last:
+            continue
+        named, independent = party(label)
+        feeds["NJ-34003"].append(
+            {
+                "county": "Bergen",
+                "contest": "Bergen County "
+                + re.sub(r"(?i)^for (members of the board of county commissioners|county |)", "", office).title()
+                if "COMMISSIONERS" not in office
+                else "Bergen County Commissioner",
+                "seats": NUMBERS.get(vote.title(), 1),
+                "name": cased(name or f"{first} {last}"),
+                "party": named,
+                "independent": independent or named is None,
+                "unexpired": "UNEXP" in office,
+            }
+        )
+    for sheet, label in (("Local Rep.", "Republican"), ("Local Dem.", "Democratic"), ("Indep. & NP", "")):
+        for cells in sheets[sheet].iter_rows():
+            values = [str(cell or "").strip() for cell in cells]
+            town, post, term, vote = values[:4]
+            name = values[-1] or " ".join(values[5:7])
+            if not town or town.startswith("MUNICIPALITY") or not vote or unfilled.search(name) or not name:
+                continue
+            slogan = values[7] if not label else label
+            named, independent = party(slogan or "")
+            feeds["NJ-34003"].append(
+                {
+                    "county": "Bergen",
+                    "contest": f"{town.title()} {re.sub(r'(?i)\s*unexp.*$', '', post).title()}",
+                    "seats": 1 if "UNEXP" in f"{term} {post}".upper() else NUMBERS.get(vote.title(), 1),
+                    "name": cased(name),
+                    "party": named,
+                    "independent": independent or named is None and bool(slogan),
+                    "unexpired": "UNEXP" in f"{term} {post}".upper(),
+                }
+            )
+
     for key, county in (("MI-26017", "Bay"), ("MI-26091", "Lenawee"), ("MI-26021", "Berrien")):
         post, seats, unexpired = "", 0, False
         for line in text(key, "-layout").splitlines():
@@ -2616,7 +2691,7 @@ def parse() -> None:
 
     for row in [
         row
-        for state in ("oh", "fl", "ca", "nj")
+        for state in ("oh", "fl", "ca", "nj", "counties")
         for row in csv.DictReader(
             Path(__file__).with_name(f"local_2026_{state}.tsv").read_text().splitlines(), delimiter="\t"
         )
