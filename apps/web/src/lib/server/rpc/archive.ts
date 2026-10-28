@@ -11385,6 +11385,19 @@ async function races(
                   union all
                   select n.id, n.contest, n.party_id, 1 from nwin n where n.contest in (select id from tree)
                 ),
+                sized as (
+                  select z.seats from body_size z
+                  where z.body_id = ${head.owner}::uuid and z.valid && daterange((select day from last), (select day from last) + 120)
+                  order by lower(z.valid) desc limit 1
+                ),
+                counted as (
+                  select w.* from winners w
+                  where not exists (select from contest k where k.id = w.contest and k.kind = 'body_seats')
+                    or (
+                      select coalesce(sum(l.seats), 0) from winners l
+                      join contest lc on lc.id = l.contest and lc.kind = 'list_allocation'
+                    ) < 0.9 * coalesce((select seats from sized), 0)
+                ),
                 leads as (
                   select distinct on (ch.parent_option_id) ch.parent_option_id as parent, ch.party_id
                   from winners w
@@ -11414,9 +11427,9 @@ async function races(
                   sum(w.seats)::int as seats,
                   (select count(*)::int from roots where ${isInside} and parents <> 1) as doubt,
                   exists (select from roots r join contest n on n.id = r.id where n.notional) as notional,
-                  (select z.seats from body_size z where z.body_id = ${head.owner}::uuid and z.valid @> (select day from last) limit 1) as size,
+                  (select seats from sized) as size,
                   (select day::text from last) as day
-                from winners w
+                from counted w
                 left join leads ld on ld.parent = w.id
                 left join entity_merge pm on pm.entity_id = coalesce(w.party_id, ld.party_id)
                 left join party_affiliation br on br.party_id = coalesce(pm.into_id, w.party_id, ld.party_id)
@@ -11659,7 +11672,9 @@ async function races(
         ...(previous?.rows ?? []).map((row) => row.doubt),
       );
       const before =
-        straddled > 0 || isTier
+        straddled > 0 ||
+        (isTier &&
+          (size == null || filled < size * 0.95 || filled > size * 1.02))
           ? null
           : carried(previous?.rows ?? null, filled, parentOf);
       const { titled, named } = naming(head, single, groups);
@@ -11688,7 +11703,7 @@ async function races(
         isNotional:
           before != null && (previous?.rows ?? []).some((row) => row.notional),
         resized:
-          before != null &&
+          (before != null || (isTier && straddled === 0)) &&
           previous?.rows[0]?.size != null &&
           previous.rows[0].size !== size
             ? previous.rows[0].size
@@ -11729,7 +11744,7 @@ async function races(
         sample: table?.sample ?? null,
         since:
           table?.since ??
-          (before == null
+          (before == null && !(isTier && straddled === 0)
             ? null
             : (previous?.rows[0]?.day?.slice(0, 4) ?? null)),
         size,

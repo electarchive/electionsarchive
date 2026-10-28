@@ -249,7 +249,6 @@
             kind: "body_seats",
             count: 1,
             sample: null,
-            since: null,
             before: base.overall,
             holders: null,
             partners: [],
